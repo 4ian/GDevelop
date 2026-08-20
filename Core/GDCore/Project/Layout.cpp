@@ -566,10 +566,21 @@ GetBehaviorNamesInObjectOrGroup(const gd::ObjectsContainer& project,
   }
 
   // Compute the intersection of the behaviors of all objects.
-  auto behaviorNames = GetBehaviorNamesInObjectOrGroup(
-      project, layout, groupsObjects[0], behaviorType, false);
-  for (size_t i = 1; i < groupsObjects.size(); i++) {
-    auto& objectName = groupsObjects[i];
+  std::vector<gd::String> behaviorNames;
+  size_t objectIndex = 0;
+  // Look for a first that object exists
+  for (; objectIndex < groupsObjects.size(); objectIndex++) {
+    auto &objectName = groupsObjects[objectIndex];
+    if (layout.HasObjectNamed(objectName) ||
+        project.HasObjectNamed(objectName)) {
+      behaviorNames = GetBehaviorNamesInObjectOrGroup(
+          project, layout, groupsObjects[objectIndex], behaviorType, false);
+      objectIndex++;
+      break;
+    }
+  }
+  for (; objectIndex < groupsObjects.size(); objectIndex++) {
+    auto& objectName = groupsObjects[objectIndex];
 
     if (layout.HasObjectNamed(objectName)) {
       auto& object = layout.GetObject(objectName);
@@ -626,16 +637,20 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer& project,
   }
 
   // Check that all objects have the behavior.
-  for (auto&& object : groupsObjects) {
+  for (auto&& objectName : groupsObjects) {
+    if (!layout.HasObjectNamed(objectName) &&
+        !project.HasObjectNamed(objectName)) {
+      continue;
+    }
     if (!HasBehaviorInObjectOrGroup(
-            project, layout, object, behaviorName, false)) {
+            project, layout, objectName, behaviorName, false)) {
       return false;
     }
   }
   return true;
 }
 
-bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
+bool GD_CORE_API HasDefaultBehavior(const gd::ObjectsContainer& project,
                                    const gd::ObjectsContainer& layout,
                                    gd::String objectOrGroupName,
                                    gd::String behaviorName,
@@ -677,8 +692,12 @@ bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
   }
 
   // Check that all objects have the same type.
-  for (auto&& object : groupsObjects) {
-    if (!IsDefaultBehavior(project, layout, object, behaviorName, false)) {
+  for (auto&& objectName : groupsObjects) {
+    if (!layout.HasObjectNamed(objectName) &&
+        !project.HasObjectNamed(objectName)) {
+      continue;
+    }
+    if (!HasDefaultBehavior(project, layout, objectName, behaviorName, false)) {
       return false;
     }
   }
@@ -730,11 +749,27 @@ GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContainer& project,
   }
 
   // Check that all objects have the behavior with the same type.
-  auto behaviorType = GetTypeOfBehaviorInObjectOrGroup(
-      project, layout, groupsObjects[0], behaviorName, false);
-  for (auto&& object : groupsObjects) {
-    if (GetTypeOfBehaviorInObjectOrGroup(
-            project, layout, object, behaviorName, false) != behaviorType) {
+  size_t objectIndex = 0;
+  gd::String behaviorType = "";
+  // Look for a first that object exists
+  for (; objectIndex < groupsObjects.size(); objectIndex++) {
+    auto &objectName = groupsObjects[objectIndex];
+    if (layout.HasObjectNamed(objectName) ||
+        project.HasObjectNamed(objectName)) {
+      behaviorType = GetTypeOfBehaviorInObjectOrGroup(
+          project, layout, groupsObjects[objectIndex], behaviorName, false);
+      objectIndex++;
+      break;
+    }
+  }
+  for (; objectIndex < groupsObjects.size(); objectIndex++) {
+    auto &objectName = groupsObjects[objectIndex];
+    if (!layout.HasObjectNamed(objectName) &&
+        !project.HasObjectNamed(objectName)) {
+      continue;
+    }
+    if (GetTypeOfBehaviorInObjectOrGroup(project, layout, objectName,
+                                         behaviorName, false) != behaviorType) {
       return "";
     }
   }
@@ -801,11 +836,17 @@ GetBehaviorsOfObject(const gd::ObjectsContainer& project,
 
         vector<gd::String> groupsObjects =
             layout.GetObjectGroups()[i].GetAllObjectsNames();
-        for (std::size_t j = 0; j < groupsObjects.size(); ++j) {
+        for (std::size_t objectIndex = 0; objectIndex < groupsObjects.size();
+             ++objectIndex) {
+          auto &objectName = groupsObjects[objectIndex];
+          if (!layout.HasObjectNamed(objectName) &&
+              !project.HasObjectNamed(objectName)) {
+            continue;
+          }
           // Get behaviors of the object of the group and delete behavior which
           // are not in commons.
           vector<gd::String> objectBehaviors =
-              GetBehaviorsOfObject(project, layout, groupsObjects[j], false);
+              GetBehaviorsOfObject(project, layout, objectName, false);
           if (!behaviorsAlreadyInserted) {
             behaviorsAlreadyInserted = true;
             behaviors = objectBehaviors;
@@ -829,11 +870,17 @@ GetBehaviorsOfObject(const gd::ObjectsContainer& project,
 
         vector<gd::String> groupsObjects =
             project.GetObjectGroups()[i].GetAllObjectsNames();
-        for (std::size_t j = 0; j < groupsObjects.size(); ++j) {
+        for (std::size_t objectIndex = 0; objectIndex < groupsObjects.size();
+             ++objectIndex) {
+          auto &objectName = groupsObjects[objectIndex];
+          if (!layout.HasObjectNamed(objectName) &&
+              !project.HasObjectNamed(objectName)) {
+            continue;
+          }
           // Get behaviors of the object of the group and delete behavior which
           // are not in commons.
           vector<gd::String> objectBehaviors =
-              GetBehaviorsOfObject(project, layout, groupsObjects[j], false);
+              GetBehaviorsOfObject(project, layout, objectName, false);
           if (!behaviorsAlreadyInserted) {
             behaviorsAlreadyInserted = true;
             behaviors = objectBehaviors;

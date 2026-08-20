@@ -79,6 +79,9 @@ export const DefaultForSpriteObject = (): React.Node => {
             ]}
             onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('extension installed')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
             shouldShowCapabilityBehaviors={false}
           />
         </BehaviorStoreStateProvider>
@@ -154,6 +157,9 @@ export const WithCommunityExtensions = (): React.Node => {
                 ]}
                 onWillInstallExtension={action('extension will be installed')}
                 onExtensionInstalled={action('extension installed')}
+                onCreateNewExtensionWithBehavior={action(
+                  'onCreateNewExtensionWithBehavior'
+                )}
                 shouldShowCapabilityBehaviors={false}
               />
             </BehaviorStoreStateProvider>
@@ -205,6 +211,9 @@ export const WithServerSideErrors = (): React.Node => {
               ]}
               onWillInstallExtension={action('extension will be installed')}
               onExtensionInstalled={action('extension installed')}
+              onCreateNewExtensionWithBehavior={action(
+                'onCreateNewExtensionWithBehavior'
+              )}
               shouldShowCapabilityBehaviors={false}
             />
           </BehaviorStoreStateProvider>

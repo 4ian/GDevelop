@@ -95,6 +95,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
       onInstancesModified,
       onWillInstallExtension,
       onExtensionInstalled,
+      onCreateNewExtensionWithBehavior,
       isActive,
       onRestartInGameEditor,
       showRestartInGameEditorAfterErrorButton,
@@ -330,6 +331,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 lastSelectionType={props.lastSelectionType}
                 onWillInstallExtension={props.onWillInstallExtension}
                 onExtensionInstalled={props.onExtensionInstalled}
+                onCreateNewExtensionWithBehavior={
+                  onCreateNewExtensionWithBehavior
+                }
                 onOpenEventBasedObjectVariantEditor={
                   props.onOpenEventBasedObjectVariantEditor
                 }

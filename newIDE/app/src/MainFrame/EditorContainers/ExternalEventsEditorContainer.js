@@ -295,6 +295,9 @@ export class ExternalEventsEditorContainer extends React.Component<
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
+            onCreateNewExtensionWithBehavior={
+              this.props.onCreateNewExtensionWithBehavior
+            }
             // Scene events don't have parameters nor properties
             editEventsFunctionParameter={null}
             openEventsBasedEntityPropertyEditorDialog={null}

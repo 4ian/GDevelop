@@ -492,6 +492,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         lastSelectionType={props.lastSelectionType}
                         onWillInstallExtension={props.onWillInstallExtension}
                         onExtensionInstalled={props.onExtensionInstalled}
+                        onCreateNewExtensionWithBehavior={
+                          props.onCreateNewExtensionWithBehavior
+                        }
                         onOpenEventBasedObjectVariantEditor={
                           props.onOpenEventBasedObjectVariantEditor
                         }

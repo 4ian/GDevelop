@@ -249,6 +249,9 @@ type Props = {|
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,
@@ -3228,6 +3231,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                     lastSelectionType={this.state.lastSelectionType}
                     onWillInstallExtension={this.props.onWillInstallExtension}
                     onExtensionInstalled={this.props.onExtensionInstalled}
+                    onCreateNewExtensionWithBehavior={
+                      this.props.onCreateNewExtensionWithBehavior
+                    }
                     editorViewPosition2D={this.editorViewPosition2D}
                     onEventsBasedObjectChildrenEdited={
                       this.props.onEventsBasedObjectChildrenEdited
@@ -3318,6 +3324,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                           this.props.onWillInstallExtension
                         }
                         onExtensionInstalled={this.props.onExtensionInstalled}
+                        onCreateNewExtensionWithBehavior={
+                          this.props.onCreateNewExtensionWithBehavior
+                        }
                         onOpenEventBasedObjectEditor={
                           this.props.onOpenEventBasedObjectEditor
                         }

@@ -14,7 +14,7 @@ import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Text from '../../../UI/Text';
 import ResourcesLoader from '../../../ResourcesLoader';
 import { Column, Line, Spacer } from '../../../UI/Grid';
-import useForceUpdate from '../../../Utils/UseForceUpdate';
+import { useForceRecompute } from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
@@ -89,9 +89,9 @@ type AnimationItemRowProps = {|
   isAnimationListLocked: boolean,
   nameError: React.Node,
   animationRef: { current: ?any } | null,
-  // Bumped when the animation contents change without any other prop
+  // Changed when the animation contents change without any other prop
   // changing, so that this memoized row re-renders.
-  contentRevision: number,
+  animationsChangeTrigger: {},
   project: gdProject,
   objectName: string,
   resourceManagementProps: ResourceManagementProps,
@@ -105,7 +105,6 @@ type AnimationItemRowProps = {|
   editDirectionWith: (
     i18n: I18nType,
     externalEditor: ResourceExternalEditor,
-    direction: gdDirection,
     animationIndex: number,
     directionIndex: number
   ) => Promise<void>,
@@ -129,7 +128,7 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
     isAnimationListLocked,
     nameError,
     animationRef,
-    contentRevision,
+    animationsChangeTrigger,
     project,
     objectName,
     resourceManagementProps,
@@ -251,30 +250,24 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
                   )}
                   <div style={styles.animationLine}>
                     <Column expand noMargin>
-                      {mapFor(0, directionsCount, directionIndex => {
-                        const direction = animations
-                          .getAnimation(animationIndex)
-                          .getDirection(directionIndex);
-                        return (
-                          <MountOnFirstVisible
-                            key={directionIndex}
-                            placeholderHeight={150}
-                          >
+                      {mapFor(0, directionsCount, directionIndex => (
+                        <MountOnFirstVisible
+                          key={directionIndex}
+                          placeholderHeight={150}
+                        >
+                          {() => (
                             <SpritesList
                               animations={animations}
-                              direction={direction}
+                              animationIndex={animationIndex}
+                              directionIndex={directionIndex}
+                              animationsChangeTrigger={animationsChangeTrigger}
                               project={project}
                               resourcesLoader={ResourcesLoader}
                               resourceManagementProps={resourceManagementProps}
-                              editDirectionWith={(
-                                i18n,
-                                externalEditor,
-                                direction
-                              ) =>
+                              editDirectionWith={(i18n, externalEditor) =>
                                 editDirectionWith(
                                   i18n,
                                   externalEditor,
-                                  direction,
                                   animationIndex,
                                   directionIndex
                                 )
@@ -303,9 +296,9 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
                               onSpriteAdded={onSpriteAdded}
                               addAnimations={addAnimations}
                             />
-                          </MountOnFirstVisible>
-                        );
-                      })}
+                          )}
+                        </MountOnFirstVisible>
+                      ))}
                     </Column>
                   </div>
                 </div>
@@ -382,7 +375,6 @@ const AnimationList: React.ComponentType<{
       false
     );
     const abortControllerRef = React.useRef<?AbortController>(null);
-    const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
     const { showConfirmation } = useAlertDialog();
     const animationsCount = animations.getAnimationsCount();
@@ -422,13 +414,18 @@ const AnimationList: React.ComponentType<{
       [number]: React.Node,
     }>({});
 
-    // Bumped when the content of one or more animations changes without any
-    // prop of the (memoized) animation rows changing, so they re-render.
-    const [contentRevision, setContentRevision] = React.useState(0);
-    const bumpContentRevision = React.useCallback(
-      () => setContentRevision(revision => revision + 1),
-      []
-    );
+    // The animation rows are memoized, and a change made to the animations is
+    // invisible to their props (`animations` is the same object in memory):
+    // `animationsChangeTrigger`, passed to the rows, is what makes them
+    // re-render.
+    // Every change to the animations must go through
+    // `notifyAnimationsChanged`: it re-renders this component (like a force
+    // update) and changes `animationsChangeTrigger`, so the memoized rows
+    // can't silently keep outdated content.
+    const [
+      animationsChangeTrigger,
+      notifyAnimationsChanged,
+    ] = useForceRecompute();
 
     const onApplyFirstSpriteCollisionMaskToSprite = React.useCallback(
       (sprite: gdSprite) => {
@@ -441,9 +438,9 @@ const AnimationList: React.ComponentType<{
         );
         sprite.setCustomCollisionMask(firstSprite.getCustomCollisionMask());
 
-        forceUpdate();
+        notifyAnimationsChanged();
       },
-      [animations, forceUpdate]
+      [animations, notifyAnimationsChanged]
     );
 
     const moveAnimationToIndex = React.useCallback(
@@ -459,15 +456,9 @@ const AnimationList: React.ComponentType<{
           // then we need to recompute it.
           onCreateMatchingSpriteCollisionMask();
         }
-        bumpContentRevision();
-        forceUpdate();
+        notifyAnimationsChanged();
       },
-      [
-        animations,
-        forceUpdate,
-        onCreateMatchingSpriteCollisionMask,
-        bumpContentRevision,
-      ]
+      [animations, onCreateMatchingSpriteCollisionMask, notifyAnimationsChanged]
     );
 
     const moveAnimation = React.useCallback(
@@ -509,11 +500,17 @@ const AnimationList: React.ComponentType<{
           animations.addAnimation(animation);
           animation.delete();
         }
-        forceUpdate();
+        notifyAnimationsChanged();
         onSizeUpdated();
         if (onObjectUpdated) onObjectUpdated();
       },
-      [forceUpdate, onObjectUpdated, onSizeUpdated, onSpriteAdded, animations]
+      [
+        notifyAnimationsChanged,
+        onObjectUpdated,
+        onSizeUpdated,
+        onSpriteAdded,
+        animations,
+      ]
     );
 
     const addAnimation = React.useCallback(
@@ -524,7 +521,7 @@ const AnimationList: React.ComponentType<{
         emptyAnimation.setDirectionsCount(1);
         animations.addAnimation(emptyAnimation);
         emptyAnimation.delete();
-        forceUpdate();
+        notifyAnimationsChanged();
         onSizeUpdated();
         if (onObjectUpdated) onObjectUpdated();
 
@@ -538,11 +535,19 @@ const AnimationList: React.ComponentType<{
           }
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [animations, forceUpdate, onSizeUpdated, onObjectUpdated, scrollView]
+      [
+        animations,
+        notifyAnimationsChanged,
+        onSizeUpdated,
+        onObjectUpdated,
+        scrollView,
+      ]
     );
 
     React.useImperativeHandle(ref, () => ({
-      forceUpdate,
+      // Exposed as `forceUpdate` for the callers, which use it after changing
+      // the animations - so it must also invalidate the memoized rows.
+      forceUpdate: notifyAnimationsChanged,
       addAnimation,
     }));
 
@@ -581,8 +586,7 @@ const AnimationList: React.ComponentType<{
         setNameErrors({});
 
         animations.removeAnimation(index);
-        bumpContentRevision();
-        forceUpdate();
+        notifyAnimationsChanged();
         onSizeUpdated();
         if (index === 0 && animations.adaptCollisionMaskAutomatically()) {
           // If the first animation is removed and the collision mask is
@@ -597,13 +601,12 @@ const AnimationList: React.ComponentType<{
         if (onObjectUpdated) onObjectUpdated();
       },
       [
-        forceUpdate,
+        notifyAnimationsChanged,
         onObjectUpdated,
         onSizeUpdated,
         showDeleteConfirmation,
         animations,
         onCreateMatchingSpriteCollisionMask,
-        bumpContentRevision,
       ]
     );
 
@@ -654,7 +657,7 @@ const AnimationList: React.ComponentType<{
             );
           }
         }
-        forceUpdate();
+        notifyAnimationsChanged();
         if (onObjectUpdated) onObjectUpdated();
       },
       [
@@ -663,7 +666,7 @@ const AnimationList: React.ComponentType<{
         object,
         eventsFunctionsExtension,
         eventsBasedObject,
-        forceUpdate,
+        notifyAnimationsChanged,
         onObjectUpdated,
         project,
       ]
@@ -675,11 +678,10 @@ const AnimationList: React.ComponentType<{
         animations
           .getAnimation(animationId)
           .setDirection(newDirection, directionId);
-        bumpContentRevision();
-        forceUpdate();
+        notifyAnimationsChanged();
         if (onObjectUpdated) onObjectUpdated();
       },
-      [forceUpdate, onObjectUpdated, animations, bumpContentRevision]
+      [notifyAnimationsChanged, onObjectUpdated, animations]
     );
 
     const storageProvider = resourceManagementProps.getStorageProvider();
@@ -746,7 +748,7 @@ const AnimationList: React.ComponentType<{
           addAnimations(resourcesByAnimation);
         }
 
-        forceUpdate();
+        notifyAnimationsChanged();
 
         adaptCollisionMaskIfNeeded();
         if (onObjectUpdated) onObjectUpdated();
@@ -754,7 +756,7 @@ const AnimationList: React.ComponentType<{
       [
         resourceManagementProps,
         addAnimations,
-        forceUpdate,
+        notifyAnimationsChanged,
         adaptCollisionMaskIfNeeded,
         onObjectUpdated,
         project,
@@ -766,17 +768,25 @@ const AnimationList: React.ComponentType<{
       async (
         i18n: I18nType,
         externalEditor: ResourceExternalEditor,
-        direction: gdDirection,
         animationIndex: number,
         directionIndex: number
       ) => {
+        const direction = getCurrentElements(
+          animations,
+          animationIndex,
+          directionIndex,
+          0
+        ).direction;
+        if (!direction) return;
         abortControllerRef.current = new AbortController();
         const { signal } = abortControllerRef.current;
         const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
           return direction.getSprite(i).getImageName();
         });
-        const animation = animations.getAnimation(animationIndex);
-        const animationName = animation.getName();
+        const timeBetweenFrames = direction.getTimeBetweenFrames();
+        const isLooping = direction.isLooping();
+        const existingMetadata = direction.getMetadata();
+        const animationName = animations.getAnimation(animationIndex).getName();
 
         try {
           setExternalEditorOpened(true);
@@ -789,17 +799,14 @@ const AnimationList: React.ComponentType<{
               resourceNames,
               extraOptions: {
                 singleFrame: false,
-                fps:
-                  direction.getTimeBetweenFrames() > 0
-                    ? 1 / direction.getTimeBetweenFrames()
-                    : 1,
+                fps: timeBetweenFrames > 0 ? 1 / timeBetweenFrames : 1,
                 name:
                   animationName ||
                   (resourceNames[0] &&
                     removeExtensionFromFileName(resourceNames[0])) ||
                   objectName,
-                isLooping: direction.isLooping(),
-                existingMetadata: direction.getMetadata(),
+                isLooping,
+                existingMetadata,
               },
               signal,
             }
@@ -808,30 +815,41 @@ const AnimationList: React.ComponentType<{
           setExternalEditorOpened(false);
           if (!editResult) return;
 
+          // Resolve the direction again: the animations could have been
+          // changed while the external editor was opened.
+          const directionAfterEdit = getCurrentElements(
+            animations,
+            animationIndex,
+            directionIndex,
+            0
+          ).direction;
+          if (!directionAfterEdit) return;
+
           const { resources, newMetadata, newName } = editResult;
 
           const newDirection = new gd.Direction();
-          newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
-          newDirection.setLoop(direction.isLooping());
+          newDirection.setTimeBetweenFrames(timeBetweenFrames);
+          newDirection.setLoop(isLooping);
           resources.forEach(resource => {
             const sprite = new gd.Sprite();
             sprite.setImageName(resource.name);
             // Restore collision masks and points
-            if (
-              resource.originalIndex !== undefined &&
-              resource.originalIndex !== null
-            ) {
+            const { originalIndex } = resource;
+            const originalSprite =
+              originalIndex !== undefined &&
+              originalIndex !== null &&
+              originalIndex < directionAfterEdit.getSpritesCount()
+                ? directionAfterEdit.getSprite(originalIndex)
+                : null;
+            if (originalSprite) {
               // The sprite existed before, so we can copy its points and collision masks.
-              const originalSprite = direction.getSprite(
-                resource.originalIndex
-              );
               copySpritePoints(originalSprite, sprite);
               copySpritePolygons(originalSprite, sprite);
             } else {
               // The sprite is new, apply points & collision masks if necessary.
               applyPointsAndMasksToSpriteIfNecessary(
                 animations,
-                direction,
+                directionAfterEdit,
                 sprite
               );
             }
@@ -914,10 +932,9 @@ const AnimationList: React.ComponentType<{
     const createAnimationWith = React.useCallback(
       async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
         addAnimation();
-        const direction = animations.getAnimation(0).getDirection(0);
-        await editDirectionWith(i18n, externalEditor, direction, 0, 0);
+        await editDirectionWith(i18n, externalEditor, 0, 0);
       },
-      [addAnimation, editDirectionWith, animations]
+      [addAnimation, editDirectionWith]
     );
 
     const imageResourceExternalEditors = resourceManagementProps.resourceExternalEditors.filter(
@@ -984,7 +1001,7 @@ const AnimationList: React.ComponentType<{
                       isAnimationListLocked={isAnimationListLocked}
                       nameError={nameErrors[animationIndex]}
                       animationRef={animationRef}
-                      contentRevision={contentRevision}
+                      animationsChangeTrigger={animationsChangeTrigger}
                       project={project}
                       objectName={objectName}
                       resourceManagementProps={resourceManagementProps}

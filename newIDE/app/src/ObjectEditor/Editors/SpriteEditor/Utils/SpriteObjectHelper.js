@@ -350,66 +350,51 @@ export const isFirstSpriteUsingFullImageCollisionMask = (
   return firstSprite ? firstSprite.isFullImageCollisionMask() : false;
 };
 
-export const deleteSpritesFromAnimation = (
-  animation: gdAnimation,
-  spritePtrs: {
-    [number]: boolean,
-  }
+const sortDescending = (indexes: Array<number>): Array<number> =>
+  [...indexes].sort((a, b) => b - a);
+
+export const deleteSpritesByIndexes = (
+  direction: gdDirection,
+  spriteIndexes: Array<number>
 ) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
-    const direction = animation.getDirection(i);
-
-    const spritesToDelete = mapFor(0, direction.getSpritesCount(), j => {
-      const sprite = direction.getSprite(j);
-
-      return !!spritePtrs[sprite.ptr];
-    });
-
-    // Iterate from the end to the beginning to avoid invalidating indexes.
-    for (
-      let spriteIndex = direction.getSpritesCount() - 1;
-      spriteIndex >= 0;
-      spriteIndex--
-    ) {
-      if (spritesToDelete[spriteIndex]) direction.removeSprite(spriteIndex);
-    }
+  // Iterate from the end to the beginning to avoid invalidating indexes.
+  sortDescending(spriteIndexes).forEach(spriteIndex => {
+    direction.removeSprite(spriteIndex);
   });
 };
 
-export const duplicateSpritesInAnimation = (
-  animation: gdAnimation,
-  spritePtrs: {
-    [number]: boolean,
-  }
+export const duplicateSpritesByIndexes = (
+  direction: gdDirection,
+  spriteIndexes: Array<number>
 ) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
-    const direction = animation.getDirection(i);
+  // Iterate from the end to the beginning to avoid invalidating indexes.
+  sortDescending(spriteIndexes).forEach(spriteIndex => {
+    const spriteToDuplicate = direction.getSprite(spriteIndex);
+    const newSprite = new gd.Sprite();
+    newSprite.setImageName(spriteToDuplicate.getImageName());
+    copySpritePoints(spriteToDuplicate, newSprite);
+    copySpritePolygons(spriteToDuplicate, newSprite);
 
-    const spritesToDuplicate = mapFor(0, direction.getSpritesCount(), j => {
-      const sprite = direction.getSprite(j);
-
-      return !!spritePtrs[sprite.ptr];
-    });
-
-    // Iterate from the end to the beginning to avoid invalidating indexes.
-    for (
-      let spriteIndex = direction.getSpritesCount() - 1;
-      spriteIndex >= 0;
-      spriteIndex--
-    ) {
-      if (spritesToDuplicate[spriteIndex]) {
-        const spriteToDuplicate = direction.getSprite(spriteIndex);
-        const newSprite = new gd.Sprite();
-        newSprite.setImageName(spriteToDuplicate.getImageName());
-        copySpritePoints(spriteToDuplicate, newSprite);
-        copySpritePolygons(spriteToDuplicate, newSprite);
-
-        direction.addSprite(newSprite);
-        direction.moveSprite(direction.getSpritesCount() - 1, spriteIndex);
-        newSprite.delete();
-      }
-    }
+    // Insert the copy just before the duplicated sprite.
+    direction.addSprite(newSprite);
+    direction.moveSprite(direction.getSpritesCount() - 1, spriteIndex);
+    newSprite.delete();
   });
+};
+
+/**
+ * Return the new index of the item at `index` after the item at `oldIndex`
+ * was moved to `newIndex` (as done by `gd.Direction.moveSprite`).
+ */
+export const getSpriteIndexAfterMove = (
+  index: number,
+  oldIndex: number,
+  newIndex: number
+): number => {
+  if (index === oldIndex) return newIndex;
+  if (oldIndex < index && index <= newIndex) return index - 1;
+  if (newIndex <= index && index < oldIndex) return index + 1;
+  return index;
 };
 
 export const hasAnyFrame = (animations: gdSpriteAnimationList): boolean => {

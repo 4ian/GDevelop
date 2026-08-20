@@ -357,7 +357,8 @@ module.exports = {
           )
           .setType('resource')
           .addExtraInfo('model3D')
-          .setLabel(_("Simplified 3D model (leave empty to use object's one)"))
+          .setLabel(_('Simplified 3D model'))
+          .setDescription(_("Leave empty to use object's one"))
           // Hidden as required to be changed in the full editor.
           .setHidden(true)
           .setHasImpactOnOtherProperties(true);
@@ -2052,7 +2053,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('slopeMaxAngle')
-          .setLabel('Slope max. angle')
+          .setLabel(_('Slope max. angle'))
           .setGroup(_('Walk'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
@@ -2070,7 +2071,7 @@ module.exports = {
         }
         behaviorProperties
           .getOrCreate('stairHeightMax')
-          .setLabel('Max. stair height')
+          .setLabel(_('Max. stair height'))
           .setGroup(_('Walk'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -2085,7 +2086,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('shouldBindObjectAndForwardAngle')
-          .setLabel('Keep object angle and forward direction the same')
+          .setLabel(_('Keep object angle and forward direction the same'))
           .setGroup(_('Walk'))
           .setType('Boolean')
           .setValue(
@@ -2103,7 +2104,7 @@ module.exports = {
         }
         behaviorProperties
           .getOrCreate('canBePushed')
-          .setLabel('Can be pushed by other characters')
+          .setLabel(_('Can be pushed by other characters'))
           .setGroup(_('Walk'))
           .setType('Boolean')
           .setValue(

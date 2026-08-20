@@ -115,3 +115,98 @@ describe('describe_instances', () => {
     );
   });
 });
+
+describe('describe_instances (per-instance state)', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+    testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const describeInstances = async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.describe_instances.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene' },
+      }
+    );
+    expect(result.success).toBe(true);
+    return result.instances || [];
+  };
+
+  it('reports the per-instance variables, only when the instance has some', async () => {
+    const plainInstance = testScene
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    plainInstance.setObjectName('Player');
+    const instanceWithVariables = testScene
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    instanceWithVariables.setObjectName('Player');
+    instanceWithVariables
+      .getVariables()
+      .insertNew('LevelNumber', 0)
+      .setValue(3);
+
+    const instances = await describeInstances();
+    expect(instances).toHaveLength(2);
+    const plain = instances.find(
+      instance => instance.id === plainInstance.getPersistentUuid().slice(0, 10)
+    );
+    const withVariables = instances.find(
+      instance =>
+        instance.id === instanceWithVariables.getPersistentUuid().slice(0, 10)
+    );
+    if (!plain || !withVariables)
+      throw new Error('Expected to find both instances in the description.');
+
+    // No key at all when the instance has no variable of its own.
+    expect(plain.initialVariables).toBeUndefined();
+    expect(withVariables.initialVariables).toHaveLength(1);
+    expect(withVariables.initialVariables[0]).toMatchObject({
+      name: 'LevelNumber',
+      type: 'number',
+      value: 3,
+    });
+    // Internal per-instance properties stay unexposed.
+    instances.forEach(instance => {
+      expect(instance.numberProperties).toBeUndefined();
+      expect(instance.stringProperties).toBeUndefined();
+    });
+  });
+
+  it('reports hidden only when the instance starts hidden', async () => {
+    const visibleInstance = testScene
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    visibleInstance.setObjectName('Player');
+    const hiddenInstance = testScene
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    hiddenInstance.setObjectName('Player');
+    hiddenInstance.setHidden(true);
+
+    const instances = await describeInstances();
+    const visible = instances.find(
+      instance =>
+        instance.id === visibleInstance.getPersistentUuid().slice(0, 10)
+    );
+    const hidden = instances.find(
+      instance =>
+        instance.id === hiddenInstance.getPersistentUuid().slice(0, 10)
+    );
+    if (!visible || !hidden)
+      throw new Error('Expected to find both instances in the description.');
+
+    expect(visible.hidden).toBeUndefined();
+    expect(hidden.hidden).toBe(true);
+  });
+});

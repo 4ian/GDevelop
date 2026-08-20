@@ -113,6 +113,8 @@ declare class libGDevelop {
   CustomObjectConfiguration: Class<gdCustomObjectConfiguration>;
   Layout: Class<gdLayout>;
   ExternalEvents: Class<gdExternalEvents>;
+  Test: Class<gdTest>;
+  TestsContainer: Class<gdTestsContainer>;
   ExternalLayout: Class<gdExternalLayout>;
   Effect: Class<gdEffect>;
   EffectsContainer: Class<gdEffectsContainer>;
@@ -260,6 +262,7 @@ declare class libGDevelop {
   PropertyFolderOrProperty: Class<gdPropertyFolderOrProperty>;
   PropertiesContainer: Class<gdPropertiesContainer>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;
+  EventsFunctionsExtensionExtractor: Class<gdEventsFunctionsExtensionExtractor>;
   AbstractFileSystem: Class<gdAbstractFileSystem>;
   AbstractFileSystemJS: Class<gdAbstractFileSystemJS>;
   ProjectResourcesAdder: Class<gdProjectResourcesAdder>;

@@ -53,6 +53,9 @@ export const Sprite2d = (): React.Node => (
             )}
             onWillInstallExtension={action('onWillInstallExtension')}
             onExtensionInstalled={action('onExtensionInstalled')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
           />
         </SerializedObjectDisplay>
       )}
@@ -94,6 +97,9 @@ export const Cube3d = (): React.Node => (
             )}
             onWillInstallExtension={action('onWillInstallExtension')}
             onExtensionInstalled={action('onExtensionInstalled')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
           />
         </SerializedObjectDisplay>
       )}
@@ -135,6 +141,9 @@ export const TextInput = (): React.Node => (
             )}
             onWillInstallExtension={action('onWillInstallExtension')}
             onExtensionInstalled={action('onExtensionInstalled')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
           />
         </SerializedObjectDisplay>
       )}
@@ -176,6 +185,9 @@ export const CustomObject = (): React.Node => (
             )}
             onWillInstallExtension={action('onWillInstallExtension')}
             onExtensionInstalled={action('onExtensionInstalled')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
           />
         </SerializedObjectDisplay>
       )}

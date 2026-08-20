@@ -136,11 +136,12 @@ export class EventsBasedBehaviorTreeViewItemContent
     return null;
   }
 
-  onSelect(): void {
+  // Must stay side-effect free: also triggered when a drag starts.
+  onSelect(): void {}
+
+  onClick(): void {
     this.props.onSelectEventsBasedBehavior(this.eventsBasedBehavior);
   }
-
-  onClick(): void {}
 
   rename(newName: string): void {
     if (this.eventsBasedBehavior.getName() === newName) return;

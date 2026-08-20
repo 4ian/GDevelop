@@ -249,6 +249,9 @@ type Props = {|
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,
@@ -2303,6 +2306,26 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  /**
+   * Center the view on the last selected instance, without changing the zoom
+   * (same behavior as the "F" shortcut of the in-game (3D) editor).
+   */
+  focusOnSelection = () => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) {
+      return;
+    }
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    if (selectedInstances.length === 0) {
+      return;
+    }
+    editorDisplay.viewControls.centerViewOnLastInstance(selectedInstances);
+
+    if (this.props.gameEditorMode === 'embedded-game') {
+      changeViewPosition('centerViewOnLastSelectedInstance');
+    }
+  };
+
   getContextMenuZoomItems = (i18n: I18nType): any => {
     return [
       {
@@ -2314,6 +2337,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         label: i18n._(t`Zoom out`),
         click: this.zoomOut,
         accelerator: 'CmdOrCtrl+numsub',
+      },
+      {
+        label: i18n._(t`Focus on selection`),
+        click: this.focusOnSelection,
+        enabled: this.instancesSelection.hasSelectedInstances(),
+        accelerator: 'F',
       },
       {
         label: i18n._(t`Zoom to fit selection`),
@@ -3166,6 +3195,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       onShift1: this.zoomToFitSelection,
                       onShift2: this.zoomToInitialPosition,
                       onShift3: this.zoomToFitContent,
+                      onFocusOnSelection: this.focusOnSelection,
                     }}
                     onInstancesAdded={this._onInstancesAddedAndSendToEditor3D}
                     onInstancesSelected={this._onInstancesSelected}
@@ -3191,6 +3221,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                     lastSelectionType={this.state.lastSelectionType}
                     onWillInstallExtension={this.props.onWillInstallExtension}
                     onExtensionInstalled={this.props.onExtensionInstalled}
+                    onCreateNewExtensionWithBehavior={
+                      this.props.onCreateNewExtensionWithBehavior
+                    }
                     editorViewPosition2D={this.editorViewPosition2D}
                     onEventsBasedObjectChildrenEdited={
                       this.props.onEventsBasedObjectChildrenEdited
@@ -3281,6 +3314,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                           this.props.onWillInstallExtension
                         }
                         onExtensionInstalled={this.props.onExtensionInstalled}
+                        onCreateNewExtensionWithBehavior={
+                          this.props.onCreateNewExtensionWithBehavior
+                        }
                         onOpenEventBasedObjectEditor={
                           this.props.onOpenEventBasedObjectEditor
                         }

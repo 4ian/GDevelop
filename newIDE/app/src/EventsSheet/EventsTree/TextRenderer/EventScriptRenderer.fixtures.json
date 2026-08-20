@@ -55,6 +55,36 @@
       ]
     },
     {
+      "name": "an explicit empty string on a required parameter is kept; optional trailing slots are still trimmed",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": { "value": "StringVariable" },
+              "parameters": ["MoveDirection", "=", "\"Left\""]
+            }
+          ],
+          "actions": [
+            {
+              "type": { "value": "SetStringVariable" },
+              "parameters": ["MoveDirection", "=", "\"\""]
+            },
+            {
+              "type": { "value": "Create" },
+              "parameters": ["", "Star", "100", "-50", "\"\""]
+            }
+          ]
+        }
+      ],
+      "expectedEventScript": [
+        "if StringVariable(MoveDirection, =, \"Left\"):",
+        "  SetStringVariable(MoveDirection, =, \"\")",
+        "  Create(Star, 100, -50)"
+      ]
+    },
+    {
       "name": "inverted conditions and or",
       "parsesBack": true,
       "serializedEvents": [

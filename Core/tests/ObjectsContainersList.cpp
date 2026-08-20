@@ -349,11 +349,83 @@ TEST_CASE("ObjectContainersList (HasBehaviorInObjectOrGroup)", "[common]") {
     REQUIRE(objectsContainersList.HasBehaviorInObjectOrGroup("MyGroup", "MyBehavior"));
     REQUIRE(!objectsContainersList.HasBehaviorInObjectOrGroup("MyGroup", "MyOtherBehavior"));
   }
+
+  SECTION("Can check a behavior exists in a group with an invalid object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+    // This behavior is only in one of the 2 objects.
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
+                           "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
+    object2.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject(object1.GetName());
+    group.AddObject("WrongObjectName");
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(objectsContainersList.HasBehaviorInObjectOrGroup("MyGroup", "MyBehavior"));
+    REQUIRE(!objectsContainersList.HasBehaviorInObjectOrGroup("MyGroup", "MyOtherBehavior"));
+  }
+
+  SECTION("Can check a behavior exists in a group with a leading invalid object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+    // This behavior is only in one of the 2 objects.
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
+                           "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
+    object2.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject("WrongObjectName");
+    group.AddObject(object1.GetName());
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(objectsContainersList.HasBehaviorInObjectOrGroup("MyGroup", "MyBehavior"));
+    REQUIRE(!objectsContainersList.HasBehaviorInObjectOrGroup("MyGroup", "MyOtherBehavior"));
+  }
+
+  SECTION("Can't find a behavior in an empty group") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    auto &group =
+        layout.GetObjects().GetObjectGroups().InsertNew("MyEmptyGroup", 0);
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(!objectsContainersList.HasBehaviorInObjectOrGroup("MyEmptyGroup",
+                                                              "MyBehavior"));
+  }
 }
 
 TEST_CASE("ObjectContainersList (GetBehaviorsOfObject)", "[common]") {
 
-  SECTION("Find the behaviors in an object") {
+  SECTION("Can find the behaviors in an object") {
     gd::Platform platform;
     gd::Project project;
     SetupProjectWithDummyPlatform(project, platform);
@@ -372,7 +444,7 @@ TEST_CASE("ObjectContainersList (GetBehaviorsOfObject)", "[common]") {
     REQUIRE(behaviors[0] == "MyBehavior");
   }
 
-  SECTION("Find the behaviors in a group") {
+  SECTION("Can find the behaviors in a group") {
     gd::Platform platform;
     gd::Project project;
     SetupProjectWithDummyPlatform(project, platform);
@@ -399,6 +471,273 @@ TEST_CASE("ObjectContainersList (GetBehaviorsOfObject)", "[common]") {
         objectsContainersList.GetBehaviorsOfObject("MyGroup", true);
     REQUIRE(behaviors.size() == 1);
     REQUIRE(behaviors[0] == "MyBehavior");
+  }
+
+  SECTION("Can find the behaviors in a group with an invalid object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+    // This behavior is only in one of the 2 objects.
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
+                           "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
+    object2.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject(object1.GetName());
+    group.AddObject("WrongObjectName");
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    const auto behaviors =
+        objectsContainersList.GetBehaviorsOfObject("MyGroup", true);
+    REQUIRE(behaviors.size() == 1);
+    REQUIRE(behaviors[0] == "MyBehavior");
+  }
+
+  SECTION("Can find the behaviors in a group with a leading invalid object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+    // This behavior is only in one of the 2 objects.
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
+                           "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
+    object2.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject("WrongObjectName");
+    group.AddObject(object1.GetName());
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    const auto behaviors =
+        objectsContainersList.GetBehaviorsOfObject("MyGroup", true);
+    REQUIRE(behaviors.size() == 1);
+    REQUIRE(behaviors[0] == "MyBehavior");
+  }
+}
+
+TEST_CASE("ObjectContainersList (GetBehaviorNamesInObjectOrGroup)", "[common]") {
+
+  SECTION("Can find behaviors of a given type in an object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject", 0);
+    object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    const auto behaviors =
+        objectsContainersList.GetBehaviorNamesInObjectOrGroup(
+            "MyObject", "MyExtension::MyBehavior", true);
+    REQUIRE(behaviors.size() == 1);
+    REQUIRE(behaviors[0] == "MyBehavior");
+  }
+
+  SECTION("Can find behaviors of a given type in a group") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+    // This behavior is only in one of the 2 objects.
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
+                           "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
+    object2.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject(object1.GetName());
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    const auto behaviors =
+        objectsContainersList.GetBehaviorNamesInObjectOrGroup(
+            "MyGroup", "MyExtension::MyBehavior", true);
+    REQUIRE(behaviors.size() == 1);
+    REQUIRE(behaviors[0] == "MyBehavior");
+  }
+
+  SECTION("Can find behaviors of a given type in a group with an invalid object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+    // This behavior is only in one of the 2 objects.
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
+                           "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
+    object2.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject(object1.GetName());
+    group.AddObject("WrongObjectName");
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    const auto behaviors =
+        objectsContainersList.GetBehaviorNamesInObjectOrGroup(
+            "MyGroup", "MyExtension::MyBehavior", true);
+    REQUIRE(behaviors.size() == 1);
+    REQUIRE(behaviors[0] == "MyBehavior");
+  }
+
+  SECTION("Can find behaviors of a given type in a group with a leading invalid object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+    // This behavior is only in one of the 2 objects.
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
+                           "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyObject2", 0);
+    object2.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject("WrongObjectName");
+    group.AddObject(object1.GetName());
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    const auto behaviors =
+        objectsContainersList.GetBehaviorNamesInObjectOrGroup(
+            "MyGroup", "MyExtension::MyBehavior", true);
+    REQUIRE(behaviors.size() == 1);
+    REQUIRE(behaviors[0] == "MyBehavior");
+  }
+}
+
+TEST_CASE("ObjectContainersList (IsDefaultBehavior)", "[common]") {
+
+  SECTION("Can check a default behavior exists in an object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject", 0);
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(objectsContainersList.HasDefaultBehavior("MyObject", "Effect"));
+  }
+
+  SECTION("Can check a default behavior exists in a group") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior", "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject2", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior", "MyOtherBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject(object1.GetName());
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(objectsContainersList.HasDefaultBehavior("MyGroup", "Effect"));
+    REQUIRE(!objectsContainersList.HasDefaultBehavior("MyGroup", "MyOtherBehavior"));
+  }
+
+  SECTION("Can check a default behavior exists in a group with an invalid object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior", "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject2", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior", "MyOtherBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject(object1.GetName());
+    group.AddObject("WrongObjectName");
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(objectsContainersList.HasDefaultBehavior("MyGroup", "Effect"));
+    REQUIRE(!objectsContainersList.HasDefaultBehavior("MyGroup", "MyOtherBehavior"));
+  }
+
+  SECTION("Can check a default behavior exists in a group with a leading invalid object") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object1 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject1", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior", "MyOtherBehavior");
+    gd::Object &object2 = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject2", 0);
+    object1.AddNewBehavior(project, "MyExtension::MyOtherBehavior", "MyOtherBehavior");
+
+    auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
+    group.AddObject("WrongObjectName");
+    group.AddObject(object1.GetName());
+    group.AddObject(object2.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(objectsContainersList.HasDefaultBehavior("MyGroup", "Effect"));
+    REQUIRE(!objectsContainersList.HasDefaultBehavior("MyGroup", "MyOtherBehavior"));
   }
 }
 

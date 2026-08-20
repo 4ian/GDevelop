@@ -50,7 +50,8 @@ export type EditorMosaicName =
   | 'scene-editor'
   | 'debugger'
   | 'resources-editor'
-  | 'events-functions-extension-editor';
+  | 'events-functions-extension-editor'
+  | 'gameplay-test-editor';
 
 export type InAppTutorialUserProgress = {|
   step: number,
@@ -170,6 +171,11 @@ export const allAlertMessages: Array<{
   },
 ];
 
+export type EditorStateForPropertyPanel = {
+  scrollPosition: number,
+  collapsedSections: { [string]: boolean },
+};
+
 /**
  * All the preferences of GDevelop. To add a new preference, add it into this
  * type and add a setter into `Preferences` type. Then, update the
@@ -177,7 +183,11 @@ export const allAlertMessages: Array<{
  */
 export type EditorStateForProject = {|
   editorTabs: EditorTabsPersistedState | null,
-  propertiesPanelScroll: { [string]: { [string]: number } },
+  propertiesPanel: {
+    [string]: {
+      [string]: EditorStateForPropertyPanel,
+    },
+  },
 |};
 
 // $FlowFixMe[deprecated-utility]

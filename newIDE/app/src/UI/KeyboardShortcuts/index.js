@@ -46,6 +46,7 @@ type ShortcutCallbacks = {|
   onZoomOut?: KeyboardEvent => void | Promise<void>,
   onZoomIn?: KeyboardEvent => void | Promise<void>,
   onEscape?: () => void | Promise<void>,
+  onFocusOnSelection?: () => void | Promise<void>,
   onShift1?: () => void | Promise<void>,
   onShift2?: () => void | Promise<void>,
   onShift3?: () => void | Promise<void>,
@@ -269,6 +270,7 @@ export default class KeyboardShortcuts {
       onZoomOut,
       onZoomIn,
       onEscape,
+      onFocusOnSelection,
       onShift1,
       onShift2,
       onShift3,
@@ -356,6 +358,17 @@ export default class KeyboardShortcuts {
     ) {
       evt.preventDefault();
       onSearch();
+    }
+    // "F" alone focuses the view on the selection, like in the in-game editor.
+    if (
+      onFocusOnSelection &&
+      !this._isControlOrCmdPressed() &&
+      !this._shiftPressed &&
+      !this._altPressed &&
+      evt.which === F_KEY
+    ) {
+      evt.preventDefault();
+      onFocusOnSelection();
     }
     if (onEscape && evt.which === ESC_KEY) {
       evt.preventDefault();

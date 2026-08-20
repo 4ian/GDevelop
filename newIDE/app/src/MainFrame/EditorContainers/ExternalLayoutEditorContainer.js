@@ -430,6 +430,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onEventsBasedObjectChildrenEdited={() => {}}
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
+            onCreateNewExtensionWithBehavior={
+              this.props.onCreateNewExtensionWithBehavior
+            }
             onDeleteEventsBasedObjectVariant={
               this.props.onDeleteEventsBasedObjectVariant
             }

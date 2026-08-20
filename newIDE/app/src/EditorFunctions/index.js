@@ -30,6 +30,7 @@ import {
 } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
+import { runGameplayTest, changeGameplayTests } from './GameplayTestTools';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import Link from '../UI/Link';
@@ -67,6 +68,7 @@ import type {
   ObjectGroupsOutsideEditorChanges,
   ProjectItemRenamedOutsideEditorChanges,
   WillDeleteSceneChanges,
+  WillDeleteGameplayTestChanges,
   WillDeleteObjectChanges,
 } from './OutsideEditorChanges';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
@@ -79,6 +81,10 @@ import {
   getObjectSizeInfoHints,
   type ObjectSizeInfo,
 } from './Utils';
+import { executeScript } from './ScriptExecution/ScriptRunner';
+import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
+import { capScriptExecutionResult } from './ScriptExecution/CapScriptOutput';
+import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
 
 export type HintEntry = {|
   code: string,
@@ -138,8 +144,37 @@ export type EditorFunctionGenericOutput = {|
   meta?: {
     newSceneNames?: Array<string>,
     createdProject?: gdProject,
+    // For `run_script`: true when ANY call the script made modified the
+    // project (so the editor refreshes even if the script ultimately failed).
+    didModifyProject?: boolean,
   },
+  // `run_script` (script-based agents) output payload. Present only for
+  // `run_script` calls.
+  functionCallRecords?: Array<Object>,
+  consoleLogs?: Array<string>,
+  returnValue?: any,
+  error?: {|
+    message: string,
+    lineNumber: number | null,
+    lastCalledFunctionName: string | null,
+  |} | null,
   message?: string,
+  // `run_gameplay_test` output payload. Present only for gameplay test runs.
+  status?: string,
+  testName?: string,
+  framesExecuted?: number,
+  durationMs?: number,
+  gameTimeMs?: number,
+  assertions?: Array<Object>,
+  errors?: Array<string>,
+  eventLog?: Array<Object>,
+  finalState?: Object | null,
+  screenshots?: Array<Object>,
+  performance?: Object | null,
+  // Set to true (v12+) when a mutating call was a no-op because the requested
+  // state already matched the current state. Lets the no-op rate be counted
+  // from `functionCallRecords`/CloudWatch without any new telemetry.
+  nothingChanged?: boolean,
   eventsAsText?: string,
   // Per-event/instruction rendering failures (the rest still rendered).
   eventsRenderingErrors?: Array<EventsTextRenderingError>,
@@ -154,6 +189,16 @@ export type EditorFunctionGenericOutput = {|
   resources?: any,
   resourcesSummary?: any,
   behaviors?: Array<SimplifiedBehavior>,
+  // `add_behavior`: the behavior name the editor assigned, per object — a
+  // declared output type, because nothing else lets a script know it.
+  addedBehaviors?: Array<{|
+    objectName: string,
+    behaviorName: string,
+    behaviorType: string,
+  |}>,
+  // `change_gameplay_tests`: the ordered tests of the scope after the changes
+  // (capped), so renames/reorders/deletions are self-verifying.
+  tests?: Array<{| test_name: string, description: string |}>,
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
   animationNames?: string,
@@ -303,6 +348,13 @@ export type LaunchFunctionOptionsWithoutProject = {|
   args: any,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  // The AI request's tools version (e.g. 'v12'). Threaded so functions can gate
+  // version-dependent behavior (e.g. `isNoOpConsideredSuccess`). May be null
+  // when unknown (treated as pre-v12).
+  toolsVersion?: ?string,
+  // When true, `run_script` exposes only non-mutating functions (explorer
+  // sub-agent scripts, which must stay read-only). Ignored by other functions.
+  runScriptReadOnly?: boolean,
   i18n: I18nType,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
@@ -325,6 +377,9 @@ export type LaunchFunctionOptionsWithoutProject = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
@@ -346,6 +401,15 @@ export type LaunchFunctionOptionsWithoutProject = {|
    */
   getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
+
+/**
+ * Everything a `launchFunction` receives except the call itself: what
+ * `run_script` forwards to every function a script calls.
+ */
+export type LaunchFunctionCollaborators = Omit<
+  LaunchFunctionOptionsWithoutProject,
+  'args'
+>;
 
 export type LaunchFunctionOptionsWithProject = {|
   ...LaunchFunctionOptionsWithoutProject,
@@ -371,6 +435,11 @@ export type EditorFunction = {|
   ) => Promise<EditorFunctionGenericOutput>,
   /** True if this function modifies the project (triggers unsaved changes tracking). */
   modifiesProject: boolean,
+  /**
+   * Optional: refine `modifiesProject` per call from its (parsed) arguments -
+   * used to gate edits behind a user confirmation when auto-edit is off.
+   */
+  getModifiesProject?: (args: any) => boolean,
 |};
 
 /**
@@ -392,6 +461,11 @@ export type EditorFunctionWithoutProject = {|
   ) => Promise<EditorFunctionGenericOutput>,
   /** True if this function modifies the project (triggers unsaved changes tracking). */
   modifiesProject: boolean,
+  /**
+   * Optional: refine `modifiesProject` per call from its (parsed) arguments -
+   * used to gate edits behind a user confirmation when auto-edit is off.
+   */
+  getModifiesProject?: (args: any) => boolean,
 |};
 
 /**
@@ -515,20 +589,48 @@ const getUsedAssetText = (
 const getLayerNameForMessage = (layerName: string): string =>
   layerName === '' ? 'the base layer ("")' : `layer "${layerName}"`;
 
+/**
+ * A call that ended up changing nothing. From tools v12 this is a SUCCESS
+ * carrying the reasons: a script stops at its first failure, so a wrong
+ * property name in one call must not throw away every other edit of the batch
+ * (measured as the most frequent script failure in production). The agent still
+ * reads the reasons, and `nothingChanged` marks the outcome for the caller.
+ * Pre-v12 keeps the failure. See isNoOpConsideredSuccess.
+ */
+const makeNothingChangedOutput = ({
+  toolsVersion,
+  message,
+  warnings,
+}: {|
+  toolsVersion: ?string,
+  message: string,
+  warnings?: string,
+|}): EditorFunctionGenericOutput => {
+  const isSuccess = isNoOpConsideredSuccess(toolsVersion);
+  return {
+    success: isSuccess,
+    message,
+    warnings,
+    nothingChanged: isSuccess ? true : undefined,
+  };
+};
+
 const makeMultipleChangesOutput = (
   changes: Array<string>,
-  warnings: Array<string>
+  warnings: Array<string>,
+  toolsVersion: ?string
 ): EditorFunctionGenericOutput => {
   if (changes.length === 0 && warnings.length === 0) {
-    return {
-      success: false,
-      message: 'No changes.',
-    };
+    return makeNothingChangedOutput({
+      toolsVersion,
+      message:
+        'Nothing changed: the requested values are already the current ones, or nothing was requested.',
+    });
   } else if (changes.length === 0 && warnings.length > 0) {
-    return {
-      success: false,
-      message: ['No changes. Issues:', ...warnings].join('\n'),
-    };
+    return makeNothingChangedOutput({
+      toolsVersion,
+      message: ['Nothing changed. Issues:', ...warnings].join('\n'),
+    });
   } else if (changes.length > 0 && warnings.length === 0) {
     return {
       success: true,
@@ -2175,6 +2277,7 @@ const changeObjectPropertiesEffects: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onObjectsModifiedOutsideEditor,
     onInstancesModifiedOutsideEditor,
     onWillDeleteObject,
@@ -2346,7 +2449,7 @@ const changeObjectPropertiesEffects: EditorFunction = {
     }
 
     return {
-      ...makeMultipleChangesOutput(changes, warnings),
+      ...makeMultipleChangesOutput(changes, warnings, toolsVersion),
       ...(newlyAddedResources && newlyAddedResources.length > 0
         ? { newlyAddedResources }
         : {}),
@@ -2471,6 +2574,7 @@ const addBehavior: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     ensureExtensionInstalled,
     onWillInstallExtension,
     onExtensionInstalled,
@@ -2545,6 +2649,22 @@ const addBehavior: EditorFunction = {
 
     const changes = [];
     const warnings = [];
+    // The behavior NAME the editor assigned, per object: a script cannot guess
+    // it (there is no argument to impose one) and needs it to call the behavior
+    // functions afterwards. Reported as a declared output type, so a script does
+    // not have to read it back with `inspect_object_properties_effects`.
+    const addedBehaviors: Array<{|
+      objectName: string,
+      behaviorName: string,
+      behaviorType: string,
+    |}> = [];
+    const reportBehaviorOnObject = (objectName: string) => {
+      addedBehaviors.push({
+        objectName,
+        behaviorName,
+        behaviorType: behavior_type,
+      });
+    };
     for (const object of concerned.objects) {
       const objectName = object.getName();
 
@@ -2559,6 +2679,8 @@ const addBehavior: EditorFunction = {
           changes.push(
             `Behavior "${behaviorName}" already on "${objectName}".`
           );
+          // Already there: a script chaining on the name must still get it.
+          reportBehaviorOnObject(objectName);
         }
         continue;
       }
@@ -2574,6 +2696,7 @@ const addBehavior: EditorFunction = {
           changes.push(
             `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability already on "${objectName}".`
           );
+          reportBehaviorOnObject(objectName);
         } else {
           warnings.push(
             `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability; cannot be added to "${objectName}".`
@@ -2612,10 +2735,14 @@ const addBehavior: EditorFunction = {
           behavior.getProperties()
         )}.`
       );
+      reportBehaviorOnObject(objectName);
     }
     layout.updateBehaviorsSharedData(project);
 
-    return makeMultipleChangesOutput(changes, warnings);
+    return {
+      ...makeMultipleChangesOutput(changes, warnings, toolsVersion),
+      addedBehaviors,
+    };
   },
   modifiesProject: true,
 };
@@ -2640,7 +2767,7 @@ const removeBehavior: EditorFunction = {
       ),
     };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, toolsVersion }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
@@ -2696,7 +2823,7 @@ const removeBehavior: EditorFunction = {
       );
     }
 
-    return makeMultipleChangesOutput(changes, warnings);
+    return makeMultipleChangesOutput(changes, warnings, toolsVersion);
   },
   modifiesProject: true,
 };
@@ -2966,7 +3093,7 @@ const changeBehaviorProperty: EditorFunction = {
     // $FlowFixMe[incompatible-type]
     return renderChanges(changes);
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, toolsVersion }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
@@ -3028,7 +3155,7 @@ const changeBehaviorProperty: EditorFunction = {
         );
       }
 
-      return makeMultipleChangesOutput(changes, warnings);
+      return makeMultipleChangesOutput(changes, warnings, toolsVersion);
     }
 
     const objectsWithBehavior = concerned.objects.filter(object =>
@@ -3174,7 +3301,7 @@ const changeBehaviorProperty: EditorFunction = {
     });
 
     // $FlowFixMe[incompatible-type]
-    return makeMultipleChangesOutput(changes, warnings);
+    return makeMultipleChangesOutput(changes, warnings, toolsVersion);
   },
   modifiesProject: true,
 };
@@ -3289,8 +3416,15 @@ const describeInstances: EditorFunction = {
             width,
             height,
             depth,
+            // Expose the per-instance variables (overrides of the object
+            // variables), but only when there are some, to keep the output
+            // compact. Absence means the instance uses the object variables.
+            initialVariables:
+              serializedInstance.initialVariables &&
+              serializedInstance.initialVariables.length > 0
+                ? serializedInstance.initialVariables
+                : undefined,
             // For now, don't expose these:
-            initialVariables: undefined,
             numberProperties: undefined,
             stringProperties: undefined,
           });
@@ -3444,6 +3578,7 @@ const put2dInstances: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -3453,19 +3588,29 @@ const put2dInstances: EditorFunction = {
       'object_name'
     );
     const layer_name = extractRequiredString(args, 'layer_name');
-    const brush_kind = extractRequiredString(args, 'brush_kind');
+    const requested_brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
       args,
       'brush_position'
     );
+    const existing_instance_ids = SafeExtractor.extractStringProperty(
+      args,
+      'existing_instance_ids'
+    );
+    // A "none" brush with both a `brush_position` and `existing_instance_ids`
+    // is contradictory ("none" never positions anything) but unambiguous: move
+    // THOSE instances there. Read it as the "point" brush, which is what the
+    // failure this replaces told the caller to do — every such call observed in
+    // production meant exactly that. Without `existing_instance_ids` the intent
+    // is genuinely unclear (create one? move all?), so that still fails.
+    const brush_kind =
+      requested_brush_kind === 'none' && brush_position && existing_instance_ids
+        ? 'point'
+        : requested_brush_kind;
     const brush_size = SafeExtractor.extractNumberProperty(args, 'brush_size');
     const brush_end_position = SafeExtractor.extractStringProperty(
       args,
       'brush_end_position'
-    );
-    const existing_instance_ids = SafeExtractor.extractStringProperty(
-      args,
-      'existing_instance_ids'
     );
     const new_instances_count = SafeExtractor.extractNumberProperty(
       args,
@@ -3730,13 +3875,6 @@ const put2dInstances: EditorFunction = {
             : `A valid \`brush_position\` is required for the "${brush_kind}" brush (or use the "none" brush to modify existing instances without moving them).`
         );
       }
-      // The "none" brush never applies a position: fail instead of silently
-      // ignoring it, so the caller switches to a placement brush to move.
-      if (brush_kind === 'none' && parsedBrushPosition) {
-        return makeGenericFailure(
-          'The "none" brush never moves instances: remove `brush_position`, or use the "point" brush to move (it sets the exact position of every matched instance — one call per target position).'
-        );
-      }
       // After the guard, a missing position can only happen when nothing is
       // created nor moved ("none" brush only): the fallback is never used.
       const brushPosition: [number, number] = parsedBrushPosition || [0, 0];
@@ -3792,6 +3930,7 @@ const put2dInstances: EditorFunction = {
             originalZOrder: instance.getZOrder(),
             originalRotation: instance.getAngle(),
             originalOpacity: instance.getOpacity(),
+            originalHidden: instance.isHidden(),
             originalCustomWidth: instance.hasCustomSize()
               ? instance.getCustomWidth()
               : null,
@@ -3935,6 +4074,10 @@ const put2dInstances: EditorFunction = {
         args,
         'instances_opacity'
       );
+      const instancesHidden = SafeExtractor.extractBooleanProperty(
+        args,
+        'instances_hidden'
+      );
 
       modifiedAndCreatedInstances.forEach(instance => {
         if (instancesSize) {
@@ -3951,6 +4094,9 @@ const put2dInstances: EditorFunction = {
         if (instancesOpacity !== null) {
           instance.setOpacity(instancesOpacity);
         }
+        if (instancesHidden !== null) {
+          instance.setHidden(instancesHidden);
+        }
       });
 
       // Track specific changes that were made
@@ -3962,6 +4108,8 @@ const put2dInstances: EditorFunction = {
           attrs.push(`rotation ${instancesRotation}°`);
         if (instancesOpacity !== null)
           attrs.push(`opacity ${instancesOpacity}/255`);
+        if (instancesHidden !== null)
+          attrs.push(instancesHidden ? 'hidden at start' : 'visible at start');
         if (instances_z_order !== null)
           attrs.push(`z-order ${instances_z_order}`);
         const effectiveSize = instancesSize
@@ -4007,6 +4155,7 @@ const put2dInstances: EditorFunction = {
       let resizedCount = 0;
       let rotatedCount = 0;
       let opacityChangedCount = 0;
+      let hiddenChangedCount = 0;
       let zOrderChangedCount = 0;
 
       existingInstanceStates.forEach((originalState, instance) => {
@@ -4037,6 +4186,12 @@ const put2dInstances: EditorFunction = {
           originalState.originalOpacity !== instance.getOpacity()
         ) {
           opacityChangedCount++;
+        }
+        if (
+          instancesHidden !== null &&
+          originalState.originalHidden !== instance.isHidden()
+        ) {
+          hiddenChangedCount++;
         }
         if (
           instances_z_order !== null &&
@@ -4099,6 +4254,18 @@ const put2dInstances: EditorFunction = {
         );
       }
 
+      if (hiddenChangedCount > 0 && instancesHidden !== null) {
+        changes.push(
+          instancesHidden
+            ? `Marked ${hiddenChangedCount} instance${
+                hiddenChangedCount > 1 ? 's' : ''
+              }${ofObjectsSuffix} as hidden at start (they can be displayed with the "Show" action).`
+            : `Marked ${hiddenChangedCount} instance${
+                hiddenChangedCount > 1 ? 's' : ''
+              }${ofObjectsSuffix} as visible at start.`
+        );
+      }
+
       if (zOrderChangedCount > 0 && instances_z_order !== null) {
         changes.push(
           `Changed Z-order of ${zOrderChangedCount} instance${
@@ -4135,6 +4302,7 @@ const put2dInstances: EditorFunction = {
           !!instancesSize ||
           instancesRotation !== null ||
           instancesOpacity !== null ||
+          instancesHidden !== null ||
           instances_z_order !== null;
         const hasPositionBrush =
           brush_kind === 'point' ||
@@ -4149,22 +4317,38 @@ const put2dInstances: EditorFunction = {
         }
 
         if (!hasMutationParams && !hasPositionBrush) {
-          return makeGenericFailure(
-            `Matched ${matchedCount} existing instance${
-              matchedCount > 1 ? 's' : ''
-            } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`
-          );
+          const noRequestMessage = `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`;
+          if (isNoOpConsideredSuccess(toolsVersion)) {
+            return {
+              success: true,
+              message: noRequestMessage,
+              nothingChanged: true,
+            };
+          }
+          return makeGenericFailure(noRequestMessage);
         }
 
-        return makeGenericFailure(
-          `Matched ${matchedCount} existing instance${
-            matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.${
-            hasPositionBrush
-              ? ''
-              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
-          }`
-        );
+        const noOpMessage = `Matched ${matchedCount} existing instance${
+          matchedCount > 1 ? 's' : ''
+        } but the requested values are identical to their current ones, so nothing changed.${
+          hasPositionBrush
+            ? ''
+            : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+        }`;
+        // A no-op (requested state == current state) is a SUCCESS from v12: a
+        // script stops at the first failure, so re-running an idempotent call
+        // must not kill it. Pre-v12 keeps the failure (useful tool-call
+        // feedback; shipped behavior unchanged). See isNoOpConsideredSuccess.
+        if (isNoOpConsideredSuccess(toolsVersion)) {
+          return {
+            success: true,
+            message: noOpMessage,
+            nothingChanged: true,
+          };
+        }
+        return makeGenericFailure(noOpMessage);
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -4286,6 +4470,7 @@ const put3dInstances: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -4295,19 +4480,29 @@ const put3dInstances: EditorFunction = {
       'object_name'
     );
     const layer_name = extractRequiredString(args, 'layer_name');
-    const brush_kind = extractRequiredString(args, 'brush_kind');
+    const requested_brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
       args,
       'brush_position'
     );
+    const existing_instance_ids = SafeExtractor.extractStringProperty(
+      args,
+      'existing_instance_ids'
+    );
+    // A "none" brush with both a `brush_position` and `existing_instance_ids`
+    // is contradictory ("none" never positions anything) but unambiguous: move
+    // THOSE instances there. Read it as the "point" brush, which is what the
+    // failure this replaces told the caller to do — every such call observed in
+    // production meant exactly that. Without `existing_instance_ids` the intent
+    // is genuinely unclear (create one? move all?), so that still fails.
+    const brush_kind =
+      requested_brush_kind === 'none' && brush_position && existing_instance_ids
+        ? 'point'
+        : requested_brush_kind;
     const brush_size = SafeExtractor.extractNumberProperty(args, 'brush_size');
     const brush_end_position = SafeExtractor.extractStringProperty(
       args,
       'brush_end_position'
-    );
-    const existing_instance_ids = SafeExtractor.extractStringProperty(
-      args,
-      'existing_instance_ids'
     );
     const new_instances_count = SafeExtractor.extractNumberProperty(
       args,
@@ -4562,13 +4757,6 @@ const put3dInstances: EditorFunction = {
             : `A valid \`brush_position\` is required for the "${brush_kind}" brush (or use the "none" brush to modify existing instances without moving them).`
         );
       }
-      // The "none" brush never applies a position: fail instead of silently
-      // ignoring it, so the caller switches to a placement brush to move.
-      if (brush_kind === 'none' && parsedBrushPosition) {
-        return makeGenericFailure(
-          'The "none" brush never moves instances: remove `brush_position`, or use the "point" brush to move (it sets the exact X, Y and Z of every matched instance — one call per target position).'
-        );
-      }
       // After the guard, a missing position can only happen when nothing is
       // created nor moved ("none" brush only): the fallback is never used.
       const brushPosition: [number, number, number] = parsedBrushPosition || [
@@ -4628,6 +4816,7 @@ const put3dInstances: EditorFunction = {
             originalRotationX: instance.getRotationX(),
             originalRotationY: instance.getRotationY(),
             originalRotationZ: instance.getAngle(),
+            originalHidden: instance.isHidden(),
             originalCustomWidth: instance.hasCustomSize()
               ? instance.getCustomWidth()
               : null,
@@ -4733,6 +4922,10 @@ const put3dInstances: EditorFunction = {
       const instancesRotationArray = instances_rotation
         ? instances_rotation.split(',').map(coord => parseFloat(coord) || 0)
         : null;
+      const instancesHidden = SafeExtractor.extractBooleanProperty(
+        args,
+        'instances_hidden'
+      );
 
       modifiedAndCreatedInstances.forEach(instance => {
         if (instancesSizeArray) {
@@ -4746,6 +4939,9 @@ const put3dInstances: EditorFunction = {
           instance.setRotationX(instancesRotationArray[0]);
           instance.setRotationY(instancesRotationArray[1]);
           instance.setAngle(instancesRotationArray[2]);
+        }
+        if (instancesHidden !== null) {
+          instance.setHidden(instancesHidden);
         }
       });
 
@@ -4764,6 +4960,8 @@ const put3dInstances: EditorFunction = {
               instancesRotationArray[1]
             }°, ${instancesRotationArray[2]}°)`
           );
+        if (instancesHidden !== null)
+          attrs.push(instancesHidden ? 'hidden at start' : 'visible at start');
         const effectiveSize = instancesSizeArray
           ? instancesSizeArray
           : objectSizeInfo &&
@@ -4807,6 +5005,7 @@ const put3dInstances: EditorFunction = {
       let movedPositionCount = 0;
       let resizedCount = 0;
       let rotatedCount = 0;
+      let hiddenChangedCount = 0;
 
       existingInstanceStates.forEach((originalState, instance) => {
         if (originalState.originalLayer !== instance.getLayer()) {
@@ -4835,6 +5034,12 @@ const put3dInstances: EditorFunction = {
             originalState.originalRotationZ !== instance.getAngle())
         ) {
           rotatedCount++;
+        }
+        if (
+          instancesHidden !== null &&
+          originalState.originalHidden !== instance.isHidden()
+        ) {
+          hiddenChangedCount++;
         }
       });
 
@@ -4887,6 +5092,18 @@ const put3dInstances: EditorFunction = {
         );
       }
 
+      if (hiddenChangedCount > 0 && instancesHidden !== null) {
+        changes.push(
+          instancesHidden
+            ? `Marked ${hiddenChangedCount} instance${
+                hiddenChangedCount > 1 ? 's' : ''
+              }${ofObjectsSuffix} as hidden at start (they can be displayed with the "Show" action).`
+            : `Marked ${hiddenChangedCount} instance${
+                hiddenChangedCount > 1 ? 's' : ''
+              }${ofObjectsSuffix} as visible at start.`
+        );
+      }
+
       if (notFoundExistingInstanceIds.size > 0) {
         // If NONE of the requested instances were found and nothing new was
         // created, the call did nothing. Return a failure so the agent gets a
@@ -4913,7 +5130,8 @@ const put3dInstances: EditorFunction = {
         const matchedCount = existingInstanceStates.size;
         const hasMutationParams =
           !!instancesSizeArray ||
-          (!!instancesRotationArray && instancesRotationArray.length >= 3);
+          (!!instancesRotationArray && instancesRotationArray.length >= 3) ||
+          instancesHidden !== null;
         const hasPositionBrush =
           brush_kind === 'point' ||
           brush_kind === 'line' ||
@@ -4927,22 +5145,38 @@ const put3dInstances: EditorFunction = {
         }
 
         if (!hasMutationParams && !hasPositionBrush) {
-          return makeGenericFailure(
-            `Matched ${matchedCount} existing instance${
-              matchedCount > 1 ? 's' : ''
-            } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`
-          );
+          const noRequestMessage = `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`;
+          if (isNoOpConsideredSuccess(toolsVersion)) {
+            return {
+              success: true,
+              message: noRequestMessage,
+              nothingChanged: true,
+            };
+          }
+          return makeGenericFailure(noRequestMessage);
         }
 
-        return makeGenericFailure(
-          `Matched ${matchedCount} existing instance${
-            matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.${
-            hasPositionBrush
-              ? ''
-              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
-          }`
-        );
+        const noOpMessage = `Matched ${matchedCount} existing instance${
+          matchedCount > 1 ? 's' : ''
+        } but the requested values are identical to their current ones, so nothing changed.${
+          hasPositionBrush
+            ? ''
+            : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+        }`;
+        // A no-op (requested state == current state) is a SUCCESS from v12: a
+        // script stops at the first failure, so re-running an idempotent call
+        // must not kill it. Pre-v12 keeps the failure (useful tool-call
+        // feedback; shipped behavior unchanged). See isNoOpConsideredSuccess.
+        if (isNoOpConsideredSuccess(toolsVersion)) {
+          return {
+            success: true,
+            message: noOpMessage,
+            nothingChanged: true,
+          };
+        }
+        return makeGenericFailure(noOpMessage);
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -5046,27 +5280,72 @@ const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
 const readEventsSource: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const eventIds = SafeExtractor.extractStringArrayProperty(
+      args,
+      'event_ids'
+    );
+    const searchText = SafeExtractor.extractStringProperty(args, 'search');
+    const objectNames = SafeExtractor.extractStringArrayProperty(
+      args,
+      'object_names'
+    );
 
-    return {
-      text: (
+    const sceneLink = (
+      <Link
+        href="#"
+        onClick={() =>
+          editorCallbacks.onOpenLayout(scene_name, {
+            openEventsEditor: true,
+            openSceneEditor: true,
+            focusWhenOpened: 'events',
+          })
+        }
+      >
+        {scene_name}
+      </Link>
+    );
+
+    // Describe what is being read (search text, objects or specific events)
+    // so it's clear which part of the events source is being inspected,
+    // rather than only showing the scene name.
+    const objectsText = objectNames ? objectNames.join(', ') : '';
+    const eventIdsCount = eventIds ? eventIds.length : 0;
+
+    let text;
+    if (searchText && objectsText) {
+      text = (
         <Trans>
-          Read events source in scene{' '}
-          <Link
-            href="#"
-            onClick={() =>
-              editorCallbacks.onOpenLayout(scene_name, {
-                openEventsEditor: true,
-                openSceneEditor: true,
-                focusWhenOpened: 'events',
-              })
-            }
-          >
-            {scene_name}
-          </Link>
-          .
+          Read events source matching "{searchText}" and involving {objectsText}{' '}
+          in scene {sceneLink}.
         </Trans>
-      ),
-    };
+      );
+    } else if (searchText) {
+      text = (
+        <Trans>
+          Read events source matching "{searchText}" in scene {sceneLink}.
+        </Trans>
+      );
+    } else if (objectsText) {
+      text = (
+        <Trans>
+          Read events source involving {objectsText} in scene {sceneLink}.
+        </Trans>
+      );
+    } else if (eventIdsCount === 1) {
+      text = (
+        <Trans>Read source of 1 specific event in scene {sceneLink}.</Trans>
+      );
+    } else if (eventIdsCount > 1) {
+      text = (
+        <Trans>
+          Read source of {eventIdsCount} specific events in scene {sceneLink}.
+        </Trans>
+      );
+    } else {
+      text = <Trans>Read all events source in scene {sceneLink}.</Trans>;
+    }
+
+    return { text };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -6395,6 +6674,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
@@ -6597,6 +6877,22 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         }
 
         if (scene.hasLayerNamed(layerName)) {
+          // `changed_layers: [{ layer_name: "HUD" }]` on an existing layer is
+          // how an agent asks to MAKE SURE the layer exists — which it does.
+          // Say so (like a rename to the current name does) instead of
+          // returning an unexplained "nothing changed" for the whole call.
+          if (
+            !delete_this_layer &&
+            !new_layer_name &&
+            new_layer_position === null &&
+            new_visibility === null &&
+            move_instances_to_layer === null
+          ) {
+            changes.push(
+              `Layer "${layerName}" already exists in scene "${scene.getName()}": nothing to change.`
+            );
+            return;
+          }
           let currentLayerName = layerName;
           if (delete_this_layer) {
             // The base layer is named "", so only a null (not set) value means
@@ -6868,17 +7164,20 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
             return;
           }
-          if (!hasObjectsToAdd) {
+          if (hasObjectsToRemove && !hasObjectsToAdd) {
             warnings.push(
-              hasObjectsToRemove
-                ? `Group "${groupName}" not found in scene "${scene.getName()}": no objects were removed from it. Existing groups are: ${existingGroupNames ||
-                    '(none)'}.`
-                : `Group "${groupName}" not found in scene "${scene.getName()}" and no changes were specified: no group was created. To create it, list the objects to put in it in "objects_to_add".`
+              `Group "${groupName}" not found in scene "${scene.getName()}": no objects were removed from it. Existing groups are: ${existingGroupNames ||
+                '(none)'}.`
             );
             return;
           }
-          // Create the group, as objects are being added to it.
+          // Create the group: either objects are being added to it, or only
+          // its name was given, which is a request for a new empty group
+          // (events can reference it before its objects exist).
           foundGroup = groups.insertNew(groupName, groups.count());
+          changes.push(
+            `Created group "${groupName}" in scene "${scene.getName()}".`
+          );
         } else {
           foundGroup = groups.get(groupName);
         }
@@ -7086,16 +7385,17 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     }
 
     if (changes.length === 0 && warnings.length === 0) {
-      return {
-        success: false,
-        message: 'No changes.',
-      };
+      return makeNothingChangedOutput({
+        toolsVersion,
+        message:
+          'Nothing changed: the requested values are already the current ones, or nothing was requested.',
+      });
     } else if (changes.length === 0 && warnings.length > 0) {
-      return {
-        success: false,
-        message: 'No changes. See warnings.',
+      return makeNothingChangedOutput({
+        toolsVersion,
+        message: 'Nothing changed. See warnings.',
         warnings: warnings.join('\n'),
-      };
+      });
     } else if (changes.length > 0 && warnings.length === 0) {
       return {
         success: true,
@@ -7304,7 +7604,7 @@ const changeProjectPropertiesResources: EditorFunction = {
       text: <Trans>Change {changedPropertiesCount} project properties.</Trans>,
     };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, toolsVersion }) => {
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
       'changed_properties'
@@ -7628,7 +7928,7 @@ const changeProjectPropertiesResources: EditorFunction = {
         );
       });
 
-    return makeMultipleChangesOutput(changes, warnings);
+    return makeMultipleChangesOutput(changes, warnings, toolsVersion);
   },
   modifiesProject: true,
 };
@@ -7692,17 +7992,78 @@ const resolveVariablesContainers = ({
   variable_scope,
   scene_name,
   object_name,
+  instance_id,
 }: {|
   project: gdProject,
   variable_scope: string,
   scene_name: ?string,
   object_name: ?string,
+  instance_id: ?string,
 |}): VariablesContainersResolution => {
   const fail = (message: string): VariablesContainersResolution => ({
     failure: makeGenericFailure(message),
     variablesContainers: [],
     scopeDescription: '',
   });
+
+  if (variable_scope === 'instance') {
+    if (!scene_name) {
+      return fail(`Missing "scene_name" (required for instance variables).`);
+    }
+    if (!project.hasLayoutNamed(scene_name)) {
+      return fail(getSceneNotFoundMessage(project, scene_name));
+    }
+    const instanceId = instance_id ? instance_id.trim() : '';
+    if (!instanceId) {
+      return fail(
+        `Missing "instance_id" (required for instance variables) - get it from \`describe_instances\` (the \`id\` field of each instance).`
+      );
+    }
+
+    const layout = project.getLayout(scene_name);
+    let wrongObjectDescription = null;
+    // The id is a prefix of the instance persistent uuid (like everywhere
+    // else, see `describe_instances`) - it normally matches a single
+    // instance.
+    const matchedInstances: Array<gdInitialInstance> = [];
+    iterateOnInstances(layout.getInitialInstances(), instance => {
+      if (!instance.getPersistentUuid().startsWith(instanceId)) return;
+      if (object_name && instance.getObjectName() !== object_name) {
+        wrongObjectDescription = `"${instanceId}" (instance of "${instance.getObjectName()}")`;
+        return;
+      }
+      matchedInstances.push(instance);
+    });
+
+    if (object_name && wrongObjectDescription) {
+      return fail(
+        `This instance id is not an instance of object "${object_name}": ${wrongObjectDescription}. Nothing was changed. Pass the right \`object_name\` (or omit it), or fix the id using \`describe_instances\`.`
+      );
+    }
+    if (matchedInstances.length === 0) {
+      return fail(
+        `No instance with id "${instanceId}" found in scene "${scene_name}". Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance).`
+      );
+    }
+
+    const instancesLabel = matchedInstances
+      .map(
+        instance =>
+          `"${instance
+            .getPersistentUuid()
+            .slice(0, 10)}" (${instance.getObjectName()})`
+      )
+      .join(', ');
+    return {
+      failure: null,
+      variablesContainers: matchedInstances.map(instance =>
+        instance.getVariables()
+      ),
+      scopeDescription: `instance${
+        matchedInstances.length > 1 ? 's' : ''
+      } ${instancesLabel} of scene "${scene_name}"`,
+    };
+  }
 
   if (variable_scope === 'scene') {
     if (!scene_name) {
@@ -7786,7 +8147,7 @@ const resolveVariablesContainers = ({
   }
 
   return fail(
-    `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\` or \`global\`.`
+    `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\`, \`instance\` or \`global\`.`
   );
 };
 
@@ -7853,6 +8214,17 @@ const addOrEditVariable: EditorFunction = {
           details,
           hasDetailsToShow: true,
         };
+      } else if (variable_scope === 'instance') {
+        return {
+          text: (
+            <Trans>
+              Set variable <b>{variable_name_or_path}</b> on an instance of
+              scene {scene_name}.
+            </Trans>
+          ),
+          details,
+          hasDetailsToShow: true,
+        };
       }
 
       return {
@@ -7898,6 +8270,17 @@ const addOrEditVariable: EditorFunction = {
         details,
         hasDetailsToShow: true,
       };
+    } else if (variable_scope === 'instance') {
+      return {
+        text: (
+          <Trans>
+            Update variables <b>{variableNames}</b> on an instance of scene{' '}
+            {scene_name}.
+          </Trans>
+        ),
+        details,
+        hasDetailsToShow: true,
+      };
     }
 
     return {
@@ -7917,6 +8300,10 @@ const addOrEditVariable: EditorFunction = {
       'object_name'
     );
     const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const instance_id = SafeExtractor.extractStringProperty(
+      args,
+      'instance_id'
+    );
     const operations = extractVariableOperations(args);
     if (operations.length === 0) {
       return makeGenericFailure(
@@ -7929,6 +8316,7 @@ const addOrEditVariable: EditorFunction = {
       variable_scope,
       scene_name,
       object_name,
+      instance_id,
     });
     if (resolved.failure) return resolved.failure;
     const { variablesContainers, scopeDescription } = resolved;
@@ -8078,6 +8466,7 @@ const inspectVariables: EditorFunction = {
       variable_scope,
       scene_name,
       object_name,
+      instance_id: SafeExtractor.extractStringProperty(args, 'instance_id'),
     });
     if (resolved.failure) return resolved.failure;
     const { variablesContainers, scopeDescription } = resolved;
@@ -8358,6 +8747,29 @@ const runEditAgent: EditorFunction = {
   modifiesProject: true,
 };
 
+const runTests: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const newTest = SafeExtractor.extractObjectProperty(args, 'new_test');
+    const newTestName = newTest
+      ? SafeExtractor.extractStringProperty(newTest, 'name')
+      : null;
+    if (newTestName) {
+      return {
+        text: <Trans>Running the gameplay test {newTestName}.</Trans>,
+      };
+    }
+    return {
+      text: <Trans>Running gameplay tests.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to run gameplay tests - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
 const readGameProjectJson: EditorFunction = {
   renderForEditor: ({ args }) => {
     return {
@@ -8387,7 +8799,111 @@ const searchObjectAssetStore: EditorFunction = {
   modifiesProject: false,
 };
 
+/**
+ * Script-based agents (v12+): runs a JavaScript script written by the AI, in
+ * which the client-side editor functions are exposed as plain async functions
+ * (see `ScriptExecution/`). Replaces N discrete tool calls by one. The script's
+ * calls use the SAME implementations and collaborators bag as individual tool
+ * calls, so behavior (including the coalesced `on*ModifiedOutsideEditor`
+ * refresh) is identical. `modifiesProject: true` so the whole script is gated
+ * behind one edit approval when auto-edit is off.
+ */
+const runScript: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const title =
+      args && typeof args.title === 'string' && args.title
+        ? args.title
+        : 'Run a script';
+    // The rich per-record view is rendered by `RunScriptFunctionCallRow`; here
+    // we only provide the user-facing title (used e.g. for the approval label).
+    return { text: title, hasDetailsToShow: false };
+  },
+  launchFunction: async ({ args, project, ...launchOptions }) => {
+    const jsCode =
+      args && typeof args.js_code === 'string' ? args.js_code : null;
+    if (!jsCode) {
+      return {
+        success: false,
+        message:
+          'run_script requires a `js_code` string argument (the JavaScript to run).',
+      };
+    }
+
+    // Explorer sub-agent scripts are read-only: expose only non-mutating
+    // functions so a script can't modify the project (defense in depth; matches
+    // the backend's explorer script-function list). Signaled by the caller via
+    // `runScriptReadOnly` in the collaborators bag.
+    const allowedFunctionNames = launchOptions.runScriptReadOnly
+      ? [
+          ...Object.keys(editorFunctions).filter(
+            name => !editorFunctions[name].modifiesProject
+          ),
+          ...Object.keys(editorFunctionsWithoutProject).filter(
+            name => !editorFunctionsWithoutProject[name].modifiesProject
+          ),
+        ]
+      : null;
+
+    const exposedFunctions = buildExposedScriptFunctions({
+      editorFunctions,
+      editorFunctionsWithoutProject,
+      launchOptions,
+      project,
+      allowedFunctionNames,
+    });
+
+    const result = await executeScript({ jsCode, exposedFunctions });
+    const capped = capScriptExecutionResult(result);
+
+    return {
+      success: capped.success,
+      functionCallRecords: capped.functionCallRecords,
+      consoleLogs: capped.consoleLogs,
+      returnValue: capped.returnValue,
+      error: capped.error,
+      meta: {
+        didModifyProject: capped.didModifyProject,
+        // Forward scene names created inside the script so they auto-open, like
+        // a standalone create_scene call does.
+        ...(capped.newSceneNames.length > 0
+          ? { newSceneNames: capped.newSceneNames }
+          : {}),
+      },
+    };
+  },
+  modifiesProject: true,
+};
+
+const searchResourceStore: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const resourceKind = SafeExtractor.extractStringProperty(
+      args,
+      'resource_kind'
+    );
+    if (resourceKind === 'audio') {
+      return {
+        text: <Trans>Searching audio files in the resource store.</Trans>,
+      };
+    }
+    if (resourceKind === 'font') {
+      return {
+        text: <Trans>Searching fonts in the resource store.</Trans>,
+      };
+    }
+    return {
+      text: <Trans>Searching the resource store.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to search the resource store - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
+  run_script: runScript,
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
   // Old tool names, kept for AI requests still using an older toolsVersion:
@@ -8423,8 +8939,12 @@ export const editorFunctions: { [string]: EditorFunction } = {
 
   run_explorer_agent: runExplorerAgent,
   run_edit_agent: runEditAgent,
+  run_tests: runTests,
+  run_gameplay_test: runGameplayTest,
+  change_gameplay_tests: changeGameplayTests,
   read_game_project_json: readGameProjectJson,
   search_object_asset_store: searchObjectAssetStore,
+  search_resource_store: searchResourceStore,
 
   generate_events: addSceneEvents,
 

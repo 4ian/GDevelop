@@ -968,7 +968,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(`
-        "No changes. Issues:
+        "Nothing changed. Issues:
         No font matching \\"non-existing-font.ttf\\" found in the free library — the property was NOT changed. An empty \\"font\\" value is valid (the default font is used). Retry with a more descriptive name if needed."
       `);
 
@@ -1005,7 +1005,7 @@ describe('editorFunctions', () => {
       expect(searchAndInstallResources).not.toHaveBeenCalled();
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(`
-        "No changes. Issues:
+        "Nothing changed. Issues:
         \\"font\\" on \\"MyTextObject\\" -> \\"assets/font2.ttf\\": resource \\"assets/font2.ttf\\" does not exist. Did you mean: \\"font2.ttf\\"? To install a new font from the free library instead, retry with a more specific name."
       `);
     });
@@ -1029,7 +1029,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(`
-        "No changes. Issues:
+        "Nothing changed. Issues:
         \\"font\\" on \\"MyTextObject\\" -> \\"audio1.aac\\": resource \\"audio1.aac\\" has kind \\"audio\\" but expected \\"font\\"."
       `);
 
@@ -3110,7 +3110,10 @@ describe('editorFunctions', () => {
 
     // A position passed with the none brush would be silently ignored, which
     // agents misread as a move failure: the call must fail explicitly.
-    it('fails when a brush_position is passed with the none brush', async () => {
+    // "none" + `brush_position` + `existing_instance_ids` is contradictory but
+    // unambiguous (move THOSE instances there), and it is what agents write:
+    // read it as the "point" brush instead of failing the whole script.
+    it('moves the instances when a brush_position is passed with the none brush', async () => {
       await putInstances({
         brush_kind: 'point',
         brush_position: '100,200',
@@ -3131,11 +3134,9 @@ describe('editorFunctions', () => {
         },
       });
 
-      expect(result.success).toBe(false);
-      expect(result.message).toEqual(
-        expect.stringContaining('never moves instances')
-      );
-      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+      expect(result.success).toBe(true);
+      // The instance moved, and no new one was created.
+      expect(getInstancePositions(testScene)).toEqual([{ x: 640, y: 360 }]);
     });
 
     // Editing an existing instance with the none brush and no brush_position
@@ -3775,9 +3776,8 @@ describe('editorFunctions', () => {
       expect(getInstancePositions(testScene)).toEqual([]);
     });
 
-    // A position passed with the none brush would be silently ignored, which
-    // agents misread as a move failure: the call must fail explicitly.
-    it('fails when a brush_position is passed with the none brush', async () => {
+    // Same reading as in 2D: "none" + position + ids means "move those there".
+    it('moves the instances when a brush_position is passed with the none brush', async () => {
       await putInstances({
         brush_kind: 'point',
         brush_position: '10,20,30',
@@ -3797,12 +3797,9 @@ describe('editorFunctions', () => {
         },
       });
 
-      expect(result.success).toBe(false);
-      expect(result.message).toEqual(
-        expect.stringContaining('never moves instances')
-      );
+      expect(result.success).toBe(true);
       expect(getInstancePositions(testScene)).toEqual([
-        { x: 10, y: 20, z: 30 },
+        { x: 10, y: 20, z: 150 },
       ]);
     });
 
@@ -5439,7 +5436,7 @@ describe('editorFunctions', () => {
       expect(groups.has('Enemies')).toBe(false);
     });
 
-    it('does not create a group when the changed_groups item specifies no changes', async () => {
+    it('creates an empty group when the changed_groups item specifies no other changes', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
@@ -5458,13 +5455,47 @@ describe('editorFunctions', () => {
         }
       );
 
-      expect(result.success).toBe(false);
-      expect(result.warnings).toMatchInlineSnapshot(
-        `"Group \\"MobileControls\\" not found in scene \\"TestScene\\" and no changes were specified: no group was created. To create it, list the objects to put in it in \\"objects_to_add\\"."`
-      );
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Created group \\"MobileControls\\" in scene \\"TestScene\\".
+        Group \\"MobileControls\\" in scene \\"TestScene\\" now contains 0 object(s): (none)."
+      `);
       const groups = testScene.getObjects().getObjectGroups();
-      expect(groups.has('MobileControls')).toBe(false);
-      expect(groups.count()).toBe(1);
+      expect(groups.has('MobileControls')).toBe(true);
+      expect(
+        groups
+          .get('MobileControls')
+          .getAllObjectsNames()
+          .size()
+      ).toBe(0);
+      expect(groups.count()).toBe(2);
+    });
+
+    it('creates an empty group when only the group name is specified', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [{ group_name: 'Interactables' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Created group \\"Interactables\\" in scene \\"TestScene\\"."
+      `);
+      const groups = testScene.getObjects().getObjectGroups();
+      expect(groups.has('Interactables')).toBe(true);
+      expect(
+        groups
+          .get('Interactables')
+          .getAllObjectsNames()
+          .size()
+      ).toBe(0);
     });
 
     it('does not create a group when deleting a group that does not exist', async () => {
@@ -6084,6 +6115,182 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('Resource not found: "ghost.png"');
+    });
+  });
+  describe('change_gameplay_tests', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      const tests = project.getTests();
+      tests.insertNewTest('First test', 0).setDescription('First.');
+      tests.insertNewTest('Second test', 1);
+      tests.insertNewTest('Debug test', 2);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a test (and notifies the editor first, so tabs can close)', async () => {
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...fakeOptions,
+          args: {
+            scope: { type: 'project' },
+            changes: [{ test_name: 'Debug test', delete_this_test: true }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Deleted the test "Debug test"');
+      expect(project.getTests().hasTestNamed('Debug test')).toBe(false);
+      expect(fakeOptions.onWillDeleteGameplayTest).toHaveBeenCalledWith({
+        gameplayTestProjectItemName: 'Debug test',
+      });
+      expect(result.tests).toEqual([
+        { test_name: 'First test', description: 'First.' },
+        { test_name: 'Second test', description: '' },
+      ]);
+    });
+
+    it('renames a test (and notifies the editor so tabs are renamed)', async () => {
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...fakeOptions,
+          args: {
+            scope: { type: 'project' },
+            changes: [
+              {
+                test_name: 'First test',
+                changed_properties: [
+                  { property_name: 'name', new_value: 'Renamed test' },
+                  { property_name: 'description', new_value: 'Updated.' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getTests().hasTestNamed('First test')).toBe(false);
+      expect(project.getTests().hasTestNamed('Renamed test')).toBe(true);
+      expect(
+        project
+          .getTests()
+          .getTest('Renamed test')
+          .getDescription()
+      ).toBe('Updated.');
+      expect(
+        fakeOptions.onProjectItemRenamedOutsideEditor
+      ).toHaveBeenCalledWith({
+        kind: 'gameplay-test',
+        oldName: 'First test',
+        newName: 'Renamed test',
+      });
+    });
+
+    it('refuses a rename colliding with an existing test', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scope: { type: 'project' },
+            changes: [
+              {
+                test_name: 'First test',
+                changed_properties: [
+                  { property_name: 'name', new_value: 'Second test' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('already exists');
+      expect(project.getTests().hasTestNamed('First test')).toBe(true);
+    });
+
+    it('reorders a test with the index property (clamped)', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scope: { type: 'project' },
+            changes: [
+              {
+                test_name: 'Debug test',
+                changed_properties: [
+                  { property_name: 'index', new_value: '0' },
+                ],
+              },
+              {
+                test_name: 'First test',
+                changed_properties: [
+                  { property_name: 'index', new_value: '999' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.tests).toEqual([
+        { test_name: 'Debug test', description: '' },
+        { test_name: 'Second test', description: '' },
+        { test_name: 'First test', description: 'First.' },
+      ]);
+    });
+
+    it('rejects an unknown test with the list of existing ones, and an unknown property', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scope: { type: 'project' },
+            changes: [
+              { test_name: 'Ghost test', delete_this_test: true },
+              {
+                test_name: 'First test',
+                changed_properties: [
+                  { property_name: 'source', new_value: 'await 1;' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Unknown test "Ghost test"');
+      expect(result.message).toContain('"First test"');
+      expect(result.message).toContain('Unknown property "source"');
+      // The valid part of the batch still reports the project as modified: no
+      // change was applied here, so it is not.
+      expect(result.meta && result.meta.didModifyProject).toBe(false);
+    });
+
+    it('fails on an unknown scope', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scope: { type: 'extension', extension_name: 'NotAnExtension' },
+            changes: [{ test_name: 'First test', delete_this_test: true }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('does not exist');
     });
   });
 });

@@ -591,6 +591,7 @@ export const AskAiStandAloneForm = ({
     onObjectGroupsModifiedOutsideEditor: () => {},
     onProjectItemRenamedOutsideEditor: () => {},
     onWillDeleteScene: () => Promise.resolve(),
+    onWillDeleteGameplayTest: () => Promise.resolve(),
     onWillDeleteObject: () => {},
     onWillInstallExtension,
     onExtensionInstalled,

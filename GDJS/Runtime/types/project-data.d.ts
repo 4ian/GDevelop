@@ -445,6 +445,8 @@ declare interface InstanceData extends InstancePersistentUuidData {
   layer: string;
   locked?: boolean;
   sealed?: boolean;
+  /** True if the instance starts hidden (it can be shown with the "Show" action). */
+  hidden?: boolean;
   name: string;
 
   x: number;

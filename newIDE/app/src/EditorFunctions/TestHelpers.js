@@ -50,6 +50,7 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   },
   onObjectsModifiedOutsideEditor: jest.fn(),
   onWillDeleteScene: jest.fn(),
+  onWillDeleteGameplayTest: jest.fn(),
   onWillDeleteObject: jest.fn(),
   onWillInstallExtension: jest.fn(),
   onExtensionInstalled: jest.fn(),

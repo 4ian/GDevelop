@@ -99,6 +99,36 @@ describe('libGD.js', function () {
       expect(project.hasExternalEventsNamed('My events')).toBe(false);
     });
 
+    it('handles tests', function () {
+      const tests = project.getTests();
+      expect(tests.hasTestNamed('My test')).toBe(false);
+
+      const test = tests.insertNewTest('My test', 0);
+      expect(tests.hasTestNamed('My test')).toBe(true);
+      expect(tests.getTestsCount()).toBe(1);
+      expect(test.getName()).toBe('My test');
+      expect(test.getType()).toBe('gameplay');
+      test.setDescription('My description');
+      test.setSource("await harness.goToScene('Scene');");
+      expect(tests.getTest('My test').getDescription()).toBe('My description');
+      expect(tests.getTestAt(0).getSource()).toBe(
+        "await harness.goToScene('Scene');"
+      );
+      expect(test.getLastRunStatus()).toBe('');
+      test.setLastRunStatus('passed');
+      test.setLastRunAt(1769700000000);
+      test.setLastRunDurationMs(5400);
+      test.setLastRunFramesExecuted(320);
+      expect(test.getLastRunStatus()).toBe('passed');
+      expect(test.getLastRunAt()).toBe(1769700000000);
+      expect(test.getLastRunDurationMs()).toBe(5400);
+      expect(test.getLastRunFramesExecuted()).toBe(320);
+
+      tests.removeTest('My test');
+      expect(tests.hasTestNamed('My test')).toBe(false);
+      expect(tests.getTestsCount()).toBe(0);
+    });
+
     it('handles external layouts', function () {
       expect(project.hasExternalLayoutNamed('My layout')).toBe(false);
 
@@ -775,6 +805,9 @@ describe('libGD.js', function () {
       expect(initialInstance.getLayer()).toBe('MyLayer');
       initialInstance.setLocked(true);
       expect(initialInstance.isLocked()).toBe(true);
+      expect(initialInstance.isHidden()).toBe(false);
+      initialInstance.setHidden(true);
+      expect(initialInstance.isHidden()).toBe(true);
       initialInstance.setHasCustomSize(true);
       expect(initialInstance.hasCustomSize()).toBe(true);
       initialInstance.setCustomWidth(34);
@@ -820,6 +853,7 @@ describe('libGD.js', function () {
       expect(initialInstance2.getZOrder()).toBe(12);
       expect(initialInstance2.getLayer()).toBe('MyLayer');
       expect(initialInstance2.isLocked()).toBe(true);
+      expect(initialInstance2.isHidden()).toBe(true);
       expect(initialInstance2.hasCustomSize()).toBe(true);
       expect(initialInstance2.hasCustomDepth()).toBe(false);
       expect(initialInstance2.getCustomWidth()).toBe(34);

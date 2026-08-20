@@ -12,11 +12,13 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
+import { registerAskAiPrefillListener } from './AskAiPrefill';
 import {
   addMessageToAiRequest,
   createAiRequest,
@@ -159,6 +161,9 @@ type Props = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -261,6 +266,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
         onWillDeleteScene,
+        onWillDeleteGameplayTest,
         onWillDeleteObject,
         onWillInstallExtension,
         onExtensionInstalled,
@@ -930,6 +936,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
         onWillDeleteScene,
+        onWillDeleteGameplayTest,
         onWillDeleteObject,
         i18n,
         onWillInstallExtension,
@@ -996,6 +1003,19 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [setSelectedAiRequestId, selectedAiRequest]
       );
+      // Start a new chat with a pre-filled user request, when asked from
+      // elsewhere in the editor ("Edit with AI" buttons...).
+      React.useEffect(
+        () =>
+          registerAskAiPrefillListener((userRequestText: string) => {
+            onStartOrOpenChat({ aiRequestId: null });
+            if (aiRequestChatRef.current) {
+              aiRequestChatRef.current.setUserInput(null, userRequestText);
+            }
+          }),
+        [onStartOrOpenChat]
+      );
+
       const onStartNewChat = React.useCallback(
         () => {
           onStartOrOpenChat({
@@ -1647,6 +1667,7 @@ export const renderAskAiEditorContainer = (
           props.onProjectItemRenamedOutsideEditor
         }
         onWillDeleteScene={props.onWillDeleteScene}
+        onWillDeleteGameplayTest={props.onWillDeleteGameplayTest}
         onWillDeleteObject={props.onWillDeleteObject}
         onWillInstallExtension={props.onWillInstallExtension}
         onExtensionInstalled={props.onExtensionInstalled}

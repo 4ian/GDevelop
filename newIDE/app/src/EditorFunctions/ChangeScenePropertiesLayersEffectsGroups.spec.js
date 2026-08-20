@@ -262,7 +262,7 @@ describe('change_scene_properties_layers_effects_groups', () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.message).toBe('No changes. See warnings.');
+    expect(result.message).toBe('Nothing changed. See warnings.');
     expect(result.warnings).toBe(
       'Layer "DoesNotExist" does not exist in scene "TestScene": layer "UI" was NOT deleted (its instances would have nowhere to go). The base layer is named "".'
     );
@@ -338,7 +338,7 @@ describe('change_scene_properties_layers_effects_groups', () => {
   });
 
   // Deleting/renaming an effect that does not exist used to be a silent
-  // no-op, producing a bare "No changes." with no diagnosis.
+  // no-op, producing an unexplained "nothing changed" for the whole call.
   it('warns when deleting or renaming an effect that does not exist', async () => {
     const effects = testScene
       .getLayers()
@@ -483,7 +483,7 @@ describe('change_scene_properties_layers_effects_groups', () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.message).toBe('No changes. See warnings.');
+    expect(result.message).toBe('Nothing changed. See warnings.');
     expect(result.warnings).toBe('Unknown scene property: "gravity". Skipped.');
   });
 
@@ -517,8 +517,58 @@ describe('change_scene_properties_layers_effects_groups', () => {
       }
     );
 
+    // Pre-v12 (no toolsVersion here) a no-op stays a failure.
     expect(result.success).toBe(false);
-    expect(result.message).toBe('No changes.');
+    expect(result.message).toBe(
+      'Nothing changed: the requested values are already the current ones, or nothing was requested.'
+    );
     expect(result.warnings).toBeUndefined();
+  });
+
+  // The most frequent script failure measured in production: a `change_*` call
+  // that changes nothing killed the whole script, throwing away every other
+  // edit of the batch. From v12 it is a reported success.
+  it('is a success carrying the reasons when nothing changed, from v12', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        toolsVersion: 'v12',
+        args: {
+          scene_name: 'TestScene',
+          changed_properties: [
+            { property_name: 'notAProperty', new_value: 'whatever' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.nothingChanged).toBe(true);
+    // The reason is still reported, so the agent can fix it in a follow-up.
+    expect(result.warnings).toEqual(expect.stringContaining('notAProperty'));
+  });
+
+  // `changed_layers: [{ layer_name: "HUD" }]` is how an agent asks to make sure
+  // a layer exists. When it does, that is satisfied — not an unexplained no-op.
+  it('reports an existing layer as nothing to change (not a failure)', async () => {
+    testScene
+      .getLayers()
+      .insertNewLayer('HUD', testScene.getLayers().getLayersCount());
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layers: [{ layer_name: 'HUD' }],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toEqual(
+      expect.stringContaining('already exists in scene "TestScene"')
+    );
+    expect(testScene.getLayers().hasLayerNamed('HUD')).toBe(true);
   });
 });

@@ -639,10 +639,11 @@ namespace gdjs {
       _gridOffsetX: float = 0;
       _gridOffsetY: float = 0;
 
-      _leftBorder: integer = 0;
-      _rightBorder: integer = 0;
-      _topBorder: integer = 0;
-      _bottomBorder: integer = 0;
+      /** Distance on the left from the owner position that is considered as solid (in pixels) */
+      _leftBorder: float = 0;
+      _rightBorder: float = 0;
+      _topBorder: float = 0;
+      _bottomBorder: float = 0;
       _distanceFunction: (pt1: FloatPoint, pt2: FloatPoint) => float;
       //An array of array. Nodes are indexed by their x position, and then by their y position.
       _allNodes: Node[][] = [];
@@ -687,10 +688,10 @@ namespace gdjs {
       }
 
       setObjectSize(
-        leftBorder: integer,
-        topBorder: integer,
-        rightBorder: integer,
-        bottomBorder: integer
+        leftBorder: float,
+        topBorder: float,
+        rightBorder: float,
+        bottomBorder: float
       ): PathfindingRuntimeBehavior.SearchContext {
         this._leftBorder = leftBorder;
         this._rightBorder = rightBorder;
@@ -922,14 +923,26 @@ namespace gdjs {
             topLeftCellY < yPos &&
             yPos < bottomRightCellY
           ) {
-            objectsOnCell = true;
-            if (this._closeObstacles[k].isImpassable()) {
-              //The cell is impassable, stop here.
-              newNode.cost = -1;
+            let hasAnyHitBoxInCell = false;
+            for (const _hitbox of obj.getHitBoxesAround(
+              nodeCenterX - this._leftBorder,
+              nodeCenterY - this._topBorder,
+              nodeCenterX + this._rightBorder - 1,
+              nodeCenterY + this._bottomBorder - 1
+            )) {
+              hasAnyHitBoxInCell = true;
               break;
-            } else {
-              //Superimpose obstacles
-              newNode.cost += this._closeObstacles[k].getCost();
+            }
+            if (hasAnyHitBoxInCell) {
+              objectsOnCell = true;
+              if (this._closeObstacles[k].isImpassable()) {
+                //The cell is impassable, stop here.
+                newNode.cost = -1;
+                break;
+              } else {
+                //Superimpose obstacles
+                newNode.cost += this._closeObstacles[k].getCost();
+              }
             }
           }
         }

@@ -1093,6 +1093,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                 }}
                 onWillInstallExtension={onWillInstallExtension}
                 onExtensionInstalled={onExtensionInstalled}
+                onCreateNewExtensionWithBehavior={null}
                 shouldShowCapabilityBehaviors={true}
               />
             )}

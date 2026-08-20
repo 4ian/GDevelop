@@ -39,4 +39,10 @@ void EventsFunctionsExtensionBrowser::ExposeEventBasedBehaviors(
   worker.Launch(eventsFunctionsExtension.GetEventsBasedBehaviors());
 }
 
+void EventsFunctionsExtensionBrowser::ExposeObjects(
+    gd::Project &project, gd::ArbitraryObjectsWorker &worker) const {
+  gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionObjects(
+      eventsFunctionsExtension, worker);
+}
+
 } // namespace gd

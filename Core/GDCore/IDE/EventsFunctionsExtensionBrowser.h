@@ -34,41 +34,50 @@ public:
       : eventsFunctionsExtension(eventsFunctionsExtension_) {}
 
   /**
-   * \brief Call the specified worker on all events of the event-based
-   * behavior.
+   * \brief Call the specified worker on all events of the events-functions
+   * extension.
    *
-   * This should be the preferred way to traverse all the events of an event-based behavior.
+   * This should be the preferred way to traverse all the events of an
+   * events-functions extension.
    */
   void ExposeEvents(gd::Project &project,
                     gd::ArbitraryEventsWorker &worker) const override;
 
   /**
-   * \brief Call the specified worker on all events of the event-based
-   * behavior.
+   * \brief Call the specified worker on all events of the events-functions
+   * extension.
    *
-   * This should be the preferred way to traverse all the events of an event-based behavior.
+   * This should be the preferred way to traverse all the events of an
+   * events-functions extension.
    */
   void
-  ExposeEvents(gd::Project &project, 
+  ExposeEvents(gd::Project &project,
                gd::ArbitraryEventsWorkerWithContext &worker) const override;
 
   /**
-   * \brief Call the specified worker on all functions of the event-based behavior
+   * \brief Call the specified worker on all functions of the events-functions
+   * extension (free function, behavior function and object function).
    *
    * This should be the preferred way to traverse all the function signatures
-   * of an event-based behavior.
+   * of an events-functions extension.
    */
-  void ExposeFunctions(gd::Project &project,
-                       gd::ArbitraryEventsFunctionsWorker &worker) const override;
+  void
+  ExposeFunctions(gd::Project &project,
+                  gd::ArbitraryEventsFunctionsWorker &worker) const override;
 
   /**
-   * \brief Do nothing.
+   * \brief Call the specified worker on all ObjectContainers of the
+   * events-functions extension.
+   *
+   * This should be the preferred way to traverse all the objects of an
+   * events-functions extension.
    */
   void ExposeObjects(gd::Project &project,
-                     gd::ArbitraryObjectsWorker &worker) const override {};
+                     gd::ArbitraryObjectsWorker &worker) const override;
 
   /**
-   * \brief Call the specified worker on the event-based behavior.
+   * \brief Call the specified worker on the event-based behaviors of the
+   * events-functions extension.
    */
   void ExposeEventBasedBehaviors(
       gd::Project &project,
@@ -77,8 +86,9 @@ public:
   /**
    * \brief Do nothing.
    */
-  void ExposeBehaviorSharedDatas(gd::Project &project,
-                         gd::ArbitraryBehaviorSharedDataWorker &worker) const override {};
+  void ExposeBehaviorSharedDatas(
+      gd::Project &project,
+      gd::ArbitraryBehaviorSharedDataWorker &worker) const override {};
 
 private:
   gd::EventsFunctionsExtension &eventsFunctionsExtension;

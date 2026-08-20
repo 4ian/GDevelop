@@ -224,7 +224,8 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
       'unserializeFrom',
       project
     );
-    newEventsFunctionsExtension.setName(newName); // Unserialization has overwritten the name.
+    // Unserialization has overwritten the name.
+    newEventsFunctionsExtension.setName(newName);
     if (newName !== oldName) {
       newEventsFunctionsExtension.setOrigin('', '');
       gd.WholeProjectRefactorer.updateExtensionNameInExtension(

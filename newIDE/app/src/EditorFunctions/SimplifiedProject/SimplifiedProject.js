@@ -400,6 +400,9 @@ export const makeSimplifiedProjectBuilder = (
     };
   };
 
+  // The full structure is intentionally uncapped here — the backend trims
+  // it if needed, and `read_game_project_json` reads it with its own token
+  // budget (see SimplifiedProjectReader.js).
   const getSimplifiedProject = (
     project: gdProject,
     options: SimplifiedProjectOptions

@@ -1996,6 +1996,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             <EventsBasedBehaviorOrObjectEditorDialog
               initiallySelectedProperty={eventsBasedEntityPropertiesDialogOpen}
               onClose={() => {
+                // Required behaviors might have been added
+                this.onSelectionChanged(
+                  null,
+                  this.state.selectedEventsBasedBehavior,
+                  null,
+                  null,
+                  null,
+                  null
+                );
                 this.setState({
                   eventsBasedEntityPropertiesDialogOpen: null,
                 });

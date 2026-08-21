@@ -57,6 +57,7 @@ import PropertyListEditor, {
 import type { EventPath } from '../Utils/EventPath';
 import type { SearchFilterParams } from '../Utils/Search';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
+import { remapSentenceParamIndices } from './EventsFunctionConfigurationEditor/SentenceParameterRemapping';
 
 const gd: libGDevelop = global.gd;
 
@@ -609,6 +610,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       newIndex + ParametersIndexOffsets.FreeFunction
     );
 
+    this._remapEventsFunctionSentence(
+      eventsFunction,
+      oldIndex,
+      newIndex,
+      ParametersIndexOffsets.FreeFunction
+    );
+
     done(true);
   };
 
@@ -620,7 +628,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done: boolean => void
   ) => {
     // Don't ask for user confirmation as this change is easy to revert.
-
     const { project, eventsFunctionsExtension } = this.props;
     gd.WholeProjectRefactorer.moveBehaviorEventsFunctionParameter(
       project,
@@ -629,6 +636,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunction.getName(),
       oldIndex,
       newIndex
+    );
+
+    this._remapEventsFunctionSentence(
+      eventsFunction,
+      oldIndex,
+      newIndex,
+      ParametersIndexOffsets.BehaviorFunction
     );
 
     done(true);
@@ -653,9 +667,33 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       newIndex
     );
 
+    this._remapEventsFunctionSentence(
+      eventsFunction,
+      oldIndex,
+      newIndex,
+      ParametersIndexOffsets.ObjectFunction
+    );
+
     done(true);
   };
 
+  _remapEventsFunctionSentence = (
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    offset: number
+  ): void => {
+    const sentence = eventsFunction.getSentence();
+    if (sentence) {
+      const newSentence = remapSentenceParamIndices(
+        sentence,
+        oldIndex,
+        newIndex,
+        offset
+      );
+      eventsFunction.setSentence(newSentence);
+    }
+  };
   _onDeleteEventsFunction = (
     eventsFunction: gdEventsFunction,
     cb: boolean => void

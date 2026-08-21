@@ -240,6 +240,18 @@ public:
       gd::ReadOnlyArbitraryEventsWorkerWithContext &worker);
 
   /**
+   * \brief Call the specified worker on all functions of the event-based
+   * extension.
+   *
+   * This should be the preferred way to traverse all the functions of an events
+   * based extension.
+   */
+    static void ExposeEventsFunctionsExtensionFunctions(
+        gd::Project &project,
+        gd::EventsFunctionsExtension &eventsFunctionsExtension,
+        ArbitraryEventsFunctionsWorker &worker);
+
+  /**
    * \brief Call the specified worker on all ObjectContainers of the project
    * (global, layouts...)
    *

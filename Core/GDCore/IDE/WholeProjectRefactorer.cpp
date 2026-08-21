@@ -14,6 +14,7 @@
 #include "GDCore/IDE/ObjectRefactorer.h"
 #include "GDCore/IDE/EventBasedBehaviorBrowser.h"
 #include "GDCore/IDE/EventBasedObjectBrowser.h"
+#include "GDCore/IDE/EventsFunctionsExtensionBrowser.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/BehaviorParametersFiller.h"
 #include "GDCore/IDE/Events/BehaviorPropertyRenamer.h"
@@ -447,6 +448,17 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
                                             objectGroup.GetName());
   gd::ProjectBrowserHelper::ExposeProjectEvents(
       project, eventsVariableInstructionTypeSwitcher);
+}
+
+void WholeProjectRefactorer::UpdateExtensionNameInExtension(
+    gd::Project &project,
+    gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::String &sourceExtensionName) {
+  const EventsFunctionsExtensionBrowser eventsFunctionsExtensionBrowser(
+      eventsFunctionsExtension);
+  WholeProjectRefactorer::RenameEventsFunctionsExtension(
+      project, eventsFunctionsExtension, sourceExtensionName,
+      eventsFunctionsExtension.GetName(), eventsFunctionsExtensionBrowser);
 }
 
 void WholeProjectRefactorer::UpdateExtensionNameInEventsBasedBehavior(

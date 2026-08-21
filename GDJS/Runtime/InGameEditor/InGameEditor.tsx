@@ -402,11 +402,11 @@ namespace gdjs {
     {
       effectType: 'Scene3D::HemisphereLight',
       name: 'Default Light for in-game editor',
-      doubleParameters: { elevation: 45, intensity: 1, rotation: 0 },
+      doubleParameters: { elevation: 45, intensity: 1, rotation: 90 },
       stringParameters: {
         groundColor: '64;64;64',
         skyColor: '255;255;255',
-        top: 'Y-',
+        top: 'Z+',
       },
       booleanParameters: {},
     },
@@ -1381,12 +1381,12 @@ namespace gdjs {
                   doubleParameters: {
                     elevation: 45,
                     intensity: 1,
-                    rotation: 0,
+                    rotation: 90,
                   },
                   stringParameters: {
                     groundColor: '64;64;64',
                     skyColor: '255;255;255',
-                    top: 'Y-',
+                    top: 'Z+',
                   },
                   booleanParameters: {},
                 },
@@ -2352,11 +2352,15 @@ namespace gdjs {
             patchNegativeAxisHandlesOnTransformControlsGizmos(
               threeTransformControls
             );
-
-            threeTransformControls.rotation.order = 'ZYX';
-            threeTransformControls.scale.y = -1;
+            threeTransformControls.getHelper().rotation.order = 'ZYX';
+            const worldScale = this._currentScene
+              ? this._currentScene.getRenderer3DWorldScale()
+              : 1;
+            threeTransformControls
+              .getHelper()
+              .scale.set(worldScale, -worldScale, worldScale);
             threeTransformControls.mode = this._transformControlsMode;
-            threeTransformControls.traverse((obj) => {
+            threeTransformControls.getHelper().traverse((obj) => {
               // To be detected correctly by OutlinePass.
               // @ts-ignore
               obj.isTransformControls = true;
@@ -2373,7 +2377,7 @@ namespace gdjs {
             threeScene.add(dummyThreeObject);
 
             threeTransformControls.attach(dummyThreeObject);
-            threeScene.add(threeTransformControls);
+            threeScene.add(threeTransformControls.getHelper());
 
             // Keep track of the movement so the editor can apply it to the selection.
             let initialObjectX = 0;
@@ -2629,7 +2633,9 @@ namespace gdjs {
         return;
       }
       this._selectionControls.threeTransformControls.detach();
-      this._selectionControls.threeTransformControls.removeFromParent();
+      this._selectionControls.threeTransformControls
+        .getHelper()
+        .removeFromParent();
       this._selectionControls.dummyThreeObject.removeFromParent();
       this._editorGrid.setVisible(false);
       this._selectionControls = null;
@@ -3379,6 +3385,11 @@ namespace gdjs {
         const firstIntersect = intersects[0];
         if (!firstIntersect) return;
 
+        const worldScale = currentScene.getRenderer3DWorldScale();
+        firstIntersect.distance *= worldScale;
+        firstIntersect.point.x *= worldScale;
+        firstIntersect.point.y *= worldScale;
+        firstIntersect.point.z *= worldScale;
         firstIntersectsByLayer[layerName] = {
           intersect: firstIntersect,
         };
@@ -5219,7 +5230,6 @@ namespace gdjs {
       // of the BoxHelper is always (0, 0, 0) and the geometry is hard to manipulate.
       this.container = new THREE.Group();
       this.container.rotation.order = 'ZYX';
-      this.container.scale.y = -1;
       this.boxHelper = new THREE.BoxHelper(threeObject, '#f2a63c');
       this.boxHelper.rotation.order = 'ZYX';
       this.boxHelper.material.depthTest = false;
@@ -5228,6 +5238,10 @@ namespace gdjs {
     }
 
     update() {
+      const worldScale = this.object
+        .getRuntimeScene()
+        .getRenderer3DWorldScale();
+      this.container.scale.set(worldScale, -worldScale, worldScale);
       if (this.dummyObject3DForObject2D) {
         this.dummyObject3DForObject2D.position.set(
           this.object.getCenterXInScene(),

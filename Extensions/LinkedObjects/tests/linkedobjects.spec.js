@@ -35,6 +35,7 @@ describe('gdjs.LinksManager', function () {
         name: 'Scene1',
         stopSoundsOnStartup: false,
         title: '',
+        renderer3DWorldScale: 100,
         usedResources: [],
         uiSettings: {
           grid: false,

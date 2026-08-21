@@ -28,6 +28,7 @@ namespace gdjs {
    * @category Behaviors > NavMesh pathfinding
    */
   export class NavMeshObstaclesManager {
+    instanceContainer: gdjs.RuntimeInstanceContainer;
     obstacles = new Set<NavMeshObstacleRuntimeBehavior>();
     characters = new Set<NavMeshCharacterRuntimeBehavior>();
     is3D = false;
@@ -56,6 +57,7 @@ namespace gdjs {
     debuggerRenderer: gdjs.NavMeshDebuggerRenderer | null = null;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
+      this.instanceContainer = instanceContainer;
       if (!sharedData) {
         // It can happens when there is no object with the character behavior.
         return;
@@ -134,7 +136,7 @@ namespace gdjs {
           this.addPolygonsFor(object, positions, indices);
         }
       }
-      if (!this.is3D && positions.length > 0) {
+      if (!this.is3D) {
         this.addGroundFor2D(positions, indices);
         this.navMeshConfig.walkableClimb = 0.1;
         this.navMeshConfig.walkableHeight = 2;
@@ -208,17 +210,34 @@ namespace gdjs {
       positions: Array<float>,
       indices: Array<integer>
     ): void {
-      let minX = Number.POSITIVE_INFINITY;
-      let minY = Number.POSITIVE_INFINITY;
-      let maxX = Number.NEGATIVE_INFINITY;
-      let maxY = Number.NEGATIVE_INFINITY;
-      for (let index = 0; index + 2 < positions.length; index += 3) {
-        const x = positions[index];
-        const y = positions[index + 2];
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
+      const game = this.instanceContainer.getGame();
+      let minX = 0;
+      let minY = 0;
+      let maxX = game.getGameResolutionWidth();
+      let maxY = game.getGameResolutionHeight();
+      if (positions.length > 0) {
+        minX = Number.POSITIVE_INFINITY;
+        minY = Number.POSITIVE_INFINITY;
+        maxX = Number.NEGATIVE_INFINITY;
+        maxY = Number.NEGATIVE_INFINITY;
+        for (let index = 0; index + 2 < positions.length; index += 3) {
+          const x = positions[index];
+          const y = positions[index + 2];
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x);
+          maxY = Math.max(maxY, y);
+        }
+        const gameSize = Math.max(
+          game.getGameResolutionWidth(),
+          game.getGameResolutionHeight()
+        );
+        // Extends the area in case it's not closed by obstacles
+        // and characters may be expected to go around them.
+        minX -= gameSize;
+        minY -= gameSize;
+        maxX += gameSize;
+        maxY += gameSize;
       }
       const width = maxX - minX;
       const height = (maxY - minY) * this.inverseSpeedScaleY;

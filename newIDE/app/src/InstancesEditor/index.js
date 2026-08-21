@@ -195,6 +195,7 @@ export default class InstancesEditor extends Component<Props, State> {
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
+  _isPointerOverCanvas = false;
   _showObjectInstancesIn3D: boolean = false;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
 
@@ -245,6 +246,7 @@ export default class InstancesEditor extends Component<Props, State> {
     const { onMouseMove, onMouseLeave } = this.props;
 
     this.keyboardShortcuts = new KeyboardShortcuts({
+      isActive: this._shouldHandleKeyboardShortcuts,
       shortcutCallbacks: {
         onMove: this.moveSelection,
         onEscape: this.onPressEscape,
@@ -336,13 +338,22 @@ export default class InstancesEditor extends Component<Props, State> {
       event.preventDefault();
     };
     this.pixiRenderer.view.setAttribute('tabIndex', -1);
+    // Keyboard shortcuts are listened on the window rather than on the canvas, so that
+    // they also work when the canvas is only hovered and not focused (for example when
+    // the focus is still in the objects list), like the mouse wheel zoom already does.
+    // They are restricted to this editor by `_shouldHandleKeyboardShortcuts`, and the
+    // capture phase is used so that a focused component stopping the event propagation
+    // (the tree views handle the keyboard) can't prevent them from working.
+    window.addEventListener('keydown', this.keyboardShortcuts.onKeyDown, true);
+    // Key releases are always handled, even when the canvas is not hovered anymore, so
+    // that a key released after leaving the canvas (which happens when moving the view
+    // up to its border) is not considered as still pressed. A key can also be released
+    // while the window is blurred (Alt+Tab...), in which case no `keyup` is received.
+    window.addEventListener('keyup', this.keyboardShortcuts.onKeyUp, true);
+    window.addEventListener('blur', this.keyboardShortcuts.resetModifiers);
     this.pixiRenderer.view.addEventListener(
-      'keydown',
-      this.keyboardShortcuts.onKeyDown
-    );
-    this.pixiRenderer.view.addEventListener(
-      'keyup',
-      this.keyboardShortcuts.onKeyUp
+      'mouseover',
+      this._onPointerOverCanvas
     );
     this.pixiRenderer.view.addEventListener(
       'mousedown',
@@ -352,14 +363,15 @@ export default class InstancesEditor extends Component<Props, State> {
       'mouseup',
       this.keyboardShortcuts.onMouseUp
     );
-    if (onMouseMove)
-      this.pixiRenderer.view.addEventListener('mousemove', event => {
-        onMouseMove(event);
-      });
-    if (onMouseLeave)
-      this.pixiRenderer.view.addEventListener('mouseout', event => {
-        onMouseLeave(event);
-      });
+    this.pixiRenderer.view.addEventListener('mousemove', event => {
+      // `mouseover` can be missed, for example if the canvas appears under a still cursor.
+      this._onPointerOverCanvas();
+      if (onMouseMove) onMouseMove(event);
+    });
+    this.pixiRenderer.view.addEventListener('mouseout', event => {
+      this._isPointerOverCanvas = false;
+      if (onMouseLeave) onMouseLeave(event);
+    });
     this.pixiRenderer.view.addEventListener('focusout', event => {
       if (this.keyboardShortcuts) {
         this.keyboardShortcuts.resetModifiers();
@@ -661,10 +673,31 @@ export default class InstancesEditor extends Component<Props, State> {
     this.backgroundPixiContainer.addChild(this.background.getPixiObject());
   }
 
+  _onPointerOverCanvas = () => {
+    this._isPointerOverCanvas = true;
+  };
+
+  /**
+   * Keyboard shortcuts are handled when the canvas is hovered by the cursor, or when it
+   * is focused - so that they can be used without having to click on the canvas first,
+   * consistently with the mouse wheel zoom that already works when only hovering.
+   */
+  _shouldHandleKeyboardShortcuts = (): boolean =>
+    !!this.pixiRenderer &&
+    (this._isPointerOverCanvas ||
+      document.activeElement === this.pixiRenderer.view);
+
   componentWillUnmount() {
     // This is an antipattern and is theoretically not needed, but help
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
+
+    if (this.keyboardShortcuts) {
+      const { onKeyDown, onKeyUp, resetModifiers } = this.keyboardShortcuts;
+      window.removeEventListener('keydown', onKeyDown, true);
+      window.removeEventListener('keyup', onKeyUp, true);
+      window.removeEventListener('blur', resetModifiers);
+    }
 
     // We've seen all those elements being undefined in some cases, so
     // by security, check that they are defined before deleting them.

@@ -240,6 +240,33 @@ export const EmbeddedGameFrame = ({
       shortcutCallbacks: {},
     })
   );
+  const hasSomeDialogOpen = React.useRef<boolean>(false);
+
+  // The game is displayed in an iframe, which is a separate document: it only receives
+  // the keyboard events if it has the focus. Give it the focus as soon as it is hovered,
+  // so that the in-game editor shortcuts (notably space to move the view) can be used
+  // without having to click on the game first.
+  const focusGameFrameOnHover = React.useCallback(() => {
+    const iframe = iframeRef.current;
+    if (!iframe || !iframe.contentWindow) return;
+
+    // A dialog can be opened on top of the game, or show it through a "hole": don't
+    // fight with its focus trap.
+    if (hasSomeDialogOpen.current) return;
+
+    const { activeElement } = document;
+    // Nothing to do if the game is already focused, and don't interrupt the user while
+    // a text is being edited (renaming an object, editing a property...).
+    if (
+      activeElement === iframe ||
+      // $FlowFixMe[prop-missing] - `closest` is available on the focused element.
+      (activeElement &&
+        activeElement.closest('textarea, input, [contenteditable="true"]'))
+    )
+      return;
+
+    iframe.contentWindow.focus();
+  }, []);
 
   const inGameEditorSettings = useInGameEditorSettings();
   React.useEffect(
@@ -568,7 +595,6 @@ export const EmbeddedGameFrame = ({
 
   React.useEffect(
     () => {
-      let hasSomeDialogOpen = false;
       let hasSomeEmbeddedGameFrameHoleActive = false;
 
       const sendInGameEditorVisibleStatus = () => {
@@ -579,7 +605,8 @@ export const EmbeddedGameFrame = ({
               previewDebuggerServer.sendMessage(debuggerId, {
                 command: 'setVisibleStatus',
                 visible:
-                  !hasSomeDialogOpen && hasSomeEmbeddedGameFrameHoleActive,
+                  !hasSomeDialogOpen.current &&
+                  hasSomeEmbeddedGameFrameHoleActive,
               });
             });
         }
@@ -587,7 +614,7 @@ export const EmbeddedGameFrame = ({
 
       const unregisterDialogOpenCallback = registerOpenedDialogsCountCallback(
         ({ openedDialogsCount }) => {
-          hasSomeDialogOpen = openedDialogsCount > 0;
+          hasSomeDialogOpen.current = openedDialogsCount > 0;
           sendInGameEditorVisibleStatus();
         }
       );
@@ -626,6 +653,9 @@ export const EmbeddedGameFrame = ({
           title="Game Preview"
           src={previewIndexHtmlLocation}
           tabIndex={0}
+          // Listened on the iframe itself and not on its container, so that the overlay
+          // covering it (drop target, pointer events blocker) doesn't take the focus.
+          onMouseOver={focusGameFrameOnHover}
           style={{
             position: 'absolute',
             top: 0,

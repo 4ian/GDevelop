@@ -85,13 +85,14 @@
 #include <GDCore/Project/InitialInstance.h>
 #include <GDCore/Project/InitialInstancesContainer.h>
 #include <GDCore/Project/Layout.h>
+#include <GDCore/Project/LayoutFolderOrLayout.h>
 #include <GDCore/Project/LayersContainer.h>
 #include <GDCore/Project/MeasurementBaseUnit.h>
 #include <GDCore/Project/MeasurementUnitElement.h>
 #include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/ObjectTools.h>
-#include <GDCore/Project/ObjectFolderOrObject.h>
+#include <GDCore/Project/ObjectsContainer.h>
 #include <GDCore/Project/ObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Project/ProjectScopedContainers.h>

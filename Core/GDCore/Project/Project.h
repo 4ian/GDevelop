@@ -11,6 +11,7 @@
 
 #include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Project/ExtensionProperties.h"
+#include "GDCore/Project/LayoutFolderOrLayout.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -650,6 +651,31 @@ class GD_CORE_API Project {
    */
   void RemoveLayout(const gd::String& name);
 
+  /**
+   * \brief Return the root folder used to organize the layouts (scenes) in
+   * folders.
+   */
+  gd::LayoutFolderOrLayout& GetLayoutsRootFolder() {
+    return *layoutsRootFolder;
+  }
+
+  /**
+   * \brief Return the root folder used to organize the layouts (scenes) in
+   * folders.
+   */
+  const gd::LayoutFolderOrLayout& GetLayoutsRootFolder() const {
+    return *layoutsRootFolder;
+  }
+
+  /**
+   * \brief Add in the root folder any layout that is not already somewhere in
+   * the folder structure.
+   *
+   * This is used for projects saved before the folder structure existed, and
+   * to be robust to a folder structure that would not contain all the layouts.
+   */
+  void AddMissingLayoutsInRootFolder();
+
   ///@}
 
   /**
@@ -1169,6 +1195,8 @@ class GD_CORE_API Project {
               ///< at runtime (behavior before
               ///< 5.6.267).
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
+  std::unique_ptr<gd::LayoutFolderOrLayout>
+      layoutsRootFolder;  ///< Folder structure used to organize the scenes.
   gd::VariablesContainer variables;  ///< Initial global variables
   gd::ObjectsContainer objectsContainer;
   std::vector<std::unique_ptr<gd::ExternalLayout> >

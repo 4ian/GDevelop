@@ -407,64 +407,6 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
   eventsParameterReplacer.Launch(events, projectScopedContainers);
 }
 
-bool EventsRefactorer::RemoveObjectInConditions(
-    const gd::Platform& platform,
-    const gd::ProjectScopedContainers& projectScopedContainers,
-    gd::InstructionsList& conditions,
-    gd::String name) {
-  bool somethingModified = false;
-
-  for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
-    bool deleteMe = false;
-
-    const gd::InstructionMetadata& instrInfos =
-        MetadataProvider::GetConditionMetadata(platform,
-                                               conditions[cId].GetType());
-    for (std::size_t pNb = 0; pNb < instrInfos.parameters.GetParametersCount(); ++pNb) {
-      // Find object's name in parameters
-      if (gd::ParameterMetadata::IsObject(instrInfos.parameters.GetParameter(pNb).GetType()) &&
-          conditions[cId].GetParameter(pNb).GetPlainString() == name) {
-        deleteMe = true;
-        break;
-      }
-      // Find object's name in expressions
-      else if (ParameterMetadata::IsExpression(
-                   "number", instrInfos.parameters.GetParameter(pNb).GetType())) {
-        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
-
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, projectScopedContainers, "number", *node, name)) {
-          deleteMe = true;
-          break;
-        }
-      }
-      // Find object's name in text expressions
-      else if (ParameterMetadata::IsExpression(
-                   "string", instrInfos.parameters.GetParameter(pNb).GetType())) {
-        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
-
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, projectScopedContainers, "string", *node, name)) {
-          deleteMe = true;
-          break;
-        }
-      }
-    }
-
-    if (deleteMe) {
-      somethingModified = true;
-      conditions.Remove(cId);
-      cId--;
-    } else if (!conditions[cId].GetSubInstructions().empty())
-      somethingModified =
-          RemoveObjectInConditions(platform,
-                                   projectScopedContainers,
-                                   conditions[cId].GetSubInstructions(),
-                                   name) ||
-          somethingModified;
-  }
-
-  return somethingModified;
-}
-
 gd::String ReplaceAllOccurrencesCaseInsensitive(gd::String context,
                                                 const gd::String& from,
                                                 const gd::String& to) {

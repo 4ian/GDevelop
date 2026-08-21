@@ -5,7 +5,6 @@
  */
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
@@ -527,6 +526,16 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("string", "")
       .AddParameter("expression", "", "", true)
       .SetFunctionName("getNumberWith3Params");
+  extension
+      ->AddStrExpression(
+          "GetVariableString",
+          "Get string of object variable",
+          "",
+          "",
+          "")
+      .AddParameter("object", _("Object parameter"))
+      .AddParameter("objectvar", _("Variable for object"))
+      .SetFunctionName("getObjectVariableString");
   extension
       ->AddStrExpression(
           "GetStringWith2ObjectParamAnd2ObjectVarParam",

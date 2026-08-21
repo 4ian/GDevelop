@@ -82,7 +82,7 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
             projectScopedContainers.GetObjectsContainersList()
                 .GetObjectsContainerSourceType(rootObjectName);
         // Only child-object variable declarations are checked.
-        if (objectSourceType == gd::ObjectsContainer::SourceType::Function) {
+        if (objectSourceType != gd::ObjectsContainer::SourceType::Object) {
           rootObjectName = "";
         }
       }

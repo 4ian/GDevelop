@@ -2288,7 +2288,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SECTION("Undeclared legacy object variables (2 levels, child does not exist)") {
     auto node = parser.ParseExpression(
         "MyObjectStructureVariable.MyNonExistingChild");
-
+      // This is a legacy object variable, we don't pass the object name.
     gd::ExpressionValidator validator(platform, projectScopedContainers,
                                       "objectvar", "");
     node->Visit(validator);
@@ -2328,7 +2328,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SECTION("Undeclared legacy object variables (3 levels, child does not exist)") {
     auto node = parser.ParseExpression(
         "MyObjectStructureVariable.MyNonExistingChild.MyNonExistingChild");
-
+      // This is a legacy object variable, we don't pass the object name.
     gd::ExpressionValidator validator(platform, projectScopedContainers,
                                       "objectvar", "");
     node->Visit(validator);
@@ -2683,7 +2683,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
-  SECTION("Invalid object variables (empty object group)") {
+  SECTION("Invalid object variables (empty object group, in expression)") {
     auto node = parser.ParseExpression("EmptyGroup.MyVariable");
 
     gd::ExpressionValidator validator(platform, projectScopedContainers,
@@ -2694,7 +2694,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "This group is empty. Add an object to this group first.");
   }
 
-  SECTION("Invalid object variables with children (empty object group)") {
+  SECTION("Invalid object variables with children (empty object group, in expression)") {
     auto node =
         parser.ParseExpression("EmptyGroup.MyObjectStructureVariable.MyChild");
 
@@ -2706,7 +2706,28 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "This group is empty. Add an object to this group first.");
   }
 
-  // TODO Add cases for EmptyGroup with objectvar and the object name.
+  SECTION("Invalid object variables (empty object group)") {
+    auto node = parser.ParseExpression("MyVariable");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "objectvar", "EmptyGroup");
+    node->Visit(validator);
+    RequireFatalErrorsCount(validator, 1);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+            "This group is empty. Add an object to this group first.");
+  }
+
+  SECTION("Invalid object variables with children (empty object group)") {
+    auto node =
+        parser.ParseExpression("MyObjectStructureVariable.MyChild");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "objectvar", "EmptyGroup");
+    node->Visit(validator);
+    RequireFatalErrorsCount(validator, 1);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+            "This group is empty. Add an object to this group first.");
+  }
 
   SECTION("Invalid object variables (2 levels, bracket accessor)") {
     {
@@ -4030,7 +4051,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers,
-                                        "objectvar", "");
+                                        "objectvar", "MyObject");
       node->Visit(validator);
       RequireFatalErrorsCount(validator, 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -4043,7 +4064,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers,
-                                        "objectvar", "");
+                                        "objectvar", "MyObject");
       node->Visit(validator);
       RequireFatalErrorsCount(validator, 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -4055,7 +4076,47 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression(
           "MyObjectStructureVariable.MyChild+MyObjectVariable");
       REQUIRE(node != nullptr);
+      // This is a legacy object variable, we don't pass the object name.
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "objectvar", "MyObject");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -, /, *) can't be used in variable names. Remove "
+              "the operator from the variable name.");
+    }
 
+    SECTION("Object variable with unary operator (legacy and extensions)") {
+      auto node = parser.ParseExpression("-MyObjectVariable");
+      REQUIRE(node != nullptr);
+      // This is a legacy object variable, we don't pass the object name.
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "objectvar", "");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -) can't be used in variable names. Remove "
+            "the operator from the variable name.");
+    }
+
+    SECTION("Object variable with operator (legacy and extensions)") {
+      auto node = parser.ParseExpression("MyObjectVariable+MyObjectVariable");
+      REQUIRE(node != nullptr);
+      // This is a legacy object variable, we don't pass the object name.
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "objectvar", "");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -, /, *) can't be used in variable names. Remove "
+              "the operator from the variable name.");
+    }
+
+    SECTION("Object children variable with operator (legacy and extensions)") {
+      auto node = parser.ParseExpression(
+          "MyObjectStructureVariable.MyChild+MyObjectVariable");
+      REQUIRE(node != nullptr);
+      // This is a legacy object variable, we don't pass the object name.
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "objectvar", "");
       node->Visit(validator);
@@ -4152,21 +4213,21 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "This variable does not exist on this object or group.");
     }
 
-    SECTION("Undeclared object variable in extensions") {
+    SECTION("Undeclared object variable (legacy and extensions)") {
       auto node = parser.ParseExpression("MyUndeclaredVariable");
       REQUIRE(node != nullptr);
-
+      // This is a legacy object variable, we don't pass the object name.
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "objectvar", "");
       node->Visit(validator);
       RequireNoError(validator);
     }
 
-    SECTION("Undeclared object variable in extensions with children") {
+    SECTION("Undeclared object variable with children (legacy and extensions)") {
       auto node =
           parser.ParseExpression("MyUndeclaredVariable.MyChild.MyChild");
       REQUIRE(node != nullptr);
-
+      // This is a legacy object variable, we don't pass the object name.
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "objectvar", "");
       node->Visit(validator);

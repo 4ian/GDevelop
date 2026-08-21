@@ -43,6 +43,7 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import Coin from '../../Credits/Icons/Coin';
 import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
+import { isCustomEndpointEnabled } from '../../AI/CustomAIClient';
 import { Divider } from '@material-ui/core';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import Link from '../../UI/Link';
@@ -221,7 +222,8 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     const availableCredits = limits ? limits.credits.userBalance.amount : 0;
     const quota =
       (limits && limits.quotas && limits.quotas['consumed-ai-credits']) || null;
-    const hasReachedLimit = !!quota && quota.limitReached;
+    const hasReachedLimit =
+      !isCustomEndpointEnabled() && !!quota && quota.limitReached;
     const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
 
     const {

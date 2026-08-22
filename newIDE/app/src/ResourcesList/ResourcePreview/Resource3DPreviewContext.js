@@ -133,6 +133,10 @@ class Resource3DPreviewWorkerManager {
 
     this.worker.onerror = error => {
       console.error('Worker error:', error);
+      // In case the worker crashed before answering the initialization
+      // message, consider it not initialized (so that renders requests
+      // are not waiting forever and get the fallback image instead).
+      this._onInitialized(false);
       // Resolve any pending promises with the fallback image
       this.pendingPromises.forEach(promise => {
         promise.resolve(this.fallbackImagePath);

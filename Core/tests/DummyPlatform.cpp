@@ -529,6 +529,16 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .SetFunctionName("getNumberWith3Params");
   extension
       ->AddStrExpression(
+          "GetVariableString",
+          "Get string of object variable",
+          "",
+          "",
+          "")
+      .AddParameter("object", _("Object parameter"))
+      .AddParameter("objectvar", _("Variable for object"))
+      .SetFunctionName("getObjectVariableString");
+  extension
+      ->AddStrExpression(
           "GetStringWith2ObjectParamAnd2ObjectVarParam",
           "Get string with twice an object param and an objectvar param",
           "",

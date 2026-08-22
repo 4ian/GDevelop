@@ -347,6 +347,11 @@ namespace gdjs {
     }
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      // Models without any animation clip (buildings, props, road tiles...)
+      // have nothing to step: avoid the elapsed time computation entirely.
+      if (!this._renderer.hasAnimations()) {
+        return;
+      }
       const elapsedTime = this.getElapsedTime() / 1000;
       this._renderer.updateAnimation(elapsedTime);
     }

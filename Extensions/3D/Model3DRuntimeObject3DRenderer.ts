@@ -64,6 +64,52 @@ namespace gdjs {
   const traverseToSetBasicMaterialFromMeshes = (node: THREE.Object3D) =>
     node.traverse(setBasicMaterialTo);
 
+  /**
+   * What a loaded GLB actually needs at runtime. Evaluated once per GLB (not
+   * once per object instance) and cached, because the answer only depends on
+   * the file.
+   */
+  type Model3DRequirements = {
+    /** True if any node of the model is a `THREE.SkinnedMesh`. */
+    hasSkinnedMesh: boolean;
+    /** True if the GLB declares at least one animation clip. */
+    hasAnimations: boolean;
+  };
+
+  const model3DRequirementsCache = new WeakMap<
+    THREE_ADDONS.GLTF,
+    Model3DRequirements
+  >();
+
+  /**
+   * Tells whether a model needs the expensive per-instance setup:
+   * - a skeleton-aware deep clone (only meaningful if there is a skinned mesh),
+   * - an `AnimationMixer` (only meaningful if there is an animation clip).
+   *
+   * The vast majority of 3D models in a game (buildings, props, road tiles,
+   * trees, rocks) have neither, so both can be skipped entirely.
+   */
+  const getModel3DRequirements = (
+    gltf: THREE_ADDONS.GLTF
+  ): Model3DRequirements => {
+    const cached = model3DRequirementsCache.get(gltf);
+    if (cached) {
+      return cached;
+    }
+    let hasSkinnedMesh = false;
+    gltf.scene.traverse((node: THREE.Object3D) => {
+      if ((node as THREE.SkinnedMesh).isSkinnedMesh) {
+        hasSkinnedMesh = true;
+      }
+    });
+    const requirements: Model3DRequirements = {
+      hasSkinnedMesh,
+      hasAnimations: gltf.animations.length > 0,
+    };
+    model3DRequirementsCache.set(gltf, requirements);
+    return requirements;
+  };
+
   class Model3DRuntimeObject3DRenderer extends gdjs.RuntimeObject3DRenderer {
     private _model3DRuntimeObject: gdjs.Model3DRuntimeObject;
     /**
@@ -71,7 +117,11 @@ namespace gdjs {
      */
     private _threeObject: THREE.Object3D;
     private _originalModel: THREE_ADDONS.GLTF;
-    private _animationMixer: THREE.AnimationMixer;
+    /**
+     * `null` for models without any animation clip: an `AnimationMixer` would
+     * be allocated and updated every frame for nothing.
+     */
+    private _animationMixer: THREE.AnimationMixer | null;
     private _action: THREE.AnimationAction | null;
 
     /**
@@ -109,12 +159,26 @@ namespace gdjs {
       this.updatePosition();
       this.updateRotation();
 
-      this._animationMixer = new THREE.AnimationMixer(model);
+      // The animation mixer, if any, is created by `_updateModel`, which is
+      // always called right after the renderer is built (see
+      // `Model3DRuntimeObject.onModelChanged`).
+      this._animationMixer = null;
       this._action = null;
     }
 
     updateAnimation(timeDelta: float) {
+      if (!this._animationMixer) {
+        return;
+      }
       this._animationMixer.update(timeDelta);
+    }
+
+    /**
+     * True when this model has no animation at all, so the object does not need
+     * to be stepped every frame.
+     */
+    hasAnimations(): boolean {
+      return this._originalModel.animations.length > 0;
     }
 
     override updatePosition() {
@@ -346,7 +410,14 @@ namespace gdjs {
       // This group hold the rotation defined by properties.
       const threeObject = new THREE.Group();
       threeObject.rotation.order = 'ZYX';
-      const root = THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene);
+      const requirements = getModel3DRequirements(this._originalModel);
+      // `SkeletonUtils.clone` re-binds skeletons and bone references, which is
+      // only needed when the model actually has a skinned mesh. For a static
+      // model (every building, prop, tree or road tile) a plain recursive
+      // `Object3D.clone` is enough and keeps sharing geometries and materials.
+      const root = requirements.hasSkinnedMesh
+        ? THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene)
+        : this._originalModel.scene.clone(true);
       threeObject.add(root);
 
       this._replaceMaterials(threeObject);
@@ -370,7 +441,12 @@ namespace gdjs {
       this._updateShadow();
 
       // Start the current animation on the new 3D object.
-      this._animationMixer = new THREE.AnimationMixer(root);
+      // A model without any animation clip needs no mixer at all: this saves an
+      // allocation per object instance and an update call per object per frame.
+      this._animationMixer = requirements.hasAnimations
+        ? new THREE.AnimationMixer(root)
+        : null;
+      this._action = null;
       const isAnimationPaused = this._model3DRuntimeObject.isAnimationPaused();
       this._model3DRuntimeObject.setAnimationIndex(
         this._model3DRuntimeObject.getAnimationIndex()
@@ -462,8 +538,14 @@ namespace gdjs {
         );
         return;
       }
+      const animationMixer = this._animationMixer;
+      if (!animationMixer) {
+        // Should not happen: a clip was found, so the model has animations and
+        // `_updateModel` has built a mixer.
+        return;
+      }
       const previousAction = this._action;
-      this._action = this._animationMixer.clipAction(clip);
+      this._action = animationMixer.clipAction(clip);
       // Reset the animation and play it from the start.
       // `clipAction` always gives back the same action for a given animation
       // and its likely to be in a finished or at least started state.
@@ -489,7 +571,7 @@ namespace gdjs {
       }
       this._action.play();
       // Make sure the first frame is displayed.
-      this._animationMixer.update(0);
+      animationMixer.update(0);
     }
 
     getAnimationElapsedTime(): float {

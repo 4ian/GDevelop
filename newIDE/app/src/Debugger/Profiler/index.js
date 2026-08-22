@@ -47,8 +47,8 @@ export default class Profiler extends React.Component<Props, void> {
                     shader(s) during this run, on{' '}
                     {profilerOutput.stats.framesWithShaderCompilationCount}{' '}
                     frame(s). Each of those frames was dropped. This happens
-                    when the number of lights of a kind that are lit changes -
-                    check the console for the counts.
+                    when the scene changes something a shader is built around -
+                    see the console for what differed.
                   </Trans>
                 </Text>
               )}

@@ -108,31 +108,19 @@ const renderStatusChip = (
 ) => {
   if (profilingInProgress) {
     return (
-      <StatusChip
-        size="small"
-        tone="progress"
-        loading
-        label={<Trans>Profiling...</Trans>}
-      />
+      <StatusChip tone="progress" loading label={<Trans>Profiling...</Trans>} />
     );
   }
   if (profilerOutput) {
     return (
       <StatusChip
-        size="small"
         tone="info"
         icon={<History />}
         label={<Trans>Last run</Trans>}
       />
     );
   }
-  return (
-    <StatusChip
-      size="small"
-      icon={<StatusDot />}
-      label={<Trans>Never run</Trans>}
-    />
-  );
+  return <StatusChip icon={<StatusDot />} label={<Trans>Never run</Trans>} />;
 };
 
 type Props = {|
@@ -155,12 +143,8 @@ const Profiler = ({
   return (
     <Background>
       <div className={classes.header}>
-        <div className={classes.headerStatus}>
-          <Text noMargin size="sub-title" noShrink>
-            <Trans>Profiler</Trans>
-          </Text>
-          {renderStatusChip(profilerOutput, profilingInProgress)}
-        </div>
+        {/* The panel is already titled "Profiler" by the window holding it. */}
+        {renderStatusChip(profilerOutput, profilingInProgress)}
         {profilingInProgress ? (
           <RaisedButton
             label={<Trans>Stop profiling</Trans>}

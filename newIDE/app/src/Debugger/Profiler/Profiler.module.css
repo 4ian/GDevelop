@@ -8,13 +8,6 @@
   border-bottom: 1px solid var(--theme-list-item-separator-color);
 }
 
-.headerStatus {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
 .progressBar {
   display: flex;
   flex-shrink: 0;

@@ -2111,6 +2111,365 @@ module.exports = {
       .setGetter('gdjs.scene3d.camera.getNearPlane')
       .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
+    // -----------------------------------------------------------------------
+    // Scenery3D: one object == N instanced copies of one 3D model.
+    // -----------------------------------------------------------------------
+    const Scenery3DObject = new gd.ObjectJsImplementation();
+    Scenery3DObject.updateProperty = function (propertyName, newValue) {
+      const objectContent = this.content;
+      if (
+        propertyName === 'width' ||
+        propertyName === 'height' ||
+        propertyName === 'depth'
+      ) {
+        objectContent[propertyName] = Math.max(1, parseFloat(newValue));
+        return true;
+      }
+      if (propertyName === 'capacity') {
+        objectContent.capacity = Math.max(1, Math.floor(parseFloat(newValue)));
+        return true;
+      }
+      if (
+        propertyName === 'rotationX' ||
+        propertyName === 'rotationY' ||
+        propertyName === 'rotationZ'
+      ) {
+        objectContent[propertyName] = parseFloat(newValue) || 0;
+        return true;
+      }
+      if (propertyName === 'modelResourceName') {
+        objectContent.modelResourceName = newValue;
+        return true;
+      }
+      if (propertyName === 'materialType') {
+        if (newValue === 'Basic') {
+          objectContent.materialType = 'Basic';
+        } else if (newValue === 'KeepOriginal') {
+          objectContent.materialType = 'KeepOriginal';
+        } else {
+          objectContent.materialType = 'StandardWithoutMetalness';
+        }
+        return true;
+      }
+      if (
+        propertyName === 'isCastingShadow' ||
+        propertyName === 'isReceivingShadow'
+      ) {
+        objectContent[propertyName] = newValue === '1';
+        return true;
+      }
+      return false;
+    };
+    Scenery3DObject.getProperties = function () {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectContent = this.content;
+
+      objectProperties
+        .getOrCreate('modelResourceName')
+        .setValue(objectContent.modelResourceName || '')
+        .setType('resource')
+        .addExtraInfo('model3D')
+        .setLabel(_('3D model'))
+        .setGroup(_('Model'));
+
+      objectProperties
+        .getOrCreate('capacity')
+        .setValue((objectContent.capacity || 1000).toString())
+        .setType('number')
+        .setLabel(_('Capacity (maximum number of copies)'))
+        .setDescription(
+          _(
+            'Memory for this many copies is reserved when the scene starts. Going over it still works but reallocates the whole batch.'
+          )
+        )
+        .setGroup(_('Model'));
+
+      objectProperties
+        .getOrCreate('width')
+        .setValue((objectContent.width || 100).toString())
+        .setType('number')
+        .setLabel(_('Width of one copy'))
+        .setGroup(_('Default size'));
+      objectProperties
+        .getOrCreate('height')
+        .setValue((objectContent.height || 100).toString())
+        .setType('number')
+        .setLabel(_('Height of one copy'))
+        .setGroup(_('Default size'));
+      objectProperties
+        .getOrCreate('depth')
+        .setValue((objectContent.depth || 100).toString())
+        .setType('number')
+        .setLabel(_('Depth of one copy'))
+        .setGroup(_('Default size'));
+
+      objectProperties
+        .getOrCreate('rotationX')
+        .setValue((objectContent.rotationX || 0).toString())
+        .setType('number')
+        .setLabel(_('Rotation around X axis'))
+        .setGroup(_('Model orientation'))
+        .setAdvanced(true);
+      objectProperties
+        .getOrCreate('rotationY')
+        .setValue((objectContent.rotationY || 0).toString())
+        .setType('number')
+        .setLabel(_('Rotation around Y axis'))
+        .setGroup(_('Model orientation'))
+        .setAdvanced(true);
+      objectProperties
+        .getOrCreate('rotationZ')
+        .setValue((objectContent.rotationZ || 0).toString())
+        .setType('number')
+        .setLabel(_('Rotation around Z axis'))
+        .setGroup(_('Model orientation'))
+        .setAdvanced(true);
+
+      objectProperties
+        .getOrCreate('materialType')
+        .setValue(objectContent.materialType || 'StandardWithoutMetalness')
+        .setType('choice')
+        .addChoice('Basic', _('Basic (no lighting, no shadows)'))
+        .addChoice(
+          'StandardWithoutMetalness',
+          _('Standard (without metalness)')
+        )
+        .addChoice('KeepOriginal', _('Keep original'))
+        .setLabel(_('Material type'))
+        .setGroup(_('Lighting'));
+
+      objectProperties
+        .getOrCreate('isCastingShadow')
+        .setValue(objectContent.isCastingShadow ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Shadow casting'))
+        .setGroup(_('Lighting'));
+      objectProperties
+        .getOrCreate('isReceivingShadow')
+        .setValue(objectContent.isReceivingShadow ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Shadow receiving'))
+        .setGroup(_('Lighting'));
+
+      return objectProperties;
+    };
+    Scenery3DObject.content = {
+      modelResourceName: '',
+      capacity: 1000,
+      width: 100,
+      height: 100,
+      depth: 100,
+      rotationX: 0,
+      rotationY: 0,
+      rotationZ: 0,
+      materialType: 'StandardWithoutMetalness',
+      isCastingShadow: true,
+      isReceivingShadow: true,
+    };
+    Scenery3DObject.updateInitialInstanceProperty = function () {
+      return false;
+    };
+    Scenery3DObject.getInitialInstanceProperties = function (instance) {
+      return new gd.MapStringPropertyDescriptor();
+    };
+
+    {
+      const object = extension
+        .addObject(
+          'Scenery3DObject',
+          _('3D Scenery (instanced)'),
+          _(
+            'Many copies of a single 3D model, drawn in one draw call per mesh of the model. Use it for static scenery: buildings, road tiles, props, trees, fences.'
+          ),
+          'JsPlatform/Extensions/3d_model.svg',
+          Scenery3DObject
+        )
+        .setCategory('General')
+        .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+        .addDefaultBehavior('ScalableCapability::ScalableBehavior')
+        .addDefaultBehavior('Scene3D::Base3DBehavior')
+        .markAsRenderedIn3D()
+        .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
+        .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
+        .addIncludeFile('Extensions/3D/Model3DRuntimeObject.js')
+        .addIncludeFile('Extensions/3D/Model3DRuntimeObject3DRenderer.js')
+        .addIncludeFile('Extensions/3D/Scenery3DRuntimeObject.js')
+        .addIncludeFile('Extensions/3D/Scenery3DRuntimeObjectRenderer.js');
+
+      object
+        .addScopedAction(
+          'AddInstance',
+          _('Add a copy'),
+          _(
+            'Add one copy of the model. The position is the centre of the copy. The scales multiply the default size of a copy.'
+          ),
+          _('Add a copy of _PARAM0_ at _PARAM1_; _PARAM2_; _PARAM3_'),
+          _('Copies'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .addParameter('number', _('X position'), '', false)
+        .addParameter('number', _('Y position'), '', false)
+        .addParameter('number', _('Z position'), '', false)
+        .addParameter('number', _('Angle around Z axis (in degrees)'), '', true)
+        .setDefaultValue('0')
+        .addParameter('number', _('Scale on X axis'), '', true)
+        .setDefaultValue('1')
+        .addParameter('number', _('Scale on Y axis'), '', true)
+        .setDefaultValue('1')
+        .addParameter('number', _('Scale on Z axis'), '', true)
+        .setDefaultValue('1')
+        .setFunctionName('addInstance');
+
+      object
+        .addScopedAction(
+          'SetInstanceTransform',
+          _('Move a copy'),
+          _('Change the position, angle and scale of an existing copy.'),
+          _('Move copy _PARAM1_ of _PARAM0_ to _PARAM2_; _PARAM3_; _PARAM4_'),
+          _('Copies'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .addParameter('number', _('Copy handle'), '', false)
+        .addParameter('number', _('X position'), '', false)
+        .addParameter('number', _('Y position'), '', false)
+        .addParameter('number', _('Z position'), '', false)
+        .addParameter('number', _('Angle around Z axis (in degrees)'), '', true)
+        .setDefaultValue('0')
+        .addParameter('number', _('Scale on X axis'), '', true)
+        .setDefaultValue('1')
+        .addParameter('number', _('Scale on Y axis'), '', true)
+        .setDefaultValue('1')
+        .addParameter('number', _('Scale on Z axis'), '', true)
+        .setDefaultValue('1')
+        .markAsAdvanced()
+        .setFunctionName('setInstanceTransform');
+
+      object
+        .addScopedAction(
+          'RemoveInstance',
+          _('Remove a copy'),
+          _(
+            'Remove one copy. The last copy takes its handle, which can be read with the expression "LastMovedInstanceHandle".'
+          ),
+          _('Remove copy _PARAM1_ of _PARAM0_'),
+          _('Copies'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .addParameter('number', _('Copy handle'), '', false)
+        .setFunctionName('removeInstance');
+
+      object
+        .addScopedAction(
+          'ClearInstances',
+          _('Remove all copies'),
+          _('Remove every copy of the model.'),
+          _('Remove all copies of _PARAM0_'),
+          _('Copies'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .setFunctionName('clearInstances');
+
+      object
+        .addExpressionAndCondition(
+          'number',
+          'InstanceCount',
+          _('Number of copies'),
+          _('the number of copies currently displayed'),
+          _('the number of copies'),
+          _('Copies'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('getInstanceCount');
+
+      object
+        .addExpression(
+          'LastInstanceHandle',
+          _('Handle of the last added copy'),
+          _('Handle of the copy added last, or -1 if there is none.'),
+          _('Copies'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .setFunctionName('getLastInstanceHandle');
+
+      object
+        .addExpression(
+          'LastMovedInstanceHandle',
+          _('Handle moved by the last removal'),
+          _(
+            'Handle of the copy that was moved by the last "Remove a copy" action, or -1.'
+          ),
+          _('Copies'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .setFunctionName('getLastMovedInstanceHandle');
+
+      object
+        .addExpression(
+          'Capacity',
+          _('Capacity'),
+          _('Number of copies that can be displayed without reallocating.'),
+          _('Copies'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .setFunctionName('getCapacity');
+
+      object
+        .addExpression(
+          'DrawCallCount',
+          _('Number of draw calls'),
+          _(
+            'Number of draw calls this object costs per render pass: the number of meshes of the model, whatever the number of copies.'
+          ),
+          _('Copies'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .setFunctionName('getBatchCount');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'boolean',
+          'CastShadow',
+          _('Shadow casting'),
+          _('the copies cast a shadow'),
+          _('the copies of _PARAM0_ cast a shadow'),
+          _('Lighting'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setIsCastingShadow')
+        .setGetter('isCastingShadow');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'boolean',
+          'ReceiveShadow',
+          _('Shadow receiving'),
+          _('the copies receive shadows'),
+          _('the copies of _PARAM0_ receive shadows'),
+          _('Lighting'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D scenery'), 'Scenery3DObject', false)
+        .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setIsReceivingShadow')
+        .setGetter('isReceivingShadow');
+    }
+
     extension
       .addExpressionAndConditionAndAction(
         'number',

@@ -1,47 +1,100 @@
 {
   "stats": {
-    "framesCount": 150,
-    "shaderProgramsCount": 14,
-    "shaderProgramCompilationsCount": 3,
+    "framesCount": 170,
+    "shaderProgramsCount": 13,
+    "shaderProgramCompilationsCount": 2,
     "framesWithShaderCompilationCount": 2,
-    "averageDrawCallsCount": 182.4,
-    "averageTrianglesCount": 41230.6,
-    "geometriesCount": 37,
-    "texturesCount": 12
+    "averageDrawCallsCount": 241,
+    "averageTrianglesCount": 4028.4,
+    "geometriesCount": 43,
+    "texturesCount": 7
   },
   "framesAverageMeasures": {
-    "time": 1.5,
+    "time": 1.43,
     "subsections": {
-      "section 1": {
-        "time": 0.3,
+      "asynchronous actions (wait action, etc...)": {
+        "time": 0,
         "subsections": {}
       },
-      "section 2": {
-        "time": 0.3,
+      "objects (pre-events)": {
+        "time": 0.38,
         "subsections": {
-          "section 1.1": {
-            "time": 0.2,
+          "Object3D": {
+            "time": 0.004,
             "subsections": {}
           },
-          "section 1.2": {
-            "time": 0.1,
+          "Physics3D": {
+            "time": 0.12,
+            "subsections": {}
+          },
+          "PathfindingObstacle": {
+            "time": 0.0035,
+            "subsections": {}
+          },
+          "Animatable": {
+            "time": 0.02,
+            "subsections": {}
+          },
+          "TopDownMovement": {
+            "time": 0.05,
+            "subsections": {}
+          },
+          "Tween": {
+            "time": 0.01,
+            "subsections": {}
+          }
+        }
+      },
+      "callbacks and extensions (pre-events)": {
+        "time": 0.05,
+        "subsections": {}
+      },
+      "events": {
+        "time": 0.42,
+        "subsections": {}
+      },
+      "objects (post-events)": {
+        "time": 0.21,
+        "subsections": {
+          "Physics3D": {
+            "time": 0.14,
+            "subsections": {}
+          },
+          "MyExtension::Button": {
+            "time": 0.03,
             "subsections": {
-              "section 1.2.1": {
-                "time": 0.1,
+              "Animatable": {
+                "time": 0.008,
                 "subsections": {}
               }
             }
-          }
-        }
-      },
-      "section 3": {
-        "time": 0.9,
-        "subsections": {
-          "section 3.1": {
-            "time": 0.85,
+          },
+          "MyExtension::HealthBar": {
+            "time": 0.02,
             "subsections": {}
           }
         }
+      },
+      "callbacks and extensions (post-events)": {
+        "time": 0.02,
+        "subsections": {}
+      },
+      "objects (pre-render, effects update)": {
+        "time": 0.06,
+        "subsections": {
+          "Object3D": {
+            "time": 0.03,
+            "subsections": {}
+          }
+        }
+      },
+      "layers (effects update)": {
+        "time": 0.03,
+        "subsections": {}
+      },
+      "render": {
+        "time": 0.26,
+        "subsections": {}
       }
     }
   }

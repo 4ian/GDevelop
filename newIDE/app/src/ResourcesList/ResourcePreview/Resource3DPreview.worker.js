@@ -1,9 +1,13 @@
 /* eslint-env worker */
 // @flow
+// IMPORTANT: this file is compiled as a worker entry point by `worker-loader`,
+// which does NOT process it with Babel: it must stay plain JavaScript.
+// In particular, no Flow syntax can be used (type imports or annotations) -
+// otherwise the whole build breaks (silently producing an empty build folder,
+// which is caught by scripts/check-build-output.js).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-import { type DracoDecoderFiles } from '../../Utils/DracoDecoder';
 
 // Copied from PixiResourcesLoader.js
 // $FlowFixMe[missing-local-annot]
@@ -45,12 +49,14 @@ let dracoLoader = null;
 /**
  * Create the loader for the Draco compressed 3D models.
  *
- * The decoder files are read by the main thread and passed to this worker,
- * because a worker can't read them by itself in the desktop app (`file://` URLs
- * can't be fetched by workers). They are exposed as blob URLs so that the
- * DRACOLoader can read them like any other file.
+ * The decoder files are read by the main thread and passed to this worker
+ * (see `DracoDecoderFiles` in `Utils/DracoDecoder.js`), because a worker can't
+ * read them by itself in the desktop app (`file://` URLs can't be fetched by
+ * workers). They are exposed as blob URLs so that the DRACOLoader can read
+ * them like any other file.
  */
-const createDracoLoader = (dracoDecoderFiles: DracoDecoderFiles) => {
+// $FlowFixMe[missing-local-annot]
+const createDracoLoader = dracoDecoderFiles => {
   const decoderFileUrls = {
     'draco_wasm_wrapper.js': URL.createObjectURL(
       new Blob([dracoDecoderFiles.dracoWasmWrapperJs], {
@@ -77,7 +83,8 @@ const createDracoLoader = (dracoDecoderFiles: DracoDecoderFiles) => {
 };
 
 // Set up the renderer when worker is initialized
-const initRenderer = (dracoDecoderFiles: ?DracoDecoderFiles) => {
+// $FlowFixMe[missing-local-annot]
+const initRenderer = dracoDecoderFiles => {
   // $FlowFixMe[incompatible-type] - OffscreenCanvas is not in Flow types
   // $FlowFixMe[cannot-resolve-name]
   offscreenCanvas = new OffscreenCanvas(width, height);

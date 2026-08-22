@@ -29,10 +29,15 @@ export type ProfilerOutput = {|
   framesAverageMeasures: ProfilerMeasuresSection,
   stats: {
     framesCount: number,
-    // Optional: only sent by game engines recent enough to measure them.
+    // Optional: only sent by game engines recent enough to measure them,
+    // and only meaningful for a game that renders in 3D.
     shaderProgramsCount?: number,
     shaderProgramCompilationsCount?: number,
     framesWithShaderCompilationCount?: number,
+    averageDrawCallsCount?: number,
+    averageTrianglesCount?: number,
+    geometriesCount?: number,
+    texturesCount?: number,
   },
 |};
 
@@ -47,7 +52,7 @@ const isUnavoidableLibraryWarning = ({ group, message }: Log): boolean =>
 
 type Props = {|
   project: gdProject,
-  setToolbar: React.Node => void,
+  setToolbar: (React.Node) => void,
   previewDebuggerServer: PreviewDebuggerServer,
 |};
 
@@ -75,7 +80,8 @@ export default class Debugger extends React.Component<Props, State> {
       | 'started'
       | 'stopped'),
     debuggerServerError: null,
-    debuggerIds: (this.props.previewDebuggerServer.getExistingDebuggerIds(): Array<DebuggerId>),
+    debuggerIds:
+      (this.props.previewDebuggerServer.getExistingDebuggerIds(): Array<DebuggerId>),
     unregisterDebuggerServerCallbacks: null,
     debuggerGameData: {},
     profilerOutputs: {},
@@ -91,9 +97,8 @@ export default class Debugger extends React.Component<Props, State> {
   updateToolbar = () => {
     const { selectedId, debuggerStatus } = this.state;
 
-    const selectedDebuggerContents = this._debuggerContents[
-      this.state.selectedId
-    ];
+    const selectedDebuggerContents =
+      this._debuggerContents[this.state.selectedId];
 
     const isSelectedDebuggerPaused = debuggerStatus[selectedId]
       ? debuggerStatus[selectedId].isPaused
@@ -159,7 +164,7 @@ export default class Debugger extends React.Component<Props, State> {
 
     // Register new callbacks
     const unregisterCallbacks = previewDebuggerServer.registerCallbacks({
-      onErrorReceived: err => {
+      onErrorReceived: (err) => {
         this.setState(
           {
             debuggerServerError: err,
@@ -190,8 +195,8 @@ export default class Debugger extends React.Component<Props, State> {
                 selectedId !== id
                   ? selectedId
                   : debuggerIds.length
-                  ? debuggerIds[debuggerIds.length - 1]
-                  : selectedId,
+                    ? debuggerIds[debuggerIds.length - 1]
+                    : selectedId,
               debuggerGameData,
               profilerOutputs,
               profilingInProgress,
@@ -235,7 +240,7 @@ export default class Debugger extends React.Component<Props, State> {
     });
 
     // Fetch the status of each debugger client.
-    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+    previewDebuggerServer.getExistingDebuggerIds().forEach((debuggerId) => {
       previewDebuggerServer.sendMessage(debuggerId, { command: 'getStatus' });
     });
   };
@@ -250,7 +255,7 @@ export default class Debugger extends React.Component<Props, State> {
       });
     } else if (data.command === 'status') {
       this.setState(
-        state => ({
+        (state) => ({
           debuggerStatus: {
             ...state.debuggerStatus,
             [id]: data.payload,
@@ -266,11 +271,11 @@ export default class Debugger extends React.Component<Props, State> {
         },
       });
     } else if (data.command === 'profiler.started') {
-      this.setState(state => ({
+      this.setState((state) => ({
         profilingInProgress: { ...state.profilingInProgress, [id]: true },
       }));
     } else if (data.command === 'profiler.stopped') {
-      this.setState(state => ({
+      this.setState((state) => ({
         profilingInProgress: { ...state.profilingInProgress, [id]: false },
       }));
     } else if (data.command === 'hotReloader.logs') {
@@ -388,7 +393,7 @@ export default class Debugger extends React.Component<Props, State> {
             <DebuggerSelector
               selectedId={selectedId}
               debuggerStatus={debuggerStatus}
-              onChooseDebugger={id =>
+              onChooseDebugger={(id) =>
                 this.setState(
                   {
                     selectedId: id,
@@ -399,7 +404,7 @@ export default class Debugger extends React.Component<Props, State> {
             />
             {this._hasSelectedDebugger() && (
               <DebuggerContent
-                ref={debuggerContent =>
+                ref={(debuggerContent) =>
                   (this._debuggerContents[selectedId] = debuggerContent)
                 }
                 gameData={debuggerGameData[selectedId]}

@@ -451,7 +451,7 @@ namespace gdjs {
           .getRenderer()
           .getThreeRenderer();
         if (threeRenderer) {
-          this._profiler.recordShaderPrograms(threeRenderer.info.programs);
+          this._profiler.record3DRendererInfo(threeRenderer.info);
         }
       }
       if (this._profiler) {

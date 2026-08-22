@@ -20,6 +20,14 @@ namespace gdjs {
     shaderProgramCompilationsCount: integer;
     /** The number of captured frames that compiled at least one shader. */
     framesWithShaderCompilationCount: integer;
+    /** Average number of 3D draw calls per captured frame. */
+    averageDrawCallsCount: float;
+    /** Average number of 3D triangles drawn per captured frame. */
+    averageTrianglesCount: float;
+    /** Geometries the 3D renderer was holding at the end of the run. */
+    geometriesCount: integer;
+    /** Textures the 3D renderer was holding at the end of the run. */
+    texturesCount: integer;
   };
 
   /**
@@ -86,6 +94,18 @@ namespace gdjs {
 
     /** How many frames compiled at least one shader program. */
     _framesWithShaderCompilationCount: integer = 0;
+
+    /** Draw calls summed over the frames measured, to average afterwards. */
+    _drawCallsSum: integer = 0;
+
+    /** Triangles summed over the frames measured, to average afterwards. */
+    _trianglesSum: integer = 0;
+
+    /** How many frames the two sums above cover. */
+    _rendererInfoFramesCount: integer = 0;
+
+    _geometriesCount: integer = 0;
+    _texturesCount: integer = 0;
 
     constructor() {
       while (this._framesMeasures.length < this._maxFramesCount) {
@@ -281,7 +301,8 @@ namespace gdjs {
     }
 
     /**
-     * Record the shader programs the 3D renderer is holding, for this frame.
+     * Record what the 3D renderer did on this frame: its cheap per-frame
+     * counters, and the shader programs it is holding.
      *
      * The renderer compiles a separate program for every distinct combination
      * of the things that shape a shader - material features, the number of
@@ -296,11 +317,26 @@ namespace gdjs {
      * itself uses to tell programs apart, and reports which fields differ from
      * the closest program already seen.
      *
-     * @param programs The current `WebGLRenderer.info.programs`.
+     * @param rendererInfo The current `WebGLRenderer.info`.
      */
-    recordShaderPrograms(
-      programs: Array<{ cacheKey?: string; type?: string }> | null
-    ): void {
+    record3DRendererInfo(rendererInfo: {
+      programs?: Array<{ cacheKey?: string; type?: string }> | null;
+      render?: { calls: number; triangles: number };
+      memory?: { geometries: number; textures: number };
+    }): void {
+      if (rendererInfo.render) {
+        // These counters are reset by the renderer on every frame, so reading
+        // them after rendering gives this frame's numbers.
+        this._drawCallsSum += rendererInfo.render.calls;
+        this._trianglesSum += rendererInfo.render.triangles;
+        this._rendererInfoFramesCount++;
+      }
+      if (rendererInfo.memory) {
+        this._geometriesCount = rendererInfo.memory.geometries;
+        this._texturesCount = rendererInfo.memory.textures;
+      }
+
+      const programs = rendererInfo.programs || null;
       const programsCount = programs ? programs.length : 0;
       this._shaderProgramsCount = programsCount;
 
@@ -414,12 +450,17 @@ namespace gdjs {
      * Get stats measured during the frames captured.
      */
     getStats(): ProfilerStats {
+      const rendererFrames = this._rendererInfoFramesCount || 1;
       return {
         framesCount: this._framesCount,
         shaderProgramsCount: this._shaderProgramsCount,
         shaderProgramCompilationsCount: this._shaderProgramCompilationsCount,
         framesWithShaderCompilationCount:
           this._framesWithShaderCompilationCount,
+        averageDrawCallsCount: this._drawCallsSum / rendererFrames,
+        averageTrianglesCount: this._trianglesSum / rendererFrames,
+        geometriesCount: this._geometriesCount,
+        texturesCount: this._texturesCount,
       };
     }
 

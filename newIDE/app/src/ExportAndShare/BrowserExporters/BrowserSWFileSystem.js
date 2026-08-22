@@ -27,6 +27,19 @@ const isURL = (filename: string) => {
 };
 
 /**
+ * Runtime files loaded as <script> tags keep pointing at gdjsRoot (CDN or
+ * /GDJS). Draco decoder libraries are fetched by THREE from a relative path
+ * on the preview origin, so they must actually be stored in IndexedDB.
+ */
+export const shouldCopyRemoteFileForPreview = (
+  source: string,
+  dest: string
+): boolean => {
+  const path = `${source} ${dest}`.split('?')[0].toLowerCase();
+  return path.endsWith('.wasm') || path.indexOf('/draco/') !== -1;
+};
+
+/**
  * Determines the content type based on file extension.
  */
 const getContentType = (filePath: string): string => {
@@ -66,6 +79,11 @@ export default class BrowserSWFileSystem {
   |}> = [];
 
   _pendingDeleteOperations: Array<Promise<any>> = [];
+
+  _pendingRemoteFiles: Array<{|
+    source: string,
+    dest: string,
+  |}> = [];
 
   // Store a set of all external URLs copied so that we can simulate
   // readDir result.
@@ -115,9 +133,23 @@ export default class BrowserSWFileSystem {
 
       await Promise.all(uploadPromises);
 
+      const remoteUploadPromises = this._pendingRemoteFiles.map(async file => {
+        const response = await fetch(file.source);
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch ${file.source} (status: ${response.status})`
+          );
+        }
+        const bytes = await response.arrayBuffer();
+        totalBytes += bytes.byteLength;
+        const relativePath = file.dest.replace(this.rootUrl, '');
+        await putFile(`/${relativePath}`, bytes, getContentType(file.dest));
+      });
+      await Promise.all(remoteUploadPromises);
+
       console.log(
         `[BrowserSWFileSystem] Successfully stored all ${
-          this._pendingFiles.length
+          this._pendingFiles.length + this._pendingRemoteFiles.length
         } preview files in IndexedDB (${Math.ceil(totalBytes / 1000)} kB).`
       );
     } catch (error) {
@@ -194,9 +226,13 @@ export default class BrowserSWFileSystem {
   };
 
   copyFile = (source: string, dest: string): any => {
-    // URLs are not copied, just tracked.
+    // URLs are not copied as text, just tracked. Binary/decoder files that
+    // the runtime will fetch from the preview origin are queued for download.
     if (isURL(source)) {
       this._allCopiedExternalUrls.add(source);
+      if (shouldCopyRemoteFileForPreview(source, dest)) {
+        this._pendingRemoteFiles.push({ source, dest });
+      }
       return true;
     }
 

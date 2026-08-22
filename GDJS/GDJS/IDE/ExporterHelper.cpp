@@ -66,6 +66,17 @@ double LogTimeSpent(const gd::String &name, double previousTime) {
                 "ms");
   return GetTimeNow();
 }
+
+// Draco wasm (and any other non-JS runtime file) is copied next to the game
+// but must not be added as a <script> tag.
+bool IsJavaScriptInclude(const gd::String &include) {
+  gd::String filename = include;
+  const auto queryPos = filename.find("?");
+  if (queryPos != gd::String::npos) {
+    filename = filename.substr(0, queryPos);
+  }
+  return filename.size() >= 3 && filename.substr(filename.size() - 3) == ".js";
+}
 }  // namespace
 
 namespace gdjs {
@@ -502,6 +513,9 @@ void ExporterHelper::SerializeRuntimeGameOptions(
     scriptFilesElement.ConsiderAsArrayOf("scriptFile");
 
     for (const auto &includeFile : includesFiles) {
+      if (!IsJavaScriptInclude(includeFile)) {
+        continue;
+      }
       auto hashIt = options.includeFileHashes.find(includeFile);
       gd::String scriptSrc = GetExportedIncludeFilename(fs, gdjsRoot, includeFile);
       scriptFilesElement.AddChild("scriptFile")
@@ -1120,6 +1134,9 @@ bool ExporterHelper::CompleteIndexFile(
 
   gd::String codeFilesIncludes;
   for (auto &include : includesFiles) {
+    if (!IsJavaScriptInclude(include)) {
+      continue;
+    }
     gd::String scriptSrc =
         GetExportedIncludeFilename(fs, gdjsRoot, include, nonRuntimeScriptsCacheBurst);
 

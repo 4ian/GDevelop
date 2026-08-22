@@ -7,6 +7,63 @@ namespace gdjs {
   const logger = new gdjs.Logger('Model3DManager');
 
   const resourceKinds: Array<ResourceKind> = ['model3D'];
+  const DRACO_DECODER_FOLDER = 'pixi-renderers/draco/gltf/';
+  const DRACO_DECODER_PATH_MARKERS = [
+    'pixi-renderers/ThreeAddons.js',
+    'pixi-renderers/three.js',
+  ];
+
+  /**
+   * Resolve the Draco decoder folder from a runtime script URL or path.
+   *
+   * Browser previews load runtime scripts from a CDN (or `/GDJS`), so a
+   * hardcoded `./pixi-renderers/draco/gltf/` path would 404 on the preview
+   * origin. Desktop exports keep using the relative folder next to the
+   * copied runtime files.
+   */
+  export const getDracoDecoderPathFromScriptPath = (
+    scriptPath: string
+  ): string | null => {
+    for (let i = 0; i < DRACO_DECODER_PATH_MARKERS.length; i++) {
+      const marker = DRACO_DECODER_PATH_MARKERS[i];
+      const index = scriptPath.indexOf(marker);
+      if (index !== -1) {
+        return scriptPath.substring(0, index) + DRACO_DECODER_FOLDER;
+      }
+    }
+    return null;
+  };
+
+  /**
+   * Find the Draco decoder folder that matches where the 3D runtime scripts
+   * were actually loaded from.
+   */
+  export const getDracoDecoderPath = (
+    scriptFiles?: Array<{ path: string }> | null
+  ): string => {
+    if (scriptFiles) {
+      for (let i = 0; i < scriptFiles.length; i++) {
+        const resolved = getDracoDecoderPathFromScriptPath(scriptFiles[i].path);
+        if (resolved) {
+          return resolved;
+        }
+      }
+    }
+    if (typeof document !== 'undefined') {
+      const scripts = document.getElementsByTagName('script');
+      for (let i = 0; i < scripts.length; i++) {
+        const src = scripts[i].src;
+        if (!src) {
+          continue;
+        }
+        const resolved = getDracoDecoderPathFromScriptPath(src);
+        if (resolved) {
+          return resolved;
+        }
+      }
+    }
+    return './' + DRACO_DECODER_FOLDER;
+  };
 
   /**
    * Load GLB files (using `Three.js`), using the "model3D" resources
@@ -38,7 +95,12 @@ namespace gdjs {
         this._loader = new THREE_ADDONS.GLTFLoader();
 
         this._dracoLoader = new THREE_ADDONS.DRACOLoader();
-        this._dracoLoader.setDecoderPath('./pixi-renderers/draco/gltf/');
+        this._dracoLoader.setDecoderPath(
+          gdjs.getDracoDecoderPath(
+            this._resourceLoader.getRuntimeGame().getAdditionalOptions()
+              .scriptFiles
+          )
+        );
         this._loader.setDRACOLoader(this._dracoLoader);
 
         /**

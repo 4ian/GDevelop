@@ -6,6 +6,7 @@ import { Spine, TextureAtlas } from '@esotericsoftware/spine-pixi-v7';
 import * as THREE from 'three';
 import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import { getEditorDracoDecoderPath } from '../Utils/DracoDecoderPath';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
@@ -174,7 +175,7 @@ const getOrCreateGltfLoader = () => {
   if (!gltfLoader) {
     gltfLoader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('./external/draco/gltf/');
+    dracoLoader.setDecoderPath(getEditorDracoDecoderPath());
     gltfLoader.setDRACOLoader(dracoLoader);
   }
   return gltfLoader;

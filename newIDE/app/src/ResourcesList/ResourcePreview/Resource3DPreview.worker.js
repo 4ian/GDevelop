@@ -2,6 +2,7 @@
 // @flow
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 // Copied from PixiResourcesLoader.js
 // $FlowFixMe[missing-local-annot]
@@ -38,6 +39,36 @@ let renderer = null;
 let width = 256;
 let height = 256;
 let offscreenCanvas = null;
+let dracoLoader = null;
+
+// $FlowFixMe[missing-local-annot]
+const createDracoLoader = (dracoWasmWrapperJs, dracoDecoderWasm) => {
+  const manager = new THREE.LoadingManager();
+  if (dracoWasmWrapperJs && dracoDecoderWasm) {
+    const wrapperUrl = URL.createObjectURL(
+      new Blob([dracoWasmWrapperJs], { type: 'text/javascript' })
+    );
+    const wasmUrl = URL.createObjectURL(
+      new Blob([dracoDecoderWasm], { type: 'application/wasm' })
+    );
+    manager.setURLModifier(url => {
+      if (url.indexOf('draco_wasm_wrapper.js') !== -1) {
+        return wrapperUrl;
+      }
+      if (url.indexOf('draco_decoder.wasm') !== -1) {
+        return wasmUrl;
+      }
+      return url;
+    });
+  }
+
+  const loader = new DRACOLoader(manager);
+  // File names are rewritten by the URL modifier above when decoder
+  // libraries were prefetched on the main thread (required on Electron,
+  // where workers cannot fetch file:// URLs).
+  loader.setDecoderPath('./external/draco/gltf/');
+  return loader;
+};
 
 // Set up the renderer when worker is initialized
 const initRenderer = () => {
@@ -83,6 +114,9 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
   // so the worker never needs to make any network/file requests.
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
+    if (dracoLoader) {
+      loader.setDRACOLoader(dracoLoader);
+    }
 
     loader.parse(
       resourceData,
@@ -177,6 +211,19 @@ self.onmessage = async event => {
   try {
     switch (type) {
       case MESSAGE_TYPES.INIT:
+        const { dracoWasmWrapperJs, dracoDecoderWasm } = event.data;
+        try {
+          dracoLoader = createDracoLoader(
+            dracoWasmWrapperJs,
+            dracoDecoderWasm
+          );
+        } catch (dracoError) {
+          console.error(
+            'Failed to initialize Draco decoder in 3D preview worker:',
+            dracoError
+          );
+          dracoLoader = null;
+        }
         const success = initRenderer();
         // eslint-disable-next-line no-restricted-globals
         self.postMessage({ type: MESSAGE_TYPES.INIT, success });

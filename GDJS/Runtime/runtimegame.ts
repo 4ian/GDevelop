@@ -108,6 +108,12 @@ namespace gdjs {
 
     inGameEditorSettings?: InGameEditorSettings;
 
+    /**
+     * The base URL (or relative path) from which the game engine files are
+     * served. Most of the time, they are next to the game index.html ("./"),
+     * but some previews serve them from a server.
+     */
+    runtimeFilesBaseUrl?: string;
     /** Script files, used for hot-reloading. */
     scriptFiles?: Array<RuntimeGameOptionsScriptFile>;
     /** if true, export is a partial preview without reloading libraries. */

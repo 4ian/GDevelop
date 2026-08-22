@@ -2,6 +2,8 @@
 // @flow
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import { type DracoDecoderFiles } from '../../Utils/DracoDecoder';
 
 // Copied from PixiResourcesLoader.js
 // $FlowFixMe[missing-local-annot]
@@ -38,9 +40,44 @@ let renderer = null;
 let width = 256;
 let height = 256;
 let offscreenCanvas = null;
+let dracoLoader = null;
+
+/**
+ * Create the loader for the Draco compressed 3D models.
+ *
+ * The decoder files are read by the main thread and passed to this worker,
+ * because a worker can't read them by itself in the desktop app (`file://` URLs
+ * can't be fetched by workers). They are exposed as blob URLs so that the
+ * DRACOLoader can read them like any other file.
+ */
+const createDracoLoader = (dracoDecoderFiles: DracoDecoderFiles) => {
+  const decoderFileUrls = {
+    'draco_wasm_wrapper.js': URL.createObjectURL(
+      new Blob([dracoDecoderFiles.dracoWasmWrapperJs], {
+        type: 'text/javascript',
+      })
+    ),
+    'draco_decoder.wasm': URL.createObjectURL(
+      new Blob([dracoDecoderFiles.dracoDecoderWasm], {
+        type: 'application/wasm',
+      })
+    ),
+  };
+
+  const loadingManager = new THREE.LoadingManager();
+  loadingManager.setURLModifier(url => decoderFileUrls[url] || url);
+
+  // No decoder path is set: the decoder files are found thanks to the
+  // loading manager.
+  const loader = new DRACOLoader(loadingManager);
+  // The models are rendered one after the other: a single worker is enough.
+  loader.setWorkerLimit(1);
+
+  return loader;
+};
 
 // Set up the renderer when worker is initialized
-const initRenderer = () => {
+const initRenderer = (dracoDecoderFiles: ?DracoDecoderFiles) => {
   // $FlowFixMe[incompatible-type] - OffscreenCanvas is not in Flow types
   // $FlowFixMe[cannot-resolve-name]
   offscreenCanvas = new OffscreenCanvas(width, height);
@@ -54,6 +91,16 @@ const initRenderer = () => {
   renderer.useLegacyLights = true; // Use legacy lights as in the editor.
 
   renderer.setSize(width, height, false);
+
+  if (dracoDecoderFiles) {
+    try {
+      dracoLoader = createDracoLoader(dracoDecoderFiles);
+    } catch (error) {
+      // Without the Draco loader, only the models that are not compressed
+      // with Draco can be rendered.
+      console.error('Unable to create the Draco loader:', error);
+    }
+  }
 
   return true;
 };
@@ -83,6 +130,9 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
   // so the worker never needs to make any network/file requests.
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
+    if (dracoLoader) {
+      loader.setDRACOLoader(dracoLoader);
+    }
 
     loader.parse(
       resourceData,
@@ -176,11 +226,19 @@ self.onmessage = async event => {
 
   try {
     switch (type) {
-      case MESSAGE_TYPES.INIT:
-        const success = initRenderer();
+      case MESSAGE_TYPES.INIT: {
+        // Always answer to the main thread, even in case of failure, so that it
+        // never waits for the worker to be initialized.
+        let success = false;
+        try {
+          success = initRenderer(event.data.dracoDecoderFiles);
+        } catch (error) {
+          console.error("Can't initialize the 3D model renderer:", error);
+        }
         // eslint-disable-next-line no-restricted-globals
         self.postMessage({ type: MESSAGE_TYPES.INIT, success });
         break;
+      }
 
       case MESSAGE_TYPES.RENDER_MODEL:
         if (!renderer) {

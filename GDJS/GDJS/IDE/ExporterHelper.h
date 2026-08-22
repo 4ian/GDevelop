@@ -544,7 +544,9 @@ class ExporterHelper {
                               gd::String exportDir);
 
   /**
-   * \brief Add libraries files to the list of includes.
+   * \brief Add libraries files to the list of includes, and the files they
+   * need at runtime to the list of resources files (these are copied next to
+   * the game, but not included with a script tag).
    */
   void AddLibsInclude(bool pixiRenderers,
                       bool pixiInThreeRenderers,
@@ -555,7 +557,8 @@ class ExporterHelper {
                       bool includeCaptureManager,
                       bool includeInAppTutorialMessage,
                       gd::String gdevelopLogoStyle,
-                      std::vector<gd::String> &includesFiles);
+                      std::vector<gd::String> &includesFiles,
+                      std::vector<gd::String> &resourcesFiles);
 
   /**
    * \brief Remove include files that are Pixi renderers.
@@ -726,6 +729,19 @@ class ExporterHelper {
   static gd::String GetExportedIncludeFilename(
       gd::AbstractFileSystem &fs, const gd::String &gdjsRoot,
       const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst = 0);
+
+  /**
+   * \brief Returns the base URL (or relative path) from which the game engine
+   * files are served in the exported game or preview.
+   *
+   * Most of the time, they are copied next to the game index.html (in which
+   * case this is "./"), but some previews serve them from a server.
+   *
+   * \param fs The abstract file system to use
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
+   */
+  static gd::String GetExportedRuntimeFilesBaseUrl(
+      gd::AbstractFileSystem &fs, const gd::String &gdjsRoot);
 
   /**
    * \brief Change the directory where code files are generated.

@@ -1,48 +1,48 @@
 // @flow
 import { getEditorDracoDecoderPath } from './DracoDecoderPath';
 
-describe('DracoDecoderPath', () => {
-  const originalLocation = window.location;
+describe('getEditorDracoDecoderPath', () => {
+  const originalWindow = global.window;
 
   afterEach(() => {
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: originalLocation,
-    });
+    if (originalWindow === undefined) {
+      delete global.window;
+    } else {
+      global.window = originalWindow;
+    }
   });
 
-  const mockLocation = (href: string, protocol: string, origin: string) => {
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: {
-        href,
-        protocol,
-        origin,
+  it('uses the current origin on the web-app so a SPA URL does not break the decoder path', () => {
+    global.window = {
+      location: {
+        protocol: 'https:',
+        origin: 'https://editor.gdevelop.io',
+        href: 'https://editor.gdevelop.io/project/abc',
       },
-    });
-  };
-
-  test('uses an origin-absolute path on http(s) so SPA routes do not break', () => {
-    mockLocation(
-      'https://editor.gdevelop.io/games/my-game',
-      'https:',
-      'https://editor.gdevelop.io'
-    );
+    };
 
     expect(getEditorDracoDecoderPath()).toBe(
       'https://editor.gdevelop.io/external/draco/gltf/'
     );
   });
 
-  test('resolves next to index.html on file:// (Electron)', () => {
-    mockLocation(
-      'file:///Users/me/GDevelop/app/index.html',
-      'file:',
-      'file://'
-    );
+  it('resolves a file URL relative to the current page on Electron', () => {
+    global.window = {
+      location: {
+        protocol: 'file:',
+        origin: 'file://',
+        href: 'file:///Users/me/GDevelop/app.asar/www/index.html',
+      },
+    };
 
     expect(getEditorDracoDecoderPath()).toBe(
-      'file:///Users/me/GDevelop/app/external/draco/gltf/'
+      'file:///Users/me/GDevelop/app.asar/www/external/draco/gltf/'
     );
+  });
+
+  it('falls back to a relative path when window is unavailable', () => {
+    delete global.window;
+
+    expect(getEditorDracoDecoderPath()).toBe('./external/draco/gltf/');
   });
 });

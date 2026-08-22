@@ -1,14 +1,17 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import classNames from 'classnames';
-import Text from '../UI/Text';
+import StatusChip, {
+  StatusDot,
+  StatusIcon,
+  StatusSpinner,
+  type StatusChipTone,
+} from '../UI/StatusChip';
 import CheckCircleFilled from '../UI/CustomSvgIcons/CheckCircleFilled';
 import ErrorFilled from '../UI/CustomSvgIcons/ErrorFilled';
 import WarningRound from '../UI/CustomSvgIcons/WarningRound';
 import History from '../UI/CustomSvgIcons/History';
 import Stop from '../UI/CustomSvgIcons/Stop';
-import classes from './GameplayTestStatusIndicator.module.css';
 
 /**
  * The status of a test as displayed in the editor: the statuses reported by
@@ -52,15 +55,15 @@ export const isGameplayTestStatusInProgress = (
   status: GameplayTestDisplayStatus
 ): boolean => status === 'launching' || status === 'running';
 
-const statusClasses = {
-  'never-run': classes.neverRun,
-  launching: classes.inProgress,
-  running: classes.inProgress,
-  passed: classes.passed,
-  failed: classes.failed,
-  error: classes.error,
-  stopped: classes.stopped,
-  timeout: classes.timeout,
+const statusTones: { [GameplayTestDisplayStatus]: StatusChipTone } = {
+  'never-run': 'neutral',
+  launching: 'progress',
+  running: 'progress',
+  passed: 'success',
+  failed: 'error',
+  error: 'warning',
+  stopped: 'neutral',
+  timeout: 'warning',
 };
 
 export const getGameplayTestStatusLabel = (
@@ -90,21 +93,22 @@ export const getGameplayTestStatusLabel = (
 const renderStatusIcon = (status: GameplayTestDisplayStatus) => {
   switch (status) {
     case 'passed':
-      return <CheckCircleFilled className={classes.icon} />;
+      return <CheckCircleFilled />;
     case 'failed':
-      return <ErrorFilled className={classes.icon} />;
+      return <ErrorFilled />;
     case 'error':
-      return <WarningRound className={classes.icon} />;
+      return <WarningRound />;
     case 'timeout':
-      return <History className={classes.icon} />;
+      return <History />;
     case 'stopped':
-      return <Stop className={classes.icon} />;
+      return <Stop />;
     case 'launching':
     case 'running':
-      return <span className={classes.spinner} />;
+      // The chip shows its own spinner for a status in progress.
+      return null;
     case 'never-run':
     default:
-      return <span className={classes.emptyDot} />;
+      return <StatusDot />;
   }
 };
 
@@ -124,27 +128,14 @@ export const GameplayTestStatusChip = ({
   details,
   size,
 }: ChipProps): React.Node => (
-  <span
-    className={classNames({
-      [classes.chip]: true,
-      [statusClasses[status]]: true,
-      [classes.small]: size === 'small',
-    })}
-  >
-    {renderStatusIcon(status)}
-    <Text
-      noMargin
-      color="inherit"
-      size={size === 'small' ? 'body-small' : 'body'}
-    >
-      {getGameplayTestStatusLabel(status)}
-    </Text>
-    {details && (
-      <Text noMargin color="inherit" size="body-small" style={{ opacity: 0.8 }}>
-        {details}
-      </Text>
-    )}
-  </span>
+  <StatusChip
+    tone={statusTones[status]}
+    icon={renderStatusIcon(status)}
+    loading={isGameplayTestStatusInProgress(status)}
+    label={getGameplayTestStatusLabel(status)}
+    details={details}
+    size={size}
+  />
 );
 
 /**
@@ -156,12 +147,14 @@ export const GameplayTestStatusIcon = ({
 }: {|
   status: GameplayTestDisplayStatus,
 |}): React.Node => (
-  <span
-    className={classNames({
-      [classes.iconOnly]: true,
-      [statusClasses[status]]: true,
-    })}
-  >
-    {renderStatusIcon(status)}
-  </span>
+  <StatusIcon
+    tone={statusTones[status]}
+    icon={
+      isGameplayTestStatusInProgress(status) ? (
+        <StatusSpinner />
+      ) : (
+        renderStatusIcon(status)
+      )
+    }
+  />
 );

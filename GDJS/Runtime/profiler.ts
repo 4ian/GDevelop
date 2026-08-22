@@ -15,7 +15,7 @@ namespace gdjs {
      * The number of shader programs the 3D renderer had to compile *during*
      * the run. Anything above 0 once the game is running means frames were
      * spent compiling shaders instead of drawing - see
-     * `Profiler.recordShaderProgramsCount`.
+     * `Profiler.recordShaderPrograms`.
      */
     shaderProgramCompilationsCount: integer;
     /** The number of captured frames that compiled at least one shader. */
@@ -72,8 +72,11 @@ namespace gdjs {
     /** A function to get the current time. If available, corresponds to performance.now(). */
     _getTimeNow: () => float;
 
-    /** The number of shader programs seen on the previous frame, -1 until the first one. */
-    _lastShaderProgramsCount: integer = -1;
+    /**
+     * The renderer cache keys already seen, or null until the first measured
+     * frame (whose programs are start-up cost, not part of the run).
+     */
+    _seenShaderCacheKeys: Set<string> | null = null;
 
     /** The number of shader programs held by the 3D renderer on the last frame. */
     _shaderProgramsCount: integer = 0;
@@ -278,52 +281,132 @@ namespace gdjs {
     }
 
     /**
-     * Record how many shader programs the 3D renderer holds, for this frame.
+     * Record the shader programs the 3D renderer is holding, for this frame.
      *
-     * three.js compiles the number of lights of each kind it can see into its
-     * shaders, so changing how many lights are visible makes it compile and
-     * link a new program for every material affected. The cost lands on a
-     * single frame, and only the first time a given combination of counts is
-     * seen - which is why it shows up as unexplained stutter early in a
-     * playthrough and never again. A program count that keeps climbing while
-     * the game is running is the signature of that problem.
+     * The renderer compiles a separate program for every distinct combination
+     * of the things that shape a shader - material features, the number of
+     * lights of each kind, fog, shadow filtering, clipping planes, tone
+     * mapping, instancing, and more. Whenever the game moves any of them onto
+     * a combination that has not been seen before, that program is compiled
+     * and linked on the spot: the cost lands on a single frame, and never
+     * again for that combination. It shows up as unexplained stutter early in
+     * a playthrough, which is why it is worth measuring rather than guessing.
      *
-     * @param programsCount The current `WebGLRenderer.info.programs.length`.
-     * @param getCompilationContext Called only on the frames that did compile
-     * something, to describe what the renderer was drawing. It is passed as a
-     * function because it is too expensive to compute on every frame.
+     * Rather than assume a cause, this compares the cache keys the renderer
+     * itself uses to tell programs apart, and reports which fields differ from
+     * the closest program already seen.
+     *
+     * @param programs The current `WebGLRenderer.info.programs`.
      */
-    recordShaderProgramsCount(
-      programsCount: integer,
-      getCompilationContext?: () => string
+    recordShaderPrograms(
+      programs: Array<{ cacheKey?: string; type?: string }> | null
     ): void {
+      const programsCount = programs ? programs.length : 0;
       this._shaderProgramsCount = programsCount;
 
-      if (this._lastShaderProgramsCount < 0) {
+      if (!this._seenShaderCacheKeys) {
         // First measured frame: whatever is already compiled is start-up
         // cost, not something that happened during the run.
-        this._lastShaderProgramsCount = programsCount;
+        this._seenShaderCacheKeys = new Set<string>();
+        if (programs) {
+          for (const program of programs) {
+            this._seenShaderCacheKeys.add(program.cacheKey || '');
+          }
+        }
         return;
       }
 
-      const newProgramsCount = programsCount - this._lastShaderProgramsCount;
-      this._lastShaderProgramsCount = programsCount;
-      if (newProgramsCount <= 0) {
+      if (!programs) {
         return;
       }
 
-      this._shaderProgramCompilationsCount += newProgramsCount;
+      const newPrograms = programs.filter(
+        (program) => !this._seenShaderCacheKeys!.has(program.cacheKey || '')
+      );
+      if (!newPrograms.length) {
+        return;
+      }
+
+      const descriptions = newPrograms.map((program) => {
+        const description = Profiler._describeNewShaderProgram(
+          program,
+          this._seenShaderCacheKeys!
+        );
+        this._seenShaderCacheKeys!.add(program.cacheKey || '');
+        return description;
+      });
+
+      this._shaderProgramCompilationsCount += newPrograms.length;
       this._framesWithShaderCompilationCount++;
 
       logger.warn(
         'Compiled ' +
-          newProgramsCount +
+          newPrograms.length +
           ' new shader program(s) on frame ' +
           this._framesCount +
           ' (' +
           programsCount +
-          ' in total). This costs a dropped frame. ' +
-          (getCompilationContext ? getCompilationContext() : '')
+          ' in total), which costs a dropped frame. ' +
+          descriptions.join(' ')
+      );
+    }
+
+    /**
+     * Describe a newly compiled shader program by what makes it different from
+     * the most similar program already compiled.
+     *
+     * The renderer's cache keys are comma separated lists of the values that
+     * decide the shader, always in the same order, so comparing them field by
+     * field points straight at what the game changed - without this having to
+     * know what any given field means.
+     */
+    private static _describeNewShaderProgram(
+      program: { cacheKey?: string; type?: string },
+      seenCacheKeys: Set<string>
+    ): string {
+      const name = program.type || 'unknown material';
+      const cacheKey = program.cacheKey;
+      if (!cacheKey) {
+        return '"' + name + '" (no cache key to compare).';
+      }
+
+      const fields = cacheKey.split(',');
+      let closestDifferences: Array<string> | null = null;
+      for (const seenCacheKey of seenCacheKeys) {
+        const seenFields = seenCacheKey.split(',');
+        if (seenFields.length !== fields.length) {
+          // A different shader entirely, not the same one reconfigured.
+          continue;
+        }
+        const differences: Array<string> = [];
+        for (let i = 0; i < fields.length; i++) {
+          if (fields[i] !== seenFields[i]) {
+            differences.push(
+              'field ' + i + ': "' + seenFields[i] + '" -> "' + fields[i] + '"'
+            );
+          }
+        }
+        if (
+          differences.length &&
+          (!closestDifferences ||
+            differences.length < closestDifferences.length)
+        ) {
+          closestDifferences = differences;
+        }
+      }
+
+      if (!closestDifferences) {
+        return '"' + name + '" is a shader that was not used before.';
+      }
+      return (
+        '"' +
+        name +
+        '" differs from the closest program already compiled in ' +
+        closestDifferences.length +
+        ' field(s): ' +
+        closestDifferences.slice(0, 4).join(', ') +
+        (closestDifferences.length > 4 ? ', ...' : '') +
+        '.'
       );
     }
 

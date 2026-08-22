@@ -451,12 +451,7 @@ namespace gdjs {
           .getRenderer()
           .getThreeRenderer();
         if (threeRenderer) {
-          this._profiler.recordShaderProgramsCount(
-            threeRenderer.info.programs
-              ? threeRenderer.info.programs.length
-              : 0,
-            () => this._describeLightsForShaderCompilation()
-          );
+          this._profiler.recordShaderPrograms(threeRenderer.info.programs);
         }
       }
       if (this._profiler) {
@@ -464,94 +459,6 @@ namespace gdjs {
       }
       return !!this.getRequestedChange();
     }
-    /**
-     * Describe how many lights of each kind are lit on each 3D layer, to be
-     * logged when the 3D renderer compiles a new shader program.
-     *
-     * three.js counts point lights, spot lights, spot lights with a projected
-     * texture and each of their shadows separately, and compiles those counts
-     * into its shaders - so these are the numbers that have to stay still to
-     * avoid recompilations. Only called on the frames that did compile
-     * something: traversing every layer is too expensive to do every frame.
-     */
-    private _describeLightsForShaderCompilation(): string {
-      if (typeof THREE === 'undefined') {
-        return '';
-      }
-
-      const descriptions: Array<string> = [];
-      for (const layerName in this._layers.items) {
-        if (!this._layers.items.hasOwnProperty(layerName)) {
-          continue;
-        }
-        const threeScene = this._layers.items[layerName]
-          .getRenderer()
-          .getThreeScene();
-        if (!threeScene) {
-          continue;
-        }
-
-        let pointLights = 0;
-        let spotLights = 0;
-        let spotLightsWithMap = 0;
-        let shadows = 0;
-
-        // Walk the scene the way three.js does, skipping hidden subtrees
-        // entirely: a light under a hidden group is not counted by three.js,
-        // so counting it here would make these logs disagree with the shaders.
-        const countLights = (object: THREE.Object3D): void => {
-          if (!object.visible) {
-            return;
-          }
-          const light = object as THREE.Light;
-          if (light.isLight) {
-            if ((light as THREE.SpotLight).isSpotLight) {
-              if ((light as THREE.SpotLight).map) {
-                spotLightsWithMap++;
-              } else {
-                spotLights++;
-              }
-            } else if ((light as THREE.PointLight).isPointLight) {
-              pointLights++;
-            }
-            if (light.castShadow) {
-              shadows++;
-            }
-          }
-          for (const child of object.children) {
-            countLights(child);
-          }
-        };
-        countLights(threeScene);
-
-        if (pointLights || spotLights || spotLightsWithMap) {
-          descriptions.push(
-            'layer "' +
-              layerName +
-              '": ' +
-              pointLights +
-              ' point, ' +
-              spotLights +
-              ' spot, ' +
-              spotLightsWithMap +
-              ' spot with a projected texture, ' +
-              shadows +
-              ' casting a shadow'
-          );
-        }
-      }
-
-      if (!descriptions.length) {
-        return '';
-      }
-      return (
-        'Lights currently lit - a change in any of these counts is what ' +
-        'forces a recompilation: ' +
-        descriptions.join('; ') +
-        '.'
-      );
-    }
-
     /**
      * Render the scene (but do not execute the game logic).
      */

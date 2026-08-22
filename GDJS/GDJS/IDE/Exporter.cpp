@@ -109,7 +109,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
         /*includeCaptureManager*/ false,
         /*includeInAppTutorialMessage*/ false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
-        includesFiles);
+        includesFiles,
+        resourcesFiles);
 
     // Export files for free function, object and behaviors
     for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {

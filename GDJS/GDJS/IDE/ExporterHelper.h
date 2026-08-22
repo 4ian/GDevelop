@@ -544,7 +544,9 @@ class ExporterHelper {
                               gd::String exportDir);
 
   /**
-   * \brief Add libraries files to the list of includes.
+   * \brief Add libraries files to the list of includes, and the files they
+   * need at runtime to the list of resources files (these are copied next to
+   * the game, but not included with a script tag).
    */
   void AddLibsInclude(bool pixiRenderers,
                       bool pixiInThreeRenderers,
@@ -555,7 +557,8 @@ class ExporterHelper {
                       bool includeCaptureManager,
                       bool includeInAppTutorialMessage,
                       gd::String gdevelopLogoStyle,
-                      std::vector<gd::String> &includesFiles);
+                      std::vector<gd::String> &includesFiles,
+                      std::vector<gd::String> &resourcesFiles);
 
   /**
    * \brief Remove include files that are Pixi renderers.

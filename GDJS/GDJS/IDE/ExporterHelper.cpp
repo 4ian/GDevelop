@@ -193,7 +193,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                   /*includeInAppTutorialMessage*/
                   !options.inAppTutorialMessageInPreview.empty(),
                   immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
-                  includesFiles);
+                  includesFiles,
+                  resourcesFiles);
 
     // Export files for free function, object and behaviors
     for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
@@ -1154,7 +1155,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool includeCaptureManager,
                                     bool includeInAppTutorialMessage,
                                     gd::String gdevelopLogoStyle,
-                                    std::vector<gd::String> &includesFiles) {
+                                    std::vector<gd::String> &includesFiles,
+                                    std::vector<gd::String> &resourcesFiles) {
   // First, do not forget common includes (they must be included before events
   // generated code files).
   InsertUnique(includesFiles, "libs/jshashtable.js");
@@ -1244,8 +1246,12 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   if (pixiInThreeRenderers || isInGameEdition) {
     InsertUnique(includesFiles, "pixi-renderers/three.js");
     InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
-    InsertUnique(includesFiles, "pixi-renderers/draco/gltf/draco_decoder.wasm");
-    InsertUnique(includesFiles,
+    // The Draco decoder files are not included with a script tag: they are
+    // fetched by the DRACOLoader (of ThreeAddons.js) when a 3D model
+    // compressed with Draco must be read.
+    InsertUnique(resourcesFiles,
+                 "pixi-renderers/draco/gltf/draco_decoder.wasm");
+    InsertUnique(resourcesFiles,
                  "pixi-renderers/draco/gltf/draco_wasm_wrapper.js");
     // Extensions in JS may use it.
     InsertUnique(includesFiles, "Extensions/3D/Scene3DTools.js");

@@ -53,7 +53,7 @@ module.exports = [
     "languageCode": "da_DK",
     "languageName": "Danish",
     "languageNativeName": "Dansk",
-    "translationRatio": 0.9663699307616221
+    "translationRatio": 0.9666666666666667
   },
   {
     "languageCode": "de_DE",
@@ -107,7 +107,7 @@ module.exports = [
     "languageCode": "fr_FR",
     "languageName": "French",
     "languageNativeName": "Français",
-    "translationRatio": 0.9736894164193868
+    "translationRatio": 0.9735905044510386
   },
   {
     "languageCode": "ha_HG",

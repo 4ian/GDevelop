@@ -376,6 +376,8 @@ void ExporterHelper::SerializeRuntimeGameOptions(
     gd::SerializerElement &runtimeGameOptions) {
   // Create the setup options passed to the gdjs.RuntimeGame
   runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
+  runtimeGameOptions.AddChild("runtimeFilesBaseUrl")
+      .SetStringValue(GetExportedRuntimeFilesBaseUrl(fs, gdjsRoot));
 
   auto &initialRuntimeGameStatus =
       runtimeGameOptions.AddChild("initialRuntimeGameStatus");
@@ -1376,6 +1378,19 @@ bool ExporterHelper::ExportScenesEventsCode(
   }
 
   return true;
+}
+
+gd::String ExporterHelper::GetExportedRuntimeFilesBaseUrl(
+    gd::AbstractFileSystem &fs, const gd::String &gdjsRoot) {
+  // Same convention as in `GetExportedIncludeFilename`: the game engine files
+  // keep, relative to the "<GDJS Root>/Runtime" folder, the same relative
+  // path when exported. Some file systems use a URL for `gdjsRoot`, and keep
+  // absolute URLs pointing to the server the game engine files are served
+  // from.
+  gd::String runtimeFilesBaseUrl = gdjsRoot + "/Runtime/";
+  fs.MakeRelative(runtimeFilesBaseUrl, gdjsRoot + "/Runtime/");
+
+  return runtimeFilesBaseUrl.empty() ? "./" : runtimeFilesBaseUrl;
 }
 
 gd::String ExporterHelper::GetExportedIncludeFilename(

@@ -731,6 +731,19 @@ class ExporterHelper {
       const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst = 0);
 
   /**
+   * \brief Returns the base URL (or relative path) from which the game engine
+   * files are served in the exported game or preview.
+   *
+   * Most of the time, they are copied next to the game index.html (in which
+   * case this is "./"), but some previews serve them from a server.
+   *
+   * \param fs The abstract file system to use
+   * \param gdjsRoot The root directory of GDJS, used to copy runtime files.
+   */
+  static gd::String GetExportedRuntimeFilesBaseUrl(
+      gd::AbstractFileSystem &fs, const gd::String &gdjsRoot);
+
+  /**
    * \brief Change the directory where code files are generated.
    *
    * By default, this is set to a temporary directory.

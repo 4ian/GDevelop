@@ -136,11 +136,14 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
       return false;
     }
 
-    //...and export it
-    gd::SerializerElement noRuntimeGameOptions;
+    //...and export it, with the setup options passed to the gdjs.RuntimeGame.
+    gd::SerializerElement runtimeGameOptions;
+    runtimeGameOptions.AddChild("runtimeFilesBaseUrl")
+        .SetStringValue(
+            ExporterHelper::GetExportedRuntimeFilesBaseUrl(fs, gdjsRoot));
     std::vector<gd::InGameEditorResourceMetadata> noInGameEditorResources;
     helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                             noRuntimeGameOptions, false, noInGameEditorResources);
+                             runtimeGameOptions, false, noInGameEditorResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
@@ -158,7 +161,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
                                     includesFiles,
                                     usedExtensionsResult.GetUsedSourceFiles(),
                                     /*nonRuntimeScriptsCacheBurst=*/0,
-                                    "")) {
+                                    "gdjs.runtimeGameOptions")) {
       gd::LogError(_("Error during export:\n") + lastError);
       return false;
     }

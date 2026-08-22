@@ -9,48 +9,6 @@ namespace gdjs {
   const resourceKinds: Array<ResourceKind> = ['model3D'];
 
   /**
-   * The folder containing the Draco decoder files, relative to the game
-   * index.html. This is where the exporter copies them.
-   */
-  const relativeDracoDecoderPath = './pixi-renderers/draco/gltf/';
-
-  /**
-   * Find the folder containing the Draco decoder files (used to read
-   * compressed 3D models).
-   *
-   * These files are shipped with the game engine, next to the Three.js library.
-   * In an exported game, they are stored next to the game index.html, but during
-   * a preview launched from the web-app or the mobile app, the game engine files
-   * are served from the GDevelop servers: the decoder must then be read from
-   * there too.
-   */
-  const findDracoDecoderPath = (): string => {
-    if (typeof document === 'undefined') return relativeDracoDecoderPath;
-
-    const threeScriptPathEnd = '/pixi-renderers/three.js';
-    const scriptElements = document.getElementsByTagName('script');
-    for (let index = 0; index < scriptElements.length; index++) {
-      // `src` is the URL of the script, resolved against the page URL.
-      const scriptUrl = scriptElements[index].src;
-      if (!scriptUrl) continue;
-
-      try {
-        const url = new URL(scriptUrl);
-        if (!url.pathname.endsWith(threeScriptPathEnd)) continue;
-
-        // The Draco decoder files are in a folder next to the Three.js library.
-        return new URL('draco/gltf/', scriptUrl).toString();
-      } catch (error) {
-        logger.warn(
-          'Unable to read the URL of a script of the game: ' + scriptUrl
-        );
-      }
-    }
-
-    return relativeDracoDecoderPath;
-  };
-
-  /**
    * Load GLB files (using `Three.js`), using the "model3D" resources
    * registered in the game resources.
    * @category Resources > 3D Models
@@ -80,7 +38,13 @@ namespace gdjs {
         this._loader = new THREE_ADDONS.GLTFLoader();
 
         this._dracoLoader = new THREE_ADDONS.DRACOLoader();
-        this._dracoLoader.setDecoderPath(findDracoDecoderPath());
+        // The Draco decoder files are shipped with the game engine files.
+        const runtimeFilesBaseUrl =
+          resourceLoader.getRuntimeGame().getAdditionalOptions()
+            .runtimeFilesBaseUrl || './';
+        this._dracoLoader.setDecoderPath(
+          runtimeFilesBaseUrl + 'pixi-renderers/draco/gltf/'
+        );
         this._loader.setDRACOLoader(this._dracoLoader);
 
         /**

@@ -1,9 +1,25 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Profiler');
+
   /**
    * @category Debugging > Profiler
    */
   export type ProfilerStats = {
     framesCount: integer;
+    /**
+     * The number of shader programs held by the 3D renderer at the end of the
+     * run (0 when the game does not render in 3D).
+     */
+    shaderProgramsCount: integer;
+    /**
+     * The number of shader programs the 3D renderer had to compile *during*
+     * the run. Anything above 0 once the game is running means frames were
+     * spent compiling shaders instead of drawing - see
+     * `Profiler.recordShaderProgramsCount`.
+     */
+    shaderProgramCompilationsCount: integer;
+    /** The number of captured frames that compiled at least one shader. */
+    framesWithShaderCompilationCount: integer;
   };
 
   /**
@@ -55,6 +71,18 @@ namespace gdjs {
 
     /** A function to get the current time. If available, corresponds to performance.now(). */
     _getTimeNow: () => float;
+
+    /** The number of shader programs seen on the previous frame, -1 until the first one. */
+    _lastShaderProgramsCount: integer = -1;
+
+    /** The number of shader programs held by the 3D renderer on the last frame. */
+    _shaderProgramsCount: integer = 0;
+
+    /** How many shader programs were compiled since profiling started. */
+    _shaderProgramCompilationsCount: integer = 0;
+
+    /** How many frames compiled at least one shader program. */
+    _framesWithShaderCompilationCount: integer = 0;
 
     constructor() {
       while (this._framesMeasures.length < this._maxFramesCount) {
@@ -250,10 +278,66 @@ namespace gdjs {
     }
 
     /**
+     * Record how many shader programs the 3D renderer holds, for this frame.
+     *
+     * three.js compiles the number of lights of each kind it can see into its
+     * shaders, so changing how many lights are visible makes it compile and
+     * link a new program for every material affected. The cost lands on a
+     * single frame, and only the first time a given combination of counts is
+     * seen - which is why it shows up as unexplained stutter early in a
+     * playthrough and never again. A program count that keeps climbing while
+     * the game is running is the signature of that problem.
+     *
+     * @param programsCount The current `WebGLRenderer.info.programs.length`.
+     * @param getCompilationContext Called only on the frames that did compile
+     * something, to describe what the renderer was drawing. It is passed as a
+     * function because it is too expensive to compute on every frame.
+     */
+    recordShaderProgramsCount(
+      programsCount: integer,
+      getCompilationContext?: () => string
+    ): void {
+      this._shaderProgramsCount = programsCount;
+
+      if (this._lastShaderProgramsCount < 0) {
+        // First measured frame: whatever is already compiled is start-up
+        // cost, not something that happened during the run.
+        this._lastShaderProgramsCount = programsCount;
+        return;
+      }
+
+      const newProgramsCount = programsCount - this._lastShaderProgramsCount;
+      this._lastShaderProgramsCount = programsCount;
+      if (newProgramsCount <= 0) {
+        return;
+      }
+
+      this._shaderProgramCompilationsCount += newProgramsCount;
+      this._framesWithShaderCompilationCount++;
+
+      logger.warn(
+        'Compiled ' +
+          newProgramsCount +
+          ' new shader program(s) on frame ' +
+          this._framesCount +
+          ' (' +
+          programsCount +
+          ' in total). This costs a dropped frame. ' +
+          (getCompilationContext ? getCompilationContext() : '')
+      );
+    }
+
+    /**
      * Get stats measured during the frames captured.
      */
     getStats(): ProfilerStats {
-      return { framesCount: this._framesCount };
+      return {
+        framesCount: this._framesCount,
+        shaderProgramsCount: this._shaderProgramsCount,
+        shaderProgramCompilationsCount: this._shaderProgramCompilationsCount,
+        framesWithShaderCompilationCount:
+          this._framesWithShaderCompilationCount,
+      };
     }
 
     /**

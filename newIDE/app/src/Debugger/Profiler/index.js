@@ -6,7 +6,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import MeasuresTable from './MeasuresTable';
 import { type ProfilerOutput } from '..';
 import EmptyMessage from '../../UI/EmptyMessage';
-import { Line } from '../../UI/Grid';
+import { Line, Column } from '../../UI/Grid';
 import Background from '../../UI/Background';
 import Text from '../../UI/Text';
 import LinearProgress from '../../UI/LinearProgress';
@@ -32,11 +32,27 @@ export default class Profiler extends React.Component<Props, void> {
       <Background>
         <Line alignItems="center" justifyContent="center">
           {!profilingInProgress && profilerOutput && (
-            <Text>
-              <Trans>
-                Last run collected on {profilerOutput.stats.framesCount} frames.
-              </Trans>
-            </Text>
+            <Column noMargin>
+              <Text>
+                <Trans>
+                  Last run collected on {profilerOutput.stats.framesCount}{' '}
+                  frames.
+                </Trans>
+              </Text>
+              {!!profilerOutput.stats.shaderProgramCompilationsCount && (
+                <Text color="secondary">
+                  <Trans>
+                    The 3D renderer compiled{' '}
+                    {profilerOutput.stats.shaderProgramCompilationsCount} new
+                    shader(s) during this run, on{' '}
+                    {profilerOutput.stats.framesWithShaderCompilationCount}{' '}
+                    frame(s). Each of those frames was dropped. This happens
+                    when the number of lights of a kind that are lit changes -
+                    check the console for the counts.
+                  </Trans>
+                </Text>
+              )}
+            </Column>
           )}
           {!profilingInProgress && profilerOutput && (
             <RaisedButton label={<Trans>Restart</Trans>} onClick={onStart} />

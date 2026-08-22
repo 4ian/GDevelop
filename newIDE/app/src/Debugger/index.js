@@ -29,6 +29,10 @@ export type ProfilerOutput = {|
   framesAverageMeasures: ProfilerMeasuresSection,
   stats: {
     framesCount: number,
+    // Optional: only sent by game engines recent enough to measure them.
+    shaderProgramsCount?: number,
+    shaderProgramCompilationsCount?: number,
+    framesWithShaderCompilationCount?: number,
   },
 |};
 

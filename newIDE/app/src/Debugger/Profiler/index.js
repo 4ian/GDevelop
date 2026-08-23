@@ -6,24 +6,13 @@ import RaisedButton from '../../UI/RaisedButton';
 import MeasuresTable from './MeasuresTable';
 import { type ProfilerOutput } from '..';
 import EmptyMessage from '../../UI/EmptyMessage';
-import { Line, Spacer } from '../../UI/Grid';
 import Background from '../../UI/Background';
+import ScrollView from '../../UI/ScrollView';
 import Text from '../../UI/Text';
 import LinearProgress from '../../UI/LinearProgress';
-import {
-  Table,
-  TableBody,
-  TableRow,
-  TableRowColumn,
-  TableHeader,
-  TableHeaderColumn,
-} from '../../UI/Table';
-
-const styles = {
-  tableContainer: {
-    flex: 1,
-  },
-};
+import StatusChip, { StatusDot } from '../../UI/StatusChip';
+import History from '../../UI/CustomSvgIcons/History';
+import classes from './Profiler.module.css';
 
 /**
  * Round to at most one decimal, without trailing ".0" on whole numbers.
@@ -39,7 +28,7 @@ type Stat = {|
 |};
 
 /**
- * The high level numbers of a profiler run, as rows for the summary table.
+ * The high level numbers of a profiler run, as cards for the summary.
  * Anything the engine did not measure (an older game, or a game that does not
  * render in 3D) is left out rather than shown as a zero.
  */
@@ -113,6 +102,27 @@ const getStats = (profilerOutput: ProfilerOutput): Array<Stat> => {
   return stat;
 };
 
+const renderStatusChip = (
+  profilerOutput: ?ProfilerOutput,
+  profilingInProgress: boolean
+) => {
+  if (profilingInProgress) {
+    return (
+      <StatusChip tone="progress" loading label={<Trans>Profiling...</Trans>} />
+    );
+  }
+  if (profilerOutput) {
+    return (
+      <StatusChip
+        tone="info"
+        icon={<History />}
+        label={<Trans>Last run</Trans>}
+      />
+    );
+  }
+  return <StatusChip icon={<StatusDot />} label={<Trans>Never run</Trans>} />;
+};
+
 type Props = {|
   onStart: () => void,
   onStop: () => void,
@@ -120,112 +130,105 @@ type Props = {|
   profilingInProgress: boolean,
 |};
 
-export default class Profiler extends React.Component<Props, void> {
-  render(): any {
-    const { onStart, onStop, profilerOutput, profilingInProgress } = this.props;
+const Profiler = ({
+  onStart,
+  onStop,
+  profilerOutput,
+  profilingInProgress,
+}: Props): React.Node => {
+  // While a run is in progress, the numbers of the previous one are not shown:
+  // they would look like the ones being measured.
+  const shownProfilerOutput = profilingInProgress ? null : profilerOutput;
 
-    return (
-      <Background>
-        <Line alignItems="center" justifyContent="space-between" noMargin>
-          <Line alignItems="center" noMargin>
-            <Spacer />
-            <Text noMargin>
-              {profilingInProgress ? (
-                <Trans>Profiling...</Trans>
-              ) : profilerOutput ? (
-                <Trans>Last run</Trans>
+  return (
+    <Background>
+      <div className={classes.header}>
+        {/* The panel is already titled "Profiler" by the window holding it. */}
+        {renderStatusChip(profilerOutput, profilingInProgress)}
+        {profilingInProgress ? (
+          <RaisedButton
+            label={<Trans>Stop profiling</Trans>}
+            onClick={onStop}
+          />
+        ) : (
+          <RaisedButton
+            label={
+              profilerOutput ? (
+                <Trans>Restart</Trans>
               ) : (
-                <Trans>Profiler</Trans>
-              )}
-            </Text>
-          </Line>
-          <Line alignItems="center" noMargin>
-            {profilingInProgress ? (
-              <RaisedButton
-                label={<Trans>Stop profiling</Trans>}
-                onClick={onStop}
-              />
-            ) : (
-              <RaisedButton
-                label={
-                  profilerOutput ? (
-                    <Trans>Restart</Trans>
-                  ) : (
-                    <Trans>Start profiling</Trans>
-                  )
-                }
-                onClick={onStart}
-                primary={!profilerOutput}
-              />
-            )}
-            <Spacer />
-          </Line>
-        </Line>
-        {profilingInProgress && (
-          <Line alignItems="center">
-            <LinearProgress />
-          </Line>
+                <Trans>Start profiling</Trans>
+              )
+            }
+            onClick={onStart}
+            primary={!profilerOutput}
+          />
         )}
-        {!profilingInProgress && profilerOutput && (
-          <Table style={{ tableLayout: 'fixed', width: '100%' }}>
-            <TableHeader>
-              <TableRow>
-                <TableHeaderColumn>
-                  <Trans>Measure</Trans>
-                </TableHeaderColumn>
-                <TableHeaderColumn
-                  style={{
-                    textAlign: 'right',
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  <Trans>Value</Trans>
-                </TableHeaderColumn>
-                <TableHeaderColumn />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {getStats(profilerOutput).map((stat, index) => (
-                <TableRow key={index}>
-                  <TableRowColumn>
-                    <Text noMargin>{stat.label}</Text>
-                  </TableRowColumn>
-                  <TableRowColumn
-                    style={{
-                      textAlign: 'right',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    <Text noMargin>{stat.value}</Text>
-                  </TableRowColumn>
-                  <TableRowColumn>
+      </div>
+      {profilingInProgress && (
+        <div className={classes.progressBar}>
+          <LinearProgress style={{ height: 2 }} />
+        </div>
+      )}
+      <ScrollView
+        autoHideScrollbar
+        // A column, so that the message shown when there is nothing to see
+        // is centered in the whole panel.
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
+        {shownProfilerOutput ? (
+          <div className={classes.content}>
+            <div className={classes.section}>
+              <Text noMargin size="body-small" color="secondary">
+                <Trans>Summary</Trans>
+              </Text>
+              <div className={classes.statsGrid}>
+                {getStats(shownProfilerOutput).map((stat, index) => (
+                  <div className={classes.statCard} key={index}>
+                    <Text noMargin size="body-small" color="secondary">
+                      {stat.label}
+                    </Text>
+                    <Text
+                      noMargin
+                      size="block-title"
+                      style={{ fontVariantNumeric: 'tabular-nums' }}
+                    >
+                      {stat.value}
+                    </Text>
                     {stat.note && (
                       <Text noMargin size="body-small" color="secondary">
                         {stat.note}
                       </Text>
                     )}
-                  </TableRowColumn>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-        <div style={styles.tableContainer}>
-          {profilerOutput && (
-            <MeasuresTable
-              profilerMeasures={profilerOutput.framesAverageMeasures}
-            />
-          )}
-          {!profilerOutput && (
-            <EmptyMessage>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className={classes.section}>
+              <Text noMargin size="body-small" color="secondary">
+                <Trans>Time spent in each section of a frame</Trans>
+              </Text>
+              <MeasuresTable
+                profilerMeasures={shownProfilerOutput.framesAverageMeasures}
+              />
+            </div>
+          </div>
+        ) : (
+          <EmptyMessage>
+            {profilingInProgress ? (
+              <Trans>
+                Profiling: stop it after a few seconds to see the results.
+              </Trans>
+            ) : (
               <Trans>
                 Start profiling and then stop it after a few seconds to see the
                 results.
               </Trans>
-            </EmptyMessage>
-          )}
-        </div>
-      </Background>
-    );
-  }
-}
+            )}
+          </EmptyMessage>
+        )}
+      </ScrollView>
+    </Background>
+  );
+};
+
+export default Profiler;

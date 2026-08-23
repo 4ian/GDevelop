@@ -4133,8 +4133,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "variable");
       node->Visit(validator);
-      RequireNoError(validator);
-	    // TODO Add a fatal error
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -) can't be used in variable names. Remove "
+            "the operator from the variable name.");
     }
 
     SECTION("Variable with operator") {
@@ -4144,8 +4146,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "variable");
       node->Visit(validator);
-      RequireNoError(validator);
-	    // TODO Add a fatal error
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -, /, *) can't be used in variable names. Remove "
+              "the operator from the variable name.");
     }
 
     SECTION("Children variable with operator") {
@@ -4156,8 +4160,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "variable");
       node->Visit(validator);
-      RequireNoError(validator);
-	    // TODO Add a fatal error
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -, /, *) can't be used in variable names. Remove "
+              "the operator from the variable name.");
     }
   }
   

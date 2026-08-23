@@ -105,14 +105,19 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.leftHandSide->Visit(*this);
     const Type leftType = childType; // Store the type of the first operand.
 
-    if (leftType == Type::Number) {
+    if (parentType == Type::Variable || parentType == Type::ObjectVariable ||
+        parentType == Type::LegacyVariable) {
+      RaiseOperatorError(
+          _("Operators (+, -, /, *) can't be used in variable names. Remove "
+            "the operator from the variable name."),
+          node.rightHandSide->location);
+    } else if (leftType == Type::Number) {
       if (node.op == ' ') {
         RaiseError(gd::ExpressionParserError::ErrorType::SyntaxError,
             "No operator found. Did you forget to enter an operator (like +, -, "
             "* or /) between numbers or expressions?", node.rightHandSide->location);
       }
-    }
-    else if (leftType == Type::String) {
+    } else if (leftType == Type::String) {
       if (node.op == ' ') {
         RaiseError(gd::ExpressionParserError::ErrorType::SyntaxError,
             "You must add the operator + between texts or expressions. For "
@@ -129,12 +134,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           _("Operators (+, -, /, *) can't be used with an object name. Remove "
             "the operator."),
             node.rightHandSide->location);
-    } else if (leftType == Type::Variable || leftType == Type::ObjectVariable ||
-               leftType == Type::LegacyVariable) {
-      RaiseOperatorError(
-          _("Operators (+, -, /, *) can't be used in variable names. Remove "
-            "the operator from the variable name."),
-          node.rightHandSide->location);
     }
 
     // The "required" type ("parentType") of the second operator is decided by:
@@ -156,7 +155,13 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.factor->Visit(*this);
     const Type rightType = childType;
 
-    if (rightType == Type::Number) {
+    if (parentType == Type::Variable || parentType == Type::ObjectVariable ||
+        parentType == Type::LegacyVariable) {
+      RaiseTypeError(
+          _("Operators (+, -) can't be used in variable names. Remove "
+            "the operator from the variable name."),
+          node.location);
+    } else if (rightType == Type::Number) {
       if (node.op != '+' && node.op != '-') {
         // This is actually a dead code because the parser takes them as
         // binary operations with an empty left side which makes as much sense.
@@ -176,13 +181,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       RaiseTypeError(
           _("Operators (+, -) can't be used with an object name. Remove the "
             "operator."),
-          node.location);
-    } else if (rightType == Type::Variable ||
-               rightType == Type::ObjectVariable ||
-               rightType == Type::LegacyVariable) {
-      RaiseTypeError(
-          _("Operators (+, -) can't be used in variable names. Remove "
-            "the operator from the variable name."),
           node.location);
     }
   }

@@ -1,7 +1,6 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
-
 import * as React from 'react';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
@@ -23,6 +22,70 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
+
+// Builds a stable path key like "Root/Enemies/Boss" by walking up the folder tree.
+// This key survives page reloads, unlike objectFolder.ptr which is a memory address.
+const getFolderStableKey = (
+  objectFolder: gdObjectFolderOrObject,
+  isGlobal: boolean
+): string => {
+  const parts: Array<string> = [];
+  let current = objectFolder;
+  try {
+    while (current && !current.isRootFolder()) {
+      parts.unshift(current.getFolderName());
+      current = current.getParent();
+    }
+  } catch (e) {
+    // fallback: if walking fails, use the folder name only
+    parts.unshift(objectFolder.getFolderName());
+  }
+  const scope = isGlobal ? 'global' : 'scene';
+  return scope + '/' + parts.join('/');
+};
+
+export const folderColors = {
+  get(objectFolder: gdObjectFolderOrObject, isGlobal: boolean): string | null {
+    try {
+      const key = getFolderStableKey(objectFolder, isGlobal);
+      const saved = localStorage.getItem('gdevelop_custom_folder_colors');
+      const colors: { [string]: string } = saved ? JSON.parse(saved) : {};
+      return colors[key] || null;
+    } catch (e) {
+      return null;
+    }
+  },
+  set(objectFolder: gdObjectFolderOrObject, isGlobal: boolean, color: string) {
+    try {
+      const key = getFolderStableKey(objectFolder, isGlobal);
+      const saved = localStorage.getItem('gdevelop_custom_folder_colors');
+      const colors: { [string]: string } = saved ? JSON.parse(saved) : {};
+      colors[key] = color;
+      localStorage.setItem(
+        'gdevelop_custom_folder_colors',
+        JSON.stringify(colors)
+      );
+    } catch (e) {
+      console.error('Error saving folder color:', e);
+    }
+  },
+  remove(objectFolder: gdObjectFolderOrObject, isGlobal: boolean) {
+    try {
+      const key = getFolderStableKey(objectFolder, isGlobal);
+      const saved = localStorage.getItem('gdevelop_custom_folder_colors');
+      if (saved) {
+        const colors: { [string]: string } = JSON.parse(saved);
+        delete colors[key];
+        localStorage.setItem(
+          'gdevelop_custom_folder_colors',
+          JSON.stringify(colors)
+        );
+      }
+    } catch (e) {
+      console.error('Error removing folder color:', e);
+    }
+  },
+};
 
 export const expandAllSubfolders = (
   objectFolder: gdObjectFolderOrObject,
@@ -81,14 +144,15 @@ export type ObjectFolderTreeViewItemProps = {|
   forceUpdateList: () => void,
   forceUpdate: () => void,
   isListLocked: boolean,
+  openColorPicker: (
+    objectFolder: gdObjectFolderOrObject,
+    isGlobal: boolean
+  ) => void,
 |};
 
 export const getObjectFolderTreeViewItemId = (
   objectFolder: gdObjectFolderOrObject
 ): string => {
-  // Use the ptr as id since two folders can have the same name.
-  // If using folder name, this would need for methods when renaming
-  // the folder to keep it open.
   return `object-folder-${objectFolder.ptr}`;
 };
 
@@ -139,14 +203,18 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     return false;
   }
 
-  getName(): string | React.Node {
+  _getFolderName(): string {
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolder)) return '';
+    return this.objectFolder.getFolderName();
+  }
+
+  getName(): string {
     if (!exceptionallyGuardAgainstDeadObject(this.objectFolder)) return '';
     return this.objectFolder.getFolderName();
   }
 
   getId(): string {
-    // getObjectFolderTreeViewItemId only uses .ptr, so it's safe even if dead.
-    return getObjectFolderTreeViewItemId(this.objectFolder);
+    return getObjectFolderTreeViewItemId(this.objectFolder) || '';
   }
 
   getHtmlId(index: number): ?string {
@@ -155,13 +223,18 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
   getDataSet(): ?HTMLDataset {
     if (!exceptionallyGuardAgainstDeadObject(this.objectFolder)) return null;
+    const color = folderColors.get(this.objectFolder, this._isGlobal);
     return {
       folderName: this.objectFolder.getFolderName(),
       global: this._isGlobal.toString(),
+      ...(color ? { folderColor: color } : {}),
     };
   }
-
   getThumbnail(): ?string {
+    const color = folderColors.get(this.objectFolder, this._isGlobal);
+    if (color) {
+      return 'NO_ICON';
+    }
     return 'FOLDER';
   }
 
@@ -169,16 +242,21 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
   rename(newName: string): void {
     const safeNewName = newName.replaceAll('/', '-');
-    if (this.getName() === safeNewName) {
+    if (this._getFolderName() === safeNewName) {
       return;
     }
-
+    // Save the current color before renaming (the key will change with the new name)
+    const currentColor = folderColors.get(this.objectFolder, this._isGlobal);
     this.props.onRenameObjectFolderOrObjectWithContextFinish(
       { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
       safeNewName,
       doRename => {
         if (!doRename) return;
-
+        // After rename, the folder path key has changed: remove old key and save with new key
+        if (currentColor) {
+          folderColors.remove(this.objectFolder, this._isGlobal);
+          folderColors.set(this.objectFolder, this._isGlobal, currentColor);
+        }
         this.props.onObjectModified(false);
       }
     );
@@ -186,7 +264,11 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
   edit(): void {}
 
-  _getPasteLabel(
+  _openColorPicker(): void {
+    this.props.openColorPicker(this.objectFolder, this._isGlobal);
+  }
+
+  getPasteLabel(
     i18n: I18nType,
     {
       isGlobalObject,
@@ -220,9 +302,11 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     const container = this._isGlobal
       ? globalObjectsContainer
       : objectsContainer;
+
     if (!container) {
       return [];
     }
+
     const folderAndPathsInContainer = enumerateFoldersInContainer(container);
     folderAndPathsInContainer.unshift({
       path: i18n._(t`Root folder`),
@@ -234,9 +318,10 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
         !folderAndPath.folder.isADescendantOf(this.objectFolder) &&
         folderAndPath.folder !== this.objectFolder
     );
+
     return [
       {
-        label: this._getPasteLabel(i18n, {
+        label: this.getPasteLabel(i18n, {
           isGlobalObject: this._isGlobal,
           isFolder: true,
         }),
@@ -247,6 +332,11 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
         accelerator: 'F2',
+        enabled: !isListLocked,
+      },
+      {
+        label: i18n._(t`Change folder color`),
+        click: () => this._openColorPicker(),
         enabled: !isListLocked,
       },
       {
@@ -281,7 +371,6 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
                   });
                 },
               })),
-
               { type: 'separator' },
               {
                 label: i18n._(t`Create new folder...`),
@@ -350,9 +439,10 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     } = this.props;
 
     const objectsToDelete = enumerateObjectsInFolder(this.objectFolder);
+
     if (objectsToDelete.length === 0) {
-      // Folder is empty or contains only empty folders.
       selectObjectFolderOrObjectWithContext(null);
+      folderColors.remove(this.objectFolder, this._isGlobal);
       this.objectFolder.getParent().removeFolderChild(this.objectFolder);
       forceUpdateList();
       return;
@@ -360,6 +450,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
     let message: MessageDescriptor;
     let title: MessageDescriptor;
+
     if (objectsToDelete.length === 1) {
       message = t`Are you sure you want to remove this folder and with it the object ${objectsToDelete[0].getName()}? This can't be undone.`;
       title = t`Remove folder and object`;
@@ -378,17 +469,9 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       global: this._isGlobal,
     }));
 
-    // TODO: Change selectedObjectFolderOrObjectWithContext so that it's easy
-    // to remove an item using keyboard only and to navigate with the arrow
-    // keys right after deleting it.
     selectObjectFolderOrObjectWithContext(null);
 
     const folderToDelete = this.objectFolder;
-    // It's important to call onDeleteObjects, because the parent might
-    // have to do some refactoring/clean up work before the object is deleted
-    // (typically, the SceneEditor will remove instances referring to the object,
-    // leading to the removal of their renderer - which can keep a reference to
-    // the object).
     onDeleteObjects(objectsWithContext, doRemove => {
       if (!doRemove) return;
       const container = this._isGlobal
@@ -400,6 +483,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
         });
       }
 
+      folderColors.remove(folderToDelete, this._isGlobal);
       folderToDelete.getParent().removeFolderChild(folderToDelete);
       forceUpdateList();
 
@@ -408,7 +492,6 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   copy(): void {}
-
   cut(): void {}
 
   paste(): void {
@@ -427,6 +510,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       clipboardContent,
       'type'
     );
+
     if (!objectName || !objectType || !serializedObject) return;
 
     const {
@@ -465,6 +549,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
     onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
+
     expandFolders([
       { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
     ]);

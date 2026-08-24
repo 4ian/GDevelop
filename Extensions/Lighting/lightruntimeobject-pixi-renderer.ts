@@ -344,7 +344,7 @@ namespace gdjs {
       const geometry = new PIXI.Geometry();
       geometry
         .addAttribute('aVertexPosition', this._vertexBuffer, 2)
-        .addIndex(this._indexBuffer);
+        .addIndex(this._indexBuffer as any);
       if (!this._light) {
         this._light = new PIXI.Mesh(geometry, shader);
         this._light.blendMode = PIXI.BLEND_MODES.ADD;
@@ -488,10 +488,10 @@ namespace gdjs {
         this._light.shader.uniforms.center = this._center;
         this._light.geometry
           .getBuffer('aVertexPosition')
-          .update(this._defaultVertexBuffer);
+          .update(this._defaultVertexBuffer as any);
         this._light.geometry
           .getIndex()
-          .update(LightRuntimeObjectPixiRenderer._defaultIndexBuffer);
+          .update(LightRuntimeObjectPixiRenderer._defaultIndexBuffer as any);
         return;
       }
       const verticesCount = vertices.length;
@@ -545,8 +545,8 @@ namespace gdjs {
       if (!isSubArrayUsed) {
         this._light.geometry
           .getBuffer('aVertexPosition')
-          .update(this._vertexBuffer);
-        this._light.geometry.getIndex().update(this._indexBuffer);
+          .update(this._vertexBuffer as any);
+        this._light.geometry.getIndex().update(this._indexBuffer as any);
       } else {
         this._light.geometry
           .getBuffer('aVertexPosition')

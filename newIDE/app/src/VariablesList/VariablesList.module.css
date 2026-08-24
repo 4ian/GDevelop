@@ -30,6 +30,9 @@
     --theme-surface-alternate-canvas-light-background-color
   );
   color: var(--theme-text-default-color);
+  /* The font is otherwise only set by the Text components, which the rows don't
+     use: the labels of a row would fall back to the font of the browser. */
+  font-family: var(--gdevelop-modern-font-family);
 }
 
 .row:not(.selected):hover::after {

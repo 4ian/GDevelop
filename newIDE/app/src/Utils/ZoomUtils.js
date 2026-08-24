@@ -1,4 +1,5 @@
 // @flow
+import { type WheelInputDevice } from './WheelInputClassifier';
 
 const zoomStepBasePower = 1 / 16;
 
@@ -7,26 +8,50 @@ const stepZoomFactor: number = Math.pow(2, 2 * zoomStepBasePower);
 export const zoomInFactor = stepZoomFactor;
 export const zoomOutFactor: number = Math.pow(stepZoomFactor, -1);
 
-// Base factor applied per unit of wheel delta. Using an exponential
-// mapping (rather than only the sign of the delta) means a bigger
-// scroll/swipe produces a proportionally bigger zoom change, instead of
-// the old fixed-size step regardless of how hard the user scrolled.
-const wheelZoomExponentialBase = 1.003;
+// Base factor applied per unit of wheel delta, for a trackpad. A trackpad
+// swipe is a continuous gesture, so its magnitude is a meaningful physical
+// signal (a longer/faster swipe should zoom more) - this exponential
+// mapping means a bigger swipe produces a proportionally bigger zoom
+// change, instead of a fixed-size step regardless of how far the user
+// swiped.
+const trackpadWheelZoomExponentialBase = 1.003;
 
-// Clamp the raw wheel delta taken into account so a very fast scroll
-// flick can't cause a huge, disorienting jump in a single event.
+// Clamp the raw wheel delta taken into account for a trackpad, so a very
+// fast flick can't cause a huge, disorienting jump in a single event -
+// this also guards against macOS scroll acceleration (see note below)
+// amplifying a flick into an extreme delta.
 const maxWheelDeltaTakenIntoAccount = 250;
 
-// TODO: Use absolute value of signal that should represent either:
-// - Mouse sensitivity
-// - MacOS scroll acceleration
-// Signal is usually WheelEvent.deltaY
-export const getWheelStepZoomFactor = (deltaY: number): number => {
+// A fixed factor applied per mouse wheel notch/detent, regardless of the
+// raw delta magnitude reported for it.
+const mouseWheelZoomFactor = 1.2;
+
+// A physical mouse wheel moves in discrete notches/detents - conceptually
+// each notch is "one zoom step", regardless of how the OS/browser reports
+// it. Unlike a trackpad's continuous swipe, the *magnitude* reported for a
+// single notch is not a trustworthy physical signal: `WheelEvent.deltaY`
+// for one notch can be 3, 40, 53, 100, 120... depending on the OS, the
+// browser, and the user's own mouse/scroll sensitivity setting - none of
+// which reflects how much the user actually wanted to zoom. So for a
+// mouse wheel we deliberately ignore the magnitude and use only the sign,
+// applying one fixed, well-tuned step per notch; for a trackpad the
+// magnitude is kept, since it's a genuine physical/continuous signal
+// (still clamped above to tame macOS's scroll acceleration curve, which
+// can otherwise report a fast flick as a huge delta rather than the
+// user's actual swipe distance).
+export const getWheelStepZoomFactor = (
+  deltaY: number,
+  device: WheelInputDevice = 'trackpad'
+): number => {
+  if (device === 'mouseWheel') {
+    return Math.pow(mouseWheelZoomFactor, Math.sign(deltaY));
+  }
+
   const clampedDeltaY = Math.max(
     -maxWheelDeltaTakenIntoAccount,
     Math.min(maxWheelDeltaTakenIntoAccount, deltaY)
   );
-  return Math.pow(wheelZoomExponentialBase, clampedDeltaY);
+  return Math.pow(trackpadWheelZoomExponentialBase, clampedDeltaY);
 };
 
 const instancesEditorMaxZoom = 128;
@@ -78,7 +103,7 @@ export const lerpZoom = (
 //
 // `smoothingTimeConstant` is roughly "how many seconds to close ~63% of
 // the remaining distance". Smaller = snappier, larger = softer/slower.
-const defaultSmoothingTimeConstant = 0.12;
+const defaultSmoothingTimeConstant = 0.06;
 
 export const lerpZoomWithDeltaTime = (
   currentZoom: number,

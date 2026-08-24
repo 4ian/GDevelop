@@ -45,6 +45,7 @@ import {
   lerpZoomWithDeltaTime,
   isZoomCloseEnough,
 } from '../Utils/ZoomUtils';
+import { WheelInputClassifier } from '../Utils/WheelInputClassifier';
 import Background from './Background';
 import TileMapPaintingPreview, {
   updateSceneToTileMapTransformation,
@@ -207,6 +208,7 @@ export default class InstancesEditor extends Component<Props, State> {
   // Set back to false by any zoom that isn't anchored on the cursor.
   _shouldAnchorZoomOnCursor: boolean = false;
   _lastZoomUpdateTime: number | null = null;
+  _wheelInputClassifier: WheelInputClassifier = new WheelInputClassifier();
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
   _showObjectInstancesIn3D: boolean = false;
@@ -344,7 +346,8 @@ export default class InstancesEditor extends Component<Props, State> {
       this.fpsLimiter.notifyInteractionHappened();
       const zoomFactor = this.getZoomFactor();
       if (this.keyboardShortcuts.shouldZoom(event)) {
-        this.zoomOnCursorBy(getWheelStepZoomFactor(-event.deltaY));
+        const device = this._wheelInputClassifier.classify(event);
+        this.zoomOnCursorBy(getWheelStepZoomFactor(-event.deltaY, device));
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         const deltaX = event.deltaY / (5 * zoomFactor);
         this.scrollBy(-deltaX, 0);

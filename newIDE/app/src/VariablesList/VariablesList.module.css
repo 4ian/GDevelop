@@ -116,7 +116,13 @@
   width: 100%;
   height: 22px;
   border-radius: 4px;
+}
+
+/* Show that the icon of the type can be clicked to change it. */
+.row:hover .typeSelectorIconOnly,
+.typeSelectorIconOnly:focus-within {
   background-color: var(--theme-text-field-default-background-color);
+  outline: 1px solid var(--theme-text-field-hover-border-color);
 }
 
 .typeSelectorIconOnly svg {

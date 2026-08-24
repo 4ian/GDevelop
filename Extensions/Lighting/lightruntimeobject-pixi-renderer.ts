@@ -72,15 +72,19 @@ namespace gdjs {
       this.updateTexture();
       this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
       this._defaultVertexBuffer = new Float32Array(8);
+      // Sized with the same sqrt(2) safety margin as the fallback quad in
+      // _updateBuffers, so a rotated texture isn't clipped on the first
+      // frame either.
+      const initialMeshHalfSize = this._radius * Math.SQRT2;
       this._vertexBuffer = new Float32Array([
-        runtimeObject.x - this._radius,
-        runtimeObject.y + this._radius,
-        runtimeObject.x + this._radius,
-        runtimeObject.y + this._radius,
-        runtimeObject.x + this._radius,
-        runtimeObject.y - this._radius,
-        runtimeObject.x - this._radius,
-        runtimeObject.y - this._radius,
+        runtimeObject.x - initialMeshHalfSize,
+        runtimeObject.y + initialMeshHalfSize,
+        runtimeObject.x + initialMeshHalfSize,
+        runtimeObject.y + initialMeshHalfSize,
+        runtimeObject.x + initialMeshHalfSize,
+        runtimeObject.y - initialMeshHalfSize,
+        runtimeObject.x - initialMeshHalfSize,
+        runtimeObject.y - initialMeshHalfSize,
       ]);
       this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
       this.updateMesh();
@@ -326,6 +330,7 @@ namespace gdjs {
         center: this._center,
         radius: this._radius,
         color: this._color,
+        angle: gdjs.toRad(this._object.getAngle()),
       };
       if (this._texture) {
         // @ts-ignore
@@ -339,7 +344,7 @@ namespace gdjs {
       const geometry = new PIXI.Geometry();
       geometry
         .addAttribute('aVertexPosition', this._vertexBuffer, 2)
-        .addIndex(this._indexBuffer);
+        .addIndex(this._indexBuffer as any);
       if (!this._light) {
         this._light = new PIXI.Mesh(geometry, shader);
         this._light.blendMode = PIXI.BLEND_MODES.ADD;
@@ -457,25 +462,36 @@ namespace gdjs {
       }
       this._center[0] = this._object.x;
       this._center[1] = this._object.y;
+      this._light.shader.uniforms.angle = gdjs.toRad(this._object.getAngle());
       const vertices = this._computeLightVertices();
 
       // Fallback to simple quad when there are no obstacles around.
       if (vertices.length === 0) {
-        this._defaultVertexBuffer[0] = this._object.x - this._radius;
-        this._defaultVertexBuffer[1] = this._object.y + this._radius;
-        this._defaultVertexBuffer[2] = this._object.x + this._radius;
-        this._defaultVertexBuffer[3] = this._object.y + this._radius;
-        this._defaultVertexBuffer[4] = this._object.x + this._radius;
-        this._defaultVertexBuffer[5] = this._object.y - this._radius;
-        this._defaultVertexBuffer[6] = this._object.x - this._radius;
-        this._defaultVertexBuffer[7] = this._object.y - this._radius;
+        // The shader now rotates the sampled texture coordinates with the
+        // object's angle, so the *mesh* must be large enough to cover the
+        // full rotated square, not just the axis-aligned one. Otherwise the
+        // rasterizer clips corners of the (correctly rotated) texture before
+        // the shader's own alpha mask gets a chance to shape it. A square of
+        // half-side `radius` rotated by any angle always fits within an
+        // axis-aligned square of half-side `radius * sqrt(2)`, so we build
+        // the mesh at that size and let the shader do the exact, rotated
+        // clipping.
+        const meshHalfSize = this._radius * Math.SQRT2;
+        this._defaultVertexBuffer[0] = this._object.x - meshHalfSize;
+        this._defaultVertexBuffer[1] = this._object.y + meshHalfSize;
+        this._defaultVertexBuffer[2] = this._object.x + meshHalfSize;
+        this._defaultVertexBuffer[3] = this._object.y + meshHalfSize;
+        this._defaultVertexBuffer[4] = this._object.x + meshHalfSize;
+        this._defaultVertexBuffer[5] = this._object.y - meshHalfSize;
+        this._defaultVertexBuffer[6] = this._object.x - meshHalfSize;
+        this._defaultVertexBuffer[7] = this._object.y - meshHalfSize;
         this._light.shader.uniforms.center = this._center;
         this._light.geometry
           .getBuffer('aVertexPosition')
-          .update(this._defaultVertexBuffer);
+          .update(this._defaultVertexBuffer as any);
         this._light.geometry
           .getIndex()
-          .update(LightRuntimeObjectPixiRenderer._defaultIndexBuffer);
+          .update(LightRuntimeObjectPixiRenderer._defaultIndexBuffer as any);
         return;
       }
       const verticesCount = vertices.length;
@@ -529,8 +545,8 @@ namespace gdjs {
       if (!isSubArrayUsed) {
         this._light.geometry
           .getBuffer('aVertexPosition')
-          .update(this._vertexBuffer);
-        this._light.geometry.getIndex().update(this._indexBuffer);
+          .update(this._vertexBuffer as any);
+        this._light.geometry.getIndex().update(this._indexBuffer as any);
       } else {
         this._light.geometry
           .getBuffer('aVertexPosition')
@@ -590,10 +606,17 @@ namespace gdjs {
         }
       }
 
-      let maxX = this._object.x + this._radius;
-      let minX = this._object.x - this._radius;
-      let maxY = this._object.y + this._radius;
-      let minY = this._object.y - this._radius;
+      // Seed the self-boundary ("wall" that unoccluded rays terminate on)
+      // with a square large enough to circumscribe the light's square at any
+      // rotation angle (see the comment in the fallback branch above for why
+      // sqrt(2) is the right factor). Without this, rays that don't hit a
+      // real obstacle would be capped by an axis-aligned box that doesn't
+      // rotate with the object, clipping the corners of the rotated texture.
+      const selfBoundaryHalfSize = this._radius * Math.SQRT2;
+      let maxX = this._object.x + selfBoundaryHalfSize;
+      let minX = this._object.x - selfBoundaryHalfSize;
+      let maxY = this._object.y + selfBoundaryHalfSize;
+      let minY = this._object.y - selfBoundaryHalfSize;
       const flattenVertices = this._flattenVerticesTemp;
       flattenVertices.length = 0;
       for (let i = 1; i < obstaclePolygons.length; i++) {
@@ -776,12 +799,22 @@ namespace gdjs {
   uniform vec2 center;
   uniform float radius;
   uniform vec3 color;
+  uniform float angle;
   uniform sampler2D uSampler;
   varying vec2 vPos;
 
   void main() {
-    vec2 topleft = vec2(center.x - radius, center.y - radius);
-    vec2 texCoord = (vPos - topleft)/(2.0 * radius);
+    vec2 relativePos = vPos - center;
+    float cosA = cos(angle);
+    float sinA = sin(angle);
+    // Rotate the sampled point back by the object's angle so that the
+    // texture appears to rotate together with the light object.
+    vec2 rotatedPos = vec2(
+      relativePos.x * cosA + relativePos.y * sinA,
+      -relativePos.x * sinA + relativePos.y * cosA
+    );
+    vec2 topleft = vec2(-radius, -radius);
+    vec2 texCoord = (rotatedPos - topleft)/(2.0 * radius);
     gl_FragColor = (texCoord.x > 0.0 && texCoord.x < 1.0 && texCoord.y > 0.0 && texCoord.y < 1.0)
       ? vec4(color, 1.0) * texture2D(uSampler, texCoord)
       : vec4(0.0, 0.0, 0.0, 0.0);

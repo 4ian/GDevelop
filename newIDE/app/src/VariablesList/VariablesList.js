@@ -2126,7 +2126,13 @@ const VariablesList: React.ComponentType<{
     >
       <I18n>
         {({ i18n }) => (
-          <ClickAwayListener onClickAway={() => setSelectedNodes([])}>
+          <ClickAwayListener
+            onClickAway={() =>
+              setSelectedNodes(selectedNodes =>
+                selectedNodes.length === 0 ? selectedNodes : []
+              )
+            }
+          >
             <Measure
               bounds
               onResize={contentRect => {

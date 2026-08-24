@@ -180,7 +180,9 @@ type Props<Item> = {|
   searchText?: string,
   selectedItems: $ReadOnlyArray<Item>,
   onClickItem?: Item => void,
-  onSelectItems: (Item[]) => void,
+  // `removedItems` lists the items explicitly deselected by the gesture
+  // (Ctrl/Cmd+click toggle-off), so callers can drop related items too.
+  onSelectItems: (Item[], removedItems?: Array<Item>) => void,
   multiSelect: boolean,
   onRenameItem: (Item, newName: string) => void,
   onMoveSelectionToItem: (

@@ -175,19 +175,29 @@ describe('ObjectFolderOrObjectsClipboard', () => {
     const objectInFolder = subFolder.getChildAt(0);
     const sibling = rootFolder.getChildAt(0);
 
-    const previous = [
-      { global: false, objectFolderOrObject: subFolder },
-      { global: false, objectFolderOrObject: objectInFolder },
-      { global: false, objectFolderOrObject: sibling },
-    ];
     const nextAfterDeselectingFolder = [
       { global: false, objectFolderOrObject: objectInFolder },
       { global: false, objectFolderOrObject: sibling },
     ];
 
+    // Ctrl+click deselected the folder: its still-selected child is dropped.
     expect(
-      dropDescendantsOfRemovedFolders(previous, nextAfterDeselectingFolder)
+      dropDescendantsOfRemovedFolders([subFolder], nextAfterDeselectingFolder)
     ).toEqual([{ global: false, objectFolderOrObject: sibling }]);
+
+    // A plain click on the child of a selected folder is not a toggle-off
+    // gesture (no removed items): the clicked child stays selected.
+    expect(
+      dropDescendantsOfRemovedFolders(
+        [],
+        [{ global: false, objectFolderOrObject: objectInFolder }]
+      )
+    ).toEqual([{ global: false, objectFolderOrObject: objectInFolder }]);
+
+    // Deselecting a plain object never drops anything.
+    expect(
+      dropDescendantsOfRemovedFolders([sibling], nextAfterDeselectingFolder)
+    ).toEqual(nextAfterDeselectingFolder);
 
     project.delete();
   });

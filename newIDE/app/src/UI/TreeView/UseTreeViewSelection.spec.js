@@ -69,7 +69,7 @@ describe('computeTreeViewSelection', () => {
     expect(result.navigationFocusId).toBe('d');
   });
 
-  test('ctrl+click on a selected item toggles it off and keeps keyboard focus on it', () => {
+  test('ctrl+click on a selected item toggles it off, reports it as removed and keeps keyboard focus on it', () => {
     const result = computeTreeViewSelection({
       multiSelect: true,
       selectedItems: [item('a'), item('d')],
@@ -82,6 +82,7 @@ describe('computeTreeViewSelection', () => {
     expect(result.newSelection && result.newSelection.map(getItemId)).toEqual([
       'a',
     ]);
+    expect(result.removedItems.map(getItemId)).toEqual(['d']);
     expect(result.navigationFocusId).toBe('d');
   });
 
@@ -157,7 +158,9 @@ describe('computeTreeViewSelection', () => {
     ]);
   });
 
-  test('exclusive click on the only selected item is a no-op for the selection', () => {
+  test('exclusive click on the only selected item keeps the selection but still notifies', () => {
+    // The parent must be notified again so it can, for instance, bring the
+    // selection back to the front of a properties panel.
     const result = computeTreeViewSelection({
       multiSelect: true,
       selectedItems: [item('b')],
@@ -168,7 +171,30 @@ describe('computeTreeViewSelection', () => {
       node: { ...node('b'), selected: true },
       exclusive: true,
     });
-    expect(result.newSelection).toBe(null);
+    expect(result.newSelection && result.newSelection.map(getItemId)).toEqual([
+      'b',
+    ]);
+    expect(result.removedItems).toEqual([]);
     expect(result.navigationFocusId).toBe('b');
+  });
+
+  test('exclusive click collapses a multi-selection to the clicked item without reporting removals', () => {
+    // Collapsing a multi-selection with a plain click is not a toggle-off
+    // gesture: the other items must not be reported as removed, otherwise
+    // clicking the child of a selected folder would drop the child too.
+    const result = computeTreeViewSelection({
+      multiSelect: true,
+      selectedItems: [item('a'), item('b'), item('c')],
+      flattenedData,
+      getItemId,
+      selectionAnchorId: 'a',
+      shiftSelectionBase: [item('a'), item('b'), item('c')],
+      node: { ...node('b'), selected: true },
+      exclusive: true,
+    });
+    expect(result.newSelection && result.newSelection.map(getItemId)).toEqual([
+      'b',
+    ]);
+    expect(result.removedItems).toEqual([]);
   });
 });

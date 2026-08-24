@@ -14,6 +14,8 @@ import {
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
+const gd: libGDevelop = global.gd;
+
 export const OBJECT_FOLDER_OR_OBJECTS_CLIPBOARD_KIND = 'ObjectFolderOrObjects';
 
 // Kept for backward compatibility: read (but never written anymore) so that
@@ -316,4 +318,71 @@ export const pasteObjectFolderOrObjectsFromClipboard = ({
   });
 
   return { createdObjects, topLevelObjectFolderOrObjects };
+};
+
+/**
+ * Paste the content of the clipboard at the given position and run the whole
+ * notification sequence shared by every paste entry point of the Objects
+ * panel: mark the project as modified, fire the object hooks (only when
+ * actual objects were created - pasting empty folders produces top-level
+ * items but no objects), and select the pasted items.
+ * Returns true when something was pasted.
+ */
+export const pasteObjectFolderOrObjectsAndNotify = ({
+  project,
+  globalObjectsContainer,
+  objectsContainer,
+  global,
+  destinationFolder,
+  positionInFolder,
+  onObjectModified,
+  onObjectPasted,
+  onObjectCreated,
+  selectObjectFolderOrObjectsWithContext,
+}: {|
+  project: gdProject,
+  globalObjectsContainer: gdObjectsContainer | null,
+  objectsContainer: gdObjectsContainer,
+  global: boolean,
+  destinationFolder: gdObjectFolderOrObject,
+  positionInFolder: number,
+  onObjectModified: (shouldForceUpdateList: boolean) => void,
+  onObjectPasted: ?(object: gdObject) => void,
+  onObjectCreated: (
+    objects: Array<gdObject>,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => void,
+  selectObjectFolderOrObjectsWithContext: (
+    items: Array<ObjectFolderOrObjectWithContext>
+  ) => void,
+|}): boolean => {
+  const isTheFirstOfItsTypeInProject = getObjectFolderOrObjectsClipboardObjectTypes().some(
+    objectType => !gd.UsedObjectTypeFinder.scanProject(project, objectType)
+  );
+
+  const pastedContent = pasteObjectFolderOrObjectsFromClipboard({
+    project,
+    globalObjectsContainer,
+    objectsContainer,
+    global,
+    destinationFolder,
+    positionInFolder,
+  });
+  if (!pastedContent) return false;
+  const { createdObjects, topLevelObjectFolderOrObjects } = pastedContent;
+  if (topLevelObjectFolderOrObjects.length === 0) return false;
+
+  // onObjectModified(true) already calls forceUpdateList internally.
+  onObjectModified(true);
+  if (createdObjects.length > 0) {
+    if (onObjectPasted) onObjectPasted(createdObjects[0]);
+    onObjectCreated(createdObjects, isTheFirstOfItsTypeInProject);
+  }
+  selectObjectFolderOrObjectsWithContext(
+    topLevelObjectFolderOrObjects.map(objectFolderOrObject => ({
+      objectFolderOrObject,
+      global,
+    }))
+  );
+  return true;
 };

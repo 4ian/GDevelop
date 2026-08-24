@@ -16,8 +16,7 @@ import {
   writeObjectFolderOrObjectsToClipboard,
   hasObjectFolderOrObjectsInClipboard,
   getObjectFolderOrObjectsClipboardSummaryName,
-  getObjectFolderOrObjectsClipboardObjectTypes,
-  pasteObjectFolderOrObjectsFromClipboard,
+  pasteObjectFolderOrObjectsAndNotify,
 } from './ObjectFolderOrObjectsClipboard';
 import { duplicateObjectFolderOrObjects } from './ObjectFolderOrObjectsDuplicate';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
@@ -458,37 +457,22 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       selectObjectFolderOrObjectsWithContext,
     } = this.props;
 
-    const isTheFirstOfItsTypeInProject = getObjectFolderOrObjectsClipboardObjectTypes().some(
-      objectType => !gd.UsedObjectTypeFinder.scanProject(project, objectType)
-    );
-
-    const pastedContent = pasteObjectFolderOrObjectsFromClipboard({
+    const pasted = pasteObjectFolderOrObjectsAndNotify({
       project,
       globalObjectsContainer,
       objectsContainer,
       global: this._isGlobal,
       destinationFolder: this.objectFolder,
       positionInFolder: this.objectFolder.getChildrenCount(),
+      onObjectModified,
+      onObjectPasted,
+      onObjectCreated,
+      selectObjectFolderOrObjectsWithContext,
     });
-    if (!pastedContent) return;
-    const { createdObjects, topLevelObjectFolderOrObjects } = pastedContent;
-    if (topLevelObjectFolderOrObjects.length === 0) return;
-
-    if (createdObjects.length > 0) {
-      onObjectCreated(createdObjects, isTheFirstOfItsTypeInProject);
-    }
-    onObjectModified(true);
-    if (onObjectPasted && createdObjects.length > 0)
-      onObjectPasted(createdObjects[0]);
+    if (!pasted) return;
     expandFolders([
       { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
     ]);
-    selectObjectFolderOrObjectsWithContext(
-      topLevelObjectFolderOrObjects.map(pastedObjectFolderOrObject => ({
-        objectFolderOrObject: pastedObjectFolderOrObject,
-        global: this._isGlobal,
-      }))
-    );
   }
 
   duplicate(): void {

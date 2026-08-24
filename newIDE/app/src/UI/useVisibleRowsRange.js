@@ -82,36 +82,35 @@ export const useVisibleRowsRange = ({
     visibleRowsRange,
     setVisibleRowsRange,
   ] = React.useState<VisibleRowsRange>(emptyRange);
-  // Finding the clipping ancestors reads the computed style of every ancestor,
-  // which is expensive: only do it when the container is (re)mounted.
   const clippingAncestorsRef = React.useRef<Array<Element>>([]);
+
+  const getRange = React.useCallback(
+    (): VisibleRowsRange => {
+      const container = containerRef.current;
+      if (!container || rowCount === 0) return emptyRange;
+
+      const { top, bottom } = getVisibleBand(
+        container,
+        clippingAncestorsRef.current
+      );
+      const firstRowIndex = Math.max(
+        0,
+        Math.min(rowCount, Math.floor(top / rowHeight) - overscanRowCount)
+      );
+      return {
+        firstRowIndex,
+        afterLastRowIndex: Math.max(
+          firstRowIndex,
+          Math.min(rowCount, Math.ceil(bottom / rowHeight) + overscanRowCount)
+        ),
+      };
+    },
+    [containerRef, rowCount, rowHeight, overscanRowCount]
+  );
 
   const updateVisibleRowsRange = React.useCallback(
     () => {
-      const container = containerRef.current;
-      const newRange =
-        !container || rowCount === 0
-          ? emptyRange
-          : (() => {
-              const { top, bottom } = getVisibleBand(
-                container,
-                clippingAncestorsRef.current
-              );
-              return {
-                firstRowIndex: Math.max(
-                  0,
-                  Math.floor(top / rowHeight) - overscanRowCount
-                ),
-                afterLastRowIndex: Math.max(
-                  0,
-                  Math.min(
-                    rowCount,
-                    Math.ceil(bottom / rowHeight) + overscanRowCount
-                  )
-                ),
-              };
-            })();
-
+      const newRange = getRange();
       setVisibleRowsRange(range =>
         range.firstRowIndex === newRange.firstRowIndex &&
         range.afterLastRowIndex === newRange.afterLastRowIndex
@@ -119,7 +118,7 @@ export const useVisibleRowsRange = ({
           : newRange
       );
     },
-    [containerRef, rowCount, rowHeight, overscanRowCount]
+    [getRange]
   );
 
   React.useLayoutEffect(
@@ -127,6 +126,10 @@ export const useVisibleRowsRange = ({
       const container = containerRef.current;
       if (!container) return;
 
+      // Finding the clipping ancestors reads the computed style of every
+      // ancestor: it's done again when the list changes size (a variable added,
+      // a search...), which is rare and also picks up a change of the layout
+      // around the list.
       clippingAncestorsRef.current = getClippingAncestors(container);
       updateVisibleRowsRange();
 

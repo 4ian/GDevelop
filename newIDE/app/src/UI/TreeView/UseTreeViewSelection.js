@@ -31,6 +31,10 @@ type ComputeArgs<Item: SelectableTreeItem> = {|
 
 export type ComputeTreeViewSelectionResult<Item: SelectableTreeItem> = {|
   newSelection: Array<Item> | null,
+  // Items explicitly deselected by this gesture (Ctrl/Cmd+click toggle-off).
+  // Callers can use this to also drop related items (e.g. the descendants of
+  // a deselected folder) - which cannot be inferred from the selections alone.
+  removedItems: Array<Item>,
   selectionAnchorId: ?string,
   shiftSelectionBase: Array<Item>,
   navigationFocusId: string,
@@ -61,6 +65,7 @@ export function computeTreeViewSelection<Item: SelectableTreeItem>({
       const newSelection = [node.item];
       return {
         newSelection,
+        removedItems: [],
         selectionAnchorId: node.id,
         shiftSelectionBase: newSelection,
         navigationFocusId: node.id,
@@ -82,6 +87,7 @@ export function computeTreeViewSelection<Item: SelectableTreeItem>({
     );
     return {
       newSelection: [...baseItemsOutsideRange, ...rangeItems],
+      removedItems: [],
       selectionAnchorId,
       shiftSelectionBase: [...shiftSelectionBase],
       navigationFocusId: node.id,
@@ -89,23 +95,20 @@ export function computeTreeViewSelection<Item: SelectableTreeItem>({
   }
 
   let newSelection;
+  let removedItems: Array<Item> = [];
   if (multiSelect) {
     const selectedItemIds = selectedItems.map(getItemId);
     if (node.selected) {
       if (exclusive) {
-        if (selectedItems.length === 1) {
-          return {
-            newSelection: null,
-            selectionAnchorId,
-            shiftSelectionBase: [...shiftSelectionBase],
-            navigationFocusId: node.id,
-          };
-        }
+        // Also when the node is already the only selected item: the parent
+        // is notified again so it can, for instance, bring the selection
+        // back to the front of a properties panel.
         newSelection = [node.item];
       } else {
         newSelection = selectedItems.filter(
           (item, index) => selectedItemIds[index] !== node.id
         );
+        removedItems = [node.item];
       }
     } else {
       if (exclusive) newSelection = [node.item];
@@ -115,6 +118,7 @@ export function computeTreeViewSelection<Item: SelectableTreeItem>({
     if (node.selected && selectedItems.length === 1) {
       return {
         newSelection: null,
+        removedItems: [],
         selectionAnchorId,
         shiftSelectionBase: [...shiftSelectionBase],
         navigationFocusId: node.id,
@@ -125,6 +129,7 @@ export function computeTreeViewSelection<Item: SelectableTreeItem>({
 
   return {
     newSelection,
+    removedItems,
     selectionAnchorId: node.id,
     shiftSelectionBase: newSelection,
     navigationFocusId: node.id,
@@ -154,7 +159,7 @@ function useTreeViewSelection<Item: ItemBaseAttributes>({
   multiSelect: boolean,
   selectedItems: $ReadOnlyArray<Item>,
   flattenedData: $ReadOnlyArray<FlattenedNode<Item>>,
-  onSelectItems: (items: Array<Item>) => void,
+  onSelectItems: (items: Array<Item>, removedItems?: Array<Item>) => void,
   getItemId: (item: Item) => string,
 |}): {|
   onSelect: (SelectArgs<Item>) => void,
@@ -163,19 +168,40 @@ function useTreeViewSelection<Item: ItemBaseAttributes>({
   const selectionAnchorIdRef = React.useRef<?string>(null);
   const shiftSelectionBaseRef = React.useRef<Array<Item>>([]);
   const navigationFocusIdRef = React.useRef<?string>(null);
+  // Set right before `onSelect` notifies the parent, and consumed by the
+  // effect below to tell user gestures apart from programmatic selection
+  // changes (paste, duplicate, "move to folder"...).
+  const selectionComesFromUserGestureRef = React.useRef<boolean>(false);
 
-  // When the selection is cleared externally (e.g. Deselect All), stale
-  // range-select refs must be reset so a later Shift+click doesn't extend
-  // from a ghost anchor. Keyboard focus is kept so arrows continue from the
-  // last interacted row.
   React.useEffect(
     () => {
+      const comesFromUserGesture = selectionComesFromUserGestureRef.current;
+      selectionComesFromUserGestureRef.current = false;
       if (selectedItems.length === 0) {
+        // When the selection is cleared (e.g. Deselect All), stale
+        // range-select refs must be reset so a later Shift+click doesn't
+        // extend from a ghost anchor. Keyboard focus is kept so arrows
+        // continue from the last interacted row.
+        selectionAnchorIdRef.current = null;
+        shiftSelectionBaseRef.current = [];
+        return;
+      }
+      if (comesFromUserGesture) return;
+      // The selection was changed programmatically (paste, duplicate, "move
+      // to folder"...) and no longer contains the last interacted row:
+      // keyboard navigation and Shift ranges must restart from the new
+      // selection, not from that now unrelated row.
+      const selectedIds = new Set(selectedItems.map(getItemId));
+      if (
+        navigationFocusIdRef.current &&
+        !selectedIds.has(navigationFocusIdRef.current)
+      ) {
+        navigationFocusIdRef.current = null;
         selectionAnchorIdRef.current = null;
         shiftSelectionBaseRef.current = [];
       }
     },
-    [selectedItems]
+    [selectedItems, getItemId]
   );
 
   const onSelect = React.useCallback(
@@ -194,7 +220,10 @@ function useTreeViewSelection<Item: ItemBaseAttributes>({
       navigationFocusIdRef.current = result.navigationFocusId;
       selectionAnchorIdRef.current = result.selectionAnchorId;
       shiftSelectionBaseRef.current = result.shiftSelectionBase;
-      if (result.newSelection !== null) onSelectItems(result.newSelection);
+      if (result.newSelection !== null) {
+        selectionComesFromUserGestureRef.current = true;
+        onSelectItems(result.newSelection, result.removedItems);
+      }
     },
     [multiSelect, selectedItems, flattenedData, onSelectItems, getItemId]
   );

@@ -166,9 +166,10 @@ const itemMatchesSearchText = (
 
 /**
  * Same case-insensitive substring match as TreeView's search filter.
- * Folders that only appear as ancestors of a match, or that still contain a
- * non-matching descendant, are not selectable: bulk ops would otherwise act
- * on hidden children.
+ * Used by "Select all" while searching: folders that only appear as ancestors
+ * of a match, or that still contain a non-matching descendant, are skipped so
+ * that this implicit selection cannot act on hidden children. Explicitly
+ * clicked rows are never filtered: a visible row is always selectable.
  */
 export const isSelectableWhileSearching = (
   objectFolderOrObject: gdObjectFolderOrObject,
@@ -203,25 +204,28 @@ export const enumerateAllChildrenInFolderMatchingSearch = (
 };
 
 /**
- * After a Ctrl+click that removes a folder from the selection, also drop
+ * After a Ctrl+click that explicitly deselects a folder, also drop its
  * descendants that Select All (or a previous range) had added. Otherwise
  * nested objects stay selected inside a collapsed folder.
+ *
+ * `removedObjectFolderOrObjects` must be the items explicitly toggled off by
+ * the gesture (as reported by TreeView), NOT the difference between the
+ * previous and next selections: a plain click on the child of a selected
+ * folder also "removes" the folder from the selection, but the clicked child
+ * must obviously stay selected.
  */
 export const dropDescendantsOfRemovedFolders = (
-  previous: Array<ObjectFolderOrObjectWithContext>,
+  removedObjectFolderOrObjects: Array<gdObjectFolderOrObject>,
   next: Array<ObjectFolderOrObjectWithContext>
 ): Array<ObjectFolderOrObjectWithContext> => {
-  const nextPtrs = new Set(next.map(item => item.objectFolderOrObject.ptr));
-  const removedFolders = previous.filter(
-    item =>
-      item.objectFolderOrObject.isFolder() &&
-      !nextPtrs.has(item.objectFolderOrObject.ptr)
+  const removedFolders = removedObjectFolderOrObjects.filter(
+    objectFolderOrObject => objectFolderOrObject.isFolder()
   );
   if (removedFolders.length === 0) return next;
   return next.filter(
     item =>
       !removedFolders.some(folder =>
-        item.objectFolderOrObject.isADescendantOf(folder.objectFolderOrObject)
+        item.objectFolderOrObject.isADescendantOf(folder)
       )
   );
 };

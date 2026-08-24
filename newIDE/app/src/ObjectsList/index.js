@@ -30,14 +30,12 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
   getFoldersAscendanceWithoutRootFolder,
   getSelectionTopLevelItems,
-  isSelectableWhileSearching,
   dropDescendantsOfRemovedFolders,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import {
   hasObjectFolderOrObjectsInClipboard,
-  getObjectFolderOrObjectsClipboardObjectTypes,
-  pasteObjectFolderOrObjectsFromClipboard,
+  pasteObjectFolderOrObjectsAndNotify,
   getPasteMenuLabel,
 } from './ObjectFolderOrObjectsClipboard';
 import { useObjectsSelection } from './UseObjectsSelection';
@@ -1101,35 +1099,18 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       (destinationFolder: gdObjectFolderOrObject, global: boolean) => {
         if (isListLocked) return;
 
-        const isTheFirstOfItsTypeInProject = getObjectFolderOrObjectsClipboardObjectTypes().some(
-          objectType =>
-            !gd.UsedObjectTypeFinder.scanProject(project, objectType)
-        );
-
-        const pastedContent = pasteObjectFolderOrObjectsFromClipboard({
+        pasteObjectFolderOrObjectsAndNotify({
           project,
           globalObjectsContainer,
           objectsContainer,
           global,
           destinationFolder,
           positionInFolder: destinationFolder.getChildrenCount(),
+          onObjectModified,
+          onObjectPasted,
+          onObjectCreated,
+          selectObjectFolderOrObjectsWithContext,
         });
-        if (!pastedContent) return;
-        const { createdObjects, topLevelObjectFolderOrObjects } = pastedContent;
-        if (topLevelObjectFolderOrObjects.length === 0) return;
-
-        // onObjectModified(true) already calls forceUpdateList internally.
-        onObjectModified(true);
-        if (createdObjects.length > 0) {
-          if (onObjectPasted) onObjectPasted(createdObjects[0]);
-          onObjectCreated(createdObjects, isTheFirstOfItsTypeInProject);
-        }
-        selectObjectFolderOrObjectsWithContext(
-          topLevelObjectFolderOrObjects.map(pastedObjectFolderOrObject => ({
-            objectFolderOrObject: pastedObjectFolderOrObject,
-            global,
-          }))
-        );
       },
       [
         isListLocked,
@@ -1964,7 +1945,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       onClickItem={onClickItem}
                       onCollapseItem={onCollapseItem}
                       selectedItems={selectedItems}
-                      onSelectItems={items => {
+                      onSelectItems={(items, removedItems) => {
                         if (!items || items.length === 0) {
                           selectObjectFolderOrObjectsWithContext([]);
                           return;
@@ -1992,28 +1973,18 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                         const sameSectionItems = objectFolderOrObjectsToSelect.filter(
                           item => item.global === global
                         );
-                        let searchableItems = sameSectionItems;
-                        if (searchText) {
-                          const matchingItems = sameSectionItems.filter(item =>
-                            isSelectableWhileSearching(
-                              item.objectFolderOrObject,
-                              searchText
-                            )
-                          );
-                          // A click/range that only hit context-only folders
-                          // must not clear the current selection.
-                          if (
-                            matchingItems.length === 0 &&
-                            sameSectionItems.length > 0
-                          ) {
-                            return;
-                          }
-                          searchableItems = matchingItems;
-                        }
+                        // When a folder is explicitly deselected (Ctrl+click),
+                        // also drop its descendants that a previous Select All
+                        // or range had added to the selection.
+                        const removedObjectFolderOrObjects = (
+                          removedItems || []
+                        )
+                          .map(item => item.content.getObjectFolderOrObject())
+                          .filter(Boolean);
                         selectObjectFolderOrObjectsWithContext(
                           dropDescendantsOfRemovedFolders(
-                            selectedObjectFolderOrObjectsWithContext,
-                            searchableItems
+                            removedObjectFolderOrObjects,
+                            sameSectionItems
                           )
                         );
                       }}

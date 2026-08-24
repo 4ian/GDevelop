@@ -21,8 +21,7 @@ import {
   writeObjectFolderOrObjectsToClipboard,
   hasObjectFolderOrObjectsInClipboard,
   getObjectFolderOrObjectsClipboardSummaryName,
-  getObjectFolderOrObjectsClipboardObjectTypes,
-  pasteObjectFolderOrObjectsFromClipboard,
+  pasteObjectFolderOrObjectsAndNotify,
 } from './ObjectFolderOrObjectsClipboard';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
@@ -293,9 +292,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {
     // Selection itself is entirely handled by TreeView (single click, Ctrl/Cmd
-    // toggle, Shift range) through `onSelectItems`. Do not select here, as it
-    // would override that selection (in particular, it would collapse any
-    // multi-selection back to this single item).
+    // toggle, Shift range) through `onSelectItems` - including a plain click
+    // on the already-selected row, which is re-notified so the parent can
+    // bring the selection back to the front of the properties panel. Do not
+    // select here, as it would override that selection (in particular, it
+    // would collapse any multi-selection back to this single item).
   }
 
   rename(newName: string): void {
@@ -647,45 +648,32 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     const objectFolderOrObject = this._getAliveObjectFolderOrObject();
     if (!objectFolderOrObject) return;
 
-    const { project, globalObjectsContainer, objectsContainer } = this.props;
     const parentFolder = exceptionallyGuardAgainstDeadObject(
       objectFolderOrObject.getParent()
     );
     if (!parentFolder) return;
 
-    const isTheFirstOfItsTypeInProject = getObjectFolderOrObjectsClipboardObjectTypes().some(
-      objectType => !gd.UsedObjectTypeFinder.scanProject(project, objectType)
-    );
-
-    const pastedContent = pasteObjectFolderOrObjectsFromClipboard({
+    const {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      onObjectPasted,
+      onObjectModified,
+      onObjectCreated,
+      selectObjectFolderOrObjectsWithContext,
+    } = this.props;
+    pasteObjectFolderOrObjectsAndNotify({
       project,
       globalObjectsContainer,
       objectsContainer,
       global: this._isGlobal,
       destinationFolder: parentFolder,
       positionInFolder: parentFolder.getChildPosition(objectFolderOrObject) + 1,
-    });
-    if (!pastedContent) return;
-    const { createdObjects, topLevelObjectFolderOrObjects } = pastedContent;
-    if (topLevelObjectFolderOrObjects.length === 0) return;
-
-    const {
-      onObjectPasted,
       onObjectModified,
+      onObjectPasted,
       onObjectCreated,
       selectObjectFolderOrObjectsWithContext,
-    } = this.props;
-    onObjectModified(true);
-    if (createdObjects.length > 0) {
-      if (onObjectPasted) onObjectPasted(createdObjects[0]);
-      onObjectCreated(createdObjects, isTheFirstOfItsTypeInProject);
-    }
-    selectObjectFolderOrObjectsWithContext(
-      topLevelObjectFolderOrObjects.map(pastedObjectFolderOrObject => ({
-        objectFolderOrObject: pastedObjectFolderOrObject,
-        global: this._isGlobal,
-      }))
-    );
+    });
   }
 
   duplicate(): void {

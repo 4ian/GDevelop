@@ -16,8 +16,7 @@ import {
   serializeObjectFolderOrObjectsForClipboard,
   writeObjectFolderOrObjectsToClipboard,
   hasObjectFolderOrObjectsInClipboard,
-  getObjectFolderOrObjectsClipboardObjectTypes,
-  pasteObjectFolderOrObjectsFromClipboard,
+  pasteObjectFolderOrObjectsAndNotify,
   getPasteMenuLabel,
   getUniqueFolderName,
 } from './ObjectFolderOrObjectsClipboard';
@@ -250,36 +249,18 @@ function useBulkObjectOperations({
         ? objectFolderOrObject.getChildrenCount()
         : destinationFolder.getChildPosition(objectFolderOrObject) + 1;
 
-      const isTheFirstOfItsTypeInProject = getObjectFolderOrObjectsClipboardObjectTypes().some(
-        objectType => !gd.UsedObjectTypeFinder.scanProject(project, objectType)
-      );
-
-      const pastedContent = pasteObjectFolderOrObjectsFromClipboard({
+      pasteObjectFolderOrObjectsAndNotify({
         project,
         globalObjectsContainer,
         objectsContainer,
         global,
         destinationFolder,
         positionInFolder,
+        onObjectModified,
+        onObjectPasted,
+        onObjectCreated,
+        selectObjectFolderOrObjectsWithContext,
       });
-      if (!pastedContent) return;
-      const { createdObjects, topLevelObjectFolderOrObjects } = pastedContent;
-      if (topLevelObjectFolderOrObjects.length === 0) return;
-
-      // onObjectModified(true) already calls forceUpdateList internally.
-      onObjectModified(true);
-      // Only fire object hooks when actual objects were created; pasting
-      // empty folders produces topLevelObjectFolderOrObjects but no objects.
-      if (createdObjects.length > 0) {
-        if (onObjectPasted) onObjectPasted(createdObjects[0]);
-        onObjectCreated(createdObjects, isTheFirstOfItsTypeInProject);
-      }
-      selectObjectFolderOrObjectsWithContext(
-        topLevelObjectFolderOrObjects.map(pastedObjectFolderOrObject => ({
-          objectFolderOrObject: pastedObjectFolderOrObject,
-          global,
-        }))
-      );
     },
     [
       isListLocked,
@@ -306,18 +287,14 @@ function useBulkObjectOperations({
       );
       if (candidates.length === 0) return;
 
-      // Filter out items that cannot be promoted, showing a warning per
-      // item rather than aborting the whole operation.
+      // Filter out items that cannot be promoted, then show a single warning
+      // listing all the name conflicts rather than one blocking dialog each.
+      const conflictingObjectNames = [];
       const objectItems = candidates.filter(item => {
         const objectName = item.objectFolderOrObject.getObject().getName();
         if (!objectsContainer.hasObjectNamed(objectName)) return false;
         if (globalObjectsContainer.hasObjectNamed(objectName)) {
-          showWarningBox(
-            i18n._(
-              t`A global object with this name already exists. Please change the object name before setting it as a global object`
-            ),
-            { delayToNextTick: true }
-          );
+          conflictingObjectNames.push(objectName);
           return false;
         }
         if (beforeSetAsGlobalObject && !beforeSetAsGlobalObject(objectName)) {
@@ -325,6 +302,16 @@ function useBulkObjectOperations({
         }
         return true;
       });
+      if (conflictingObjectNames.length > 0) {
+        showWarningBox(
+          i18n._(
+            t`Global objects with these names already exist: ${conflictingObjectNames.join(
+              ', '
+            )}. Please rename the objects before setting them as global objects.`
+          ),
+          { delayToNextTick: true }
+        );
+      }
       if (objectItems.length === 0) return;
 
       const answer = Window.showConfirmDialog(

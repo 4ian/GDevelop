@@ -23,7 +23,7 @@ import { getHelpLink } from '../Utils/HelpLink';
 import Window from '../Utils/Window';
 import CompactTextField from '../UI/CompactTextField';
 import Link from '../UI/Link';
-import useVariablesContainerRefactoring from '../VariablesList/useVariablesContainerRefactoring';
+import { useGroupVariablesEditing } from '../VariablesList/GroupVariablesContainer';
 import { type ObjectGroupEditorTab } from './EditedObjectGroupEditorDialog';
 import CompactObjectGroupEditor from './CompactObjectGroupEditor';
 import { CollapsibleSubPanel } from '../ObjectEditor/CompactObjectPropertiesEditor';
@@ -126,22 +126,6 @@ export const CompactObjectGroupPropertiesEditor = ({
   const { isMobile } = useResponsiveWindowSize();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
-  const groupVariablesContainer = React.useMemo(
-    // The VariablesContainer is returned by value.
-    // Thus, the same instance is reused every time.
-    () =>
-      gd.ObjectRefactorer.mergeVariableContainers(
-        projectScopedContainersAccessor.get().getObjectsContainersList(),
-        objectGroup
-      ),
-    [objectGroup, projectScopedContainersAccessor]
-  );
-
-  const openFullEditor = React.useCallback(
-    () => onEditObjectGroup(objectGroup, 'objects'),
-    [objectGroup, onEditObjectGroup]
-  );
-
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const scrollKey = '' + objectGroup.ptr;
 
@@ -193,25 +177,47 @@ export const CompactObjectGroupPropertiesEditor = ({
     onCreateNewExtensionWithBehavior,
   });
 
-  // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
-  const { onVariablesUpdated } = useVariablesContainerRefactoring({
+  // The variables of the group are the ones common to all its objects: they are
+  // edited in a container owned by this editor, and the changes are applied to
+  // the objects of the group shortly after each of them.
+  const {
+    groupVariablesContainer,
+    onVariablesUpdated,
+    applyPendingVariablesChanges,
+  } = useGroupVariablesEditing({
     project,
-    variablesContainer: groupVariablesContainer,
-    initialInstances,
-    eventsBasedObject,
-    enabled: true,
+    projectScopedContainersAccessor,
     objectGroup,
     objectsContainer,
     globalObjectsContainer,
-    objectName: null,
+    initialInstances,
+    eventsBasedObject,
   });
+
+  // The group editor dialog reads the variables from the objects of the group:
+  // the changes made here must be applied to them before opening it, otherwise
+  // it would show (and then re-apply) the variables as they were before.
+  const editObjectGroup = React.useCallback(
+    (initialTab: ObjectGroupEditorTab) => {
+      applyPendingVariablesChanges();
+      onEditObjectGroup(objectGroup, initialTab);
+    },
+    [applyPendingVariablesChanges, objectGroup, onEditObjectGroup]
+  );
+  const openFullEditor = React.useCallback(() => editObjectGroup('objects'), [
+    editObjectGroup,
+  ]);
 
   const removeObject = React.useCallback(
     (objectName: string) => {
+      // Changing the objects of the group changes the variables they have in
+      // common: apply the changes made to them first, as they only exist in the
+      // container of the group until they are applied to its objects.
+      applyPendingVariablesChanges();
       objectGroup.removeObject(objectName);
       forceUpdate();
     },
-    [forceUpdate, objectGroup]
+    [applyPendingVariablesChanges, forceUpdate, objectGroup]
   );
 
   const addObject = React.useCallback(
@@ -224,6 +230,10 @@ export const CompactObjectGroupPropertiesEditor = ({
       if (!object) {
         return;
       }
+      // Changing the objects of the group changes the variables they have in
+      // common: apply the changes made to them first, as they only exist in the
+      // container of the group until they are applied to its objects.
+      applyPendingVariablesChanges();
       objectGroup.addObject(objectName);
       gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
         object,
@@ -243,6 +253,7 @@ export const CompactObjectGroupPropertiesEditor = ({
     },
     [
       allVisibleBehaviorNames,
+      applyPendingVariablesChanges,
       forceUpdate,
       globalObjectsContainer,
       groupVariablesContainer,
@@ -433,9 +444,7 @@ export const CompactObjectGroupPropertiesEditor = ({
                 title={<Trans>Object Variables</Trans>}
                 isFolded={isSectionFolded('variables')}
                 toggleFolded={() => toggleSectionFolded('variables')}
-                onOpenFullEditor={() =>
-                  onEditObjectGroup(objectGroup, 'variables')
-                }
+                onOpenFullEditor={() => editObjectGroup('variables')}
                 onAdd={
                   isVariableListLocked
                     ? null

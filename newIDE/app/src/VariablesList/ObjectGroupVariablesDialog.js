@@ -16,7 +16,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 import { getRootVariableName } from '../EventsSheet/ParameterFields/VariableField';
 import { getNodeIdFromVariableName } from './VariableToTreeNodeHandling';
-import useValueWithInit from '../Utils/UseRefInitHook';
+import { useGroupVariablesContainer } from './GroupVariablesContainer';
 
 const gd: libGDevelop = global.gd;
 
@@ -53,15 +53,14 @@ const ObjectGroupVariablesDialog = ({
   onComputeAllVariableNames,
   isListLocked,
 }: Props): React.Node => {
-  const groupVariablesContainer = useValueWithInit(
-    // The VariablesContainer is returned by value.
-    // Thus, the same instance is reused every time.
-    () =>
-      gd.ObjectRefactorer.mergeVariableContainers(
-        projectScopedContainersAccessor.get().getObjectsContainersList(),
-        objectGroup
-      )
-  );
+  // The variables common to all the objects of the group, in a container owned
+  // by this dialog (it must not be shared with the other editors, otherwise the
+  // variables being edited here could be replaced at any moment - see
+  // `GroupVariablesContainer`).
+  const { groupVariablesContainer } = useGroupVariablesContainer({
+    projectScopedContainersAccessor,
+    objectGroup,
+  });
 
   const {
     notifyOfChange: notifyOfVariableChange,

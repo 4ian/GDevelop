@@ -12,7 +12,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import VariablesList from '../VariablesList/VariablesList';
 import HelpButton from '../UI/HelpButton';
-import useValueWithInit from '../Utils/UseRefInitHook';
+import { useGroupVariablesContainer } from '../VariablesList/GroupVariablesContainer';
 import Text from '../UI/Text';
 
 const gd: libGDevelop = global.gd;
@@ -61,15 +61,14 @@ const EditedObjectGroupEditorDialog = ({
     initialTab || 'objects'
   );
 
-  const groupVariablesContainer = useValueWithInit(
-    // The VariablesContainer is returned by value.
-    // Thus, the same instance is reused every time.
-    () =>
-      gd.ObjectRefactorer.mergeVariableContainers(
-        projectScopedContainersAccessor.get().getObjectsContainersList(),
-        group
-      )
-  );
+  // The variables common to all the objects of the group, in a container owned
+  // by this dialog (it must not be shared with the other editors, otherwise the
+  // variables being edited here could be replaced at any moment - see
+  // `GroupVariablesContainer`).
+  const { groupVariablesContainer } = useGroupVariablesContainer({
+    projectScopedContainersAccessor,
+    objectGroup: group,
+  });
 
   const {
     notifyOfChange: notifyOfVariableChange,

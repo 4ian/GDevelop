@@ -324,12 +324,10 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
     } else if (type == Type::Boolean) {
       SetBool(element.GetBoolAttribute("value", false, "Value"));
     }
-  } else {
+  } else if (type == Type::Structure || type == Type::Array) {
     const SerializerElement& childrenElement =
         element.GetChild("children", 0, "Children");
     childrenElement.ConsiderAsArrayOf("variable", "Variable");
-    if (childrenElement.GetChildrenCount() == 0) return;
-
     for (int i = 0; i < childrenElement.GetChildrenCount(); ++i) {
       const SerializerElement& childElement = childrenElement.GetChild(i);
       if (type == Type::Structure) {
@@ -340,6 +338,10 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
         PushNew().UnserializeFrom(childElement);
     }
   }
+  // The editor-only "mixed values" marker is restored last, and for every
+  // type: a variable marked as having mixed values has no children (they are
+  // cleared by MarkAsMixedValues) and a "mixed types" variable has no value,
+  // so there is nothing else to read for them.
   if (element.GetBoolAttribute("hasMixedValues", false)) {
     MarkAsMixedValues();
   }

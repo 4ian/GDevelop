@@ -109,20 +109,25 @@ const memoized = memoizeOne((initialValue, callback) => callback());
 const VARIABLE_ROW_HEIGHT = 30;
 const actionButtonStyle = { padding: 2 };
 
-/** Below this width, the name of the variable type is replaced by its icon only. */
-const MIN_WIDTH_TO_DISPLAY_TYPE_NAME = 650;
+/**
+ * Below this width, the rows are laid out more tightly: a smaller indentation,
+ * and the type of a variable displayed as its icon only.
+ */
+const MIN_WIDTH_FOR_WIDE_ROWS = 450;
+/** Below this width, the toolbar shows icons instead of labelled buttons. */
+const MIN_WIDTH_FOR_TOOLBAR_LABELS = 650;
 
 const getIndent = ({
   depth,
-  isNarrow,
+  hasNarrowRows,
   containerWidth,
 }: {|
   depth: number,
-  isNarrow: boolean,
+  hasNarrowRows: boolean,
   containerWidth: ?number,
 |}): number =>
   Math.min(
-    depth * (isNarrow ? 12 : 20),
+    depth * (hasNarrowRows ? 12 : 20),
     // Never let the indentation eat too much of the available width.
     containerWidth ? Math.round(0.3 * containerWidth) : 200
   );
@@ -770,24 +775,24 @@ const VariablesList: React.ComponentType<{
       ? !hasVariablesContainerSubChildren(aliveInheritedVariablesContainer)
       : true);
 
-  const isNarrow = React.useMemo(
-    () =>
-      props.size === 'compact' ||
-      (containerWidth
-        ? containerWidth < MIN_WIDTH_TO_DISPLAY_TYPE_NAME
-        : false),
-    [containerWidth, props.size]
-  );
+  const isToolbarNarrow =
+    props.size === 'compact' ||
+    (containerWidth ? containerWidth < MIN_WIDTH_FOR_TOOLBAR_LABELS : false);
+  // The properties panel can be resized, so how the rows are laid out is based
+  // on the width the list actually has, not on it being a compact one.
+  const hasNarrowRows = containerWidth
+    ? containerWidth < MIN_WIDTH_FOR_WIDE_ROWS
+    : props.size === 'compact';
   const rowRightSideStyle = React.useMemo(
     () => ({
       // A fixed width keeps the types and the values aligned, whatever the
       // indentation of the row is.
       width: containerWidth
-        ? Math.round((isNarrow ? 0.5 : 0.6) * containerWidth)
+        ? Math.round((hasNarrowRows ? 0.5 : 0.6) * containerWidth)
         : 400,
       flexShrink: 0,
     }),
-    [containerWidth, isNarrow]
+    [containerWidth, hasNarrowRows]
   );
 
   const undefinedVariableNames =
@@ -1906,7 +1911,6 @@ const VariablesList: React.ComponentType<{
   const selectedNodesSet = React.useMemo(() => new Set(selectedNodes), [
     selectedNodes,
   ]);
-  const hideTypeName = isNarrow;
 
   const renderRow = (
     flattenedVariable: FlattenedVariable,
@@ -1967,9 +1971,9 @@ const VariablesList: React.ComponentType<{
       <VariableRow
         key={nodeId}
         depth={depth}
-        indent={getIndent({ depth, isNarrow, containerWidth })}
+        indent={getIndent({ depth, hasNarrowRows, containerWidth })}
         top={rowIndex * VARIABLE_ROW_HEIGHT}
-        hideTypeName={hideTypeName}
+        hideTypeName={hasNarrowRows}
         shouldHideExpandIcons={shouldHideExpandIcons}
         isExpanded={isExpanded}
         onExpand={onExpand}
@@ -2023,7 +2027,7 @@ const VariablesList: React.ComponentType<{
 
   const toolbar = (
     <VariablesListToolbar
-      isNarrow={isNarrow}
+      isNarrow={isToolbarNarrow}
       isCompact={props.size === 'compact'}
       onCopy={copySelection}
       onPaste={pasteClipboardContent}

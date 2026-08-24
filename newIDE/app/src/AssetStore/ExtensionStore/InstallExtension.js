@@ -41,6 +41,7 @@ export type RequiredExtensionInstallation = {|
   breakingChangesExtensionShortHeaders: Array<ExtensionShortHeader>,
   incompatibleWithIdeExtensionShortHeaders: Array<ExtensionShortHeader>,
   safeToUpdateExtensions: Array<ExtensionShortHeader>,
+  unknownExtensionDependencies: Array<ExtensionDependency>,
   isGDevelopUpdateNeeded: boolean,
 |};
 
@@ -78,13 +79,8 @@ export const getExtensionHeader = (
     [name: string]: ExtensionShortHeader,
   },
   extensionName: string
-): ExtensionShortHeader => {
+): ExtensionShortHeader | null => {
   const extensionShortHeader = extensionShortHeadersByName[extensionName];
-  if (!extensionShortHeader) {
-    throw new Error(
-      'Unable to find extension ' + extensionName + ' in the registry.'
-    );
-  }
   return extensionShortHeader;
 };
 
@@ -94,12 +90,14 @@ type CheckRequiredExtensionsArgs = {|
   extensionShortHeadersByName: {
     [name: string]: ExtensionShortHeader,
   },
+  shouldAllowUnknownExtension?: boolean,
 |};
 
 export const checkRequiredExtensionsUpdate = async ({
   requiredExtensions,
   project,
   extensionShortHeadersByName,
+  shouldAllowUnknownExtension,
 }: CheckRequiredExtensionsArgs): Promise<RequiredExtensionInstallation> => {
   if (requiredExtensions.length === 0) {
     return {
@@ -109,17 +107,26 @@ export const checkRequiredExtensionsUpdate = async ({
       breakingChangesExtensionShortHeaders: [],
       incompatibleWithIdeExtensionShortHeaders: [],
       safeToUpdateExtensions: [],
+      unknownExtensionDependencies: [],
       isGDevelopUpdateNeeded: false,
     };
   }
 
-  const requiredExtensionShortHeaders = requiredExtensions.map(
-    requiredExtension =>
-      getExtensionHeader(
-        extensionShortHeadersByName,
-        requiredExtension.extensionName
-      )
-  );
+  const requiredExtensionShortHeaders: Array<ExtensionShortHeader> = [];
+  const unknownExtensionDependencies: Array<ExtensionDependency> = [];
+  for (const requiredExtension of requiredExtensions) {
+    const extensionShortHeader = getExtensionHeader(
+      extensionShortHeadersByName,
+      requiredExtension.extensionName
+    );
+    if (extensionShortHeader) {
+      requiredExtensionShortHeaders.push(extensionShortHeader);
+    } else if (
+      !project.hasEventsFunctionsExtensionNamed(requiredExtension.extensionName)
+    ) {
+      unknownExtensionDependencies.push(requiredExtension);
+    }
+  }
 
   // Add extensions dependencies
   for (let i = 0; i < requiredExtensionShortHeaders.length; i++) {
@@ -139,8 +146,24 @@ export const checkRequiredExtensionsUpdate = async ({
         extensionShortHeadersByName,
         requiredExtension.extensionName
       );
-      requiredExtensionShortHeaders.push(extensionShortHeader);
+      if (extensionShortHeader) {
+        requiredExtensionShortHeaders.push(extensionShortHeader);
+      } else if (
+        !project.hasEventsFunctionsExtensionNamed(
+          requiredExtension.extensionName
+        )
+      ) {
+        unknownExtensionDependencies.push(requiredExtension);
+      }
     }
+  }
+
+  if (!shouldAllowUnknownExtension && unknownExtensionDependencies.length > 0) {
+    throw new Error(
+      'Unable to find extension ' +
+        unknownExtensionDependencies.join(', ') +
+        ' in the registry.'
+    );
   }
 
   const incompatibleWithIdeExtensionShortHeaders = requiredExtensionShortHeaders.filter(
@@ -197,6 +220,7 @@ export const checkRequiredExtensionsUpdate = async ({
     breakingChangesExtensionShortHeaders,
     incompatibleWithIdeExtensionShortHeaders,
     safeToUpdateExtensions,
+    unknownExtensionDependencies,
     isGDevelopUpdateNeeded,
   };
 };
@@ -526,6 +550,11 @@ export const addSerializedExtensionsToProject = async (
   return;
 };
 
+const formatDependency = (dependency: ExtensionDependency) =>
+  dependency.extensionVersion.length > 0
+    ? dependency.extensionName + '-' + dependency.extensionVersion
+    : dependency.extensionName;
+
 /**
  * Open a dialog to choose an extension and install it in the project.
  */
@@ -637,8 +666,27 @@ export const useImportExtension = (): (({
           requiredExtensions,
           project,
           extensionShortHeadersByName,
+          shouldAllowUnknownExtension: importedExtensionNames.length > 0,
         }
       );
+      if (
+        requiredExtensionInstallation.unknownExtensionDependencies.length > 0
+      ) {
+        if (skipUserPrompts) {
+          throw new Error(
+            'The extension cannot be imported because it has unknown dependencies: ' +
+              requiredExtensionInstallation.unknownExtensionDependencies
+                .map(formatDependency)
+                .join(', ')
+          );
+        }
+        await showAlert({
+          title: t`Missing dependencies`,
+          message: t`The extension cannot be imported because it has unknown dependencies: ${requiredExtensionInstallation.unknownExtensionDependencies
+            .map(formatDependency)
+            .join(', ')}`,
+        });
+      }
       const isNotImportedExtension = (
         extensionShortHeader: ExtensionShortHeader
       ) => !importedExtensionNames.includes(extensionShortHeader.name);

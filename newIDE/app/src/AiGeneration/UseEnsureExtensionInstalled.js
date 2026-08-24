@@ -61,6 +61,11 @@ export const useEnsureExtensionInstalled = ({
           extensionShortHeadersByNameToUse,
           extensionName
         );
+        if (!extensionShortHeader) {
+          throw new Error(
+            'Unable to find extension ' + extensionName + ' in the registry.'
+          );
+        }
         const extensionShortHeaders: Array<ExtensionShortHeader> = [
           extensionShortHeader,
         ];

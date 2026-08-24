@@ -1285,15 +1285,6 @@ export default class InstancesEditor extends Component<Props, State> {
     if (!shouldMoveView) {
       this.selectionRectangle.startSelectionRectangle(x, y);
     }
-
-    if (
-      !this.keyboardShortcuts.shouldMultiSelect() &&
-      !shouldMoveView &&
-      this.props.instancesSelection.hasSelectedInstances()
-    ) {
-      this.props.instancesSelection.clearSelection();
-      this.props.onInstancesSelected([]);
-    }
   };
 
   _onPanMove = (deltaX: number, deltaY: number, x: number, y: number) => {

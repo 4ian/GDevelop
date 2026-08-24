@@ -24,6 +24,7 @@ export type PreviewState = {|
 
 type PreviewDebuggerServerWatcherResults = {|
   hasNonEditionPreviewsRunning: boolean,
+  nonEditionPreviewsCount: number,
 
   gameHotReloadLogs: Array<HotReloaderLog>,
   clearGameHotReloadLogs: () => void,
@@ -144,6 +145,9 @@ export const usePreviewDebuggerServerWatcher = (
 
       console.info('Hard reloading all previews...');
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        // The gameplay test frame is only driven by the gameplay test runner.
+        if (debuggerId === 'gameplay-test-frame') return;
+
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hardReload',
         });
@@ -152,12 +156,18 @@ export const usePreviewDebuggerServerWatcher = (
     [previewDebuggerServer]
   );
 
+  // The gameplay test frame is not counted as a running preview: it's
+  // entirely driven by the gameplay test runner (no hot-reload/update).
   const hasNonEditionPreviewsRunning = Object.keys(debuggerStatus).some(
-    key => !debuggerStatus[key].isInGameEdition
+    key => key !== 'gameplay-test-frame' && !debuggerStatus[key].isInGameEdition
   );
+  const nonEditionPreviewsCount = Object.keys(debuggerStatus).filter(
+    key => key !== 'gameplay-test-frame' && !debuggerStatus[key].isInGameEdition
+  ).length;
 
   return {
     hasNonEditionPreviewsRunning,
+    nonEditionPreviewsCount,
     gameHotReloadLogs,
     clearGameHotReloadLogs,
     editorHotReloadLogs,

@@ -102,9 +102,10 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setter.GetGetterName() == "MovementAngle");
       // These fields are deducted from the getter.
       REQUIRE(setter.GetFullName() == "");
-      REQUIRE(setter.GetGroup() == "");
       REQUIRE(setter.GetDescription() == "");
       REQUIRE(setter.GetSentence() == "");
+      // The group is automatically filled according to the function folder.
+      REQUIRE(setter.GetGroup() == "My events based behavior movement configuration");
       // Object and behavior parameters are added automatically.
       REQUIRE(setter.GetParameters().GetParametersCount() == 0);
 
@@ -349,9 +350,10 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setter.GetGetterName() == "MovementAngle");
       // These fields are deducted from the getter.
       REQUIRE(setter.GetFullName() == "");
-      REQUIRE(setter.GetGroup() == "");
       REQUIRE(setter.GetDescription() == "");
       REQUIRE(setter.GetSentence() == "");
+      // The group is automatically filled according to the function folder.
+      REQUIRE(setter.GetGroup() == "My events based object movement configuration");
       // Object parameter is added automatically.
       REQUIRE(setter.GetParameters().GetParametersCount() == 0);
 

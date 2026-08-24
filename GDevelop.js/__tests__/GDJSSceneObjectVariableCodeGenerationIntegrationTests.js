@@ -160,7 +160,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push number variable action', function () {
-    object.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    object.getVariables().insertNew('MyVariable', 0).castTo('array');
     const runtimeScene = generateAndRunActionsForLayout([
       {
         type: { value: 'PushNumberToObjectVariable' },
@@ -178,7 +178,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push string variable action', function () {
-    object.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    object.getVariables().insertNew('MyVariable', 0).castTo('array');
     const runtimeScene = generateAndRunActionsForLayout([
       {
         type: { value: 'PushStringToObjectVariable' },
@@ -196,7 +196,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push boolean variable action', function () {
-    object.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    object.getVariables().insertNew('MyVariable', 0).castTo('array');
     const runtimeScene = generateAndRunActionsForLayout([
       {
         type: { value: 'PushBooleanToObjectVariable' },

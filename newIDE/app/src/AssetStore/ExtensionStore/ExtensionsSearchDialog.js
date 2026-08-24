@@ -9,11 +9,7 @@ import FlatButton from '../../UI/FlatButton';
 import { ExtensionStore } from '.';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../../UI/HelpButton';
-import {
-  useImportExtension,
-  useInstallExtension,
-  getRequiredExtensions,
-} from './InstallExtension';
+import { useImportExtension } from './InstallExtension';
 import DismissableInfoBar from '../../UI/Messages/DismissableInfoBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -25,16 +21,18 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import Download from '../../UI/CustomSvgIcons/Download';
 import Add from '../../UI/CustomSvgIcons/Add';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import { checkRequiredExtensionsUpdate } from '../../AssetStore/ExtensionStore/InstallExtension';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { ExtensionStoreContext } from './ExtensionStoreContext';
+import ShareExternalIcon from '../../UI/CustomSvgIcons/ShareExternal';
+import Window from '../../Utils/Window';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { useInstallExtensionWithDependencies } from '../../ProjectManager/InstalledExtensionDetails';
 
 type Props = {|
   project: gdProject,
   onClose: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  onCreateNew?: () => void,
+  onCreateNewExtension?: () => void,
 |};
 
 /**
@@ -45,13 +43,11 @@ const ExtensionsSearchDialog = ({
   onClose,
   onWillInstallExtension,
   onExtensionInstalled,
-  onCreateNew,
+  onCreateNewExtension,
 }: Props) => {
+  const preferences = React.useContext(PreferencesContext);
   const { isMobile } = useResponsiveWindowSize();
-  const installExtension = useInstallExtension();
-  const {
-    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
-  } = React.useContext(ExtensionStoreContext);
+  const installExtensionWithDependencies = useInstallExtensionWithDependencies();
   const importExtension = useImportExtension();
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
@@ -76,43 +72,11 @@ const ExtensionsSearchDialog = ({
     try {
       if (extensionShortHeader) {
         try {
-          const extensionShortHeaders: Array<ExtensionShortHeader> = [
-            extensionShortHeader,
-          ];
-          const requiredExtensions = getRequiredExtensions(
-            extensionShortHeaders
-          );
-          requiredExtensions.push({
-            extensionName: extensionShortHeader.name,
-            extensionVersion: extensionShortHeader.version,
-          });
-          const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
-            {
-              requiredExtensions,
-              project,
-              extensionShortHeadersByName,
-            }
-          );
-          if (
-            !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
-              extensionShortHeader
-            )
-          ) {
-            // The extension chosen by users is not part of `requiredExtensions`
-            // but should always be installed. This is true even if the versions
-            // are matching to allow to reinstall the extension.
-            requiredExtensionInstallation.missingExtensionShortHeaders.push(
-              extensionShortHeader
-            );
-          }
-          const wasExtensionInstalled = await installExtension({
+          const wasExtensionInstalled = await installExtensionWithDependencies({
             project,
-            requiredExtensionInstallation,
-            importedSerializedExtensions: [],
+            extensionShortHeader,
             onWillInstallExtension,
             onExtensionInstalled,
-            updateMode: 'all',
-            reason: 'extension',
           });
           if (!wasExtensionInstalled) {
             return false;
@@ -186,10 +150,10 @@ const ExtensionsSearchDialog = ({
                 disabled={isInstalling}
               />
             ) : null,
-            onCreateNew ? (
+            onCreateNewExtension ? (
               <FlatButton
                 key="create-new"
-                onClick={onCreateNew}
+                onClick={onCreateNewExtension}
                 label={
                   isMobile ? (
                     <Trans>Create</Trans>
@@ -198,6 +162,18 @@ const ExtensionsSearchDialog = ({
                   )
                 }
                 leftIcon={<Add />}
+              />
+            ) : null,
+            preferences.values.showExperimentalExtensions ? (
+              <FlatButton
+                leftIcon={<ShareExternalIcon />}
+                key="open-community-list"
+                label={<Trans>Community list</Trans>}
+                onClick={() => {
+                  Window.openExternalURL(
+                    'https://github.com/GDevelopApp/GDevelop-community-list'
+                  );
+                }}
               />
             ) : null,
           ]}

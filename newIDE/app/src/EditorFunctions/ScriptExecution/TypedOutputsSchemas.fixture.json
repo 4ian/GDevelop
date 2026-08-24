@@ -1,0 +1,407 @@
+{
+  "_comment": "VENDORED from GDevelop-services/generation-api/src/lib/script-api/output-types.js (scriptApiSharedOutputTypes + scriptApiToolOutputSchemas). This is the FIELD STRUCTURE only (names, types, required/openEnded) — human-readable descriptions are intentionally stripped, so it is NOT a byte-for-byte copy. Keep the field shapes in sync with that file (update both in the same change). Used by TypedOutputsConformance.spec.js to check that the typed reads keep returning the declared stable fields.",
+  "sharedOutputTypes": {
+    "SimplifiedInstance": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        },
+        "angle": {
+          "type": "number"
+        },
+        "layer": {
+          "type": "string"
+        },
+        "zOrder": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "depth": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "id",
+        "x",
+        "y",
+        "width",
+        "height"
+      ]
+    },
+    "SimplifiedVariable": {
+      "type": "object",
+      "properties": {
+        "variableName": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "variableChildren": {
+          "type": "array",
+          "items": {
+            "$namedType": "SimplifiedVariable"
+          }
+        }
+      },
+      "required": [
+        "variableName",
+        "type"
+      ]
+    },
+    "NamedProperty": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ]
+    },
+    "ObjectSizeInfo": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "$rawType": "number | null"
+        },
+        "height": {
+          "$rawType": "number | null"
+        },
+        "depth": {
+          "$rawType": "number | null"
+        },
+        "originX": {
+          "type": "number"
+        },
+        "originY": {
+          "type": "number"
+        },
+        "originZ": {
+          "$rawType": "number | null"
+        },
+        "centerX": {
+          "$rawType": "number | null"
+        },
+        "centerY": {
+          "$rawType": "number | null"
+        },
+        "centerZ": {
+          "$rawType": "number | null"
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "depth",
+        "originX",
+        "originY",
+        "originZ",
+        "centerX",
+        "centerY",
+        "centerZ"
+      ]
+    }
+  },
+  "toolOutputSchemas": {
+    "describe_instances": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "instances": {
+          "type": "array",
+          "items": {
+            "$namedType": "SimplifiedInstance"
+          }
+        },
+        "objectSizeInfo": {
+          "$rawType": "{ [objectName: string]: ObjectSizeInfo | null }"
+        }
+      },
+      "required": [
+        "instances"
+      ]
+    },
+    "inspect_variables": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "variables": {
+          "type": "array",
+          "items": {
+            "$namedType": "SimplifiedVariable"
+          }
+        }
+      },
+      "required": [
+        "variables"
+      ]
+    },
+    "inspect_object_properties_effects": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "properties": {
+          "type": "array",
+          "items": {
+            "$namedType": "NamedProperty"
+          }
+        },
+        "behaviors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "behaviorName": {
+                "type": "string"
+              },
+              "behaviorType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "behaviorName",
+              "behaviorType"
+            ]
+          }
+        }
+      },
+      "required": [
+        "properties",
+        "behaviors"
+      ]
+    },
+    "inspect_behavior_properties": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "properties": {
+          "type": "array",
+          "items": {
+            "$namedType": "NamedProperty"
+          }
+        }
+      },
+      "required": [
+        "properties"
+      ]
+    },
+    "inspect_scene_properties_layers_effects": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "properties": {
+          "type": "object",
+          "openEnded": true,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "isFirstScene": {
+              "type": "boolean"
+            },
+            "backgroundColor": {
+              "type": "string"
+            },
+            "gameResolutionWidth": {
+              "type": "number"
+            },
+            "gameResolutionHeight": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "name",
+            "isFirstScene",
+            "backgroundColor",
+            "gameResolutionWidth",
+            "gameResolutionHeight"
+          ]
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "openEnded": true,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "position": {
+                "type": "number"
+              },
+              "visible": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "position",
+              "visible"
+            ]
+          }
+        }
+      },
+      "required": [
+        "properties",
+        "layers"
+      ]
+    },
+    "inspect_project_properties_resources": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "properties": {
+          "type": "object",
+          "openEnded": true,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "windowWidth": {
+              "type": "number"
+            },
+            "windowHeight": {
+              "type": "number"
+            },
+            "firstLayout": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "windowWidth",
+            "windowHeight",
+            "firstLayout"
+          ]
+        },
+        "sceneNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "openEnded": true,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "kind"
+            ]
+          }
+        }
+      },
+      "required": [
+        "properties",
+        "sceneNames"
+      ]
+    },
+    "read_events_source": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "eventScript": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "eventScript"
+      ]
+    },
+    "read_game_project_json": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "result": {
+          "$rawType": "any"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success"
+      ]
+    },
+    "add_behavior": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "addedBehaviors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "openEnded": true,
+            "properties": {
+              "objectName": {
+                "type": "string"
+              },
+              "behaviorName": {
+                "type": "string"
+              },
+              "behaviorType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "objectName",
+              "behaviorName",
+              "behaviorType"
+            ]
+          }
+        }
+      },
+      "required": [
+        "addedBehaviors"
+      ]
+    }
+  }
+}

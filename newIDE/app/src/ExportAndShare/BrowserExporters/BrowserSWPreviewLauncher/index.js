@@ -12,6 +12,7 @@ import {
 import {
   browserPreviewDebuggerServer,
   registerNewPreviewWindow,
+  getExistingPreviewWindowForDebuggerId,
 } from '../BrowserPreview/BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
@@ -22,6 +23,7 @@ import {
   getBrowserSWPreviewRootUrl,
 } from './BrowserSWPreviewIndexedDB';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { setGameplayTestFramePreviewLocation } from '../../../GameplayTests/GameplayTestFrame';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 const gd: libGDevelop = global.gd;
 
@@ -29,8 +31,10 @@ let nextPreviewId = 1;
 
 const prepareExporter = async ({
   isForInGameEdition,
+  isForGameplayTest,
 }: {
   isForInGameEdition: boolean,
+  isForGameplayTest: boolean,
 }): Promise<{|
   outputDir: string,
   exporter: gdjsExporter,
@@ -42,7 +46,11 @@ const prepareExporter = async ({
   const baseUrl = getBrowserSWPreviewBaseUrl();
   const rootUrl = getBrowserSWPreviewRootUrl();
   const outputDir = `${baseUrl}/${
-    isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+    isForGameplayTest
+      ? 'gameplay-test-preview'
+      : isForInGameEdition
+      ? 'in-game-editor-preview'
+      : 'preview'
   }`;
 
   console.log(
@@ -139,7 +147,10 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     const debuggerIds = previewOptions.isForInGameEdition
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
-    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
+    const shouldHotReload =
+      previewOptions.hotReload &&
+      !previewOptions.isForGameplayTest &&
+      !!debuggerIds.length;
 
     try {
       await this.getPreviewDebuggerServer().startServer({
@@ -161,6 +172,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         browserSWFileSystem,
       } = await prepareExporter({
         isForInGameEdition: previewOptions.isForInGameEdition,
+        isForGameplayTest: !!previewOptions.isForGameplayTest,
       });
 
       const previewExportOptions = new gd.PreviewExportOptions(
@@ -294,7 +306,14 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         });
       }
 
-      if (shouldHotReload) {
+      if (previewOptions.isForGameplayTest) {
+        // The preview is shown in (and run by) the gameplay test frame:
+        // no window to open.
+        setGameplayTestFramePreviewLocation({
+          previewIndexHtmlLocation:
+            outputDir + '/index.html?previewId=' + previewId,
+        });
+      } else if (shouldHotReload) {
         const projectDataElement = new gd.SerializerElement();
         exporter.serializeProjectData(
           project,
@@ -340,6 +359,19 @@ export default class BrowserSWPreviewLauncher extends React.Component<
             });
           });
         }
+
+        // Bring the preview window(s) to the front so users immediately see
+        // the result of their update.
+        debuggerIds.forEach(debuggerId => {
+          const previewWindow = getExistingPreviewWindowForDebuggerId(
+            debuggerId
+          );
+          if (previewWindow && !previewWindow.closed) {
+            try {
+              previewWindow.focus();
+            } catch (e) {}
+          }
+        });
       } else if (previewWindows) {
         if (previewOptions.isForInGameEdition) {
           setEmbeddedGameFramePreviewLocation({

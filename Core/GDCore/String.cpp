@@ -232,6 +232,9 @@ void String::pop_back()
 
 String& String::insert( size_type pos, const String &str )
 {
+    if(pos > size())
+        throw std::out_of_range("[gd::String::insert] starting pos greater than size");
+
     iterator it = begin();
     std::advance(it, pos);
 
@@ -408,6 +411,11 @@ String String::LowerCase() const
 String String::CapitalizeFirstLetter() const
 {
   return size() < 1 ? *this : substr(0, 1).UpperCase() + substr(1);
+}
+
+String String::UncapitalizeFirstLetter() const
+{
+  return size() < 1 ? *this : substr(0, 1).LowerCase() + substr(1);
 }
 
 String String::FindAndReplace(String search, String replacement, bool all) const

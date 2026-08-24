@@ -18,6 +18,8 @@ import {
 } from '../ExportAndShare/PreviewLauncher.flow';
 import { type Log, LogsManager } from './DebuggerConsole';
 
+// Mirrors `gdjs.FrameMeasureOutput`: a plain tree (no back-references),
+// as sent by the game's profiler.
 export type ProfilerMeasuresSection = {|
   time: number,
   subsections: { [string]: ProfilerMeasuresSection },
@@ -27,6 +29,15 @@ export type ProfilerOutput = {|
   framesAverageMeasures: ProfilerMeasuresSection,
   stats: {
     framesCount: number,
+    // Optional: only sent by game engines recent enough to measure them,
+    // and only meaningful for a game that renders in 3D.
+    shaderProgramsCount?: number,
+    shaderProgramCompilationsCount?: number,
+    framesWithShaderCompilationCount?: number,
+    averageDrawCallsCount?: number,
+    averageTrianglesCount?: number,
+    geometriesCount?: number,
+    texturesCount?: number,
   },
 |};
 

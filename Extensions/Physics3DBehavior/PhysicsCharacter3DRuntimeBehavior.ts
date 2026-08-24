@@ -1907,7 +1907,15 @@ namespace gdjs {
           const bodyLockInterface =
             _sharedData.physicsSystem.GetBodyLockInterface();
           const body = bodyLockInterface.TryGetBody(contact.mBodyB);
-          const behavior = body.gdjsAssociatedBehavior;
+          let behavior = body.gdjsAssociatedBehavior;
+          if (!behavior) {
+            // For some reason, the body can be different than the character
+            // inner body. So, we go through the character instead.
+            const body = bodyLockInterface.TryGetBody(
+              contact.mCharacterB.GetInnerBodyID()
+            );
+            behavior = body.gdjsAssociatedBehavior;
+          }
           if (behavior) {
             this._currentContacts.push(behavior);
           }

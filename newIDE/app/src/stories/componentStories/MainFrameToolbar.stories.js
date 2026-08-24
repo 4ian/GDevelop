@@ -44,6 +44,7 @@ const fakeEditorToolbar = (
 
 const defaultProps: MainFrameToolbarProps = {
   showProjectButtons: true,
+  showPreviewAndShareButtons: true,
   openShareDialog: () => {},
   isSharingEnabled: true,
   hidden: false,
@@ -71,6 +72,7 @@ const defaultProps: MainFrameToolbarProps = {
   },
   toolbarButtons: [],
   projectPath: '',
+  triggerNpmScript: () => {},
 };
 
 export const NoProjectOpen = (): React.Node => (

@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import classes from './CompactToggleButtons.module.css';
 import { tooltipEnterDelay } from '../Tooltip';
 
-type CompactToggleButton = {|
+export type CompactToggleButton = {|
   id: string,
   renderIcon: (className?: string) => React.Node,
   tooltip: React.Node,

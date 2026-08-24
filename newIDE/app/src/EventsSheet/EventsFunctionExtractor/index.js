@@ -6,6 +6,8 @@ import {
   ProjectScopedContainersAccessor,
   type EventsScope,
 } from '../../InstructionOrExpression/EventsScope';
+import newNameGenerator from '../../Utils/NewNameGenerator';
+
 const gd: libGDevelop = global.gd;
 
 /**
@@ -175,15 +177,13 @@ export const validateExtensionName = (extensionName: string): boolean => {
   return gd.Project.isNameSafe(extensionName);
 };
 
-/**
- * Validate that an events functions extension name is unique in a project.
- */
-export const validateExtensionNameUniqueness = (
+export const getSafeExtensionName = (
   project: gdProject,
-  extensionName: string
-): boolean => {
-  return !project.hasEventsFunctionsExtensionNamed(extensionName);
-};
+  chosenExtensionName: string
+): string =>
+  newNameGenerator(gd.Project.getSafeName(chosenExtensionName), name =>
+    project.hasEventsFunctionsExtensionNamed(name)
+  );
 
 /**
  * Validate that an events function name is unique in a project extension.
@@ -206,6 +206,22 @@ export const validateEventsFunctionNameUniqueness = (
   return true;
 };
 
+export const getSafeEventsFunctionName = (
+  project: gdProject,
+  extensionName: string,
+  chosenFunctionName: string
+): string => {
+  if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+    return gd.Project.getSafeName(chosenFunctionName);
+  }
+  const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+    extensionName
+  );
+  return newNameGenerator(gd.Project.getSafeName(chosenFunctionName), name =>
+    eventsFunctionsExtension.getEventsFunctions().hasEventsFunctionNamed(name)
+  );
+};
+
 /**
  * Return true if the events function can be added to the given extension
  * without any conflict/invalid name.
@@ -220,13 +236,7 @@ export const canCreateEventsFunction = (
     validateExtensionName(extensionName) &&
     eventsFunction.getName() !== '' &&
     validateEventsFunctionName(eventsFunction.getName()) &&
-    validateEventsFunctionNameUniqueness(
-      project,
-      extensionName,
-      eventsFunction
-    ) &&
-    eventsFunction.getFullName() !== '' &&
-    eventsFunction.getSentence() !== ''
+    validateEventsFunctionNameUniqueness(project, extensionName, eventsFunction)
   );
 };
 

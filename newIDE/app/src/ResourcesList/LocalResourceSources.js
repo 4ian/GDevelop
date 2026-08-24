@@ -188,8 +188,12 @@ const localResourceSources: Array<ResourceSource> = [
 
         return filePaths.map(filePath => {
           const newResource = createNewResource();
-          newResource.setFile(path.relative(projectPath, filePath));
-          newResource.setName(path.relative(projectPath, filePath));
+          newResource.setFile(
+            path.relative(projectPath, filePath).replace(/\\/g, '/')
+          );
+          newResource.setName(
+            path.relative(projectPath, filePath).replace(/\\/g, '/')
+          );
 
           const filePathWithMapping = newToOldFilePaths.has(filePath)
             ? newToOldFilePaths.get(filePath)

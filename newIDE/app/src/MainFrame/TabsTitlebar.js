@@ -15,10 +15,12 @@ import RobotIcon from '../ProjectCreation/RobotIcon';
 import PreferencesContext from './Preferences/PreferencesContext';
 import TextButton from '../UI/TextButton';
 import { useInterval } from '../Utils/UseInterval';
+import classes from './TabsTitlebar.module.css';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Window from '../Utils/Window';
 import { isMacLike } from '../Utils/Platform';
+import { AiRequestContext } from '../AiGeneration/AiRequestContext';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -117,6 +119,10 @@ export default function TabsTitlebar({
   const isTouchscreen = useScreenType() === 'touch';
   const preferences = React.useContext(PreferencesContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
+  const { getWorkingAiRequest } = React.useContext(AiRequestContext);
+  // True when an AI request is still working — even if its tab/panel is closed,
+  // since the request lives in the app-level AiRequestContext.
+  const isAiWorking = !!getWorkingAiRequest();
   const [tooltipData, setTooltipData] = React.useState<?{|
     element: HTMLElement,
     editorTab: EditorTab,
@@ -191,6 +197,41 @@ export default function TabsTitlebar({
     preferences.values.showAiAskButtonInTitleBar && displayAskAi && !hideAskAi;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
+  const [isGlowing, setIsGlowing] = React.useState(false);
+  const glowTimeoutRef = React.useRef<?TimeoutID>(null);
+
+  const triggerGlow = React.useCallback(() => {
+    if (glowTimeoutRef.current) clearTimeout(glowTimeoutRef.current);
+    setIsGlowing(true);
+    glowTimeoutRef.current = setTimeout(() => {
+      setIsGlowing(false);
+      glowTimeoutRef.current = null;
+    }, 1000);
+  }, []);
+
+  React.useEffect(
+    () => () => {
+      if (glowTimeoutRef.current) clearTimeout(glowTimeoutRef.current);
+    },
+    []
+  );
+
+  // Desktop: glow when the Ask AI panel is closed (button re-appears).
+  const prevShouldDisplayAskAiRef = React.useRef(shouldDisplayAskAi);
+  React.useEffect(
+    () => {
+      if (shouldDisplayAskAi && !prevShouldDisplayAskAiRef.current) {
+        triggerGlow();
+      }
+      prevShouldDisplayAskAiRef.current = shouldDisplayAskAi;
+    },
+    [shouldDisplayAskAi, triggerGlow]
+  );
+
+  // While an AI request is working (and the button is shown), flash the button
+  // every 5 seconds to keep signalling that it is still working.
+  useInterval(triggerGlow, shouldDisplayAskAi && isAiWorking ? 5000 : null);
+
   const handleDoubleClick = React.useCallback(() => {
     // On macOS, double-clicking the title bar should maximize/restore the window
     if (isMacLike()) {
@@ -233,15 +274,22 @@ export default function TabsTitlebar({
           style={styles.askAiContainer}
           className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
         >
-          <TextButton
-            icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
-            label={'Ask AI'}
-            onClick={onAskAiClicked}
-          />
+          <div className={isGlowing ? classes.askAiGlow : undefined}>
+            <TextButton
+              icon={
+                <RobotIcon
+                  size={16}
+                  rotating={isAskAiIconAnimated || isAiWorking}
+                />
+              }
+              label={'Ask AI'}
+              onClick={onAskAiClicked}
+            />
+          </div>
         </div>
       ) : null}
       {isRightMostPane && <TitleBarRightSafeMargins />}
-      {tooltipData && (
+      {tooltipData && tooltipData.element.isConnected && (
         <TabsTitlebarTooltip
           anchorElement={tooltipData.element}
           editorTab={tooltipData.editorTab}

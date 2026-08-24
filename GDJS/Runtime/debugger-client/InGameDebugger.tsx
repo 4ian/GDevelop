@@ -115,9 +115,10 @@ namespace gdjs {
       }
 
       if (this._uncaughtException) {
-        const errorIsInJs = gdjs.AbstractDebuggerClient.isErrorComingFromJavaScriptCode(
-          this._uncaughtException
-        );
+        const errorIsInJs =
+          gdjs.AbstractDebuggerClient.isErrorComingFromJavaScriptCode(
+            this._uncaughtException
+          );
         this._uncaughtExceptionElement = (
           <div style={styles.errorContainer}>
             <button

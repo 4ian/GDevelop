@@ -6,6 +6,8 @@ export type EventsFunctionsExtensionOpener = {
   readEventsFunctionExtensionFile: (
     filepath: any
   ) => Promise<SerializedExtension>,
+  chooseAssetPackFile: () => Promise<any>,
+  readAssetPackFile: (filepath: any) => Promise<Blob>,
 };
 
 export type EventsFunctionsExtensionWriter = {

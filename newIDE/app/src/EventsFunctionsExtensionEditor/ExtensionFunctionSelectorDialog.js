@@ -8,17 +8,12 @@ import Subheader from '../UI/Subheader';
 import { List, ListItem } from '../UI/List';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
-import Create from '../UI/CustomSvgIcons/Behaviors/Create';
-import Step from '../UI/CustomSvgIcons/Behaviors/Step';
-import Destroy from '../UI/CustomSvgIcons/Behaviors/Destroy';
-import Action from '../UI/CustomSvgIcons/Behaviors/Action';
-import Condition from '../UI/CustomSvgIcons/Behaviors/Condition';
-import Expression from '../UI/CustomSvgIcons/Behaviors/Expression';
-import Activate from '../UI/CustomSvgIcons/Behaviors/Activate';
-import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
 import { Line } from '../UI/Grid';
 import Visibility from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import ListIcon from '../UI/ListIcon';
+import { getFunctionIconUrl } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
+
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -32,27 +27,41 @@ const styles = {
   disabledItem: { opacity: 0.6 },
 };
 
-const FunctionListItem = ({
-  icon,
+export const FunctionListItem = ({
+  functionType,
+  functionName,
   disabled,
   onChoose,
   name,
   description,
 }: {|
-  icon: React.Node,
+  functionType: EventsFunction_FunctionType,
+  functionName: string | null,
   disabled?: boolean,
-  onChoose: () => void,
-  name: React.Node,
+  onChoose: EventsFunctionCreationParameters => void,
+  name?: React.Node,
   description: React.Node,
-|}) => {
+|}): React.Node => {
   return (
     // $FlowFixMe[incompatible-type]
     <ListItem
-      leftIcon={icon}
-      primaryText={name}
+      leftIcon={
+        <ListIcon
+          src={getFunctionIconUrl(functionType, functionName)}
+          iconSize={32}
+          padding={4}
+          useExactIconSize
+        />
+      }
+      primaryText={name || functionName}
       secondaryText={description}
       secondaryTextLines={2}
-      onClick={onChoose}
+      onClick={() =>
+        onChoose({
+          functionType: functionType,
+          name: functionName,
+        })
+      }
       style={disabled ? styles.disabledItem : undefined}
       disabled={disabled}
     />
@@ -82,55 +91,44 @@ export default function ExtensionFunctionSelectorDialog({
       ]}
       open
       onRequestClose={onCancel}
+      maxWidth="sm"
     >
       <List>
         <FunctionListItem
-          icon={<Action style={styles.icon} />}
+          functionType={gd.EventsFunction.Action}
+          functionName={null}
           name={<Trans>Action</Trans>}
-          onChoose={() =>
-            onChoose({
-              functionType: gd.EventsFunction.Action,
-              name: null,
-            })
-          }
           description={
             <Trans>
               An action that can be used in other events sheet. You can define
               the action parameters: objects, texts, numbers, layers, etc...
             </Trans>
           }
+          onChoose={onChoose}
         />
         <FunctionListItem
-          icon={<Condition style={styles.icon} />}
+          functionType={gd.EventsFunction.Condition}
+          functionName={null}
           name={<Trans>Condition</Trans>}
-          onChoose={() =>
-            onChoose({
-              functionType: gd.EventsFunction.Condition,
-              name: null,
-            })
-          }
           description={
             <Trans>
               A condition that can be used in other events sheet. You can define
               the condition parameters: objects, texts, numbers, layers, etc...
             </Trans>
           }
+          onChoose={onChoose}
         />
         <FunctionListItem
-          icon={<Expression style={styles.icon} />}
+          functionType={gd.EventsFunction.Expression}
+          functionName={null}
           name={<Trans>Expression</Trans>}
-          onChoose={() =>
-            onChoose({
-              functionType: gd.EventsFunction.Expression,
-              name: null,
-            })
-          }
           description={
             <Trans>
               An expression that can be used in formulas. Can either return a
               number or a string, and take some parameters.
             </Trans>
           }
+          onChoose={onChoose}
         />
         {showAdvanced && (
           <React.Fragment>
@@ -138,131 +136,95 @@ export default function ExtensionFunctionSelectorDialog({
               <Trans>Lifecycle functions (advanced)</Trans>
             </Subheader>
             <FunctionListItem
-              icon={<Create style={styles.icon} />}
-              name={'onFirstSceneLoaded'}
+              functionType={gd.EventsFunction.Action}
+              functionName="onFirstSceneLoaded"
               disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onFirstSceneLoaded'
               )}
-              onChoose={() =>
-                onChoose({
-                  functionType: gd.EventsFunction.Action,
-                  name: 'onFirstSceneLoaded',
-                })
-              }
               description={
                 <Trans>
                   Events that will be run once when the first scene of the game
                   is loaded, before any other events.
                 </Trans>
               }
+              onChoose={onChoose}
             />
             <FunctionListItem
-              icon={<Create style={styles.icon} />}
-              name={'onSceneLoaded'}
+              functionType={gd.EventsFunction.Action}
+              functionName="onSceneLoaded"
               disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onSceneLoaded'
               )}
-              onChoose={() =>
-                onChoose({
-                  functionType: gd.EventsFunction.Action,
-                  name: 'onSceneLoaded',
-                })
-              }
               description={
                 <Trans>
                   Events that will be run once when a scene of the game is
                   loaded, before the scene events.
                 </Trans>
               }
+              onChoose={onChoose}
             />
             <FunctionListItem
-              icon={<Step style={styles.icon} />}
-              name={'onScenePreEvents'}
+              functionType={gd.EventsFunction.Action}
+              functionName="onScenePreEvents"
               disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onScenePreEvents'
               )}
-              onChoose={() =>
-                onChoose({
-                  functionType: gd.EventsFunction.Action,
-                  name: 'onScenePreEvents',
-                })
-              }
               description={
                 <Trans>
                   Events that will be run at every frame (roughly 60 times per
                   second), before the events from the events sheet of the scene.
                 </Trans>
               }
+              onChoose={onChoose}
             />
             <FunctionListItem
-              icon={<Step style={styles.icon} />}
-              name={'onScenePostEvents'}
+              functionType={gd.EventsFunction.Action}
+              functionName="onScenePostEvents"
               disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onScenePostEvents'
               )}
-              onChoose={() =>
-                onChoose({
-                  functionType: gd.EventsFunction.Action,
-                  name: 'onScenePostEvents',
-                })
-              }
               description={
                 <Trans>
                   Events that will be run at every frame (roughly 60 times per
                   second), after the events from the events sheet of the scene.
                 </Trans>
               }
+              onChoose={onChoose}
             />
             <FunctionListItem
-              icon={<Deactivate style={styles.icon} />}
-              name={'onScenePaused'}
+              functionType={gd.EventsFunction.Action}
+              functionName="onScenePaused"
               disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onScenePaused'
               )}
-              onChoose={() =>
-                onChoose({
-                  functionType: gd.EventsFunction.Action,
-                  name: 'onScenePaused',
-                })
-              }
               description={
                 <Trans>
                   Events that will be run once when a scene is paused (another
                   scene is run on top of it).
                 </Trans>
               }
+              onChoose={onChoose}
             />
             <FunctionListItem
-              icon={<Activate style={styles.icon} />}
-              name={'onSceneResumed'}
+              functionType={gd.EventsFunction.Action}
+              functionName="onSceneResumed"
               disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onSceneResumed'
               )}
-              onChoose={() =>
-                onChoose({
-                  functionType: gd.EventsFunction.Action,
-                  name: 'onSceneResumed',
-                })
-              }
               description={
                 <Trans>
                   Events that will be run once when a scene is resumed (after it
                   was previously paused).
                 </Trans>
               }
+              onChoose={onChoose}
             />
             <FunctionListItem
-              icon={<Destroy style={styles.icon} />}
-              name={'onSceneUnloading'}
+              functionType={gd.EventsFunction.Action}
+              functionName="onSceneUnloading"
               disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onSceneUnloading'
               )}
-              onChoose={() =>
-                onChoose({
-                  functionType: gd.EventsFunction.Action,
-                  name: 'onSceneUnloading',
-                })
-              }
               description={
                 <Trans>
                   Events that will be run once when a scene is about to be
@@ -270,6 +232,7 @@ export default function ExtensionFunctionSelectorDialog({
                   be resumed after this.
                 </Trans>
               }
+              onChoose={onChoose}
             />
           </React.Fragment>
         )}

@@ -67,7 +67,20 @@ InstructionSentenceFormatter::GetAsFormattedText(
       TextFormatting format;
       format.userData = firstParamIndex;
 
-      gd::String text = instr.GetParameter(firstParamIndex).GetPlainString();
+      const gd::ParameterMetadata &parameterMetadata =
+          metadata.GetParameter(firstParamIndex);
+      const gd::String &parameterValue =
+          instr.GetParameter(firstParamIndex).GetPlainString();
+      // Use the default value when the parameter is left empty, so that the
+      // displayed text matches what is actually generated as code (see
+      // `gd::ParameterMetadataTools::IterateOverParametersWithIndex`).
+      const gd::String &parameterValueOrDefault =
+          parameterValue.empty() && parameterMetadata.IsOptional()
+              ? parameterMetadata.GetDefaultValue()
+              : parameterValue;
+
+      gd::String text = GetFormattedParameterValue(
+          parameterValueOrDefault, parameterMetadata.GetType());
       std::replace(text.Raw().begin(),
                    text.Raw().end(),
                    '\n',
@@ -87,6 +100,18 @@ InstructionSentenceFormatter::GetAsFormattedText(
   }
 
   return formattedStr;
+}
+
+gd::String InstructionSentenceFormatter::GetFormattedParameterValue(
+    const gd::String &rawValue, const gd::String &parameterType) {
+  // This is duplicated in `EventsCodeGenerator::GenerateParameterCodes` and
+  // `AdvancedExtension.cpp` for GDJS.
+  if (parameterType == "yesorno") {
+    return (rawValue == "yes" || rawValue == "oui") ? "yes" : "no";
+  } else if (parameterType == "trueorfalse") {
+    return (rawValue == "True" || rawValue == "Vrai") ? "True" : "False";
+  }
+  return rawValue;
 }
 
 gd::String InstructionSentenceFormatter::GetFullText(

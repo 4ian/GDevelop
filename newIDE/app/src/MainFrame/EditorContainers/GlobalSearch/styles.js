@@ -1,0 +1,105 @@
+// @flow
+import { makeStyles } from '@material-ui/styles';
+
+export const styles = {
+  groupHeaderIcon: {
+    opacity: 0.7,
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: 28,
+    fontFamily: 'var(--gdevelop-classic-font-family)',
+  },
+  matchCountChip: {
+    height: 20,
+    fontSize: 12,
+    flexShrink: 0,
+  },
+  eventRowIndicator: {
+    width: 4,
+    flexShrink: 0,
+    background: 'var(--event-sheet-rst-move-handle-background-color, #a3b1c0)',
+  },
+  eventRowColumns: {
+    display: 'flex',
+    flex: 1,
+    minHeight: 32,
+    minWidth: 0,
+  },
+  eventRowConditions: {
+    flex: '0 0 40%',
+    background: 'var(--event-sheet-conditions-background-color, #f1f2f2)',
+    color: 'var(--event-sheet-conditions-color, black)',
+    borderRight:
+      '1px solid var(--event-sheet-conditions-border-right-color, #e2e2e2)',
+    padding: '6px 10px',
+    fontSize: 13,
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  eventRowActions: {
+    flex: 1,
+    background: 'var(--event-sheet-actions-background-color, #FFFFFF)',
+    color: 'var(--event-sheet-actions-color, black)',
+    padding: '6px 10px',
+    fontSize: 13,
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  eventRowOther: {
+    flex: 1,
+    background: 'var(--event-sheet-actions-background-color, #FFFFFF)',
+    color: 'var(--event-sheet-actions-color, black)',
+    padding: '6px 10px',
+    fontSize: 13,
+    overflow: 'hidden',
+    fontStyle: 'italic',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  eventRowText: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    lineHeight: '20px',
+    flex: 1,
+    minWidth: 0,
+    fontFamily: 'var(--gdevelop-classic-font-family) !important',
+    fontSize: '16px',
+  },
+  searchMatchText: {
+    backgroundColor: 'rgba(252, 100, 33, 0.25)',
+    borderRadius: 2,
+    padding: '0 2px',
+  },
+  emptyStateContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '48px 24px',
+    gap: 12,
+    opacity: 0.5,
+  },
+  emptyStateIcon: {
+    fontSize: 48,
+    opacity: 0.4,
+  },
+};
+
+export const useEventRowStyles: () => {
+  eventRow: string,
+} = makeStyles({
+  eventRow: {
+    cursor: 'pointer',
+    display: 'flex',
+    borderBottom:
+      '1px solid var(--event-sheet-conditions-border-color, #e2e2e2)',
+    marginBottom: 3,
+    '&:last-child': {
+      marginBottom: 0,
+    },
+  },
+});

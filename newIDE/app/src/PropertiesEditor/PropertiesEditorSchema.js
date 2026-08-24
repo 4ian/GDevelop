@@ -9,6 +9,7 @@ export type Instance = Object; // This could be improved using generics.
 export type Instances = Array<Instance>;
 
 export type FieldVisibility = 'basic' | 'advanced' | 'deprecated';
+export type FieldDisablingMethod = 'never' | 'always' | 'onValuesDifferent';
 
 // "Value" fields are fields displayed in the properties.
 export type ValueFieldCommonProperties = {|
@@ -20,7 +21,7 @@ export type ValueFieldCommonProperties = {|
   getExtraDescription?: Instance => string,
   hasImpactOnAllOtherFields?: boolean,
   canBeUnlimitedUsingMinus1?: boolean,
-  disabled?: (instances: Array<Instance>) => boolean,
+  disabled?: (instances: Array<Instance>) => FieldDisablingMethod,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
   getValueFromDisplayedValue?: string => string,
@@ -29,17 +30,19 @@ export type ValueFieldCommonProperties = {|
   defaultValue?: string | number | boolean | null,
 |};
 
+export type FieldChoices = {|
+  value: string,
+  label: string,
+  labelIsUserDefined?: boolean,
+|};
+
 // "Primitive" value fields are "simple" fields.
 export type PrimitiveValueField =
   | {|
       valueType: 'number',
       getValue: Instance => number | null,
       setValue: (instance: Instance, newValue: number) => void,
-      getChoices?: ?() => Array<{|
-        value: string,
-        label: string,
-        labelIsUserDefined?: boolean,
-      |}>,
+      getChoices?: ?() => Array<FieldChoices>,
       /** Only supported on non compact property editors. */
       getEndAdornment?: Instance => {|
         label: string,

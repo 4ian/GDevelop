@@ -361,7 +361,8 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_char(utf8proc_int32_t uc,
       utf8proc_ssize_t written = 0;
       for (casefold_entry = property->casefold_mapping;
           *casefold_entry >= 0; casefold_entry++) {
-        written += utf8proc_decompose_char(*casefold_entry, dst+written,
+        written += utf8proc_decompose_char(*casefold_entry,
+          dst ? dst+written : NULL,
           (bufsize > written) ? (bufsize - written) : 0, options,
           last_boundclass);
         if (written < 0) return UTF8PROC_ERROR_OVERFLOW;
@@ -376,7 +377,8 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_char(utf8proc_int32_t uc,
       utf8proc_ssize_t written = 0;
       for (decomp_entry = property->decomp_mapping;
           *decomp_entry >= 0; decomp_entry++) {
-        written += utf8proc_decompose_char(*decomp_entry, dst+written,
+        written += utf8proc_decompose_char(*decomp_entry,
+          dst ? dst+written : NULL,
           (bufsize > written) ? (bufsize - written) : 0, options,
         last_boundclass);
         if (written < 0) return UTF8PROC_ERROR_OVERFLOW;
@@ -429,7 +431,8 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose(
         if (uc < 0) return UTF8PROC_ERROR_INVALIDUTF8;
       }
       decomp_result = utf8proc_decompose_char(
-        uc, buffer + wpos, (bufsize > wpos) ? (bufsize - wpos) : 0, options,
+        uc, buffer ? buffer + wpos : NULL,
+        (bufsize > wpos) ? (bufsize - wpos) : 0, options,
         &boundclass
       );
       if (decomp_result < 0) return decomp_result;

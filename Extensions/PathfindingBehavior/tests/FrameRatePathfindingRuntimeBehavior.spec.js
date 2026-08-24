@@ -34,6 +34,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           title: '',
           behaviorsSharedData: [],
           objects: [],
+          objectsGroups: [],
           instances: [],
           usedResources: [],
           uiSettings: {

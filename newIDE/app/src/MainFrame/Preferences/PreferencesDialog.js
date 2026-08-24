@@ -89,6 +89,7 @@ const PreferencesDialog = ({
     setShowCreateSectionByDefault,
     setDisableNpmScriptConfirmation,
     setUseBackgroundSerializerForSaving,
+    setShowJsTypeError,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -609,6 +610,15 @@ const PreferencesDialog = ({
                   </CompactSelectField>
                 </Column>
               </LineStackLayout>
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setShowJsTypeError}
+                checked={values.showJsTypeError}
+                label={i18n._(
+                  t`Show type errors in JavaScript events (needs a restart)`
+                )}
+              />
               <CompactToggleField
                 labelColor="primary"
                 hideTooltip

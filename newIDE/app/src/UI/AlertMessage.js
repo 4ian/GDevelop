@@ -24,11 +24,11 @@ const styles = {
 type Props = {|
   kind?: 'info' | 'warning' | 'error' | 'valid',
   children: React.Node,
-  onHide?: ?() => void,
+  onHide?: ?() => void | Promise<void>,
   hideButtonSize?: 'small',
   renderLeftIcon?: () => React.Node,
   renderRightButton?: ?() => React.Node,
-  markdownImageOnly?: boolean,
+  contentOnly?: boolean,
   background?: 'dark' | 'medium' | 'light',
 |};
 
@@ -43,7 +43,7 @@ const AlertMessage = ({
   hideButtonSize,
   renderRightButton,
   renderLeftIcon,
-  markdownImageOnly,
+  contentOnly,
   background = 'dark',
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -71,7 +71,7 @@ const AlertMessage = ({
 
   return (
     <Paper variant="outlined" style={paperStyle} background={background}>
-      {markdownImageOnly ? (
+      {contentOnly ? (
         children
       ) : (
         <Line noMargin>

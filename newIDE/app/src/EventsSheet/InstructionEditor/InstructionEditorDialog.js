@@ -36,6 +36,12 @@ import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { fillBehaviorParameter } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionParametersEditor.js';
+import { fillBehaviorProperty } from '../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedBehaviorOrObjectPropertiesEditor';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
+import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
+
+const gd: libGDevelop = global.gd;
 
 const styles = {
   fullHeightSelector: {
@@ -74,6 +80,13 @@ type Props = {|
   onPasteInstructions: () => void, // Unused
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
+  editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {
@@ -109,7 +122,10 @@ const InstructionEditorDialog = ({
   openInstructionOrExpression,
   onWillInstallExtension,
   onExtensionInstalled,
+  onCreateNewExtensionWithBehavior,
   i18n,
+  editEventsFunctionParameter,
+  openEventsBasedEntityPropertyEditorDialog,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [
@@ -166,6 +182,7 @@ const InstructionEditorDialog = ({
     setNewExtensionDialogOpen,
   ] = React.useState<boolean>(false);
   const shouldAutofocusInput = useShouldAutofocusInput();
+  const { setSearchText } = React.useContext(ExtensionStoreContext);
 
   // Handle the back button
   const stepBackFrom = (origin: StepName) => {
@@ -179,33 +196,136 @@ const InstructionEditorDialog = ({
     }
   };
 
-  const addBehavior = (type: string, defaultName: string) => {
-    // Avoid to add behaviors to object parameters.
-    if (!chosenObject || !scope.layout) return;
-
-    const wasBehaviorAdded = addBehaviorToObject(
-      project,
-      chosenObject,
-      type,
-      defaultName
-    );
-
-    if (wasBehaviorAdded) {
-      setNewBehaviorDialogOpen(false);
-      sendBehaviorAdded({
-        behaviorType: type,
-        parentEditor: 'instruction-editor-dialog',
-      });
+  /**
+   * Check if an object is coming from the scene (or the custom object),
+   * the opposite being an object coming from the parameter of a function.
+   */
+  const isSceneObject = React.useCallback(
+    (object: gdObject) => {
       if (scope.layout) {
-        scope.layout.updateBehaviorsSharedData(project);
+        return true;
       }
-    }
+      const projectScopedContainers = projectScopedContainersAccessor.get();
+      const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+      const objectsContainerSourceType = objectsContainersList.getObjectsContainerSourceType(
+        object.getName()
+      );
+      return objectsContainerSourceType === gd.ObjectsContainer.Object;
+    },
+    [projectScopedContainersAccessor, scope.layout]
+  );
 
-    // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
-    // This is not done automatically because a change in the object behaviors
-    // is not detected by React at this level.
-    chooseObject(chosenObject.getName());
-  };
+  const addBehavior = React.useCallback(
+    (type: string, defaultName: string) => {
+      if (!chosenObject) return;
+
+      if (scope.layout) {
+        // This is an object of the scene.
+        const wasBehaviorAdded = addBehaviorToObject(
+          project,
+          chosenObject,
+          type,
+          defaultName,
+          /* shouldSkipExistingBehaviorSilently= */ false
+        );
+
+        if (wasBehaviorAdded) {
+          setNewBehaviorDialogOpen(false);
+          sendBehaviorAdded({
+            behaviorType: type,
+            parentEditor: 'instruction-editor-dialog',
+          });
+          if (scope.layout) {
+            scope.layout.updateBehaviorsSharedData(project);
+          }
+        }
+      } else {
+        const projectScopedContainers = projectScopedContainersAccessor.get();
+        const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+        const objectsContainerSourceType = objectsContainersList.getObjectsContainerSourceType(
+          chosenObject.getName()
+        );
+
+        if (objectsContainerSourceType === gd.ObjectsContainer.Object) {
+          // This is a child object in a custom object.
+          const wasBehaviorAdded = addBehaviorToObject(
+            project,
+            chosenObject,
+            type,
+            defaultName,
+            /* shouldSkipExistingBehaviorSilently= */ false
+          );
+
+          if (wasBehaviorAdded) {
+            setNewBehaviorDialogOpen(false);
+            sendBehaviorAdded({
+              behaviorType: type,
+              parentEditor: 'instruction-editor-dialog',
+            });
+          }
+        } else if (
+          objectsContainerSourceType === gd.ObjectsContainer.Function
+        ) {
+          // This is an object coming from the parameter of a function.
+          const { eventsFunction, eventsBasedBehavior } = scope;
+          if (eventsFunction) {
+            if (eventsBasedBehavior && chosenObject.getName() === 'Object') {
+              // This is the object the custom behavior is attached to.
+              const properties = eventsBasedBehavior.getPropertyDescriptors();
+              const property = properties.insertNew('NewBehavior', 0);
+              property.setType('Behavior');
+              fillBehaviorProperty(
+                projectScopedContainersAccessor,
+                eventsBasedBehavior,
+                property,
+                type
+              );
+              setNewBehaviorDialogOpen(false);
+            } else {
+              // This is an object coming from the parameter of a function.
+              const parameters = eventsFunction.getParameters();
+              const objectParameterIndex = parameters.getParameterPosition(
+                parameters.getParameter(chosenObject.getName())
+              );
+
+              const behaviorParameter = parameters.insertNewParameter(
+                'NewBehavior',
+                objectParameterIndex + 1
+              );
+              behaviorParameter.setType('behavior');
+              behaviorParameter.setExtraInfo(type);
+              fillBehaviorParameter(
+                projectScopedContainersAccessor,
+                eventsFunction,
+                behaviorParameter
+              );
+              if (editEventsFunctionParameter) {
+                editEventsFunctionParameter({
+                  variableName: behaviorParameter.getName(),
+                  shouldCreate: false,
+                  variableType: null,
+                });
+              }
+              setNewBehaviorDialogOpen(false);
+            }
+          }
+        }
+      }
+
+      // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
+      // This is not done automatically because a change in the object behaviors
+      // is not detected by React at this level.
+      chooseObject(chosenObject.getName());
+    },
+    [
+      chooseObject,
+      chosenObject,
+      editEventsFunctionParameter,
+      project,
+      projectScopedContainersAccessor,
+      scope,
+    ]
+  );
 
   const instructionParametersEditor = React.useRef<?InstructionParametersEditorInterface>(
     null
@@ -258,7 +378,10 @@ const InstructionEditorDialog = ({
           }}
           focusOnMount={shouldAutofocusInput && !instructionType}
           onSearchStartOrReset={forceUpdate}
-          onClickMore={() => setNewExtensionDialogOpen(true)}
+          onOpenExtensionStore={props => {
+            setSearchText(props.searchText);
+            setNewExtensionDialogOpen(true);
+          }}
           i18n={i18n}
         />
       )}
@@ -282,6 +405,9 @@ const InstructionEditorDialog = ({
       focusOnMount={shouldAutofocusInput && !!instructionType}
       noHelpButton
       id="object-instruction-parameters"
+      openEventsBasedEntityPropertyEditorDialog={
+        openEventsBasedEntityPropertyEditorDialog
+      }
     />
   );
 
@@ -302,7 +428,11 @@ const InstructionEditorDialog = ({
         focusOnMount={shouldAutofocusInput && !instructionType}
         searchPlaceholderObjectName={chosenObjectName}
         searchPlaceholderIsCondition={isCondition}
-        onClickMore={scope.layout ? () => setNewBehaviorDialogOpen(true) : null}
+        onClickMore={
+          scope.eventsBasedObject && chosenObjectName === 'Object'
+            ? null
+            : () => setNewBehaviorDialogOpen(true)
+        }
         id="object-instruction-selector"
       />
     ) : null;
@@ -439,15 +569,29 @@ const InstructionEditorDialog = ({
           open={newBehaviorDialogOpen}
           objectType={chosenObject.getType()}
           objectBehaviorsTypes={listObjectBehaviorsTypes(chosenObject)}
-          isChildObject={!scope.layout}
+          isChildObject={
+            !!scope.eventsBasedObject && isSceneObject(chosenObject)
+          }
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
           onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={extensionName => {
+            onExtensionInstalled(extensionName);
             freeInstructionComponentRef.current &&
               freeInstructionComponentRef.current.reEnumerateInstructions(i18n);
-            onExtensionInstalled(extensionName);
           }}
+          onCreateNewExtensionWithBehavior={
+            onCreateNewExtensionWithBehavior
+              ? () => {
+                  onCreateNewExtensionWithBehavior(project, chosenObject);
+                  setNewBehaviorDialogOpen(false);
+                  onCancel();
+                }
+              : null
+          }
+          shouldShowCapabilityBehaviors={
+            chosenObject && !isSceneObject(chosenObject)
+          }
         />
       )}
       {newExtensionDialogOpen && (
@@ -459,11 +603,11 @@ const InstructionEditorDialog = ({
               onWillInstallExtension={onWillInstallExtension}
               onExtensionInstalled={extensionName => {
                 setNewExtensionDialogOpen(false);
+                onExtensionInstalled(extensionName);
                 freeInstructionComponentRef.current &&
                   freeInstructionComponentRef.current.reEnumerateInstructions(
                     i18n
                   );
-                onExtensionInstalled(extensionName);
               }}
             />
           )}

@@ -16,6 +16,7 @@ class EventsBasedObject;
 class EventsBasedObjectVariant;
 class ArbitraryEventsWorker;
 class ArbitraryEventsWorkerWithContext;
+class ReadOnlyArbitraryEventsWorkerWithContext;
 class ArbitraryEventsFunctionsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventBasedBehaviorsWorker;
@@ -68,6 +69,15 @@ public:
       gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
+   * \brief Call the specified worker on all events of the project (layout and
+   * external events) but not events from extensions (read-only version with
+   * context).
+   */
+  static void ExposeProjectEventsWithoutExtensions(
+      gd::Project &project,
+      gd::ReadOnlyArbitraryEventsWorkerWithContext &worker);
+
+  /**
    * \brief Call the specified worker on all events of a layout and
    * its external events.
    */
@@ -89,6 +99,15 @@ public:
   static void
   ExposeLayoutEventsAndDependencies(gd::Project &project, gd::Layout &layout,
                                     gd::ArbitraryEventsWorker &worker);
+
+  /**
+   * \brief Call the specified worker on all events of a layout and
+   * its dependencies according to EventLink (external events or other layout
+   * events).
+   */
+  static void ExposeLayoutEventsAndDependencies(
+      gd::Project &project, gd::Layout &layout,
+      gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
    * \brief Call the specified worker on all events of the event-based
@@ -113,6 +132,15 @@ public:
       gd::Project &project,
       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       gd::ArbitraryEventsWorkerWithContext &worker);
+
+  /**
+   * \brief Call the specified worker on all events of the event-based
+   * extension (read-only version with context).
+   */
+  static void ExposeEventsFunctionsExtensionEvents(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::ReadOnlyArbitraryEventsWorkerWithContext &worker);
 
   /**
    * \brief Call the specified worker on all events of the event-based
@@ -154,6 +182,16 @@ public:
 
   /**
    * \brief Call the specified worker on all events of the event-based
+   * behavior (read-only version with context).
+   */
+  static void ExposeEventsBasedBehaviorEvents(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
+      gd::ReadOnlyArbitraryEventsWorkerWithContext &worker);
+
+  /**
+   * \brief Call the specified worker on all events of the event-based
    * object.
    *
    * This should be the preferred way to traverse all the events of an
@@ -192,6 +230,28 @@ public:
       gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
+   * \brief Call the specified worker on all events of the event-based
+   * object (read-only version with context).
+   */
+  static void ExposeEventsBasedObjectEvents(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedObject &eventsBasedObject,
+      gd::ReadOnlyArbitraryEventsWorkerWithContext &worker);
+
+  /**
+   * \brief Call the specified worker on all functions of the event-based
+   * extension.
+   *
+   * This should be the preferred way to traverse all the functions of an events
+   * based extension.
+   */
+    static void ExposeEventsFunctionsExtensionFunctions(
+        gd::Project &project,
+        gd::EventsFunctionsExtension &eventsFunctionsExtension,
+        ArbitraryEventsFunctionsWorker &worker);
+
+  /**
    * \brief Call the specified worker on all ObjectContainers of the project
    * (global, layouts...)
    *
@@ -207,6 +267,17 @@ public:
    */
   static void ExposeLayoutObjects(gd::Layout &layout,
                                   gd::ArbitraryObjectsWorker &worker);
+
+  /**
+   * \brief Call the specified worker on all ObjectContainers of the
+   * events-functions extension.
+   *
+   * This should be the preferred way to traverse all the objects of an
+   * events-functions extension.
+   */
+  static void ExposeEventsFunctionsExtensionObjects(
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::ArbitraryObjectsWorker &worker);
 
   /**
    * \brief Call the specified worker on all ObjectContainers of the

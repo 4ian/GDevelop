@@ -210,15 +210,12 @@ const ResourceSelector: React.ComponentType<{
         );
 
         mapVector(
-          // $FlowFixMe[incompatible-exact]
           resourcesContainer.getAllResourceNames(),
           (resourceName, index) => {
             if (
-              // $FlowFixMe[incompatible-type]
               resourcesContainer.getResource(resourceName).getKind() ===
               resourceKind
             ) {
-              // $FlowFixMe[incompatible-type]
               allResourcesNames.add(resourceName);
             }
           }
@@ -226,15 +223,12 @@ const ResourceSelector: React.ComponentType<{
 
         if (fallbackResourceKind) {
           mapVector(
-            // $FlowFixMe[incompatible-exact]
             resourcesContainer.getAllResourceNames(),
             (resourceName, index) => {
               if (
-                // $FlowFixMe[incompatible-type]
                 resourcesContainer.getResource(resourceName).getKind() ===
                 fallbackResourceKind
               ) {
-                // $FlowFixMe[incompatible-type]
                 allResourcesNames.add(resourceName);
               }
             }

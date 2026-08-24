@@ -22,6 +22,7 @@ class SerializerElement;
 class EffectsContainer;
 class AbstractFileSystem;
 class EventsBasedObjectVariant;
+class ExtensionDependencyCache;
 } // namespace gd
 
 namespace gd {
@@ -43,10 +44,11 @@ public:
    * \param element The element where the asset is serialize.
    * \param usedResourceNames Return the names of the resources used by the asset.
    */
-  static void
-  SerializeTo(gd::Project &project, const gd::Object &object,
-              const gd::String &objectFullName, SerializerElement &element,
-              std::vector<gd::String> &usedResourceNames);
+  static void SerializeTo(gd::Project &project, const gd::Object &object,
+                          const gd::String &objectFullName,
+                          SerializerElement &element,
+                          std::vector<gd::String> &usedResourceNames,
+                          ExtensionDependencyCache &extensionDependencyCache);
 
   ~ObjectAssetSerializer(){};
 

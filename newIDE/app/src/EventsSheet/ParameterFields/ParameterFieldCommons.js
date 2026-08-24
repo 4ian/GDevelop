@@ -3,11 +3,14 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 export type ParameterRenderingServiceType = {
   components: any,
   getParameterComponent: (type: string) => any,
   getUserFriendlyTypeName: (rawType: string) => ?MessageDescriptor,
+  renderInlineParameter: (props: ParameterInlineRendererProps) => React.Node,
 };
 
 type CommonProps = {|
@@ -54,6 +57,10 @@ export type ParameterFieldProps = {|
   // The index of the parameter in the instruction or expression.
   parameterIndex?: number,
   onInstructionTypeChanged?: () => void,
+  editEventsFunctionParameter?: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog?:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 export type FieldFocusFunction = (

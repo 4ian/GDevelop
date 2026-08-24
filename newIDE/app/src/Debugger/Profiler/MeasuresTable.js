@@ -2,19 +2,12 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { AutoSizer, Table, Column } from 'react-virtualized';
+import classNames from 'classnames';
 import flatMap from 'lodash/flatMap';
 import { type ProfilerMeasuresSection } from '..';
-import IconButton from '../../UI/IconButton';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
-
-const styles = {
-  indent: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-};
+import classes from './Profiler.module.css';
 
 type Props = {|
   profilerMeasures: ?ProfilerMeasuresSection,
@@ -25,14 +18,30 @@ type ProfilerRowData = {|
   time: string,
   parentPercent: string,
   totalPercent: string,
+  /** The share of the total time, drawn as a bar behind its value. */
+  totalShare: number,
   depth: number,
   hasSubsections: boolean,
   path: string,
   isCollapsed: boolean,
 |};
 
-const MeasuresTable = (props: Props): null | React.Node => {
+const MeasuresTable = ({ profilerMeasures }: Props): null | React.Node => {
   const [collapsedPaths, setCollapsedPaths] = React.useState({});
+
+  const isSectionCollapsed = (path: string) => {
+    // $FlowFixMe[invalid-computed-prop]
+    return !!collapsedPaths[path];
+  };
+
+  const toggleSection = (path: string) => {
+    // $FlowFixMe[incompatible-type]
+    setCollapsedPaths({
+      ...collapsedPaths,
+      // $FlowFixMe[invalid-computed-prop]
+      [path]: !collapsedPaths[path],
+    });
+  };
 
   const convertToDataRows = (
     name: string,
@@ -41,8 +50,6 @@ const MeasuresTable = (props: Props): null | React.Node => {
     depth: number = 0,
     path: string = ''
   ): Array<ProfilerRowData> => {
-    const { profilerMeasures } = props;
-
     const parentPercent =
       parentSection && section.time && parentSection.time !== 0
         ? (section.time / parentSection.time) * 100
@@ -52,13 +59,17 @@ const MeasuresTable = (props: Props): null | React.Node => {
         ? (section.time / profilerMeasures.time) * 100
         : 100;
     const isCollapsed = isSectionCollapsed(path);
+    // A section that was never entered has no time, and so no share of the
+    // time of the frame either.
+    const hasTime = !!section.time;
 
     return [
       {
         name,
-        time: section.time ? `${section.time.toFixed(2)}ms` : '?',
-        parentPercent: `${parentPercent.toFixed(2)}%`,
-        totalPercent: `${totalPercent.toFixed(2)}%`,
+        time: hasTime ? `${section.time.toFixed(2)}ms` : '?',
+        parentPercent: hasTime ? `${parentPercent.toFixed(1)}%` : '-',
+        totalPercent: hasTime ? `${totalPercent.toFixed(1)}%` : '-',
+        totalShare: hasTime ? Math.max(0, Math.min(100, totalPercent)) : 0,
         depth,
         hasSubsections: !!Object.keys(section.subsections).length,
         path,
@@ -78,104 +89,69 @@ const MeasuresTable = (props: Props): null | React.Node => {
     ];
   };
 
-  const isSectionCollapsed = (path: string) => {
-    // $FlowFixMe[invalid-computed-prop]
-    return collapsedPaths[path];
-  };
-
-  const toggleSection = (path: string) => {
-    // $FlowFixMe[incompatible-type]
-    setCollapsedPaths({
-      ...collapsedPaths,
-      // $FlowFixMe[invalid-computed-prop]
-      [path]: !collapsedPaths[path],
-    });
-  };
-
-  const rowClassName = ({ index }: {| index: number |}) => {
-    if (index < 0) {
-      return 'tableHeaderRow';
-    } else {
-      return index % 2 === 0 ? 'tableEvenRow' : 'tableOddRow';
-    }
-  };
-
-  const renderSectionNameCell = ({
-    rowData,
-  }: {|
-    rowData: ProfilerRowData,
-  |}) => {
-    return (
-      <div style={styles.indent}>
-        <div style={{ width: rowData.depth * 8 }} />
-        {rowData.hasSubsections ? (
-          <IconButton onClick={() => toggleSection(rowData.path)}>
-            {rowData.isCollapsed ? (
-              <ChevronArrowRight />
-            ) : (
-              <ChevronArrowBottom />
-            )}
-          </IconButton>
-        ) : (
-          <div style={{ width: 24 }} />
-        )}
-        {/*
-          The name is wrapped in a span to prevent crashes when Google Translate
-          translates the website. See https://github.com/4ian/GDevelop/issues/3453.
-        */}
-        <span>{rowData.name}</span>
-      </div>
-    );
-  };
-
-  const { profilerMeasures } = props;
   if (!profilerMeasures) return null;
 
   const dataRows = convertToDataRows('All', null, profilerMeasures);
 
   return (
-    <AutoSizer>
-      {({ height, width }) => (
-        <Table
-          headerHeight={30}
-          height={height}
-          className={`gd-table`}
-          headerClassName={'tableHeaderColumn'}
-          rowCount={dataRows.length}
-          rowGetter={({ index }) => dataRows[index]}
-          rowHeight={35}
-          onRowClick={() => {}}
-          rowClassName={rowClassName}
-          width={width}
+    <div className={classes.measuresTable}>
+      <div className={classNames(classes.row, classes.headerRow)}>
+        <span className={classes.nameCell}>
+          <Trans>Section name</Trans>
+        </span>
+        <span className={classes.numberCell}>
+          <Trans>Time (ms)</Trans>
+        </span>
+        <span className={classes.numberCell}>
+          <Trans>% of parent</Trans>
+        </span>
+        <span className={classes.numberCell}>
+          <Trans>% of total</Trans>
+        </span>
+      </div>
+      {dataRows.map(row => (
+        <div
+          key={row.path}
+          className={classNames({
+            [classes.row]: true,
+            [classes.bodyRow]: true,
+            [classes.rootRow]: row.depth === 0,
+          })}
+          style={{ '--profiler-share': `${row.totalShare}%` }}
         >
-          <Column
-            label={<Trans>Section name</Trans>}
-            dataKey="name"
-            width={width * 0.4}
-            className={'tableColumn'}
-            cellRenderer={renderSectionNameCell}
-          />
-          <Column
-            label={<Trans>Time (ms)</Trans>}
-            dataKey="time"
-            width={width * 0.2}
-            className={'tableColumn'}
-          />
-          <Column
-            label={<Trans>% of parent</Trans>}
-            dataKey="parentPercent"
-            width={width * 0.2}
-            className={'tableColumn'}
-          />
-          <Column
-            label={<Trans>% of total</Trans>}
-            dataKey="totalPercent"
-            width={width * 0.2}
-            className={'tableColumn'}
-          />
-        </Table>
-      )}
-    </AutoSizer>
+          <span
+            className={classes.nameCell}
+            style={{ paddingLeft: row.depth * 12 }}
+          >
+            {row.hasSubsections ? (
+              <button
+                type="button"
+                className={classes.toggle}
+                onClick={() => toggleSection(row.path)}
+              >
+                {row.isCollapsed ? (
+                  <ChevronArrowRight />
+                ) : (
+                  <ChevronArrowBottom />
+                )}
+              </button>
+            ) : (
+              <span className={classes.togglePlaceholder} />
+            )}
+            {/*
+              The name is wrapped in a span to prevent crashes when Google Translate
+              translates the website. See https://github.com/4ian/GDevelop/issues/3453.
+            */}
+            <span className={classes.name} title={row.name}>
+              {row.name}
+            </span>
+          </span>
+          <span className={classes.numberCell}>{row.time}</span>
+          <span className={classes.numberCell}>{row.parentPercent}</span>
+          <span className={classes.numberCell}>{row.totalPercent}</span>
+        </div>
+      ))}
+    </div>
   );
 };
 

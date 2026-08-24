@@ -195,7 +195,10 @@ export const MockTeamProvider = ({
   noActiveMembers?: boolean,
   teamSize?: number,
 |}): React.Node => {
-  const team = { ...initialTeam, seats: teamSize || initialTeam.seats };
+  const [team, setTeam] = React.useState<Team>({
+    ...initialTeam,
+    seats: teamSize || initialTeam.seats,
+  });
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
   const [userChangeTryCount, setUserChangeTryCount] = React.useState<number>(0);
   const [members, setMembers] = React.useState<?(User[])>(
@@ -503,7 +506,17 @@ export const MockTeamProvider = ({
               onActivateMembers: action('activateMembers'),
               onChangeMemberPassword: changeMemberPassword,
               onSetAdmin: setAdmin,
+              onSetMember: action('setMember'),
               onEditUser: editUser,
+              invitations: null,
+              onRefreshInvitations: async () => {},
+              onUpdateTeam: async attributes => {
+                action('updateTeam')(attributes);
+                setTeam(currentTeam => ({
+                  ...currentTeam,
+                  classrooms: attributes.classrooms,
+                }));
+              },
             }}
           >
             <Text allowSelection>

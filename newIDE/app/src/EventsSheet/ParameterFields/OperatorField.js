@@ -22,7 +22,7 @@ const operatorLabels = {
   Toggle: t`toggle`,
 };
 
-const mapTypeToOperators: { [string]: Array<string> } = {
+export const mapTypeToOperators: { [string]: Array<string> } = {
   // $FlowFixMe[incompatible-type]
   unknown: Object.keys(operatorLabels),
   number: ['=', '+', '-', '*', '/'],
@@ -54,11 +54,11 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     React.useEffect(
       () => {
-        if (comparedValueType !== 'unknown' && !value) {
+        if (!value) {
           onChange(operators[0]);
         }
       },
-      [value, onChange, comparedValueType, operators]
+      [value, onChange, operators]
     );
 
     return (

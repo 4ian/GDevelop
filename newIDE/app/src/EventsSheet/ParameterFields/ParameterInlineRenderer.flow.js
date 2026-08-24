@@ -20,6 +20,7 @@ export type ParameterInlineRendererProps = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   parameterMetadata: gdParameterMetadata,
   value: string,
+  expression: gdExpression,
   expressionIsValid: boolean,
   hasDeprecationWarning: boolean,
   renderObjectThumbnail: string => React.Node,
@@ -27,6 +28,8 @@ export type ParameterInlineRendererProps = {|
   DeprecatedParameterValue: DeprecatedParameterValueProps => React.Node,
   MissingParameterValue: () => React.Node,
   useAssignmentOperators: boolean,
+  highlightedSearchText?: ?string,
+  highlightedSearchMatchCase?: boolean,
 |};
 
 /**

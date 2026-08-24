@@ -33,6 +33,8 @@ export const Default = (): React.Node => (
         'onEventsBasedObjectChildrenEdited'
       )}
       onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+      onWillInstallExtension={action('onWillInstallExtension')}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </DragAndDropContextProvider>
 );
@@ -56,6 +58,8 @@ export const WithoutFunction = (): React.Node => (
         'onEventsBasedObjectChildrenEdited'
       )}
       onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+      onWillInstallExtension={action('onWillInstallExtension')}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </DragAndDropContextProvider>
 );

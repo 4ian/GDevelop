@@ -40,6 +40,7 @@
 #include <GDCore/IDE/Events/EventsTypesLister.h>
 #include <GDCore/IDE/Events/EventsVariablesFinder.h>
 #include <GDCore/IDE/Events/ExpressionCompletionFinder.h>
+#include <GDCore/IDE/Events/ExpressionSyntaxColoringHelper.h>
 #include <GDCore/IDE/Events/ExpressionNodeLocationFinder.h>
 #include <GDCore/IDE/Events/ExpressionTypeFinder.h>
 #include <GDCore/IDE/Events/ExpressionValidator.h>
@@ -51,8 +52,9 @@
 #include <GDCore/IDE/Events/UsedObjectTypeFinder.h>
 #include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
-#include <GDCore/IDE/ObjectVariableHelper.h>
 #include <GDCore/IDE/EventsBasedObjectVariantHelper.h>
+#include <GDCore/IDE/EventsFunctionsExtensionExtractor.h>
+#include <GDCore/IDE/ObjectRefactorer.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>
 #include <GDCore/IDE/Project/ObjectsUsingResourceCollector.h>
@@ -68,6 +70,7 @@
 #include <GDCore/IDE/VariableInstructionSwitcher.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/Project/Behavior.h>
+#include <GDCore/Project/MemoryTrackedRegistry.h>
 #include <GDCore/Project/CustomObjectConfiguration.h>
 #include <GDCore/Project/Effect.h>
 #include <GDCore/Project/EventsBasedBehavior.h>
@@ -76,6 +79,9 @@
 #include <GDCore/Project/EventsFunctionsExtension.h>
 #include <GDCore/Project/ExternalEvents.h>
 #include <GDCore/Project/ExternalLayout.h>
+#include <GDCore/Project/Test.h>
+#include <GDCore/Project/TestsContainer.h>
+#include <GDCore/Project/FunctionFolderOrFunction.h>
 #include <GDCore/Project/InitialInstance.h>
 #include <GDCore/Project/InitialInstancesContainer.h>
 #include <GDCore/Project/Layout.h>
@@ -103,6 +109,7 @@
 #include <GDCore/Serialization/SerializerElement.h>
 #include <GDCore/Serialization/BinarySerializer.h>
 #include <GDCore/IDE/ObjectAssetSerializer.h>
+#include <GDCore/IDE/Events/ExtensionDependencyCache.h>
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
@@ -405,6 +412,17 @@ class ReadOnlyArbitraryEventsWorkerWithContextJS : public ReadOnlyArbitraryEvent
         isCondition,
         (int)&GetProjectScopedContainers());
   }
+
+  virtual void DoOnLaunch(const gd::EventsList &events) {
+    EM_ASM(
+        {
+          var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
+          if (self.hasOwnProperty('doOnLaunch'))
+            self.doOnLaunch(wrapPointer($1, Module['EventsList']));
+        },
+        (int)this,
+        (int)&events);
+  }
 };
 
 class InitialInstanceJSFunctorWrapper : public gd::InitialInstanceFunctor {
@@ -498,6 +516,10 @@ typedef ExpressionCompletionDescription::CompletionKind
     ExpressionCompletionDescription_CompletionKind;
 typedef std::vector<gd::ExpressionCompletionDescription>
     VectorExpressionCompletionDescription;
+typedef ExpressionColorationDescription::ColorationKind
+    ExpressionColorationDescription_ColorationKind;
+typedef std::vector<gd::ExpressionColorationDescription>
+    VectorExpressionColorationDescription;
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
 typedef gd::Variable::Type Variable_Type;
@@ -512,6 +534,7 @@ typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
 typedef std::vector<const gd::PropertyFolderOrProperty*> VectorPropertyFolderOrProperty;
+typedef std::vector<const gd::FunctionFolderOrFunction*> VectorFunctionFolderOrFunction;
 typedef std::vector<gd::Screenshot> VectorScreenshot;
 typedef QuickCustomization::Visibility
     QuickCustomization_Visibility;
@@ -591,6 +614,8 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetSafeName GetSafeName
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(x)
+#define STATIC_SetCanonicalMode SetCanonicalMode
+#define STATIC_IsCanonicalMode IsCanonicalMode
 #define STATIC_SerializeTo SerializeTo
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior
@@ -660,7 +685,9 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents
 #define STATIC_ReplaceStringInEvents ReplaceStringInEvents
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
+#define STATIC_ExposeProjectEventsWithoutExtensions ExposeProjectEventsWithoutExtensions
 #define STATIC_ExposeProjectObjects ExposeProjectObjects
+#define STATIC_ExposeEventsFunctionsExtensionEvents ExposeEventsFunctionsExtensionEvents
 #define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
 #define STATIC_GetResourceTypes GetResourceTypes
 
@@ -718,7 +745,6 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_FillBehaviorParameters FillBehaviorParameters
 #define STATIC_ValidateParameter ValidateParameter
 #define STATIC_IsParameterValid IsParameterValid
-#define STATIC_HasDeprecationWarnings HasDeprecationWarnings
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
 #define STATIC_RemoveLayerInScene RemoveLayerInScene
@@ -735,6 +761,8 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GenerateObjectGetterAndSetter GenerateObjectGetterAndSetter
 #define STATIC_CanGenerateGetterAndSetter CanGenerateGetterAndSetter
 #define STATIC_GenerateConditionSkeleton GenerateConditionSkeleton
+#define STATIC_GenerateExpressionSkeleton GenerateExpressionSkeleton
+#define STATIC_UpdateReturnActionType UpdateReturnActionType
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
 #define STATIC_SanityCheckObjectProperty SanityCheckObjectProperty
@@ -787,8 +815,12 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_MergeVariableContainers MergeVariableContainers
 #define STATIC_FillAnyVariableBetweenObjects FillAnyVariableBetweenObjects
 #define STATIC_ApplyChangesToVariants ApplyChangesToVariants
+#define STATIC_FillMissingGroupVariablesToObject FillMissingGroupVariablesToObject
+#define STATIC_FillMissingGroupBehaviorToObject FillMissingGroupBehaviorToObject
 #define STATIC_ComplyVariantsToEventsBasedObject ComplyVariantsToEventsBasedObject
+#define STATIC_FindAllChildrenCustomObjectType FindAllChildrenCustomObjectType
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
+#define STATIC_UpdateExtensionNameInExtension UpdateExtensionNameInExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior \
   UpdateExtensionNameInEventsBasedBehavior
 #define STATIC_UpdateExtensionNameInEventsBasedObject \
@@ -865,15 +897,18 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_IsObjectLifecycleEventsFunction IsObjectLifecycleEventsFunction
 #define STATIC_IsExtensionLifecycleEventsFunction \
   IsExtensionLifecycleEventsFunction
+#define STATIC_CreateCustomBehaviorForObject CreateCustomBehaviorForObject
 #define STATIC_ShiftSentenceParamIndexes ShiftSentenceParamIndexes
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 #define STATIC_CopyObjectResourcesTo CopyObjectResourcesTo
+#define STATIC_UnserializeResourceFrom UnserializeResourceFrom
 
 #define STATIC_IsExtensionLifecycleEventsFunction \
   IsExtensionLifecycleEventsFunction
 
 #define STATIC_GetCompletionDescriptionsFor GetCompletionDescriptionsFor
+#define STATIC_GetColorationDescriptionsFor GetColorationDescriptionsFor
 #define STATIC_GetType GetType
 #define STATIC_GetNodeAtPosition GetNodeAtPosition
 
@@ -904,6 +939,19 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_FreeBinarySnapshot FreeBinarySnapshot
 #define STATIC_DeserializeBinarySnapshot DeserializeBinarySnapshot
 
+// MemoryTrackedRegistry
+#define STATIC_add add
+#define STATIC_remove remove
+#define STATIC_isDead isDead
+#define STATIC_getDeadCount getDeadCount
+#define STATIC_pruneDead pruneDead
+#define STATIC_getAliveCount getAliveCount
+#define STATIC_getAliveCountForClass getAliveCountForClass
+#define STATIC_getDeadCountForClass getDeadCountForClass
+#define STATIC_setCurrentCallContextId setCurrentCallContextId
+#define STATIC_getDeadContextId getDeadContextId
+#define STATIC_getDeadContextTimeMs getDeadContextTimeMs
+
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout
 #define GetExternalEventsAt GetExternalEvents
@@ -917,6 +965,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
 #define GetVariantAt GetVariant
+#define GetTestAt GetTest
 #define GetEffectAt GetEffect
 #define GetParameterAt GetParameter
 

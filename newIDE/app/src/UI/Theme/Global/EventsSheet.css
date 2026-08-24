@@ -73,10 +73,12 @@
  */
 .gd-events-sheet .large-selectable {
   border: var(--event-sheet-selectable-border) !important;
+  border-radius: 0 2px 2px 0;
 }
 
 .gd-events-sheet .large-selectable.large-selected {
   border: var(--event-sheet-selectable-selected-border) !important;
+  border-radius: 0 2px 2px 0;
 }
 
 /**
@@ -113,6 +115,7 @@
   color: var(--event-sheet-actions-color);
   padding-left: 5px;
   padding-right: 5px;
+  border-radius: 0 2px 2px 0;
   /* Prevent container to growing outside its parent. We don't have a way to prevent an infinitely
      * small action column, but responsive design should avoid the problem on small screens. */
   min-width: 0;
@@ -137,6 +140,12 @@
  * Instructions parameters color scheme
  */
 .gd-events-sheet .instruction-parameter {
+  color: var(--event-sheet-instruction-parameter-base-color);
+}
+
+.gd-events-sheet .instruction-parameter.string,
+.gd-events-sheet .instruction-parameter.resource,
+.gd-events-sheet .instruction-parameter.mouse {
   color: var(--event-sheet-instruction-parameter-base-color);
 }
 
@@ -171,11 +180,18 @@
   font-weight: bold;
 }
 
+.gd-events-sheet .instruction-parameter.objectInExpression {
+  color: var(--event-sheet-instruction-parameter-object-color);
+}
+
 .gd-events-sheet .instruction-parameter.behavior {
   color: var(--event-sheet-instruction-parameter-behavior-color);
 }
 
-.gd-events-sheet .instruction-parameter.operator {
+.gd-events-sheet .instruction-parameter.operator,
+.gd-events-sheet .instruction-parameter.relationalOperator,
+.gd-events-sheet .instruction-parameter.yesorno,
+.gd-events-sheet .instruction-parameter.trueorfalse {
   color: var(--event-sheet-instruction-parameter-operator-color);
 }
 
@@ -228,7 +244,12 @@
   );
   border-bottom: 1px dashed var(--event-sheet-instruction-parameter-error-color);
   min-width: var(--instruction-missing-parameter-min-width);
-  min-height: var(--instruction-missing-parameter-min-height);
+}
+
+.gd-events-sheet .instruction-parameter .instruction-missing-parameter::before {
+  content: "";
+  display: inline-block;
+  height: 1em;
 }
 
 .gd-events-sheet .else-text-container {
@@ -339,4 +360,11 @@
   padding-right: 3px;
   width: 24px;
   height: 24px;
+}
+
+@media only screen and (max-width: 750px) {
+  .gd-events-sheet .large-selectable,
+  .gd-events-sheet .large-selectable.large-selected {
+    border-radius: 0 1px 1px 0;
+  }
 }

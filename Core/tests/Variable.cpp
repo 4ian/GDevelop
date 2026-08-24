@@ -136,4 +136,39 @@ TEST_CASE("Variable", "[common][variables]") {
 
     REQUIRE(variable != otherVariable);
   }
+  SECTION("EnsurePersistentUuid sets missing UUIDs, recursively") {
+    gd::Variable variable;
+    variable.GetChild("MyChild").SetValue(123);
+    variable.GetChild("MyStructureChild").GetChild("MyGrandChild").SetValue(1);
+
+    REQUIRE(variable.GetPersistentUuid() == "");
+
+    variable.EnsurePersistentUuid();
+
+    REQUIRE(variable.GetPersistentUuid() != "");
+    REQUIRE(variable.GetChild("MyChild").GetPersistentUuid() != "");
+    REQUIRE(variable.GetChild("MyStructureChild")
+                .GetChild("MyGrandChild")
+                .GetPersistentUuid() != "");
+  }
+  SECTION("EnsurePersistentUuid preserves existing UUIDs") {
+    gd::Variable variable;
+    variable.GetChild("MyChild").SetValue(123);
+    variable.ResetPersistentUuid();
+
+    const gd::String uuid = variable.GetPersistentUuid();
+    const gd::String childUuid =
+        variable.GetChild("MyChild").GetPersistentUuid();
+    REQUIRE(uuid != "");
+    REQUIRE(childUuid != "");
+
+    // A new child, without a UUID, is added.
+    variable.GetChild("MyNewChild").SetValue(456);
+
+    variable.EnsurePersistentUuid();
+
+    REQUIRE(variable.GetPersistentUuid() == uuid);
+    REQUIRE(variable.GetChild("MyChild").GetPersistentUuid() == childUuid);
+    REQUIRE(variable.GetChild("MyNewChild").GetPersistentUuid() != "");
+  }
 }

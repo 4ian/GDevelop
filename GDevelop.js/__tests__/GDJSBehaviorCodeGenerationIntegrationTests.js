@@ -325,6 +325,59 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     expect(behavior._getMyIdentifier()).toBe(456);
   });
 
+  it('Can use a shared property in a variable action', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    eventsBasedBehavior
+      .getSharedPropertyDescriptors()
+      .insertNew('MySharedProperty', 0)
+      .setValue('123')
+      .setType('Number');
+
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MySharedProperty', '=', '456'],
+          },
+        ],
+      },
+    ]);
+    eventsBasedBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
+
+    const { runtimeScene, behavior } = generatedBehavior(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      { logCode: false }
+    );
+
+    // Check the default value is set.
+    expect(behavior._sharedData._getMySharedProperty()).toBe(123);
+
+    behavior.MyFunction();
+    expect(behavior._sharedData._getMySharedProperty()).toBe(456);
+  });
+
   it('Can use a property in a variable condition', () => {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const scene = project.insertNewLayout('MyScene', 0);
@@ -434,6 +487,80 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
           {
             type: { value: 'NumberVariable' },
             parameters: ['MyIdentifier', '=', '123'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyVariable', '=', '456'],
+          },
+        ],
+      },
+    ]);
+    eventsBasedBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
+
+    const { runtimeScene, behavior } = generatedBehavior(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      { logCode: false }
+    );
+
+    // Check the default value is set.
+    expect(
+      runtimeScene
+        .getVariablesForExtension('MyExtension')
+        .get('MyVariable')
+        .getAsNumber()
+    ).toBe(0);
+
+    behavior.MyFunction();
+    expect(
+      runtimeScene
+        .getVariablesForExtension('MyExtension')
+        .get('MyVariable')
+        .getAsNumber()
+    ).toBe(456);
+  });
+
+  it('Can use a shared property in a variable condition', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const scene = project.insertNewLayout('MyScene', 0);
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    eventsBasedBehavior
+      .getSharedPropertyDescriptors()
+      .insertNew('MySharedProperty', 0)
+      .setValue('123')
+      .setType('Number');
+
+    eventsFunctionsExtension
+      .getSceneVariables()
+      .insertNew('MyVariable', 0)
+      .setValue(0);
+
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'NumberVariable' },
+            parameters: ['MySharedProperty', '=', '123'],
           },
         ],
         actions: [

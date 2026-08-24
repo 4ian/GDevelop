@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { Trans, t } from '@lingui/macro';
-import { mapFor } from '../../Utils/MapFor';
+import { mapReverseFor } from '../../Utils/MapFor';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -39,7 +39,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const layersSource = layout || eventsBasedObject;
     const layersContainer = layersSource ? layersSource.getLayers() : null;
     const layerNames = layersContainer
-      ? mapFor(0, layersContainer.getLayersCount(), i => {
+      ? mapReverseFor(0, layersContainer.getLayersCount(), i => {
           const layer = layersContainer.getLayerAt(i);
           return layer.getName();
         })

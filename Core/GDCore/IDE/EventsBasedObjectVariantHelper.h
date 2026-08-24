@@ -5,6 +5,9 @@
  */
 #pragma once
 
+#include "GDCore/String.h"
+#include <vector>
+
 namespace gd {
 class EventsBasedObject;
 class Project;
@@ -21,6 +24,16 @@ public:
   static void
   ComplyVariantsToEventsBasedObject(const gd::Project &project,
                                     gd::EventsBasedObject &eventsBasedObject);
+
+  static std::vector<gd::String> FindAllChildrenCustomObjectType(
+      const gd::Project &project,
+      const gd::EventsBasedObject &eventsBasedObject);
+
+private:
+  static void FindAllChildrenCustomObjectType(
+      const gd::Project &project,
+      const gd::EventsBasedObject &eventsBasedObject,
+      std::vector<gd::String> &objectTypes);
 };
 
 } // namespace gd

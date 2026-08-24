@@ -96,7 +96,7 @@ export default function BottomButtons({
                               : addButtonTooltipLabelMouse
                           )}
                         >
-                          <Trans>Add a new event</Trans>
+                          + <Trans>Add a new event</Trans>
                         </button>
                       }
                       // $FlowFixMe[incompatible-type]
@@ -107,7 +107,7 @@ export default function BottomButtons({
                     <ElementWithMenu
                       element={
                         <button style={styles.addButton} className="add-link">
-                          <Trans>Add...</Trans>
+                          + <Trans>Add...</Trans>
                         </button>
                       }
                       // $FlowFixMe[incompatible-type]

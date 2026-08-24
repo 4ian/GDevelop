@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import Toggle from '../../UI/Toggle';
@@ -19,7 +18,7 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import { Column, Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
-import Window from '../../Utils/Window';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { getExtraInstructionInformation } from '../../Hints';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
@@ -41,6 +40,7 @@ import {
 } from '../ParameterFields/ParameterFieldCommons';
 import Edit from '../../UI/CustomSvgIcons/Edit';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -91,6 +91,9 @@ type Props = {|
   ) => void,
   noHelpButton?: boolean,
   id?: string,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 const isParameterVisible = (
@@ -137,6 +140,7 @@ const InstructionParametersEditor: React.ComponentType<{
       openInstructionOrExpression,
       resourceManagementProps,
       id,
+      openEventsBasedEntityPropertyEditorDialog,
     },
     ref
   ) => {
@@ -148,6 +152,7 @@ const InstructionParametersEditor: React.ComponentType<{
     const preferences = React.useContext(PreferencesContext);
     const showDeprecatedInstructionWarning =
       preferences.values.showDeprecatedInstructionWarning;
+    const { showConfirmation } = useAlertDialog();
 
     const forceUpdate = useForceUpdate();
 
@@ -200,13 +205,12 @@ const InstructionParametersEditor: React.ComponentType<{
       focus,
     }));
 
-    const openExtension = (i18n: I18nType) => {
+    const openExtension = async () => {
       if (isDirty) {
-        const answer = Window.showConfirmDialog(
-          i18n._(
-            t`You've made some changes here. Are you sure you want to discard them and open the function?`
-          )
-        );
+        const answer = await showConfirmation({
+          title: t`Discard changes?`,
+          message: t`You've made some changes here. Are you sure you want to discard them and open the function?`,
+        });
         if (!answer) return;
       }
 
@@ -435,6 +439,9 @@ const InstructionParametersEditor: React.ComponentType<{
                             firstVisibleField.current = field;
                           }
                         }}
+                        openEventsBasedEntityPropertyEditorDialog={
+                          openEventsBasedEntityPropertyEditorDialog
+                        }
                       />
                     );
                   })}
@@ -488,7 +495,7 @@ const InstructionParametersEditor: React.ComponentType<{
                         )
                       }
                       onClick={() => {
-                        openExtension(i18n);
+                        openExtension();
                       }}
                       leftIcon={<Edit />}
                     />

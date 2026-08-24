@@ -1,0 +1,84 @@
+.container {
+  padding: 12px 16px;
+}
+
+.emptyCircle {
+  width: 6px;
+  height: 6px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.5;
+}
+
+.filledCircle {
+  width: 6px;
+  height: 6px;
+  background-color: currentColor;
+  border-radius: 50%;
+}
+
+.statusIconContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 20px;
+  gap: 2px; /* breathing room between icon and line below */
+}
+
+/* Fixed-size wrapper so all status icons occupy the same height, preventing
+   row height variation between circle (6px) and check (14px). */
+.statusIconFixed {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.taskRow {
+  padding: 4px 0;
+}
+
+.taskRowHeader {
+  display: flex;
+  align-items: flex-start;
+}
+
+.taskRowClickable:hover {
+  opacity: 0.8;
+}
+
+.chevron {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  opacity: 0.6;
+  padding: 0 2px;
+}
+
+.functionCallsContainer {
+  margin-top: 4px;
+  padding-left: 16px;
+}
+
+.descriptionContainer {
+  margin-top: 4px;
+  padding-left: 20px;
+}
+
+.tasksContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.lineSegmentBottom {
+  flex: 1;
+  width: 2px;
+  background-color: currentColor;
+  opacity: 0.2;
+  /* -4px bridges the full inter-row gap: taskRow's 4px bottom padding
+     + next taskRow's 4px top padding, so the line reaches the next row's
+     container top. The next container's padding-top: 4px then provides
+     the breathing room before the icon. */
+  margin-bottom: -8px;
+}

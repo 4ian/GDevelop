@@ -57,7 +57,7 @@ const ObjectGroupVariablesDialog = ({
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
     () =>
-      gd.ObjectVariableHelper.mergeVariableContainers(
+      gd.ObjectRefactorer.mergeVariableContainers(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         objectGroup
       )
@@ -69,7 +69,12 @@ const ObjectGroupVariablesDialog = ({
   } = useSerializableObjectCancelableEditor({
     serializableObject: groupVariablesContainer,
     onCancel: () => {},
-    resetThenClearPersistentUuid: true,
+    // The merged container is a temporary object, but its variables keep the
+    // persistent UUIDs of the variables of the first object of the group -
+    // they must be preserved (only set for variables not having one yet), as
+    // they can be copied to the objects of the group when applying changes,
+    // are persisted in the project file and so must stay stable.
+    ensurePersistentUuids: true,
   });
 
   const apply = async () => {
@@ -105,14 +110,13 @@ const ObjectGroupVariablesDialog = ({
     const { eventsBasedObject } = projectScopedContainersAccessor.getScope();
     if (eventsBasedObject) {
       for (const objectName of objectGroup.getAllObjectsNames().toJSArray()) {
-        gd.ObjectVariableHelper.applyChangesToVariants(
+        gd.ObjectRefactorer.applyChangesToVariants(
           eventsBasedObject,
           objectName,
           changeset
         );
       }
     }
-    groupVariablesContainer.clearPersistentUuid();
   };
 
   const lastSelectedVariableNodeId = React.useRef<string | null>(null);

@@ -25,6 +25,11 @@ export const enumerateEventsFunctionsExtensions = (
     project.getEventsFunctionsExtensionAt(i)
   );
 
+export const enumerateGameplayTests = (project: gdProject): Array<gdTest> =>
+  mapFor(0, project.getTests().getTestsCount(), i =>
+    project.getTests().getTestAt(i)
+  );
+
 export const filterProjectItemsList = <T>(
   list: Array<T>,
   searchText: string

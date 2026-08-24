@@ -555,6 +555,11 @@ namespace gdjs {
     }
 
     resumeAllActiveSounds(): void {
+      // Mobile OSes (notably iOS) suspend the WebAudio context in the background and never resume it on their own, which would leave every sound silent on return.
+      const audioContext = Howler.ctx;
+      if (audioContext) {
+        audioContext.resume().catch(() => {});
+      }
       try {
         for (let i = 0; i < this._pausedSounds.length; i++) {
           const sound = this._pausedSounds[i];
@@ -562,7 +567,8 @@ namespace gdjs {
             sound.play();
           }
         }
-      } catch (error) {
+      } catch (e) {
+        const error = e as Error;
         if (
           error.message &&
           typeof error.message === 'string' &&
@@ -690,6 +696,31 @@ namespace gdjs {
       return sound;
     }
 
+    private static playedSoundsLogMaxSize = 500;
+    /** The sounds/musics played while the log is enabled, in play order -
+     * see `setPlayedSoundsLogEnabled`. */
+    private _playedSoundsLog: Array<{
+      soundName: string;
+      isMusic: boolean;
+    }> | null = null;
+
+    /**
+     * Enable (clearing any previous entries) or disable the recording of
+     * the played sounds and musics, read with `getPlayedSoundsLog`.
+     * Used by gameplay tests to check that a sound was played.
+     */
+    setPlayedSoundsLogEnabled(enable: boolean): void {
+      this._playedSoundsLog = enable ? [] : null;
+    }
+
+    /**
+     * The sounds and musics played since the log was enabled (capped),
+     * oldest first. Empty when the log is not enabled.
+     */
+    getPlayedSoundsLog(): Array<{ soundName: string; isMusic: boolean }> {
+      return this._playedSoundsLog || [];
+    }
+
     /**
      * Creates a new gdjs.HowlerSound using preloaded/cached Howl instances.
      * @param soundName The name of the file or resource to play.
@@ -705,6 +736,12 @@ namespace gdjs {
       loop: boolean,
       rate: float
     ): HowlerSound {
+      if (
+        this._playedSoundsLog &&
+        this._playedSoundsLog.length < HowlerSoundManager.playedSoundsLogMaxSize
+      ) {
+        this._playedSoundsLog.push({ soundName, isMusic });
+      }
       const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;
       const resource = this._getAudioResource(soundName);
 

@@ -5,7 +5,9 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
+import CompactSearchBar, {
+  type CompactSearchBarInterface,
+} from '../UI/CompactSearchBar';
 import GlobalVariablesDialog from '../VariablesList/GlobalVariablesDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -65,6 +67,13 @@ import {
   type ExternalLayoutTreeViewItemProps,
   type ExternalLayoutTreeViewItemCallbacks,
 } from './ExternalLayoutTreeViewItemContent';
+import {
+  GameplayTestTreeViewItemContent,
+  getGameplayTestTreeViewItemId,
+  type GameplayTestTreeViewItemProps,
+  type GameplayTestTreeViewItemCallbacks,
+} from './GameplayTestTreeViewItemContent';
+import { DEFAULT_GAMEPLAY_TEST_SOURCE } from '../GameplayTests/DefaultGameplayTestSource';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
@@ -105,11 +114,15 @@ export const externalEventsRootFolderId: string = getProjectManagerItemId(
 export const externalLayoutsRootFolderId: string = getProjectManagerItemId(
   'external-layout'
 );
+export const gameplayTestsRootFolderId: string = getProjectManagerItemId(
+  'gameplay-tests'
+);
 
 const scenesEmptyPlaceholderId = 'scenes-placeholder';
 const extensionsEmptyPlaceholderId = 'extensions-placeholder';
 const externalEventsEmptyPlaceholderId = 'external-events-placeholder';
 const externalLayoutEmptyPlaceholderId = 'external-layout-placeholder';
+const gameplayTestsEmptyPlaceholderId = 'gameplay-tests-placeholder';
 
 const styles = {
   listContainer: {
@@ -249,8 +262,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
@@ -340,8 +352,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     this.onClickCallback();
   }
 
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
@@ -421,6 +432,7 @@ type Props = {|
   ...ExtensionTreeViewItemCallbacks,
   ...ExternalEventsTreeViewItemCallbacks,
   ...ExternalLayoutTreeViewItemCallbacks,
+  ...GameplayTestTreeViewItemCallbacks,
   onOpenResources: () => void,
   onReloadEventsFunctionsExtensions: () => void,
   isOpen: boolean,
@@ -456,14 +468,18 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onDeleteExternalEvents,
       onDeleteExternalLayout,
       onDeleteEventsFunctionsExtension,
+      onDeleteGameplayTest,
       onRenameLayout,
       onRenameExternalEvents,
       onRenameExternalLayout,
       onRenameEventsFunctionsExtension,
+      onRenameGameplayTest,
       onOpenLayout,
       onOpenExternalEvents,
       onOpenExternalLayout,
       onOpenEventsFunctionsExtension,
+      onOpenGameplayTest,
+      onRunGameplayTest,
       onOpenResources,
       onReloadEventsFunctionsExtensions,
       isOpen,
@@ -598,7 +614,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const onOpenLayoutProperties = React.useCallback((layout: ?gdLayout) => {
       setEditedPropertiesLayout(layout);
     }, []);
-    const onOpenLayoutVariables = React.useCallback((layout: ?gdLayout) => {
+    const openSceneVariables = React.useCallback((layout: ?gdLayout) => {
       setEditedVariablesLayout(layout);
     }, []);
 
@@ -615,7 +631,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     ] = React.useState(null);
     const [openedExtensionName, setOpenedExtensionName] = React.useState(null);
 
-    const searchBarRef = React.useRef<?SearchBarInterface>(null);
+    const searchBarRef = React.useRef<?CompactSearchBarInterface>(null);
 
     React.useImperativeHandle(ref, () => ({
       forceUpdateList: () => {
@@ -788,6 +804,35 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [project, onProjectItemModified, editName, scrollToItem]
     );
 
+    const addGameplayTest = React.useCallback(
+      (index: number, i18n: I18nType) => {
+        if (!project) return;
+
+        const newName = newNameGenerator(i18n._(t`Untitled test`), name =>
+          project.getTests().hasTestNamed(name)
+        );
+        const newTest = project.getTests().insertNewTest(newName, index + 1);
+        newTest.setSource(DEFAULT_GAMEPLAY_TEST_SOURCE);
+        onProjectItemModified();
+
+        const gameplayTestItemId = getGameplayTestTreeViewItemId(newTest);
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems([
+            gameplayTestItemId,
+            gameplayTestsRootFolderId,
+          ]);
+        }
+        // Scroll to the new test (after a new render was done).
+        setTimeout(() => {
+          scrollToItem(gameplayTestItemId);
+        }, 100); // A few ms is enough for a new render to be done.
+
+        // We focus it so the user can edit the name directly.
+        editName(gameplayTestItemId);
+      },
+      [project, onProjectItemModified, editName, scrollToItem]
+    );
+
     const addExternalLayout = React.useCallback(
       (index: number, i18n: I18nType) => {
         if (!project) return;
@@ -904,7 +949,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               onRenameLayout,
               onOpenLayout,
               onOpenLayoutProperties,
-              onOpenLayoutVariables,
+              openSceneVariables,
             }
           : null,
       [
@@ -922,7 +967,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onRenameLayout,
         onOpenLayout,
         onOpenLayoutProperties,
-        onOpenLayoutVariables,
+        openSceneVariables,
       ]
     );
 
@@ -1034,13 +1079,50 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ]
     );
 
+    const gameplayTestTreeViewItemProps = React.useMemo<?GameplayTestTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              project,
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              editName,
+              scrollToItem,
+              onDeleteGameplayTest,
+              onRenameGameplayTest,
+              onOpenGameplayTest,
+              onRunGameplayTest,
+            }
+          : null,
+      [
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        onDeleteGameplayTest,
+        onRenameGameplayTest,
+        onOpenGameplayTest,
+        onRunGameplayTest,
+      ]
+    );
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         return !project ||
           !sceneTreeViewItemProps ||
           !extensionTreeViewItemProps ||
           !externalEventsTreeViewItemProps ||
-          !externalLayoutTreeViewItemProps
+          !externalLayoutTreeViewItemProps ||
+          !gameplayTestTreeViewItemProps
           ? []
           : [
               {
@@ -1234,15 +1316,54 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   );
                 },
               },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  gameplayTestsRootFolderId,
+                  i18n._(t`Gameplay tests`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Add a gameplay test`),
+                    click: () => {
+                      const index = project.getTests().getTestsCount() - 1;
+                      addGameplayTest(index, i18n);
+                    },
+                    id: 'add-new-gameplay-test-button',
+                  }
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  if (project.getTests().getTestsCount() === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        gameplayTestsEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new gameplay test.`)
+                      ),
+                    ];
+                  }
+                  return mapFor(
+                    0,
+                    project.getTests().getTestsCount(),
+                    i =>
+                      new LeafTreeViewItem(
+                        new GameplayTestTreeViewItemContent(
+                          project.getTests().getTestAt(i),
+                          gameplayTestTreeViewItemProps
+                        )
+                      )
+                  );
+                },
+              },
             ];
       },
       [
         addExternalEvents,
         addExternalLayout,
+        addGameplayTest,
         addNewScene,
         extensionTreeViewItemProps,
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
+        gameplayTestTreeViewItemProps,
         onOpenGamesDashboardDialog,
         onOpenResources,
         openProjectProperties,
@@ -1309,13 +1430,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       extensionsRootFolderId,
       externalEventsRootFolderId,
       externalLayoutsRootFolderId,
+      gameplayTestsRootFolderId,
     ];
 
     const [
       selectedMainMenuItemIndices,
       setSelectedMainMenuItemIndices,
-      // $FlowFixMe[missing-empty-array-annot]
-    ] = React.useState([]);
+    ] = React.useState<Array<number>>([]);
     const isNavigatingInMainMenuItem = selectedMainMenuItemIndices.length > 0;
     const shouldHideMainMenu = isMacLike() && !!electron;
 
@@ -1355,10 +1476,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             {!isNavigatingInMainMenuItem && project && (
               <Line noMargin>
                 <Column expand>
-                  <SearchBar
+                  <CompactSearchBar
                     ref={searchBarRef}
                     value={searchText}
-                    onRequestSearch={() => {}}
                     onChange={setSearchText}
                     placeholder={t`Search in project`}
                   />
@@ -1383,6 +1503,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                           // $FlowFixMe[incompatible-type]
                           // $FlowFixMe[incompatible-exact]
                           <TreeView
+                            enableStickyAncestors
                             key={listKey}
                             ref={treeViewRef}
                             items={getTreeViewData(i18n)}
@@ -1465,6 +1586,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       }}
                       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                       isListLocked={false}
+                      initiallySelectedVariable={null}
                     />
                   )}
                   {!!editedPropertiesLayout &&
@@ -1480,7 +1602,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         }}
                         onClose={() => onOpenLayoutProperties(null)}
                         onEditVariables={() => {
-                          onOpenLayoutVariables(editedPropertiesLayout);
+                          openSceneVariables(editedPropertiesLayout);
                           onOpenLayoutProperties(null);
                         }}
                         resourceManagementProps={resourceManagementProps}
@@ -1497,13 +1619,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       open
                       project={project}
                       layout={editedVariablesLayout}
-                      onCancel={() => onOpenLayoutVariables(null)}
+                      onCancel={() => openSceneVariables(null)}
                       onApply={() => {
                         triggerUnsavedChanges();
-                        onOpenLayoutVariables(null);
+                        openSceneVariables(null);
                       }}
                       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                       isListLocked={false}
+                      initiallySelectedVariable={null}
                     />
                   )}
                   {project && extensionsSearchDialogOpen && (
@@ -1511,7 +1634,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       project={project}
                       onClose={() => setExtensionsSearchDialogOpen(false)}
                       onWillInstallExtension={onWillInstallExtension}
-                      onCreateNew={() => {
+                      onCreateNewExtension={() => {
                         onCreateNewExtension(project, i18n);
                       }}
                       onExtensionInstalled={onExtensionInstalled}

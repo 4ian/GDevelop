@@ -26,6 +26,7 @@ type DraggableEditorTabsProps = {|
   onCloseTab: (editor: EditorTab) => void,
   onCloseOtherTabs: (editor: EditorTab) => void,
   onCloseAll: () => void,
+  onPopOutTab?: ?(editor: EditorTab) => void,
   onTabActivated: (editor: EditorTab) => void,
   onDropTab: (fromIndex: number, toHoveredIndex: number) => void,
   onHoverTab: (
@@ -47,11 +48,16 @@ export function DraggableEditorTabs({
   onCloseTab,
   onCloseOtherTabs,
   onCloseAll,
+  onPopOutTab,
   onTabActivated,
   onDropTab,
   onHoverTab,
 }: DraggableEditorTabsProps): React.Node {
-  let draggedTabIndex: ?number = null;
+  // Kept in a ref (not a plain variable) so the index survives any re-render
+  // happening between the drag start and the drop (tooltip hover timeouts, the
+  // Ask AI glow interval, window resize...). Otherwise it would be reset to null
+  // mid-drag and the drop would be silently ignored.
+  const draggedTabIndexRef = React.useRef<?number>(null);
 
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
@@ -102,7 +108,7 @@ export function DraggableEditorTabs({
               label={editorTab.label}
               icon={editorTab.icon}
               renderCustomIcon={editorTab.renderCustomIcon}
-              key={editorTab.key}
+              key={editorTab.id}
               id={getTabId(editorTab)}
               data={
                 editorTab.tabOptions ? editorTab.tabOptions.data : undefined
@@ -112,6 +118,17 @@ export function DraggableEditorTabs({
               onClose={() => onCloseTab(editorTab)}
               onCloseOthers={() => onCloseOtherTabs(editorTab)}
               onCloseAll={onCloseAll}
+              onPopOut={
+                onPopOutTab && editorTab.closable
+                  ? () => onPopOutTab(editorTab)
+                  : null
+              }
+              popOutEnabled={
+                // For now, don't allow popping out anything that can have a 3D editor shown.
+                editorTab.kind !== 'layout' &&
+                editorTab.kind !== 'external layout' &&
+                editorTab.kind !== 'custom object'
+              }
               onHover={(
                 enter: boolean,
                 options: {| isLabelTruncated: boolean |}
@@ -119,13 +136,13 @@ export function DraggableEditorTabs({
               onActivated={() => onTabActivated(editorTab)}
               closable={editorTab.closable}
               onBeginDrag={() => {
-                draggedTabIndex = id;
+                draggedTabIndexRef.current = id;
                 return editorTab;
               }}
               onDrop={toHoveredIndex => {
-                if (typeof draggedTabIndex === 'number') {
-                  onDropTab(draggedTabIndex, id);
-                  draggedTabIndex = null;
+                if (typeof draggedTabIndexRef.current === 'number') {
+                  onDropTab(draggedTabIndexRef.current, id);
+                  draggedTabIndexRef.current = null;
                 }
               }}
               maxWidth={maxWidth}
@@ -152,6 +169,8 @@ export function DraggableClosableTab({
   onClose,
   onCloseOthers,
   onCloseAll,
+  onPopOut,
+  popOutEnabled,
   label,
   icon,
   renderCustomIcon,
@@ -194,6 +213,8 @@ export function DraggableClosableTab({
                   onClose={onClose}
                   onCloseOthers={onCloseOthers}
                   onCloseAll={onCloseAll}
+                  onPopOut={onPopOut}
+                  popOutEnabled={popOutEnabled}
                   label={label}
                   icon={icon}
                   renderCustomIcon={renderCustomIcon}

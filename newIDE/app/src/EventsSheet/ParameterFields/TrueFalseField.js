@@ -73,6 +73,9 @@ export const renderInlineTrueFalse = ({
   value,
   parameterMetadata,
 }: ParameterInlineRendererProps): React.Node => {
+  // This is duplicated in `EventsCodeGenerator::GenerateParameterCodes`,
+  // `AdvancedExtension.cpp` for GDJS and
+  // `InstructionSentenceFormatter::GetFormattedParameterValue`.
   if (getParameterValueOrDefault(value, parameterMetadata) === 'True') {
     return <Trans>true</Trans>;
   } else {

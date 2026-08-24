@@ -85,6 +85,7 @@ import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -670,10 +671,25 @@ const VariablesList: React.ComponentType<{
   ...Props,
   +ref?: React.RefSetter<VariablesListInterface>,
 }> = React.forwardRef<Props, VariablesListInterface>((props, ref) => {
+  // The variables containers can be destroyed on the C++ side while this
+  // component is still mounted (e.g. when the object owning them is deleted
+  // or re-created by a change made outside the editor). Guard them once here:
+  // the nullable typing forces every usage to handle the dead case - in which
+  // case the component renders nothing (the parent editor is responsible for
+  // re-rendering or unmounting it).
+  const aliveVariablesContainer = exceptionallyGuardAgainstDeadObject(
+    props.variablesContainer
+  );
+  const aliveInheritedVariablesContainer = props.inheritedVariablesContainer
+    ? exceptionallyGuardAgainstDeadObject(props.inheritedVariablesContainer)
+    : null;
+
   const historyRef = useRefWithInit(() =>
-    getHistoryInitialState(props.variablesContainer, {
-      historyMaxSize: 50,
-    })
+    aliveVariablesContainer
+      ? getHistoryInitialState(aliveVariablesContainer, {
+          historyMaxSize: 50,
+        })
+      : null
   );
 
   const {
@@ -731,12 +747,12 @@ const VariablesList: React.ComponentType<{
   );
   const [selectedNodes, doSetSelectedNodes] = React.useState<Array<string>>(
     () => {
-      if (!props.initiallySelectedVariableName) {
+      if (!props.initiallySelectedVariableName || !aliveVariablesContainer) {
         return [];
       }
       let variableContext = getVariableContextFromNodeId(
         getNodeIdFromVariableName(props.initiallySelectedVariableName),
-        props.variablesContainer
+        aliveVariablesContainer
       );
       // When a child-variable is not declared, its direct parent is used.
       if (!variableContext.variable) {
@@ -766,14 +782,12 @@ const VariablesList: React.ComponentType<{
 
   const triggerSearch = React.useCallback(
     () => {
-      // $FlowFixMe[missing-empty-array-annot]
-      let matchingInheritedNodes = [];
+      let matchingInheritedNodes: Array<string> = [];
       const matchingNodes = generateListOfNodesMatchingSearchInVariablesContainer(
         props.variablesContainer,
         normalizeString(searchText)
       );
       if (props.inheritedVariablesContainer) {
-        // $FlowFixMe[incompatible-type]
         matchingInheritedNodes = generateListOfNodesMatchingSearchInVariablesContainer(
           props.inheritedVariablesContainer,
           normalizeString(searchText),
@@ -797,9 +811,10 @@ const VariablesList: React.ComponentType<{
   );
 
   const shouldHideExpandIcons =
-    !hasVariablesContainerSubChildren(props.variablesContainer) &&
-    (props.inheritedVariablesContainer
-      ? !hasVariablesContainerSubChildren(props.inheritedVariablesContainer)
+    !!aliveVariablesContainer &&
+    !hasVariablesContainerSubChildren(aliveVariablesContainer) &&
+    (aliveInheritedVariablesContainer
+      ? !hasVariablesContainerSubChildren(aliveInheritedVariablesContainer)
       : true);
 
   const rowRightSideStyle = React.useMemo(
@@ -816,20 +831,21 @@ const VariablesList: React.ComponentType<{
     [containerWidth, props.size]
   );
 
-  const undefinedVariableNames = allVariablesNames
-    ? allVariablesNames.filter(variableName => {
-        return (
-          !props.variablesContainer.has(variableName) &&
-          (!props.inheritedVariablesContainer ||
-            !props.inheritedVariablesContainer.has(variableName))
-        );
-      })
-    : [];
+  const undefinedVariableNames =
+    allVariablesNames && aliveVariablesContainer
+      ? allVariablesNames.filter(variableName => {
+          return (
+            !aliveVariablesContainer.has(variableName) &&
+            (!aliveInheritedVariablesContainer ||
+              !aliveInheritedVariablesContainer.has(variableName))
+          );
+        })
+      : [];
 
   const _onChange = React.useCallback(
     () => {
       if (historyHandler) historyHandler.saveToHistory();
-      else
+      else if (historyRef.current)
         historyRef.current = saveToHistory(
           historyRef.current,
           variablesContainer
@@ -842,7 +858,7 @@ const VariablesList: React.ComponentType<{
   const _undo = React.useCallback(
     () => {
       if (historyHandler) historyHandler.undo();
-      else
+      else if (historyRef.current)
         historyRef.current = undo(historyRef.current, props.variablesContainer);
       setSelectedNodes([]);
     },
@@ -852,7 +868,7 @@ const VariablesList: React.ComponentType<{
   const _redo = React.useCallback(
     () => {
       if (historyHandler) historyHandler.redo();
-      else
+      else if (historyRef.current)
         historyRef.current = redo(historyRef.current, props.variablesContainer);
       setSelectedNodes([]);
     },
@@ -862,17 +878,12 @@ const VariablesList: React.ComponentType<{
   const _canUndo = (): boolean =>
     props.historyHandler
       ? props.historyHandler.canUndo()
-      : canUndo(historyRef.current);
+      : !!historyRef.current && canUndo(historyRef.current);
 
   const _canRedo = (): boolean =>
     props.historyHandler
       ? props.historyHandler.canRedo()
-      : canRedo(historyRef.current);
-
-  const keyboardShortcuts = new KeyboardShortcuts({
-    isActive: () => true,
-    shortcutCallbacks: { onUndo: _undo, onRedo: _redo },
-  });
+      : !!historyRef.current && canRedo(historyRef.current);
 
   const copySelection = React.useCallback(
     () => {
@@ -918,6 +929,12 @@ const VariablesList: React.ComponentType<{
   const pasteClipboardContent = React.useCallback(
     () => {
       if (!Clipboard.has(CLIPBOARD_KIND)) return;
+      const variablesContainer = exceptionallyGuardAgainstDeadObject(
+        props.variablesContainer
+      );
+      if (!variablesContainer) {
+        return;
+      }
       const newSelectedNodes = [];
 
       const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
@@ -951,10 +968,10 @@ const VariablesList: React.ComponentType<{
           if (props.isListLocked) return;
           if (!name) return;
           const { name: newName } = insertInVariablesContainer(
-            props.variablesContainer,
+            variablesContainer,
             gd.Project.getSafeName(name),
             serializedVariable,
-            props.variablesContainer.count(),
+            variablesContainer.count(),
             props.inheritedVariablesContainer
           );
           newSelectedNodes.push(newName);
@@ -965,10 +982,7 @@ const VariablesList: React.ComponentType<{
           const {
             name: targetVariableName,
             lineage: targetVariableLineage,
-          } = getVariableContextFromNodeId(
-            targetNode,
-            props.variablesContainer
-          );
+          } = getVariableContextFromNodeId(targetNode, variablesContainer);
           if (!targetVariableName) return;
 
           const targetParentVariable = getDirectParentVariable(
@@ -978,10 +992,10 @@ const VariablesList: React.ComponentType<{
             if (props.isListLocked) return;
             if (!name) return;
             const { name: newName } = insertInVariablesContainer(
-              props.variablesContainer,
+              variablesContainer,
               name,
               serializedVariable,
-              props.variablesContainer.getPosition(targetVariableName) + 1,
+              variablesContainer.getPosition(targetVariableName) + 1,
               props.inheritedVariablesContainer
             );
             newSelectedNodes.push(newName);
@@ -1143,6 +1157,56 @@ const VariablesList: React.ComponentType<{
       props.isListLocked,
     ]
   );
+
+  const canCopySelection = selectedNodes.length > 0;
+  const canPasteSelection =
+    Clipboard.has(CLIPBOARD_KIND) &&
+    (!props.isListLocked ||
+      // If the list is locked, only allow pasting in the children of overriden variables:
+      (selectedNodes.length > 0 &&
+        selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix)) &&
+        selectedNodes.every(nodeId => {
+          return nodeId.includes(separator);
+        })));
+  const canDeleteSelection =
+    selectedNodes.length > 0 &&
+    // An inherited variable can never be deleted:
+    selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix)) &&
+    // If the list is locked, only allow deleting children of overriden variables:
+    selectedNodes.every(nodeId => {
+      if (props.isListLocked) {
+        return nodeId.includes(separator);
+      }
+      return true;
+    });
+
+  const cutSelection = React.useCallback(
+    () => {
+      if (!canDeleteSelection) return;
+
+      copySelection();
+      deleteSelection();
+    },
+    [canDeleteSelection, copySelection, deleteSelection]
+  );
+
+  const keyboardShortcuts = new KeyboardShortcuts({
+    isActive: () => true,
+    shortcutCallbacks: {
+      onUndo: _undo,
+      onRedo: _redo,
+      onDelete: () => {
+        if (canDeleteSelection) deleteSelection();
+      },
+      onCopy: () => {
+        if (canCopySelection) copySelection();
+      },
+      onCut: cutSelection,
+      onPaste: () => {
+        if (canPasteSelection) pasteClipboardContent();
+      },
+    },
+  });
 
   const updateExpandedAndSelectedNodesFollowingNameChange = React.useCallback(
     (oldNodeId: string, newName: string) => {
@@ -1483,16 +1547,22 @@ const VariablesList: React.ComponentType<{
 
   const addVariable = React.useCallback(
     () => {
+      const variablesContainer = exceptionallyGuardAgainstDeadObject(
+        props.variablesContainer
+      );
+      if (!variablesContainer) {
+        return;
+      }
       const addAtTopLevel =
         selectedNodes.length === 0 ||
         selectedNodes.some(node => node.startsWith(inheritedPrefix));
 
       if (addAtTopLevel) {
         const { name: newName, variable } = insertInVariablesContainer(
-          props.variablesContainer,
+          variablesContainer,
           'Variable',
           null,
-          props.variablesContainer.count(),
+          variablesContainer.count(),
           props.inheritedVariablesContainer
         );
         _onChange();
@@ -1510,10 +1580,9 @@ const VariablesList: React.ComponentType<{
       const oldestAncestry = getOldestAncestryVariable(targetLineage);
       let position;
       if (!oldestAncestry) {
-        position = props.variablesContainer.getPosition(targetVariableName) + 1;
+        position = variablesContainer.getPosition(targetVariableName) + 1;
       } else {
-        position =
-          props.variablesContainer.getPosition(oldestAncestry.name) + 1;
+        position = variablesContainer.getPosition(oldestAncestry.name) + 1;
       }
       const { name: newName, variable } = insertInVariablesContainer(
         props.variablesContainer,
@@ -1607,8 +1676,8 @@ const VariablesList: React.ComponentType<{
     const overwritesInheritedVariable =
       isTopLevel &&
       !isInherited &&
-      props.inheritedVariablesContainer &&
-      props.inheritedVariablesContainer.has(name);
+      !!aliveInheritedVariablesContainer &&
+      aliveInheritedVariablesContainer.has(name);
 
     const typeErrorMessage =
       parentType === gd.Variable.Array &&
@@ -1622,17 +1691,18 @@ const VariablesList: React.ComponentType<{
       if (
         !(
           searchMatchingNodes.includes(nodeId) ||
-          // $FlowFixMe[incompatible-type]
-          searchMatchingNodes.includes(parentNodeId) ||
           searchMatchingNodes.some(matchingNodeId =>
             matchingNodeId.startsWith(nodeId)
+          ) ||
+          searchMatchingNodes.some(matchingNodeId =>
+            nodeId.startsWith(matchingNodeId + separator)
           )
         )
       ) {
         // Display node if one of these is true:
         // - node is in the list of nodes matching search
-        // - parent node is in the list of nodes matching search (to be able to edit direct children of searched structure)
-        // - node is an ancestry of a node in the list of nodes matching search
+        // - node is an ancestor of a node in the list of nodes matching search
+        // - node is a descendant of a node in the list of nodes matching search
         return [];
       }
     }
@@ -1842,7 +1912,16 @@ const VariablesList: React.ComponentType<{
         props.variablesContainer
       );
       if (!variable) return;
+      const oldType = variable.getType();
       variable.castTo(newType);
+      // When changing type to String, reset to an empty string.
+      if (newType === 'string' && oldType === gd.Variable.Number) {
+        variable.setString('');
+      }
+      // When changing type to Number, reset to 0.
+      if (newType === 'number' && oldType === gd.Variable.String) {
+        variable.setValue(0);
+      }
       _onChange();
       forceUpdate();
     },
@@ -1901,7 +1980,13 @@ const VariablesList: React.ComponentType<{
           newVariable,
           serializeToJSObject(changedInheritedVariable)
         );
-        variable = props.variablesContainer.insert(name, newVariable, 0);
+        const variablesContainer = exceptionallyGuardAgainstDeadObject(
+          props.variablesContainer
+        );
+        if (!variablesContainer) {
+          return;
+        }
+        variable = variablesContainer.insert(name, newVariable, 0);
 
         setSelectedNodes(selectedNodes => {
           const newSelectedNodes = [...selectedNodes];
@@ -1968,17 +2053,18 @@ const VariablesList: React.ComponentType<{
   );
 
   const renderTree = (i18n: I18nType, isInherited: boolean = false) => {
-    const variablesContainer =
-      isInherited && props.inheritedVariablesContainer
-        ? props.inheritedVariablesContainer
-        : props.variablesContainer;
     // $FlowFixMe[missing-empty-array-annot]
     const allRows = [];
+    const variablesContainer =
+      isInherited && aliveInheritedVariablesContainer
+        ? aliveInheritedVariablesContainer
+        : aliveVariablesContainer;
+    if (!variablesContainer) return allRows;
     mapFor(0, variablesContainer.count(), index => {
       const variable = variablesContainer.getAt(index);
       const name = variablesContainer.getNameAt(index);
       if (isInherited) {
-        if (props.variablesContainer.has(name)) {
+        if (aliveVariablesContainer && aliveVariablesContainer.has(name)) {
           return null;
         }
       }
@@ -2003,6 +2089,13 @@ const VariablesList: React.ComponentType<{
     addVariable,
   }));
 
+  if (
+    !aliveVariablesContainer ||
+    (props.inheritedVariablesContainer && !aliveInheritedVariablesContainer)
+  ) {
+    return null;
+  }
+
   const toolbar = (
     <VariablesListToolbar
       isNarrow={isNarrow}
@@ -2010,31 +2103,9 @@ const VariablesList: React.ComponentType<{
       onCopy={copySelection}
       onPaste={pasteClipboardContent}
       onDelete={deleteSelection}
-      canCopy={selectedNodes.length > 0}
-      canPaste={
-        Clipboard.has(CLIPBOARD_KIND) &&
-        (!props.isListLocked ||
-          // If the list is locked, only allow pasting in the children of overriden variables:
-          (selectedNodes.length > 0 &&
-            selectedNodes.every(
-              nodeId => !nodeId.startsWith(inheritedPrefix)
-            ) &&
-            selectedNodes.every(nodeId => {
-              return nodeId.includes(separator);
-            })))
-      }
-      canDelete={
-        selectedNodes.length > 0 &&
-        // An inherited variable can never be deleted:
-        selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix)) &&
-        // If the list is locked, only allow deleting children of overriden variables:
-        selectedNodes.every(nodeId => {
-          if (props.isListLocked) {
-            return nodeId.includes(separator);
-          }
-          return true;
-        })
-      }
+      canCopy={canCopySelection}
+      canPaste={canPasteSelection}
+      canDelete={canDeleteSelection}
       canAdd={!props.isListLocked}
       onUndo={_undo}
       onRedo={_redo}
@@ -2065,15 +2136,25 @@ const VariablesList: React.ComponentType<{
               {({ contentRect, measureRef }) => (
                 <div
                   ref={measureRef}
-                  style={{ flex: 1, display: 'flex', minHeight: 0 }}
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    minHeight: 0,
+                    outline: 'none',
+                  }}
                   onKeyDown={keyboardShortcuts.onKeyDown}
                   onKeyUp={keyboardShortcuts.onKeyUp}
+                  tabIndex={0}
                 >
                   <Column expand useFullHeight noOverflowParent noMargin>
-                    {toolbar}
-                    {props.variablesContainer.count() === 0 &&
-                    (!props.inheritedVariablesContainer ||
-                      props.inheritedVariablesContainer.count() === 0) ? (
+                    {props.size === 'compact' ? (
+                      <Column>{toolbar}</Column>
+                    ) : (
+                      toolbar
+                    )}
+                    {aliveVariablesContainer.count() === 0 &&
+                    (!aliveInheritedVariablesContainer ||
+                      aliveInheritedVariablesContainer.count() === 0) ? (
                       <Column noMargin expand justifyContent="center">
                         {props.emptyPlaceholderTitle &&
                         props.emptyPlaceholderDescription ? (
@@ -2117,7 +2198,7 @@ const VariablesList: React.ComponentType<{
                       </Column>
                     ) : (
                       <ScrollView autoHideScrollbar>
-                        {props.inheritedVariablesContainer
+                        {aliveInheritedVariablesContainer
                           ? renderTree(i18n, true)
                           : null}
                         {renderTree(i18n)}

@@ -110,8 +110,11 @@ class GD_CORE_API EventsFunction {
 
   /**
    * \brief Set the group of the instruction in the editor.
+   *
+   * \note `SetGroup` should not be called directly
+   * `MoveFunctionFolderOrFunctionToAnotherFolder` should be used instead.
    */
-  EventsFunction& SetGroup(const gd::String& group_) {
+  EventsFunction &SetGroup(const gd::String &group_) {
     group = group_;
     return *this;
   }

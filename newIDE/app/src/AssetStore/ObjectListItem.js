@@ -79,7 +79,8 @@ export const ObjectListItem = ({
     );
   };
 
-  const isEnabled = isEngineCompatible;
+  const isEnabled =
+    isEngineCompatible && !objectShortHeader.isDependentWithParent;
 
   const chooseObject = React.useCallback(
     () => {
@@ -163,6 +164,25 @@ export const ObjectListItem = ({
                   >
                     <CircledInfo />
                   </IconButton>
+                </Tooltip>
+              )}
+              {objectShortHeader.isDependentWithParent && (
+                <Tooltip
+                  title={
+                    <Trans>
+                      This object can't be used here because it would create a
+                      circular dependency with the object being edited.
+                    </Trans>
+                  }
+                >
+                  <span>
+                    <Chip
+                      size="small"
+                      label={<Trans>No cycle</Trans>}
+                      variant="outlined"
+                      onClick={() => {}}
+                    />
+                  </span>
                 </Tooltip>
               )}
             </LineStackLayout>

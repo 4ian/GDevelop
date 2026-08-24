@@ -47,6 +47,7 @@ import { enumerateParametersUsableInExpressions } from '../ParameterFields/Enume
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import Warning from '../../UI/CustomSvgIcons/Warning';
+import { highlightSearchText } from '../../Utils/HighlightSearchText';
 
 const gd: libGDevelop = global.gd;
 
@@ -109,15 +110,9 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   id: string,
+  highlightedSearchText?: ?string,
+  highlightedSearchMatchCase?: boolean,
 |};
-
-const shouldNotBeValidated = ({
-  value,
-  parameterType,
-}: {|
-  value: string,
-  parameterType: string,
-|}) => parameterType === 'layer' && value === '';
 
 const formatValue = ({
   value,
@@ -288,7 +283,14 @@ const Instruction = (props: Props): React.Node => {
               metadata.isHidden()
                 ? '[DEPRECATED] '
                 : '';
-            return <span key={i}>{deprecatedPrefix + value}</span>;
+            return (
+              <span key={i}>
+                {deprecatedPrefix}
+                {highlightSearchText(value, props.highlightedSearchText, {
+                  matchCase: props.highlightedSearchMatchCase,
+                })}
+              </span>
+            );
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
@@ -300,60 +302,54 @@ const Instruction = (props: Props): React.Node => {
               : parameterMetadata.getType();
           let expressionIsValid = true;
           let hasDeprecationWarning = false;
-          if (!shouldNotBeValidated({ value, parameterType })) {
-            const validationResult = gd.InstructionValidator.validateParameter(
-              platform,
-              projectScopedContainers,
-              instruction,
-              metadata,
-              parameterIndex,
-              value
-            );
-            expressionIsValid = validationResult.isValid();
-            if (showDeprecatedInstructionWarning !== 'no') {
-              hasDeprecationWarning = validationResult.hasDeprecationWarning();
-            }
-            // TODO Move this code inside `InstructionValidator.isParameterValid`
-            if (
-              expressionIsValid &&
-              parameterType === 'functionParameterName'
-            ) {
-              const eventsFunction = props.scope.eventsFunction;
-              if (eventsFunction) {
-                const eventsBasedEntity =
-                  props.scope.eventsBasedBehavior ||
-                  props.scope.eventsBasedObject;
-                const functionsContainer = eventsBasedEntity
-                  ? eventsBasedEntity.getEventsFunctions()
-                  : props.scope.eventsFunctionsExtension
-                  ? props.scope.eventsFunctionsExtension.getEventsFunctions()
-                  : null;
+          const validationResult = gd.InstructionValidator.validateParameter(
+            platform,
+            projectScopedContainers,
+            instruction,
+            metadata,
+            parameterIndex
+          );
+          expressionIsValid = validationResult.isValid();
+          if (showDeprecatedInstructionWarning !== 'no') {
+            hasDeprecationWarning = validationResult.hasDeprecationWarning();
+          }
+          // TODO Move this code inside `InstructionValidator.isParameterValid`
+          if (expressionIsValid && parameterType === 'functionParameterName') {
+            const eventsFunction = props.scope.eventsFunction;
+            if (eventsFunction) {
+              const eventsBasedEntity =
+                props.scope.eventsBasedBehavior ||
+                props.scope.eventsBasedObject;
+              const functionsContainer = eventsBasedEntity
+                ? eventsBasedEntity.getEventsFunctions()
+                : props.scope.eventsFunctionsExtension
+                ? props.scope.eventsFunctionsExtension.getEventsFunctions()
+                : null;
 
-                if (functionsContainer) {
-                  const allowedParameterTypes = parameterMetadata
-                    .getExtraInfo()
-                    .split(',');
-                  const parameters = enumerateParametersUsableInExpressions(
-                    functionsContainer,
-                    eventsFunction,
-                    allowedParameterTypes
-                  );
-                  const functionParameterNameExpression = instruction
-                    .getParameter(parameterIndex)
-                    .getPlainString();
-                  const functionParameterName = functionParameterNameExpression.substring(
-                    1,
-                    functionParameterNameExpression.length - 1
-                  );
-                  expressionIsValid = parameters.some(
-                    parameter => parameter.getName() === functionParameterName
-                  );
-                }
-              } else {
-                // This can happen if function-dedicated instructions are
-                // copied to scene events.
-                expressionIsValid = false;
+              if (functionsContainer) {
+                const allowedParameterTypes = parameterMetadata
+                  .getExtraInfo()
+                  .split(',');
+                const parameters = enumerateParametersUsableInExpressions(
+                  functionsContainer,
+                  eventsFunction,
+                  allowedParameterTypes
+                );
+                const functionParameterNameExpression = instruction
+                  .getParameter(parameterIndex)
+                  .getPlainString();
+                const functionParameterName = functionParameterNameExpression.substring(
+                  1,
+                  functionParameterNameExpression.length - 1
+                );
+                expressionIsValid = parameters.some(
+                  parameter => parameter.getName() === functionParameterName
+                );
               }
+            } else {
+              // This can happen if function-dedicated instructions are
+              // copied to scene events.
+              expressionIsValid = false;
             }
           }
 
@@ -369,8 +365,15 @@ const Instruction = (props: Props): React.Node => {
               className={classNames({
                 [selectableArea]: true,
                 [instructionParameter]: true,
+                // Resources are string literals they use the same color as strings.
                 // $FlowFixMe[invalid-computed-prop]
-                [parameterType]: true,
+                [parameterMetadata.getValueTypeMetadata().isResource()
+                  ? 'resource'
+                  : parameterType]:
+                  // Variables, numbers and strings are expressions with syntax coloring.
+                  parameterType !== 'number' &&
+                  parameterType !== 'string' &&
+                  !parameterMetadata.getValueTypeMetadata().isVariable(),
               })}
               onClick={domEvent => {
                 props.onParameterClick(domEvent, parameterIndex);
@@ -393,6 +396,7 @@ const Instruction = (props: Props): React.Node => {
               {ParameterRenderingService.renderInlineParameter({
                 scope,
                 value: formattedValue,
+                expression: instruction.getParameter(parameterIndex),
                 expressionIsValid,
                 hasDeprecationWarning,
                 parameterMetadata,
@@ -403,6 +407,8 @@ const Instruction = (props: Props): React.Node => {
                 useAssignmentOperators,
                 projectScopedContainersAccessor:
                   props.projectScopedContainersAccessor,
+                highlightedSearchText: props.highlightedSearchText,
+                highlightedSearchMatchCase: props.highlightedSearchMatchCase,
               })}
             </span>
           );
@@ -417,7 +423,7 @@ const Instruction = (props: Props): React.Node => {
   const dragAllowed = screenType !== 'touch';
 
   // Allow a long press to show the context menu
-  const longTouchForContextMenuProps = useLongTouch(
+  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
     React.useCallback(
       event => {
         onContextMenu(event.clientX, event.clientY);
@@ -462,7 +468,7 @@ const Instruction = (props: Props): React.Node => {
                   instruction.getType()
                 );
 
-            const smallIconFilename = metadata.getSmallIconFilename();
+            const smallIconFilename = metadata.getSmallIconFilename() || '';
             // The instruction itself can be dragged and is a target for
             // another instruction to be dropped. It's IMPORTANT NOT to have
             // the subinstructions list inside the connectDropTarget/connectDragSource
@@ -498,6 +504,7 @@ const Instruction = (props: Props): React.Node => {
                   props.onDoubleClick();
                 }}
                 onContextMenu={e => {
+                  e.preventDefault();
                   e.stopPropagation();
                   onContextMenu(e.clientX, e.clientY);
                 }}
@@ -634,6 +641,10 @@ const Instruction = (props: Props): React.Node => {
                       props.projectScopedContainersAccessor
                     }
                     idPrefix={props.id}
+                    highlightedSearchText={props.highlightedSearchText}
+                    highlightedSearchMatchCase={
+                      props.highlightedSearchMatchCase
+                    }
                   />
                 )}
               </React.Fragment>

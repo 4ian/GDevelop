@@ -3,40 +3,25 @@ import * as React from 'react';
 
 export type ScreenType = 'normal' | 'touch';
 
-let userHasTouchedScreen = false;
-let userHasMovedMouse = false;
+// Module-level state shared across all hook instances.
+// A single pointerdown listener detects the current input type and only
+// notifies subscribers when the type actually changes (touch ↔ mouse/pen).
+let _screenType: ScreenType = 'normal';
+const _listeners: Set<(type: ScreenType) => void> = new Set();
 
 if (typeof window !== 'undefined') {
-  window.addEventListener(
-    'touchstart',
-    function onFirstTouch() {
-      console.info('Touch detected, considering the screen as touch enabled.');
-      userHasTouchedScreen = true;
-      window.removeEventListener('touchstart', onFirstTouch, false);
-    },
-    false
-  );
-
-  // An event listener is added (and then removed at the first event triggering) and
-  // will determine if the user is on a device that uses a mouse.
-  // If the first pointermove event is not triggered by a mouse move, the device
-  // will never be considered as mouse-enabled.
-  // Note: mousemove cannot be used since browsers emulate the mouse movement when
-  // the screen is touched.
-  window.addEventListener(
-    'pointermove',
-    function onPointerMove(event: PointerEvent) {
-      console.info('Pointer move detected.');
-      if (event.pointerType === 'mouse') {
-        console.info(
-          'Pointer type is mouse, considering the device is a desktop/laptop computer.'
-        );
-        userHasMovedMouse = true;
-      }
-      window.removeEventListener('pointermove', onPointerMove, false);
-    },
-    false
-  );
+  window.addEventListener('pointerdown', (event: PointerEvent) => {
+    const newType: ScreenType =
+      event.pointerType === 'touch' ? 'touch' : 'normal';
+    if (newType === _screenType) return;
+    console.info(
+      `Screen type changed from "${_screenType}" to "${newType}" (pointerType: "${
+        event.pointerType
+      }").`
+    );
+    _screenType = newType;
+    _listeners.forEach(fn => fn(newType));
+  });
 }
 
 type Props = {|
@@ -50,21 +35,28 @@ export const ScreenTypeMeasurer = ({ children }: Props): React.Node =>
   children(useScreenType());
 
 /**
- * Return if the screen is a touchscreen or not.
+ * Returns whether the screen is currently being used as a touchscreen or not.
+ * Dynamically switches when the user alternates between touch and mouse/pen,
+ * so hybrid devices (e.g. Windows touchscreen laptops) are handled correctly.
  */
 export const useScreenType = (): ScreenType => {
-  // Note: this is not a React hook but is named as one to encourage
-  // components to use it as such, so that it could be reworked
-  // at some point to use a context (verify in this case all usages).
-  if (typeof window === 'undefined') return 'normal';
+  const [screenType, setScreenType] = React.useState<ScreenType>(_screenType);
 
-  return userHasTouchedScreen ? 'touch' : 'normal';
+  React.useEffect(() => {
+    // setScreenType is stable across renders, safe to store in the Set.
+    _listeners.add(setScreenType);
+    return () => {
+      _listeners.delete(setScreenType);
+    };
+  }, []);
+
+  return screenType;
 };
 
-export const useShouldAutofocusInput = (): boolean => {
-  const isTouchscreen = useScreenType() === 'touch';
-  // Whatever size the screen is, if a touch event has been detected, no autofocus should
-  // be triggered (that would annoyingly open the keyboard) unless a mouse move has been
-  // detected (in that case, the device should be a touch-enabled desktop/laptop computer).
-  return !(isTouchscreen && !userHasMovedMouse);
-};
+/**
+ * Returns true if inputs should be auto-focused.
+ * No autofocus when the last interaction was touch, to avoid opening the
+ * on-screen keyboard unexpectedly.
+ */
+export const useShouldAutofocusInput = (): boolean =>
+  useScreenType() !== 'touch';

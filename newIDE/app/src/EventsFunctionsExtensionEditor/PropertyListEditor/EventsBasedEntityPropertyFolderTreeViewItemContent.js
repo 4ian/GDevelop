@@ -6,8 +6,7 @@ import * as React from 'react';
 import Clipboard from '../../Utils/Clipboard';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import {
-  // $FlowFixMe[import-type-as-value]
-  TreeViewItemContent,
+  type TreeViewItemContent,
   type TreeItemProps,
   propertiesRootFolderId,
   sharedPropertiesRootFolderId,
@@ -152,10 +151,11 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
   onClick(): void {}
 
   rename(newName: string): void {
-    if (this.getName() === newName) {
+    const safeNewName = newName.replaceAll('/', '-');
+    if (this.getName() === safeNewName) {
       return;
     }
-    this.propertyFolder.setFolderName(newName);
+    this.propertyFolder.setFolderName(safeNewName);
     this.props.onPropertiesUpdated();
   }
 

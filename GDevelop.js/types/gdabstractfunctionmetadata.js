@@ -4,6 +4,7 @@ declare class gdAbstractFunctionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdAbstractFunctionMetadata;
   setDefaultValue(defaultValue: string): gdAbstractFunctionMetadata;
   setParameterLongDescription(longDescription: string): gdAbstractFunctionMetadata;
+  setParameterHint(hint: string): gdAbstractFunctionMetadata;
   setParameterExtraInfo(extraInfo: string): gdAbstractFunctionMetadata;
   setHidden(): gdAbstractFunctionMetadata;
   setPrivate(): gdAbstractFunctionMetadata;

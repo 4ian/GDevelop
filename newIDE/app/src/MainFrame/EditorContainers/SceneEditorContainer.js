@@ -9,11 +9,14 @@ import {
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -119,16 +122,25 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) {
     const { editor } = this;
     if (editor) {
-      // Update every custom object because some custom objects may include
-      // the one actually edited.
-      editor.forceUpdateCustomObjectRenderedInstances();
+      // Update the edited object and every custom object that includes it.
+      editor.forceUpdateCustomObjectRenderedInstances(
+        eventsBasedObject,
+        options
+      );
     }
   }
 
-  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+  onSceneObjectEdited(
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
+  ) {
     const layout = this.getLayout();
     if (!layout) {
       return;
@@ -139,7 +151,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     const { editor } = this;
     if (editor) {
       // Update instances of the object as it was modified in an editor.
-      editor.forceUpdateRenderedInstancesOfObject(objectWithContext.object);
+      editor.forceUpdateRenderedInstancesOfObject(
+        objectWithContext.object,
+        hasResourceChanged
+      );
     }
   }
 
@@ -161,6 +176,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     // No thing to be done.
   }
 
+  selectAllInsideEditor() {
+    // No thing to be done.
+  }
+
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
     if (changes.scene !== this.getLayout()) {
       return;
@@ -178,6 +197,16 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
     if (this.editor) {
       this.editor.onObjectsModifiedOutsideEditor();
+    }
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
+    if (changes.scene !== this.getLayout()) {
+      return;
+    }
+
+    if (this.editor) {
+      this.editor.onWillDeleteObject(changes);
     }
   }
 
@@ -277,13 +306,20 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         }
         onWillInstallExtension={this.props.onWillInstallExtension}
         onExtensionInstalled={this.props.onExtensionInstalled}
+        onCreateNewExtensionWithBehavior={
+          this.props.onCreateNewExtensionWithBehavior
+        }
         onDeleteEventsBasedObjectVariant={
           this.props.onDeleteEventsBasedObjectVariant
         }
         onEffectAdded={this.props.onEffectAdded}
         onObjectListsModified={this.props.onObjectListsModified}
-        onObjectEdited={objectWithContext =>
-          this.props.onSceneObjectEdited(layout, objectWithContext)
+        onObjectEdited={(objectWithContext, hasResourceChanged) =>
+          this.props.onSceneObjectEdited(
+            layout,
+            objectWithContext,
+            hasResourceChanged
+          )
         }
         onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
         triggerHotReloadInGameEditorIfNeeded={
@@ -292,8 +328,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         // It's only used to refresh events-based object variants.
         onObjectGroupEdited={() => {}}
         onObjectGroupsDeleted={() => {}}
-        // Nothing to do as scenes are not events-based objects.
-        onEventsBasedObjectChildrenEdited={() => {}}
+        onEventsBasedObjectChildrenEdited={
+          this.props.onEventsBasedObjectChildrenEdited
+        }
       />
     );
   }

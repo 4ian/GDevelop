@@ -104,7 +104,7 @@ namespace gdjs {
         functionCalled: () => Promise<T>
       ): Promise<T> => {
         let tries = 0;
-        let latestError = null;
+        let latestError: unknown | null = null;
         while (tries < times) {
           tries++;
           latestError = null;

@@ -9,6 +9,12 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import {
+  renderStylizedText,
+  mergeStylizedText,
+  getHighlightSearchTextParts,
+  applySyntaxColoring,
+} from '../../Utils/HighlightSearchText';
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
@@ -53,15 +59,44 @@ export const renderInlineDefaultField = ({
   InvalidParameterValue,
   DeprecatedParameterValue,
   MissingParameterValue,
-}: ParameterInlineRendererProps): string | React.MixedElement => {
+  highlightedSearchText,
+  highlightedSearchMatchCase,
+  scope,
+  projectScopedContainersAccessor,
+  expression,
+}: ParameterInlineRendererProps): string | React.Node => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
   if (!expressionIsValid) {
-    return <InvalidParameterValue>{value}</InvalidParameterValue>;
+    return (
+      <InvalidParameterValue>
+        {renderStylizedText(
+          value,
+          getHighlightSearchTextParts(value, highlightedSearchText, {
+            matchCase: highlightedSearchMatchCase,
+          })
+        )}
+      </InvalidParameterValue>
+    );
   }
+  const stylizedText = renderStylizedText(
+    value,
+    mergeStylizedText(
+      getHighlightSearchTextParts(value, highlightedSearchText, {
+        matchCase: highlightedSearchMatchCase,
+      }),
+      applySyntaxColoring({
+        text: value,
+        rootNode: expression.getRootNode(),
+        rootType: parameterMetadata.getValueTypeMetadata().getName(),
+        platform: scope.project.getCurrentPlatform(),
+        projectScopedContainers: projectScopedContainersAccessor.get(),
+      })
+    )
+  );
   if (hasDeprecationWarning) {
-    return <DeprecatedParameterValue>{value}</DeprecatedParameterValue>;
+    return <DeprecatedParameterValue>{stylizedText}</DeprecatedParameterValue>;
   }
-  return value;
+  return stylizedText;
 };

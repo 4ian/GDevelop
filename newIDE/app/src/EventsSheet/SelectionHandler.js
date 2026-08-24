@@ -2,6 +2,7 @@
 
 import values from 'lodash/values';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 export type InstructionsListContext = {|
   isCondition: boolean,
@@ -48,11 +49,7 @@ export type SelectionState = {|
   selectedEvents: Array<EventContext>,
 |};
 
-export const getInitialSelection = (): {
-  selectedEvents: Array<empty>,
-  selectedInstructions: Array<empty>,
-  selectedInstructionsLists: Array<empty>,
-} => {
+export const getInitialSelection = (): SelectionState => {
   return {
     selectedInstructions: [],
     selectedEvents: [],
@@ -60,10 +57,28 @@ export const getInitialSelection = (): {
   };
 };
 
+// The selection can exceptionally contain events that were destroyed on the
+// C++ side by a change that did not clear the selection (see
+// `onEventsModifiedOutsideEditor`). Calling any method on such an event would
+// crash the editor, so all the getters below filter them out.
+const isAliveEventContext = (eventContext: EventContext): boolean =>
+  !!exceptionallyGuardAgainstDeadObject(eventContext.event);
+
+const getAliveSelectedEventContexts = (
+  selection: SelectionState
+): Array<EventContext> => selection.selectedEvents.filter(isAliveEventContext);
+
+const getAliveSelectedInstructionContexts = (
+  selection: SelectionState
+): Array<InstructionContextWithEventContext> =>
+  selection.selectedInstructions.filter(({ eventContext }) =>
+    isAliveEventContext(eventContext)
+  );
+
 export const getSelectedEvents = (
   selection: SelectionState
 ): Array<gdBaseEvent> => {
-  return selection.selectedEvents.map(
+  return getAliveSelectedEventContexts(selection).map(
     (eventContext: EventContext) => eventContext.event
   );
 };
@@ -71,30 +86,32 @@ export const getSelectedEvents = (
 export const getLastSelectedEvent = (
   selection: SelectionState
 ): Event | null => {
-  if (!selection.selectedEvents.length) return null;
+  const eventContexts = getAliveSelectedEventContexts(selection);
+  if (!eventContexts.length) return null;
 
-  return selection.selectedEvents[selection.selectedEvents.length - 1].event;
+  return eventContexts[eventContexts.length - 1].event;
 };
 
 export const getSelectedEventContexts = (
   selection: SelectionState
 ): Array<EventContext> => {
-  return selection.selectedEvents;
+  return getAliveSelectedEventContexts(selection);
 };
 
 export const getLastSelectedEventContext = (
   selection: SelectionState
 ): EventContext | null => {
-  if (!selection.selectedEvents.length) return null;
+  const eventContexts = getAliveSelectedEventContexts(selection);
+  if (!eventContexts.length) return null;
 
-  return selection.selectedEvents[selection.selectedEvents.length - 1];
+  return eventContexts[eventContexts.length - 1];
 };
 
 export const getLastSelectedEventContextWhichCanHaveSubEvents = (
   selection: SelectionState
 ): EventContext | null => {
-  const candidates = selection.selectedEvents.filter(({ event }) =>
-    event.canHaveSubEvents()
+  const candidates = getAliveSelectedEventContexts(selection).filter(
+    ({ event }) => event.canHaveSubEvents()
   );
   if (!candidates.length) return null;
 
@@ -104,8 +121,8 @@ export const getLastSelectedEventContextWhichCanHaveSubEvents = (
 export const getLastSelectedEventContextWhichCanHaveVariables = (
   selection: SelectionState
 ): EventContext | null => {
-  const candidates = selection.selectedEvents.filter(({ event }) =>
-    event.canHaveVariables()
+  const candidates = getAliveSelectedEventContexts(selection).filter(
+    ({ event }) => event.canHaveVariables()
   );
   if (!candidates.length) return null;
 
@@ -116,7 +133,7 @@ export const getSelectedTopMostOnlyEventContexts = (
   selection: SelectionState
 ): Array<EventContext> => {
   const selectedEventContexts: Array<EventContext> = values(
-    selection.selectedEvents
+    getAliveSelectedEventContexts(selection)
   );
 
   return selectedEventContexts.filter(eventContext => {
@@ -155,7 +172,7 @@ export const getLastSelectedTopMostOnlyEventContext = (
 export const getSelectedInstructions = (
   selection: SelectionState
 ): Array<gdInstruction> => {
-  return selection.selectedInstructions.map(
+  return getAliveSelectedInstructionContexts(selection).map(
     (instructionContext: InstructionContextWithEventContext) =>
       instructionContext.instruction
   );
@@ -164,7 +181,7 @@ export const getSelectedInstructions = (
 export const getSelectedInstructionsLocatingEvents = (
   selection: SelectionState
 ): Array<gdBaseEvent> => {
-  return selection.selectedInstructions.map(
+  return getAliveSelectedInstructionContexts(selection).map(
     (instructionContext: InstructionContextWithEventContext) =>
       instructionContext.eventContext.event
   );
@@ -173,7 +190,7 @@ export const getSelectedInstructionsLocatingEvents = (
 export const getSelectedInstructionsContexts = (
   selection: SelectionState
 ): Array<InstructionContextWithEventContext> => {
-  return selection.selectedInstructions;
+  return getAliveSelectedInstructionContexts(selection);
 };
 
 export const getSelectedInstructionsListsContexts = (
@@ -185,17 +202,15 @@ export const getSelectedInstructionsListsContexts = (
 export const getLastSelectedInstructionContext = (
   selection: SelectionState
 ): InstructionContextWithEventContext | null => {
-  return (
-    selection.selectedInstructions[selection.selectedInstructions.length - 1] ||
-    null
-  );
+  const instructionContexts = getAliveSelectedInstructionContexts(selection);
+  return instructionContexts[instructionContexts.length - 1] || null;
 };
 
 export const getLastSelectedInstructionEventContextWhichCanHaveSubEvents = (
   selection: SelectionState
 ): EventContext | null => {
-  const candidates = selection.selectedInstructions.filter(({ eventContext }) =>
-    eventContext.event.canHaveSubEvents()
+  const candidates = getAliveSelectedInstructionContexts(selection).filter(
+    ({ eventContext }) => eventContext.event.canHaveSubEvents()
   );
   if (!candidates.length) return null;
 
@@ -205,8 +220,8 @@ export const getLastSelectedInstructionEventContextWhichCanHaveSubEvents = (
 export const getLastSelectedInstructionEventContextWhichCanHaveVariables = (
   selection: SelectionState
 ): EventContext | null => {
-  const candidates = selection.selectedInstructions.filter(({ eventContext }) =>
-    eventContext.event.canHaveVariables()
+  const candidates = getAliveSelectedInstructionContexts(selection).filter(
+    ({ eventContext }) => eventContext.event.canHaveVariables()
   );
   if (!candidates.length) return null;
 
@@ -293,12 +308,32 @@ export const selectEvent = (
   multiSelection: boolean = false
 ): SelectionState => {
   const event = eventContext.event;
-  if (isEventSelected(selection, event)) return selection;
+  const alreadySelected = isEventSelected(selection, event);
+
+  if (multiSelection && alreadySelected) {
+    return {
+      ...selection,
+      selectedEvents: selection.selectedEvents.filter(
+        selectedEventContext => selectedEventContext.event.ptr !== event.ptr
+      ),
+    };
+  }
+
+  if (alreadySelected) return selection;
 
   const existingSelection = multiSelection ? selection : clearSelection();
   return {
     ...existingSelection,
     selectedEvents: [...existingSelection.selectedEvents, eventContext],
+  };
+};
+
+export const selectEvents = (
+  eventContexts: Array<EventContext>
+): SelectionState => {
+  return {
+    ...clearSelection(),
+    selectedEvents: eventContexts,
   };
 };
 
@@ -342,11 +377,7 @@ export const selectInstructionsList = (
 
 export const selectEventsAfterHistoryChange = (
   eventContexts: Array<EventContext>
-): {
-  selectedEvents: Array<empty>,
-  selectedInstructions: Array<empty>,
-  selectedInstructionsLists: Array<empty>,
-} => {
+): SelectionState => {
   let newSelection = getInitialSelection();
 
   eventContexts.forEach(eventContext => {

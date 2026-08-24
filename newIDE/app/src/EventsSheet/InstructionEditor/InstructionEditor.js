@@ -99,6 +99,7 @@ export const useInstructionEditor = ({
         globalObjectsContainer,
         objectsContainer,
         objectName,
+        project,
         i18n
       ),
       scope

@@ -99,6 +99,36 @@ describe('libGD.js', function () {
       expect(project.hasExternalEventsNamed('My events')).toBe(false);
     });
 
+    it('handles tests', function () {
+      const tests = project.getTests();
+      expect(tests.hasTestNamed('My test')).toBe(false);
+
+      const test = tests.insertNewTest('My test', 0);
+      expect(tests.hasTestNamed('My test')).toBe(true);
+      expect(tests.getTestsCount()).toBe(1);
+      expect(test.getName()).toBe('My test');
+      expect(test.getType()).toBe('gameplay');
+      test.setDescription('My description');
+      test.setSource("await harness.goToScene('Scene');");
+      expect(tests.getTest('My test').getDescription()).toBe('My description');
+      expect(tests.getTestAt(0).getSource()).toBe(
+        "await harness.goToScene('Scene');"
+      );
+      expect(test.getLastRunStatus()).toBe('');
+      test.setLastRunStatus('passed');
+      test.setLastRunAt(1769700000000);
+      test.setLastRunDurationMs(5400);
+      test.setLastRunFramesExecuted(320);
+      expect(test.getLastRunStatus()).toBe('passed');
+      expect(test.getLastRunAt()).toBe(1769700000000);
+      expect(test.getLastRunDurationMs()).toBe(5400);
+      expect(test.getLastRunFramesExecuted()).toBe(320);
+
+      tests.removeTest('My test');
+      expect(tests.hasTestNamed('My test')).toBe(false);
+      expect(tests.getTestsCount()).toBe(0);
+    });
+
     it('handles external layouts', function () {
       expect(project.hasExternalLayoutNamed('My layout')).toBe(false);
 
@@ -775,6 +805,9 @@ describe('libGD.js', function () {
       expect(initialInstance.getLayer()).toBe('MyLayer');
       initialInstance.setLocked(true);
       expect(initialInstance.isLocked()).toBe(true);
+      expect(initialInstance.isHidden()).toBe(false);
+      initialInstance.setHidden(true);
+      expect(initialInstance.isHidden()).toBe(true);
       initialInstance.setHasCustomSize(true);
       expect(initialInstance.hasCustomSize()).toBe(true);
       initialInstance.setCustomWidth(34);
@@ -820,6 +853,7 @@ describe('libGD.js', function () {
       expect(initialInstance2.getZOrder()).toBe(12);
       expect(initialInstance2.getLayer()).toBe('MyLayer');
       expect(initialInstance2.isLocked()).toBe(true);
+      expect(initialInstance2.isHidden()).toBe(true);
       expect(initialInstance2.hasCustomSize()).toBe(true);
       expect(initialInstance2.hasCustomDepth()).toBe(false);
       expect(initialInstance2.getCustomWidth()).toBe(34);
@@ -1083,6 +1117,25 @@ describe('libGD.js', function () {
       expect(container.getNameAt(0)).toBe('SecondVariable');
       expect(container.getNameAt(1)).toBe('Variable');
       expect(container.getNameAt(2)).toBe('ThirdVariable');
+
+      container.delete();
+    });
+    it('can ensure persistent UUIDs are set, while preserving existing ones', function () {
+      let container = new gd.VariablesContainer();
+      container.insertNew('Variable', 0).setValue(4);
+
+      container.ensurePersistentUuids();
+      const variableUuid = container.get('Variable').getPersistentUuid();
+      expect(variableUuid).toBeTruthy();
+
+      container.insertNew('SecondVariable', 1).setValue(5);
+      expect(container.get('SecondVariable').getPersistentUuid()).toBe('');
+
+      container.ensurePersistentUuids();
+
+      // The existing UUID is preserved, the new variable got one.
+      expect(container.get('Variable').getPersistentUuid()).toBe(variableUuid);
+      expect(container.get('SecondVariable').getPersistentUuid()).toBeTruthy();
 
       container.delete();
     });
@@ -2582,6 +2635,77 @@ describe('libGD.js', function () {
 
       action.delete();
     });
+
+    it('should use the default value of optional yes/no parameters when left empty', function () {
+      // `SetFullScreen` has a required yes/no parameter (PARAM1) and an
+      // optional yes/no parameter defaulting to "yes" (PARAM2).
+      let action = new gd.Instruction();
+      action.setType('SetFullScreen');
+      action.setParametersCount(3);
+
+      let formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+        action,
+        gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'SetFullScreen')
+      );
+
+      // An empty required parameter is rendered as "no"...
+      expect(formattedTexts.getString(1)).toBe('no');
+      // ...while an empty optional parameter falls back to its default value.
+      expect(formattedTexts.getString(3)).toBe('yes');
+
+      action.delete();
+    });
+  });
+
+  describe('InstructionValidator', function () {
+    let project = null;
+    let layout = null;
+    let projectScopedContainers = null;
+    beforeAll(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      layout = project.insertNewLayout('Scene', 0);
+      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+        project,
+        layout
+      );
+    });
+    afterAll(() => {
+      project.delete();
+    });
+
+    const validateVolumeParameter = value => {
+      // `PlaySoundOnChannel` has an optional "expression" parameter (Volume,
+      // PARAM4) defaulting to "100".
+      const action = new gd.Instruction();
+      action.setType('PlaySoundOnChannel');
+      action.setParametersCount(6);
+      action.setParameter(4, value);
+      const result = gd.InstructionValidator.validateParameter(
+        gd.JsPlatform.get(),
+        projectScopedContainers,
+        action,
+        gd.MetadataProvider.getActionMetadata(
+          gd.JsPlatform.get(),
+          'PlaySoundOnChannel'
+        ),
+        4
+      );
+      const isValid = result.isValid();
+      action.delete();
+      return isValid;
+    };
+
+    it('considers an optional parameter left empty as valid', function () {
+      // The default value is used when generating the code, so it must not be
+      // shown as an error in the events sheet.
+      expect(validateVolumeParameter('')).toBe(true);
+    });
+
+    it('still validates the value of a filled optional parameter', function () {
+      expect(validateVolumeParameter('50')).toBe(true);
+      expect(validateVolumeParameter('1 +')).toBe(false);
+      expect(validateVolumeParameter('"Not a number"')).toBe(false);
+    });
   });
 
   describe('EventsRefactorer', function () {
@@ -2660,6 +2784,7 @@ describe('libGD.js', function () {
           true,
           true,
           false,
+          false,
           false
         );
         expect(searchResultEvents1.size()).toBe(0);
@@ -2670,6 +2795,7 @@ describe('libGD.js', function () {
           true,
           true,
           true,
+          false,
           false,
           false
         );
@@ -2686,6 +2812,7 @@ describe('libGD.js', function () {
           true,
           true,
           false,
+          false,
           false
         );
         expect(searchResultEvents1.size()).toBe(1);
@@ -2698,6 +2825,7 @@ describe('libGD.js', function () {
           false,
           true,
           true,
+          false,
           false,
           false
         );
@@ -2713,7 +2841,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
@@ -2728,7 +2857,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
@@ -2743,7 +2873,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
@@ -2758,7 +2889,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
@@ -2773,7 +2905,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
@@ -2788,7 +2921,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
@@ -2802,7 +2936,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents1.size()).toBe(1);
         expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
@@ -2815,7 +2950,8 @@ describe('libGD.js', function () {
           true,
           true,
           false,
-          true
+          true,
+          false
         );
         expect(searchResultEvents2.size()).toBe(1);
         expect(searchResultEvents2.at(0).getEvent()).toBe(event2);
@@ -3813,6 +3949,7 @@ describe('libGD.js', function () {
           layout
         ),
         type,
+        '',
         ''
       );
       expressionNode.visit(expressionValidator);

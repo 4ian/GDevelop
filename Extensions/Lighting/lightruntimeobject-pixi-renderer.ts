@@ -29,6 +29,32 @@ namespace gdjs {
      */
     _lightBoundingPoly: gdjs.Polygon;
 
+    /**
+     * Pool of reusable FloatPoint arrays to avoid per-frame allocations
+     * inside _computeClosestIntersectionPoint. Reset each call to
+     * _computeLightVertices.
+     */
+    _closestPointsPool: FloatPoint[] = [];
+    _closestPointsPoolIndex: integer = 0;
+
+    /**
+     * Flat array of precomputed AABBs for obstacle polygons, laid out as
+     * [minX, minY, maxX, maxY, minX, minY, ...] (4 floats per polygon).
+     * Rebuilt each _computeLightVertices call to allow cheap AABB rejection
+     * in _computeClosestIntersectionPoint before the full raycast.
+     */
+    _obstaclePolygonsAABB: Float32Array = new Float32Array(0);
+
+    // Reusable arrays for _computeLightVertices — cleared and refilled each call
+    // to avoid per-frame heap allocations that would otherwise pressure the GC.
+    _lightObstaclesTemp: gdjs.LightObstacleRuntimeBehavior[] = [];
+    _obstaclePolygonsTemp: gdjs.Polygon[] = [];
+    _flattenVerticesTemp: FloatPoint[] = [];
+    _closestVerticesTemp: { vertex: FloatPoint; angle: float }[] = [];
+    _closestVertexAnglePool: { vertex: FloatPoint; angle: float }[] = [];
+    _closestVertexAnglePoolIndex: integer = 0;
+    _filteredVerticesTemp: FloatPoint[] = [];
+
     constructor(
       runtimeObject: gdjs.LightRuntimeObject,
       instanceContainer: gdjs.RuntimeInstanceContainer
@@ -124,17 +150,66 @@ namespace gdjs {
       lightObject: gdjs.LightRuntimeObject,
       angle: float,
       polygons: Array<gdjs.Polygon>,
-      boundingSquareHalfDiag: float
-    ) {
+      polygonAABBs: Float32Array,
+      boundingSquareHalfDiag: float,
+      result: FloatPoint
+    ): FloatPoint | null {
       const centerX = lightObject.getX();
       const centerY = lightObject.getY();
       const targetX = centerX + boundingSquareHalfDiag * Math.cos(angle);
       const targetY = centerY + boundingSquareHalfDiag * Math.sin(angle);
+      const dx = targetX - centerX;
+      const dy = targetY - centerY;
+      // Precompute inverses for the slab test. Mark near-zero components to handle
+      // axis-aligned rays without division by zero.
+      const isDxSmall = Math.abs(dx) < 1e-8;
+      const isDySmall = Math.abs(dy) < 1e-8;
+      const invDx = isDxSmall ? 0 : 1.0 / dx;
+      const invDy = isDySmall ? 0 : 1.0 / dy;
       let minSqDist = boundingSquareHalfDiag * boundingSquareHalfDiag;
-      const closestPoint: Array<integer | null> = [null, null];
-      for (const poly of polygons) {
+      result[0] = 0;
+      result[1] = 0;
+      for (let i = 0; i < polygons.length; i++) {
+        const aabbBase = i * 4;
+        const pMinX = polygonAABBs[aabbBase];
+        const pMinY = polygonAABBs[aabbBase + 1];
+        const pMaxX = polygonAABBs[aabbBase + 2];
+        const pMaxY = polygonAABBs[aabbBase + 3];
+        // Slab test: checks whether the ray segment actually passes through the
+        // polygon AABB. This is far tighter than a bounding-box overlap check —
+        // diagonal rays no longer spuriously test every polygon in the swept square.
+        let tNear = 0.0;
+        let tFar = 1.0;
+        if (isDxSmall) {
+          if (centerX < pMinX || centerX > pMaxX) continue;
+        } else {
+          const tx1 = (pMinX - centerX) * invDx;
+          const tx2 = (pMaxX - centerX) * invDx;
+          if (tx1 < tx2) {
+            if (tx1 > tNear) tNear = tx1;
+            if (tx2 < tFar) tFar = tx2;
+          } else {
+            if (tx2 > tNear) tNear = tx2;
+            if (tx1 < tFar) tFar = tx1;
+          }
+          if (tNear > tFar) continue;
+        }
+        if (isDySmall) {
+          if (centerY < pMinY || centerY > pMaxY) continue;
+        } else {
+          const ty1 = (pMinY - centerY) * invDy;
+          const ty2 = (pMaxY - centerY) * invDy;
+          if (ty1 < ty2) {
+            if (ty1 > tNear) tNear = ty1;
+            if (ty2 < tFar) tFar = ty2;
+          } else {
+            if (ty2 > tNear) tNear = ty2;
+            if (ty1 < tFar) tFar = ty1;
+          }
+          if (tNear > tFar) continue;
+        }
         const raycastResult = gdjs.Polygon.raycastTest(
-          poly,
+          polygons[i],
           centerX,
           centerY,
           targetX,
@@ -142,14 +217,43 @@ namespace gdjs {
         );
         if (raycastResult.collision && raycastResult.closeSqDist <= minSqDist) {
           minSqDist = raycastResult.closeSqDist;
-          closestPoint[0] = raycastResult.closeX;
-          closestPoint[1] = raycastResult.closeY;
+          result[0] = raycastResult.closeX;
+          result[1] = raycastResult.closeY;
         }
       }
-      if (closestPoint[0] && closestPoint[1]) {
-        return closestPoint;
+      if (result[0] && result[1]) {
+        return result;
       }
       return null;
+    }
+
+    _getNextPooledPoint(): FloatPoint {
+      if (this._closestPointsPoolIndex < this._closestPointsPool.length) {
+        return this._closestPointsPool[this._closestPointsPoolIndex++];
+      }
+      const point: FloatPoint = [0, 0];
+      this._closestPointsPool.push(point);
+      this._closestPointsPoolIndex++;
+      return point;
+    }
+
+    _getNextPooledVertexAngle(
+      vertex: FloatPoint,
+      angle: float
+    ): { vertex: FloatPoint; angle: float } {
+      if (
+        this._closestVertexAnglePoolIndex < this._closestVertexAnglePool.length
+      ) {
+        const obj =
+          this._closestVertexAnglePool[this._closestVertexAnglePoolIndex++];
+        obj.vertex = vertex;
+        obj.angle = angle;
+        return obj;
+      }
+      const obj = { vertex, angle };
+      this._closestVertexAnglePool.push(obj);
+      this._closestVertexAnglePoolIndex++;
+      return obj;
     }
 
     getRendererObject(): PIXI.Mesh | null | PIXI.Container {
@@ -442,7 +546,7 @@ namespace gdjs {
      * @returns the vertices of mesh.
      */
     _computeLightVertices(): Array<FloatPoint> {
-      const lightObstacles: gdjs.LightObstacleRuntimeBehavior[] = [];
+      const lightObstacles = this._lightObstaclesTemp;
       if (this._manager) {
         this._manager.getAllObstaclesAround(
           this._object,
@@ -469,8 +573,10 @@ namespace gdjs {
         this._lightBoundingPoly.vertices[i][1] = objectHitBox.vertices[i][1];
       }
 
-      // Create the list of polygons to compute the light vertices
-      const obstaclePolygons: Array<gdjs.Polygon> = [];
+      // Build the list of polygons, reusing the class-level array to avoid
+      // per-frame heap allocation.
+      const obstaclePolygons = this._obstaclePolygonsTemp;
+      obstaclePolygons.length = 0;
       obstaclePolygons.push(this._lightBoundingPoly);
       for (let i = 0; i < lightObstacles.length; i++) {
         const obstacleHitBoxes = lightObstacles[i].owner.getHitBoxesAround(
@@ -488,7 +594,8 @@ namespace gdjs {
       let minX = this._object.x - this._radius;
       let maxY = this._object.y + this._radius;
       let minY = this._object.y - this._radius;
-      const flattenVertices: Array<FloatPoint> = [];
+      const flattenVertices = this._flattenVerticesTemp;
+      flattenVertices.length = 0;
       for (let i = 1; i < obstaclePolygons.length; i++) {
         const vertices = obstaclePolygons[i].vertices;
         const verticesCount = vertices.length;
@@ -530,11 +637,41 @@ namespace gdjs {
             (maxY - this._object.y) * (maxY - this._object.y)
         )
       );
+
+      // Pre-compute AABBs for all obstacle polygons (4 floats each: minX, minY, maxX, maxY).
+      // These are used in _computeClosestIntersectionPoint to quickly skip polygons
+      // whose bounding box doesn't overlap the ray segment, avoiding the full raycast.
+      const polyCount = obstaclePolygons.length;
+      if (this._obstaclePolygonsAABB.length < polyCount * 4) {
+        this._obstaclePolygonsAABB = new Float32Array(polyCount * 4);
+      }
+      for (let i = 0; i < polyCount; i++) {
+        const verts = obstaclePolygons[i].vertices;
+        let pMinX = verts[0][0];
+        let pMaxX = verts[0][0];
+        let pMinY = verts[0][1];
+        let pMaxY = verts[0][1];
+        for (let v = 1; v < verts.length; v++) {
+          if (verts[v][0] < pMinX) pMinX = verts[v][0];
+          else if (verts[v][0] > pMaxX) pMaxX = verts[v][0];
+          if (verts[v][1] < pMinY) pMinY = verts[v][1];
+          else if (verts[v][1] > pMaxY) pMaxY = verts[v][1];
+        }
+        const base = i * 4;
+        this._obstaclePolygonsAABB[base] = pMinX;
+        this._obstaclePolygonsAABB[base + 1] = pMinY;
+        this._obstaclePolygonsAABB[base + 2] = pMaxX;
+        this._obstaclePolygonsAABB[base + 3] = pMaxY;
+      }
+
       // Add this._object.hitBoxes vertices.
       for (let i = 0; i < 4; i++) {
         flattenVertices.push(obstaclePolygons[0].vertices[i]);
       }
-      const closestVertices: Array<any> = [];
+      const closestVertices = this._closestVerticesTemp;
+      closestVertices.length = 0;
+      this._closestPointsPoolIndex = 0;
+      this._closestVertexAnglePoolIndex = 0;
       const flattenVerticesCount = flattenVertices.length;
       for (let i = 0; i < flattenVerticesCount; i++) {
         const xdiff = flattenVertices[i][0] - this._object.x;
@@ -545,10 +682,14 @@ namespace gdjs {
             this._object,
             angle,
             obstaclePolygons,
-            boundingSquareHalfDiag
+            this._obstaclePolygonsAABB,
+            boundingSquareHalfDiag,
+            this._getNextPooledPoint()
           );
         if (closestVertex) {
-          closestVertices.push({ vertex: closestVertex, angle: angle });
+          closestVertices.push(
+            this._getNextPooledVertexAngle(closestVertex, angle)
+          );
         }
 
         // TODO: Check whether we need to raycast these two extra rays or not.
@@ -557,34 +698,44 @@ namespace gdjs {
             this._object,
             angle + 0.0001,
             obstaclePolygons,
-            boundingSquareHalfDiag
+            this._obstaclePolygonsAABB,
+            boundingSquareHalfDiag,
+            this._getNextPooledPoint()
           );
         if (closestVertexOffsetLeft) {
-          closestVertices.push({
-            vertex: closestVertexOffsetLeft,
-            angle: angle + 0.0001,
-          });
+          closestVertices.push(
+            this._getNextPooledVertexAngle(
+              closestVertexOffsetLeft,
+              angle + 0.0001
+            )
+          );
         }
         const closestVertexOffsetRight =
           LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
             this._object,
             angle - 0.0001,
             obstaclePolygons,
-            boundingSquareHalfDiag
+            this._obstaclePolygonsAABB,
+            boundingSquareHalfDiag,
+            this._getNextPooledPoint()
           );
         if (closestVertexOffsetRight) {
-          closestVertices.push({
-            vertex: closestVertexOffsetRight,
-            angle: angle - 0.0001,
-          });
+          closestVertices.push(
+            this._getNextPooledVertexAngle(
+              closestVertexOffsetRight,
+              angle - 0.0001
+            )
+          );
         }
       }
       closestVertices.sort(
         LightRuntimeObjectPixiRenderer._verticesWithAngleComparator
       );
       const closestVerticesCount = closestVertices.length;
-      if (closestVerticesCount === 0) return [];
-      const filteredVerticesResult = [closestVertices[0].vertex];
+      const filteredVerticesResult = this._filteredVerticesTemp;
+      filteredVerticesResult.length = 0;
+      if (closestVerticesCount === 0) return filteredVerticesResult;
+      filteredVerticesResult.push(closestVertices[0].vertex);
       for (let i = 1; i < closestVerticesCount; i++) {
         if (closestVertices[i].angle !== closestVertices[i - 1].angle) {
           filteredVerticesResult.push(closestVertices[i].vertex);

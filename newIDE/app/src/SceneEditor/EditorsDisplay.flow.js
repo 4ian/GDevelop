@@ -20,6 +20,9 @@ import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateOb
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { type EditorViewPosition2D } from '../InstancesEditor';
+import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
+
+export type LastSelectionType = 'instance' | 'object' | 'layer' | 'objectGroup';
 
 export type SceneEditorsDisplayProps = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -33,7 +36,7 @@ export type SceneEditorsDisplayProps = {|
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   initialInstances: gdInitialInstancesContainer,
-  lastSelectionType: 'instance' | 'object' | 'layer',
+  lastSelectionType: LastSelectionType,
   instancesSelection: InstancesSelection,
   onSelectInstances: (
     instances: Array<gdInitialInstance>,
@@ -42,7 +45,11 @@ export type SceneEditorsDisplayProps = {|
   ) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
-  editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
+  editObjectByName: ({
+    objectName: string,
+    initialTab: ObjectEditorTab,
+    shouldSelectTheObject: boolean,
+  }) => void,
   editObjectInPropertiesPanel: (objectName: string) => void,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onEffectAdded: () => void,
@@ -72,6 +79,9 @@ export type SceneEditorsDisplayProps = {|
   onLayersModified: () => void,
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,
+  selectedObjectGroup: gdObjectGroup | null,
+  onSelectObjectGroup: (objectGroup: gdObjectGroup | null) => void,
+  openSceneVariables: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
@@ -86,6 +96,7 @@ export type SceneEditorsDisplayProps = {|
   ) => void,
   onSetAsGlobalObject: (object: gdObject) => void,
   onExportAssets: () => void,
+  onImportAssets: () => void,
   onDeleteObjects: (
     i18n: I18nType,
     objectsWithContext: ObjectWithContext[],
@@ -101,7 +112,10 @@ export type SceneEditorsDisplayProps = {|
     done: (boolean) => void
   ) => void,
   onCreateObjectGroup: () => void,
-  onEditObjectGroup: (?gdObjectGroup) => void,
+  onEditObjectGroup: (
+    objectGroup: gdObjectGroup,
+    initialTab: ?ObjectGroupEditorTab
+  ) => void,
   onDeleteObjectGroup: (
     groupWithContext: GroupWithContext,
     done: (boolean) => void
@@ -122,6 +136,9 @@ export type SceneEditorsDisplayProps = {|
   ) => boolean,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
 
   updateBehaviorsSharedData: () => void,
   onInstancesAdded: (Array<gdInitialInstance>) => void,
@@ -156,7 +173,10 @@ export type SceneEditorsDisplayProps = {|
   onOpenedEditorsChanged: () => void,
   onRestartInGameEditor: (reason: string) => void,
   showRestartInGameEditorAfterErrorButton: boolean,
-  onEventsBasedObjectChildrenEdited: gdEventsBasedObject => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) => void,
 |};
 
 export type SceneEditorsDisplayInterface = {|
@@ -185,7 +205,7 @@ export type SceneEditorsDisplayInterface = {|
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,
   |},
-  startSceneRendering: (start: boolean) => void,
+  startSceneRendering: (start: boolean, reason: string) => void,
   instancesHandlers: {|
     getContentAABB: () => Rectangle | null,
     getSelectionAABB: () => Rectangle,

@@ -3,11 +3,14 @@ import React from 'react';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 import ResourcesEditor from '../../ResourcesEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -47,11 +50,18 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No updates to be done.
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) {
     // No thing to be done.
   }
 
-  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+  onSceneObjectEdited(
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
+  ) {
     // No thing to be done.
   }
 
@@ -60,6 +70,10 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  selectAllInsideEditor() {
     // No thing to be done.
   }
 
@@ -74,6 +88,10 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
     // No thing to be done.
   }
 

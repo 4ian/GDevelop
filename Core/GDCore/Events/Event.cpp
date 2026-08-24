@@ -18,12 +18,39 @@ namespace gd {
 
 EventsList BaseEvent::badSubEvents;
 VariablesContainer BaseEvent::badLocalVariables;
+const gd::String BaseEvent::conditionsLabel = "conditions";
+const gd::String BaseEvent::actionsLabel = "actions";
+const gd::String BaseEvent::whileConditionsLabel = "whileConditions";
 
 BaseEvent::BaseEvent()
     : totalTimeDuringLastSession(0),
       percentDuringLastSession(0),
       disabled(false),
       folded(false) {}
+
+// Copy operations are user-defined because _memoryTracked must not be copied:
+// it registers the owning instance in MemoryTrackedRegistry.
+BaseEvent::BaseEvent(const BaseEvent& other)
+    : originalEvent(other.originalEvent),
+      totalTimeDuringLastSession(other.totalTimeDuringLastSession),
+      percentDuringLastSession(other.percentDuringLastSession),
+      folded(other.folded),
+      disabled(other.disabled),
+      type(other.type),
+      aiGeneratedEventId(other.aiGeneratedEventId) {}
+
+BaseEvent& BaseEvent::operator=(const BaseEvent& other) {
+  if (this != &other) {
+    originalEvent = other.originalEvent;
+    totalTimeDuringLastSession = other.totalTimeDuringLastSession;
+    percentDuringLastSession = other.percentDuringLastSession;
+    folded = other.folded;
+    disabled = other.disabled;
+    type = other.type;
+    aiGeneratedEventId = other.aiGeneratedEventId;
+  }
+  return *this;
+}
 
 bool BaseEvent::HasSubEvents() const { return !GetSubEvents().IsEmpty(); }
 

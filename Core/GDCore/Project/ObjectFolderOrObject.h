@@ -11,6 +11,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/Project/QuickCustomization.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 
 namespace gd {
 class Project;
@@ -151,6 +152,13 @@ class GD_CORE_API ObjectFolderOrObject {
    */
   ObjectFolderOrObject& InsertNewFolder(const gd::String& newFolderName,
                                         std::size_t position);
+
+  /**
+   * \brief Return a folder with the given name and create it if it didn't
+   * exist.
+   */
+  ObjectFolderOrObject &GetOrCreateFolderChild(const gd::String &name);
+
   /**
    * \brief Returns true if the instance is a descendant of the given instance
    * of ObjectFolderOrObject.
@@ -207,6 +215,8 @@ class GD_CORE_API ObjectFolderOrObject {
   gd::String folderName;  // Empty if object is set.
   std::vector<std::unique_ptr<ObjectFolderOrObject>>
       children;  // Folder children.
+
+  gd::MemoryTracked _memoryTracked{this, "ObjectFolderOrObject"};
 };
 
 }  // namespace gd

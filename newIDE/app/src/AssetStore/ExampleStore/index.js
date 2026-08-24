@@ -154,28 +154,18 @@ const ExampleStore = ({
         receivedGameTemplates,
         privateGameTemplateListingDatas:
           privateGameTemplateListingDatasSearchResults && !hidePremiumTemplates
-            ? privateGameTemplateListingDatasSearchResults
-                .map(({ item }) => item)
-                .filter(
-                  privateGameTemplateListingData =>
-                    !onlyShowGames || gameFilter(privateGameTemplateListingData)
-                )
+            ? privateGameTemplateListingDatasSearchResults.filter(
+                ({ item }) => !onlyShowGames || gameFilter(item)
+              )
             : [],
         exampleShortHeaders: exampleShortHeadersSearchResults
           ? exampleShortHeadersSearchResults
-              .map(({ item }) => item)
+              .filter(({ item }) => !onlyShowGames || gameFilter(item))
               .filter(
-                exampleShortHeader =>
-                  !onlyShowGames || gameFilter(exampleShortHeader)
-              )
-              .filter(
-                exampleShortHeader =>
+                ({ item }) =>
                   !allExampleShortHeaders ||
                   !hideStartingPoints ||
-                  noStartingPointFilter(
-                    allExampleShortHeaders,
-                    exampleShortHeader
-                  )
+                  noStartingPointFilter(allExampleShortHeaders, item)
               )
           : [],
         onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
@@ -201,6 +191,7 @@ const ExampleStore = ({
         gdevelopTheme,
         privateGameTemplatesPeriodicity: 1,
         showOwnedGameTemplatesFirst: true,
+        isSearchActive: !!exampleStoreSearchText,
         disabled,
       });
     },
@@ -216,6 +207,7 @@ const ExampleStore = ({
       hideStartingPoints,
       allExampleShortHeaders,
       hidePremiumTemplates,
+      exampleStoreSearchText,
       disabled,
     ]
   );

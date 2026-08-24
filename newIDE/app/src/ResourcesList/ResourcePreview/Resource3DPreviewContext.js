@@ -2,14 +2,25 @@
 import * as React from 'react';
 // Import the worker (will be handled by worker-loader)
 import Resource3DPreviewWorker from './Resource3DPreview.worker';
+import { checkIfCredentialsRequired } from '../../Utils/CrossOrigin';
+import {
+  loadDracoDecoderFiles,
+  type DracoDecoderFiles,
+} from '../../Utils/DracoDecoder';
 
 type WorkerInitMessage = {|
   type: 'INIT',
+  // The Draco decoder files are read by the main thread, because a worker can't
+  // read them by itself in the desktop app (`file://` URLs can't be fetched by
+  // workers).
+  dracoDecoderFiles: ?DracoDecoderFiles,
 |};
 
 type WorkerRenderModelMessage = {|
   type: 'RENDER_MODEL',
   resourceUrl: string,
+  resourceData: ArrayBuffer,
+  basePath: string,
 |};
 
 type WorkerOutInitMessage = {|
@@ -60,7 +71,8 @@ const MESSAGE_TYPES = {
 // Worker manager that handles initialization and communication
 class Resource3DPreviewWorkerManager {
   worker: Worker;
-  isInitialized: boolean = false;
+  initializationPromise: Promise<boolean>;
+  _onInitialized: (isInitialized: boolean) => void = () => {};
   pendingPromises: Map<
     string,
     { resolve: (dataUrl: string) => void, reject: () => void }
@@ -72,7 +84,7 @@ class Resource3DPreviewWorkerManager {
     // $FlowFixMe[invalid-constructor]
     this.worker = new Resource3DPreviewWorker();
     this.setupMessageHandlers();
-    this.initWorker();
+    this.initializationPromise = this.initWorker();
   }
 
   setupMessageHandlers() {
@@ -86,7 +98,7 @@ class Resource3DPreviewWorkerManager {
           const { success } =
             // $FlowFixMe[incompatible-type]
             (workerOutMessageData: WorkerOutInitMessage);
-          this.isInitialized = success;
+          this._onInitialized(success);
           break;
 
         case MESSAGE_TYPES.RENDER_COMPLETE:
@@ -121,6 +133,10 @@ class Resource3DPreviewWorkerManager {
 
     this.worker.onerror = error => {
       console.error('Worker error:', error);
+      // In case the worker crashed before answering the initialization
+      // message, consider it not initialized (so that renders requests
+      // are not waiting forever and get the fallback image instead).
+      this._onInitialized(false);
       // Resolve any pending promises with the fallback image
       this.pendingPromises.forEach(promise => {
         promise.resolve(this.fallbackImagePath);
@@ -129,26 +145,62 @@ class Resource3DPreviewWorkerManager {
     };
   }
 
-  initWorker() {
-    // $FlowFixMe[incompatible-type]
-    const message: WorkerInitMessage = { type: MESSAGE_TYPES.INIT };
-    this.worker.postMessage(message);
+  async initWorker(): Promise<boolean> {
+    const initializedPromise: Promise<boolean> = new Promise(resolve => {
+      this._onInitialized = resolve;
+    });
+
+    // Read the Draco decoder files so that the worker can render the models
+    // compressed with Draco.
+    let dracoDecoderFiles = null;
+    try {
+      dracoDecoderFiles = await loadDracoDecoderFiles();
+    } catch (error) {
+      // Without the decoder files, only the models that are not compressed
+      // with Draco can be rendered.
+      console.error("Can't read the Draco decoder files:", error);
+    }
+
+    const message: WorkerInitMessage = {
+      // $FlowFixMe[incompatible-type]
+      type: MESSAGE_TYPES.INIT,
+      dracoDecoderFiles,
+    };
+    this.worker.postMessage(
+      message,
+      dracoDecoderFiles
+        ? // Transfer the ArrayBuffers to avoid copying them across threads.
+          [
+            dracoDecoderFiles.dracoWasmWrapperJs,
+            dracoDecoderFiles.dracoDecoderWasm,
+          ]
+        : []
+    );
+
+    return initializedPromise;
   }
 
-  renderModel(resourceUrl: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      if (!this.isInitialized) {
-        resolve(this.fallbackImagePath);
-        return;
-      }
+  async renderModel(
+    resourceUrl: string,
+    resourceData: ArrayBuffer,
+    basePath: string
+  ): Promise<string> {
+    const isInitialized = await this.initializationPromise;
+    if (!isInitialized) {
+      return this.fallbackImagePath;
+    }
 
+    return new Promise((resolve, reject) => {
       this.pendingPromises.set(resourceUrl, { resolve, reject });
       const message: WorkerRenderModelMessage = {
         // $FlowFixMe[incompatible-type]
         type: MESSAGE_TYPES.RENDER_MODEL,
         resourceUrl,
+        resourceData,
+        basePath,
       };
-      this.worker.postMessage(message);
+      // Transfer the ArrayBuffer to avoid copying it across threads.
+      this.worker.postMessage(message, [resourceData]);
     });
   }
 
@@ -210,12 +262,36 @@ export const Resource3DPreviewProvider = ({
   }, []);
 
   const renderModel = React.useCallback(async (url: string) => {
-    if (!workerManagerRef.current) {
+    const workerManager = workerManagerRef.current;
+    if (!workerManager) {
       return null;
     }
 
+    // Fetch the resource data on the main thread. Workers in Electron cannot
+    // fetch file:// URLs because webSecurity:false only applies to the renderer
+    // process, not the network service process used by workers.
+    let resourceData: ArrayBuffer;
     try {
-      const dataUrl = await workerManagerRef.current.renderModel(url);
+      const response = await fetch(url, {
+        credentials: checkIfCredentialsRequired(url)
+          ? 'include'
+          : 'same-origin',
+      });
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+      resourceData = await response.arrayBuffer();
+    } catch (error) {
+      console.error('Error fetching 3D model resource:', error);
+      return 'JsPlatform/Extensions/3d_model.svg';
+    }
+
+    const basePath = url.substring(0, url.lastIndexOf('/') + 1);
+
+    try {
+      const dataUrl = await workerManager.renderModel(
+        url,
+        resourceData,
+        basePath
+      );
       return dataUrl;
     } catch (error) {
       console.error('Error rendering 3D model:', error);

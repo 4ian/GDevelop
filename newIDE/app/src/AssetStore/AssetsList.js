@@ -57,17 +57,18 @@ import { LARGE_WIDGET_SIZE } from '../MainFrame/EditorContainers/HomePage/CardWi
 
 const ASSETS_DISPLAY_LIMIT = 60;
 
-const getAssetSize = (windowSize: WindowSizeType) => {
+const getAssetColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
   switch (windowSize) {
     case 'small':
-      return 80;
+      return isLandscape ? 4 : 3;
     case 'medium':
-      return 120;
+      return 5;
     case 'large':
+      return 8;
     case 'xlarge':
-      return 130;
+      return 10;
     default:
-      return 120;
+      return 3;
   }
 };
 
@@ -111,17 +112,28 @@ const getPageBreakAssetLowerIndex = (pageBreakIndex: number) =>
 const getPageBreakAssetUpperIndex = (pageBreakIndex: number) =>
   ASSETS_DISPLAY_LIMIT * (pageBreakIndex + 1);
 
+export const filterAssetShortHeadersByFolders = (
+  allAssetShortHeaders: AssetShortHeader[],
+  selectedFolders: string[]
+): AssetShortHeader[] => {
+  if (!selectedFolders.length) return allAssetShortHeaders;
+  return allAssetShortHeaders.filter(assetShortHeader =>
+    // Check that the asset has all the selected folders tags.
+    selectedFolders.every(folderTag =>
+      assetShortHeader.tags.includes(folderTag)
+    )
+  );
+};
+
 export const getAssetShortHeadersToDisplay = (
   allAssetShortHeaders: AssetShortHeader[],
   selectedFolders: string[],
   pageBreakIndex: number = 0
 ): AssetShortHeader[] => {
-  let assetShortHeaders = allAssetShortHeaders.filter(assetShortHeader => {
-    if (!selectedFolders.length) return true;
-    const allAssetTags = assetShortHeader.tags;
-    // Check that the asset has all the selected folders tags.
-    return selectedFolders.every(folderTag => allAssetTags.includes(folderTag));
-  });
+  let assetShortHeaders = filterAssetShortHeadersByFolders(
+    allAssetShortHeaders,
+    selectedFolders
+  );
   // Limit the number of displayed assets to avoid performance issues
   const pageBreakAssetLowerIndex = getPageBreakAssetLowerIndex(pageBreakIndex);
   const pageBreakAssetUpperIndex = Math.min(
@@ -154,6 +166,8 @@ const styles = {
   scrollView: {
     display: 'flex',
     flexDirection: 'column',
+    // Prevent horizontal scrollbars.
+    overflowX: 'hidden',
   },
   previewImageContainer: {
     display: 'flex',
@@ -341,6 +355,25 @@ const AssetsList: React.ComponentType<{
       },
       [currentPage]
     );
+    React.useEffect(
+      () => {
+        setPageBreakIndex(0);
+        if (currentPage) currentPage.pageBreakIndex = 0;
+      },
+      // selectedFolders is a new array reference each time a folder is selected,
+      // so this resets pagination whenever the folder selection changes.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [selectedFolders]
+    );
+    const folderFilteredAssetShortHeaders = React.useMemo<
+      Array<AssetShortHeader>
+    >(
+      () =>
+        assetShortHeaders
+          ? filterAssetShortHeadersByFolders(assetShortHeaders, selectedFolders)
+          : [],
+      [assetShortHeaders, selectedFolders]
+    );
     const { windowSize, isLandscape } = useResponsiveWindowSize();
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -494,7 +527,6 @@ const AssetsList: React.ComponentType<{
         // Don't show assets if filtering on asset packs.)
         // $FlowFixMe[missing-empty-array-annot]
         if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
-        const assetSize = getAssetSize(windowSize);
 
         return getAssetShortHeadersToDisplay(
           assetShortHeaders,
@@ -504,9 +536,7 @@ const AssetsList: React.ComponentType<{
           <AssetCardTile
             assetShortHeader={assetShortHeader}
             onOpenDetails={() => onOpenDetails(assetShortHeader)}
-            size={assetSize}
             key={assetShortHeader.id}
-            margin={cellSpacing / 2}
             hideShortDescription={!!hideDetails}
           />
         ));
@@ -517,7 +547,6 @@ const AssetsList: React.ComponentType<{
         openedAssetPack,
         selectedFolders,
         pageBreakIndex,
-        windowSize,
         onOpenDetails,
         hideDetails,
       ]
@@ -630,7 +659,7 @@ const AssetsList: React.ComponentType<{
 
     const publicAssetPackAuthors: ?Array<Author> = React.useMemo(
       () =>
-        openedAssetPack && authors && openedAssetPack.authors
+        openedAssetPack && Array.isArray(authors) && openedAssetPack.authors
           ? openedAssetPack.authors
               .map(author => {
                 return authors.find(({ name }) => name === author.name);
@@ -642,7 +671,7 @@ const AssetsList: React.ComponentType<{
 
     const publicAssetPackLicenses: ?Array<License> = React.useMemo(
       () =>
-        openedAssetPack && licenses && openedAssetPack.licenses
+        openedAssetPack && Array.isArray(licenses) && openedAssetPack.licenses
           ? openedAssetPack.licenses
               .map(license => {
                 return licenses.find(({ name }) => name === license.name);
@@ -945,7 +974,12 @@ const AssetsList: React.ComponentType<{
         {isNavigatingInsideFolder ? (
           <PlaceholderLoader />
         ) : assetTiles && assetTiles.length ? (
-          <GridList style={styles.grid} cellHeight="auto">
+          <GridList
+            style={styles.grid}
+            cellHeight="auto"
+            cols={getAssetColumns(windowSize, isLandscape)}
+            spacing={cellSpacing}
+          >
             {assetTiles}
           </GridList>
         ) : openedAssetPack &&
@@ -973,13 +1007,13 @@ const AssetsList: React.ComponentType<{
             !isAssetPackAudioOnly(openedAssetPack)) &&
           noResultComponent}
         {currentPage &&
-          assetShortHeaders &&
-          assetShortHeaders.length > getPageBreakAssetUpperIndex(0) && (
+          folderFilteredAssetShortHeaders.length >
+            getPageBreakAssetUpperIndex(0) && (
             <PageBreakNavigation
               currentPage={currentPage}
               pageBreakIndex={pageBreakIndex}
               setPageBreakIndex={setPageBreakIndex}
-              assetShortHeaders={assetShortHeaders}
+              assetShortHeaders={folderFilteredAssetShortHeaders}
               scrollView={scrollView.current}
             />
           )}

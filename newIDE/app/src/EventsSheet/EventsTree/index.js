@@ -6,7 +6,6 @@ import SortableEventsTree, {
   getNodeAtPath,
   type SortableTreeNode,
 } from './SortableEventsTree';
-import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
 import { isEventSelected } from '../SelectionHandler';
 import EventsRenderingService from './EventsRenderingService';
@@ -55,6 +54,7 @@ import {
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import { useDragDropManager } from 'react-dnd';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
@@ -62,12 +62,23 @@ const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
 
+const EventDragSourceAndDropTarget = makeDragSourceAndDropTarget<SortableTreeNode>(
+  eventsSheetEventsDnDType
+);
+const EventDropTarget = makeDropTarget<SortableTreeNode>(
+  eventsSheetEventsDnDType
+);
+
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
 );
 
 const defaultIndentWidth = 22;
 const smallIndentWidth = 11;
+// Placeholder height for events whose real height is not yet measured.
+// Prevents all events from collapsing to 1px at startup, which would cause
+// the virtualized list to render all of them at once.
+const defaultEventHeight = 100;
 
 const styles = {
   container: { flex: 1, position: 'relative' },
@@ -135,12 +146,19 @@ type EventsContainerProps = {|
   eventsSheetWidth: number,
   eventsSheetHeight: number,
 
-  connectDragSource: ConnectDragSource,
   windowSize: WindowSizeType,
 
   idPrefix: string,
   highlightedAiGeneratedEventIds: Set<string>,
   isValidElseEvent: boolean,
+  highlightedSearchText: ?string,
+  highlightedSearchMatchCase?: boolean,
+
+  node: SortableTreeNode,
+  isDragged: boolean,
+  onBeginDrag: () => void,
+  onEndDrag: () => void,
+  onTemporaryUnfoldNode: (isOverLazy: boolean) => void,
 |};
 
 /**
@@ -167,8 +185,10 @@ const EventContainer = (props: EventsContainerProps) => {
   React.useLayoutEffect(() => {
     const container = containerRef.current;
     const height = container ? container.offsetHeight : 0;
-    if (height === 0) {
-      // An empty height means that the event is hidden, when navigating outside of the events sheet tab for example.
+    const width = container ? container.offsetWidth : 0;
+    if (height === 0 || width === 0) {
+      // An empty height or width means the event is hidden (e.g. navigating outside
+      // the events sheet tab), or the container hasn't been sized yet.
       // Don't store the height in this case.
       return;
     }
@@ -185,86 +205,158 @@ const EventContainer = (props: EventsContainerProps) => {
 
   const _onEventContextMenu = React.useCallback(
     (domEvent: MouseEvent) => {
+      // When right-clicking inside an editable text field (for example when
+      // editing a Comment, a Group name or some JavaScript code), let the
+      // native text editing context menu (cut/copy/paste) be shown instead of
+      // the event context menu. Otherwise both would open at the same time,
+      // which makes the menu flicker and disappear on Windows.
+      // `closest` is duck-typed rather than gated on `instanceof Element`: when
+      // the events sheet is rendered in a popped-out window, the target comes
+      // from that window's realm and would fail an `instanceof` check against
+      // the main window's `Element`.
+      const target: any = domEvent.target;
+      if (
+        target &&
+        typeof target.closest === 'function' &&
+        target.closest('textarea, input, [contenteditable="true"]')
+      ) {
+        return;
+      }
       domEvent.preventDefault();
       onEventContextMenu(domEvent.clientX, domEvent.clientY);
     },
     [onEventContextMenu]
   );
 
-  const longTouchForContextMenuProps = useLongTouch(
+  const dragDropManager = useDragDropManager();
+  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
     React.useCallback(
       (domEvent: any) => {
+        // When the context menu opens it intercepts subsequent touch events,
+        // so the drag backend never receives touchend/touchcancel and the drag
+        // stays active indefinitely. End it explicitly before opening the menu.
+        if (dragDropManager.getMonitor().isDragging()) {
+          dragDropManager.getActions().endDrag();
+        }
         onEventContextMenu(domEvent.clientX, domEvent.clientY);
       },
-      [onEventContextMenu]
+      [dragDropManager, onEventContextMenu]
     ),
     { context: 'events-tree-event-component' }
   );
 
   const EventComponent = EventsRenderingService.getEventComponent(event);
 
+  const eventType = event.getType();
+  const coloredHandleStyle = (() => {
+    if (eventType === 'BuiltinCommonInstructions::Comment') {
+      const commentEvent = gd.asCommentEvent(event);
+      return {
+        backgroundColor: `rgb(${commentEvent.getBackgroundColorRed()}, ${commentEvent.getBackgroundColorGreen()}, ${commentEvent.getBackgroundColorBlue()})`,
+        filter: 'brightness(0.8)',
+      };
+    }
+    if (eventType === 'BuiltinCommonInstructions::Group') {
+      const groupEvent = gd.asGroupEvent(event);
+      return {
+        backgroundColor: `rgb(${groupEvent.getBackgroundColorR()}, ${groupEvent.getBackgroundColorG()}, ${groupEvent.getBackgroundColorB()})`,
+        filter: 'brightness(0.8)',
+      };
+    }
+    return undefined;
+  })();
+
   return (
-    <div
-      ref={containerRef}
-      onClick={props.onEventClick}
-      onContextMenu={_onEventContextMenu}
-      {...longTouchForContextMenuProps}
+    <EventDragSourceAndDropTarget
+      beginDrag={() => {
+        props.onBeginDrag();
+        // $FlowFixMe[incompatible-type]
+        return props.node;
+      }}
+      canDrag={() => !!props.node && !!props.node.event}
+      canDrop={() => true}
+      drop={() => {}}
+      endDrag={props.onEndDrag}
     >
-      {!!EventComponent && (
-        <div style={styles.eventComponentContainer}>
-          {props.connectDragSource(
-            <div
-              className={classNames({
-                [handle]: true,
-                [aiGeneratedEventHandle]: highlightedAiGeneratedEventIds.has(
-                  event.getAiGeneratedEventId()
-                ),
-              })}
-            />
-          )}
-          <div style={styles.container}>
-            <EventComponent
-              project={project}
-              scope={scope}
-              event={event}
-              globalObjectsContainer={props.globalObjectsContainer}
-              objectsContainer={props.objectsContainer}
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
-              selected={isEventSelected(props.selection, event)}
-              selection={props.selection}
-              leftIndentWidth={props.leftIndentWidth}
-              onUpdate={_onUpdate}
-              onAddNewInstruction={props.onAddNewInstruction}
-              onPasteInstructions={props.onPasteInstructions}
-              onMoveToInstruction={props.onMoveToInstruction}
-              onMoveToInstructionsList={props.onMoveToInstructionsList}
-              onInstructionClick={props.onInstructionClick}
-              onInstructionDoubleClick={props.onInstructionDoubleClick}
-              onInstructionContextMenu={props.onInstructionContextMenu}
-              onAddInstructionContextMenu={props.onAddInstructionContextMenu}
-              onVariableDeclarationClick={props.onVariableDeclarationClick}
-              onVariableDeclarationDoubleClick={
-                props.onVariableDeclarationDoubleClick
-              }
-              onEndEditingEvent={props.onEndEditingEvent}
-              onParameterClick={props.onParameterClick}
-              onOpenExternalEvents={props.onOpenExternalEvents}
-              onOpenLayout={props.onOpenLayout}
-              disabled={
-                disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
-              }
-              renderObjectThumbnail={props.renderObjectThumbnail}
-              screenType={props.screenType}
-              eventsSheetWidth={props.eventsSheetWidth}
-              eventsSheetHeight={props.eventsSheetHeight}
-              windowSize={props.windowSize}
-              idPrefix={props.idPrefix}
-              isValidElseEvent={props.isValidElseEvent}
-            />
+      {({ connectDragSource, connectDropTarget, isOverLazy }) => {
+        props.onTemporaryUnfoldNode(isOverLazy);
+        const content = (
+          <div
+            ref={containerRef}
+            onClick={props.onEventClick}
+            onContextMenu={_onEventContextMenu}
+            {...longTouchForContextMenuProps}
+          >
+            {!!EventComponent && (
+              <div style={styles.eventComponentContainer}>
+                {connectDragSource(
+                  <div
+                    className={classNames({
+                      [handle]: true,
+                      [aiGeneratedEventHandle]: highlightedAiGeneratedEventIds.has(
+                        event.getAiGeneratedEventId()
+                      ),
+                    })}
+                    style={coloredHandleStyle}
+                  />
+                )}
+                <div style={styles.container}>
+                  <EventComponent
+                    project={project}
+                    scope={scope}
+                    event={event}
+                    globalObjectsContainer={props.globalObjectsContainer}
+                    objectsContainer={props.objectsContainer}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    selected={isEventSelected(props.selection, event)}
+                    selection={props.selection}
+                    leftIndentWidth={props.leftIndentWidth}
+                    onUpdate={_onUpdate}
+                    onAddNewInstruction={props.onAddNewInstruction}
+                    onPasteInstructions={props.onPasteInstructions}
+                    onMoveToInstruction={props.onMoveToInstruction}
+                    onMoveToInstructionsList={props.onMoveToInstructionsList}
+                    onInstructionClick={props.onInstructionClick}
+                    onInstructionDoubleClick={props.onInstructionDoubleClick}
+                    onInstructionContextMenu={props.onInstructionContextMenu}
+                    onAddInstructionContextMenu={
+                      props.onAddInstructionContextMenu
+                    }
+                    onVariableDeclarationClick={
+                      props.onVariableDeclarationClick
+                    }
+                    onVariableDeclarationDoubleClick={
+                      props.onVariableDeclarationDoubleClick
+                    }
+                    onEndEditingEvent={props.onEndEditingEvent}
+                    onParameterClick={props.onParameterClick}
+                    onOpenExternalEvents={props.onOpenExternalEvents}
+                    onOpenLayout={props.onOpenLayout}
+                    disabled={
+                      disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
+                    }
+                    renderObjectThumbnail={props.renderObjectThumbnail}
+                    screenType={props.screenType}
+                    eventsSheetWidth={props.eventsSheetWidth}
+                    eventsSheetHeight={props.eventsSheetHeight}
+                    windowSize={props.windowSize}
+                    idPrefix={props.idPrefix}
+                    isValidElseEvent={props.isValidElseEvent}
+                    highlightedSearchText={props.highlightedSearchText}
+                    highlightedSearchMatchCase={
+                      props.highlightedSearchMatchCase
+                    }
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
-    </div>
+        );
+        return props.isDragged ? content : connectDropTarget(content);
+      }}
+    </EventDragSourceAndDropTarget>
   );
 };
 
@@ -351,6 +443,8 @@ type EventsTreeProps = {|
 
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
+  highlightedSearchText: ?string,
+  highlightedSearchMatchCase?: boolean,
 
   onEventMoved: (previousRowIndex: number, nextRowIndex: number) => void,
   onEndEditingEvent: (event: gdBaseEvent) => void,
@@ -377,6 +471,11 @@ export type EventsTreeInterface = {|
     rowIndexes: Array<number>
   ) => Array<EventContext>,
   scrollToRow: (row: number) => void,
+  scrollToInstruction: (
+    rowIndex: number,
+    listLabel: string,
+    instructionIndex: number
+  ) => void,
   getEventRow: (event: gdBaseEvent) => number,
   unfoldForEvent: (event: gdBaseEvent) => void,
 |};
@@ -399,14 +498,12 @@ const EventsTree: React.ComponentType<{
   const _list = React.useRef<?any>(null);
   const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
 
-  const DragSourceAndDropTarget = React.useMemo(
-    () =>
-      makeDragSourceAndDropTarget<SortableTreeNode>(eventsSheetEventsDnDType),
-    []
-  );
-  const DropTarget = React.useMemo(
-    () => makeDropTarget<SortableTreeNode>(eventsSheetEventsDnDType),
-    []
+  React.useLayoutEffect(
+    () => {
+      eventsHeightsCache.setOnHeightsChanged(forceUpdate);
+      return () => eventsHeightsCache.setOnHeightsChanged(null);
+    },
+    [eventsHeightsCache, forceUpdate]
   );
   const temporaryUnfoldedNodes = React.useRef<Array<SortableTreeNode>>([]);
   const _hoverTimerId = React.useRef<?TimeoutID>(null);
@@ -414,6 +511,7 @@ const EventsTree: React.ComponentType<{
   const [draggedNode, setDraggedNode] = React.useState(null);
   const [isScrolledTop, setIsScrolledTop] = React.useState(true);
   const [isScrolledBottom, setIsScrolledBottom] = React.useState(false);
+  const lastKnownScrollPosition = React.useRef(0);
 
   // This is the data that will be displayed by the tree - reconstructed at each render
   // (because events could have changed, some could have been deleted, so we can't keep
@@ -427,14 +525,11 @@ const EventsTree: React.ComponentType<{
     };
   }, []);
 
-  /**
-   * Should be called whenever an event height has changed
-   */
-  const onHeightsChanged = React.useCallback(
-    (cb: ?() => void) => {
-      if (_list.current) {
-        _list.current.recomputeRowHeights();
-      }
+  const forceEventsUpdate = React.useCallback(
+    (cb?: () => void) => {
+      // Note: do not do anything here that would trigger re-render of the events yet,
+      // because they can be invalid (deleted). We just ask for a re-render of this component,
+      // which will rebuild the tree data passed to SortableEventsTree.
       forceUpdate();
 
       // Use a timeout so that the callback is called after the events
@@ -445,17 +540,36 @@ const EventsTree: React.ComponentType<{
     },
     [forceUpdate]
   );
-  const forceEventsUpdate = onHeightsChanged;
 
   React.useEffect(() => {
-    onHeightsChanged();
+    forceUpdate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const scrollToRow = React.useCallback((row: number) => {
     if (row === -1) return;
-    if (!_list.current) return;
-    _list.current.scrollToRow(row);
+    const list = _list.current;
+    if (!list) return;
+
+    // If the target row is already fully visible in the DOM, skip the scroll.
+    // React-window's scrollToItem uses summed item heights which can be
+    // inaccurate for non-visible rows, causing unnecessary jumps.
+    const container = list.container;
+    if (container) {
+      const element = container.querySelector(`[data-row-index="${row}"]`);
+      if (element) {
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        if (
+          elementRect.top >= containerRect.top &&
+          elementRect.bottom <= containerRect.bottom
+        ) {
+          return;
+        }
+      }
+    }
+
+    list.scrollToRow(row);
   }, []);
 
   /**
@@ -464,39 +578,31 @@ const EventsTree: React.ComponentType<{
   const unfoldForEvent = React.useCallback(
     (event: gdBaseEvent) => {
       gd.EventsListUnfolder.unfoldWhenContaining(props.events, event);
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate, props.events]
+    [forceUpdate, props.events]
   );
 
   const foldAll = React.useCallback(
     () => {
       gd.EventsListUnfolder.foldAll(props.events);
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate, props.events]
+    [forceUpdate, props.events]
   );
 
   const unfoldToLevel = React.useCallback(
     (level: number) => {
       gd.EventsListUnfolder.unfoldToLevel(props.events, level);
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate, props.events]
+    [forceUpdate, props.events]
   );
 
   const tutorial = React.useMemo(
     () => getTutorial(props.preferences, props.tutorials, 'the-events'),
     [props.preferences, props.tutorials]
   );
-
-  const _canDrag = React.useCallback((node: ?SortableTreeNode) => {
-    return !!node && !!node.event;
-  }, []);
-
-  const _canDrop = React.useCallback((hoveredNode: SortableTreeNode) => {
-    return true;
-  }, []);
 
   const _restoreFoldedNodes = React.useCallback(
     () => {
@@ -505,33 +611,125 @@ const EventsTree: React.ComponentType<{
       );
 
       temporaryUnfoldedNodes.current = [];
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate]
+    [forceUpdate]
   );
 
   const _onEndDrag = React.useCallback(
     () => {
-      // This method is always called at the end of the drag, regardless of whether
-      // an event was actually dropped. It is also already called in `_onDrop` to update
-      // the event list and compute history. So if draggedNode is null, we want to avoid
-      // recomputing the event list.
-      // $FlowFixMe[constant-condition]
-      if (draggedNode) {
-        setDraggedNode(null);
-        _restoreFoldedNodes();
-        forceEventsUpdate();
-      }
+      // Don't look at the draggedNode value. On mobile, the OS
+      // fires touchcancel almost immediately after beginDrag, creating a race
+      // where the spec callback arrives before React re-renders with the updated
+      // draggedNode — so checking the value makes it see draggedNode=null (stale
+      // closure) and skips the cleanup. Calling unconditionally is safe: React
+      // deduplicates the null→null state update, and _restoreFoldedNodes is a
+      // no-op when no nodes were temporarily unfolded.
+      setDraggedNode(null);
+      _restoreFoldedNodes();
+      forceUpdate();
     },
-    [draggedNode, _restoreFoldedNodes, forceEventsUpdate]
+    [_restoreFoldedNodes, forceUpdate]
   );
+
+  // Position-based height snapshot. Used as a fallback in _getRowHeight when
+  // the ptr-based cache has no entry (e.g. right after undo/redo, which
+  // deserializes all events with fresh pointers). Merged rather than replaced
+  // so off-screen events keep their last known height instead of collapsing to
+  // defaultEventHeight.
+  const heightsByRowIndex = React.useRef<{ [number]: number }>({});
 
   const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
   const getEventRow = React.useCallback(
     (searchedEvent: gdBaseEvent) => {
-      return eventPtrToRowIndex.current['' + searchedEvent.ptr] || -1;
+      const key = '' + searchedEvent.ptr;
+      const rowIndex = eventPtrToRowIndex.current[key];
+      return rowIndex === undefined ? -1 : rowIndex;
     },
     [eventPtrToRowIndex]
+  );
+
+  const scrollToInstruction = React.useCallback(
+    (rowIndex: number, listLabel: string, instructionIndex: number) => {
+      // Do NOT call scrollToRow here unconditionally. For tall event rows (many
+      // actions), scrollToRow snaps the row's top edge to the viewport top even
+      // when the target instruction is already visible. We only fall back to it
+      // inside tryScrollToElement if the DOM element isn't found (row not yet
+      // rendered by the virtual list).
+
+      const tryScrollToElement = ({
+        retriesLeft,
+        didScrollToRow,
+      }: {
+        retriesLeft: number,
+        didScrollToRow: boolean,
+      }) => {
+        requestAnimationFrame(() => {
+          const list = _list.current;
+          if (!list || !list.container) return;
+
+          // Search by rowIndex (position-based, stable across undo/redo) rather
+          // than by event.ptr which changes after every deserialization.
+          let relativeNodePath = null;
+          const findNode = (nodes: Array<SortableTreeNode>): boolean => {
+            for (const node of nodes) {
+              if (node.rowIndex === rowIndex) {
+                relativeNodePath = node.relativeNodePath;
+                return true;
+              }
+              if (node.children.length > 0 && findNode(node.children))
+                return true;
+            }
+            return false;
+          };
+          findNode(treeDataRoot.current);
+          if (!relativeNodePath) return;
+
+          // For WhileEvent's loop-guard list the idPrefix gets a '-while' suffix
+          // (set in WhileEvent.js) to avoid colliding with the body conditions.
+          const listIdPrefix =
+            listLabel === 'whileConditions'
+              ? `event-${relativeNodePath.join('-')}-while`
+              : `event-${relativeNodePath.join('-')}`;
+          const type = listLabel === 'actions' ? 'action' : 'condition';
+          const doc = list.container.ownerDocument;
+
+          // Try the exact index first, then one below (covers undo of add where
+          // the instruction at instructionIndex was removed).
+          const element =
+            doc.getElementById(`${listIdPrefix}-${type}-${instructionIndex}`) ||
+            (instructionIndex > 0
+              ? doc.getElementById(
+                  `${listIdPrefix}-${type}-${instructionIndex - 1}`
+                )
+              : null);
+
+          if (element) {
+            const containerRect = list.container.getBoundingClientRect();
+            const elementRect = element.getBoundingClientRect();
+            const alreadyVisible =
+              elementRect.top >= containerRect.top &&
+              elementRect.bottom <= containerRect.bottom;
+            if (!alreadyVisible) {
+              element.scrollIntoView({ block: 'nearest' });
+            }
+          } else if (!didScrollToRow) {
+            // Element not in DOM — the row may not be rendered by the virtual
+            // list yet. Scroll to the row first, then retry.
+            scrollToRow(rowIndex);
+            tryScrollToElement({ retriesLeft, didScrollToRow: true });
+          } else if (retriesLeft > 0) {
+            tryScrollToElement({
+              retriesLeft: retriesLeft - 1,
+              didScrollToRow: true,
+            });
+          }
+        });
+      };
+
+      tryScrollToElement({ retriesLeft: 2, didScrollToRow: false });
+    },
+    [scrollToRow]
   );
 
   const temporaryUnfoldNode = React.useCallback(
@@ -549,7 +747,7 @@ const EventsTree: React.ComponentType<{
               // $FlowFixMe[incompatible-type] - Per the condition above, we are confident that node.event is not null.
               event.setFolded(false);
               temporaryUnfoldedNodes.current.push(node);
-              forceEventsUpdate();
+              forceUpdate();
             }, 1000);
           }
         }
@@ -558,7 +756,7 @@ const EventsTree: React.ComponentType<{
         _hoverTimerId.current = null;
       }
     },
-    [forceEventsUpdate]
+    [forceUpdate]
   );
 
   const _getRowHeight = ({ node }: { node: ?SortableTreeNode }) => {
@@ -570,7 +768,11 @@ const EventsTree: React.ComponentType<{
     }
 
     const height = eventsHeightsCache.getEventHeight(node.event);
-    return height;
+    if (height > 0) return height;
+    // Fall back to the last known height for this row position. This avoids a
+    // visible collapse to defaultEventHeight after undo/redo, which replaces all
+    // event pointers via deserialization and empties the ptr-based cache.
+    return heightsByRowIndex.current[node.rowIndex] || defaultEventHeight;
   };
 
   const {
@@ -637,178 +839,144 @@ const EventsTree: React.ComponentType<{
       !!draggedNode &&
       // $FlowFixMe[invalid-compare]
       (isDescendant(draggedNode, node) || node.key === draggedNode.key);
+
+    const eventContext = {
+      eventsList: node.eventsList,
+      event: event,
+      indexInList: node.indexInList,
+      projectScopedContainersAccessor: node.projectScopedContainersAccessor,
+    };
+
     return (
-      <DragSourceAndDropTarget
-        beginDrag={() => {
-          // $FlowFixMe[incompatible-type]
-          setDraggedNode(node);
-          return node;
+      <div
+        style={{
+          opacity: isDragged ? 0.5 : 1,
+          ...getEventContainerStyle(props.windowSize),
         }}
-        canDrag={() => _canDrag(node)}
-        canDrop={() => _canDrop(node)}
-        // Drop operations are handled by DropContainers.
-        drop={() => {
-          return;
-        }}
-        endDrag={_onEndDrag}
+        {...dataObjectToProps({ rowIndex: node.rowIndex.toString() })}
       >
-        {({ connectDragSource, connectDropTarget, isOverLazy }) => {
-          temporaryUnfoldNode(isOverLazy, node);
-
-          const eventContext = {
-            eventsList: node.eventsList,
-            event: event,
-            indexInList: node.indexInList,
-            projectScopedContainersAccessor:
-              node.projectScopedContainersAccessor,
-          };
-
-          const dropTarget = (
-            <div
-              style={{
-                opacity: isDragged ? 0.5 : 1,
-                ...getEventContainerStyle(props.windowSize),
-              }}
-              {...dataObjectToProps({ rowIndex: node.rowIndex.toString() })}
-            >
-              <EventContainer
-                project={props.project}
-                scope={props.scope}
-                globalObjectsContainer={props.globalObjectsContainer}
-                objectsContainer={props.objectsContainer}
-                projectScopedContainersAccessor={
-                  node.projectScopedContainersAccessor
-                }
-                event={event}
-                key={event.ptr}
-                eventsHeightsCache={eventsHeightsCache}
-                selection={props.selection}
-                leftIndentWidth={
-                  depth * (getIndentWidth(props.windowSize) * props.indentScale)
-                }
-                onUpdate={forceUpdate}
-                onAddNewInstruction={instructionsListContext =>
-                  props.onAddNewInstruction(
-                    eventContext,
-                    instructionsListContext
-                  )
-                }
-                onPasteInstructions={instructionsListContext =>
-                  props.onPasteInstructions(
-                    eventContext,
-                    instructionsListContext
-                  )
-                }
-                onMoveToInstruction={instructionContext =>
-                  props.onMoveToInstruction(eventContext, instructionContext)
-                }
-                onMoveToInstructionsList={instructionContext =>
-                  props.onMoveToInstructionsList(
-                    eventContext,
-                    instructionContext
-                  )
-                }
-                onInstructionClick={instructionContext =>
-                  props.onInstructionClick(eventContext, instructionContext)
-                }
-                onInstructionDoubleClick={instructionContext =>
-                  props.onInstructionDoubleClick(
-                    eventContext,
-                    instructionContext
-                  )
-                }
-                onParameterClick={parameterContext =>
-                  props.onParameterClick(eventContext, parameterContext)
-                }
-                onVariableDeclarationClick={variableDeclarationContext =>
-                  props.onVariableDeclarationClick(
-                    eventContext,
-                    variableDeclarationContext
-                  )
-                }
-                onVariableDeclarationDoubleClick={variableDeclarationContext =>
-                  props.onVariableDeclarationDoubleClick(
-                    eventContext,
-                    variableDeclarationContext
-                  )
-                }
-                onEventClick={() =>
-                  props.onEventClick({
-                    eventsList: node.eventsList,
-                    event: event,
-                    indexInList: node.indexInList,
-                    projectScopedContainersAccessor:
-                      node.projectScopedContainersAccessor,
-                  })
-                }
-                onEndEditingEvent={() => props.onEndEditingEvent(event)}
-                onEventContextMenu={(x, y) =>
-                  props.onEventContextMenu(x, y, {
-                    eventsList: node.eventsList,
-                    event: event,
-                    indexInList: node.indexInList,
-                    projectScopedContainersAccessor:
-                      node.projectScopedContainersAccessor,
-                  })
-                }
-                onInstructionContextMenu={(...args) =>
-                  props.onInstructionContextMenu(eventContext, ...args)
-                }
-                onAddInstructionContextMenu={(...args) =>
-                  props.onAddInstructionContextMenu(eventContext, ...args)
-                }
-                onOpenExternalEvents={props.onOpenExternalEvents}
-                onOpenLayout={(name: string) => {
-                  props.onOpenLayout(name);
-                }}
-                disabled={
-                  disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
-                }
-                renderObjectThumbnail={renderObjectThumbnail}
-                screenType={props.screenType}
-                eventsSheetWidth={props.eventsSheetWidth}
-                eventsSheetHeight={props.eventsSheetHeight}
-                connectDragSource={connectDragSource}
-                windowSize={props.windowSize}
-                idPrefix={`event-${node.relativeNodePath.join('-')}`}
-                isValidElseEvent={isValidElseEvent}
-                highlightedAiGeneratedEventIds={
-                  props.highlightedAiGeneratedEventIds
-                }
-              />
-              {/* $FlowFixMe[constant-condition] */}
-              {draggedNode && (
-                <DropContainer
-                  node={node}
-                  draggedNode={draggedNode}
-                  draggedNodeHeight={_getRowHeight({
-                    node: draggedNode,
-                  })}
-                  DnDComponent={DropTarget}
-                  onDrop={_onDrop}
-                  activateTargets={!isDragged && !!draggedNode}
-                  windowSize={props.windowSize}
-                  indentScale={props.indentScale}
-                  getNodeAtPath={path => {
-                    const result = getNodeAtPath({
-                      path,
-                      treeData: treeDataRoot.current,
-                      getNodeKey,
-                    });
-                    if (!result)
-                      throw new Error(
-                        'Could not find node at path in events tree.'
-                      );
-                    return result.node;
-                  }}
-                />
-              )}
-            </div>
-          );
-
-          return isDragged ? dropTarget : connectDropTarget(dropTarget);
-        }}
-      </DragSourceAndDropTarget>
+        <EventContainer
+          project={props.project}
+          scope={props.scope}
+          globalObjectsContainer={props.globalObjectsContainer}
+          objectsContainer={props.objectsContainer}
+          projectScopedContainersAccessor={node.projectScopedContainersAccessor}
+          event={event}
+          key={event.ptr}
+          eventsHeightsCache={eventsHeightsCache}
+          selection={props.selection}
+          leftIndentWidth={
+            depth * (getIndentWidth(props.windowSize) * props.indentScale)
+          }
+          onUpdate={forceUpdate}
+          onAddNewInstruction={instructionsListContext =>
+            props.onAddNewInstruction(eventContext, instructionsListContext)
+          }
+          onPasteInstructions={instructionsListContext =>
+            props.onPasteInstructions(eventContext, instructionsListContext)
+          }
+          onMoveToInstruction={instructionContext =>
+            props.onMoveToInstruction(eventContext, instructionContext)
+          }
+          onMoveToInstructionsList={instructionContext =>
+            props.onMoveToInstructionsList(eventContext, instructionContext)
+          }
+          onInstructionClick={instructionContext =>
+            props.onInstructionClick(eventContext, instructionContext)
+          }
+          onInstructionDoubleClick={instructionContext =>
+            props.onInstructionDoubleClick(eventContext, instructionContext)
+          }
+          onParameterClick={parameterContext =>
+            props.onParameterClick(eventContext, parameterContext)
+          }
+          onVariableDeclarationClick={variableDeclarationContext =>
+            props.onVariableDeclarationClick(
+              eventContext,
+              variableDeclarationContext
+            )
+          }
+          onVariableDeclarationDoubleClick={variableDeclarationContext =>
+            props.onVariableDeclarationDoubleClick(
+              eventContext,
+              variableDeclarationContext
+            )
+          }
+          onEventClick={() =>
+            props.onEventClick({
+              eventsList: node.eventsList,
+              event: event,
+              indexInList: node.indexInList,
+              projectScopedContainersAccessor:
+                node.projectScopedContainersAccessor,
+            })
+          }
+          onEndEditingEvent={() => props.onEndEditingEvent(event)}
+          onEventContextMenu={(x, y) =>
+            props.onEventContextMenu(x, y, {
+              eventsList: node.eventsList,
+              event: event,
+              indexInList: node.indexInList,
+              projectScopedContainersAccessor:
+                node.projectScopedContainersAccessor,
+            })
+          }
+          onInstructionContextMenu={(...args) =>
+            props.onInstructionContextMenu(eventContext, ...args)
+          }
+          onAddInstructionContextMenu={(...args) =>
+            props.onAddInstructionContextMenu(eventContext, ...args)
+          }
+          onOpenExternalEvents={props.onOpenExternalEvents}
+          onOpenLayout={(name: string) => {
+            props.onOpenLayout(name);
+          }}
+          disabled={
+            disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
+          }
+          renderObjectThumbnail={renderObjectThumbnail}
+          screenType={props.screenType}
+          eventsSheetWidth={props.eventsSheetWidth}
+          eventsSheetHeight={props.eventsSheetHeight}
+          windowSize={props.windowSize}
+          idPrefix={`event-${node.relativeNodePath.join('-')}`}
+          isValidElseEvent={isValidElseEvent}
+          highlightedSearchText={props.highlightedSearchText}
+          highlightedSearchMatchCase={props.highlightedSearchMatchCase}
+          highlightedAiGeneratedEventIds={props.highlightedAiGeneratedEventIds}
+          node={node}
+          isDragged={isDragged}
+          // $FlowFixMe[incompatible-type]
+          onBeginDrag={() => setDraggedNode(node)}
+          onEndDrag={_onEndDrag}
+          onTemporaryUnfoldNode={isOverLazy =>
+            temporaryUnfoldNode(isOverLazy, node)
+          }
+        />
+        {/* $FlowFixMe[constant-condition] */}
+        {draggedNode && (
+          <DropContainer
+            node={node}
+            draggedNode={draggedNode}
+            draggedNodeHeight={_getRowHeight({ node: draggedNode })}
+            DnDComponent={EventDropTarget}
+            onDrop={_onDrop}
+            activateTargets={!isDragged && !!draggedNode}
+            windowSize={props.windowSize}
+            indentScale={props.indentScale}
+            getNodeAtPath={path => {
+              const result = getNodeAtPath({
+                path,
+                treeData: treeDataRoot.current,
+                getNodeKey,
+              });
+              if (!result)
+                throw new Error('Could not find node at path in events tree.');
+              return result.node;
+            }}
+          />
+        )}
+      </div>
     );
   };
 
@@ -846,10 +1014,8 @@ const EventsTree: React.ComponentType<{
           ? isElseEventValid(eventsList, i)
           : false;
 
-      // $FlowFixMe[missing-empty-array-annot]
-      const childrenTreeData = [];
+      const childrenTreeData: Array<SortableTreeNode> = [];
       buildEventsTreeData(
-        // $FlowFixMe[incompatible-type]
         childrenTreeData,
         projectScopedContainersAccessor,
         event.getSubEvents(),
@@ -892,7 +1058,7 @@ const EventsTree: React.ComponentType<{
                 onAddEvent={(eventType: string) =>
                   props.onAddNewEvent(eventType, props.events)
                 }
-                DnDComponent={DropTarget}
+                DnDComponent={EventDropTarget}
                 draggedNode={draggedNode}
                 rootEventsList={eventsList}
               />
@@ -1016,13 +1182,13 @@ const EventsTree: React.ComponentType<{
       .filter(Boolean);
   };
 
-  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => ({
     forceEventsUpdate,
     foldAll,
     unfoldToLevel,
     getEventContextAtRowIndexes,
     scrollToRow,
+    scrollToInstruction,
     getEventRow,
     unfoldForEvent,
   }));
@@ -1033,9 +1199,9 @@ const EventsTree: React.ComponentType<{
       if (!event) return;
 
       event.setFolded(!event.isFolded());
-      forceEventsUpdate();
+      forceUpdate();
     },
-    [forceEventsUpdate]
+    [forceUpdate]
   );
 
   const _isNodeHighlighted = React.useCallback(
@@ -1079,11 +1245,28 @@ const EventsTree: React.ComponentType<{
   );
 
   React.useLayoutEffect(() => {
-    // Recompute the row heights of the tree at each render, because there
-    // is no guarantee that events heights have not changed (resizing, change in event...).
+    // Recompute row heights on every render. This is needed for any change
+    // that affects which event is at which row (deletion, fold/unfold, move)
+    // — not just changes to individual event heights. Scroll-triggered
+    // re-renders (isScrolledTop / isScrolledBottom state flips) are infrequent
+    // and recalculate the same heights, so the extra work is negligible.
     if (_list.current) {
       _list.current.recomputeRowHeights();
     }
+    // Merge newly measured heights into the position-based snapshot so that the
+    // next render after an undo/redo (which replaces all ptrs) can use them as
+    // fallback heights instead of collapsing to defaultEventHeight.
+    const flatData = getFlatDataFromTree({
+      treeData: treeDataRoot.current,
+      getNodeKey,
+      ignoreCollapsed: true,
+    });
+    flatData.forEach(entry => {
+      if (entry.node.event) {
+        const h = eventsHeightsCache.getEventHeight(entry.node.event);
+        if (h > 0) heightsByRowIndex.current[entry.node.rowIndex] = h;
+      }
+    });
   });
 
   return (
@@ -1092,9 +1275,6 @@ const EventsTree: React.ComponentType<{
         ...styles.container,
         fontSize: `${zoomLevel}px`,
         '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
-        '--instruction-missing-parameter-min-height': `${Math.round(
-          zoomLevel * 1.1
-        )}px`,
         '--instruction-missing-parameter-min-width': `${Math.round(
           zoomLevel * 3
         )}px`,
@@ -1105,14 +1285,14 @@ const EventsTree: React.ComponentType<{
       {props.screenType !== 'touch' && (
         <>
           <AutoScroll
-            DnDComponent={DropTarget}
+            DnDComponent={EventDropTarget}
             direction="top"
             // $FlowFixMe[constant-condition]
             activateTargets={!!draggedNode && !isScrolledTop}
             onHover={_scrollUp}
           />
           <AutoScroll
-            DnDComponent={DropTarget}
+            DnDComponent={EventDropTarget}
             direction="bottom"
             // $FlowFixMe[constant-condition]
             activateTargets={!!draggedNode && !isScrolledBottom}
@@ -1133,19 +1313,33 @@ const EventsTree: React.ComponentType<{
         searchMethod={_isNodeHighlighted}
         searchQuery={props.searchResults}
         searchFocusOffset={props.searchFocusOffset}
+        searchFocusedEvent={
+          props.searchResults && props.searchFocusOffset != null
+            ? props.searchResults[props.searchFocusOffset] || null
+            : null
+        }
         className={props.searchResults ? eventsTreeWithSearchResults : ''}
+        eventsSheetWidth={props.eventsSheetWidth}
         reactVirtualizedListProps={{
           ref: list => {
             _list.current = list;
           },
           onScroll: event => {
+            if (lastKnownScrollPosition.current === event.scrollTop) {
+              return;
+            }
+            lastKnownScrollPosition.current = event.scrollTop;
             props.onScroll && props.onScroll();
             setIsScrolledTop(event.scrollTop === 0);
             setIsScrolledBottom(
               event.clientHeight + event.scrollTop >= event.scrollHeight
             );
           },
-          scrollToAlignment: 'center',
+          // 'smart': no-op if the row is already visible; centers it only when
+          // it is more than one viewport away. This prevents undo of an in-view
+          // edit from jumping the viewport due to accumulated height-estimate
+          // errors in never-scrolled-to rows.
+          scrollToAlignment: 'smart',
         }}
       />
     </div>

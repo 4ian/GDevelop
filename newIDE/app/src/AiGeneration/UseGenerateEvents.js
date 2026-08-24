@@ -3,34 +3,40 @@ import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { delay } from '../Utils/Delay';
+import { getBackedOffIntervalInMs } from '../Utils/UseAdaptivePollingInterval';
 import {
   getAiGeneratedEvent,
   createAiGeneratedEvent,
 } from '../Utils/GDevelopServices/Generation';
 
-import { type EventsGenerationResult } from '../EditorFunctions';
+import {
+  type EventsGenerationResult,
+  type EventBatch,
+} from '../EditorFunctions';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
-type _UseGenerateEventsReturnType = {
+type UseGenerateEventsReturnType = {
   generateEvents: ({
-    eventsDescription: string,
+    eventsDescription: string | null,
+    eventBatches: Array<EventBatch> | null,
     existingEventsAsText: string,
     existingEventsJson: string | null,
     extensionNamesList: string,
     objectsList: string,
-    placementHint: string,
+    placementHint: string | null,
     relatedAiRequestId: string,
     sceneName: string,
+    estimatedComplexity: number | null,
   }) => Promise<EventsGenerationResult>,
 };
 export const useGenerateEvents = ({
   project,
 }: {|
   project: ?gdProject,
-|}): _UseGenerateEventsReturnType => {
+|}): UseGenerateEventsReturnType => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
@@ -39,21 +45,25 @@ export const useGenerateEvents = ({
     async ({
       sceneName,
       eventsDescription,
+      eventBatches,
       extensionNamesList,
       objectsList,
       existingEventsAsText,
       existingEventsJson,
       placementHint,
       relatedAiRequestId,
+      estimatedComplexity,
     }: {|
       sceneName: string,
-      eventsDescription: string,
+      eventsDescription: string | null,
+      eventBatches: Array<EventBatch> | null,
       extensionNamesList: string,
       objectsList: string,
       existingEventsAsText: string,
       existingEventsJson: string | null,
-      placementHint: string,
+      placementHint: string | null,
       relatedAiRequestId: string,
+      estimatedComplexity: number | null,
     |}): Promise<EventsGenerationResult> => {
       if (!project) throw new Error('No project is opened.');
       if (!profile) throw new Error('User should be authenticated.');
@@ -66,71 +76,100 @@ export const useGenerateEvents = ({
         simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project)
       );
 
-      const preparedAiUserContent = await prepareAiUserContent({
-        getAuthorizationHeader,
-        userId: profile.id,
-        simplifiedProjectJson,
-        projectSpecificExtensionsSummaryJson,
-        eventsJson: existingEventsJson,
-      });
-
-      const createResult = await retryIfFailed({ times: 2 }, () =>
-        createAiGeneratedEvent(getAuthorizationHeader, {
+      try {
+        const preparedAiUserContent = await prepareAiUserContent({
+          getAuthorizationHeader,
           userId: profile.id,
-          gameProjectJsonUserRelativeKey:
-            preparedAiUserContent.gameProjectJsonUserRelativeKey,
-          gameProjectJson: preparedAiUserContent.gameProjectJson,
-          projectSpecificExtensionsSummaryJsonUserRelativeKey:
-            preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-          projectSpecificExtensionsSummaryJson:
-            preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-          existingEventsJsonUserRelativeKey:
-            preparedAiUserContent.eventsJsonUserRelativeKey,
-          existingEventsJson: preparedAiUserContent.eventsJson,
-          sceneName,
-          eventsDescription,
-          extensionNamesList,
-          objectsList,
-          existingEventsAsText,
-          placementHint,
-          relatedAiRequestId,
-        })
-      );
+          simplifiedProjectJson,
+          projectSpecificExtensionsSummaryJson,
+          eventsJson: existingEventsJson,
+        });
 
-      if (!createResult.creationSucceeded) {
-        return {
-          generationCompleted: false,
-          errorMessage: createResult.errorMessage,
-        };
-      }
+        const createResult = await retryIfFailed(
+          { times: 3, backoff: { initialDelay: 200, factor: 2 } },
+          () =>
+            createAiGeneratedEvent(getAuthorizationHeader, {
+              userId: profile.id,
+              gameProjectJsonUserRelativeKey:
+                preparedAiUserContent.gameProjectJsonUserRelativeKey,
+              gameProjectJson: preparedAiUserContent.gameProjectJson,
+              projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+              projectSpecificExtensionsSummaryJson:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+              existingEventsJsonUserRelativeKey:
+                preparedAiUserContent.eventsJsonUserRelativeKey,
+              existingEventsJson: preparedAiUserContent.eventsJson,
+              sceneName,
+              eventsDescription,
+              eventBatches,
+              extensionNamesList,
+              objectsList,
+              existingEventsAsText,
+              placementHint,
+              relatedAiRequestId,
+              estimatedComplexity,
+            })
+        );
 
-      let remainingAttempts = 50;
-      let aiGeneratedEvent = createResult.aiGeneratedEvent;
-      while (aiGeneratedEvent.status === 'working') {
-        remainingAttempts--;
-        await delay(1000);
-
-        try {
-          aiGeneratedEvent = await getAiGeneratedEvent(getAuthorizationHeader, {
-            userId: profile.id,
-            aiGeneratedEventId: aiGeneratedEvent.id,
-          });
-        } catch (error) {
-          console.warn(
-            'Error while checking status of AI generated event - continuing...',
-            error
-          );
-        }
-        if (remainingAttempts <= 0) {
+        if (!createResult.creationSucceeded) {
           return {
             generationCompleted: false,
-            errorMessage:
-              'Event generation started but failed to complete in time.',
+            errorMessage: createResult.errorMessage,
           };
         }
-      }
 
-      return { generationCompleted: true, aiGeneratedEvent };
+        // Poll with exponential backoff (fast initially, capped), bounded by a
+        // total time budget rather than a fixed attempt count.
+        const maxTotalWaitMs = 180000;
+        const maxPollIntervalMs = 5000;
+        const startTime = Date.now();
+        let pollIntervalMs = 1000;
+        let aiGeneratedEvent = createResult.aiGeneratedEvent;
+        while (aiGeneratedEvent.status === 'working') {
+          await delay(pollIntervalMs);
+
+          try {
+            aiGeneratedEvent = await getAiGeneratedEvent(
+              getAuthorizationHeader,
+              {
+                userId: profile.id,
+                aiGeneratedEventId: aiGeneratedEvent.id,
+              }
+            );
+          } catch (error) {
+            console.warn(
+              'Error while checking status of AI generated event - continuing...',
+              error
+            );
+          }
+          pollIntervalMs = getBackedOffIntervalInMs(
+            pollIntervalMs,
+            maxPollIntervalMs
+          );
+          if (Date.now() - startTime >= maxTotalWaitMs) {
+            return {
+              generationCompleted: false,
+              errorMessage:
+                'Event generation started but failed to complete in time.',
+            };
+          }
+        }
+
+        if (aiGeneratedEvent.status === 'suspended') {
+          return {
+            generationAborted: true,
+          };
+        }
+
+        return { generationCompleted: true, aiGeneratedEvent };
+      } catch (error) {
+        console.error('Error while launching events generation:', error);
+        return {
+          generationCompleted: false,
+          errorMessage: error.message,
+        };
+      }
     },
     [getAuthorizationHeader, project, profile]
   );

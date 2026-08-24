@@ -15,6 +15,7 @@ import {
 import type { ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import GridListTile from '@material-ui/core/GridListTile';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
+import { ImageWithFallback } from '../UI/ImageWithFallback';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
@@ -114,20 +115,19 @@ const styles = {
 export const AssetCardTile = ({
   assetShortHeader,
   onOpenDetails,
-  size,
-  margin,
+  style,
   hideShortDescription,
   disabled,
 }: {|
   assetShortHeader: AssetShortHeader,
   onOpenDetails: () => void,
-  size: number,
-  margin?: number,
+  /** Prop injected by GridList so it can adjust tile size. */
+  style?: any,
   hideShortDescription?: boolean,
   disabled?: boolean,
 |}): React.Node => {
   return (
-    <GridListTile style={{ margin }}>
+    <GridListTile style={style}>
       <CardWidget
         onClick={!disabled ? onOpenDetails : undefined}
         size="large"
@@ -137,7 +137,6 @@ export const AssetCardTile = ({
         <AssetCard
           id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
           assetShortHeader={assetShortHeader}
-          size={size}
           hideShortDescription={hideShortDescription}
         />
       </CardWidget>
@@ -210,7 +209,7 @@ export const PublicAssetPackTile = ({
           id={`asset-pack-${assetPack.tag.replace(/\s/g, '-')}`}
           noOverflowParent
         >
-          <CorsAwareImage
+          <ImageWithFallback
             key={assetPack.name}
             style={{
               ...styles.previewImage,
@@ -266,7 +265,7 @@ export const PrivateAssetPackTile = ({
       >
         <Column noMargin expand noOverflowParent>
           <div style={styles.thumbnailContainer}>
-            <CorsAwareImage
+            <ImageWithFallback
               key={assetPackListingData.name}
               style={{
                 ...styles.previewImage,
@@ -344,7 +343,7 @@ export const PromoBundleCard = ({
           >
             <ResponsiveLineStackLayout expand noMargin noResponsiveLandscape>
               <div style={styles.promoImageContainer}>
-                <CorsAwareImage
+                <ImageWithFallback
                   key={bundleProductListingData.name}
                   style={{
                     ...styles.previewImage,
@@ -489,7 +488,7 @@ export const PrivateGameTemplateTile = ({
         noBorder
       >
         <Column noMargin expand noOverflowParent>
-          <CorsAwareImage
+          <ImageWithFallback
             key={privateGameTemplateListingData.name}
             style={{
               ...styles.previewImage,
@@ -550,7 +549,7 @@ export const CourseTile = ({
         noBorder
       >
         <Column noMargin expand noOverflowParent>
-          <CorsAwareImage
+          <ImageWithFallback
             key={courseListingData.name}
             style={{
               ...styles.previewImage,
@@ -612,7 +611,7 @@ export const BundleTile = ({
             noBorder
           >
             <Column noMargin expand noOverflowParent>
-              <CorsAwareImage
+              <ImageWithFallback
                 key={bundleListingData.name}
                 style={{
                   ...styles.previewImage,
@@ -705,7 +704,7 @@ export const ExampleTile = ({
         <Column noMargin expand noOverflowParent>
           {exampleShortHeader ? (
             thumbnailImgUrl ? (
-              <CorsAwareImage
+              <ImageWithFallback
                 key={exampleShortHeader.name}
                 style={{
                   ...styles.previewImage,

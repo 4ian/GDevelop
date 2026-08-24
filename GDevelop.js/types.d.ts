@@ -112,6 +112,14 @@ export enum ExpressionCompletionDescription_CompletionKind {
   Parameter = 6,
 }
 
+export enum ExpressionColorationDescription_ColorationKind {
+  String = 0,
+  Number = 1,
+  Object = 2,
+  Variable = 3,
+  Operator = 4,
+}
+
 export enum EventsFunction_FunctionType {
   Action = 0,
   Condition = 1,
@@ -176,6 +184,11 @@ export class VectorObjectFolderOrObject extends EmscriptenObject {
 export class VectorPropertyFolderOrProperty extends EmscriptenObject {
   size(): number;
   at(index: number): PropertyFolderOrProperty;
+}
+
+export class VectorFunctionFolderOrFunction extends EmscriptenObject {
+  size(): number;
+  at(index: number): FunctionFolderOrFunction;
 }
 
 export class VectorScreenshot extends EmscriptenObject {
@@ -357,7 +370,9 @@ export class Variable extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   resetPersistentUuid(): Variable;
+  ensurePersistentUuid(): Variable;
   clearPersistentUuid(): Variable;
+  getPersistentUuid(): string;
 }
 
 export class VariablesContainer extends EmscriptenObject {
@@ -380,7 +395,9 @@ export class VariablesContainer extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   resetPersistentUuid(): VariablesContainer;
+  ensurePersistentUuids(): VariablesContainer;
   clearPersistentUuid(): VariablesContainer;
+  getPersistentUuid(): string;
 }
 
 export class VariablesContainersList extends EmscriptenObject {
@@ -405,14 +422,17 @@ export class ObjectGroup extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
-export class ObjectVariableHelper extends EmscriptenObject {
+export class ObjectRefactorer extends EmscriptenObject {
   static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
   static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
   static applyChangesToVariants(eventsBasedObject: EventsBasedObject, objectName: string, changeset: VariablesChangeset): void;
+  static fillMissingGroupVariablesToObject(obj: gdObject, groupVariablesContainer: VariablesContainer): void;
+  static fillMissingGroupBehaviorToObject(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, obj: gdObject, objectGroup: ObjectGroup, behaviorName: string): void;
 }
 
 export class EventsBasedObjectVariantHelper extends EmscriptenObject {
   static complyVariantsToEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject): void;
+  static findAllChildrenCustomObjectType(project: Project, eventsBasedObject: EventsBasedObject): VectorString;
 }
 
 export class ObjectGroupsContainer extends EmscriptenObject {
@@ -502,6 +522,7 @@ export class ObjectFolderOrObject extends EmscriptenObject {
   getChildPosition(child: ObjectFolderOrObject): number;
   getParent(): ObjectFolderOrObject;
   insertNewFolder(name: string, newPosition: number): ObjectFolderOrObject;
+  getOrCreateFolderChild(name: string): ObjectFolderOrObject;
   moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: ObjectFolderOrObject, newParentFolder: ObjectFolderOrObject, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ObjectFolderOrObject): void;
@@ -530,7 +551,7 @@ export class ObjectsContainer extends EmscriptenObject {
   getTypeOfBehavior(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
   getTypeOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): VectorString;
-  isDefaultBehavior(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
+  hasDefaultBehavior(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
   getTypeOfBehaviorInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   getBehaviorNamesInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
 }
@@ -588,8 +609,11 @@ export class Project extends EmscriptenObject {
   isFolderProject(): boolean;
   setUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
   getUseDeprecatedZeroAsDefaultZOrder(): boolean;
+  setUseDeprecatedZeroAsDefaultStringVariable(enable: boolean): void;
+  getUseDeprecatedZeroAsDefaultStringVariable(): boolean;
   areEffectsHiddenInEditor(): boolean;
   setEffectsHiddenInEditor(enable: boolean): void;
+  getInitialGDVersion(): string;
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
   getExtensionProperties(): ExtensionProperties;
@@ -608,6 +632,8 @@ export class Project extends EmscriptenObject {
   removeLayout(name: string): void;
   setFirstLayout(name: string): void;
   getFirstLayout(): string;
+  setPreviewLayout(name: string): void;
+  getPreviewLayout(): string;
   getLayoutPosition(name: string): number;
   hasExternalEventsNamed(name: string): boolean;
   getExternalEvents(name: string): ExternalEvents;
@@ -618,6 +644,7 @@ export class Project extends EmscriptenObject {
   insertNewExternalEvents(name: string, position: number): ExternalEvents;
   removeExternalEvents(name: string): void;
   getExternalEventsPosition(name: string): number;
+  getTests(): TestsContainer;
   hasExternalLayoutNamed(name: string): boolean;
   getExternalLayout(name: string): ExternalLayout;
   getExternalLayoutAt(index: number): ExternalLayout;
@@ -663,7 +690,7 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfBehavior(name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(objectOrGroupName: string, searchInGroups: boolean): VectorString;
   getBehaviorNamesInObjectOrGroup(objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
-  isDefaultBehavior(objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): boolean;
+  hasDefaultBehavior(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
   getAnimationNamesOfObject(name: string): VectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   hasObjectOrGroupNamed(name: string): boolean;
@@ -688,6 +715,12 @@ export class ProjectScopedContainers extends EmscriptenObject {
   getObjectsContainersList(): ObjectsContainersList;
   getVariablesContainersList(): VariablesContainersList;
   getResourcesContainersList(): ResourcesContainersList;
+  getScopeSceneName(): string;
+  getScopeExternalEventsName(): string;
+  getScopeExtensionName(): string;
+  getScopeFunctionName(): string;
+  getScopeBehaviorName(): string;
+  getScopeObjectName(): string;
 }
 
 export class ExtensionProperties extends EmscriptenObject {
@@ -736,6 +769,8 @@ export class BehaviorsSharedData extends EmscriptenObject {
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
   getPropertiesQuickCustomizationVisibilities(): QuickCustomizationVisibilitiesContainer;
 }
 
@@ -776,6 +811,8 @@ export class gdObject extends EmscriptenObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
+  setResourcesPreloading(value: string): void;
+  getResourcesPreloading(): string;
   getConfiguration(): ObjectConfiguration;
   getVariables(): VariablesContainer;
   getEffects(): EffectsContainer;
@@ -788,7 +825,7 @@ export class gdObject extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   resetPersistentUuid(): gdObject;
-  clearPersistentUuid(): gdObject;
+  getPersistentUuid(): string;
 }
 
 export class UniquePtrObject extends EmscriptenObject {
@@ -875,6 +912,41 @@ export class ExternalEvents extends EmscriptenObject {
   getEvents(): EventsList;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+}
+
+export class Test extends EmscriptenObject {
+  constructor();
+  setName(name: string): void;
+  getName(): string;
+  setType(type: string): void;
+  getType(): string;
+  setDescription(description: string): void;
+  getDescription(): string;
+  setSource(source: string): void;
+  getSource(): string;
+  setLastRunStatus(lastRunStatus: string): void;
+  getLastRunStatus(): string;
+  setLastRunAt(lastRunAt: number): void;
+  getLastRunAt(): number;
+  setLastRunDurationMs(lastRunDurationMs: number): void;
+  getLastRunDurationMs(): number;
+  setLastRunFramesExecuted(lastRunFramesExecuted: number): void;
+  getLastRunFramesExecuted(): number;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
+}
+
+export class TestsContainer extends EmscriptenObject {
+  insertNewTest(name: string, pos: number): Test;
+  insertTest(test: Test, pos: number): Test;
+  hasTestNamed(name: string): boolean;
+  getTest(name: string): Test;
+  getTestAt(pos: number): Test;
+  removeTest(name: string): void;
+  clearTests(): void;
+  moveTest(oldIndex: number, newIndex: number): void;
+  getTestsCount(): number;
+  getTestPosition(test: Test): number;
 }
 
 export class ExternalLayout extends EmscriptenObject {
@@ -1127,7 +1199,7 @@ export class ResourcesContainer extends EmscriptenObject {
   getResource(name: string): Resource;
   getResourceAt(index: number): Resource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
-  getResourceNameWithFile(file: string): string;
+  getResourceNamesWithFile(file: string): VectorString;
   addResource(res: Resource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;
@@ -1136,6 +1208,7 @@ export class ResourcesContainer extends EmscriptenObject {
   moveResourceUpInList(oldName: string): boolean;
   moveResourceDownInList(oldName: string): boolean;
   moveResource(oldIndex: number, newIndex: number): void;
+  static unserializeResourceFrom(resource: Resource, resourceElement: SerializerElement): void;
 }
 
 export class ResourcesContainersList extends EmscriptenObject {
@@ -1218,6 +1291,8 @@ export class InitialInstance extends EmscriptenObject {
   setSealed(seal: boolean): void;
   shouldKeepRatio(): boolean;
   setShouldKeepRatio(keepRatio: boolean): void;
+  isHidden(): boolean;
+  setHidden(hidden: boolean): void;
   getZOrder(): number;
   setZOrder(zOrder: number): void;
   getOpacity(): number;
@@ -1341,6 +1416,7 @@ export class SerializerElement extends EmscriptenObject {
   consideredAsArray(): boolean;
   addChild(str: string): SerializerElement;
   getChild(str: string): SerializerElement;
+  getOrCreateChild(str: string): SerializerElement;
   setChild(str: string, element: SerializerElement): void;
   hasChild(str: string): boolean;
   getAllChildren(): VectorPairStringSharedPtrSerializerElement;
@@ -1355,6 +1431,8 @@ export class SharedPtrSerializerElement extends EmscriptenObject {
 export class Serializer extends EmscriptenObject {
   static toJSON(element: SerializerElement): string;
   static fromJSON(json: string): SerializerElement;
+  static setCanonicalMode(canonical: boolean): void;
+  static isCanonicalMode(): boolean;
   static fromJSObject(object: Object): gdSerializerElement;
   static toJSObject(element: gdSerializerElement): any;
 }
@@ -1367,7 +1445,11 @@ export class BinarySerializer extends EmscriptenObject {
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {
-  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, usedResourceNames: VectorString): void;
+  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, usedResourceNames: VectorString, ExtensionDependencyCache: ExtensionDependencyCache): void;
+}
+
+export class ExtensionDependencyCache extends EmscriptenObject {
+  constructor();
 }
 
 export class InstructionsList extends EmscriptenObject {
@@ -1432,6 +1514,7 @@ export class AbstractFunctionMetadata extends EmscriptenObject {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): AbstractFunctionMetadata;
   setDefaultValue(defaultValue: string): AbstractFunctionMetadata;
   setParameterLongDescription(longDescription: string): AbstractFunctionMetadata;
+  setParameterHint(hint: string): AbstractFunctionMetadata;
   setParameterExtraInfo(extraInfo: string): AbstractFunctionMetadata;
   setHidden(): AbstractFunctionMetadata;
   setPrivate(): AbstractFunctionMetadata;
@@ -1476,7 +1559,10 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): InstructionMetadata;
   setDefaultValue(defaultValue: string): InstructionMetadata;
   setParameterLongDescription(longDescription: string): InstructionMetadata;
+  setParameterHint(hint: string): InstructionMetadata;
   setParameterExtraInfo(extraInfo: string): InstructionMetadata;
+  setHint(hint: string): InstructionMetadata;
+  getHint(): string;
   useStandardOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
   useStandardRelationalOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
   markAsSimple(): InstructionMetadata;
@@ -1524,6 +1610,7 @@ export class ExpressionMetadata extends AbstractFunctionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): ExpressionMetadata;
   setDefaultValue(defaultValue: string): ExpressionMetadata;
   setParameterLongDescription(longDescription: string): ExpressionMetadata;
+  setParameterHint(hint: string): ExpressionMetadata;
   setParameterExtraInfo(extraInfo: string): ExpressionMetadata;
   getCodeExtraInformation(): ExpressionMetadata;
   setFunctionName(functionName: string): ExpressionMetadata;
@@ -1539,6 +1626,7 @@ export class MultipleInstructionMetadata extends AbstractFunctionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): MultipleInstructionMetadata;
   setDefaultValue(defaultValue: string): MultipleInstructionMetadata;
   setParameterLongDescription(longDescription: string): MultipleInstructionMetadata;
+  setParameterHint(hint: string): MultipleInstructionMetadata;
   setParameterExtraInfo(extraInfo: string): MultipleInstructionMetadata;
   useStandardParameters(type: string, options: ParameterOptions): MultipleInstructionMetadata;
   setHidden(): MultipleInstructionMetadata;
@@ -1592,6 +1680,8 @@ export class ParameterMetadata extends EmscriptenObject {
   setDescription(description_: string): ParameterMetadata;
   getLongDescription(): string;
   setLongDescription(longDescription_: string): ParameterMetadata;
+  getHint(): string;
+  setHint(hint_: string): ParameterMetadata;
   isCodeOnly(): boolean;
   setCodeOnly(codeOnly_: boolean): ParameterMetadata;
   getDefaultValue(): string;
@@ -1620,6 +1710,7 @@ export class ValueTypeMetadata extends EmscriptenObject {
   isNumber(): boolean;
   isString(): boolean;
   isVariable(): boolean;
+  isResource(): boolean;
   static isTypeObject(parameterType: string): boolean;
   static isTypeBehavior(parameterType: string): boolean;
   static isTypeExpression(type: string, parameterType: string): boolean;
@@ -1656,6 +1747,7 @@ export class ObjectMetadata extends EmscriptenObject {
   getHelpPath(): string;
   getCategory(): string;
   getAssetStoreTag(): string;
+  setHelpPath(helpPath: string): ObjectMetadata;
   setCategory(categoryFullName: string): ObjectMetadata;
   setAssetStoreTag(assetStoreTag: string): ObjectMetadata;
   addInGameEditorResource(): InGameEditorResourceMetadata;
@@ -1726,6 +1818,7 @@ export class BehaviorMetadata extends EmscriptenObject {
   getGroup(): string;
   getIconFilename(): string;
   getHelpPath(): string;
+  setHelpPath(helpPath: string): BehaviorMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
@@ -1804,7 +1897,9 @@ export class PlatformExtension extends EmscriptenObject {
   setDimension(dimension: string): PlatformExtension;
   getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
-  markAsDeprecated(): void;
+  markAsDeprecatedSince(version: string): PlatformExtension;
+  isDeprecated(): boolean;
+  getDeprecationGDVersion(): string;
   getTags(): VectorString;
   setTags(csvTags: string): PlatformExtension;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
@@ -1895,6 +1990,7 @@ export class BaseEvent extends EmscriptenObject {
   setDisabled(disable: boolean): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  getInstructionList(label: string): InstructionsList;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   getAiGeneratedEventId(): string;
@@ -1940,6 +2036,14 @@ export class ForEachEvent extends BaseEvent {
   getActions(): InstructionsList;
   getLoopIndexVariableName(): string;
   setLoopIndexVariableName(name: string): void;
+  getOrderBy(): string;
+  setOrderBy(orderBy: string): void;
+  getOrderByExpression(): Expression;
+  getOrder(): string;
+  setOrder(order: string): void;
+  getLimit(): string;
+  setLimit(limit: string): void;
+  getLimitExpression(): Expression;
 }
 
 export class ForEachChildVariableEvent extends BaseEvent {
@@ -2033,7 +2137,7 @@ export class VectorEventsSearchResult extends EmscriptenObject {
 export class EventsRefactorer extends EmscriptenObject {
   static renameObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, targetedObjectsContainer: ObjectsContainer, oldName: string, newName: string): void;
   static replaceStringInEvents(project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): VectorEventsSearchResult;
-  static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean): VectorEventsSearchResult;
+  static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean, inInstructionNames: boolean): VectorEventsSearchResult;
 }
 
 export class UnfilledRequiredBehaviorPropertyProblem extends EmscriptenObject {
@@ -2051,7 +2155,9 @@ export class VectorUnfilledRequiredBehaviorPropertyProblem extends EmscriptenObj
 
 export class ProjectBrowserHelper extends EmscriptenObject {
   static exposeProjectEvents(project: Project, worker: ArbitraryEventsWorker): void;
+  static exposeProjectEventsWithoutExtensions(project: Project, worker: ReadOnlyArbitraryEventsWorkerWithContext): void;
   static exposeProjectObjects(project: Project, worker: ArbitraryObjectsWorker): void;
+  static exposeEventsFunctionsExtensionEvents(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, worker: ReadOnlyArbitraryEventsWorkerWithContext): void;
 }
 
 export class ResourceExposer extends EmscriptenObject {
@@ -2069,6 +2175,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static applyRefactoringForObjectVariablesContainer(project: Project, objectVariablesContainer: VariablesContainer, initialInstancesContainer: InitialInstancesContainer, objectName: string, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
   static applyRefactoringForGroupVariablesContainer(project: Project, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, initialInstancesContainer: InitialInstancesContainer, groupVariablesContainer: VariablesContainer, objectGroup: ObjectGroup, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
   static renameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
+  static updateExtensionNameInExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, sourceExtensionName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
   static updateExtensionNameInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, sourceExtensionName: string): void;
   static renameEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
@@ -2140,9 +2247,8 @@ export class ParameterValidationResult extends EmscriptenObject {
 }
 
 export class InstructionValidator extends EmscriptenObject {
-  static validateParameter(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): ParameterValidationResult;
-  static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
-  static hasDeprecationWarnings(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
+  static validateParameter(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number): ParameterValidationResult;
+  static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number): boolean;
 }
 
 export class ObjectTools extends EmscriptenObject {
@@ -2157,7 +2263,9 @@ export class PropertyFunctionGenerator extends EmscriptenObject {
   static generateBehaviorGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, property: NamedPropertyDescriptor, isSharedProperties: boolean): void;
   static generateObjectGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, property: NamedPropertyDescriptor): void;
   static canGenerateGetterAndSetter(eventsBasedBehavior: AbstractEventsBasedEntity, property: NamedPropertyDescriptor): boolean;
-  static generateConditionSkeleton(project: Project, eventFunction: EventsFunction): void;
+  static generateConditionSkeleton(project: Project, eventsFunction: EventsFunction): void;
+  static generateExpressionSkeleton(project: Project, eventsFunction: EventsFunction): void;
+  static updateReturnActionType(project: Project, eventsFunction: EventsFunction): void;
 }
 
 export class UsedExtensionsResult extends EmscriptenObject {
@@ -2273,9 +2381,10 @@ export class VectorExpressionParserError extends EmscriptenObject {
 export class ExpressionParser2NodeWorker extends EmscriptenObject {}
 
 export class ExpressionValidator extends EmscriptenObject {
-  constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, extraInfo: string);
+  constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, rootObjectName: string, extraInfo: string);
   getAllErrors(): VectorExpressionParserError;
   getFatalErrors(): VectorExpressionParserError;
+  getDeprecationWarnings(): VectorExpressionParserError;
 }
 
 export class ExpressionCompletionDescription extends EmscriptenObject {
@@ -2305,6 +2414,22 @@ export class VectorExpressionCompletionDescription extends EmscriptenObject {
 export class ExpressionCompletionFinder extends EmscriptenObject {
   static getCompletionDescriptionsFor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, node: ExpressionNode, location: number): VectorExpressionCompletionDescription;
   getCompletionDescriptions(): VectorExpressionCompletionDescription;
+}
+
+export class ExpressionColorationDescription extends EmscriptenObject {
+  getColorationKind(): ExpressionColorationDescription_ColorationKind;
+  getStartPosition(): number;
+  getEndPosition(): number;
+}
+
+export class VectorExpressionColorationDescription extends EmscriptenObject {
+  size(): number;
+  at(index: number): ExpressionColorationDescription;
+}
+
+export class ExpressionSyntaxColoringHelper extends EmscriptenObject {
+  static getColorationDescriptionsFor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, node: ExpressionNode): VectorExpressionColorationDescription;
+  getColorationDescriptions(): VectorExpressionColorationDescription;
 }
 
 export class ExpressionNodeLocationFinder extends EmscriptenObject {
@@ -2368,6 +2493,28 @@ export class EventsFunction extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
+export class FunctionFolderOrFunction extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getFunction(): EventsFunction;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasFunctionNamed(name: string): boolean;
+  getFunctionNamed(name: string): FunctionFolderOrFunction;
+  getChildrenCount(): number;
+  getChildAt(pos: number): FunctionFolderOrFunction;
+  getFunctionChild(name: string): FunctionFolderOrFunction;
+  getOrCreateChildFolder(name: string): FunctionFolderOrFunction;
+  getChildPosition(child: FunctionFolderOrFunction): number;
+  getParent(): FunctionFolderOrFunction;
+  insertNewFolder(name: string, newPosition: number): FunctionFolderOrFunction;
+  moveFunctionFolderOrFunctionToAnotherFolder(functionFolderOrFunction: FunctionFolderOrFunction, newParentFolder: FunctionFolderOrFunction, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: FunctionFolderOrFunction): void;
+  isADescendantOf(otherFunctionFolderOrFunction: FunctionFolderOrFunction): boolean;
+}
+
 export class EventsFunctionsContainer extends EmscriptenObject {
   insertNewEventsFunction(name: string, pos: number): EventsFunction;
   insertEventsFunction(eventsFunction: EventsFunction, pos: number): EventsFunction;
@@ -2378,6 +2525,10 @@ export class EventsFunctionsContainer extends EmscriptenObject {
   moveEventsFunction(oldIndex: number, newIndex: number): void;
   getEventsFunctionsCount(): number;
   getEventsFunctionPosition(eventsFunction: EventsFunction): number;
+  insertNewEventsFunctionInFolder(name: string, folder: FunctionFolderOrFunction, pos: number): EventsFunction;
+  getRootFolder(): FunctionFolderOrFunction;
+  getAllFunctionFolderOrFunction(): VectorFunctionFolderOrFunction;
+  addMissingFunctionsInRootFolder(): void;
 }
 
 export class AbstractEventsBasedEntity extends EmscriptenObject {
@@ -2387,6 +2538,9 @@ export class AbstractEventsBasedEntity extends EmscriptenObject {
   getFullName(): string;
   getDescription(): string;
   isPrivate(): boolean;
+  getPreviewIconUrl(): string;
+  getIconUrl(): string;
+  getHelpPath(): string;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
@@ -2397,6 +2551,9 @@ export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   setFullName(fullName: string): EventsBasedBehavior;
   setDescription(description: string): EventsBasedBehavior;
   setPrivate(isPrivate: boolean): EventsBasedBehavior;
+  setPreviewIconUrl(previewIconUrl: string): EventsBasedBehavior;
+  setIconUrl(iconUrl: string): EventsBasedBehavior;
+  setHelpPath(helpPath: string): EventsBasedBehavior;
   setObjectType(fullName: string): EventsBasedBehavior;
   getObjectType(): string;
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): EventsBasedBehavior;
@@ -2432,6 +2589,9 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   setFullName(fullName: string): EventsBasedObject;
   setDescription(description: string): EventsBasedObject;
   setPrivate(isPrivate: boolean): EventsBasedObject;
+  setPreviewIconUrl(previewIconUrl: string): EventsBasedObject;
+  setIconUrl(iconUrl: string): EventsBasedObject;
+  setHelpPath(helpPath: string): EventsBasedObject;
   setDefaultName(defaultName: string): EventsBasedObject;
   setAssetStoreTag(assetStoreTag: string): EventsBasedObject;
   getDefaultName(): string;
@@ -2606,10 +2766,16 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getSceneVariables(): VariablesContainer;
   getEventsBasedBehaviors(): EventsBasedBehaviorsList;
   getEventsBasedObjects(): EventsBasedObjectsList;
+  getTests(): TestsContainer;
   serializeTo(element: SerializerElement): void;
   serializeToExternal(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   static isExtensionLifecycleEventsFunction(eventsFunctionName: string): boolean;
+}
+
+export class EventsFunctionsExtensionExtractor extends EmscriptenObject {
+  constructor();
+  static createCustomBehaviorForObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, obj: gdObject): EventsBasedBehavior;
 }
 
 export class AbstractFileSystem extends EmscriptenObject {}
@@ -2682,11 +2848,13 @@ export class EventsContextAnalyzer extends EmscriptenObject {
 }
 
 export class ReadOnlyArbitraryEventsWorkerWithContext extends EmscriptenObject {
+  setSkipDisabledEvents(skip: boolean): void;
   launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
 }
 
 export class ReadOnlyArbitraryEventsWorkerWithContextJS extends ReadOnlyArbitraryEventsWorkerWithContext {
   constructor();
+  doOnLaunch(events: EventsList): void;
   doVisitEvent(event: BaseEvent): void;
   doVisitInstruction(instruction: Instruction, isCondition: boolean, projectScopedContainers: ProjectScopedContainers): void;
 }
@@ -3197,6 +3365,12 @@ export class JsCodeEvent extends EmscriptenObject {
   setDisabled(disable: boolean): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  getScrollTop(): number;
+  setScrollTop(value: number): void;
+  getCursorColumn(): number;
+  setCursorColumn(value: number): void;
+  getCursorLine(): number;
+  setCursorLine(value: number): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
@@ -3218,6 +3392,20 @@ export class MetadataDeclarationHelper extends EmscriptenObject {
   static shiftSentenceParamIndexes(sentence: string, offset: number): string;
 }
 
+export class MemoryTrackedRegistry extends EmscriptenObject {
+  static add(ptr: number, className: string): void;
+  static remove(ptr: number, className: string): void;
+  static isDead(ptr: number, className: string): boolean;
+  static getDeadCount(): number;
+  static getAliveCount(): number;
+  static pruneDead(maxSize: number): void;
+  static getAliveCountForClass(className: string): number;
+  static getDeadCountForClass(className: string): number;
+  static setCurrentCallContextId(id: number): void;
+  static getDeadContextId(ptr: number, className: string): number;
+  static getDeadContextTimeMs(ptr: number, className: string): number;
+}
+
 export function toNewVectorString(): VectorString;
 
 export function getTypeOfBehavior(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
@@ -3226,7 +3414,7 @@ export function getTypeOfObject(layout: ObjectsContainer, name: string, searchIn
 
 export function getBehaviorsOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): VectorString;
 
-export function isDefaultBehavior(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
+export function hasDefaultBehavior(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
 
 export function getTypeOfBehaviorInObjectOrGroup(layout: ObjectsContainer, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
 
@@ -3348,6 +3536,19 @@ export function compare<T extends EmscriptenObject>(object1: T, object2: T): boo
  * The alias {@link EmscriptenObject.delete} is recommended instead, for readability.
  */
 export function destroy(object: EmscriptenObject): void;
+
+/**
+ * Check that an Emscripten object is still alive, i.e. not destroyed from
+ * JavaScript (ptr is 0) or from C++ (only for memory-tracked classes).
+ *
+ * In theory, a dead object should never be accessed. In practice this can
+ * help prevent stale references to objects (deleted by JS: ptr will be 0,
+ * or deleted in C++, only for tracked classes).
+ * This is used just to add extra protection and should usually not be useful.
+ *
+ * @throws if the object is dead.
+ */
+export function assertObjectAlive(object: EmscriptenObject): void;
 
 export function _malloc(size: number): number;
 export function _free(ptr: number): void;

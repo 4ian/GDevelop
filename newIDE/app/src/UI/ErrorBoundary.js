@@ -44,8 +44,10 @@ type ErrorBoundaryScope =
   | 'preferences'
   | 'profile'
   | 'scene-editor'
+  | 'scene-editor-scene-properties'
   | 'scene-editor-instance-properties'
   | 'scene-editor-object-properties'
+  | 'scene-editor-object-group-properties'
   | 'scene-editor-layer-properties'
   | 'scene-editor-events-based-object-variant-properties'
   | 'scene-editor-objects-list'
@@ -63,6 +65,7 @@ type ErrorBoundaryScope =
   | 'extensions-search-dialog'
   | 'external-events-editor'
   | 'external-layout-editor'
+  | 'gameplay-test-editor-properties'
   | 'variables-list'
   | 'new-object-dialog'
   | 'object-details'
@@ -155,6 +158,8 @@ const errorHandler = (
       errorMessage: error.message || '',
       errorStack: error.stack || '',
       errorName: error.name || '',
+      // $FlowFixMe[prop-missing] - this is only set by UseAfterFreeError.
+      useAfterFreeContext: error.useAfterFreeContext || undefined,
       IDEVersion: getIDEVersion(),
       IDEVersionWithHash: getIDEVersionWithHash(),
       arch: getArch(),
@@ -224,6 +229,16 @@ export const ErrorFallbackComponent = ({
                 {error.stack.slice(0, 400)}...
               </BackgroundText>
             )}
+            {// $FlowFixMe[prop-missing] - this is only set by UseAfterFreeError.
+            error && error.useAfterFreeContext ? (
+              <BackgroundText allowSelection style={styles.errorMessage}>
+                {(
+                  JSON.stringify(error.useAfterFreeContext, null, 1) ||
+                  'unknown context'
+                ).slice(0, 400)}
+                ...
+              </BackgroundText>
+            ) : null}
             {componentStack && (
               <BackgroundText allowSelection style={styles.errorMessage}>
                 {componentStack.slice(0, 300)}...

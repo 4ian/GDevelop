@@ -10,6 +10,8 @@ import {
   enumerateObjectExpressions,
 } from '../../../InstructionOrExpression/EnumerateExpressions';
 
+const gd: libGDevelop = global.gd;
+
 // $FlowFixMe[incompatible-type]
 // $FlowFixMe[missing-local-annot]
 // $FlowFixMe[cannot-resolve-name]
@@ -20,8 +22,10 @@ const makeFakeI18n = (fakeI18n): I18nType => ({
 
 describe('FormatExpressionCall', () => {
   it('properly formats a free function, with one or more arguments', () => {
+    const project = new gd.Project();
     const freeExpressions = enumerateFreeExpressions(
       'number|string',
+      project,
       makeFakeI18n()
     );
     const countExpression = filterExpressions(
@@ -40,11 +44,14 @@ describe('FormatExpressionCall', () => {
         shouldConvertToString: false,
       })
     ).toBe('atan2(1, 2)');
+    project.delete();
   });
 
   it('properly formats a free function, with "code-only" parameters', () => {
+    const project = new gd.Project();
     const freeExpressions = enumerateFreeExpressions(
       'number|string',
+      project,
       makeFakeI18n()
     );
     const cameraHeightExpression = filterExpressions(
@@ -56,11 +63,14 @@ describe('FormatExpressionCall', () => {
         shouldConvertToString: false,
       })
     ).toBe('CameraHeight("My layer", 0)');
+    project.delete();
   });
 
   it('properly formats a free function, with "code-only" and optional parameters', () => {
+    const project = new gd.Project();
     const freeExpressions = enumerateFreeExpressions(
       'number|string',
+      project,
       makeFakeI18n()
     );
     const touchExpression = filterExpressions(freeExpressions, 'TouchX')[0];
@@ -84,6 +94,7 @@ describe('FormatExpressionCall', () => {
         shouldConvertToString: false,
       })
     ).toBe('TouchX(1, "", 2)');
+    project.delete();
   });
 
   it('properly formats an object function', () => {

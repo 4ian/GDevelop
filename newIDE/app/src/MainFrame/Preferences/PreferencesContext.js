@@ -50,7 +50,8 @@ export type EditorMosaicName =
   | 'scene-editor'
   | 'debugger'
   | 'resources-editor'
-  | 'events-functions-extension-editor';
+  | 'events-functions-extension-editor'
+  | 'gameplay-test-editor';
 
 export type InAppTutorialUserProgress = {|
   step: number,
@@ -170,11 +171,28 @@ export const allAlertMessages: Array<{
   },
 ];
 
+export type EditorStateForPropertyPanel = {
+  scrollPosition: number,
+  collapsedSections: { [string]: boolean },
+};
+
 /**
  * All the preferences of GDevelop. To add a new preference, add it into this
  * type and add a setter into `Preferences` type. Then, update the
  * preference dialog.
  */
+export type EditorStateForProject = {|
+  editorTabs: EditorTabsPersistedState | null,
+  propertiesPanel: {
+    [string]: {
+      [string]: EditorStateForPropertyPanel,
+    },
+  },
+|};
+
+// $FlowFixMe[deprecated-utility]
+export type EditorStateForProjectUpdate = $Shape<EditorStateForProject>;
+
 export type PreferencesValues = {|
   language: string,
   autoDownloadUpdates: boolean,
@@ -226,16 +244,18 @@ export type PreferencesValues = {|
     [featureId: string]: {| dates: [number] |},
   },
   displaySaveReminder: {| activated: boolean |}, // Store as object in case we need to add options.
-  editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
+  editorStateByProject: { [string]: EditorStateForProject },
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
   showAiAskButtonInTitleBar: boolean,
-  aiState: {| aiRequestId: string | null |},
   automaticallyUseCreditsForAiRequests: boolean,
+  automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
   useBackgroundSerializerForSaving: boolean,
   disableNpmScriptConfirmation: boolean,
+  showJsTypeError: boolean,
+  canonicalEventSerialization: boolean,
 |};
 
 /**
@@ -344,12 +364,10 @@ export type Preferences = {|
     [featureId: string]: {| dates: [number] |},
   }) => void,
   setDisplaySaveReminder: ({| activated: boolean |}) => void,
-  getEditorStateForProject: (
-    projectId: string
-  ) => ?{| editorTabs: EditorTabsPersistedState |},
+  getEditorStateForProject: (projectId: string) => ?EditorStateForProject,
   setEditorStateForProject: (
     projectId: string,
-    editorState?: {| editorTabs: EditorTabsPersistedState |}
+    editorState: EditorStateForProjectUpdate | null
   ) => void,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
   setPreviewCrashReportUploadLevel: (level: string) => void,
@@ -358,11 +376,14 @@ export type Preferences = {|
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
-  setAiState: ({|
-    aiRequestId: string | null,
-  |}) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
+  setAutomaticallyApplyAiRequestEditsForProjectId: (
+    projectId: string,
+    enabled: boolean
+  ) => void,
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
+  setShowJsTypeError: (enabled: boolean) => void,
+  setCanonicalEventSerialization: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -424,10 +445,12 @@ export const initialPreferences = {
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
     showAiAskButtonInTitleBar: true,
-    aiState: { aiRequestId: null },
     automaticallyUseCreditsForAiRequests: false,
+    automaticallyApplyAiRequestEditsByProjectId: {},
     useBackgroundSerializerForSaving: false,
     disableNpmScriptConfirmation: false,
+    showJsTypeError: false,
+    canonicalEventSerialization: false,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -511,9 +534,14 @@ export const initialPreferences = {
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
-  setAiState: ({ aiRequestId }: {| aiRequestId: string | null |}) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
+  setAutomaticallyApplyAiRequestEditsForProjectId: (
+    projectId: string,
+    enabled: boolean
+  ) => {},
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
+  setShowJsTypeError: (enabled: boolean) => {},
+  setCanonicalEventSerialization: (enabled: boolean) => {},
 };
 
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(

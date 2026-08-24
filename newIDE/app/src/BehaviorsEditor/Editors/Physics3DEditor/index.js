@@ -94,12 +94,13 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
 const Physics3DEditor = (props: Props): React.Node => {
   const {
     object,
-    behavior,
+    behaviors,
     onBehaviorUpdated,
     project,
     projectScopedContainersAccessor,
     resourceManagementProps,
   } = props;
+  const behavior = behaviors[0];
   const forceUpdate = useForceUpdate();
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
@@ -122,8 +123,7 @@ const Physics3DEditor = (props: Props): React.Node => {
   );
 
   const updateBehaviorProperty = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    (property, value) => {
+    (property: string, value: string) => {
       behavior.updateProperty(property, value);
       forceUpdate();
       onBehaviorUpdated();
@@ -148,7 +148,11 @@ const Physics3DEditor = (props: Props): React.Node => {
   const [gltf, setGltf] = React.useState<GLTF | null>(null);
   const loadGltf = React.useCallback(
     async (modelResourceName: string) => {
-      if (!modelResourceName && object.getType() === 'Scene3D::Model3DObject') {
+      if (
+        !modelResourceName &&
+        object &&
+        object.getType() === 'Scene3D::Model3DObject'
+      ) {
         const model3DConfiguration = gd.asModel3DConfiguration(
           object.getConfiguration()
         );
@@ -264,13 +268,17 @@ const Physics3DEditor = (props: Props): React.Node => {
           />
         )}
       </ResponsiveLineStackLayout>
-      {shape === 'Mesh' && object.getType() !== 'Scene3D::Model3DObject' && (
-        <Line>
-          <AlertMessage kind="error">
-            <Trans>Mesh shapes are only supported for 3D model objects.</Trans>
-          </AlertMessage>
-        </Line>
-      )}
+      {shape === 'Mesh' &&
+        object &&
+        object.getType() !== 'Scene3D::Model3DObject' && (
+          <Line>
+            <AlertMessage kind="error">
+              <Trans>
+                Mesh shapes are only supported for 3D model objects.
+              </Trans>
+            </AlertMessage>
+          </Line>
+        )}
       {shape !== 'Mesh' && (
         <ResponsiveLineStackLayout>
           <SemiControlledTextField

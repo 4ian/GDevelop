@@ -18,6 +18,9 @@ void ParameterMetadata::SerializeTo(SerializerElement& element) const {
   if (!longDescription.empty()) {
     element.SetAttribute("longDescription", longDescription);
   }
+  if (!hint.empty()) {
+    element.SetAttribute("hint", hint);
+  }
   if (codeOnly) {
    element.SetAttribute("codeOnly", codeOnly);
   }
@@ -28,6 +31,7 @@ void ParameterMetadata::UnserializeFrom(const SerializerElement& element) {
   valueTypeMetadata.UnserializeFrom(element);
   description = element.GetStringAttribute("description");
   longDescription = element.GetStringAttribute("longDescription");
+  hint = element.GetStringAttribute("hint");
   codeOnly = element.GetBoolAttribute("codeOnly");
   name = element.GetStringAttribute("name");
 }

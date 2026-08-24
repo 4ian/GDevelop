@@ -79,7 +79,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
             "specified element.\nSpecify the structure leading to the "
             "element using / (example : Root/Level/Current)\nSpaces are "
             "forbidden in element names."),
-          _("Save _PARAM2_ in _PARAM1_ of storage _PARAM0_"),
+          _("Save value _PARAM2_ in _PARAM1_ of storage _PARAM0_"),
           "",
           "res/actions/fichier24.png",
           "res/actions/fichier.png")
@@ -95,7 +95,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
             "element.\nSpecify "
             "the structure leading to the element using / (example : "
             "Root/Level/Current)\nSpaces are forbidden in element names."),
-          _("Save _PARAM2_ in _PARAM1_ of storage _PARAM0_"),
+          _("Save text _PARAM2_ in _PARAM1_ of storage _PARAM0_"),
           "",
           "res/actions/fichier24.png",
           "res/actions/fichier.png")

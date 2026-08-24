@@ -4,7 +4,8 @@ import {
   type EnumeratedInstructionMetadata,
   type InstructionOrExpressionScope,
 } from './EnumeratedInstructionOrExpressionMetadata';
-import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories.js';
+import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
+import { shouldHideExtension } from '../Version';
 
 const gd: libGDevelop = global.gd;
 
@@ -136,8 +137,12 @@ const enumerateExtraBehaviorInstructions = (
   behaviorType: string,
   prefix: string,
   scope: InstructionOrExpressionScope,
+  project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
+  if (shouldHideExtension(project, extension)) {
+    return [];
+  }
   const instructions = isCondition
     ? extension.getAllConditions()
     : extension.getAllActions();
@@ -171,8 +176,13 @@ const enumerateExtraObjectInstructions = (
   objectType: string,
   objectBehaviorTypes?: Set<string>,
   scope: InstructionOrExpressionScope,
+  project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
+  if (shouldHideExtension(project, extension)) {
+    return [];
+  }
+
   const instructions = isCondition
     ? extension.getAllConditions()
     : extension.getAllActions();
@@ -205,8 +215,12 @@ const enumerateFreeInstructionsWithoutExtra = (
   isCondition: boolean,
   extension: gdPlatformExtension,
   scope: InstructionOrExpressionScope,
+  project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
+  if (shouldHideExtension(project, extension)) {
+    return [];
+  }
   const instructions = isCondition
     ? extension.getAllConditions()
     : extension.getAllActions();
@@ -264,8 +278,7 @@ const enumerateInstruction = (
   instrMetadata: gdInstructionMetadata,
   scope: InstructionOrExpressionScope,
   i18n: I18nType,
-  // $FlowFixMe[missing-local-annot]
-  ignoresGroups = false
+  ignoresGroups?: boolean = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
   let description = instrMetadata.getDescription();
@@ -344,16 +357,19 @@ const enumerateExtensionInstructions = (
  */
 export const enumerateAllInstructions = (
   isCondition: boolean,
+  project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  // $FlowFixMe[missing-empty-array-annot]
-  let allInstructions = [];
+  let allInstructions: Array<EnumeratedInstructionMetadata> = [];
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
+    if (shouldHideExtension(project, extension)) {
+      continue;
+    }
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
     const prefix = getExtensionPrefix(extension, i18n);
@@ -369,14 +385,13 @@ export const enumerateAllInstructions = (
       },
       i18n
     );
-    // $FlowFixMe[recursive-definition]
     allInstructions = [...allInstructions, ...extensionFreeInstructions];
 
     //Objects instructions:
     for (let j = 0; j < allObjectsTypes.size(); ++j) {
       const objectType = allObjectsTypes.at(j);
       const objectMetadata = extension.getObjectMetadata(objectType);
-      const scope = {
+      const scope: InstructionOrExpressionScope = {
         extension: { name: extension.getName() },
         objectMetadata: {
           name: objectMetadata.getName(),
@@ -390,7 +405,6 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForObject(objectType)
             : extension.getAllActionsForObject(objectType),
-          // $FlowFixMe[incompatible-type]
           scope,
           i18n
         ),
@@ -451,6 +465,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   objectName: string,
+  project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
   let allInstructions: Array<EnumeratedInstructionMetadata> = [];
@@ -533,6 +548,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
         objectBehaviorTypes,
         // $FlowFixMe[incompatible-type]
         scope,
+        project,
         i18n
       ),
     ];
@@ -585,6 +601,10 @@ export const enumerateObjectAndBehaviorsInstructions = (
       const freeBehaviorInstructions: Array<EnumeratedInstructionMetadata> = [];
       for (let i = 0; i < allExtensions.size(); ++i) {
         const extension = allExtensions.at(i);
+        if (shouldHideExtension(project, extension)) {
+          continue;
+        }
+
         freeBehaviorInstructions.push(
           ...enumerateExtraBehaviorInstructions(
             isCondition,
@@ -593,6 +613,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
             prefix,
             // $FlowFixMe[incompatible-type]
             scope,
+            project,
             i18n
           )
         );
@@ -638,10 +659,10 @@ export const enumerateObjectAndBehaviorsInstructions = (
  */
 export const enumerateFreeInstructions = (
   isCondition: boolean,
+  project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  // $FlowFixMe[missing-empty-array-annot]
-  let allFreeInstructions = [];
+  const allFreeInstructions: Array<EnumeratedInstructionMetadata> = [];
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -649,7 +670,6 @@ export const enumerateFreeInstructions = (
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
 
-    // $FlowFixMe[incompatible-type]
     allFreeInstructions.push(
       ...enumerateFreeInstructionsWithoutExtra(
         isCondition,
@@ -659,11 +679,11 @@ export const enumerateFreeInstructions = (
           objectMetadata: undefined,
           behaviorMetadata: undefined,
         },
+        project,
         i18n
       )
     );
   }
-  // $FlowFixMe[incompatible-type]
   return allFreeInstructions;
 };
 

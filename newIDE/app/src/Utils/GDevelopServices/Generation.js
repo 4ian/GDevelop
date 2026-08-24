@@ -12,7 +12,7 @@ import {
 
 export type Environment = 'staging' | 'live';
 
-export type GenerationStatus = 'working' | 'ready' | 'error';
+export type GenerationStatus = 'working' | 'ready' | 'error' | 'suspended';
 
 export type AiRequestSuggestion = {
   title: string,
@@ -24,12 +24,27 @@ export type AiRequestSuggestions = {
   suggestions: Array<AiRequestSuggestion>,
 };
 
+export type AiRequestPlanTask = {
+  id: string,
+  title: string,
+  description: string,
+  status: 'pending' | 'in_progress' | 'done' | 'voided',
+  dependsOn: string[],
+};
+
+export type AiRequestPlan = {
+  tasks: AiRequestPlanTask[],
+};
+
 export type AiRequestMessageAssistantFunctionCall = {|
   type: 'function_call',
   status: 'completed',
   call_id: string,
   name: string,
   arguments: string,
+
+  taskId?: string,
+  subAgentAiRequestId?: string,
 |};
 
 export type AiRequestFunctionCallOutput = {
@@ -40,6 +55,7 @@ export type AiRequestFunctionCallOutput = {
   messageId?: string,
   projectVersionIdAfterMessage?: string,
 };
+
 export type AiRequestAssistantMessage = {
   type: 'message',
   status: 'completed',
@@ -101,20 +117,21 @@ export type AiRequest = {
   gameId?: string | null,
   gameProjectJson?: string | null,
   status: GenerationStatus,
-  mode?: 'chat' | 'agent',
+  mode?: 'chat' | 'agent' | 'orchestrator',
   aiConfiguration?: AiConfiguration,
   toolsVersion?: string,
   toolOptions?: AiRequestToolOptions | null,
   forkedFromAiRequestId?: string | null,
   forkedAfterOriginalMessageId?: string | null,
   forkedAfterNewMessageId?: string | null,
+  parentAiRequestId?: string | null,
 
   error: {
     code: string,
     message: string,
   } | null,
 
-  output: Array<AiRequestMessage>,
+  output?: Array<AiRequestMessage>,
 
   lastUserMessagePriceInCredits?: number | null,
   totalPriceInCredits?: number | null,
@@ -180,6 +197,22 @@ export type AiGeneratedEventChange = {
   missingResources: AiGeneratedEventMissingResource[],
 };
 
+export type AiGeneratedEventBatch = {
+  eventsDescription: string,
+  eventScript: string | null,
+  placementRelation: string,
+  placementTargetEventId: string | null,
+  placementExpectedParentEventId: string | null,
+  placementRationale: string | null,
+  // Anchor echo for replace placements: the caller's copy of the current
+  // source of the event being replaced (proof it was read).
+  expectedEventSource: string | null,
+  // The actual current source of the target event (its own lines, without
+  // sub-events), computed by the editor, that the backend compares the
+  // anchor against.
+  placementTargetEventSource: string | null,
+};
+
 export type AiGeneratedEvent = {
   id: string,
   createdAt: string,
@@ -188,7 +221,8 @@ export type AiGeneratedEvent = {
   status: GenerationStatus,
 
   partialGameProjectJson: string,
-  eventsDescription: string,
+  eventsDescription: string | null,
+  eventBatches: Array<AiGeneratedEventBatch> | null,
   extensionNamesList: string,
   objectsList: string,
   existingEventsAsText: string,
@@ -254,9 +288,13 @@ export const getAiRequest = async (
   {
     userId,
     aiRequestId,
+    // When set, the backend only returns the messages from this one onward
+    // (see mergeIncrementalAiRequest in AiRequestContext).
+    outputFromMessageId,
   }: {|
     userId: string,
     aiRequestId: string,
+    outputFromMessageId?: ?string,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -266,6 +304,7 @@ export const getAiRequest = async (
     {
       params: {
         userId,
+        outputFromMessageId: outputFromMessageId || undefined,
       },
       headers: {
         Authorization: authorizationHeader,
@@ -279,37 +318,43 @@ export const getAiRequest = async (
   });
 };
 
-export const getPartialAiRequest = async (
+/**
+ * Fetch the status of several AI requests at once (a parent request and all its
+ * active sub-agents). This collapses what used to be one status request per
+ * entity into a single request, without changing the polling cadence.
+ */
+export const getAiRequestStatuses = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
-    aiRequestId,
-    include,
+    aiRequestIds,
   }: {|
     userId: string,
-    aiRequestId: string,
-    include: string,
+    aiRequestIds: Array<string>,
   |}
-): // $FlowFixMe[deprecated-utility]
-Promise<$Shape<AiRequest>> => {
+): Promise<
+  Array<{| id: string, status: GenerationStatus, userId: ?string |}>
+> => {
+  if (aiRequestIds.length === 0) return [];
+
   const authorizationHeader = await getAuthorizationHeader();
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/ai-request/${aiRequestId}`,
+    `${GDevelopGenerationApi.baseUrl}/ai-request`,
     {
       params: {
         userId,
-        include,
+        ids: aiRequestIds.join(','),
+        include: 'status',
       },
       headers: {
         Authorization: authorizationHeader,
       },
     }
   );
-  return ensureObjectHasProperty({
+  return ensureIsArray({
     data: response.data,
-    propertyName: 'id',
-    endpointName: '/ai-request/{id} of Generation API',
+    endpointName: '/ai-request?ids=...&include=status of Generation API',
   });
 };
 
@@ -373,7 +418,7 @@ export const createAiRequest = async (
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     payWithCredits: boolean,
-    mode: 'chat' | 'agent',
+    mode: 'chat' | 'agent' | 'orchestrator',
     aiConfiguration: AiConfiguration,
     gameId: string | null,
     projectVersionIdBeforeMessage?: string | null,
@@ -453,7 +498,7 @@ export const addMessageToAiRequest = async (
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     paused?: boolean,
-    mode?: 'chat' | 'agent',
+    mode?: 'chat' | 'agent' | 'orchestrator',
     toolsVersion?: string,
   |}
 ): Promise<AiRequest> => {
@@ -489,6 +534,23 @@ export const addMessageToAiRequest = async (
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/add-message of Generation API',
+  });
+};
+
+export const suspendAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/ai-request/${aiRequestId}/action/suspend`,
+    {},
+    { params: { userId }, headers: { Authorization: authorizationHeader } }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id}/action/suspend of Generation API',
   });
 };
 
@@ -637,6 +699,7 @@ export const createAiGeneratedEvent = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
     sceneName,
     eventsDescription,
+    eventBatches,
     extensionNamesList,
     objectsList,
     existingEventsAsText,
@@ -644,6 +707,7 @@ export const createAiGeneratedEvent = async (
     existingEventsJsonUserRelativeKey,
     placementHint,
     relatedAiRequestId,
+    estimatedComplexity,
   }: {|
     userId: string,
     gameProjectJson: string | null,
@@ -651,7 +715,8 @@ export const createAiGeneratedEvent = async (
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     sceneName: string,
-    eventsDescription: string,
+    eventsDescription: string | null,
+    eventBatches: Array<AiGeneratedEventBatch> | null,
     extensionNamesList: string,
     objectsList: string,
     existingEventsAsText: string,
@@ -659,6 +724,7 @@ export const createAiGeneratedEvent = async (
     existingEventsJsonUserRelativeKey: string | null,
     placementHint: string | null,
     relatedAiRequestId: string,
+    estimatedComplexity: number | null,
   |}
 ): Promise<CreateAiGeneratedEventResult> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -672,6 +738,7 @@ export const createAiGeneratedEvent = async (
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
       sceneName,
       eventsDescription,
+      eventBatches,
       extensionNamesList,
       objectsList,
       existingEventsAsText,
@@ -679,6 +746,7 @@ export const createAiGeneratedEvent = async (
       existingEventsJsonUserRelativeKey,
       placementHint,
       relatedAiRequestId,
+      estimatedComplexity,
     },
     {
       params: {
@@ -754,6 +822,7 @@ export const createAssetSearch = async (
     description,
     objectType,
     twoDimensionalViewKind,
+    exactOrPartialAssetId,
     relatedAiRequestId,
     lastUserMessage,
     lastAssistantMessages,
@@ -761,8 +830,9 @@ export const createAssetSearch = async (
     userId: string,
     searchTerms: string,
     description: string,
-    objectType: string,
+    objectType: string | null,
     twoDimensionalViewKind: string,
+    exactOrPartialAssetId?: string | null,
     relatedAiRequestId?: string | null,
     lastUserMessage?: string | null,
     lastAssistantMessages?: string[],
@@ -777,6 +847,7 @@ export const createAssetSearch = async (
       description,
       objectType,
       twoDimensionalViewKind,
+      exactOrPartialAssetId,
       relatedAiRequestId,
       lastUserMessage,
       lastAssistantMessages,
@@ -882,9 +953,11 @@ export const createAiUserContentPresignedUrls = async (
 };
 
 export type AiConfigurationPreset = {|
-  mode: 'chat' | 'agent',
+  mode: 'chat' | 'agent' | 'orchestrator',
   id: string,
   nameByLocale: MessageByLocale,
+  reasoningLevelByLocale?: MessageByLocale,
+  reasoningLevel?: number,
   disabled: boolean,
   isDefault?: boolean,
 |};
@@ -936,11 +1009,11 @@ export const fetchAiSettings = async ({
 |}): Promise<AiSettings> => {
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
-    `${GDevelopAiCdn.baseUrl[environment]}/ai-settings.json`
+    `${GDevelopAiCdn.baseUrl[environment]}/ai-settings-v2.json`
   );
   return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'aiRequest',
-    endpointName: '/ai-settings.json of Generation API',
+    endpointName: '/ai-settings-v2.json of Generation API',
   });
 };

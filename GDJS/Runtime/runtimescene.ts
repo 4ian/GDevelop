@@ -45,7 +45,6 @@ namespace gdjs {
     /** Should the canvas be cleared before this scene rendering. */
     _clearCanvas: boolean = true;
 
-    _onceTriggers: OnceTriggers;
     _profiler: gdjs.Profiler | null = null;
 
     // Set to `new gdjs.Profiler()` to have profiling done on the scene.
@@ -74,7 +73,6 @@ namespace gdjs {
         gdjs.VariablesContainer
       >();
       this._timeManager = new gdjs.TimeManager();
-      this._onceTriggers = new gdjs.OnceTriggers();
       this._requestedChange = SceneChangeRequest.CONTINUE;
       this._cachedGameResolutionWidth = runtimeGame
         ? runtimeGame.getGameResolutionWidth()
@@ -345,8 +343,6 @@ namespace gdjs {
       this._eventsFunction = null;
       this._lastId = 0;
       this.networkId = null;
-      // @ts-ignore We are deleting the object
-      this._onceTriggers = null;
     }
 
     /**
@@ -451,6 +447,14 @@ namespace gdjs {
         this._profiler.end('render');
       }
       if (this._profiler) {
+        const threeRenderer = this._runtimeGame
+          .getRenderer()
+          .getThreeRenderer();
+        if (threeRenderer) {
+          this._profiler.record3DRendererInfo(threeRenderer.info);
+        }
+      }
+      if (this._profiler) {
         this._profiler.endFrame();
       }
       return !!this.getRequestedChange();
@@ -482,9 +486,11 @@ namespace gdjs {
       if (this._debugDrawEnabled) {
         this._debuggerRenderer.renderDebugDraw(
           this.getAdhocListOfAllInstances(),
+          this._debugDrawShowHitBoxes,
           this._debugDrawShowHiddenInstances,
           this._debugDrawShowPointsNames,
-          this._debugDrawShowCustomPoints
+          this._debugDrawShowCustomPoints,
+          this._debugDrawHooks
         );
       }
 
@@ -817,13 +823,6 @@ namespace gdjs {
       if (onProfilerStopped) {
         onProfilerStopped(oldProfiler);
       }
-    }
-
-    /**
-     * Get the structure containing the triggers for "Trigger once" conditions.
-     */
-    getOnceTriggers() {
-      return this._onceTriggers;
     }
 
     /**

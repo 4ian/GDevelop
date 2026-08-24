@@ -105,8 +105,7 @@ const mergeAnimations = function<A: { name: string }>(
     objectsAnimation: A,
     assetAnimation: A
   ) => A
-  // $FlowFixMe[missing-local-annot]
-) {
+): Array<A> {
   const animations = [];
   // Ensure the object don't loose any animation.
   for (const objectAnimation of objectAnimations) {
@@ -300,10 +299,8 @@ const mergeSpriteAnimations = (
 const mergeModel3DAnimation = (
   project: gdProject,
   PixiResourcesLoader: any,
-  // $FlowFixMe[missing-local-annot]
-  objectsAnimation,
-  // $FlowFixMe[missing-local-annot]
-  assetAnimation
+  objectsAnimation: { name: string },
+  assetAnimation: { name: string }
 ) => assetAnimation;
 
 const mergeModel3DAnimations = (
@@ -326,9 +323,16 @@ export const swapAsset = (
   object: gdObject,
   assetObject: gdObject,
   assetShortHeader?: ?AssetShortHeader
-) => {
+): boolean => {
   let serializedObject = serializeToJSObject(object);
   const serializedAssetObject = serializeToJSObject(assetObject);
+
+  if (object.getType() !== assetObject.getType()) {
+    console.error(
+      `Cannot swap object of type ${object.getType()} with assets from object of type ${assetObject.getType()}. Not doing any swap.`
+    );
+    return false;
+  }
 
   if (object.getType() === 'Sprite') {
     serializedObject.preScale = evaluatePreScale(
@@ -392,4 +396,6 @@ export const swapAsset = (
     };
   }
   unserializeFromJSObject(object, serializedObject, 'unserializeFrom', project);
+
+  return true;
 };

@@ -28,11 +28,13 @@ const CompactLeaderboardIdPropertyField = ({
   value,
   onChange,
   id,
+  disabled,
 }: {|
   project: gdProject,
   value: string,
   onChange: (newValue: string) => void,
   id?: string,
+  disabled?: boolean,
 |}): React.Node => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
@@ -73,11 +75,12 @@ const CompactLeaderboardIdPropertyField = ({
     <I18n>
       {({ i18n }) => (
         <LineStackLayout noMargin expand id={idToUse.current}>
-          <Column noMargin expand>
+          <Column noMargin expand noOverflowParent>
             {!isExpressionField ? (
               <CompactSelectField
                 value={gameHasLeaderboards ? value : 'empty'}
                 onChange={onChange}
+                disabled={disabled}
               >
                 {gameHasLeaderboards ? (
                   selectOptions
@@ -94,6 +97,7 @@ const CompactLeaderboardIdPropertyField = ({
               <CompactSemiControlledTextField
                 onChange={onChange}
                 value={value}
+                disabled={disabled}
                 errorText={
                   leaderboards ? null : isOnline ? (
                     <Trans>
@@ -111,7 +115,7 @@ const CompactLeaderboardIdPropertyField = ({
           </Column>
           <ElementWithMenu
             element={
-              <IconButton size="small">
+              <IconButton size="small" disabled={disabled}>
                 <Edit style={styles.icon} />
               </IconButton>
             }

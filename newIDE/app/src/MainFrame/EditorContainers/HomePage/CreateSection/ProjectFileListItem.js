@@ -97,7 +97,7 @@ export const ProjectFileListItem = ({
     [disabled, onOpenContextMenu]
   );
 
-  const longTouchForContextMenuProps = useLongTouch(
+  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
     React.useCallback(
       event => {
         onWillOpenContextMenu(event, file);

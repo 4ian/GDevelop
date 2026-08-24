@@ -16,6 +16,7 @@ type Props = {|
   leftIconTooltip?: React.Node,
   renderOptionIcon?: (className: string) => React.Node,
   rounded?: boolean,
+  onFocus?: () => void,
 |};
 
 const CompactSelectField = ({
@@ -29,6 +30,7 @@ const CompactSelectField = ({
   renderOptionIcon,
   leftIconTooltip,
   rounded,
+  onFocus,
 }: Props): React.MixedElement => {
   return (
     <div
@@ -78,6 +80,7 @@ const CompactSelectField = ({
           disabled={disabled}
           value={value}
           onChange={e => onChange(e.currentTarget.value)}
+          onFocus={e => onFocus && onFocus()}
         >
           {children}
         </select>

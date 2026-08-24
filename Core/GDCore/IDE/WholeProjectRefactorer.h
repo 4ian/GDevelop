@@ -126,6 +126,15 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newName);
 
   /**
+   * \brief Refactor extension events after the extension has been pasted or
+   * duplicated.
+   */
+  static void UpdateExtensionNameInExtension(
+      gd::Project &project,
+      gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &sourceExtensionName);
+
+  /**
    * \brief Refactor behavior events after the behavior has been placed in a new
    * extension.
    */

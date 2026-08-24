@@ -210,7 +210,7 @@ const CurrentUsageDisplayer = ({
           }
           label={<Trans>Get a subscription</Trans>}
           payWithCreditsOptions={
-            !quota.limitReached || hidePurchaseWithCredits
+            isFeatureLocked || !quota.limitReached || hidePurchaseWithCredits
               ? undefined
               : {
                   label: (

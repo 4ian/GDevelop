@@ -124,7 +124,11 @@ public:
 
 private:
   static const gd::String &
-  GetExtensionIconUrl(gd::PlatformExtension &extension);
+  GetExtensionIconUrl(const gd::PlatformExtension &extension);
+
+  static const gd::String &
+  GetEntityIconUrl(const gd::PlatformExtension &extension,
+                     const gd::AbstractEventsBasedEntity &eventsBasedEntity);
 
   /**
    * Declare the dependencies of an extension from an events based extension.
@@ -341,6 +345,8 @@ private:
   static gd::String
   GetObjectFunctionSentence(const gd::EventsFunction &eventsFunction,
                             const bool excludeObjectParameter = false);
+
+  static gd::String GetFunctionGroup(const gd::EventsFunction &eventsFunction);
 
   std::vector<gd::MultipleInstructionMetadata> expressionAndConditions;
 };

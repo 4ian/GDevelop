@@ -7,7 +7,7 @@ import {
   selectableArea,
   largeSelectableArea,
   largeSelectedArea,
-  executableEventContainer,
+  conditionsActionsContainer,
   disabledText,
   instructionParameter,
   nameAndIconContainer,
@@ -180,6 +180,34 @@ export default class ForEachChildVariableEvent extends React.Component<
     });
   };
 
+  applyEditing = () => {
+    const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
+      this.props.event
+    );
+    const {
+      editingPreviousValue,
+      editingIterableVariableName,
+      editingValueIteratorVariableName,
+      editingKeyIteratorVariableName,
+    } = this.state;
+    const currentValue = editingIterableVariableName
+      ? forEachChildVariableEvent.getIterableVariableName()
+      : editingValueIteratorVariableName
+      ? forEachChildVariableEvent.getValueIteratorVariableName()
+      : editingKeyIteratorVariableName
+      ? forEachChildVariableEvent.getKeyIteratorVariableName()
+      : null;
+    if (
+      editingPreviousValue != null &&
+      currentValue != null &&
+      editingPreviousValue !== currentValue
+    ) {
+      // Value changed: record the change in the history (this also flags the project as having unsaved changes).
+      this.props.onEndEditingEvent();
+    }
+    this.endEditing();
+  };
+
   render(): any {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
       this.props.event
@@ -207,7 +235,6 @@ export default class ForEachChildVariableEvent extends React.Component<
       <div
         style={styles.container}
         className={classNames({
-          [executableEventContainer]: true,
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
         })}
@@ -331,6 +358,9 @@ export default class ForEachChildVariableEvent extends React.Component<
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
           eventsSheetWidth={this.props.eventsSheetWidth}
+          className={classNames({
+            [conditionsActionsContainer]: true,
+          })}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
               platform={this.props.project.getCurrentPlatform()}
@@ -362,6 +392,8 @@ export default class ForEachChildVariableEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
           renderActionsList={({ className }) => (
@@ -399,6 +431,8 @@ export default class ForEachChildVariableEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
         />
@@ -406,7 +440,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           open={this.state.editingValueIteratorVariableName}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.cancelEditing}
-          onApply={this.endEditing}
+          onApply={this.applyEditing}
         >
           <AnyVariableField
             project={this.props.project}
@@ -423,7 +457,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             }}
             isInline
             onRequestClose={this.cancelEditing}
-            onApply={this.endEditing}
+            onApply={this.applyEditing}
             ref={iteratorField => (this._valueIteratorField = iteratorField)}
           />
         </InlinePopover>
@@ -431,7 +465,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           open={this.state.editingKeyIteratorVariableName}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.cancelEditing}
-          onApply={this.endEditing}
+          onApply={this.applyEditing}
         >
           <AnyVariableField
             project={this.props.project}
@@ -448,7 +482,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             }}
             isInline
             onRequestClose={this.cancelEditing}
-            onApply={this.endEditing}
+            onApply={this.applyEditing}
             ref={iteratorField => (this._keyIteratorField = iteratorField)}
           />
         </InlinePopover>
@@ -456,7 +490,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           open={this.state.editingIterableVariableName}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.cancelEditing}
-          onApply={this.endEditing}
+          onApply={this.applyEditing}
         >
           <AnyVariableField
             project={this.props.project}
@@ -473,7 +507,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             }}
             isInline
             onRequestClose={this.cancelEditing}
-            onApply={this.endEditing}
+            onApply={this.applyEditing}
             ref={iterableField => (this._iterableField = iterableField)}
           />
         </InlinePopover>

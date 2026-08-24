@@ -86,8 +86,7 @@ export default class InstancesAdder {
   _instances: gdInitialInstancesContainer;
   _temporaryInstances: Array<gdInitialInstance>;
   _instancesEditorSettings: InstancesEditorSettings;
-  // $FlowFixMe[missing-local-annot]
-  _zOrderFinder = (new gd.HighestZOrderFinder(): gdHighestZOrderFinder);
+  _zOrderFinder: gdHighestZOrderFinder = new gd.HighestZOrderFinder();
 
   constructor({ project, instances, instancesEditorSettings }: Props) {
     this._project = project;
@@ -213,6 +212,17 @@ export default class InstancesAdder {
 
     return this._temporaryInstances;
   };
+
+  /**
+   * Check if the given instance is one of the temporary instances added while
+   * an object is being dragged over the scene.
+   */
+  isTemporaryInstance(instance: ?gdInitialInstance): boolean {
+    if (!instance) return false;
+    return this._temporaryInstances.some(
+      temporaryInstance => temporaryInstance.ptr === instance.ptr
+    );
+  }
 
   /**
    * Delete the temporary instances.

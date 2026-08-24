@@ -101,6 +101,21 @@ export const Spacer: React.ComponentType<NoProps> = React.memo<NoProps>(() => (
   <span style={spacerStyle} />
 ));
 
+// Spacing between an icon and a label inside a button. Intentionally tighter
+// than the standard `Spacer` (marginsSize) so the icon and label read as one unit.
+export const buttonIconLabelSpacingSize = 4;
+
+const buttonSpacerStyle = {
+  width: buttonIconLabelSpacingSize,
+  height: buttonIconLabelSpacingSize,
+  flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
+};
+
+/** A small spacer used between an icon and a label inside buttons. */
+export const ButtonSpacer: React.ComponentType<NoProps> = React.memo<NoProps>(
+  () => <span style={buttonSpacerStyle} />
+);
+
 const largeSpacerStyle = {
   width: 24,
   height: 24,

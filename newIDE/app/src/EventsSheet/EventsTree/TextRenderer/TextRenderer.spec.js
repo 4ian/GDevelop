@@ -1,7 +1,11 @@
 // @flow
 import { makeTestProject } from '../../../fixtures/TestProject';
 import { unserializeFromJSObject } from '../../../Utils/Serializer';
-import { renderNonTranslatedEventsAsText } from '.';
+import {
+  renderNonTranslatedEventsAsText,
+  renderNonTranslatedEventsAsTextWithErrors,
+  eventsTextRenderingErrorText,
+} from '.';
 
 const gd: libGDevelop = global.gd;
 
@@ -30,6 +34,30 @@ describe('EventsTree/TextRenderer', () => {
             {
               type: { value: 'Show' },
               parameters: ['GroupOfObjects', ''],
+            },
+            {
+              type: { value: 'ActivateBehavior' },
+              parameters: [
+                'GroupOfSpriteObjectsWithBehaviors',
+                'PlatformerObject',
+                '',
+              ],
+            },
+            {
+              type: { value: 'ActivateBehavior' },
+              parameters: [
+                'GroupOfSpriteObjectsWithBehaviors',
+                'PlatformerObject',
+                'yes',
+              ],
+            },
+            {
+              type: { value: 'ActivateBehavior' },
+              parameters: [
+                'GroupOfSpriteObjectsWithBehaviors',
+                'PlatformerObject',
+                'something else',
+              ],
             },
           ],
           events: [
@@ -377,6 +405,47 @@ describe('EventsTree/TextRenderer', () => {
           comment: longCommentText,
           color: { r: 255, g: 230, b: 109, textR: 0, textG: 0, textB: 0 },
         },
+        // ForEach event without orderBy
+        {
+          type: 'BuiltinCommonInstructions::ForEach',
+          object: 'MySpriteObject',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Show' },
+              parameters: ['MySpriteObject', ''],
+            },
+          ],
+        },
+        // ForEach event with orderBy ascending and limit
+        {
+          type: 'BuiltinCommonInstructions::ForEach',
+          object: 'MySpriteObject',
+          orderBy: 'MySpriteObject.Variable(Priority)',
+          order: 'asc',
+          limit: '3',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Show' },
+              parameters: ['MySpriteObject', ''],
+            },
+          ],
+        },
+        // ForEach event with orderBy descending without limit
+        {
+          type: 'BuiltinCommonInstructions::ForEach',
+          object: 'MySpriteObject',
+          orderBy: 'MySpriteObject.Variable(Score)',
+          order: 'desc',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Show' },
+              parameters: ['MySpriteObject', ''],
+            },
+          ],
+        },
       ];
 
       const eventsList = new gd.EventsList();
@@ -398,6 +467,9 @@ describe('EventsTree/TextRenderer', () => {
          Actions:
          - Change the number of the animation of MySpriteObject: = 1
          - Show GroupOfObjects
+         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: no
+         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: yes
+         - Activate behavior PlatformerObject of GroupOfSpriteObjectsWithBehaviors: no
          Sub-events:
           <event-0.0>
            ~~Else~~ (Else is ignored because not following a standard event)
@@ -523,9 +595,120 @@ describe('EventsTree/TextRenderer', () => {
         </event-2>
         <event-3 type=\\"comment\\">
          AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA[cut - 50 more characters]
-        </event-3>"
+        </event-3>
+        <event-4 type=\\"for-each\\">
+         Repeat these separately for each instance of MySpriteObject:
+         Conditions:
+          (no conditions)
+         Actions:
+          - Show MySpriteObject
+        </event-4>
+        <event-5 type=\\"for-each\\">
+         Repeat these separately for each instance of MySpriteObject ordered by \`MySpriteObject.Variable(Priority)\` (ascending) limit: \`3\`:
+         Conditions:
+          (no conditions)
+         Actions:
+          - Show MySpriteObject
+        </event-5>
+        <event-6 type=\\"for-each\\">
+         Repeat these separately for each instance of MySpriteObject ordered by \`MySpriteObject.Variable(Score)\` (descending):
+         Conditions:
+          (no conditions)
+         Actions:
+          - Show MySpriteObject
+        </event-6>"
       `);
     } finally {
+      project.delete();
+    }
+  });
+
+  it('renders a link event', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = new gd.EventsList();
+      unserializeFromJSObject(
+        eventsList,
+        [
+          {
+            type: 'BuiltinCommonInstructions::Link',
+            target: 'MyExternalEvents',
+            include: { includeConfig: 0 },
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      const {
+        text,
+        renderingErrors,
+      } = renderNonTranslatedEventsAsTextWithErrors({
+        eventsList,
+      });
+
+      expect(renderingErrors).toEqual([]);
+      expect(text).toContain('type="link"');
+      expect(text).toContain(
+        '(link to events in events sheet called "MyExternalEvents")'
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('degrades gracefully and reports errors when an event/instruction fails to render', () => {
+    const { project } = makeTestProject(gd);
+    // `any` alias to override the non-writable gd binding.
+    const sentenceFormatterClass: any = gd.InstructionSentenceFormatter;
+    const realFormatterProvider = sentenceFormatterClass.get;
+    try {
+      const eventsList = new gd.EventsList();
+      unserializeFromJSObject(
+        eventsList,
+        [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'Show' },
+                parameters: ['MySpriteObject', ''],
+              },
+            ],
+          },
+          {
+            type: 'BuiltinCommonInstructions::Comment',
+            comment: 'This comment must still be rendered',
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      // Force instruction rendering to throw.
+      sentenceFormatterClass.get = () => ({
+        getAsFormattedText: () => {
+          throw new Error('Simulated rendering failure');
+        },
+      });
+
+      const {
+        text,
+        renderingErrors,
+      } = renderNonTranslatedEventsAsTextWithErrors({
+        eventsList,
+      });
+
+      expect(text).not.toBe(eventsTextRenderingErrorText);
+      expect(text).toContain('(this action could not be rendered)');
+      expect(text).toContain('This comment must still be rendered');
+
+      expect(renderingErrors).toHaveLength(1);
+      expect(renderingErrors[0].message).toBe('Simulated rendering failure');
+      expect(renderingErrors[0].path).toContain('action 0');
+    } finally {
+      sentenceFormatterClass.get = realFormatterProvider;
       project.delete();
     }
   });

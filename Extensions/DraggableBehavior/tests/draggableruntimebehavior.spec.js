@@ -27,6 +27,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       title: '',
       behaviorsSharedData: [],
       objects: [],
+      objectsGroups: [],
       instances: [],
       usedResources: [],
       uiSettings: {

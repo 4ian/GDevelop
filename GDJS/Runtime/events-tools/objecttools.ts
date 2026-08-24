@@ -357,7 +357,10 @@ namespace gdjs {
         );
       };
 
-      export const pickAllObjects = function (objectsContext, objectsLists) {
+      export const pickAllObjects = function (
+        objectsContext: EventsFunctionContext | gdjs.RuntimeScene,
+        objectsLists: ObjectsLists
+      ) {
         for (const name in objectsLists.items) {
           if (objectsLists.items.hasOwnProperty(name)) {
             const allObjects = objectsContext.getObjects(name);

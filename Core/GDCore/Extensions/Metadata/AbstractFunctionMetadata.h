@@ -72,6 +72,12 @@ public:
   SetParameterLongDescription(const gd::String &longDescription) = 0;
 
   /**
+   * \see gd::InstructionMetadata::SetParameterHint
+   */
+  virtual AbstractFunctionMetadata &
+  SetParameterHint(const gd::String &hint) = 0;
+
+  /**
    * \see gd::InstructionMetadata::SetHidden
    */
   virtual AbstractFunctionMetadata &SetHidden() = 0;

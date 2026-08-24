@@ -245,7 +245,10 @@ const AssetPackInstallDialog = ({
         const createdObjects = results
           .map(result => result.createdObjects)
           .flat();
-        complyVariantsToEventsBasedObjectOf(project, createdObjects);
+        complyVariantsToEventsBasedObjectOf(
+          project,
+          createdObjects.map(object => object.getType())
+        );
         onAssetsAdded({ createdObjects, isTheFirstOfItsTypeInProject });
       } catch (error) {
         setAreAssetsBeingInstalled(false);

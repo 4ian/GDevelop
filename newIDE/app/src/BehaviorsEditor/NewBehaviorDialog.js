@@ -26,6 +26,8 @@ import {
   TRIVIAL_FIRST_EXTENSION,
 } from '../Utils/GDevelopServices/Badge';
 import { mapVector } from '../Utils/MapFor';
+import Add from '../UI/CustomSvgIcons/Add';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const gd: libGDevelop = global.gd;
 
@@ -40,6 +42,9 @@ type Props = {|
   onChoose: (type: string, defaultName: string) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  shouldShowCapabilityBehaviors: boolean,
+  title?: React.Node,
+  onCreateNewExtensionWithBehavior: (() => void) | null,
 |};
 
 export default function NewBehaviorDialog({
@@ -53,7 +58,11 @@ export default function NewBehaviorDialog({
   isChildObject,
   onWillInstallExtension,
   onExtensionInstalled,
+  shouldShowCapabilityBehaviors,
+  title,
+  onCreateNewExtensionWithBehavior,
 }: Props): null | React.Node {
+  const { isMobile } = useResponsiveWindowSize();
   const [isInstalling, setIsInstalling] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -79,18 +88,14 @@ export default function NewBehaviorDialog({
       allRequiredBehaviorTypes: Array<string> = []
     ): Array<string> => {
       mapVector(
-        // $FlowFixMe[incompatible-exact]
         behaviorMetadata.getRequiredBehaviorTypes(),
         requiredBehaviorType => {
-          // $FlowFixMe[incompatible-type]
           if (allRequiredBehaviorTypes.includes(requiredBehaviorType)) {
             return;
           }
-          // $FlowFixMe[incompatible-type]
           allRequiredBehaviorTypes.push(requiredBehaviorType);
           const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
             project.getCurrentPlatform(),
-            // $FlowFixMe[incompatible-type]
             requiredBehaviorType
           );
           getAllRequiredBehaviorTypes(
@@ -107,7 +112,7 @@ export default function NewBehaviorDialog({
   const allInstalledBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
     () => {
       const platform = project.getCurrentPlatform();
-      const behaviorMetadataList =
+      let behaviorMetadataList =
         project && platform
           ? enumerateBehaviorsMetadata(
               platform,
@@ -116,39 +121,48 @@ export default function NewBehaviorDialog({
             )
           : [];
 
-      return behaviorMetadataList
-        .filter(behavior => !behavior.behaviorMetadata.isHidden())
-        .map(behavior => ({
-          type: behavior.type,
-          fullName: behavior.fullName,
-          description: behavior.description,
-          previewIconUrl: behavior.previewIconUrl,
-          objectType: behavior.objectType,
-          category: behavior.category,
-          allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(
-            behavior.behaviorMetadata
-          ),
-          tags: behavior.tags,
-          name: gd.PlatformExtension.getBehaviorNameFromFullBehaviorType(
-            behavior.type
-          ),
-          extensionName: gd.PlatformExtension.getExtensionFromFullBehaviorType(
-            behavior.type
-          ),
+      if (!shouldShowCapabilityBehaviors) {
+        behaviorMetadataList = behaviorMetadataList.filter(
+          behavior => !behavior.behaviorMetadata.isHidden()
+        );
+      }
 
-          isInstalled: true,
-          // The tier will be overridden with repository data.
-          // Only the built-in and user extensions will keep this value.
-          tier: 'installed',
-          // Not relevant for `installed` extensions
-          version: '',
-          url: '',
-          headerUrl: '',
-          extensionNamespace: '',
-          authorIds: [],
-        }));
+      return behaviorMetadataList.map(behavior => ({
+        type: behavior.type,
+        fullName: behavior.fullName,
+        description: behavior.description,
+        previewIconUrl: behavior.previewIconUrl,
+        objectType: behavior.objectType,
+        category: behavior.category,
+        allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(
+          behavior.behaviorMetadata
+        ),
+        tags: behavior.tags,
+        name: gd.PlatformExtension.getBehaviorNameFromFullBehaviorType(
+          behavior.type
+        ),
+        extensionName: gd.PlatformExtension.getExtensionFromFullBehaviorType(
+          behavior.type
+        ),
+
+        isInstalled: true,
+        // The tier will be overridden with repository data.
+        // Only the built-in and user extensions will keep this value.
+        tier: 'installed',
+        // Not relevant for `installed` extensions
+        version: '',
+        url: '',
+        headerUrl: '',
+        extensionNamespace: '',
+        authorIds: [],
+      }));
     },
-    [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]
+    [
+      project,
+      eventsFunctionsExtension,
+      shouldShowCapabilityBehaviors,
+      getAllRequiredBehaviorTypes,
+    ]
   );
 
   const installedBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
@@ -248,7 +262,7 @@ export default function NewBehaviorDialog({
     <I18n>
       {({ i18n }) => (
         <Dialog
-          title={<Trans>Add a new behavior to the object</Trans>}
+          title={title || <Trans>Add a new behavior to the object</Trans>}
           actions={[
             <FlatButton
               key="close"
@@ -259,6 +273,20 @@ export default function NewBehaviorDialog({
           ]}
           secondaryActions={[
             <HelpButton helpPagePath="/behaviors" key="help" />,
+            onCreateNewExtensionWithBehavior ? (
+              <FlatButton
+                key="create-new"
+                onClick={onCreateNewExtensionWithBehavior}
+                label={
+                  isMobile ? (
+                    <Trans>Create</Trans>
+                  ) : (
+                    <Trans>Create a new behavior</Trans>
+                  )
+                }
+                leftIcon={<Add />}
+              />
+            ) : null,
           ]}
           open
           onRequestClose={onClose}
@@ -276,6 +304,7 @@ export default function NewBehaviorDialog({
             onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
             installedBehaviorMetadataList={installedBehaviorMetadataList}
             deprecatedBehaviorMetadataList={deprecatedBehaviorMetadataList}
+            shouldCheckCapabilityBehaviors={!shouldShowCapabilityBehaviors}
           />
         </Dialog>
       )}

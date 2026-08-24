@@ -18,6 +18,11 @@ import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFie
 import { Trans } from '@lingui/macro';
 import ChevronArrowTop from '../../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowBottom from '../../../UI/CustomSvgIcons/ChevronArrowBottom';
+import { exceptionallyGuardAgainstDeadObject } from '../../../Utils/IsNullPtr';
+import UnsavedChangesContext, {
+  type UnsavedChanges,
+} from '../../../MainFrame/UnsavedChangesContext';
+
 const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
@@ -70,6 +75,8 @@ export default class JsCodeEvent extends React.Component<
   EventRendererProps,
   State
 > {
+  static contextType: React.Context<UnsavedChanges> = UnsavedChangesContext;
+
   _objectField: ?ParameterFieldInterface = null;
   // $FlowFixMe[missing-local-annot]
   state = {
@@ -96,6 +103,31 @@ export default class JsCodeEvent extends React.Component<
   onChange = (newValue: string) => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     jsCodeEvent.setInlineCode(newValue);
+
+    // The JS Event is modified live as the user types, so flag the
+    // project as having unsaved changes immediately.
+    const unsavedChanges: UnsavedChanges = this.context;
+    unsavedChanges.triggerUnsavedChanges();
+  };
+
+  saveEditorState = ({
+    scrollTop,
+    cursorColumn,
+    cursorLine,
+  }: {
+    scrollTop: number,
+    cursorColumn: number,
+    cursorLine: number,
+  }): void => {
+    const jsCodeEvent = exceptionallyGuardAgainstDeadObject(
+      gd.asJsCodeEvent(this.props.event)
+    );
+    if (!jsCodeEvent) {
+      return;
+    }
+    jsCodeEvent.setScrollTop(scrollTop);
+    jsCodeEvent.setCursorColumn(cursorColumn);
+    jsCodeEvent.setCursorLine(cursorLine);
   };
 
   editObject = (domEvent: any) => {
@@ -270,6 +302,10 @@ export default class JsCodeEvent extends React.Component<
             <CodeEditor
               value={jsCodeEvent.getInlineCode()}
               onChange={this.onChange}
+              initialScrollTop={jsCodeEvent.getScrollTop()}
+              initialCursorColumn={jsCodeEvent.getCursorColumn()}
+              initialCursorLine={jsCodeEvent.getCursorLine()}
+              saveEditorState={this.saveEditorState}
               width={contentRect.bounds.width - 5}
               height={this._getCodeEditorHeight()}
               onEditorMounted={() => {

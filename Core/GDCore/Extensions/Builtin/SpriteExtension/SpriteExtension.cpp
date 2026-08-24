@@ -485,7 +485,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/color.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("color", _("Tint"));
+      .AddParameter("color", _("Tint"))
+      .SetHint(
+          "The tint is multiplicative on the image pixels (white restores the "
+          "original colors): it can only darken or shift existing colors, and "
+          "cannot turn a non-white sprite into an arbitrary solid color. For a "
+          "solid color, use a white image, another animation/image or an "
+          "effect.");
 
   obj.AddAction("ChangeBlendMode",
                 _("Blend mode"),

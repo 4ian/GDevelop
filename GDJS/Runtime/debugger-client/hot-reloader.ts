@@ -302,6 +302,7 @@ namespace gdjs {
             // resources will be loaded with a 'cache bursting' parameter.
             this._runtimeGame._resourcesLoader.unloadAllResources();
           }
+          this._runtimeGame._resourcesLoader.registerOptionalManagersForHotReload();
           // The editor don't need to hot-reload the current scene because the
           // editor always stays in the initial state.
           this._runtimeGame.setProjectData(newProjectData);
@@ -333,14 +334,15 @@ namespace gdjs {
             this._runtimeGame
           );
         }
-      } catch (error) {
-        const errorTarget = error.target;
+      } catch (e) {
+        const errorTarget = (e as ErrorEvent).target;
         if (errorTarget instanceof HTMLScriptElement) {
           this._logs.push({
             kind: 'fatal',
             message: 'Unable to reload script: ' + errorTarget.src,
           });
         } else {
+          const error = e as Error;
           this._logs.push({
             kind: 'fatal',
             message:
@@ -516,6 +518,7 @@ namespace gdjs {
       }
       // Update project data and re-load assets (sound/image/font/json managers
       // will take care of reloading only what is needed).
+      runtimeGame.getResourceLoader().registerOptionalManagersForHotReload();
       runtimeGame.setProjectData(newProjectData);
       await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
         currentScene.getName(),
@@ -639,12 +642,16 @@ namespace gdjs {
           const oldObjectDataList =
             HotReloader.resolveCustomObjectConfigurations(
               oldProjectData,
-              oldLayoutData ? oldLayoutData.objects : []
+              oldLayoutData
+                ? [...oldProjectData.objects, ...oldLayoutData.objects]
+                : oldProjectData.objects
             );
           const newObjectDataList =
             HotReloader.resolveCustomObjectConfigurations(
               newProjectData,
-              newLayoutData ? newLayoutData.objects : []
+              newLayoutData
+                ? [...newProjectData.objects, ...newLayoutData.objects]
+                : newProjectData.objects
             );
 
           sceneStack._stack.forEach((runtimeScene) => {
@@ -947,11 +954,11 @@ namespace gdjs {
       }
       const oldObjectDataList = HotReloader.resolveCustomObjectConfigurations(
         oldProjectData,
-        oldLayoutData.objects
+        [...oldProjectData.objects, ...oldLayoutData.objects]
       );
       const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
         newProjectData,
-        newLayoutData.objects
+        [...newProjectData.objects, ...newLayoutData.objects]
       );
 
       // Re-instantiate any gdjs.RuntimeBehavior that was changed.
@@ -1848,6 +1855,15 @@ namespace gdjs {
       }
       if (oldInstance.layer !== newInstance.layer) {
         runtimeObject.setLayer(newInstance.layer);
+        somethingChanged = true;
+      }
+      if (
+        // Instances hidden at start are not hidden in the in-game editor:
+        // they must stay visible to be seen and manipulated.
+        !this._runtimeGame.isInGameEdition() &&
+        !oldInstance.hidden !== !newInstance.hidden
+      ) {
+        runtimeObject.hide(!!newInstance.hidden);
         somethingChanged = true;
       }
       if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(runtimeObject)) {

@@ -223,7 +223,7 @@ public:
         static_assert(!std::is_same<T, std::string>::value, "Can't use gd::String::From with std::string.");
 
         std::ostringstream oss;
-        oss.precision(17);
+        oss.precision(16);
         oss << value;
         return gd::String(oss.str().c_str());
     }
@@ -529,6 +529,11 @@ public:
      * \brief Returns the string with the first letter in upper case.
      */
     String CapitalizeFirstLetter() const;
+
+    /**
+     * \brief Returns the string with the first letter in lower case.
+     */
+    String UncapitalizeFirstLetter() const;
 
     /**
      * \brief Searches a string for a specified substring and returns a new string where all occurrences of this substring is replaced.

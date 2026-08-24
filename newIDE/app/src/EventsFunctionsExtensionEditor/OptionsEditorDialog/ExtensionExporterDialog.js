@@ -12,14 +12,14 @@ import EventsFunctionsExtensionsContext, {
 import Window from '../../Utils/Window';
 import Upload from '../../UI/CustomSvgIcons/Upload';
 import { serializeToJSObject } from '../../Utils/Serializer';
+import { type ExtensionDependency } from '../../Utils/GDevelopServices/Extension';
 
 const gd: libGDevelop = global.gd;
 
-const exportExtension = async (
+const findRequiredExtensions = (
   project: gdProject,
-  eventsFunctionsExtension: gdEventsFunctionsExtension,
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
-) => {
+  eventsFunctionsExtension: gdEventsFunctionsExtension
+): Array<ExtensionDependency> => {
   const requiredExtensions = gd.UsedExtensionsFinder.scanEventsFunctionsExtension(
     project,
     eventsFunctionsExtension
@@ -38,6 +38,18 @@ const exportExtension = async (
         .getEventsFunctionsExtension(extensionName)
         .getVersion(),
     }));
+  return requiredExtensions;
+};
+
+const exportExtension = async (
+  project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
+) => {
+  const requiredExtensions = findRequiredExtensions(
+    project,
+    eventsFunctionsExtension
+  );
   const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
   if (!eventsFunctionsExtensionWriter) {
     // This won't happen in practice because this view can't be reached from the web-app.

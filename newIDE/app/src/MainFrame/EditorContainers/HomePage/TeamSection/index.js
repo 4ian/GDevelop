@@ -46,8 +46,10 @@ import { EducationCard } from '../LearnSection/EducationCard';
 import UserSVG from '../../../../UI/CustomSvgIcons/User';
 import { copyTextToClipboard } from '../../../../Utils/Clipboard';
 import ManageEducationAccountDialog from './ManageEducationAccountDialog';
+import AdvancedStudentOptionsDialog from './AdvancedStudentOptionsDialog';
 import TeamAvailableSeats from './TeamAvailableSeats';
-import StudentCreationCard from './StudentCreationCard';
+import IconButton from '../../../../UI/IconButton';
+import Settings from '../../../../UI/CustomSvgIcons/Settings';
 
 const PADDING = 16;
 
@@ -107,12 +109,15 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       onRefreshMembers,
       onRefreshAdmins,
       getAvailableSeats,
-      onCreateMembers,
     } = React.useContext(TeamContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [
       manageSeatsDialogOpen,
       setManageSeatsDialogOpen,
+    ] = React.useState<boolean>(false);
+    const [
+      advancedStudentOptionsDialogOpen,
+      setAdvancedStudentOptionsDialogOpen,
     ] = React.useState<boolean>(false);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
@@ -137,9 +142,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       setShowNewGroupNameField,
     ] = React.useState<boolean>(false);
     const [isLoadingMembers, setIsLoadingMembers] = React.useState<boolean>(
-      false
-    );
-    const [isCreatingMembers, setIsCreatingMembers] = React.useState<boolean>(
       false
     );
     const [movingUsers, setMovingUsers] = React.useState<?{|
@@ -208,30 +210,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     );
 
     const availableSeats = getAvailableSeats();
-
-    const onCreateTeamMembers = React.useCallback(
-      async (quantity: number) => {
-        if (
-          !availableSeats ||
-          quantity > availableSeats ||
-          quantity <= 0 ||
-          isCreatingMembers
-        ) {
-          return;
-        }
-        setIsCreatingMembers(true);
-        try {
-          await onCreateMembers(quantity);
-          await onRefreshTeamMembers();
-        } catch (error) {
-          console.error(`An error occurred when creating members: `, error);
-          throw error;
-        } finally {
-          setIsCreatingMembers(false);
-        }
-      },
-      [onCreateMembers, onRefreshTeamMembers, availableSeats, isCreatingMembers]
-    );
 
     const buildContextMenu = (
       i18n: I18nType,
@@ -325,14 +303,23 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           justifyContent="space-between"
         >
           <TeamAvailableSeats />
-          <RaisedButton
-            primary
-            label={
-              isMobile ? <Trans>Manage</Trans> : <Trans>Manage seats</Trans>
-            }
-            icon={<UserSVG fontSize="small" />}
-            onClick={() => setManageSeatsDialogOpen(true)}
-          />
+          <LineStackLayout noMargin alignItems="center">
+            <RaisedButton
+              primary
+              label={
+                isMobile ? <Trans>Manage</Trans> : <Trans>Manage seats</Trans>
+              }
+              icon={<UserSVG fontSize="small" />}
+              onClick={() => setManageSeatsDialogOpen(true)}
+            />
+            <IconButton
+              size="small"
+              tooltip={t`Advanced student options`}
+              onClick={() => setAdvancedStudentOptionsDialogOpen(true)}
+            >
+              <Settings />
+            </IconButton>
+          </LineStackLayout>
         </LineStackLayout>
       </div>
     );
@@ -404,11 +391,12 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                       <Trans>Lobby</Trans>
                     </Text>
                     {hasNoActiveTeamMembers && availableSeats !== null ? (
-                      <StudentCreationCard
-                        availableSeats={availableSeats}
-                        onCreateStudentAccounts={onCreateTeamMembers}
-                        isCreatingMembers={isCreatingMembers}
-                      />
+                      <EmptyMessage>
+                        <Trans>
+                          You don't have any active students. Click on "Manage
+                          seats" to add students or teachers to your team.
+                        </Trans>
+                      </EmptyMessage>
                     ) : (
                       <List style={styles.list}>
                         {membersNotInAGroupToDisplay.members
@@ -566,6 +554,11 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         {manageSeatsDialogOpen && (
           <ManageEducationAccountDialog
             onClose={() => setManageSeatsDialogOpen(false)}
+          />
+        )}
+        {advancedStudentOptionsDialogOpen && (
+          <AdvancedStudentOptionsDialog
+            onClose={() => setAdvancedStudentOptionsDialogOpen(false)}
           />
         )}
       </>

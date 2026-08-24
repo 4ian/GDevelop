@@ -34,6 +34,7 @@ import {
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 const initialMosaicEditorNodes = {
   direction: 'row',
@@ -89,10 +90,12 @@ const MosaicEditorsDisplay: React.ComponentType<{
       initialInstances,
       chosenLayer,
       selectedLayer,
+      selectedObjectGroup,
       onSelectInstances,
       onInstancesModified,
       onWillInstallExtension,
       onExtensionInstalled,
+      onCreateNewExtensionWithBehavior,
       isActive,
       onRestartInGameEditor,
       showRestartInGameEditorAfterErrorButton,
@@ -149,9 +152,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
             instance.getDefaultDepth(),
           ];
     }, []);
+
     const _onInstancesModified = React.useCallback(
-      // $FlowFixMe[missing-local-annot]
-      instances => {
+      (instances: Array<gdInitialInstance>) => {
         if (onInstancesModified) onInstancesModified(instances);
         forceUpdateInstancesList();
       },
@@ -160,8 +163,11 @@ const MosaicEditorsDisplay: React.ComponentType<{
     const toggleEditorView = React.useCallback((editorId: EditorId) => {
       if (!editorMosaicRef.current) return;
       const config = defaultPanelConfigByEditor[editorId];
-      // $FlowFixMe[incompatible-type]
-      editorMosaicRef.current.toggleEditor(editorId, config.position);
+      editorMosaicRef.current.toggleEditor(
+        editorId,
+        // $FlowFixMe[incompatible-type]
+        config.position
+      );
     }, []);
     const isEditorVisible = React.useCallback((editorId: EditorId) => {
       if (!editorMosaicRef.current) return false;
@@ -176,13 +182,16 @@ const MosaicEditorsDisplay: React.ComponentType<{
       [isEditorVisible, toggleEditorView]
     );
 
-    const startSceneRendering = React.useCallback((start: boolean) => {
-      const editor = editorRef.current;
-      if (!editor) return;
+    const startSceneRendering = React.useCallback(
+      (start: boolean, reason: string) => {
+        const editor = editorRef.current;
+        if (!editor) return;
 
-      if (start) editor.restartSceneRendering();
-      else editor.pauseSceneRendering();
-    }, []);
+        if (start) editor.resumeSceneRendering(reason);
+        else editor.pauseSceneRendering(reason);
+      },
+      []
+    );
     const openNewObjectDialog = React.useCallback(
       () => {
         if (!isEditorVisible('objects-list')) {
@@ -266,7 +275,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
         const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
         if (objectFolderOrObject.isFolder()) return null;
-        return objectFolderOrObject.getObject();
+        return exceptionallyGuardAgainstDeadObject(
+          objectFolderOrObject.getObject()
+        );
       })
       .filter(Boolean);
 
@@ -292,6 +303,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onUpdateBehaviorsSharedData={updateBehaviorsSharedData}
                 objectsContainer={objectsContainer}
                 globalObjectsContainer={globalObjectsContainer}
+                initialInstances={initialInstances}
                 layersContainer={layersContainer}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
@@ -299,9 +311,11 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 instances={selectedInstances}
                 objects={selectedObjects}
                 layer={selectedLayer}
+                objectGroup={selectedObjectGroup}
                 editInstanceVariables={props.editInstanceVariables}
                 editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
                 onEditObject={props.onEditObject}
+                onEditObjectGroup={props.onEditObjectGroup}
                 onObjectsModified={props.onObjectsModified}
                 onEffectAdded={props.onEffectAdded}
                 onInstancesModified={_onInstancesModified}
@@ -314,6 +328,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 lastSelectionType={props.lastSelectionType}
                 onWillInstallExtension={props.onWillInstallExtension}
                 onExtensionInstalled={props.onExtensionInstalled}
+                onCreateNewExtensionWithBehavior={
+                  onCreateNewExtensionWithBehavior
+                }
                 onOpenEventBasedObjectVariantEditor={
                   props.onOpenEventBasedObjectVariantEditor
                 }
@@ -322,6 +339,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 }
                 isVariableListLocked={isCustomVariant}
                 isBehaviorListLocked={isCustomVariant}
+                isObjectGroupObjectListLocked={isCustomVariant}
                 onEditLayerEffects={props.editLayerEffects}
                 onEditLayer={props.editLayer}
                 onLayersModified={props.onLayersModified}
@@ -335,6 +353,8 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onEventsBasedObjectChildrenEdited={
                   props.onEventsBasedObjectChildrenEdited
                 }
+                onBackgroundColorChanged={props.onBackgroundColorChanged}
+                openSceneVariables={props.openSceneVariables}
               />
             )}
           </I18n>
@@ -477,6 +497,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   props.onOpenEventBasedObjectVariantEditor
                 }
                 onExportAssets={props.onExportAssets}
+                onImportAssets={props.onImportAssets}
                 onDeleteObjects={(objectWithContext, cb) =>
                   props.onDeleteObjects(i18n, objectWithContext, cb)
                 }
@@ -525,6 +546,8 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 }
                 objectGroups={objectsContainer.getObjectGroups()}
                 onCreateGroup={props.onCreateObjectGroup}
+                selectedObjectGroup={selectedObjectGroup}
+                onSelectObjectGroup={props.onSelectObjectGroup}
                 onEditGroup={props.onEditObjectGroup}
                 onDeleteGroup={props.onDeleteObjectGroup}
                 onRenameGroup={props.onRenameObjectGroup}

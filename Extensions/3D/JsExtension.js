@@ -249,6 +249,114 @@ module.exports = {
         .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundZ');
+
+      base3D
+        .addExpression(
+          'ForwardX',
+          _('Forward vector X component'),
+          _('Return the object forward vector X component.'),
+          _('Object basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getForwardX');
+
+      base3D
+        .addExpression(
+          'ForwardY',
+          _('Forward vector Y component'),
+          _('Return the object forward vector Y component.'),
+          _('Object basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getForwardY');
+
+      base3D
+        .addExpression(
+          'ForwardZ',
+          _('Forward vector Z component'),
+          _('Return the object forward vector Z component.'),
+          _('Object basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getForwardZ');
+
+      base3D
+        .addExpression(
+          'UpX',
+          _('Up vector X component'),
+          _('Return the object up vector X component.'),
+          _('Object basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getUpX');
+
+      base3D
+        .addExpression(
+          'UpY',
+          _('Up vector Y component'),
+          _('Return the object up vector Y component.'),
+          _('Object basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getUpY');
+
+      base3D
+        .addExpression(
+          'UpZ',
+          _('Up vector Z component'),
+          _('Return the object up vector Z component.'),
+          _('Object basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getUpZ');
+
+      base3D
+        .addExpression(
+          'RightX',
+          _('Right vector X component'),
+          _('Return the object right vector X component.'),
+          _('Object basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getRightX');
+
+      base3D
+        .addExpression(
+          'RightY',
+          _('Right vector Y component'),
+          _('Return the object right vector Y component.'),
+          _('Object basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getRightY');
+
+      base3D
+        .addExpression(
+          'RightZ',
+          _('Right vector Z component'),
+          _('Return the object right vector Z component.'),
+          _('Object basis'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getRightZ');
     }
 
     {
@@ -261,6 +369,7 @@ module.exports = {
           new gd.Model3DObjectConfiguration()
         )
         .setCategory('General')
+        .setHelpPath('/objects/3d-model')
         // Effects are unsupported because the object is not rendered with PIXI.
         .addDefaultBehavior('ResizableCapability::ResizableBehavior')
         .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -855,6 +964,12 @@ module.exports = {
         objectContent[propertyName] = parseFloat(newValue);
         return true;
       }
+      if (propertyName === 'tileScale') {
+        const newTileScale = parseFloat(newValue);
+        objectContent.tileScale =
+          isNaN(newTileScale) || newTileScale <= 0 ? 1 : newTileScale;
+        return true;
+      }
       if (propertyName === 'facesOrientation') {
         const normalizedValue = newValue.toUpperCase();
         if (normalizedValue === 'Y' || normalizedValue === 'Z') {
@@ -932,7 +1047,7 @@ module.exports = {
             'Enabling texture transparency has an impact on rendering performance.'
           )
         )
-        .setGroup(_('Texture settings'));
+        .setGroup(_('Texture'));
 
       objectProperties
         .getOrCreate('facesOrientation')
@@ -1085,6 +1200,18 @@ module.exports = {
         .setGroup(_('Textures'));
 
       objectProperties
+        .getOrCreate('tileScale')
+        .setValue((objectContent.tileScale || 1).toString())
+        .setType('number')
+        .setLabel(_('Tile scale'))
+        .setDescription(
+          _(
+            'The scale applied to tiled textures. A value of 1 displays them at the same size as in 2D.'
+          )
+        )
+        .setGroup(_('Textures'));
+
+      objectProperties
         .getOrCreate('frontFaceVisible')
         .setValue(objectContent.frontFaceVisible ? 'true' : 'false')
         .setType('boolean')
@@ -1185,6 +1312,7 @@ module.exports = {
       rightFaceResourceRepeat: false,
       topFaceResourceRepeat: false,
       bottomFaceResourceRepeat: false,
+      tileScale: 1,
       materialType: 'StandardWithoutMetalness',
       tint: '255;255;255',
       isCastingShadow: true,
@@ -1213,6 +1341,8 @@ module.exports = {
         Cube3DObject
       )
       .setCategory('General')
+      .setAssetStoreTag('3d cubes')
+      .setHelpPath('/objects/3d-box')
       // Effects are unsupported because the object is not rendered with PIXI.
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -1696,7 +1826,7 @@ module.exports = {
         'CameraZ',
         _('Camera Z position'),
         _('the camera position on Z axis'),
-        _('the camera position on Z axis'),
+        _('the camera position on Z axis (layer: _PARAM3_)'),
         '',
         'res/conditions/3d_box.svg'
       )
@@ -1717,7 +1847,7 @@ module.exports = {
         'CameraRotationX',
         _('Camera X rotation'),
         _('the camera rotation on X axis'),
-        _('the camera rotation on X axis'),
+        _('the camera rotation on X axis (layer: _PARAM3_)'),
         '',
         'res/conditions/3d_box.svg'
       )
@@ -1743,7 +1873,7 @@ module.exports = {
         'CameraRotationY',
         _('Camera Y rotation'),
         _('the camera rotation on Y axis'),
-        _('the camera rotation on Y axis'),
+        _('the camera rotation on Y axis (layer: _PARAM3_)'),
         '',
         'res/conditions/3d_box.svg'
       )
@@ -1761,6 +1891,150 @@ module.exports = {
       .markAsAdvanced()
       .setFunctionName('gdjs.scene3d.camera.setCameraRotationY')
       .setGetter('gdjs.scene3d.camera.getCameraRotationY')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraForwardX',
+        _('Camera forward vector X component'),
+        _('Return the camera forward vector X component.'),
+        _('Camera basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraForwardX')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraForwardY',
+        _('Camera forward vector Y component'),
+        _('Return the camera forward vector Y component.'),
+        _('Camera basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraForwardY')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraForwardZ',
+        _('Camera forward vector Z component'),
+        _('Return the camera forward vector Z component.'),
+        _('Camera basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraForwardZ')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraUpX',
+        _('Camera up vector X component'),
+        _('Return the camera up vector X component.'),
+        _('Camera basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraUpX')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraUpY',
+        _('Camera up vector Y component'),
+        _('Return the camera up vector Y component.'),
+        _('Camera basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraUpY')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraUpZ',
+        _('Camera up vector Z component'),
+        _('Return the camera up vector Z component.'),
+        _('Camera basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraUpZ')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraRightX',
+        _('Camera right vector X component'),
+        _('Return the camera right vector X component.'),
+        _('Camera basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraRightX')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraRightY',
+        _('Camera right vector Y component'),
+        _('Return the camera right vector Y component.'),
+        _('Camera basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraRightY')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addExpression(
+        'CameraRightZ',
+        _('Camera right vector Z component'),
+        _('Return the camera right vector Z component.'),
+        _('Camera basis'),
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.getCameraRightZ')
       .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     extension
@@ -1948,6 +2222,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .setHelpPath('/objects/3d-light')
         .addIncludeFile('Extensions/3D/AmbientLight.js');
       const properties = effect.getProperties();
       properties
@@ -1972,6 +2247,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .setHelpPath('/objects/3d-light')
         .addIncludeFile('Extensions/3D/DirectionalLight.js');
       const properties = effect.getProperties();
       properties
@@ -2062,6 +2338,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .setHelpPath('/objects/3d-light')
         .addIncludeFile('Extensions/3D/HemisphereLight.js');
       const properties = effect.getProperties();
       properties
@@ -2565,9 +2842,11 @@ module.exports = {
       _faceResourceNames = new Array(6).fill(null);
       _faceVisibilities = new Array(6).fill(null);
       _shouldRepeatTextureOnFace = new Array(6).fill(null);
+      _tileScale = 1;
       _facesOrientation = 'Y';
       _backFaceUpThroughWhichAxisRotation = 'X';
       _shouldUseTransparentTexture = false;
+      _materialType = '';
       _tint = '';
 
       constructor(
@@ -2615,6 +2894,7 @@ module.exports = {
             project,
             this._faceResourceNames[faceIndex],
             {
+              forceBasicMaterial: this._materialType === 'Basic',
               useTransparentTexture: this._shouldUseTransparentTexture,
             }
           );
@@ -2704,6 +2984,11 @@ module.exports = {
           this._shouldUseTransparentTexture = shouldUseTransparentTexture;
           materialsDirty = true;
         }
+        const materialType = object.content.materialType;
+        if (this._materialType !== materialType) {
+          this._materialType = materialType;
+          materialsDirty = true;
+        }
         const tint = object.content.tint || '255;255;255';
         if (this._tint !== tint) {
           this._tint = tint;
@@ -2771,6 +3056,12 @@ module.exports = {
           uvMappingDirty = true;
         }
 
+        const tileScale = object.content.tileScale || 1;
+        if (tileScale !== this._tileScale) {
+          this._tileScale = tileScale;
+          uvMappingDirty = true;
+        }
+
         const backFaceUpThroughWhichAxisRotation =
           object.content.backFaceUpThroughWhichAxisRotation || 'X';
         if (
@@ -2820,6 +3111,7 @@ module.exports = {
         const uvMapping = this._threeObject.geometry.getAttribute('uv');
         const startIndex = 0;
         const endIndex = 23;
+        const tileScale = this._tileScale || 1;
         for (
           let vertexIndex = startIndex;
           vertexIndex <= endIndex;
@@ -3011,6 +3303,10 @@ module.exports = {
             default:
               [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
           }
+          if (shouldRepeatTexture && tileScale !== 1) {
+            x /= tileScale;
+            y /= tileScale;
+          }
           uvMapping.setXY(vertexIndex, x, y);
         }
         uvMapping.needsUpdate = true;
@@ -3071,9 +3367,9 @@ module.exports = {
       /** @type {number} */
       _defaultDepth;
 
-      /** @type {[number, number, number] | null} */
+      /** @type {[number | null, number | null, number | null]} */
       _originPoint;
-      /** @type {[number, number, number] | null} */
+      /** @type {[number | null, number | null, number | null]} */
       _centerPoint;
 
       /** @type {[number, number, number]} */
@@ -3168,11 +3464,31 @@ module.exports = {
       }
 
       getOriginPoint() {
-        return this._originPoint || this._modelOriginPoint;
+        return [
+          this._originPoint[0] === null
+            ? this._modelOriginPoint[0]
+            : this._originPoint[0],
+          this._originPoint[1] === null
+            ? this._modelOriginPoint[1]
+            : this._originPoint[1],
+          this._originPoint[2] === null
+            ? this._modelOriginPoint[2]
+            : this._originPoint[2],
+        ];
       }
 
       getCenterPoint() {
-        return this._centerPoint || this._modelOriginPoint;
+        return [
+          this._centerPoint[0] === null
+            ? this._modelOriginPoint[0]
+            : this._centerPoint[0],
+          this._centerPoint[1] === null
+            ? this._modelOriginPoint[1]
+            : this._centerPoint[1],
+          this._centerPoint[2] === null
+            ? this._modelOriginPoint[2]
+            : this._centerPoint[2],
+        ];
       }
 
       _updateDefaultTransformation(
@@ -3195,13 +3511,22 @@ module.exports = {
         );
         threeObject.updateMatrixWorld(true);
         const boundingBox = new THREE.Box3().setFromObject(threeObject);
-        const shouldKeepModelOrigin = !this._originPoint;
+        const shouldKeepModelOrigin =
+          this._originPoint[0] === null ||
+          this._originPoint[1] === null ||
+          this._originPoint[2] === null;
         if (shouldKeepModelOrigin) {
           // Keep the origin as part of the model.
           // For instance, a model can be 1 face of a cube and we want to keep the
           // inside as part of the object even if it's just void.
           // It also avoids to have the origin outside of the object box.
-          boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
+          boundingBox.expandByPoint(
+            new THREE.Vector3(
+              this._originPoint[0] === null ? 0 : boundingBox.min[0],
+              this._originPoint[1] === null ? 0 : boundingBox.min[1],
+              this._originPoint[2] === null ? 0 : boundingBox.min[2]
+            )
+          );
         }
 
         const modelWidth = boundingBox.max.x - boundingBox.min.x;
@@ -3219,12 +3544,23 @@ module.exports = {
 
         // Center the model.
         const centerPoint = this._centerPoint;
-        if (centerPoint) {
-          threeObject.position.set(
-            -(boundingBox.min.x + modelWidth * centerPoint[0]),
-            // The model is flipped on Y axis.
-            -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
-            -(boundingBox.min.z + modelDepth * centerPoint[2])
+        if (centerPoint[0]) {
+          threeObject.position.x = -(
+            boundingBox.min.x +
+            modelWidth * centerPoint[0]
+          );
+        }
+        if (centerPoint[1]) {
+          // The model is flipped on Y axis.
+          threeObject.position.y = -(
+            boundingBox.min.y +
+            modelHeight * (1 - centerPoint[1])
+          );
+        }
+        if (centerPoint[2]) {
+          threeObject.position.z = -(
+            boundingBox.min.z +
+            modelDepth * centerPoint[2]
           );
         }
 
@@ -3320,8 +3656,8 @@ module.exports = {
     }
 
     /**
-     * @param {[number, number, number] | null} point1
-     * @param {[number, number, number] | null} point2
+     * @param {[number | null, number | null, number | null]} point1
+     * @param {[number | null, number | null, number | null]} point2
      * @returns {boolean}
      */
     const isSamePoint = (point1, point2) => {
@@ -3337,14 +3673,16 @@ module.exports = {
 
     /**
      * @param {string} location
-     * @returns {[number, number, number] | null}
+     * @returns {[number | null, number | null, number | null]}
      */
     const getPointForLocation = (location) => {
       switch (location) {
         case 'ModelOrigin':
-          return null;
+          return [null, null, null];
         case 'ObjectCenter':
           return [0.5, 0.5, 0.5];
+        case 'CenteredOnZ':
+          return [null, null, 0.5];
         case 'BottomCenterZ':
           return [0.5, 0.5, 0];
         case 'BottomCenterY':
@@ -3352,7 +3690,7 @@ module.exports = {
         case 'TopLeft':
           return [0, 0, 0];
         default:
-          return null;
+          return [null, null, null];
       }
     };
 
@@ -3367,10 +3705,10 @@ module.exports = {
       _rotationY = 0;
       _rotationZ = 0;
       _keepAspectRatio = false;
-      /** @type {[number, number, number] | null} */
-      _originPoint = null;
-      /** @type {[number, number, number] | null} */
-      _centerPoint = null;
+      /** @type {[number | null, number | null, number | null]} */
+      _originPoint = [null, null, null];
+      /** @type {[number | null, number | null, number | null]} */
+      _centerPoint = [null, null, null];
 
       /** @type {[number, number, number]} */
       _modelOriginPoint = [0, 0, 0];
@@ -3436,11 +3774,31 @@ module.exports = {
       }
 
       getOriginPoint() {
-        return this._originPoint || this._modelOriginPoint;
+        return [
+          this._originPoint[0] === null
+            ? this._modelOriginPoint[0]
+            : this._originPoint[0],
+          this._originPoint[1] === null
+            ? this._modelOriginPoint[1]
+            : this._originPoint[1],
+          this._originPoint[2] === null
+            ? this._modelOriginPoint[2]
+            : this._originPoint[2],
+        ];
       }
 
       getCenterPoint() {
-        return this._centerPoint || this._modelOriginPoint;
+        return [
+          this._centerPoint[0] === null
+            ? this._modelOriginPoint[0]
+            : this._centerPoint[0],
+          this._centerPoint[1] === null
+            ? this._modelOriginPoint[1]
+            : this._centerPoint[1],
+          this._centerPoint[2] === null
+            ? this._modelOriginPoint[2]
+            : this._centerPoint[2],
+        ];
       }
 
       _updateDefaultTransformation() {
@@ -3469,13 +3827,22 @@ module.exports = {
         threeModelGroup.updateMatrixWorld(true);
         const boundingBox = new THREE.Box3().setFromObject(threeModelGroup);
 
-        const shouldKeepModelOrigin = !this._originPoint;
+        const shouldKeepModelOrigin =
+          this._originPoint[0] === null ||
+          this._originPoint[1] === null ||
+          this._originPoint[2] === null;
         if (shouldKeepModelOrigin) {
           // Keep the origin as part of the model.
           // For instance, a model can be 1 face of a cube and we want to keep the
           // inside as part of the object even if it's just void.
           // It also avoids to have the origin outside of the object box.
-          boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
+          boundingBox.expandByPoint(
+            new THREE.Vector3(
+              this._originPoint[0] === null ? 0 : boundingBox.min[0],
+              this._originPoint[1] === null ? 0 : boundingBox.min[1],
+              this._originPoint[2] === null ? 0 : boundingBox.min[2]
+            )
+          );
         }
 
         const modelWidth = boundingBox.max.x - boundingBox.min.x;
@@ -3493,12 +3860,23 @@ module.exports = {
 
         // Center the model.
         const centerPoint = this._centerPoint;
-        if (centerPoint) {
-          threeModelGroup.position.set(
-            -(boundingBox.min.x + modelWidth * centerPoint[0]),
-            // The model is flipped on Y axis.
-            -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
-            -(boundingBox.min.z + modelDepth * centerPoint[2])
+        if (centerPoint[0] !== null) {
+          threeModelGroup.position.x = -(
+            boundingBox.min.x +
+            modelWidth * centerPoint[0]
+          );
+        }
+        if (centerPoint[1] !== null) {
+          // The model is flipped on Y axis.
+          threeModelGroup.position.y = -(
+            boundingBox.min.y +
+            modelHeight * (1 - centerPoint[1])
+          );
+        }
+        if (centerPoint[2] !== null) {
+          threeModelGroup.position.z = -(
+            boundingBox.min.z +
+            modelDepth * centerPoint[2]
           );
         }
 

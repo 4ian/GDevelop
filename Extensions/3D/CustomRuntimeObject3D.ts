@@ -17,7 +17,7 @@ namespace gdjs {
    */
   export class CustomRuntimeObject3D
     extends gdjs.CustomRuntimeObject
-    implements gdjs.Base3DHandler
+    implements gdjs.AbstractRuntimeObject3D
   {
     /**
      * Position on the Z axis.
@@ -41,6 +41,11 @@ namespace gdjs {
     private _rotationY: float = 0;
     private _customCenterZ: float = 0;
     private static _temporaryVector = new THREE.Vector3();
+
+    private _hasEstimatedVelocity = false;
+    private _estimatedVelocityX: float = 0;
+    private _estimatedVelocityY: float = 0;
+    private _estimatedVelocityZ: float = 0;
 
     constructor(
       parent: gdjs.RuntimeInstanceContainer,
@@ -141,15 +146,7 @@ namespace gdjs {
      * @return The Z position of the rendered object.
      */
     getDrawableZ(): float {
-      let minZ = 0;
-      if (this._innerArea) {
-        minZ = this._innerArea.min[2];
-      } else {
-        if (this._isUntransformedHitBoxesDirty) {
-          this._updateUntransformedHitBoxes();
-        }
-        minZ = this._minZ;
-      }
+      const minZ = this.getUnscaledMinZ();
       const absScaleZ = this.getScaleZ();
       if (!this._flippedZ) {
         return this._z + minZ * absScaleZ;
@@ -159,6 +156,17 @@ namespace gdjs {
           (-minZ - this.getUnscaledDepth() + 2 * this.getUnscaledCenterZ()) *
             absScaleZ
         );
+      }
+    }
+
+    private getUnscaledMinZ(): float {
+      if (this._innerArea) {
+        return this._innerArea.min[2];
+      } else {
+        if (this._isUntransformedHitBoxesDirty) {
+          this._updateUntransformedHitBoxes();
+        }
+        return this._minZ;
       }
     }
 
@@ -172,7 +180,9 @@ namespace gdjs {
      * `getDrawableZ()`.
      */
     getCenterZ(): float {
-      return this.getDepth() / 2;
+      return (
+        (this.getUnscaledCenterZ() - this.getUnscaledMinZ()) * this.getScaleZ()
+      );
     }
 
     getCenterZInScene(): float {
@@ -282,6 +292,42 @@ namespace gdjs {
       this.setAngle(gdjs.toDegrees(mesh.rotation.z));
     }
 
+    getForwardX(): float {
+      return this.getRenderer().getForwardX();
+    }
+
+    getForwardY(): float {
+      return this.getRenderer().getForwardY();
+    }
+
+    getForwardZ(): float {
+      return this.getRenderer().getForwardZ();
+    }
+
+    getUpX(): float {
+      return this.getRenderer().getUpX();
+    }
+
+    getUpY(): float {
+      return this.getRenderer().getUpY();
+    }
+
+    getUpZ(): float {
+      return this.getRenderer().getUpZ();
+    }
+
+    getRightX(): float {
+      return this.getRenderer().getRightX();
+    }
+
+    getRightY(): float {
+      return this.getRenderer().getRightY();
+    }
+
+    getRightZ(): float {
+      return this.getRenderer().getRightZ();
+    }
+
     /**
      * @return the internal top bound of the object according to its children.
      */
@@ -357,13 +403,7 @@ namespace gdjs {
       if (this.hasCustomRotationCenter()) {
         return this._customCenterZ;
       }
-      if (this._innerArea) {
-        return (this._innerArea.min[2] + this._innerArea.max[2]) / 2;
-      }
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
-      }
-      return (this._minZ + this._maxZ) / 2;
+      return this.getUnscaledDepth() / 2 + this.getUnscaledMinZ();
     }
 
     /**
@@ -469,6 +509,44 @@ namespace gdjs {
 
     isFlippedZ(): boolean {
       return this._flippedZ;
+    }
+
+    hasEstimatedVelocity(): boolean {
+      return this._hasEstimatedVelocity;
+    }
+
+    resetEstimatedVelocity(): void {
+      this._hasEstimatedVelocity = false;
+      this._estimatedVelocityX = 0;
+      this._estimatedVelocityY = 0;
+      this._estimatedVelocityZ = 0;
+    }
+
+    getEstimatedVelocityX(): float {
+      return this._estimatedVelocityX;
+    }
+
+    getEstimatedVelocityY(): float {
+      return this._estimatedVelocityY;
+    }
+
+    getEstimatedVelocityZ(): float {
+      return this._estimatedVelocityZ;
+    }
+
+    setEstimatedVelocityX(velocityX: float): void {
+      this._estimatedVelocityX = velocityX;
+      this._hasEstimatedVelocity = true;
+    }
+
+    setEstimatedVelocityY(velocityY: float): void {
+      this._estimatedVelocityY = velocityY;
+      this._hasEstimatedVelocity = true;
+    }
+
+    setEstimatedVelocityZ(velocityZ: float): void {
+      this._estimatedVelocityZ = velocityZ;
+      this._hasEstimatedVelocity = true;
     }
   }
 }

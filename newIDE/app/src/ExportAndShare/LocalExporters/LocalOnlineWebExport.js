@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import assignIn from 'lodash/assignIn';
 import {
@@ -116,9 +117,17 @@ export const localOnlineWebExportPipeline: ExportPipeline<
         fallbackAuthor.username
       );
     }
-    exporter.exportWholePixiProject(exportOptions);
+    const exportSucceeded = exporter.exportWholePixiProject(exportOptions);
     exportOptions.delete();
     exporter.delete();
+
+    if (!exportSucceeded) {
+      throw new Error(
+        context.i18n._(
+          t`Export failed. Check that the output folder is accessible and that you have the necessary permissions.`
+        )
+      );
+    }
 
     return {
       temporaryOutputDir,

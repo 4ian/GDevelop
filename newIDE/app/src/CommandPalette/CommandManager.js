@@ -1,7 +1,6 @@
 // @flow
 import { type Node } from 'react';
 import { type CommandName } from './CommandsList';
-import { type AlgoliaSearchHit } from '../Utils/AlgoliaSearch';
 type CommandHandler = () => void | Promise<void>;
 
 export type SimpleCommand = {|
@@ -21,11 +20,6 @@ export type CommandWithOptions = {|
 
 export type Command = SimpleCommand | CommandWithOptions;
 
-export type GoToWikiCommand = {|
-  hit: AlgoliaSearchHit,
-  handler: CommandHandler,
-|};
-
 export type NamedCommand = {|
   name: CommandName,
   ...Command,
@@ -38,7 +32,7 @@ export type NamedCommandWithOptions = {|
 
 export interface CommandManagerInterface {
   registerCommand: (commandName: CommandName, command: Command) => void;
-  deregisterCommand: (commandName: CommandName) => void;
+  deregisterCommand: (commandName: CommandName, command?: Command) => void;
   getNamedCommand: (commandName: CommandName) => ?NamedCommand;
   getAllNamedCommands: () => Array<NamedCommand>;
 }
@@ -59,11 +53,12 @@ export default class CommandManager implements CommandManagerInterface {
     this._commands[commandName] = command;
   };
 
-  deregisterCommand = (commandName: CommandName) => {
-    // if (!this._commands[commandName])
-    //   return console.warn(
-    //     `Tried to deregister command ${commandName}, but it is not registered.`
-    //   );
+  deregisterCommand = (commandName: CommandName, command?: Command) => {
+    // When a specific command is given, only remove it if it's still the
+    // registered one: a component being unmounted or deactivated must not
+    // remove the command that another component owns (as its registration was
+    // refused, see `registerCommand`).
+    if (command && this._commands[commandName] !== command) return;
     delete this._commands[commandName];
   };
 

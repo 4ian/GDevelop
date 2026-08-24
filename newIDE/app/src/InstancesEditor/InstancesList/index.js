@@ -9,11 +9,16 @@ import {
 } from 'react-virtualized';
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
+import CompactSearchBar from '../../UI/CompactSearchBar';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
+import Visibility from '../../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
+import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
+import Layers from '../../UI/CustomSvgIcons/Layers';
+import SortArrowUp from '../../UI/CustomSvgIcons/SortArrowUp';
+import SortArrowDown from '../../UI/CustomSvgIcons/SortArrowDown';
 import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -32,6 +37,7 @@ type RenderedRowInfo = {
   instance: gdInitialInstance,
   name: string,
   locked: boolean,
+  hidden: boolean,
   x: string,
   y: string,
   angle: string,
@@ -45,11 +51,16 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
+    minWidth: 0,
+    // Search-bar band: matches the column-header band, kept distinct from the
+    // alternating row colors so it stays stable when the rows change.
+    backgroundColor: 'var(--table-header-background-color)',
   },
   tableContainer: {
     flex: 1,
     overflowX: 'auto',
     overflowY: 'hidden',
+    backgroundColor: 'var(--table-header-background-color)',
   },
 };
 
@@ -60,6 +71,40 @@ const compareStrings = (x: string, y: string, direction: number): number => {
   if (x < y) return direction * 1;
   if (x > y) return direction * -1;
   return 0;
+};
+
+const renderSortableHeader = ({
+  dataKey,
+  label,
+  sortBy,
+  sortDirection,
+}: {
+  dataKey: string,
+  label: React.Node,
+  sortBy: string,
+  sortDirection: string,
+}) => {
+  const isActive = dataKey === sortBy;
+  return (
+    <span
+      style={{
+        color: isActive
+          ? 'var(--theme-text-default-color)'
+          : 'var(--table-text-color-header)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+      }}
+    >
+      {label}
+      {isActive &&
+        (sortDirection === 'ASC' ? (
+          <SortArrowUp style={{ width: 12, height: 12, display: 'block' }} />
+        ) : (
+          <SortArrowDown style={{ width: 12, height: 12, display: 'block' }} />
+        ))}
+    </span>
+  );
 };
 
 export type InstancesListInterface = {|
@@ -81,19 +126,15 @@ type Props = {|
 |};
 
 class InstancesList extends Component<Props, State> {
-  // $FlowFixMe[missing-local-annot]
-  state = {
+  state: State = {
     searchText: '',
-    sortBy: '',
-    sortDirection: SortDirection.ASC,
+    sortBy: 'zOrder',
+    sortDirection: SortDirection.DESC,
   };
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
-  // $FlowFixMe[missing-local-annot]
-  _searchBar = React.createRef<SearchBarInterface>();
-  // $FlowFixMe[missing-local-annot]
-  _keyboardShortcuts = new KeyboardShortcuts({
+  _keyboardShortcuts: KeyboardShortcuts = new KeyboardShortcuts({
     isActive: () => false,
     shortcutCallbacks: {},
   });
@@ -115,11 +156,12 @@ class InstancesList extends Component<Props, State> {
           instance,
           name,
           locked: instance.isLocked(),
+          hidden: instance.isHidden(),
           x: toFixedWithoutTrailingZeros(instance.getX(), 2),
           y: toFixedWithoutTrailingZeros(instance.getY(), 2),
           angle: toFixedWithoutTrailingZeros(instance.getAngle(), 2),
           layer: instance.getLayer(),
-          zOrder: instance.getZOrder(),
+          zOrder: String(instance.getZOrder()),
         });
       }
     };
@@ -138,13 +180,11 @@ class InstancesList extends Component<Props, State> {
     );
   };
 
-  // $FlowFixMe[missing-local-annot]
-  _rowGetter = ({ index }: {| index: number |}) => {
+  _rowGetter = ({ index }: {| index: number |}): RenderedRowInfo => {
     return this.renderedRows[index];
   };
 
-  // $FlowFixMe[missing-local-annot]
-  _rowClassName = ({ index }: {| index: number |}) => {
+  _rowClassName = ({ index }: {| index: number |}): string => {
     if (index < 0) {
       return 'tableHeaderRow';
     } else {
@@ -156,12 +196,34 @@ class InstancesList extends Component<Props, State> {
     }
   };
 
+  _renderVisibilityCell = ({
+    rowData: { instance },
+  }: {
+    rowData: RenderedRowInfo,
+  }): React.Node => {
+    return (
+      <IconButton
+        size="small"
+        tooltip={
+          instance.isHidden()
+            ? t`Hidden when the scene starts`
+            : t`Visible when the scene starts`
+        }
+        onClick={() => {
+          instance.setHidden(!instance.isHidden());
+          this.props.onInstancesModified([instance]);
+        }}
+      >
+        {instance.isHidden() ? <VisibilityOff /> : <Visibility />}
+      </IconButton>
+    );
+  };
+
   _renderLockCell = ({
     rowData: { instance },
   }: {
     rowData: RenderedRowInfo,
-    // $FlowFixMe[missing-local-annot]
-  }) => {
+  }): React.Node => {
     return (
       <IconButton
         size="small"
@@ -234,8 +296,7 @@ class InstancesList extends Component<Props, State> {
     );
   };
 
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): React.Node {
     const { searchText, sortBy, sortDirection } = this.state;
     const { instances } = this.props;
 
@@ -251,114 +312,119 @@ class InstancesList extends Component<Props, State> {
     const tableKey = instances.ptr;
 
     return (
-      <GDevelopThemeContext.Consumer>
-        {gdevelopTheme => (
-          <div style={styles.container}>
-            <Line>
-              <Column expand>
-                <SearchBar
-                  value={searchText}
-                  onChange={searchText =>
-                    this.setState({
-                      searchText,
-                    })
-                  }
-                  onRequestSearch={this._selectFirstInstance}
-                  ref={this._searchBar}
-                  placeholder={t`Search instances`}
-                  autoFocus="desktop"
+      <div style={styles.container}>
+        <Line>
+          <Column expand noOverflowParent>
+            <CompactSearchBar
+              value={searchText}
+              onChange={searchText =>
+                this.setState({
+                  searchText,
+                })
+              }
+              onRequestSearch={this._selectFirstInstance}
+              placeholder={t`Search instances`}
+            />
+          </Column>
+        </Line>
+        <div
+          style={styles.tableContainer}
+          onKeyDown={this._keyboardShortcuts.onKeyDown}
+          onKeyUp={this._keyboardShortcuts.onKeyUp}
+        >
+          <AutoSizer>
+            {({ height, width }) => (
+              <RVTable
+                ref={table => (this.table = table)}
+                key={tableKey}
+                headerHeight={30}
+                height={height}
+                className={`gd-table`}
+                headerClassName={'tableHeaderColumn'}
+                headerStyle={{
+                  backgroundColor: 'var(--table-header-background-color)',
+                }}
+                rowCount={this.renderedRows.length}
+                rowGetter={this._rowGetter}
+                rowHeight={32}
+                onRowClick={this._onRowClick}
+                rowClassName={this._rowClassName}
+                sort={this._sort}
+                sortBy={sortBy}
+                sortDirection={sortDirection}
+                width={Math.max(width, minimumWidths.table)}
+              >
+                <RVColumn
+                  label={<Trans>Object name</Trans>}
+                  dataKey="name"
+                  width={Math.max(width * 0.35, minimumWidths.objectName)}
+                  className={'tableColumn'}
+                  headerRenderer={renderSortableHeader}
                 />
-              </Column>
-            </Line>
-            <div
-              style={styles.tableContainer}
-              onKeyDown={this._keyboardShortcuts.onKeyDown}
-              onKeyUp={this._keyboardShortcuts.onKeyUp}
-            >
-              <AutoSizer>
-                {({ height, width }) => (
-                  <RVTable
-                    ref={table => (this.table = table)}
-                    key={tableKey}
-                    headerHeight={30}
-                    height={height}
-                    className={`gd-table`}
-                    headerClassName={'tableHeaderColumn'}
-                    rowCount={this.renderedRows.length}
-                    rowGetter={this._rowGetter}
-                    rowHeight={32}
-                    onRowClick={this._onRowClick}
-                    rowClassName={this._rowClassName}
-                    sort={this._sort}
-                    sortBy={sortBy}
-                    sortDirection={sortDirection}
-                    width={Math.max(width, minimumWidths.table)}
-                  >
-                    <RVColumn
-                      label={<Trans>Object name</Trans>}
-                      dataKey="name"
-                      width={Math.max(width * 0.35, minimumWidths.objectName)}
-                      className={'tableColumn'}
+                <RVColumn
+                  label={<Trans>X</Trans>}
+                  dataKey="x"
+                  width={Math.max(width * 0.1, minimumWidths.numberProperty)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label={<Trans>Y</Trans>}
+                  dataKey="y"
+                  width={Math.max(width * 0.1, minimumWidths.numberProperty)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label={<Trans>Z</Trans>}
+                  dataKey="zOrder"
+                  width={Math.max(width * 0.1, minimumWidths.numberProperty)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label={
+                    <RotateZ
+                      titleAccess="Rotation (Z)"
+                      style={{ width: 18, height: 18, display: 'block' }}
                     />
-                    <RVColumn
-                      label=""
-                      dataKey="locked"
-                      width={Math.max(
-                        width * 0.05,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn'}
-                      cellRenderer={this._renderLockCell}
+                  }
+                  dataKey="angle"
+                  width={Math.max(width * 0.1, minimumWidths.numberProperty)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label={
+                    <Layers
+                      titleAccess="Layer"
+                      style={{ width: 18, height: 18, display: 'block' }}
                     />
-                    <RVColumn
-                      label={<Trans>X</Trans>}
-                      dataKey="x"
-                      width={Math.max(
-                        width * 0.1,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn'}
-                    />
-                    <RVColumn
-                      label={<Trans>Y</Trans>}
-                      dataKey="y"
-                      width={Math.max(
-                        width * 0.1,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn'}
-                    />
-                    <RVColumn
-                      label={<Trans>Angle</Trans>}
-                      dataKey="angle"
-                      width={Math.max(
-                        width * 0.1,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn'}
-                    />
-                    <RVColumn
-                      label={<Trans>Layer</Trans>}
-                      dataKey="layer"
-                      width={Math.max(width * 0.2, minimumWidths.layerName)}
-                      className={'tableColumn'}
-                    />
-                    <RVColumn
-                      label={<Trans>Z Order</Trans>}
-                      dataKey="zOrder"
-                      width={Math.max(
-                        width * 0.1,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn'}
-                    />
-                  </RVTable>
-                )}
-              </AutoSizer>
-            </div>
-          </div>
-        )}
-      </GDevelopThemeContext.Consumer>
+                  }
+                  dataKey="layer"
+                  width={Math.max(width * 0.2, minimumWidths.layerName)}
+                  className={'tableColumn tableColumnSecondary'}
+                  headerRenderer={renderSortableHeader}
+                />
+                <RVColumn
+                  label=""
+                  dataKey="hidden"
+                  width={Math.max(width * 0.05, minimumWidths.numberProperty)}
+                  className={'tableColumn'}
+                  cellRenderer={this._renderVisibilityCell}
+                />
+                <RVColumn
+                  label=""
+                  dataKey="locked"
+                  width={Math.max(width * 0.05, minimumWidths.numberProperty)}
+                  className={'tableColumn'}
+                  cellRenderer={this._renderLockCell}
+                />
+              </RVTable>
+            )}
+          </AutoSizer>
+        </div>
+      </div>
     );
   }
 }

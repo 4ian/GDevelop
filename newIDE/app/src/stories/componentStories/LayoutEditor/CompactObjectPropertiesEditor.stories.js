@@ -29,8 +29,10 @@ export const Sprite2d = (): React.Node => (
             project={testProject.project}
             layout={testProject.testLayout}
             eventsFunctionsExtension={null}
+            eventsBasedObject={null}
             objectsContainer={testProject.testLayout.getObjects()}
             globalObjectsContainer={testProject.project.getObjects()}
+            initialInstances={testProject.testLayout.getInitialInstances()}
             layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
@@ -51,6 +53,9 @@ export const Sprite2d = (): React.Node => (
             )}
             onWillInstallExtension={action('onWillInstallExtension')}
             onExtensionInstalled={action('onExtensionInstalled')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
           />
         </SerializedObjectDisplay>
       )}
@@ -68,8 +73,10 @@ export const Cube3d = (): React.Node => (
             project={testProject.project}
             layout={testProject.testLayout}
             eventsFunctionsExtension={null}
+            eventsBasedObject={null}
             objectsContainer={testProject.testLayout.getObjects()}
             globalObjectsContainer={testProject.project.getObjects()}
+            initialInstances={testProject.testLayout.getInitialInstances()}
             layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
@@ -90,6 +97,9 @@ export const Cube3d = (): React.Node => (
             )}
             onWillInstallExtension={action('onWillInstallExtension')}
             onExtensionInstalled={action('onExtensionInstalled')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
           />
         </SerializedObjectDisplay>
       )}
@@ -107,8 +117,10 @@ export const TextInput = (): React.Node => (
             project={testProject.project}
             layout={testProject.testLayout}
             eventsFunctionsExtension={null}
+            eventsBasedObject={null}
             objectsContainer={testProject.testLayout.getObjects()}
             globalObjectsContainer={testProject.project.getObjects()}
+            initialInstances={testProject.testLayout.getInitialInstances()}
             layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
@@ -129,6 +141,9 @@ export const TextInput = (): React.Node => (
             )}
             onWillInstallExtension={action('onWillInstallExtension')}
             onExtensionInstalled={action('onExtensionInstalled')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
           />
         </SerializedObjectDisplay>
       )}
@@ -146,8 +161,10 @@ export const CustomObject = (): React.Node => (
             project={testProject.project}
             layout={testProject.testLayout}
             eventsFunctionsExtension={null}
+            eventsBasedObject={null}
             objectsContainer={testProject.testLayout.getObjects()}
             globalObjectsContainer={testProject.project.getObjects()}
+            initialInstances={testProject.testLayout.getInitialInstances()}
             layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
@@ -168,6 +185,9 @@ export const CustomObject = (): React.Node => (
             )}
             onWillInstallExtension={action('onWillInstallExtension')}
             onExtensionInstalled={action('onExtensionInstalled')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
           />
         </SerializedObjectDisplay>
       )}

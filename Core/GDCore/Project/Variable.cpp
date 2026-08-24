@@ -8,6 +8,7 @@
 
 #include <sstream>
 
+#include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/UUID/UUID.h"
@@ -236,6 +237,9 @@ bool Variable::InsertAtIndex(const gd::Variable& variable, const size_t index) {
   if (type != Type::Array) return false;
   hasMixedValues = false;
   auto newVariable = std::make_shared<gd::Variable>(variable);
+  // The "mixed values" marker is an editor-only, display state: a variable
+  // stored in a container must always have an actual value.
+  newVariable->ClearMixedValues();
   if (index < childrenArray.size()) {
     childrenArray.insert(childrenArray.begin() + index, newVariable);
   } else {
@@ -251,14 +255,19 @@ bool Variable::InsertChild(const gd::String& name,
   }
   hasMixedValues = false;
   children[name] = std::make_shared<gd::Variable>(variable);
+  // The "mixed values" marker is an editor-only, display state: a variable
+  // stored in a container must always have an actual value.
+  children[name]->ClearMixedValues();
   return true;
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {
+  const bool canonical = gd::Serializer::IsCanonicalMode();
   element.SetStringAttribute("type", TypeAsString(GetType()));
-  if (IsFolded()) element.SetBoolAttribute("folded", true);
+  if (canonical || IsFolded())
+    element.SetBoolAttribute("folded", IsFolded());
 
-  if (!persistentUuid.empty())
+  if (canonical || !persistentUuid.empty())
     element.SetStringAttribute("persistentUuid", persistentUuid);
 
   if (type == Type::String) {
@@ -306,6 +315,9 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
 
   if (IsPrimitive(type)) {
     if (type == Type::String) {
+      // Default to "0" for backward compatibility - projects saved before 5.6.267
+      // used "0" as the implicit default for string variables. The project flag
+      // useDeprecatedZeroAsDefaultStringVariable controls runtime behavior.
       SetString(element.GetStringAttribute("value", "0", "Value"));
     } else if (type == Type::Number) {
       SetValue(element.GetDoubleAttribute("value", 0.0, "Value"));
@@ -340,6 +352,17 @@ Variable& Variable::ResetPersistentUuid() {
   }
   for (auto& it : childrenArray) {
     it->ResetPersistentUuid();
+  }
+  return *this;
+}
+
+Variable& Variable::EnsurePersistentUuid() {
+  if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
+  for (auto& it : children) {
+    it.second->EnsurePersistentUuid();
+  }
+  for (auto& it : childrenArray) {
+    it->EnsurePersistentUuid();
   }
   return *this;
 }
@@ -486,6 +509,21 @@ bool Variable::operator!=(const gd::Variable &variable) const {
 void Variable::MarkAsMixedValues() {
   hasMixedValues = true;
   ClearChildren();
+}
+
+void Variable::ClearMixedValues() {
+  hasMixedValues = false;
+  if (type == Type::MixedTypes) {
+    // A variable with entirely mixed types has no meaningful value:
+    // default to a number.
+    CastTo(Type::Number);
+  }
+  for (auto& it : children) {
+    it.second->ClearMixedValues();
+  }
+  for (auto& child : childrenArray) {
+    child->ClearMixedValues();
+  }
 }
 
 }  // namespace gd

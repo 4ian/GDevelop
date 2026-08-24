@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import {
   largeSelectedArea,
   largeSelectableArea,
-  executableEventContainer,
+  conditionsActionsContainer,
   invalidElse,
   elseTextContainer,
   disabledText,
@@ -91,7 +91,7 @@ export default class ElseEvent extends React.Component<
           windowSize={this.props.windowSize}
           eventsSheetWidth={this.props.eventsSheetWidth}
           className={classNames({
-            [executableEventContainer]: true,
+            [conditionsActionsContainer]: true,
           })}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
@@ -124,6 +124,8 @@ export default class ElseEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
           renderActionsList={({ className }) => (
@@ -157,6 +159,8 @@ export default class ElseEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
         />

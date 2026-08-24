@@ -1,12 +1,12 @@
 const electron = require('electron');
 const path = require('path');
+const fs = require('fs');
 const child_process = require('child_process');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
 const Notification = electron.Notification;
 const protocol = electron.protocol;
-const parseArgs = require('minimist');
 const isDev = require('electron-is-dev');
 const ipcMain = electron.ipcMain;
 const autoUpdater = require('electron-updater').autoUpdater;
@@ -45,6 +45,17 @@ const {
   onLocalGDJSDevelopmentWatcherRuntimeUpdated,
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
+const { installCliInPath } = require('./InstallCliInPath');
+const {
+  setWindowFileIdentifier,
+  clearWindowFileIdentifier,
+} = require('./OpenProjectsRegistry');
+const {
+  parseGDevelopArgs,
+  parseSecondInstanceArgs,
+  isCliProjectAlreadyOpenElsewhere,
+  routeCliCommandToLiveEditor,
+} = require('./CliCommandHandoff');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -65,13 +76,7 @@ let mainWindows = new Set();
 let mainWindow = null; // Primary window reference for backwards compatibility
 let windowCounter = 0; // Counter for creating unique session partitions
 
-// Parse arguments (knowing that in dev, we run electron with an argument,
-// so have to ignore one more).
-const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
-  // "Officially" supported arguments and their types:
-  boolean: ['dev-tools', 'disable-update-check'],
-  string: '_', // Files are always strings
-});
+const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
 
 const devTools = !!args['dev-tools'];
 
@@ -85,22 +90,35 @@ if (process.platform === 'win32') {
 }
 
 // Single instance lock - prevents multiple Electron processes
-// This solves Firebase IndexedDB locking issues while still allowing multiple windows
-const gotTheLock = app.requestSingleInstanceLock();
+// This solves Firebase IndexedDB locking issues while still allowing multiple windows.
+// CLI: skip the lock unless the target project is a known open window (registry hit);
+// a stale registry entry falls back to running headless in this process.
+const isCliRunCommand = !!args['run-command'];
+const gotTheLock =
+  isCliRunCommand && !isCliProjectAlreadyOpenElsewhere(args)
+    ? true
+    : app.requestSingleInstanceLock({ args });
 
 if (!gotTheLock) {
   // Second instance attempted - quit immediately
   app.quit();
 } else {
-  // First instance - handle second-instance events by creating new windows
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
-    // User tried to launch app again - create a new window instead
-    const secondInstanceArgs = parseArgs(commandLine.slice(isDev ? 2 : 1), {
-      boolean: ['dev-tools', 'disable-update-check'],
-      string: '_',
+  app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
+    const secondInstanceArgs = parseSecondInstanceArgs({
+      commandLine,
+      additionalData,
+      isDev,
     });
 
-    // Create a new window in the existing process
+    if (routeCliCommandToLiveEditor({ parsedArgs: secondInstanceArgs, mainWindows })) {
+      return;
+    }
+
+    // Update the global args so the new window's renderer (which reads them
+    // via remote.getGlobal('args')) picks up the second-instance CLI flags
+    // (e.g. --run-command, positional project file).
+    global['args'] = secondInstanceArgs;
+
     createNewWindow(secondInstanceArgs);
   });
 }
@@ -127,9 +145,15 @@ app.on('window-all-closed', function() {
   app.quit();
 });
 
+// Maps target (from window.open) to BrowserWindow ID for child windows.
+// This is used to target the correct BrowserWindow for IPC messages.
+const windowTargetIdToBrowserWindowIds = new Map();
+
 // Function to create a new GDevelop window
 function createNewWindow(windowArgs = args) {
   const isIntegrated = windowArgs.mode === 'integrated';
+  // windowArgs: a GUI primary process can still open a CLI window (second-instance fallback).
+  const isCliWindow = !!windowArgs['run-command'];
 
   if (isIntegrated && app.dock) {
     app.dock.hide();
@@ -187,8 +211,13 @@ function createNewWindow(windowArgs = args) {
     options.show = false;
   }
 
+  if (isCliWindow && !windowArgs['keep-open']) {
+    options.show = false;
+    options.skipTaskbar = true;
+  }
+
   const newWindow = new BrowserWindow(options);
-  if (!isIntegrated) newWindow.maximize();
+  if (!isIntegrated && !isCliWindow) newWindow.maximize();
 
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
@@ -207,6 +236,19 @@ function createNewWindow(windowArgs = args) {
 
   // Enable `@electron/remote` module for renderer process
   require('@electron/remote/main').enable(newWindow.webContents);
+
+  // Uses process.stdout/stderr directly (not electron-log) to avoid
+  // re-entering the renderer console and causing an infinite loop.
+  if (isCliWindow) {
+    newWindow.webContents.on('console-message', (_event, level, message) => {
+      if (level < 1) return;
+      if (message.startsWith('%c')) return;
+      if (message.includes('[renderer:')) return; // break recursion
+      const tag = ['verbose', 'info', 'warning', 'error'][level] || 'log';
+      const stream = level >= 2 ? process.stderr : process.stdout;
+      stream.write(`[renderer:${tag}] ${message}\n`);
+    });
+  }
 
   // Log process ID to verify separate renderer processes
   newWindow.webContents.once('did-finish-load', () => {
@@ -238,6 +280,7 @@ function createNewWindow(windowArgs = args) {
   newWindow.on('closed', function() {
     // Remove from tracked windows
     mainWindows.delete(newWindow);
+    clearWindowFileIdentifier(windowId);
 
     // If this was the primary window, set a new primary
     if (isPrimaryWindow) {
@@ -261,11 +304,85 @@ function createNewWindow(windowArgs = args) {
     }
   });
 
-  // Prevent opening any website or url inside Electron
+  // Allow blank-URL pop-out windows (used by WindowPortal for editor pop-outs),
+  // but open all other URLs in the external browser.
   newWindow.webContents.setWindowOpenHandler(details => {
+    if (details.frameName.startsWith('GDevelopWindowPortal')) {
+      // Extract the theme background color passed via the features string
+      // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
+      let backgroundColor = '#000';
+      const match = details.features.match(
+        /themeBackgroundColor=([^,]*)/
+      );
+      if (match) {
+        try {
+          backgroundColor = decodeURIComponent(match[1]);
+        } catch (e) {}
+      }
+
+      return {
+        action: 'allow',
+        overrideBrowserWindowOptions: {
+          // Use hidden title bar with overlay controls, like the main window,
+          // so that ToolbarTitlebar can provide safe margins for window controls.
+          titleBarStyle: 'hidden',
+          titleBarOverlay: {
+            color: '#000000',
+            symbolColor: '#ffffff',
+          },
+          trafficLightPosition: { x: 12, y: 12 },
+          backgroundColor,
+          webPreferences: {
+            // No need for Node.js integration or disabled context isolation, because
+            // popped-out windows are driven by React portals and don't do any Node operations.
+            // Still keep webSecurity enabled to allow local file access.
+            // nodeIntegration: true,
+            // contextIsolation: false,
+            webSecurity: false,
+          },
+        },
+      };
+    }
+
     console.info('Opening in browser (because of new window): ', details.url);
     electron.shell.openExternal(details.url);
     return { action: 'deny' };
+  });
+
+  // When a child window is created (e.g. a popped-out editor), set up security
+  // policies and enable @electron/remote on it.
+  newWindow.webContents.on('did-create-window', (childWindow, details) => {
+    require('@electron/remote/main').enable(childWindow.webContents);
+
+    if (!details.frameName || !details.frameName.startsWith('GDevelopWindowPortal')) {
+      console.warn(`Unexpected frameName for child window: ${details.frameName} - verify handling on Electron side.`);
+    }
+
+    // Track child window by frameName so the renderer can look up its
+    // BrowserWindow ID (needed for titlebar overlay IPC targeting).
+    if (details.frameName) {
+      windowTargetIdToBrowserWindowIds.set(details.frameName, childWindow.id);
+      childWindow.on('closed', () => {
+        windowTargetIdToBrowserWindowIds.delete(details.frameName);
+      });
+    }
+
+    // Remove the menu bar from popped-out editor windows.
+    childWindow.setMenu(null);
+
+    // Prevent navigation inside child windows.
+    childWindow.webContents.on('will-navigate', (e, url) => {
+      if (url !== childWindow.webContents.getURL()) {
+        e.preventDefault();
+        electron.shell.openExternal(url);
+      }
+    });
+
+    // Block further nesting of new windows from pop-outs.
+    childWindow.webContents.setWindowOpenHandler(childDetails => {
+      electron.shell.openExternal(childDetails.url);
+      return { action: 'deny' };
+    });
   });
 
   return newWindow;
@@ -274,6 +391,11 @@ function createNewWindow(windowArgs = args) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
+  // Handoff calls app.quit() but 'ready' still runs; without the lock, do not create a window.
+  if (!gotTheLock) {
+    return;
+  }
+
   registerGdideProtocol({ isDev });
 
   // Create the first window
@@ -310,6 +432,21 @@ app.on('ready', function() {
       },
     ]);
   }
+
+  ipcMain.on('app-exit', (_event, exitCode) => {
+    app.exit(typeof exitCode === 'number' ? exitCode : 0);
+  });
+
+  ipcMain.on('set-window-project-path', (event, fileIdentifier) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (window) setWindowFileIdentifier(window.id, fileIdentifier);
+  });
+
+  ipcMain.handle('install-cli-in-path', async () => {
+    // Inside an AppImage, process.execPath points into a transient mount that
+    // vanishes on quit; APPIMAGE is the stable file path (still breaks if moved).
+    return installCliInPath(process.env.APPIMAGE || process.execPath);
+  });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
     const window = BrowserWindow.fromWebContents(event.sender);
@@ -403,8 +540,17 @@ app.on('ready', function() {
   // Titlebar handling:
   ipcMain.handle(
     'titlebar-set-overlay-options',
-    async (event, overlayOptions) => {
-      const window = BrowserWindow.fromWebContents(event.sender);
+    async (event, overlayOptions, optionalTargetId) => {
+      // When a optionalTargetId is provided, resolve it to the child BrowserWindow
+      // (needed for popped-out editor windows, where event.sender is always
+      // the main window's webContents). Otherwise, use event.sender.
+      let window;
+      if (optionalTargetId) {
+        const windowId = windowTargetIdToBrowserWindowIds.get(optionalTargetId);
+        window = windowId != null ? BrowserWindow.fromId(windowId) : null;
+      } else {
+        window = BrowserWindow.fromWebContents(event.sender);
+      }
       if (!window) return;
 
       // setTitleBarOverlay seems not defined on macOS.
@@ -449,7 +595,9 @@ app.on('ready', function() {
       const subscriptionId = setupWatcher(
         folderPath,
         changedFilePath => {
-          event.sender.send('project-file-changed', changedFilePath);
+          if (!event.sender.isDestroyed()) {
+            event.sender.send('project-file-changed', changedFilePath);
+          }
         },
         options
       );
@@ -581,9 +729,14 @@ app.on('ready', function() {
     closeAllConnections(windowId);
   });
 
-  ipcMain.on('updates-check-and-download', event => {
+  // Track whether the current update check was triggered explicitly by the user,
+  // so that errors are only surfaced to the user for manual checks.
+  let isExplicitUpdateCheck = false;
+
+  ipcMain.on('updates-check-and-download', (event, { explicit } = {}) => {
     // This will immediately download an update, then install when the
     // app quits.
+    isExplicitUpdateCheck = !!explicit;
     log.info('Starting check for updates (with auto-download if any)');
     autoUpdater.autoDownload = true;
     autoUpdater.checkForUpdatesAndNotify().catch(err => {
@@ -591,12 +744,17 @@ app.on('ready', function() {
     });
   });
 
-  ipcMain.on('updates-check', event => {
+  ipcMain.on('updates-check', (event, { explicit } = {}) => {
+    isExplicitUpdateCheck = !!explicit;
     log.info('Starting check for updates (without auto-download)');
     autoUpdater.autoDownload = false;
     autoUpdater.checkForUpdates().catch(err => {
       log.error('Error checking for updates:', err);
     });
+  });
+
+  ipcMain.on('updates-install-and-quit', () => {
+    autoUpdater.quitAndInstall();
   });
 
   function sendUpdateStatus(status) {
@@ -617,6 +775,7 @@ app.on('ready', function() {
     sendUpdateStatus({
       message: 'Update available.',
       status: 'update-available',
+      info,
     });
   });
   autoUpdater.on('update-not-available', info => {
@@ -626,11 +785,15 @@ app.on('ready', function() {
     });
   });
   autoUpdater.on('error', err => {
-    sendUpdateStatus({
-      message: 'Error in auto-updater. ' + err,
-      status: 'error',
-      err,
-    });
+    if (isExplicitUpdateCheck) {
+      sendUpdateStatus({
+        message: 'Error in auto-updater. ' + err,
+        status: 'error',
+        err,
+      });
+    } else {
+      log.error('Background update check failed:', err);
+    }
   });
   autoUpdater.on('download-progress', progressObj => {
     let logMessage = 'Download speed: ' + progressObj.bytesPerSecond;
@@ -661,70 +824,80 @@ app.on('ready', function() {
 
   setUpDiscordRichPresence(ipcMain);
 
+  const NPM_SCRIPT_COMMAND_FAILED_MESSAGE = 'Command failed!';
+
   // npm script execution in external terminal (cross-platform)
-  ipcMain.on('run-npm-script', (event, { projectPath, npmScript }) => {
-    log.info(`Running npm script "${npmScript}" in ${projectPath}`);
+  ipcMain.on(
+    'run-npm-script',
+    (event, { projectPath, npmScript, keepTerminalOpen }) => {
+      log.info(`Running npm script "${npmScript}" in ${projectPath}`);
 
-    const platform = process.platform;
-    const npmCommand = `npm run ${npmScript}`;
+      const platform = process.platform;
+      const npmCommand = `npm run ${npmScript}`;
+      const keepOpen = !!keepTerminalOpen;
 
-    try {
-      if (platform === 'win32') {
-        // Windows: open cmd window that stays open after npm command
-        child_process
-          .spawn(
-            'cmd.exe',
-            [
-              '/c',
-              'start',
+      try {
+        if (platform === 'win32') {
+          const innerCmd = keepOpen
+            ? `cd /d ${projectPath} && ${npmCommand}`
+            : `cd /d ${projectPath} && ${npmCommand} || (echo. & echo ${NPM_SCRIPT_COMMAND_FAILED_MESSAGE} & pause)`;
+          const cmdCloseFlag = keepOpen ? '/k' : '/c';
+          child_process
+            .spawn(
               'cmd.exe',
-              '/k',
-              `cd ${projectPath} && ${npmCommand}`,
-            ],
-            {
-              detached: true,
-              stdio: 'ignore',
-            }
-          )
-          .unref();
-      } else if (platform === 'darwin') {
-        const escapedPath = projectPath.replace(/'/g, "'\\''");
-        const script = `tell application "Terminal" to do script "cd '${escapedPath}' && ${npmCommand}"`;
-        child_process.spawn('osascript', ['-e', script], {
-          detached: true,
-          stdio: 'ignore',
-        });
-      } else {
-        // Linux: try common terminal emulators
-        const bashCommand = `cd "${projectPath}" && ${npmCommand}; exec bash`;
-        const terminals = [
-          {
-            cmd: 'x-terminal-emulator',
-            args: ['-e', 'bash', '-c', bashCommand],
-          },
-          { cmd: 'gnome-terminal', args: ['--', 'bash', '-c', bashCommand] },
-          { cmd: 'konsole', args: ['-e', 'bash', '-c', bashCommand] },
-          { cmd: 'xterm', args: ['-e', 'bash', '-c', bashCommand] },
-        ];
-
-        const tryTerminal = index => {
-          if (index >= terminals.length) {
-            log.error('No terminal emulator found');
-            return;
-          }
-          const terminal = terminals[index];
-          const proc = child_process.spawn(terminal.cmd, terminal.args, {
+              ['/c', 'start', 'cmd.exe', cmdCloseFlag, innerCmd],
+              {
+                detached: true,
+                stdio: 'ignore',
+              }
+            )
+            .unref();
+        } else if (platform === 'darwin') {
+          const escapedPath = projectPath.replace(/'/g, "'\\''");
+          const shellCommand = keepOpen
+            ? `cd '${escapedPath}' && ${npmCommand}`
+            : `cd '${escapedPath}' && ${npmCommand} && exit || echo '${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}'`;
+          const script = `tell application "Terminal" to do script "${shellCommand.replace(
+            /"/g,
+            '\\"'
+          )}"`;
+          child_process.spawn('osascript', ['-e', script], {
             detached: true,
             stdio: 'ignore',
           });
-          proc.on('error', () => tryTerminal(index + 1));
-          proc.unref();
-        };
+        } else {
+          const bashCommand = keepOpen
+            ? `cd "${projectPath}" && ${npmCommand}; exec bash`
+            : `cd "${projectPath}" && ${npmCommand} || { echo "${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}"; exec bash; }`;
+          const terminals = [
+            {
+              cmd: 'x-terminal-emulator',
+              args: ['-e', 'bash', '-c', bashCommand],
+            },
+            { cmd: 'gnome-terminal', args: ['--', 'bash', '-c', bashCommand] },
+            { cmd: 'konsole', args: ['-e', 'bash', '-c', bashCommand] },
+            { cmd: 'xterm', args: ['-e', 'bash', '-c', bashCommand] },
+          ];
 
-        tryTerminal(0);
+          const tryTerminal = index => {
+            if (index >= terminals.length) {
+              log.error('No terminal emulator found');
+              return;
+            }
+            const terminal = terminals[index];
+            const proc = child_process.spawn(terminal.cmd, terminal.args, {
+              detached: true,
+              stdio: 'ignore',
+            });
+            proc.on('error', () => tryTerminal(index + 1));
+            proc.unref();
+          };
+
+          tryTerminal(0);
+        }
+      } catch (err) {
+        log.error('Failed to run npm script:', err);
       }
-    } catch (err) {
-      log.error('Failed to run npm script:', err);
     }
-  });
+  );
 });

@@ -250,7 +250,7 @@ blocks:
               (cd GDJS && git checkout package-lock.json && npm i)
             - cd newIDE/app
             - npm run postinstall
-            - npm run analyze-test-coverage
+            - npm run test
 
         - name: GDJS tests
           commands:

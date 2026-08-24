@@ -13,12 +13,16 @@ type Props = BehaviorEditorProps;
 
 const BehaviorPropertiesEditor = ({
   project,
-  behavior,
+  behaviors,
   object,
+  layersContainer,
   onBehaviorUpdated,
   resourceManagementProps,
   projectScopedContainersAccessor,
+  isAdvancedSectionInitiallyUncollapsed,
 }: Props): React.Node => {
+  const behavior = behaviors[0];
+
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
     behavior.getTypeName()
@@ -38,9 +42,11 @@ const BehaviorPropertiesEditor = ({
           instance.updateProperty(name, value);
         },
         object,
+        layersContainer,
         visibility: 'All',
+        shouldDisabledFieldsWithMixedValues: true,
       }),
-    [behavior, behaviorMetadata, object]
+    [behavior, behaviorMetadata, layersContainer, object]
   );
 
   return (
@@ -49,7 +55,7 @@ const BehaviorPropertiesEditor = ({
         project={project}
         object={object}
         schema={schema}
-        instances={[behavior]}
+        instances={behaviors}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -58,6 +64,9 @@ const BehaviorPropertiesEditor = ({
             There is nothing to configure for this behavior. You can still use
             events to interact with the object and this behavior.
           </Trans>
+        }
+        isAdvancedSectionInitiallyUncollapsed={
+          isAdvancedSectionInitiallyUncollapsed
         }
       />
     </Column>

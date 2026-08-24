@@ -7,11 +7,14 @@ import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 import ExternalPropertiesDialog, {
   type ExternalProperties,
 } from './ExternalPropertiesDialog';
@@ -32,6 +35,8 @@ import {
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 import Background from '../../UI/Background';
+import type { EventPath } from '../../Utils/EventPath';
+import type { SearchFilterParams } from '../../Utils/Search';
 
 const styles = {
   container: {
@@ -94,19 +99,50 @@ export class ExternalEventsEditorContainer extends React.Component<
     }
   }
 
-  scrollToEventPath(eventPath: Array<number>) {
+  scrollToEventPath(eventPath: EventPath) {
     if (this.editor) this.editor.scrollToEventPath(eventPath);
+  }
+
+  setGlobalSearchResults(
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    searchFilters?: SearchFilterParams
+  ) {
+    if (this.editor) {
+      this.editor.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText,
+        searchFilters
+      );
+    }
+  }
+
+  clearGlobalSearchResults() {
+    if (this.editor) this.editor.clearGlobalSearchResults();
+  }
+
+  selectAllInsideEditor() {
+    if (this.editor) this.editor.selectAllEvents();
   }
 
   forceUpdateEditor() {
     // No updates to be done.
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) {
     // No thing to be done.
   }
 
-  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+  onSceneObjectEdited(
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
+  ) {
     // No thing to be done.
   }
 
@@ -129,6 +165,10 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
     // No thing to be done.
   }
 
@@ -199,8 +239,11 @@ export class ExternalEventsEditorContainer extends React.Component<
     });
   };
 
-  onCreateEventsFunction = (extensionName: any, eventsFunction: any) => {
-    this.props.onCreateEventsFunction(
+  onCreateEventsFunction = async (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
+  ) => {
+    await this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
       'external-events-editor'
@@ -252,6 +295,12 @@ export class ExternalEventsEditorContainer extends React.Component<
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
+            onCreateNewExtensionWithBehavior={
+              this.props.onCreateNewExtensionWithBehavior
+            }
+            // Scene events don't have parameters nor properties
+            editEventsFunctionParameter={null}
+            openEventsBasedEntityPropertyEditorDialog={null}
           />
         )}
         {!layout && (

@@ -319,15 +319,23 @@ export function getMuiOverrides({
       tooltip: {
         backgroundColor: tooltipBackgroundColor,
         color: tooltipTextColor,
-        // Ensure chips inside tooltips have good contrast
-        '& .MuiChip-root': {
+        // Ensure Typography and Chip components inside tooltips use the tooltip text color.
+        // We use attribute selectors because in some contexts (e.g. dialogs opened from the
+        // scene editor), components render under MuiThemeOnlyProvider which creates a new MUI
+        // theme object instance. JSS uses theme identity as a cache key, so a new theme triggers
+        // fresh style sheets with incremented class name counters (e.g. "MuiChip-root-16627"),
+        // which breaks plain class selectors. Attribute selectors match regardless of the suffix.
+        '& [class*="MuiTypography-root"]': {
           color: tooltipTextColor,
         },
-        '& .MuiChip-outlined': {
+        '& [class*="MuiChip-root"]': {
+          color: tooltipTextColor,
+        },
+        '& [class*="MuiChip-outlined"]': {
           borderColor: tooltipTextColor,
           color: tooltipTextColor,
         },
-        '& .MuiChip-icon': {
+        '& [class*="MuiChip-icon"]': {
           color: tooltipTextColor,
         },
       },

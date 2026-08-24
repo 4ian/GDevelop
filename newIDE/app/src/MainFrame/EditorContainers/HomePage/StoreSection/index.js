@@ -10,7 +10,10 @@ import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
-import { type Course } from '../../../../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  type Course,
+} from '../../../../Utils/GDevelopServices/Asset';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 import { AssetStoreNavigatorContext } from '../../../../AssetStore/AssetStoreNavigator';
@@ -42,9 +45,9 @@ const StoreSection = ({
   getCourseCompletion,
 }: Props) => {
   const [
-    isAssetPackDialogInstallOpen,
-    setIsAssetPackDialogInstallOpen,
-  ] = React.useState(false);
+    assetShortHeadersToInstall,
+    setAssetShortHeadersToInstall,
+  ] = React.useState<?Array<AssetShortHeader>>(null);
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { assetShortHeadersSearchResults } = React.useContext(
     AssetStoreContext
@@ -71,7 +74,7 @@ const StoreSection = ({
 
   const existingAssetStoreIds = React.useMemo(
     () => {
-      if (!project || !isAssetPackDialogInstallOpen) {
+      if (!project || !assetShortHeadersToInstall) {
         return new Set<string>();
       }
 
@@ -82,7 +85,29 @@ const StoreSection = ({
       // Force recompute existing installed asset ids when the dialog to install them is
       // opened/closed, so that this list of ids is always up-to-date (but not recomputed at each render,
       // just when you're likely to need it).
-      isAssetPackDialogInstallOpen,
+      assetShortHeadersToInstall,
+    ]
+  );
+
+  const openAssetPackInstallDialog = React.useCallback(
+    () => {
+      const currentPage = shopNavigationState.getCurrentPage();
+      setAssetShortHeadersToInstall(
+        openedAssetShortHeader
+          ? [openedAssetShortHeader]
+          : assetShortHeadersSearchResults
+          ? getAssetShortHeadersToDisplay(
+              assetShortHeadersSearchResults,
+              currentPage.selectedFolders,
+              currentPage.pageBreakIndex || 0
+            )
+          : []
+      );
+    },
+    [
+      shopNavigationState,
+      openedAssetShortHeader,
+      assetShortHeadersSearchResults,
     ]
   );
 
@@ -107,7 +132,7 @@ const StoreSection = ({
                 return; // TODO: create a project, await, and then show dialog.
               }
 
-              setIsAssetPackDialogInstallOpen(true);
+              openAssetPackInstallDialog();
             }}
             disabled={!project || !displayedAssetShortHeaders.length}
             label={
@@ -131,15 +156,15 @@ const StoreSection = ({
         </Line>
       )}
       {project &&
-        isAssetPackDialogInstallOpen &&
-        !!displayedAssetShortHeaders.length && (
+        assetShortHeadersToInstall &&
+        !!assetShortHeadersToInstall.length && (
           <AssetPackInstallDialog
             assetPack={openedAssetPack}
-            assetShortHeaders={displayedAssetShortHeaders}
+            assetShortHeaders={assetShortHeadersToInstall}
             addedAssetIds={existingAssetStoreIds}
-            onClose={() => setIsAssetPackDialogInstallOpen(false)}
+            onClose={() => setAssetShortHeadersToInstall(null)}
             onAssetsAdded={() => {
-              setIsAssetPackDialogInstallOpen(false);
+              setAssetShortHeadersToInstall(null);
             }}
             project={project}
             objectsContainer={null}

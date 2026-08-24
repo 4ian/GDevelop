@@ -2,6 +2,8 @@
 
 import { mapFor } from '../Utils/MapFor';
 import { normalizeString } from '../Utils/Search';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+
 const gd: libGDevelop = global.gd;
 
 type MovementType =
@@ -85,6 +87,14 @@ export const getVariableContextFromNodeId = (
   nodeId: string,
   variablesContainer: gdVariablesContainer
 ): VariableContext => {
+  if (!exceptionallyGuardAgainstDeadObject(variablesContainer)) {
+    return {
+      variable: null,
+      name: null,
+      depth: 0,
+      lineage: [],
+    };
+  }
   const bits = nodeId.split(separator);
   let parentVariable = null;
   let currentVariable = null;

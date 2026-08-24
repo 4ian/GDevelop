@@ -10,8 +10,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-// $FlowFixMe[import-type-as-value]
-import { TreeViewItemContent } from '.';
+import { type TreeViewItemContent } from '.';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import {
@@ -22,6 +21,7 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -161,6 +161,7 @@ export const addSerializedObjectToObjectsContainer = ({
     project
   );
   newObject.setName(newName); // Unserialization has overwritten the name.
+  newObject.resetPersistentUuid();
 
   return { object: newObject, global };
 };
@@ -184,24 +185,54 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return this.object;
   }
 
+  _getAliveObjectFolderOrObject(): ?gdObjectFolderOrObject {
+    if (!exceptionallyGuardAgainstDeadObject(this.object)) return null;
+    return this.object;
+  }
+
+  _getAliveObject(): ?gdObject {
+    const objectFolderOrObject = this._getAliveObjectFolderOrObject();
+    if (!objectFolderOrObject) return null;
+    const object = objectFolderOrObject.getObject();
+    if (!exceptionallyGuardAgainstDeadObject(object)) return null;
+    return object;
+  }
+
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
-    const objectFolderOrObject = treeViewItemContent.getObjectFolderOrObject();
+    const objectFolderOrObject = exceptionallyGuardAgainstDeadObject(
+      treeViewItemContent.getObjectFolderOrObject()
+    );
+    const ownObjectFolderOrObject = this._getAliveObjectFolderOrObject();
     return (
+      !!ownObjectFolderOrObject &&
       !!objectFolderOrObject &&
-      this.object.isADescendantOf(objectFolderOrObject)
+      ownObjectFolderOrObject.isADescendantOf(objectFolderOrObject)
     );
   }
 
   isSibling(treeViewItemContent: TreeViewItemContent): boolean {
-    const objectFolderOrObject = treeViewItemContent.getObjectFolderOrObject();
-    return (
-      !!objectFolderOrObject &&
-      this.object.getParent() === objectFolderOrObject.getParent()
+    const objectFolderOrObject = exceptionallyGuardAgainstDeadObject(
+      treeViewItemContent.getObjectFolderOrObject()
     );
+    const ownObjectFolderOrObject = this._getAliveObjectFolderOrObject();
+    if (!ownObjectFolderOrObject || !objectFolderOrObject) return false;
+    const ownParent = exceptionallyGuardAgainstDeadObject(
+      ownObjectFolderOrObject.getParent()
+    );
+    const otherParent = exceptionallyGuardAgainstDeadObject(
+      objectFolderOrObject.getParent()
+    );
+    return !!ownParent && !!otherParent && ownParent === otherParent;
   }
 
   getIndex(): number {
-    return this.object.getParent().getChildPosition(this.object);
+    const ownObjectFolderOrObject = this._getAliveObjectFolderOrObject();
+    if (!ownObjectFolderOrObject) return 0;
+    const parent = exceptionallyGuardAgainstDeadObject(
+      ownObjectFolderOrObject.getParent()
+    );
+    if (!parent) return 0;
+    return parent.getChildPosition(ownObjectFolderOrObject);
   }
 
   isGlobal(): boolean {
@@ -209,19 +240,25 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   is3D(): boolean {
+    const object = this._getAliveObject();
+    if (!object) return false;
     const objectMetadata = gd.MetadataProvider.getObjectMetadata(
       this.props.project.getCurrentPlatform(),
-      this.object.getObject().getType()
+      object.getType()
     );
     return objectMetadata.isRenderedIn3D();
   }
 
   getName(): string | React.Node {
-    return this.object.getObject().getName();
+    const object = this._getAliveObject();
+    if (!object) return '';
+    return object.getName();
   }
 
   getId(): string {
-    return getObjectTreeViewItemId(this.object.getObject());
+    const object = this._getAliveObject();
+    if (!object) return `deleted-${this.object.ptr}`;
+    return getObjectTreeViewItemId(object);
   }
 
   getHtmlId(index: number): ?string {
@@ -229,28 +266,39 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
+    const object = this._getAliveObject();
+    if (!object) return null;
     return {
-      objectName: this.object.getObject().getName(),
+      objectName: object.getName(),
       global: this._isGlobal.toString(),
     };
   }
 
   getThumbnail(): ?string {
+    const object = this._getAliveObject();
+    if (!object) return null;
     return this.props.getThumbnail(
       this.props.project,
-      this.object.getObject().getConfiguration()
+      object.getConfiguration()
     );
   }
 
   onClick(): void {
+    const objectFolderOrObject = this._getAliveObjectFolderOrObject();
+    if (!objectFolderOrObject) return;
+    if (!objectFolderOrObject.isFolder() && !this._getAliveObject()) return;
+
     this.props.selectObjectFolderOrObjectWithContext({
-      objectFolderOrObject: this.object,
+      objectFolderOrObject,
       global: this._isGlobal,
     });
   }
 
   rename(newName: string): void {
-    if (this.getName() === newName) {
+    const objectFolderOrObject = this._getAliveObjectFolderOrObject();
+    const object = this._getAliveObject();
+    if (!objectFolderOrObject || !object) return;
+    if (object.getName() === newName) {
       return;
     }
 
@@ -259,7 +307,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       this._isGlobal
     );
     this.props.onRenameObjectFolderOrObjectWithContextFinish(
-      { objectFolderOrObject: this.object, global: this._isGlobal },
+      { objectFolderOrObject, global: this._isGlobal },
       validatedNewName,
       doRename => {
         if (!doRename) return;
@@ -270,7 +318,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   edit(): void {
-    this.props.onEditObject(this.object.getObject());
+    const object = this._getAliveObject();
+    if (!object) return;
+    this.props.onEditObject(object);
   }
 
   _getPasteLabel(
@@ -317,13 +367,15 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     if (!container) {
       return [];
     }
+    const objectFolderOrObject = this._getAliveObjectFolderOrObject();
+    const object = this._getAliveObject();
+    if (!objectFolderOrObject || !object) return [];
     const folderAndPathsInContainer = enumerateFoldersInContainer(container);
     folderAndPathsInContainer.unshift({
       path: i18n._(t`Root folder`),
       folder: container.getRootFolder(),
     });
 
-    const object = this.object.getObject();
     const instanceCountOnScene = initialInstances
       ? getInstanceCountInLayoutForObject(initialInstances, object.getName())
       : undefined;
@@ -424,7 +476,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Swap assets`),
         click: () =>
           swapObjectAsset({
-            object: this.object.getObject(),
+            object,
             global: this._isGlobal,
           }),
         enabled: canSwapAssetOfObject(object),
@@ -435,7 +487,12 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
         enabled: !this._isGlobal && !isListLocked,
         click: () => {
           selectObjectFolderOrObjectWithContext(null);
-          setAsGlobalObject({ i18n, objectFolderOrObject: this.object });
+          const ownObjectFolderOrObject = this._getAliveObjectFolderOrObject();
+          if (!ownObjectFolderOrObject) return;
+          setAsGlobalObject({
+            i18n,
+            objectFolderOrObject: ownObjectFolderOrObject,
+          });
         },
         visible: canSetAsGlobalObject !== false,
       },
@@ -449,15 +506,19 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
             submenu: [
               ...folderAndPathsInContainer.map(({ folder, path }) => ({
                 label: path,
-                enabled: folder !== this.object.getParent(),
+                enabled: folder !== objectFolderOrObject.getParent(),
                 click: () => {
-                  this.object
-                    .getParent()
-                    .moveObjectFolderOrObjectToAnotherFolder(
-                      this.object,
-                      folder,
-                      0
-                    );
+                  const ownObjectFolderOrObject = this._getAliveObjectFolderOrObject();
+                  if (!ownObjectFolderOrObject) return;
+                  const ownParent = exceptionallyGuardAgainstDeadObject(
+                    ownObjectFolderOrObject.getParent()
+                  );
+                  if (!ownParent) return;
+                  ownParent.moveObjectFolderOrObjectToAnotherFolder(
+                    ownObjectFolderOrObject,
+                    folder,
+                    0
+                  );
                   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
                     objectFolderOrObject: folder,
                     global: this._isGlobal,
@@ -467,13 +528,20 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
               { type: 'separator' },
               {
                 label: i18n._(t`Create new folder...`),
-                click: () =>
+                click: () => {
+                  const ownObjectFolderOrObject = this._getAliveObjectFolderOrObject();
+                  if (!ownObjectFolderOrObject) return;
+                  const ownParent = exceptionallyGuardAgainstDeadObject(
+                    ownObjectFolderOrObject.getParent()
+                  );
+                  if (!ownParent) return;
                   addFolder([
                     {
-                      objectFolderOrObject: this.object.getParent(),
+                      objectFolderOrObject: ownParent,
                       global: this._isGlobal,
                     },
-                  ]),
+                  ]);
+                },
               },
             ],
           },
@@ -503,6 +571,8 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   async _delete(): Promise<void> {
+    const object = this._getAliveObject();
+    if (!object) return;
     const {
       globalObjectsContainer,
       objectsContainer,
@@ -518,7 +588,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     });
     if (!answer) return;
 
-    const objectsToDelete = [this.object.getObject()];
+    const objectsToDelete = [object];
     const objectsWithContext = objectsToDelete.map(object => ({
       object,
       global: this._isGlobal,
@@ -549,10 +619,12 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   copy(): void {
+    const object = this._getAliveObject();
+    if (!object) return;
     Clipboard.set(OBJECT_CLIPBOARD_KIND, {
-      type: this.object.getObject().getType(),
-      name: this.object.getObject().getName(),
-      object: serializeToJSObject(this.object.getObject()),
+      type: object.getType(),
+      name: object.getName(),
+      object: serializeToJSObject(object),
     });
   }
 
@@ -563,6 +635,8 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
+    const objectFolderOrObject = this._getAliveObjectFolderOrObject();
+    if (!objectFolderOrObject) return;
     if (!Clipboard.has(OBJECT_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(OBJECT_CLIPBOARD_KIND);
@@ -600,7 +674,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       objectsContainer,
       objectName,
       positionObjectFolderOrObjectWithContext: {
-        objectFolderOrObject: this.object,
+        objectFolderOrObject,
         global: this._isGlobal,
       },
       objectType,
@@ -617,6 +691,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   duplicate(): void {
+    const objectFolderOrObject = this._getAliveObjectFolderOrObject();
+    const object = this._getAliveObject();
+    if (!objectFolderOrObject || !object) return;
     const {
       project,
       globalObjectsContainer,
@@ -627,7 +704,6 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       onObjectCreated,
     } = this.props;
 
-    const object = this.object.getObject();
     const serializedObject = serializeToJSObject(object);
 
     const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
@@ -641,17 +717,21 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       objectsContainer,
       objectName: object.getName(),
       positionObjectFolderOrObjectWithContext: {
-        objectFolderOrObject: this.object,
+        objectFolderOrObject,
         global: this._isGlobal,
       },
       objectType: object.getType(),
       serializedObject,
     });
 
+    const parent = exceptionallyGuardAgainstDeadObject(
+      objectFolderOrObject.getParent()
+    );
+    if (!parent) return;
     const newObjectFolderOrObjectWithContext = {
-      objectFolderOrObject: this.object
-        .getParent()
-        .getObjectChild(newObjectWithContext.object.getName()),
+      objectFolderOrObject: parent.getObjectChild(
+        newObjectWithContext.object.getName()
+      ),
       global: this._isGlobal,
     };
 

@@ -16,8 +16,10 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesContainer.h"
+#include "GDCore/Project/TestsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Watermark.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 namespace gd {
 class Platform;
@@ -438,6 +440,22 @@ class GD_CORE_API Project {
   }
 
   /**
+   * \brief Check if the project should use "0" as the default value for
+   * unset string variables (deprecated behavior from before 5.6.267).
+   */
+  bool GetUseDeprecatedZeroAsDefaultStringVariable() const {
+    return useDeprecatedZeroAsDefaultStringVariable;
+  }
+
+  /**
+   * \brief Set if the project should use "0" as the default value for
+   * unset string variables (deprecated behavior from before 5.6.267).
+   */
+  void SetUseDeprecatedZeroAsDefaultStringVariable(bool enable) {
+    useDeprecatedZeroAsDefaultStringVariable = enable;
+  }
+
+  /**
    * \brief Change the project UUID.
    */
   void SetProjectUuid(const gd::String& projectUuid_) {
@@ -661,6 +679,11 @@ class GD_CORE_API Project {
    */
   unsigned int GetLastSaveGDBuildVersion() { return gdBuildVersion; };
 
+  /**
+   * Get the version of GDevelop used to create the project.
+   */
+  const gd::String& GetInitialGDVersion() const { return initialGDVersion; };
+
   /** \name External events management
    * Members functions related to external events management.
    */
@@ -737,6 +760,21 @@ class GD_CORE_API Project {
    * \brief Delete external events named "name".
    */
   void RemoveExternalEvents(const gd::String& name);
+  ///@}
+
+  /** \name Tests management
+   * Members functions related to the tests of the project.
+   */
+  ///@{
+  /**
+   * \brief Return a reference to the tests of the project.
+   */
+  gd::TestsContainer& GetTests() { return tests; }
+
+  /**
+   * \brief Return a const reference to the tests of the project.
+   */
+  const gd::TestsContainer& GetTests() const { return tests; }
   ///@}
 
   /** \name External layout management
@@ -830,6 +868,18 @@ class GD_CORE_API Project {
    * Get the first layout of the project.
    */
   const gd::String& GetFirstLayout() { return firstLayout; }
+
+  /**
+   * Set the layout used by the IDE to start all previews.
+   * An empty string means there is no preview override.
+   */
+  void SetPreviewLayout(const gd::String& name) { previewLayout = name; }
+
+  /**
+   * Get the layout used by the IDE to start all previews.
+   * Returns an empty string if there is no preview override.
+   */
+  const gd::String& GetPreviewLayout() const { return previewLayout; }
 
   ///@}
 
@@ -979,16 +1029,16 @@ class GD_CORE_API Project {
   ResourcesContainer& GetResourcesManager() { return resourcesContainer; }
 
   /**
-   * Set when the scenes must preload their resources: `at-startup`, `never`
-   * (default).
+   * Set when the scenes must preload their resources: `at-startup` (default),
+   * `never`.
    */
   void SetSceneResourcesPreloading(gd::String sceneResourcesPreloading_) {
     sceneResourcesPreloading = sceneResourcesPreloading_;
   }
 
   /**
-   * Get when the scenes must preload their resources: `at-startup`, `never`
-   * (default).
+   * Get when the scenes must preload their resources: `at-startup` (default),
+   * `never`.
    */
   const gd::String& GetSceneResourcesPreloading() const {
     return sceneResourcesPreloading;
@@ -1067,18 +1117,6 @@ class GD_CORE_API Project {
     return wholeProjectDiagnosticReport;
   }
 
-  /**
-   * @brief Get the project extensions names in the order they have to be
-   * unserialized.
-   *
-   * Child-objects need the event-based objects they use to be loaded completely
-   * before they are unserialized.
-   *
-   * \warning This is only public to allow testing - don't use it in the editor.
-   */
-  static std::vector<gd::String> GetUnserializingOrderExtensionNames(
-      const gd::SerializerElement& eventsFunctionsExtensionsElement);
-
  private:
   /**
    * Initialize from another game. Used by copy-ctor and assign-op.
@@ -1093,6 +1131,8 @@ class GD_CORE_API Project {
    */
   std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
       const gd::String& type) const;
+
+  gd::MemoryTracked _memoryTracked{this, "Project"};
 
   gd::String name;         ///< Game name
   gd::String description;  ///< Game description
@@ -1123,6 +1163,11 @@ class GD_CORE_API Project {
               ///< instead of the highest Z order
               ///< found on the layer at the scene
               ///< startup.
+  bool useDeprecatedZeroAsDefaultStringVariable =
+      false;  ///< If true, string variables with
+              ///< no stored value default to "0"
+              ///< at runtime (behavior before
+              ///< 5.6.267).
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
   gd::ObjectsContainer objectsContainer;
@@ -1135,6 +1180,8 @@ class GD_CORE_API Project {
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;
+  gd::String previewLayout;  ///< Editor-only: layout used by the IDE to start
+                             ///< all previews. Empty if not set.
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;  ///< Game author ids, from GDevelop users DB.
@@ -1163,6 +1210,7 @@ class GD_CORE_API Project {
   gd::Watermark watermark;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;  ///< List of all externals events
+  gd::TestsContainer tests;  ///< The tests of the project.
   ExtensionProperties
       extensionProperties;  ///< The properties of the extensions.
   gd::WholeProjectDiagnosticReport wholeProjectDiagnosticReport;
@@ -1179,6 +1227,7 @@ class GD_CORE_API Project {
   mutable unsigned int gdBuildVersion =
       0;  ///< The GD build version used the last
           ///< time the project was saved.
+  gd::String initialGDVersion; ///< The GD version used to create the project.
   bool areEffectsHiddenInEditor =
       false; ///< When false effects are not shown and a default light is used
              ///< for 3D layers.

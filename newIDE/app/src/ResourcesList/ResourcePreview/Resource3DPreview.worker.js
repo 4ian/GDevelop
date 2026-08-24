@@ -1,30 +1,13 @@
 /* eslint-env worker */
 // @flow
+// IMPORTANT: this file is compiled as a worker entry point by `worker-loader`,
+// which does NOT process it with Babel: it must stay plain JavaScript.
+// In particular, no Flow syntax can be used (type imports or annotations) -
+// otherwise the whole build breaks (silently producing an empty build folder,
+// which is caught by scripts/check-build-output.js).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-
-const isNativeMobileApp = false;
-
-// Copied from Utils/CrossOrigin.js
-// $FlowFixMe[missing-local-annot]
-const checkIfIsGDevelopCloudBucketUrl = url => {
-  return (
-    url.startsWith('https://project-resources.gdevelop.io/') ||
-    url.startsWith('https://project-resources-dev.gdevelop.io/')
-  );
-};
-
-// Copied from Utils/CrossOrigin.js
-// $FlowFixMe[missing-local-annot]
-const checkIfCredentialsRequired = url => {
-  // Any resource stored on the GDevelop Cloud buckets needs credentials
-  // $FlowFixMe[constant-condition]
-  if (isNativeMobileApp) return false;
-  if (checkIfIsGDevelopCloudBucketUrl(url)) return true;
-
-  // For other resources, use the default way of loading resources
-  return false;
-};
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 // Copied from PixiResourcesLoader.js
 // $FlowFixMe[missing-local-annot]
@@ -61,9 +44,47 @@ let renderer = null;
 let width = 256;
 let height = 256;
 let offscreenCanvas = null;
+let dracoLoader = null;
+
+/**
+ * Create the loader for the Draco compressed 3D models.
+ *
+ * The decoder files are read by the main thread and passed to this worker
+ * (see `DracoDecoderFiles` in `Utils/DracoDecoder.js`), because a worker can't
+ * read them by itself in the desktop app (`file://` URLs can't be fetched by
+ * workers). They are exposed as blob URLs so that the DRACOLoader can read
+ * them like any other file.
+ */
+// $FlowFixMe[missing-local-annot]
+const createDracoLoader = dracoDecoderFiles => {
+  const decoderFileUrls = {
+    'draco_wasm_wrapper.js': URL.createObjectURL(
+      new Blob([dracoDecoderFiles.dracoWasmWrapperJs], {
+        type: 'text/javascript',
+      })
+    ),
+    'draco_decoder.wasm': URL.createObjectURL(
+      new Blob([dracoDecoderFiles.dracoDecoderWasm], {
+        type: 'application/wasm',
+      })
+    ),
+  };
+
+  const loadingManager = new THREE.LoadingManager();
+  loadingManager.setURLModifier(url => decoderFileUrls[url] || url);
+
+  // No decoder path is set: the decoder files are found thanks to the
+  // loading manager.
+  const loader = new DRACOLoader(loadingManager);
+  // The models are rendered one after the other: a single worker is enough.
+  loader.setWorkerLimit(1);
+
+  return loader;
+};
 
 // Set up the renderer when worker is initialized
-const initRenderer = () => {
+// $FlowFixMe[missing-local-annot]
+const initRenderer = dracoDecoderFiles => {
   // $FlowFixMe[incompatible-type] - OffscreenCanvas is not in Flow types
   // $FlowFixMe[cannot-resolve-name]
   offscreenCanvas = new OffscreenCanvas(width, height);
@@ -78,12 +99,24 @@ const initRenderer = () => {
 
   renderer.setSize(width, height, false);
 
+  if (dracoDecoderFiles) {
+    try {
+      dracoLoader = createDracoLoader(dracoDecoderFiles);
+    } catch (error) {
+      // Without the Draco loader, only the models that are not compressed
+      // with Draco can be rendered.
+      console.error('Unable to create the Draco loader:', error);
+    }
+  }
+
   return true;
 };
 
-// Render a 3D model to the offscreen canvas and return the data URL
+// Render a 3D model to the offscreen canvas and return the data URL.
+// resourceData is an ArrayBuffer fetched by the main thread (workers cannot
+// fetch file:// URLs in Electron due to network service sandboxing).
 // $FlowFixMe[missing-local-annot]
-const renderModel = async resourceUrl => {
+const renderModel = async (resourceUrl, resourceData, basePath) => {
   if (!renderer) {
     throw new Error('Renderer not initialized');
   }
@@ -100,13 +133,17 @@ const renderModel = async resourceUrl => {
   lightGroup.add(light);
   scene.add(lightGroup);
 
-  // Load the model
+  // Parse the pre-fetched model data instead of fetching the URL,
+  // so the worker never needs to make any network/file requests.
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
-    loader.withCredentials = checkIfCredentialsRequired(resourceUrl);
+    if (dracoLoader) {
+      loader.setDRACOLoader(dracoLoader);
+    }
 
-    loader.load(
-      resourceUrl,
+    loader.parse(
+      resourceData,
+      basePath,
       gltf => {
         if (!renderer) {
           throw new Error('Renderer not initialized');
@@ -196,18 +233,31 @@ self.onmessage = async event => {
 
   try {
     switch (type) {
-      case MESSAGE_TYPES.INIT:
-        const success = initRenderer();
+      case MESSAGE_TYPES.INIT: {
+        // Always answer to the main thread, even in case of failure, so that it
+        // never waits for the worker to be initialized.
+        let success = false;
+        try {
+          success = initRenderer(event.data.dracoDecoderFiles);
+        } catch (error) {
+          console.error("Can't initialize the 3D model renderer:", error);
+        }
         // eslint-disable-next-line no-restricted-globals
         self.postMessage({ type: MESSAGE_TYPES.INIT, success });
         break;
+      }
 
       case MESSAGE_TYPES.RENDER_MODEL:
         if (!renderer) {
           throw new Error('Renderer not initialized');
         }
 
-        const screenshot = await renderModel(resourceUrl);
+        const { resourceData, basePath } = event.data;
+        const screenshot = await renderModel(
+          resourceUrl,
+          resourceData,
+          basePath
+        );
         // eslint-disable-next-line no-restricted-globals
         self.postMessage({
           type: MESSAGE_TYPES.RENDER_COMPLETE,

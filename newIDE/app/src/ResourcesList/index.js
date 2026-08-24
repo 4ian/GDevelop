@@ -67,7 +67,7 @@ type Props = {|
   project: gdProject,
   selectedResource: ?gdResource,
   onSelectResource: (resource: ?gdResource) => void,
-  onDeleteResource: (resource: gdResource) => void,
+  onDeleteResource: (resource: gdResource) => Promise<void>,
   onRenameResource: (resource: gdResource, newName: string) => void,
   fileMetadata: ?FileMetadata,
   onRemoveUnusedResources: ResourceKind => void,

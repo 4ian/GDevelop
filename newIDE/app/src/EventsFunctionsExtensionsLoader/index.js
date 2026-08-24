@@ -96,14 +96,25 @@ const loadProjectEventsFunctionsExtension = (
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   options: OptionsForGeneration
 ): Promise<void> => {
+  const extensionName = eventsFunctionsExtension.getName();
+  const phase = options.skipCodeGeneration ? 'metadata' : 'codegen';
   return generateEventsFunctionExtension(
     project,
     eventsFunctionsExtension,
     options
-  ).then(extension => {
-    gd.JsPlatform.get().addNewExtension(extension);
-    extension.delete();
-  });
+  ).then(
+    extension => {
+      gd.JsPlatform.get().addNewExtension(extension);
+      extension.delete();
+    },
+    error => {
+      console.error(
+        `[EventsFunctionsExtensionsLoader] Failed to load extension "${extensionName}" (phase=${phase}):`,
+        error
+      );
+      throw error;
+    }
+  );
 };
 
 /**
@@ -160,14 +171,12 @@ const generateEventsFunctionExtension = (
   return Promise.all(
     // Generate all behaviors and their functions
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtension.getEventsBasedBehaviors(),
       eventsBasedBehavior => {
         return generateBehavior(
           project,
           extension,
           eventsFunctionsExtension,
-          // $FlowFixMe[incompatible-type]
           eventsBasedBehavior,
           options,
           codeGenerationContext
@@ -179,14 +188,12 @@ const generateEventsFunctionExtension = (
       // Generate all objects and their functions
       Promise.all(
         mapVector(
-          // $FlowFixMe[incompatible-exact]
           eventsFunctionsExtension.getEventsBasedObjects(),
           eventsBasedObject => {
             return generateObject(
               project,
               extension,
               eventsFunctionsExtension,
-              // $FlowFixMe[incompatible-type]
               eventsBasedObject,
               options,
               codeGenerationContext
@@ -254,7 +261,6 @@ const generateEventsFunctionExtensionMetadata = (
 
   // Generate all behaviors and their functions
   mapVector(
-    // $FlowFixMe[incompatible-exact]
     eventsFunctionsExtension.getEventsBasedBehaviors(),
     eventsBasedBehavior => {
       const behaviorMethodMangledNames = new gd.MapStringString();
@@ -262,7 +268,6 @@ const generateEventsFunctionExtensionMetadata = (
         project,
         extension,
         eventsFunctionsExtension,
-        // $FlowFixMe[incompatible-type]
         eventsBasedBehavior,
         options,
         codeGenerationContext,
@@ -274,7 +279,6 @@ const generateEventsFunctionExtensionMetadata = (
   );
   // Generate all objects and their functions
   mapVector(
-    // $FlowFixMe[incompatible-exact]
     eventsFunctionsExtension.getEventsBasedObjects(),
     eventsBasedObject => {
       const objectMethodMangledNames = new gd.MapStringString();
@@ -282,7 +286,6 @@ const generateEventsFunctionExtensionMetadata = (
         project,
         extension,
         eventsFunctionsExtension,
-        // $FlowFixMe[incompatible-type]
         eventsBasedObject,
         options,
         codeGenerationContext,
@@ -321,16 +324,26 @@ const generateFreeFunction = (
   codeGenerationContext: CodeGenerationContext
 ): Promise<void> => {
   const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
-  const { functionMetadata } = generateFreeFunctionMetadata(
-    project,
-    extension,
-    eventsFunctionsExtension,
-    eventsFunction,
-    // $FlowFixMe[incompatible-type]
-    options,
-    codeGenerationContext,
-    metadataDeclarationHelper
-  );
+  let functionMetadata;
+  try {
+    ({ functionMetadata } = generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventsFunctionsExtension,
+      eventsFunction,
+      // $FlowFixMe[incompatible-type]
+      options,
+      codeGenerationContext,
+      metadataDeclarationHelper
+    ));
+  } catch (error) {
+    console.error(
+      `[EventsFunctionsExtensionsLoader] Failed to generate metadata for free function "${eventsFunctionsExtension.getName()}::${eventsFunction.getName()}":`,
+      error
+    );
+    metadataDeclarationHelper.delete();
+    throw error;
+  }
 
   if (!options.skipCodeGeneration) {
     const includeFiles = new gd.SetString();
@@ -341,16 +354,28 @@ const generateFreeFunction = (
       eventsFunction,
       codeGenerationContext.codeNamespacePrefix
     );
-    const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-      eventsFunctionsExtension,
-      eventsFunction,
-      codeNamespace,
-      includeFiles,
-      // For now, always generate functions for runtime (this disables
-      // generation of profiling for groups (see EventsCodeGenerator))
-      // as extensions generated can be used either for preview or export.
-      true
-    );
+    let code;
+    try {
+      code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+        eventsFunctionsExtension,
+        eventsFunction,
+        codeNamespace,
+        includeFiles,
+        // For now, always generate functions for runtime (this disables
+        // generation of profiling for groups (see EventsCodeGenerator))
+        // as extensions generated can be used either for preview or export.
+        true
+      );
+    } catch (error) {
+      console.error(
+        `[EventsFunctionsExtensionsLoader] Failed to generate code for free function "${eventsFunctionsExtension.getName()}::${eventsFunction.getName()}":`,
+        error
+      );
+      includeFiles.delete();
+      eventsFunctionsExtensionCodeGenerator.delete();
+      metadataDeclarationHelper.delete();
+      throw error;
+    }
 
     // Add any include file required by the function to the list
     // of include files for this function (so that when used, the "dependencies"

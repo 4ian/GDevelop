@@ -669,20 +669,27 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // be worth it.
          "    if (objectsList) {\n" +
          "      const object = parentEventsFunctionContext && "
-         // Check if  `objectName` is not a child object and is passed by
-         // parameter from a parent instance container.
+         // The object is not a child object and is passed by parameter from a
+         // parent instance container.
          "!(scopeInstanceContainer && "
          "scopeInstanceContainer.isObjectRegistered(objectName)) ?\n" +
          "        "
          "parentEventsFunctionContext.createObject(objectsList.firstKey()) "
          ":\n" +
          "        runtimeScene.createObject(objectsList.firstKey());\n" +
-         // Add the new instance to object lists
          "      if (object) {\n" +
+         // Add the new instance to object lists
          "        objectsList.get(objectsList.firstKey()).push(object);\n" +
-         "        "
+         // For child-objects _objectsMap` and `_objectArraysMap` contains the
+         //same Array instance so we only add it once.
+         "        if (!(scopeInstanceContainer && "
+         "scopeInstanceContainer.isObjectRegistered(objectName))) {\n" +
+         "          "
          "eventsFunctionContext._objectArraysMap[objectName].push(object);\n" +
-         "      }\n" + "      return object;\n" + "    }\n" +
+         "        }\n" + //
+         "      }\n" + //
+         "      return object;\n" + //
+         "    }\n" +
          // Unknown object, don't create anything:
          "    return null;\n" +
          "  },\n"

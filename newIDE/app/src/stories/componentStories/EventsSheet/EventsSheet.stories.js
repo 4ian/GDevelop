@@ -39,6 +39,13 @@ export const DefaultNoScope = (): React.Node => (
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('extension installed')}
+        onCreateNewExtensionWithBehavior={action(
+          'onCreateNewExtensionWithBehavior'
+        )}
+        editEventsFunctionParameter={action('edit function parameter')}
+        openEventsBasedEntityPropertyEditorDialog={action(
+          'openEventsBasedEntityPropertyEditorDialog'
+        )}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -71,6 +78,13 @@ export const EmptyNoScope = (): React.Node => (
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('extension installed')}
+        onCreateNewExtensionWithBehavior={action(
+          'onCreateNewExtensionWithBehavior'
+        )}
+        editEventsFunctionParameter={action('edit function parameter')}
+        openEventsBasedEntityPropertyEditorDialog={action(
+          'openEventsBasedEntityPropertyEditorDialog'
+        )}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

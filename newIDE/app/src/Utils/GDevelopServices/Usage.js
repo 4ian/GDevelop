@@ -63,11 +63,12 @@ export type Subscription = {|
 
 type AiCapability = {
   availablePresets: Array<{
-    mode: 'chat' | 'agent',
+    mode: 'chat' | 'agent' | 'orchestrator',
     name: string,
     id: string,
     disabled?: boolean,
     enableWith?: 'higher-tier-plan',
+    enabledWithPlans?: Array<string>,
   }>,
   versionHistory?: { retentionDays: number },
 };
@@ -87,6 +88,14 @@ export type Capabilities = {|
     maximumCount: number,
     canMaximumCountBeIncreased: boolean,
     maximumGuestCollaboratorsPerProject: number,
+    // How long after deletion a project can still be restored by the user, in seconds.
+    // -1 means unlimited (within the retention period). This is a "soft" limit:
+    // a subscription can extend it.
+    projectRestorationTimeWindowInSeconds: number,
+    // How long a deleted project is kept before being permanently erased, in days.
+    // This is a "hard" limit, identical for all users: after this delay, the project
+    // is not returned by the API anymore.
+    deletedProjectRetentionInDays: number,
   },
   leaderboards: {
     maximumCountPerGame: number,
@@ -161,6 +170,20 @@ export type Quotas = {
   [string]: Quota,
 };
 
+export type SubscriptionDialogVariantConfig = {|
+  type: string,
+  weight: number,
+  featuredPlanId?: string,
+|};
+
+export type SubscriptionDialogPlacementConfig = {|
+  variants: Array<SubscriptionDialogVariantConfig>,
+|};
+
+export type SubscriptionDialogDisplayConfig = {|
+  placements: { [placementId: string]: SubscriptionDialogPlacementConfig },
+|};
+
 /**
  * The limits communicated by the API for a user.
  */
@@ -173,6 +196,7 @@ export type Limits = {|
     purchasableQuantities: UsagePurchasableQuantities,
   },
   message: string | typeof undefined,
+  subscriptionDialogDisplayConfig?: SubscriptionDialogDisplayConfig,
 |};
 
 export type PlanDetails = {|
@@ -201,6 +225,23 @@ export type SubscriptionPlanPricingSystem = {|
   periodCount: number,
 |};
 
+export type SimplifiedSubscriptionStoreBadge = string;
+
+export type SimplifiedSubscriptionBulletPoint = {|
+  enabled: boolean,
+  messageByLocale: MessageByLocale,
+  storeBadges?: Array<SimplifiedSubscriptionStoreBadge>,
+|};
+
+export type SimplifiedSubscriptionFeatures = {|
+  titleByLocale?: MessageByLocale,
+  taglineByLocale?: MessageByLocale,
+  upgradeOverlineByLocale?: MessageByLocale,
+  upgradeTitleByLocale?: MessageByLocale,
+  upgradeButtonLabelByLocale?: MessageByLocale,
+  bulletPoints: Array<SimplifiedSubscriptionBulletPoint>,
+|};
+
 export type SubscriptionPlan = {|
   id: string,
   isLegacy: boolean,
@@ -208,6 +249,7 @@ export type SubscriptionPlan = {|
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
   specificRequirementByLocale?: MessageByLocale,
+  simplifiedFeatures?: SimplifiedSubscriptionFeatures,
   targetAudiences: Array<'CASUAL' | 'PRO' | 'EDUCATION'>,
   fullFeatures: Array<{|
     featureName: string,
@@ -695,12 +737,17 @@ export const validateCoupon = async (
   return response.data;
 };
 
-export const canBenefitFromDiscordRole = (
+export const canBenefitFromSocialRole = (
   subscription: ?Subscription
 ): false | true | boolean => {
   return (
     !!subscription &&
-    ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+    [
+      'gdevelop_education',
+      'gdevelop_startup',
+      'gdevelop_gold',
+      'gdevelop_silver',
+    ].includes(
       // $FlowFixMe[incompatible-type]
       subscription.planId
     ) &&

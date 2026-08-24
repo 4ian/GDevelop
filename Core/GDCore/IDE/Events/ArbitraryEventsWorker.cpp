@@ -35,6 +35,8 @@ void AbstractArbitraryEventsWorker::VisitEventList(gd::EventsList& events) {
 }
 
 bool AbstractArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
+  if (skipDisabledEvents_ && event.IsDisabled()) return false;
+
   bool shouldDelete = DoVisitEvent(event);
   if (shouldDelete) return true;
 
@@ -103,6 +105,8 @@ void AbstractReadOnlyArbitraryEventsWorker::VisitEventList(const gd::EventsList&
 }
 
 void AbstractReadOnlyArbitraryEventsWorker::VisitEvent(const gd::BaseEvent& event) {
+  if (skipDisabledEvents_ && event.IsDisabled()) return;
+
   DoVisitEvent(event);
 
   const vector<const gd::InstructionsList*> conditionsVectors =

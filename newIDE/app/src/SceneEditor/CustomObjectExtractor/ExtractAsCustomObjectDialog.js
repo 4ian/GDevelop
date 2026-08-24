@@ -133,9 +133,7 @@ export default function ExtractAsCustomObjectDialog({
       }
       const behaviorMetadatas = new Set<gdBehaviorMetadata>();
       for (const object of objects) {
-        // $FlowFixMe[incompatible-exact]
         mapVector(object.getAllBehaviorNames(), behaviorName => {
-          // $FlowFixMe[incompatible-type]
           const behavior = object.getBehavior(behaviorName);
 
           const platform = project.getCurrentPlatform();

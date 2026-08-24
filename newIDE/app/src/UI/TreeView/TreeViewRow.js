@@ -18,6 +18,7 @@ import {
 import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 import { type ItemData, type ItemBaseAttributes, navigationKeys } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import { useDragDropManager } from 'react-dnd';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
 import classNames from 'classnames';
@@ -27,7 +28,7 @@ import { TreeViewRightPrimaryButton } from './TreeViewRightPrimaryButton';
 const stopPropagation = e => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
-const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 1000;
+const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 600;
 export const TREE_VIEW_ROW_HEIGHT = 32;
 const COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT = 6;
 
@@ -54,12 +55,23 @@ const SemiControlledRowInput = ({
   const inputRef = React.useRef<?HTMLInputElement>(null);
 
   /**
-   * When mounting the component, select content.
+   * When mounting the component, focus and select content.
+   * We use setTimeout to ensure this runs after any deferred focus restoration
+   * from MUI Modal (used by the context menu on web), which runs in a useEffect
+   * cleanup. Without this, MUI's focus restoration steals focus from the input
+   * right after it mounts (introduced in React 18).
    */
   React.useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.select();
-    }
+    const id = setTimeout(() => {
+      const input = inputRef.current;
+      if (input) {
+        // We focus and select the text here, and not with autoFocus on the input,
+        // to avoid issues with focus restoration from MUI Modal (used by the context menu on web)
+        input.focus();
+        input.select();
+      }
+    }, 0);
+    return () => clearTimeout(id);
   }, []);
 
   /**
@@ -79,7 +91,6 @@ const SemiControlledRowInput = ({
   return (
     <div className={classes.itemNameInputContainer}>
       <input
-        autoFocus
         ref={inputRef}
         type="text"
         className={classes.itemNameInput}
@@ -90,6 +101,7 @@ const SemiControlledRowInput = ({
         }}
         onClick={stopPropagation}
         onDoubleClick={stopPropagation}
+        onContextMenu={stopPropagation}
         onBlur={() => {
           onEndRenaming(value);
         }}
@@ -117,11 +129,14 @@ type Props<Item> = {|
   data: ItemData<Item>,
   /** Used by react-window. */
   isScrolling?: boolean,
+  /** True when the row is displayed as a sticky copy of an actual row. */
+  isSticky?: boolean,
 |};
 
-// $FlowFixMe[missing-local-annot]
-const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
-  const { data, index, style } = props;
+const TreeViewRow = <Item: ItemBaseAttributes>(
+  props: Props<Item>
+): React.Node => {
+  const { data, index, style, isSticky } = props;
   const {
     flattenedData,
     onOpen,
@@ -141,7 +156,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     shouldSelectUponContextMenuOpening,
   } = data;
   const node = flattenedData[index];
-  const left = node.depth * 16;
+  // Slightly reduce the indentation on mobile, as horizontal space is scarce.
+  const left = node.depth * (isMobile ? 12 : 16);
   const forceUpdate = useForceUpdate();
   const isStayingOverRef = React.useRef<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
@@ -149,9 +165,16 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     'before' | 'after' | 'inside'
   >('before');
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  const dragDropManager = useDragDropManager();
   const openContextMenu = React.useCallback(
     // $FlowFixMe[missing-local-annot]
     ({ clientX, clientY }) => {
+      // When the context menu opens it intercepts subsequent touch events,
+      // so the drag backend never receives touchend/touchcancel and the drag
+      // stays active indefinitely. End it explicitly before opening the menu.
+      if (dragDropManager.getMonitor().isDragging()) {
+        dragDropManager.getActions().endDrag();
+      }
       onContextMenu({
         index: index,
         item: node.item,
@@ -159,25 +182,30 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         y: clientY,
       });
     },
-    [onContextMenu, index, node.item]
+    [dragDropManager, onContextMenu, index, node.item]
   );
 
-  const longTouchForContextMenuProps = useLongTouch(openContextMenu, {
-    delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
-  });
+  const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
+    openContextMenu,
+    {
+      delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
+    }
+  );
 
   const onClickItem = React.useCallback(
     // $FlowFixMe[missing-local-annot]
     event => {
       if (!node || node.item.isPlaceholder) return;
       if (node.item.isRoot) {
-        onOpen(node);
+        // A sticky root row does not collapse on click: the click reveals the
+        // actual row instead (handled by the sticky rows container).
+        if (!isSticky) onOpen(node);
         return;
       }
       onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
       onClick(node);
     },
-    [onClick, onSelect, node, onOpen]
+    [onClick, onSelect, node, onOpen, isSticky]
   );
 
   const onDoubleClickItem = React.useCallback(
@@ -288,7 +316,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           return {};
         }}
         canDrag={() =>
-          // Prevent dragging of root folder or placeholder.
+          // Prevent dragging of sticky copies, root folder or placeholder.
+          !isSticky &&
           !node.item.isRoot &&
           !node.item.isPlaceholder &&
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
@@ -354,6 +383,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         }) => {
           setIsStayingOver(isOver, canDrop);
 
+          const isRenaming = renamedItemId === node.id;
+
           let itemRow = (
             <div
               className={classNames(classes.rowContentSide, {
@@ -395,7 +426,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   <ListIcon iconSize={20} src={node.thumbnailSrc} />
                 </div>
               ) : null}
-              {renamedItemId === node.id && typeof node.name === 'string' ? (
+              {renamedItemId === node.id &&
+              !isSticky &&
+              typeof node.name === 'string' ? (
                 <SemiControlledRowInput
                   initialValue={node.name}
                   onEndRenaming={endRenaming}
@@ -450,11 +483,13 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   onEditItem ? () => onEditItem(node.item) : undefined
                 }
                 onContextMenu={
-                  shouldSelectUponContextMenuOpening
+                  isRenaming
+                    ? undefined
+                    : shouldSelectUponContextMenuOpening
                     ? selectAndOpenContextMenu
                     : openContextMenu
                 }
-                {...longTouchForContextMenuProps}
+                {...(isRenaming ? {} : longTouchForContextMenuProps)}
               >
                 {itemRow}
                 {(node.rightComponent ||
@@ -550,7 +585,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
           const dropTarget = connectDropTarget(
             <div
-              id={getItemHtmlId ? getItemHtmlId(node.item, index) : undefined}
+              id={
+                // Do not duplicate the id on the sticky copy of a row.
+                getItemHtmlId && !isSticky
+                  ? getItemHtmlId(node.item, index)
+                  : undefined
+              }
               onClick={onClickItem}
               onDoubleClick={onDoubleClickItem}
               className={classNames(
@@ -572,7 +612,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             <div
               style={{ paddingLeft: left }}
               className={classNames(classes.fullHeightFlexContainer, {
-                [classes.withDivider]: node.item.isRoot && index > 0,
+                [classes.withDivider]:
+                  node.item.isRoot && index > 0 && !isSticky,
               })}
             >
               {dropTarget}

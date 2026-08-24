@@ -230,14 +230,16 @@ void EventsListSerialization::UnserializeEventsFrom(
 
 void EventsListSerialization::SerializeEventsTo(const EventsList& list,
                                                 SerializerElement& events) {
+  const bool canonical = gd::Serializer::IsCanonicalMode();
   events.ConsiderAsArrayOf("event");
   for (std::size_t j = 0; j < list.size(); j++) {
     const gd::BaseEvent& event = list.GetEvent(j);
     SerializerElement& eventElem = events.AddChild("event");
 
-    if (event.IsDisabled())
+    if (canonical || event.IsDisabled())
       eventElem.SetAttribute("disabled", event.IsDisabled());
-    if (event.IsFolded()) eventElem.SetAttribute("folded", event.IsFolded());
+    if (canonical || event.IsFolded())
+      eventElem.SetAttribute("folded", event.IsFolded());
     if (!event.GetAiGeneratedEventId().empty())
       eventElem.SetAttribute("aiGeneratedEventId", event.GetAiGeneratedEventId());
     eventElem.AddChild("type").SetValue(event.GetType());
@@ -346,15 +348,16 @@ void gd::EventsListSerialization::UnserializeInstructionsFrom(
 
 void gd::EventsListSerialization::SerializeInstructionsTo(
     const gd::InstructionsList& list, SerializerElement& instructions) {
+  const bool canonical = gd::Serializer::IsCanonicalMode();
   instructions.ConsiderAsArrayOf("instruction");
   for (std::size_t k = 0; k < list.size(); k++) {
     SerializerElement& instruction = instructions.AddChild("instruction");
     instruction.AddChild("type").SetAttribute("value", list[k].GetType());
 
-    if (list[k].IsInverted())
-      instruction.GetChild("type").SetAttribute("inverted", true);
-    if (list[k].IsAwaited())
-      instruction.GetChild("type").SetAttribute("await", true);
+    if (canonical || list[k].IsInverted())
+      instruction.GetChild("type").SetAttribute("inverted", list[k].IsInverted());
+    if (canonical || list[k].IsAwaited())
+      instruction.GetChild("type").SetAttribute("await", list[k].IsAwaited());
 
     // Parameters
     SerializerElement& parameters = instruction.AddChild("parameters");
@@ -376,7 +379,7 @@ void gd::EventsListSerialization::SerializeInstructionsTo(
     }
 
     // Sub instructions
-    if (!list[k].GetSubInstructions().empty()) {
+    if (canonical || !list[k].GetSubInstructions().empty()) {
       SerializeInstructionsTo(list[k].GetSubInstructions(),
                               instruction.AddChild("subInstructions"));
     }

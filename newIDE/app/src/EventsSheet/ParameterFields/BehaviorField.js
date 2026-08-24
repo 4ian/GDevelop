@@ -34,7 +34,7 @@ export const getSelectableBehavior = (
         .toJSArray()
         .filter(
           behaviorName =>
-            !objectsContainersList.isDefaultBehavior(
+            !objectsContainersList.hasDefaultBehavior(
               objectOrGroupName,
               behaviorName,
               true

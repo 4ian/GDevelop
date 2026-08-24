@@ -49,8 +49,9 @@ const AssetStoreProviders = ({ children }: {| children: React.Node |}) => (
   </AuthenticatedUserContext.Provider>
 );
 
-// Shared props used by all stories.
-const sharedProps = {
+// Shared props used by all stories. Must be built at render time (not at
+// module load): `testProject` is only usable once GDevelop.js is initialized.
+const getSharedProps = () => ({
   getThumbnail: () => 'res/unknown32.png',
   project: testProject.project,
   layout: testProject.testLayout,
@@ -81,14 +82,14 @@ const sharedProps = {
   hotReloadPreviewButtonProps: fakeHotReloadPreviewButtonProps,
   onWillInstallExtension: action('extension will be installed'),
   onExtensionInstalled: action('onExtensionInstalled'),
-};
+});
 
 export const Default = (): React.Node => (
   <AssetStoreProviders>
     <DragAndDropContextProvider>
       <div style={{ height: 400 }}>
         <ObjectsList
-          {...sharedProps}
+          {...getSharedProps()}
           selectedObjectFolderOrObjectsWithContext={[]}
           onObjectFolderOrObjectsWithContextSelected={() => {}}
           isListLocked={false}
@@ -119,7 +120,7 @@ export const WithMultiSelection = (): React.Node => {
       <DragAndDropContextProvider>
         <div style={{ height: 400 }}>
           <ObjectsList
-            {...sharedProps}
+            {...getSharedProps()}
             selectedObjectFolderOrObjectsWithContext={
               selectedObjectFolderOrObjectsWithContext
             }
@@ -269,7 +270,7 @@ const SelectionPlaygroundStory = () => {
       <DragAndDropContextProvider>
         <div style={{ height: 400 }}>
           <ObjectsList
-            {...sharedProps}
+            {...getSharedProps()}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             selectedObjectFolderOrObjectsWithContext={selection}
@@ -294,7 +295,7 @@ export const WithSerializedObjectView = (): React.Node => (
       <SerializedObjectDisplay object={testProject.testLayout}>
         <div style={{ height: 250 }}>
           <ObjectsList
-            {...sharedProps}
+            {...getSharedProps()}
             selectedObjectFolderOrObjectsWithContext={[]}
             onObjectFolderOrObjectsWithContextSelected={() => {}}
             isListLocked={false}
@@ -310,7 +311,7 @@ export const Locked = (): React.Node => (
     <DragAndDropContextProvider>
       <div style={{ height: 400 }}>
         <ObjectsList
-          {...sharedProps}
+          {...getSharedProps()}
           selectedObjectFolderOrObjectsWithContext={[]}
           onObjectFolderOrObjectsWithContextSelected={() => {}}
           isListLocked={true}

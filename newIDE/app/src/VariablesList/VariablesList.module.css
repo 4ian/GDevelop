@@ -8,14 +8,11 @@
   position: relative;
 }
 
-/* Holds the rows that are rendered, positioned at the first of them. */
-.renderedRows {
+/* Every row is positioned at `index * VARIABLE_ROW_HEIGHT` of the container. */
+.rowContainer {
   position: absolute;
   left: 0;
   right: 0;
-}
-
-.rowContainer {
   /* Leave a thin gap between two rows. */
   padding-bottom: 1px;
   box-sizing: border-box;

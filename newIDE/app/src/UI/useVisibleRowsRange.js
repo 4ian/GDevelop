@@ -178,9 +178,15 @@ export const useVisibleRowsRange = ({
         scrollingAncestor.scrollBy(0, rowTop - top);
       } else if (rowBottom > bottom) {
         scrollingAncestor.scrollBy(0, rowBottom - bottom);
+      } else {
+        return;
       }
+
+      // Take the new scroll position into account right away, so that the row
+      // is rendered without waiting for the scroll event to be handled.
+      updateVisibleRowsRange();
     },
-    [containerRef, rowHeight]
+    [containerRef, rowHeight, updateVisibleRowsRange]
   );
 
   return { visibleRowsRange, scrollRowIntoView };

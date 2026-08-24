@@ -107,7 +107,6 @@ const memoized = memoizeOne((initialValue, callback) => callback());
  * that are visible on screen: the position of a row is `index * this height`.
  */
 const VARIABLE_ROW_HEIGHT = 30;
-const rowContainerStyle = { height: VARIABLE_ROW_HEIGHT };
 const actionButtonStyle = { padding: 2 };
 
 /** Below this width, the name of the variable type is replaced by its icon only. */
@@ -175,6 +174,8 @@ type VariableRowProps = {|
   // Context:
   depth: number,
   indent: number,
+  /** Position of the row in the container holding all of them. */
+  top: number,
   hideTypeName: boolean,
   shouldHideExpandIcons: boolean,
   isExpanded: boolean,
@@ -228,6 +229,7 @@ const VariableRow = React.memo<VariableRowProps>(
   ({
     depth,
     indent,
+    top,
     hideTypeName,
     shouldHideExpandIcons,
     isExpanded,
@@ -292,7 +294,7 @@ const VariableRow = React.memo<VariableRowProps>(
       <div
         ref={containerRef}
         className={classes.rowContainer}
-        style={rowContainerStyle}
+        style={{ top, height: VARIABLE_ROW_HEIGHT }}
       >
         <DragSourceAndDropTarget
           beginDrag={() => {
@@ -372,11 +374,14 @@ const VariableRow = React.memo<VariableRowProps>(
                   <SimpleTextField
                     type="text"
                     ref={element => {
-                      if (element) {
+                      // The pointers of deleted variables get reused, so an
+                      // unmounted field must not be left behind.
+                      if (element)
                         variableNameInputRefs.current[
                           variablePointer
                         ] = element;
-                      }
+                      else
+                        delete variableNameInputRefs.current[variablePointer];
                     }}
                     directlyStoreValueChangesWhileEditing={
                       directlyStoreValueChangesWhileEditing
@@ -456,11 +461,15 @@ const VariableRow = React.memo<VariableRowProps>(
                     <div className={classes.valueField}>
                       <SimpleTextField
                         ref={element => {
-                          if (depth === 0 && element) {
+                          if (depth !== 0) return;
+                          if (element)
                             topLevelVariableValueInputRefs.current[
                               variablePointer
                             ] = element;
-                          }
+                          else
+                            delete topLevelVariableValueInputRefs.current[
+                              variablePointer
+                            ];
                         }}
                         type={type === gd.Variable.Number ? 'number' : 'text'}
                         directlyStoreValueChangesWhileEditing={
@@ -660,8 +669,6 @@ const VariablesList: React.ComponentType<{
   |}>({});
   // $FlowFixMe[incompatible-type] - Hard to fix issue regarding strict checking with interface.
   const refocusNameField = useRefocusField(variableNameInputRefs);
-  // $FlowFixMe[incompatible-type] - Hard to fix issue regarding strict checking with interface.
-  const refocusValueField = useRefocusField(topLevelVariableValueInputRefs);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
@@ -696,20 +703,22 @@ const VariablesList: React.ComponentType<{
       if (!variableContext.variable) {
         variableContext = getParentVariableContext(variableContext);
       }
-      if (variableContext.variable) {
-        refocusNameField({ identifier: variableContext.variable.ptr });
-      }
       const initialSelectedNodeId = variableContext.variable
         ? getNodeIdFromVariableContext(variableContext)
         : null;
       return initialSelectedNodeId ? [initialSelectedNodeId] : [];
     }
   );
-  // A variable that must be rendered and scrolled to, even if it's outside of
-  // the rows that are visible on screen: this is needed when a variable is
-  // added or initially selected, so that its name field can be focused.
-  const [nodeIdToReveal, setNodeIdToReveal] = React.useState<?string>(
-    () => selectedNodes[0] || null
+  // A variable that must be scrolled to - because it was just added, or is the
+  // one the editor was opened on - and the field of it to focus once it's
+  // displayed. Only the rows visible on screen are rendered, so the focus can
+  // only be given after the list scrolled to the variable.
+  const [variableToReveal, setVariableToReveal] = React.useState<?{|
+    nodeId: string,
+    fieldToFocus: 'name' | 'value' | null,
+    caretPosition?: ?number,
+  |}>(() =>
+    selectedNodes[0] ? { nodeId: selectedNodes[0], fieldToFocus: 'name' } : null
   );
   const setSelectedNodes = React.useCallback(
     (nodes: Array<string> | ((nodes: Array<string>) => Array<string>)) => {
@@ -1485,7 +1494,10 @@ const VariablesList: React.ComponentType<{
       );
       _onChange();
       setSelectedNodes([inheritedVariableName]);
-      setNodeIdToReveal(inheritedVariableName);
+      setVariableToReveal({
+        nodeId: inheritedVariableName,
+        fieldToFocus: null,
+      });
       newVariable.delete();
     },
     [
@@ -1509,7 +1521,7 @@ const VariablesList: React.ComponentType<{
         selectedNodes.some(node => node.startsWith(inheritedPrefix));
 
       if (addAtTopLevel) {
-        const { name: newName, variable } = insertInVariablesContainer(
+        const { name: newName } = insertInVariablesContainer(
           variablesContainer,
           'Variable',
           null,
@@ -1518,8 +1530,7 @@ const VariablesList: React.ComponentType<{
         );
         _onChange();
         setSelectedNodes([newName]);
-        setNodeIdToReveal(newName);
-        refocusNameField({ identifier: variable.ptr });
+        setVariableToReveal({ nodeId: newName, fieldToFocus: 'name' });
         return;
       }
 
@@ -1536,7 +1547,7 @@ const VariablesList: React.ComponentType<{
       } else {
         position = variablesContainer.getPosition(oldestAncestry.name) + 1;
       }
-      const { name: newName, variable } = insertInVariablesContainer(
+      const { name: newName } = insertInVariablesContainer(
         props.variablesContainer,
         'Variable',
         null,
@@ -1545,14 +1556,12 @@ const VariablesList: React.ComponentType<{
       );
       _onChange();
       setSelectedNodes([newName]);
-      setNodeIdToReveal(newName);
-      refocusNameField({ identifier: variable.ptr });
+      setVariableToReveal({ nodeId: newName, fieldToFocus: 'name' });
     },
     [
       _onChange,
       props.inheritedVariablesContainer,
       props.variablesContainer,
-      refocusNameField,
       selectedNodes,
       setSelectedNodes,
     ]
@@ -1761,8 +1770,9 @@ const VariablesList: React.ComponentType<{
         });
         const currentlyFocusedValueField =
           topLevelVariableValueInputRefs.current[changedInheritedVariable.ptr];
-        refocusValueField({
-          identifier: variable.ptr,
+        setVariableToReveal({
+          nodeId: name,
+          fieldToFocus: 'value',
           caretPosition: currentlyFocusedValueField
             ? currentlyFocusedValueField.getCaretPosition()
             : null,
@@ -1808,7 +1818,6 @@ const VariablesList: React.ComponentType<{
       forceUpdate,
       props.inheritedVariablesContainer,
       props.variablesContainer,
-      refocusValueField,
       setSelectedNodes,
     ]
   );
@@ -1836,22 +1845,62 @@ const VariablesList: React.ComponentType<{
     rowHeight: VARIABLE_ROW_HEIGHT,
   });
   const { firstRowIndex, afterLastRowIndex } = visibleRowsRange;
-  const rowIndexToReveal = nodeIdToReveal
-    ? flattenedVariables.findIndex(({ nodeId }) => nodeId === nodeIdToReveal)
-    : -1;
-  const shouldRenderRevealedRowApart =
-    rowIndexToReveal >= 0 &&
-    (rowIndexToReveal < firstRowIndex || rowIndexToReveal >= afterLastRowIndex);
 
+  const rowIndexToReveal = variableToReveal
+    ? flattenedVariables.findIndex(
+        ({ nodeId }) => nodeId === variableToReveal.nodeId
+      )
+    : -1;
+  const variablePointerToReveal =
+    rowIndexToReveal >= 0
+      ? flattenedVariables[rowIndexToReveal].variable.ptr
+      : 0;
+
+  // Scroll to the variable to reveal, then - once its row is rendered, which
+  // only happens after the scroll - focus the field of it to focus.
   React.useLayoutEffect(
     () => {
-      if (rowIndexToReveal < 0) return;
+      if (!variableToReveal) return;
+      if (rowIndexToReveal < 0) {
+        // The variable is gone (renamed, deleted, filtered out by a search...).
+        setVariableToReveal(null);
+        return;
+      }
+
       scrollRowIntoView(rowIndexToReveal);
-      // Only stop rendering the revealed row once it's part of the rows visible
-      // on screen, so that it never gets unmounted while being focused.
-      if (!shouldRenderRevealedRowApart) setNodeIdToReveal(null);
+      if (
+        rowIndexToReveal < firstRowIndex ||
+        rowIndexToReveal >= afterLastRowIndex
+      ) {
+        // Not rendered yet: wait for the scroll to be taken into account.
+        return;
+      }
+
+      const { fieldToFocus, caretPosition } = variableToReveal;
+      if (fieldToFocus) {
+        const fieldRefs =
+          fieldToFocus === 'name'
+            ? variableNameInputRefs
+            : topLevelVariableValueInputRefs;
+        const field = fieldRefs.current[variablePointerToReveal];
+        if (field) {
+          field.focus(
+            caretPosition === null || caretPosition === undefined
+              ? null
+              : { caretPosition }
+          );
+        }
+      }
+      setVariableToReveal(null);
     },
-    [rowIndexToReveal, shouldRenderRevealedRowApart, scrollRowIntoView]
+    [
+      variableToReveal,
+      rowIndexToReveal,
+      variablePointerToReveal,
+      scrollRowIntoView,
+      firstRowIndex,
+      afterLastRowIndex,
+    ]
   );
 
   const selectedNodesSet = React.useMemo(() => new Set(selectedNodes), [
@@ -1861,6 +1910,7 @@ const VariablesList: React.ComponentType<{
 
   const renderRow = (
     flattenedVariable: FlattenedVariable,
+    rowIndex: number,
     i18n: I18nType
   ): React.Node => {
     const {
@@ -1918,6 +1968,7 @@ const VariablesList: React.ComponentType<{
         key={nodeId}
         depth={depth}
         indent={getIndent({ depth, isNarrow, containerWidth })}
+        top={rowIndex * VARIABLE_ROW_HEIGHT}
         hideTypeName={hideTypeName}
         shouldHideExpandIcons={shouldHideExpandIcons}
         isExpanded={isExpanded}
@@ -2080,29 +2131,15 @@ const VariablesList: React.ComponentType<{
                               flattenedVariables.length * VARIABLE_ROW_HEIGHT,
                           }}
                         >
-                          <div
-                            className={classes.renderedRows}
-                            style={{ top: firstRowIndex * VARIABLE_ROW_HEIGHT }}
-                          >
-                            {flattenedVariables
-                              .slice(firstRowIndex, afterLastRowIndex)
-                              .map(flattenedVariable =>
-                                renderRow(flattenedVariable, i18n)
-                              )}
-                          </div>
-                          {shouldRenderRevealedRowApart && (
-                            <div
-                              className={classes.renderedRows}
-                              style={{
-                                top: rowIndexToReveal * VARIABLE_ROW_HEIGHT,
-                              }}
-                            >
-                              {renderRow(
-                                flattenedVariables[rowIndexToReveal],
+                          {flattenedVariables
+                            .slice(firstRowIndex, afterLastRowIndex)
+                            .map((flattenedVariable, index) =>
+                              renderRow(
+                                flattenedVariable,
+                                firstRowIndex + index,
                                 i18n
-                              )}
-                            </div>
-                          )}
+                              )
+                            )}
                         </div>
                         {!!undefinedVariableNames.length && (
                           <Paper background="dark" variant="outlined">

@@ -249,6 +249,7 @@ export type PreferencesValues = {|
   previewCrashReportUploadLevel: string,
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
+  gameplayTestFramePosition: {| left: number, bottom: number |} | null,
   showAiAskButtonInTitleBar: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
   automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
@@ -375,6 +376,10 @@ export type Preferences = {|
     orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
+  setGameplayTestFramePosition: (position: {|
+    left: number,
+    bottom: number,
+  |}) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
   setAutomaticallyApplyAiRequestEditsForProjectId: (
@@ -444,6 +449,7 @@ export const initialPreferences = {
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
+    gameplayTestFramePosition: null,
     showAiAskButtonInTitleBar: true,
     automaticallyUseCreditsForAiRequests: false,
     automaticallyApplyAiRequestEditsByProjectId: {},
@@ -533,6 +539,10 @@ export const initialPreferences = {
     orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
+  setGameplayTestFramePosition: (position: {|
+    left: number,
+    bottom: number,
+  |}) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
   setAutomaticallyApplyAiRequestEditsForProjectId: (

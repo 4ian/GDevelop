@@ -16,6 +16,7 @@ import {
   isGameplayTestStatusInProgress,
   type GameplayTestDisplayStatus,
 } from './GameplayTestStatusIndicator';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import classes from './GameplayTestFrame.module.css';
 
 /** The status of the run displayed on the gameplay test frame. */
@@ -86,10 +87,18 @@ export const GameplayTestFrameLayout = ({
   children,
 }: GameplayTestFrameLayoutProps): React.Node => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const [position, setPosition] = React.useState<Position>({
-    left: windowMargin,
-    bottom: windowMargin,
-  });
+  const { values, setGameplayTestFramePosition } = React.useContext(
+    PreferencesContext
+  );
+  // Restore the last position of the frame (it will be clamped to the window
+  // as soon as it is rendered, in case the window is now smaller).
+  const [position, setPosition] = React.useState<Position>(
+    () =>
+      values.gameplayTestFramePosition || {
+        left: windowMargin,
+        bottom: windowMargin,
+      }
+  );
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
   const dragOrigin = React.useRef<{|
     pointerId: number,
@@ -153,13 +162,17 @@ export const GameplayTestFrameLayout = ({
     );
   }, []);
 
-  const onPointerUp = React.useCallback((event: PointerEvent) => {
-    const origin = dragOrigin.current;
-    if (!origin || origin.pointerId !== event.pointerId) return;
+  const onPointerUp = React.useCallback(
+    (event: PointerEvent) => {
+      const origin = dragOrigin.current;
+      if (!origin || origin.pointerId !== event.pointerId) return;
 
-    dragOrigin.current = null;
-    setIsDragging(false);
-  }, []);
+      dragOrigin.current = null;
+      setIsDragging(false);
+      setGameplayTestFramePosition(position);
+    },
+    [position, setGameplayTestFramePosition]
+  );
 
   const isInProgress = runStatus
     ? isGameplayTestStatusInProgress(runStatus.status)

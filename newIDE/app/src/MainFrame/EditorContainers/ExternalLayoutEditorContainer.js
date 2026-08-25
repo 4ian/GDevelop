@@ -66,6 +66,11 @@ export class ExternalLayoutEditorContainer extends React.Component<
     externalPropertiesDialogOpen: false,
   };
 
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
+
   getProject(): ?gdProject {
     return this.props.project;
   }
@@ -94,7 +99,6 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 
   componentDidMount() {
-    this._rebuildProjectScopedContainersAccessor();
     if (this.props.isActive) {
       this._setPreviewedLayout();
     }

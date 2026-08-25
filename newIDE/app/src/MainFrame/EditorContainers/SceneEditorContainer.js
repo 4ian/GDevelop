@@ -30,6 +30,11 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   editor: ?SceneEditor;
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
+
   getProject(): ?gdProject {
     return this.props.project;
   }
@@ -55,7 +60,6 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   componentDidMount() {
-    this._rebuildProjectScopedContainersAccessor();
     if (this.props.isActive) {
       this._setPreviewedLayout();
     }

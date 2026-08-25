@@ -67,6 +67,11 @@ export class ExternalEventsEditorContainer extends React.Component<
     externalPropertiesDialogOpen: false,
   };
 
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
+
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
@@ -81,12 +86,12 @@ export class ExternalEventsEditorContainer extends React.Component<
       this.props.projectItemName !== prevProps.projectItemName ||
       this._associatedLayoutName !== associatedLayoutName
     ) {
+      this._associatedLayoutName = associatedLayoutName;
       this._rebuildProjectScopedContainersAccessor();
     }
   }
 
   componentDidMount() {
-    this._rebuildProjectScopedContainersAccessor();
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
@@ -237,7 +242,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     return project.getLayout(layoutName);
   }
 
-  getAssociatedLayoutName(): ?string {
+  getAssociatedLayoutName(): string | null {
     const { project } = this.props;
     if (!project) return null;
 

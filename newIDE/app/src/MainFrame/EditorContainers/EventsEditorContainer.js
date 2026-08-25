@@ -28,6 +28,11 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
   _scope: EventsScope | null = null;
 
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
+
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
@@ -48,7 +53,6 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   }
 
   componentDidMount() {
-    this._rebuildProjectScopedContainersAccessor();
     if (this.props.isActive) {
       this._setPreviewedLayout();
     }

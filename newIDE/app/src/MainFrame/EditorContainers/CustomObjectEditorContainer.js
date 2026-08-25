@@ -52,6 +52,11 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     gd.ObjectsContainer.Function
   );
 
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
+
   getProject(): ?gdProject {
     return this.props.project;
   }
@@ -77,7 +82,6 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   }
 
   componentDidMount() {
-    this._rebuildProjectScopedContainersAccessor();
     if (this.props.isActive) {
       this._setPreviewedLayout();
     }

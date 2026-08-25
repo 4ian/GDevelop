@@ -59,6 +59,8 @@ export class ExternalLayoutEditorContainer extends React.Component<
 > {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
+  _associatedLayoutName: string | null = null;
   // $FlowFixMe[missing-local-annot]
   state = {
     externalPropertiesDialogOpen: false,
@@ -79,7 +81,20 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return this.props.isActive || nextProps.isActive;
   }
 
+  componentDidUpdate(prevProps: RenderEditorContainerProps): void {
+    const associatedLayoutName = this.getAssociatedLayoutName();
+    if (
+      this.props.project !== prevProps.project ||
+      this.props.projectItemName !== prevProps.projectItemName ||
+      this._associatedLayoutName !== associatedLayoutName
+    ) {
+      this._associatedLayoutName = associatedLayoutName;
+      this._rebuildProjectScopedContainersAccessor();
+    }
+  }
+
   componentDidMount() {
+    this._rebuildProjectScopedContainersAccessor();
     if (this.props.isActive) {
       this._setPreviewedLayout();
     }
@@ -103,6 +118,22 @@ export class ExternalLayoutEditorContainer extends React.Component<
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
+  }
+
+  _rebuildProjectScopedContainersAccessor() {
+    const { project } = this.props;
+    if (project) {
+      // The scene can be null when users didn't choose an associated scene yet.
+      const scene = this.getLayout();
+      this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        {
+          project,
+          layout: scene,
+        }
+      );
+    } else {
+      this._projectScopedContainersAccessor = null;
+    }
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
@@ -300,7 +331,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return project.getLayout(layoutName);
   }
 
-  getAssociatedLayoutName(): ?string {
+  getAssociatedLayoutName(): string | null {
     const { project } = this.props;
     if (!project) return null;
 
@@ -326,6 +357,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       },
       () => this.updateToolbar()
     );
+    this._rebuildProjectScopedContainersAccessor();
     this.props.onExternalLayoutAssociationChanged();
   };
 
@@ -352,17 +384,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
 
-    if (!externalLayout || !project) {
+    if (!externalLayout || !project || !this._projectScopedContainersAccessor) {
       //TODO: Error component
       return <div>No external layout called {projectItemName} found!</div>;
     }
-
-    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      {
-        project,
-        layout,
-      }
-    );
 
     return (
       <div style={styles.container}>
@@ -381,7 +406,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             ref={editor => (this.editor = editor)}
             project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            projectScopedContainersAccessor={
+              this._projectScopedContainersAccessor
+            }
             layout={layout}
             externalLayout={externalLayout}
             eventsFunctionsExtension={null}

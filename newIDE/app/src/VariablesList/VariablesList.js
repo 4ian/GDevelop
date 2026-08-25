@@ -1565,6 +1565,7 @@ const VariablesList: React.ComponentType<{
           variablesContainer.count(),
           props.inheritedVariablesContainer
         );
+        console.log('addVariable', newName);
         _onChange();
         setSelectedNodes([newName]);
         refocusNameField({ identifier: variable.ptr });
@@ -1591,6 +1592,7 @@ const VariablesList: React.ComponentType<{
         position,
         props.inheritedVariablesContainer
       );
+      console.log('addVariable', newName);
       _onChange();
       setSelectedNodes([newName]);
       refocusNameField({ identifier: variable.ptr });

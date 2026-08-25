@@ -129,11 +129,13 @@ export const CompactObjectGroupPropertiesEditor = ({
   const groupVariablesContainer = React.useMemo(
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
-    () =>
-      gd.ObjectRefactorer.mergeVariableContainers(
+    () => {
+      console.log('mergeVariableContainers');
+      return gd.ObjectRefactorer.mergeVariableContainers(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         objectGroup
-      ),
+      );
+    },
     [objectGroup, projectScopedContainersAccessor]
   );
 

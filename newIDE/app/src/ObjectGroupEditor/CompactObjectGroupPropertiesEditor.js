@@ -260,9 +260,11 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
     const removeObject = React.useCallback(
       (objectName: string) => {
         objectGroup.removeObject(objectName);
+        // The variables common to the objects of the group may have changed.
+        forceRecomputeGroupVariablesContainer();
         forceUpdate();
       },
-      [forceUpdate, objectGroup]
+      [forceUpdate, forceRecomputeGroupVariablesContainer, objectGroup]
     );
 
     const addObject = React.useCallback(
@@ -290,11 +292,14 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
             behaviorName
           );
         }
+        // The variables common to the objects of the group may have changed.
+        forceRecomputeGroupVariablesContainer();
         forceUpdate();
       },
       [
         allVisibleBehaviorNames,
         forceUpdate,
+        forceRecomputeGroupVariablesContainer,
         globalObjectsContainer,
         groupVariablesContainer,
         objectGroup,

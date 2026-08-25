@@ -2,6 +2,7 @@
 import * as React from 'react';
 import Measure from 'react-measure';
 import memoizeOne from 'memoize-one';
+import classNames from 'classnames';
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { ClickAwayListener } from '@material-ui/core';
@@ -14,20 +15,18 @@ import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ButtonBase from '@material-ui/core/ButtonBase';
 
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import IconButton from '../UI/IconButton';
 import { DragHandleIcon } from '../UI/DragHandle';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
-import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import ScrollView from '../UI/ScrollView';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import { useVisibleRowsRange } from '../UI/useVisibleRowsRange';
 
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { mapFor } from '../Utils/MapFor';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
@@ -65,6 +64,10 @@ import {
   separator,
   updateListOfNodesFollowingChangeName,
 } from './VariableToTreeNodeHandling';
+import {
+  flattenVariablesContainers,
+  type FlattenedVariable,
+} from './FlattenVariables';
 
 import VariableTypeSelector from './VariableTypeSelector';
 import { CLIPBOARD_KIND } from './ClipboardKind';
@@ -86,6 +89,7 @@ import Paper from '../UI/Paper';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import classes from './VariablesList.module.css';
 
 const gd: libGDevelop = global.gd;
 
@@ -98,7 +102,35 @@ const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
 // $FlowFixMe[missing-local-annot]
 const memoized = memoizeOne((initialValue, callback) => callback());
 
-const styles = { inlineIcon: { padding: 0 }, handlePlaceholder: { width: 24 } };
+/**
+ * Every row has this exact height, which is what allows to render only the rows
+ * that are visible on screen: the position of a row is `index * this height`.
+ */
+const VARIABLE_ROW_HEIGHT = 30;
+const actionButtonStyle = { padding: 2 };
+
+/**
+ * Below this width, the rows are laid out more tightly: a smaller indentation,
+ * and the type of a variable displayed as its icon only.
+ */
+const MIN_WIDTH_FOR_WIDE_ROWS = 450;
+/** Below this width, the toolbar shows icons instead of labelled buttons. */
+const MIN_WIDTH_FOR_TOOLBAR_LABELS = 650;
+
+const getIndent = ({
+  depth,
+  hasNarrowRows,
+  containerWidth,
+}: {|
+  depth: number,
+  hasNarrowRows: boolean,
+  containerWidth: ?number,
+|}): number =>
+  Math.min(
+    depth * (hasNarrowRows ? 12 : 20),
+    // Never let the indentation eat too much of the available width.
+    containerWidth ? Math.round(0.3 * containerWidth) : 200
+  );
 
 export type HistoryHandler = {|
   saveToHistory: () => void,
@@ -143,15 +175,13 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const variableRowStyles = {
-  chevron: { width: 15, alignSelf: 'stretch' },
-};
-
 type VariableRowProps = {|
   // Context:
   depth: number,
-  isNarrow: boolean,
-  containerWidth: ?number,
+  indent: number,
+  /** Position of the row in the container holding all of them. */
+  top: number,
+  hideTypeName: boolean,
   shouldHideExpandIcons: boolean,
   isExpanded: boolean,
   onExpand: (shouldExpand: boolean, nodeId: string) => void,
@@ -179,7 +209,7 @@ type VariableRowProps = {|
 
   // Variable information:
   onChangeName: (string, string, reason: 'blur' | 'change') => void,
-  overwritesInheritedVariable: boolean | void,
+  overwritesInheritedVariable: boolean,
   name: string,
   index: number,
   isTopLevel: boolean,
@@ -187,7 +217,7 @@ type VariableRowProps = {|
   typeErrorMessage: MessageDescriptor | null,
   onChangeType: (string, nodeId: string) => void,
   isLoopIndexVariable: boolean,
-  onRemoveLoopIndexVariable: () => void,
+  removeLoopIndexVariable: (nodeId: string) => void,
   hasMixedValues: boolean,
   valueAsString: string | null,
   valueAsBool: boolean | null,
@@ -203,8 +233,9 @@ type VariableRowProps = {|
 const VariableRow = React.memo<VariableRowProps>(
   ({
     depth,
-    isNarrow,
-    containerWidth,
+    indent,
+    top,
+    hideTypeName,
     shouldHideExpandIcons,
     isExpanded,
     onExpand,
@@ -230,7 +261,7 @@ const VariableRow = React.memo<VariableRowProps>(
     type,
     typeErrorMessage,
     isLoopIndexVariable,
-    onRemoveLoopIndexVariable,
+    removeLoopIndexVariable,
     onChangeType,
     hasMixedValues,
     valueAsString,
@@ -248,17 +279,6 @@ const VariableRow = React.memo<VariableRowProps>(
     const [whereToDrop, setWhereToDrop] = React.useState<'before' | 'after'>(
       'before'
     );
-    const shouldWrap =
-      isNarrow ||
-      (!containerWidth
-        ? false
-        : containerWidth <= 750
-        ? depth >= 5
-        : containerWidth <= 850
-        ? depth >= 6
-        : containerWidth <= 950
-        ? depth >= 7
-        : depth >= 8);
     const [editInMultilineEditor, setEditInMultilineEditor] = React.useState(
       false
     );
@@ -276,7 +296,11 @@ const VariableRow = React.memo<VariableRowProps>(
     }, []);
 
     return (
-      <div ref={containerRef}>
+      <div
+        ref={containerRef}
+        className={classes.rowContainer}
+        style={{ top, height: VARIABLE_ROW_HEIGHT }}
+      >
         <DragSourceAndDropTarget
           beginDrag={() => {
             draggedNodeId.current = nodeId;
@@ -307,13 +331,11 @@ const VariableRow = React.memo<VariableRowProps>(
           {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
             connectDropTarget(
               <div
-                style={{
-                  marginLeft: (isNarrow ? 16 : 32) * depth,
-                  backgroundColor: isSelected
-                    ? gdevelopTheme.listItem.selectedBackgroundColor
-                    : gdevelopTheme.list.itemsBackgroundColor,
-                  marginBottom: 1,
-                }}
+                className={classNames({
+                  [classes.row]: true,
+                  [classes.selected]: isSelected,
+                })}
+                style={{ marginLeft: indent }}
                 aria-selected={isSelected}
                 aria-expanded={isExpanded}
                 onPointerUp={event => {
@@ -329,310 +351,240 @@ const VariableRow = React.memo<VariableRowProps>(
                   }
                 }}
               >
-                {isOver && whereToDrop === 'before' && (
-                  <DropIndicator canDrop={canDrop} />
-                )}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: isNarrow ? '4px 4px 4px 0px' : '6px 30px 6px 6px',
-                  }}
-                >
-                  {shouldHideExpandIcons ? null : isCollection ? (
-                    <ButtonBase
-                      onClick={() => onExpand(!isExpanded, nodeId)}
-                      focusRipple
-                      style={variableRowStyles.chevron}
-                    >
-                      {isExpanded ? (
-                        <ChevronArrowBottom />
-                      ) : (
-                        <ChevronArrowRight />
-                      )}
-                    </ButtonBase>
-                  ) : (
-                    <div style={variableRowStyles.chevron} />
-                  )}
-
-                  {isInherited ? (
-                    <span style={styles.handlePlaceholder} />
-                  ) : (
-                    connectDragSource(
-                      <span>
-                        <DragHandleIcon
-                          color={
-                            isSelected
-                              ? gdevelopTheme.listItem.selectedTextColor
-                              : '#AAA'
-                          }
-                        />
-                      </span>
-                    )
-                  )}
-                  <ResponsiveLineStackLayout
-                    expand
-                    noMargin
-                    forceMobileLayout={shouldWrap}
+                {shouldHideExpandIcons ? null : isCollection ? (
+                  <ButtonBase
+                    onClick={() => onExpand(!isExpanded, nodeId)}
+                    focusRipple
+                    className={classes.chevron}
                   >
-                    <Line alignItems="center" noMargin expand>
-                      {shouldWrap ? null : <Spacer />}
+                    {isExpanded ? (
+                      <ChevronArrowBottom />
+                    ) : (
+                      <ChevronArrowRight />
+                    )}
+                  </ButtonBase>
+                ) : (
+                  <span className={classes.chevron} />
+                )}
+                {isInherited || isLoopIndexVariable ? (
+                  <span className={classes.dragHandle} />
+                ) : (
+                  connectDragSource(
+                    <span className={classes.dragHandle}>
+                      <DragHandleIcon color="inherit" />
+                    </span>
+                  )
+                )}
+                <div className={classes.nameField}>
+                  <SimpleTextField
+                    type="text"
+                    ref={element => {
+                      // The pointers of deleted variables get reused, so an
+                      // unmounted field must not be left behind.
+                      if (element)
+                        variableNameInputRefs.current[
+                          variablePointer
+                        ] = element;
+                      else
+                        delete variableNameInputRefs.current[variablePointer];
+                    }}
+                    directlyStoreValueChangesWhileEditing={
+                      directlyStoreValueChangesWhileEditing
+                    }
+                    disabled={
+                      isNameLocked ||
+                      isInherited ||
+                      parentType === gd.Variable.Array
+                    }
+                    onChange={onChangeName}
+                    additionalContext={JSON.stringify({ nodeId, depth })}
+                    italic={overwritesInheritedVariable}
+                    value={name}
+                    id={`variable-${index}-name`}
+                  />
+                </div>
+                <div className={classes.rowRightSide} style={rowRightSideStyle}>
+                  <div
+                    className={classNames({
+                      [classes.typeSelector]: true,
+                      [classes.withTypeName]: !hideTypeName,
+                    })}
+                  >
+                    <VariableTypeSelector
+                      variableType={
+                        isLoopIndexVariable ? gd.Variable.Number : type
+                      }
+                      onChange={onChangeType}
+                      nodeId={nodeId}
+                      hideTypeName={hideTypeName}
+                      readOnlyWithIcon={
+                        isInherited || overwritesInheritedVariable
+                      }
+                      id={`variable-${index}-type`}
+                      errorMessage={typeErrorMessage}
+                      disabled={isTypeLocked || isLoopIndexVariable}
+                    />
+                  </div>
+                  {isLoopIndexVariable ? (
+                    <span className={classes.valueLabel}>
+                      <Trans>Counter of the loop</Trans>
+                    </span>
+                  ) : type === gd.Variable.Boolean ? (
+                    <>
+                      <span className={classes.valueLabel}>
+                        {hasMixedValues ? (
+                          <Trans>Mixed values</Trans>
+                        ) : valueAsBool ? (
+                          <Trans>True</Trans>
+                        ) : (
+                          <Trans>False</Trans>
+                        )}
+                      </span>
+                      {isInherited && !isTopLevel ? null : (
+                        // $FlowFixMe[incompatible-type]
+                        <IconButton
+                          size="small"
+                          color="inherit"
+                          className={classes.actionButton}
+                          style={actionButtonStyle}
+                          onClick={() => {
+                            onChangeValue(
+                              !valueAsBool ? 'true' : 'false',
+                              nodeId
+                            );
+                            forceUpdate();
+                          }}
+                          tooltip={
+                            !valueAsBool ? t`Set to true` : t`Set to false`
+                          }
+                        >
+                          <SwitchHorizontal />
+                        </IconButton>
+                      )}
+                    </>
+                  ) : (
+                    <div className={classes.valueField}>
                       <SimpleTextField
-                        type="text"
                         ref={element => {
-                          if (element) {
-                            variableNameInputRefs.current[
+                          if (depth !== 0) return;
+                          if (element)
+                            topLevelVariableValueInputRefs.current[
                               variablePointer
                             ] = element;
-                          }
+                          else
+                            delete topLevelVariableValueInputRefs.current[
+                              variablePointer
+                            ];
                         }}
+                        type={type === gd.Variable.Number ? 'number' : 'text'}
                         directlyStoreValueChangesWhileEditing={
                           directlyStoreValueChangesWhileEditing
                         }
+                        key="value"
                         disabled={
-                          isNameLocked ||
-                          isInherited ||
-                          parentType === gd.Variable.Array
+                          type === gd.Variable.MixedTypes ||
+                          isCollection ||
+                          (isInherited && !isTopLevel) ||
+                          hasLineBreaks
                         }
-                        onChange={onChangeName}
-                        additionalContext={JSON.stringify({ nodeId, depth })}
-                        italic={!!overwritesInheritedVariable}
-                        value={name}
-                        id={`variable-${index}-name`}
+                        hint={hasMixedValues ? i18n._(t`Mixed values`) : ''}
+                        onChange={onChangeValue}
+                        value={
+                          hasMixedValues
+                            ? ''
+                            : // If line breaks are present, disable the field (as it's
+                            // single line only) and make line breaks visible.
+                            hasLineBreaks
+                            ? (valueAsString || '').replace(/\n/g, '↵')
+                            : valueAsString || ''
+                        }
+                        additionalContext={nodeId}
+                        id={`variable-${index}-text-value`}
                       />
-                      <Spacer />
-                    </Line>
-                    <div style={shouldWrap ? undefined : rowRightSideStyle}>
-                      <Line noMargin alignItems="center">
-                        <Column noMargin>
-                          <VariableTypeSelector
-                            variableType={
-                              isLoopIndexVariable ? gd.Variable.Number : type
-                            }
-                            onChange={onChangeType}
-                            nodeId={nodeId}
-                            isHighlighted={isSelected}
-                            readOnlyWithIcon={
-                              isInherited || overwritesInheritedVariable
-                            }
-                            id={`variable-${index}-type`}
-                            errorMessage={typeErrorMessage}
-                            disabled={isTypeLocked || isLoopIndexVariable}
-                          />
-                        </Column>
-                        <Column expand>
-                          {isLoopIndexVariable ? (
-                            <Line noMargin alignItems="center">
-                              <span
-                                style={
-                                  isSelected
-                                    ? {
-                                        color:
-                                          gdevelopTheme.listItem
-                                            .selectedTextColor,
-                                      }
-                                    : undefined
-                                }
-                              >
-                                <Text
-                                  displayInlineAsSpan
-                                  noMargin
-                                  color="inherit"
-                                >
-                                  <Trans>Counter of the loop</Trans>
-                                </Text>
-                              </span>
-                            </Line>
-                          ) : type === gd.Variable.Boolean ? (
-                            <Line noMargin alignItems="center">
-                              <span
-                                style={
-                                  isSelected
-                                    ? {
-                                        color:
-                                          gdevelopTheme.listItem
-                                            .selectedTextColor,
-                                      }
-                                    : undefined
-                                }
-                              >
-                                <Text
-                                  displayInlineAsSpan
-                                  noMargin
-                                  color="inherit"
-                                >
-                                  {hasMixedValues ? (
-                                    <Trans>Mixed values</Trans>
-                                  ) : valueAsBool ? (
-                                    <Trans>True</Trans>
-                                  ) : (
-                                    <Trans>False</Trans>
-                                  )}
-                                </Text>
-                              </span>
-                              {isInherited && !isTopLevel ? null : (
-                                <>
-                                  <Spacer />
-                                  {/* $FlowFixMe[incompatible-type] */}
-                                  <IconButton
-                                    size="small"
-                                    style={styles.inlineIcon}
-                                    onClick={() => {
-                                      onChangeValue(
-                                        !valueAsBool ? 'true' : 'false',
-                                        nodeId
-                                      );
-                                      forceUpdate();
-                                    }}
-                                    tooltip={
-                                      !valueAsBool
-                                        ? t`Set to true`
-                                        : t`Set to false`
-                                    }
-                                  >
-                                    <SwitchHorizontal
-                                      htmlColor={
-                                        isSelected
-                                          ? gdevelopTheme.listItem
-                                              .selectedTextColor
-                                          : undefined
-                                      }
-                                    />
-                                  </IconButton>
-                                </>
-                              )}
-                            </Line>
-                          ) : (
-                            <SimpleTextField
-                              ref={element => {
-                                if (depth === 0 && element) {
-                                  topLevelVariableValueInputRefs.current[
-                                    variablePointer
-                                  ] = element;
-                                }
-                              }}
-                              type={
-                                type === gd.Variable.Number ? 'number' : 'text'
-                              }
-                              directlyStoreValueChangesWhileEditing={
-                                directlyStoreValueChangesWhileEditing
-                              }
-                              key="value"
-                              disabled={
-                                type === gd.Variable.MixedTypes ||
-                                isCollection ||
-                                (isInherited && !isTopLevel) ||
-                                hasLineBreaks
-                              }
-                              hint={
-                                hasMixedValues ? i18n._(t`Mixed values`) : ''
-                              }
-                              onChange={onChangeValue}
-                              value={
-                                hasMixedValues
-                                  ? ''
-                                  : // If line breaks are present, disable the field (as it's
-                                  // single line only) and make line breaks visible.
-                                  hasLineBreaks
-                                  ? (valueAsString || '').replace(/\n/g, '↵')
-                                  : valueAsString || ''
-                              }
-                              additionalContext={nodeId}
-                              id={`variable-${index}-text-value`}
-                            />
-                          )}
-                        </Column>
-                        {// Only show the large edit button for string variables,
-                        // and not for those who are in an inherited structure or array.
-                        type === gd.Variable.String &&
-                        !(isInherited && !isTopLevel) ? (
-                          // $FlowFixMe[incompatible-type]
-                          <IconButton
-                            size="small"
-                            style={styles.inlineIcon}
-                            tooltip={t`Open in a larger editor`}
-                            onClick={event => {
-                              stopEventPropagation(event);
-                              setEditInMultilineEditor(true);
-                            }}
-                          >
-                            <Edit
-                              htmlColor={
-                                isSelected
-                                  ? gdevelopTheme.listItem.selectedTextColor
-                                  : undefined
-                              }
-                            />
-                          </IconButton>
-                        ) : null}
-                        {isCollection && !isInherited ? (
-                          // $FlowFixMe[incompatible-type]
-                          <IconButton
-                            size="small"
-                            style={styles.inlineIcon}
-                            tooltip={t`Add child`}
-                            onClick={event => {
-                              stopEventPropagation(event);
-                              onAddChild(nodeId);
-                            }}
-                          >
-                            <Add
-                              htmlColor={
-                                isSelected
-                                  ? gdevelopTheme.listItem.selectedTextColor
-                                  : undefined
-                              }
-                            />
-                          </IconButton>
-                        ) : null}
-                        {isCollection && isInherited && isTopLevel ? (
-                          // $FlowFixMe[incompatible-type]
-                          <IconButton
-                            size="small"
-                            tooltip={t`Edit`}
-                            style={styles.inlineIcon}
-                            onClick={event => {
-                              stopEventPropagation(event);
-                              editInheritedVariable(nodeId);
-                            }}
-                          >
-                            <Edit
-                              htmlColor={
-                                isSelected
-                                  ? gdevelopTheme.listItem.selectedTextColor
-                                  : undefined
-                              }
-                            />
-                          </IconButton>
-                        ) : null}
-                        {overwritesInheritedVariable && isTopLevel ? (
-                          // $FlowFixMe[incompatible-type]
-                          <IconButton
-                            size="small"
-                            tooltip={t`Reset`}
-                            style={styles.inlineIcon}
-                            onClick={event => {
-                              stopEventPropagation(event);
-                              deleteNode(nodeId);
-                            }}
-                          >
-                            <Undo
-                              htmlColor={
-                                isSelected
-                                  ? gdevelopTheme.listItem.selectedTextColor
-                                  : undefined
-                              }
-                            />
-                          </IconButton>
-                        ) : null}
-                      </Line>
                     </div>
-                  </ResponsiveLineStackLayout>
+                  )}
+                  {// Only show the large edit button for string variables,
+                  // and not for those who are in an inherited structure or array.
+                  type === gd.Variable.String &&
+                  !(isInherited && !isTopLevel) ? (
+                    // $FlowFixMe[incompatible-type]
+                    <IconButton
+                      size="small"
+                      color="inherit"
+                      className={classes.actionButton}
+                      style={actionButtonStyle}
+                      tooltip={t`Open in a larger editor`}
+                      onClick={event => {
+                        stopEventPropagation(event);
+                        setEditInMultilineEditor(true);
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  ) : null}
+                  {isCollection && !isInherited ? (
+                    // $FlowFixMe[incompatible-type]
+                    <IconButton
+                      size="small"
+                      color="inherit"
+                      className={classes.actionButton}
+                      style={actionButtonStyle}
+                      tooltip={t`Add child`}
+                      onClick={event => {
+                        stopEventPropagation(event);
+                        onAddChild(nodeId);
+                      }}
+                    >
+                      <Add />
+                    </IconButton>
+                  ) : null}
+                  {isCollection && isInherited && isTopLevel ? (
+                    // $FlowFixMe[incompatible-type]
+                    <IconButton
+                      size="small"
+                      color="inherit"
+                      className={classes.actionButton}
+                      style={actionButtonStyle}
+                      tooltip={t`Edit`}
+                      onClick={event => {
+                        stopEventPropagation(event);
+                        editInheritedVariable(nodeId);
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  ) : null}
+                  {overwritesInheritedVariable && isTopLevel ? (
+                    // $FlowFixMe[incompatible-type]
+                    <IconButton
+                      size="small"
+                      color="inherit"
+                      className={classes.actionButton}
+                      style={actionButtonStyle}
+                      tooltip={t`Reset`}
+                      onClick={event => {
+                        stopEventPropagation(event);
+                        deleteNode(nodeId);
+                      }}
+                    >
+                      <Undo />
+                    </IconButton>
+                  ) : null}
                 </div>
-                {isOver && whereToDrop === 'after' && (
-                  <DropIndicator canDrop={canDrop} />
+                {isOver && (
+                  <div
+                    className={classNames({
+                      [classes.dropIndicator]: true,
+                      [classes.dropIndicatorBefore]: whereToDrop === 'before',
+                      [classes.dropIndicatorAfter]: whereToDrop === 'after',
+                    })}
+                    style={{
+                      backgroundColor: canDrop
+                        ? gdevelopTheme.dropIndicator.canDrop
+                        : gdevelopTheme.dropIndicator.cannotDrop,
+                    }}
+                  />
                 )}
-
                 {editInMultilineEditor && (
                   <MultilineVariableEditorDialog
                     initialValue={valueAsString || ''}
@@ -649,7 +601,7 @@ const VariableRow = React.memo<VariableRowProps>(
                     buildMenuTemplate={i18n => [
                       {
                         label: i18n._(t`Remove this counter of the loop`),
-                        click: onRemoveLoopIndexVariable,
+                        click: () => removeLoopIndexVariable(nodeId),
                       },
                     ]}
                   />
@@ -722,8 +674,6 @@ const VariablesList: React.ComponentType<{
   |}>({});
   // $FlowFixMe[incompatible-type] - Hard to fix issue regarding strict checking with interface.
   const refocusNameField = useRefocusField(variableNameInputRefs);
-  // $FlowFixMe[incompatible-type] - Hard to fix issue regarding strict checking with interface.
-  const refocusValueField = useRefocusField(topLevelVariableValueInputRefs);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
@@ -758,14 +708,22 @@ const VariablesList: React.ComponentType<{
       if (!variableContext.variable) {
         variableContext = getParentVariableContext(variableContext);
       }
-      if (variableContext.variable) {
-        refocusNameField({ identifier: variableContext.variable.ptr });
-      }
       const initialSelectedNodeId = variableContext.variable
         ? getNodeIdFromVariableContext(variableContext)
         : null;
       return initialSelectedNodeId ? [initialSelectedNodeId] : [];
     }
+  );
+  // A variable that must be scrolled to - because it was just added, or is the
+  // one the editor was opened on - and the field of it to focus once it's
+  // displayed. Only the rows visible on screen are rendered, so the focus can
+  // only be given after the list scrolled to the variable.
+  const [variableToReveal, setVariableToReveal] = React.useState<?{|
+    nodeId: string,
+    fieldToFocus: 'name' | 'value' | null,
+    caretPosition?: ?number,
+  |}>(() =>
+    selectedNodes[0] ? { nodeId: selectedNodes[0], fieldToFocus: 'name' } : null
   );
   const setSelectedNodes = React.useCallback(
     (nodes: Array<string> | ((nodes: Array<string>) => Array<string>)) => {
@@ -817,18 +775,24 @@ const VariablesList: React.ComponentType<{
       ? !hasVariablesContainerSubChildren(aliveInheritedVariablesContainer)
       : true);
 
+  const isToolbarNarrow =
+    props.size === 'compact' ||
+    (containerWidth ? containerWidth < MIN_WIDTH_FOR_TOOLBAR_LABELS : false);
+  // The properties panel can be resized, so how the rows are laid out is based
+  // on the width the list actually has, not on it being a compact one.
+  const hasNarrowRows = containerWidth
+    ? containerWidth < MIN_WIDTH_FOR_WIDE_ROWS
+    : props.size === 'compact';
   const rowRightSideStyle = React.useMemo(
     () => ({
-      minWidth: containerWidth ? Math.round(0.6 * containerWidth) : 600,
+      // A fixed width keeps the types and the values aligned, whatever the
+      // indentation of the row is.
+      width: containerWidth
+        ? Math.round((hasNarrowRows ? 0.5 : 0.6) * containerWidth)
+        : 400,
       flexShrink: 0,
     }),
-    [containerWidth]
-  );
-  const isNarrow = React.useMemo(
-    () =>
-      props.size === 'compact' ||
-      (containerWidth ? containerWidth < 650 : false),
-    [containerWidth, props.size]
+    [containerWidth, hasNarrowRows]
   );
 
   const undefinedVariableNames =
@@ -1535,6 +1499,10 @@ const VariablesList: React.ComponentType<{
       );
       _onChange();
       setSelectedNodes([inheritedVariableName]);
+      setVariableToReveal({
+        nodeId: inheritedVariableName,
+        fieldToFocus: null,
+      });
       newVariable.delete();
     },
     [
@@ -1558,7 +1526,7 @@ const VariablesList: React.ComponentType<{
         selectedNodes.some(node => node.startsWith(inheritedPrefix));
 
       if (addAtTopLevel) {
-        const { name: newName, variable } = insertInVariablesContainer(
+        const { name: newName } = insertInVariablesContainer(
           variablesContainer,
           'Variable',
           null,
@@ -1567,7 +1535,7 @@ const VariablesList: React.ComponentType<{
         );
         _onChange();
         setSelectedNodes([newName]);
-        refocusNameField({ identifier: variable.ptr });
+        setVariableToReveal({ nodeId: newName, fieldToFocus: 'name' });
         return;
       }
 
@@ -1584,7 +1552,7 @@ const VariablesList: React.ComponentType<{
       } else {
         position = variablesContainer.getPosition(oldestAncestry.name) + 1;
       }
-      const { name: newName, variable } = insertInVariablesContainer(
+      const { name: newName } = insertInVariablesContainer(
         props.variablesContainer,
         'Variable',
         null,
@@ -1593,13 +1561,12 @@ const VariablesList: React.ComponentType<{
       );
       _onChange();
       setSelectedNodes([newName]);
-      refocusNameField({ identifier: variable.ptr });
+      setVariableToReveal({ nodeId: newName, fieldToFocus: 'name' });
     },
     [
       _onChange,
       props.inheritedVariablesContainer,
       props.variablesContainer,
-      refocusNameField,
       selectedNodes,
       setSelectedNodes,
     ]
@@ -1629,198 +1596,6 @@ const VariablesList: React.ComponentType<{
     },
     [setSelectedNodes]
   );
-
-  const renderVariableAndChildrenRows = (
-    {
-      name,
-      variable,
-      parentNodeId,
-      parentVariable,
-      isInherited,
-      index,
-    }: {|
-      name: string,
-      variable: gdVariable,
-      parentNodeId?: string,
-      parentVariable?: gdVariable,
-      isInherited: boolean,
-      index: number,
-    |},
-    i18n: I18nType
-  ): Array<React.Node> => {
-    const isCollection = isCollectionVariable(variable);
-    const type = variable.getType();
-    const isExpanded = !variable.isFolded();
-    const variablePointer = variable.ptr;
-
-    const depth = parentNodeId ? parentNodeId.split(separator).length : 0;
-    const isTopLevel = depth === 0;
-
-    let nodeId;
-    if (!parentNodeId) {
-      if (isInherited) {
-        nodeId = `${inheritedPrefix}${name}`;
-      } else {
-        nodeId = name;
-      }
-    } else {
-      nodeId = `${parentNodeId}${separator}${name}`;
-    }
-    const parentType = parentVariable ? parentVariable.getType() : null;
-    const isSelected = selectedNodes.includes(nodeId);
-    const isLoopIndexVariable =
-      !isInherited &&
-      isTopLevel &&
-      !!currentIndexVariableName &&
-      name === currentIndexVariableName;
-    const overwritesInheritedVariable =
-      isTopLevel &&
-      !isInherited &&
-      !!aliveInheritedVariablesContainer &&
-      aliveInheritedVariablesContainer.has(name);
-
-    const typeErrorMessage =
-      parentType === gd.Variable.Array &&
-      parentVariable &&
-      parentVariable.getChildrenCount() > 1 &&
-      parentVariable.getAtIndex(0).getType() !== type
-        ? i18n._(t`Every child of an array must be the same type.`)
-        : null;
-
-    if (!!searchText) {
-      if (
-        !(
-          searchMatchingNodes.includes(nodeId) ||
-          searchMatchingNodes.some(matchingNodeId =>
-            matchingNodeId.startsWith(nodeId)
-          ) ||
-          searchMatchingNodes.some(matchingNodeId =>
-            nodeId.startsWith(matchingNodeId + separator)
-          )
-        )
-      ) {
-        // Display node if one of these is true:
-        // - node is in the list of nodes matching search
-        // - node is an ancestor of a node in the list of nodes matching search
-        // - node is a descendant of a node in the list of nodes matching search
-        return [];
-      }
-    }
-
-    const hasMixedValues = variable.hasMixedValues();
-    const valueAsString = isCollection
-      ? i18n._(
-          variable.getChildrenCount() === 0
-            ? t`No children`
-            : variable.getChildrenCount() === 1
-            ? t`1 child`
-            : t`${variable.getChildrenCount()} children`
-        )
-      : type === gd.Variable.String
-      ? variable.getString()
-      : type === gd.Variable.Number
-      ? variable.getValue().toString()
-      : null;
-
-    const valueAsBool =
-      type === gd.Variable.Boolean ? variable.getBool() : null;
-
-    const variableRow = (
-      <VariableRow
-        key={nodeId}
-        depth={depth}
-        isNarrow={isNarrow}
-        containerWidth={containerWidth}
-        shouldHideExpandIcons={shouldHideExpandIcons}
-        isExpanded={isExpanded}
-        onExpand={onExpand}
-        draggedNodeId={draggedNodeId}
-        nodeId={nodeId}
-        isInherited={isInherited}
-        isNameLocked={props.isListLocked && isTopLevel}
-        isTypeLocked={props.isListLocked && isTopLevel}
-        canDrop={canDrop}
-        dropNode={dropNode}
-        isSelected={isSelected}
-        onSelect={onSelect}
-        gdevelopTheme={gdevelopTheme}
-        variableNameInputRefs={variableNameInputRefs}
-        topLevelVariableValueInputRefs={topLevelVariableValueInputRefs}
-        parentType={parentType}
-        onChangeName={onChangeName}
-        overwritesInheritedVariable={overwritesInheritedVariable}
-        name={name}
-        index={index}
-        rowRightSideStyle={rowRightSideStyle}
-        isTopLevel={isTopLevel}
-        type={type}
-        typeErrorMessage={typeErrorMessage}
-        isLoopIndexVariable={isLoopIndexVariable}
-        onRemoveLoopIndexVariable={() => removeLoopIndexVariable(nodeId)}
-        variablePointer={variablePointer}
-        onChangeType={onChangeType}
-        hasMixedValues={hasMixedValues}
-        valueAsString={valueAsString}
-        valueAsBool={valueAsBool}
-        onChangeValue={onChangeValue}
-        isCollection={isCollection}
-        onAddChild={onAddChild}
-        editInheritedVariable={editInheritedVariable}
-        deleteNode={deleteNode}
-        directlyStoreValueChangesWhileEditing={
-          !!props.directlyStoreValueChangesWhileEditing
-        }
-        i18n={i18n}
-      />
-    );
-
-    if (type === gd.Variable.Structure) {
-      return [
-        variableRow,
-        ...(isExpanded
-          ? variable
-              .getAllChildrenNames()
-              .toJSArray()
-              .map((childName, index) => {
-                const childVariable = variable.getChild(childName);
-                return renderVariableAndChildrenRows(
-                  {
-                    name: childName,
-                    variable: childVariable,
-                    parentNodeId: nodeId,
-                    parentVariable: variable,
-                    isInherited,
-                    index,
-                  },
-                  i18n
-                );
-              })
-          : []),
-      ];
-    } else if (type === gd.Variable.Array) {
-      return [
-        variableRow,
-        ...(isExpanded
-          ? mapFor(0, variable.getChildrenCount(), index => {
-              const childVariable = variable.getAtIndex(index);
-              return renderVariableAndChildrenRows(
-                {
-                  name: index.toString(),
-                  variable: childVariable,
-                  parentNodeId: nodeId,
-                  parentVariable: variable,
-                  isInherited,
-                  index,
-                },
-                i18n
-              );
-            })
-          : []),
-      ];
-    } else {
-      return [variableRow];
-    }
-  };
 
   const onChangeName = React.useCallback(
     (newName: string, additionalContext: any, reason: 'blur' | 'change') => {
@@ -2000,8 +1775,9 @@ const VariablesList: React.ComponentType<{
         });
         const currentlyFocusedValueField =
           topLevelVariableValueInputRefs.current[changedInheritedVariable.ptr];
-        refocusValueField({
-          identifier: variable.ptr,
+        setVariableToReveal({
+          nodeId: name,
+          fieldToFocus: 'value',
           caretPosition: currentlyFocusedValueField
             ? currentlyFocusedValueField.getCaretPosition()
             : null,
@@ -2047,47 +1823,200 @@ const VariablesList: React.ComponentType<{
       forceUpdate,
       props.inheritedVariablesContainer,
       props.variablesContainer,
-      refocusValueField,
       setSelectedNodes,
     ]
   );
 
-  const renderTree = (i18n: I18nType, isInherited: boolean = false) => {
-    // $FlowFixMe[missing-empty-array-annot]
-    const allRows = [];
-    const variablesContainer =
-      isInherited && aliveInheritedVariablesContainer
-        ? aliveInheritedVariablesContainer
-        : aliveVariablesContainer;
-    if (!variablesContainer) return allRows;
-    mapFor(0, variablesContainer.count(), index => {
-      const variable = variablesContainer.getAt(index);
-      const name = variablesContainer.getNameAt(index);
-      if (isInherited) {
-        if (aliveVariablesContainer && aliveVariablesContainer.has(name)) {
-          return null;
-        }
-      }
-
-      // $FlowFixMe[incompatible-type]
-      allRows.push(
-        ...renderVariableAndChildrenRows(
-          {
-            name,
-            variable,
-            isInherited,
-            index,
-          },
-          i18n
-        )
-      );
-    });
-    return allRows;
-  };
-
   React.useImperativeHandle(ref, () => ({
     addVariable,
   }));
+
+  // The whole tree of variables is flattened into the list of rows to display,
+  // so that only the rows visible on screen have to be rendered. This is done
+  // at every render because the variables are mutated in place (in the C++
+  // objects), so the result can't be memoized.
+  const flattenedVariables = aliveVariablesContainer
+    ? flattenVariablesContainers({
+        variablesContainer: aliveVariablesContainer,
+        inheritedVariablesContainer: aliveInheritedVariablesContainer,
+        searchMatchingNodeIds: searchText ? searchMatchingNodes : null,
+      })
+    : [];
+
+  const rowsContainerRef = React.useRef<?HTMLDivElement>(null);
+  const { visibleRowsRange, scrollRowIntoView } = useVisibleRowsRange({
+    containerRef: rowsContainerRef,
+    rowCount: flattenedVariables.length,
+    rowHeight: VARIABLE_ROW_HEIGHT,
+  });
+  const { firstRowIndex, afterLastRowIndex } = visibleRowsRange;
+
+  const rowIndexToReveal = variableToReveal
+    ? flattenedVariables.findIndex(
+        ({ nodeId }) => nodeId === variableToReveal.nodeId
+      )
+    : -1;
+  const variablePointerToReveal =
+    rowIndexToReveal >= 0
+      ? flattenedVariables[rowIndexToReveal].variable.ptr
+      : 0;
+
+  // Scroll to the variable to reveal, then - once its row is rendered, which
+  // only happens after the scroll - focus the field of it to focus.
+  React.useLayoutEffect(
+    () => {
+      if (!variableToReveal) return;
+      if (rowIndexToReveal < 0) {
+        // The variable is gone (renamed, deleted, filtered out by a search...).
+        setVariableToReveal(null);
+        return;
+      }
+
+      scrollRowIntoView(rowIndexToReveal);
+      if (
+        rowIndexToReveal < firstRowIndex ||
+        rowIndexToReveal >= afterLastRowIndex
+      ) {
+        // Not rendered yet: wait for the scroll to be taken into account.
+        return;
+      }
+
+      const { fieldToFocus, caretPosition } = variableToReveal;
+      if (fieldToFocus) {
+        const fieldRefs =
+          fieldToFocus === 'name'
+            ? variableNameInputRefs
+            : topLevelVariableValueInputRefs;
+        const field = fieldRefs.current[variablePointerToReveal];
+        if (field) {
+          field.focus(
+            caretPosition === null || caretPosition === undefined
+              ? null
+              : { caretPosition }
+          );
+        }
+      }
+      setVariableToReveal(null);
+    },
+    [
+      variableToReveal,
+      rowIndexToReveal,
+      variablePointerToReveal,
+      scrollRowIntoView,
+      firstRowIndex,
+      afterLastRowIndex,
+    ]
+  );
+
+  const selectedNodesSet = React.useMemo(() => new Set(selectedNodes), [
+    selectedNodes,
+  ]);
+
+  const renderRow = (
+    flattenedVariable: FlattenedVariable,
+    rowIndex: number,
+    i18n: I18nType
+  ): React.Node => {
+    const {
+      nodeId,
+      name,
+      index,
+      depth,
+      variable,
+      parentVariable,
+      isInherited,
+      type,
+      isCollection,
+      isExpanded,
+    } = flattenedVariable;
+    const isTopLevel = depth === 0;
+    const parentType = parentVariable ? parentVariable.getType() : null;
+    const isLoopIndexVariable =
+      !isInherited &&
+      isTopLevel &&
+      !!currentIndexVariableName &&
+      name === currentIndexVariableName;
+    const overwritesInheritedVariable =
+      isTopLevel &&
+      !isInherited &&
+      !!aliveInheritedVariablesContainer &&
+      aliveInheritedVariablesContainer.has(name);
+
+    const typeErrorMessage =
+      parentType === gd.Variable.Array &&
+      parentVariable &&
+      parentVariable.getChildrenCount() > 1 &&
+      parentVariable.getAtIndex(0).getType() !== type
+        ? i18n._(t`Every child of an array must be the same type.`)
+        : null;
+
+    const hasMixedValues = variable.hasMixedValues();
+    const valueAsString = isCollection
+      ? i18n._(
+          variable.getChildrenCount() === 0
+            ? t`No children`
+            : variable.getChildrenCount() === 1
+            ? t`1 child`
+            : t`${variable.getChildrenCount()} children`
+        )
+      : type === gd.Variable.String
+      ? variable.getString()
+      : type === gd.Variable.Number
+      ? variable.getValue().toString()
+      : null;
+    const valueAsBool =
+      type === gd.Variable.Boolean ? variable.getBool() : null;
+
+    return (
+      <VariableRow
+        key={nodeId}
+        depth={depth}
+        indent={getIndent({ depth, hasNarrowRows, containerWidth })}
+        top={rowIndex * VARIABLE_ROW_HEIGHT}
+        hideTypeName={hasNarrowRows}
+        shouldHideExpandIcons={shouldHideExpandIcons}
+        isExpanded={isExpanded}
+        onExpand={onExpand}
+        draggedNodeId={draggedNodeId}
+        nodeId={nodeId}
+        isInherited={isInherited}
+        isNameLocked={props.isListLocked && isTopLevel}
+        isTypeLocked={props.isListLocked && isTopLevel}
+        canDrop={canDrop}
+        dropNode={dropNode}
+        isSelected={selectedNodesSet.has(nodeId)}
+        onSelect={onSelect}
+        gdevelopTheme={gdevelopTheme}
+        variableNameInputRefs={variableNameInputRefs}
+        topLevelVariableValueInputRefs={topLevelVariableValueInputRefs}
+        parentType={parentType}
+        onChangeName={onChangeName}
+        overwritesInheritedVariable={overwritesInheritedVariable}
+        name={name}
+        index={index}
+        rowRightSideStyle={rowRightSideStyle}
+        isTopLevel={isTopLevel}
+        type={type}
+        typeErrorMessage={typeErrorMessage}
+        isLoopIndexVariable={isLoopIndexVariable}
+        removeLoopIndexVariable={removeLoopIndexVariable}
+        variablePointer={variable.ptr}
+        onChangeType={onChangeType}
+        hasMixedValues={hasMixedValues}
+        valueAsString={valueAsString}
+        valueAsBool={valueAsBool}
+        onChangeValue={onChangeValue}
+        isCollection={isCollection}
+        onAddChild={onAddChild}
+        editInheritedVariable={editInheritedVariable}
+        deleteNode={deleteNode}
+        directlyStoreValueChangesWhileEditing={
+          !!props.directlyStoreValueChangesWhileEditing
+        }
+        i18n={i18n}
+      />
+    );
+  };
 
   if (
     !aliveVariablesContainer ||
@@ -2098,7 +2027,7 @@ const VariablesList: React.ComponentType<{
 
   const toolbar = (
     <VariablesListToolbar
-      isNarrow={isNarrow}
+      isNarrow={isToolbarNarrow}
       isCompact={props.size === 'compact'}
       onCopy={copySelection}
       onPaste={pasteClipboardContent}
@@ -2204,10 +2133,24 @@ const VariablesList: React.ComponentType<{
                       </Column>
                     ) : (
                       <ScrollView autoHideScrollbar>
-                        {aliveInheritedVariablesContainer
-                          ? renderTree(i18n, true)
-                          : null}
-                        {renderTree(i18n)}
+                        <div
+                          ref={rowsContainerRef}
+                          className={classes.rowsContainer}
+                          style={{
+                            height:
+                              flattenedVariables.length * VARIABLE_ROW_HEIGHT,
+                          }}
+                        >
+                          {flattenedVariables
+                            .slice(firstRowIndex, afterLastRowIndex)
+                            .map((flattenedVariable, index) =>
+                              renderRow(
+                                flattenedVariable,
+                                firstRowIndex + index,
+                                i18n
+                              )
+                            )}
+                        </div>
                         {!!undefinedVariableNames.length && (
                           <Paper background="dark" variant="outlined">
                             <Column>

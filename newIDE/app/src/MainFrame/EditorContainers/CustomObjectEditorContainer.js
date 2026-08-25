@@ -47,7 +47,7 @@ const styles = {
 export class CustomObjectEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
-  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
   _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
     gd.ObjectsContainer.Function
   );

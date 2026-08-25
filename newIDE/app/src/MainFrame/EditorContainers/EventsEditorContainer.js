@@ -25,8 +25,8 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
-  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null;
-  _scope: EventsScope | null;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
+  _scope: EventsScope | null = null;
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.

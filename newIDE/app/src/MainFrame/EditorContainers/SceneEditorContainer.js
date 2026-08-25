@@ -28,7 +28,7 @@ import {
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
-  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   getProject(): ?gdProject {
     return this.props.project;

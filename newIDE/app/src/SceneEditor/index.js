@@ -290,6 +290,10 @@ type State = {|
   editedGroup: gdObjectGroup | null,
   isCreatingNewGroup: boolean,
   editedGroupInitialTab: ObjectGroupEditorTab | null,
+  // Incremented each time the object group editor dialog is closed, so that
+  // editors displaying a state derived from a group (like its merged
+  // variables shown in the properties panel) can refresh it.
+  objectGroupEditionRevision: number,
 
   instancesEditorSettings: InstancesEditorSettings,
   history: HistoryState,
@@ -348,6 +352,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedGroup: null,
       isCreatingNewGroup: false,
       editedGroupInitialTab: null,
+      objectGroupEditionRevision: 0,
       extractAsExternalLayoutDialogOpen: false,
       extractAsCustomObjectDialogOpen: false,
 
@@ -1123,7 +1128,14 @@ export default class SceneEditor extends React.Component<Props, State> {
         global: false,
       });
     }
-    this.setState({ editedGroup: null, isCreatingNewGroup: false });
+    this.setState(state => ({
+      editedGroup: null,
+      isCreatingNewGroup: false,
+      // The group objects and variables may have been changed by the dialog:
+      // notify editors displaying a state derived from a group (like the
+      // properties panel showing its merged variables) to refresh it.
+      objectGroupEditionRevision: state.objectGroupEditionRevision + 1,
+    }));
   };
 
   setInstancesEditorSettings = (
@@ -3126,6 +3138,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                     editLayer={this.editLayer}
                     editLayerEffects={this.editLayerEffects}
                     selectedObjectGroup={this.state.selectedObjectGroup}
+                    objectGroupEditionRevision={
+                      this.state.objectGroupEditionRevision
+                    }
                     onSelectObjectGroup={this._onSelectObjectGroup}
                     editInstanceVariables={this.editInstanceVariables}
                     editObjectByName={this.editObjectByName}

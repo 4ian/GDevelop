@@ -29,6 +29,7 @@ export const Default = (): React.Node => (
       initialInstances={testProject.testLayout.getInitialInstances()}
       layersContainer={testProject.testLayout.getLayers()}
       objectGroup={testProject.group2}
+      objectGroupEditionRevision={0}
       isVariableListLocked={false}
       isObjectListLocked={false}
       isBehaviorListLocked={false}
@@ -58,6 +59,7 @@ export const WithLongObjectNames = (): React.Node => (
       initialInstances={testProject.testLayout.getInitialInstances()}
       layersContainer={testProject.testLayout.getLayers()}
       objectGroup={testProject.group4WithLongsNames}
+      objectGroupEditionRevision={0}
       isVariableListLocked={false}
       isObjectListLocked={false}
       isBehaviorListLocked={false}
@@ -87,6 +89,7 @@ export const Empty = (): React.Node => (
       initialInstances={testProject.testLayout.getInitialInstances()}
       layersContainer={testProject.testLayout.getLayers()}
       objectGroup={testProject.emptyGroup}
+      objectGroupEditionRevision={0}
       isVariableListLocked={false}
       isObjectListLocked={false}
       isBehaviorListLocked={false}

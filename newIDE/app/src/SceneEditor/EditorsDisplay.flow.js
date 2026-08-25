@@ -80,6 +80,10 @@ export type SceneEditorsDisplayProps = {|
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,
   selectedObjectGroup: gdObjectGroup | null,
+  // Incremented each time an object group is edited in a dialog, so that
+  // editors displaying a state derived from the group (like its merged
+  // variables) can refresh it.
+  objectGroupEditionRevision: number,
   onSelectObjectGroup: (objectGroup: gdObjectGroup | null) => void,
   openSceneVariables: () => void,
   onObjectCreated: (

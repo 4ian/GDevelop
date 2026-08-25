@@ -475,6 +475,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         instances={selectedInstances}
                         layer={selectedLayer}
                         objectGroup={selectedObjectGroup}
+                        objectGroupEditionRevision={
+                          props.objectGroupEditionRevision
+                        }
                         editInstanceVariables={props.editInstanceVariables}
                         editObjectInPropertiesPanel={
                           props.editObjectInPropertiesPanel

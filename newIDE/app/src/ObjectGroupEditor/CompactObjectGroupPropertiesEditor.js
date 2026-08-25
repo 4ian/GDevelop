@@ -24,6 +24,7 @@ import Window from '../Utils/Window';
 import CompactTextField from '../UI/CompactTextField';
 import Link from '../UI/Link';
 import useVariablesContainerRefactoring from '../VariablesList/useVariablesContainerRefactoring';
+import { makeObjectGroupMergedVariablesContainer } from '../Utils/VariablesUtils';
 import { type ObjectGroupEditorTab } from './EditedObjectGroupEditorDialog';
 import CompactObjectGroupEditor from './CompactObjectGroupEditor';
 import { CollapsibleSubPanel } from '../ObjectEditor/CompactObjectPropertiesEditor';
@@ -83,6 +84,12 @@ type Props = {|
   historyHandler?: HistoryHandler,
 
   objectGroup: gdObjectGroup,
+  /**
+   * Incremented each time the group is edited elsewhere (typically: the
+   * object group editor dialog was closed), so the merged variables
+   * container displayed by this editor is rebuilt.
+   */
+  objectGroupEditionRevision: number,
   isObjectListLocked: boolean,
   isVariableListLocked: boolean,
   isBehaviorListLocked: boolean,
@@ -113,6 +120,7 @@ export const CompactObjectGroupPropertiesEditor = ({
   unsavedChanges,
   historyHandler,
   objectGroup,
+  objectGroupEditionRevision,
   isObjectListLocked,
   isVariableListLocked,
   isBehaviorListLocked,
@@ -126,15 +134,30 @@ export const CompactObjectGroupPropertiesEditor = ({
   const { isMobile } = useResponsiveWindowSize();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
+  // Incremented to rebuild the merged variables container when the common
+  // variables of the group objects changed (see refreshGroupVariablesContainer).
+  const [
+    groupVariablesContainerRevision,
+    setGroupVariablesContainerRevision,
+  ] = React.useState(0);
+
   const groupVariablesContainer = React.useMemo(
-    // The VariablesContainer is returned by value.
-    // Thus, the same instance is reused every time.
+    // This merged container is a temporary container, owned by this editor,
+    // that the user edits in place - edits only reach the objects of the
+    // group when the (debounced) refactoring is applied. It must NOT be
+    // rebuilt on unrelated re-renders. In particular,
+    // `projectScopedContainersAccessor` must not be a dependency, as parent
+    // components re-create it at each render: rebuilding the container would
+    // drop pending edits and show the previous variables again. It's only
+    // rebuilt when the edited group changes or when
+    // `refreshGroupVariablesContainer` is explicitly called.
     () =>
-      gd.ObjectRefactorer.mergeVariableContainers(
+      makeObjectGroupMergedVariablesContainer(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         objectGroup
       ),
-    [objectGroup, projectScopedContainersAccessor]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [objectGroup, groupVariablesContainerRevision]
   );
 
   const openFullEditor = React.useCallback(
@@ -194,7 +217,10 @@ export const CompactObjectGroupPropertiesEditor = ({
   });
 
   // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
-  const { onVariablesUpdated } = useVariablesContainerRefactoring({
+  const {
+    onVariablesUpdated,
+    flushPendingRefactoring,
+  } = useVariablesContainerRefactoring({
     project,
     variablesContainer: groupVariablesContainer,
     initialInstances,
@@ -206,12 +232,55 @@ export const CompactObjectGroupPropertiesEditor = ({
     objectName: null,
   });
 
+  // Free the C++ memory of the merged container when it's replaced or when
+  // this editor is unmounted. This effect is declared after
+  // `useVariablesContainerRefactoring` so its cleanup runs after the pending
+  // refactoring was applied (flushed) on the container.
+  React.useEffect(
+    () => () => {
+      groupVariablesContainer.delete();
+    },
+    [groupVariablesContainer]
+  );
+
+  const refreshGroupVariablesContainer = React.useCallback(
+    () => {
+      // Apply any pending variable refactoring to the objects of the group
+      // first, so the rebuilt merged container reflects it (instead of
+      // dropping the edits).
+      flushPendingRefactoring();
+      setGroupVariablesContainerRevision(revision => revision + 1);
+    },
+    [flushPendingRefactoring]
+  );
+
+  // When the group is edited elsewhere (typically: the object group editor
+  // dialog was applied), the merged variables container and its snapshot
+  // must be rebuilt from the group objects - otherwise the next refactoring
+  // would be computed against a stale state (which could notably re-create
+  // variables removed in the dialog).
+  const previousExternalRevisionRef = React.useRef<number>(
+    objectGroupEditionRevision
+  );
+  React.useEffect(
+    () => {
+      if (previousExternalRevisionRef.current !== objectGroupEditionRevision) {
+        previousExternalRevisionRef.current = objectGroupEditionRevision;
+        refreshGroupVariablesContainer();
+      }
+    },
+    [objectGroupEditionRevision, refreshGroupVariablesContainer]
+  );
+
   const removeObject = React.useCallback(
     (objectName: string) => {
       objectGroup.removeObject(objectName);
+      // The variables shared by all the objects of the group may have
+      // changed: rebuild the merged variables container.
+      refreshGroupVariablesContainer();
       forceUpdate();
     },
-    [forceUpdate, objectGroup]
+    [forceUpdate, objectGroup, refreshGroupVariablesContainer]
   );
 
   const addObject = React.useCallback(
@@ -239,6 +308,10 @@ export const CompactObjectGroupPropertiesEditor = ({
           behaviorName
         );
       }
+      // The variables shared by all the objects of the group may have
+      // changed (values or types can now be "mixed"): rebuild the merged
+      // variables container.
+      refreshGroupVariablesContainer();
       forceUpdate();
     },
     [
@@ -249,6 +322,7 @@ export const CompactObjectGroupPropertiesEditor = ({
       objectGroup,
       objectsContainer,
       project,
+      refreshGroupVariablesContainer,
     ]
   );
 

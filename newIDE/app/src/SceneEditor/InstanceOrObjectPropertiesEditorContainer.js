@@ -99,6 +99,7 @@ type Props = {|
 
   // For object groups
   objectGroup: gdObjectGroup | null,
+  objectGroupEditionRevision: number,
   isObjectGroupObjectListLocked: boolean,
   onEditObjectGroup: (
     objectGroup: gdObjectGroup,
@@ -203,6 +204,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
 
       // For object groups
       objectGroup,
+      objectGroupEditionRevision,
       isObjectGroupObjectListLocked,
       onEditObjectGroup,
     } = props;
@@ -298,6 +300,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             historyHandler={historyHandler}
             objectGroup={objectGroup}
+            objectGroupEditionRevision={objectGroupEditionRevision}
             isObjectListLocked={isObjectGroupObjectListLocked}
             isBehaviorListLocked={isBehaviorListLocked}
             isVariableListLocked={isVariableListLocked}

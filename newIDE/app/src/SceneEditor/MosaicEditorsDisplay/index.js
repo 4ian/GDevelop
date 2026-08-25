@@ -315,6 +315,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 objects={selectedObjects}
                 layer={selectedLayer}
                 objectGroup={selectedObjectGroup}
+                objectGroupEditionRevision={props.objectGroupEditionRevision}
                 editInstanceVariables={props.editInstanceVariables}
                 editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
                 onEditObject={props.onEditObject}

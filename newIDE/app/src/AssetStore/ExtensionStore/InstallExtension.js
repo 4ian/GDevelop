@@ -161,7 +161,9 @@ export const checkRequiredExtensionsUpdate = async ({
   if (!shouldAllowUnknownExtension && unknownExtensionDependencies.length > 0) {
     throw new Error(
       'Unable to find extension ' +
-        unknownExtensionDependencies.join(', ') +
+        unknownExtensionDependencies
+          .map(dependency => dependency.extensionName)
+          .join(', ') +
         ' in the registry.'
     );
   }

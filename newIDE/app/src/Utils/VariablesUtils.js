@@ -48,20 +48,19 @@ export const hasChildThatContainsStringInNameOrValue = (
  * variables container: the intersection of the variables of all the objects
  * of the group, with "mixed values"/"mixed types" markers when they differ
  * between objects.
- *
- * `gd.ObjectRefactorer.mergeVariableContainers` returns a `VariablesContainer`
- * "by value", which means the same C++ instance is shared by every call (it's
- * stored in a static variable by the bindings). Keeping it in an editor is
- * unsafe: any other call (from another editor, an AI editor function, etc.)
- * would overwrite it, making the variables being edited seemingly "reset" to
- * their previous state. This helper copies the merged result into a new
- * container owned by the caller - which must call `delete` on it when done,
- * to free the C++ memory.
  */
 export const makeObjectGroupMergedVariablesContainer = (
   objectsContainersList: gdObjectsContainersList,
   objectGroup: gdObjectGroup
 ): gdVariablesContainer => {
+  
+  // `gd.ObjectRefactorer.mergeVariableContainers` returns a `VariablesContainer`
+  // "by value", which means the same C++ instance is shared by every call (it's
+  // stored in a static variable by the bindings). Keeping it in an editor is
+  // unsafe: any other call (from another editor, an AI editor function, etc.)
+  // would overwrite it. This helper copies the merged result into a new
+  // container owned by the caller - which must call `delete` on it when done,
+  // to free the C++ memory.
   const sharedMergedVariablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
     objectsContainersList,
     objectGroup

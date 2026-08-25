@@ -43,6 +43,41 @@ export const hasChildThatContainsStringInNameOrValue = (
   }
 };
 
+/**
+ * Merge the variables of the objects of a group into a new, caller-owned
+ * variables container: the intersection of the variables of all the objects
+ * of the group, with "mixed values"/"mixed types" markers when they differ
+ * between objects.
+ */
+export const makeObjectGroupMergedVariablesContainer = (
+  objectsContainersList: gdObjectsContainersList,
+  objectGroup: gdObjectGroup
+): gdVariablesContainer => {
+  // `gd.ObjectRefactorer.mergeVariableContainers` returns a `VariablesContainer`
+  // "by value", which means the same C++ instance is shared by every call (it's
+  // stored in a static variable by the bindings). Keeping it in an editor is
+  // unsafe: any other call (from another editor, an AI editor function, etc.)
+  // would overwrite it. This helper copies the merged result into a new
+  // container owned by the caller - which must call `delete` on it when done,
+  // to free the C++ memory.
+  const sharedMergedVariablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
+    objectsContainersList,
+    objectGroup
+  );
+  const mergedVariablesContainer = new gd.VariablesContainer(
+    sharedMergedVariablesContainer.getSourceType()
+  );
+  // Serialization preserves everything needed for editing and refactoring:
+  // variable types and values (including the editor-only "mixed values"
+  // markers) and persistent UUIDs (of the container and its variables).
+  const serializedElement = new gd.SerializerElement();
+  sharedMergedVariablesContainer.serializeTo(serializedElement);
+  mergedVariablesContainer.unserializeFrom(serializedElement);
+  serializedElement.delete();
+
+  return mergedVariablesContainer;
+};
+
 export const insertInVariablesContainer = (
   variablesContainer: gdVariablesContainer,
   name: string,

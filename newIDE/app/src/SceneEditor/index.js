@@ -1124,6 +1124,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       });
     }
     this.setState({ editedGroup: null, isCreatingNewGroup: false });
+    // The dialog may have changed the group objects and variables: make the
+    // properties panel re-read them.
+    this.forceUpdatePropertiesEditor();
   };
 
   setInstancesEditorSettings = (

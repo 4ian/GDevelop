@@ -17,7 +17,10 @@ import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/
 import { CompactScenePropertiesEditor } from './CompactScenePropertiesEditor';
 import Rectangle from '../Utils/Rectangle';
 import { type LastSelectionType } from './EditorsDisplay.flow';
-import { CompactObjectGroupPropertiesEditor } from '../ObjectGroupEditor/CompactObjectGroupPropertiesEditor';
+import {
+  CompactObjectGroupPropertiesEditor,
+  type CompactObjectGroupPropertiesEditorInterface,
+} from '../ObjectGroupEditor/CompactObjectGroupPropertiesEditor';
 import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
 import EmptyMessage from '../UI/EmptyMessage';
 
@@ -117,10 +120,21 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
 }> = React.forwardRef<Props, InstanceOrObjectPropertiesEditorInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();
+    const compactObjectGroupPropertiesEditorRef = React.useRef<?CompactObjectGroupPropertiesEditorInterface>(
+      null
+    );
     React.useImperativeHandle<InstanceOrObjectPropertiesEditorInterface>(
       ref,
       () => ({
-        forceUpdate,
+        forceUpdate: () => {
+          // The variables of an object group are derived from its objects
+          // (they are the ones common to all of them): make the group
+          // properties editor re-read them, so changes made elsewhere (in the
+          // object group editor dialog, by an undo/redo...) are displayed.
+          if (compactObjectGroupPropertiesEditorRef.current)
+            compactObjectGroupPropertiesEditorRef.current.refreshVariables();
+          forceUpdate();
+        },
         getEditorTitle: () =>
           lastSelectionType === 'instance' ? (
             <Trans>Instance properties</Trans>
@@ -285,6 +299,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
           </EmptyMessage>
         ) : objectGroup && lastSelectionType === 'objectGroup' ? (
           <CompactObjectGroupPropertiesEditor
+            ref={compactObjectGroupPropertiesEditorRef}
             project={project}
             resourceManagementProps={resourceManagementProps}
             layout={layout}

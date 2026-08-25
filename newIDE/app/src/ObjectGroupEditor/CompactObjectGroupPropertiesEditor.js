@@ -24,6 +24,7 @@ import Window from '../Utils/Window';
 import CompactTextField from '../UI/CompactTextField';
 import Link from '../UI/Link';
 import useVariablesContainerRefactoring from '../VariablesList/useVariablesContainerRefactoring';
+import { makeObjectGroupMergedVariablesContainer } from '../Utils/VariablesUtils';
 import { type ObjectGroupEditorTab } from './EditedObjectGroupEditorDialog';
 import CompactObjectGroupEditor from './CompactObjectGroupEditor';
 import { CollapsibleSubPanel } from '../ObjectEditor/CompactObjectPropertiesEditor';
@@ -127,15 +128,25 @@ export const CompactObjectGroupPropertiesEditor = ({
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const groupVariablesContainer = React.useMemo(
-    // The VariablesContainer is returned by value.
-    // Thus, the same instance is reused every time.
+    // This merged container is a temporary container, owned by this editor,
+    // that the user edits in place - edits only reach the objects of the
+    // group when the (debounced) refactoring is applied.
     () => {
-      return gd.ObjectRefactorer.mergeVariableContainers(
+      return makeObjectGroupMergedVariablesContainer(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         objectGroup
       );
     },
     [objectGroup, projectScopedContainersAccessor]
+  );
+
+  // Free the C++ memory of the merged container when it's replaced or when
+  // this editor is unmounted.
+  React.useEffect(
+    () => () => {
+      groupVariablesContainer.delete();
+    },
+    [groupVariablesContainer]
   );
 
   const openFullEditor = React.useCallback(

@@ -130,7 +130,6 @@ export const CompactObjectGroupPropertiesEditor = ({
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
     () => {
-      console.log('mergeVariableContainers');
       return gd.ObjectRefactorer.mergeVariableContainers(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         objectGroup

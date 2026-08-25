@@ -80,7 +80,6 @@ const useVariablesContainerRefactoring = ({
   variablesContainerRef.current = variablesContainer;
 
   const applyPendingRefactoring = React.useCallback(() => {
-    console.log('applyPendingRefactoring');
     const snapshot = snapshotRef.current;
     const variablesContainer = exceptionallyGuardAgainstDeadObject(
       variablesContainerRef.current

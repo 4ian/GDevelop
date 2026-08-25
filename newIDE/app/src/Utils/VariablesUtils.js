@@ -53,7 +53,6 @@ export const makeObjectGroupMergedVariablesContainer = (
   objectsContainersList: gdObjectsContainersList,
   objectGroup: gdObjectGroup
 ): gdVariablesContainer => {
-  
   // `gd.ObjectRefactorer.mergeVariableContainers` returns a `VariablesContainer`
   // "by value", which means the same C++ instance is shared by every call (it's
   // stored in a static variable by the bindings). Keeping it in an editor is

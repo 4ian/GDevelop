@@ -25,6 +25,13 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
+  _scope: EventsScope | null = null;
+
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
@@ -33,14 +40,20 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     return this.props.isActive || nextProps.isActive;
   }
 
-  componentDidMount() {
-    if (this.props.isActive) {
+  componentDidUpdate(prevProps: RenderEditorContainerProps): void {
+    if (!prevProps.isActive && this.props.isActive) {
       this._setPreviewedLayout();
+    }
+    if (
+      this.props.project !== prevProps.project ||
+      this.props.projectItemName !== prevProps.projectItemName
+    ) {
+      this._rebuildProjectScopedContainersAccessor();
     }
   }
 
-  componentDidUpdate(prevProps: RenderEditorContainerProps) {
-    if (!prevProps.isActive && this.props.isActive) {
+  componentDidMount() {
+    if (this.props.isActive) {
       this._setPreviewedLayout();
     }
   }
@@ -53,6 +66,25 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
+  }
+
+  _rebuildProjectScopedContainersAccessor() {
+    const { project } = this.props;
+    const scene = this.getLayout();
+    if (scene && project) {
+      this._scope = {
+        project,
+        layout: scene,
+      };
+      this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        {
+          project,
+          layout: scene,
+        }
+      );
+    } else {
+      this._projectScopedContainersAccessor = null;
+    }
   }
 
   getProject(): ?gdProject {
@@ -187,19 +219,13 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   render(): any {
     const { project, projectItemName } = this.props;
     const layout = this.getLayout();
-    if (!layout || !project) {
+    const scope = this._scope;
+    const projectScopedContainersAccessor = this
+      ._projectScopedContainersAccessor;
+    if (!layout || !project || !scope || !projectScopedContainersAccessor) {
       //TODO: Error component
       return <div>No layout called {projectItemName} found!</div>;
     }
-
-    const scope: EventsScope = {
-      project,
-      layout,
-    };
-    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      // $FlowFixMe[incompatible-type]
-      scope
-    );
 
     return (
       <EventsSheet

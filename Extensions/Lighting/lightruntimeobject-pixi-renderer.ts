@@ -72,19 +72,24 @@ namespace gdjs {
       this.updateTexture();
       this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
       this._defaultVertexBuffer = new Float32Array(8);
-      // Sized with the same sqrt(2) safety margin as the fallback quad in
-      // _updateBuffers, so a rotated texture isn't clipped on the first
-      // frame either.
-      const initialMeshHalfSize = this._radius * Math.SQRT2;
+      // Built from the light's square *rotated by the object's initial
+      // angle*, matching the fallback quad computed in _updateBuffers (see
+      // the comment there). At angle 0 this is identical to the original
+      // axis-aligned square.
+      const initialAngleRad = gdjs.toRad(runtimeObject.getAngle());
+      const initialCosA = Math.cos(initialAngleRad);
+      const initialSinA = Math.sin(initialAngleRad);
+      const initialA = this._radius * (initialCosA + initialSinA);
+      const initialB = this._radius * (initialCosA - initialSinA);
       this._vertexBuffer = new Float32Array([
-        runtimeObject.x - initialMeshHalfSize,
-        runtimeObject.y + initialMeshHalfSize,
-        runtimeObject.x + initialMeshHalfSize,
-        runtimeObject.y + initialMeshHalfSize,
-        runtimeObject.x + initialMeshHalfSize,
-        runtimeObject.y - initialMeshHalfSize,
-        runtimeObject.x - initialMeshHalfSize,
-        runtimeObject.y - initialMeshHalfSize,
+        runtimeObject.x - initialA,
+        runtimeObject.y + initialB,
+        runtimeObject.x + initialB,
+        runtimeObject.y + initialA,
+        runtimeObject.x + initialA,
+        runtimeObject.y - initialB,
+        runtimeObject.x - initialB,
+        runtimeObject.y - initialA,
       ]);
       this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
       this.updateMesh();
@@ -344,7 +349,7 @@ namespace gdjs {
       const geometry = new PIXI.Geometry();
       geometry
         .addAttribute('aVertexPosition', this._vertexBuffer, 2)
-        .addIndex(this._indexBuffer as any);
+        .addIndex(this._indexBuffer);
       if (!this._light) {
         this._light = new PIXI.Mesh(geometry, shader);
         this._light.blendMode = PIXI.BLEND_MODES.ADD;
@@ -467,31 +472,36 @@ namespace gdjs {
 
       // Fallback to simple quad when there are no obstacles around.
       if (vertices.length === 0) {
-        // The shader now rotates the sampled texture coordinates with the
-        // object's angle, so the *mesh* must be large enough to cover the
-        // full rotated square, not just the axis-aligned one. Otherwise the
-        // rasterizer clips corners of the (correctly rotated) texture before
-        // the shader's own alpha mask gets a chance to shape it. A square of
-        // half-side `radius` rotated by any angle always fits within an
-        // axis-aligned square of half-side `radius * sqrt(2)`, so we build
-        // the mesh at that size and let the shader do the exact, rotated
-        // clipping.
-        const meshHalfSize = this._radius * Math.SQRT2;
-        this._defaultVertexBuffer[0] = this._object.x - meshHalfSize;
-        this._defaultVertexBuffer[1] = this._object.y + meshHalfSize;
-        this._defaultVertexBuffer[2] = this._object.x + meshHalfSize;
-        this._defaultVertexBuffer[3] = this._object.y + meshHalfSize;
-        this._defaultVertexBuffer[4] = this._object.x + meshHalfSize;
-        this._defaultVertexBuffer[5] = this._object.y - meshHalfSize;
-        this._defaultVertexBuffer[6] = this._object.x - meshHalfSize;
-        this._defaultVertexBuffer[7] = this._object.y - meshHalfSize;
+        // Build the mesh as the light's square *rotated by the object's
+        // angle*, so it exactly matches the rotated square the shader
+        // samples the texture from (see texturedFragmentShader). At angle 0
+        // this collapses to exactly the original axis-aligned square, so it
+        // doesn't change anything for unrotated lights; at other angles it
+        // avoids clipping the corners of the (correctly rotated) texture,
+        // without over-sizing the mesh beyond what's actually needed.
+        const angleRad = gdjs.toRad(this._object.getAngle());
+        const cosA = Math.cos(angleRad);
+        const sinA = Math.sin(angleRad);
+        const r = this._radius;
+        const cx = this._object.x;
+        const cy = this._object.y;
+        const a = r * (cosA + sinA);
+        const b = r * (cosA - sinA);
+        this._defaultVertexBuffer[0] = cx - a;
+        this._defaultVertexBuffer[1] = cy + b;
+        this._defaultVertexBuffer[2] = cx + b;
+        this._defaultVertexBuffer[3] = cy + a;
+        this._defaultVertexBuffer[4] = cx + a;
+        this._defaultVertexBuffer[5] = cy - b;
+        this._defaultVertexBuffer[6] = cx - b;
+        this._defaultVertexBuffer[7] = cy - a;
         this._light.shader.uniforms.center = this._center;
         this._light.geometry
           .getBuffer('aVertexPosition')
-          .update(this._defaultVertexBuffer as any);
+          .update(this._defaultVertexBuffer);
         this._light.geometry
           .getIndex()
-          .update(LightRuntimeObjectPixiRenderer._defaultIndexBuffer as any);
+          .update(LightRuntimeObjectPixiRenderer._defaultIndexBuffer);
         return;
       }
       const verticesCount = vertices.length;
@@ -545,8 +555,8 @@ namespace gdjs {
       if (!isSubArrayUsed) {
         this._light.geometry
           .getBuffer('aVertexPosition')
-          .update(this._vertexBuffer as any);
-        this._light.geometry.getIndex().update(this._indexBuffer as any);
+          .update(this._vertexBuffer);
+        this._light.geometry.getIndex().update(this._indexBuffer);
       } else {
         this._light.geometry
           .getBuffer('aVertexPosition')
@@ -607,16 +617,33 @@ namespace gdjs {
       }
 
       // Seed the self-boundary ("wall" that unoccluded rays terminate on)
-      // with a square large enough to circumscribe the light's square at any
-      // rotation angle (see the comment in the fallback branch above for why
-      // sqrt(2) is the right factor). Without this, rays that don't hit a
-      // real obstacle would be capped by an axis-aligned box that doesn't
-      // rotate with the object, clipping the corners of the rotated texture.
-      const selfBoundaryHalfSize = this._radius * Math.SQRT2;
-      let maxX = this._object.x + selfBoundaryHalfSize;
-      let minX = this._object.x - selfBoundaryHalfSize;
-      let maxY = this._object.y + selfBoundaryHalfSize;
-      let minY = this._object.y - selfBoundaryHalfSize;
+      // with the axis-aligned bounding box of the light's square *rotated by
+      // the object's angle* — i.e. the same rotated square the fallback quad
+      // and the shader use (see the fallback branch above). At angle 0 this
+      // is exactly [x-radius, x+radius] x [y-radius, y+radius], same as
+      // before; at other angles it grows just enough to avoid clipping the
+      // corners of the rotated texture, without over-sizing the search area.
+      const selfAngleRad = gdjs.toRad(this._object.getAngle());
+      const selfCosA = Math.cos(selfAngleRad);
+      const selfSinA = Math.sin(selfAngleRad);
+      const selfA = this._radius * (selfCosA + selfSinA);
+      const selfB = this._radius * (selfCosA - selfSinA);
+      const selfCornersX = [
+        this._object.x - selfA,
+        this._object.x + selfB,
+        this._object.x + selfA,
+        this._object.x - selfB,
+      ];
+      const selfCornersY = [
+        this._object.y + selfB,
+        this._object.y + selfA,
+        this._object.y - selfB,
+        this._object.y - selfA,
+      ];
+      let maxX = Math.max.apply(null, selfCornersX);
+      let minX = Math.min.apply(null, selfCornersX);
+      let maxY = Math.max.apply(null, selfCornersY);
+      let minY = Math.min.apply(null, selfCornersY);
       const flattenVertices = this._flattenVerticesTemp;
       flattenVertices.length = 0;
       for (let i = 1; i < obstaclePolygons.length; i++) {

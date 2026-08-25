@@ -227,6 +227,13 @@ export default function NewBehaviorDialog({
         extensionShortHeadersByName,
         behaviorShortHeader.extensionName
       );
+      if (!extensionShortHeader) {
+        throw new Error(
+          'Unable to find extension ' +
+            behaviorShortHeader.extensionName +
+            ' in the registry.'
+        );
+      }
       if (
         !requiredExtensionInstallation.missingExtensionShortHeaders.includes(
           extensionShortHeader

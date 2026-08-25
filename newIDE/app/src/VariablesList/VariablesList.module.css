@@ -11,8 +11,10 @@
 /* Every row is positioned at `index * VARIABLE_ROW_HEIGHT` of the container. */
 .rowContainer {
   position: absolute;
-  left: 0;
-  right: 0;
+  /* Leave a thin gap on the sides, so that the rounded corners of the rows are
+     not stuck to the borders of the panel/dialog containing the list. */
+  left: 2px;
+  right: 2px;
   /* Leave a thin gap between two rows. */
   padding-bottom: 1px;
   box-sizing: border-box;

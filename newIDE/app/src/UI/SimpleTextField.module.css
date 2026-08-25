@@ -60,3 +60,12 @@
 .disabled:focus-within::before {
   border-bottom-color: transparent;
 }
+
+/**
+ * Firefox displays large increment buttons on number fields, which don't fit in
+ * a dense list of fields (and can't be styled): hide them. The other browsers
+ * display small buttons, which are fine as they are.
+ */
+.simpleTextField input[type='number'] {
+  -moz-appearance: textfield;
+}

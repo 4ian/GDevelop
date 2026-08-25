@@ -6,7 +6,7 @@
         "comment": "Palette/Purple/60"
       },
       "color": {
-        "value": "#BCA4FF",
+        "value": "#C3B3FF",
         "comment": "Palette/Purple/50"
       },
       "light": {
@@ -189,11 +189,11 @@
     "icon-button": {
       "selected": {
         "color": {
-          "value": "#1A1A1A",
+          "value": "#C3B3FF",
           "comment": "Palette/Grey/100"
         },
         "background-color": {
-          "value": "#BCA4FF",
+          "value": "transparent",
           "comment:": "Palette/Purple/20"
         }
       }
@@ -616,17 +616,17 @@
           "comment": "Palette/Grey/10"
         },
         "background-color": {
-          "value": "#606166",
+          "value": "#646464",
           "comment": "Palette/Grey/60"
         }
       },
       "active": {
         "slider-color": {
-          "value": "#EBEBED",
+          "value": "#fafafa",
           "comment": "Palette/Purple/50"
         },
         "background-color": {
-          "value": "#DFD3FF",
+          "value": "#9a80e0",
           "comment": "Palette/Purple/30"
         }
       },
@@ -651,7 +651,7 @@
   "input": {
     "border-bottom": {
       "color": {
-        "value": "#D6DEEC"
+        "value": "#FAFAFA"
       }
     }
   },

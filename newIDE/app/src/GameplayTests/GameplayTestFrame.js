@@ -38,6 +38,7 @@ const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
 
 type Position = {| left: number, bottom: number |};
+type Size = {| width: number, height: number |};
 
 const clampPositionToWindow = (
   position: Position,
@@ -57,6 +58,34 @@ const clampPositionToWindow = (
       Math.max(windowMargin, window.innerHeight - height - windowMargin)
     ),
   };
+};
+
+const defaultGameAreaSize = { width: 320, height: 180 };
+const minGameAreaSize = { width: 240, height: 135 };
+// Approximate height of the header, footer and borders around the game area,
+// used to clamp the restored size before the frame is rendered (the exact
+// size of these elements can only be measured once rendered).
+const approximateFrameChromeHeight = 70;
+
+type ResizeDirection =
+  | 'left'
+  | 'right'
+  | 'top'
+  | 'bottom'
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right';
+
+const resizeHandleClasses: { [ResizeDirection]: string } = {
+  left: classes.resizeLeft,
+  right: classes.resizeRight,
+  top: classes.resizeTop,
+  bottom: classes.resizeBottom,
+  'top-left': classes.resizeTopLeft,
+  'top-right': classes.resizeTopRight,
+  'bottom-left': classes.resizeBottomLeft,
+  'bottom-right': classes.resizeBottomRight,
 };
 
 type GameplayTestFrameLayoutProps = {|
@@ -87,9 +116,12 @@ export const GameplayTestFrameLayout = ({
   children,
 }: GameplayTestFrameLayoutProps): React.Node => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const { values, setGameplayTestFramePosition } = React.useContext(
-    PreferencesContext
-  );
+  const gameAreaRef = React.useRef<HTMLDivElement | null>(null);
+  const {
+    values,
+    setGameplayTestFramePosition,
+    setGameplayTestFrameSize,
+  } = React.useContext(PreferencesContext);
   // Restore the last position of the frame (it will be clamped to the window
   // as soon as it is rendered, in case the window is now smaller).
   const [position, setPosition] = React.useState<Position>(
@@ -99,12 +131,45 @@ export const GameplayTestFrameLayout = ({
         bottom: windowMargin,
       }
   );
+  // Restore the last size of the game area, clamped in case the window is
+  // now smaller than when the size was saved.
+  const [size, setSize] = React.useState<Size>(() => {
+    const savedSize = values.gameplayTestFrameSize;
+    if (!savedSize) return defaultGameAreaSize;
+    return {
+      width: clamp(
+        savedSize.width,
+        minGameAreaSize.width,
+        Math.max(minGameAreaSize.width, window.innerWidth - 2 * windowMargin)
+      ),
+      height: clamp(
+        savedSize.height,
+        minGameAreaSize.height,
+        Math.max(
+          minGameAreaSize.height,
+          window.innerHeight - 2 * windowMargin - approximateFrameChromeHeight
+        )
+      ),
+    };
+  });
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
+  const [isResizing, setIsResizing] = React.useState<boolean>(false);
   const dragOrigin = React.useRef<{|
     pointerId: number,
     clientX: number,
     clientY: number,
     position: Position,
+  |} | null>(null);
+  const resizeOrigin = React.useRef<{|
+    pointerId: number,
+    clientX: number,
+    clientY: number,
+    position: Position,
+    size: Size,
+    direction: ResizeDirection,
+    /** Size taken by the borders, header and footer around the game area. */
+    chromeWidth: number,
+    chromeHeight: number,
   |} | null>(null);
 
   // Keep the frame inside the window when it is resized (or when the frame
@@ -174,9 +239,125 @@ export const GameplayTestFrameLayout = ({
     [position, setGameplayTestFramePosition]
   );
 
+  const onResizePointerDown = React.useCallback(
+    (direction: ResizeDirection, event: PointerEvent) => {
+      if (event.button !== 0) return;
+      const currentTarget = event.currentTarget;
+      if (!(currentTarget instanceof HTMLElement)) return;
+      const container = containerRef.current;
+      const gameArea = gameAreaRef.current;
+      if (!container || !gameArea) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const gameAreaRect = gameArea.getBoundingClientRect();
+      resizeOrigin.current = {
+        pointerId: event.pointerId,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        position,
+        size,
+        direction,
+        chromeWidth: containerRect.width - gameAreaRect.width,
+        chromeHeight: containerRect.height - gameAreaRect.height,
+      };
+      // $FlowFixMe[incompatible-type] - the Flow definition of `setPointerCapture` wrongly takes a string.
+      currentTarget.setPointerCapture(event.pointerId);
+      setIsResizing(true);
+    },
+    [position, size]
+  );
+
+  const onResizePointerMove = React.useCallback((event: PointerEvent) => {
+    const origin = resizeOrigin.current;
+    if (!origin || origin.pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - origin.clientX;
+    const deltaY = event.clientY - origin.clientY;
+    const newSize = { ...origin.size };
+    const newPosition = { ...origin.position };
+
+    if (origin.direction.includes('right')) {
+      // The left border stays in place: only the width changes.
+      const maxWidth =
+        window.innerWidth -
+        windowMargin -
+        origin.position.left -
+        origin.chromeWidth;
+      newSize.width = clamp(
+        origin.size.width + deltaX,
+        minGameAreaSize.width,
+        Math.max(minGameAreaSize.width, maxWidth)
+      );
+    } else if (origin.direction.includes('left')) {
+      // The right border stays in place: the frame moves as it grows.
+      const maxWidth = origin.size.width + origin.position.left - windowMargin;
+      newSize.width = clamp(
+        origin.size.width - deltaX,
+        minGameAreaSize.width,
+        Math.max(minGameAreaSize.width, maxWidth)
+      );
+      newPosition.left =
+        origin.position.left + (origin.size.width - newSize.width);
+    }
+    if (origin.direction.includes('top')) {
+      // The frame is anchored to the bottom of the window: it grows upwards
+      // without moving.
+      const maxHeight =
+        window.innerHeight -
+        windowMargin -
+        origin.position.bottom -
+        origin.chromeHeight;
+      newSize.height = clamp(
+        origin.size.height - deltaY,
+        minGameAreaSize.height,
+        Math.max(minGameAreaSize.height, maxHeight)
+      );
+    } else if (origin.direction.includes('bottom')) {
+      // The top border stays in place: the frame moves down as it grows.
+      const maxHeight =
+        origin.size.height + origin.position.bottom - windowMargin;
+      newSize.height = clamp(
+        origin.size.height + deltaY,
+        minGameAreaSize.height,
+        Math.max(minGameAreaSize.height, maxHeight)
+      );
+      newPosition.bottom =
+        origin.position.bottom - (newSize.height - origin.size.height);
+    }
+
+    setSize(newSize);
+    setPosition(newPosition);
+  }, []);
+
+  const onResizePointerUp = React.useCallback(
+    (event: PointerEvent) => {
+      const origin = resizeOrigin.current;
+      if (!origin || origin.pointerId !== event.pointerId) return;
+
+      resizeOrigin.current = null;
+      setIsResizing(false);
+      setGameplayTestFrameSize(size);
+      // Resizing from the left or bottom edges also moves the frame.
+      setGameplayTestFramePosition(position);
+    },
+    [size, setGameplayTestFrameSize, position, setGameplayTestFramePosition]
+  );
+
   const isInProgress = runStatus
     ? isGameplayTestStatusInProgress(runStatus.status)
     : false;
+
+  // Cancel any resize in progress when a test starts (the handles are
+  // removed, so the pointer capture is lost anyway).
+  React.useEffect(
+    () => {
+      if (isInProgress) {
+        resizeOrigin.current = null;
+        setIsResizing(false);
+      }
+    },
+    [isInProgress]
+  );
 
   return (
     <div
@@ -185,6 +366,7 @@ export const GameplayTestFrameLayout = ({
         [classes.container]: true,
         [classes.minimized]: isMinimized,
         [classes.dragging]: isDragging,
+        [classes.resizing]: isResizing,
       })}
       style={{ left: position.left, bottom: position.bottom }}
     >
@@ -249,10 +431,15 @@ export const GameplayTestFrameLayout = ({
         </div>
       </div>
       <div
+        ref={gameAreaRef}
         className={classNames({
           [classes.gameArea]: true,
           [classes.hiddenGameArea]: isMinimized,
         })}
+        style={
+          // When minimized, let the CSS shrink the game area to 1x1 pixel.
+          isMinimized ? undefined : { width: size.width, height: size.height }
+        }
       >
         {children}
       </div>
@@ -280,6 +467,24 @@ export const GameplayTestFrameLayout = ({
           </Text>
         )}
       </div>
+      {/* Resizing while a test runs would change the game resolution and
+          skew tests based on screen positions: only allow it when no test
+          is in progress. */}
+      {!isMinimized &&
+        !isInProgress &&
+        Object.keys(resizeHandleClasses).map(direction => (
+          <div
+            key={direction}
+            className={classNames(
+              classes.resizeHandle,
+              resizeHandleClasses[direction]
+            )}
+            onPointerDown={event => onResizePointerDown(direction, event)}
+            onPointerMove={onResizePointerMove}
+            onPointerUp={onResizePointerUp}
+            onPointerCancel={onResizePointerUp}
+          />
+        ))}
     </div>
   );
 };

@@ -43,8 +43,80 @@
   cursor: grabbing;
 }
 
-.container.dragging {
+.container.dragging,
+.container.resizing {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* Invisible handles on the borders and corners of the frame to resize it. */
+.resizeHandle {
+  position: absolute;
+  z-index: 10;
+  touch-action: none;
+}
+
+.resizeLeft,
+.resizeRight {
+  top: 10px;
+  bottom: 10px;
+  width: 5px;
+  cursor: ew-resize;
+}
+
+.resizeLeft {
+  left: 0;
+}
+
+.resizeRight {
+  right: 0;
+}
+
+.resizeTop,
+.resizeBottom {
+  left: 10px;
+  right: 10px;
+  height: 5px;
+  cursor: ns-resize;
+}
+
+.resizeTop {
+  top: 0;
+}
+
+.resizeBottom {
+  bottom: 0;
+}
+
+.resizeTopLeft,
+.resizeTopRight,
+.resizeBottomLeft,
+.resizeBottomRight {
+  width: 10px;
+  height: 10px;
+}
+
+.resizeTopLeft {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
+
+.resizeTopRight {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
+
+.resizeBottomLeft {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+}
+
+.resizeBottomRight {
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
 }
 
 /* Two columns of three dots, hinting that the frame can be moved. */

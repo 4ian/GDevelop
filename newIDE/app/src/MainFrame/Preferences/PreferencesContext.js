@@ -250,6 +250,7 @@ export type PreferencesValues = {|
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
   gameplayTestFramePosition: {| left: number, bottom: number |} | null,
+  gameplayTestFrameSize: {| width: number, height: number |} | null,
   showAiAskButtonInTitleBar: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
   automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
@@ -380,6 +381,10 @@ export type Preferences = {|
     left: number,
     bottom: number,
   |}) => void,
+  setGameplayTestFrameSize: (size: {|
+    width: number,
+    height: number,
+  |}) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
   setAutomaticallyApplyAiRequestEditsForProjectId: (
@@ -450,6 +455,7 @@ export const initialPreferences = {
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
     gameplayTestFramePosition: null,
+    gameplayTestFrameSize: null,
     showAiAskButtonInTitleBar: true,
     automaticallyUseCreditsForAiRequests: false,
     automaticallyApplyAiRequestEditsByProjectId: {},
@@ -543,6 +549,7 @@ export const initialPreferences = {
     left: number,
     bottom: number,
   |}) => {},
+  setGameplayTestFrameSize: (size: {| width: number, height: number |}) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
   setAutomaticallyApplyAiRequestEditsForProjectId: (

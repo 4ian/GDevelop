@@ -719,6 +719,28 @@ export const ErrorLaunchingFollowupAiRequest = (): React.Node => (
   />
 );
 
+// The request itself stopped on an error: the chat offers to continue it where
+// it stopped, or to start over in a new chat.
+export const AiRequestStoppedOnError = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      status: 'error',
+      error: {
+        code: 'ai-request/internal-error',
+        message: 'The AI request failed to complete.',
+      },
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
+export const AiRequestStoppedOnErrorWithoutRetry = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{ ...aiRequestWithAiResponses, status: 'error' }}
+  />
+);
+
 // Quota limits
 // ------------
 

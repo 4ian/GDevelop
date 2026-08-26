@@ -29,8 +29,8 @@ import {
 } from '../../EditorFunctions';
 import classes from './ChatMessages.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
+import { AiRequestErrorRow } from './AiRequestErrorRow';
 import Text from '../../UI/Text';
-import AlertMessage from '../../UI/AlertMessage';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
 import Paper from '../../UI/Paper';
@@ -119,6 +119,9 @@ type Props = {|
   onSwitchedToGDevelopCredits: () => void,
 
   onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
+  // Continues a request that stopped on an error, from where it stopped.
+  // Absent when the chat has no way to resume it (e.g. the standalone form).
+  onRetryAfterError?: ?() => Promise<void>,
   isSending?: boolean,
   // True while the request is paused waiting for the user to answer the inline
   // "Apply this edit?" prompt. Replaces the working/thinking indicators.
@@ -203,6 +206,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     hasStartedRequestButCannotContinue,
     onSwitchedToGDevelopCredits,
     onStartOrOpenChat,
+    onRetryAfterError,
     isSending,
     isWaitingForEditApproval,
     savingProjectForMessageId,
@@ -1255,12 +1259,11 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
 
         {aiRequest.status === 'error' ? (
           <Line justifyContent="flex-start">
-            <AlertMessage kind="error">
-              <Trans>
-                The AI encountered an error while handling your request - this
-                request was not counted in your AI usage. Try again later.
-              </Trans>
-            </AlertMessage>
+            <AiRequestErrorRow
+              error={aiRequest.error}
+              onRetry={onRetryAfterError}
+              onStartNewChat={() => onStartOrOpenChat({ aiRequestId: null })}
+            />
           </Line>
         ) : isWaitingForEditApproval ? null : aiRequest.status === // EditApprovalRow): suppress the working/thinking indicators. // Paused on the inline "Apply this edit?" prompt (rendered below by
             'suspended' && !shouldBeWorkingIfNotPaused ? (

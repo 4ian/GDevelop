@@ -354,6 +354,9 @@ type Props = {|
   ) => Promise<void>,
   editorFunctionCallResults: Array<EditorFunctionCallResult> | null,
   editorCallbacks: EditorCallbacks,
+  // Continues a request that stopped on an error, from where it stopped.
+  // Absent in contexts that can't resume a request (e.g. the standalone form).
+  onRetryAfterError?: ?() => Promise<void>,
   // Error that occurred while sending the last request.
   lastSendError: ?Error,
 
@@ -421,6 +424,7 @@ export const AiRequestChat: React.ComponentType<{
       onIsAutoEditEnabledChange,
       pendingEditApproval,
       onResolveEditApproval,
+      onRetryAfterError,
     }: Props,
     ref
   ) => {
@@ -571,6 +575,15 @@ export const AiRequestChat: React.ComponentType<{
         if (pendingEditApproval) scrollToBottom();
       },
       [pendingEditApproval, scrollToBottom]
+    );
+
+    const retryAfterErrorAndScroll = React.useCallback(
+      async () => {
+        if (!onRetryAfterError) return;
+        scrollToBottom();
+        await onRetryAfterError();
+      },
+      [onRetryAfterError, scrollToBottom]
     );
 
     const onScroll = React.useCallback(
@@ -1165,6 +1178,9 @@ export const AiRequestChat: React.ComponentType<{
               setHasSwitchedToGDevelopCreditsMidChat(true)
             }
             onStartOrOpenChat={onStartOrOpenChat}
+            onRetryAfterError={
+              onRetryAfterError ? retryAfterErrorAndScroll : null
+            }
             isSending={isSendingUserMessage}
             isWaitingForEditApproval={!!pendingEditApproval}
             savingProjectForMessageId={savingProjectForMessageId}

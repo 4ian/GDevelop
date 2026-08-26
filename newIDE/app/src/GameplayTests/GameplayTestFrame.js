@@ -64,24 +64,44 @@ const clampPositionToWindow = (
 // (only used if the frame is shown without a preview being launched).
 const fallbackGameResolution = { width: 1280, height: 720 };
 
-// The game is displayed scaled down: the frame is a small floating window,
-// while the game itself keeps running at the resolution of the project.
+// Width of the game area when the frame is opened: small enough to stay
+// unobtrusive on top of the editor.
 const defaultGameAreaWidth = 320;
 const minGameAreaSize = { width: 240, height: 135 };
 
 /**
- * The default size of the game area: small enough to stay unobtrusive, with
- * the aspect ratio of the game so that it is displayed without black bars.
+ * The zoom at which the game is displayed in the frame. The frame is a real
+ * preview window, only zoomed out: the game window is always
+ * `game area size / zoom`, so that the game area shows exactly the game
+ * resolution when the frame has its default size.
+ *
+ * This zoom never changes while the frame is shown: resizing the frame
+ * resizes the game window (like resizing a preview window would - a game
+ * adapting to its window size shows it), but the scale at which the game is
+ * displayed stays the same.
  */
-const getDefaultGameAreaSize = (gameResolution: Size): Size => ({
-  width: defaultGameAreaWidth,
-  height: Math.max(
-    minGameAreaSize.height,
-    Math.round(
-      (defaultGameAreaWidth * gameResolution.height) / gameResolution.width
-    )
-  ),
-});
+const getGameZoomFactor = (gameResolution: Size): number =>
+  // Never zoom in on a game with a resolution smaller than the frame: it
+  // would be displayed blurry for no reason.
+  Math.min(1, defaultGameAreaWidth / gameResolution.width);
+
+/**
+ * The default size of the game area: the size at which the game window is
+ * exactly the game resolution, like a preview window when it is opened.
+ */
+const getDefaultGameAreaSize = (gameResolution: Size): Size => {
+  const zoomFactor = getGameZoomFactor(gameResolution);
+  return {
+    width: Math.max(
+      minGameAreaSize.width,
+      Math.round(gameResolution.width * zoomFactor)
+    ),
+    height: Math.max(
+      minGameAreaSize.height,
+      Math.round(gameResolution.height * zoomFactor)
+    ),
+  };
+};
 // Approximate height of the header, footer and borders around the game area,
 // used to clamp the restored size before the frame is rendered (the exact
 // size of these elements can only be measured once rendered).
@@ -114,10 +134,8 @@ type GameplayTestFrameLayoutProps = {|
   onToggleMinimized: () => void,
   onStopRequested: () => void,
   /**
-   * The resolution of the game: the game is always displayed at this size
-   * (scaled down to fit the frame), so that it runs exactly like in a normal
-   * preview window - moving or resizing the frame must not change anything
-   * for the game.
+   * The resolution of the game, used to choose the zoom at which it is
+   * displayed in the frame (see `getGameZoomFactor`).
    */
   gameResolution: Size,
   /**
@@ -150,6 +168,7 @@ export const GameplayTestFrameLayout = ({
     setGameplayTestFramePosition,
     setGameplayTestFrameSize,
   } = React.useContext(PreferencesContext);
+  const zoomFactor = getGameZoomFactor(gameResolution);
   // Restore the last position of the frame (it will be clamped to the window
   // as soon as it is rendered, in case the window is now smaller).
   const [position, setPosition] = React.useState<Position>(
@@ -469,21 +488,18 @@ export const GameplayTestFrameLayout = ({
           isMinimized ? undefined : { width: size.width, height: size.height }
         }
       >
-        {/* The game is kept at the resolution of the project and only scaled
-            down visually: it must never know that the frame is resized (it
-            would change its resolution, unlike in a normal preview window).
-            The scale is not changed when minimized either: the game area
-            simply clips the game, which keeps being rendered (and so the
-            test keeps running). */}
+        {/* The game window is the game area at 1:1 scale, only displayed
+            zoomed out: the game runs like in a preview window of this size,
+            so that a game adapting to its window size shows it. When
+            minimized, the game window is left untouched (the game area
+            simply clips it) so that the game keeps being rendered - and so
+            the test keeps running. */}
         <div
           className={classes.gameScaler}
           style={{
-            width: gameResolution.width,
-            height: gameResolution.height,
-            transform: `translate(-50%, -50%) scale(${Math.min(
-              size.width / gameResolution.width,
-              size.height / gameResolution.height
-            )})`,
+            width: Math.round(size.width / zoomFactor),
+            height: Math.round(size.height / zoomFactor),
+            transform: `translate(-50%, -50%) scale(${zoomFactor})`,
           }}
         >
           {children}
@@ -513,9 +529,12 @@ export const GameplayTestFrameLayout = ({
           </Text>
         )}
       </div>
-      {/* Resizing only changes the scale at which the game is displayed:
-          it is safe to do it while a test is running. */}
+      {/* Resizing resizes the game window, which would skew tests based on
+          screen positions (and, for a game adapting to its window size,
+          change its resolution mid-test): only allow it when no test is in
+          progress. */}
       {!isMinimized &&
+        !isInProgress &&
         Object.keys(resizeHandleClasses).map(direction => (
           <div
             key={direction}
@@ -554,9 +573,9 @@ export const setGameplayTestFramePreviewLocation = ({
 }: {|
   previewIndexHtmlLocation: string,
   /**
-   * The resolution of the game being previewed: the game is run at this
-   * resolution, like in a normal preview window, whatever the size of
-   * the frame.
+   * The resolution of the game being previewed: the frame is sized so that
+   * the game window is exactly this size when it is opened, like a normal
+   * preview window (see `getGameZoomFactor`).
    */
   gameResolution: Size,
 |}) => {

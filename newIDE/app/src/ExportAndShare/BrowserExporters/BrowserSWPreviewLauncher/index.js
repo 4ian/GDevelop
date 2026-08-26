@@ -312,8 +312,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         setGameplayTestFramePreviewLocation({
           previewIndexHtmlLocation:
             outputDir + '/index.html?previewId=' + previewId,
-          // The game runs at the resolution of the project, like in a normal
-          // preview window: the frame only displays it scaled down.
+          // The frame shows the game zoomed out, in a game window that has
+          // the resolution of the project when the frame is opened, like a
+          // normal preview window.
           gameResolution: {
             width: project.getGameResolutionWidth(),
             height: project.getGameResolutionHeight(),

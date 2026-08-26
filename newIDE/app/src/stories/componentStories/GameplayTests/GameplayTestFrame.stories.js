@@ -26,19 +26,21 @@ const styles = {
     alignItems: 'flex-end',
     background: 'linear-gradient(to bottom, #4f28cd, #95c6ff)',
   },
+  // Sized for the fake game resolution below (the frame displays the game
+  // zoomed out, so these are divided by 4 on screen).
   fakeGameGround: {
     width: '100%',
-    height: 32,
+    height: 128,
     backgroundColor: '#16cf89',
     position: 'relative',
   },
   fakeGamePlayer: {
     position: 'absolute',
-    bottom: 32,
-    left: 60,
-    width: 20,
-    height: 28,
-    borderRadius: 3,
+    bottom: 128,
+    left: 240,
+    width: 80,
+    height: 112,
+    borderRadius: 12,
     backgroundColor: '#ffbc57',
   },
 };

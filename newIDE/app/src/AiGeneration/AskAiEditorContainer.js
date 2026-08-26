@@ -880,6 +880,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           triggerUnsavedChanges,
         ]
       );
+
       // Ask the AI to continue a request that stopped on an error: nothing new
       // is sent, so it picks up from the last message it managed to write.
       const onRetryAfterError = React.useCallback(

@@ -1129,3 +1129,55 @@ export const agentAiRequestWithFailedAndIgnoredFunctionCallOutputs: AiRequest = 
     finalModelPublicId: 'g2f1-g',
   },
 };
+
+/**
+ * A request that failed with an unspecified internal error: this is the most
+ * common failure, and the one worth retrying (the work already done by the AI
+ * is kept, so it resumes where it stopped).
+ */
+export const erroredAgentAiRequest: AiRequest = {
+  ...agentAiRequest,
+  status: 'error',
+  error: {
+    code: 'internal-error',
+    message: 'Internal error while handling the AI request.',
+  },
+};
+
+/**
+ * A request that failed because the conversation and the project don't fit in
+ * the AI model anymore: retrying is pointless, a new chat is needed.
+ */
+export const erroredWithContextTooLargeAgentAiRequest: AiRequest = {
+  ...agentAiRequest,
+  status: 'error',
+  error: {
+    code: 'context-too-large',
+    message:
+      'The conversation and project are too large for the AI model. Start a new chat, or simplify the project.',
+  },
+};
+
+/**
+ * A request stopped because the AI was repeating the same tool call again and
+ * again.
+ */
+export const erroredWithRepeatedToolCallLoopAgentAiRequest: AiRequest = {
+  ...agentAiRequest,
+  status: 'error',
+  error: {
+    code: 'repeated-tool-call-loop',
+    message:
+      'The same tool call was repeated too many times: the AI request was stopped.',
+  },
+};
+
+/**
+ * A request that failed before the API stored any error: older requests, and
+ * requests interrupted by an infrastructure failure, can look like this.
+ */
+export const erroredWithoutDetailsAgentAiRequest: AiRequest = {
+  ...agentAiRequest,
+  status: 'error',
+  error: null,
+};

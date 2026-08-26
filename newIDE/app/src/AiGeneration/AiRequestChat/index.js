@@ -836,6 +836,27 @@ export const AiRequestChat: React.ComponentType<{
       ]
     );
 
+    // Continue a request that failed: the AI resumes from the work it had
+    // already done (kept by the API), so the only thing to add to the
+    // conversation is the ask to carry on. This message is read by the AI, not
+    // by the user: it's intentionally not translated.
+    // Note that this is sent (and so priced) like any other user message.
+    const onRetryAfterError = React.useCallback(
+      () => {
+        scrollToBottom();
+
+        setHasStartedRequestButCannotContinue(cannotContinue);
+        if (cannotContinue) return;
+
+        onSendUserMessage({
+          userMessage: 'Please continue your work.',
+        }).catch(error =>
+          console.error('Failed to retry the AI request:', error)
+        );
+      },
+      [onSendUserMessage, scrollToBottom, cannotContinue]
+    );
+
     const onClickExistingChatButton = React.useCallback(
       () => {
         setIsButtonLoading(true);
@@ -1165,6 +1186,7 @@ export const AiRequestChat: React.ComponentType<{
               setHasSwitchedToGDevelopCreditsMidChat(true)
             }
             onStartOrOpenChat={onStartOrOpenChat}
+            onRetryAfterError={onRetryAfterError}
             isSending={isSendingUserMessage}
             isWaitingForEditApproval={!!pendingEditApproval}
             savingProjectForMessageId={savingProjectForMessageId}

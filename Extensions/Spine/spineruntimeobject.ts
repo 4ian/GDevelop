@@ -61,6 +61,7 @@ namespace gdjs {
 
     readonly spineResourceName: string;
 
+    /** @deprecated Has no effect: hitboxes are only recomputed when the skeleton pose changes. */
     static isHitBoxesUpdateDisabled = false;
 
     /**
@@ -91,10 +92,6 @@ namespace gdjs {
 
       this.setAnimationIndex(0);
       this._renderer.updateAnimation(0);
-
-      if (SpineRuntimeObject.isHitBoxesUpdateDisabled) {
-        this.hitBoxes.length = 0;
-      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -208,14 +205,6 @@ namespace gdjs {
       ) {
         this.setAnimationElapsedTime(syncData.anet);
       }
-    }
-
-    updateHitBoxes(): void {
-      if (SpineRuntimeObject.isHitBoxesUpdateDisabled) {
-        return;
-      }
-
-      super.updateHitBoxes();
     }
 
     extraInitializationFromInitialInstance(

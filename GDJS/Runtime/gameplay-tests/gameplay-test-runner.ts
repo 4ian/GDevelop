@@ -2908,42 +2908,44 @@ namespace gdjs {
     /** The game left frozen by the last finished test, if any. */
     let frozenRuntimeGame: gdjs.RuntimeGame | null = null;
     let freezeResizeLayoutListenerInstalled = false;
+    let freezeResizeLayoutScheduled = false;
 
     /**
      * A game frozen by `freezeWhenFinished` keeps rendering its last frame but
      * runs no logic: nothing re-lays it out when the window is resized (anchor
      * behavior, objects sized by events...). Run a single frame with a zero
-     * time delta on resize: the game is laid out for the new size without
-     * anything moving or animating.
+     * time delta: the game is laid out for the new size without anything
+     * moving or animating.
      */
-    const installFreezeResizeLayoutListener = () => {
+    const layOutFrozenGameForNewWindowSize = () => {
+      freezeResizeLayoutScheduled = false;
+      if (!frozenRuntimeGame || currentlyRunningHarness) return;
+
+      // The renderer already adapted the game resolution (its own resize
+      // listener ran first): adapt the cameras before stepping.
+      frozenRuntimeGame.getSceneStack().onGameResolutionResized();
+      frozenRuntimeGame.getSceneStack().step(0);
+    };
+
+    const onWindowResizedWhileFrozen = () => {
       if (
-        freezeResizeLayoutListenerInstalled ||
-        typeof window === 'undefined'
+        !frozenRuntimeGame ||
+        currentlyRunningHarness ||
+        freezeResizeLayoutScheduled
       ) {
         return;
       }
+
+      // Lay the game out at most once per animation frame, for the latest size.
+      freezeResizeLayoutScheduled = true;
+      requestAnimationFrame(layOutFrozenGameForNewWindowSize);
+    };
+
+    const installFreezeResizeLayoutListener = () => {
+      if (freezeResizeLayoutListenerInstalled) return;
       freezeResizeLayoutListenerInstalled = true;
 
-      let layoutScheduled = false;
-      window.addEventListener('resize', () => {
-        if (!frozenRuntimeGame || currentlyRunningHarness || layoutScheduled) {
-          return;
-        }
-        // Lay the game out at most once per animation frame, for the
-        // latest size.
-        layoutScheduled = true;
-        requestAnimationFrame(() => {
-          layoutScheduled = false;
-          if (!frozenRuntimeGame || currentlyRunningHarness) {
-            return;
-          }
-          // The renderer already adapted the game resolution (its own
-          // resize listener ran first): adapt the cameras before stepping.
-          frozenRuntimeGame.getSceneStack().onGameResolutionResized();
-          frozenRuntimeGame.getSceneStack().step(0);
-        });
-      });
+      window.addEventListener('resize', onWindowResizedWhileFrozen);
     };
 
     /**

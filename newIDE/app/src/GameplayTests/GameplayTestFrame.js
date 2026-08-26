@@ -60,9 +60,6 @@ const clampPositionToWindow = (
   };
 };
 
-// Resolution assumed for the game before a preview is launched.
-const fallbackGameResolution = { width: 1280, height: 720 };
-
 // Game area width when the frame is opened: unobtrusive on top of the editor.
 const defaultGameAreaWidth = 320;
 const minGameAreaSize = { width: 240, height: 135 };
@@ -605,9 +602,8 @@ export const GameplayTestFrame = ({
     setRunStatus,
   ] = React.useState<GameplayTestFrameRunStatus | null>(null);
   const [isMinimized, setIsMinimized] = React.useState<boolean>(false);
-  const [gameResolution, setGameResolution] = React.useState<Size>(
-    fallbackGameResolution
-  );
+  // Set together with the preview location, by the launcher starting the game.
+  const [gameResolution, setGameResolution] = React.useState<Size | null>(null);
 
   React.useEffect(() => {
     onSetGameplayTestFramePreviewLocation = (
@@ -651,7 +647,7 @@ export const GameplayTestFrame = ({
     [previewDebuggerServer, previewIndexHtmlLocation]
   );
 
-  if (!previewIndexHtmlLocation) return null;
+  if (!previewIndexHtmlLocation || !gameResolution) return null;
 
   const isInProgress = runStatus
     ? isGameplayTestStatusInProgress(runStatus.status)

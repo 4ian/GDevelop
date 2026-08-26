@@ -33,6 +33,9 @@ export type GameplayTestFrameRunStatus = {|
 
 // Distance kept between the frame and the borders of the window.
 const windowMargin = 12;
+// Larger at the top, to keep what is displayed there (like the tabs of the
+// editor) reachable.
+const windowTopMargin = windowMargin * 3;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
@@ -55,7 +58,7 @@ const clampPositionToWindow = (
     bottom: clamp(
       position.bottom,
       windowMargin,
-      Math.max(windowMargin, window.innerHeight - height - windowMargin)
+      Math.max(windowMargin, window.innerHeight - height - windowTopMargin)
     ),
   };
 };
@@ -90,6 +93,34 @@ const getDefaultGameAreaSize = (gameResolution: Size): Size => {
 // Approximate height of the chrome around the game area, to clamp the
 // restored size before the frame is rendered (and can be measured).
 const approximateFrameChromeHeight = 70;
+
+/**
+ * Clamp the game area size so the frame fits in the window.
+ * `chromeWidth`/`chromeHeight` are the size of the borders, header and
+ * footer around the game area.
+ */
+const clampSizeToWindow = (
+  size: Size,
+  chromeWidth: number,
+  chromeHeight: number
+): Size => ({
+  width: clamp(
+    size.width,
+    minGameAreaSize.width,
+    Math.max(
+      minGameAreaSize.width,
+      window.innerWidth - 2 * windowMargin - chromeWidth
+    )
+  ),
+  height: clamp(
+    size.height,
+    minGameAreaSize.height,
+    Math.max(
+      minGameAreaSize.height,
+      window.innerHeight - windowMargin - windowTopMargin - chromeHeight
+    )
+  ),
+});
 
 type ResizeDirection =
   | 'left'
@@ -166,21 +197,7 @@ export const GameplayTestFrameLayout = ({
   const [size, setSize] = React.useState<Size>(() => {
     const savedSize = values.gameplayTestFrameSize;
     if (!savedSize) return getDefaultGameAreaSize(gameResolution);
-    return {
-      width: clamp(
-        savedSize.width,
-        minGameAreaSize.width,
-        Math.max(minGameAreaSize.width, window.innerWidth - 2 * windowMargin)
-      ),
-      height: clamp(
-        savedSize.height,
-        minGameAreaSize.height,
-        Math.max(
-          minGameAreaSize.height,
-          window.innerHeight - 2 * windowMargin - approximateFrameChromeHeight
-        )
-      ),
-    };
+    return clampSizeToWindow(savedSize, 0, approximateFrameChromeHeight);
   });
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
   const [isResizing, setIsResizing] = React.useState<boolean>(false);
@@ -202,25 +219,40 @@ export const GameplayTestFrameLayout = ({
     chromeHeight: number,
   |} | null>(null);
 
-  // Keep the frame inside the window when it is resized (or when the frame
-  // grows back after being minimized).
-  React.useEffect(() => {
-    const onWindowResized = () => {
-      setPosition(position =>
-        clampPositionToWindow(position, containerRef.current)
-      );
-    };
-    window.addEventListener('resize', onWindowResized);
-    return () => window.removeEventListener('resize', onWindowResized);
-  }, []);
-  React.useEffect(
+  // Keep the frame inside the window: shrink the game area if the window
+  // got too small for the frame (not when minimized: the game area is then
+  // 1x1 and the chrome around it can't be measured), then clamp the
+  // position.
+  const keepFrameInsideWindow = React.useCallback(
     () => {
-      setPosition(position =>
-        clampPositionToWindow(position, containerRef.current)
-      );
+      const container = containerRef.current;
+      const gameArea = gameAreaRef.current;
+      if (!isMinimized && container && gameArea) {
+        const containerRect = container.getBoundingClientRect();
+        const gameAreaRect = gameArea.getBoundingClientRect();
+        setSize(size =>
+          clampSizeToWindow(
+            size,
+            containerRect.width - gameAreaRect.width,
+            containerRect.height - gameAreaRect.height
+          )
+        );
+      }
+      setPosition(position => clampPositionToWindow(position, container));
     },
     [isMinimized]
   );
+
+  // Apply it when the window is resized, and when the frame is first
+  // rendered or grows back after being minimized.
+  React.useEffect(
+    () => {
+      window.addEventListener('resize', keepFrameInsideWindow);
+      return () => window.removeEventListener('resize', keepFrameInsideWindow);
+    },
+    [keepFrameInsideWindow]
+  );
+  React.useEffect(keepFrameInsideWindow, [keepFrameInsideWindow]);
 
   const onPointerDown = React.useCallback(
     (event: PointerEvent) => {
@@ -333,7 +365,7 @@ export const GameplayTestFrameLayout = ({
       // Anchored to the window bottom: the frame grows upwards without moving.
       const maxHeight =
         window.innerHeight -
-        windowMargin -
+        windowTopMargin -
         origin.position.bottom -
         origin.chromeHeight;
       newSize.height = clamp(

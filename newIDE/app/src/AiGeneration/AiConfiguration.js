@@ -4,6 +4,10 @@ import {
   type AiConfigurationPreset,
   type AiSettings,
 } from '../Utils/GDevelopServices/Generation';
+import {
+  isCustomEndpointEnabled,
+  DEFAULT_LOCAL_AI_SETTINGS,
+} from '../AI/CustomAIClient';
 
 export type AiConfigurationPresetWithAvailability = {|
   ...AiConfigurationPreset,
@@ -19,17 +23,25 @@ export const getAiConfigurationPresetsWithAvailability = ({
   getAiSettings: () => AiSettings | null,
   limits: ?Limits,
 |}): Array<AiConfigurationPresetWithAvailability> => {
-  const aiSettings = getAiSettings();
-  if (!aiSettings) {
-    return [];
+  if (isCustomEndpointEnabled()) {
+    const aiSettings = getAiSettings() || DEFAULT_LOCAL_AI_SETTINGS;
+    return aiSettings.aiRequest.presets.map(preset => ({
+      ...preset,
+      enableWith: null,
+      enabledWithPlans: [],
+      disabled: false,
+    }));
   }
+
+  const aiSettings = getAiSettings();
+  if (!aiSettings) return [];
 
   if (!limits) {
     return aiSettings.aiRequest.presets.map(preset => ({
       ...preset,
       enableWith: null,
       enabledWithPlans: [],
-      disabled: preset.isDefault ? false : true,
+      disabled: !preset.isDefault,
     }));
   }
 

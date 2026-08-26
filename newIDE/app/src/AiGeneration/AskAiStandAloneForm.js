@@ -35,9 +35,13 @@ import { listAllExamples } from '../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
+import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
+import {
+  isCustomEndpointEnabled,
+  LOCAL_BYOK_USER_ID,
+} from '../AI/CustomAIClient';
 import {
   useProcessFunctionCalls,
   useRefreshLimits,
@@ -202,15 +206,30 @@ export const AskAiStandAloneForm = ({
   const {
     values: { automaticallyUseCreditsForAiRequests },
   } = React.useContext(PreferencesContext);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     profile,
-    getAuthorizationHeader,
+    getAuthorizationHeader: rawGetAuthorizationHeader,
     onOpenCreateAccountDialog,
     limits,
     onRefreshLimits,
     subscription,
-  } = React.useContext(AuthenticatedUserContext);
+  } = authenticatedUser;
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
+
+  const getAuthorizationHeader = React.useCallback(
+    async (): Promise<string> => {
+      try {
+        return await rawGetAuthorizationHeader();
+      } catch (error) {
+        if (isCustomEndpointEnabled()) {
+          return 'Bearer local-byok-token';
+        }
+        throw error;
+      }
+    },
+    [rawGetAuthorizationHeader]
+  );
 
   const { isRefreshingLimits, refreshLimits } = useRefreshLimits(
     onRefreshLimits
@@ -251,11 +270,13 @@ export const AskAiStandAloneForm = ({
         if (!newAiRequestOptions) return;
         console.info('Starting a new AI request...');
 
-        if (!profile) {
+        if (!profile && !isCustomEndpointEnabled()) {
           onOpenCreateAccountDialog();
           startNewAiRequest(null);
           return;
         }
+
+        const activeUserId = profile ? profile.id : LOCAL_BYOK_USER_ID;
 
         // Read the options and reset them immediately to prevent the effect from firing
         // again if dependencies change during the async operations below (e.g. when
@@ -275,7 +296,12 @@ export const AskAiStandAloneForm = ({
         // Ensure the user has enough credits to pay for the request, or ask them
         // to buy some more.
         let payWithCredits = false;
-        if (quota && quota.limitReached && aiRequestPriceInCredits) {
+        if (
+          quota &&
+          quota.limitReached &&
+          aiRequestPriceInCredits &&
+          !isCustomEndpointEnabled()
+        ) {
           payWithCredits = true;
           const doesNotHaveEnoughCreditsToContinue =
             availableCredits < aiRequestPriceInCredits;
@@ -299,7 +325,7 @@ export const AskAiStandAloneForm = ({
 
           const preparedAiUserContent = await prepareAiUserContent({
             getAuthorizationHeader,
-            userId: profile.id,
+            userId: activeUserId,
             simplifiedProjectJson: null,
             projectSpecificExtensionsSummaryJson: null,
             eventsJson: null,
@@ -307,7 +333,7 @@ export const AskAiStandAloneForm = ({
 
           const aiRequest = await createAiRequest(getAuthorizationHeader, {
             userRequest: userRequest,
-            userId: profile.id,
+            userId: activeUserId,
             gameProjectJsonUserRelativeKey:
               preparedAiUserContent.gameProjectJsonUserRelativeKey,
             gameProjectJson: preparedAiUserContent.gameProjectJson,
@@ -480,9 +506,11 @@ export const AskAiStandAloneForm = ({
             )
           : null;
 
+        const activeUserId = profile ? profile.id : LOCAL_BYOK_USER_ID;
+
         const preparedAiUserContent = await prepareAiUserContent({
           getAuthorizationHeader,
-          userId: profile.id,
+          userId: activeUserId,
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
           eventsJson: null,
@@ -490,7 +518,7 @@ export const AskAiStandAloneForm = ({
 
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
           addMessageToAiRequest(getAuthorizationHeader, {
-            userId: profile.id,
+            userId: activeUserId,
             aiRequestId,
             functionCallOutputs,
             gameProjectJsonUserRelativeKey:
@@ -687,7 +715,9 @@ export const AskAiStandAloneForm = ({
         lastSendError={getLastSendError(aiRequestIdForForm)}
         quota={quota}
         increaseQuotaOffering={
-          !hasValidSubscriptionPlan(subscription)
+          isCustomEndpointEnabled()
+            ? 'none'
+            : !hasValidSubscriptionPlan(subscription)
             ? 'subscribe'
             : canUpgradeSubscription(subscription)
             ? 'upgrade'

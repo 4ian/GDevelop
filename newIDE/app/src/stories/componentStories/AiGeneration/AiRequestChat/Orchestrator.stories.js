@@ -10,6 +10,9 @@ import {
   agentAiRequest,
   agentAiRequestWithFailedAndIgnoredFunctionCallOutputs,
   agentAiRequestWithFunctionCallToDo,
+  contextTooLargeAiRequestError,
+  internalAiRequestError,
+  repeatedToolCallLoopAiRequestError,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
 import { action } from '@storybook/addon-actions';
 import {
@@ -716,6 +719,63 @@ export const ErrorLaunchingFollowupAiRequest = (): React.Node => (
   <WrappedChatComponent
     aiRequest={agentAiRequest}
     lastSendError={new Error('fake error while sending request')}
+  />
+);
+
+// The request itself stopped on an error: the chat offers to continue it where
+// it stopped, or to start over in a new chat.
+export const AiRequestStoppedOnError = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      status: 'error',
+      error: internalAiRequestError,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
+// The conversation is too large for the AI model: continuing it is not offered
+// (it would fail again), starting a new chat is.
+export const AiRequestStoppedOnErrorWithContextTooLarge = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      status: 'error',
+      error: contextTooLargeAiRequestError,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
+export const AiRequestStoppedOnErrorWithRepeatedToolCallLoop = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      status: 'error',
+      error: repeatedToolCallLoopAiRequestError,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
+export const AiRequestStoppedOnErrorWithoutRetry = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{ ...aiRequestWithAiResponses, status: 'error' }}
+  />
+);
+
+// The request was made for another project than the one opened: it cannot be
+// continued (the project sent to the AI would not be the right one).
+export const AiRequestStoppedOnErrorForAnotherProject = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      gameId: 'another-project-game-id',
+      status: 'error',
+      error: internalAiRequestError,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
   />
 );
 

@@ -109,6 +109,15 @@ type AiRequestToolOptions = {
   watchPollingIntervalInMs?: number,
 };
 
+/**
+ * Why an AI request failed, as reported by the API. The code is used to tell
+ * the user what happened and what they can do about it (see AiRequestErrorRow).
+ */
+export type AiRequestError = {
+  code: string,
+  message: string,
+};
+
 export type AiRequest = {
   id: string,
   createdAt: string,
@@ -126,10 +135,7 @@ export type AiRequest = {
   forkedAfterNewMessageId?: string | null,
   parentAiRequestId?: string | null,
 
-  error: {
-    code: string,
-    message: string,
-  } | null,
+  error: AiRequestError | null,
 
   output?: Array<AiRequestMessage>,
 

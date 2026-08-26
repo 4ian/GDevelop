@@ -659,12 +659,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           createdSceneNames,
           createdProject,
           editorFunctionCallResults,
+          forceSend,
         }: {|
           aiRequestId: string,
           userMessage: string,
           createdSceneNames?: Array<string>,
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
+          // Sends even when there is nothing new to send: used to ask the AI to
+          // continue a request that stopped on an error.
+          forceSend?: boolean,
         |}) => {
           if (!profile) return;
 
@@ -709,7 +713,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           }
 
           // If nothing to send, stop there.
-          if (functionCallOutputs.length === 0 && !userMessage) return;
+          if (functionCallOutputs.length === 0 && !userMessage && !forceSend)
+            return;
 
           // Paying with credits is only when a user message is sent (and quota is exhausted).
           let payWithCredits = false;
@@ -875,6 +880,23 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           triggerUnsavedChanges,
         ]
       );
+
+      // Ask the AI to continue a request that stopped on an error: nothing new
+      // is sent, so it picks up from the last message it managed to write.
+      const onRetryAfterError = React.useCallback(
+        async () => {
+          if (!selectedAiRequestId) return;
+          await onSendMessage({
+            aiRequestId: selectedAiRequestId,
+            userMessage: '',
+            editorFunctionCallResults:
+              getEditorFunctionCallResults(selectedAiRequestId) || [],
+            forceSend: true,
+          });
+        },
+        [selectedAiRequestId, onSendMessage, getEditorFunctionCallResults]
+      );
+
       useActivatePendingSubAgents({ selectedAiRequest });
       useLoadSubAgentRequests({ selectedAiRequest });
 
@@ -1545,6 +1567,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                       : [],
                   });
                 }}
+                onRetryAfterError={onRetryAfterError}
                 onIsAutoEditEnabledChange={enabled => {
                   isAutoEditEnabledRef.current = enabled;
                   // Toggling auto-edit revokes any blanket approvals already

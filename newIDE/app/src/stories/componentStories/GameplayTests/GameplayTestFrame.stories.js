@@ -21,7 +21,8 @@ const styles = {
   storyContainer: { height: 460, position: 'relative' },
   fakeGame: {
     display: 'flex',
-    flex: 1,
+    width: '100%',
+    height: '100%',
     alignItems: 'flex-end',
     background: 'linear-gradient(to bottom, #4f28cd, #95c6ff)',
   },
@@ -87,6 +88,7 @@ const FrameStory = ({
         isMinimized={isMinimized}
         onToggleMinimized={() => setIsMinimized(!isMinimized)}
         onStopRequested={action('stop requested')}
+        gameResolution={{ width: 1280, height: 720 }}
       >
         <FakeGameView />
       </GameplayTestFrameLayout>

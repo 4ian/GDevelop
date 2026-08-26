@@ -149,16 +149,28 @@
 
 .gameArea {
   position: relative;
-  display: flex;
   width: 320px;
   height: 180px;
+  overflow: hidden;
   background-color: #000;
 }
 
 /*
- * When minimized, the game is kept in a 1x1 pixel visible area: `display: none`
- * (or a zero size) would stop `requestAnimationFrame` in the game - and so the
- * test being run.
+ * Holds the game at its own resolution and only scales it down visually to
+ * fit the game area: the game must never be resized, so that it runs exactly
+ * like in a normal preview window.
+ */
+.gameScaler {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+/*
+ * When minimized, the game (still rendered at its own resolution) is clipped
+ * to a 1x1 pixel visible area: `display: none` (or a zero size) would stop
+ * `requestAnimationFrame` in the game - and so the test being run.
  */
 .hiddenGameArea {
   width: 1px;

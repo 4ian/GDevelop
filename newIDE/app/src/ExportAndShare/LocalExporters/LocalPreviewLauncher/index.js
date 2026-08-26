@@ -461,6 +461,12 @@ export default class LocalPreviewLauncher extends React.Component<
         // reload the game when the same preview is re-exported.
         setGameplayTestFramePreviewLocation({
           previewIndexHtmlLocation: `file://${outputDir}/index.html?previewId=${previewId}`,
+          // The game runs at the resolution of the project, like in a normal
+          // preview window: the frame only displays it scaled down.
+          gameResolution: {
+            width: project.getGameResolutionWidth(),
+            height: project.getGameResolutionHeight(),
+          },
         });
       } else if (previewOptions.numberOfWindows >= 1) {
         this._openPreviewWindow(project, outputDir, previewOptions);

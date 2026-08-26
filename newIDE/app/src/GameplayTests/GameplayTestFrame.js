@@ -60,8 +60,28 @@ const clampPositionToWindow = (
   };
 };
 
-const defaultGameAreaSize = { width: 320, height: 180 };
+// The resolution assumed for the game before knowing the one of the project
+// (only used if the frame is shown without a preview being launched).
+const fallbackGameResolution = { width: 1280, height: 720 };
+
+// The game is displayed scaled down: the frame is a small floating window,
+// while the game itself keeps running at the resolution of the project.
+const defaultGameAreaWidth = 320;
 const minGameAreaSize = { width: 240, height: 135 };
+
+/**
+ * The default size of the game area: small enough to stay unobtrusive, with
+ * the aspect ratio of the game so that it is displayed without black bars.
+ */
+const getDefaultGameAreaSize = (gameResolution: Size): Size => ({
+  width: defaultGameAreaWidth,
+  height: Math.max(
+    minGameAreaSize.height,
+    Math.round(
+      (defaultGameAreaWidth * gameResolution.height) / gameResolution.width
+    )
+  ),
+});
 // Approximate height of the header, footer and borders around the game area,
 // used to clamp the restored size before the frame is rendered (the exact
 // size of these elements can only be measured once rendered).
@@ -94,6 +114,13 @@ type GameplayTestFrameLayoutProps = {|
   onToggleMinimized: () => void,
   onStopRequested: () => void,
   /**
+   * The resolution of the game: the game is always displayed at this size
+   * (scaled down to fit the frame), so that it runs exactly like in a normal
+   * preview window - moving or resizing the frame must not change anything
+   * for the game.
+   */
+  gameResolution: Size,
+  /**
    * The game itself (an iframe running the preview). It is always rendered,
    * even when minimized, so that the test keeps running.
    */
@@ -113,6 +140,7 @@ export const GameplayTestFrameLayout = ({
   isMinimized,
   onToggleMinimized,
   onStopRequested,
+  gameResolution,
   children,
 }: GameplayTestFrameLayoutProps): React.Node => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
@@ -135,7 +163,7 @@ export const GameplayTestFrameLayout = ({
   // now smaller than when the size was saved.
   const [size, setSize] = React.useState<Size>(() => {
     const savedSize = values.gameplayTestFrameSize;
-    if (!savedSize) return defaultGameAreaSize;
+    if (!savedSize) return getDefaultGameAreaSize(gameResolution);
     return {
       width: clamp(
         savedSize.width,
@@ -441,7 +469,25 @@ export const GameplayTestFrameLayout = ({
           isMinimized ? undefined : { width: size.width, height: size.height }
         }
       >
-        {children}
+        {/* The game is kept at the resolution of the project and only scaled
+            down visually: it must never know that the frame is resized (it
+            would change its resolution, unlike in a normal preview window).
+            The scale is not changed when minimized either: the game area
+            simply clips the game, which keeps being rendered (and so the
+            test keeps running). */}
+        <div
+          className={classes.gameScaler}
+          style={{
+            width: gameResolution.width,
+            height: gameResolution.height,
+            transform: `translate(-50%, -50%) scale(${Math.min(
+              size.width / gameResolution.width,
+              size.height / gameResolution.height
+            )})`,
+          }}
+        >
+          {children}
+        </div>
       </div>
       <div className={classes.footer}>
         <GameplayTestStatusChip
@@ -467,11 +513,9 @@ export const GameplayTestFrameLayout = ({
           </Text>
         )}
       </div>
-      {/* Resizing while a test runs would change the game resolution and
-          skew tests based on screen positions: only allow it when no test
-          is in progress. */}
+      {/* Resizing only changes the scale at which the game is displayed:
+          it is safe to do it while a test is running. */}
       {!isMinimized &&
-        !isInProgress &&
         Object.keys(resizeHandleClasses).map(direction => (
           <div
             key={direction}
@@ -491,7 +535,10 @@ export const GameplayTestFrameLayout = ({
 
 let onSetGameplayTestFramePreviewLocation:
   | null
-  | ((previewIndexHtmlLocation: string) => void) = null;
+  | ((
+      previewIndexHtmlLocation: string,
+      gameResolution: Size | null
+    ) => void) = null;
 let onSetGameplayTestFrameRunStatus:
   | null
   | ((runStatus: GameplayTestFrameRunStatus | null) => void) = null;
@@ -503,12 +550,22 @@ let onSetGameplayTestFrameRunStatus:
  */
 export const setGameplayTestFramePreviewLocation = ({
   previewIndexHtmlLocation,
+  gameResolution,
 }: {|
   previewIndexHtmlLocation: string,
+  /**
+   * The resolution of the game being previewed: the game is run at this
+   * resolution, like in a normal preview window, whatever the size of
+   * the frame.
+   */
+  gameResolution: Size,
 |}) => {
   if (!onSetGameplayTestFramePreviewLocation)
     throw new Error('No GameplayTestFrame registered.');
-  onSetGameplayTestFramePreviewLocation(previewIndexHtmlLocation);
+  onSetGameplayTestFramePreviewLocation(
+    previewIndexHtmlLocation,
+    gameResolution
+  );
 };
 
 /**
@@ -516,7 +573,7 @@ export const setGameplayTestFramePreviewLocation = ({
  */
 export const clearGameplayTestFramePreview = () => {
   if (!onSetGameplayTestFramePreviewLocation) return;
-  onSetGameplayTestFramePreviewLocation('');
+  onSetGameplayTestFramePreviewLocation('', null);
 };
 
 /**
@@ -553,12 +610,17 @@ export const GameplayTestFrame = ({
     setRunStatus,
   ] = React.useState<GameplayTestFrameRunStatus | null>(null);
   const [isMinimized, setIsMinimized] = React.useState<boolean>(false);
+  const [gameResolution, setGameResolution] = React.useState<Size>(
+    fallbackGameResolution
+  );
 
   React.useEffect(() => {
     onSetGameplayTestFramePreviewLocation = (
-      newPreviewIndexHtmlLocation: string
+      newPreviewIndexHtmlLocation: string,
+      newGameResolution: Size | null
     ) => {
       setPreviewIndexHtmlLocation(newPreviewIndexHtmlLocation);
+      if (newGameResolution) setGameResolution(newGameResolution);
       setIsMinimized(false);
       // Don't show the status of a previous run when the frame is closed
       // then shown again.
@@ -604,6 +666,7 @@ export const GameplayTestFrame = ({
     <GameplayTestFrameLayout
       runStatus={runStatus}
       isMinimized={isMinimized}
+      gameResolution={gameResolution}
       onToggleMinimized={() => setIsMinimized(!isMinimized)}
       onStopRequested={() => {
         if (isInProgress) {

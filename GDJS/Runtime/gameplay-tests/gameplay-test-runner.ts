@@ -2906,47 +2906,6 @@ namespace gdjs {
       !!currentlyRunningHarness;
 
     /**
-     * The game left paused (frozen) by the last finished test, if any.
-     * See `installFreezeResizeStepListener`.
-     */
-    let frozenRuntimeGame: gdjs.RuntimeGame | null = null;
-    let freezeResizeStepListenerInstalled = false;
-
-    /**
-     * When a test finished with `freezeWhenFinished`, the game stays paused,
-     * showing the last frame. If the game window is then resized, run a
-     * single game frame so that everything adapting to the window size
-     * (anchored objects, cameras...) updates the displayed frame. This does
-     * not change the results of the test: they were already computed and
-     * reported when the test finished.
-     */
-    const installFreezeResizeStepListener = () => {
-      if (freezeResizeStepListenerInstalled || typeof window === 'undefined') {
-        return;
-      }
-      freezeResizeStepListenerInstalled = true;
-
-      let stepScheduled = false;
-      window.addEventListener('resize', () => {
-        if (!frozenRuntimeGame || currentlyRunningHarness || stepScheduled) {
-          return;
-        }
-        // Coalesce to at most one game frame per animation frame, but run
-        // the frame synchronously so the adaptation is rendered in the same
-        // paint as the resize (no trailing while dragging a window border).
-        stepScheduled = true;
-        requestAnimationFrame(() => {
-          stepScheduled = false;
-        });
-        // The game renderer's own resize listener ran first (it was
-        // registered at game startup): the game resolution is already
-        // adapted. Adapt the cameras now, then run a single game frame.
-        frozenRuntimeGame.getSceneStack().onGameResolutionResized();
-        frozenRuntimeGame.getSceneStack().step(1000 / 60);
-      });
-    };
-
-    /**
      * Run a gameplay test script against the game and return its result.
      *
      * The game main loop keeps rendering (paused) while the test steps the
@@ -2971,8 +2930,6 @@ namespace gdjs {
 
       const harness = new GameplayTestHarness(runtimeGame, payload);
       currentlyRunningHarness = harness;
-      // The game is not frozen anymore: the test owns the game stepping.
-      frozenRuntimeGame = null;
       harness._onProgress = onProgress || null;
 
       // The source must be the BODY of `async (harness) => { ... }`, but
@@ -3205,9 +3162,6 @@ namespace gdjs {
           } catch (error) {
             // Ignore errors while muting the game.
           }
-          // Still adapt the displayed last frame if the window is resized.
-          frozenRuntimeGame = runtimeGame;
-          installFreezeResizeStepListener();
         } else {
           runtimeGame.pause(wasPaused);
         }

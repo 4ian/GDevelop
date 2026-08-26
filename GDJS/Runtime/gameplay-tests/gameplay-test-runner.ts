@@ -2905,26 +2905,16 @@ namespace gdjs {
     export const isGameplayTestRunning = (): boolean =>
       !!currentlyRunningHarness;
 
-    /**
-     * The game left paused (frozen) by the last finished test, if any.
-     * See `installFreezeResizeLayoutListener`.
-     */
+    /** The game left frozen by the last finished test, if any. */
     let frozenRuntimeGame: gdjs.RuntimeGame | null = null;
     let freezeResizeLayoutListenerInstalled = false;
 
     /**
-     * When a test finished with `freezeWhenFinished`, the game stays paused:
-     * its main loop keeps rendering the last frame (`renderWithoutStep`), but
-     * runs no game logic at all. If the game window is then resized, this
-     * rendering is not enough: everything laying the game out from the window
-     * size (objects with the anchor behavior, objects resized by events...) is
-     * only updated when the game logic runs, so the last frame would be
-     * rendered with a layout made for the previous window size.
-     *
-     * Run a single frame with a zero time delta when this happens: the game is
-     * laid out for the new window size without any time passing, so nothing
-     * moves, no timer advances and no animation plays. The results of the test
-     * are untouched: they were already computed and reported when it finished.
+     * A game frozen by `freezeWhenFinished` keeps rendering its last frame but
+     * runs no logic: nothing re-lays it out when the window is resized (anchor
+     * behavior, objects sized by events...). Run a single frame with a zero
+     * time delta on resize: the game is laid out for the new size without
+     * anything moving or animating.
      */
     const installFreezeResizeLayoutListener = () => {
       if (
@@ -2940,20 +2930,16 @@ namespace gdjs {
         if (!frozenRuntimeGame || currentlyRunningHarness || layoutScheduled) {
           return;
         }
-        // The resize event can fire more often than the display refreshes:
-        // lay the game out at most once per animation frame while a window
-        // border is dragged, always for the latest size.
+        // Lay the game out at most once per animation frame, for the
+        // latest size.
         layoutScheduled = true;
         requestAnimationFrame(() => {
           layoutScheduled = false;
           if (!frozenRuntimeGame || currentlyRunningHarness) {
             return;
           }
-          // The game renderer's own resize listener already ran (it was
-          // registered at game startup): the game resolution is already
-          // adapted. Adapt the cameras to it before stepping, as the paused
-          // main loop would only do it on its next frame - too late for the
-          // frame stepped here.
+          // The renderer already adapted the game resolution (its own
+          // resize listener ran first): adapt the cameras before stepping.
           frozenRuntimeGame.getSceneStack().onGameResolutionResized();
           frozenRuntimeGame.getSceneStack().step(0);
         });
@@ -2985,7 +2971,7 @@ namespace gdjs {
 
       const harness = new GameplayTestHarness(runtimeGame, payload);
       currentlyRunningHarness = harness;
-      // The game is not frozen anymore: the test owns the game stepping.
+      // The test owns the game stepping from now on.
       frozenRuntimeGame = null;
       harness._onProgress = onProgress || null;
 

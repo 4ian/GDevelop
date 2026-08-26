@@ -461,9 +461,8 @@ export default class LocalPreviewLauncher extends React.Component<
         // reload the game when the same preview is re-exported.
         setGameplayTestFramePreviewLocation({
           previewIndexHtmlLocation: `file://${outputDir}/index.html?previewId=${previewId}`,
-          // The frame shows the game zoomed out, in a game window that has
-          // the resolution of the project when the frame is opened, like a
-          // normal preview window.
+          // The frame opens with a game window of the project resolution,
+          // displayed zoomed out.
           gameResolution: {
             width: project.getGameResolutionWidth(),
             height: project.getGameResolutionHeight(),

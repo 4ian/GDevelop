@@ -156,9 +156,8 @@
 }
 
 /*
- * Holds the game window, which has the size of the game area at 1:1 scale
- * and is only zoomed out to fit it: the game runs like in a preview window
- * of this size (see `getGameZoomFactor`).
+ * Holds the game window: sized 1:1 and only zoomed out to fit the game area
+ * (see `getGameZoomFactor`).
  */
 .gameScaler {
   position: absolute;
@@ -168,9 +167,9 @@
 }
 
 /*
- * When minimized, the game window is left untouched and only clipped to a
- * 1x1 pixel visible area: `display: none` (or a zero size) would stop
- * `requestAnimationFrame` in the game - and so the test being run.
+ * When minimized, the game window is only clipped to a 1x1 pixel area:
+ * `display: none` (or a zero size) would stop `requestAnimationFrame` in
+ * the game - and so the test being run.
  */
 .hiddenGameArea {
   width: 1px;

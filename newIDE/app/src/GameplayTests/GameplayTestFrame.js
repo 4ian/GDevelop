@@ -60,35 +60,23 @@ const clampPositionToWindow = (
   };
 };
 
-// The resolution assumed for the game before knowing the one of the project
-// (only used if the frame is shown without a preview being launched).
+// Resolution assumed for the game before a preview is launched.
 const fallbackGameResolution = { width: 1280, height: 720 };
 
-// Width of the game area when the frame is opened: small enough to stay
-// unobtrusive on top of the editor.
+// Game area width when the frame is opened: unobtrusive on top of the editor.
 const defaultGameAreaWidth = 320;
 const minGameAreaSize = { width: 240, height: 135 };
 
 /**
- * The zoom at which the game is displayed in the frame. The frame is a real
- * preview window, only zoomed out: the game window is always
- * `game area size / zoom`, so that the game area shows exactly the game
- * resolution when the frame has its default size.
- *
- * This zoom never changes while the frame is shown: resizing the frame
- * resizes the game window (like resizing a preview window would - a game
- * adapting to its window size shows it), but the scale at which the game is
- * displayed stays the same.
+ * The fixed zoom at which the game is displayed: the game window is always
+ * `game area size / zoom`. Resizing the frame resizes the game window (like
+ * resizing a preview window would), never the scale.
  */
 const getGameZoomFactor = (gameResolution: Size): number =>
-  // Never zoom in on a game with a resolution smaller than the frame: it
-  // would be displayed blurry for no reason.
+  // Never zoom in: a small game would only be displayed blurry.
   Math.min(1, defaultGameAreaWidth / gameResolution.width);
 
-/**
- * The default size of the game area: the size at which the game window is
- * exactly the game resolution, like a preview window when it is opened.
- */
+/** Game area size at which the game window is exactly the game resolution. */
 const getDefaultGameAreaSize = (gameResolution: Size): Size => {
   const zoomFactor = getGameZoomFactor(gameResolution);
   return {
@@ -102,9 +90,8 @@ const getDefaultGameAreaSize = (gameResolution: Size): Size => {
     ),
   };
 };
-// Approximate height of the header, footer and borders around the game area,
-// used to clamp the restored size before the frame is rendered (the exact
-// size of these elements can only be measured once rendered).
+// Approximate height of the chrome around the game area, to clamp the
+// restored size before the frame is rendered (and can be measured).
 const approximateFrameChromeHeight = 70;
 
 type ResizeDirection =
@@ -136,10 +123,7 @@ type GameplayTestFrameLayoutProps = {|
   isMinimized: boolean,
   onToggleMinimized: () => void,
   onStopRequested: () => void,
-  /**
-   * The resolution of the game, used to choose the zoom at which it is
-   * displayed in the frame (see `getGameZoomFactor`).
-   */
+  /** The game resolution, giving the display zoom (see `getGameZoomFactor`). */
   gameResolution: Size,
   /**
    * The game itself (an iframe running the preview). It is always rendered,
@@ -181,8 +165,7 @@ export const GameplayTestFrameLayout = ({
         bottom: windowMargin,
       }
   );
-  // Restore the last size of the game area, clamped in case the window is
-  // now smaller than when the size was saved.
+  // Restore the last size, clamped in case the window is now smaller.
   const [size, setSize] = React.useState<Size>(() => {
     const savedSize = values.gameplayTestFrameSize;
     if (!savedSize) return getDefaultGameAreaSize(gameResolution);
@@ -217,7 +200,7 @@ export const GameplayTestFrameLayout = ({
     position: Position,
     size: Size,
     direction: ResizeDirection,
-    /** Size taken by the borders, header and footer around the game area. */
+    /** Size of the chrome (borders, header, footer) around the game area. */
     chromeWidth: number,
     chromeHeight: number,
   |} | null>(null);
@@ -350,8 +333,7 @@ export const GameplayTestFrameLayout = ({
         origin.position.left + (origin.size.width - newSize.width);
     }
     if (origin.direction.includes('top')) {
-      // The frame is anchored to the bottom of the window: it grows upwards
-      // without moving.
+      // Anchored to the window bottom: the frame grows upwards without moving.
       const maxHeight =
         window.innerHeight -
         windowMargin -
@@ -397,8 +379,7 @@ export const GameplayTestFrameLayout = ({
     ? isGameplayTestStatusInProgress(runStatus.status)
     : false;
 
-  // Cancel any resize in progress when a test starts (the handles are
-  // removed, so the pointer capture is lost anyway).
+  // Cancel any resize in progress when a test starts.
   React.useEffect(
     () => {
       if (isInProgress) {
@@ -491,11 +472,9 @@ export const GameplayTestFrameLayout = ({
           isMinimized ? undefined : { width: size.width, height: size.height }
         }
       >
-        {/* The game window is the game area at 1:1 scale, only displayed
-            zoomed out: the game runs like in a preview window of this size,
-            so that a game adapting to its window size shows it. When
-            minimized, the game window is left untouched (the game area
-            simply clips it) so that the game keeps being rendered - and so
+        {/* The game window: the game area at 1:1 scale, displayed zoomed
+            out - the game runs like in a preview window of this size. When
+            minimized it is only clipped, so the game keeps rendering and
             the test keeps running. */}
         <div
           className={classes.gameScaler}
@@ -532,10 +511,8 @@ export const GameplayTestFrameLayout = ({
           </Text>
         )}
       </div>
-      {/* Resizing resizes the game window, which would skew tests based on
-          screen positions (and, for a game adapting to its window size,
-          change its resolution mid-test): only allow it when no test is in
-          progress. */}
+      {/* Resizing resizes the game window, which would skew a running
+          test: only allow it when no test is in progress. */}
       {!isMinimized &&
         !isInProgress &&
         resizeHandles.map(({ direction, className }) => (
@@ -573,9 +550,8 @@ export const setGameplayTestFramePreviewLocation = ({
 }: {|
   previewIndexHtmlLocation: string,
   /**
-   * The resolution of the game being previewed: the frame is sized so that
-   * the game window is exactly this size when it is opened, like a normal
-   * preview window (see `getGameZoomFactor`).
+   * The game resolution: the frame opens with the game window at exactly
+   * this size (see `getGameZoomFactor`).
    */
   gameResolution: Size,
 |}) => {

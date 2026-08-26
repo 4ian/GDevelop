@@ -300,7 +300,9 @@ export const getAiRequest = async (
   const authorizationHeader = await getAuthorizationHeader();
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/ai-request/${aiRequestId}`,
+    `${GDevelopGenerationApi.getBaseUrlForRoute(
+      'GET /ai-request/{id}'
+    )}/ai-request/${aiRequestId}`,
     {
       params: {
         userId,
@@ -340,7 +342,7 @@ export const getAiRequestStatuses = async (
   const authorizationHeader = await getAuthorizationHeader();
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/ai-request`,
+    `${GDevelopGenerationApi.getBaseUrlForRoute('GET /ai-request')}/ai-request`,
     {
       params: {
         userId,

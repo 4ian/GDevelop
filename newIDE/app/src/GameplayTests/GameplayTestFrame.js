@@ -117,16 +117,19 @@ type ResizeDirection =
   | 'bottom-left'
   | 'bottom-right';
 
-const resizeHandleClasses: { [ResizeDirection]: string } = {
-  left: classes.resizeLeft,
-  right: classes.resizeRight,
-  top: classes.resizeTop,
-  bottom: classes.resizeBottom,
-  'top-left': classes.resizeTopLeft,
-  'top-right': classes.resizeTopRight,
-  'bottom-left': classes.resizeBottomLeft,
-  'bottom-right': classes.resizeBottomRight,
-};
+const resizeHandles: Array<{|
+  direction: ResizeDirection,
+  className: string,
+|}> = [
+  { direction: 'left', className: classes.resizeLeft },
+  { direction: 'right', className: classes.resizeRight },
+  { direction: 'top', className: classes.resizeTop },
+  { direction: 'bottom', className: classes.resizeBottom },
+  { direction: 'top-left', className: classes.resizeTopLeft },
+  { direction: 'top-right', className: classes.resizeTopRight },
+  { direction: 'bottom-left', className: classes.resizeBottomLeft },
+  { direction: 'bottom-right', className: classes.resizeBottomRight },
+];
 
 type GameplayTestFrameLayoutProps = {|
   runStatus: GameplayTestFrameRunStatus | null,
@@ -535,13 +538,10 @@ export const GameplayTestFrameLayout = ({
           progress. */}
       {!isMinimized &&
         !isInProgress &&
-        Object.keys(resizeHandleClasses).map(direction => (
+        resizeHandles.map(({ direction, className }) => (
           <div
             key={direction}
-            className={classNames(
-              classes.resizeHandle,
-              resizeHandleClasses[direction]
-            )}
+            className={classNames(classes.resizeHandle, className)}
             onPointerDown={event => onResizePointerDown(direction, event)}
             onPointerMove={onResizePointerMove}
             onPointerUp={onResizePointerUp}

@@ -2935,28 +2935,28 @@ namespace gdjs {
       }
       freezeResizeLayoutListenerInstalled = true;
 
-      let alreadySteppedForThisAnimationFrame = false;
+      let layoutScheduled = false;
       window.addEventListener('resize', () => {
-        if (
-          !frozenRuntimeGame ||
-          currentlyRunningHarness ||
-          alreadySteppedForThisAnimationFrame
-        ) {
+        if (!frozenRuntimeGame || currentlyRunningHarness || layoutScheduled) {
           return;
         }
         // The resize event can fire more often than the display refreshes:
         // lay the game out at most once per animation frame while a window
-        // border is dragged.
-        alreadySteppedForThisAnimationFrame = true;
+        // border is dragged, always for the latest size.
+        layoutScheduled = true;
         requestAnimationFrame(() => {
-          alreadySteppedForThisAnimationFrame = false;
+          layoutScheduled = false;
+          if (!frozenRuntimeGame || currentlyRunningHarness) {
+            return;
+          }
+          // The game renderer's own resize listener already ran (it was
+          // registered at game startup): the game resolution is already
+          // adapted. Adapt the cameras to it before stepping, as the paused
+          // main loop would only do it on its next frame - too late for the
+          // frame stepped here.
+          frozenRuntimeGame.getSceneStack().onGameResolutionResized();
+          frozenRuntimeGame.getSceneStack().step(0);
         });
-        // The game renderer's own resize listener ran first (it was registered
-        // at game startup): the game resolution is already adapted. Adapt the
-        // cameras to it before stepping, as the paused main loop would only do
-        // it on its next frame - too late for the frame stepped here.
-        frozenRuntimeGame.getSceneStack().onGameResolutionResized();
-        frozenRuntimeGame.getSceneStack().step(0);
       });
     };
 

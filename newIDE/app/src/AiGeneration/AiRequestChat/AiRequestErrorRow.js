@@ -2,149 +2,186 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
-import RaisedButton from '../../UI/RaisedButton';
-import FlatButton from '../../UI/FlatButton';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../UI/Layout';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import ErrorIcon from '../../UI/CustomSvgIcons/Error';
-import RefreshIcon from '../../UI/CustomSvgIcons/Refresh';
-import AddIcon from '../../UI/CustomSvgIcons/Add';
+import ErrorFilled from '../../UI/CustomSvgIcons/ErrorFilled';
+import Refresh from '../../UI/CustomSvgIcons/Refresh';
+import ChatBubbles from '../../UI/CustomSvgIcons/ChatBubbles';
+import { ChatActionButton } from './ChatActionButton';
 import { type AiRequestError } from '../../Utils/GDevelopServices/Generation';
+import classes from './AiRequestErrorRow.module.css';
+
+type Props = {|
+  /** The error reported by the API, shown as a discreet technical detail. */
+  error?: ?AiRequestError,
+  /** Continues the request where it stopped. Absent when it can't be resumed. */
+  onRetry?: ?() => void | Promise<void>,
+  onStartNewChat?: ?() => void,
+|};
 
 const styles = {
-  icon: {
-    fontSize: 14,
-    flexShrink: 0,
-    marginTop: 1,
+  title: {
+    fontWeight: 'bold',
+  },
+  errorCode: {
+    fontFamily: '"Lucida Console", Monaco, monospace',
+    opacity: 0.75,
   },
 };
 
 /**
- * How to present a failed AI request to the user. Deliberately not a 1-1
- * mapping with the error codes sent by the API: a code we don't know about
- * (or an old request stored without any error) is presented as a plain
- * failure that is worth retrying.
+ * What a failed request means for the user. Deliberately not a 1-1 mapping
+ * with the error codes sent by the API: a code we don't know about (or an old
+ * request stored without any error) is presented as a plain failure, which is
+ * worth retrying.
  */
 type AiRequestErrorKind =
   // Something went wrong on our side: retrying is likely to work.
   | 'transient'
-  // The conversation and the project don't fit in the AI model anymore:
-  // retrying would fail in the exact same way.
+  // The conversation doesn't fit in the AI model anymore: retrying would fail
+  // in the exact same way, only a new chat can help.
   | 'too-large'
   // The AI kept repeating the same action and was stopped: retrying can work,
   // but giving more details is more likely to.
   | 'stuck';
 
-const getAiRequestErrorKind = (
-  error: AiRequestError | null
-): AiRequestErrorKind => {
+const getAiRequestErrorKind = (error: ?AiRequestError): AiRequestErrorKind => {
   if (!error) return 'transient';
   if (error.code === 'context-too-large') return 'too-large';
   if (error.code === 'repeated-tool-call-loop') return 'stuck';
   return 'transient';
 };
 
-const renderErrorText = (errorKind: AiRequestErrorKind): React.Node => {
+const renderTitle = (errorKind: AiRequestErrorKind): React.Node => {
+  if (errorKind === 'too-large') return <Trans>This chat is too long</Trans>;
+  if (errorKind === 'stuck') return <Trans>The AI got stuck</Trans>;
+  return <Trans>The AI ran into an error</Trans>;
+};
+
+const renderExplanation = ({
+  errorKind,
+  canRetry,
+}: {|
+  errorKind: AiRequestErrorKind,
+  canRetry: boolean,
+|}): React.Node => {
   if (errorKind === 'too-large') {
     return (
       <Trans>
-        This conversation has become too large for the AI to continue. Start a
-        new chat to keep working on your game - this request was not counted in
-        your AI usage.
+        The conversation has become too large for the AI to continue. This
+        request was not counted in your AI usage: start a new chat to keep
+        working on your game.
       </Trans>
     );
   }
   if (errorKind === 'stuck') {
-    return (
+    return canRetry ? (
       <Trans>
         The AI kept trying the same thing over and over, so it was stopped. This
         request was not counted in your AI usage. Try again, or tell the AI more
         precisely what you'd like it to do.
       </Trans>
+    ) : (
+      <Trans>
+        The AI kept trying the same thing over and over, so it was stopped. This
+        request was not counted in your AI usage.
+      </Trans>
     );
   }
-  return (
+  return canRetry ? (
     <Trans>
-      The AI ran into an error while working on your request - this request was
-      not counted in your AI usage. Its work so far is kept: try again to
-      continue from where it stopped.
+      This request was not counted in your AI usage. The work done so far is
+      kept: try again to continue where it stopped.
+    </Trans>
+  ) : (
+    <Trans>
+      This request was not counted in your AI usage. The work done so far is
+      kept.
     </Trans>
   );
 };
 
-type Props = {|
-  error: AiRequestError | null,
-  onRetry: () => void,
-  onStartNewChat: () => void,
-  /** True while the retry is being sent. */
-  isRetrying?: boolean,
-  /**
-   * Prevents retrying (for instance because the project of the request is not
-   * opened). Starting a new chat always stays possible.
-   */
-  disabled?: boolean,
-|};
-
 /**
- * Shown in the chat when an AI request failed: explains what happened (as
- * precisely as the error reported by the API allows) and offers the way
- * forward, which is most of the time to simply retry - the AI then continues
- * from the work it had already done.
+ * Shown at the end of the chat when the AI request stopped on an error: what
+ * happened, what it means for the user, and how to get going again.
  */
 export const AiRequestErrorRow = ({
   error,
   onRetry,
   onStartNewChat,
-  isRetrying,
-  disabled,
 }: Props): React.Node => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [isRetrying, setIsRetrying] = React.useState(false);
   const errorKind = getAiRequestErrorKind(error);
+  // Continuing a conversation that is already too large for the AI can only
+  // fail again: don't offer it, whatever the chat allows.
+  const canRetry = !!onRetry && errorKind !== 'too-large';
+
+  const retry = React.useCallback(
+    async () => {
+      if (!onRetry) return;
+      setIsRetrying(true);
+      try {
+        await onRetry();
+      } finally {
+        setIsRetrying(false);
+      }
+    },
+    [onRetry]
+  );
 
   return (
-    <ColumnStackLayout noMargin expand noOverflowParent>
-      <LineStackLayout noMargin alignItems="flex-start">
-        <ErrorIcon
-          style={styles.icon}
-          htmlColor={gdevelopTheme.message.error}
-        />
-        <Text noMargin size="body-small" color="secondary">
-          {renderErrorText(errorKind)}
-        </Text>
-      </LineStackLayout>
-      {/* Note: the buttons are direct children of the layout (no fragment
-      around them), so that they are properly spaced out - and stacked on
-      mobile. */}
-      <ResponsiveLineStackLayout noMargin alignItems="center">
-        {errorKind !== 'too-large' && (
-          <RaisedButton
-            primary
-            icon={<RefreshIcon fontSize="small" />}
+    <div className={classes.container}>
+      <div className={classes.header}>
+        <span className={classes.icon}>
+          <ErrorFilled fontSize="inherit" />
+        </span>
+        <span className={classes.title}>
+          <Text
+            noMargin
+            size="body-small"
+            // $FlowFixMe[incompatible-type]
+            style={styles.title}
+          >
+            {renderTitle(errorKind)}
+          </Text>
+        </span>
+        {error && (
+          <span className={classes.errorCode}>
+            <Text
+              noMargin
+              size="body-small"
+              color="secondary"
+              tooltip={error.message}
+              // $FlowFixMe[incompatible-type]
+              style={styles.errorCode}
+            >
+              {error.code}
+            </Text>
+          </span>
+        )}
+      </div>
+      <Text noMargin size="body-small" color="secondary">
+        {renderExplanation({ errorKind, canRetry })}
+      </Text>
+      <div className={classes.actions}>
+        {canRetry && (
+          <ChatActionButton
+            emphasis="primary"
+            icon={<Refresh fontSize="inherit" />}
             label={
               isRetrying ? <Trans>Retrying...</Trans> : <Trans>Retry</Trans>
             }
-            onClick={onRetry}
-            disabled={disabled || isRetrying}
+            disabled={isRetrying}
+            onClick={retry}
           />
         )}
-        {errorKind === 'too-large' ? (
-          <RaisedButton
-            primary
-            icon={<AddIcon fontSize="small" />}
-            label={<Trans>Start a new chat</Trans>}
-            onClick={onStartNewChat}
-          />
-        ) : (
-          <FlatButton
+        {onStartNewChat && (
+          <ChatActionButton
+            emphasis={canRetry ? 'quiet' : 'primary'}
+            icon={<ChatBubbles fontSize="inherit" />}
             label={<Trans>Start a new chat</Trans>}
             onClick={onStartNewChat}
           />
         )}
-      </ResponsiveLineStackLayout>
-    </ColumnStackLayout>
+      </div>
+    </div>
   );
 };

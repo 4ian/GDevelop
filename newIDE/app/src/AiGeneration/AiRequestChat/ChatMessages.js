@@ -29,6 +29,7 @@ import {
 } from '../../EditorFunctions';
 import classes from './ChatMessages.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
+import { AiRequestErrorRow } from './AiRequestErrorRow';
 import Text from '../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
@@ -49,7 +50,6 @@ import { type FileMetadata } from '../../ProjectsStorage';
 import UnsavedChangesContext from '../../MainFrame/UnsavedChangesContext';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import { OrchestratorPlan } from './OrchestratorPlan';
-import { AiRequestErrorRow } from './AiRequestErrorRow';
 import { type FunctionCallItem, type RenderItem } from './Utils';
 
 const styles = {
@@ -119,9 +119,9 @@ type Props = {|
   onSwitchedToGDevelopCredits: () => void,
 
   onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
-  // Ask the AI to continue the request that failed, from the work it had
-  // already done.
-  onRetryAfterError: () => void,
+  // Continues a request that stopped on an error, from where it stopped.
+  // Absent when the chat has no way to resume it (e.g. the standalone form).
+  onRetryAfterError?: ?() => Promise<void>,
   isSending?: boolean,
   // True while the request is paused waiting for the user to answer the inline
   // "Apply this edit?" prompt. Replaces the working/thinking indicators.
@@ -1266,10 +1266,12 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
           <Line justifyContent="flex-start">
             <AiRequestErrorRow
               error={aiRequest.error}
-              onRetry={onRetryAfterError}
+              onRetry={
+                // Continuing sends the project that is opened: a request made
+                // for another project can only be restarted in a new chat.
+                isForAnotherProject ? null : onRetryAfterError
+              }
               onStartNewChat={() => onStartOrOpenChat({ aiRequestId: null })}
-              isRetrying={isSending}
-              disabled={disabled}
             />
           </Line>
         ) : isWaitingForEditApproval ? null : aiRequest.status === // EditApprovalRow): suppress the working/thinking indicators. // Paused on the inline "Apply this edit?" prompt (rendered below by

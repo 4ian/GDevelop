@@ -354,6 +354,9 @@ type Props = {|
   ) => Promise<void>,
   editorFunctionCallResults: Array<EditorFunctionCallResult> | null,
   editorCallbacks: EditorCallbacks,
+  // Continues a request that stopped on an error, from where it stopped.
+  // Absent in contexts that can't resume a request (e.g. the standalone form).
+  onRetryAfterError?: ?() => Promise<void>,
   // Error that occurred while sending the last request.
   lastSendError: ?Error,
 
@@ -421,6 +424,7 @@ export const AiRequestChat: React.ComponentType<{
       onIsAutoEditEnabledChange,
       pendingEditApproval,
       onResolveEditApproval,
+      onRetryAfterError,
     }: Props,
     ref
   ) => {
@@ -571,6 +575,15 @@ export const AiRequestChat: React.ComponentType<{
         if (pendingEditApproval) scrollToBottom();
       },
       [pendingEditApproval, scrollToBottom]
+    );
+
+    const retryAfterErrorAndScroll = React.useCallback(
+      async () => {
+        if (!onRetryAfterError) return;
+        scrollToBottom();
+        await onRetryAfterError();
+      },
+      [onRetryAfterError, scrollToBottom]
     );
 
     const onScroll = React.useCallback(
@@ -834,27 +847,6 @@ export const AiRequestChat: React.ComponentType<{
         scrollToBottom,
         cannotContinue,
       ]
-    );
-
-    // Continue a request that failed: the AI resumes from the work it had
-    // already done (kept by the API), so the only thing to add to the
-    // conversation is the ask to carry on. This message is read by the AI, not
-    // by the user: it's intentionally not translated.
-    // Note that this is sent (and so priced) like any other user message.
-    const onRetryAfterError = React.useCallback(
-      () => {
-        scrollToBottom();
-
-        setHasStartedRequestButCannotContinue(cannotContinue);
-        if (cannotContinue) return;
-
-        onSendUserMessage({
-          userMessage: 'Please continue your work.',
-        }).catch(error =>
-          console.error('Failed to retry the AI request:', error)
-        );
-      },
-      [onSendUserMessage, scrollToBottom, cannotContinue]
     );
 
     const onClickExistingChatButton = React.useCallback(
@@ -1186,7 +1178,9 @@ export const AiRequestChat: React.ComponentType<{
               setHasSwitchedToGDevelopCreditsMidChat(true)
             }
             onStartOrOpenChat={onStartOrOpenChat}
-            onRetryAfterError={onRetryAfterError}
+            onRetryAfterError={
+              onRetryAfterError ? retryAfterErrorAndScroll : null
+            }
             isSending={isSendingUserMessage}
             isWaitingForEditApproval={!!pendingEditApproval}
             savingProjectForMessageId={savingProjectForMessageId}

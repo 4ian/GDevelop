@@ -1348,6 +1348,42 @@ namespace gdjs {
         return this._runtimeGame.getGameResolutionHeight();
       }
 
+      /** Undo the game window size override (see `setGameResolutionSize`). */
+      _uninstallGameWindowSizeOverride: () => void = () => {};
+
+      /**
+       * Change the game resolution, as if the game window was resized to
+       * this size. Useful to test layouts made for other screen sizes,
+       * before asserting positions or taking a screenshot.
+       *
+       * The engine sees a game window of this size until the end of the
+       * test: a game adapting its resolution to the game window size would
+       * otherwise recompute it from the real window, ignoring the size
+       * requested here.
+       */
+      setGameResolutionSize(width: float, height: float): void {
+        this._uninstallGameWindowSizeOverride();
+        const original = {
+          getWindowInnerWidth: gdjs.RuntimeGameRenderer.getWindowInnerWidth,
+          getWindowInnerHeight: gdjs.RuntimeGameRenderer.getWindowInnerHeight,
+        };
+        gdjs.RuntimeGameRenderer.getWindowInnerWidth = () => width;
+        gdjs.RuntimeGameRenderer.getWindowInnerHeight = () => height;
+        this._uninstallGameWindowSizeOverride = () => {
+          gdjs.RuntimeGameRenderer.getWindowInnerWidth =
+            original.getWindowInnerWidth;
+          gdjs.RuntimeGameRenderer.getWindowInnerHeight =
+            original.getWindowInnerHeight;
+          this._uninstallGameWindowSizeOverride = () => {};
+        };
+
+        this._runtimeGame.setGameResolutionSize(width, height);
+        // The paused main loop would only adapt the cameras on its next
+        // animation frame: do it now, so the next stepped frame is laid out
+        // for the new resolution.
+        this._runtimeGame.getSceneStack().onGameResolutionResized();
+      }
+
       /**
        * Release all pressed keys, mouse buttons and touches.
        */
@@ -2905,49 +2941,6 @@ namespace gdjs {
     export const isGameplayTestRunning = (): boolean =>
       !!currentlyRunningHarness;
 
-    /** The game left frozen by the last finished test, if any. */
-    let frozenRuntimeGame: gdjs.RuntimeGame | null = null;
-    let freezeResizeLayoutListenerInstalled = false;
-    let freezeResizeLayoutScheduled = false;
-
-    /**
-     * A game frozen by `freezeWhenFinished` keeps rendering its last frame but
-     * runs no logic: nothing re-lays it out when the window is resized (anchor
-     * behavior, objects sized by events...). Run a single frame with a zero
-     * time delta: the game is laid out for the new size without anything
-     * moving or animating.
-     */
-    const layOutFrozenGameForNewWindowSize = () => {
-      freezeResizeLayoutScheduled = false;
-      if (!frozenRuntimeGame || currentlyRunningHarness) return;
-
-      // The renderer already adapted the game resolution (its own resize
-      // listener ran first): adapt the cameras before stepping.
-      frozenRuntimeGame.getSceneStack().onGameResolutionResized();
-      frozenRuntimeGame.getSceneStack().step(0);
-    };
-
-    const onWindowResizedWhileFrozen = () => {
-      if (
-        !frozenRuntimeGame ||
-        currentlyRunningHarness ||
-        freezeResizeLayoutScheduled
-      ) {
-        return;
-      }
-
-      // Lay the game out at most once per animation frame, for the latest size.
-      freezeResizeLayoutScheduled = true;
-      requestAnimationFrame(layOutFrozenGameForNewWindowSize);
-    };
-
-    const installFreezeResizeLayoutListener = () => {
-      if (freezeResizeLayoutListenerInstalled) return;
-      freezeResizeLayoutListenerInstalled = true;
-
-      window.addEventListener('resize', onWindowResizedWhileFrozen);
-    };
-
     /**
      * Run a gameplay test script against the game and return its result.
      *
@@ -2973,8 +2966,6 @@ namespace gdjs {
 
       const harness = new GameplayTestHarness(runtimeGame, payload);
       currentlyRunningHarness = harness;
-      // The test owns the game stepping from now on.
-      frozenRuntimeGame = null;
       harness._onProgress = onProgress || null;
 
       // The source must be the BODY of `async (harness) => { ... }`, but
@@ -3197,6 +3188,7 @@ namespace gdjs {
         inputManager.onFrameEnded = originalOnFrameEnded;
         harness._uninstallPointerLockShim();
         harness._uninstallSoundLog();
+        harness._uninstallGameWindowSizeOverride();
         gdjs.Logger.setLoggerOutput(existingLoggerOutput);
         if (payload.freezeWhenFinished) {
           // Keep the game paused (the main loop keeps rendering the last
@@ -3207,9 +3199,6 @@ namespace gdjs {
           } catch (error) {
             // Ignore errors while muting the game.
           }
-          // Still lay out the displayed last frame if the window is resized.
-          frozenRuntimeGame = runtimeGame;
-          installFreezeResizeLayoutListener();
         } else {
           runtimeGame.pause(wasPaused);
         }

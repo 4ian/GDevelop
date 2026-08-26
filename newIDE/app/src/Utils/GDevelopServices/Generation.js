@@ -137,6 +137,12 @@ export type AiRequest = {
 
   error: AiRequestError | null,
 
+  // How many times the request was continued after a failure without making
+  // any progress in between, and the number of messages it had then: the API
+  // refuses to continue it again past MAX_AI_REQUEST_RETRIES_IN_A_ROW.
+  retriesInARowCount?: number,
+  retriedAfterMessagesCount?: number,
+
   output?: Array<AiRequestMessage>,
 
   lastUserMessagePriceInCredits?: number | null,
@@ -540,6 +546,27 @@ export const addMessageToAiRequest = async (
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/add-message of Generation API',
+  });
+};
+
+/**
+ * Continue a failed AI request from where it stopped: nothing is added to the
+ * conversation, the AI picks up from the last message it managed to write.
+ */
+export const retryAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/ai-request/${aiRequestId}/action/retry`,
+    {},
+    { params: { userId }, headers: { Authorization: authorizationHeader } }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id}/action/retry of Generation API',
   });
 };
 

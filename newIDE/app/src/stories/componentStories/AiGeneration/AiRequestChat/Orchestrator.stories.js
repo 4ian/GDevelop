@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
 import { AiRequestChat } from '../../../../AiGeneration/AiRequestChat';
 import { type AiRequest } from '../../../../Utils/GDevelopServices/Generation';
+import { MAX_AI_REQUEST_RETRIES_IN_A_ROW } from '../../../../AiGeneration/AiRequestUtils';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import FixedWidthFlexContainer from '../../../FixedWidthFlexContainer';
 import {
@@ -754,6 +755,21 @@ export const AiRequestStoppedOnErrorWithRepeatedToolCallLoop = (): React.Node =>
       ...aiRequestWithAiResponses,
       status: 'error',
       error: repeatedToolCallLoopAiRequestError,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
+// Already retried the maximum number of times in a row, without anything
+// being written to the conversation in between: the chat stops offering it.
+export const AiRequestStoppedOnErrorWithExhaustedRetries = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      status: 'error',
+      error: internalAiRequestError,
+      retriesInARowCount: MAX_AI_REQUEST_RETRIES_IN_A_ROW,
+      retriedAfterMessagesCount: (aiRequestWithAiResponses.output || []).length,
     }}
     onRetryAfterError={async () => action('onRetryAfterError')()}
   />

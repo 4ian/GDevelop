@@ -139,6 +139,18 @@ export const AiRequestErrorWithoutRetry = (): React.Node => (
   </FixedWidthFlexContainer>
 );
 
+// Retried too many times in a row: the API would refuse to continue it again,
+// so only starting a new chat is left.
+export const AiRequestErrorWithExhaustedRetries = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <AiRequestErrorRow
+      error={internalAiRequestError}
+      hasExhaustedRetries
+      onStartNewChat={action('onStartNewChat')}
+    />
+  </FixedWidthFlexContainer>
+);
+
 // All of them side by side, to compare what is said and offered for each.
 export const AllAiRequestErrors = (): React.Node => (
   <FixedWidthFlexContainer width={600}>

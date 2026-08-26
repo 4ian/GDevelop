@@ -5,7 +5,10 @@ import { ChatBubble } from './ChatBubble';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { ChatMarkdownText } from './ChatMarkdownText';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
+import {
+  canRetryAiRequest,
+  getFunctionCallToFunctionCallOutputMap,
+} from '../AiRequestUtils';
 import { FunctionCallRow } from './FunctionCallRow';
 import { FunctionCallsGroup } from './FunctionCallsGroup';
 import { SuggestionLines } from './SuggestionLines';
@@ -1233,10 +1236,14 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
             <AiRequestErrorRow
               error={aiRequest.error}
               onRetry={
-                // Continuing sends the project that is opened: a request made
-                // for another project can only be restarted in a new chat.
-                isForAnotherProject ? null : onRetryAfterError
+                // The AI would carry on editing whichever project is opened:
+                // a request made for another one, or that already failed too
+                // many times in a row, can only be restarted in a new chat.
+                isForAnotherProject || !canRetryAiRequest(aiRequest)
+                  ? null
+                  : onRetryAfterError
               }
+              hasExhaustedRetries={!canRetryAiRequest(aiRequest)}
               onStartNewChat={() => onStartOrOpenChat({ aiRequestId: null })}
             />
           </Line>

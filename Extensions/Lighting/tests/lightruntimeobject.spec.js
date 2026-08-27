@@ -173,7 +173,35 @@ describe('Light with obstacles around it', function () {
     });
   });
 
+  it('Rotated light is occluded by an obstacle beyond the unrotated radius box.', function () {
+    // At 45°, the lit rotated square extends up to radius * sqrt(2) ≈ 141.42
+    // from the center along the axes. Place the obstacle outside the
+    // unrotated ±radius box ([100, 300] x [100, 300]) but inside the lit
+    // area: it must still be found and occlude the light.
+    light.setPosition(200, 200);
+    light.setAngle(45);
+    obstacle.setPosition(320, 175);
+    runtimeScene.renderAndStep(1000 / 60);
+    light.update();
+
+    const vertices = light._renderer._computeLightVertices();
+    expect(vertices.length).to.be.greaterThan(0);
+    // Rays cast towards the obstacle stop on its left edge (x = 320)
+    // instead of reaching the boundary of the lit area.
+    expect(
+      vertices.some(
+        (vertex) =>
+          Math.abs(vertex[0] - 320) < 0.5 &&
+          vertex[1] >= 175 &&
+          vertex[1] <= 225
+      )
+    ).to.be(true);
+
+    light.setAngle(0);
+  });
+
   it("Obstacle moved outside light's radius.", function () {
+    light.setAngle(0);
     obstacle.setPosition(400, 400);
     runtimeScene.renderAndStep(1000 / 60);
     light.update();

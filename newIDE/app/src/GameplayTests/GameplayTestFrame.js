@@ -65,62 +65,77 @@ const clampPositionToWindow = (
 
 // Game area width when the frame is opened: unobtrusive on top of the editor.
 const defaultGameAreaWidth = 320;
+// Below this, the header and footer of the frame become unusable.
 const minGameAreaSize = { width: 240, height: 135 };
 
-/**
- * The fixed zoom at which the game is displayed: the game window is always
- * `game area size / zoom`. Resizing the frame resizes the game window (like
- * resizing a preview window would), never the scale.
+/*
+ * The game window (the iframe running the preview) is always exactly the
+ * game resolution: the game runs as in a preview window of this size and
+ * can never observe the frame being moved, resized or minimized. The frame
+ * only displays it at a variable zoom - the only thing resizing changes.
+ * The aspect ratio of the game area is thus always the game one.
  */
-const getGameZoomFactor = (gameResolution: Size): number =>
-  // Never zoom in: a small game would only be displayed blurry.
-  Math.min(1, defaultGameAreaWidth / gameResolution.width);
 
-/** Game area size at which the game window is exactly the game resolution. */
-const getDefaultGameAreaSize = (gameResolution: Size): Size => {
-  const zoomFactor = getGameZoomFactor(gameResolution);
-  return {
-    width: Math.max(
-      minGameAreaSize.width,
-      Math.round(gameResolution.width * zoomFactor)
-    ),
-    height: Math.max(
-      minGameAreaSize.height,
-      Math.round(gameResolution.height * zoomFactor)
-    ),
-  };
-};
+/** The smallest zoom keeping the frame usable. */
+const getMinZoomFactor = (gameResolution: Size): number =>
+  Math.max(
+    minGameAreaSize.width / gameResolution.width,
+    minGameAreaSize.height / gameResolution.height
+  );
+
+/**
+ * The largest allowed zoom: 1 (a game displayed larger than its resolution
+ * would only be blurry), unless more is needed to reach the minimum frame
+ * size (for games with a tiny resolution).
+ */
+const getMaxZoomFactor = (gameResolution: Size): number =>
+  Math.max(1, getMinZoomFactor(gameResolution));
+
+/** The zoom used when the frame is opened for the first time. */
+const getDefaultZoomFactor = (gameResolution: Size): number =>
+  clamp(
+    defaultGameAreaWidth / gameResolution.width,
+    getMinZoomFactor(gameResolution),
+    getMaxZoomFactor(gameResolution)
+  );
+
+/** The size of the game area: the game resolution, displayed at this zoom. */
+const getGameAreaSize = (gameResolution: Size, zoomFactor: number): Size => ({
+  width: Math.round(gameResolution.width * zoomFactor),
+  height: Math.round(gameResolution.height * zoomFactor),
+});
+
 // Approximate height of the chrome around the game area, to clamp the
-// restored size before the frame is rendered (and can be measured).
+// restored zoom before the frame is rendered (and can be measured).
 const approximateFrameChromeHeight = 70;
 
 /**
- * Clamp the game area size so the frame fits in the window.
- * `chromeWidth`/`chromeHeight` are the size of the borders, header and
- * footer around the game area.
+ * Clamp the zoom so the frame fits in the window - unless even the minimum
+ * usable size does not (`clampPositionToWindow` then keeps the frame
+ * reachable). `chromeWidth`/`chromeHeight` are the size of the borders,
+ * header and footer around the game area.
  */
-const clampSizeToWindow = (
-  size: Size,
+const clampZoomFactorToWindow = (
+  zoomFactor: number,
+  gameResolution: Size,
   chromeWidth: number,
   chromeHeight: number
-): Size => ({
-  width: clamp(
-    size.width,
-    minGameAreaSize.width,
+): number => {
+  const fittingZoomFactor = Math.min(
+    (window.innerWidth - 2 * windowMargin - chromeWidth) / gameResolution.width,
+    (window.innerHeight - windowMargin - windowTopMargin - chromeHeight) /
+      gameResolution.height
+  );
+  const minZoomFactor = getMinZoomFactor(gameResolution);
+  return clamp(
+    zoomFactor,
+    minZoomFactor,
     Math.max(
-      minGameAreaSize.width,
-      window.innerWidth - 2 * windowMargin - chromeWidth
+      minZoomFactor,
+      Math.min(getMaxZoomFactor(gameResolution), fittingZoomFactor)
     )
-  ),
-  height: clamp(
-    size.height,
-    minGameAreaSize.height,
-    Math.max(
-      minGameAreaSize.height,
-      window.innerHeight - windowMargin - windowTopMargin - chromeHeight
-    )
-  ),
-});
+  );
+};
 
 type ResizeDirection =
   | 'left'
@@ -151,7 +166,10 @@ type GameplayTestFrameLayoutProps = {|
   isMinimized: boolean,
   onToggleMinimized: () => void,
   onStopRequested: () => void,
-  /** The game resolution, giving the display zoom (see `getGameZoomFactor`). */
+  /**
+   * The game resolution: the game window is fixed at exactly this size,
+   * the frame only displays it zoomed.
+   */
   gameResolution: Size,
   /**
    * The game itself (an iframe running the preview). It is always rendered,
@@ -181,9 +199,8 @@ export const GameplayTestFrameLayout = ({
   const {
     values,
     setGameplayTestFramePosition,
-    setGameplayTestFrameSize,
+    setGameplayTestFrameZoomFactor,
   } = React.useContext(PreferencesContext);
-  const zoomFactor = getGameZoomFactor(gameResolution);
   // Restore the last position of the frame (it will be clamped to the window
   // as soon as it is rendered, in case the window is now smaller).
   const [position, setPosition] = React.useState<Position>(
@@ -193,12 +210,17 @@ export const GameplayTestFrameLayout = ({
         bottom: windowMargin,
       }
   );
-  // Restore the last size, clamped in case the window is now smaller.
-  const [size, setSize] = React.useState<Size>(() => {
-    const savedSize = values.gameplayTestFrameSize;
-    if (!savedSize) return getDefaultGameAreaSize(gameResolution);
-    return clampSizeToWindow(savedSize, 0, approximateFrameChromeHeight);
-  });
+  // Restore the last zoom, clamped in case the window is now smaller (or
+  // this project has a larger game resolution).
+  const [zoomFactor, setZoomFactor] = React.useState<number>(() =>
+    clampZoomFactorToWindow(
+      values.gameplayTestFrameZoomFactor ||
+        getDefaultZoomFactor(gameResolution),
+      gameResolution,
+      0,
+      approximateFrameChromeHeight
+    )
+  );
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
   const [isResizing, setIsResizing] = React.useState<boolean>(false);
   const dragOrigin = React.useRef<{|
@@ -212,6 +234,7 @@ export const GameplayTestFrameLayout = ({
     clientX: number,
     clientY: number,
     position: Position,
+    zoomFactor: number,
     size: Size,
     direction: ResizeDirection,
     /** Size of the chrome (borders, header, footer) around the game area. */
@@ -219,10 +242,9 @@ export const GameplayTestFrameLayout = ({
     chromeHeight: number,
   |} | null>(null);
 
-  // Keep the frame inside the window: shrink the game area if the window
-  // got too small for the frame (not when minimized: the game area is then
-  // 1x1 and the chrome around it can't be measured), then clamp the
-  // position.
+  // Keep the frame inside the window: zoom out if the window got too small
+  // for the frame (not when minimized: the game area is then 1x1 and the
+  // chrome around it can't be measured), then clamp the position.
   const keepFrameInsideWindow = React.useCallback(
     () => {
       const container = containerRef.current;
@@ -230,9 +252,10 @@ export const GameplayTestFrameLayout = ({
       if (!isMinimized && container && gameArea) {
         const containerRect = container.getBoundingClientRect();
         const gameAreaRect = gameArea.getBoundingClientRect();
-        setSize(size =>
-          clampSizeToWindow(
-            size,
+        setZoomFactor(zoomFactor =>
+          clampZoomFactorToWindow(
+            zoomFactor,
+            gameResolution,
             containerRect.width - gameAreaRect.width,
             containerRect.height - gameAreaRect.height
           )
@@ -240,7 +263,7 @@ export const GameplayTestFrameLayout = ({
       }
       setPosition(position => clampPositionToWindow(position, container));
     },
-    [isMinimized]
+    [isMinimized, gameResolution]
   );
 
   // Apply it when the window is resized, and when the frame is first
@@ -317,7 +340,8 @@ export const GameplayTestFrameLayout = ({
         clientX: event.clientX,
         clientY: event.clientY,
         position,
-        size,
+        zoomFactor,
+        size: getGameAreaSize(gameResolution, zoomFactor),
         direction,
         chromeWidth: containerRect.width - gameAreaRect.width,
         chromeHeight: containerRect.height - gameAreaRect.height,
@@ -326,69 +350,85 @@ export const GameplayTestFrameLayout = ({
       currentTarget.setPointerCapture(event.pointerId);
       setIsResizing(true);
     },
-    [position, size]
+    [position, zoomFactor, gameResolution]
   );
 
-  const onResizePointerMove = React.useCallback((event: PointerEvent) => {
-    const origin = resizeOrigin.current;
-    if (!origin || origin.pointerId !== event.pointerId) return;
+  const onResizePointerMove = React.useCallback(
+    (event: PointerEvent) => {
+      const origin = resizeOrigin.current;
+      if (!origin || origin.pointerId !== event.pointerId) return;
 
-    const deltaX = event.clientX - origin.clientX;
-    const deltaY = event.clientY - origin.clientY;
-    const newSize = { ...origin.size };
-    const newPosition = { ...origin.position };
+      // The aspect ratio is fixed (it is the game one): resizing only
+      // changes the zoom. Moving the pointer outwards zooms in.
+      const deltaX = event.clientX - origin.clientX;
+      const deltaY = event.clientY - origin.clientY;
+      const widthDelta = origin.direction.includes('left')
+        ? -deltaX
+        : origin.direction.includes('right')
+        ? deltaX
+        : 0;
+      const heightDelta = origin.direction.includes('top')
+        ? -deltaY
+        : origin.direction.includes('bottom')
+        ? deltaY
+        : 0;
+      const zoomFactorFromWidth =
+        origin.zoomFactor + widthDelta / gameResolution.width;
+      const zoomFactorFromHeight =
+        origin.zoomFactor + heightDelta / gameResolution.height;
+      // On corners, follow the axis on which the pointer moved the most.
+      const newZoomFactor =
+        Math.abs(zoomFactorFromWidth - origin.zoomFactor) >=
+        Math.abs(zoomFactorFromHeight - origin.zoomFactor)
+          ? zoomFactorFromWidth
+          : zoomFactorFromHeight;
 
-    if (origin.direction.includes('right')) {
-      // The left border stays in place: only the width changes.
-      const maxWidth =
-        window.innerWidth -
-        windowMargin -
-        origin.position.left -
-        origin.chromeWidth;
-      newSize.width = clamp(
-        origin.size.width + deltaX,
-        minGameAreaSize.width,
-        Math.max(minGameAreaSize.width, maxWidth)
+      // The window space available for the two moving edges to grow into
+      // (the two others are anchored and stay in place).
+      const maxWidth = origin.direction.includes('left')
+        ? origin.size.width + origin.position.left - windowMargin
+        : window.innerWidth -
+          windowMargin -
+          origin.position.left -
+          origin.chromeWidth;
+      const maxHeight = origin.direction.includes('bottom')
+        ? origin.size.height + origin.position.bottom - windowMargin
+        : window.innerHeight -
+          windowTopMargin -
+          origin.position.bottom -
+          origin.chromeHeight;
+      const minZoomFactor = getMinZoomFactor(gameResolution);
+      const clampedZoomFactor = clamp(
+        newZoomFactor,
+        minZoomFactor,
+        Math.max(
+          minZoomFactor,
+          Math.min(
+            getMaxZoomFactor(gameResolution),
+            maxWidth / gameResolution.width,
+            maxHeight / gameResolution.height
+          )
+        )
       );
-    } else if (origin.direction.includes('left')) {
-      // The right border stays in place: the frame moves as it grows.
-      const maxWidth = origin.size.width + origin.position.left - windowMargin;
-      newSize.width = clamp(
-        origin.size.width - deltaX,
-        minGameAreaSize.width,
-        Math.max(minGameAreaSize.width, maxWidth)
-      );
-      newPosition.left =
-        origin.position.left + (origin.size.width - newSize.width);
-    }
-    if (origin.direction.includes('top')) {
-      // Anchored to the window bottom: the frame grows upwards without moving.
-      const maxHeight =
-        window.innerHeight -
-        windowTopMargin -
-        origin.position.bottom -
-        origin.chromeHeight;
-      newSize.height = clamp(
-        origin.size.height - deltaY,
-        minGameAreaSize.height,
-        Math.max(minGameAreaSize.height, maxHeight)
-      );
-    } else if (origin.direction.includes('bottom')) {
-      // The top border stays in place: the frame moves down as it grows.
-      const maxHeight =
-        origin.size.height + origin.position.bottom - windowMargin;
-      newSize.height = clamp(
-        origin.size.height + deltaY,
-        minGameAreaSize.height,
-        Math.max(minGameAreaSize.height, maxHeight)
-      );
-      newPosition.bottom =
-        origin.position.bottom - (newSize.height - origin.size.height);
-    }
 
-    setSize(newSize);
-    setPosition(newPosition);
-  }, []);
+      // Keep the anchored edges in place: growing from the left moves the
+      // frame left, growing from the bottom moves it down.
+      const newSize = getGameAreaSize(gameResolution, clampedZoomFactor);
+      const newPosition = { ...origin.position };
+      if (origin.direction.includes('left')) {
+        newPosition.left =
+          origin.position.left + (origin.size.width - newSize.width);
+      }
+      if (origin.direction.includes('bottom')) {
+        newPosition.bottom =
+          origin.position.bottom - (newSize.height - origin.size.height);
+      }
+
+      setZoomFactor(clampedZoomFactor);
+      setPosition(newPosition);
+    },
+    [gameResolution]
+  );
 
   const onResizePointerUp = React.useCallback(
     (event: PointerEvent) => {
@@ -397,27 +437,23 @@ export const GameplayTestFrameLayout = ({
 
       resizeOrigin.current = null;
       setIsResizing(false);
-      setGameplayTestFrameSize(size);
+      setGameplayTestFrameZoomFactor(zoomFactor);
       // Resizing from the left or bottom edges also moves the frame.
       setGameplayTestFramePosition(position);
     },
-    [size, setGameplayTestFrameSize, position, setGameplayTestFramePosition]
+    [
+      zoomFactor,
+      setGameplayTestFrameZoomFactor,
+      position,
+      setGameplayTestFramePosition,
+    ]
   );
 
   const isInProgress = runStatus
     ? isGameplayTestStatusInProgress(runStatus.status)
     : false;
 
-  // Cancel any resize in progress when a test starts.
-  React.useEffect(
-    () => {
-      if (isInProgress) {
-        resizeOrigin.current = null;
-        setIsResizing(false);
-      }
-    },
-    [isInProgress]
-  );
+  const gameAreaSize = getGameAreaSize(gameResolution, zoomFactor);
 
   return (
     <div
@@ -498,18 +534,23 @@ export const GameplayTestFrameLayout = ({
         })}
         style={
           // When minimized, let the CSS shrink the game area to 1x1 pixel.
-          isMinimized ? undefined : { width: size.width, height: size.height }
+          isMinimized
+            ? undefined
+            : { width: gameAreaSize.width, height: gameAreaSize.height }
         }
       >
-        {/* The game window: the game area at 1:1 scale, displayed zoomed
-            out - the game runs like in a preview window of this size. When
-            minimized it is only clipped, so the game keeps rendering and
-            the test keeps running. */}
+        {/* The game window: always exactly the game resolution, only its
+            displayed zoom changes - the game runs as in a preview window of
+            this size and cannot observe the frame being moved, resized or
+            minimized (minimizing only clips it, so the game keeps rendering
+            and the test keeps running). Only the test itself can change the
+            game resolution (see `setGameResolutionSize` in the harness):
+            the game is then displayed fitted in this same window. */}
         <div
           className={classes.gameScaler}
           style={{
-            width: Math.round(size.width / zoomFactor),
-            height: Math.round(size.height / zoomFactor),
+            width: gameResolution.width,
+            height: gameResolution.height,
             transform: `translate(-50%, -50%) scale(${zoomFactor})`,
           }}
         >
@@ -540,10 +581,10 @@ export const GameplayTestFrameLayout = ({
           </Text>
         )}
       </div>
-      {/* Resizing resizes the game window, which would skew a running
-          test: only allow it when no test is in progress. */}
+      {/* Resizing only changes the zoom at which the game is displayed:
+          the game cannot observe it, so it is harmless even while a test
+          is running. */}
       {!isMinimized &&
-        !isInProgress &&
         resizeHandles.map(({ direction, className }) => (
           <div
             key={direction}
@@ -579,8 +620,8 @@ export const setGameplayTestFramePreviewLocation = ({
 }: {|
   previewIndexHtmlLocation: string,
   /**
-   * The game resolution: the frame opens with the game window at exactly
-   * this size (see `getGameZoomFactor`).
+   * The game resolution: the game window is fixed at exactly this size,
+   * the frame only displays it zoomed.
    */
   gameResolution: Size,
 |}) => {

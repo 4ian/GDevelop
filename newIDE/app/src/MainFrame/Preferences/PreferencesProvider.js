@@ -135,7 +135,7 @@ export const getInitialPreferences = (): {
   showInAppTutorialDeveloperMode: boolean,
   takeScreenshotOnPreview: boolean,
   gameplayTestFramePosition: {| left: number, bottom: number |} | null,
-  gameplayTestFrameSize: {| width: number, height: number |} | null,
+  gameplayTestFrameZoomFactor: number | null,
   themeName: any,
   use3DEditor: any,
   useBackgroundSerializerForSaving: boolean,
@@ -402,7 +402,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
-    setGameplayTestFrameSize: (this._setGameplayTestFrameSize.bind(this): any),
+    setGameplayTestFrameZoomFactor: (this._setGameplayTestFrameZoomFactor.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setShowAiAskButtonInTitleBar: (this._setShowAiAskButtonInTitleBar.bind(
       this
@@ -1428,12 +1430,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setGameplayTestFrameSize(newValue: {| width: number, height: number |}) {
+  _setGameplayTestFrameZoomFactor(newValue: number) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          gameplayTestFrameSize: newValue,
+          gameplayTestFrameZoomFactor: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

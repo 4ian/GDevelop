@@ -26,7 +26,8 @@ const styles = {
     alignItems: 'flex-end',
     background: 'linear-gradient(to bottom, #4f28cd, #95c6ff)',
   },
-  // Sized for the fake game resolution below (displayed zoomed out by 4).
+  // Sized for the fake game resolution below (displayed zoomed out by 4
+  // when the frame is at its default size).
   fakeGameGround: {
     width: '100%',
     height: 128,

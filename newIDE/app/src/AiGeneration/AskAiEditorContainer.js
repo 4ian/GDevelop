@@ -24,6 +24,7 @@ import {
   createAiRequest,
   sendAiRequestFeedback,
   forkAiRequest,
+  retryAiRequest,
   suspendAiRequest as apiSuspendAiRequest,
   getAiRequest,
   type AiRequest,
@@ -659,16 +660,12 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           createdSceneNames,
           createdProject,
           editorFunctionCallResults,
-          forceSend,
         }: {|
           aiRequestId: string,
           userMessage: string,
           createdSceneNames?: Array<string>,
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
-          // Sends even when there is nothing new to send: used to ask the AI to
-          // continue a request that stopped on an error.
-          forceSend?: boolean,
         |}) => {
           if (!profile) return;
 
@@ -713,8 +710,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           }
 
           // If nothing to send, stop there.
-          if (functionCallOutputs.length === 0 && !userMessage && !forceSend)
-            return;
+          if (functionCallOutputs.length === 0 && !userMessage) return;
 
           // Paying with credits is only when a user message is sent (and quota is exhausted).
           let payWithCredits = false;
@@ -881,20 +877,30 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         ]
       );
 
-      // Ask the AI to continue a request that stopped on an error: nothing new
-      // is sent, so it picks up from the last message it managed to write.
+      // Ask the AI to continue a request that stopped on an error: nothing is
+      // added to the conversation, so this is not charged again (the API only
+      // charges back the usage it refunded when the request failed).
       const onRetryAfterError = React.useCallback(
         async () => {
-          if (!selectedAiRequestId) return;
-          await onSendMessage({
-            aiRequestId: selectedAiRequestId,
-            userMessage: '',
-            editorFunctionCallResults:
-              getEditorFunctionCallResults(selectedAiRequestId) || [],
-            forceSend: true,
-          });
+          if (!selectedAiRequestId || !profile) return;
+          try {
+            const aiRequest = await retryAiRequest(getAuthorizationHeader, {
+              userId: profile.id,
+              aiRequestId: selectedAiRequestId,
+            });
+            updateAiRequest(aiRequest.id, () => aiRequest);
+          } catch (error) {
+            console.error('Error while retrying the AI request:', error);
+            setLastSendError(selectedAiRequestId, error);
+          }
         },
-        [selectedAiRequestId, onSendMessage, getEditorFunctionCallResults]
+        [
+          selectedAiRequestId,
+          profile,
+          getAuthorizationHeader,
+          updateAiRequest,
+          setLastSendError,
+        ]
       );
 
       useActivatePendingSubAgents({ selectedAiRequest });

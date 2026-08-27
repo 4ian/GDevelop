@@ -14,6 +14,11 @@ type Props = {|
   error?: ?AiRequestError,
   /** Continues the request where it stopped. Absent when it can't be resumed. */
   onRetry?: ?() => void | Promise<void>,
+  /**
+   * True when the request already failed too many times in a row to be
+   * continued again: only a new chat is left.
+   */
+  hasExhaustedRetries?: boolean,
   onStartNewChat?: ?() => void,
 |};
 
@@ -59,10 +64,21 @@ const renderTitle = (errorKind: AiRequestErrorKind): React.Node => {
 const renderExplanation = ({
   errorKind,
   canRetry,
+  hasExhaustedRetries,
 }: {|
   errorKind: AiRequestErrorKind,
   canRetry: boolean,
+  hasExhaustedRetries?: boolean,
 |}): React.Node => {
+  if (hasExhaustedRetries && errorKind !== 'too-large') {
+    return (
+      <Trans>
+        The AI tried again several times without getting any further. None of
+        these attempts were counted in your AI usage: start a new chat to keep
+        working on your game.
+      </Trans>
+    );
+  }
   if (errorKind === 'too-large') {
     return (
       <Trans>
@@ -106,6 +122,7 @@ const renderExplanation = ({
 export const AiRequestErrorRow = ({
   error,
   onRetry,
+  hasExhaustedRetries,
   onStartNewChat,
 }: Props): React.Node => {
   const [isRetrying, setIsRetrying] = React.useState(false);
@@ -159,7 +176,7 @@ export const AiRequestErrorRow = ({
         )}
       </div>
       <Text noMargin size="body-small" color="secondary">
-        {renderExplanation({ errorKind, canRetry })}
+        {renderExplanation({ errorKind, canRetry, hasExhaustedRetries })}
       </Text>
       <div className={classes.actions}>
         {canRetry && (

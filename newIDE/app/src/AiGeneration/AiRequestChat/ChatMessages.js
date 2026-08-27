@@ -36,7 +36,7 @@ import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Floppy from '../../UI/CustomSvgIcons/Floppy';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { canUpgradeSubscription } from '../../Utils/GDevelopServices/Usage';
+import { getSubscriptionPlanToUpsell } from '../../Profile/Subscription/SubscriptionUpsellUtils';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
@@ -219,26 +219,12 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
 
     const suggestedSubscriptionPlanWithPricingSystem = React.useMemo(
       () => {
-        if (
-          !subscriptionPlansWithPricingSystems ||
-          subscriptionPlansWithPricingSystems.length === 0 ||
-          !hasReachedLimit ||
-          (subscription && !canUpgradeSubscription(subscription)) ||
-          !hasStartedRequestButCannotContinue
-        )
+        if (!hasReachedLimit || !hasStartedRequestButCannotContinue)
           return null;
-
-        const goldPlan = subscriptionPlansWithPricingSystems.find(
-          plan => plan.id === 'gdevelop_gold'
-        );
-        const proPlan = subscriptionPlansWithPricingSystems.find(
-          plan => plan.id === 'gdevelop_startup'
-        );
-        return (
-          (subscription && subscription.planId === 'gdevelop_gold'
-            ? proPlan
-            : goldPlan) || subscriptionPlansWithPricingSystems[0]
-        );
+        return getSubscriptionPlanToUpsell({
+          subscription,
+          subscriptionPlansWithPricingSystems,
+        });
       },
       [
         subscriptionPlansWithPricingSystems,

@@ -2,12 +2,59 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import {
+  type Subscription,
   type SubscriptionPlanPricingSystem,
   type SubscriptionPlanWithPricingSystems,
   type SimplifiedSubscriptionBulletPoint,
+  canUpgradeSubscription,
 } from '../../Utils/GDevelopServices/Usage';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
-import { formatPriceWithCurrency } from './PlanSmallCard';
+import {
+  formatPriceWithCurrency,
+  planIdSortingFunction,
+} from './PlanSmallCard';
+
+const GOLD_PLAN_ID = 'gdevelop_gold';
+const PRO_PLAN_ID = 'gdevelop_startup';
+
+/**
+ * The plan to offer to a user who reached the limits of the one they have:
+ * Gold for a user without a subscription (or on a lower plan), and the plan
+ * above it for a user already on Gold.
+ *
+ * Returns null when there is nothing to offer: a user already on the highest
+ * plan, or one benefiting from an education plan they don't pay for, must not be
+ * sold a plan they already have (or a lower one).
+ */
+export const getSubscriptionPlanToUpsell = ({
+  subscription,
+  subscriptionPlansWithPricingSystems,
+}: {|
+  subscription: ?Subscription,
+  subscriptionPlansWithPricingSystems: ?Array<SubscriptionPlanWithPricingSystems>,
+|}): ?SubscriptionPlanWithPricingSystems => {
+  if (
+    !subscriptionPlansWithPricingSystems ||
+    subscriptionPlansWithPricingSystems.length === 0
+  ) {
+    return null;
+  }
+  if (subscription && !canUpgradeSubscription(subscription)) return null;
+
+  const planId = (subscription && subscription.planId) || null;
+  // `planIdSortingFunction` orders the legacy plans with the current ones, so
+  // the legacy plan giving the same benefits as Gold is also offered the plan
+  // above it (rather than the Gold plan it already has).
+  const isAlreadyAtLeastGold =
+    !!planId && planIdSortingFunction(planId, GOLD_PLAN_ID) >= 0;
+  const planIdToUpsell = isAlreadyAtLeastGold ? PRO_PLAN_ID : GOLD_PLAN_ID;
+
+  return (
+    subscriptionPlansWithPricingSystems.find(
+      plan => plan.id === planIdToUpsell
+    ) || null
+  );
+};
 
 /**
  * Renders text with a minimal markdown-ish syntax: words wrapped in `**...**`

@@ -15,7 +15,15 @@ import {
   fakePlanWithoutSimplifiedFeatures,
   fakePlanWithMonthlyPricingOnly,
   fakePlanWithoutPricingSystems,
+  fakeSubscriptionPlansWithPricingSystems,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeSubscriptionPlans';
+import {
+  noSubscription,
+  subscriptionForSilverUser,
+  subscriptionForGoldUser,
+  subscriptionForStartupUser,
+} from '../../../../fixtures/GDevelopServicesTestData';
+import { getSubscriptionPlanToUpsell } from '../../../../Profile/Subscription/SubscriptionUpsellUtils';
 import { type Quota } from '../../../../Utils/GDevelopServices/Usage';
 import {
   internalAiRequestError,
@@ -250,6 +258,41 @@ export const AiCreditsLimitWithoutPlanToSuggest = (): React.Node => (
         quota={reachedDailyQuota}
         {...aiCreditsLimitActions}
       />
+    </ColumnStackLayout>
+  </FixedWidthFlexContainer>
+);
+
+// What each kind of account is shown once its AI usage is consumed. The plan to
+// offer is resolved with the very function the chat uses, so this story can't
+// drift from what users actually see.
+const accountTypes = [
+  { label: 'Free account', subscription: noSubscription },
+  { label: 'Silver account', subscription: subscriptionForSilverUser },
+  { label: 'Gold account', subscription: subscriptionForGoldUser },
+  { label: 'Pro account', subscription: subscriptionForStartupUser },
+];
+
+export const AiCreditsLimitPerAccountType = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <ColumnStackLayout noMargin expand>
+      {accountTypes.map(({ label, subscription }) => (
+        <React.Fragment key={label}>
+          <Text noMargin size="body-small" color="secondary">
+            {label}
+          </Text>
+          <AiCreditsLimitRow
+            suggestedSubscriptionPlan={getSubscriptionPlanToUpsell({
+              subscription,
+              subscriptionPlansWithPricingSystems: fakeSubscriptionPlansWithPricingSystems,
+            })}
+            hasSubscription={!!subscription.planId}
+            availableCredits={350}
+            automaticallyUseCreditsForAiRequests={false}
+            quota={reachedDailyQuota}
+            {...aiCreditsLimitActions}
+          />
+        </React.Fragment>
+      ))}
     </ColumnStackLayout>
   </FixedWidthFlexContainer>
 );

@@ -6,7 +6,8 @@ import {
 
 // Kept minimal on purpose: only what the components upselling a plan read
 // (name, simplified features and pricing systems) is filled with realistic
-// values, so the stories don't need the real API.
+// values, so the stories don't need the real API. The names are the ones the
+// backend really serves ('Gold', 'Pro'), not prefixed with 'GDevelop'.
 
 export const fakeGoldMonthlyPricingSystem: SubscriptionPlanPricingSystem = {
   id: 'gold_1month_5eur',
@@ -33,7 +34,7 @@ export const fakeGoldYearlyPricingSystem: SubscriptionPlanPricingSystem = {
 export const fakeGoldSubscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems = {
   id: 'gdevelop_gold',
   isLegacy: false,
-  nameByLocale: { en: 'GDevelop Gold' },
+  nameByLocale: { en: 'Gold' },
   descriptionByLocale: { en: 'For ambitious game creators.' },
   bulletPointsByLocale: [],
   targetAudiences: ['CASUAL'],
@@ -69,7 +70,7 @@ export const fakeGoldSubscriptionPlanWithPricingSystems: SubscriptionPlanWithPri
 export const fakeProSubscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems = {
   ...fakeGoldSubscriptionPlanWithPricingSystems,
   id: 'gdevelop_startup',
-  nameByLocale: { en: 'GDevelop Pro' },
+  nameByLocale: { en: 'Pro' },
   simplifiedFeatures: {
     bulletPoints: [
       {
@@ -114,3 +115,35 @@ export const fakePlanWithoutPricingSystems: SubscriptionPlanWithPricingSystems =
   ...fakeGoldSubscriptionPlanWithPricingSystems,
   pricingSystems: [],
 };
+
+// The plan below Gold, and the one the backend describes as free: they are part
+// of the list served to the editor, so the code picking a plan to upsell must
+// never end up offering one of them.
+export const fakeSilverSubscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems = {
+  ...fakeGoldSubscriptionPlanWithPricingSystems,
+  id: 'gdevelop_silver',
+  nameByLocale: { en: 'Silver' },
+  pricingSystems: [
+    {
+      ...fakeGoldMonthlyPricingSystem,
+      id: 'silver_1month_3eur',
+      planId: 'gdevelop_silver',
+      amountInCents: 299,
+    },
+  ],
+};
+
+export const fakeFreeSubscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems = {
+  ...fakeGoldSubscriptionPlanWithPricingSystems,
+  id: 'free',
+  nameByLocale: { en: 'Free' },
+  pricingSystems: [],
+};
+
+// The plans the editor is served, in the order the backend sends them.
+export const fakeSubscriptionPlansWithPricingSystems: Array<SubscriptionPlanWithPricingSystems> = [
+  fakeFreeSubscriptionPlanWithPricingSystems,
+  fakeSilverSubscriptionPlanWithPricingSystems,
+  fakeGoldSubscriptionPlanWithPricingSystems,
+  fakeProSubscriptionPlanWithPricingSystems,
+];

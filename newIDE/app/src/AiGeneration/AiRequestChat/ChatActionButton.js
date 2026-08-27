@@ -11,9 +11,9 @@ type Props = {|
   icon?: React.Node,
   /**
    * `primary` for the action the user is expected to take, `quiet` for the one
-   * that dismisses the row.
+   * that dismisses the row, `premium` for the one leading to a purchase.
    */
-  emphasis?: 'primary' | 'default' | 'quiet',
+  emphasis?: 'primary' | 'default' | 'quiet' | 'premium',
   disabled?: boolean,
   tooltip?: React.Node,
 |};
@@ -37,6 +37,7 @@ export const ChatActionButton = ({
         [classes.button]: true,
         [classes.buttonPrimary]: emphasis === 'primary',
         [classes.buttonQuiet]: emphasis === 'quiet',
+        [classes.buttonPremium]: emphasis === 'premium',
       })}
       onClick={onClick}
       disabled={disabled}

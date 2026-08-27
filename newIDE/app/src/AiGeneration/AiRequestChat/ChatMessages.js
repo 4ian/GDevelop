@@ -30,20 +30,16 @@ import {
 import classes from './ChatMessages.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import { AiRequestErrorRow } from './AiRequestErrorRow';
+import { AiCreditsLimitRow } from './AiCreditsLimitRow';
 import Text from '../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import FlatButton from '../../UI/FlatButton';
-import Paper from '../../UI/Paper';
 import Floppy from '../../UI/CustomSvgIcons/Floppy';
-import SubscriptionPlanTableSummary from '../../Profile/Subscription/SubscriptionDialog/SubscriptionPlanTableSummary';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { canUpgradeSubscription } from '../../Utils/GDevelopServices/Usage';
+import { getSubscriptionPlanToUpsell } from '../../Profile/Subscription/SubscriptionUpsellUtils';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import Coin from '../../Credits/Icons/Coin';
 import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
-import { Divider } from '@material-ui/core';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import Link from '../../UI/Link';
 import { type FileMetadata } from '../../ProjectsStorage';
@@ -51,21 +47,6 @@ import UnsavedChangesContext from '../../MainFrame/UnsavedChangesContext';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import { OrchestratorPlan } from './OrchestratorPlan';
 import { type FunctionCallItem, type RenderItem } from './Utils';
-
-const styles = {
-  subscriptionPaper: {
-    paddingTop: 5,
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingBottom: 5,
-  },
-  assistantChatBubbleLight: {
-    background: 'linear-gradient(90deg, #F5F5F7 77%, #EAE3FF 100%)',
-  },
-  assistantChatBubbleDark: {
-    background: 'linear-gradient(90deg, #25252E 0%, #312442 100%)',
-  },
-};
 
 // Phrases displayed while the AI is thinking/waiting (no active function calls).
 // Defined outside the component so the array is stable across renders.
@@ -215,7 +196,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
   }: Props) {
     const project = exceptionallyGuardAgainstDeadObject(nullableProject);
     const theme = React.useContext(GDevelopThemeContext);
-    const isLightTheme = theme.palette.type === 'light';
     const {
       getSubscriptionPlansWithPricingSystems,
       openSubscriptionDialog,
@@ -239,26 +219,12 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
 
     const suggestedSubscriptionPlanWithPricingSystem = React.useMemo(
       () => {
-        if (
-          !subscriptionPlansWithPricingSystems ||
-          subscriptionPlansWithPricingSystems.length === 0 ||
-          !hasReachedLimit ||
-          (subscription && !canUpgradeSubscription(subscription)) ||
-          !hasStartedRequestButCannotContinue
-        )
+        if (!hasReachedLimit || !hasStartedRequestButCannotContinue)
           return null;
-
-        const goldPlan = subscriptionPlansWithPricingSystems.find(
-          plan => plan.id === 'gdevelop_gold'
-        );
-        const proPlan = subscriptionPlansWithPricingSystems.find(
-          plan => plan.id === 'gdevelop_startup'
-        );
-        return (
-          (subscription && subscription.planId === 'gdevelop_gold'
-            ? proPlan
-            : goldPlan) || subscriptionPlansWithPricingSystems[0]
-        );
+        return getSubscriptionPlanToUpsell({
+          subscription,
+          subscriptionPlansWithPricingSystems,
+        });
       },
       [
         subscriptionPlansWithPricingSystems,
@@ -1345,139 +1311,38 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
         ) : null}
 
         {shouldShowCreditsOrSubscriptionPrompt && (
-          <Line justifyContent="center">
-            <Paper
-              background="medium"
-              style={{
-                ...styles.subscriptionPaper,
-                ...(isLightTheme
-                  ? styles.assistantChatBubbleLight
-                  : styles.assistantChatBubbleDark),
-              }}
-            >
-              {suggestedSubscriptionPlanWithPricingSystem && (
-                <ColumnStackLayout noMargin>
-                  <Line>
-                    <RobotIcon size={20} sad />
-                  </Line>
-                  <Text size="block-title" noMargin>
-                    <Trans>
-                      You don't have enough AI credits to continue this
-                      conversation.
-                    </Trans>
-                  </Text>
-                  <Text>
-                    {!!subscription ? (
-                      <Trans>
-                        Upgrade your Premium subscription to have more AI
-                        requests and GDevelop coins to unlock the engine's extra
-                        benefits.
-                      </Trans>
-                    ) : (
-                      <Trans>
-                        Get a Premium subscription to have more AI requests and
-                        GDevelop coins to unlock the engine's extra benefits.
-                      </Trans>
-                    )}
-                  </Text>
-                  <SubscriptionPlanTableSummary
-                    subscriptionPlanWithPricingSystems={
-                      suggestedSubscriptionPlanWithPricingSystem
-                    }
-                    displayedFeatures={['AI_PROTOTYPING', 'FREE_CREDITS']}
-                    hideFullTableLink
-                    actionLabel={<Trans>Upgrade</Trans>}
-                  />
-                </ColumnStackLayout>
-              )}
-
-              {suggestedSubscriptionPlanWithPricingSystem && (
-                <Line>
-                  <Column expand noMargin>
-                    <Divider orientation="horizontal" />
-                  </Column>
-                </Line>
-              )}
-
-              <ColumnStackLayout noMargin>
-                {suggestedSubscriptionPlanWithPricingSystem ? (
-                  <Text size="sub-title">
-                    <Trans>You can switch to GDevelop credits.</Trans>
-                  </Text>
-                ) : (
-                  <ColumnStackLayout noMargin>
-                    <Line>
-                      <Coin />
-                    </Line>
-                    <Text size="block-title" noMargin>
-                      <Trans>
-                        You've ran out of GDevelop credits to continue this
-                        conversation.
-                      </Trans>
-                    </Text>
-                  </ColumnStackLayout>
-                )}
-                <Text noMargin color="secondary">
-                  {availableCredits > 0 ? (
-                    <Trans>
-                      You still have {availableCredits} credits you can use for
-                      AI requests.
-                    </Trans>
-                  ) : (
-                    <Trans>
-                      You don't have any credits available. You can purchase
-                      GDevelop credits to continue making AI requests.
-                    </Trans>
-                  )}
-                </Text>
-                <Line noMargin>
-                  <Text>
-                    <Trans>What would you like to do next?</Trans>
-                  </Text>
-                </Line>
-                <FlatButton
-                  color="ai"
-                  onClick={() => {
-                    openSubscriptionDialog({
-                      analyticsMetadata: {
-                        reason: 'AI requests (subscribe)',
-                        recommendedPlanId: suggestedSubscriptionPlanWithPricingSystem
-                          ? suggestedSubscriptionPlanWithPricingSystem.id
-                          : 'gdevelop_gold',
-                        placementId: 'ai-requests',
-                      },
-                    });
-                  }}
-                  label={<Trans>See subscriptions</Trans>}
-                />
-                {availableCredits > 0 ? (
-                  <FlatButton
-                    leftIcon={<Coin fontSize="small" />}
-                    color="ai"
-                    onClick={() => {
-                      setAutomaticallyUseCreditsForAiRequests(true);
-                      onSwitchedToGDevelopCredits();
-                    }}
-                    label={
-                      automaticallyUseCreditsForAiRequests ? (
-                        <Trans>Using GDevelop Credits</Trans>
-                      ) : (
-                        <Trans>Switch to GDevelop Credits</Trans>
-                      )
-                    }
-                    disabled={automaticallyUseCreditsForAiRequests}
-                  />
-                ) : (
-                  <FlatButton
-                    leftIcon={<Coin fontSize="small" />}
-                    color="ai"
-                    onClick={openCreditsPackageDialog}
-                    label={<Trans>Get more credits</Trans>}
-                    disabled={false}
-                  />
-                )}
-              </ColumnStackLayout>
-            </Paper>
+          <Line>
+            <Column expand noMargin noOverflowParent>
+              <AiCreditsLimitRow
+                suggestedSubscriptionPlan={
+                  suggestedSubscriptionPlanWithPricingSystem
+                }
+                hasSubscription={!!subscription && !!subscription.planId}
+                availableCredits={availableCredits}
+                automaticallyUseCreditsForAiRequests={
+                  automaticallyUseCreditsForAiRequests
+                }
+                quota={quota}
+                onUpgradeSubscription={() => {
+                  openSubscriptionDialog({
+                    analyticsMetadata: {
+                      reason: 'AI requests (subscribe)',
+                      recommendedPlanId: suggestedSubscriptionPlanWithPricingSystem
+                        ? suggestedSubscriptionPlanWithPricingSystem.id
+                        : 'gdevelop_gold',
+                      placementId: 'ai-requests',
+                    },
+                  });
+                }}
+                onSwitchToGDevelopCredits={() => {
+                  setAutomaticallyUseCreditsForAiRequests(true);
+                  onSwitchedToGDevelopCredits();
+                }}
+                onBuyCredits={() =>
+                  openCreditsPackageDialog({ placementId: 'ai-requests' })
+                }
+              />
+            </Column>
           </Line>
         )}
 

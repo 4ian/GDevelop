@@ -1048,7 +1048,11 @@ export const AiRequestChat: React.ComponentType<{
                             <RaisedButton
                               icon={<Coin fontSize="small" />}
                               primary
-                              onClick={() => openCreditsPackageDialog()}
+                              onClick={() =>
+                                openCreditsPackageDialog({
+                                  placementId: 'ai-requests',
+                                })
+                              }
                               label={<Trans>Get more credits</Trans>}
                             />
                           )}

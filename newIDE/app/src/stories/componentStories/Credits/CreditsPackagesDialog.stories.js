@@ -8,8 +8,12 @@ import {
   initialCreditsPackageStoreState,
 } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { type CreditsPackageListingData } from '../../../Utils/GDevelopServices/Shop';
+import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { fakeAuthenticatedUserWithNoSubscriptionAndCredits } from '../../../fixtures/GDevelopServicesTestData';
+import {
+  fakeAuthenticatedUserWithNoSubscriptionAndCredits,
+  fakeNotAuthenticatedUser,
+} from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Credits/CreditsPackagesDialog',
@@ -75,15 +79,15 @@ const Wrapper = ({
   children,
   creditsPackageListingDatas: packages = creditsPackageListingDatas,
   error = null,
+  authenticatedUser = fakeAuthenticatedUserWithNoSubscriptionAndCredits,
 }: {|
   children: React.Node,
   creditsPackageListingDatas?: ?(CreditsPackageListingData[]),
   error?: ?Error,
+  authenticatedUser?: AuthenticatedUser,
 |}) => (
   // $FlowFixMe[incompatible-type]
-  <AuthenticatedUserContext.Provider
-    value={fakeAuthenticatedUserWithNoSubscriptionAndCredits}
-  >
+  <AuthenticatedUserContext.Provider value={authenticatedUser}>
     <CreditsPackageStoreContext.Provider
       value={makeStoreState({
         creditsPackageListingDatas: packages,
@@ -186,6 +190,106 @@ export const WithThreePackages = (): React.Node => (
       onClose={() => {}}
       suggestedPackage={null}
       missingCredits={null}
+    />
+  </Wrapper>
+);
+
+// Not logged in (or the limits are not loaded yet): the balance is unknown, so
+// the chip showing it is not rendered at all.
+export const WithoutKnownBalance = (): React.Node => (
+  <Wrapper authenticatedUser={fakeNotAuthenticatedUser}>
+    <CreditsPackagesDialog
+      onClose={() => {}}
+      suggestedPackage={null}
+      missingCredits={null}
+    />
+  </Wrapper>
+);
+
+// A single package: no package can be cheaper per credit than another, so there
+// is neither a saving to show nor a best value to point at.
+export const WithASinglePackage = (): React.Node => (
+  <Wrapper creditsPackageListingDatas={creditsPackageListingDatas.slice(0, 1)}>
+    <CreditsPackagesDialog
+      onClose={() => {}}
+      suggestedPackage={null}
+      missingCredits={null}
+    />
+  </Wrapper>
+);
+
+// Packages all priced at the same rate per credit: nothing is a better deal, so
+// no saving and no best value are advertised.
+export const WithoutBetterValueForBiggerPackages = (): React.Node => (
+  <Wrapper
+    creditsPackageListingDatas={[
+      makeCreditsPackageListingData({ creditsAmount: 500, priceInCents: 500 }),
+      makeCreditsPackageListingData({
+        creditsAmount: 1000,
+        priceInCents: 1000,
+      }),
+      makeCreditsPackageListingData({
+        creditsAmount: 2000,
+        priceInCents: 2000,
+      }),
+    ]}
+  >
+    <CreditsPackagesDialog
+      onClose={() => {}}
+      suggestedPackage={null}
+      missingCredits={null}
+    />
+  </Wrapper>
+);
+
+// A package whose id doesn't say how many credits it gives (a package shape
+// added later by the shop): its name is shown instead of a credits count, and
+// it stays out of the value comparison.
+export const WithAPackageOfAnUnknownShape = (): React.Node => (
+  <Wrapper
+    creditsPackageListingDatas={[
+      ...creditsPackageListingDatas.slice(0, 2),
+      {
+        ...makeCreditsPackageListingData({
+          creditsAmount: 2000,
+          priceInCents: 1899,
+        }),
+        id: 'some-package-added-later',
+        name: 'Creator pack',
+      },
+    ]}
+  >
+    <CreditsPackagesDialog
+      onClose={() => {}}
+      suggestedPackage={null}
+      missingCredits={null}
+    />
+  </Wrapper>
+);
+
+// The user is short of more credits than the biggest package gives: the biggest
+// one is then the recommended one.
+export const WithMoreMissingCreditsThanAnyPackage = (): React.Node => (
+  <Wrapper>
+    <CreditsPackagesDialog
+      onClose={() => {}}
+      suggestedPackage={
+        creditsPackageListingDatas[creditsPackageListingDatas.length - 1]
+      }
+      missingCredits={25000}
+    />
+  </Wrapper>
+);
+
+// The AI wording, with the recommended package of a user short of credits: the
+// two ways the dialog is opened from the AI chat, together.
+export const AiVariantWithSuggestedPackage = (): React.Node => (
+  <Wrapper>
+    <CreditsPackagesDialog
+      onClose={() => {}}
+      suggestedPackage={creditsPackageListingDatas[2]}
+      missingCredits={1500}
+      dialogVariant="ai"
     />
   </Wrapper>
 );

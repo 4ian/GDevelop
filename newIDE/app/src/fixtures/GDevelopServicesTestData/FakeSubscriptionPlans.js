@@ -100,3 +100,17 @@ export const fakePlanWithoutSimplifiedFeatures: SubscriptionPlanWithPricingSyste
   ...fakeGoldSubscriptionPlanWithPricingSystems,
   simplifiedFeatures: undefined,
 };
+
+// A plan sold monthly only: the upsells must then show the monthly price,
+// without the "billed annually" mention nor a saving to advertise.
+export const fakePlanWithMonthlyPricingOnly: SubscriptionPlanWithPricingSystems = {
+  ...fakeGoldSubscriptionPlanWithPricingSystems,
+  pricingSystems: [fakeGoldMonthlyPricingSystem],
+};
+
+// A plan whose prices could not be loaded: the upsells must then show no price
+// at all rather than a broken one.
+export const fakePlanWithoutPricingSystems: SubscriptionPlanWithPricingSystems = {
+  ...fakeGoldSubscriptionPlanWithPricingSystems,
+  pricingSystems: [],
+};

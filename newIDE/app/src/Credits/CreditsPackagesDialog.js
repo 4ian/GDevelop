@@ -121,6 +121,10 @@ const getSavingsPercentages = (
  * What a given amount of credits realistically allows: an AI request costs a
  * few credits, an asset pack or a mobile build a few hundred. Thresholds are
  * kept deliberately coarse so the promise stays true if prices move a little.
+ *
+ * Nothing is promised for a package whose id doesn't say how many credits it
+ * gives (a package shape added later by the shop): a wrong promise would be
+ * worse than none.
  */
 const renderPackageValue = ({
   creditsAmount,
@@ -129,18 +133,19 @@ const renderPackageValue = ({
   creditsAmount: number,
   isAiFocused: boolean,
 |}): React.Node => {
+  if (!creditsAmount) return null;
   if (creditsAmount >= 10000) {
     return isAiFocused ? (
-      <Trans>A whole year of building with the AI</Trans>
+      <Trans>Build and iterate on entire games, every day</Trans>
     ) : (
-      <Trans>A whole year of making games</Trans>
+      <Trans>Make entire games, every day</Trans>
     );
   }
   if (creditsAmount >= 5000) {
     return isAiFocused ? (
-      <Trans>Iterate on entire games, every day</Trans>
+      <Trans>Advanced features on an ambitious game, with the AI</Trans>
     ) : (
-      <Trans>Make entire games, every day</Trans>
+      <Trans>Advanced features on an ambitious game</Trans>
     );
   }
   if (creditsAmount >= 2000) {

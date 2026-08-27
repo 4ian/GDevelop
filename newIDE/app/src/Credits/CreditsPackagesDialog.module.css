@@ -94,8 +94,12 @@
   padding: 12px;
   border-radius: 10px;
   min-width: 0;
-  border: 1px solid var(--theme-list-item-separator-color);
-  background-color: var(--theme-surface-alternate-canvas-background-color);
+  /* The canvas background, not the alternate one: the alternate background is
+     the dialog's own background in every theme, which would make the tile
+     invisible (its faint border alone had to carry it, and did not on the light
+     theme). */
+  border: 1px solid var(--theme-dialog-separator-color);
+  background-color: var(--theme-surface-canvas-background-color);
 }
 
 .usageTexts {
@@ -127,6 +131,7 @@
 .packages {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  justify-items: center;
   gap: 12px;
   min-width: 0;
 }
@@ -135,13 +140,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* The app has no global border-box rule, and the card has its own padding and
+     border: without this, `width: 100%` would overflow the grid column. */
+  box-sizing: border-box;
+  width: 100%;
+  /* So a shop selling only one or two packages doesn't show absurdly wide
+     cards: they stay at a card's size, centered in the space they have. */
+  max-width: 300px;
   gap: 7px;
   position: relative;
   padding: 16px 10px 10px 10px;
   border-radius: 12px;
   min-width: 0;
-  border: 1px solid var(--theme-list-item-separator-color);
-  background-color: var(--theme-surface-alternate-canvas-background-color);
+  /* See `.usage` for why the canvas background (and the dialog separator
+     color) are used rather than the alternate canvas one. */
+  border: 1px solid var(--theme-dialog-separator-color);
+  background-color: var(--theme-surface-canvas-background-color);
   transition: border-color 150ms ease, transform 150ms ease;
 }
 

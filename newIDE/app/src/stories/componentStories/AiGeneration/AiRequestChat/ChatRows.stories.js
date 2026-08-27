@@ -13,6 +13,8 @@ import {
   fakeGoldSubscriptionPlanWithPricingSystems,
   fakeProSubscriptionPlanWithPricingSystems,
   fakePlanWithoutSimplifiedFeatures,
+  fakePlanWithMonthlyPricingOnly,
+  fakePlanWithoutPricingSystems,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeSubscriptionPlans';
 import { type Quota } from '../../../../Utils/GDevelopServices/Usage';
 import {
@@ -248,6 +250,101 @@ export const AiCreditsLimitWithoutPlanToSuggest = (): React.Node => (
         quota={reachedDailyQuota}
         {...aiCreditsLimitActions}
       />
+    </ColumnStackLayout>
+  </FixedWidthFlexContainer>
+);
+
+// The user already chose to pay their AI requests with GDevelop credits: the
+// action saying so is disabled, so they can see it is already on.
+export const AiCreditsLimitAlreadyUsingCredits = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <AiCreditsLimitRow
+      suggestedSubscriptionPlan={fakeGoldSubscriptionPlanWithPricingSystems}
+      hasSubscription={false}
+      availableCredits={350}
+      automaticallyUseCreditsForAiRequests
+      quota={reachedDailyQuota}
+      {...aiCreditsLimitActions}
+    />
+  </FixedWidthFlexContainer>
+);
+
+// Every kind of AI usage allowance, and the case where we don't know when it
+// comes back: each must be said with the right wording (or not at all).
+export const AiCreditsLimitWithAllQuotaPeriods = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <ColumnStackLayout noMargin expand>
+      {[
+        { label: 'Daily allowance', quota: reachedDailyQuota },
+        {
+          label: 'Weekly allowance',
+          quota: { ...reachedDailyQuota, period: '7days' },
+        },
+        {
+          label: 'Monthly allowance',
+          quota: { ...reachedDailyQuota, period: '30days' },
+        },
+        {
+          label: 'Reset date already passed (not shown)',
+          quota: {
+            ...reachedDailyQuota,
+            resetsAt: new Date('2020-01-01T08:00:00Z').getTime(),
+          },
+        },
+        { label: 'No allowance known (not shown)', quota: null },
+      ].map(({ label, quota }) => (
+        <React.Fragment key={label}>
+          <Text noMargin size="body-small" color="secondary">
+            {label}
+          </Text>
+          <AiCreditsLimitRow
+            suggestedSubscriptionPlan={
+              fakeGoldSubscriptionPlanWithPricingSystems
+            }
+            hasSubscription={false}
+            availableCredits={350}
+            automaticallyUseCreditsForAiRequests={false}
+            // $FlowFixMe[incompatible-type] - the periods are the ones of a Quota.
+            quota={quota}
+            {...aiCreditsLimitActions}
+          />
+        </React.Fragment>
+      ))}
+    </ColumnStackLayout>
+  </FixedWidthFlexContainer>
+);
+
+// What the plan is sold for decides what the row can promise: a yearly plan is
+// shown as a monthly equivalent with the saving, and a plan whose prices are
+// missing must show no price rather than a broken one.
+export const AiCreditsLimitWithAllPricingCases = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <ColumnStackLayout noMargin expand>
+      {[
+        {
+          label: 'Sold yearly and monthly',
+          plan: fakeGoldSubscriptionPlanWithPricingSystems,
+        },
+        { label: 'Sold monthly only', plan: fakePlanWithMonthlyPricingOnly },
+        {
+          label: 'Prices unavailable (no price line)',
+          plan: fakePlanWithoutPricingSystems,
+        },
+      ].map(({ label, plan }) => (
+        <React.Fragment key={label}>
+          <Text noMargin size="body-small" color="secondary">
+            {label}
+          </Text>
+          <AiCreditsLimitRow
+            suggestedSubscriptionPlan={plan}
+            hasSubscription={false}
+            availableCredits={0}
+            automaticallyUseCreditsForAiRequests={false}
+            quota={reachedDailyQuota}
+            {...aiCreditsLimitActions}
+          />
+        </React.Fragment>
+      ))}
     </ColumnStackLayout>
   </FixedWidthFlexContainer>
 );

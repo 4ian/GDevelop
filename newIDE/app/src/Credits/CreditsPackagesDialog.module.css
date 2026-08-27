@@ -82,7 +82,7 @@
    phone (rather than a two column grid leaving a hole under the third one). */
 .usages {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 10px;
   min-width: 0;
 }
@@ -245,9 +245,25 @@
   padding-bottom: 4px;
 }
 
+/* Between a wide desktop dialog and a phone, four columns would leave the last
+   of the five packages sold alone on its own row: use three, then two. The
+   column counts are set here (rather than left to `auto-fit`) so the packages
+   always split into rows that look deliberate. */
+@media (max-width: 950px) {
+  .packages {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .packages {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* On a phone the dialog is fullscreen and the packages are stacked two by two:
    keep each card short enough that a few of them are visible at once. */
-@media (max-width: 600px) {
+@media (max-width: 620px) {
   .container {
     gap: 12px;
   }

@@ -512,6 +512,7 @@ const PrivateAssetPackInformationPage = ({
       if (currentCreditsAmount < assetPackCreditsAmount) {
         openCreditsPackageDialog({
           missingCredits: assetPackCreditsAmount - currentCreditsAmount,
+          placementId: 'asset-store',
         });
         return;
       }

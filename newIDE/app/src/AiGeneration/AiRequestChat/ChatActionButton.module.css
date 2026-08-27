@@ -66,3 +66,25 @@ button.buttonQuiet:hover {
 .tooltipWrapper {
   display: inline-flex;
 }
+
+/* For the action leading to a purchase (a subscription, credits): the premium
+   gradient used across the editor, so an upsell is recognizable at a glance. */
+button.buttonPremium {
+  border-color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--theme-premium-teal) 0%,
+    var(--theme-premium-orange) 100%
+  );
+  color: var(--theme-premium-text-contrast-color);
+  font-weight: bold;
+}
+
+button.buttonPremium:hover {
+  border-color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--theme-premium-teal-dark) 0%,
+    var(--theme-premium-orange-dark) 100%
+  );
+}

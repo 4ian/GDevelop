@@ -78,7 +78,10 @@ const CreditsStatusBanner = ({
               <FlatButton
                 label={<Trans>Get credit packs</Trans>}
                 onClick={() =>
-                  openCreditsPackageDialog({ showCalloutTip: true })
+                  openCreditsPackageDialog({
+                    showCalloutTip: true,
+                    placementId: 'profile',
+                  })
                 }
                 noBackground
               />

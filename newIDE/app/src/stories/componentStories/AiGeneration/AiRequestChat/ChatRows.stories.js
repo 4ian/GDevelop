@@ -7,7 +7,14 @@ import { ColumnStackLayout } from '../../../../UI/Layout';
 import Text from '../../../../UI/Text';
 import { EditApprovalRow } from '../../../../AiGeneration/AiRequestChat/EditApprovalRow';
 import { AiRequestErrorRow } from '../../../../AiGeneration/AiRequestChat/AiRequestErrorRow';
+import { AiCreditsLimitRow } from '../../../../AiGeneration/AiRequestChat/AiCreditsLimitRow';
 import { type EditApprovalRequest } from '../../../../AiGeneration/Utils';
+import {
+  fakeGoldSubscriptionPlanWithPricingSystems,
+  fakeProSubscriptionPlanWithPricingSystems,
+  fakePlanWithoutSimplifiedFeatures,
+} from '../../../../fixtures/GDevelopServicesTestData/FakeSubscriptionPlans';
+import { type Quota } from '../../../../Utils/GDevelopServices/Usage';
 import {
   internalAiRequestError,
   contextTooLargeAiRequestError,
@@ -143,6 +150,123 @@ export const AllAiRequestErrors = (): React.Node => (
   </FixedWidthFlexContainer>
 );
 
+// The daily AI usage of a user without a subscription, all consumed, coming
+// back in a few days.
+const reachedDailyQuota: Quota = {
+  limitReached: true,
+  current: 12,
+  max: 12,
+  period: '1day',
+  resetsAt: new Date('2026-09-03T08:00:00Z').getTime(),
+};
+
+const aiCreditsLimitActions = {
+  onUpgradeSubscription: action('onUpgradeSubscription'),
+  onSwitchToGDevelopCredits: action('onSwitchToGDevelopCredits'),
+  onBuyCredits: action('onBuyCredits'),
+};
+
+// The user has no subscription and no credits: the upsell is the only way
+// forward, so it takes all the space it needs.
+export const AiCreditsLimitWithoutSubscription = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <AiCreditsLimitRow
+      suggestedSubscriptionPlan={fakeGoldSubscriptionPlanWithPricingSystems}
+      hasSubscription={false}
+      availableCredits={0}
+      automaticallyUseCreditsForAiRequests={false}
+      quota={reachedDailyQuota}
+      {...aiCreditsLimitActions}
+    />
+  </FixedWidthFlexContainer>
+);
+
+// The user has credits left: continuing right away is offered next to the
+// subscription, which stays the featured action.
+export const AiCreditsLimitWithCreditsLeft = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <AiCreditsLimitRow
+      suggestedSubscriptionPlan={fakeGoldSubscriptionPlanWithPricingSystems}
+      hasSubscription={false}
+      availableCredits={350}
+      automaticallyUseCreditsForAiRequests={false}
+      quota={reachedDailyQuota}
+      {...aiCreditsLimitActions}
+    />
+  </FixedWidthFlexContainer>
+);
+
+// Already paying: the upsell is an upgrade to the plan above.
+export const AiCreditsLimitWithSubscriptionToUpgrade = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <AiCreditsLimitRow
+      suggestedSubscriptionPlan={fakeProSubscriptionPlanWithPricingSystems}
+      hasSubscription
+      availableCredits={120}
+      automaticallyUseCreditsForAiRequests={false}
+      quota={{ ...reachedDailyQuota, period: '30days' }}
+      {...aiCreditsLimitActions}
+    />
+  </FixedWidthFlexContainer>
+);
+
+// Nothing left to upsell (the user is on the best plan): only credits can get
+// the conversation going again.
+export const AiCreditsLimitWithoutPlanToSuggest = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <ColumnStackLayout noMargin expand>
+      <Text noMargin size="body-small" color="secondary">
+        With credits to spend
+      </Text>
+      <AiCreditsLimitRow
+        suggestedSubscriptionPlan={null}
+        hasSubscription
+        availableCredits={350}
+        automaticallyUseCreditsForAiRequests={false}
+        quota={reachedDailyQuota}
+        {...aiCreditsLimitActions}
+      />
+      <Text noMargin size="body-small" color="secondary">
+        Without credits
+      </Text>
+      <AiCreditsLimitRow
+        suggestedSubscriptionPlan={null}
+        hasSubscription
+        availableCredits={0}
+        automaticallyUseCreditsForAiRequests={false}
+        quota={reachedDailyQuota}
+        {...aiCreditsLimitActions}
+      />
+      <Text noMargin size="body-small" color="secondary">
+        Already paying with credits
+      </Text>
+      <AiCreditsLimitRow
+        suggestedSubscriptionPlan={null}
+        hasSubscription
+        availableCredits={350}
+        automaticallyUseCreditsForAiRequests
+        quota={reachedDailyQuota}
+        {...aiCreditsLimitActions}
+      />
+    </ColumnStackLayout>
+  </FixedWidthFlexContainer>
+);
+
+// An older backend that doesn't describe the plan features: the row falls back
+// to its own wording.
+export const AiCreditsLimitWithoutBackendFeatures = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <AiCreditsLimitRow
+      suggestedSubscriptionPlan={fakePlanWithoutSimplifiedFeatures}
+      hasSubscription={false}
+      availableCredits={0}
+      automaticallyUseCreditsForAiRequests={false}
+      quota={null}
+      {...aiCreditsLimitActions}
+    />
+  </FixedWidthFlexContainer>
+);
+
 // The chat panel can be docked and narrow: the actions must then wrap instead
 // of overflowing.
 export const RowsInANarrowPanel = (): React.Node => (
@@ -163,6 +287,17 @@ export const RowsInANarrowPanel = (): React.Node => (
         error={internalAiRequestError}
         onRetry={async () => action('onRetry')()}
         onStartNewChat={action('onStartNewChat')}
+      />
+      <Text noMargin size="body-small" color="secondary">
+        AI credits limit
+      </Text>
+      <AiCreditsLimitRow
+        suggestedSubscriptionPlan={fakeGoldSubscriptionPlanWithPricingSystems}
+        hasSubscription={false}
+        availableCredits={350}
+        automaticallyUseCreditsForAiRequests={false}
+        quota={reachedDailyQuota}
+        {...aiCreditsLimitActions}
       />
     </ColumnStackLayout>
   </FixedWidthFlexContainer>

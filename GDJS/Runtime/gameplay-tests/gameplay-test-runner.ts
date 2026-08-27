@@ -1356,6 +1356,12 @@ namespace gdjs {
        * this size. Useful to test layouts made for other screen sizes,
        * before asserting positions or taking a screenshot.
        *
+       * This is the ONLY way the game resolution changes during a test:
+       * a gameplay test always runs in a game window of the project's game
+       * resolution, and moving, resizing or minimizing the gameplay test
+       * frame in the editor is never visible to the game (the frame is
+       * only a zoomed view of that fixed window).
+       *
        * The engine sees a game window of this size until the end of the
        * test: a game adapting its resolution to the game window size would
        * otherwise recompute it from the real window, ignoring the size

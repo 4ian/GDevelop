@@ -156,8 +156,8 @@
 }
 
 /*
- * Holds the game window: sized 1:1 and only zoomed out to fit the game area
- * (see `getGameZoomFactor`).
+ * Holds the game window: always sized at exactly the game resolution, and
+ * only scaled to be displayed at the frame zoom.
  */
 .gameScaler {
   position: absolute;

@@ -14,10 +14,10 @@
   padding: 2px;
   border-radius: 4px;
   background-color: var(--theme-text-field-default-background-color);
-  /* Keep the toggles at the same size whatever the number of bits. */
+  /* Keep the toggles at the same size whatever the number of bits, but let
+     them shrink rather than overflow in a narrow panel. */
   width: fit-content;
   max-width: 100%;
-  overflow-x: auto;
 }
 
 .bit {
@@ -25,7 +25,8 @@
   border: 0;
   padding: 0;
   height: 20px;
-  width: 24px;
+  width: 100%;
+  min-width: 0px;
   border-radius: 3px;
   background-color: transparent;
   color: var(--theme-text-default-color);

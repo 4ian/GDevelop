@@ -92,7 +92,10 @@ export const CompactBitmaskField = ({
         className={classes.bits}
         id={id}
         style={{
-          gridTemplateColumns: `repeat(${Math.min(bitCount, 8)}, 24px)`,
+          gridTemplateColumns: `repeat(${Math.min(
+            bitCount,
+            8
+          )}, minmax(0, 24px))`,
         }}
       >
         {Array.from({ length: bitCount }, (_, index) => {

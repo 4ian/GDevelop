@@ -95,7 +95,6 @@ const initRenderer = dracoDecoderFiles => {
     antialias: true,
     alpha: true,
   });
-  renderer.useLegacyLights = true; // Use legacy lights as in the editor.
 
   renderer.setSize(width, height, false);
 
@@ -124,6 +123,7 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
   const scene = new THREE.Scene();
 
   const light = new THREE.HemisphereLight();
+  light.intensity = Math.PI;
   light.color = new THREE.Color(1, 1, 1);
   light.groundColor = new THREE.Color(0.25, 0.25, 0.25);
   light.position.set(0, 0, 1);

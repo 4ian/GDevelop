@@ -357,6 +357,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   props.onEventsBasedObjectChildrenEdited
                 }
                 onBackgroundColorChanged={props.onBackgroundColorChanged}
+                onRenderer3DWorldScaleFieldChanged={
+                  props.onRenderer3DWorldScaleFieldChanged
+                }
                 openSceneVariables={props.openSceneVariables}
               />
             )}

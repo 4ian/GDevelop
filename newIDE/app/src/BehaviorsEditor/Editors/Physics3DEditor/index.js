@@ -140,9 +140,8 @@ const Physics3DEditor = (props: Props): React.Node => {
 
   const isStatic = properties.get('bodyType').getValue() === 'Static';
 
-  const canShapeBeOriented =
-    properties.get('shape').getValue() !== 'Sphere' &&
-    properties.get('shape').getValue() !== 'Box';
+  // The property is hidden for the shapes that can't be oriented.
+  const canShapeBeOriented = !properties.get('shapeOrientation').isHidden();
 
   // $FlowFixMe[value-as-type]
   const [gltf, setGltf] = React.useState<GLTF | null>(null);
@@ -281,56 +280,26 @@ const Physics3DEditor = (props: Props): React.Node => {
         )}
       {shape !== 'Mesh' && (
         <ResponsiveLineStackLayout>
-          <SemiControlledTextField
-            fullWidth
-            value={properties.get('shapeDimensionA').getValue()}
-            key={'shapeDimensionA'}
-            floatingLabelText={
-              shape === 'Box' ? <Trans>Width</Trans> : <Trans>Radius</Trans>
-            }
-            min={0}
-            onChange={newValue =>
-              updateBehaviorProperty('shapeDimensionA', newValue)
-            }
-            type="number"
-            endAdornment={
-              <UnitAdornment property={properties.get('shapeDimensionA')} />
-            }
-          />
-          {shape !== 'Sphere' && (
-            <SemiControlledTextField
-              fullWidth
-              value={properties.get('shapeDimensionB').getValue()}
-              key={'shapeDimensionB'}
-              floatingLabelText={
-                shape === 'Box' ? <Trans>Height</Trans> : <Trans>Depth</Trans>
-              }
-              min={0}
-              onChange={newValue =>
-                updateBehaviorProperty('shapeDimensionB', newValue)
-              }
-              type="number"
-              endAdornment={
-                <UnitAdornment property={properties.get('shapeDimensionB')} />
-              }
-            />
-          )}
-          {shape === 'Box' && (
-            <SemiControlledTextField
-              fullWidth
-              value={properties.get('shapeDimensionC').getValue()}
-              key={'shapeDimensionC'}
-              floatingLabelText={<Trans>Depth</Trans>}
-              min={0}
-              onChange={newValue =>
-                updateBehaviorProperty('shapeDimensionC', newValue)
-              }
-              type="number"
-              endAdornment={
-                <UnitAdornment property={properties.get('shapeDimensionC')} />
-              }
-            />
-          )}
+          {/* Labels and visibility are given by the properties themselves,
+              as they depend on the shape. */}
+          {['shapeDimensionA', 'shapeDimensionB', 'shapeDimensionC']
+            .filter(propertyName => !properties.get(propertyName).isHidden())
+            .map(propertyName => (
+              <SemiControlledTextField
+                fullWidth
+                value={properties.get(propertyName).getValue()}
+                key={propertyName}
+                floatingLabelText={properties.get(propertyName).getLabel()}
+                min={0}
+                onChange={newValue =>
+                  updateBehaviorProperty(propertyName, newValue)
+                }
+                type="number"
+                endAdornment={
+                  <UnitAdornment property={properties.get(propertyName)} />
+                }
+              />
+            ))}
         </ResponsiveLineStackLayout>
       )}
       {shape === 'Mesh' && (

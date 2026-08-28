@@ -219,6 +219,13 @@ module.exports = {
     physics2Behavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
+      // The shape decides which dimensions are meaningful and how they
+      // should be labelled, so these properties adapt themselves to it.
+      const shape = behaviorContent.getChild('shape').getStringValue();
+      const isCircleShape = shape === 'Circle';
+      const isEdgeShape = shape === 'Edge';
+      const isPolygonShape = shape === 'Polygon';
+
       behaviorProperties
         .getOrCreate('bodyType')
         .setValue(behaviorContent.getChild('bodyType').getStringValue())
@@ -288,7 +295,8 @@ module.exports = {
         .addChoice('Box', _('Box'))
         .addChoice('Circle', _('Circle'))
         .addChoice('Edge', _('Edge'))
-        .addChoice('Polygon', _('Polygon'));
+        .addChoice('Polygon', _('Polygon'))
+        .setHasImpactOnOtherProperties(true);
       behaviorProperties
         .getOrCreate('shapeDimensionA')
         .setValue(
@@ -299,9 +307,19 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Dimension A')
+        .setLabel(
+          isCircleShape ? _('Radius') : isEdgeShape ? _('Length') : _('Width')
+        )
+        .setDescription(
+          isCircleShape
+            ? _('Radius of the circle. Use 0 to follow the object size.')
+            : isEdgeShape
+              ? _('Length of the edge. Use 0 to follow the object width.')
+              : _('Width of the box. Use 0 to follow the object width.')
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        // A polygon is defined by its vertices instead of dimensions.
+        .setHidden(isPolygonShape);
       behaviorProperties
         .getOrCreate('shapeDimensionB')
         .setValue(
@@ -311,10 +329,20 @@ module.exports = {
             .toString(10)
         )
         .setType('Number')
-        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Dimension B')
+        .setMeasurementUnit(
+          isEdgeShape
+            ? gd.MeasurementUnit.getDegreeAngle()
+            : gd.MeasurementUnit.getPixel()
+        )
+        .setLabel(isEdgeShape ? _('Angle') : _('Height'))
+        .setDescription(
+          isEdgeShape
+            ? _('Angle of the edge.')
+            : _('Height of the box. Use 0 to follow the object height.')
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        // A circle only needs a radius and a polygon uses its vertices.
+        .setHidden(isPolygonShape || isCircleShape);
       behaviorProperties
         .getOrCreate('shapeOffsetX')
         .setValue(
@@ -353,12 +381,16 @@ module.exports = {
             : 'Center'
         )
         .setType('Choice')
-        .setLabel('Polygon Origin')
+        .setLabel(_('Polygon origin'))
+        .setDescription(
+          _('Point of the object the polygon vertices are relative to.')
+        )
         .addChoice('Center', _('Center'))
         .addChoice('Origin', _('Origin'))
         .addChoice('TopLeft', _('TopLeft'))
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        // Only used by the "Polygon" shape.
+        .setHidden(!isPolygonShape);
       behaviorProperties
         .getOrCreate('vertices')
         .setValue(

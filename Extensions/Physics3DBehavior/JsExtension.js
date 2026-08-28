@@ -285,6 +285,12 @@ module.exports = {
       behavior.getProperties = function (behaviorContent) {
         const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
+        // The shape decides which dimensions are meaningful and how they
+        // should be labelled, so these properties adapt themselves to it.
+        const shape = behaviorContent.getChild('shape').getStringValue();
+        const isBoxShape = shape === 'Box';
+        const isMeshShape = shape === 'Mesh';
+
         behaviorProperties
           .getOrCreate('object3D')
           .setValue(behaviorContent.getChild('object3D').getStringValue())
@@ -349,7 +355,8 @@ module.exports = {
           .addChoice('Capsule', _('Capsule'))
           .addChoice('Sphere', _('Sphere'))
           .addChoice('Cylinder', _('Cylinder'))
-          .addChoice('Mesh', _('Mesh (works for Static only)'));
+          .addChoice('Mesh', _('Mesh (works for Static only)'))
+          .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('meshShapeResourceName')
           .setValue(
@@ -359,8 +366,8 @@ module.exports = {
           .addExtraInfo('model3D')
           .setLabel(_('Simplified 3D model'))
           .setDescription(_("Leave empty to use object's one"))
-          // Hidden as required to be changed in the full editor.
-          .setHidden(true)
+          // Only used by the "Mesh" shape.
+          .setHidden(!isMeshShape)
           .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('shapeOrientation')
@@ -368,11 +375,16 @@ module.exports = {
             behaviorContent.getChild('shapeOrientation').getStringValue()
           )
           .setType('Choice')
-          .setLabel('Shape orientation')
+          .setLabel(_('Shape orientation'))
+          .setDescription(
+            _('Axis along which the capsule or cylinder is extended.')
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addChoice('Z', _('Z'))
           .addChoice('Y', _('Y'))
-          .addChoice('X', _('X'));
+          .addChoice('X', _('X'))
+          // Only capsules and cylinders can be oriented.
+          .setHidden(shape !== 'Capsule' && shape !== 'Cylinder');
         behaviorProperties
           .getOrCreate('shapeDimensionA')
           .setValue(
@@ -383,9 +395,15 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Dimension A')
+          .setLabel(isBoxShape ? _('Width') : _('Radius'))
+          .setDescription(
+            isBoxShape
+              ? _('Width of the box. Use 0 to follow the object width.')
+              : _('Radius of the shape. Use 0 to follow the object size.')
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          // The "Mesh" shape uses a 3D model instead of dimensions.
+          .setHidden(isMeshShape);
         behaviorProperties
           .getOrCreate('shapeDimensionB')
           .setValue(
@@ -396,9 +414,17 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Dimension B')
+          .setLabel(isBoxShape ? _('Height') : _('Depth'))
+          .setDescription(
+            isBoxShape
+              ? _('Height of the box. Use 0 to follow the object height.')
+              : _(
+                  'Size of the shape along its orientation axis. Use 0 to follow the object depth.'
+                )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          // A sphere only needs a radius and a mesh uses a 3D model.
+          .setHidden(isMeshShape || shape === 'Sphere');
         behaviorProperties
           .getOrCreate('shapeDimensionC')
           .setValue(
@@ -409,9 +435,13 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Dimension C')
+          .setLabel(_('Depth'))
+          .setDescription(
+            _('Depth of the box. Use 0 to follow the object depth.')
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          // Only a box has a third dimension to configure.
+          .setHidden(!isBoxShape);
         if (!behaviorContent.hasChild('shapeOffsetX')) {
           behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
         }

@@ -247,20 +247,14 @@ const Physics2Editor = (props: Props): React.Node => {
         />
       </Line>
       <ResponsiveLineStackLayout>
-        {shape !== 'Polygon' && (
+        {/* Labels and visibility are given by the properties themselves,
+            as they depend on the shape. */}
+        {!properties.get('shapeDimensionA').isHidden() && (
           <SemiControlledTextField
             fullWidth
             value={properties.get('shapeDimensionA').getValue()}
             key={'shapeDimensionA'}
-            floatingLabelText={
-              shape === 'Circle' ? (
-                <Trans>Radius</Trans>
-              ) : shape === 'Edge' ? (
-                <Trans>Length</Trans>
-              ) : (
-                <Trans>Width</Trans>
-              )
-            }
+            floatingLabelText={properties.get('shapeDimensionA').getLabel()}
             min={0}
             onChange={newValue =>
               updateBehaviorProperty('shapeDimensionA', newValue)
@@ -271,14 +265,12 @@ const Physics2Editor = (props: Props): React.Node => {
             }
           />
         )}
-        {shape !== 'Polygon' && shape !== 'Circle' && (
+        {!properties.get('shapeDimensionB').isHidden() && (
           <SemiControlledTextField
             fullWidth
             value={properties.get('shapeDimensionB').getValue()}
             key={'shapeDimensionB'}
-            floatingLabelText={
-              shape === 'Edge' ? <Trans>Angle</Trans> : <Trans>Height</Trans>
-            }
+            floatingLabelText={properties.get('shapeDimensionB').getLabel()}
             min={shape === 'Edge' ? undefined : 0}
             onChange={newValue =>
               updateBehaviorProperty('shapeDimensionB', newValue)
@@ -289,7 +281,7 @@ const Physics2Editor = (props: Props): React.Node => {
             }
           />
         )}
-        {shape === 'Polygon' && (
+        {!properties.get('polygonOrigin').isHidden() && (
           <ChoiceProperty
             properties={properties}
             propertyName={'polygonOrigin'}

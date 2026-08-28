@@ -290,7 +290,12 @@ module.exports = {
         .getOrCreate('shape')
         .setValue(behaviorContent.getChild('shape').getStringValue())
         .setType('Choice')
-        .setLabel('Shape')
+        .setLabel(_('Shape'))
+        .setDescription(
+          _(
+            'The shape used for collisions. It gives their meaning to the dimension properties. A polygon is defined by its "Vertices" and positioned according to "Polygon origin".'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .addChoice('Box', _('Box'))
         .addChoice('Circle', _('Circle'))
@@ -311,11 +316,9 @@ module.exports = {
           isCircleShape ? _('Radius') : isEdgeShape ? _('Length') : _('Width')
         )
         .setDescription(
-          isCircleShape
-            ? _('Radius of the circle. Use 0 to follow the object size.')
-            : isEdgeShape
-              ? _('Length of the edge. Use 0 to follow the object width.')
-              : _('Width of the box. Use 0 to follow the object width.')
+          _(
+            'Width of the box, radius of the circle or length of the edge. Use 0 to follow the object size.'
+          )
         )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         // A polygon is defined by its vertices instead of dimensions.
@@ -336,9 +339,9 @@ module.exports = {
         )
         .setLabel(isEdgeShape ? _('Angle') : _('Height'))
         .setDescription(
-          isEdgeShape
-            ? _('Angle of the edge.')
-            : _('Height of the box. Use 0 to follow the object height.')
+          _(
+            'Height of the box, or angle of the edge in degrees. Not used by a circle. Use 0 to follow the object height.'
+          )
         )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         // A circle only needs a radius and a polygon uses its vertices.

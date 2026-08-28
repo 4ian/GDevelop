@@ -352,7 +352,12 @@ module.exports = {
           .getOrCreate('shape')
           .setValue(behaviorContent.getChild('shape').getStringValue())
           .setType('Choice')
-          .setLabel('Shape')
+          .setLabel(_('Shape'))
+          .setDescription(
+            _(
+              'The shape used for collisions. It gives their meaning to the dimension properties. A capsule or a cylinder is extended along the axis given by "Shape orientation" and a mesh uses the model given by "Simplified 3D model".'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addChoice('Box', _('Box'))
           .addChoice('Capsule', _('Capsule'))
@@ -400,9 +405,9 @@ module.exports = {
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setLabel(isBoxShape ? _('Width') : _('Radius'))
           .setDescription(
-            isBoxShape
-              ? _('Width of the box. Use 0 to follow the object width.')
-              : _('Radius of the shape. Use 0 to follow the object size.')
+            _(
+              'Width of the box, or radius of the sphere, capsule or cylinder. Use 0 to follow the object size.'
+            )
           )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           // The "Mesh" shape uses a 3D model instead of dimensions.
@@ -419,11 +424,9 @@ module.exports = {
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setLabel(isBoxShape ? _('Height') : _('Depth'))
           .setDescription(
-            isBoxShape
-              ? _('Height of the box. Use 0 to follow the object height.')
-              : _(
-                  'Size of the shape along its orientation axis. Use 0 to follow the object depth.'
-                )
+            _(
+              'Height of the box, or size of the capsule or cylinder along its orientation axis. Not used by a sphere. Use 0 to follow the object size.'
+            )
           )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           // A sphere only needs a radius and a mesh uses a 3D model.
@@ -440,7 +443,9 @@ module.exports = {
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setLabel(_('Depth'))
           .setDescription(
-            _('Depth of the box. Use 0 to follow the object depth.')
+            _(
+              'Depth of the box. Only used by a box. Use 0 to follow the object depth.'
+            )
           )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           // Only a box has a third dimension to configure.
@@ -692,13 +697,9 @@ module.exports = {
           .addExtraInfo(isStaticBody ? 'firstBit=0' : 'firstBit=4')
           .setLabel(_('Layers'))
           .setDescription(
-            isStaticBody
-              ? _(
-                  'Layers the object belongs to, as a bitmask. Static objects use the layers 1 to 4 (1, 2, 4 and 8).'
-                )
-              : _(
-                  'Layers the object belongs to, as a bitmask. Moving objects use the layers 5 to 8 (16, 32, 64 and 128).'
-                )
+            _(
+              'Layers the object belongs to, as a bitmask. Static objects use the layers 1 to 4 (1, 2, 4 and 8) and moving ones the layers 5 to 8 (16, 32, 64 and 128).'
+            )
           )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Collision filtering'));
@@ -712,7 +713,7 @@ module.exports = {
           .setLabel(_('Masks'))
           .setDescription(
             _(
-              'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 8 which is 128.'
+              'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 8 which is 128. Not used by static objects, which accept every collision.'
             )
           )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)

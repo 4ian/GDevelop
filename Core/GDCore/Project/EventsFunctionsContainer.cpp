@@ -58,6 +58,7 @@ void EventsFunctionsContainer::AddMissingFunctionsInRootFolder() {
         }
       }
       const gd::String &group = groupSource->GetGroup();
+      // TODO Handle sub-folders
       auto &folder = !group.empty() ? rootFolder->GetOrCreateChildFolder(group)
                                     : *rootFolder;
       folder.InsertFunction(&function);

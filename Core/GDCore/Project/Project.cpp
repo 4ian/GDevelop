@@ -231,7 +231,7 @@ const gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(
 }
 
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(
-    const gd::String& type, const gd::String& platformName) {
+    const gd::String& type, const gd::String& platformName) const {
   for (std::size_t i = 0; i < platforms.size(); ++i) {
     if (!platformName.empty() && platforms[i]->GetName() != platformName)
       continue;

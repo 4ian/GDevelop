@@ -17,6 +17,7 @@ export default {
 
 export const Default = (): React.Node => (
   <EventsBasedObjectEditor
+    project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
     eventsBasedObject={testProject.testEventsBasedObject}
     onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}

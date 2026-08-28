@@ -53,7 +53,7 @@ void EventsList::InsertEvent(std::shared_ptr<gd::BaseEvent> event,
     events.push_back(event);
 }
 
-gd::BaseEvent& EventsList::InsertNewEvent(gd::Project& project,
+gd::BaseEvent& EventsList::InsertNewEvent(const gd::Project& project,
                                           const gd::String& eventType,
                                           size_t position) {
   gd::BaseEventSPtr event = project.CreateEvent(eventType);

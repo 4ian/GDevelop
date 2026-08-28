@@ -8,12 +8,16 @@
 
 .bits {
   display: grid;
-  /* Bits are laid out on as many rows as needed to fit the container. */
-  grid-template-columns: repeat(auto-fit, minmax(24px, 1fr));
+  /* The number of columns is given by the component, so that bits are laid
+     out on rows of at most 8, like they are usually read. */
   gap: 2px;
   padding: 2px;
   border-radius: 4px;
   background-color: var(--theme-text-field-default-background-color);
+  /* Keep the toggles at the same size whatever the number of bits. */
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .bit {
@@ -21,7 +25,7 @@
   border: 0;
   padding: 0;
   height: 20px;
-  min-width: 0px;
+  width: 24px;
   border-radius: 3px;
   background-color: transparent;
   color: var(--theme-text-default-color);
@@ -30,9 +34,7 @@
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition:
-    background-color 0.1s linear,
-    color 0.1s linear;
+  transition: background-color 0.1s linear, color 0.1s linear;
 }
 
 .bit:hover {
@@ -40,8 +42,8 @@
 }
 
 .bit.enabled {
-  background-color: var(--theme-icon-button-selected-background-color);
-  color: var(--theme-icon-button-selected-color);
+  background-color: var(--theme-primary-color);
+  color: var(--theme-primary-text-contrast-color);
 }
 
 .bit:focus-visible {

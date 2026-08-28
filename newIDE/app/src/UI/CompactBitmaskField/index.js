@@ -88,7 +88,13 @@ export const CompactBitmaskField = ({
           </Text>
         </Tooltip>
       )}
-      <div className={classes.bits} id={id}>
+      <div
+        className={classes.bits}
+        id={id}
+        style={{
+          gridTemplateColumns: `repeat(${Math.min(bitCount, 8)}, 24px)`,
+        }}
+      >
         {Array.from({ length: bitCount }, (_, index) => {
           const bit = firstBit + index;
           const enabled = isBitEnabled(value, bit);

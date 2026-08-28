@@ -12,6 +12,7 @@ import {
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
 import { keyNames } from '../Utils/KeyboardKeyNames';
+import { getChoiceDisplayLabel } from '../Utils/ChoiceLabel';
 import Restore from '../UI/CustomSvgIcons/Restore';
 
 const gd: libGDevelop = global.gd;
@@ -193,11 +194,7 @@ const createField = (
       property.getChoices(),
       choice => ({
         value: choice.getValue(),
-        label:
-          choice.getValue() +
-          (choice.getLabel() && choice.getLabel() !== choice.getValue()
-            ? ` — ${choice.getLabel()}`
-            : ''),
+        label: getChoiceDisplayLabel(choice.getValue(), choice.getLabel()),
       })
     );
     // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.

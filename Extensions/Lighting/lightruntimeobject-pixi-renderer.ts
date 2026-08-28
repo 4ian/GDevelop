@@ -575,17 +575,23 @@ namespace gdjs {
      * @returns the vertices of mesh.
      */
     _computeLightVertices(): Array<FloatPoint> {
-      // The lit region is the light's square *rotated by the object's angle*
-      // (see the fallback quad in _updateBuffers and texturedFragmentShader),
-      // whose axis-aligned bounding box extends up to
-      // radius * (|cos| + |sin|) from the center. Search obstacles in that
-      // whole box — searching only ±radius would miss obstacles near the
-      // rotated square's corners and let the light shine through them.
-      // At angle 0 this is exactly ±radius, as before rotation was supported.
-      const angleRad = gdjs.toRad(this._object.getAngle());
-      const searchHalfExtent =
-        this._radius *
-        (Math.abs(Math.cos(angleRad)) + Math.abs(Math.sin(angleRad)));
+      // An untextured light renders as a circle (see defaultFragmentShader),
+      // which never lights anything beyond ±radius whatever the angle, so
+      // the ±radius box is an exact obstacle search area for it.
+      // A textured light's lit region is the light's square *rotated by the
+      // object's angle* (see the fallback quad in _updateBuffers and
+      // texturedFragmentShader), whose axis-aligned bounding box extends up
+      // to radius * (|cos| + |sin|) from the center. Search obstacles in
+      // that whole box — searching only ±radius would miss obstacles near
+      // the rotated square's corners and let the light shine through them.
+      // At angle 0 both are exactly ±radius, as before rotation support.
+      let searchHalfExtent = this._radius;
+      if (this._texture !== null) {
+        const angleRad = gdjs.toRad(this._object.getAngle());
+        searchHalfExtent =
+          this._radius *
+          (Math.abs(Math.cos(angleRad)) + Math.abs(Math.sin(angleRad)));
+      }
       const lightObstacles = this._lightObstaclesTemp;
       if (this._manager) {
         this._manager.getAllObstaclesAround(

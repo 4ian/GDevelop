@@ -72,6 +72,9 @@ namespace gdjs {
       this.updateTexture();
       this._center = new Float32Array([runtimeObject.x, runtimeObject.y]);
       this._defaultVertexBuffer = new Float32Array(8);
+      // The object's angle is not applied yet at construction time (it is set
+      // afterwards, via setAngle), so the initial quad is the axis-aligned
+      // square. _updateBuffers rebuilds it with the rotation applied.
       this._vertexBuffer = new Float32Array([
         runtimeObject.x - this._radius,
         runtimeObject.y + this._radius,
@@ -326,6 +329,7 @@ namespace gdjs {
         center: this._center,
         radius: this._radius,
         color: this._color,
+        angle: gdjs.toRad(this._object.getAngle()),
       };
       if (this._texture) {
         // @ts-ignore
@@ -409,21 +413,24 @@ namespace gdjs {
 
       const computedVertices = this._computeLightVertices();
       if (!computedVertices.length) {
+        // Draw the same rotated quad the mesh falls back to when there are
+        // no obstacles around (see _updateBuffers), so the debug overlay
+        // matches the actual light boundary. _updateBuffers recomputes the
+        // same values into this buffer right after, so reusing it is safe.
+        const corners = this._defaultVertexBuffer;
+        this._computeRotatedSquareVertices(
+          gdjs.toRad(this._object.getAngle()),
+          corners
+        );
         debugGraphics.clear();
-        debugGraphics
-          .lineStyle(1, 16711680, 1)
-          .moveTo(this._object.x, this._object.y)
-          .lineTo(this._object.x - this._radius, this._object.y + this._radius)
-          .lineTo(this._object.x + this._radius, this._object.y + this._radius)
-          .moveTo(this._object.x, this._object.y)
-          .lineTo(this._object.x + this._radius, this._object.y + this._radius)
-          .lineTo(this._object.x + this._radius, this._object.y - this._radius)
-          .moveTo(this._object.x, this._object.y)
-          .lineTo(this._object.x + this._radius, this._object.y - this._radius)
-          .lineTo(this._object.x - this._radius, this._object.y - this._radius)
-          .moveTo(this._object.x, this._object.y)
-          .lineTo(this._object.x - this._radius, this._object.y - this._radius)
-          .lineTo(this._object.x - this._radius, this._object.y + this._radius);
+        debugGraphics.lineStyle(1, 16711680, 1);
+        for (let i = 0; i < 8; i += 2) {
+          const next = (i + 2) % 8;
+          debugGraphics
+            .moveTo(this._object.x, this._object.y)
+            .lineTo(corners[i], corners[i + 1])
+            .lineTo(corners[next], corners[next + 1]);
+        }
         return;
       }
       const vertices = new Array(2 * computedVertices.length + 2);
@@ -451,24 +458,46 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Fill the given buffer (4 corners, as x/y pairs) with the corners of the
+     * light's square *rotated by the given angle* — the same rotated square
+     * the shader samples the texture from (see texturedFragmentShader). At
+     * angle 0, this is exactly the axis-aligned square
+     * [x-radius, x+radius] x [y-radius, y+radius].
+     */
+    _computeRotatedSquareVertices(angleRad: float, output: Float32Array) {
+      const cosA = Math.cos(angleRad);
+      const sinA = Math.sin(angleRad);
+      const cx = this._object.x;
+      const cy = this._object.y;
+      const a = this._radius * (cosA + sinA);
+      const b = this._radius * (cosA - sinA);
+      output[0] = cx - a;
+      output[1] = cy + b;
+      output[2] = cx + b;
+      output[3] = cy + a;
+      output[4] = cx + a;
+      output[5] = cy - b;
+      output[6] = cx - b;
+      output[7] = cy - a;
+    }
+
     _updateBuffers() {
       if (!this._light) {
         return;
       }
       this._center[0] = this._object.x;
       this._center[1] = this._object.y;
+      const angleRad = gdjs.toRad(this._object.getAngle());
+      this._light.shader.uniforms.angle = angleRad;
       const vertices = this._computeLightVertices();
 
-      // Fallback to simple quad when there are no obstacles around.
+      // Fallback to simple quad when there are no obstacles around: the
+      // light's rotated square, so it exactly matches the area the shader
+      // samples the texture from, without clipping its corners nor
+      // over-sizing the mesh.
       if (vertices.length === 0) {
-        this._defaultVertexBuffer[0] = this._object.x - this._radius;
-        this._defaultVertexBuffer[1] = this._object.y + this._radius;
-        this._defaultVertexBuffer[2] = this._object.x + this._radius;
-        this._defaultVertexBuffer[3] = this._object.y + this._radius;
-        this._defaultVertexBuffer[4] = this._object.x + this._radius;
-        this._defaultVertexBuffer[5] = this._object.y - this._radius;
-        this._defaultVertexBuffer[6] = this._object.x - this._radius;
-        this._defaultVertexBuffer[7] = this._object.y - this._radius;
+        this._computeRotatedSquareVertices(angleRad, this._defaultVertexBuffer);
         this._light.shader.uniforms.center = this._center;
         this._light.geometry
           .getBuffer('aVertexPosition')
@@ -546,18 +575,35 @@ namespace gdjs {
      * @returns the vertices of mesh.
      */
     _computeLightVertices(): Array<FloatPoint> {
+      // An untextured light renders as a circle (see defaultFragmentShader),
+      // which never lights anything beyond ±radius whatever the angle, so
+      // the ±radius box is an exact obstacle search area for it.
+      // A textured light's lit region is the light's square *rotated by the
+      // object's angle* (see the fallback quad in _updateBuffers and
+      // texturedFragmentShader), whose axis-aligned bounding box extends up
+      // to radius * (|cos| + |sin|) from the center. Search obstacles in
+      // that whole box — searching only ±radius would miss obstacles near
+      // the rotated square's corners and let the light shine through them.
+      // At angle 0 both are exactly ±radius, as before rotation support.
+      let searchHalfExtent = this._radius;
+      if (this._texture !== null) {
+        const angleRad = gdjs.toRad(this._object.getAngle());
+        searchHalfExtent =
+          this._radius *
+          (Math.abs(Math.cos(angleRad)) + Math.abs(Math.sin(angleRad)));
+      }
       const lightObstacles = this._lightObstaclesTemp;
       if (this._manager) {
         this._manager.getAllObstaclesAround(
           this._object,
-          this._radius,
+          searchHalfExtent,
           lightObstacles
         );
       }
-      const searchAreaLeft = this._object.getX() - this._radius;
-      const searchAreaTop = this._object.getY() - this._radius;
-      const searchAreaRight = this._object.getX() + this._radius;
-      const searchAreaBottom = this._object.getY() + this._radius;
+      const searchAreaLeft = this._object.getX() - searchHalfExtent;
+      const searchAreaTop = this._object.getY() - searchHalfExtent;
+      const searchAreaRight = this._object.getX() + searchHalfExtent;
+      const searchAreaBottom = this._object.getY() + searchHalfExtent;
 
       // Bail out early if there are no obstacles.
       if (lightObstacles.length === 0) {
@@ -590,10 +636,16 @@ namespace gdjs {
         }
       }
 
-      let maxX = this._object.x + this._radius;
-      let minX = this._object.x - this._radius;
-      let maxY = this._object.y + this._radius;
-      let minY = this._object.y - this._radius;
+      // Seed the self-boundary ("wall" that unoccluded rays terminate on)
+      // with the axis-aligned bounding box of the light's rotated square —
+      // the same box used to search obstacles above. At angle 0 this is
+      // exactly [x-radius, x+radius] x [y-radius, y+radius], same as before;
+      // at other angles it grows just enough to avoid clipping the corners
+      // of the rotated texture, without over-sizing the search area.
+      let minX = searchAreaLeft;
+      let maxX = searchAreaRight;
+      let minY = searchAreaTop;
+      let maxY = searchAreaBottom;
       const flattenVertices = this._flattenVerticesTemp;
       flattenVertices.length = 0;
       for (let i = 1; i < obstaclePolygons.length; i++) {
@@ -776,12 +828,22 @@ namespace gdjs {
   uniform vec2 center;
   uniform float radius;
   uniform vec3 color;
+  uniform float angle;
   uniform sampler2D uSampler;
   varying vec2 vPos;
 
   void main() {
-    vec2 topleft = vec2(center.x - radius, center.y - radius);
-    vec2 texCoord = (vPos - topleft)/(2.0 * radius);
+    vec2 relativePos = vPos - center;
+    float cosA = cos(angle);
+    float sinA = sin(angle);
+    // Rotate the sampled point back by the object's angle so that the
+    // texture appears to rotate together with the light object.
+    vec2 rotatedPos = vec2(
+      relativePos.x * cosA + relativePos.y * sinA,
+      -relativePos.x * sinA + relativePos.y * cosA
+    );
+    vec2 topleft = vec2(-radius, -radius);
+    vec2 texCoord = (rotatedPos - topleft)/(2.0 * radius);
     gl_FragColor = (texCoord.x > 0.0 && texCoord.x < 1.0 && texCoord.y > 0.0 && texCoord.y < 1.0)
       ? vec4(color, 1.0) * texture2D(uSampler, texCoord)
       : vec4(0.0, 0.0, 0.0, 0.0);

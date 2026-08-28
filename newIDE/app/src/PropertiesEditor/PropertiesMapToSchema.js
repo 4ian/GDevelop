@@ -320,6 +320,34 @@ const createField = (
       isHighlighted: isHighlightedForString,
       disabled,
     };
+  } else if (valueType === 'bitmask') {
+    // A bitmask is a number where each bit is a flag. The extra information
+    // tells which bits are meaningful, for example: "bitCount=4", "firstBit=4".
+    const extraInfo = property.getExtraInfo().toJSArray();
+    const getExtraInfoNumber = (key: string, defaultValue: number): number => {
+      const entry = extraInfo.find(info => info.startsWith(`${key}=`));
+      if (!entry) return defaultValue;
+      const parsedValue = parseInt(entry.substring(key.length + 1), 10);
+      return Number.isFinite(parsedValue) ? parsedValue : defaultValue;
+    };
+
+    return {
+      name,
+      valueType: 'bitmask',
+      getValue: getValueForNumber,
+      setValue: (instance: Instance, newValue: number) => {
+        setNumberValue(instance, name, newValue);
+      },
+      firstBit: getExtraInfoNumber('firstBit', 0),
+      bitCount: getExtraInfoNumber('bitCount', 8),
+      defaultValue: defaultValueNumber,
+      getLabel,
+      getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
+      isHighlighted: isHighlightedForNumber,
+      disabled,
+    };
   } else if (valueType === 'multilinestring') {
     return {
       name,

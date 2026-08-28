@@ -65,16 +65,25 @@ export const CompactBehaviorPropertiesEditor = ({
   resourceManagementProps,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+  // The schema is built from the first behavior. There is always one, but
+  // stay safe as an empty list would break the whole properties panel.
+  const behavior = behaviors.length > 0 ? behaviors[0] : null;
+  // The behavior is identified by its pointer, as a new wrapper object is
+  // given at each render.
+  const behaviorPtr = behavior ? behavior.ptr : null;
 
-  const propertiesSchema = React.useMemo(
+  const propertiesSchema: Schema = React.useMemo(
     () => {
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
-      const behaviorMetadataProperties = behaviorMetadata.getProperties();
+      if (!behavior) return [];
       return propertiesMapToSchema({
-        properties: behaviorMetadataProperties,
-        defaultValueProperties: behaviorMetadataProperties,
+        // Use the behavior properties (and not the metadata ones) so that
+        // properties adapting themselves to the current values (labels,
+        // visibility...) are properly displayed.
+        properties: behavior.getProperties(),
+        defaultValueProperties: behaviorMetadata.getProperties(),
         getPropertyValue: (instance, name) =>
           instance
             .getProperties()
@@ -89,7 +98,14 @@ export const CompactBehaviorPropertiesEditor = ({
         shouldDisabledFieldsWithMixedValues: true,
       });
     },
-    [schemaRecomputeTrigger, behaviorMetadata, object, layersContainer]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      schemaRecomputeTrigger,
+      behaviorPtr,
+      behaviorMetadata,
+      object,
+      layersContainer,
+    ]
   );
 
   return (

@@ -18,6 +18,7 @@ import {
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
+import { canPayForAiRequest } from './AiRequestChat/Utils';
 import { registerAskAiPrefillListener } from './AskAiPrefill';
 import {
   addMessageToAiRequest,
@@ -527,15 +528,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             let payWithCredits = false;
             if (quota && quota.limitReached && aiRequestPriceInCredits) {
               payWithCredits = true;
-              const doesNotHaveEnoughCreditsToContinue =
-                availableCredits < aiRequestPriceInCredits;
-              const cannotContinue =
-                !automaticallyUseCreditsForAiRequests ||
-                doesNotHaveEnoughCreditsToContinue;
-
-              if (cannotContinue) {
-                return;
-              }
+            }
+            // The same rule as the one enabling the send button, so the button
+            // can't offer to send a request this would silently drop.
+            if (
+              !canPayForAiRequest({
+                quota,
+                price: aiRequestPrice,
+                availableCredits,
+                automaticallyUseCreditsForAiRequests,
+              })
+            ) {
+              return;
             }
 
             // Request is now ready to be started.
@@ -629,6 +633,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           })();
         },
         [
+          aiRequestPrice,
           aiRequestPriceInCredits,
           availableCredits,
           getAuthorizationHeader,
@@ -721,13 +726,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             aiRequestPriceInCredits
           ) {
             payWithCredits = true;
-            const doesNotHaveEnoughCreditsToContinue =
-              availableCredits < aiRequestPriceInCredits;
-            const cannotContinue =
-              !automaticallyUseCreditsForAiRequests ||
-              doesNotHaveEnoughCreditsToContinue;
-
-            if (cannotContinue) {
+            // The same rule as the one enabling the send button, so the button
+            // can't offer to send a message this would silently drop.
+            if (
+              !canPayForAiRequest({
+                quota,
+                price: aiRequestPrice,
+                availableCredits,
+                automaticallyUseCreditsForAiRequests,
+              })
+            ) {
               return;
             }
           }
@@ -860,6 +868,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           aiRequests,
           isSendingAiRequest,
           quota,
+          aiRequestPrice,
           aiRequestPriceInCredits,
           availableCredits,
           setSendingAiRequest,

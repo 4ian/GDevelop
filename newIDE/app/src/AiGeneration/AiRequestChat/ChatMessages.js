@@ -34,6 +34,7 @@ import classes from './ChatMessages.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import { AiRequestErrorRow } from './AiRequestErrorRow';
 import { AiCreditsLimitRow } from './AiCreditsLimitRow';
+import { canPayForAiRequest } from './Utils';
 import Text from '../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Floppy from '../../UI/CustomSvgIcons/Floppy';
@@ -100,7 +101,6 @@ type Props = {|
   shouldDisplayFeedbackBanner?: boolean,
   onScrollToBottom: () => void,
   hasStartedRequestButCannotContinue: boolean,
-  onSwitchedToGDevelopCredits: () => void,
 
   onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
   // Continues a request that stopped on an error, from where it stopped.
@@ -188,7 +188,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     shouldDisplayFeedbackBanner,
     onScrollToBottom,
     hasStartedRequestButCannotContinue,
-    onSwitchedToGDevelopCredits,
     onStartOrOpenChat,
     onRetryAfterError,
     isSending,
@@ -219,6 +218,19 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     const { openCreditsPackageDialog } = React.useContext(
       CreditsPackageStoreContext
     );
+
+    // Whether paying with the credits the user already has would be enough to
+    // continue: if it is, offering to switch is all the banner has to do.
+    const canSwitchToGDevelopCredits =
+      !automaticallyUseCreditsForAiRequests &&
+      canPayForAiRequest({
+        quota,
+        price:
+          (limits && limits.credits && limits.credits.prices['ai-request']) ||
+          null,
+        availableCredits,
+        automaticallyUseCreditsForAiRequests: true,
+      });
 
     const suggestedSubscriptionPlanWithPricingSystem = React.useMemo(
       () => {
@@ -1326,9 +1338,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                 }
                 hasSubscription={!!subscription && !!subscription.planId}
                 availableCredits={availableCredits}
-                automaticallyUseCreditsForAiRequests={
-                  automaticallyUseCreditsForAiRequests
-                }
+                canSwitchToGDevelopCredits={canSwitchToGDevelopCredits}
                 quota={quota}
                 onUpgradeSubscription={() => {
                   openSubscriptionDialog({
@@ -1341,10 +1351,9 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                     },
                   });
                 }}
-                onSwitchToGDevelopCredits={() => {
-                  setAutomaticallyUseCreditsForAiRequests(true);
-                  onSwitchedToGDevelopCredits();
-                }}
+                onSwitchToGDevelopCredits={() =>
+                  setAutomaticallyUseCreditsForAiRequests(true)
+                }
                 onBuyCredits={() =>
                   openCreditsPackageDialog({ placementId: 'ai-requests' })
                 }

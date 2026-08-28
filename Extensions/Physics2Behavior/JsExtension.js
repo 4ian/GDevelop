@@ -488,7 +488,8 @@ module.exports = {
           )
         )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setGroup(_('Collision filtering'));
+        .setGroup(_('Collision filtering'))
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('masks')
         .setValue(behaviorContent.getChild('masks').getIntValue().toString(10))
@@ -501,7 +502,8 @@ module.exports = {
           )
         )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setGroup(_('Collision filtering'));
+        .setGroup(_('Collision filtering'))
+        .setAdvanced(true);
 
       return behaviorProperties;
     };

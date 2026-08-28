@@ -702,7 +702,8 @@ module.exports = {
             )
           )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setGroup(_('Collision filtering'));
+          .setGroup(_('Collision filtering'))
+          .setAdvanced(true);
         behaviorProperties
           .getOrCreate('masks')
           .setValue(
@@ -718,6 +719,7 @@ module.exports = {
           )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Collision filtering'))
+          .setAdvanced(true)
           // Static objects accept every collision: it's the mask of the moving
           // objects that matters.
           .setHidden(isStaticBody);

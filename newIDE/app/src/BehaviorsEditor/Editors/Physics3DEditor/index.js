@@ -2,16 +2,18 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { Line, Column, Spacer } from '../../../UI/Grid';
+import { Line, Column } from '../../../UI/Grid';
 import Checkbox from '../../../UI/Checkbox';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
 import Text from '../../../UI/Text';
 import DismissableAlertMessage from '../../../UI/DismissableAlertMessage';
-import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
+import { CompactBitmaskField } from '../../../UI/CompactBitmaskField';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 import {
   NumericProperty,
   UnitAdornment,
@@ -57,40 +59,6 @@ const areAdvancedPropertiesModified = (
   return hasFoundModifiedAdvancedProperty;
 };
 
-const BitGroupEditor = (props: {|
-  bits: Array<boolean>,
-  onChange: (index: number, value: boolean) => void,
-  firstIndex: number,
-  disabled: boolean,
-|}) => {
-  return (
-    <div style={{ overflowX: 'auto', flex: 1 }}>
-      <ButtonGroup disableElevation fullWidth disabled={props.disabled}>
-        {props.bits.map((bit, index) => (
-          <Button
-            key={props.firstIndex + index}
-            variant={bit ? 'contained' : 'outlined'}
-            color={bit ? 'primary' : 'default'}
-            onClick={() => props.onChange(props.firstIndex + index, !bit)}
-          >
-            {props.firstIndex + index + 1}
-          </Button>
-        ))}
-      </ButtonGroup>
-    </div>
-  );
-};
-
-const isBitEnabled = (bitsValue: number, pos: number) => {
-  return !!(bitsValue & (1 << pos));
-};
-
-const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
-  if (enable) bitsValue |= 1 << pos;
-  else bitsValue &= ~(1 << pos);
-  return bitsValue;
-};
-
 const Physics3DEditor = (props: Props): React.Node => {
   const {
     object,
@@ -132,8 +100,6 @@ const Physics3DEditor = (props: Props): React.Node => {
   );
 
   const properties = behavior.getProperties();
-  const staticBits = Array(4).fill(null);
-  const dynamicBits = Array(4).fill(null);
   const shape = properties.get('shape').getValue();
   const layersValues = parseInt(properties.get('layers').getValue(), 10);
   const masksValues = parseInt(properties.get('masks').getValue(), 10);
@@ -410,65 +376,32 @@ const Physics3DEditor = (props: Props): React.Node => {
           }
         />
       </ResponsiveLineStackLayout>
-      <Line>
-        <Text style={{ marginRight: 10 }}>
-          {properties.get('layers').getLabel()}
-        </Text>
-        <BitGroupEditor
-          key={'static-layers'}
-          firstIndex={0}
-          bits={staticBits.map(
-            (_, index) => isBitEnabled(layersValues, index) && isStatic
+      <Line expand>
+        <ColumnStackLayout expand noMargin>
+          {/* Static and moving objects don't use the same layers, so only
+              the ones of the current body type are shown. */}
+          <CompactBitmaskField
+            label={properties.get('layers').getLabel()}
+            markdownDescription={properties.get('layers').getDescription()}
+            value={layersValues}
+            firstBit={isStatic ? 0 : 4}
+            bitCount={4}
+            onChange={newValue =>
+              updateBehaviorProperty('layers', newValue.toString(10))
+            }
+          />
+          {!properties.get('masks').isHidden() && (
+            <CompactBitmaskField
+              label={properties.get('masks').getLabel()}
+              markdownDescription={properties.get('masks').getDescription()}
+              value={masksValues}
+              bitCount={8}
+              onChange={newValue =>
+                updateBehaviorProperty('masks', newValue.toString(10))
+              }
+            />
           )}
-          onChange={(index, value) => {
-            const newValue = enableBit(layersValues, index, value);
-            updateBehaviorProperty('layers', newValue.toString(10));
-          }}
-          disabled={!isStatic}
-        />
-        <Spacer />
-        <BitGroupEditor
-          key={'dynamic-layers'}
-          firstIndex={4}
-          bits={dynamicBits.map(
-            (_, index) => isBitEnabled(layersValues, index + 4) && !isStatic
-          )}
-          onChange={(index, value) => {
-            const newValue = enableBit(layersValues, index, value);
-            updateBehaviorProperty('layers', newValue.toString(10));
-          }}
-          disabled={isStatic}
-        />
-      </Line>
-      <Line>
-        <Text style={{ marginRight: 10 }}>
-          {properties.get('masks').getLabel()}
-        </Text>
-        <BitGroupEditor
-          key={'static-mask'}
-          firstIndex={0}
-          bits={staticBits.map(
-            (_, index) => isBitEnabled(masksValues, index) || isStatic
-          )}
-          onChange={(index, value) => {
-            const newValue = enableBit(masksValues, index, value);
-            updateBehaviorProperty('masks', newValue.toString(10));
-          }}
-          disabled={isStatic}
-        />
-        <Spacer />
-        <BitGroupEditor
-          key={'dynamic-mask'}
-          firstIndex={4}
-          bits={dynamicBits.map(
-            (_, index) => isBitEnabled(masksValues, index + 4) || isStatic
-          )}
-          onChange={(index, value) => {
-            const newValue = enableBit(masksValues, index, value);
-            updateBehaviorProperty('masks', newValue.toString(10));
-          }}
-          disabled={isStatic}
-        />
+        </ColumnStackLayout>
       </Line>
       <Accordion
         defaultExpanded={areAdvancedPropertiesExpandedByDefault}

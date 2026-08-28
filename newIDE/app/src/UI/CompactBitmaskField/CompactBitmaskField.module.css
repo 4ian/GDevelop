@@ -1,0 +1,64 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 4px;
+}
+
+.bits {
+  display: grid;
+  /* Bits are laid out on as many rows as needed to fit the container. */
+  grid-template-columns: repeat(auto-fit, minmax(24px, 1fr));
+  gap: 2px;
+  padding: 2px;
+  border-radius: 4px;
+  background-color: var(--theme-text-field-default-background-color);
+}
+
+.bit {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  height: 20px;
+  min-width: 0px;
+  border-radius: 3px;
+  background-color: transparent;
+  color: var(--theme-text-default-color);
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background-color 0.1s linear,
+    color 0.1s linear;
+}
+
+.bit:hover {
+  background-color: var(--theme-hover-background-color);
+}
+
+.bit.enabled {
+  background-color: var(--theme-icon-button-selected-background-color);
+  color: var(--theme-icon-button-selected-color);
+}
+
+.bit:focus-visible {
+  outline: 1px solid var(--theme-text-field-active-border-color);
+  outline-offset: -1px;
+}
+
+.container.disabled .bit {
+  color: var(--theme-text-field-disabled-color);
+  cursor: default;
+}
+
+.container.disabled .bit:hover {
+  background-color: transparent;
+}
+
+.container.disabled .bit.enabled {
+  background-color: var(--theme-text-field-disabled-color);
+  color: var(--theme-text-field-default-background-color);
+}

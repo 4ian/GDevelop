@@ -476,17 +476,29 @@ module.exports = {
       behaviorProperties
         .getOrCreate('layers')
         .setValue(behaviorContent.getChild('layers').getIntValue().toString(10))
-        .setType('Number')
-        .setLabel('Layers')
+        .setType('Bitmask')
+        .addExtraInfo('bitCount=16')
+        .setLabel(_('Layers'))
+        .setDescription(
+          _(
+            'Layers the object belongs to, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 16 which is 32768.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        .setGroup(_('Collision filtering'));
       behaviorProperties
         .getOrCreate('masks')
         .setValue(behaviorContent.getChild('masks').getIntValue().toString(10))
-        .setType('Number')
-        .setLabel('Masks')
+        .setType('Bitmask')
+        .addExtraInfo('bitCount=16')
+        .setLabel(_('Masks'))
+        .setDescription(
+          _(
+            'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 16 which is 32768.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        .setGroup(_('Collision filtering'));
 
       return behaviorProperties;
     };

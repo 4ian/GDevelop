@@ -17,13 +17,14 @@ import MeasurementUnitDocumentation from '../../../PropertiesEditor/MeasurementU
 import ShapePreview from './ShapePreview';
 import PolygonEditor from './PolygonEditor';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
-import Text from '../../../UI/Text';
 import DismissableAlertMessage from '../../../UI/DismissableAlertMessage';
-import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
+import { CompactBitmaskField } from '../../../UI/CompactBitmaskField';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Tooltip from '@material-ui/core/Tooltip';
 import CircledInfo from '../../../UI/CustomSvgIcons/SmallCircledInfo';
@@ -129,38 +130,6 @@ export const UnitAdornment = (props: {|
   );
 };
 
-const BitGroupEditor = (props: {|
-  bits: Array<boolean>,
-  onChange: (index: number, value: boolean) => void,
-|}) => {
-  return (
-    <div style={{ overflowX: 'auto', flex: 1 }}>
-      <ButtonGroup disableElevation fullWidth>
-        {props.bits.map((bit, index) => (
-          <Button
-            key={index}
-            variant={bit ? 'contained' : 'outlined'}
-            color={bit ? 'primary' : 'default'}
-            onClick={() => props.onChange(index, !bit)}
-          >
-            {index + 1}
-          </Button>
-        ))}
-      </ButtonGroup>
-    </div>
-  );
-};
-
-const isBitEnabled = (bitsValue: number, pos: number) => {
-  return !!(bitsValue & (1 << pos));
-};
-
-const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
-  if (enable) bitsValue |= 1 << pos;
-  else bitsValue &= ~(1 << pos);
-  return bitsValue;
-};
-
 const Physics2Editor = (props: Props): React.Node => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
@@ -178,7 +147,6 @@ const Physics2Editor = (props: Props): React.Node => {
   );
 
   const properties = behavior.getProperties();
-  const bits = Array(16).fill(null);
   const shape = properties.get('shape').getValue();
   const layersValues = parseInt(properties.get('layers').getValue(), 10);
   const masksValues = parseInt(properties.get('masks').getValue(), 10);
@@ -496,29 +464,27 @@ const Physics2Editor = (props: Props): React.Node => {
           }
         />
       </ResponsiveLineStackLayout>
-      <Line>
-        <Text style={{ marginRight: 10 }}>
-          {properties.get('layers').getLabel()}
-        </Text>
-        <BitGroupEditor
-          bits={bits.map((_, idx) => isBitEnabled(layersValues, idx))}
-          onChange={(index, value) => {
-            const newValue = enableBit(layersValues, index, value);
-            updateBehaviorProperty('layers', newValue.toString(10));
-          }}
-        />
-      </Line>
-      <Line>
-        <Text style={{ marginRight: 10 }}>
-          {properties.get('masks').getLabel()}
-        </Text>
-        <BitGroupEditor
-          bits={bits.map((_, idx) => isBitEnabled(masksValues, idx))}
-          onChange={(index, value) => {
-            const newValue = enableBit(masksValues, index, value);
-            updateBehaviorProperty('masks', newValue.toString(10));
-          }}
-        />
+      <Line expand>
+        <ColumnStackLayout expand noMargin>
+          <CompactBitmaskField
+            label={properties.get('layers').getLabel()}
+            markdownDescription={properties.get('layers').getDescription()}
+            value={layersValues}
+            bitCount={16}
+            onChange={newValue =>
+              updateBehaviorProperty('layers', newValue.toString(10))
+            }
+          />
+          <CompactBitmaskField
+            label={properties.get('masks').getLabel()}
+            markdownDescription={properties.get('masks').getDescription()}
+            value={masksValues}
+            bitCount={16}
+            onChange={newValue =>
+              updateBehaviorProperty('masks', newValue.toString(10))
+            }
+          />
+        </ColumnStackLayout>
       </Line>
     </Column>
   );

@@ -286,10 +286,13 @@ module.exports = {
         const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
         // The shape decides which dimensions are meaningful and how they
-        // should be labelled, so these properties adapt themselves to it.
+        // should be labelled, and the body type decides which collision
+        // layers are used, so these properties adapt themselves to them.
         const shape = behaviorContent.getChild('shape').getStringValue();
         const isBoxShape = shape === 'Box';
         const isMeshShape = shape === 'Mesh';
+        const isStaticBody =
+          behaviorContent.getChild('bodyType').getStringValue() === 'Static';
 
         behaviorProperties
           .getOrCreate('object3D')
@@ -682,19 +685,41 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('layers').getIntValue().toString(10)
           )
-          .setType('Number')
-          .setLabel('Layers')
+          .setType('Bitmask')
+          // Static objects use the layers 1 to 4 and moving ones the layers
+          // 5 to 8, so that they never register in the wrong layer group.
+          .addExtraInfo('bitCount=4')
+          .addExtraInfo(isStaticBody ? 'firstBit=0' : 'firstBit=4')
+          .setLabel(_('Layers'))
+          .setDescription(
+            isStaticBody
+              ? _(
+                  'Layers the object belongs to, as a bitmask. Static objects use the layers 1 to 4 (1, 2, 4 and 8).'
+                )
+              : _(
+                  'Layers the object belongs to, as a bitmask. Moving objects use the layers 5 to 8 (16, 32, 64 and 128).'
+                )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setGroup(_('Collision filtering'));
         behaviorProperties
           .getOrCreate('masks')
           .setValue(
             behaviorContent.getChild('masks').getIntValue().toString(10)
           )
-          .setType('Number')
-          .setLabel('Masks')
+          .setType('Bitmask')
+          .addExtraInfo('bitCount=8')
+          .setLabel(_('Masks'))
+          .setDescription(
+            _(
+              'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 8 which is 128.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setGroup(_('Collision filtering'))
+          // Static objects accept every collision: it's the mask of the moving
+          // objects that matters.
+          .setHidden(isStaticBody);
 
         return behaviorProperties;
       };

@@ -196,7 +196,7 @@ export const AiCreditsLimitWithoutSubscription = (): React.Node => (
       suggestedSubscriptionPlan={fakeGoldSubscriptionPlanWithPricingSystems}
       hasSubscription={false}
       availableCredits={0}
-      automaticallyUseCreditsForAiRequests={false}
+      canSwitchToGDevelopCredits={false}
       quota={reachedDailyQuota}
       {...aiCreditsLimitActions}
     />
@@ -211,7 +211,7 @@ export const AiCreditsLimitWithCreditsLeft = (): React.Node => (
       suggestedSubscriptionPlan={fakeGoldSubscriptionPlanWithPricingSystems}
       hasSubscription={false}
       availableCredits={350}
-      automaticallyUseCreditsForAiRequests={false}
+      canSwitchToGDevelopCredits
       quota={reachedDailyQuota}
       {...aiCreditsLimitActions}
     />
@@ -225,7 +225,7 @@ export const AiCreditsLimitWithSubscriptionToUpgrade = (): React.Node => (
       suggestedSubscriptionPlan={fakeProSubscriptionPlanWithPricingSystems}
       hasSubscription
       availableCredits={120}
-      automaticallyUseCreditsForAiRequests={false}
+      canSwitchToGDevelopCredits
       quota={{ ...reachedDailyQuota, period: '30days' }}
       {...aiCreditsLimitActions}
     />
@@ -244,29 +244,19 @@ export const AiCreditsLimitWithoutPlanToSuggest = (): React.Node => (
         suggestedSubscriptionPlan={null}
         hasSubscription
         availableCredits={350}
-        automaticallyUseCreditsForAiRequests={false}
+        canSwitchToGDevelopCredits
         quota={reachedDailyQuota}
         {...aiCreditsLimitActions}
       />
       <Text noMargin size="body-small" color="secondary">
-        Without credits
+        Without enough credits to switch to (none, or fewer than a request
+        costs), or already paying with them
       </Text>
       <AiCreditsLimitRow
         suggestedSubscriptionPlan={null}
         hasSubscription
         availableCredits={0}
-        automaticallyUseCreditsForAiRequests={false}
-        quota={reachedDailyQuota}
-        {...aiCreditsLimitActions}
-      />
-      <Text noMargin size="body-small" color="secondary">
-        Already paying with credits
-      </Text>
-      <AiCreditsLimitRow
-        suggestedSubscriptionPlan={null}
-        hasSubscription
-        availableCredits={350}
-        automaticallyUseCreditsForAiRequests
+        canSwitchToGDevelopCredits={false}
         quota={reachedDailyQuota}
         {...aiCreditsLimitActions}
       />
@@ -299,7 +289,7 @@ export const AiCreditsLimitPerAccountType = (): React.Node => (
             })}
             hasSubscription={!!subscription.planId}
             availableCredits={350}
-            automaticallyUseCreditsForAiRequests={false}
+            canSwitchToGDevelopCredits
             quota={reachedDailyQuota}
             {...aiCreditsLimitActions}
           />
@@ -309,15 +299,16 @@ export const AiCreditsLimitPerAccountType = (): React.Node => (
   </FixedWidthFlexContainer>
 );
 
-// The user already chose to pay their AI requests with GDevelop credits: the
-// action saying so is disabled, so they can see it is already on.
+// The user already pays their AI requests with GDevelop credits but doesn't
+// have enough of them left: switching is not something they can do, so the
+// actionable offer is to buy credits (never a disabled button).
 export const AiCreditsLimitAlreadyUsingCredits = (): React.Node => (
   <FixedWidthFlexContainer width={600}>
     <AiCreditsLimitRow
       suggestedSubscriptionPlan={fakeGoldSubscriptionPlanWithPricingSystems}
       hasSubscription={false}
-      availableCredits={350}
-      automaticallyUseCreditsForAiRequests
+      availableCredits={2}
+      canSwitchToGDevelopCredits={false}
       quota={reachedDailyQuota}
       {...aiCreditsLimitActions}
     />
@@ -358,7 +349,7 @@ export const AiCreditsLimitWithAllQuotaPeriods = (): React.Node => (
             }
             hasSubscription={false}
             availableCredits={350}
-            automaticallyUseCreditsForAiRequests={false}
+            canSwitchToGDevelopCredits
             // $FlowFixMe[incompatible-type] - the periods are the ones of a Quota.
             quota={quota}
             {...aiCreditsLimitActions}
@@ -394,7 +385,7 @@ export const AiCreditsLimitWithAllPricingCases = (): React.Node => (
             suggestedSubscriptionPlan={plan}
             hasSubscription={false}
             availableCredits={0}
-            automaticallyUseCreditsForAiRequests={false}
+            canSwitchToGDevelopCredits={false}
             quota={reachedDailyQuota}
             {...aiCreditsLimitActions}
           />
@@ -412,7 +403,7 @@ export const AiCreditsLimitWithoutBackendFeatures = (): React.Node => (
       suggestedSubscriptionPlan={fakePlanWithoutSimplifiedFeatures}
       hasSubscription={false}
       availableCredits={0}
-      automaticallyUseCreditsForAiRequests={false}
+      canSwitchToGDevelopCredits={false}
       quota={null}
       {...aiCreditsLimitActions}
     />
@@ -447,7 +438,7 @@ export const RowsInANarrowPanel = (): React.Node => (
         suggestedSubscriptionPlan={fakeGoldSubscriptionPlanWithPricingSystems}
         hasSubscription={false}
         availableCredits={350}
-        automaticallyUseCreditsForAiRequests={false}
+        canSwitchToGDevelopCredits
         quota={reachedDailyQuota}
         {...aiCreditsLimitActions}
       />

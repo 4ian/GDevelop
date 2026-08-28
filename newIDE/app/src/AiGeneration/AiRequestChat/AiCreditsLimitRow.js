@@ -62,8 +62,11 @@ type Props = {|
   /** True when the user already pays for a plan (and can upgrade it). */
   hasSubscription: boolean,
   availableCredits: number,
-  /** True when AI requests are already paid with GDevelop credits. */
-  automaticallyUseCreditsForAiRequests: boolean,
+  /**
+   * True when the user has enough GDevelop credits to pay for a request, and is
+   * not already paying with them: switching is then all they need to do.
+   */
+  canSwitchToGDevelopCredits: boolean,
   /** The AI credits quota, used to tell when the free usage comes back. */
   quota: ?Quota,
   onUpgradeSubscription: () => void,
@@ -80,13 +83,12 @@ export const AiCreditsLimitRow = ({
   suggestedSubscriptionPlan,
   hasSubscription,
   availableCredits,
-  automaticallyUseCreditsForAiRequests,
+  canSwitchToGDevelopCredits,
   quota,
   onUpgradeSubscription,
   onSwitchToGDevelopCredits,
   onBuyCredits,
 }: Props): React.Node => {
-  const hasCreditsToSpend = availableCredits > 0;
   const resetSentence = renderResetSentence(quota);
 
   const renderContent = (i18n: I18nType) => {
@@ -109,7 +111,7 @@ export const AiCreditsLimitRow = ({
             </div>
           </div>
           <Text noMargin size="body-small" color="secondary">
-            {hasCreditsToSpend ? (
+            {canSwitchToGDevelopCredits ? (
               <>
                 <Trans>
                   Switch to GDevelop credits to continue this conversation right
@@ -127,18 +129,11 @@ export const AiCreditsLimitRow = ({
             )}
           </Text>
           <div className={classes.actions}>
-            {hasCreditsToSpend ? (
+            {canSwitchToGDevelopCredits ? (
               <ChatActionButton
                 emphasis="primary"
                 icon={<Coin fontSize="inherit" />}
-                label={
-                  automaticallyUseCreditsForAiRequests ? (
-                    <Trans>Using GDevelop credits</Trans>
-                  ) : (
-                    <Trans>Use my {availableCredits} credits</Trans>
-                  )
-                }
-                disabled={automaticallyUseCreditsForAiRequests}
+                label={<Trans>Use my {availableCredits} credits</Trans>}
                 onClick={onSwitchToGDevelopCredits}
               />
             ) : (
@@ -230,23 +225,16 @@ export const AiCreditsLimitRow = ({
             icon={<ArrowRight fontSize="inherit" />}
             onClick={onUpgradeSubscription}
           />
-          {hasCreditsToSpend ? (
+          {canSwitchToGDevelopCredits ? (
             <ChatActionButton
               icon={<Coin fontSize="inherit" />}
-              label={
-                automaticallyUseCreditsForAiRequests ? (
-                  <Trans>Using GDevelop credits</Trans>
-                ) : (
-                  <Trans>Use my {availableCredits} credits</Trans>
-                )
-              }
+              label={<Trans>Use my {availableCredits} credits</Trans>}
               tooltip={
                 <Trans>
                   Continue right away by paying this conversation with your
                   GDevelop credits.
                 </Trans>
               }
-              disabled={automaticallyUseCreditsForAiRequests}
               onClick={onSwitchToGDevelopCredits}
             />
           ) : (

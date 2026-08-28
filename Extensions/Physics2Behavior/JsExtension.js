@@ -322,9 +322,14 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Offset X')
+        .setLabel(_('Shape offset X'))
+        .setDescription(
+          _(
+            'Offset of the collision shape relative to the object center, on the X axis.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('shapeOffsetY')
         .setValue(
@@ -332,9 +337,14 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Offset Y')
+        .setLabel(_('Shape offset Y'))
+        .setDescription(
+          _(
+            'Offset of the collision shape relative to the object center, on the Y axis.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('polygonOrigin')
         .setValue(

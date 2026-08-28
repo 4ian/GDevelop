@@ -425,10 +425,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape offset X')
+          .setLabel(_('Shape offset X'))
+          .setDescription(
+            _(
+              'Offset of the collision shape relative to the object center, on the X axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('shapeOffsetY')) {
           behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
         }
@@ -442,9 +446,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape offset Y')
+          .setLabel(_('Shape offset Y'))
+          .setDescription(
+            _(
+              'Offset of the collision shape relative to the object center, on the Y axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('shapeOffsetZ')) {
           behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
         }
@@ -458,10 +467,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape offset Z')
+          .setLabel(_('Shape offset Z'))
+          .setDescription(
+            _(
+              'Offset of the collision shape relative to the object center, on the Z axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetX')) {
           behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
         }
@@ -475,10 +488,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Center of mass offset X')
+          .setLabel(_('Center of mass X'))
+          .setDescription(
+            _(
+              'Offset of the center of mass relative to the object center, on the X axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetY')) {
           behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
         }
@@ -492,10 +509,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Center of mass offset Y')
+          .setLabel(_('Center of mass Y'))
+          .setDescription(
+            _(
+              'Offset of the center of mass relative to the object center, on the Y axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetZ')) {
           behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
         }
@@ -509,10 +530,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Center of mass offset Z')
+          .setLabel(_('Center of mass Z'))
+          .setDescription(
+            _(
+              'Offset of the center of mass relative to the object center, on the Z axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         behaviorProperties
           .getOrCreate('density')
           .setValue(

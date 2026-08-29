@@ -108,18 +108,8 @@ export const GDevelopProjectApi = {
     : 'https://api.gdevelop.io/project'): string),
 };
 
-/**
- * Routes already served by the cheaper API Gateway "HTTP API" (see
- * `GDevelopGenerationApi.getBaseUrlForRoute`). Names match the `routeKey` used
- * by the backend, so a route is easy to grep for across both repositories.
- *
- * Requests are billed $1.00 per million there against $3.50 on the REST API,
- * and both front doors reach the same Lambdas - so a route can be moved one at
- * a time, and moved back by deleting its line here.
- */
+// Routes served by the API Gateway "HTTP API" (cheaper) instead of the "REST API".
 const generationApiRoutesServedByHttpApi: Array<string> = [
-  // The two most requested routes of the whole backend: 25.8M and 22.3M
-  // requests in July 2026 respectively.
   'GET /ai-request/{id}',
   'GET /ai-request',
 ];
@@ -128,15 +118,9 @@ export const GDevelopGenerationApi = {
   baseUrl: ((isDev
     ? 'https://api-dev.gdevelop.io/generation'
     : 'https://api.gdevelop.io/generation'): string),
-  // The HTTP API needs its own domain: api.gdevelop.io is an edge-optimized
-  // custom domain and those cannot serve an HTTP API at all.
   httpApiBaseUrl: ((isDev
     ? 'https://api-2-dev.gdevelop.io/generation'
     : 'https://api-2.gdevelop.io/generation'): string),
-  /**
-   * The base URL to use for a given route, so that traffic can be shifted to
-   * the HTTP API route by route.
-   */
   getBaseUrlForRoute: (route: string): string =>
     generationApiRoutesServedByHttpApi.includes(route)
       ? GDevelopGenerationApi.httpApiBaseUrl

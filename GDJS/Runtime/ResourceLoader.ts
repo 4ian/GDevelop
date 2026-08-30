@@ -29,6 +29,19 @@ namespace gdjs {
     );
   };
 
+  const encodeLocalResourceUrl = (url: string): string => {
+    if (
+      url.startsWith('http://') ||
+      url.startsWith('https://') ||
+      url.startsWith('data:') ||
+      url.startsWith('blob:')
+    ) {
+      return url;
+    }
+
+    return encodeURI(url).replace(/#/g, '%23');
+  };
+
   /**
    * A task of pre-loading resources used by a scene.
    *
@@ -617,6 +630,8 @@ namespace gdjs {
      * the resource (this can be for example a token needed to access the resource).
      */
     getFullUrl(url: string) {
+      url = encodeLocalResourceUrl(url);
+
       if (this._runtimeGame.isInGameEdition()) {
         // Avoid adding cache burst to URLs which are assumed to be immutable files,
         // to avoid costly useless requests each time the game is hot-reloaded.

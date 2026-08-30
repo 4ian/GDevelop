@@ -707,6 +707,33 @@ interface Project {
 
     boolean STATIC_IsNameSafe([Const] DOMString name);
     [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
+
+    [Ref] LayoutFolderOrLayout GetLayoutsRootFolder();
+};
+
+interface LayoutFolderOrLayout {
+    void LayoutFolderOrLayout();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] Layout GetLayout();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasLayoutNamed([Const] DOMString name);
+    [Ref] LayoutFolderOrLayout GetLayoutNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] LayoutFolderOrLayout GetChildAt(unsigned long pos);
+    [Ref] LayoutFolderOrLayout GetLayoutChild([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] LayoutFolderOrLayout child);
+    [Ref] LayoutFolderOrLayout GetParent();
+    void InsertLayout(Layout layout, unsigned long position);
+    [Ref] LayoutFolderOrLayout InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    [Ref] LayoutFolderOrLayout GetOrCreateFolderChild([Const] DOMString name);
+    void MoveLayoutFolderOrLayoutToAnotherFolder([Ref] LayoutFolderOrLayout layoutFolderOrLayout, [Ref] LayoutFolderOrLayout newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] LayoutFolderOrLayout childToRemove);
+    void RemoveRecursivelyLayoutNamed([Const] DOMString name);
+    boolean IsADescendantOf([Const, Ref] LayoutFolderOrLayout otherLayoutFolderOrLayout);
+    void Clear();
 };
 
 enum ObjectsContainersList_VariableExistence {

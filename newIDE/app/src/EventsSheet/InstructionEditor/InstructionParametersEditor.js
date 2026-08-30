@@ -27,7 +27,10 @@ import { getObjectParameterIndex } from '../../InstructionOrExpression/Enumerate
 import Text from '../../UI/Text';
 import { getInstructionMetadata } from './InstructionEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
-import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
+import {
+  setupInstructionParameters,
+  resetParametersAfterSwitch,
+} from '../../InstructionOrExpression/SetupInstructionParameters';
 import ScrollView from '../../UI/ScrollView';
 import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -246,11 +249,15 @@ const InstructionParametersEditor: React.ComponentType<{
       [focus, focusOnMount]
     );
 
+    const typeBeforeSwitch = instruction.getType();
     gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
       project.getCurrentPlatform(),
       projectScopedContainersAccessor.get(),
       instruction
     );
+    if (instruction.getType() !== typeBeforeSwitch) {
+      resetParametersAfterSwitch(instruction);
+    }
 
     const instructionType = instruction.getType();
 

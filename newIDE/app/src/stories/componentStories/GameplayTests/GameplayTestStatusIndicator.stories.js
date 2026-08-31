@@ -24,6 +24,7 @@ const allStatuses: Array<GameplayTestDisplayStatus> = [
   'failed',
   'error',
   'timeout',
+  'paused',
   'stopped',
 ];
 

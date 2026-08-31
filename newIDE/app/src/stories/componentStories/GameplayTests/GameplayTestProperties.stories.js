@@ -75,6 +75,7 @@ const makeResult = (
   durationMs: 0,
   loadingMs: 0,
   timeoutMs: 0,
+  hiddenStallMs: 0,
   gameTimeMs: 0,
   assertions: [],
   errors: [],

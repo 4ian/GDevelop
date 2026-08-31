@@ -10,6 +10,7 @@ import MinimizeIcon from '../UI/CustomSvgIcons/Minimize';
 import MaximizeIcon from '../UI/CustomSvgIcons/Maximize';
 import StopIcon from '../UI/CustomSvgIcons/Stop';
 import CrossIcon from '../UI/CustomSvgIcons/Cross';
+import PauseIcon from '../UI/CustomSvgIcons/Pause';
 import {
   formatRunDuration,
   GameplayTestStatusChip,
@@ -18,6 +19,116 @@ import {
 } from './GameplayTestStatusIndicator';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import classes from './GameplayTestFrame.module.css';
+
+/**
+ * Why and for how long a run was frozen because the editor was in the
+ * background (see the banner below).
+ */
+export type GameplayTestFrameHiddenPause = {|
+  /** How long the game was frozen, in total. */
+  pausedMs: number,
+  /**
+   * Whether the run was given up on (it stayed frozen for too long) rather
+   * than resumed when the editor came back.
+   */
+  isRunInterrupted: boolean,
+|};
+
+// How long the "the test resumed by itself" banner stays before dismissing
+// itself. Long enough to be read after coming back to the editor.
+const RESUMED_BANNER_DURATION_MS = 12000;
+
+/**
+ * How long the run was paused, written for someone reading a message rather
+ * than for a report: "paused for 40 seconds", "paused for 3 minutes".
+ */
+const renderPausedDurationTitle = (pausedMs: number): React.Node => {
+  const seconds = Math.round(pausedMs / 1000);
+  if (seconds < 90) return <Trans>Test paused for {seconds} seconds</Trans>;
+
+  const minutes = Math.round(seconds / 60);
+  return <Trans>Test paused for {minutes} minutes</Trans>;
+};
+
+type HiddenPauseBannerProps = {|
+  hiddenPause: GameplayTestFrameHiddenPause,
+  onDismiss: () => void,
+|};
+
+/**
+ * Shown when a run was frozen because GDevelop was in the background: games
+ * are not run by the browser in a hidden tab or a covered window, so the
+ * test simply stopped progressing.
+ *
+ * This is the one thing that keeps a paused run from looking like a broken
+ * game: the user (or the AI) must understand that nothing failed, that the
+ * pause was not counted against the test, and what to do about it.
+ */
+export const GameplayTestHiddenPauseBanner = ({
+  hiddenPause,
+  onDismiss,
+}: HiddenPauseBannerProps): React.Node => {
+  const { pausedMs, isRunInterrupted } = hiddenPause;
+
+  // A run that resumed on its own needs no action: say what happened, then
+  // get out of the way. An interrupted one has to be run again, so it stays
+  // until it is dismissed.
+  React.useEffect(
+    () => {
+      if (isRunInterrupted) return;
+      const timeoutId = setTimeout(onDismiss, RESUMED_BANNER_DURATION_MS);
+      return () => clearTimeout(timeoutId);
+    },
+    [isRunInterrupted, onDismiss]
+  );
+
+  return (
+    <div
+      className={classNames({
+        [classes.hiddenPauseBanner]: true,
+        [classes.interrupted]: isRunInterrupted,
+      })}
+      role="status"
+    >
+      <span className={classes.hiddenPauseIcon}>
+        <PauseIcon />
+      </span>
+      <div className={classes.hiddenPauseText}>
+        <Text noMargin size="body-small" color="inherit">
+          {isRunInterrupted ? (
+            <Trans>Test paused - and not run to the end</Trans>
+          ) : (
+            renderPausedDurationTitle(pausedMs)
+          )}
+        </Text>
+        <Text noMargin size="body-small" color="secondary">
+          {isRunInterrupted ? (
+            <Trans>
+              GDevelop stayed in the background, where the browser stops running
+              games. This is not a test failure - run it again with this window
+              visible.
+            </Trans>
+          ) : (
+            <Trans>
+              GDevelop was in the background, where the browser stops running
+              games. The test picked up where it left off, and the pause is not
+              counted against it.
+            </Trans>
+          )}
+        </Text>
+      </div>
+      <IconButton size="small" tooltip={t`Dismiss`} onClick={onDismiss}>
+        <CrossIcon className={classes.headerIcon} />
+      </IconButton>
+      {!isRunInterrupted && (
+        <span
+          className={classes.hiddenPauseCountdown}
+          style={{ animationDuration: `${RESUMED_BANNER_DURATION_MS}ms` }}
+        />
+      )}
+    </div>
+  );
+};
 
 /** The status of the run displayed on the gameplay test frame. */
 export type GameplayTestFrameRunStatus = {|
@@ -163,6 +274,9 @@ const resizeHandles: Array<{|
 
 type GameplayTestFrameLayoutProps = {|
   runStatus: GameplayTestFrameRunStatus | null,
+  /** Set when the run was frozen because the editor was in the background. */
+  hiddenPause: GameplayTestFrameHiddenPause | null,
+  onDismissHiddenPause: () => void,
   isMinimized: boolean,
   onToggleMinimized: () => void,
   onStopRequested: () => void,
@@ -188,6 +302,8 @@ type GameplayTestFrameLayoutProps = {|
  */
 export const GameplayTestFrameLayout = ({
   runStatus,
+  hiddenPause,
+  onDismissHiddenPause,
   isMinimized,
   onToggleMinimized,
   onStopRequested,
@@ -526,6 +642,12 @@ export const GameplayTestFrameLayout = ({
           </IconButton>
         </div>
       </div>
+      {hiddenPause && (
+        <GameplayTestHiddenPauseBanner
+          hiddenPause={hiddenPause}
+          onDismiss={onDismissHiddenPause}
+        />
+      )}
       <div
         ref={gameAreaRef}
         className={classNames({
@@ -608,6 +730,9 @@ let onSetGameplayTestFramePreviewLocation:
 let onSetGameplayTestFrameRunStatus:
   | null
   | ((runStatus: GameplayTestFrameRunStatus | null) => void) = null;
+let onSetGameplayTestFrameHiddenPause:
+  | null
+  | ((hiddenPause: GameplayTestFrameHiddenPause | null) => void) = null;
 
 /**
  * Point the gameplay test frame to a preview (and show it).
@@ -651,6 +776,17 @@ export const setGameplayTestFrameRunStatus = (
   onSetGameplayTestFrameRunStatus(runStatus);
 };
 
+/**
+ * Show (or hide, with null) the banner telling that the run was frozen
+ * because GDevelop was in the background.
+ */
+export const setGameplayTestFrameHiddenPause = (
+  hiddenPause: GameplayTestFrameHiddenPause | null
+) => {
+  if (!onSetGameplayTestFrameHiddenPause) return;
+  onSetGameplayTestFrameHiddenPause(hiddenPause);
+};
+
 type Props = {|
   previewDebuggerServer: ?PreviewDebuggerServer,
   onStopRequested: () => void,
@@ -675,6 +811,10 @@ export const GameplayTestFrame = ({
     setRunStatus,
   ] = React.useState<GameplayTestFrameRunStatus | null>(null);
   const [isMinimized, setIsMinimized] = React.useState<boolean>(false);
+  const [
+    hiddenPause,
+    setHiddenPause,
+  ] = React.useState<GameplayTestFrameHiddenPause | null>(null);
   // Set together with the preview location, by the launcher starting the game.
   const [gameResolution, setGameResolution] = React.useState<Size | null>(null);
 
@@ -688,12 +828,17 @@ export const GameplayTestFrame = ({
       setIsMinimized(false);
       // Don't show the status of a previous run when the frame is closed
       // then shown again.
-      if (!newPreviewIndexHtmlLocation) setRunStatus(null);
+      if (!newPreviewIndexHtmlLocation) {
+        setRunStatus(null);
+        setHiddenPause(null);
+      }
     };
     onSetGameplayTestFrameRunStatus = setRunStatus;
+    onSetGameplayTestFrameHiddenPause = setHiddenPause;
     return () => {
       onSetGameplayTestFramePreviewLocation = null;
       onSetGameplayTestFrameRunStatus = null;
+      onSetGameplayTestFrameHiddenPause = null;
     };
   }, []);
 
@@ -729,6 +874,8 @@ export const GameplayTestFrame = ({
   return (
     <GameplayTestFrameLayout
       runStatus={runStatus}
+      hiddenPause={hiddenPause}
+      onDismissHiddenPause={() => setHiddenPause(null)}
       isMinimized={isMinimized}
       gameResolution={gameResolution}
       onToggleMinimized={() => setIsMinimized(!isMinimized)}
@@ -742,6 +889,7 @@ export const GameplayTestFrame = ({
           // the game running in it.
           setPreviewIndexHtmlLocation('');
           setRunStatus(null);
+          setHiddenPause(null);
         }
       }}
     >

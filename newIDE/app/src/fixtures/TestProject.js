@@ -45,6 +45,7 @@ export type TestProject = {|
   testBehaviorEventsFunction: gdEventsFunction,
   testBehaviorLifecycleEventsFunction: gdEventsFunction,
   testEventsBasedObject: gdEventsBasedObject,
+  composedEventBasedObject: gdEventsBasedObject,
   testObjectEventsFunction: gdEventsFunction,
   layerWithEffects: gdLayer,
   layerWith3DEffects: gdLayer,
@@ -181,6 +182,13 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testObjectEventsFunction
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+  const composedEventBasedObject = buttonExtension
+    .getEventsBasedObjects()
+    .insertNew('ComposedEventBasedObject', 0);
+  buttonEventBasedObject
+    .getObjects()
+    .insertNewObject(project, 'Button::PanelSpriteButton', 'Button', 0);
 
   // Create and expose some objects
   const testLayout = project.insertNewLayout('TestLayout', 0);
@@ -1013,6 +1021,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testBehaviorEventsFunction,
     testBehaviorLifecycleEventsFunction,
     testEventsBasedObject: buttonEventBasedObject,
+    composedEventBasedObject: composedEventBasedObject,
     testObjectEventsFunction,
     layerWithEffects,
     layerWith3DEffects,

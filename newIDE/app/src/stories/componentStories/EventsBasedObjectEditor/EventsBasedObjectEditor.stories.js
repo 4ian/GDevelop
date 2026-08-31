@@ -34,3 +34,22 @@ export const Default = (): React.Node => (
     )}
   />
 );
+
+export const WithChildCustomObject = (): React.Node => (
+  <EventsBasedObjectEditor
+    projectScopedContainersAccessor={
+      new ProjectScopedContainersAccessor({
+        project: testProject.project,
+        eventsFunctionsExtension: testProject.testEventsFunctionsExtension,
+        eventsBasedObject: testProject.composedEventBasedObject,
+      })
+    }
+    project={testProject.project}
+    eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
+    eventsBasedObject={testProject.composedEventBasedObject}
+    onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+    onEventsBasedObjectChildrenEdited={action(
+      'onEventsBasedObjectChildrenEdited'
+    )}
+  />
+);

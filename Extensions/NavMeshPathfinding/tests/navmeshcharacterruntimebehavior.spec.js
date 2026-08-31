@@ -112,6 +112,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
       return 20;
     };
     runtimeScene.addObject(character);
+    character.onCreated();
     return character;
   };
 

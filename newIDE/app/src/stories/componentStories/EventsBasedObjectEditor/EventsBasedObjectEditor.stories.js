@@ -8,7 +8,6 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import paperDecorator from '../../PaperDecorator';
 import EventsBasedObjectEditor from '../../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedObjectEditor';
-import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope';
 
 export default {
   title: 'EventsBasedObjectEditor/index',
@@ -19,11 +18,7 @@ export default {
 export const Default = (): React.Node => (
   <EventsBasedObjectEditor
     projectScopedContainersAccessor={
-      new ProjectScopedContainersAccessor({
-        project: testProject.project,
-        eventsFunctionsExtension: testProject.testEventsFunctionsExtension,
-        eventsBasedObject: testProject.testEventsBasedObject,
-      })
+      testProject.eventBasedObjectProjectScopedContainersAccessor
     }
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
@@ -38,11 +33,7 @@ export const Default = (): React.Node => (
 export const WithChildCustomObject = (): React.Node => (
   <EventsBasedObjectEditor
     projectScopedContainersAccessor={
-      new ProjectScopedContainersAccessor({
-        project: testProject.project,
-        eventsFunctionsExtension: testProject.testEventsFunctionsExtension,
-        eventsBasedObject: testProject.composedEventBasedObject,
-      })
+      testProject.composedEventBasedObjectProjectScopedContainersAccessor
     }
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}

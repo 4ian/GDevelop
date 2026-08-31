@@ -19,6 +19,7 @@ export const RelationalOperatorFieldString = (): React.Node => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
+        project={testProject.project}
         scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
@@ -39,6 +40,7 @@ export const RelationalOperatorFieldNumber = (): React.Node => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
+        project={testProject.project}
         scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
@@ -59,6 +61,7 @@ export const RelationalOperatorFieldColor = (): React.Node => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
+        project={testProject.project}
         scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
@@ -77,6 +80,7 @@ export const RelationalOperatorFieldUnknownType = (): React.Node => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
+        project={testProject.project}
         scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}

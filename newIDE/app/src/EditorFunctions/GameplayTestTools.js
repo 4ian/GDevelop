@@ -50,6 +50,26 @@ const makeGameplayTestOutput = (
   didModifyProject: boolean,
   executedSource: string | null
 ): EditorFunctionGenericOutput => {
+  // The run never finished because the editor was left in the background,
+  // where the browser stops running games. Nothing was learned about the
+  // game: say so as explicitly as possible, so that this is never read as a
+  // failing test and "fixed" by changing a game that is fine.
+  if (result.status === 'paused') {
+    return {
+      success: false,
+      ...makeGameplayTestResultReadableOutput(result),
+      message:
+        'The test was PAUSED, not failed: it could not run to the end ' +
+        'because the GDevelop window was in the background (browsers stop ' +
+        'running games in a hidden tab or a covered window). This result ' +
+        'says nothing about the game. Do NOT change the game, the test or ' +
+        'anything else because of it, and do not report it as a problem: ' +
+        'run the test again, and tell the user to keep the GDevelop window ' +
+        'visible while gameplay tests run.',
+      meta: didModifyProject ? { didModifyProject: true } : undefined,
+    };
+  }
+
   return {
     success: result.status === 'passed',
     ...makeGameplayTestResultReadableOutput(result),

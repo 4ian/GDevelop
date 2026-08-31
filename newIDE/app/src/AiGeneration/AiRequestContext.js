@@ -18,6 +18,8 @@ import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInterval } from '../Utils/UseInterval';
 import { useAdaptivePollingInterval } from '../Utils/UseAdaptivePollingInterval';
+import { usePageBecameVisible } from '../Utils/PageVisibility';
+import { useKeepPageActive } from '../Utils/UseKeepPageActive';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import {
   aiRequestShouldBeWatched,
@@ -942,14 +944,34 @@ export const AiRequestProvider = ({
     reportWatchPollingTick(sawChangeThisTick);
   };
 
+  // Kept in a ref so the visibility effect below can run the latest watch
+  // loop without re-registering a listener on every render.
+  const onWatchRef = React.useRef(onWatch);
+  onWatchRef.current = onWatch;
+
+  const isWatching =
+    (shouldWatchRequest || hasActiveSubAgents) && !pendingEditApproval;
+
   useInterval(
     () => {
       onWatch();
     },
-    (shouldWatchRequest || hasActiveSubAgents) && !pendingEditApproval
-      ? currentWatchPollingIntervalInMs
-      : null
+    isWatching ? currentWatchPollingIntervalInMs : null
   );
+
+  // Catch up immediately when the user comes back to the editor. While the
+  // page is hidden, the browser throttles the watch loop (down to one wake
+  // up per minute after a few minutes in the background), and the adaptive
+  // interval has had every reason to back off to its maximum: without this,
+  // returning to the editor would show a stale conversation for seconds.
+  usePageBecameVisible(() => {
+    if (!isWatching) return;
+    resetWatchPollingInterval();
+    // Force the next tick to be a full fetch, so the messages produced
+    // while the editor was in the background are all picked up at once.
+    lastFullFetchTimeRef.current = 0;
+    onWatchRef.current();
+  });
 
   // Clear sub-agents when the parent request is suspended.
   React.useEffect(
@@ -1037,6 +1059,13 @@ export const AiRequestProvider = ({
     },
     [selectedAiRequest, getEditorFunctionCallResults]
   );
+
+  // Keep the app running at full speed while the AI is working, even if the
+  // user goes to another tab or covers the window: the whole agent loop
+  // (polling for the next turn, running the editor functions, sending their
+  // results back) lives in this page, so a throttled or frozen page means a
+  // paused AI request.
+  useKeepPageActive(!!getWorkingAiRequest());
 
   const suspendAiRequest = React.useCallback(
     async (aiRequestId: string): Promise<void> => {

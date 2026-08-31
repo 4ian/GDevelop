@@ -312,6 +312,12 @@ namespace gdjs {
        * (`durationMs - loadingMs` close to it means the test is at risk of
        * timing out on a slower machine). */
       timeoutMs: number;
+      /** Time during which the game was frozen by the browser because the
+       * page was hidden (tab in the background, window minimized or covered
+       * by another one): animation frames stop, so the game stops stepping.
+       * Excluded from the `timeoutMs` budget - being looked away from is
+       * not a reason for a test to fail. */
+      hiddenStallMs: number;
       gameTimeMs: number;
       assertions: Array<GameplayTestAssertion>;
       errors: Array<string>;
@@ -541,6 +547,17 @@ namespace gdjs {
       /** Time spent waiting for loading (game boot, scene assets) so far:
        * excluded from the `_timeoutMs` budget, reported as `loadingMs`. */
       _loadingTimeMs: number = 0;
+      /** Time already spent frozen by the browser because the page was
+       * hidden, excluded from the `_timeoutMs` budget (see
+       * `_installPageVisibilityTracking`). */
+      _hiddenStallTimeMs: number = 0;
+      /** When the page became hidden, while it still is, or null. */
+      _hiddenSinceMs: number | null = null;
+      /** When the last game frame was stepped: tells apart a page that is
+       * hidden AND frozen from one that is only hidden (in the desktop app,
+       * background throttling is disabled and the game keeps running). */
+      _lastFrameStepTimeMs: number = 0;
+      _uninstallPageVisibilityTracking: () => void = () => {};
       _maxFrames: integer;
       /** Last time the stepping loop yielded to the browser (see
        * `_maybeYield`). */
@@ -650,6 +667,60 @@ namespace gdjs {
         }
       }
 
+      /**
+       * Track the time during which the game is frozen because the page is
+       * hidden, so that it can be excluded from the `_timeoutMs` budget.
+       *
+       * Browsers stop `requestAnimationFrame` in a hidden page (a tab in
+       * the background, a minimized window, or - with Chrome's occlusion
+       * detection - a window entirely covered by another one). The test
+       * loop steps frames from animation frames, so the game simply stops:
+       * without this, a test would be reported as timing out just because
+       * the user looked at something else while it ran.
+       *
+       * Being hidden is not enough to conclude the game was frozen: the
+       * desktop app disables background throttling, and the game then keeps
+       * running while hidden. So only the time after the last stepped frame
+       * is counted as a stall.
+       */
+      _installPageVisibilityTracking(): void {
+        if (typeof document === 'undefined') return;
+
+        const onVisibilityChanged = () => {
+          if (document.visibilityState === 'hidden') {
+            this._hiddenSinceMs = Date.now();
+          } else {
+            this._hiddenStallTimeMs += this._getOngoingHiddenStallMs();
+            this._hiddenSinceMs = null;
+          }
+        };
+        if (document.visibilityState === 'hidden') {
+          this._hiddenSinceMs = Date.now();
+        }
+        document.addEventListener('visibilitychange', onVisibilityChanged);
+        this._uninstallPageVisibilityTracking = () => {
+          document.removeEventListener('visibilitychange', onVisibilityChanged);
+          this._uninstallPageVisibilityTracking = () => {};
+        };
+      }
+
+      /** The stall of the hidden period currently in progress, if any. */
+      private _getOngoingHiddenStallMs(): number {
+        if (this._hiddenSinceMs === null) return 0;
+        // Frames stepped while hidden are frames the game was not frozen
+        // for: the stall only starts after the last of them.
+        const stallStartTimeMs = Math.max(
+          this._hiddenSinceMs,
+          this._lastFrameStepTimeMs
+        );
+        return Math.max(0, Date.now() - stallStartTimeMs);
+      }
+
+      /** Total time the game was frozen because the page was hidden. */
+      _getHiddenStallTimeMs(): number {
+        return this._hiddenStallTimeMs + this._getOngoingHiddenStallMs();
+      }
+
       private _checkGuards(): void {
         if (this._stopped) {
           throw new GameplayTestStoppedError('The test was stopped.');
@@ -660,12 +731,15 @@ namespace gdjs {
           );
         }
         if (
-          Date.now() - this._startTimeMs - this._loadingTimeMs >
+          Date.now() -
+            this._startTimeMs -
+            this._loadingTimeMs -
+            this._getHiddenStallTimeMs() >
           this._timeoutMs
         ) {
           throw new GameplayTestTimeoutError(
             `The test timed out after ${this._timeoutMs}ms ` +
-              '(wall-clock, loading time excluded).'
+              '(wall-clock, loading and time spent hidden excluded).'
           );
         }
       }
@@ -856,6 +930,7 @@ namespace gdjs {
         this._framesExecuted++;
         this._gameTimeMs += dtMs;
         const stepTimeMs = Date.now() - stepStartTimeMs;
+        this._lastFrameStepTimeMs = stepStartTimeMs + stepTimeMs;
         this._totalStepTimeMs += stepTimeMs;
         if (stepTimeMs > this._worstStepTimeMs) {
           this._worstStepTimeMs = stepTimeMs;
@@ -2896,6 +2971,7 @@ namespace gdjs {
           durationMs: this._startTimeMs ? Date.now() - this._startTimeMs : 0,
           loadingMs: Math.round(this._loadingTimeMs),
           timeoutMs: this._timeoutMs,
+          hiddenStallMs: Math.round(this._getHiddenStallTimeMs()),
           gameTimeMs: Math.round(this._gameTimeMs),
           assertions: this._assertions,
           errors: errors.slice(0, MAX_ERRORS),
@@ -3056,6 +3132,10 @@ namespace gdjs {
 
       harness._installPointerLockShim();
       harness._installSoundLog();
+      // Only from now on: the boot wait above is already excluded from the
+      // `timeoutMs` budget, as loading time.
+      harness._lastFrameStepTimeMs = Date.now();
+      harness._installPageVisibilityTracking();
 
       // Capture the logs of the game itself (in addition to the `console`
       // passed to the script).
@@ -3192,6 +3272,7 @@ namespace gdjs {
           // Ignore errors during cleanup.
         }
         inputManager.onFrameEnded = originalOnFrameEnded;
+        harness._uninstallPageVisibilityTracking();
         harness._uninstallPointerLockShim();
         harness._uninstallSoundLog();
         harness._uninstallGameWindowSizeOverride();

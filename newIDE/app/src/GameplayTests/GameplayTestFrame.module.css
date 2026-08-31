@@ -198,3 +198,139 @@
   background-color: var(--theme-surface-canvas-background-color);
   border-top: 1px solid var(--theme-dialog-separator-color);
 }
+
+/*
+ * The banner shown when the run was frozen because the editor was in the
+ * background: it is the only sign the user gets that nothing was wrong with
+ * their game, so it must be noticed - and read - as soon as they come back.
+ *
+ * `width: 0` with `min-width: 100%` keeps it from widening the frame: the
+ * frame is sized by the game area (`width: max-content` on the container),
+ * and a banner longer than the game would otherwise stretch it.
+ */
+.hiddenPauseBanner {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 0;
+  min-width: 100%;
+  padding: 8px 4px 8px 10px;
+  overflow: hidden;
+  /* The tone color, used by the accent, the icon and the tint below. */
+  color: var(--theme-info-color);
+  background-color: color-mix(
+    in srgb,
+    currentColor 10%,
+    var(--theme-surface-alternate-canvas-background-color)
+  );
+  border-bottom: 1px solid
+    color-mix(in srgb, currentColor 35%, var(--theme-dialog-separator-color));
+  animation: gameplay-test-hidden-pause-in 260ms
+    cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+
+.hiddenPauseBanner.interrupted {
+  color: var(--theme-warning-color);
+}
+
+/* A gradient bar on the left edge, tying the banner to its tone. */
+.hiddenPauseBanner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    currentColor,
+    color-mix(in srgb, currentColor 25%, transparent)
+  );
+}
+
+@keyframes gameplay-test-hidden-pause-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hiddenPauseIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, currentColor 18%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.hiddenPauseIcon svg {
+  font-size: 14px;
+}
+
+/* A slow breathing halo, to catch the eye of someone coming back to the
+   editor without ever becoming distracting. */
+.hiddenPauseBanner:not(.interrupted) .hiddenPauseIcon {
+  animation: gameplay-test-hidden-pause-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes gameplay-test-hidden-pause-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 30%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 12%, transparent);
+  }
+}
+
+.hiddenPauseText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+  /* Let the explanation wrap on as many lines as it needs. */
+  overflow-wrap: anywhere;
+  padding-top: 2px;
+}
+
+/* The countdown of the banner dismissing itself, so its disappearance is
+   never a surprise. */
+.hiddenPauseCountdown {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: left center;
+  background-color: color-mix(in srgb, currentColor 45%, transparent);
+  animation: gameplay-test-hidden-pause-countdown linear forwards;
+}
+
+@keyframes gameplay-test-hidden-pause-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hiddenPauseBanner,
+  .hiddenPauseBanner:not(.interrupted) .hiddenPauseIcon,
+  .hiddenPauseCountdown {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}

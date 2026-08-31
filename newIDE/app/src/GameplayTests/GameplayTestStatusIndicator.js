@@ -12,6 +12,7 @@ import ErrorFilled from '../UI/CustomSvgIcons/ErrorFilled';
 import WarningRound from '../UI/CustomSvgIcons/WarningRound';
 import History from '../UI/CustomSvgIcons/History';
 import Stop from '../UI/CustomSvgIcons/Stop';
+import Pause from '../UI/CustomSvgIcons/Pause';
 
 /**
  * The status of a test as displayed in the editor: the statuses reported by
@@ -26,7 +27,11 @@ export type GameplayTestDisplayStatus =
   | 'failed'
   | 'error'
   | 'stopped'
-  | 'timeout';
+  | 'timeout'
+  // The run was frozen because GDevelop was left in the background (the
+  // browser stops running games in a hidden page) and did not finish. Says
+  // nothing about the game: not a failure.
+  | 'paused';
 
 export const getDisplayStatusFromTest = (
   test: gdTest
@@ -37,7 +42,8 @@ export const getDisplayStatusFromTest = (
     lastRunStatus === 'failed' ||
     lastRunStatus === 'error' ||
     lastRunStatus === 'stopped' ||
-    lastRunStatus === 'timeout'
+    lastRunStatus === 'timeout' ||
+    lastRunStatus === 'paused'
   ) {
     return lastRunStatus;
   }
@@ -64,6 +70,7 @@ const statusTones: { [GameplayTestDisplayStatus]: StatusChipTone } = {
   error: 'warning',
   stopped: 'neutral',
   timeout: 'warning',
+  paused: 'info',
 };
 
 export const getGameplayTestStatusLabel = (
@@ -80,6 +87,8 @@ export const getGameplayTestStatusLabel = (
       return <Trans>Stopped</Trans>;
     case 'timeout':
       return <Trans>Timed out</Trans>;
+    case 'paused':
+      return <Trans>Paused</Trans>;
     case 'launching':
       return <Trans>Starting the game...</Trans>;
     case 'running':
@@ -102,6 +111,8 @@ const renderStatusIcon = (status: GameplayTestDisplayStatus) => {
       return <History />;
     case 'stopped':
       return <Stop />;
+    case 'paused':
+      return <Pause />;
     case 'launching':
     case 'running':
       // The chip shows its own spinner for a status in progress.

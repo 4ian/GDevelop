@@ -5,6 +5,7 @@ import { action } from '@storybook/addon-actions';
 import {
   GameplayTestFrameLayout,
   type GameplayTestFrameRunStatus,
+  type GameplayTestFrameHiddenPause,
 } from '../../../GameplayTests/GameplayTestFrame';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
@@ -69,12 +70,20 @@ const makeRunStatus = (
 const FrameStory = ({
   runStatus,
   initiallyMinimized,
+  initialHiddenPause,
 }: {|
   runStatus: GameplayTestFrameRunStatus | null,
   initiallyMinimized?: boolean,
+  initialHiddenPause?: GameplayTestFrameHiddenPause,
 |}) => {
   const [isMinimized, setIsMinimized] = React.useState<boolean>(
     !!initiallyMinimized
+  );
+  const [
+    hiddenPause,
+    setHiddenPause,
+  ] = React.useState<GameplayTestFrameHiddenPause | null>(
+    initialHiddenPause || null
   );
   return (
     <div style={styles.storyContainer}>
@@ -87,6 +96,11 @@ const FrameStory = ({
       </Column>
       <GameplayTestFrameLayout
         runStatus={runStatus}
+        hiddenPause={hiddenPause}
+        onDismissHiddenPause={() => {
+          action('hidden pause dismissed')();
+          setHiddenPause(null);
+        }}
         isMinimized={isMinimized}
         onToggleMinimized={() => setIsMinimized(!isMinimized)}
         onStopRequested={action('stop requested')}
@@ -139,4 +153,30 @@ export const Failed = (): React.Node => (
 
 export const Minimized = (): React.Node => (
   <FrameStory runStatus={makeRunStatus({})} initiallyMinimized />
+);
+
+export const PausedWhileInTheBackgroundThenResumed = (): React.Node => (
+  <FrameStory
+    runStatus={makeRunStatus({ frame: 512 })}
+    initialHiddenPause={{ pausedMs: 47000, isRunInterrupted: false }}
+  />
+);
+
+export const InterruptedAfterTooLongInTheBackground = (): React.Node => (
+  <FrameStory
+    runStatus={makeRunStatus({
+      status: 'paused',
+      frame: 512,
+      durationMs: 312000,
+    })}
+    initialHiddenPause={{ pausedMs: 300000, isRunInterrupted: true }}
+  />
+);
+
+export const PausedWhileMinimized = (): React.Node => (
+  <FrameStory
+    runStatus={makeRunStatus({ frame: 512 })}
+    initialHiddenPause={{ pausedMs: 8000, isRunInterrupted: false }}
+    initiallyMinimized
+  />
 );

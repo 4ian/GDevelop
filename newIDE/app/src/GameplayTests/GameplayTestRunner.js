@@ -11,8 +11,13 @@ import {
 import {
   clearGameplayTestFramePreview,
   setGameplayTestFrameRunStatus,
+  setGameplayTestFrameHiddenPause,
   type GameplayTestFrameRunStatus,
 } from './GameplayTestFrame';
+import {
+  getIsPageHidden,
+  addPageVisibilityListener,
+} from '../Utils/PageVisibility';
 
 export type GameplayTestScope =
   | {| type: 'project' |}
@@ -37,7 +42,10 @@ export type GameplayTestAssertion = {|
 
 export type GameplayTestResult = {
   testName: string,
-  status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout',
+  // 'paused': the run was interrupted because the editor stayed in the
+  // background, where the browser stops running the game. Not a failure of
+  // the test: it must simply be run again.
+  status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout' | 'paused',
   framesExecuted: number,
   durationMs: number,
   // Time spent waiting for the game to boot and for scene assets to load,
@@ -47,6 +55,10 @@ export type GameplayTestResult = {
   // (`durationMs - loadingMs` close to it means the test is at risk of
   // timing out on a slower machine).
   timeoutMs: number,
+  // Time during which the game was frozen because the editor was in the
+  // background (browsers stop animation frames in a hidden page, so the
+  // game stops stepping). Excluded from the `timeoutMs` budget.
+  hiddenStallMs: number,
   gameTimeMs: number,
   assertions: Array<GameplayTestAssertion>,
   errors: Array<string>,
@@ -100,6 +112,15 @@ const GAMEPLAY_TEST_FRAME_DEBUGGER_ID = 'gameplay-test-frame';
 const GAME_READY_TIMEOUT_MS = 60 * 1000;
 const GAME_READY_POLL_INTERVAL_MS = 300;
 const RESULT_EXTRA_TIMEOUT_MS = 10 * 1000;
+// A silence shorter than this while the editor is in the background is not
+// considered a stall: the game sends progress every 500ms, so a quick tab
+// switch can pass unnoticed by the game.
+const HIDDEN_STALL_THRESHOLD_MS = 1500;
+// How long a run is allowed to stay frozen because the editor is in the
+// background before it is given up on (as 'paused', not as a failure).
+// Generous: the run resumes by itself as soon as the editor is looked at
+// again, and giving up means the test has to be run from the start.
+const MAX_HIDDEN_STALL_MS = 5 * 60 * 1000;
 const DEFAULT_TIMEOUT_MS = 30 * 1000;
 // Paced runs are slow by design (a human is watching): give them room.
 // They can always be stopped with the stop button.
@@ -151,7 +172,7 @@ export const useIsGameplayTestRunInProgress = (): boolean => {
 
 const makeResultWithoutRun = (
   testName: string,
-  status: 'error' | 'stopped',
+  status: 'error' | 'stopped' | 'paused',
   errorMessage: string
 ): GameplayTestResult => ({
   testName,
@@ -160,6 +181,7 @@ const makeResultWithoutRun = (
   durationMs: 0,
   loadingMs: 0,
   timeoutMs: 0,
+  hiddenStallMs: 0,
   gameTimeMs: 0,
   assertions: [],
   errors: [errorMessage],
@@ -189,6 +211,7 @@ export const makeGameplayTestResultReadableOutput = (
   durationMs: result.durationMs,
   loadingMs: result.loadingMs,
   timeoutMs: result.timeoutMs,
+  hiddenStallMs: result.hiddenStallMs,
   gameTimeMs: result.gameTimeMs,
   assertions: result.assertions,
   errors: result.errors,
@@ -206,6 +229,27 @@ const makeStoppedResult = (testName: string): GameplayTestResult =>
     'stopped',
     'The test was not run because the run was stopped.'
   );
+
+/**
+ * The run was interrupted because the editor was left in the background:
+ * browsers stop animation frames in a hidden page, so the game stopped
+ * stepping and never finished. This says nothing about the game: the test
+ * has to be run again, with the editor visible.
+ */
+const makePausedResult = (
+  testName: string,
+  hiddenStallMs: number
+): GameplayTestResult => ({
+  ...makeResultWithoutRun(
+    testName,
+    'paused',
+    'The test did not finish: it was paused because GDevelop was left in ' +
+      'the background, where the browser stops running games. This is not a ' +
+      'test failure and says nothing about the game - run the test again ' +
+      'with the GDevelop window visible.'
+  ),
+  hiddenStallMs,
+});
 
 /**
  * Get the tests container for a scope ('project' or an extension name),
@@ -308,6 +352,71 @@ const waitForGameToBeReady = async (
   });
 };
 
+export type HiddenStallTracker = {|
+  /** Call on every sign of life from the game (a progress message). */
+  reportProgress: () => void,
+  /** Call when the editor goes to the background. */
+  reportHidden: () => void,
+  /**
+   * Call when the editor comes back. Returns how long the game was actually
+   * frozen during the period that just ended (0 when it kept running, or
+   * when the editor was only away for an instant).
+   */
+  reportVisible: () => number,
+  /** The total stall so far, hidden period in progress included. */
+  getTotalStallMs: () => number,
+|};
+
+/**
+ * Measures how long a run is frozen because the editor is in the
+ * background. Browsers stop animation frames in a hidden page, so the game
+ * stops stepping - but being hidden is not enough to conclude it was
+ * frozen: the desktop app disables background throttling, and the game then
+ * keeps running. Only the silence *after the last sign of life* counts.
+ */
+export const createHiddenStallTracker = ({
+  isHiddenAtStart,
+  getNowMs = () => Date.now(),
+}: {|
+  isHiddenAtStart: boolean,
+  getNowMs?: () => number,
+|}): HiddenStallTracker => {
+  let hiddenSinceMs: number | null = isHiddenAtStart ? getNowMs() : null;
+  let lastProgressAtMs = getNowMs();
+  let totalStallMs = 0;
+
+  /** The stall of the hidden period in progress, if any. */
+  const getOngoingStallMs = (): number => {
+    const startedBeingHiddenAtMs = hiddenSinceMs;
+    if (startedBeingHiddenAtMs === null) return 0;
+    return Math.max(
+      0,
+      getNowMs() - Math.max(startedBeingHiddenAtMs, lastProgressAtMs)
+    );
+  };
+
+  return {
+    reportProgress: () => {
+      lastProgressAtMs = getNowMs();
+    },
+    reportHidden: () => {
+      hiddenSinceMs = getNowMs();
+    },
+    reportVisible: () => {
+      if (hiddenSinceMs === null) return 0;
+      const stalledMs = getOngoingStallMs();
+      hiddenSinceMs = null;
+      // A short gap is not a stall: the game only heartbeats every 500ms,
+      // so a quick look at another tab can pass completely unnoticed.
+      if (stalledMs <= HIDDEN_STALL_THRESHOLD_MS) return 0;
+
+      totalStallMs += stalledMs;
+      return stalledMs;
+    },
+    getTotalStallMs: () => totalStallMs + getOngoingStallMs(),
+  };
+};
+
 const runSingleTest = async ({
   previewDebuggerServer,
   test,
@@ -331,6 +440,9 @@ const runSingleTest = async ({
 
   return new Promise(resolve => {
     let watchdogTimeoutId: ?TimeoutID = null;
+    const hiddenStallTracker = createHiddenStallTracker({
+      isHiddenAtStart: getIsPageHidden(),
+    });
     const unregisterCallbacks: () => void = previewDebuggerServer.registerCallbacks(
       {
         onErrorReceived: () => {},
@@ -354,6 +466,7 @@ const runSingleTest = async ({
             // The game is alive (stepping frames, or heartbeating while it
             // loads assets - loading is not counted against the test
             // timeout): give it a full budget again.
+            hiddenStallTracker.reportProgress();
             armWatchdog();
             if (onProgress && parsedMessage.payload) {
               onProgress(test, parsedMessage.payload.frame || 0);
@@ -371,8 +484,18 @@ const runSingleTest = async ({
 
     const finish = (result: GameplayTestResult) => {
       if (watchdogTimeoutId !== null) clearTimeout(watchdogTimeoutId);
+      unregisterVisibilityListener();
       unregisterCallbacks();
-      resolve(result);
+      resolve({
+        ...result,
+        // The game measures the same thing on its side; keep the longest,
+        // as each can miss a stall the other saw (the game is frozen while
+        // hidden, the editor only learns about it when it comes back).
+        hiddenStallMs: Math.max(
+          result.hiddenStallMs || 0,
+          hiddenStallTracker.getTotalStallMs()
+        ),
+      });
     };
 
     // An editor-side watchdog, in case the game dies without sending its
@@ -380,18 +503,64 @@ const runSingleTest = async ({
     // spends long over its own timeout while loading assets (loading is
     // excluded from the test budget), but it heartbeats while doing so - a
     // full silence is what means it crashed.
+    //
+    // Unless the editor is in the background: browsers then stop animation
+    // frames, so the game stops stepping and goes silent for a reason that
+    // has nothing to do with the game. The watchdog then waits much longer
+    // and gives up on the run as 'paused' rather than blaming the game.
     const armWatchdog = () => {
       if (watchdogTimeoutId !== null) clearTimeout(watchdogTimeoutId);
-      watchdogTimeoutId = setTimeout(() => {
-        finish(
-          makeErrorResult(
-            test.testName,
-            `No result nor progress received from the game after ${timeoutMs +
-              RESULT_EXTRA_TIMEOUT_MS}ms - the game may have crashed or been closed.`
-          )
-        );
-      }, timeoutMs + RESULT_EXTRA_TIMEOUT_MS);
+      const wasHidden = getIsPageHidden();
+      watchdogTimeoutId = setTimeout(
+        () => {
+          // Visibility changed while waiting (the timer itself is throttled
+          // in a hidden page, so it can fire long after it was armed): the
+          // budget that just elapsed was not the right one.
+          if (getIsPageHidden() !== wasHidden) {
+            armWatchdog();
+            return;
+          }
+          if (wasHidden) {
+            const totalHiddenStallMs = hiddenStallTracker.getTotalStallMs();
+            setGameplayTestFrameHiddenPause({
+              pausedMs: totalHiddenStallMs,
+              isRunInterrupted: true,
+            });
+            finish(makePausedResult(test.testName, totalHiddenStallMs));
+            return;
+          }
+          finish(
+            makeErrorResult(
+              test.testName,
+              `No result nor progress received from the game after ${timeoutMs +
+                RESULT_EXTRA_TIMEOUT_MS}ms - the game may have crashed or been closed.`
+            )
+          );
+        },
+        wasHidden ? MAX_HIDDEN_STALL_MS : timeoutMs + RESULT_EXTRA_TIMEOUT_MS
+      );
     };
+
+    // Follow the editor being hidden and shown again, to tell a frozen run
+    // apart from a crashed one and to nudge the user about it (see the
+    // banner on the gameplay test frame).
+    const unregisterVisibilityListener = addPageVisibilityListener(isHidden => {
+      if (isHidden) {
+        hiddenStallTracker.reportHidden();
+      } else if (hiddenStallTracker.reportVisible() > 0) {
+        // The game really was frozen while the editor was away: nudge the
+        // user about it, so a run that took much longer than it should - or
+        // a game that looks stuck on an old frame - is never a mystery.
+        setGameplayTestFrameHiddenPause({
+          pausedMs: hiddenStallTracker.getTotalStallMs(),
+          isRunInterrupted: false,
+        });
+      }
+      // The run only resumes when the editor is looked at again: give it a
+      // full budget from now on, not from when it was frozen.
+      armWatchdog();
+    });
+
     armWatchdog();
 
     const payload: Object = {
@@ -457,6 +626,7 @@ export const runGameplayTests = async ({
       // always loads in a fresh frame (and a stale game can never answer
       // in place of the new one).
       clearGameplayTestFramePreview();
+      setGameplayTestFrameHiddenPause(null);
 
       // Readable state for object/behavior snapshots, derived once per batch
       // from the extensions metadata.
@@ -599,6 +769,20 @@ export const runGameplayTests = async ({
             durationMs: result.durationMs,
           });
           results.push(result);
+
+          if (result.status === 'paused') {
+            // The editor is (still) in the background, so the game is not
+            // running: the remaining tests would all be paused the same
+            // way. Report them as such rather than pretending to run them.
+            for (const { test: remainingTest } of testsWithSources.slice(
+              testIndex + 1
+            )) {
+              results.push(
+                makePausedResult(remainingTest.testName, result.hiddenStallMs)
+              );
+            }
+            break;
+          }
         }
       } catch (error) {
         if (error.isStopRequested) {

@@ -460,8 +460,7 @@ TEST_CASE("ChildObjectForwardFunctionGenerator", "[common]") {
     REQUIRE(parentFunction.GetEvents().GetEventsCount() == 1);
     {
       auto &event = parentFunction.GetEvents().GetEvent(0);
-      REQUIRE(event.GetInstructionList("conditions")->GetCount() == 0);
-      REQUIRE(event.GetInstructionList("actions")->GetCount() == 0);
+      REQUIRE(event.GetType() == "BuiltinCommonInstructions::Comment");
       auto &comment = dynamic_cast<gd::CommentEvent &>(event);
       REQUIRE(comment.GetComment() ==
               "TODO: Please implement this function manually.");

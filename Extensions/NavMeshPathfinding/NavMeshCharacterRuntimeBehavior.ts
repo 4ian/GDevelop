@@ -86,6 +86,9 @@ namespace gdjs {
 
       this._manager =
         gdjs.NavMeshObstaclesManager.getManager(instanceContainer);
+    }
+
+    override onCreated(): void {
       this._manager.addCharacter(this);
     }
 

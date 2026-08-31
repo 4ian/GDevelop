@@ -5,7 +5,10 @@ import { ChatBubble } from './ChatBubble';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { ChatMarkdownText } from './ChatMarkdownText';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
+import {
+  canRetryAiRequest,
+  getFunctionCallToFunctionCallOutputMap,
+} from '../AiRequestUtils';
 import { FunctionCallRow } from './FunctionCallRow';
 import { FunctionCallsGroup } from './FunctionCallsGroup';
 import { SuggestionLines } from './SuggestionLines';
@@ -29,21 +32,18 @@ import {
 } from '../../EditorFunctions';
 import classes from './ChatMessages.module.css';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
+import { AiRequestErrorRow } from './AiRequestErrorRow';
+import { AiCreditsLimitRow } from './AiCreditsLimitRow';
+import { canPayForAiRequest } from './Utils';
 import Text from '../../UI/Text';
-import AlertMessage from '../../UI/AlertMessage';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import FlatButton from '../../UI/FlatButton';
-import Paper from '../../UI/Paper';
 import Floppy from '../../UI/CustomSvgIcons/Floppy';
-import SubscriptionPlanTableSummary from '../../Profile/Subscription/SubscriptionDialog/SubscriptionPlanTableSummary';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { canUpgradeSubscription } from '../../Utils/GDevelopServices/Usage';
+import { getSubscriptionPlanToUpsell } from '../../Profile/Subscription/SubscriptionUpsellUtils';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import Coin from '../../Credits/Icons/Coin';
 import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
-import { Divider } from '@material-ui/core';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import Link from '../../UI/Link';
 import { type FileMetadata } from '../../ProjectsStorage';
@@ -51,21 +51,6 @@ import UnsavedChangesContext from '../../MainFrame/UnsavedChangesContext';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import { OrchestratorPlan } from './OrchestratorPlan';
 import { type FunctionCallItem, type RenderItem } from './Utils';
-
-const styles = {
-  subscriptionPaper: {
-    paddingTop: 5,
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingBottom: 5,
-  },
-  assistantChatBubbleLight: {
-    background: 'linear-gradient(90deg, #F5F5F7 77%, #EAE3FF 100%)',
-  },
-  assistantChatBubbleDark: {
-    background: 'linear-gradient(90deg, #25252E 0%, #312442 100%)',
-  },
-};
 
 // Phrases displayed while the AI is thinking/waiting (no active function calls).
 // Defined outside the component so the array is stable across renders.
@@ -116,9 +101,11 @@ type Props = {|
   shouldDisplayFeedbackBanner?: boolean,
   onScrollToBottom: () => void,
   hasStartedRequestButCannotContinue: boolean,
-  onSwitchedToGDevelopCredits: () => void,
 
   onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
+  // Continues a request that stopped on an error, from where it stopped.
+  // Absent when the chat has no way to resume it (e.g. the standalone form).
+  onRetryAfterError?: ?() => Promise<void>,
   isSending?: boolean,
   // True while the request is paused waiting for the user to answer the inline
   // "Apply this edit?" prompt. Replaces the working/thinking indicators.
@@ -201,8 +188,8 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     shouldDisplayFeedbackBanner,
     onScrollToBottom,
     hasStartedRequestButCannotContinue,
-    onSwitchedToGDevelopCredits,
     onStartOrOpenChat,
+    onRetryAfterError,
     isSending,
     isWaitingForEditApproval,
     savingProjectForMessageId,
@@ -211,7 +198,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
   }: Props) {
     const project = exceptionallyGuardAgainstDeadObject(nullableProject);
     const theme = React.useContext(GDevelopThemeContext);
-    const isLightTheme = theme.palette.type === 'light';
     const {
       getSubscriptionPlansWithPricingSystems,
       openSubscriptionDialog,
@@ -233,28 +219,27 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
       CreditsPackageStoreContext
     );
 
+    // Whether paying with the credits the user already has would be enough to
+    // continue: if it is, offering to switch is all the banner has to do.
+    const canSwitchToGDevelopCredits =
+      !automaticallyUseCreditsForAiRequests &&
+      canPayForAiRequest({
+        quota,
+        price:
+          (limits && limits.credits && limits.credits.prices['ai-request']) ||
+          null,
+        availableCredits,
+        automaticallyUseCreditsForAiRequests: true,
+      });
+
     const suggestedSubscriptionPlanWithPricingSystem = React.useMemo(
       () => {
-        if (
-          !subscriptionPlansWithPricingSystems ||
-          subscriptionPlansWithPricingSystems.length === 0 ||
-          !hasReachedLimit ||
-          (subscription && !canUpgradeSubscription(subscription)) ||
-          !hasStartedRequestButCannotContinue
-        )
+        if (!hasReachedLimit || !hasStartedRequestButCannotContinue)
           return null;
-
-        const goldPlan = subscriptionPlansWithPricingSystems.find(
-          plan => plan.id === 'gdevelop_gold'
-        );
-        const proPlan = subscriptionPlansWithPricingSystems.find(
-          plan => plan.id === 'gdevelop_startup'
-        );
-        return (
-          (subscription && subscription.planId === 'gdevelop_gold'
-            ? proPlan
-            : goldPlan) || subscriptionPlansWithPricingSystems[0]
-        );
+        return getSubscriptionPlanToUpsell({
+          subscription,
+          subscriptionPlansWithPricingSystems,
+        });
       },
       [
         subscriptionPlansWithPricingSystems,
@@ -269,11 +254,15 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
       hasReachedLimit &&
       hasStartedRequestButCannotContinue;
 
+    const hasErrored = aiRequest.status === 'error';
     React.useEffect(
       () => {
         if (
           shouldShowCreditsOrSubscriptionPrompt ||
-          shouldBeWorkingIfNotPaused
+          shouldBeWorkingIfNotPaused ||
+          // The error and its "Retry" button are shown at the very bottom of
+          // the chat: make sure they are not missed.
+          hasErrored
         ) {
           onScrollToBottom();
         }
@@ -281,6 +270,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
       [
         shouldShowCreditsOrSubscriptionPrompt,
         shouldBeWorkingIfNotPaused,
+        hasErrored,
         onScrollToBottom,
       ]
     );
@@ -1255,12 +1245,19 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
 
         {aiRequest.status === 'error' ? (
           <Line justifyContent="flex-start">
-            <AlertMessage kind="error">
-              <Trans>
-                The AI encountered an error while handling your request - this
-                request was not counted in your AI usage. Try again later.
-              </Trans>
-            </AlertMessage>
+            <AiRequestErrorRow
+              error={aiRequest.error}
+              onRetry={
+                // The AI would carry on editing whichever project is opened:
+                // a request made for another one, or that already failed too
+                // many times in a row, can only be restarted in a new chat.
+                isForAnotherProject || !canRetryAiRequest(aiRequest)
+                  ? null
+                  : onRetryAfterError
+              }
+              hasExhaustedRetries={!canRetryAiRequest(aiRequest)}
+              onStartNewChat={() => onStartOrOpenChat({ aiRequestId: null })}
+            />
           </Line>
         ) : isWaitingForEditApproval ? null : aiRequest.status === // EditApprovalRow): suppress the working/thinking indicators. // Paused on the inline "Apply this edit?" prompt (rendered below by
             'suspended' && !shouldBeWorkingIfNotPaused ? (
@@ -1333,139 +1330,35 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
         ) : null}
 
         {shouldShowCreditsOrSubscriptionPrompt && (
-          <Line justifyContent="center">
-            <Paper
-              background="medium"
-              style={{
-                ...styles.subscriptionPaper,
-                ...(isLightTheme
-                  ? styles.assistantChatBubbleLight
-                  : styles.assistantChatBubbleDark),
-              }}
-            >
-              {suggestedSubscriptionPlanWithPricingSystem && (
-                <ColumnStackLayout noMargin>
-                  <Line>
-                    <RobotIcon size={20} sad />
-                  </Line>
-                  <Text size="block-title" noMargin>
-                    <Trans>
-                      You don't have enough AI credits to continue this
-                      conversation.
-                    </Trans>
-                  </Text>
-                  <Text>
-                    {!!subscription ? (
-                      <Trans>
-                        Upgrade your Premium subscription to have more AI
-                        requests and GDevelop coins to unlock the engine's extra
-                        benefits.
-                      </Trans>
-                    ) : (
-                      <Trans>
-                        Get a Premium subscription to have more AI requests and
-                        GDevelop coins to unlock the engine's extra benefits.
-                      </Trans>
-                    )}
-                  </Text>
-                  <SubscriptionPlanTableSummary
-                    subscriptionPlanWithPricingSystems={
-                      suggestedSubscriptionPlanWithPricingSystem
-                    }
-                    displayedFeatures={['AI_PROTOTYPING', 'FREE_CREDITS']}
-                    hideFullTableLink
-                    actionLabel={<Trans>Upgrade</Trans>}
-                  />
-                </ColumnStackLayout>
-              )}
-
-              {suggestedSubscriptionPlanWithPricingSystem && (
-                <Line>
-                  <Column expand noMargin>
-                    <Divider orientation="horizontal" />
-                  </Column>
-                </Line>
-              )}
-
-              <ColumnStackLayout noMargin>
-                {suggestedSubscriptionPlanWithPricingSystem ? (
-                  <Text size="sub-title">
-                    <Trans>You can switch to GDevelop credits.</Trans>
-                  </Text>
-                ) : (
-                  <ColumnStackLayout noMargin>
-                    <Line>
-                      <Coin />
-                    </Line>
-                    <Text size="block-title" noMargin>
-                      <Trans>
-                        You've ran out of GDevelop credits to continue this
-                        conversation.
-                      </Trans>
-                    </Text>
-                  </ColumnStackLayout>
-                )}
-                <Text noMargin color="secondary">
-                  {availableCredits > 0 ? (
-                    <Trans>
-                      You still have {availableCredits} credits you can use for
-                      AI requests.
-                    </Trans>
-                  ) : (
-                    <Trans>
-                      You don't have any credits available. You can purchase
-                      GDevelop credits to continue making AI requests.
-                    </Trans>
-                  )}
-                </Text>
-                <Line noMargin>
-                  <Text>
-                    <Trans>What would you like to do next?</Trans>
-                  </Text>
-                </Line>
-                <FlatButton
-                  color="ai"
-                  onClick={() => {
-                    openSubscriptionDialog({
-                      analyticsMetadata: {
-                        reason: 'AI requests (subscribe)',
-                        recommendedPlanId: suggestedSubscriptionPlanWithPricingSystem
-                          ? suggestedSubscriptionPlanWithPricingSystem.id
-                          : 'gdevelop_gold',
-                        placementId: 'ai-requests',
-                      },
-                    });
-                  }}
-                  label={<Trans>See subscriptions</Trans>}
-                />
-                {availableCredits > 0 ? (
-                  <FlatButton
-                    leftIcon={<Coin fontSize="small" />}
-                    color="ai"
-                    onClick={() => {
-                      setAutomaticallyUseCreditsForAiRequests(true);
-                      onSwitchedToGDevelopCredits();
-                    }}
-                    label={
-                      automaticallyUseCreditsForAiRequests ? (
-                        <Trans>Using GDevelop Credits</Trans>
-                      ) : (
-                        <Trans>Switch to GDevelop Credits</Trans>
-                      )
-                    }
-                    disabled={automaticallyUseCreditsForAiRequests}
-                  />
-                ) : (
-                  <FlatButton
-                    leftIcon={<Coin fontSize="small" />}
-                    color="ai"
-                    onClick={openCreditsPackageDialog}
-                    label={<Trans>Get more credits</Trans>}
-                    disabled={false}
-                  />
-                )}
-              </ColumnStackLayout>
-            </Paper>
+          <Line>
+            <Column expand noMargin noOverflowParent>
+              <AiCreditsLimitRow
+                suggestedSubscriptionPlan={
+                  suggestedSubscriptionPlanWithPricingSystem
+                }
+                hasSubscription={!!subscription && !!subscription.planId}
+                availableCredits={availableCredits}
+                canSwitchToGDevelopCredits={canSwitchToGDevelopCredits}
+                quota={quota}
+                onUpgradeSubscription={() => {
+                  openSubscriptionDialog({
+                    analyticsMetadata: {
+                      reason: 'AI requests (subscribe)',
+                      recommendedPlanId: suggestedSubscriptionPlanWithPricingSystem
+                        ? suggestedSubscriptionPlanWithPricingSystem.id
+                        : 'gdevelop_gold',
+                      placementId: 'ai-requests',
+                    },
+                  });
+                }}
+                onSwitchToGDevelopCredits={() =>
+                  setAutomaticallyUseCreditsForAiRequests(true)
+                }
+                onBuyCredits={() =>
+                  openCreditsPackageDialog({ placementId: 'ai-requests' })
+                }
+              />
+            </Column>
           </Line>
         )}
 

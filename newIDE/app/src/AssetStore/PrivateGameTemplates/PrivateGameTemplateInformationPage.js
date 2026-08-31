@@ -418,6 +418,7 @@ const PrivateGameTemplateInformationPage = ({
       if (currentCreditsAmount < gameTemplateCreditsAmount) {
         openCreditsPackageDialog({
           missingCredits: gameTemplateCreditsAmount - currentCreditsAmount,
+          placementId: 'asset-store',
         });
         return;
       }

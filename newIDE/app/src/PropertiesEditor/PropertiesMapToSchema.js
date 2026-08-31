@@ -12,6 +12,7 @@ import {
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
 import { keyNames } from '../Utils/KeyboardKeyNames';
+import { getChoiceDisplayLabel } from '../Utils/ChoiceLabel';
 import Restore from '../UI/CustomSvgIcons/Restore';
 
 const gd: libGDevelop = global.gd;
@@ -193,11 +194,7 @@ const createField = (
       property.getChoices(),
       choice => ({
         value: choice.getValue(),
-        label:
-          choice.getValue() +
-          (choice.getLabel() && choice.getLabel() !== choice.getValue()
-            ? ` — ${choice.getLabel()}`
-            : ''),
+        label: getChoiceDisplayLabel(choice.getValue(), choice.getLabel()),
       })
     );
     // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
@@ -321,6 +318,34 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
+    };
+  } else if (valueType === 'bitmask') {
+    // A bitmask is a number where each bit is a flag. The extra information
+    // tells which bits are meaningful, for example: "bitCount=4", "firstBit=4".
+    const extraInfo = property.getExtraInfo().toJSArray();
+    const getExtraInfoNumber = (key: string, defaultValue: number): number => {
+      const entry = extraInfo.find(info => info.startsWith(`${key}=`));
+      if (!entry) return defaultValue;
+      const parsedValue = parseInt(entry.substring(key.length + 1), 10);
+      return Number.isFinite(parsedValue) ? parsedValue : defaultValue;
+    };
+
+    return {
+      name,
+      valueType: 'bitmask',
+      getValue: getValueForNumber,
+      setValue: (instance: Instance, newValue: number) => {
+        setNumberValue(instance, name, newValue);
+      },
+      firstBit: getExtraInfoNumber('firstBit', 0),
+      bitCount: getExtraInfoNumber('bitCount', 8),
+      defaultValue: defaultValueNumber,
+      getLabel,
+      getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
+      isHighlighted: isHighlightedForNumber,
       disabled,
     };
   } else if (valueType === 'multilinestring') {

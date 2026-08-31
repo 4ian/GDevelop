@@ -1,0 +1,66 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--theme-primary-light) 40%, transparent);
+  /* A purple tint, matching the AI accent of the chat, kept discreet enough to
+     stay readable on both light and dark themes. */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--theme-primary-light) 14%, transparent) 0%,
+    color-mix(in srgb, var(--theme-primary-light) 4%, transparent) 55%,
+    transparent 100%
+  );
+  min-width: 0;
+  animation: editApprovalAppear 180ms ease-out;
+}
+
+@keyframes editApprovalAppear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container {
+    animation: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  font-size: 15px;
+  background-color: color-mix(
+    in srgb,
+    var(--theme-primary-light) 25%,
+    transparent
+  );
+  color: var(--theme-text-default-color);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}

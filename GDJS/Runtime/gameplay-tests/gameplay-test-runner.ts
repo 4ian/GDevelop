@@ -1348,6 +1348,48 @@ namespace gdjs {
         return this._runtimeGame.getGameResolutionHeight();
       }
 
+      /** Undo the game window size override (see `setGameResolutionSize`). */
+      _uninstallGameWindowSizeOverride: () => void = () => {};
+
+      /**
+       * Change the game resolution, as if the game window was resized to
+       * this size. Useful to test layouts made for other screen sizes,
+       * before asserting positions or taking a screenshot.
+       *
+       * This is the ONLY way the game resolution changes during a test:
+       * a gameplay test always runs in a game window of the project's game
+       * resolution, and moving, resizing or minimizing the gameplay test
+       * frame in the editor is never visible to the game (the frame is
+       * only a zoomed view of that fixed window).
+       *
+       * The engine sees a game window of this size until the end of the
+       * test: a game adapting its resolution to the game window size would
+       * otherwise recompute it from the real window, ignoring the size
+       * requested here.
+       */
+      setGameResolutionSize(width: float, height: float): void {
+        this._uninstallGameWindowSizeOverride();
+        const original = {
+          getWindowInnerWidth: gdjs.RuntimeGameRenderer.getWindowInnerWidth,
+          getWindowInnerHeight: gdjs.RuntimeGameRenderer.getWindowInnerHeight,
+        };
+        gdjs.RuntimeGameRenderer.getWindowInnerWidth = () => width;
+        gdjs.RuntimeGameRenderer.getWindowInnerHeight = () => height;
+        this._uninstallGameWindowSizeOverride = () => {
+          gdjs.RuntimeGameRenderer.getWindowInnerWidth =
+            original.getWindowInnerWidth;
+          gdjs.RuntimeGameRenderer.getWindowInnerHeight =
+            original.getWindowInnerHeight;
+          this._uninstallGameWindowSizeOverride = () => {};
+        };
+
+        this._runtimeGame.setGameResolutionSize(width, height);
+        // The paused main loop would only adapt the cameras on its next
+        // animation frame: do it now, so the next stepped frame is laid out
+        // for the new resolution.
+        this._runtimeGame.getSceneStack().onGameResolutionResized();
+      }
+
       /**
        * Release all pressed keys, mouse buttons and touches.
        */
@@ -3152,6 +3194,7 @@ namespace gdjs {
         inputManager.onFrameEnded = originalOnFrameEnded;
         harness._uninstallPointerLockShim();
         harness._uninstallSoundLog();
+        harness._uninstallGameWindowSizeOverride();
         gdjs.Logger.setLoggerOutput(existingLoggerOutput);
         if (payload.freezeWhenFinished) {
           // Keep the game paused (the main loop keeps rendering the last

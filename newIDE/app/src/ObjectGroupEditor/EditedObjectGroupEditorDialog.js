@@ -14,6 +14,7 @@ import VariablesList from '../VariablesList/VariablesList';
 import HelpButton from '../UI/HelpButton';
 import useValueWithInit from '../Utils/UseRefInitHook';
 import Text from '../UI/Text';
+import { makeObjectGroupMergedVariablesContainer } from '../Utils/VariablesUtils';
 
 const gd: libGDevelop = global.gd;
 
@@ -62,10 +63,11 @@ const EditedObjectGroupEditorDialog = ({
   );
 
   const groupVariablesContainer = useValueWithInit(
-    // The VariablesContainer is returned by value.
-    // Thus, the same instance is reused every time.
+    // This merged container is a temporary container, owned by this dialog,
+    // that the user edits in place - edits only reach the objects of the
+    // group when the refactoring is applied.
     () =>
-      gd.ObjectRefactorer.mergeVariableContainers(
+      makeObjectGroupMergedVariablesContainer(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         group
       )
@@ -84,6 +86,16 @@ const EditedObjectGroupEditorDialog = ({
     // are persisted in the project file and so must stay stable.
     ensurePersistentUuids: true,
   });
+
+  // Free the C++ memory of the merged container when the dialog is closed
+  // (declared after other hooks using the container, so their cleanups run
+  // before the container is deleted).
+  React.useEffect(
+    () => () => {
+      groupVariablesContainer.delete();
+    },
+    [groupVariablesContainer]
+  );
 
   const apply = async () => {
     onApply();

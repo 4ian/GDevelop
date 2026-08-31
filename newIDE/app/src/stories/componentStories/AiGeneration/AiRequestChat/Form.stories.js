@@ -20,6 +20,8 @@ import PreferencesContext, {
   initialPreferences,
 } from '../../../../MainFrame/Preferences/PreferencesContext';
 import FixedWidthFlexContainer from '../../../FixedWidthFlexContainer';
+import RaisedButton from '../../../../UI/RaisedButton';
+import { Column, Line } from '../../../../UI/Grid';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/AiRequestChat/Form',
@@ -453,3 +455,57 @@ export const ErrorLaunching = (): React.Node => (
     lastSendError={new Error('Fake error while sending request')}
   />
 );
+
+// The exact situation a user got stuck in: their AI usage allowance is
+// exhausted, they already accepted to pay with GDevelop credits but have none
+// left, so the form is replaced by the prompt and the send button is disabled.
+// Buying credits (the button below stands for the purchase dialog refreshing
+// the limits) must unblock the form right away, without closing and reopening
+// the chat.
+export const QuotaLimitReachedThenCreditsBought = (): React.Node => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+  const [availableCredits, setAvailableCredits] = React.useState<number>(0);
+
+  return (
+    <Column noMargin>
+      <Line noMargin>
+        <RaisedButton
+          primary
+          label={
+            availableCredits === 0
+              ? 'Simulate buying 500 credits'
+              : 'Simulate spending every credit'
+          }
+          onClick={() => setAvailableCredits(availableCredits === 0 ? 500 : 0)}
+        />
+      </Line>
+      <WrappedChatComponent
+        aiRequest={null}
+        quota={quota}
+        availableCredits={availableCredits}
+        authenticatedUser={{
+          ...defaultAuthenticatedUserWithNoSubscription,
+          limits: {
+            ...limitsForNoSubscriptionUser,
+            credits: {
+              userBalance: {
+                amount: availableCredits,
+              },
+            },
+            quotas: {
+              'consumed-ai-requests': quota,
+            },
+          },
+        }}
+        automaticallyUseCreditsForAiRequests={true}
+        increaseQuotaOffering="subscribe"
+      />
+    </Column>
+  );
+};

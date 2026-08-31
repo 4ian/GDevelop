@@ -21,23 +21,26 @@ const styles = {
   storyContainer: { height: 460, position: 'relative' },
   fakeGame: {
     display: 'flex',
-    flex: 1,
+    width: '100%',
+    height: '100%',
     alignItems: 'flex-end',
     background: 'linear-gradient(to bottom, #4f28cd, #95c6ff)',
   },
+  // Sized for the fake game resolution below (displayed zoomed out by 4
+  // when the frame is at its default size).
   fakeGameGround: {
     width: '100%',
-    height: 32,
+    height: 128,
     backgroundColor: '#16cf89',
     position: 'relative',
   },
   fakeGamePlayer: {
     position: 'absolute',
-    bottom: 32,
-    left: 60,
-    width: 20,
-    height: 28,
-    borderRadius: 3,
+    bottom: 128,
+    left: 240,
+    width: 80,
+    height: 112,
+    borderRadius: 12,
     backgroundColor: '#ffbc57',
   },
 };
@@ -87,6 +90,7 @@ const FrameStory = ({
         isMinimized={isMinimized}
         onToggleMinimized={() => setIsMinimized(!isMinimized)}
         onStopRequested={action('stop requested')}
+        gameResolution={{ width: 1280, height: 720 }}
       >
         <FakeGameView />
       </GameplayTestFrameLayout>

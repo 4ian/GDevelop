@@ -1,79 +1,221 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { Column, Line } from '../UI/Grid';
-import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../UI/Layout';
-import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
 import Dialog from '../UI/Dialog';
-import CreditsStatusBanner from './CreditsStatusBanner';
-import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
 import PlaceholderError from '../UI/PlaceholderError';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import RaisedButton from '../UI/RaisedButton';
-import { renderProductPrice } from '../AssetStore/ProductPriceTag';
-import BackgroundText from '../UI/BackgroundText';
 import Link from '../UI/Link';
 import Window from '../Utils/Window';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import {
+  CreditsPackageStoreContext,
+  getCreditsAmountFromId,
+} from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import CreditsPackagePurchaseDialog from '../AssetStore/CreditsPackages/CreditsPackagePurchaseDialog';
 import { type CreditsPackageListingData } from '../Utils/GDevelopServices/Shop';
+import { renderProductPrice } from '../AssetStore/ProductPriceTag';
+import { type CreditsPackageDialogVariant } from './CreditsPackagesDialogDisplay';
+import Coin from './Icons/Coin';
 import OneCoin from './Icons/OneCoin';
 import TwoCoins from './Icons/TwoCoins';
 import ThreeCoins from './Icons/ThreeCoins';
 import FourCoins from './Icons/FourCoins';
 import FiveCoins from './Icons/FiveCoins';
-import AlertMessage from '../UI/AlertMessage';
-import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import { getItemsSplitInLines } from './CreditsPackagesHelper';
+import MultipleCoins from './Icons/MultipleCoins';
+import RobotFace from '../UI/CustomSvgIcons/RobotFace';
+import Store from '../UI/CustomSvgIcons/Store';
+import Publish from '../UI/CustomSvgIcons/Publish';
+import classes from './CreditsPackagesDialog.module.css';
+
+const CREDITS_GUIDE_URL =
+  'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits';
 
 const styles = {
-  creditsPackage: {
-    display: 'flex',
-    flex: 1,
-    borderRadius: 8,
-    padding: 16,
-  },
-  iconStyle: {
-    width: 30,
-    height: 30,
-  },
-  titleContainer: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  iconContainer: {
-    marginRight: 8,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 30,
-  },
-  backgroundText: {
-    textAlign: 'left',
+  packageIcon: {
+    width: 34,
+    height: 34,
   },
 };
 
 const getIconFromIndex = (index: number) => {
   switch (index) {
     case 0:
-      return <OneCoin style={styles.iconStyle} />;
+      return <OneCoin style={styles.packageIcon} />;
     case 1:
-      return <TwoCoins style={styles.iconStyle} />;
+      return <TwoCoins style={styles.packageIcon} />;
     case 2:
-      return <ThreeCoins style={styles.iconStyle} />;
+      return <ThreeCoins style={styles.packageIcon} />;
     case 3:
-      return <FourCoins style={styles.iconStyle} />;
+      return <FourCoins style={styles.packageIcon} />;
     case 4:
     default:
-      return <FiveCoins style={styles.iconStyle} />;
+      return <FiveCoins style={styles.packageIcon} />;
   }
+};
+
+/**
+ * The price of a package, in cents, or null when the package has no comparable
+ * price (so it is left out of the "best value" comparison).
+ */
+const getPriceInCents = (
+  creditsPackageListingData: CreditsPackageListingData
+): {| valueInCents: number, currency: string |} | null => {
+  const price =
+    creditsPackageListingData.prices.find(
+      price => price.usageType === 'default'
+    ) || creditsPackageListingData.prices[0];
+  if (!price) return null;
+  return { valueInCents: price.value, currency: price.currency };
+};
+
+type SavingsPercentages = { [packageId: string]: number };
+
+/**
+ * How much cheaper each credit is in a package, compared to the package with
+ * the worst rate (usually the smallest one) - the reason to buy a bigger pack,
+ * made explicit.
+ *
+ * Packages priced in another currency (or without a price) are ignored, so the
+ * comparison always holds.
+ */
+const getSavingsPercentages = (
+  creditsPackageListingDatas: Array<CreditsPackageListingData>
+): SavingsPercentages => {
+  const centsPerCreditByPackageId: { [packageId: string]: number } = {};
+  let referenceCurrency: string | null = null;
+  let worstCentsPerCredit: number | null = null;
+
+  creditsPackageListingDatas.forEach(creditsPackageListingData => {
+    const price = getPriceInCents(creditsPackageListingData);
+    const creditsAmount = getCreditsAmountFromId(creditsPackageListingData.id);
+    if (!price || !price.valueInCents || !creditsAmount) return;
+    if (!referenceCurrency) referenceCurrency = price.currency;
+    if (price.currency !== referenceCurrency) return;
+
+    const centsPerCredit = price.valueInCents / creditsAmount;
+    centsPerCreditByPackageId[creditsPackageListingData.id] = centsPerCredit;
+    if (worstCentsPerCredit === null || centsPerCredit > worstCentsPerCredit) {
+      worstCentsPerCredit = centsPerCredit;
+    }
+  });
+
+  const savingsPercentages: SavingsPercentages = {};
+  if (!worstCentsPerCredit) return savingsPercentages;
+  Object.keys(centsPerCreditByPackageId).forEach(packageId => {
+    const savingsPercentage = Math.round(
+      (1 - centsPerCreditByPackageId[packageId] / Number(worstCentsPerCredit)) *
+        100
+    );
+    if (savingsPercentage > 0)
+      savingsPercentages[packageId] = savingsPercentage;
+  });
+  return savingsPercentages;
+};
+
+/**
+ * What a given amount of credits realistically allows: an AI request costs a
+ * few credits, an asset pack or a mobile build a few hundred. Thresholds are
+ * kept deliberately coarse so the promise stays true if prices move a little.
+ *
+ * Nothing is promised for a package whose id doesn't say how many credits it
+ * gives (a package shape added later by the shop): a wrong promise would be
+ * worse than none.
+ */
+const renderPackageValue = ({
+  creditsAmount,
+  isAiFocused,
+}: {|
+  creditsAmount: number,
+  isAiFocused: boolean,
+|}): React.Node => {
+  if (!creditsAmount) return null;
+  if (creditsAmount >= 10000) {
+    return isAiFocused ? (
+      <Trans>Build and iterate on entire games, every day</Trans>
+    ) : (
+      <Trans>Make entire games, every day</Trans>
+    );
+  }
+  if (creditsAmount >= 5000) {
+    return isAiFocused ? (
+      <Trans>Advanced features on an ambitious game, with the AI</Trans>
+    ) : (
+      <Trans>Advanced features on an ambitious game</Trans>
+    );
+  }
+  if (creditsAmount >= 2000) {
+    return isAiFocused ? (
+      <Trans>Build a whole game with the AI</Trans>
+    ) : (
+      <Trans>A whole game, assets and exports</Trans>
+    );
+  }
+  if (creditsAmount >= 1000) {
+    return isAiFocused ? (
+      <Trans>Several features built with the AI</Trans>
+    ) : (
+      <Trans>Several features, or an asset pack</Trans>
+    );
+  }
+  return isAiFocused ? (
+    <Trans>A few features built with the AI</Trans>
+  ) : (
+    <Trans>A few AI features, or some assets</Trans>
+  );
+};
+
+type CreditsUsage = {|
+  key: string,
+  icon: React.Node,
+  title: React.Node,
+  description: React.Node,
+|};
+
+const getCreditsUsages = (isAiFocused: boolean): Array<CreditsUsage> => {
+  const aiUsage: CreditsUsage = {
+    key: 'ai',
+    icon: <RobotFace fontSize="inherit" />,
+    title: <Trans>Build with the AI</Trans>,
+    description: isAiFocused ? (
+      <Trans>
+        Keep asking the AI to add features, fix bugs and build entire scenes,
+        without waiting for your usage to reset.
+      </Trans>
+    ) : (
+      <Trans>
+        Ask the AI to add features, fix bugs and build entire scenes for you.
+      </Trans>
+    ),
+  };
+  const assetStoreUsage: CreditsUsage = {
+    key: 'asset-store',
+    icon: <Store fontSize="inherit" />,
+    title: <Trans>Fill your game</Trans>,
+    description: (
+      <Trans>
+        Buy asset packs, game templates and sounds in the GDevelop asset store.
+      </Trans>
+    ),
+  };
+  const publishUsage: CreditsUsage = {
+    key: 'publish',
+    icon: <Publish fontSize="inherit" />,
+    title: <Trans>Publish and grow</Trans>,
+    description: (
+      <Trans>
+        Export to Android and iOS, and get your game featured on gd.games.
+      </Trans>
+    ),
+  };
+
+  return isAiFocused
+    ? [aiUsage, assetStoreUsage, publishUsage]
+    : [assetStoreUsage, aiUsage, publishUsage];
 };
 
 type Props = {|
@@ -81,6 +223,8 @@ type Props = {|
   suggestedPackage: ?CreditsPackageListingData,
   missingCredits: ?number,
   showCalloutTip?: boolean,
+  /** Which wording/layout of the dialog to show (see `CreditsPackagesDialogDisplay`). */
+  dialogVariant?: CreditsPackageDialogVariant,
 |};
 
 const CreditsPackagesDialog = ({
@@ -88,18 +232,20 @@ const CreditsPackagesDialog = ({
   suggestedPackage,
   missingCredits,
   showCalloutTip,
+  dialogVariant = 'standard',
 }: Props): React.Node => {
   const {
     error,
     fetchCreditsPackages,
     creditsPackageListingDatas,
   } = React.useContext(CreditsPackageStoreContext);
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { limits, onRefreshLimits } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [
     purchasingCreditsPackageListingData,
     setPurchasingCreditsPackageListingData,
   ] = React.useState<?CreditsPackageListingData>(null);
-  const { isMediumScreen } = useResponsiveWindowSize();
 
   React.useEffect(
     () => {
@@ -108,27 +254,158 @@ const CreditsPackagesDialog = ({
     [fetchCreditsPackages]
   );
 
-  // Split credit packages on multiple lines to spread them as much as possible.
-  // Logic is different based on the screen size so that it looks ok.
-  const creditsPackageListingDatasArrays: ?(CreditsPackageListingData[][]) = React.useMemo(
-    () => getItemsSplitInLines(creditsPackageListingDatas, isMediumScreen),
-    [creditsPackageListingDatas, isMediumScreen]
+  // Ensure the credits balance shown in the dialog is up to date.
+  React.useEffect(
+    () => {
+      onRefreshLimits();
+    },
+    [onRefreshLimits]
   );
 
-  const getCreditPackageIndex = (creditsPackage: CreditsPackageListingData) => {
-    return creditsPackageListingDatas
-      ? creditsPackageListingDatas.findIndex(
-          creditsPackageListingData =>
-            creditsPackageListingData.id === creditsPackage.id
-        )
-      : 0;
+  const isAiFocused = dialogVariant === 'ai';
+  const shouldShowCreditsUsages = dialogVariant !== 'compact';
+  const availableCredits = limits ? limits.credits.userBalance.amount : null;
+
+  const savingsPercentages: SavingsPercentages = React.useMemo(
+    () =>
+      creditsPackageListingDatas
+        ? getSavingsPercentages(creditsPackageListingDatas)
+        : {},
+    [creditsPackageListingDatas]
+  );
+
+  // The package to visually feature: the one that covers what the user is
+  // missing, or - when they are just topping up - the one giving the most
+  // credits for their money.
+  const highlightedPackageId = React.useMemo(
+    () => {
+      if (suggestedPackage) return suggestedPackage.id;
+      if (!creditsPackageListingDatas) return null;
+      let bestPackageId = null;
+      let bestSavingsPercentage = 0;
+      creditsPackageListingDatas.forEach(creditsPackageListingData => {
+        const savingsPercentage =
+          savingsPercentages[creditsPackageListingData.id] || 0;
+        if (savingsPercentage > bestSavingsPercentage) {
+          bestSavingsPercentage = savingsPercentage;
+          bestPackageId = creditsPackageListingData.id;
+        }
+      });
+      return bestPackageId;
+    },
+    [suggestedPackage, creditsPackageListingDatas, savingsPercentages]
+  );
+
+  const renderPackages = (i18n: I18nType) => {
+    if (error) {
+      return (
+        <PlaceholderError onRetry={fetchCreditsPackages}>
+          <Trans>
+            Can't load the credits packages. Verify your internet connection or
+            retry later.
+          </Trans>
+        </PlaceholderError>
+      );
+    }
+    if (!creditsPackageListingDatas) return <PlaceholderLoader />;
+
+    return (
+      <div className={classes.packages}>
+        {creditsPackageListingDatas.map((creditsPackageListingData, index) => {
+          const { id, name } = creditsPackageListingData;
+          const creditsAmount = getCreditsAmountFromId(id);
+          const isHighlighted = highlightedPackageId === id;
+          const savingsPercentage = savingsPercentages[id];
+
+          return (
+            <div
+              key={id}
+              className={
+                isHighlighted
+                  ? `${classes.package} ${classes.highlightedPackage}`
+                  : classes.package
+              }
+            >
+              {isHighlighted && (
+                <span className={classes.packageBadge}>
+                  {suggestedPackage ? (
+                    <Trans>Recommended</Trans>
+                  ) : (
+                    <Trans>Best value</Trans>
+                  )}
+                </span>
+              )}
+              <div className={classes.packageIconContainer}>
+                {getIconFromIndex(index)}
+              </div>
+              <div className={classes.packageAmount}>
+                {creditsAmount ? (
+                  <>
+                    <span className={classes.packageAmountNumber}>
+                      {i18n.number(creditsAmount)}
+                    </span>
+                    <Text noMargin size="body-small" color="secondary">
+                      <Trans>credits</Trans>
+                    </Text>
+                  </>
+                ) : (
+                  <span className={classes.packageAmountNumber}>{name}</span>
+                )}
+              </div>
+              <div className={classes.packagePrice}>
+                <Text noMargin size="sub-title">
+                  {renderProductPrice({
+                    productListingData: creditsPackageListingData,
+                    usageType: 'default',
+                    i18n,
+                  })}
+                </Text>
+                {savingsPercentage ? (
+                  <span className={classes.savingsChip}>
+                    <Trans>Save {savingsPercentage}%</Trans>
+                  </span>
+                ) : null}
+              </div>
+              <div className={classes.packageValue}>
+                <Text noMargin size="body-small" color="secondary">
+                  {renderPackageValue({ creditsAmount, isAiFocused })}
+                </Text>
+              </div>
+              {isHighlighted ? (
+                <RaisedButton
+                  color="premium"
+                  fullWidth
+                  label={<Trans>Purchase</Trans>}
+                  onClick={() =>
+                    setPurchasingCreditsPackageListingData(
+                      creditsPackageListingData
+                    )
+                  }
+                />
+              ) : (
+                <FlatButton
+                  primary
+                  fullWidth
+                  label={<Trans>Purchase</Trans>}
+                  onClick={() =>
+                    setPurchasingCreditsPackageListingData(
+                      creditsPackageListingData
+                    )
+                  }
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   return (
     <I18n>
       {({ i18n }) => (
         <Dialog
-          title={<Trans>Purchase credits</Trans>}
+          title={null}
           open
           maxWidth="md"
           onRequestClose={onClose}
@@ -140,162 +417,103 @@ const CreditsPackagesDialog = ({
             />,
           ]}
         >
-          <ColumnStackLayout noMargin>
-            <CreditsStatusBanner displayPurchaseAction={false} />
-            {showCalloutTip && (
-              <AlertMessage kind="info">
-                <Trans>
-                  You can use credits to feature a game or purchase asset packs
-                  and game templates in the store!
-                </Trans>
-              </AlertMessage>
-            )}
-            {!!missingCredits && (
-              <Column noMargin>
-                <Text size="sub-title">
-                  <Trans>You're {missingCredits} credits short.</Trans>
+          <div className={classes.container}>
+            <div className={classes.header}>
+              <span className={classes.headerBadge}>
+                <MultipleCoins fontSize="inherit" />
+              </span>
+              <div className={classes.headerTexts}>
+                <span className={classes.overline}>
+                  <Trans>GDevelop credits</Trans>
+                </span>
+                <Text noMargin size="section-title">
+                  {isAiFocused ? (
+                    <Trans>Keep building with the AI</Trans>
+                  ) : (
+                    <Trans>Get more credits</Trans>
+                  )}
                 </Text>
-                <Text noMargin>
-                  <Trans>Recharge your account to purchase this item.</Trans>
-                </Text>
-              </Column>
-            )}
-            {error ? (
-              <PlaceholderError onRetry={fetchCreditsPackages}>
-                <Trans>
-                  Can't load the credits packages. Verify your internet
-                  connection or retry later.
-                </Trans>
-              </PlaceholderError>
-            ) : !creditsPackageListingDatasArrays ? (
-              <PlaceholderLoader />
-            ) : (
-              creditsPackageListingDatasArrays.map(
-                (creditsPackageListingDatasArray, lineIndex) => (
-                  <ResponsiveLineStackLayout
-                    noColumnMargin
-                    key={`line-${lineIndex}`}
-                  >
-                    {creditsPackageListingDatasArray.map(
-                      creditsPackageListingData => {
-                        const {
-                          id,
-                          name,
-                          description,
-                        } = creditsPackageListingData;
-                        const shouldSuggestPackage =
-                          !suggestedPackage || suggestedPackage.id === id;
-                        return (
-                          <div
-                            style={{
-                              ...styles.creditsPackage,
-                              border: `1px solid ${
-                                gdevelopTheme.palette.secondary
-                              }`,
-                            }}
-                            key={id}
-                          >
-                            <ColumnStackLayout
-                              alignItems="center"
-                              justifyContent="space-between"
-                              noMargin
-                              expand
-                            >
-                              <div style={styles.titleContainer}>
-                                <div style={styles.iconContainer}>
-                                  {getIconFromIndex(
-                                    getCreditPackageIndex(
-                                      creditsPackageListingData
-                                    )
-                                  )}
-                                </div>
-                                <LineStackLayout
-                                  justifyContent="space-between"
-                                  alignItems="flex-end"
-                                  expand
-                                >
-                                  <Line noMargin alignItems="flex-end">
-                                    <Text size="sub-title" noMargin>
-                                      {name}
-                                    </Text>
-                                  </Line>
-                                  <Text
-                                    size="body-small"
-                                    color="secondary"
-                                    noMargin
-                                  >
-                                    {renderProductPrice({
-                                      productListingData: creditsPackageListingData,
-                                      usageType: 'default',
-                                      i18n,
-                                    })}
-                                  </Text>
-                                </LineStackLayout>
-                              </div>
+              </div>
+              {availableCredits !== null && (
+                <span className={classes.balanceChip}>
+                  <Coin fontSize="inherit" />
+                  <Text noMargin size="body-small" color="inherit">
+                    <Trans>{i18n.number(availableCredits)} credits</Trans>
+                  </Text>
+                </span>
+              )}
+            </div>
 
-                              <Column noMargin alignItems="center" expand>
-                                <Text
-                                  size="body-small"
-                                  noMargin
-                                  color="secondary"
-                                  align="left"
-                                >
-                                  {description}
-                                </Text>
-                              </Column>
-                              {shouldSuggestPackage ? (
-                                <RaisedButton
-                                  primary
-                                  onClick={() =>
-                                    setPurchasingCreditsPackageListingData(
-                                      creditsPackageListingData
-                                    )
-                                  }
-                                  label={<Trans>Purchase</Trans>}
-                                  fullWidth
-                                />
-                              ) : (
-                                <FlatButton
-                                  primary
-                                  onClick={() =>
-                                    setPurchasingCreditsPackageListingData(
-                                      creditsPackageListingData
-                                    )
-                                  }
-                                  label={<Trans>Purchase</Trans>}
-                                  fullWidth
-                                />
-                              )}
-                            </ColumnStackLayout>
-                          </div>
-                        );
-                      }
-                    )}
-                  </ResponsiveLineStackLayout>
-                )
-              )
+            {!!missingCredits ? (
+              <Text noMargin color="secondary">
+                <Trans>
+                  You're {missingCredits} credits short - top up your account to
+                  purchase this item.
+                </Trans>
+              </Text>
+            ) : (
+              <Text noMargin color="secondary">
+                {isAiFocused ? (
+                  <Trans>
+                    Credits are spent only when you use them, never expire, and
+                    work everywhere in GDevelop.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    One balance for everything: the asset store, the AI and
+                    publishing your games. Credits never expire.
+                  </Trans>
+                )}
+              </Text>
             )}
-            <BackgroundText style={styles.backgroundText}>
-              <Trans>
-                Not sure how many credits you need? Check{' '}
-                <Link
-                  href="https://wiki.gdevelop.io/gdevelop5/interface/profile/credits"
-                  onClick={() =>
-                    Window.openExternalURL(
-                      'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits'
-                    )
-                  }
-                >
-                  this guide
-                </Link>{' '}
-                to help you decide.
-              </Trans>{' '}
-              <Trans>
-                Follow GDevelop on socials and check your profile to get some
-                free credits!
-              </Trans>
-            </BackgroundText>
-          </ColumnStackLayout>
+
+            {shouldShowCreditsUsages && (
+              <div className={classes.usages}>
+                {getCreditsUsages(isAiFocused).map(usage => (
+                  <div key={usage.key} className={classes.usage}>
+                    <span className={classes.usageIcon}>{usage.icon}</span>
+                    <div className={classes.usageTexts}>
+                      <Text noMargin size="body-small">
+                        <b>{usage.title}</b>
+                      </Text>
+                      <Text noMargin size="body-small" color="secondary">
+                        {usage.description}
+                      </Text>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {renderPackages(i18n)}
+
+            <Text noMargin size="body-small" color="secondary">
+              {showCalloutTip ? (
+                <Trans>
+                  Not sure how many credits you need? Check{' '}
+                  <Link
+                    href={CREDITS_GUIDE_URL}
+                    onClick={() => Window.openExternalURL(CREDITS_GUIDE_URL)}
+                  >
+                    this guide
+                  </Link>
+                  . Follow GDevelop on socials and check your profile to get
+                  free credits!
+                </Trans>
+              ) : (
+                <Trans>
+                  Not sure how many credits you need? Check{' '}
+                  <Link
+                    href={CREDITS_GUIDE_URL}
+                    onClick={() => Window.openExternalURL(CREDITS_GUIDE_URL)}
+                  >
+                    this guide
+                  </Link>
+                  .
+                </Trans>
+              )}
+            </Text>
+          </div>
           {!!purchasingCreditsPackageListingData && (
             <CreditsPackagePurchaseDialog
               creditsPackageListingData={purchasingCreditsPackageListingData}

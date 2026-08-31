@@ -8,7 +8,6 @@ import AuthenticatedUserContext from '../../AuthenticatedUserContext';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import {
   type SubscriptionPlanWithPricingSystems,
-  type SubscriptionPlanPricingSystem,
   type SimplifiedSubscriptionFeatures,
 } from '../../../Utils/GDevelopServices/Usage';
 import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
@@ -29,6 +28,11 @@ import Apple from '../../../UI/CustomSvgIcons/Apple';
 import GooglePlay from '../../../UI/CustomSvgIcons/GooglePlay';
 import Steam from '../../../UI/CustomSvgIcons/Steam';
 import { useBuyUpdateOrCancelPlan } from './useBuyUpdateOrCancelPlan';
+import {
+  formatMonthlyEquivalentPrice,
+  getYearlyDiscountText,
+  renderTextWithEmphasis,
+} from '../SubscriptionUpsellUtils';
 
 // Plan featured by this dialog when the backend does not specify one.
 const DEFAULT_FEATURED_PLAN_ID = 'gdevelop_gold';
@@ -241,31 +245,6 @@ const renderStoreBadges = (storeBadges: Array<string>): React.Node => {
 };
 
 /**
- * Renders text with a minimal markdown-ish syntax: words wrapped in `**...**`
- * are shown in bold, optionally using the given emphasis color.
- */
-const renderTextWithEmphasis = (
-  text: string,
-  emphasisColor?: string
-): React.Node => {
-  // Splitting on the capturing group yields normal text at even indices and the
-  // bold content at odd indices.
-  const parts = text.split(/\*\*(.+?)\*\*/g);
-  return parts.map((part, index) =>
-    index % 2 === 1 ? (
-      <b
-        key={index}
-        style={emphasisColor ? { color: emphasisColor } : undefined}
-      >
-        {part}
-      </b>
-    ) : (
-      part
-    )
-  );
-};
-
-/**
  * Renders the bullet points (and optional store badges) of a plan's simplified
  * features, served and translated by the backend.
  */
@@ -338,31 +317,6 @@ const ContinueForFreeButton = ({
       </Text>
     </button>
   );
-};
-
-/**
- * Compute the monthly-equivalent price of a yearly plan (the price shown as
- * "X / month, billed annually").
- */
-const formatMonthlyEquivalentPrice = (
-  yearlyPricingSystem: SubscriptionPlanPricingSystem
-): string =>
-  formatPriceWithCurrency(
-    Math.floor(yearlyPricingSystem.amountInCents / 12),
-    yearlyPricingSystem.currency
-  );
-
-const getYearlyDiscountText = (
-  monthlyPricingSystem: SubscriptionPlanPricingSystem,
-  yearlyPricingSystem: SubscriptionPlanPricingSystem
-): string | null => {
-  const monthlyTotalForAYear = monthlyPricingSystem.amountInCents * 12;
-  if (monthlyTotalForAYear <= 0) return null;
-  const discount = Math.round(
-    100 - (yearlyPricingSystem.amountInCents / monthlyTotalForAYear) * 100
-  );
-  if (discount <= 0) return null;
-  return `-${discount}%`;
 };
 
 type Props = {|

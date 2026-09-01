@@ -85,6 +85,10 @@ export type GameplayTestRunOptions = {|
   // Pace the run for a human watching it: game seconds simulated per real
   // second (1 = normal speed, 4 = 4x...). Omitted: run as fast as possible.
   speedFactor?: number,
+  // Close the gameplay test frame (unloading the game) as soon as the run is
+  // finished, instead of leaving it open showing the frozen game and the
+  // outcome of the run. For runs nobody is watching (the AI agent).
+  closeFrameWhenFinished?: boolean,
   onTestStarted?: (test: GameplayTestToRun) => void,
   onProgress?: (test: GameplayTestToRun, frame: number) => void,
 |};
@@ -806,9 +810,11 @@ export const runGameplayTests = async ({
         setRunInProgress(false);
         // When at least one test ran, the frame stays open (showing the
         // frozen game and the outcome of the run) until its close button
-        // is used or another run starts. Otherwise (the game could not
-        // boot, or the run was stopped before the first test), close it.
-        if (!anyTestRan) {
+        // is used or another run starts - unless the caller asked for it
+        // to be closed (nobody is watching the run). Otherwise (the game
+        // could not boot, or the run was stopped before the first test),
+        // close it.
+        if (!anyTestRan || options.closeFrameWhenFinished) {
           clearGameplayTestFramePreview();
         }
       }

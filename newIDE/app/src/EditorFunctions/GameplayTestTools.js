@@ -167,6 +167,10 @@ export const runGameplayTest: EditorFunction = {
         options: {
           timeoutMs,
           screenshots,
+          // The AI is the one reading the result: close the frame (and
+          // unload the game) once the test is finished, instead of leaving
+          // it over the editor.
+          closeFrameWhenFinished: true,
         },
       });
       if (!results[0]) {

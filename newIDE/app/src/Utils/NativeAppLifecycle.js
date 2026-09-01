@@ -17,3 +17,13 @@ export const startNativeAppActivity = (activityName: string): (() => void) => {
 export const updateNativeAppLifecycleContext = (newContext: {
   [string]: any,
 }) => {};
+
+/**
+ * Declare that the editor is doing something that should go on for a while if the user leaves
+ * the app (an AI request being processed), so that the native mobile app asks the system for
+ * extra time when it goes to the background. Does nothing otherwise.
+ * Returns the function to call when the work is finished.
+ */
+export const startNativeAppBackgroundWork = (): (() => void) => {
+  return () => {};
+};

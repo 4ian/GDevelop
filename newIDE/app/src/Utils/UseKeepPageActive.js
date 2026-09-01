@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import optionalRequire from './OptionalRequire';
+import { isNativeMobileApp } from './Platform';
+import { startNativeAppBackgroundWork } from './NativeAppLifecycle';
 
 const electron = optionalRequire('electron');
 
@@ -98,23 +100,34 @@ const stopKeepingPageActive = () => {
 };
 
 /**
- * While `shouldKeepPageActive` is true, prevent the browser from throttling
- * or freezing the app when it is not looked at (tab in the background,
- * window minimized or covered by another one).
+ * While `shouldKeepPageActive` is true, keep the app working when it is not
+ * looked at (tab in the background, window minimized or covered by another
+ * one, mobile app left for another one).
  *
  * Use it only for work that must keep going while the user is away (an AI
- * request being processed): it makes the tab show the "playing audio"
- * indicator, and keeping a page fully awake in the background costs
- * battery.
+ * request being processed): keeping a page fully awake in the background
+ * costs battery, and in a browser it makes the tab show the "playing audio"
+ * indicator.
  *
- * Does nothing in the desktop app, where the main window is already created
- * with `backgroundThrottling` disabled.
+ * What is done depends on where the editor runs:
+ * - Desktop app: nothing, the main window is already created with
+ *   `backgroundThrottling` disabled.
+ * - Mobile app: the native side is told about the work, and asks the system
+ *   for extra time when the app goes to the background (see
+ *   `startNativeAppBackgroundWork`). The tone played in a browser would be
+ *   useless there (the system suspends the whole app, audible or not) and
+ *   would take the audio focus from whatever the user is listening to.
+ * - Browser: the inaudible tone described above.
  */
 export const useKeepPageActive = (shouldKeepPageActive: boolean) => {
   React.useEffect(
     () => {
       if (electron) return;
       if (!shouldKeepPageActive) return;
+
+      if (isNativeMobileApp()) {
+        return startNativeAppBackgroundWork();
+      }
 
       startKeepingPageActive();
       return () => stopKeepingPageActive();

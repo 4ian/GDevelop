@@ -260,8 +260,6 @@ export class GameplayTestEditorContainer extends React.Component<
           isRunning={this.state.isRunning}
           runningFrame={this.state.runningFrame}
           lastResult={this.state.lastResult}
-          onRunTest={this.runTest}
-          onStopTest={this.stopTest}
           onEditWithAi={this.editWithAi}
           onTestModified={this.onTestModified}
           onOpenedEditorsChanged={() => this.updateToolbar()}

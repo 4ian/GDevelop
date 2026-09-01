@@ -137,8 +137,6 @@ const PropertiesPanelStory = ({
           isRunning={!!isRunning}
           runningFrame={runningFrame || null}
           lastResult={lastResult || null}
-          onRunTest={action('run test')}
-          onStopTest={action('stop test')}
           onEditWithAi={action('edit with AI')}
           onTestModified={action('test modified')}
         />

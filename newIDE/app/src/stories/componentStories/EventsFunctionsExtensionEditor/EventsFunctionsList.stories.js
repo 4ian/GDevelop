@@ -32,7 +32,9 @@ export const Default = (): React.Node => (
         onSelectEventsBasedObject={action('object selected')}
         onDeleteEventsBasedObject={action('object deleted')}
         onRenameEventsBasedObject={action('rename object')}
+        moveEventsBasedObjectTo={action('move object')}
         onEventsBasedObjectRenamed={action('object renamed')}
+        onEventsBasedObjectMoved={action('object moved')}
         onEventsBasedObjectPasted={action('object pasted')}
         onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
         onAddEventsBasedObject={cb => cb({ isRenderedIn3D: false })}

@@ -240,6 +240,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
       this.editor.selectEventsBasedBehaviorByName(eventBasedBehaviorName);
   }
 
+  selectEventsBasedObjectByName(eventBasedObjectName: string) {
+    if (this.editor)
+      this.editor.selectEventsBasedObjectByName(eventBasedObjectName);
+  }
+
   _onBlur = () => {
     // We forward the event on the next tick by using setTimeout.
     // This is necessary because we need to first check if
@@ -308,6 +313,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           }
           onRenamedEventsBasedObject={this.props.onRenamedEventsBasedObject}
           onDeletedEventsBasedObject={this.props.onDeletedEventsBasedObject}
+          onEventsBasedObjectMoved={this.props.onEventsBasedObjectMoved}
           onWillInstallExtension={this.props.onWillInstallExtension}
           onExtensionInstalled={this.props.onExtensionInstalled}
           onEventBasedObjectTypeChanged={

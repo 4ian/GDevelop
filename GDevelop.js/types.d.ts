@@ -2193,7 +2193,8 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static changeEventsBasedObjectPropertyType(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, propertyName: string): void;
   static renameEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateBehaviorNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceBehaviorName: string): void;
-  static renameEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
+  static renameEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldObjectName: string, newObjectName: string): void;
+  static moveEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldExtensionName: string, newExtensionName: string, oldObjectName: string, newObjectName: string): void;
   static updateObjectNameInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, sourceObjectName: string): void;
   static renameLayout(project: Project, oldName: string, newName: string): void;
   static renameExternalLayout(project: Project, oldName: string, newName: string): void;

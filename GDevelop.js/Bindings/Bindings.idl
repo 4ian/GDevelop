@@ -2924,8 +2924,15 @@ interface WholeProjectRefactorer {
     void STATIC_RenameEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
-      [Const] DOMString oldName,
-      [Const] DOMString newName);
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
+    void STATIC_MoveEventsBasedObject(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
     void STATIC_UpdateObjectNameInEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,

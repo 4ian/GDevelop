@@ -145,6 +145,12 @@ export type RenderEditorContainerProps = {|
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
   ) => void,
+  onEventsBasedObjectMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldObjectName: string,
+    newObjectName: string
+  ) => void,
 
   // Project opening
   canOpen: boolean,

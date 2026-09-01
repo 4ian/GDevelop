@@ -46,6 +46,7 @@ export const Default = (): React.Node => (
               onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
               onRenamedEventsBasedObject={action('onRenamedEventsBasedObject')}
               onDeletedEventsBasedObject={action('onDeletedEventsBasedObject')}
+              onEventsBasedObjectMoved={action('onEventsBasedObjectMoved')}
               onEventsBasedObjectChildrenEdited={action(
                 'onEventsBasedObjectChildrenEdited'
               )}
@@ -103,6 +104,7 @@ export const WithObjectEditor = (): React.Node => {
                   onDeletedEventsBasedObject={action(
                     'onDeletedEventsBasedObject'
                   )}
+                  onEventsBasedObjectMoved={action('onEventsBasedObjectMoved')}
                   onEventsBasedObjectChildrenEdited={action(
                     'onEventsBasedObjectChildrenEdited'
                   )}

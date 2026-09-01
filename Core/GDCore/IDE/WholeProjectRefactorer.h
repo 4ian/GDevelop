@@ -411,10 +411,22 @@ class GD_CORE_API WholeProjectRefactorer {
    * refactoring.
    */
   static void RenameEventsBasedObject(
-      gd::Project& project,
-      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
-      const gd::String& oldObjectName,
-      const gd::String& newObjectName);
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldObjectName, const gd::String &newObjectName);
+
+  /**
+   * \brief Refactor the project **before** an object is renamed.
+   *
+   * \warning Do the renaming of the specified object after calling this.
+   * This is because the object is expected to have its old name for the
+   * refactoring.
+   */
+  static void MoveEventsBasedObject(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName, const gd::String &newExtensionName,
+      const gd::String &oldObjectName, const gd::String &newObjectName);
 
   /**
    * \brief Refactor events-based object events after the events-based object
@@ -794,9 +806,9 @@ class GD_CORE_API WholeProjectRefactorer {
    * This is because the object is expected to have its old name for the
    * refactoring.
    */
-  static void RenameEventsBasedObject(
+  static void MoveEventsBasedObject(
       gd::Project &project,
-      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName, const gd::String &newExtensionName,
       const gd::EventsBasedObject &eventsBasedObject,
       const gd::String &oldObjectName, const gd::String &newObjectName,
       const gd::ProjectBrowser &projectBrowser);

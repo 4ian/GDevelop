@@ -294,6 +294,7 @@ import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
 import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
+
 const electron = optionalRequire('electron');
 const ipcRendererForUpdates = electron ? electron.ipcRenderer : null;
 
@@ -2570,6 +2571,43 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
+  const onEventsBasedObjectMoved = (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldObjectName: string,
+    newObjectName: string
+  ) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    openObjectEvents(newExtensionName, newObjectName);
+    // The object is already renamed; update its custom-object tabs in place.
+    setState(state => ({
+      ...state,
+      // TODO Open new tabs in their place
+      // We can't just use getRenamedEventsBasedObjectTabProjectItemName
+      // because even if the event-based object was still the same instance
+      // the context would have the wrong extension.
+      editorTabs: closeCustomObjectTab(
+        state.editorTabs,
+        oldExtensionName,
+        newExtensionName
+      ),
+    })).then(() => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['renamed-custom-object'],
+      });
+    });
+    // (async () => {
+    //   await delay(2000);
+    //   console.log("Select", newExtensionName, newObjectName);
+    // })();
+  };
+
   const onDeletedEventsBasedObject = (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
@@ -3567,7 +3605,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       );
       if (foundTab) {
         // Open the given function and focus the tab
-        foundTab.editor.selectEventsBasedBehaviorByName(objectName);
+        foundTab.editor.selectEventsBasedObjectByName(objectName);
         setState(state => ({
           ...state,
           editorTabs: changeCurrentTab(
@@ -5801,6 +5839,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
+    onEventsBasedObjectMoved: onEventsBasedObjectMoved,
     openObjectEvents: openObjectEvents,
     onNavigateToEventFromGlobalSearch: navigateToEventFromGlobalSearch,
     onEditorTabClosing: onEditorTabClosing,

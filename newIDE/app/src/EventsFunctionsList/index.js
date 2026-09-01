@@ -676,6 +676,16 @@ type Props = {|
   onSelectExtensionGlobalVariables: () => void,
   onSelectExtensionSceneVariables: () => void,
   onEventBasedObjectTypeChanged: () => void,
+  moveEventsBasedObjectTo: (
+    eventsBasedObject: gdEventsBasedObject,
+    (destinationExtensionName: string) => void
+  ) => void,
+  onEventsBasedObjectMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldObjectName: string,
+    newObjectName: string
+  ) => void,
 |};
 
 const EventsFunctionsList = React.forwardRef<
@@ -701,6 +711,7 @@ const EventsFunctionsList = React.forwardRef<
       onDeleteEventsBasedObject,
       onRenameEventsBasedObject,
       onEventsBasedObjectRenamed,
+      onEventsBasedObjectMoved,
       onEventsBasedObjectPasted,
       onAddEventsBasedObject,
       onOpenGameplayTest,
@@ -716,6 +727,7 @@ const EventsFunctionsList = React.forwardRef<
       onSelectExtensionSceneVariables,
       onOpenCustomObjectEditor,
       onEventBasedObjectTypeChanged,
+      moveEventsBasedObjectTo,
     }: Props,
     ref
   ) => {
@@ -1373,6 +1385,8 @@ const EventsFunctionsList = React.forwardRef<
         expandFolders,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
+        moveEventsBasedObjectTo,
+        onEventsBasedObjectMoved,
       }),
       [
         treeItemProps,
@@ -1388,6 +1402,8 @@ const EventsFunctionsList = React.forwardRef<
         expandFolders,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
+        moveEventsBasedObjectTo,
+        onEventsBasedObjectMoved,
       ]
     );
 

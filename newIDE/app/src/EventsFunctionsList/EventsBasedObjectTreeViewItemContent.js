@@ -22,6 +22,8 @@ import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Add from '../UI/CustomSvgIcons/Add';
 import { expandAllSubfolders } from './EventsFunctionFolderTreeViewItemContent';
 
+const gd: libGDevelop = global.gd;
+
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
 const styles = {
@@ -54,6 +56,16 @@ export type EventsBasedObjectCallbacks = {|
   ) => void,
   onOpenCustomObjectEditor: (eventsBasedObject: gdEventsBasedObject) => void,
   onEventBasedObjectTypeChanged: () => void,
+  moveEventsBasedObjectTo: (
+    eventsBasedObject: gdEventsBasedObject,
+    (destinationExtensionName: string) => void
+  ) => void,
+  onEventsBasedObjectMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldObjectName: string,
+    newObjectName: string
+  ) => void,
 |};
 
 export type EventsBasedObjectProps = {|
@@ -165,6 +177,57 @@ export class EventsBasedObjectTreeViewItemContent
     );
   }
 
+  _moveTo(): void {
+    const { eventsBasedObjectsList, project } = this.props;
+
+    this.props.moveEventsBasedObjectTo(
+      this.eventsBasedObject,
+      destinationExtensionName => {
+        const extension = project.getEventsFunctionsExtension(
+          destinationExtensionName
+        );
+        const eventsBasedObject = extension
+          .getEventsBasedObjects()
+          .insertNew(
+            newNameGenerator(this.eventsBasedObject.getName(), name =>
+              eventsBasedObjectsList.has(name)
+            ),
+            extension.getEventsBasedObjects().getCount()
+          );
+        unserializeFromJSObject(
+          eventsBasedObject,
+          serializeToJSObject(this.eventsBasedObject),
+          'unserializeFrom',
+          project
+        );
+        const oldExtensionName = this.props.eventsFunctionsExtension.getName();
+        const newExtensionName = extension.getName();
+        const oldObjectName = this.eventsBasedObject.getName();
+        const newObjectName = eventsBasedObject.getName();
+        eventsBasedObject.getName();
+        gd.WholeProjectRefactorer.moveEventsBasedObject(
+          project,
+          this.props.eventsFunctionsExtension,
+          oldExtensionName,
+          newExtensionName,
+          oldObjectName,
+          newObjectName
+        );
+        // Rebuild tabs with the newly created custom object.
+        this.props.onEventsBasedObjectMoved(
+          oldExtensionName,
+          newExtensionName,
+          oldObjectName,
+          newObjectName
+        );
+        // We can now safely remove the old custom object
+        // since it's no longer used in the UI.
+        eventsBasedObjectsList.remove(this.eventsBasedObject.getName());
+        this._onEventsBasedObjectModified();
+      }
+    );
+  }
+
   edit(): void {
     this.props.editName(this.getId());
   }
@@ -207,6 +270,10 @@ export class EventsBasedObjectTreeViewItemContent
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
         click: () => this._togglePrivate(),
+      },
+      {
+        label: i18n._(t`Move to...`),
+        click: () => this._moveTo(),
       },
       {
         type: 'separator',

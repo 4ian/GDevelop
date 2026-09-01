@@ -4,6 +4,7 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { ToolbarGroup } from '../UI/Toolbar';
+import { Spacer } from '../UI/Grid';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
@@ -56,40 +57,47 @@ export const Toolbar = ({
   isPropertiesShown,
 }: Props): React.Node => {
   return (
-    <ToolbarGroup lastChild>
-      <IconButton
-        size="small"
-        color="default"
-        onClick={onToggleProperties}
-        selected={isPropertiesShown}
-        tooltip={
-          isPropertiesShown
-            ? t`Close Properties Panel`
-            : t`Open Properties Panel`
-        }
-      >
-        <PropertiesPanelIcon />
-      </IconButton>
-      {isRunning ? (
-        <FlatButton
-          primary
-          onClick={onStopTest}
-          leftIcon={<StopIcon />}
-          label={<Trans>Stop the test</Trans>}
-        />
-      ) : (
-        <RaisedButtonWithSplitMenu
-          primary
-          onClick={() => onRunTest({ speedFactor: null })}
-          icon={<PlayIcon />}
-          label={<Trans>Run the test</Trans>}
-          disabled={!canRun}
-          buildMenuTemplate={(i18n: I18nType) =>
-            buildRunTestSpeedMenuTemplate(i18n, onRunTest)
+    <>
+      {/* Centered in the toolbar, like the preview button of the other editors. */}
+      <ToolbarGroup>
+        <Spacer />
+        {isRunning ? (
+          <FlatButton
+            primary
+            onClick={onStopTest}
+            leftIcon={<StopIcon />}
+            label={<Trans>Stop the test</Trans>}
+          />
+        ) : (
+          <RaisedButtonWithSplitMenu
+            primary
+            onClick={() => onRunTest({ speedFactor: null })}
+            icon={<PlayIcon />}
+            label={<Trans>Run the test</Trans>}
+            disabled={!canRun}
+            buildMenuTemplate={(i18n: I18nType) =>
+              buildRunTestSpeedMenuTemplate(i18n, onRunTest)
+            }
+          />
+        )}
+        <Spacer />
+      </ToolbarGroup>
+      <ToolbarGroup lastChild>
+        <IconButton
+          size="small"
+          color="default"
+          onClick={onToggleProperties}
+          selected={isPropertiesShown}
+          tooltip={
+            isPropertiesShown
+              ? t`Close Properties Panel`
+              : t`Open Properties Panel`
           }
-        />
-      )}
-    </ToolbarGroup>
+        >
+          <PropertiesPanelIcon />
+        </IconButton>
+      </ToolbarGroup>
+    </>
   );
 };
 

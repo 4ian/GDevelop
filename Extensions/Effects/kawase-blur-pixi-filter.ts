@@ -9,7 +9,11 @@ namespace gdjs {
     'KawaseBlur',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(target: EffectsTarget, effectData) {
-        const kawaseBlurFilter = new PIXI.filters.KawaseBlurFilter();
+        // Clamp the texture coordinates, so that the blur never reads the empty
+        // area that PixiJS can leave around what is rendered (which would show
+        // up as a seam on the right and bottom edges).
+        const clamp = true;
+        const kawaseBlurFilter = new PIXI.filters.KawaseBlurFilter(4, 3, clamp);
         return kawaseBlurFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}

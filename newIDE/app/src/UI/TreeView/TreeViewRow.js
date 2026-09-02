@@ -21,6 +21,8 @@ import { useLongTouch } from '../../Utils/UseLongTouch';
 import { useDragDropManager } from 'react-dnd';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
+import { LONG_PRESS_DELAY_ON_HELD_ITEM } from '../DragAndDrop/TouchDragDelay';
+import HoldForMenuProgress from '../DragAndDrop/HoldForMenuProgress';
 import classNames from 'classnames';
 import { TreeViewRightPrimaryButton } from './TreeViewRightPrimaryButton';
 
@@ -28,7 +30,6 @@ import { TreeViewRightPrimaryButton } from './TreeViewRightPrimaryButton';
 const stopPropagation = e => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
-const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 600;
 export const TREE_VIEW_ROW_HEIGHT = 32;
 const COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT = 6;
 
@@ -188,7 +189,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
   const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
     openContextMenu,
     {
-      delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
+      delay: LONG_PRESS_DELAY_ON_HELD_ITEM,
     }
   );
 
@@ -388,6 +389,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
           connectDragPreview,
           isOver,
           canDrop,
+          isReadyToDrag,
         }) => {
           setIsStayingOver(isOver, canDrop);
 
@@ -606,6 +608,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                 dropIndicatorClassName,
                 {
                   [classes.selected]: node.selected,
+                  [classes.readyToDrag]: isReadyToDrag,
                 }
               )}
               aria-selected={node.selected}
@@ -613,6 +616,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
               {...dataObjectToProps(node.dataset)}
             >
               {dragSource}
+              {isReadyToDrag && <HoldForMenuProgress />}
             </div>
           );
 

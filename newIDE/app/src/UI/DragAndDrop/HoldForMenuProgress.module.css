@@ -1,0 +1,34 @@
+/* A translucent circle growing from the finger until it covers the held
+ * item, showing that keeping the finger pressed will open the context menu
+ * when it is full (like the ripple of a long press on Android). */
+.container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: var(--theme-drop-indicator-can-drop-color);
+  opacity: 0.25;
+  transform: translate(-50%, -50%) scale(0);
+  animation-name: grow;
+  animation-timing-function: linear;
+  /* Invisible (scale 0) during the delay, full at the end. */
+  animation-fill-mode: both;
+}
+
+@keyframes grow {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}

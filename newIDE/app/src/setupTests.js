@@ -12,6 +12,18 @@
 // * We use a convoluted name to avoid it being imported by mistake in the
 // rest of the codebase. See scripts/import-libGD.js
 const initializeGDevelopJs = require('libGD.js-for-tests-only');
+const fs = require('fs');
+const path = require('path');
+
+// Give the wasm binary directly to libGD.js: in a test using the jsdom
+// environment, it would otherwise try to fetch it with an XMLHttpRequest
+// (which fails and logs an error) before falling back to the filesystem.
+const wasmBinary = fs.readFileSync(
+  path.join(
+    path.dirname(require.resolve('libGD.js-for-tests-only')),
+    'libGD.wasm'
+  )
+);
 
 // We create the global "gd" object **synchronously** here. This is done as
 // the source files are using `global.gd` as a "top level" object (after imports).
@@ -22,7 +34,7 @@ global.gd = {
 };
 
 beforeAll(done => {
-  initializeGDevelopJs().then(module => {
+  initializeGDevelopJs({ wasmBinary }).then(module => {
     // We're **updating** the global "gd" object here. This is done so that
     // the source files that are using `global.gd` have the proper reference to the
     // object.

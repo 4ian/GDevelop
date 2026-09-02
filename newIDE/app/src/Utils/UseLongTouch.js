@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { hapticFeedback, hapticPatterns } from './Haptic';
 
 export type ClientCoordinates = {|
   /* The X position, relative to the viewport, not including scroll offset, of the long touch */
@@ -26,6 +27,9 @@ const getClientXY = (event: TouchEvent): ClientCoordinates => {
   };
 };
 
+// Long press opening a context menu. Items that must be held before being
+// dragged use a longer delay (see LONG_PRESS_DELAY_ON_HELD_ITEM), as the
+// hold has an intermediate state (the item lifts) to notice first.
 const defaultDelay = 600; // ms
 const moveTolerance = 10; // px
 
@@ -120,6 +124,9 @@ export const useLongTouch = (
         // menu swallows the touchend and `clear` would never run.
         if (context) delete contextLocks[context];
         longTouchFired.current = true;
+        if (hapticFeedback) {
+          hapticFeedback({ pattern: hapticPatterns.longPress });
+        }
         callback(clientCoordinates);
       }, delay);
     },

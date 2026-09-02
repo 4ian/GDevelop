@@ -40,11 +40,19 @@ type Props = {|
   selected?: boolean,
   onSelect?: (checked: boolean) => void,
   onContextMenu?: (x: number, y: number) => void,
+  /** The delay of the long press opening the context menu. */
+  longTouchDelay?: number,
   size?: number,
 |};
 
 const ImageThumbnail = (props: Props): React.MixedElement => {
-  const { onContextMenu, resourcesLoader, resourceName, project } = props;
+  const {
+    onContextMenu,
+    longTouchDelay,
+    resourcesLoader,
+    resourceName,
+    project,
+  } = props;
   const theme = React.useContext(GDevelopThemeContext);
   const [error, setError] = React.useState(false);
 
@@ -55,7 +63,8 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
         if (onContextMenu) onContextMenu(event.clientX, event.clientY);
       },
       [onContextMenu]
-    )
+    ),
+    { delay: longTouchDelay }
   );
 
   const normalBorderColor = theme.imagePreview.borderColor;

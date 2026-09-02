@@ -134,7 +134,7 @@ export type ServerAddress = {
 /** Interface to run a debugger server for previews. */
 export interface PreviewDebuggerServer {
   startServer({ origin?: string }): Promise<void>;
-  getServerState(): 'started' | 'stopped';
+  getServerState(): 'started' | 'starting' | 'stopped';
   getExistingDebuggerIds(): Array<DebuggerId>;
   getExistingEmbeddedGameFrameDebuggerIds(): Array<DebuggerId>;
   getExistingPreviewDebuggerIds(): Array<DebuggerId>;

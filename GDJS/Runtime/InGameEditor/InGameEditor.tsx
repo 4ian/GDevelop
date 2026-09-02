@@ -2710,7 +2710,8 @@ namespace gdjs {
           this._editorGrid.setTreeScene(threeScene);
         }
         this._editorGrid.setVisible(
-          this._transformControlsMode === 'translate'
+          this._transformControlsMode === 'translate' ||
+            this._transformControlsMode === 'scale'
         );
       }
     }

@@ -591,6 +591,22 @@ namespace gdjs {
   const snap = (value: float, size: float, offset: float) =>
     size ? offset + size * Math.round((value - offset) / size) : value;
 
+  /**
+   * Convert a scale ratio to the ratio giving a size whose far edge
+   * (origin + size) is on the grid. The size is kept at least 1.
+   */
+  const getScaleSnappedOnGrid = (
+    origin: float,
+    initialSize: float,
+    scale: float,
+    snapPosition: (position: float) => float
+  ): float => {
+    if (initialSize <= 0) return scale;
+    const snappedEdge = snapPosition(origin + initialSize * Math.abs(scale));
+    const snappedSize = Math.max(1, snappedEdge - origin);
+    return snappedSize / initialSize;
+  };
+
   class Selection {
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
 
@@ -2424,6 +2440,9 @@ namespace gdjs {
             let initialObjectX = 0;
             let initialObjectY = 0;
             let initialObjectZ = 0;
+            let initialObjectWidth = 0;
+            let initialObjectHeight = 0;
+            let initialObjectDepth = 0;
             const initialDummyPosition = new THREE.Vector3();
             const initialDummyRotation = new THREE.Euler();
             const initialDummyScale = new THREE.Vector3();
@@ -2442,6 +2461,11 @@ namespace gdjs {
                 initialObjectY = lastEditableSelectedObject.getY();
                 initialObjectZ = is3D(lastEditableSelectedObject)
                   ? lastEditableSelectedObject.getZ()
+                  : 0;
+                initialObjectWidth = lastEditableSelectedObject.getWidth();
+                initialObjectHeight = lastEditableSelectedObject.getHeight();
+                initialObjectDepth = is3D(lastEditableSelectedObject)
+                  ? lastEditableSelectedObject.getDepth()
                   : 0;
                 initialDummyPosition.copy(dummyThreeObject.position);
                 initialDummyRotation.copy(dummyThreeObject.rotation);
@@ -2522,6 +2546,71 @@ namespace gdjs {
                 threeTransformControls.axis.length === 1
                   ? 1
                   : 0.2;
+              let scaleX =
+                1 +
+                (dummyThreeObject.scale.x / initialDummyScale.x - 1) *
+                  scaleDamping;
+              let scaleY =
+                1 +
+                (dummyThreeObject.scale.y / initialDummyScale.y - 1) *
+                  scaleDamping;
+              let scaleZ =
+                1 +
+                (dummyThreeObject.scale.z / initialDummyScale.z - 1) *
+                  scaleDamping;
+              if (
+                this._transformControlsMode === 'scale' &&
+                threeTransformControls.axis &&
+                this._editorGrid.isSpanningEnabled(inputManager)
+              ) {
+                // The scale gizmo is anchored on the object origin, so snap the
+                // opposite edge on the grid (like the 2D editor resize handles).
+                const getSnappedScaleX = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectX,
+                    initialObjectWidth,
+                    scaleX,
+                    (x) => this._editorGrid.getSnappedX(x)
+                  );
+                const getSnappedScaleY = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectY,
+                    initialObjectHeight,
+                    scaleY,
+                    (y) => this._editorGrid.getSnappedY(y)
+                  );
+                const getSnappedScaleZ = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectZ,
+                    initialObjectDepth,
+                    scaleZ,
+                    (z) => this._editorGrid.getSnappedZ(z)
+                  );
+                if (threeTransformControls.axis === 'XYZ') {
+                  // Uniform scaling: like the 2D proportional resize, snap the
+                  // biggest side and apply the same ratio to the others.
+                  const uniformScale =
+                    initialObjectWidth >= initialObjectHeight &&
+                    initialObjectWidth >= initialObjectDepth
+                      ? getSnappedScaleX()
+                      : initialObjectHeight >= initialObjectDepth
+                        ? getSnappedScaleY()
+                        : getSnappedScaleZ();
+                  scaleX = uniformScale;
+                  scaleY = uniformScale;
+                  scaleZ = uniformScale;
+                } else {
+                  if (threeTransformControls.axis.includes('X')) {
+                    scaleX = getSnappedScaleX();
+                  }
+                  if (threeTransformControls.axis.includes('Y')) {
+                    scaleY = getSnappedScaleY();
+                  }
+                  if (threeTransformControls.axis.includes('Z')) {
+                    scaleZ = getSnappedScaleZ();
+                  }
+                }
+              }
               this._selectionControlsMovementTotalDelta = {
                 translationX,
                 translationY,
@@ -2535,18 +2624,9 @@ namespace gdjs {
                 rotationZ: -gdjs.toDegrees(
                   dummyThreeObject.rotation.z - initialDummyRotation.z
                 ),
-                scaleX:
-                  1 +
-                  (dummyThreeObject.scale.x / initialDummyScale.x - 1) *
-                    scaleDamping,
-                scaleY:
-                  1 +
-                  (dummyThreeObject.scale.y / initialDummyScale.y - 1) *
-                    scaleDamping,
-                scaleZ:
-                  1 +
-                  (dummyThreeObject.scale.z / initialDummyScale.z - 1) *
-                    scaleDamping,
+                scaleX,
+                scaleY,
+                scaleZ,
               };
 
               this._hasSelectionActuallyMoved =
@@ -2630,7 +2710,8 @@ namespace gdjs {
           this._editorGrid.setTreeScene(threeScene);
         }
         this._editorGrid.setVisible(
-          this._transformControlsMode === 'translate'
+          this._transformControlsMode === 'translate' ||
+            this._transformControlsMode === 'scale'
         );
       }
     }
@@ -4152,8 +4233,8 @@ namespace gdjs {
     }
 
     getSnappedZ(z: float): float {
-      const { gridDepth, gridOffsetY } = this;
-      return snap(z, gridDepth || 0, gridOffsetY);
+      const { gridDepth, gridOffsetZ } = this;
+      return snap(z, gridDepth || 0, gridOffsetZ);
     }
 
     isSpanningEnabled(

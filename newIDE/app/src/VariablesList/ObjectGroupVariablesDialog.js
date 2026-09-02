@@ -92,16 +92,16 @@ const ObjectGroupVariablesDialog = ({
   );
 
   const apply = async () => {
-    onApply(
+    const selectedVariableName =
       lastSelectedVariableNodeId.current &&
-        getVariablePathFromNodeId(
-          lastSelectedVariableNodeId.current,
-          groupVariablesContainer
-        )
-    );
+      getVariablePathFromNodeId(
+        lastSelectedVariableNodeId.current,
+        groupVariablesContainer
+      );
     if (!initialInstances) {
       // This can only happens for legacy function object groups.
       // In this case, we don't do any refactoring.
+      onApply(selectedVariableName);
       return;
     }
 
@@ -131,6 +131,9 @@ const ObjectGroupVariablesDialog = ({
         );
       }
     }
+    // Notify only once the variables are copied to the objects of the group,
+    // so that the caller can read them (for example to refresh autocompletions).
+    onApply(selectedVariableName);
   };
 
   const lastSelectedVariableNodeId = React.useRef<string | null>(null);

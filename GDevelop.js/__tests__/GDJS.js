@@ -34,6 +34,7 @@ describe('libGD.js - GDJS related tests', function () {
   <platform name="ios">
 <!-- GDJS_ICONS_IOS -->
   </platform>
+<!-- GDJS_ORIENTATION -->
 <!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->
 </widget>`;
     const fakePackageJsonContent = `
@@ -133,6 +134,7 @@ describe('libGD.js - GDJS related tests', function () {
   <platform name="ios">
 
   </platform>
+<preference name="Orientation" value="landscape" />
 
 </widget>`
       );
@@ -146,6 +148,42 @@ describe('libGD.js - GDJS related tests', function () {
   \"description\": \"My great project with spaces and \\\"quotes\\\" and (parentheses)!\",
   \"author\": \"\"
 }`
+      );
+    });
+    it('does not declare an orientation in Cordova config.xml for the default orientation', () => {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.setName('My game');
+      project.setVersion('1.2.3');
+      project.setOrientation('default');
+
+      var fs = makeFakeAbstractFileSystem(gd, {
+        '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
+        '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': '',
+      });
+
+      const exporter = new gd.Exporter(fs, '/fake-gdjs-root');
+      const exportOptions = new gd.ExportOptions(project, '/fake-export-dir');
+      exportOptions.setTarget('cordova');
+      expect(exporter.exportWholePixiProject(exportOptions)).toBe(true);
+      exportOptions.delete();
+      exporter.delete();
+
+      expect(fs.writeToFile).toHaveBeenCalledWith(
+        '/fake-export-dir/config.xml',
+        `
+<widget id="com.example.gamename" version="1.2.3">
+  <name>My game</name>
+  <platform name="android">
+
+  </platform>
+  <platform name="ios">
+
+  </platform>
+
+
+</widget>`
       );
     });
     it('properly exports Cordova plugins config if required by an extension', () => {
@@ -191,6 +229,7 @@ describe('libGD.js - GDJS related tests', function () {
   <platform name="ios">
 
   </platform>
+<preference name="Orientation" value="landscape" />
 <plugin name=\"gdevelop-cordova-admob-plus\" spec=\"0.43.0\">
     <variable name=\"APP_ID_ANDROID\" value=\"my android app id\" />
 </plugin>

@@ -56,6 +56,8 @@
 
     <preference name="BackgroundColor" value="0xff000000" />
 
+    <!-- GDJS_ORIENTATION -->
+
     <!-- Android Fullscreen -->
     <preference name="Fullscreen" value="true" />
 

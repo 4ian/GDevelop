@@ -867,6 +867,20 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
         .FindAndReplace("*", "");
   };
 
+  auto makeOrientationPreference = [&project]() {
+    const gd::String &orientation = project.GetOrientation();
+    if (orientation != "landscape" && orientation != "portrait") {
+      return gd::String("");
+    }
+
+    // Declare the orientation at build time so that the native app only
+    // supports it. This is required on iPad: an app declaring support for all
+    // orientations is a "multitasking" app, for which iOS ignores any
+    // orientation lock requested at runtime.
+    return "<preference name=\"Orientation\" value=\"" + orientation +
+           "\" />";
+  };
+
   gd::String str =
       fs.ReadFile(gdjsRoot + "/Runtime/Cordova/config.xml")
           .FindAndReplace("GDJS_PROJECTNAME",
@@ -877,7 +891,9 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
               gd::Serializer::ToEscapedXMLString(project.GetPackageName()))
           .FindAndReplace("GDJS_PROJECTVERSION", project.GetVersion())
           .FindAndReplace("<!-- GDJS_ICONS_ANDROID -->", makeIconsAndroid())
-          .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos());
+          .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos())
+          .FindAndReplace("<!-- GDJS_ORIENTATION -->",
+                          makeOrientationPreference());
 
   gd::String plugins = "";
   auto dependenciesAndExtensions =

@@ -46,8 +46,10 @@
 
         <preference name="SwiftVersion" value="5.3" />
 
-        <!-- Required by admob-plus plugin > version 2 -->
-        <preference name="deployment-target" value="13.0" />
+        <!-- Apple requires a minimum OS version of 15.0 for App Store uploads
+        (ITMS-90068, enforced from Spring 2027) and Xcode 27 refuses to build
+        anything lower. -->
+        <preference name="deployment-target" value="15.0" />
 
         <!-- GDJS_ICONS_IOS -->
     </platform>

@@ -12,11 +12,24 @@ namespace gdjs {
     lc: number;
     sc: number;
   }
+  /**
+   * `PIXI.filters.BevelFilter` reads the pixels up to `thickness` pixels away, but
+   * declares a padding of 1. Keep the padding in sync with the thickness, otherwise
+   * the filter reads outside of what PixiJS rendered and a dark line appears on the
+   * edges of the screen.
+   */
+  const updateBevelFilterPadding = function (
+    bevelFilter: PIXI.filters.BevelFilter
+  ) {
+    bevelFilter.padding = Math.max(1, bevelFilter.thickness);
+  };
+
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Bevel',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(target: EffectsTarget, effectData) {
         const bevelFilter = new PIXI.filters.BevelFilter();
+        updateBevelFilterPadding(bevelFilter);
         return bevelFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
@@ -31,6 +44,7 @@ namespace gdjs {
           bevelFilter.rotation = value;
         } else if (parameterName === 'thickness') {
           bevelFilter.thickness = value;
+          updateBevelFilterPadding(bevelFilter);
         } else if (parameterName === 'distance') {
           bevelFilter.distance = value;
         } else if (parameterName === 'lightAlpha') {
@@ -128,6 +142,7 @@ namespace gdjs {
         bevelFilter.shadowAlpha = data.sa;
         bevelFilter.lightColor = data.lc;
         bevelFilter.shadowColor = data.sc;
+        updateBevelFilterPadding(bevelFilter);
       }
     })()
   );

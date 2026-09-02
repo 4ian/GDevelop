@@ -2480,6 +2480,87 @@ describe('libGD.js', function () {
     });
   });
 
+  describe('gd.ObjectsContainersList', function () {
+    it('lets a scene object group shadow a global object group with the same name', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const globalObject = project
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'GlobalObject', 0);
+      globalObject.addNewBehavior(
+        project,
+        'DraggableBehavior::Draggable',
+        'Draggable'
+      );
+      const globalGroup = project
+        .getObjects()
+        .getObjectGroups()
+        .insertNew('Group', 0);
+      globalGroup.addObject('GlobalObject');
+
+      const layout = project.insertNewLayout('Scene', 0);
+      // A scene group with the same name as the global group, empty for now.
+      const sceneGroup = layout
+        .getObjects()
+        .getObjectGroups()
+        .insertNew('Group', 0);
+
+      const objectsContainersList =
+        gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+          project,
+          layout
+        );
+
+      // The empty scene group is the only one considered: no type, no behaviors.
+      expect(objectsContainersList.getTypeOfObject('Group')).toBe('');
+      expect(
+        objectsContainersList.getBehaviorsOfObject('Group', true).size()
+      ).toBe(0);
+      expect(
+        objectsContainersList.getTypeOfBehaviorInObjectOrGroup(
+          'Group',
+          'Draggable',
+          true
+        )
+      ).toBe('');
+
+      // Once the scene group has an object, only this object is considered.
+      const sceneObject = layout
+        .getObjects()
+        .insertNewObject(project, 'TextObject::Text', 'SceneObject', 0);
+      sceneObject.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+      sceneGroup.addObject('SceneObject');
+
+      expect(objectsContainersList.getTypeOfObject('Group')).toBe(
+        'TextObject::Text'
+      );
+      const behaviors = objectsContainersList
+        .getBehaviorsOfObject('Group', true)
+        .toJSArray();
+      expect(behaviors).toContain('PlatformerObject');
+      expect(behaviors).not.toContain('Draggable');
+      expect(
+        objectsContainersList.getTypeOfBehaviorInObjectOrGroup(
+          'Group',
+          'PlatformerObject',
+          true
+        )
+      ).toBe('PlatformBehavior::PlatformerObjectBehavior');
+      expect(
+        objectsContainersList.getTypeOfBehaviorInObjectOrGroup(
+          'Group',
+          'Draggable',
+          true
+        )
+      ).toBe('');
+
+      project.delete();
+    });
+  });
+
   describe('gd.Instruction', function () {
     it('initial values', function () {
       let instr = new gd.Instruction();

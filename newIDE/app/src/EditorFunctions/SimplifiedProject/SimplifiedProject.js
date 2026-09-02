@@ -263,20 +263,6 @@ export const makeSimplifiedProjectBuilder = (
         .getBehaviorsOfObject(objectGroup.getName(), true)
         .toJSArray();
 
-      const behaviors = behaviorNames
-        .map(behaviorName => ({
-          behaviorName,
-          behaviorType: objectsContainersList.getTypeOfBehaviorInObjectOrGroup(
-            objectGroup.getName(),
-            behaviorName,
-            true
-          ),
-        }))
-        // A behavior without a type can't be used on the group (for example,
-        // the objects of the group have a behavior with the same name but
-        // of different types). Don't list it.
-        .filter(behavior => !!behavior.behaviorType);
-
       const variablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
         objectsContainersList,
         objectGroup
@@ -288,7 +274,17 @@ export const makeSimplifiedProjectBuilder = (
           objectGroup.getName()
         ),
         objectNames: objectGroup.getAllObjectsNames().toJSArray(),
-        behaviors: behaviors.length > 0 ? behaviors : undefined,
+        behaviors:
+          behaviorNames.length > 0
+            ? behaviorNames.map(behaviorName => ({
+                behaviorName,
+                behaviorType: objectsContainersList.getTypeOfBehaviorInObjectOrGroup(
+                  objectGroup.getName(),
+                  behaviorName,
+                  true
+                ),
+              }))
+            : undefined,
         variables:
           variablesContainer.count() > 0
             ? getSimplifiedVariablesContainer(gd, variablesContainer)

@@ -98,10 +98,10 @@ const EditedObjectGroupEditorDialog = ({
   );
 
   const apply = async () => {
-    onApply();
     if (!initialInstances) {
       // This can only happens for legacy function object groups.
       // In this case, we don't do any refactoring.
+      onApply();
       return;
     }
 
@@ -131,6 +131,8 @@ const EditedObjectGroupEditorDialog = ({
         );
       }
     }
+    // Notify only once the variables are copied to the objects of the group.
+    onApply();
   };
 
   const removeObject = React.useCallback(

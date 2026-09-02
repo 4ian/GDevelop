@@ -280,7 +280,6 @@ export type EventsGenerationOptions = {|
   eventBatches: Array<EventBatch> | null,
   extensionNamesList: string,
   objectsList: string,
-  existingEventsAsText: string,
   existingEventsJson: string | null,
   placementHint: string | null,
   relatedAiRequestId: string,
@@ -5734,9 +5733,8 @@ const addSceneEvents: EditorFunction = {
     const scene = project.getLayout(sceneName);
     const currentSceneEvents = scene.getEvents();
 
-    const existingEventsAsText = renderNonTranslatedEventsAsText({
-      eventsList: currentSceneEvents,
-    });
+    // The existing events are sent as JSON only: the generation backend
+    // renders them itself (as a bounded EventScript view) for its model.
     const existingEventsJson =
       toolOptions && toolOptions.includeEventsJson
         ? serializeToJSON(currentSceneEvents)
@@ -5841,7 +5839,6 @@ const addSceneEvents: EditorFunction = {
           eventBatches: parsedEventBatches,
           extensionNamesList,
           objectsList,
-          existingEventsAsText,
           existingEventsJson,
           placementHint,
           relatedAiRequestId,

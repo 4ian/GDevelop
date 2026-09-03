@@ -190,7 +190,7 @@ export class EventsBasedObjectTreeViewItemContent
           .getEventsBasedObjects()
           .insertNew(
             newNameGenerator(this.eventsBasedObject.getName(), name =>
-              eventsBasedObjectsList.has(name)
+              extension.getEventsBasedObjects().has(name)
             ),
             extension.getEventsBasedObjects().getCount()
           );

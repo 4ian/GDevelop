@@ -341,7 +341,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
           .getEventsFunctions()
           .insertNewEventsFunction(
             newNameGenerator(oldEventsFunction.getName(), name =>
-              eventsFunctionsContainer.hasEventsFunctionNamed(name)
+              extension.getEventsFunctions().hasEventsFunctionNamed(name)
             ),
             extension.getEventsFunctions().getEventsFunctionsCount()
           );

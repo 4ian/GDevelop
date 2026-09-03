@@ -183,7 +183,7 @@ export class EventsBasedBehaviorTreeViewItemContent
           .getEventsBasedBehaviors()
           .insertNew(
             newNameGenerator(this.eventsBasedBehavior.getName(), name =>
-              eventsBasedBehaviorsList.has(name)
+              extension.getEventsBasedBehaviors().has(name)
             ),
             extension.getEventsBasedBehaviors().getCount()
           );

@@ -42,6 +42,8 @@ import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExte
 import { makeDragSourceAndDropTarget } from '../../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { makeDropTarget } from '../../../UI/DragAndDrop/DropTarget';
 import { useAutoScrollDuringDrag } from '../../../UI/DragAndDrop/UseAutoScrollDuringDrag';
+import { LONG_PRESS_DELAY_ON_HELD_ITEM } from '../../../UI/DragAndDrop/TouchDragDelay';
+import HoldForMenuProgress from '../../../UI/DragAndDrop/HoldForMenuProgress';
 import { ColumnDropIndicator } from '../../../MainFrame/EditorTabs/DropIndicator';
 import { useDragDropManager } from 'react-dnd';
 
@@ -62,6 +64,14 @@ const styles = {
   },
   spriteDragSource: {
     display: 'flex',
+  },
+  // On touch screens, the sprite held by the finger, ready to be dragged.
+  spriteReadyToDrag: {
+    display: 'flex',
+    position: 'relative',
+    transform: 'scale(1.05)',
+    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.35)',
+    transition: 'transform 100ms ease-out, box-shadow 100ms ease-out',
   },
   // A drop zone to allow moving a sprite at the end of the list. It also
   // grows to fill the empty space after the last sprite, if any.
@@ -85,7 +95,7 @@ type DraggedSpriteItem = {|
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<DraggedSpriteItem>(
   'sprite-editor-sprites-list',
-  { vibrate: 100 }
+  { touchDragStart: 'afterHold' }
 );
 const EndOfListDropTarget = makeDropTarget<DraggedSpriteItem>(
   'sprite-editor-sprites-list'
@@ -700,13 +710,27 @@ const SpritesList = ({
                 canDrop={item => item.directionPtr === direction.ptr}
                 drop={() => dropBeforeSprite(i)}
               >
-                {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
+                {({
+                  connectDragSource,
+                  connectDropTarget,
+                  isOver,
+                  canDrop,
+                  isReadyToDrag,
+                }) =>
                   connectDropTarget(
                     <div style={styles.spriteAndIndicator}>
                       {isOver && canDrop && <ColumnDropIndicator />}
                       {connectDragSource(
-                        <div style={styles.spriteDragSource}>
+                        <div
+                          style={
+                            isReadyToDrag
+                              ? styles.spriteReadyToDrag
+                              : styles.spriteDragSource
+                          }
+                        >
+                          {isReadyToDrag && <HoldForMenuProgress />}
                           <ImageThumbnail
+                            longTouchDelay={LONG_PRESS_DELAY_ON_HELD_ITEM}
                             selectable
                             selected={selectedSpriteIndexes.current.has(i)}
                             onSelect={selected =>

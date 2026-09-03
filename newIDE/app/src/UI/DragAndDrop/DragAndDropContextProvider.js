@@ -1,10 +1,13 @@
 // @flow
 import * as React from 'react';
-import { DndProvider } from 'react-dnd';
+import { DndProvider, useDragDropManager } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
-import { trackTouchGesturesForDrag } from './TouchDragDelay';
+import {
+  trackTouchGesturesForDrag,
+  getCurrentDragSlop,
+} from './TouchDragDelay';
 
-const touchBackendOptions = {
+const makeTouchBackendOptions = (rootElement: ?Document) => ({
   // No delay before a drag can start: a touch move happening during this delay
   // would cancel the drag for the whole gesture, and a finger always moves a
   // bit while pressing. Instead, drags coming from a finger are delayed by
@@ -14,9 +17,45 @@ const touchBackendOptions = {
   // events (fired after touch events) can trigger drags with no delay,
   // making dragging feel instant on Android.
   enableMouseEvents: true,
-  // Android Chrome's long-press synthesizes hover mouse events ~1px off the
-  // touch position - without a slop, every long press starts a phantom drag.
-  touchSlop: 10,
+  // The backend reads the slop at each pointer move: it's larger while a
+  // finger holds an item before dragging it (see TouchDragDelay).
+  get touchSlop(): number {
+    return getCurrentDragSlop();
+  },
+  rootElement,
+});
+
+/**
+ * End the drag in progress when the system interrupts the touch gesture
+ * (a notification, a second finger, the app going to the background...).
+ * react-dnd-touch-backend only listens to touchend: without this, the drag
+ * would stay active and the item be dropped wherever the next gesture ends.
+ */
+const EndDragOnTouchCancel = ({
+  documentToWatch,
+}: {|
+  documentToWatch: Document,
+|}) => {
+  const dragDropManager = useDragDropManager();
+  React.useEffect(
+    () => {
+      const handleTouchCancel = () => {
+        if (dragDropManager.getMonitor().isDragging()) {
+          dragDropManager.getActions().endDrag();
+        }
+      };
+      documentToWatch.addEventListener('touchcancel', handleTouchCancel, true);
+      return () => {
+        documentToWatch.removeEventListener(
+          'touchcancel',
+          handleTouchCancel,
+          true
+        );
+      };
+    },
+    [dragDropManager, documentToWatch]
+  );
+  return null;
 };
 
 type Props = {|
@@ -56,13 +95,7 @@ const DragAndDropContextProvider = ({
   );
 
   const backendOptions = React.useMemo(
-    () =>
-      rootElement
-        ? {
-            ...touchBackendOptions,
-            rootElement,
-          }
-        : touchBackendOptions,
+    () => makeTouchBackendOptions(rootElement),
     [rootElement]
   );
 
@@ -72,6 +105,9 @@ const DragAndDropContextProvider = ({
       options={backendOptions}
       context={backendContext}
     >
+      <EndDragOnTouchCancel
+        documentToWatch={window ? window.document : document}
+      />
       {children}
     </DndProvider>
   );

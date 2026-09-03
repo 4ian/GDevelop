@@ -95,6 +95,15 @@
 .rowContainer:hover:not(.selected) {
   background-color: var(--theme-list-item-hover-background-color);
 }
+/* On touch screens, the row held by the finger, ready to be dragged. */
+.rowContainer.readyToDrag {
+  position: relative;
+  z-index: 1;
+  transform: scale(1.03);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+  background-color: var(--theme-list-item-hover-background-color);
+  transition: transform 100ms ease-out, box-shadow 100ms ease-out;
+}
 
 .itemName,
 .itemDescription,

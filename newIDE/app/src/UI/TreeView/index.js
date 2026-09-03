@@ -677,7 +677,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     () =>
       // $FlowFixMe[underconstrained-implicit-instantiation]
       makeDragSourceAndDropTarget(reactDndType, {
-        vibrate: 100,
+        touchDragStart: 'afterHold',
       }),
     [reactDndType]
   );

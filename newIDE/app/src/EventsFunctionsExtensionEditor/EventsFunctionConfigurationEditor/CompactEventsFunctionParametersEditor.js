@@ -50,7 +50,8 @@ const PARAMETERS_CLIPBOARD_KIND = 'Parameters';
 
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
-  'events-function-parameter-list'
+  'events-function-parameter-list',
+  { touchDragStart: 'immediate' }
 );
 
 const styles = {

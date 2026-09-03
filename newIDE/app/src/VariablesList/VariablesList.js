@@ -94,7 +94,9 @@ import classes from './VariablesList.module.css';
 const gd: libGDevelop = global.gd;
 
 // $FlowFixMe[underconstrained-implicit-instantiation]
-const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor', {
+  touchDragStart: 'immediate',
+});
 
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
   event.stopPropagation();

@@ -13,6 +13,7 @@ import {
   disabledText,
   icon,
   warningInstruction,
+  readyToDrag,
 } from './ClassNames';
 import {
   type InstructionsListContext,
@@ -25,10 +26,9 @@ import InvalidParameterValue from './InvalidParameterValue';
 import DeprecatedParameterValue from './DeprecatedParameterValue';
 import MissingParameterValue from './MissingParameterValue';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
-import {
-  type ScreenType,
-  useScreenType,
-} from '../../UI/Responsive/ScreenTypeMeasurer';
+import { LONG_PRESS_DELAY_ON_HELD_ITEM } from '../../UI/DragAndDrop/TouchDragDelay';
+import HoldForMenuProgress from '../../UI/DragAndDrop/HoldForMenuProgress';
+import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
@@ -64,7 +64,7 @@ export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{
   isCondition: boolean,
-}>(reactDndInstructionType);
+}>(reactDndInstructionType, { touchDragStart: 'afterHold' });
 
 type Props = {|
   platform: gdPlatform,
@@ -417,11 +417,6 @@ const Instruction = (props: Props): React.Node => {
     );
   };
 
-  // Disable drag on touchscreens, because it would interfere with the
-  // scroll, and would create too much mistake/frustration.
-  const screenType = useScreenType();
-  const dragAllowed = screenType !== 'touch';
-
   // Allow a long press to show the context menu
   const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
     React.useCallback(
@@ -430,7 +425,10 @@ const Instruction = (props: Props): React.Node => {
       },
       [onContextMenu]
     ),
-    { context: 'events-tree-event-component' }
+    {
+      context: 'events-tree-event-component',
+      delay: LONG_PRESS_DELAY_ON_HELD_ITEM,
+    }
   );
 
   return (
@@ -446,13 +444,18 @@ const Instruction = (props: Props): React.Node => {
               isCondition,
             };
           }}
-          canDrag={() => dragAllowed}
           canDrop={draggedItem => draggedItem.isCondition === isCondition}
           drop={() => {
             onMoveToInstruction();
           }}
         >
-          {({ connectDragSource, connectDropTarget, isOver, canDrop }) => {
+          {({
+            connectDragSource,
+            connectDropTarget,
+            isOver,
+            canDrop,
+            isReadyToDrag,
+          }) => {
             // /!\ It's important to get the metadata now so that we're sure they
             // are valid.
             // If the metadata is retrieved outside of the closure, it's possible
@@ -484,6 +487,7 @@ const Instruction = (props: Props): React.Node => {
                 className={classNames({
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
+                  [readyToDrag]: isReadyToDrag,
                   [warningInstruction]:
                     showDeprecatedInstructionWarning !== 'no' &&
                     (!isInstructionVisible(scope, metadata) ||
@@ -523,6 +527,7 @@ const Instruction = (props: Props): React.Node => {
                 tabIndex={0}
                 id={id}
               >
+                {isReadyToDrag && <HoldForMenuProgress />}
                 {showDeprecatedInstructionWarning !== 'no' &&
                 metadata.isHidden() ? (
                   <Tooltip

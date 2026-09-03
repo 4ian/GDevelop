@@ -5,6 +5,7 @@ import * as React from 'react';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
+import { LONG_PRESS_DELAY_ON_HELD_ITEM } from './DragAndDrop/TouchDragDelay';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import Cross from './CustomSvgIcons/Cross';
@@ -219,7 +220,9 @@ export function ClosableTab({
         }
       },
       [contextMenu]
-    )
+    ),
+    // Tabs are held before being dragged.
+    { delay: LONG_PRESS_DELAY_ON_HELD_ITEM }
   );
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

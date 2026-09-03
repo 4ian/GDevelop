@@ -59,7 +59,8 @@ const removeExtensionFromFileName = (fileName: string) => {
 
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
-  'sprite-animations-list'
+  'sprite-animations-list',
+  { touchDragStart: 'immediate' }
 );
 
 const styles = {

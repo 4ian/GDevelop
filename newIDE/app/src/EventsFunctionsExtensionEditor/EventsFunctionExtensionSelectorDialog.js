@@ -48,6 +48,9 @@ export default function EventsFunctionExtensionSelectorDialog({
             const extension = project.getEventsFunctionsExtensionAt(
               extensionIndex
             );
+            if (extension.getOriginName() === 'gdevelop-extension-store') {
+              return null;
+            }
 
             return (
               <ListItem

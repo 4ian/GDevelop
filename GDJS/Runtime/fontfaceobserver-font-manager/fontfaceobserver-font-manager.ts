@@ -98,12 +98,13 @@ namespace gdjs {
      */
     private _loadFont(fontFamily: string, src: string): Promise<void> {
       const descriptors = {};
-      const srcWithUrl = 'url(' + encodeURI(src) + ')';
+      const fullUrl = this._resourceLoader.getFullUrl(src);
+      const srcWithUrl = 'url(' + encodeURI(fullUrl) + ')';
 
       // @ts-ignore
       if (typeof FontFace !== 'undefined') {
         // Load the given font using CSS Font Loading API.
-        return fetch(this._resourceLoader.getFullUrl(src), {
+        return fetch(fullUrl, {
           credentials: this._resourceLoader.checkIfCredentialsRequired(src)
             ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
               // i.e: its gdevelop.io cookie, to be passed.

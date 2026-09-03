@@ -103,6 +103,11 @@ namespace gdjs {
         return imagesMap;
       }, {});
 
+      // Note: "atlas" and "spine" resources are never put inside a resource
+      // pack at export (see `ResourcePackPlanner`), because `PIXI.Assets`
+      // decides which loader to use from the extension of the URL, and a
+      // `blob:` URL has none. Only the atlas pages, which are plain images
+      // given to the loader below as already-loaded textures, are packed.
       const url = this._resourceLoader.getFullUrl(resource.file);
       const alias = url;
 

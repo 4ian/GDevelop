@@ -26,6 +26,7 @@ import {
   DoneFooter,
   ExportFlow,
 } from '../GenericExporters/HTML5Export';
+import { packResourcesInBlobFiles } from '../ResourcePacking/BrowserResourcePacker';
 
 const gd: libGDevelop = global.gd;
 
@@ -133,14 +134,27 @@ export const browserHTML5ExportPipeline: ExportPipeline<
     }));
   },
 
-  launchCompression: (
+  launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
   ): Promise<Blob> => {
+    const basePath = '/export/';
+
+    // Gather the resources into a few ".gdpak" archives before zipping, so
+    // that the zip stays below the file count limit of hosting services.
+    const filesToArchive = context.packResources
+      ? await packResourcesInBlobFiles({
+          textFiles,
+          blobFiles,
+          basePath,
+          onProgress: context.updateStepProgress,
+        })
+      : { textFiles, blobFiles };
+
     return archiveFiles({
-      blobFiles,
-      textFiles,
-      basePath: '/export/',
+      blobFiles: filesToArchive.blobFiles,
+      textFiles: filesToArchive.textFiles,
+      basePath,
       onProgress: context.updateStepProgress,
     });
   },

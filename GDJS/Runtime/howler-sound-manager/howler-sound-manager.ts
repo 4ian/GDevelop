@@ -18,6 +18,49 @@ namespace gdjs {
   };
 
   /**
+   * The file extensions Howler knows how to check support for.
+   * See https://github.com/goldfire/howler.js#format-array-
+   */
+  const supportedAudioFormats = [
+    'mp3',
+    'mpeg',
+    'opus',
+    'ogg',
+    'oga',
+    'wav',
+    'aac',
+    'caf',
+    'm4a',
+    'm4b',
+    'mp4',
+    'weba',
+    'webm',
+    'dolby',
+    'flac',
+  ];
+
+  /**
+   * Howler guesses the codec of a sound from the extension of its URL. This
+   * does not work when the game resources were packed at export: the sound is
+   * then read from a `blob:` URL, which has no extension. Tell Howler the
+   * format explicitly, using the name the resource file had.
+   */
+  const getAudioFormats = (file: string): Array<string> | undefined => {
+    const lastDotIndex = file.lastIndexOf('.');
+    if (lastDotIndex === -1) return undefined;
+
+    const extension = file
+      .slice(lastDotIndex + 1)
+      .toLowerCase()
+      // A resource file can keep a search parameter when it comes from a URL.
+      .replace(/[?#].*$/, '');
+
+    return supportedAudioFormats.indexOf(extension) === -1
+      ? undefined
+      : [extension];
+  };
+
+  /**
    * Ensure the volume is between 0 and 1.
    */
   const clampVolume = (volume: float): float => {
@@ -656,6 +699,7 @@ namespace gdjs {
         container[file] = new Howl(
           Object.assign({}, HowlParameters, {
             src: this._getSoundUrlsFromResource(resource),
+            format: getAudioFormats(resource.file),
             onload: resolve,
             onloaderror: (soundId: number, error?: string) => reject(error),
             html5: isMusic,
@@ -751,6 +795,7 @@ namespace gdjs {
           Object.assign(
             {
               src: this._getSoundUrlsFromResource(resource),
+              format: getAudioFormats(resource.file),
               html5: isMusic,
               xhr: {
                 withCredentials:
@@ -790,6 +835,7 @@ namespace gdjs {
           Object.assign(
             {
               src: this._getSoundUrlsFromResource(resource),
+              format: getAudioFormats(resource.file),
               html5: isMusic,
               xhr: {
                 withCredentials:
@@ -1104,13 +1150,16 @@ namespace gdjs {
           throw error;
         }
       } else if (
-        resource.preloadInCache ||
-        // Force downloading of sounds.
-        // TODO Decide if sounds should be allowed to be downloaded after the scene starts.
-        // - they should be requested automatically at the end of the scene loading
-        // - they will be downloaded while the scene is playing
-        // - other scenes will be pre-loaded only when all the sounds for the current scene are in cache
-        !resource.preloadAsMusic
+        // A file read from a resource pack is already in memory: requesting it
+        // to put it in the browser cache would only copy it for nothing.
+        !this._resourceLoader.isFileInResourcePack(resource.file) &&
+        (resource.preloadInCache ||
+          // Force downloading of sounds.
+          // TODO Decide if sounds should be allowed to be downloaded after the scene starts.
+          // - they should be requested automatically at the end of the scene loading
+          // - they will be downloaded while the scene is playing
+          // - other scenes will be pre-loaded only when all the sounds for the current scene are in cache
+          !resource.preloadAsMusic)
       ) {
         // preloading as sound already does a XHR request, hence "else if"
         try {
@@ -1124,7 +1173,9 @@ namespace gdjs {
                 resolve(undefined);
               } else {
                 reject(
-                  `HTTP error while preloading audio file in cache. Status is ${sound.status}.`
+                  `HTTP error while preloading audio file in cache. Status is ${
+                    sound.status
+                  }.`
                 );
               }
             });

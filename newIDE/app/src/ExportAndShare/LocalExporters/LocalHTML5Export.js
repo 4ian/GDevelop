@@ -20,6 +20,7 @@ import {
   ExportFlow,
 } from '../GenericExporters/HTML5Export';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { packResourcesInFolder } from '../ResourcePacking/LocalResourcePacker';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
 // It's important to use remote and not electron for folder actions,
@@ -163,11 +164,21 @@ export const localHTML5ExportPipeline: ExportPipeline<
     return null;
   },
 
-  launchCompression: (
+  launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     exportOutput: ResourcesDownloadOutput
   ): Promise<CompressionOutput> => {
-    return Promise.resolve(null);
+    // The export is a folder, so there is nothing to compress. This is where
+    // the resources are gathered into a few ".gdpak" archives instead, now
+    // that the ones stored as URLs have been downloaded.
+    if (context.packResources) {
+      await packResourcesInFolder({
+        exportDir: context.exportState.outputDir,
+        onProgress: context.updateStepProgress,
+      });
+    }
+
+    return null;
   },
 
   renderDoneFooter: ({ exportState }) => {

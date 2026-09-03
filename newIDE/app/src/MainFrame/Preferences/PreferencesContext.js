@@ -240,6 +240,11 @@ export type PreferencesValues = {|
   newProjectsDefaultStorageProviderName: string,
   useShortcutToClosePreviewWindow: boolean,
   watchProjectFolderFilesForLocalProjects: boolean,
+  /**
+   * Gather the resources of exported games into a few ".gdpak" archives, so
+   * that they stay below the file count limits of hosting services.
+   */
+  packResourcesAtExport: boolean,
   newFeaturesAcknowledgements: {
     [featureId: string]: {| dates: [number] |},
   },
@@ -362,6 +367,7 @@ export type Preferences = {|
   setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
   setUseShortcutToClosePreviewWindow: (enabled: boolean) => void,
   setWatchProjectFolderFilesForLocalProjects: (enabled: boolean) => void,
+  setPackResourcesAtExport: (enabled: boolean) => void,
   setNewFeaturesAcknowledgements: ({
     [featureId: string]: {| dates: [number] |},
   }) => void,
@@ -444,6 +450,7 @@ export const initialPreferences = {
     newProjectsDefaultStorageProviderName: 'Cloud',
     useShortcutToClosePreviewWindow: true,
     watchProjectFolderFilesForLocalProjects: true,
+    packResourcesAtExport: true,
     newFeaturesAcknowledgements: {},
     displaySaveReminder: { activated: true },
     editorStateByProject: {},
@@ -532,6 +539,7 @@ export const initialPreferences = {
   setNewProjectsDefaultStorageProviderName: () => {},
   setUseShortcutToClosePreviewWindow: () => {},
   setWatchProjectFolderFilesForLocalProjects: () => {},
+  setPackResourcesAtExport: () => {},
   setNewFeaturesAcknowledgements: () => {},
   setDisplaySaveReminder: () => {},
   getEditorStateForProject: (projectId: any): any => {},

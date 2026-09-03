@@ -11,6 +11,7 @@ import {
   downloadUrlFilesToBlobFiles,
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
+import { packResourcesInBlobFiles } from '../ResourcePacking/BrowserResourcePacker';
 import {
   type ExportFlowProps,
   type ExportPipeline,
@@ -135,14 +136,27 @@ export const browserElectronExportPipeline: ExportPipeline<
     }));
   },
 
-  launchCompression: (
+  launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
   ): Promise<Blob> => {
+    const basePath = '/export/';
+
+    // Gather the resources into a few ".gdpak" archives before zipping, so
+    // that the archive holds a few files rather than one per resource.
+    const filesToArchive = context.packResources
+      ? await packResourcesInBlobFiles({
+          textFiles,
+          blobFiles,
+          basePath: basePath + 'app/',
+          onProgress: context.updateStepProgress,
+        })
+      : { textFiles, blobFiles };
+
     return archiveFiles({
-      blobFiles,
-      textFiles,
-      basePath: '/export/',
+      blobFiles: filesToArchive.blobFiles,
+      textFiles: filesToArchive.textFiles,
+      basePath,
       onProgress: context.updateStepProgress,
     });
   },

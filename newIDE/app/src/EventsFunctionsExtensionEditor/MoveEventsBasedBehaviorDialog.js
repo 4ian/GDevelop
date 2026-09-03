@@ -9,7 +9,7 @@ type Props = {|
   onChoose: (destinationExtensionName: string) => void,
 |};
 
-export default function EventsBasedObjectSelectorDialog({
+export default function MoveEventsBasedBehaviorDialog({
   project,
   onChoose,
   onCancel,

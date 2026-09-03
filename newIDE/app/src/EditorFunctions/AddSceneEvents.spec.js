@@ -138,7 +138,6 @@ describe('add_scene_events', () => {
     eventsDescription: 'Some events',
     extensionNamesList: '',
     objectsList: 'Player',
-    existingEventsAsText: '',
     existingEventsJson: null,
     existingEventsJsonUserRelativeKey: null,
     resultMessage: 'Successfully added events.',

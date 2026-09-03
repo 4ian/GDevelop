@@ -204,7 +204,6 @@ export class EventsBasedObjectTreeViewItemContent
         const newExtensionName = extension.getName();
         const oldObjectName = this.eventsBasedObject.getName();
         const newObjectName = eventsBasedObject.getName();
-        eventsBasedObject.getName();
         gd.WholeProjectRefactorer.moveEventsBasedObject(
           project,
           this.props.eventsFunctionsExtension,

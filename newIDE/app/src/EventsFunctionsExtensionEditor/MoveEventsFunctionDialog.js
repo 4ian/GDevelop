@@ -20,9 +20,7 @@ export default function MoveEventsBasedObjectDialog({
     <EventsFunctionExtensionSelectorDialog
       project={project}
       message={
-        <Trans>
-          Choose the extension where the custom object should be moved.
-        </Trans>
+        <Trans>Choose the extension where the function should be moved.</Trans>
       }
       onCancel={onCancel}
       onChoose={onChoose}

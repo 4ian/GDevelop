@@ -550,6 +550,19 @@ void WholeProjectRefactorer::RenameEventsFunction(
     gd::Project &project,
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::String &oldFunctionName, const gd::String &newFunctionName) {
+  WholeProjectRefactorer::MoveEventsFunction(
+    project,
+    eventsFunctionsExtension,
+    eventsFunctionsExtension.GetName(),
+    eventsFunctionsExtension.GetName(),
+    oldFunctionName, newFunctionName);
+}
+
+void WholeProjectRefactorer::MoveEventsFunction(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::String &oldExtensionName, const gd::String &newExtensionName,
+    const gd::String &oldFunctionName, const gd::String &newFunctionName) {
   const auto &eventsFunctions = eventsFunctionsExtension.GetEventsFunctions();
   if (!eventsFunctions.HasEventsFunctionNamed(oldFunctionName))
     return;
@@ -561,9 +574,9 @@ void WholeProjectRefactorer::RenameEventsFunction(
   DoRenameEventsFunction(
       project, eventsFunction,
       gd::PlatformExtension::GetEventsFunctionFullType(
-          eventsFunctionsExtension.GetName(), oldFunctionName),
+          oldExtensionName, oldFunctionName),
       gd::PlatformExtension::GetEventsFunctionFullType(
-          eventsFunctionsExtension.GetName(), newFunctionName),
+          newExtensionName, newFunctionName),
       wholeProjectExposer);
 
   if (eventsFunction.GetFunctionType() ==

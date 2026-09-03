@@ -826,6 +826,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_UpdateExtensionNameInEventsBasedObject \
   UpdateExtensionNameInEventsBasedObject
 #define STATIC_RenameEventsFunction RenameEventsFunction
+#define STATIC_MoveEventsFunction MoveEventsFunction
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
 #define STATIC_RenameObjectEventsFunction RenameObjectEventsFunction
 #define STATIC_RenameParameter RenameParameter

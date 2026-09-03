@@ -197,7 +197,6 @@ export class EventsBasedBehaviorTreeViewItemContent
         const newExtensionName = extension.getName();
         const oldObjectName = this.eventsBasedBehavior.getName();
         const newObjectName = eventsBasedBehavior.getName();
-        eventsBasedBehavior.getName();
         gd.WholeProjectRefactorer.moveEventsBasedBehavior(
           project,
           this.props.eventsFunctionsExtension,

@@ -720,6 +720,8 @@ const EventsFunctionsList = React.forwardRef<
       moveEventsBasedObjectTo,
       moveEventsBasedBehaviorTo,
       onEventsBasedBehaviorMoved,
+      moveEventsFunctionTo,
+      onEventsFunctionMoved,
     }: Props,
     ref
   ) => {
@@ -1293,6 +1295,8 @@ const EventsFunctionsList = React.forwardRef<
         onEventsFunctionAdded,
         addFolder,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+        moveEventsFunctionTo,
+        onEventsFunctionMoved,
       }),
       [
         treeItemProps,
@@ -1303,6 +1307,8 @@ const EventsFunctionsList = React.forwardRef<
         onEventsFunctionAdded,
         addFolder,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+        moveEventsFunctionTo,
+        onEventsFunctionMoved,
       ]
     );
 

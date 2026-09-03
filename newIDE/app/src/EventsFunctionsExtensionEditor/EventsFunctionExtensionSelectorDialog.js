@@ -14,6 +14,7 @@ type Props = {|
   message: React.Node,
   onCancel: () => void,
   onChoose: (destinationExtensionName: string) => void,
+  excludedExtensionName: string,
 |};
 
 export default function EventsFunctionExtensionSelectorDialog({
@@ -21,6 +22,7 @@ export default function EventsFunctionExtensionSelectorDialog({
   message,
   onChoose,
   onCancel,
+  excludedExtensionName,
 }: Props): React.Node {
   return (
     <Dialog
@@ -62,6 +64,7 @@ export default function EventsFunctionExtensionSelectorDialog({
                 }
                 primaryText={extension.getName()}
                 onClick={() => onChoose(extension.getName())}
+                disabled={extension.getName() === excludedExtensionName}
               />
             );
           }

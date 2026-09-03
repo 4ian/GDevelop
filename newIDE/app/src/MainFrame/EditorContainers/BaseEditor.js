@@ -96,10 +96,7 @@ export type RenderEditorContainerProps = {|
     |}
   ) => void,
   onOpenEvents: (sceneName: string) => void,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   onOpenCustomObjectEditor: (
     gdEventsFunctionsExtension,
     gdEventsBasedObject,
@@ -156,6 +153,12 @@ export type RenderEditorContainerProps = {|
     newExtensionName: string,
     oldBehaviorName: string,
     newBehaviorName: string
+  ) => void,
+  onEventsFunctionMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldFunctionName: string,
+    newFunctionName: string
   ) => void,
 
   // Project opening

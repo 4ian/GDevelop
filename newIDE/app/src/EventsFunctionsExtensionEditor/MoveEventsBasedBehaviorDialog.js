@@ -7,12 +7,14 @@ type Props = {|
   project: gdProject,
   onCancel: () => void,
   onChoose: (destinationExtensionName: string) => void,
+  excludedExtensionName: string,
 |};
 
 export default function MoveEventsBasedBehaviorDialog({
   project,
   onChoose,
   onCancel,
+  excludedExtensionName,
 }: Props): React.Node {
   return (
     <EventsFunctionExtensionSelectorDialog
@@ -24,6 +26,7 @@ export default function MoveEventsBasedBehaviorDialog({
       }
       onCancel={onCancel}
       onChoose={onChoose}
+      excludedExtensionName={excludedExtensionName}
     />
   );
 }

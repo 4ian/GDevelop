@@ -168,6 +168,19 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newFunctionName);
 
   /**
+   * \brief Refactor the project **before** an events function is moved.
+   *
+   * \warning Do move the specified function after calling this.
+   * This is because the function is expected to have its old name for the
+   * refactoring.
+   */
+  static void MoveEventsFunction(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName, const gd::String &newExtensionName,
+      const gd::String &oldFunctionName, const gd::String &newFunctionName);
+
+  /**
    * \brief Refactor the project **before** an events function of a behavior is
    * renamed.
    *

@@ -3056,6 +3056,223 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
+  // TODO: Check that this works when behaviors are attached to a child-object.
+  SECTION("Events based behavior renamed (other behaviors properties update)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
+
+    // Set up another events based behavior having a "required behavior"
+    // property referring to the behavior.
+    auto &otherEventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
+    auto &otherEventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew(
+            "MyOtherEventsBasedBehavior");
+    auto &otherEventsBasedBehaviorFirstProperty =
+        otherEventsBasedBehavior.GetPropertyDescriptors()
+            .InsertNew("SomeRequiredBehavior")
+            .SetType("Behavior")
+            .AddExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
+
+    // Also add another "required behavior" property referring to another
+    // unrelated behavior.
+    auto &otherEventsBasedBehaviorSecondProperty =
+        otherEventsBasedBehavior.GetPropertyDescriptors()
+            .InsertNew("SomeRequiredBehavior")
+            .SetType("Behavior")
+            .AddExtraInfo("SomeOtherExtension::SomeOtherBehavior");
+
+    gd::WholeProjectRefactorer::MoveEventsBasedBehavior(
+        project, eventsExtension, "MyEventsExtension", "MyOtherEventsExtension",
+        "MyEventsBasedBehavior", "MyRenamedEventsBasedBehavior");
+
+    // Check the other events-based behavior has its property updated.
+    REQUIRE(otherEventsBasedBehaviorFirstProperty.GetExtraInfo().size() == 1);
+    REQUIRE(otherEventsBasedBehaviorFirstProperty.GetExtraInfo().at(0) ==
+            "MyOtherEventsExtension::MyRenamedEventsBasedBehavior");
+
+    // Check the other events-based behavior has its other property left
+    // untouched.
+    REQUIRE(otherEventsBasedBehaviorSecondProperty.GetExtraInfo().size() == 1);
+    REQUIRE(otherEventsBasedBehaviorSecondProperty.GetExtraInfo().at(0) ==
+            "SomeOtherExtension::SomeOtherBehavior");
+  }
+
+  SECTION("Events based behavior moved (instructions update)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
+
+    gd::WholeProjectRefactorer::MoveEventsBasedBehavior(
+        project, eventsExtension, "MyEventsExtension", "MyOtherEventsExtension",
+        "MyEventsBasedBehavior", "MyRenamedEventsBasedBehavior");
+
+    // Check that the type of the behavior was changed in the behaviors of
+    // objects. Name is *not* changed.
+    REQUIRE(project.GetLayout("Scene")
+                .GetObjects()
+                .GetObject("ObjectWithMyBehavior")
+                .GetBehavior("MyBehavior")
+                .GetTypeName() ==
+            "MyOtherEventsExtension::MyRenamedEventsBasedBehavior");
+    REQUIRE(project.GetObjects()
+                .GetObject("GlobalObjectWithMyBehavior")
+                .GetBehavior("MyBehavior")
+                .GetTypeName() ==
+            "MyOtherEventsExtension::MyRenamedEventsBasedBehavior");
+    REQUIRE(project.GetEventsFunctionsExtension("MyEventsExtension")
+                .GetEventsBasedObjects()
+                .Get("MyOtherEventsBasedObject")
+                .GetObjects()
+                .GetObject("ObjectWithMyBehavior")
+                .GetBehavior("MyBehavior")
+                .GetTypeName() ==
+            "MyOtherEventsExtension::MyRenamedEventsBasedBehavior");
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      // Check if events-based behavior methods have been renamed in
+      // instructions
+      REQUIRE(GetEventFirstActionType(eventsList->GetEvent(BehaviorAction)) ==
+              "MyOtherEventsExtension::MyRenamedEventsBasedBehavior::"
+              "MyBehaviorEventsFunction");
+      REQUIRE(GetEventFirstConditionType(
+                  eventsList->GetEvent(BehaviorConditionFromExpressionAndCondition)) ==
+          "MyOtherEventsExtension::MyRenamedEventsBasedBehavior::"
+          "MyBehaviorEventsFunctionExpressionAndCondition");
+      REQUIRE(GetEventFirstActionType(
+                  eventsList->GetEvent(BehaviorActionWithOperator)) ==
+          "MyOtherEventsExtension::MyRenamedEventsBasedBehavior::"
+          "MyBehaviorEventsFunctionActionWithOperator");
+
+      // Check if events-based behaviors properties have been renamed in
+      // instructions
+      REQUIRE(GetEventFirstActionType(
+                  eventsList->GetEvent(BehaviorPropertyAction)) ==
+              "MyOtherEventsExtension::MyRenamedEventsBasedBehavior::"
+              "SetPropertyMyProperty");
+      REQUIRE(GetEventFirstActionType(
+                  eventsList->GetEvent(BehaviorSharedPropertyAction)) ==
+              "MyOtherEventsExtension::MyRenamedEventsBasedBehavior::"
+              "SetSharedPropertyMySharedProperty");
+
+      // Check events-based behavior methods have *not* been renamed in
+      // expressions
+      REQUIRE(GetEventFirstActionFirstParameterString(
+                  eventsList->GetEvent(BehaviorExpression)) ==
+              "1 + ObjectWithMyBehavior.MyBehavior::"
+              "MyBehaviorEventsFunctionExpression(123, 456, 789)");
+      REQUIRE(GetEventFirstActionFirstParameterString(
+                  eventsList->GetEvent(BehaviorExpressionFromExpressionAndCondition)) ==
+              "5 + ObjectWithMyBehavior.MyBehavior::"
+              "MyBehaviorEventsFunctionExpressionAndCondition(111, 222)");
+    }
+  }
+
+  SECTION("Events based behavior moved (in parameters)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
+
+    gd::WholeProjectRefactorer::MoveEventsBasedBehavior(
+        project, eventsExtension, "MyEventsExtension", "MyOtherEventsExtension",
+        "MyEventsBasedBehavior", "MyRenamedEventsBasedBehavior");
+
+    // Free function
+    auto &myEventsFunction =
+        project.GetEventsFunctionsExtension("MyEventsExtension")
+            .GetEventsFunctions()
+            .GetEventsFunction("MyEventsFunction");
+    REQUIRE(myEventsFunction.GetParameters().GetParameter(2).GetExtraInfo() ==
+            "MyOtherEventsExtension::MyRenamedEventsBasedBehavior");
+
+    // Behavior function
+    {
+      auto &myBehaviorEventsFunction =
+          project.GetEventsFunctionsExtension("MyEventsExtension")
+              .GetEventsBasedBehaviors()
+              .Get("MyEventsBasedBehavior")
+              .GetEventsFunctions()
+              .GetEventsFunction("MyBehaviorEventsFunction");
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(3)
+                  .GetExtraInfo() ==
+              "MyOtherEventsExtension::MyRenamedEventsBasedBehavior");
+    }
+
+    // Object function
+    {
+      auto &myBehaviorEventsFunction =
+          project.GetEventsFunctionsExtension("MyEventsExtension")
+              .GetEventsBasedObjects()
+              .Get("MyEventsBasedObject")
+              .GetEventsFunctions()
+              .GetEventsFunction("MyObjectEventsFunction");
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .GetParameter(2)
+                  .GetExtraInfo() ==
+              "MyOtherEventsExtension::MyRenamedEventsBasedBehavior");
+    }
+  }
+
+  // TODO: Check that this works when behaviors are attached to a child-object.
+  SECTION("Events based behavior moved (other behaviors properties update)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    // Set up another events based behavior having a "required behavior"
+    // property referring to the behavior.
+    auto &otherEventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
+    auto &otherEventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew(
+            "MyOtherEventsBasedBehavior");
+    auto &otherEventsBasedBehaviorFirstProperty =
+        otherEventsBasedBehavior.GetPropertyDescriptors()
+            .InsertNew("SomeRequiredBehavior")
+            .SetType("Behavior")
+            .AddExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
+
+    // Also add another "required behavior" property referring to another
+    // unrelated behavior.
+    auto &otherEventsBasedBehaviorSecondProperty =
+        otherEventsBasedBehavior.GetPropertyDescriptors()
+            .InsertNew("SomeRequiredBehavior")
+            .SetType("Behavior")
+            .AddExtraInfo("SomeOtherExtension::SomeOtherBehavior");
+
+    gd::WholeProjectRefactorer::MoveEventsBasedBehavior(
+        project, eventsExtension, "MyEventsExtension", "MyOtherEventsExtension",
+        "MyEventsBasedBehavior", "MyRenamedEventsBasedBehavior");
+
+    // Check the other events-based behavior has its property updated.
+    REQUIRE(otherEventsBasedBehaviorFirstProperty.GetExtraInfo().size() == 1);
+    REQUIRE(otherEventsBasedBehaviorFirstProperty.GetExtraInfo().at(0) ==
+            "MyOtherEventsExtension::MyRenamedEventsBasedBehavior");
+
+    // Check the other events-based behavior has its other property left
+    // untouched.
+    REQUIRE(otherEventsBasedBehaviorSecondProperty.GetExtraInfo().size() == 1);
+    REQUIRE(otherEventsBasedBehaviorSecondProperty.GetExtraInfo().at(0) ==
+            "SomeOtherExtension::SomeOtherBehavior");
+  }
+
   SECTION("Events based object renamed (instructions update)") {
     gd::Project project;
     gd::Platform platform;
@@ -3320,52 +3537,6 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                 .Get("MyEventsBasedBehavior")
                 .GetObjectType() ==
             "MyOtherEventsExtension::MyRenamedEventsBasedObject");
-  }
-
-  // TODO: Check that this works when behaviors are attached to a child-object.
-  SECTION("Events based behavior renamed (other behaviors properties update)") {
-    gd::Project project;
-    gd::Platform platform;
-    SetupProjectWithDummyPlatform(project, platform);
-    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
-    auto &eventsBasedBehavior =
-        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
-
-    // Set up another events based behavior having a "required behavior"
-    // property referring to the behavior.
-    auto &otherEventsExtension =
-        project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
-    auto &otherEventsBasedBehavior =
-        eventsExtension.GetEventsBasedBehaviors().InsertNew(
-            "MyOtherEventsBasedBehavior");
-    auto &otherEventsBasedBehaviorFirstProperty =
-        otherEventsBasedBehavior.GetPropertyDescriptors()
-            .InsertNew("SomeRequiredBehavior")
-            .SetType("Behavior")
-            .AddExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
-
-    // Also add another "required behavior" property referring to another
-    // unrelated behavior.
-    auto &otherEventsBasedBehaviorSecondProperty =
-        otherEventsBasedBehavior.GetPropertyDescriptors()
-            .InsertNew("SomeRequiredBehavior")
-            .SetType("Behavior")
-            .AddExtraInfo("SomeOtherExtension::SomeOtherBehavior");
-
-    gd::WholeProjectRefactorer::RenameEventsBasedBehavior(
-        project, eventsExtension, "MyEventsBasedBehavior",
-        "MyRenamedEventsBasedBehavior");
-
-    // Check the other events-based behavior has its property updated.
-    REQUIRE(otherEventsBasedBehaviorFirstProperty.GetExtraInfo().size() == 1);
-    REQUIRE(otherEventsBasedBehaviorFirstProperty.GetExtraInfo().at(0) ==
-            "MyEventsExtension::MyRenamedEventsBasedBehavior");
-
-    // Check the other events-based behavior has its other property left
-    // untouched.
-    REQUIRE(otherEventsBasedBehaviorSecondProperty.GetExtraInfo().size() == 1);
-    REQUIRE(otherEventsBasedBehaviorSecondProperty.GetExtraInfo().at(0) ==
-            "SomeOtherExtension::SomeOtherBehavior");
   }
 
   SECTION("(Events based behavior) events action renamed") {

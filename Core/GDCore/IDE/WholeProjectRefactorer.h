@@ -442,9 +442,9 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String &oldObjectName, const gd::String &newObjectName);
 
   /**
-   * \brief Refactor the project **before** an object is renamed.
+   * \brief Refactor the project **before** an object is moved.
    *
-   * \warning Do the renaming of the specified object after calling this.
+   * \warning Do move the specified object after calling this.
    * This is because the object is expected to have its old name for the
    * refactoring.
    */

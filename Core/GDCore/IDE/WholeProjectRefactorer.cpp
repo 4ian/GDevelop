@@ -509,92 +509,6 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
                            projectBrowser);
   };
 
-  auto renameBehaviorEventsFunction =
-      [&project, &oldName, &newName,
-       &projectBrowser](const gd::EventsBasedBehavior &eventsBasedBehavior,
-                        const gd::EventsFunction &eventsFunction) {
-        if (eventsFunction.IsExpression()) {
-          // Nothing to do, expressions are not including the extension name
-        }
-        if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
-          gd::InstructionsTypeRenamer renamer = gd::InstructionsTypeRenamer(
-              project,
-              gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                  oldName, eventsBasedBehavior.GetName(),
-                  eventsFunction.GetName()),
-              gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                  newName, eventsBasedBehavior.GetName(),
-                  eventsFunction.GetName()));
-          projectBrowser.ExposeEvents(project, renamer);
-        }
-      };
-
-  auto renameBehaviorPropertyFunctions =
-      [&project, &oldName, &newName,
-       &projectBrowser](const gd::EventsBasedBehavior &eventsBasedBehavior,
-                        const gd::NamedPropertyDescriptor &property) {
-        gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
-            project,
-            gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                oldName, eventsBasedBehavior.GetName(),
-                gd::EventsBasedBehavior::GetPropertyActionName(
-                    property.GetName())),
-            gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                newName, eventsBasedBehavior.GetName(),
-                gd::EventsBasedBehavior::GetPropertyActionName(
-                    property.GetName())));
-        projectBrowser.ExposeEvents(project, actionRenamer);
-
-        gd::InstructionsTypeRenamer conditionRenamer =
-            gd::InstructionsTypeRenamer(
-                project,
-                gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                    oldName, eventsBasedBehavior.GetName(),
-                    gd::EventsBasedBehavior::GetPropertyConditionName(
-                        property.GetName())),
-                gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                    newName, eventsBasedBehavior.GetName(),
-                    gd::EventsBasedBehavior::GetPropertyConditionName(
-                        property.GetName())));
-        projectBrowser.ExposeEvents(project, conditionRenamer);
-
-        // Nothing to do for expressions, expressions are not including the
-        // extension name
-      };
-
-  auto renameBehaviorSharedPropertyFunctions =
-      [&project, &oldName, &newName,
-       &projectBrowser](const gd::EventsBasedBehavior &eventsBasedBehavior,
-                        const gd::NamedPropertyDescriptor &property) {
-        gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
-            project,
-            gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                oldName, eventsBasedBehavior.GetName(),
-                gd::EventsBasedBehavior::GetSharedPropertyActionName(
-                    property.GetName())),
-            gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                newName, eventsBasedBehavior.GetName(),
-                gd::EventsBasedBehavior::GetSharedPropertyActionName(
-                    property.GetName())));
-        projectBrowser.ExposeEvents(project, actionRenamer);
-
-        gd::InstructionsTypeRenamer conditionRenamer =
-            gd::InstructionsTypeRenamer(
-                project,
-                gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                    oldName, eventsBasedBehavior.GetName(),
-                    gd::EventsBasedBehavior::GetSharedPropertyConditionName(
-                        property.GetName())),
-                gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                    newName, eventsBasedBehavior.GetName(),
-                    gd::EventsBasedBehavior::GetSharedPropertyConditionName(
-                        property.GetName())));
-        projectBrowser.ExposeEvents(project, conditionRenamer);
-
-        // Nothing to do for expressions, expressions are not including the
-        // extension name
-      };
-
   // Order is important: we first rename the expressions then the instructions,
   // to avoid being unable to fetch the metadata (the types of parameters) of
   // instructions after they are renamed.
@@ -617,34 +531,10 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
 
   for (auto &&eventsBasedBehavior :
        eventsFunctionsExtension.GetEventsBasedBehaviors().GetInternalVector()) {
-    // Behavior instructions
-    auto &behaviorEventsFunctions = eventsBasedBehavior->GetEventsFunctions();
-    for (auto &&eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
-      if (eventsFunction->IsAction() || eventsFunction->IsCondition()) {
-        renameBehaviorEventsFunction(*eventsBasedBehavior, *eventsFunction);
-      }
-    }
-
-    // Behavior properties
-    for (auto &&propertyDescriptor :
-         eventsBasedBehavior->GetPropertyDescriptors().GetInternalVector()) {
-      renameBehaviorPropertyFunctions(*eventsBasedBehavior,
-                                      *propertyDescriptor);
-    }
-    for (auto &&propertyDescriptor :
-         eventsBasedBehavior->GetSharedPropertyDescriptors()
-             .GetInternalVector()) {
-      renameBehaviorSharedPropertyFunctions(*eventsBasedBehavior,
-                                            *propertyDescriptor);
-    }
-
-    // Finally, rename behaviors used in objects
-    DoRenameBehavior(project,
-                     gd::PlatformExtension::GetBehaviorFullType(
-                         oldName, eventsBasedBehavior->GetName()),
-                     gd::PlatformExtension::GetBehaviorFullType(
-                         newName, eventsBasedBehavior->GetName()),
-                     projectBrowser);
+    WholeProjectRefactorer::MoveEventsBasedBehavior(
+        project, oldName, newName, *eventsBasedBehavior,
+        eventsBasedBehavior->GetName(), eventsBasedBehavior->GetName(),
+        projectBrowser);
   }
 
   for (auto &&eventsBasedObject :
@@ -1420,8 +1310,9 @@ void WholeProjectRefactorer::UpdateBehaviorNameInEventsBasedBehavior(
     const gd::String &sourceBehaviorName) {
   const EventBasedBehaviorBrowser eventBasedBehaviorExposer(
       eventsFunctionsExtension, eventsBasedBehavior);
-  WholeProjectRefactorer::RenameEventsBasedBehavior(
-      project, eventsFunctionsExtension, eventsBasedBehavior,
+  WholeProjectRefactorer::MoveEventsBasedBehavior(
+      project, eventsFunctionsExtension.GetName(),
+      eventsFunctionsExtension.GetName(), eventsBasedBehavior,
       sourceBehaviorName, eventsBasedBehavior.GetName(),
       eventBasedBehaviorExposer);
 }
@@ -1439,21 +1330,44 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
   }
   auto &eventsBasedBehavior = eventsBasedBehaviors.Get(oldBehaviorName);
   const WholeProjectBrowser projectBrowser;
-  WholeProjectRefactorer::RenameEventsBasedBehavior(
-      project, eventsFunctionsExtension, eventsBasedBehavior, oldBehaviorName,
+  WholeProjectRefactorer::MoveEventsBasedBehavior(
+      project, eventsFunctionsExtension.GetName(),
+      eventsFunctionsExtension.GetName(), eventsBasedBehavior, oldBehaviorName,
       newBehaviorName, projectBrowser);
 }
 
-void WholeProjectRefactorer::RenameEventsBasedBehavior(
+void WholeProjectRefactorer::MoveEventsBasedBehavior(
     gd::Project &project,
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::String &oldExtensionName, const gd::String &newExtensionName,
+    const gd::String &oldBehaviorName, const gd::String &newBehaviorName) {
+  auto &eventsBasedBehaviors =
+      eventsFunctionsExtension.GetEventsBasedBehaviors();
+  if (!eventsBasedBehaviors.Has(oldBehaviorName)) {
+    gd::LogWarning("Warning, " + oldBehaviorName +
+                   " was not found when calling RenameEventsBasedBehavior.");
+    return;
+  }
+  auto &eventsBasedBehavior = eventsBasedBehaviors.Get(oldBehaviorName);
+  const WholeProjectBrowser projectBrowser;
+  WholeProjectRefactorer::MoveEventsBasedBehavior(
+      project, oldExtensionName,
+      newExtensionName, eventsBasedBehavior, oldBehaviorName,
+      newBehaviorName, projectBrowser);
+}
+
+void WholeProjectRefactorer::MoveEventsBasedBehavior(
+    gd::Project &project,
+    const gd::String &oldExtensionName,
+    const gd::String &newExtensionName,
     const gd::EventsBasedBehavior &eventsBasedBehavior,
     const gd::String &oldBehaviorName,
     const gd::String &newBehaviorName,
     const gd::ProjectBrowser &projectBrowser) {
   auto renameBehaviorEventsFunction =
-      [&project, &eventsFunctionsExtension, &oldBehaviorName,
-       &newBehaviorName, &projectBrowser](const gd::EventsFunction &eventsFunction) {
+      [&project, &oldExtensionName, &newExtensionName, &oldBehaviorName,
+       &newBehaviorName,
+       &projectBrowser](const gd::EventsFunction &eventsFunction) {
         if (eventsFunction.IsExpression()) {
           // Nothing to do, expressions are not including the name of the
           // behavior
@@ -1462,36 +1376,36 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
           gd::InstructionsTypeRenamer renamer = gd::InstructionsTypeRenamer(
               project,
               gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                  eventsFunctionsExtension.GetName(), oldBehaviorName,
+                  oldExtensionName, oldBehaviorName,
                   eventsFunction.GetName()),
               gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                  eventsFunctionsExtension.GetName(), newBehaviorName,
+                  newExtensionName, newBehaviorName,
                   eventsFunction.GetName()));
           projectBrowser.ExposeEvents(project, renamer);
         }
       };
 
-  auto renameBehaviorProperty = [&project, &eventsFunctionsExtension,
+  auto renameBehaviorProperty = [&project, &oldExtensionName, &newExtensionName,
                                  &oldBehaviorName, &newBehaviorName, &projectBrowser](
                                     const gd::NamedPropertyDescriptor
                                         &property) {
     gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
         project,
         gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-            eventsFunctionsExtension.GetName(), oldBehaviorName,
+            oldExtensionName, oldBehaviorName,
             EventsBasedBehavior::GetPropertyActionName(property.GetName())),
         gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-            eventsFunctionsExtension.GetName(), newBehaviorName,
+            newExtensionName, newBehaviorName,
             EventsBasedBehavior::GetPropertyActionName(property.GetName())));
     projectBrowser.ExposeEvents(project, actionRenamer);
 
     gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
         project,
         gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-            eventsFunctionsExtension.GetName(), oldBehaviorName,
+            oldExtensionName, oldBehaviorName,
             EventsBasedBehavior::GetPropertyConditionName(property.GetName())),
         gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-            eventsFunctionsExtension.GetName(), newBehaviorName,
+            newExtensionName, newBehaviorName,
             EventsBasedBehavior::GetPropertyConditionName(property.GetName())));
     projectBrowser.ExposeEvents(project, conditionRenamer);
 
@@ -1500,16 +1414,16 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
   };
 
   auto renameBehaviorSharedProperty =
-      [&project, &eventsFunctionsExtension, &oldBehaviorName,
+      [&project, &oldExtensionName, &newExtensionName, &oldBehaviorName,
        &newBehaviorName, &projectBrowser](const gd::NamedPropertyDescriptor &property) {
         gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
             project,
             gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                eventsFunctionsExtension.GetName(), oldBehaviorName,
+                oldExtensionName, oldBehaviorName,
                 EventsBasedBehavior::GetSharedPropertyActionName(
                     property.GetName())),
             gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                eventsFunctionsExtension.GetName(), newBehaviorName,
+                newExtensionName, newBehaviorName,
                 EventsBasedBehavior::GetSharedPropertyActionName(
                     property.GetName())));
         projectBrowser.ExposeEvents(project, actionRenamer);
@@ -1518,11 +1432,11 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
             gd::InstructionsTypeRenamer(
                 project,
                 gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                    eventsFunctionsExtension.GetName(), oldBehaviorName,
+                    oldExtensionName, oldBehaviorName,
                     EventsBasedBehavior::GetSharedPropertyConditionName(
                         property.GetName())),
                 gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-                    eventsFunctionsExtension.GetName(), newBehaviorName,
+                    newExtensionName, newBehaviorName,
                     EventsBasedBehavior::GetSharedPropertyConditionName(
                         property.GetName())));
         projectBrowser.ExposeEvents(project, conditionRenamer);
@@ -1564,9 +1478,9 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
 
   DoRenameBehavior(project,
                    gd::PlatformExtension::GetBehaviorFullType(
-                       eventsFunctionsExtension.GetName(), oldBehaviorName),
+                       oldExtensionName, oldBehaviorName),
                    gd::PlatformExtension::GetBehaviorFullType(
-                       eventsFunctionsExtension.GetName(), newBehaviorName),
+                       newExtensionName, newBehaviorName),
                    projectBrowser);
 }
 

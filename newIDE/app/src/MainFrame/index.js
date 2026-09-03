@@ -2602,10 +2602,18 @@ const MainFrame = (props: Props): React.MixedElement => {
         reasons: ['renamed-custom-object'],
       });
     });
-    // (async () => {
-    //   await delay(2000);
-    //   console.log("Select", newExtensionName, newObjectName);
-    // })();
+  };
+
+  const onEventsBasedBehaviorMoved = (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldBehaviorName: string,
+    newBehaviorName: string
+  ) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    openBehaviorEvents(newExtensionName, newBehaviorName);
   };
 
   const onDeletedEventsBasedObject = (
@@ -5840,6 +5848,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
     onEventsBasedObjectMoved: onEventsBasedObjectMoved,
+    onEventsBasedBehaviorMoved: onEventsBasedBehaviorMoved,
     openObjectEvents: openObjectEvents,
     onNavigateToEventFromGlobalSearch: navigateToEventFromGlobalSearch,
     onEditorTabClosing: onEditorTabClosing,

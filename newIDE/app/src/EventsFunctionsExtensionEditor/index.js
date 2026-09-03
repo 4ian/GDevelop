@@ -58,6 +58,7 @@ import type { EventPath } from '../Utils/EventPath';
 import type { SearchFilterParams } from '../Utils/Search';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
 import MoveEventsBasedObjectDialog from './MoveEventsBasedObjectDialog';
+import MoveEventsBasedBehaviorDialog from './MoveEventsBasedBehaviorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -111,6 +112,12 @@ type Props = {|
     oldObjectName: string,
     newObjectName: string
   ) => void,
+  onEventsBasedBehaviorMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldBehaviorName: string,
+    newBehaviorName: string
+  ) => void,
   onEventBasedObjectTypeChanged: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -129,6 +136,7 @@ type State = {|
   extensionFunctionSelectorDialogOpen: boolean,
   eventsBasedObjectSelectorDialogOpen: boolean,
   isMoveEventsBasedObjectDialogOpen: boolean,
+  isMoveEventsBasedBehaviorDialogOpen: boolean,
   variablesEditorOpen: { isGlobalTabInitiallyOpen: boolean } | null,
   eventsBasedEntityPropertiesDialogOpen: VariableDialogOpeningProps | null,
   onAddEventsFunctionCb: ?(
@@ -138,6 +146,9 @@ type State = {|
     parameters: ?EventsBasedObjectCreationParameters
   ) => void,
   doMoveEventsBasedObjectToCb:
+    | null
+    | ((destinationExtensionName: string) => void),
+  doMoveEventsBasedBehaviorToCb:
     | null
     | ((destinationExtensionName: string) => void),
 |};
@@ -175,11 +186,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     extensionFunctionSelectorDialogOpen: false,
     eventsBasedObjectSelectorDialogOpen: false,
     isMoveEventsBasedObjectDialogOpen: false,
+    isMoveEventsBasedBehaviorDialogOpen: false,
     variablesEditorOpen: null,
     eventsBasedEntityPropertiesDialogOpen: null,
     onAddEventsFunctionCb: null,
     onAddEventsBasedObjectCb: null,
     doMoveEventsBasedObjectToCb: null,
+    doMoveEventsBasedBehaviorToCb: null,
   };
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
@@ -874,6 +887,33 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
+  _moveEventsBasedBehaviorTo = (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    doMoveEventsBasedBehaviorToCb: (destinationExtensionName: string) => void
+  ) => {
+    this.setState({
+      isMoveEventsBasedBehaviorDialogOpen: true,
+      doMoveEventsBasedBehaviorToCb,
+    });
+  };
+
+  _onCloseMoveEventsBasedBehaviorToDialog = (
+    destinationExtensionName: string | null
+  ) => {
+    const { doMoveEventsBasedBehaviorToCb } = this.state;
+    this.setState(
+      {
+        isMoveEventsBasedBehaviorDialogOpen: false,
+        doMoveEventsBasedBehaviorToCb: null,
+        selectedEventsBasedBehavior: null,
+      },
+      () => {
+        if (doMoveEventsBasedBehaviorToCb && destinationExtensionName)
+          doMoveEventsBasedBehaviorToCb(destinationExtensionName);
+      }
+    );
+  };
+
   _onEventsBasedBehaviorPasted = (
     eventsBasedBehavior: gdEventsBasedBehavior,
     sourceExtensionName: string,
@@ -1469,6 +1509,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       variablesEditorOpen,
       eventsBasedEntityPropertiesDialogOpen,
       isMoveEventsBasedObjectDialogOpen,
+      isMoveEventsBasedBehaviorDialogOpen,
     } = this.state;
 
     const scope = {
@@ -1860,6 +1901,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._onEventsBasedBehaviorRenamed
                 }
                 onEventsBasedBehaviorPasted={this._onEventsBasedBehaviorPasted}
+                moveEventsBasedBehaviorTo={this._moveEventsBasedBehaviorTo}
+                onEventsBasedBehaviorMoved={
+                  this.props.onEventsBasedBehaviorMoved
+                }
                 // Objects
                 selectedEventsBasedObject={selectedEventsBasedObject}
                 onSelectEventsBasedObject={this._selectEventsBasedObject}
@@ -2184,6 +2229,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             project={project}
             onCancel={() => this._onCloseMoveEventsBasedObjectToDialog(null)}
             onChoose={this._onCloseMoveEventsBasedObjectToDialog}
+          />
+        )}
+        {isMoveEventsBasedBehaviorDialogOpen && (
+          <MoveEventsBasedBehaviorDialog
+            project={project}
+            onCancel={() => this._onCloseMoveEventsBasedBehaviorToDialog(null)}
+            onChoose={this._onCloseMoveEventsBasedBehaviorToDialog}
           />
         )}
       </React.Fragment>

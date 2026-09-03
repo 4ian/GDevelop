@@ -9,7 +9,7 @@ type Props = {|
   onChoose: (destinationExtensionName: string) => void,
 |};
 
-export default function MoveEventsBasedObjectDialog({
+export default function EventsBasedObjectSelectorDialog({
   project,
   onChoose,
   onCancel,
@@ -19,7 +19,7 @@ export default function MoveEventsBasedObjectDialog({
       project={project}
       message={
         <Trans>
-          Choose the extension where the custom object should be moved.
+          Choose the extension where the custom behavior should be moved.
         </Trans>
       }
       onCancel={onCancel}

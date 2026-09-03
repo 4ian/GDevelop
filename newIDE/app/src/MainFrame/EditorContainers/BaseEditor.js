@@ -151,6 +151,12 @@ export type RenderEditorContainerProps = {|
     oldObjectName: string,
     newObjectName: string
   ) => void,
+  onEventsBasedBehaviorMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldBehaviorName: string,
+    newBehaviorName: string
+  ) => void,
 
   // Project opening
   canOpen: boolean,

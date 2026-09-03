@@ -48,8 +48,10 @@ export const Default = (): React.Node => (
         onSelectEventsBasedBehavior={action('behavior selected')}
         onDeleteEventsBasedBehavior={action('behavior deleted')}
         onRenameEventsBasedBehavior={action('rename behavior')}
+        moveEventsBasedBehaviorTo={action('move behavior')}
         onEventsBasedBehaviorRenamed={action('behavior renamed')}
         onEventsBasedBehaviorPasted={action('behavior pasted')}
+        onEventsBasedBehaviorMoved={action('behavior moved')}
         // Free functions
         onSelectEventsFunction={action('function selected')}
         onDeleteEventsFunction={action('function deleted')}

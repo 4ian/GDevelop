@@ -214,6 +214,12 @@ export type EditorTabsPaneCommonProps = {|
     oldObjectName: string,
     newObjectName: string
   ) => void,
+  onEventsBasedBehaviorMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldBehaviorName: string,
+    newBehaviorName: string
+  ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
   onNavigateToEventFromGlobalSearch: (
     params: NavigateToEventFromGlobalSearchParams
@@ -388,6 +394,7 @@ const EditorTabsPane: React.ComponentType<{
     onRenamedEventsBasedObject,
     onDeletedEventsBasedObject,
     onEventsBasedObjectMoved,
+    onEventsBasedBehaviorMoved,
     openObjectEvents,
     onNavigateToEventFromGlobalSearch,
     onEditorTabClosing,
@@ -822,6 +829,7 @@ const EditorTabsPane: React.ComponentType<{
                     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
                     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
                     onEventsBasedObjectMoved: onEventsBasedObjectMoved,
+                    onEventsBasedBehaviorMoved: onEventsBasedBehaviorMoved,
                     openObjectEvents,
                     onNavigateToEventFromGlobalSearch,
                     unsavedChanges: unsavedChanges,

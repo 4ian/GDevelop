@@ -394,6 +394,19 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newBehaviorName);
 
   /**
+   * \brief Refactor the project **before** a behavior is moved.
+   *
+   * \warning Move the specified behavior after calling this.
+   * This is because the behavior is expected to have its old name for the
+   * refactoring.
+   */
+  static void MoveEventsBasedBehavior(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName, const gd::String &newExtensionName,
+      const gd::String &oldBehaviorName, const gd::String &newBehaviorName);
+
+  /**
    * \brief Refactor events-based behavior events after the events-based
    * behavior has been duplicated.
    */
@@ -791,9 +804,10 @@ class GD_CORE_API WholeProjectRefactorer {
    * This is because the behavior is expected to have its old name for the
    * refactoring.
    */
-  static void RenameEventsBasedBehavior(
+  static void MoveEventsBasedBehavior(
       gd::Project &project,
-      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName,
+      const gd::String &newExtensionName,
       const gd::EventsBasedBehavior &eventsBasedBehavior,
       const gd::String &oldBehaviorName,
       const gd::String &newBehaviorName,

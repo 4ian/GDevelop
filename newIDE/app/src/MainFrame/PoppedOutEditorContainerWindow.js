@@ -262,6 +262,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                           props.onDeletedEventsBasedObject,
                         onEventsBasedObjectMoved:
                           props.onEventsBasedObjectMoved,
+                        onEventsBasedBehaviorMoved:
+                          props.onEventsBasedBehaviorMoved,
                         openObjectEvents: props.openObjectEvents,
                         onNavigateToEventFromGlobalSearch:
                           props.onNavigateToEventFromGlobalSearch,

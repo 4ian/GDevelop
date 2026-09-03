@@ -443,11 +443,15 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
         click: () => this.delete(),
         accelerator: 'Backspace',
       },
-      {
-        label: i18n._(t`Move to...`),
-        click: () => this._moveTo(),
-        enabled: this.canBeRenamed(),
-      },
+      ...(eventsBasedBehavior || eventsBasedObject
+        ? []
+        : [
+            {
+              label: i18n._(t`Move to...`),
+              click: () => this._moveTo(),
+              enabled: this.canBeRenamed(),
+            },
+          ]),
       {
         type: 'separator',
       },

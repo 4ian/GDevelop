@@ -2457,6 +2457,77 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
+  SECTION("Free function moved (instructions update)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
+
+    gd::WholeProjectRefactorer::MoveEventsFunction(
+        project, eventsExtension, "MyEventsExtension", "MyOtherEventsExtension",
+        "MyEventsFunction",
+        "MyRenamedEventsFunction");
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      // Check that events function calls in instructions have been renamed
+      REQUIRE(
+          GetEventFirstActionType(eventsList->GetEvent(FreeFunctionAction)) ==
+          "MyOtherEventsExtension::MyRenamedEventsFunction");
+    }
+  }
+
+  SECTION("Free function moved (expressions updated)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
+
+    gd::WholeProjectRefactorer::MoveEventsFunction(
+        project, eventsExtension, "MyEventsExtension", "MyOtherEventsExtension",
+        "MyEventsFunctionExpression",
+        "MyRenamedFunctionExpression");
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      // Check that events function calls in expressions have been renamed
+      REQUIRE(GetEventFirstActionFirstParameterString(
+                  eventsList->GetEvent(FreeFunctionWithExpression)) ==
+              "1 + MyOtherEventsExtension::MyRenamedFunctionExpression(123, 456)");
+    }
+  }
+
+  SECTION("Free function moved (expression and condition updated)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
+
+    gd::WholeProjectRefactorer::MoveEventsFunction(
+        project, eventsExtension, "MyEventsExtension", "MyOtherEventsExtension",
+        "MyEventsFunctionExpressionAndCondition",
+        "MyRenamedFunctionExpressionAndCondition");
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      // Check that events function calls in expressions have been renamed
+      REQUIRE(GetEventFirstActionFirstParameterString(
+                  eventsList->GetEvent(FreeExpressionFromExpressionAndCondition)) ==
+              "2 + MyOtherEventsExtension::MyRenamedFunctionExpressionAndCondition(111, 222)");
+
+      // Check that events function calls in instructions have been renamed
+      REQUIRE(GetEventFirstConditionType(
+                  eventsList->GetEvent(FreeConditionFromExpressionAndCondition)) ==
+              "MyOtherEventsExtension::MyRenamedFunctionExpressionAndCondition");
+
+      // Check that the action still refer to the right ExpressionAndCondition.
+      REQUIRE(eventsExtension.GetEventsFunctions()
+                  .GetEventsFunction("MyEventsFunctionActionWithOperator")
+                  .GetGetterName() ==
+              "MyRenamedFunctionExpressionAndCondition");
+    }
+  }
+
   SECTION("(Free function) number parameter renamed (in expressions)") {
     gd::Project project;
     gd::Platform platform;

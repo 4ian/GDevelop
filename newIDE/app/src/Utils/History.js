@@ -183,3 +183,178 @@ export const redo = (
     currentValue: newCurrentValue,
   };
 };
+
+// Composite history: track several pieces of state as a single history
+// (so one undoable step can capture changes across all of them - for
+// example the deletion of a layer together with the instances it contained).
+
+export type CompositeTarget = {
+  serializableObject?: gdSerializable,
+  serializationMethodName?: string,
+  unserializationMethodName?: string,
+  // The unserialization method of some gd.* classes requires the project as
+  // first argument - and others break if it is given.
+  unserializationNeedsProject?: boolean,
+  // For state without its own serializer (like a few scene properties):
+  getValue?: () => Object,
+  setValue?: (value: Object) => void,
+};
+
+export type CompositeTargets = { [key: string]: CompositeTarget };
+
+const serializeCompositeTargets = (targets: CompositeTargets): Object => {
+  const value: { [key: string]: Object } = {};
+  for (const key of Object.keys(targets)) {
+    const target = targets[key];
+    if (target.serializableObject) {
+      value[key] = serializeToJSObject(
+        target.serializableObject,
+        target.serializationMethodName || 'serializeTo'
+      );
+    } else if (target.getValue) {
+      value[key] = target.getValue();
+    }
+  }
+  return value;
+};
+
+const unserializeCompositeTargets = (
+  targets: CompositeTargets,
+  value: Object,
+  project: ?gdProject
+): void => {
+  for (const key of Object.keys(targets)) {
+    const target = targets[key];
+    if (value[key] === undefined) continue;
+
+    if (target.serializableObject) {
+      unserializeFromJSObject(
+        target.serializableObject,
+        value[key],
+        target.unserializationMethodName || 'unserializeFrom',
+        target.unserializationNeedsProject ? project : undefined
+      );
+    } else if (target.setValue) {
+      target.setValue(value[key]);
+    }
+  }
+};
+
+/**
+ * Return the initial state of a history tracking several pieces of state.
+ */
+export const getCompositeHistoryInitialState = (
+  targets: CompositeTargets,
+  {
+    historyMaxSize,
+  }: {
+    historyMaxSize: number,
+  }
+): HistoryState => {
+  return {
+    previousActions: [],
+    currentValue: serializeCompositeTargets(targets),
+    futureActions: [],
+    maxSize: historyMaxSize,
+  };
+};
+
+/**
+ * Save a new state of the given targets to the history.
+ */
+export const saveCompositeToHistory = (
+  history: HistoryState,
+  targets: CompositeTargets,
+  actionType?: RevertableActionType,
+  changeContext?: any
+): HistoryState => {
+  const newCurrentValue = serializeCompositeTargets(targets);
+  const newPreviousActions = [
+    ...history.previousActions,
+    {
+      type: actionType,
+      valueBeforeChange: history.currentValue,
+      changeContext,
+    },
+  ];
+  const newFutureActions: Array<RedoAction> = []; // Empty the future actions on save.
+  if (newPreviousActions.length > history.maxSize) {
+    newPreviousActions.splice(0, newPreviousActions.length - history.maxSize);
+  }
+
+  return {
+    ...history,
+    currentValue: newCurrentValue,
+    previousActions: newPreviousActions,
+    futureActions: newFutureActions,
+  };
+};
+
+/**
+ * Update the targets to undo the last changes.
+ * /!\ This mutates the objects of the targets and there could be objects
+ * owned by them deleted or becoming invalid. Be sure to drop/refresh any
+ * reference to them.
+ */
+export const undoComposite = (
+  history: HistoryState,
+  targets: CompositeTargets,
+  project: ?gdProject = undefined
+): HistoryState => {
+  if (!history.previousActions.length) {
+    return history;
+  }
+
+  const previousAction =
+    history.previousActions[history.previousActions.length - 1];
+  const newCurrentValue = previousAction.valueBeforeChange;
+  unserializeCompositeTargets(targets, newCurrentValue, project);
+
+  return {
+    ...history,
+    previousActions: history.previousActions.slice(0, -1),
+    futureActions: [
+      ...history.futureActions,
+      {
+        type: previousAction.type,
+        changeContext: previousAction.changeContext,
+        valueAfterChange: history.currentValue,
+      },
+    ],
+    currentValue: newCurrentValue,
+  };
+};
+
+/**
+ * Update the targets to redo the last undone changes.
+ * /!\ This mutates the objects of the targets and there could be objects
+ * owned by them deleted or becoming invalid. Be sure to drop/refresh any
+ * reference to them.
+ */
+export const redoComposite = (
+  history: HistoryState,
+  targets: CompositeTargets,
+  project: ?gdProject = undefined
+): HistoryState => {
+  if (!history.futureActions.length) {
+    return history;
+  }
+
+  const futureAction = history.futureActions[history.futureActions.length - 1];
+  const newCurrentValue = futureAction.valueAfterChange;
+  unserializeCompositeTargets(targets, newCurrentValue, project);
+
+  return {
+    ...history,
+    previousActions: [
+      ...history.previousActions,
+      {
+        type: futureAction.type,
+        changeContext: futureAction.changeContext,
+        valueBeforeChange: history.currentValue,
+      },
+    ],
+    futureActions: history.futureActions.slice(0, -1),
+    currentValue: newCurrentValue,
+  };
+};

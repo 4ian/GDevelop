@@ -1,0 +1,15 @@
+/* Brief highlight of a properties panel row changed by an undo/redo
+   (see `_flashChangedInstancePropertyRows` in `SceneEditor/index.js`). */
+@keyframes undo-redo-property-flash {
+  0% {
+    background-color: rgba(255, 176, 32, 0.5);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.undo-redo-property-flash {
+  animation: undo-redo-property-flash 1.2s ease-out;
+  border-radius: 4px;
+}

@@ -75,6 +75,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
+  onScenePropertiesModified?: () => void,
 |};
 
 export const CompactScenePropertiesEditor = ({
@@ -87,6 +88,7 @@ export const CompactScenePropertiesEditor = ({
   unsavedChanges,
   i18n,
   historyHandler,
+  onScenePropertiesModified,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
@@ -201,9 +203,7 @@ export const CompactScenePropertiesEditor = ({
                   project={project}
                   schema={propertiesSchema}
                   instances={[scene]}
-                  onInstancesModified={() => {
-                    // TODO: undo/redo?
-                  }}
+                  onInstancesModified={onScenePropertiesModified || noop}
                   resourceManagementProps={resourceManagementProps}
                   placeholder=""
                   onRefreshAllFields={forceRecomputeSchema}

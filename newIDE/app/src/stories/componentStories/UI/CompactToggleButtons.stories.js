@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Default = (): React.Node => {
+export const MultiSelect = (): React.Node => {
   const [value, setValue] = React.useState<boolean>(false);
   const [value1, setValue1] = React.useState<boolean>(true);
   const [value2, setValue2] = React.useState<boolean>(false);
@@ -142,6 +142,114 @@ export const Default = (): React.Node => {
                   setValue5(!value5);
                 },
                 isActive: value5,
+              },
+            ]}
+          />
+        </Line>
+      </ColumnStackLayout>
+    </ElementHighlighterProvider>
+  );
+};
+
+/**
+ * Preferred usage pattern: exclusive selection (radio-like).
+ * Only one option can be active at a time, and clicking the active option
+ * does not deselect it. This prevents the component from acting as an on/off
+ * toggle on a single element, which goes against standardized UI patterns
+ * for segmented controls.
+ */
+export const ExclusiveSelection = (): React.Node => {
+  const [selectedTwo, setSelectedTwo] = React.useState<string>('button1');
+  const [selectedThree, setSelectedThree] = React.useState<string>('button1');
+  return (
+    <ElementHighlighterProvider
+      elements={[
+        { label: '2 items exclusive', id: 'two-items-exclusive' },
+        { label: '3 items exclusive', id: 'three-items-exclusive' },
+        {
+          label: '3 items exclusive, no separator',
+          id: 'three-items-exclusive-no-sep',
+        },
+      ]}
+    >
+      <ColumnStackLayout expand>
+        <Text size="sub-title">Two items (exclusive)</Text>
+        <CompactToggleButtons
+          expand
+          id="two-items-exclusive"
+          buttons={[
+            {
+              id: 'button1',
+              renderIcon: className => <Layers className={className} />,
+              tooltip: 'Layer 1',
+              onClick: () => setSelectedTwo('button1'),
+              isActive: selectedTwo === 'button1',
+            },
+            {
+              id: 'button2',
+              renderIcon: className => <Layers className={className} />,
+              tooltip: 'Layer 2',
+              onClick: () => setSelectedTwo('button2'),
+              isActive: selectedTwo === 'button2',
+            },
+          ]}
+        />
+        <Text size="sub-title">Three items (exclusive)</Text>
+        <CompactToggleButtons
+          expand
+          id="three-items-exclusive"
+          buttons={[
+            {
+              id: 'button1',
+              renderIcon: className => <Layers className={className} />,
+              tooltip: 'Layer 1',
+              onClick: () => setSelectedThree('button1'),
+              isActive: selectedThree === 'button1',
+            },
+            {
+              id: 'button2',
+              renderIcon: className => <Layers className={className} />,
+              tooltip: 'Layer 2',
+              onClick: () => setSelectedThree('button2'),
+              isActive: selectedThree === 'button2',
+            },
+            {
+              id: 'button3',
+              renderIcon: className => <Layers className={className} />,
+              tooltip: 'Layer 3',
+              onClick: () => setSelectedThree('button3'),
+              isActive: selectedThree === 'button3',
+            },
+          ]}
+        />
+        <Text size="sub-title">
+          Three items, exclusive, not expanded and no separators
+        </Text>
+        <Line expand noMargin>
+          <CompactToggleButtons
+            noSeparator
+            id="three-items-exclusive-no-sep"
+            buttons={[
+              {
+                id: 'button1',
+                renderIcon: className => <Layers className={className} />,
+                tooltip: 'Layer 1',
+                onClick: () => setSelectedThree('button1'),
+                isActive: selectedThree === 'button1',
+              },
+              {
+                id: 'button2',
+                renderIcon: className => <Layers className={className} />,
+                tooltip: 'Layer 2',
+                onClick: () => setSelectedThree('button2'),
+                isActive: selectedThree === 'button2',
+              },
+              {
+                id: 'button3',
+                renderIcon: className => <Layers className={className} />,
+                tooltip: 'Layer 3',
+                onClick: () => setSelectedThree('button3'),
+                isActive: selectedThree === 'button3',
               },
             ]}
           />

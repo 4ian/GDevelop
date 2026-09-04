@@ -2,6 +2,7 @@
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+import { type FieldModificationContext } from '../../CompactPropertiesEditor';
 import VariablesList, {
   type HistoryHandler,
   type VariablesListInterface,
@@ -75,6 +76,8 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
+  onScenePropertiesModified?: (?FieldModificationContext) => void,
+  onBehaviorSharedDataModified?: (?FieldModificationContext) => void,
 |};
 
 export const CompactScenePropertiesEditor = ({
@@ -87,6 +90,8 @@ export const CompactScenePropertiesEditor = ({
   unsavedChanges,
   i18n,
   historyHandler,
+  onScenePropertiesModified,
+  onBehaviorSharedDataModified,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
@@ -201,8 +206,9 @@ export const CompactScenePropertiesEditor = ({
                   project={project}
                   schema={propertiesSchema}
                   instances={[scene]}
-                  onInstancesModified={() => {
-                    // TODO: undo/redo?
+                  onInstancesModified={(instances, context) => {
+                    if (onScenePropertiesModified)
+                      onScenePropertiesModified(context);
                   }}
                   resourceManagementProps={resourceManagementProps}
                   placeholder=""
@@ -247,6 +253,9 @@ export const CompactScenePropertiesEditor = ({
                               behaviorMetadata={behaviorMetadata}
                               behaviorSharedData={behaviorSharedData}
                               resourceManagementProps={resourceManagementProps}
+                              onBehaviorSharedDataModified={
+                                onBehaviorSharedDataModified
+                              }
                             />
                           )}
                           isFolded={behaviorSharedData.isFolded()}

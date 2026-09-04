@@ -37,13 +37,26 @@ import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.fl
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import {
   type HistoryState,
-  undo,
-  redo,
+  type CompositeTarget,
+  type CompositeTargets,
+  type RevertableActionType,
+  type UndoAction,
+  type RedoAction,
   canUndo,
   canRedo,
-  getHistoryInitialState,
-  saveToHistory,
+  getCompositeHistoryInitialState,
+  savePartialValueToHistory,
+  saveCommandToHistory,
+  serializeCompositeTargets,
+  refreshCompositeHistoryValue,
+  getLastUndoableAction,
+  getLastRedoableAction,
+  undoComposite,
+  redoComposite,
 } from '../Utils/History';
+import { diffInstancesSnapshots } from '../Utils/InstancesSnapshotDiff';
+import './UndoRedoFlash.css';
+
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import {
   type ObjectWithContext,
@@ -66,7 +79,11 @@ import debounce from 'lodash/debounce';
 import { mapFor } from '../Utils/MapFor';
 import MosaicEditorsDisplay from './MosaicEditorsDisplay';
 import SwipeableDrawerEditorsDisplay from './SwipeableDrawerEditorsDisplay';
-import { type SceneEditorsDisplayInterface } from './EditorsDisplay.flow';
+import {
+  type SceneEditorsDisplayInterface,
+  type InstancesModificationContext,
+} from './EditorsDisplay.flow';
+import { type FieldModificationContext } from '../CompactPropertiesEditor';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import {
@@ -95,6 +112,7 @@ import { type EditorViewPosition2D } from '../InstancesEditor';
 import {
   changeViewPosition,
   setCameraState,
+  focusEmbeddedGameFrame,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
@@ -108,6 +126,28 @@ import { type LastSelectionType } from './EditorsDisplay.flow';
 import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
 
 const gd: libGDevelop = global.gd;
+
+// How the attributes of a serialized instance (as found in the history
+// snapshots) map to the field ids of the compact instance properties editor
+// (see `CompactInstancePropertiesSchema.js`).
+const serializedInstanceKeyToPropertyFieldId: { [string]: string } = {
+  x: 'X',
+  y: 'Y',
+  z: 'Z',
+  angle: 'Angle',
+  rotationX: 'Rotation X',
+  rotationY: 'Rotation Y',
+  zOrder: 'Z Order',
+  layer: 'Layer',
+  width: 'Width',
+  height: 'Height',
+  depth: 'Depth',
+  // Toggling the custom size is seen in the size fields.
+  customSize: 'Width',
+  customDepth: 'Depth',
+  hidden: 'Hide instance',
+  locked: 'Lock instance',
+};
 
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -182,6 +222,44 @@ export type EditorId =
   | 'object-groups-list'
   | 'instances-list'
   | 'layers-list';
+
+// Where the change of an undoable step was made: an undo/redo reveals the
+// change where it was made.
+type HistoryChangeContext =
+  | {| source: 'canvas' |}
+  | {| source: 'panel', editorId: EditorId |};
+
+// A change that can't be captured by a snapshot of the history targets, as
+// it refactors the whole project (see `_applyHistoryCommand`).
+type HistoryCommand = {|
+  type: 'renameObject' | 'renameObjectGroup',
+  global: boolean,
+  oldName: string,
+  newName: string,
+|};
+
+// The keys of the history targets (see `_getHistoryTargets`) - grouped as
+// the callers of `_recordHistoryStep` usually can't tell them apart.
+const OBJECTS_HISTORY_KEYS = ['objects', 'globalObjects'];
+const OBJECT_GROUPS_HISTORY_KEYS = ['objectGroups', 'globalObjectGroups'];
+const VARIABLES_HISTORY_KEYS = ['sceneVariables', 'globalVariables'];
+// Targets renamed along with an object or a group (see `_renameObjectOrGroup`).
+const REFACTORED_HISTORY_KEYS = [
+  ...OBJECTS_HISTORY_KEYS,
+  ...OBJECT_GROUPS_HISTORY_KEYS,
+  'instances',
+];
+// Targets that other editors (other scenes) can change too.
+const SHARED_HISTORY_KEYS = [
+  'globalObjects',
+  'globalObjectGroups',
+  'globalVariables',
+];
+// In development, check after each step that no target changed without
+// being declared (such a change would be silently reverted by an undo).
+const CHECK_UNDECLARED_HISTORY_CHANGES =
+  // $FlowFixMe[cannot-resolve-name]
+  process.env.NODE_ENV === 'development';
 
 const styles = {
   container: {
@@ -352,7 +430,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       extractAsCustomObjectDialogOpen: false,
 
       instancesEditorSettings: initialInstancesEditorSettings,
-      history: getHistoryInitialState(props.initialInstances, {
+      history: getCompositeHistoryInitialState(this._getHistoryTargets(), {
         historyMaxSize: 50,
       }),
 
@@ -381,6 +459,24 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
+
+    // When the editor tab becomes active again, the focus can be lost
+    // (staying on the previous tab or on the document body): take it back
+    // so the keyboard shortcuts work without a click in the editor. Same
+    // when switching between the 2D and 3D editors, which don't listen to
+    // the keyboard on the same element.
+    if (!prevProps.isActive && this.props.isActive) {
+      // Another editor may have changed the shared targets while this one
+      // was inactive: refresh them so the next step is based on their
+      // actual value (and an undo doesn't revert the other editor's change).
+      this._refreshHistoryValue(SHARED_HISTORY_KEYS);
+    }
+    if (
+      (!prevProps.isActive && this.props.isActive) ||
+      prevProps.gameEditorMode !== this.props.gameEditorMode
+    ) {
+      this._ensureKeyboardFocusStaysInEditor();
+    }
   }
 
   componentDidMount() {
@@ -463,6 +559,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.unregisterDebuggerCallback();
       this.unregisterDebuggerCallback = null;
     }
+    // Cancelled, not flushed: the history lives in the state of this
+    // component, so there is nothing left to save it to.
+    this._flushPendingPanelHistorySaveDebounced.cancel();
   }
 
   onEditorReloaded() {
@@ -580,14 +679,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.props.initialInstances.removeInstance(instance);
       });
 
+      this._recordHistoryStep('DELETE', { source: 'canvas' }, ['instances']);
       this.setState(
         {
           selectedObjectFolderOrObjectsWithContext: [],
-          history: saveToHistory(
-            this.state.history,
-            this.props.initialInstances,
-            'DELETE'
-          ),
         },
         () => {
           this.updateToolbar();
@@ -800,6 +895,20 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdateObjectGroupsList();
   };
 
+  /**
+   * The toolbar is rendered by the app outside of the editor: a click on
+   * one of its buttons moves the focus on it, killing the editor keyboard
+   * shortcuts (like undo/redo). Wrap the actions staying in the editor so
+   * they take the focus back (actions opening a dialog are left untouched:
+   * the dialog takes the focus).
+   */
+  _withFocusReturnedToEditor = (
+    action: (...args: Array<any>) => void
+  ): ((...args: Array<any>) => void) => (...args) => {
+    action(...args);
+    this._ensureKeyboardFocusStaysInEditor();
+  };
+
   updateToolbar = () => {
     const { editorDisplay } = this;
     if (!editorDisplay) return;
@@ -808,29 +917,45 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.setToolbar(
         <MosaicEditorsDisplayToolbar
           gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}
-          setGameEditorMode={this.setGameEditorMode}
+          setGameEditorMode={this._withFocusReturnedToEditor(
+            this.setGameEditorMode
+          )}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
-          toggleObjectsList={this.toggleObjectsList}
+          toggleObjectsList={this._withFocusReturnedToEditor(
+            this.toggleObjectsList
+          )}
           isObjectsListShown={editorDisplay.isEditorVisible('objects-list')}
-          toggleObjectGroupsList={this.toggleObjectGroupsList}
+          toggleObjectGroupsList={this._withFocusReturnedToEditor(
+            this.toggleObjectGroupsList
+          )}
           isObjectGroupsListShown={editorDisplay.isEditorVisible(
             'object-groups-list'
           )}
-          toggleProperties={this.toggleProperties}
+          toggleProperties={this._withFocusReturnedToEditor(
+            this.toggleProperties
+          )}
           isPropertiesShown={editorDisplay.isEditorVisible('properties')}
-          deleteSelection={this.deleteSelection}
-          toggleInstancesList={this.toggleInstancesList}
+          deleteSelection={this._withFocusReturnedToEditor(
+            this.deleteSelection
+          )}
+          toggleInstancesList={this._withFocusReturnedToEditor(
+            this.toggleInstancesList
+          )}
           isInstancesListShown={editorDisplay.isEditorVisible('instances-list')}
-          toggleLayersList={this.toggleLayersList}
+          toggleLayersList={this._withFocusReturnedToEditor(
+            this.toggleLayersList
+          )}
           isLayersListShown={editorDisplay.isEditorVisible('layers-list')}
-          toggleWindowMask={this.toggleWindowMask}
+          toggleWindowMask={this._withFocusReturnedToEditor(
+            this.toggleWindowMask
+          )}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
-          toggleGrid={this.toggleGrid}
+          toggleGrid={this._withFocusReturnedToEditor(this.toggleGrid)}
           isGridShown={!!this.state.instancesEditorSettings.grid}
           openSetupGrid={this.openSetupGrid}
-          setZoomFactor={this.setZoomFactor}
+          setZoomFactor={this._withFocusReturnedToEditor(this.setZoomFactor)}
           getContextMenuZoomItems={this.getContextMenuZoomItems}
           canUndo={canUndo(this.state.history)}
           canRedo={canRedo(this.state.history)}
@@ -845,22 +970,38 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.setToolbar(
         <SwipeableDrawerEditorsDisplayToolbar
           gameEditorMode={this.props.gameEditorMode}
-          setGameEditorMode={this.props.setGameEditorMode}
+          setGameEditorMode={this._withFocusReturnedToEditor(
+            this.props.setGameEditorMode
+          )}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
-          toggleObjectsList={this.toggleObjectsList}
-          toggleObjectGroupsList={this.toggleObjectGroupsList}
-          toggleProperties={this.toggleProperties}
-          deleteSelection={this.deleteSelection}
-          toggleInstancesList={this.toggleInstancesList}
-          toggleLayersList={this.toggleLayersList}
-          toggleWindowMask={this.toggleWindowMask}
+          toggleObjectsList={this._withFocusReturnedToEditor(
+            this.toggleObjectsList
+          )}
+          toggleObjectGroupsList={this._withFocusReturnedToEditor(
+            this.toggleObjectGroupsList
+          )}
+          toggleProperties={this._withFocusReturnedToEditor(
+            this.toggleProperties
+          )}
+          deleteSelection={this._withFocusReturnedToEditor(
+            this.deleteSelection
+          )}
+          toggleInstancesList={this._withFocusReturnedToEditor(
+            this.toggleInstancesList
+          )}
+          toggleLayersList={this._withFocusReturnedToEditor(
+            this.toggleLayersList
+          )}
+          toggleWindowMask={this._withFocusReturnedToEditor(
+            this.toggleWindowMask
+          )}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
-          toggleGrid={this.toggleGrid}
+          toggleGrid={this._withFocusReturnedToEditor(this.toggleGrid)}
           isGridShown={!!this.state.instancesEditorSettings.grid}
           openSetupGrid={this.openSetupGrid}
-          setZoomFactor={this.setZoomFactor}
+          setZoomFactor={this._withFocusReturnedToEditor(this.setZoomFactor)}
           getContextMenuZoomItems={this.getContextMenuZoomItems}
           canUndo={canUndo(this.state.history)}
           canRedo={canRedo(this.state.history)}
@@ -1116,6 +1257,13 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _closeObjectGroupEditorDialog = () => {
+    // The group, and the objects too: the variables of the group are applied
+    // to its objects.
+    this._recordHistoryStep(
+      undefined,
+      { source: 'panel', editorId: 'object-groups-list' },
+      [...OBJECT_GROUPS_HISTORY_KEYS, ...OBJECTS_HISTORY_KEYS]
+    );
     if (this.state.editedGroup) {
       // TODO Set the `global` attribute correctly.
       this.props.onObjectGroupEdited({
@@ -1172,50 +1320,529 @@ export default class SceneEditor extends React.Component<Props, State> {
     { leading: false, trailing: true }
   ): any);
 
-  undo = () => {
-    // /!\ Drop the selection to avoid keeping any references to deleted instances.
-    // This could be avoided if the selection used something like UUID to address instances.
-    this.instancesSelection.clearSelection();
-    this.setState(
-      {
-        history: undo(
-          this.state.history,
-          this.props.initialInstances,
-          this.props.project
-        ),
+  /**
+   * The state tracked by the undo/redo history: everything owned by the
+   * edited scene (or events-based object) that the panels and dialogs of
+   * this editor can modify, plus the global objects, groups and variables
+   * (also shown in the panels). Each step of the history only stores the
+   * targets it changed - see `_recordHistoryStep`.
+   * Not tracked: the events (the events sheet has its own history), and an
+   * object's instances placed in an external layout (deleting the object
+   * removes them too, but undo won't bring them back there).
+   */
+  _getHistoryTargets = (): CompositeTargets => {
+    const {
+      layout,
+      project,
+      objectsContainer,
+      globalObjectsContainer,
+    } = this.props;
+    const targets: CompositeTargets = {
+      // Objects first: instances, groups and folders reference them.
+      objects: this._getObjectsContainerHistoryTarget(objectsContainer),
+      objectGroups: {
+        serializableObject: objectsContainer.getObjectGroups(),
       },
-      () => {
-        // /!\ Force the instances editor to destroy and mount again the
-        // renderers to avoid keeping any references to existing instances
-        if (this.editorDisplay)
-          this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
-        this.updateToolbar();
-        this._sendHotReloadAllInstances();
-      }
+    };
+    if (globalObjectsContainer) {
+      targets.globalObjects = this._getObjectsContainerHistoryTarget(
+        globalObjectsContainer
+      );
+      targets.globalObjectGroups = {
+        serializableObject: globalObjectsContainer.getObjectGroups(),
+      };
+    }
+    targets.layers = {
+      serializableObject: this.props.layersContainer,
+      serializationMethodName: 'serializeLayersTo',
+      unserializationMethodName: 'unserializeLayersFrom',
+    };
+    targets.instances = {
+      getValue: () => {
+        this._ensurePersistentUuidsOfInstances();
+        return serializeToJSObject(this.props.initialInstances);
+      },
+      setValue: (value: Object) => {
+        unserializeFromJSObject(
+          this.props.initialInstances,
+          value,
+          'unserializeFrom',
+          project
+        );
+      },
+    };
+    targets.globalVariables = this._getVariablesContainerHistoryTarget(
+      project.getVariables()
+    );
+    if (layout) {
+      targets.sceneVariables = this._getVariablesContainerHistoryTarget(
+        layout.getVariables()
+      );
+      targets.sceneProperties = {
+        getValue: () => ({
+          windowDefaultTitle: layout.getWindowDefaultTitle(),
+          stopSoundsOnStartup: layout.stopSoundsOnStartup(),
+          resourcesPreloading: layout.getResourcesPreloading(),
+          resourcesUnloading: layout.getResourcesUnloading(),
+          backgroundColorRed: layout.getBackgroundColorRed(),
+          backgroundColorGreen: layout.getBackgroundColorGreen(),
+          backgroundColorBlue: layout.getBackgroundColorBlue(),
+        }),
+        setValue: (value: Object) => {
+          layout.setWindowDefaultTitle(value.windowDefaultTitle);
+          layout.setStopSoundsOnStartup(value.stopSoundsOnStartup);
+          layout.setResourcesPreloading(value.resourcesPreloading);
+          layout.setResourcesUnloading(value.resourcesUnloading);
+          layout.setBackgroundColor(
+            value.backgroundColorRed,
+            value.backgroundColorGreen,
+            value.backgroundColorBlue
+          );
+        },
+      };
+      targets.behaviorsSharedData = {
+        getValue: () => {
+          const value: { [string]: Object } = {};
+          layout
+            .getAllBehaviorSharedDataNames()
+            .toJSArray()
+            .forEach(name => {
+              const properties = layout
+                .getBehaviorSharedData(name)
+                .getProperties();
+              const propertyValues: { [string]: string } = {};
+              properties
+                .keys()
+                .toJSArray()
+                .forEach(propertyName => {
+                  propertyValues[propertyName] = properties
+                    .get(propertyName)
+                    .getValue();
+                });
+              value[name] = propertyValues;
+            });
+          return value;
+        },
+        setValue: (value: Object) => {
+          Object.keys(value).forEach(name => {
+            if (!layout.hasBehaviorSharedData(name)) return;
+            const sharedData = layout.getBehaviorSharedData(name);
+            Object.keys(value[name]).forEach(propertyName => {
+              sharedData.updateProperty(
+                propertyName,
+                value[name][propertyName]
+              );
+            });
+          });
+        },
+      };
+    }
+    return targets;
+  };
+
+  // Persistent UUIDs (of objects, variables) are generated lazily, at their
+  // first access - which can happen after a snapshot was taken, making the
+  // snapshots differ (and an undo reset them). Generate them before a
+  // snapshot.
+  _ensurePersistentUuidsOfObject = (object: gdObject) => {
+    object.getPersistentUuid();
+    object.getVariables().ensurePersistentUuids();
+  };
+
+  _ensurePersistentUuidsOfInstances = () => {
+    const functor = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe[incompatible-type] - typing is not correct.
+    // $FlowFixMe[cannot-write]
+    functor.invoke = (instancePtr: number) => {
+      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
+      const instance: gdInitialInstance = gd.wrapPointer(
+        instancePtr,
+        gd.InitialInstance
+      );
+      instance.getVariables().ensurePersistentUuids();
+    };
+    // $FlowFixMe[incompatible-type] - typing is not correct.
+    this.props.initialInstances.iterateOverInstances(functor);
+    functor.delete();
+  };
+
+  _getVariablesContainerHistoryTarget = (
+    variablesContainer: gdVariablesContainer
+  ): CompositeTarget => ({
+    getValue: () => {
+      variablesContainer.ensurePersistentUuids();
+      return serializeToJSObject(variablesContainer);
+    },
+    setValue: (value: Object) => {
+      unserializeFromJSObject(variablesContainer, value);
+    },
+  });
+
+  _getObjectsContainerHistoryTarget = (
+    objectsContainer: gdObjectsContainer
+  ): CompositeTarget => ({
+    getValue: () => {
+      mapFor(0, objectsContainer.getObjectsCount(), i =>
+        this._ensurePersistentUuidsOfObject(objectsContainer.getObjectAt(i))
+      );
+      return {
+        objects: serializeToJSObject(objectsContainer, 'serializeObjectsTo'),
+        folders: serializeToJSObject(objectsContainer, 'serializeFoldersTo'),
+      };
+    },
+    setValue: (value: Object) => {
+      // Objects first: the folders reference them.
+      unserializeFromJSObject(
+        objectsContainer,
+        value.objects,
+        'unserializeObjectsFrom',
+        this.props.project
+      );
+      unserializeFromJSObject(
+        objectsContainer,
+        value.folders,
+        'unserializeFoldersFrom',
+        this.props.project
+      );
+    },
+  });
+
+  _serializeHistoryTargets = (keys: Array<string>): Object =>
+    serializeCompositeTargets(this._getHistoryTargets(), keys);
+
+  /**
+   * Return the history, with any modification pending a debounced save
+   * (see `_queuePanelHistorySave`) committed to it. Must be used by
+   * undo/redo: an uncommitted modification would otherwise be reverted
+   * without being redoable (`undo` restores the last *saved* snapshot).
+   */
+  _getHistoryWithPendingModificationsSaved = (): HistoryState => {
+    this._flushPendingPanelHistorySaveDebounced.cancel();
+    const pending = this._pendingPanelHistorySave;
+    if (!pending) return this._getLatestHistory();
+
+    this._pendingPanelHistorySave = null;
+    return savePartialValueToHistory(
+      this._getLatestHistory(),
+      pending.value,
+      undefined,
+      pending.changeContext
     );
   };
 
-  redo = () => {
-    // /!\ Drop the selection to avoid keeping any references to deleted instances.
-    // This could be avoided if the selection used something like UUID to address instances.
-    this.instancesSelection.clearSelection();
-    this.setState(
-      {
-        history: redo(
-          this.state.history,
-          this.props.initialInstances,
-          this.props.project
-        ),
-      },
-      () => {
-        // /!\ Force the instances editor to destroy and mount again the
-        // renderers to avoid keeping any references to existing instances
-        if (this.editorDisplay)
-          this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
-        this.updateToolbar();
-        this._sendHotReloadAllInstances();
-      }
+  undo = (): void => {
+    this._applyHistoryChange('undo');
+  };
+
+  redo = (): void => {
+    this._applyHistoryChange('redo');
+  };
+
+  /**
+   * A dialog editing a part of the tracked state is open: applying the
+   * history would change (or delete) what it's editing.
+   */
+  _isDialogEditingTrackedStateOpen = (): boolean => {
+    const { state } = this;
+    return (
+      !!state.editedObjectWithContext ||
+      !!state.editedGroup ||
+      !!state.editedLayer ||
+      !!state.variablesEditedInstance ||
+      state.scenePropertiesDialogOpen ||
+      state.layoutVariablesDialogOpen ||
+      state.extractAsExternalLayoutDialogOpen ||
+      state.extractAsCustomObjectDialogOpen ||
+      state.isAssetExporterDialogOpen ||
+      state.isAssetImporterDialogOpen
     );
+  };
+
+  _applyHistoryChange = (direction: 'undo' | 'redo') => {
+    if (this._isDialogEditingTrackedStateOpen()) return;
+
+    const history = this._getHistoryWithPendingModificationsSaved();
+    const canApply = direction === 'undo' ? canUndo(history) : canRedo(history);
+    if (!canApply) {
+      // Nothing to apply - but a pending modification may just have been
+      // committed to the history: keep it.
+      if (history !== this._getLatestHistory()) this._setHistory(history);
+      return;
+    }
+    let action: UndoAction | RedoAction;
+    let changedKeys: Array<string>;
+    if (direction === 'undo') {
+      const undoAction = getLastUndoableAction(history);
+      if (!undoAction) return;
+      action = undoAction;
+      changedKeys = Object.keys(undoAction.valueBeforeChange);
+    } else {
+      const redoAction = getLastRedoableAction(history);
+      if (!redoAction) return;
+      action = redoAction;
+      changedKeys = Object.keys(redoAction.valueAfterChange);
+    }
+    const changeContext: ?HistoryChangeContext = action.changeContext || null;
+    const command: ?HistoryCommand = action.command || null;
+
+    const selectedInstancesPersistentUuids = this.instancesSelection
+      .getSelectedInstances()
+      .map(instance => instance.getPersistentUuid());
+    // What is selected is remembered by name, to select it again after
+    // the history is applied (if it still exists).
+    const {
+      lastSelectionType,
+      selectedObjectGroup,
+      selectedLayer,
+      selectedObjectFolderOrObjectsWithContext,
+    } = this.state;
+    const selectedObjectNames = selectedObjectFolderOrObjectsWithContext
+      .filter(({ objectFolderOrObject }) => !objectFolderOrObject.isFolder())
+      .map(({ objectFolderOrObject }) =>
+        objectFolderOrObject.getObject().getName()
+      );
+    const selectedObjectGroupName = selectedObjectGroup
+      ? selectedObjectGroup.getName()
+      : null;
+    const selectedLayerName = selectedLayer ? selectedLayer.getName() : null;
+
+    // /!\ Drop every reference to what the targets own: it can be deleted
+    // (or re-created) when the history is applied.
+    this.instancesSelection.clearSelection();
+    this.setState({
+      selectedObjectFolderOrObjectsWithContext: [],
+      selectedObjectGroup: null,
+      selectedLayer: null,
+      tileMapTileSelection: null,
+    });
+
+    if (command) this._applyHistoryCommand(command, direction);
+
+    const valueBeforeChange = history.currentValue;
+    const targets = this._getHistoryTargets();
+    let newHistory =
+      direction === 'undo'
+        ? undoComposite(history, targets, this.props.project)
+        : redoComposite(history, targets, this.props.project);
+    if (command) {
+      newHistory = refreshCompositeHistoryValue(
+        newHistory,
+        targets,
+        REFACTORED_HISTORY_KEYS
+      );
+    }
+    this._setHistory(newHistory, () => {
+      // /!\ Force the instances editor to destroy and mount again the
+      // renderers to avoid keeping any references to existing instances
+      // (or objects).
+      if (this.editorDisplay)
+        this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+
+      const haveObjectsChanged =
+        !!command ||
+        changedKeys.some(
+          key =>
+            OBJECTS_HISTORY_KEYS.includes(key) ||
+            OBJECT_GROUPS_HISTORY_KEYS.includes(key)
+        );
+      if (haveObjectsChanged) {
+        this.forceUpdateObjectsList();
+        this.forceUpdateObjectGroupsList();
+        if (changedKeys.some(key => OBJECTS_HISTORY_KEYS.includes(key))) {
+          // Behaviors may have been added/removed with the objects.
+          this.updateBehaviorsSharedData();
+          this._refreshHistoryValue(['behaviorsSharedData']);
+          this._hotReloadAllObjects();
+        }
+        this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
+      }
+
+      // Select the instances touched by the change, so it can be seen -
+      // notably in the 3D editor, where the camera is not moved (like
+      // other engines do: the change is revealed by the selection). If no
+      // instance was touched, restore the previous selection.
+      const { changedOrAddedPersistentUuids } = diffInstancesSnapshots(
+        valueBeforeChange.instances,
+        newHistory.currentValue.instances
+      );
+      const persistentUuidsToSelect =
+        changedOrAddedPersistentUuids.length > 0
+          ? changedOrAddedPersistentUuids
+          : selectedInstancesPersistentUuids;
+      persistentUuidsToSelect.forEach(persistentUuid => {
+        const instance = getInstanceInLayoutWithPersistentUuid(
+          this.props.initialInstances,
+          persistentUuid
+        );
+        if (instance)
+          this.instancesSelection.selectInstance({
+            instance,
+            multiSelect: true,
+            layersLocks: null,
+          });
+      });
+      this.forceUpdatePropertiesEditor();
+      this._sendSelectedInstances();
+      if (changedOrAddedPersistentUuids.length === 0) {
+        this._restoreSelectionByName({
+          lastSelectionType,
+          selectedObjectNames,
+          selectedObjectGroupName,
+          selectedLayerName,
+        });
+      }
+      this._ensureKeyboardFocusStaysInEditor();
+
+      this.forceUpdateLayersList();
+      this.updateToolbar();
+      this._sendHotReloadAllInstances();
+      this._sendHotReloadLayers();
+
+      this._revealHistoryChanges(
+        valueBeforeChange,
+        newHistory.currentValue,
+        changeContext,
+        changedKeys
+      );
+    });
+  };
+
+  /**
+   * Select again, after the history was applied, what was selected in the
+   * panels (objects were re-created: they are found by their name).
+   */
+  _restoreSelectionByName = ({
+    lastSelectionType,
+    selectedObjectNames,
+    selectedObjectGroupName,
+    selectedLayerName,
+  }: {|
+    lastSelectionType: LastSelectionType,
+    selectedObjectNames: Array<string>,
+    selectedObjectGroupName: ?string,
+    selectedLayerName: ?string,
+  |}) => {
+    const {
+      objectsContainer,
+      globalObjectsContainer,
+      layersContainer,
+    } = this.props;
+    if (lastSelectionType === 'object' && selectedObjectNames.length > 0) {
+      const objectsWithContext = selectedObjectNames
+        .map(objectName =>
+          getObjectFolderOrObjectWithContextFromObjectName(
+            globalObjectsContainer,
+            objectsContainer,
+            objectName
+          )
+        )
+        .filter(Boolean);
+      if (objectsWithContext.length > 0)
+        this._onObjectFolderOrObjectsWithContextSelected(objectsWithContext);
+    } else if (lastSelectionType === 'objectGroup' && selectedObjectGroupName) {
+      const groupName = selectedObjectGroupName;
+      const groupsContainer = [
+        objectsContainer.getObjectGroups(),
+        globalObjectsContainer
+          ? globalObjectsContainer.getObjectGroups()
+          : null,
+      ].find(groups => groups && groups.has(groupName));
+      if (groupsContainer)
+        this._onSelectObjectGroup(groupsContainer.get(groupName));
+    } else if (
+      lastSelectionType === 'layer' &&
+      typeof selectedLayerName === 'string'
+    ) {
+      const layerName = selectedLayerName;
+      if (layersContainer.hasLayerNamed(layerName))
+        this._onSelectLayer(layersContainer.getLayer(layerName));
+    }
+  };
+
+  _applyHistoryCommand = (
+    command: HistoryCommand,
+    direction: 'undo' | 'redo'
+  ) => {
+    const { oldName, newName } = command;
+    const [from, to] =
+      direction === 'undo' ? [newName, oldName] : [oldName, newName];
+    if (command.type === 'renameObject') {
+      this._renameObjectOrGroup(false, command.global, from, to);
+    } else if (command.type === 'renameObjectGroup') {
+      this._renameObjectOrGroup(true, command.global, from, to);
+    }
+  };
+
+  /**
+   * Rename an object or a group, refactoring the whole project so events
+   * and other objects (groups...) keep referring to it.
+   */
+  _renameObjectOrGroup = (
+    isObjectGroup: boolean,
+    global: boolean,
+    oldName: string,
+    newName: string
+  ) => {
+    const {
+      project,
+      layout,
+      eventsBasedObject,
+      projectScopedContainersAccessor,
+      objectsContainer,
+      globalObjectsContainer,
+    } = this.props;
+    if (oldName === newName) return;
+
+    if (layout) {
+      if (global) {
+        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+          project,
+          oldName,
+          newName,
+          isObjectGroup
+        );
+      } else {
+        gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
+          project,
+          layout,
+          oldName,
+          newName,
+          isObjectGroup
+        );
+      }
+    } else if (eventsBasedObject) {
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
+        project,
+        projectScopedContainersAccessor.get(),
+        eventsBasedObject,
+        oldName,
+        newName,
+        isObjectGroup
+      );
+    }
+
+    const container = global ? globalObjectsContainer : objectsContainer;
+    if (!container) return;
+    if (isObjectGroup) {
+      const groups = container.getObjectGroups();
+      if (groups.has(oldName)) groups.get(oldName).setName(newName);
+    } else {
+      if (container.hasObjectNamed(oldName))
+        container.getObject(oldName).setName(newName);
+    }
+    this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
+  };
+
+  _hotReloadAllObjects = () => {
+    const { objectsContainer, globalObjectsContainer } = this.props;
+    const updatedObjects = [];
+    [objectsContainer, globalObjectsContainer].forEach(container => {
+      if (!container) return;
+      mapFor(0, container.getObjectsCount(), i =>
+        updatedObjects.push(container.getObjectAt(i))
+      );
+    });
+    this._hotReloadObjects({ updatedObjects });
   };
 
   _sendHotReloadAllInstances = () => {
@@ -1353,16 +1980,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
     }
 
-    this.setState(
-      {
-        history: saveToHistory(
-          this.state.history,
-          this.props.initialInstances,
-          'ADD'
-        ),
-      },
-      () => this.updateToolbar()
-    );
+    this._recordHistoryStep('ADD', { source: 'canvas' }, ['instances']);
   };
 
   onInstanceAddedOnInvisibleLayer = (layer: ?string) => {
@@ -1467,43 +2085,22 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesMoved = (instances: Array<gdInitialInstance>) => {
-    this.setState(
-      {
-        history: saveToHistory(
-          this.state.history,
-          this.props.initialInstances,
-          'EDIT'
-        ),
-      },
-      () => this.forceUpdatePropertiesEditor()
+    this._recordHistoryStep('EDIT', { source: 'canvas' }, ['instances'], () =>
+      this.forceUpdatePropertiesEditor()
     );
     this._sendUpdatedInstances(instances);
   };
 
   _onInstancesResized = (instances: Array<gdInitialInstance>) => {
-    this.setState(
-      {
-        history: saveToHistory(
-          this.state.history,
-          this.props.initialInstances,
-          'EDIT'
-        ),
-      },
-      () => this.forceUpdatePropertiesEditor()
+    this._recordHistoryStep('EDIT', { source: 'canvas' }, ['instances'], () =>
+      this.forceUpdatePropertiesEditor()
     );
     this._sendUpdatedInstances(instances);
   };
 
   _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
-    this.setState(
-      {
-        history: saveToHistory(
-          this.state.history,
-          this.props.initialInstances,
-          'EDIT'
-        ),
-      },
-      () => this.forceUpdatePropertiesEditor()
+    this._recordHistoryStep('EDIT', { source: 'canvas' }, ['instances'], () =>
+      this.forceUpdatePropertiesEditor()
     );
     this._sendUpdatedInstances(instances);
   };
@@ -1513,10 +2110,351 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
   }, 250): any);
 
-  _onInstancesModified = (instances: Array<gdInitialInstance>) => {
+  _onInstancesModified = (
+    instances: Array<gdInitialInstance>,
+    context: ?InstancesModificationContext
+  ) => {
     this._sendUpdatedInstances(instances);
     this.forceUpdate();
-    //TODO: Save for redo with debounce (and cancel on unmount)
+
+    const editorId = (context && context.editorId) || 'properties';
+    const fieldName = (context && context.fieldName) || '';
+    this._queuePanelHistorySave(
+      `instances/${editorId}/${fieldName}`,
+      { source: 'panel', editorId },
+      baseValue => this._getInstancesPartialSnapshot(baseValue, instances)
+    );
+  };
+
+  _onScenePropertiesModified = (context: ?FieldModificationContext) => {
+    const fieldName = (context && context.fieldName) || '';
+    this._queuePanelHistorySave(
+      `sceneProperties/${fieldName}`,
+      { source: 'panel', editorId: 'properties' },
+      () => this._serializeHistoryTargets(['sceneProperties'])
+    );
+  };
+
+  _onBackgroundColorChanged = () => {
+    // Same key as the background color field of the properties panel,
+    // which calls this too before reporting its modification: the last
+    // queued context (the properties panel) wins.
+    this._queuePanelHistorySave(
+      'sceneProperties/BackgroundColor',
+      { source: 'panel', editorId: 'layers-list' },
+      () => this._serializeHistoryTargets(['sceneProperties'])
+    );
+    this._sendSetBackgroundColor();
+  };
+
+  _onBehaviorSharedDataModified = (context: ?FieldModificationContext) => {
+    const fieldName = (context && context.fieldName) || '';
+    this._queuePanelHistorySave(
+      `behaviorsSharedData/${fieldName}`,
+      { source: 'panel', editorId: 'properties' },
+      () => this._serializeHistoryTargets(['behaviorsSharedData'])
+    );
+  };
+
+  _onLayerPropertiesModified = (
+    layers: Array<gdLayer>,
+    context: ?FieldModificationContext
+  ) => {
+    const fieldName = (context && context.fieldName) || '';
+    this._queuePanelHistorySave(
+      `layers/${fieldName}`,
+      { source: 'panel', editorId: 'properties' },
+      () => this._serializeHistoryTargets(['layers'])
+    );
+    this.forceUpdateLayersList();
+    this._sendHotReloadLayers();
+  };
+
+  _onObjectsModified = (
+    objects: Array<gdObject>,
+    context: ?FieldModificationContext
+  ) => {
+    this._hotReloadObjects({ updatedObjects: objects });
+    const fieldName = (context && context.fieldName) || '';
+    this._queuePanelHistorySave(
+      `objects/${fieldName}`,
+      { source: 'panel', editorId: 'properties' },
+      baseValue => this._getObjectsPartialSnapshot(baseValue, objects)
+    );
+  };
+
+  _onObjectGroupModified = (context: ?FieldModificationContext) => {
+    const fieldName = (context && context.fieldName) || '';
+    this._queuePanelHistorySave(
+      `objectGroups/${fieldName}`,
+      { source: 'panel', editorId: 'properties' },
+      () => this._serializeHistoryTargets(OBJECT_GROUPS_HISTORY_KEYS)
+    );
+  };
+
+  _onObjectGroupsModified = () => {
+    this._recordHistoryStep(
+      undefined,
+      { source: 'panel', editorId: 'object-groups-list' },
+      OBJECT_GROUPS_HISTORY_KEYS
+    );
+  };
+
+  // Set while an object refactoring (rename, deletion) is done, as the
+  // objects list reports it as a modification too: this flag prevents that
+  // generic report from recording a duplicate (or incomplete) step - a
+  // specific one is recorded explicitly instead (see `_onRenameObjectFinish`,
+  // `_onDeleteObjects`).
+  _isRefactoringObjects = false;
+
+  _onObjectFolderOrObjectsModified = () => {
+    if (this._isRefactoringObjects) return;
+    this._recordHistoryStep(
+      undefined,
+      { source: 'panel', editorId: 'objects-list' },
+      OBJECTS_HISTORY_KEYS
+    );
+  };
+
+  // The history is kept in the state (to re-render what depends on it), but
+  // a change of it must be visible right away to the next change - which
+  // can happen in the same event, before the state is updated (like a
+  // field left on undo, committing its value, then the undo itself).
+  _latestHistory: ?HistoryState = null;
+
+  _getLatestHistory = (): HistoryState =>
+    this._latestHistory || this.state.history;
+
+  _setHistory = (history: HistoryState, callback?: () => void) => {
+    this._latestHistory = history;
+    this.setState({ history }, callback);
+  };
+
+  /**
+   * Update the cached value of the given targets without saving a step
+   * (for targets changed outside of the history).
+   */
+  _refreshHistoryValue = (keys: Array<string>) => {
+    this._setHistory(
+      refreshCompositeHistoryValue(
+        this._getLatestHistory(),
+        this._getHistoryTargets(),
+        keys
+      )
+    );
+  };
+
+  /**
+   * Save a new step in the history, capturing the current state of the
+   * given targets - after any pending panel modification.
+   */
+  _recordHistoryStep = (
+    actionType: ?RevertableActionType,
+    changeContext: HistoryChangeContext,
+    keys: Array<string>,
+    callback?: () => void
+  ) => {
+    this._flushPendingPanelHistorySave();
+    this._setHistory(
+      savePartialValueToHistory(
+        this._getLatestHistory(),
+        this._serializeHistoryTargets(keys),
+        actionType || undefined,
+        changeContext
+      ),
+      () => {
+        this.updateToolbar();
+        if (callback) callback();
+      }
+    );
+    this._checkNoUndeclaredHistoryChange(keys);
+  };
+
+  _recordHistoryCommand = (
+    command: HistoryCommand,
+    changeContext: HistoryChangeContext
+  ) => {
+    this._flushPendingPanelHistorySave();
+    // The refactoring renamed things in several targets without a step:
+    // refresh their cached value so the next step is based on the actual
+    // names (an older step, undone, first undoes the rename).
+    this._setHistory(
+      refreshCompositeHistoryValue(
+        saveCommandToHistory(this._getLatestHistory(), command, changeContext),
+        this._getHistoryTargets(),
+        REFACTORED_HISTORY_KEYS
+      ),
+      () => this.updateToolbar()
+    );
+  };
+
+  _checkNoUndeclaredHistoryChange = (declaredKeys: Array<string>) => {
+    if (!CHECK_UNDECLARED_HISTORY_CHANGES) return;
+    const { currentValue } = this._getLatestHistory();
+    const otherKeys = Object.keys(this._getHistoryTargets()).filter(
+      key => !declaredKeys.includes(key)
+    );
+    const actualValue = this._serializeHistoryTargets(otherKeys);
+    const getFirstDifferencePath = (a: any, b: any, path: string): ?string => {
+      if (a === b) return null;
+      if (typeof a !== 'object' || typeof b !== 'object' || !a || !b)
+        return `${path}: ${JSON.stringify(a)} -> ${JSON.stringify(b)}`;
+      for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) {
+        const difference = getFirstDifferencePath(
+          a[key],
+          b[key],
+          `${path}.${key}`
+        );
+        if (difference) return difference;
+      }
+      return null;
+    };
+    otherKeys.forEach(key => {
+      const difference = getFirstDifferencePath(
+        currentValue[key],
+        actualValue[key],
+        key
+      );
+      if (difference) {
+        console.warn(
+          `[SceneEditor history] "${key}" changed without being declared in the last saved step (declared: ${declaredKeys.join(
+            ', '
+          )}). This change would be reverted by an undo without being redoable. First difference: ${difference}`
+        );
+      }
+    });
+  };
+
+  // A modification made from a panel waiting to be saved to the history, so
+  // that a rapid series of modifications of the same thing (like typing a
+  // position digit by digit, or scrolling a number field) makes a single
+  // undoable step. Modifying something else (another field...) saves it
+  // first: its snapshot is taken at the time of the modification so that
+  // the new modification is not merged in it.
+  _pendingPanelHistorySave: null | {|
+    key: string,
+    changeContext: HistoryChangeContext,
+    // The (partial) value of the targets changed by the modification.
+    value: Object,
+  |} = null;
+
+  _queuePanelHistorySave = (
+    key: string,
+    changeContext: HistoryChangeContext,
+    getValue: (baseValue: Object) => Object
+  ) => {
+    const pending = this._pendingPanelHistorySave;
+    const baseValue = {
+      ...this._getLatestHistory().currentValue,
+      ...(pending ? pending.value : {}),
+    };
+    if (pending && pending.key !== key) this._flushPendingPanelHistorySave();
+
+    this._pendingPanelHistorySave = {
+      key,
+      changeContext,
+      value: getValue(baseValue),
+    };
+    this._flushPendingPanelHistorySaveDebounced();
+  };
+
+  _flushPendingPanelHistorySave = () => {
+    this._flushPendingPanelHistorySaveDebounced.cancel();
+    const pending = this._pendingPanelHistorySave;
+    if (!pending) return;
+
+    this._pendingPanelHistorySave = null;
+    this._setHistory(
+      savePartialValueToHistory(
+        this._getLatestHistory(),
+        pending.value,
+        undefined,
+        pending.changeContext
+      ),
+      () => this.updateToolbar()
+    );
+    this._checkNoUndeclaredHistoryChange(Object.keys(pending.value));
+  };
+
+  // $FlowFixMe[missing-local-annot]
+  _flushPendingPanelHistorySaveDebounced = (debounce(() => {
+    this._flushPendingPanelHistorySave();
+  }, 500): any);
+
+  /**
+   * Return the value of the instances target, with the given instances
+   * updated to their current state - much cheaper than serializing all the
+   * instances of the scene, which can be a lot (this is called at each
+   * modification from a panel, like each digit typed in a field).
+   */
+  _getInstancesPartialSnapshot = (
+    baseValue: Object,
+    instances: Array<gdInitialInstance>
+  ): Object => {
+    const baseInstances = baseValue.instances;
+    if (!Array.isArray(baseInstances))
+      return this._serializeHistoryTargets(['instances']);
+
+    const serializedInstancesByUuid = new Map<string, Object>();
+    instances.forEach(instance => {
+      instance.getVariables().ensurePersistentUuids();
+      serializedInstancesByUuid.set(
+        instance.getPersistentUuid(),
+        serializeToJSObject(instance)
+      );
+    });
+    let updatedCount = 0;
+    const newInstances = baseInstances.map(serializedInstance => {
+      const updatedInstance = serializedInstancesByUuid.get(
+        serializedInstance.persistentUuid
+      );
+      if (!updatedInstance) return serializedInstance;
+      updatedCount++;
+      return updatedInstance;
+    });
+    // An instance not found in the snapshot: something else changed the
+    // instances without being saved. Take a full snapshot to be safe.
+    if (updatedCount !== serializedInstancesByUuid.size)
+      return this._serializeHistoryTargets(['instances']);
+
+    return { instances: newInstances };
+  };
+
+  /**
+   * Same as `_getInstancesPartialSnapshot`, for objects (which can be
+   * large: sprites with many animations).
+   */
+  _getObjectsPartialSnapshot = (
+    baseValue: Object,
+    objects: Array<gdObject>
+  ): Object => {
+    const { objectsContainer } = this.props;
+    const value: { [string]: Object } = {};
+    objects.forEach(object => {
+      const objectName = object.getName();
+      const key = objectsContainer.hasObjectNamed(objectName)
+        ? 'objects'
+        : 'globalObjects';
+      const baseObjectsValue = value[key] || baseValue[key];
+      const baseObjects = baseObjectsValue && baseObjectsValue.objects;
+      if (!Array.isArray(baseObjects)) {
+        value[key] = this._serializeHistoryTargets([key])[key];
+        return;
+      }
+      let found = false;
+      this._ensurePersistentUuidsOfObject(object);
+      const newObjects = baseObjects.map(serializedObject => {
+        if (serializedObject.name !== objectName) return serializedObject;
+        found = true;
+        return serializeToJSObject(object);
+      });
+      if (!found) {
+        value[key] = this._serializeHistoryTargets([key])[key];
+        return;
+      }
+      value[key] = { ...baseObjectsValue, objects: newObjects };
+    });
+    return value;
   };
 
   _sendUpdatedInstances = (instances: Array<gdInitialInstance>) => {
@@ -1535,11 +2473,12 @@ export default class SceneEditor extends React.Component<Props, State> {
       });
   };
 
-  _onObjectsModified = (objects: Array<gdObject>) => {
-    this._hotReloadObjects({ updatedObjects: objects });
-  };
-
   _onSetAsGlobalObject = (object: gdObject) => {
+    this._recordHistoryStep(
+      undefined,
+      { source: 'panel', editorId: 'objects-list' },
+      [...OBJECTS_HISTORY_KEYS, 'behaviorsSharedData']
+    );
     this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
   };
 
@@ -1590,6 +2529,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     }
     this.updateBehaviorsSharedData();
+    this._recordHistoryStep(
+      undefined,
+      { source: 'panel', editorId: 'objects-list' },
+      [...OBJECTS_HISTORY_KEYS, 'behaviorsSharedData']
+    );
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
 
@@ -1703,6 +2647,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     // "Add under cursor" coordinates are only meaningful when a single new
     // object is created through the dialog flow; bulk paste/duplicate should
     // never auto-place stacked instances at the same position.
+    // Saved before the instance is added (which saves its own step), so
+    // that undoing the instance never leaves it without its object.
+    // Layers too: a layer can be created for the object (like a lighting
+    // layer for a light).
+    this._recordHistoryStep(
+      'ADD',
+      { source: 'panel', editorId: 'objects-list' },
+      [...OBJECTS_HISTORY_KEYS, 'layers']
+    );
     if (objects.length === 1) {
       this._addInstanceForNewObject(objects[0].getName());
     }
@@ -1776,6 +2729,9 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
           }
 
+          // The history is saved by the layers list once it removed the
+          // layer (see `_onLayersModified`), in a single step with the
+          // instances removed above.
           done(doRemove);
           // /!\ Force the instances editor to destroy and mount again the
           // renderers to avoid keeping any references to existing instances
@@ -1793,6 +2749,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onLayerRenamed = () => {
+    // The history is saved by the layers list right after (see
+    // `_onLayersModified`).
     this.forceUpdatePropertiesEditor();
   };
 
@@ -1843,6 +2801,13 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onLayersModified = (hasAnyEffectBeenAdded: boolean) => {
+    // Instances too: removing a layer removes its instances.
+    this._recordHistoryStep(
+      undefined,
+      { source: 'panel', editorId: 'layers-list' },
+      ['layers', 'instances']
+    );
+
     const { onEffectAdded } = this.props;
     if (hasAnyEffectBeenAdded) {
       // This triggers a full hot-reload. We don't need to reload layers specifically.
@@ -1934,8 +2899,20 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     // Note: done() actually does the deletion of the objects,
     // so ensure objectsWithContext are not used after this call.
+    this._isRefactoringObjects = true;
     done(true);
+    this._isRefactoringObjects = false;
     onObjectsDeleted();
+    // Deleting an object only removes its own definition, its instances (in
+    // this scene, not in external layouts - see the note on
+    // `_getHistoryTargets`) and its membership in groups: it doesn't touch
+    // events, so - unlike a rename - it can be undone like any other change
+    // to these targets.
+    this._recordHistoryStep(
+      'DELETE',
+      { source: 'panel', editorId: 'objects-list' },
+      [...OBJECTS_HISTORY_KEYS, ...OBJECT_GROUPS_HISTORY_KEYS, 'instances']
+    );
 
     // /!\ Force the instances editor to destroy and mount again the
     // renderers to avoid keeping any references to existing instances
@@ -2018,49 +2995,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     newName: string
   ) => {
     const { object, global } = objectWithContext;
-    const {
-      project,
-      layout,
-      eventsBasedObject,
-      projectScopedContainersAccessor,
-    } = this.props;
-
     // newName is supposed to have been already validated.
-    // Avoid triggering renaming refactoring if name has not really changed
-    if (object.getName() === newName) {
-      return;
-    }
+    const oldName = object.getName();
+    if (oldName === newName) return;
 
-    if (layout) {
-      if (global) {
-        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
-          project,
-          object.getName(),
-          newName,
-          /* isObjectGroup=*/ false
-        );
-      } else {
-        gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
-          project,
-          layout,
-          object.getName(),
-          newName,
-          /* isObjectGroup=*/ false
-        );
-      }
-    } else if (eventsBasedObject) {
-      gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
-        project,
-        projectScopedContainersAccessor.get(),
-        eventsBasedObject,
-        object.getName(),
-        newName,
-        /* isObjectGroup=*/ false
-      );
-    }
-
-    object.setName(newName);
-    this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
+    this._renameObjectOrGroup(false, global, oldName, newName);
+    this._recordHistoryCommand(
+      { type: 'renameObject', global, oldName, newName },
+      { source: 'panel', editorId: 'objects-list' }
+    );
   };
 
   _onRenameObjectFolderOrObjectWithContextFinish = (
@@ -2095,7 +3038,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._onObjectFolderOrObjectsWithContextSelected([
       objectFolderOrObjectWithContext,
     ]);
+    this._isRefactoringObjects = true;
     done(true);
+    this._isRefactoringObjects = false;
   };
 
   _onMoveInstancesZOrder = (where: 'front' | 'back') => {
@@ -2151,6 +3096,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     // so ensure groupWithContext is not used after this call.
     done(true);
     this.props.onObjectGroupsDeleted();
+    this._recordHistoryStep(
+      'DELETE',
+      { source: 'panel', editorId: 'object-groups-list' },
+      OBJECT_GROUPS_HISTORY_KEYS
+    );
   };
 
   _onRenameObjectGroup = (
@@ -2165,6 +3115,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       eventsBasedObject,
       projectScopedContainersAccessor,
     } = this.props;
+    const oldName = group.getName();
 
     // newName is supposed to have been already validated
 
@@ -2200,6 +3151,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     done(true);
     this.props.onObjectGroupEdited(groupWithContext);
+    if (oldName !== newName) {
+      this._recordHistoryCommand(
+        { type: 'renameObjectGroup', global, oldName, newName },
+        { source: 'panel', editorId: 'object-groups-list' }
+      );
+    }
   };
 
   canObjectOrGroupBeGlobal = (
@@ -2260,19 +3217,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.initialInstances.removeInstance(instance);
     });
 
-    this.setState(
-      {
-        selectedObjectFolderOrObjectsWithContext: [],
-        history: saveToHistory(
-          this.state.history,
-          this.props.initialInstances,
-          'DELETE'
-        ),
-      },
-      () => {
-        this.updateToolbar();
-      }
-    );
+    this._recordHistoryStep('DELETE', { source: 'canvas' }, ['instances']);
+    this.setState({
+      selectedObjectFolderOrObjectsWithContext: [],
+    });
 
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
@@ -2904,6 +3852,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       onExtractAsEventBasedObject,
     });
 
+    this._recordHistoryStep(
+      undefined,
+      { source: 'panel', editorId: 'objects-list' },
+      [...OBJECTS_HISTORY_KEYS, 'instances', 'layers']
+    );
     this.setState({ extractAsCustomObjectDialogOpen: false });
   };
 
@@ -3017,6 +3970,252 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  _containerElement: ?HTMLDivElement = null;
+
+  /**
+   * If the focused element disappeared (like a button of the properties
+   * panel unmounted after an undo), the focus falls back on the document
+   * body - outside of the editor, killing its keyboard shortcuts. Take the
+   * focus back in that case.
+   */
+  _ensureKeyboardFocusStaysInEditor = () => {
+    // In the 3D editor, the keyboard is handled by the embedded game: its
+    // in-game editor has its own shortcuts (like "F" to focus the
+    // selection) and forwards undo/redo & others back to the editor. Give
+    // it the focus instead of the editor container.
+    if (
+      this.props.gameEditorMode === 'embedded-game' &&
+      focusEmbeddedGameFrame()
+    ) {
+      return;
+    }
+
+    const containerElement = this._containerElement;
+    if (!containerElement) return;
+    const { activeElement } = document;
+    if (
+      !activeElement ||
+      activeElement === document.body ||
+      !containerElement.contains(activeElement)
+    ) {
+      containerElement.focus();
+    }
+  };
+
+  /**
+   * After an undo/redo touching instances, briefly highlight the rows of
+   * the properties panel showing the values it changed.
+   */
+  _flashChangedInstancePropertyRows = (
+    instancesBeforeChange: ?Array<Object>,
+    instancesAfterChange: ?Array<Object>,
+    changedOrAddedPersistentUuids: Array<string>
+  ) => {
+    if (changedOrAddedPersistentUuids.length === 0) return;
+    const containerElement = this._containerElement;
+    if (!containerElement) return;
+
+    const byUuid = (instances: ?Array<Object>) =>
+      new Map(
+        (instances || [])
+          .filter(instance => instance.persistentUuid)
+          .map(instance => [instance.persistentUuid, instance])
+      );
+    const instancesByUuidBeforeChange = byUuid(instancesBeforeChange);
+    const instancesByUuidAfterChange = byUuid(instancesAfterChange);
+
+    const changedFieldIds = new Set<string>();
+    changedOrAddedPersistentUuids.forEach(persistentUuid => {
+      const beforeInstance = instancesByUuidBeforeChange.get(persistentUuid);
+      const afterInstance = instancesByUuidAfterChange.get(persistentUuid);
+      // Only flash edited instances: an instance appearing or disappearing
+      // (undo/redo of an addition or deletion) is seen on the canvas, and
+      // flashing all its rows would be noise.
+      if (!beforeInstance || !afterInstance) return;
+      new Set([
+        ...Object.keys(beforeInstance),
+        ...Object.keys(afterInstance),
+      ]).forEach(key => {
+        if (
+          JSON.stringify(beforeInstance[key]) !==
+          JSON.stringify(afterInstance[key])
+        ) {
+          const fieldId = serializedInstanceKeyToPropertyFieldId[key];
+          if (fieldId) changedFieldIds.add(fieldId);
+        }
+      });
+    });
+    if (changedFieldIds.size === 0) return;
+
+    // Only flash if the panel is shown (`_revealHistoryChanges` opens it
+    // if the change was made there).
+    const { editorDisplay } = this;
+    if (!editorDisplay || !editorDisplay.isEditorVisible('properties')) return;
+
+    // Wait for the properties panel to (re-)render with the new values
+    // before flashing its rows.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        changedFieldIds.forEach(fieldId => {
+          // Field ids can contain spaces: use an attribute selector.
+          const element = containerElement.querySelector(`[id="${fieldId}"]`);
+          if (!element) return;
+          element.classList.remove('undo-redo-property-flash');
+          // Force a reflow so re-adding the class restarts the animation.
+          void element.offsetWidth;
+          element.classList.add('undo-redo-property-flash');
+        });
+      });
+    });
+  };
+
+  /**
+   * The history targets edited by the variables list of the properties
+   * panel, which depend on what is selected.
+   */
+  _getSelectionHistoryKeys = (): Array<string> => {
+    const { lastSelectionType, selectedObjectGroup } = this.state;
+    if (
+      lastSelectionType === 'instance' &&
+      this.instancesSelection.getSelectedInstances().length > 0
+    ) {
+      return ['instances'];
+    }
+    if (lastSelectionType === 'object') return OBJECTS_HISTORY_KEYS;
+    if (lastSelectionType === 'objectGroup' && selectedObjectGroup) {
+      // The variables of a group are applied to its objects.
+      return [...OBJECT_GROUPS_HISTORY_KEYS, ...OBJECTS_HISTORY_KEYS];
+    }
+    if (lastSelectionType === 'layer') return ['layers'];
+    return VARIABLES_HISTORY_KEYS;
+  };
+
+  /**
+   * After an undo/redo, make sure its effect can be seen - otherwise the
+   * undo/redo feels like it did nothing:
+   * - a change on state only shown in a panel (layers, scene properties)
+   *   opens this panel,
+   * - a change on instances all outside of the view moves the view to them.
+   */
+  _revealHistoryChanges = (
+    valueBeforeChange: ?Object,
+    valueAfterChange: ?Object,
+    changeContext: ?HistoryChangeContext,
+    changedKeys: Array<string>
+  ) => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) return;
+    const beforeChange: Object = valueBeforeChange || {};
+    const afterChange: Object = valueAfterChange || {};
+
+    // A change made in a panel is only visible there: open this panel. A
+    // change made on the canvas is already visible: don't open anything.
+    if (changeContext && changeContext.source === 'panel') {
+      if (
+        changeContext.editorId === 'properties' &&
+        changedKeys.some(key =>
+          ['sceneProperties', 'sceneVariables', 'behaviorsSharedData'].includes(
+            key
+          )
+        )
+      ) {
+        // Scene properties are only shown in the properties panel when
+        // nothing is selected: deselect so the change can be seen.
+        this.instancesSelection.clearSelection();
+        this.setState({ lastSelectionType: 'instance' });
+        this.forceUpdatePropertiesEditor();
+        this._sendSelectedInstances();
+      }
+      editorDisplay.ensureEditorVisible(changeContext.editorId);
+    }
+
+    const {
+      changedOrAddedPersistentUuids,
+      removedInstances,
+    } = diffInstancesSnapshots(beforeChange.instances, afterChange.instances);
+
+    this._flashChangedInstancePropertyRows(
+      beforeChange.instances,
+      afterChange.instances,
+      changedOrAddedPersistentUuids
+    );
+
+    const changedInstances = changedOrAddedPersistentUuids
+      .map(persistentUuid =>
+        getInstanceInLayoutWithPersistentUuid(
+          this.props.initialInstances,
+          persistentUuid
+        )
+      )
+      .filter(Boolean);
+
+    const removedPositions: Array<[number, number]> = removedInstances.map(
+      instance => [Number(instance.x) || 0, Number(instance.y) || 0]
+    );
+    if (changedInstances.length === 0 && removedPositions.length === 0) return;
+
+    const viewPosition = editorDisplay.viewControls.getViewPosition();
+    if (!viewPosition) return;
+    // If at least one touched instance is visible - even partly - the user
+    // can already see the effect of the undo/redo: don't move the view.
+    if (
+      changedInstances.some(instance =>
+        editorDisplay.viewControls.isInstanceVisibleInViewport(instance)
+      )
+    )
+      return;
+    if (removedPositions.some(([x, y]) => viewPosition.containsPoint(x, y)))
+      return;
+
+    if (changedInstances.length > 0) {
+      editorDisplay.viewControls.scrollViewToLastInstance(changedInstances);
+    } else {
+      // Only deletions: bring the view to where the last deleted
+      // instance was.
+      const [x, y] = removedPositions[removedPositions.length - 1];
+      editorDisplay.viewControls.scrollViewToPoint(x, y);
+    }
+  };
+
+  _onKeyDownInEditor = (evt: SyntheticKeyboardEvent<HTMLElement>) => {
+    // The instances editor canvas handles its own shortcuts (including
+    // undo/redo): don't handle the same event twice.
+    if (evt.nativeEvent.defaultPrevented) return;
+    // React events bubble through the React tree, not the DOM tree: a
+    // shortcut pressed inside a dialog (rendered in a portal, on top of the
+    // editor) reaches this handler too. Ignore it - the dialog handles (or
+    // ignores) its own shortcuts.
+    if (
+      evt.target instanceof Node &&
+      this._containerElement &&
+      !this._containerElement.contains(evt.target)
+    ) {
+      return;
+    }
+    const { target } = evt;
+    // Let multiline text fields handle their own undo/redo.
+    if (
+      target instanceof Element &&
+      target.closest('textarea, [contenteditable="true"]')
+    ) {
+      return;
+    }
+    if (!evt.ctrlKey && !evt.metaKey) return;
+
+    const key = evt.key.toLowerCase();
+    if (key !== 'z' && key !== 'y') return;
+    evt.preventDefault();
+
+    // A single line field (like a number field that was just scrolled) is
+    // left first: the value still being edited is committed - and saved to
+    // the history - before the undo/redo, so it's neither lost nor
+    // re-applied on top of the undo/redo when the field is left later.
+    if (target instanceof HTMLInputElement) target.blur();
+
+    if (key === 'y' || evt.shiftKey) this.redo();
+    else this.undo();
+  };
+
   render(): any {
     const {
       project,
@@ -3084,6 +4283,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                   style={styles.container}
                   id="scene-editor"
                   data-active={isActive ? 'true' : undefined}
+                  onKeyDown={this._onKeyDownInEditor}
+                  // Allow the container to receive the focus (see
+                  // `_ensureKeyboardFocusStaysInEditor`), so the keyboard
+                  // shortcuts keep working after an undo/redo.
+                  tabIndex={-1}
+                  ref={containerElement =>
+                    (this._containerElement = containerElement)
+                  }
                 >
                   <UseSceneEditorCommands
                     project={project}
@@ -3121,6 +4328,16 @@ export default class SceneEditor extends React.Component<Props, State> {
                     instancesSelection={this.instancesSelection}
                     onSelectInstances={this._onSelectInstances}
                     onInstancesModified={this._onInstancesModified}
+                    onScenePropertiesModified={this._onScenePropertiesModified}
+                    onBehaviorSharedDataModified={
+                      this._onBehaviorSharedDataModified
+                    }
+                    onLayerPropertiesModified={this._onLayerPropertiesModified}
+                    onObjectGroupModified={this._onObjectGroupModified}
+                    onObjectGroupsModified={this._onObjectGroupsModified}
+                    onObjectFolderOrObjectsModified={
+                      this._onObjectFolderOrObjectsModified
+                    }
                     onAddObjectInstance={this.addInstanceOnTheScene}
                     chosenLayer={this.state.chosenLayer}
                     onChooseLayer={this._onChooseLayer}
@@ -3140,7 +4357,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     }
                     onLayerRenamed={this._onLayerRenamed}
                     onLayersModified={() => this._onLayersModified(false)}
-                    onBackgroundColorChanged={this._sendSetBackgroundColor}
+                    onBackgroundColorChanged={this._onBackgroundColorChanged}
                     onLayersVisibilityInEditorChanged={
                       this._onLayersVisibilityInEditorChanged
                     }
@@ -3185,13 +4402,34 @@ export default class SceneEditor extends React.Component<Props, State> {
                       redo: this.redo,
                       canUndo: () => canUndo(this.state.history),
                       canRedo: () => canRedo(this.state.history),
-                      saveToHistory: () =>
-                        this.setState({
-                          history: saveToHistory(
-                            this.state.history,
-                            this.props.initialInstances
-                          ),
-                        }),
+                      // Used by the variables list of the selected
+                      // instances (in the properties panel).
+                      saveToHistory: (batchKey?: string) => {
+                        const changeContext: HistoryChangeContext = {
+                          source: 'panel',
+                          editorId: 'properties',
+                        };
+                        const keys = this._getSelectionHistoryKeys();
+                        if (!batchKey) {
+                          this._recordHistoryStep(
+                            undefined,
+                            changeContext,
+                            keys
+                          );
+                          return;
+                        }
+                        this._queuePanelHistorySave(
+                          `${keys.join('+')}/variables/${batchKey}`,
+                          changeContext,
+                          baseValue =>
+                            keys[0] === 'instances'
+                              ? this._getInstancesPartialSnapshot(
+                                  baseValue,
+                                  this.instancesSelection.getSelectedInstances()
+                                )
+                              : this._serializeHistoryTargets(keys)
+                        );
+                      },
                     }}
                     instancesEditorShortcutsCallbacks={{
                       onCopy: () =>
@@ -3467,7 +4705,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                         objectInstance={this.state.variablesEditedInstance}
                         open
                         onCancel={() => this.editInstanceVariables(null)}
-                        onApply={() => this.editInstanceVariables(null)}
+                        onApply={() => {
+                          this._recordHistoryStep(
+                            undefined,
+                            { source: 'panel', editorId: 'properties' },
+                            ['instances']
+                          );
+                          this.editInstanceVariables(null);
+                        }}
                         onEditObjectVariables={() => {
                           this.editObject(
                             variablesEditedAssociatedObject,
@@ -3531,7 +4776,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                       project={project}
                       layout={layout}
                       onClose={() => this.openSceneProperties(false)}
-                      onApply={() => this.openSceneProperties(false)}
+                      onApply={() => {
+                        this._recordHistoryStep(
+                          undefined,
+                          { source: 'panel', editorId: 'properties' },
+                          ['sceneProperties']
+                        );
+                        this.openSceneProperties(false);
+                      }}
                       onEditVariables={() => this.openSceneVariables(true)}
                       onOpenMoreSettings={this.props.onOpenMoreSettings}
                       resourceManagementProps={
@@ -3589,7 +4841,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                       open
                       project={project}
                       layout={layout}
-                      onApply={() => this.openSceneVariables(false)}
+                      onApply={() => {
+                        this._recordHistoryStep(
+                          undefined,
+                          { source: 'panel', editorId: 'properties' },
+                          VARIABLES_HISTORY_KEYS
+                        );
+                        this.openSceneVariables(false);
+                      }}
                       onCancel={() => this.openSceneVariables(false)}
                       hotReloadPreviewButtonProps={
                         this.props.hotReloadPreviewButtonProps

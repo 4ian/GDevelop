@@ -17,6 +17,7 @@ import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/
 import { CompactScenePropertiesEditor } from './CompactScenePropertiesEditor';
 import Rectangle from '../Utils/Rectangle';
 import { type LastSelectionType } from './EditorsDisplay.flow';
+import { type FieldModificationContext } from '../CompactPropertiesEditor';
 import {
   CompactObjectGroupPropertiesEditor,
   type CompactObjectGroupPropertiesEditorInterface,
@@ -76,7 +77,17 @@ type Props = {|
   // For instances:
   instances: Array<gdInitialInstance>,
   editObjectInPropertiesPanel: (objectName: string) => void,
-  onInstancesModified?: (Array<gdInitialInstance>) => void,
+  onInstancesModified?: (
+    Array<gdInitialInstance>,
+    ?FieldModificationContext
+  ) => void,
+  onScenePropertiesModified?: (?FieldModificationContext) => void,
+  onBehaviorSharedDataModified?: (?FieldModificationContext) => void,
+  onLayerPropertiesModified?: (
+    Array<gdLayer>,
+    ?FieldModificationContext
+  ) => void,
+  onObjectGroupModified?: (?FieldModificationContext) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   editInstanceVariables: gdInitialInstance => void,
   tileMapTileSelection: ?TileMapTileSelection,
@@ -187,6 +198,10 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       instances,
       editObjectInPropertiesPanel,
       onInstancesModified,
+      onScenePropertiesModified,
+      onBehaviorSharedDataModified,
+      onLayerPropertiesModified,
+      onObjectGroupModified,
       onGetInstanceSize,
       editInstanceVariables,
       tileMapTileSelection,
@@ -312,6 +327,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             unsavedChanges={unsavedChanges}
             historyHandler={historyHandler}
+            onObjectGroupModified={onObjectGroupModified}
             objectGroup={objectGroup}
             isObjectListLocked={isObjectGroupObjectListLocked}
             isBehaviorListLocked={isBehaviorListLocked}
@@ -327,7 +343,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             layer={layer}
             onEditLayer={onEditLayer}
             onEditLayerEffects={onEditLayerEffects}
-            onLayersModified={onLayersModified}
+            onLayersModified={onLayerPropertiesModified || onLayersModified}
             onEffectAdded={onEffectAdded}
             resourceManagementProps={resourceManagementProps}
             layersContainer={layersContainer}
@@ -357,6 +373,9 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             i18n={i18n}
             onBackgroundColorChanged={onBackgroundColorChanged}
             openSceneVariables={openSceneVariables}
+            onScenePropertiesModified={onScenePropertiesModified}
+            onBehaviorSharedDataModified={onBehaviorSharedDataModified}
+            historyHandler={historyHandler}
           />
         ) : null}
       </Paper>

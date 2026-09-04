@@ -7,7 +7,11 @@ import {
   AiRequestContext,
   initialAiRequestContextState,
 } from '../../../AiGeneration/AiRequestContext';
-import { type AiRequest } from '../../../Utils/GDevelopServices/Generation';
+import {
+  getAiRequestSummary,
+  type AiRequest,
+  type AiRequestSummary,
+} from '../../../Utils/GDevelopServices/Generation';
 
 // Re-use fake AI request data from AiRequestChat.stories.js
 const fakeOutputWithUserRequestOnly = [
@@ -118,7 +122,18 @@ const AskAIHistoryContentStoryTemplate = ({
         ...initialAiRequestContextState,
         aiRequestStorage: {
           ...initialAiRequestContextState.aiRequestStorage,
-          aiRequests,
+          aiRequestSummaries: Object.keys(aiRequests).reduce(
+            (
+              aiRequestSummaries: { [string]: AiRequestSummary },
+              aiRequestId
+            ) => {
+              aiRequestSummaries[aiRequestId] = getAiRequestSummary(
+                aiRequests[aiRequestId]
+              );
+              return aiRequestSummaries;
+            },
+            {}
+          ),
           isLoading,
           error,
           canLoadMore,
@@ -126,7 +141,7 @@ const AskAIHistoryContentStoryTemplate = ({
       }}
     >
       <AskAiHistoryContent
-        onSelectAiRequest={() => {}}
+        onSelectAiRequestSummary={() => {}}
         selectedAiRequestId={selectedAiRequestId}
       />
     </AiRequestContext.Provider>

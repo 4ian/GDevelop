@@ -5,7 +5,8 @@ import {
   getAiRequest,
   getAiRequestStatuses,
   fetchAiSettings,
-  getAiRequests,
+  getAiRequestSummaries,
+  getAiRequestSummary,
   type AiRequest,
   type AiRequestUserMessage,
 } from '../Utils/GDevelopServices/Generation';
@@ -22,7 +23,13 @@ import {
 } from './AiRequestContext';
 import { act } from 'react-dom/test-utils';
 
-jest.mock('../Utils/GDevelopServices/Generation');
+jest.mock('../Utils/GDevelopServices/Generation', () => ({
+  ...jest.genMockFromModule('../Utils/GDevelopServices/Generation'),
+  // A pure helper: the summary of a request is built for real.
+  getAiRequestSummary: jest.requireActual<any>(
+    '../Utils/GDevelopServices/Generation'
+  ).getAiRequestSummary,
+}));
 
 const mockFn = (fn: any): JestMockFn<any, any> => fn;
 
@@ -120,9 +127,9 @@ describe('AiRequestProvider sub-agent polling', () => {
     mockFn(getAiRequestStatuses).mockResolvedValue([]);
     mockFn(fetchAiSettings).mockReset();
     mockFn(fetchAiSettings).mockResolvedValue(null);
-    mockFn(getAiRequests).mockReset();
-    mockFn(getAiRequests).mockResolvedValue({
-      aiRequests: [],
+    mockFn(getAiRequestSummaries).mockReset();
+    mockFn(getAiRequestSummaries).mockResolvedValue({
+      aiRequestSummaries: [],
       nextPageUri: null,
     });
   });
@@ -386,9 +393,9 @@ describe('AiRequestProvider sub-agent cleanup on navigation', () => {
     mockFn(getAiRequestStatuses).mockResolvedValue([]);
     mockFn(fetchAiSettings).mockReset();
     mockFn(fetchAiSettings).mockResolvedValue(null);
-    mockFn(getAiRequests).mockReset();
-    mockFn(getAiRequests).mockResolvedValue({
-      aiRequests: [],
+    mockFn(getAiRequestSummaries).mockReset();
+    mockFn(getAiRequestSummaries).mockResolvedValue({
+      aiRequestSummaries: [],
       nextPageUri: null,
     });
   });
@@ -577,10 +584,15 @@ describe('useAiRequestHistory', () => {
     output: texts.map(userMessage),
   });
 
-  const renderHistoryHook = (aiRequests: { [string]: AiRequest }) => {
+  const renderHistoryHook = (
+    aiRequests: { [string]: AiRequest },
+    aiRequestSummaries: { [string]: any } = {}
+  ) => {
     const hookResultRef: { current: any } = { current: null };
     const HookCapture = () => {
-      hookResultRef.current = useAiRequestHistory(({ aiRequests }: any));
+      hookResultRef.current = useAiRequestHistory(
+        ({ aiRequests, aiRequestSummaries }: any)
+      );
       return null;
     };
     act(() => {
@@ -625,6 +637,33 @@ describe('useAiRequestHistory', () => {
     expect(navigateUp(hookResultRef)).toBe('Add coins to collect');
     expect(navigateUp(hookResultRef)).toBe('Make a platformer game');
     // No more history: the sub-agent request message must not appear.
+    expect(navigateUp(hookResultRef)).toBe('');
+  });
+
+  it('browses the first message of a conversation known only as a summary', () => {
+    const loadedRequest = requestWithUserMessages(
+      'loaded-1',
+      '2024-01-01T00:02:00.000Z',
+      ['Add coins to collect', 'Make them spin']
+    );
+    const hookResultRef = renderHistoryHook(
+      { 'loaded-1': loadedRequest },
+      {
+        // A summary of the loaded request: its messages must not be browsed
+        // twice.
+        'loaded-1': getAiRequestSummary(loadedRequest),
+        'listed-1': getAiRequestSummary(
+          requestWithUserMessages('listed-1', '2024-01-01T00:01:00.000Z', [
+            'Make a platformer game',
+            'A second message the summary does not carry',
+          ])
+        ),
+      }
+    );
+
+    expect(navigateUp(hookResultRef)).toBe('Make them spin');
+    expect(navigateUp(hookResultRef)).toBe('Add coins to collect');
+    expect(navigateUp(hookResultRef)).toBe('Make a platformer game');
     expect(navigateUp(hookResultRef)).toBe('');
   });
 });

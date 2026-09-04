@@ -6,7 +6,7 @@ import { Line, Column } from '../UI/Grid';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
-import { type AiRequest } from '../Utils/GDevelopServices/Generation';
+import { type AiRequestSummary } from '../Utils/GDevelopServices/Generation';
 import Paper from '../UI/Paper';
 import ScrollView from '../UI/ScrollView';
 import FlatButton from '../UI/FlatButton';
@@ -22,7 +22,9 @@ import { AiRequestContext } from './AiRequestContext';
 type Props = {|
   open: boolean,
   onClose: () => void,
-  onSelectAiRequest: (aiRequest: AiRequest) => void | Promise<void>,
+  onSelectAiRequestSummary: (
+    aiRequestSummary: AiRequestSummary
+  ) => void | Promise<void>,
   selectedAiRequestId: string | null,
 |};
 
@@ -54,13 +56,10 @@ const styles = {
   },
 };
 
-const getFirstUserRequestText = (aiRequest: AiRequest): string => {
-  if (!aiRequest.output || aiRequest.output.length === 0) return '';
-
-  // Find the first user message
-  const userMessage = aiRequest.output.find(
-    message => message.type === 'message' && message.role === 'user'
-  );
+const getFirstUserRequestText = (
+  aiRequestSummary: AiRequestSummary
+): string => {
+  const userMessage = aiRequestSummary.firstUserMessage;
   if (
     !userMessage ||
     userMessage.type !== 'message' ||
@@ -68,7 +67,6 @@ const getFirstUserRequestText = (aiRequest: AiRequest): string => {
   )
     return '';
 
-  // Extract text from user message content
   return userMessage.content
     .map(content => (content.type === 'user_request' ? content.text : null))
     .filter(Boolean)
@@ -76,35 +74,32 @@ const getFirstUserRequestText = (aiRequest: AiRequest): string => {
 };
 
 type AskAiHistoryContentProps = {|
-  onSelectAiRequest: (aiRequest: AiRequest) => void,
+  onSelectAiRequestSummary: (aiRequestSummary: AiRequestSummary) => void,
   selectedAiRequestId: string | null,
 |};
 
 export const AskAiHistoryContent = ({
-  onSelectAiRequest,
+  onSelectAiRequestSummary,
   selectedAiRequestId,
 }: AskAiHistoryContentProps): React.Node => {
   const {
     aiRequestStorage: {
-      aiRequests,
-      fetchAiRequests,
-      onLoadMoreAiRequests,
+      aiRequestSummaries,
+      fetchAiRequestSummaries,
+      onLoadMoreAiRequestSummaries,
       canLoadMore,
       isLoading,
       error,
     },
   } = React.useContext(AiRequestContext);
-  // Sub-agent requests live in the same `aiRequests` map as top-level
-  // conversations (they are fetched on demand for display within their parent
-  // request). They carry a `parentAiRequestId` and must not appear as
-  // independent entries in the history.
-  const aiRequestsArray: AiRequest[] = Object.values(aiRequests)
-    // $FlowFixMe[incompatible-type] - Object.values loses the value type.
-    .filter((aiRequest: AiRequest) => !aiRequest.parentAiRequestId)
-    .sort((a: AiRequest, b: AiRequest) => {
+  const aiRequestSummariesArray: AiRequestSummary[] = Object.keys(
+    aiRequestSummaries
+  )
+    .map(aiRequestId => aiRequestSummaries[aiRequestId])
+    .sort((a: AiRequestSummary, b: AiRequestSummary) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  if (!aiRequestsArray.length && isLoading) {
+  if (!aiRequestSummariesArray.length && isLoading) {
     return (
       <Column
         noMargin
@@ -120,13 +115,13 @@ export const AskAiHistoryContent = ({
 
   if (error) {
     return (
-      <PlaceholderError onRetry={fetchAiRequests}>
+      <PlaceholderError onRetry={fetchAiRequestSummaries}>
         <Trans>An error occurred while loading your AI requests.</Trans>
       </PlaceholderError>
     );
   }
 
-  if (aiRequestsArray.length === 0) {
+  if (aiRequestSummariesArray.length === 0) {
     return (
       <EmptyMessage>
         <Trans>
@@ -139,15 +134,15 @@ export const AskAiHistoryContent = ({
   return (
     <ScrollView>
       <ColumnStackLayout expand>
-        {aiRequestsArray.map(aiRequest => {
-          const isSelected = selectedAiRequestId === aiRequest.id;
-          const userRequestText = getFirstUserRequestText(aiRequest);
-          const requestDate = new Date(aiRequest.createdAt);
+        {aiRequestSummariesArray.map(aiRequestSummary => {
+          const isSelected = selectedAiRequestId === aiRequestSummary.id;
+          const userRequestText = getFirstUserRequestText(aiRequestSummary);
+          const requestDate = new Date(aiRequestSummary.createdAt);
           const formattedDate = formatDate(requestDate, 'MMM d, yyyy h:mm a');
 
           return (
             <Paper
-              key={aiRequest.id}
+              key={aiRequestSummary.id}
               background={isSelected ? 'dark' : 'medium'}
               style={{
                 ...styles.paperItem,
@@ -156,7 +151,7 @@ export const AskAiHistoryContent = ({
             >
               <ButtonBase
                 style={styles.requestItem}
-                onClick={() => onSelectAiRequest(aiRequest)}
+                onClick={() => onSelectAiRequestSummary(aiRequestSummary)}
                 focusRipple
               >
                 <div style={styles.requestItemContent}>
@@ -167,12 +162,14 @@ export const AskAiHistoryContent = ({
                     <Text
                       size="body-small"
                       color={
-                        aiRequest.status === 'error' ? 'error' : 'secondary'
+                        aiRequestSummary.status === 'error'
+                          ? 'error'
+                          : 'secondary'
                       }
                     >
-                      {aiRequest.status === 'working' ? (
+                      {aiRequestSummary.status === 'working' ? (
                         <Trans>Working...</Trans>
-                      ) : aiRequest.status === 'error' ? (
+                      ) : aiRequestSummary.status === 'error' ? (
                         <Trans>Error</Trans>
                       ) : null}
                     </Text>
@@ -189,13 +186,13 @@ export const AskAiHistoryContent = ({
           <FlatButton
             primary
             label={<Trans>Refresh</Trans>}
-            onClick={fetchAiRequests}
+            onClick={fetchAiRequestSummaries}
             disabled={isLoading}
           />
           <FlatButton
             primary
             label={<Trans>Load more</Trans>}
-            onClick={onLoadMoreAiRequests}
+            onClick={onLoadMoreAiRequestSummaries}
             disabled={isLoading || !canLoadMore}
           />
         </LineStackLayout>
@@ -207,13 +204,13 @@ export const AskAiHistoryContent = ({
 export const AskAiHistory = ({
   open,
   onClose,
-  onSelectAiRequest,
+  onSelectAiRequestSummary,
   selectedAiRequestId,
 }: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
 
-  const handleSelectAiRequest = (aiRequest: AiRequest) => {
-    onSelectAiRequest(aiRequest);
+  const handleSelectAiRequestSummary = (aiRequestSummary: AiRequestSummary) => {
+    onSelectAiRequestSummary(aiRequestSummary);
     if (isMobile) {
       onClose();
     }
@@ -240,7 +237,7 @@ export const AskAiHistory = ({
           onClose={onClose}
         />
         <AskAiHistoryContent
-          onSelectAiRequest={handleSelectAiRequest}
+          onSelectAiRequestSummary={handleSelectAiRequestSummary}
           selectedAiRequestId={selectedAiRequestId}
         />
       </ColumnStackLayout>

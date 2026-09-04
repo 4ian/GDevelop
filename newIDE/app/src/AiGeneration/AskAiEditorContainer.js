@@ -339,7 +339,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         : null;
       const {
         aiRequestStorage: {
-          fetchAiRequests,
+          fetchAiRequestSummaries,
           aiRequests,
           forkingState,
           setForkingState,
@@ -407,16 +407,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       React.useEffect(
         () => {
           if (isActive && Object.keys(aiRequests).length === 0) {
-            fetchAiRequests();
+            fetchAiRequestSummaries();
           }
         },
         // Fetch when the editor becomes active, but only if there were no
         // requests done (as we provide a way to refresh in the history).
-        // fetchAiRequests is also a dependency so that if the profile was not
-        // yet loaded when the editor first became active, the fetch is retried
-        // once it becomes available.
+        // fetchAiRequestSummaries is also a dependency so that if the profile
+        // was not yet loaded when the editor first became active, the fetch is
+        // retried once it becomes available.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [isActive, fetchAiRequests]
+        [isActive, fetchAiRequestSummaries]
       );
 
       const canStartNewChat = !!selectedAiRequestId;
@@ -1628,11 +1628,17 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           <AskAiHistory
             open={isHistoryOpen}
             onClose={onCloseHistory}
-            onSelectAiRequest={async aiRequest => {
-              let requestToOpen = aiRequest;
+            onSelectAiRequestSummary={async aiRequestSummary => {
+              const aiRequestId = aiRequestSummary.id;
+              // The history only has a summary: load the conversation.
+              const aiRequest =
+                aiRequests[aiRequestId] ||
+                (await refreshAiRequest(aiRequestId));
+              if (!aiRequest) return;
+
               // Suspend the request if it was left with work in progress (e.g. from a previous session).
               const editorFunctionCallResultsForRequest =
-                getEditorFunctionCallResults(aiRequest.id) || [];
+                getEditorFunctionCallResults(aiRequestId) || [];
               if (
                 aiRequestHasWorkInProgress(
                   aiRequest,
@@ -1641,14 +1647,15 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 profile
               ) {
                 try {
-                  requestToOpen = await apiSuspendAiRequest(
+                  const suspendedAiRequest = await apiSuspendAiRequest(
                     getAuthorizationHeader,
                     {
                       userId: profile.id,
-                      aiRequestId: aiRequest.id,
+                      aiRequestId,
                     }
                   );
-                  clearEditorFunctionCallResults(requestToOpen.id);
+                  clearEditorFunctionCallResults(aiRequestId);
+                  updateAiRequest(aiRequestId, () => suspendedAiRequest);
                 } catch (err) {
                   console.error(
                     'Failed to suspend AI request when opening from history:',
@@ -1656,10 +1663,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   );
                 }
               }
-              // Immediately switch the UI and refresh in the background.
-              updateAiRequest(requestToOpen.id, () => requestToOpen);
-              setSelectedAiRequestId(requestToOpen.id);
-              refreshAiRequest(requestToOpen.id);
+              setSelectedAiRequestId(aiRequestId);
               onCloseHistory();
             }}
             selectedAiRequestId={selectedAiRequestId}

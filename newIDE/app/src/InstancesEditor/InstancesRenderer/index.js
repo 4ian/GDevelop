@@ -192,6 +192,57 @@ export default class InstancesRenderer {
     return this._basicProfilingCounters;
   }
 
+  _getOrCreateLayerRenderer(
+    layer: gdLayer,
+    // $FlowFixMe[value-as-type]
+    pixiRenderer: PIXI.Renderer
+  ): LayerRenderer {
+    const layerName = layer.getName();
+    let layerRenderer = this.layersRenderers[layerName];
+    if (!layerRenderer) {
+      this.layersRenderers[layerName] = layerRenderer = new LayerRenderer({
+        project: this.project,
+        globalObjectsContainer: this.globalObjectsContainer,
+        objectsContainer: this.objectsContainer,
+        instances: this.instances,
+        viewPosition: this.viewPosition,
+        layer: layer,
+        onInstanceClicked: this.onInstanceClicked,
+        onInstanceRightClicked: this.onInstanceRightClicked,
+        onInstanceDoubleClicked: this.onInstanceDoubleClicked,
+        onOverInstance: this.onOverInstance,
+        onOutInstance: this.onOutInstance,
+        onMoveInstance: this.onMoveInstance,
+        onMoveInstanceEnd: this.onMoveInstanceEnd,
+        onDownInstance: this.onDownInstance,
+        onUpInstance: this.onUpInstance,
+        pixiRenderer: pixiRenderer,
+        showObjectInstancesIn3D: this._showObjectInstancesIn3D,
+      });
+      this.pixiContainer.addChild(layerRenderer.getPixiContainer());
+    }
+    return layerRenderer;
+  }
+
+  /**
+   * Create the renderers of the layers that don't have one yet. They are
+   * normally created lazily at the first render: call this to measure
+   * instances (see `getInstanceMeasurer`) before it happened - for example
+   * right after the renderers were remounted, as the measurer falls back
+   * to a zero-sized rectangle at the instance origin without them.
+   */
+  ensureLayerRenderersExist(
+    // $FlowFixMe[value-as-type]
+    pixiRenderer: PIXI.Renderer
+  ) {
+    for (let i = 0; i < this.layersContainer.getLayersCount(); i++) {
+      this._getOrCreateLayerRenderer(
+        this.layersContainer.getLayerAt(i),
+        pixiRenderer
+      );
+    }
+  }
+
   render(
     // $FlowFixMe[value-as-type]
     pixiRenderer: PIXI.Renderer,
@@ -232,31 +283,8 @@ export default class InstancesRenderer {
 
     for (let i = 0; i < this.layersContainer.getLayersCount(); i++) {
       const layer = this.layersContainer.getLayerAt(i);
-      const layerName = layer.getName();
 
-      let layerRenderer = this.layersRenderers[layerName];
-      if (!layerRenderer) {
-        this.layersRenderers[layerName] = layerRenderer = new LayerRenderer({
-          project: this.project,
-          globalObjectsContainer: this.globalObjectsContainer,
-          objectsContainer: this.objectsContainer,
-          instances: this.instances,
-          viewPosition: this.viewPosition,
-          layer: layer,
-          onInstanceClicked: this.onInstanceClicked,
-          onInstanceRightClicked: this.onInstanceRightClicked,
-          onInstanceDoubleClicked: this.onInstanceDoubleClicked,
-          onOverInstance: this.onOverInstance,
-          onOutInstance: this.onOutInstance,
-          onMoveInstance: this.onMoveInstance,
-          onMoveInstanceEnd: this.onMoveInstanceEnd,
-          onDownInstance: this.onDownInstance,
-          onUpInstance: this.onUpInstance,
-          pixiRenderer: pixiRenderer,
-          showObjectInstancesIn3D: this._showObjectInstancesIn3D,
-        });
-        this.pixiContainer.addChild(layerRenderer.getPixiContainer());
-      }
+      const layerRenderer = this._getOrCreateLayerRenderer(layer, pixiRenderer);
 
       // /!\ Objects representing layers can be deleted at any moment and replaced
       // by new one, for example when two layers are swapped.

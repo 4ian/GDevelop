@@ -113,6 +113,8 @@ type Props = {|
   beforeSetAsGlobalGroup?: (groupName: string) => boolean,
   onGroupRemoved?: () => void,
   onGroupRenamed?: () => void,
+  // Called after any other change of the groups (like their order).
+  onObjectGroupsModified?: () => void,
   canSetAsGlobalGroup?: boolean,
   unsavedChanges?: ?UnsavedChanges,
   isListLocked: boolean,
@@ -132,6 +134,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       getValidatedObjectOrGroupName,
       onRenameGroup,
       onGroupRenamed,
+      onObjectGroupsModified,
       beforeSetAsGlobalGroup,
       unsavedChanges,
       onEditGroup,
@@ -224,9 +227,10 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     const onObjectGroupModified = React.useCallback(
       () => {
         if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        if (onObjectGroupsModified) onObjectGroupsModified();
         forceUpdate();
       },
-      [unsavedChanges, forceUpdate]
+      [unsavedChanges, forceUpdate, onObjectGroupsModified]
     );
 
     const onDelete = React.useCallback(

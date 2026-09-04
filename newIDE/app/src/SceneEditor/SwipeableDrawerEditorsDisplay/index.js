@@ -27,6 +27,7 @@ import {
   type SceneEditorsDisplayInterface,
   type SceneEditorsDisplayProps,
 } from '../EditorsDisplay.flow';
+import { type FieldModificationContext } from '../../CompactPropertiesEditor';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import {
   InstanceOrObjectPropertiesEditorContainer,
@@ -145,6 +146,27 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
     const forceUpdateInstancesList = React.useCallback(() => {
       if (instancesListRef.current) instancesListRef.current.forceUpdate();
     }, []);
+    const _onInstancesModified = React.useCallback(
+      (
+        instances: Array<gdInitialInstance>,
+        context: ?FieldModificationContext
+      ) => {
+        if (onInstancesModified)
+          onInstancesModified(instances, {
+            editorId: 'properties',
+            fieldName: context ? context.fieldName : undefined,
+          });
+        forceUpdateInstancesList();
+      },
+      [onInstancesModified, forceUpdateInstancesList]
+    );
+    const _onInstancesModifiedInInstancesList = React.useCallback(
+      (instances: Array<gdInitialInstance>) => {
+        if (onInstancesModified)
+          onInstancesModified(instances, { editorId: 'instances-list' });
+      },
+      [onInstancesModified]
+    );
     const forceUpdateObjectsList = React.useCallback(() => {
       if (objectsListRef.current) objectsListRef.current.forceUpdateList();
     }, []);
@@ -254,6 +276,13 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
           centerViewOnLastInstance: editor
             ? editor.centerViewOnLastInstance
             : noop,
+          isInstanceVisibleInViewport: editor
+            ? editor.isInstanceVisibleInViewport
+            : () => false,
+          scrollViewToLastInstance: editor
+            ? editor.scrollViewToLastInstance
+            : noop,
+          scrollViewToPoint: editor ? editor.scrollViewToPoint : noop,
           getLastCursorSceneCoordinates: editor
             ? editor.getLastCursorSceneCoordinates
             : () => [0, 0],
@@ -440,6 +469,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         }
                         onObjectCreated={props.onObjectCreated}
                         onEffectAdded={props.onEffectAdded}
+                        onObjectFolderOrObjectsModified={
+                          props.onObjectFolderOrObjectsModified
+                        }
                         onObjectEdited={props.onObjectEdited}
                         onObjectFolderOrObjectsWithContextSelected={
                           props.onObjectFolderOrObjectsWithContextSelected
@@ -499,10 +531,20 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onEditObjectGroup={props.onEditObjectGroup}
                         onObjectsModified={props.onObjectsModified}
                         onEffectAdded={props.onEffectAdded}
-                        onInstancesModified={forceUpdateInstancesList}
+                        onInstancesModified={_onInstancesModified}
+                        onScenePropertiesModified={
+                          props.onScenePropertiesModified
+                        }
                         onGetInstanceSize={getInstanceSize}
                         ref={instanceOrObjectPropertiesEditorRef}
                         historyHandler={props.historyHandler}
+                        onBehaviorSharedDataModified={
+                          props.onBehaviorSharedDataModified
+                        }
+                        onLayerPropertiesModified={
+                          props.onLayerPropertiesModified
+                        }
+                        onObjectGroupModified={props.onObjectGroupModified}
                         tileMapTileSelection={props.tileMapTileSelection}
                         onSelectTileMapTile={props.onSelectTileMapTile}
                         lastSelectionType={props.lastSelectionType}
@@ -565,6 +607,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onEditGroup={props.onEditObjectGroup}
                         onDeleteGroup={props.onDeleteObjectGroup}
                         onRenameGroup={props.onRenameObjectGroup}
+                        onObjectGroupsModified={props.onObjectGroupsModified}
                         getValidatedObjectOrGroupName={(newName, global) =>
                           props.getValidatedObjectOrGroupName(
                             newName,
@@ -591,7 +634,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                       instances={initialInstances}
                       selectedInstances={selectedInstances}
                       onSelectInstances={selectInstances}
-                      onInstancesModified={onInstancesModified || noop}
+                      onInstancesModified={_onInstancesModifiedInInstancesList}
                       ref={instancesListRef}
                     />
                   </Paper>

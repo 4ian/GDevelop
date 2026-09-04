@@ -210,6 +210,9 @@ const CompactTextField: React.ComponentType<{
             type={'text'}
             ref={inputRef}
             disabled={disabled}
+            // Don't let the browser suggest values previously typed in this
+            // field: a property has no reason to take one of its old values.
+            autoComplete="off"
             value={
               value === null
                 ? ''

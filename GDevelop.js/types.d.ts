@@ -548,6 +548,10 @@ export class ObjectsContainer extends EmscriptenObject {
   getRootFolder(): ObjectFolderOrObject;
   getAllObjectFolderOrObjects(): VectorObjectFolderOrObject;
   getObjectGroups(): ObjectGroupsContainer;
+  serializeObjectsTo(element: SerializerElement): void;
+  unserializeObjectsFrom(project: Project, element: SerializerElement): void;
+  serializeFoldersTo(element: SerializerElement): void;
+  unserializeFoldersFrom(project: Project, element: SerializerElement): void;
   getTypeOfBehavior(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
   getTypeOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(layout: ObjectsContainer, name: string, searchInGroups: boolean): VectorString;

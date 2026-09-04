@@ -40,8 +40,9 @@ import {
   canUndo,
   canRedo,
   getHistoryInitialState,
-  saveToHistory,
+  saveValueToHistory,
 } from '../Utils/History';
+import debounce from 'lodash/debounce';
 import {
   hasVariablesContainerSubChildren,
   insertInVariableChildren,
@@ -135,7 +136,9 @@ const getIndent = ({
   );
 
 export type HistoryHandler = {|
-  saveToHistory: () => void,
+  // Changes saved with the same `batchKey` in a short interval are merged
+  // in a single undoable step (like typing a value digit by digit).
+  saveToHistory: (batchKey?: string) => void,
   undo: () => void,
   redo: () => void,
   canUndo: () => boolean,
@@ -808,43 +811,117 @@ const VariablesList: React.ComponentType<{
         })
       : [];
 
-  const _onChange = React.useCallback(
+  // A change of the local history waiting to be saved, so that a rapid
+  // series of changes on the same variable (like typing a value digit by
+  // digit) makes a single undoable step. The snapshot is taken at the time
+  // of the change, so that a change on something else, which flushes it,
+  // is not merged in it.
+  const pendingLocalHistorySaveRef = React.useRef<null | {|
+    batchKey: string,
+    value: Object,
+  |}>(null);
+  const flushPendingLocalHistorySave = React.useCallback(
     () => {
-      if (historyHandler) historyHandler.saveToHistory();
-      else if (historyRef.current)
-        historyRef.current = saveToHistory(
-          historyRef.current,
-          variablesContainer
-        );
+      const pending = pendingLocalHistorySaveRef.current;
+      if (!pending) return;
+      pendingLocalHistorySaveRef.current = null;
+      const history = historyRef.current;
+      if (history)
+        historyRef.current = saveValueToHistory(history, pending.value);
+    },
+    [historyRef]
+  );
+  const flushPendingLocalHistorySaveDebounced = React.useMemo(
+    () => debounce(flushPendingLocalHistorySave, 500),
+    [flushPendingLocalHistorySave]
+  );
+  React.useEffect(
+    () => () => {
+      // The local history does not survive the unmount: nothing to flush.
+      flushPendingLocalHistorySaveDebounced.cancel();
+    },
+    [flushPendingLocalHistorySaveDebounced]
+  );
+
+  const _onChange = React.useCallback(
+    (batchKey?: string) => {
+      if (historyHandler) historyHandler.saveToHistory(batchKey);
+      else if (historyRef.current) {
+        const pending = pendingLocalHistorySaveRef.current;
+        if (!batchKey || (pending && pending.batchKey !== batchKey)) {
+          flushPendingLocalHistorySaveDebounced.cancel();
+          flushPendingLocalHistorySave();
+        }
+        const value = serializeToJSObject(variablesContainer);
+        const history = historyRef.current;
+        if (batchKey) {
+          pendingLocalHistorySaveRef.current = { batchKey, value };
+          flushPendingLocalHistorySaveDebounced();
+        } else if (history) {
+          historyRef.current = saveValueToHistory(history, value);
+        }
+      }
       if (onVariablesUpdated) onVariablesUpdated();
     },
-    [historyRef, historyHandler, onVariablesUpdated, variablesContainer]
+    [
+      historyRef,
+      historyHandler,
+      onVariablesUpdated,
+      variablesContainer,
+      flushPendingLocalHistorySave,
+      flushPendingLocalHistorySaveDebounced,
+    ]
   );
 
   const _undo = React.useCallback(
     () => {
       if (historyHandler) historyHandler.undo();
-      else if (historyRef.current)
-        historyRef.current = undo(historyRef.current, props.variablesContainer);
+      else if (historyRef.current) {
+        flushPendingLocalHistorySaveDebounced.cancel();
+        flushPendingLocalHistorySave();
+        const history = historyRef.current;
+        if (history)
+          historyRef.current = undo(history, props.variablesContainer);
+      }
       setSelectedNodes([]);
     },
-    [historyHandler, historyRef, props.variablesContainer, setSelectedNodes]
+    [
+      historyHandler,
+      historyRef,
+      props.variablesContainer,
+      setSelectedNodes,
+      flushPendingLocalHistorySave,
+      flushPendingLocalHistorySaveDebounced,
+    ]
   );
 
   const _redo = React.useCallback(
     () => {
       if (historyHandler) historyHandler.redo();
-      else if (historyRef.current)
-        historyRef.current = redo(historyRef.current, props.variablesContainer);
+      else if (historyRef.current) {
+        flushPendingLocalHistorySaveDebounced.cancel();
+        flushPendingLocalHistorySave();
+        const history = historyRef.current;
+        if (history)
+          historyRef.current = redo(history, props.variablesContainer);
+      }
       setSelectedNodes([]);
     },
-    [historyHandler, historyRef, props.variablesContainer, setSelectedNodes]
+    [
+      historyHandler,
+      historyRef,
+      props.variablesContainer,
+      setSelectedNodes,
+      flushPendingLocalHistorySave,
+      flushPendingLocalHistorySaveDebounced,
+    ]
   );
 
   const _canUndo = (): boolean =>
     props.historyHandler
       ? props.historyHandler.canUndo()
-      : !!historyRef.current && canUndo(historyRef.current);
+      : !!historyRef.current &&
+        (!!pendingLocalHistorySaveRef.current || canUndo(historyRef.current));
 
   const _canRedo = (): boolean =>
     props.historyHandler
@@ -1817,7 +1894,7 @@ const VariablesList: React.ComponentType<{
             `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
           );
       }
-      _onChange();
+      _onChange(`value:${nodeId}`);
       forceUpdate();
     },
     [

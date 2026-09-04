@@ -1,0 +1,2504 @@
+{
+  "firstLayout": "Scene",
+  "gdVersion": {
+    "build": 281,
+    "major": 5,
+    "minor": 6,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": false,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.gdevelop.tests.concavecollisionmasks",
+    "pixelsRounding": false,
+    "projectUuid": "caa736a8-98c4-4aa8-9f81-e142d01a2457",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "useDeprecatedZeroAsDefaultStringVariable": true,
+    "useDeprecatedZeroAsDefaultZOrder": true,
+    "version": "1.0.0",
+    "name": "Concave collision masks",
+    "description": "Manual test for concave sprite collision masks (automatically split into convex polygons).",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 10,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "backgroundColor": 0,
+      "backgroundFadeInDuration": 0.2,
+      "backgroundImageResourceName": "",
+      "gdevelopLogoStyle": "light",
+      "logoAndProgressFadeInDuration": 0.2,
+      "logoAndProgressLogoFadeInDelay": 0.2,
+      "minDuration": 1.5,
+      "progressBarColor": 16777215,
+      "progressBarHeight": 20,
+      "progressBarMaxWidth": 200,
+      "progressBarMinWidth": 40,
+      "progressBarWidthPercent": 30,
+      "showGDevelopSplash": false,
+      "showProgressBar": true
+    },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
+    "authorIds": [],
+    "authorUsernames": [],
+    "categories": [],
+    "playableDevices": [],
+    "extensionProperties": [],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "file": "ConcaveShape.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "ConcaveShape.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "ConvexShape.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "ConvexShape.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "FullImageShape.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "FullImageShape.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "Player.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Player.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "Coin.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Coin.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "assets/Bunny.glb",
+        "kind": "model3D",
+        "metadata": "",
+        "name": "Bunny.glb",
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/3D Colorful Monsters/Standing/d3ede48f1b7b3c5c2a0aba8499f84117c72e1411f3069b94dd026db295587de5_Bunny.glb",
+          "name": "Bunny.glb"
+        }
+      },
+      {
+        "file": "assets/Base 1 Low White Green.glb",
+        "kind": "model3D",
+        "metadata": "",
+        "name": "Base 1 Low White Green.glb",
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://private-assets-dev.gdevelop.io/d6cc1aec-721d-46f5-b2eb-f5ad7a9a7f23/resources/assets/Platform/Base/Green/Base 1 Low White Green.glb",
+          "name": "gdevelop-private-asset-storage"
+        }
+      },
+      {
+        "file": "assets/wall archedwindow gated.glb",
+        "kind": "model3D",
+        "metadata": "",
+        "name": "wall archedwindow gated.glb",
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://private-assets-dev.gdevelop.io/6f680db3-9bc4-46eb-9814-adf0d3f7b7ef/resources/assets/Wall/wall archedwindow gated.glb",
+          "name": "gdevelop-private-asset-storage"
+        }
+      }
+    ]
+  },
+  "objects": [],
+  "objectsFolderStructure": {
+    "folderName": "__ROOT"
+  },
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 255,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Scene",
+      "name": "Scene",
+      "r": 247,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 249,
+      "uiSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridDepth": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridOffsetZ": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 1.0676438397327954,
+        "windowMask": false,
+        "selectedLayer": "",
+        "gameEditorMode": "instances-editor"
+      },
+      "objectsGroups": [],
+      "variables": [
+        {
+          "name": "CollectedCoins",
+          "persistentUuid": "c96ce349-8f7c-4a53-8fab-e96781aec11d",
+          "type": "number",
+          "value": 0
+        }
+      ],
+      "instances": [
+        {
+          "angle": 316,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Player",
+          "persistentUuid": "e06887c8-4574-43eb-b24b-623ca5a34cb8",
+          "width": 0,
+          "x": 97,
+          "y": 119,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ConcaveShape",
+          "persistentUuid": "895bb2a3-e477-482d-b5bb-c7e249979948",
+          "width": 0,
+          "x": 105,
+          "y": 134,
+          "zOrder": -4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ConvexShape",
+          "persistentUuid": "03400ddc-d342-4e5c-a58f-fb36e7b28d5f",
+          "width": 0,
+          "x": 600,
+          "y": 100,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "FullImageShape",
+          "persistentUuid": "23f96172-4617-4f29-bb5f-6c0e44732e11",
+          "width": 0,
+          "x": 600,
+          "y": 400,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coin",
+          "persistentUuid": "d9c45dda-1db4-4f56-9005-f2bf0dae66ef",
+          "width": 0,
+          "x": 264,
+          "y": 292,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ScoreText",
+          "persistentUuid": "7645c009-a8bf-45ef-ae76-c371fc66290f",
+          "width": 0,
+          "x": 16,
+          "y": 12,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "ConcaveShape",
+          "persistentUuid": "bfc645f4-f225-40f4-a13b-b9214b0d4817",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "ConcaveShape.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 256,
+                            "y": 0
+                          },
+                          {
+                            "x": 256,
+                            "y": 80
+                          },
+                          {
+                            "x": 80,
+                            "y": 80
+                          },
+                          {
+                            "x": 80,
+                            "y": 256
+                          },
+                          {
+                            "x": 0,
+                            "y": 256
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "ConvexShape",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "ConvexShape.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 64,
+                            "y": 4
+                          },
+                          {
+                            "x": 116,
+                            "y": 34
+                          },
+                          {
+                            "x": 116,
+                            "y": 94
+                          },
+                          {
+                            "x": 64,
+                            "y": 124
+                          },
+                          {
+                            "x": 12,
+                            "y": 94
+                          },
+                          {
+                            "x": 12,
+                            "y": 34
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "FullImageShape",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "FullImageShape.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Player",
+          "persistentUuid": "50604ae8-5372-49ab-9a53-4ee0c11eb8b5",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "TopDownMovement",
+              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
+              "acceleration": 2000,
+              "allowDiagonals": true,
+              "angleOffset": 0,
+              "angularMaxSpeed": 180,
+              "customIsometryAngle": 30,
+              "deceleration": 2000,
+              "ignoreDefaultControls": false,
+              "maxSpeed": 250,
+              "movementAngleOffset": 0,
+              "rotateObject": true,
+              "useLegacyTurnBack": false,
+              "viewpoint": "TopDown"
+            }
+          ],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Player.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Coin",
+          "persistentUuid": "86ead9b1-3782-47bf-842d-488a4871c260",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Coin.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "ScoreText",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Coins: 0",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 24,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Coins: 0",
+            "font": "",
+            "textAlignment": "left",
+            "verticalTextAlignment": "top",
+            "characterSize": 24,
+            "lineHeight": 0,
+            "color": "0;0;0"
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "New3DBox",
+          "persistentUuid": "5c1abb48-3f5d-4356-b2c9-47a11eda2658",
+          "type": "Scene3D::Cube3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "width": 100,
+            "height": 100,
+            "depth": 100,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Y",
+            "frontFaceResourceName": "",
+            "backFaceResourceName": "",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "",
+            "rightFaceResourceName": "",
+            "topFaceResourceName": "",
+            "bottomFaceResourceName": "",
+            "frontFaceVisible": true,
+            "backFaceVisible": true,
+            "leftFaceVisible": true,
+            "rightFaceVisible": true,
+            "topFaceVisible": true,
+            "bottomFaceVisible": true,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "tileScale": 1,
+            "materialType": "StandardWithoutMetalness",
+            "tint": "255;255;255",
+            "isCastingShadow": true,
+            "isReceivingShadow": true
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "ConcaveShape"
+          },
+          {
+            "objectName": "ConvexShape"
+          },
+          {
+            "objectName": "FullImageShape"
+          },
+          {
+            "objectName": "Player"
+          },
+          {
+            "objectName": "Coin"
+          },
+          {
+            "objectName": "ScoreText"
+          },
+          {
+            "objectName": "New3DBox"
+          }
+        ]
+      },
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 46,
+            "g": 37,
+            "r": 37,
+            "textB": 140,
+            "textG": 136,
+            "textR": 136
+          },
+          "comment": "Manual test for concave sprite collision masks.\nConcaveShape has a concave (L shaped) collision mask, split into convex polygons by the game engine.\nConvexShape has a convex (hexagon) mask. FullImageShape has no custom mask (full image bounding box).\nMove the Player with the arrow keys: it must be blocked by the shapes, and enter the empty corner of the L."
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Debug draw",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneJustBegins"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "DebuggerTools::EnableDebugDraw"
+                  },
+                  "parameters": [
+                    "",
+                    "yes",
+                    "yes",
+                    "yes",
+                    "yes"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Player is blocked by the shapes",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "ConcaveShape",
+                    "",
+                    "",
+                    "no"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SeparateFromObjects"
+                  },
+                  "parameters": [
+                    "Player",
+                    "ConcaveShape",
+                    "no"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "ConvexShape",
+                    "",
+                    "",
+                    "no"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SeparateFromObjects"
+                  },
+                  "parameters": [
+                    "Player",
+                    "ConvexShape",
+                    "no"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "FullImageShape",
+                    "",
+                    "",
+                    "no"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SeparateFromObjects"
+                  },
+                  "parameters": [
+                    "Player",
+                    "FullImageShape",
+                    "no"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Collect the coin hidden in the empty corner of the L",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Coin",
+                    "",
+                    "",
+                    "no"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Coin",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CollectedCoins",
+                    "+",
+                    "1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "ScoreText",
+                    "Text",
+                    "=",
+                    "\"Coins: \" + ToString(Variable(CollectedCoins))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": [
+            {
+              "effectType": "Scene3D::HemisphereLight",
+              "name": "3D Ambient Hemisphere Light",
+              "doubleParameters": {
+                "elevation": 40,
+                "intensity": 0.33,
+                "rotation": 300
+              },
+              "stringParameters": {
+                "groundColor": "127;127;127",
+                "skyColor": "255;255;255",
+                "top": "Z+"
+              },
+              "booleanParameters": {}
+            },
+            {
+              "effectType": "Scene3D::DirectionalLight",
+              "name": "3D Sun Light",
+              "doubleParameters": {
+                "distanceFromCamera": 1500,
+                "elevation": 40,
+                "frustumSize": 4000,
+                "intensity": 0.75,
+                "minimumShadowBias": 0,
+                "rotation": 300
+              },
+              "stringParameters": {
+                "color": "255;255;255",
+                "shadowQuality": "medium",
+                "top": "Z+"
+              },
+              "booleanParameters": {
+                "isCastingShadow": true
+              }
+            }
+          ]
+        }
+      ],
+      "behaviorsSharedData": [
+        {
+          "name": "Animation",
+          "type": "AnimatableCapability::AnimatableBehavior"
+        },
+        {
+          "name": "Effect",
+          "type": "EffectCapability::EffectBehavior"
+        },
+        {
+          "name": "Flippable",
+          "type": "FlippableCapability::FlippableBehavior"
+        },
+        {
+          "name": "Object3D",
+          "type": "Scene3D::Base3DBehavior"
+        },
+        {
+          "name": "Opacity",
+          "type": "OpacityCapability::OpacityBehavior"
+        },
+        {
+          "name": "Resizable",
+          "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "Scale",
+          "type": "ScalableCapability::ScalableBehavior"
+        },
+        {
+          "name": "Text",
+          "type": "TextContainerCapability::TextContainerBehavior"
+        },
+        {
+          "name": "TopDownMovement",
+          "type": "TopDownMovementBehavior::TopDownMovementBehavior"
+        }
+      ]
+    },
+    {
+      "b": 255,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Scene2",
+      "name": "Scene2",
+      "r": 247,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 249,
+      "uiSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridDepth": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridOffsetZ": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 0.5320619346001235,
+        "windowMask": false,
+        "selectedLayer": "",
+        "gameEditorMode": "instances-editor"
+      },
+      "objectsGroups": [],
+      "variables": [
+        {
+          "name": "CollectedCoins",
+          "persistentUuid": "c96ce349-8f7c-4a53-8fab-e96781aec11d",
+          "type": "number",
+          "value": 0
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Player",
+          "persistentUuid": "e06887c8-4574-43eb-b24b-623ca5a34cb8",
+          "width": 0,
+          "x": 79,
+          "y": 543,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ConcaveShape",
+          "persistentUuid": "895bb2a3-e477-482d-b5bb-c7e249979948",
+          "width": 0,
+          "x": 127,
+          "y": 74,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 1,
+          "height": 190,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ConvexShape",
+          "persistentUuid": "03400ddc-d342-4e5c-a58f-fb36e7b28d5f",
+          "width": 182,
+          "x": 604,
+          "y": 63,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "FullImageShape",
+          "persistentUuid": "23f96172-4617-4f29-bb5f-6c0e44732e11",
+          "width": 0,
+          "x": 564,
+          "y": 410,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coin",
+          "persistentUuid": "d9c45dda-1db4-4f56-9005-f2bf0dae66ef",
+          "width": 0,
+          "x": 252,
+          "y": 202,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ScoreText",
+          "persistentUuid": "7645c009-a8bf-45ef-ae76-c371fc66290f",
+          "width": 0,
+          "x": 11,
+          "y": 15,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coin",
+          "persistentUuid": "f276d73e-87da-41da-b7e8-52b58b60804f",
+          "width": 0,
+          "x": 333,
+          "y": 11,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 90,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ConcaveShape",
+          "persistentUuid": "9a20c01a-efa6-48f2-9346-a04ea20baff0",
+          "width": 0,
+          "x": 292,
+          "y": 261,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ConcaveShape",
+          "persistentUuid": "967f54a7-5a6c-495f-8c64-5ac3560822d2",
+          "width": 0,
+          "x": 467,
+          "y": -74,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coin",
+          "persistentUuid": "74cb26ae-82b8-4bc5-942d-e38fe3588f89",
+          "width": 0,
+          "x": 753,
+          "y": 62,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 90,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ConcaveShape",
+          "persistentUuid": "c01bd518-0494-465a-9453-bf8e0a6dc611",
+          "width": 0,
+          "x": 627,
+          "y": -76,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Coin",
+          "persistentUuid": "52c4ca7a-412e-449b-98f6-6471173d384e",
+          "width": 0,
+          "x": 623,
+          "y": 522,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 225,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ConcaveShape",
+          "persistentUuid": "722aafd3-8afa-44d5-8883-d2e26af61f90",
+          "width": 0,
+          "x": 509,
+          "y": 407,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "ConcaveShape",
+          "persistentUuid": "bfc645f4-f225-40f4-a13b-b9214b0d4817",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "NavMeshObstacle",
+              "type": "NavMeshPathfinding::NavMeshObstacleBehavior",
+              "shape": "Box",
+              "meshShapeResourceName": ""
+            }
+          ],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "ConcaveShape.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 256,
+                            "y": 0
+                          },
+                          {
+                            "x": 256,
+                            "y": 80
+                          },
+                          {
+                            "x": 80,
+                            "y": 80
+                          },
+                          {
+                            "x": 80,
+                            "y": 256
+                          },
+                          {
+                            "x": 0,
+                            "y": 256
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "ConvexShape",
+          "persistentUuid": "7fca2d27-4519-4cc8-bb27-30f73352ad37",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "NavMeshObstacle",
+              "type": "NavMeshPathfinding::NavMeshObstacleBehavior",
+              "shape": "Box",
+              "meshShapeResourceName": ""
+            }
+          ],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "ConvexShape.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 64,
+                            "y": 4
+                          },
+                          {
+                            "x": 116,
+                            "y": 34
+                          },
+                          {
+                            "x": 116,
+                            "y": 94
+                          },
+                          {
+                            "x": 64,
+                            "y": 124
+                          },
+                          {
+                            "x": 12,
+                            "y": 94
+                          },
+                          {
+                            "x": 12,
+                            "y": 34
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "FullImageShape",
+          "persistentUuid": "6fe8af93-3942-48a4-a6be-45ebe52af221",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "NavMeshObstacle",
+              "type": "NavMeshPathfinding::NavMeshObstacleBehavior",
+              "shape": "Box",
+              "meshShapeResourceName": ""
+            }
+          ],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "FullImageShape.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Player",
+          "persistentUuid": "ab408df0-4478-4ea4-91ea-99996a76f56d",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "NavMeshCharacter",
+              "type": "NavMeshPathfinding::NavMeshCharacterBehavior",
+              "acceleration": 400,
+              "maxSpeed": 200,
+              "angularMaxSpeed": 180,
+              "rotateObject": true,
+              "angleOffset": 0,
+              "radius": 16,
+              "avoidanceSightRange": 120
+            },
+            {
+              "name": "TopDownMovement",
+              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
+              "ignoreDefaultControls": true,
+              "acceleration": 2000,
+              "allowDiagonals": true,
+              "angleOffset": 0,
+              "angularMaxSpeed": 180,
+              "customIsometryAngle": 30,
+              "deceleration": 2000,
+              "maxSpeed": 250,
+              "movementAngleOffset": 0,
+              "rotateObject": true,
+              "useLegacyTurnBack": false,
+              "viewpoint": "TopDown"
+            }
+          ],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Player.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 16,
+                        "y": 16
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "",
+          "name": "Coin",
+          "persistentUuid": "86ead9b1-3782-47bf-842d-488a4871c260",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Coin.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "ScoreText",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Coins: 0",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 24,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Coins: 0",
+            "font": "",
+            "textAlignment": "left",
+            "verticalTextAlignment": "top",
+            "characterSize": 24,
+            "lineHeight": 0,
+            "color": "0;0;0"
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "ConcaveShape"
+          },
+          {
+            "objectName": "ConvexShape"
+          },
+          {
+            "objectName": "FullImageShape"
+          },
+          {
+            "objectName": "Player"
+          },
+          {
+            "objectName": "Coin"
+          },
+          {
+            "objectName": "ScoreText"
+          }
+        ]
+      },
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 46,
+            "g": 37,
+            "r": 37,
+            "textB": 140,
+            "textG": 136,
+            "textR": 136
+          },
+          "comment": "Manual test for concave sprite collision masks.\nConcaveShape has a concave (L shaped) collision mask, split into convex polygons by the game engine.\nConvexShape has a convex (hexagon) mask. FullImageShape has no custom mask (full image bounding box).\nMove the Player with the arrow keys: it must be blocked by the shapes, and enter the empty corner of the L."
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Debug draw",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneJustBegins"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "DebuggerTools::EnableDebugDraw"
+                  },
+                  "parameters": [
+                    "",
+                    "yes",
+                    "yes",
+                    "yes",
+                    "yes"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Player is blocked by the shapes",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "ConcaveShape",
+                    "",
+                    "",
+                    "no"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SeparateFromObjects"
+                  },
+                  "parameters": [
+                    "Player",
+                    "ConcaveShape",
+                    "no"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "ConvexShape",
+                    "",
+                    "",
+                    "no"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SeparateFromObjects"
+                  },
+                  "parameters": [
+                    "Player",
+                    "ConvexShape",
+                    "no"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "FullImageShape",
+                    "",
+                    "",
+                    "no"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SeparateFromObjects"
+                  },
+                  "parameters": [
+                    "Player",
+                    "FullImageShape",
+                    "no"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "Collect the coin hidden in the empty corner of the L",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Coin",
+                    "",
+                    "",
+                    "no"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Coin",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CollectedCoins",
+                    "+",
+                    "1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "ScoreText",
+                    "Text",
+                    "=",
+                    "\"Coins: \" + ToString(Variable(CollectedCoins))"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "NavMesh: the player walks to the coins by itself",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 46,
+                "g": 37,
+                "r": 37,
+                "textB": 140,
+                "textG": 136,
+                "textR": 136
+              },
+              "comment": "The player has no keyboard controls here: the NavMesh pathfinding drives it to the nearest coin, one after the other, until the 4 coins are collected.\nThe shapes are NavMesh obstacles: the concave L must leave its empty corner walkable."
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "SceneJustBegins"
+                  },
+                  "parameters": [
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "NavMeshPathfinding::EnableDebugDraw"
+                  },
+                  "parameters": [
+                    "",
+                    "yes"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Or"
+                  },
+                  "parameters": [],
+                  "subInstructions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "NavMeshPathfinding::PathFound"
+                      },
+                      "parameters": [
+                        "Player",
+                        "NavMeshCharacter"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "NavMeshPathfinding::DestinationReached"
+                      },
+                      "parameters": [
+                        "Player",
+                        "NavMeshCharacter"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PickNearest"
+                  },
+                  "parameters": [
+                    "Coin",
+                    "Player.CenterX()",
+                    "Player.CenterY()",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "NavMeshPathfinding::MoveTo"
+                  },
+                  "parameters": [
+                    "Player",
+                    "NavMeshCharacter",
+                    "Coin.CenterX()",
+                    "Coin.CenterY()",
+                    "0"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "CollectedCoins",
+                    ">=",
+                    "4"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+                  },
+                  "parameters": [
+                    "ScoreText",
+                    "Text",
+                    "=",
+                    "\"All 4 coins collected!\""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": [
+            {
+              "effectType": "Scene3D::HemisphereLight",
+              "name": "3D Ambient Hemisphere Light",
+              "doubleParameters": {
+                "elevation": 40,
+                "intensity": 0.33,
+                "rotation": 300
+              },
+              "stringParameters": {
+                "groundColor": "127;127;127",
+                "skyColor": "255;255;255",
+                "top": "Z+"
+              },
+              "booleanParameters": {}
+            },
+            {
+              "effectType": "Scene3D::DirectionalLight",
+              "name": "3D Sun Light",
+              "doubleParameters": {
+                "distanceFromCamera": 1500,
+                "elevation": 40,
+                "frustumSize": 4000,
+                "intensity": 0.75,
+                "minimumShadowBias": 0,
+                "rotation": 300
+              },
+              "stringParameters": {
+                "color": "255;255;255",
+                "shadowQuality": "medium",
+                "top": "Z+"
+              },
+              "booleanParameters": {
+                "isCastingShadow": true
+              }
+            }
+          ]
+        }
+      ],
+      "behaviorsSharedData": [
+        {
+          "name": "Animation",
+          "type": "AnimatableCapability::AnimatableBehavior"
+        },
+        {
+          "name": "Effect",
+          "type": "EffectCapability::EffectBehavior"
+        },
+        {
+          "name": "Flippable",
+          "type": "FlippableCapability::FlippableBehavior"
+        },
+        {
+          "name": "NavMeshCharacter",
+          "type": "NavMeshPathfinding::NavMeshCharacterBehavior",
+          "cellSize": 4,
+          "cellDepth": 4,
+          "slopeMaxAngle": 50,
+          "stairHeightMax": 20,
+          "walkableRadius": -1,
+          "walkableDepth": 150,
+          "speedScaleY": 1
+        },
+        {
+          "name": "NavMeshObstacle",
+          "type": "NavMeshPathfinding::NavMeshObstacleBehavior"
+        },
+        {
+          "name": "Opacity",
+          "type": "OpacityCapability::OpacityBehavior"
+        },
+        {
+          "name": "Resizable",
+          "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "Scale",
+          "type": "ScalableCapability::ScalableBehavior"
+        },
+        {
+          "name": "Text",
+          "type": "TextContainerCapability::TextContainerBehavior"
+        },
+        {
+          "name": "TopDownMovement",
+          "type": "TopDownMovementBehavior::TopDownMovementBehavior"
+        }
+      ]
+    },
+    {
+      "b": 255,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "_51d_32test",
+      "name": "3d test",
+      "r": 247,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 249,
+      "uiSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridDepth": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridOffsetZ": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 0.875,
+        "windowMask": false,
+        "selectedLayer": "",
+        "gameEditorMode": "embedded-game"
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 145,
+          "height": 145,
+          "layer": "",
+          "name": "wall_archedwindow_gated",
+          "persistentUuid": "ad084e90-238d-451f-af28-0f9ec754a8a3",
+          "width": 36,
+          "x": 224,
+          "y": 335,
+          "z": 20,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 319,
+          "layer": "",
+          "name": "Base_1_Low_White_Green",
+          "persistentUuid": "bc9d9acd-77ed-4d94-96d6-9d321f6ab757",
+          "width": 318.8257486031299,
+          "x": 338,
+          "y": 253,
+          "z": -55,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 145,
+          "height": 145,
+          "layer": "",
+          "name": "wall_archedwindow_gated",
+          "persistentUuid": "860c5f01-1b47-4477-bf3b-cf148b08dc9b",
+          "width": 36,
+          "x": 224,
+          "y": 192,
+          "z": 25,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 144,
+          "layer": "",
+          "name": "Bunny",
+          "persistentUuid": "29f4619f-5f68-44e3-9fdb-15af3b4debd2",
+          "width": 54.39373706092506,
+          "x": 404,
+          "y": 267,
+          "z": 24.923812018910496,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "assetStoreId": "7f724eed4de900004f1edcbf2bad9f651868cf2448150a49fe6c27d3a1846b33",
+          "name": "Bunny",
+          "persistentUuid": "887c661c-1428-485a-95a2-537987019843",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "CenteredOnZ",
+            "crossfadeDuration": 0.10000000149011612,
+            "depth": 144,
+            "height": 144,
+            "isCastingShadow": true,
+            "isReceivingShadow": true,
+            "keepAspectRatio": true,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "Bunny.glb",
+            "originLocation": "ModelOrigin",
+            "rotationX": 90,
+            "rotationY": 0,
+            "rotationZ": 90,
+            "width": 144,
+            "animations": [
+              {
+                "loop": true,
+                "name": "Idle",
+                "source": "Idle"
+              },
+              {
+                "loop": true,
+                "name": "Walk",
+                "source": "Walk"
+              },
+              {
+                "loop": true,
+                "name": "Run",
+                "source": "Run"
+              },
+              {
+                "loop": false,
+                "name": "Duck",
+                "source": "Duck"
+              },
+              {
+                "loop": false,
+                "name": "Jump",
+                "source": "Jump"
+              },
+              {
+                "loop": false,
+                "name": "Punch",
+                "source": "Punch"
+              },
+              {
+                "loop": false,
+                "name": "Death",
+                "source": "Death"
+              },
+              {
+                "loop": true,
+                "name": "JumpIdle",
+                "source": "Jump_Idle"
+              },
+              {
+                "loop": false,
+                "name": "JumpLand",
+                "source": "Jump_Land"
+              },
+              {
+                "loop": false,
+                "name": "HitReact",
+                "source": "HitReact"
+              },
+              {
+                "loop": false,
+                "name": "Wave",
+                "source": "Wave"
+              },
+              {
+                "loop": false,
+                "name": "Weapon",
+                "source": "Weapon"
+              },
+              {
+                "loop": false,
+                "name": "Yes",
+                "source": "Yes"
+              },
+              {
+                "loop": false,
+                "name": "No",
+                "source": "No"
+              }
+            ]
+          }
+        },
+        {
+          "assetStoreId": "ef5e511308d48fd5e19cab44b4da91ec1466c85daba66a45e0aa74805ad983ae",
+          "name": "Base_1_Low_White_Green",
+          "persistentUuid": "f5fb70f6-b977-4ee7-b150-90982a2fba0f",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0.10000000149011612,
+            "depth": 319,
+            "height": 319,
+            "isCastingShadow": true,
+            "isReceivingShadow": true,
+            "keepAspectRatio": true,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "Base 1 Low White Green.glb",
+            "originLocation": "ModelOrigin",
+            "rotationX": 90,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 319,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "051556b86f2cc8295e1e3e988e395a7ea88d604cdc4ead323a239f81ecf6c1e7",
+          "name": "wall_archedwindow_gated",
+          "persistentUuid": "3ded9c98-7d53-4715-9b70-4c7c09c66357",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
+            "depth": 120,
+            "height": 120,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": true,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "wall archedwindow gated.glb",
+            "originLocation": "ModelOrigin",
+            "rotationX": 90,
+            "rotationY": 0,
+            "rotationZ": 90,
+            "width": 120,
+            "animations": []
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Bunny"
+          },
+          {
+            "objectName": "Base_1_Low_White_Green"
+          },
+          {
+            "objectName": "wall_archedwindow_gated"
+          }
+        ]
+      },
+      "events": [],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": [
+            {
+              "effectType": "Scene3D::HemisphereLight",
+              "name": "3D Ambient Hemisphere Light",
+              "doubleParameters": {
+                "elevation": 40,
+                "intensity": 0.33,
+                "rotation": 300
+              },
+              "stringParameters": {
+                "groundColor": "127;127;127",
+                "skyColor": "255;255;255",
+                "top": "Z+"
+              },
+              "booleanParameters": {}
+            },
+            {
+              "effectType": "Scene3D::DirectionalLight",
+              "name": "3D Sun Light",
+              "doubleParameters": {
+                "distanceFromCamera": 1500,
+                "elevation": 40,
+                "frustumSize": 4000,
+                "intensity": 0.75,
+                "minimumShadowBias": 0,
+                "rotation": 300
+              },
+              "stringParameters": {
+                "color": "255;255;255",
+                "shadowQuality": "medium",
+                "top": "Z+"
+              },
+              "booleanParameters": {
+                "isCastingShadow": true
+              }
+            }
+          ]
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "tests": [
+    {
+      "description": "The concave L mask must let the player stand in its empty corner and collect the coin there, while blocking it on its edges. Positions are relative to the L instance so the scene layout can change.",
+      "lastRunAt": 1788518842255,
+      "lastRunDurationMs": 298,
+      "lastRunFramesExecuted": 273,
+      "lastRunStatus": "passed",
+      "name": "ConcaveMaskBlocksPlayer",
+      "type": "gameplay",
+      "source": [
+        "await harness.goToScene(\"Scene\");",
+        "await harness.stepFrames(2);",
+        "",
+        "// ConcaveShape is a 256x256 \"L\" with 80px thick arms: its empty corner covers",
+        "// x in [l.x + 80, l.x + 256] and y in [l.y + 80, l.y + 256].",
+        "const lShape = harness.getObjects(\"ConcaveShape\")[0];",
+        "const coin = harness.getObjects(\"Coin\")[0];",
+        "harness.assert(coin.x >= lShape.x + 80 && coin.x + coin.width <= lShape.x + 256",
+        "  && coin.y >= lShape.y + 80 && coin.y + coin.height <= lShape.y + 256,",
+        "  \"The coin must be placed inside the empty corner of the L\");",
+        "",
+        "// 1. The empty corner of the L is not solid: a player standing there is not pushed away.",
+        "const player = harness.getObjects(\"Player\")[0];",
+        "const cornerX = lShape.x + 200, cornerY = lShape.y + 210;",
+        "harness.setObjectPosition(player.id, cornerX, cornerY);",
+        "await harness.stepFrames(30);",
+        "const inCorner = harness.getObjects(\"Player\")[0];",
+        "harness.assert(Math.abs(inCorner.x - cornerX) < 0.5 && Math.abs(inCorner.y - cornerY) < 0.5,",
+        "  \"Player in the empty corner of the L must not be pushed away, got \" + inCorner.x + \",\" + inCorner.y);",
+        "",
+        "// 2. Walking right towards the top arm, the player is blocked by the left edge of the L.",
+        "harness.setObjectPosition(inCorner.id, lShape.x - 130, lShape.y + 30);",
+        "harness.setKeyPressed(\"Right\", true);",
+        "await harness.stepFrames(120);",
+        "harness.setKeyPressed(\"Right\", false);",
+        "const blocked = harness.getObjects(\"Player\")[0];",
+        "harness.assert(blocked.x + blocked.width <= lShape.x + 0.5, \"Player must be blocked by the L left edge, right side at \" + (blocked.x + blocked.width) + \" for edge at \" + lShape.x);",
+        "harness.assert(blocked.x + blocked.width > lShape.x - 10, \"Player should have reached the L, right side at \" + (blocked.x + blocked.width));",
+        "",
+        "// 3. Walking up inside the empty corner, aligned with the coin: the coin is collected,",
+        "// then the player is blocked by the inner edge of the L (y = l.y + 80).",
+        "harness.setObjectPosition(blocked.id, coin.x, lShape.y + 216);",
+        "harness.setKeyPressed(\"Up\", true);",
+        "await harness.stepFrames(120);",
+        "harness.setKeyPressed(\"Up\", false);",
+        "const inner = harness.getObjects(\"Player\")[0];",
+        "harness.assert(inner.y >= lShape.y + 80 - 0.5, \"Player must be blocked by the inner edge of the L, top at \" + inner.y + \" for edge at \" + (lShape.y + 80));",
+        "harness.assert(inner.y < lShape.y + 140, \"Player should have moved up to the inner edge, top at \" + inner.y);",
+        "harness.assert(harness.getObjects(\"Coin\").length === 0, \"The coin must have been collected\");",
+        "harness.assert(harness.getSceneVariable(\"CollectedCoins\")?.value === 1, \"CollectedCoins must be 1\");"
+      ]
+    },
+    {
+      "description": "In Scene2, the NavMesh pathfinding must drive the player to the 4 coins, including the ones only reachable through the empty corners of the concave L shapes.",
+      "lastRunAt": 1788518845294,
+      "lastRunDurationMs": 3038,
+      "lastRunFramesExecuted": 762,
+      "lastRunStatus": "passed",
+      "name": "NavMeshCollectsAllCoins",
+      "type": "gameplay",
+      "source": [
+        "await harness.goToScene(\"Scene2\");",
+        "await harness.stepFrames(2);",
+        "harness.assert(harness.getObjects(\"Coin\").length === 4, \"Scene2 must start with 4 coins, got \" + harness.getObjects(\"Coin\").length);",
+        "",
+        "// 40 seconds of game time at most to collect everything.",
+        "const collectedAll = await harness.stepUntil(",
+        "  () => harness.getSceneVariable(\"CollectedCoins\")?.value === 4,",
+        "  { maxFrames: 2400 }",
+        ");",
+        "const player = harness.getObjects(\"Player\")[0];",
+        "harness.assert(collectedAll, \"The player must collect the 4 coins, got \" + harness.getSceneVariable(\"CollectedCoins\")?.value",
+        "  + \" (player at \" + Math.round(player.x) + \",\" + Math.round(player.y) + \", coins left: \"",
+        "  + harness.getObjects(\"Coin\").map(c => Math.round(c.x) + \",\" + Math.round(c.y)).join(\" | \") + \")\");",
+        "harness.assert(harness.getObjects(\"Coin\").length === 0, \"No coin must remain\");"
+      ]
+    }
+  ],
+  "eventsFunctionsExtensions": [],
+  "externalLayouts": []
+}

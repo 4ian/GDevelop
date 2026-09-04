@@ -111,6 +111,8 @@ let onSetCameraState:
 let onChangeViewPosition:
   | null
   | ((command: ChangeViewPositionCommand) => void) = null;
+// POC: open the inspection of a 3D model in the in-game editor.
+let onInspectModel3DObject: null | ((objectName: string) => void) = null;
 
 export const setEmbeddedGameFramePreviewLocation = ({
   previewIndexHtmlLocation,
@@ -163,6 +165,11 @@ export const preventGameFramePointerEvents = (enabled: boolean) => {
 export const changeViewPosition = (command: ChangeViewPositionCommand) => {
   if (!onChangeViewPosition) return;
   onChangeViewPosition(command);
+};
+
+export const inspectModel3DObject = (objectName: string) => {
+  if (!onInspectModel3DObject) return;
+  onInspectModel3DObject(objectName);
 };
 
 const logSwitchingInfo = ({
@@ -487,6 +494,17 @@ export const EmbeddedGameFrame = ({
               eventsBasedObjectType,
               eventsBasedObjectVariantName,
               cameraState3D: cameraStates.current.get(editorId),
+            });
+          });
+      };
+      onInspectModel3DObject = (objectName: string) => {
+        if (!previewDebuggerServer) return;
+        previewDebuggerServer
+          .getExistingEmbeddedGameFrameDebuggerIds()
+          .forEach(debuggerId => {
+            previewDebuggerServer.sendMessage(debuggerId, {
+              command: 'inspectModel3DObject',
+              payload: { objectName },
             });
           });
       };

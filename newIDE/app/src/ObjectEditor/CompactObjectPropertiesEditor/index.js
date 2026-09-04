@@ -38,6 +38,7 @@ import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
 import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
+import { inspectModel3DObject } from '../../EmbeddedGame/EmbeddedGameFrame';
 import Help from '../../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
@@ -620,14 +621,26 @@ export const CompactObjectPropertiesEditor = ({
                   }}
                   resourceManagementProps={resourceManagementProps}
                   placeholder={<Trans>This object has no properties.</Trans>}
-                  customizeBasicSchema={schema =>
-                    getSchemaWithOpenFullEditorButton({
-                      schema,
-                      fullEditorLabel,
-                      object,
-                      onEditObject,
-                    })
-                  }
+                  customizeBasicSchema={schema => {
+                    const schemaWithButtons = getSchemaWithOpenFullEditorButton(
+                      {
+                        schema,
+                        fullEditorLabel,
+                        object,
+                        onEditObject,
+                      }
+                    );
+                    // POC: edit the points of a 3D model in the in-game editor.
+                    if (object.getType() === 'Scene3D::Model3DObject') {
+                      schemaWithButtons.push({
+                        label: i18n._(t`Edit points`),
+                        nonFieldType: 'button',
+                        getIcon: style => <Object3d style={style} />,
+                        onClick: () => inspectModel3DObject(object.getName()),
+                      });
+                    }
+                    return schemaWithButtons;
+                  }}
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (

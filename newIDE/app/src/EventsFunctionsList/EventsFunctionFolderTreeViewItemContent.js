@@ -102,6 +102,8 @@ export const buildMoveToMenu = ({
   eventsBasedObject,
   addFolder,
   onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+  moveToExtension,
+  canBeRenamed,
 }: {|
   functionFolderOrFunction: gdFunctionFolderOrFunction,
   i18n: I18nType,
@@ -116,6 +118,8 @@ export const buildMoveToMenu = ({
   onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer: (
     functionFolderOrFunction: gdFunctionFolderOrFunction
   ) => void,
+  moveToExtension: () => void,
+  canBeRenamed: boolean,
 |}): MenuItemTemplate => {
   const folderAndPathsInContainer = enumerateFoldersInContainer(
     eventsFunctionsContainer
@@ -130,7 +134,7 @@ export const buildMoveToMenu = ({
       folderAndPath.folder !== functionFolderOrFunction
   );
   return {
-    label: i18n._('Move to folder'),
+    label: i18n._('Move to...'),
     submenu: [
       ...filteredFolderAndPathsInContainer.map(({ folder, path }) => ({
         label: path,
@@ -157,6 +161,17 @@ export const buildMoveToMenu = ({
             eventsBasedObject
           ),
       },
+      ...(functionFolderOrFunction.isFolder() ||
+      eventsBasedBehavior ||
+      eventsBasedObject
+        ? []
+        : [
+            {
+              label: i18n._(t`Move to extension...`),
+              click: () => moveToExtension(),
+              enabled: canBeRenamed,
+            },
+          ]),
     ],
   };
 };
@@ -360,6 +375,8 @@ export class EventsFunctionFolderTreeViewItemContent
         eventsBasedObject,
         addFolder,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+        moveToExtension: () => {},
+        canBeRenamed: true,
       }),
       {
         label: i18n._(t`Delete`),

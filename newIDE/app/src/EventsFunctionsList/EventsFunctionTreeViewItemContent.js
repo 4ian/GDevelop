@@ -437,21 +437,14 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
         eventsBasedObject,
         addFolder,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+        moveToExtension: () => this._moveTo(),
+        canBeRenamed: this.canBeRenamed(),
       }),
       {
         label: i18n._(t`Delete`),
         click: () => this.delete(),
         accelerator: 'Backspace',
       },
-      ...(eventsBasedBehavior || eventsBasedObject
-        ? []
-        : [
-            {
-              label: i18n._(t`Move to...`),
-              click: () => this._moveTo(),
-              enabled: this.canBeRenamed(),
-            },
-          ]),
       {
         type: 'separator',
       },

@@ -378,12 +378,12 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     let message: MessageDescriptor;
     let title: MessageDescriptor;
     if (objectsToDelete.length === 1) {
-      message = t`Are you sure you want to remove this folder and with it the object ${objectsToDelete[0].getName()}? This can't be undone.`;
+      message = t`Are you sure you want to remove this folder and with it the object ${objectsToDelete[0].getName()}?`;
       title = t`Remove folder and object`;
     } else {
       message = t`Are you sure you want to remove this folder and all its content (objects ${objectsToDelete
         .map(object => object.getName())
-        .join(', ')})? This can't be undone.`;
+        .join(', ')})?`;
       title = t`Remove folder and objects`;
     }
 

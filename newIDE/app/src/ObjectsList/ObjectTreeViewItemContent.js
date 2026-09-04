@@ -585,7 +585,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
     const answer = await showDeleteConfirmation({
       title: t`Remove object`,
-      message: t`Are you sure you want to remove this object? This can't be undone.`,
+      message: t`Are you sure you want to remove this object?`,
     });
     if (!answer) return false;
 

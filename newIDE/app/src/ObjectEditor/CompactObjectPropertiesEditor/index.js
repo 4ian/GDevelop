@@ -56,6 +56,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertiesEditor/CompactEffectsListEditor';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
+import { type FieldModificationContext } from '../../CompactPropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
@@ -214,7 +215,10 @@ type Props = {|
 
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
-  onObjectsModified: (objects: Array<gdObject>) => void,
+  onObjectsModified: (
+    objects: Array<gdObject>,
+    context?: ?FieldModificationContext
+  ) => void,
   onEffectAdded: () => void,
   onOpenEventBasedObjectVariantEditor: (
     extensionName: string,
@@ -249,11 +253,11 @@ export const CompactObjectPropertiesEditor = ({
   projectScopedContainersAccessor,
   unsavedChanges,
   i18n,
-  historyHandler,
   objects,
   onEditObject,
   onObjectsModified,
   onEffectAdded,
+  historyHandler,
   onOpenEventBasedObjectVariantEditor,
   onDeleteEventsBasedObjectVariant,
   onWillInstallExtension,
@@ -530,7 +534,7 @@ export const CompactObjectPropertiesEditor = ({
             .getValue(),
         onUpdateProperty: ({ objectConfiguration }, name, value) => {
           objectConfiguration.updateProperty(name, value);
-          onObjectsModified([object]);
+          onObjectsModified([object], { fieldName: name });
         },
         object,
         layersContainer,

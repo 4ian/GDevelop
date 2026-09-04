@@ -3134,6 +3134,20 @@ interface PropertyFunctionGenerator {
 
 };
 
+interface ChildObjectForwardFunctionGenerator {
+    void STATIC_GenerateChildObjectForwardFunctions(
+        [Const, Ref] Project project,
+        [Const, Ref] EventsFunctionsExtension extension,
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString childObjectName);
+    boolean STATIC_HasAnyChildCustomObject(
+        [Const, Ref] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
+    [Value] VectorString STATIC_GetChildCustomObjectNames(
+        [Const, Ref] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
+};
+
 interface UsedExtensionsResult {
   [Const, Ref] SetString GetUsedExtensions();
 };

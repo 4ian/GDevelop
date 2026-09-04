@@ -413,8 +413,7 @@ bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
  */
 bool MetadataDeclarationHelper::IsObjectLifecycleEventsFunction(
     const gd::String &functionName) {
-  return functionName == "onCreated" || functionName == "doStepPostEvents" ||
-         functionName == "onDestroy" || functionName == "onHotReloading";
+  return gd::EventsBasedObject::IsObjectLifecycleEventsFunction(functionName);
 }
 
 /**

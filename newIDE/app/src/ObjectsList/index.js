@@ -528,6 +528,8 @@ type Props = {|
     Array<ObjectFolderOrObjectWithContext>
   ) => void,
   onObjectPasted?: gdObject => void,
+  // Called after any other change of the objects, folders or their order.
+  onObjectFolderOrObjectsModified?: () => void,
   getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onAddObjectInstance: (objectName: string) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
@@ -573,6 +575,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onObjectEdited,
       onObjectFolderOrObjectsWithContextSelected,
       onObjectPasted,
+      onObjectFolderOrObjectsModified,
       getValidatedObjectOrGroupName,
       onAddObjectInstance,
       onWillInstallExtension,
@@ -799,11 +802,17 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const onObjectModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
         if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        if (onObjectFolderOrObjectsModified) onObjectFolderOrObjectsModified();
 
         if (shouldForceUpdateList) forceUpdateList();
         else forceUpdate();
       },
-      [forceUpdate, forceUpdateList, unsavedChanges]
+      [
+        forceUpdate,
+        forceUpdateList,
+        unsavedChanges,
+        onObjectFolderOrObjectsModified,
+      ]
     );
 
     const globalObjectsRootFolder = globalObjectsContainer
@@ -906,7 +915,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const answer = Window.showConfirmDialog(
           i18n._(
-            t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects. This action cannot be undone.
+            t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects.
 
             Do you want to set this as global object?`
           )
@@ -1015,9 +1024,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             newObjectFolderOrObjectWithContext.objectFolderOrObject
           )
         );
+        if (onObjectFolderOrObjectsModified) onObjectFolderOrObjectsModified();
         forceUpdateList();
       },
       [
+        onObjectFolderOrObjectsModified,
         forceUpdateList,
         objectsContainer,
         selectObjectFolderOrObjectWithContext,

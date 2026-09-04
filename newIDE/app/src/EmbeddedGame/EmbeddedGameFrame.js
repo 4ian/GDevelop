@@ -259,6 +259,40 @@ export const EmbeddedGameFrame = ({
     [previewDebuggerServer, inGameEditorSettings]
   );
 
+  // POC: keep the game aware of the part of the frame that is not covered by
+  // the IDE panels, so the in-game editor can place its own UI there.
+  // Sent regularly (cheap): the hole moves with the panels, and the game can
+  // be restarted at any time.
+  React.useEffect(
+    () => {
+      if (!previewDebuggerServer) return;
+      const intervalId = setInterval(() => {
+        const iframe = iframeRef.current;
+        const holeRect = getActiveEmbeddedGameFrameHoleRect();
+        if (!iframe || !holeRect) return;
+        const frameRect = iframe.getBoundingClientRect();
+        if (!frameRect.width || !frameRect.height) return;
+
+        const visibleScreenArea = {
+          minX: (holeRect.left - frameRect.left) / frameRect.width,
+          minY: (holeRect.top - frameRect.top) / frameRect.height,
+          maxX: (holeRect.right - frameRect.left) / frameRect.width,
+          maxY: (holeRect.bottom - frameRect.top) / frameRect.height,
+        };
+        previewDebuggerServer
+          .getExistingEmbeddedGameFrameDebuggerIds()
+          .forEach((debuggerId: string) => {
+            previewDebuggerServer.sendMessage(debuggerId, {
+              command: 'setVisibleScreenArea',
+              payload: { visibleScreenArea },
+            });
+          });
+      }, 300);
+      return () => clearInterval(intervalId);
+    },
+    [previewDebuggerServer]
+  );
+
   React.useEffect(
     () => {
       // TODO: use a real context for this to handle several in-game editors.

@@ -10,10 +10,15 @@ namespace gdjs {
     attrs: {
       style?: Partial<CSSStyleDeclaration>;
       onClick?: () => void;
-    },
+    } | null,
     ...nodes: (HTMLElement | string)[]
   ): HTMLElement {
     const node = document.createElement(tag);
+    // An element without any attribute (`<span>text</span>`) gets `null`.
+    if (!attrs) {
+      node.append(...nodes);
+      return node;
+    }
     Object.keys(attrs).forEach((key) => {
       if (key === 'style') {
         for (const [styleName, value] of Object.entries(attrs.style!)) {
@@ -671,6 +676,17 @@ namespace gdjs {
   const pressAndReleaseForClickDuration = 200;
   const timeBetweenClicksForDoubleClick = 400;
 
+  /** Axis of the bone boxes geometry (see Model3DInspector). */
+  const boneBoxAxis = new THREE.Vector3(0, 0, 1);
+
+  /** Part of the game frame not covered by the IDE panels, normalized (0 to 1). */
+  type VisibleScreenArea = {
+    minX: float;
+    minY: float;
+    maxX: float;
+    maxY: float;
+  };
+
   /** Get the identifiers of the touches that are currently active, without the mouse. */
   const getCurrentTouchIdentifiers = (inputManager: gdjs.InputManager) => {
     return inputManager
@@ -1111,6 +1127,12 @@ namespace gdjs {
     private _toolbar: Toolbar;
     private _inGameEditorSettings: InGameEditorSettings;
     private _shortcuts: InGameEditorShortcuts = new InGameEditorShortcuts();
+    // POC: inspector opened by double clicking a 3D model.
+    private _model3DInspector: Model3DInspector | null = null;
+    private _lastClickTimeWhileInspecting: number = 0;
+    // The last visible area of the game frame sent by the IDE (the IDE
+    // panels float over the frame), used to place the inspector UI.
+    private _lastVisibleScreenArea: VisibleScreenArea | null = null;
 
     constructor(
       game: RuntimeGame,
@@ -1176,6 +1198,7 @@ namespace gdjs {
     }
 
     dispose(): void {
+      this._exitModel3DInspection();
       if (this._unregisterContextLostListener) {
         this._unregisterContextLostListener();
         this._unregisterContextLostListener = null;
@@ -1341,6 +1364,8 @@ namespace gdjs {
       eventsBasedObjectVariantName: string | null,
       editorCamera3D: EditorCameraState | null
     ) {
+      // The inspected model belongs to the scene being left.
+      this._exitModel3DInspection();
       if (this._currentScene) {
         this._currentScene.unloadScene();
         this._currentScene = null;
@@ -1698,6 +1723,10 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       if (this._innerArea) {
         this.zoomToFitArea(
           {
@@ -1733,6 +1762,10 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
@@ -1749,6 +1782,10 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       this.zoomToFitObjects(
         this._selection.getSelectedObjects(),
         visibleScreenArea,
@@ -1766,6 +1803,10 @@ namespace gdjs {
       },
       margin: float
     ) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       this._getEditorCamera().zoomToFitObjects(
         objects,
         visibleScreenArea,
@@ -1790,6 +1831,10 @@ namespace gdjs {
       },
       margin: float
     ) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       if (!this._currentScene) return;
       this._getEditorCamera().zoomToFitArea(
         sceneArea,
@@ -2254,8 +2299,39 @@ namespace gdjs {
       }
 
       if (inputManager.wasKeyJustPressed(ESC_KEY)) {
+        if (this._model3DInspector) {
+          this._exitModel3DInspection();
+          return;
+        }
         this._selection.clear();
         this._sendSelectionUpdate();
+      }
+
+      // While a 3D model is inspected, clicks are for the inspector (to pick
+      // the origin point handle), not for the selection. A double click
+      // anywhere but on the inspected model leaves the inspection.
+      if (this._model3DInspector) {
+        if (
+          inputManager.isMouseButtonReleased(0) &&
+          this._hasCursorStayedStillWhilePressed({ toleranceRadius: 10 })
+        ) {
+          const inspector = this._model3DInspector;
+          const now = Date.now();
+          const isDoubleClick =
+            now - this._lastClickTimeWhileInspecting <
+            timeBetweenClicksForDoubleClick;
+          this._lastClickTimeWhileInspecting = now;
+          if (
+            isDoubleClick &&
+            objectUnderCursor !== inspector.getObject() &&
+            !inspector.isCursorOnOriginHandle()
+          ) {
+            this._exitModel3DInspection();
+            return;
+          }
+          inspector.handleClick();
+        }
+        return;
       }
 
       // Left click: select the object under the cursor.
@@ -2283,8 +2359,13 @@ namespace gdjs {
             Date.now() - this._lastClickOnObjectUnderCursor.time <
               timeBetweenClicksForDoubleClick
           ) {
-            // Double click on the same object: edit the object.
-            objectToEdit = objectUnderCursor;
+            if (objectUnderCursor.type === 'Scene3D::Model3DObject') {
+              // Double click on a 3D model: inspect it inside the editor (POC).
+              this._enterModel3DInspection(objectUnderCursor);
+            } else {
+              // Double click on the same object: edit the object.
+              objectToEdit = objectUnderCursor;
+            }
 
             this._lastClickOnObjectUnderCursor = {
               object: null,
@@ -3991,11 +4072,18 @@ namespace gdjs {
       this._handleShortcuts();
       this._updateMouseCursor();
 
+      if (this._model3DInspector) {
+        this._model3DInspector.update();
+      }
+
       const domElementContainer = this._runtimeGame
         .getRenderer()
         .getDomElementContainer();
       if (domElementContainer) {
         this._toolbar.render(domElementContainer);
+        if (this._model3DInspector) {
+          this._model3DInspector.render(domElementContainer);
+        }
       }
 
       // Prepare state of the mouse/cursor for the next frame.
@@ -4023,6 +4111,854 @@ namespace gdjs {
 
     private _getEditorCamera(): EditorCamera {
       return this._editorCamera;
+    }
+
+    /**
+     * POC: open the inspector of a 3D model. Only one model can be inspected
+     * at a time, and the selection is dropped so that the only gizmo shown is
+     * the one of the origin point.
+     */
+    private _enterModel3DInspection(object: gdjs.RuntimeObject) {
+      if (!is3D(object)) return;
+      this._exitModel3DInspection();
+
+      const editedInstanceContainer = this.getEditedInstanceContainer();
+      const cameraLayer = this.getCameraLayer(object.getLayer());
+      if (!editedInstanceContainer || !cameraLayer) return;
+      const runtimeLayerRender = cameraLayer.getRenderer();
+      const threeCamera = runtimeLayerRender.getThreeCamera();
+      const threeScene = runtimeLayerRender.getThreeScene();
+      if (!threeCamera || !threeScene) return;
+
+      this._selection.clear();
+      this._removeSelectionControls();
+      this._sendSelectionUpdate();
+
+      this._model3DInspector = new Model3DInspector({
+        object,
+        threeScene,
+        threeCamera,
+        canvas: this._runtimeGame.getRenderer().getCanvas() || undefined,
+        allObjects: editedInstanceContainer.getAdhocListOfAllInstances(),
+        getCursorNormalizedDeviceCoordinates: () => {
+          const inputManager = this._runtimeGame.getInputManager();
+          return this._getTempVector2d(
+            this._getNormalizedScreenX(inputManager.getCursorX()),
+            this._getNormalizedScreenY(inputManager.getCursorY())
+          );
+        },
+        getVisibleScreenArea: () => this._lastVisibleScreenArea,
+        onExit: () => this._exitModel3DInspection(),
+      });
+    }
+
+    /**
+     * POC: called by the IDE with the part of the game frame that is not
+     * covered by its panels, so that the in-game editor UI can be placed there.
+     */
+    setVisibleScreenArea(visibleScreenArea: VisibleScreenArea) {
+      this._lastVisibleScreenArea = visibleScreenArea;
+    }
+
+    private _exitModel3DInspection() {
+      if (!this._model3DInspector) return;
+      this._model3DInspector.dispose();
+      this._model3DInspector = null;
+    }
+  }
+
+  /**
+   * Append several children to an element. esbuild does not spread JSX
+   * children (`{...nodes}`), so lists are built with this instead.
+   */
+  const appendChildren = (
+    parent: HTMLElement,
+    children: Array<HTMLElement>
+  ): HTMLElement => {
+    for (const child of children) parent.appendChild(child);
+    return parent;
+  };
+
+  /**
+   * POC: inspect a 3D model inside the editor.
+   *
+   * Every other object of the scene is greyed out, the model origin point is
+   * shown as a sphere that can be picked and dragged with a gizmo (which
+   * changes the origin of the model without moving it), the bones of the model
+   * are shown as boxes, and a panel lists the content of the model.
+   */
+  class Model3DInspector {
+    private _object: RuntimeObjectWith3D;
+    private _threeScene: THREE.Scene;
+    private _threeCamera: THREE.Camera;
+    private _getCursorNormalizedDeviceCoordinates: () => THREE.Vector2;
+    private _getVisibleScreenArea: () => VisibleScreenArea | null;
+    private _onExit: () => void;
+    private _raycaster = new THREE.Raycaster();
+
+    // What was changed on the other objects, to restore them on exit.
+    private _greyedMeshes: Array<{
+      mesh: THREE.Mesh;
+      material: THREE.Material | THREE.Material[];
+    }> = [];
+    private _greyedPixiObjects: Array<{
+      pixiObject: { alpha: number };
+      alpha: number;
+    }> = [];
+    private _greyMaterial = new THREE.MeshBasicMaterial({
+      color: 0x8a8a8a,
+      transparent: true,
+      opacity: 0.35,
+      depthWrite: false,
+    });
+
+    // 3D helpers.
+    private _originSphere: THREE.Mesh;
+    private _originControls: THREE_ADDONS.TransformControls;
+    private _isOriginSelected = false;
+    private _bonesGroup = new THREE.Group();
+    private _skeletonHelper: THREE.SkeletonHelper | null = null;
+    private _boneBoxes: Array<{ bone: THREE.Bone; box: THREE.Mesh }> = [];
+    private _tempVector3 = new THREE.Vector3();
+    private _tempVector3b = new THREE.Vector3();
+
+    // The element of the model highlighted from the tree: its meshes blink.
+    private _blinkingMeshes: Array<THREE.Mesh> = [];
+    private _blinkingOriginalMaterials: Array<{
+      material: THREE.Material;
+      opacity: float;
+      transparent: boolean;
+    }> = [];
+    private _selectedRow: HTMLElement | null = null;
+    private _blinkTime: float = 0;
+    // Bright blue shells drawn around the highlighted element.
+    private _outlineShells: Array<THREE.Object3D> = [];
+    private _outlineMaterial = Model3DInspector._makeOutlineMaterial();
+
+    // DOM.
+    private _parent: HTMLElement | null = null;
+    private _renderedElements: {
+      banner: HTMLElement;
+      panel: HTMLElement;
+      originInfo: HTMLElement;
+      originItem: HTMLElement;
+      pointCrumb: HTMLElement;
+      pointCrumbSeparator: HTMLElement;
+    } | null = null;
+
+    constructor({
+      object,
+      threeScene,
+      threeCamera,
+      canvas,
+      allObjects,
+      getCursorNormalizedDeviceCoordinates,
+      getVisibleScreenArea,
+      onExit,
+    }: {
+      object: RuntimeObjectWith3D;
+      threeScene: THREE.Scene;
+      threeCamera: THREE.Camera;
+      canvas: HTMLCanvasElement | undefined;
+      allObjects: Array<gdjs.RuntimeObject>;
+      getCursorNormalizedDeviceCoordinates: () => THREE.Vector2;
+      getVisibleScreenArea: () => VisibleScreenArea | null;
+      onExit: () => void;
+    }) {
+      this._object = object;
+      this._threeScene = threeScene;
+      this._threeCamera = threeCamera;
+      this._getCursorNormalizedDeviceCoordinates =
+        getCursorNormalizedDeviceCoordinates;
+      this._getVisibleScreenArea = getVisibleScreenArea;
+      this._onExit = onExit;
+
+      this._greyOutOtherObjects(allObjects);
+
+      const objectSize = Math.max(
+        object.getWidth(),
+        object.getHeight(),
+        object.getDepth()
+      );
+      const sphereRadius = Math.min(20, Math.max(2, objectSize * 0.05));
+      this._originSphere = new THREE.Mesh(
+        new THREE.SphereGeometry(sphereRadius, 16, 12),
+        new THREE.MeshBasicMaterial({
+          color: 0xf2a63c,
+          transparent: true,
+          opacity: 0.9,
+          depthTest: false,
+        })
+      );
+      this._originSphere.renderOrder = 999;
+      this._updateOriginSpherePosition();
+      // Directly in the scene, like the dummy object of the selection controls,
+      // so that its position is expressed in GDevelop coordinates.
+      threeScene.add(this._originSphere);
+
+      this._buildBoneBoxes(sphereRadius);
+      threeScene.add(this._bonesGroup);
+
+      // The gizmo moving the origin sphere. Same setup as the selection controls.
+      const originControls = new THREE_ADDONS.TransformControls(
+        threeCamera,
+        canvas
+      );
+      patchAxesOnTransformControlsGizmos(originControls);
+      patchColorsOnTransformControlsGizmos(originControls);
+      patchNegativeAxisHandlesOnTransformControlsGizmos(originControls);
+      patchAxisGuideLinesOnTransformControlsGizmos(originControls);
+      originControls.rotation.order = 'ZYX';
+      originControls.scale.y = -1;
+      originControls.mode = 'translate';
+      originControls.traverse((obj) => {
+        // @ts-ignore
+        obj.isTransformControls = true;
+      });
+      originControls.attach(this._originSphere);
+      originControls.visible = false;
+      originControls.enabled = false;
+      originControls.addEventListener('change', () => {
+        if (originControls.dragging) {
+          this._applyOriginFromSphere();
+        }
+      });
+      threeScene.add(originControls);
+      this._originControls = originControls;
+
+      this._addOrUpdateStyle();
+    }
+
+    private _greyOutOtherObjects(allObjects: Array<gdjs.RuntimeObject>) {
+      for (const otherObject of allObjects) {
+        if (otherObject === this._object) continue;
+
+        const threeObject = otherObject.get3DRendererObject();
+        if (threeObject) {
+          threeObject.traverse((child) => {
+            const mesh = child as THREE.Mesh;
+            // @ts-ignore
+            if (!mesh.isMesh || !mesh.material) return;
+            this._greyedMeshes.push({ mesh, material: mesh.material });
+            mesh.material = this._greyMaterial;
+          });
+          continue;
+        }
+
+        const pixiObject = otherObject.getRendererObject() as any;
+        if (pixiObject && typeof pixiObject.alpha === 'number') {
+          this._greyedPixiObjects.push({ pixiObject, alpha: pixiObject.alpha });
+          pixiObject.alpha *= 0.3;
+        }
+      }
+    }
+
+    private _getModelBones(): Array<THREE.Bone> {
+      const bones: Array<THREE.Bone> = [];
+      const threeObject = this._object.get3DRendererObject();
+      if (!threeObject) return bones;
+      threeObject.traverse((child) => {
+        // @ts-ignore
+        if (child.isBone) bones.push(child as THREE.Bone);
+      });
+      return bones;
+    }
+
+    private _buildBoneBoxes(sphereRadius: float) {
+      // The whole skeleton is drawn by the Three.js helper (it follows the
+      // animation and renders at the bones world positions whatever the
+      // transformations of the scene).
+      const threeObject = this._object.get3DRendererObject();
+      if (threeObject) {
+        const skeletonHelper = new THREE.SkeletonHelper(threeObject);
+        const helperMaterial =
+          skeletonHelper.material as THREE.LineBasicMaterial;
+        helperMaterial.depthTest = false;
+        helperMaterial.transparent = true;
+        helperMaterial.opacity = 0.9;
+        skeletonHelper.renderOrder = 998;
+        // The helper computes its vertices relatively to root.matrixWorld and
+        // expects to be a child of the world root. The scene is mirrored
+        // (scale.y = -1), which would flip the skeleton: put the helper under a
+        // group cancelling the scene transformation, so that its matrixWorld is
+        // exactly root.matrixWorld.
+        const helperRoot = new THREE.Group();
+        helperRoot.matrixAutoUpdate = false;
+        this._threeScene.updateMatrix();
+        helperRoot.matrix.copy(this._threeScene.matrix).invert();
+        helperRoot.add(skeletonHelper);
+        this._threeScene.add(helperRoot);
+        this._skeletonHelper = skeletonHelper;
+      }
+
+      // One box per bone, only shown for the bone selected in the tree.
+      const boneMaterial = new THREE.MeshBasicMaterial({
+        color: 0x6bafff,
+        transparent: true,
+        opacity: 0.85,
+        depthTest: false,
+      });
+      // The box goes from the bone toward its first child (along +Z).
+      const boneGeometry = new THREE.BoxGeometry(1, 1, 1).translate(0, 0, 0.5);
+      for (const bone of this._getModelBones()) {
+        // One material per box, so that a single bone can be highlighted.
+        const box = new THREE.Mesh(boneGeometry, boneMaterial.clone());
+        box.renderOrder = 998;
+        box.visible = false;
+        this._bonesGroup.add(box);
+        this._boneBoxes.push({ bone, box });
+      }
+      boneMaterial.dispose();
+      this._bonesGroup.userData.thickness = Math.max(1, sphereRadius * 0.5);
+    }
+
+    private _updateBoneBoxes() {
+      const thickness: float = this._bonesGroup.userData.thickness;
+      for (const { bone, box } of this._boneBoxes) {
+        // The group has no transformation: scene local coordinates are the
+        // GDevelop ones, whatever the flip applied by the scene itself. All
+        // the maths are done in this space: `lookAt` can't be used, as the
+        // scene is mirrored (scale.y = -1) which breaks its rotation extraction.
+        const boneLocalPosition = this._threeScene.worldToLocal(
+          bone.getWorldPosition(this._tempVector3)
+        );
+        box.position.copy(boneLocalPosition);
+
+        const childBone = bone.children.find(
+          // @ts-ignore
+          (child) => child.isBone
+        ) as THREE.Bone | undefined;
+        if (childBone) {
+          const childLocalPosition = this._threeScene.worldToLocal(
+            childBone.getWorldPosition(this._tempVector3b)
+          );
+          const direction = childLocalPosition.sub(boneLocalPosition);
+          const length = direction.length();
+          if (length > 0.0001) {
+            direction.divideScalar(length);
+            // The box geometry goes along +Z from the bone to its child.
+            box.quaternion.setFromUnitVectors(boneBoxAxis, direction);
+          }
+          box.scale.set(thickness, thickness, Math.max(length, thickness));
+        } else {
+          box.quaternion.identity();
+          box.scale.set(thickness, thickness, thickness * 2);
+        }
+      }
+    }
+    private _updateOriginSpherePosition() {
+      // By definition, the origin point is at the object position.
+      this._originSphere.position.set(
+        this._object.getX(),
+        this._object.getY(),
+        this._object.getZ()
+      );
+    }
+
+    /**
+     * The sphere was dragged: make its position the new origin of the model,
+     * without moving the model itself.
+     */
+    private _applyOriginFromSphere() {
+      const object = this._object;
+      const group = object.get3DRendererObject();
+      // @ts-ignore - _renderer and _threeObject are specific to Model3D.
+      const renderer = object._renderer;
+      const model: THREE.Object3D | null = renderer
+        ? renderer._threeObject
+        : null;
+      if (!group || !model || !renderer.getCenterPoint) return;
+
+      // Where the sphere is, in the group local space (unit cube of the
+      // model, rotated and scaled by the group): this is the offset of the
+      // new pivot relatively to the current one, in normalized units.
+      const sphereWorldPosition = this._threeScene.localToWorld(
+        this._tempVector3.copy(this._originSphere.position)
+      );
+      const localOffset = group.worldToLocal(sphereWorldPosition);
+
+      // The model Y axis is flipped compared to the GDevelop normalized points.
+      const currentCenter: [float, float, float] = renderer.getCenterPoint();
+      const newPoint: [float, float, float] = [
+        currentCenter[0] + localOffset.x,
+        currentCenter[1] - localOffset.y,
+        currentCenter[2] + localOffset.z,
+      ];
+
+      // Move the pivot: the model is shifted the other way inside the group so
+      // that it does not move on screen, and the group is put on the sphere.
+      model.position.sub(localOffset);
+      // @ts-ignore - _originPoint and _centerPoint are specific to Model3D.
+      object._originPoint = newPoint;
+      // @ts-ignore
+      object._centerPoint = [newPoint[0], newPoint[1], newPoint[2]];
+      object.setX(this._originSphere.position.x);
+      object.setY(this._originSphere.position.y);
+      object.setZ(this._originSphere.position.z);
+    }
+
+    /**
+     * A click (without drag) happened: pick or unpick the origin sphere.
+     */
+    getObject(): gdjs.RuntimeObject {
+      return this._object;
+    }
+
+    /**
+     * True if the cursor is on the origin sphere or on its gizmo.
+     */
+    isCursorOnOriginHandle(): boolean {
+      if (this._originControls.dragging || !!this._originControls.axis) {
+        return true;
+      }
+      this._raycaster.setFromCamera(
+        this._getCursorNormalizedDeviceCoordinates(),
+        this._threeCamera
+      );
+      return (
+        this._raycaster.intersectObject(this._originSphere, false).length > 0
+      );
+    }
+
+    handleClick() {
+      if (this._originControls.dragging || this._originControls.axis) {
+        // Click on the gizmo itself: keep the selection.
+        return;
+      }
+      this._setOriginSelected(this.isCursorOnOriginHandle());
+    }
+
+    private _setOriginSelected(isSelected: boolean) {
+      this._isOriginSelected = isSelected;
+      this._originControls.visible = isSelected;
+      this._originControls.enabled = isSelected;
+      (this._originSphere.material as THREE.MeshBasicMaterial).color.setHex(
+        isSelected ? 0xffd200 : 0xf2a63c
+      );
+    }
+
+    update() {
+      if (!this._originControls.dragging) {
+        this._updateOriginSpherePosition();
+      }
+      this._updateBoneBoxes();
+      this._updateBlinking();
+    }
+
+    private _addOrUpdateStyle() {
+      const id = 'InGameEditor-Model3DInspector-Style';
+      if (document.getElementById(id)) return;
+      const styleElement = document.createElement('style');
+      styleElement.id = id;
+      styleElement.textContent = `
+        .InGameEditor-Inspector-Banner, .InGameEditor-Inspector-Panel {
+          position: absolute;
+          color: var(--in-game-editor-theme-text-color-primary);
+          background-color: var(--in-game-editor-theme-toolbar-background-color);
+          font-family: system-ui, sans-serif;
+          font-size: 13px;
+          box-sizing: border-box;
+          pointer-events: auto;
+          opacity: 0.95;
+        }
+        /* Breadcrumb, top left of the game frame. */
+        .InGameEditor-Inspector-Banner {
+          top: 0;
+          left: 0;
+          height: 40px;
+          min-width: 380px;
+          padding: 0 14px;
+          border-radius: 0 0 8px 0;
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+        .InGameEditor-Inspector-Crumb {
+          cursor: pointer;
+          text-decoration: underline;
+        }
+        .InGameEditor-Inspector-Crumb-Current {
+          font-weight: bold;
+        }
+        /* Tree of the model content, right side of the game frame. */
+        .InGameEditor-Inspector-Panel {
+          top: 40px;
+          right: 0;
+          bottom: 0;
+          width: 240px;
+          padding: 8px 10px;
+          overflow: auto;
+        }
+        .InGameEditor-Inspector-Panel ul {
+          margin: 0;
+          padding-left: 14px;
+          list-style: none;
+        }
+        .InGameEditor-Inspector-Panel > ul {
+          padding-left: 0;
+        }
+        .InGameEditor-Inspector-Panel li {
+          line-height: 1.6;
+          white-space: nowrap;
+        }
+        .InGameEditor-Inspector-Selectable {
+          cursor: pointer;
+          border-radius: 4px;
+          padding: 0 4px;
+        }
+        .InGameEditor-Inspector-Selectable:hover {
+          background-color: rgba(255, 255, 255, 0.08);
+        }
+        .InGameEditor-Inspector-Selected {
+          background-color: rgba(242, 166, 60, 0.35);
+        }
+        .InGameEditor-Inspector-Hint {
+          opacity: 0.6;
+          font-style: italic;
+        }
+      `;
+      document.head.appendChild(styleElement);
+    }
+
+    private _renderBoneTree(bone: THREE.Bone): HTMLElement {
+      const childBones = bone.children.filter(
+        // @ts-ignore
+        (child) => child.isBone
+      ) as Array<THREE.Bone>;
+      const boneBox = this._boneBoxes.find((entry) => entry.bone === bone);
+      const row = (
+        <span class="InGameEditor-Inspector-Selectable">
+          ▭ {bone.name || '(unnamed bone)'}
+        </span>
+      );
+      row.addEventListener('click', () =>
+        this._setBlinkingElement(row, boneBox ? [boneBox.box] : [])
+      );
+      const item = <li>{row}</li>;
+      if (childBones.length > 0) {
+        item.appendChild(
+          appendChildren(
+            <ul />,
+            childBones.map((childBone) => this._renderBoneTree(childBone))
+          )
+        );
+      }
+      return item;
+    }
+
+    private _renderChildObjects(object3D: THREE.Object3D): HTMLElement {
+      const children = object3D.children.filter(
+        // @ts-ignore
+        (child) => !child.isBone
+      );
+      return appendChildren(
+        <ul />,
+        children.map((child) => {
+          const row = (
+            <span class="InGameEditor-Inspector-Selectable">
+              {child.name || '(unnamed)'}{' '}
+              <span class="InGameEditor-Inspector-Hint">{child.type}</span>
+            </span>
+          );
+          row.addEventListener('click', () => {
+            // Blink every mesh of this element (a group blinks its content).
+            const meshes: Array<THREE.Mesh> = [];
+            child.traverse((descendant) => {
+              // @ts-ignore
+              if (descendant.isMesh) meshes.push(descendant as THREE.Mesh);
+            });
+            this._setBlinkingElement(row, meshes);
+          });
+          const item = <li>{row}</li>;
+          if (child.children.length > 0) {
+            item.appendChild(this._renderChildObjects(child));
+          }
+          return item;
+        })
+      );
+    }
+
+    /**
+     * Highlight an element of the model listed in the tree: the row is
+     * marked as selected and the meshes blink. Clicking the row again stops.
+     */
+    private _setBlinkingElement(row: HTMLElement, meshes: Array<THREE.Mesh>) {
+      this._stopBlinking();
+      if (this._selectedRow === row) {
+        this._selectedRow = null;
+        return;
+      }
+      this._selectedRow = row;
+      row.classList.add('InGameEditor-Inspector-Selected');
+      this._blinkingMeshes = meshes;
+      this._blinkTime = 0;
+      const seenMaterials = new Set<THREE.Material>();
+      for (const mesh of meshes) {
+        const materials = Array.isArray(mesh.material)
+          ? mesh.material
+          : [mesh.material];
+        for (const material of materials) {
+          if (seenMaterials.has(material)) continue;
+          seenMaterials.add(material);
+          this._blinkingOriginalMaterials.push({
+            material,
+            opacity: material.opacity,
+            transparent: material.transparent,
+          });
+          material.transparent = true;
+        }
+        this._addOutlineShell(mesh);
+        // A bone box is hidden unless its bone is selected.
+        if (this._boneBoxes.some((entry) => entry.box === mesh)) {
+          mesh.visible = true;
+        }
+      }
+    }
+
+    /**
+     * Draw a bright blue outline around a mesh: a clone of it, rendered with
+     * its back faces only and pushed along the normals. Done after skinning
+     * in the shader, so it follows the animation of a skinned mesh. It's a
+     * child of the mesh, so it follows any transformation of it.
+     */
+    private _addOutlineShell(mesh: THREE.Mesh) {
+      const shell = mesh.clone();
+      shell.material = this._outlineMaterial;
+      shell.renderOrder = (mesh.renderOrder || 0) - 1;
+      // Reset the transformation copied by clone: the shell is a child, and
+      // the extrusion is done in the shader (see _makeOutlineMaterial).
+      shell.position.set(0, 0, 0);
+      shell.rotation.set(0, 0, 0);
+      shell.scale.set(1, 1, 1);
+      shell.children.length = 0;
+      shell.visible = true;
+      mesh.add(shell);
+      this._outlineShells.push(shell);
+    }
+
+    private static _makeOutlineMaterial(): THREE.MeshBasicMaterial {
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x00c8ff,
+        side: THREE.BackSide,
+        transparent: true,
+        opacity: 0.95,
+        depthWrite: false,
+      });
+      // Push the vertices along their normal (after skinning, so it follows
+      // the animation) by about 2 world pixels: the extrusion is expressed in
+      // object units, so it's divided by the object world scale (3D models are
+      // normalized in a unit cube and then scaled to their size in pixels).
+      material.onBeforeCompile = (shader) => {
+        shader.vertexShader = shader.vertexShader.replace(
+          '#include <skinning_vertex>',
+          '#include <skinning_vertex>\n' +
+            'transformed += objectNormal * (2.0 / length(modelMatrix[0].xyz));\n'
+        );
+      };
+      return material;
+    }
+
+    private _stopBlinking() {
+      if (this._selectedRow) {
+        this._selectedRow.classList.remove('InGameEditor-Inspector-Selected');
+      }
+      for (const { material, opacity, transparent } of this
+        ._blinkingOriginalMaterials) {
+        material.opacity = opacity;
+        material.transparent = transparent;
+        material.needsUpdate = true;
+      }
+      this._blinkingOriginalMaterials.length = 0;
+      this._blinkingMeshes.length = 0;
+      for (const shell of this._outlineShells) {
+        shell.removeFromParent();
+      }
+      this._outlineShells.length = 0;
+      for (const { box } of this._boneBoxes) {
+        box.visible = false;
+      }
+    }
+
+    private _updateBlinking() {
+      if (this._blinkingOriginalMaterials.length === 0) return;
+      this._blinkTime += 1 / 60;
+      // Between 15% and 100% opacity, twice per second.
+      const opacityFactor =
+        0.15 + 0.85 * Math.abs(Math.sin(this._blinkTime * Math.PI * 2));
+      for (const { material, opacity } of this._blinkingOriginalMaterials) {
+        material.opacity = opacity * opacityFactor;
+      }
+    }
+
+    render(parent: HTMLElement) {
+      if (this._renderedElements && this._parent !== parent) {
+        this._renderedElements.banner.remove();
+        this._renderedElements.panel.remove();
+        this._renderedElements = null;
+      }
+      this._parent = parent;
+
+      if (!this._renderedElements) {
+        const objectName = this._object.getName();
+        // Breadcrumb: "Scene › Bunny › Origin point" (the last crumb only
+        // while the origin point is selected).
+        const pointCrumb = (
+          <span class="InGameEditor-Inspector-Crumb-Current">Origin point</span>
+        );
+        const pointCrumbSeparator = <span>›</span>;
+        const banner = (
+          <div
+            class="InGameEditor-Inspector-Banner"
+            onClick={() => this._onExit()}
+          >
+            <span class="InGameEditor-Inspector-Crumb">Scene</span>
+            <span>›</span>
+            <span class="InGameEditor-Inspector-Crumb">{objectName}</span>
+            {pointCrumbSeparator}
+            {pointCrumb}
+          </div>
+        );
+
+        // Tree of the model content: origin point, meshes, bones.
+        const rootBones = this._getModelBones().filter(
+          // @ts-ignore
+          (bone) => !bone.parent || !bone.parent.isBone
+        );
+        const threeObject = this._object.get3DRendererObject();
+        const originInfo = <span class="InGameEditor-Inspector-Hint"></span>;
+        const originItem = (
+          <span
+            class="InGameEditor-Inspector-Selectable"
+            onClick={() => this._setOriginSelected(!this._isOriginSelected)}
+          >
+            ● Origin point
+          </span>
+        );
+        const panel = (
+          <div class="InGameEditor-Inspector-Panel">
+            <ul>
+              <li>
+                <b>{objectName}</b>{' '}
+                <span class="InGameEditor-Inspector-Hint">3D model</span>
+                <ul>
+                  <li>
+                    {originItem} {originInfo}
+                  </li>
+                  <li>
+                    Meshes
+                    {threeObject ? this._renderChildObjects(threeObject) : ''}
+                  </li>
+                  <li>
+                    Bones ({String(this._boneBoxes.length)})
+                    {appendChildren(
+                      <ul />,
+                      rootBones.length > 0
+                        ? rootBones.map((bone) => this._renderBoneTree(bone))
+                        : [
+                            <li class="InGameEditor-Inspector-Hint">
+                              No skeleton
+                            </li>,
+                          ]
+                    )}
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        );
+        parent.appendChild(banner);
+        parent.appendChild(panel);
+        this._renderedElements = {
+          banner,
+          panel,
+          originInfo,
+          originItem,
+          pointCrumb,
+          pointCrumbSeparator,
+        };
+      }
+
+      const {
+        banner,
+        panel,
+        originInfo,
+        originItem,
+        pointCrumb,
+        pointCrumbSeparator,
+      } = this._renderedElements;
+
+      // The IDE panels float over the game frame: stay in the area that is
+      // actually visible (normalized coordinates, sent by the IDE).
+      const visibleArea = this._getVisibleScreenArea() || {
+        minX: 0,
+        minY: 0,
+        maxX: 1,
+        maxY: 1,
+      };
+      banner.style.left = `${visibleArea.minX * 100}%`;
+      banner.style.top = `${visibleArea.minY * 100}%`;
+      panel.style.right = `${(1 - visibleArea.maxX) * 100}%`;
+      panel.style.top = `calc(${visibleArea.minY * 100}% + 40px)`;
+      panel.style.bottom = `${(1 - visibleArea.maxY) * 100}%`;
+      pointCrumb.style.display = this._isOriginSelected ? '' : 'none';
+      pointCrumbSeparator.style.display = this._isOriginSelected ? '' : 'none';
+      originItem.classList.toggle(
+        'InGameEditor-Inspector-Selected',
+        this._isOriginSelected
+      );
+
+      // @ts-ignore - _originPoint is specific to Model3DRuntimeObject.
+      const originPoint = this._object._originPoint as Array<float | null>;
+      const formatOriginCoordinate = (value: float | null) =>
+        value === null ? 'auto' : value.toFixed(2);
+      originInfo.textContent = `(${originPoint
+        .map(formatOriginCoordinate)
+        .join(', ')}) at ${this._object.getX().toFixed(0)}, ${this._object
+        .getY()
+        .toFixed(0)}, ${this._object.getZ().toFixed(0)}`;
+    }
+
+    dispose() {
+      this._stopBlinking();
+      this._outlineMaterial.dispose();
+      for (const { mesh, material } of this._greyedMeshes) {
+        mesh.material = material;
+      }
+      this._greyedMeshes.length = 0;
+      for (const { pixiObject, alpha } of this._greyedPixiObjects) {
+        pixiObject.alpha = alpha;
+      }
+      this._greyedPixiObjects.length = 0;
+      this._greyMaterial.dispose();
+
+      this._originControls.detach();
+      this._originControls.removeFromParent();
+      this._originControls.dispose();
+      this._originSphere.removeFromParent();
+      this._originSphere.geometry.dispose();
+      (this._originSphere.material as THREE.Material).dispose();
+      this._bonesGroup.removeFromParent();
+      if (this._skeletonHelper) {
+        const helperRoot = this._skeletonHelper.parent;
+        this._skeletonHelper.removeFromParent();
+        if (helperRoot) helperRoot.removeFromParent();
+        this._skeletonHelper.dispose();
+        this._skeletonHelper = null;
+      }
+      if (this._boneBoxes.length > 0) {
+        // The geometry is shared, the materials are not.
+        this._boneBoxes[0].box.geometry.dispose();
+        for (const { box } of this._boneBoxes) {
+          (box.material as THREE.Material).dispose();
+        }
+      }
+      this._boneBoxes.length = 0;
+
+      if (this._renderedElements) {
+        this._renderedElements.banner.remove();
+        this._renderedElements.panel.remove();
+        this._renderedElements = null;
+      }
     }
   }
 

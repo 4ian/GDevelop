@@ -480,6 +480,11 @@ namespace gdjs {
             });
         } else if (data.command === 'cancelDragNewInstance') {
           if (inGameEditor) inGameEditor.cancelDragNewInstance();
+        } else if (data.command === 'setVisibleScreenArea') {
+          // POC: the part of the game frame not covered by the IDE panels.
+          if (inGameEditor && data.payload?.visibleScreenArea) {
+            inGameEditor.setVisibleScreenArea(data.payload.visibleScreenArea);
+          }
         } else if (data.command === 'setInGameEditorSettings') {
           if (inGameEditor && data.payload?.inGameEditorSettings) {
             inGameEditor.setInGameEditorSettings(

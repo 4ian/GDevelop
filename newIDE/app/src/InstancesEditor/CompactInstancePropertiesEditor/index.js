@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
+import { type FieldModificationContext } from '../../CompactPropertiesEditor';
 
 import CompactPropertiesEditor, {
   Separator,
@@ -117,7 +118,10 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instances: Array<gdInitialInstance>,
   editObjectInPropertiesPanel: string => void,
-  onInstancesModified?: (Array<gdInitialInstance>) => void,
+  onInstancesModified?: (
+    Array<gdInitialInstance>,
+    ?FieldModificationContext
+  ) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,

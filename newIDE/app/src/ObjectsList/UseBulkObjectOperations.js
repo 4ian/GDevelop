@@ -177,7 +177,7 @@ function useBulkObjectOperations({
         title: t`Remove objects`,
         message: t`Are you sure you want to remove these ${
           objectsToDelete.length
-        } objects? This can't be undone.`,
+        } objects?`,
       });
       if (!answer) return false;
 
@@ -316,7 +316,7 @@ function useBulkObjectOperations({
 
       const answer = Window.showConfirmDialog(
         i18n._(
-          t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects. This action cannot be undone.
+          t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects.
 
           Do you want to set these ${
             objectItems.length

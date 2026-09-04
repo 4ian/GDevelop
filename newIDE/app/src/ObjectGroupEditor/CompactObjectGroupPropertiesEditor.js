@@ -29,6 +29,7 @@ import { type ObjectGroupEditorTab } from './EditedObjectGroupEditorDialog';
 import CompactObjectGroupEditor from './CompactObjectGroupEditor';
 import { CollapsibleSubPanel } from '../ObjectEditor/CompactObjectPropertiesEditor';
 import { TopLevelCollapsibleSection } from '../CompactPropertiesEditor/TopLevelCollapsibleSection';
+import { type FieldModificationContext } from '../CompactPropertiesEditor';
 import { useManageObjectBehaviors } from '../BehaviorsEditor';
 import CompactBehaviorsEditorService from '../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorsEditorService';
 import { IconContainer } from '../UI/IconContainer';
@@ -82,6 +83,7 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
   historyHandler?: HistoryHandler,
+  onObjectGroupModified?: (?FieldModificationContext) => void,
 
   objectGroup: gdObjectGroup,
   isObjectListLocked: boolean,
@@ -129,6 +131,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
       projectScopedContainersAccessor,
       unsavedChanges,
       historyHandler,
+      onObjectGroupModified,
       objectGroup,
       isObjectListLocked,
       isVariableListLocked,
@@ -260,11 +263,18 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
     const removeObject = React.useCallback(
       (objectName: string) => {
         objectGroup.removeObject(objectName);
+        if (onObjectGroupModified)
+          onObjectGroupModified({ fieldName: 'objects' });
         // The variables common to the objects of the group may have changed.
         forceRecomputeGroupVariablesContainer();
         forceUpdate();
       },
-      [forceUpdate, forceRecomputeGroupVariablesContainer, objectGroup]
+      [
+        forceUpdate,
+        forceRecomputeGroupVariablesContainer,
+        objectGroup,
+        onObjectGroupModified,
+      ]
     );
 
     const addObject = React.useCallback(
@@ -278,6 +288,8 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
           return;
         }
         objectGroup.addObject(objectName);
+        if (onObjectGroupModified)
+          onObjectGroupModified({ fieldName: 'objects' });
         gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
           object,
           groupVariablesContainer
@@ -299,6 +311,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
       [
         allVisibleBehaviorNames,
         forceUpdate,
+        onObjectGroupModified,
         forceRecomputeGroupVariablesContainer,
         globalObjectsContainer,
         groupVariablesContainer,

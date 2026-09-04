@@ -48,8 +48,10 @@ import {
   getDisabled,
 } from '../PropertiesEditor';
 
+export type FieldModificationContext = {| +fieldName?: string |};
+
 type Props = {|
-  onInstancesModified?: Instances => void,
+  onInstancesModified?: (Instances, ?FieldModificationContext) => void,
   onRefreshAllFields: () => void,
   instances: Instances,
   schema: Schema,
@@ -196,19 +198,14 @@ const CompactPropertiesEditor = ({
   const forceUpdate = useForceUpdate();
 
   const onFieldChanged = React.useCallback(
-    ({
-      instances,
-      hasImpactOnAllOtherFields,
-    }: {|
-      instances: Instances,
-      hasImpactOnAllOtherFields: ?boolean,
-    |}) => {
+    ({ instances, field }: {| instances: Instances, field: Field |}) => {
       // This properties editor is dealing with fields that are
       // responsible to update their state (see field.setValue).
 
       if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-      if (onInstancesModified) onInstancesModified(instances);
-      if (hasImpactOnAllOtherFields) {
+      if (onInstancesModified)
+        onInstancesModified(instances, { fieldName: field.name || undefined });
+      if (field.hasImpactOnAllOtherFields) {
         // $FlowFixMe[constant-condition]
         if (onRefreshAllFields) onRefreshAllFields();
       }
@@ -257,7 +254,7 @@ const CompactPropertiesEditor = ({
               instances.forEach(i => setValue(i, newValue));
               onFieldChanged({
                 instances,
-                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                field,
               });
             }}
             disabled={getDisabled({ instances, field, mixedValues })}
@@ -289,7 +286,7 @@ const CompactPropertiesEditor = ({
             instances.forEach(i => setValue(i, newValue));
             onFieldChanged({
               instances,
-              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              field,
             });
           },
           disabled: getDisabled({ instances, field, mixedValues }),
@@ -300,7 +297,7 @@ const CompactPropertiesEditor = ({
             instances.forEach(i => onClickEndAdornment(i));
             onFieldChanged({
               instances,
-              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              field,
             });
           },
           getValueFromDisplayedValue: field.getValueFromDisplayedValue,
@@ -365,7 +362,7 @@ const CompactPropertiesEditor = ({
                   instances.forEach(i => setValue(i, rgbString));
                   onFieldChanged({
                     instances,
-                    hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                    field,
                   });
                 }}
                 disabled={getDisabled({ instances, field, mixedValues })}
@@ -392,7 +389,7 @@ const CompactPropertiesEditor = ({
               );
               onFieldChanged({
                 instances,
-                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                field,
               });
             }}
             disabled={getDisabled({ instances, field, mixedValues })}
@@ -416,7 +413,7 @@ const CompactPropertiesEditor = ({
               instances.forEach(i => setValue(i, newValue));
               onFieldChanged({
                 instances,
-                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                field,
               });
             }}
             disabled={getDisabled({ instances, field, mixedValues })}
@@ -436,7 +433,7 @@ const CompactPropertiesEditor = ({
               instances.forEach(i => setValue(i, text || ''));
               onFieldChanged({
                 instances,
-                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                field,
               });
             }}
             value={
@@ -479,7 +476,7 @@ const CompactPropertiesEditor = ({
             instances.forEach(i => setValue(i, newValue || ''));
             onFieldChanged({
               instances,
-              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              field,
             });
           },
 
@@ -491,7 +488,7 @@ const CompactPropertiesEditor = ({
             instances.forEach(i => onClickEndAdornment(i));
             onFieldChanged({
               instances,
-              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              field,
             });
           },
         };
@@ -575,7 +572,7 @@ const CompactPropertiesEditor = ({
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               onFieldChanged({
                 instances,
-                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                field,
               });
             }}
             disabled={getDisabled({ instances, field, mixedValues })}
@@ -597,7 +594,7 @@ const CompactPropertiesEditor = ({
               instances.forEach(i => setValue(i, newValue || ''));
               onFieldChanged({
                 instances,
-                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                field,
               });
             }}
             disabled={getDisabled({ instances, field, mixedValues })}
@@ -685,7 +682,7 @@ const CompactPropertiesEditor = ({
             );
             onFieldChanged({
               instances,
-              hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              field,
             });
           },
         };
@@ -734,7 +731,7 @@ const CompactPropertiesEditor = ({
               instances.forEach(i => setValue(i, newValue));
               onFieldChanged({
                 instances,
-                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                field,
               });
             }}
             disabled={getDisabled({ instances, field, mixedValues })}
@@ -775,7 +772,7 @@ const CompactPropertiesEditor = ({
               instances.forEach(i => setValue(i, newValue));
               onFieldChanged({
                 instances,
-                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+                field,
               });
             }}
             disabled={getDisabled({ instances, field, mixedValues })}

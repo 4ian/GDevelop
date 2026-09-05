@@ -17,7 +17,6 @@ import {
   type CompactTextAreaFieldWithControlsInterface,
 } from '../../UI/CompactTextAreaFieldWithControls';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import Tooltip from '@material-ui/core/Tooltip';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import AlertMessage from '../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
@@ -53,10 +52,7 @@ import DelayedPlaceholderLoader from '../../UI/DelayedPlaceholderLoader';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useStickyVisibility } from './UseStickyVisibility';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
 import Coin from '../../Credits/Icons/Coin';
-import LinearProgress from '../../UI/LinearProgress';
 import FlatButton from '../../UI/FlatButton';
 import GoldCompact from '../../Profile/Subscription/Icons/GoldCompact';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
@@ -69,6 +65,7 @@ import AutoEditButton from './AutoEditButton';
 import { EditApprovalRow } from './EditApprovalRow';
 import { type EditApprovalRequest } from '../Utils';
 import { canPayForAiRequest } from './Utils';
+import { AiUsageIndicator } from './AiUsageIndicator';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
@@ -90,36 +87,6 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
   },
-  quotaContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    overflow: 'hidden',
-    gap: 4,
-    width: '100%',
-  },
-  quotaInfoIconSpan: {
-    flexShrink: 0,
-    display: 'inline-flex',
-    alignItems: 'center',
-  },
-  quotaInfoIcon: {
-    fontSize: 18,
-  },
-  quotaProgressBarWrapper: {
-    width: 30,
-  },
-  quotaProgressBar: {
-    height: 4,
-    borderRadius: 2,
-  },
-  quotaCoinSpan: {
-    verticalAlign: 'middle',
-    display: 'inline-block',
-    marginRight: 4,
-  },
-  quotaPlaceholder: {
-    height: 29,
-  },
 };
 
 const getRowsAndHeight = ({
@@ -131,165 +98,6 @@ const getRowsAndHeight = ({
   // Matching height to avoid layout shifts when showing subscription/credits prompt.
   const height = standAloneForm ? 93 : 153;
   return { rows, height };
-};
-
-const getPriceAndRequestsTextAndTooltip = ({
-  quota,
-  price,
-  availableCredits,
-  automaticallyUseCreditsForAiRequests,
-  isRefreshingLimits,
-  progressBarColor,
-  progressTrackColor,
-  onOpenSubscriptionDialog,
-  hideLabel,
-}: {|
-  quota: Quota | null,
-  price: UsagePrice | null,
-  availableCredits: number,
-  automaticallyUseCreditsForAiRequests: boolean,
-  isRefreshingLimits?: boolean,
-  progressBarColor: string,
-  progressTrackColor: string,
-  onOpenSubscriptionDialog: () => void,
-  hideLabel?: boolean,
-|}): React.Node => {
-  if (!quota || !price) {
-    if (isRefreshingLimits) {
-      // No value yet: show only the indeterminate bar and the (i) icon, no label.
-      return (
-        <div style={styles.quotaContainer}>
-          <div style={styles.quotaProgressBarWrapper}>
-            <LinearProgress
-              variant="indeterminate"
-              barColor={progressBarColor}
-              trackColor={progressTrackColor}
-              style={{ ...styles.quotaProgressBar }}
-            />
-          </div>
-          <span style={styles.quotaInfoIconSpan}>
-            <CircledInfo color="inherit" style={styles.quotaInfoIcon} />
-          </span>
-        </div>
-      );
-    }
-    // Placeholder to avoid layout shift.
-    return <div style={styles.quotaPlaceholder} />;
-  }
-
-  const aiCreditsAvailable = Math.max(0, quota.max - quota.current);
-  const percentage =
-    quota.max > 0 ? Math.round((aiCreditsAvailable / quota.max) * 100) : 0;
-
-  const timeForReset = quota.resetsAt ? new Date(quota.resetsAt) : null;
-  const now = new Date();
-
-  let dateString = '';
-  let timeString = '';
-  if (timeForReset && timeForReset.getTime() - now.getTime() > 0) {
-    dateString = timeForReset.toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-    });
-    timeString = timeForReset.toLocaleTimeString(undefined, {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-  }
-  const hasTimeForReset = !!dateString;
-
-  const tooltipSentence = hasTimeForReset ? (
-    quota.period === '7days' ? (
-      <Trans>
-        You still have {percentage}% left on this week's AI usage. It resets on{' '}
-        {dateString} at {timeString}.
-      </Trans>
-    ) : quota.period === '30days' ? (
-      <Trans>
-        You still have {percentage}% left on this month's AI usage. It resets on{' '}
-        {dateString} at {timeString}.
-      </Trans>
-    ) : (
-      <Trans>
-        You still have {percentage}% left on today's AI usage. It resets on{' '}
-        {dateString} at {timeString}.
-      </Trans>
-    )
-  ) : quota.period === '7days' ? (
-    <Trans>You still have {percentage}% left on this week's AI usage.</Trans>
-  ) : quota.period === '30days' ? (
-    <Trans>You still have {percentage}% left on this month's AI usage.</Trans>
-  ) : (
-    <Trans>You still have {percentage}% left on today's AI usage.</Trans>
-  );
-
-  const tooltipText = (
-    <ColumnStackLayout noMargin>
-      <Line noMargin>{tooltipSentence}</Line>
-      <Line noMargin justifyContent="space-between">
-        <Link href="#" color="secondary" onClick={onOpenSubscriptionDialog}>
-          <Trans>Need more?</Trans>
-        </Link>
-        <Link
-          href={getHelpLink('/interface/ai/', 'cost-of-ai-requests')}
-          color="secondary"
-          onClick={() =>
-            Window.openExternalURL(
-              getHelpLink('/interface/ai/', 'cost-of-ai-requests')
-            )
-          }
-        >
-          <Trans>Learn more</Trans>
-        </Link>
-      </Line>
-    </ColumnStackLayout>
-  );
-
-  const shouldShowCredits =
-    quota.limitReached && automaticallyUseCreditsForAiRequests;
-
-  return (
-    <div style={styles.quotaContainer}>
-      {!hideLabel && (
-        <Text size="body-small" color="secondary" noMargin>
-          {shouldShowCredits ? (
-            <>
-              <span style={styles.quotaCoinSpan}>
-                <Coin fontSize="small" />
-              </span>
-              <Trans>{Math.max(0, availableCredits)} credits available</Trans>
-            </>
-          ) : (
-            <Trans>{percentage}% left</Trans>
-          )}
-        </Text>
-      )}
-      {!shouldShowCredits && (
-        <div style={styles.quotaProgressBarWrapper}>
-          <LinearProgress
-            variant={isRefreshingLimits ? 'indeterminate' : 'determinate'}
-            value={isRefreshingLimits ? undefined : percentage}
-            barColor={progressBarColor}
-            trackColor={progressTrackColor}
-            style={{ ...styles.quotaProgressBar }}
-          />
-        </div>
-      )}
-      <span style={styles.quotaInfoIconSpan}>
-        <Tooltip
-          title={tooltipText}
-          placement="top"
-          interactive
-          // Show on simple touch (not long press) and leave time to tap the links.
-          enterTouchDelay={0}
-          leaveTouchDelay={5000}
-        >
-          <CircledInfo color="inherit" style={styles.quotaInfoIcon} />
-        </Tooltip>
-      </span>
-    </div>
-  );
 };
 
 const getSendButtonIcon = (): React.Node => <Send fontSize="small" />;
@@ -491,11 +299,6 @@ export const AiRequestChat: React.ComponentType<{
         onResolveEditApproval,
       ]
     );
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
-    const progressBarColor =
-      gdevelopTheme.palette.type === 'light' ? '#7046EC' : '#9979F1';
-    const progressTrackColor =
-      gdevelopTheme.palette.type === 'light' ? '#D9D9DE' : '#32323B';
     const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
     const { openCreditsPackageDialog } = React.useContext(
       CreditsPackageStoreContext
@@ -694,24 +497,32 @@ export const AiRequestChat: React.ComponentType<{
       value: !!isRefreshingLimits,
     });
 
-    const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
-      quota,
-      price,
-      availableCredits,
-      automaticallyUseCreditsForAiRequests,
-      isRefreshingLimits: isRefreshingLimitsStable,
-      progressBarColor,
-      progressTrackColor,
-      hideLabel: isMobile,
-      onOpenSubscriptionDialog: () =>
-        openSubscriptionDialog({
-          analyticsMetadata: {
-            reason: 'AI requests (subscribe)',
-            recommendedPlanId: 'gdevelop_gold',
-            placementId: 'ai-requests',
-          },
-        }),
-    });
+    const priceAndRequestsText = (
+      <AiUsageIndicator
+        quota={quota}
+        price={price}
+        availableCredits={availableCredits}
+        automaticallyUseCreditsForAiRequests={
+          automaticallyUseCreditsForAiRequests
+        }
+        isRefreshingLimits={isRefreshingLimitsStable}
+        hideLabel={isMobile}
+        contextUsedRatio={
+          aiRequest && aiRequest.contextStats
+            ? aiRequest.contextStats.usedPercentage
+            : null
+        }
+        onOpenSubscriptionDialog={() =>
+          openSubscriptionDialog({
+            analyticsMetadata: {
+              reason: 'AI requests (subscribe)',
+              recommendedPlanId: 'gdevelop_gold',
+              placementId: 'ai-requests',
+            },
+          })
+        }
+      />
+    );
 
     const chosenOrDefaultAiConfigurationPresetId =
       aiConfigurationPresetId ||

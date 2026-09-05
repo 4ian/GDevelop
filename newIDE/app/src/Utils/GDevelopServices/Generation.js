@@ -118,6 +118,18 @@ export type AiRequestError = {
   message: string,
 };
 
+/**
+ * How much of the context (the "memory" of the conversation) an AI request
+ * uses, as estimated by the API.
+ */
+export type AiRequestContextStats = {
+  // Rough estimate of the tokens consumed by the conversation so far.
+  totalTokens: number,
+  // The share of the context budget used, from 0 to 1 (it can exceed 1 once
+  // the budget is passed, the AI is then asked to wrap up).
+  usedPercentage: number,
+};
+
 export type AiRequest = {
   id: string,
   createdAt: string,
@@ -136,6 +148,7 @@ export type AiRequest = {
   parentAiRequestId?: string | null,
 
   error: AiRequestError | null,
+  contextStats?: AiRequestContextStats | null,
 
   // How many times the request was continued after a failure without making
   // any progress in between, and the number of messages it had then: the API

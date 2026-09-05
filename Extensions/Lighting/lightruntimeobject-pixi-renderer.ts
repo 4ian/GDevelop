@@ -818,9 +818,17 @@ namespace gdjs {
 
   void main() {
       float l = length(vPos - center);
-      float intensity = 0.0;
-      if(l < radius)
-        intensity = clamp((radius - l)*(radius - l)/(radius*radius), 0.0, 1.0);
+      // Discard fragments outside the light's radius rather than writing a
+      // transparent color. PixiJS's stencil-based masking (used when this
+      // mesh is assigned as another object's mask, e.g. via an object
+      // masking extension) only looks at which fragments were rasterized,
+      // not their color/alpha - a plain color write of (0,0,0,1) would
+      // still count as "inside" the mask, making the light's whole
+      // quad/mesh footprint act as the mask instead of its actual visible
+      // circular shape. discard removes the fragment from the pipeline
+      // entirely, so only the true circle is considered "inside".
+      if (l >= radius) discard;
+      float intensity = clamp((radius - l)*(radius - l)/(radius*radius), 0.0, 1.0);
       gl_FragColor = vec4(color*intensity, 1.0);
   }`;
     static texturedFragmentShader = `
@@ -844,9 +852,20 @@ namespace gdjs {
     );
     vec2 topleft = vec2(-radius, -radius);
     vec2 texCoord = (rotatedPos - topleft)/(2.0 * radius);
-    gl_FragColor = (texCoord.x > 0.0 && texCoord.x < 1.0 && texCoord.y > 0.0 && texCoord.y < 1.0)
-      ? vec4(color, 1.0) * texture2D(uSampler, texCoord)
-      : vec4(0.0, 0.0, 0.0, 0.0);
+
+    // See the comment in defaultFragmentShader above: discard (rather than
+    // just writing a transparent color) any fragment outside the texture's
+    // square, and any fragment whose texture pixel is itself fully
+    // transparent, so stencil-based masking respects the texture's actual
+    // (rotated) silhouette instead of the mesh's raw quad.
+    if (texCoord.x <= 0.0 || texCoord.x >= 1.0 || texCoord.y <= 0.0 || texCoord.y >= 1.0) {
+      discard;
+    }
+    vec4 texColor = texture2D(uSampler, texCoord);
+    if (texColor.a <= 0.0) {
+      discard;
+    }
+    gl_FragColor = vec4(color, 1.0) * texColor;
   }`;
   }
 

@@ -85,10 +85,7 @@ type Props = {|
   focusOnMount?: boolean,
   resourceManagementProps: ResourceManagementProps,
   style?: Object,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   noHelpButton?: boolean,
   id?: string,
   openEventsBasedEntityPropertyEditorDialog:
@@ -217,17 +214,7 @@ const InstructionParametersEditor: React.ComponentType<{
       const instructionType = instruction.getType();
       if (!instructionType) return null;
 
-      const extension = isCondition
-        ? gd.MetadataProvider.getExtensionAndConditionMetadata(
-            project.getCurrentPlatform(),
-            instructionType
-          ).getExtension()
-        : gd.MetadataProvider.getExtensionAndActionMetadata(
-            project.getCurrentPlatform(),
-            instructionType
-          ).getExtension();
-
-      openInstructionOrExpression(extension, instructionType);
+      openInstructionOrExpression(instructionType);
     };
 
     const renderEmpty = () => {

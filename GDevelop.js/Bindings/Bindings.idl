@@ -2838,6 +2838,13 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_MoveEventsFunction(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldFunctionName,
+      [Const] DOMString newFunctionName);
     void STATIC_RenameBehaviorEventsFunction(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2916,6 +2923,13 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_MoveEventsBasedBehavior(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldBehaviorName,
+      [Const] DOMString newBehaviorName);
     void STATIC_UpdateBehaviorNameInEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2924,8 +2938,15 @@ interface WholeProjectRefactorer {
     void STATIC_RenameEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
-      [Const] DOMString oldName,
-      [Const] DOMString newName);
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
+    void STATIC_MoveEventsBasedObject(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
     void STATIC_UpdateObjectNameInEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,

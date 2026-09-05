@@ -54,10 +54,7 @@ type Props = {|
   onCancel: () => void,
   onSubmit: () => void,
   open: boolean,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   i18n: I18nType,
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused

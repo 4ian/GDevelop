@@ -184,10 +184,7 @@ export type EditorTabsPaneCommonProps = {|
       | 'extension-events-editor'
       | 'external-events-editor'
   ) => Promise<void>,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   onOpenCustomObjectEditor: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventsBasedObject: gdEventsBasedObject,
@@ -207,6 +204,24 @@ export type EditorTabsPaneCommonProps = {|
   onDeletedEventsBasedObject: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
+  ) => void,
+  onEventsBasedObjectMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldObjectName: string,
+    newObjectName: string
+  ) => void,
+  onEventsBasedBehaviorMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldBehaviorName: string,
+    newBehaviorName: string
+  ) => void,
+  onEventsFunctionMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldFunctionName: string,
+    newFunctionName: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
   onNavigateToEventFromGlobalSearch: (
@@ -381,6 +396,9 @@ const EditorTabsPane: React.ComponentType<{
     onOpenEventsFunctionsExtension,
     onRenamedEventsBasedObject,
     onDeletedEventsBasedObject,
+    onEventsBasedObjectMoved,
+    onEventsBasedBehaviorMoved,
+    onEventsFunctionMoved,
     openObjectEvents,
     onNavigateToEventFromGlobalSearch,
     onEditorTabClosing,
@@ -815,6 +833,9 @@ const EditorTabsPane: React.ComponentType<{
                     onOpenEventsFunctionsExtension,
                     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
                     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
+                    onEventsBasedObjectMoved: onEventsBasedObjectMoved,
+                    onEventsBasedBehaviorMoved: onEventsBasedBehaviorMoved,
+                    onEventsFunctionMoved: onEventsFunctionMoved,
                     openObjectEvents,
                     onNavigateToEventFromGlobalSearch,
                     unsavedChanges: unsavedChanges,

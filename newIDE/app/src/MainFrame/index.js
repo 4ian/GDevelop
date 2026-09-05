@@ -294,6 +294,7 @@ import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
 import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
+
 const electron = optionalRequire('electron');
 const ipcRendererForUpdates = electron ? electron.ipcRenderer : null;
 
@@ -2570,6 +2571,63 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
+  const onEventsBasedObjectMoved = (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldObjectName: string,
+    newObjectName: string
+  ) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    openObjectEvents(newExtensionName, newObjectName);
+    // The object is already renamed; update its custom-object tabs in place.
+    setState(state => ({
+      ...state,
+      // TODO Open new tabs in their place
+      // We can't just use getRenamedEventsBasedObjectTabProjectItemName
+      // because even if the event-based object was still the same instance
+      // the context would have the wrong extension.
+      editorTabs: closeCustomObjectTab(
+        state.editorTabs,
+        oldExtensionName,
+        newExtensionName
+      ),
+    })).then(() => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['renamed-custom-object'],
+      });
+    });
+  };
+
+  const onEventsBasedBehaviorMoved = (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldBehaviorName: string,
+    newBehaviorName: string
+  ) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    openBehaviorEvents(newExtensionName, newBehaviorName);
+  };
+
+  const onEventsFunctionMoved = (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldFunctionName: string,
+    newFunctionName: string
+  ) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    openInstructionOrExpression(newExtensionName + '::' + newFunctionName);
+  };
+
   const onDeletedEventsBasedObject = (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
@@ -3382,21 +3440,20 @@ const MainFrame = (props: Props): React.MixedElement => {
     [openDebugger, launchNewPreview]
   );
 
-  const openInstructionOrExpression = (
-    extension: gdPlatformExtension,
-    type: string
-  ) => {
+  const openInstructionOrExpression = (type: string) => {
     const { currentProject, editorTabs } = state;
     if (!currentProject) return;
 
-    const extensionName = extension.getName();
+    const {
+      extensionName,
+      behaviorName: eventsBasedEntityName,
+      name: functionName,
+    } = getFunctionNameFromType(type);
     if (currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
       // It's an events functions extension, open the editor for it.
       const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
         extensionName
       );
-      const functionName = getFunctionNameFromType(type);
-      const eventsBasedEntityName = functionName.behaviorName;
 
       let eventBasedBehaviorName = null;
       let eventBasedObjectName = null;
@@ -3423,7 +3480,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (foundTab) {
         // Open the given function and focus the tab
         foundTab.editor.selectEventsFunctionByName(
-          functionName.name,
+          functionName,
           eventBasedBehaviorName,
           eventBasedObjectName
         );
@@ -3439,7 +3496,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         // Open a new editor for the extension and the given function
         openEventsFunctionsExtension(
           extensionName,
-          functionName.name,
+          functionName,
           eventBasedBehaviorName,
           eventBasedObjectName
         );
@@ -3567,7 +3624,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       );
       if (foundTab) {
         // Open the given function and focus the tab
-        foundTab.editor.selectEventsBasedBehaviorByName(objectName);
+        foundTab.editor.selectEventsBasedObjectByName(objectName);
         setState(state => ({
           ...state,
           editorTabs: changeCurrentTab(
@@ -5801,6 +5858,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
+    onEventsBasedObjectMoved: onEventsBasedObjectMoved,
+    onEventsBasedBehaviorMoved: onEventsBasedBehaviorMoved,
+    onEventsFunctionMoved: onEventsFunctionMoved,
     openObjectEvents: openObjectEvents,
     onNavigateToEventFromGlobalSearch: navigateToEventFromGlobalSearch,
     onEditorTabClosing: onEditorTabClosing,

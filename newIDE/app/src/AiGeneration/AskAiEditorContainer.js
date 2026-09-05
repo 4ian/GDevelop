@@ -1086,11 +1086,23 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               <Toolbar
                 isHistoryOpen={isHistoryOpen}
                 onToggleHistory={onToggleHistory}
+                onStartNewChat={onStartNewChat}
+                canStartNewChat={canStartNewChat}
+                showNewChatButton={
+                  !(historyLayout === 'side-panel' && isHistoryOpen)
+                }
               />
             );
           }
         },
-        [setToolbar, isHistoryOpen, onToggleHistory]
+        [
+          setToolbar,
+          isHistoryOpen,
+          onToggleHistory,
+          onStartNewChat,
+          canStartNewChat,
+          historyLayout,
+        ]
       );
 
       React.useEffect(updateToolbar, [updateToolbar]);

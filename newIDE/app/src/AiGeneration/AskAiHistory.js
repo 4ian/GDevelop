@@ -8,6 +8,7 @@ import ScrollView from '../UI/ScrollView';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import PlaceholderError from '../UI/PlaceholderError';
 import TextButton from '../UI/TextButton';
+import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import CollapsibleSidePanel from '../UI/CollapsibleSidePanel';
 import Add from '../UI/CustomSvgIcons/Add';
@@ -97,6 +98,7 @@ const ChatItem = ({
     : '';
   return (
     <button
+      type="button"
       className={classNames(classes.item, {
         [classes.itemSelected]: isSelected,
       })}
@@ -171,17 +173,15 @@ export const AskAiHistoryContent = ({
   return (
     <div className={classNames(classes.panel, className)}>
       <div className={classes.header}>
-        <button
-          className={classes.newChatButton}
+        <RaisedButton
+          primary
+          fullWidth
+          icon={<Add />}
+          label={<Trans>New chat</Trans>}
           onClick={onStartNewChat}
           disabled={!canStartNewChat}
           id="ask-ai-new-chat-button"
-        >
-          <span className={classes.newChatButtonIcon}>
-            <Add fontSize="inherit" />
-          </span>
-          <Trans>New chat</Trans>
-        </button>
+        />
       </div>
       <div className={classes.sectionTitle}>
         <Trans>Recents</Trans>

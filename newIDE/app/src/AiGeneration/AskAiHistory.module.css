@@ -48,6 +48,11 @@
   line-height: 16px;
 }
 
+.sectionTitleButtons {
+  display: inline-flex;
+  align-items: center;
+}
+
 .list {
   display: flex;
   flex-direction: column;
@@ -123,6 +128,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.itemTextArchived {
+  color: var(--theme-text-secondary-color);
 }
 
 .itemTextUntitled {

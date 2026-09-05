@@ -221,12 +221,14 @@ export const AiUsagePopoverContent = ({
           )}
           <div className={classes.footer}>
             <button
+              type="button"
               className={classes.needMoreButton}
               onClick={onOpenSubscriptionDialog}
             >
               <Trans>Need more?</Trans>
             </button>
             <button
+              type="button"
               className={classes.helpButton}
               onClick={() =>
                 Window.openExternalURL(
@@ -310,6 +312,8 @@ export const AiUsageIndicator = ({
   return (
     <>
       <button
+        // Not a submit button: the indicator is inside the form of the chat.
+        type="button"
         className={classNames(classes.trigger, {
           [classes.triggerOpen]: isOpen,
         })}
@@ -318,17 +322,23 @@ export const AiUsageIndicator = ({
         aria-expanded={isOpen}
         id="ai-usage-indicator"
       >
-        {!hideLabel && (
+        {shouldShowCredits ? (
+          // The GDevelop credits are always shown, as they are what allows
+          // continuing: only the word is dropped where there is no room.
           <span className={classes.triggerLabel}>
-            {shouldShowCredits ? (
-              <>
-                <Coin fontSize="small" />
-                <Trans>{Math.max(0, availableCredits)} credits available</Trans>
-              </>
+            <Coin fontSize="small" />
+            {hideLabel ? (
+              Math.max(0, availableCredits)
             ) : (
-              <Trans>{percentage}% left</Trans>
+              <Trans>{Math.max(0, availableCredits)} credits</Trans>
             )}
           </span>
+        ) : (
+          !hideLabel && (
+            <span className={classes.triggerLabel}>
+              <Trans>{percentage}% left</Trans>
+            </span>
+          )
         )}
         {!shouldShowCredits && (
           <span className={classes.triggerBar}>

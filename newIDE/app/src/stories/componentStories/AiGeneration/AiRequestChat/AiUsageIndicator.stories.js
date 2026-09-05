@@ -125,6 +125,25 @@ export const LimitReachedUsingCredits = (): React.Node => (
   />
 );
 
+export const OnMobileLimitReachedUsingCredits = (): React.Node => (
+  <IndicatorInChat
+    quota={quotaLimitReached}
+    availableCredits={400}
+    automaticallyUseCreditsForAiRequests={true}
+    contextUsedRatio={0.32}
+    hideLabel
+  />
+);
+
+export const LimitReachedNotUsingCredits = (): React.Node => (
+  <IndicatorInChat
+    quota={quotaLimitReached}
+    availableCredits={400}
+    automaticallyUseCreditsForAiRequests={false}
+    contextUsedRatio={0.32}
+  />
+);
+
 export const RefreshingLimits = (): React.Node => (
   <IndicatorInChat
     quota={quotaWithPlentyLeft}

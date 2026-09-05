@@ -10,7 +10,8 @@
 }
 
 /* Buttons styled as list rows: reset the browser styles. */
-.item {
+.itemButton,
+.itemMenuButton {
   appearance: none;
   margin: 0;
   border: none;
@@ -21,11 +22,8 @@
   outline: none;
 }
 
-.item:disabled {
-  cursor: default;
-}
-
-.item:focus-visible {
+.itemButton:focus-visible,
+.itemMenuButton:focus-visible {
   box-shadow: 0 0 0 2px var(--theme-text-field-active-border-color);
 }
 
@@ -60,14 +58,54 @@
 .item {
   display: flex;
   align-items: center;
-  gap: 8px;
   width: 100%;
-  padding: 7px 10px;
   border-radius: 8px;
   font-size: 14px;
   line-height: 18px;
-  text-align: left;
   transition: background-color 120ms ease;
+}
+
+.itemButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.itemRenameContainer {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+}
+
+/* The menu button appears when the row is hovered or focused. */
+.itemMenuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  margin-right: 3px;
+  border-radius: 6px;
+  color: var(--theme-text-secondary-color);
+  opacity: 0;
+  transition: opacity 120ms ease, background-color 120ms ease;
+}
+
+.item:hover .itemMenuButton,
+.item:focus-within .itemMenuButton {
+  opacity: 1;
+}
+
+.itemMenuButton:hover {
+  background-color: var(--theme-hover-background-color);
+  color: var(--theme-text-default-color);
 }
 
 .item:hover {

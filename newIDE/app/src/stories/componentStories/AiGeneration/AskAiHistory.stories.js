@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import alertDecorator from '../../AlertDecorator';
 import { AskAiHistory } from '../../../AiGeneration/AskAiHistory';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import FixedWidthFlexContainer from '../../FixedWidthFlexContainer';
@@ -12,6 +13,7 @@ import {
   getAiRequestSummary,
   type AiRequest,
   type AiRequestSummary,
+  type AiRequestSummariesFilter,
   type GenerationStatus,
 } from '../../../Utils/GDevelopServices/Generation';
 import Paper from '../../../UI/Paper';
@@ -22,18 +24,21 @@ const createFakeAiRequestSummary = ({
   id,
   text,
   title = null,
+  archivedAt = null,
   status = 'ready',
   createdAt = '2024-01-01T12:00:00Z',
 }: {|
   id: string,
   text: string | null,
   title?: string | null,
+  archivedAt?: string | null,
   status?: GenerationStatus,
   createdAt?: string,
 |}): AiRequestSummary => {
   const aiRequest: AiRequest = {
     id,
     title,
+    archivedAt,
     status,
     createdAt,
     updatedAt: createdAt,
@@ -99,6 +104,19 @@ const fakeAiRequestSummaries = toAiRequestSummariesById([
     status: 'ready',
     createdAt: '2024-03-11T09:15:00Z',
   }),
+  createFakeAiRequestSummary({
+    id: 'archived-1',
+    text: 'An old idea about a racing game',
+    archivedAt: '2024-03-01T09:15:00Z',
+    createdAt: '2024-02-29T09:15:00Z',
+  }),
+  createFakeAiRequestSummary({
+    id: 'archived-2',
+    text: 'Prototype of a match-3 puzzle',
+    title: 'Match-3 prototype',
+    archivedAt: '2024-03-01T09:15:00Z',
+    createdAt: '2024-02-28T20:15:00Z',
+  }),
   ...Array.from({ length: 12 }, (_, index) =>
     createFakeAiRequestSummary({
       id: `request-old-${index}`,
@@ -111,6 +129,7 @@ const fakeAiRequestSummaries = toAiRequestSummariesById([
 export default {
   title: 'AskAi/AskAiHistory',
   component: AskAiHistory,
+  decorators: [alertDecorator],
 };
 
 const AskAiHistoryStoryTemplate = ({
@@ -121,6 +140,7 @@ const AskAiHistoryStoryTemplate = ({
   canLoadMore = false,
   selectedAiRequestId = 'request-2',
   isWaitingForUser = false,
+  filter = 'active',
   width = 1000,
   height = 600,
   initiallyOpen = true,
@@ -132,6 +152,7 @@ const AskAiHistoryStoryTemplate = ({
   canLoadMore?: boolean,
   selectedAiRequestId?: string | null,
   isWaitingForUser?: boolean,
+  filter?: AiRequestSummariesFilter,
   width?: number,
   height?: number,
   initiallyOpen?: boolean,
@@ -155,6 +176,14 @@ const AskAiHistoryStoryTemplate = ({
                 action('onLoadMoreAiRequestSummaries')(),
               renameAiRequest: async (aiRequestId, title) =>
                 action('renameAiRequest')(aiRequestId, title),
+              setAiRequestArchived: async (aiRequestId, archived) =>
+                action('setAiRequestArchived')(aiRequestId, archived),
+              deleteAiRequest: async aiRequestId =>
+                action('deleteAiRequest')(aiRequestId),
+              aiRequestSummariesFilter: filter,
+              setAiRequestSummariesFilter: action(
+                'setAiRequestSummariesFilter'
+              ),
             },
             selectedAiRequestId,
             pendingEditApproval: isWaitingForUser
@@ -201,6 +230,27 @@ const AskAiHistoryStoryTemplate = ({
 
 export const SidePanel = (): React.Node => (
   <AskAiHistoryStoryTemplate layout="side-panel" />
+);
+
+export const SidePanelArchivedChats = (): React.Node => (
+  <AskAiHistoryStoryTemplate
+    layout="side-panel"
+    filter="archived"
+    selectedAiRequestId="archived-2"
+  />
+);
+
+export const SidePanelAllChats = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="side-panel" filter="all" />
+);
+
+export const SidePanelNoArchivedChat = (): React.Node => (
+  <AskAiHistoryStoryTemplate
+    layout="side-panel"
+    filter="archived"
+    aiRequestSummaries={{}}
+    selectedAiRequestId={null}
+  />
 );
 
 export const SidePanelInitiallyClosed = (): React.Node => (

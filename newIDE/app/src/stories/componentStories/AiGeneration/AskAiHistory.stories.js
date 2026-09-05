@@ -141,7 +141,7 @@ const AskAIHistoryContentStoryTemplate = ({
       }}
     >
       <AskAiHistoryContent
-        onSelectAiRequestSummary={() => {}}
+        onOpenAiRequest={() => {}}
         selectedAiRequestId={selectedAiRequestId}
       />
     </AiRequestContext.Provider>

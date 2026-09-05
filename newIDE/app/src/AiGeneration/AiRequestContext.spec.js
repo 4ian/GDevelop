@@ -7,7 +7,9 @@ import {
   fetchAiSettings,
   getAiRequestSummaries,
   getAiRequestSummary,
+  suspendAiRequest,
   type AiRequest,
+  type AiRequestSummary,
   type AiRequestUserMessage,
 } from '../Utils/GDevelopServices/Generation';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
@@ -584,11 +586,14 @@ describe('useAiRequestHistory', () => {
     output: texts.map(userMessage),
   });
 
-  const renderHistoryHook = (
-    aiRequests: { [string]: AiRequest },
-    aiRequestSummaries: { [string]: any } = {}
-  ) => {
+  const renderHistoryHook = (aiRequests: { [string]: AiRequest }) => {
     const hookResultRef: { current: any } = { current: null };
+    const aiRequestSummaries: { [string]: AiRequestSummary } = {};
+    Object.keys(aiRequests).forEach(aiRequestId => {
+      aiRequestSummaries[aiRequestId] = getAiRequestSummary(
+        aiRequests[aiRequestId]
+      );
+    });
     const HookCapture = () => {
       hookResultRef.current = useAiRequestHistory(
         ({ aiRequests, aiRequestSummaries }: any)
@@ -615,55 +620,146 @@ describe('useAiRequestHistory', () => {
     return latestText;
   };
 
-  it('browses only messages sent by the user, skipping sub-agent requests', () => {
+  it('browses the first message of each conversation, from the most recent', () => {
     const hookResultRef = renderHistoryHook({
-      'orchestrator-1': requestWithUserMessages(
-        'orchestrator-1',
-        '2024-01-01T00:00:00.000Z',
-        ['Make a platformer game']
-      ),
-      // A sub-agent request: its "user" messages come from the orchestrator.
-      'sub-agent-1': requestWithUserMessages(
-        'sub-agent-1',
-        '2024-01-01T00:01:00.000Z',
-        ['Create the player object with animations'],
-        'orchestrator-1'
-      ),
-      'chat-1': requestWithUserMessages('chat-1', '2024-01-01T00:02:00.000Z', [
+      'chat-1': requestWithUserMessages('chat-1', '2024-01-01T00:00:00.000Z', [
+        'Make a platformer game',
+        'A second message, which the summary does not carry',
+      ]),
+      'chat-2': requestWithUserMessages('chat-2', '2024-01-01T00:02:00.000Z', [
         'Add coins to collect',
+      ]),
+      'chat-3': requestWithUserMessages('chat-3', '2024-01-01T00:01:00.000Z', [
+        'Make the player jump',
       ]),
     });
 
     expect(navigateUp(hookResultRef)).toBe('Add coins to collect');
+    expect(navigateUp(hookResultRef)).toBe('Make the player jump');
     expect(navigateUp(hookResultRef)).toBe('Make a platformer game');
-    // No more history: the sub-agent request message must not appear.
+    // No more history.
     expect(navigateUp(hookResultRef)).toBe('');
   });
+});
 
-  it('browses the first message of a conversation known only as a summary', () => {
-    const loadedRequest = requestWithUserMessages(
-      'loaded-1',
-      '2024-01-01T00:02:00.000Z',
-      ['Add coins to collect', 'Make them spin']
-    );
-    const hookResultRef = renderHistoryHook(
-      { 'loaded-1': loadedRequest },
-      {
-        // A summary of the loaded request: its messages must not be browsed
-        // twice.
-        'loaded-1': getAiRequestSummary(loadedRequest),
-        'listed-1': getAiRequestSummary(
-          requestWithUserMessages('listed-1', '2024-01-01T00:01:00.000Z', [
-            'Make a platformer game',
-            'A second message the summary does not carry',
-          ])
-        ),
-      }
-    );
+describe('AiRequestProvider opening a chat from the history', () => {
+  beforeEach(() => {
+    mockFn(getAiRequest).mockReset();
+    mockFn(suspendAiRequest).mockReset();
+    mockFn(getAiRequestStatuses).mockReset();
+    mockFn(getAiRequestStatuses).mockResolvedValue([]);
+    mockFn(fetchAiSettings).mockReset();
+    mockFn(fetchAiSettings).mockResolvedValue(null);
+    mockFn(getAiRequestSummaries).mockReset();
+    mockFn(getAiRequestSummaries).mockResolvedValue({
+      aiRequestSummaries: [],
+      nextPageUri: null,
+    });
+  });
 
-    expect(navigateUp(hookResultRef)).toBe('Make them spin');
-    expect(navigateUp(hookResultRef)).toBe('Add coins to collect');
-    expect(navigateUp(hookResultRef)).toBe('Make a platformer game');
-    expect(navigateUp(hookResultRef)).toBe('');
+  const getContext = (contextRef: {
+    current: AiRequestContextState | null,
+  }): AiRequestContextState => {
+    if (!contextRef.current) throw new Error('Context not captured');
+    return contextRef.current;
+  };
+
+  it('selects the chat immediately and loads it', async () => {
+    const { contextRef } = renderProvider();
+    const aiRequest = makeAiRequest('chat-1', 'ready');
+    mockFn(getAiRequest).mockResolvedValue(aiRequest);
+
+    act(() => {
+      getContext(contextRef).setSelectedAiRequestId('chat-1');
+    });
+    // Selected right away, with its conversation being loaded.
+    expect(getContext(contextRef).selectedAiRequestId).toBe('chat-1');
+    expect(getContext(contextRef).selectedAiRequest).toBe(null);
+    expect(
+      getContext(contextRef).aiRequestStorage.aiRequestLoadingStates['chat-1']
+    ).toEqual({ isLoading: true, error: null });
+
+    await act(async () => {
+      await flushPromises();
+    });
+    expect(getContext(contextRef).selectedAiRequest).toEqual(aiRequest);
+    expect(
+      getContext(contextRef).aiRequestStorage.aiRequestLoadingStates['chat-1']
+    ).toBeUndefined();
+    expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(1);
+    expect(mockFn(suspendAiRequest)).not.toHaveBeenCalled();
+    // The loaded chat is listed in the history.
+    expect(
+      getContext(contextRef).aiRequestStorage.aiRequestSummaries['chat-1']
+    ).toEqual(getAiRequestSummary(aiRequest));
+  });
+
+  it('does not load a chat already in memory', async () => {
+    const { contextRef } = renderProvider();
+    const aiRequest = makeAiRequest('chat-1', 'ready');
+    act(() => {
+      getContext(contextRef).aiRequestStorage.updateAiRequest(
+        'chat-1',
+        () => aiRequest
+      );
+    });
+
+    act(() => {
+      getContext(contextRef).setSelectedAiRequestId('chat-1');
+    });
+    await act(async () => {
+      await flushPromises();
+    });
+    expect(getContext(contextRef).selectedAiRequest).toEqual(aiRequest);
+    expect(mockFn(getAiRequest)).not.toHaveBeenCalled();
+  });
+
+  it('suspends a chat left with work in progress before opening it', async () => {
+    const { contextRef } = renderProvider();
+    const workingAiRequest = makeAiRequest('chat-1', 'working');
+    const suspendedAiRequest = makeAiRequest('chat-1', 'suspended');
+    mockFn(getAiRequest).mockResolvedValue(workingAiRequest);
+    mockFn(suspendAiRequest).mockResolvedValue(suspendedAiRequest);
+
+    act(() => {
+      getContext(contextRef).setSelectedAiRequestId('chat-1');
+    });
+    await act(async () => {
+      await flushPromises();
+    });
+    expect(mockFn(suspendAiRequest)).toHaveBeenCalledTimes(1);
+    expect(getContext(contextRef).selectedAiRequest).toEqual(
+      suspendedAiRequest
+    );
+  });
+
+  it('keeps a loading error until the user retries', async () => {
+    const { contextRef } = renderProvider();
+    mockFn(getAiRequest).mockRejectedValue(new Error('Network error'));
+
+    act(() => {
+      getContext(contextRef).setSelectedAiRequestId('chat-1');
+    });
+    await act(async () => {
+      await flushPromises();
+    });
+    expect(getContext(contextRef).selectedAiRequest).toBe(null);
+    const loadingState = getContext(contextRef).aiRequestStorage
+      .aiRequestLoadingStates['chat-1'];
+    expect(loadingState.isLoading).toBe(false);
+    expect(loadingState.error).toBeInstanceOf(Error);
+    // No automatic retry.
+    expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(1);
+
+    const aiRequest = makeAiRequest('chat-1', 'ready');
+    mockFn(getAiRequest).mockResolvedValue(aiRequest);
+    await act(async () => {
+      await getContext(contextRef).aiRequestStorage.loadAiRequest('chat-1');
+    });
+    expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(2);
+    expect(getContext(contextRef).selectedAiRequest).toEqual(aiRequest);
+    expect(
+      getContext(contextRef).aiRequestStorage.aiRequestLoadingStates['chat-1']
+    ).toBeUndefined();
   });
 });

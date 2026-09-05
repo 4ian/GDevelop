@@ -44,7 +44,12 @@ import {
   getDefaultAiConfigurationPresetId,
 } from '../AiConfiguration';
 import { ReasoningLevelSelector } from './ReasoningLevelSelector';
-import { AiRequestContext } from '../AiRequestContext';
+import {
+  AiRequestContext,
+  type AiRequestLoadingState,
+} from '../AiRequestContext';
+import PlaceholderError from '../../UI/PlaceholderError';
+import DelayedPlaceholderLoader from '../../UI/DelayedPlaceholderLoader';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useStickyVisibility } from './UseStickyVisibility';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -318,6 +323,10 @@ type Props = {|
   fileMetadata: ?FileMetadata,
   i18n: I18nType,
   aiRequest: AiRequest | null,
+  // Set when the chat to show is not loaded yet (it was opened from the
+  // history, which only has its summary), or failed to load.
+  aiRequestLoadingState?: ?AiRequestLoadingState,
+  onRetryLoadingAiRequest?: () => void,
 
   isSending: boolean,
   isSendingUserMessage?: boolean,
@@ -399,6 +408,8 @@ export const AiRequestChat: React.ComponentType<{
       project: nullableProject,
       fileMetadata,
       aiRequest,
+      aiRequestLoadingState,
+      onRetryLoadingAiRequest,
       isSending,
       isSendingUserMessage,
       onStartNewAiRequest,
@@ -888,6 +899,27 @@ export const AiRequestChat: React.ComponentType<{
       showDelayMs: 1000,
       hideDelayMs: 300,
     });
+
+    if (!aiRequest && aiRequestLoadingState) {
+      return (
+        <div
+          className={classNames({
+            [classes.aiRequestChatContainer]: true,
+          })}
+        >
+          {aiRequestLoadingState.error ? (
+            <PlaceholderError onRetry={onRetryLoadingAiRequest}>
+              <Trans>
+                This chat could not be loaded. Verify your internet connection
+                or try again later.
+              </Trans>
+            </PlaceholderError>
+          ) : (
+            <DelayedPlaceholderLoader />
+          )}
+        </div>
+      );
+    }
 
     if (!aiRequest || standAloneForm) {
       return (

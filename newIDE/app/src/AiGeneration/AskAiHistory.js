@@ -10,7 +10,6 @@ import { type AiRequestSummary } from '../Utils/GDevelopServices/Generation';
 import Paper from '../UI/Paper';
 import ScrollView from '../UI/ScrollView';
 import FlatButton from '../UI/FlatButton';
-import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import EmptyMessage from '../UI/EmptyMessage';
 import CircularProgress from '../UI/CircularProgress';
 import formatDate from 'date-fns/format';
@@ -18,13 +17,12 @@ import DrawerTopBar from '../UI/DrawerTopBar';
 import PlaceholderError from '../UI/PlaceholderError';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { AiRequestContext } from './AiRequestContext';
+import { getUserRequestText } from './AiRequestUtils';
 
 type Props = {|
   open: boolean,
   onClose: () => void,
-  onSelectAiRequestSummary: (
-    aiRequestSummary: AiRequestSummary
-  ) => void | Promise<void>,
+  onOpenAiRequest: (aiRequestId: string) => void,
   selectedAiRequestId: string | null,
 |};
 
@@ -56,30 +54,13 @@ const styles = {
   },
 };
 
-const getFirstUserRequestText = (
-  aiRequestSummary: AiRequestSummary
-): string => {
-  const userMessage = aiRequestSummary.firstUserMessage;
-  if (
-    !userMessage ||
-    userMessage.type !== 'message' ||
-    userMessage.role !== 'user'
-  )
-    return '';
-
-  return userMessage.content
-    .map(content => (content.type === 'user_request' ? content.text : null))
-    .filter(Boolean)
-    .join(' ');
-};
-
 type AskAiHistoryContentProps = {|
-  onSelectAiRequestSummary: (aiRequestSummary: AiRequestSummary) => void,
+  onOpenAiRequest: (aiRequestId: string) => void,
   selectedAiRequestId: string | null,
 |};
 
 export const AskAiHistoryContent = ({
-  onSelectAiRequestSummary,
+  onOpenAiRequest,
   selectedAiRequestId,
 }: AskAiHistoryContentProps): React.Node => {
   const {
@@ -136,7 +117,9 @@ export const AskAiHistoryContent = ({
       <ColumnStackLayout expand>
         {aiRequestSummariesArray.map(aiRequestSummary => {
           const isSelected = selectedAiRequestId === aiRequestSummary.id;
-          const userRequestText = getFirstUserRequestText(aiRequestSummary);
+          const userRequestText = aiRequestSummary.firstUserMessage
+            ? getUserRequestText(aiRequestSummary.firstUserMessage)
+            : '';
           const requestDate = new Date(aiRequestSummary.createdAt);
           const formattedDate = formatDate(requestDate, 'MMM d, yyyy h:mm a');
 
@@ -151,7 +134,7 @@ export const AskAiHistoryContent = ({
             >
               <ButtonBase
                 style={styles.requestItem}
-                onClick={() => onSelectAiRequestSummary(aiRequestSummary)}
+                onClick={() => onOpenAiRequest(aiRequestSummary.id)}
                 focusRipple
               >
                 <div style={styles.requestItemContent}>
@@ -204,18 +187,9 @@ export const AskAiHistoryContent = ({
 export const AskAiHistory = ({
   open,
   onClose,
-  onSelectAiRequestSummary,
+  onOpenAiRequest,
   selectedAiRequestId,
 }: Props): React.Node => {
-  const { isMobile } = useResponsiveWindowSize();
-
-  const handleSelectAiRequestSummary = (aiRequestSummary: AiRequestSummary) => {
-    onSelectAiRequestSummary(aiRequestSummary);
-    if (isMobile) {
-      onClose();
-    }
-  };
-
   return (
     <Drawer
       open={open}
@@ -237,7 +211,7 @@ export const AskAiHistory = ({
           onClose={onClose}
         />
         <AskAiHistoryContent
-          onSelectAiRequestSummary={handleSelectAiRequestSummary}
+          onOpenAiRequest={onOpenAiRequest}
           selectedAiRequestId={selectedAiRequestId}
         />
       </ColumnStackLayout>

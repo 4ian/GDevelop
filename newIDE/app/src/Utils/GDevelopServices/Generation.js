@@ -385,7 +385,7 @@ export type AiRequestSummary = {
   parentAiRequestId: string | null,
   totalPriceInCredits: number | null,
   lastUserMessagePriceInCredits: number | null,
-  firstUserMessage: AiRequestMessage | null,
+  firstUserMessage: AiRequestUserMessage | null,
   lastMessage: AiRequestMessage | null,
   outputMessagesCount: number,
 };

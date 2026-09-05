@@ -643,7 +643,17 @@ describe('useAiRequestHistory', () => {
 });
 
 describe('AiRequestProvider opening a chat from the history', () => {
+  // The provider is unmounted after each test: its timers (polling, settings
+  // fetch) must not outlive the test, or Jest would not exit.
+  let renderer = null;
+  const renderProviderToUnmount = () => {
+    const rendered = renderProvider();
+    renderer = rendered.renderer;
+    return rendered.contextRef;
+  };
+
   beforeEach(() => {
+    jest.useFakeTimers();
     mockFn(getAiRequest).mockReset();
     mockFn(suspendAiRequest).mockReset();
     mockFn(getAiRequestStatuses).mockReset();
@@ -657,6 +667,14 @@ describe('AiRequestProvider opening a chat from the history', () => {
     });
   });
 
+  afterEach(() => {
+    act(() => {
+      if (renderer) renderer.unmount();
+    });
+    renderer = null;
+    jest.useRealTimers();
+  });
+
   const getContext = (contextRef: {
     current: AiRequestContextState | null,
   }): AiRequestContextState => {
@@ -665,7 +683,7 @@ describe('AiRequestProvider opening a chat from the history', () => {
   };
 
   it('selects the chat immediately and loads it', async () => {
-    const { contextRef } = renderProvider();
+    const contextRef = renderProviderToUnmount();
     const aiRequest = makeAiRequest('chat-1', 'ready');
     mockFn(getAiRequest).mockResolvedValue(aiRequest);
 
@@ -695,7 +713,7 @@ describe('AiRequestProvider opening a chat from the history', () => {
   });
 
   it('does not load a chat already in memory', async () => {
-    const { contextRef } = renderProvider();
+    const contextRef = renderProviderToUnmount();
     const aiRequest = makeAiRequest('chat-1', 'ready');
     act(() => {
       getContext(contextRef).aiRequestStorage.updateAiRequest(
@@ -715,7 +733,7 @@ describe('AiRequestProvider opening a chat from the history', () => {
   });
 
   it('suspends a chat left with work in progress before opening it', async () => {
-    const { contextRef } = renderProvider();
+    const contextRef = renderProviderToUnmount();
     const workingAiRequest = makeAiRequest('chat-1', 'working');
     const suspendedAiRequest = makeAiRequest('chat-1', 'suspended');
     mockFn(getAiRequest).mockResolvedValue(workingAiRequest);
@@ -734,7 +752,7 @@ describe('AiRequestProvider opening a chat from the history', () => {
   });
 
   it('keeps a loading error until the user retries', async () => {
-    const { contextRef } = renderProvider();
+    const contextRef = renderProviderToUnmount();
     mockFn(getAiRequest).mockRejectedValue(new Error('Network error'));
 
     act(() => {

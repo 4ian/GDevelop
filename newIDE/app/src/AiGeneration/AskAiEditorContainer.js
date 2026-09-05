@@ -38,7 +38,7 @@ import {
 import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
-import { AskAiHistory } from './AskAiHistory';
+import { AskAiHistory, type AskAiHistoryLayout } from './AskAiHistory';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import {
   canUpgradeSubscription,
@@ -98,6 +98,12 @@ import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext
 const gd: libGDevelop = global.gd;
 
 const styles = {
+  container: {
+    flex: 1,
+    display: 'flex',
+    minWidth: 0,
+    minHeight: 0,
+  },
   paper: {
     flex: 1,
     display: 'flex',
@@ -122,6 +128,7 @@ const styles = {
 
 type Props = {|
   isActive: boolean,
+  paneIdentifier: string,
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
@@ -252,6 +259,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
     (
       {
         isActive,
+        paneIdentifier,
         setToolbar,
         project: nullableProject,
         resourceManagementProps,
@@ -380,7 +388,26 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         []
       );
 
-      const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
+      const { isMobile, isMediumScreen } = useResponsiveWindowSize();
+      // The history is a list on the side of the chat when there is room for
+      // it: not on small or medium screens (the window size is the one of the
+      // pane), and not in the right pane, where it comes from the right.
+      const historyLayout: AskAiHistoryLayout =
+        paneIdentifier === 'right'
+          ? 'right-drawer'
+          : isMobile || isMediumScreen
+          ? 'left-drawer'
+          : 'side-panel';
+      const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(
+        historyLayout === 'side-panel'
+      );
+      React.useEffect(
+        () => {
+          // The side list is shown by default, a drawer is not.
+          setIsHistoryOpen(historyLayout === 'side-panel');
+        },
+        [historyLayout]
+      );
 
       const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
@@ -399,7 +426,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       );
 
       const { showAlert, showConfirmation, showYesNoCancel } = useAlertDialog();
-      const { isMobile } = useResponsiveWindowSize();
 
       const [
         isReadyToProcessFunctionCalls,
@@ -423,8 +449,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
       const canStartNewChat = !!selectedAiRequestId;
 
-      const onOpenHistory = React.useCallback(() => {
-        setIsHistoryOpen(true);
+      const onToggleHistory = React.useCallback(() => {
+        setIsHistoryOpen(isHistoryOpen => !isHistoryOpen);
       }, []);
 
       const onCloseHistory = React.useCallback(() => {
@@ -1058,14 +1084,13 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           if (setToolbar) {
             setToolbar(
               <Toolbar
-                onStartNewChat={onStartNewChat}
-                canStartNewChat={canStartNewChat}
-                onOpenHistory={onOpenHistory}
+                isHistoryOpen={isHistoryOpen}
+                onToggleHistory={onToggleHistory}
               />
             );
           }
         },
-        [setToolbar, onStartNewChat, canStartNewChat, onOpenHistory]
+        [setToolbar, isHistoryOpen, onToggleHistory]
       );
 
       React.useEffect(updateToolbar, [updateToolbar]);
@@ -1546,7 +1571,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       );
 
       return (
-        <>
+        <div style={styles.container}>
+          <AskAiHistory
+            layout={historyLayout}
+            open={isHistoryOpen}
+            onClose={onCloseHistory}
+            onOpenAiRequest={aiRequestId => {
+              onStartOrOpenChat({ aiRequestId });
+            }}
+            onStartNewChat={onStartNewChat}
+            canStartNewChat={canStartNewChat}
+            selectedAiRequestId={selectedAiRequestId}
+          />
           <Paper square background="dark" style={styles.paper}>
             <div style={styles.chatContainer}>
               <AiRequestChat
@@ -1628,16 +1664,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               />
             </div>
           </Paper>
-          <AskAiHistory
-            open={isHistoryOpen}
-            onClose={onCloseHistory}
-            onOpenAiRequest={aiRequestId => {
-              onStartOrOpenChat({ aiRequestId });
-              onCloseHistory();
-            }}
-            selectedAiRequestId={selectedAiRequestId}
-          />
-        </>
+        </div>
       );
     }
   ),
@@ -1661,6 +1688,7 @@ export const renderAskAiEditorContainer = (
         storageProvider={props.storageProvider}
         setToolbar={props.setToolbar}
         isActive={props.isActive}
+        paneIdentifier={props.paneIdentifier}
         onCreateProjectFromExample={props.onCreateProjectFromExample}
         onCreateEmptyProject={props.onCreateEmptyProject}
         onOpenLayout={props.onOpenLayout}

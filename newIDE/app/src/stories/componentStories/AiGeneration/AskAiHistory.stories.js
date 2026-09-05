@@ -21,16 +21,19 @@ import Text from '../../../UI/Text';
 const createFakeAiRequestSummary = ({
   id,
   text,
+  title = null,
   status = 'ready',
   createdAt = '2024-01-01T12:00:00Z',
 }: {|
   id: string,
   text: string | null,
+  title?: string | null,
   status?: GenerationStatus,
   createdAt?: string,
 |}): AiRequestSummary => {
   const aiRequest: AiRequest = {
     id,
+    title,
     status,
     createdAt,
     updatedAt: createdAt,
@@ -73,6 +76,8 @@ const fakeAiRequestSummaries = toAiRequestSummariesById([
   createFakeAiRequestSummary({
     id: 'request-2',
     text: 'Create a GTA-style game with cars, pedestrians and a city',
+    // A chat renamed by the user.
+    title: 'City game',
     status: 'ready',
     createdAt: '2024-03-14T16:20:00Z',
   }),
@@ -148,6 +153,8 @@ const AskAiHistoryStoryTemplate = ({
                 action('fetchAiRequestSummaries')(),
               onLoadMoreAiRequestSummaries: async () =>
                 action('onLoadMoreAiRequestSummaries')(),
+              renameAiRequest: async (aiRequestId, title) =>
+                action('renameAiRequest')(aiRequestId, title),
             },
             selectedAiRequestId,
             pendingEditApproval: isWaitingForUser

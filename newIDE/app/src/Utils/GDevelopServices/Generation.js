@@ -132,6 +132,9 @@ export type AiRequestContextStats = {
 
 export type AiRequest = {
   id: string,
+  // The name given by the user to the chat. Without one, the first user
+  // message stands for it.
+  title?: string | null,
   createdAt: string,
   updatedAt: string,
   userId: string,
@@ -388,6 +391,7 @@ export const getAiRequestStatuses = async (
  */
 export type AiRequestSummary = {
   id: string,
+  title: string | null,
   createdAt: string,
   updatedAt: string,
   userId: string,
@@ -408,6 +412,7 @@ export const getAiRequestSummary = (aiRequest: AiRequest): AiRequestSummary => {
   const firstMessage = output.length > 0 ? output[0] : null;
   return {
     id: aiRequest.id,
+    title: aiRequest.title || null,
     createdAt: aiRequest.createdAt,
     updatedAt: aiRequest.updatedAt,
     userId: aiRequest.userId,
@@ -649,6 +654,31 @@ export const suspendAiRequest = async (
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/suspend of Generation API',
+  });
+};
+
+/**
+ * Set the title of an AI request, or remove it with `null` (its first user
+ * message is then shown as its name).
+ */
+export const setAiRequestTitle = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    title,
+  }: {| userId: string, aiRequestId: string, title: string | null |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.patch(
+    `/ai-request/${aiRequestId}`,
+    { title },
+    { params: { userId }, headers: { Authorization: authorizationHeader } }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id} of Generation API',
   });
 };
 

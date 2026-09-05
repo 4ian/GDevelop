@@ -3,6 +3,7 @@ import * as React from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import classNames from 'classnames';
 import { Trans, t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import { type AiRequestSummary } from '../Utils/GDevelopServices/Generation';
 import ScrollView from '../UI/ScrollView';
 import DrawerTopBar from '../UI/DrawerTopBar';
@@ -13,8 +14,14 @@ import IconButton from '../UI/IconButton';
 import CollapsibleSidePanel from '../UI/CollapsibleSidePanel';
 import Add from '../UI/CustomSvgIcons/Add';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
+import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import InlineRenameInput from '../UI/InlineRenameInput';
+import { useLongTouch } from '../Utils/UseLongTouch';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { AiRequestContext } from './AiRequestContext';
-import { getUserRequestText } from './AiRequestUtils';
+import { getAiRequestSummaryTitle } from './AiRequestUtils';
 import classes from './AskAiHistory.module.css';
 
 /**
@@ -86,37 +93,90 @@ const ChatItem = ({
   aiRequestSummary,
   isSelected,
   isWaitingForUser,
+  isRenaming,
+  showMenuButton,
   onOpen,
+  onOpenContextMenu,
+  onEndRenaming,
 }: {|
   aiRequestSummary: AiRequestSummary,
   isSelected: boolean,
   isWaitingForUser: boolean,
+  isRenaming: boolean,
+  showMenuButton: boolean,
   onOpen: () => void,
+  onOpenContextMenu: (x: number, y: number) => void,
+  onEndRenaming: (newTitle: string) => void,
 |}): React.Node => {
-  const title = aiRequestSummary.firstUserMessage
-    ? getUserRequestText(aiRequestSummary.firstUserMessage)
-    : '';
+  const title = getAiRequestSummaryTitle(aiRequestSummary);
+  const { contextMenuProps: longTouchProps } = useLongTouch(
+    React.useCallback(
+      ({ clientX, clientY }) => onOpenContextMenu(clientX, clientY),
+      [onOpenContextMenu]
+    )
+  );
   return (
-    <button
-      type="button"
+    <div
       className={classNames(classes.item, {
         [classes.itemSelected]: isSelected,
       })}
-      onClick={onOpen}
-      title={title}
-      aria-current={isSelected ? 'true' : undefined}
+      onContextMenu={
+        isRenaming
+          ? undefined
+          : event => {
+              event.preventDefault();
+              onOpenContextMenu(event.clientX, event.clientY);
+            }
+      }
+      {...(isRenaming ? {} : longTouchProps)}
     >
-      <span
-        className={classNames(classes.itemText, {
-          [classes.itemTextUntitled]: !title,
-        })}
-      >
-        {title || <Trans>Untitled chat</Trans>}
-      </span>
-      <ChatStatusDot
-        status={getChatStatus(aiRequestSummary, isWaitingForUser)}
-      />
-    </button>
+      {isRenaming ? (
+        // Same padding and font as the name it replaces: only the underline
+        // shows the name is being edited.
+        <div className={classes.itemRenameContainer}>
+          <InlineRenameInput
+            initialValue={title}
+            onEndRenaming={onEndRenaming}
+          />
+        </div>
+      ) : (
+        <button
+          type="button"
+          className={classes.itemButton}
+          onClick={onOpen}
+          title={title}
+          aria-current={isSelected ? 'true' : undefined}
+        >
+          <span
+            className={classNames(classes.itemText, {
+              [classes.itemTextUntitled]: !title,
+            })}
+          >
+            {title || <Trans>Untitled chat</Trans>}
+          </span>
+          <ChatStatusDot
+            status={getChatStatus(aiRequestSummary, isWaitingForUser)}
+          />
+        </button>
+      )}
+      {showMenuButton && !isRenaming && (
+        <button
+          type="button"
+          className={classes.itemMenuButton}
+          onClick={event => {
+            event.stopPropagation();
+            const {
+              left,
+              bottom,
+            } = event.currentTarget.getBoundingClientRect();
+            onOpenContextMenu(left, bottom);
+          }}
+          aria-label={t`Chat actions`.id}
+        >
+          <ThreeDotsMenu />
+        </button>
+      )}
+    </div>
   );
 };
 
@@ -158,6 +218,26 @@ export const AskAiHistoryContent = ({
     },
     pendingEditApproval,
   } = React.useContext(AiRequestContext);
+  const { renameAiRequest } = React.useContext(
+    AiRequestContext
+  ).aiRequestStorage;
+  const { isMobile } = useResponsiveWindowSize();
+  const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
+  const [renamedAiRequestId, setRenamedAiRequestId] = React.useState<
+    string | null
+  >(null);
+  const buildMenuTemplate = React.useCallback(
+    (
+      i18n: I18nType,
+      { aiRequestId }: {| aiRequestId: string |}
+    ): Array<MenuItemTemplate> => [
+      {
+        label: i18n._(t`Rename`),
+        click: () => setRenamedAiRequestId(aiRequestId),
+      },
+    ],
+    []
+  );
   const sortedAiRequestSummaries = React.useMemo(
     () =>
       Object.keys(aiRequestSummaries)
@@ -219,11 +299,28 @@ export const AskAiHistoryContent = ({
                   aiRequestSummary={aiRequestSummary}
                   isSelected={isSelected}
                   isWaitingForUser={isSelected && !!pendingEditApproval}
+                  isRenaming={renamedAiRequestId === aiRequestSummary.id}
+                  // On touch screens, a long press opens the menu.
+                  showMenuButton={!isMobile}
                   onOpen={() => onOpenAiRequest(aiRequestSummary.id)}
+                  onOpenContextMenu={(x, y) => {
+                    if (contextMenuRef.current)
+                      contextMenuRef.current.open(x, y, {
+                        aiRequestId: aiRequestSummary.id,
+                      });
+                  }}
+                  onEndRenaming={newTitle => {
+                    setRenamedAiRequestId(null);
+                    renameAiRequest(aiRequestSummary.id, newTitle);
+                  }}
                 />
               );
             })}
           </div>
+          <ContextMenu
+            ref={contextMenuRef}
+            buildMenuTemplate={buildMenuTemplate}
+          />
           {canLoadMore && (
             <div className={classes.footer}>
               <TextButton

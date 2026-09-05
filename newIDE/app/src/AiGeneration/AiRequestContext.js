@@ -10,6 +10,7 @@ import {
   type AiRequestSummary,
   getAiRequestSummaries,
   getAiRequestSummary,
+  setAiRequestTitle,
   suspendAiRequest as apiSuspendAiRequest,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -132,6 +133,9 @@ type AiRequestStorage = {|
   // The AI requests being loaded to be opened, or that could not be loaded.
   aiRequestLoadingStates: { [aiRequestId: string]: AiRequestLoadingState },
   loadAiRequest: (aiRequestId: string) => Promise<void>,
+  // Give a name to a chat (an empty title removes it). The name is shown right
+  // away and reverted if the API refuses it.
+  renameAiRequest: (aiRequestId: string, title: string) => Promise<void>,
   updateAiRequest: (
     aiRequestId: string,
     updateFn: (previousAiRequest: ?AiRequest) => AiRequest
@@ -359,6 +363,63 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     [getAuthorizationHeader, profile, updateAiRequest]
   );
 
+  /** Set the title of a request and of its summary, when they are known. */
+  const setTitleInState = React.useCallback(
+    (aiRequestId: string, title: string | null) => {
+      setState(previousState => {
+        const aiRequest = previousState.aiRequests[aiRequestId];
+        const aiRequestSummary = previousState.aiRequestSummaries[aiRequestId];
+        return {
+          ...previousState,
+          aiRequests: aiRequest
+            ? {
+                ...previousState.aiRequests,
+                [aiRequestId]: { ...aiRequest, title },
+              }
+            : previousState.aiRequests,
+          aiRequestSummaries: aiRequestSummary
+            ? {
+                ...previousState.aiRequestSummaries,
+                [aiRequestId]: { ...aiRequestSummary, title },
+              }
+            : previousState.aiRequestSummaries,
+        };
+      });
+    },
+    []
+  );
+
+  const renameAiRequest = React.useCallback(
+    async (aiRequestId: string, title: string): Promise<void> => {
+      if (!profile) return;
+      const newTitle = title.trim() || null;
+      const aiRequestSummary = state.aiRequestSummaries[aiRequestId];
+      const previousTitle =
+        (aiRequestSummary && aiRequestSummary.title) || null;
+      if (previousTitle === newTitle) return;
+
+      // Optimistic update: the new name is shown right away.
+      setTitleInState(aiRequestId, newTitle);
+
+      try {
+        await retryIfFailed({ times: 2 }, () =>
+          setAiRequestTitle(getAuthorizationHeader, {
+            userId: profile.id,
+            aiRequestId,
+            title: newTitle,
+          })
+        );
+      } catch (error) {
+        console.error(
+          'Error while renaming the AI request - reverting:',
+          error
+        );
+        setTitleInState(aiRequestId, previousTitle);
+      }
+    },
+    [getAuthorizationHeader, profile, state.aiRequestSummaries, setTitleInState]
+  );
+
   React.useEffect(
     () => {
       // Reset AI requests when the user logs out.
@@ -433,6 +494,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     aiRequests: state.aiRequests,
     aiRequestLoadingStates,
     loadAiRequest,
+    renameAiRequest,
     updateAiRequest,
     refreshAiRequest,
     isSendingAiRequest,
@@ -578,6 +640,7 @@ export const initialAiRequestContextState: AiRequestContextState = {
     aiRequests: {},
     aiRequestLoadingStates: {},
     loadAiRequest: async () => {},
+    renameAiRequest: async () => {},
     updateAiRequest: () => {},
     refreshAiRequest: async () => {},
     isSendingAiRequest: () => false,

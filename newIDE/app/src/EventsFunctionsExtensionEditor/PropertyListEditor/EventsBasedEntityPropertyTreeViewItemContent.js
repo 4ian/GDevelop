@@ -102,7 +102,24 @@ export const pasteProperties = async (
     index++;
     const groupName = property.getGroup();
     unserializeFromJSObject(property, serializedProperty);
-    property.setGroup(groupName);
+    // Try to rebuild the folder structure when several properties are paste at once.
+    if (
+      propertyContents.length > 1 &&
+      parentFolder === properties.getRootFolder() &&
+      property.getGroup()
+    ) {
+      const root = properties.getRootFolder();
+      const folder = root.getOrCreateChildFolder(property.getGroup());
+      properties
+        .getRootFolder()
+        .movePropertyFolderOrPropertyToAnotherFolder(
+          root.getPropertyChild(property.getName()),
+          folder,
+          folder.getChildrenCount()
+        );
+    } else {
+      property.setGroup(groupName);
+    }
     if (!firstAddedPropertyName) {
       firstAddedPropertyName = name;
     }

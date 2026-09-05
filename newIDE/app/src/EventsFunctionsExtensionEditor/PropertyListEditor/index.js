@@ -34,6 +34,8 @@ import {
   EventsBasedEntityPropertyTreeViewItemContent,
   getEventsBasedEntityPropertyTreeViewItemId,
   type EventsBasedEntityPropertyTreeViewItemProps,
+  PROPERTIES_CLIPBOARD_KIND,
+  pasteProperties,
 } from './EventsBasedEntityPropertyTreeViewItemContent';
 import {
   EventsBasedEntityPropertyFolderTreeViewItemContent,
@@ -53,6 +55,8 @@ import {
   getFoldersAscendanceWithoutRootFolder,
   enumerateFoldersInContainer,
 } from './EnumeratePropertyFolderOrProperty';
+import Clipboard from '../../Utils/Clipboard';
+import { serializeToJSObject } from '../../Utils/Serializer';
 
 const configurationItemId = 'events-based-entity-configuration';
 export const propertiesRootFolderId = 'properties';
@@ -805,6 +809,46 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       ]
     );
 
+    const copyAllProperties = React.useCallback(
+      (propertiesContainer: gdPropertiesContainer) => {
+        Clipboard.set(
+          PROPERTIES_CLIPBOARD_KIND,
+          mapFor(0, propertiesContainer.getCount(), i => {
+            const property = propertiesContainer.getAt(i);
+            return {
+              name: property.getName(),
+              serializedProperty: serializeToJSObject(property),
+            };
+          })
+        );
+      },
+      []
+    );
+
+    const pastePropertiesInRoot = React.useCallback(
+      async (propertiesContainer: gdPropertiesContainer) => {
+        const hasPasteAnyProperty = await pasteProperties(
+          propertiesContainer,
+          propertiesContainer.getRootFolder(),
+          0,
+          showPropertyOverridingConfirmation
+        );
+        if (hasPasteAnyProperty) {
+          if (unsavedChanges) {
+            unsavedChanges.triggerUnsavedChanges();
+          }
+          forceUpdate();
+          onPropertiesUpdated();
+        }
+      },
+      [
+        forceUpdate,
+        onPropertiesUpdated,
+        showPropertyOverridingConfirmation,
+        unsavedChanges,
+      ]
+    );
+
     const onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer = React.useCallback(
       (
         propertyFolderOrProperty: gdPropertyFolderOrProperty,
@@ -1011,6 +1055,15 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                     },
                     { type: 'separator' },
                     {
+                      label: i18n._(t`Copy all`),
+                      click: () => copyAllProperties(properties),
+                    },
+                    {
+                      label: i18n._(t`Paste`),
+                      click: () => pastePropertiesInRoot(properties),
+                    },
+                    { type: 'separator' },
+                    {
                       label: i18n._(t`Expand all sub folders`),
                       click: () =>
                         expandAllSubfolders(
@@ -1079,9 +1132,11 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       [
         addFolder,
         addProperty,
+        copyAllProperties,
         eventsBasedObject,
         expandFolders,
         onOpenConfiguration,
+        pastePropertiesInRoot,
         properties,
         propertiesTreeViewItemProps,
         propertyFolderTreeViewItemProps,

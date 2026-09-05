@@ -1,300 +1,269 @@
 // @flow
 import * as React from 'react';
-import paperDecorator from '../../PaperDecorator';
-import { AskAiHistoryContent } from '../../../AiGeneration/AskAiHistory';
+import { action } from '@storybook/addon-actions';
+import { AskAiHistory } from '../../../AiGeneration/AskAiHistory';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
+import FixedWidthFlexContainer from '../../FixedWidthFlexContainer';
 import {
   AiRequestContext,
   initialAiRequestContextState,
 } from '../../../AiGeneration/AiRequestContext';
-import { type AiRequest } from '../../../Utils/GDevelopServices/Generation';
+import {
+  getAiRequestSummary,
+  type AiRequest,
+  type AiRequestSummary,
+  type GenerationStatus,
+} from '../../../Utils/GDevelopServices/Generation';
+import Paper from '../../../UI/Paper';
+import RaisedButton from '../../../UI/RaisedButton';
+import Text from '../../../UI/Text';
 
-// Re-use fake AI request data from AiRequestChat.stories.js
-const fakeOutputWithUserRequestOnly = [
-  {
-    type: 'message',
-    status: 'completed',
-    role: 'user',
-    content: [
-      {
-        type: 'user_request',
-        status: 'completed',
-        text: 'How to add a leaderboard with the player best score?',
-      },
-    ],
-  },
-];
-
-const fakeOutputWithAiResponses = [
-  ...fakeOutputWithUserRequestOnly,
-  {
-    type: 'message',
-    status: 'completed',
-    role: 'assistant',
-    content: [
-      {
-        type: 'output_text',
-        status: 'completed',
-        text:
-          "Creating a leaderboard for player best scores in GDevelop is straightforward. Here's how you can do it:\n\n1. First, you need to use the Leaderboard extension to handle saving and retrieving scores.",
-        annotations: [],
-      },
-    ],
-  },
-];
-
-const fakeOutputWithDifferentUserRequest = [
-  {
-    type: 'message',
-    status: 'completed',
-    role: 'user',
-    content: [
-      {
-        type: 'user_request',
-        status: 'completed',
-        text: 'How to create a GTA-style game?',
-      },
-    ],
-  },
-  {
-    type: 'message',
-    status: 'completed',
-    role: 'assistant',
-    content: [
-      {
-        type: 'output_text',
-        status: 'completed',
-        text:
-          "Creating a GTA-style game is complex but doable in GDevelop. You'll need to implement several core systems...",
-        annotations: [],
-      },
-    ],
-  },
-];
-
-// Factory function to create AI request objects with different properties
-// $FlowFixMe[missing-local-annot]
-const createFakeAiRequest = ({
+const createFakeAiRequestSummary = ({
   id,
+  text,
   status = 'ready',
   createdAt = '2024-01-01T12:00:00Z',
-  output = fakeOutputWithUserRequestOnly,
-  error = null,
-}) => ({
-  id,
-  status,
-  createdAt,
-  updatedAt: createdAt,
-  userId: 'fake-user-id',
-  gameProjectJson: 'FAKE DATA',
-  output,
-  error,
-  lastUserMessagePriceInCredits: 5,
-  totalPriceInCredits: 5,
-});
+}: {|
+  id: string,
+  text: string | null,
+  status?: GenerationStatus,
+  createdAt?: string,
+|}): AiRequestSummary => {
+  const aiRequest: AiRequest = {
+    id,
+    status,
+    createdAt,
+    updatedAt: createdAt,
+    userId: 'fake-user-id',
+    error: null,
+    output:
+      text === null
+        ? []
+        : [
+            {
+              type: 'message',
+              status: 'completed',
+              role: 'user',
+              content: [{ type: 'user_request', status: 'completed', text }],
+            },
+          ],
+    lastUserMessagePriceInCredits: 5,
+    totalPriceInCredits: 5,
+  };
+  return getAiRequestSummary(aiRequest);
+};
+
+const toAiRequestSummariesById = (
+  aiRequestSummaries: Array<AiRequestSummary>
+): { [string]: AiRequestSummary } => {
+  const aiRequestSummariesById: { [string]: AiRequestSummary } = {};
+  aiRequestSummaries.forEach(aiRequestSummary => {
+    aiRequestSummariesById[aiRequestSummary.id] = aiRequestSummary;
+  });
+  return aiRequestSummariesById;
+};
+
+const fakeAiRequestSummaries = toAiRequestSummariesById([
+  createFakeAiRequestSummary({
+    id: 'request-1',
+    text: 'Add a leaderboard with the player best score',
+    status: 'working',
+    createdAt: '2024-03-15T10:30:00Z',
+  }),
+  createFakeAiRequestSummary({
+    id: 'request-2',
+    text: 'Create a GTA-style game with cars, pedestrians and a city',
+    status: 'ready',
+    createdAt: '2024-03-14T16:20:00Z',
+  }),
+  createFakeAiRequestSummary({
+    id: 'request-3',
+    text: 'Make the enemies shoot at the player',
+    status: 'error',
+    createdAt: '2024-03-13T09:15:00Z',
+  }),
+  createFakeAiRequestSummary({
+    id: 'request-4',
+    text: 'How to make a platformer?',
+    status: 'suspended',
+    createdAt: '2024-03-12T09:15:00Z',
+  }),
+  createFakeAiRequestSummary({
+    id: 'request-5',
+    text: null,
+    status: 'ready',
+    createdAt: '2024-03-11T09:15:00Z',
+  }),
+  ...Array.from({ length: 12 }, (_, index) =>
+    createFakeAiRequestSummary({
+      id: `request-old-${index}`,
+      text: `Older chat number ${index + 1} about a game mechanic`,
+      createdAt: `2024-02-${String(28 - index).padStart(2, '0')}T09:15:00Z`,
+    })
+  ),
+]);
 
 export default {
   title: 'AskAi/AskAiHistory',
-  component: AskAiHistoryContent,
-  decorators: [paperDecorator],
+  component: AskAiHistory,
 };
 
-const AskAIHistoryContentStoryTemplate = ({
-  error,
-  isLoading,
-  aiRequests,
-  canLoadMore,
-  selectedAiRequestId,
+const AskAiHistoryStoryTemplate = ({
+  layout,
+  aiRequestSummaries = fakeAiRequestSummaries,
+  isLoading = false,
+  error = null,
+  canLoadMore = false,
+  selectedAiRequestId = 'request-2',
+  isWaitingForUser = false,
+  width = 1000,
+  height = 600,
+  initiallyOpen = true,
 }: {|
-  error: ?Error,
-  isLoading: boolean,
-  aiRequests: { [string]: AiRequest },
-  canLoadMore: boolean,
-  selectedAiRequestId: string | null,
-|}) => (
-  <FixedHeightFlexContainer height={500}>
-    <AiRequestContext.Provider
-      value={{
-        ...initialAiRequestContextState,
-        aiRequestStorage: {
-          ...initialAiRequestContextState.aiRequestStorage,
-          aiRequests,
-          isLoading,
-          error,
-          canLoadMore,
-        },
-      }}
-    >
-      <AskAiHistoryContent
-        onSelectAiRequest={() => {}}
-        selectedAiRequestId={selectedAiRequestId}
-      />
-    </AiRequestContext.Provider>
-  </FixedHeightFlexContainer>
+  layout: 'side-panel' | 'left-drawer' | 'right-drawer',
+  aiRequestSummaries?: { [string]: AiRequestSummary },
+  isLoading?: boolean,
+  error?: ?Error,
+  canLoadMore?: boolean,
+  selectedAiRequestId?: string | null,
+  isWaitingForUser?: boolean,
+  width?: number,
+  height?: number,
+  initiallyOpen?: boolean,
+|}) => {
+  const [open, setOpen] = React.useState<boolean>(initiallyOpen);
+  return (
+    <FixedHeightFlexContainer height={height}>
+      <FixedWidthFlexContainer width={width}>
+        <AiRequestContext.Provider
+          value={{
+            ...initialAiRequestContextState,
+            aiRequestStorage: {
+              ...initialAiRequestContextState.aiRequestStorage,
+              aiRequestSummaries,
+              isLoading,
+              error,
+              canLoadMore,
+              fetchAiRequestSummaries: async () =>
+                action('fetchAiRequestSummaries')(),
+              onLoadMoreAiRequestSummaries: async () =>
+                action('onLoadMoreAiRequestSummaries')(),
+            },
+            selectedAiRequestId,
+            pendingEditApproval: isWaitingForUser
+              ? {
+                  aiRequestId: selectedAiRequestId || '',
+                  callIds: ['call-1'],
+                  label: 'Edit agent',
+                }
+              : null,
+          }}
+        >
+          <AskAiHistory
+            layout={layout}
+            open={open}
+            onClose={() => setOpen(false)}
+            onOpenAiRequest={action('onOpenAiRequest')}
+            onStartNewChat={action('onStartNewChat')}
+            canStartNewChat={!!selectedAiRequestId}
+            selectedAiRequestId={selectedAiRequestId}
+          />
+          <Paper
+            background="dark"
+            square
+            style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text color="secondary">The chat is displayed here.</Text>
+            <RaisedButton
+              label={open ? 'Hide the chats' : 'Show the chats'}
+              onClick={() => setOpen(!open)}
+            />
+          </Paper>
+        </AiRequestContext.Provider>
+      </FixedWidthFlexContainer>
+    </FixedHeightFlexContainer>
+  );
+};
+
+export const SidePanel = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="side-panel" />
 );
 
-export const Loading = (): React.Node => (
-  <AskAIHistoryContentStoryTemplate
-    aiRequests={{}}
-    isLoading={true}
-    error={null}
-    selectedAiRequestId={null}
-    canLoadMore={false}
+export const SidePanelInitiallyClosed = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="side-panel" initiallyOpen={false} />
+);
+
+export const SidePanelWaitingForUser = (): React.Node => (
+  <AskAiHistoryStoryTemplate
+    layout="side-panel"
+    selectedAiRequestId="request-1"
+    isWaitingForUser
   />
 );
 
-export const Errored = (): React.Node => (
-  <AskAIHistoryContentStoryTemplate
-    aiRequests={{}}
-    isLoading={false}
+export const SidePanelNoSelectedChat = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="side-panel" selectedAiRequestId={null} />
+);
+
+export const SidePanelCanLoadMore = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="side-panel" canLoadMore />
+);
+
+export const SidePanelLoadingMore = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="side-panel" canLoadMore isLoading />
+);
+
+export const SidePanelLoading = (): React.Node => (
+  <AskAiHistoryStoryTemplate
+    layout="side-panel"
+    aiRequestSummaries={{}}
+    isLoading
+    selectedAiRequestId={null}
+  />
+);
+
+export const SidePanelErrored = (): React.Node => (
+  <AskAiHistoryStoryTemplate
+    layout="side-panel"
+    aiRequestSummaries={{}}
     error={new Error('Failed to fetch AI requests')}
     selectedAiRequestId={null}
-    canLoadMore={false}
   />
 );
 
-export const Empty = (): React.Node => (
-  <AskAIHistoryContentStoryTemplate
-    aiRequests={{}}
-    isLoading={false}
-    error={null}
+export const SidePanelEmpty = (): React.Node => (
+  <AskAiHistoryStoryTemplate
+    layout="side-panel"
+    aiRequestSummaries={{}}
     selectedAiRequestId={null}
-    canLoadMore={false}
   />
 );
 
-export const SingleAiRequest = (): React.Node => (
-  <AskAIHistoryContentStoryTemplate
-    aiRequests={{
-      // $FlowFixMe[incompatible-type]
-      'request-1': createFakeAiRequest({
-        id: 'request-1',
-        createdAt: '2024-03-15T10:30:00Z',
-        output: fakeOutputWithAiResponses,
-      }),
-    }}
-    isLoading={false}
-    error={null}
+export const LeftDrawerOnMobile = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="left-drawer" width={360} height={640} />
+);
+
+export const LeftDrawerOnMediumScreen = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="left-drawer" width={900} height={600} />
+);
+
+export const RightDrawerInRightPane = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="right-drawer" width={450} height={600} />
+);
+
+export const RightDrawerEmpty = (): React.Node => (
+  <AskAiHistoryStoryTemplate
+    layout="right-drawer"
+    aiRequestSummaries={{}}
     selectedAiRequestId={null}
-    canLoadMore={false}
-  />
-);
-
-export const MultipleAiRequests = (): React.Node => (
-  <AskAIHistoryContentStoryTemplate
-    aiRequests={{
-      // $FlowFixMe[incompatible-type]
-      'request-1': createFakeAiRequest({
-        id: 'request-1',
-        createdAt: '2024-03-15T14:30:00Z',
-        output: fakeOutputWithAiResponses,
-      }),
-      // $FlowFixMe[incompatible-type]
-      'request-2': createFakeAiRequest({
-        id: 'request-2',
-        createdAt: '2024-03-14T09:45:00Z',
-        output: fakeOutputWithDifferentUserRequest,
-      }),
-      // $FlowFixMe[incompatible-type]
-      'request-3': createFakeAiRequest({
-        id: 'request-3',
-        createdAt: '2024-03-10T16:20:00Z',
-      }),
-    }}
-    isLoading={false}
-    error={null}
-    selectedAiRequestId={null}
-    canLoadMore
-  />
-);
-
-export const WithSelectedRequest = (): React.Node => (
-  <AskAIHistoryContentStoryTemplate
-    aiRequests={{
-      // $FlowFixMe[incompatible-type]
-      'request-1': createFakeAiRequest({
-        id: 'request-1',
-        createdAt: '2024-03-15T14:30:00Z',
-        output: fakeOutputWithAiResponses,
-      }),
-      // $FlowFixMe[incompatible-type]
-      'request-2': createFakeAiRequest({
-        id: 'request-2',
-        createdAt: '2024-03-14T09:45:00Z',
-        output: fakeOutputWithDifferentUserRequest,
-      }),
-    }}
-    isLoading={false}
-    error={null}
-    selectedAiRequestId="request-2"
-    canLoadMore={false}
-  />
-);
-
-export const WithWorkingRequest = (): React.Node => (
-  <AskAIHistoryContentStoryTemplate
-    aiRequests={{
-      // $FlowFixMe[incompatible-type]
-      'request-1': createFakeAiRequest({
-        id: 'request-1',
-        status: 'working',
-        createdAt: '2024-03-15T14:30:00Z',
-      }),
-      // $FlowFixMe[incompatible-type]
-      'request-2': createFakeAiRequest({
-        id: 'request-2',
-        createdAt: '2024-03-14T09:45:00Z',
-        output: fakeOutputWithDifferentUserRequest,
-      }),
-    }}
-    isLoading={false}
-    error={null}
-    selectedAiRequestId={null}
-    canLoadMore={false}
-  />
-);
-
-export const WithErroredRequest = (): React.Node => (
-  <AskAIHistoryContentStoryTemplate
-    aiRequests={{
-      // $FlowFixMe[incompatible-type]
-      'request-1': createFakeAiRequest({
-        id: 'request-1',
-        status: 'error',
-        createdAt: '2024-03-15T14:30:00Z',
-        error: { code: 'internal-error', message: 'Some error happened' },
-      }),
-      // $FlowFixMe[incompatible-type]
-      'request-2': createFakeAiRequest({
-        id: 'request-2',
-        createdAt: '2024-03-14T09:45:00Z',
-        output: fakeOutputWithDifferentUserRequest,
-      }),
-    }}
-    isLoading={false}
-    error={null}
-    selectedAiRequestId={null}
-    canLoadMore={false}
-  />
-);
-
-export const RefreshingRequests = (): React.Node => (
-  <AskAIHistoryContentStoryTemplate
-    aiRequests={{
-      // $FlowFixMe[incompatible-type]
-      'request-1': createFakeAiRequest({
-        id: 'request-1',
-        createdAt: '2024-03-15T14:30:00Z',
-      }),
-      // $FlowFixMe[incompatible-type]
-      'request-2': createFakeAiRequest({
-        id: 'request-2',
-        createdAt: '2024-03-14T09:45:00Z',
-      }),
-    }}
-    isLoading={true}
-    error={null}
-    selectedAiRequestId={null}
-    canLoadMore={false}
+    width={450}
+    height={600}
   />
 );

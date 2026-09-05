@@ -7,7 +7,9 @@ import {
   type AiRequest,
   type AiSettings,
   type GenerationStatus,
-  getAiRequests,
+  type AiRequestSummary,
+  getAiRequestSummaries,
+  getAiRequestSummary,
   suspendAiRequest as apiSuspendAiRequest,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -25,6 +27,7 @@ import {
   aiRequestShouldBeWatched,
   aiRequestHasWorkInProgress,
   aiRequestPollSawActivity,
+  getUserRequestText,
 } from './AiRequestUtils';
 import { type EditApprovalRequest } from './Utils';
 
@@ -107,13 +110,28 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
   };
 };
 
+/**
+ * The loading of an AI request known only by its id (opened from the history).
+ */
+export type AiRequestLoadingState = {|
+  isLoading: boolean,
+  error: ?Error,
+|};
+
 type AiRequestStorage = {|
-  fetchAiRequests: () => Promise<void>,
-  onLoadMoreAiRequests: () => Promise<void>,
+  fetchAiRequestSummaries: () => Promise<void>,
+  onLoadMoreAiRequestSummaries: () => Promise<void>,
   canLoadMore: boolean,
   error: ?Error,
   isLoading: boolean,
-  aiRequests: { [string]: AiRequest },
+  // The chat history: the user's top-level AI requests, newest first.
+  aiRequestSummaries: { [aiRequestId: string]: AiRequestSummary },
+  // The AI requests loaded with their conversation: the ones opened, created
+  // or running in this session, and the sub-agents of the opened one.
+  aiRequests: { [aiRequestId: string]: AiRequest },
+  // The AI requests being loaded to be opened, or that could not be loaded.
+  aiRequestLoadingStates: { [aiRequestId: string]: AiRequestLoadingState },
+  loadAiRequest: (aiRequestId: string) => Promise<void>,
   updateAiRequest: (
     aiRequestId: string,
     updateFn: (previousAiRequest: ?AiRequest) => AiRequest
@@ -141,14 +159,28 @@ type AiRequestSendState = {|
   lastSendError: ?Error,
 |};
 
-type PaginationState = {|
+type AiRequestsState = {|
+  aiRequestSummaries: { [aiRequestId: string]: AiRequestSummary },
+  nextPageUri: ?string,
   aiRequests: { [aiRequestId: string]: AiRequest },
-  nextPageUri: ?Object,
 |};
 
-const emptyPaginationState: PaginationState = {
-  aiRequests: {},
+const emptyAiRequestsState: AiRequestsState = {
+  aiRequestSummaries: {},
   nextPageUri: null,
+  aiRequests: {},
+};
+
+const toAiRequestSummariesById = (
+  aiRequestSummaries: Array<AiRequestSummary>
+): { [aiRequestId: string]: AiRequestSummary } => {
+  const aiRequestSummariesById: {
+    [aiRequestId: string]: AiRequestSummary,
+  } = {};
+  aiRequestSummaries.forEach(aiRequestSummary => {
+    aiRequestSummariesById[aiRequestSummary.id] = aiRequestSummary;
+  });
+  return aiRequestSummariesById;
 };
 
 export const useAiRequestsStorage = (): AiRequestStorage => {
@@ -156,17 +188,20 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     AuthenticatedUserContext
   );
 
-  const [state, setState] = React.useState<PaginationState>(
-    emptyPaginationState
+  const [state, setState] = React.useState<AiRequestsState>(
+    emptyAiRequestsState
   );
   const [error, setError] = React.useState<Error | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [aiRequestLoadingStates, setAiRequestLoadingStates] = React.useState<{
+    [aiRequestId: string]: AiRequestLoadingState,
+  }>({});
   const [forkingState, setForkingState] = React.useState<?{|
     aiRequestId: string,
     messageId: string,
   |}>(null);
 
-  const fetchAiRequests = React.useCallback(
+  const fetchAiRequestSummaries = React.useCallback(
     async () => {
       if (!profile) return;
 
@@ -174,26 +209,20 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
       setError(null);
 
       try {
-        const history = await getAiRequests(getAuthorizationHeader, {
+        const history = await getAiRequestSummaries(getAuthorizationHeader, {
           userId: profile.id,
           forceUri: null, // Fetch the first page.
         });
-        if (!history) return;
-        const aiRequestsById = history.aiRequests.reduce(
-          (accumulator, aiRequest) => {
-            // $FlowFixMe[prop-missing]
-            accumulator[aiRequest.id] = aiRequest;
-            return accumulator;
-          },
-          {}
-        );
-        setState({
-          aiRequests: aiRequestsById,
+        setState(previousState => ({
+          ...previousState,
+          aiRequestSummaries: toAiRequestSummariesById(
+            history.aiRequestSummaries
+          ),
           nextPageUri: history.nextPageUri,
-        });
+        }));
       } catch (err) {
         setError(err);
-        console.error('Error fetching AI requests:', err);
+        console.error('Error fetching AI request summaries:', err);
       } finally {
         setIsLoading(false);
       }
@@ -201,7 +230,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     [profile, getAuthorizationHeader]
   );
 
-  const onLoadMoreAiRequests = React.useCallback(
+  const onLoadMoreAiRequestSummaries = React.useCallback(
     async () => {
       if (!profile) return;
 
@@ -209,32 +238,27 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
       setError(null);
 
       try {
-        const history = await getAiRequests(getAuthorizationHeader, {
+        const history = await getAiRequestSummaries(getAuthorizationHeader, {
           userId: profile.id,
           forceUri: state.nextPageUri,
         });
-        if (!history) return;
-        const newRequests = history.aiRequests;
-        const currentRequestsById = state.aiRequests;
-
-        newRequests.forEach(newRequest => {
-          // Add new requests to the state.
-          if (!currentRequestsById[newRequest.id]) {
-            currentRequestsById[newRequest.id] = newRequest;
-          }
-        });
-        setState({
-          aiRequests: currentRequestsById,
+        setState(previousState => ({
+          ...previousState,
+          aiRequestSummaries: {
+            // The summaries already known are the most up to date.
+            ...toAiRequestSummariesById(history.aiRequestSummaries),
+            ...previousState.aiRequestSummaries,
+          },
           nextPageUri: history.nextPageUri,
-        });
+        }));
       } catch (err) {
         setError(err);
-        console.error('Error fetching AI requests:', err);
+        console.error('Error fetching AI request summaries:', err);
       } finally {
         setIsLoading(false);
       }
     },
-    [profile, getAuthorizationHeader, state.nextPageUri, state.aiRequests]
+    [profile, getAuthorizationHeader, state.nextPageUri]
   );
 
   const updateAiRequest = React.useCallback(
@@ -242,17 +266,24 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
       aiRequestId: string,
       updateFn: (previousAiRequest: ?AiRequest) => AiRequest
     ) => {
-      setState(prevState => {
-        const currentAiRequest = prevState.aiRequests
-          ? prevState.aiRequests[aiRequestId]
-          : null;
-        const newAiRequest = updateFn(currentAiRequest || null);
+      setState(previousState => {
+        const newAiRequest = updateFn(
+          previousState.aiRequests[aiRequestId] || null
+        );
         return {
-          ...prevState,
+          ...previousState,
           aiRequests: {
-            ...(prevState.aiRequests || {}),
+            ...previousState.aiRequests,
             [aiRequestId]: newAiRequest,
           },
+          // The history shows the request as it is now (sub-agents are not
+          // listed in the history).
+          aiRequestSummaries: newAiRequest.parentAiRequestId
+            ? previousState.aiRequestSummaries
+            : {
+                ...previousState.aiRequestSummaries,
+                [aiRequestId]: getAiRequestSummary(newAiRequest),
+              },
         };
       });
     },
@@ -260,7 +291,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   );
 
   const refreshAiRequest = React.useCallback(
-    async (aiRequestId: string) => {
+    async (aiRequestId: string): Promise<void> => {
       if (!profile) return;
 
       try {
@@ -279,11 +310,61 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     [getAuthorizationHeader, profile, updateAiRequest]
   );
 
+  /**
+   * Load an AI request known only by its id (typically from its summary in the
+   * history), so that it can be opened. The loading state is tracked per
+   * request so that the UI can show the loading and offer to retry.
+   *
+   * A request left with work in progress (e.g. from a previous session) is
+   * suspended before being stored: opening it never resumes this work.
+   */
+  const loadAiRequest = React.useCallback(
+    async (aiRequestId: string): Promise<void> => {
+      if (!profile) return;
+
+      setAiRequestLoadingStates(previousStates => ({
+        ...previousStates,
+        [aiRequestId]: { isLoading: true, error: null },
+      }));
+      try {
+        let aiRequest = await getAiRequest(getAuthorizationHeader, {
+          userId: profile.id,
+          aiRequestId,
+        });
+        if (aiRequestHasWorkInProgress(aiRequest, null)) {
+          try {
+            aiRequest = await apiSuspendAiRequest(getAuthorizationHeader, {
+              userId: profile.id,
+              aiRequestId,
+            });
+          } catch (error) {
+            console.error(
+              'Failed to suspend the AI request opened with work in progress - opening it as is:',
+              error
+            );
+          }
+        }
+        updateAiRequest(aiRequestId, () => aiRequest);
+        setAiRequestLoadingStates(
+          ({ [aiRequestId]: _, ...otherStates }) => otherStates
+        );
+      } catch (error) {
+        console.error('Error while loading AI request:', error);
+        setAiRequestLoadingStates(previousStates => ({
+          ...previousStates,
+          [aiRequestId]: { isLoading: false, error },
+        }));
+      }
+    },
+    [getAuthorizationHeader, profile, updateAiRequest]
+  );
+
   React.useEffect(
     () => {
       // Reset AI requests when the user logs out.
       if (!profile) {
-        setState(emptyPaginationState);
+        setState(emptyAiRequestsState);
+        setAiRequestLoadingStates({});
       }
     },
     [profile]
@@ -343,12 +424,15 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   );
 
   return {
-    fetchAiRequests,
-    onLoadMoreAiRequests,
+    fetchAiRequestSummaries,
+    onLoadMoreAiRequestSummaries,
     canLoadMore: !!state.nextPageUri,
     error,
     isLoading,
+    aiRequestSummaries: state.aiRequestSummaries,
     aiRequests: state.aiRequests,
+    aiRequestLoadingStates,
+    loadAiRequest,
     updateAiRequest,
     refreshAiRequest,
     isSendingAiRequest,
@@ -363,53 +447,24 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
 export const useAiRequestHistory = (
   aiRequestStorage: AiRequestStorage
 ): AiRequestHistory => {
-  const { aiRequests } = aiRequestStorage;
+  const { aiRequestSummaries } = aiRequestStorage;
   const [historyIndex, setHistoryIndex] = React.useState<number>(-1);
   const [savedCurrentText, setSavedCurrentText] = React.useState<string>('');
-  // Build history from sent user messages across all aiRequests
+  // The history browsed with the up/down arrows: the first message of each
+  // conversation, from the oldest to the most recent.
   const requestsHistory = React.useMemo(
-    () => {
-      const history: Array<string> = [];
-
-      // Iterate through all aiRequests ordered by request update date.
-      // A request can request multiple user messages, but we only know the
-      // information about the request date, not the date of each user message.
-      Object.values(aiRequests)
-        .sort((a: AiRequest, b: AiRequest) => {
-          return (
+    () =>
+      Object.keys(aiRequestSummaries)
+        .map(aiRequestId => aiRequestSummaries[aiRequestId])
+        .sort(
+          (a, b) =>
             new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-          );
-        })
-        .forEach((request: AiRequest) => {
-          if (!request.output) return;
-
-          // Exclude sub-agent requests: their "user" messages are sent by
-          // the orchestrator, not by the user.
-          if (request.parentAiRequestId) return;
-
-          const userMessages = request.output
-            .filter(
-              message => message.type === 'message' && message.role === 'user'
-            )
-            .map(
-              // $FlowFixMe[cannot-resolve-name]
-              (message: AiRequestUserMessage) => {
-                const content = message.content;
-                if (!Array.isArray(content)) return '';
-                const userRequest = content.find(
-                  item => item.type === 'user_request'
-                );
-                return userRequest ? userRequest.text : '';
-              }
-            )
-            .filter(text => text !== '');
-
-          history.push(...userMessages);
-        });
-
-      return history;
-    },
-    [aiRequests]
+        )
+        .map(({ firstUserMessage }) =>
+          firstUserMessage ? getUserRequestText(firstUserMessage) : ''
+        )
+        .filter(text => text !== ''),
+    [aiRequestSummaries]
   );
 
   const handleNavigateHistory = React.useCallback(
@@ -514,12 +569,15 @@ export type AiRequestContextState = {|
 
 export const initialAiRequestContextState: AiRequestContextState = {
   aiRequestStorage: {
-    fetchAiRequests: async () => {},
-    onLoadMoreAiRequests: async () => {},
+    fetchAiRequestSummaries: async () => {},
+    onLoadMoreAiRequestSummaries: async () => {},
     canLoadMore: true,
     error: null,
     isLoading: false,
+    aiRequestSummaries: {},
     aiRequests: {},
+    aiRequestLoadingStates: {},
+    loadAiRequest: async () => {},
     updateAiRequest: () => {},
     refreshAiRequest: async () => {},
     isSendingAiRequest: () => false,
@@ -602,9 +660,41 @@ export const AiRequestProvider = ({
   const [selectedAiRequestId, setSelectedAiRequestId] = React.useState<
     string | null
   >(null);
-  const { aiRequests, updateAiRequest } = aiRequestStorage;
+  const {
+    aiRequests,
+    updateAiRequest,
+    aiRequestLoadingStates,
+    loadAiRequest,
+  } = aiRequestStorage;
   const selectedAiRequest =
     (selectedAiRequestId && aiRequests[selectedAiRequestId]) || null;
+
+  // A chat is selected as soon as the user opens it, even if only its summary
+  // is known (from the history): load it then. A failed loading is kept as is
+  // for the user to retry.
+  React.useEffect(
+    () => {
+      if (!selectedAiRequestId || selectedAiRequest) return;
+      const loadingState = aiRequestLoadingStates[selectedAiRequestId];
+      if (loadingState && (loadingState.isLoading || loadingState.error))
+        return;
+      loadAiRequest(selectedAiRequestId);
+    },
+    [
+      selectedAiRequestId,
+      selectedAiRequest,
+      aiRequestLoadingStates,
+      loadAiRequest,
+    ]
+  );
+
+  React.useEffect(
+    () => {
+      // Nothing can be selected when logged out (the AI requests are reset).
+      if (!profile) setSelectedAiRequestId(null);
+    },
+    [profile]
+  );
 
   const [shouldWatchRequest, setShouldWatchRequest] = React.useState<boolean>(
     false

@@ -192,6 +192,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     >
                       {editorTab.renderEditorContainer({
                         editorId: editorTab.id,
+                        // The editor has its own window: a full width layout.
+                        paneIdentifier: 'center',
                         gameEditorMode: props.gameEditorMode,
                         setGameEditorMode: props.setGameEditorMode,
                         isActive: true,

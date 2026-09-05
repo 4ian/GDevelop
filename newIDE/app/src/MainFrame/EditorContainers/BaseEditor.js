@@ -51,6 +51,9 @@ export type EditorContainerExtraProps = {|
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
+  // The pane the editor is displayed in ('left', 'center' or 'right'), for
+  // editors adapting their layout to their position.
+  paneIdentifier: string,
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   projectItemName: ?string,

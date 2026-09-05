@@ -509,3 +509,24 @@ export const QuotaLimitReachedThenCreditsBought = (): React.Node => {
     </Column>
   );
 };
+
+// A chat opened from the history, whose conversation is being loaded: the
+// space stays blank, then a loader appears after a short delay.
+export const LoadingChatOpenedFromHistory = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={null}
+    aiRequestLoadingState={{ isLoading: true, error: null }}
+    onRetryLoadingAiRequest={action('onRetryLoadingAiRequest')}
+  />
+);
+
+export const ChatOpenedFromHistoryFailedToLoad = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={null}
+    aiRequestLoadingState={{
+      isLoading: false,
+      error: new Error('Network error'),
+    }}
+    onRetryLoadingAiRequest={action('onRetryLoadingAiRequest')}
+  />
+);

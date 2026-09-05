@@ -118,6 +118,18 @@ export type AiRequestError = {
   message: string,
 };
 
+/**
+ * How much of the context (the "memory" of the conversation) an AI request
+ * uses, as estimated by the API.
+ */
+export type AiRequestContextStats = {
+  // Rough estimate of the tokens consumed by the conversation so far.
+  totalTokens: number,
+  // The share of the context budget used, from 0 to 1 (it can exceed 1 once
+  // the budget is passed, the AI is then asked to wrap up).
+  usedPercentage: number,
+};
+
 export type AiRequest = {
   id: string,
   createdAt: string,
@@ -136,6 +148,7 @@ export type AiRequest = {
   parentAiRequestId?: string | null,
 
   error: AiRequestError | null,
+  contextStats?: AiRequestContextStats | null,
 
   // How many times the request was continued after a failure without making
   // any progress in between, and the number of messages it had then: the API
@@ -369,7 +382,60 @@ export const getAiRequestStatuses = async (
   });
 };
 
-export const getAiRequests = async (
+/**
+ * An AI request as the chat history lists it: enough to show and open it,
+ * without its conversation. Opening it loads the `AiRequest`.
+ */
+export type AiRequestSummary = {
+  id: string,
+  createdAt: string,
+  updatedAt: string,
+  userId: string,
+  status: GenerationStatus,
+  mode?: 'chat' | 'agent' | 'orchestrator',
+  error: AiRequestError | null,
+  forkedFromAiRequestId: string | null,
+  parentAiRequestId: string | null,
+  totalPriceInCredits: number | null,
+  lastUserMessagePriceInCredits: number | null,
+  firstUserMessage: AiRequestUserMessage | null,
+  lastMessage: AiRequestMessage | null,
+  outputMessagesCount: number,
+};
+
+export const getAiRequestSummary = (aiRequest: AiRequest): AiRequestSummary => {
+  const output = aiRequest.output || [];
+  const firstMessage = output.length > 0 ? output[0] : null;
+  return {
+    id: aiRequest.id,
+    createdAt: aiRequest.createdAt,
+    updatedAt: aiRequest.updatedAt,
+    userId: aiRequest.userId,
+    status: aiRequest.status,
+    mode: aiRequest.mode,
+    error: aiRequest.error,
+    forkedFromAiRequestId: aiRequest.forkedFromAiRequestId || null,
+    parentAiRequestId: aiRequest.parentAiRequestId || null,
+    totalPriceInCredits:
+      aiRequest.totalPriceInCredits !== undefined
+        ? aiRequest.totalPriceInCredits
+        : null,
+    lastUserMessagePriceInCredits:
+      aiRequest.lastUserMessagePriceInCredits !== undefined
+        ? aiRequest.lastUserMessagePriceInCredits
+        : null,
+    firstUserMessage:
+      firstMessage &&
+      firstMessage.type === 'message' &&
+      firstMessage.role === 'user'
+        ? firstMessage
+        : null,
+    lastMessage: output.length > 0 ? output[output.length - 1] : null,
+    outputMessagesCount: output.length,
+  };
+};
+
+export const getAiRequestSummaries = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
@@ -379,11 +445,11 @@ export const getAiRequests = async (
     forceUri: ?string,
   |}
 ): Promise<{
-  aiRequests: Array<AiRequest>,
+  aiRequestSummaries: Array<AiRequestSummary>,
   nextPageUri: ?string,
 }> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const uri = forceUri || '/ai-request';
+  const uri = forceUri || '/ai-request-summary';
 
   // $FlowFixMe[incompatible-type]
   const response = await apiClient.get(uri, {
@@ -396,9 +462,9 @@ export const getAiRequests = async (
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
   return {
-    aiRequests: ensureIsArray({
+    aiRequestSummaries: ensureIsArray({
       data: response.data,
-      endpointName: '/ai-request of Generation API',
+      endpointName: '/ai-request-summary of Generation API',
     }),
     nextPageUri,
   };

@@ -770,6 +770,7 @@ const EditorTabsPane: React.ComponentType<{
                 >
                   {editorTab.renderEditorContainer({
                     editorId: editorTab.id,
+                    paneIdentifier,
                     gameEditorMode,
                     setGameEditorMode,
                     isActive: isCurrentTab,

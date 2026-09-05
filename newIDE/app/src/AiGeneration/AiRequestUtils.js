@@ -5,9 +5,17 @@ import {
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
   type AiRequestPlan,
+  type AiRequestUserMessage,
 } from '../Utils/GDevelopServices/Generation';
 import { type EditorFunctionCallResult } from '../EditorFunctions';
 import { type RelatedAiRequestLastMessages } from '../EditorFunctions';
+
+/** The text typed by the user in one of their messages. */
+export const getUserRequestText = (message: AiRequestUserMessage): string =>
+  message.content
+    .filter(content => content.type === 'user_request')
+    .map(content => content.text)
+    .join(' ');
 
 /**
  * Maximum number of times a failed AI request can be continued without making

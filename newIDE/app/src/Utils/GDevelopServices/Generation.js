@@ -132,6 +132,11 @@ export type AiRequestContextStats = {
 
 export type AiRequest = {
   id: string,
+  // The name given by the user to the chat. Without one, the first user
+  // message stands for it.
+  title?: string | null,
+  // When the user archived the chat, hiding it from the active chats.
+  archivedAt?: string | null,
   createdAt: string,
   updatedAt: string,
   userId: string,
@@ -388,6 +393,8 @@ export const getAiRequestStatuses = async (
  */
 export type AiRequestSummary = {
   id: string,
+  title: string | null,
+  archivedAt: string | null,
   createdAt: string,
   updatedAt: string,
   userId: string,
@@ -408,6 +415,8 @@ export const getAiRequestSummary = (aiRequest: AiRequest): AiRequestSummary => {
   const firstMessage = output.length > 0 ? output[0] : null;
   return {
     id: aiRequest.id,
+    title: aiRequest.title || null,
+    archivedAt: aiRequest.archivedAt || null,
     createdAt: aiRequest.createdAt,
     updatedAt: aiRequest.updatedAt,
     userId: aiRequest.userId,
@@ -435,14 +444,27 @@ export const getAiRequestSummary = (aiRequest: AiRequest): AiRequestSummary => {
   };
 };
 
+/** Which chats to list: the active ones, the archived ones or all of them. */
+export type AiRequestSummariesFilter = 'active' | 'archived' | 'all';
+
+const archivedParameterByFilter = {
+  active: 'false',
+  archived: 'true',
+  all: 'any',
+};
+
 export const getAiRequestSummaries = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
     forceUri,
+    filter,
   }: {|
     userId: string,
+    // The URI of the page to fetch, which carries the filter (or null for the
+    // first page).
     forceUri: ?string,
+    filter: AiRequestSummariesFilter,
   |}
 ): Promise<{
   aiRequestSummaries: Array<AiRequestSummary>,
@@ -456,7 +478,9 @@ export const getAiRequestSummaries = async (
     headers: {
       Authorization: authorizationHeader,
     },
-    params: forceUri ? { userId } : { userId, perPage: 10 },
+    params: forceUri
+      ? { userId }
+      : { userId, perPage: 10, archived: archivedParameterByFilter[filter] },
   });
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
@@ -649,6 +673,52 @@ export const suspendAiRequest = async (
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/suspend of Generation API',
+  });
+};
+
+/**
+ * Update what the user can set on an AI request: its title (`null` removes
+ * it, its first user message is then shown as its name) and whether it's
+ * archived.
+ */
+export const updateAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    title,
+    archived,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    title?: string | null,
+    archived?: boolean,
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const attributes: { title?: string | null, archived?: boolean } = {};
+  if (title !== undefined) attributes.title = title;
+  if (archived !== undefined) attributes.archived = archived;
+  const response = await apiClient.patch(
+    `/ai-request/${aiRequestId}`,
+    attributes,
+    { params: { userId }, headers: { Authorization: authorizationHeader } }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id} of Generation API',
+  });
+};
+
+export const deleteAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await apiClient.delete(`/ai-request/${aiRequestId}`, {
+    params: { userId },
+    headers: { Authorization: authorizationHeader },
   });
 };
 

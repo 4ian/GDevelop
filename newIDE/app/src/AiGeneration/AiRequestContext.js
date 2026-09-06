@@ -8,8 +8,11 @@ import {
   type AiSettings,
   type GenerationStatus,
   type AiRequestSummary,
+  type AiRequestSummariesFilter,
   getAiRequestSummaries,
   getAiRequestSummary,
+  updateAiRequest as apiUpdateAiRequest,
+  deleteAiRequest as apiDeleteAiRequest,
   suspendAiRequest as apiSuspendAiRequest,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -124,6 +127,10 @@ type AiRequestStorage = {|
   canLoadMore: boolean,
   error: ?Error,
   isLoading: boolean,
+  // Which chats are fetched in the history. The summaries of the other chats
+  // known are kept, the history only shows the ones matching the filter.
+  aiRequestSummariesFilter: AiRequestSummariesFilter,
+  setAiRequestSummariesFilter: (filter: AiRequestSummariesFilter) => void,
   // The chat history: the user's top-level AI requests, newest first.
   aiRequestSummaries: { [aiRequestId: string]: AiRequestSummary },
   // The AI requests loaded with their conversation: the ones opened, created
@@ -132,6 +139,16 @@ type AiRequestStorage = {|
   // The AI requests being loaded to be opened, or that could not be loaded.
   aiRequestLoadingStates: { [aiRequestId: string]: AiRequestLoadingState },
   loadAiRequest: (aiRequestId: string) => Promise<void>,
+  // Give a name to a chat (an empty title removes it). The name is shown right
+  // away and reverted if the API refuses it.
+  renameAiRequest: (aiRequestId: string, title: string) => Promise<void>,
+  // Archive a chat, or restore it. Shown right away and reverted on failure.
+  setAiRequestArchived: (
+    aiRequestId: string,
+    archived: boolean
+  ) => Promise<void>,
+  // Delete a chat. Removed right away, the history is refreshed on failure.
+  deleteAiRequest: (aiRequestId: string) => Promise<void>,
   updateAiRequest: (
     aiRequestId: string,
     updateFn: (previousAiRequest: ?AiRequest) => AiRequest
@@ -196,13 +213,17 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   const [aiRequestLoadingStates, setAiRequestLoadingStates] = React.useState<{
     [aiRequestId: string]: AiRequestLoadingState,
   }>({});
+  const [
+    aiRequestSummariesFilter,
+    setAiRequestSummariesFilterState,
+  ] = React.useState<AiRequestSummariesFilter>('active');
   const [forkingState, setForkingState] = React.useState<?{|
     aiRequestId: string,
     messageId: string,
   |}>(null);
 
-  const fetchAiRequestSummaries = React.useCallback(
-    async () => {
+  const fetchAiRequestSummariesWithFilter = React.useCallback(
+    async (filter: AiRequestSummariesFilter) => {
       if (!profile) return;
 
       setIsLoading(true);
@@ -212,6 +233,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
         const history = await getAiRequestSummaries(getAuthorizationHeader, {
           userId: profile.id,
           forceUri: null, // Fetch the first page.
+          filter,
         });
         setState(previousState => ({
           ...previousState,
@@ -229,6 +251,17 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     },
     [profile, getAuthorizationHeader]
   );
+  const fetchAiRequestSummaries = React.useCallback(
+    () => fetchAiRequestSummariesWithFilter(aiRequestSummariesFilter),
+    [fetchAiRequestSummariesWithFilter, aiRequestSummariesFilter]
+  );
+  const setAiRequestSummariesFilter = React.useCallback(
+    (filter: AiRequestSummariesFilter) => {
+      setAiRequestSummariesFilterState(filter);
+      fetchAiRequestSummariesWithFilter(filter);
+    },
+    [fetchAiRequestSummariesWithFilter]
+  );
 
   const onLoadMoreAiRequestSummaries = React.useCallback(
     async () => {
@@ -241,6 +274,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
         const history = await getAiRequestSummaries(getAuthorizationHeader, {
           userId: profile.id,
           forceUri: state.nextPageUri,
+          filter: aiRequestSummariesFilter,
         });
         setState(previousState => ({
           ...previousState,
@@ -258,7 +292,12 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
         setIsLoading(false);
       }
     },
-    [profile, getAuthorizationHeader, state.nextPageUri]
+    [
+      profile,
+      getAuthorizationHeader,
+      state.nextPageUri,
+      aiRequestSummariesFilter,
+    ]
   );
 
   const updateAiRequest = React.useCallback(
@@ -359,6 +398,157 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     [getAuthorizationHeader, profile, updateAiRequest]
   );
 
+  /**
+   * Set the attributes the user can change on a request and on its summary,
+   * when they are known.
+   */
+  const setUserAttributesInState = React.useCallback(
+    (
+      aiRequestId: string,
+      attributes: {| title?: string | null, archivedAt?: string | null |}
+    ) => {
+      setState(previousState => {
+        const aiRequest = previousState.aiRequests[aiRequestId];
+        const aiRequestSummary = previousState.aiRequestSummaries[aiRequestId];
+        return {
+          ...previousState,
+          aiRequests: aiRequest
+            ? {
+                ...previousState.aiRequests,
+                [aiRequestId]: { ...aiRequest, ...attributes },
+              }
+            : previousState.aiRequests,
+          aiRequestSummaries: aiRequestSummary
+            ? {
+                ...previousState.aiRequestSummaries,
+                [aiRequestId]: { ...aiRequestSummary, ...attributes },
+              }
+            : previousState.aiRequestSummaries,
+        };
+      });
+    },
+    []
+  );
+
+  const renameAiRequest = React.useCallback(
+    async (aiRequestId: string, title: string): Promise<void> => {
+      if (!profile) return;
+      const newTitle = title.trim() || null;
+      const aiRequestSummary = state.aiRequestSummaries[aiRequestId];
+      const previousTitle =
+        (aiRequestSummary && aiRequestSummary.title) || null;
+      if (previousTitle === newTitle) return;
+
+      // Optimistic update: the new name is shown right away.
+      setUserAttributesInState(aiRequestId, { title: newTitle });
+
+      try {
+        await retryIfFailed({ times: 2 }, () =>
+          apiUpdateAiRequest(getAuthorizationHeader, {
+            userId: profile.id,
+            aiRequestId,
+            title: newTitle,
+          })
+        );
+      } catch (error) {
+        console.error(
+          'Error while renaming the AI request - reverting:',
+          error
+        );
+        setUserAttributesInState(aiRequestId, { title: previousTitle });
+      }
+    },
+    [
+      getAuthorizationHeader,
+      profile,
+      state.aiRequestSummaries,
+      setUserAttributesInState,
+    ]
+  );
+
+  const setAiRequestArchived = React.useCallback(
+    async (aiRequestId: string, archived: boolean): Promise<void> => {
+      if (!profile) return;
+      const aiRequestSummary = state.aiRequestSummaries[aiRequestId];
+      const previousArchivedAt =
+        (aiRequestSummary && aiRequestSummary.archivedAt) || null;
+      if (!!previousArchivedAt === archived) return;
+
+      // Optimistic update: the chat moves right away. The date is then the one
+      // set by the API.
+      setUserAttributesInState(aiRequestId, {
+        archivedAt: archived ? new Date().toISOString() : null,
+      });
+
+      try {
+        const updatedAiRequest = await retryIfFailed({ times: 2 }, () =>
+          apiUpdateAiRequest(getAuthorizationHeader, {
+            userId: profile.id,
+            aiRequestId,
+            archived,
+          })
+        );
+        setUserAttributesInState(aiRequestId, {
+          archivedAt: updatedAiRequest.archivedAt || null,
+        });
+      } catch (error) {
+        console.error(
+          'Error while archiving or restoring the AI request - reverting:',
+          error
+        );
+        setUserAttributesInState(aiRequestId, {
+          archivedAt: previousArchivedAt,
+        });
+      }
+    },
+    [
+      getAuthorizationHeader,
+      profile,
+      state.aiRequestSummaries,
+      setUserAttributesInState,
+    ]
+  );
+
+  const deleteAiRequest = React.useCallback(
+    async (aiRequestId: string): Promise<void> => {
+      if (!profile) return;
+
+      // Optimistic update: the chat disappears right away.
+      setState(previousState => {
+        const {
+          [aiRequestId]: _deletedAiRequest,
+          ...aiRequests
+        } = previousState.aiRequests;
+        const {
+          [aiRequestId]: _deletedAiRequestSummary,
+          ...aiRequestSummaries
+        } = previousState.aiRequestSummaries;
+        return { ...previousState, aiRequests, aiRequestSummaries };
+      });
+
+      try {
+        await retryIfFailed({ times: 2 }, () =>
+          apiDeleteAiRequest(getAuthorizationHeader, {
+            userId: profile.id,
+            aiRequestId,
+          })
+        );
+      } catch (error) {
+        console.error(
+          'Error while deleting the AI request - refreshing the history:',
+          error
+        );
+        fetchAiRequestSummariesWithFilter(aiRequestSummariesFilter);
+      }
+    },
+    [
+      getAuthorizationHeader,
+      profile,
+      fetchAiRequestSummariesWithFilter,
+      aiRequestSummariesFilter,
+    ]
+  );
+
   React.useEffect(
     () => {
       // Reset AI requests when the user logs out.
@@ -429,10 +619,15 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     canLoadMore: !!state.nextPageUri,
     error,
     isLoading,
+    aiRequestSummariesFilter,
+    setAiRequestSummariesFilter,
     aiRequestSummaries: state.aiRequestSummaries,
     aiRequests: state.aiRequests,
     aiRequestLoadingStates,
     loadAiRequest,
+    renameAiRequest,
+    setAiRequestArchived,
+    deleteAiRequest,
     updateAiRequest,
     refreshAiRequest,
     isSendingAiRequest,
@@ -574,10 +769,15 @@ export const initialAiRequestContextState: AiRequestContextState = {
     canLoadMore: true,
     error: null,
     isLoading: false,
+    aiRequestSummariesFilter: 'active',
+    setAiRequestSummariesFilter: () => {},
     aiRequestSummaries: {},
     aiRequests: {},
     aiRequestLoadingStates: {},
     loadAiRequest: async () => {},
+    renameAiRequest: async () => {},
+    setAiRequestArchived: async () => {},
+    deleteAiRequest: async () => {},
     updateAiRequest: () => {},
     refreshAiRequest: async () => {},
     isSendingAiRequest: () => false,

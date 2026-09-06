@@ -3,7 +3,11 @@ import * as React from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import classNames from 'classnames';
 import { Trans, t } from '@lingui/macro';
-import { type AiRequestSummary } from '../Utils/GDevelopServices/Generation';
+import { type I18n as I18nType } from '@lingui/core';
+import {
+  type AiRequestSummary,
+  type AiRequestSummariesFilter,
+} from '../Utils/GDevelopServices/Generation';
 import ScrollView from '../UI/ScrollView';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -13,8 +17,17 @@ import IconButton from '../UI/IconButton';
 import CollapsibleSidePanel from '../UI/CollapsibleSidePanel';
 import Add from '../UI/CustomSvgIcons/Add';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
+import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import Tune from '../UI/CustomSvgIcons/Tune';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import InlineRenameInput from '../UI/InlineRenameInput';
+import { useLongTouch } from '../Utils/UseLongTouch';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { AiRequestContext } from './AiRequestContext';
-import { getUserRequestText } from './AiRequestUtils';
+import { getAiRequestSummaryTitle } from './AiRequestUtils';
 import classes from './AskAiHistory.module.css';
 
 /**
@@ -86,37 +99,92 @@ const ChatItem = ({
   aiRequestSummary,
   isSelected,
   isWaitingForUser,
+  isRenaming,
+  showMenuButton,
   onOpen,
+  onOpenContextMenu,
+  onEndRenaming,
 }: {|
   aiRequestSummary: AiRequestSummary,
   isSelected: boolean,
   isWaitingForUser: boolean,
+  isRenaming: boolean,
+  showMenuButton: boolean,
   onOpen: () => void,
+  onOpenContextMenu: (x: number, y: number) => void,
+  onEndRenaming: (newTitle: string) => void,
 |}): React.Node => {
-  const title = aiRequestSummary.firstUserMessage
-    ? getUserRequestText(aiRequestSummary.firstUserMessage)
-    : '';
+  const title = getAiRequestSummaryTitle(aiRequestSummary);
+  const { contextMenuProps: longTouchProps } = useLongTouch(
+    React.useCallback(
+      ({ clientX, clientY }) => onOpenContextMenu(clientX, clientY),
+      [onOpenContextMenu]
+    )
+  );
   return (
-    <button
-      type="button"
+    <div
       className={classNames(classes.item, {
         [classes.itemSelected]: isSelected,
       })}
-      onClick={onOpen}
-      title={title}
-      aria-current={isSelected ? 'true' : undefined}
+      onContextMenu={
+        isRenaming
+          ? undefined
+          : event => {
+              event.preventDefault();
+              onOpenContextMenu(event.clientX, event.clientY);
+            }
+      }
+      {...(isRenaming ? {} : longTouchProps)}
     >
-      <span
-        className={classNames(classes.itemText, {
-          [classes.itemTextUntitled]: !title,
-        })}
-      >
-        {title || <Trans>Untitled chat</Trans>}
-      </span>
-      <ChatStatusDot
-        status={getChatStatus(aiRequestSummary, isWaitingForUser)}
-      />
-    </button>
+      {isRenaming ? (
+        // Same padding and font as the name it replaces: only the underline
+        // shows the name is being edited.
+        <div className={classes.itemRenameContainer}>
+          <InlineRenameInput
+            initialValue={title}
+            onEndRenaming={onEndRenaming}
+          />
+        </div>
+      ) : (
+        <button
+          type="button"
+          className={classes.itemButton}
+          onClick={onOpen}
+          title={title}
+          aria-current={isSelected ? 'true' : undefined}
+        >
+          <span
+            className={classNames(classes.itemText, {
+              [classes.itemTextUntitled]: !title,
+              // Muted when shown among the active chats.
+              [classes.itemTextArchived]: !!aiRequestSummary.archivedAt,
+            })}
+          >
+            {title || <Trans>Untitled chat</Trans>}
+          </span>
+          <ChatStatusDot
+            status={getChatStatus(aiRequestSummary, isWaitingForUser)}
+          />
+        </button>
+      )}
+      {showMenuButton && !isRenaming && (
+        <button
+          type="button"
+          className={classes.itemMenuButton}
+          onClick={event => {
+            event.stopPropagation();
+            const {
+              left,
+              bottom,
+            } = event.currentTarget.getBoundingClientRect();
+            onOpenContextMenu(left, bottom);
+          }}
+          aria-label={t`Chat actions`.id}
+        >
+          <ThreeDotsMenu />
+        </button>
+      )}
+    </div>
   );
 };
 
@@ -131,6 +199,43 @@ const LoadingSkeleton = (): React.Node => (
     ))}
   </div>
 );
+
+const matchesFilter = (
+  aiRequestSummary: AiRequestSummary,
+  filter: AiRequestSummariesFilter
+): boolean =>
+  filter === 'all' ||
+  (filter === 'archived'
+    ? !!aiRequestSummary.archivedAt
+    : !aiRequestSummary.archivedAt);
+
+const filters: Array<AiRequestSummariesFilter> = ['active', 'archived', 'all'];
+
+const filterLabels = {
+  active: t`Active`,
+  archived: t`Archived`,
+  all: t`All`,
+};
+
+const sectionTitles = {
+  active: <Trans>Recents</Trans>,
+  archived: <Trans>Archived</Trans>,
+  all: <Trans>All chats</Trans>,
+};
+
+const emptyMessages = {
+  active: (
+    <Trans>
+      Your chats with the AI will be listed here. Start by asking anything!
+    </Trans>
+  ),
+  archived: <Trans>No archived chat.</Trans>,
+  all: (
+    <Trans>
+      Your chats with the AI will be listed here. Start by asking anything!
+    </Trans>
+  ),
+};
 
 type AskAiHistoryContentProps = {|
   onOpenAiRequest: (aiRequestId: string) => void,
@@ -158,15 +263,88 @@ export const AskAiHistoryContent = ({
     },
     pendingEditApproval,
   } = React.useContext(AiRequestContext);
+  const {
+    renameAiRequest,
+    setAiRequestArchived,
+    deleteAiRequest,
+    aiRequestSummariesFilter,
+    setAiRequestSummariesFilter,
+  } = React.useContext(AiRequestContext).aiRequestStorage;
+  const { isMobile } = useResponsiveWindowSize();
+  const { showConfirmation } = useAlertDialog();
+  const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
+  const [renamedAiRequestId, setRenamedAiRequestId] = React.useState<
+    string | null
+  >(null);
+  const onDeleteAiRequest = React.useCallback(
+    async (aiRequestId: string) => {
+      const shouldDelete = await showConfirmation({
+        title: t`Delete this chat?`,
+        message: t`The chat and its history will be removed. This cannot be undone.`,
+        confirmButtonLabel: t`Delete`,
+        dismissButtonLabel: t`Cancel`,
+      });
+      if (!shouldDelete) return;
+      // Nothing to show anymore for a deleted chat: leave it first.
+      if (selectedAiRequestId === aiRequestId) onStartNewChat();
+      deleteAiRequest(aiRequestId);
+    },
+    [showConfirmation, selectedAiRequestId, onStartNewChat, deleteAiRequest]
+  );
+  const buildMenuTemplate = React.useCallback(
+    (
+      i18n: I18nType,
+      {
+        aiRequestId,
+        isArchived,
+      }: {| aiRequestId: string, isArchived: boolean |}
+    ): Array<MenuItemTemplate> => [
+      {
+        label: i18n._(t`Rename`),
+        click: () => setRenamedAiRequestId(aiRequestId),
+      },
+      isArchived
+        ? {
+            label: i18n._(t`Unarchive`),
+            click: () => setAiRequestArchived(aiRequestId, false),
+          }
+        : {
+            label: i18n._(t`Archive`),
+            click: () => setAiRequestArchived(aiRequestId, true),
+          },
+      ...(isArchived
+        ? [
+            {
+              label: i18n._(t`Delete`),
+              click: () => onDeleteAiRequest(aiRequestId),
+            },
+          ]
+        : []),
+    ],
+    [setAiRequestArchived, onDeleteAiRequest]
+  );
+  const buildFilterMenuTemplate = React.useCallback(
+    (i18n: I18nType): Array<MenuItemTemplate> =>
+      filters.map(filter => ({
+        type: 'checkbox',
+        label: i18n._(filterLabels[filter]),
+        checked: aiRequestSummariesFilter === filter,
+        click: () => setAiRequestSummariesFilter(filter),
+      })),
+    [aiRequestSummariesFilter, setAiRequestSummariesFilter]
+  );
   const sortedAiRequestSummaries = React.useMemo(
     () =>
       Object.keys(aiRequestSummaries)
         .map(aiRequestId => aiRequestSummaries[aiRequestId])
+        .filter(aiRequestSummary =>
+          matchesFilter(aiRequestSummary, aiRequestSummariesFilter)
+        )
         .sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         ),
-    [aiRequestSummaries]
+    [aiRequestSummaries, aiRequestSummariesFilter]
   );
   const hasChats = sortedAiRequestSummaries.length > 0;
 
@@ -184,16 +362,31 @@ export const AskAiHistoryContent = ({
         />
       </div>
       <div className={classes.sectionTitle}>
-        <Trans>Recents</Trans>
-        <IconButton
-          size="small"
-          color="inherit"
-          tooltip={t`Refresh the chats`}
-          onClick={fetchAiRequestSummaries}
-          disabled={isLoading}
-        >
-          <Refresh fontSize="small" />
-        </IconButton>
+        {sectionTitles[aiRequestSummariesFilter]}
+        <span className={classes.sectionTitleButtons}>
+          <IconButton
+            size="small"
+            color="inherit"
+            tooltip={t`Refresh the chats`}
+            onClick={fetchAiRequestSummaries}
+            disabled={isLoading}
+          >
+            <Refresh fontSize="small" />
+          </IconButton>
+          <ElementWithMenu
+            element={
+              <IconButton
+                size="small"
+                color="inherit"
+                tooltip={t`Choose which chats to show`}
+                selected={aiRequestSummariesFilter !== 'active'}
+              >
+                <Tune fontSize="small" />
+              </IconButton>
+            }
+            buildMenuTemplate={buildFilterMenuTemplate}
+          />
+        </span>
       </div>
       {error && !hasChats ? (
         <PlaceholderError onRetry={fetchAiRequestSummaries}>
@@ -203,10 +396,7 @@ export const AskAiHistoryContent = ({
         <LoadingSkeleton />
       ) : !hasChats ? (
         <div className={classes.emptyMessage}>
-          <Trans>
-            Your chats with the AI will be listed here. Start by asking
-            anything!
-          </Trans>
+          {emptyMessages[aiRequestSummariesFilter]}
         </div>
       ) : (
         <ScrollView>
@@ -219,11 +409,29 @@ export const AskAiHistoryContent = ({
                   aiRequestSummary={aiRequestSummary}
                   isSelected={isSelected}
                   isWaitingForUser={isSelected && !!pendingEditApproval}
+                  isRenaming={renamedAiRequestId === aiRequestSummary.id}
+                  // On touch screens, a long press opens the menu.
+                  showMenuButton={!isMobile}
                   onOpen={() => onOpenAiRequest(aiRequestSummary.id)}
+                  onOpenContextMenu={(x, y) => {
+                    if (contextMenuRef.current)
+                      contextMenuRef.current.open(x, y, {
+                        aiRequestId: aiRequestSummary.id,
+                        isArchived: !!aiRequestSummary.archivedAt,
+                      });
+                  }}
+                  onEndRenaming={newTitle => {
+                    setRenamedAiRequestId(null);
+                    renameAiRequest(aiRequestSummary.id, newTitle);
+                  }}
                 />
               );
             })}
           </div>
+          <ContextMenu
+            ref={contextMenuRef}
+            buildMenuTemplate={buildMenuTemplate}
+          />
           {canLoadMore && (
             <div className={classes.footer}>
               <TextButton

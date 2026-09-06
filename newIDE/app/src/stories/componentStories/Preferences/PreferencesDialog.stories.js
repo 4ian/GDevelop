@@ -42,6 +42,7 @@ const StatefulPreferencesProvider = ({
 
   const setValue = (name: string, value: any) => {
     action('Set preference')(name, value);
+    // $FlowFixMe[incompatible-type] - the name is the one of a preference.
     setValues(previousValues => ({ ...previousValues, [name]: value }));
   };
 
@@ -63,8 +64,8 @@ const StatefulPreferencesProvider = ({
     });
   };
 
+  // $FlowFixMe[incompatible-type] - only the setters used by the dialog are overridden.
   const preferences: Preferences = {
-    // $FlowFixMe[incompatible-type] - only the setters used by the dialog are overridden.
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]
     values,
@@ -131,10 +132,13 @@ const PreferencesDialogStory = ({
   initialTab,
   initialSection,
   initialUserShortcutMap = {},
+  isDesktop = false,
 }: {|
   initialTab?: PreferencesTabName,
   initialSection?: PreferencesSectionName,
   initialUserShortcutMap?: ShortcutMap,
+  /** Display the settings of the desktop version. */
+  isDesktop?: boolean,
 |}) => (
   <StatefulPreferencesProvider initialUserShortcutMap={initialUserShortcutMap}>
     <I18n>
@@ -143,6 +147,7 @@ const PreferencesDialogStory = ({
           i18n={i18n}
           initialTab={initialTab}
           initialSection={initialSection}
+          isDesktop={isDesktop}
           onClose={action('onClose')}
           onOpenQuickCustomizationDialog={action(
             'onOpenQuickCustomizationDialog'
@@ -164,7 +169,13 @@ const customizedUserShortcutMap: ShortcutMap = {
   OPEN_PROJECT_PROPERTIES: 'Alt+KeyP',
 };
 
-export const Default = (): React.Node => <PreferencesDialogStory />;
+export const Web = (): React.Node => <PreferencesDialogStory />;
+
+export const Desktop = (): React.Node => <PreferencesDialogStory isDesktop />;
+
+export const DesktopFoldersSection = (): React.Node => (
+  <PreferencesDialogStory isDesktop initialSection="folders" />
+);
 
 export const EventsSheetSection = (): React.Node => (
   <PreferencesDialogStory initialSection="events-sheet" />

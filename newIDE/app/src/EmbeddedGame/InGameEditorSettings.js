@@ -2,7 +2,10 @@
 import * as React from 'react';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { useShortcutMap } from '../KeyboardShortcuts';
-import { getCommandNamesHandledByInGameEditor } from '../CommandPalette/CommandsList';
+import {
+  getCommandNamesHandledByInGameEditor,
+  type CommandName,
+} from '../CommandPalette/CommandsList';
 
 export type InGameEditorSettings = {
   theme: {
@@ -38,10 +41,13 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
   // one of these shortcuts really changed.
   const shortcutMap = useShortcutMap();
   const inGameEditorShortcutsJson = JSON.stringify(
-    getCommandNamesHandledByInGameEditor().reduce((shortcuts, commandName) => {
-      shortcuts[commandName] = shortcutMap[commandName] || '';
-      return shortcuts;
-    }, {})
+    getCommandNamesHandledByInGameEditor().reduce(
+      (shortcuts: { [CommandName]: string }, commandName) => {
+        shortcuts[commandName] = shortcutMap[commandName] || '';
+        return shortcuts;
+      },
+      {}
+    )
   );
 
   const inGameEditorSettings = React.useMemo<InGameEditorSettings>(

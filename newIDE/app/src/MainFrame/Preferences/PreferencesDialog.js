@@ -16,7 +16,9 @@ import { themes } from '../../UI/Theme/ThemeRegistry';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
-import PreferencesContext from './PreferencesContext';
+import PreferencesContext, {
+  type EditorMosaicName,
+} from './PreferencesContext';
 import Text from '../../UI/Text';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -40,7 +42,6 @@ import {
 } from '../../KeyboardShortcuts';
 import defaultShortcuts, {
   defaultSecondaryShortcuts,
-  getDefaultShortcuts,
 } from '../../KeyboardShortcuts/DefaultShortcuts';
 import AlertMessage from '../../UI/AlertMessage';
 import ErrorBoundary from '../../UI/ErrorBoundary';
@@ -59,6 +60,8 @@ import SettingsIcon from '../../UI/CustomSvgIcons/Settings';
 import FolderIcon from '../../UI/CustomSvgIcons/Folder';
 import HammerIcon from '../../UI/CustomSvgIcons/Hammer';
 import SparkleIcon from '../../UI/CustomSvgIcons/Sparkle';
+import RobotFaceIcon from '../../UI/CustomSvgIcons/RobotFace';
+import ExtensionIcon from '../../UI/CustomSvgIcons/Extension';
 import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 import ProjectManagerIcon from '../../UI/CustomSvgIcons/ProjectManager';
 import Object3dIcon from '../../UI/CustomSvgIcons/Object3d';
@@ -79,6 +82,8 @@ export type PreferencesSectionName =
   | 'folders'
   | 'experimental'
   | 'contributor'
+  | 'ask-ai'
+  | 'extensions'
   | 'developer';
 
 export type PreferencesTabName = 'preferences' | 'shortcuts';
@@ -171,18 +176,30 @@ const sections: Array<PreferencesSection> = [
       <SceneIcon fontSize={fontSize} color={color} />
     ),
   },
-  ...(electron
-    ? [
-        {
-          name: 'folders',
-          label: <Trans>Folders</Trans>,
-          getSearchableLabel: i18n => i18n._(t`Folders`),
-          getIcon: ({ color, fontSize }) => (
-            <FolderIcon fontSize={fontSize} color={color} />
-          ),
-        },
-      ]
-    : []),
+  {
+    name: 'ask-ai',
+    label: <Trans>Ask AI</Trans>,
+    getSearchableLabel: i18n => i18n._(t`Ask AI`),
+    getIcon: ({ color, fontSize }) => (
+      <RobotFaceIcon fontSize={fontSize} color={color} />
+    ),
+  },
+  {
+    name: 'extensions',
+    label: <Trans>Extensions</Trans>,
+    getSearchableLabel: i18n => i18n._(t`Extensions`),
+    getIcon: ({ color, fontSize }) => (
+      <ExtensionIcon fontSize={fontSize} color={color} />
+    ),
+  },
+  {
+    name: 'folders',
+    label: <Trans>Folders</Trans>,
+    getSearchableLabel: i18n => i18n._(t`Folders`),
+    getIcon: ({ color, fontSize }) => (
+      <FolderIcon fontSize={fontSize} color={color} />
+    ),
+  },
   {
     name: 'contributor',
     label: <Trans>Contributor options</Trans>,
@@ -305,9 +322,14 @@ const getSectionElementId = (sectionName: string): string =>
 const getShortcutAreaElementId = (areaName: string): string =>
   `preferences-shortcuts-area-${areaName}`;
 
-// A section is considered displayed at the top of the content when its top is
-// at most this number of pixels below the top of the content.
-const scrollSpyTolerance = 8;
+// When scrolling to a section, its title is placed this number of pixels
+// below the top of the content, so that it does not stick to the edge.
+const sectionScrollOffset = 16;
+// A section is considered displayed at the top of the content (and highlighted
+// in the sections list) when its top is at most this number of pixels below the
+// top of the content. Larger than the scroll offset, so that a section that has
+// just been scrolled to is the highlighted one.
+const scrollSpyTolerance = sectionScrollOffset + 8;
 
 const styles = {
   body: {
@@ -356,6 +378,12 @@ type Props = {|
   initialTab?: PreferencesTabName,
   /** The preferences section displayed when the dialog opens. Defaults to the general one. */
   initialSection?: PreferencesSectionName,
+  /**
+   * Display the settings of the desktop version (folders, Electron specific
+   * options...). Defaults to whether the dialog runs in the desktop version:
+   * only useful to force it, for example in Storybook.
+   */
+  isDesktop?: boolean,
 |};
 
 const PreferencesDialog = ({
@@ -364,6 +392,7 @@ const PreferencesDialog = ({
   onOpenQuickCustomizationDialog,
   initialTab,
   initialSection,
+  isDesktop = !!electron,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { showConfirmation } = useAlertDialog();
@@ -408,7 +437,6 @@ const PreferencesDialog = ({
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
     setShowExperimentalExtensions,
-    setKeyboardLayout,
     setShowInAppTutorialDeveloperMode,
     setOpenDiagnosticReportAutomatically,
     setBlockPreviewAndExportOnDiagnosticErrors,
@@ -446,14 +474,36 @@ const PreferencesDialog = ({
       : null
   );
 
+  // A scroll made by the dialog itself (to the section chosen in the list)
+  // must not change the highlighted entry: near the bottom of the content, the
+  // chosen section can't reach the top, and the scroll spy would highlight the
+  // last entry instead of the chosen one.
+  const isProgrammaticScrollRef = React.useRef<boolean>(false);
+  const setProgrammaticScrollTop = (
+    container: HTMLDivElement,
+    scrollTop: number
+  ) => {
+    if (container.scrollTop === scrollTop) return;
+    isProgrammaticScrollRef.current = true;
+    container.scrollTop = scrollTop;
+    // In case no scroll event is fired (already at the bottom, for example).
+    setTimeout(() => {
+      isProgrammaticScrollRef.current = false;
+    }, 100);
+  };
+
   const scrollToElement = (elementId: string) => {
     const container = sectionContentRef.current;
     const element = document.getElementById(elementId);
     if (!container || !element) return;
 
-    container.scrollTop +=
-      element.getBoundingClientRect().top -
-      container.getBoundingClientRect().top;
+    setProgrammaticScrollTop(
+      container,
+      container.scrollTop +
+        element.getBoundingClientRect().top -
+        container.getBoundingClientRect().top -
+        sectionScrollOffset
+    );
   };
 
   React.useEffect(() => {
@@ -464,7 +514,8 @@ const PreferencesDialog = ({
     pendingScrollElementIdRef.current = null;
 
     if (pendingScrollElementId === '') {
-      if (sectionContentRef.current) sectionContentRef.current.scrollTop = 0;
+      if (sectionContentRef.current)
+        setProgrammaticScrollTop(sectionContentRef.current, 0);
     } else {
       scrollToElement(pendingScrollElementId);
     }
@@ -501,11 +552,15 @@ const PreferencesDialog = ({
   };
 
   const onContentScroll = () => {
+    if (isProgrammaticScrollRef.current) {
+      isProgrammaticScrollRef.current = false;
+      return;
+    }
     if (isSearching) return;
 
     if (currentTab === 'preferences') {
       const sectionNameAtTop = getEntryKeyAtTop(
-        sections.map(section => section.name),
+        getVisibleSections().map(section => section.name),
         getSectionElementId
       );
       if (sectionNameAtTop && sectionNameAtTop !== currentSection) {
@@ -526,7 +581,7 @@ const PreferencesDialog = ({
     commandName =>
       values.userShortcutMap[commandName] != null &&
       values.userShortcutMap[commandName] !==
-        (getDefaultShortcuts(values.keyboardLayout)[commandName] || '')
+        (defaultShortcuts[commandName] || '')
   );
 
   const resetAllShortcutsToDefault = async () => {
@@ -559,7 +614,7 @@ const PreferencesDialog = ({
     />
   );
 
-  const renderResetLayoutButton = (editorMosaicName: string) => (
+  const renderResetLayoutButton = (editorMosaicName: EditorMosaicName) => (
     <FlatButton
       label={<Trans>Reset</Trans>}
       onClick={() => setDefaultEditorMosaicNode(editorMosaicName, null)}
@@ -737,7 +792,7 @@ const PreferencesDialog = ({
                 </div>
               ),
             },
-            ...(electron
+            ...(isDesktop
               ? [
                   {
                     id: 'resources-importation-behavior',
@@ -957,7 +1012,7 @@ const PreferencesDialog = ({
                   setTakeScreenshotOnPreview
                 ),
             },
-            ...(electron
+            ...(isDesktop
               ? [
                   {
                     id: 'hide-menu-bar-in-preview',
@@ -1058,18 +1113,9 @@ const PreferencesDialog = ({
                   !Object.keys(values.hiddenAnnouncements).length
                 ),
             },
-            {
-              id: 'hidden-ask-ai-forms',
-              label: i18n._(t`Hidden Ask AI text inputs`),
-              renderControl: () =>
-                renderResetButton(
-                  showAllAskAiStandAloneForms,
-                  !Object.keys(values.hiddenAskAiStandAloneForms).length
-                ),
-            },
           ],
         };
-      case 'other':
+      case 'ask-ai':
         return {
           settings: [
             {
@@ -1093,6 +1139,20 @@ const PreferencesDialog = ({
                 ),
             },
             {
+              id: 'hidden-ask-ai-forms',
+              label: i18n._(t`Hidden Ask AI text inputs`),
+              renderControl: () =>
+                renderResetButton(
+                  showAllAskAiStandAloneForms,
+                  !Object.keys(values.hiddenAskAiStandAloneForms).length
+                ),
+            },
+          ],
+        };
+      case 'other':
+        return {
+          settings: [
+            {
               id: 'display-save-reminder',
               label: i18n._(
                 t`Display save reminder after significant changes in project`
@@ -1113,7 +1173,7 @@ const PreferencesDialog = ({
                   setUseBackgroundSerializerForSaving
                 ),
             },
-            ...(electron
+            ...(isDesktop
               ? [
                   {
                     id: 'watch-project-folder-files',
@@ -1129,7 +1189,7 @@ const PreferencesDialog = ({
                   },
                 ]
               : []),
-            ...(electron && values.disableNpmScriptConfirmation
+            ...(isDesktop && values.disableNpmScriptConfirmation
               ? [
                   {
                     id: 'npm-script-confirmation',
@@ -1146,6 +1206,19 @@ const PreferencesDialog = ({
           ],
         };
       case 'folders':
+        if (!isDesktop) {
+          return {
+            settings: [],
+            renderHeader: () => (
+              <Text noMargin color="secondary">
+                <Trans>
+                  The folders can only be configured in the desktop version of
+                  GDevelop.
+                </Trans>
+              </Text>
+            ),
+          };
+        }
         return {
           settings: [
             {
@@ -1162,7 +1235,7 @@ const PreferencesDialog = ({
             },
           ],
         };
-      case 'experimental':
+      case 'extensions':
         return {
           settings: [
             {
@@ -1178,6 +1251,9 @@ const PreferencesDialog = ({
             },
           ],
         };
+      case 'experimental':
+        // No experimental setting for now: the section is hidden while empty.
+        return { settings: [] };
       case 'developer':
         return {
           settings: [
@@ -1225,6 +1301,19 @@ const PreferencesDialog = ({
     }
   };
 
+  /**
+   * The sections having something to display. A section without any setting
+   * (for example when its settings are only available on some platforms) is
+   * hidden from the sections list and the content.
+   */
+  const getVisibleSections = (): Array<PreferencesSection> =>
+    sections.filter(section => {
+      const { settings, renderHeader, renderFooter } = getSectionContent(
+        section.name
+      );
+      return settings.length > 0 || !!renderHeader || !!renderFooter;
+    });
+
   const renderSettingsRows = (settings: Array<SettingDefinition>) => (
     <Column noMargin>
       {settings.map(setting => (
@@ -1266,28 +1355,6 @@ const PreferencesDialog = ({
    * Display all the sections of the current tab, one after another. The
    * sections list on the left (not displayed on mobile) scrolls to a section.
    */
-  /**
-   * The keyboard layout (QWERTY or AZERTY) is chosen at the top of the 3D
-   * editor area, as it only changes the default keys moving its camera. The
-   * options are explicit enough to be displayed without a label.
-   */
-  const renderShortcutAreaHeader = (areaName: string) => {
-    if (areaName !== 'SCENE_3D') return null;
-    return (
-      <SettingsRow id="preferences-keyboard-layout" label="">
-        <div style={styles.fullWidthControl}>
-          <CompactSelectField
-            value={values.keyboardLayout}
-            onChange={(value: string) => setKeyboardLayout((value: any))}
-          >
-            <SelectOption value="qwerty" label={t`QWERTY`} />
-            <SelectOption value="azerty" label={t`AZERTY`} />
-          </CompactSelectField>
-        </div>
-      </SettingsRow>
-    );
-  };
-
   const renderCurrentTabContent = () => {
     if (currentTab === 'shortcuts') {
       return (
@@ -1306,10 +1373,8 @@ const PreferencesDialog = ({
           <ShortcutsList
             i18n={i18n}
             userShortcutMap={values.userShortcutMap}
-            keyboardLayout={values.keyboardLayout}
             onEdit={setShortcutForCommand}
             getSectionElementId={getShortcutAreaElementId}
-            renderAreaHeader={renderShortcutAreaHeader}
           />
         </ColumnStackLayout>
       );
@@ -1317,7 +1382,7 @@ const PreferencesDialog = ({
 
     return (
       <ColumnStackLayout noMargin expand>
-        {sections.map(renderSection)}
+        {getVisibleSections().map(renderSection)}
       </ColumnStackLayout>
     );
   };
@@ -1330,12 +1395,7 @@ const PreferencesDialog = ({
     const normalizedSearchText = normalizeForSearch(searchText);
 
     const hasMatchingShortcuts =
-      getShortcutSections(
-        i18n,
-        values.userShortcutMap,
-        values.keyboardLayout,
-        searchText
-      ).length > 0;
+      getShortcutSections(i18n, values.userShortcutMap, searchText).length > 0;
     const matchingSections = sections
       .map(section => {
         const { settings } = getSectionContent(section.name);
@@ -1377,7 +1437,6 @@ const PreferencesDialog = ({
             <ShortcutsList
               i18n={i18n}
               userShortcutMap={values.userShortcutMap}
-              keyboardLayout={values.keyboardLayout}
               onEdit={setShortcutForCommand}
               searchText={searchText}
             />
@@ -1391,7 +1450,8 @@ const PreferencesDialog = ({
     setSearchText('');
     setCurrentTab(tabName);
     // Start from the top of the new tab.
-    if (tabName === 'preferences') setCurrentSection(sections[0].name);
+    if (tabName === 'preferences')
+      setCurrentSection(getVisibleSections()[0].name);
     else setCurrentShortcutArea(shortcutAreas[0].name);
     pendingScrollElementIdRef.current = '';
   };
@@ -1412,7 +1472,7 @@ const PreferencesDialog = ({
   // preferences sections or the shortcut areas, depending on the current tab.
   const sectionListEntries =
     currentTab === 'preferences'
-      ? sections.map(section => ({
+      ? getVisibleSections().map(section => ({
           key: section.name,
           label: section.label,
           getIcon: section.getIcon,

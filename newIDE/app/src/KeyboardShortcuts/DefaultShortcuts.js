@@ -97,26 +97,4 @@ export const defaultSecondaryShortcuts: ShortcutMap = {
   OPEN_COMMAND_PALETTE: 'CmdOrCtrl+KeyK',
 };
 
-export type KeyboardLayout = 'qwerty' | 'azerty';
-
-/**
- * On AZERTY keyboards, the keys used to move the camera of the 3D editor are
- * ZQSD (and A to go down) instead of WASD (and Q to go down).
- */
-const azertyDefaultShortcutOverrides: ShortcutMap = {
-  IN_GAME_EDITOR_MOVE_CAMERA_FORWARD: 'KeyZ',
-  IN_GAME_EDITOR_MOVE_CAMERA_LEFT: 'KeyQ',
-  IN_GAME_EDITOR_MOVE_CAMERA_DOWN: 'KeyA',
-};
-
-/**
- * The default shortcuts for the given keyboard layout.
- */
-export const getDefaultShortcuts = (
-  keyboardLayout: KeyboardLayout
-): ShortcutMap =>
-  keyboardLayout === 'azerty'
-    ? { ...defaultShortcuts, ...azertyDefaultShortcutOverrides }
-    : defaultShortcuts;
-
 export default defaultShortcuts;

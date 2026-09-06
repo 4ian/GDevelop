@@ -395,6 +395,7 @@ export type AiRequestSummary = {
   id: string,
   title: string | null,
   archivedAt: string | null,
+  gameId: string | null,
   createdAt: string,
   updatedAt: string,
   userId: string,
@@ -417,6 +418,7 @@ export const getAiRequestSummary = (aiRequest: AiRequest): AiRequestSummary => {
     id: aiRequest.id,
     title: aiRequest.title || null,
     archivedAt: aiRequest.archivedAt || null,
+    gameId: aiRequest.gameId || null,
     createdAt: aiRequest.createdAt,
     updatedAt: aiRequest.updatedAt,
     userId: aiRequest.userId,
@@ -459,12 +461,15 @@ export const getAiRequestSummaries = async (
     userId,
     forceUri,
     filter,
+    gameId,
   }: {|
     userId: string,
-    // The URI of the page to fetch, which carries the filter (or null for the
-    // first page).
+    // The URI of the page to fetch, which carries the filter and the game (or
+    // null for the first page).
     forceUri: ?string,
     filter: AiRequestSummariesFilter,
+    // Only the chats made on this game.
+    gameId?: ?string,
   |}
 ): Promise<{
   aiRequestSummaries: Array<AiRequestSummary>,
@@ -480,7 +485,12 @@ export const getAiRequestSummaries = async (
     },
     params: forceUri
       ? { userId }
-      : { userId, perPage: 10, archived: archivedParameterByFilter[filter] },
+      : {
+          userId,
+          perPage: 10,
+          archived: archivedParameterByFilter[filter],
+          gameId: gameId || undefined,
+        },
   });
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)

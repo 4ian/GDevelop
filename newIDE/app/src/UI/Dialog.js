@@ -128,6 +128,12 @@ const styles = {
   minHeightForFullHeightModal: 'calc(100% - 64px)',
   minHeightForSmallHeightModal: 'min(100% - 64px, 350px)',
   minHeightForLargeHeightModal: 'min(100% - 64px, 800px)',
+  // Material UI dialogs have a 32px margin on each side of the paper.
+  aspectRatio16by9Paper: {
+    width: 'min(calc(100vw - 64px), calc((100vh - 64px) * 16 / 9))',
+    height: 'min(calc(100vh - 64px), calc((100vw - 64px) * 9 / 16))',
+    maxWidth: 'none',
+  },
   topBackground: {
     position: 'absolute',
     top: 0,
@@ -244,6 +250,9 @@ type DialogProps = {|
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false,
   minHeight?: 'sm' | 'lg',
   fullHeight?: boolean,
+  // Force the dialog to keep a given aspect ratio, as large as the window allows.
+  // Ignored when the dialog is displayed fullscreen (typically on mobile).
+  aspectRatio?: '16:9',
   fullscreen?: 'never-even-on-mobile' | 'always-even-on-desktop',
   noPadding?: boolean,
   actionsFullWidthOnMobile?: boolean,
@@ -271,6 +280,7 @@ const DialogWithoutWindowSizeProvider = ({
   flexColumnBody,
   flexBody,
   fullHeight,
+  aspectRatio,
   id,
   cannotBeDismissed,
   exceptionallyStillAllowRenderingInstancesEditors,
@@ -400,15 +410,18 @@ const DialogWithoutWindowSizeProvider = ({
     : minHeight === 'sm'
     ? styles.minHeightForSmallHeightModal
     : undefined;
+  const hasForcedAspectRatio = aspectRatio === '16:9' && !isFullScreen;
   const paperStyle = React.useMemo(
     () => ({
       backgroundColor: gdevelopTheme.dialog.backgroundColor,
       minHeight: paperMinHeight,
+      ...(hasForcedAspectRatio ? styles.aspectRatio16by9Paper : {}),
       ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
     }),
     [
       gdevelopTheme.dialog.backgroundColor,
       paperMinHeight,
+      hasForcedAspectRatio,
       softKeyboardBottomOffset,
     ]
   );
@@ -444,7 +457,9 @@ const DialogWithoutWindowSizeProvider = ({
         style: paperStyle,
       }}
       maxWidth={
-        maxWidth !== undefined
+        hasForcedAspectRatio
+          ? false
+          : maxWidth !== undefined
           ? maxWidth
           : getDefaultMaxWidthFromSize(windowSize)
       }

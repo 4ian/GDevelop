@@ -16,6 +16,7 @@ const styles = {
   },
 };
 type Props = {|
+  /** The label displayed next to the toggle. Empty to display the toggle alone. */
   label: string,
   markdownDescription?: ?string,
   id?: string,
@@ -88,7 +89,7 @@ export const CompactToggleField = (props: Props): React.MixedElement => {
           </span>
         </span>
       </div>
-      {props.hideTooltip ? (
+      {!props.label ? null : props.hideTooltip ? (
         label
       ) : (
         <Tooltip

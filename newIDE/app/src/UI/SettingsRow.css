@@ -1,0 +1,8 @@
+/* Alternating ("zebra") row colors, like in the instances list (see
+ * Theme/Global/Table.css), instead of separators between the rows. */
+.settings-row:nth-child(odd) {
+  background-color: var(--table-row-even-background-color);
+}
+.settings-row:nth-child(even) {
+  background-color: var(--table-row-odd-background-color);
+}

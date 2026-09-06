@@ -76,9 +76,55 @@ const renderLanguageSelectOption = localeMetadata => {
   );
 };
 
-const LanguageSelector = ({ onLanguageChanged }: Props): React.Node => {
+/**
+ * The select field listing the available languages, to be placed in a
+ * settings row or in a layout of your choice.
+ */
+export const LanguageSelectField = ({
+  onLanguageChanged,
+}: Props): React.Node => {
   const { values, setLanguage } = useContext(PreferencesContext);
 
+  return (
+    <CompactSelectField
+      value={values.language}
+      onChange={(value: string) => {
+        setLanguage(value);
+        onLanguageChanged(value);
+      }}
+    >
+      <SelectOption value="en" label="English (default)" />
+      {goodProgressLocales.map(localeMetadata =>
+        renderLanguageSelectOption(localeMetadata)
+      )}
+      {incompleteLocales.map(localeMetadata =>
+        renderLanguageSelectOption(localeMetadata)
+      )}
+    </CompactSelectField>
+  );
+};
+
+/**
+ * The text inviting to contribute to the translations.
+ */
+export const TranslationContributionText = (): React.Node => (
+  <Text color="secondary">
+    <Trans>
+      You can{' '}
+      <Link
+        href={'https://crowdin.com/project/gdevelop'}
+        onClick={() =>
+          Window.openExternalURL('https://crowdin.com/project/gdevelop')
+        }
+      >
+        help translate GDevelop into your language
+      </Link>
+      .
+    </Trans>
+  </Text>
+);
+
+const LanguageSelector = ({ onLanguageChanged }: Props): React.Node => {
   return (
     <Column noMargin>
       <LineStackLayout noMargin alignItems="center">
@@ -88,37 +134,10 @@ const LanguageSelector = ({ onLanguageChanged }: Props): React.Node => {
           </Text>
         </Column>
         <Column noMargin expand>
-          <CompactSelectField
-            value={values.language}
-            onChange={(value: string) => {
-              setLanguage(value);
-              onLanguageChanged(value);
-            }}
-          >
-            <SelectOption value="en" label="English (default)" />
-            {goodProgressLocales.map(localeMetadata =>
-              renderLanguageSelectOption(localeMetadata)
-            )}
-            {incompleteLocales.map(localeMetadata =>
-              renderLanguageSelectOption(localeMetadata)
-            )}
-          </CompactSelectField>
+          <LanguageSelectField onLanguageChanged={onLanguageChanged} />
         </Column>
       </LineStackLayout>
-      <Text color="secondary">
-        <Trans>
-          You can{' '}
-          <Link
-            href={'https://crowdin.com/project/gdevelop'}
-            onClick={() =>
-              Window.openExternalURL('https://crowdin.com/project/gdevelop')
-            }
-          >
-            help translate GDevelop into your language
-          </Link>
-          .
-        </Trans>
-      </Text>
+      <TranslationContributionText />
     </Column>
   );
 };

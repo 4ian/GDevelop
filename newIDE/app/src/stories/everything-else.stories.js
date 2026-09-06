@@ -105,7 +105,6 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
-import PreferencesDialog from '../MainFrame/Preferences/PreferencesDialog';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
@@ -2416,18 +2415,3 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       }
     />
   ));
-
-// $FlowFixMe[invalid-export]
-storiesOf('PreferencesDialog', module).add('default', () => (
-  <I18n>
-    {({ i18n }) => (
-      <PreferencesDialog
-        i18n={i18n}
-        onClose={action('onClose')}
-        onOpenQuickCustomizationDialog={action(
-          'onOpenQuickCustomizationDialog'
-        )}
-      />
-    )}
-  </I18n>
-));

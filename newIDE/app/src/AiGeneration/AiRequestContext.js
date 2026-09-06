@@ -131,6 +131,11 @@ type AiRequestStorage = {|
   // known are kept, the history only shows the ones matching the filter.
   aiRequestSummariesFilter: AiRequestSummariesFilter,
   setAiRequestSummariesFilter: (filter: AiRequestSummariesFilter) => void,
+  // The opened game, whose chats are fetched too, to be shown first.
+  aiRequestSummariesGameId: ?string,
+  setAiRequestSummariesGameId: (gameId: ?string) => void,
+  onLoadMoreGameAiRequestSummaries: () => Promise<void>,
+  canLoadMoreGameAiRequestSummaries: boolean,
   // The chat history: the user's top-level AI requests, newest first.
   aiRequestSummaries: { [aiRequestId: string]: AiRequestSummary },
   // The AI requests loaded with their conversation: the ones opened, created
@@ -178,13 +183,18 @@ type AiRequestSendState = {|
 
 type AiRequestsState = {|
   aiRequestSummaries: { [aiRequestId: string]: AiRequestSummary },
+  // The next page of the recent chats, and of the chats of the opened game.
   nextPageUri: ?string,
+  gameId: ?string,
+  gameNextPageUri: ?string,
   aiRequests: { [aiRequestId: string]: AiRequest },
 |};
 
 const emptyAiRequestsState: AiRequestsState = {
   aiRequestSummaries: {},
   nextPageUri: null,
+  gameId: null,
+  gameNextPageUri: null,
   aiRequests: {},
 };
 
@@ -222,25 +232,62 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     messageId: string,
   |}>(null);
 
-  const fetchAiRequestSummariesWithFilter = React.useCallback(
-    async (filter: AiRequestSummariesFilter) => {
+  /**
+   * Fetch the first pages of the recent chats and of the chats of the game (if
+   * one is given), or the next page of one of them (`forceUri`).
+   */
+  const fetchAiRequestSummariesPages = React.useCallback(
+    async ({
+      filter,
+      gameId,
+      forceUri,
+    }: {|
+      filter: AiRequestSummariesFilter,
+      gameId: ?string,
+      forceUri?: {| list: 'recents' | 'game', uri: string |},
+    |}) => {
       if (!profile) return;
 
       setIsLoading(true);
       setError(null);
 
       try {
-        const history = await getAiRequestSummaries(getAuthorizationHeader, {
-          userId: profile.id,
-          forceUri: null, // Fetch the first page.
-          filter,
-        });
+        const [recentsPage, gamePage] = await Promise.all([
+          forceUri && forceUri.list === 'game'
+            ? null
+            : getAiRequestSummaries(getAuthorizationHeader, {
+                userId: profile.id,
+                forceUri: forceUri ? forceUri.uri : null,
+                filter,
+              }),
+          gameId && (!forceUri || forceUri.list === 'game')
+            ? getAiRequestSummaries(getAuthorizationHeader, {
+                userId: profile.id,
+                forceUri: forceUri ? forceUri.uri : null,
+                filter,
+                gameId,
+              })
+            : null,
+        ]);
+        const fetchedSummaries = [
+          ...(recentsPage ? recentsPage.aiRequestSummaries : []),
+          ...(gamePage ? gamePage.aiRequestSummaries : []),
+        ];
         setState(previousState => ({
           ...previousState,
-          aiRequestSummaries: toAiRequestSummariesById(
-            history.aiRequestSummaries
-          ),
-          nextPageUri: history.nextPageUri,
+          aiRequestSummaries: forceUri
+            ? {
+                // The summaries already known are the most up to date.
+                ...toAiRequestSummariesById(fetchedSummaries),
+                ...previousState.aiRequestSummaries,
+              }
+            : toAiRequestSummariesById(fetchedSummaries),
+          nextPageUri: recentsPage
+            ? recentsPage.nextPageUri
+            : previousState.nextPageUri,
+          gameNextPageUri: gamePage
+            ? gamePage.nextPageUri
+            : previousState.gameNextPageUri,
         }));
       } catch (err) {
         setError(err);
@@ -252,51 +299,69 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     [profile, getAuthorizationHeader]
   );
   const fetchAiRequestSummaries = React.useCallback(
-    () => fetchAiRequestSummariesWithFilter(aiRequestSummariesFilter),
-    [fetchAiRequestSummariesWithFilter, aiRequestSummariesFilter]
+    () =>
+      fetchAiRequestSummariesPages({
+        filter: aiRequestSummariesFilter,
+        gameId: state.gameId,
+      }),
+    [fetchAiRequestSummariesPages, aiRequestSummariesFilter, state.gameId]
   );
   const setAiRequestSummariesFilter = React.useCallback(
     (filter: AiRequestSummariesFilter) => {
       setAiRequestSummariesFilterState(filter);
-      fetchAiRequestSummariesWithFilter(filter);
+      fetchAiRequestSummariesPages({ filter, gameId: state.gameId });
     },
-    [fetchAiRequestSummariesWithFilter]
+    [fetchAiRequestSummariesPages, state.gameId]
+  );
+  const setAiRequestSummariesGameId = React.useCallback(
+    (gameId: ?string) => {
+      if (gameId === state.gameId) return;
+      setState(previousState => ({
+        ...previousState,
+        gameId,
+        gameNextPageUri: null,
+      }));
+      if (gameId) {
+        fetchAiRequestSummariesPages({
+          filter: aiRequestSummariesFilter,
+          gameId,
+          forceUri: { list: 'game', uri: '/ai-request-summary' },
+        });
+      }
+    },
+    [fetchAiRequestSummariesPages, aiRequestSummariesFilter, state.gameId]
   );
 
   const onLoadMoreAiRequestSummaries = React.useCallback(
     async () => {
-      if (!profile) return;
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const history = await getAiRequestSummaries(getAuthorizationHeader, {
-          userId: profile.id,
-          forceUri: state.nextPageUri,
-          filter: aiRequestSummariesFilter,
-        });
-        setState(previousState => ({
-          ...previousState,
-          aiRequestSummaries: {
-            // The summaries already known are the most up to date.
-            ...toAiRequestSummariesById(history.aiRequestSummaries),
-            ...previousState.aiRequestSummaries,
-          },
-          nextPageUri: history.nextPageUri,
-        }));
-      } catch (err) {
-        setError(err);
-        console.error('Error fetching AI request summaries:', err);
-      } finally {
-        setIsLoading(false);
-      }
+      if (!state.nextPageUri) return;
+      await fetchAiRequestSummariesPages({
+        filter: aiRequestSummariesFilter,
+        gameId: state.gameId,
+        forceUri: { list: 'recents', uri: state.nextPageUri },
+      });
     },
     [
-      profile,
-      getAuthorizationHeader,
-      state.nextPageUri,
+      fetchAiRequestSummariesPages,
       aiRequestSummariesFilter,
+      state.gameId,
+      state.nextPageUri,
+    ]
+  );
+  const onLoadMoreGameAiRequestSummaries = React.useCallback(
+    async () => {
+      if (!state.gameNextPageUri) return;
+      await fetchAiRequestSummariesPages({
+        filter: aiRequestSummariesFilter,
+        gameId: state.gameId,
+        forceUri: { list: 'game', uri: state.gameNextPageUri },
+      });
+    },
+    [
+      fetchAiRequestSummariesPages,
+      aiRequestSummariesFilter,
+      state.gameId,
+      state.gameNextPageUri,
     ]
   );
 
@@ -538,15 +603,10 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
           'Error while deleting the AI request - refreshing the history:',
           error
         );
-        fetchAiRequestSummariesWithFilter(aiRequestSummariesFilter);
+        fetchAiRequestSummaries();
       }
     },
-    [
-      getAuthorizationHeader,
-      profile,
-      fetchAiRequestSummariesWithFilter,
-      aiRequestSummariesFilter,
-    ]
+    [getAuthorizationHeader, profile, fetchAiRequestSummaries]
   );
 
   React.useEffect(
@@ -621,6 +681,10 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     isLoading,
     aiRequestSummariesFilter,
     setAiRequestSummariesFilter,
+    aiRequestSummariesGameId: state.gameId,
+    setAiRequestSummariesGameId,
+    onLoadMoreGameAiRequestSummaries,
+    canLoadMoreGameAiRequestSummaries: !!state.gameNextPageUri,
     aiRequestSummaries: state.aiRequestSummaries,
     aiRequests: state.aiRequests,
     aiRequestLoadingStates,
@@ -771,6 +835,10 @@ export const initialAiRequestContextState: AiRequestContextState = {
     isLoading: false,
     aiRequestSummariesFilter: 'active',
     setAiRequestSummariesFilter: () => {},
+    aiRequestSummariesGameId: null,
+    setAiRequestSummariesGameId: () => {},
+    onLoadMoreGameAiRequestSummaries: async () => {},
+    canLoadMoreGameAiRequestSummaries: false,
     aiRequestSummaries: {},
     aiRequests: {},
     aiRequestLoadingStates: {},

@@ -269,6 +269,9 @@ export const AskAiHistoryContent = ({
     deleteAiRequest,
     aiRequestSummariesFilter,
     setAiRequestSummariesFilter,
+    aiRequestSummariesGameId,
+    onLoadMoreGameAiRequestSummaries,
+    canLoadMoreGameAiRequestSummaries,
   } = React.useContext(AiRequestContext).aiRequestStorage;
   const { isMobile } = useResponsiveWindowSize();
   const { showConfirmation } = useAlertDialog();
@@ -346,7 +349,83 @@ export const AskAiHistoryContent = ({
         ),
     [aiRequestSummaries, aiRequestSummariesFilter]
   );
+  // The chats of the opened project come first, the others after.
+  const gameAiRequestSummaries = aiRequestSummariesGameId
+    ? sortedAiRequestSummaries.filter(
+        aiRequestSummary => aiRequestSummary.gameId === aiRequestSummariesGameId
+      )
+    : [];
+  const recentAiRequestSummaries = aiRequestSummariesGameId
+    ? sortedAiRequestSummaries.filter(
+        aiRequestSummary => aiRequestSummary.gameId !== aiRequestSummariesGameId
+      )
+    : sortedAiRequestSummaries;
+  const hasGameSection =
+    gameAiRequestSummaries.length > 0 || canLoadMoreGameAiRequestSummaries;
   const hasChats = sortedAiRequestSummaries.length > 0;
+
+  const renderChatItems = (summaries: Array<AiRequestSummary>) =>
+    summaries.map(aiRequestSummary => {
+      const isSelected = selectedAiRequestId === aiRequestSummary.id;
+      return (
+        <ChatItem
+          key={aiRequestSummary.id}
+          aiRequestSummary={aiRequestSummary}
+          isSelected={isSelected}
+          isWaitingForUser={isSelected && !!pendingEditApproval}
+          isRenaming={renamedAiRequestId === aiRequestSummary.id}
+          // On touch screens, a long press opens the menu.
+          showMenuButton={!isMobile}
+          onOpen={() => onOpenAiRequest(aiRequestSummary.id)}
+          onOpenContextMenu={(x, y) => {
+            if (contextMenuRef.current)
+              contextMenuRef.current.open(x, y, {
+                aiRequestId: aiRequestSummary.id,
+                isArchived: !!aiRequestSummary.archivedAt,
+              });
+          }}
+          onEndRenaming={newTitle => {
+            setRenamedAiRequestId(null);
+            renameAiRequest(aiRequestSummary.id, newTitle);
+          }}
+        />
+      );
+    });
+  const renderLoadMore = (onLoadMore: () => Promise<void>) => (
+    <div className={classes.footer}>
+      <TextButton
+        label={isLoading ? <Trans>Loading...</Trans> : <Trans>Load more</Trans>}
+        onClick={onLoadMore}
+        disabled={isLoading}
+      />
+    </div>
+  );
+  const headerButtons = (
+    <span className={classes.sectionTitleButtons}>
+      <IconButton
+        size="small"
+        color="inherit"
+        tooltip={t`Refresh the chats`}
+        onClick={fetchAiRequestSummaries}
+        disabled={isLoading}
+      >
+        <Refresh fontSize="small" />
+      </IconButton>
+      <ElementWithMenu
+        element={
+          <IconButton
+            size="small"
+            color="inherit"
+            tooltip={t`Choose which chats to show`}
+            selected={aiRequestSummariesFilter !== 'active'}
+          >
+            <Tune fontSize="small" />
+          </IconButton>
+        }
+        buildMenuTemplate={buildFilterMenuTemplate}
+      />
+    </span>
+  );
 
   return (
     <div className={classNames(classes.panel, className)}>
@@ -362,31 +441,12 @@ export const AskAiHistoryContent = ({
         />
       </div>
       <div className={classes.sectionTitle}>
-        {sectionTitles[aiRequestSummariesFilter]}
-        <span className={classes.sectionTitleButtons}>
-          <IconButton
-            size="small"
-            color="inherit"
-            tooltip={t`Refresh the chats`}
-            onClick={fetchAiRequestSummaries}
-            disabled={isLoading}
-          >
-            <Refresh fontSize="small" />
-          </IconButton>
-          <ElementWithMenu
-            element={
-              <IconButton
-                size="small"
-                color="inherit"
-                tooltip={t`Choose which chats to show`}
-                selected={aiRequestSummariesFilter !== 'active'}
-              >
-                <Tune fontSize="small" />
-              </IconButton>
-            }
-            buildMenuTemplate={buildFilterMenuTemplate}
-          />
-        </span>
+        {hasGameSection ? (
+          <Trans>This project</Trans>
+        ) : (
+          sectionTitles[aiRequestSummariesFilter]
+        )}
+        {headerButtons}
       </div>
       {error && !hasChats ? (
         <PlaceholderError onRetry={fetchAiRequestSummaries}>
@@ -400,53 +460,26 @@ export const AskAiHistoryContent = ({
         </div>
       ) : (
         <ScrollView>
+          {hasGameSection && (
+            <>
+              <div className={classes.list}>
+                {renderChatItems(gameAiRequestSummaries)}
+              </div>
+              {canLoadMoreGameAiRequestSummaries &&
+                renderLoadMore(onLoadMoreGameAiRequestSummaries)}
+              <div className={classes.sectionTitle}>
+                {sectionTitles[aiRequestSummariesFilter]}
+              </div>
+            </>
+          )}
           <div className={classes.list}>
-            {sortedAiRequestSummaries.map(aiRequestSummary => {
-              const isSelected = selectedAiRequestId === aiRequestSummary.id;
-              return (
-                <ChatItem
-                  key={aiRequestSummary.id}
-                  aiRequestSummary={aiRequestSummary}
-                  isSelected={isSelected}
-                  isWaitingForUser={isSelected && !!pendingEditApproval}
-                  isRenaming={renamedAiRequestId === aiRequestSummary.id}
-                  // On touch screens, a long press opens the menu.
-                  showMenuButton={!isMobile}
-                  onOpen={() => onOpenAiRequest(aiRequestSummary.id)}
-                  onOpenContextMenu={(x, y) => {
-                    if (contextMenuRef.current)
-                      contextMenuRef.current.open(x, y, {
-                        aiRequestId: aiRequestSummary.id,
-                        isArchived: !!aiRequestSummary.archivedAt,
-                      });
-                  }}
-                  onEndRenaming={newTitle => {
-                    setRenamedAiRequestId(null);
-                    renameAiRequest(aiRequestSummary.id, newTitle);
-                  }}
-                />
-              );
-            })}
+            {renderChatItems(recentAiRequestSummaries)}
           </div>
           <ContextMenu
             ref={contextMenuRef}
             buildMenuTemplate={buildMenuTemplate}
           />
-          {canLoadMore && (
-            <div className={classes.footer}>
-              <TextButton
-                label={
-                  isLoading ? (
-                    <Trans>Loading...</Trans>
-                  ) : (
-                    <Trans>Load more</Trans>
-                  )
-                }
-                onClick={onLoadMoreAiRequestSummaries}
-                disabled={isLoading}
-              />
-            </div>
-          )}
+          {canLoadMore && renderLoadMore(onLoadMoreAiRequestSummaries)}
         </ScrollView>
       )}
     </div>

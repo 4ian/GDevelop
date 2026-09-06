@@ -25,6 +25,7 @@ const createFakeAiRequestSummary = ({
   text,
   title = null,
   archivedAt = null,
+  gameId = null,
   status = 'ready',
   createdAt = '2024-01-01T12:00:00Z',
 }: {|
@@ -32,6 +33,7 @@ const createFakeAiRequestSummary = ({
   text: string | null,
   title?: string | null,
   archivedAt?: string | null,
+  gameId?: string | null,
   status?: GenerationStatus,
   createdAt?: string,
 |}): AiRequestSummary => {
@@ -39,6 +41,7 @@ const createFakeAiRequestSummary = ({
     id,
     title,
     archivedAt,
+    gameId,
     status,
     createdAt,
     updatedAt: createdAt,
@@ -76,6 +79,7 @@ const fakeAiRequestSummaries = toAiRequestSummariesById([
     id: 'request-1',
     text: 'Add a leaderboard with the player best score',
     status: 'working',
+    gameId: 'opened-game',
     createdAt: '2024-03-15T10:30:00Z',
   }),
   createFakeAiRequestSummary({
@@ -83,6 +87,7 @@ const fakeAiRequestSummaries = toAiRequestSummariesById([
     text: 'Create a GTA-style game with cars, pedestrians and a city',
     // A chat renamed by the user.
     title: 'City game',
+    gameId: 'opened-game',
     status: 'ready',
     createdAt: '2024-03-14T16:20:00Z',
   }),
@@ -141,6 +146,7 @@ const AskAiHistoryStoryTemplate = ({
   selectedAiRequestId = 'request-2',
   isWaitingForUser = false,
   filter = 'active',
+  gameId = null,
   width = 1000,
   height = 600,
   initiallyOpen = true,
@@ -153,6 +159,7 @@ const AskAiHistoryStoryTemplate = ({
   selectedAiRequestId?: string | null,
   isWaitingForUser?: boolean,
   filter?: AiRequestSummariesFilter,
+  gameId?: ?string,
   width?: number,
   height?: number,
   initiallyOpen?: boolean,
@@ -184,6 +191,10 @@ const AskAiHistoryStoryTemplate = ({
               setAiRequestSummariesFilter: action(
                 'setAiRequestSummariesFilter'
               ),
+              aiRequestSummariesGameId: gameId,
+              onLoadMoreGameAiRequestSummaries: async () =>
+                action('onLoadMoreGameAiRequestSummaries')(),
+              canLoadMoreGameAiRequestSummaries: false,
             },
             selectedAiRequestId,
             pendingEditApproval: isWaitingForUser
@@ -230,6 +241,23 @@ const AskAiHistoryStoryTemplate = ({
 
 export const SidePanel = (): React.Node => (
   <AskAiHistoryStoryTemplate layout="side-panel" />
+);
+
+export const SidePanelWithOpenedProject = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="side-panel" gameId="opened-game" />
+);
+
+export const SidePanelWithOpenedProjectWithoutChats = (): React.Node => (
+  <AskAiHistoryStoryTemplate layout="side-panel" gameId="another-game" />
+);
+
+export const RightDrawerWithOpenedProject = (): React.Node => (
+  <AskAiHistoryStoryTemplate
+    layout="right-drawer"
+    gameId="opened-game"
+    width={450}
+    height={600}
+  />
 );
 
 export const SidePanelArchivedChats = (): React.Node => (

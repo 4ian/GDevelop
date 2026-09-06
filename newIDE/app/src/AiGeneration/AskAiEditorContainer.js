@@ -347,6 +347,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       const {
         aiRequestStorage: {
           fetchAiRequestSummaries,
+          setAiRequestSummariesGameId,
           aiRequests,
           aiRequestSummaries,
           aiRequestLoadingStates,
@@ -445,6 +446,15 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         // retried once it becomes available.
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [isActive, fetchAiRequestSummaries]
+      );
+
+      // The chats of the opened project are listed first in the history.
+      const projectGameId = project ? project.getProjectUuid() : null;
+      React.useEffect(
+        () => {
+          setAiRequestSummariesGameId(projectGameId);
+        },
+        [projectGameId, setAiRequestSummariesGameId]
       );
 
       const canStartNewChat = !!selectedAiRequestId;

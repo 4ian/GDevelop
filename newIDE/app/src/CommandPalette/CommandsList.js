@@ -1,6 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import Window from '../Utils/Window';
 
 export type CommandName =
   | 'QUIT_APP'
@@ -106,7 +107,16 @@ export const commandAreas = {
   DEVELOPER: (t`Developer`: any),
 };
 
-type CommandArea = $Keys<typeof commandAreas>;
+export type CommandArea = $Keys<typeof commandAreas>;
+
+/**
+ * The areas of the commands displayed to the user, in order: the developer
+ * area is only displayed in development mode.
+ */
+export const getDisplayedCommandAreaNames = (): Array<CommandArea> =>
+  Object.keys(commandAreas).filter(
+    areaName => areaName !== 'DEVELOPER' || Window.isDev()
+  );
 
 type CommandMetadata = {|
   area: CommandArea,
@@ -117,7 +127,8 @@ type CommandMetadata = {|
   /**
    * If true, the shortcut is handled by the in-game editor (the game running
    * in the embedded preview), which has the keyboard focus when it's used.
-   * The IDE ignores these shortcuts, and they can't clash with the IDE ones.
+   * The IDE ignores these shortcuts, and the ones without modifier can't
+   * clash with the IDE ones.
    */
   handledByInGameEditor?: boolean,
 |};
@@ -518,6 +529,9 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_MEMORY_TRACKER_REGISTRY: {
     area: 'DEVELOPER',
     displayText: t`Open memory tracker registry`,
+    // A tool for the developers of GDevelop: hidden from the palette (and
+    // from the shortcuts list, like the whole area) in production.
+    ghost: !Window.isDev(),
   },
 };
 

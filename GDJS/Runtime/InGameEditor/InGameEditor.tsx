@@ -357,8 +357,9 @@ namespace gdjs {
     Comma: 188,
     Equal: 187,
     Minus: 189,
-    NumpadAdd: 107,
-    NumpadSubtract: 109,
+    // The input manager stores the numpad keys with their location.
+    NumpadAdd: gdjs.InputManager.getLocationAwareKeyCode(107, 3),
+    NumpadSubtract: gdjs.InputManager.getLocationAwareKeyCode(109, 3),
   };
   for (let letterIndex = 0; letterIndex < 26; letterIndex++) {
     shortcutKeyCodes['Key' + String.fromCharCode(65 + letterIndex)] =
@@ -403,49 +404,21 @@ namespace gdjs {
   };
 
   /**
-   * The default shortcuts of the in-game editor, used when the IDE did not
-   * send its own (customized) shortcuts. Must be kept in sync with the
-   * defaults of the IDE (`DefaultShortcuts.js`).
-   */
-  const defaultInGameEditorShortcuts: { [commandName: string]: string } = {
-    IN_GAME_EDITOR_TRANSLATE_MODE: 'Digit1',
-    IN_GAME_EDITOR_ROTATE_MODE: 'Digit2',
-    IN_GAME_EDITOR_SCALE_MODE: 'Digit3',
-    IN_GAME_EDITOR_FOCUS_ON_SELECTION: 'KeyF',
-    IN_GAME_EDITOR_MOVE_CAMERA_FORWARD: 'KeyW',
-    IN_GAME_EDITOR_MOVE_CAMERA_BACKWARD: 'KeyS',
-    IN_GAME_EDITOR_MOVE_CAMERA_LEFT: 'KeyA',
-    IN_GAME_EDITOR_MOVE_CAMERA_RIGHT: 'KeyD',
-    IN_GAME_EDITOR_MOVE_CAMERA_UP: 'KeyE',
-    IN_GAME_EDITOR_MOVE_CAMERA_DOWN: 'KeyQ',
-    IN_GAME_EDITOR_ORBIT_CAMERA: 'KeyO',
-  };
-
-  /**
-   * The keyboard shortcuts of the in-game editor, customizable from the IDE.
+   * The keyboard shortcuts of the in-game editor, sent by the IDE (which owns
+   * their default values, see `DefaultShortcuts.js`) and customizable there.
    * The keys of the shortcuts are checked with the input manager of the game.
    */
   class InGameEditorShortcuts {
     private _parsedShortcuts: { [commandName: string]: ParsedShortcut } = {};
 
-    constructor() {
-      this.update({});
-    }
-
     /**
-     * Set the shortcuts sent by the IDE. The commands that are not listed keep
-     * their default shortcut.
+     * Set the shortcuts sent by the IDE. A command that is not listed, or
+     * whose shortcut can't be parsed, has no shortcut.
      */
     update(shortcuts: { [commandName: string]: string }): void {
-      const shortcutsWithDefaults = {
-        ...defaultInGameEditorShortcuts,
-        ...shortcuts,
-      };
       this._parsedShortcuts = {};
-      for (const commandName in shortcutsWithDefaults) {
-        const parsedShortcut = parseShortcut(
-          shortcutsWithDefaults[commandName]
-        );
+      for (const commandName in shortcuts) {
+        const parsedShortcut = parseShortcut(shortcuts[commandName]);
         if (parsedShortcut) this._parsedShortcuts[commandName] = parsedShortcut;
       }
     }
@@ -470,7 +443,7 @@ namespace gdjs {
     isPressed(
       inputManager: gdjs.InputManager,
       commandName: string,
-      { ignoreShift }: { ignoreShift: boolean } = { ignoreShift: false }
+      ignoreShift: boolean = false
     ): boolean {
       const parsedShortcut = this._parsedShortcuts[commandName];
       if (!parsedShortcut) return false;
@@ -504,9 +477,11 @@ namespace gdjs {
     isShortcutKey(inputManager: gdjs.InputManager, keyCode: integer): boolean {
       for (const commandName in this._parsedShortcuts) {
         const parsedShortcut = this._parsedShortcuts[commandName];
+        // Shift makes the camera move faster: it's not part of these shortcuts.
+        const ignoreShift = moveCameraCommandNames.indexOf(commandName) !== -1;
         if (
           parsedShortcut.keyCode === keyCode &&
-          this._areModifiersMatching(inputManager, parsedShortcut, false)
+          this._areModifiersMatching(inputManager, parsedShortcut, ignoreShift)
         ) {
           return true;
         }
@@ -752,7 +727,7 @@ namespace gdjs {
       !isShiftPressed(inputManager) &&
       arrowKeys.some((key) => inputManager.isKeyPressed(key))) ||
     moveCameraCommandNames.some((commandName) =>
-      shortcuts.isPressed(inputManager, commandName, { ignoreShift: true })
+      shortcuts.isPressed(inputManager, commandName, true)
     );
 
   const snap = (value: float, size: float, offset: float) =>
@@ -5218,9 +5193,7 @@ namespace gdjs {
 
         const shortcuts = this._editorCamera.editor.getShortcuts();
         const isMoveCameraShortcutPressed = (commandName: string) =>
-          shortcuts.isPressed(inputManager, commandName, {
-            ignoreShift: true,
-          });
+          shortcuts.isPressed(inputManager, commandName, true);
         // Forward/back
         if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_FORWARD')) {
           moveCameraByVector(forward, moveSpeed);

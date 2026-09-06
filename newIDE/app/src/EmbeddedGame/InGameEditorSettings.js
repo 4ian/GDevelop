@@ -20,8 +20,10 @@ export type InGameEditorSettings = {
    * format as the IDE shortcuts (for example "Shift+KeyW"). An empty string
    * means that the command has no shortcut.
    */
-  shortcuts: { [string]: string },
+  shortcuts: { [CommandName]: string },
 };
+
+const commandNamesHandledByInGameEditor = getCommandNamesHandledByInGameEditor();
 
 /**
  * Generate the settings sent to the in-game editor, either at preview launch
@@ -36,18 +38,17 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
   const toolbarSeparatorColor = gdevelopTheme.toolbar.separatorColor;
   const textColorPrimary = gdevelopTheme.text.color.primary;
 
-  // The shortcut map is a new object at each render: the shortcuts handled by
-  // the in-game editor are serialized so that the settings only change when
-  // one of these shortcuts really changed.
   const shortcutMap = useShortcutMap();
-  const inGameEditorShortcutsJson = JSON.stringify(
-    getCommandNamesHandledByInGameEditor().reduce(
-      (shortcuts: { [CommandName]: string }, commandName) => {
-        shortcuts[commandName] = shortcutMap[commandName] || '';
-        return shortcuts;
-      },
-      {}
-    )
+  const shortcuts = React.useMemo(
+    () =>
+      commandNamesHandledByInGameEditor.reduce(
+        (shortcuts: { [CommandName]: string }, commandName) => {
+          shortcuts[commandName] = shortcutMap[commandName] || '';
+          return shortcuts;
+        },
+        {}
+      ),
+    [shortcutMap]
   );
 
   const inGameEditorSettings = React.useMemo<InGameEditorSettings>(
@@ -59,7 +60,7 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
         toolbarSeparatorColor,
         textColorPrimary,
       },
-      shortcuts: JSON.parse(inGameEditorShortcutsJson),
+      shortcuts,
     }),
     [
       iconButtonSelectedBackgroundColor,
@@ -67,7 +68,7 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
       toolbarBackgroundColor,
       toolbarSeparatorColor,
       textColorPrimary,
-      inGameEditorShortcutsJson,
+      shortcuts,
     ]
   );
 

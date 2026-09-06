@@ -9,17 +9,23 @@ import './SettingsRow.css';
 // (toggles, select fields, buttons, shortcuts...) are aligned like in a table.
 // On mobile, the control takes the full width, on its own line.
 const controlColumnWidth = '40%';
+// Fixed height of the rows (except on mobile, where the control is on its own
+// line), so that all the rows have the same height whatever their control:
+// a toggle, a select field or a button.
+const rowHeight = 40;
 
 const styles = {
   row: {
     display: 'flex',
     alignItems: 'center',
+    boxSizing: 'border-box',
     padding: `${marginsSize / 2}px ${marginsSize}px`,
   },
   // On mobile, the control is displayed on its own line, below the label.
   rowOnMobile: {
     flexDirection: 'column',
     alignItems: 'stretch',
+    height: 'auto',
   },
   labelColumn: {
     flex: 1,
@@ -40,6 +46,25 @@ const styles = {
     paddingTop: marginsSize / 2,
   },
 };
+
+type SettingsRowControlIds = {|
+  /** The id to give to the control, so that clicking on the label focuses it. */
+  controlId: string,
+  /** The id of the label, to use as `aria-labelledby` on the control. */
+  labelId: string,
+|};
+
+const SettingsRowContext = React.createContext<?SettingsRowControlIds>(null);
+
+/**
+ * The ids of the label and of the control of the enclosing settings row, so
+ * that a control can be labelled by the row (for accessibility and to be
+ * toggled by a click on the label).
+ */
+export const useSettingsRowControlIds = (): ?SettingsRowControlIds =>
+  React.useContext(SettingsRowContext);
+
+let generatedRowIdsCount = 0;
 
 type Props = {|
   id?: string,
@@ -63,15 +88,34 @@ const SettingsRow = ({
   children,
 }: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
+  const generatedIdRef = React.useRef<string>('');
+  if (!generatedIdRef.current) {
+    generatedRowIdsCount++;
+    generatedIdRef.current = `settings-row-${generatedRowIdsCount}`;
+  }
+  const rowId = id || generatedIdRef.current;
+  const controlIds = React.useMemo(
+    () => ({ controlId: `${rowId}-control`, labelId: `${rowId}-label` }),
+    [rowId]
+  );
 
   return (
     <div
       id={id}
       className="settings-row"
-      style={{ ...styles.row, ...(isMobile ? styles.rowOnMobile : {}) }}
+      style={{
+        ...styles.row,
+        // A description takes a second line: the row can't have the fixed height.
+        height: description ? 'auto' : rowHeight,
+        ...(isMobile ? styles.rowOnMobile : {}),
+      }}
     >
       <div style={styles.labelColumn}>
-        <Text noMargin>{label}</Text>
+        <label htmlFor={controlIds.controlId} id={controlIds.labelId}>
+          <Text noMargin displayInlineAsSpan>
+            {label}
+          </Text>
+        </label>
         {description && (
           <Text noMargin size="body-small" color="secondary">
             {description}
@@ -88,7 +132,9 @@ const SettingsRow = ({
               }
         }
       >
-        {children}
+        <SettingsRowContext.Provider value={controlIds}>
+          {children}
+        </SettingsRowContext.Provider>
       </div>
     </div>
   );

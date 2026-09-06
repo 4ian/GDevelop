@@ -11,9 +11,9 @@ import ShortcutsListRow from './ShortcutsListRow';
 import commandsList, {
   type CommandName,
   commandAreas,
+  getDisplayedCommandAreaNames,
 } from '../CommandPalette/CommandsList';
 import { ColumnStackLayout } from '../UI/Layout';
-import Window from '../Utils/Window';
 
 const styles = {
   section: {
@@ -43,16 +43,23 @@ const getPatchedShortcutString = (
 
 /**
  * The shortcuts of the commands handled by the in-game editor are only active
- * when the game preview has the focus, while the other ones are active in the
- * IDE: two commands can only clash if they are in the same context.
+ * when the game preview has the focus, and the preview forwards to the IDE the
+ * keys pressed with a modifier. So a shortcut without modifier can't clash
+ * between the two contexts, while a shortcut with a modifier can (the in-game
+ * editor takes it over when it has the focus).
  */
 const getShortcutContextKey = (
   commandName: CommandName,
   shortcutString: string
-): string =>
-  (commandsList[commandName].handledByInGameEditor
-    ? 'in-game-editor:'
-    : 'ide:') + shortcutString;
+): string => {
+  const isIsolatedInGameEditorShortcut =
+    !!commandsList[commandName].handledByInGameEditor &&
+    !shortcutString.includes('+');
+  return (
+    (isIsolatedInGameEditorShortcut ? 'in-game-editor:' : 'ide:') +
+    shortcutString
+  );
+};
 
 /**
  * Sorts all commands into an object keyed by area name, and also creates a
@@ -128,9 +135,8 @@ export const getShortcutSections = (
 
   // The areas are displayed in the order of `commandAreas`, which is also the
   // order of the areas list in the preferences dialog.
-  return Object.keys(commandAreas)
+  return getDisplayedCommandAreaNames()
     .filter(areaName => !!areaWiseCommands[areaName])
-    .filter(areaName => areaName !== 'DEVELOPER' || Window.isDev())
     .map(
       (areaName): ShortcutSectionData => {
         const rows: Array<ShortcutRowData> = areaWiseCommands[areaName]
@@ -194,8 +200,6 @@ type Props = {|
   onEdit: (commandName: CommandName, shortcut: string) => void,
   /** Filter the displayed commands by name or by shortcut. */
   searchText?: string,
-  /** Only display the commands of this area, without the area title. */
-  areaName?: string,
   /** Give an id to the element of each area, to be able to scroll to it. */
   getSectionElementId?: (areaName: string) => string,
 |};
@@ -214,7 +218,7 @@ const ShortcutsList = (props: Props): React.Node => {
     props.i18n,
     props.userShortcutMap,
     props.searchText || ''
-  ).filter(section => !props.areaName || section.areaName === props.areaName);
+  );
 
   return (
     <ColumnStackLayout noMargin expand>
@@ -227,9 +231,9 @@ const ShortcutsList = (props: Props): React.Node => {
                 ? props.getSectionElementId(section.areaName)
                 : undefined
             }
-            style={props.areaName ? styles.section : styles.areaSection}
+            style={styles.areaSection}
           >
-            {!props.areaName && <Text size="block-title">{section.title}</Text>}
+            <Text size="block-title">{section.title}</Text>
             <div style={styles.section}>
               {section.rows.map(row => (
                 <ShortcutsListRow

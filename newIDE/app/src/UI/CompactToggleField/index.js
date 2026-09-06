@@ -20,6 +20,10 @@ type Props = {|
   label: string,
   markdownDescription?: ?string,
   id?: string,
+  /** The id of the checkbox itself, to be targeted by an external label. */
+  inputId?: string,
+  /** The id of the element labelling the toggle, when `label` is empty. */
+  ariaLabelledBy?: string,
   checked: boolean,
   onCheck: (newValue: boolean) => void,
   disabled?: boolean,
@@ -61,6 +65,8 @@ export const CompactToggleField = (props: Props): React.MixedElement => {
       <div className={classes.toggleSwitch}>
         <input
           type="checkbox"
+          id={props.inputId}
+          aria-labelledby={props.ariaLabelledBy}
           className={classes.checkbox}
           onChange={() => props.onCheck(!props.checked)}
           disabled={props.disabled}

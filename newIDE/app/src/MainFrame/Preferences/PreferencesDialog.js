@@ -23,7 +23,7 @@ import Text from '../../UI/Text';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { Tabs } from '../../UI/Tabs';
-import SettingsRow from '../../UI/SettingsRow';
+import SettingsRow, { useSettingsRowControlIds } from '../../UI/SettingsRow';
 import VerticalTabButton from '../../UI/VerticalTabButton';
 import SearchBar from '../../UI/SearchBar';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
@@ -33,7 +33,12 @@ import ShortcutsList, {
 } from '../../KeyboardShortcuts/ShortcutsList';
 import { LanguageSelectField } from './LanguageSelector';
 import Link from '../../UI/Link';
-import { commandAreas } from '../../CommandPalette/CommandsList';
+import {
+  commandAreas,
+  getDisplayedCommandAreaNames,
+  type CommandArea,
+} from '../../CommandPalette/CommandsList';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { adaptAcceleratorString } from '../../UI/AcceleratorString';
 import {
@@ -88,8 +93,6 @@ export type PreferencesSectionName =
 
 export type PreferencesTabName = 'preferences' | 'shortcuts';
 
-type ShortcutArea = $Keys<typeof commandAreas>;
-
 type GetIconFunction = ({
   color: string,
   fontSize: 'inherit' | 'small',
@@ -97,129 +100,113 @@ type GetIconFunction = ({
 
 type PreferencesSection = {|
   name: PreferencesSectionName,
-  label: React.Node,
-  /** The label as a string, used by the search. */
-  getSearchableLabel: (i18n: I18n) => string,
+  /** The label, displayed with `i18n._` and used by the search. */
+  label: MessageDescriptor,
   getIcon: GetIconFunction,
 |};
 
 const sections: Array<PreferencesSection> = [
   {
     name: 'general',
-    label: <Trans>General</Trans>,
-    getSearchableLabel: i18n => i18n._(t`General`),
+    label: t`General`,
     getIcon: ({ color, fontSize }) => (
       <TuneIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'updates',
-    label: <Trans>Updates</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Updates`),
+    label: t`Updates`,
     getIcon: ({ color, fontSize }) => (
       <UpdateIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'help',
-    label: <Trans>Help and tutorials</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Help and tutorials`),
+    label: t`Help and tutorials`,
     getIcon: ({ color, fontSize }) => (
       <HelpIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'appearance',
-    label: <Trans>Appearance</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Appearance`),
+    label: t`Appearance`,
     getIcon: ({ color, fontSize }) => (
       <BrushIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'layouts',
-    label: <Trans>Layouts</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Layouts`),
+    label: t`Layouts`,
     getIcon: ({ color, fontSize }) => (
       <GridIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'dialogs',
-    label: <Trans>Dialogs</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Dialogs`),
+    label: t`Dialogs`,
     getIcon: ({ color, fontSize }) => (
       <DesktopIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'events-sheet',
-    label: <Trans>Events Sheet</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Events Sheet`),
+    label: t`Events Sheet`,
     getIcon: ({ color, fontSize }) => (
       <EventsIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'previews',
-    label: <Trans>Previews & Saves</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Previews & Saves`),
+    label: t`Previews & Saves`,
     getIcon: ({ color, fontSize }) => (
       <PlayIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'scene-editor',
-    label: <Trans>Scene editor</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Scene editor`),
+    label: t`Scene editor`,
     getIcon: ({ color, fontSize }) => (
       <SceneIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'ask-ai',
-    label: <Trans>Ask AI</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Ask AI`),
+    label: t`Ask AI`,
     getIcon: ({ color, fontSize }) => (
       <RobotFaceIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'extensions',
-    label: <Trans>Extensions</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Extensions`),
+    label: t`Extensions`,
     getIcon: ({ color, fontSize }) => (
       <ExtensionIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'folders',
-    label: <Trans>Folders</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Folders`),
+    label: t`Folders`,
     getIcon: ({ color, fontSize }) => (
       <FolderIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'contributor',
-    label: <Trans>Contributor options</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Contributor options`),
+    label: t`Contributor options`,
     getIcon: ({ color, fontSize }) => (
       <HammerIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'experimental',
-    label: <Trans>Experimental</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Experimental`),
+    label: t`Experimental`,
     getIcon: ({ color, fontSize }) => (
       <SparkleIcon fontSize={fontSize} color={color} />
     ),
   },
   {
     name: 'other',
-    label: <Trans>Advanced</Trans>,
-    getSearchableLabel: i18n => i18n._(t`Advanced`),
+    label: t`Advanced`,
     getIcon: ({ color, fontSize }) => (
       <SettingsIcon fontSize={fontSize} color={color} />
     ),
@@ -229,8 +216,7 @@ const sections: Array<PreferencesSection> = [
     ? [
         {
           name: 'developer',
-          label: <Trans>Developer</Trans>,
-          getSearchableLabel: i18n => i18n._(t`Developer`),
+          label: t`Developer`,
           getIcon: ({ color, fontSize }) => (
             <DebugIcon fontSize={fontSize} color={color} />
           ),
@@ -240,62 +226,42 @@ const sections: Array<PreferencesSection> = [
 ];
 
 type ShortcutAreaDefinition = {|
-  name: ShortcutArea,
+  name: CommandArea,
   getIcon: GetIconFunction,
 |};
 
 /**
- * The areas of the commands, displayed as the sections of the shortcuts tab.
- * Their labels come from `commandAreas`.
+ * The icons of the areas of the commands. The areas themselves (and their
+ * labels and order) come from `commandAreas`, displayed as the sections of the
+ * shortcuts tab.
  */
-const shortcutAreas: Array<ShortcutAreaDefinition> = [
-  {
-    name: 'GENERAL',
-    getIcon: ({ color, fontSize }) => (
-      <TuneIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  {
-    name: 'PROJECT',
-    getIcon: ({ color, fontSize }) => (
-      <ProjectManagerIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  {
-    name: 'SCENE',
-    getIcon: ({ color, fontSize }) => (
-      <SceneIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  {
-    name: 'SCENE_3D',
-    getIcon: ({ color, fontSize }) => (
-      <Object3dIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  {
-    name: 'TILEMAP',
-    getIcon: ({ color, fontSize }) => (
-      <Grid2dIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  {
-    name: 'EVENTS',
-    getIcon: ({ color, fontSize }) => (
-      <EventsIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  ...(Window.isDev()
-    ? [
-        {
-          name: 'DEVELOPER',
-          getIcon: ({ color, fontSize }) => (
-            <DebugIcon fontSize={fontSize} color={color} />
-          ),
-        },
-      ]
-    : []),
-];
+const shortcutAreaIcons: { [CommandArea]: GetIconFunction } = {
+  GENERAL: ({ color, fontSize }) => (
+    <TuneIcon fontSize={fontSize} color={color} />
+  ),
+  PROJECT: ({ color, fontSize }) => (
+    <ProjectManagerIcon fontSize={fontSize} color={color} />
+  ),
+  SCENE: ({ color, fontSize }) => (
+    <SceneIcon fontSize={fontSize} color={color} />
+  ),
+  SCENE_3D: ({ color, fontSize }) => (
+    <Object3dIcon fontSize={fontSize} color={color} />
+  ),
+  TILEMAP: ({ color, fontSize }) => (
+    <Grid2dIcon fontSize={fontSize} color={color} />
+  ),
+  EVENTS: ({ color, fontSize }) => (
+    <EventsIcon fontSize={fontSize} color={color} />
+  ),
+  DEVELOPER: ({ color, fontSize }) => (
+    <DebugIcon fontSize={fontSize} color={color} />
+  ),
+};
+
+const shortcutAreas: Array<ShortcutAreaDefinition> = getDisplayedCommandAreaNames().map(
+  areaName => ({ name: areaName, getIcon: shortcutAreaIcons[areaName] })
+);
 
 /**
  * A setting displayed as a row: a translated label (also used by the search)
@@ -386,6 +352,30 @@ type Props = {|
   isDesktop?: boolean,
 |};
 
+/**
+ * A toggle alone, labelled by the settings row containing it: clicking on the
+ * label of the row toggles it, and screen readers read the label.
+ */
+const SettingToggle = ({
+  checked,
+  onCheck,
+}: {|
+  checked: boolean,
+  onCheck: (newValue: boolean) => void,
+|}) => {
+  const controlIds = useSettingsRowControlIds();
+  return (
+    <CompactToggleField
+      label=""
+      hideTooltip
+      inputId={controlIds ? controlIds.controlId : undefined}
+      ariaLabelledBy={controlIds ? controlIds.labelId : undefined}
+      checked={checked}
+      onCheck={onCheck}
+    />
+  );
+};
+
 const PreferencesDialog = ({
   i18n,
   onClose,
@@ -406,7 +396,7 @@ const PreferencesDialog = ({
   const [
     currentShortcutArea,
     setCurrentShortcutArea,
-  ] = React.useState<ShortcutArea>('GENERAL');
+  ] = React.useState<CommandArea>('GENERAL');
   const [searchText, setSearchText] = React.useState<string>('');
   const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
     false
@@ -560,7 +550,7 @@ const PreferencesDialog = ({
 
     if (currentTab === 'preferences') {
       const sectionNameAtTop = getEntryKeyAtTop(
-        getVisibleSections().map(section => section.name),
+        visibleSections.map(section => section.name),
         getSectionElementId
       );
       if (sectionNameAtTop && sectionNameAtTop !== currentSection) {
@@ -605,14 +595,7 @@ const PreferencesDialog = ({
   const renderToggle = (
     checked: boolean,
     onCheck: (newValue: boolean) => void
-  ) => (
-    <CompactToggleField
-      label=""
-      hideTooltip
-      checked={checked}
-      onCheck={onCheck}
-    />
-  );
+  ) => <SettingToggle checked={checked} onCheck={onCheck} />;
 
   const renderResetLayoutButton = (editorMosaicName: EditorMosaicName) => (
     <FlatButton
@@ -1004,7 +987,7 @@ const PreferencesDialog = ({
             {
               id: 'take-screenshot-on-preview',
               label: i18n._(
-                t`Automatically take a screenshot in game previews`
+                t`Take a screenshot in previews for the game dashboard and gd.games`
               ),
               renderControl: () =>
                 renderToggle(
@@ -1052,6 +1035,16 @@ const PreferencesDialog = ({
                   },
                 ]
               : []),
+            {
+              id: 'display-save-reminder',
+              label: i18n._(
+                t`Display save reminder after significant changes in project`
+              ),
+              renderControl: () =>
+                renderToggle(values.displaySaveReminder.activated, check =>
+                  setDisplaySaveReminder({ activated: check })
+                ),
+            },
           ],
         };
       case 'scene-editor':
@@ -1153,16 +1146,6 @@ const PreferencesDialog = ({
         return {
           settings: [
             {
-              id: 'display-save-reminder',
-              label: i18n._(
-                t`Display save reminder after significant changes in project`
-              ),
-              renderControl: () =>
-                renderToggle(values.displaySaveReminder.activated, check =>
-                  setDisplaySaveReminder({ activated: check })
-                ),
-            },
-            {
               id: 'use-background-serializer-for-saving',
               label: i18n._(
                 t`Use experimental background serializer for saving projects`
@@ -1206,19 +1189,8 @@ const PreferencesDialog = ({
           ],
         };
       case 'folders':
-        if (!isDesktop) {
-          return {
-            settings: [],
-            renderHeader: () => (
-              <Text noMargin color="secondary">
-                <Trans>
-                  The folders can only be configured in the desktop version of
-                  GDevelop.
-                </Trans>
-              </Text>
-            ),
-          };
-        }
+        // Only in the desktop version: the section is hidden otherwise.
+        if (!isDesktop) return { settings: [] };
         return {
           settings: [
             {
@@ -1306,13 +1278,21 @@ const PreferencesDialog = ({
    * (for example when its settings are only available on some platforms) is
    * hidden from the sections list and the content.
    */
-  const getVisibleSections = (): Array<PreferencesSection> =>
-    sections.filter(section => {
+  const visibleSections: Array<PreferencesSection> = sections.filter(
+    section => {
       const { settings, renderHeader, renderFooter } = getSectionContent(
         section.name
       );
       return settings.length > 0 || !!renderHeader || !!renderFooter;
-    });
+    }
+  );
+  // The current section can be hidden (an initial section without any setting
+  // on this platform): the first visible section is highlighted instead.
+  const highlightedSectionName = visibleSections.some(
+    section => section.name === currentSection
+  )
+    ? currentSection
+    : visibleSections[0].name;
 
   const renderSettingsRows = (settings: Array<SettingDefinition>) => (
     <Column noMargin>
@@ -1341,7 +1321,7 @@ const PreferencesDialog = ({
       >
         <ColumnStackLayout noMargin expand>
           <Text size="section-title" noMargin>
-            {section.label}
+            {i18n._(section.label)}
           </Text>
           {renderHeader && renderHeader()}
           {settings.length > 0 && renderSettingsRows(settings)}
@@ -1382,7 +1362,7 @@ const PreferencesDialog = ({
 
     return (
       <ColumnStackLayout noMargin expand>
-        {getVisibleSections().map(renderSection)}
+        {visibleSections.map(renderSection)}
       </ColumnStackLayout>
     );
   };
@@ -1398,9 +1378,11 @@ const PreferencesDialog = ({
       getShortcutSections(i18n, values.userShortcutMap, searchText).length > 0;
     const matchingSections = sections
       .map(section => {
-        const { settings } = getSectionContent(section.name);
+        const { settings, renderHeader, renderFooter } = getSectionContent(
+          section.name
+        );
         const isSectionNameMatching = normalizeForSearch(
-          section.getSearchableLabel(i18n)
+          i18n._(section.label)
         ).includes(normalizedSearchText);
         const matchingSettings = isSectionNameMatching
           ? settings
@@ -1408,7 +1390,7 @@ const PreferencesDialog = ({
               normalizeForSearch(setting.label).includes(normalizedSearchText)
             );
         return matchingSettings.length > 0
-          ? { section, settings: matchingSettings }
+          ? { section, settings: matchingSettings, renderHeader, renderFooter }
           : null;
       })
       .filter(Boolean);
@@ -1423,12 +1405,16 @@ const PreferencesDialog = ({
 
     return (
       <ColumnStackLayout noMargin expand>
-        {matchingSections.map(({ section, settings }) => (
-          <Column noMargin key={section.name}>
-            <Text size="section-title">{section.label}</Text>
-            {renderSettingsRows(settings)}
-          </Column>
-        ))}
+        {matchingSections.map(
+          ({ section, settings, renderHeader, renderFooter }) => (
+            <Column noMargin key={section.name}>
+              <Text size="section-title">{i18n._(section.label)}</Text>
+              {renderHeader && renderHeader()}
+              {renderSettingsRows(settings)}
+              {renderFooter && renderFooter()}
+            </Column>
+          )
+        )}
         {hasMatchingShortcuts && (
           <Column noMargin>
             <Text size="section-title">
@@ -1450,8 +1436,7 @@ const PreferencesDialog = ({
     setSearchText('');
     setCurrentTab(tabName);
     // Start from the top of the new tab.
-    if (tabName === 'preferences')
-      setCurrentSection(getVisibleSections()[0].name);
+    if (tabName === 'preferences') setCurrentSection(visibleSections[0].name);
     else setCurrentShortcutArea(shortcutAreas[0].name);
     pendingScrollElementIdRef.current = '';
   };
@@ -1462,7 +1447,7 @@ const PreferencesDialog = ({
     pendingScrollElementIdRef.current = getSectionElementId(sectionName);
   };
 
-  const onSelectShortcutArea = (areaName: ShortcutArea) => {
+  const onSelectShortcutArea = (areaName: CommandArea) => {
     setSearchText('');
     setCurrentShortcutArea(areaName);
     pendingScrollElementIdRef.current = getShortcutAreaElementId(areaName);
@@ -1472,11 +1457,11 @@ const PreferencesDialog = ({
   // preferences sections or the shortcut areas, depending on the current tab.
   const sectionListEntries =
     currentTab === 'preferences'
-      ? getVisibleSections().map(section => ({
+      ? visibleSections.map(section => ({
           key: section.name,
-          label: section.label,
+          label: i18n._(section.label),
           getIcon: section.getIcon,
-          isActive: !isSearching && currentSection === section.name,
+          isActive: !isSearching && highlightedSectionName === section.name,
           onSelect: () => onSelectSection(section.name),
         }))
       : shortcutAreas.map(area => ({

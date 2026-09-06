@@ -240,7 +240,9 @@ export const getShortcutMetadataFromEvent = (
 export const useShortcutMap = (): ShortcutMap => {
   const preferences = React.useContext(PreferencesContext);
   const userShortcutMap = preferences.values.userShortcutMap;
-  return { ...defaultShortcuts, ...userShortcutMap };
+  return React.useMemo(() => ({ ...defaultShortcuts, ...userShortcutMap }), [
+    userShortcutMap,
+  ]);
 };
 
 type UseKeyboardShortcutsProps = {|
@@ -274,11 +276,15 @@ export const useKeyboardShortcuts = ({
         // the in-game editor are ignored: their shortcuts are only active
         // when the game preview has the focus, and are handled by the game.
         const commandName =
-          Object.keys(shortcutMap).find(
-            name =>
-              !commandsList[name].handledByInGameEditor &&
+          Object.keys(shortcutMap).find(name => {
+            // The user shortcut map can contain commands that don't exist anymore.
+            const command = commandsList[name];
+            return (
+              !!command &&
+              !command.handledByInGameEditor &&
               shortcutMap[name] === shortcutData.shortcutString
-          ) ||
+            );
+          }) ||
           Object.keys(defaultSecondaryShortcuts).find(
             name =>
               defaultSecondaryShortcuts[name] === shortcutData.shortcutString

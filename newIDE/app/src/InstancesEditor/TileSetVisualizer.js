@@ -784,45 +784,31 @@ const TileSetVisualizer = ({
 
   // The painting tools, used both by the toolbar buttons and by the keyboard
   // shortcuts (commands). Selecting the current tool again deselects it.
-  const defaultPaintingCoordinates: TileMapCoordinates[] = lastPaintingSelection
-    ? lastPaintingSelection.coordinates
-    : [{ x: 0, y: 0 }, { x: 0, y: 0 }];
   const isToolSelected = (kind: string): boolean =>
     !!tileMapTileSelection && tileMapTileSelection.kind === kind;
 
-  const toggleFreehandBrush = () => {
-    if (isToolSelected('freehand')) onSelectTileMapTile(null);
-    else
-      onSelectTileMapTile({
-        kind: 'freehand',
-        coordinates: defaultPaintingCoordinates,
-        flipHorizontally: shouldFlipHorizontally,
-        flipVertically: shouldFlipVertically,
-      });
-  };
-  const toggleRectanglePaint = () => {
-    if (isToolSelected('rectangle')) onSelectTileMapTile(null);
-    else
-      onSelectTileMapTile(
-        lastSelection && lastSelection.kind === 'rectangle'
-          ? lastSelection
-          : {
-              kind: 'rectangle',
-              coordinates: defaultPaintingCoordinates,
-              flipHorizontally: shouldFlipHorizontally,
-              flipVertically: shouldFlipVertically,
-            }
-      );
-  };
-  const toggleFillBucket = () => {
-    if (isToolSelected('floodfill')) onSelectTileMapTile(null);
-    else
-      onSelectTileMapTile({
-        kind: 'floodfill',
-        coordinates: defaultPaintingCoordinates,
-        flipHorizontally: shouldFlipHorizontally,
-        flipVertically: shouldFlipVertically,
-      });
+  const togglePaintingTool = (kind: 'freehand' | 'rectangle' | 'floodfill') => {
+    if (isToolSelected(kind)) {
+      onSelectTileMapTile(null);
+      return;
+    }
+    // The rectangle tool restores its last selection of tiles.
+    if (
+      kind === 'rectangle' &&
+      lastSelection &&
+      lastSelection.kind === 'rectangle'
+    ) {
+      onSelectTileMapTile(lastSelection);
+      return;
+    }
+    onSelectTileMapTile({
+      kind: (kind: any),
+      coordinates: lastPaintingSelection
+        ? lastPaintingSelection.coordinates
+        : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+      flipHorizontally: shouldFlipHorizontally,
+      flipVertically: shouldFlipVertically,
+    });
   };
   const toggleTilePicker = () => {
     if (isToolSelected('picker')) {
@@ -842,55 +828,81 @@ const TileSetVisualizer = ({
     !!tileMapTileSelection &&
     tileMapTileSelection.kind !== 'erase' &&
     tileMapTileSelection.kind !== 'picker';
-  const toggleFlipHorizontally = () => {
-    const newShouldFlipHorizontally = !shouldFlipHorizontally;
-    setShouldFlipHorizontally(newShouldFlipHorizontally);
+  const toggleFlip = (axis: 'flipHorizontally' | 'flipVertically') => {
+    const isHorizontal = axis === 'flipHorizontally';
+    const newShouldFlip = isHorizontal
+      ? !shouldFlipHorizontally
+      : !shouldFlipVertically;
+    if (isHorizontal) setShouldFlipHorizontally(newShouldFlip);
+    else setShouldFlipVertically(newShouldFlip);
     if (tileMapPaintingSelection) {
-      const selection: TileMapTileSelection = {
+      onSelectTileMapTile({
         kind: (tileMapPaintingSelection.kind: any),
         coordinates: (tileMapPaintingSelection.coordinates: TileMapCoordinates[]),
-        flipHorizontally: newShouldFlipHorizontally,
-        flipVertically: tileMapPaintingSelection.flipVertically,
-      };
-      onSelectTileMapTile(selection);
-    }
-  };
-  const toggleFlipVertically = () => {
-    const newShouldFlipVertically = !shouldFlipVertically;
-    setShouldFlipVertically(newShouldFlipVertically);
-    if (tileMapPaintingSelection) {
-      const selection: TileMapTileSelection = {
-        kind: (tileMapPaintingSelection.kind: any),
-        coordinates: (tileMapPaintingSelection.coordinates: TileMapCoordinates[]),
-        flipHorizontally: tileMapPaintingSelection.flipHorizontally,
-        flipVertically: newShouldFlipVertically,
-      };
-      onSelectTileMapTile(selection);
+        flipHorizontally: isHorizontal
+          ? newShouldFlip
+          : tileMapPaintingSelection.flipHorizontally,
+        flipVertically: isHorizontal
+          ? tileMapPaintingSelection.flipVertically
+          : newShouldFlip,
+      });
     }
   };
 
   // Keyboard shortcuts of the painting tools, only when the toolbar is shown.
+  // `useCommand` registers a command again each time its handler changes, and
+  // this component renders at each mouse move on the atlas: the handlers are
+  // kept stable and read the (fresh) tools from a ref when they are called.
+  const paintingToolsRef = React.useRef<{|
+    togglePaintingTool: typeof togglePaintingTool,
+    toggleTilePicker: typeof toggleTilePicker,
+    toggleErase: typeof toggleErase,
+    toggleFlip: typeof toggleFlip,
+  |}>({ togglePaintingTool, toggleTilePicker, toggleErase, toggleFlip });
+  paintingToolsRef.current = {
+    togglePaintingTool,
+    toggleTilePicker,
+    toggleErase,
+    toggleFlip,
+  };
+  const paintingCommandHandlers = React.useMemo(
+    () => ({
+      freehandBrush: () =>
+        paintingToolsRef.current.togglePaintingTool('freehand'),
+      rectanglePaint: () =>
+        paintingToolsRef.current.togglePaintingTool('rectangle'),
+      fillBucket: () =>
+        paintingToolsRef.current.togglePaintingTool('floodfill'),
+      tilePicker: () => paintingToolsRef.current.toggleTilePicker(),
+      erase: () => paintingToolsRef.current.toggleErase(),
+      flipHorizontally: () =>
+        paintingToolsRef.current.toggleFlip('flipHorizontally'),
+      flipVertically: () =>
+        paintingToolsRef.current.toggleFlip('flipVertically'),
+    }),
+    []
+  );
   const arePaintingCommandsEnabled = showPaintingToolbar && isAtlasImageSet;
   useCommand('TILEMAP_FREEHAND_BRUSH', arePaintingCommandsEnabled, {
-    handler: toggleFreehandBrush,
+    handler: paintingCommandHandlers.freehandBrush,
   });
   useCommand('TILEMAP_RECTANGLE_PAINT', arePaintingCommandsEnabled, {
-    handler: toggleRectanglePaint,
+    handler: paintingCommandHandlers.rectanglePaint,
   });
   useCommand('TILEMAP_FILL_BUCKET', arePaintingCommandsEnabled, {
-    handler: toggleFillBucket,
+    handler: paintingCommandHandlers.fillBucket,
   });
   useCommand('TILEMAP_TILE_PICKER', arePaintingCommandsEnabled, {
-    handler: toggleTilePicker,
+    handler: paintingCommandHandlers.tilePicker,
   });
   useCommand('TILEMAP_ERASE', showPaintingToolbar, {
-    handler: toggleErase,
+    handler: paintingCommandHandlers.erase,
   });
   useCommand('TILEMAP_FLIP_HORIZONTALLY', showPaintingToolbar && canFlip, {
-    handler: toggleFlipHorizontally,
+    handler: paintingCommandHandlers.flipHorizontally,
   });
   useCommand('TILEMAP_FLIP_VERTICALLY', showPaintingToolbar && canFlip, {
-    handler: toggleFlipVertically,
+    handler: paintingCommandHandlers.flipVertically,
   });
 
   return (
@@ -904,7 +916,7 @@ const TileSetVisualizer = ({
                 size="small"
                 tooltip={t`Freehand brush`}
                 selected={isToolSelected('freehand')}
-                onClick={toggleFreehandBrush}
+                onClick={() => togglePaintingTool('freehand')}
                 disabled={!isAtlasImageSet}
               >
                 <Brush style={styles.icon} />
@@ -914,7 +926,7 @@ const TileSetVisualizer = ({
                 size="small"
                 tooltip={t`Rectangle paint`}
                 selected={isToolSelected('rectangle')}
-                onClick={toggleRectanglePaint}
+                onClick={() => togglePaintingTool('rectangle')}
                 disabled={!isAtlasImageSet}
               >
                 <Rectangle style={styles.icon} />
@@ -924,7 +936,7 @@ const TileSetVisualizer = ({
                 size="small"
                 tooltip={t`Fill bucket`}
                 selected={isToolSelected('floodfill')}
-                onClick={toggleFillBucket}
+                onClick={() => togglePaintingTool('floodfill')}
                 disabled={!isAtlasImageSet}
               >
                 <Bucket style={styles.icon} />
@@ -956,7 +968,7 @@ const TileSetVisualizer = ({
                 tooltip={t`Horizontal flip`}
                 selected={shouldFlipHorizontally}
                 disabled={!canFlip}
-                onClick={toggleFlipHorizontally}
+                onClick={() => toggleFlip('flipHorizontally')}
               >
                 <FlipHorizontal style={styles.icon} />
               </IconButton>
@@ -966,7 +978,7 @@ const TileSetVisualizer = ({
                 tooltip={t`Vertical flip`}
                 selected={shouldFlipVertically}
                 disabled={!canFlip}
-                onClick={toggleFlipVertically}
+                onClick={() => toggleFlip('flipVertically')}
               >
                 <FlipVertical style={styles.icon} />
               </IconButton>

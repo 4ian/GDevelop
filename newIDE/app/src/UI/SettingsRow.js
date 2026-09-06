@@ -3,7 +3,6 @@ import * as React from 'react';
 import Text from './Text';
 import { marginsSize } from './Grid';
 import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
-import './SettingsRow.css';
 
 // Width of the control column, shared by all rows so that the controls
 // (toggles, select fields, buttons, shortcuts...) are aligned like in a table.
@@ -70,8 +69,6 @@ type Props = {|
   id?: string,
   /** The name of the setting, displayed on the left. */
   label: React.Node,
-  /** An optional explanation, displayed below the label. */
-  description?: React.Node,
   /** The control (toggle, select field, button...), aligned on the right. */
   children?: React.Node,
 |};
@@ -79,14 +76,8 @@ type Props = {|
 /**
  * A row of a settings list: a label on the left and a control aligned on the
  * right, in a fixed width column shared by all the rows, like in a table.
- * Rows must be direct siblings so that their background colors alternate.
  */
-const SettingsRow = ({
-  id,
-  label,
-  description,
-  children,
-}: Props): React.Node => {
+const SettingsRow = ({ id, label, children }: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const generatedIdRef = React.useRef<string>('');
   if (!generatedIdRef.current) {
@@ -102,11 +93,9 @@ const SettingsRow = ({
   return (
     <div
       id={id}
-      className="settings-row"
       style={{
         ...styles.row,
-        // A description takes a second line: the row can't have the fixed height.
-        height: description ? 'auto' : rowHeight,
+        height: rowHeight,
         ...(isMobile ? styles.rowOnMobile : {}),
       }}
     >
@@ -116,11 +105,6 @@ const SettingsRow = ({
             {label}
           </Text>
         </label>
-        {description && (
-          <Text noMargin size="body-small" color="secondary">
-            {description}
-          </Text>
-        )}
       </div>
       <div
         style={

@@ -107,7 +107,7 @@ export const LanguageSelectField = ({
 /**
  * The text inviting to contribute to the translations.
  */
-export const TranslationContributionText = (): React.Node => (
+const TranslationContributionText = (): React.Node => (
   <Text color="secondary">
     <Trans>
       You can{' '}

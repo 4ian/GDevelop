@@ -103,7 +103,7 @@ const sortCommandsIntoAreasAndGetReverseMap = (
 export const normalizeForSearch = (text: string): string =>
   text.toLowerCase().replace(/\s+/g, '');
 
-export type ShortcutRowData = {|
+type ShortcutRowData = {|
   commandName: CommandName,
   commandDisplayText: string,
   shortcutDisplayName: string,
@@ -112,7 +112,7 @@ export type ShortcutRowData = {|
   clashingCommandNames: Array<CommandName>,
 |};
 
-export type ShortcutSectionData = {|
+type ShortcutSectionData = {|
   areaName: string,
   title: string,
   rows: Array<ShortcutRowData>,

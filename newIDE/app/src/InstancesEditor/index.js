@@ -42,7 +42,10 @@ import { shouldPreventRenderingInstanceEditors } from '../UI/MaterialUISpecificU
 import {
   clampInstancesEditorZoom,
   getWheelStepZoomFactor,
+  lerpZoomWithDeltaTime,
+  isZoomCloseEnough,
 } from '../Utils/ZoomUtils';
+import { WheelInputClassifier } from '../Utils/WheelInputClassifier';
 import Background from './Background';
 import TileMapPaintingPreview, {
   updateSceneToTileMapTransformation,
@@ -195,6 +198,17 @@ export default class InstancesEditor extends Component<Props, State> {
   _stopNativeAppActivity: (() => void) | null = null;
   _renderingPausedReasons: Set<string> = new Set();
   nextFrame: AnimationFrameID;
+  // The zoom factor that interactive zooming (wheel, keyboard, pinch) is
+  // animating towards. `instancesEditorSettings.zoomFactor` (read via
+  // `getZoomFactor`) is smoothly interpolated towards this value every
+  // frame in `_updateZoomTowardsTarget`, instead of jumping instantly.
+  _targetZoomFactor: number = 1;
+  // When true, the per-frame zoom interpolation keeps the scene point
+  // under the cursor fixed (like `zoomOnCursorBy` used to do instantly).
+  // Set back to false by any zoom that isn't anchored on the cursor.
+  _shouldAnchorZoomOnCursor: boolean = false;
+  _lastZoomUpdateTime: number | null = null;
+  _wheelInputClassifier: WheelInputClassifier = new WheelInputClassifier();
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
   _showObjectInstancesIn3D: boolean = false;
@@ -209,6 +223,9 @@ export default class InstancesEditor extends Component<Props, State> {
     if (this.canvasArea && !this.pixiRenderer) {
       this._initializeCanvasAndRenderer();
     }
+
+    // Don't animate from some default value to the actual initial zoom.
+    this._targetZoomFactor = this.getZoomFactor();
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -329,7 +346,8 @@ export default class InstancesEditor extends Component<Props, State> {
       this.fpsLimiter.notifyInteractionHappened();
       const zoomFactor = this.getZoomFactor();
       if (this.keyboardShortcuts.shouldZoom(event)) {
-        this.zoomOnCursorBy(getWheelStepZoomFactor(-event.deltaY));
+        const device = this._wheelInputClassifier.classify(event);
+        this.zoomOnCursorBy(getWheelStepZoomFactor(-event.deltaY, device));
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         const deltaX = event.deltaY / (5 * zoomFactor);
         this.scrollBy(-deltaX, 0);
@@ -812,25 +830,75 @@ export default class InstancesEditor extends Component<Props, State> {
       this.instancesRenderer.resetInstanceRenderersFor(objectName);
   };
 
+  /**
+   * Set the zoom target that interactive zooming animates towards, without
+   * anchoring the zoom on the cursor position (so it zooms around the
+   * center of the view, like the previous instant behavior did).
+   */
   zoomBy = (value: number) => {
-    this.setZoomFactor(this.getZoomFactor() * value);
+    this._shouldAnchorZoomOnCursor = false;
+    this._targetZoomFactor = clampInstancesEditorZoom(
+      this._targetZoomFactor * value
+    );
+    this.fpsLimiter.notifyInteractionHappened();
   };
 
   /**
-   * Zoom and scroll so that the cursor stays on the same position scene-wise.
+   * Set the zoom target so that, as it animates there over the next few
+   * frames, the cursor stays on the same position scene-wise (see
+   * `_updateZoomTowardsTarget`, called from `_renderScene`).
    */
   zoomOnCursorBy(value: number) {
-    const beforeZoomCursorPosition = this.getLastCursorSceneCoordinates();
-    if (!beforeZoomCursorPosition) return;
-    this.setZoomFactor(this.getZoomFactor() * value);
-    const afterZoomCursorPosition = this.getLastCursorSceneCoordinates();
-    if (!afterZoomCursorPosition) return;
-    // Compensate for the cursor change in position
-    this.scrollBy(
-      beforeZoomCursorPosition[0] - afterZoomCursorPosition[0],
-      beforeZoomCursorPosition[1] - afterZoomCursorPosition[1]
+    if (!this.getLastCursorSceneCoordinates()) return;
+    this._shouldAnchorZoomOnCursor = true;
+    this._targetZoomFactor = clampInstancesEditorZoom(
+      this._targetZoomFactor * value
     );
+    this.fpsLimiter.notifyInteractionHappened();
   }
+
+  /**
+   * Smoothly moves the current zoom factor towards `_targetZoomFactor`,
+   * called every rendered frame. This is what makes interactive zoom
+   * (wheel, keyboard shortcuts) feel smooth instead of jumping instantly:
+   * `zoomBy`/`zoomOnCursorBy` only update the target, this does the
+   * actual, gradual work.
+   */
+  _updateZoomTowardsTarget = (deltaTimeInSeconds: number) => {
+    const currentZoomFactor = this.getZoomFactor();
+    if (isZoomCloseEnough(currentZoomFactor, this._targetZoomFactor)) return;
+
+    const beforeZoomCursorPosition = this._shouldAnchorZoomOnCursor
+      ? this.getLastCursorSceneCoordinates()
+      : null;
+
+    const newZoomFactor = lerpZoomWithDeltaTime(
+      currentZoomFactor,
+      this._targetZoomFactor,
+      deltaTimeInSeconds
+    );
+    // Use the low level setter here: it must NOT reset `_targetZoomFactor`,
+    // otherwise the target would collapse to this intermediate value and
+    // the animation would stop after a single tiny step.
+    this._setZoomFactorValue(newZoomFactor);
+
+    if (beforeZoomCursorPosition) {
+      const afterZoomCursorPosition = this.getLastCursorSceneCoordinates();
+      if (afterZoomCursorPosition) {
+        // Compensate for the cursor change in position, same as the old
+        // (instant) `zoomOnCursorBy` did - just done in small increments.
+        this.scrollBy(
+          beforeZoomCursorPosition[0] - afterZoomCursorPosition[0],
+          beforeZoomCursorPosition[1] - afterZoomCursorPosition[1]
+        );
+      }
+    }
+
+    // Keep rendering at full framerate until the animation has converged,
+    // even if there was no other user interaction on this frame (e.g. a
+    // zoom triggered by a keyboard shortcut).
+    this.fpsLimiter.notifyInteractionHappened();
+  };
 
   getTileMapTileSelection = (): any => {
     return this.props.tileMapTileSelection;
@@ -849,7 +917,24 @@ export default class InstancesEditor extends Component<Props, State> {
     return this.props.instancesEditorSettings.zoomFactor;
   };
 
+  /**
+   * Instantly set the zoom factor (used for zoom presets, "zoom to fit",
+   * pinch gestures...). Also resyncs the animation target to this value,
+   * so that any in-progress smooth zoom animation doesn't fight it and
+   * pull the zoom back afterwards.
+   */
   setZoomFactor = (zoomFactor: number) => {
+    const clampedZoomFactor = clampInstancesEditorZoom(zoomFactor);
+    this._targetZoomFactor = clampedZoomFactor;
+    this._setZoomFactorValue(clampedZoomFactor);
+  };
+
+  /**
+   * Low level setter, used both by `setZoomFactor` (instant zoom) and by
+   * `_updateZoomTowardsTarget` (one animation step towards the target).
+   * Does not touch `_targetZoomFactor`.
+   */
+  _setZoomFactorValue = (zoomFactor: number) => {
     this.props.instancesEditorSettings.zoomFactor = clampInstancesEditorZoom(
       zoomFactor
     );
@@ -1821,6 +1906,16 @@ export default class InstancesEditor extends Component<Props, State> {
 
     // Avoid killing the CPU by limiting the rendering calls.
     try {
+      const now = Date.now();
+      // Clamp the delta time: if the tab was backgrounded (or the
+      // debugger paused execution) between two frames, we don't want the
+      // zoom to jump straight to its target on the next frame.
+      const deltaTimeInSeconds = this._lastZoomUpdateTime
+        ? Math.min((now - this._lastZoomUpdateTime) / 1000, 0.1)
+        : 0;
+      this._lastZoomUpdateTime = now;
+      this._updateZoomTowardsTarget(deltaTimeInSeconds);
+
       if (
         this.fpsLimiter.shouldUpdate() &&
         !shouldPreventRenderingInstanceEditors()

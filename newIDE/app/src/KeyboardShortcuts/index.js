@@ -6,9 +6,10 @@ import reservedShortcuts from './ReservedShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 import isUserTyping from './IsUserTyping';
-import defaultShortcuts, {
+import {
   defaultSecondaryShortcuts,
   type ShortcutMap,
+  getDefaultShortcuts,
 } from './DefaultShortcuts';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import optionalRequire from '../Utils/OptionalRequire';
@@ -240,7 +241,10 @@ export const getShortcutMetadataFromEvent = (
 export const useShortcutMap = (): ShortcutMap => {
   const preferences = React.useContext(PreferencesContext);
   const userShortcutMap = preferences.values.userShortcutMap;
-  return { ...defaultShortcuts, ...userShortcutMap };
+  return {
+    ...getDefaultShortcuts(preferences.values.keyboardLayout),
+    ...userShortcutMap,
+  };
 };
 
 type UseKeyboardShortcutsProps = {|
@@ -270,10 +274,14 @@ export const useKeyboardShortcuts = ({
         const shortcutData = getShortcutMetadataFromEvent(e);
         if (!shortcutData.isValid) return;
 
-        // Get corresponding command, if it exists
+        // Get corresponding command, if it exists. The commands handled by
+        // the in-game editor are ignored: their shortcuts are only active
+        // when the game preview has the focus, and are handled by the game.
         const commandName =
           Object.keys(shortcutMap).find(
-            name => shortcutMap[name] === shortcutData.shortcutString
+            name =>
+              !commandsList[name].handledByInGameEditor &&
+              shortcutMap[name] === shortcutData.shortcutString
           ) ||
           Object.keys(defaultSecondaryShortcuts).find(
             name =>

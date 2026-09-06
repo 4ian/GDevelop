@@ -7,7 +7,10 @@ import type {
 } from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
-import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
+import {
+  type ShortcutMap,
+  type KeyboardLayout,
+} from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
@@ -225,6 +228,7 @@ export type PreferencesValues = {|
   resourcesImporationBehavior: ResourceImportationBehavior,
   eventsSheetCancelInlineParameter: 'cancel' | 'apply',
   showExperimentalExtensions: boolean,
+  keyboardLayout: KeyboardLayout,
   showCreateSectionByDefault: boolean,
   showInAppTutorialDeveloperMode: boolean,
   showDeprecatedInstructionWarning:
@@ -332,6 +336,7 @@ export type Preferences = {|
   setIsAlwaysOnTopInPreview: (enabled: boolean) => void,
   setEventsSheetCancelInlineParameter: (value: string) => void,
   setShowExperimentalExtensions: (enabled: boolean) => void,
+  setKeyboardLayout: (keyboardLayout: KeyboardLayout) => void,
   setShowCreateSectionByDefault: (enabled: boolean) => void,
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => void,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => void,
@@ -432,6 +437,7 @@ export const initialPreferences = {
     resourcesImporationBehavior: 'ask',
     eventsSheetCancelInlineParameter: 'apply',
     showExperimentalExtensions: false,
+    keyboardLayout: 'qwerty',
     showCreateSectionByDefault: false,
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
@@ -512,6 +518,7 @@ export const initialPreferences = {
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},
   setShowExperimentalExtensions: () => {},
+  setKeyboardLayout: () => {},
   setShowCreateSectionByDefault: (enabled: boolean) => {},
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => {},
   setShowDeprecatedInstructionWarning: (

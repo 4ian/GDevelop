@@ -22,7 +22,10 @@ import type {
 } from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
-import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
+import {
+  getDefaultShortcuts,
+  type KeyboardLayout,
+} from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import {
   getBrowserLanguageOrLocale,
@@ -132,6 +135,7 @@ export const getInitialPreferences = (): {
   showDeprecatedInstructionWarning: string,
   showEffectParameterNames: boolean,
   showExperimentalExtensions: boolean,
+  keyboardLayout: KeyboardLayout,
   showInAppTutorialDeveloperMode: boolean,
   takeScreenshotOnPreview: boolean,
   gameplayTestFramePosition: {| left: number, bottom: number |} | null,
@@ -309,6 +313,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowExperimentalExtensions: (this._setShowCommunityExtensions.bind(
       this
     ): any),
+    // $FlowFixMe[method-unbinding]
+    setKeyboardLayout: (this._setKeyboardLayout.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setShowCreateSectionByDefault: (this._setShowCreateSectionByDefault.bind(
       this
@@ -700,6 +706,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showExperimentalExtensions,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setKeyboardLayout(keyboardLayout: KeyboardLayout) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          keyboardLayout,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -1121,7 +1139,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setShortcutForCommand(commandName: CommandName, shortcutString: string) {
-    const defaultShortcut = defaultShortcuts[commandName] || '';
+    const defaultShortcut =
+      getDefaultShortcuts(this.state.values.keyboardLayout)[commandName] || '';
     const setToDefault = defaultShortcut === shortcutString;
 
     const updatedShortcutMap = { ...this.state.values.userShortcutMap };

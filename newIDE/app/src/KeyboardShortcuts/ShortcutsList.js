@@ -5,20 +5,30 @@ import { type I18n } from '@lingui/core';
 import Text from '../UI/Text';
 import EmptyMessage from '../UI/EmptyMessage';
 import DetectShortcutDialog from './DetectShortcutDialog';
-import { type ShortcutMap } from './DefaultShortcuts';
+import {
+  type ShortcutMap,
+  type KeyboardLayout,
+  getDefaultShortcuts,
+} from './DefaultShortcuts';
 import { getShortcutDisplayName } from './index';
-import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 import ShortcutsListRow from './ShortcutsListRow';
 import commandsList, {
   type CommandName,
   commandAreas,
 } from '../CommandPalette/CommandsList';
 import { ColumnStackLayout } from '../UI/Layout';
+import Window from '../Utils/Window';
 
 const styles = {
   section: {
     display: 'flex',
     flexDirection: 'column',
+  },
+  // An area with its title, separated from the previous one.
+  areaSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginTop: 10,
   },
 };
 
@@ -36,14 +46,30 @@ const getPatchedShortcutString = (
 };
 
 /**
+ * The shortcuts of the commands handled by the in-game editor are only active
+ * when the game preview has the focus, while the other ones are active in the
+ * IDE: two commands can only clash if they are in the same context.
+ */
+const getShortcutContextKey = (
+  commandName: CommandName,
+  shortcutString: string
+): string =>
+  (commandsList[commandName].handledByInGameEditor
+    ? 'in-game-editor:'
+    : 'ide:') + shortcutString;
+
+/**
  * Sorts all commands into an object keyed by area name, and also creates a
- * reverse mapping from shortcut string to list of commands with that shortcut.
+ * reverse mapping from shortcut (in its context, see `getShortcutContextKey`)
+ * to list of commands with that shortcut.
  */
 const sortCommandsIntoAreasAndGetReverseMap = (
-  userShortcutMap: ShortcutMap
+  userShortcutMap: ShortcutMap,
+  keyboardLayout: KeyboardLayout
 ) => {
+  const defaultShortcuts = getDefaultShortcuts(keyboardLayout);
   const areaWiseCommands = {};
-  const shortcutStringToCommands: { [string]: Array<CommandName> } = {};
+  const shortcutContextKeyToCommands: { [string]: Array<CommandName> } = {};
   Object.keys(commandsList)
     .filter(name => !commandsList[name].noShortcut)
     .forEach(name => {
@@ -62,12 +88,13 @@ const sortCommandsIntoAreasAndGetReverseMap = (
         userShortcut
       );
       if (shortcutString === '') return;
-      shortcutStringToCommands[shortcutString] = (
-        shortcutStringToCommands[shortcutString] || []
+      const shortcutContextKey = getShortcutContextKey(name, shortcutString);
+      shortcutContextKeyToCommands[shortcutContextKey] = (
+        shortcutContextKeyToCommands[shortcutContextKey] || []
       ).concat(name);
     });
 
-  return [areaWiseCommands, shortcutStringToCommands];
+  return [areaWiseCommands, shortcutContextKeyToCommands];
 };
 
 /**
@@ -99,15 +126,21 @@ export type ShortcutSectionData = {|
 export const getShortcutSections = (
   i18n: I18n,
   userShortcutMap: ShortcutMap,
+  keyboardLayout: KeyboardLayout,
   searchText: string
 ): Array<ShortcutSectionData> => {
+  const defaultShortcuts = getDefaultShortcuts(keyboardLayout);
   const [
     areaWiseCommands,
     shortcutStringToCommands,
-  ] = sortCommandsIntoAreasAndGetReverseMap(userShortcutMap);
+  ] = sortCommandsIntoAreasAndGetReverseMap(userShortcutMap, keyboardLayout);
   const normalizedSearchText = normalizeForSearch(searchText);
 
-  return Object.keys(areaWiseCommands)
+  // The areas are displayed in the order of `commandAreas`, which is also the
+  // order of the areas list in the preferences dialog.
+  return Object.keys(commandAreas)
+    .filter(areaName => !!areaWiseCommands[areaName])
+    .filter(areaName => areaName !== 'DEVELOPER' || Window.isDev())
     .map(areaName => {
       const rows = areaWiseCommands[areaName]
         .map(
@@ -162,11 +195,17 @@ export const getShortcutSections = (
 type Props = {|
   i18n: I18n,
   userShortcutMap: ShortcutMap,
+  /** The keyboard layout, which changes some default shortcuts. */
+  keyboardLayout: KeyboardLayout,
   onEdit: (commandName: CommandName, shortcut: string) => void,
   /** Filter the displayed commands by name or by shortcut. */
   searchText?: string,
   /** Only display the commands of this area, without the area title. */
   areaName?: string,
+  /** Give an id to the element of each area, to be able to scroll to it. */
+  getSectionElementId?: (areaName: string) => string,
+  /** Render content displayed at the top of an area, below its title. */
+  renderAreaHeader?: (areaName: string) => React.Node,
 |};
 
 const ShortcutsList = (props: Props): React.Node => {
@@ -176,12 +215,16 @@ const ShortcutsList = (props: Props): React.Node => {
   ] = React.useState<null | CommandName>(null);
 
   const resetShortcut = (commandName: CommandName) => {
-    props.onEdit(commandName, defaultShortcuts[commandName]);
+    props.onEdit(
+      commandName,
+      getDefaultShortcuts(props.keyboardLayout)[commandName]
+    );
   };
 
   const sections = getShortcutSections(
     props.i18n,
     props.userShortcutMap,
+    props.keyboardLayout,
     props.searchText || ''
   ).filter(section => !props.areaName || section.areaName === props.areaName);
 
@@ -189,8 +232,17 @@ const ShortcutsList = (props: Props): React.Node => {
     <ColumnStackLayout noMargin expand>
       {sections.length > 0 ? (
         sections.map(section => (
-          <div key={section.areaName} style={styles.section}>
+          <div
+            key={section.areaName}
+            id={
+              props.getSectionElementId
+                ? props.getSectionElementId(section.areaName)
+                : undefined
+            }
+            style={props.areaName ? styles.section : styles.areaSection}
+          >
             {!props.areaName && <Text size="block-title">{section.title}</Text>}
+            {props.renderAreaHeader && props.renderAreaHeader(section.areaName)}
             <div style={styles.section}>
               {section.rows.map(row => (
                 <ShortcutsListRow

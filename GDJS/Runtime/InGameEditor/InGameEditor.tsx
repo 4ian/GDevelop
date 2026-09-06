@@ -337,15 +337,7 @@ namespace gdjs {
   const RIGHT_CTRL_KEY = gdjs.InputManager.getLocationAwareKeyCode(CTRL_KEY, 2);
   const LEFT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(91, 1);
   const RIGHT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(93, 2);
-  const W_KEY = 87;
-  const A_KEY = 65;
   const C_KEY = 67;
-  const S_KEY = 83;
-  const D_KEY = 68;
-  const Q_KEY = 81;
-  const E_KEY = 69;
-  const F_KEY = 70;
-  const O_KEY = 79;
   const V_KEY = 86;
   const X_KEY = 88;
   const Y_KEY = 89;
@@ -353,10 +345,175 @@ namespace gdjs {
   const ESC_KEY = 27;
   const EQUAL_KEY = 187;
   const MINUS_KEY = 189;
-  const KEY_DIGIT_1 = 49;
-  const KEY_DIGIT_2 = 50;
-  const KEY_DIGIT_3 = 51;
   const ROTATION_SNAP_DEGREES = 45;
+
+  /**
+   * The key codes of the keys that can be used in a shortcut, by the name of
+   * the key in the IDE shortcuts (the `code` of the keyboard events).
+   */
+  const shortcutKeyCodes: { [code: string]: integer } = {
+    Tab: 9,
+    Space: 32,
+    Comma: 188,
+    Equal: 187,
+    Minus: 189,
+    NumpadAdd: 107,
+    NumpadSubtract: 109,
+  };
+  for (let letterIndex = 0; letterIndex < 26; letterIndex++) {
+    shortcutKeyCodes['Key' + String.fromCharCode(65 + letterIndex)] =
+      65 + letterIndex;
+  }
+  for (let digit = 0; digit <= 9; digit++) {
+    shortcutKeyCodes['Digit' + digit] = 48 + digit;
+  }
+  for (let functionKeyIndex = 1; functionKeyIndex <= 12; functionKeyIndex++) {
+    shortcutKeyCodes['F' + functionKeyIndex] = 111 + functionKeyIndex;
+  }
+
+  /**
+   * A shortcut parsed from the IDE format (for example "CmdOrCtrl+Shift+KeyW"):
+   * the key code of the key and the modifiers that must be pressed with it.
+   */
+  type ParsedShortcut = {
+    keyCode: integer;
+    ctrlOrCmd: boolean;
+    shift: boolean;
+    alt: boolean;
+  };
+
+  const parseShortcut = (shortcutString: string): ParsedShortcut | null => {
+    if (!shortcutString) return null;
+
+    const parsedShortcut: ParsedShortcut = {
+      keyCode: 0,
+      ctrlOrCmd: false,
+      shift: false,
+      alt: false,
+    };
+    for (const shortcutPart of shortcutString.split('+')) {
+      if (shortcutPart === 'CmdOrCtrl') parsedShortcut.ctrlOrCmd = true;
+      else if (shortcutPart === 'Shift') parsedShortcut.shift = true;
+      else if (shortcutPart === 'Alt') parsedShortcut.alt = true;
+      else if (shortcutKeyCodes[shortcutPart] !== undefined)
+        parsedShortcut.keyCode = shortcutKeyCodes[shortcutPart];
+      else return null;
+    }
+    return parsedShortcut.keyCode ? parsedShortcut : null;
+  };
+
+  /**
+   * The default shortcuts of the in-game editor, used when the IDE did not
+   * send its own (customized) shortcuts. Must be kept in sync with the
+   * defaults of the IDE (`DefaultShortcuts.js`).
+   */
+  const defaultInGameEditorShortcuts: { [commandName: string]: string } = {
+    IN_GAME_EDITOR_TRANSLATE_MODE: 'Digit1',
+    IN_GAME_EDITOR_ROTATE_MODE: 'Digit2',
+    IN_GAME_EDITOR_SCALE_MODE: 'Digit3',
+    IN_GAME_EDITOR_FOCUS_ON_SELECTION: 'KeyF',
+    IN_GAME_EDITOR_MOVE_CAMERA_FORWARD: 'KeyW',
+    IN_GAME_EDITOR_MOVE_CAMERA_BACKWARD: 'KeyS',
+    IN_GAME_EDITOR_MOVE_CAMERA_LEFT: 'KeyA',
+    IN_GAME_EDITOR_MOVE_CAMERA_RIGHT: 'KeyD',
+    IN_GAME_EDITOR_MOVE_CAMERA_UP: 'KeyE',
+    IN_GAME_EDITOR_MOVE_CAMERA_DOWN: 'KeyQ',
+    IN_GAME_EDITOR_ORBIT_CAMERA: 'KeyO',
+  };
+
+  /**
+   * The keyboard shortcuts of the in-game editor, customizable from the IDE.
+   * The keys of the shortcuts are checked with the input manager of the game.
+   */
+  class InGameEditorShortcuts {
+    private _parsedShortcuts: { [commandName: string]: ParsedShortcut } = {};
+
+    constructor() {
+      this.update({});
+    }
+
+    /**
+     * Set the shortcuts sent by the IDE. The commands that are not listed keep
+     * their default shortcut.
+     */
+    update(shortcuts: { [commandName: string]: string }): void {
+      const shortcutsWithDefaults = {
+        ...defaultInGameEditorShortcuts,
+        ...shortcuts,
+      };
+      this._parsedShortcuts = {};
+      for (const commandName in shortcutsWithDefaults) {
+        const parsedShortcut = parseShortcut(
+          shortcutsWithDefaults[commandName]
+        );
+        if (parsedShortcut) this._parsedShortcuts[commandName] = parsedShortcut;
+      }
+    }
+
+    private _areModifiersMatching(
+      inputManager: gdjs.InputManager,
+      parsedShortcut: ParsedShortcut,
+      ignoreShift: boolean
+    ): boolean {
+      return (
+        isControlOrCmdPressed(inputManager) === parsedShortcut.ctrlOrCmd &&
+        isAltPressed(inputManager) === parsedShortcut.alt &&
+        (ignoreShift || isShiftPressed(inputManager) === parsedShortcut.shift)
+      );
+    }
+
+    /**
+     * Check if the shortcut of a command is pressed (held down).
+     * `ignoreShift` allows Shift to be used as an extra modifier (for example
+     * to move the camera faster) without preventing the shortcut to match.
+     */
+    isPressed(
+      inputManager: gdjs.InputManager,
+      commandName: string,
+      { ignoreShift }: { ignoreShift: boolean } = { ignoreShift: false }
+    ): boolean {
+      const parsedShortcut = this._parsedShortcuts[commandName];
+      if (!parsedShortcut) return false;
+
+      return (
+        inputManager.isKeyPressed(parsedShortcut.keyCode) &&
+        this._areModifiersMatching(inputManager, parsedShortcut, ignoreShift)
+      );
+    }
+
+    /**
+     * Check if the shortcut of a command was just pressed during this frame.
+     */
+    wasJustPressed(
+      inputManager: gdjs.InputManager,
+      commandName: string
+    ): boolean {
+      const parsedShortcut = this._parsedShortcuts[commandName];
+      if (!parsedShortcut) return false;
+
+      return (
+        inputManager.wasKeyJustPressed(parsedShortcut.keyCode) &&
+        this._areModifiersMatching(inputManager, parsedShortcut, false)
+      );
+    }
+
+    /**
+     * Check if a key, with the modifiers currently pressed, is the shortcut of
+     * a command: such a key must not be forwarded to the IDE.
+     */
+    isShortcutKey(inputManager: gdjs.InputManager, keyCode: integer): boolean {
+      for (const commandName in this._parsedShortcuts) {
+        const parsedShortcut = this._parsedShortcuts[commandName];
+        if (
+          parsedShortcut.keyCode === keyCode &&
+          this._areModifiersMatching(inputManager, parsedShortcut, false)
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
 
   const exceptionallyGetKeyCodeFromLocationAwareKeyCode = (
     locationAwareKeyCode: number
@@ -395,6 +552,12 @@ namespace gdjs {
       toolbarSeparatorColor: string;
       textColorPrimary: string;
     };
+    /**
+     * The shortcuts handled by the in-game editor, by command name, in the
+     * format of the IDE shortcuts (for example "Shift+KeyW"). A command that
+     * is not listed keeps its default shortcut, an empty string removes it.
+     */
+    shortcuts?: { [commandName: string]: string };
   };
 
   const defaultInGameEditorSettings: InGameEditorSettings = {
@@ -405,6 +568,7 @@ namespace gdjs {
       toolbarSeparatorColor: 'black',
       textColorPrimary: 'black',
     },
+    shortcuts: {},
   };
 
   let hasWindowFocus = true;
@@ -570,23 +734,26 @@ namespace gdjs {
     return true;
   };
 
-  const freeCameraKeys = [
-    LEFT_KEY,
-    RIGHT_KEY,
-    UP_KEY,
-    DOWN_KEY,
-    W_KEY,
-    S_KEY,
-    A_KEY,
-    D_KEY,
-    Q_KEY,
-    E_KEY,
+  const arrowKeys = [LEFT_KEY, RIGHT_KEY, UP_KEY, DOWN_KEY];
+  const moveCameraCommandNames = [
+    'IN_GAME_EDITOR_MOVE_CAMERA_FORWARD',
+    'IN_GAME_EDITOR_MOVE_CAMERA_BACKWARD',
+    'IN_GAME_EDITOR_MOVE_CAMERA_LEFT',
+    'IN_GAME_EDITOR_MOVE_CAMERA_RIGHT',
+    'IN_GAME_EDITOR_MOVE_CAMERA_UP',
+    'IN_GAME_EDITOR_MOVE_CAMERA_DOWN',
   ];
-  const shouldSwitchToFreeCamera = (inputManager: gdjs.InputManager) =>
-    !isControlOrCmdPressed(inputManager) &&
-    !isAltPressed(inputManager) &&
-    !isShiftPressed(inputManager) &&
-    freeCameraKeys.some((key) => inputManager.isKeyPressed(key));
+  const shouldSwitchToFreeCamera = (
+    inputManager: gdjs.InputManager,
+    shortcuts: InGameEditorShortcuts
+  ) =>
+    (!isControlOrCmdPressed(inputManager) &&
+      !isAltPressed(inputManager) &&
+      !isShiftPressed(inputManager) &&
+      arrowKeys.some((key) => inputManager.isKeyPressed(key))) ||
+    moveCameraCommandNames.some((commandName) =>
+      shortcuts.isPressed(inputManager, commandName, { ignoreShift: true })
+    );
 
   const snap = (value: float, size: float, offset: float) =>
     size ? offset + size * Math.round((value - offset) / size) : value;
@@ -961,6 +1128,7 @@ namespace gdjs {
     private _instancesEditorSettings: InstancesEditorSettings | null = null;
     private _toolbar: Toolbar;
     private _inGameEditorSettings: InGameEditorSettings;
+    private _shortcuts: InGameEditorShortcuts = new InGameEditorShortcuts();
 
     constructor(
       game: RuntimeGame,
@@ -1032,7 +1200,16 @@ namespace gdjs {
       }
     }
 
+    /**
+     * The keyboard shortcuts of the in-game editor, as customized in the IDE.
+     */
+    getShortcuts(): InGameEditorShortcuts {
+      return this._shortcuts;
+    }
+
     private _applyInGameEditorSettings() {
+      this._shortcuts.update(this._inGameEditorSettings.shortcuts || {});
+
       if (typeof document === 'undefined') return;
 
       const rootElement = document.documentElement;
@@ -1707,13 +1884,19 @@ namespace gdjs {
       if (!currentScene) return;
 
       const selectedObject = this._selection.getLastSelectedObject();
-      if (inputManager.isKeyPressed(F_KEY) && selectedObject) {
+      if (
+        selectedObject &&
+        this._shortcuts.isPressed(
+          inputManager,
+          'IN_GAME_EDITOR_FOCUS_ON_SELECTION'
+        )
+      ) {
         this._focusOnSelection();
       }
 
       if (
         !this._getEditorCamera().isFreeCamera() &&
-        shouldSwitchToFreeCamera(inputManager)
+        shouldSwitchToFreeCamera(inputManager, this._shortcuts)
       ) {
         this._getEditorCamera().switchToFreeCamera();
       }
@@ -3150,6 +3333,9 @@ namespace gdjs {
         const keyCode =
           exceptionallyGetKeyCodeFromLocationAwareKeyCode(locationAwareKeyCode);
 
+        // A shortcut of the in-game editor is handled here, not by the IDE.
+        if (this._shortcuts.isShortcutKey(inputManager, keyCode)) continue;
+
         const debuggerClient = this._runtimeGame._debuggerClient;
         if (debuggerClient) {
           debuggerClient.sendKeyboardShortcut({
@@ -3658,11 +3844,26 @@ namespace gdjs {
 
     private _handleTransformControlsMode() {
       const inputManager = this._runtimeGame.getInputManager();
-      if (inputManager.wasKeyJustPressed(KEY_DIGIT_1)) {
+      if (
+        this._shortcuts.wasJustPressed(
+          inputManager,
+          'IN_GAME_EDITOR_TRANSLATE_MODE'
+        )
+      ) {
         this._setTransformControlsMode('translate');
-      } else if (inputManager.wasKeyJustPressed(KEY_DIGIT_2)) {
+      } else if (
+        this._shortcuts.wasJustPressed(
+          inputManager,
+          'IN_GAME_EDITOR_ROTATE_MODE'
+        )
+      ) {
         this._setTransformControlsMode('rotate');
-      } else if (inputManager.wasKeyJustPressed(KEY_DIGIT_3)) {
+      } else if (
+        this._shortcuts.wasJustPressed(
+          inputManager,
+          'IN_GAME_EDITOR_SCALE_MODE'
+        )
+      ) {
         this._setTransformControlsMode('scale');
       }
     }
@@ -4403,7 +4604,10 @@ namespace gdjs {
       }
       // With touches, 3 touches will orbit around the point "in front of the camera".
       if (
-        (touchCount === 3 || inputManager.isKeyPressed(O_KEY)) &&
+        (touchCount === 3 ||
+          this.editor
+            .getShortcuts()
+            .isPressed(inputManager, 'IN_GAME_EDITOR_ORBIT_CAMERA')) &&
         this.isFreeCamera()
       ) {
         const maxDistance = 4000; // Large enough to orbit quickly on most parts of a level.
@@ -4989,7 +5193,9 @@ namespace gdjs {
         }
 
         // Movement with the keyboard:
-        // Either arrow keys (move in the camera plane) or WASD ("FPS move" + Q/E for up/down).
+        // Either arrow keys (move in the camera plane) or the customizable
+        // shortcuts (by default WASD for a "FPS move" + Q/E for up/down).
+        // Shift makes the camera move faster.
         const moveSpeed = isShiftPressed(inputManager) ? 48 : 6;
 
         if (
@@ -5008,29 +5214,37 @@ namespace gdjs {
           if (inputManager.isKeyPressed(DOWN_KEY)) {
             moveCameraByVector(up, -moveSpeed);
           }
-          // Forward/back
-          if (inputManager.isKeyPressed(W_KEY)) {
-            moveCameraByVector(forward, moveSpeed);
-          }
-          if (inputManager.isKeyPressed(S_KEY)) {
-            moveCameraByVector(forward, -moveSpeed);
-          }
+        }
 
-          // Left/right (strafe)
-          if (inputManager.isKeyPressed(A_KEY)) {
-            moveCameraByVector(right, -moveSpeed);
-          }
-          if (inputManager.isKeyPressed(D_KEY)) {
-            moveCameraByVector(right, moveSpeed);
-          }
+        const shortcuts = this._editorCamera.editor.getShortcuts();
+        const isMoveCameraShortcutPressed = (commandName: string) =>
+          shortcuts.isPressed(inputManager, commandName, {
+            ignoreShift: true,
+          });
+        // Forward/back
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_FORWARD')) {
+          moveCameraByVector(forward, moveSpeed);
+        }
+        if (
+          isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_BACKWARD')
+        ) {
+          moveCameraByVector(forward, -moveSpeed);
+        }
 
-          // Up/down
-          if (inputManager.isKeyPressed(Q_KEY)) {
-            moveCameraByVector(up, -moveSpeed);
-          }
-          if (inputManager.isKeyPressed(E_KEY)) {
-            moveCameraByVector(up, moveSpeed);
-          }
+        // Left/right (strafe)
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_LEFT')) {
+          moveCameraByVector(right, -moveSpeed);
+        }
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_RIGHT')) {
+          moveCameraByVector(right, moveSpeed);
+        }
+
+        // Up/down
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_DOWN')) {
+          moveCameraByVector(up, -moveSpeed);
+        }
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_UP')) {
+          moveCameraByVector(up, moveSpeed);
         }
 
         // Movement with keyboard: zoom in/out.

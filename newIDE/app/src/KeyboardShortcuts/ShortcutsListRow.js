@@ -9,17 +9,13 @@ import SettingsRow from '../UI/SettingsRow';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 import Warning from '../UI/CustomSvgIcons/Warning';
 import Undo from '../UI/CustomSvgIcons/Undo';
-import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-
-// The reset button always has its own column, even when it's not displayed,
-// so that the shortcuts stay aligned on their right edge across all rows.
-const resetButtonColumnWidth = 40;
+import { marginsSize } from '../UI/Grid';
 
 const styles = {
   clashWarningCell: {
     display: 'flex',
     alignItems: 'center',
-    marginRight: 8,
+    marginRight: marginsSize,
   },
   shortcutCell: {
     display: 'flex',
@@ -27,12 +23,10 @@ const styles = {
     justifyContent: 'flex-end',
     minWidth: 0,
   },
-  resetButtonCell: {
-    width: resetButtonColumnWidth,
-    flexShrink: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+  // The reset button is kept in the layout even when it's not displayed, so
+  // that the shortcuts stay aligned on their right edge across all rows.
+  hiddenResetButton: {
+    visibility: 'hidden',
   },
   shortcutChip: {
     borderRadius: 3,
@@ -52,8 +46,6 @@ type Props = {|
 |};
 
 const ShortcutsListRow = (props: Props): React.Node => {
-  const { isMobile } = useResponsiveWindowSize();
-
   const commandDisplayText = props.i18n._(
     commandsList[props.commandName].displayText
   );
@@ -84,19 +76,16 @@ const ShortcutsListRow = (props: Props): React.Node => {
           label={props.shortcutString || <Trans>No shortcut</Trans>}
           onClick={props.onEditShortcut}
           color={props.shortcutString ? 'secondary' : 'default'}
-          size={isMobile ? 'small' : 'medium'}
         />
       </div>
-      <div style={styles.resetButtonCell}>
-        {!props.isDefault && (
-          <IconButton
-            onClick={props.onResetShortcut}
-            tooltip={t`Reset to default`}
-            size="small"
-          >
-            <Undo />
-          </IconButton>
-        )}
+      <div style={props.isDefault ? styles.hiddenResetButton : undefined}>
+        <IconButton
+          onClick={props.onResetShortcut}
+          tooltip={t`Reset to default`}
+          size="small"
+        >
+          <Undo />
+        </IconButton>
       </div>
     </SettingsRow>
   );

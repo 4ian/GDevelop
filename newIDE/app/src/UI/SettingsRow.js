@@ -1,23 +1,20 @@
 // @flow
 import * as React from 'react';
 import Text from './Text';
+import { marginsSize } from './Grid';
 import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 import './SettingsRow.css';
 
-// Fixed width of the control column, shared by all rows so that the controls
+// Width of the control column, shared by all rows so that the controls
 // (toggles, select fields, buttons, shortcuts...) are aligned like in a table.
 // On mobile, the control takes the full width, on its own line.
-export const settingsRowControlColumnWidth = 320;
+const controlColumnWidth = '40%';
 
 const styles = {
   row: {
     display: 'flex',
     alignItems: 'center',
-    paddingTop: 6,
-    paddingBottom: 6,
-    paddingLeft: 8,
-    paddingRight: 8,
-    borderRadius: 4,
+    padding: `${marginsSize / 2}px ${marginsSize}px`,
   },
   // On mobile, the control is displayed on its own line, below the label.
   rowOnMobile: {
@@ -29,7 +26,7 @@ const styles = {
     minWidth: 0,
     display: 'flex',
     flexDirection: 'column',
-    paddingRight: 8,
+    paddingRight: marginsSize,
   },
   controlColumn: {
     flexShrink: 0,
@@ -40,7 +37,7 @@ const styles = {
   },
   controlColumnOnMobile: {
     width: '100%',
-    paddingTop: 4,
+    paddingTop: marginsSize / 2,
   },
 };
 
@@ -87,7 +84,7 @@ const SettingsRow = ({
             ? { ...styles.controlColumn, ...styles.controlColumnOnMobile }
             : {
                 ...styles.controlColumn,
-                width: settingsRowControlColumnWidth,
+                width: controlColumnWidth,
               }
         }
       >

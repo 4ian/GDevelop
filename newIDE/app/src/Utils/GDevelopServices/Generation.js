@@ -679,7 +679,7 @@ export const suspendAiRequest = async (
 /**
  * Update what the user can set on an AI request: its title (`null` removes
  * it, its first user message is then shown as its name) and whether it's
- * archived. Only the given attributes are changed.
+ * archived.
  */
 export const updateAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
@@ -711,7 +711,6 @@ export const updateAiRequest = async (
   });
 };
 
-/** Delete an AI request: it's not listed nor readable anymore. */
 export const deleteAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
   { userId, aiRequestId }: {| userId: string, aiRequestId: string |}

@@ -156,7 +156,9 @@ type State = {|
   doMoveEventsBasedBehaviorToCb:
     | null
     | ((destinationExtensionName: string) => void),
-  doMoveEventsFunctionToCb: null | ((destinationExtensionName: string) => void),
+  doMoveEventsFunctionToCb:
+    | null
+    | ((destinationExtensionName: string) => Promise<void>),
 |};
 
 const extensionEditIconReactNode = <ExtensionEditIcon />;
@@ -923,8 +925,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   _moveEventsFunctionTo = (
-    eventsFunction: gdEventsFunction,
-    doMoveEventsFunctionToCb: (destinationExtensionName: string) => void
+    doMoveEventsFunctionToCb: (
+      destinationExtensionName: string
+    ) => Promise<void>
   ) => {
     this.setState({
       isMoveEventsFunctionDialogOpen: true,
@@ -943,8 +946,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         selectedEventsFunction: null,
       },
       () => {
-        if (doMoveEventsFunctionToCb && destinationExtensionName)
+        if (doMoveEventsFunctionToCb && destinationExtensionName) {
           doMoveEventsFunctionToCb(destinationExtensionName);
+        }
       }
     );
   };

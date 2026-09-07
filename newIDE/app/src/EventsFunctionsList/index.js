@@ -1324,6 +1324,8 @@ const EventsFunctionsList = React.forwardRef<
           setSelectedFunctionFolderOrFunction.current,
         onEventsFunctionAdded,
         onSelectEventsFunction,
+        moveEventsFunctionTo,
+        onEventsFunctionMoved,
       }),
       [
         treeItemProps,
@@ -1334,6 +1336,8 @@ const EventsFunctionsList = React.forwardRef<
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
         onEventsFunctionAdded,
         onSelectEventsFunction,
+        moveEventsFunctionTo,
+        onEventsFunctionMoved,
       ]
     );
 

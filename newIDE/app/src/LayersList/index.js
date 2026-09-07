@@ -719,9 +719,10 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         selectedItem.content.moveAt(
           destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
         );
+        onLayersModified();
         onTreeModified(true);
       },
-      [onTreeModified, selectedItems]
+      [onLayersModified, onTreeModified, selectedItems]
     );
 
     /**

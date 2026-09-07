@@ -27,6 +27,7 @@ import {
   type SceneEditorsDisplayProps,
   type SceneEditorsDisplayInterface,
 } from '../EditorsDisplay.flow';
+import { type FieldModificationContext } from '../../CompactPropertiesEditor';
 import {
   InstanceOrObjectPropertiesEditorContainer,
   type InstanceOrObjectPropertiesEditorInterface,
@@ -154,11 +155,25 @@ const MosaicEditorsDisplay: React.ComponentType<{
     }, []);
 
     const _onInstancesModified = React.useCallback(
-      (instances: Array<gdInitialInstance>) => {
-        if (onInstancesModified) onInstancesModified(instances);
+      (
+        instances: Array<gdInitialInstance>,
+        context: ?FieldModificationContext
+      ) => {
+        if (onInstancesModified)
+          onInstancesModified(instances, {
+            editorId: 'properties',
+            fieldName: context ? context.fieldName : undefined,
+          });
         forceUpdateInstancesList();
       },
       [onInstancesModified, forceUpdateInstancesList]
+    );
+    const _onInstancesModifiedInInstancesList = React.useCallback(
+      (instances: Array<gdInitialInstance>) => {
+        if (onInstancesModified)
+          onInstancesModified(instances, { editorId: 'instances-list' });
+      },
+      [onInstancesModified]
     );
     const toggleEditorView = React.useCallback((editorId: EditorId) => {
       if (!editorMosaicRef.current) return;
@@ -232,6 +247,13 @@ const MosaicEditorsDisplay: React.ComponentType<{
           centerViewOnLastInstance: editor
             ? editor.centerViewOnLastInstance
             : noop,
+          isInstanceVisibleInViewport: editor
+            ? editor.isInstanceVisibleInViewport
+            : () => false,
+          scrollViewToLastInstance: editor
+            ? editor.scrollViewToLastInstance
+            : noop,
+          scrollViewToPoint: editor ? editor.scrollViewToPoint : noop,
           getLastCursorSceneCoordinates: editor
             ? editor.getLastCursorSceneCoordinates
             : () => [0, 0],
@@ -322,6 +344,12 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onObjectsModified={props.onObjectsModified}
                 onEffectAdded={props.onEffectAdded}
                 onInstancesModified={_onInstancesModified}
+                onScenePropertiesModified={props.onScenePropertiesModified}
+                onBehaviorSharedDataModified={
+                  props.onBehaviorSharedDataModified
+                }
+                onLayerPropertiesModified={props.onLayerPropertiesModified}
+                onObjectGroupModified={props.onObjectGroupModified}
                 onGetInstanceSize={getInstanceSize}
                 ref={instanceOrObjectPropertiesEditorRef}
                 unsavedChanges={props.unsavedChanges}
@@ -401,7 +429,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
             instances={initialInstances}
             selectedInstances={selectedInstances}
             onSelectInstances={selectInstances}
-            onInstancesModified={onInstancesModified || noop}
+            onInstancesModified={_onInstancesModifiedInInstancesList}
             ref={instancesListRef}
           />
         ),
@@ -508,6 +536,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   props.getValidatedObjectOrGroupName(newName, global, i18n)
                 }
                 onObjectCreated={props.onObjectCreated}
+                onObjectFolderOrObjectsModified={
+                  props.onObjectFolderOrObjectsModified
+                }
                 onObjectEdited={props.onObjectEdited}
                 onObjectFolderOrObjectsWithContextSelected={
                   props.onObjectFolderOrObjectsWithContextSelected
@@ -554,6 +585,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onEditGroup={props.onEditObjectGroup}
                 onDeleteGroup={props.onDeleteObjectGroup}
                 onRenameGroup={props.onRenameObjectGroup}
+                onObjectGroupsModified={props.onObjectGroupsModified}
                 getValidatedObjectOrGroupName={(newName, global) =>
                   props.getValidatedObjectOrGroupName(newName, global, i18n)
                 }

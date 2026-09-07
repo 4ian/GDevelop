@@ -408,6 +408,8 @@ export const ExtensionListsStory = (): React.Node => (
         onDeleteEventsBasedObject={action('object deleted')}
         onRenameEventsBasedObject={action('rename object')}
         onEventsBasedObjectRenamed={action('object renamed')}
+        moveEventsBasedObjectTo={action('move object')}
+        onEventsBasedObjectMoved={action('object moved')}
         onEventsBasedObjectPasted={action('object pasted')}
         onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
         onAddEventsBasedObject={cb => cb({ isRenderedIn3D: false })}
@@ -422,6 +424,8 @@ export const ExtensionListsStory = (): React.Node => (
         onDeleteEventsBasedBehavior={action('behavior deleted')}
         onRenameEventsBasedBehavior={action('rename behavior')}
         onEventsBasedBehaviorRenamed={action('behavior renamed')}
+        moveEventsBasedBehaviorTo={action('move behavior')}
+        onEventsBasedBehaviorMoved={action('behavior moved')}
         onEventsBasedBehaviorPasted={action('behavior pasted')}
         // Free functions
         onSelectEventsFunction={action('function selected')}
@@ -431,6 +435,8 @@ export const ExtensionListsStory = (): React.Node => (
         }
         onEventsFunctionAdded={action('function added')}
         onRenameEventsFunction={action('function renamed')}
+        moveEventsFunctionTo={action('move function')}
+        onEventsFunctionMoved={action('function moved')}
         forceUpdateEditor={action('force editor update')}
         onSelectExtensionProperties={action('open extension properties')}
         onSelectExtensionGlobalVariables={action('open global variables')}

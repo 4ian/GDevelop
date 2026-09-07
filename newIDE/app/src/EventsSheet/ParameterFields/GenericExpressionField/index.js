@@ -228,6 +228,11 @@ export default class ExpressionField extends React.Component<Props, State> {
     autocompletions: (getAutocompletionsInitialState(): AutocompletionsState),
   };
 
+  constructor(props: Props) {
+    super(props);
+    this._enqueueValidation();
+  }
+
   componentDidMount() {
     if (this._field) {
       this._fieldElementWidth = this._field.getFieldWidth();

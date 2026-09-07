@@ -35,6 +35,29 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
   );
 
   const getBranchFromGitRef = gitRef => {
+    // Prefer a remote-tracking branch that already contains this commit:
+    // some build/deployment setups reuse a git checkout across builds and
+    // only reset it to the new commit, without renaming the local branch to
+    // match - so the local branch below can be a leftover, unrelated name.
+    // A commit that was just pushed is normally only "contained" in the
+    // remote branch(es) it was pushed to, so this is a more reliable source
+    // of truth than the local branch name whenever it's available.
+    const containingBranchesString = shell.exec(
+      `git branch -r --contains "${gitRef}"`,
+      { silent: true }
+    );
+    if (!containingBranchesString.stderr && !containingBranchesString.code) {
+      const containingBranch = (containingBranchesString.stdout || '')
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean)[0];
+      if (containingBranch) {
+        // Strip the remote name prefix ("origin/development" -> "development").
+        const branchName = containingBranch.replace(/^[^/]+\//, '');
+        if (branchName) return branchName;
+      }
+    }
+
     const branchShellString = shell.exec(
       `git rev-parse --abbrev-ref "${gitRef}"`,
       {

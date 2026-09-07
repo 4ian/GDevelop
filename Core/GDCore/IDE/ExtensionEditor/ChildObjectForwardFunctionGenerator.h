@@ -18,7 +18,9 @@ class Object;
 
 namespace gd {
 /**
- * Contains tools to extract events function extensions.
+ * Generate events functions in a custom object that forwards the call to one of
+ * its child object. It allows users to quickly expose features from a child
+ * object.
  */
 class GD_CORE_API ChildObjectForwardFunctionGenerator {
 public:
@@ -35,12 +37,11 @@ public:
       const gd::String &childObjectName,
       const gd::EventsFunction &eventsFunction);
 
-  static bool HasAnyChildCustomObject(
-      const gd::Project &project,
-      gd::EventsBasedObject &eventsBasedObject);
+  static bool HasAnyChildCustomObject(const gd::Project &project,
+                                      gd::EventsBasedObject &eventsBasedObject);
 
-  static std::vector<gd::String> GetChildCustomObjectNames(
-      const gd::Project &project,
-      gd::EventsBasedObject &eventsBasedObject);
+  static std::vector<gd::String>
+  GetChildCustomObjectNames(const gd::Project &project,
+                            gd::EventsBasedObject &eventsBasedObject);
 };
 } // namespace gd

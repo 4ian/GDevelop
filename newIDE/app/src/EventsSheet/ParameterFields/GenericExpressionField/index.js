@@ -233,6 +233,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       this._fieldElementWidth = this._field.getFieldWidth();
       this._inputElement = this._field ? this._field.getInputNode() : null;
     }
+    this._enqueueValidation();
   }
 
   componentWillUnmount() {

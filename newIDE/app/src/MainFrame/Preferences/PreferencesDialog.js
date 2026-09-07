@@ -1518,7 +1518,6 @@ const PreferencesDialog = ({
       open
       fullHeight
       flexColumnBody
-      actionsFullWidthOnMobile
       fixedContent={
         <ColumnStackLayout noMargin>
           <Tabs

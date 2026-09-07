@@ -13,6 +13,11 @@ export type ExportPipelineContext<ExportState> = {|
   exportState: ExportState,
   updateStepProgress: (count: number, total: number) => void,
   i18n: I18nType,
+  /**
+   * Gather the game resources into a few ".gdpak" archives instead of leaving
+   * one file per resource (see `ResourcePacking`). Comes from the preferences.
+   */
+  packResources: boolean,
 |};
 
 export type HeaderProps<ExportState> = {|

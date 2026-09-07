@@ -24,6 +24,7 @@ import {
   ExportFlow,
 } from '../GenericExporters/OnlineElectronExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { packResourcesInFolder } from '../ResourcePacking/LocalResourcePacker';
 
 const path = optionalRequire('path');
 const os = optionalRequire('os');
@@ -157,10 +158,19 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
     return { temporaryOutputDir };
   },
 
-  launchCompression: (
+  launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     { temporaryOutputDir }: ResourcesDownloadOutput
   ): Promise<CompressionOutput> => {
+    // Gather the resources into a few ".gdpak" archives before zipping, so
+    // that the archive holds a few files rather than one per resource.
+    if (context.packResources) {
+      await packResourcesInFolder({
+        exportDir: path.join(temporaryOutputDir, 'app'),
+        onProgress: context.updateStepProgress,
+      });
+    }
+
     const archiveOutputDir = os.tmpdir();
     return archiveLocalFolder({
       path: temporaryOutputDir,

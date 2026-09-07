@@ -20,6 +20,7 @@ import {
 } from '../ExportPipeline.flow';
 import { ExplanationHeader } from '../GenericExporters/OnlineWebExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { packResourcesInFolder } from '../ResourcePacking/LocalResourcePacker';
 import OnlineWebExportFlow from '../GenericExporters/OnlineWebExport/OnlineWebExportFlow';
 
 const path = optionalRequire('path');
@@ -148,10 +149,19 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     return { temporaryOutputDir };
   },
 
-  launchCompression: (
+  launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     { temporaryOutputDir }: ResourcesDownloadOutput
   ): Promise<CompressionOutput> => {
+    // Gather the resources into a few ".gdpak" archives before zipping, so
+    // that the archive holds a few files rather than one per resource.
+    if (context.packResources) {
+      await packResourcesInFolder({
+        exportDir: temporaryOutputDir,
+        onProgress: context.updateStepProgress,
+      });
+    }
+
     const archiveOutputDir = os.tmpdir();
     return archiveLocalFolder({
       path: temporaryOutputDir,

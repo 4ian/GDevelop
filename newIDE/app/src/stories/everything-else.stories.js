@@ -1205,6 +1205,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"GUI"'}
       render={(value, onChange) => (
         <LayerField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1243,6 +1244,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"TestLayout"'}
       render={(value, onChange) => (
         <SceneNameField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1317,6 +1319,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <SceneVariableField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1334,6 +1337,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <ObjectVariableField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1351,6 +1355,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1368,6 +1373,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1386,6 +1392,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <TrueFalseField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1404,6 +1411,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <YesNoField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1422,6 +1430,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <ForceMultiplierField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1439,6 +1448,7 @@ storiesOf('ParameterFields', module)
       initialValue={'0.8'}
       render={(value, onChange) => (
         <ForceMultiplierField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}

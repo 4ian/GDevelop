@@ -18,7 +18,7 @@ const styles = {
 };
 
 type Props = {|
-  project: ?gdProject,
+  project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,

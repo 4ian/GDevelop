@@ -53,7 +53,9 @@
 #include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
 #include <GDCore/IDE/EventsBasedObjectVariantHelper.h>
-#include <GDCore/IDE/EventsFunctionsExtensionExtractor.h>
+#include <GDCore/IDE/ExtensionEditor/ChildObjectForwardFunctionGenerator.h>
+#include <GDCore/IDE/ExtensionEditor/EventsFunctionsExtensionExtractor.h>
+#include <GDCore/IDE/ExtensionEditor/PropertyFunctionGenerator.h>
 #include <GDCore/IDE/ObjectRefactorer.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>
@@ -65,7 +67,6 @@
 #include <GDCore/IDE/Project/ResourcesRenamer.h>
 #include <GDCore/IDE/Project/EventsBasedObjectDependencyFinder.h>
 #include <GDCore/IDE/ProjectBrowserHelper.h>
-#include <GDCore/IDE/PropertyFunctionGenerator.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
 #include <GDCore/IDE/VariableInstructionSwitcher.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
@@ -762,6 +763,9 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_CanGenerateGetterAndSetter CanGenerateGetterAndSetter
 #define STATIC_GenerateConditionSkeleton GenerateConditionSkeleton
 #define STATIC_GenerateExpressionSkeleton GenerateExpressionSkeleton
+#define STATIC_GenerateChildObjectForwardFunctions GenerateChildObjectForwardFunctions
+#define STATIC_HasAnyChildCustomObject HasAnyChildCustomObject
+#define STATIC_GetChildCustomObjectNames GetChildCustomObjectNames
 #define STATIC_UpdateReturnActionType UpdateReturnActionType
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty

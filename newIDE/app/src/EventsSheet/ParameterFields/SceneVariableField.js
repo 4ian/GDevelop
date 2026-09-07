@@ -89,6 +89,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           openVariableEditorDialog={setVariableEditorOpen}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
+          project={project}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
           id={

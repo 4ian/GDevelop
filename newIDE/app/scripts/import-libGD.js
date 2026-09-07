@@ -35,6 +35,29 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
   );
 
   const getBranchFromGitRef = gitRef => {
+    // Prefer a remote-tracking branch that already contains this commit:
+    // some build/deployment setups reuse a git checkout across builds and
+    // only reset it to the new commit, without renaming the local branch to
+    // match - so the local branch below can be a leftover, unrelated name.
+    // A commit that was just pushed is normally only "contained" in the
+    // remote branch(es) it was pushed to, so this is a more reliable source
+    // of truth than the local branch name whenever it's available.
+    const containingBranchesString = shell.exec(
+      `git branch -r --contains "${gitRef}"`,
+      { silent: true }
+    );
+    if (!containingBranchesString.stderr && !containingBranchesString.code) {
+      const containingBranch = (containingBranchesString.stdout || '')
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean)[0];
+      if (containingBranch) {
+        // Strip the remote name prefix ("origin/development" -> "development").
+        const branchName = containingBranch.replace(/^[^/]+\//, '');
+        if (branchName) return branchName;
+      }
+    }
+
     const branchShellString = shell.exec(
       `git rev-parse --abbrev-ref "${gitRef}"`,
       {
@@ -154,9 +177,32 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
 
   const branch = getBranchFromGitRef('HEAD');
 
+  // The detected branch is a best guess: some build/deployment setups make
+  // it unreliable (see `getBranchFromGitRef`). Rather than depending on
+  // guessing it right, also try the well-known branches this project
+  // actually publishes builds for - so the exact current commit is still
+  // found even when the guess above is wrong, instead of silently falling
+  // back to an older, unrelated commit.
+  const candidateBranches = Array.from(
+    new Set([branch, 'development', 'master'].filter(Boolean))
+  );
+
+  // Try every candidate branch for the exact same commit before giving up
+  // precision and moving to an older one.
+  const tryDownloadCommitAcrossBranches = (branches, gitRef, onAllFailed) => {
+    if (branches.length === 0) {
+      onAllFailed();
+      return;
+    }
+    const [candidateBranch, ...remainingBranches] = branches;
+    downloadCommitLibGdJs(candidateBranch, gitRef).then(onLibGdJsDownloaded, () =>
+      tryDownloadCommitAcrossBranches(remainingBranches, gitRef, onAllFailed)
+    );
+  };
+
   // Try to download the latest libGD.js, fallback to previous or master ones
   // if not found (including different parents, for handling of merge commits).
-  downloadCommitLibGdJs(branch, 'HEAD').then(onLibGdJsDownloaded, () => {
+  tryDownloadCommitAcrossBranches(candidateBranches, 'HEAD', () => {
     // Force the exact version of GDevelop.js to be downloaded for AppVeyor - because
     // this means we build the app and we don't want to risk mismatch (Core C++ not up to date
     // with the IDE JavaScript).
@@ -170,28 +216,30 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       shell.exit(1);
     }
 
-    downloadCommitLibGdJs(branch, 'HEAD~1').then(onLibGdJsDownloaded, () =>
-      downloadCommitLibGdJs(branch, 'HEAD~2').then(onLibGdJsDownloaded, () =>
-        downloadCommitLibGdJs(branch, 'HEAD~3').then(onLibGdJsDownloaded, () =>
-          downloadBranchLatestLibGdJs(branch).then(onLibGdJsDownloaded, () =>
-            downloadBranchLatestLibGdJs('master').then(
-              onLibGdJsDownloaded,
-              () => {
-                if (alreadyHasLibGdJs) {
-                  shell.echo(
-                    `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
-                  );
-                  shell.exit(0);
-                  return;
-                } else {
-                  shell.echo(
-                    `❌ Can't download any version of libGD.js, please check your internet connection.`
-                  );
-                  shell.exit(1);
-                  return;
+    tryDownloadCommitAcrossBranches(candidateBranches, 'HEAD~1', () =>
+      tryDownloadCommitAcrossBranches(candidateBranches, 'HEAD~2', () =>
+        tryDownloadCommitAcrossBranches(candidateBranches, 'HEAD~3', () =>
+          downloadBranchLatestLibGdJs(branch || 'development').then(
+            onLibGdJsDownloaded,
+            () =>
+              downloadBranchLatestLibGdJs('master').then(
+                onLibGdJsDownloaded,
+                () => {
+                  if (alreadyHasLibGdJs) {
+                    shell.echo(
+                      `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
+                    );
+                    shell.exit(0);
+                    return;
+                  } else {
+                    shell.echo(
+                      `❌ Can't download any version of libGD.js, please check your internet connection.`
+                    );
+                    shell.exit(1);
+                    return;
+                  }
                 }
-              }
-            )
+              )
           )
         )
       )

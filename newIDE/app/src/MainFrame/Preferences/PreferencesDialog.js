@@ -1320,7 +1320,7 @@ const PreferencesDialog = ({
         style={styles.section}
       >
         <ColumnStackLayout noMargin expand>
-          <Text size="section-title" noMargin>
+          <Text size="block-title" noMargin>
             {i18n._(section.label)}
           </Text>
           {renderHeader && renderHeader()}
@@ -1408,7 +1408,7 @@ const PreferencesDialog = ({
         {matchingSections.map(
           ({ section, settings, renderHeader, renderFooter }) => (
             <Column noMargin key={section.name}>
-              <Text size="section-title">{i18n._(section.label)}</Text>
+              <Text size="block-title">{i18n._(section.label)}</Text>
               {renderHeader && renderHeader()}
               {renderSettingsRows(settings)}
               {renderFooter && renderFooter()}
@@ -1417,7 +1417,7 @@ const PreferencesDialog = ({
         )}
         {hasMatchingShortcuts && (
           <Column noMargin>
-            <Text size="section-title">
+            <Text size="block-title">
               <Trans>Keyboard Shortcuts</Trans>
             </Text>
             <ShortcutsList

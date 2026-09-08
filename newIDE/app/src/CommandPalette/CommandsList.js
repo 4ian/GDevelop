@@ -429,15 +429,15 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   // Tile map painting tools (shown when painting a tile map in the scene editor)
   TILEMAP_FREEHAND_BRUSH: {
     area: 'TILEMAP',
-    displayText: t`Freehand brush`,
+    displayText: t`Freehand tile brush`,
   },
   TILEMAP_RECTANGLE_PAINT: {
     area: 'TILEMAP',
-    displayText: t`Rectangle paint`,
+    displayText: t`Rectangle tile paint`,
   },
   TILEMAP_FILL_BUCKET: {
     area: 'TILEMAP',
-    displayText: t`Fill bucket`,
+    displayText: t`Tile fill bucket`,
   },
   TILEMAP_TILE_PICKER: {
     area: 'TILEMAP',
@@ -445,15 +445,15 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   },
   TILEMAP_ERASE: {
     area: 'TILEMAP',
-    displayText: t`Erase`,
+    displayText: t`Tile eraser`,
   },
   TILEMAP_FLIP_HORIZONTALLY: {
     area: 'TILEMAP',
-    displayText: t`Flip horizontally`,
+    displayText: t`Flip tile horizontally`,
   },
   TILEMAP_FLIP_VERTICALLY: {
     area: 'TILEMAP',
-    displayText: t`Flip vertically`,
+    displayText: t`Flip tile vertically`,
   },
 
   // In-game (3D) editor commands. Their shortcuts are handled by the game
@@ -520,7 +520,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   },
   IN_GAME_EDITOR_ORBIT_CAMERA: {
     area: 'SCENE_3D',
-    displayText: t`Orbit the camera around the point in front of it`,
+    displayText: t`Orbit mode`,
     ghost: true,
     handledByInGameEditor: true,
   },

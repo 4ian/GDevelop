@@ -1,5 +1,7 @@
-/* Brief highlight of a properties panel row changed by an undo/redo
-   (see `_flashChangedInstancePropertyRows` in `SceneEditor/index.js`).
+/* Brief highlight of a UI element changed by an undo/redo - a properties
+   panel row (see `_flashChangedInstancePropertyRows` in
+   `SceneEditor/index.js`) or a project manager row (see
+   `scrollToAndFlashItem` in `ProjectManager/index.js`).
    Uses the theme's warning color (identical in both the light and dark
    theme) rather than the selection color, which is too muted to be
    noticed as a "this just changed" signal. */

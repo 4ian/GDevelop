@@ -17,7 +17,7 @@ import {
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 export type ExternalLayoutTreeViewItemCallbacks = {|
-  onExternalLayoutAdded: () => void,
+  onExternalLayoutAdded: (name: string) => void,
   // Resolves to true once removed (after the user confirmed).
   onDeleteExternalLayouts: (
     Array<gdExternalLayout>,
@@ -97,7 +97,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
       externalLayoutFoldersKind,
       folderOrItem,
       props,
-      () => props.onExternalLayoutAdded()
+      props.onExternalLayoutAdded
     );
     this.props = props;
   }

@@ -17,6 +17,7 @@ import {
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 export type ExternalEventsTreeViewItemCallbacks = {|
+  onExternalEventsAdded: (name: string) => void,
   // Resolves to true once removed (after the user confirmed).
   onDeleteExternalEventsList: (
     Array<gdExternalEvents>,
@@ -95,7 +96,8 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     this.inFolder = new ProjectItemInFolder(
       externalEventsFoldersKind,
       folderOrItem,
-      props
+      props,
+      props.onExternalEventsAdded
     );
     this.props = props;
   }

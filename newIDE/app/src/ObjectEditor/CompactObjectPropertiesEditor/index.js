@@ -813,7 +813,11 @@ export const CompactObjectPropertiesEditor = ({
                           behaviors={[behavior]}
                           object={object}
                           layersContainer={layersContainer}
-                          onBehaviorUpdated={() => {}}
+                          onBehaviorUpdated={() =>
+                            onObjectsModified([object], {
+                              fieldName: behavior.getName(),
+                            })
+                          }
                           resourceManagementProps={resourceManagementProps}
                           onOpenFullEditor={() =>
                             onEditObject(object, 'behaviors')

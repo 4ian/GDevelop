@@ -3,9 +3,57 @@ import { makeSimplifiedProjectBuilder } from './SimplifiedProject';
 import { makeTestProject } from '../../fixtures/TestProject';
 import { makeTestExtensions } from '../../fixtures/TestExtensions';
 import { unserializeFromJSObject } from '../../Utils/Serializer';
+import { makeFakeI18n } from '../TestHelpers';
+import {
+  reloadProjectEventsFunctionsExtensionMetadata,
+  type EventsFunctionCodeWriter,
+} from '../../EventsFunctionsExtensionsLoader';
 import tankConfigurationExtensionJson from '../../fixtures/TankConfigurationExtension.json';
 
 const gd: libGDevelop = global.gd;
+
+const createFakeEventsFunctionCodeWriter = (): EventsFunctionCodeWriter => ({
+  getIncludeFileFor: (functionName: string) => `${functionName}.js`,
+  writeFunctionCode: () => Promise.resolve(),
+  writeBehaviorCode: () => Promise.resolve(),
+  writeObjectCode: () => Promise.resolve(),
+});
+
+/**
+ * An extension with a public and a private free action, with its generated
+ * metadata registered in the platform (where the summary reads it from).
+ */
+const createFakeExtensionWithAPrivateFunction = (
+  project: gdProject,
+  extensionName: string,
+  privateFunctionName: string
+) => {
+  const extension = project.insertNewEventsFunctionsExtension(
+    extensionName,
+    project.getEventsFunctionsExtensionsCount()
+  );
+  extension.setFullName(`The ${extensionName} extension`);
+  const publicFunction = extension
+    .getEventsFunctions()
+    .insertNewEventsFunction('ShowToast', 0);
+  publicFunction.setFunctionType(gd.EventsFunction.Action);
+  publicFunction.setFullName('Show a toast');
+  publicFunction.setSentence('Show a toast');
+  const privateFunction = extension
+    .getEventsFunctions()
+    .insertNewEventsFunction(privateFunctionName, 1);
+  privateFunction.setFunctionType(gd.EventsFunction.Action);
+  privateFunction.setFullName('Reset the internal state');
+  privateFunction.setSentence('Reset the internal state');
+  privateFunction.setPrivate(true);
+
+  reloadProjectEventsFunctionsExtensionMetadata(
+    project,
+    extension,
+    createFakeEventsFunctionCodeWriter(),
+    makeFakeI18n()
+  );
+};
 
 describe('SimplifiedProject', () => {
   it('should create a simplified project JSON with global objects and scenes', () => {
@@ -1422,6 +1470,61 @@ describe('SimplifiedProject', () => {
     `);
 
     project.delete();
+  });
+
+  describe('project specific extensions summary', () => {
+    it('describes the private functions of one extension only when asked', () => {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      createFakeExtensionWithAPrivateFunction(
+        project,
+        'MyExt',
+        'ResetInternalState'
+      );
+      createFakeExtensionWithAPrivateFunction(
+        project,
+        'OtherExt',
+        'ResetOtherInternalState'
+      );
+
+      const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
+      const getFreeActionTypes = (
+        extensionsSummary: Object,
+        extensionName: string
+      ): Array<string> => {
+        const extensionSummary = extensionsSummary.extensionSummaries.find(
+          summary => summary.extensionName === extensionName
+        );
+        if (!extensionSummary) {
+          throw new Error(`No summary for the extension "${extensionName}".`);
+        }
+        return extensionSummary.freeActions.map(action => action.type);
+      };
+
+      // By default, a private function is not described: it can't be used
+      // from outside its extension.
+      const summaryWithoutPrivate = simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
+        project
+      );
+      expect(getFreeActionTypes(summaryWithoutPrivate, 'MyExt')).toEqual([
+        'MyExt::ShowToast',
+      ]);
+
+      // Writing events inside "MyExt" can use its own private functions, but
+      // not the private functions of the other extensions.
+      const summaryWithPrivate = simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
+        project,
+        { includePrivateOfExtension: 'MyExt' }
+      );
+      expect(getFreeActionTypes(summaryWithPrivate, 'MyExt').sort()).toEqual([
+        'MyExt::ResetInternalState',
+        'MyExt::ShowToast',
+      ]);
+      expect(getFreeActionTypes(summaryWithPrivate, 'OtherExt')).toEqual([
+        'OtherExt::ShowToast',
+      ]);
+
+      project.delete();
+    });
   });
 
   describe('extensions', () => {

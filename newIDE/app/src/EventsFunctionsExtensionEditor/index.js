@@ -764,6 +764,31 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   /**
+   * The events of a function were changed outside of this editor (by the AI):
+   * refresh the events sheet showing them, exactly like the events editor of
+   * a scene does. Nothing to do when another function is selected: the sheet
+   * is remounted (and reads the events again) when it becomes the selected
+   * one.
+   */
+  onEventsModifiedOutsideEditor = (
+    eventsFunction: gdEventsFunction,
+    newOrChangedAiGeneratedEventIds: Set<string>
+  ) => {
+    const { selectedEventsFunction } = this.state;
+    if (
+      !this.editor ||
+      !selectedEventsFunction ||
+      // $FlowFixMe[incompatible-exact]
+      !gd.compare(eventsFunction, selectedEventsFunction)
+    ) {
+      return;
+    }
+    this.editor.onEventsModifiedOutsideEditor({
+      newOrChangedAiGeneratedEventIds,
+    });
+  };
+
+  /**
    * Re-read the selection from the extension after it was changed outside of
    * this editor: items may have been renamed (the selection follows them) or
    * removed (the selection is released), and the lists must be refreshed.

@@ -21,6 +21,8 @@ import {
 import {
   buildEventScriptSourceView,
   renderEventSourceById,
+  renderScopeSummaryHeaderLines,
+  type ScopeSummary,
 } from '../EventsSheet/EventsTree/TextRenderer/EventScriptSourceView';
 import {
   addMissingObjectBehaviors,
@@ -115,9 +117,11 @@ import {
   getEventsFunctionInScope,
   getSceneNameFromArgs,
   getScopeLabelFromArgs,
+  getFunctionTargetFromArgs,
   type ResolvedScope,
   type ScopeFailure,
   type ToolScopeType,
+  type ToolScope,
 } from './Scope';
 import {
   createExtension,
@@ -197,19 +201,6 @@ export type SingleResourceSearchAndInstallResult = {|
 
 export type ResourceSearchAndInstallResult = {|
   results: Array<SingleResourceSearchAndInstallResult>,
-|};
-
-/**
- * What a function can use, in names only: its parameters, the properties of
- * the behavior/object owning it, the child objects of a custom object and the
- * variables of its extension. Enough to write or read its events without
- * another call.
- */
-type ScopeSummary = {|
-  parameters: Array<{| name: string, type: string |}>,
-  properties: Array<string>,
-  childObjects?: Array<string>,
-  extensionVariables: {| global: Array<string>, scene: Array<string> |},
 |};
 
 export type EditorFunctionGenericOutput = {|
@@ -392,6 +383,11 @@ export type EventBatch = {|
 |};
 
 export type EventsGenerationOptions = {|
+  // Where the events are generated: a scene, or a function of an extension
+  // (`functionName` set). `sceneName` is the scene name (or '' for a
+  // function), kept for the generation API.
+  scope: ToolScope,
+  functionName: string | null,
   sceneName: string,
   eventsDescription: string | null,
   eventBatches: Array<EventBatch> | null,
@@ -5876,7 +5872,7 @@ const readEventsSource: EditorFunction = {
 
     return { text };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, ensureExtensionsUpToDate }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
       allowedTypes: ['scene', 'extension', 'custom_behavior', 'custom_object'],
     });
@@ -5890,6 +5886,11 @@ const readEventsSource: EditorFunction = {
     const target = getEventsSourceTarget(resolvedScope, functionName);
     if (target.success === false) return makeScopeFailureOutput(target);
     const { eventsList, eventsFunction } = target;
+    if (eventsFunction) {
+      // The instructions of a function edited earlier in this batch are
+      // rendered from the generated metadata: regenerate it first.
+      await ensureExtensionsUpToDate();
+    }
 
     const eventIds = SafeExtractor.extractStringArrayProperty(
       args,
@@ -5916,6 +5917,18 @@ const readEventsSource: EditorFunction = {
       )
     );
 
+    // In a function, what the events can use (parameters, properties, child
+    // objects, extension variables) is shown as `#` comment lines at the top
+    // of the source: the reader has everything at hand, and the source stays
+    // valid EventScript if it is sent back as is. They count against
+    // `max_chars` like the rest of the output.
+    const scopeSummary = eventsFunction
+      ? getScopeSummary(resolvedScope, eventsFunction)
+      : null;
+    const scopeSummaryHeaderText = scopeSummary
+      ? renderScopeSummaryHeaderLines(scopeSummary).join('\n')
+      : '';
+
     const {
       text,
       selectedEventIds,
@@ -5928,28 +5941,37 @@ const readEventsSource: EditorFunction = {
       searchText,
       objectNames,
       subEventsDepth,
-      maxChars,
+      maxChars: Math.max(
+        0,
+        maxChars -
+          (scopeSummaryHeaderText ? scopeSummaryHeaderText.length + 1 : 0)
+      ),
     });
+
+    // An empty `text` does NOT mean the scene has no events: a filter can
+    // match nothing on a populated sheet (the notes say which case it is).
+    // Only a truly empty sheet gets the "no events" text.
+    const eventScriptText =
+      text ||
+      (eventsList.getEventsCount() === 0
+        ? eventsFunction
+          ? noEventsInFunctionText
+          : noEventsInSceneText
+        : '');
 
     const output: EditorFunctionGenericOutput = {
       success: true,
-      ...(eventsFunction
+      ...(eventsFunction && scopeSummary
         ? {
             eventsForScopeLabel: resolvedScope.label,
             functionName: eventsFunction.getName(),
-            scopeSummary: getScopeSummary(resolvedScope, eventsFunction),
+            scopeSummary,
           }
         : { eventsForSceneNamed: resolvedScope.scope.scene_name || '' }),
-      // An empty `text` does NOT mean the scene has no events: a filter can
-      // match nothing on a populated sheet (the notes say which case it
-      // is). Only a truly empty sheet gets the "no events" text.
-      eventScript:
-        text ||
-        (eventsList.getEventsCount() === 0
-          ? eventsFunction
-            ? noEventsInFunctionText
-            : noEventsInSceneText
-          : ''),
+      eventScript: scopeSummaryHeaderText
+        ? scopeSummaryHeaderText +
+          (eventScriptText ? `\n${eventScriptText}` : '')
+        : eventScriptText,
       selectedEventIds,
     };
     if (truncated) output.truncated = true;
@@ -5963,11 +5985,9 @@ const readEventsSource: EditorFunction = {
   modifiesProject: false,
 };
 
-const EVENTS_IN_FUNCTION_NOT_SUPPORTED_MESSAGE =
-  'Generating events in a function of an extension is not supported yet: edit the events of a scene, or write the function events from the extension editor.';
-
 /**
- * Adds a new event to a scene's event sheet
+ * Generates events with the AI and applies them: in the events sheet of a
+ * scene, or in the events of a function of an extension (`function_name`).
  */
 const addSceneEvents: EditorFunction = {
   renderForEditor: ({
@@ -6157,10 +6177,38 @@ const addSceneEvents: EditorFunction = {
     ) : null;
 
     if (!scene_name) {
-      // A function of an extension: no editor link to it yet, so only name
-      // the scope the events are written in.
+      // A function of an extension: name the function and link to it in the
+      // extension editor.
+      const functionTarget = getFunctionTargetFromArgs(args);
+      if (!functionTarget) {
+        return {
+          text: <Trans>Write events in {getScopeLabelFromArgs(args)}.</Trans>,
+          details,
+          hasDetailsToShow: true,
+        };
+      }
       return {
-        text: <Trans>Write events in {getScopeLabelFromArgs(args)}.</Trans>,
+        text: (
+          <Trans>
+            Generate events in function{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenEventsFunctionsExtension(
+                  functionTarget.extensionName,
+                  {
+                    functionName: functionTarget.functionName,
+                    behaviorName: functionTarget.behaviorName,
+                    objectName: functionTarget.objectName,
+                  }
+                )
+              }
+            >
+              {functionTarget.functionReference}
+            </Link>
+            .
+          </Trans>
+        ),
         details,
         hasDetailsToShow: true,
       };
@@ -6244,6 +6292,8 @@ const addSceneEvents: EditorFunction = {
     relatedAiRequestId,
     generateEvents,
     onSceneEventsModifiedOutsideEditor,
+    onExtensionsModifiedOutsideEditor,
+    ensureExtensionsUpToDate,
     ensureExtensionInstalled,
     onWillInstallExtension,
     onExtensionInstalled,
@@ -6279,24 +6329,50 @@ const addSceneEvents: EditorFunction = {
     if (resolvedScope.success === false)
       return makeScopeFailureOutput(resolvedScope);
     const scene = resolvedScope.layout;
-    // Only a scene has a layout here: the events of a function are written
-    // from the extension editor for now.
     if (!scene) {
-      return makeGenericFailure(EVENTS_IN_FUNCTION_NOT_SUPPORTED_MESSAGE);
+      // Events written in a function of an extension: the extension must be
+      // editable (a store extension is read-only).
+      const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+      if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
     }
     if (!relatedAiRequestId) {
       return makeGenericFailure(
         'No related AI request ID found for events generation.'
       );
     }
-    const sceneName = resolvedScope.scope.scene_name || '';
-    const currentSceneEvents = scene.getEvents();
+
+    // The events to write in: those of the scene, or those of the function
+    // named by `function_name` in the extension scope.
+    const functionNameArgument = SafeExtractor.extractStringProperty(
+      args,
+      'function_name'
+    );
+    const eventsTarget = getEventsSourceTarget(
+      resolvedScope,
+      functionNameArgument
+    );
+    if (eventsTarget.success === false)
+      return makeScopeFailureOutput(eventsTarget);
+    const { eventsList: currentEventsList, eventsFunction } = eventsTarget;
+    const extensionName = resolvedScope.eventsFunctionsExtension
+      ? resolvedScope.eventsFunctionsExtension.getName()
+      : '';
+    // A scene name is only sent for a scene (the generation API keeps it
+    // beside the scope for older editors).
+    const sceneName = scene ? resolvedScope.scope.scene_name || '' : '';
+
+    // An extension may have been authored earlier in this batch: the generated
+    // metadata (and the extensions summary uploaded with this generation, the
+    // private functions of an edited extension included) must describe the
+    // extensions as they are now, whatever the scope. A no-op when nothing
+    // changed.
+    await ensureExtensionsUpToDate();
 
     // The existing events are sent as JSON only: the generation backend
     // renders them itself (as a bounded EventScript view) for its model.
     const existingEventsJson =
       toolOptions && toolOptions.includeEventsJson
-        ? serializeToJSON(currentSceneEvents)
+        ? serializeToJSON(currentEventsList)
         : null;
 
     const parsedEventBatches = eventBatches
@@ -6324,7 +6400,7 @@ const addSceneEvents: EditorFunction = {
           const renderedTargetEventSource =
             isReplacePlacement && placementTargetEventId
               ? renderEventSourceById({
-                  eventsList: currentSceneEvents,
+                  eventsList: currentEventsList,
                   eventIdOrGroupName: placementTargetEventId,
                   includeSubEvents: isReplaceEntirePlacement,
                 })
@@ -6393,6 +6469,8 @@ const addSceneEvents: EditorFunction = {
     try {
       const eventsGenerationResult: EventsGenerationResult = await generateEvents(
         {
+          scope: resolvedScope.scope,
+          functionName: eventsFunction ? eventsFunction.getName() : null,
           sceneName,
           eventsDescription,
           eventBatches: parsedEventBatches,
@@ -6493,10 +6571,11 @@ const addSceneEvents: EditorFunction = {
         );
       }
       try {
+        let hasChangedChildObjects = false;
         for (const change of changes) {
           addUndeclaredVariables({
             project,
-            scene,
+            resolvedScope,
             undeclaredVariables: change.undeclaredVariables,
           });
 
@@ -6508,10 +6587,11 @@ const addSceneEvents: EditorFunction = {
               change.undeclaredObjectVariables[objectName];
             addObjectUndeclaredVariables({
               project,
-              scene,
+              resolvedScope,
               objectName,
               undeclaredVariables,
             });
+            hasChangedChildObjects = true;
           }
 
           const objectNamesWithMissingBehavior = Object.keys(
@@ -6521,16 +6601,22 @@ const addSceneEvents: EditorFunction = {
             const missingBehaviors = change.missingObjectBehaviors[objectName];
             addMissingObjectBehaviors({
               project,
-              scene,
+              resolvedScope,
               objectName,
               missingBehaviors,
             });
+            hasChangedChildObjects = true;
           }
+        }
+        if (eventsFunction && hasChangedChildObjects) {
+          // The variables and behaviors of the child objects are part of the
+          // structure of the custom object: the named variants follow.
+          complyVariantsAfterStructuralEdit(project, resolvedScope);
         }
 
         const { applied, errors } = applyEventsChanges(
           project,
-          currentSceneEvents,
+          currentEventsList,
           changes,
           aiGeneratedEvent.id
         );
@@ -6550,10 +6636,25 @@ Events were not changed (extensions, variables or behaviors needed by them may h
           };
         }
 
-        onSceneEventsModifiedOutsideEditor({
-          scene,
-          newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
-        });
+        if (eventsFunction) {
+          onSceneEventsModifiedOutsideEditor({
+            scene: null,
+            eventsFunction,
+            extensionName,
+            newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
+          });
+          // The code of the function changed: the extension must be
+          // regenerated before anything reads its metadata again.
+          onExtensionsModifiedOutsideEditor({
+            extensionNames: [extensionName],
+            needsCodeRegeneration: true,
+          });
+        } else {
+          onSceneEventsModifiedOutsideEditor({
+            scene,
+            newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
+          });
+        }
 
         // Search and install missing resources if any. This runs after the
         // events were applied: a failure here must NOT fail the whole call,

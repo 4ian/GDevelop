@@ -185,6 +185,13 @@ describe('scope of the events and variables functions', () => {
       })
     ).toBeTruthy();
     expect(
+      render('add_scene_events', {
+        scope: customObjectScope,
+        function_name: 'Open',
+        events_description: 'Open the dialog',
+      })
+    ).toBeTruthy();
+    expect(
       render('add_or_edit_variable', {
         scope: dialogVariantScope(''),
         variable_scope: 'object',
@@ -520,7 +527,17 @@ describe('scope of the events and variables functions', () => {
       expect(result.success).toBe(true);
       expect(result.eventsForScopeLabel).toBe('custom object "UI::Dialog"');
       expect(result.functionName).toBe('Open');
-      expect(result.eventScript).toBe(noEventsInFunctionText);
+      // What the function can use is also written at the top of the source as
+      // `#` comments (ignored by the EventScript parser).
+      expect(result.eventScript).toBe(
+        [
+          '# parameters: Object (object), Duration (number)',
+          '# properties: Title',
+          '# child objects: Back, Label',
+          '# extension variables: global Score; scene Level',
+          noEventsInFunctionText,
+        ].join('\n')
+      );
       expect(result.eventsForSceneNamed).toBeUndefined();
       expect(result.scopeSummary).toEqual({
         parameters: [
@@ -645,7 +662,7 @@ describe('scope of the events and variables functions', () => {
       objects_list: '',
     });
 
-    it('refuses to generate events in a function of an extension', async () => {
+    it('requires a function_name in a custom object, listing its functions', async () => {
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const generateEvents = jest.fn();
 
@@ -661,12 +678,12 @@ describe('scope of the events and variables functions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toBe(
-        'Generating events in a function of an extension is not supported yet: edit the events of a scene, or write the function events from the extension editor.'
+        '`function_name` is required for custom object "UI::Dialog". Existing functions: "Open".'
       );
       expect(generateEvents).not.toHaveBeenCalled();
     });
 
-    it('refuses to generate events in an extension', async () => {
+    it('requires a function_name in an extension, listing its functions', async () => {
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const generateEvents = jest.fn();
 
@@ -677,7 +694,9 @@ describe('scope of the events and variables functions', () => {
       );
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('is not supported yet');
+      expect(result.message).toBe(
+        '`function_name` is required for extension "UI". Existing functions: "ShowToast".'
+      );
       expect(generateEvents).not.toHaveBeenCalled();
     });
 

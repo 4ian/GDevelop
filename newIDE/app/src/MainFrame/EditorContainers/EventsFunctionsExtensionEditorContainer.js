@@ -113,8 +113,22 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
+  // The events of a function of this extension were changed outside of the
+  // editor (by the AI): refresh the events sheet showing them.
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
-    // No thing to be done.
+    const { eventsFunction, extensionName } = changes;
+    if (
+      !this.editor ||
+      !eventsFunction ||
+      !extensionName ||
+      extensionName !== this.getEventsFunctionsExtensionName()
+    ) {
+      return;
+    }
+    this.editor.onEventsModifiedOutsideEditor(
+      eventsFunction,
+      changes.newOrChangedAiGeneratedEventIds
+    );
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {

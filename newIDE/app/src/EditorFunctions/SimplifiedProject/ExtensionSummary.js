@@ -215,10 +215,16 @@ export const buildExtensionSummary = ({
   gd,
   eventsFunctionsExtension,
   extension,
+  includePrivate,
 }: {
   gd: libGDevelop,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   extension: gdPlatformExtension,
+  // Private members are hidden by default (they can't be used from outside
+  // the extension). Set when the events being written are inside this very
+  // extension: its own private functions, objects and behaviors are usable
+  // there.
+  includePrivate: boolean,
 }): ExtensionSummary => {
   const objects: { [string]: ObjectSummary } = {};
   const behaviors: { [string]: BehaviorSummary } = {};
@@ -234,7 +240,7 @@ export const buildExtensionSummary = ({
       .map(instructionType => {
         const instructionMetadata = instructionsMetadata.get(instructionType);
 
-        if (instructionMetadata.isPrivate()) return null;
+        if (!includePrivate && instructionMetadata.isPrivate()) return null;
 
         const instructionSummary: InstructionSummary = {
           type: instructionType,
@@ -270,7 +276,7 @@ export const buildExtensionSummary = ({
       .map(expressionType => {
         const expressionMetadata = expressionsMetadata.get(expressionType);
 
-        if (expressionMetadata.isPrivate()) return null;
+        if (!includePrivate && expressionMetadata.isPrivate()) return null;
 
         const expressionSummary: ExpressionSummary = {
           type: expressionType,
@@ -303,7 +309,7 @@ export const buildExtensionSummary = ({
       const objectMetadata = extension.getObjectMetadata(objectType);
       if (
         gd.MetadataProvider.isBadObjectMetadata(objectMetadata) ||
-        objectMetadata.isPrivate()
+        (!includePrivate && objectMetadata.isPrivate())
       ) {
         return;
       }
@@ -353,7 +359,7 @@ export const buildExtensionSummary = ({
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       if (
         gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata) ||
-        behaviorMetadata.isPrivate()
+        (!includePrivate && behaviorMetadata.isPrivate())
       ) {
         return;
       }

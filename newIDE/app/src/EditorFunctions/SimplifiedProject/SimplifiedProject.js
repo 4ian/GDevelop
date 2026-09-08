@@ -194,9 +194,20 @@ export const getSimplifiedVariablesContainer = (
   }).filter(Boolean);
 };
 
+/**
+ * Options of the extensions summary sent to the AI: by default the private
+ * members of the extensions are left out (they can't be used from outside
+ * their extension). `includePrivateOfExtension` names the extension whose
+ * events are being written, so its own private members are described.
+ */
+export type ProjectSpecificExtensionsSummaryOptions = {|
+  includePrivateOfExtension?: string | null,
+|};
+
 export type SimplifiedProjectBuilder = {|
   getProjectSpecificExtensionsSummary: (
-    project: gdProject
+    project: gdProject,
+    options?: ProjectSpecificExtensionsSummaryOptions
   ) => ProjectSpecificExtensionsSummary,
   getSimplifiedProject: (
     project: gdProject,
@@ -499,8 +510,11 @@ export const makeSimplifiedProjectBuilder = (
   };
 
   const getProjectSpecificExtensionsSummary = (
-    project: gdProject
+    project: gdProject,
+    options?: ProjectSpecificExtensionsSummaryOptions
   ): ProjectSpecificExtensionsSummary => {
+    const includePrivateOfExtension =
+      (options && options.includePrivateOfExtension) || null;
     const startTime = Date.now();
     const platform = project.getCurrentPlatform();
     const allExtensions = platform.getAllPlatformExtensions();
@@ -535,6 +549,7 @@ export const makeSimplifiedProjectBuilder = (
           gd,
           eventsFunctionsExtension,
           extension,
+          includePrivate: extensionName === includePrivateOfExtension,
         });
       }),
     };

@@ -300,6 +300,54 @@ export const getSceneNameFromArgs = (args: any): string => {
   return '';
 };
 
+/** A function of an extension, as named in messages and opened in the editor. */
+export type FunctionTarget = {|
+  // `Ext::Fn` for a free function, `Ext::Beh.Fn` / `Ext::Obj.Fn` for the
+  // functions of a custom behavior or custom object.
+  functionReference: string,
+  extensionName: string,
+  functionName: string,
+  behaviorName?: string,
+  objectName?: string,
+|};
+
+/**
+ * The function a call works in, from its (raw) arguments: how to name it and
+ * what is needed to open it in the extension editor. Null when the call is
+ * not about a function of an extension. Never throws (the arguments may be
+ * anything): the chat rendering uses it.
+ */
+export const getFunctionTargetFromArgs = (args: any): FunctionTarget | null => {
+  const functionName =
+    args && typeof args.function_name === 'string' ? args.function_name : '';
+  if (!functionName) return null;
+
+  let scope = null;
+  try {
+    scope = parseScopeArgument(args, { allowedTypes: ALL_SCOPE_TYPES });
+  } catch (error) {
+    // Malformed: nothing to open.
+    return null;
+  }
+  if (!scope || !scope.extension_name) return null;
+
+  const extensionName = scope.extension_name;
+  const behaviorName =
+    scope.type === 'custom_behavior' ? scope.custom_behavior_name : undefined;
+  const objectName =
+    scope.type === 'custom_object' ? scope.custom_object_name : undefined;
+  const ownerName = behaviorName || objectName || '';
+  return {
+    functionReference: ownerName
+      ? `${extensionName}::${ownerName}.${functionName}`
+      : `${extensionName}::${functionName}`,
+    extensionName,
+    functionName,
+    behaviorName,
+    objectName,
+  };
+};
+
 // ---------------------------------------------------------------------------
 // Resolution against the project.
 // ---------------------------------------------------------------------------

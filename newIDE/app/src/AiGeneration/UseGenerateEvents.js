@@ -13,6 +13,7 @@ import {
   type EventsGenerationResult,
   type EventBatch,
 } from '../EditorFunctions';
+import { type ToolScope } from '../EditorFunctions/Scope';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 
@@ -27,6 +28,8 @@ type UseGenerateEventsReturnType = {
     objectsList: string,
     placementHint: string | null,
     relatedAiRequestId: string,
+    scope: ToolScope,
+    functionName: string | null,
     sceneName: string,
     estimatedComplexity: number | null,
   }) => Promise<EventsGenerationResult>,
@@ -42,6 +45,8 @@ export const useGenerateEvents = ({
 
   const generateEvents = React.useCallback(
     async ({
+      scope,
+      functionName,
       sceneName,
       eventsDescription,
       eventBatches,
@@ -52,6 +57,8 @@ export const useGenerateEvents = ({
       relatedAiRequestId,
       estimatedComplexity,
     }: {|
+      scope: ToolScope,
+      functionName: string | null,
       sceneName: string,
       eventsDescription: string | null,
       eventBatches: Array<EventBatch> | null,
@@ -70,7 +77,13 @@ export const useGenerateEvents = ({
         simplifiedProjectBuilder.getSimplifiedProject(project, {})
       );
       const projectSpecificExtensionsSummaryJson = JSON.stringify(
-        simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project)
+        simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project, {
+          // Events written inside a function of an extension can use the
+          // private members of that extension: describe them.
+          includePrivateOfExtension: functionName
+            ? scope.extension_name || null
+            : null,
+        })
       );
 
       try {
@@ -97,6 +110,8 @@ export const useGenerateEvents = ({
               existingEventsJsonUserRelativeKey:
                 preparedAiUserContent.eventsJsonUserRelativeKey,
               existingEventsJson: preparedAiUserContent.eventsJson,
+              scope,
+              functionName,
               sceneName,
               eventsDescription,
               eventBatches,

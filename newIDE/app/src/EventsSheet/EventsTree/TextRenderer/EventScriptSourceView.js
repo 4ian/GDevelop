@@ -30,6 +30,58 @@ export type EventScriptSourceView = {|
   renderingErrors: Array<EventScriptRenderingError>,
 |};
 
+/**
+ * What a function of an extension can use, in names only: its parameters (the
+ * implicit `Object`/`Behavior` included), the properties of the behavior or
+ * object owning it, the child objects of a custom object and the variables of
+ * its extension. Enough to read or write its events without another call.
+ */
+export type ScopeSummary = {|
+  parameters: Array<{| name: string, type: string |}>,
+  properties: Array<string>,
+  childObjects?: Array<string>,
+  extensionVariables: {| global: Array<string>, scene: Array<string> |},
+|};
+
+/**
+ * The scope summary of a function as EventScript comment lines, to show at
+ * the top of its source. `#` lines are ignored by the EventScript parser, so
+ * the source stays valid if it is sent back as is.
+ */
+export const renderScopeSummaryHeaderLines = (
+  scopeSummary: ScopeSummary
+): Array<string> => {
+  const lines: Array<string> = [];
+
+  if (scopeSummary.parameters.length > 0) {
+    const parameters = scopeSummary.parameters
+      .map(parameter => `${parameter.name} (${parameter.type})`)
+      .join(', ');
+    lines.push(`# parameters: ${parameters}`);
+  }
+  if (scopeSummary.properties.length > 0) {
+    lines.push(`# properties: ${scopeSummary.properties.join(', ')}`);
+  }
+  const childObjects = scopeSummary.childObjects || [];
+  if (childObjects.length > 0) {
+    lines.push(`# child objects: ${childObjects.join(', ')}`);
+  }
+  const { extensionVariables } = scopeSummary;
+  const extensionVariablesParts = [
+    ...(extensionVariables.global.length > 0
+      ? [`global ${extensionVariables.global.join(', ')}`]
+      : []),
+    ...(extensionVariables.scene.length > 0
+      ? [`scene ${extensionVariables.scene.join(', ')}`]
+      : []),
+  ];
+  if (extensionVariablesParts.length > 0) {
+    lines.push(`# extension variables: ${extensionVariablesParts.join('; ')}`);
+  }
+
+  return lines;
+};
+
 const indexEvents = (
   eventsList: gdEventsList,
   parentPath: string,

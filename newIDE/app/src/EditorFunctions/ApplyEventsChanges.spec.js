@@ -6,12 +6,23 @@ import {
   addObjectUndeclaredVariables,
 } from './ApplyEventsChanges';
 import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
+import { resolveScope, type ResolvedScope } from './Scope';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
+
+/** The resolved scope of a scene, as the editor functions build it. */
+const makeSceneScope = (project: gdProject, scene: gdLayout): ResolvedScope => {
+  const resolvedScope = resolveScope(project, {
+    type: 'scene',
+    scene_name: scene.getName(),
+  });
+  if (resolvedScope.success === false) throw new Error(resolvedScope.message);
+  return resolvedScope;
+};
 
 describe('applyEventsChanges', () => {
   let project: gdProject;
@@ -2821,7 +2832,7 @@ describe('addMissingObjectBehaviors', () => {
     // Add the PlatformerObjectBehavior
     addMissingObjectBehaviors({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       objectName: 'Player',
       missingBehaviors: [
         {
@@ -2868,7 +2879,7 @@ describe('addMissingObjectBehaviors', () => {
     // Add the PlatformerObjectBehavior to the group
     addMissingObjectBehaviors({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       objectName: 'Players',
       missingBehaviors: [
         {
@@ -2908,7 +2919,7 @@ describe('addUndeclaredVariables', () => {
   it('adds scene, global and unscoped variables with their type', () => {
     addUndeclaredVariables({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       undeclaredVariables: [
         { name: 'score', type: 'number', requiredScope: 'scene' },
         { name: 'playerName', type: 'string', requiredScope: 'none' },
@@ -2959,7 +2970,7 @@ describe('addUndeclaredVariables', () => {
 
     addUndeclaredVariables({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       undeclaredVariables: [
         { name: 'score', type: 'string', requiredScope: 'scene' },
       ],
@@ -2983,7 +2994,7 @@ describe('addUndeclaredVariables', () => {
   it('skips a variable with an unknown scope', () => {
     addUndeclaredVariables({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       undeclaredVariables: [
         // $FlowFixMe[incompatible-type] - invalid scope on purpose.
         { name: 'mystery', type: 'number', requiredScope: 'galaxy' },
@@ -3016,7 +3027,7 @@ describe('addObjectUndeclaredVariables', () => {
 
     addObjectUndeclaredVariables({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       objectName: 'Player',
       undeclaredVariables: [
         { name: 'health', type: 'number', requiredScope: 'none' },
@@ -3039,7 +3050,7 @@ describe('addObjectUndeclaredVariables', () => {
 
     addObjectUndeclaredVariables({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       objectName: 'GlobalHud',
       undeclaredVariables: [
         { name: 'visible', type: 'boolean', requiredScope: 'none' },
@@ -3065,7 +3076,7 @@ describe('addObjectUndeclaredVariables', () => {
 
     addObjectUndeclaredVariables({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       objectName: 'Enemies',
       undeclaredVariables: [
         { name: 'health', type: 'number', requiredScope: 'none' },
@@ -3087,7 +3098,7 @@ describe('addObjectUndeclaredVariables', () => {
 
     addObjectUndeclaredVariables({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       objectName: 'Player',
       undeclaredVariables: [
         { name: 'health', type: 'string', requiredScope: 'none' },
@@ -3096,7 +3107,7 @@ describe('addObjectUndeclaredVariables', () => {
     // Does not throw for an object that does not exist.
     addObjectUndeclaredVariables({
       project,
-      scene: testScene,
+      resolvedScope: makeSceneScope(project, testScene),
       objectName: 'Ghost',
       undeclaredVariables: [
         { name: 'health', type: 'number', requiredScope: 'none' },

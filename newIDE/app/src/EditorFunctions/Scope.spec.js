@@ -6,6 +6,7 @@ import {
   getNamedVariantRejection,
   getOutsideEditorChangesTarget,
   getScopeLabel,
+  getFunctionTargetFromArgs,
   mergeLayersInScope,
   removeLayerInScope,
   renameLayerInScope,
@@ -554,5 +555,64 @@ describe('Scope', () => {
         variant_name: 'Dark',
       })
     ).toBe('custom object "UI::Dialog" (variant "Dark")');
+  });
+
+  describe('getFunctionTargetFromArgs', () => {
+    it('names the function of a custom object, a custom behavior or an extension', () => {
+      expect(
+        getFunctionTargetFromArgs({
+          scope: {
+            type: 'custom_object',
+            extension_name: 'UI',
+            custom_object_name: 'Dialog',
+          },
+          function_name: 'Open',
+        })
+      ).toEqual({
+        functionReference: 'UI::Dialog.Open',
+        extensionName: 'UI',
+        functionName: 'Open',
+        behaviorName: undefined,
+        objectName: 'Dialog',
+      });
+      expect(
+        getFunctionTargetFromArgs({
+          scope: {
+            type: 'custom_behavior',
+            extension_name: 'Combat',
+            custom_behavior_name: 'Health',
+          },
+          function_name: 'Hit',
+        })
+      ).toMatchObject({
+        functionReference: 'Combat::Health.Hit',
+        behaviorName: 'Health',
+      });
+      expect(
+        getFunctionTargetFromArgs({
+          scope: { type: 'extension', extension_name: 'Combat' },
+          function_name: 'Explode',
+        })
+      ).toMatchObject({ functionReference: 'Combat::Explode' });
+    });
+
+    it('is null without a function, for a scene, or for malformed arguments', () => {
+      expect(
+        getFunctionTargetFromArgs({
+          scope: { type: 'extension', extension_name: 'Combat' },
+          function_name: '',
+        })
+      ).toBeNull();
+      expect(
+        getFunctionTargetFromArgs({
+          scope: { type: 'scene', scene_name: 'Level' },
+          function_name: 'Open',
+        })
+      ).toBeNull();
+      expect(
+        getFunctionTargetFromArgs({ scope: 'Level', function_name: 'Open' })
+      ).toBeNull();
+      expect(getFunctionTargetFromArgs(null)).toBeNull();
+    });
   });
 });

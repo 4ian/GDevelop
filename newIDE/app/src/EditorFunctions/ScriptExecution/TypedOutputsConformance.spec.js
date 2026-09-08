@@ -1,6 +1,15 @@
 // @flow
 import { editorFunctions, type EditorFunctionGenericOutput } from '..';
-import { makeFakeLaunchFunctionOptionsWithProject } from '../TestHelpers';
+import {
+  makeFakeI18n,
+  makeFakeLaunchFunctionOptionsWithProject,
+} from '../TestHelpers';
+import {
+  reloadProjectEventsFunctionsExtensionMetadata,
+  type EventsFunctionCodeWriter,
+} from '../../EventsFunctionsExtensionsLoader';
+import { unserializeFromJSObject } from '../../Utils/Serializer';
+import tankConfigurationExtensionJson from '../../fixtures/TankConfigurationExtension.json';
 import schemasFixture from './TypedOutputsSchemas.fixture.json';
 
 const gd: libGDevelop = global.gd;
@@ -26,7 +35,15 @@ const TESTED_TYPED_FUNCTION_NAMES = [
   'read_events_source',
   'read_game_project_json',
   'add_behavior',
+  'inspect_extension',
 ];
+
+const createFakeEventsFunctionCodeWriter = (): EventsFunctionCodeWriter => ({
+  getIncludeFileFor: (functionName: string) => `${functionName}.js`,
+  writeFunctionCode: () => Promise.resolve(),
+  writeBehaviorCode: () => Promise.resolve(),
+  writeObjectCode: () => Promise.resolve(),
+});
 
 const sharedTypes = schemasFixture.sharedOutputTypes;
 const toolSchemas = schemasFixture.toolOutputSchemas;
@@ -282,5 +299,77 @@ describe('typed outputs conformance (script API declared reads)', () => {
     );
     expect(result.success).toBe(true);
     validateResultAgainstSchema(result, 'inspect_behavior_properties');
+  });
+
+  // `inspect_extension` returns up to four levels in one output: exercise them
+  // all at once, since the schema declares each of them.
+  it('inspect_extension output conforms at the extension, object, function and variant levels', async () => {
+    const extension = project.insertNewEventsFunctionsExtension(
+      'TankConfiguration',
+      0
+    );
+    unserializeFromJSObject(
+      extension,
+      tankConfigurationExtensionJson,
+      'unserializeFrom',
+      project
+    );
+    // Register the generated metadata, so the call forms can be computed.
+    reloadProjectEventsFunctionsExtensionMetadata(
+      project,
+      extension,
+      createFakeEventsFunctionCodeWriter(),
+      makeFakeI18n()
+    );
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.inspect_extension.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          extension_name: 'TankConfiguration',
+          custom_object_name: 'CombinedTank',
+          function_name: 'SetTopRotation',
+          variant_name: '',
+        },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(result, 'inspect_extension');
+    // The four levels are really there (an empty output would validate too).
+    expect(result.extension).toBeTruthy();
+    expect(result.customObject).toBeTruthy();
+    expect(result.functionDeclaration).toBeTruthy();
+    expect(result.variant).toBeTruthy();
+  });
+
+  it('inspect_extension output conforms at the behavior level', async () => {
+    const extension = project.insertNewEventsFunctionsExtension('MyExt', 0);
+    const behavior = extension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    behavior
+      .getPropertyDescriptors()
+      .insertNew('Health', 0)
+      .setType('Number');
+    behavior.getEventsFunctions().insertNewEventsFunction('IsDead', 0);
+    reloadProjectEventsFunctionsExtensionMetadata(
+      project,
+      extension,
+      createFakeEventsFunctionCodeWriter(),
+      makeFakeI18n()
+    );
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.inspect_extension.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          extension_name: 'MyExt',
+          custom_behavior_name: 'MyBehavior',
+        },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(result, 'inspect_extension');
+    expect(result.customBehavior).toBeTruthy();
   });
 });

@@ -1,0 +1,697 @@
+{
+  "author": "",
+  "category": "",
+  "dimension": "",
+  "extensionNamespace": "",
+  "fullName": "",
+  "gdevelopVersion": "",
+  "helpPath": "",
+  "iconUrl": "",
+  "name": "TankConfiguration",
+  "previewIconUrl": "",
+  "shortDescription": "",
+  "version": "",
+  "description": "",
+  "tags": [],
+  "authorIds": [],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [
+    {
+      "name": "CannonWidth",
+      "type": "number",
+      "value": 0
+    }
+  ],
+  "eventsFunctions": [],
+  "eventsFunctionsFolderStructure": {
+    "folderName": "__ROOT"
+  },
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": [
+    {
+      "areaMaxX": 95,
+      "areaMaxY": 65,
+      "areaMaxZ": 69,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "defaultName": "Combined_Tank",
+      "description": "",
+      "fullName": "Combined Tank",
+      "helpPath": "",
+      "iconUrl": "",
+      "is3D": true,
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "CombinedTank",
+      "previewIconUrl": "",
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "TankBase",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0.10000000149011612,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": true,
+            "isReceivingShadow": true,
+            "keepAspectRatio": true,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "assets\\Tank_Orange_Base.glb",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "TankTop_Combined",
+          "persistentUuid": "5f2a95c1-f9cd-4f43-b143-9e8cb93d9bec",
+          "type": "TankConfiguration::TankTop",
+          "variant": "",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {}
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "TankBase"
+          },
+          {
+            "objectName": "TankTop_Combined"
+          }
+        ]
+      },
+      "objectsGroups": [],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 25,
+          "height": 65,
+          "keepRatio": true,
+          "layer": "",
+          "name": "TankBase",
+          "persistentUuid": "6eedf890-c262-4f2e-a139-dbb8ab052b83",
+          "width": 95,
+          "x": 41.97606798483116,
+          "y": 32.5,
+          "zOrder": 12,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 76,
+          "height": 56,
+          "keepRatio": true,
+          "layer": "",
+          "name": "TankTop_Combined",
+          "persistentUuid": "c80610c1-0ffd-4631-b076-37aee90b376e",
+          "width": 57,
+          "x": 14,
+          "y": 4.5,
+          "z": 28,
+          "zOrder": 13,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 3.3943255487207074,
+        "windowMask": false,
+        "selectedLayer": ""
+      },
+      "eventsFunctions": [
+        {
+          "description": "the rotation of the tank top of the object.",
+          "fullName": "The rotation of the tank top",
+          "functionType": "ExpressionAndCondition",
+          "group": "CustomTank_Combined_Orange configuration",
+          "name": "TopRotation",
+          "sentence": "the rotation of the tank top",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "TopRotation"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TankConfiguration::CombinedTank",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "TopRotation",
+          "group": "CustomTank_Combined_Orange configuration",
+          "name": "SetTopRotation",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "TopRotation",
+                    "=",
+                    "Value"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "RotateTowardAngle"
+                  },
+                  "parameters": [
+                    "TankTop_Combined",
+                    "TopRotation",
+                    "0",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TankConfiguration::CombinedTank",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "the elevation of the tank cannon of the object.",
+          "fullName": "The elevation of the tank cannon",
+          "functionType": "ExpressionAndCondition",
+          "group": "CustomTank_Combined_Orange configuration",
+          "name": "CannonAngle",
+          "sentence": "the elevation of the tank cannon",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "CannonAngle"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TankConfiguration::CombinedTank",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "fullName": "",
+          "functionType": "ActionWithOperator",
+          "getterName": "CannonAngle",
+          "group": "CustomTank_Combined_Orange configuration",
+          "name": "SetCannonAngle",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CannonAngle",
+                    "=",
+                    "clamp(Value,-20,5)"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "TankConfiguration::TankTop::Elevation"
+                  },
+                  "parameters": [
+                    "TankTop_Combined",
+                    "CannonAngle",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TankConfiguration::CombinedTank",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Return the distance between the end of the cannon and the center of the TankTop object",
+          "fullName": "Return CannonWidth",
+          "functionType": "Expression",
+          "name": "CannonWidth",
+          "sentence": "",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TankConfiguration::TankTop::CannonInfo"
+                  },
+                  "parameters": [
+                    "TankTop_Combined",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "CannonWidth"
+                  ]
+                }
+              ]
+            }
+          ],
+          "expressionType": {
+            "type": "expression"
+          },
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TankConfiguration::CombinedTank",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsFunctionsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "folderName": "CustomTank_Combined_Orange configuration",
+            "children": [
+              {
+                "functionName": "TopRotation"
+              },
+              {
+                "functionName": "SetTopRotation"
+              },
+              {
+                "functionName": "CannonAngle"
+              },
+              {
+                "functionName": "SetCannonAngle"
+              }
+            ]
+          },
+          {
+            "functionName": "CannonWidth"
+          }
+        ]
+      },
+      "propertyDescriptors": [
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "DegreeAngle",
+          "label": "The elevation of the tank cannon",
+          "name": "CannonAngle"
+        },
+        {
+          "value": "0",
+          "type": "Number",
+          "unit": "DegreeAngle",
+          "label": "The rotation of the tank top",
+          "name": "TopRotation"
+        }
+      ],
+      "propertiesFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "propertyName": "CannonAngle"
+          },
+          {
+            "propertyName": "TopRotation"
+          }
+        ]
+      },
+      "variants": []
+    },
+    {
+      "areaMaxX": 48,
+      "areaMaxY": 51,
+      "areaMaxZ": 57,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "defaultName": "Tank_Top",
+      "description": "",
+      "fullName": "Tank Top",
+      "helpPath": "",
+      "iconUrl": "",
+      "is3D": true,
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "TankTop",
+      "previewIconUrl": "",
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "TankTop",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0.10000000149011612,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": true,
+            "isReceivingShadow": true,
+            "keepAspectRatio": true,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "assets\\Tank_Orange_upperbase.glb",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "TankCanon",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0.10000000149011612,
+            "depth": 100,
+            "height": 100,
+            "isCastingShadow": true,
+            "isReceivingShadow": true,
+            "keepAspectRatio": true,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "assets\\Tank_Orange_Cannon.glb",
+            "originLocation": "ModelOrigin",
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "width": 100,
+            "animations": []
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "TankCanon"
+          },
+          {
+            "objectName": "TankTop"
+          }
+        ]
+      },
+      "objectsGroups": [],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 10,
+          "height": 10,
+          "layer": "",
+          "name": "TankCanon",
+          "persistentUuid": "b3a4c66d-b3da-42ea-ba69-670751fbd29d",
+          "width": 65,
+          "x": 46,
+          "y": 25.5,
+          "zOrder": 14,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 57,
+          "height": 51,
+          "layer": "",
+          "name": "TankTop",
+          "persistentUuid": "aa82e4bd-a61a-4a48-a0c6-e56afe78de7f",
+          "width": 52,
+          "x": 24,
+          "y": 25.5,
+          "z": -35,
+          "zOrder": 13,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 6.166071119581128,
+        "windowMask": false,
+        "selectedLayer": ""
+      },
+      "eventsFunctions": [
+        {
+          "description": "Change the elevation of the tank cannon inside of the Tank_Top.",
+          "fullName": "Cannon Elevation",
+          "functionType": "Action",
+          "name": "Elevation",
+          "sentence": "Change the _PARAM0_ elevation to _PARAM1_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetRotationY"
+                  },
+                  "parameters": [
+                    "TankCanon",
+                    "Object3D",
+                    "=",
+                    "Angle"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TankConfiguration::TankTop",
+              "type": "object"
+            },
+            {
+              "description": "Elevation angle",
+              "name": "Angle",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Record variables related to the TankCannon object",
+          "fullName": "Record TankCannon information",
+          "functionType": "Action",
+          "name": "CannonInfo",
+          "sentence": "Record information for the TankCannon of _PARAM0_",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "CannonWidth",
+                    "=",
+                    "TankCanon.Width() + TankTop.Width()/2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "description": "Object",
+              "name": "Object",
+              "supplementaryInformation": "TankConfiguration::TankTop",
+              "type": "object"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsFunctionsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "functionName": "Elevation"
+          },
+          {
+            "functionName": "CannonInfo"
+          }
+        ]
+      },
+      "propertyDescriptors": [],
+      "propertiesFolderStructure": {
+        "folderName": "__ROOT"
+      },
+      "variants": []
+    }
+  ]
+}

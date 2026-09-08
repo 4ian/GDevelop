@@ -4,7 +4,7 @@ import {
   getInstancesInLayoutForLayer,
   renameLayoutInProject,
 } from '../Utils/Layout';
-import { mapFor, mapVector } from '../Utils/MapFor';
+import { mapFor } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
@@ -82,14 +82,27 @@ import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
 import {
+  extractRequiredString,
+  formatPropertiesList,
   getObjectSizeInfo,
   getObjectSizeInfoHints,
+  getSimplifiedInstance,
+  makeGenericFailure,
+  shouldHideProperty,
   type ObjectSizeInfo,
 } from './Utils';
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
 import { capScriptExecutionResult } from './ScriptExecution/CapScriptOutput';
 import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
+import {
+  inspectExtension,
+  type InspectedCustomBehavior,
+  type InspectedCustomObject,
+  type InspectedExtension,
+  type InspectedFunction,
+  type InspectedVariant,
+} from './Extensions/InspectExtension';
 
 export type HintEntry = {|
   code: string,
@@ -208,6 +221,13 @@ export type EditorFunctionGenericOutput = {|
   // (capped), so renames/reorders/deletions are self-verifying.
   tests?: Array<{| test_name: string, description: string |}>,
   variables?: Array<SimplifiedVariable>,
+  // `inspect_extension` output payload: the extension level is always there,
+  // the other levels only when their selector argument is given.
+  extension?: InspectedExtension,
+  customObject?: InspectedCustomObject,
+  customBehavior?: InspectedCustomBehavior,
+  functionDeclaration?: InspectedFunction,
+  variant?: InspectedVariant,
   reminder?: string,
   animationNames?: string,
   // EventScript source view (see `read_events_source`):
@@ -475,24 +495,6 @@ export type EditorFunctionWithoutProject = {|
   getModifiesProject?: (args: any) => boolean,
 |};
 
-/**
- * Helper function to safely extract required string arguments
- */
-const extractRequiredString = (args: any, propertyName: string): string => {
-  const value = SafeExtractor.extractStringProperty(args, propertyName);
-  if (value === null) {
-    throw new Error(
-      `Missing or invalid required string argument: ${propertyName}`
-    );
-  }
-  return value;
-};
-
-const makeGenericFailure = (message: string): EditorFunctionGenericOutput => ({
-  success: false,
-  message,
-});
-
 const getSceneNotFoundMessage = (
   project: gdProject,
   sceneName: string
@@ -658,14 +660,6 @@ const truncateValue = (value: string, limit: number = TRUNCATION_LIMIT) => {
   if (value.length <= limit) return value;
   return `${value.slice(0, limit)}[...truncated - ${value.length -
     limit} more characters]`;
-};
-
-const shouldHideProperty = (property: gdPropertyDescriptor): boolean => {
-  return (
-    property.isHidden() ||
-    property.isDeprecated() ||
-    property.getType() === 'Behavior' // No need to mess around with the "required behaviors", they are automatically filled.
-  );
 };
 
 const serializeNamedProperty = (
@@ -868,122 +862,6 @@ const verifyPropertyChange = ({
     propertyWarnings,
     propertyChanges,
   };
-};
-
-// Compact unit string: prefer the short symbol (e.g. "px", "deg") if it's
-// shorter than the full unit name (e.g. "Pixel", "DegreeAngle"). Returns null
-// if the property has no unit.
-const getShortMeasurementUnit = (
-  measurementUnit: gdMeasurementUnit
-): string | null => {
-  if (measurementUnit.isUndefined()) return null;
-  const name = measurementUnit.getName();
-  let shortLabel = '';
-  try {
-    const elementsCount = measurementUnit.getElementsCount();
-    for (let i = 0; i < elementsCount; i++) {
-      const baseUnit = measurementUnit.getElementBaseUnit(i);
-      const power = measurementUnit.getElementPower(i);
-      const symbol = baseUnit.getSymbol();
-      if (!symbol) continue;
-      shortLabel +=
-        (shortLabel ? '·' : '') + symbol + (power === 1 ? '' : `^${power}`);
-    }
-  } catch (_) {
-    // Defensive: if anything goes wrong, fall back to the name.
-    return name;
-  }
-  if (!shortLabel) return name;
-  return shortLabel.length < name.length ? shortLabel : name;
-};
-
-const getPropertyChoices = (
-  property: gdPropertyDescriptor
-): Array<string> | null => {
-  if (property.getType().toLowerCase() !== 'choice') return null;
-  return [
-    ...mapVector(property.getChoices(), choice => choice.getValue()),
-    // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
-    ...property.getExtraInfo().toJSArray(),
-  ];
-};
-
-// Builds a compact textual listing of properties optimized for LLM consumption:
-// - Boolean values omit the type tag (the value already implies it).
-// - Empty-valued properties are grouped at the end ("Empty: a, b (resource), c (string)").
-// - Number units use a short symbol ("px") when shorter than the full name ("Pixel").
-const formatPropertiesList = (
-  properties: gdMapStringPropertyDescriptor
-): string => {
-  const propertyNames = properties.keys().toJSArray();
-
-  const nonEmptyParts: Array<string> = [];
-  const emptyByType: Map<string, Array<string>> = new Map();
-
-  for (const name of propertyNames) {
-    const property = properties.get(name);
-    if (shouldHideProperty(property)) continue;
-
-    const rawType = property.getType();
-    const type = rawType.toLowerCase();
-    const value = property.getValue();
-    const unit = getShortMeasurementUnit(property.getMeasurementUnit());
-    const choices = getPropertyChoices(property);
-
-    // Booleans are always "true"/"false" - never grouped as empty.
-    if (type === 'boolean') {
-      nonEmptyParts.push(`${name}: ${value || 'false'}`);
-      continue;
-    }
-
-    if (value === '' || value === undefined) {
-      // Group empty properties by their descriptor (type + optional unit/choices).
-      const choicesText = choices
-        ? `one of: [${choices.map(c => `"${c}"`).join(', ')}]`
-        : null;
-      const resourceKind =
-        type === 'resource'
-          ? (property.getExtraInfo().toJSArray()[0] || '').toLowerCase()
-          : '';
-      const emptyFontNote =
-        resourceKind === 'font' ? ' — the default font is used' : '';
-      const tag =
-        [type, choicesText, unit].filter(Boolean).join(', ') + emptyFontNote;
-      const list = emptyByType.get(tag) || [];
-      list.push(name);
-      emptyByType.set(tag, list);
-      continue;
-    }
-
-    if (type === 'number') {
-      nonEmptyParts.push(
-        unit ? `${name}: ${value} (${unit})` : `${name}: ${value}`
-      );
-      continue;
-    }
-
-    const information = [
-      type,
-      choices ? `one of: [${choices.map(c => `"${c}"`).join(', ')}]` : null,
-      unit,
-    ]
-      .filter(Boolean)
-      .join(', ');
-    nonEmptyParts.push(
-      information ? `${name}: ${value} (${information})` : `${name}: ${value}`
-    );
-  }
-
-  const emptyParts: Array<string> = [];
-  for (const [tag, names] of emptyByType.entries()) {
-    emptyParts.push(tag ? `${names.join(', ')} (${tag})` : names.join(', '));
-  }
-
-  const segments = [];
-  if (nonEmptyParts.length > 0) segments.push(nonEmptyParts.join(', '));
-  if (emptyParts.length > 0) segments.push(`Empty: ${emptyParts.join(', ')}`);
-
-  return segments.join('. ');
 };
 
 const listLabelAndValuesFromChangedProperties = (
@@ -3395,46 +3273,7 @@ const describeInstances: EditorFunction = {
             ? sizeInfo
             : { width: 0, height: 0, depth: 0 };
 
-          const width = instance.hasCustomSize()
-            ? instance.getCustomWidth()
-            : defaultSize
-            ? defaultSize.width
-            : null;
-          const height = instance.hasCustomSize()
-            ? instance.getCustomHeight()
-            : defaultSize
-            ? defaultSize.height
-            : null;
-          const depth = instance.hasCustomDepth()
-            ? instance.getCustomDepth()
-            : defaultSize
-            ? defaultSize.depth
-            : null;
-
-          const serializedInstance = serializeToJSObject(instance);
-          instances.push({
-            ...serializedInstance,
-            // Replace persistentUuid by id:
-            persistentUuid: undefined,
-            id: instance.getPersistentUuid().slice(0, 10),
-            // The serializer omits z when it's 0 - always expose it for 3D objects:
-            z: depth !== null ? instance.getZ() : undefined,
-            // Actual computed dimensions (accounting for default size when no custom size is set):
-            width,
-            height,
-            depth,
-            // Expose the per-instance variables (overrides of the object
-            // variables), but only when there are some, to keep the output
-            // compact. Absence means the instance uses the object variables.
-            initialVariables:
-              serializedInstance.initialVariables &&
-              serializedInstance.initialVariables.length > 0
-                ? serializedInstance.initialVariables
-                : undefined,
-            // For now, don't expose these:
-            numberProperties: undefined,
-            stringProperties: undefined,
-          });
+          instances.push(getSimplifiedInstance(instance, defaultSize));
         }
       );
     });
@@ -8978,6 +8817,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   change_project_properties_resources: changeProjectPropertiesResources,
   add_or_edit_variable: addOrEditVariable,
   inspect_variables: inspectVariables,
+  inspect_extension: inspectExtension,
   read_full_docs: readFullDocs,
   search_docs: searchDocs,
 

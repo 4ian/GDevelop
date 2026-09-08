@@ -2,6 +2,8 @@
 import { makeSimplifiedProjectBuilder } from './SimplifiedProject';
 import { makeTestProject } from '../../fixtures/TestProject';
 import { makeTestExtensions } from '../../fixtures/TestExtensions';
+import { unserializeFromJSObject } from '../../Utils/Serializer';
+import tankConfigurationExtensionJson from '../../fixtures/TankConfigurationExtension.json';
 
 const gd: libGDevelop = global.gd;
 
@@ -14,6 +16,236 @@ describe('SimplifiedProject', () => {
 
     expect(simplifiedJson).toMatchInlineSnapshot(`
       Object {
+        "extensions": Array [
+          Object {
+            "description": "My description",
+            "extensionName": "My name",
+            "freeFunctions": Array [
+              Object {
+                "eventsCount": 1,
+                "functionName": "MyTestFunction",
+                "functionType": "Action",
+                "parameters": Array [
+                  Object {
+                    "label": "The first object to be used",
+                    "name": "MyObjectWithoutType",
+                    "type": "objectList",
+                  },
+                  Object {
+                    "label": "Some number",
+                    "name": "MyNumber",
+                    "type": "expression",
+                  },
+                  Object {
+                    "label": "Some string",
+                    "name": "MyString",
+                    "type": "string",
+                  },
+                  Object {
+                    "label": "The second object to be used, a sprite",
+                    "name": "MySpriteObject",
+                    "type": "objectList",
+                  },
+                ],
+              },
+              Object {
+                "eventsCount": 0,
+                "functionName": "MyTestFunction2",
+                "functionType": "Action",
+                "parameters": Array [],
+              },
+              Object {
+                "eventsCount": 0,
+                "functionName": "MyPrivateTestFunction3",
+                "functionType": "Action",
+                "isPrivate": true,
+                "parameters": Array [],
+              },
+            ],
+            "fullName": "My descriptive name",
+            "shortDescription": "",
+            "version": "1.1",
+          },
+          Object {
+            "extensionName": "SomeAlreadyInstalledExtension",
+            "fullName": "Some fake already installed extension",
+            "shortDescription": "",
+            "version": "1.2.3",
+          },
+          Object {
+            "customObjects": Array [
+              Object {
+                "area": Object {
+                  "maxX": 64,
+                  "maxY": 64,
+                  "maxZ": 64,
+                  "minX": 0,
+                  "minY": 0,
+                  "minZ": 0,
+                },
+                "childObjects": Array [
+                  Object {
+                    "objectName": "Button",
+                    "objectType": "Button::PanelSpriteButton",
+                  },
+                ],
+                "functions": Array [],
+                "instancesDescription": "There are no instances of child objects placed in this variant of the custom object - it is empty.",
+                "layers": Array [
+                  Object {
+                    "isBaseLayer": true,
+                    "layerName": "",
+                    "position": 0,
+                  },
+                ],
+                "objectName": "ComposedEventBasedObject",
+                "properties": Array [],
+              },
+              Object {
+                "area": Object {
+                  "maxX": 64,
+                  "maxY": 64,
+                  "maxZ": 64,
+                  "minX": 0,
+                  "minY": 0,
+                  "minZ": 0,
+                },
+                "childObjects": Array [
+                  Object {
+                    "behaviors": Array [
+                      Object {
+                        "behaviorName": "Effect",
+                        "behaviorType": "EffectCapability::EffectBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Opacity",
+                        "behaviorType": "OpacityCapability::OpacityBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Scale",
+                        "behaviorType": "ScalableCapability::ScalableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Text",
+                        "behaviorType": "TextContainerCapability::TextContainerBehavior",
+                      },
+                    ],
+                    "objectName": "Label",
+                    "objectType": "TextObject::Text",
+                  },
+                  Object {
+                    "behaviors": Array [
+                      Object {
+                        "behaviorName": "Effect",
+                        "behaviorType": "EffectCapability::EffectBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Opacity",
+                        "behaviorType": "OpacityCapability::OpacityBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Resizable",
+                        "behaviorType": "ResizableCapability::ResizableBehavior",
+                      },
+                    ],
+                    "objectName": "Idle",
+                    "objectType": "PanelSpriteObject::PanelSprite",
+                  },
+                  Object {
+                    "behaviors": Array [
+                      Object {
+                        "behaviorName": "Effect",
+                        "behaviorType": "EffectCapability::EffectBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Opacity",
+                        "behaviorType": "OpacityCapability::OpacityBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Resizable",
+                        "behaviorType": "ResizableCapability::ResizableBehavior",
+                      },
+                    ],
+                    "objectName": "Hovered",
+                    "objectType": "PanelSpriteObject::PanelSprite",
+                  },
+                  Object {
+                    "behaviors": Array [
+                      Object {
+                        "behaviorName": "Effect",
+                        "behaviorType": "EffectCapability::EffectBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Opacity",
+                        "behaviorType": "OpacityCapability::OpacityBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Resizable",
+                        "behaviorType": "ResizableCapability::ResizableBehavior",
+                      },
+                    ],
+                    "objectName": "Pressed",
+                    "objectType": "PanelSpriteObject::PanelSprite",
+                  },
+                ],
+                "functions": Array [
+                  Object {
+                    "eventsCount": 1,
+                    "functionName": "MyTestFunction",
+                    "functionType": "Action",
+                    "parameters": Array [],
+                  },
+                ],
+                "instancesDescription": "There are no instances of child objects placed in this variant of the custom object - it is empty.",
+                "layers": Array [
+                  Object {
+                    "isBaseLayer": true,
+                    "layerName": "",
+                    "position": 0,
+                  },
+                ],
+                "objectName": "PanelSpriteButton",
+                "properties": Array [
+                  Object {
+                    "label": "Label offset on Y axis when pressed",
+                    "propertyName": "PressedLabelOffsetY",
+                    "type": "number",
+                  },
+                  Object {
+                    "description": "The left padding of the button",
+                    "group": "Padding",
+                    "label": "Left padding",
+                    "measurementUnit": "Pixel",
+                    "propertyName": "LeftPadding",
+                    "type": "number",
+                  },
+                  Object {
+                    "group": "Padding",
+                    "label": "Right padding",
+                    "propertyName": "RightPadding",
+                    "type": "number",
+                  },
+                  Object {
+                    "group": "Padding",
+                    "label": "Top padding",
+                    "propertyName": "TopPadding",
+                    "type": "number",
+                  },
+                  Object {
+                    "group": "Padding",
+                    "label": "Down padding",
+                    "propertyName": "DownPadding",
+                    "type": "number",
+                  },
+                ],
+              },
+            ],
+            "extensionName": "Button",
+            "fullName": "",
+            "shortDescription": "",
+            "version": "1.0.0",
+          },
+        ],
         "globalObjectGroups": Array [],
         "globalObjects": Array [
           Object {
@@ -1190,5 +1422,666 @@ describe('SimplifiedProject', () => {
     `);
 
     project.delete();
+  });
+
+  describe('extensions', () => {
+    // An authored extension covering every declaration kind of the contract.
+    const makeProjectWithCombatExtension = (): gdProject => {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const extension = project.insertNewEventsFunctionsExtension('Combat', 0);
+      extension.setFullName('Combat');
+      extension.setShortDescription('Combat helpers');
+      extension.setDescription('Behaviors and objects for combat.');
+      extension.setCategory('Game mechanic');
+      extension.getTags().push_back('combat');
+      extension.getTags().push_back('health');
+      extension.setVersion('1.0.0');
+      extension.setAuthor('Me');
+      extension
+        .getGlobalVariables()
+        .insertNew('KillCount', 0)
+        .setValue(0);
+      extension
+        .getSceneVariables()
+        .insertNew('WaveIndex', 0)
+        .setValue(1);
+      const dependency = extension.addDependency();
+      dependency.setName('SomeNpmPackage');
+      dependency.setDependencyType('npm');
+      dependency.setExportName('some-npm-package');
+      dependency.setVersion('2.0.0');
+
+      const behavior = extension
+        .getEventsBasedBehaviors()
+        .insertNew('Patrol', 0);
+      behavior.setFullName('Patrol');
+      behavior.setDescription('Moves between points.');
+      behavior
+        .getPropertyDescriptors()
+        .insertNew('Speed', 0)
+        .setType('Number')
+        .setValue('100')
+        .setLabel('Speed')
+        .setDescription('Pixels per second');
+      behavior
+        .getPropertyDescriptors()
+        .insertNew('Mode', 1)
+        .setType('Choice')
+        .setValue('Loop')
+        .addChoice('Loop', 'Loop')
+        .addChoice('Once', 'Once');
+      behavior
+        .getSharedPropertyDescriptors()
+        .insertNew('DebugLayer', 0)
+        .setType('Layer')
+        .setLabel('Debug layer');
+      behavior
+        .getEventsFunctions()
+        .insertNewEventsFunction('doStepPreEvents', 0);
+      const patrolAction = behavior
+        .getEventsFunctions()
+        .insertNewEventsFunction('GoTo', 1);
+      patrolAction.setFunctionType(gd.EventsFunction.Action);
+      patrolAction.setFullName('Go to a point');
+      patrolAction.setSentence('Move _PARAM0_ to _PARAM2_;_PARAM3_');
+      gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+        extension,
+        behavior
+      );
+      patrolAction
+        .getParameters()
+        .insertNewParameter('TargetX', 2)
+        .setType('expression')
+        .setDescription('Target X');
+      patrolAction
+        .getParameters()
+        .insertNewParameter('TargetY', 3)
+        .setType('expression')
+        .setDescription('Target Y')
+        .setOptional(true);
+
+      const healthBar = extension
+        .getEventsBasedObjects()
+        .insertNew('HealthBar', 0);
+      healthBar.setFullName('Health bar');
+      healthBar.setDefaultName('HealthBar');
+      healthBar.setAreaMaxX(200);
+      healthBar.setAreaMaxY(20);
+      healthBar
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'Background', 0);
+      healthBar
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'Fill', 1)
+        .getVariables()
+        .insertNew('Ratio', 0)
+        .setValue(1);
+      const group = healthBar
+        .getObjects()
+        .getObjectGroups()
+        .insertNew('Parts', 0);
+      group.addObject('Background');
+      group.addObject('Fill');
+      healthBar
+        .getPropertyDescriptors()
+        .insertNew('MaxValue', 0)
+        .setType('Number')
+        .setValue('100')
+        .setLabel('Maximum value');
+      healthBar.getEventsFunctions().insertNewEventsFunction('onCreated', 0);
+      const getValue = healthBar
+        .getEventsFunctions()
+        .insertNewEventsFunction('Value', 1);
+      getValue.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
+      getValue.getExpressionType().setName('number');
+      gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+        extension,
+        healthBar
+      );
+      const instance = healthBar
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      instance.setObjectName('Background');
+      const largeVariant = healthBar.getVariants().insertNewVariant('Large', 0);
+      largeVariant.setAreaMaxX(400);
+      largeVariant.setAreaMaxY(40);
+      largeVariant.setAssetStoreAssetId('asset-id-1');
+      gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+        project,
+        healthBar
+      );
+
+      const computeDamage = extension
+        .getEventsFunctions()
+        .insertNewEventsFunction('ComputeDamage', 0);
+      computeDamage.setFunctionType(gd.EventsFunction.Expression);
+      computeDamage.getExpressionType().setName('number');
+      computeDamage.setPrivate(true);
+      computeDamage
+        .getParameters()
+        .insertNewParameter('BaseDamage', 0)
+        .setType('expression');
+      const waitForWave = extension
+        .getEventsFunctions()
+        .insertNewEventsFunction('WaitForWave', 1);
+      waitForWave.setAsync(true);
+      waitForWave.setDeprecated(true);
+      extension
+        .getEventsFunctions()
+        .insertNewEventsFunction('onSceneLoaded', 2);
+      extension
+        .getTests()
+        .insertNewTest('Health bar fills', 0)
+        .setDescription('A test');
+
+      return project;
+    };
+
+    it('serializes the declarations of an authored extension', () => {
+      const project = makeProjectWithCombatExtension();
+      const { extensions } = makeSimplifiedProjectBuilder(
+        gd
+      ).getSimplifiedProject(project, {});
+
+      expect(extensions).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "author": "Me",
+            "category": "Game mechanic",
+            "customBehaviors": Array [
+              Object {
+                "behaviorName": "Patrol",
+                "description": "Moves between points.",
+                "fullName": "Patrol",
+                "functions": Array [
+                  Object {
+                    "eventsCount": 0,
+                    "functionName": "doStepPreEvents",
+                    "functionType": "Action",
+                    "isLifecycle": true,
+                    "parameters": Array [
+                      Object {
+                        "isImplicit": true,
+                        "label": "Object",
+                        "name": "Object",
+                        "type": "object",
+                      },
+                      Object {
+                        "extraInfo": "Combat::Patrol",
+                        "isImplicit": true,
+                        "label": "Behavior",
+                        "name": "Behavior",
+                        "type": "behavior",
+                      },
+                    ],
+                  },
+                  Object {
+                    "eventsCount": 0,
+                    "fullName": "Go to a point",
+                    "functionName": "GoTo",
+                    "functionType": "Action",
+                    "parameters": Array [
+                      Object {
+                        "isImplicit": true,
+                        "label": "Object",
+                        "name": "Object",
+                        "type": "object",
+                      },
+                      Object {
+                        "extraInfo": "Combat::Patrol",
+                        "isImplicit": true,
+                        "label": "Behavior",
+                        "name": "Behavior",
+                        "type": "behavior",
+                      },
+                      Object {
+                        "label": "Target X",
+                        "name": "TargetX",
+                        "type": "expression",
+                      },
+                      Object {
+                        "label": "Target Y",
+                        "name": "TargetY",
+                        "optional": true,
+                        "type": "expression",
+                      },
+                    ],
+                    "sentence": "Move _PARAM0_ to _PARAM2_;_PARAM3_",
+                  },
+                ],
+                "properties": Array [
+                  Object {
+                    "defaultValue": "100",
+                    "description": "Pixels per second",
+                    "label": "Speed",
+                    "propertyName": "Speed",
+                    "type": "Number",
+                  },
+                  Object {
+                    "choices": Array [
+                      Object {
+                        "label": "Loop",
+                        "value": "Loop",
+                      },
+                      Object {
+                        "label": "Once",
+                        "value": "Once",
+                      },
+                    ],
+                    "defaultValue": "Loop",
+                    "propertyName": "Mode",
+                    "type": "Choice",
+                  },
+                ],
+                "sharedProperties": Array [
+                  Object {
+                    "label": "Debug layer",
+                    "propertyName": "DebugLayer",
+                    "type": "Layer",
+                  },
+                ],
+              },
+            ],
+            "customObjects": Array [
+              Object {
+                "area": Object {
+                  "maxX": 200,
+                  "maxY": 20,
+                  "maxZ": 64,
+                  "minX": 0,
+                  "minY": 0,
+                  "minZ": 0,
+                },
+                "childObjects": Array [
+                  Object {
+                    "behaviors": Array [
+                      Object {
+                        "behaviorName": "Animation",
+                        "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Effect",
+                        "behaviorType": "EffectCapability::EffectBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Flippable",
+                        "behaviorType": "FlippableCapability::FlippableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Opacity",
+                        "behaviorType": "OpacityCapability::OpacityBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Resizable",
+                        "behaviorType": "ResizableCapability::ResizableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Scale",
+                        "behaviorType": "ScalableCapability::ScalableBehavior",
+                      },
+                    ],
+                    "objectName": "Background",
+                    "objectType": "Sprite",
+                  },
+                  Object {
+                    "behaviors": Array [
+                      Object {
+                        "behaviorName": "Animation",
+                        "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Effect",
+                        "behaviorType": "EffectCapability::EffectBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Flippable",
+                        "behaviorType": "FlippableCapability::FlippableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Opacity",
+                        "behaviorType": "OpacityCapability::OpacityBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Resizable",
+                        "behaviorType": "ResizableCapability::ResizableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Scale",
+                        "behaviorType": "ScalableCapability::ScalableBehavior",
+                      },
+                    ],
+                    "objectName": "Fill",
+                    "objectType": "Sprite",
+                    "objectVariables": Array [
+                      Object {
+                        "type": "Number",
+                        "value": "1",
+                        "variableName": "Ratio",
+                      },
+                    ],
+                  },
+                ],
+                "defaultName": "HealthBar",
+                "fullName": "Health bar",
+                "functions": Array [
+                  Object {
+                    "eventsCount": 0,
+                    "functionName": "onCreated",
+                    "functionType": "Action",
+                    "isLifecycle": true,
+                    "parameters": Array [
+                      Object {
+                        "extraInfo": "Combat::HealthBar",
+                        "isImplicit": true,
+                        "label": "Object",
+                        "name": "Object",
+                        "type": "object",
+                      },
+                    ],
+                  },
+                  Object {
+                    "eventsCount": 0,
+                    "expressionType": "number",
+                    "functionName": "Value",
+                    "functionType": "ExpressionAndCondition",
+                    "parameters": Array [
+                      Object {
+                        "extraInfo": "Combat::HealthBar",
+                        "isImplicit": true,
+                        "label": "Object",
+                        "name": "Object",
+                        "type": "object",
+                      },
+                    ],
+                  },
+                ],
+                "instancesDescription": "In this variant of the custom object, there are:
+        - on base layer:
+          - 1 Background
+
+        Inspect instances of this variant to get more details if needed.",
+                "layers": Array [
+                  Object {
+                    "isBaseLayer": true,
+                    "layerName": "",
+                    "position": 0,
+                  },
+                ],
+                "objectGroups": Array [
+                  Object {
+                    "behaviors": Array [
+                      Object {
+                        "behaviorName": "Animation",
+                        "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Effect",
+                        "behaviorType": "EffectCapability::EffectBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Flippable",
+                        "behaviorType": "FlippableCapability::FlippableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Opacity",
+                        "behaviorType": "OpacityCapability::OpacityBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Resizable",
+                        "behaviorType": "ResizableCapability::ResizableBehavior",
+                      },
+                      Object {
+                        "behaviorName": "Scale",
+                        "behaviorType": "ScalableCapability::ScalableBehavior",
+                      },
+                    ],
+                    "objectGroupName": "Parts",
+                    "objectGroupType": "Sprite",
+                    "objectNames": Array [
+                      "Background",
+                      "Fill",
+                    ],
+                    "variables": undefined,
+                  },
+                ],
+                "objectName": "HealthBar",
+                "properties": Array [
+                  Object {
+                    "defaultValue": "100",
+                    "label": "Maximum value",
+                    "propertyName": "MaxValue",
+                    "type": "Number",
+                  },
+                ],
+                "variants": Array [
+                  Object {
+                    "area": Object {
+                      "maxX": 400,
+                      "maxY": 40,
+                      "maxZ": 64,
+                      "minX": 0,
+                      "minY": 0,
+                      "minZ": 0,
+                    },
+                    "assetStoreAssetId": "asset-id-1",
+                    "childObjects": Array [
+                      Object {
+                        "behaviors": Array [
+                          Object {
+                            "behaviorName": "Animation",
+                            "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Effect",
+                            "behaviorType": "EffectCapability::EffectBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Flippable",
+                            "behaviorType": "FlippableCapability::FlippableBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Opacity",
+                            "behaviorType": "OpacityCapability::OpacityBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Resizable",
+                            "behaviorType": "ResizableCapability::ResizableBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Scale",
+                            "behaviorType": "ScalableCapability::ScalableBehavior",
+                          },
+                        ],
+                        "objectName": "Background",
+                        "objectType": "Sprite",
+                      },
+                      Object {
+                        "behaviors": Array [
+                          Object {
+                            "behaviorName": "Animation",
+                            "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Effect",
+                            "behaviorType": "EffectCapability::EffectBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Flippable",
+                            "behaviorType": "FlippableCapability::FlippableBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Opacity",
+                            "behaviorType": "OpacityCapability::OpacityBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Resizable",
+                            "behaviorType": "ResizableCapability::ResizableBehavior",
+                          },
+                          Object {
+                            "behaviorName": "Scale",
+                            "behaviorType": "ScalableCapability::ScalableBehavior",
+                          },
+                        ],
+                        "objectName": "Fill",
+                        "objectType": "Sprite",
+                        "objectVariables": Array [
+                          Object {
+                            "type": "Number",
+                            "value": "1",
+                            "variableName": "Ratio",
+                          },
+                        ],
+                      },
+                    ],
+                    "instancesDescription": "There are no instances of child objects placed in this variant of the custom object - it is empty.",
+                    "layers": Array [
+                      Object {
+                        "isBaseLayer": true,
+                        "layerName": "",
+                        "position": 0,
+                      },
+                    ],
+                    "variantName": "Large",
+                  },
+                ],
+              },
+            ],
+            "dependencies": Array [
+              Object {
+                "dependencyName": "SomeNpmPackage",
+                "exportName": "some-npm-package",
+                "type": "npm",
+                "version": "2.0.0",
+              },
+            ],
+            "description": "Behaviors and objects for combat.",
+            "extensionName": "Combat",
+            "freeFunctions": Array [
+              Object {
+                "eventsCount": 0,
+                "expressionType": "number",
+                "functionName": "ComputeDamage",
+                "functionType": "Expression",
+                "isPrivate": true,
+                "parameters": Array [
+                  Object {
+                    "name": "BaseDamage",
+                    "type": "expression",
+                  },
+                ],
+              },
+              Object {
+                "eventsCount": 0,
+                "functionName": "WaitForWave",
+                "functionType": "Action",
+                "isAsync": true,
+                "isDeprecated": true,
+                "parameters": Array [],
+              },
+              Object {
+                "eventsCount": 0,
+                "functionName": "onSceneLoaded",
+                "functionType": "Action",
+                "isLifecycle": true,
+                "parameters": Array [],
+              },
+            ],
+            "fullName": "Combat",
+            "globalVariables": Array [
+              Object {
+                "type": "Number",
+                "value": "0",
+                "variableName": "KillCount",
+              },
+            ],
+            "sceneVariables": Array [
+              Object {
+                "type": "Number",
+                "value": "1",
+                "variableName": "WaveIndex",
+              },
+            ],
+            "shortDescription": "Combat helpers",
+            "tags": "combat, health",
+            "tests": Array [
+              Object {
+                "description": "A test",
+                "testName": "Health bar fills",
+                "type": "gameplay",
+              },
+            ],
+            "version": "1.0.0",
+          },
+        ]
+      `);
+
+      project.delete();
+    });
+
+    it('marks store extensions and describes nested custom objects (TankConfiguration)', () => {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const extension = project.insertNewEventsFunctionsExtension(
+        'TankConfiguration',
+        0
+      );
+      unserializeFromJSObject(
+        extension,
+        tankConfigurationExtensionJson,
+        'unserializeFrom',
+        project
+      );
+      const storeExtension = project.insertNewEventsFunctionsExtension(
+        'CameraShake',
+        1
+      );
+      storeExtension.setOrigin('gdevelop-extension-store', 'CameraShake');
+
+      const { extensions } = makeSimplifiedProjectBuilder(
+        gd
+      ).getSimplifiedProject(project, {});
+
+      const tankConfiguration = extensions.find(
+        extension => extension.extensionName === 'TankConfiguration'
+      );
+      if (!tankConfiguration) throw new Error('TankConfiguration not found');
+      expect(tankConfiguration.isFromStore).toBeUndefined();
+      const combinedTank = (tankConfiguration.customObjects || []).find(
+        object => object.objectName === 'CombinedTank'
+      );
+      if (!combinedTank) throw new Error('CombinedTank not found');
+      expect(combinedTank.childObjects[1].objectType).toBe(
+        'TankConfiguration::TankTop'
+      );
+      expect(combinedTank.isRenderedIn3D).toBe(true);
+      expect(combinedTank.area).toEqual({
+        minX: 0,
+        minY: 0,
+        minZ: 0,
+        maxX: 95,
+        maxY: 65,
+        maxZ: 69,
+      });
+      const setTopRotation = combinedTank.functions.find(
+        eventsFunction => eventsFunction.functionName === 'SetTopRotation'
+      );
+      if (!setTopRotation) throw new Error('SetTopRotation not found');
+      expect(setTopRotation.functionType).toBe('ActionWithOperator');
+      expect(setTopRotation.getterName).toBe('TopRotation');
+      expect(setTopRotation.parameters[0].isImplicit).toBe(true);
+      expect(setTopRotation.parameters[0].extraInfo).toBe(
+        'TankConfiguration::CombinedTank'
+      );
+      expect(setTopRotation.eventsCount).toBe(1);
+      expect(combinedTank.instancesDescription).toContain('1 TankTop_Combined');
+
+      const cameraShake = extensions.find(
+        extension => extension.extensionName === 'CameraShake'
+      );
+      if (!cameraShake) throw new Error('CameraShake not found');
+      expect(cameraShake.isFromStore).toBe(true);
+      expect(cameraShake.originIdentifier).toBe('CameraShake');
+
+      project.delete();
+    });
   });
 });

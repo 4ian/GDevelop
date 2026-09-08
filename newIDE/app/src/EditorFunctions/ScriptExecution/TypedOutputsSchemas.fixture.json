@@ -136,6 +136,120 @@
         "centerY",
         "centerZ"
       ]
+    },
+    "SimplifiedFunction": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "functionName": {
+          "type": "string"
+        },
+        "functionType": {
+          "type": "string"
+        },
+        "expressionType": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "openEnded": true,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "extraInfo": {
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              },
+              "isImplicit": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "type"
+            ]
+          }
+        },
+        "isPrivate": {
+          "type": "boolean"
+        },
+        "isAsync": {
+          "type": "boolean"
+        },
+        "isLifecycle": {
+          "type": "boolean"
+        },
+        "eventsCount": {
+          "type": "number"
+        },
+        "callForm": {
+          "type": "string"
+        },
+        "callFormUnavailableReason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "functionName",
+        "functionType",
+        "parameters",
+        "eventsCount"
+      ]
+    },
+    "SimplifiedChildObject": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "objectName": {
+          "type": "string"
+        },
+        "objectType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "objectName",
+        "objectType"
+      ]
+    },
+    "SimplifiedProperty": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "propertyName": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "defaultValue": {
+          "type": "string"
+        },
+        "extraInfo": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hidden": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "propertyName",
+        "type"
+      ]
     }
   },
   "toolOutputSchemas": {
@@ -369,6 +483,299 @@
       },
       "required": [
         "success"
+      ]
+    },
+    "inspect_extension": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "extension": {
+          "type": "object",
+          "openEnded": true,
+          "properties": {
+            "extensionName": {
+              "type": "string"
+            },
+            "fullName": {
+              "type": "string"
+            },
+            "isReadOnly": {
+              "type": "boolean"
+            },
+            "customObjects": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "openEnded": true,
+                "properties": {
+                  "objectName": {
+                    "type": "string"
+                  },
+                  "objectType": {
+                    "type": "string"
+                  },
+                  "signature": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "objectName",
+                  "objectType",
+                  "signature"
+                ]
+              }
+            },
+            "customBehaviors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "openEnded": true,
+                "properties": {
+                  "behaviorName": {
+                    "type": "string"
+                  },
+                  "behaviorType": {
+                    "type": "string"
+                  },
+                  "signature": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "behaviorName",
+                  "behaviorType",
+                  "signature"
+                ]
+              }
+            },
+            "freeFunctions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "openEnded": true,
+                "properties": {
+                  "functionName": {
+                    "type": "string"
+                  },
+                  "functionType": {
+                    "type": "string"
+                  },
+                  "signature": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "functionName",
+                  "functionType",
+                  "signature"
+                ]
+              }
+            },
+            "globalVariables": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedVariable"
+              }
+            },
+            "sceneVariables": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedVariable"
+              }
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "openEnded": true,
+                "properties": {
+                  "dependencyName": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "dependencyName",
+                  "type"
+                ]
+              }
+            },
+            "tests": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "openEnded": true,
+                "properties": {
+                  "testName": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "testName",
+                  "type"
+                ]
+              }
+            }
+          },
+          "required": [
+            "extensionName",
+            "fullName",
+            "isReadOnly",
+            "customObjects",
+            "customBehaviors",
+            "freeFunctions",
+            "globalVariables",
+            "sceneVariables",
+            "dependencies",
+            "tests"
+          ]
+        },
+        "customObject": {
+          "type": "object",
+          "openEnded": true,
+          "properties": {
+            "objectName": {
+              "type": "string"
+            },
+            "objectType": {
+              "type": "string"
+            },
+            "properties": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedProperty"
+              }
+            },
+            "functions": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedFunction"
+              }
+            },
+            "childObjects": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedChildObject"
+              }
+            },
+            "variantNames": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "objectName",
+            "objectType",
+            "properties",
+            "functions",
+            "childObjects",
+            "variantNames"
+          ]
+        },
+        "customBehavior": {
+          "type": "object",
+          "openEnded": true,
+          "properties": {
+            "behaviorName": {
+              "type": "string"
+            },
+            "behaviorType": {
+              "type": "string"
+            },
+            "properties": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedProperty"
+              }
+            },
+            "sharedProperties": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedProperty"
+              }
+            },
+            "functions": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedFunction"
+              }
+            }
+          },
+          "required": [
+            "behaviorName",
+            "behaviorType",
+            "properties",
+            "sharedProperties",
+            "functions"
+          ]
+        },
+        "functionDeclaration": {
+          "$namedType": "SimplifiedFunction"
+        },
+        "variant": {
+          "type": "object",
+          "openEnded": true,
+          "properties": {
+            "variantName": {
+              "type": "string"
+            },
+            "isDefaultVariant": {
+              "type": "boolean"
+            },
+            "childObjects": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedChildObject"
+              }
+            },
+            "layers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "openEnded": true,
+                "properties": {
+                  "layerName": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "number"
+                  },
+                  "visible": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "layerName",
+                  "position",
+                  "visible"
+                ]
+              }
+            },
+            "instances": {
+              "type": "array",
+              "items": {
+                "$namedType": "SimplifiedInstance"
+              }
+            }
+          },
+          "required": [
+            "variantName",
+            "isDefaultVariant",
+            "childObjects",
+            "layers",
+            "instances"
+          ]
+        }
+      },
+      "required": [
+        "extension"
       ]
     },
     "add_behavior": {

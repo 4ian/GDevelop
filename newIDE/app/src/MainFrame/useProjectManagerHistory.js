@@ -59,12 +59,31 @@ const getProjectListHistoryTarget = (
     return { items };
   },
   setValue: (value: Object) => {
+    const targetItems = value.items || [];
+    const targetNames = new Set(targetItems.map(item => item.name));
+
     const currentNames = [];
     for (let i = 0; i < list.getCount(); i++) {
       currentNames.push(list.getAt(i).getName());
     }
-    currentNames.forEach(name => list.remove(name));
-    (value.items || []).forEach(({ name, serialized }, index) => {
+    // Only remove items that shouldn't exist any more, and only insert
+    // items that are missing - never remove-then-reinsert an item that's
+    // in both the current and the target state. That item would otherwise
+    // be destroyed and recreated as a new C++ object for no reason, even
+    // though nothing about it (its own content included) is tracked by
+    // this step - and any open editor for it (holding references to its
+    // instances, events, instructions...) would be left with dangling
+    // references to the destroyed original, crashing on next use.
+    currentNames
+      .filter(name => !targetNames.has(name))
+      .forEach(name => list.remove(name));
+
+    const remainingNames = new Set<string>();
+    for (let i = 0; i < list.getCount(); i++) {
+      remainingNames.add(list.getAt(i).getName());
+    }
+    targetItems.forEach(({ name, serialized }, index) => {
+      if (remainingNames.has(name)) return;
       const item = list.insertNew(name, index);
       unserializeFromJSObject(item, serialized, 'unserializeFrom', project);
     });

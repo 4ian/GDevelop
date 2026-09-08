@@ -2135,6 +2135,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     value={searchText}
                     onChange={setSearchText}
                     placeholder={t`Search in project`}
+                    onUndo={onUndo}
+                    onRedo={onRedo}
                   />
                 </Column>
               </Line>

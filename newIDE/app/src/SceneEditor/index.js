@@ -236,11 +236,31 @@ export type EditorId =
   | 'instances-list'
   | 'layers-list';
 
+// What is selected, remembered by name so it can be found again after the
+// history is applied (the actual objects/groups/layers can be destroyed
+// and re-created).
+type SelectionByName = {|
+  lastSelectionType: LastSelectionType,
+  selectedObjectNames: Array<string>,
+  selectedObjectGroupName: ?string,
+  selectedLayerName: ?string,
+|};
+
 // Where the change of an undoable step was made: an undo/redo reveals the
-// change where it was made.
+// change where it was made. For a panel edit of an object/group/layer's own
+// properties (as opposed to an instance's, already revealed by selecting
+// the touched instances), `revealSelection` is what was selected when the
+// change was made - so an undo/redo re-selects the actual object/group/
+// layer that was edited, not whatever happens to be selected right before
+// the undo/redo is triggered (see `_recordHistoryStep`/
+// `_queuePanelHistorySave`, which fill it in automatically).
 type HistoryChangeContext =
   | {| source: 'canvas' |}
-  | {| source: 'panel', editorId: EditorId |};
+  | {|
+      source: 'panel',
+      editorId: EditorId,
+      revealSelection?: SelectionByName,
+    |};
 
 // A change that can't be captured by a snapshot of the history targets, as
 // it refactors the whole project (see `_applyHistoryCommand`).
@@ -1578,23 +1598,19 @@ export default class SceneEditor extends React.Component<Props, State> {
     const selectedInstancesPersistentUuids = this.instancesSelection
       .getSelectedInstances()
       .map(instance => instance.getPersistentUuid());
-    // What is selected is remembered by name, to select it again after
-    // the history is applied (if it still exists).
-    const {
-      lastSelectionType,
-      selectedObjectGroup,
-      selectedLayer,
-      selectedObjectFolderOrObjectsWithContext,
-    } = this.state;
-    const selectedObjectNames = selectedObjectFolderOrObjectsWithContext
-      .filter(({ objectFolderOrObject }) => !objectFolderOrObject.isFolder())
-      .map(({ objectFolderOrObject }) =>
-        objectFolderOrObject.getObject().getName()
-      );
-    const selectedObjectGroupName = selectedObjectGroup
-      ? selectedObjectGroup.getName()
-      : null;
-    const selectedLayerName = selectedLayer ? selectedLayer.getName() : null;
+    // What is selected right now (just before applying the change) - the
+    // fallback used to restore selection when the action being applied
+    // doesn't say what it touched (e.g. an older/canvas-sourced action).
+    const currentSelectionByName = this._getCurrentSelectionByName();
+    // What was selected when the step being applied was actually made (for
+    // a panel edit of an object/group/layer) - the object/group/layer this
+    // undo/redo should reveal, which can differ from what's selected now.
+    const revealSelectionByName =
+      changeContext &&
+      changeContext.source === 'panel' &&
+      changeContext.revealSelection
+        ? changeContext.revealSelection
+        : currentSelectionByName;
 
     // /!\ Drop every reference to what the targets own: it can be deleted
     // (or re-created) when the history is applied.
@@ -1674,12 +1690,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.forceUpdatePropertiesEditor();
       this._sendSelectedInstances();
       if (changedOrAddedPersistentUuids.length === 0) {
-        this._restoreSelectionByName({
-          lastSelectionType,
-          selectedObjectNames,
-          selectedObjectGroupName,
-          selectedLayerName,
-        });
+        this._restoreSelectionByName(revealSelectionByName);
       }
       this._ensureKeyboardFocusStaysInEditor();
 
@@ -1698,6 +1709,32 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   /**
+   * The current selection, by name (an object/group/layer can be destroyed
+   * and re-created, so its name - not a reference to it - is what survives
+   * an undo/redo).
+   */
+  _getCurrentSelectionByName = (): SelectionByName => {
+    const {
+      lastSelectionType,
+      selectedObjectGroup,
+      selectedLayer,
+      selectedObjectFolderOrObjectsWithContext,
+    } = this.state;
+    return {
+      lastSelectionType,
+      selectedObjectNames: selectedObjectFolderOrObjectsWithContext
+        .filter(({ objectFolderOrObject }) => !objectFolderOrObject.isFolder())
+        .map(({ objectFolderOrObject }) =>
+          objectFolderOrObject.getObject().getName()
+        ),
+      selectedObjectGroupName: selectedObjectGroup
+        ? selectedObjectGroup.getName()
+        : null,
+      selectedLayerName: selectedLayer ? selectedLayer.getName() : null,
+    };
+  };
+
+  /**
    * Select again, after the history was applied, what was selected in the
    * panels (objects were re-created: they are found by their name).
    */
@@ -1706,12 +1743,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     selectedObjectNames,
     selectedObjectGroupName,
     selectedLayerName,
-  }: {|
-    lastSelectionType: LastSelectionType,
-    selectedObjectNames: Array<string>,
-    selectedObjectGroupName: ?string,
-    selectedLayerName: ?string,
-  |}) => {
+  }: SelectionByName) => {
     const {
       objectsContainer,
       globalObjectsContainer,
@@ -2238,6 +2270,24 @@ export default class SceneEditor extends React.Component<Props, State> {
    * Save a new step in the history, capturing the current state of the
    * given targets - after any pending panel modification.
    */
+  /**
+   * A panel edit of an object/group/layer's own properties doesn't say
+   * which one it touched otherwise - fill it in from what's currently
+   * selected (which is what's being edited), so an undo/redo can reveal
+   * the actual object/group/layer touched by this step, not whatever ends
+   * up selected by the time the undo/redo is triggered.
+   */
+  _withRevealSelection = (
+    changeContext: HistoryChangeContext
+  ): HistoryChangeContext => {
+    if (changeContext.source !== 'panel' || changeContext.revealSelection)
+      return changeContext;
+    return {
+      ...changeContext,
+      revealSelection: this._getCurrentSelectionByName(),
+    };
+  };
+
   _recordHistoryStep = (
     actionType: ?RevertableActionType,
     changeContext: HistoryChangeContext,
@@ -2250,7 +2300,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         this._getLatestHistory(),
         this._serializeHistoryTargets(keys),
         actionType || undefined,
-        changeContext
+        this._withRevealSelection(changeContext)
       ),
       () => {
         this.updateToolbar();
@@ -2342,7 +2392,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this._pendingPanelHistorySave = {
       key,
-      changeContext,
+      changeContext: this._withRevealSelection(changeContext),
       value: getValue(baseValue),
     };
     this._flushPendingPanelHistorySaveDebounced();

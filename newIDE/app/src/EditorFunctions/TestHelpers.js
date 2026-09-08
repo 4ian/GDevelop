@@ -21,6 +21,8 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   editorCallbacks: {
     onOpenLayout: jest.fn(),
     onCreateProject: jest.fn(),
+    onOpenEventsFunctionsExtension: jest.fn(),
+    onOpenCustomObjectEditor: jest.fn(),
   },
   relatedAiRequestId: 'fake-ai-request-id',
   getRelatedAiRequestLastMessages: () => ({
@@ -52,6 +54,9 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   onWillDeleteScene: jest.fn(),
   onWillDeleteGameplayTest: jest.fn(),
   onWillDeleteObject: jest.fn(),
+  onExtensionsModifiedOutsideEditor: jest.fn(),
+  ensureExtensionsUpToDate: jest.fn(() => Promise.resolve()),
+  onWillDeleteExtensionItem: jest.fn(() => Promise.resolve()),
   onWillInstallExtension: jest.fn(),
   onExtensionInstalled: jest.fn(),
   getAssetStoreTagForNewObject: () => null,

@@ -10,6 +10,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import {
@@ -256,6 +257,16 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   ) {
     if (!this._isTargetingThisVariant(changes)) return;
     if (this.editor) this.editor.onObjectGroupsModifiedOutsideEditor();
+  }
+
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
+    const extensionName = this.getEventsFunctionsExtensionName();
+    if (!extensionName || !changes.extensionNames.includes(extensionName)) {
+      return;
+    }
+    // The properties and children of the edited object may have changed.
+    this._rebuildProjectScopedContainersAccessor();
+    this.forceUpdateEditor();
   }
 
   saveUiSettings = () => {

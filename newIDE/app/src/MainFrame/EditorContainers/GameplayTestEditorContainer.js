@@ -11,6 +11,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type HotReloadSteps } from '../../EmbeddedGame/EmbeddedGameFrame';
@@ -150,6 +151,10 @@ export class GameplayTestEditorContainer extends React.Component<
   }
 
   onWillDeleteObject(changes: WillDeleteObjectChanges) {
+    // No thing to be done.
+  }
+
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
     // No thing to be done.
   }
 

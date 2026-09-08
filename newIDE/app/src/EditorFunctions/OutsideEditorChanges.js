@@ -63,17 +63,56 @@ export type ObjectGroupsOutsideEditorChanges = {|
   ...OutsideEditorChangesTarget,
 |};
 
-// Only scenes and gameplay tests are renamed outside the editor for now;
-// extend as needed.
-export type RenamableProjectItemKind = 'scene' | 'gameplay-test';
+export type RenamableProjectItemKind =
+  | 'scene'
+  | 'gameplay-test'
+  | 'extension'
+  | 'custom-object'
+  | 'custom-behavior'
+  | 'function';
 
 // For 'gameplay-test', the names are the tab "project item names" (the test
 // name for a project test, `ExtensionName::TestName` for an extension test —
-// see `getGameplayTestProjectItemName`).
+// see `getGameplayTestProjectItemName`). For the items of an extension
+// ('custom-object', 'custom-behavior', 'function'), `extensionName` is set,
+// and a function of a behavior or object also gives its owner.
 export type ProjectItemRenamedOutsideEditorChanges = {|
   kind: RenamableProjectItemKind,
   oldName: string,
   newName: string,
+  extensionName?: string,
+  behaviorName?: string,
+  objectName?: string,
+|};
+
+/**
+ * Extensions changed by the AI (created, edited, deleted, or their custom
+ * objects/behaviors/functions). Coalesced per batch: the flush reloads the
+ * generated extensions (`needsCodeRegeneration`: declarations or children
+ * changed; otherwise only the metadata) and refreshes the open editors.
+ */
+export type ExtensionsOutsideEditorChanges = {|
+  extensionNames: Array<string>,
+  needsCodeRegeneration: boolean,
+  // Set when an extension of `extensionNames` was removed from the project.
+  deleted?: boolean,
+|};
+
+// Called before an extension or one of its items is actually deleted, so any
+// tab or selection bound to it can be released first (a deleted function or
+// object pointer would be dangling).
+export type WillDeleteExtensionItemChanges = {|
+  kind:
+    | 'extension'
+    | 'custom-object'
+    | 'custom-object-variant'
+    | 'custom-behavior'
+    | 'function',
+  extensionName: string,
+  objectName?: string,
+  behaviorName?: string,
+  variantName?: string,
+  functionName?: string,
 |};
 
 // Called before the scene is actually deleted, so its gdLayout is still

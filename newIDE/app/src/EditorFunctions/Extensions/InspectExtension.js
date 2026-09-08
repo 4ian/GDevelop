@@ -279,7 +279,7 @@ const getCustomBehaviorSignature = (
 // guessed): what the agent must literally write to call the function.
 // ---------------------------------------------------------------------------
 
-type CallFormContext = {|
+export type CallFormContext = {|
   extensionName: string,
   owner: FunctionOwner,
   // `Ext::Obj` / `Ext::Beh` for object and behavior functions, null for free ones.
@@ -459,17 +459,18 @@ const getExpressionCallForm = (
 
 /**
  * The EventScript call form(s) of a function and the instruction type it was
- * read from, or nothing when the function is a lifecycle function or when the
- * extension has no generated metadata in the editor yet.
+ * read from. Both are empty for a lifecycle function and when the extension
+ * has no generated metadata in the editor yet.
  */
-const getCallFormAndInstructionType = (
+export const getCallFormsAndInstructionType = (
   platform: gdPlatform,
   context: CallFormContext,
   simplifiedFunction: SimplifiedFunction,
   getterFunction: SimplifiedFunction | null
-): {| callForm?: string, instructionType?: string |} => {
+): {| callForms: Array<string>, instructionType: string | null |} => {
   const { functionName, functionType } = simplifiedFunction;
-  if (simplifiedFunction.isLifecycle) return {};
+  if (simplifiedFunction.isLifecycle)
+    return { callForms: [], instructionType: null };
 
   // An `ActionWithOperator` takes the parameters of its getter.
   const declaredParameters = getterFunction
@@ -530,13 +531,29 @@ const getCallFormAndInstructionType = (
     if (getterForm) forms.push(`read the value with ${getterForm}`);
   }
 
+  return { callForms: forms, instructionType };
+};
+
+/** The same call forms, rendered as the single string the reads return. */
+const getCallFormAndInstructionType = (
+  platform: gdPlatform,
+  context: CallFormContext,
+  simplifiedFunction: SimplifiedFunction,
+  getterFunction: SimplifiedFunction | null
+): {| callForm?: string, instructionType?: string |} => {
+  const { callForms, instructionType } = getCallFormsAndInstructionType(
+    platform,
+    context,
+    simplifiedFunction,
+    getterFunction
+  );
   const result: {| callForm?: string, instructionType?: string |} = {};
-  if (forms.length > 0) result.callForm = forms.join(' | ');
+  if (callForms.length > 0) result.callForm = callForms.join(' | ');
   if (instructionType) result.instructionType = instructionType;
   return result;
 };
 
-const makeCallFormContext = (
+export const makeCallFormContext = (
   extensionName: string,
   owner: FunctionOwner,
   ownerName: string | null

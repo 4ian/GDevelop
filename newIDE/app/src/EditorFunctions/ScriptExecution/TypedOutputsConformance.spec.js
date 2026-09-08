@@ -36,6 +36,14 @@ const TESTED_TYPED_FUNCTION_NAMES = [
   'read_game_project_json',
   'add_behavior',
   'inspect_extension',
+  'create_extension',
+  'change_extension_properties',
+  'create_custom_object',
+  'change_custom_object',
+  'create_custom_behavior',
+  'change_custom_behavior',
+  'create_custom_function',
+  'change_custom_function',
 ];
 
 const createFakeEventsFunctionCodeWriter = (): EventsFunctionCodeWriter => ({
@@ -400,6 +408,128 @@ describe('typed outputs conformance (script API declared reads)', () => {
     expect(result.customObject).toBeTruthy();
     expect(result.functionDeclaration).toBeTruthy();
     expect(result.variant).toBeTruthy();
+  });
+
+  it('create_extension and change_extension_properties outputs conform', async () => {
+    const created: EditorFunctionGenericOutput = await editorFunctions.create_extension.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { extension_name: 'Combat', full_name: 'Combat' },
+      }
+    );
+    expect(created.success).toBe(true);
+    validateResultAgainstSchema(created, 'create_extension');
+
+    const changed: EditorFunctionGenericOutput = await editorFunctions.change_extension_properties.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          extension_name: 'Combat',
+          changed_properties: [
+            { property_name: 'description', new_value: 'Fights.' },
+          ],
+        },
+      }
+    );
+    expect(changed.success).toBe(true);
+    validateResultAgainstSchema(changed, 'change_extension_properties');
+  });
+
+  it('create_custom_object and change_custom_object outputs conform', async () => {
+    const created: EditorFunctionGenericOutput = await editorFunctions.create_custom_object.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { extension_name: 'UI', custom_object_name: 'Panel' },
+      }
+    );
+    expect(created.success).toBe(true);
+    validateResultAgainstSchema(created, 'create_custom_object');
+
+    const changed: EditorFunctionGenericOutput = await editorFunctions.change_custom_object.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          extension_name: 'UI',
+          custom_object_name: 'Panel',
+          changed_settings: [{ setting_name: 'fullName', new_value: 'Panel' }],
+          changed_variants: [{ variant_name: 'Dark' }],
+        },
+      }
+    );
+    expect(changed.success).toBe(true);
+    validateResultAgainstSchema(changed, 'change_custom_object');
+    expect(changed.variantNames).toEqual(['Dark']);
+
+    const deleted: EditorFunctionGenericOutput = await editorFunctions.change_custom_object.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          extension_name: 'UI',
+          custom_object_name: 'Panel',
+          delete_this_custom_object: true,
+        },
+      }
+    );
+    expect(deleted.success).toBe(true);
+    validateResultAgainstSchema(deleted, 'change_custom_object');
+  });
+
+  it('create_custom_behavior and change_custom_behavior outputs conform', async () => {
+    const created: EditorFunctionGenericOutput = await editorFunctions.create_custom_behavior.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { extension_name: 'UI', custom_behavior_name: 'Blink' },
+      }
+    );
+    expect(created.success).toBe(true);
+    validateResultAgainstSchema(created, 'create_custom_behavior');
+
+    const changed: EditorFunctionGenericOutput = await editorFunctions.change_custom_behavior.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          extension_name: 'UI',
+          custom_behavior_name: 'Blink',
+          changed_properties: [
+            { property_name: 'Speed', type: 'Number', default_value: '2' },
+          ],
+        },
+      }
+    );
+    expect(changed.success).toBe(true);
+    validateResultAgainstSchema(changed, 'change_custom_behavior');
+  });
+
+  it('create_custom_function and change_custom_function outputs conform', async () => {
+    const created: EditorFunctionGenericOutput = await editorFunctions.create_custom_function.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scope: { type: 'extension', extension_name: 'UI' },
+          function_name: 'Shake',
+          function_type: 'Action',
+          parameters: [{ name: 'Target', type: 'objectList' }],
+        },
+      }
+    );
+    expect(created.success).toBe(true);
+    validateResultAgainstSchema(created, 'create_custom_function');
+    expect(created.callForms && created.callForms.length).toBeGreaterThan(0);
+
+    const changed: EditorFunctionGenericOutput = await editorFunctions.change_custom_function.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scope: { type: 'extension', extension_name: 'UI' },
+          function_name: 'Shake',
+          changed_settings: [
+            { setting_name: 'description', new_value: 'Shakes.' },
+          ],
+        },
+      }
+    );
+    expect(changed.success).toBe(true);
+    validateResultAgainstSchema(changed, 'change_custom_function');
   });
 
   it('inspect_extension output conforms at the behavior level', async () => {

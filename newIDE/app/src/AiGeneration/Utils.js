@@ -10,9 +10,16 @@ import {
   type WillDeleteSceneChanges,
   type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
+  type WillDeleteExtensionItemChanges,
   getOutsideEditorChangesTargetKey,
   getSceneEventsOutsideEditorChangesKey,
 } from '../EditorFunctions/OutsideEditorChanges';
+import {
+  makeExtensionsOutsideEditorChangesAccumulator,
+  doExtensionChangesNeedCodeRegeneration,
+} from './ExtensionsOutsideEditorChangesAccumulator';
+import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
   getAiRequest,
   getAiRequestSuggestions,
@@ -248,6 +255,9 @@ export const useProcessFunctionCalls = ({
   onWillDeleteScene,
   onWillDeleteGameplayTest,
   onWillDeleteObject,
+  eventsFunctionsExtensionsState,
+  onExtensionsModifiedOutsideEditor,
+  onWillDeleteExtensionItem,
   onWillInstallExtension,
   onExtensionInstalled,
   isReadyToProcessFunctionCalls,
@@ -293,6 +303,15 @@ export const useProcessFunctionCalls = ({
     changes: WillDeleteGameplayTestChanges
   ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  // Used to regenerate the extensions changed by the AI (see
+  // `ensureExtensionsUpToDate` below).
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  onExtensionsModifiedOutsideEditor: (
+    changes: ExtensionsOutsideEditorChanges
+  ) => void,
+  onWillDeleteExtensionItem: (
+    changes: WillDeleteExtensionItemChanges
+  ) => Promise<void>,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
@@ -321,6 +340,7 @@ export const useProcessFunctionCalls = ({
     resourceManagementProps,
   });
   const { generateEvents } = useGenerateEvents({ project });
+  const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
 
   const { translatedObjectShortHeadersByType, fetchObjects } = React.useContext(
     ObjectStoreContext
@@ -543,6 +563,7 @@ export const useProcessFunctionCalls = ({
         string,
         ObjectGroupsOutsideEditorChanges
       > = new Map();
+      const accumulatedExtensionsChanges = makeExtensionsOutsideEditorChangesAccumulator();
       const flushAccumulatedOutsideEditorChanges = () => {
         accumulatedSceneEventsChanges.forEach(changes =>
           onSceneEventsModifiedOutsideEditor(changes)
@@ -556,6 +577,36 @@ export const useProcessFunctionCalls = ({
         accumulatedObjectGroupsChanges.forEach(changes =>
           onObjectGroupsModifiedOutsideEditor(changes)
         );
+      };
+
+      // Regenerate the extensions changed so far, so the platform metadata (and
+      // the extensions summary sent with the next message) matches the project
+      // again. Awaited by the functions needing fresh metadata to continue, and
+      // at the end of the batch so nothing is left dirty.
+      const ensureExtensionsUpToDate = async () => {
+        if (accumulatedExtensionsChanges.isEmpty()) return;
+        const changes = accumulatedExtensionsChanges.flush();
+
+        if (project) {
+          if (doExtensionChangesNeedCodeRegeneration(changes)) {
+            await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+              project
+            );
+          } else {
+            changes.extensionNames.forEach(extensionName => {
+              if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+                return;
+              }
+              eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+                project,
+                project.getEventsFunctionsExtension(extensionName)
+              );
+            });
+          }
+        }
+
+        onExtensionsModifiedOutsideEditor(changes);
+        triggerUnsavedChanges();
       };
 
       try {
@@ -633,6 +684,15 @@ export const useProcessFunctionCalls = ({
           // Not coalesced: must run before the object is actually deleted so
           // editors can safely read it to close a dialog/panel referring to it.
           onWillDeleteObject,
+          // Coalesced per extension: regenerating the extensions once for the
+          // whole batch instead of once per call.
+          onExtensionsModifiedOutsideEditor: changes =>
+            accumulatedExtensionsChanges.add(changes),
+          ensureExtensionsUpToDate,
+          // Not coalesced: must run before the extension (or one of its items)
+          // is actually deleted so the tabs and selections bound to it are
+          // released while it's still valid.
+          onWillDeleteExtensionItem,
           ensureExtensionInstalled,
           onWillInstallExtension,
           onExtensionInstalled,
@@ -664,6 +724,17 @@ export const useProcessFunctionCalls = ({
         // batch was aborted or threw, matching the previous inline behavior.
         flushAccumulatedOutsideEditorChanges();
 
+        // Regenerate the extensions left dirty by the batch, so the project
+        // summary sent with the next message describes them as they are now.
+        try {
+          await ensureExtensionsUpToDate();
+        } catch (error) {
+          console.error(
+            'Error while reloading the extensions modified by the AI:',
+            error
+          );
+        }
+
         // Release the lock so these calls can be retried if needed
         // (e.g. after an error or a suspension).
         functionCallsToProcess.forEach(functionCall => {
@@ -687,6 +758,10 @@ export const useProcessFunctionCalls = ({
       onWillDeleteScene,
       onWillDeleteGameplayTest,
       onWillDeleteObject,
+      eventsFunctionsExtensionsState,
+      onExtensionsModifiedOutsideEditor,
+      onWillDeleteExtensionItem,
+      triggerUnsavedChanges,
       ensureExtensionInstalled,
       onWillInstallExtension,
       onExtensionInstalled,

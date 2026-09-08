@@ -612,6 +612,17 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& objectName);
 
   /**
+   * \brief Remove a variant of an events-based object: every object of the
+   * project using this variant (in scenes, global objects and children of
+   * other events-based objects) uses the default variant instead.
+   */
+  static void RemoveEventsBasedObjectVariant(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      gd::EventsBasedObject& eventsBasedObject,
+      const gd::String& variantName);
+
+  /**
    * \brief Refactor the events function after an object or group is renamed
    *
    * This will update the events of the function and groups.

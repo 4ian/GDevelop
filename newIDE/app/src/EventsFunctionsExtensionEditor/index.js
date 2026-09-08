@@ -707,6 +707,125 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     cb(true);
   };
 
+  /**
+   * Release the selection of an item that is about to be removed from the
+   * extension by something else than this editor (the selection holds a
+   * pointer that would be dangling).
+   */
+  deselectIfSelected = ({
+    functionName,
+    behaviorName,
+    objectName,
+  }: {|
+    functionName?: string,
+    behaviorName?: string,
+    objectName?: string,
+  |}) => {
+    const {
+      selectedEventsFunction,
+      selectedEventsBasedBehavior,
+      selectedEventsBasedObject,
+    } = this.state;
+
+    const isSelectedBehavior =
+      !!behaviorName &&
+      !!selectedEventsBasedBehavior &&
+      selectedEventsBasedBehavior.getName() === behaviorName;
+    const isSelectedObject =
+      !!objectName &&
+      !!selectedEventsBasedObject &&
+      selectedEventsBasedObject.getName() === objectName;
+
+    if (functionName) {
+      // Only the function is removed: keep its behavior or object selected.
+      const isOwnerSelected = behaviorName
+        ? isSelectedBehavior
+        : objectName
+        ? isSelectedObject
+        : !selectedEventsBasedBehavior && !selectedEventsBasedObject;
+      if (
+        isOwnerSelected &&
+        selectedEventsFunction &&
+        selectedEventsFunction.getName() === functionName
+      ) {
+        this._selectEventsFunction(
+          null,
+          selectedEventsBasedBehavior,
+          selectedEventsBasedObject
+        );
+      }
+      return;
+    }
+
+    // The whole behavior or object is removed, with all of its functions.
+    if (isSelectedBehavior || isSelectedObject) {
+      this._selectEventsFunction(null, null, null);
+    }
+  };
+
+  /**
+   * Re-read the selection from the extension after it was changed outside of
+   * this editor: items may have been renamed (the selection follows them) or
+   * removed (the selection is released), and the lists must be refreshed.
+   */
+  refreshAfterOutsideChanges = () => {
+    const { eventsFunctionsExtension } = this.props;
+    const {
+      selectedEventsFunction,
+      selectedEventsBasedBehavior,
+      selectedEventsBasedObject,
+    } = this.state;
+
+    const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+    const newSelectedEventsBasedBehavior =
+      selectedEventsBasedBehavior &&
+      eventsBasedBehaviors.has(selectedEventsBasedBehavior.getName())
+        ? eventsBasedBehaviors.get(selectedEventsBasedBehavior.getName())
+        : null;
+
+    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+    const newSelectedEventsBasedObject =
+      selectedEventsBasedObject &&
+      eventsBasedObjects.has(selectedEventsBasedObject.getName())
+        ? eventsBasedObjects.get(selectedEventsBasedObject.getName())
+        : null;
+
+    const eventsFunctionsContainer = selectedEventsBasedBehavior
+      ? newSelectedEventsBasedBehavior &&
+        newSelectedEventsBasedBehavior.getEventsFunctions()
+      : selectedEventsBasedObject
+      ? newSelectedEventsBasedObject &&
+        newSelectedEventsBasedObject.getEventsFunctions()
+      : eventsFunctionsExtension.getEventsFunctions();
+    const newSelectedEventsFunction =
+      selectedEventsFunction &&
+      eventsFunctionsContainer &&
+      eventsFunctionsContainer.hasEventsFunctionNamed(
+        selectedEventsFunction.getName()
+      )
+        ? eventsFunctionsContainer.getEventsFunction(
+            selectedEventsFunction.getName()
+          )
+        : null;
+
+    this._updateProjectScopedContainerFrom({
+      eventsFunction: newSelectedEventsFunction,
+      eventsBasedBehavior: newSelectedEventsBasedBehavior,
+      eventsBasedObject: newSelectedEventsBasedObject,
+    });
+    this.setState(
+      {
+        selectedEventsFunction: newSelectedEventsFunction,
+        selectedEventsBasedBehavior: newSelectedEventsBasedBehavior,
+        selectedEventsBasedObject: newSelectedEventsBasedObject,
+      },
+      () => {
+        if (this.eventsFunctionList) this.eventsFunctionList.forceUpdateList();
+        this.updateToolbar();
+      }
+    );
+  };
+
   selectEventsBasedBehaviorByName = (behaviorName: string) => {
     const { eventsFunctionsExtension } = this.props;
     const eventsBasedBehaviorsList = eventsFunctionsExtension.getEventsBasedBehaviors();

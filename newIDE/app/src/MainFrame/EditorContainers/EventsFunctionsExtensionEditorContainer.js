@@ -11,6 +11,8 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
+  type WillDeleteExtensionItemChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -137,6 +139,26 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     changes: ObjectGroupsOutsideEditorChanges
   ) {
     // No thing to be done.
+  }
+
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
+    const extensionName = this.getEventsFunctionsExtensionName();
+    if (!extensionName || !changes.extensionNames.includes(extensionName)) {
+      return;
+    }
+    if (this.editor) this.editor.refreshAfterOutsideChanges();
+  }
+
+  // Called before the item is removed from the extension, so the editor can
+  // release a selection pointing at it (it would be dangling afterwards).
+  // A variant is not selectable here: only its object would match.
+  onWillDeleteExtensionItem(changes: WillDeleteExtensionItemChanges) {
+    if (!this.editor || changes.kind === 'custom-object-variant') return;
+    this.editor.deselectIfSelected({
+      functionName: changes.functionName,
+      behaviorName: changes.behaviorName,
+      objectName: changes.objectName,
+    });
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {

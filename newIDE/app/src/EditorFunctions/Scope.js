@@ -64,6 +64,17 @@ export type ResolvedScope = {|
   readOnlyReason: ?string,
 |};
 
+/**
+ * Whether an object or behavior type (`Ext::Name`) comes from an extension of
+ * the project: its metadata may be stale until the extensions are regenerated.
+ */
+export const isTypeOfProjectExtension = (
+  project: gdProject,
+  type: string
+): boolean =>
+  type.includes('::') &&
+  project.hasEventsFunctionsExtensionNamed(type.split('::')[0]);
+
 /** The scopes holding objects: a scene, or a variant of a custom object (its child objects). */
 export const OBJECTS_SCOPE_TYPES: Array<ToolScopeType> = [
   'scene',
@@ -810,7 +821,7 @@ export const makeScopeProjectScopedContainersAccessor = (
 // Events of a scope.
 // ---------------------------------------------------------------------------
 
-const getFunctionsContainerOfScope = (
+export const getFunctionsContainerOfScope = (
   resolvedScope: ResolvedScope
 ): ?gdEventsFunctionsContainer => {
   const {

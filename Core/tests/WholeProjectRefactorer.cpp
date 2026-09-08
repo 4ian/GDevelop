@@ -21,6 +21,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -1916,6 +1917,71 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
           "RenamedObjectWithMyBehavior.MyVariable + "
           "RenamedObjectWithMyBehavior.MyStructureVariable.Child");
     }
+  }
+
+  SECTION("Variant removed (in events-based object)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().InsertNew(
+            "MyEventsBasedObject", 0);
+    eventsBasedObject.GetVariants().InsertNewVariant("Dark", 0);
+    eventsBasedObject.GetVariants().InsertNewVariant("Light", 1);
+    const gd::String customObjectType =
+        "MyEventsExtension::MyEventsBasedObject";
+
+    auto setVariant = [](gd::Object &object, const gd::String &variantName) {
+      auto *configuration = dynamic_cast<gd::CustomObjectConfiguration *>(
+          &object.GetConfiguration());
+      REQUIRE(configuration != nullptr);
+      configuration->SetVariantName(variantName);
+    };
+    auto getVariant = [](const gd::Object &object) {
+      return dynamic_cast<const gd::CustomObjectConfiguration &>(
+                 object.GetConfiguration())
+          .GetVariantName();
+    };
+
+    // A scene object, a global object and a child of another events-based
+    // object use the "Dark" variant; one more object uses "Light".
+    auto &layout = project.InsertNewLayout("Scene", 0);
+    auto &sceneObject = layout.GetObjects().InsertNewObject(
+        project, customObjectType, "SceneObject", 0);
+    setVariant(sceneObject, "Dark");
+    auto &lightObject = layout.GetObjects().InsertNewObject(
+        project, customObjectType, "LightObject", 1);
+    setVariant(lightObject, "Light");
+    auto &globalObject = project.GetObjects().InsertNewObject(
+        project, customObjectType, "GlobalObject", 0);
+    setVariant(globalObject, "Dark");
+    auto &parentEventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().InsertNew("Parent", 1);
+    auto &childObject = parentEventsBasedObject.GetObjects().InsertNewObject(
+        project, customObjectType, "Child", 0);
+    setVariant(childObject, "Dark");
+    parentEventsBasedObject.GetVariants().InsertVariant(
+        parentEventsBasedObject.GetDefaultVariant(), 0);
+    auto &parentVariant = parentEventsBasedObject.GetVariants().GetVariant(0);
+    parentVariant.SetName("ParentVariant");
+
+    gd::WholeProjectRefactorer::RemoveEventsBasedObjectVariant(
+        project, eventsExtension, eventsBasedObject, "Dark");
+
+    REQUIRE(eventsBasedObject.GetVariants().HasVariantNamed("Dark") == false);
+    REQUIRE(eventsBasedObject.GetVariants().HasVariantNamed("Light") == true);
+    REQUIRE(getVariant(sceneObject) == "");
+    REQUIRE(getVariant(globalObject) == "");
+    REQUIRE(getVariant(childObject) == "");
+    REQUIRE(getVariant(parentVariant.GetObjects().GetObject("Child")) == "");
+    REQUIRE(getVariant(lightObject) == "Light");
+
+    // The default variant can't be removed.
+    gd::WholeProjectRefactorer::RemoveEventsBasedObjectVariant(
+        project, eventsExtension, eventsBasedObject, "");
+    REQUIRE(eventsBasedObject.GetVariants().GetVariantsCount() == 1);
   }
 
   SECTION("Object deleted (in events-based object)") {

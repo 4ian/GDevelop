@@ -899,6 +899,179 @@
         "extension"
       ]
     },
+    "create_extension": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "extensionName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "extensionName"
+      ]
+    },
+    "change_extension_properties": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "extensionName": {
+          "type": "string"
+        },
+        "nothingChanged": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "extensionName"
+      ]
+    },
+    "create_custom_object": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "extensionName": {
+          "type": "string"
+        },
+        "customObjectName": {
+          "type": "string"
+        },
+        "objectType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "extensionName",
+        "customObjectName",
+        "objectType"
+      ]
+    },
+    "change_custom_object": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "extensionName": {
+          "type": "string"
+        },
+        "customObjectName": {
+          "type": "string"
+        },
+        "objectType": {
+          "type": "string"
+        },
+        "variantNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "nothingChanged": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "extensionName",
+        "customObjectName",
+        "objectType",
+        "variantNames"
+      ]
+    },
+    "create_custom_behavior": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "extensionName": {
+          "type": "string"
+        },
+        "customBehaviorName": {
+          "type": "string"
+        },
+        "behaviorType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "extensionName",
+        "customBehaviorName",
+        "behaviorType"
+      ]
+    },
+    "change_custom_behavior": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "extensionName": {
+          "type": "string"
+        },
+        "customBehaviorName": {
+          "type": "string"
+        },
+        "behaviorType": {
+          "type": "string"
+        },
+        "nothingChanged": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "extensionName",
+        "customBehaviorName",
+        "behaviorType"
+      ]
+    },
+    "create_custom_function": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "extensionName": {
+          "type": "string"
+        },
+        "functionName": {
+          "type": "string"
+        },
+        "callForms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "functionType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "extensionName",
+        "functionName",
+        "callForms",
+        "functionType"
+      ]
+    },
+    "change_custom_function": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "extensionName": {
+          "type": "string"
+        },
+        "functionName": {
+          "type": "string"
+        },
+        "callForms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "nothingChanged": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "extensionName",
+        "functionName",
+        "callForms"
+      ]
+    },
     "add_behavior": {
       "type": "object",
       "openEnded": true,

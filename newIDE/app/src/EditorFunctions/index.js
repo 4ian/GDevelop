@@ -68,6 +68,8 @@ import getObjectByName from '../Utils/GetObjectByName';
 import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
 import type {
   SceneEventsOutsideEditorChanges,
+  ExtensionsOutsideEditorChanges,
+  WillDeleteExtensionItemChanges,
   InstancesOutsideEditorChanges,
   ObjectsOutsideEditorChanges,
   ObjectGroupsOutsideEditorChanges,
@@ -101,6 +103,7 @@ import {
   complyVariantsAfterStructuralEdit,
   getOutsideEditorChangesTarget,
   OBJECTS_SCOPE_TYPES,
+  isTypeOfProjectExtension,
   getScopeObjectsContainer,
   getObjectLookupScopeText,
   updateBehaviorsSharedDataInScope,
@@ -116,6 +119,22 @@ import {
   type ScopeFailure,
   type ToolScopeType,
 } from './Scope';
+import {
+  createExtension,
+  changeExtensionProperties,
+} from './Extensions/ExtensionFunctions';
+import {
+  createCustomObject,
+  changeCustomObject,
+} from './Extensions/CustomObjectFunctions';
+import {
+  createCustomBehavior,
+  changeCustomBehavior,
+} from './Extensions/CustomBehaviorFunctions';
+import {
+  createCustomFunction,
+  changeCustomFunction,
+} from './Extensions/CustomFunctionFunctions';
 import { capScriptExecutionResult } from './ScriptExecution/CapScriptOutput';
 import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
 import {
@@ -264,6 +283,19 @@ export type EditorFunctionGenericOutput = {|
   customBehavior?: InspectedCustomBehavior,
   functionDeclaration?: InspectedFunction,
   variant?: InspectedVariant,
+  // The extension authoring functions (`create_extension`,
+  // `change_extension_properties`, `create_custom_object`,
+  // `change_custom_object`): the FINAL names of what was created or changed.
+  extensionName?: string,
+  customObjectName?: string,
+  objectType?: string,
+  variantNames?: Array<string>,
+  // Custom behaviors and functions: the type to write in the events and, for
+  // a function, how to call it from EventScript.
+  customBehaviorName?: string,
+  behaviorType?: string,
+  functionType?: string,
+  callForms?: Array<string>,
   reminder?: string,
   animationNames?: string,
   // EventScript source view (see `read_events_source`):
@@ -412,6 +444,19 @@ export type EditorCallbacks = {|
     createdProject: gdProject | null,
     exampleSlug: string | null,
   |}>,
+  onOpenEventsFunctionsExtension: (
+    extensionName: string,
+    options: {|
+      functionName?: string,
+      behaviorName?: string,
+      objectName?: string,
+    |}
+  ) => void,
+  onOpenCustomObjectEditor: (
+    extensionName: string,
+    objectName: string,
+    variantName: string
+  ) => void,
 |};
 
 export type ToolOptions = {
@@ -473,6 +518,17 @@ export type LaunchFunctionOptionsWithoutProject = {|
     changes: WillDeleteGameplayTestChanges
   ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  // Extensions authored by the AI (see `OutsideEditorChanges.js`): the
+  // changes are coalesced per batch, `ensureExtensionsUpToDate` flushes them
+  // (regenerating the extensions) when a function needs fresh metadata, and
+  // `onWillDeleteExtensionItem` must be awaited before a deletion.
+  onExtensionsModifiedOutsideEditor: (
+    changes: ExtensionsOutsideEditorChanges
+  ) => void,
+  ensureExtensionsUpToDate: () => Promise<void>,
+  onWillDeleteExtensionItem: (
+    changes: WillDeleteExtensionItemChanges
+  ) => Promise<void>,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
   ) => Promise<void>,
@@ -1080,6 +1136,7 @@ const createOrReplaceObject: EditorFunction = {
     relatedAiRequestId,
     getRelatedAiRequestLastMessages,
     ensureExtensionInstalled,
+    ensureExtensionsUpToDate,
     searchAndInstallAsset,
     onObjectsModifiedOutsideEditor,
     onWillInstallExtension,
@@ -1401,6 +1458,11 @@ const createOrReplaceObject: EditorFunction = {
         }
       }
 
+      // A custom object of the project may have just been authored: its
+      // metadata only exists once the extensions are regenerated.
+      if (isTypeOfProjectExtension(project, candidateType)) {
+        await ensureExtensionsUpToDate();
+      }
       // Ensure the object type is valid.
       const objectMetadata = gd.MetadataProvider.getObjectMetadata(
         project.getCurrentPlatform(),
@@ -2757,6 +2819,7 @@ const addBehavior: EditorFunction = {
     args,
     toolsVersion,
     ensureExtensionInstalled,
+    ensureExtensionsUpToDate,
     onWillInstallExtension,
     onExtensionInstalled,
   }) => {
@@ -2820,6 +2883,11 @@ const addBehavior: EditorFunction = {
       }
     }
 
+    // A behavior of an extension of the project may have just been authored:
+    // its metadata only exists once the extensions are regenerated.
+    if (isTypeOfProjectExtension(project, behavior_type)) {
+      await ensureExtensionsUpToDate();
+    }
     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
       project.getCurrentPlatform(),
       behavior_type
@@ -9810,6 +9878,14 @@ export const editorFunctions: { [string]: EditorFunction } = {
   add_or_edit_variable: addOrEditVariable,
   inspect_variables: inspectVariables,
   inspect_extension: inspectExtension,
+  create_extension: createExtension,
+  change_extension_properties: changeExtensionProperties,
+  create_custom_object: createCustomObject,
+  change_custom_object: changeCustomObject,
+  create_custom_behavior: createCustomBehavior,
+  change_custom_behavior: changeCustomBehavior,
+  create_custom_function: createCustomFunction,
+  change_custom_function: changeCustomFunction,
   read_full_docs: readFullDocs,
   search_docs: searchDocs,
 

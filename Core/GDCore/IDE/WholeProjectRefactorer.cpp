@@ -20,6 +20,7 @@
 #include "GDCore/IDE/Events/BehaviorPropertyRenamer.h"
 #include "GDCore/IDE/Events/BehaviorTypeRenamer.h"
 #include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
+#include "GDCore/IDE/Events/CustomObjectVariantResetter.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
 #include "GDCore/IDE/Events/EventsParameterReplacer.h"
 #include "GDCore/IDE/Events/EventsPropertyReplacer.h"
@@ -1996,6 +1997,27 @@ void WholeProjectRefactorer::ObjectRemovedInEventsBasedObject(
   }
   eventsBasedObject.GetInitialInstances().RemoveInitialInstancesOfObject(
       objectName);
+}
+
+void WholeProjectRefactorer::RemoveEventsBasedObjectVariant(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    gd::EventsBasedObject &eventsBasedObject, const gd::String &variantName) {
+  auto &variants = eventsBasedObject.GetVariants();
+  // The default variant is the events-based object itself: it can't be removed.
+  if (variantName.empty() || !variants.HasVariantNamed(variantName)) {
+    gd::LogWarning("Warning, variant " + variantName +
+                   " was not found when calling RemoveEventsBasedObjectVariant.");
+    return;
+  }
+
+  gd::CustomObjectVariantResetter resetter(
+      gd::PlatformExtension::GetObjectFullType(eventsFunctionsExtension.GetName(),
+                                               eventsBasedObject.GetName()),
+      variantName);
+  gd::ProjectBrowserHelper::ExposeProjectObjects(project, resetter);
+
+  variants.RemoveVariant(variantName);
 }
 
 void WholeProjectRefactorer::ObjectRemovedInEventsFunction(

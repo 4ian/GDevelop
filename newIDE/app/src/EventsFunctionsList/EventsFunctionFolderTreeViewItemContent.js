@@ -165,9 +165,7 @@ export const buildMoveToMenu = ({
             eventsBasedObject
           ),
       },
-      ...(functionFolderOrFunction.isFolder() ||
-      eventsBasedBehavior ||
-      eventsBasedObject
+      ...(eventsBasedBehavior || eventsBasedObject
         ? []
         : [
             {
@@ -447,17 +445,13 @@ export class EventsFunctionFolderTreeViewItemContent
         eventsBasedObject,
         addFolder,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
-        moveToExtension: () => {},
+        moveToExtension: () => this._moveTo(),
         canBeRenamed: true,
       }),
       {
         label: i18n._(t`Delete`),
         click: () => this.delete(),
         accelerator: 'Backspace',
-      },
-      {
-        label: i18n._(t`Move to...`),
-        click: () => this._moveTo(),
       },
       {
         label: this._getPasteLabel(i18n),

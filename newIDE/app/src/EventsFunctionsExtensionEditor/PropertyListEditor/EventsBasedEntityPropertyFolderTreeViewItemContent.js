@@ -23,6 +23,7 @@ import {
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { removeSubFolders } from '../../Utils/Folders';
+import { serializeToJSObject } from '../../Utils/Serializer';
 
 export const expandAllSubfolders = (
   propertyFolder: gdPropertyFolderOrProperty,
@@ -196,9 +197,15 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     );
     return [
       {
+        label: i18n._(t`Copy`),
+        click: () => this.copy(),
+        accelerator: 'CmdOrCtrl+C',
+      },
+      {
         label: this._getPasteLabel(i18n),
         enabled: Clipboard.has(PROPERTIES_CLIPBOARD_KIND),
         click: () => this.paste(),
+        accelerator: 'CmdOrCtrl+V',
       },
       {
         label: i18n._(t`Rename`),
@@ -317,7 +324,15 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     this._onProjectItemModified();
   }
 
-  copy(): void {}
+  copy(): void {
+    Clipboard.set(
+      PROPERTIES_CLIPBOARD_KIND,
+      enumeratePropertiesInFolder(this.propertyFolder).map(property => ({
+        name: property.getName(),
+        serializedProperty: serializeToJSObject(property),
+      }))
+    );
+  }
 
   cut(): void {}
 

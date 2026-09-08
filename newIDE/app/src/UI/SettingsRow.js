@@ -104,9 +104,7 @@ const SettingsRow = ({ id, label, children }: Props): React.Node => {
         ...styles.row,
         height: rowHeight,
         ...(isMobile ? styles.rowOnMobile : {}),
-        ...(isHovered
-          ? { backgroundColor: muiTheme.palette.action.hover }
-          : {}),
+        backgroundColor: isHovered ? muiTheme.palette.action.hover : undefined,
       }}
       // Only a mouse hovers: a touch would leave the row highlighted after
       // the finger is lifted.

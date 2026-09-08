@@ -9,21 +9,29 @@
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
-              "type": { "value": "Timer" },
+              "type": {
+                "value": "Timer"
+              },
               "parameters": ["", "2", "\"SpawnTimer\""]
             },
             {
-              "type": { "value": "BuiltinCommonInstructions::Once" },
+              "type": {
+                "value": "BuiltinCommonInstructions::Once"
+              },
               "parameters": []
             }
           ],
           "actions": [
             {
-              "type": { "value": "ResetTimer" },
+              "type": {
+                "value": "ResetTimer"
+              },
               "parameters": ["", "\"SpawnTimer\""]
             },
             {
-              "type": { "value": "CentreCamera" },
+              "type": {
+                "value": "CentreCamera"
+              },
               "parameters": ["", "MySpriteObject", "", "", ""]
             }
           ],
@@ -32,13 +40,17 @@
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
-                  "type": { "value": "PlatformBehavior::IsFalling" },
+                  "type": {
+                    "value": "PlatformBehavior::IsFalling"
+                  },
                   "parameters": ["MySpriteObject", "PlatformerObject"]
                 }
               ],
               "actions": [
                 {
-                  "type": { "value": "Delete" },
+                  "type": {
+                    "value": "Delete"
+                  },
                   "parameters": ["MySpriteObject", ""]
                 }
               ]
@@ -62,17 +74,23 @@
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
-              "type": { "value": "StringVariable" },
+              "type": {
+                "value": "StringVariable"
+              },
               "parameters": ["MoveDirection", "=", "\"Left\""]
             }
           ],
           "actions": [
             {
-              "type": { "value": "SetStringVariable" },
+              "type": {
+                "value": "SetStringVariable"
+              },
               "parameters": ["MoveDirection", "=", "\"\""]
             },
             {
-              "type": { "value": "Create" },
+              "type": {
+                "value": "Create"
+              },
               "parameters": ["", "Star", "100", "-50", "\"\""]
             }
           ]
@@ -99,12 +117,22 @@
               "parameters": ["MySpriteObject", "PlatformerObject"]
             },
             {
-              "type": { "value": "BuiltinCommonInstructions::Or" },
+              "type": {
+                "value": "BuiltinCommonInstructions::Or"
+              },
               "parameters": [],
               "subInstructions": [
-                { "type": { "value": "DepartScene" }, "parameters": [""] },
                 {
-                  "type": { "value": "Timer", "inverted": true },
+                  "type": {
+                    "value": "DepartScene"
+                  },
+                  "parameters": [""]
+                },
+                {
+                  "type": {
+                    "value": "Timer",
+                    "inverted": true
+                  },
                   "parameters": ["", "2", "\"T\""]
                 }
               ]
@@ -129,8 +157,16 @@
         {
           "type": "BuiltinCommonInstructions::Standard",
           "variables": [
-            { "name": "Count", "type": "number", "value": "3" },
-            { "name": "Title", "type": "string", "value": "Hello \"world\"" }
+            {
+              "name": "Count",
+              "type": "number",
+              "value": "3"
+            },
+            {
+              "name": "Title",
+              "type": "string",
+              "value": "Hello \"world\""
+            }
           ],
           "conditions": [],
           "actions": []
@@ -138,7 +174,12 @@
         {
           "type": "BuiltinCommonInstructions::Else",
           "conditions": [
-            { "type": { "value": "DepartScene" }, "parameters": [""] }
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [""]
+            }
           ],
           "actions": []
         },
@@ -148,7 +189,9 @@
           "conditions": [],
           "actions": [
             {
-              "type": { "value": "Delete" },
+              "type": {
+                "value": "Delete"
+              },
               "parameters": ["MySpriteObject", ""]
             }
           ]
@@ -162,10 +205,22 @@
         {
           "type": "BuiltinCommonInstructions::While",
           "whileConditions": [
-            { "type": { "value": "DepartScene" }, "parameters": [""] }
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [""]
+            }
           ],
           "conditions": [],
-          "actions": [{ "type": { "value": "Wait" }, "parameters": ["1"] }]
+          "actions": [
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": ["1"]
+            }
+          ]
         },
         {
           "type": "BuiltinCommonInstructions::ForEachChildVariable",
@@ -184,7 +239,9 @@
               "conditions": [],
               "actions": [
                 {
-                  "type": { "value": "Delete" },
+                  "type": {
+                    "value": "Delete"
+                  },
                   "parameters": ["MySpriteObject", ""]
                 }
               ]
@@ -195,7 +252,14 @@
           "type": "BuiltinCommonInstructions::Standard",
           "disabled": true,
           "conditions": [],
-          "actions": [{ "type": { "value": "Wait" }, "parameters": ["1"] }]
+          "actions": [
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": ["1"]
+            }
+          ]
         }
       ],
       "expectedEventScript": [
@@ -229,11 +293,26 @@
           "repeatExpression": "3",
           "loopIndexVariable": "I",
           "variables": [
-            { "name": "I", "type": "number", "value": "0" },
-            { "name": "Total", "type": "number", "value": "5" }
+            {
+              "name": "I",
+              "type": "number",
+              "value": "0"
+            },
+            {
+              "name": "Total",
+              "type": "number",
+              "value": "5"
+            }
           ],
           "conditions": [],
-          "actions": [{ "type": { "value": "Wait" }, "parameters": ["1"] }]
+          "actions": [
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": ["1"]
+            }
+          ]
         }
       ],
       "expectedEventScript": [
@@ -303,16 +382,32 @@
           "object": "Héros",
           "conditions": [],
           "actions": [
-            { "type": { "value": "Delete" }, "parameters": ["Héros", ""] }
+            {
+              "type": {
+                "value": "Delete"
+              },
+              "parameters": ["Héros", ""]
+            }
           ]
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
           "variables": [
-            { "name": "Vitesse_éclair", "type": "number", "value": "3" }
+            {
+              "name": "Vitesse_éclair",
+              "type": "number",
+              "value": "3"
+            }
           ],
           "conditions": [],
-          "actions": [{ "type": { "value": "Wait" }, "parameters": ["1"] }]
+          "actions": [
+            {
+              "type": {
+                "value": "Wait"
+              },
+              "parameters": ["1"]
+            }
+          ]
         },
         {
           "type": "BuiltinCommonInstructions::ForEachChildVariable",
@@ -334,7 +429,7 @@
       ]
     },
     {
-      "name": "unknown instruction and non-representable event",
+      "name": "unknown instruction (parameters kept as written)",
       "parsesBack": true,
       "serializedEvents": [
         {
@@ -342,20 +437,184 @@
           "conditions": [],
           "actions": [
             {
-              "type": { "value": "SomeUnknownExtension::Unknown" },
+              "type": {
+                "value": "SomeUnknownExtension::Unknown"
+              },
               "parameters": ["A", "", "B"]
             }
           ]
-        },
-        {
-          "type": "BuiltinCommonInstructions::JsCode",
-          "inlineCode": "runtimeScene.setBackgroundColor(255, 0, 0);"
         }
       ],
       "expectedEventScript": [
         "always:",
-        "  SomeUnknownExtension::Unknown(A, , B)",
-        "# (event of type \"BuiltinCommonInstructions::JsCode\" cannot be shown as EventScript)"
+        "  SomeUnknownExtension::Unknown(A, , B)"
+      ]
+    },
+    {
+      "name": "javascript code event",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "runtimeScene.getGame().pause(true);",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expectedEventScript": [
+        "js \"\"\"",
+        "runtimeScene.getGame().pause(true);",
+        "\"\"\""
+      ]
+    },
+    {
+      "name": "javascript code event on an object group (its instances are `objects`)",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "for (const enemy of objects) {\n  enemy.setX(enemy.getX() + 10);\n}",
+          "parameterObjects": "Enemies",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expectedEventScript": [
+        "js(Enemies) \"\"\"",
+        "for (const enemy of objects) {",
+        "  enemy.setX(enemy.getX() + 10);",
+        "}",
+        "\"\"\""
+      ]
+    },
+    {
+      "name": "javascript code event as a sub-event, with quotes, `#`, blank lines and indentation in the code",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [""]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const label = \"Score: #1\";\n\nif (label !== '') {\n  console.log(label);\n}",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ]
+        }
+      ],
+      "expectedEventScript": [
+        "if DepartScene():",
+        "  js \"\"\"",
+        "  const label = \"Score: #1\";",
+        "",
+        "  if (label !== '') {",
+        "    console.log(label);",
+        "  }",
+        "  \"\"\""
+      ]
+    },
+    {
+      "name": "disabled javascript code events (with and without an object)",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "disabled": true,
+          "inlineCode": "for (const enemy of objects) enemy.hide();",
+          "parameterObjects": "Enemies",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "disabled": true,
+          "inlineCode": "runtimeScene.getGame().pause(false);",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expectedEventScript": [
+        "disabled js(Enemies) \"\"\"",
+        "for (const enemy of objects) enemy.hide();",
+        "\"\"\"",
+        "disabled js \"\"\"",
+        "runtimeScene.getGame().pause(false);",
+        "\"\"\""
+      ]
+    },
+    {
+      "name": "empty javascript code event (the fence opens and closes)",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expectedEventScript": ["js \"\"\"", "\"\"\""]
+    },
+    {
+      "name": "javascript code event with CRLF line endings (normalized to LF)",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "a();\r\nb();",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expectedEventScript": ["js \"\"\"", "a();", "b();", "\"\"\""]
+    },
+    {
+      "name": "multi-line javascript code event as the editor serializes it (one array element per line, with a trailing CR)",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "const game = runtimeScene.getGame();\r",
+            "game.pause(true);"
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "expectedEventScript": [
+        "js \"\"\"",
+        "const game = runtimeScene.getGame();",
+        "game.pause(true);",
+        "\"\"\""
+      ]
+    },
+    {
+      "name": "event with no EventScript form (shown as a `#` comment)",
+      "parsesBack": false,
+      "serializedEvents": [
+        {
+          "type": "BuiltinAsync::Async"
+        }
+      ],
+      "expectedEventScript": [
+        "# (event of type \"BuiltinAsync::Async\" cannot be shown as EventScript)"
       ]
     }
   ]

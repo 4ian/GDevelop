@@ -1525,6 +1525,39 @@ describe('SimplifiedProject', () => {
 
       project.delete();
     });
+
+    it('says whether each function is asynchronous (for `await` in EventScript)', () => {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      createFakeExtensionWithAPrivateFunction(project, 'MyExt', 'Reload');
+      const extension = project.getEventsFunctionsExtension('MyExt');
+      extension
+        .getEventsFunctions()
+        .getEventsFunction('Reload')
+        .setAsync(true);
+      reloadProjectEventsFunctionsExtensionMetadata(
+        project,
+        extension,
+        createFakeEventsFunctionCodeWriter(),
+        makeFakeI18n()
+      );
+
+      const summary = makeSimplifiedProjectBuilder(
+        gd
+      ).getProjectSpecificExtensionsSummary(project, {
+        includePrivateOfExtension: 'MyExt',
+      });
+      const extensionSummary = summary.extensionSummaries.find(
+        candidate => candidate.extensionName === 'MyExt'
+      );
+      if (!extensionSummary) throw new Error('No summary for MyExt.');
+      expect(
+        extensionSummary.freeActions
+          .map(action => [action.type, action.isAsync])
+          .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
+      ).toEqual([['MyExt::Reload', true], ['MyExt::ShowToast', false]]);
+
+      project.delete();
+    });
   });
 
   describe('extensions', () => {

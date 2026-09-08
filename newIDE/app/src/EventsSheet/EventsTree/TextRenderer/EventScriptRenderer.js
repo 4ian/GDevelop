@@ -279,12 +279,15 @@ const getLoopIndexVariableName = (event: gdBaseEvent): string => {
  * The header of an event and its actions list, in a form ready to be
  * rendered as EventScript. `header` is without indentation, `disabled`
  * prefix, trailing `:` and id annotation. Events without a body (comment,
- * link) have `standaloneLine` instead.
+ * link) have `standaloneLine` instead, and `jsHeader`/`jsBodyLines` are the
+ * fenced JavaScript code of a `js` event.
  */
 type EventScriptParts = {|
   header?: string,
   standaloneLine?: string,
   actionsList?: gdInstructionsList,
+  jsHeader?: string,
+  jsBodyLines?: Array<string>,
 |};
 
 const buildEventScriptParts = (
@@ -425,6 +428,17 @@ const buildEventScriptParts = (
       standaloneLine: `link "${escapeStringLiteral(linkEvent.getTarget())}"`,
     };
   }
+  if (type === 'BuiltinCommonInstructions::JsCode') {
+    const jsCodeEvent = gd.asJsCodeEvent(event);
+    const parameterObjects = jsCodeEvent.getParameterObjects().trim();
+    const inlineCode = jsCodeEvent.getInlineCode();
+    return {
+      jsHeader: `js${parameterObjects ? `(${parameterObjects})` : ''} """`,
+      // (No line at all for an empty code: the fence opens and closes.)
+      jsBodyLines:
+        inlineCode === '' ? [] : inlineCode.replace(/\r\n/g, '\n').split('\n'),
+    };
+  }
 
   return null;
 };
@@ -445,6 +459,9 @@ const renderHeaderLineFromParts = ({
 
   if (!parts) {
     return `${indent}# (event of type "${event.getType()}" cannot be shown as EventScript)${idAnnotation}`;
+  }
+  if (parts.jsHeader) {
+    return `${indent}${disabledPrefix}${parts.jsHeader}${idAnnotation}`;
   }
   if (parts.standaloneLine) {
     return `${indent}${disabledPrefix}${parts.standaloneLine}${idAnnotation}`;
@@ -546,6 +563,28 @@ export const renderEventAsEventScriptLines = ({
     });
   }
   lines.push(renderHeaderLineFromParts({ event, parts, eventPath, indent }));
+
+  if (parts && parts.jsHeader) {
+    // A `js` event is its header (with the id annotation, like every other
+    // event), its code re-indented like the event, and a closing `"""` line.
+    // An empty code line stays empty (no trailing spaces). It has no
+    // sub-events, no variables and no actions.
+    const jsBodyLines = parts.jsBodyLines || [];
+    jsBodyLines.forEach(codeLine => {
+      lines.push(codeLine === '' ? '' : `${indent}${codeLine}`);
+    });
+    lines.push(`${indent}"""`);
+    // Documented limitation: a code line starting with `"""` closes the
+    // fence early and nothing escapes it, so such an event cannot be
+    // rendered faithfully - report it instead of silently changing it.
+    if (jsBodyLines.some(codeLine => codeLine.trim().startsWith('"""'))) {
+      renderingErrors.push({
+        path: `event-${eventPath}`,
+        message: `The JavaScript code of event-${eventPath} has a line starting with the """ delimiter: it cannot be written as EventScript (the delimiter would close the code block early).`,
+      });
+    }
+    return lines;
+  }
 
   try {
     if (event.canHaveVariables() && event.hasVariables()) {

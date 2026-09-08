@@ -20,6 +20,9 @@ export type InstructionSummary = {|
   parameters: Array<ParameterSummary>,
   hidden?: boolean,
   relevantForSceneEvents?: boolean,
+  // Always written (true or false): the backend only refuses `await` on an
+  // instruction EXPLICITLY not asynchronous (older summaries have no flag).
+  isAsync: boolean,
 |};
 
 /**
@@ -253,6 +256,7 @@ export const buildExtensionSummary = ({
               return getParameterSummary(parameterMetadata);
             }
           ),
+          isAsync: instructionMetadata.isAsync(),
         };
         if (instructionMetadata.isHidden()) {
           instructionSummary.hidden = true;

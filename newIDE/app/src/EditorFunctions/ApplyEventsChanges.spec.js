@@ -60,6 +60,43 @@ describe('applyEventsChanges', () => {
   const makeStandardEventJson = (actionType: string) =>
     `{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[{"type":{"value":"${actionType}"}}]}`;
 
+  // A JavaScript code event as the events generation serializes it (the
+  // EventScript `js` fence compiles to exactly this shape).
+  const makeJsCodeEventJson = ({
+    inlineCode,
+    parameterObjects,
+  }: {|
+    inlineCode: string,
+    parameterObjects: string,
+  |}) =>
+    JSON.stringify({
+      type: 'BuiltinCommonInstructions::JsCode',
+      inlineCode,
+      parameterObjects,
+      useStrict: true,
+      eventsSheetExpanded: false,
+    });
+
+  const insertJsCodeEvent = ({
+    inlineCode,
+    parameterObjects,
+    index,
+  }: {|
+    inlineCode: string,
+    parameterObjects: string,
+    index: number,
+  |}) => {
+    const jsCodeEvent = gd.asJsCodeEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::JsCode',
+        index
+      )
+    );
+    jsCodeEvent.setInlineCode(inlineCode);
+    jsCodeEvent.setParameterObjects(parameterObjects);
+  };
+
   const setupMarkedSceneEvents = (actionTypes: Array<string>) => {
     sceneEventsList.clear();
     unserializeFromJSObject(
@@ -978,6 +1015,121 @@ describe('applyEventsChanges', () => {
     ]);
     expect(result.applied).toBe(2);
     expect(result.errors).toEqual([]);
+  });
+
+  it('should insert a generated JavaScript code event like any other event', () => {
+    setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
+    const inlineCode = [
+      'for (const enemy of objects) {',
+      '  enemy.setX(enemy.getX() + 10);',
+      '}',
+    ].join('\n');
+    const eventOperations = [
+      makeChange({
+        operationName: 'insert_at_end',
+        operationTargetEvent: null,
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode,
+          parameterObjects: 'Enemies',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::JsCode',
+    ]);
+    const insertedEvent = sceneEventsList.getEventAt(1);
+    const jsCodeEvent = gd.asJsCodeEvent(insertedEvent);
+    // The code is stored exactly as generated (nothing is reformatted).
+    expect(jsCodeEvent.getInlineCode()).toBe(inlineCode);
+    expect(jsCodeEvent.getParameterObjects()).toBe('Enemies');
+    expect(insertedEvent.canHaveSubEvents()).toBe(false);
+    expect(insertedEvent.getAiGeneratedEventId()).toBe(fakeGeneratedEventId);
+    // `useStrict` is always written by the generation: without it the
+    // unserialization would default it to false.
+    const serializedEvents = serializeToJSObject(sceneEventsList);
+    expect(serializedEvents[1].useStrict).toBe(true);
+  });
+
+  it('should replace an existing JavaScript code event with a generated one', () => {
+    sceneEventsList.clear();
+    insertJsCodeEvent({
+      inlineCode: 'runtimeScene.getGame().pause(true);',
+      parameterObjects: '',
+      index: 0,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_entire_event_and_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'runtimeScene.getGame().pause(false);',
+          parameterObjects: 'MyObject',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    // A delete + an insert: two applied operations, like any replacement.
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    const jsCodeEvent = gd.asJsCodeEvent(sceneEventsList.getEventAt(0));
+    expect(jsCodeEvent.getInlineCode()).toBe(
+      'runtimeScene.getGame().pause(false);'
+    );
+    expect(jsCodeEvent.getParameterObjects()).toBe('MyObject');
+  });
+
+  it('should replace a JavaScript code event keeping the sub-events it cannot have', () => {
+    sceneEventsList.clear();
+    insertJsCodeEvent({
+      inlineCode: 'console.log("before");',
+      parameterObjects: '',
+      index: 0,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_event_but_keep_existing_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    // A `js` event has no sub-events: there is nothing to keep, and the
+    // replacement still works.
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    expect(
+      gd.asJsCodeEvent(sceneEventsList.getEventAt(0)).getInlineCode()
+    ).toBe('console.log("after");');
   });
 
   it('should process deletions before insertions when paths are sorted', () => {

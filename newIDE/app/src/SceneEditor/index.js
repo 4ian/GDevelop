@@ -56,6 +56,11 @@ import {
 } from '../Utils/History';
 import { diffInstancesSnapshots } from '../Utils/InstancesSnapshotDiff';
 import '../UI/UndoRedoFlash.css';
+import {
+  getVariablesContainerHistoryTarget,
+  getObjectsContainerHistoryTarget,
+  getObjectGroupsContainerHistoryTarget,
+} from './ObjectsAndVariablesHistoryTargets';
 
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import {
@@ -1348,17 +1353,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     const targets: CompositeTargets = {
       // Objects first: instances, groups and folders reference them.
       objects: this._getObjectsContainerHistoryTarget(objectsContainer),
-      objectGroups: {
-        serializableObject: objectsContainer.getObjectGroups(),
-      },
+      objectGroups: this._getObjectGroupsContainerHistoryTarget(
+        objectsContainer.getObjectGroups()
+      ),
     };
     if (globalObjectsContainer) {
       targets.globalObjects = this._getObjectsContainerHistoryTarget(
         globalObjectsContainer
       );
-      targets.globalObjectGroups = {
-        serializableObject: globalObjectsContainer.getObjectGroups(),
-      };
+      targets.globalObjectGroups = this._getObjectGroupsContainerHistoryTarget(
+        globalObjectsContainer.getObjectGroups()
+      );
     }
     targets.layers = {
       serializableObject: this.props.layersContainer,
@@ -1476,44 +1481,21 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _getVariablesContainerHistoryTarget = (
     variablesContainer: gdVariablesContainer
-  ): CompositeTarget => ({
-    getValue: () => {
-      variablesContainer.ensurePersistentUuids();
-      return serializeToJSObject(variablesContainer);
-    },
-    setValue: (value: Object) => {
-      unserializeFromJSObject(variablesContainer, value);
-    },
-  });
+  ): CompositeTarget => getVariablesContainerHistoryTarget(variablesContainer);
 
   _getObjectsContainerHistoryTarget = (
     objectsContainer: gdObjectsContainer
-  ): CompositeTarget => ({
-    getValue: () => {
-      mapFor(0, objectsContainer.getObjectsCount(), i =>
-        this._ensurePersistentUuidsOfObject(objectsContainer.getObjectAt(i))
-      );
-      return {
-        objects: serializeToJSObject(objectsContainer, 'serializeObjectsTo'),
-        folders: serializeToJSObject(objectsContainer, 'serializeFoldersTo'),
-      };
-    },
-    setValue: (value: Object) => {
-      // Objects first: the folders reference them.
-      unserializeFromJSObject(
-        objectsContainer,
-        value.objects,
-        'unserializeObjectsFrom',
-        this.props.project
-      );
-      unserializeFromJSObject(
-        objectsContainer,
-        value.folders,
-        'unserializeFoldersFrom',
-        this.props.project
-      );
-    },
-  });
+  ): CompositeTarget =>
+    getObjectsContainerHistoryTarget(
+      objectsContainer,
+      this.props.project,
+      this._ensurePersistentUuidsOfObject
+    );
+
+  _getObjectGroupsContainerHistoryTarget = (
+    objectGroupsContainer: gdObjectGroupsContainer
+  ): CompositeTarget =>
+    getObjectGroupsContainerHistoryTarget(objectGroupsContainer);
 
   _serializeHistoryTargets = (keys: Array<string>): Object =>
     serializeCompositeTargets(this._getHistoryTargets(), keys);

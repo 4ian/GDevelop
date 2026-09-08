@@ -21,6 +21,12 @@ export type CompactSearchBarProps = {|
   disabled?: boolean,
   errored?: boolean,
   placeholder?: MessageDescriptor,
+  // A search bar is a transient filter, not project content being edited -
+  // unlike other inputs (a rename field, say), pressing undo/redo while
+  // it's focused should still reach the panel's history rather than being
+  // swallowed as "an input is being edited" (see `KeyboardShortcuts`).
+  onUndo?: () => void,
+  onRedo?: () => void,
 |};
 
 const CompactSearchBar: React.ComponentType<{
@@ -28,7 +34,17 @@ const CompactSearchBar: React.ComponentType<{
   +ref?: React.RefSetter<CompactSearchBarInterface>,
 }> = React.forwardRef<CompactSearchBarProps, CompactSearchBarInterface>(
   (
-    { value, onChange, onRequestSearch, id, disabled, errored, placeholder },
+    {
+      value,
+      onChange,
+      onRequestSearch,
+      id,
+      disabled,
+      errored,
+      placeholder,
+      onUndo,
+      onRedo,
+    },
     ref
   ) => {
     const idToUse = React.useRef<string>(id || makeTimestampedId());
@@ -71,6 +87,22 @@ const CompactSearchBar: React.ComponentType<{
                 onKeyPress={e => {
                   if (e.key === 'Enter' && onRequestSearch) {
                     onRequestSearch();
+                  }
+                }}
+                onKeyDown={e => {
+                  if (!(onUndo || onRedo) || !(e.ctrlKey || e.metaKey)) return;
+                  if (e.key === 'z' || e.key === 'Z') {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                      if (onRedo) onRedo();
+                    } else {
+                      if (onUndo) onUndo();
+                    }
+                  } else if (e.key === 'y' || e.key === 'Y') {
+                    if (onRedo) {
+                      e.preventDefault();
+                      onRedo();
+                    }
                   }
                 }}
                 placeholder={i18n._(placeholder || t`Search`)}

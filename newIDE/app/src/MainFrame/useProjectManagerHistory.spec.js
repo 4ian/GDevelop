@@ -134,6 +134,58 @@ describe('useProjectManagerHistory', () => {
     project.delete();
   });
 
+  it('never destroys and recreates a scene unrelated to the step being undone/redone', () => {
+    // A regression test for a real memory-safety bug: undoing/redoing the
+    // creation of one scene must not touch any other scene's underlying
+    // object - otherwise any editor already open for it (holding
+    // references to its instances, events, instructions...) is left
+    // pointing at destroyed memory, crashing on next use.
+    const project = makeProject();
+    const scene1 = project.getLayout('Scene1');
+    const event = scene1
+      .getEvents()
+      .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+    const condition = new gd.Instruction();
+    condition.setType('BuiltinCommonInstructions::Once');
+    gd.asStandardEvent(event)
+      .getConditions()
+      .insert(condition, 0);
+    condition.delete();
+    const conditionPtrBefore = gd
+      .asStandardEvent(scene1.getEvents().getEventAt(0))
+      .getConditions()
+      .get(0).ptr;
+
+    const removedNames = [];
+    const originalRemoveLayout = project.removeLayout.bind(project);
+    project.removeLayout = (name: string) => {
+      removedNames.push(name);
+      originalRemoveLayout(name);
+    };
+
+    const { call } = renderProjectManagerHistoryTester(project);
+    project.insertNewLayout('Scene3', 2);
+    call(r => r.recordStep('scenes', 'ADD', 'Scene3'));
+    call(r => r.undo(project, noopApplyRenameCommand));
+    call(r => r.redo(project, noopApplyRenameCommand));
+
+    expect(removedNames).not.toContain('Scene1');
+    expect(removedNames).not.toContain('Scene2');
+
+    const conditionPtrAfter = gd
+      .asStandardEvent(
+        project
+          .getLayout('Scene1')
+          .getEvents()
+          .getEventAt(0)
+      )
+      .getConditions()
+      .get(0).ptr;
+    expect(conditionPtrAfter).toBe(conditionPtrBefore);
+
+    project.delete();
+  });
+
   it('undoes and redoes the deletion of a scene, restoring its exact content', () => {
     const project = makeProject();
     const scene2 = project.getLayout('Scene2');

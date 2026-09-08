@@ -22,6 +22,7 @@ import {
 } from './EventsBasedEntityPropertyTreeViewItemContent';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
+import { removeSubFolders } from '../../Utils/Folders';
 
 export const expandAllSubfolders = (
   propertyFolder: gdPropertyFolderOrProperty,
@@ -282,6 +283,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     if (propertiesToDelete.length === 0) {
       // Folder is empty or contains only empty folders.
       setSelectedPropertyFolderOrProperty(null, false);
+      removeSubFolders(this.propertyFolder);
       this.propertyFolder.getParent().removeFolderChild(this.propertyFolder);
       forceUpdateList();
       return;
@@ -310,6 +312,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     for (const propertyToDelete of propertiesToDelete) {
       properties.remove(propertyToDelete.getName());
     }
+    removeSubFolders(this.propertyFolder);
     this.propertyFolder.getParent().removeFolderChild(this.propertyFolder);
     this._onProjectItemModified();
   }

@@ -3,6 +3,7 @@ import * as React from 'react';
 import Text from './Text';
 import { marginsSize } from './Grid';
 import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 // Width of the control column, shared by all rows so that the controls
 // (toggles, select fields, buttons, shortcuts...) are aligned like in a table.
@@ -19,6 +20,7 @@ const styles = {
     alignItems: 'center',
     boxSizing: 'border-box',
     padding: `${marginsSize / 2}px ${marginsSize}px`,
+    borderRadius: 4,
   },
   // On mobile, the control is displayed on its own line, below the label.
   rowOnMobile: {
@@ -80,6 +82,10 @@ type Props = {|
  */
 const SettingsRow = ({ id, label, children }: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  // The row is highlighted on hover: the label and its control are far apart,
+  // so the highlight is what shows which control belongs to which label.
+  const [isHovered, setIsHovered] = React.useState<boolean>(false);
   const generatedIdRef = React.useRef<string>('');
   if (!generatedIdRef.current) {
     generatedRowIdsCount++;
@@ -98,7 +104,16 @@ const SettingsRow = ({ id, label, children }: Props): React.Node => {
         ...styles.row,
         height: rowHeight,
         ...(isMobile ? styles.rowOnMobile : {}),
+        ...(isHovered
+          ? { backgroundColor: gdevelopTheme.list.hover.backgroundColor }
+          : {}),
       }}
+      // Only a mouse hovers: a touch would leave the row highlighted after
+      // the finger is lifted.
+      onPointerEnter={event => {
+        if (event.pointerType === 'mouse') setIsHovered(true);
+      }}
+      onPointerLeave={() => setIsHovered(false)}
     >
       <div style={styles.labelColumn}>
         <span id={controlIds.labelId}>

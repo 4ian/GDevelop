@@ -47,7 +47,7 @@ const styles = {
 };
 
 type SettingsRowControlIds = {|
-  /** The id to give to the control, so that clicking on the label focuses it. */
+  /** The id to give to the control. */
   controlId: string,
   /** The id of the label, to use as `aria-labelledby` on the control. */
   labelId: string,
@@ -57,8 +57,9 @@ const SettingsRowContext = React.createContext<?SettingsRowControlIds>(null);
 
 /**
  * The ids of the label and of the control of the enclosing settings row, so
- * that a control can be labelled by the row (for accessibility and to be
- * toggled by a click on the label).
+ * that a control can be labelled by the row (for accessibility). The label is
+ * not clickable on purpose: it would silently toggle the setting, which is too
+ * easy to do by mistake with a mouse or on a touchscreen.
  */
 export const useSettingsRowControlIds = (): ?SettingsRowControlIds =>
   React.useContext(SettingsRowContext);
@@ -100,11 +101,11 @@ const SettingsRow = ({ id, label, children }: Props): React.Node => {
       }}
     >
       <div style={styles.labelColumn}>
-        <label htmlFor={controlIds.controlId} id={controlIds.labelId}>
+        <span id={controlIds.labelId}>
           <Text noMargin displayInlineAsSpan>
             {label}
           </Text>
-        </label>
+        </span>
       </div>
       <div
         style={

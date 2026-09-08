@@ -211,7 +211,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
-    if (changes.scene !== this.getLayout()) {
+    if (changes.externalLayout || changes.scene !== this.getLayout()) {
       return;
     }
 

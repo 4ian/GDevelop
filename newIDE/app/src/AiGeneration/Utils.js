@@ -10,6 +10,8 @@ import {
   type WillDeleteSceneChanges,
   type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
+  getOutsideEditorChangesTargetKey,
+  getSceneEventsOutsideEditorChangesKey,
 } from '../EditorFunctions/OutsideEditorChanges';
 import {
   getAiRequest,
@@ -522,30 +524,37 @@ export const useProcessFunctionCalls = ({
       // trigger an in-game editor hot reload. Firing them once per function
       // call would, for a batch of modifying calls (e.g. a sub-agent adding 20
       // objects), hot reload the editor 20 times. Instead, accumulate the
-      // changes per scene while the batch is processed, then flush a single
-      // coalesced notification per change type once it is done.
+      // changes per target (a scene, an external layout or a variant of a
+      // custom object) while the batch is processed, then flush a single
+      // coalesced notification per change type and target once it is done.
       const accumulatedSceneEventsChanges: Map<
-        gdLayout,
-        Set<string>
+        string,
+        SceneEventsOutsideEditorChanges
       > = new Map();
-      const accumulatedInstancesScenes: Set<gdLayout> = new Set();
-      const accumulatedObjectsChanges: Map<gdLayout, boolean> = new Map();
-      const accumulatedObjectGroupsScenes: Set<gdLayout> = new Set();
+      const accumulatedInstancesChanges: Map<
+        string,
+        InstancesOutsideEditorChanges
+      > = new Map();
+      const accumulatedObjectsChanges: Map<
+        string,
+        ObjectsOutsideEditorChanges
+      > = new Map();
+      const accumulatedObjectGroupsChanges: Map<
+        string,
+        ObjectGroupsOutsideEditorChanges
+      > = new Map();
       const flushAccumulatedOutsideEditorChanges = () => {
-        accumulatedSceneEventsChanges.forEach((eventIds, scene) =>
-          onSceneEventsModifiedOutsideEditor({
-            scene,
-            newOrChangedAiGeneratedEventIds: eventIds,
-          })
+        accumulatedSceneEventsChanges.forEach(changes =>
+          onSceneEventsModifiedOutsideEditor(changes)
         );
-        accumulatedInstancesScenes.forEach(scene =>
-          onInstancesModifiedOutsideEditor({ scene })
+        accumulatedInstancesChanges.forEach(changes =>
+          onInstancesModifiedOutsideEditor(changes)
         );
-        accumulatedObjectsChanges.forEach((isNewObjectTypeUsed, scene) =>
-          onObjectsModifiedOutsideEditor({ scene, isNewObjectTypeUsed })
+        accumulatedObjectsChanges.forEach(changes =>
+          onObjectsModifiedOutsideEditor(changes)
         );
-        accumulatedObjectGroupsScenes.forEach(scene =>
-          onObjectGroupsModifiedOutsideEditor({ scene })
+        accumulatedObjectGroupsChanges.forEach(changes =>
+          onObjectGroupsModifiedOutsideEditor(changes)
         );
       };
 
@@ -576,33 +585,43 @@ export const useProcessFunctionCalls = ({
             getLastMessagesFromAiRequestOutput(aiRequest.output || []),
           generateEvents,
           onSceneEventsModifiedOutsideEditor: changes => {
-            const existingEventIds = accumulatedSceneEventsChanges.get(
-              changes.scene
-            );
-            if (existingEventIds) {
-              changes.newOrChangedAiGeneratedEventIds.forEach(eventId =>
-                existingEventIds.add(eventId)
+            const key = getSceneEventsOutsideEditorChangesKey(changes);
+            const existingChanges = accumulatedSceneEventsChanges.get(key);
+            if (existingChanges) {
+              changes.newOrChangedAiGeneratedEventIds.forEach(id =>
+                existingChanges.newOrChangedAiGeneratedEventIds.add(id)
               );
             } else {
-              accumulatedSceneEventsChanges.set(
-                changes.scene,
-                new Set(changes.newOrChangedAiGeneratedEventIds)
-              );
+              accumulatedSceneEventsChanges.set(key, {
+                ...changes,
+                newOrChangedAiGeneratedEventIds: new Set(
+                  changes.newOrChangedAiGeneratedEventIds
+                ),
+              });
             }
           },
           onInstancesModifiedOutsideEditor: changes => {
-            accumulatedInstancesScenes.add(changes.scene);
-          },
-          onObjectsModifiedOutsideEditor: changes => {
-            accumulatedObjectsChanges.set(
-              changes.scene,
-              accumulatedObjectsChanges.get(changes.scene) ||
-                false ||
-                changes.isNewObjectTypeUsed
+            accumulatedInstancesChanges.set(
+              getOutsideEditorChangesTargetKey(changes),
+              changes
             );
           },
+          onObjectsModifiedOutsideEditor: changes => {
+            const key = getOutsideEditorChangesTargetKey(changes);
+            const existingChanges = accumulatedObjectsChanges.get(key);
+            accumulatedObjectsChanges.set(key, {
+              ...changes,
+              isNewObjectTypeUsed:
+                (existingChanges
+                  ? existingChanges.isNewObjectTypeUsed
+                  : false) || changes.isNewObjectTypeUsed,
+            });
+          },
           onObjectGroupsModifiedOutsideEditor: changes => {
-            accumulatedObjectGroupsScenes.add(changes.scene);
+            accumulatedObjectGroupsChanges.set(
+              getOutsideEditorChangesTargetKey(changes),
+              changes
+            );
           },
           // Not coalesced: the tab rename must track the model rename, else the
           // open scene editor briefly looks up a now-missing layout name.

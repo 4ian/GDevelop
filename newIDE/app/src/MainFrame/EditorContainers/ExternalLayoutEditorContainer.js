@@ -274,7 +274,12 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
-    if (changes.scene !== this.getLayout()) {
+    // Instances of an external layout: only this one is concerned. Instances
+    // of a scene: every external layout of the scene refreshes (as before).
+    const isConcerned = changes.externalLayout
+      ? changes.externalLayout === this.getExternalLayout()
+      : changes.scene === this.getLayout();
+    if (!isConcerned) {
       return;
     }
 

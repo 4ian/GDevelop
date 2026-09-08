@@ -122,7 +122,28 @@ describe('typed outputs conformance (script API declared reads)', () => {
       .getVariables()
       .insertNew('Score', 0)
       .setValue(0);
+    // An external layout of the scene, and a custom object with a child and an
+    // instance of it, for the scoped reads.
+    project
+      .insertNewExternalLayout('Chunk', 0)
+      .setAssociatedLayout('TestScene');
+    const dialog = project
+      .insertNewEventsFunctionsExtension('UI', 0)
+      .getEventsBasedObjects()
+      .insertNew('Dialog', 0);
+    dialog.getObjects().insertNewObject(project, 'Sprite', 'Back', 0);
+    dialog
+      .getInitialInstances()
+      .insertNewInitialInstance()
+      .setObjectName('Back');
   });
+
+  const dialogScope = {
+    type: 'custom_object_variant',
+    extension_name: 'UI',
+    custom_object_name: 'Dialog',
+    variant_name: '',
+  };
 
   afterEach(() => {
     project.delete();
@@ -144,6 +165,45 @@ describe('typed outputs conformance (script API declared reads)', () => {
     expect(result.success).toBe(true);
     validateResultAgainstSchema(result, 'describe_instances');
     expect((result.instances || []).length).toBeGreaterThan(0);
+  });
+
+  it('describe_instances output conforms for an external layout and a custom object variant', async () => {
+    const externalLayoutResult: EditorFunctionGenericOutput = await editorFunctions.describe_instances.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scope: { type: 'external_layout', external_layout_name: 'Chunk' },
+        },
+      }
+    );
+    expect(externalLayoutResult.success).toBe(true);
+    validateResultAgainstSchema(externalLayoutResult, 'describe_instances');
+
+    const variantResult: EditorFunctionGenericOutput = await editorFunctions.describe_instances.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scope: dialogScope },
+      }
+    );
+    expect(variantResult.success).toBe(true);
+    validateResultAgainstSchema(variantResult, 'describe_instances');
+    expect((variantResult.instances || []).length).toBe(1);
+  });
+
+  it('inspect_scene_properties_layers_effects output conforms for a custom object variant', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.inspect_scene_properties_layers_effects.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scope: dialogScope },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(
+      result,
+      'inspect_scene_properties_layers_effects'
+    );
+    expect(result.isDefaultVariant).toBe(true);
+    expect(result.properties).toBeUndefined();
   });
 
   it('inspect_variables output conforms to InspectVariablesResult', async () => {

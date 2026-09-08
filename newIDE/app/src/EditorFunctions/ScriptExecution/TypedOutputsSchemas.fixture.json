@@ -389,10 +389,67 @@
               "visible"
             ]
           }
+        },
+        "isDefaultVariant": {
+          "type": "boolean"
+        },
+        "area": {
+          "type": "object",
+          "properties": {
+            "minX": {
+              "type": "number"
+            },
+            "minY": {
+              "type": "number"
+            },
+            "minZ": {
+              "type": "number"
+            },
+            "maxX": {
+              "type": "number"
+            },
+            "maxY": {
+              "type": "number"
+            },
+            "maxZ": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "minX",
+            "minY",
+            "minZ",
+            "maxX",
+            "maxY",
+            "maxZ"
+          ]
+        },
+        "assetStoreAssetId": {
+          "type": "string"
+        },
+        "objectGroups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "objectGroupName": {
+                "type": "string"
+              },
+              "objectNames": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "objectGroupName",
+              "objectNames"
+            ]
+          }
         }
       },
       "required": [
-        "properties",
         "layers"
       ]
     },
@@ -461,6 +518,70 @@
       "properties": {
         "eventScript": {
           "type": "string"
+        },
+        "functionName": {
+          "type": "string"
+        },
+        "scopeSummary": {
+          "type": "object",
+          "properties": {
+            "parameters": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "type"
+                ]
+              }
+            },
+            "properties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "childObjects": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "extensionVariables": {
+              "type": "object",
+              "properties": {
+                "global": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "scene": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "global",
+                "scene"
+              ]
+            }
+          },
+          "required": [
+            "parameters",
+            "properties",
+            "extensionVariables"
+          ]
         }
       },
       "required": [

@@ -4011,12 +4011,21 @@ const MainFrame = (props: Props): React.MixedElement => {
           editorRef.onInstancesModifiedOutsideEditor(changes);
         }
       }
+      // Children of a custom object moved: refresh its rendered instances.
+      if (changes.eventsBasedObject) {
+        onEventsBasedObjectChildrenEdited(changes.eventsBasedObject);
+      }
     },
-    [state.editorTabs]
+    [state.editorTabs, onEventsBasedObjectChildrenEdited]
   );
 
   const onObjectsModifiedOutsideEditor = React.useCallback(
     (changes: ObjectsOutsideEditorChanges) => {
+      // Children of a custom object changed: the named variants follow the
+      // default one, and every rendered instance is refreshed.
+      if (changes.eventsBasedObject) {
+        onEventsBasedObjectChildrenEdited(changes.eventsBasedObject);
+      }
       for (const editor of getAllEditorTabs(state.editorTabs)) {
         const { editorRef } = editor;
         if (editorRef) {
@@ -4027,7 +4036,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         isNewObjectTypeUsed: changes.isNewObjectTypeUsed,
       });
     },
-    [state.editorTabs, onObjectListsModified]
+    [state.editorTabs, onObjectListsModified, onEventsBasedObjectChildrenEdited]
   );
 
   const onObjectGroupsModifiedOutsideEditor = React.useCallback(

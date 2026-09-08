@@ -484,7 +484,8 @@ export const makeSimplifiedExtensionsBuilder = (
         objectGroups,
         objectsContainersList
       );
-      objectsContainersList.delete();
+      // The list is a static temporary of the bindings: only the scratch
+      // container is freed.
       emptyGlobalObjectsContainer.delete();
     }
 

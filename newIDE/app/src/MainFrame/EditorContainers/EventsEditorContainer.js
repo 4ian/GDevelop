@@ -153,7 +153,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   }
 
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
-    if (this.getLayout() === changes.scene) {
+    if (changes.scene && this.getLayout() === changes.scene) {
       if (this.editor)
         this.editor.onEventsModifiedOutsideEditor({
           newOrChangedAiGeneratedEventIds:

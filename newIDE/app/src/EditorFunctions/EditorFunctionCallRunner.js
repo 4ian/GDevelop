@@ -30,6 +30,7 @@ import {
 } from './OutsideEditorChanges';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
+import { normalizeLegacyArguments } from './Scope';
 
 type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
@@ -186,6 +187,10 @@ export const processEditorFunctionCalls = async ({
         });
         continue;
       }
+
+      // Legacy argument names (e.g. `scene_name`) are mapped to their current
+      // form once here, so the functions implement one version of the tools.
+      args = normalizeLegacyArguments(args);
 
       // Check if the function exists
       const editorFunction: EditorFunction | null =

@@ -22,6 +22,7 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import VisibilityOffIcon from '../../UI/CustomSvgIcons/VisibilityOff';
 import { renderQuickCustomizationMenuItems } from '../../QuickCustomization/QuickCustomizationMenuItems';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { buildMoveToMenu } from './EventsBasedEntityPropertyFolderTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
 
@@ -175,6 +176,14 @@ export type EventsBasedEntityPropertyTreeViewItemProps = {|
   ) => Promise<boolean>,
   onPropertiesUpdated: () => void,
   onEventsFunctionsAdded: () => void,
+  addFolder: (
+    items: Array<gdPropertyFolderOrProperty>,
+    isSharedProperties: boolean
+  ) => void,
+  onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer: (
+    propertyFolderOrProperty: gdPropertyFolderOrProperty,
+    isSharedProperties: boolean
+  ) => void,
 |};
 
 export const getEventsBasedEntityPropertyTreeViewItemId = (
@@ -302,6 +311,12 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
+    const {
+      properties,
+      isSharedProperties,
+      addFolder,
+      onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
+    } = this.props;
     const property = this.property.getProperty();
     return [
       {
@@ -314,6 +329,14 @@ export class EventsBasedEntityPropertyTreeViewItemContent
         click: () => this.delete(),
         accelerator: 'Backspace',
       },
+      buildMoveToMenu({
+        propertyFolderOrProperty: this.property,
+        i18n,
+        properties,
+        addFolder,
+        onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
+        isSharedProperties,
+      }),
       {
         type: 'separator',
       },

@@ -54,6 +54,7 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import {
   getFoldersAscendanceWithoutRootFolder,
   enumerateFoldersInContainer,
+  enumeratePropertiesInFolder,
 } from './EnumeratePropertyFolderOrProperty';
 import Clipboard from '../../Utils/Clipboard';
 import { serializeToJSObject } from '../../Utils/Serializer';
@@ -813,13 +814,12 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       (propertiesContainer: gdPropertiesContainer) => {
         Clipboard.set(
           PROPERTIES_CLIPBOARD_KIND,
-          mapFor(0, propertiesContainer.getCount(), i => {
-            const property = propertiesContainer.getAt(i);
-            return {
+          enumeratePropertiesInFolder(propertiesContainer.getRootFolder()).map(
+            property => ({
               name: property.getName(),
               serializedProperty: serializeToJSObject(property),
-            };
-          })
+            })
+          )
         );
       },
       []
@@ -909,6 +909,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
               onPropertiesUpdated,
               onRenameProperty,
               onEventsFunctionsAdded,
+              addFolder,
+              onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
             }
           : null,
       [
@@ -932,6 +934,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         onPropertiesUpdated,
         onRenameProperty,
         onEventsFunctionsAdded,
+        addFolder,
+        onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
       ]
     );
 

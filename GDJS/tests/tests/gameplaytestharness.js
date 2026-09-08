@@ -35,6 +35,20 @@ describe('gdjs.gameplayTests', () => {
       layouts: [createSceneData('Scene 1'), createSceneData('Scene 2')],
     });
 
+  /**
+   * A harness ready to be stepped, without going through `runGameplayTest`.
+   * @param {gdjs.RuntimeGame} runtimeGame
+   */
+  const makeStartedHarness = (runtimeGame) => {
+    const harness = new gdjs.gameplayTests.GameplayTestHarness(runtimeGame, {
+      testName: 'Test',
+      source: '',
+      timeoutMs: 5000,
+    });
+    harness._startTimeMs = Date.now();
+    return harness;
+  };
+
   const createSceneDataWithPlatformerObject = (name) => {
     const sceneData = createSceneData(name);
     sceneData.objects.push({
@@ -1073,19 +1087,6 @@ describe('gdjs.gameplayTests', () => {
   });
 
   describe('GameplayTestHarness inputs', () => {
-    /**
-     * @param {gdjs.RuntimeGame} runtimeGame
-     */
-    const makeStartedHarness = (runtimeGame) => {
-      const harness = new gdjs.gameplayTests.GameplayTestHarness(runtimeGame, {
-        testName: 'Test',
-        source: '',
-        timeoutMs: 5000,
-      });
-      harness._startTimeMs = Date.now();
-      return harness;
-    };
-
     it('simulates keyboard keys (with GDevelop and Web API names)', async () => {
       const runtimeGame = makeRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
@@ -1212,6 +1213,486 @@ describe('gdjs.gameplayTests', () => {
       // so this maps back to game resolution coordinates).
       harness.setMousePosition(100, 50, '');
       expect(typeof inputManager.getMouseX()).to.be('number');
+    });
+  });
+
+  describe('GameplayTestHarness snapshots of nested custom objects', () => {
+    // A hierarchy an extension would declare: CombinedTank (a custom object)
+    // contains TankTop_Combined (a custom object too) which contains
+    // TankCanon (a plain object).
+    const TANK_EXTENSION_NAME = 'TankConfiguration';
+    /** How many custom objects the deep chain used to test the depth cap has. */
+    const DEEP_LEVELS_COUNT = 10;
+    /** Same as `MAX_CHILDREN_DEPTH` in `gameplay-test-runner.ts`. */
+    const MAX_CHILDREN_DEPTH = 8;
+
+    /**
+     * @param {string} name
+     * @param {number} x
+     * @param {number} y
+     * @returns {InstanceData}
+     */
+    const createChildInstanceData = (name, x, y) => ({
+      persistentUuid: `${name}-${x}-${y}`,
+      layer: '',
+      locked: false,
+      name,
+      x,
+      y,
+      angle: 0,
+      zOrder: 0,
+      customSize: false,
+      width: 0,
+      height: 0,
+      numberProperties: [],
+      stringProperties: [],
+      initialVariables: [],
+    });
+
+    /**
+     * The object data of a plain (not custom) child object. It has no size,
+     * so its center is at its position.
+     * @param {string} name
+     * @returns {ObjectData}
+     */
+    const createPlainChildObjectData = (name) => ({
+      name,
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+
+    /**
+     * The object data of an instance of a custom object (as the editor
+     * serializes it in a scene or in another custom object).
+     * @param {string} name
+     * @param {string} type
+     * @returns {ObjectData & gdjs.CustomObjectConfiguration}
+     */
+    const createCustomObjectData = (name, type) => ({
+      name,
+      type,
+      variant: '',
+      isInnerAreaFollowingParentSize: false,
+      variables: [],
+      behaviors: [],
+      effects: [],
+      content: {},
+    });
+
+    /**
+     * @param {string} name
+     * @param {Array<ObjectData>} objects
+     * @param {Array<InstanceData>} instances
+     * @param {number} areaMax
+     * @returns {EventsBasedObjectData}
+     */
+    const createEventsBasedObjectData = (
+      name,
+      objects,
+      instances,
+      areaMax
+    ) => ({
+      name,
+      objects,
+      instances,
+      objectsGroups: [],
+      layers: [],
+      variables: [],
+      areaMinX: 0,
+      areaMinY: 0,
+      areaMinZ: 0,
+      areaMaxX: areaMax,
+      areaMaxY: areaMax,
+      areaMaxZ: 0,
+      _initialInnerArea: null,
+      isInnerAreaFollowingParentSize: false,
+      variants: [],
+      usedResources: [],
+      editionSettings: {
+        grid: false,
+        gridType: 'rectangular',
+        gridWidth: 10,
+        gridHeight: 10,
+        gridDepth: 10,
+        gridOffsetX: 0,
+        gridOffsetY: 0,
+        gridOffsetZ: 0,
+        gridColor: 0,
+        gridAlpha: 1,
+        snap: false,
+      },
+    });
+
+    /** @returns {EventsFunctionsExtensionData} */
+    const createTankExtensionData = () => {
+      const eventsBasedObjects = [
+        createEventsBasedObjectData(
+          'TankTop',
+          [createPlainChildObjectData('TankCanon')],
+          [createChildInstanceData('TankCanon', 10, 20)],
+          64
+        ),
+        createEventsBasedObjectData(
+          'CombinedTank',
+          [
+            createCustomObjectData(
+              'TankTop_Combined',
+              TANK_EXTENSION_NAME + '::TankTop'
+            ),
+          ],
+          [createChildInstanceData('TankTop_Combined', 30, 40)],
+          128
+        ),
+        // Two instances of the same child object, to check they are all
+        // snapshotted.
+        createEventsBasedObjectData(
+          'TwinTank',
+          [createPlainChildObjectData('TankCanon')],
+          [
+            createChildInstanceData('TankCanon', 10, 20),
+            createChildInstanceData('TankCanon', 50, 60),
+          ],
+          128
+        ),
+      ];
+      // A chain of custom objects deeper than MAX_CHILDREN_DEPTH, to check
+      // snapshots stop there: DeepLevel0 > Child > Child > ...
+      for (let level = 0; level < DEEP_LEVELS_COUNT; level++) {
+        const isDeepest = level === DEEP_LEVELS_COUNT - 1;
+        eventsBasedObjects.push(
+          createEventsBasedObjectData(
+            'DeepLevel' + level,
+            [
+              isDeepest
+                ? createPlainChildObjectData('Child')
+                : createCustomObjectData(
+                    'Child',
+                    TANK_EXTENSION_NAME + '::DeepLevel' + (level + 1)
+                  ),
+            ],
+            [createChildInstanceData('Child', 1, 1)],
+            32
+          )
+        );
+      }
+      return {
+        name: TANK_EXTENSION_NAME,
+        eventsBasedObjects,
+        sceneVariables: [],
+        globalVariables: [],
+      };
+    };
+
+    /**
+     * Register the object classes an extension would generate for its custom
+     * objects (see `MockedCustomObject.js`).
+     */
+    const registerCustomObjectClasses = () => {
+      const types = [
+        TANK_EXTENSION_NAME + '::TankTop',
+        TANK_EXTENSION_NAME + '::CombinedTank',
+        TANK_EXTENSION_NAME + '::TwinTank',
+      ];
+      for (let level = 0; level < DEEP_LEVELS_COUNT; level++) {
+        types.push(TANK_EXTENSION_NAME + '::DeepLevel' + level);
+      }
+      for (const type of types) {
+        if (gdjs.objectsTypes.containsKey(type)) continue;
+        gdjs.registerObject(
+          type,
+          class extends gdjs.CustomRuntimeObject2D {
+            constructor(parent, objectData, instanceData) {
+              super(parent, objectData, instanceData);
+              // The generated code calls onCreated at the constructor end.
+              this.onCreated();
+            }
+          }
+        );
+      }
+    };
+
+    const makeRuntimeGameWithCustomObjects = () => {
+      registerCustomObjectClasses();
+      const sceneData = createSceneData('Scene 1');
+      sceneData.layers.push({
+        name: 'UI',
+        visibility: true,
+        effects: [],
+        cameras: [],
+      });
+      sceneData.objects.push(
+        createCustomObjectData(
+          'CombinedTank',
+          TANK_EXTENSION_NAME + '::CombinedTank'
+        ),
+        createCustomObjectData('TwinTank', TANK_EXTENSION_NAME + '::TwinTank'),
+        createCustomObjectData('DeepTank', TANK_EXTENSION_NAME + '::DeepLevel0')
+      );
+      const projectData = gdjs.createProjectData({ layouts: [sceneData] });
+      projectData.eventsFunctionsExtensions = [createTankExtensionData()];
+      return new gdjs.RuntimeGame(projectData);
+    };
+
+    /**
+     * The snapshots of the children of an object, by child object name.
+     * @param {gdjs.gameplayTests.GameplayTestObjectSnapshot} snapshot
+     * @param {string} childName
+     * @returns {Array<gdjs.gameplayTests.GameplayTestObjectSnapshot>}
+     */
+    const getChildren = (snapshot, childName) => {
+      const children = snapshot.children && snapshot.children[childName];
+      if (!children) {
+        throw new Error(
+          `No child "${childName}" in the snapshot of "${snapshot.name}".`
+        );
+      }
+      return children;
+    };
+
+    /**
+     * A harness with a `CombinedTank` spawned at (100 ; 200) on the UI layer.
+     * @returns {Promise<gdjs.gameplayTests.GameplayTestHarness>}
+     */
+    const makeHarnessWithSpawnedTank = async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('CombinedTank', 100, 200, undefined, 'UI');
+      await harness.stepFrames(1);
+      return harness;
+    };
+
+    /**
+     * The scene position the harness is expected to report for a grandchild,
+     * computed with the runtime transformations of the two custom objects.
+     * @param {any} tank
+     * @param {number} x
+     * @param {number} y
+     * @returns {Array<number>}
+     */
+    const toSceneCoordinates = (tank, x, y) => {
+      const tankTop = tank
+        .getChildrenContainer()
+        .getObjects('TankTop_Combined')[0];
+      const point = [0, 0];
+      tankTop.applyObjectTransformation(x, y, point);
+      tank.applyObjectTransformation(point[0], point[1], point);
+      return point;
+    };
+
+    /**
+     * A snapshot as `_makeObjectSnapshot` would build it, to unit-test the
+     * conversion of a snapshot tree to the space containing its parent.
+     * @param {{name: string, x: number, y: number, z: number,
+     *   children?: {[objectName: string]: Array<any>}}} data
+     * @returns {any}
+     */
+    const createFakeObjectSnapshot = ({ name, x, y, z, children }) => ({
+      id: 1,
+      name,
+      x,
+      y,
+      z,
+      angle: 0,
+      width: 0,
+      height: 0,
+      depth: 0,
+      centerX: x,
+      centerY: y,
+      centerZ: z,
+      layer: '',
+      hidden: false,
+      variables: [],
+      state: {},
+      behaviors: {},
+      children,
+    });
+
+    it('snapshots only the direct children by default', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+
+      const tank = harness.getObjects('CombinedTank')[0];
+      const tankTops = getChildren(tank, 'TankTop_Combined');
+      expect(tankTops.length).to.be(1);
+      // Depth 1: the child of the child custom object is not snapshotted.
+      expect(tankTops[0].children).to.be(undefined);
+    });
+
+    it('snapshots nested custom objects with childrenDepth', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+
+      const tank = harness.getObjects('CombinedTank', { childrenDepth: 2 })[0];
+      const tankTop = getChildren(tank, 'TankTop_Combined')[0];
+      const tankCanon = getChildren(tankTop, 'TankCanon')[0];
+
+      // The child is at (30 ; 40) in the tank, the grandchild at (10 ; 20)
+      // in the child: both are reported in scene coordinates.
+      expect(tank.x).to.be(100);
+      expect(tank.y).to.be(200);
+      expect(tankTop.x).to.be(130);
+      expect(tankTop.y).to.be(240);
+      expect(tankCanon.x).to.be(140);
+      expect(tankCanon.y).to.be(260);
+      // These children have no size: their center is at their position.
+      expect(tankCanon.centerX).to.be(140);
+      expect(tankCanon.centerY).to.be(260);
+
+      // The internal layers of a custom object mean nothing outside of it:
+      // every descendant reports the layer of the custom object.
+      expect(tank.layer).to.be('UI');
+      expect(tankTop.layer).to.be('UI');
+      expect(tankCanon.layer).to.be('UI');
+    });
+
+    it('snapshots every instance of a child object', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('TwinTank', 100, 200);
+      await harness.stepFrames(1);
+
+      const canons = getChildren(
+        harness.getObjects('TwinTank')[0],
+        'TankCanon'
+      );
+      expect(canons.length).to.be(2);
+      expect(canons.map((canon) => canon.x).sort()).to.eql([110, 150]);
+      expect(canons.map((canon) => canon.y).sort()).to.eql([220, 260]);
+    });
+
+    it('converts nested children with the transformation of every level', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('CombinedTank', 100, 200);
+      // Rotate and scale the tank: the whole subtree must follow.
+      const runtimeTank = harness.getRuntimeObject('CombinedTank');
+      if (!runtimeTank) throw new Error('The tank was not spawned.');
+      runtimeTank.setAngle(90);
+      runtimeTank.setWidth(runtimeTank.getWidth() * 2);
+      await harness.stepFrames(1);
+
+      const tank = harness.getObjects('CombinedTank', { childrenDepth: 2 })[0];
+      const tankCanon = getChildren(
+        getChildren(tank, 'TankTop_Combined')[0],
+        'TankCanon'
+      )[0];
+      const expectedPosition = toSceneCoordinates(runtimeTank, 10, 20);
+      expect(tankCanon.x).to.be(expectedPosition[0]);
+      expect(tankCanon.y).to.be(expectedPosition[1]);
+    });
+
+    it('snapshots no children with a childrenDepth of 0', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+
+      const tank = harness.getObjects('CombinedTank', { childrenDepth: 0 })[0];
+      expect(tank).to.not.have.key('children');
+    });
+
+    it('rounds a fractional childrenDepth down', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+
+      // 1.9 is the default depth 1: the direct children only.
+      const tank = harness.getObjects('CombinedTank', {
+        childrenDepth: 1.9,
+      })[0];
+      const tankTops = getChildren(tank, 'TankTop_Combined');
+      expect(tankTops.length).to.be(1);
+      expect(tankTops[0].children).to.be(undefined);
+    });
+
+    it('throws on malformed snapshot options', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+
+      expect(() =>
+        harness.getObjects('CombinedTank', /** @type {any} */ (2))
+      ).to.throwError(/childrenDepth/);
+      expect(() =>
+        harness.getObjects('CombinedTank', {
+          childrenDepth: /** @type {any} */ ('2'),
+        })
+      ).to.throwError(/childrenDepth/);
+    });
+
+    it('caps the children depth', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('DeepTank', 0, 0);
+      await harness.stepFrames(1);
+
+      let snapshot = harness.getObjects('DeepTank', { childrenDepth: 50 })[0];
+      let depth = 0;
+      while (snapshot.children && snapshot.children.Child) {
+        snapshot = snapshot.children.Child[0];
+        depth++;
+      }
+      expect(depth).to.be(MAX_CHILDREN_DEPTH);
+    });
+
+    it('snapshots nested children in getNearby too', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+      harness.spawn('MyObject', 100, 200);
+      await harness.stepFrames(1);
+
+      const nearby = harness.getNearby('CombinedTank', 'MyObject', 1000, {
+        childrenDepth: 2,
+      });
+      expect(nearby.length).to.be(1);
+      const tankCanon = getChildren(
+        getChildren(nearby[0], 'TankTop_Combined')[0],
+        'TankCanon'
+      )[0];
+      expect(tankCanon.x).to.be(140);
+    });
+
+    it('moves the Z of a snapshot tree with the Z and Z scale of the parent', () => {
+      const harness = makeStartedHarness(makeRuntimeGame());
+      // A 3D custom object places its children at
+      // parentZ + childZ * parentScaleZ (see
+      // `CustomRuntimeObject3DRenderer._updateThreeGroup`).
+      const parentObject = /** @type {any} */ ({
+        applyObjectTransformation: (x, y, destination) => {
+          destination[0] = x + 1000;
+          destination[1] = y + 2000;
+        },
+        getZ: () => 50,
+        getScaleZ: () => 2,
+        getLayer: () => 'UI',
+      });
+      const snapshot = createFakeObjectSnapshot({
+        name: 'Child',
+        x: 1,
+        y: 2,
+        z: 10,
+        children: {
+          GrandChild: [
+            createFakeObjectSnapshot({
+              name: 'GrandChild',
+              x: 3,
+              y: 4,
+              z: 5,
+            }),
+          ],
+        },
+      });
+
+      harness['_transformSnapshotTreeToContainingSpace'](
+        snapshot,
+        parentObject
+      );
+
+      expect(snapshot.x).to.be(1001);
+      expect(snapshot.y).to.be(2002);
+      expect(snapshot.z).to.be(70);
+      expect(snapshot.centerZ).to.be(70);
+      expect(snapshot.layer).to.be('UI');
+      // The grandchild is already expressed in the space containing the
+      // child: it is moved by the same transformation.
+      const grandChild = snapshot.children.GrandChild[0];
+      expect(grandChild.x).to.be(1003);
+      expect(grandChild.y).to.be(2004);
+      expect(grandChild.z).to.be(60);
+      expect(grandChild.centerZ).to.be(60);
+      expect(grandChild.layer).to.be('UI');
     });
   });
 });

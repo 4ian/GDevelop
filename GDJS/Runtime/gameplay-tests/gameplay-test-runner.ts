@@ -164,6 +164,16 @@ namespace gdjs {
       };
       flippedX?: boolean;
       flippedY?: boolean;
+      /** For a custom object, the snapshots of its children - children of
+       * the default depth 1; pass `childrenDepth` to go deeper (max 8) and
+       * reach the children of nested custom objects.
+       *
+       * Only the positions (x, y, z, centerX, centerY, centerZ) are
+       * converted, level by level, to scene coordinates (and the layer is
+       * the one of the custom object). The sizes and angles (width, height,
+       * depth, angle, rotationX, rotationY) stay as the child reports them
+       * in the local space of the custom object: they are not scaled nor
+       * rotated by their parents. */
       children?: { [objectName: string]: Array<GameplayTestObjectSnapshot> };
     };
 
@@ -179,6 +189,14 @@ namespace gdjs {
         right: boolean;
         bearingFromReference: float;
       };
+
+    /** Options of the methods returning object snapshots. */
+    export type GameplayTestSnapshotOptions = {
+      /** How deep the `children` of custom objects are snapshotted: 1 (the
+       * default) for the direct children, more (up to 8) to reach the
+       * children of nested custom objects, 0 for no `children` at all. */
+      childrenDepth?: integer;
+    };
 
     /**
      * The position of a target relative to a reference object (2D and 3D).
@@ -378,6 +396,9 @@ namespace gdjs {
     const MAX_ERRORS = 20;
     const SCREENSHOT_MAX_SIZE = 512;
     const DEFAULT_FRAME_DT_MS = 1000 / 60;
+    /** Deepest `children` nesting a snapshot can expose (nested custom
+     * objects), to keep snapshots bounded. */
+    const MAX_CHILDREN_DEPTH = 8;
 
     // Keys that must never throw on the self-describing state, so language
     // internals (JSON.stringify, await inspection, string coercion...) keep
@@ -1486,9 +1507,15 @@ namespace gdjs {
 
       // INSPECTION:
 
+      /**
+       * @param childrenDepth How deep the `children` of custom objects are
+       * snapshotted: 0 for none, N for children snapshotted with N-1 (so
+       * nested custom objects are reachable). Assumed already clamped to
+       * `MAX_CHILDREN_DEPTH` by the public methods.
+       */
       private _makeObjectSnapshot(
         object: gdjs.RuntimeObject,
-        includeChildren: boolean
+        childrenDepth: number
       ): GameplayTestObjectSnapshot {
         const anyObject = object as any;
         const stateInspectors = this._payload.stateInspectors || null;
@@ -1568,7 +1595,7 @@ namespace gdjs {
           snapshot.flippedY = anyObject.isFlippedY();
         }
         if (
-          includeChildren &&
+          childrenDepth > 0 &&
           typeof anyObject.getChildrenContainer === 'function'
         ) {
           const childrenContainer: gdjs.RuntimeInstanceContainer =
@@ -1576,46 +1603,120 @@ namespace gdjs {
           const children: {
             [objectName: string]: Array<GameplayTestObjectSnapshot>;
           } = {};
-          const canTransformToScene =
-            typeof anyObject.applyObjectTransformation === 'function';
           for (const child of childrenContainer.getAdhocListOfAllInstances()) {
             const childName = child.getName();
             if (!children[childName]) children[childName] = [];
-            const childSnapshot = this._makeObjectSnapshot(child, false);
-            // The children live in the coordinates space of the custom
-            // object: convert to scene coordinates, like every other
-            // snapshot (so clicking a child at its centerX/centerY works).
-            if (canTransformToScene) {
-              const point: FloatPoint = [0, 0];
-              anyObject.applyObjectTransformation(
-                childSnapshot.x,
-                childSnapshot.y,
-                point
-              );
-              childSnapshot.x = point[0];
-              childSnapshot.y = point[1];
-              anyObject.applyObjectTransformation(
-                childSnapshot.centerX,
-                childSnapshot.centerY,
-                point
-              );
-              childSnapshot.centerX = point[0];
-              childSnapshot.centerY = point[1];
-              if (typeof anyObject.getZ === 'function') {
-                if (childSnapshot.z !== undefined)
-                  childSnapshot.z += anyObject.getZ();
-                if (childSnapshot.centerZ !== undefined)
-                  childSnapshot.centerZ += anyObject.getZ();
-              }
-            }
-            // The internal layer name of the parent means nothing outside
-            // of it: report the layer of the custom object itself.
-            childSnapshot.layer = object.getLayer();
+            const childSnapshot = this._makeObjectSnapshot(
+              child,
+              childrenDepth - 1
+            );
+            this._transformSnapshotTreeToContainingSpace(childSnapshot, object);
             children[childName].push(childSnapshot);
           }
           snapshot.children = children;
         }
         return snapshot;
+      }
+
+      /**
+       * Move a snapshot - and, recursively, everything under it - from the
+       * local coordinates space of `parentObject` to the space containing
+       * `parentObject`. Applied at every level, a grandchild of a nested
+       * custom object ends up in scene coordinates, like every other
+       * snapshot (so clicking it at its centerX/centerY works).
+       *
+       * Only the positions (x, y, z, centerX, centerY, centerZ) are moved:
+       * the sizes and angles (width, height, depth, angle, rotationX,
+       * rotationY) are left as the child reports them, in the local space of
+       * `parentObject`. The 3D rotations of `parentObject` are not applied to
+       * the positions either (same limitation as the 2D affine
+       * transformation used for x/y, which handles the angle around Z only).
+       *
+       * The internal layers of a custom object mean nothing outside of it, so
+       * every descendant reports the layer of the custom object itself.
+       */
+      private _transformSnapshotTreeToContainingSpace(
+        snapshot: GameplayTestObjectSnapshot,
+        parentObject: gdjs.RuntimeObject
+      ): void {
+        const anyParentObject = parentObject as any;
+        if (typeof anyParentObject.applyObjectTransformation === 'function') {
+          const point: FloatPoint = [0, 0];
+          anyParentObject.applyObjectTransformation(
+            snapshot.x,
+            snapshot.y,
+            point
+          );
+          snapshot.x = point[0];
+          snapshot.y = point[1];
+          anyParentObject.applyObjectTransformation(
+            snapshot.centerX,
+            snapshot.centerY,
+            point
+          );
+          snapshot.centerX = point[0];
+          snapshot.centerY = point[1];
+          if (typeof anyParentObject.getZ === 'function') {
+            // Children of a 3D custom object are placed at the Z of their
+            // parent, scaled by its Z scale (see
+            // `CustomRuntimeObject3DRenderer._updateThreeGroup`).
+            const parentZ = anyParentObject.getZ();
+            const parentScaleZ =
+              typeof anyParentObject.getScaleZ === 'function'
+                ? anyParentObject.getScaleZ()
+                : 1;
+            if (snapshot.z !== undefined)
+              snapshot.z = parentZ + snapshot.z * parentScaleZ;
+            if (snapshot.centerZ !== undefined)
+              snapshot.centerZ = parentZ + snapshot.centerZ * parentScaleZ;
+          }
+        }
+        snapshot.layer = parentObject.getLayer();
+        if (snapshot.children) {
+          for (const childName in snapshot.children) {
+            for (const childSnapshot of snapshot.children[childName]) {
+              this._transformSnapshotTreeToContainingSpace(
+                childSnapshot,
+                parentObject
+              );
+            }
+          }
+        }
+      }
+
+      /**
+       * The children depth to use for a snapshot, from the caller options
+       * (default 1 - the direct children only), clamped to
+       * `MAX_CHILDREN_DEPTH`. Malformed options throw, so a mistake is
+       * never silently ignored.
+       */
+      private _getChildrenDepth(
+        options?: GameplayTestSnapshotOptions
+      ): integer {
+        if (options === undefined || options === null) return 1;
+        if (typeof options !== 'object' || Array.isArray(options)) {
+          throw new Error(
+            `Invalid snapshot options: expected an object like { childrenDepth: 2 }, but got ${JSON.stringify(
+              options
+            )}.`
+          );
+        }
+        const childrenDepth = options.childrenDepth;
+        if (childrenDepth === undefined) return 1;
+        if (
+          typeof childrenDepth !== 'number' ||
+          !Number.isFinite(childrenDepth)
+        ) {
+          throw new Error(
+            `Invalid childrenDepth: expected a number between 0 and ${MAX_CHILDREN_DEPTH}, but got ${JSON.stringify(
+              childrenDepth
+            )}.`
+          );
+        }
+        return Math.max(
+          0,
+          Math.min(MAX_CHILDREN_DEPTH, Math.floor(childrenDepth))
+        );
       }
 
       private _getInstances(objectName: string): Array<gdjs.RuntimeObject> {
@@ -1625,33 +1726,43 @@ namespace gdjs {
       /**
        * Get a state snapshot of all the instances of an object.
        * Instances are returned in an unspecified order.
+       *
+       * For a custom object, `children` holds the snapshots of its direct
+       * children: pass `{ childrenDepth: 2 }` (or more, up to 8) to also get
+       * the children of nested custom objects.
        */
-      getObjects(objectName: string): Array<GameplayTestObjectSnapshot> {
+      getObjects(
+        objectName: string,
+        options?: GameplayTestSnapshotOptions
+      ): Array<GameplayTestObjectSnapshot> {
+        const childrenDepth = this._getChildrenDepth(options);
         return this._getInstances(objectName).map((object) =>
-          this._makeObjectSnapshot(object, true)
+          this._makeObjectSnapshot(object, childrenDepth)
         );
       }
 
       /**
        * Get the instances of `objectName` within `radius` of the first
        * instance of `referenceObjectName`, sorted by distance.
+       *
+       * As in `getObjects`, `childrenDepth` (1 by default, 8 at most) sets
+       * how deep the `children` of custom objects are snapshotted.
        */
       getNearby(
         objectName: string,
         referenceObjectName: string,
-        radius: float
+        radius: float,
+        options?: GameplayTestSnapshotOptions
       ): Array<GameplayTestNearbyObjectSnapshot> {
+        const childrenDepth = this._getChildrenDepth(options);
         const referenceInstances = this._getInstances(referenceObjectName);
         if (referenceInstances.length === 0) return [];
-        const reference = this._makeObjectSnapshot(
-          referenceInstances[0],
-          false
-        );
+        const reference = this._makeObjectSnapshot(referenceInstances[0], 0);
         const referenceZ = reference.centerZ || 0;
 
         const nearby: Array<GameplayTestNearbyObjectSnapshot> = [];
         for (const object of this._getInstances(objectName)) {
-          const snapshot = this._makeObjectSnapshot(object, true);
+          const snapshot = this._makeObjectSnapshot(object, childrenDepth);
           const relativeX = snapshot.centerX - reference.centerX;
           const relativeY = snapshot.centerY - reference.centerY;
           const relativeZ = (snapshot.centerZ || 0) - referenceZ;
@@ -2489,7 +2600,7 @@ namespace gdjs {
         if (layerName !== undefined) {
           object.setLayer(layerName);
         }
-        return this._makeObjectSnapshot(object, false);
+        return this._makeObjectSnapshot(object, 0);
       }
 
       /**

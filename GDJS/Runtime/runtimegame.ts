@@ -1416,7 +1416,14 @@ namespace gdjs {
               }
               this._hasJustResumed = false;
               if (gdjs.eventsExecutionTracker) {
-                gdjs.eventsExecutionTracker.onFrameEnded();
+                if (this._paused) {
+                  // The game was paused by this frame (the "pause" action, for
+                  // example): report everything it executed right away, as no
+                  // other frame will come.
+                  gdjs.eventsExecutionTracker.flush();
+                } else {
+                  gdjs.eventsExecutionTracker.onFrameEnded();
+                }
               }
             }
 
@@ -1748,6 +1755,22 @@ namespace gdjs {
 
       gdjs.eventsExecutionTracker.flush();
       gdjs.eventsExecutionTracker = null;
+    }
+
+    /**
+     * Advance the game of exactly one frame (as if it ran at 60 FPS) while it
+     * is paused, to follow frame by frame what the events do. Does nothing if
+     * the game is not paused.
+     */
+    stepOneFrame(): void {
+      this._throwIfDisposed();
+      if (!this._paused) return;
+
+      const frameDurationMs = 1000 / 60;
+      this._sceneStack.step(frameDurationMs);
+      this.getInputManager().onFrameEnded();
+      // Report right away what this frame executed.
+      if (gdjs.eventsExecutionTracker) gdjs.eventsExecutionTracker.flush();
     }
 
     /**

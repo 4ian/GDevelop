@@ -6,7 +6,12 @@ import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.fl
  * not at all, at the normal speed of the game, or with the game slowed down
  * to see the instructions being executed one after the other.
  */
-export type EventsExecutionTrackingMode = 'off' | 'normal-speed' | 'slow-speed';
+export type EventsExecutionTrackingMode =
+  | 'off'
+  | 'normal-speed'
+  | 'slow-speed'
+  // The game is paused and only advances one frame at a time, on demand.
+  | 'frame-by-frame';
 
 export const SLOW_SPEED_GAME_SPEED_FACTOR = 0.1;
 
@@ -67,6 +72,34 @@ export class EventsExecutionTrackingStore {
   _listeners: Set<() => void> = new Set();
   _expirationTimeoutId: TimeoutID | null = null;
   _previewDebuggerServer: ?PreviewDebuggerServer = null;
+  /**
+   * When the game advances frame by frame, what a frame executed stays
+   * highlighted until the next frame instead of fading out.
+   */
+  _areHighlightsPersistent: boolean = false;
+
+  setHighlightsPersistent(areHighlightsPersistent: boolean): void {
+    if (this._areHighlightsPersistent === areHighlightsPersistent) return;
+    this._areHighlightsPersistent = areHighlightsPersistent;
+    if (areHighlightsPersistent) {
+      // What is displayed stays as is.
+      if (this._expirationTimeoutId) {
+        clearTimeout(this._expirationTimeoutId);
+        this._expirationTimeoutId = null;
+      }
+    } else if (this._instructionExecutions.size > 0) {
+      this._scheduleExpiration();
+    }
+  }
+
+  /** Ask the paused previews to advance of one frame. */
+  stepOneFrame(): void {
+    const previewDebuggerServer = this._previewDebuggerServer;
+    if (!previewDebuggerServer) return;
+    previewDebuggerServer.getExistingPreviewDebuggerIds().forEach(id => {
+      previewDebuggerServer.sendMessage(id, { command: 'stepFrame' });
+    });
+  }
   /** The expressions of the "watched variables" panel, kept while it's closed. */
   _watchedExpressions: Array<string> = [];
 
@@ -119,6 +152,11 @@ export class EventsExecutionTrackingStore {
   ingest(output: EventsExecutionTrackerOutput): void {
     const reportedAt = Date.now();
     const eventDurations: Map<number, number> = new Map();
+    if (this._areHighlightsPersistent) {
+      // Only the last frame is shown.
+      this._instructionExecutions.clear();
+      this._eventExecutions.clear();
+    }
 
     for (const instructionExecutionId in output.instructionDurations) {
       const durationMs = output.instructionDurations[instructionExecutionId];
@@ -140,7 +178,7 @@ export class EventsExecutionTrackingStore {
     });
 
     this._notify();
-    this._scheduleExpiration();
+    if (!this._areHighlightsPersistent) this._scheduleExpiration();
   }
 
   clear(): void {

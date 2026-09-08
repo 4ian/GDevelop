@@ -342,6 +342,8 @@ namespace gdjs {
         } else if (data.command === 'eventsExecutionTracker.stop') {
           runtimeGame.stopEventsExecutionTracking();
           runtimeGame.setGameSpeedFactor(1);
+        } else if (data.command === 'stepFrame') {
+          runtimeGame.stepOneFrame();
         } else if (data.command === 'evaluateExpression') {
           that.sendExpressionValue(data.messageId, data.payload.code);
         } else if (data.command === 'hotReload') {

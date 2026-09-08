@@ -15,6 +15,8 @@ import { useIsGameplayTestRunInProgress } from '../../GameplayTests/GameplayTest
 import { type EventsExecutionTrackingMode } from '../../EventsExecutionTracking/EventsExecutionTrackingStore';
 import IconButton from '../../UI/IconButton';
 import VariableTreeIcon from '../../UI/CustomSvgIcons/VariableTree';
+import SkipForwardIcon from '../../UI/CustomSvgIcons/SkipForward';
+import EventsExecutionTrackingContext from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
 
 export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: (?{ numberOfWindows: number }) => Promise<void>,
@@ -65,6 +67,9 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     // Launching or hot-reloading a preview while a gameplay test runs would
     // interfere with it (the game also ignores these commands as a backstop).
     const isGameplayTestRunInProgress = useIsGameplayTestRunInProgress();
+    const eventsExecutionTrackingStore = React.useContext(
+      EventsExecutionTrackingContext
+    );
 
     const previewBuildMenuTemplate = React.useCallback(
       (i18n: I18nType) =>
@@ -143,6 +148,12 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
                 label: i18n._(t`x0.1 speed`),
                 checked: eventsExecutionTrackingMode === 'slow-speed',
                 click: () => setEventsExecutionTrackingMode('slow-speed'),
+              },
+              {
+                type: 'checkbox',
+                label: i18n._(t`Frame by frame (paused)`),
+                checked: eventsExecutionTrackingMode === 'frame-by-frame',
+                click: () => setEventsExecutionTrackingMode('frame-by-frame'),
               },
             ],
           },
@@ -248,6 +259,18 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           // $FlowFixMe[incompatible-type]
           buildMenuTemplate={previewBuildMenuTemplate}
         />
+        {eventsExecutionTrackingMode === 'frame-by-frame' && (
+          <IconButton
+            size="small"
+            color="default"
+            onClick={() => eventsExecutionTrackingStore.stepOneFrame()}
+            disabled={!hasPreviewsRunning}
+            tooltip={t`Advance the preview of one frame`}
+            id="toolbar-step-one-frame-button"
+          >
+            <SkipForwardIcon />
+          </IconButton>
+        )}
         <IconButton
           size="small"
           color="default"

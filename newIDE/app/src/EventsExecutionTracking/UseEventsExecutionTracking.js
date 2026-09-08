@@ -29,6 +29,23 @@ export const useEventsExecutionTracking = ({
   const modeRef = React.useRef(mode);
   modeRef.current = mode;
 
+  // Whether a preview is paused (by the frame by frame mode, the "pause"
+  // action of the game or the debugger): what the last frame executed then
+  // stays highlighted, as nothing else will run.
+  const isPreviewPausedRef = React.useRef(false);
+  const updateHighlightsPersistence = React.useCallback(
+    () => {
+      store.setHighlightsPersistent(
+        isPreviewPausedRef.current || modeRef.current === 'frame-by-frame'
+      );
+    },
+    [store]
+  );
+
+  // Whether the previews were paused by the frame by frame mode, to resume
+  // them when leaving it (and only then: the debugger can pause them too).
+  const werePreviewsPausedRef = React.useRef(false);
+
   const sendTrackingCommand = React.useCallback(
     (debuggerId: DebuggerId) => {
       if (!previewDebuggerServer) return;
@@ -43,6 +60,12 @@ export const useEventsExecutionTracking = ({
           command: 'eventsExecutionTracker.start',
           payload: { gameSpeedFactor: getGameSpeedFactorForMode(currentMode) },
         });
+      }
+      if (currentMode === 'frame-by-frame') {
+        previewDebuggerServer.sendMessage(debuggerId, { command: 'pause' });
+        werePreviewsPausedRef.current = true;
+      } else if (werePreviewsPausedRef.current) {
+        previewDebuggerServer.sendMessage(debuggerId, { command: 'play' });
       }
     },
     [previewDebuggerServer]
@@ -75,6 +98,9 @@ export const useEventsExecutionTracking = ({
             modeRef.current !== 'off'
           ) {
             store.ingest(parsedMessage.payload);
+          } else if (parsedMessage.command === 'status') {
+            isPreviewPausedRef.current = !!parsedMessage.payload.isPaused;
+            updateHighlightsPersistence();
           }
         },
       });
@@ -85,7 +111,12 @@ export const useEventsExecutionTracking = ({
         store.clear();
       };
     },
-    [previewDebuggerServer, store, sendTrackingCommand]
+    [
+      previewDebuggerServer,
+      store,
+      sendTrackingCommand,
+      updateHighlightsPersistence,
+    ]
   );
 
   // Apply a mode change to the previews already running.
@@ -96,8 +127,16 @@ export const useEventsExecutionTracking = ({
       previewDebuggerServer
         .getExistingPreviewDebuggerIds()
         .forEach(sendTrackingCommand);
+      if (mode !== 'frame-by-frame') werePreviewsPausedRef.current = false;
+      updateHighlightsPersistence();
       if (mode === 'off') store.clear();
     },
-    [previewDebuggerServer, store, mode, sendTrackingCommand]
+    [
+      previewDebuggerServer,
+      store,
+      mode,
+      sendTrackingCommand,
+      updateHighlightsPersistence,
+    ]
   );
 };

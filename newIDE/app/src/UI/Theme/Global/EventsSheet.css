@@ -39,6 +39,26 @@
 }
 
 /**
+ * Events and instructions executed by a running preview
+ */
+.gd-events-sheet .executed-event-move-handle {
+  background: var(--event-sheet-events-highlighted-color);
+}
+
+.gd-events-sheet .executed-instruction {
+  background-color: var(--event-sheet-events-highlighted-background-color);
+  transition: background-color 250ms ease-out;
+}
+
+.gd-events-sheet .instruction-execution-time {
+  margin-left: 6px;
+  font-size: 0.85em;
+  opacity: 0.8;
+  color: var(--event-sheet-events-highlighted-color);
+  white-space: nowrap;
+}
+
+/**
  * Scaffolding lines on the left
  */
 .gd-events-sheet .rst__lineHalfHorizontalRight::before,

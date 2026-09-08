@@ -3254,6 +3254,7 @@ export class ParticleEmitterObject extends ObjectConfiguration {
 export class LayoutCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
   generateLayoutCompleteCode(layout: Layout, includes: SetString, diagnosticReport: DiagnosticReport, compilationForRuntime: boolean): string;
+  generateExpressionEvaluationCode(layout: Layout, type: string, expression: string, objectName: string): string;
 }
 
 export class BehaviorCodeGenerator extends EmscriptenObject {

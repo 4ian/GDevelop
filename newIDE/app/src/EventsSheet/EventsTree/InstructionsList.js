@@ -148,6 +148,7 @@ export default function InstructionsList({
         instruction={instruction}
         isCondition={areConditions}
         key={instruction.ptr}
+        indexInList={i}
         selected={isInstructionSelected(selection, instruction)}
         onMoveToInstruction={() => onMoveToInstruction(instructionContext)}
         onClick={() => onInstructionClick(instructionContext)}

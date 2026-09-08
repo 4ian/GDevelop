@@ -1,0 +1,151 @@
+.container {
+  position: fixed;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--theme-dialog-separator-color);
+  background-color: var(--theme-dialog-background-color);
+  color: var(--theme-text-default-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  /* Dragging the panel should never select the text of its title bar. */
+  user-select: none;
+}
+
+.container.dragging,
+.container.resizing {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 6px;
+  min-width: 0;
+  flex-shrink: 0;
+  background-color: var(--theme-surface-alternate-canvas-background-color);
+  border-bottom: 1px solid var(--theme-dialog-separator-color);
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.container.dragging .dragHandle {
+  cursor: grabbing;
+}
+
+/* Two columns of three dots, hinting that the panel can be moved. */
+.grip {
+  flex-shrink: 0;
+  width: 6px;
+  height: 12px;
+  background-image: radial-gradient(
+    circle at center,
+    var(--theme-text-secondary-color) 1px,
+    transparent 1.2px
+  );
+  background-size: 3px 4px;
+  opacity: 0.6;
+}
+
+.dragHandle:hover .grip {
+  opacity: 1;
+}
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.headerIcon {
+  font-size: 16px;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  user-select: text;
+}
+
+/* Invisible handles on the borders and corners of the panel to resize it. */
+.resizeHandle {
+  position: absolute;
+  z-index: 10;
+  touch-action: none;
+}
+
+.resizeLeft,
+.resizeRight {
+  top: 10px;
+  bottom: 10px;
+  width: 5px;
+  cursor: ew-resize;
+}
+
+.resizeLeft {
+  left: 0;
+}
+
+.resizeRight {
+  right: 0;
+}
+
+.resizeTop,
+.resizeBottom {
+  left: 10px;
+  right: 10px;
+  height: 5px;
+  cursor: ns-resize;
+}
+
+.resizeTop {
+  top: 0;
+}
+
+.resizeBottom {
+  bottom: 0;
+}
+
+.resizeTopLeft,
+.resizeTopRight,
+.resizeBottomLeft,
+.resizeBottomRight {
+  width: 10px;
+  height: 10px;
+}
+
+.resizeTopLeft {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
+
+.resizeTopRight {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
+
+.resizeBottomLeft {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+}
+
+.resizeBottomRight {
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+}

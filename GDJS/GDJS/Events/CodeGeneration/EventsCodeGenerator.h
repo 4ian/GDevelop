@@ -376,6 +376,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& section) override;
   virtual gd::String GenerateProfilerSectionEnd(
       const gd::String& section) override;
+  virtual gd::String GenerateInstructionExecutionTrackingBegin(
+      const gd::String& instructionExecutionId) override;
+  virtual gd::String GenerateInstructionExecutionTrackingEnd(
+      const gd::String& instructionExecutionId) override;
 
   virtual gd::String GenerateRelationalOperation(
       const gd::String& relationalOperator,
@@ -458,6 +462,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
   gd::String GenerateEventsFunctionReturn(
       const gd::EventsFunction& eventFunction);
+
+  // LayoutCodeGenerator generates expression evaluation code for the editor.
+  friend class LayoutCodeGenerator;
 
   /**
    * \brief Construct a code generator for the specified project and layout.

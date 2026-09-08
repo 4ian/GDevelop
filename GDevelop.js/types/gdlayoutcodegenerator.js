@@ -2,6 +2,7 @@
 declare class gdLayoutCodeGenerator {
   constructor(project: gdProject): void;
   generateLayoutCompleteCode(layout: gdLayout, includes: gdSetString, diagnosticReport: gdDiagnosticReport, compilationForRuntime: boolean): string;
+  generateExpressionEvaluationCode(layout: gdLayout, type: string, expression: string, objectName: string): string;
   delete(): void;
   ptr: number;
 };

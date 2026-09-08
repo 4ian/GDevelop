@@ -12,6 +12,9 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useIsGameplayTestRunInProgress } from '../../GameplayTests/GameplayTestRunner';
+import { type EventsExecutionTrackingMode } from '../../EventsExecutionTracking/EventsExecutionTrackingStore';
+import IconButton from '../../UI/IconButton';
+import VariableTreeIcon from '../../UI/CustomSvgIcons/VariableTree';
 
 export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: (?{ numberOfWindows: number }) => Promise<void>,
@@ -30,6 +33,10 @@ export type PreviewAndShareButtonsProps = {|
   isPreviewEnabled: boolean,
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
+  eventsExecutionTrackingMode: EventsExecutionTrackingMode,
+  setEventsExecutionTrackingMode: EventsExecutionTrackingMode => void,
+  isWatchedVariablesPanelOpen: boolean,
+  onToggleWatchedVariablesPanel: () => void,
   openShareDialog: () => void,
   isSharingEnabled: boolean,
 |};
@@ -46,6 +53,10 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     hasPreviewsRunning,
     previewState,
     setPreviewOverride,
+    eventsExecutionTrackingMode,
+    setEventsExecutionTrackingMode,
+    isWatchedVariablesPanelOpen,
+    onToggleWatchedVariablesPanel,
     openShareDialog,
     isSharingEnabled,
   }: PreviewAndShareButtonsProps) {
@@ -107,6 +118,31 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
                   onPreviewWithoutHotReload({ numberOfWindows: 4 });
                 },
                 enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
+              },
+            ],
+          },
+          {
+            // Highlight, in the events sheets, the instructions executed by
+            // the previews (which can be slowed down to follow them).
+            label: i18n._(t`Follow execution`),
+            submenu: [
+              {
+                type: 'checkbox',
+                label: i18n._(t`Disabled`),
+                checked: eventsExecutionTrackingMode === 'off',
+                click: () => setEventsExecutionTrackingMode('off'),
+              },
+              {
+                type: 'checkbox',
+                label: i18n._(t`Normal speed`),
+                checked: eventsExecutionTrackingMode === 'normal-speed',
+                click: () => setEventsExecutionTrackingMode('normal-speed'),
+              },
+              {
+                type: 'checkbox',
+                label: i18n._(t`x0.1 speed`),
+                checked: eventsExecutionTrackingMode === 'slow-speed',
+                click: () => setEventsExecutionTrackingMode('slow-speed'),
               },
             ],
           },
@@ -175,6 +211,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         previewState.previewExternalLayoutName,
         previewState.previewLayoutName,
         setPreviewOverride,
+        eventsExecutionTrackingMode,
+        setEventsExecutionTrackingMode,
       ]
     );
 
@@ -210,6 +248,16 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           // $FlowFixMe[incompatible-type]
           buildMenuTemplate={previewBuildMenuTemplate}
         />
+        <IconButton
+          size="small"
+          color="default"
+          selected={isWatchedVariablesPanelOpen}
+          onClick={onToggleWatchedVariablesPanel}
+          tooltip={t`Watch variables of the running preview`}
+          id="toolbar-watched-variables-button"
+        >
+          <VariableTreeIcon />
+        </IconButton>
         <ResponsiveRaisedButton
           primary
           onClick={onShareClick}

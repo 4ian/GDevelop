@@ -16,8 +16,14 @@ import {
   eventsTreeWithSearchResults,
   handle,
   aiGeneratedEventHandle,
+  executedEventHandle,
   icon,
 } from './ClassNames';
+import {
+  TrackedEventPtrContext,
+  useEventExecution,
+} from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
+import { formatExecutionDuration } from '../../EventsExecutionTracking/EventsExecutionTrackingStore';
 import {
   type SelectionState,
   type EventContext,
@@ -249,6 +255,8 @@ const EventContainer = (props: EventsContainerProps) => {
   );
 
   const EventComponent = EventsRenderingService.getEventComponent(event);
+  // Set while a followed preview executes instructions of this event.
+  const eventExecution = useEventExecution(event.ptr);
 
   const eventType = event.getType();
   const coloredHandleStyle = (() => {
@@ -299,8 +307,14 @@ const EventContainer = (props: EventsContainerProps) => {
                       [aiGeneratedEventHandle]: highlightedAiGeneratedEventIds.has(
                         event.getAiGeneratedEventId()
                       ),
+                      [executedEventHandle]: !!eventExecution,
                     })}
                     style={coloredHandleStyle}
+                    title={
+                      eventExecution
+                        ? formatExecutionDuration(eventExecution.durationMs)
+                        : undefined
+                    }
                   />
                 )}
                 <div style={styles.container}>
@@ -357,7 +371,11 @@ const EventContainer = (props: EventsContainerProps) => {
             )}
           </div>
         );
-        return props.isDragged ? content : connectDropTarget(content);
+        return (
+          <TrackedEventPtrContext.Provider value={event.ptr}>
+            {props.isDragged ? content : connectDropTarget(content)}
+          </TrackedEventPtrContext.Provider>
+        );
       }}
     </EventDragSourceAndDropTarget>
   );

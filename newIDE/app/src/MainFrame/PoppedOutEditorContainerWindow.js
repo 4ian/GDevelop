@@ -158,6 +158,18 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                       props.currentProject.getLayoutsCount() > 0
                     }
                     previewState={props.previewState}
+                    eventsExecutionTrackingMode={
+                      props.eventsExecutionTrackingMode
+                    }
+                    setEventsExecutionTrackingMode={
+                      props.setEventsExecutionTrackingMode
+                    }
+                    isWatchedVariablesPanelOpen={
+                      props.isWatchedVariablesPanelOpen
+                    }
+                    onToggleWatchedVariablesPanel={
+                      props.onToggleWatchedVariablesPanel
+                    }
                     onOpenVersionHistory={props.openVersionHistoryPanel}
                     checkedOutVersionStatus={props.checkedOutVersionStatus}
                     onQuitVersionHistory={props.onQuitVersionHistory}

@@ -1,0 +1,72 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px 8px 8px;
+  gap: 4px;
+  font-family: var(--gdevelop-classic-font-family);
+}
+
+.addRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* Same columns on every row, so that icons, names and values line up. */
+.row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 2fr) 1px minmax(0, 3fr) 28px;
+  align-items: center;
+  column-gap: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.row:hover {
+  background-color: var(--theme-list-item-hover-background-color);
+}
+
+.rowIcon {
+  font-size: 18px;
+  color: var(--theme-text-secondary-color);
+}
+
+.rowName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A variable that does not exist (anymore) in the project or in the game. */
+.row.missing .rowName {
+  text-decoration: line-through;
+  color: var(--theme-text-secondary-color);
+}
+
+.rowSeparator {
+  align-self: stretch;
+  background-color: var(--theme-dialog-separator-color);
+}
+
+.rowValue {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--theme-text-secondary-color);
+}
+
+/* The delete button only shows up on the hovered row. */
+.rowDelete {
+  opacity: 0;
+}
+
+.row:hover .rowDelete,
+.rowDelete:focus-within {
+  opacity: 1;
+}
+
+.rowValue.error {
+  color: var(--theme-error-color);
+}

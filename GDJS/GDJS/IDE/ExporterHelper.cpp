@@ -1193,6 +1193,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
+  InsertUnique(includesFiles, "events-execution-tracker.js");
   InsertUnique(includesFiles, "RuntimeInstanceContainer.js");
   InsertUnique(includesFiles, "runtimescene.js");
   InsertUnique(includesFiles, "scenestack.js");

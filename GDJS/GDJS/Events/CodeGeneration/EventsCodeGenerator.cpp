@@ -1240,9 +1240,15 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
     gd::String conditionCode =
         GenerateConditionCode(conditions[cId], "isConditionTrue", context);
     if (!conditions[cId].GetType().empty()) {
+      const gd::String instructionExecutionId =
+          GetInstructionExecutionId(true, cId);
       outputCode +=
           GenerateBooleanFullName("isConditionTrue", context) + " = false;\n";
+      outputCode +=
+          GenerateInstructionExecutionTrackingBegin(instructionExecutionId);
       outputCode += conditionCode;
+      outputCode +=
+          GenerateInstructionExecutionTrackingEnd(instructionExecutionId);
     }
   }
   // Close nested "if".
@@ -1571,6 +1577,25 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
 
   return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
          ConvertToStringExplicit(section) + "); }";
+}
+
+gd::String EventsCodeGenerator::GenerateInstructionExecutionTrackingBegin(
+    const gd::String& instructionExecutionId) {
+  // The tracker only exists in previews, when the editor asks for it.
+  if (GenerateCodeForRuntime() || instructionExecutionId.empty()) return "";
+
+  return "if (gdjs.eventsExecutionTracker) { "
+         "gdjs.eventsExecutionTracker.begin(" +
+         ConvertToStringExplicit(instructionExecutionId) + "); }\n";
+}
+
+gd::String EventsCodeGenerator::GenerateInstructionExecutionTrackingEnd(
+    const gd::String& instructionExecutionId) {
+  if (GenerateCodeForRuntime() || instructionExecutionId.empty()) return "";
+
+  return "\nif (gdjs.eventsExecutionTracker) { "
+         "gdjs.eventsExecutionTracker.end(" +
+         ConvertToStringExplicit(instructionExecutionId) + "); }\n";
 }
 
 gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(

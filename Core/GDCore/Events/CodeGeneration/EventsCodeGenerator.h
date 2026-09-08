@@ -450,6 +450,43 @@ class GD_CORE_API EventsCodeGenerator {
   };
 
   /**
+   * \brief Return the identifier, as known by the editor, of the event from
+   * which the given (copied) event was generated - see
+   * gd::CloneRememberingOriginalEvent. Empty if unknown.
+   *
+   * Used to let the editor highlight the instructions executed by a preview.
+   */
+  static gd::String GetOriginalEventExecutionId(const gd::BaseEvent& event);
+
+  /**
+   * \brief Generate the code notifying that an instruction starts being
+   * executed, so that the editor can highlight it (nothing by default).
+   *
+   * \param instructionExecutionId The id built by GetInstructionExecutionId.
+   */
+  virtual gd::String GenerateInstructionExecutionTrackingBegin(
+      const gd::String& instructionExecutionId) {
+    return "";
+  };
+
+  /**
+   * \brief Generate the code notifying that an instruction was executed
+   * (nothing by default).
+   */
+  virtual gd::String GenerateInstructionExecutionTrackingEnd(
+      const gd::String& instructionExecutionId) {
+    return "";
+  };
+
+  /**
+   * \brief Return the id identifying, for the editor, an instruction of the
+   * event being generated (see GetOriginalEventExecutionId). Empty if the
+   * event is unknown.
+   */
+  gd::String GetInstructionExecutionId(bool isCondition,
+                                       std::size_t indexInList) const;
+
+  /**
    * \brief Get the namespace to be used to store code generated
    * objects/values/functions, with the extra "dot" at the end to be used to
    * access to a property/member.
@@ -859,6 +896,9 @@ class GD_CORE_API EventsCodeGenerator {
   bool errorOccurred;          ///< Must be set to true if an error occurred.
   bool compilationForRuntime;  ///< Is set to true if the code generation is
                                ///< made for runtime only.
+  gd::String currentEventExecutionId;  ///< Id, for the editor, of the event
+                                       ///< being generated (see
+                                       ///< GetOriginalEventExecutionId).
 
   std::set<gd::String>
       includeFiles;  ///< List of headers files used by instructions. A (shared)

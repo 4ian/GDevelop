@@ -14,7 +14,16 @@ import {
   icon,
   warningInstruction,
   readyToDrag,
+  executedInstruction,
+  instructionExecutionTime,
 } from './ClassNames';
+import {
+  TrackedEventPtrContext,
+  useInstructionExecution,
+} from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
+import { formatExecutionDuration } from '../../EventsExecutionTracking/EventsExecutionTrackingStore';
+import LiveExpressionValueTooltip from '../../EventsExecutionTracking/LiveExpressionValueTooltip';
+import { getLastObjectParameterValue } from '../ParameterFields/ParameterMetadataTools';
 import {
   type InstructionsListContext,
   type InstructionContext,
@@ -70,6 +79,8 @@ type Props = {|
   platform: gdPlatform,
   instruction: gdInstruction,
   isCondition: boolean,
+  /** Position in the list of conditions or actions of the event. */
+  indexInList: number,
   onClick: Function,
   selected: boolean,
   disabled: boolean,
@@ -359,7 +370,38 @@ const Instruction = (props: Props): React.Node => {
             i18n,
           });
 
-          return (
+          // Expressions and variables can show their value in the running
+          // preview when hovered.
+          const valueTypeMetadata = parameterMetadata.getValueTypeMetadata();
+          const canShowLiveValue =
+            expressionIsValid &&
+            !!scope.layout &&
+            (valueTypeMetadata.isNumber() ||
+              valueTypeMetadata.isString() ||
+              valueTypeMetadata.isVariable());
+          const wrapWithLiveValue = (parameterElement: React.Node) =>
+            canShowLiveValue ? (
+              <LiveExpressionValueTooltip
+                key={i}
+                layout={scope.layout}
+                project={scope.project}
+                parameterType={parameterType}
+                expression={value}
+                objectName={getLastObjectParameterValue({
+                  instructionMetadata: metadata,
+                  instruction,
+                  expressionMetadata: null,
+                  expression: null,
+                  parameterIndex,
+                })}
+              >
+                {parameterElement}
+              </LiveExpressionValueTooltip>
+            ) : (
+              parameterElement
+            );
+
+          return wrapWithLiveValue(
             <span
               key={i}
               className={classNames({
@@ -416,6 +458,12 @@ const Instruction = (props: Props): React.Node => {
       </span>
     );
   };
+
+  // Highlighted while a followed preview executes this instruction.
+  const instructionExecution = useInstructionExecution(
+    isCondition,
+    props.indexInList
+  );
 
   // Allow a long press to show the context menu
   const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
@@ -488,6 +536,7 @@ const Instruction = (props: Props): React.Node => {
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
                   [readyToDrag]: isReadyToDrag,
+                  [executedInstruction]: !!instructionExecution,
                   [warningInstruction]:
                     showDeprecatedInstructionWarning !== 'no' &&
                     (!isInstructionVisible(scope, metadata) ||
@@ -600,6 +649,11 @@ const Instruction = (props: Props): React.Node => {
                   }}
                 />
                 {renderInstructionText(metadata, i18n)}
+                {instructionExecution && (
+                  <span className={instructionExecutionTime}>
+                    {formatExecutionDuration(instructionExecution.durationMs)}
+                  </span>
+                )}
               </div>
             );
 
@@ -612,45 +666,53 @@ const Instruction = (props: Props): React.Node => {
                 {isOver && <DropIndicator canDrop={canDrop} />}
                 {instructionDragSourceDropTargetElement}
                 {metadata.canHaveSubInstructions() && (
-                  <InstructionsList
-                    platform={props.platform}
-                    style={
-                      {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
-                    }
-                    className={subInstructionsContainer}
-                    instrsList={instruction.getSubInstructions()}
-                    areConditions={props.isCondition}
-                    selection={props.selection}
-                    onAddNewInstruction={props.onAddNewSubInstruction}
-                    onPasteInstructions={props.onPasteSubInstructions}
-                    onMoveToInstruction={props.onMoveToSubInstruction}
-                    onMoveToInstructionsList={props.onMoveToSubInstructionsList}
-                    onInstructionClick={props.onSubInstructionClick}
-                    onInstructionDoubleClick={props.onSubInstructionDoubleClick}
-                    onInstructionContextMenu={props.onSubInstructionContextMenu}
-                    onAddInstructionContextMenu={
-                      props.onAddSubInstructionContextMenu
-                    }
-                    onParameterClick={props.onSubParameterClick}
-                    addButtonLabel={<Trans>Add a sub-condition</Trans>}
-                    addButtonId="add-sub-condition-button"
-                    disabled={props.disabled}
-                    renderObjectThumbnail={props.renderObjectThumbnail}
-                    screenType={props.screenType}
-                    windowSize={props.windowSize}
-                    scope={props.scope}
-                    resourcesManager={props.resourcesManager}
-                    globalObjectsContainer={props.globalObjectsContainer}
-                    objectsContainer={props.objectsContainer}
-                    projectScopedContainersAccessor={
-                      props.projectScopedContainersAccessor
-                    }
-                    idPrefix={props.id}
-                    highlightedSearchText={props.highlightedSearchText}
-                    highlightedSearchMatchCase={
-                      props.highlightedSearchMatchCase
-                    }
-                  />
+                  <TrackedEventPtrContext.Provider value={null}>
+                    <InstructionsList
+                      platform={props.platform}
+                      style={
+                        {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+                      }
+                      className={subInstructionsContainer}
+                      instrsList={instruction.getSubInstructions()}
+                      areConditions={props.isCondition}
+                      selection={props.selection}
+                      onAddNewInstruction={props.onAddNewSubInstruction}
+                      onPasteInstructions={props.onPasteSubInstructions}
+                      onMoveToInstruction={props.onMoveToSubInstruction}
+                      onMoveToInstructionsList={
+                        props.onMoveToSubInstructionsList
+                      }
+                      onInstructionClick={props.onSubInstructionClick}
+                      onInstructionDoubleClick={
+                        props.onSubInstructionDoubleClick
+                      }
+                      onInstructionContextMenu={
+                        props.onSubInstructionContextMenu
+                      }
+                      onAddInstructionContextMenu={
+                        props.onAddSubInstructionContextMenu
+                      }
+                      onParameterClick={props.onSubParameterClick}
+                      addButtonLabel={<Trans>Add a sub-condition</Trans>}
+                      addButtonId="add-sub-condition-button"
+                      disabled={props.disabled}
+                      renderObjectThumbnail={props.renderObjectThumbnail}
+                      screenType={props.screenType}
+                      windowSize={props.windowSize}
+                      scope={props.scope}
+                      resourcesManager={props.resourcesManager}
+                      globalObjectsContainer={props.globalObjectsContainer}
+                      objectsContainer={props.objectsContainer}
+                      projectScopedContainersAccessor={
+                        props.projectScopedContainersAccessor
+                      }
+                      idPrefix={props.id}
+                      highlightedSearchText={props.highlightedSearchText}
+                      highlightedSearchMatchCase={
+                        props.highlightedSearchMatchCase
+                      }
+                    />
+                  </TrackedEventPtrContext.Provider>
                 )}
               </React.Fragment>
             );

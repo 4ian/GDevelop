@@ -197,6 +197,9 @@ import {
   type PreviewState,
   usePreviewDebuggerServerWatcher,
 } from './PreviewState';
+import { useEventsExecutionTracking } from '../EventsExecutionTracking/UseEventsExecutionTracking';
+import { type EventsExecutionTrackingMode } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
+import WatchedVariablesPanel from '../EventsExecutionTracking/WatchedVariablesPanel';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
@@ -452,6 +455,20 @@ export type Props = {|
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
 
+/** The scene whose variables are offered in the "watched variables" panel. */
+const getLayoutForWatchedVariables = (
+  project: gdProject,
+  previewState: PreviewState
+): ?gdLayout => {
+  const layoutName = previewState.isPreviewOverriden
+    ? previewState.overridenPreviewLayoutName
+    : previewState.previewLayoutName;
+  if (layoutName && project.hasLayoutNamed(layoutName)) {
+    return project.getLayout(layoutName);
+  }
+  return project.getLayoutsCount() > 0 ? project.getLayoutAt(0) : null;
+};
+
 const MainFrame = (props: Props): React.MixedElement => {
   const [state, setState]: [
     State,
@@ -592,6 +609,18 @@ const MainFrame = (props: Props): React.MixedElement => {
     [preferences, showConfirmation, setDiagnosticReportDialogOpen]
   );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
+  const [
+    eventsExecutionTrackingMode,
+    setEventsExecutionTrackingMode,
+  ] = React.useState<EventsExecutionTrackingMode>('off');
+  const [
+    isWatchedVariablesPanelOpen,
+    setIsWatchedVariablesPanelOpen,
+  ] = React.useState<boolean>(false);
+  const toggleWatchedVariablesPanel = React.useCallback(
+    () => setIsWatchedVariablesPanelOpen(isOpen => !isOpen),
+    []
+  );
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const lastProjectSettingsPromise = React.useRef<?Promise<void>>(null);
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
@@ -621,6 +650,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     clearInGameEditorExtensionErrors,
     hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
+  useEventsExecutionTracking({
+    previewDebuggerServer,
+    mode: eventsExecutionTrackingMode,
+  });
   const {
     ensureInteractionHappened,
     renderOpenConfirmDialog,
@@ -6034,6 +6067,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId,
     hasPreviewsRunning: hasNonEditionPreviewsRunning,
     previewState: previewState,
+    eventsExecutionTrackingMode,
+    setEventsExecutionTrackingMode,
+    isWatchedVariablesPanelOpen,
+    onToggleWatchedVariablesPanel: toggleWatchedVariablesPanel,
     checkedOutVersionStatus: checkedOutVersionStatus,
     canDoNetworkPreview:
       !!_previewLauncher.current &&
@@ -6192,6 +6229,13 @@ const MainFrame = (props: Props): React.MixedElement => {
         previewDebuggerServer={previewDebuggerServer || null}
         onStopRequested={stopRunningProjectGameplayTest}
       />
+      {isWatchedVariablesPanelOpen && currentProject && (
+        <WatchedVariablesPanel
+          project={currentProject}
+          layout={getLayoutForWatchedVariables(currentProject, previewState)}
+          onClose={toggleWatchedVariablesPanel}
+        />
+      )}
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },

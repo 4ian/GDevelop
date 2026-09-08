@@ -4408,6 +4408,11 @@ interface LayoutCodeGenerator {
         [Ref] SetString includes,
         [Ref] DiagnosticReport diagnosticReport,
         boolean compilationForRuntime);
+    [Const, Value] DOMString GenerateExpressionEvaluationCode(
+        [Const, Ref] Layout layout,
+        [Const] DOMString type,
+        [Const] DOMString expression,
+        [Const] DOMString objectName);
 };
 
 [Prefix="gdjs::"]

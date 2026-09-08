@@ -24,6 +24,7 @@ import {
   saveUiSettings,
 } from './EditorTabs/EditorTabsHandler';
 import { type PreviewState } from './PreviewState';
+import { type EventsExecutionTrackingMode } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
@@ -106,6 +107,10 @@ export type EditorTabsPaneCommonProps = {|
   isSharingEnabled: boolean,
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
+  eventsExecutionTrackingMode: EventsExecutionTrackingMode,
+  setEventsExecutionTrackingMode: EventsExecutionTrackingMode => void,
+  isWatchedVariablesPanelOpen: boolean,
+  onToggleWatchedVariablesPanel: () => void,
   checkedOutVersionStatus: ?OpenedVersionStatus,
   canDoNetworkPreview: boolean,
   gamesPlatformFrameTools: GamesPlatformFrameTools,
@@ -371,6 +376,10 @@ const EditorTabsPane: React.ComponentType<{
     isSharingEnabled,
     hasPreviewsRunning,
     previewState,
+    eventsExecutionTrackingMode,
+    setEventsExecutionTrackingMode,
+    isWatchedVariablesPanelOpen,
+    onToggleWatchedVariablesPanel,
     checkedOutVersionStatus,
     canDoNetworkPreview,
     gamesPlatformFrameTools,
@@ -774,6 +783,10 @@ const EditorTabsPane: React.ComponentType<{
           !!currentProject && currentProject.getLayoutsCount() > 0
         }
         previewState={previewState}
+        eventsExecutionTrackingMode={eventsExecutionTrackingMode}
+        setEventsExecutionTrackingMode={setEventsExecutionTrackingMode}
+        isWatchedVariablesPanelOpen={isWatchedVariablesPanelOpen}
+        onToggleWatchedVariablesPanel={onToggleWatchedVariablesPanel}
         onOpenVersionHistory={openVersionHistoryPanel}
         checkedOutVersionStatus={checkedOutVersionStatus}
         onQuitVersionHistory={onQuitVersionHistory}

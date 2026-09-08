@@ -238,6 +238,14 @@ namespace gdjs {
     _paused: boolean = false;
 
     /**
+     * Multiplier applied to the time elapsed between two frames before the
+     * game logic runs. Lower than 1 slows the game down (for debugging: the
+     * editor uses it to follow the execution of events). Unlike the time
+     * scale of a scene, it is not affected by the events of the game.
+     */
+    _gameSpeedFactor: float = 1;
+
+    /**
      * True during the first frame the game is back from being hidden.
      * This has nothing to do with `_paused`.
      */
@@ -1403,10 +1411,13 @@ namespace gdjs {
             } else {
               // The game is not paused (and so, not edited): both the rendering
               // and game logic (a full "step") is executed.
-              if (!this._sceneStack.step(elapsedTime)) {
+              if (!this._sceneStack.step(elapsedTime * this._gameSpeedFactor)) {
                 return false; // Return if game asked to be stopped.
               }
               this._hasJustResumed = false;
+              if (gdjs.eventsExecutionTracker) {
+                gdjs.eventsExecutionTracker.onFrameEnded();
+              }
             }
 
             this.getInputManager().onFrameEnded();
@@ -1438,6 +1449,7 @@ namespace gdjs {
      * @param removeCanvas If true, the canvas will be removed from the DOM.
      */
     dispose(removeCanvas?: boolean): void {
+      this.stopEventsExecutionTracking();
       if (this._inGameEditor) {
         this._inGameEditor.dispose();
       }
@@ -1711,6 +1723,43 @@ namespace gdjs {
         return;
       }
       currentScene.stopProfiler();
+    }
+
+    /**
+     * Start reporting which instructions of the events are executed, and how
+     * long they take (previews only: the generated code of exported games
+     * does not track anything).
+     * @param onReport Called regularly with the instructions that ran.
+     */
+    startEventsExecutionTracking(
+      onReport: (output: EventsExecutionTrackerOutput) => void
+    ): void {
+      this._throwIfDisposed();
+      this.stopEventsExecutionTracking();
+      gdjs.eventsExecutionTracker = new gdjs.EventsExecutionTracker(onReport);
+    }
+
+    /**
+     * Stop reporting the execution of the events (see
+     * `startEventsExecutionTracking`). Does nothing if it was not started.
+     */
+    stopEventsExecutionTracking(): void {
+      if (!gdjs.eventsExecutionTracker) return;
+
+      gdjs.eventsExecutionTracker.flush();
+      gdjs.eventsExecutionTracker = null;
+    }
+
+    /**
+     * Set the multiplier applied to the time elapsed between two frames
+     * (see `_gameSpeedFactor`). 1 is the normal speed.
+     */
+    setGameSpeedFactor(gameSpeedFactor: float): void {
+      this._gameSpeedFactor = Math.max(0, gameSpeedFactor);
+    }
+
+    getGameSpeedFactor(): float {
+      return this._gameSpeedFactor;
     }
 
     /**

@@ -283,6 +283,8 @@ export default class Debugger extends React.Component<Props, State> {
       // Nothing to do.
     } else if (data.command === 'updateInstances') {
       // Nothing to do.
+    } else if (data.command === 'eventsExecutionTracker.output') {
+      // Handled by the events sheets (see EventsExecutionTracking).
     } else if (data.command === 'console.log') {
       // Filter out unavoidable warnings that do not concern non-engine devs.
       if (isUnavoidableLibraryWarning(data.payload)) return;

@@ -55,7 +55,7 @@ import {
   redoComposite,
 } from '../Utils/History';
 import { diffInstancesSnapshots } from '../Utils/InstancesSnapshotDiff';
-import './UndoRedoFlash.css';
+import '../UI/UndoRedoFlash.css';
 
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import {
@@ -147,6 +147,14 @@ const serializedInstanceKeyToPropertyFieldId: { [string]: string } = {
   customDepth: 'Depth',
   hidden: 'Hide instance',
   locked: 'Lock instance',
+  opacity: 'Opacity',
+  keepRatio: 'Keep ratio',
+  // The 3 flip toggles are rendered as buttons inside a single group (see
+  // `CompactToggleButtons`), which is the only element of the group with an
+  // id - individual buttons aren't addressable, so all 3 flash it.
+  flippedX: 'Flip',
+  flippedY: 'Flip',
+  flippedZ: 'Flip',
 };
 
 const BASE_LAYER_NAME = '';

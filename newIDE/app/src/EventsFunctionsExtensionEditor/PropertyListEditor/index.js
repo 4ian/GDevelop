@@ -909,6 +909,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
               onPropertiesUpdated,
               onRenameProperty,
               onEventsFunctionsAdded,
+              addFolder,
+              onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
             }
           : null,
       [
@@ -932,6 +934,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         onPropertiesUpdated,
         onRenameProperty,
         onEventsFunctionsAdded,
+        addFolder,
+        onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
       ]
     );
 

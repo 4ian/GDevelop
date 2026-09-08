@@ -171,8 +171,7 @@ export type EventsFunctionCallbacks = {|
     eventsBasedObject: ?gdEventsBasedObject
   ) => void,
   moveEventsFunctionTo: (
-    eventsFunction: gdEventsFunction,
-    (destinationExtensionName: string) => void
+    (destinationExtensionName: string) => Promise<void>
   ) => void,
   onEventsFunctionMoved: (
     oldExtensionName: string,
@@ -331,53 +330,50 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     const { eventsFunctionsContainer, project } = this.props;
     const oldEventsFunction = this.functionFolderOrFunction.getFunction();
 
-    this.props.moveEventsFunctionTo(
-      oldEventsFunction,
-      destinationExtensionName => {
-        const extension = project.getEventsFunctionsExtension(
-          destinationExtensionName
+    this.props.moveEventsFunctionTo(async destinationExtensionName => {
+      const extension = project.getEventsFunctionsExtension(
+        destinationExtensionName
+      );
+      const newEventsFunction = extension
+        .getEventsFunctions()
+        .insertNewEventsFunction(
+          newNameGenerator(oldEventsFunction.getName(), name =>
+            extension.getEventsFunctions().hasEventsFunctionNamed(name)
+          ),
+          extension.getEventsFunctions().getEventsFunctionsCount()
         );
-        const newEventsFunction = extension
-          .getEventsFunctions()
-          .insertNewEventsFunction(
-            newNameGenerator(oldEventsFunction.getName(), name =>
-              extension.getEventsFunctions().hasEventsFunctionNamed(name)
-            ),
-            extension.getEventsFunctions().getEventsFunctionsCount()
-          );
-        unserializeFromJSObject(
-          newEventsFunction,
-          serializeToJSObject(oldEventsFunction),
-          'unserializeFrom',
-          project
-        );
-        const oldExtensionName = this.props.eventsFunctionsExtension.getName();
-        const newExtensionName = extension.getName();
-        const oldFunctionName = oldEventsFunction.getName();
-        const newFunctionName = newEventsFunction.getName();
-        gd.WholeProjectRefactorer.moveEventsFunction(
-          project,
-          this.props.eventsFunctionsExtension,
-          oldExtensionName,
-          newExtensionName,
-          oldFunctionName,
-          newFunctionName
-        );
-        // Rebuild tabs with the newly created custom object.
-        this.props.onEventsFunctionMoved(
-          oldExtensionName,
-          newExtensionName,
-          oldFunctionName,
-          newFunctionName
-        );
-        // We can now safely remove the old custom object
-        // since it's no longer used in the UI.
-        eventsFunctionsContainer.removeEventsFunction(
-          oldEventsFunction.getName()
-        );
-        this._onEventsFunctionModified();
-      }
-    );
+      unserializeFromJSObject(
+        newEventsFunction,
+        serializeToJSObject(oldEventsFunction),
+        'unserializeFrom',
+        project
+      );
+      const oldExtensionName = this.props.eventsFunctionsExtension.getName();
+      const newExtensionName = extension.getName();
+      const oldFunctionName = oldEventsFunction.getName();
+      const newFunctionName = newEventsFunction.getName();
+      gd.WholeProjectRefactorer.moveEventsFunction(
+        project,
+        this.props.eventsFunctionsExtension,
+        oldExtensionName,
+        newExtensionName,
+        oldFunctionName,
+        newFunctionName
+      );
+      // Rebuild tabs with the newly created custom object.
+      this.props.onEventsFunctionMoved(
+        oldExtensionName,
+        newExtensionName,
+        oldFunctionName,
+        newFunctionName
+      );
+      // We can now safely remove the old custom object
+      // since it's no longer used in the UI.
+      eventsFunctionsContainer.removeEventsFunction(
+        oldEventsFunction.getName()
+      );
+      this._onEventsFunctionModified();
+    });
   }
 
   edit(): void {

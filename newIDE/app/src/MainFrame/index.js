@@ -17,7 +17,13 @@ import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
-import ProjectManager from '../ProjectManager';
+import ProjectManager, {
+  type ProjectManagerInterface,
+} from '../ProjectManager';
+import useProjectManagerHistory, {
+  type ProjectManagerRenameCommand,
+  type ProjectManagerHistoryChange,
+} from './useProjectManagerHistory';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
@@ -496,6 +502,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [projectManagerOpen, openProjectManager] = React.useState<boolean>(
     false
   );
+  const projectManagerHistory = useProjectManagerHistory(state.currentProject);
+  const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
@@ -1746,16 +1754,16 @@ const MainFrame = (props: Props): React.MixedElement => {
     if (!currentProject) return;
 
     const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove this scene? This can't be undone.`
-      )
+      i18n._(t`Are you sure you want to remove this scene?`)
     );
     if (!answer) return;
 
+    const layoutName = layout.getName();
     onWillDeleteScene({ scene: layout }).then(() => {
-      if (currentProject.getFirstLayout() === layout.getName())
+      if (currentProject.getFirstLayout() === layoutName)
         currentProject.setFirstLayout('');
-      currentProject.removeLayout(layout.getName());
+      currentProject.removeLayout(layoutName);
+      projectManagerHistory.recordStep('scenes', 'DELETE', layoutName);
       _onProjectItemModified();
     });
   };
@@ -1766,18 +1774,23 @@ const MainFrame = (props: Props): React.MixedElement => {
     if (!currentProject) return;
 
     const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove this external layout? This can't be undone.`
-      )
+      i18n._(t`Are you sure you want to remove this external layout?`)
     );
     if (!answer) return;
 
+    const externalLayoutName = externalLayout.getName();
     setState(state => ({
       ...state,
       editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
     })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeExternalLayout(externalLayout.getName());
+      if (state.currentProject) {
+        state.currentProject.removeExternalLayout(externalLayoutName);
+        projectManagerHistory.recordStep(
+          'externalLayouts',
+          'DELETE',
+          externalLayoutName
+        );
+      }
       _onProjectItemModified();
     });
   };
@@ -1787,18 +1800,23 @@ const MainFrame = (props: Props): React.MixedElement => {
     if (!state.currentProject) return;
 
     const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to remove these external events? This can't be undone.`
-      )
+      i18n._(t`Are you sure you want to remove these external events?`)
     );
     if (!answer) return;
 
+    const externalEventsName = externalEvents.getName();
     setState(state => ({
       ...state,
       editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
     })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeExternalEvents(externalEvents.getName());
+      if (state.currentProject) {
+        state.currentProject.removeExternalEvents(externalEventsName);
+        projectManagerHistory.recordStep(
+          'externalEvents',
+          'DELETE',
+          externalEventsName
+        );
+      }
       _onProjectItemModified();
     });
   };
@@ -2273,7 +2291,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onSceneAdded = React.useCallback(
-    () => {
+    (name: string) => {
+      projectManagerHistory.recordStep('scenes', 'ADD', name);
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
@@ -2282,11 +2301,12 @@ const MainFrame = (props: Props): React.MixedElement => {
         reasons: ['scene-added'],
       });
     },
-    [notifyChangesToInGameEditor]
+    [notifyChangesToInGameEditor, projectManagerHistory]
   );
 
   const onExternalLayoutAdded = React.useCallback(
-    () => {
+    (name: string) => {
+      projectManagerHistory.recordStep('externalLayouts', 'ADD', name);
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
@@ -2295,7 +2315,14 @@ const MainFrame = (props: Props): React.MixedElement => {
         reasons: ['external-layout-added'],
       });
     },
-    [notifyChangesToInGameEditor]
+    [notifyChangesToInGameEditor, projectManagerHistory]
+  );
+
+  const onExternalEventsAdded = React.useCallback(
+    (name: string) => {
+      projectManagerHistory.recordStep('externalEvents', 'ADD', name);
+    },
+    [projectManagerHistory]
   );
 
   const onEffectAdded = React.useCallback(
@@ -2370,6 +2397,11 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
 
     renameLayoutInProject(currentProject, oldName, uniqueNewName);
+    projectManagerHistory.recordRename({
+      type: 'renameScene',
+      oldName,
+      newName: uniqueNewName,
+    });
     if (inAppTutorialOrchestratorRef.current) {
       inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
     }
@@ -2418,6 +2450,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       oldName,
       uniqueNewName
     );
+    projectManagerHistory.recordRename({
+      type: 'renameExternalLayout',
+      oldName,
+      newName: uniqueNewName,
+    });
     setState(state => ({
       ...state,
       editorTabs: getEditorTabsWithRenamedProjectItem(
@@ -2464,6 +2501,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       oldName,
       uniqueNewName
     );
+    projectManagerHistory.recordRename({
+      type: 'renameExternalEvents',
+      oldName,
+      newName: uniqueNewName,
+    });
     setState(state => ({
       ...state,
       editorTabs: getEditorTabsWithRenamedProjectItem(
@@ -2480,6 +2522,163 @@ const MainFrame = (props: Props): React.MixedElement => {
       _onProjectItemModified();
     });
   };
+
+  /**
+   * Revert/re-apply a project manager rename command (a scene, external
+   * layout or external events renamed - a whole-project refactoring, so it
+   * can't be captured by a snapshot of the targets like an add/delete).
+   */
+  const applyProjectManagerRenameCommand = (
+    command: ProjectManagerRenameCommand,
+    direction: 'undo' | 'redo'
+  ) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    const fromName = direction === 'undo' ? command.newName : command.oldName;
+    const toName = direction === 'undo' ? command.oldName : command.newName;
+
+    if (command.type === 'renameScene') {
+      if (!currentProject.hasLayoutNamed(fromName)) return;
+      renameLayoutInProject(currentProject, fromName, toName);
+      if (inAppTutorialOrchestratorRef.current) {
+        inAppTutorialOrchestratorRef.current.changeData(fromName, toName);
+      }
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorTabsWithRenamedProjectItem(
+          state.editorTabs,
+          currentProject,
+          editorTab =>
+            getRenamedLayoutTabProjectItemName(editorTab, fromName, toName)
+        ),
+      })).then(() => {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['renamed-scene'],
+        });
+        _onProjectItemModified();
+      });
+    } else if (command.type === 'renameExternalLayout') {
+      if (!currentProject.hasExternalLayoutNamed(fromName)) return;
+      const externalLayout = currentProject.getExternalLayout(fromName);
+      externalLayout.setName(toName);
+      gd.WholeProjectRefactorer.renameExternalLayout(
+        currentProject,
+        fromName,
+        toName
+      );
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorTabsWithRenamedProjectItem(
+          state.editorTabs,
+          currentProject,
+          editorTab =>
+            getRenamedExternalLayoutTabProjectItemName(
+              editorTab,
+              fromName,
+              toName
+            )
+        ),
+      })).then(() => {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['renamed-external-layout'],
+        });
+        _onProjectItemModified();
+      });
+    } else {
+      if (!currentProject.hasExternalEventsNamed(fromName)) return;
+      const externalEvents = currentProject.getExternalEvents(fromName);
+      externalEvents.setName(toName);
+      gd.WholeProjectRefactorer.renameExternalEvents(
+        currentProject,
+        fromName,
+        toName
+      );
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorTabsWithRenamedProjectItem(
+          state.editorTabs,
+          currentProject,
+          editorTab =>
+            getRenamedExternalEventsTabProjectItemName(
+              editorTab,
+              fromName,
+              toName
+            )
+        ),
+      })).then(() => {
+        _onProjectItemModified();
+      });
+    }
+  };
+
+  /**
+   * After a project manager undo/redo, make sure its effect can be seen:
+   * open the project manager and reveal the affected item.
+   */
+  const revealProjectManagerHistoryChange = (
+    change: ProjectManagerHistoryChange
+  ) => {
+    // Undo/redo mutates the project directly (unlike a normal add/delete/
+    // rename, which goes through callbacks that already refresh the UI) -
+    // the project manager's tree view and the rest of the app need to be
+    // told about it explicitly.
+    if (projectManagerRef.current) projectManagerRef.current.forceUpdateList();
+    _onProjectItemModified();
+    if (change.targetKey === 'scenes') {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['project-manager-undo-redo'],
+      });
+    }
+
+    openProjectManager(true);
+    // Wait for the project manager to (re-)open/render before scrolling to
+    // and flashing the affected row.
+    setTimeout(() => {
+      if (projectManagerRef.current) {
+        projectManagerRef.current.scrollToAndFlashItem(
+          change.targetKey,
+          change.itemName
+        );
+      }
+    }, 100);
+  };
+
+  const onProjectManagerUndo = React.useCallback(
+    () => {
+      const change = projectManagerHistory.undo(
+        state.currentProject,
+        applyProjectManagerRenameCommand
+      );
+      if (change) revealProjectManagerHistoryChange(change);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [projectManagerHistory, state.currentProject]
+  );
+
+  const onProjectManagerRedo = React.useCallback(
+    () => {
+      const change = projectManagerHistory.redo(
+        state.currentProject,
+        applyProjectManagerRenameCommand
+      );
+      if (change) revealProjectManagerHistoryChange(change);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [projectManagerHistory, state.currentProject]
+  );
 
   const renameEventsFunctionsExtension = (oldName: string, newName: string) => {
     const { currentProject } = state;
@@ -6215,6 +6414,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       >
         <ProjectManager
+          ref={projectManagerRef}
           project={currentProject}
           onChangeProjectName={onChangeProjectName}
           onSaveProjectProperties={onSaveProjectProperties}
@@ -6248,6 +6448,9 @@ const MainFrame = (props: Props): React.MixedElement => {
           onExtensionInstalled={onExtensionInstalled}
           onSceneAdded={onSceneAdded}
           onExternalLayoutAdded={onExternalLayoutAdded}
+          onExternalEventsAdded={onExternalEventsAdded}
+          onUndo={onProjectManagerUndo}
+          onRedo={onProjectManagerRedo}
           onShareProject={() => {
             openShareDialog();
           }}

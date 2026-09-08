@@ -120,7 +120,9 @@ type ShortcutSectionData = {|
 
 /**
  * Get the shortcuts grouped by area, keeping only the commands matching the
- * search text (by name or by shortcut). Sections without any match are omitted.
+ * search text (by name, by shortcut, or by area name: searching "tilemap"
+ * shows all the shortcuts of the "Tilemap tools" area). Sections without any
+ * match are omitted.
  */
 export const getShortcutSections = (
   i18n: I18n,
@@ -139,6 +141,11 @@ export const getShortcutSections = (
     .filter(areaName => !!areaWiseCommands[areaName])
     .map(
       (areaName): ShortcutSectionData => {
+        const areaTitle = i18n._(commandAreas[areaName]);
+        // An area whose name matches shows all its shortcuts.
+        const isAreaNameMatching =
+          !!normalizedSearchText &&
+          normalizeForSearch(areaTitle).includes(normalizedSearchText);
         const rows: Array<ShortcutRowData> = areaWiseCommands[areaName]
           .map(
             (commandName: CommandName): ShortcutRowData | null => {
@@ -158,6 +165,7 @@ export const getShortcutSections = (
 
               const matchesSearch =
                 !normalizedSearchText ||
+                isAreaNameMatching ||
                 normalizeForSearch(commandDisplayText).includes(
                   normalizedSearchText
                 ) ||
@@ -186,7 +194,7 @@ export const getShortcutSections = (
 
         return {
           areaName,
-          title: i18n._(commandAreas[areaName]),
+          title: areaTitle,
           rows,
         };
       }

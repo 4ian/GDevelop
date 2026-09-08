@@ -405,7 +405,7 @@ export class EventsFunctionFolderTreeViewItemContent
       );
       // We can now safely remove the old custom object
       // since it's no longer used in the UI.
-      await this._delete(true);
+      await this._delete({ isSilent: true });
     });
   }
 
@@ -497,10 +497,10 @@ export class EventsFunctionFolderTreeViewItemContent
   }
 
   delete(): void {
-    this._delete();
+    this._delete({ isSilent: false });
   }
 
-  async _delete(isSilent: boolean = false): Promise<void> {
+  async _delete({ isSilent }: { isSilent: boolean }): Promise<void> {
     const {
       eventsFunctionsContainer,
       forceUpdateList,

@@ -3,7 +3,7 @@ import * as React from 'react';
 import Text from './Text';
 import { marginsSize } from './Grid';
 import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
-import GDevelopThemeContext from './Theme/GDevelopThemeContext';
+import { useTheme } from '@material-ui/styles';
 
 // Width of the control column, shared by all rows so that the controls
 // (toggles, select fields, buttons, shortcuts...) are aligned like in a table.
@@ -82,7 +82,7 @@ type Props = {|
  */
 const SettingsRow = ({ id, label, children }: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const muiTheme = useTheme();
   // The row is highlighted on hover: the label and its control are far apart,
   // so the highlight is what shows which control belongs to which label.
   const [isHovered, setIsHovered] = React.useState<boolean>(false);
@@ -105,7 +105,7 @@ const SettingsRow = ({ id, label, children }: Props): React.Node => {
         height: rowHeight,
         ...(isMobile ? styles.rowOnMobile : {}),
         ...(isHovered
-          ? { backgroundColor: gdevelopTheme.list.hover.backgroundColor }
+          ? { backgroundColor: muiTheme.palette.action.hover }
           : {}),
       }}
       // Only a mouse hovers: a touch would leave the row highlighted after

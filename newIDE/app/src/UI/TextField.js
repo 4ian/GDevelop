@@ -80,6 +80,7 @@ type Props = {|
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   name?: string,
+  autoComplete?: string,
   translatableHintText?: MessageDescriptor,
   hintText?: string,
   helperMarkdownText?: ?string,
@@ -345,6 +346,7 @@ const TextField: React.ComponentType<{
               onClick: props.onClick,
               // String field props:
               maxLength: props.maxLength,
+              autoComplete: props.autoComplete,
               // Number field props:
               max: props.max,
               min: props.min,

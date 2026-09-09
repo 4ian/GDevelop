@@ -98,6 +98,8 @@ const ForgotPasswordDialog = ({
                 )
               }
               type="email"
+              name="email"
+              autoComplete="email"
               fullWidth
               onBlur={event => {
                 const trimmedEmail = event.currentTarget.value.trim();

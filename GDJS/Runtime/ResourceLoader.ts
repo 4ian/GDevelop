@@ -172,10 +172,22 @@ namespace gdjs {
     private _svgManager: InternalInGameEditorOnlySvgManager;
 
     private privateResourceManager = new PrivateResourceManager(this);
+    /** Remembers when, why and how each resource was loaded (for the debugger). */
+    private _loadTracker: gdjs.ResourceLoadTracker;
+    /**
+     * When set (by a hard reload asked to start from scratch), added to the
+     * URL of every resource so that the HTTP cache is bypassed.
+     */
+    private _resourcesCacheBurst: string | null = null;
     private sceneResourceLoadingQueue = new ResourceLoadingQueue(
       'scene',
       this.privateResourceManager,
       /** shouldProcessResources= */ false,
+      (sceneName, isLoadingInForeground) => ({
+        type: 'scene',
+        sceneName,
+        foreground: isLoadingInForeground,
+      }),
       (
         unloadedTaskIdentifier,
         unloadedTaskState,
@@ -208,6 +220,19 @@ namespace gdjs {
     ) {
       this._runtimeGame = runtimeGame;
       this._globalResources = globalResources;
+      this._loadTracker = new gdjs.ResourceLoadTracker(() =>
+        runtimeGame.getGameTimeMs()
+      );
+      if (typeof location !== 'undefined' && location.search) {
+        this._resourcesCacheBurst = new URLSearchParams(location.search).get(
+          'resourcesCacheBurst'
+        );
+      }
+      gdjs.registerRuntimeSceneLoadedCallback((runtimeScene) => {
+        if (runtimeScene.getGame() === this._runtimeGame) {
+          this._loadTracker.recordSceneChange(runtimeScene.getName());
+        }
+      });
 
       // These 3 attributes are filled by `setResources`.
       this.setResources(resourceDataArray, globalResources, layoutDataArray);
@@ -289,6 +314,7 @@ namespace gdjs {
       }
 
       this.privateResourceManager._resources.clear();
+      this._loadTracker.reset();
       for (const resourceData of resourceDataArray) {
         if (!resourceData.file) {
           // Empty string or missing `file` field: not a valid resource, let's entirely ignore it.
@@ -313,8 +339,9 @@ namespace gdjs {
         ResourceLoader.maxForegroundConcurrency,
         ResourceLoader.maxAttempt,
         async (resource) => {
-          await this.privateResourceManager._loadResource(resource);
-          await this.privateResourceManager._processResource(resource);
+          const origin = this._getStartupOrigin(resource.name, null);
+          await this.privateResourceManager._loadResource(resource, origin);
+          await this.privateResourceManager._processResource(resource, origin);
           loadedCount++;
           onProgress(loadedCount, this.privateResourceManager._resources.size);
         }
@@ -339,8 +366,12 @@ namespace gdjs {
           const resource =
             this.privateResourceManager._resources.get(resourceName);
           if (resource) {
-            await this.privateResourceManager._loadResource(resource);
-            await this.privateResourceManager._processResource(resource);
+            const origin: ResourceLoadOrigin = { type: 'editor' };
+            await this.privateResourceManager._loadResource(resource, origin);
+            await this.privateResourceManager._processResource(
+              resource,
+              origin
+            );
           }
           loadedCount++;
           onProgress(loadedCount, this.privateResourceManager._resources.size);
@@ -380,8 +411,9 @@ namespace gdjs {
             logger.warn('Unable to find resource "' + resourceName + '".');
             return;
           }
-          await this.privateResourceManager._loadResource(resource);
-          await this.privateResourceManager._processResource(resource);
+          const origin = this._getStartupOrigin(resourceName, firstSceneName);
+          await this.privateResourceManager._loadResource(resource, origin);
+          await this.privateResourceManager._processResource(resource, origin);
           loadedCount++;
           onProgress(loadedCount, resourceNames.length);
         }
@@ -496,6 +528,7 @@ namespace gdjs {
           `Independent objects of ${sceneName}`,
           this.privateResourceManager,
           /** shouldProcessResources= */ true,
+          (objectName) => ({ type: 'object', sceneName, objectName }),
           (
             unloadedTaskIdentifier,
             unloadedTaskState,
@@ -633,6 +666,103 @@ namespace gdjs {
       return this.privateResourceManager._resources.get(resourceName) || null;
     }
 
+    getLoadTracker(): gdjs.ResourceLoadTracker {
+      return this._loadTracker;
+    }
+
+    /**
+     * The origin of a resource loaded when the game starts: global resources
+     * are told apart from the ones of the first scene.
+     */
+    private _getStartupOrigin(
+      resourceName: string,
+      firstSceneName: string | null
+    ): ResourceLoadOrigin {
+      return {
+        type: 'startup',
+        sceneName: this._globalResources.includes(resourceName)
+          ? null
+          : firstSceneName,
+      };
+    }
+
+    /**
+     * Every scene and object referencing each resource, for the debugger.
+     */
+    private _getRequestersByResourceName(): Map<
+      string,
+      Array<ResourceLoadOrigin>
+    > {
+      const requestersByResourceName = new Map<
+        string,
+        Array<ResourceLoadOrigin>
+      >();
+      const addRequester = (
+        resourceName: string,
+        requester: ResourceLoadOrigin
+      ) => {
+        const requesters = requestersByResourceName.get(resourceName);
+        if (requesters) {
+          requesters.push(requester);
+        } else {
+          requestersByResourceName.set(resourceName, [requester]);
+        }
+      };
+      for (const resourceName of this._globalResources) {
+        addRequester(resourceName, { type: 'startup', sceneName: null });
+      }
+      for (const [sceneName, loadingState] of this.sceneResourceLoadingQueue
+        .loadingStates) {
+        for (const resourceName of loadingState.resourceNames) {
+          addRequester(resourceName, {
+            type: 'scene',
+            sceneName,
+            foreground: false,
+          });
+        }
+      }
+      for (const [sceneName, objectResourceLoadingQueue] of this
+        .objectResourceLoadingQueues) {
+        for (const [
+          objectName,
+          loadingState,
+        ] of objectResourceLoadingQueue.loadingStates) {
+          for (const resourceName of loadingState.resourceNames) {
+            addRequester(resourceName, {
+              type: 'object',
+              sceneName,
+              objectName,
+            });
+          }
+        }
+      }
+      return requestersByResourceName;
+    }
+
+    /**
+     * A snapshot of every resource of the game with its loading state, for
+     * the debugger. Cheap enough to be polled every second or so.
+     */
+    getResourcesDebugState(): ResourcesDebugState {
+      const requestersByResourceName = this._getRequestersByResourceName();
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      return this._loadTracker.buildDebugState(
+        this.privateResourceManager._resources.values(),
+        (resourceName) => requestersByResourceName.get(resourceName) || [],
+        (resource) => {
+          const resourceManager = this._resourceManagersMap.get(resource.kind);
+          if (
+            !resourceManager ||
+            typeof resourceManager.getResourceDebugMetrics !== 'function'
+          ) {
+            return null;
+          }
+          return resourceManager.getResourceDebugMetrics(resource.name);
+        },
+        currentScene ? currentScene.getName() : null
+      );
+    }
+
     // Helper methods used when resources are loaded from an URL.
 
     /**
@@ -641,7 +771,9 @@ namespace gdjs {
      */
     getFullUrl(url: string) {
       url = encodeLocalFileNameForUrl(url);
-      if (this._runtimeGame.isInGameEdition()) {
+      if (this._resourcesCacheBurst) {
+        url = addSearchParameterToUrl(url, 'cache', this._resourcesCacheBurst);
+      } else if (this._runtimeGame.isInGameEdition()) {
         // Avoid adding cache burst to URLs which are assumed to be immutable files,
         // to avoid costly useless requests each time the game is hot-reloaded.
         if (url.startsWith('file://') || !url.startsWith('http')) {
@@ -970,7 +1102,14 @@ namespace gdjs {
       this.resourceLoader = resourceLoader;
     }
 
-    async _processResource(resource: ResourceData): Promise<void> {
+    /**
+     * @param origin What triggered the processing (for the debugger).
+     */
+    async _processResource(
+      resource: ResourceData,
+      origin: ResourceLoadOrigin
+    ): Promise<void> {
+      const loadTracker = this.resourceLoader.getLoadTracker();
       const resourceManager = this.resourceLoader._resourceManagersMap.get(
         resource.kind
       );
@@ -982,12 +1121,30 @@ namespace gdjs {
             resource.name +
             '".'
         );
+        loadTracker.onLoadFailed(
+          resource.name,
+          'Unknown resource kind: "' + resource.kind + '".'
+        );
         return;
       }
-      await resourceManager.processResource(resource.name);
+      loadTracker.onProcessingStarted(resource.name);
+      try {
+        await resourceManager.processResource(resource.name);
+      } catch (error) {
+        loadTracker.onProcessFailed(resource.name, error);
+        throw error;
+      }
+      loadTracker.onReady(resource.name);
     }
 
-    async _loadResource(resource: ResourceData): Promise<void> {
+    /**
+     * @param origin What triggered the download (for the debugger).
+     */
+    async _loadResource(
+      resource: ResourceData,
+      origin: ResourceLoadOrigin
+    ): Promise<void> {
+      const loadTracker = this.resourceLoader.getLoadTracker();
       const resourceManager = this.resourceLoader._resourceManagersMap.get(
         resource.kind
       );
@@ -999,9 +1156,24 @@ namespace gdjs {
             resource.name +
             '".'
         );
+        loadTracker.onLoadFailed(
+          resource.name,
+          'Unknown resource kind: "' + resource.kind + '".'
+        );
         return;
       }
-      await resourceManager.loadResource(resource.name);
+      loadTracker.onLoadStarted(resource.name, origin);
+      try {
+        await resourceManager.loadResource(resource.name);
+      } catch (error) {
+        // The loading queue retries a few times: the tracker keeps the last error.
+        loadTracker.onLoadFailed(resource.name, error);
+        throw error;
+      }
+      loadTracker.onLoaded(
+        resource.name,
+        this.resourceLoader.getFullUrl(resource.file)
+      );
     }
 
     _unloadResource(resourceName: string): void {
@@ -1015,6 +1187,7 @@ namespace gdjs {
             `Unloading of resources of kind ${resourceData.kind} : ${resourceName}`
           );
           resourceManager.unloadResource(resourceData);
+          this.resourceLoader.getLoadTracker().onUnloaded(resourceName);
         }
       }
     }
@@ -1062,16 +1235,26 @@ namespace gdjs {
 
     private getResourcesDifference: ResourceDifferenceOperation;
     private shouldProcessResources: boolean;
+    /** Describes, for the debugger, what a task of this queue is. */
+    private getLoadOrigin: (
+      taskIdentifier: string,
+      isLoadingInForeground: boolean
+    ) => ResourceLoadOrigin;
 
     constructor(
       name: string,
       resourceLoader: PrivateResourceManager,
       shouldProcessResources: boolean,
+      getLoadOrigin: (
+        taskIdentifier: string,
+        isLoadingInForeground: boolean
+      ) => ResourceLoadOrigin,
       getResourcesDifference: ResourceDifferenceOperation
     ) {
       this.name = name;
       this.resourceLoader = resourceLoader;
       this.shouldProcessResources = shouldProcessResources;
+      this.getLoadOrigin = getLoadOrigin;
       this.getResourcesDifference = getResourcesDifference;
     }
 
@@ -1099,8 +1282,10 @@ namespace gdjs {
           );
           const loadingState = this.loadingStates.get(task.identifier);
           if (loadingState) {
-            await this._doLoadResources(loadingState, async (count, total) =>
-              task.onProgress(count, total)
+            await this._doLoadResources(
+              task.identifier,
+              loadingState,
+              async (count, total) => task.onProgress(count, total)
             );
           } else {
             logger.warn(
@@ -1128,10 +1313,15 @@ namespace gdjs {
     }
 
     private async _doLoadResources(
+      taskIdentifier: string,
       loadingState: LoadingTaskState,
       onProgress?: (count: number, total: number) => Promise<void>
     ): Promise<void> {
       let loadedCount = 0;
+      const origin = this.getLoadOrigin(
+        taskIdentifier,
+        this.isLoadingInForeground
+      );
       await ResourceLoader.processAndRetryIfNeededWithPromisePool(
         loadingState.resourceNames,
         this.isLoadingInForeground
@@ -1144,9 +1334,9 @@ namespace gdjs {
             logger.warn('Unable to find resource "' + resourceName + '".');
             return;
           }
-          await this.resourceLoader._loadResource(resource);
+          await this.resourceLoader._loadResource(resource, origin);
           if (this.shouldProcessResources) {
-            await this.resourceLoader._processResource(resource);
+            await this.resourceLoader._processResource(resource, origin);
           }
           loadedCount++;
           this.currentTaskProgress =
@@ -1180,13 +1370,14 @@ namespace gdjs {
       }
 
       let parsedCount = 0;
+      const origin = this.getLoadOrigin(taskIdentifier, true);
       for (const resourceName of loadingState.resourceNames) {
         const resource = this.resourceLoader._resources.get(resourceName);
         if (!resource) {
           logger.warn('Unable to find resource "' + resourceName + '".');
           continue;
         }
-        await this.resourceLoader._processResource(resource);
+        await this.resourceLoader._processResource(resource, origin);
         parsedCount++;
         onProgress &&
           (await onProgress(parsedCount, loadingState.resourceNames.length));

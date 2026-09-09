@@ -45,11 +45,6 @@ namespace gdjs {
     /** Should the canvas be cleared before this scene rendering. */
     _clearCanvas: boolean = true;
 
-    _profiler: gdjs.Profiler | null = null;
-
-    // Set to `new gdjs.Profiler()` to have profiling done on the scene.
-    _onProfilerStopped: null | ((oldProfiler: gdjs.Profiler) => void) = null;
-
     _cachedGameResolutionWidth: integer;
     _cachedGameResolutionHeight: integer;
 
@@ -298,9 +293,6 @@ namespace gdjs {
       if (!this._isLoaded) {
         return;
       }
-      if (this._profiler) {
-        this.stopProfiler();
-      }
 
       // Notify the global callbacks (which should not release resources yet,
       // as other callbacks might still refer to the objects/scene).
@@ -390,76 +382,80 @@ namespace gdjs {
      * or a game stop was requested.
      */
     renderAndStep(elapsedTime: float): boolean {
-      if (this._profiler) {
-        this._profiler.beginFrame();
+      // The profiler belongs to the game: read it once, as it can be stopped
+      // during the frame (see `Profiler.setOnRecordingCapReached`).
+      const profiler = this._runtimeGame.getProfiler();
+      if (profiler) {
+        profiler.setCurrentSceneName(this._name);
+        profiler.beginFrame();
       }
       this._requestedChange = SceneChangeRequest.CONTINUE;
       this._timeManager.update(
         elapsedTime,
         this._runtimeGame.getMinimalFramerate()
       );
-      if (this._profiler) {
-        this._profiler.begin('asynchronous actions (wait action, etc...)');
+      if (profiler) {
+        profiler.begin('asynchronous actions (wait action, etc...)');
       }
       this._asyncTasksManager.processTasks(this);
-      if (this._profiler) {
-        this._profiler.end('asynchronous actions (wait action, etc...)');
+      if (profiler) {
+        profiler.end('asynchronous actions (wait action, etc...)');
       }
-      if (this._profiler) {
-        this._profiler.begin('objects (pre-events)');
+      if (profiler) {
+        profiler.begin('objects (pre-events)');
       }
       this._updateObjectsPreEvents();
-      if (this._profiler) {
-        this._profiler.end('objects (pre-events)');
+      if (profiler) {
+        profiler.end('objects (pre-events)');
       }
-      if (this._profiler) {
-        this._profiler.begin('callbacks and extensions (pre-events)');
+      if (profiler) {
+        profiler.begin('callbacks and extensions (pre-events)');
       }
       for (let i = 0; i < gdjs.callbacksRuntimeScenePreEvents.length; ++i) {
         gdjs.callbacksRuntimeScenePreEvents[i](this);
       }
-      if (this._profiler) {
-        this._profiler.end('callbacks and extensions (pre-events)');
+      if (profiler) {
+        profiler.end('callbacks and extensions (pre-events)');
       }
-      if (this._profiler) {
-        this._profiler.begin('events');
+      if (profiler) {
+        profiler.begin('events');
       }
       if (this._eventsFunction !== null) this._eventsFunction(this);
-      if (this._profiler) {
-        this._profiler.end('events');
+      if (profiler) {
+        profiler.end('events');
       }
-      if (this._profiler) {
-        this._profiler.begin('objects (post-events)');
+      if (profiler) {
+        profiler.begin('objects (post-events)');
       }
       this._stepBehaviorsPostEvents();
-      if (this._profiler) {
-        this._profiler.end('objects (post-events)');
+      if (profiler) {
+        profiler.end('objects (post-events)');
       }
-      if (this._profiler) {
-        this._profiler.begin('callbacks and extensions (post-events)');
+      if (profiler) {
+        profiler.begin('callbacks and extensions (post-events)');
       }
       for (let i = 0; i < gdjs.callbacksRuntimeScenePostEvents.length; ++i) {
         gdjs.callbacksRuntimeScenePostEvents[i](this);
       }
-      if (this._profiler) {
-        this._profiler.end('callbacks and extensions (post-events)');
+      if (profiler) {
+        profiler.end('callbacks and extensions (post-events)');
       }
 
-      this.render();
+      this._render(profiler);
       this._isJustResumed = false;
-      if (this._profiler) {
-        this._profiler.end('render');
+      if (profiler) {
+        profiler.end('render');
       }
-      if (this._profiler) {
+      if (profiler) {
         const threeRenderer = this._runtimeGame
           .getRenderer()
           .getThreeRenderer();
         if (threeRenderer) {
-          this._profiler.record3DRendererInfo(threeRenderer.info);
+          profiler.record3DRendererInfo(threeRenderer.info);
         }
       }
-      if (this._profiler) {
-        this._profiler.endFrame();
+      if (profiler) {
+        profiler.endFrame();
       }
       return !!this.getRequestedChange();
     }
@@ -467,22 +463,31 @@ namespace gdjs {
      * Render the scene (but do not execute the game logic).
      */
     render() {
-      if (this._profiler) {
-        this._profiler.begin('objects (pre-render, effects update)');
+      this._render(null);
+    }
+
+    /**
+     * Render the scene, opening the profiler sections when a profiler is given.
+     * The 'render' section is left open: it's closed by the caller, once the
+     * renderer has flushed (see `renderAndStep`).
+     */
+    private _render(profiler: gdjs.Profiler | null) {
+      if (profiler) {
+        profiler.begin('objects (pre-render, effects update)');
       }
       this._updateObjectsPreRender();
-      if (this._profiler) {
-        this._profiler.end('objects (pre-render, effects update)');
+      if (profiler) {
+        profiler.end('objects (pre-render, effects update)');
       }
-      if (this._profiler) {
-        this._profiler.begin('layers (effects update)');
+      if (profiler) {
+        profiler.begin('layers (effects update)');
       }
       this._updateLayersPreRender();
-      if (this._profiler) {
-        this._profiler.end('layers (effects update)');
+      if (profiler) {
+        profiler.end('layers (effects update)');
       }
-      if (this._profiler) {
-        this._profiler.begin('render');
+      if (profiler) {
+        profiler.begin('render');
       }
 
       // Set to true to enable debug rendering (look for the implementation in the renderer
@@ -794,39 +799,28 @@ namespace gdjs {
     }
 
     /**
-     * Get the profiler associated with the scene, or null if none.
+     * Get the profiler of the game (which records every scene), or null if
+     * not profiling.
      */
     getProfiler(): gdjs.Profiler | null {
-      return this._profiler;
+      return this._runtimeGame.getProfiler();
     }
 
     /**
-     * Start a new profiler to measures the time passed in sections of the engine
-     * in the scene.
+     * Start the profiler of the game.
+     * @deprecated The profiler belongs to the game: use `RuntimeGame.startProfiler`.
      * @param onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
      */
     startProfiler(onProfilerStopped: (oldProfiler: gdjs.Profiler) => void) {
-      if (this._profiler) {
-        return;
-      }
-      this._profiler = new gdjs.Profiler();
-      this._onProfilerStopped = onProfilerStopped;
+      this._runtimeGame.startProfiler({ onStopped: onProfilerStopped });
     }
 
     /**
-     * Stop the profiler being run on the scene.
+     * Stop the profiler of the game.
+     * @deprecated The profiler belongs to the game: use `RuntimeGame.stopProfiler`.
      */
     stopProfiler() {
-      if (!this._profiler) {
-        return;
-      }
-      const oldProfiler = this._profiler;
-      const onProfilerStopped = this._onProfilerStopped;
-      this._profiler = null;
-      this._onProfilerStopped = null;
-      if (onProfilerStopped) {
-        onProfilerStopped(oldProfiler);
-      }
+      this._runtimeGame.stopProfiler();
     }
 
     /**

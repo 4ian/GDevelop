@@ -5,18 +5,32 @@ import * as React from 'react';
 import Toolbar from './Toolbar';
 import DebuggerContent from './DebuggerContent';
 import DebuggerSelector from './DebuggerSelector';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
+import PlayIcon from '../UI/CustomSvgIcons/Preview';
 import Text from '../UI/Text';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import Background from '../UI/Background';
-import EmptyMessage from '../UI/EmptyMessage';
 import {
   type PreviewDebuggerServer,
   type DebuggerId,
   type DebuggerStatus,
 } from '../ExportAndShare/PreviewLauncher.flow';
 import { type Log, LogsManager } from './DebuggerConsole';
+import { ProfilerRecordingStore } from './ProfilerRecording/ProfilerRecordingStore';
+import { type ResourcesDebugState } from './Resources/ResourcesDebugTypes';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { isProfilerAccessAllowed } from './ProfilerAccess';
+import Window from '../Utils/Window';
+import classes from './Debugger.module.css';
+import { type EventsExecutionTrackingMode } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
+
+export type ResourcesDebugSnapshot = {|
+  state: ?ResourcesDebugState,
+  lastUpdatedAt: number,
+  lastError: ?string,
+|};
 
 // Mirrors `gdjs.FrameMeasureOutput`: a plain tree (no back-references),
 // as sent by the game's profiler.
@@ -54,6 +68,12 @@ type Props = {|
   project: gdProject,
   setToolbar: React.Node => void,
   previewDebuggerServer: PreviewDebuggerServer,
+  onLaunchDebuggerAndPreview: () => void,
+  onClosePreviews: () => void,
+  isWatchedVariablesPanelOpen: boolean,
+  onToggleWatchedVariablesPanel: () => void,
+  eventsExecutionTrackingMode: EventsExecutionTrackingMode,
+  setEventsExecutionTrackingMode: EventsExecutionTrackingMode => void,
 |};
 
 type State = {|
@@ -63,17 +83,23 @@ type State = {|
   unregisterDebuggerServerCallbacks: ?() => void,
 
   debuggerGameData: { [DebuggerId]: any },
-  profilerOutputs: { [DebuggerId]: ProfilerOutput },
   profilingInProgress: { [DebuggerId]: boolean },
+  resourcesDebugSnapshots: { [DebuggerId]: ResourcesDebugSnapshot },
   debuggerStatus: { [DebuggerId]: DebuggerStatus },
   selectedId: DebuggerId,
   logs: { [DebuggerId]: Array<Log> },
+  /** True for a moment after a screenshot key was pressed: the panels are hidden. */
+  isScreenshotShieldShown: boolean,
 |};
+
+/** How long the panels stay hidden after a screenshot key was pressed. */
+const SCREENSHOT_SHIELD_DURATION_MS = 2000;
 
 /**
  * Start the debugger server, listen to commands received and issue commands to it.
  */
 export default class Debugger extends React.Component<Props, State> {
+  static contextType: typeof AuthenticatedUserContext = AuthenticatedUserContext;
   // $FlowFixMe[missing-local-annot]
   state = {
     debuggerServerState: (this.props.previewDebuggerServer.getServerState():
@@ -84,15 +110,58 @@ export default class Debugger extends React.Component<Props, State> {
     debuggerIds: (this.props.previewDebuggerServer.getExistingDebuggerIds(): Array<DebuggerId>),
     unregisterDebuggerServerCallbacks: null,
     debuggerGameData: {},
-    profilerOutputs: {},
     profilingInProgress: {},
+    resourcesDebugSnapshots: {},
     debuggerStatus: {},
     selectedId: '0',
     logs: {},
+    isScreenshotShieldShown: false,
+  };
+  _screenshotShieldTimeoutId: ?TimeoutID = null;
+  _wasProfilerAccessAllowed: boolean = false;
+
+  /**
+   * The profiler, performance and resources panels are for the allowed users
+   * only (everyone in development).
+   */
+  _isProfilerAccessAllowed = (): boolean =>
+    isProfilerAccessAllowed(
+      this.context ? this.context.profile : null,
+      Window.isDev()
+    );
+
+  /**
+   * The screenshot shield: the window is protected against captures by the
+   * system (desktop app on Windows), and the panels are hidden for a moment
+   * when a screenshot key is pressed (the only thing a page can notice).
+   */
+  _onWindowKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== 'PrintScreen' && event.key !== 'Snapshot') return;
+    this._showScreenshotShield();
+  };
+
+  _onWindowKeyUp = (event: KeyboardEvent) => {
+    // Print Screen is only reported on key up by some browsers.
+    if (event.key !== 'PrintScreen' && event.key !== 'Snapshot') return;
+    this._showScreenshotShield();
+  };
+
+  _showScreenshotShield = () => {
+    if (this._screenshotShieldTimeoutId) {
+      clearTimeout(this._screenshotShieldTimeoutId);
+    }
+    this.setState({ isScreenshotShieldShown: true });
+    this._screenshotShieldTimeoutId = setTimeout(() => {
+      this._screenshotShieldTimeoutId = null;
+      this.setState({ isScreenshotShieldShown: false });
+    }, SCREENSHOT_SHIELD_DURATION_MS);
   };
 
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
   _debuggerLogs: Map<DebuggerId, LogsManager> = new Map();
+  // The recordings of the profiler, out of the state: chunks arrive twice a
+  // second and the panels re-render on their own.
+  _profilerRecordingStore: ProfilerRecordingStore = new ProfilerRecordingStore();
 
   updateToolbar = () => {
     const { selectedId, debuggerStatus } = this.state;
@@ -107,11 +176,45 @@ export default class Debugger extends React.Component<Props, State> {
 
     this.props.setToolbar(
       <Toolbar
+        hasDebugger={this._hasSelectedDebugger()}
+        onLaunchDebuggerAndPreview={this.props.onLaunchDebuggerAndPreview}
+        onClosePreviews={this.props.onClosePreviews}
+        canStepFrame={this._hasSelectedDebugger() && isSelectedDebuggerPaused}
+        onStepFrame={() => this._stepFrame(this.state.selectedId)}
+        isWatchedVariablesPanelOpen={this.props.isWatchedVariablesPanelOpen}
+        onToggleWatchedVariablesPanel={this.props.onToggleWatchedVariablesPanel}
+        eventsExecutionTrackingMode={this.props.eventsExecutionTrackingMode}
+        setEventsExecutionTrackingMode={
+          this.props.setEventsExecutionTrackingMode
+        }
         onPlay={() => this._play(this.state.selectedId)}
         onPause={() => this._pause(this.state.selectedId)}
         canPlay={this._hasSelectedDebugger() && isSelectedDebuggerPaused}
         canPause={this._hasSelectedDebugger() && !isSelectedDebuggerPaused}
-        canOpenProfiler={this._hasSelectedDebugger()}
+        recordingStore={this._profilerRecordingStore}
+        debuggerId={selectedId}
+        profilingInProgress={!!this.state.profilingInProgress[selectedId]}
+        canRecord={
+          this._hasSelectedDebugger() && this._isProfilerAccessAllowed()
+        }
+        onStartRecording={() => this._startProfiler(this.state.selectedId)}
+        onStopRecording={() => this._stopProfiler(this.state.selectedId)}
+        canClear={this._hasSelectedDebugger()}
+        onClear={() => this._clear(this.state.selectedId)}
+        canRestart={this._hasSelectedDebugger()}
+        onRestart={() => this._restart(this.state.selectedId)}
+        canOpenInspector={this._hasSelectedDebugger()}
+        isInspectorShown={
+          !!selectedDebuggerContents &&
+          selectedDebuggerContents.isInspectorShown()
+        }
+        onToggleInspector={() => {
+          if (this._debuggerContents[this.state.selectedId])
+            this._debuggerContents[this.state.selectedId].toggleInspector();
+        }}
+        canOpenProfiler={
+          this._hasSelectedDebugger() && this._isProfilerAccessAllowed()
+        }
         isProfilerShown={
           !!selectedDebuggerContents &&
           selectedDebuggerContents.isProfilerShown()
@@ -129,17 +232,56 @@ export default class Debugger extends React.Component<Props, State> {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].toggleConsole();
         }}
+        canOpenPerformance={
+          this._hasSelectedDebugger() && this._isProfilerAccessAllowed()
+        }
+        isPerformanceShown={
+          !!selectedDebuggerContents &&
+          selectedDebuggerContents.isPerformanceShown()
+        }
+        onTogglePerformance={() => {
+          if (this._debuggerContents[this.state.selectedId])
+            this._debuggerContents[this.state.selectedId].togglePerformance();
+        }}
+        canOpenResources={
+          this._hasSelectedDebugger() && this._isProfilerAccessAllowed()
+        }
+        isResourcesShown={
+          !!selectedDebuggerContents &&
+          selectedDebuggerContents.isResourcesShown()
+        }
+        onToggleResources={() => {
+          if (this._debuggerContents[this.state.selectedId])
+            this._debuggerContents[this.state.selectedId].toggleResources();
+        }}
       />
     );
   };
 
   componentDidMount() {
     this._registerServerCallbacks();
+    this._wasProfilerAccessAllowed = this._isProfilerAccessAllowed();
+    window.addEventListener('keydown', this._onWindowKeyDown);
+    window.addEventListener('keyup', this._onWindowKeyUp);
+  }
+
+  componentDidUpdate() {
+    // The user logged in or out: the toolbar and the panels follow.
+    const isProfilerAccessAllowed = this._isProfilerAccessAllowed();
+    if (isProfilerAccessAllowed !== this._wasProfilerAccessAllowed) {
+      this._wasProfilerAccessAllowed = isProfilerAccessAllowed;
+      this.updateToolbar();
+    }
   }
 
   componentWillUnmount() {
     if (this.state.unregisterDebuggerServerCallbacks) {
       this.state.unregisterDebuggerServerCallbacks();
+    }
+    window.removeEventListener('keydown', this._onWindowKeyDown);
+    window.removeEventListener('keyup', this._onWindowKeyUp);
+    if (this._screenshotShieldTimeoutId) {
+      clearTimeout(this._screenshotShieldTimeoutId);
     }
   }
 
@@ -175,19 +317,20 @@ export default class Debugger extends React.Component<Props, State> {
       },
       onConnectionClosed: ({ id, debuggerIds }) => {
         this._debuggerLogs.delete(id);
+        this._profilerRecordingStore.clear(id);
         this.setState(
           ({
             selectedId,
             debuggerGameData,
-            profilerOutputs,
             profilingInProgress,
+            resourcesDebugSnapshots,
             debuggerStatus,
           }) => {
             // Remove any data bound to the instance that might have been stored.
             // Otherwise this would be a memory leak.
             if (debuggerGameData[id]) delete debuggerGameData[id];
-            if (profilerOutputs[id]) delete profilerOutputs[id];
             if (profilingInProgress[id]) delete profilingInProgress[id];
+            if (resourcesDebugSnapshots[id]) delete resourcesDebugSnapshots[id];
             if (debuggerStatus[id]) delete debuggerStatus[id];
 
             return {
@@ -199,8 +342,8 @@ export default class Debugger extends React.Component<Props, State> {
                   ? debuggerIds[debuggerIds.length - 1]
                   : selectedId,
               debuggerGameData,
-              profilerOutputs,
               profilingInProgress,
+              resourcesDebugSnapshots,
               debuggerStatus,
             };
           },
@@ -265,20 +408,29 @@ export default class Debugger extends React.Component<Props, State> {
         () => this.updateToolbar()
       );
     } else if (data.command === 'profiler.output') {
-      this.setState({
-        profilerOutputs: {
-          ...this.state.profilerOutputs,
-          [id]: data.payload,
-        },
-      });
+      this._profilerRecordingStore.onOutput(id, data.payload);
     } else if (data.command === 'profiler.started') {
-      this.setState(state => ({
-        profilingInProgress: { ...state.profilingInProgress, [id]: true },
-      }));
+      this._profilerRecordingStore.onStarted(id, data.payload);
+      this.setState(
+        state => ({
+          profilingInProgress: { ...state.profilingInProgress, [id]: true },
+        }),
+        () => this.updateToolbar()
+      );
+    } else if (data.command === 'profiler.chunk') {
+      this._profilerRecordingStore.onChunk(id, data.payload);
     } else if (data.command === 'profiler.stopped') {
-      this.setState(state => ({
-        profilingInProgress: { ...state.profilingInProgress, [id]: false },
-      }));
+      this._profilerRecordingStore.onStopped(id, data.payload);
+      this.setState(
+        state => ({
+          profilingInProgress: { ...state.profilingInProgress, [id]: false },
+        }),
+        () => this.updateToolbar()
+      );
+    } else if (data.command === 'resources.dumped') {
+      // Answered to `_requestResourcesDebugState` (see `sendMessageWithResponse`).
+    } else if (data.command === 'expressionValue') {
+      // Answered to the events sheets (see EventsExecutionTracking).
     } else if (data.command === 'hotReloader.logs') {
       // Nothing to do.
     } else if (data.command === 'updateInstances') {
@@ -302,6 +454,12 @@ export default class Debugger extends React.Component<Props, State> {
     previewDebuggerServer.sendMessage(id, { command: 'play' });
 
     // Pause status is transmitted by the game (using `status`).
+  };
+
+  /** Advance the paused game of one frame (frame by frame debugging). */
+  _stepFrame = (id: DebuggerId) => {
+    const { previewDebuggerServer } = this.props;
+    previewDebuggerServer.sendMessage(id, { command: 'stepFrame' });
   };
 
   _pause = (id: DebuggerId) => {
@@ -342,12 +500,121 @@ export default class Debugger extends React.Component<Props, State> {
 
   _startProfiler = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
+    if (!this._isProfilerAccessAllowed()) return;
+    // A paused game records nothing: recording resumes it. Except when
+    // debugging frame by frame, where the game must stay paused: each step
+    // then records exactly one frame.
+    const status = this.state.debuggerStatus[id];
+    if (
+      status &&
+      status.isPaused &&
+      this.props.eventsExecutionTrackingMode !== 'frame-by-frame'
+    ) {
+      this._play(id);
+    }
     previewDebuggerServer.sendMessage(id, { command: 'profiler.start' });
   };
 
   _stopProfiler = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'profiler.stop' });
+  };
+
+  /**
+   * Forget everything recorded about a preview (recording, logs, inspected
+   * data, resources) and start recording again if a recording was running.
+   */
+  _clear = (id: DebuggerId) => {
+    const wasRecording = !!this.state.profilingInProgress[id];
+    this._profilerRecordingStore.clear(id);
+    this._getLogsManager(id).clear();
+    this.setState(state => {
+      const debuggerGameData = { ...state.debuggerGameData };
+      const resourcesDebugSnapshots = { ...state.resourcesDebugSnapshots };
+      delete debuggerGameData[id];
+      delete resourcesDebugSnapshots[id];
+      return { debuggerGameData, resourcesDebugSnapshots };
+    });
+    if (wasRecording) {
+      this._stopProfiler(id);
+      this._startProfiler(id);
+    }
+  };
+
+  /**
+   * Restart the game from scratch: caches emptied, resources downloaded
+   * again, and everything recorded about it forgotten.
+   */
+  _restart = (id: DebuggerId) => {
+    const { previewDebuggerServer } = this.props;
+    this._clear(id);
+    previewDebuggerServer.sendMessage(id, {
+      command: 'hardReload',
+      payload: { clearCaches: true },
+    });
+  };
+
+  /**
+   * Read what is at the given path in the running game (an object selected in
+   * the inspector), so that its values can be refreshed while it runs.
+   * Resolves to null if the game did not answer.
+   */
+  _inspectPath = async (
+    id: DebuggerId,
+    path: Array<string>
+  ): Promise<Object | null> => {
+    const { previewDebuggerServer } = this.props;
+    try {
+      const answer = await previewDebuggerServer.sendMessageWithResponse(
+        { command: 'inspector.dump', payload: { path } },
+        id
+      );
+      return answer.payload || null;
+    } catch (error) {
+      // The game did not answer in time (closed, or busy).
+      return null;
+    }
+  };
+
+  /**
+   * Ask the game for the state of its resources. On failure, the previous
+   * snapshot is kept and the error is shown.
+   */
+  _requestResourcesDebugState = async (id: DebuggerId): Promise<void> => {
+    const { previewDebuggerServer } = this.props;
+    const previousSnapshot = this.state.resourcesDebugSnapshots[id];
+    try {
+      const answer = await previewDebuggerServer.sendMessageWithResponse(
+        { command: 'resources.dump' },
+        id,
+        // A game with a lot of resources needs more than the default second
+        // to build and send its answer.
+        10000
+      );
+      const payload = answer.payload;
+      if (!payload || payload.error) {
+        throw new Error(payload ? payload.error : 'No payload in the answer.');
+      }
+      this.setState(state => ({
+        resourcesDebugSnapshots: {
+          ...state.resourcesDebugSnapshots,
+          [id]: { state: payload, lastUpdatedAt: Date.now(), lastError: null },
+        },
+      }));
+    } catch (error) {
+      this.setState(state => ({
+        resourcesDebugSnapshots: {
+          ...state.resourcesDebugSnapshots,
+          [id]: {
+            state: previousSnapshot ? previousSnapshot.state : null,
+            lastUpdatedAt: previousSnapshot
+              ? previousSnapshot.lastUpdatedAt
+              : 0,
+            lastError: error.message || String(error),
+          },
+        },
+      }));
+    }
   };
 
   _hasSelectedDebugger = (): any => {
@@ -367,8 +634,9 @@ export default class Debugger extends React.Component<Props, State> {
       selectedId,
       debuggerStatus,
       debuggerGameData,
-      profilerOutputs,
       profilingInProgress,
+      resourcesDebugSnapshots,
+      debuggerIds,
     } = this.state;
 
     if (debuggerServerState === 'stopped' && debuggerServerError) {
@@ -404,6 +672,9 @@ export default class Debugger extends React.Component<Props, State> {
     // running (it will be started as soon as a preview is launched).
     return (
       <Background>
+        {this.state.isScreenshotShieldShown && (
+          <div className={classes.screenshotShield} />
+        )}
         <Column expand noMargin>
           <DebuggerSelector
             selectedId={selectedId}
@@ -426,22 +697,40 @@ export default class Debugger extends React.Component<Props, State> {
               onPlay={() => this._play(selectedId)}
               onPause={() => this._pause(selectedId)}
               onRefresh={() => this._refresh(selectedId)}
+              onInspectPath={path => this._inspectPath(selectedId, path)}
               onEdit={(path, args) => this._edit(selectedId, path, args)}
               onCall={(path, args) => this._call(selectedId, path, args)}
-              onStartProfiler={() => this._startProfiler(selectedId)}
-              onStopProfiler={() => this._stopProfiler(selectedId)}
-              profilerOutput={profilerOutputs[selectedId]}
-              profilingInProgress={profilingInProgress[selectedId]}
+              profilingInProgress={!!profilingInProgress[selectedId]}
+              profilerRecordingStore={this._profilerRecordingStore}
+              debuggerId={selectedId}
+              resourcesDebugSnapshot={resourcesDebugSnapshots[selectedId]}
+              onRequestResourcesDebugState={() =>
+                this._requestResourcesDebugState(selectedId)
+              }
+              isProfilerAccessAllowed={this._isProfilerAccessAllowed()}
+              isDebuggerConnected={debuggerIds.includes(selectedId)}
+              isDebuggerPaused={
+                !!debuggerStatus[selectedId] &&
+                debuggerStatus[selectedId].isPaused
+              }
               logsManager={this._getLogsManager(selectedId)}
               onOpenedEditorsChanged={this.updateToolbar}
             />
           ) : (
-            <EmptyMessage>
-              <Trans>
-                Run a preview and you will be able to inspect it with the
-                debugger.
-              </Trans>
-            </EmptyMessage>
+            // Centered in the whole panel, like an empty events sheet.
+            <Line expand justifyContent="center" alignItems="center">
+              <EmptyPlaceholder
+                title={<Trans>Start a preview to debug it</Trans>}
+                description={
+                  <Trans>Inspect, watch and profile a running game.</Trans>
+                }
+                actionLabel={<Trans>Debugger</Trans>}
+                actionIcon={<PlayIcon />}
+                helpPagePath="/interface/debugger"
+                actionButtonId="start-preview-and-debugger-button"
+                onAction={this.props.onLaunchDebuggerAndPreview}
+              />
+            </Line>
           )}
         </Column>
       </Background>

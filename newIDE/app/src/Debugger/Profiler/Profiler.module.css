@@ -47,40 +47,23 @@
   background-color: var(--theme-surface-alternate-canvas-background-color);
 }
 
-/* The tree of the sections measured during a frame. */
+/* The tree of the sections measured during a frame (a `gd-table`, like the
+list of the instances). */
 
 .measuresTable {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   min-width: 0;
   border-radius: 8px;
   overflow: hidden;
-  font-family: var(--gdevelop-modern-font-family);
-  background-color: var(--theme-surface-alternate-canvas-background-color);
-}
-
-.row {
-  display: grid;
-  /* The name takes the remaining room, the numbers keep a stable width. */
-  grid-template-columns: minmax(0, 1fr) 64px 64px 64px;
-  align-items: center;
-  gap: 8px;
-  height: 28px;
-  padding: 0 12px 0 8px;
-  font-size: 13px;
-}
-
-.headerRow {
-  height: 30px;
-  font-size: 12px;
-  color: var(--theme-text-secondary-color);
-  border-bottom: 1px solid var(--theme-list-item-separator-color);
 }
 
 /* The share of the frame taken by a section is drawn as a bar filling the row
 from its left, so that the heaviest sections stand out while reading the tree.
 The share of the row is given by the `--profiler-share` variable. */
-.bodyRow {
+.shareRow {
+  cursor: pointer;
   background-image: linear-gradient(
     to right,
     color-mix(in srgb, var(--theme-primary-light) 30%, transparent) 0
@@ -92,18 +75,6 @@ The share of the row is given by the `--profiler-share` variable. */
   background-repeat: no-repeat;
   background-size: 100% 18px;
   background-position: left center;
-}
-
-.bodyRow:nth-child(odd) {
-  background-color: color-mix(
-    in srgb,
-    var(--theme-text-default-color) 4%,
-    transparent
-  );
-}
-
-.bodyRow:hover {
-  background-color: var(--theme-list-item-hover-background-color);
 }
 
 .nameCell {
@@ -156,4 +127,62 @@ The share of the row is given by the `--profiler-share` variable. */
 .togglePlaceholder {
   flex-shrink: 0;
   width: 20px;
+}
+
+/* The timeline: the strip of frames, and the flame chart of the selection. */
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.frameStrip {
+  position: relative;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: crosshair;
+  user-select: none;
+  background-color: var(--theme-surface-alternate-canvas-background-color);
+}
+
+.flameChart {
+  position: relative;
+  min-height: 80px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  background-color: var(--theme-surface-alternate-canvas-background-color);
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 1;
+  max-width: 240px;
+  pointer-events: none;
+}
+
+.rangeSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* The tables of the debugger use the same font as the rest of its panels. */
+.measuresTable :global(.gd-table) {
+  font-family: var(--gdevelop-modern-font-family);
 }

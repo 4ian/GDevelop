@@ -9,6 +9,7 @@ import {
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
 import VariablesContainerInspector from './VariablesContainerInspector';
+import BehaviorsInspector from './BehaviorsInspector';
 import Text from '../../UI/Text';
 import TimersInspector from './TimersInspector';
 
@@ -111,6 +112,13 @@ const RuntimeObjectInspector = (props: Props): React.Node => (
         props.onEdit(['_variables'].concat(path), newValue)
       }
       onCall={(path, args) => props.onCall(['_variables'].concat(path), args)}
+    />
+    <Text>
+      <Trans>Behaviors:</Trans>
+    </Text>
+    <BehaviorsInspector
+      behaviors={props.runtimeObject ? props.runtimeObject._behaviors : null}
+      onEdit={(path, newValue) => props.onEdit(path, newValue)}
     />
     <Text>
       <Trans>Timers:</Trans>

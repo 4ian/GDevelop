@@ -44,7 +44,7 @@ import {
   flashExtensionShortHeader,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
-import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
+import { makeFakeRecordingStore } from '../Debugger/ProfilerRecording/ProfilerRecordingFixtures';
 import consoleTestData from '../fixtures/ConsoleTestData';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildStepsProgress from '../ExportAndShare/Builds/BuildStepsProgress';
@@ -1745,10 +1745,14 @@ storiesOf('DebuggerContent', module)
           onRefresh={action('on refresh')}
           onEdit={() => false}
           onCall={() => false}
-          onStartProfiler={action('start profiler')}
-          onStopProfiler={action('stop profiler')}
-          profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
+          profilerRecordingStore={makeFakeRecordingStore(5000)}
+          debuggerId="0"
+          resourcesDebugSnapshot={null}
+          onRequestResourcesDebugState={async () => {}}
+          isDebuggerConnected={false}
+          isDebuggerPaused={false}
+          isProfilerAccessAllowed={true}
           logsManager={consoleTestData}
           onOpenedEditorsChanged={() => {}}
         />
@@ -1765,10 +1769,14 @@ storiesOf('DebuggerContent', module)
           onRefresh={action('on refresh')}
           onEdit={() => false}
           onCall={() => false}
-          onStartProfiler={action('start profiler')}
-          onStopProfiler={action('stop profiler')}
-          profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
+          profilerRecordingStore={makeFakeRecordingStore(5000)}
+          debuggerId="0"
+          resourcesDebugSnapshot={null}
+          onRequestResourcesDebugState={async () => {}}
+          isDebuggerConnected={false}
+          isDebuggerPaused={false}
+          isProfilerAccessAllowed={true}
           logsManager={consoleTestData}
           onOpenedEditorsChanged={() => {}}
         />

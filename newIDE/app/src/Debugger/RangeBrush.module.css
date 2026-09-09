@@ -1,0 +1,47 @@
+.brush {
+  position: relative;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--theme-list-item-separator-color);
+  background-color: var(--theme-surface-canvas-background-color);
+}
+
+.selection {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  min-width: 8px;
+  cursor: grab;
+  background-color: color-mix(
+    in srgb,
+    var(--theme-primary-light) 35%,
+    transparent
+  );
+  border-left: 1px solid var(--theme-primary-light);
+  border-right: 1px solid var(--theme-primary-light);
+}
+
+.selection:active {
+  cursor: grabbing;
+}
+
+.handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  background-color: var(--theme-primary-light);
+}
+
+.handleLeft {
+  left: -1px;
+  border-radius: 4px 0 0 4px;
+}
+
+.handleRight {
+  right: -1px;
+  border-radius: 0 4px 4px 0;
+}

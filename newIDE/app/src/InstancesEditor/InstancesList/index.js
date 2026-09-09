@@ -17,8 +17,7 @@ import Visibility from '../../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
 import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
 import Layers from '../../UI/CustomSvgIcons/Layers';
-import SortArrowUp from '../../UI/CustomSvgIcons/SortArrowUp';
-import SortArrowDown from '../../UI/CustomSvgIcons/SortArrowDown';
+import { renderSortableHeader } from '../../UI/VirtualizedTableSortableHeader';
 import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -71,40 +70,6 @@ const compareStrings = (x: string, y: string, direction: number): number => {
   if (x < y) return direction * 1;
   if (x > y) return direction * -1;
   return 0;
-};
-
-const renderSortableHeader = ({
-  dataKey,
-  label,
-  sortBy,
-  sortDirection,
-}: {
-  dataKey: string,
-  label: React.Node,
-  sortBy: string,
-  sortDirection: string,
-}) => {
-  const isActive = dataKey === sortBy;
-  return (
-    <span
-      style={{
-        color: isActive
-          ? 'var(--theme-text-default-color)'
-          : 'var(--table-text-color-header)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-      }}
-    >
-      {label}
-      {isActive &&
-        (sortDirection === 'ASC' ? (
-          <SortArrowUp style={{ width: 12, height: 12, display: 'block' }} />
-        ) : (
-          <SortArrowDown style={{ width: 12, height: 12, display: 'block' }} />
-        ))}
-    </span>
-  );
 };
 
 export type InstancesListInterface = {|

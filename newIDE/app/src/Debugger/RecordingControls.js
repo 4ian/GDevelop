@@ -1,0 +1,124 @@
+// @flow
+import { Trans } from '@lingui/macro';
+import * as React from 'react';
+import StatusChip, { StatusDot } from '../UI/StatusChip';
+import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
+import History from '../UI/CustomSvgIcons/History';
+import { type DebuggerId } from '../ExportAndShare/PreviewLauncher.flow';
+import {
+  ProfilerRecordingStore,
+  useProfilerRecording,
+  type ProfilerRecording,
+} from './ProfilerRecording/ProfilerRecordingStore';
+import {
+  formatClockDuration,
+  getRecordingTimeBounds,
+} from './ProfilerRecording/ProfilerRecordingAggregation';
+
+/** Re-render the elapsed time of a running recording this often. */
+const CLOCK_REFRESH_MS = 1000;
+
+const useRecordingClock = (recording: ?ProfilerRecording): number => {
+  const [, setTick] = React.useState(0);
+  const isRecording = !!recording && recording.status === 'recording';
+  React.useEffect(
+    () => {
+      if (!isRecording) return;
+      const intervalId = setInterval(
+        () => setTick(tick => tick + 1),
+        CLOCK_REFRESH_MS
+      );
+      return () => clearInterval(intervalId);
+    },
+    [isRecording]
+  );
+  if (!recording) return 0;
+  const bounds = getRecordingTimeBounds(recording);
+  return bounds.toMs - bounds.fromMs;
+};
+
+type StatusProps = {|
+  recordingStore: ProfilerRecordingStore,
+  debuggerId: DebuggerId,
+  profilingInProgress: boolean,
+|};
+
+/**
+ * The status of the recording (feeding the profiler, performance and
+ * resources panels), shown at the left of the toolbar.
+ */
+export const RecordingStatusChip = ({
+  recordingStore,
+  debuggerId,
+  profilingInProgress,
+}: StatusProps): React.Node => {
+  const recording = useProfilerRecording(recordingStore, debuggerId);
+  const durationMs = useRecordingClock(recording);
+
+  if (profilingInProgress) {
+    return (
+      <StatusChip
+        tone="progress"
+        loading
+        label={<Trans>Recording {formatClockDuration(durationMs)}</Trans>}
+      />
+    );
+  }
+  if (recording) {
+    return (
+      <StatusChip
+        tone={recording.stoppedByCap ? 'warning' : 'info'}
+        icon={<History />}
+        label={
+          recording.stoppedByCap ? (
+            <Trans>Stopped after 5 min</Trans>
+          ) : (
+            <Trans>Last recording {formatClockDuration(durationMs)}</Trans>
+          )
+        }
+      />
+    );
+  }
+  return (
+    <StatusChip icon={<StatusDot />} label={<Trans>Never recorded</Trans>} />
+  );
+};
+
+type ButtonProps = {|
+  recordingStore: ProfilerRecordingStore,
+  debuggerId: DebuggerId,
+  profilingInProgress: boolean,
+  onStart: () => void,
+  onStop: () => void,
+  disabled: boolean,
+|};
+
+/**
+ * The button starting or stopping the recording.
+ */
+export const RecordingButton = ({
+  recordingStore,
+  debuggerId,
+  profilingInProgress,
+  onStart,
+  onStop,
+  disabled,
+}: ButtonProps): React.Node => {
+  const recording = useProfilerRecording(recordingStore, debuggerId);
+  return profilingInProgress ? (
+    <FlatButton
+      primary
+      label={<Trans>Stop</Trans>}
+      onClick={onStop}
+      disabled={disabled}
+    />
+  ) : (
+    <RaisedButton
+      primary={!recording}
+      label={recording ? <Trans>Record again</Trans> : <Trans>Record</Trans>}
+      onClick={onStart}
+      disabled={disabled}
+    />
+  );
+};

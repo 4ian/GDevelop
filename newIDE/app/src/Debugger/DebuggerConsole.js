@@ -71,6 +71,13 @@ export class LogsManager {
     }
   }
 
+  /** Forget every log (the groups are kept, so the filters stay stable). */
+  clear() {
+    this.logs = [];
+    this._pendingLogs.length = 0;
+    this._onNewLog.forEach(f => f());
+  }
+
   on(event: 'group' | 'log', handler: () => void) {
     if (event === 'group') this._onNewGroup.add(handler);
     if (event === 'log') this._onNewLog.add(handler);

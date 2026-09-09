@@ -305,6 +305,12 @@ const EditorMosaic: React.ComponentType<{
       (editorName: string, position: 'left' | 'right' | 'bottom') => {
         const editor = editors[editorName];
         if (!editor) return false;
+        if (editorName === centralNodeId) {
+          // The central node is always rendered, even when the tree of the
+          // other editors is empty: adding it would make a duplicated leaf
+          // (which the mosaic does not support).
+          return false;
+        }
 
         const openedEditorNames = getLeaves(hidableMosaicNode);
         if (openedEditorNames.indexOf(editorName) !== -1) {

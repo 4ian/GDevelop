@@ -47,8 +47,8 @@ import PropertyIcon from '../../UI/CustomSvgIcons/Settings';
 import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
 import Add from '../../UI/CustomSvgIcons/Add';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
-import debounce from 'lodash/debounce';
 import { extractErrors } from './GenericExpressionField';
+import { useDebounce } from '../../Utils/UseDebounce';
 
 const gd: libGDevelop = global.gd;
 
@@ -390,7 +390,9 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       ]
     );
 
-    const enqueueValidation = debounce(doValidation, 250);
+    const enqueueValidation = useDebounce(() => {
+      doValidation();
+    }, 250);
 
     React.useEffect(
       () => {

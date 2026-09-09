@@ -347,10 +347,7 @@ export default function SimplifiedSubscriptionDialog({
     ? 'rgba(0, 0, 0, 0.08)'
     : 'rgba(255, 255, 255, 0.08)';
 
-  const {
-    buyUpdateOrCancelPlan,
-    isChangingSubscription,
-  } = useBuyUpdateOrCancelPlan({
+  const { buyUpdateOrCancelPlan } = useBuyUpdateOrCancelPlan({
     onOpenPendingDialog,
     couponCode,
     dialogVariant: 'simplified',
@@ -383,8 +380,7 @@ export default function SimplifiedSubscriptionDialog({
     [availableSubscriptionPlansWithPrices]
   );
 
-  const isLoading =
-    authenticatedUser.loginState === 'loggingIn' || isChangingSubscription;
+  const isLoading = authenticatedUser.loginState === 'loggingIn';
 
   const renderContent = (i18n: I18nType) => {
     if (!availableSubscriptionPlansWithPrices || !featuredPlan) {

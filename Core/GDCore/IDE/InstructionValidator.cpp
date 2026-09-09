@@ -53,13 +53,13 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
 
   bool shouldNotBeValidated = parameterType == "layer" && value.empty();
   if (shouldNotBeValidated) {
-    return result; // Valid by default, no deprecation warning
+    return result;  // Valid by default, no deprecation warning
   }
 
   // An optional parameter left empty is valid: the default value is used when
   // generating the code.
   if (parameterMetadata.IsOptional() && value.empty()) {
-    return result; // Valid by default, no deprecation warning
+    return result;  // Valid by default, no deprecation warning
   }
 
   if (gd::ParameterMetadata::IsExpression("number", parameterType) ||
@@ -71,7 +71,8 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
     auto &expressionNode =
         *instruction.GetParameter(parameterIndex).GetRootNode();
     ExpressionValidator expressionValidator(platform, projectScopedContainers,
-                                            parameterType, rootObjectName,
+                                            parameterType,
+                                            rootObjectName,
                                             parameterMetadata.GetExtraInfo());
     expressionNode.Visit(expressionValidator);
 
@@ -96,9 +97,8 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
   } else if (gd::ParameterMetadata::IsExpression("resource", parameterType)) {
     const auto &resourceName =
         instruction.GetParameter(parameterIndex).GetPlainString();
-    result.isValid =
-        projectScopedContainers.GetResourcesContainersList().HasResourceNamed(
-            resourceName);
+    result.isValid = projectScopedContainers.GetResourcesContainersList()
+                         .HasResourceNamed(resourceName);
   }
 
   return result;

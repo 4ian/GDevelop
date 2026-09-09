@@ -15,6 +15,7 @@ import {
 } from '../EditorFunctions';
 import { type ToolScope } from '../EditorFunctions/Scope';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
+import { type FunctionAuthoringScope } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
@@ -76,13 +77,19 @@ export const useGenerateEvents = ({
       const simplifiedProjectJson = JSON.stringify(
         simplifiedProjectBuilder.getSimplifiedProject(project, {})
       );
+      // Events written inside a function of an extension can call the private
+      // members reachable from where this function is authored: describe them.
+      const authoringScope: FunctionAuthoringScope | null =
+        functionName && scope.extension_name
+          ? {
+              extensionName: scope.extension_name,
+              customBehaviorName: scope.custom_behavior_name || null,
+              customObjectName: scope.custom_object_name || null,
+            }
+          : null;
       const projectSpecificExtensionsSummaryJson = JSON.stringify(
         simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project, {
-          // Events written inside a function of an extension can use the
-          // private members of that extension: describe them.
-          includePrivateOfExtension: functionName
-            ? scope.extension_name || null
-            : null,
+          authoringScope,
         })
       );
 

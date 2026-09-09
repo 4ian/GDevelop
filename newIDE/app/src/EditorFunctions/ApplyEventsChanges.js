@@ -1,5 +1,8 @@
 // @flow
-import { unserializeFromJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import {
   type AiGeneratedEventChange,
   type AiGeneratedEventUndeclaredVariable,
@@ -165,6 +168,58 @@ const getEventByPath = (
   );
   // Bounds check already done by getParentListAndIndex for 'access'
   return parentList.getEventAt(eventIndexInParentList);
+};
+
+const JS_CODE_EVENT_TYPE = 'BuiltinCommonInstructions::JsCode';
+
+/**
+ * The settings of a JavaScript code event that the events generation never
+ * describes: it always serializes the default ones. When such an event replaces
+ * an existing one, they are kept from the replaced event.
+ */
+const JS_CODE_EVENT_SETTINGS_KEPT_WHEN_REPLACED = [
+  'useStrict',
+  'eventsSheetExpanded',
+];
+
+/**
+ * True for the operations replacing an existing event by the generated one.
+ */
+const isEventReplacedByGeneratedEvents = (operationName: string): boolean =>
+  operationName === 'insert_and_replace_event' ||
+  operationName === 'replace_entire_event_and_sub_events' ||
+  operationName === 'replace_event_but_keep_existing_sub_events';
+
+/**
+ * When a generated JavaScript code event replaces an existing one, keep the
+ * settings of the replaced event that the generation can't describe. This is done
+ * on the serialized generated events, as these settings have no setter in the editor.
+ */
+const keepReplacedJsCodeEventSettings = ({
+  rootEventsList,
+  replacedEventPath,
+  generatedEventsContent,
+}: {|
+  rootEventsList: gdEventsList,
+  replacedEventPath: EventPath,
+  generatedEventsContent: Array<Object>,
+|}): void => {
+  const generatedEvent = generatedEventsContent[0];
+  if (!generatedEvent || generatedEvent.type !== JS_CODE_EVENT_TYPE) return;
+
+  let replacedEvent = null;
+  try {
+    replacedEvent = getEventByPath(rootEventsList, replacedEventPath);
+  } catch (error) {
+    // An invalid path is reported when the operation is applied.
+    return;
+  }
+  if (replacedEvent.getType() !== JS_CODE_EVENT_TYPE) return;
+
+  const serializedReplacedEvent = serializeToJSObject(replacedEvent);
+  JS_CODE_EVENT_SETTINGS_KEPT_WHEN_REPLACED.forEach(settingName => {
+    generatedEvent[settingName] = serializedReplacedEvent[settingName];
+  });
 };
 
 type EventOperationType =
@@ -393,6 +448,13 @@ export const applyEventsChanges = (
 
       if (generatedEvents && operationName !== 'delete_event') {
         const eventsListContent = JSON.parse(generatedEvents);
+        if (parsedPath && isEventReplacedByGeneratedEvents(operationName)) {
+          keepReplacedJsCodeEventSettings({
+            rootEventsList: sceneEvents,
+            replacedEventPath: parsedPath,
+            generatedEventsContent: eventsListContent,
+          });
+        }
         localEventsToInsert = new gd.EventsList();
         unserializeFromJSObject(
           localEventsToInsert,

@@ -115,6 +115,7 @@ import {
   withScopeObjectsContainersList,
   makeScopeProjectScopedContainersAccessor,
   getEventsFunctionInScope,
+  getFunctionsContainerOfScope,
   getSceneNameFromArgs,
   getScopeLabelFromArgs,
   getFunctionTargetFromArgs,
@@ -522,6 +523,10 @@ export type LaunchFunctionOptionsWithoutProject = {|
     changes: ExtensionsOutsideEditorChanges
   ) => void,
   ensureExtensionsUpToDate: () => Promise<void>,
+  // Regenerates the metadata of one extension: its declarations only (no code
+  // generation, and the code regeneration pending for the batch stays
+  // pending), so a function just changed is described as it is now.
+  reloadExtensionMetadata: (extensionName: string) => void,
   onWillDeleteExtensionItem: (
     changes: WillDeleteExtensionItemChanges
   ) => Promise<void>,
@@ -5714,11 +5719,16 @@ const getScopeSummary = (
     eventsBasedBehavior,
     eventsBasedObject,
   } = resolvedScope;
-  const parameters = eventsFunction.getParameters();
+  // What the events can use: the declared parameters, except for an
+  // `ActionWithOperator`, whose parameters GDevelop takes from its getter.
+  const functionsContainer = getFunctionsContainerOfScope(resolvedScope);
+  const parameters = functionsContainer
+    ? eventsFunction.getParametersForEvents(functionsContainer)
+    : eventsFunction.getParameters();
 
   const summary: ScopeSummary = {
-    // Every declared parameter, the implicit Object/Behavior included: they
-    // are usable in the events under these names.
+    // Every parameter, the implicit Object/Behavior included: they are usable
+    // in the events under these names.
     parameters: mapFor(0, parameters.getParametersCount(), i => {
       const parameter = parameters.getParameterAt(i);
       return { name: parameter.getName(), type: parameter.getType() };
@@ -6323,40 +6333,68 @@ const addSceneEvents: EditorFunction = {
     const placementHint =
       SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
 
-    const resolvedScope = resolveScopeFromArgs(project, args, {
-      allowedTypes: ['scene', 'extension', 'custom_behavior', 'custom_object'],
-    });
-    if (resolvedScope.success === false)
-      return makeScopeFailureOutput(resolvedScope);
+    const functionNameArgument = SafeExtractor.extractStringProperty(
+      args,
+      'function_name'
+    );
+
+    /**
+     * The scope and the events to write in: those of the scene, or those of
+     * the function named by `function_name` in the extension scope. Everything
+     * is looked up again from the identifiers of the call, as the target can be
+     * deleted or renamed while the generation runs.
+     */
+    const resolveEventsTarget = ():
+      | ScopeFailure
+      | {|
+          success: true,
+          resolvedScope: ResolvedScope,
+          eventsList: gdEventsList,
+          eventsFunction: gdEventsFunction | null,
+        |} => {
+      const resolvedScope = resolveScopeFromArgs(project, args, {
+        allowedTypes: [
+          'scene',
+          'extension',
+          'custom_behavior',
+          'custom_object',
+        ],
+      });
+      if (resolvedScope.success === false) return resolvedScope;
+      if (!resolvedScope.layout) {
+        // Events written in a function of an extension: the extension must be
+        // editable (a store extension is read-only).
+        const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+        if (readOnlyRejection) return readOnlyRejection;
+      }
+      const eventsTarget = getEventsSourceTarget(
+        resolvedScope,
+        functionNameArgument
+      );
+      if (eventsTarget.success === false) return eventsTarget;
+
+      return {
+        success: true,
+        resolvedScope,
+        eventsList: eventsTarget.eventsList,
+        eventsFunction: eventsTarget.eventsFunction,
+      };
+    };
+
+    const eventsTarget = resolveEventsTarget();
+    if (eventsTarget.success === false)
+      return makeScopeFailureOutput(eventsTarget);
+    const {
+      resolvedScope,
+      eventsList: currentEventsList,
+      eventsFunction,
+    } = eventsTarget;
     const scene = resolvedScope.layout;
-    if (!scene) {
-      // Events written in a function of an extension: the extension must be
-      // editable (a store extension is read-only).
-      const readOnlyRejection = getReadOnlyRejection(resolvedScope);
-      if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
-    }
     if (!relatedAiRequestId) {
       return makeGenericFailure(
         'No related AI request ID found for events generation.'
       );
     }
-
-    // The events to write in: those of the scene, or those of the function
-    // named by `function_name` in the extension scope.
-    const functionNameArgument = SafeExtractor.extractStringProperty(
-      args,
-      'function_name'
-    );
-    const eventsTarget = getEventsSourceTarget(
-      resolvedScope,
-      functionNameArgument
-    );
-    if (eventsTarget.success === false)
-      return makeScopeFailureOutput(eventsTarget);
-    const { eventsList: currentEventsList, eventsFunction } = eventsTarget;
-    const extensionName = resolvedScope.eventsFunctionsExtension
-      ? resolvedScope.eventsFunctionsExtension.getName()
-      : '';
     // A scene name is only sent for a scene (the generation API keeps it
     // beside the scope for older editors).
     const sceneName = scene ? resolvedScope.scope.scene_name || '' : '';
@@ -6570,12 +6608,55 @@ const addSceneEvents: EditorFunction = {
           }. Try again or a different approach.`
         );
       }
+
+      // The scope, the function and its events were resolved before the
+      // generation (and the extension installations) ran: the target may have
+      // been deleted or renamed since (another tool call, the user). Resolve
+      // everything again and only use these from now on, so that nothing is
+      // ever written to a target that is gone or is another one.
+      const upToDateEventsTarget = resolveEventsTarget();
+      if (upToDateEventsTarget.success === false) {
+        return makeAiGeneratedEventFailure(
+          `The events to write in are not available anymore: ${
+            upToDateEventsTarget.message
+          } Nothing was changed (no events, no variables, no behaviors). Check what the target became and retry.`
+        );
+      }
+      const {
+        resolvedScope: upToDateResolvedScope,
+        eventsList: upToDateEventsList,
+        eventsFunction: upToDateEventsFunction,
+      } = upToDateEventsTarget;
+      const extensionName = upToDateResolvedScope.eventsFunctionsExtension
+        ? upToDateResolvedScope.eventsFunctionsExtension.getName()
+        : '';
+
+      // A replacement was decided on the source of an event sent to the
+      // generation: refuse to apply it if this event changed meanwhile.
+      const changedPlacementBatch = (parsedEventBatches || []).find(
+        batch =>
+          batch.placementTargetEventSource &&
+          batch.placementTargetEventId &&
+          renderEventSourceById({
+            eventsList: upToDateEventsList,
+            eventIdOrGroupName: batch.placementTargetEventId,
+            includeSubEvents:
+              batch.placementRelation === 'replace_entire_event_and_sub_events',
+          }) !== batch.placementTargetEventSource
+      );
+      if (changedPlacementBatch) {
+        return makeAiGeneratedEventFailure(
+          `The event to replace ("${changedPlacementBatch.placementTargetEventId ||
+            ''}") changed while the events were being generated. Nothing was changed: read the events again and retry.`
+        );
+      }
+
       try {
         let hasChangedChildObjects = false;
         for (const change of changes) {
           addUndeclaredVariables({
             project,
-            resolvedScope,
+            resolvedScope: upToDateResolvedScope,
             undeclaredVariables: change.undeclaredVariables,
           });
 
@@ -6587,7 +6668,7 @@ const addSceneEvents: EditorFunction = {
               change.undeclaredObjectVariables[objectName];
             addObjectUndeclaredVariables({
               project,
-              resolvedScope,
+              resolvedScope: upToDateResolvedScope,
               objectName,
               undeclaredVariables,
             });
@@ -6601,22 +6682,22 @@ const addSceneEvents: EditorFunction = {
             const missingBehaviors = change.missingObjectBehaviors[objectName];
             addMissingObjectBehaviors({
               project,
-              resolvedScope,
+              resolvedScope: upToDateResolvedScope,
               objectName,
               missingBehaviors,
             });
             hasChangedChildObjects = true;
           }
         }
-        if (eventsFunction && hasChangedChildObjects) {
+        if (upToDateEventsFunction && hasChangedChildObjects) {
           // The variables and behaviors of the child objects are part of the
           // structure of the custom object: the named variants follow.
-          complyVariantsAfterStructuralEdit(project, resolvedScope);
+          complyVariantsAfterStructuralEdit(project, upToDateResolvedScope);
         }
 
         const { applied, errors } = applyEventsChanges(
           project,
-          currentEventsList,
+          upToDateEventsList,
           changes,
           aiGeneratedEvent.id
         );
@@ -6636,10 +6717,10 @@ Events were not changed (extensions, variables or behaviors needed by them may h
           };
         }
 
-        if (eventsFunction) {
+        if (upToDateEventsFunction) {
           onSceneEventsModifiedOutsideEditor({
             scene: null,
-            eventsFunction,
+            eventsFunction: upToDateEventsFunction,
             extensionName,
             newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
           });
@@ -6651,7 +6732,7 @@ Events were not changed (extensions, variables or behaviors needed by them may h
           });
         } else {
           onSceneEventsModifiedOutsideEditor({
-            scene,
+            scene: upToDateResolvedScope.layout,
             newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
           });
         }

@@ -609,6 +609,21 @@ export const useProcessFunctionCalls = ({
         triggerUnsavedChanges();
       };
 
+      // Regenerate the metadata of one extension, without generating its code
+      // and without flushing what the batch accumulated: a function that just
+      // changed an extension reads back how the editor now describes it.
+      const reloadExtensionMetadata = (extensionName: string) => {
+        if (
+          !project ||
+          !project.hasEventsFunctionsExtensionNamed(extensionName)
+        )
+          return;
+        eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+          project,
+          project.getEventsFunctionsExtension(extensionName)
+        );
+      };
+
       try {
         const {
           results,
@@ -689,6 +704,7 @@ export const useProcessFunctionCalls = ({
           onExtensionsModifiedOutsideEditor: changes =>
             accumulatedExtensionsChanges.add(changes),
           ensureExtensionsUpToDate,
+          reloadExtensionMetadata,
           // Not coalesced: must run before the extension (or one of its items)
           // is actually deleted so the tabs and selections bound to it are
           // released while it's still valid.

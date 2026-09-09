@@ -1,10 +1,12 @@
 // @flow
 import { mapFor } from '../../Utils/MapFor';
+import { serializeToJSON } from '../../Utils/Serializer';
 import {
   reloadProjectEventsFunctionsExtensionMetadata,
   type EventsFunctionCodeWriter,
 } from '../../EventsFunctionsExtensionsLoader';
 import {
+  editorFunctions,
   type EditorFunction,
   type EditorFunctionGenericOutput,
   type LaunchFunctionOptionsWithProject,
@@ -114,6 +116,14 @@ const getParameterTypes = (eventsFunction: gdEventsFunction): Array<string> => {
     parameters.getParameterAt(index).getType()
   );
 };
+
+/** The type of the action the skeleton of a function uses to return a value. */
+const getFirstActionType = (eventsFunction: gdEventsFunction): string =>
+  gd
+    .asStandardEvent(eventsFunction.getEvents().getEventAt(0))
+    .getActions()
+    .get(0)
+    .getType();
 
 describe('CustomFunctionFunctions', () => {
   let project: gdProject;
@@ -376,6 +386,127 @@ describe('CustomFunctionFunctions', () => {
           .getType()
       ).toBe('SetReturnString');
       expect(output.callForms).toEqual(['MyExt::Label()']);
+    });
+
+    it('creates an expression and condition returning a string', async () => {
+      const { output } = await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Label',
+        function_type: 'ExpressionAndCondition',
+        expression_type: 'string',
+        full_name: 'Label',
+        sentence: 'the label',
+      });
+
+      expect(output.success).toBe(true);
+      const eventsFunction = getFreeFunction('Label');
+      expect(eventsFunction.getExpressionType().getName()).toBe('string');
+      // `updateReturnActionType` ran: the skeleton returns a string.
+      expect(getFirstActionType(eventsFunction)).toBe('SetReturnString');
+      // Both the expression and the condition can be called.
+      expect(output.callForms).toEqual([
+        'MyExt::Label()',
+        'MyExt::Label(>, Value)',
+      ]);
+
+      const inspected = await editorFunctions.inspect_extension.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { extension_name: 'MyExt', function_name: 'Label' },
+      });
+      expect(inspected.success).toBe(true);
+      const functionDeclaration = inspected.functionDeclaration;
+      if (!functionDeclaration) throw new Error('Expected a declaration.');
+      expect(functionDeclaration.expressionType).toBe('string');
+    });
+
+    it('accepts `expression`, the name the project gives to a number return type', async () => {
+      const { output } = await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Width',
+        function_type: 'Expression',
+        expression_type: 'expression',
+      });
+
+      expect(output.success).toBe(true);
+      expect(
+        getFreeFunction('Width')
+          .getExpressionType()
+          .getName()
+      ).toBe('expression');
+
+      const changed = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Width',
+        changed_settings: [
+          { setting_name: 'expressionType', new_value: 'string' },
+        ],
+      });
+      expect(changed.output.success).toBe(true);
+      expect(
+        getFreeFunction('Width')
+          .getExpressionType()
+          .getName()
+      ).toBe('string');
+      const back = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Width',
+        changed_settings: [
+          { setting_name: 'expressionType', new_value: 'expression' },
+        ],
+      });
+      expect(back.output.success).toBe(true);
+      expect(
+        getFreeFunction('Width')
+          .getExpressionType()
+          .getName()
+      ).toBe('expression');
+    });
+
+    it('applies `expressionType` after `functionType`, whatever their order in the call', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+      });
+      expect(getFirstActionType(getFreeFunction('Score'))).toBe(
+        'SetReturnNumber'
+      );
+
+      // Turning a number expression into a string expression and condition:
+      // `expressionType` listed first must still win over the reset done by
+      // `functionType`.
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_settings: [
+          { setting_name: 'expressionType', new_value: 'string' },
+          { setting_name: 'functionType', new_value: 'ExpressionAndCondition' },
+        ],
+      });
+
+      expect(output.success).toBe(true);
+      const eventsFunction = getFreeFunction('Score');
+      expect(eventsFunction.getFunctionType()).toBe(
+        gd.EventsFunction.ExpressionAndCondition
+      );
+      expect(eventsFunction.getExpressionType().getName()).toBe('string');
+      expect(getFirstActionType(eventsFunction)).toBe('SetReturnString');
+    });
+
+    it('refuses an expression type on a function returning nothing', async () => {
+      const { output } = await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Explode',
+        function_type: 'Action',
+        expression_type: 'string',
+      });
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('`expression_type`');
+      expect(output.message).toContain('"ExpressionAndCondition"');
+      expect(
+        extension.getEventsFunctions().hasEventsFunctionNamed('Explode')
+      ).toBe(false);
     });
 
     it('creates a condition with the skeleton returning a boolean', async () => {
@@ -837,6 +968,220 @@ describe('CustomFunctionFunctions', () => {
       expect(
         fakeOptions.onExtensionsModifiedOutsideEditor
       ).not.toHaveBeenCalled();
+    });
+
+    it('refreshes the metadata so the call forms show the parameters just added', async () => {
+      // The editor already generated the metadata of the extension: the call
+      // forms are read from it, so it has to be refreshed after the change.
+      reloadProjectEventsFunctionsExtensionMetadata(
+        project,
+        extension,
+        createFakeEventsFunctionCodeWriter(),
+        makeFakeI18n()
+      );
+
+      const { output, fakeOptions } = await launchFunction(
+        changeCustomFunction,
+        project,
+        {
+          scope: behaviorScope,
+          function_name: 'Hit',
+          changed_parameters: [
+            { parameter_name: 'Knockback', type: 'expression' },
+          ],
+        }
+      );
+
+      expect(output.success).toBe(true);
+      expect(fakeOptions.reloadExtensionMetadata).toHaveBeenCalledWith('MyExt');
+      // The metadata only: the code regeneration waits for the batch flush.
+      expect(fakeOptions.ensureExtensionsUpToDate).not.toHaveBeenCalled();
+      expect(
+        fakeOptions.onExtensionsModifiedOutsideEditor
+      ).toHaveBeenCalledWith({
+        extensionNames: ['MyExt'],
+        needsCodeRegeneration: true,
+      });
+      expect(output.callForms).toEqual([
+        'MyExt::MyBehavior::Hit(Object, Behavior, Damage, Knockback)',
+      ]);
+    });
+
+    it('sends the parameters of an action with operator back to its getter', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'Health',
+        function_type: 'ExpressionAndCondition',
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'Shield',
+        function_type: 'ExpressionAndCondition',
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'SetHealth',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Health',
+      });
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'SetHealth',
+        changed_parameters: [{ parameter_name: 'Amount', type: 'expression' }],
+      });
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('"ActionWithOperator"');
+      expect(output.message).toContain('"Health"');
+      expect(getParameterNames(getBehaviorFunction('SetHealth'))).toEqual([
+        'Object',
+        'Behavior',
+      ]);
+
+      // Reading another getter stays allowed.
+      const { output: getterOutput } = await launchFunction(
+        changeCustomFunction,
+        project,
+        {
+          scope: behaviorScope,
+          function_name: 'SetHealth',
+          changed_settings: [
+            { setting_name: 'getterName', new_value: 'Shield' },
+          ],
+        }
+      );
+      expect(getterOutput.success).toBe(true);
+      expect(getBehaviorFunction('SetHealth').getGetterName()).toBe('Shield');
+    });
+
+    it('renames the getter read by the actions with operator using it', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Value',
+        function_type: 'Expression',
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetValue',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Value',
+      });
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Value',
+        new_name: 'Amount',
+      });
+
+      expect(output.success).toBe(true);
+      // The refactorer only follows an `ExpressionAndCondition` getter.
+      expect(getFreeFunction('SetValue').getGetterName()).toBe('Amount');
+    });
+
+    it('refuses to give parameters or another type to a lifecycle function', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'onSceneLoaded',
+      });
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'onSceneLoaded',
+        changed_parameters: [{ parameter_name: 'Speed', type: 'expression' }],
+      });
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('takes no parameter');
+      expect(
+        getFreeFunction('onSceneLoaded')
+          .getParameters()
+          .getParametersCount()
+      ).toBe(0);
+
+      const { output: typeOutput } = await launchFunction(
+        changeCustomFunction,
+        project,
+        {
+          scope: extensionScope,
+          function_name: 'onSceneLoaded',
+          changed_settings: [
+            { setting_name: 'functionType', new_value: 'Condition' },
+          ],
+        }
+      );
+
+      expect(typeOutput.success).toBe(false);
+      expect(typeOutput.message).toContain('always an Action');
+      expect(getFreeFunction('onSceneLoaded').isAction()).toBe(true);
+    });
+
+    it('leaves the function untouched when one change of the call is refused', async () => {
+      const functionBefore = serializeToJSON(getBehaviorFunction('Hit'));
+
+      const { output, fakeOptions } = await launchFunction(
+        changeCustomFunction,
+        project,
+        {
+          scope: behaviorScope,
+          function_name: 'Hit',
+          changed_settings: [
+            { setting_name: 'fullName', new_value: 'Changed' },
+          ],
+          changed_parameters: [{ parameter_name: 'Bad', type: 'NO_SUCH_TYPE' }],
+        }
+      );
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('"NO_SUCH_TYPE" does not exist');
+      // The settings of the call are not applied when its parameters are refused.
+      expect(getBehaviorFunction('Hit').getFullName()).toBe('');
+      expect(serializeToJSON(getBehaviorFunction('Hit'))).toBe(functionBefore);
+      expect(
+        fakeOptions.onExtensionsModifiedOutsideEditor
+      ).not.toHaveBeenCalled();
+    });
+
+    it('changes what an expression returns, and the events returning it', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+      });
+      expect(getFirstActionType(getFreeFunction('Score'))).toBe(
+        'SetReturnNumber'
+      );
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_settings: [
+          { setting_name: 'expressionType', new_value: 'string' },
+        ],
+      });
+
+      expect(output.success).toBe(true);
+      expect(
+        getFreeFunction('Score')
+          .getExpressionType()
+          .getName()
+      ).toBe('string');
+      expect(getFirstActionType(getFreeFunction('Score'))).toBe(
+        'SetReturnString'
+      );
+    });
+
+    it('refuses to change what a function returning nothing returns', async () => {
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'Hit',
+        changed_settings: [
+          { setting_name: 'expressionType', new_value: 'string' },
+        ],
+      });
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('returns nothing');
     });
 
     it('deletes a function after warning the editor', async () => {

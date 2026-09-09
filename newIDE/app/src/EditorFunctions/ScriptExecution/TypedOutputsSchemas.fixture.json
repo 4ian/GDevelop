@@ -39,14 +39,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "name",
-        "id",
-        "x",
-        "y",
-        "width",
-        "height"
-      ]
+      "required": ["name", "id", "x", "y", "width", "height"]
     },
     "SimplifiedVariable": {
       "type": "object",
@@ -67,10 +60,7 @@
           }
         }
       },
-      "required": [
-        "variableName",
-        "type"
-      ]
+      "required": ["variableName", "type"]
     },
     "NamedProperty": {
       "type": "object",
@@ -89,10 +79,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name",
-        "value"
-      ]
+      "required": ["name", "value"]
     },
     "ObjectSizeInfo": {
       "type": "object",
@@ -172,10 +159,32 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "name",
-              "type"
-            ]
+            "required": ["name", "type"]
+          }
+        },
+        "parametersForEvents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "openEnded": true,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "extraInfo": {
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              },
+              "isImplicit": {
+                "type": "boolean"
+              }
+            },
+            "required": ["name", "type"]
           }
         },
         "isPrivate": {
@@ -197,12 +206,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "functionName",
-        "functionType",
-        "parameters",
-        "eventsCount"
-      ]
+      "required": ["functionName", "functionType", "parameters", "eventsCount"]
     },
     "SimplifiedChildObject": {
       "type": "object",
@@ -215,10 +219,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "objectName",
-        "objectType"
-      ]
+      "required": ["objectName", "objectType"]
     },
     "SimplifiedProperty": {
       "type": "object",
@@ -246,10 +247,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "propertyName",
-        "type"
-      ]
+      "required": ["propertyName", "type"]
     }
   },
   "toolOutputSchemas": {
@@ -267,9 +265,7 @@
           "$rawType": "{ [objectName: string]: ObjectSizeInfo | null }"
         }
       },
-      "required": [
-        "instances"
-      ]
+      "required": ["instances"]
     },
     "inspect_variables": {
       "type": "object",
@@ -282,9 +278,7 @@
           }
         }
       },
-      "required": [
-        "variables"
-      ]
+      "required": ["variables"]
     },
     "inspect_object_properties_effects": {
       "type": "object",
@@ -308,17 +302,11 @@
                 "type": "string"
               }
             },
-            "required": [
-              "behaviorName",
-              "behaviorType"
-            ]
+            "required": ["behaviorName", "behaviorType"]
           }
         }
       },
-      "required": [
-        "properties",
-        "behaviors"
-      ]
+      "required": ["properties", "behaviors"]
     },
     "inspect_behavior_properties": {
       "type": "object",
@@ -331,9 +319,7 @@
           }
         }
       },
-      "required": [
-        "properties"
-      ]
+      "required": ["properties"]
     },
     "inspect_scene_properties_layers_effects": {
       "type": "object",
@@ -383,11 +369,7 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "name",
-              "position",
-              "visible"
-            ]
+            "required": ["name", "position", "visible"]
           }
         },
         "isDefaultVariant": {
@@ -415,14 +397,7 @@
               "type": "number"
             }
           },
-          "required": [
-            "minX",
-            "minY",
-            "minZ",
-            "maxX",
-            "maxY",
-            "maxZ"
-          ]
+          "required": ["minX", "minY", "minZ", "maxX", "maxY", "maxZ"]
         },
         "assetStoreAssetId": {
           "type": "string"
@@ -442,16 +417,11 @@
                 }
               }
             },
-            "required": [
-              "objectGroupName",
-              "objectNames"
-            ]
+            "required": ["objectGroupName", "objectNames"]
           }
         }
       },
-      "required": [
-        "layers"
-      ]
+      "required": ["layers"]
     },
     "inspect_project_properties_resources": {
       "type": "object",
@@ -474,12 +444,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "name",
-            "windowWidth",
-            "windowHeight",
-            "firstLayout"
-          ]
+          "required": ["name", "windowWidth", "windowHeight", "firstLayout"]
         },
         "sceneNames": {
           "type": "array",
@@ -500,17 +465,11 @@
                 "type": "string"
               }
             },
-            "required": [
-              "name",
-              "kind"
-            ]
+            "required": ["name", "kind"]
           }
         }
       },
-      "required": [
-        "properties",
-        "sceneNames"
-      ]
+      "required": ["properties", "sceneNames"]
     },
     "read_events_source": {
       "type": "object",
@@ -537,10 +496,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name",
-                  "type"
-                ]
+                "required": ["name", "type"]
               }
             },
             "properties": {
@@ -571,22 +527,13 @@
                   }
                 }
               },
-              "required": [
-                "global",
-                "scene"
-              ]
+              "required": ["global", "scene"]
             }
           },
-          "required": [
-            "parameters",
-            "properties",
-            "extensionVariables"
-          ]
+          "required": ["parameters", "properties", "extensionVariables"]
         }
       },
-      "required": [
-        "eventScript"
-      ]
+      "required": ["eventScript"]
     },
     "read_game_project_json": {
       "type": "object",
@@ -602,9 +549,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "success"
-      ]
+      "required": ["success"]
     },
     "inspect_extension": {
       "type": "object",
@@ -639,11 +584,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "objectName",
-                  "objectType",
-                  "signature"
-                ]
+                "required": ["objectName", "objectType", "signature"]
               }
             },
             "customBehaviors": {
@@ -662,11 +603,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "behaviorName",
-                  "behaviorType",
-                  "signature"
-                ]
+                "required": ["behaviorName", "behaviorType", "signature"]
               }
             },
             "freeFunctions": {
@@ -685,11 +622,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "functionName",
-                  "functionType",
-                  "signature"
-                ]
+                "required": ["functionName", "functionType", "signature"]
               }
             },
             "globalVariables": {
@@ -717,10 +650,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "dependencyName",
-                  "type"
-                ]
+                "required": ["dependencyName", "type"]
               }
             },
             "tests": {
@@ -736,10 +666,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "testName",
-                  "type"
-                ]
+                "required": ["testName", "type"]
               }
             }
           },
@@ -872,11 +799,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": [
-                  "layerName",
-                  "position",
-                  "visible"
-                ]
+                "required": ["layerName", "position", "visible"]
               }
             },
             "instances": {
@@ -895,9 +818,7 @@
           ]
         }
       },
-      "required": [
-        "extension"
-      ]
+      "required": ["extension"]
     },
     "create_extension": {
       "type": "object",
@@ -907,9 +828,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "extensionName"
-      ]
+      "required": ["extensionName"]
     },
     "change_extension_properties": {
       "type": "object",
@@ -922,9 +841,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "extensionName"
-      ]
+      "required": ["extensionName"]
     },
     "create_custom_object": {
       "type": "object",
@@ -940,11 +857,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "extensionName",
-        "customObjectName",
-        "objectType"
-      ]
+      "required": ["extensionName", "customObjectName", "objectType"]
     },
     "change_custom_object": {
       "type": "object",
@@ -990,11 +903,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "extensionName",
-        "customBehaviorName",
-        "behaviorType"
-      ]
+      "required": ["extensionName", "customBehaviorName", "behaviorType"]
     },
     "change_custom_behavior": {
       "type": "object",
@@ -1013,11 +922,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "extensionName",
-        "customBehaviorName",
-        "behaviorType"
-      ]
+      "required": ["extensionName", "customBehaviorName", "behaviorType"]
     },
     "create_custom_function": {
       "type": "object",
@@ -1039,12 +944,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "extensionName",
-        "functionName",
-        "callForms",
-        "functionType"
-      ]
+      "required": ["extensionName", "functionName", "callForms", "functionType"]
     },
     "change_custom_function": {
       "type": "object",
@@ -1066,11 +966,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "extensionName",
-        "functionName",
-        "callForms"
-      ]
+      "required": ["extensionName", "functionName", "callForms"]
     },
     "add_behavior": {
       "type": "object",
@@ -1092,17 +988,11 @@
                 "type": "string"
               }
             },
-            "required": [
-              "objectName",
-              "behaviorName",
-              "behaviorType"
-            ]
+            "required": ["objectName", "behaviorName", "behaviorType"]
           }
         }
       },
-      "required": [
-        "addedBehaviors"
-      ]
+      "required": ["addedBehaviors"]
     }
   }
 }

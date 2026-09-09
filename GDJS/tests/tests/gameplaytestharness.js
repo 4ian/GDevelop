@@ -530,8 +530,7 @@ describe('gdjs.gameplayTests', () => {
     // The transient empty stack is never recorded: Scene 1 (goToScene)
     // then Scene 2 (the game's change), no '' scene in between.
     const sceneEvents = result.eventLog.filter(
-      (event) =>
-        event.event === 'sceneChanged' || event.event === 'sceneReset'
+      (event) => event.event === 'sceneChanged' || event.event === 'sceneReset'
     );
     expect(sceneEvents.length).to.be(2);
     expect(sceneEvents[0].sceneName).to.be('Scene 1');
@@ -1225,6 +1224,15 @@ describe('gdjs.gameplayTests', () => {
     const DEEP_LEVELS_COUNT = 10;
     /** Same as `MAX_CHILDREN_DEPTH` in `gameplay-test-runner.ts`. */
     const MAX_CHILDREN_DEPTH = 8;
+    /** The size of the sized child of `BoxTurret` (see `SizedBox`). */
+    const BOX_WIDTH = 10;
+    const BOX_HEIGHT = 6;
+    /** The size of the 3D cube child of `Barrel3D`. */
+    const CUBE_WIDTH = 10;
+    const CUBE_HEIGHT = 6;
+    const CUBE_DEPTH = 4;
+    /** Positions are compared through rotations: they are only nearly equal. */
+    const POSITION_EPSILON = 1e-9;
 
     /**
      * @param {string} name
@@ -1262,6 +1270,40 @@ describe('gdjs.gameplayTests', () => {
       behaviors: [],
       effects: [],
     });
+
+    /**
+     * The object data of a child object with a size (a plain 2D object whose
+     * width and height can be set), to check the world geometry of a child.
+     * @param {string} name
+     * @returns {ObjectData}
+     */
+    const createSizedChildObjectData = (name) => ({
+      name,
+      type: 'TestObject::TestObject',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+
+    /**
+     * The object data of a 3D cube child object, with a size on the three
+     * axes, to check the world geometry inside a 3D custom object.
+     * @param {string} name
+     * @returns {ObjectData}
+     */
+    const createCube3DChildObjectData = (name) =>
+      /** @type {any} */ ({
+        name,
+        type: 'Scene3D::Cube3DObject',
+        variables: [],
+        behaviors: [],
+        effects: [],
+        content: {
+          width: CUBE_WIDTH,
+          height: CUBE_HEIGHT,
+          depth: CUBE_DEPTH,
+        },
+      });
 
     /**
      * The object data of an instance of a custom object (as the editor
@@ -1356,6 +1398,45 @@ describe('gdjs.gameplayTests', () => {
           ],
           128
         ),
+        // A 2D chain with a child that has a size, to check the world
+        // geometry of descendants: BoxTank > BoxTurret_Inner > SizedBox.
+        createEventsBasedObjectData(
+          'BoxTurret',
+          [createSizedChildObjectData('SizedBox')],
+          [createChildInstanceData('SizedBox', 10, 20)],
+          64
+        ),
+        createEventsBasedObjectData(
+          'BoxTank',
+          [
+            createCustomObjectData(
+              'BoxTurret_Inner',
+              TANK_EXTENSION_NAME + '::BoxTurret'
+            ),
+          ],
+          [createChildInstanceData('BoxTurret_Inner', 30, 40)],
+          128
+        ),
+        // The same chain in 3D (rendered by `CustomRuntimeObject3D`), to
+        // check the rotations around X and Y: Turret3D > Barrel3D_Inner >
+        // Cube3D.
+        createEventsBasedObjectData(
+          'Barrel3D',
+          [createCube3DChildObjectData('Cube3D')],
+          [createChildInstanceData('Cube3D', 10, 20)],
+          64
+        ),
+        createEventsBasedObjectData(
+          'Turret3D',
+          [
+            createCustomObjectData(
+              'Barrel3D_Inner',
+              TANK_EXTENSION_NAME + '::Barrel3D'
+            ),
+          ],
+          [createChildInstanceData('Barrel3D_Inner', 30, 40)],
+          128
+        ),
       ];
       // A chain of custom objects deeper than MAX_CHILDREN_DEPTH, to check
       // snapshots stop there: DeepLevel0 > Child > Child > ...
@@ -1394,6 +1475,8 @@ describe('gdjs.gameplayTests', () => {
         TANK_EXTENSION_NAME + '::TankTop',
         TANK_EXTENSION_NAME + '::CombinedTank',
         TANK_EXTENSION_NAME + '::TwinTank',
+        TANK_EXTENSION_NAME + '::BoxTurret',
+        TANK_EXTENSION_NAME + '::BoxTank',
       ];
       for (let level = 0; level < DEEP_LEVELS_COUNT; level++) {
         types.push(TANK_EXTENSION_NAME + '::DeepLevel' + level);
@@ -1403,6 +1486,25 @@ describe('gdjs.gameplayTests', () => {
         gdjs.registerObject(
           type,
           class extends gdjs.CustomRuntimeObject2D {
+            constructor(parent, objectData, instanceData) {
+              super(parent, objectData, instanceData);
+              // The generated code calls onCreated at the constructor end.
+              this.onCreated();
+            }
+          }
+        );
+      }
+      // The custom objects of a 3D extension are rendered with a THREE group
+      // holding their complete transformation.
+      const types3D = [
+        TANK_EXTENSION_NAME + '::Barrel3D',
+        TANK_EXTENSION_NAME + '::Turret3D',
+      ];
+      for (const type of types3D) {
+        if (gdjs.objectsTypes.containsKey(type)) continue;
+        gdjs.registerObject(
+          type,
+          class extends gdjs.CustomRuntimeObject3D {
             constructor(parent, objectData, instanceData) {
               super(parent, objectData, instanceData);
               // The generated code calls onCreated at the constructor end.
@@ -1428,7 +1530,17 @@ describe('gdjs.gameplayTests', () => {
           TANK_EXTENSION_NAME + '::CombinedTank'
         ),
         createCustomObjectData('TwinTank', TANK_EXTENSION_NAME + '::TwinTank'),
-        createCustomObjectData('DeepTank', TANK_EXTENSION_NAME + '::DeepLevel0')
+        createCustomObjectData(
+          'DeepTank',
+          TANK_EXTENSION_NAME + '::DeepLevel0'
+        ),
+        createCustomObjectData(
+          'BoxTurret',
+          TANK_EXTENSION_NAME + '::BoxTurret'
+        ),
+        createCustomObjectData('BoxTank', TANK_EXTENSION_NAME + '::BoxTank'),
+        createCustomObjectData('Barrel3D', TANK_EXTENSION_NAME + '::Barrel3D'),
+        createCustomObjectData('Turret3D', TANK_EXTENSION_NAME + '::Turret3D')
       );
       const projectData = gdjs.createProjectData({ layouts: [sceneData] });
       projectData.eventsFunctionsExtensions = [createTankExtensionData()];
@@ -1482,32 +1594,90 @@ describe('gdjs.gameplayTests', () => {
     };
 
     /**
-     * A snapshot as `_makeObjectSnapshot` would build it, to unit-test the
-     * conversion of a snapshot tree to the space containing its parent.
-     * @param {{name: string, x: number, y: number, z: number,
-     *   children?: {[objectName: string]: Array<any>}}} data
+     * The scene position expected for a point given in the local space of
+     * the deepest custom object of `parentsFromInnermost`, computed with the
+     * runtime transformation of each of them.
+     * @param {Array<any>} parentsFromInnermost
+     * @param {number} x
+     * @param {number} y
+     * @returns {Array<number>}
+     */
+    const toSceneCoordinatesThrough = (parentsFromInnermost, x, y) => {
+      const point = [x, y];
+      for (const parent of parentsFromInnermost) {
+        parent.applyObjectTransformation(point[0], point[1], point);
+      }
+      return point;
+    };
+
+    /**
+     * The scene bounds expected for a child object: the corners of its own
+     * box, moved with the runtime transformation of every custom object
+     * above it (innermost first).
+     * @param {Array<any>} parentsFromInnermost
+     * @param {gdjs.RuntimeObject} childObject
+     * @returns {gdjs.gameplayTests.GameplayTestWorldBounds}
+     */
+    const toSceneBounds = (parentsFromInnermost, childObject) => {
+      const localBox = childObject.getAABB();
+      const bounds = {
+        minX: Number.MAX_VALUE,
+        minY: Number.MAX_VALUE,
+        // These 2D children have no Z: they stay on the Z of their parents.
+        minZ: 0,
+        maxX: -Number.MAX_VALUE,
+        maxY: -Number.MAX_VALUE,
+        maxZ: 0,
+      };
+      for (const x of [localBox.min[0], localBox.max[0]]) {
+        for (const y of [localBox.min[1], localBox.max[1]]) {
+          const point = toSceneCoordinatesThrough(parentsFromInnermost, x, y);
+          bounds.minX = Math.min(bounds.minX, point[0]);
+          bounds.minY = Math.min(bounds.minY, point[1]);
+          bounds.maxX = Math.max(bounds.maxX, point[0]);
+          bounds.maxY = Math.max(bounds.maxY, point[1]);
+        }
+      }
+      return bounds;
+    };
+
+    /**
+     * A position going through rotations is only nearly equal to the
+     * expected one.
+     * @param {number|undefined} actual
+     * @param {number} expected
+     */
+    const expectNearlyEqual = (actual, expected) => {
+      expect(actual).to.be.within(
+        expected - POSITION_EPSILON,
+        expected + POSITION_EPSILON
+      );
+    };
+
+    /**
+     * The first child instance of a custom object with this object name.
+     * @param {any} customObject
+     * @param {string} childName
      * @returns {any}
      */
-    const createFakeObjectSnapshot = ({ name, x, y, z, children }) => ({
-      id: 1,
-      name,
-      x,
-      y,
-      z,
-      angle: 0,
-      width: 0,
-      height: 0,
-      depth: 0,
-      centerX: x,
-      centerY: y,
-      centerZ: z,
-      layer: '',
-      hidden: false,
-      variables: [],
-      state: {},
-      behaviors: {},
-      children,
-    });
+    const getChildInstance = (customObject, childName) =>
+      customObject.getChildrenContainer().getObjects(childName)[0];
+
+    /**
+     * The world bounds of the snapshot of a child (every child of a custom
+     * object has some).
+     * @param {gdjs.gameplayTests.GameplayTestObjectSnapshot} snapshot
+     * @returns {gdjs.gameplayTests.GameplayTestWorldBounds}
+     */
+    const getWorldBounds = (snapshot) => {
+      const worldBounds = snapshot.worldBounds;
+      if (!worldBounds) {
+        throw new Error(
+          `No world bounds in the snapshot of "${snapshot.name}".`
+        );
+      }
+      return worldBounds;
+    };
 
     it('snapshots only the direct children by default', async () => {
       const harness = await makeHarnessWithSpawnedTank();
@@ -1644,11 +1814,12 @@ describe('gdjs.gameplayTests', () => {
       expect(tankCanon.x).to.be(140);
     });
 
-    it('moves the Z of a snapshot tree with the Z and Z scale of the parent', () => {
+    it('moves a point with the Z and Z scale of a parent without a THREE object', () => {
       const harness = makeStartedHarness(makeRuntimeGame());
       // A 3D custom object places its children at
       // parentZ + childZ * parentScaleZ (see
-      // `CustomRuntimeObject3DRenderer._updateThreeGroup`).
+      // `CustomRuntimeObject3DRenderer._updateThreeGroup`) - the fallback
+      // used when the object has no THREE object (no 3D rendering).
       const parentObject = /** @type {any} */ ({
         applyObjectTransformation: (x, y, destination) => {
           destination[0] = x + 1000;
@@ -1658,41 +1829,304 @@ describe('gdjs.gameplayTests', () => {
         getScaleZ: () => 2,
         getLayer: () => 'UI',
       });
-      const snapshot = createFakeObjectSnapshot({
-        name: 'Child',
-        x: 1,
-        y: 2,
-        z: 10,
-        children: {
-          GrandChild: [
-            createFakeObjectSnapshot({
-              name: 'GrandChild',
-              x: 3,
-              y: 4,
-              z: 5,
-            }),
-          ],
+
+      const space = harness['_makeChildrenSpace'](parentObject, null);
+      const point = { x: 1, y: 2, z: 10 };
+      harness['_transformPointToScene'](space, point);
+
+      expect(point.x).to.be(1001);
+      expect(point.y).to.be(2002);
+      expect(point.z).to.be(70);
+      expect(space.layer).to.be('UI');
+    });
+
+    it('applies the transformation of every level to the children of a nested parent', () => {
+      const harness = makeStartedHarness(makeRuntimeGame());
+      const outerParentObject = /** @type {any} */ ({
+        applyObjectTransformation: (x, y, destination) => {
+          destination[0] = x + 1000;
+          destination[1] = y + 2000;
         },
+        getZ: () => 50,
+        getScaleZ: () => 2,
+        getLayer: () => 'UI',
+      });
+      const innerParentObject = /** @type {any} */ ({
+        applyObjectTransformation: (x, y, destination) => {
+          destination[0] = x * 2;
+          destination[1] = y * 3;
+        },
+        getZ: () => 5,
+        getScaleZ: () => 10,
+        // The internal layers of a custom object mean nothing outside of it.
+        getLayer: () => 'Internal layer',
       });
 
-      harness['_transformSnapshotTreeToContainingSpace'](
-        snapshot,
-        parentObject
+      const outerSpace = harness['_makeChildrenSpace'](outerParentObject, null);
+      const innerSpace = harness['_makeChildrenSpace'](
+        innerParentObject,
+        outerSpace
       );
+      const point = { x: 1, y: 2, z: 3 };
+      harness['_transformPointToScene'](innerSpace, point);
 
-      expect(snapshot.x).to.be(1001);
-      expect(snapshot.y).to.be(2002);
-      expect(snapshot.z).to.be(70);
-      expect(snapshot.centerZ).to.be(70);
-      expect(snapshot.layer).to.be('UI');
-      // The grandchild is already expressed in the space containing the
-      // child: it is moved by the same transformation.
-      const grandChild = snapshot.children.GrandChild[0];
-      expect(grandChild.x).to.be(1003);
-      expect(grandChild.y).to.be(2004);
-      expect(grandChild.z).to.be(60);
-      expect(grandChild.centerZ).to.be(60);
-      expect(grandChild.layer).to.be('UI');
+      // The innermost transformation is applied first: (1 ; 2 ; 3) becomes
+      // (2 ; 6 ; 35) in the outer parent, then (1002 ; 2006 ; 120).
+      expect(point.x).to.be(1002);
+      expect(point.y).to.be(2006);
+      expect(point.z).to.be(120);
+      expect(innerSpace.layer).to.be('UI');
+    });
+
+    it('reports the world bounds of a child scaled by its parent', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('BoxTurret', 100, 200);
+      await harness.stepFrames(1);
+
+      const runtimeTurret = /** @type {any} */ (
+        harness.getRuntimeObject('BoxTurret')
+      );
+      if (!runtimeTurret) throw new Error('The turret was not spawned.');
+      getChildInstance(runtimeTurret, 'SizedBox').setCustomWidthAndHeight(
+        BOX_WIDTH,
+        BOX_HEIGHT
+      );
+      runtimeTurret.setScale(2);
+
+      const turret = harness.getObjects('BoxTurret')[0];
+      const box = getChildren(turret, 'SizedBox')[0];
+
+      // A 10x6 child at (10 ; 20) in a turret scaled by 2 at (100 ; 200).
+      expect(box.x).to.be(120);
+      expect(box.y).to.be(240);
+      // Its size stays its own, local value...
+      expect(box.width).to.be(BOX_WIDTH);
+      expect(box.height).to.be(BOX_HEIGHT);
+      expect(box.isLocalGeometry).to.be(true);
+      // ...while the world geometry reflects the scale of the parent.
+      expect(getWorldBounds(box)).to.eql({
+        minX: 120,
+        minY: 240,
+        minZ: 0,
+        maxX: 140,
+        maxY: 252,
+        maxZ: 0,
+      });
+      expect(getWorldBounds(box).maxX - getWorldBounds(box).minX).to.be(
+        2 * BOX_WIDTH
+      );
+      // The turret is in the scene: its own geometry needs no world box.
+      expect(turret.worldBounds).to.be(undefined);
+      expect(turret.isLocalGeometry).to.be(undefined);
+    });
+
+    it('places a child of a 3D parent rotated around X with the complete transformation', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('Barrel3D', 100, 200, 50);
+      const runtimeBarrel = /** @type {any} */ (
+        harness.getRuntimeObject('Barrel3D')
+      );
+      if (!runtimeBarrel) throw new Error('The barrel was not spawned.');
+      // Rotate around the origin of the barrel, to keep the expected
+      // positions readable.
+      runtimeBarrel.setRotationCenter3D(0, 0, 0);
+      getChildInstance(runtimeBarrel, 'Cube3D').setZ(5);
+      await harness.stepFrames(1);
+      runtimeBarrel.setRotationX(90);
+
+      const cube = getChildren(harness.getObjects('Barrel3D')[0], 'Cube3D')[0];
+
+      // A rotation of 90° around X maps (x ; y ; z) to (x ; -z ; y): the
+      // child at (10 ; 20 ; 5) of a barrel at (100 ; 200 ; 50) is at
+      // (110 ; 195 ; 70) in the scene.
+      expectNearlyEqual(cube.x, 110);
+      expectNearlyEqual(cube.y, 195);
+      expectNearlyEqual(cube.z, 70);
+      // Its center is at (15 ; 23 ; 7) in the barrel (a 10x6x4 cube).
+      expectNearlyEqual(cube.centerX, 115);
+      expectNearlyEqual(cube.centerY, 193);
+      expectNearlyEqual(cube.centerZ, 73);
+      // Its box, 10x6x4 in the barrel, is 10x4x6 in the scene.
+      const worldBounds = getWorldBounds(cube);
+      expectNearlyEqual(worldBounds.minX, 110);
+      expectNearlyEqual(worldBounds.maxX, 120);
+      expectNearlyEqual(worldBounds.minY, 191);
+      expectNearlyEqual(worldBounds.maxY, 195);
+      expectNearlyEqual(worldBounds.minZ, 70);
+      expectNearlyEqual(worldBounds.maxZ, 76);
+      // The sizes and angles of the child stay its own, local values: the
+      // rotation of the parent is not summed into them.
+      expect(cube.width).to.be(CUBE_WIDTH);
+      expect(cube.height).to.be(CUBE_HEIGHT);
+      expect(cube.depth).to.be(CUBE_DEPTH);
+      expect(cube.rotationX).to.be(0);
+      expect(cube.isLocalGeometry).to.be(true);
+    });
+
+    it('places descendants of nested parents combining rotation, scale and flips', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('BoxTank', 100, 200);
+      await harness.stepFrames(1);
+
+      const runtimeTank = /** @type {any} */ (
+        harness.getRuntimeObject('BoxTank')
+      );
+      if (!runtimeTank) throw new Error('The tank was not spawned.');
+      const runtimeTurret = getChildInstance(runtimeTank, 'BoxTurret_Inner');
+      const runtimeBox = getChildInstance(runtimeTurret, 'SizedBox');
+      runtimeBox.setCustomWidthAndHeight(BOX_WIDTH, BOX_HEIGHT);
+      // Two levels of translation, rotation, non-uniform scale and flip.
+      runtimeTank.setAngle(30);
+      runtimeTank.setScaleX(2);
+      runtimeTank.setScaleY(3);
+      runtimeTank.flipX(true);
+      runtimeTurret.setAngle(45);
+      runtimeTurret.setScaleY(0.5);
+      runtimeTurret.flipY(true);
+
+      const tank = harness.getObjects('BoxTank', { childrenDepth: 2 })[0];
+      const turret = getChildren(tank, 'BoxTurret_Inner')[0];
+      const box = getChildren(turret, 'SizedBox')[0];
+      const parentsFromInnermost = [runtimeTurret, runtimeTank];
+
+      // Every level of the chain is applied, to the origins...
+      expect([turret.x, turret.y]).to.eql(
+        toSceneCoordinatesThrough(
+          [runtimeTank],
+          runtimeTurret.getX(),
+          runtimeTurret.getY()
+        )
+      );
+      expect([box.x, box.y]).to.eql(
+        toSceneCoordinatesThrough(
+          parentsFromInnermost,
+          runtimeBox.getX(),
+          runtimeBox.getY()
+        )
+      );
+      // ...to the centers...
+      expect([box.centerX, box.centerY]).to.eql(
+        toSceneCoordinatesThrough(
+          parentsFromInnermost,
+          runtimeBox.getCenterXInScene(),
+          runtimeBox.getCenterYInScene()
+        )
+      );
+      // ...and to the corners of the box of the child.
+      expect(getWorldBounds(box)).to.eql(
+        toSceneBounds(parentsFromInnermost, runtimeBox)
+      );
+      // The size of the child stays local: its world box is wider than it.
+      expect(box.width).to.be(BOX_WIDTH);
+      const worldBounds = getWorldBounds(box);
+      expect(worldBounds.maxX - worldBounds.minX).to.be.greaterThan(BOX_WIDTH);
+    });
+
+    it('places a descendant of nested 3D parents through the rotation and translation of each level', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('Turret3D', 0, 0, 0);
+      const runtimeTurret = /** @type {any} */ (
+        harness.getRuntimeObject('Turret3D')
+      );
+      if (!runtimeTurret) throw new Error('The turret was not spawned.');
+      const runtimeBarrel = getChildInstance(runtimeTurret, 'Barrel3D_Inner');
+      // Rotate both custom objects around their own origin, to keep the
+      // expected positions readable.
+      runtimeTurret.setRotationCenter3D(0, 0, 0);
+      runtimeBarrel.setRotationCenter3D(0, 0, 0);
+      getChildInstance(runtimeBarrel, 'Cube3D').setZ(5);
+      await harness.stepFrames(1);
+
+      // A translation and a rotation on each of the two levels.
+      runtimeTurret.setX(100);
+      runtimeTurret.setY(200);
+      runtimeTurret.setZ(50);
+      runtimeTurret.setRotationX(90);
+      runtimeBarrel.setX(50);
+      runtimeBarrel.setY(60);
+      runtimeBarrel.setZ(10);
+      runtimeBarrel.setRotationY(90);
+
+      const turret = harness.getObjects('Turret3D', { childrenDepth: 2 })[0];
+      const barrel = getChildren(turret, 'Barrel3D_Inner')[0];
+      const cube = getChildren(barrel, 'Cube3D')[0];
+
+      // The turret is rotated by 90° around X, which maps (x ; y ; z) to
+      // (x ; -z ; y): the barrel at (50 ; 60 ; 10) in it is at
+      // (150 ; 190 ; 110) in the scene.
+      expectNearlyEqual(barrel.x, 150);
+      expectNearlyEqual(barrel.y, 190);
+      expectNearlyEqual(barrel.z, 110);
+
+      // The barrel is rotated by 90° around Y, which maps (x ; y ; z) to
+      // (z ; y ; -x): the cube at (10 ; 20 ; 5) in it is at (55 ; 80 ; 0)
+      // in the turret, and the two rotations together map it to
+      // (155 ; 200 ; 130) in the scene.
+      expectNearlyEqual(cube.x, 155);
+      expectNearlyEqual(cube.y, 200);
+      expectNearlyEqual(cube.z, 130);
+      // Its center is at (15 ; 23 ; 7) in the barrel (a 10x6x4 cube).
+      expectNearlyEqual(cube.centerX, 157);
+      expectNearlyEqual(cube.centerY, 205);
+      expectNearlyEqual(cube.centerZ, 133);
+      // Composed, the two rotations map (x ; y ; z) of the barrel to
+      // (z ; x ; y) in the scene: the 10x6x4 box of the cube is 4x10x6
+      // there.
+      const worldBounds = getWorldBounds(cube);
+      expectNearlyEqual(worldBounds.minX, 155);
+      expectNearlyEqual(worldBounds.maxX, 159);
+      expectNearlyEqual(worldBounds.minY, 200);
+      expectNearlyEqual(worldBounds.maxY, 210);
+      expectNearlyEqual(worldBounds.minZ, 130);
+      expectNearlyEqual(worldBounds.maxZ, 136);
+      // The rotations of the two parents are not summed into the angles of
+      // the cube: they stay its own, local values.
+      expect(cube.rotationX).to.be(0);
+      expect(cube.rotationY).to.be(0);
+      expect(cube.isLocalGeometry).to.be(true);
+    });
+
+    it('applies a parent transformation changed just before the snapshot', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('Barrel3D', 100, 200, 50);
+      const runtimeBarrel = /** @type {any} */ (
+        harness.getRuntimeObject('Barrel3D')
+      );
+      if (!runtimeBarrel) throw new Error('The barrel was not spawned.');
+      runtimeBarrel.setRotationCenter3D(0, 0, 0);
+      getChildInstance(runtimeBarrel, 'Cube3D').setZ(5);
+      await harness.stepFrames(1);
+
+      // This first snapshot leaves the renderer of the barrel up to date.
+      const cubeBefore = getChildren(
+        harness.getObjects('Barrel3D')[0],
+        'Cube3D'
+      )[0];
+      expectNearlyEqual(cubeBefore.x, 110);
+      expectNearlyEqual(cubeBefore.y, 220);
+      expectNearlyEqual(cubeBefore.z, 55);
+
+      // Move and rotate the barrel without stepping a frame: the snapshot
+      // must not use the transformation of the last rendered frame.
+      runtimeBarrel.setX(300);
+      runtimeBarrel.setZ(80);
+      runtimeBarrel.setRotationY(90);
+
+      const cubeAfter = getChildren(
+        harness.getObjects('Barrel3D')[0],
+        'Cube3D'
+      )[0];
+      // A rotation of 90° around Y maps (x ; y ; z) to (z ; y ; -x): the
+      // child at (10 ; 20 ; 5) of a barrel at (300 ; 200 ; 80) is at
+      // (305 ; 220 ; 70) in the scene.
+      expectNearlyEqual(cubeAfter.x, 305);
+      expectNearlyEqual(cubeAfter.y, 220);
+      expectNearlyEqual(cubeAfter.z, 70);
     });
   });
 });

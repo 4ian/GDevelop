@@ -275,7 +275,7 @@ describe('Scope', () => {
       if (storeExtension.success === false)
         throw new Error(storeExtension.message);
       expect(storeExtension.readOnlyReason).toContain(
-        '"Health" comes from the GDevelop extension store'
+        '"Health" is installed from the GDevelop extension store'
       );
 
       const behavior = resolveScope(project, {

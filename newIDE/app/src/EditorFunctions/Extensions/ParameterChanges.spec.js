@@ -9,6 +9,8 @@ import {
 import {
   applyParameterChanges,
   applyParameterSpecs,
+  getPlannedUserParametersCount,
+  planParameterChanges,
   PARAMETER_TYPES,
   type ParameterChange,
   type ParameterChangesResult,
@@ -560,6 +562,31 @@ describe('ParameterChanges', () => {
       );
 
       expect(message).toContain('does not exist');
+      expect(getParameterNames(hitFunction)).toEqual([
+        'Object',
+        'Behavior',
+        'Damage',
+        'Knockback',
+      ]);
+    });
+
+    it('plans the changes of a call without touching the function', () => {
+      const resolvedScope = resolveScope(project, behaviorScope);
+      if (!resolvedScope.success) throw new Error(resolvedScope.message);
+
+      const result = planParameterChanges({
+        resolvedScope,
+        eventsFunction: hitFunction,
+        changes: [
+          { parameter_name: 'Damage', delete_this_parameter: true },
+          { parameter_name: 'Force', type: 'expression' },
+        ],
+      });
+
+      if (!result.success) throw new Error(result.message);
+      // The caller checks its own rules on what the function would declare...
+      expect(getPlannedUserParametersCount(result.plannedChanges)).toBe(2);
+      // ...while the function is still untouched.
       expect(getParameterNames(hitFunction)).toEqual([
         'Object',
         'Behavior',

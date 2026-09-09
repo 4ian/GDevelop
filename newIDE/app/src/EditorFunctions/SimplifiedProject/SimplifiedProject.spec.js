@@ -9,6 +9,7 @@ import {
   type EventsFunctionCodeWriter,
 } from '../../EventsFunctionsExtensionsLoader';
 import tankConfigurationExtensionJson from '../../fixtures/TankConfigurationExtension.json';
+import { type FunctionAuthoringScope } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 
 const gd: libGDevelop = global.gd;
 
@@ -1513,7 +1514,7 @@ describe('SimplifiedProject', () => {
       // not the private functions of the other extensions.
       const summaryWithPrivate = simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
         project,
-        { includePrivateOfExtension: 'MyExt' }
+        { authoringScope: { extensionName: 'MyExt' } }
       );
       expect(getFreeActionTypes(summaryWithPrivate, 'MyExt').sort()).toEqual([
         'MyExt::ResetInternalState',
@@ -1544,7 +1545,7 @@ describe('SimplifiedProject', () => {
       const summary = makeSimplifiedProjectBuilder(
         gd
       ).getProjectSpecificExtensionsSummary(project, {
-        includePrivateOfExtension: 'MyExt',
+        authoringScope: { extensionName: 'MyExt' },
       });
       const extensionSummary = summary.extensionSummaries.find(
         candidate => candidate.extensionName === 'MyExt'
@@ -1557,6 +1558,260 @@ describe('SimplifiedProject', () => {
       ).toEqual([['MyExt::Reload', true], ['MyExt::ShowToast', false]]);
 
       project.delete();
+    });
+
+    describe('private members of the extension being authored', () => {
+      /**
+       * An extension with a private member of each kind (free function, behavior
+       * method, object method, and a whole private behavior), with its generated
+       * metadata registered in the platform (where the summary reads it from).
+       */
+      const createCombatExtension = (project: gdProject) => {
+        const extension = project.insertNewEventsFunctionsExtension(
+          'Combat',
+          0
+        );
+        extension.setFullName('Combat');
+
+        const addAction = (
+          eventsFunctions: gdEventsFunctionsContainer,
+          name: string,
+          { isPrivate }: {| isPrivate: boolean |}
+        ) => {
+          const eventsFunction = eventsFunctions.insertNewEventsFunction(
+            name,
+            eventsFunctions.getEventsFunctionsCount()
+          );
+          eventsFunction.setFunctionType(gd.EventsFunction.Action);
+          eventsFunction.setFullName(name);
+          eventsFunction.setSentence(name);
+          eventsFunction.setPrivate(isPrivate);
+        };
+
+        addAction(extension.getEventsFunctions(), 'ShowToast', {
+          isPrivate: false,
+        });
+        addAction(extension.getEventsFunctions(), 'ResetInternalState', {
+          isPrivate: true,
+        });
+
+        const health = extension
+          .getEventsBasedBehaviors()
+          .insertNew('Health', 0);
+        health.setFullName('Health');
+        addAction(health.getEventsFunctions(), 'Damage', { isPrivate: false });
+        addAction(health.getEventsFunctions(), 'RecomputeInternals', {
+          isPrivate: true,
+        });
+        gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+          extension,
+          health
+        );
+
+        const shield = extension
+          .getEventsBasedBehaviors()
+          .insertNew('Shield', 1);
+        shield.setFullName('Shield');
+        addAction(shield.getEventsFunctions(), 'Absorb', { isPrivate: false });
+        gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+          extension,
+          shield
+        );
+
+        const internals = extension
+          .getEventsBasedBehaviors()
+          .insertNew('Internals', 2);
+        internals.setFullName('Internals');
+        internals.setPrivate(true);
+        addAction(internals.getEventsFunctions(), 'Tick', { isPrivate: false });
+        gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+          extension,
+          internals
+        );
+
+        const healthBar = extension
+          .getEventsBasedObjects()
+          .insertNew('HealthBar', 0);
+        healthBar.setFullName('Health bar');
+        healthBar.setDefaultName('HealthBar');
+        addAction(healthBar.getEventsFunctions(), 'Refresh', {
+          isPrivate: false,
+        });
+        addAction(healthBar.getEventsFunctions(), 'RecomputeLayout', {
+          isPrivate: true,
+        });
+        gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+          extension,
+          healthBar
+        );
+
+        reloadProjectEventsFunctionsExtensionMetadata(
+          project,
+          extension,
+          createFakeEventsFunctionCodeWriter(),
+          makeFakeI18n()
+        );
+      };
+
+      let project: gdProject;
+      beforeEach(() => {
+        project = gd.ProjectHelper.createNewGDJSProject();
+        createCombatExtension(project);
+      });
+      afterEach(() => {
+        project.delete();
+      });
+
+      const getCombatSummary = (
+        authoringScope: FunctionAuthoringScope | null
+      ): Object => {
+        const summary = makeSimplifiedProjectBuilder(
+          gd
+        ).getProjectSpecificExtensionsSummary(project, { authoringScope });
+        const combatSummary = summary.extensionSummaries.find(
+          candidate => candidate.extensionName === 'Combat'
+        );
+        if (!combatSummary) throw new Error('No summary for Combat.');
+        return combatSummary;
+      };
+
+      const getActionTypes = (actions: Array<Object>): Array<string> =>
+        actions.map(action => action.type).sort();
+
+      // The scopes from which the extension can be authored.
+      const authoringFreeFunction: FunctionAuthoringScope = {
+        extensionName: 'Combat',
+      };
+      const authoringHealth: FunctionAuthoringScope = {
+        extensionName: 'Combat',
+        customBehaviorName: 'Health',
+      };
+      const authoringShield: FunctionAuthoringScope = {
+        extensionName: 'Combat',
+        customBehaviorName: 'Shield',
+      };
+      const authoringHealthBar: FunctionAuthoringScope = {
+        extensionName: 'Combat',
+        customObjectName: 'HealthBar',
+      };
+
+      it('describes a private free function everywhere in its extension', () => {
+        // From a scene: only the public free function.
+        expect(getActionTypes(getCombatSummary(null).freeActions)).toEqual([
+          'Combat::ShowToast',
+        ]);
+
+        // From anywhere in the extension, including its behaviors and objects.
+        [
+          authoringFreeFunction,
+          authoringHealth,
+          authoringShield,
+          authoringHealthBar,
+        ].forEach(authoringScope => {
+          expect(
+            getActionTypes(getCombatSummary(authoringScope).freeActions)
+          ).toEqual(['Combat::ResetInternalState', 'Combat::ShowToast']);
+        });
+      });
+
+      it('describes the private method of a behavior only while authoring this behavior', () => {
+        expect(
+          getActionTypes(
+            getCombatSummary(authoringHealth).behaviors['Combat::Health']
+              .actions
+          )
+        ).toEqual([
+          'Combat::Health::Damage',
+          'Combat::Health::RecomputeInternals',
+        ]);
+
+        // Being in the same extension is not enough: another behavior, a free
+        // function or a scene only see the public method.
+        [
+          authoringShield,
+          authoringFreeFunction,
+          authoringHealthBar,
+          null,
+        ].forEach(authoringScope => {
+          expect(
+            getActionTypes(
+              getCombatSummary(authoringScope).behaviors['Combat::Health']
+                .actions
+            )
+          ).toEqual(['Combat::Health::Damage']);
+        });
+      });
+
+      it('describes the private method of a custom object only while authoring this object', () => {
+        // Custom objects also declare the actions of their capabilities: only
+        // look at the methods declared by the extension.
+        const getDeclaredObjectActionTypes = (
+          authoringScope: FunctionAuthoringScope | null
+        ): Array<string> =>
+          getActionTypes(
+            getCombatSummary(authoringScope).objects['Combat::HealthBar']
+              .actions
+          ).filter(
+            type =>
+              type === 'Combat::HealthBar::Refresh' ||
+              type === 'Combat::HealthBar::RecomputeLayout'
+          );
+
+        expect(getDeclaredObjectActionTypes(authoringHealthBar)).toEqual([
+          'Combat::HealthBar::RecomputeLayout',
+          'Combat::HealthBar::Refresh',
+        ]);
+
+        // Being in the same extension is not enough: another custom object, a
+        // behavior, a free function or a scene only see the public method.
+        [authoringHealth, authoringFreeFunction, null].forEach(
+          authoringScope => {
+            expect(getDeclaredObjectActionTypes(authoringScope)).toEqual([
+              'Combat::HealthBar::Refresh',
+            ]);
+          }
+        );
+      });
+
+      it('describes the public method of a private behavior within its extension only', () => {
+        // A private behavior is not usable outside of its extension.
+        expect(getCombatSummary(null).behaviors['Combat::Internals']).toBe(
+          undefined
+        );
+
+        // Inside the extension, its public methods are usable.
+        [authoringFreeFunction, authoringHealth, authoringHealthBar].forEach(
+          authoringScope => {
+            expect(
+              getActionTypes(
+                getCombatSummary(authoringScope).behaviors['Combat::Internals']
+                  .actions
+              )
+            ).toEqual(['Combat::Internals::Tick']);
+          }
+        );
+      });
+
+      it('describes no private member of another extension', () => {
+        createFakeExtensionWithAPrivateFunction(
+          project,
+          'OtherExt',
+          'ResetOtherInternalState'
+        );
+
+        const summary = makeSimplifiedProjectBuilder(
+          gd
+        ).getProjectSpecificExtensionsSummary(project, {
+          authoringScope: authoringHealth,
+        });
+        const otherExtensionSummary = summary.extensionSummaries.find(
+          candidate => candidate.extensionName === 'OtherExt'
+        );
+        if (!otherExtensionSummary) throw new Error('No summary for OtherExt.');
+        expect(getActionTypes(otherExtensionSummary.freeActions)).toEqual([
+          'OtherExt::ShowToast',
+        ]);
+      });
     });
   });
 

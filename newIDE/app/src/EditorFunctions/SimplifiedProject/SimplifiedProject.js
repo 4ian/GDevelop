@@ -5,6 +5,7 @@ import {
   buildExtensionSummary,
   type ExtensionSummary,
 } from './ExtensionSummary';
+import { type FunctionAuthoringScope } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import {
   makeSimplifiedExtensionsBuilder,
   getSimplifiedTests,
@@ -196,12 +197,12 @@ export const getSimplifiedVariablesContainer = (
 
 /**
  * Options of the extensions summary sent to the AI: by default the private
- * members of the extensions are left out (they can't be used from outside
- * their extension). `includePrivateOfExtension` names the extension whose
- * events are being written, so its own private members are described.
+ * members of the extensions are left out (they can't be called from outside).
+ * `authoringScope` tells where the events being written are authored, so that
+ * exactly the private members callable from there are described.
  */
 export type ProjectSpecificExtensionsSummaryOptions = {|
-  includePrivateOfExtension?: string | null,
+  authoringScope?: FunctionAuthoringScope | null,
 |};
 
 export type SimplifiedProjectBuilder = {|
@@ -513,8 +514,7 @@ export const makeSimplifiedProjectBuilder = (
     project: gdProject,
     options?: ProjectSpecificExtensionsSummaryOptions
   ): ProjectSpecificExtensionsSummary => {
-    const includePrivateOfExtension =
-      (options && options.includePrivateOfExtension) || null;
+    const authoringScope = (options && options.authoringScope) || null;
     const startTime = Date.now();
     const platform = project.getCurrentPlatform();
     const allExtensions = platform.getAllPlatformExtensions();
@@ -549,7 +549,7 @@ export const makeSimplifiedProjectBuilder = (
           gd,
           eventsFunctionsExtension,
           extension,
-          includePrivate: extensionName === includePrivateOfExtension,
+          authoringScope,
         });
       }),
     };

@@ -404,24 +404,44 @@ type PlannedParameterChange = {|
   renameNotice: string | null,
 |};
 
+/** Changes checked against the function, ready to be applied to it. */
+export type PlannedParameterChanges = {|
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  owner: FunctionOwner,
+  implicitParametersCount: number,
+  changes: Array<PlannedParameterChange>,
+  // The parameters of the function once the changes are applied (the implicit
+  // ones included): what the caller checks its own rules against.
+  finalParameters: Array<SimulatedParameter>,
+|};
+
+export type PlannedParameterChangesResult =
+  | {| success: true, plannedChanges: PlannedParameterChanges |}
+  | {| success: false, message: string |};
+
+/** The parameters the author declares, once the changes are applied. */
+export const getPlannedUserParametersCount = (
+  plannedChanges: PlannedParameterChanges
+): number =>
+  Math.max(
+    0,
+    plannedChanges.finalParameters.length -
+      plannedChanges.implicitParametersCount
+  );
+
 /**
- * Create, edit, move and delete the parameters of a function, updating the
- * events using them. Every change is checked first: nothing is applied when
- * one of them is refused.
+ * Check every change of a call against the function, without touching it:
+ * `applyPlannedParameterChanges` then applies them all.
  */
-export const applyParameterChanges = ({
-  project,
+export const planParameterChanges = ({
   resolvedScope,
   eventsFunction,
-  accessor,
   changes,
 }: {|
-  project: gdProject,
   resolvedScope: ResolvedScope,
   eventsFunction: gdEventsFunction,
-  accessor: ProjectScopedContainersAccessor,
   changes: Array<ParameterChange>,
-|}): ParameterChangesResult => {
+|}): PlannedParameterChangesResult => {
   const { eventsFunctionsExtension } = resolvedScope;
   const functionsContainer = getFunctionsContainer(resolvedScope);
   if (!eventsFunctionsExtension || !functionsContainer) {
@@ -619,15 +639,48 @@ export const applyParameterChanges = ({
     return makeFailure(getBehaviorRuleFailureMessage(brokenBehaviorNames));
   }
 
+  return {
+    success: true,
+    plannedChanges: {
+      eventsFunctionsExtension,
+      owner,
+      implicitParametersCount,
+      changes: plannedChanges,
+      finalParameters: simulatedParameters,
+    },
+  };
+};
+
+/**
+ * Create, edit, move and delete the parameters of a function, updating the
+ * events using them. Every change is checked first: nothing is applied when
+ * one of them is refused.
+ */
+export const applyParameterChanges = ({
+  project,
+  resolvedScope,
+  eventsFunction,
+  accessor,
+  changes,
+}: {|
+  project: gdProject,
+  resolvedScope: ResolvedScope,
+  eventsFunction: gdEventsFunction,
+  accessor: ProjectScopedContainersAccessor,
+  changes: Array<ParameterChange>,
+|}): ParameterChangesResult => {
+  const plannedChangesResult = planParameterChanges({
+    resolvedScope,
+    eventsFunction,
+    changes,
+  });
+  if (!plannedChangesResult.success) return plannedChangesResult;
   return applyPlannedParameterChanges({
     project,
-    eventsFunctionsExtension,
     resolvedScope,
     eventsFunction,
     accessor,
-    owner,
-    implicitParametersCount,
-    plannedChanges,
+    plannedChanges: plannedChangesResult.plannedChanges,
   });
 };
 
@@ -695,30 +748,29 @@ const changeParameterTypeInEvents = (
   );
 };
 
-const applyPlannedParameterChanges = ({
+export const applyPlannedParameterChanges = ({
   project,
-  eventsFunctionsExtension,
   resolvedScope,
   eventsFunction,
   accessor,
-  owner,
-  implicitParametersCount,
   plannedChanges,
 }: {|
   project: gdProject,
-  eventsFunctionsExtension: gdEventsFunctionsExtension,
   resolvedScope: ResolvedScope,
   eventsFunction: gdEventsFunction,
   accessor: ProjectScopedContainersAccessor,
-  owner: FunctionOwner,
-  implicitParametersCount: number,
-  plannedChanges: Array<PlannedParameterChange>,
+  plannedChanges: PlannedParameterChanges,
 |}): ParameterChangesResult => {
+  const {
+    eventsFunctionsExtension,
+    owner,
+    implicitParametersCount,
+  } = plannedChanges;
   const parameters = eventsFunction.getParameters();
   const messages: Array<string> = [];
   let changedCount = 0;
 
-  for (const plannedChange of plannedChanges) {
+  for (const plannedChange of plannedChanges.changes) {
     const { change, currentName, finalName } = plannedChange;
     const details: Array<string> = [];
 

@@ -75,6 +75,7 @@ type ProcessEditorFunctionCallsOptions = {|
     changes: ExtensionsOutsideEditorChanges
   ) => void,
   ensureExtensionsUpToDate: () => Promise<void>,
+  reloadExtensionMetadata: (extensionName: string) => void,
   onWillDeleteExtensionItem: (
     changes: WillDeleteExtensionItemChanges
   ) => Promise<void>,
@@ -111,6 +112,7 @@ export const processEditorFunctionCalls = async ({
   onWillDeleteObject,
   onExtensionsModifiedOutsideEditor,
   ensureExtensionsUpToDate,
+  reloadExtensionMetadata,
   onWillDeleteExtensionItem,
   relatedAiRequestId,
   getRelatedAiRequestLastMessages,
@@ -241,6 +243,7 @@ export const processEditorFunctionCalls = async ({
         onWillDeleteObject,
         onExtensionsModifiedOutsideEditor,
         ensureExtensionsUpToDate,
+        reloadExtensionMetadata,
         onWillDeleteExtensionItem,
         ensureExtensionInstalled,
         onWillInstallExtension,

@@ -269,7 +269,7 @@ describe('inspect_extension', () => {
         throw new Error('Expected an extension in the output.');
       expect(inspectedExtension.isReadOnly).toBe(true);
       expect(inspectedExtension.readOnlyReason).toBe(
-        '"LeaderboardDialog" comes from the GDevelop extension store and is updated from there: it is read-only.'
+        '"LeaderboardDialog" is installed from the GDevelop extension store and updated from there: it is read-only for the AI tools (the editor can edit it, but the changes would be lost at the next update).'
       );
       expect(inspectedExtension.originIdentifier).toBe('LeaderboardDialog');
     });
@@ -374,6 +374,47 @@ describe('inspect_extension', () => {
       );
 
       expect(result.message).toContain('replace `Object`');
+    });
+
+    it('tells what the events of an action with operator can use', async () => {
+      createFakeExtensionFromJson(
+        project,
+        'TankConfiguration',
+        tankConfigurationExtensionJson,
+        0
+      );
+
+      const result = await inspectExtension(project, {
+        extension_name: 'TankConfiguration',
+        custom_object_name: 'CombinedTank',
+        function_name: 'SetTopRotation',
+      });
+
+      expect(result.success).toBe(true);
+      const inspectedFunction = result.functionDeclaration;
+      if (!inspectedFunction) throw new Error('Expected a function.');
+      // An `ActionWithOperator` declares no parameter of its own: its events
+      // read the `Value` GDevelop generates from the getter.
+      expect(
+        inspectedFunction.parameters.map(parameter => parameter.name)
+      ).toEqual(['Object']);
+      const parametersForEvents = inspectedFunction.parametersForEvents || [];
+      expect(parametersForEvents.map(parameter => parameter.name)).toEqual([
+        'Object',
+        'Value',
+      ]);
+      expect(parametersForEvents[0].isImplicit).toBe(true);
+      expect(parametersForEvents[1].type).toBe('expression');
+
+      // Every other function uses the parameters it declares.
+      const getterResult = await inspectExtension(project, {
+        extension_name: 'TankConfiguration',
+        custom_object_name: 'CombinedTank',
+        function_name: 'TopRotation',
+      });
+      const inspectedGetter = getterResult.functionDeclaration;
+      if (!inspectedGetter) throw new Error('Expected a function.');
+      expect(inspectedGetter).not.toHaveProperty('parametersForEvents');
     });
 
     it('returns the call form of a store extension function (from the generated metadata)', async () => {

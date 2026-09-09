@@ -37,6 +37,10 @@ export type SimplifiedFunction = {|
   expressionType?: string,
   getterName?: string,
   parameters: Array<SimplifiedParameter>,
+  // What the events of the function can use, when it is not what the function
+  // declares: an `ActionWithOperator` takes the parameters of its getter plus
+  // the `Value` it sets. Absent when it is the same as `parameters`.
+  parametersForEvents?: Array<SimplifiedParameter>,
   eventsCount: number,
 |};
 
@@ -198,25 +202,57 @@ export const getSimplifiedParameter = (
   return parameter;
 };
 
+const getSimplifiedParameters = (
+  parameters: gdParameterMetadataContainer,
+  implicitParametersCount: number
+): Array<SimplifiedParameter> =>
+  mapFor(0, parameters.getParametersCount(), index =>
+    getSimplifiedParameter(
+      parameters.getParameterAt(index),
+      index < implicitParametersCount
+    )
+  );
+
+const haveSameParameters = (
+  parameters: Array<SimplifiedParameter>,
+  otherParameters: Array<SimplifiedParameter>
+): boolean =>
+  parameters.length === otherParameters.length &&
+  parameters.every(
+    (parameter, index) =>
+      parameter.name === otherParameters[index].name &&
+      parameter.type === otherParameters[index].type
+  );
+
 export const getSimplifiedFunction = (
   gd: libGDevelop,
   eventsFunction: gdEventsFunction,
-  owner: FunctionOwner
+  owner: FunctionOwner,
+  functionsContainer: gdEventsFunctionsContainer
 ): SimplifiedFunction => {
   const functionName = eventsFunction.getName();
   const implicitParametersCount = getImplicitParametersCount(owner);
-  const parameters = eventsFunction.getParameters();
+  const functionType = getFunctionTypeAsString(gd, eventsFunction);
+  const parameters = getSimplifiedParameters(
+    eventsFunction.getParameters(),
+    implicitParametersCount
+  );
   const simplifiedFunction: SimplifiedFunction = {
     functionName,
-    functionType: getFunctionTypeAsString(gd, eventsFunction),
-    parameters: mapFor(0, parameters.getParametersCount(), index =>
-      getSimplifiedParameter(
-        parameters.getParameterAt(index),
-        index < implicitParametersCount
-      )
-    ),
+    functionType,
+    parameters,
     eventsCount: eventsFunction.getEvents().getEventsCount(),
   };
+  // An `ActionWithOperator` declares no parameter: GDevelop generates what its
+  // events use from the getter (its parameters and the `Value` being set).
+  if (functionType === 'ActionWithOperator') {
+    const parametersForEvents = getSimplifiedParameters(
+      eventsFunction.getParametersForEvents(functionsContainer),
+      implicitParametersCount
+    );
+    if (!haveSameParameters(parameters, parametersForEvents))
+      simplifiedFunction.parametersForEvents = parametersForEvents;
+  }
   if (eventsFunction.getFullName())
     simplifiedFunction.fullName = eventsFunction.getFullName();
   if (eventsFunction.getDescription())
@@ -250,7 +286,8 @@ export const getSimplifiedFunctions = (
     getSimplifiedFunction(
       gd,
       eventsFunctionsContainer.getEventsFunctionAt(index),
-      owner
+      owner,
+      eventsFunctionsContainer
     )
   );
 

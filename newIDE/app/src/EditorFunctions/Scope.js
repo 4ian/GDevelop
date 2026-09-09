@@ -118,13 +118,15 @@ export const NAMED_VARIANT_REJECTED_MESSAGE =
   'Do this on the default variant (variant_name: "") - named variants inherit it';
 
 /**
- * The fixed explanation given when a mutation targets an extension installed
- * from the extension store. Same text as the backend.
+ * The explanation given when an AI tool would change an extension installed
+ * from the extension store: the tools leave those alone (the user can still
+ * edit them in the editor, at the cost of the store updates). The backend
+ * explains the same rule in its own words.
  */
 export const makeStoreExtensionReadOnlyMessage = (
   extensionName: string
 ): string =>
-  `"${extensionName}" comes from the GDevelop extension store and is updated from there: it is read-only. ` +
+  `"${extensionName}" is installed from the GDevelop extension store and updated from there: it is read-only for the AI tools (the editor can edit it, but the changes would be lost at the next update). ` +
   `To customize: (a) custom object → create your own custom object holding an instance of "${extensionName}::<Obj>" as a child and forward the functions you need (\`change_custom_object.forward_child_object_functions\`); ` +
   `(b) behavior → create your own behavior with a \`Behavior\` property requiring "${extensionName}::<Behavior>" and call it from your functions; ` +
   `(c) functions → call "${extensionName}::<Fn>" from a function of your own extension. ` +

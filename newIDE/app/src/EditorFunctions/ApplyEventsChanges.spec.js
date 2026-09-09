@@ -97,6 +97,44 @@ describe('applyEventsChanges', () => {
     jsCodeEvent.setParameterObjects(parameterObjects);
   };
 
+  // A JavaScript code event with non default settings can only be set up by
+  // unserializing it: the editor has no setter for `useStrict`.
+  const setupSceneEventsWithJsCodeEvent = ({
+    inlineCode,
+    useStrict,
+    eventsSheetExpanded,
+  }: {|
+    inlineCode: string,
+    useStrict: boolean,
+    eventsSheetExpanded: boolean,
+  |}) => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode,
+          parameterObjects: '',
+          useStrict,
+          eventsSheetExpanded,
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+  };
+
+  const getJsCodeEventSettings = (
+    index: number
+  ): {| useStrict: boolean, eventsSheetExpanded: boolean |} => {
+    const serializedEvent = serializeToJSObject(sceneEventsList)[index];
+    return {
+      useStrict: serializedEvent.useStrict,
+      eventsSheetExpanded: serializedEvent.eventsSheetExpanded,
+    };
+  };
+
   const setupMarkedSceneEvents = (actionTypes: Array<string>) => {
     sceneEventsList.clear();
     unserializeFromJSObject(
@@ -1130,6 +1168,191 @@ describe('applyEventsChanges', () => {
     expect(
       gd.asJsCodeEvent(sceneEventsList.getEventAt(0)).getInlineCode()
     ).toBe('console.log("after");');
+  });
+
+  it('should keep the settings of the JavaScript code event replaced by a generated one', () => {
+    setupSceneEventsWithJsCodeEvent({
+      inlineCode: 'console.log("before");',
+      useStrict: false,
+      eventsSheetExpanded: true,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_entire_event_and_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: 'MyObject',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    const jsCodeEvent = gd.asJsCodeEvent(sceneEventsList.getEventAt(0));
+    expect(jsCodeEvent.getInlineCode()).toBe('console.log("after");');
+    expect(jsCodeEvent.getParameterObjects()).toBe('MyObject');
+    // The generation always writes the default settings: the ones of the
+    // replaced event are kept.
+    expect(getJsCodeEventSettings(0)).toEqual({
+      useStrict: false,
+      eventsSheetExpanded: true,
+    });
+  });
+
+  it('should keep the settings of the JavaScript code event replaced while keeping its sub-events', () => {
+    setupSceneEventsWithJsCodeEvent({
+      inlineCode: 'console.log("before");',
+      useStrict: false,
+      eventsSheetExpanded: true,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_event_but_keep_existing_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    expect(
+      gd.asJsCodeEvent(sceneEventsList.getEventAt(0)).getInlineCode()
+    ).toBe('console.log("after");');
+    expect(getJsCodeEventSettings(0)).toEqual({
+      useStrict: false,
+      eventsSheetExpanded: true,
+    });
+  });
+
+  it('should keep the settings of the JavaScript code event replaced by "insert_and_replace_event"', () => {
+    setupSceneEventsWithJsCodeEvent({
+      inlineCode: 'console.log("before");',
+      useStrict: false,
+      eventsSheetExpanded: false,
+    });
+    const eventOperations = [
+      makeChange({
+        operationName: 'insert_and_replace_event',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    expect(getJsCodeEventSettings(0)).toEqual({
+      useStrict: false,
+      eventsSheetExpanded: false,
+    });
+  });
+
+  it('should use the generated settings when the replaced event is not a JavaScript code event', () => {
+    setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_entire_event_and_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("new");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    expect(getJsCodeEventSettings(0)).toEqual({
+      useStrict: true,
+      eventsSheetExpanded: false,
+    });
+  });
+
+  it('should keep the settings of a JavaScript code event replaced deeper in the events tree', () => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::JsCode',
+              inlineCode: 'console.log("before");',
+              parameterObjects: '',
+              useStrict: false,
+              eventsSheetExpanded: true,
+            },
+          ],
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+    const eventOperations = [
+      makeChange({
+        operationName: 'replace_entire_event_and_sub_events',
+        operationTargetEvent: 'event-0.0',
+        generatedEvents: `[${makeJsCodeEventJson({
+          inlineCode: 'console.log("after");',
+          parameterObjects: '',
+        })}]`,
+      }),
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    const serializedEvents = serializeToJSObject(sceneEventsList);
+    expect(serializedEvents[0].events[0].inlineCode).toBe(
+      'console.log("after");'
+    );
+    expect(serializedEvents[0].events[0].useStrict).toBe(false);
+    expect(serializedEvents[0].events[0].eventsSheetExpanded).toBe(true);
   });
 
   it('should process deletions before insertions when paths are sorted', () => {

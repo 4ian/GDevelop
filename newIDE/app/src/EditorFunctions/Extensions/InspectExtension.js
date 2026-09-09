@@ -573,7 +573,8 @@ const getInspectedFunction = (
   const simplifiedFunction = getSimplifiedFunction(
     gd,
     eventsFunction,
-    context.owner
+    context.owner,
+    eventsFunctionsContainer
   );
   const getterName = simplifiedFunction.getterName;
   const getterFunction =
@@ -583,7 +584,8 @@ const getInspectedFunction = (
       ? getSimplifiedFunction(
           gd,
           eventsFunctionsContainer.getEventsFunction(getterName),
-          context.owner
+          context.owner,
+          eventsFunctionsContainer
         )
       : null;
   const inspectedFunction: InspectedFunction = {
@@ -684,7 +686,8 @@ const getInspectedExtension = (
       const simplifiedFunction = getSimplifiedFunction(
         gd,
         freeFunctions.getEventsFunctionAt(i),
-        'extension'
+        'extension',
+        freeFunctions
       );
       const summary: InspectedFreeFunctionSummary = {
         functionName: simplifiedFunction.functionName,
@@ -698,7 +701,7 @@ const getInspectedExtension = (
   };
 
   if (isReadOnly) {
-    inspectedExtension.readOnlyReason = `"${extensionName}" comes from the GDevelop extension store and is updated from there: it is read-only.`;
+    inspectedExtension.readOnlyReason = `"${extensionName}" is installed from the GDevelop extension store and updated from there: it is read-only for the AI tools (the editor can edit it, but the changes would be lost at the next update).`;
   }
   if (eventsFunctionsExtension.getDescription())
     inspectedExtension.description = eventsFunctionsExtension.getDescription();

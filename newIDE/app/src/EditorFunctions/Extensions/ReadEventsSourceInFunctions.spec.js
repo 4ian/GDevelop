@@ -135,9 +135,10 @@ describe('read_events_source in a function of an extension', () => {
       .split('\n')
       .filter(line => line.startsWith('#'));
     expect(headerLines).toEqual([
-      // `SetTopRotation` is an "action with operator": the value it sets is
-      // not a declared parameter of the function.
-      '# parameters: Object (object)',
+      // `SetTopRotation` is an "action with operator": it declares no
+      // parameter, but its events read the `Value` it sets (GDevelop generates
+      // it from the getter).
+      '# parameters: Object (object), Value (expression)',
       '# properties: CannonAngle, TopRotation',
       '# child objects: TankBase, TankTop_Combined',
       '# extension variables: scene CannonWidth',

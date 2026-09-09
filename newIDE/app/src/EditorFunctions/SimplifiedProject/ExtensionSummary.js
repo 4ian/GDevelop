@@ -1,5 +1,23 @@
 // @flow
 import { mapFor, mapVector } from '../../Utils/MapFor';
+import {
+  isFunctionCallableInAuthoringScope,
+  type FunctionAuthoringScope,
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
+
+/**
+ * The custom behavior or custom object owning the functions being summarized.
+ * Both are null for the free functions of an extension.
+ */
+type FunctionsOwner = {|
+  behaviorMetadata: ?{ name: string, isPrivate: boolean },
+  objectMetadata: ?{ name: string, isPrivate: boolean },
+|};
+
+const NO_FUNCTIONS_OWNER: FunctionsOwner = {
+  behaviorMetadata: null,
+  objectMetadata: null,
+};
 
 export type ParameterSummary = {|
   isCodeOnly?: boolean,
@@ -218,32 +236,50 @@ export const buildExtensionSummary = ({
   gd,
   eventsFunctionsExtension,
   extension,
-  includePrivate,
+  authoringScope,
 }: {
   gd: libGDevelop,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   extension: gdPlatformExtension,
-  // Private members are hidden by default (they can't be used from outside
-  // the extension). Set when the events being written are inside this very
-  // extension: its own private functions, objects and behaviors are usable
-  // there.
-  includePrivate: boolean,
+  // Where the events being written are authored: only the private members
+  // callable from there are described. Null when the events are written outside
+  // of any extension (a scene): no private member is then described.
+  authoringScope: FunctionAuthoringScope | null,
 }): ExtensionSummary => {
   const objects: { [string]: ObjectSummary } = {};
   const behaviors: { [string]: BehaviorSummary } = {};
   const effects: { [string]: EffectSummary } = {};
+  const extensionName = extension.getName();
+  // A private behavior or object is only described while authoring its own
+  // extension: its public functions are callable from there.
+  const isAuthoringThisExtension =
+    !!authoringScope && authoringScope.extensionName === extensionName;
 
   const generateInstructionsSummaries = ({
     instructionsMetadata,
+    functionsOwner,
   }: {
     instructionsMetadata: gdMapStringInstructionMetadata,
+    functionsOwner: FunctionsOwner,
   }) => {
     const instructionTypes = instructionsMetadata.keys().toJSArray();
     return instructionTypes
       .map(instructionType => {
         const instructionMetadata = instructionsMetadata.get(instructionType);
 
-        if (!includePrivate && instructionMetadata.isPrivate()) return null;
+        if (
+          !isFunctionCallableInAuthoringScope(
+            {
+              extensionName,
+              isPrivate: instructionMetadata.isPrivate(),
+              behaviorMetadata: functionsOwner.behaviorMetadata,
+              objectMetadata: functionsOwner.objectMetadata,
+            },
+            authoringScope
+          )
+        ) {
+          return null;
+        }
 
         const instructionSummary: InstructionSummary = {
           type: instructionType,
@@ -272,15 +308,29 @@ export const buildExtensionSummary = ({
 
   const generateExpressionSummaries = ({
     expressionsMetadata,
+    functionsOwner,
   }: {
     expressionsMetadata: gdMapStringExpressionMetadata,
+    functionsOwner: FunctionsOwner,
   }) => {
     const expressionTypes = expressionsMetadata.keys().toJSArray();
     return expressionTypes
       .map(expressionType => {
         const expressionMetadata = expressionsMetadata.get(expressionType);
 
-        if (!includePrivate && expressionMetadata.isPrivate()) return null;
+        if (
+          !isFunctionCallableInAuthoringScope(
+            {
+              extensionName,
+              isPrivate: expressionMetadata.isPrivate(),
+              behaviorMetadata: functionsOwner.behaviorMetadata,
+              objectMetadata: functionsOwner.objectMetadata,
+            },
+            authoringScope
+          )
+        ) {
+          return null;
+        }
 
         const expressionSummary: ExpressionSummary = {
           type: expressionType,
@@ -313,10 +363,17 @@ export const buildExtensionSummary = ({
       const objectMetadata = extension.getObjectMetadata(objectType);
       if (
         gd.MetadataProvider.isBadObjectMetadata(objectMetadata) ||
-        (!includePrivate && objectMetadata.isPrivate())
+        (objectMetadata.isPrivate() && !isAuthoringThisExtension)
       ) {
         return;
       }
+      const functionsOwner: FunctionsOwner = {
+        behaviorMetadata: null,
+        objectMetadata: {
+          name: objectMetadata.getName(),
+          isPrivate: objectMetadata.isPrivate(),
+        },
+      };
 
       const objectName =
         objectType.split('::').pop() || 'Unrecognized object type format';
@@ -342,16 +399,20 @@ export const buildExtensionSummary = ({
           : undefined,
         actions: generateInstructionsSummaries({
           instructionsMetadata: objectMetadata.getAllActions(),
+          functionsOwner,
         }),
         conditions: generateInstructionsSummaries({
           instructionsMetadata: objectMetadata.getAllConditions(),
+          functionsOwner,
         }),
         expressions: [
           ...generateExpressionSummaries({
             expressionsMetadata: objectMetadata.getAllExpressions(),
+            functionsOwner,
           }),
           ...generateExpressionSummaries({
             expressionsMetadata: objectMetadata.getAllStrExpressions(),
+            functionsOwner,
           }),
         ],
       };
@@ -363,10 +424,17 @@ export const buildExtensionSummary = ({
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       if (
         gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata) ||
-        (!includePrivate && behaviorMetadata.isPrivate())
+        (behaviorMetadata.isPrivate() && !isAuthoringThisExtension)
       ) {
         return;
       }
+      const functionsOwner: FunctionsOwner = {
+        behaviorMetadata: {
+          name: behaviorMetadata.getName(),
+          isPrivate: behaviorMetadata.isPrivate(),
+        },
+        objectMetadata: null,
+      };
 
       const behaviorSummary: BehaviorSummary = {
         name: behaviorMetadata.getName(),
@@ -382,16 +450,20 @@ export const buildExtensionSummary = ({
         }),
         actions: generateInstructionsSummaries({
           instructionsMetadata: behaviorMetadata.getAllActions(),
+          functionsOwner,
         }),
         conditions: generateInstructionsSummaries({
           instructionsMetadata: behaviorMetadata.getAllConditions(),
+          functionsOwner,
         }),
         expressions: [
           ...generateExpressionSummaries({
             expressionsMetadata: behaviorMetadata.getAllExpressions(),
+            functionsOwner,
           }),
           ...generateExpressionSummaries({
             expressionsMetadata: behaviorMetadata.getAllStrExpressions(),
+            functionsOwner,
           }),
         ],
       };
@@ -428,23 +500,27 @@ export const buildExtensionSummary = ({
     });
 
   return {
-    extensionName: extension.getName(),
+    extensionName,
     extensionFullName: extension.getFullName(),
     description: extension.getDescription(),
     shortDescription: extension.getShortDescription(),
     dimension: extension.getDimension(),
     freeActions: generateInstructionsSummaries({
       instructionsMetadata: extension.getAllActions(),
+      functionsOwner: NO_FUNCTIONS_OWNER,
     }),
     freeConditions: generateInstructionsSummaries({
       instructionsMetadata: extension.getAllConditions(),
+      functionsOwner: NO_FUNCTIONS_OWNER,
     }),
     freeExpressions: [
       ...generateExpressionSummaries({
         expressionsMetadata: extension.getAllExpressions(),
+        functionsOwner: NO_FUNCTIONS_OWNER,
       }),
       ...generateExpressionSummaries({
         expressionsMetadata: extension.getAllStrExpressions(),
+        functionsOwner: NO_FUNCTIONS_OWNER,
       }),
     ],
     objects,

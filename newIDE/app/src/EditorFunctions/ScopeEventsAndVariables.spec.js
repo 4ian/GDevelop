@@ -425,7 +425,7 @@ describe('scope of the events and variables functions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toContain(
-        '"Health" comes from the GDevelop extension store'
+        '"Health" is installed from the GDevelop extension store'
       );
       expect(
         project

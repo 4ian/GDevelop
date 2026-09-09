@@ -231,7 +231,7 @@ describe('CustomObjectFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toContain(
-        'comes from the GDevelop extension store'
+        'is installed from the GDevelop extension store'
       );
     });
   });
@@ -669,7 +669,7 @@ describe('CustomObjectFunctions', () => {
       });
       expect(changeResult.success).toBe(false);
       expect(changeResult.message).toContain(
-        'comes from the GDevelop extension store'
+        'is installed from the GDevelop extension store'
       );
 
       const deleteResult = await launchChangeCustomObject({

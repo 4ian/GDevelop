@@ -36,10 +36,13 @@ import {
   type CallFormContext,
 } from './InspectExtension';
 import {
-  applyParameterChanges,
   applyParameterSpecs,
+  applyPlannedParameterChanges,
+  getPlannedUserParametersCount,
+  planParameterChanges,
   type ParameterChange,
   type ParameterSpec,
+  type PlannedParameterChanges,
 } from './ParameterChanges';
 import {
   getEnumSettingValue,
@@ -50,6 +53,7 @@ import {
   renamedMessage,
   listQuoted,
   getRequestedNewName,
+  type ParsedValue,
 } from './NameHelpers';
 
 const gd: libGDevelop = global.gd;
@@ -77,6 +81,12 @@ const EXPRESSION_FUNCTION_TYPES = [
   'ExpressionAndCondition',
 ];
 
+/** What a function returns, as `expression_type` names it. */
+const EXPRESSION_TYPES = ['number', 'string'];
+// The types a new function declares a return type for: `StringExpression` is
+// the legacy way of writing an `Expression` returning a string.
+const EXPRESSION_TYPE_FUNCTION_TYPES = ['Expression', 'ExpressionAndCondition'];
+
 const FUNCTION_SETTING_NAMES = [
   'fullName',
   'description',
@@ -86,6 +96,7 @@ const FUNCTION_SETTING_NAMES = [
   'isPrivate',
   'isAsync',
   'functionType',
+  'expressionType',
   'helpUrl',
   'isDeprecated',
   'deprecationMessage',
@@ -140,6 +151,42 @@ const getFunctionTypeName = (eventsFunction: gdEventsFunction): string => {
     : functionType;
 };
 
+/**
+ * The project reports a number as `expression` (the name GDevelop gives to
+ * that value type): accept it where `number` is expected.
+ */
+const normalizeExpressionType = (value: mixed): mixed =>
+  value === 'expression' ? 'number' : value;
+
+/** What the function returns, as `expression_type` names it. */
+const getExpressionTypeName = (eventsFunction: gdEventsFunction): string =>
+  eventsFunction.getExpressionType().getName() === 'string'
+    ? 'string'
+    : 'number';
+
+// `expression` is the name GDevelop gives to a number in a value type.
+const setExpressionTypeName = (
+  eventsFunction: gdEventsFunction,
+  expressionType: string
+) => {
+  const valueTypeMetadata = new gd.ValueTypeMetadata();
+  valueTypeMetadata.setName(
+    expressionType === 'string' ? 'string' : 'expression'
+  );
+  eventsFunction.setExpressionType(valueTypeMetadata);
+  valueTypeMetadata.delete();
+};
+
+/** Change what a function returns, and the return action of its events with it. */
+const setExpressionType = (
+  project: gdProject,
+  eventsFunction: gdEventsFunction,
+  expressionType: string
+) => {
+  setExpressionTypeName(eventsFunction, expressionType);
+  gd.PropertyFunctionGenerator.updateReturnActionType(project, eventsFunction);
+};
+
 const setFunctionTypeName = (
   eventsFunction: gdEventsFunction,
   name: string
@@ -156,13 +203,44 @@ const setFunctionTypeName = (
       : gd.EventsFunction.Action
   );
   if (name === 'Expression' || name === 'StringExpression') {
-    const valueTypeMetadata = new gd.ValueTypeMetadata();
-    valueTypeMetadata.setName(
-      name === 'StringExpression' ? 'string' : 'expression'
+    setExpressionTypeName(
+      eventsFunction,
+      name === 'StringExpression' ? 'string' : 'number'
     );
-    eventsFunction.setExpressionType(valueTypeMetadata);
-    valueTypeMetadata.delete();
   }
+};
+
+/**
+ * The `expression_type` of a call: `null` when not given, or the reason it
+ * can't be used on this kind of function.
+ */
+const readExpressionType = (
+  args: any,
+  functionTypeName: string
+): ParsedValue<string | null> => {
+  const rawExpressionType = args ? args.expression_type : undefined;
+  if (rawExpressionType === undefined || rawExpressionType === null)
+    return { success: true, value: null };
+  if (!EXPRESSION_TYPE_FUNCTION_TYPES.includes(functionTypeName)) {
+    return {
+      success: false,
+      message:
+        `\`expression_type\` says what a function returns: it only applies to a \`function_type\` of ${listQuoted(
+          EXPRESSION_TYPE_FUNCTION_TYPES
+        )} (got "${functionTypeName}")` +
+        (functionTypeName === 'StringExpression'
+          ? ', and a "StringExpression" already returns a string.'
+          : '.'),
+    };
+  }
+  const parsedExpressionType = getEnumSettingValue(
+    normalizeExpressionType(rawExpressionType),
+    EXPRESSION_TYPES,
+    'expression_type'
+  );
+  return parsedExpressionType.success
+    ? { success: true, value: parsedExpressionType.value }
+    : parsedExpressionType;
 };
 
 /** The events the editor puts in a new function so it returns something. */
@@ -382,7 +460,12 @@ const getCallForms = (
     owner,
     getOwnerName(resolvedScope)
   );
-  const simplifiedFunction = getSimplifiedFunction(gd, eventsFunction, owner);
+  const simplifiedFunction = getSimplifiedFunction(
+    gd,
+    eventsFunction,
+    owner,
+    functionsContainer
+  );
   const getterName = simplifiedFunction.getterName;
   const getterFunction =
     simplifiedFunction.functionType === 'ActionWithOperator' &&
@@ -391,7 +474,8 @@ const getCallForms = (
       ? getSimplifiedFunction(
           gd,
           functionsContainer.getEventsFunction(getterName),
-          owner
+          owner,
+          functionsContainer
         )
       : null;
   const { callForms } = getCallFormsAndInstructionType(
@@ -457,23 +541,28 @@ const getLifecycleRejection = ({
   scopeLabel,
   functionTypeName,
   parametersCount,
+  // How the call names what it asks for, to say what to remove from it.
+  typeField = '`function_type`',
+  parametersField = '`parameters`',
 }: {|
   functionName: string,
   owner: FunctionOwner,
   scopeLabel: string,
   functionTypeName: string | null,
   parametersCount: number,
+  typeField?: string,
+  parametersField?: string,
 |}): string | null => {
   if (isLifecycleFunctionName(owner, functionName)) {
     if (functionTypeName !== null && functionTypeName !== 'Action') {
       return `"${functionName}" is a lifecycle function called by GDevelop on ${
         OWNER_LABELS[owner]
-      }: it is always an Action. Remove \`function_type\`, or give the function another name.`;
+      }: it is always an Action. Remove ${typeField}, or give the function another name.`;
     }
     if (parametersCount > 0) {
       return `"${functionName}" is a lifecycle function called by GDevelop on ${
         OWNER_LABELS[owner]
-      }: it takes no parameter (GDevelop has nothing to fill them with). Remove \`parameters\`, or give the function another name to make it a regular action.`;
+      }: it takes no parameter (GDevelop has nothing to fill them with). Remove ${parametersField}, or give the function another name to make it a regular action.`;
     }
     return null;
   }
@@ -571,10 +660,31 @@ const makeFunctionRenamedChanges = (
   return { kind: 'function', oldName, newName, extensionName };
 };
 
+/**
+ * The refactorers only follow the getter of an `ActionWithOperator` when it is
+ * an `ExpressionAndCondition`: a plain `Expression` can be one too.
+ */
+const renameGetterOfSiblingFunctions = (
+  functionsContainer: gdEventsFunctionsContainer,
+  oldName: string,
+  newName: string
+) => {
+  for (
+    let index = 0;
+    index < functionsContainer.getEventsFunctionsCount();
+    index++
+  ) {
+    const siblingFunction = functionsContainer.getEventsFunctionAt(index);
+    if (siblingFunction.getGetterName() === oldName)
+      siblingFunction.setGetterName(newName);
+  }
+};
+
 const renameFunctionInProject = (
   project: gdProject,
   resolvedScope: ResolvedScope,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
+  functionsContainer: gdEventsFunctionsContainer,
   oldName: string,
   newName: string
 ) => {
@@ -603,6 +713,7 @@ const renameFunctionInProject = (
       newName
     );
   }
+  renameGetterOfSiblingFunctions(functionsContainer, oldName, newName);
 };
 
 // The names of the scope, for the chat rendering (the arguments may be anything).
@@ -693,6 +804,7 @@ export const createCustomFunction: EditorFunction = {
     project,
     args,
     onExtensionsModifiedOutsideEditor,
+    reloadExtensionMetadata,
   }): Promise<EditorFunctionGenericOutput> => {
     const containerResult = resolveFunctionsContainerOfCall(project, args);
     if (!containerResult.success)
@@ -726,18 +838,39 @@ export const createCustomFunction: EditorFunction = {
       (SafeExtractor.extractArrayProperty(args, 'parameters'): any) || [];
 
     const functionName = gd.Project.getSafeName(requestedFunctionName);
-    // A duplicated function brings the declared parameters of its source.
-    const duplicatedParametersCount =
+    // A duplicated function brings the type and declared parameters of its source.
+    if (
       duplicatedFunctionName &&
-      functionsContainer.hasEventsFunctionNamed(duplicatedFunctionName)
-        ? Math.max(
-            0,
-            functionsContainer
-              .getEventsFunction(duplicatedFunctionName)
-              .getParameters()
-              .getParametersCount() - getImplicitParametersCount(owner)
-          )
-        : 0;
+      !functionsContainer.hasEventsFunctionNamed(duplicatedFunctionName)
+    ) {
+      return makeGenericFailure(
+        `Function "${duplicatedFunctionName}" not found in ${
+          resolvedScope.label
+        }: it cannot be copied (a function is always copied inside its own extension, behavior or custom object). Existing functions: ${listQuoted(
+          getFunctionNames(functionsContainer)
+        )}.`
+      );
+    }
+    const duplicatedFunction = duplicatedFunctionName
+      ? functionsContainer.getEventsFunction(duplicatedFunctionName)
+      : null;
+    const duplicatedParametersCount = duplicatedFunction
+      ? Math.max(
+          0,
+          duplicatedFunction.getParameters().getParametersCount() -
+            getImplicitParametersCount(owner)
+        )
+      : 0;
+    // A new function is an Action unless the call (or its source) says otherwise.
+    const createdFunctionTypeName =
+      functionTypeName ||
+      (duplicatedFunction ? getFunctionTypeName(duplicatedFunction) : 'Action');
+    const parsedExpressionType = readExpressionType(
+      args,
+      createdFunctionTypeName
+    );
+    if (!parsedExpressionType.success)
+      return makeGenericFailure(parsedExpressionType.message);
     const lifecycleRejection = getLifecycleRejection({
       functionName,
       owner,
@@ -777,19 +910,8 @@ export const createCustomFunction: EditorFunction = {
     if (renameNotice) messages.push(renameNotice);
 
     let eventsFunction;
-    if (duplicatedFunctionName) {
-      if (!functionsContainer.hasEventsFunctionNamed(duplicatedFunctionName)) {
-        return makeGenericFailure(
-          `Function "${duplicatedFunctionName}" not found in ${
-            resolvedScope.label
-          }: it cannot be copied (a function is always copied inside its own extension, behavior or custom object). Existing functions: ${listQuoted(
-            getFunctionNames(functionsContainer)
-          )}.`
-        );
-      }
-      const clonedFunction = functionsContainer
-        .getEventsFunction(duplicatedFunctionName)
-        .clone();
+    if (duplicatedFunction) {
+      const clonedFunction = duplicatedFunction.clone();
       eventsFunction = functionsContainer.insertEventsFunction(
         clonedFunction,
         functionsContainer.getEventsFunctionsCount()
@@ -797,7 +919,7 @@ export const createCustomFunction: EditorFunction = {
       clonedFunction.delete();
       eventsFunction.setName(functionName);
       messages.push(
-        `Copied "${duplicatedFunctionName}" with its parameters and events.`
+        `Copied "${duplicatedFunction.getName()}" with its parameters and events.`
       );
     } else {
       eventsFunction = functionsContainer.insertNewEventsFunction(
@@ -808,6 +930,9 @@ export const createCustomFunction: EditorFunction = {
 
     if (functionTypeName !== null) {
       setFunctionTypeName(eventsFunction, functionTypeName);
+    }
+    if (parsedExpressionType.value !== null) {
+      setExpressionType(project, eventsFunction, parsedExpressionType.value);
     }
     const fullName = SafeExtractor.extractStringProperty(args, 'full_name');
     if (fullName !== null) eventsFunction.setFullName(fullName);
@@ -861,8 +986,10 @@ export const createCustomFunction: EditorFunction = {
       extensionNames: [extensionName],
       needsCodeRegeneration: true,
     });
-    // The call forms come from the declaration (or from the metadata when it
-    // is already generated): no regeneration per call, the batch flush does it.
+    // The call forms are read from the generated metadata when the editor has
+    // it: refresh it so it describes the function that was just written (the
+    // code is only regenerated by the flush at the end of the batch).
+    reloadExtensionMetadata(extensionName);
     const callForms = getCallForms(
       resolvedScope,
       functionsContainer,
@@ -911,7 +1038,12 @@ const planFunctionSettings = ({
   functionsContainer: gdEventsFunctionsContainer,
   changedSettings: Array<any>,
 |}):
-  | {| success: true, plannedSettings: Array<PlannedFunctionSetting> |}
+  | {|
+      success: true,
+      plannedSettings: Array<PlannedFunctionSetting>,
+      finalFunctionTypeName: string,
+      finalGetterName: string,
+    |}
   | {| success: false, message: string |} => {
   const plannedSettings: Array<PlannedFunctionSetting> = [];
   let finalFunctionTypeName = getFunctionTypeName(eventsFunction);
@@ -992,6 +1124,27 @@ const planFunctionSettings = ({
       continue;
     }
 
+    if (settingName === 'expressionType') {
+      const parsedValue = getEnumSettingValue(
+        normalizeExpressionType(newValue),
+        EXPRESSION_TYPES,
+        settingName
+      );
+      if (!parsedValue.success)
+        return { success: false, message: parsedValue.message };
+      const expressionType = parsedValue.value;
+      plannedSettings.push({
+        settingName,
+        apply: () => {
+          if (getExpressionTypeName(eventsFunction) === expressionType)
+            return null;
+          setExpressionType(project, eventsFunction, expressionType);
+          return `expressionType set to "${expressionType}"`;
+        },
+      });
+      continue;
+    }
+
     if (typeof newValue !== 'string') {
       return {
         success: false,
@@ -1041,7 +1194,35 @@ const planFunctionSettings = ({
     );
     if (getterRejection) return { success: false, message: getterRejection };
   }
-  return { success: true, plannedSettings };
+  const hasExpressionTypeSetting = plannedSettings.some(
+    plannedSetting => plannedSetting.settingName === 'expressionType'
+  );
+  if (
+    hasExpressionTypeSetting &&
+    !EXPRESSION_FUNCTION_TYPES.includes(finalFunctionTypeName)
+  ) {
+    return {
+      success: false,
+      message: `"expressionType" says what a function returns, and a "${finalFunctionTypeName}" returns nothing. Only ${listQuoted(
+        EXPRESSION_FUNCTION_TYPES
+      )} return a value: change \`functionType\` too, or drop "expressionType".`,
+    };
+  }
+  return {
+    success: true,
+    // Changing `functionType` resets what an expression returns: whatever the
+    // order of the call, `expressionType` is applied after it.
+    plannedSettings: [
+      ...plannedSettings.filter(
+        plannedSetting => plannedSetting.settingName !== 'expressionType'
+      ),
+      ...plannedSettings.filter(
+        plannedSetting => plannedSetting.settingName === 'expressionType'
+      ),
+    ],
+    finalFunctionTypeName,
+    finalGetterName,
+  };
 };
 
 export const changeCustomFunction: EditorFunction = {
@@ -1074,6 +1255,7 @@ export const changeCustomFunction: EditorFunction = {
     onExtensionsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
     onWillDeleteExtensionItem,
+    reloadExtensionMetadata,
   }): Promise<EditorFunctionGenericOutput> => {
     const containerResult = resolveFunctionsContainerOfCall(project, args);
     if (!containerResult.success)
@@ -1134,6 +1316,34 @@ export const changeCustomFunction: EditorFunction = {
     });
     if (!plannedSettingsResult.success)
       return makeGenericFailure(plannedSettingsResult.message);
+    const { finalFunctionTypeName, finalGetterName } = plannedSettingsResult;
+
+    const changedParameters: Array<ParameterChange> =
+      (SafeExtractor.extractArrayProperty(args, 'changed_parameters'): any) ||
+      [];
+    if (
+      changedParameters.length > 0 &&
+      finalFunctionTypeName === 'ActionWithOperator'
+    ) {
+      return makeGenericFailure(
+        `"${functionName}" is an "ActionWithOperator": it declares no parameter, GDevelop builds them from its getter${
+          finalGetterName ? ` "${finalGetterName}"` : ''
+        } (the parameters of the getter, plus the "Value" being set). Change the parameters of the getter${
+          finalGetterName ? ` ("${finalGetterName}")` : ''
+        } instead, or read another one with \`changed_settings\` "getterName".`
+      );
+    }
+    let plannedParameterChanges: PlannedParameterChanges | null = null;
+    if (changedParameters.length > 0) {
+      const plannedParametersResult = planParameterChanges({
+        resolvedScope,
+        eventsFunction,
+        changes: changedParameters,
+      });
+      if (!plannedParametersResult.success)
+        return makeGenericFailure(plannedParametersResult.message);
+      plannedParameterChanges = plannedParametersResult.plannedChanges;
+    }
 
     const newName = getRequestedNewName(args, functionName);
     let finalFunctionName = functionName;
@@ -1144,20 +1354,6 @@ export const changeCustomFunction: EditorFunction = {
         );
       }
       finalFunctionName = gd.Project.getSafeName(newName);
-      const newNameLifecycleRejection = getLifecycleRejection({
-        functionName: finalFunctionName,
-        owner,
-        scopeLabel: resolvedScope.label,
-        functionTypeName: null,
-        // Only the declared parameters count: the implicit ones stay.
-        parametersCount: Math.max(
-          0,
-          eventsFunction.getParameters().getParametersCount() -
-            getImplicitParametersCount(owner)
-        ),
-      });
-      if (newNameLifecycleRejection)
-        return makeGenericFailure(newNameLifecycleRejection);
       if (functionsContainer.hasEventsFunctionNamed(finalFunctionName)) {
         return makeGenericFailure(
           `Name "${finalFunctionName}" is already used by another function of ${
@@ -1168,6 +1364,30 @@ export const changeCustomFunction: EditorFunction = {
         );
       }
     }
+
+    // The declaration the call ends up with must stay one GDevelop can call: a
+    // lifecycle function keeps its name, its Action type and no parameter.
+    const isRenamed = finalFunctionName !== functionName;
+    const lifecycleRejection =
+      isRenamed || isLifecycleFunctionName(owner, finalFunctionName)
+        ? getLifecycleRejection({
+            functionName: finalFunctionName,
+            owner,
+            scopeLabel: resolvedScope.label,
+            functionTypeName: finalFunctionTypeName,
+            // Only the declared parameters count: the implicit ones stay.
+            parametersCount: plannedParameterChanges
+              ? getPlannedUserParametersCount(plannedParameterChanges)
+              : Math.max(
+                  0,
+                  eventsFunction.getParameters().getParametersCount() -
+                    getImplicitParametersCount(owner)
+                ),
+            typeField: '`functionType`',
+            parametersField: '`changed_parameters`',
+          })
+        : null;
+    if (lifecycleRejection) return makeGenericFailure(lifecycleRejection);
 
     const messages: Array<string> = [];
     let changedCount = 0;
@@ -1183,22 +1403,19 @@ export const changeCustomFunction: EditorFunction = {
       }
     }
 
-    const changedParameters: Array<ParameterChange> =
-      (SafeExtractor.extractArrayProperty(args, 'changed_parameters'): any) ||
-      [];
-    if (changedParameters.length > 0) {
+    if (plannedParameterChanges) {
       const { accessor, dispose } = makeScopeProjectScopedContainersAccessor(
         project,
         resolvedScope,
         eventsFunction
       );
       try {
-        const parametersResult = applyParameterChanges({
+        const parametersResult = applyPlannedParameterChanges({
           project,
           resolvedScope,
           eventsFunction,
           accessor,
-          changes: changedParameters,
+          plannedChanges: plannedParameterChanges,
         });
         if (!parametersResult.success)
           return makeGenericFailure(parametersResult.message);
@@ -1210,11 +1427,12 @@ export const changeCustomFunction: EditorFunction = {
       }
     }
 
-    if (finalFunctionName !== functionName) {
+    if (isRenamed) {
       renameFunctionInProject(
         project,
         resolvedScope,
         eventsFunctionsExtension,
+        functionsContainer,
         functionName,
         finalFunctionName
       );
@@ -1264,6 +1482,10 @@ export const changeCustomFunction: EditorFunction = {
       extensionNames: [extensionName],
       needsCodeRegeneration,
     });
+    // The call forms are read from the generated metadata when the editor has
+    // it: refresh it so it describes the function as it is now (the code is
+    // only regenerated by the flush at the end of the batch).
+    reloadExtensionMetadata(extensionName);
     const callForms = getCallForms(
       resolvedScope,
       functionsContainer,

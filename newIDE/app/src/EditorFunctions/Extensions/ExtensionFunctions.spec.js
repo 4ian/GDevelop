@@ -488,7 +488,7 @@ describe('ExtensionFunctions', () => {
       });
       expect(changeResult.success).toBe(false);
       expect(changeResult.message).toContain(
-        'comes from the GDevelop extension store'
+        'is installed from the GDevelop extension store'
       );
       expect(changeResult.message).toContain(
         'create_extension({ duplicated_extension_name: "Health" })'

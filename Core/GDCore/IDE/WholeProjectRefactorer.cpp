@@ -685,15 +685,41 @@ void WholeProjectRefactorer::RenameObjectEventsFunction(
   }
 }
 
+namespace {
+/**
+ * Find, among the parameters the events of a function resolve against (the
+ * ones listed in its scoped containers, innermost first like
+ * `ParameterMetadataTools::Get`), the container declaring `parameterName`.
+ * These are usually the parameters the function declares, but an
+ * "ActionWithOperator" doesn't declare any: its events use the parameters of
+ * its getter (and a generated "Value").
+ */
+const gd::ParameterMetadataContainer *FindParametersContainerDeclaring(
+    const gd::ProjectScopedContainers &projectScopedContainers,
+    const gd::String &parameterName) {
+  const auto &parametersVectorsList =
+      projectScopedContainers.GetParametersVectorsList();
+  for (auto it = parametersVectorsList.rbegin();
+       it != parametersVectorsList.rend(); ++it) {
+    if ((*it)->HasParameterNamed(parameterName)) {
+      return *it;
+    }
+  }
+  return nullptr;
+}
+}  // namespace
+
 void WholeProjectRefactorer::RenameParameter(
     gd::Project &project, gd::ProjectScopedContainers &projectScopedContainers,
     gd::EventsFunction &eventsFunction,
     const gd::ObjectsContainer &parameterObjectsContainer,
     const gd::String &oldParameterName, const gd::String &newParameterName) {
-  auto &parameters = eventsFunction.GetParameters();
-  if (!parameters.HasParameterNamed(oldParameterName))
+  const auto *parametersPtr = FindParametersContainerDeclaring(
+      projectScopedContainers, oldParameterName);
+  if (!parametersPtr)
     return;
-  auto &parameter = parameters.GetParameter(oldParameterName);
+  const auto &parameters = *parametersPtr;
+  const auto &parameter = parameters.GetParameter(oldParameterName);
   if (parameter.GetValueTypeMetadata().IsObject()) {
     gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
         project, projectScopedContainers, eventsFunction,
@@ -771,7 +797,15 @@ void WholeProjectRefactorer::MoveEventsFunctionParameter(
     gd::ProjectBrowserHelper::ExposeProjectEvents(project, mover);
   }
   if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
-    const int operatorIndexOffset = eventsFunction.IsExpression() ? 2 : 0;
+    // The generated instructions of these functions take an operator and a
+    // value before the parameters of the function (see
+    // `MetadataDeclarationHelper::DeclareEventsFunctionParameters`).
+    const int operatorIndexOffset =
+        eventsFunction.IsExpression() ||
+                eventsFunction.GetFunctionType() ==
+                    gd::EventsFunction::ActionWithOperator
+            ? 2
+            : 0;
     gd::InstructionsParameterMover mover = gd::InstructionsParameterMover(
         project, eventsFunctionType, oldIndex + operatorIndexOffset,
         newIndex + operatorIndexOffset);
@@ -807,7 +841,15 @@ void WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
     gd::ProjectBrowserHelper::ExposeProjectEvents(project, mover);
   }
   if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
-    const int operatorIndexOffset = eventsFunction.IsExpression() ? 2 : 0;
+    // The generated instructions of these functions take an operator and a
+    // value before the parameters of the function (see
+    // `MetadataDeclarationHelper::DeclareEventsFunctionParameters`).
+    const int operatorIndexOffset =
+        eventsFunction.IsExpression() ||
+                eventsFunction.GetFunctionType() ==
+                    gd::EventsFunction::ActionWithOperator
+            ? 2
+            : 0;
     gd::InstructionsParameterMover mover = gd::InstructionsParameterMover(
         project, eventsFunctionType, oldIndex + operatorIndexOffset,
         newIndex + operatorIndexOffset);
@@ -843,7 +885,15 @@ void WholeProjectRefactorer::MoveObjectEventsFunctionParameter(
     gd::ProjectBrowserHelper::ExposeProjectEvents(project, mover);
   }
   if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
-    const int operatorIndexOffset = eventsFunction.IsExpression() ? 2 : 0;
+    // The generated instructions of these functions take an operator and a
+    // value before the parameters of the function (see
+    // `MetadataDeclarationHelper::DeclareEventsFunctionParameters`).
+    const int operatorIndexOffset =
+        eventsFunction.IsExpression() ||
+                eventsFunction.GetFunctionType() ==
+                    gd::EventsFunction::ActionWithOperator
+            ? 2
+            : 0;
     gd::InstructionsParameterMover mover = gd::InstructionsParameterMover(
         project, eventsFunctionType, oldIndex + operatorIndexOffset,
         newIndex + operatorIndexOffset);

@@ -5,6 +5,7 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import {
   type ResolvedScope,
   getFunctionsContainerOfScope as getFunctionsContainer,
+  makeScopeProjectScopedContainersAccessor,
 } from '../Scope';
 import { getImplicitParametersCount } from '../SimplifiedProject/SimplifiedExtensions';
 import {
@@ -455,6 +456,20 @@ export const planParameterChanges = ({
   const implicitParametersCount = getImplicitParametersCount(owner);
   const parameters = eventsFunction.getParameters();
   const simulatedParameters = getSimulatedParameters(parameters);
+  // GDevelop gives the name `Value` to the parameter carrying the new value
+  // in the actions with operator reading this function.
+  const linkedSetterNames = getLinkedSetterNames(
+    functionsContainer,
+    eventsFunction.getName()
+  );
+  const getReservedNameRejection = (name: string): string | null =>
+    name === 'Value' && linkedSetterNames.length > 0
+      ? `"Value" is the name GDevelop gives to the new value received by ${listQuoted(
+          linkedSetterNames
+        )} (the ${
+          linkedSetterNames.length > 1 ? 'actions' : 'action'
+        } with operator reading "${eventsFunction.getName()}"): a parameter of "${eventsFunction.getName()}" cannot take it. Pick another name.`
+      : null;
   const brokenBehaviorNamesBefore = getBehaviorParametersWithoutObject(
     simulatedParameters
   );
@@ -563,6 +578,8 @@ export const planParameterChanges = ({
     let finalName = parameterName;
     let renameNotice = null;
     if (!isExisting) {
+      const reservedNameRejection = getReservedNameRejection(parameterName);
+      if (reservedNameRejection) return makeFailure(reservedNameRejection);
       finalName = getSafeUniqueName(parameterName, someName =>
         simulatedParameters.some(parameter => parameter.name === someName)
       );
@@ -579,6 +596,8 @@ export const planParameterChanges = ({
           );
         }
         const newName = requestedNewName.trim();
+        const reservedNameRejection = getReservedNameRejection(newName);
+        if (reservedNameRejection) return makeFailure(reservedNameRejection);
         finalName = getSafeUniqueName(
           newName,
           someName =>
@@ -748,6 +767,75 @@ const changeParameterTypeInEvents = (
   );
 };
 
+/** The names of the `ActionWithOperator` functions reading `getterName`. */
+export const getLinkedSetterNames = (
+  functionsContainer: gdEventsFunctionsContainer,
+  getterName: string
+): Array<string> =>
+  mapFor(0, functionsContainer.getEventsFunctionsCount(), index =>
+    functionsContainer.getEventsFunctionAt(index)
+  )
+    .filter(
+      candidate =>
+        candidate.getFunctionType() === gd.EventsFunction.ActionWithOperator &&
+        candidate.getGetterName() === getterName
+    )
+    .map(setter => setter.getName());
+
+/**
+ * Run `callback` on every `ActionWithOperator` reading its value from
+ * `getter`, with the scoped containers of that setter: its events use the
+ * parameters of the getter (Core builds them from it), so a rename or a type
+ * change of one of those parameters must reach its events too.
+ */
+const forEachLinkedSetter = (
+  project: gdProject,
+  resolvedScope: ResolvedScope,
+  getter: gdEventsFunction,
+  callback: (
+    setter: gdEventsFunction,
+    accessor: ProjectScopedContainersAccessor
+  ) => void
+) => {
+  const functionsContainer = getFunctionsContainer(resolvedScope);
+  if (!functionsContainer) return;
+  for (const setterName of getLinkedSetterNames(
+    functionsContainer,
+    getter.getName()
+  )) {
+    const setter = functionsContainer.getEventsFunction(setterName);
+    const { accessor, dispose } = makeScopeProjectScopedContainersAccessor(
+      project,
+      resolvedScope,
+      setter
+    );
+    try {
+      callback(setter, accessor);
+    } finally {
+      dispose();
+    }
+  }
+};
+
+/**
+ * Switch the variable instructions of the `ActionWithOperator` functions
+ * reading `getter` to the type it now returns: the `Value` they receive is of
+ * that type (Core generates it from the getter).
+ */
+export const changeGetterValueTypeInSetterEvents = ({
+  project,
+  resolvedScope,
+  getter,
+}: {|
+  project: gdProject,
+  resolvedScope: ResolvedScope,
+  getter: gdEventsFunction,
+|}) => {
+  forEachLinkedSetter(project, resolvedScope, getter, (setter, accessor) =>
+    changeParameterTypeInEvents(project, accessor, setter, 'Value')
+  );
+};
+
 export const applyPlannedParameterChanges = ({
   project,
   resolvedScope,
@@ -770,6 +858,36 @@ export const applyPlannedParameterChanges = ({
   const messages: Array<string> = [];
   let changedCount = 0;
 
+  // The events of the actions with operator reading this function use its
+  // parameters (Core builds them from it), and their calls list them: every
+  // rename, type change and move is applied to the function, then to them.
+  const functionsContainer = getFunctionsContainer(resolvedScope);
+  const linkedSetterNames = functionsContainer
+    ? getLinkedSetterNames(functionsContainer, eventsFunction.getName())
+    : [];
+  const applyToFunctionAndLinkedSetters = (
+    callback: (
+      refactoredFunction: gdEventsFunction,
+      refactoredAccessor: ProjectScopedContainersAccessor
+    ) => void
+  ) => {
+    callback(eventsFunction, accessor);
+    if (!functionsContainer) return;
+    for (const setterName of linkedSetterNames) {
+      const setter = functionsContainer.getEventsFunction(setterName);
+      const setterAccessor = makeScopeProjectScopedContainersAccessor(
+        project,
+        resolvedScope,
+        setter
+      );
+      try {
+        callback(setter, setterAccessor.accessor);
+      } finally {
+        setterAccessor.dispose();
+      }
+    }
+  };
+
   for (const plannedChange of plannedChanges.changes) {
     const { change, currentName, finalName } = plannedChange;
     const details: Array<string> = [];
@@ -791,12 +909,15 @@ export const applyPlannedParameterChanges = ({
     } else {
       parameter = parameters.getParameter(currentName);
       if (finalName !== currentName) {
-        renameParameterInEvents(
-          project,
-          accessor,
-          eventsFunction,
-          currentName,
-          finalName
+        applyToFunctionAndLinkedSetters(
+          (refactoredFunction, refactoredAccessor) =>
+            renameParameterInEvents(
+              project,
+              refactoredAccessor,
+              refactoredFunction,
+              currentName,
+              finalName
+            )
         );
         parameter.setName(finalName);
         details.push(`renamed from "${currentName}"`);
@@ -804,11 +925,14 @@ export const applyPlannedParameterChanges = ({
       const type = plannedChange.type;
       if (type && type !== parameter.getType()) {
         parameter.setType(type);
-        changeParameterTypeInEvents(
-          project,
-          accessor,
-          eventsFunction,
-          finalName
+        applyToFunctionAndLinkedSetters(
+          (refactoredFunction, refactoredAccessor) =>
+            changeParameterTypeInEvents(
+              project,
+              refactoredAccessor,
+              refactoredFunction,
+              finalName
+            )
         );
         details.push(`type set to "${type}"`);
       }
@@ -821,15 +945,20 @@ export const applyPlannedParameterChanges = ({
       const oldIndex = parameters.getParameterPosition(parameter);
       const newIndex = implicitParametersCount + userIndex;
       if (oldIndex !== newIndex) {
-        moveParameter({
-          project,
-          eventsFunctionsExtension,
-          resolvedScope,
-          functionName: eventsFunction.getName(),
-          owner,
-          oldIndex,
-          newIndex,
-        });
+        for (const functionName of [
+          eventsFunction.getName(),
+          ...linkedSetterNames,
+        ]) {
+          moveParameter({
+            project,
+            eventsFunctionsExtension,
+            resolvedScope,
+            functionName,
+            owner,
+            oldIndex,
+            newIndex,
+          });
+        }
         parameters.moveParameter(oldIndex, newIndex);
         details.push(`moved to position ${userIndex}`);
       }

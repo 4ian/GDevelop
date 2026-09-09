@@ -6381,6 +6381,28 @@ const addSceneEvents: EditorFunction = {
       };
     };
 
+    if (!relatedAiRequestId) {
+      return makeGenericFailure(
+        'No related AI request ID found for events generation.'
+      );
+    }
+
+    // A refused call (unknown scene or function, extension of the store...)
+    // regenerates nothing: the target is checked first.
+    const checkedEventsTarget = resolveEventsTarget();
+    if (checkedEventsTarget.success === false)
+      return makeScopeFailureOutput(checkedEventsTarget);
+
+    // An extension may have been authored earlier in this batch: the generated
+    // metadata (and the extensions summary uploaded with this generation, the
+    // private functions of an edited extension included) must describe the
+    // extensions as they are now, whatever the scope. A no-op when nothing
+    // changed.
+    await ensureExtensionsUpToDate();
+
+    // The target is resolved AGAIN after the `await`: a Core object found
+    // before it may be gone when the code resumes (the function deleted or
+    // renamed meanwhile), so nothing found before is used.
     const eventsTarget = resolveEventsTarget();
     if (eventsTarget.success === false)
       return makeScopeFailureOutput(eventsTarget);
@@ -6390,21 +6412,9 @@ const addSceneEvents: EditorFunction = {
       eventsFunction,
     } = eventsTarget;
     const scene = resolvedScope.layout;
-    if (!relatedAiRequestId) {
-      return makeGenericFailure(
-        'No related AI request ID found for events generation.'
-      );
-    }
     // A scene name is only sent for a scene (the generation API keeps it
     // beside the scope for older editors).
     const sceneName = scene ? resolvedScope.scope.scene_name || '' : '';
-
-    // An extension may have been authored earlier in this batch: the generated
-    // metadata (and the extensions summary uploaded with this generation, the
-    // private functions of an edited extension included) must describe the
-    // extensions as they are now, whatever the scope. A no-op when nothing
-    // changed.
-    await ensureExtensionsUpToDate();
 
     // The existing events are sent as JSON only: the generation backend
     // renders them itself (as a bounded EventScript view) for its model.

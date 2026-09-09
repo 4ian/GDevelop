@@ -21,6 +21,8 @@ import {
   createCustomFunction,
 } from './CustomFunctionFunctions';
 
+import { unserializeFromJSObject } from '../../Utils/Serializer';
+
 const gd: libGDevelop = global.gd;
 
 const extensionScope = { type: 'extension', extension_name: 'MyExt' };
@@ -493,6 +495,76 @@ describe('CustomFunctionFunctions', () => {
       expect(getFirstActionType(eventsFunction)).toBe('SetReturnString');
     });
 
+    it('refuses to copy a function into a lifecycle name when its type is not an action', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Ready',
+        function_type: 'Condition',
+      });
+
+      const { output } = await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'onSceneLoaded',
+        duplicated_function_name: 'Ready',
+      });
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('duplicated_function_name');
+      expect(
+        extension.getEventsFunctions().hasEventsFunctionNamed('onSceneLoaded')
+      ).toBe(false);
+    });
+
+    it('refuses parameters on an action with operator: they come from its getter', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+      });
+
+      const { output } = await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+        parameters: [{ name: 'Ignored', type: 'expression' }],
+      });
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('"Score"');
+      expect(
+        extension.getEventsFunctions().hasEventsFunctionNamed('SetScore')
+      ).toBe(false);
+    });
+
+    it('refuses parameters on a copy of an action with operator, naming its getter', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+
+      const { output } = await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScoreAgain',
+        duplicated_function_name: 'SetScore',
+        parameters: [{ name: 'Bonus', type: 'expression' }],
+      });
+
+      expect(output.success).toBe(false);
+      // The getter is the one of the copied function.
+      expect(output.message).toContain('the getter "Score"');
+      expect(
+        extension.getEventsFunctions().hasEventsFunctionNamed('SetScoreAgain')
+      ).toBe(false);
+    });
+
     it('refuses an expression type on a function returning nothing', async () => {
       const { output } = await launchFunction(createCustomFunction, project, {
         scope: extensionScope,
@@ -711,6 +783,627 @@ describe('CustomFunctionFunctions', () => {
   });
 
   describe('change_custom_function', () => {
+    it('renames a parameter of a getter in the events of its actions with operator too', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+        parameters: [
+          { name: 'Target', type: 'objectList', extra_info: 'Sprite' },
+        ],
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+      const setter = getFreeFunction('SetScore');
+      // The events of the setter use the parameter of its getter.
+      unserializeFromJSObject(
+        setter.getEvents(),
+        [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              { type: { value: 'Delete' }, parameters: ['Target', ''] },
+            ],
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_parameters: [{ parameter_name: 'Target', new_name: 'Enemy' }],
+      });
+
+      expect(output.success).toBe(true);
+      expect(
+        setter
+          .getParametersForEvents(extension.getEventsFunctions())
+          .getParameterAt(1)
+          .getName()
+      ).toBe('Enemy');
+      expect(
+        gd
+          .asStandardEvent(setter.getEvents().getEventAt(0))
+          .getActions()
+          .get(0)
+          .getParameter(0)
+          .getPlainString()
+      ).toBe('Enemy');
+    });
+
+    it('changes the type of a parameter in the conditions comparing it', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+        parameters: [{ name: 'Threshold', type: 'string' }],
+      });
+      const getter = getFreeFunction('Score');
+      unserializeFromJSObject(
+        getter.getEvents(),
+        [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'StringVariable' },
+                parameters: ['Threshold', '=', '"123"'],
+              },
+            ],
+            actions: [],
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_parameters: [
+          { parameter_name: 'Threshold', type: 'expression' },
+        ],
+      });
+
+      expect(output.success).toBe(true);
+      expect(
+        gd
+          .asStandardEvent(getter.getEvents().getEventAt(0))
+          .getConditions()
+          .get(0)
+          .getType()
+      ).toBe('NumberVariable');
+    });
+
+    it('changes the type of a parameter of a getter in the events of its actions with operator too', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+        parameters: [{ name: 'Threshold', type: 'string' }],
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+      const setter = getFreeFunction('SetScore');
+      // The setter compares the (text) parameter of its getter.
+      unserializeFromJSObject(
+        setter.getEvents(),
+        [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'StringVariable' },
+                parameters: ['Threshold', '=', '"123"'],
+              },
+            ],
+            actions: [],
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_parameters: [
+          { parameter_name: 'Threshold', type: 'expression' },
+        ],
+      });
+
+      expect(output.success).toBe(true);
+      // The condition of the setter now compares a number.
+      expect(
+        gd
+          .asStandardEvent(setter.getEvents().getEventAt(0))
+          .getConditions()
+          .get(0)
+          .getType()
+      ).toBe('NumberVariable');
+    });
+
+    it('changes what a getter returns in the events of its actions with operator too', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+      const setter = getFreeFunction('SetScore');
+      // The setter compares the `Value` it receives: a number, like its getter.
+      unserializeFromJSObject(
+        setter.getEvents(),
+        [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'NumberVariable' },
+                parameters: ['Value', '=', '1'],
+              },
+            ],
+            actions: [],
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_settings: [
+          { setting_name: 'expressionType', new_value: 'string' },
+        ],
+      });
+
+      expect(output.success).toBe(true);
+      // The `Value` of the setter is now a text.
+      expect(
+        gd
+          .asStandardEvent(setter.getEvents().getEventAt(0))
+          .getConditions()
+          .get(0)
+          .getType()
+      ).toBe('StringVariable');
+    });
+
+    it('moves a parameter of a getter in the calls of its actions with operator too', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+        parameters: [
+          { name: 'Base', type: 'expression' },
+          { name: 'Bonus', type: 'expression' },
+        ],
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+      // A scene event calling the setter: the (code-only) scene, the operator
+      // and the value come before the parameters of the getter.
+      const event = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      const action = new gd.Instruction();
+      action.setType('MyExt::SetScore');
+      action.setParametersCount(5);
+      action.setParameter(0, '');
+      action.setParameter(1, '=');
+      action.setParameter(2, '3');
+      action.setParameter(3, '1');
+      action.setParameter(4, '2');
+      gd.asStandardEvent(event)
+        .getActions()
+        .insert(action, 0);
+      action.delete();
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_parameters: [{ parameter_name: 'Base', new_index: 1 }],
+      });
+
+      expect(output.success).toBe(true);
+      const movedAction = gd
+        .asStandardEvent(layout.getEvents().getEventAt(0))
+        .getActions()
+        .get(0);
+      expect(
+        mapFor(0, movedAction.getParametersCount(), index =>
+          movedAction.getParameter(index).getPlainString()
+        )
+      ).toEqual(['', '=', '3', '2', '1']);
+    });
+
+    it('refuses to name a parameter of a getter "Value", the value its actions with operator receive', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+        parameters: [{ name: 'Threshold', type: 'expression' }],
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_parameters: [
+          { parameter_name: 'Threshold', new_name: 'Value' },
+        ],
+      });
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('"Value"');
+      expect(output.message).toContain('"SetScore"');
+      expect(
+        getFreeFunction('Score')
+          .getParameters()
+          .hasParameterNamed('Threshold')
+      ).toBe(true);
+    });
+
+    it('keeps editing a getter whose type was already changed outside the tools', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+      // The extension editor lets a getter become an action.
+      getFreeFunction('Score').setFunctionType(gd.EventsFunction.Action);
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_settings: [
+          { setting_name: 'description', new_value: 'The score.' },
+        ],
+      });
+
+      // Only a call taking the value away is refused.
+      expect(output.success).toBe(true);
+      expect(getFreeFunction('Score').getDescription()).toBe('The score.');
+    });
+
+    it('renames a parameter of a behavior getter in the events of its actions with operator too', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+        parameters: [{ name: 'Bonus', type: 'expression' }],
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+      const setter = extension
+        .getEventsBasedBehaviors()
+        .get('MyBehavior')
+        .getEventsFunctions()
+        .getEventsFunction('SetScore');
+      // The `Value` of a behavior setter comes after `Object` and `Behavior`.
+      expect(
+        mapFor(
+          0,
+          setter
+            .getParametersForEvents(
+              extension
+                .getEventsBasedBehaviors()
+                .get('MyBehavior')
+                .getEventsFunctions()
+            )
+            .getParametersCount(),
+          index =>
+            setter
+              .getParametersForEvents(
+                extension
+                  .getEventsBasedBehaviors()
+                  .get('MyBehavior')
+                  .getEventsFunctions()
+              )
+              .getParameterAt(index)
+              .getName()
+        )
+      ).toEqual(['Object', 'Behavior', 'Value', 'Bonus']);
+      unserializeFromJSObject(
+        setter.getEvents(),
+        [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'NumberVariable' },
+                parameters: ['Bonus', '=', '1'],
+              },
+            ],
+            actions: [],
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'Score',
+        changed_parameters: [{ parameter_name: 'Bonus', new_name: 'Extra' }],
+      });
+
+      expect(output.success).toBe(true);
+      expect(
+        gd
+          .asStandardEvent(setter.getEvents().getEventAt(0))
+          .getConditions()
+          .get(0)
+          .getParameter(0)
+          .getPlainString()
+      ).toBe('Extra');
+    });
+
+    it('moves a parameter of a behavior getter in the calls of its actions with operator too', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+        parameters: [
+          { name: 'Base', type: 'expression' },
+          { name: 'Bonus', type: 'expression' },
+        ],
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+      // A scene event calling the setter: the object, the behavior, the
+      // operator and the value come before the parameters of the getter.
+      const event = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      const action = new gd.Instruction();
+      action.setType('MyExt::MyBehavior::SetScore');
+      action.setParametersCount(6);
+      action.setParameter(0, 'Player');
+      action.setParameter(1, 'MyBehavior');
+      action.setParameter(2, '=');
+      action.setParameter(3, '3');
+      action.setParameter(4, '1');
+      action.setParameter(5, '2');
+      gd.asStandardEvent(event)
+        .getActions()
+        .insert(action, 0);
+      action.delete();
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: behaviorScope,
+        function_name: 'Score',
+        changed_parameters: [{ parameter_name: 'Base', new_index: 1 }],
+      });
+
+      expect(output.success).toBe(true);
+      const movedAction = gd
+        .asStandardEvent(layout.getEvents().getEventAt(0))
+        .getActions()
+        .get(0);
+      expect(
+        mapFor(0, movedAction.getParametersCount(), index =>
+          movedAction.getParameter(index).getPlainString()
+        )
+      ).toEqual(['Player', 'MyBehavior', '=', '3', '2', '1']);
+    });
+
+    it('refuses to turn the getter of an action with operator into a function returning nothing', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        function_type: 'Expression',
+      });
+      await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'SetScore',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Score',
+      });
+
+      const { output } = await launchFunction(changeCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Score',
+        changed_settings: [
+          { setting_name: 'functionType', new_value: 'Action' },
+        ],
+      });
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('"SetScore"');
+      expect(getFreeFunction('Score').getFunctionType()).toBe(
+        gd.EventsFunction.Expression
+      );
+    });
+
+    // The Core function type a case of the table expects (the table only
+    // names stored types: a `StringExpression` is an `Expression`).
+    const getExpectedFunctionType = (functionTypeName: string): number => {
+      const functionTypes: { [string]: number } = {
+        Action: gd.EventsFunction.Action,
+        Expression: gd.EventsFunction.Expression,
+        ExpressionAndCondition: gd.EventsFunction.ExpressionAndCondition,
+      };
+      const functionType = functionTypes[functionTypeName];
+      if (functionType === undefined)
+        throw new Error(
+          `No function type for "${functionTypeName}" in the transition table.`
+        );
+      return functionType;
+    };
+
+    // The same cases run against the mock editor of the prompts
+    // (mock-project-mutations.spec.cjs): both must agree on what a function
+    // returns after its type changes. `expressionType` is the tool spelling
+    // (`null` for a function returning nothing).
+    const returnTypeTransitions = [
+      {
+        title:
+          'an ExpressionAndCondition returning a text becomes an Expression: still a text',
+        created: {
+          function_type: 'ExpressionAndCondition',
+          expression_type: 'string',
+        },
+        changes: [[{ setting_name: 'functionType', new_value: 'Expression' }]],
+        expected: { functionType: 'Expression', expressionType: 'string' },
+      },
+      {
+        title:
+          'an Expression becomes an ExpressionAndCondition: still a number',
+        created: { function_type: 'Expression' },
+        changes: [
+          [
+            {
+              setting_name: 'functionType',
+              new_value: 'ExpressionAndCondition',
+            },
+          ],
+        ],
+        expected: {
+          functionType: 'ExpressionAndCondition',
+          expressionType: 'number',
+        },
+      },
+      {
+        title: 'an Expression becomes a StringExpression: a text',
+        created: { function_type: 'Expression' },
+        changes: [
+          [{ setting_name: 'functionType', new_value: 'StringExpression' }],
+        ],
+        expected: { functionType: 'Expression', expressionType: 'string' },
+      },
+      {
+        title: 'a StringExpression becomes an Expression: still a text',
+        created: { function_type: 'StringExpression' },
+        changes: [[{ setting_name: 'functionType', new_value: 'Expression' }]],
+        expected: { functionType: 'Expression', expressionType: 'string' },
+      },
+      {
+        title:
+          'a StringExpression becomes an Expression returning a number when expressionType says so',
+        created: { function_type: 'StringExpression' },
+        changes: [
+          [
+            { setting_name: 'functionType', new_value: 'Expression' },
+            { setting_name: 'expressionType', new_value: 'number' },
+          ],
+        ],
+        expected: { functionType: 'Expression', expressionType: 'number' },
+      },
+      {
+        title: 'expressionType wins whatever its position in the call',
+        created: { function_type: 'Expression' },
+        changes: [
+          [
+            { setting_name: 'expressionType', new_value: 'string' },
+            {
+              setting_name: 'functionType',
+              new_value: 'ExpressionAndCondition',
+            },
+          ],
+        ],
+        expected: {
+          functionType: 'ExpressionAndCondition',
+          expressionType: 'string',
+        },
+      },
+      {
+        title:
+          'an Expression returning a text becomes an Action: no return type',
+        created: { function_type: 'Expression', expression_type: 'string' },
+        changes: [[{ setting_name: 'functionType', new_value: 'Action' }]],
+        expected: { functionType: 'Action', expressionType: null },
+      },
+      {
+        title:
+          'an Action that returned a text becomes an Expression again: a number',
+        created: { function_type: 'Expression', expression_type: 'string' },
+        changes: [
+          [{ setting_name: 'functionType', new_value: 'Action' }],
+          [{ setting_name: 'functionType', new_value: 'Expression' }],
+        ],
+        expected: { functionType: 'Expression', expressionType: 'number' },
+      },
+    ];
+    returnTypeTransitions.forEach(({ title, created, changes, expected }) => {
+      it(`agrees with the mock editor on the return type when ${title}`, async () => {
+        await launchFunction(createCustomFunction, project, {
+          scope: extensionScope,
+          function_name: 'Value',
+          ...created,
+        });
+        for (const changedSettings of changes) {
+          const { output } = await launchFunction(
+            changeCustomFunction,
+            project,
+            {
+              scope: extensionScope,
+              function_name: 'Value',
+              changed_settings: changedSettings,
+            }
+          );
+          expect(output.success).toBe(true);
+        }
+
+        const eventsFunction = getFreeFunction('Value');
+        expect(eventsFunction.getFunctionType()).toBe(
+          getExpectedFunctionType(expected.functionType)
+        );
+        // GDevelop names a number `expression`, and a function returning
+        // nothing keeps the default.
+        expect(eventsFunction.getExpressionType().getName()).toBe(
+          expected.expressionType === 'string' ? 'string' : 'expression'
+        );
+        if (expected.expressionType) {
+          // The events return the right type too.
+          expect(getFirstActionType(eventsFunction)).toBe(
+            expected.expressionType === 'string'
+              ? 'SetReturnString'
+              : 'SetReturnNumber'
+          );
+        }
+      });
+    });
+
     beforeEach(async () => {
       await launchFunction(createCustomFunction, project, {
         scope: behaviorScope,
@@ -810,6 +1503,10 @@ describe('CustomFunctionFunctions', () => {
       });
       expect(output.success).toBe(false);
       expect(output.message).toContain('takes no parameter');
+      // The parameters come from the copied function, not from `parameters`.
+      expect(output.message).toContain(
+        'Remove `duplicated_function_name` (the copy keeps the parameters of its source)'
+      );
       expect(
         extension
           .getEventsBasedBehaviors()

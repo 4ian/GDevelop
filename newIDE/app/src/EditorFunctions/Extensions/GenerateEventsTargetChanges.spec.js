@@ -234,6 +234,32 @@ describe('generate_events when its target changes while generating', () => {
     expect(onSceneEventsModifiedOutsideEditor).not.toHaveBeenCalled();
   };
 
+  it('fails without writing anything when the target function is deleted while the extensions are refreshed', async () => {
+    // The target is checked before the refresh, then resolved AGAIN after it:
+    // only the second resolution is used, so a function deleted during the
+    // refresh is not found and nothing is generated.
+    const generateEvents = jest.fn(async () => {
+      throw new Error('generateEvents must not be called: the target is gone.');
+    });
+    const ensureExtensionsUpToDate = jest.fn(async () => {
+      extension
+        .getEventsBasedObjects()
+        .get('CombinedTank')
+        .getEventsFunctions()
+        .removeEventsFunction('onCreated');
+    });
+
+    const result = await launch(makeArgs(), {
+      generateEvents,
+      ensureExtensionsUpToDate,
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain('"onCreated"');
+    expect(generateEvents).not.toHaveBeenCalled();
+    expectNothingWasChanged();
+  });
+
   it('fails without writing anything when the target function is deleted while generating', async () => {
     const {
       generateEvents,

@@ -213,6 +213,11 @@ class GD_CORE_API WholeProjectRefactorer {
   /**
    * \brief Refactor the function **before** a parameter is renamed.
    *
+   * \note The parameter is searched in `projectScopedContainers` (the
+   * parameters the events resolve against), not in the declaration of
+   * `eventsFunction`: the events of an "ActionWithOperator" use the parameters
+   * of its getter. Nothing is done when no parameter of that name is in scope.
+   *
    * \warning Do the renaming of the specified parameter after calling this.
    * This is because the function is expected to have its old name for the
    * refactoring.

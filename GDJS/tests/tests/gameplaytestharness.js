@@ -1646,12 +1646,14 @@ describe('gdjs.gameplayTests', () => {
      * expected one.
      * @param {number|undefined} actual
      * @param {number} expected
+     * @param {number} [epsilon]
      */
-    const expectNearlyEqual = (actual, expected) => {
-      expect(actual).to.be.within(
-        expected - POSITION_EPSILON,
-        expected + POSITION_EPSILON
-      );
+    const expectNearlyEqual = (
+      actual,
+      expected,
+      epsilon = POSITION_EPSILON
+    ) => {
+      expect(actual).to.be.within(expected - epsilon, expected + epsilon);
     };
 
     /**
@@ -1678,6 +1680,62 @@ describe('gdjs.gameplayTests', () => {
       }
       return worldBounds;
     };
+
+    /**
+     * The world bounds of a snapshot, compared to the expected box: the
+     * corners went through rotations, so they are only nearly equal.
+     * @param {gdjs.gameplayTests.GameplayTestObjectSnapshot} snapshot
+     * @param {gdjs.gameplayTests.GameplayTestWorldBounds} expectedBounds
+     * @param {number} [epsilon]
+     */
+    const expectNearlyEqualBounds = (
+      snapshot,
+      expectedBounds,
+      epsilon = POSITION_EPSILON
+    ) => {
+      const worldBounds = getWorldBounds(snapshot);
+      expectNearlyEqual(worldBounds.minX, expectedBounds.minX, epsilon);
+      expectNearlyEqual(worldBounds.minY, expectedBounds.minY, epsilon);
+      expectNearlyEqual(worldBounds.minZ, expectedBounds.minZ, epsilon);
+      expectNearlyEqual(worldBounds.maxX, expectedBounds.maxX, epsilon);
+      expectNearlyEqual(worldBounds.maxY, expectedBounds.maxY, epsilon);
+      expectNearlyEqual(worldBounds.maxZ, expectedBounds.maxZ, epsilon);
+    };
+
+    /**
+     * A harness with a `Barrel3D` (a 3D custom object) spawned at the
+     * origin, where it transforms nothing: the world bounds of its `Cube3D`
+     * child are then exactly the box of the cube in the barrel.
+     * @returns {Promise<gdjs.gameplayTests.GameplayTestHarness>}
+     */
+    const makeHarnessWithUntransformedBarrel3D = async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('Barrel3D', 0, 0, 0);
+      await harness.stepFrames(1);
+      return harness;
+    };
+
+    /**
+     * The runtime `Cube3D` child of the `Barrel3D` spawned in the scene.
+     * @param {gdjs.gameplayTests.GameplayTestHarness} harness
+     * @returns {any}
+     */
+    const getRuntimeCube3D = (harness) => {
+      const runtimeBarrel = harness.getRuntimeObject('Barrel3D');
+      if (!runtimeBarrel) throw new Error('The barrel was not spawned.');
+      return getChildInstance(runtimeBarrel, 'Cube3D');
+    };
+
+    /**
+     * The snapshot of the `Cube3D` child of the `Barrel3D` spawned in the
+     * scene, taken now (so a transformation changed since the last frame is
+     * included).
+     * @param {gdjs.gameplayTests.GameplayTestHarness} harness
+     * @returns {gdjs.gameplayTests.GameplayTestObjectSnapshot}
+     */
+    const getCube3DSnapshot = (harness) =>
+      getChildren(harness.getObjects('Barrel3D')[0], 'Cube3D')[0];
 
     it('snapshots only the direct children by default', async () => {
       const harness = await makeHarnessWithSpawnedTank();
@@ -2127,6 +2185,264 @@ describe('gdjs.gameplayTests', () => {
       expectNearlyEqual(cubeAfter.x, 305);
       expectNearlyEqual(cubeAfter.y, 220);
       expectNearlyEqual(cubeAfter.z, 70);
+    });
+
+    it('orients the world bounds of a 3D child rotated around X or Y', async () => {
+      const harness = await makeHarnessWithUntransformedBarrel3D();
+      const runtimeCube = getRuntimeCube3D(harness);
+
+      // The 10x6x4 cube is at (10 ; 20 ; 0) in the barrel, so it rotates
+      // around its center, at (15 ; 23 ; 2).
+      runtimeCube.setRotationX(90);
+
+      const cube = getCube3DSnapshot(harness);
+      expectNearlyEqual(cube.centerX, 15);
+      expectNearlyEqual(cube.centerY, 23);
+      expectNearlyEqual(cube.centerZ, 2);
+      // A rotation of 90° around X maps (x ; y ; z) to (x ; -z ; y): the
+      // 10x6x4 box of the cube is 10x4x6 around its center.
+      expectNearlyEqualBounds(cube, {
+        minX: 10,
+        minY: 21,
+        minZ: -1,
+        maxX: 20,
+        maxY: 25,
+        maxZ: 5,
+      });
+      // The sizes and angles of the child stay its own, local values.
+      expect(cube.width).to.be(CUBE_WIDTH);
+      expect(cube.height).to.be(CUBE_HEIGHT);
+      expect(cube.depth).to.be(CUBE_DEPTH);
+      expect(cube.rotationX).to.be(90);
+      expect(cube.isLocalGeometry).to.be(true);
+
+      // The same cube rotated by 90° around Y instead: (x ; y ; z) becomes
+      // (z ; y ; -x), so its box is 4x6x10 around its center.
+      runtimeCube.setRotationX(0);
+      runtimeCube.setRotationY(90);
+
+      expectNearlyEqualBounds(getCube3DSnapshot(harness), {
+        minX: 13,
+        minY: 20,
+        minZ: -3,
+        maxX: 17,
+        maxY: 26,
+        maxZ: 7,
+      });
+    });
+
+    it('agrees with the renderer of a 3D child on its own transformation', async () => {
+      const harness = await makeHarnessWithUntransformedBarrel3D();
+      const runtimeCube = getRuntimeCube3D(harness);
+      runtimeCube.setRotationX(90);
+
+      // An independent oracle: the box THREE itself computes from the
+      // geometry of the mesh of the cube and the LOCAL matrix of this mesh.
+      // The barrel transforms nothing, so this local box is also the box of
+      // the cube in the scene.
+      const mesh = runtimeCube.get3DRendererObject();
+      mesh.updateMatrix();
+      mesh.geometry.computeBoundingBox();
+      const meshBounds = mesh.geometry.boundingBox
+        .clone()
+        .applyMatrix4(mesh.matrix);
+
+      // The oracle is the 10x4x6 box expected of the rotated cube (and not
+      // the 10x6x4 one it has when it is not rotated).
+      expectNearlyEqual(meshBounds.max.x - meshBounds.min.x, CUBE_WIDTH);
+      expectNearlyEqual(meshBounds.max.y - meshBounds.min.y, CUBE_DEPTH);
+      expectNearlyEqual(meshBounds.max.z - meshBounds.min.z, CUBE_HEIGHT);
+      expectNearlyEqualBounds(getCube3DSnapshot(harness), {
+        minX: meshBounds.min.x,
+        minY: meshBounds.min.y,
+        minZ: meshBounds.min.z,
+        maxX: meshBounds.max.x,
+        maxY: meshBounds.max.y,
+        maxZ: meshBounds.max.z,
+      });
+    });
+
+    it('composes the own rotation of a 3D child with the rotation of its parent', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('Barrel3D', 100, 200, 50);
+      const runtimeBarrel = /** @type {any} */ (
+        harness.getRuntimeObject('Barrel3D')
+      );
+      if (!runtimeBarrel) throw new Error('The barrel was not spawned.');
+      // Rotate the barrel around its origin, to keep the expected positions
+      // readable.
+      runtimeBarrel.setRotationCenter3D(0, 0, 0);
+      await harness.stepFrames(1);
+      runtimeBarrel.setRotationY(90);
+      getChildInstance(runtimeBarrel, 'Cube3D').setRotationX(90);
+
+      const cube = getCube3DSnapshot(harness);
+
+      // Rotated by 90° around X, the cube is a 10x4x6 box centered on
+      // (15 ; 23 ; 2) in the barrel. The barrel rotated by 90° around Y
+      // maps (x ; y ; z) to (z ; y ; -x) and translates by
+      // (100 ; 200 ; 50), so the box of the cube is 6x4x10 in the scene.
+      expectNearlyEqual(cube.centerX, 102);
+      expectNearlyEqual(cube.centerY, 223);
+      expectNearlyEqual(cube.centerZ, 35);
+      expectNearlyEqualBounds(cube, {
+        minX: 99,
+        minY: 221,
+        minZ: 30,
+        maxX: 105,
+        maxY: 225,
+        maxZ: 40,
+      });
+    });
+
+    it('orients the world bounds of a 3D child rotated around X and Z in the order of the renderer', async () => {
+      const harness = await makeHarnessWithUntransformedBarrel3D();
+      const runtimeCube = getRuntimeCube3D(harness);
+      runtimeCube.setRotationX(90);
+      runtimeCube.setAngle(90);
+
+      const cube = getCube3DSnapshot(harness);
+      // The renderer applies the rotation around X first ((x ; y ; z) becomes
+      // (x ; -z ; y): the 10x6x4 cube is 10x4x6), then the angle around Z
+      // ((x ; y ; z) becomes (-y ; x ; z)): 4x10x6 around the center
+      // (15 ; 23 ; 2). The other order would give 6x4x10.
+      expectNearlyEqualBounds(cube, {
+        minX: 13,
+        minY: 18,
+        minZ: -1,
+        maxX: 17,
+        maxY: 28,
+        maxZ: 5,
+      });
+      expect(cube.angle).to.be(90);
+      expect(cube.rotationX).to.be(90);
+    });
+
+    it('orients the world bounds of a 2D custom object child rotated around Z', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('BoxTank', 100, 200);
+      await harness.stepFrames(1);
+      const runtimeTank = /** @type {any} */ (
+        harness.getRuntimeObject('BoxTank')
+      );
+      if (!runtimeTank) throw new Error('The tank was not spawned.');
+      getChildInstance(runtimeTank, 'BoxTurret_Inner').setAngle(45);
+
+      const turret = getChildren(
+        harness.getObjects('BoxTank')[0],
+        'BoxTurret_Inner'
+      )[0];
+
+      /** The area of `BoxTurret` (see `createTankExtensionData`). */
+      const TURRET_AREA_SIZE = 64;
+      // The tank at (100 ; 200) only translates its turret, at (30 ; 40) in
+      // it: the 64x64 area of the turret rotates by 45° around its center,
+      // (162 ; 272) in the scene, and spans 64 * sqrt(2) on both axes. A 2D
+      // custom object has no Z.
+      const halfDiagonal = (TURRET_AREA_SIZE / 2) * Math.SQRT2;
+      // A 2D custom object places its children with single-precision
+      // matrices: the corners are only equal to about 1e-5.
+      const SINGLE_PRECISION_EPSILON = 1e-4;
+      expectNearlyEqual(turret.centerX, 162, SINGLE_PRECISION_EPSILON);
+      expectNearlyEqual(turret.centerY, 272, SINGLE_PRECISION_EPSILON);
+      expectNearlyEqualBounds(
+        turret,
+        {
+          minX: 162 - halfDiagonal,
+          minY: 272 - halfDiagonal,
+          minZ: 0,
+          maxX: 162 + halfDiagonal,
+          maxY: 272 + halfDiagonal,
+          maxZ: 0,
+        },
+        SINGLE_PRECISION_EPSILON
+      );
+      expect(turret.width).to.be(TURRET_AREA_SIZE);
+      expect(turret.angle).to.be(45);
+    });
+
+    it('orients the world bounds of a 2D child rotated around Z', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('BoxTurret', 100, 200);
+      await harness.stepFrames(1);
+
+      const runtimeTurret = /** @type {any} */ (
+        harness.getRuntimeObject('BoxTurret')
+      );
+      if (!runtimeTurret) throw new Error('The turret was not spawned.');
+      const runtimeBox = getChildInstance(runtimeTurret, 'SizedBox');
+      runtimeBox.setCustomWidthAndHeight(BOX_WIDTH, BOX_HEIGHT);
+      runtimeBox.setAngle(45);
+
+      const box = getChildren(
+        harness.getObjects('BoxTurret')[0],
+        'SizedBox'
+      )[0];
+
+      // The 10x6 box is at (10 ; 20) in the turret, which only translates
+      // it by (100 ; 200): its center is at (115 ; 223), and its box,
+      // rotated by 45° around it, spans (10 + 6) / sqrt(2) on both axes.
+      const halfDiagonal = (BOX_WIDTH + BOX_HEIGHT) / 2 / Math.sqrt(2);
+      expectNearlyEqual(box.centerX, 115);
+      expectNearlyEqual(box.centerY, 223);
+      expectNearlyEqualBounds(box, {
+        minX: 115 - halfDiagonal,
+        minY: 223 - halfDiagonal,
+        minZ: 0,
+        maxX: 115 + halfDiagonal,
+        maxY: 223 + halfDiagonal,
+        maxZ: 0,
+      });
+      // The size and the angle of the child stay its own, local values.
+      expect(box.width).to.be(BOX_WIDTH);
+      expect(box.height).to.be(BOX_HEIGHT);
+      expect(box.angle).to.be(45);
+    });
+
+    it('orients the world bounds of a nested 3D custom object around its rotation center', async () => {
+      const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+      await harness.goToScene('Scene 1');
+      harness.spawn('Turret3D', 0, 0, 0);
+      const runtimeTurret = /** @type {any} */ (
+        harness.getRuntimeObject('Turret3D')
+      );
+      if (!runtimeTurret) throw new Error('The turret was not spawned.');
+      const runtimeBarrel = getChildInstance(runtimeTurret, 'Barrel3D_Inner');
+      // The barrel rotates around (10 ; 10 ; 0) in its own space, and not
+      // around the center of its area.
+      runtimeBarrel.setRotationCenter3D(10, 10, 0);
+      runtimeBarrel.setZ(10);
+      await harness.stepFrames(1);
+      runtimeBarrel.setRotationX(90);
+
+      const barrel = getChildren(
+        harness.getObjects('Turret3D')[0],
+        'Barrel3D_Inner'
+      )[0];
+
+      /** The inner area of `Barrel3D` (see `createTankExtensionData`). */
+      const BARREL_AREA_SIZE = 64;
+      // The turret at the origin transforms nothing, so the box of the
+      // barrel in the scene is the one of its own area: 64x64, flat on Z,
+      // at (30 ; 40 ; 10) - rotated by 90° around X around its rotation
+      // center, at (40 ; 50 ; 10) in the turret. The rotation maps
+      // (x ; y ; z) to (x ; -z ; y), so the box becomes flat on Y and 64
+      // deep.
+      expectNearlyEqualBounds(barrel, {
+        minX: 30,
+        minY: 50,
+        minZ: 0,
+        maxX: 30 + BARREL_AREA_SIZE,
+        maxY: 50,
+        maxZ: BARREL_AREA_SIZE,
+      });
+      // The size and the angles of the barrel stay its own, local values.
+      expect(barrel.width).to.be(BARREL_AREA_SIZE);
+      expect(barrel.rotationX).to.be(90);
+      expect(barrel.isLocalGeometry).to.be(true);
     });
   });
 });

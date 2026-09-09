@@ -38,6 +38,8 @@ import {
 import {
   applyParameterSpecs,
   applyPlannedParameterChanges,
+  changeGetterValueTypeInSetterEvents,
+  getLinkedSetterNames,
   getPlannedUserParametersCount,
   planParameterChanges,
   type ParameterChange,
@@ -202,11 +204,14 @@ const setFunctionTypeName = (
       ? gd.EventsFunction.ActionWithOperator
       : gd.EventsFunction.Action
   );
-  if (name === 'Expression' || name === 'StringExpression') {
-    setExpressionTypeName(
-      eventsFunction,
-      name === 'StringExpression' ? 'string' : 'number'
-    );
+  // Only the legacy `StringExpression` says what the function returns: the
+  // other types returning a value keep it. A function returning nothing has
+  // no return type: it returns a number again (the default) if it becomes an
+  // expression later.
+  if (name === 'StringExpression') {
+    setExpressionTypeName(eventsFunction, 'string');
+  } else if (!eventsFunction.isExpression()) {
+    setExpressionTypeName(eventsFunction, 'expression');
   }
 };
 
@@ -669,14 +674,8 @@ const renameGetterOfSiblingFunctions = (
   oldName: string,
   newName: string
 ) => {
-  for (
-    let index = 0;
-    index < functionsContainer.getEventsFunctionsCount();
-    index++
-  ) {
-    const siblingFunction = functionsContainer.getEventsFunctionAt(index);
-    if (siblingFunction.getGetterName() === oldName)
-      siblingFunction.setGetterName(newName);
+  for (const setterName of getLinkedSetterNames(functionsContainer, oldName)) {
+    functionsContainer.getEventsFunction(setterName).setGetterName(newName);
   }
 };
 
@@ -875,8 +874,17 @@ export const createCustomFunction: EditorFunction = {
       functionName,
       owner,
       scopeLabel: resolvedScope.label,
-      functionTypeName,
+      // The type the function will have, copied one included.
+      functionTypeName: createdFunctionTypeName,
       parametersCount: parameterSpecs.length + duplicatedParametersCount,
+      typeField:
+        functionTypeName === null && duplicatedFunction
+          ? '`duplicated_function_name` (the copy keeps the type of its source)'
+          : '`function_type`',
+      parametersField:
+        parameterSpecs.length === 0 && duplicatedFunction
+          ? '`duplicated_function_name` (the copy keeps the parameters of its source)'
+          : '`parameters`',
     });
     if (lifecycleRejection) return makeGenericFailure(lifecycleRejection);
     if (functionsContainer.hasEventsFunctionNamed(functionName)) {
@@ -897,12 +905,24 @@ export const createCustomFunction: EditorFunction = {
       return makeGenericFailure(parsedIsAsync.message);
 
     const getterName = SafeExtractor.extractStringProperty(args, 'getter_name');
-    if (functionTypeName === 'ActionWithOperator') {
+    if (createdFunctionTypeName === 'ActionWithOperator') {
+      // The getter of a copy is the one of its source unless the call says.
+      const effectiveGetterName =
+        getterName ||
+        (duplicatedFunction && duplicatedFunction.getGetterName()) ||
+        null;
       const getterRejection = getGetterRejection(
         functionsContainer,
-        getterName
+        effectiveGetterName
       );
       if (getterRejection) return makeGenericFailure(getterRejection);
+      if (parameterSpecs.length > 0) {
+        return makeGenericFailure(
+          `An "ActionWithOperator" takes the parameters of its getter (and a generated \`Value\`): GDevelop ignores parameters declared on it. Remove \`parameters\`, and declare them on the getter${
+            effectiveGetterName ? ` "${effectiveGetterName}"` : ''
+          } with change_custom_function instead.`
+        );
+      }
     }
 
     const messages = [];
@@ -1194,6 +1214,27 @@ const planFunctionSettings = ({
     );
     if (getterRejection) return { success: false, message: getterRejection };
   }
+  // A getter must keep returning a value for the actions reading it.
+  const linkedSetterNames = getLinkedSetterNames(
+    functionsContainer,
+    eventsFunction.getName()
+  );
+  if (
+    linkedSetterNames.length > 0 &&
+    finalFunctionTypeName !== getFunctionTypeName(eventsFunction) &&
+    !EXPRESSION_FUNCTION_TYPES.includes(finalFunctionTypeName)
+  ) {
+    return {
+      success: false,
+      message: `"${eventsFunction.getName()}" is the getter of ${listQuoted(
+        linkedSetterNames
+      )}: an "ActionWithOperator" changes the value its getter returns, so "${eventsFunction.getName()}" must keep a type returning a value (${listQuoted(
+        EXPRESSION_FUNCTION_TYPES
+      )}). Change or delete ${
+        linkedSetterNames.length > 1 ? 'these actions' : 'this action'
+      } first.`,
+    };
+  }
   const hasExpressionTypeSetting = plannedSettings.some(
     plannedSetting => plannedSetting.settingName === 'expressionType'
   );
@@ -1210,8 +1251,8 @@ const planFunctionSettings = ({
   }
   return {
     success: true,
-    // Changing `functionType` resets what an expression returns: whatever the
-    // order of the call, `expressionType` is applied after it.
+    // A `StringExpression` type forces what the function returns: whatever
+    // the order of the call, `expressionType` is applied after `functionType`.
     plannedSettings: [
       ...plannedSettings.filter(
         plannedSetting => plannedSetting.settingName !== 'expressionType'
@@ -1393,6 +1434,9 @@ export const changeCustomFunction: EditorFunction = {
     let changedCount = 0;
     let needsCodeRegeneration = false;
 
+    const returnTypeBefore = eventsFunction.isExpression()
+      ? getExpressionTypeName(eventsFunction)
+      : null;
     for (const plannedSetting of plannedSettingsResult.plannedSettings) {
       const detail = plannedSetting.apply();
       if (!detail) continue;
@@ -1401,6 +1445,17 @@ export const changeCustomFunction: EditorFunction = {
       if (!METADATA_ONLY_SETTING_NAMES.includes(plannedSetting.settingName)) {
         needsCodeRegeneration = true;
       }
+    }
+    if (
+      eventsFunction.isExpression() &&
+      getExpressionTypeName(eventsFunction) !== returnTypeBefore
+    ) {
+      // The `Value` the actions with operator receive is of this type.
+      changeGetterValueTypeInSetterEvents({
+        project,
+        resolvedScope,
+        getter: eventsFunction,
+      });
     }
 
     if (plannedParameterChanges) {

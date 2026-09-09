@@ -10,6 +10,7 @@ namespace gdjs {
     'getStatus',
     'profiler.start',
     'profiler.stop',
+    'resources.dump',
     'gameplayTest.run',
     'gameplayTest.stop',
   ]);
@@ -319,33 +320,49 @@ namespace gdjs {
         } else if (data.command === 'call') {
           that.call(data.path, data.args);
         } else if (data.command === 'profiler.start') {
-          runtimeGame.startCurrentSceneProfiler(function (stoppedProfiler) {
-            that.sendProfilerOutput(
-              stoppedProfiler.getFramesAverageMeasures(),
-              stoppedProfiler.getStats()
-            );
-            that.sendProfilerStopped();
+          runtimeGame.startProfiler({
+            onChunk: (chunk) => {
+              that.sendProfilerChunk(chunk);
+            },
+            onStopped: (stoppedProfiler) => {
+              // Kept for the tools reading only the averages (MCP, tests).
+              that.sendProfilerOutput(
+                stoppedProfiler.getFramesAverageMeasures(),
+                stoppedProfiler.getStats()
+              );
+              that.sendProfilerStopped(stoppedProfiler);
+            },
           });
-          that.sendProfilerStarted();
+          const profiler = runtimeGame.getProfiler();
+          if (profiler) {
+            // Answered even when a recording was already running (`wasStarted`
+            // is then false): the editor may have missed it (it was started as
+            // soon as the game connected) and must not stay out of sync.
+            that.sendProfilerStarted(profiler);
+          }
         } else if (data.command === 'profiler.stop') {
-          runtimeGame.stopCurrentSceneProfiler();
+          runtimeGame.stopProfiler();
         } else if (data.command === 'eventsExecutionTracker.start') {
-          // Sent again by the editor to change the speed: re-starting is fine.
-          const gameSpeedFactor: float | undefined =
-            data.payload && data.payload.gameSpeedFactor;
-          runtimeGame.setGameSpeedFactor(
-            typeof gameSpeedFactor === 'number' ? gameSpeedFactor : 1
-          );
+          // Sent again by the editor is fine: the tracker is re-created.
           runtimeGame.startEventsExecutionTracking((output) => {
             that.sendEventsExecutionTrackerOutput(output);
           });
         } else if (data.command === 'eventsExecutionTracker.stop') {
           runtimeGame.stopEventsExecutionTracking();
-          runtimeGame.setGameSpeedFactor(1);
+        } else if (data.command === 'setGameSpeedFactor') {
+          const gameSpeedFactor: float | undefined =
+            data.payload && data.payload.gameSpeedFactor;
+          runtimeGame.setGameSpeedFactor(
+            typeof gameSpeedFactor === 'number' ? gameSpeedFactor : 1
+          );
         } else if (data.command === 'stepFrame') {
           runtimeGame.stepOneFrame();
         } else if (data.command === 'evaluateExpression') {
           that.sendExpressionValue(data.messageId, data.payload.code);
+        } else if (data.command === 'inspector.dump') {
+          that.sendInspectedValue(data.messageId, data.payload.path);
+        } else if (data.command === 'resources.dump') {
+          that.sendResourcesDebugState(data.messageId);
         } else if (data.command === 'hotReload') {
           const runtimeGameOptions: RuntimeGameOptions =
             data.payload.runtimeGameOptions;
@@ -618,9 +635,13 @@ namespace gdjs {
             gdjs.gameplayTests.stopCurrentGameplayTest();
           }
         } else if (data.command === 'hardReload') {
+          // `clearCaches` restarts the game from scratch: caches emptied, and
+          // resources downloaded again.
           // This usually means that the preview was modified so much that an entire reload
           // is needed, or that the runtime itself could have been modified.
-          this.launchHardReload();
+          this.launchHardReload({
+            clearCaches: !!(data.payload && data.payload.clearCaches),
+          });
         } else {
           logger.info(
             'Unknown command "' + data.command + '" received by the debugger.'
@@ -889,13 +910,12 @@ namespace gdjs {
     /**
      * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
      */
-    sendRuntimeGameDump(): void {
+    /**
+     * The replacer used when serializing (a part of) the running game: it
+     * removes what is too big, circular or useless for the debugger.
+     */
+    private _getDumpReplacer(): (key: string, value: any) => any {
       const that = this;
-      const message = { command: 'dump', payload: this._runtimegame };
-      const serializationStartTime = Date.now();
-
-      // Stringify the message, excluding some known data that are big and/or not
-      // useful for the debugger.
       const excludedValues = [that._runtimegame.getGameData()];
       const excludedKeys = [
         // Exclude reference to the debugger
@@ -932,17 +952,24 @@ namespace gdjs {
         '_baseTexture',
         '_invalidTexture',
       ];
+      return function (key, value) {
+        if (
+          excludedValues.indexOf(value) !== -1 ||
+          excludedKeys.indexOf(key) !== -1
+        ) {
+          return '[Removed from the debugger]';
+        }
+        return value;
+      };
+    }
+
+    sendRuntimeGameDump(): void {
+      const message = { command: 'dump', payload: this._runtimegame };
+      const serializationStartTime = Date.now();
+
       const stringifiedMessage = circularSafeStringify(
         message,
-        function (key, value) {
-          if (
-            excludedValues.indexOf(value) !== -1 ||
-            excludedKeys.indexOf(key) !== -1
-          ) {
-            return '[Removed from the debugger]';
-          }
-          return value;
-        },
+        this._getDumpReplacer(),
         /* Limit maximum depth to prevent any crashes */
         22
       );
@@ -956,6 +983,34 @@ namespace gdjs {
         );
       }
       this._sendMessage(stringifiedMessage);
+    }
+
+    /**
+     * Send what is at the given path in the running game (the object selected
+     * in the inspector of the debugger), as an answer to `inspector.dump`.
+     *
+     * Only this part of the game is serialized: the editor can ask for it
+     * several times per second, unlike the whole game dump.
+     */
+    sendInspectedValue(messageId: number, path: string[]): void {
+      let value: any = this._runtimegame;
+      for (const key of path || []) {
+        if (value === null || value === undefined) break;
+        value = value[key];
+      }
+
+      this._sendMessage(
+        circularSafeStringify(
+          {
+            command: 'inspector.dumped',
+            messageId,
+            payload: value === undefined ? null : value,
+          },
+          this._getDumpReplacer(),
+          /* Limit maximum depth to prevent any crashes */
+          8
+        )
+      );
     }
 
     /**
@@ -1025,6 +1080,29 @@ namespace gdjs {
     }
 
     /**
+     * Send a snapshot of every resource of the game with its loading state,
+     * as an answer to the `resources.dump` command.
+     */
+    sendResourcesDebugState(messageId?: number): void {
+      let payload: gdjs.ResourcesDebugState | { error: string };
+      try {
+        payload = this._runtimegame
+          .getResourceLoader()
+          .getResourcesDebugState();
+      } catch (error) {
+        payload = { error: String(error) };
+      }
+      // Plain data without cycles: the cheaper stringify is enough.
+      this._sendMessage(
+        JSON.stringify({
+          command: 'resources.dumped',
+          messageId,
+          payload,
+        })
+      );
+    }
+
+    /**
      * Send the instructions of the events that were executed, and the duration
      * of their last execution.
      */
@@ -1042,11 +1120,27 @@ namespace gdjs {
     /**
      * Callback called when profiling is starting.
      */
-    sendProfilerStarted(): void {
+    sendProfilerStarted(profiler: gdjs.Profiler): void {
       this._sendMessage(
         circularSafeStringify({
           command: 'profiler.started',
-          payload: null,
+          payload: {
+            recordingId: profiler.getRecordingId(),
+            startedAtGameTimeMs: profiler.getRecordingStartGameTimeMs(),
+          },
+        })
+      );
+    }
+
+    /**
+     * Send a batch of recorded frames while profiling.
+     */
+    sendProfilerChunk(chunk: gdjs.ProfilerChunk): void {
+      // Plain data without cycles: the cheaper stringify is enough.
+      this._sendMessage(
+        JSON.stringify({
+          command: 'profiler.chunk',
+          payload: chunk,
         })
       );
     }
@@ -1054,11 +1148,16 @@ namespace gdjs {
     /**
      * Callback called when profiling is ending.
      */
-    sendProfilerStopped(): void {
+    sendProfilerStopped(profiler: gdjs.Profiler): void {
       this._sendMessage(
         circularSafeStringify({
           command: 'profiler.stopped',
-          payload: null,
+          payload: {
+            recordingId: profiler.getRecordingId(),
+            framesCount: profiler.getRecordedFramesCount(),
+            endedAtGameTimeMs: this._runtimegame.getGameTimeMs(),
+            stoppedByCap: profiler.isStoppedByCap(),
+          },
         })
       );
     }
@@ -1315,9 +1414,37 @@ namespace gdjs {
       );
     }
 
-    launchHardReload(): void {
+    launchHardReload(options?: { clearCaches?: boolean }): void {
+      const clearCaches = !!(options && options.clearCaches);
+      const reload = () => {
+        this._launchHardReloadNow(clearCaches);
+      };
+      if (
+        clearCaches &&
+        typeof caches !== 'undefined' &&
+        typeof caches.keys === 'function'
+      ) {
+        // Service worker caches (browser previews) are emptied before reloading.
+        caches
+          .keys()
+          .then((cacheNames) =>
+            Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)))
+          )
+          .then(reload, reload);
+        return;
+      }
+      reload();
+    }
+
+    private _launchHardReloadNow(clearCaches: boolean): void {
       try {
         const reloadUrl = new URL(location.href);
+        if (clearCaches) {
+          // Read by the resource loader to bypass the HTTP cache of every file.
+          reloadUrl.searchParams.set('resourcesCacheBurst', '' + Date.now());
+        } else {
+          reloadUrl.searchParams.delete('resourcesCacheBurst');
+        }
 
         // Construct the initial status to be restored.
         const initialRuntimeGameStatus =

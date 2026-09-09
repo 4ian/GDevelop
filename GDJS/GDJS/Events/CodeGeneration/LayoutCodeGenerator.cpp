@@ -182,7 +182,13 @@ gd::String LayoutCodeGenerator::GenerateLayoutCompleteCode(
   gd::String codeNamespace = "gdjs." + sceneMangledName + "Code";
 
   gd::String layoutCode = EventsCodeGenerator::GenerateLayoutCode(
-      project, layout, codeNamespace, includeFiles, diagnosticReport, compilationForRuntime);
+      project,
+      layout,
+      codeNamespace,
+      includeFiles,
+      diagnosticReport,
+      compilationForRuntime,
+      generateEventsExecutionTracking);
 
   // Export the symbols to avoid them being stripped by the Closure Compiler:
   gd::String exportCode =

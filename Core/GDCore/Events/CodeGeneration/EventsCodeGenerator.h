@@ -316,6 +316,24 @@ class GD_CORE_API EventsCodeGenerator {
   }
 
   /**
+   * \brief Return true if the generated code must report the execution of
+   * the instructions to the editor (see
+   * GenerateInstructionExecutionTrackingBegin).
+   */
+  bool GenerateEventsExecutionTracking() const {
+    return generateEventsExecutionTracking;
+  }
+
+  /**
+   * \brief Set if the generated code must report the execution of the
+   * instructions to the editor. Off by default: the tracking has a cost, it is
+   * only enabled for the previews launched with the debugger.
+   */
+  void SetGenerateEventsExecutionTracking(bool enable) {
+    generateEventsExecutionTracking = enable;
+  }
+
+  /**
    * \brief Report that an error occurred during code generation ( Event code
    * won't be generated )
    */
@@ -896,6 +914,9 @@ class GD_CORE_API EventsCodeGenerator {
   bool errorOccurred;          ///< Must be set to true if an error occurred.
   bool compilationForRuntime;  ///< Is set to true if the code generation is
                                ///< made for runtime only.
+  bool generateEventsExecutionTracking;  ///< Is set to true to report the
+                                         ///< executed instructions to the
+                                         ///< editor (debugger).
   gd::String currentEventExecutionId;  ///< Id, for the editor, of the event
                                        ///< being generated (see
                                        ///< GetOriginalEventExecutionId).

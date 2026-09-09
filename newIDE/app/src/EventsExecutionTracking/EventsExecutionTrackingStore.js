@@ -73,6 +73,15 @@ export class EventsExecutionTrackingStore {
   _expirationTimeoutId: TimeoutID | null = null;
   _previewDebuggerServer: ?PreviewDebuggerServer = null;
   /**
+   * The values of the game are only read while it is debugged: a preview
+   * launched without the debugger is left alone.
+   */
+  _isDebuggerOpened: boolean = false;
+
+  setDebuggerOpened(isDebuggerOpened: boolean): void {
+    this._isDebuggerOpened = isDebuggerOpened;
+  }
+  /**
    * When the game advances frame by frame, what a frame executed stays
    * highlighted until the next frame instead of fading out.
    */
@@ -92,14 +101,6 @@ export class EventsExecutionTrackingStore {
     }
   }
 
-  /** Ask the paused previews to advance of one frame. */
-  stepOneFrame(): void {
-    const previewDebuggerServer = this._previewDebuggerServer;
-    if (!previewDebuggerServer) return;
-    previewDebuggerServer.getExistingPreviewDebuggerIds().forEach(id => {
-      previewDebuggerServer.sendMessage(id, { command: 'stepFrame' });
-    });
-  }
   /** The expressions of the "watched variables" panel, kept while it's closed. */
   _watchedExpressions: Array<string> = [];
 
@@ -124,6 +125,7 @@ export class EventsExecutionTrackingStore {
 
   hasRunningPreview(): boolean {
     return (
+      this._isDebuggerOpened &&
       !!this._previewDebuggerServer &&
       this._previewDebuggerServer.getExistingPreviewDebuggerIds().length > 0
     );

@@ -653,6 +653,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   useEventsExecutionTracking({
     previewDebuggerServer,
     mode: eventsExecutionTrackingMode,
+    isDebuggerOpened: !!getEditorTabOpenedWithKey(state.editorTabs, 'debugger'),
   });
   const {
     ensureInteractionHappened,
@@ -2830,6 +2831,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       forceDiagnosticReport,
       launchCaptureOptions,
       isForInGameEdition,
+      isForDebugger,
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
@@ -2992,6 +2994,14 @@ const MainFrame = (props: Props): React.MixedElement => {
           numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
           isForInGameEdition: !!isForInGameEdition,
           isForGameplayTest: false,
+          // The executed instructions are only reported when the game is
+          // debugged: it is not slowed down otherwise. `isForDebugger` is
+          // given when the debugger is being opened, as the editor tabs are
+          // only updated on the next render.
+          instrumentEventsExecution:
+            !isForInGameEdition &&
+            (!!isForDebugger ||
+              !!getEditorTabOpenedWithKey(state.editorTabs, 'debugger')),
           editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
           editorCameraState3D: isForInGameEdition
             ? isForInGameEdition.editorCameraState3D
@@ -3082,6 +3092,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const launchNewPreview = React.useCallback(
     // $FlowFixMe[missing-local-annot]
     async options => {
+      const isForDebugger = options ? options.isForDebugger : false;
       const launchCaptureOptions =
         currentProject && !hasNonEditionPreviewsRunning
           ? // TODO Rename it getPreviewLaunchCaptureOptions
@@ -3095,6 +3106,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         networkPreview: false,
         numberOfWindows,
         launchCaptureOptions,
+        isForDebugger,
       });
     },
     [
@@ -3186,6 +3198,13 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     [hardReloadAllPreviews, launchPreview]
   );
+
+  const closeAllPreviews = React.useCallback(() => {
+    const previewLauncher = _previewLauncher.current;
+    if (previewLauncher && previewLauncher.closeAllPreviews) {
+      previewLauncher.closeAllPreviews();
+    }
+  }, []);
 
   const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = React.useMemo(
     () => ({
@@ -3474,9 +3493,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   const launchDebuggerAndPreview = React.useCallback(
     () => {
       openDebugger();
-      launchNewPreview();
+      // All the debugging tools are enabled on this preview: the execution of
+      // the events is followed too (at normal speed, unless another speed was
+      // already chosen).
+      setEventsExecutionTrackingMode(mode =>
+        mode === 'off' ? 'normal-speed' : mode
+      );
+      launchNewPreview({ isForDebugger: true });
     },
-    [openDebugger, launchNewPreview]
+    [openDebugger, launchNewPreview, setEventsExecutionTrackingMode]
   );
 
   const openInstructionOrExpression = (type: string) => {
@@ -6089,6 +6114,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     launchNewPreview: launchNewPreview,
     launchNetworkPreview: launchNetworkPreview,
     launchHotReloadPreview: launchHotReloadPreview,
+    closeAllPreviews: closeAllPreviews,
     launchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
     setPreviewOverride: setPreviewOverride,
     openVersionHistoryPanel: openVersionHistoryPanel,

@@ -280,7 +280,7 @@ const WatchedVariablesPanel = ({ project, layout, onClose }: Props) => {
     if (!evaluation) {
       return (
         <Text noMargin size="body2" color="secondary">
-          <Trans>No preview running</Trans>
+          <Trans>Start the debugger</Trans>
         </Text>
       );
     }

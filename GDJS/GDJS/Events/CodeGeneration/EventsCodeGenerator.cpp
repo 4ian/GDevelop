@@ -43,7 +43,8 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
     gd::String functionPreEventsCode,
     const gd::EventsList& events,
     gd::String functionPostEventsCode,
-    gd::String functionReturnCode) {
+    gd::String functionReturnCode,
+    const gd::String& profilerSectionName) {
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;
   gd::EventsCodeGenerationContext context(&maxDepthLevelReached);
@@ -55,6 +56,18 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   codeGenerator.PreprocessEventList(generatedEvents);
   gd::String wholeEventsCode =
       codeGenerator.GenerateEventsListCode(generatedEvents, context);
+
+  // In previews, measure the time spent in the function. `finally` keeps the
+  // profiler sections balanced when the events return early.
+  gd::String profilerSectionBegin =
+      codeGenerator.GenerateProfilerSectionBegin(profilerSectionName);
+  if (!profilerSectionBegin.empty()) {
+    wholeEventsCode =
+        profilerSectionBegin + "\ntry {\n" + wholeEventsCode +
+        "\n} finally {\n" +
+        codeGenerator.GenerateProfilerSectionEnd(profilerSectionName) +
+        "\n}\n";
+  }
 
   // Extra declarations needed by events
   gd::String globalDeclarations;
@@ -107,10 +120,13 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     gd::DiagnosticReport& diagnosticReport,
-    bool compilationForRuntime) {
+    bool compilationForRuntime,
+    bool generateEventsExecutionTracking) {
   EventsCodeGenerator codeGenerator(project, scene);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetGenerateEventsExecutionTracking(
+      generateEventsExecutionTracking);
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
@@ -174,7 +190,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       fullPreludeCode,
       eventsFunction.GetEvents(),
       "",
-      codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction),
+      eventsFunctionsExtension.GetName() + "::" + eventsFunction.GetName());
 
   // TODO: the editor should pass the diagnostic report and display it to the
   // user. For now, display it in the console.
@@ -270,7 +287,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       fullPreludeCode,
       eventsFunction.GetEvents(),
       "",
-      codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction),
+      eventsFunctionsExtension.GetName() + "::" +
+          eventsBasedBehavior.GetName() + "::" + eventsFunction.GetName());
 
   // TODO: the editor should pass the diagnostic report and display it to the
   // user. For now, display it in the console.
@@ -377,7 +396,9 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       fullPreludeCode,
       eventsFunction.GetEvents(),
       endingCode,
-      codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction),
+      eventsFunctionsExtension.GetName() + "::" + eventsBasedObject.GetName() +
+          "::" + eventsFunction.GetName());
 
   // TODO: the editor should pass the diagnostic report and display it to the
   // user. For now, display it in the console.
@@ -1565,24 +1586,33 @@ gd::String EventsCodeGenerator::GenerateBooleanFullName(
 
 gd::String EventsCodeGenerator::GenerateProfilerSectionBegin(
     const gd::String& section) {
-  if (GenerateCodeForRuntime()) return "";
+  if (GenerateCodeForRuntime() || section.empty()) return "";
 
-  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().begin(" +
+  // `runtimeScene` is a `RuntimeInstanceContainer` in the functions of
+  // events-based objects: `getScene()` gives the scene (and its profiler) in
+  // every context.
+  return "if (runtimeScene.getScene().getProfiler()) { "
+         "runtimeScene.getScene().getProfiler().begin(" +
          ConvertToStringExplicit(section) + "); }";
 }
 
 gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
     const gd::String& section) {
-  if (GenerateCodeForRuntime()) return "";
+  if (GenerateCodeForRuntime() || section.empty()) return "";
 
-  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
+  return "if (runtimeScene.getScene().getProfiler()) { "
+         "runtimeScene.getScene().getProfiler().end(" +
          ConvertToStringExplicit(section) + "); }";
 }
 
 gd::String EventsCodeGenerator::GenerateInstructionExecutionTrackingBegin(
     const gd::String& instructionExecutionId) {
-  // The tracker only exists in previews, when the editor asks for it.
-  if (GenerateCodeForRuntime() || instructionExecutionId.empty()) return "";
+  // Only for the previews launched with the debugger: nothing is generated
+  // (and nothing costs anything) otherwise, and never for exported games.
+  if (!GenerateEventsExecutionTracking() || GenerateCodeForRuntime() ||
+      instructionExecutionId.empty()) {
+    return "";
+  }
 
   return "if (gdjs.eventsExecutionTracker) { "
          "gdjs.eventsExecutionTracker.begin(" +
@@ -1591,7 +1621,10 @@ gd::String EventsCodeGenerator::GenerateInstructionExecutionTrackingBegin(
 
 gd::String EventsCodeGenerator::GenerateInstructionExecutionTrackingEnd(
     const gd::String& instructionExecutionId) {
-  if (GenerateCodeForRuntime() || instructionExecutionId.empty()) return "";
+  if (!GenerateEventsExecutionTracking() || GenerateCodeForRuntime() ||
+      instructionExecutionId.empty()) {
+    return "";
+  }
 
   return "\nif (gdjs.eventsExecutionTracker) { "
          "gdjs.eventsExecutionTracker.end(" +

@@ -4403,6 +4403,7 @@ ParticleEmitterObject implements ObjectConfiguration;
 [Prefix="gdjs::"]
 interface LayoutCodeGenerator {
     void LayoutCodeGenerator([Ref] Project project);
+    void SetGenerateEventsExecutionTracking(boolean enable);
     [Const, Value] DOMString GenerateLayoutCompleteCode(
         [Const, Ref] Layout layout,
         [Ref] SetString includes,
@@ -4475,6 +4476,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetNativeMobileApp(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
+    [Ref] PreviewExportOptions SetInstrumentEventsExecution(boolean enable);
     [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);
     [Ref] PreviewExportOptions SetInGameEditorSettingsJson([Const] DOMString inGameEditorSettingsJson);
     [Ref] PreviewExportOptions SetEditorId([Const] DOMString editorId);

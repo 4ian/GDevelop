@@ -45,6 +45,7 @@ struct PreviewExportOptions {
         nativeMobileApp(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
+        instrumentEventsExecution(false),
         isInGameEdition(false),
         nonRuntimeScriptsCacheBurst(0),
         inAppTutorialMessageInPreview(""),
@@ -227,6 +228,15 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set if the events code must report the executed instructions to
+   * the editor (previews launched with the debugger only: it has a cost).
+   */
+  PreviewExportOptions &SetInstrumentEventsExecution(bool enable) {
+    instrumentEventsExecution = enable;
+    return *this;
+  }
+
+  /**
    * \brief Set if the export is made for being edited in the editor.
    */
   PreviewExportOptions &SetIsInGameEdition(bool enable) {
@@ -389,6 +399,7 @@ struct PreviewExportOptions {
   bool shouldGenerateScenesEventsCode = true;
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
+  bool instrumentEventsExecution;
   bool isInGameEdition;
   gd::String editorId;
   gd::String editorCamera3DCameraMode;
@@ -585,7 +596,8 @@ class ExporterHelper {
       gd::String outputDir,
       std::vector<gd::String> &includesFiles,
       gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport,
-      bool exportForPreview);
+      bool exportForPreview,
+      bool instrumentEventsExecution = false);
 
   /**
    * \brief Add the project effects include files.

@@ -3253,6 +3253,7 @@ export class ParticleEmitterObject extends ObjectConfiguration {
 
 export class LayoutCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
+  setGenerateEventsExecutionTracking(enable: boolean): void;
   generateLayoutCompleteCode(layout: Layout, includes: SetString, diagnosticReport: DiagnosticReport, compilationForRuntime: boolean): string;
   generateExpressionEvaluationCode(layout: Layout, type: string, expression: string, objectName: string): string;
 }
@@ -3301,6 +3302,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setNativeMobileApp(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
+  setInstrumentEventsExecution(enable: boolean): PreviewExportOptions;
   setIsInGameEdition(enable: boolean): PreviewExportOptions;
   setInGameEditorSettingsJson(inGameEditorSettingsJson: string): PreviewExportOptions;
   setEditorId(editorId: string): PreviewExportOptions;

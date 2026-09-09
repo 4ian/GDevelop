@@ -36,6 +36,14 @@ class LayoutCodeGenerator {
       bool compilationForRuntime);
 
   /**
+   * \brief Set if the generated code must report the execution of the
+   * instructions to the editor (only for previews launched with the debugger).
+   */
+  void SetGenerateEventsExecutionTracking(bool enable) {
+    generateEventsExecutionTracking = enable;
+  }
+
+  /**
    * \brief Generate the body of a JavaScript function `(runtimeScene) => ...`
    * evaluating an expression in the running scene, so that the editor can
    * display the value of a parameter while a preview runs.
@@ -54,6 +62,7 @@ class LayoutCodeGenerator {
 
  private:
   const gd::Project& project;
+  bool generateEventsExecutionTracking = false;
 };
 
 }  // namespace gdjs

@@ -50,6 +50,14 @@ const openPreviewWindow = ({
     };
 
     let previewWindow = new BrowserWindow(browserWindowOptions);
+    if (
+      !isDev &&
+      (process.platform === 'win32' || process.platform === 'darwin')
+    ) {
+      // Like the windows of the editor: black in screenshots and recordings,
+      // except in development where everything stays capturable.
+      previewWindow.setContentProtection(true);
+    }
 
     previewWindow.setMenuBarVisibility(hideMenuBar);
     previewWindow.webContents.on('devtools-opened', () => {

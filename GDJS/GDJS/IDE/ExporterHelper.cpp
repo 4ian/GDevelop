@@ -278,7 +278,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                           codeOutputDir,
                           includesFiles,
                           wholeProjectDiagnosticReport,
-                          true)) {
+                          true,
+                          options.instrumentEventsExecution)) {
       return false;
     }
     previousTime = LogTimeSpent("Events code export", previousTime);
@@ -1193,6 +1194,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
+  InsertUnique(includesFiles, "resource-load-tracker.js");
   InsertUnique(includesFiles, "events-execution-tracker.js");
   InsertUnique(includesFiles, "RuntimeInstanceContainer.js");
   InsertUnique(includesFiles, "runtimescene.js");
@@ -1360,7 +1362,8 @@ bool ExporterHelper::ExportScenesEventsCode(
     gd::String outputDir,
     std::vector<gd::String> &includesFiles,
     gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport,
-    bool exportForPreview) {
+    bool exportForPreview,
+    bool instrumentEventsExecution) {
   fs.MkDir(outputDir);
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
@@ -1372,6 +1375,8 @@ bool ExporterHelper::ExportScenesEventsCode(
         wholeProjectDiagnosticReport.AddNewDiagnosticReportForScene(
             layout.GetName());
     LayoutCodeGenerator layoutCodeGenerator(project);
+    layoutCodeGenerator.SetGenerateEventsExecutionTracking(
+        exportForPreview && instrumentEventsExecution);
     gd::String eventsOutput = layoutCodeGenerator.GenerateLayoutCompleteCode(
         layout, eventsIncludes, diagnosticReport, !exportForPreview);
     gd::String filename =

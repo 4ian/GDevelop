@@ -233,6 +233,18 @@ namespace gdjs {
     _notifyScenesForGameResolutionResize: boolean = false;
 
     /**
+     * The profiler recording the frames of the running scenes, or null when
+     * not profiling. It belongs to the game (not to a scene) so that a
+     * recording survives scene changes.
+     */
+    _profiler: gdjs.Profiler | null = null;
+    _onProfilerStopped: ((stoppedProfiler: gdjs.Profiler) => void) | null =
+      null;
+
+    /** `performance.now()` (or `Date.now()`) when the game was created. */
+    _gameStartTime: float;
+
+    /**
      * When paused, the game won't step and will be freezed. Useful for debugging.
      */
     _paused: boolean = false;
@@ -292,6 +304,7 @@ namespace gdjs {
      */
     constructor(data: ProjectData, options?: RuntimeGameOptions) {
       this._options = options || {};
+      this._gameStartTime = RuntimeGame._getTimeNow();
 
       this._isPreview = this._options.isPreview || false;
       if (this._isPreview) {
@@ -1457,6 +1470,7 @@ namespace gdjs {
      */
     dispose(removeCanvas?: boolean): void {
       this.stopEventsExecutionTracking();
+      this.stopProfiler();
       if (this._inGameEditor) {
         this._inGameEditor.dispose();
       }
@@ -1704,32 +1718,127 @@ namespace gdjs {
       );
     }
 
+    private static _getTimeNow(): float {
+      return typeof performance !== 'undefined' &&
+        typeof performance.now === 'function'
+        ? performance.now()
+        : Date.now();
+    }
+
     /**
-     * Start a profiler for the currently running scene.
+     * The time elapsed since the game was created, in milliseconds. This is
+     * the common clock of everything the debugger reports (profiler frames,
+     * resources loading...).
+     */
+    getGameTimeMs(): float {
+      return RuntimeGame._getTimeNow() - this._gameStartTime;
+    }
+
+    /**
+     * Get the profiler recording the running scenes, or null if none.
+     */
+    getProfiler(): gdjs.Profiler | null {
+      return this._profiler;
+    }
+
+    /**
+     * Start recording the time spent in the sections of the engine and of the
+     * events, for every scene until `stopProfiler` is called (or the
+     * recording reaches its maximum duration).
+     *
+     * @returns false if a profiler was already running.
+     */
+    startProfiler(options: {
+      onChunk?: (chunk: gdjs.ProfilerChunk) => void;
+      onStopped?: (stoppedProfiler: gdjs.Profiler) => void;
+    }): boolean {
+      this._throwIfDisposed();
+      if (this._profiler) {
+        return false;
+      }
+      const profiler = new gdjs.Profiler(() => this.getGameTimeMs());
+      profiler.setOnChunk(options.onChunk || null);
+      profiler.setSampleProvider(() => this._samplePerformanceCounters());
+      profiler.setOnRecordingCapReached(() => {
+        if (this._profiler === profiler) {
+          this.stopProfiler();
+        }
+      });
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (currentScene) {
+        profiler.setCurrentSceneName(currentScene.getName());
+      }
+      this._profiler = profiler;
+      this._onProfilerStopped = options.onStopped || null;
+      return true;
+    }
+
+    /**
+     * Stop the running profiler, sending the last recorded frames.
+     */
+    stopProfiler(): void {
+      const stoppedProfiler = this._profiler;
+      if (!stoppedProfiler) {
+        return;
+      }
+      const onProfilerStopped = this._onProfilerStopped;
+      this._profiler = null;
+      this._onProfilerStopped = null;
+      stoppedProfiler.flushChunk();
+      stoppedProfiler.setOnChunk(null);
+      if (onProfilerStopped) {
+        onProfilerStopped(stoppedProfiler);
+      }
+    }
+
+    /**
+     * Read the memory and renderer counters put in the profiler samples.
+     */
+    private _samplePerformanceCounters(): gdjs.ProfilerPerformanceSampleSource {
+      const performanceMemory: {
+        usedJSHeapSize?: number;
+        jsHeapSizeLimit?: number;
+      } | null =
+        typeof performance !== 'undefined' && (performance as any).memory
+          ? (performance as any).memory
+          : null;
+      const threeRenderer = this._renderer.getThreeRenderer();
+      const rendererMemory = threeRenderer ? threeRenderer.info.memory : null;
+      return {
+        usedJSHeapBytes:
+          performanceMemory && performanceMemory.usedJSHeapSize !== undefined
+            ? performanceMemory.usedJSHeapSize
+            : null,
+        jsHeapSizeLimitBytes:
+          performanceMemory && performanceMemory.jsHeapSizeLimit !== undefined
+            ? performanceMemory.jsHeapSizeLimit
+            : null,
+        estimatedGpuMemoryBytes: this._resourcesLoader
+          .getImageManager()
+          .getEstimatedGpuMemoryBytes(),
+        texturesCount: rendererMemory ? rendererMemory.textures : null,
+        geometriesCount: rendererMemory ? rendererMemory.geometries : null,
+      };
+    }
+
+    /**
+     * Start a profiler.
+     * @deprecated The profiler belongs to the game: use `startProfiler`.
      * @param onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
      */
     startCurrentSceneProfiler(
       onProfilerStopped: (oldProfiler: Profiler) => void
     ) {
-      this._throwIfDisposed();
-      const currentScene = this._sceneStack.getCurrentScene();
-      if (!currentScene) {
-        return false;
-      }
-      currentScene.startProfiler(onProfilerStopped);
-      return true;
+      return this.startProfiler({ onStopped: onProfilerStopped });
     }
 
     /**
-     * Stop the profiler for the currently running scene.
+     * Stop the profiler.
+     * @deprecated The profiler belongs to the game: use `stopProfiler`.
      */
     stopCurrentSceneProfiler() {
       this._throwIfDisposed();
-      const currentScene = this._sceneStack.getCurrentScene();
-      if (!currentScene) {
-        return;
-      }
-      currentScene.stopProfiler();
+      this.stopProfiler();
     }
 
     /**

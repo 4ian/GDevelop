@@ -19,6 +19,7 @@ declare class gdPreviewExportOptions {
   setNativeMobileApp(enable: boolean): gdPreviewExportOptions;
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;
+  setInstrumentEventsExecution(enable: boolean): gdPreviewExportOptions;
   setIsInGameEdition(enable: boolean): gdPreviewExportOptions;
   setInGameEditorSettingsJson(inGameEditorSettingsJson: string): gdPreviewExportOptions;
   setEditorId(editorId: string): gdPreviewExportOptions;

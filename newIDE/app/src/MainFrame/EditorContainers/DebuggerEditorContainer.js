@@ -155,6 +155,16 @@ export class DebuggerEditorContainer extends React.Component<
           project={project}
           setToolbar={this.props.setToolbar}
           previewDebuggerServer={previewDebuggerServer}
+          onLaunchDebuggerAndPreview={this.props.onLaunchDebuggerAndPreview}
+          onClosePreviews={this.props.onClosePreviews}
+          isWatchedVariablesPanelOpen={this.props.isWatchedVariablesPanelOpen}
+          onToggleWatchedVariablesPanel={
+            this.props.onToggleWatchedVariablesPanel
+          }
+          eventsExecutionTrackingMode={this.props.eventsExecutionTrackingMode}
+          setEventsExecutionTrackingMode={
+            this.props.setEventsExecutionTrackingMode
+          }
           ref={editor => (this.editor = editor)}
         />
         <SubscriptionChecker

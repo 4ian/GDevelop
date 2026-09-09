@@ -712,6 +712,7 @@ export const runGameplayTests = async ({
             authenticatedPlayer: null,
             isForInGameEdition: false,
             isForGameplayTest: true,
+            instrumentEventsExecution: false,
             editorId: '',
             getIsMenuBarHiddenInPreview: () => true,
             getIsAlwaysOnTopInPreview: () => false,

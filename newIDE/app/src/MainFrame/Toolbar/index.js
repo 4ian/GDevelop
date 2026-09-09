@@ -160,6 +160,7 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                   onOpenDebugger={props.onOpenDebugger}
                   onNetworkPreview={props.onNetworkPreview}
                   onHotReloadPreview={props.onHotReloadPreview}
+                  onClosePreviews={props.onClosePreviews}
                   onLaunchPreviewWithDiagnosticReport={
                     props.onLaunchPreviewWithDiagnosticReport
                   }
@@ -167,18 +168,6 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                   canDoNetworkPreview={props.canDoNetworkPreview}
                   isPreviewEnabled={props.isPreviewEnabled}
                   previewState={props.previewState}
-                  eventsExecutionTrackingMode={
-                    props.eventsExecutionTrackingMode
-                  }
-                  setEventsExecutionTrackingMode={
-                    props.setEventsExecutionTrackingMode
-                  }
-                  isWatchedVariablesPanelOpen={
-                    props.isWatchedVariablesPanelOpen
-                  }
-                  onToggleWatchedVariablesPanel={
-                    props.onToggleWatchedVariablesPanel
-                  }
                   hasPreviewsRunning={props.hasPreviewsRunning}
                   openShareDialog={props.openShareDialog}
                   isSharingEnabled={props.isSharingEnabled}

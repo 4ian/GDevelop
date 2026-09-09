@@ -12,6 +12,27 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 let debuggerServerState: 'started' | 'starting' | 'stopped' = 'stopped';
 let debuggerServerAddress: ?ServerAddress = null;
 const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
+
+/**
+ * Notify all the subscribers of the debugger server. One of them failing (a
+ * bug in a panel of the editor) must never prevent the others from receiving
+ * what the preview sent.
+ */
+const forEachCallbacks = (
+  notify: (callbacks: PreviewDebuggerServerCallbacks) => void
+) => {
+  // Iterate on a copy: a subscriber can register or unregister while notified.
+  [...callbacksList].forEach(callbacks => {
+    try {
+      notify(callbacks);
+    } catch (error) {
+      console.error(
+        'Error while notifying a subscriber of the preview debugger server:',
+        error
+      );
+    }
+  });
+};
 const debuggerIds: Array<DebuggerId> = [];
 const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
@@ -26,7 +47,7 @@ const setDebuggerServerState = (
   if (debuggerServerState === newState) return;
 
   debuggerServerState = newState;
-  callbacksList.forEach(({ onServerStateChanged }) => onServerStateChanged());
+  forEachCallbacks(({ onServerStateChanged }) => onServerStateChanged());
 };
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
@@ -63,13 +84,13 @@ const handleParsedMessage = (
     }
   }
 
-  callbacksList.forEach(({ onHandleParsedMessage }) =>
+  forEachCallbacks(({ onHandleParsedMessage }) =>
     onHandleParsedMessage({ id, parsedMessage })
   );
 };
 
 const notifyConnectionClosed = (id: DebuggerId) => {
-  callbacksList.forEach(({ onConnectionClosed }) =>
+  forEachCallbacks(({ onConnectionClosed }) =>
     onConnectionClosed({
       id,
       debuggerIds: getExistingDebuggerIds(),
@@ -138,7 +159,7 @@ class LocalPreviewDebuggerServer {
           serverStartPromiseCompleted = true;
         }
 
-        callbacksList.forEach(({ onErrorReceived }) => onErrorReceived(err));
+        forEachCallbacks(({ onErrorReceived }) => onErrorReceived(err));
       });
 
       ipcRenderer.on('debugger-connection-closed', (event, { id }) => {
@@ -150,7 +171,7 @@ class LocalPreviewDebuggerServer {
 
       ipcRenderer.on('debugger-connection-opened', (event, { id }) => {
         debuggerIds.push(id);
-        callbacksList.forEach(({ onConnectionOpened }) =>
+        forEachCallbacks(({ onConnectionOpened }) =>
           onConnectionOpened({
             id,
             debuggerIds: getExistingDebuggerIds(),
@@ -161,7 +182,7 @@ class LocalPreviewDebuggerServer {
       ipcRenderer.on(
         'debugger-connection-errored',
         (event, { id, errorMessage }) => {
-          callbacksList.forEach(({ onConnectionErrored }) =>
+          forEachCallbacks(({ onConnectionErrored }) =>
             onConnectionErrored({
               id,
               errorMessage,
@@ -248,14 +269,20 @@ class LocalPreviewDebuggerServer {
       message: JSON.stringify(message),
     });
   }
-  sendMessageWithResponse(message: Object): Promise<Object> {
+  sendMessageWithResponse(
+    message: Object,
+    debuggerId?: DebuggerId,
+    timeoutMs?: number
+  ): Promise<Object> {
     const messageId = nextMessageWithResponseId;
     nextMessageWithResponseId++;
-    for (const id of getExistingDebuggerIds()) {
+    const targetIds =
+      debuggerId != null ? [debuggerId] : getExistingDebuggerIds();
+    for (const id of targetIds) {
       this.sendMessage(id, { ...message, messageId });
     }
 
-    const timeout = 1000;
+    const timeout = timeoutMs || 1000;
     const promise = new Promise<Object>((resolve, reject) => {
       responseCallbacks.set(messageId, resolve);
       setTimeout(() => {
@@ -299,7 +326,7 @@ class LocalPreviewDebuggerServer {
     }
 
     embeddedGameFrameWindow = embeddedWindow;
-    callbacksList.forEach(({ onConnectionOpened }) =>
+    forEachCallbacks(({ onConnectionOpened }) =>
       onConnectionOpened({
         id: 'embedded-game-frame',
         debuggerIds: getExistingDebuggerIds(),
@@ -329,7 +356,7 @@ class LocalPreviewDebuggerServer {
     }
 
     gameplayTestFrameWindow = embeddedWindow;
-    callbacksList.forEach(({ onConnectionOpened }) =>
+    forEachCallbacks(({ onConnectionOpened }) =>
       onConnectionOpened({
         id: 'gameplay-test-frame',
         debuggerIds: getExistingDebuggerIds(),

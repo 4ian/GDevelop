@@ -95,9 +95,17 @@ describe('libGD.js - GDJS events execution tracking code generation integration 
     return { project, layout, externalEvents };
   };
 
-  const generateLayoutCode = (project, layout, compilationForRuntime) => {
+  const generateLayoutCode = (
+    project,
+    layout,
+    compilationForRuntime,
+    generateEventsExecutionTracking = true
+  ) => {
     const includeFiles = new gd.SetString();
     const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+    layoutCodeGenerator.setGenerateEventsExecutionTracking(
+      generateEventsExecutionTracking
+    );
     const diagnosticReport = new gd.DiagnosticReport();
     const code = layoutCodeGenerator.generateLayoutCompleteCode(
       layout,
@@ -148,6 +156,9 @@ describe('libGD.js - GDJS events execution tracking code generation integration 
     // Exported games are never slowed down by the tracking.
     const runtimeCode = generateLayoutCode(project, layout, true);
     expect(runtimeCode).not.toContain('eventsExecutionTracker');
+    // Neither are the previews launched without the debugger.
+    const plainPreviewCode = generateLayoutCode(project, layout, false, false);
+    expect(plainPreviewCode).not.toContain('eventsExecutionTracker');
 
     project.delete();
   });

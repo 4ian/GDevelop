@@ -12,11 +12,6 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useIsGameplayTestRunInProgress } from '../../GameplayTests/GameplayTestRunner';
-import { type EventsExecutionTrackingMode } from '../../EventsExecutionTracking/EventsExecutionTrackingStore';
-import IconButton from '../../UI/IconButton';
-import VariableTreeIcon from '../../UI/CustomSvgIcons/VariableTree';
-import SkipForwardIcon from '../../UI/CustomSvgIcons/SkipForward';
-import EventsExecutionTrackingContext from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
 
 export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: (?{ numberOfWindows: number }) => Promise<void>,
@@ -25,6 +20,7 @@ export type PreviewAndShareButtonsProps = {|
   onHotReloadPreview: () => void,
   onNetworkPreview: () => Promise<void>,
   onHotReloadPreview: () => Promise<void>,
+  onClosePreviews: () => void,
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
   setPreviewOverride: ({|
     isPreviewOverriden: boolean,
@@ -35,10 +31,6 @@ export type PreviewAndShareButtonsProps = {|
   isPreviewEnabled: boolean,
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
-  eventsExecutionTrackingMode: EventsExecutionTrackingMode,
-  setEventsExecutionTrackingMode: EventsExecutionTrackingMode => void,
-  isWatchedVariablesPanelOpen: boolean,
-  onToggleWatchedVariablesPanel: () => void,
   openShareDialog: () => void,
   isSharingEnabled: boolean,
 |};
@@ -49,16 +41,13 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     onNetworkPreview,
     onOpenDebugger,
     onHotReloadPreview,
+    onClosePreviews,
     onLaunchPreviewWithDiagnosticReport,
     canDoNetworkPreview,
     isPreviewEnabled,
     hasPreviewsRunning,
     previewState,
     setPreviewOverride,
-    eventsExecutionTrackingMode,
-    setEventsExecutionTrackingMode,
-    isWatchedVariablesPanelOpen,
-    onToggleWatchedVariablesPanel,
     openShareDialog,
     isSharingEnabled,
   }: PreviewAndShareButtonsProps) {
@@ -67,9 +56,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     // Launching or hot-reloading a preview while a gameplay test runs would
     // interfere with it (the game also ignores these commands as a backstop).
     const isGameplayTestRunInProgress = useIsGameplayTestRunInProgress();
-    const eventsExecutionTrackingStore = React.useContext(
-      EventsExecutionTrackingContext
-    );
 
     const previewBuildMenuTemplate = React.useCallback(
       (i18n: I18nType) =>
@@ -127,35 +113,9 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
             ],
           },
           {
-            // Highlight, in the events sheets, the instructions executed by
-            // the previews (which can be slowed down to follow them).
-            label: i18n._(t`Follow execution`),
-            submenu: [
-              {
-                type: 'checkbox',
-                label: i18n._(t`Disabled`),
-                checked: eventsExecutionTrackingMode === 'off',
-                click: () => setEventsExecutionTrackingMode('off'),
-              },
-              {
-                type: 'checkbox',
-                label: i18n._(t`Normal speed`),
-                checked: eventsExecutionTrackingMode === 'normal-speed',
-                click: () => setEventsExecutionTrackingMode('normal-speed'),
-              },
-              {
-                type: 'checkbox',
-                label: i18n._(t`x0.1 speed`),
-                checked: eventsExecutionTrackingMode === 'slow-speed',
-                click: () => setEventsExecutionTrackingMode('slow-speed'),
-              },
-              {
-                type: 'checkbox',
-                label: i18n._(t`Frame by frame (paused)`),
-                checked: eventsExecutionTrackingMode === 'frame-by-frame',
-                click: () => setEventsExecutionTrackingMode('frame-by-frame'),
-              },
-            ],
+            label: i18n._(t`Kill the running previews`),
+            click: onClosePreviews,
+            enabled: hasPreviewsRunning,
           },
           { type: 'separator' },
           ...(previewState.overridenPreviewLayoutName
@@ -211,6 +171,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         canDoNetworkPreview,
         onOpenDebugger,
         onPreviewWithoutHotReload,
+        onClosePreviews,
         isPreviewEnabled,
         hasPreviewsRunning,
         isGameplayTestRunInProgress,
@@ -222,8 +183,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         previewState.previewExternalLayoutName,
         previewState.previewLayoutName,
         setPreviewOverride,
-        eventsExecutionTrackingMode,
-        setEventsExecutionTrackingMode,
       ]
     );
 
@@ -259,28 +218,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           // $FlowFixMe[incompatible-type]
           buildMenuTemplate={previewBuildMenuTemplate}
         />
-        {eventsExecutionTrackingMode === 'frame-by-frame' && (
-          <IconButton
-            size="small"
-            color="default"
-            onClick={() => eventsExecutionTrackingStore.stepOneFrame()}
-            disabled={!hasPreviewsRunning}
-            tooltip={t`Advance the preview of one frame`}
-            id="toolbar-step-one-frame-button"
-          >
-            <SkipForwardIcon />
-          </IconButton>
-        )}
-        <IconButton
-          size="small"
-          color="default"
-          selected={isWatchedVariablesPanelOpen}
-          onClick={onToggleWatchedVariablesPanel}
-          tooltip={t`Watch variables of the running preview`}
-          id="toolbar-watched-variables-button"
-        >
-          <VariableTreeIcon />
-        </IconButton>
         <ResponsiveRaisedButton
           primary
           onClick={onShareClick}

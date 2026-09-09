@@ -84,6 +84,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/runtimescene.js',
       './newIDE/app/resources/GDJS/Runtime/scenestack.js',
       './newIDE/app/resources/GDJS/Runtime/profiler.js',
+      './newIDE/app/resources/GDJS/Runtime/resource-load-tracker.js',
       './newIDE/app/resources/GDJS/Runtime/events-execution-tracker.js',
       './newIDE/app/resources/GDJS/Runtime/force.js',
       './newIDE/app/resources/GDJS/Runtime/RuntimeLayer.js',

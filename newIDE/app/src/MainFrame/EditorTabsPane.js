@@ -142,6 +142,7 @@ export type EditorTabsPaneCommonProps = {|
   launchNewPreview: (?{ numberOfWindows: number }) => Promise<void>,
   launchNetworkPreview: () => Promise<void>,
   launchHotReloadPreview: () => Promise<void>,
+  closeAllPreviews: () => void,
   launchPreviewWithDiagnosticReport: () => Promise<void>,
   setPreviewOverride: (override: {|
     isPreviewOverriden: boolean,
@@ -393,6 +394,7 @@ const EditorTabsPane: React.ComponentType<{
     launchNewPreview,
     launchNetworkPreview,
     launchHotReloadPreview,
+    closeAllPreviews,
     launchPreviewWithDiagnosticReport,
     setPreviewOverride,
     openVersionHistoryPanel,
@@ -776,6 +778,7 @@ const EditorTabsPane: React.ComponentType<{
         onPreviewWithoutHotReload={launchNewPreview}
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}
+        onClosePreviews={closeAllPreviews}
         onLaunchPreviewWithDiagnosticReport={launchPreviewWithDiagnosticReport}
         canDoNetworkPreview={canDoNetworkPreview}
         setPreviewOverride={setPreviewOverride}
@@ -783,10 +786,6 @@ const EditorTabsPane: React.ComponentType<{
           !!currentProject && currentProject.getLayoutsCount() > 0
         }
         previewState={previewState}
-        eventsExecutionTrackingMode={eventsExecutionTrackingMode}
-        setEventsExecutionTrackingMode={setEventsExecutionTrackingMode}
-        isWatchedVariablesPanelOpen={isWatchedVariablesPanelOpen}
-        onToggleWatchedVariablesPanel={onToggleWatchedVariablesPanel}
         onOpenVersionHistory={openVersionHistoryPanel}
         checkedOutVersionStatus={checkedOutVersionStatus}
         onQuitVersionHistory={onQuitVersionHistory}
@@ -847,6 +846,12 @@ const EditorTabsPane: React.ComponentType<{
                     onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,
                     hotReloadPreviewButtonProps,
+                    onLaunchDebuggerAndPreview: launchDebuggerAndPreview,
+                    onClosePreviews: closeAllPreviews,
+                    isWatchedVariablesPanelOpen,
+                    onToggleWatchedVariablesPanel,
+                    eventsExecutionTrackingMode,
+                    setEventsExecutionTrackingMode,
                     onRestartInGameEditor,
                     showRestartInGameEditorAfterErrorButton,
                     resourceManagementProps,

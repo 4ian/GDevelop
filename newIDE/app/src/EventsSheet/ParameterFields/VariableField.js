@@ -379,7 +379,6 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
 
         parser.delete();
 
-        console.log('setErrorText', errorText);
         setErrorText(errorText);
       },
       [

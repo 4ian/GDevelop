@@ -75,6 +75,9 @@ export type CommandName =
   | 'SEARCH_EVENTS'
   | 'OPEN_EXTENSION_SETTINGS'
   | 'OPEN_PROFILE'
+  | 'TOGGLE_PROFILER_RECORDING'
+  | 'START_PROFILER_RECORDING'
+  | 'STOP_PROFILER_RECORDING'
   | 'OPEN_MEMORY_TRACKER_REGISTRY'
   | 'INSTALL_CLI_IN_PATH'
   | 'TILEMAP_FREEHAND_BRUSH'
@@ -169,6 +172,18 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_DIAGNOSTIC_REPORT: {
     area: 'PROJECT',
     displayText: t`Show diagnostic report`,
+  },
+  TOGGLE_PROFILER_RECORDING: {
+    area: 'PROJECT',
+    displayText: t`Start or stop recording the running preview`,
+  },
+  START_PROFILER_RECORDING: {
+    area: 'PROJECT',
+    displayText: t`Start recording the running preview`,
+  },
+  STOP_PROFILER_RECORDING: {
+    area: 'PROJECT',
+    displayText: t`Stop recording the running preview`,
   },
   OPEN_HOME_PAGE: { area: 'GENERAL', displayText: t`Show Home` },
   CREATE_NEW_PROJECT: {

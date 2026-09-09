@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import FlatButton from '../../UI/FlatButton';
@@ -23,7 +24,7 @@ import {
   getFrameStats,
   getFramesInRange,
   getRecordingTimeBounds,
-  getSceneChanges,
+  getTimelineMarkers,
   getShownRange,
 } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import classes from './Profiler.module.css';
@@ -45,6 +46,10 @@ const Profiler = ({
   debuggerId,
 }: Props): React.Node => {
   const recording = useProfilerRecording(recordingStore, debuggerId);
+  // The store appends to the recording in place: what changed is told by
+  // these counters, which the memos below depend on.
+  const framesCount = recording ? recording.frames.length : 0;
+  const startsCount = recording ? recording.startsAtGameTimeMs.length : 0;
 
   const bounds = recording ? getRecordingTimeBounds(recording) : null;
   const shownRange = recording ? getShownRange(recording) : null;
@@ -53,7 +58,8 @@ const Profiler = ({
       recording && shownRange
         ? getFramesInRange(recording.frames, shownRange)
         : [],
-    [recording, shownRange, recording && recording.frames.length] // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recording, shownRange, framesCount]
   );
   const measures = React.useMemo(
     () =>
@@ -65,9 +71,10 @@ const Profiler = ({
   const frameStats = React.useMemo(() => getFrameStats(framesInRange), [
     framesInRange,
   ]);
-  const sceneChanges = React.useMemo(
-    () => (recording ? getSceneChanges(recording.frames) : []),
-    [recording, recording && recording.frames.length] // eslint-disable-line react-hooks/exhaustive-deps
+  const markers = React.useMemo(
+    () => (recording ? getTimelineMarkers(recording) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recording, framesCount, startsCount]
   );
 
   const hasFrames = !!recording && recording.frames.length > 0;
@@ -88,15 +95,20 @@ const Profiler = ({
         {recording && bounds && shownRange && hasFrames ? (
           <div className={classes.content}>
             <div className={classes.timeline}>
-              <FrameStrip
-                frames={recording.frames}
-                bounds={bounds}
-                selectedRange={recording.selectedRange}
-                onSelectRange={range =>
-                  recordingStore.setSelectedRange(debuggerId, range)
-                }
-                sceneChanges={sceneChanges}
-              />
+              <I18n>
+                {({ i18n }) => (
+                  <FrameStrip
+                    frames={recording.frames}
+                    bounds={bounds}
+                    selectedRange={recording.selectedRange}
+                    onSelectRange={range =>
+                      recordingStore.setSelectedRange(debuggerId, range)
+                    }
+                    markers={markers}
+                    recordingStartLabel={i18n._(t`Record start`)}
+                  />
+                )}
+              </I18n>
               <div className={classes.rangeSummary}>
                 <Text noMargin size="body-small" color="secondary">
                   <Trans>

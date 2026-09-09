@@ -248,10 +248,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                           props.isWatchedVariablesPanelOpen,
                         onToggleWatchedVariablesPanel:
                           props.onToggleWatchedVariablesPanel,
-                        eventsExecutionTrackingMode:
-                          props.eventsExecutionTrackingMode,
-                        setEventsExecutionTrackingMode:
-                          props.setEventsExecutionTrackingMode,
+                        debuggerPlaySpeed: props.debuggerPlaySpeed,
+                        setDebuggerPlaySpeed: props.setDebuggerPlaySpeed,
                         hotReloadPreviewButtonProps:
                           props.hotReloadPreviewButtonProps,
                         onRestartInGameEditor: props.onRestartInGameEditor,

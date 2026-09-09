@@ -78,18 +78,29 @@ const LiveExpressionValueTooltip = ({
 
       // The code is generated once per hover: it depends on the events, not
       // on the game state.
+      let code: string | null = null;
       const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
-      const code = layoutCodeGenerator.generateExpressionEvaluationCode(
-        layout,
-        parameterType,
-        expression,
-        objectName || ''
-      );
-      layoutCodeGenerator.delete();
+      try {
+        code = layoutCodeGenerator.generateExpressionEvaluationCode(
+          layout,
+          parameterType,
+          expression,
+          objectName || ''
+        );
+      } catch (error) {
+        console.error(
+          `Unable to generate the code evaluating "${expression}" (${parameterType}):`,
+          error
+        );
+      } finally {
+        layoutCodeGenerator.delete();
+      }
+      if (code === null) return;
+      const generatedCode = code;
 
       let isCancelled = false;
       const refresh = async () => {
-        const newEvaluation = await store.evaluateExpression(code);
+        const newEvaluation = await store.evaluateExpression(generatedCode);
         if (!isCancelled) setEvaluation(newEvaluation);
       };
       refresh();

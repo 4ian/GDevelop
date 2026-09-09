@@ -16,6 +16,46 @@ namespace gdjs {
       };
 
       /**
+       * Start recording the game (the profiler, performance and resources
+       * panels of the debugger), as the "Record" button of the debugger does.
+       * Does nothing if a recording is already running.
+       * @param instanceContainer - The current container.
+       */
+      export const startProfiling = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ) {
+        const runtimeGame = instanceContainer.getGame();
+        const debuggerClient = runtimeGame.getDebuggerClient();
+        if (!debuggerClient) return;
+
+        const wasStarted = runtimeGame.startProfiler({
+          onChunk: (chunk) => debuggerClient.sendProfilerChunk(chunk),
+          onStopped: (stoppedProfiler) => {
+            debuggerClient.sendProfilerOutput(
+              stoppedProfiler.getFramesAverageMeasures(),
+              stoppedProfiler.getStats()
+            );
+            debuggerClient.sendProfilerStopped(stoppedProfiler);
+          },
+        });
+        const profiler = runtimeGame.getProfiler();
+        if (wasStarted && profiler) {
+          debuggerClient.sendProfilerStarted(profiler);
+        }
+      };
+
+      /**
+       * Stop the recording of the game started with `startProfiling`: what was
+       * measured stays in the debugger.
+       * @param instanceContainer - The current container.
+       */
+      export const stopProfiling = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ) {
+        instanceContainer.getGame().stopProfiler();
+      };
+
+      /**
        * Logs a message to the console.
        * @param message - The message to log.
        * @param type - The type of log (info, warning or error).

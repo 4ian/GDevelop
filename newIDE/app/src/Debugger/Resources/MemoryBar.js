@@ -28,6 +28,13 @@ type Props = {|
   onSelectResource: (?string) => void,
 |};
 
+/** The part of the memory limit taken by some resources, as a percentage. */
+const formatShareOfLimit = (bytes: number, limitBytes: number): string => {
+  if (!limitBytes) return '-';
+  const share = (bytes / limitBytes) * 100;
+  return `${share < 0.1 ? '< 0.1' : share.toFixed(1)}%`;
+};
+
 /**
  * How the memory of the device (or an artificial limit) is filled by the
  * loaded resources: one segment per resource, colored by kind.
@@ -66,6 +73,13 @@ const MemoryBar = ({
     },
     [memorySegments]
   );
+  // What the device (or its JavaScript heap) can hold, in megabytes.
+  const deviceLimitBytes =
+    state.device.deviceMemoryBytes || state.device.jsHeapSizeLimit || 0;
+  const deviceLimitMegabytes = deviceLimitBytes
+    ? Math.round(deviceLimitBytes / 1024 / 1024)
+    : null;
+
   const usedHeapShare =
     state.device.usedJSHeapSize != null && memorySegments.limitBytes > 0
       ? state.device.usedJSHeapSize / memorySegments.limitBytes
@@ -97,14 +111,90 @@ const MemoryBar = ({
             ) : null}
           </Trans>
         </Text>
+      </div>
+      <div className={classes.memoryBarRow}>
+        <div
+          className={classNames(classes.memoryBar, {
+            [classes.memoryBarOverLimit]: memorySegments.isOverLimit,
+          })}
+        >
+          {memorySegments.segments.map((segment, index) => {
+            const record = segment.record;
+            const title = record ? (
+              <span>
+                {record.name} ({record.kind})
+                <br />
+                {formatBytes(segment.bytes)} ({(segment.share * 100).toFixed(1)}
+                % of the limit)
+              </span>
+            ) : (
+              <Trans>
+                {memorySegments.unknownResourcesCount} loaded resources of
+                unknown size
+              </Trans>
+            );
+            return (
+              <Tooltip key={record ? record.name : 'unknown'} title={title}>
+                <div
+                  className={classNames(classes.memorySegment, {
+                    [classes.memorySegmentUnknown]: segment.isUnknown,
+                    [classes.memorySegmentSelected]:
+                      !!record && record.name === selectedResourceName,
+                  })}
+                  style={{
+                    width: `${Math.min(100, segment.share * 100)}%`,
+                    backgroundColor: record
+                      ? getResourceKindColor(
+                          gdevelopTheme,
+                          record.kind,
+                          shadeBySegmentIndex[index]
+                        )
+                      : undefined,
+                  }}
+                  onClick={() =>
+                    onSelectResource(
+                      record && record.name !== selectedResourceName
+                        ? record.name
+                        : null
+                    )
+                  }
+                />
+              </Tooltip>
+            );
+          })}
+          {usedHeapShare != null && usedHeapShare <= 1 && (
+            <Tooltip
+              title={
+                <Trans>
+                  JavaScript heap used by the game:{' '}
+                  {formatBytes(state.device.usedJSHeapSize)}
+                </Trans>
+              }
+            >
+              <div
+                className={classes.memoryHeapMarker}
+                style={{
+                  left: `${usedHeapShare * 100}%`,
+                  pointerEvents: 'auto',
+                }}
+              />
+            </Tooltip>
+          )}
+        </div>
         <div className={classes.headerRow}>
           <div className={classes.memoryLimitField}>
             <TextField
               type="number"
               margin="none"
               min={1}
+              // Filled with what the device reports, so that the limit can
+              // be adjusted from a meaningful value instead of an empty field.
               value={
-                artificialLimitMegabytes != null ? artificialLimitMegabytes : ''
+                artificialLimitMegabytes != null
+                  ? artificialLimitMegabytes
+                  : deviceLimitMegabytes != null
+                  ? deviceLimitMegabytes
+                  : ''
               }
               onChange={(event, value) => {
                 const megabytes = parseFloat(value);
@@ -124,71 +214,6 @@ const MemoryBar = ({
           )}
         </div>
       </div>
-      <div
-        className={classNames(classes.memoryBar, {
-          [classes.memoryBarOverLimit]: memorySegments.isOverLimit,
-        })}
-      >
-        {memorySegments.segments.map((segment, index) => {
-          const record = segment.record;
-          const title = record ? (
-            <span>
-              {record.name} ({record.kind})
-              <br />
-              {formatBytes(segment.bytes)} ({(segment.share * 100).toFixed(1)}%
-              of the limit)
-            </span>
-          ) : (
-            <Trans>
-              {memorySegments.unknownResourcesCount} loaded resources of unknown
-              size
-            </Trans>
-          );
-          return (
-            <Tooltip key={record ? record.name : 'unknown'} title={title}>
-              <div
-                className={classNames(classes.memorySegment, {
-                  [classes.memorySegmentUnknown]: segment.isUnknown,
-                  [classes.memorySegmentSelected]:
-                    !!record && record.name === selectedResourceName,
-                })}
-                style={{
-                  width: `${Math.min(100, segment.share * 100)}%`,
-                  backgroundColor: record
-                    ? getResourceKindColor(
-                        gdevelopTheme,
-                        record.kind,
-                        shadeBySegmentIndex[index]
-                      )
-                    : undefined,
-                }}
-                onClick={() =>
-                  onSelectResource(
-                    record && record.name !== selectedResourceName
-                      ? record.name
-                      : null
-                  )
-                }
-              />
-            </Tooltip>
-          );
-        })}
-        {usedHeapShare != null && usedHeapShare <= 1 && (
-          <Tooltip
-            title={
-              <Trans>
-                JavaScript heap used by the game:{' '}
-                {formatBytes(state.device.usedJSHeapSize)}
-              </Trans>
-            }
-          >
-            <div
-              className={classes.memoryHeapMarker}
-              style={{ left: `${usedHeapShare * 100}%`, pointerEvents: 'auto' }}
-            />
-          </Tooltip>
-        )}
-      </div>
       <div className={classes.legend}>
         {bytesByKind.map(entry => (
           <div className={classes.legendItem} key={entry.kind}>
@@ -202,7 +227,9 @@ const MemoryBar = ({
               }}
             />
             <Text noMargin size="body-small" color="secondary">
-              {entry.kind}: {formatBytes(entry.bytes)} ({entry.count})
+              {entry.kind}: {formatBytes(entry.bytes)} (
+              {formatShareOfLimit(entry.bytes, memorySegments.limitBytes)},{' '}
+              {entry.count})
             </Text>
           </div>
         ))}

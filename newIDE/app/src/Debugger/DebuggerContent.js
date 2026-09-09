@@ -8,7 +8,6 @@ import EditorMosaic, {
   type EditorMosaicNode,
 } from '../UI/EditorMosaic';
 import Background from '../UI/Background';
-import get from 'lodash/get';
 import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
 import InspectorsList from './InspectorsList';
@@ -18,7 +17,7 @@ import {
   type EditFunction,
   type CallFunction,
 } from './GDJSInspectorDescriptions';
-import RawContentInspector from './Inspectors/RawContentInspector';
+import InspectedValue from './Inspectors/InspectedValue';
 import EmptyMessage from '../UI/EmptyMessage';
 import Checkbox from '../UI/Checkbox';
 import Flash from '@material-ui/icons/FlashOn';
@@ -63,12 +62,6 @@ type Props = {|
 type State = {|
   selectedInspector: ?InspectorDescription,
   selectedInspectorFullPath: Array<string>,
-  /**
-   * What the running game answers for the selected path, refreshed while it
-   * runs. Undefined when there is nothing live to show (the values of the
-   * last dump are then displayed).
-   */
-  liveInspectedValue: Object | void,
   rawMode: boolean,
   /** The artificial memory limit set in the resources panel (MB). */
   memoryLimitMegabytes: ?number,
@@ -100,22 +93,16 @@ const initialMosaicEditorNodes: EditorMosaicNode = {
  * The debugger interface: show the list of inspectors for a game, along with the
  * currently selected inspector.
  */
-/** How often the selected element is read again in the running game. */
-const LIVE_INSPECTOR_INTERVAL_MS = 500;
-
 export default class DebuggerContent extends React.Component<Props, State> {
   state: State = {
     selectedInspector: null,
     selectedInspectorFullPath: [],
-    liveInspectedValue: undefined,
     rawMode: false,
     memoryLimitMegabytes: null,
     inspectorListWidth: 280,
   };
 
   _editors: ?EditorMosaicInterface = null;
-  _liveInspectorIntervalId: ?IntervalID = null;
-  _isLiveInspectionInFlight: boolean = false;
   _inspectorResizeStart: ?{| x: number, width: number |} = null;
 
   /**
@@ -143,42 +130,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
 
   componentDidMount() {
     this._updateOverviewVisibility();
-    this._liveInspectorIntervalId = setInterval(
-      this._refreshLiveInspectedValue,
-      LIVE_INSPECTOR_INTERVAL_MS
-    );
   }
-
-  /**
-   * Read again, in the running game, what is at the selected path: the
-   * inspector then shows the values of the game as they change (the behaviors
-   * of an object, for example) instead of those of the last dump.
-   */
-  _refreshLiveInspectedValue = async () => {
-    const { onInspectPath, isDebuggerConnected } = this.props;
-    const { selectedInspectorFullPath } = this.state;
-
-    if (
-      !isDebuggerConnected ||
-      !selectedInspectorFullPath.length ||
-      !this.isInspectorShown()
-    ) {
-      if (this.state.liveInspectedValue !== undefined) {
-        this.setState({ liveInspectedValue: undefined });
-      }
-      return;
-    }
-    // Never ask again while the game is answering.
-    if (this._isLiveInspectionInFlight) return;
-
-    this._isLiveInspectionInFlight = true;
-    try {
-      const value = await onInspectPath(selectedInspectorFullPath);
-      if (value !== null) this.setState({ liveInspectedValue: value });
-    } finally {
-      this._isLiveInspectionInFlight = false;
-    }
-  };
 
   _startInspectorResize = (event: SyntheticMouseEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -211,10 +163,6 @@ export default class DebuggerContent extends React.Component<Props, State> {
 
   componentWillUnmount() {
     this._stopInspectorResize();
-    if (this._liveInspectorIntervalId) {
-      clearInterval(this._liveInspectorIntervalId);
-      this._liveInspectorIntervalId = null;
-    }
   }
 
   isProfilerShown = (): any => {
@@ -282,6 +230,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
       profilerRecordingStore,
       debuggerId,
       resourcesDebugSnapshot,
+      onInspectPath,
       onRequestResourcesDebugState,
       isDebuggerConnected,
       isDebuggerPaused,
@@ -291,7 +240,6 @@ export default class DebuggerContent extends React.Component<Props, State> {
     const {
       selectedInspector,
       selectedInspectorFullPath,
-      liveInspectedValue,
       rawMode,
       memoryLimitMegabytes,
       inspectorListWidth,
@@ -340,6 +288,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
                   <RaisedButton
                     label={<Trans>Refresh</Trans>}
                     onClick={onRefresh}
+                    disabled={!isDebuggerConnected}
                     primary
                   />
                 </Line>
@@ -359,7 +308,6 @@ export default class DebuggerContent extends React.Component<Props, State> {
                     this.setState({
                       selectedInspector,
                       selectedInspectorFullPath,
-                      liveInspectedValue: undefined,
                     })
                   }
                 />
@@ -372,46 +320,18 @@ export default class DebuggerContent extends React.Component<Props, State> {
                 <ScrollView>
                   <Column>
                     {selectedInspector ? (
-                      rawMode ? (
-                        <RawContentInspector
-                          gameData={get(
-                            gameData,
-                            selectedInspectorFullPath,
-                            null
-                          )}
-                          onEdit={(path, newValue) =>
-                            onEdit(
-                              selectedInspectorFullPath.concat(path),
-                              newValue
-                            )
-                          }
-                        />
-                      ) : (
-                        selectedInspector.renderInspector(
-                          liveInspectedValue !== undefined
-                            ? liveInspectedValue
-                            : get(gameData, selectedInspectorFullPath, null),
-                          {
-                            onCall: (path, args) =>
-                              onCall(
-                                selectedInspectorFullPath.concat(path),
-                                args
-                              ),
-                            onEdit: (path, newValue) =>
-                              onEdit(
-                                selectedInspectorFullPath.concat(path),
-                                newValue
-                              ),
-                          }
-                        ) || (
-                          <EmptyMessage>
-                            <Trans>
-                              No inspector, choose another element in the list
-                              or toggle the raw data view.
-                            </Trans>
-                          </EmptyMessage>
-                        )
-                      )
+                      <InspectedValue
+                        selectedInspector={selectedInspector}
+                        selectedInspectorFullPath={selectedInspectorFullPath}
+                        gameData={gameData}
+                        onInspectPath={onInspectPath}
+                        // The values are only followed while recording, like
+                        // every other statistic of the debugger.
+                        isLive={isDebuggerConnected && profilingInProgress}
+                        rawMode={rawMode}
+                        onCall={onCall}
+                        onEdit={onEdit}
+                      />
                     ) : (
                       <EmptyMessage>
                         {gameData ? (

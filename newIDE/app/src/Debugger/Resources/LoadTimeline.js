@@ -102,9 +102,34 @@ const LoadTimeline = ({
       let fromMs = 0;
       let toMs = state.generatedAtMs;
       for (const row of rows) toMs = Math.max(toMs, row.endMs);
+      // The recording is part of what can be looked at, even when it happened
+      // after everything was loaded: focusing on it must stay possible.
+      if (profilerRecordingRange) {
+        toMs = Math.max(toMs, profilerRecordingRange.toMs);
+      }
       return { fromMs, toMs: Math.max(toMs, fromMs + 1) };
     },
-    [rows, state.generatedAtMs]
+    [rows, state.generatedAtMs, profilerRecordingRange]
+  );
+
+  /**
+   * A view that can be displayed: inside the bounds, and never empty (looking
+   * at a resource loaded instantly, or at a very short recording).
+   */
+  const clampViewToBounds = React.useCallback(
+    (fromMs: number, toMs: number): ProfilerRecordingRange => {
+      const minimumSpanMs = 10;
+      let clampedFrom = Math.max(bounds.fromMs, Math.min(fromMs, bounds.toMs));
+      let clampedTo = Math.min(bounds.toMs, Math.max(toMs, bounds.fromMs));
+      if (clampedTo - clampedFrom < minimumSpanMs) {
+        const center = (clampedFrom + clampedTo) / 2;
+        clampedFrom = Math.max(bounds.fromMs, center - minimumSpanMs / 2);
+        clampedTo = Math.min(bounds.toMs, clampedFrom + minimumSpanMs);
+        clampedFrom = Math.max(bounds.fromMs, clampedTo - minimumSpanMs);
+      }
+      return { fromMs: clampedFrom, toMs: clampedTo };
+    },
+    [bounds]
   );
   // By default, look at the loadings themselves: a game that loaded
   // everything at startup would otherwise show a thin bar in an empty strip.
@@ -127,21 +152,27 @@ const LoadTimeline = ({
   );
   const shownView = view || fittedView;
 
-  // Zoom on a resource when asked (F key on the selected row).
+  // Zoom on a resource when asked (F key on the selected row). The request is
+  // kept until the row is known: the timeline may just have been shown.
+  const handledFocusRequestId = React.useRef<number>(0);
   React.useEffect(
     () => {
       if (!focusRequest) return;
+      if (focusRequest.requestId === handledFocusRequestId.current) return;
       const row = rows.find(
         row => row.record.name === focusRequest.resourceName
       );
       if (!row) return;
+      handledFocusRequestId.current = focusRequest.requestId;
       const durationMs = Math.max(10, row.endMs - row.startMs);
-      setView({
-        fromMs: Math.max(bounds.fromMs, row.startMs - durationMs * 0.5),
-        toMs: Math.min(bounds.toMs, row.endMs + durationMs * 0.5),
-      });
+      setView(
+        clampViewToBounds(
+          row.startMs - durationMs * 0.5,
+          row.endMs + durationMs * 0.5
+        )
+      );
     },
-    [focusRequest] // eslint-disable-line react-hooks/exhaustive-deps
+    [focusRequest, rows] // eslint-disable-line react-hooks/exhaustive-deps
   );
   const viewSpanMs = Math.max(1, shownView.toMs - shownView.fromMs);
   const timeToX = React.useCallback(
@@ -383,17 +414,15 @@ const LoadTimeline = ({
             game started
           </Trans>
         </Text>
-        {profilerRecordingRange && (
-          <FlatButton
-            label={<Trans>Focus on the recording</Trans>}
-            onClick={() =>
-              setView({
-                fromMs: Math.max(bounds.fromMs, profilerRecordingRange.fromMs),
-                toMs: Math.min(bounds.toMs, profilerRecordingRange.toMs),
-              })
-            }
-          />
-        )}
+        <FlatButton
+          label={<Trans>See everything</Trans>}
+          disabled={!view && verticalZoom === 1 && !verticalScrollPx}
+          onClick={() => {
+            setView(null);
+            setVerticalZoom(1);
+            setVerticalScrollPx(0);
+          }}
+        />
       </div>
       <div
         ref={containerRef}

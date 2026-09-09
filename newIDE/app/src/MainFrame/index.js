@@ -198,7 +198,10 @@ import {
   usePreviewDebuggerServerWatcher,
 } from './PreviewState';
 import { useEventsExecutionTracking } from '../EventsExecutionTracking/UseEventsExecutionTracking';
-import { type EventsExecutionTrackingMode } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
+import {
+  type DebuggerPlaySpeed,
+  type LaunchDebuggerAndPreviewOptions,
+} from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import WatchedVariablesPanel from '../EventsExecutionTracking/WatchedVariablesPanel';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
@@ -610,9 +613,9 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const [
-    eventsExecutionTrackingMode,
-    setEventsExecutionTrackingMode,
-  ] = React.useState<EventsExecutionTrackingMode>('off');
+    debuggerPlaySpeed,
+    setDebuggerPlaySpeed,
+  ] = React.useState<DebuggerPlaySpeed>('normal');
   const [
     isWatchedVariablesPanelOpen,
     setIsWatchedVariablesPanelOpen,
@@ -652,7 +655,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
   useEventsExecutionTracking({
     previewDebuggerServer,
-    mode: eventsExecutionTrackingMode,
+    playSpeed: debuggerPlaySpeed,
     isDebuggerOpened: !!getEditorTabOpenedWithKey(state.editorTabs, 'debugger'),
   });
   const {
@@ -3491,17 +3494,16 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const launchDebuggerAndPreview = React.useCallback(
-    () => {
+    (options: ?LaunchDebuggerAndPreviewOptions) => {
       openDebugger();
-      // All the debugging tools are enabled on this preview: the execution of
-      // the events is followed too (at normal speed, unless another speed was
-      // already chosen).
-      setEventsExecutionTrackingMode(mode =>
-        mode === 'off' ? 'normal-speed' : mode
-      );
+      // The game plays at the speed asked for, or at the one already chosen.
+      // The options are checked as this is also used as a plain click handler.
+      if (options && typeof options.playSpeed === 'string') {
+        setDebuggerPlaySpeed(options.playSpeed);
+      }
       launchNewPreview({ isForDebugger: true });
     },
-    [openDebugger, launchNewPreview, setEventsExecutionTrackingMode]
+    [openDebugger, launchNewPreview, setDebuggerPlaySpeed]
   );
 
   const openInstructionOrExpression = (type: string) => {
@@ -6092,8 +6094,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId,
     hasPreviewsRunning: hasNonEditionPreviewsRunning,
     previewState: previewState,
-    eventsExecutionTrackingMode,
-    setEventsExecutionTrackingMode,
+    debuggerPlaySpeed,
+    setDebuggerPlaySpeed,
     isWatchedVariablesPanelOpen,
     onToggleWatchedVariablesPanel: toggleWatchedVariablesPanel,
     checkedOutVersionStatus: checkedOutVersionStatus,

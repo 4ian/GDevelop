@@ -46,6 +46,19 @@ const getEditableProperties = (
   const keysByLabel: { [string]: string } = {};
   if (!behavior) return { properties, keysByLabel };
 
+  try {
+    fillEditableProperties(behavior, properties, keysByLabel);
+  } catch (error) {
+    console.error('Unable to read the properties of a behavior:', error);
+  }
+  return { properties, keysByLabel };
+};
+
+const fillEditableProperties = (
+  behavior: GameData,
+  properties: { [string]: number | string | boolean },
+  keysByLabel: { [string]: string }
+) => {
   for (const key in behavior) {
     if (excludedKeys.includes(key)) continue;
     const value = behavior[key];
@@ -58,7 +71,6 @@ const getEditableProperties = (
     properties[label] = value;
     keysByLabel[label] = key;
   }
-  return { properties, keysByLabel };
 };
 
 const BehaviorsInspector = ({ behaviors, onEdit }: Props): React.Node => {

@@ -5,6 +5,14 @@ namespace gdjs {
    * read-only inspection and the gameplay test commands themselves. Every
    * other command is ignored (fail closed: a command added later cannot
    * accidentally mutate the game state or stepping the harness owns). */
+  /** What the editor reads: a variable becomes a plain value. */
+  const toDebuggerValue = (value: unknown) => {
+    if (value instanceof gdjs.Variable) {
+      return value.isUndefinedInContainer() ? undefined : value.toJSObject();
+    }
+    return value;
+  };
+
   const DEBUGGER_COMMANDS_ALLOWED_DURING_GAMEPLAY_TESTS = new Set([
     'refresh',
     'getStatus',
@@ -358,7 +366,7 @@ namespace gdjs {
         } else if (data.command === 'stepFrame') {
           runtimeGame.stepOneFrame();
         } else if (data.command === 'evaluateExpression') {
-          that.sendExpressionValue(data.messageId, data.payload.code);
+          that.sendExpressionValues(data.messageId, data.payload.codes);
         } else if (data.command === 'inspector.dump') {
           that.sendInspectedValue(data.messageId, data.payload.path);
         } else if (data.command === 'resources.dump') {
@@ -993,14 +1001,15 @@ namespace gdjs {
      * several times per second, unlike the whole game dump.
      */
     sendInspectedValue(messageId: number, path: string[]): void {
-      let value: any = this._runtimegame;
-      for (const key of path || []) {
-        if (value === null || value === undefined) break;
-        value = value[key];
-      }
+      let message: string;
+      try {
+        let value: any = this._runtimegame;
+        for (const key of path || []) {
+          if (value === null || value === undefined) break;
+          value = value[key];
+        }
 
-      this._sendMessage(
-        circularSafeStringify(
+        message = circularSafeStringify(
           {
             command: 'inspector.dumped',
             messageId,
@@ -1009,8 +1018,22 @@ namespace gdjs {
           this._getDumpReplacer(),
           /* Limit maximum depth to prevent any crashes */
           8
-        )
-      );
+        );
+      } catch (error) {
+        logger.error(
+          'Unable to read what the debugger asked to inspect (' +
+            (path || []).join('.') +
+            '):',
+          error
+        );
+        message = circularSafeStringify({
+          command: 'inspector.dumped',
+          messageId,
+          payload: null,
+        });
+      }
+
+      this._sendMessage(message);
     }
 
     /**
@@ -1034,25 +1057,14 @@ namespace gdjs {
      * expression (see `LayoutCodeGenerator::GenerateExpressionEvaluationCode`)
      * and send back its value and the values of the variables it uses.
      */
-    sendExpressionValue(messageId: number, code: string): void {
-      const toJSValue = (value: unknown) => {
-        if (value instanceof gdjs.Variable) {
-          return value.isUndefinedInContainer()
-            ? undefined
-            : value.toJSObject();
-        }
-        return value;
-      };
-
-      let payload: {
-        result?: unknown;
-        variables?: Record<string, unknown>;
-        error?: string;
-      } = {};
+    sendExpressionValues(messageId: number, codes: string[]): void {
       const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
-      if (!currentScene) {
-        payload = { error: 'No scene is running.' };
-      } else {
+
+      // Everything is evaluated in one go: the editor watches several
+      // expressions at once and must not pay a round trip for each of them.
+      const payload = (codes || []).map((code) => {
+        if (!currentScene) return { error: 'No scene is running.' };
+
         try {
           const evaluation = new Function('runtimeScene', 'gdjs', code)(
             currentScene,
@@ -1060,15 +1072,15 @@ namespace gdjs {
           );
           const variables: Record<string, unknown> = {};
           for (const variableExpression in evaluation.variables) {
-            variables[variableExpression] = toJSValue(
+            variables[variableExpression] = toDebuggerValue(
               evaluation.variables[variableExpression]
             );
           }
-          payload = { result: toJSValue(evaluation.result), variables };
+          return { result: toDebuggerValue(evaluation.result), variables };
         } catch (error) {
-          payload = { error: String(error) };
+          return { error: String(error) };
         }
-      }
+      });
 
       this._sendMessage(
         circularSafeStringify({

@@ -24,7 +24,10 @@ import {
   saveUiSettings,
 } from './EditorTabs/EditorTabsHandler';
 import { type PreviewState } from './PreviewState';
-import { type EventsExecutionTrackingMode } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
+import {
+  type DebuggerPlaySpeed,
+  type LaunchDebuggerAndPreviewOptions,
+} from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
@@ -107,8 +110,8 @@ export type EditorTabsPaneCommonProps = {|
   isSharingEnabled: boolean,
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
-  eventsExecutionTrackingMode: EventsExecutionTrackingMode,
-  setEventsExecutionTrackingMode: EventsExecutionTrackingMode => void,
+  debuggerPlaySpeed: DebuggerPlaySpeed,
+  setDebuggerPlaySpeed: DebuggerPlaySpeed => void,
   isWatchedVariablesPanelOpen: boolean,
   onToggleWatchedVariablesPanel: () => void,
   checkedOutVersionStatus: ?OpenedVersionStatus,
@@ -138,7 +141,7 @@ export type EditorTabsPaneCommonProps = {|
     versionId: string
   ) => Promise<?ExpandedCloudProjectVersion>,
   openShareDialog: (tab?: ShareTab) => void,
-  launchDebuggerAndPreview: () => void,
+  launchDebuggerAndPreview: (?LaunchDebuggerAndPreviewOptions) => void,
   launchNewPreview: (?{ numberOfWindows: number }) => Promise<void>,
   launchNetworkPreview: () => Promise<void>,
   launchHotReloadPreview: () => Promise<void>,
@@ -377,8 +380,8 @@ const EditorTabsPane: React.ComponentType<{
     isSharingEnabled,
     hasPreviewsRunning,
     previewState,
-    eventsExecutionTrackingMode,
-    setEventsExecutionTrackingMode,
+    debuggerPlaySpeed,
+    setDebuggerPlaySpeed,
     isWatchedVariablesPanelOpen,
     onToggleWatchedVariablesPanel,
     checkedOutVersionStatus,
@@ -850,8 +853,8 @@ const EditorTabsPane: React.ComponentType<{
                     onClosePreviews: closeAllPreviews,
                     isWatchedVariablesPanelOpen,
                     onToggleWatchedVariablesPanel,
-                    eventsExecutionTrackingMode,
-                    setEventsExecutionTrackingMode,
+                    debuggerPlaySpeed,
+                    setDebuggerPlaySpeed,
                     onRestartInGameEditor,
                     showRestartInGameEditorAfterErrorButton,
                     resourceManagementProps,

@@ -46,6 +46,24 @@ const getWatchedVariableSourceType = (
   projectScopedContainers: gdProjectScopedContainers | null
 ): VariablesContainer_SourceType => {
   if (!projectScopedContainers) return gd.VariablesContainer.Unknown;
+  try {
+    return getWatchedVariableSourceTypeOrThrow(
+      expression,
+      projectScopedContainers
+    );
+  } catch (error) {
+    console.error(
+      `Unable to find where the variable "${expression}" comes from:`,
+      error
+    );
+    return gd.VariablesContainer.Unknown;
+  }
+};
+
+const getWatchedVariableSourceTypeOrThrow = (
+  expression: string,
+  projectScopedContainers: gdProjectScopedContainers
+): VariablesContainer_SourceType => {
   if (
     projectScopedContainers
       .getObjectsContainersList()
@@ -61,6 +79,21 @@ const getWatchedVariableSourceType = (
  * known variable, as a number or a string (whichever is valid) otherwise.
  */
 const getWatchedExpressionType = (
+  expression: string,
+  projectScopedContainers: gdProjectScopedContainers
+): string => {
+  try {
+    return getWatchedExpressionTypeOrThrow(expression, projectScopedContainers);
+  } catch (error) {
+    console.error(
+      `Unable to determine the type of "${expression}", read as a text:`,
+      error
+    );
+    return 'string';
+  }
+};
+
+const getWatchedExpressionTypeOrThrow = (
   expression: string,
   projectScopedContainers: gdProjectScopedContainers
 ): string => {
@@ -244,14 +277,23 @@ const WatchedVariablesPanel = ({
         return;
 
       const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
-      const codes = watchedExpressions.map(expression =>
-        layoutCodeGenerator.generateExpressionEvaluationCode(
-          layout,
-          getWatchedExpressionType(expression, projectScopedContainers),
-          expression,
-          ''
-        )
-      );
+      const codes = watchedExpressions.map(expression => {
+        try {
+          return layoutCodeGenerator.generateExpressionEvaluationCode(
+            layout,
+            getWatchedExpressionType(expression, projectScopedContainers),
+            expression,
+            ''
+          );
+        } catch (error) {
+          console.error(
+            `Unable to generate the code watching "${expression}":`,
+            error
+          );
+          // Evaluated as nothing rather than breaking the whole panel.
+          return '';
+        }
+      });
       layoutCodeGenerator.delete();
 
       let isCancelled = false;
@@ -260,15 +302,14 @@ const WatchedVariablesPanel = ({
           if (!isCancelled) setEvaluations({});
           return;
         }
-        const results = await Promise.all(
-          codes.map(code => store.evaluateExpression(code))
-        );
-        if (isCancelled) return;
+        // One round trip for every watched variable, not one each.
+        const results = await store.evaluateExpressions(codes);
+        if (isCancelled || !results) return;
         const newEvaluations: {
           [expression: string]: ExpressionEvaluation | null,
         } = {};
         watchedExpressions.forEach((expression, index) => {
-          newEvaluations[expression] = results[index];
+          newEvaluations[expression] = results[index] || null;
         });
         setEvaluations(newEvaluations);
       };

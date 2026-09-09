@@ -17,7 +17,8 @@ import {
   getFramesInRange,
   getRecordingTimeBounds,
   getSamplesInRange,
-  getSceneChanges,
+  getTimelineMarkers,
+  extendSamplesToStarts,
   getShownRange,
 } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import { formatBytes } from '../Resources/ResourcesDebugTypes';
@@ -40,8 +41,8 @@ type Stat = {|
 /**
  * The high level numbers of a recording, as cards for the summary: the
  * frames of the selection, and what the engine measured over the whole run.
- * Anything the engine did not measure (an older game, or a game that does
- * not render in 3D) is left out rather than shown as a zero.
+ * Every card is always there, with a dash for what is not measured yet: the
+ * cards then never move while the recording goes on.
  */
 const getStats = (recording: ProfilerRecording): Array<Stat> => {
   const shownRange = getShownRange(recording);
@@ -59,100 +60,103 @@ const getStats = (recording: ProfilerRecording): Array<Stat> => {
       <Trans>in the recording</Trans>
     ),
   });
-  if (frameStats.averageMs) {
-    stats.push({
-      label: <Trans>Average frame</Trans>,
-      value: formatMilliseconds(frameStats.averageMs),
-      note: <Trans>{formatNumber(frameStats.fps)} frames per second</Trans>,
-    });
-    stats.push({
-      label: <Trans>Slowest frame</Trans>,
-      value: formatMilliseconds(frameStats.maxMs),
-      note: (
-        <Trans>
-          {formatNumber(frameStats.slowFramesCount)} frames above 16.7 ms
-        </Trans>
-      ),
-    });
-  }
+  const hasFrames = frameStats.averageMs > 0;
+  stats.push({
+    label: <Trans>Average frame</Trans>,
+    value: hasFrames ? formatMilliseconds(frameStats.averageMs) : '-',
+    note: <Trans>{formatNumber(frameStats.fps)} frames per second</Trans>,
+  });
+  stats.push({
+    label: <Trans>Slowest frame</Trans>,
+    value: hasFrames ? formatMilliseconds(frameStats.maxMs) : '-',
+    note: (
+      <Trans>
+        {formatNumber(frameStats.slowFramesCount)} frames above 16.7 ms
+      </Trans>
+    ),
+  });
 
   const lastSampleWithHeap = [...samples]
     .reverse()
     .find(sample => sample.usedJSHeapBytes != null);
-  if (lastSampleWithHeap && lastSampleWithHeap.usedJSHeapBytes != null) {
-    const peakHeap = samples.reduce(
-      (peak, sample) => Math.max(peak, sample.usedJSHeapBytes || 0),
-      0
-    );
-    stats.push({
-      label: <Trans>Memory (JavaScript heap)</Trans>,
-      value: formatBytes(lastSampleWithHeap.usedJSHeapBytes),
-      note: <Trans>peak {formatBytes(peakHeap)}</Trans>,
-    });
-  }
+  const peakHeap = samples.reduce(
+    (peak, sample) => Math.max(peak, sample.usedJSHeapBytes || 0),
+    0
+  );
+  stats.push({
+    label: <Trans>Memory (JavaScript heap)</Trans>,
+    value:
+      lastSampleWithHeap && lastSampleWithHeap.usedJSHeapBytes != null
+        ? formatBytes(lastSampleWithHeap.usedJSHeapBytes)
+        : '-',
+    note: <Trans>peak {peakHeap ? formatBytes(peakHeap) : '-'}</Trans>,
+  });
   const lastSampleWithGpu = [...samples]
     .reverse()
     .find(sample => sample.estimatedGpuMemoryBytes != null);
-  if (lastSampleWithGpu && lastSampleWithGpu.estimatedGpuMemoryBytes != null) {
-    stats.push({
-      label: <Trans>GPU memory (textures)</Trans>,
-      value: formatBytes(lastSampleWithGpu.estimatedGpuMemoryBytes),
-      note: <Trans>estimated from the loaded textures</Trans>,
-    });
-  }
+  stats.push({
+    label: <Trans>GPU memory (textures)</Trans>,
+    value:
+      lastSampleWithGpu && lastSampleWithGpu.estimatedGpuMemoryBytes != null
+        ? formatBytes(lastSampleWithGpu.estimatedGpuMemoryBytes)
+        : '-',
+    note: <Trans>estimated from the loaded textures</Trans>,
+  });
 
+  // Sent by the engine when the recording stops.
   const legacyStats = recording.legacyOutput
     ? recording.legacyOutput.stats
     : null;
-  if (legacyStats) {
-    if (legacyStats.averageDrawCallsCount != null) {
-      stats.push({
-        label: <Trans>3D draw calls</Trans>,
-        value: formatNumber(legacyStats.averageDrawCallsCount),
-        note: <Trans>per frame, on average over the run</Trans>,
-      });
-    }
-    if (legacyStats.averageTrianglesCount != null) {
-      stats.push({
-        label: <Trans>3D triangles</Trans>,
-        value: formatNumber(legacyStats.averageTrianglesCount),
-        note: <Trans>per frame, on average over the run</Trans>,
-      });
-    }
-    if (
-      legacyStats.geometriesCount != null ||
-      legacyStats.texturesCount != null
-    ) {
-      stats.push({
-        label: <Trans>3D geometries / textures</Trans>,
-        value: `${formatNumber(
-          legacyStats.geometriesCount || 0
-        )} / ${formatNumber(legacyStats.texturesCount || 0)}`,
-        note: <Trans>held by the renderer</Trans>,
-      });
-    }
-    if (legacyStats.shaderProgramsCount != null) {
-      stats.push({
-        label: <Trans>Shader programs</Trans>,
-        value: formatNumber(legacyStats.shaderProgramsCount),
-      });
-    }
-    if (legacyStats.shaderProgramCompilationsCount != null) {
-      const compilations = legacyStats.shaderProgramCompilationsCount;
-      stats.push({
-        label: <Trans>Shaders compiled during the run</Trans>,
-        value: formatNumber(compilations),
-        note: compilations ? (
-          <Trans>
-            on {formatNumber(legacyStats.framesWithShaderCompilationCount || 0)}{' '}
-            dropped frame(s) - see the console for what differed
-          </Trans>
-        ) : (
-          <Trans>none, so no frame was spent compiling</Trans>
-        ),
-      });
-    }
-  }
+  const formatLegacyNumber = (value: ?number): string =>
+    value != null ? formatNumber(value) : '-';
+  stats.push({
+    label: <Trans>3D draw calls</Trans>,
+    value: formatLegacyNumber(
+      legacyStats ? legacyStats.averageDrawCallsCount : null
+    ),
+    note: <Trans>per frame, on average over the run</Trans>,
+  });
+  stats.push({
+    label: <Trans>3D triangles</Trans>,
+    value: formatLegacyNumber(
+      legacyStats ? legacyStats.averageTrianglesCount : null
+    ),
+    note: <Trans>per frame, on average over the run</Trans>,
+  });
+  stats.push({
+    label: <Trans>3D geometries / textures</Trans>,
+    value: `${formatLegacyNumber(
+      legacyStats ? legacyStats.geometriesCount : null
+    )} / ${formatLegacyNumber(legacyStats ? legacyStats.texturesCount : null)}`,
+    note: <Trans>held by the renderer</Trans>,
+  });
+  stats.push({
+    label: <Trans>Shader programs</Trans>,
+    value: formatLegacyNumber(
+      legacyStats ? legacyStats.shaderProgramsCount : null
+    ),
+  });
+  const compilations = legacyStats
+    ? legacyStats.shaderProgramCompilationsCount
+    : null;
+  stats.push({
+    label: <Trans>Shaders compiled during the run</Trans>,
+    value: formatLegacyNumber(compilations),
+    note:
+      compilations == null ? (
+        <Trans>known when the recording stops</Trans>
+      ) : compilations ? (
+        <Trans>
+          on{' '}
+          {formatNumber(
+            (legacyStats && legacyStats.framesWithShaderCompilationCount) || 0
+          )}{' '}
+          dropped frame(s) - see the console for what differed
+        </Trans>
+      ) : (
+        <Trans>none, so no frame was spent compiling</Trans>
+      ),
+  });
 
   return stats;
 };
@@ -166,8 +170,8 @@ type Props = {|
 |};
 
 /**
- * The performance panel: the summary of the profiler recording, and the
- * counters sampled while recording (frames per second, memory) over time.
+ * The performance panel: the counters sampled while recording (frames per
+ * second, memory) over time, and the summary of the profiler recording.
  */
 const Performance = ({
   recordingStore,
@@ -176,15 +180,34 @@ const Performance = ({
   memoryLimitBytes,
 }: Props): React.Node => {
   const recording = useProfilerRecording(recordingStore, debuggerId);
-  const stats = React.useMemo(() => (recording ? getStats(recording) : []), [
-    recording,
-    recording && recording.frames.length, // eslint-disable-line react-hooks/exhaustive-deps
-    recording && recording.selectedRange, // eslint-disable-line react-hooks/exhaustive-deps
-    recording && recording.legacyOutput, // eslint-disable-line react-hooks/exhaustive-deps
-  ]);
-  const sceneChanges = React.useMemo(
-    () => (recording ? getSceneChanges(recording.frames) : []),
-    [recording, recording && recording.frames.length] // eslint-disable-line react-hooks/exhaustive-deps
+  // The store appends to the recording in place: what changed is told by
+  // these counters, which the memos below depend on.
+  const framesCount = recording ? recording.frames.length : 0;
+  const samplesCount = recording ? recording.samples.length : 0;
+  const startsCount = recording ? recording.startsAtGameTimeMs.length : 0;
+  const selectedRange = recording ? recording.selectedRange : null;
+  const legacyOutput = recording ? recording.legacyOutput : null;
+  const stats = React.useMemo(
+    () => (recording ? getStats(recording) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recording, framesCount, samplesCount, selectedRange, legacyOutput]
+  );
+  const markers = React.useMemo(
+    () => (recording ? getTimelineMarkers(recording) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recording, framesCount, startsCount]
+  );
+  // The store appends the samples in place: the charts only redraw when they
+  // are given a new array, so one is made each time samples arrived. The game
+  // samples at the end of each chunk, so the curves are extended back to each
+  // start of the recording, otherwise they leave a gap after it.
+  const samples = React.useMemo(
+    () =>
+      recording
+        ? extendSamplesToStarts(recording.samples, recording.startsAtGameTimeMs)
+        : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recording, samplesCount, startsCount]
   );
 
   if (!recording || (!recording.frames.length && !recording.samples.length)) {
@@ -210,6 +233,28 @@ const Performance = ({
     <Background>
       <ScrollView autoHideScrollbar>
         <div className={profilerClasses.content}>
+          {/* The charts first: their height never changes, while the cards of
+              the summary appear and grow as the recording goes on. */}
+          {samples.length > 1 && (
+            <div className={profilerClasses.section}>
+              <Text noMargin size="body-small" color="secondary">
+                <Trans>
+                  Over the recording (drag the handles of the last chart to
+                  select a range in the profiler)
+                </Trans>
+              </Text>
+              <PerformanceChart
+                samples={samples}
+                bounds={bounds}
+                selectedRange={recording.selectedRange}
+                onSelectRange={range =>
+                  recordingStore.setSelectedRange(debuggerId, range)
+                }
+                markers={markers}
+                memoryLimitBytes={memoryLimitBytes}
+              />
+            </div>
+          )}
           <div className={profilerClasses.section}>
             <Text noMargin size="body-small" color="secondary">
               <Trans>Summary</Trans>
@@ -236,26 +281,6 @@ const Performance = ({
               ))}
             </div>
           </div>
-          {recording.samples.length > 1 && (
-            <div className={profilerClasses.section}>
-              <Text noMargin size="body-small" color="secondary">
-                <Trans>
-                  Over the recording (drag the handles of the last chart to
-                  select a range in the profiler)
-                </Trans>
-              </Text>
-              <PerformanceChart
-                samples={recording.samples}
-                bounds={bounds}
-                selectedRange={recording.selectedRange}
-                onSelectRange={range =>
-                  recordingStore.setSelectedRange(debuggerId, range)
-                }
-                sceneChanges={sceneChanges}
-                memoryLimitBytes={memoryLimitBytes}
-              />
-            </div>
-          )}
         </div>
       </ScrollView>
     </Background>

@@ -2,22 +2,24 @@
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 
 /**
- * How the execution of the events of a preview is followed by the editor:
- * not at all, at the normal speed of the game, or with the game slowed down
- * to see the instructions being executed one after the other.
+ * The speed a game plays at while debugged: normal, or slowed down to see the
+ * instructions being executed one after the other in the events sheets.
  */
-export type EventsExecutionTrackingMode =
-  | 'off'
-  | 'normal-speed'
-  | 'slow-speed'
-  // The game is paused and only advances one frame at a time, on demand.
-  | 'frame-by-frame';
+export type DebuggerPlaySpeed = 'normal' | 'slow';
 
-export const SLOW_SPEED_GAME_SPEED_FACTOR = 0.1;
+/**
+ * How to start a preview for the debugger: at the given play speed, or at the
+ * speed already chosen when omitted.
+ */
+export type LaunchDebuggerAndPreviewOptions = {|
+  playSpeed?: DebuggerPlaySpeed,
+|};
 
-export const getGameSpeedFactorForMode = (
-  mode: EventsExecutionTrackingMode
-): number => (mode === 'slow-speed' ? SLOW_SPEED_GAME_SPEED_FACTOR : 1);
+export const SLOW_PLAY_SPEED_GAME_SPEED_FACTOR = 0.1;
+
+export const getGameSpeedFactorForPlaySpeed = (
+  playSpeed: DebuggerPlaySpeed
+): number => (playSpeed === 'slow' ? SLOW_PLAY_SPEED_GAME_SPEED_FACTOR : 1);
 
 /** What the game reports: the duration of the last execution of each instruction. */
 export type EventsExecutionTrackerOutput = {|
@@ -69,7 +71,12 @@ const getEventPtrFromInstructionExecutionId = (
 export class EventsExecutionTrackingStore {
   _instructionExecutions: Map<string, InstructionExecution> = new Map();
   _eventExecutions: Map<number, InstructionExecution> = new Map();
-  _listeners: Set<() => void> = new Set();
+  /**
+   * The listeners of each event, so that a report only wakes up the rows that
+   * it concerns: an events sheet has one listener per instruction, and waking
+   * them all up several times per second would be far too expensive.
+   */
+  _listenersByEventPtr: Map<number, Set<() => void>> = new Map();
   _expirationTimeoutId: TimeoutID | null = null;
   _previewDebuggerServer: ?PreviewDebuggerServer = null;
   /**
@@ -132,17 +139,20 @@ export class EventsExecutionTrackingStore {
   }
 
   /**
-   * Ask the running preview to evaluate the code generated for an expression
-   * (see `LayoutCodeGenerator.generateExpressionEvaluationCode`).
-   * Resolves to null if no preview answers.
+   * Ask the running preview to evaluate the codes generated for expressions
+   * (see `LayoutCodeGenerator.generateExpressionEvaluationCode`), all of them
+   * in a single round trip. Resolves to null if no preview answers.
    */
-  async evaluateExpression(code: string): Promise<ExpressionEvaluation | null> {
+  async evaluateExpressions(
+    codes: Array<string>
+  ): Promise<Array<ExpressionEvaluation | null> | null> {
     if (!this._previewDebuggerServer || !this.hasRunningPreview()) return null;
+    if (!codes.length) return [];
 
     try {
       const answer = await this._previewDebuggerServer.sendMessageWithResponse({
         command: 'evaluateExpression',
-        payload: { code },
+        payload: { codes },
       });
       return answer.payload || null;
     } catch (error) {
@@ -151,9 +161,31 @@ export class EventsExecutionTrackingStore {
     }
   }
 
+  /** Evaluate a single expression (see `evaluateExpressions`). */
+  async evaluateExpression(code: string): Promise<ExpressionEvaluation | null> {
+    const evaluations = await this.evaluateExpressions([code]);
+    return evaluations ? evaluations[0] || null : null;
+  }
+
   ingest(output: EventsExecutionTrackerOutput): void {
+    try {
+      this._ingestOrThrow(output);
+    } catch (error) {
+      console.error(
+        'Unable to read what the game reported about its events:',
+        error
+      );
+    }
+  }
+
+  _ingestOrThrow(output: EventsExecutionTrackerOutput): void {
     const reportedAt = Date.now();
     const eventDurations: Map<number, number> = new Map();
+    // The events that were showing something and are not reported anymore
+    // must be notified too, so that they stop being highlighted.
+    const previouslyShownEventPtrs = this._areHighlightsPersistent
+      ? Array.from(this._eventExecutions.keys())
+      : null;
     if (this._areHighlightsPersistent) {
       // Only the last frame is shown.
       this._instructionExecutions.clear();
@@ -179,7 +211,14 @@ export class EventsExecutionTrackingStore {
       this._eventExecutions.set(eventPtr, { durationMs, reportedAt });
     });
 
-    this._notify();
+    this._notifyEvents(eventDurations.keys());
+    if (previouslyShownEventPtrs) {
+      this._notifyEvents(
+        previouslyShownEventPtrs.filter(
+          eventPtr => !eventDurations.has(eventPtr)
+        )
+      );
+    }
     if (!this._areHighlightsPersistent) this._scheduleExpiration();
   }
 
@@ -194,9 +233,10 @@ export class EventsExecutionTrackingStore {
     ) {
       return;
     }
+    const shownEventPtrs = Array.from(this._eventExecutions.keys());
     this._instructionExecutions.clear();
     this._eventExecutions.clear();
-    this._notify();
+    this._notifyEvents(shownEventPtrs);
   }
 
   getInstructionExecution(
@@ -215,15 +255,36 @@ export class EventsExecutionTrackingStore {
     return this._eventExecutions.get(eventPtr) || null;
   }
 
-  subscribe(listener: () => void): () => void {
-    this._listeners.add(listener);
+  /** Listen to what is reported about the instructions of one event. */
+  subscribe(eventPtr: number, listener: () => void): () => void {
+    let listeners = this._listenersByEventPtr.get(eventPtr);
+    if (!listeners) {
+      listeners = new Set();
+      this._listenersByEventPtr.set(eventPtr, listeners);
+    }
+    listeners.add(listener);
+
     return () => {
-      this._listeners.delete(listener);
+      const currentListeners = this._listenersByEventPtr.get(eventPtr);
+      if (!currentListeners) return;
+      currentListeners.delete(listener);
+      if (currentListeners.size === 0) {
+        this._listenersByEventPtr.delete(eventPtr);
+      }
     };
   }
 
-  _notify(): void {
-    this._listeners.forEach(listener => listener());
+  _notifyEvents(eventPtrs: Iterable<number>): void {
+    for (const eventPtr of eventPtrs) {
+      const listeners = this._listenersByEventPtr.get(eventPtr);
+      if (listeners) listeners.forEach(listener => listener());
+    }
+  }
+
+  _notifyAll(): void {
+    this._listenersByEventPtr.forEach(listeners =>
+      listeners.forEach(listener => listener())
+    );
   }
 
   /** Forget the executions that are too old to be highlighted anymore. */
@@ -241,14 +302,16 @@ export class EventsExecutionTrackingStore {
           hasChanged = true;
         }
       });
+      const expiredEventPtrs = [];
       this._eventExecutions.forEach((execution, eventPtr) => {
         if (execution.reportedAt <= expirationTime) {
           this._eventExecutions.delete(eventPtr);
+          expiredEventPtrs.push(eventPtr);
           hasChanged = true;
         }
       });
 
-      if (hasChanged) this._notify();
+      if (hasChanged) this._notifyEvents(expiredEventPtrs);
       if (this._instructionExecutions.size > 0) this._scheduleExpiration();
     }, HIGHLIGHT_DURATION_MS);
   }

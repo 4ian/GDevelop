@@ -56,6 +56,8 @@ export type ProfilerRecording = {|
   recordingId: number,
   status: 'recording' | 'stopped',
   startedAtGameTimeMs: number,
+  /** When each recording started, in game time: the first one and the ones appended to it. */
+  startsAtGameTimeMs: Array<number>,
   endedAtGameTimeMs: ?number,
   stoppedByCap: boolean,
   /** The interned section names, indexed by id. */
@@ -65,6 +67,12 @@ export type ProfilerRecording = {|
   /** The averages sent when the recording stopped (kept for the summary stats). */
   legacyOutput: ?ProfilerOutput,
   nextChunkIndex: number,
+  /**
+   * Added to the name ids of the chunks being received: the game interns its
+   * names per recording (starting from 0), while a recording started again
+   * without clearing keeps the names of the previous ones.
+   */
+  nameIdOffset: number,
   /** The range the user is looking at, or null for the whole recording. */
   selectedRange: ?ProfilerRecordingRange,
 |};
@@ -85,23 +93,42 @@ export class ProfilerRecordingStore {
     return this._recordings.get(debuggerId) || null;
   }
 
+  /**
+   * A recording starts. If one is already kept for this preview (not cleared
+   * before recording again), the new frames are appended to it.
+   */
   onStarted(debuggerId: DebuggerId, payload: ?ProfilerStartedPayload) {
     // Older game engines send no payload: they also send no chunks, so the
     // recording stays empty and only `legacyOutput` is shown.
     const recordingId = payload ? payload.recordingId : 0;
-    this._recordings.set(debuggerId, {
-      recordingId,
-      status: 'recording',
-      startedAtGameTimeMs: payload ? payload.startedAtGameTimeMs : 0,
-      endedAtGameTimeMs: null,
-      stoppedByCap: false,
-      names: [],
-      frames: [],
-      samples: [],
-      legacyOutput: null,
-      nextChunkIndex: 0,
-      selectedRange: null,
-    });
+    const startedAtGameTimeMs = payload ? payload.startedAtGameTimeMs : 0;
+    const existingRecording = this._recordings.get(debuggerId);
+    if (existingRecording) {
+      existingRecording.recordingId = recordingId;
+      existingRecording.status = 'recording';
+      existingRecording.endedAtGameTimeMs = null;
+      existingRecording.stoppedByCap = false;
+      existingRecording.legacyOutput = null;
+      existingRecording.nextChunkIndex = 0;
+      existingRecording.nameIdOffset = existingRecording.names.length;
+      existingRecording.startsAtGameTimeMs.push(startedAtGameTimeMs);
+    } else {
+      this._recordings.set(debuggerId, {
+        recordingId,
+        status: 'recording',
+        startedAtGameTimeMs,
+        startsAtGameTimeMs: [startedAtGameTimeMs],
+        endedAtGameTimeMs: null,
+        stoppedByCap: false,
+        names: [],
+        frames: [],
+        samples: [],
+        legacyOutput: null,
+        nextChunkIndex: 0,
+        nameIdOffset: 0,
+        selectedRange: null,
+      });
+    }
     this._notify(true);
   }
 
@@ -119,11 +146,19 @@ export class ProfilerRecordingStore {
       );
     }
     recording.nextChunkIndex = chunk.chunkIndex + 1;
+    const { nameIdOffset } = recording;
     for (const { id, name } of chunk.newNames) {
-      recording.names[id] = name;
+      recording.names[id + nameIdOffset] = name;
     }
     for (const frame of chunk.frames) {
-      recording.frames.push(frame);
+      recording.frames.push(
+        nameIdOffset === 0
+          ? frame
+          : {
+              ...frame,
+              nameIds: frame.nameIds.map(nameId => nameId + nameIdOffset),
+            }
+      );
     }
     for (const sample of chunk.samples) {
       recording.samples.push(sample);

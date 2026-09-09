@@ -6,6 +6,7 @@ import {
   type ProfilerRecordingRange,
 } from '../ProfilerRecording/ProfilerRecordingStore';
 import {
+  type TimelineMarker,
   SLOW_FRAME_THRESHOLD_MS,
   findFirstFrameIndexAtOrAfter,
   formatGameTime,
@@ -19,7 +20,9 @@ type Props = {|
   bounds: ProfilerRecordingRange,
   selectedRange: ?ProfilerRecordingRange,
   onSelectRange: (range: ?ProfilerRecordingRange) => void,
-  sceneChanges: Array<{| atMs: number, sceneName: string |}>,
+  markers: Array<TimelineMarker>,
+  /** The label of the markers of a recording start, translated. */
+  recordingStartLabel: string,
 |};
 
 /** Frames longer than this are drawn at the full height of the strip. */
@@ -37,7 +40,8 @@ const FrameStrip = ({
   bounds,
   selectedRange,
   onSelectRange,
-  sceneChanges,
+  markers,
+  recordingStartLabel,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {
@@ -120,19 +124,27 @@ const FrameStrip = ({
       context.stroke();
       context.setLineDash([]);
 
-      // Scene changes.
+      // Scene changes (labelled at the top) and recording starts (dashed,
+      // labelled at the bottom: they often share the same time).
       context.font = `10px ${gdevelopTheme.chart.fontFamily}`;
-      context.textBaseline = 'top';
       context.fillStyle = textColor;
-      for (const sceneChange of sceneChanges) {
-        const x = Math.floor(timeToX(sceneChange.atMs)) + 0.5;
-        context.strokeStyle = textColor;
+      context.strokeStyle = textColor;
+      for (const marker of markers) {
+        const isRecordingStart = marker.kind === 'recordingStart';
+        const x = Math.floor(timeToX(marker.atMs)) + 0.5;
+        context.setLineDash(isRecordingStart ? [2, 3] : []);
         context.beginPath();
         context.moveTo(x, 0);
         context.lineTo(x, height);
         context.stroke();
-        context.fillText(sceneChange.sceneName, x + 3, 1);
+        context.textBaseline = isRecordingStart ? 'bottom' : 'top';
+        context.fillText(
+          isRecordingStart ? recordingStartLabel : marker.label,
+          x + 3,
+          isRecordingStart ? height - 1 : 1
+        );
       }
+      context.setLineDash([]);
 
       // The selection: everything else is dimmed.
       const shownSelection = dragRange || selectedRange;
@@ -160,7 +172,8 @@ const FrameStrip = ({
       bounds,
       selectedRange,
       dragRange,
-      sceneChanges,
+      markers,
+      recordingStartLabel,
       size,
       spanMs,
       timeToX,

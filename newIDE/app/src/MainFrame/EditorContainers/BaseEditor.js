@@ -9,7 +9,10 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import type { StorageProvider } from '../../ProjectsStorage';
 import { type PreviewDebuggerServer } from '../../ExportAndShare/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
-import { type EventsExecutionTrackingMode } from '../../EventsExecutionTracking/EventsExecutionTrackingStore';
+import {
+  type DebuggerPlaySpeed,
+  type LaunchDebuggerAndPreviewOptions,
+} from '../../EventsExecutionTracking/EventsExecutionTrackingStore';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
@@ -84,12 +87,12 @@ export type RenderEditorContainerProps = {|
   |}) => void,
   previewDebuggerServer: ?PreviewDebuggerServer,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onLaunchDebuggerAndPreview: () => void,
+  onLaunchDebuggerAndPreview: (?LaunchDebuggerAndPreviewOptions) => void,
   onClosePreviews: () => void,
   isWatchedVariablesPanelOpen: boolean,
   onToggleWatchedVariablesPanel: () => void,
-  eventsExecutionTrackingMode: EventsExecutionTrackingMode,
-  setEventsExecutionTrackingMode: EventsExecutionTrackingMode => void,
+  debuggerPlaySpeed: DebuggerPlaySpeed,
+  setDebuggerPlaySpeed: DebuggerPlaySpeed => void,
   onRestartInGameEditor: (reason: string) => void,
   showRestartInGameEditorAfterErrorButton: boolean,
 

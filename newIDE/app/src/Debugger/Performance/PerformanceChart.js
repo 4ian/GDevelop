@@ -2,6 +2,7 @@
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import type { I18n as I18nType } from '@lingui/core';
+import { type TimelineMarker } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import { I18n } from '@lingui/react';
 import {
   ResponsiveContainer,
@@ -38,7 +39,7 @@ type Props = {|
   bounds: ProfilerRecordingRange,
   selectedRange: ?ProfilerRecordingRange,
   onSelectRange: (range: ?ProfilerRecordingRange) => void,
-  sceneChanges: Array<{| atMs: number, sceneName: string |}>,
+  markers: Array<TimelineMarker>,
   /** Drawn as a dashed line on the memory chart, like the limit of an offer. */
   memoryLimitBytes: ?number,
 |};
@@ -81,7 +82,7 @@ const PerformanceChart = ({
   bounds,
   selectedRange,
   onSelectRange,
-  sceneChanges,
+  markers,
   memoryLimitBytes,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -241,18 +242,33 @@ const PerformanceChart = ({
                         }}
                       />
                     )}
-                    {sceneChanges.map(sceneChange => (
+                    {markers.map(marker => (
                       <ReferenceLine
-                        key={sceneChange.atMs}
-                        x={sceneChange.atMs}
-                        stroke={gdevelopTheme.chart.gridColor}
+                        key={`${marker.kind}-${marker.atMs}`}
+                        x={marker.atMs}
+                        stroke={
+                          marker.kind === 'recordingStart'
+                            ? gdevelopTheme.chart.textColor
+                            : gdevelopTheme.chart.gridColor
+                        }
+                        strokeDasharray={
+                          marker.kind === 'recordingStart' ? '2 3' : undefined
+                        }
                         label={
                           index === 0
                             ? {
-                                value: sceneChange.sceneName,
+                                value:
+                                  marker.kind === 'recordingStart'
+                                    ? i18n._(t`Record start`)
+                                    : marker.label,
                                 fill: gdevelopTheme.chart.textColor,
                                 fontSize: 10,
-                                position: 'insideTopLeft',
+                                // Scene names at the top, record starts at
+                                // the bottom: they often share the same time.
+                                position:
+                                  marker.kind === 'recordingStart'
+                                    ? 'insideBottomLeft'
+                                    : 'insideTopLeft',
                               }
                             : undefined
                         }

@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Events execution tracker');
+
   /**
    * What the tracker reports: the duration (in milliseconds) of the last
    * execution of each instruction that ran since the previous report.
@@ -27,8 +29,15 @@ namespace gdjs {
    * @category Debugging > Events execution tracker
    */
   export class EventsExecutionTracker {
-    private _startTimes: Record<string, float> = {};
-    private _pendingOutput: EventsExecutionTrackerOutput | null = null;
+    /**
+     * The instruction being executed and when it started. Instructions are
+     * never nested (the generated code wraps each one of them separately),
+     * so a single pair is enough: no map to look up, nothing to allocate.
+     */
+    private _startedInstructionId: string | null = null;
+    private _startedAt: float = 0;
+    /** Durations of the instructions that ran since the last report. */
+    private _durations: Map<string, float> = new Map();
     /** `null` until the first report, which is never delayed. */
     private _lastReportTime: float | null = null;
     private readonly _reportIntervalMs: float;
@@ -57,21 +66,21 @@ namespace gdjs {
      * Called by the generated code just before an instruction runs.
      */
     begin(instructionExecutionId: string): void {
-      this._startTimes[instructionExecutionId] = this._getTimeNow();
+      this._startedInstructionId = instructionExecutionId;
+      this._startedAt = this._getTimeNow();
     }
 
     /**
      * Called by the generated code just after an instruction ran.
      */
     end(instructionExecutionId: string): void {
-      const startTime = this._startTimes[instructionExecutionId];
-      if (startTime === undefined) return;
+      if (this._startedInstructionId !== instructionExecutionId) return;
 
-      if (!this._pendingOutput) {
-        this._pendingOutput = { instructionDurations: {} };
-      }
-      this._pendingOutput.instructionDurations[instructionExecutionId] =
-        this._getTimeNow() - startTime;
+      this._durations.set(
+        instructionExecutionId,
+        this._getTimeNow() - this._startedAt
+      );
+      this._startedInstructionId = null;
     }
 
     /**
@@ -79,7 +88,7 @@ namespace gdjs {
      * previous report. To be called once per frame by the game.
      */
     onFrameEnded(): void {
-      if (!this._pendingOutput) return;
+      if (this._durations.size === 0) return;
 
       const now = this._getTimeNow();
       if (
@@ -97,11 +106,24 @@ namespace gdjs {
      * Report immediately what ran since the previous report, if anything did.
      */
     flush(): void {
-      const output = this._pendingOutput;
-      if (!output) return;
+      if (this._durations.size === 0) return;
 
-      this._pendingOutput = null;
-      this._onReport(output);
+      // Built only when reporting: the durations are collected in a map,
+      // which is much cheaper to fill than an object with dynamic keys.
+      const instructionDurations: Record<string, float> = {};
+      this._durations.forEach((durationMs, instructionExecutionId) => {
+        instructionDurations[instructionExecutionId] = durationMs;
+      });
+      this._durations.clear();
+
+      try {
+        this._onReport({ instructionDurations });
+      } catch (error) {
+        logger.error(
+          'Unable to report the executed instructions to the debugger:',
+          error
+        );
+      }
     }
   }
 

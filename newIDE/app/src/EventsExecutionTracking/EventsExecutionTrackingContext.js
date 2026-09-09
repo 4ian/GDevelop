@@ -37,18 +37,29 @@ const areExecutionsEqual = (
     first.reportedAt === second.reportedAt);
 
 /**
- * Subscribe to the store, re-rendering only when the selected execution changes.
+ * Subscribe to what is reported about one event, re-rendering only when the
+ * selected execution changes.
+ *
+ * An events sheet mounts one of these per instruction: the subscription is
+ * made for the event only, so that a report does not wake up the rows of the
+ * whole sheet.
  */
 const useStoreSelection = (
+  eventPtr: number | null,
   select: (store: EventsExecutionTrackingStore) => InstructionExecution | null
 ): InstructionExecution | null => {
   const store = React.useContext(EventsExecutionTrackingContext);
   const [execution, setExecution] = React.useState<InstructionExecution | null>(
-    () => select(store)
+    () => (eventPtr === null ? null : select(store))
   );
 
   React.useEffect(
     () => {
+      if (eventPtr === null) {
+        setExecution(null);
+        return;
+      }
+
       const update = () => {
         const newExecution = select(store);
         setExecution(previousExecution =>
@@ -58,9 +69,9 @@ const useStoreSelection = (
         );
       };
       update();
-      return store.subscribe(update);
+      return store.subscribe(eventPtr, update);
     },
-    [store, select]
+    [store, eventPtr, select]
   );
 
   return execution;
@@ -83,7 +94,7 @@ export const useInstructionExecution = (
     [eventPtr, isCondition, indexInList]
   );
 
-  return useStoreSelection(select);
+  return useStoreSelection(eventPtr, select);
 };
 
 /**
@@ -98,5 +109,5 @@ export const useEventExecution = (
     [eventPtr]
   );
 
-  return useStoreSelection(select);
+  return useStoreSelection(eventPtr, select);
 };

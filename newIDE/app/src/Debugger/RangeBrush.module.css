@@ -6,13 +6,15 @@
   overflow: hidden;
   border: 1px solid var(--theme-list-item-separator-color);
   background-color: var(--theme-surface-canvas-background-color);
+  /* Dragging the empty part draws a new range. */
+  cursor: crosshair;
 }
 
 .selection {
   position: absolute;
   top: 0;
   bottom: 0;
-  min-width: 8px;
+  min-width: 16px;
   cursor: grab;
   background-color: color-mix(
     in srgb,
@@ -31,7 +33,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 8px;
+  width: 6px;
   cursor: col-resize;
   background-color: var(--theme-primary-light);
 }

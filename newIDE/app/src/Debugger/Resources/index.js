@@ -7,7 +7,6 @@ import Text from '../../UI/Text';
 import SearchBar from '../../UI/SearchBar';
 import Chip from '../../UI/Chip';
 import IconButton from '../../UI/IconButton';
-import FlatButton from '../../UI/FlatButton';
 import Refresh from '../../UI/CustomSvgIcons/Refresh';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
@@ -52,6 +51,12 @@ const toggleInArray = <T>(array: Array<T>, value: T): Array<T> =>
   array.includes(value)
     ? array.filter(item => item !== value)
     : [...array, value];
+
+/**
+ * "Not loaded" resources have no kind and no other status: this filter is
+ * exclusive, selecting it clears the other filters (and the other way around).
+ */
+const notLoadedStatus: ResourceLoadStatus = 'not-loaded';
 
 /**
  * The resources of the running game: how much memory they take, when they
@@ -170,13 +175,17 @@ const ResourcesPanel = ({
   }
 
   const kinds = Object.keys(resourcesDebugState.totals.byKind).sort();
+  const isShowingEverything =
+    !filters.kinds.length && !filters.statuses.length && !filters.searchText;
   const statusesWithResources: Array<ResourceLoadStatus> = resourceLoadStatuses.filter(
     status => (resourcesDebugState.totals.byStatus[status] || 0) > 0
   );
 
   return (
     <Background>
-      <div className={classes.panel} onKeyDown={onKeyDown}>
+      {/* Focusable, so that the F shortcut works as soon as the panel or one
+          of its rows is used. */}
+      <div className={classes.panel} onKeyDown={onKeyDown} tabIndex={-1}>
         <div className={classes.header}>
           <div className={classes.headerRow}>
             <div style={{ flex: 1, minWidth: 160 }}>
@@ -188,31 +197,14 @@ const ResourcesPanel = ({
                 aspect="integrated-search-bar"
               />
             </div>
-            <Text noMargin size="body-small" color="secondary">
-              <Trans>
-                {filteredRecords.length} of{' '}
-                {resourcesDebugState.resources.length} resources,{' '}
-                {formatBytes(filteredMemoryBytes)}
-              </Trans>
-            </Text>
-            <IconButton
-              size="small"
-              tooltip={t`Refresh now`}
-              onClick={refresh}
-              disabled={!isPollingEnabled}
-            >
-              <Refresh />
-            </IconButton>
           </div>
           <div className={classes.chips}>
-            <FlatButton
+            <Chip
+              size="small"
               label={<Trans>See all</Trans>}
+              color={isShowingEverything ? 'primary' : 'default'}
+              variant={isShowingEverything ? 'default' : 'outlined'}
               onClick={() => setFilters(emptyResourcesFilters)}
-              disabled={
-                !filters.kinds.length &&
-                !filters.statuses.length &&
-                !filters.searchText
-              }
             />
             {kinds.map(kind => (
               <Chip
@@ -225,6 +217,9 @@ const ResourcesPanel = ({
                   setFilters({
                     ...filters,
                     kinds: toggleInArray(filters.kinds, kind),
+                    statuses: filters.statuses.filter(
+                      status => status !== notLoadedStatus
+                    ),
                   })
                 }
               />
@@ -246,13 +241,45 @@ const ResourcesPanel = ({
                   filters.statuses.includes(status) ? 'default' : 'outlined'
                 }
                 onClick={() =>
-                  setFilters({
-                    ...filters,
-                    statuses: toggleInArray(filters.statuses, status),
-                  })
+                  setFilters(
+                    status === notLoadedStatus
+                      ? {
+                          ...filters,
+                          kinds: [],
+                          statuses: filters.statuses.includes(notLoadedStatus)
+                            ? []
+                            : [notLoadedStatus],
+                        }
+                      : {
+                          ...filters,
+                          statuses: toggleInArray(
+                            filters.statuses.filter(
+                              otherStatus => otherStatus !== notLoadedStatus
+                            ),
+                            status
+                          ),
+                        }
+                  )
                 }
               />
             ))}
+            <div className={classes.chipsEnd}>
+              <Text noMargin size="body-small" color="secondary">
+                <Trans>
+                  {filteredRecords.length} of{' '}
+                  {resourcesDebugState.resources.length} resources,{' '}
+                  {formatBytes(filteredMemoryBytes)}
+                </Trans>
+              </Text>
+              <IconButton
+                size="small"
+                tooltip={t`Refresh now`}
+                onClick={refresh}
+                disabled={!isPollingEnabled}
+              >
+                <Refresh />
+              </IconButton>
+            </div>
           </div>
         </div>
         <MemoryBar

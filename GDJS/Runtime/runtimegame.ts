@@ -1842,6 +1842,14 @@ namespace gdjs {
     }
 
     /**
+     * The client connected to the debugger of the editor, or null when the
+     * game is not being debugged.
+     */
+    getDebuggerClient(): gdjs.AbstractDebuggerClient | null {
+      return this._debuggerClient;
+    }
+
+    /**
      * Start reporting which instructions of the events are executed, and how
      * long they take (previews only: the generated code of exported games
      * does not track anything).
@@ -1876,8 +1884,12 @@ namespace gdjs {
       if (!this._paused) return;
 
       const frameDurationMs = 1000 / 60;
-      this._sceneStack.step(frameDurationMs);
-      this.getInputManager().onFrameEnded();
+      try {
+        this._sceneStack.step(frameDurationMs);
+        this.getInputManager().onFrameEnded();
+      } catch (error) {
+        logger.error('Error while stepping one frame of the game:', error);
+      }
       // Report right away what this frame executed.
       if (gdjs.eventsExecutionTracker) gdjs.eventsExecutionTracker.flush();
     }

@@ -24,7 +24,11 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { isProfilerAccessAllowed } from './ProfilerAccess';
 import Window from '../Utils/Window';
 import classes from './Debugger.module.css';
-import { type EventsExecutionTrackingMode } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
+import {
+  type DebuggerPlaySpeed,
+  type LaunchDebuggerAndPreviewOptions,
+} from '../EventsExecutionTracking/EventsExecutionTrackingStore';
+import { UseCommandHook } from '../CommandPalette/CommandHooks';
 
 export type ResourcesDebugSnapshot = {|
   state: ?ResourcesDebugState,
@@ -68,12 +72,12 @@ type Props = {|
   project: gdProject,
   setToolbar: React.Node => void,
   previewDebuggerServer: PreviewDebuggerServer,
-  onLaunchDebuggerAndPreview: () => void,
+  onLaunchDebuggerAndPreview: (?LaunchDebuggerAndPreviewOptions) => void,
   onClosePreviews: () => void,
   isWatchedVariablesPanelOpen: boolean,
   onToggleWatchedVariablesPanel: () => void,
-  eventsExecutionTrackingMode: EventsExecutionTrackingMode,
-  setEventsExecutionTrackingMode: EventsExecutionTrackingMode => void,
+  debuggerPlaySpeed: DebuggerPlaySpeed,
+  setDebuggerPlaySpeed: DebuggerPlaySpeed => void,
 |};
 
 type State = {|
@@ -90,6 +94,9 @@ type State = {|
   logs: { [DebuggerId]: Array<Log> },
   /** True for a moment after a screenshot key was pressed: the panels are hidden. */
   isScreenshotShieldShown: boolean,
+  /** Start recording the game as soon as it is restarted. */
+  shouldRecordOnLaunch: boolean,
+  shouldClearOnRecord: boolean,
 |};
 
 /** How long the panels stay hidden after a screenshot key was pressed. */
@@ -116,6 +123,8 @@ export default class Debugger extends React.Component<Props, State> {
     selectedId: '0',
     logs: {},
     isScreenshotShieldShown: false,
+    shouldRecordOnLaunch: false,
+    shouldClearOnRecord: true,
   };
   _screenshotShieldTimeoutId: ?TimeoutID = null;
   _wasProfilerAccessAllowed: boolean = false;
@@ -158,6 +167,11 @@ export default class Debugger extends React.Component<Props, State> {
   };
 
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
+  /**
+   * The games to record as soon as they say they are running: the ones just
+   * launched or restarted while recording on launch is asked for.
+   */
+  _recordOnConnectionIds: Set<DebuggerId> = new Set();
   _debuggerLogs: Map<DebuggerId, LogsManager> = new Map();
   // The recordings of the profiler, out of the state: chunks arrive twice a
   // second and the panels re-render on their own.
@@ -183,10 +197,8 @@ export default class Debugger extends React.Component<Props, State> {
         onStepFrame={() => this._stepFrame(this.state.selectedId)}
         isWatchedVariablesPanelOpen={this.props.isWatchedVariablesPanelOpen}
         onToggleWatchedVariablesPanel={this.props.onToggleWatchedVariablesPanel}
-        eventsExecutionTrackingMode={this.props.eventsExecutionTrackingMode}
-        setEventsExecutionTrackingMode={
-          this.props.setEventsExecutionTrackingMode
-        }
+        debuggerPlaySpeed={this.props.debuggerPlaySpeed}
+        setDebuggerPlaySpeed={this.props.setDebuggerPlaySpeed}
         onPlay={() => this._play(this.state.selectedId)}
         onPause={() => this._pause(this.state.selectedId)}
         canPlay={this._hasSelectedDebugger() && isSelectedDebuggerPaused}
@@ -203,6 +215,20 @@ export default class Debugger extends React.Component<Props, State> {
         onClear={() => this._clear(this.state.selectedId)}
         canRestart={this._hasSelectedDebugger()}
         onRestart={() => this._restart(this.state.selectedId)}
+        shouldRecordOnLaunch={this.state.shouldRecordOnLaunch}
+        onToggleRecordOnLaunch={() =>
+          this.setState(
+            state => ({ shouldRecordOnLaunch: !state.shouldRecordOnLaunch }),
+            () => this.updateToolbar()
+          )
+        }
+        shouldClearOnRecord={this.state.shouldClearOnRecord}
+        onToggleClearOnRecord={() =>
+          this.setState(
+            state => ({ shouldClearOnRecord: !state.shouldClearOnRecord }),
+            () => this.updateToolbar()
+          )
+        }
         canOpenInspector={this._hasSelectedDebugger()}
         isInspectorShown={
           !!selectedDebuggerContents &&
@@ -351,6 +377,10 @@ export default class Debugger extends React.Component<Props, State> {
         );
       },
       onConnectionOpened: ({ id, debuggerIds }) => {
+        // The game is not ready to record yet: it is when it sends its status.
+        if (this.state.shouldRecordOnLaunch) {
+          this._recordOnConnectionIds.add(id);
+        }
         this.setState(
           {
             debuggerIds,
@@ -407,6 +437,13 @@ export default class Debugger extends React.Component<Props, State> {
         }),
         () => this.updateToolbar()
       );
+      // A paused game (by the debugger, or by a "pause" action used as a
+      // breakpoint in the events) keeps its recording: each frame advanced by
+      // hand then records exactly one frame.
+      if (data.payload && this._recordOnConnectionIds.has(id)) {
+        this._recordOnConnectionIds.delete(id);
+        this._startProfiler(id);
+      }
     } else if (data.command === 'profiler.output') {
       this._profilerRecordingStore.onOutput(id, data.payload);
     } else if (data.command === 'profiler.started') {
@@ -501,17 +538,12 @@ export default class Debugger extends React.Component<Props, State> {
   _startProfiler = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     if (!this._isProfilerAccessAllowed()) return;
-    // A paused game records nothing: recording resumes it. Except when
-    // debugging frame by frame, where the game must stay paused: each step
-    // then records exactly one frame.
-    const status = this.state.debuggerStatus[id];
-    if (
-      status &&
-      status.isPaused &&
-      this.props.eventsExecutionTrackingMode !== 'frame-by-frame'
-    ) {
-      this._play(id);
+    // Recording again starts from a blank slate, unless asked otherwise.
+    if (this.state.shouldClearOnRecord && !this.state.profilingInProgress[id]) {
+      this._forgetRecordedData(id);
     }
+    // A paused game is left paused: each frame advanced by hand then records
+    // exactly one frame, which is how the events are debugged frame by frame.
     previewDebuggerServer.sendMessage(id, { command: 'profiler.start' });
   };
 
@@ -522,10 +554,16 @@ export default class Debugger extends React.Component<Props, State> {
 
   /**
    * Forget everything recorded about a preview (recording, logs, inspected
-   * data, resources) and start recording again if a recording was running.
+   * data, resources). A running recording is stopped, not started again: the
+   * user chooses when to record anew.
    */
   _clear = (id: DebuggerId) => {
-    const wasRecording = !!this.state.profilingInProgress[id];
+    if (this.state.profilingInProgress[id]) this._stopProfiler(id);
+    this._forgetRecordedData(id);
+  };
+
+  /** Forget the recording, logs, inspected data and resources of a preview. */
+  _forgetRecordedData = (id: DebuggerId) => {
     this._profilerRecordingStore.clear(id);
     this._getLogsManager(id).clear();
     this.setState(state => {
@@ -535,10 +573,6 @@ export default class Debugger extends React.Component<Props, State> {
       delete resourcesDebugSnapshots[id];
       return { debuggerGameData, resourcesDebugSnapshots };
     });
-    if (wasRecording) {
-      this._stopProfiler(id);
-      this._startProfiler(id);
-    }
   };
 
   /**
@@ -548,6 +582,8 @@ export default class Debugger extends React.Component<Props, State> {
   _restart = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     this._clear(id);
+    // The game comes back as a new connection, recorded again if recording
+    // on launch is asked for (see `onConnectionOpened`).
     previewDebuggerServer.sendMessage(id, {
       command: 'hardReload',
       payload: { clearCaches: true },
@@ -670,8 +706,34 @@ export default class Debugger extends React.Component<Props, State> {
     // The debugger server is only started when a preview is launched, so a
     // stopped server is displayed like a started one without any preview
     // running (it will be started as soon as a preview is launched).
+    // A recording can only be started on a preview that is running and that
+    // the user is allowed to profile.
+    const canRecord =
+      this._hasSelectedDebugger() && this._isProfilerAccessAllowed();
+    const isRecording = !!profilingInProgress[selectedId];
+
     return (
       <Background>
+        <UseCommandHook
+          name="TOGGLE_PROFILER_RECORDING"
+          enabled={canRecord}
+          command={{
+            handler: () =>
+              isRecording
+                ? this._stopProfiler(selectedId)
+                : this._startProfiler(selectedId),
+          }}
+        />
+        <UseCommandHook
+          name="START_PROFILER_RECORDING"
+          enabled={canRecord && !isRecording}
+          command={{ handler: () => this._startProfiler(selectedId) }}
+        />
+        <UseCommandHook
+          name="STOP_PROFILER_RECORDING"
+          enabled={canRecord && isRecording}
+          command={{ handler: () => this._stopProfiler(selectedId) }}
+        />
         {this.state.isScreenshotShieldShown && (
           <div className={classes.screenshotShield} />
         )}

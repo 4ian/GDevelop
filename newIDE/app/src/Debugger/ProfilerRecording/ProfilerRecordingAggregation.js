@@ -170,6 +170,60 @@ export const getFrameStats = (frames: Array<ProfilerFrame>): FrameStats => {
 };
 
 /** Where the scene running changed, from the frames themselves. */
+/**
+ * A moment marked with a vertical line on the timelines: a scene starting
+ * (labelled with its name) or a recording starting.
+ */
+export type TimelineMarker = {|
+  atMs: number,
+  kind: 'scene' | 'recordingStart',
+  label: string,
+|};
+
+/**
+ * The samples with, at each start of the recording that has no sample yet, a
+ * copy of the first sample following it: the game samples at the end of each
+ * chunk, and the curves would otherwise begin after the start.
+ */
+export const extendSamplesToStarts = (
+  samples: Array<ProfilerPerformanceSample>,
+  startsAtGameTimeMs: Array<number>
+): Array<ProfilerPerformanceSample> => {
+  const extendedSamples = samples.slice();
+  for (const startMs of startsAtGameTimeMs) {
+    const nextSampleIndex = extendedSamples.findIndex(
+      sample => sample.atGameTimeMs >= startMs
+    );
+    if (nextSampleIndex === -1) continue;
+    const nextSample = extendedSamples[nextSampleIndex];
+    if (nextSample.atGameTimeMs === startMs) continue;
+    const previousSample = extendedSamples[nextSampleIndex - 1];
+    if (previousSample && previousSample.atGameTimeMs >= startMs) continue;
+    extendedSamples.splice(nextSampleIndex, 0, {
+      ...nextSample,
+      atGameTimeMs: startMs,
+    });
+  }
+  return extendedSamples;
+};
+
+/** The markers of a recording: its scene changes and its starts, in time order. */
+export const getTimelineMarkers = (
+  recording: ProfilerRecording
+): Array<TimelineMarker> =>
+  [
+    ...getSceneChanges(recording.frames).map(sceneChange => ({
+      atMs: sceneChange.atMs,
+      kind: 'scene',
+      label: sceneChange.sceneName,
+    })),
+    ...recording.startsAtGameTimeMs.map(atMs => ({
+      atMs,
+      kind: 'recordingStart',
+      label: '',
+    })),
+  ].sort((markerA, markerB) => markerA.atMs - markerB.atMs);
+
 export const getSceneChanges = (
   frames: Array<ProfilerFrame>
 ): Array<{| atMs: number, sceneName: string |}> => {

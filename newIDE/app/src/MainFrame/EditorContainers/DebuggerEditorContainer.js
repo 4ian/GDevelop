@@ -161,10 +161,8 @@ export class DebuggerEditorContainer extends React.Component<
           onToggleWatchedVariablesPanel={
             this.props.onToggleWatchedVariablesPanel
           }
-          eventsExecutionTrackingMode={this.props.eventsExecutionTrackingMode}
-          setEventsExecutionTrackingMode={
-            this.props.setEventsExecutionTrackingMode
-          }
+          debuggerPlaySpeed={this.props.debuggerPlaySpeed}
+          setDebuggerPlaySpeed={this.props.setDebuggerPlaySpeed}
           ref={editor => (this.editor = editor)}
         />
         <SubscriptionChecker

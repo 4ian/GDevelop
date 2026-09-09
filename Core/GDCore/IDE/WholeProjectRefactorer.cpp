@@ -1754,7 +1754,7 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
   // Rename object in the current layout
   gd::EventsRefactorer::RenameObjectInEvents(
       project.GetCurrentPlatform(), projectScopedContainers, layout.GetEvents(),
-      layout.GetObjects(), oldName, newName);
+      targetedObjectsContainer, oldName, newName);
 
   // Object groups can't have instances or be in other groups
   if (!isObjectGroup) {
@@ -1771,7 +1771,7 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
     auto &externalEvents = project.GetExternalEvents(externalEventsName);
     gd::EventsRefactorer::RenameObjectInEvents(
         project.GetCurrentPlatform(), projectScopedContainers,
-        externalEvents.GetEvents(), layout.GetObjects(), oldName, newName);
+        externalEvents.GetEvents(), targetedObjectsContainer, oldName, newName);
   }
 
   // Rename object in external layouts

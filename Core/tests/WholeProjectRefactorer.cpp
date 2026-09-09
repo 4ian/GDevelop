@@ -1583,6 +1583,31 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                 "RenamedObjectWithMyBehavior.GetObjectNumber() + RenamedObjectWithMyBehavior.MyVariable + RenamedObjectWithMyBehavior.MyStructureVariable.Child");
       }
     }
+
+    SECTION("Global object in scene events") {
+      gd::Project project;
+      gd::Platform platform;
+      SetupProjectWithDummyPlatform(project, platform);
+      auto &layout = project.InsertNewLayout("Scene", 0);
+      auto &globalObject = project.GetObjects().InsertNewObject(
+          project, "MyExtension::Sprite", "GlobalObject", 0);
+
+      const auto &objectParameterInstruction =
+          CreateInstructionWithObjectParameter(
+              project, layout.GetEvents(), globalObject.GetName());
+      const auto &objectExpressionInstruction =
+          CreateInstructionWithNumberParameter(
+              project, layout.GetEvents(), "GlobalObject.GetObjectNumber()");
+
+      gd::WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
+          project, "GlobalObject", "RenamedGlobalObject",
+          /* isObjectGroup=*/false);
+
+      REQUIRE(objectParameterInstruction.GetParameter(0).GetPlainString() ==
+              "RenamedGlobalObject");
+      REQUIRE(objectExpressionInstruction.GetParameter(0).GetPlainString() ==
+              "RenamedGlobalObject.GetObjectNumber()");
+    }
   }
 
   SECTION("Group renamed (in layout)") {

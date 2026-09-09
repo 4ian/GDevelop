@@ -53,6 +53,7 @@ const defaultProps: MainFrameToolbarProps = {
   onOpenDebugger: () => {},
   onNetworkPreview: async () => {},
   onHotReloadPreview: async () => {},
+  onClosePreviews: () => {},
   onLaunchPreviewWithDiagnosticReport: async () => {},
   setPreviewOverride: () => {},
   canDoNetworkPreview: true,

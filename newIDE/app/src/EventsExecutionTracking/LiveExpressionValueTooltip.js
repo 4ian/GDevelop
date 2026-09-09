@@ -60,7 +60,7 @@ const LiveExpressionValueTooltip = ({
   parameterType,
   expression,
   objectName,
-}: Props) => {
+}: Props): React.Node => {
   const store = React.useContext(EventsExecutionTrackingContext);
   const [isHovered, setIsHovered] = React.useState(false);
   const [

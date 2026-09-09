@@ -1743,6 +1743,7 @@ storiesOf('DebuggerContent', module)
           onPause={action('on pause')}
           onPlay={action('on play')}
           onRefresh={action('on refresh')}
+          onInspectPath={async () => null}
           onEdit={() => false}
           onCall={() => false}
           profilingInProgress={false}
@@ -1767,6 +1768,7 @@ storiesOf('DebuggerContent', module)
           onPause={action('on pause')}
           onPlay={action('on play')}
           onRefresh={action('on refresh')}
+          onInspectPath={async () => null}
           onEdit={() => false}
           onCall={() => false}
           profilingInProgress={true}

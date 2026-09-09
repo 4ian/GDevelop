@@ -10,7 +10,7 @@ import {
  * single one for the editor, provided by default: tests and stories can still
  * provide their own.
  */
-const EventsExecutionTrackingContext = React.createContext<EventsExecutionTrackingStore>(
+const EventsExecutionTrackingContext: React.Context<EventsExecutionTrackingStore> = React.createContext<EventsExecutionTrackingStore>(
   new EventsExecutionTrackingStore()
 );
 
@@ -22,7 +22,9 @@ export default EventsExecutionTrackingContext;
  * pass it down. `null` when the instructions are not tracked (sub-instructions
  * of a condition, for example).
  */
-export const TrackedEventPtrContext = React.createContext<number | null>(null);
+export const TrackedEventPtrContext: React.Context<
+  number | null
+> = React.createContext<number | null>(null);
 
 const areExecutionsEqual = (
   first: InstructionExecution | null,

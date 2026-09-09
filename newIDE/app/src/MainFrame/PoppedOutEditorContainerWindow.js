@@ -241,6 +241,17 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         onOpenTemplateFromCourseChapter:
                           props.openTemplateFromCourseChapter,
                         previewDebuggerServer: props.previewDebuggerServer,
+                        onLaunchDebuggerAndPreview:
+                          props.launchDebuggerAndPreview,
+                        onClosePreviews: props.closeAllPreviews,
+                        isWatchedVariablesPanelOpen:
+                          props.isWatchedVariablesPanelOpen,
+                        onToggleWatchedVariablesPanel:
+                          props.onToggleWatchedVariablesPanel,
+                        eventsExecutionTrackingMode:
+                          props.eventsExecutionTrackingMode,
+                        setEventsExecutionTrackingMode:
+                          props.setEventsExecutionTrackingMode,
                         hotReloadPreviewButtonProps:
                           props.hotReloadPreviewButtonProps,
                         onRestartInGameEditor: props.onRestartInGameEditor,

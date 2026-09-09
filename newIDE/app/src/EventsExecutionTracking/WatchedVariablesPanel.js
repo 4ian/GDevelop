@@ -5,7 +5,9 @@ import classNames from 'classnames';
 import FloatingPanel from '../UI/FloatingPanel';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
-import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
+import SemiControlledAutoComplete, {
+  type DataSource,
+} from '../UI/SemiControlledAutoComplete';
 import AddIcon from '../UI/CustomSvgIcons/Add';
 import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import { enumerateVariablesOfContainersList } from '../EventsSheet/ParameterFields/EnumerateVariables';
@@ -89,7 +91,7 @@ const getVariableNames = (
   variablesContainer: gdVariablesContainer,
   prefix: string = ''
 ): Array<string> => {
-  const names = [];
+  const names: Array<string> = [];
   for (let index = 0; index < variablesContainer.count(); index++) {
     names.push(prefix + variablesContainer.getNameAt(index));
   }
@@ -100,7 +102,7 @@ const getVariableNames = (
 const getObjectsVariableNames = (
   objectsContainer: gdObjectsContainer
 ): Array<string> => {
-  const names = [];
+  const names: Array<string> = [];
   for (let index = 0; index < objectsContainer.getObjectsCount(); index++) {
     const object = objectsContainer.getObjectAt(index);
     names.push(
@@ -113,7 +115,7 @@ const getObjectsVariableNames = (
     const objectNames = group.getAllObjectsNames().toJSArray();
     if (objectNames.length === 0) continue;
     // A group has the variables shared by all its objects.
-    let sharedNames = null;
+    let sharedNames: Array<string> | null = null;
     for (const objectName of objectNames) {
       if (!objectsContainer.hasObjectNamed(objectName)) continue;
       const objectVariableNames = getVariableNames(
@@ -131,7 +133,7 @@ const getObjectsVariableNames = (
 
 /** Local variables declared on the events (at any depth) of a list. */
 const getLocalVariableNames = (events: gdEventsList): Array<string> => {
-  const names = [];
+  const names: Array<string> = [];
   for (let index = 0; index < events.getEventsCount(); index++) {
     const event = events.getEventAt(index);
     if (event.hasVariables())
@@ -154,7 +156,11 @@ type Props = {|
  * A floating panel listing variables (or any expression) whose value in the
  * running preview is displayed and refreshed.
  */
-const WatchedVariablesPanel = ({ project, layout, onClose }: Props) => {
+const WatchedVariablesPanel = ({
+  project,
+  layout,
+  onClose,
+}: Props): React.Node => {
   const store = React.useContext(EventsExecutionTrackingContext);
   const [watchedExpressions, setWatchedExpressions] = React.useState<
     Array<string>
@@ -177,9 +183,9 @@ const WatchedVariablesPanel = ({ project, layout, onClose }: Props) => {
 
   // Scene and global variables, then object variables and the local
   // variables of the events of the scene.
-  const variablesDataSource = React.useMemo(
+  const variablesDataSource: DataSource = React.useMemo(
     () => {
-      if (!projectScopedContainers || !layout) return [];
+      if (!projectScopedContainers || !layout) return ([]: DataSource);
       const variables: Map<string, WatchableVariable> = new Map();
       const add = (name: string, sourceType: VariablesContainer_SourceType) => {
         if (!variables.has(name)) variables.set(name, { name, sourceType });
@@ -258,7 +264,9 @@ const WatchedVariablesPanel = ({ project, layout, onClose }: Props) => {
           codes.map(code => store.evaluateExpression(code))
         );
         if (isCancelled) return;
-        const newEvaluations = {};
+        const newEvaluations: {
+          [expression: string]: ExpressionEvaluation | null,
+        } = {};
         watchedExpressions.forEach((expression, index) => {
           newEvaluations[expression] = results[index];
         });

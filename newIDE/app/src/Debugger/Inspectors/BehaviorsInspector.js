@@ -38,9 +38,12 @@ const getBehaviorName = (behavior: GameData, index: number): string => {
  */
 const getEditableProperties = (
   behavior: GameData
-): {| properties: Object, keysByLabel: { [string]: string } |} => {
-  const properties = {};
-  const keysByLabel = {};
+): {|
+  properties: { [string]: number | string | boolean },
+  keysByLabel: { [string]: string },
+|} => {
+  const properties: { [string]: number | string | boolean } = {};
+  const keysByLabel: { [string]: string } = {};
   if (!behavior) return { properties, keysByLabel };
 
   for (const key in behavior) {

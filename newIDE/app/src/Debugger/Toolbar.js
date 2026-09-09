@@ -1,6 +1,7 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ProfilerIcon from '../UI/CustomSvgIcons/Profiler';
@@ -124,7 +125,9 @@ export class Toolbar extends React.PureComponent<Props> {
 
     // Following the execution of the events is set from the menu of the play
     // button, like the speed of a gameplay test run.
-    const followExecutionMenuTemplate = (i18n: I18nType) => [
+    const followExecutionMenuTemplate = (
+      i18n: I18nType
+    ): Array<MenuItemTemplate> => [
       {
         type: 'checkbox',
         label: i18n._(t`Don't follow the execution of the events`),

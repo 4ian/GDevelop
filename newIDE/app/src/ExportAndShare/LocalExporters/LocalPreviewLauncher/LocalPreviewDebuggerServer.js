@@ -19,7 +19,8 @@ const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
  * what the preview sent.
  */
 const forEachCallbacks = (
-  notify: (callbacks: PreviewDebuggerServerCallbacks) => void
+  // The callbacks can be asynchronous: what they return is not awaited.
+  notify: (callbacks: PreviewDebuggerServerCallbacks) => void | Promise<void>
 ) => {
   // Iterate on a copy: a subscriber can register or unregister while notified.
   [...callbacksList].forEach(callbacks => {

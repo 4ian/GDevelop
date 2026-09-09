@@ -3260,7 +3260,7 @@ export class LayoutCodeGenerator extends EmscriptenObject {
 
 export class BehaviorCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateRuntimeBehaviorCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  generateRuntimeBehaviorCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean, generateEventsExecutionTracking: boolean): string;
   static getBehaviorPropertyGetterName(propertyName: string): string;
   static getBehaviorPropertySetterName(propertyName: string): string;
   static getBehaviorPropertyToggleFunctionName(propertyName: string): string;
@@ -3271,7 +3271,7 @@ export class BehaviorCodeGenerator extends EmscriptenObject {
 
 export class ObjectCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateRuntimeObjectCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  generateRuntimeObjectCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean, generateEventsExecutionTracking: boolean): string;
   static getObjectPropertyGetterName(propertyName: string): string;
   static getObjectPropertySetterName(propertyName: string): string;
   static getObjectPropertyToggleFunctionName(propertyName: string): string;
@@ -3279,7 +3279,7 @@ export class ObjectCodeGenerator extends EmscriptenObject {
 
 export class EventsFunctionsExtensionCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean): string;
+  generateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean, generateEventsExecutionTracking: boolean): string;
 }
 
 export class PreviewExportOptions extends EmscriptenObject {

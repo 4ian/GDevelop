@@ -40,7 +40,8 @@ class BehaviorCodeGenerator {
       const gd::String& codeNamespace,
       const std::map<gd::String, gd::String>& behaviorMethodMangledNames,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false);
+      bool compilationForRuntime = false,
+      bool generateEventsExecutionTracking = false);
 
   /**
    * \brief Generate the name of the method to get the value of the property

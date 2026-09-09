@@ -149,7 +149,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
-    bool compilationForRuntime) {
+    bool compilationForRuntime,
+    bool generateEventsExecutionTracking) {
   gd::ObjectsContainer parameterObjectsAndGroups(
       gd::ObjectsContainer::SourceType::Function);
   gd::VariablesContainer parameterVariablesContainer(
@@ -168,6 +169,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetGenerateEventsExecutionTracking(
+      generateEventsExecutionTracking);
 
   gd::DiagnosticReport diagnosticReport;
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
@@ -217,7 +220,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     const gd::String& onceTriggersVariable,
     const gd::String& preludeCode,
     std::set<gd::String>& includeFiles,
-    bool compilationForRuntime) {
+    bool compilationForRuntime,
+    bool generateEventsExecutionTracking) {
   gd::ObjectsContainer parameterObjectsContainers(
       gd::ObjectsContainer::SourceType::Function);
   gd::VariablesContainer parameterVariablesContainer(
@@ -243,6 +247,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetGenerateEventsExecutionTracking(
+      generateEventsExecutionTracking);
 
   gd::DiagnosticReport diagnosticReport;
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
@@ -316,7 +322,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     const gd::String& preludeCode,
     const gd::String& endingCode,
     std::set<gd::String>& includeFiles,
-    bool compilationForRuntime) {
+    bool compilationForRuntime,
+    bool generateEventsExecutionTracking) {
   gd::ObjectsContainer parameterObjectsContainers(
       gd::ObjectsContainer::SourceType::Function);
   gd::VariablesContainer parameterVariablesContainer(
@@ -342,6 +349,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetGenerateEventsExecutionTracking(
+      generateEventsExecutionTracking);
 
   gd::DiagnosticReport diagnosticReport;
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
@@ -1608,9 +1617,10 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
 gd::String EventsCodeGenerator::GenerateInstructionExecutionTrackingBegin(
     const gd::String& instructionExecutionId) {
   // Only for the previews launched with the debugger: nothing is generated
-  // (and nothing costs anything) otherwise, and never for exported games.
-  if (!GenerateEventsExecutionTracking() || GenerateCodeForRuntime() ||
-      instructionExecutionId.empty()) {
+  // (and nothing costs anything) otherwise, and never for exported games as
+  // they never ask for it. The functions of extensions are compiled by the
+  // editor "for runtime" and get the tracking too when asked for.
+  if (!GenerateEventsExecutionTracking() || instructionExecutionId.empty()) {
     return "";
   }
 
@@ -1621,8 +1631,7 @@ gd::String EventsCodeGenerator::GenerateInstructionExecutionTrackingBegin(
 
 gd::String EventsCodeGenerator::GenerateInstructionExecutionTrackingEnd(
     const gd::String& instructionExecutionId) {
-  if (!GenerateEventsExecutionTracking() || GenerateCodeForRuntime() ||
-      instructionExecutionId.empty()) {
+  if (!GenerateEventsExecutionTracking() || instructionExecutionId.empty()) {
     return "";
   }
 

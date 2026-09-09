@@ -46,7 +46,8 @@ describe('libGD.js - GDJS profiler sections code generation integration tests', 
       eventsFunction,
       'functionNamespace',
       includeFiles,
-      compilationForRuntime
+      compilationForRuntime,
+      false
     );
     codeGenerator.delete();
     includeFiles.delete();
@@ -115,6 +116,7 @@ describe('libGD.js - GDJS profiler sections code generation integration tests', 
         'behaviorNamespace',
         new gd.MapStringString(),
         includeFiles,
+        false,
         false
       );
     behaviorCodeGenerator.delete();

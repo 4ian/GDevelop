@@ -153,8 +153,9 @@ describe('libGD.js - GDJS events execution tracking code generation integration 
       `gdjs.eventsExecutionTracker.begin("${externalEventPtr}:a0")`
     );
 
-    // Exported games are never slowed down by the tracking.
-    const runtimeCode = generateLayoutCode(project, layout, true);
+    // Exported games are never slowed down by the tracking: the exporter
+    // never asks for it (see ExporterHelper).
+    const runtimeCode = generateLayoutCode(project, layout, true, false);
     expect(runtimeCode).not.toContain('eventsExecutionTracker');
     // Neither are the previews launched without the debugger.
     const plainPreviewCode = generateLayoutCode(project, layout, false, false);
@@ -211,6 +212,61 @@ describe('libGD.js - GDJS events execution tracking code generation integration 
     ]);
     expect(executedInstructionIds).not.toContain(`${secondEventPtr}:a0`);
     expect(executedInstructionIds).not.toContain(`${subEventPtr}:a0`);
+
+    project.delete();
+  });
+  it('tracks the instructions of the functions of extensions when asked', function () {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsFunction = eventsFunctionsExtension
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0);
+    eventsFunction.getEvents().unserializeFrom(
+      project,
+      gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            {
+              type: { value: 'BuiltinCommonInstructions::Once' },
+              parameters: [],
+            },
+          ],
+          actions: [],
+        },
+      ])
+    );
+    const eventPtr = eventsFunction.getEvents().getEventAt(0).ptr;
+
+    const generateFunctionCode = (generateEventsExecutionTracking) => {
+      const codeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+        project
+      );
+      const includeFiles = new gd.SetString();
+      const code = codeGenerator.generateFreeEventsFunctionCompleteCode(
+        eventsFunctionsExtension,
+        eventsFunction,
+        'functionNamespace',
+        includeFiles,
+        // The extensions are always compiled "for runtime" by the editor.
+        true,
+        generateEventsExecutionTracking
+      );
+      codeGenerator.delete();
+      includeFiles.delete();
+      return code;
+    };
+
+    // The instructions are tracked with the identity of the events of the
+    // extension editor.
+    expect(generateFunctionCode(true)).toContain(
+      `gdjs.eventsExecutionTracker.begin("${eventPtr}:c0")`
+    );
+    // Nothing is generated (and nothing costs anything) otherwise.
+    expect(generateFunctionCode(false)).not.toContain('eventsExecutionTracker');
 
     project.delete();
   });

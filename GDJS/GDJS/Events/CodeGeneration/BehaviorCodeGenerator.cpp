@@ -20,7 +20,8 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
     const gd::String& codeNamespace,
     const std::map<gd::String, gd::String>& behaviorMethodMangledNames,
     std::set<gd::String>& includeFiles,
-    bool compilationForRuntime) {
+    bool compilationForRuntime,
+    bool generateEventsExecutionTracking) {
   auto& eventsFunctionsVector =
       eventsBasedBehavior.GetEventsFunctions().GetInternalVector();
 
@@ -104,7 +105,8 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
                   ? GenerateDoStepPreEventsPreludeCode()
                   : "",
               includeFiles,
-              compilationForRuntime);
+              compilationForRuntime,
+              generateEventsExecutionTracking);
 
       // Compatibility with GD <= 5.0 beta 75
       if (functionName == "onOwnerRemovedFromScene") {

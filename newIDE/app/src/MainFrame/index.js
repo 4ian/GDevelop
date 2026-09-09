@@ -2950,9 +2950,23 @@ const MainFrame = (props: Props): React.MixedElement => {
           : createCaptureOptionsForPreview(launchCaptureOptions),
       ]);
 
+      // The executed instructions are only reported when the game is
+      // debugged: it is not slowed down otherwise. `isForDebugger` is
+      // given when the debugger is being opened, as the editor tabs are
+      // only updated on the next render.
+      const instrumentEventsExecution =
+        !isForInGameEdition &&
+        (!!isForDebugger ||
+          !!getEditorTabOpenedWithKey(state.editorTabs, 'debugger'));
+
       try {
         await Promise.all([
-          eventsFunctionsExtensionsState.ensureLoadFinished(),
+          // The extensions are compiled by the editor: their code must report
+          // the executed instructions like the scenes do.
+          eventsFunctionsExtensionsState.ensureEventsExecutionInstrumentation(
+            currentProject,
+            instrumentEventsExecution
+          ),
           // The preview will load all the resources of the project: ensure
           // the credentials to access them (if any) are still valid.
           ensureCanAccessResources(),
@@ -2997,14 +3011,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
           isForInGameEdition: !!isForInGameEdition,
           isForGameplayTest: false,
-          // The executed instructions are only reported when the game is
-          // debugged: it is not slowed down otherwise. `isForDebugger` is
-          // given when the debugger is being opened, as the editor tabs are
-          // only updated on the next render.
-          instrumentEventsExecution:
-            !isForInGameEdition &&
-            (!!isForDebugger ||
-              !!getEditorTabOpenedWithKey(state.editorTabs, 'debugger')),
+          instrumentEventsExecution,
           editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
           editorCameraState3D: isForInGameEdition
             ? isForInGameEdition.editorCameraState3D

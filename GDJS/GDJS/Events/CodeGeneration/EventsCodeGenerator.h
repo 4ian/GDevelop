@@ -67,6 +67,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param includeFiles Will be filled with the necessary include files.
    * \param compilationForRuntime Set this to true if the code is generated for
    * runtime.
+   * \param generateEventsExecutionTracking Set this to true to report the
+   * executed instructions to the editor (previews launched with the debugger).
    *
    * \return JavaScript code
    */
@@ -76,7 +78,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false);
+      bool compilationForRuntime = false,
+      bool generateEventsExecutionTracking = false);
 
   /**
    * Generate JavaScript for executing events of a events based behavior
@@ -93,6 +96,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param includeFiles Will be filled with the necessary include files.
    * \param compilationForRuntime Set this to true if the code
    * is generated for runtime.
+   * \param generateEventsExecutionTracking Set this to true to report the
+   * executed instructions to the editor (previews launched with the debugger).
    *
    * \return JavaScript code
    */
@@ -106,7 +111,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& onceTriggersVariable,
       const gd::String& preludeCode,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false);
+      bool compilationForRuntime = false,
+      bool generateEventsExecutionTracking = false);
 
   /**
    * Generate JavaScript for executing events of a events based object
@@ -127,6 +133,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param includeFiles Will be filled with the necessary include files.
    * \param compilationForRuntime Set this to true if the code
    * is generated for runtime.
+   * \param generateEventsExecutionTracking Set this to true to report the
+   * executed instructions to the editor (previews launched with the debugger).
    *
    * \return JavaScript code
    */
@@ -141,7 +149,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& preludeCode,
       const gd::String& endingCode,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false);
+      bool compilationForRuntime = false,
+      bool generateEventsExecutionTracking = false);
 
   /**
    * \brief Generate code for executing an event list

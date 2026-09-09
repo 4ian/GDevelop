@@ -1017,6 +1017,7 @@ describe('InstallAsset', () => {
       getEventsFunctionsExtensionWriter: () => null,
       getEventsFunctionsExtensionOpener: () => null,
       ensureLoadFinished: () => Promise.resolve(),
+      ensureEventsExecutionInstrumentation: () => Promise.resolve(),
       getIncludeFileHashs: () => ({}),
     };
 
@@ -1090,6 +1091,7 @@ describe('InstallAsset', () => {
       getEventsFunctionsExtensionWriter: () => null,
       getEventsFunctionsExtensionOpener: () => null,
       ensureLoadFinished: () => Promise.resolve(),
+      ensureEventsExecutionInstrumentation: () => Promise.resolve(),
       getIncludeFileHashs: () => ({}),
     };
 

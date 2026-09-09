@@ -80,6 +80,10 @@ export const EventsFunctionsExtensionsProvider = ({
     });
   }, []);
 
+  // Whether the code of the extensions reports the executed instructions to
+  // the editor (see `ensureEventsExecutionInstrumentation`).
+  const isEventsExecutionInstrumentedRef = React.useRef(false);
+
   const _loadProjectEventsFunctionsExtensions = React.useCallback(
     (project: ?gdProject): Promise<void> => {
       if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
@@ -96,7 +100,11 @@ export const EventsFunctionsExtensionsProvider = ({
           return loadProjectEventsFunctionsExtensions(
             project,
             eventsFunctionCodeWriter,
-            i18n
+            i18n,
+            {
+              instrumentEventsExecution:
+                isEventsExecutionInstrumentedRef.current,
+            }
           );
         })
         .then(() => setEventsFunctionsExtensionsError(null))
@@ -181,6 +189,23 @@ export const EventsFunctionsExtensionsProvider = ({
     ]
   );
 
+  const ensureEventsExecutionInstrumentation = React.useCallback(
+    (
+      project: ?gdProject,
+      instrumentEventsExecution: boolean
+    ): Promise<void> => {
+      if (
+        !project ||
+        isEventsExecutionInstrumentedRef.current === instrumentEventsExecution
+      ) {
+        return ensureLoadFinished();
+      }
+      isEventsExecutionInstrumentedRef.current = instrumentEventsExecution;
+      return _reloadProjectEventsFunctionsExtensions(project);
+    },
+    [ensureLoadFinished, _reloadProjectEventsFunctionsExtensions]
+  );
+
   const state = React.useMemo<EventsFunctionsExtensionsState>(
     () => ({
       eventsFunctionsExtensionsError,
@@ -190,12 +215,14 @@ export const EventsFunctionsExtensionsProvider = ({
       reloadProjectEventsFunctionsExtensions: _reloadProjectEventsFunctionsExtensions,
       reloadProjectEventsFunctionsExtensionMetadata: _reloadProjectEventsFunctionsExtensionMetadata,
       ensureLoadFinished,
+      ensureEventsExecutionInstrumentation,
       getEventsFunctionsExtensionWriter: () => eventsFunctionsExtensionWriter,
       getEventsFunctionsExtensionOpener: () => eventsFunctionsExtensionOpener,
       getIncludeFileHashs: () => includeFileHashs.current,
     }),
     [
       ensureLoadFinished,
+      ensureEventsExecutionInstrumentation,
       _loadProjectEventsFunctionsExtensions,
       _reloadProjectEventsFunctionsExtensionMetadata,
       _reloadProjectEventsFunctionsExtensions,

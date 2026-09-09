@@ -23,7 +23,16 @@ export type EventsFunctionCodeWriterCallbacks = {|
 type Options = {
   eventsFunctionCodeWriter: EventsFunctionCodeWriter,
   i18n: I18nType,
+  /**
+   * Generate the code reporting the executed instructions to the editor, for
+   * the previews launched with the debugger. Off by default: it has a cost.
+   */
+  instrumentEventsExecution?: boolean,
 };
+
+export type LoadProjectEventsFunctionsExtensionsOptions = {|
+  instrumentEventsExecution: boolean,
+|};
 
 type OptionsForGeneration = {
   ...Options,
@@ -41,7 +50,8 @@ type CodeGenerationContext = {|
 export const loadProjectEventsFunctionsExtensions = (
   project: gdProject,
   eventsFunctionCodeWriter: EventsFunctionCodeWriter,
-  i18n: I18nType
+  i18n: I18nType,
+  { instrumentEventsExecution }: LoadProjectEventsFunctionsExtensionsOptions
 ): Promise<Array<void>> => {
   return Promise.all(
     // First pass: generate extensions from the events functions extensions,
@@ -66,6 +76,7 @@ export const loadProjectEventsFunctionsExtensions = (
             skipCodeGeneration: false,
             eventsFunctionCodeWriter,
             i18n,
+            instrumentEventsExecution,
           }
         );
       })
@@ -364,7 +375,8 @@ const generateFreeFunction = (
         // For now, always generate functions for runtime (this disables
         // generation of profiling for groups (see EventsCodeGenerator))
         // as extensions generated can be used either for preview or export.
-        true
+        true,
+        !!options.instrumentEventsExecution
       );
     } catch (error) {
       console.error(
@@ -488,7 +500,8 @@ function generateBehavior(
         // For now, always generate functions for runtime (this disables
         // generation of profiling for groups (see EventsCodeGenerator))
         // as extensions generated can be used either for preview or export.
-        true
+        true,
+        !!options.instrumentEventsExecution
       );
       behaviorCodeGenerator.delete();
       behaviorMethodMangledNames.delete();
@@ -591,7 +604,8 @@ function generateObject(
         // For now, always generate functions for runtime (this disables
         // generation of profiling for groups (see EventsCodeGenerator))
         // as extensions generated can be used either for preview or export.
-        true
+        true,
+        !!options.instrumentEventsExecution
       );
       objectCodeGenerator.delete();
       objectMethodMangledNames.delete();

@@ -141,6 +141,8 @@ export const UsernameField = ({
       autoFocus="desktop"
       value={value}
       floatingLabelText={<Trans>Username</Trans>}
+      name="username"
+      autoComplete="nickname"
       fullWidth
       onChange={onChange}
       errorText={

@@ -2252,6 +2252,7 @@ export class ParameterValidationResult extends EmscriptenObject {
 export class InstructionValidator extends EmscriptenObject {
   static validateParameter(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number): ParameterValidationResult;
   static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number): boolean;
+  static getObjectNameForParameter(projectScopedContainers: ProjectScopedContainers, instruction: Instruction, parameterType: string): string;
 }
 
 export class ObjectTools extends EmscriptenObject {

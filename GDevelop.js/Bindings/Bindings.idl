@@ -3128,6 +3128,10 @@ interface InstructionValidator {
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
     long parameterIndex);
+  [Const, Value] DOMString STATIC_GetObjectNameForParameter(
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const] DOMString parameterType);
 };
 
 interface ObjectTools {

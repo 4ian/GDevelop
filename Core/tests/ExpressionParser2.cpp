@@ -4033,7 +4033,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       RequireFatalErrorsCount(validator, 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "You entered a number, but this type was expected: variable");
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[3].");
     }
     SECTION("string instead") {
       auto node = parser.ParseExpression("\"text\"");
@@ -4043,7 +4045,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       RequireFatalErrorsCount(validator, 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "You entered a text, but this type was expected: variable");
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[\"Player1\"].");
     }
 
     SECTION("Object variable with unary operator") {

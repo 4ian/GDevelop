@@ -191,6 +191,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       RaiseTypeError(
           _("You entered a number, but a text was expected (in quotes)."),
           node.location);
+    } else if (parentType == Type::Variable ||
+               parentType == Type::ObjectVariable ||
+               parentType == Type::LegacyVariable) {
+      RaiseTypeError(
+          _("The variable name looks like you're building an expression or a "
+            "formula. You can only use this for structure or arrays, for "
+            "example: Score[3]."),
+          node.location);
     } else if (parentType != Type::Number &&
                parentType != Type::NumberOrString) {
       RaiseTypeError(_("You entered a number, but this type was expected:") +
@@ -204,6 +212,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     if (parentType == Type::Number) {
       RaiseTypeError(_("You entered a text, but a number was expected."),
                      node.location);
+    } else if (parentType == Type::Variable ||
+               parentType == Type::ObjectVariable ||
+               parentType == Type::LegacyVariable) {
+      RaiseTypeError(
+          _("The variable name looks like you're building an expression or a "
+            "formula. You can only use this for structure or arrays, for "
+            "example: Score[\"Player1\"]."),
+          node.location);
     } else if (parentType != Type::String &&
                parentType != Type::NumberOrString) {
       RaiseTypeError(_("You entered a text, but this type was expected:") +

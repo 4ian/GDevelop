@@ -248,6 +248,15 @@ export class Toolbar extends React.PureComponent<Props> {
           )}
         </ToolbarGroup>
         <ToolbarGroup lastChild>
+          <IconButton
+            size="small"
+            color="default"
+            onClick={onToggleWatchedVariablesPanel}
+            selected={isWatchedVariablesPanelOpen}
+            tooltip={t`Watch variables`}
+          >
+            <VariableTreeIcon />
+          </IconButton>
           <ToolbarSeparator />
           <IconButton
             size="small"
@@ -298,15 +307,6 @@ export class Toolbar extends React.PureComponent<Props> {
             tooltip={t`Console`}
           >
             <ConsoleIcon />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="default"
-            onClick={onToggleWatchedVariablesPanel}
-            selected={isWatchedVariablesPanelOpen}
-            tooltip={t`Watch variables`}
-          >
-            <VariableTreeIcon />
           </IconButton>
         </ToolbarGroup>
       </React.Fragment>

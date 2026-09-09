@@ -34,6 +34,10 @@ import {
 import { sendGameTemplateBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Window from '../../Utils/Window';
+import {
+  getPublicGame,
+  getPublicGameUrl,
+} from '../../Utils/GDevelopServices/Game';
 import ScrollView from '../../UI/ScrollView';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -190,6 +194,12 @@ const PrivateGameTemplateInformationPage = ({
   ] = React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
+  // The gd.games URL of the game showcasing this template, once verified
+  // that the game is actually published. Null otherwise.
+  const [
+    verifiedShowcasedGameUrl,
+    setVerifiedShowcasedGameUrl,
+  ] = React.useState<?string>(null);
   const {
     windowSize,
     isLandscape,
@@ -337,6 +347,50 @@ const PrivateGameTemplateInformationPage = ({
     },
     [id, sellerId]
   );
+
+  // The listing data is available immediately, the game template is fetched:
+  // prefer the former so the check starts right away. Both are strings, so the
+  // effect below only runs when the id itself changes (once, in practice).
+  const showcasedGameId =
+    privateGameTemplateListingData.showcasedGameId ||
+    (gameTemplate ? gameTemplate.showcasedGameId : null);
+
+  React.useEffect(
+    () => {
+      setVerifiedShowcasedGameUrl(null);
+      if (!showcasedGameId) return;
+
+      let isCancelled = false;
+      (async () => {
+        try {
+          const publicGame = await getPublicGame(showcasedGameId);
+          if (isCancelled) return;
+          // Only link to the game if it's actually published (has a web build),
+          // otherwise the link would lead to a "not found" page.
+          setVerifiedShowcasedGameUrl(
+            publicGame.publicWebBuildId ? getPublicGameUrl(publicGame) : null
+          );
+        } catch (error) {
+          // The game does not exist (anymore) or could not be fetched:
+          // don't display a button leading nowhere.
+          if (!isCancelled) setVerifiedShowcasedGameUrl(null);
+        }
+      })();
+
+      return () => {
+        isCancelled = true;
+      };
+    },
+    [showcasedGameId]
+  );
+
+  // Templates not synced with a showcased game id yet fall back to the
+  // deprecated, unverified preview link, if any.
+  const tryItOnlineUrl = showcasedGameId
+    ? verifiedShowcasedGameUrl
+    : gameTemplate
+    ? gameTemplate.gamePreviewLink
+    : null;
 
   const onClickBuy = React.useCallback(
     async () => {
@@ -576,21 +630,18 @@ const PrivateGameTemplateInformationPage = ({
                             helpPagePath="https://gdevelop.io/page/asset-store-license-agreement"
                           />
                         </Line>
-                        {!isAlreadyReceived &&
-                        !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
-                            <Column noMargin>
-                              <RaisedButton
-                                primary
-                                label={<Trans>Try it online</Trans>}
-                                onClick={() =>
-                                  Window.openExternalURL(
-                                    gameTemplate.gamePreviewLink
-                                  )
-                                }
-                                icon={<Play style={styles.playIcon} />}
-                              />
-                            </Column>
-                          )}
+                        {!isAlreadyReceived && !!tryItOnlineUrl && (
+                          <Column noMargin>
+                            <RaisedButton
+                              primary
+                              label={<Trans>Try it online</Trans>}
+                              onClick={() =>
+                                Window.openExternalURL(tryItOnlineUrl)
+                              }
+                              icon={<Play style={styles.playIcon} />}
+                            />
+                          </Column>
+                        )}
                       </LineStackLayout>
                       <ProductLicenseOptions
                         value={selectedUsageType}

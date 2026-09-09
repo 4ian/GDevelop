@@ -53,45 +53,25 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
 
   bool shouldNotBeValidated = parameterType == "layer" && value.empty();
   if (shouldNotBeValidated) {
-    return result;  // Valid by default, no deprecation warning
+    return result; // Valid by default, no deprecation warning
   }
 
   // An optional parameter left empty is valid: the default value is used when
   // generating the code.
   if (parameterMetadata.IsOptional() && value.empty()) {
-    return result;  // Valid by default, no deprecation warning
+    return result; // Valid by default, no deprecation warning
   }
 
   if (gd::ParameterMetadata::IsExpression("number", parameterType) ||
       gd::ParameterMetadata::IsExpression("string", parameterType) ||
       gd::ParameterMetadata::IsExpression("variable", parameterType)) {
 
-    // New object variable instructions require the variable to be
-    // declared while legacy ones don't.
-    // For legacy variable instruction, we pass an empty object name.
-    gd::String rootObjectName = "";
-    if (parameterType == "objectvar") {
-      const auto &objectsContainersList =
-          projectScopedContainers.GetObjectsContainersList();
-      rootObjectName = instruction.GetParameter(0).GetPlainString();
-
-      if (!gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
-              instruction.GetType())) {
-        // Extensions still rely on legacy object variables instructions.
-        auto objectSourceType =
-            projectScopedContainers.GetObjectsContainersList()
-                .GetObjectsContainerSourceType(rootObjectName);
-        // Only child-object variable declarations are checked.
-        if (objectSourceType != gd::ObjectsContainer::SourceType::Object) {
-          rootObjectName = "";
-        }
-      }
-    }
+    gd::String rootObjectName = InstructionValidator::GetObjectNameForParameter(
+        projectScopedContainers, instruction, parameterType);
     auto &expressionNode =
         *instruction.GetParameter(parameterIndex).GetRootNode();
     ExpressionValidator expressionValidator(platform, projectScopedContainers,
-                                            parameterType,
-                                            rootObjectName,
+                                            parameterType, rootObjectName,
                                             parameterMetadata.GetExtraInfo());
     expressionNode.Visit(expressionValidator);
 
@@ -116,11 +96,41 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
   } else if (gd::ParameterMetadata::IsExpression("resource", parameterType)) {
     const auto &resourceName =
         instruction.GetParameter(parameterIndex).GetPlainString();
-    result.isValid = projectScopedContainers.GetResourcesContainersList()
-                         .HasResourceNamed(resourceName);
+    result.isValid =
+        projectScopedContainers.GetResourcesContainersList().HasResourceNamed(
+            resourceName);
   }
 
   return result;
+}
+
+gd::String InstructionValidator::GetObjectNameForParameter(
+    const gd::ProjectScopedContainers projectScopedContainers,
+    const gd::Instruction &instruction, const gd::String &parameterType) {
+  // New object variable instructions require the variable to be
+  // declared while legacy ones don't.
+  // For legacy variable instruction, we pass an empty object name.
+  gd::String rootObjectName = "";
+  if (parameterType != "objectvar") {
+      return "";
+  }
+  if (instruction.GetParametersCount() == 0) {
+    return "";
+  }
+  rootObjectName = instruction.GetParameter(0).GetPlainString();
+
+  if (!gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
+          instruction.GetType())) {
+    // Extensions still rely on legacy object variables instructions.
+    auto objectSourceType =
+        projectScopedContainers.GetObjectsContainersList()
+            .GetObjectsContainerSourceType(rootObjectName);
+    // Only child-object variable declarations are checked.
+    if (objectSourceType != gd::ObjectsContainer::SourceType::Object) {
+      return "";
+    }
+  }
+  return rootObjectName;
 }
 
 bool InstructionValidator::IsParameterValid(

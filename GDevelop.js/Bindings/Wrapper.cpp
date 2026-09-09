@@ -746,6 +746,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_FillBehaviorParameters FillBehaviorParameters
 #define STATIC_ValidateParameter ValidateParameter
 #define STATIC_IsParameterValid IsParameterValid
+#define STATIC_GetObjectNameForParameter GetObjectNameForParameter
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
 #define STATIC_RemoveLayerInScene RemoveLayerInScene

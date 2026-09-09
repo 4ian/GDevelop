@@ -45,7 +45,8 @@ import TutorialMessage from '../../Hints/TutorialMessage';
 import getTutorial from '../../Hints/getTutorial';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
-import { AutoScroll, DropContainer } from './DropContainer';
+import { DropContainer } from './DropContainer';
+import { useAutoScrollDuringDrag } from '../../UI/DragAndDrop/UseAutoScrollDuringDrag';
 import {
   isDescendant,
   isElseEventValid,
@@ -511,9 +512,11 @@ const EventsTree: React.ComponentType<{
   const _hoverTimerId = React.useRef<?TimeoutID>(null);
 
   const [draggedNode, setDraggedNode] = React.useState(null);
-  const [isScrolledTop, setIsScrolledTop] = React.useState(true);
-  const [isScrolledBottom, setIsScrolledBottom] = React.useState(false);
   const lastKnownScrollPosition = React.useRef(0);
+  const { startAutoScroll, stopAutoScroll } = useAutoScrollDuringDrag(
+    () => (_list.current ? _list.current.container : null),
+    { maxSpeed: 900 }
+  );
 
   // This is the data that will be displayed by the tree - reconstructed at each render
   // (because events could have changed, some could have been deleted, so we can't keep
@@ -627,11 +630,12 @@ const EventsTree: React.ComponentType<{
       // closure) and skips the cleanup. Calling unconditionally is safe: React
       // deduplicates the null→null state update, and _restoreFoldedNodes is a
       // no-op when no nodes were temporarily unfolded.
+      stopAutoScroll();
       setDraggedNode(null);
       _restoreFoldedNodes();
       forceUpdate();
     },
-    [_restoreFoldedNodes, forceUpdate]
+    [stopAutoScroll, _restoreFoldedNodes, forceUpdate]
   );
 
   // Position-based height snapshot. Used as a fallback in _getRowHeight when
@@ -948,8 +952,11 @@ const EventsTree: React.ComponentType<{
           highlightedAiGeneratedEventIds={props.highlightedAiGeneratedEventIds}
           node={node}
           isDragged={isDragged}
-          // $FlowFixMe[incompatible-type]
-          onBeginDrag={() => setDraggedNode(node)}
+          onBeginDrag={() => {
+            // $FlowFixMe[incompatible-type]
+            setDraggedNode(node);
+            startAutoScroll();
+          }}
           onEndDrag={_onEndDrag}
           onTemporaryUnfoldNode={isOverLazy =>
             temporaryUnfoldNode(isOverLazy, node)
@@ -1227,14 +1234,6 @@ const EventsTree: React.ComponentType<{
     []
   );
 
-  const _scrollUp = React.useCallback(() => {
-    _list.current && _list.current.container.scrollBy({ top: -5 });
-  }, []);
-
-  const _scrollDown = React.useCallback(() => {
-    _list.current && _list.current.container.scrollBy({ top: 5 });
-  }, []);
-
   const zoomLevel = props.fontSize || 14;
 
   // Update treeDataRoot with the events tree. Done at each render as events
@@ -1249,9 +1248,7 @@ const EventsTree: React.ComponentType<{
   React.useLayoutEffect(() => {
     // Recompute row heights on every render. This is needed for any change
     // that affects which event is at which row (deletion, fold/unfold, move)
-    // — not just changes to individual event heights. Scroll-triggered
-    // re-renders (isScrolledTop / isScrolledBottom state flips) are infrequent
-    // and recalculate the same heights, so the extra work is negligible.
+    // — not just changes to individual event heights.
     if (_list.current) {
       _list.current.recomputeRowHeights();
     }
@@ -1282,26 +1279,6 @@ const EventsTree: React.ComponentType<{
         )}px`,
       }}
     >
-      {/* Disable for touchscreen because the dragged DOM node gets deleted, the */}
-      {/* touch events are lost and the dnd does not drop anymore (hypothesis). */}
-      {props.screenType !== 'touch' && (
-        <>
-          <AutoScroll
-            DnDComponent={EventDropTarget}
-            direction="top"
-            // $FlowFixMe[constant-condition]
-            activateTargets={!!draggedNode && !isScrolledTop}
-            onHover={_scrollUp}
-          />
-          <AutoScroll
-            DnDComponent={EventDropTarget}
-            direction="bottom"
-            // $FlowFixMe[constant-condition]
-            activateTargets={!!draggedNode && !isScrolledBottom}
-            onHover={_scrollDown}
-          />
-        </>
-      )}
       <SortableTree
         treeData={
           // Pass a new array each time, otherwise the tree will not re-render.
@@ -1332,10 +1309,6 @@ const EventsTree: React.ComponentType<{
             }
             lastKnownScrollPosition.current = event.scrollTop;
             props.onScroll && props.onScroll();
-            setIsScrolledTop(event.scrollTop === 0);
-            setIsScrolledBottom(
-              event.clientHeight + event.scrollTop >= event.scrollHeight
-            );
           },
           // 'smart': no-op if the row is already visible; centers it only when
           // it is more than one viewport away. This prevents undo of an in-view

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { VariableSizeList } from 'react-window';
+import { VariableSizeList, areEqual } from 'react-window';
 import classNames from 'classnames';
 import { AutoSizer } from 'react-virtualized';
 import type { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
@@ -354,6 +354,13 @@ const TreeRow = ({
   );
 };
 
+// Rows only re-render when their data changes, not on every scroll.
+const MemoizedTreeRow = React.memo<{
+  index: number,
+  style: any,
+  data: RowItemData,
+}>(TreeRow, areEqual);
+
 // -- Main component --
 
 const SortableEventsTree = ({
@@ -481,7 +488,7 @@ const SortableEventsTree = ({
             onScroll={handleScroll}
             overscanCount={10}
           >
-            {TreeRow}
+            {MemoizedTreeRow}
           </VariableSizeList>
         )}
       </AutoSizer>

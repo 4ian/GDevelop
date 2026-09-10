@@ -7,13 +7,15 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
+import RichSelectField, {
+  type RichSelectFieldInterface,
+} from '../../UI/RichSelectField';
 
 import GenericExpressionField from './GenericExpressionField';
 import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import RaisedButton from '../../UI/RaisedButton';
 import Functions from '@material-ui/icons/Functions';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import FlatButton from '../../UI/FlatButton';
 import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 import { getParameterChoiceValues } from './ParameterMetadataTools';
@@ -22,9 +24,14 @@ import { renderInlineDefaultField } from './DefaultField';
 
 /**
  * Where a choice adornment is displayed: in the field of an instruction editor,
- * in the field of an inline (compact) editor or in the events sheet.
+ * in the field of an inline (compact) editor, in the menu listing the choices
+ * or in the events sheet.
  */
-export type ChoiceAdornmentContext = 'field' | 'inlineField' | 'eventsSheet';
+export type ChoiceAdornmentContext =
+  | 'field'
+  | 'inlineField'
+  | 'menu'
+  | 'eventsSheet';
 
 export type RenderChoiceAdornment = (
   choice: string,
@@ -35,15 +42,10 @@ export type StringWithSelectorFieldProps = {|
   ...ParameterFieldProps,
   // The choices to display. If not specified, they are read from the parameter metadata.
   choices?: Array<string>,
-  // If specified, displayed next to the selected choice (an icon, a preview...).
+  // If specified, displayed next to each choice (an icon, a preview...). The
+  // choices are then displayed in a menu instead of a native select.
   renderChoiceAdornment?: RenderChoiceAdornment,
 |};
-
-const choiceAdornmentStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  flexShrink: 0,
-};
 
 /**
  * If the value is one of the choices (i.e: `"choice"`), return the choice
@@ -74,9 +76,11 @@ export default (React.forwardRef<
     isInline,
   } = parameterFieldProps;
 
-  const field = React.useRef<?(GenericExpressionField | SelectFieldInterface)>(
-    null
-  );
+  const field = React.useRef<?(
+    | GenericExpressionField
+    | SelectFieldInterface
+    | RichSelectFieldInterface
+  )>(null);
 
   const focus: FieldFocusFunction = options => {
     if (field.current) field.current.focus(options);
@@ -120,62 +124,67 @@ export default (React.forwardRef<
     ? parameterMetadata.getDescription()
     : undefined;
 
-  const selectOptions = choices.map(choice => {
-    return (
-      <SelectOption
-        key={choice}
-        value={`"${choice}"`}
-        label={choice}
-        shouldNotTranslate={true}
+  const fieldId =
+    parameterIndex !== undefined
+      ? `parameter-${parameterIndex}-string-with-selector`
+      : undefined;
+  const helperMarkdownText =
+    (parameterMetadata && parameterMetadata.getLongDescription()) || null;
+
+  const renderSelectField = () =>
+    renderChoiceAdornment ? (
+      <RichSelectField
+        ref={field}
+        id={fieldId}
+        value={value}
+        onChange={onChange}
+        margin={isInline ? 'none' : 'dense'}
+        fullWidth
+        floatingLabelText={fieldLabel}
+        translatableHintText={t`Choose a value`}
+        helperMarkdownText={helperMarkdownText}
+        options={choices.map(choice => ({
+          value: `"${choice}"`,
+          label: choice,
+          adornment: renderChoiceAdornment(
+            choice,
+            isInline ? 'inlineField' : 'field'
+          ),
+        }))}
       />
+    ) : (
+      <SelectField
+        ref={field}
+        id={fieldId}
+        value={value}
+        onChange={onChangeSelectValue}
+        margin={isInline ? 'none' : 'dense'}
+        fullWidth
+        floatingLabelText={fieldLabel}
+        translatableHintText={t`Choose a value`}
+        helperMarkdownText={helperMarkdownText}
+      >
+        {choices.map(choice => (
+          <SelectOption
+            key={choice}
+            value={`"${choice}"`}
+            label={choice}
+            shouldNotTranslate={true}
+          />
+        ))}
+      </SelectField>
     );
-  });
 
   return (
     <TextFieldWithButtonLayout
       renderTextField={() =>
         !isExpressionField ? (
-          <SelectField
-            ref={field}
-            id={
-              parameterIndex !== undefined
-                ? `parameter-${parameterIndex}-string-with-selector`
-                : undefined
-            }
-            value={value}
-            onChange={onChangeSelectValue}
-            margin={isInline ? 'none' : 'dense'}
-            fullWidth
-            floatingLabelText={fieldLabel}
-            translatableHintText={t`Choose a value`}
-            helperMarkdownText={
-              (parameterMetadata && parameterMetadata.getLongDescription()) ||
-              null
-            }
-            startAdornment={
-              renderChoiceAdornment && selectedChoice !== null ? (
-                <InputAdornment position="start">
-                  <span style={choiceAdornmentStyle}>
-                    {renderChoiceAdornment(
-                      selectedChoice,
-                      isInline ? 'inlineField' : 'field'
-                    )}
-                  </span>
-                </InputAdornment>
-              ) : null
-            }
-          >
-            {selectOptions}
-          </SelectField>
+          renderSelectField()
         ) : (
           <GenericExpressionField
             expressionType="string"
             ref={field}
-            id={
-              parameterIndex !== undefined
-                ? `parameter-${parameterIndex}-string-with-selector`
-                : undefined
-            }
+            id={fieldId}
             {...parameterFieldProps}
             onChange={onChange}
           />

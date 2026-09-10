@@ -16,6 +16,7 @@ import { allEasingNames } from '../../Utils/Easings';
 const previewSizes = {
   field: { width: 40, height: 24 },
   inlineField: { width: 30, height: 18 },
+  menu: { width: 40, height: 24 },
   eventsSheet: { width: 24, height: 16 },
 };
 

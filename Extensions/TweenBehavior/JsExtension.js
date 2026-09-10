@@ -53,7 +53,7 @@ const easingChoices = JSON.stringify([
 
 /** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -596,7 +596,7 @@ module.exports = {
 
     const tweenBehavior = new gd.BehaviorJsImplementation();
 
-    tweenBehavior.updateProperty = function(
+    tweenBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
       newValue
@@ -604,12 +604,12 @@ module.exports = {
       return false;
     };
 
-    tweenBehavior.getProperties = function(behaviorContent) {
+    tweenBehavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
       return behaviorProperties;
     };
 
-    tweenBehavior.initializeContent = function(behaviorContent) {};
+    tweenBehavior.initializeContent = function (behaviorContent) {};
 
     const behavior = extension
       .addBehavior(
@@ -2105,7 +2105,7 @@ module.exports = {
     return extension;
   },
 
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 };

@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { FixedSizeList } from 'react-window';
-import { useDragDropManager } from 'react-dnd';
 import memoizeOne from 'memoize-one';
 import classes from './TreeView.module.css';
 import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
@@ -11,6 +10,7 @@ import TreeViewRow, { TREE_VIEW_ROW_HEIGHT } from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import { makeDropTarget } from '../DragAndDrop/DropTarget';
 import { useAutoScrollDuringAnyDrag } from '../DragAndDrop/UseAutoScrollDuringDrag';
+import { useIsDragging } from '../DragAndDrop/UseIsDragging';
 import DropIndicator from '../SortableVirtualizedItemList/DropIndicator';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -514,26 +514,11 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
 
   // Only consider the items of this tree view (not the ones dragged from
   // other components).
-  const dragDropManager = useDragDropManager();
-  const [isDraggingItem, setIsDraggingItem] = React.useState(false);
-  React.useEffect(
-    () => {
-      const monitor = dragDropManager.getMonitor();
-      const updateIsDraggingItem = () =>
-        setIsDraggingItem(
-          monitor.isDragging() && monitor.getItemType() === reactDndType
-        );
-      updateIsDraggingItem();
-      return monitor.subscribeToStateChange(updateIsDraggingItem);
-    },
-    [dragDropManager, reactDndType]
-  );
-  const endOfListDropZoneHeightRef = React.useRef(0);
-  endOfListDropZoneHeightRef.current = isDraggingItem
-    ? END_OF_LIST_DROP_ZONE_HEIGHT
-    : 0;
-  // Stable component (rows would be unmounted otherwise) reading the height
-  // to add from a ref.
+  const isDraggingItem = useIsDragging(reactDndType);
+  const isDraggingItemRef = React.useRef(false);
+  isDraggingItemRef.current = isDraggingItem;
+  // Stable component (rows would be unmounted otherwise) reading the drag
+  // state from a ref.
   const listInnerElementType = React.useMemo(
     () =>
       React.forwardRef<{ style: Object }, HTMLDivElement>(
@@ -543,7 +528,13 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
             style={{
               ...style,
               height:
-                parseFloat(style.height) + endOfListDropZoneHeightRef.current,
+                parseFloat(style.height) +
+                (isDraggingItemRef.current ? END_OF_LIST_DROP_ZONE_HEIGHT : 0),
+              // react-window disables pointer events while scrolling: rows
+              // must stay drop targets while the list auto scrolls during a drag.
+              pointerEvents: isDraggingItemRef.current
+                ? undefined
+                : style.pointerEvents,
             }}
             {...otherProps}
           />
@@ -1052,7 +1043,11 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
               )
             : true)
         }
-        drop={() => {
+        drop={monitor => {
+          // Only handle drops in the empty space below the rows: when a row
+          // refuses the drop (an item dropped on itself...), the drop must
+          // not fall through to the end of the list.
+          if (!monitor.isOver({ shallow: true })) return;
           if (endOfListDropTarget)
             onMoveSelectionToItem(
               endOfListDropTarget.node.item,

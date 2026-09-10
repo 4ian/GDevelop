@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { VariableSizeList, areEqual } from 'react-window';
+import { useIsDragging } from '../../UI/DragAndDrop/UseIsDragging';
 import classNames from 'classnames';
 import { AutoSizer } from 'react-virtualized';
 import type { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
@@ -466,6 +467,31 @@ const SortableEventsTree = ({
     ]
   );
 
+  const isDragging = useIsDragging();
+  const isDraggingRef = React.useRef(false);
+  isDraggingRef.current = isDragging;
+  // react-window disables pointer events while scrolling: the drop targets of
+  // the rows must stay active while the sheet auto scrolls during a drag.
+  // Stable component (rows would be unmounted otherwise) reading a ref.
+  const listInnerElementType = React.useMemo(
+    () =>
+      React.forwardRef<{ style: Object }, HTMLDivElement>(
+        ({ style, ...otherProps }, ref) => (
+          <div
+            ref={ref}
+            style={{
+              ...style,
+              pointerEvents: isDraggingRef.current
+                ? undefined
+                : style.pointerEvents,
+            }}
+            {...otherProps}
+          />
+        )
+      ),
+    []
+  );
+
   const itemKey = React.useCallback((index: number, data: RowItemData) => {
     const entry = data.flatData[index];
     return entry ? String(entry.node.key) : String(index);
@@ -487,6 +513,7 @@ const SortableEventsTree = ({
             itemKey={itemKey}
             onScroll={handleScroll}
             overscanCount={10}
+            innerElementType={listInnerElementType}
           >
             {MemoizedTreeRow}
           </VariableSizeList>

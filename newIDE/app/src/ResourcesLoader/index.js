@@ -4,6 +4,16 @@ import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
+export const getFileUrlFromPath = (filePath: string): string => {
+  const normalizedFilePath = filePath.replace(/\\/g, '/');
+  return (
+    'file://' +
+    encodeURI(normalizedFilePath)
+      .replace(/#/g, '%23')
+      .replace(/\?/g, '%3F')
+  );
+};
+
 class UrlsCache {
   projectCache: { [number]: { [string]: string } } = {};
 
@@ -131,14 +141,12 @@ export default class ResourcesLoader {
       // Support local filesystem with Electron
       const file = project.getProjectFile();
       const projectPath = path.dirname(file);
-      const resourceAbsolutePath = path
-        .resolve(projectPath, urlOrFilename)
-        .replace(/\\/g, '/');
+      const resourceAbsolutePath = path.resolve(projectPath, urlOrFilename);
 
       return this._cache.cacheLocalFileUrl(
         project,
         urlOrFilename,
-        'file://' + resourceAbsolutePath,
+        getFileUrlFromPath(resourceAbsolutePath),
         !!disableCacheBurst
       );
     }

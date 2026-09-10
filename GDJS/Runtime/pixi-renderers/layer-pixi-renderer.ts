@@ -189,6 +189,13 @@ namespace gdjs {
     private _pixiContainer: PIXI.Container;
 
     private _layer: gdjs.RuntimeLayer;
+    private _runtimeGameRenderer: gdjs.RuntimeGameRenderer;
+
+    /**
+     * True for a layer of a scene, false for a layer inside a custom object
+     * (only the former is covering the whole screen).
+     */
+    private _isSceneLayer: boolean;
 
     /** For a lighting layer, the sprite used to display the render texture. */
     private _lightingSprite: PIXI.Sprite | null = null;
@@ -245,6 +252,9 @@ namespace gdjs {
       this._pixiContainer = new PIXI.Container();
       this._pixiContainer.sortableChildren = true;
       this._layer = layer;
+      this._runtimeGameRenderer = runtimeGameRenderer;
+      const instanceContainer = layer.getInstanceContainer();
+      this._isSceneLayer = instanceContainer === instanceContainer.getScene();
       this._isLightingLayer = layer.isLightingLayer();
       const parentRendererObject =
         runtimeInstanceContainerRenderer.getRendererObject();
@@ -252,6 +262,7 @@ namespace gdjs {
         parentRendererObject.addChild(this._pixiContainer);
       }
       this._pixiContainer.filters = [];
+      this._updateFilterArea();
 
       // Setup rendering for lighting or 3D rendering:
       const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
@@ -285,6 +296,47 @@ namespace gdjs {
     onGameResolutionResized() {
       // Ensure the 3D camera aspect is updated:
       this._update3DCameraAspectAndPosition();
+
+      this._updateFilterArea();
+    }
+
+    /**
+     * Tell PixiJS the area on which the effects (filters) of a scene layer must
+     * be applied: the whole screen.
+     *
+     * Without this, PixiJS uses the bounding box of what the layer contains,
+     * which has two downsides:
+     * - the bounding box of the whole layer is computed at every frame;
+     * - when this bounding box is smaller than the screen, PixiJS renders the
+     *   layer in a bigger (rounded up to a power of two) texture taken from its
+     *   pool. Effects reading the neighbor pixels (blurs notably) then read the
+     *   empty area around the layer, which shows up as a seam on the right and
+     *   bottom edges of the screen.
+     */
+    private _updateFilterArea() {
+      if (!this._isSceneLayer) {
+        // A layer of a custom object only covers the object: let PixiJS compute
+        // the area from its content.
+        return;
+      }
+      const pixiRenderer = this._runtimeGameRenderer.getPIXIRenderer();
+      if (!pixiRenderer) {
+        return;
+      }
+      const filterArea = this._pixiContainer.filterArea;
+      if (filterArea) {
+        filterArea.x = 0;
+        filterArea.y = 0;
+        filterArea.width = pixiRenderer.screen.width;
+        filterArea.height = pixiRenderer.screen.height;
+      } else {
+        this._pixiContainer.filterArea = new PIXI.Rectangle(
+          0,
+          0,
+          pixiRenderer.screen.width,
+          pixiRenderer.screen.height
+        );
+      }
     }
 
     private _update3DCameraAspectAndPosition() {
@@ -441,8 +493,17 @@ namespace gdjs {
             this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
               threeRenderer
             );
+            // Clear the composer buffers with a transparent color, so that the
+            // parts of the layer where nothing is rendered stay transparent
+            // (the layers rendered before this one must remain visible).
             this._threeEffectComposer.addPass(
-              new THREE_ADDONS.RenderPass(this._threeScene, this._threeCamera)
+              new THREE_ADDONS.RenderPass(
+                this._threeScene,
+                this._threeCamera,
+                null,
+                null,
+                0
+              )
             );
             if (game.getAntialiasingMode() !== 'none') {
               this._threeEffectComposer.addPass(
@@ -452,7 +513,18 @@ namespace gdjs {
                 )
               );
             }
-            this._threeEffectComposer.addPass(new THREE_ADDONS.OutputPass());
+            const outputPass = new THREE_ADDONS.OutputPass();
+            // The composer result is drawn on top of the layers already rendered
+            // on the canvas: blend it (the buffers hold premultiplied colors)
+            // instead of overwriting everything.
+            outputPass.material.transparent = true;
+            outputPass.material.depthTest = false;
+            outputPass.material.depthWrite = false;
+            outputPass.material.blending = THREE.CustomBlending;
+            outputPass.material.blendEquation = THREE.AddEquation;
+            outputPass.material.blendSrc = THREE.OneFactor;
+            outputPass.material.blendDst = THREE.OneMinusSrcAlphaFactor;
+            this._threeEffectComposer.addPass(outputPass);
           }
 
           if (
@@ -994,7 +1066,15 @@ namespace gdjs {
     updateResolution() {
       if (this._threeEffectComposer) {
         const game = this._layer.getRuntimeScene().getGame();
-        this._threeEffectComposer.setPixelRatio(window.devicePixelRatio);
+        const threeRenderer = game.getRenderer().getThreeRenderer();
+        if (threeRenderer) {
+          // The composer must render at the same resolution as the canvas,
+          // otherwise the layer would be scaled (and so, antialiased) when it's
+          // drawn on the canvas.
+          this._threeEffectComposer.setPixelRatio(
+            threeRenderer.getPixelRatio()
+          );
+        }
         this._threeEffectComposer.setSize(
           game.getGameResolutionWidth(),
           game.getGameResolutionHeight()

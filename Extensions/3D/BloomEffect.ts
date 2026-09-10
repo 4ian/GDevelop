@@ -25,6 +25,17 @@ namespace gdjs {
               0,
               0
             );
+            // The bloom is added on the rendered layer, but it must not make
+            // the transparent parts of the layer opaque (the layers rendered
+            // before this one must remain visible).
+            const blendMaterial = this.shaderPass.blendMaterial;
+            blendMaterial.blending = THREE.CustomBlending;
+            blendMaterial.blendEquation = THREE.AddEquation;
+            blendMaterial.blendSrc = THREE.SrcAlphaFactor;
+            blendMaterial.blendDst = THREE.OneFactor;
+            blendMaterial.blendEquationAlpha = THREE.AddEquation;
+            blendMaterial.blendSrcAlpha = THREE.ZeroFactor;
+            blendMaterial.blendDstAlpha = THREE.OneFactor;
             this._isEnabled = false;
           }
 

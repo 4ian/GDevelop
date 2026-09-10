@@ -10,10 +10,13 @@
  */
 #include "GDCore/Project/ObjectsContainer.h"
 
+#include <memory>
+
 #include "DummyPlatform.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "catch.hpp"
@@ -195,6 +198,117 @@ TEST_CASE("ObjectsContainer", "[common]") {
     REQUIRE(objectsContainer.HasObjectNamed("Object2"));
     REQUIRE(&objectsContainer.GetObject("Object2") ==
             &objectsContainer.GetObject(0));
+  }
+
+  SECTION("Empty container and empty names") {
+    REQUIRE(!objectsContainer.HasObjectNamed("Object1"));
+    REQUIRE(!objectsContainer.HasObjectNamed(""));
+
+    InsertObject(project, objectsContainer, "Object1");
+    REQUIRE(!objectsContainer.HasObjectNamed(""));
+
+    gd::Object &unnamedObject = InsertObject(project, objectsContainer, "");
+    REQUIRE(&objectsContainer.GetObject("") == &unnamedObject);
+  }
+
+  SECTION("Names with non-ASCII characters") {
+    gd::Object &object = InsertObject(project, objectsContainer, "Objet_é_日本");
+    REQUIRE(objectsContainer.HasObjectNamed("Objet_é_日本"));
+    REQUIRE(&objectsContainer.GetObject("Objet_é_日本") == &object);
+    REQUIRE(!objectsContainer.HasObjectNamed("Objet_e_日本"));
+
+    object.SetName("Objet_è_日本");
+    REQUIRE(!objectsContainer.HasObjectNamed("Objet_é_日本"));
+    REQUIRE(&objectsContainer.GetObject("Objet_è_日本") == &object);
+  }
+
+  SECTION("References stay valid while other objects are changed") {
+    gd::Object &object1 = InsertObject(project, objectsContainer, "Object1");
+    const gd::Object *found = &objectsContainer.GetObject("Object1");
+    REQUIRE(found == &object1);
+
+    // Enough insertions to force reallocations of the underlying vector.
+    for (int i = 0; i < 100; ++i) {
+      InsertObject(project, objectsContainer, "Other" + gd::String::From(i));
+    }
+    objectsContainer.RemoveObject("Other3");
+    objectsContainer.MoveObject(0, 50);
+    objectsContainer.GetObject("Other4").SetName("RenamedOther4");
+
+    REQUIRE(&objectsContainer.GetObject("Object1") == found);
+    REQUIRE(&objectsContainer.GetObject("Other99") ==
+            &objectsContainer.GetObject(objectsContainer.GetObjectsCount() - 1));
+    REQUIRE(!objectsContainer.HasObjectNamed("Other3"));
+    REQUIRE(!objectsContainer.HasObjectNamed("Other4"));
+    REQUIRE(objectsContainer.HasObjectNamed("RenamedOther4"));
+  }
+
+  SECTION("Duplicated object renamed afterwards (as done by the IDE)") {
+    gd::Object &object1 = InsertObject(project, objectsContainer, "Object1");
+    REQUIRE(&objectsContainer.GetObject("Object1") == &object1);
+
+    // The IDE inserts a copy (which has the same name), then renames it.
+    gd::Object &duplicatedObject =
+        objectsContainer.InsertObject(objectsContainer.GetObject("Object1"), 0);
+    REQUIRE(&objectsContainer.GetObject("Object1") == &duplicatedObject);
+
+    duplicatedObject.SetName("Object1Copy");
+    REQUIRE(&objectsContainer.GetObject("Object1") == &object1);
+    REQUIRE(&objectsContainer.GetObject("Object1Copy") == &duplicatedObject);
+  }
+
+  SECTION("A copied container outlives the original") {
+    std::unique_ptr<gd::ObjectsContainer> copiedObjectsContainer;
+    gd::ObjectsContainer assignedObjectsContainer(gd::ObjectsContainer::Global);
+    InsertObject(project, assignedObjectsContainer, "OldObject");
+    REQUIRE(assignedObjectsContainer.HasObjectNamed("OldObject"));
+    {
+      gd::ObjectsContainer originalObjectsContainer(
+          gd::ObjectsContainer::Scene);
+      InsertObject(project, originalObjectsContainer, "Object1");
+      // Build the index of the original before copying it.
+      REQUIRE(originalObjectsContainer.HasObjectNamed("Object1"));
+
+      copiedObjectsContainer.reset(
+          new gd::ObjectsContainer(originalObjectsContainer));
+      assignedObjectsContainer = originalObjectsContainer;
+    }
+
+    REQUIRE(copiedObjectsContainer->HasObjectNamed("Object1"));
+    REQUIRE(&copiedObjectsContainer->GetObject("Object1") ==
+            &copiedObjectsContainer->GetObject(0));
+    REQUIRE(!assignedObjectsContainer.HasObjectNamed("OldObject"));
+    REQUIRE(&assignedObjectsContainer.GetObject("Object1") ==
+            &assignedObjectsContainer.GetObject(0));
+  }
+
+  SECTION("Lookups through an ObjectsContainersList follow renames") {
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &globalObject =
+        InsertObject(project, project.GetObjects(), "GlobalObject");
+    gd::Object &sceneObject =
+        InsertObject(project, layout.GetObjects(), "SceneObject");
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+    // The variables container identifies which object was found.
+    auto findVariables = [&](const gd::String &name) {
+      return objectsContainersList.GetObjectOrGroupVariablesContainer(name);
+    };
+
+    REQUIRE(findVariables("GlobalObject") == &globalObject.GetVariables());
+    REQUIRE(findVariables("SceneObject") == &sceneObject.GetVariables());
+    REQUIRE(findVariables("UnknownObject") == nullptr);
+    REQUIRE(!objectsContainersList.HasObjectNamed("UnknownObject"));
+
+    sceneObject.SetName("RenamedSceneObject");
+    globalObject.SetName("SceneObject");
+    REQUIRE(!objectsContainersList.HasObjectNamed("GlobalObject"));
+    REQUIRE(findVariables("RenamedSceneObject") == &sceneObject.GetVariables());
+    REQUIRE(findVariables("SceneObject") == &globalObject.GetVariables());
+
+    layout.GetObjects().RemoveObject("RenamedSceneObject");
+    REQUIRE(!objectsContainersList.HasObjectNamed("RenamedSceneObject"));
+    REQUIRE(findVariables("RenamedSceneObject") == nullptr);
   }
 
   SECTION("The first object wins when two objects have the same name") {

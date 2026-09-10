@@ -1,4 +1,5 @@
 import path from 'path';
+import nodeUrl from 'url';
 
 const mockElectron = {
   ipcRenderer: {
@@ -44,6 +45,9 @@ const mockOptionalRequire = jest.fn(
     }
     if (moduleName === 'path') {
       return path;
+    }
+    if (moduleName === 'url') {
+      return nodeUrl;
     }
     if (moduleName === 'os') {
       return mockOs;

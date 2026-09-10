@@ -40,14 +40,14 @@ public:
    * \brief Validate a parameter and check for deprecation warnings in a single
    * pass.
    *
-   * This method is more efficient than calling IsParameterValid and
-   * HasDeprecationWarnings separately as it only parses the expression once.
+   * The parameter value is read from the instruction itself, so the displayed
+   * (possibly defaulted) value doesn't have to be passed.
    */
   static ParameterValidationResult ValidateParameter(
       const gd::Platform &platform,
       const gd::ProjectScopedContainers projectScopedContainers,
       const gd::Instruction &instruction, const InstructionMetadata &metadata,
-      std::size_t parameterIndex, const gd::String &value);
+      std::size_t parameterIndex);
 
   /**
    * \brief Check if a parameter is valid.
@@ -59,21 +59,13 @@ public:
                    const gd::ProjectScopedContainers projectScopedContainers,
                    const gd::Instruction &instruction,
                    const InstructionMetadata &metadata,
-                   std::size_t parameterIndex, const gd::String &value);
-
-  /**
-   * \brief Check if a parameter expression has deprecation warnings.
-   * \deprecated Use ValidateParameter instead for better performance when you
-   * also need to check for validity.
-   */
-  static bool
-  HasDeprecationWarnings(const gd::Platform &platform,
-                         const gd::ProjectScopedContainers projectScopedContainers,
-                         const gd::Instruction &instruction,
-                         const InstructionMetadata &metadata,
-                         std::size_t parameterIndex, const gd::String &value);
+                   std::size_t parameterIndex);
 
   static gd::String GetRootVariableName(const gd::String &name);
+
+  static gd::String GetObjectNameForParameter(
+      const gd::ProjectScopedContainers projectScopedContainers,
+      const gd::Instruction &instruction, const gd::String &parameterType);
 
 private:
   static bool

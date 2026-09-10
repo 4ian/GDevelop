@@ -40,6 +40,7 @@ import {
 } from '../ParameterFields/ParameterFieldCommons';
 import Edit from '../../UI/CustomSvgIcons/Edit';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -84,12 +85,12 @@ type Props = {|
   focusOnMount?: boolean,
   resourceManagementProps: ResourceManagementProps,
   style?: Object,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   noHelpButton?: boolean,
   id?: string,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 const isParameterVisible = (
@@ -136,6 +137,7 @@ const InstructionParametersEditor: React.ComponentType<{
       openInstructionOrExpression,
       resourceManagementProps,
       id,
+      openEventsBasedEntityPropertyEditorDialog,
     },
     ref
   ) => {
@@ -212,17 +214,7 @@ const InstructionParametersEditor: React.ComponentType<{
       const instructionType = instruction.getType();
       if (!instructionType) return null;
 
-      const extension = isCondition
-        ? gd.MetadataProvider.getExtensionAndConditionMetadata(
-            project.getCurrentPlatform(),
-            instructionType
-          ).getExtension()
-        : gd.MetadataProvider.getExtensionAndActionMetadata(
-            project.getCurrentPlatform(),
-            instructionType
-          ).getExtension();
-
-      openInstructionOrExpression(extension, instructionType);
+      openInstructionOrExpression(instructionType);
     };
 
     const renderEmpty = () => {
@@ -434,6 +426,9 @@ const InstructionParametersEditor: React.ComponentType<{
                             firstVisibleField.current = field;
                           }
                         }}
+                        openEventsBasedEntityPropertyEditorDialog={
+                          openEventsBasedEntityPropertyEditorDialog
+                        }
                       />
                     );
                   })}

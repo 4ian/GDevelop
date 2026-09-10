@@ -175,8 +175,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props): React.Node => {
   );
 
   const onCurrentPageChange = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    newPage => {
+    (newPage: number) => {
       const minPage = 1;
       const maxPage = totalNumberOfPages;
       if (newPage < minPage) {

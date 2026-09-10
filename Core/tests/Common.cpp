@@ -77,10 +77,13 @@ TEST_CASE("EventsList", "[common][events]") {
 
     size_t endMemory = gd::SystemStats::GetUsedVirtualMemory();
     INFO("Memory used: " << endMemory - startMemory << "KB");
+    // Each event carries a MemoryTracked member and an entry in
+    // MemoryTrackedRegistry (use-after-free detection), adding a few tens
+    // of bytes per event on 64-bit platforms.
     #if defined(WINDOWS)
-      REQUIRE(3800 >= endMemory - startMemory);
+      REQUIRE(4200 >= endMemory - startMemory);
     #else
-      REQUIRE(2000 >= endMemory - startMemory);
+      REQUIRE(2400 >= endMemory - startMemory);
     #endif
   }
 }

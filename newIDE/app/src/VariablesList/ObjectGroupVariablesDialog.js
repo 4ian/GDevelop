@@ -13,7 +13,10 @@ import VariablesList from './VariablesList';
 import HelpButton from '../UI/HelpButton';
 import { getVariablePathFromNodeId } from './VariableToTreeNodeHandling';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
-import { insertInVariablesContainer } from '../Utils/VariablesUtils';
+import {
+  insertInVariablesContainer,
+  makeObjectGroupMergedVariablesContainer,
+} from '../Utils/VariablesUtils';
 import { getRootVariableName } from '../EventsSheet/ParameterFields/VariableField';
 import { getNodeIdFromVariableName } from './VariableToTreeNodeHandling';
 import useValueWithInit from '../Utils/UseRefInitHook';
@@ -54,10 +57,11 @@ const ObjectGroupVariablesDialog = ({
   isListLocked,
 }: Props): React.Node => {
   const groupVariablesContainer = useValueWithInit(
-    // The VariablesContainer is returned by value.
-    // Thus, the same instance is reused every time.
+    // This merged container is a temporary container, owned by this dialog,
+    // that the user edits in place - edits only reach the objects of the
+    // group when the refactoring is applied.
     () =>
-      gd.ObjectVariableHelper.mergeVariableContainers(
+      makeObjectGroupMergedVariablesContainer(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         objectGroup
       )
@@ -69,20 +73,35 @@ const ObjectGroupVariablesDialog = ({
   } = useSerializableObjectCancelableEditor({
     serializableObject: groupVariablesContainer,
     onCancel: () => {},
-    resetThenClearPersistentUuid: true,
+    // The merged container is a temporary object, but its variables keep the
+    // persistent UUIDs of the variables of the first object of the group -
+    // they must be preserved (only set for variables not having one yet), as
+    // they can be copied to the objects of the group when applying changes,
+    // are persisted in the project file and so must stay stable.
+    ensurePersistentUuids: true,
   });
 
+  // Free the C++ memory of the merged container when the dialog is closed
+  // (declared after other hooks using the container, so their cleanups run
+  // before the container is deleted).
+  React.useEffect(
+    () => () => {
+      groupVariablesContainer.delete();
+    },
+    [groupVariablesContainer]
+  );
+
   const apply = async () => {
-    onApply(
+    const selectedVariableName =
       lastSelectedVariableNodeId.current &&
-        getVariablePathFromNodeId(
-          lastSelectedVariableNodeId.current,
-          groupVariablesContainer
-        )
-    );
+      getVariablePathFromNodeId(
+        lastSelectedVariableNodeId.current,
+        groupVariablesContainer
+      );
     if (!initialInstances) {
       // This can only happens for legacy function object groups.
       // In this case, we don't do any refactoring.
+      onApply(selectedVariableName);
       return;
     }
 
@@ -105,14 +124,16 @@ const ObjectGroupVariablesDialog = ({
     const { eventsBasedObject } = projectScopedContainersAccessor.getScope();
     if (eventsBasedObject) {
       for (const objectName of objectGroup.getAllObjectsNames().toJSArray()) {
-        gd.ObjectVariableHelper.applyChangesToVariants(
+        gd.ObjectRefactorer.applyChangesToVariants(
           eventsBasedObject,
           objectName,
           changeset
         );
       }
     }
-    groupVariablesContainer.clearPersistentUuid();
+    // Notify only once the variables are copied to the objects of the group,
+    // so that the caller can read them (for example to refresh autocompletions).
+    onApply(selectedVariableName);
   };
 
   const lastSelectedVariableNodeId = React.useRef<string | null>(null);

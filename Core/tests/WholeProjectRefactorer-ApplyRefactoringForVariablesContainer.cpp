@@ -19,7 +19,7 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/ObjectVariableHelper.h"
+#include "GDCore/IDE/ObjectRefactorer.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -1138,7 +1138,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     gd::WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
         project, object.GetVariables(), eventsBasedObject.GetInitialInstances(),
         object.GetName(), changeset, originalSerializedVariables);
-    gd::ObjectVariableHelper::ApplyChangesToVariants(
+    gd::ObjectRefactorer::ApplyChangesToVariants(
         eventsBasedObject, "MyChildObject", changeset);
 
     REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
@@ -2209,7 +2209,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Count() == 1);
@@ -2241,7 +2241,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Count() == 1);
@@ -2261,7 +2261,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Count() == 0);
@@ -2282,10 +2282,150 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Count() == 0);
+  }
+
+  SECTION("Can fill an object added to a group with the missing group variables") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MySharedVariable").SetValue(123);
+    object.GetVariables().InsertNew("MyMixedValuesVariable").SetValue(111);
+    object.GetVariables().InsertNew("MyMixedTypesVariable").SetValue(1);
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MySharedVariable").SetValue(123);
+    otherObject.GetVariables().InsertNew("MyMixedValuesVariable").SetValue(222);
+    otherObject.GetVariables()
+        .InsertNew("MyMixedTypesVariable")
+        .SetString("Hello");
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::ObjectRefactorer::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+
+    REQUIRE(groupVariables.Get("MyMixedValuesVariable").HasMixedValues());
+    REQUIRE(groupVariables.Get("MyMixedTypesVariable").GetType() ==
+            gd::Variable::Type::MixedTypes);
+
+    // An object without any variable is added to the group.
+    auto &newObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "NewObject", 0);
+    group.AddObject("NewObject");
+    gd::ObjectRefactorer::FillMissingGroupVariablesToObject(newObject,
+                                                            groupVariables);
+
+    REQUIRE(newObject.GetVariables().Has("MySharedVariable"));
+    REQUIRE(newObject.GetVariables().Get("MySharedVariable").GetValue() == 123);
+
+    // The variable with mixed values is filled with the value of the first
+    // object of the group, but the editor-only "mixed values" marker is not
+    // kept - otherwise it would be persisted in the project and the variable
+    // of this single object would wrongly show "Mixed values" in the editor.
+    REQUIRE(newObject.GetVariables().Has("MyMixedValuesVariable"));
+    REQUIRE(newObject.GetVariables()
+                .Get("MyMixedValuesVariable")
+                .HasMixedValues() == false);
+    REQUIRE(newObject.GetVariables().Get("MyMixedValuesVariable").GetValue() ==
+            111);
+
+    // A variable with entirely mixed types has no meaningful type or value to
+    // give to the object: it's not copied.
+    REQUIRE(!newObject.GetVariables().Has("MyMixedTypesVariable"));
+  }
+
+  SECTION("Can apply group variable changes after an object was added to the group") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyMixedValuesVariable").SetValue(111);
+    auto &otherObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "OtherObject", 0);
+    otherObject.GetVariables().InsertNew("MyMixedValuesVariable").SetValue(222);
+    auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
+    group.AddObject("Object");
+    group.AddObject("OtherObject");
+
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
+    gd::VariablesContainer groupVariables =
+        gd::ObjectRefactorer::MergeVariableContainers(
+            projectScopedContainers.GetObjectsContainersList(), group);
+
+    REQUIRE(groupVariables.Get("MyMixedValuesVariable").HasMixedValues());
+
+    // Take a snapshot of the group variables, like the editor does when the
+    // group is selected.
+    groupVariables.ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    groupVariables.SerializeTo(originalSerializedVariables);
+
+    // An object without any variable is added to the group while its
+    // variables are edited.
+    auto &newObject = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "NewObject", 0);
+    group.AddObject("NewObject");
+
+    // A new variable is also added to the group.
+    groupVariables.InsertNew("MyNewVariable").SetValue(42);
+
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, groupVariables);
+    gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
+
+    // The variable with mixed values is filled on the added object with the
+    // value of the first object of the group, without the editor-only "mixed
+    // values" marker.
+    REQUIRE(newObject.GetVariables().Has("MyMixedValuesVariable"));
+    REQUIRE(newObject.GetVariables()
+                .Get("MyMixedValuesVariable")
+                .HasMixedValues() == false);
+    REQUIRE(newObject.GetVariables().Get("MyMixedValuesVariable").GetValue() ==
+            111);
+    REQUIRE(newObject.GetVariables().Get("MyNewVariable").GetValue() == 42);
+
+    // The other objects keep their own values for the variable with mixed
+    // values, and get the new variable.
+    REQUIRE(object.GetVariables().Get("MyMixedValuesVariable").GetValue() ==
+            111);
+    REQUIRE(object.GetVariables()
+                .Get("MyMixedValuesVariable")
+                .HasMixedValues() == false);
+    REQUIRE(object.GetVariables().Get("MyNewVariable").GetValue() == 42);
+    REQUIRE(
+        otherObject.GetVariables().Get("MyMixedValuesVariable").GetValue() ==
+        222);
+    REQUIRE(otherObject.GetVariables()
+                .Get("MyMixedValuesVariable")
+                .HasMixedValues() == false);
+    REQUIRE(otherObject.GetVariables().Get("MyNewVariable").GetValue() == 42);
+
+    // No "mixed values" marker is persisted when the project is saved.
+    gd::SerializerElement projectElement;
+    project.SerializeTo(projectElement);
+    const gd::String projectJson =
+        gd::Serializer::ToJSON(projectElement);
+    REQUIRE(projectJson.find("hasMixedValues") == gd::String::npos);
   }
 
   SECTION("Can change a group variable value") {
@@ -2307,7 +2447,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2354,7 +2494,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2401,7 +2541,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2450,7 +2590,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2499,7 +2639,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2555,7 +2695,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Count() == 1);
@@ -2607,7 +2747,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2667,7 +2807,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2726,7 +2866,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2799,7 +2939,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2862,7 +3002,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -2906,7 +3046,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Count() == 0);
@@ -2952,7 +3092,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Count() == 0);
@@ -3039,7 +3179,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -3141,7 +3281,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -3247,7 +3387,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));
@@ -3323,7 +3463,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     gd::VariablesContainer groupVariables =
-        gd::ObjectVariableHelper::MergeVariableContainers(
+        gd::ObjectRefactorer::MergeVariableContainers(
             projectScopedContainers.GetObjectsContainersList(), group);
 
     REQUIRE(groupVariables.Has("MyGroupVariable"));

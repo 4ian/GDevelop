@@ -186,8 +186,10 @@ export const ExtensionStore = ({
               filteredSearchResults.map(({ item }) => item)
             }
             getSearchItemUniqueId={getExtensionName}
-            // $FlowFixMe[missing-local-annot]
-            renderSearchItem={(extensionShortHeader, onHeightComputed) => (
+            renderSearchItem={(
+              extensionShortHeader: ExtensionShortHeader,
+              onHeightComputed
+            ) => (
               <ExtensionListItem
                 id={`extension-list-item-${extensionShortHeader.name}`}
                 key={extensionShortHeader.name}

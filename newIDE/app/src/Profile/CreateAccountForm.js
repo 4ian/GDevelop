@@ -157,6 +157,8 @@ const CreateAccountForm = ({
                     errorText={getEmailErrorText(error)}
                     fullWidth
                     type="email"
+                    name="email"
+                    autoComplete="email"
                     required
                     onChange={(e, value) => {
                       onChangeEmail(value);
@@ -171,6 +173,8 @@ const CreateAccountForm = ({
                     floatingLabelText={<Trans>Password</Trans>}
                     errorText={getPasswordErrorText(error)}
                     type="password"
+                    name="password"
+                    autoComplete="new-password"
                     fullWidth
                     required
                     onChange={(e, value) => {

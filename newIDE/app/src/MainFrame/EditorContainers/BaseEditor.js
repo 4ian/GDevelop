@@ -23,7 +23,18 @@ import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPla
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
+import { type GameplayTestsCallbacks } from '../../GameplayTests/GameplayTestRunner';
 import type { NavigateToEventFromGlobalSearchParams } from '../../Utils/Search';
+import type {
+  SceneEventsOutsideEditorChanges,
+  InstancesOutsideEditorChanges,
+  ObjectsOutsideEditorChanges,
+  ObjectGroupsOutsideEditorChanges,
+  ProjectItemRenamedOutsideEditorChanges,
+  WillDeleteSceneChanges,
+  WillDeleteGameplayTestChanges,
+  WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -38,26 +49,11 @@ export type EditorContainerExtraProps = {|
   continueProcessingFunctionCallsOnMount?: boolean,
 |};
 
-export type SceneEventsOutsideEditorChanges = {|
-  scene: gdLayout,
-  newOrChangedAiGeneratedEventIds: Set<string>,
-|};
-
-export type InstancesOutsideEditorChanges = {|
-  scene: gdLayout,
-|};
-
-export type ObjectsOutsideEditorChanges = {|
-  scene: gdLayout,
-  isNewObjectTypeUsed: boolean,
-|};
-
-export type ObjectGroupsOutsideEditorChanges = {|
-  scene: gdLayout,
-|};
-
 export type RenderEditorContainerProps = {|
   isActive: boolean,
+  // The pane the editor is displayed in ('left', 'center' or 'right'), for
+  // editors adapting their layout to their position.
+  paneIdentifier: string,
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   projectItemName: ?string,
@@ -103,10 +99,7 @@ export type RenderEditorContainerProps = {|
     |}
   ) => void,
   onOpenEvents: (sceneName: string) => void,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   onOpenCustomObjectEditor: (
     gdEventsFunctionsExtension,
     gdEventsBasedObject,
@@ -124,6 +117,9 @@ export type RenderEditorContainerProps = {|
   ) => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
+
+  // Gameplay tests management:
+  gameplayTestsCallbacks: GameplayTestsCallbacks,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: ({|
@@ -148,6 +144,24 @@ export type RenderEditorContainerProps = {|
   onDeletedEventsBasedObject: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
+  ) => void,
+  onEventsBasedObjectMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldObjectName: string,
+    newObjectName: string
+  ) => void,
+  onEventsBasedBehaviorMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldBehaviorName: string,
+    newBehaviorName: string
+  ) => void,
+  onEventsFunctionMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldFunctionName: string,
+    newFunctionName: string
   ) => void,
 
   // Project opening
@@ -242,6 +256,14 @@ export type RenderEditorContainerProps = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
 
   // Events editing
   onSceneEventsModifiedOutsideEditor: (
@@ -264,6 +286,9 @@ export type RenderEditorContainerProps = {|
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,

@@ -561,13 +561,13 @@ std::vector<gd::String> ObjectsContainersList::GetBehaviorNamesInObjectOrGroup(
       *objectsContainers[0], *objectsContainers[1], objectOrGroupName, behaviorType, searchInGroups);
 }
 
-bool ObjectsContainersList::IsDefaultBehavior(
-    const gd::String &objectOrGroupName, const gd::String &behaviorType, bool searchInGroups) const {
+bool ObjectsContainersList::HasDefaultBehavior(
+    const gd::String &objectOrGroupName, const gd::String &behaviorName, bool searchInGroups) const {
   if (objectsContainers.size() > 2) {
     // TODO: rework forwarded methods so they can work with any number of
     // containers.
     gd::LogFatalError(
-        "ObjectsContainersList::IsDefaultBehavior called with objectsContainers "
+        "ObjectsContainersList::HasDefaultBehavior called with objectsContainers "
         "not being exactly 2. This is a logical error and will crash.");
   }
   if (objectsContainers.size() == 0) {
@@ -576,12 +576,12 @@ bool ObjectsContainersList::IsDefaultBehavior(
   if (objectsContainers.size() == 1) {
     gd::ObjectsContainer emptyObjectsContainer(
         gd::ObjectsContainer::SourceType::Unknown);
-    return gd::IsDefaultBehavior(emptyObjectsContainer,
-                                    *objectsContainers[0], objectOrGroupName, behaviorType,
+    return gd::HasDefaultBehavior(emptyObjectsContainer,
+                                    *objectsContainers[0], objectOrGroupName, behaviorName,
                                     searchInGroups);
   }
-  return gd::IsDefaultBehavior(
-      *objectsContainers[0], *objectsContainers[1], objectOrGroupName, behaviorType, searchInGroups);
+  return gd::HasDefaultBehavior(*objectsContainers[0], *objectsContainers[1],
+                               objectOrGroupName, behaviorName, searchInGroups);
 }
 
 

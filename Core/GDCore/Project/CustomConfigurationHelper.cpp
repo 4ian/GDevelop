@@ -31,7 +31,8 @@ void CustomConfigurationHelper::InitializeContent(
     if (primitiveType == "string" || valueType == "behavior") {
       element.SetStringValue(property->GetValue());
     } else if (primitiveType == "number") {
-      element.SetDoubleValue(property->GetValue().To<double>());
+      const gd::String &value = property->GetValue();
+      element.SetDoubleValue(value.empty() ? 0 : value.To<double>());
     } else if (primitiveType == "boolean") {
       element.SetBoolValue(property->GetValue() == "true");
     }

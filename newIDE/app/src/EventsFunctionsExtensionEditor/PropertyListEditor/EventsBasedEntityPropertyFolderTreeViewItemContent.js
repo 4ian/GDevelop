@@ -22,6 +22,9 @@ import {
 } from './EventsBasedEntityPropertyTreeViewItemContent';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
+import { removeSubFolders } from '../../Utils/Folders';
+import { serializeToJSObject } from '../../Utils/Serializer';
+import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
 
 export const expandAllSubfolders = (
   propertyFolder: gdPropertyFolderOrProperty,
@@ -33,6 +36,69 @@ export const expandAllSubfolders = (
     folderAndPath => folderAndPath.folder
   );
   expandFolders([propertyFolder, ...subFolders].map(folder => folder));
+};
+
+export const buildMoveToMenu = ({
+  propertyFolderOrProperty,
+  i18n,
+  properties,
+  addFolder,
+  onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
+  isSharedProperties,
+}: {|
+  propertyFolderOrProperty: gdPropertyFolderOrProperty,
+  i18n: I18nType,
+  properties: gdPropertiesContainer,
+  addFolder: (
+    items: Array<gdPropertyFolderOrProperty>,
+    isSharedProperties: boolean
+  ) => void,
+  onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer: (
+    propertyFolderOrProperty: gdPropertyFolderOrProperty,
+    isSharedProperties: boolean
+  ) => void,
+  isSharedProperties: boolean,
+|}): MenuItemTemplate => {
+  const folderAndPathsInContainer = enumerateFoldersInContainer(properties);
+  folderAndPathsInContainer.unshift({
+    path: i18n._(t`Root folder`),
+    folder: properties.getRootFolder(),
+  });
+  const filteredFolderAndPathsInContainer = folderAndPathsInContainer.filter(
+    folderAndPath =>
+      !folderAndPath.folder.isADescendantOf(propertyFolderOrProperty) &&
+      folderAndPath.folder !== propertyFolderOrProperty
+  );
+  return {
+    label: i18n._('Move to folder'),
+    submenu: [
+      ...filteredFolderAndPathsInContainer.map(({ folder, path }) => ({
+        label: path,
+        enabled: folder !== propertyFolderOrProperty.getParent(),
+        click: () => {
+          if (folder === propertyFolderOrProperty.getParent()) return;
+          propertyFolderOrProperty
+            .getParent()
+            .movePropertyFolderOrPropertyToAnotherFolder(
+              propertyFolderOrProperty,
+              folder,
+              0
+            );
+          onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer(
+            folder,
+            isSharedProperties
+          );
+        },
+      })),
+
+      { type: 'separator' },
+      {
+        label: i18n._(t`Create new folder...`),
+        click: () =>
+          addFolder([propertyFolderOrProperty.getParent()], isSharedProperties),
+      },
+    ],
+  };
 };
 
 export type EventsBasedEntityPropertyFolderTreeViewItemProps = {|
@@ -182,22 +248,17 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
       onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
     } = this.props;
 
-    const folderAndPathsInContainer = enumerateFoldersInContainer(properties);
-    folderAndPathsInContainer.unshift({
-      path: i18n._(t`Root folder`),
-      folder: properties.getRootFolder(),
-    });
-
-    const filteredFolderAndPathsInContainer = folderAndPathsInContainer.filter(
-      folderAndPath =>
-        !folderAndPath.folder.isADescendantOf(this.propertyFolder) &&
-        folderAndPath.folder !== this.propertyFolder
-    );
     return [
+      {
+        label: i18n._(t`Copy`),
+        click: () => this.copy(),
+        accelerator: 'CmdOrCtrl+C',
+      },
       {
         label: this._getPasteLabel(i18n),
         enabled: Clipboard.has(PROPERTIES_CLIPBOARD_KIND),
         click: () => this.paste(),
+        accelerator: 'CmdOrCtrl+V',
       },
       {
         label: i18n._(t`Rename`),
@@ -209,36 +270,14 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
         click: () => this.delete(),
         accelerator: 'Backspace',
       },
-      {
-        label: i18n._('Move to folder'),
-        submenu: [
-          ...filteredFolderAndPathsInContainer.map(({ folder, path }) => ({
-            label: path,
-            enabled: folder !== this.propertyFolder.getParent(),
-            click: () => {
-              if (folder === this.propertyFolder.getParent()) return;
-              this.propertyFolder
-                .getParent()
-                .movePropertyFolderOrPropertyToAnotherFolder(
-                  this.propertyFolder,
-                  folder,
-                  0
-                );
-              onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer(
-                folder,
-                this.props.isSharedProperties
-              );
-            },
-          })),
-
-          { type: 'separator' },
-          {
-            label: i18n._(t`Create new folder...`),
-            click: () =>
-              addFolder([this.propertyFolder.getParent()], isSharedProperties),
-          },
-        ],
-      },
+      buildMoveToMenu({
+        propertyFolderOrProperty: this.propertyFolder,
+        i18n,
+        properties,
+        addFolder,
+        onMovedPropertyFolderOrPropertyToAnotherFolderInSameContainer,
+        isSharedProperties,
+      }),
       { type: 'separator' },
       {
         label: i18n._(t`Add a new property`),
@@ -282,6 +321,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     if (propertiesToDelete.length === 0) {
       // Folder is empty or contains only empty folders.
       setSelectedPropertyFolderOrProperty(null, false);
+      removeSubFolders(this.propertyFolder);
       this.propertyFolder.getParent().removeFolderChild(this.propertyFolder);
       forceUpdateList();
       return;
@@ -310,11 +350,20 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     for (const propertyToDelete of propertiesToDelete) {
       properties.remove(propertyToDelete.getName());
     }
+    removeSubFolders(this.propertyFolder);
     this.propertyFolder.getParent().removeFolderChild(this.propertyFolder);
     this._onProjectItemModified();
   }
 
-  copy(): void {}
+  copy(): void {
+    Clipboard.set(
+      PROPERTIES_CLIPBOARD_KIND,
+      enumeratePropertiesInFolder(this.propertyFolder).map(property => ({
+        name: property.getName(),
+        serializedProperty: serializeToJSObject(property),
+      }))
+    );
+  }
 
   cut(): void {}
 

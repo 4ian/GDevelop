@@ -36,24 +36,33 @@ const useGamesList = (): GamesList => {
       if (loginState !== 'done') return;
 
       if (!authenticated || !firebaseUser) {
+        // Forget any fetch that could still be running for a previously
+        // authenticated user, so that its result is discarded when received.
+        gamesFetchingPromise.current = null;
         setGames([]);
         return;
       }
       if (gamesFetchingPromise.current) return gamesFetchingPromise.current;
 
+      const fetchPromise = getGames(getAuthorizationHeader, firebaseUser.uid);
       try {
         setGamesFetchingError(null);
-        gamesFetchingPromise.current = getGames(
-          getAuthorizationHeader,
-          firebaseUser.uid
-        );
-        const fetchedGames = await gamesFetchingPromise.current;
+        gamesFetchingPromise.current = fetchPromise;
+        const fetchedGames = await fetchPromise;
+        if (gamesFetchingPromise.current !== fetchPromise) {
+          // The user logged out while the games were being fetched:
+          // discard the result.
+          return;
+        }
         setGames(fetchedGames);
       } catch (error) {
+        if (gamesFetchingPromise.current !== fetchPromise) return;
         console.error('Error while loading user games.', error);
         setGamesFetchingError(error);
       } finally {
-        gamesFetchingPromise.current = null;
+        if (gamesFetchingPromise.current === fetchPromise) {
+          gamesFetchingPromise.current = null;
+        }
       }
     },
     [authenticated, firebaseUser, getAuthorizationHeader, loginState]

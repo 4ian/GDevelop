@@ -13,7 +13,7 @@ export declare const decodeBase64LayerData: (
   tiledLayer: TiledLayer
 ) => number[];
 export type TiledGID = {
-  id: integer;
+  id: integer | undefined;
   flippedHorizontally: boolean;
   flippedVertically: boolean;
   flippedDiagonally: boolean;
@@ -32,6 +32,6 @@ export declare const extractTileUidFlippedStates: (
  * @return the tile identifier.
  */
 export declare function getTileIdFromTiledGUI(
-  tiledGUI: number | undefined
+  tiledGUI: number
 ): number | undefined;
 //# sourceMappingURL=TiledTileMapLoaderHelper.d.ts.map

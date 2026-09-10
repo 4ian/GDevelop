@@ -278,8 +278,7 @@ const enumerateInstruction = (
   instrMetadata: gdInstructionMetadata,
   scope: InstructionOrExpressionScope,
   i18n: I18nType,
-  // $FlowFixMe[missing-local-annot]
-  ignoresGroups = false
+  ignoresGroups?: boolean = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
   let description = instrMetadata.getDescription();

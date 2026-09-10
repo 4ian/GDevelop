@@ -12,6 +12,7 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
@@ -43,6 +44,8 @@ typedef std::shared_ptr<BaseEvent> BaseEventSPtr;
 class GD_CORE_API BaseEvent {
  public:
   BaseEvent();
+  BaseEvent(const BaseEvent& other);
+  BaseEvent& operator=(const BaseEvent& other);
   virtual ~BaseEvent(){};
 
   /**
@@ -342,6 +345,7 @@ class GD_CORE_API BaseEvent {
 
   static gd::EventsList badSubEvents;
   static gd::VariablesContainer badLocalVariables;
+  gd::MemoryTracked _memoryTracked{this, "BaseEvent"};
 };
 
 /**

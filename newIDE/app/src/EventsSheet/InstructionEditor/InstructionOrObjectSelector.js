@@ -921,6 +921,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
                 }}
                 searchText={searchText}
                 multiSelect={false}
+                enableStickyAncestors
               />
             )}
           </AutoSizer>
@@ -983,6 +984,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
                   }
                 }}
                 multiSelect={false}
+                enableStickyAncestors
               />
             )}
           </AutoSizer>

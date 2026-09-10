@@ -22,7 +22,7 @@ export const Default = (): React.Node => (
     <BehaviorsEditor
       project={testProject.project}
       eventsFunctionsExtension={null}
-      object={testProject.spriteObjectWithBehaviors}
+      objects={[testProject.spriteObjectWithBehaviors]}
       layersContainer={testProject.testLayout.getLayers()}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
@@ -34,6 +34,9 @@ export const Default = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={false}
     />
   </SerializedObjectDisplay>
@@ -44,7 +47,7 @@ export const WithoutAnyBehaviors = (): React.Node => (
     <BehaviorsEditor
       project={testProject.project}
       eventsFunctionsExtension={null}
-      object={testProject.spriteObjectWithoutBehaviors}
+      objects={[testProject.spriteObjectWithoutBehaviors]}
       layersContainer={testProject.testLayout.getLayers()}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
@@ -56,6 +59,9 @@ export const WithoutAnyBehaviors = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={false}
     />
   </SerializedObjectDisplay>
@@ -66,7 +72,7 @@ export const Locked = (): React.Node => (
     <BehaviorsEditor
       project={testProject.project}
       eventsFunctionsExtension={null}
-      object={testProject.spriteObjectWithBehaviors}
+      objects={[testProject.spriteObjectWithBehaviors]}
       layersContainer={testProject.testLayout.getLayers()}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
@@ -78,6 +84,9 @@ export const Locked = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={true}
     />
   </SerializedObjectDisplay>
@@ -88,7 +97,7 @@ export const LockedWithoutAnyBehaviors = (): React.Node => (
     <BehaviorsEditor
       project={testProject.project}
       eventsFunctionsExtension={null}
-      object={testProject.spriteObjectWithoutBehaviors}
+      objects={[testProject.spriteObjectWithoutBehaviors]}
       layersContainer={testProject.testLayout.getLayers()}
       isChildObject={false}
       resourceManagementProps={fakeResourceManagementProps}
@@ -100,6 +109,9 @@ export const LockedWithoutAnyBehaviors = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={true}
     />
   </SerializedObjectDisplay>

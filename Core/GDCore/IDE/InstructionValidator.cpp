@@ -29,7 +29,7 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
     const gd::Platform &platform,
     const gd::ProjectScopedContainers projectScopedContainers,
     const gd::Instruction &instruction, const InstructionMetadata &metadata,
-    std::size_t parameterIndex, const gd::String &value) {
+    std::size_t parameterIndex) {
   ParameterValidationResult result;
 
   if (parameterIndex >= instruction.GetParametersCount() ||
@@ -45,18 +45,34 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
                                   ? "number"
                                   : parameterMetadata.GetType();
 
+  // The parameter value as stored in the project: empty for an unset optional
+  // parameter or for the base layer. This is what must be validated, as opposed
+  // to the value formatted for display which may show a default value.
+  const gd::String &value =
+      instruction.GetParameter(parameterIndex).GetPlainString();
+
   bool shouldNotBeValidated = parameterType == "layer" && value.empty();
   if (shouldNotBeValidated) {
+    return result;  // Valid by default, no deprecation warning
+  }
+
+  // An optional parameter left empty is valid: the default value is used when
+  // generating the code.
+  if (parameterMetadata.IsOptional() && value.empty()) {
     return result;  // Valid by default, no deprecation warning
   }
 
   if (gd::ParameterMetadata::IsExpression("number", parameterType) ||
       gd::ParameterMetadata::IsExpression("string", parameterType) ||
       gd::ParameterMetadata::IsExpression("variable", parameterType)) {
+
+    gd::String rootObjectName = InstructionValidator::GetObjectNameForParameter(
+        projectScopedContainers, instruction, parameterType);
     auto &expressionNode =
         *instruction.GetParameter(parameterIndex).GetRootNode();
     ExpressionValidator expressionValidator(platform, projectScopedContainers,
                                             parameterType,
+                                            rootObjectName,
                                             parameterMetadata.GetExtraInfo());
     expressionNode.Visit(expressionValidator);
 
@@ -65,27 +81,6 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
     }
     if (!expressionValidator.GetDeprecationWarnings().empty()) {
       result.hasDeprecationWarning = true;
-    }
-
-    // New object variable instructions require the variable to be
-    // declared while legacy ones don't.
-    // This is why it's done here instead of in the parser directly.
-    if (result.isValid && parameterType == "objectvar" &&
-        gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
-            instruction.GetType())) {
-      // Check at least the name of the root variable, it's the best we can
-      // do.
-      const auto &objectsContainersList =
-          projectScopedContainers.GetObjectsContainersList();
-      const auto &objectName = instruction.GetParameter(0).GetPlainString();
-      const auto &variableName =
-          instruction.GetParameter(parameterIndex).GetPlainString();
-      if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
-              objectName,
-              gd::InstructionValidator::GetRootVariableName(variableName)) ==
-          gd::ObjectsContainersList::DoesNotExist) {
-        result.isValid = false;
-      }
     }
   } else if (gd::ParameterMetadata::IsObject(parameterType)) {
     const auto &objectOrGroupName =
@@ -109,13 +104,42 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
   return result;
 }
 
+gd::String InstructionValidator::GetObjectNameForParameter(
+    const gd::ProjectScopedContainers projectScopedContainers,
+    const gd::Instruction &instruction, const gd::String &parameterType) {
+  // New object variable instructions require the variable to be
+  // declared while legacy ones don't.
+  // For legacy variable instruction, we pass an empty object name.
+  gd::String rootObjectName = "";
+  if (parameterType != "objectvar") {
+      return "";
+  }
+  if (instruction.GetParametersCount() == 0) {
+    return "";
+  }
+  rootObjectName = instruction.GetParameter(0).GetPlainString();
+
+  if (!gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
+          instruction.GetType())) {
+    // Extensions still rely on legacy object variables instructions.
+    auto objectSourceType =
+        projectScopedContainers.GetObjectsContainersList()
+            .GetObjectsContainerSourceType(rootObjectName);
+    // Only child-object variable declarations are checked.
+    if (objectSourceType != gd::ObjectsContainer::SourceType::Object) {
+      return "";
+    }
+  }
+  return rootObjectName;
+}
+
 bool InstructionValidator::IsParameterValid(
     const gd::Platform &platform,
     const gd::ProjectScopedContainers projectScopedContainers,
     const gd::Instruction &instruction, const InstructionMetadata &metadata,
-    std::size_t parameterIndex, const gd::String &value) {
+    std::size_t parameterIndex) {
   return ValidateParameter(platform, projectScopedContainers, instruction,
-                           metadata, parameterIndex, value)
+                           metadata, parameterIndex)
       .isValid;
 }
 
@@ -130,16 +154,6 @@ gd::String InstructionValidator::GetRootVariableName(const gd::String &name) {
                             ? dotPosition
                             : squareBracketPosition);
 };
-
-bool InstructionValidator::HasDeprecationWarnings(
-    const gd::Platform &platform,
-    const gd::ProjectScopedContainers projectScopedContainers,
-    const gd::Instruction &instruction, const InstructionMetadata &metadata,
-    std::size_t parameterIndex, const gd::String &value) {
-  return ValidateParameter(platform, projectScopedContainers, instruction,
-                           metadata, parameterIndex, value)
-      .hasDeprecationWarning;
-}
 
 bool InstructionValidator::HasRequiredBehaviors(
     const gd::Instruction &instruction,

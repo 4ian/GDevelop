@@ -2,7 +2,11 @@
 const shell = require('shelljs');
 const path = require('path');
 const { downloadLocalFile } = require('./lib/DownloadLocalFile');
-const args = require('minimist')(process.argv.slice(2));
+// Keep commit hashes (and other CLI values) as strings: minimist would
+// otherwise coerce an all-digit hash to a number (e.g. "000…0" → 0).
+const args = require('minimist')(process.argv.slice(2), {
+  string: ['outputPath', 'commitHash', 'branch', 'version'],
+});
 
 if (!args['outputPath']) {
   shell.echo(
@@ -11,7 +15,7 @@ if (!args['outputPath']) {
   shell.exit(1);
 }
 const outputPath = args['outputPath'];
-const commitHash = args['commitHash'];
+const commitHash = args['commitHash'] || '';
 const branch = args['branch'];
 if (!branch) {
   shell.echo(
@@ -37,9 +41,18 @@ if (!version) {
 //   - OR using the script at https://github.com/electron-userland/electron-builder/issues/3913#issuecomment-504698845
 // - The size in bytes of the file.
 
-shell.echo(
-  `⚠️ This will download the latest artifacts built for ${branch} for version ${version}. Please ensure the CI finished building everything before continuing.`
-);
+if (!commitHash) {
+  shell.echo(
+    `⚠️ No --commitHash passed. Downloading from "latest" for ${branch} (version ${version}).`
+  );
+  shell.echo(
+    `⚠️ Warning: "latest" is per-platform. If a build finished, is still running, or failed on one platform, you may download artifacts from different commit hashes across Windows/macOS/Linux. Prefer --commitHash=<hash> to download a consistent set.`
+  );
+} else {
+  shell.echo(
+    `ℹ️ Downloading artifacts for commit ${commitHash} on ${branch} (version ${version}).`
+  );
+}
 
 const artifactsToDownload = {
   // Windows:
@@ -103,8 +116,39 @@ const artifactsToDownload = {
   },
 };
 
+/**
+ * @param {unknown} error
+ * @returns {string}
+ */
+const describeDownloadError = error => {
+  const status =
+    error &&
+    typeof error === 'object' &&
+    'response' in error &&
+    error.response &&
+    typeof error.response === 'object' &&
+    'status' in error.response
+      ? /** @type {{ status: number }} */ (error.response).status
+      : null;
+  // S3 often returns 403 (Access Denied) for missing keys on this bucket,
+  // not only 404. When a commit hash was requested, treat both as "not found".
+  if (commitHash && (status === 404 || status === 403)) {
+    return `not found (${status}). Commit ${commitHash} may not exist for this branch/platform, or the artifact was not built yet.`;
+  }
+  if (status === 404) {
+    return 'not found (404). The artifact may not have been built yet.';
+  }
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return String(error);
+};
+
 (async () => {
   shell.mkdir('-p', outputPath);
+
+  /** @type {Array<{ key: string, url: string, reason: string }>} */
+  const failures = [];
 
   await Promise.all(
     Object.keys(artifactsToDownload).map(async key => {
@@ -119,9 +163,27 @@ const artifactsToDownload = {
           `ℹ️ Done downloading ${key} artifact (${url}) to ${outputFilename}...`
         );
       } catch (error) {
-        shell.echo(`❌ Error while downloading ${key} artifact. Aborting.`);
-        shell.exit(2);
+        const reason = describeDownloadError(error);
+        shell.echo(`❌ Error while downloading ${key} artifact: ${reason}`);
+        failures.push({ key, url, reason });
       }
     })
   );
+
+  if (failures.length > 0) {
+    shell.echo('');
+    if (commitHash) {
+      shell.echo(
+        `❌ Failed to download ${failures.length} artifact(s) for commit ${commitHash}. Aborting.`
+      );
+    } else {
+      shell.echo(
+        `❌ Failed to download ${failures.length} artifact(s) from "latest". Aborting.`
+      );
+    }
+    for (const failure of failures) {
+      shell.echo(`  - ${failure.key}: ${failure.reason}`);
+    }
+    shell.exit(2);
+  }
 })();

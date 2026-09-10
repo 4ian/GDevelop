@@ -113,7 +113,7 @@ export namespace PixiTileMapHelper {
     leftBound: number,
     rightBound: number,
     topBound: number,
-    bottomBound: number,
+    bottomBound: number
   ): void {
     // The extension doesn't handle the Pixi sub-namespace very well.
     const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeTilemap;

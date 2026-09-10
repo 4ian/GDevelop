@@ -2,13 +2,17 @@
 
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
-import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
+import {
+  type Schema,
+  type Field,
+  type FieldChoices,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
 import {
   rgbColorToRGBString,
   rgbStringAndAlphaToRGBColor,
 } from '../../Utils/ColorTransformer';
 
-const defaultCameraBehaviorChoices = [
+const defaultCameraBehaviorChoices: Array<FieldChoices> = [
   {
     value: 'do-nothing',
     label: t`Keep centered (best for game content)`,
@@ -18,7 +22,11 @@ const defaultCameraBehaviorChoices = [
     label: t`Keep top-left corner fixed (best for content that can extend)`,
   },
 ];
-const getDefaultCameraBehaviorField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getDefaultCameraBehaviorField = ({
+  i18n,
+}: {|
+  i18n: I18nType,
+|}): Field => ({
   name: 'Default camera behavior',
   getLabel: () => i18n._(t`Default camera behavior`),
   valueType: 'string',
@@ -28,7 +36,7 @@ const getDefaultCameraBehaviorField = ({ i18n }: {| i18n: I18nType |}) => ({
     layer.setDefaultCameraBehavior(newValue),
 });
 
-const renderingTypeChoices = [
+const renderingTypeChoices: Array<FieldChoices> = [
   {
     value: '',
     label: t`Display both 2D and 3D objects (default)`,
@@ -52,7 +60,7 @@ const getRenderingTypeField = ({
 }: {|
   i18n: I18nType,
   forceUpdate: () => void,
-|}) => ({
+|}): Field => ({
   name: 'Rendering type',
   getLabel: () => i18n._(t`Rendering type`),
   valueType: 'string',
@@ -64,7 +72,7 @@ const getRenderingTypeField = ({
   },
 });
 
-const cameraTypeChoices = [
+const cameraTypeChoices: Array<FieldChoices> = [
   {
     value: 'perspective',
     label: t`Perspective camera`,
@@ -74,7 +82,7 @@ const cameraTypeChoices = [
     label: t`Orthographic camera`,
   },
 ];
-const getCameraTypeField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getCameraTypeField = ({ i18n }: {| i18n: I18nType |}): Field => ({
   name: 'Camera type',
   getLabel: () => i18n._(t`Camera type`),
   valueType: 'string',
@@ -84,7 +92,11 @@ const getCameraTypeField = ({ i18n }: {| i18n: I18nType |}) => ({
   setValue: (layer: gdLayer, newValue: string) => layer.setCameraType(newValue),
 });
 
-const getCamera3DFieldOfViewField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getCamera3DFieldOfViewField = ({
+  i18n,
+}: {|
+  i18n: I18nType,
+|}): Field => ({
   name: 'Field of view',
   getLabel: () => i18n._(t`Field of view (in degrees)`),
   valueType: 'number',
@@ -93,10 +105,12 @@ const getCamera3DFieldOfViewField = ({ i18n }: {| i18n: I18nType |}) => ({
   setValue: (layer: gdLayer, newValue: number) =>
     layer.setCamera3DFieldOfView(newValue),
   disabled: (layers: Array<gdLayer>) =>
-    layers[0] && layers[0].getCameraType() !== 'perspective',
+    layers[0] && layers[0].getCameraType() === 'perspective'
+      ? 'never'
+      : 'always',
 });
 
-const getNearPlaneDistanceField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getNearPlaneDistanceField = ({ i18n }: {| i18n: I18nType |}): Field => ({
   name: 'Near plane distance',
   getLabel: () => i18n._(t`Near plane distance`),
   valueType: 'number',
@@ -106,7 +120,7 @@ const getNearPlaneDistanceField = ({ i18n }: {| i18n: I18nType |}) => ({
     layer.setCamera3DNearPlaneDistance(newValue),
 });
 
-const getFarPlaneDistanceField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getFarPlaneDistanceField = ({ i18n }: {| i18n: I18nType |}): Field => ({
   name: 'Far plane distance',
   getLabel: () => i18n._(t`Far plane distance`),
   valueType: 'number',
@@ -120,7 +134,7 @@ const getCamera2DPlaneMaxDrawingDistanceField = ({
   i18n,
 }: {|
   i18n: I18nType,
-|}) => ({
+|}): Field => ({
   name: 'Maximum 2D drawing distance',
   getLabel: () => i18n._(t`Maximum 2D drawing distance`),
   valueType: 'number',
@@ -130,7 +144,11 @@ const getCamera2DPlaneMaxDrawingDistanceField = ({
     layer.setCamera2DPlaneMaxDrawingDistance(newValue),
 });
 
-const getFollowingBaseLayerCameraField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getFollowingBaseLayerCameraField = ({
+  i18n,
+}: {|
+  i18n: I18nType,
+|}): Field => ({
   name: 'Automatically follow the base layer',
   getLabel: () => i18n._(t`Automatically follow the base layer.`),
   valueType: 'boolean',
@@ -139,7 +157,7 @@ const getFollowingBaseLayerCameraField = ({ i18n }: {| i18n: I18nType |}) => ({
     layer.setFollowBaseLayerCamera(newValue),
 });
 
-const getAmbientLightColorField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getAmbientLightColorField = ({ i18n }: {| i18n: I18nType |}): Field => ({
   name: 'Ambient light color',
   getLabel: () => i18n._(t`Ambient light color`),
   valueType: 'color',
@@ -178,20 +196,17 @@ export const makeSchema = ({
   onEditLayer: (layer: gdLayer) => void,
   layersContainer: gdLayersContainer,
 |}): Schema => {
-  // $FlowFixMe[incompatible-type]
   return [
     getDefaultCameraBehaviorField({ i18n }),
     {
       name: 'Not a lighting layer',
       type: 'column',
-      // $FlowFixMe[missing-local-annot]
       isHidden: layers => layers[0] && layers[0].isLightingLayer(),
       children: [
         getRenderingTypeField({ i18n, forceUpdate }),
         {
           name: 'Optional 3D settings',
           type: 'column',
-          // $FlowFixMe[missing-local-annot]
           isHidden: layers =>
             layers[0] && layers[0].getRenderingType() === '2d',
           children: [
@@ -213,7 +228,6 @@ export const makeSchema = ({
     {
       name: 'Optional lighting layer settings',
       type: 'column',
-      // $FlowFixMe[missing-local-annot]
       isHidden: layers => layers[0] && !layers[0].isLightingLayer(),
       children: [
         {
@@ -226,5 +240,5 @@ export const makeSchema = ({
         getAmbientLightColorField({ i18n }),
       ],
     },
-  ].filter(Boolean);
+  ];
 };

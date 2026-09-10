@@ -46,3 +46,5 @@ export const isWindows = (): boolean => _isWindows;
 export const isMacLike = (): boolean => _isMacLike;
 export const isMobile = (): boolean => _isMobile;
 export const isNativeMobileApp = (): boolean => false;
+export const isNativeIos = (): boolean => false;
+export const isNativeAndroid = (): boolean => false;

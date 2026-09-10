@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
-import { ScreenTypeMeasurer } from '../../UI/Responsive/ScreenTypeMeasurer';
+import HoldForMenuProgress from '../../UI/DragAndDrop/HoldForMenuProgress';
 import { ColumnDropIndicator } from './DropIndicator';
 import { type EditorTab } from './EditorTabsHandler';
 import {
@@ -15,7 +15,8 @@ import useOnResize from '../../Utils/UseOnResize';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<EditorTab>(
-  'draggable-closable-tab'
+  'draggable-closable-tab',
+  { touchDragStart: 'afterHold' }
 );
 
 type DraggableEditorTabsProps = {|
@@ -40,6 +41,22 @@ export const getTabId = (editorTab: EditorTab): string =>
 
 const homeTabApproximateWidth = 35;
 
+const styles = {
+  tabContainer: {
+    display: 'flex',
+    flexShrink: 0,
+  },
+  // On touch screens, the tab held by the finger, ready to be dragged.
+  tabReadyToDrag: {
+    display: 'flex',
+    flexShrink: 0,
+    position: 'relative',
+    transform: 'scale(1.03)',
+    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.35)',
+    transition: 'transform 100ms ease-out, box-shadow 100ms ease-out',
+  },
+};
+
 export function DraggableEditorTabs({
   hideLabels,
   editors,
@@ -53,7 +70,11 @@ export function DraggableEditorTabs({
   onDropTab,
   onHoverTab,
 }: DraggableEditorTabsProps): React.Node {
-  let draggedTabIndex: ?number = null;
+  // Kept in a ref (not a plain variable) so the index survives any re-render
+  // happening between the drag start and the drop (tooltip hover timeouts, the
+  // Ask AI glow interval, window resize...). Otherwise it would be reset to null
+  // mid-drag and the drop would be silently ignored.
+  const draggedTabIndexRef = React.useRef<?number>(null);
 
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
@@ -104,7 +125,7 @@ export function DraggableEditorTabs({
               label={editorTab.label}
               icon={editorTab.icon}
               renderCustomIcon={editorTab.renderCustomIcon}
-              key={editorTab.key}
+              key={editorTab.id}
               id={getTabId(editorTab)}
               data={
                 editorTab.tabOptions ? editorTab.tabOptions.data : undefined
@@ -132,13 +153,13 @@ export function DraggableEditorTabs({
               onActivated={() => onTabActivated(editorTab)}
               closable={editorTab.closable}
               onBeginDrag={() => {
-                draggedTabIndex = id;
+                draggedTabIndexRef.current = id;
                 return editorTab;
               }}
               onDrop={toHoveredIndex => {
-                if (typeof draggedTabIndex === 'number') {
-                  onDropTab(draggedTabIndex, id);
-                  draggedTabIndex = null;
+                if (typeof draggedTabIndexRef.current === 'number') {
+                  onDropTab(draggedTabIndexRef.current, id);
+                  draggedTabIndexRef.current = null;
                 }
               }}
               maxWidth={maxWidth}
@@ -179,58 +200,54 @@ export function DraggableClosableTab({
   maxWidth,
 }: DraggableClosableTabProps): React.Node {
   return (
-    <ScreenTypeMeasurer>
-      {screenType => (
-        <DragSourceAndDropTarget
-          beginDrag={onBeginDrag}
-          canDrag={() => {
-            // On touchscreens, we disable drag and drop.
-            if (screenType === 'touch') return false;
-            // We want "Home" tab to stay on the left.
-            return index !== 0;
-          }}
-          canDrop={() => true}
-          drop={() => onDrop(index)}
-        >
-          {({ connectDragSource, connectDropTarget, isOver, canDrop }) => {
-            // Add an extra div because connectDropTarget/connectDragSource can
-            // only be used on native elements.
-            const dropTarget = connectDropTarget(
-              <div
-                style={{
-                  display: 'flex',
-                  flexShrink: 0,
-                }}
-              >
-                <ClosableTab
-                  id={id}
-                  data={data}
-                  active={active}
-                  onClose={onClose}
-                  onCloseOthers={onCloseOthers}
-                  onCloseAll={onCloseAll}
-                  onPopOut={onPopOut}
-                  popOutEnabled={popOutEnabled}
-                  label={label}
-                  icon={icon}
-                  renderCustomIcon={renderCustomIcon}
-                  closable={closable}
-                  onClick={onClick}
-                  onHover={onHover}
-                  onActivated={onActivated}
-                  maxWidth={maxWidth}
-                  key={id}
-                />
-                {isOver && <ColumnDropIndicator />}
-              </div>
-            );
+    <DragSourceAndDropTarget
+      beginDrag={onBeginDrag}
+      // We want "Home" tab to stay on the left.
+      canDrag={() => index !== 0}
+      canDrop={() => true}
+      drop={() => onDrop(index)}
+    >
+      {({
+        connectDragSource,
+        connectDropTarget,
+        isOver,
+        canDrop,
+        isReadyToDrag,
+      }) => {
+        // Add an extra div because connectDropTarget/connectDragSource can
+        // only be used on native elements.
+        const dropTarget = connectDropTarget(
+          <div
+            style={isReadyToDrag ? styles.tabReadyToDrag : styles.tabContainer}
+          >
+            <ClosableTab
+              id={id}
+              data={data}
+              active={active}
+              onClose={onClose}
+              onCloseOthers={onCloseOthers}
+              onCloseAll={onCloseAll}
+              onPopOut={onPopOut}
+              popOutEnabled={popOutEnabled}
+              label={label}
+              icon={icon}
+              renderCustomIcon={renderCustomIcon}
+              closable={closable}
+              onClick={onClick}
+              onHover={onHover}
+              onActivated={onActivated}
+              maxWidth={maxWidth}
+              key={id}
+            />
+            {isOver && <ColumnDropIndicator />}
+            {isReadyToDrag && <HoldForMenuProgress />}
+          </div>
+        );
 
-            if (!dropTarget) return null;
+        if (!dropTarget) return null;
 
-            return connectDragSource(dropTarget);
-          }}
-        </DragSourceAndDropTarget>
-      )}
-    </ScreenTypeMeasurer>
+        return connectDragSource(dropTarget);
+      }}
+    </DragSourceAndDropTarget>
   );
 }

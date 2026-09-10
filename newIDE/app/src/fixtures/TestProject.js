@@ -45,6 +45,9 @@ export type TestProject = {|
   testBehaviorEventsFunction: gdEventsFunction,
   testBehaviorLifecycleEventsFunction: gdEventsFunction,
   testEventsBasedObject: gdEventsBasedObject,
+  composedEventBasedObject: gdEventsBasedObject,
+  eventBasedObjectProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  composedEventBasedObjectProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
   testObjectEventsFunction: gdEventsFunction,
   layerWithEffects: gdLayer,
   layerWith3DEffects: gdLayer,
@@ -181,6 +184,30 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testObjectEventsFunction
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+  const composedEventBasedObject = buttonExtension
+    .getEventsBasedObjects()
+    .insertNew('ComposedEventBasedObject', 0);
+  composedEventBasedObject
+    .getObjects()
+    .insertNewObject(project, 'Button::PanelSpriteButton', 'Button', 0);
+
+  const eventBasedObjectProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+    {
+      project,
+      eventsFunctionsExtension: buttonExtension,
+      eventsBasedObject: buttonEventBasedObject,
+    },
+    new gd.ObjectsContainer(gd.ObjectsContainer.Function)
+  );
+  const composedEventBasedObjectProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+    {
+      project,
+      eventsFunctionsExtension: buttonExtension,
+      eventsBasedObject: composedEventBasedObject,
+    },
+    new gd.ObjectsContainer(gd.ObjectsContainer.Function)
+  );
 
   // Create and expose some objects
   const testLayout = project.insertNewLayout('TestLayout', 0);
@@ -532,8 +559,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   jsCodeEvent.setInlineCode('console.log("Hello, World!");');
   jsCodeEvent.setParameterObjects('MyObject');
 
-  // $FlowFixMe[missing-local-annot]
-  const makeKeyPressedCondition = key => {
+  const makeKeyPressedCondition = (key: string) => {
     const condition = new gd.Instruction();
     condition.setType('KeyPressed');
     condition.setParametersCount(2);
@@ -541,8 +567,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     return condition; // This leaks memory if not deleted
   };
 
-  // $FlowFixMe[missing-local-annot]
-  const makeMouseButtonPressedCondition = button => {
+  const makeMouseButtonPressedCondition = (button: string) => {
     const condition = new gd.Instruction();
     condition.setType('SourisBouton');
     condition.setParametersCount(2);
@@ -550,8 +575,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     return condition; // This leaks memory if not deleted
   };
 
-  // $FlowFixMe[missing-local-annot]
-  const makeDeleteAction = objectToDelete => {
+  const makeDeleteAction = (objectToDelete: string) => {
     var action = new gd.Instruction(); //Add a simple action
     action.setType('Delete');
     action.setParametersCount(2);
@@ -1016,6 +1040,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testBehaviorEventsFunction,
     testBehaviorLifecycleEventsFunction,
     testEventsBasedObject: buttonEventBasedObject,
+    composedEventBasedObject,
+    eventBasedObjectProjectScopedContainersAccessor,
+    composedEventBasedObjectProjectScopedContainersAccessor,
     testObjectEventsFunction,
     layerWithEffects,
     layerWith3DEffects,

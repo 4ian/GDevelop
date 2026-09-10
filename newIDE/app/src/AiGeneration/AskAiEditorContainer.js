@@ -4,22 +4,28 @@ import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { I18n } from '@lingui/react';
+import { type RenderEditorContainerPropsWithRef } from '../MainFrame/EditorContainers/BaseEditor';
 import {
-  type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from '../MainFrame/EditorContainers/BaseEditor';
+  type ProjectItemRenamedOutsideEditorChanges,
+  type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
+  type WillDeleteObjectChanges,
+} from '../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
+import { canPayForAiRequest } from './AiRequestChat/Utils';
+import { registerAskAiPrefillListener } from './AskAiPrefill';
 import {
   addMessageToAiRequest,
   createAiRequest,
   sendAiRequestFeedback,
   forkAiRequest,
-  suspendAiRequest as apiSuspendAiRequest,
+  retryAiRequest,
   getAiRequest,
   type AiRequest,
   type AiRequestMessage,
@@ -32,7 +38,7 @@ import {
 import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
-import { AskAiHistory } from './AskAiHistory';
+import { AskAiHistory, type AskAiHistoryLayout } from './AskAiHistory';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import {
   canUpgradeSubscription,
@@ -92,6 +98,12 @@ import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext
 const gd: libGDevelop = global.gd;
 
 const styles = {
+  container: {
+    flex: 1,
+    display: 'flex',
+    minWidth: 0,
+    minHeight: 0,
+  },
   paper: {
     flex: 1,
     display: 'flex',
@@ -116,6 +128,7 @@ const styles = {
 
 type Props = {|
   isActive: boolean,
+  paneIdentifier: string,
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
@@ -152,6 +165,14 @@ type Props = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenAskAi: ({|
@@ -206,6 +227,7 @@ export type AskAiEditorInterface = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   selectAllInsideEditor: () => void,
   startOrOpenChat: (
     ?{|
@@ -237,6 +259,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
     (
       {
         isActive,
+        paneIdentifier,
         setToolbar,
         project: nullableProject,
         resourceManagementProps,
@@ -250,6 +273,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
+        onProjectItemRenamedOutsideEditor,
+        onWillDeleteScene,
+        onWillDeleteGameplayTest,
+        onWillDeleteObject,
         onWillInstallExtension,
         onExtensionInstalled,
         onOpenAskAi,
@@ -319,8 +346,12 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         : null;
       const {
         aiRequestStorage: {
-          fetchAiRequests,
+          fetchAiRequestSummaries,
+          setAiRequestSummariesGameId,
           aiRequests,
+          aiRequestSummaries,
+          aiRequestLoadingStates,
+          loadAiRequest,
           forkingState,
           setForkingState,
         },
@@ -358,7 +389,26 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         []
       );
 
-      const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
+      const { isMobile, isMediumScreen } = useResponsiveWindowSize();
+      // The history is a list on the side of the chat when there is room for
+      // it: not on small or medium screens (the window size is the one of the
+      // pane), and not in the right pane, where it comes from the right.
+      const historyLayout: AskAiHistoryLayout =
+        paneIdentifier === 'right'
+          ? 'right-drawer'
+          : isMobile || isMediumScreen
+          ? 'left-drawer'
+          : 'side-panel';
+      const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(
+        historyLayout === 'side-panel'
+      );
+      React.useEffect(
+        () => {
+          // The side list is shown by default, a drawer is not.
+          setIsHistoryOpen(historyLayout === 'side-panel');
+        },
+        [historyLayout]
+      );
 
       const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
@@ -377,7 +427,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       );
 
       const { showAlert, showConfirmation, showYesNoCancel } = useAlertDialog();
-      const { isMobile } = useResponsiveWindowSize();
 
       const [
         isReadyToProcessFunctionCalls,
@@ -386,23 +435,32 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
       React.useEffect(
         () => {
-          if (isActive && Object.keys(aiRequests).length === 0) {
-            fetchAiRequests();
+          if (isActive && Object.keys(aiRequestSummaries).length === 0) {
+            fetchAiRequestSummaries();
           }
         },
-        // Fetch when the editor becomes active, but only if there were no
-        // requests done (as we provide a way to refresh in the history).
-        // fetchAiRequests is also a dependency so that if the profile was not
-        // yet loaded when the editor first became active, the fetch is retried
-        // once it becomes available.
+        // Fetch when the editor becomes active, but only if the history is
+        // empty (as we provide a way to refresh in the history).
+        // fetchAiRequestSummaries is also a dependency so that if the profile
+        // was not yet loaded when the editor first became active, the fetch is
+        // retried once it becomes available.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [isActive, fetchAiRequests]
+        [isActive, fetchAiRequestSummaries]
+      );
+
+      // The chats of the opened project are listed first in the history.
+      const projectGameId = project ? project.getProjectUuid() : null;
+      React.useEffect(
+        () => {
+          setAiRequestSummariesGameId(projectGameId);
+        },
+        [projectGameId, setAiRequestSummariesGameId]
       );
 
       const canStartNewChat = !!selectedAiRequestId;
 
-      const onOpenHistory = React.useCallback(() => {
-        setIsHistoryOpen(true);
+      const onToggleHistory = React.useCallback(() => {
+        setIsHistoryOpen(isHistoryOpen => !isHistoryOpen);
       }, []);
 
       const onCloseHistory = React.useCallback(() => {
@@ -426,7 +484,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       } = editorFunctionCallResultsStorage;
       const {
         updateAiRequest,
-        refreshAiRequest,
         isSendingAiRequest,
         getLastSendError,
         setSendingAiRequest,
@@ -508,15 +565,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             let payWithCredits = false;
             if (quota && quota.limitReached && aiRequestPriceInCredits) {
               payWithCredits = true;
-              const doesNotHaveEnoughCreditsToContinue =
-                availableCredits < aiRequestPriceInCredits;
-              const cannotContinue =
-                !automaticallyUseCreditsForAiRequests ||
-                doesNotHaveEnoughCreditsToContinue;
-
-              if (cannotContinue) {
-                return;
-              }
+            }
+            // The same rule as the one enabling the send button, so the button
+            // can't offer to send a request this would silently drop.
+            if (
+              !canPayForAiRequest({
+                quota,
+                price: aiRequestPrice,
+                availableCredits,
+                automaticallyUseCreditsForAiRequests,
+              })
+            ) {
+              return;
             }
 
             // Request is now ready to be started.
@@ -610,6 +670,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           })();
         },
         [
+          aiRequestPrice,
           aiRequestPriceInCredits,
           availableCredits,
           getAuthorizationHeader,
@@ -702,13 +763,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             aiRequestPriceInCredits
           ) {
             payWithCredits = true;
-            const doesNotHaveEnoughCreditsToContinue =
-              availableCredits < aiRequestPriceInCredits;
-            const cannotContinue =
-              !automaticallyUseCreditsForAiRequests ||
-              doesNotHaveEnoughCreditsToContinue;
-
-            if (cannotContinue) {
+            // The same rule as the one enabling the send button, so the button
+            // can't offer to send a message this would silently drop.
+            if (
+              !canPayForAiRequest({
+                quota,
+                price: aiRequestPrice,
+                availableCredits,
+                automaticallyUseCreditsForAiRequests,
+              })
+            ) {
               return;
             }
           }
@@ -841,6 +905,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           aiRequests,
           isSendingAiRequest,
           quota,
+          aiRequestPrice,
           aiRequestPriceInCredits,
           availableCredits,
           setSendingAiRequest,
@@ -857,6 +922,33 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           triggerUnsavedChanges,
         ]
       );
+
+      // Ask the AI to continue a request that stopped on an error: nothing is
+      // added to the conversation, so this is not charged again (the API only
+      // charges back the usage it refunded when the request failed).
+      const onRetryAfterError = React.useCallback(
+        async () => {
+          if (!selectedAiRequestId || !profile) return;
+          try {
+            const aiRequest = await retryAiRequest(getAuthorizationHeader, {
+              userId: profile.id,
+              aiRequestId: selectedAiRequestId,
+            });
+            updateAiRequest(aiRequest.id, () => aiRequest);
+          } catch (error) {
+            console.error('Error while retrying the AI request:', error);
+            setLastSendError(selectedAiRequestId, error);
+          }
+        },
+        [
+          selectedAiRequestId,
+          profile,
+          getAuthorizationHeader,
+          updateAiRequest,
+          setLastSendError,
+        ]
+      );
+
       useActivatePendingSubAgents({ selectedAiRequest });
       useLoadSubAgentRequests({ selectedAiRequest });
 
@@ -916,6 +1008,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
+        onProjectItemRenamedOutsideEditor,
+        onWillDeleteScene,
+        onWillDeleteGameplayTest,
+        onWillDeleteObject,
         i18n,
         onWillInstallExtension,
         onExtensionInstalled,
@@ -935,18 +1031,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       );
 
       React.useEffect(() => {
-        // When component is mounted, and an AI request was already selected,
-        // ensure we reset the selection if not logged in.
-        if (selectedAiRequestId) {
-          if (!profile) {
-            setSelectedAiRequestId(null);
-            return;
-          }
-        }
-
         setIsReadyToProcessFunctionCalls(true);
-        // We only want this to run once on mount.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, []);
 
       const onStartOrOpenChat = React.useCallback(
@@ -981,6 +1066,19 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [setSelectedAiRequestId, selectedAiRequest]
       );
+      // Start a new chat with a pre-filled user request, when asked from
+      // elsewhere in the editor ("Edit with AI" buttons...).
+      React.useEffect(
+        () =>
+          registerAskAiPrefillListener((userRequestText: string) => {
+            onStartOrOpenChat({ aiRequestId: null });
+            if (aiRequestChatRef.current) {
+              aiRequestChatRef.current.setUserInput(null, userRequestText);
+            }
+          }),
+        [onStartOrOpenChat]
+      );
+
       const onStartNewChat = React.useCallback(
         () => {
           onStartOrOpenChat({
@@ -996,14 +1094,25 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           if (setToolbar) {
             setToolbar(
               <Toolbar
+                isHistoryOpen={isHistoryOpen}
+                onToggleHistory={onToggleHistory}
                 onStartNewChat={onStartNewChat}
                 canStartNewChat={canStartNewChat}
-                onOpenHistory={onOpenHistory}
+                showNewChatButton={
+                  !(historyLayout === 'side-panel' && isHistoryOpen)
+                }
               />
             );
           }
         },
-        [setToolbar, onStartNewChat, canStartNewChat, onOpenHistory]
+        [
+          setToolbar,
+          isHistoryOpen,
+          onToggleHistory,
+          onStartNewChat,
+          canStartNewChat,
+          historyLayout,
+        ]
       );
 
       React.useEffect(updateToolbar, [updateToolbar]);
@@ -1020,6 +1129,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor: noop,
         onObjectsModifiedOutsideEditor: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
+        onWillDeleteObject: noop,
         selectAllInsideEditor: noop,
         startOrOpenChat: onStartOrOpenChat,
         notifyChangesToInGameEditor: setEditorHotReloadNeeded,
@@ -1099,6 +1209,13 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           title: MessageDescriptor,
           message: MessageDescriptor,
         |}): Promise<boolean> => {
+          if (pendingEditApproval) {
+            // Paused on an inline edit approval (not actively working): leaving
+            // refuses the pending change, which suspends the request. Don't show
+            // the "is working" prompt.
+            resolveEditApproval(false);
+            return true;
+          }
           if (!getHasWorkInProgress()) return true;
           const answer = await showYesNoCancel({
             title,
@@ -1126,7 +1243,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           // running in the background.
           return true;
         },
-        [getHasWorkInProgress, showYesNoCancel, upToDateOnStop, isMobile]
+        [
+          pendingEditApproval,
+          resolveEditApproval,
+          getHasWorkInProgress,
+          showYesNoCancel,
+          upToDateOnStop,
+          isMobile,
+        ]
       );
 
       // Called when the AI editor is about to be closed by an explicit user
@@ -1152,6 +1276,13 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           title: MessageDescriptor,
           message: MessageDescriptor,
         |}): Promise<boolean> => {
+          if (pendingEditApproval) {
+            // Paused on an inline edit approval (not actively working): leaving
+            // refuses the pending change, which suspends the request. Don't show
+            // the "is working" prompt.
+            resolveEditApproval(false);
+            return true;
+          }
           if (!getHasWorkInProgress()) return true;
           const shouldStop = await showConfirmation({
             title,
@@ -1163,7 +1294,13 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           await upToDateOnStop.current();
           return true;
         },
-        [getHasWorkInProgress, showConfirmation, upToDateOnStop]
+        [
+          pendingEditApproval,
+          resolveEditApproval,
+          getHasWorkInProgress,
+          showConfirmation,
+          upToDateOnStop,
+        ]
       );
       const upToDateConfirmStopping = useStableUpToDateRef(
         confirmStoppingWorkingRequest
@@ -1456,7 +1593,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       );
 
       return (
-        <>
+        <div style={styles.container}>
+          <AskAiHistory
+            layout={historyLayout}
+            open={isHistoryOpen}
+            onClose={onCloseHistory}
+            onOpenAiRequest={aiRequestId => {
+              onStartOrOpenChat({ aiRequestId });
+            }}
+            onStartNewChat={onStartNewChat}
+            canStartNewChat={canStartNewChat}
+            selectedAiRequestId={selectedAiRequestId}
+          />
           <Paper square background="dark" style={styles.paper}>
             <div style={styles.chatContainer}>
               <AiRequestChat
@@ -1467,6 +1615,19 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 fileMetadata={fileMetadata}
                 ref={aiRequestChatRef}
                 aiRequest={selectedAiRequest}
+                // The selected chat was opened from the history, which only
+                // has its summary: its conversation is being loaded.
+                aiRequestLoadingState={
+                  selectedAiRequestId && !selectedAiRequest
+                    ? aiRequestLoadingStates[selectedAiRequestId] || {
+                        isLoading: true,
+                        error: null,
+                      }
+                    : null
+                }
+                onRetryLoadingAiRequest={() => {
+                  if (selectedAiRequestId) loadAiRequest(selectedAiRequestId);
+                }}
                 onStartNewAiRequest={startNewAiRequest}
                 onSendUserMessage={async ({
                   userMessage,
@@ -1482,6 +1643,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                       : [],
                   });
                 }}
+                onRetryAfterError={onRetryAfterError}
                 onIsAutoEditEnabledChange={enabled => {
                   isAutoEditEnabledRef.current = enabled;
                   // Toggling auto-edit revokes any blanket approvals already
@@ -1524,46 +1686,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               />
             </div>
           </Paper>
-          <AskAiHistory
-            open={isHistoryOpen}
-            onClose={onCloseHistory}
-            onSelectAiRequest={async aiRequest => {
-              let requestToOpen = aiRequest;
-              // Suspend the request if it was left with work in progress (e.g. from a previous session).
-              const editorFunctionCallResultsForRequest =
-                getEditorFunctionCallResults(aiRequest.id) || [];
-              if (
-                aiRequestHasWorkInProgress(
-                  aiRequest,
-                  editorFunctionCallResultsForRequest
-                ) &&
-                profile
-              ) {
-                try {
-                  requestToOpen = await apiSuspendAiRequest(
-                    getAuthorizationHeader,
-                    {
-                      userId: profile.id,
-                      aiRequestId: aiRequest.id,
-                    }
-                  );
-                  clearEditorFunctionCallResults(requestToOpen.id);
-                } catch (err) {
-                  console.error(
-                    'Failed to suspend AI request when opening from history:',
-                    err
-                  );
-                }
-              }
-              // Immediately switch the UI and refresh in the background.
-              updateAiRequest(requestToOpen.id, () => requestToOpen);
-              setSelectedAiRequestId(requestToOpen.id);
-              refreshAiRequest(requestToOpen.id);
-              onCloseHistory();
-            }}
-            selectedAiRequestId={selectedAiRequestId}
-          />
-        </>
+        </div>
       );
     }
   ),
@@ -1587,6 +1710,7 @@ export const renderAskAiEditorContainer = (
         storageProvider={props.storageProvider}
         setToolbar={props.setToolbar}
         isActive={props.isActive}
+        paneIdentifier={props.paneIdentifier}
         onCreateProjectFromExample={props.onCreateProjectFromExample}
         onCreateEmptyProject={props.onCreateEmptyProject}
         onOpenLayout={props.onOpenLayout}
@@ -1600,6 +1724,12 @@ export const renderAskAiEditorContainer = (
         onObjectGroupsModifiedOutsideEditor={
           props.onObjectGroupsModifiedOutsideEditor
         }
+        onProjectItemRenamedOutsideEditor={
+          props.onProjectItemRenamedOutsideEditor
+        }
+        onWillDeleteScene={props.onWillDeleteScene}
+        onWillDeleteGameplayTest={props.onWillDeleteGameplayTest}
+        onWillDeleteObject={props.onWillDeleteObject}
         onWillInstallExtension={props.onWillInstallExtension}
         onExtensionInstalled={props.onExtensionInstalled}
         onOpenAskAi={props.onOpenAskAi}

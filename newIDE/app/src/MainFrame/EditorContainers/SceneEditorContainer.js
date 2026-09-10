@@ -9,11 +9,14 @@ import {
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -25,6 +28,12 @@ import {
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
+
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -41,6 +50,15 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     return this.props.isActive || nextProps.isActive;
   }
 
+  componentDidUpdate(prevProps: RenderEditorContainerProps): void {
+    if (
+      this.props.project !== prevProps.project ||
+      this.props.projectItemName !== prevProps.projectItemName
+    ) {
+      this._rebuildProjectScopedContainersAccessor();
+    }
+  }
+
   componentDidMount() {
     if (this.props.isActive) {
       this._setPreviewedLayout();
@@ -55,6 +73,21 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
+  }
+
+  _rebuildProjectScopedContainersAccessor() {
+    const { project } = this.props;
+    const scene = this.getLayout();
+    if (scene && project) {
+      this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        {
+          project,
+          layout: scene,
+        }
+      );
+    } else {
+      this._projectScopedContainersAccessor = null;
+    }
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
@@ -197,6 +230,16 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
+    if (changes.scene !== this.getLayout()) {
+      return;
+    }
+
+    if (this.editor) {
+      this.editor.onWillDeleteObject(changes);
+    }
+  }
+
   onObjectGroupsModifiedOutsideEditor(
     changes: ObjectGroupsOutsideEditorChanges
   ) {
@@ -236,17 +279,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   render(): any {
     const { project, projectItemName, isActive } = this.props;
     const layout = this.getLayout();
-    if (!layout || !project) {
+    if (!project || !layout || !this._projectScopedContainersAccessor) {
       //TODO: Error component
       return <div>No layout called {projectItemName} found!</div>;
     }
-
-    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      {
-        project,
-        layout,
-      }
-    );
 
     return (
       <SceneEditor
@@ -262,7 +298,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         unsavedChanges={this.props.unsavedChanges}
         ref={editor => (this.editor = editor)}
         project={project}
-        projectScopedContainersAccessor={projectScopedContainersAccessor}
+        projectScopedContainersAccessor={this._projectScopedContainersAccessor}
         layout={layout}
         eventsFunctionsExtension={null}
         eventsBasedObject={null}
@@ -293,6 +329,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         }
         onWillInstallExtension={this.props.onWillInstallExtension}
         onExtensionInstalled={this.props.onExtensionInstalled}
+        onCreateNewExtensionWithBehavior={
+          this.props.onCreateNewExtensionWithBehavior
+        }
         onDeleteEventsBasedObjectVariant={
           this.props.onDeleteEventsBasedObjectVariant
         }

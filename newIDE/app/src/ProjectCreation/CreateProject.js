@@ -2,7 +2,6 @@
 import { t } from '@lingui/macro';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { getExample } from '../Utils/GDevelopServices/Example';
-import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import {
@@ -12,20 +11,34 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 const gd: libGDevelop = global.gd;
 
+// Metadata for the `new_game_creation` analytics event. The event itself is sent
+// later (from `useCreateProject`), once the project has its final UUID assigned.
+export type NewProjectAnalyticsMetadata = {|
+  exampleUrl: string,
+  exampleSlug: string,
+  exampleCompositeSlug: string,
+  creationSource: NewProjectCreationSource,
+|};
+
 export type NewProjectSource = {|
   project: ?gdProject,
   storageProvider: ?StorageProvider,
   fileMetadata: ?FileMetadata,
   templateSlug?: ?string,
+  analyticsMetadata: NewProjectAnalyticsMetadata,
 |};
 
-const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {
+const getNewProjectSourceFromUrl = (
+  projectUrl: string,
+  analyticsMetadata: NewProjectAnalyticsMetadata
+): NewProjectSource => {
   return {
     project: null,
     storageProvider: UrlStorageProvider,
     fileMetadata: {
       fileIdentifier: projectUrl,
     },
+    analyticsMetadata,
   };
 };
 
@@ -88,16 +101,16 @@ export const createNewEmptyProject = ({
 
   const exampleSlug = 'empty-project';
 
-  sendNewGameCreated({
-    exampleUrl: '',
-    exampleSlug,
-    creationSource,
-    exampleCompositeSlug: getCompositeSlug(creationSource, exampleSlug),
-  });
   return {
     project,
     storageProvider: null,
     fileMetadata: null,
+    analyticsMetadata: {
+      exampleUrl: '',
+      exampleSlug,
+      creationSource,
+      exampleCompositeSlug: getCompositeSlug(creationSource, exampleSlug),
+    },
   };
 };
 
@@ -105,13 +118,12 @@ export const createNewProjectFromTutorialTemplate = (
   tutorialTemplateUrl: string,
   tutorialId: string
 ): NewProjectSource => {
-  sendNewGameCreated({
+  const newProjectSource = getNewProjectSourceFromUrl(tutorialTemplateUrl, {
     exampleUrl: tutorialTemplateUrl,
     exampleSlug: tutorialId,
     creationSource: 'in-app-tutorial',
     exampleCompositeSlug: getCompositeSlug('in-app-tutorial', tutorialId),
   });
-  const newProjectSource = getNewProjectSourceFromUrl(tutorialTemplateUrl);
   newProjectSource.templateSlug = tutorialId;
   return newProjectSource;
 };
@@ -120,13 +132,12 @@ export const createNewProjectFromCourseChapterTemplate = (
   templateUrl: string,
   courseChapterId: string
 ): NewProjectSource => {
-  sendNewGameCreated({
+  const newProjectSource = getNewProjectSourceFromUrl(templateUrl, {
     exampleUrl: templateUrl,
     exampleSlug: courseChapterId,
     creationSource: 'course-chapter',
     exampleCompositeSlug: getCompositeSlug('course-chapter', courseChapterId),
   });
-  const newProjectSource = getNewProjectSourceFromUrl(templateUrl);
   newProjectSource.templateSlug = courseChapterId;
   return newProjectSource;
 };
@@ -135,13 +146,12 @@ export const createNewProjectFromPrivateGameTemplate = (
   privateGameTemplateUrl: string,
   privateGameTemplateTag: string
 ): NewProjectSource => {
-  sendNewGameCreated({
+  const newProjectSource = getNewProjectSourceFromUrl(privateGameTemplateUrl, {
     exampleUrl: privateGameTemplateUrl,
     exampleSlug: privateGameTemplateTag,
     creationSource: 'default',
     exampleCompositeSlug: getCompositeSlug('default', privateGameTemplateTag),
   });
-  const newProjectSource = getNewProjectSourceFromUrl(privateGameTemplateUrl);
   newProjectSource.templateSlug = privateGameTemplateTag;
   return newProjectSource;
 };
@@ -157,16 +167,18 @@ export const createNewProjectFromExampleShortHeader = async ({
     );
     const creationSource = newProjectSetup.creationSource;
 
-    sendNewGameCreated({
-      exampleUrl: example.projectFileUrl,
-      exampleSlug: exampleShortHeader.slug,
-      exampleCompositeSlug: getCompositeSlug(
+    const newProjectSource = getNewProjectSourceFromUrl(
+      example.projectFileUrl,
+      {
+        exampleUrl: example.projectFileUrl,
+        exampleSlug: exampleShortHeader.slug,
+        exampleCompositeSlug: getCompositeSlug(
+          creationSource,
+          exampleShortHeader.slug
+        ),
         creationSource,
-        exampleShortHeader.slug
-      ),
-      creationSource,
-    });
-    const newProjectSource = getNewProjectSourceFromUrl(example.projectFileUrl);
+      }
+    );
     newProjectSource.templateSlug = exampleShortHeader.slug;
     return newProjectSource;
   } catch (error) {

@@ -131,7 +131,10 @@ export type PrivateGameTemplate = {|
   createdAt: string,
   tag: string,
   longDescription: string,
-  gamePreviewLink: string,
+  /** The id of the game published on gd.games showcasing this template. */
+  showcasedGameId?: ?string,
+  /** @deprecated Use `showcasedGameId` and check the game is published before building a link. */
+  gamePreviewLink?: ?string,
   includedTemplateIds?: Array<string>,
 |};
 
@@ -751,9 +754,9 @@ export const listReceivedBundles = async (
 export const isPublicAssetResourceUrl = (url: string): boolean =>
   url.startsWith(GDevelopPublicAssetResourcesStorageBaseUrl) ||
   url.startsWith(GDevelopPublicAssetResourcesStorageStagingBaseUrl);
-// $FlowFixMe[missing-local-annot]
-const escapeStringForRegExp = string =>
-  string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+
+const escapeStringForRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 const resourceFilenameRegex = new RegExp(
   `(${escapeStringForRegExp(
     GDevelopPublicAssetResourcesStorageBaseUrl

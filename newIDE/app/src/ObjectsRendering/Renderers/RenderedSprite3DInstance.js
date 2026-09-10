@@ -226,6 +226,7 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
       imageName,
       {
         useTransparentTexture: true,
+        forceBasicMaterial: true,
       }
     );
     if (this._wasDestroyed) return;

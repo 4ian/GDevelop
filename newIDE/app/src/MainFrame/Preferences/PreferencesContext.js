@@ -50,7 +50,8 @@ export type EditorMosaicName =
   | 'scene-editor'
   | 'debugger'
   | 'resources-editor'
-  | 'events-functions-extension-editor';
+  | 'events-functions-extension-editor'
+  | 'gameplay-test-editor';
 
 export type InAppTutorialUserProgress = {|
   step: number,
@@ -170,6 +171,11 @@ export const allAlertMessages: Array<{
   },
 ];
 
+export type EditorStateForPropertyPanel = {
+  scrollPosition: number,
+  collapsedSections: { [string]: boolean },
+};
+
 /**
  * All the preferences of GDevelop. To add a new preference, add it into this
  * type and add a setter into `Preferences` type. Then, update the
@@ -177,7 +183,11 @@ export const allAlertMessages: Array<{
  */
 export type EditorStateForProject = {|
   editorTabs: EditorTabsPersistedState | null,
-  propertiesPanelScroll: { [string]: { [string]: number } },
+  propertiesPanel: {
+    [string]: {
+      [string]: EditorStateForPropertyPanel,
+    },
+  },
 |};
 
 // $FlowFixMe[deprecated-utility]
@@ -239,12 +249,11 @@ export type PreferencesValues = {|
   previewCrashReportUploadLevel: string,
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
+  gameplayTestFramePosition: {| left: number, bottom: number |} | null,
+  gameplayTestFrameZoomFactor: number | null,
   showAiAskButtonInTitleBar: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
-  // Default for the AI chat "auto edit" toggle when a project is open. When no
-  // project is open the toggle is always on (so a no-project request can create
-  // and build a project seamlessly), regardless of this value.
-  automaticallyApplyAiRequestEdits: boolean,
+  automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
   useBackgroundSerializerForSaving: boolean,
   disableNpmScriptConfirmation: boolean,
   showJsTypeError: boolean,
@@ -368,9 +377,17 @@ export type Preferences = {|
     orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
+  setGameplayTestFramePosition: (position: {|
+    left: number,
+    bottom: number,
+  |}) => void,
+  setGameplayTestFrameZoomFactor: (zoomFactor: number) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
-  setAutomaticallyApplyAiRequestEdits: (enabled: boolean) => void,
+  setAutomaticallyApplyAiRequestEditsForProjectId: (
+    projectId: string,
+    enabled: boolean
+  ) => void,
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
   setShowJsTypeError: (enabled: boolean) => void,
   setCanonicalEventSerialization: (enabled: boolean) => void,
@@ -434,9 +451,11 @@ export const initialPreferences = {
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
+    gameplayTestFramePosition: null,
+    gameplayTestFrameZoomFactor: null,
     showAiAskButtonInTitleBar: true,
     automaticallyUseCreditsForAiRequests: false,
-    automaticallyApplyAiRequestEdits: false,
+    automaticallyApplyAiRequestEditsByProjectId: {},
     useBackgroundSerializerForSaving: false,
     disableNpmScriptConfirmation: false,
     showJsTypeError: false,
@@ -523,9 +542,17 @@ export const initialPreferences = {
     orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
+  setGameplayTestFramePosition: (position: {|
+    left: number,
+    bottom: number,
+  |}) => {},
+  setGameplayTestFrameZoomFactor: (zoomFactor: number) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
-  setAutomaticallyApplyAiRequestEdits: (enabled: boolean) => {},
+  setAutomaticallyApplyAiRequestEditsForProjectId: (
+    projectId: string,
+    enabled: boolean
+  ) => {},
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
   setShowJsTypeError: (enabled: boolean) => {},
   setCanonicalEventSerialization: (enabled: boolean) => {},

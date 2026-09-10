@@ -74,7 +74,10 @@ const InviteHome = ({ cloudProjectId }: Props): React.Node | React.Node => {
   const { profile, limits } = authenticatedUser;
   const isOnline = useOnlineStatus();
 
-  const [projectUserAcls, setProjectUserAcls] = React.useState(null);
+  const [
+    projectUserAcls,
+    setProjectUserAcls,
+  ] = React.useState<Array<ProjectUserAclWithEmail> | null>(null);
   const [fetchError, setFetchError] = React.useState<
     'project-not-found' | 'project-not-owned' | 'unexpected' | null
   >(null);
@@ -156,7 +159,6 @@ const InviteHome = ({ cloudProjectId }: Props): React.Node | React.Node => {
       if (!projectUserAcls || !projectUserAcls.length) return;
 
       const userIds = projectUserAcls.map(
-        // $FlowFixMe[missing-local-annot]
         projectUserAcl => projectUserAcl.userId
       );
       try {
@@ -372,7 +374,6 @@ const InviteHome = ({ cloudProjectId }: Props): React.Node | React.Node => {
         !projectUserAcls ? (
           <PlaceholderLoader />
         ) : (
-          // $FlowFixMe[missing-local-annot]
           projectUserAcls.map(projectUserAcl => (
             <UserLine
               username={getCollaboratorUsername(projectUserAcl.userId)}

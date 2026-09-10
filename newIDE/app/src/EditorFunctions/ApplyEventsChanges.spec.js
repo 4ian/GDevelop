@@ -2,6 +2,8 @@
 import {
   applyEventsChanges,
   addMissingObjectBehaviors,
+  addUndeclaredVariables,
+  addObjectUndeclaredVariables,
 } from './ApplyEventsChanges';
 import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
 import {
@@ -2886,5 +2888,232 @@ describe('addMissingObjectBehaviors', () => {
     expect(player2.getBehavior('PlatformerObject').getTypeName()).toBe(
       'PlatformBehavior::PlatformerObjectBehavior'
     );
+  });
+});
+
+describe('addUndeclaredVariables', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  it('adds scene, global and unscoped variables with their type', () => {
+    addUndeclaredVariables({
+      project,
+      scene: testScene,
+      undeclaredVariables: [
+        { name: 'score', type: 'number', requiredScope: 'scene' },
+        { name: 'playerName', type: 'string', requiredScope: 'none' },
+        { name: 'settings', type: 'structure', requiredScope: 'global' },
+        { name: 'inventory', type: 'array', requiredScope: 'global' },
+        { name: 'isPaused', type: 'boolean', requiredScope: 'scene' },
+      ],
+    });
+
+    expect(
+      testScene
+        .getVariables()
+        .get('score')
+        .getType()
+    ).toBe(gd.Variable.Number);
+    // 'none' scope defaults to the scene.
+    expect(
+      testScene
+        .getVariables()
+        .get('playerName')
+        .getType()
+    ).toBe(gd.Variable.String);
+    expect(
+      testScene
+        .getVariables()
+        .get('isPaused')
+        .getType()
+    ).toBe(gd.Variable.Boolean);
+    expect(
+      project
+        .getVariables()
+        .get('settings')
+        .getType()
+    ).toBe(gd.Variable.Structure);
+    expect(
+      project
+        .getVariables()
+        .get('inventory')
+        .getType()
+    ).toBe(gd.Variable.Array);
+  });
+
+  it('leaves an already-declared variable untouched', () => {
+    testScene
+      .getVariables()
+      .insertNew('score', 0)
+      .setValue(42);
+
+    addUndeclaredVariables({
+      project,
+      scene: testScene,
+      undeclaredVariables: [
+        { name: 'score', type: 'string', requiredScope: 'scene' },
+      ],
+    });
+
+    // Neither re-created nor re-typed.
+    expect(
+      testScene
+        .getVariables()
+        .get('score')
+        .getType()
+    ).toBe(gd.Variable.Number);
+    expect(
+      testScene
+        .getVariables()
+        .get('score')
+        .getValue()
+    ).toBe(42);
+  });
+
+  it('skips a variable with an unknown scope', () => {
+    addUndeclaredVariables({
+      project,
+      scene: testScene,
+      undeclaredVariables: [
+        // $FlowFixMe[incompatible-type] - invalid scope on purpose.
+        { name: 'mystery', type: 'number', requiredScope: 'galaxy' },
+      ],
+    });
+
+    expect(testScene.getVariables().has('mystery')).toBe(false);
+    expect(project.getVariables().has('mystery')).toBe(false);
+  });
+});
+
+describe('addObjectUndeclaredVariables', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  it('adds a typed variable to a scene object', () => {
+    const object = testScene
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Player', 0);
+
+    addObjectUndeclaredVariables({
+      project,
+      scene: testScene,
+      objectName: 'Player',
+      undeclaredVariables: [
+        { name: 'health', type: 'number', requiredScope: 'none' },
+      ],
+    });
+
+    expect(object.getVariables().has('health')).toBe(true);
+    expect(
+      object
+        .getVariables()
+        .get('health')
+        .getType()
+    ).toBe(gd.Variable.Number);
+  });
+
+  it('adds a variable to a global object', () => {
+    const object = project
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'GlobalHud', 0);
+
+    addObjectUndeclaredVariables({
+      project,
+      scene: testScene,
+      objectName: 'GlobalHud',
+      undeclaredVariables: [
+        { name: 'visible', type: 'boolean', requiredScope: 'none' },
+      ],
+    });
+
+    expect(object.getVariables().has('visible')).toBe(true);
+    expect(
+      object
+        .getVariables()
+        .get('visible')
+        .getType()
+    ).toBe(gd.Variable.Boolean);
+  });
+
+  it('adds the variable to every member of a group', () => {
+    const sceneObjects = testScene.getObjects();
+    const enemy1 = sceneObjects.insertNewObject(project, 'Sprite', 'Enemy1', 0);
+    const enemy2 = sceneObjects.insertNewObject(project, 'Sprite', 'Enemy2', 1);
+    const group = sceneObjects.getObjectGroups().insertNew('Enemies', 0);
+    group.addObject('Enemy1');
+    group.addObject('Enemy2');
+
+    addObjectUndeclaredVariables({
+      project,
+      scene: testScene,
+      objectName: 'Enemies',
+      undeclaredVariables: [
+        { name: 'health', type: 'number', requiredScope: 'none' },
+      ],
+    });
+
+    expect(enemy1.getVariables().has('health')).toBe(true);
+    expect(enemy2.getVariables().has('health')).toBe(true);
+  });
+
+  it('leaves an already-declared object variable untouched and skips unknown objects', () => {
+    const object = testScene
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Player', 0);
+    object
+      .getVariables()
+      .insertNew('health', 0)
+      .setValue(100);
+
+    addObjectUndeclaredVariables({
+      project,
+      scene: testScene,
+      objectName: 'Player',
+      undeclaredVariables: [
+        { name: 'health', type: 'string', requiredScope: 'none' },
+      ],
+    });
+    // Does not throw for an object that does not exist.
+    addObjectUndeclaredVariables({
+      project,
+      scene: testScene,
+      objectName: 'Ghost',
+      undeclaredVariables: [
+        { name: 'health', type: 'number', requiredScope: 'none' },
+      ],
+    });
+
+    expect(
+      object
+        .getVariables()
+        .get('health')
+        .getType()
+    ).toBe(gd.Variable.Number);
+    expect(
+      object
+        .getVariables()
+        .get('health')
+        .getValue()
+    ).toBe(100);
   });
 });

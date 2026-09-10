@@ -18,6 +18,8 @@ import {
 } from '../ExportAndShare/PreviewLauncher.flow';
 import { type Log, LogsManager } from './DebuggerConsole';
 
+// Mirrors `gdjs.FrameMeasureOutput`: a plain tree (no back-references),
+// as sent by the game's profiler.
 export type ProfilerMeasuresSection = {|
   time: number,
   subsections: { [string]: ProfilerMeasuresSection },
@@ -27,6 +29,15 @@ export type ProfilerOutput = {|
   framesAverageMeasures: ProfilerMeasuresSection,
   stats: {
     framesCount: number,
+    // Optional: only sent by game engines recent enough to measure them,
+    // and only meaningful for a game that renders in 3D.
+    shaderProgramsCount?: number,
+    shaderProgramCompilationsCount?: number,
+    framesWithShaderCompilationCount?: number,
+    averageDrawCallsCount?: number,
+    averageTrianglesCount?: number,
+    geometriesCount?: number,
+    texturesCount?: number,
   },
 |};
 
@@ -46,7 +57,7 @@ type Props = {|
 |};
 
 type State = {|
-  debuggerServerState: 'started' | 'stopped',
+  debuggerServerState: 'started' | 'starting' | 'stopped',
   debuggerServerError: ?any,
   debuggerIds: Array<DebuggerId>,
   unregisterDebuggerServerCallbacks: ?() => void,
@@ -67,6 +78,7 @@ export default class Debugger extends React.Component<Props, State> {
   state = {
     debuggerServerState: (this.props.previewDebuggerServer.getServerState():
       | 'started'
+      | 'starting'
       | 'stopped'),
     debuggerServerError: null,
     debuggerIds: (this.props.previewDebuggerServer.getExistingDebuggerIds(): Array<DebuggerId>),
@@ -357,17 +369,9 @@ export default class Debugger extends React.Component<Props, State> {
       profilingInProgress,
     } = this.state;
 
-    return (
-      <Background>
-        {debuggerServerState === 'stopped' && !debuggerServerError && (
-          <PlaceholderMessage>
-            <PlaceholderLoader />
-            <Text>
-              <Trans>Debugger is starting...</Trans>
-            </Text>
-          </PlaceholderMessage>
-        )}
-        {debuggerServerState === 'stopped' && debuggerServerError && (
+    if (debuggerServerState === 'stopped' && debuggerServerError) {
+      return (
+        <Background>
           <PlaceholderMessage>
             <Text>
               <Trans>
@@ -376,50 +380,68 @@ export default class Debugger extends React.Component<Props, State> {
               </Trans>
             </Text>
           </PlaceholderMessage>
-        )}
-        {debuggerServerState === 'started' && (
-          <Column expand noMargin>
-            <DebuggerSelector
-              selectedId={selectedId}
-              debuggerStatus={debuggerStatus}
-              onChooseDebugger={id =>
-                this.setState(
-                  {
-                    selectedId: id,
-                  },
-                  () => this.updateToolbar()
-                )
+        </Background>
+      );
+    }
+
+    if (debuggerServerState === 'starting') {
+      return (
+        <Background>
+          <PlaceholderMessage>
+            <PlaceholderLoader />
+            <Text>
+              <Trans>Debugger is starting...</Trans>
+            </Text>
+          </PlaceholderMessage>
+        </Background>
+      );
+    }
+
+    // The debugger server is only started when a preview is launched, so a
+    // stopped server is displayed like a started one without any preview
+    // running (it will be started as soon as a preview is launched).
+    return (
+      <Background>
+        <Column expand noMargin>
+          <DebuggerSelector
+            selectedId={selectedId}
+            debuggerStatus={debuggerStatus}
+            onChooseDebugger={id =>
+              this.setState(
+                {
+                  selectedId: id,
+                },
+                () => this.updateToolbar()
+              )
+            }
+          />
+          {this._hasSelectedDebugger() ? (
+            <DebuggerContent
+              ref={debuggerContent =>
+                (this._debuggerContents[selectedId] = debuggerContent)
               }
+              gameData={debuggerGameData[selectedId]}
+              onPlay={() => this._play(selectedId)}
+              onPause={() => this._pause(selectedId)}
+              onRefresh={() => this._refresh(selectedId)}
+              onEdit={(path, args) => this._edit(selectedId, path, args)}
+              onCall={(path, args) => this._call(selectedId, path, args)}
+              onStartProfiler={() => this._startProfiler(selectedId)}
+              onStopProfiler={() => this._stopProfiler(selectedId)}
+              profilerOutput={profilerOutputs[selectedId]}
+              profilingInProgress={profilingInProgress[selectedId]}
+              logsManager={this._getLogsManager(selectedId)}
+              onOpenedEditorsChanged={this.updateToolbar}
             />
-            {this._hasSelectedDebugger() && (
-              <DebuggerContent
-                ref={debuggerContent =>
-                  (this._debuggerContents[selectedId] = debuggerContent)
-                }
-                gameData={debuggerGameData[selectedId]}
-                onPlay={() => this._play(selectedId)}
-                onPause={() => this._pause(selectedId)}
-                onRefresh={() => this._refresh(selectedId)}
-                onEdit={(path, args) => this._edit(selectedId, path, args)}
-                onCall={(path, args) => this._call(selectedId, path, args)}
-                onStartProfiler={() => this._startProfiler(selectedId)}
-                onStopProfiler={() => this._stopProfiler(selectedId)}
-                profilerOutput={profilerOutputs[selectedId]}
-                profilingInProgress={profilingInProgress[selectedId]}
-                logsManager={this._getLogsManager(selectedId)}
-                onOpenedEditorsChanged={this.updateToolbar}
-              />
-            )}
-            {!this._hasSelectedDebugger() && (
-              <EmptyMessage>
-                <Trans>
-                  Run a preview and you will be able to inspect it with the
-                  debugger.
-                </Trans>
-              </EmptyMessage>
-            )}
-          </Column>
-        )}
+          ) : (
+            <EmptyMessage>
+              <Trans>
+                Run a preview and you will be able to inspect it with the
+                debugger.
+              </Trans>
+            </EmptyMessage>
+          )}
+        </Column>
       </Background>
     );
   }

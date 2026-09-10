@@ -343,8 +343,7 @@ function NewObjectDialog({
   const installExtension = useInstallExtension();
 
   const onInstallAsset = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    async (assetShortHeader): Promise<boolean> => {
+    async (assetShortHeader: AssetShortHeader): Promise<boolean> => {
       if (!assetShortHeader) return false;
 
       setIsAssetBeingInstalled(true);

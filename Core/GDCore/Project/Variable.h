@@ -136,6 +136,19 @@ class GD_CORE_API Variable {
    */
   void MarkAsMixedValues();
 
+  /**
+   * \brief Clear the "mixed values" marker on this variable and all its
+   * children (a variable with entirely mixed types is casted back to a
+   * number).
+   *
+   * This marker is only relevant for the temporary variables containers built
+   * by the editor to display the variables shared by several objects (see
+   * `gd::ObjectRefactorer::MergeVariableContainers`). It must never be kept
+   * on a variable stored in a project (object variables, instance
+   * variables...).
+   */
+  void ClearMixedValues();
+
   // Operators are overloaded to allow accessing to variable using a simple
   // int-like semantic.
   void operator=(double val) { SetValue(val); };
@@ -368,6 +381,14 @@ class GD_CORE_API Variable {
    * the same variable between serialization.
    */
   Variable& ResetPersistentUuid();
+
+  /**
+   * \brief Set the persistent UUID if it is not set already, and do the
+   * same for all the children - contrary to `ResetPersistentUuid`, existing
+   * UUIDs are preserved (so that they stay stable across serializations,
+   * avoiding useless changes in the project file).
+   */
+  Variable& EnsurePersistentUuid();
 
   /**
    * \brief Remove the persistent UUID - when the variable no

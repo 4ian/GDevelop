@@ -5,6 +5,13 @@ namespace gd {
 
 /**
  * Contains functions to handle the grammar of the expressions accepted by GDevelop.
+ *
+ * \warning This file is ported to JavaScript (notably `IsAllowedInIdentifier`
+ * and the character sets it relies on). Any change here must be mirrored in:
+ * - `newIDE/app/src/EventsSheet/EventsTree/TextRenderer/EventScriptIdentifiers.js`
+ *   (this repository),
+ * - `generation-api/src/lib/gdevelop-identifiers.js`
+ *   (GDevelop-services repository).
  */
 namespace GrammarTerminals {
 

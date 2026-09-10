@@ -447,6 +447,14 @@ namespace gdjs {
         this._profiler.end('render');
       }
       if (this._profiler) {
+        const threeRenderer = this._runtimeGame
+          .getRenderer()
+          .getThreeRenderer();
+        if (threeRenderer) {
+          this._profiler.record3DRendererInfo(threeRenderer.info);
+        }
+      }
+      if (this._profiler) {
         this._profiler.endFrame();
       }
       return !!this.getRequestedChange();
@@ -478,9 +486,11 @@ namespace gdjs {
       if (this._debugDrawEnabled) {
         this._debuggerRenderer.renderDebugDraw(
           this.getAdhocListOfAllInstances(),
+          this._debugDrawShowHitBoxes,
           this._debugDrawShowHiddenInstances,
           this._debugDrawShowPointsNames,
-          this._debugDrawShowCustomPoints
+          this._debugDrawShowCustomPoints,
+          this._debugDrawHooks
         );
       }
 

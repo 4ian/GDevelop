@@ -2,8 +2,6 @@
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import Clipboard from '../Utils/Clipboard';
-import { SafeExtractor } from '../Utils/SafeExtractor';
 import { type TreeViewItemContent } from '.';
 import {
   enumerateFoldersInContainer,
@@ -12,14 +10,20 @@ import {
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import {
-  addSerializedObjectToObjectsContainer,
-  OBJECT_CLIPBOARD_KIND,
-} from './ObjectTreeViewItemContent';
+  copyObjectFolderOrObjectsToClipboard,
+  serializeObjectFolderOrObjectsForClipboard,
+  writeObjectFolderOrObjectsToClipboard,
+  hasObjectFolderOrObjectsInClipboard,
+  getObjectFolderOrObjectsClipboardSummaryName,
+  pasteObjectFolderOrObjectsAndNotify,
+} from './ObjectFolderOrObjectsClipboard';
+import { duplicateObjectFolderOrObjects } from './ObjectFolderOrObjectsDuplicate';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import { removeSubFolders } from '../Utils/Folders';
 
 const gd: libGDevelop = global.gd;
 
@@ -140,6 +144,9 @@ export type ObjectFolderTreeViewItemProps = {|
   showDeleteConfirmation: (options: any) => Promise<boolean>,
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
+  ) => void,
+  selectObjectFolderOrObjectsWithContext: (
+    items: Array<ObjectFolderOrObjectWithContext>
   ) => void,
   forceUpdateList: () => void,
   forceUpdate: () => void,
@@ -270,19 +277,16 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
   getPasteLabel(
     i18n: I18nType,
-    {
-      isGlobalObject,
-      isFolder,
-    }: {| isGlobalObject: boolean, isFolder: boolean |}
+    { isGlobalObject }: {| isGlobalObject: boolean |}
   ): any {
     let translation = t`Paste`;
-    if (Clipboard.has(OBJECT_CLIPBOARD_KIND)) {
-      const clipboardContent = Clipboard.get(OBJECT_CLIPBOARD_KIND);
-      const clipboardObjectName =
-        SafeExtractor.extractStringProperty(clipboardContent, 'name') || '';
+    if (hasObjectFolderOrObjectsInClipboard()) {
+      const clipboardSummaryName = getObjectFolderOrObjectsClipboardSummaryName(
+        i18n
+      );
       translation = isGlobalObject
-        ? t`Paste ${clipboardObjectName} as a Global Object inside folder`
-        : t`Paste ${clipboardObjectName} inside folder`;
+        ? t`Paste ${clipboardSummaryName} as a Global Object inside folder`
+        : t`Paste ${clipboardSummaryName} inside folder`;
     }
     return i18n._(translation);
   }
@@ -323,10 +327,15 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       {
         label: this.getPasteLabel(i18n, {
           isGlobalObject: this._isGlobal,
-          isFolder: true,
         }),
-        enabled: Clipboard.has(OBJECT_CLIPBOARD_KIND) && !isListLocked,
+        enabled: hasObjectFolderOrObjectsInClipboard() && !isListLocked,
         click: () => this.paste(),
+      },
+      {
+        label: i18n._(t`Duplicate`),
+        click: () => this.duplicate(),
+        accelerator: 'CmdOrCtrl+D',
+        enabled: !isListLocked,
       },
       {
         label: i18n._(t`Rename`),
@@ -427,7 +436,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     this._delete();
   }
 
-  async _delete(): Promise<void> {
+  async _delete(): Promise<boolean> {
     const {
       globalObjectsContainer,
       objectsContainer,
@@ -443,9 +452,10 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     if (objectsToDelete.length === 0) {
       selectObjectFolderOrObjectWithContext(null);
       folderColors.remove(this.objectFolder, this._isGlobal);
+      removeSubFolders(this.objectFolder);
       this.objectFolder.getParent().removeFolderChild(this.objectFolder);
-      forceUpdateList();
-      return;
+      onObjectModified(true);
+      return true;
     }
 
     let message: MessageDescriptor;
@@ -462,7 +472,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     }
 
     const answer = await showDeleteConfirmation({ message, title });
-    if (!answer) return;
+    if (!answer) return false;
 
     const objectsWithContext = objectsToDelete.map(object => ({
       object,
@@ -484,18 +494,26 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       }
 
       folderColors.remove(folderToDelete, this._isGlobal);
+      removeSubFolders(folderToDelete);
       folderToDelete.getParent().removeFolderChild(folderToDelete);
       forceUpdateList();
 
       onObjectModified(false);
     });
+    return true;
   }
 
   copy(): void {}
   cut(): void {}
+  copy(): void {
+    copyObjectFolderOrObjectsToClipboard([
+      { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
+    ]);
+  }
 
-  paste(): void {
-    if (!Clipboard.has(OBJECT_CLIPBOARD_KIND)) return;
+  cut(): void {
+    this._cut();
+  }
 
     const clipboardContent = Clipboard.get(OBJECT_CLIPBOARD_KIND);
     const serializedObject = SafeExtractor.extractObjectProperty(
@@ -512,7 +530,17 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     );
 
     if (!objectName || !objectType || !serializedObject) return;
+  async _cut(): Promise<void> {
+    const clipboardPayload = serializeObjectFolderOrObjectsForClipboard([
+      { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
+    ]);
+    if (!clipboardPayload) return;
+    const deleted = await this._delete();
+    if (!deleted) return;
+    writeObjectFolderOrObjectsToClipboard(clipboardPayload);
+  }
 
+  paste(): void {
     const {
       project,
       globalObjectsContainer,
@@ -521,25 +549,20 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       expandFolders,
       onObjectModified,
       onObjectCreated,
+      selectObjectFolderOrObjectsWithContext,
     } = this.props;
 
-    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
-      project,
-      objectType
-    );
-
-    const newObjectWithContext = addSerializedObjectToObjectsContainer({
+    const pasted = pasteObjectFolderOrObjectsAndNotify({
       project,
       globalObjectsContainer,
       objectsContainer,
-      objectName,
-      positionObjectFolderOrObjectWithContext: {
-        objectFolderOrObject: this.objectFolder,
-        global: this._isGlobal,
-      },
-      objectType,
-      serializedObject,
-      addInsideFolder: true,
+      global: this._isGlobal,
+      destinationFolder: this.objectFolder,
+      positionInFolder: this.objectFolder.getChildrenCount(),
+      onObjectModified,
+      onObjectPasted,
+      onObjectCreated,
+      selectObjectFolderOrObjectsWithContext,
     });
 
     onObjectCreated(
@@ -550,12 +573,55 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
 
+    if (!pasted) return;
     expandFolders([
       { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
     ]);
   }
 
-  duplicate(): void {}
+  duplicate(): void {
+    const {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      onObjectCreated,
+      onObjectModified,
+      forceUpdateList,
+      selectObjectFolderOrObjectWithContext,
+    } = this.props;
+
+    const parent = exceptionallyGuardAgainstDeadObject(
+      this.objectFolder.getParent()
+    );
+    if (!parent) return;
+
+    const isTheFirstOfItsTypeInProject = enumerateObjectsInFolder(
+      this.objectFolder
+    ).some(
+      object => !gd.UsedObjectTypeFinder.scanProject(project, object.getType())
+    );
+
+    const duplicatedContent = duplicateObjectFolderOrObjects({
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      items: [
+        { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
+      ],
+      destinationFolder: parent,
+      positionInFolder: parent.getChildPosition(this.objectFolder) + 1,
+    });
+    if (!duplicatedContent) return;
+    const { createdObjects, topLevelObjectFolderOrObjects } = duplicatedContent;
+
+    onObjectCreated(createdObjects, isTheFirstOfItsTypeInProject);
+    onObjectModified(true);
+    forceUpdateList();
+    selectObjectFolderOrObjectWithContext({
+      objectFolderOrObject: topLevelObjectFolderOrObjects[0],
+      global: this._isGlobal,
+    });
+  }
 
   getRightButton(i18n: I18nType): any {
     return null;

@@ -44,6 +44,87 @@ export const initializeCompletions = (monaco: any) => {
   setupAutocompletions(monaco);
 };
 
+// The version of Monaco used does not support ignoring some diagnostics
+// per model (`diagnosticCodesToIgnore` appeared in a later version, and
+// would be global anyway). To avoid showing diagnostics that don't apply
+// to a specific editor (like "'await' expression is only allowed within an
+// async function" in a gameplay test, whose code is actually run inside an
+// async function), `setModelMarkers` is patched to filter the markers of
+// the registered models.
+const patchedMonacoInstances: WeakSet<any> = new WeakSet();
+const suppressedMessagesByMonacoInstance: WeakMap<
+  any,
+  Map<string, Array<string>>
+> = new WeakMap();
+
+const patchSetModelMarkersToFilterSuppressedMessages = (monaco: any) => {
+  if (patchedMonacoInstances.has(monaco)) return;
+  patchedMonacoInstances.add(monaco);
+
+  const originalSetModelMarkers = monaco.editor.setModelMarkers;
+  monaco.editor.setModelMarkers = (model: any, owner: string, markers: any) => {
+    const suppressedMessagesByModelUri = suppressedMessagesByMonacoInstance.get(
+      monaco
+    );
+    const suppressedMessages =
+      suppressedMessagesByModelUri && model
+        ? suppressedMessagesByModelUri.get(model.uri.toString())
+        : null;
+    const filteredMarkers = suppressedMessages
+      ? markers.filter(
+          marker =>
+            !suppressedMessages.some(suppressedMessage =>
+              marker.message.includes(suppressedMessage)
+            )
+        )
+      : markers;
+    originalSetModelMarkers.call(monaco.editor, model, owner, filteredMarkers);
+  };
+};
+
+/**
+ * Don't show the diagnostics whose message contains one of the given texts,
+ * for the given model. Used by editors whose code is run in a way the
+ * TypeScript language service can not know about (see `CodeEditor`).
+ */
+export const suppressDiagnosticsMessagesForModel = (
+  monaco: any,
+  model: any,
+  suppressedMessages: Array<string>
+) => {
+  if (!model) return;
+  patchSetModelMarkersToFilterSuppressedMessages(monaco);
+
+  let suppressedMessagesByModelUri = suppressedMessagesByMonacoInstance.get(
+    monaco
+  );
+  if (!suppressedMessagesByModelUri) {
+    suppressedMessagesByModelUri = new Map();
+    suppressedMessagesByMonacoInstance.set(
+      monaco,
+      suppressedMessagesByModelUri
+    );
+  }
+  suppressedMessagesByModelUri.set(model.uri.toString(), suppressedMessages);
+};
+
+/**
+ * Stop filtering the diagnostics of the given model (when the editor that
+ * asked for it is unmounted).
+ */
+export const unsuppressDiagnosticsMessagesForModel = (
+  monaco: any,
+  model: any
+) => {
+  if (!model) return;
+  const suppressedMessagesByModelUri = suppressedMessagesByMonacoInstance.get(
+    monaco
+  );
+  if (suppressedMessagesByModelUri) {
+    suppressedMessagesByModelUri.delete(model.uri.toString());
+  }
+};
+
 /**
  * Enable JS type error diagnostics. This won't work for .d.ts classes/functions
  * for some reason. See:

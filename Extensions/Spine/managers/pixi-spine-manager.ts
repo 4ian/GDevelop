@@ -9,17 +9,32 @@ namespace gdjs {
   const resourceKinds: ResourceKind[] = ['spine'];
 
   /**
-   * SpineManager manages pixi spine skeleton data.
+   * Aliases used to instantiate a Spine container via `Spine.from`.
+   */
+  export type SpineAssetAliases = {
+    skeletonAlias: string;
+    atlasAlias: string;
+  };
+
+  /**
+   * SpineManager loads Spine skeleton (`.json` / `.skel`) resources via the
+   * official `@esotericsoftware/spine-pixi-v7` asset loader. The skeleton is
+   * stored in the global `PIXI.Assets` cache under a stable alias, ready to be
+   * consumed by `spine.Spine.from(...)`.
    * @category Resources > Spine
    */
   export class SpineManager implements gdjs.ResourceManager {
     private _spineAtlasManager: SpineAtlasManager;
     private _resourceLoader: ResourceLoader;
-    private _loadedSpines = new gdjs.ResourceCache<pixi_spine.ISkeletonData>();
+    /**
+     * Stores the asset aliases needed to construct a Spine container.
+     * The atlas page textures are tracked separately by the SpineAtlasManager.
+     */
+    private _loadedSpines = new gdjs.ResourceCache<SpineAssetAliases>();
 
     /**
      * @param resourceLoader The resources loader of the game.
-     * @param spineAtlasManager The resources data of the game.
+     * @param spineAtlasManager The Spine atlas manager of the game.
      */
     constructor(
       resourceLoader: gdjs.ResourceLoader,
@@ -33,8 +48,8 @@ namespace gdjs {
       return resourceKinds;
     }
 
-    async processResource(resourceName: string): Promise<void> {
-      // Do nothing because pixi-spine parses resources by itself.
+    async processResource(_resourceName: string): Promise<void> {
+      // The spine-pixi-v7 skeleton loader parses the resource itself.
     }
 
     async loadResource(resourceName: string): Promise<void> {
@@ -42,12 +57,12 @@ namespace gdjs {
 
       if (!resource) {
         return logger.error(
-          `Unable to find spine json for resource ${resourceName}.`
+          `Unable to find spine skeleton for resource ${resourceName}.`
         );
       }
 
-      const url = this._resourceLoader.getFullUrl(resource.file);
-      const alias = url;
+      const skeletonUrl = this._resourceLoader.getFullUrl(resource.file);
+      const skeletonAlias = skeletonUrl;
 
       try {
         const game = this._resourceLoader.getRuntimeGame();
@@ -55,10 +70,10 @@ namespace gdjs {
           resource.name
         );
 
-        // there should be exactly one file which is pointing to atlas
+        // there should be exactly one embedded resource (the atlas)
         if (embeddedResourcesNames.length !== 1) {
           return logger.error(
-            `Unable to find atlas metadata for resource spine json ${resourceName}.`
+            `Unable to find atlas metadata for resource spine skeleton ${resourceName}.`
           );
         }
 
@@ -66,53 +81,47 @@ namespace gdjs {
           resource.name,
           embeddedResourcesNames[0]
         );
-        const spineAtlas =
-          await this._spineAtlasManager.getOrLoad(atlasResourceName);
+        await this._spineAtlasManager.getOrLoad(atlasResourceName);
+        const atlasAlias =
+          this._spineAtlasManager.getAtlasAlias(atlasResourceName);
+
+        if (!atlasAlias) {
+          return logger.error(
+            `Atlas '${atlasResourceName}' was loaded but no alias is registered.`
+          );
+        }
 
         PIXI.Assets.setPreferences({
           preferWorkers: false,
-          crossOrigin: this._resourceLoader.checkIfCredentialsRequired(url)
+          crossOrigin: this._resourceLoader.checkIfCredentialsRequired(
+            skeletonUrl
+          )
             ? 'use-credentials'
             : 'anonymous',
         });
-        PIXI.Assets.add({
-          alias,
-          src: url,
-          data: { spineAtlas },
-        });
-        const loadedJson = await PIXI.Assets.load(alias);
+        PIXI.Assets.add({ alias: skeletonAlias, src: skeletonUrl });
+        await PIXI.Assets.load(skeletonAlias);
 
-        if (loadedJson.spineData) {
-          this._loadedSpines.set(resource, loadedJson.spineData);
-        } else {
-          logger.error(
-            `Loader cannot process spine resource ${resource.name} correctly.`
-          );
-        }
+        this._loadedSpines.set(resource, { skeletonAlias, atlasAlias });
       } catch (error) {
         logger.error(
           `Error while preloading spine resource ${resource.name}: ${error}`
         );
-        PIXI.Assets.unload(alias);
+        await PIXI.Assets.unload(skeletonAlias).catch(() => {});
         throw error;
       }
     }
 
     /**
-     * Get the object for the given resource that is already loaded (preloaded or loaded with `loadJson`).
-     * If the resource is not loaded, `null` will be returned.
-     *
-     * @param resourceName The name of the spine skeleton.
-     * @returns the spine skeleton if loaded, `null` otherwise.
+     * Returns the asset aliases required to instantiate a Spine container,
+     * or `null` if the resource is not loaded yet.
      */
-    getSpine(resourceName: string): pixi_spine.ISkeletonData | null {
+    getSpineAliases(resourceName: string): SpineAssetAliases | null {
       return this._loadedSpines.getFromName(resourceName);
     }
 
     /**
      * Check if the given spine skeleton was loaded.
-     * @param resourceName The name of the spine skeleton.
-     * @returns true if the content of the spine skeleton is loaded, false otherwise.
      */
     isSpineLoaded(resourceName: string): boolean {
       return !!this._loadedSpines.getFromName(resourceName);
@@ -127,15 +136,23 @@ namespace gdjs {
 
     /**
      * To be called when the game is disposed.
-     * Clear the Spine skeleton data loaded in this manager.
      */
     dispose(): void {
       this._loadedSpines.clear();
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedSpine = this._loadedSpines.get(resourceData);
-      if (loadedSpine) {
+      const aliases = this._loadedSpines.get(resourceData);
+      if (aliases) {
+        // Drop cached SkeletonData entries created by Spine.from for this skeleton.
+        const skeletonCache = spine.Spine.skeletonCache;
+        const cachePrefix = `${aliases.skeletonAlias}-${aliases.atlasAlias}-`;
+        for (const cacheKey of Object.keys(skeletonCache)) {
+          if (cacheKey.startsWith(cachePrefix)) {
+            delete skeletonCache[cacheKey];
+          }
+        }
+        PIXI.Assets.unload(aliases.skeletonAlias).catch(() => {});
         this._loadedSpines.delete(resourceData);
       }
     }

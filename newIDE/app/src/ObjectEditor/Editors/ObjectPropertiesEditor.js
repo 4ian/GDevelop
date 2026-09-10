@@ -51,6 +51,7 @@ const ObjectPropertiesEditor = (props: Props): React.Node => {
     onUpdateProperty: (object, name, value) =>
       object.updateProperty(name, value),
     layersContainer: null,
+    shouldDisabledFieldsWithMixedValues: false,
   });
 
   const extraInformation = getExtraObjectsInformation()[

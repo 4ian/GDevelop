@@ -50,7 +50,16 @@ export const findGDJS = (
   let gdjsRoot = `https://resources.gdevelop-app.com/GDJS-${getIDEVersionWithHash()}`;
 
   if (Window.isDev()) {
-    gdjsRoot = `http://localhost:5002`;
+    gdjsRoot =
+      window.location.hostname === 'localhost'
+        ? // Served by `watch-serve-GDJS-runtime.js` when running the IDE locally.
+          `http://localhost:5002`
+        : // On a deployed development build (e.g. editor-dev), use the runtime
+          // bundled with the build (see `copy-GDJS-Runtime-to-build.js`).
+          // Fetching localhost from a public origin would trigger the browser
+          // "Local Network Access" permission prompt and fail for anyone
+          // not running a local server.
+          `${window.location.origin}/GDJS`;
   }
 
   return Promise.all(

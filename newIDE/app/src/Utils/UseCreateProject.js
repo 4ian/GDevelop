@@ -13,6 +13,8 @@ import {
   type NewProjectSetup,
   type ExampleProjectSetup,
 } from '../ProjectCreation/NewProjectSetupDialog';
+import { sendNewGameCreated } from './Analytics/EventSender';
+import { type MessageDescriptor } from './i18n/MessageDescriptor.flow';
 import { type State } from '../MainFrame/MainFrameState';
 import {
   type StorageProvider,
@@ -65,7 +67,14 @@ type Props = {|
     project: gdProject,
     fileMetadata: ?FileMetadata
   ) => Promise<State>,
-  openFromFileMetadata: (fileMetadata: FileMetadata) => Promise<?State>,
+  openFromFileMetadata: (
+    fileMetadata: FileMetadata,
+    options?: {|
+      openingMessage?: ?MessageDescriptor,
+      ignoreAutoSave?: boolean,
+      doNotTrackAsProjectOpened?: boolean,
+    |}
+  ) => Promise<?State>,
   onProjectSaved: (fileMetadata: ?FileMetadata) => void,
   ensureResourcesAreMoved: (
     options: MoveAllProjectResourcesOptionsWithoutProgress
@@ -169,7 +178,12 @@ const useCreateProject = ({
         if (newProjectSource.project) {
           state = await loadFromProject(newProjectSource.project, null);
         } else if (newProjectSource.fileMetadata && sourceStorageProvider) {
-          state = await openFromFileMetadata(newProjectSource.fileMetadata);
+          state = await openFromFileMetadata(newProjectSource.fileMetadata, {
+            // This "open" is only loading the template/example that this new
+            // project is based on - it must not be reported as the user
+            // re-opening an existing project.
+            doNotTrackAsProjectOpened: true,
+          });
         }
 
         if (!state) {
@@ -185,6 +199,15 @@ const useCreateProject = ({
 
         const oldProjectId = currentProject.getProjectUuid();
         initialiseProjectProperties(currentProject, newProjectSetup);
+
+        // Now that the project has its final UUID (assigned by
+        // initialiseProjectProperties), report its creation along with that UUID,
+        // so the new game can be tied to its later "project-opened" events.
+        sendNewGameCreated({
+          ...newProjectSource.analyticsMetadata,
+          projectUuid: currentProject.getProjectUuid(),
+        });
+
         if (newProjectSource.templateSlug) {
           currentProject.setTemplateSlug(newProjectSource.templateSlug);
         }

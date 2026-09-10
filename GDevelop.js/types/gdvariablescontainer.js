@@ -28,7 +28,9 @@ declare class gdVariablesContainer {
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   resetPersistentUuid(): gdVariablesContainer;
+  ensurePersistentUuids(): gdVariablesContainer;
   clearPersistentUuid(): gdVariablesContainer;
+  getPersistentUuid(): string;
   delete(): void;
   ptr: number;
 };

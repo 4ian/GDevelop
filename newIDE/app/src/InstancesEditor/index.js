@@ -7,6 +7,7 @@ import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
 import HighlightedInstance from './HighlightedInstance';
+import HiddenInstancesDecorations from './HiddenInstancesDecorations';
 import SelectionRectangle from './SelectionRectangle';
 import InstancesResizer, {
   type ResizeGrabbingLocation,
@@ -57,6 +58,7 @@ import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
+import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
 import { Trans } from '@lingui/macro';
 import { generateUUID } from 'three/src/math/MathUtils';
 import {
@@ -93,6 +95,7 @@ export type InstancesEditorShortcutsCallbacks = {|
   onShift1: () => void,
   onShift2: () => void,
   onShift3: () => void,
+  onFocusOnSelection: () => void,
 |};
 
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
@@ -154,8 +157,7 @@ export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuY = 0;
   lastCursorX: number | null = null;
   lastCursorY: number | null = null;
-  // $FlowFixMe[missing-local-annot]
-  fpsLimiter = (new FpsLimiter({ maxFps: 60, idleFps: 10 }): FpsLimiter);
+  fpsLimiter: FpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   // $FlowFixMe[value-as-type]
   pixiRenderer: PIXI.Renderer;
@@ -170,6 +172,7 @@ export default class InstancesEditor extends Component<Props, State> {
   tileMapPaintingPreview: TileMapPaintingPreview;
   clickInterceptor: ClickInterceptor;
   highlightedInstance: HighlightedInstance;
+  hiddenInstancesDecorations: HiddenInstancesDecorations;
   instancesResizer: InstancesResizer;
   instancesRotator: InstancesRotator;
   instancesMover: InstancesMover;
@@ -189,6 +192,7 @@ export default class InstancesEditor extends Component<Props, State> {
   grid: Grid;
   background: Background;
   _unmounted = false;
+  _stopNativeAppActivity: (() => void) | null = null;
   _renderingPausedReasons: Set<string> = new Set();
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
@@ -196,8 +200,7 @@ export default class InstancesEditor extends Component<Props, State> {
   _showObjectInstancesIn3D: boolean = false;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
 
-  // $FlowFixMe[missing-local-annot]
-  state = {
+  state: State = {
     renderingError: null,
   };
 
@@ -301,6 +304,10 @@ export default class InstancesEditor extends Component<Props, State> {
 
       gameCanvas = this.pixiRenderer.view;
     }
+
+    // Each instances editor keeps a WebGL context and its textures alive.
+    if (this._stopNativeAppActivity) this._stopNativeAppActivity();
+    this._stopNativeAppActivity = startNativeAppActivity('instances-editor');
 
     // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
     // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
@@ -495,6 +502,12 @@ export default class InstancesEditor extends Component<Props, State> {
         this.highlightedInstance.getPixiObject()
       );
     }
+    if (this.hiddenInstancesDecorations) {
+      this.uiPixiContainer.removeChild(
+        this.hiddenInstancesDecorations.getPixiObject()
+      );
+      this.hiddenInstancesDecorations.delete();
+    }
     if (this.tileMapPaintingPreview) {
       this.uiPixiContainer.removeChild(
         this.tileMapPaintingPreview.getPixiObject()
@@ -597,6 +610,12 @@ export default class InstancesEditor extends Component<Props, State> {
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
       isInstanceOf3DObject: this.props.isInstanceOf3DObject,
     });
+    this.hiddenInstancesDecorations = new HiddenInstancesDecorations({
+      instances: props.initialInstances,
+      layersContainer: props.layersContainer,
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
+      toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+    });
     this.instancesResizer = new InstancesResizer({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       instancesEditorSettings: this.props.instancesEditorSettings,
@@ -632,6 +651,9 @@ export default class InstancesEditor extends Component<Props, State> {
     this.uiPixiContainer.addChild(this.windowMask.getPixiObject());
     this.uiPixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.uiPixiContainer.addChild(this.highlightedInstance.getPixiObject());
+    this.uiPixiContainer.addChild(
+      this.hiddenInstancesDecorations.getPixiObject()
+    );
     this.uiPixiContainer.addChild(this.tileMapPaintingPreview.getPixiObject());
     this.uiPixiContainer.addChild(this.clickInterceptor.getPixiObject());
     this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
@@ -650,10 +672,18 @@ export default class InstancesEditor extends Component<Props, State> {
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 
+    if (this._stopNativeAppActivity) {
+      this._stopNativeAppActivity();
+      this._stopNativeAppActivity = null;
+    }
+
     // We've seen all those elements being undefined in some cases, so
     // by security, check that they are defined before deleting them.
     if (this.selectionRectangle) {
       this.selectionRectangle.delete();
+    }
+    if (this.hiddenInstancesDecorations) {
+      this.hiddenInstancesDecorations.delete();
     }
     if (this.instancesRenderer) {
       this.instancesRenderer.delete();
@@ -1255,15 +1285,6 @@ export default class InstancesEditor extends Component<Props, State> {
     if (!shouldMoveView) {
       this.selectionRectangle.startSelectionRectangle(x, y);
     }
-
-    if (
-      !this.keyboardShortcuts.shouldMultiSelect() &&
-      !shouldMoveView &&
-      this.props.instancesSelection.hasSelectedInstances()
-    ) {
-      this.props.instancesSelection.clearSelection();
-      this.props.onInstancesSelected([]);
-    }
   };
 
   _onPanMove = (deltaX: number, deltaY: number, x: number, y: number) => {
@@ -1807,6 +1828,7 @@ export default class InstancesEditor extends Component<Props, State> {
         this.canvasCursor.render();
         this.grid.render();
         this.highlightedInstance.render();
+        this.hiddenInstancesDecorations.render();
         this.tileMapPaintingPreview.render();
         this.clickInterceptor.render();
         this.selectedInstances.render();

@@ -5,12 +5,8 @@ import {
   type AiRequestFunctionCallOutput,
 } from '../../Utils/GDevelopServices/Generation';
 import { type EditorFunctionCallResult } from '../../EditorFunctions';
-import CircularProgress from '../../UI/CircularProgress';
-import { Tooltip } from '@material-ui/core';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
-import Check from '../../UI/CustomSvgIcons/Check';
-import Error from '../../UI/CustomSvgIcons/Error';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import classes from './FunctionCallRow.module.css';
 import {
@@ -21,8 +17,6 @@ import {
   type EditorCallbacks,
 } from '../../EditorFunctions';
 import { LineStackLayout } from '../../UI/Layout';
-import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
-import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
 import { AiRequestContext } from '../AiRequestContext';
@@ -33,14 +27,12 @@ import {
 } from '../AiRequestUtils';
 import SubAgentInput from '../../UI/CustomSvgIcons/SubAgentInput';
 import SubAgentOutput from '../../UI/CustomSvgIcons/SubAgentOutput';
-
-const styles = {
-  functionCallText: {
-    // Anywhere because behavior names can be long and have no spaces.
-    overflowWrap: 'anywhere',
-    whiteSpace: 'pre-wrap',
-  },
-};
+import {
+  FunctionCallRowLayout,
+  FunctionCallStatusIcon,
+  type FunctionCallRowStatus,
+} from './FunctionCallRowLayout';
+import { RunScriptFunctionCallRow } from './RunScriptFunctionCallRow';
 
 type Props = {|
   project: ?gdProject,
@@ -48,6 +40,7 @@ type Props = {|
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,
   editorCallbacks: EditorCallbacks,
+  isRequestStopped?: boolean,
 |};
 
 export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
@@ -55,6 +48,18 @@ export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
     // If this is a sub-agent function call, render the sub-agent progress instead.
     if (props.functionCall.subAgentAiRequestId) {
       return <SubAgentFunctionCallRow {...props} />;
+    }
+    // Script-based agents: a `run_script` call renders its title + a folded
+    // view of the script source, the calls it made, its logs and any error.
+    if (props.functionCall.name === 'run_script') {
+      return (
+        <RunScriptFunctionCallRow
+          functionCall={props.functionCall}
+          editorFunctionCallResult={props.editorFunctionCallResult}
+          existingFunctionCallOutput={props.existingFunctionCallOutput}
+          isRequestStopped={props.isRequestStopped}
+        />
+      );
     }
     return <EditorFunctionCallRow {...props} />;
   }
@@ -66,10 +71,16 @@ const EditorFunctionCallRow = ({
   editorFunctionCallResult,
   existingFunctionCallOutput,
   editorCallbacks,
+  isRequestStopped,
 }: Props) => {
   const [showDetails, setShowDetails] = React.useState(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+  const { pendingEditApproval } = React.useContext(AiRequestContext);
+
+  const isAwaitingApproval =
+    !!pendingEditApproval &&
+    pendingEditApproval.callIds.includes(functionCall.call_id);
 
   let existingParsedOutput;
   try {
@@ -82,14 +93,17 @@ const EditorFunctionCallRow = ({
     existingParsedOutput = null;
   }
 
-  const isAborted =
-    (!!editorFunctionCallResult &&
-      editorFunctionCallResult.status === 'aborted') ||
-    (existingParsedOutput && !!existingParsedOutput.stopped);
   const isFinished =
     !!existingFunctionCallOutput ||
     (!!editorFunctionCallResult &&
       editorFunctionCallResult.status === 'finished');
+  const isAborted =
+    (!!editorFunctionCallResult &&
+      editorFunctionCallResult.status === 'aborted') ||
+    (existingParsedOutput && !!existingParsedOutput.stopped) ||
+    // The request was suspended before this call ran (no output): treat it as
+    // aborted rather than leaving a pending spinner.
+    (!!isRequestStopped && !isFinished);
   const functionCallResultIsErrored =
     editorFunctionCallResult &&
     editorFunctionCallResult.status === 'finished' &&
@@ -98,9 +112,20 @@ const EditorFunctionCallRow = ({
     functionCallResultIsErrored ||
     (existingParsedOutput && existingParsedOutput.success === false);
   const isWorking =
+    !isAwaitingApproval &&
     !isFinished &&
     !!editorFunctionCallResult &&
     editorFunctionCallResult.status === 'working';
+
+  const status: FunctionCallRowStatus = hasErrored
+    ? 'errored'
+    : isAborted
+    ? 'aborted'
+    : isFinished
+    ? 'finished'
+    : isWorking
+    ? 'working'
+    : 'pending';
 
   // Get the output from either the existing function call output or the current result
   const editorFunctionCallResultOutput = existingParsedOutput
@@ -164,76 +189,28 @@ const EditorFunctionCallRow = ({
     }
   }
 
-  const toggle = () => setShowDetails(v => !v);
-
   return (
-    <div className={classes.functionCallContainer}>
-      <div className={classes.functionCallRow}>
-        <Tooltip
-          title={JSON.stringify(
-            existingFunctionCallOutput || editorFunctionCallResult
-          )}
-        >
-          <span className={classes.statusIconContainer}>
-            {hasErrored ? (
-              <Error htmlColor={gdevelopTheme.message.error} fontSize="small" />
-            ) : isAborted ? (
-              <Error
-                htmlColor={gdevelopTheme.text.color.disabled}
-                fontSize="small"
-              />
-            ) : isFinished ? (
-              <Check htmlColor={gdevelopTheme.message.valid} fontSize="small" />
-            ) : (
-              <CircularProgress
-                size={16}
-                value={100}
-                variant={isWorking ? 'indeterminate' : 'determinate'}
-              />
-            )}
-          </span>
-        </Tooltip>
-        <div
-          className={
-            hasDetailsToShow
-              ? `${classes.functionCallTextArea} ${
-                  classes.functionCallTextAreaClickable
-                }`
-              : classes.functionCallTextArea
-          }
-          onClick={hasDetailsToShow ? toggle : undefined}
-          role={hasDetailsToShow ? 'button' : undefined}
-          tabIndex={hasDetailsToShow ? 0 : undefined}
-          onKeyDown={
-            hasDetailsToShow
-              ? e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggle();
-                  }
-                }
-              : undefined
-          }
-        >
-          <Text
-            size="body-small"
-            color="secondary"
-            // $FlowFixMe[incompatible-type]
-            style={styles.functionCallText}
-          >
-            {text || <Trans>Working...</Trans>}
+    <>
+      <FunctionCallRowLayout
+        icon={<FunctionCallStatusIcon status={status} />}
+        label={text || <Trans>Working...</Trans>}
+        tooltip={
+          existingFunctionCallOutput || editorFunctionCallResult
+            ? JSON.stringify(
+                existingFunctionCallOutput || editorFunctionCallResult
+              )
+            : undefined
+        }
+        isExpandable={hasDetailsToShow}
+        isExpanded={showDetails}
+        onToggleExpanded={() => setShowDetails(shown => !shown)}
+      >
+        {details && (
+          <Text noMargin size="body-small" color="secondary">
+            {details}
           </Text>
-          {hasDetailsToShow && (
-            <div className={classes.chevron}>
-              {showDetails ? (
-                <ChevronArrowBottom fontSize="small" />
-              ) : (
-                <ChevronArrowRight fontSize="small" />
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+        )}
+      </FunctionCallRowLayout>
       {newlyAddedResourcesNames && newlyAddedResourcesNames.length > 0 && (
         <div className={classes.addedResourcesContainer}>
           <LineStackLayout noMargin alignItems="center">
@@ -249,14 +226,7 @@ const EditorFunctionCallRow = ({
           </LineStackLayout>
         </div>
       )}
-      {showDetails && details && (
-        <div className={classes.detailsContent}>
-          <Text noMargin size="body-small" color="secondary">
-            {details}
-          </Text>
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
@@ -279,12 +249,13 @@ const SubAgentFunctionCallRow = ({
   functionCall,
   existingFunctionCallOutput,
   editorCallbacks,
+  isRequestStopped,
 }: Props) => {
   const [showDetails, setShowDetails] = React.useState(false);
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {
     aiRequestStorage,
     editorFunctionCallResultsStorage,
+    pendingEditApproval,
   } = React.useContext(AiRequestContext);
   const { aiRequests } = aiRequestStorage;
   const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
@@ -300,6 +271,10 @@ const SubAgentFunctionCallRow = ({
   } catch (error) {
     existingParsedOutput = null;
   }
+
+  const isAwaitingApproval =
+    !!pendingEditApproval &&
+    pendingEditApproval.aiRequestId === subAgentAiRequestId;
 
   const isStopped = existingParsedOutput && !!existingParsedOutput.stopped;
   const hasErrored =
@@ -327,9 +302,20 @@ const SubAgentFunctionCallRow = ({
       (subAgentRequest.status === 'ready' ||
         subAgentRequest.status === 'error'));
   const isWorking =
+    !isAwaitingApproval &&
     !isFinished &&
     ((subAgentRequest && subAgentRequest.status === 'working') ||
       hasWorkInProgress);
+
+  const status: FunctionCallRowStatus = hasErrored
+    ? 'errored'
+    : isStopped
+    ? 'aborted'
+    : isFinished
+    ? 'finished'
+    : isWorking
+    ? 'working'
+    : 'pending';
 
   const editorFunction =
     editorFunctions[functionCall.name] ||
@@ -430,62 +416,16 @@ const SubAgentFunctionCallRow = ({
     [subAgentRequest, subAgentAiRequestId, getEditorFunctionCallResults]
   );
 
-  const toggle = () => setShowDetails(v => !v);
-
   return (
-    <div className={classes.functionCallContainer}>
-      <div className={classes.functionCallRow}>
-        <span className={classes.statusIconContainer}>
-          {hasErrored ? (
-            <Error htmlColor={gdevelopTheme.message.error} fontSize="small" />
-          ) : isStopped ? (
-            <Error
-              htmlColor={gdevelopTheme.text.color.disabled}
-              fontSize="small"
-            />
-          ) : isFinished ? (
-            <Check htmlColor={gdevelopTheme.message.valid} fontSize="small" />
-          ) : (
-            <CircularProgress
-              size={16}
-              value={100}
-              variant={isWorking ? 'indeterminate' : 'determinate'}
-            />
-          )}
-        </span>
-        <div
-          className={`${classes.functionCallTextArea} ${
-            classes.functionCallTextAreaClickable
-          }`}
-          onClick={toggle}
-          role="button"
-          tabIndex={0}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              toggle();
-            }
-          }}
-        >
-          <Text
-            size="body-small"
-            color="secondary"
-            // $FlowFixMe[incompatible-type]
-            style={styles.functionCallText}
-          >
-            {text || <Trans>Working...</Trans>}
-          </Text>
-          <div className={classes.chevron}>
-            {showDetails ? (
-              <ChevronArrowBottom fontSize="small" />
-            ) : (
-              <ChevronArrowRight fontSize="small" />
-            )}
-          </div>
-        </div>
-      </div>
-      {showDetails && (subAgentPrompt || subAgentItems.length > 0) && (
-        <div className={classes.detailsContent}>
+    <FunctionCallRowLayout
+      icon={<FunctionCallStatusIcon status={status} />}
+      label={text || <Trans>Working...</Trans>}
+      isExpandable
+      isExpanded={showDetails}
+      onToggleExpanded={() => setShowDetails(shown => !shown)}
+    >
+      {(subAgentPrompt || subAgentItems.length > 0) && (
+        <>
           {subAgentPrompt && (
             <SubAgentTextRow
               key={`sub-${subAgentAiRequestId}-prompt`}
@@ -495,13 +435,21 @@ const SubAgentFunctionCallRow = ({
           )}
           {subAgentItems.map(item =>
             item.type === 'function_call' ? (
-              <EditorFunctionCallRow
+              // Route through the dispatcher (not EditorFunctionCallRow
+              // directly) so a sub-agent's `run_script` child call gets the
+              // rich RunScriptFunctionCallRow (code/records/logs). In v12,
+              // run_script exists ONLY on sub-agents, so this is the path that
+              // matters.
+              <FunctionCallRow
                 project={project}
                 key={item.key}
                 functionCall={item.messageContent}
                 editorFunctionCallResult={item.editorFunctionCallResult}
                 existingFunctionCallOutput={item.existingFunctionCallOutput}
                 editorCallbacks={editorCallbacks}
+                isRequestStopped={
+                  isRequestStopped || !!isStopped || !!hasErrored
+                }
               />
             ) : (
               <SubAgentTextRow
@@ -511,9 +459,9 @@ const SubAgentFunctionCallRow = ({
               />
             )
           )}
-        </div>
+        </>
       )}
-    </div>
+    </FunctionCallRowLayout>
   );
 };
 
@@ -526,53 +474,20 @@ const SubAgentTextRow = ({
 |}) => {
   const [showDetails, setShowDetails] = React.useState(false);
 
-  const firstLine = text.split('\n')[0];
-  const truncatedLabel =
-    firstLine.length > 80 ? firstLine.substring(0, 80) + '...' : firstLine;
-
-  const toggle = () => setShowDetails(v => !v);
-
   return (
-    <div className={classes.functionCallContainer}>
-      <div className={classes.functionCallRow}>
-        <span className={classes.statusIconContainer}>
-          {textType === 'output' ? (
-            <SubAgentOutput fontSize="small" />
-          ) : textType === 'prompt' ? (
-            <SubAgentInput fontSize="small" />
-          ) : null}
-        </span>
-        <div
-          className={`${classes.functionCallTextArea} ${
-            classes.functionCallTextAreaClickable
-          }`}
-          onClick={toggle}
-          role="button"
-          tabIndex={0}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              toggle();
-            }
-          }}
-        >
-          <Text
-            size="body-small"
-            color="secondary"
-            // $FlowFixMe[incompatible-type]
-            style={styles.functionCallText}
-          >
-            {showDetails ? text : truncatedLabel}
-          </Text>
-          <div className={classes.chevron}>
-            {showDetails ? (
-              <ChevronArrowBottom fontSize="small" />
-            ) : (
-              <ChevronArrowRight fontSize="small" />
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+    <FunctionCallRowLayout
+      icon={
+        textType === 'output' ? (
+          <SubAgentOutput fontSize="small" />
+        ) : (
+          <SubAgentInput fontSize="small" />
+        )
+      }
+      label={showDetails ? text : text.split('\n')[0]}
+      labelOnOneLine={!showDetails}
+      isExpandable
+      isExpanded={showDetails}
+      onToggleExpanded={() => setShowDetails(shown => !shown)}
+    />
   );
 };

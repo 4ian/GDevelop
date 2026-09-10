@@ -7,6 +7,7 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
   type EditorStateForProject,
   type EditorStateForProjectUpdate,
+  type EditorStateForPropertyPanel,
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
@@ -88,7 +89,7 @@ export const getInitialPreferences = (): {
   autoDisplayChangelog: boolean,
   autoDownloadUpdates: boolean,
   autoOpenMostRecentProject: boolean,
-  automaticallyApplyAiRequestEdits: boolean,
+  automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
   automaticallyUseCreditsForAiRequests: boolean,
   autosaveOnPreview: boolean,
   backdropClickBehavior: string,
@@ -133,6 +134,8 @@ export const getInitialPreferences = (): {
   showExperimentalExtensions: boolean,
   showInAppTutorialDeveloperMode: boolean,
   takeScreenshotOnPreview: boolean,
+  gameplayTestFramePosition: {| left: number, bottom: number |} | null,
+  gameplayTestFrameZoomFactor: number | null,
   themeName: any,
   use3DEditor: any,
   useBackgroundSerializerForSaving: boolean,
@@ -395,6 +398,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
+    setGameplayTestFramePosition: (this._setGameplayTestFramePosition.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setGameplayTestFrameZoomFactor: (this._setGameplayTestFrameZoomFactor.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
     setShowAiAskButtonInTitleBar: (this._setShowAiAskButtonInTitleBar.bind(
       this
     ): any),
@@ -403,7 +414,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
-    setAutomaticallyApplyAiRequestEdits: (this._setAutomaticallyApplyAiRequestEdits.bind(
+    setAutomaticallyApplyAiRequestEditsForProjectId: (this._setAutomaticallyApplyAiRequestEditsForProjectId.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
@@ -1300,10 +1311,24 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     const editorState = this.state.values.editorStateByProject[projectId];
     if (!editorState) return null;
 
+    const defaultState: EditorStateForPropertyPanel = {
+      scrollPosition: 0,
+      collapsedSections: {},
+    };
+    for (const panelType in editorState.propertiesPanel) {
+      const states = editorState.propertiesPanel[panelType];
+      for (const id in states) {
+        states[id] = {
+          ...defaultState,
+          ...states[id],
+        };
+      }
+    }
+
     return {
       editorTabs:
         editorState.editorTabs == null ? null : editorState.editorTabs,
-      propertiesPanelScroll: editorState.propertiesPanelScroll || {},
+      propertiesPanel: editorState.propertiesPanel || {},
     };
   }
 
@@ -1324,7 +1349,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
             projectId
           ] || {
             editorTabs: null,
-            propertiesPanelScroll: {},
+            propertiesPanel: {},
           };
           const mergedEditorState: EditorStateForProject = {
             ...previousEditorState,
@@ -1393,6 +1418,30 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setGameplayTestFramePosition(newValue: {| left: number, bottom: number |}) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          gameplayTestFramePosition: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setGameplayTestFrameZoomFactor(newValue: number) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          gameplayTestFrameZoomFactor: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _setShowAiAskButtonInTitleBar(newValue: boolean) {
     this.setState(
       state => ({
@@ -1417,12 +1466,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setAutomaticallyApplyAiRequestEdits(newValue: boolean) {
+  _setAutomaticallyApplyAiRequestEditsForProjectId(
+    projectId: string,
+    newValue: boolean
+  ) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          automaticallyApplyAiRequestEdits: newValue,
+          automaticallyApplyAiRequestEditsByProjectId: {
+            ...state.values.automaticallyApplyAiRequestEditsByProjectId,
+            [projectId]: newValue,
+          },
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

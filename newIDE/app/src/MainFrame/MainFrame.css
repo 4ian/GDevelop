@@ -91,6 +91,11 @@ body {
   padding-left: var(--safe-area-inset-left);
 }
 
+/* Add right padding to fit on screen, useful for drawers on non square screens ("notch"). */
+.safe-area-aware-right-container {
+  padding-right: var(--safe-area-inset-right);
+}
+
 /* Helper for avoiding the soft keyboard. See also `getAvoidSoftKeyboardStyle`. */
 .avoid-soft-keyboard {
   transform: translateY(calc(-1 * var(--softKeyboardBottomOffset)));
@@ -115,12 +120,4 @@ a[href^="https://"],
 a[href^="ftp://"] {
     -webkit-user-drag: auto;
     user-drag: auto; /* Technically not supported in Electron yet */
-}
-
-/* Used for react-sortable-hoc SortableContainer, to make sure the
- * dragged element is visible (and not hidden behind a drawer or dialog)
- */
-.sortable-helper {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif; /* Font from the theme*/
-  z-index: 9999;
 }

@@ -1,5 +1,4 @@
 // @flow
-import 'pixi-spine';
 import RenderedUnknownInstance from './Renderers/RenderedUnknownInstance';
 import RenderedSpriteInstance from './Renderers/RenderedSpriteInstance';
 import RenderedTiledSpriteInstance from './Renderers/RenderedTiledSpriteInstance';
@@ -15,8 +14,7 @@ import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
 import Rendered3DInstance from './Renderers/Rendered3DInstance';
-import * as PIXI_LEGACY from 'pixi.js-legacy';
-import * as PIXI_SPINE from 'pixi-spine';
+import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 import optionalRequire from '../Utils/OptionalRequire';
@@ -28,11 +26,14 @@ import {
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const gd: libGDevelop = global.gd;
-const PIXI = { ...PIXI_LEGACY, ...PIXI_SPINE };
-
 // Some PixiJS plugins like pixi-tilemap are not distributed as UMD modules,
 // or still require a global PIXI object to be accessible, so we expose PIXI here.
 // This can be removed if no more extension PixiJS plugin requires this.
+// Note: the spine runtime (@esotericsoftware/spine-pixi-v7) is intentionally NOT
+// merged in here. It is consumed through direct imports in PixiResourcesLoader,
+// and merging it would shadow PixiJS's `Texture`/`Color` (spine's `Texture` has
+// no `.from`, which breaks `PIXI.Texture.from(...)` calls made by extensions like
+// Lighting).
 global.PIXI = PIXI;
 
 const requirableModules = {};

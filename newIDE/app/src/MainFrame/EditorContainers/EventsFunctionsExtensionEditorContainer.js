@@ -4,11 +4,14 @@ import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
   setEditorHotReloadNeeded,
@@ -31,6 +34,7 @@ const styles = {
 
 export class EventsFunctionsExtensionEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsFunctionsExtensionEditor;
+  _blurTimeOutId: any = null;
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -122,6 +126,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
     // No thing to be done.
   }
 
@@ -232,6 +240,28 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
       this.editor.selectEventsBasedBehaviorByName(eventBasedBehaviorName);
   }
 
+  selectEventsBasedObjectByName(eventBasedObjectName: string) {
+    if (this.editor)
+      this.editor.selectEventsBasedObjectByName(eventBasedObjectName);
+  }
+
+  _onBlur = () => {
+    // We forward the event on the next tick by using setTimeout.
+    // This is necessary because we need to first check if
+    // another child of the element has received focus as
+    // the blur event fires prior to the new focus event.
+    this._blurTimeOutId = setTimeout(() => {
+      if (this.editor) {
+        this.editor.onFocusLost();
+      }
+    });
+  };
+
+  _onFocus = () => {
+    // If a child receives focus, do not forward the onBlur.
+    clearTimeout(this._blurTimeOutId);
+  };
+
   render(): any {
     const { project, projectItemName } = this.props;
     const eventsFunctionsExtension = this.getEventsFunctionsExtension();
@@ -248,7 +278,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     } = this.props.extraEditorProps || {};
 
     return (
-      <div style={styles.container}>
+      <div
+        style={styles.container}
+        onBlur={this._onBlur}
+        onFocus={this._onFocus}
+      >
         <EventsFunctionsExtensionEditor
           key={eventsFunctionsExtension.ptr}
           project={project}
@@ -263,6 +297,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onBehaviorEdited={this._reloadExtensionMetadata}
           onObjectEdited={this._reloadExtensionMetadata}
           onFunctionEdited={this._reloadExtensionMetadata}
+          gameplayTestsCallbacks={this.props.gameplayTestsCallbacks}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
           onOpenCustomObjectEditor={eventsBasedObject => {
@@ -278,6 +313,9 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           }
           onRenamedEventsBasedObject={this.props.onRenamedEventsBasedObject}
           onDeletedEventsBasedObject={this.props.onDeletedEventsBasedObject}
+          onEventsBasedObjectMoved={this.props.onEventsBasedObjectMoved}
+          onEventsBasedBehaviorMoved={this.props.onEventsBasedBehaviorMoved}
+          onEventsFunctionMoved={this.props.onEventsFunctionMoved}
           onWillInstallExtension={this.props.onWillInstallExtension}
           onExtensionInstalled={this.props.onExtensionInstalled}
           onEventBasedObjectTypeChanged={

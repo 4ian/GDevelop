@@ -19,6 +19,9 @@ import {
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { Trans } from '@lingui/macro';
 import { dataObjectToProps } from '../../../Utils/HTMLDataset';
+import UnsavedChangesContext, {
+  type UnsavedChanges,
+} from '../../../MainFrame/UnsavedChangesContext';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -39,6 +42,8 @@ export default class GroupEvent extends React.Component<
   EventRendererProps,
   any
 > {
+  static contextType: React.Context<UnsavedChanges> = UnsavedChangesContext;
+
   // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
@@ -116,6 +121,12 @@ export default class GroupEvent extends React.Component<
             onBlur={this.endEditing}
             onChange={(e, text) => {
               groupEvent.setName(text);
+
+              // The group is modified live as the user types, so flag the
+              // project as having unsaved changes immediately.
+              const unsavedChanges: UnsavedChanges = this.context;
+              unsavedChanges.triggerUnsavedChanges();
+
               this.forceUpdate();
             }}
             style={styles.title}

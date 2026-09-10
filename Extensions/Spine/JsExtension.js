@@ -54,8 +54,10 @@ module.exports = {
       .addDefaultBehavior('OpacityCapability::OpacityBehavior')
       .addDefaultBehavior('AnimatableCapability::AnimatableBehavior')
       .setIncludeFile('Extensions/Spine/spineruntimeobject.js')
+      .addIncludeFile('Extensions/Spine/spine-pixi-v7/A_spine-pixi-v7-pre.js')
+      .addIncludeFile('Extensions/Spine/spine-pixi-v7/B_spine-pixi-v7.js')
+      .addIncludeFile('Extensions/Spine/spine-pixi-v7/C_spine-pixi-v7-post.js')
       .addIncludeFile('Extensions/Spine/spineruntimeobject-pixi-renderer.js')
-      .addIncludeFile('Extensions/Spine/pixi-spine/pixi-spine.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-atlas-manager.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-manager.js')
       .setCategory('Advanced')
@@ -280,7 +282,7 @@ module.exports = {
     const { PIXI, RenderedInstance, gd } = objectsRenderingService;
 
     class RenderedSpineInstance extends RenderedInstance {
-      /** @type {pixi_spine.Spine | null} */
+      /** @type {spine.Spine | null} */
       _spine = null;
       /** @type {PIXI.Sprite} */
       _placeholder;
@@ -467,7 +469,8 @@ module.exports = {
         // if custom size is set it will be reinitialized in update method
         spine.scale.set(1, 1);
         spine.state.setAnimation(0, source, shouldLoop);
-        spine.state.tracks[0].trackTime = 0;
+        const newTrack = spine.state.tracks[0];
+        if (newTrack) newTrack.trackTime = 0;
         spine.update(0);
         spine.autoUpdate = false;
       }
@@ -497,49 +500,34 @@ module.exports = {
           gd.SpineObjectConfiguration
         );
         this._pixiResourcesLoader
-          .getSpineData(this._project, object.getSpineResourceName())
-          .then((spineDataOrLoadingError) => {
+          .createSpine(this._project, object.getSpineResourceName())
+          .then((spineInstance) => {
             if (this._wasDestroyed) return;
             if (this._spine) this._pixiObject.removeChild(this._spine);
 
-            if (!spineDataOrLoadingError.skeleton) {
-              console.error(
-                'Unable to load Spine (' +
-                  (spineDataOrLoadingError.loadingErrorReason ||
-                    'Unknown reason') +
-                  ')',
-                spineDataOrLoadingError.loadingError
-              );
+            if (!spineInstance) {
               this._spine = null;
               this._placeholder.alpha = 255;
               return;
             }
 
-            try {
-              this._spine = new PIXI.Spine(spineDataOrLoadingError.skeleton);
+            this._spine = spineInstance;
 
-              // Apply the default skin if configured.
-              const skinName = object.getSkinName();
-              if (skinName && this._spine) {
-                try {
-                  this._spine.skeleton.setSkinByName(skinName);
-                  this._spine.skeleton.setSlotsToSetupPose();
-                } catch (skinError) {
-                  console.warn(
-                    'Unable to set skin "' + skinName + '":',
-                    skinError
-                  );
-                }
+            const skinName = object.getSkinName();
+            if (skinName) {
+              try {
+                spineInstance.skeleton.setSkinByName(skinName);
+                spineInstance.skeleton.setSlotsToSetupPose();
+              } catch (skinError) {
+                console.warn(
+                  'Unable to set skin "' + skinName + '":',
+                  skinError
+                );
               }
-
-              this._pixiObject.addChild(this._spine);
-              this._placeholder.alpha = 0;
-            } catch (error) {
-              console.error('Exception while loading Spine.', error);
-              this._spine = null;
-              this._placeholder.alpha = 255;
-              return;
             }
+
+            this._pixiObject.addChild(spineInstance);
+            this._placeholder.alpha = 0;
           });
       }
     }

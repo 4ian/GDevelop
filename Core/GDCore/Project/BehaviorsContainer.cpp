@@ -107,6 +107,12 @@ gd::Behavior *BehaviorsContainer::AddNewBehavior(const gd::Project &project,
   }
 }
 
+gd::Behavior *BehaviorsContainer::AddBehavior(const gd::Behavior &behavior,
+                                              const gd::String &name) {
+  behaviors[name] = std::move(behavior.Clone());
+  return behaviors[name].get();
+}
+
 void BehaviorsContainer::UnserializeFrom(gd::Project &project,
                                          const SerializerElement &element) {
   element.ConsiderAsArrayOf("behavior", "automatism");

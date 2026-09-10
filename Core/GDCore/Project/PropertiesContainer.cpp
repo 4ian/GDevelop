@@ -18,7 +18,7 @@ PropertiesContainer::PropertiesContainer(const PropertiesContainer &other)
     : properties(other.properties), owner(other.owner) {
   // The properties folders are not copied.
   // It's not an issue because the UI uses the serialization for duplication.
-  rootFolder = gd::make_unique<gd::PropertyFolderOrProperty>("__ROOT");
+  rootFolder = gd::make_unique<gd::PropertyFolderOrProperty>("__ROOT");;
 }
 
 PropertiesContainer &

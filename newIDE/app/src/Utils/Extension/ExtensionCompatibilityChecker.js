@@ -66,8 +66,7 @@ export const formatBreakingChanges = (
   return formattedChanges;
 };
 
-// $FlowFixMe[missing-local-annot]
-const formatChange = (change: string, indentation) =>
+const formatChange = (change: string, indentation: string) =>
   indentation + change.replace(/\n/g, '\n' + indentation) + '\n';
 
 export const formatOldBreakingChanges = (

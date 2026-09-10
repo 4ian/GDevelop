@@ -51,4 +51,31 @@ describe('SafeExtractor', () => {
       );
     });
   });
+
+  describe('extractStringArrayProperty', () => {
+    test('returns only the string items of an array property', () => {
+      expect(
+        SafeExtractor.extractStringArrayProperty(
+          { names: ['a', 'b', 2, null, {}, 'c'] },
+          'names'
+        )
+      ).toEqual(['a', 'b', 'c']);
+    });
+    test('returns an empty array when the property is an empty array', () => {
+      expect(
+        SafeExtractor.extractStringArrayProperty({ names: [] }, 'names')
+      ).toEqual([]);
+    });
+    test('returns null when the property is missing or not an array', () => {
+      expect(SafeExtractor.extractStringArrayProperty({}, 'names')).toEqual(
+        null
+      );
+      expect(
+        SafeExtractor.extractStringArrayProperty({ names: 'a,b' }, 'names')
+      ).toEqual(null);
+      expect(SafeExtractor.extractStringArrayProperty(null, 'names')).toEqual(
+        null
+      );
+    });
+  });
 });

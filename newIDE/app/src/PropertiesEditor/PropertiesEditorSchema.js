@@ -9,6 +9,7 @@ export type Instance = Object; // This could be improved using generics.
 export type Instances = Array<Instance>;
 
 export type FieldVisibility = 'basic' | 'advanced' | 'deprecated';
+export type FieldDisablingMethod = 'never' | 'always' | 'onValuesDifferent';
 
 // "Value" fields are fields displayed in the properties.
 export type ValueFieldCommonProperties = {|
@@ -20,7 +21,7 @@ export type ValueFieldCommonProperties = {|
   getExtraDescription?: Instance => string,
   hasImpactOnAllOtherFields?: boolean,
   canBeUnlimitedUsingMinus1?: boolean,
-  disabled?: (instances: Array<Instance>) => boolean,
+  disabled?: (instances: Array<Instance>) => FieldDisablingMethod,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
   getValueFromDisplayedValue?: string => string,
@@ -89,6 +90,15 @@ export type PrimitiveValueField =
       valueType: 'color',
       getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
+      /** A number of which each bit is displayed as a toggle. */
+      valueType: 'bitmask',
+      getValue: Instance => number,
+      setValue: (instance: Instance, newValue: number) => void,
+      firstBit: number,
+      bitCount: number,
       ...ValueFieldCommonProperties,
     |}
   | {|

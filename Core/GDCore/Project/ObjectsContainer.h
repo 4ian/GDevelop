@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <unordered_map>
 #include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
@@ -173,14 +174,10 @@ class GD_CORE_API ObjectsContainer {
   void Clear();
 
   /**
-   * Provide a raw access to the vector containing the objects
-   */
-  std::vector<std::unique_ptr<gd::Object> >& GetObjects() {
-    return initialObjects;
-  }
-
-  /**
-   * Provide a raw access to the vector containing the objects
+   * Provide a read-only access to the vector containing the objects.
+   *
+   * \note Objects must only be added, removed or moved using the methods of
+   * this class, so that the index of objects by name is kept up-to-date.
    */
   const std::vector<std::unique_ptr<gd::Object> >& GetObjects() const {
     return initialObjects;
@@ -254,6 +251,25 @@ class GD_CORE_API ObjectsContainer {
   SourceType sourceType = Unknown;
   std::unique_ptr<gd::ObjectFolderOrObject> rootFolder;
   gd::MemoryTracked _memoryTracked{this, "ObjectsContainer"};
+
+  /**
+   * Objects indexed by name, for fast lookups. Lazily (re)built by
+   * `FindObject` when marked as outdated (after any change to `initialObjects`)
+   * or when any object was renamed (see gd::Object::GetNameGeneration).
+   */
+  mutable std::unordered_map<gd::String, gd::Object*> objectsByName;
+  mutable std::size_t objectsByNameGeneration = 0;
+  mutable bool objectsByNameUpToDate = false;
+
+  /**
+   * Return the object called \a name, or nullptr if not found.
+   */
+  gd::Object* FindObject(const gd::String& name) const;
+
+  /**
+   * Must be called after any change to `initialObjects`.
+   */
+  void InvalidateObjectsByName() { objectsByNameUpToDate = false; }
 
   /**
    * Initialize from another variables container, copying elements. Used by

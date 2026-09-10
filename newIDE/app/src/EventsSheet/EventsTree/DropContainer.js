@@ -21,12 +21,6 @@ const sharedStyles = {
     border: '2px solid black',
     outline: '1px solid white',
   },
-  autoScroll: {
-    width: '100%',
-    position: 'absolute',
-    height: '10%',
-    zIndex: 2,
-  },
 };
 
 type DropTargetContainerStyle = {|
@@ -329,70 +323,5 @@ export function DropContainer({
         />
       )}
     </div>
-  );
-}
-
-export function AutoScroll({
-  direction,
-  DnDComponent,
-  activateTargets,
-  onHover,
-}: {|
-  direction: 'top' | 'bottom',
-  DnDComponent: DropTargetComponent<SortableTreeNode>,
-  activateTargets: boolean,
-  onHover: () => void,
-|}): React.MixedElement {
-  const delayActivationTimer = React.useRef<?TimeoutID>(null);
-  const [show, setShow] = React.useState(false);
-
-  // This drop target overlaps with sibling drag source and cancels drag immediately.
-  // See: https://github.com/react-dnd/react-dnd/issues/766#issuecomment-388943403
-  // Delaying the render of the drop target seems to solve the issue.
-  React.useEffect(
-    () => {
-      if (activateTargets) {
-        delayActivationTimer.current = setTimeout(() => {
-          setShow(true);
-        }, 100);
-      } else {
-        setShow(false);
-        clearTimeout(delayActivationTimer.current);
-        delayActivationTimer.current = null;
-      }
-      return () => {
-        delayActivationTimer.current &&
-          clearTimeout(delayActivationTimer.current);
-      };
-    },
-    [activateTargets]
-  );
-
-  return (
-    <DnDComponent
-      canDrop={() => true}
-      drop={() => {
-        return;
-      }}
-    >
-      {({ isOverLazy, connectDropTarget }) => {
-        if (isOverLazy) {
-          onHover();
-        }
-        const dropTarget = (
-          <div
-            style={{
-              ...sharedStyles.autoScroll,
-              ...(direction === 'top' ? { top: 0 } : { bottom: 0 }),
-
-              // Uncomment for debugging purposes.
-              // backgroundColor: 'black',
-              // opacity: isOverLazy ? 1 : 0,
-            }}
-          />
-        );
-        return show ? connectDropTarget(dropTarget) : null;
-      }}
-    </DnDComponent>
   );
 }

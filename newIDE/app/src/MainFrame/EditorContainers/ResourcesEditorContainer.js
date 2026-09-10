@@ -3,11 +3,14 @@ import React from 'react';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 import ResourcesEditor from '../../ResourcesEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -85,6 +88,10 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
     // No thing to be done.
   }
 

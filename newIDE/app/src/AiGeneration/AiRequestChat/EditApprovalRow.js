@@ -2,53 +2,78 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
-import RaisedButton from '../../UI/RaisedButton';
-import FlatButton from '../../UI/FlatButton';
-import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import HelpQuestion from '../../UI/CustomSvgIcons/HelpQuestion';
+import Check from '../../UI/CustomSvgIcons/Check';
+import Cross from '../../UI/CustomSvgIcons/Cross';
+import Edit from '../../UI/CustomSvgIcons/Edit';
+import Sparkle from '../../UI/CustomSvgIcons/Sparkle';
+import { ChatActionButton } from './ChatActionButton';
 import { type EditApprovalRequest } from '../Utils';
+import classes from './EditApprovalRow.module.css';
 
 type Props = {|
   pendingEditApproval: EditApprovalRequest,
   onResolveEditApproval: (accepted: boolean) => void,
+  onAcceptAndEnableAutoEdit: () => void,
 |};
 
 const styles = {
-  icon: {
-    fontSize: 14,
-    flexShrink: 0,
-    marginTop: 1,
+  label: {
+    // Anywhere because the label can contain long object or scene names.
+    overflowWrap: 'anywhere',
+    fontWeight: 'bold',
   },
 };
 
 /**
  * Inline confirmation shown in the chat when auto-edit is off and the AI is
- * about to modify the project. The first line ("Apply this change: …", styled
- * like the chat's status line) wraps as needed; the second line holds the
- * No (suspends the request so the user can redirect) / Yes (runs the edit and
- * the rest of that edit agent's tools) buttons.
+ * about to modify the project.
  */
 export const EditApprovalRow = ({
   pendingEditApproval,
   onResolveEditApproval,
+  onAcceptAndEnableAutoEdit,
 }: Props): React.Node => (
-  <ColumnStackLayout noMargin>
-    <LineStackLayout noMargin alignItems="flex-start">
-      <HelpQuestion style={styles.icon} />
+  <div className={classes.container}>
+    <div className={classes.header}>
+      <span className={classes.iconBadge}>
+        <Edit fontSize="inherit" />
+      </span>
       <Text noMargin size="body-small" color="secondary">
-        <Trans>Apply this change:</Trans> {pendingEditApproval.label}
+        <Trans>The AI wants to edit your project</Trans>
       </Text>
-    </LineStackLayout>
-    <LineStackLayout noMargin alignItems="center">
-      <FlatButton
-        label={<Trans>No</Trans>}
-        onClick={() => onResolveEditApproval(false)}
-      />
-      <RaisedButton
-        primary
-        label={<Trans>Yes</Trans>}
+    </div>
+    <Text
+      noMargin
+      size="body-small"
+      // $FlowFixMe[incompatible-type]
+      style={styles.label}
+    >
+      {pendingEditApproval.label}
+    </Text>
+    <div className={classes.actions}>
+      <ChatActionButton
+        emphasis="primary"
+        icon={<Check fontSize="inherit" />}
+        label={<Trans>Apply</Trans>}
         onClick={() => onResolveEditApproval(true)}
       />
-    </LineStackLayout>
-  </ColumnStackLayout>
+      <ChatActionButton
+        icon={<Sparkle fontSize="inherit" />}
+        label={<Trans>Always apply</Trans>}
+        tooltip={
+          <Trans>
+            Apply this change and turn on auto edit, so the next changes are
+            applied without asking.
+          </Trans>
+        }
+        onClick={onAcceptAndEnableAutoEdit}
+      />
+      <ChatActionButton
+        emphasis="quiet"
+        icon={<Cross fontSize="inherit" />}
+        label={<Trans>Don't apply</Trans>}
+        onClick={() => onResolveEditApproval(false)}
+      />
+    </div>
+  </div>
 );

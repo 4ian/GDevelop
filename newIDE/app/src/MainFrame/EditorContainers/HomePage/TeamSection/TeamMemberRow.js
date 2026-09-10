@@ -10,7 +10,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { LineStackLayout } from '../../../../UI/Layout';
 import Text from '../../../../UI/Text';
-import DragHandle from '../../../../UI/DragHandle';
+import { DragHandleIcon } from '../../../../UI/DragHandle';
 import FlatButton from '../../../../UI/FlatButton';
 import { makeDragSourceAndDropTarget } from '../../../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -32,7 +32,9 @@ const styles = {
   copyIconContainer: { opacity: 0.7, display: 'flex' },
 };
 
-const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{}>('team-groups');
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{}>('team-groups', {
+  touchDragStart: 'immediate',
+});
 
 type Props = {|
   member: User,
@@ -94,7 +96,7 @@ const TeamMemberRow = ({
               <LineStackLayout noMargin alignItems="center">
                 {connectDragSource(
                   <div>
-                    <DragHandle />
+                    <DragHandleIcon />
                   </div>
                 )}
                 {connectDragPreview(

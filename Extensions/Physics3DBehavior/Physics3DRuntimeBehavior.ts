@@ -264,6 +264,17 @@ namespace gdjs {
       }
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.updateBodyFromObject();
+        const owner = physicsBehavior.owner3D;
+        if (physicsBehavior.isKinematic() && owner.hasEstimatedVelocity()) {
+          // Set the velocity declared by other movement behavior to allow
+          // realistic collision forces.
+          // It's only done for kinematic bodies because:
+          // - static bodies are not supposed to move
+          // - dynamics bodies are meant to only be moved by physics
+          physicsBehavior.setLinearVelocityX(owner.getEstimatedVelocityX());
+          physicsBehavior.setLinearVelocityY(owner.getEstimatedVelocityY());
+          physicsBehavior.setLinearVelocityZ(owner.getEstimatedVelocityZ());
+        }
       }
       for (const physics3DHook of this._physics3DHooks) {
         physics3DHook.doBeforePhysicsStep(deltaTime);
@@ -277,7 +288,12 @@ namespace gdjs {
       // called at the same time because other behavior may move the object in
       // their doStepPreEvents.
       for (const physicsBehavior of this._registeredBehaviors) {
-        physicsBehavior.updateObjectFromBody();
+        const owner = physicsBehavior.owner3D;
+        // Only move the object if no other movement behavior already did it.
+        if (!physicsBehavior.isKinematic() || !owner.hasEstimatedVelocity()) {
+          physicsBehavior.updateObjectFromBody();
+        }
+        owner.resetEstimatedVelocity();
       }
     }
 

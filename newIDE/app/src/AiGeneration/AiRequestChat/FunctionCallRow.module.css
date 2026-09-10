@@ -1,51 +1,3 @@
-.functionCallContainer {
-  display: flex;
-  flex-direction: column;
-}
-
-.functionCallRow {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.statusIconContainer {
-  padding-top: 6px;
-  width: 16px;
-  flex-shrink: 0;
-}
-
-.functionCallTextArea {
-  display: flex;
-  align-items: flex-start;
-  flex: 1;
-  min-width: 0;
-}
-
-.functionCallTextAreaClickable {
-  cursor: pointer;
-}
-
-.functionCallTextAreaClickable:hover {
-  opacity: 0.8;
-}
-
-.functionCallTextAreaClickable:focus-visible {
-  outline: 2px solid;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-.chevron {
-  display: flex;
-  align-items: center;
-  opacity: 0.6;
-  padding: 0 2px;
-  padding-top: 6px;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
 .addedResourcesContainer {
   padding-left: 20px;
   user-select: all;
@@ -54,9 +6,4 @@
   align-items: center;
   gap: 4px;
   outline: none;
-}
-
-.detailsContent {
-  padding-left: 20px;
-  margin-top: 2px;
 }

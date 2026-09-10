@@ -41,6 +41,8 @@ import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
 import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
 import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
 import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
+import { type CompactTextFieldInterface } from '../../UI/CompactTextField';
+import { getChoiceDisplayLabel } from '../../Utils/ChoiceLabel';
 
 const gd: libGDevelop = global.gd;
 
@@ -179,6 +181,7 @@ const getChoicesArray = (
 export type EventsBasedBehaviorOrObjectPropertiesEditorInterface = {|
   forceUpdate: () => void,
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
+  focusOnProperty: (propertyName: string) => void,
 |};
 
 export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
@@ -210,10 +213,22 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
   ) => {
     const forceUpdate = useForceUpdate();
     const propertyRefs = React.useRef(new Map<string, React.ElementRef<any>>());
+    const propertyNameFieldRefs = React.useRef(
+      new Map<string, CompactTextFieldInterface | null>()
+    );
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
       getPropertyEditorRef: (propertyName: string) =>
         propertyRefs ? propertyRefs.current.get(propertyName) : null,
+      focusOnProperty: (propertyName: string) => {
+        const propertyNameField = propertyNameFieldRefs.current.get(
+          propertyName
+        );
+        if (propertyNameField) {
+          propertyNameField.focus();
+          propertyNameField.select();
+        }
+      },
     }));
 
     const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState<{
@@ -233,7 +248,6 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
         property.setType('Number');
         forceUpdate();
         onPropertiesUpdated();
-        //setJustAddedPropertyName(newName);
       },
       [forceUpdate, onPropertiesUpdated, properties]
     );
@@ -309,6 +323,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
     );
 
     propertyRefs.current.clear();
+    propertyNameFieldRefs.current.clear();
 
     return (
       <I18n>
@@ -349,6 +364,12 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                               <LineStackLayout expand noMargin>
                                 <Line noMargin expand alignItems="center">
                                   <CompactSemiControlledTextField
+                                    ref={ref => {
+                                      propertyNameFieldRefs.current.set(
+                                        property.getName(),
+                                        ref
+                                      );
+                                    }}
                                     commitOnBlur
                                     placeholder={i18n._(
                                       t`Enter the property name`
@@ -786,13 +807,10 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                           <SelectOption
                                             key={index}
                                             value={choice.value}
-                                            label={
-                                              choice.value +
-                                              (choice.label &&
-                                              choice.label !== choice.value
-                                                ? ` — ${choice.label}`
-                                                : '')
-                                            }
+                                            label={getChoiceDisplayLabel(
+                                              choice.value,
+                                              choice.label
+                                            )}
                                           />
                                         )
                                       )}
@@ -876,6 +894,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                     }}
                     onWillInstallExtension={onWillInstallExtension}
                     onExtensionInstalled={onExtensionInstalled}
+                    onCreateNewExtensionWithBehavior={null}
                     shouldShowCapabilityBehaviors={true}
                   />
                 )}

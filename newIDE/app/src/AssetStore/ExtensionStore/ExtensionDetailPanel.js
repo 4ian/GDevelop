@@ -164,13 +164,10 @@ export const useExtensionDetail = ({
         }
       }
       Window.openExternalURL(
-        `https://github.com/GDevelopApp/GDevelop-extensions/issues/new` +
-          `?assignees=&labels=&template=bug-report.yml&title=[${
-            extensionShortHeader.name
-          }] Issue short description`
+        'https://forum.gdevelop.io/c/gdevelop-general/bugs-reports/'
       );
     },
-    [extensionShortHeader.name, extensionUpdate, showOutOfDateAlert]
+    [extensionUpdate, showOutOfDateAlert]
   );
 
   const renderInstallButtonLabel = React.useCallback(

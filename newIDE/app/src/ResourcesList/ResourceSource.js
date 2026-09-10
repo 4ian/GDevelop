@@ -14,6 +14,7 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import { type ResourceExternalEditor } from './ResourceExternalEditor';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { type ResourceCustomPropertyConfig } from '../Utils/ProjectSettingsReader';
 
 const gd: libGDevelop = global.gd;
 
@@ -100,8 +101,8 @@ export const allResourceKindsAndMetadata = [
   },
   {
     kind: 'spine',
-    displayName: (t`Spine Json`: any),
-    fileExtensions: ['json'],
+    displayName: (t`Spine skeleton`: any),
+    fileExtensions: ['json', 'skel'],
     createNewResource: (): gdSpineResource => {
       return new gd.SpineResource();
     },
@@ -205,6 +206,7 @@ export type ResourceManagementProps = {|
   canInstallPrivateAsset: () => boolean,
   onNewResourcesAdded: () => void,
   onResourceUsageChanged: () => void,
+  resourceCustomPropertyConfigs: Array<ResourceCustomPropertyConfig>,
 |};
 
 export type ResourceStoreChooserProps = {|

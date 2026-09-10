@@ -27,6 +27,7 @@ type Props = {|
   setAiConfigurationPresetId: string => void,
   aiConfigurationPresetsWithAvailability: Array<AiConfigurationPresetWithAvailability>,
   disabled?: boolean,
+  showSelectedLabel?: boolean,
 |};
 
 const networkIcons = [NetworkLow, NetworkMedium, NetworkHigh, NetworkMaximum];
@@ -57,6 +58,12 @@ const styles = {
   },
   networkIcon: {
     fontSize: 20,
+  },
+  label: {
+    fontSize: 13,
+    fontFamily: 'var(--gdevelop-modern-font-family)',
+    whiteSpace: 'nowrap',
+    margin: '0 4px',
   },
   chevronIcon: {
     fontSize: 20,
@@ -96,6 +103,7 @@ export const ReasoningLevelSelector = ({
   setAiConfigurationPresetId,
   aiConfigurationPresetsWithAvailability,
   disabled,
+  showSelectedLabel,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const networkIconColor =
@@ -166,6 +174,19 @@ export const ReasoningLevelSelector = ({
                   <NetworkIcon
                     style={{ ...styles.networkIcon, color: networkIconColor }}
                   />
+                  {showSelectedLabel && currentPreset && (
+                    <span style={styles.label}>
+                      {currentPreset.reasoningLevelByLocale
+                        ? selectMessageByLocale(
+                            i18n,
+                            currentPreset.reasoningLevelByLocale
+                          )
+                        : selectMessageByLocale(
+                            i18n,
+                            currentPreset.nameByLocale
+                          )}
+                    </span>
+                  )}
                   <ChevronArrowBottom style={styles.chevronIcon} />
                 </ButtonBase>
               </span>

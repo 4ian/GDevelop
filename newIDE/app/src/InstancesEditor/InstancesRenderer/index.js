@@ -59,8 +59,7 @@ export default class InstancesRenderer {
   temporaryRectangle: Rectangle;
   instanceMeasurer: InstanceMeasurer;
 
-  // $FlowFixMe[missing-local-annot]
-  _basicProfilingCounters = (makeBasicProfilingCounters(): BasicProfilingCounters);
+  _basicProfilingCounters: BasicProfilingCounters = makeBasicProfilingCounters();
 
   constructor({
     project,

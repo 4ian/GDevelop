@@ -18,7 +18,7 @@ import CompactPropertiesEditorRowField from '../CompactPropertiesEditor/CompactP
 const gd: libGDevelop = global.gd;
 
 type Props = {|
-  project: ?gdProject,
+  project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   /** If specified, only this object type should be allowed to be selected. */
@@ -37,6 +37,8 @@ type Props = {|
 
   /** A list of object names to exclude from the autocomplete list (for example if they have already been selected). */
   excludedObjectOrGroupNames?: Array<string>,
+
+  requireCustomObject?: boolean,
 
   onChoose?: string => void,
   onChange: string => void,
@@ -62,6 +64,7 @@ const CompactObjectSelector = (props: Props): React.Node => {
     project,
     projectScopedContainersAccessor,
     allowedObjectType,
+    requireCustomObject,
     noGroups,
     errorTextIfInvalid,
     onRequestClose,
@@ -88,6 +91,7 @@ const CompactObjectSelector = (props: Props): React.Node => {
         allowedObjectType,
         requiredCapabilitiesBehaviorTypes,
         excludedObjectOrGroupNames,
+        requireCustomObject,
       });
     },
     [
@@ -96,6 +100,7 @@ const CompactObjectSelector = (props: Props): React.Node => {
       noGroups,
       project,
       projectScopedContainersAccessor,
+      requireCustomObject,
       requiredCapabilitiesBehaviorTypes,
     ]
   );

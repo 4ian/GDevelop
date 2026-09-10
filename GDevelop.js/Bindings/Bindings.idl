@@ -299,7 +299,9 @@ interface Variable {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
     [Ref] Variable ResetPersistentUuid();
+    [Ref] Variable EnsurePersistentUuid();
     [Ref] Variable ClearPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 enum VariablesContainer_SourceType {
@@ -337,7 +339,9 @@ interface VariablesContainer {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
     [Ref] VariablesContainer ResetPersistentUuid();
+    [Ref] VariablesContainer EnsurePersistentUuids();
     [Ref] VariablesContainer ClearPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 interface VariablesContainersList {
@@ -366,7 +370,7 @@ interface ObjectGroup {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface ObjectVariableHelper {
+interface ObjectRefactorer {
     [Value] VariablesContainer STATIC_MergeVariableContainers(
         [Const, Ref] ObjectsContainersList objectsContainersList,
         [Const, Ref] ObjectGroup objectGroup);
@@ -378,6 +382,16 @@ interface ObjectVariableHelper {
         [Ref] EventsBasedObject eventsBasedObject,
         [Const] DOMString objectName,
         [Const, Ref] VariablesChangeset changeset);
+    void STATIC_FillMissingGroupVariablesToObject(
+        [Ref] gdObject obj,
+        [ Const, Ref ] VariablesContainer groupVariablesContainer);
+    void STATIC_FillMissingGroupBehaviorToObject(
+        [Const, Ref] Platform platform,
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Ref] gdObject obj,
+        [ Const, Ref ] ObjectGroup objectGroup,
+        [Const] DOMString behaviorName);
 };
 
 interface EventsBasedObjectVariantHelper {
@@ -536,7 +550,7 @@ interface ObjectsContainer {
         [Const, Ref] ObjectsContainer layout,
         [Const] DOMString name,
         boolean searchInGroups);
-    boolean FREE_IsDefaultBehavior(
+    boolean FREE_HasDefaultBehavior(
         [Const, Ref] ObjectsContainer layout,
         [Const] DOMString objectOrGroupName,
         [Const] DOMString behaviorName,
@@ -648,6 +662,8 @@ interface Project {
     void RemoveExternalEvents([Const] DOMString name);
     unsigned long GetExternalEventsPosition([Const] DOMString name);
 
+    [Ref] TestsContainer GetTests();
+
     boolean HasExternalLayoutNamed([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayout([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayoutAt(unsigned long index);
@@ -715,9 +731,9 @@ interface ObjectsContainersList {
     [Const] DOMString objectOrGroupName,
     [Const] DOMString behaviorType,
     boolean searchInGroups);
-  boolean IsDefaultBehavior(
+  boolean HasDefaultBehavior(
     [Const] DOMString objectOrGroupName,
-    [Const] DOMString behaviorType,
+    [Const] DOMString behaviorName,
     boolean searchInGroups);
   [Value] VectorString GetAnimationNamesOfObject([Const] DOMString name);
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
@@ -1068,6 +1084,50 @@ interface ExternalEvents {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
+interface Test {
+    void Test();
+
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+
+    void SetType([Const] DOMString type);
+    [Const, Ref] DOMString GetType();
+
+    void SetDescription([Const] DOMString description);
+    [Const, Ref] DOMString GetDescription();
+
+    void SetSource([Const] DOMString source);
+    [Const, Ref] DOMString GetSource();
+
+    void SetLastRunStatus([Const] DOMString lastRunStatus);
+    [Const, Ref] DOMString GetLastRunStatus();
+
+    void SetLastRunAt(double lastRunAt);
+    double GetLastRunAt();
+
+    void SetLastRunDurationMs(double lastRunDurationMs);
+    double GetLastRunDurationMs();
+
+    void SetLastRunFramesExecuted(long lastRunFramesExecuted);
+    long GetLastRunFramesExecuted();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
+interface TestsContainer {
+    [Ref] Test InsertNewTest([Const] DOMString name, unsigned long pos);
+    [Ref] Test InsertTest([Const, Ref] Test test, unsigned long pos);
+    boolean HasTestNamed([Const] DOMString name);
+    [Ref] Test GetTest([Const] DOMString name);
+    [Ref] Test GetTestAt(unsigned long pos);
+    void RemoveTest([Const] DOMString name);
+    void ClearTests();
+    void MoveTest(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetTestsCount();
+    unsigned long GetTestPosition([Const, Ref] Test test);
 };
 
 interface ExternalLayout {
@@ -1475,6 +1535,8 @@ interface InitialInstance {
     void SetSealed(boolean seal);
     boolean ShouldKeepRatio();
     void SetShouldKeepRatio(boolean keepRatio);
+    boolean IsHidden();
+    void SetHidden(boolean hidden);
     long GetZOrder();
     void SetZOrder(long zOrder);
     long GetOpacity();
@@ -1634,6 +1696,7 @@ interface SerializerElement {
     // Use the element as an object ("associative array", "dictionary") or array:
     [Ref] SerializerElement AddChild([Const] DOMString str);
     [Ref] SerializerElement GetChild([Const] DOMString str);
+    [Ref] SerializerElement GetOrCreateChild([Const] DOMString str);
     void WRAPPED_SetChild([Const] DOMString str, [Const, Ref] SerializerElement element);
     boolean HasChild([Const] DOMString str);
 
@@ -2756,6 +2819,10 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_UpdateExtensionNameInExtension(
+      [Ref] Project project,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString sourceExtensionName);
     void STATIC_UpdateExtensionNameInEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2771,6 +2838,13 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_MoveEventsFunction(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldFunctionName,
+      [Const] DOMString newFunctionName);
     void STATIC_RenameBehaviorEventsFunction(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2849,6 +2923,13 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_MoveEventsBasedBehavior(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldBehaviorName,
+      [Const] DOMString newBehaviorName);
     void STATIC_UpdateBehaviorNameInEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2857,8 +2938,15 @@ interface WholeProjectRefactorer {
     void STATIC_RenameEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
-      [Const] DOMString oldName,
-      [Const] DOMString newName);
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
+    void STATIC_MoveEventsBasedObject(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
     void STATIC_UpdateObjectNameInEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -3033,22 +3121,17 @@ interface InstructionValidator {
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    long parameterIndex);
   boolean STATIC_IsParameterValid(
     [Const, Ref] Platform platform,
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
-  boolean STATIC_HasDeprecationWarnings(
-    [Const, Ref] Platform platform,
+    long parameterIndex);
+  [Const, Value] DOMString STATIC_GetObjectNameForParameter(
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
-    [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    [Const] DOMString parameterType);
 };
 
 interface ObjectTools {
@@ -3074,6 +3157,20 @@ interface PropertyFunctionGenerator {
     void STATIC_GenerateExpressionSkeleton([Ref] Project project, [Ref] EventsFunction eventsFunction);
     void STATIC_UpdateReturnActionType([Ref] Project project, [Ref] EventsFunction eventsFunction);
 
+};
+
+interface ChildObjectForwardFunctionGenerator {
+    void STATIC_GenerateChildObjectForwardFunctions(
+        [Const, Ref] Project project,
+        [Const, Ref] EventsFunctionsExtension extension,
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString childObjectName);
+    boolean STATIC_HasAnyChildCustomObject(
+        [Const, Ref] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
+    [Value] VectorString STATIC_GetChildCustomObjectNames(
+        [Const, Ref] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
 };
 
 interface UsedExtensionsResult {
@@ -3225,6 +3322,7 @@ interface ExpressionValidator {
         [Const, Ref] Platform platform,
         [Const, Ref] ProjectScopedContainers projectScopedContainers,
         [Const] DOMString rootType,
+        [Const] DOMString rootObjectName,
         [Const] DOMString extraInfo);
 
     [Const, Ref] VectorExpressionParserError GetAllErrors();
@@ -3697,11 +3795,21 @@ interface EventsFunctionsExtension {
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
     [Ref] EventsBasedObjectsList GetEventsBasedObjects();
 
+    [Ref] TestsContainer GetTests();
+
     void SerializeTo([Ref] SerializerElement element);
     void SerializeToExternal([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 
     boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString eventsFunctionName);
+};
+
+interface EventsFunctionsExtensionExtractor {
+    void EventsFunctionsExtensionExtractor();
+    [Ref] EventsBasedBehavior STATIC_CreateCustomBehaviorForObject(
+        [Const, Ref] Project project,
+        [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Ref] gdObject obj);
 };
 
 interface AbstractFileSystem {

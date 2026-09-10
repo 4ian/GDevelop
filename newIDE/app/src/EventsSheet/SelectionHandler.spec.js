@@ -753,4 +753,77 @@ describe('SelectionHandler', () => {
 
     topEventsList.delete();
   });
+  it('ignores selected events that were destroyed on the C++ side', () => {
+    const topEventsList = new gd.EventsList();
+    const emptyStandardEvent = new gd.StandardEvent();
+    const standardEvent1 = topEventsList.insertEvent(emptyStandardEvent, 0);
+    const standardEvent2 = topEventsList.insertEvent(emptyStandardEvent, 1);
+    emptyStandardEvent.delete();
+
+    const { emptySceneProjectScopedContainersAccessor } = makeTestProject(gd);
+
+    let currentSelection = selectEvent(
+      // $FlowFixMe[incompatible-type]
+      getInitialSelection(),
+      {
+        eventsList: topEventsList,
+        event: standardEvent1,
+        indexInList: 0,
+        projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
+      },
+      /*multiSelection=*/ true
+    );
+    // $FlowFixMe[incompatible-type]
+    currentSelection = selectEvent(
+      currentSelection,
+      {
+        eventsList: topEventsList,
+        event: standardEvent2,
+        indexInList: 1,
+        projectScopedContainersAccessor: emptySceneProjectScopedContainersAccessor,
+      },
+      /*multiSelection=*/ true
+    );
+
+    // Destroy the last selected event on the C++ side, without the selection
+    // being cleared (as done by changes not going through the events sheet).
+    topEventsList.removeEventAt(1);
+
+    // The dead event is filtered out instead of crashing the editor.
+    expect(getSelectedEventContexts(currentSelection)).toEqual([
+      {
+        eventsList: topEventsList,
+        event: standardEvent1,
+        indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
+      },
+    ]);
+    expect(
+      getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
+    ).toEqual({
+      eventsList: topEventsList,
+      event: standardEvent1,
+      indexInList: 0,
+      projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
+    });
+    expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([
+      {
+        eventsList: topEventsList,
+        event: standardEvent1,
+        indexInList: 0,
+        projectScopedContainersAccessor: expectProjectScopedContainersAccessor(),
+      },
+    ]);
+
+    // Destroy the remaining selected event: the selection behaves as empty.
+    topEventsList.removeEventAt(0);
+    expect(getSelectedEventContexts(currentSelection)).toEqual([]);
+    expect(
+      getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
+    ).toBe(null);
+    expect(getLastSelectedEventContext(currentSelection)).toBe(null);
+    expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([]);
+
+    topEventsList.delete();
+  });
 });

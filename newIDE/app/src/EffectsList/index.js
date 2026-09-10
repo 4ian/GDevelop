@@ -64,11 +64,13 @@ const EFFECTS_CLIPBOARD_KIND = 'Effects';
 
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget2D = makeDragSourceAndDropTarget(
-  '2d-effects-list'
+  '2d-effects-list',
+  { touchDragStart: 'immediate' }
 );
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget3D = makeDragSourceAndDropTarget(
-  '3d-effects-list'
+  '3d-effects-list',
+  { touchDragStart: 'immediate' }
 );
 
 const styles = {
@@ -567,8 +569,7 @@ export const useManageEffects = ({
   );
 
   const pasteEffects = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    async effectInsertionIndex => {
+    async (effectInsertionIndex: number) => {
       const clipboardContent = Clipboard.get(EFFECTS_CLIPBOARD_KIND);
       const effectContents = SafeExtractor.extractArray(clipboardContent);
       if (!effectContents) return;

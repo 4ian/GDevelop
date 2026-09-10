@@ -47,7 +47,7 @@ module.exports = {
         newValue
       ) {
         if (propertyName === 'object3D') {
-          behaviorContent.getChild('object3D').setStringValue(newValue);
+          behaviorContent.getOrCreateChild('object3D').setStringValue(newValue);
           return true;
         }
 
@@ -59,25 +59,29 @@ module.exports = {
           else if (normalizedValue === 'kinematic') bodyTypeValue = 'Kinematic';
           else return false;
 
-          behaviorContent.getChild('bodyType').setStringValue(bodyTypeValue);
+          behaviorContent
+            .getOrCreateChild('bodyType')
+            .setStringValue(bodyTypeValue);
           if (
             bodyTypeValue !== 'Static' &&
             behaviorContent.getChild('shape').getStringValue().toLowerCase() ===
               'mesh'
           ) {
-            behaviorContent.getChild('shape').setStringValue('Box');
+            behaviorContent.getOrCreateChild('shape').setStringValue('Box');
           }
           return true;
         }
 
         if (propertyName === 'bullet') {
-          behaviorContent.getChild('bullet').setBoolValue(newValue === '1');
+          behaviorContent
+            .getOrCreateChild('bullet')
+            .setBoolValue(newValue === '1');
           return true;
         }
 
         if (propertyName === 'fixedRotation') {
           behaviorContent
-            .getChild('fixedRotation')
+            .getOrCreateChild('fixedRotation')
             .setBoolValue(newValue === '1');
           return true;
         }
@@ -92,16 +96,18 @@ module.exports = {
           else if (normalizedValue === 'mesh') shapeValue = 'Mesh';
           else return false;
 
-          behaviorContent.getChild('shape').setStringValue(shapeValue);
+          behaviorContent.getOrCreateChild('shape').setStringValue(shapeValue);
           if (shapeValue === 'Mesh') {
-            behaviorContent.getChild('bodyType').setStringValue('Static');
+            behaviorContent
+              .getOrCreateChild('bodyType')
+              .setStringValue('Static');
           }
           return true;
         }
 
         if (propertyName === 'meshShapeResourceName') {
           behaviorContent
-            .getChild('meshShapeResourceName')
+            .getOrCreateChild('meshShapeResourceName')
             .setStringValue(newValue);
           return true;
         }
@@ -115,7 +121,7 @@ module.exports = {
           else return false;
 
           behaviorContent
-            .getChild('shapeOrientation')
+            .getOrCreateChild('shapeOrientation')
             .setStringValue(orientationValue);
           return true;
         }
@@ -124,7 +130,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeDimensionA')
+            .getOrCreateChild('shapeDimensionA')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -133,7 +139,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeDimensionB')
+            .getOrCreateChild('shapeDimensionB')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -142,7 +148,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeDimensionC')
+            .getOrCreateChild('shapeDimensionC')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -151,7 +157,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeOffsetX')
+            .getOrCreateChild('shapeOffsetX')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -160,7 +166,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeOffsetY')
+            .getOrCreateChild('shapeOffsetY')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -169,7 +175,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeOffsetZ')
+            .getOrCreateChild('shapeOffsetZ')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -178,7 +184,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('massCenterOffsetX')
+            .getOrCreateChild('massCenterOffsetX')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -187,7 +193,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('massCenterOffsetY')
+            .getOrCreateChild('massCenterOffsetY')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -196,21 +202,21 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('massCenterOffsetZ')
+            .getOrCreateChild('massCenterOffsetZ')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
 
         if (propertyName === 'density') {
           behaviorContent
-            .getChild('density')
+            .getOrCreateChild('density')
             .setDoubleValue(parseFloat(newValue));
           return true;
         }
 
         if (propertyName === 'massOverride') {
           behaviorContent
-            .getChild('massOverride')
+            .getOrCreateChild('massOverride')
             .setDoubleValue(parseFloat(newValue));
           return true;
         }
@@ -218,7 +224,9 @@ module.exports = {
         if (propertyName === 'friction') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent.getChild('friction').setDoubleValue(newValueAsNumber);
+          behaviorContent
+            .getOrCreateChild('friction')
+            .setDoubleValue(newValueAsNumber);
           return true;
         }
 
@@ -226,7 +234,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('restitution')
+            .getOrCreateChild('restitution')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -235,7 +243,7 @@ module.exports = {
           const newValueAsNumber = Math.max(0, parseFloat(newValue));
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('linearDamping')
+            .getOrCreateChild('linearDamping')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -244,7 +252,7 @@ module.exports = {
           const newValueAsNumber = Math.max(0, parseFloat(newValue));
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('angularDamping')
+            .getOrCreateChild('angularDamping')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -253,20 +261,22 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gravityScale')
+            .getOrCreateChild('gravityScale')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
 
         if (propertyName === 'layers') {
           behaviorContent
-            .getChild('layers')
+            .getOrCreateChild('layers')
             .setIntValue(parseInt(newValue, 10));
           return true;
         }
 
         if (propertyName === 'masks') {
-          behaviorContent.getChild('masks').setIntValue(parseInt(newValue, 10));
+          behaviorContent
+            .getOrCreateChild('masks')
+            .setIntValue(parseInt(newValue, 10));
           return true;
         }
 
@@ -274,6 +284,15 @@ module.exports = {
       };
       behavior.getProperties = function (behaviorContent) {
         const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        // The shape decides which dimensions are meaningful and how they
+        // should be labelled, and the body type decides which collision
+        // layers are used, so these properties adapt themselves to them.
+        const shape = behaviorContent.getChild('shape').getStringValue();
+        const isBoxShape = shape === 'Box';
+        const isMeshShape = shape === 'Mesh';
+        const isStaticBody =
+          behaviorContent.getChild('bodyType').getStringValue() === 'Static';
 
         behaviorProperties
           .getOrCreate('object3D')
@@ -333,13 +352,19 @@ module.exports = {
           .getOrCreate('shape')
           .setValue(behaviorContent.getChild('shape').getStringValue())
           .setType('Choice')
-          .setLabel('Shape')
+          .setLabel(_('Shape'))
+          .setDescription(
+            _(
+              'The shape used for collisions. It gives their meaning to the dimension properties. A capsule or a cylinder is extended along the axis given by "Shape orientation" and a mesh uses the model given by "Simplified 3D model".'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addChoice('Box', _('Box'))
           .addChoice('Capsule', _('Capsule'))
           .addChoice('Sphere', _('Sphere'))
           .addChoice('Cylinder', _('Cylinder'))
-          .addChoice('Mesh', _('Mesh (works for Static only)'));
+          .addChoice('Mesh', _('Mesh (works for Static only)'))
+          .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('meshShapeResourceName')
           .setValue(
@@ -347,9 +372,10 @@ module.exports = {
           )
           .setType('resource')
           .addExtraInfo('model3D')
-          .setLabel(_("Simplified 3D model (leave empty to use object's one)"))
-          // Hidden as required to be changed in the full editor.
-          .setHidden(true)
+          .setLabel(_('Simplified 3D model'))
+          .setDescription(_("Leave empty to use object's one"))
+          // Only used by the "Mesh" shape.
+          .setHidden(!isMeshShape)
           .setHasImpactOnOtherProperties(true);
         behaviorProperties
           .getOrCreate('shapeOrientation')
@@ -357,11 +383,16 @@ module.exports = {
             behaviorContent.getChild('shapeOrientation').getStringValue()
           )
           .setType('Choice')
-          .setLabel('Shape orientation')
+          .setLabel(_('Shape orientation'))
+          .setDescription(
+            _('Axis along which the capsule or cylinder is extended.')
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addChoice('Z', _('Z'))
           .addChoice('Y', _('Y'))
-          .addChoice('X', _('X'));
+          .addChoice('X', _('X'))
+          // Only capsules and cylinders can be oriented.
+          .setHidden(shape !== 'Capsule' && shape !== 'Cylinder');
         behaviorProperties
           .getOrCreate('shapeDimensionA')
           .setValue(
@@ -372,9 +403,15 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Dimension A')
+          .setLabel(isBoxShape ? _('Width') : _('Radius'))
+          .setDescription(
+            _(
+              'Width of the box, or radius of the sphere, capsule or cylinder. Use 0 to follow the object size.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          // The "Mesh" shape uses a 3D model instead of dimensions.
+          .setHidden(isMeshShape);
         behaviorProperties
           .getOrCreate('shapeDimensionB')
           .setValue(
@@ -385,9 +422,15 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Dimension B')
+          .setLabel(isBoxShape ? _('Height') : _('Depth'))
+          .setDescription(
+            _(
+              'Height of the box, or size of the capsule or cylinder along its orientation axis. Not used by a sphere. Use 0 to follow the object size.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          // A sphere only needs a radius and a mesh uses a 3D model.
+          .setHidden(isMeshShape || shape === 'Sphere');
         behaviorProperties
           .getOrCreate('shapeDimensionC')
           .setValue(
@@ -398,9 +441,15 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Dimension C')
+          .setLabel(_('Depth'))
+          .setDescription(
+            _(
+              'Depth of the box. Only used by a box. Use 0 to follow the object depth.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          // Only a box has a third dimension to configure.
+          .setHidden(!isBoxShape);
         if (!behaviorContent.hasChild('shapeOffsetX')) {
           behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
         }
@@ -414,10 +463,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape offset X')
+          .setLabel(_('Shape offset X'))
+          .setDescription(
+            _(
+              'Offset of the collision shape relative to the object center, on the X axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('shapeOffsetY')) {
           behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
         }
@@ -431,9 +484,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape offset Y')
+          .setLabel(_('Shape offset Y'))
+          .setDescription(
+            _(
+              'Offset of the collision shape relative to the object center, on the Y axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('shapeOffsetZ')) {
           behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
         }
@@ -447,10 +505,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape offset Z')
+          .setLabel(_('Shape offset Z'))
+          .setDescription(
+            _(
+              'Offset of the collision shape relative to the object center, on the Z axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetX')) {
           behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
         }
@@ -464,10 +526,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Center of mass offset X')
+          .setLabel(_('Center of mass X'))
+          .setDescription(
+            _(
+              'Offset of the center of mass relative to the object center, on the X axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetY')) {
           behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
         }
@@ -481,10 +547,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Center of mass offset Y')
+          .setLabel(_('Center of mass Y'))
+          .setDescription(
+            _(
+              'Offset of the center of mass relative to the object center, on the Y axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetZ')) {
           behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
         }
@@ -498,10 +568,14 @@ module.exports = {
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Center of mass offset Z')
+          .setLabel(_('Center of mass Z'))
+          .setDescription(
+            _(
+              'Offset of the center of mass relative to the object center, on the Z axis.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setAdvanced(true)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setAdvanced(true);
         behaviorProperties
           .getOrCreate('density')
           .setValue(
@@ -616,19 +690,39 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('layers').getIntValue().toString(10)
           )
-          .setType('Number')
-          .setLabel('Layers')
+          .setType('Bitmask')
+          // Static objects use the layers 1 to 4 and moving ones the layers
+          // 5 to 8, so that they never register in the wrong layer group.
+          .addExtraInfo('bitCount=4')
+          .addExtraInfo(isStaticBody ? 'firstBit=0' : 'firstBit=4')
+          .setLabel(_('Layers'))
+          .setDescription(
+            _(
+              'Layers the object belongs to, as a bitmask. Static objects use the layers 1 to 4 (1, 2, 4 and 8) and moving ones the layers 5 to 8 (16, 32, 64 and 128).'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setGroup(_('Collision filtering'))
+          .setAdvanced(true);
         behaviorProperties
           .getOrCreate('masks')
           .setValue(
             behaviorContent.getChild('masks').getIntValue().toString(10)
           )
-          .setType('Number')
-          .setLabel('Masks')
+          .setType('Bitmask')
+          .addExtraInfo('bitCount=8')
+          .setLabel(_('Masks'))
+          .setDescription(
+            _(
+              'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 8 which is 128. Not used by static objects, which accept every collision.'
+            )
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
+          .setGroup(_('Collision filtering'))
+          .setAdvanced(true)
+          // Static objects accept every collision: it's the mask of the moving
+          // objects that matters.
+          .setHidden(isStaticBody);
 
         return behaviorProperties;
       };
@@ -708,28 +802,32 @@ module.exports = {
             sharedContent.getChild('gravityX').getDoubleValue().toString(10)
           )
           .setType('Number')
-          .setMeasurementUnit(gd.MeasurementUnit.getNewton());
+          .setMeasurementUnit(gd.MeasurementUnit.getNewton())
+          .setAdvanced(true);
         sharedProperties
           .getOrCreate('gravityY')
           .setValue(
             sharedContent.getChild('gravityY').getDoubleValue().toString(10)
           )
           .setType('Number')
-          .setMeasurementUnit(gd.MeasurementUnit.getNewton());
+          .setMeasurementUnit(gd.MeasurementUnit.getNewton())
+          .setAdvanced(true);
         sharedProperties
           .getOrCreate('gravityZ')
           .setValue(
             sharedContent.getChild('gravityZ').getDoubleValue().toString(10)
           )
           .setType('Number')
-          .setMeasurementUnit(gd.MeasurementUnit.getNewton());
+          .setMeasurementUnit(gd.MeasurementUnit.getNewton())
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('worldScale')
           .setValue(
             sharedContent.getChild('worldScale').getDoubleValue().toString(10)
           )
-          .setType('Number');
+          .setType('Number')
+          .setAdvanced(true);
 
         return sharedProperties;
       };
@@ -1762,7 +1860,9 @@ module.exports = {
         newValue
       ) {
         if (propertyName === 'physics3D') {
-          behaviorContent.getChild('physics3D').setStringValue(newValue);
+          behaviorContent
+            .getOrCreateChild('physics3D')
+            .setStringValue(newValue);
           return true;
         }
 
@@ -1770,7 +1870,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('jumpHeight')
+            .getOrCreateChild('jumpHeight')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1779,7 +1879,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('jumpSustainTime')
+            .getOrCreateChild('jumpSustainTime')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1787,7 +1887,9 @@ module.exports = {
         if (propertyName === 'gravity') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent.getChild('gravity').setDoubleValue(newValueAsNumber);
+          behaviorContent
+            .getOrCreateChild('gravity')
+            .setDoubleValue(newValueAsNumber);
           return true;
         }
 
@@ -1795,7 +1897,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('fallingSpeedMax')
+            .getOrCreateChild('fallingSpeedMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1804,7 +1906,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('forwardAcceleration')
+            .getOrCreateChild('forwardAcceleration')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1813,7 +1915,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('forwardDeceleration')
+            .getOrCreateChild('forwardDeceleration')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1822,7 +1924,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('forwardSpeedMax')
+            .getOrCreateChild('forwardSpeedMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1831,7 +1933,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('sidewaysAcceleration')
+            .getOrCreateChild('sidewaysAcceleration')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1840,7 +1942,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('sidewaysDeceleration')
+            .getOrCreateChild('sidewaysDeceleration')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1849,7 +1951,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('sidewaysSpeedMax')
+            .getOrCreateChild('sidewaysSpeedMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1858,7 +1960,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('slopeMaxAngle')
+            .getOrCreateChild('slopeMaxAngle')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1867,21 +1969,21 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('stairHeightMax')
+            .getOrCreateChild('stairHeightMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
 
         if (propertyName === 'shouldBindObjectAndForwardAngle') {
           behaviorContent
-            .getChild('shouldBindObjectAndForwardAngle')
+            .getOrCreateChild('shouldBindObjectAndForwardAngle')
             .setBoolValue(newValue === '1');
           return true;
         }
 
         if (propertyName === 'canBePushed') {
           behaviorContent
-            .getChild('canBePushed')
+            .getOrCreateChild('canBePushed')
             .setBoolValue(newValue === '1');
           return true;
         }
@@ -2034,7 +2136,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('slopeMaxAngle')
-          .setLabel('Slope max. angle')
+          .setLabel(_('Slope max. angle'))
           .setGroup(_('Walk'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
@@ -2052,7 +2154,7 @@ module.exports = {
         }
         behaviorProperties
           .getOrCreate('stairHeightMax')
-          .setLabel('Max. stair height')
+          .setLabel(_('Max. stair height'))
           .setGroup(_('Walk'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -2067,7 +2169,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('shouldBindObjectAndForwardAngle')
-          .setLabel('Keep object angle and forward direction the same')
+          .setLabel(_('Keep object angle and forward direction the same'))
           .setGroup(_('Walk'))
           .setType('Boolean')
           .setValue(
@@ -2085,7 +2187,7 @@ module.exports = {
         }
         behaviorProperties
           .getOrCreate('canBePushed')
-          .setLabel('Can be pushed by other characters')
+          .setLabel(_('Can be pushed by other characters'))
           .setGroup(_('Walk'))
           .setType('Boolean')
           .setValue(
@@ -2803,7 +2905,9 @@ module.exports = {
         newValue
       ) {
         if (propertyName === 'physics3D') {
-          behaviorContent.getChild('physics3D').setStringValue(newValue);
+          behaviorContent
+            .getOrCreateChild('physics3D')
+            .setStringValue(newValue);
           return true;
         }
 
@@ -2811,7 +2915,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('steerAngleMax')
+            .getOrCreateChild('steerAngleMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2820,7 +2924,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('beginningSteerSpeed')
+            .getOrCreateChild('beginningSteerSpeed')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2829,7 +2933,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('endSteerSpeed')
+            .getOrCreateChild('endSteerSpeed')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2838,7 +2942,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('engineTorqueMax')
+            .getOrCreateChild('engineTorqueMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2847,7 +2951,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('engineSpeedMax')
+            .getOrCreateChild('engineSpeedMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2856,7 +2960,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('engineInertia')
+            .getOrCreateChild('engineInertia')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2865,7 +2969,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('reverseGearRatio1')
+            .getOrCreateChild('reverseGearRatio1')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2874,7 +2978,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio1')
+            .getOrCreateChild('gearRatio1')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2883,7 +2987,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio2')
+            .getOrCreateChild('gearRatio2')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2892,7 +2996,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio2')
+            .getOrCreateChild('gearRatio2')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2901,7 +3005,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio3')
+            .getOrCreateChild('gearRatio3')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2910,7 +3014,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio4')
+            .getOrCreateChild('gearRatio4')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2919,7 +3023,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio5')
+            .getOrCreateChild('gearRatio5')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2928,7 +3032,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio6')
+            .getOrCreateChild('gearRatio6')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2937,7 +3041,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('wheelRadius')
+            .getOrCreateChild('wheelRadius')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2946,7 +3050,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('wheelWidth')
+            .getOrCreateChild('wheelWidth')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2955,7 +3059,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('backWheelOffsetX')
+            .getOrCreateChild('backWheelOffsetX')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2964,7 +3068,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('frontWheelOffsetX')
+            .getOrCreateChild('frontWheelOffsetX')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2973,7 +3077,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('wheelOffsetY')
+            .getOrCreateChild('wheelOffsetY')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2982,7 +3086,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('wheelOffsetZ')
+            .getOrCreateChild('wheelOffsetZ')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2991,7 +3095,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('brakeTorqueMax')
+            .getOrCreateChild('brakeTorqueMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -3000,21 +3104,21 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('handBrakeTorqueMax')
+            .getOrCreateChild('handBrakeTorqueMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
 
         if (propertyName === 'hasBackWheelDrive') {
           behaviorContent
-            .getChild('hasBackWheelDrive')
+            .getOrCreateChild('hasBackWheelDrive')
             .setBoolValue(newValue === '1');
           return true;
         }
 
         if (propertyName === 'hasFrontWheelDrive') {
           behaviorContent
-            .getChild('hasFrontWheelDrive')
+            .getOrCreateChild('hasFrontWheelDrive')
             .setBoolValue(newValue === '1');
           return true;
         }
@@ -3023,7 +3127,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('pitchRollAngleMax')
+            .getOrCreateChild('pitchRollAngleMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -3697,6 +3801,12 @@ module.exports = {
         sharedData,
         'gravityY',
         '456'
+      ),
+      // Revert back
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        'gravityY',
+        '0'
       ),
     ];
   },

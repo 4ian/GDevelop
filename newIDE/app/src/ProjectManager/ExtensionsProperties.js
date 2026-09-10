@@ -51,6 +51,7 @@ function ExtensionsProperties(props: Props): React.Node | null {
         }
       },
       layersContainer: null,
+      shouldDisabledFieldsWithMixedValues: false,
     });
 
     propertyList.push(

@@ -85,7 +85,7 @@ declare class libGDevelop {
   VariablesContainer: Class<gdVariablesContainer>;
   VariablesContainersList: Class<gdVariablesContainersList>;
   ObjectGroup: Class<gdObjectGroup>;
-  ObjectVariableHelper: Class<gdObjectVariableHelper>;
+  ObjectRefactorer: Class<gdObjectRefactorer>;
   EventsBasedObjectVariantHelper: Class<gdEventsBasedObjectVariantHelper>;
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
@@ -113,6 +113,8 @@ declare class libGDevelop {
   CustomObjectConfiguration: Class<gdCustomObjectConfiguration>;
   Layout: Class<gdLayout>;
   ExternalEvents: Class<gdExternalEvents>;
+  Test: Class<gdTest>;
+  TestsContainer: Class<gdTestsContainer>;
   ExternalLayout: Class<gdExternalLayout>;
   Effect: Class<gdEffect>;
   EffectsContainer: Class<gdEffectsContainer>;
@@ -212,6 +214,7 @@ declare class libGDevelop {
   ObjectTools: Class<gdObjectTools>;
   EventsBasedObjectDependencyFinder: Class<gdEventsBasedObjectDependencyFinder>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
+  ChildObjectForwardFunctionGenerator: Class<gdChildObjectForwardFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
   UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;
   UsedObjectTypeFinder: Class<gdUsedObjectTypeFinder>;
@@ -260,6 +263,7 @@ declare class libGDevelop {
   PropertyFolderOrProperty: Class<gdPropertyFolderOrProperty>;
   PropertiesContainer: Class<gdPropertiesContainer>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;
+  EventsFunctionsExtensionExtractor: Class<gdEventsFunctionsExtensionExtractor>;
   AbstractFileSystem: Class<gdAbstractFileSystem>;
   AbstractFileSystemJS: Class<gdAbstractFileSystemJS>;
   ProjectResourcesAdder: Class<gdProjectResourcesAdder>;

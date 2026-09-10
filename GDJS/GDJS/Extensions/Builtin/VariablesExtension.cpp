@@ -263,7 +263,7 @@ VariablesExtension::VariablesExtension() {
             return codeGenerator.GeneratePropertySetterWithoutCasting(
                 propertiesContainerAndProperty.first,
                 propertiesContainerAndProperty.second,
-                getterCode + op + expressionCode);
+                getterCode + op + "(" + expressionCode + ")");
           }
         }
 

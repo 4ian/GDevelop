@@ -54,109 +54,36 @@ export const getSchemaWithOpenFullEditorButton = ({
   return schema;
 };
 
-export const getPropertyValue = (
-  behavior: gdBehavior,
-  propertyName: string,
-  initialInstance: gdInitialInstance | null
-): string => {
-  const behaviorName = behavior.getName();
-  if (
-    initialInstance &&
-    initialInstance.hasBehaviorOverridingNamed(behaviorName) &&
-    initialInstance
-      .getBehaviorOverriding(behaviorName)
-      .hasPropertyValue(propertyName)
-  ) {
-    const behaviorOverriding = initialInstance.getBehaviorOverriding(
-      behaviorName
-    );
-    return behaviorOverriding
-      .getProperties()
-      .get(propertyName)
-      .getValue();
-  }
-  return behavior
-    .getProperties()
-    .get(propertyName)
-    .getValue();
-};
-
-export const updateProperty = (
-  project: gdProject,
-  behavior: gdBehavior,
-  propertyName: string,
-  value: string,
-  initialInstance: gdInitialInstance | null
-): void => {
-  if (initialInstance) {
-    const behaviorName = behavior.getName();
-    const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
-      behaviorName
-    )
-      ? initialInstance.getBehaviorOverriding(behaviorName)
-      : initialInstance.addNewBehaviorOverriding(
-          project,
-          behavior.getTypeName(),
-          behaviorName
-        );
-    const behaviorProperties = behavior.getProperties();
-    const inheritedValue = behaviorProperties.has(propertyName)
-      ? behaviorProperties.get(propertyName).getValue()
-      : null;
-    if (inheritedValue === value) {
-      behaviorOverriding.removeProperty(propertyName);
-    } else {
-      behaviorOverriding.updateProperty(propertyName, value);
-    }
-  } else {
-    behavior.updateProperty(propertyName, value);
-  }
-};
-
 export const CompactBehaviorPropertiesEditor = ({
   project,
   behaviorMetadata,
-  behavior,
+  behaviors,
   object,
   layersContainer,
-  behaviorOverriding,
-  initialInstance,
   onOpenFullEditor,
   onBehaviorUpdated,
   resourceManagementProps,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+  // The schema is built from the first behavior. There is always one, but
+  // stay safe as an empty list would break the whole properties panel.
+  const behavior = behaviors.length > 0 ? behaviors[0] : null;
+  // The behavior is identified by its pointer, as a new wrapper object is
+  // given at each render.
+  const behaviorPtr = behavior ? behavior.ptr : null;
 
-  const propertiesSchema = React.useMemo(
+  const propertiesSchema: Schema = React.useMemo(
     () => {
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
-      if (initialInstance) {
-        const behaviorProperties = behavior.getProperties();
-        return propertiesMapToSchema({
-          properties: behaviorProperties,
-          defaultValueProperties: behaviorProperties,
-          getPropertyValue: (instance, propertyName) =>
-            getPropertyValue(behavior, propertyName, initialInstance),
-          onUpdateProperty: (instance, propertyName, value) =>
-            updateProperty(
-              project,
-              behavior,
-              propertyName,
-              value,
-              initialInstance
-            ),
-          object,
-          layersContainer,
-          visibility: 'All',
-          showcaseNonDefaultValues: true,
-        });
-      }
-      const behaviorMetadataProperties = behaviorMetadata.getProperties();
+      if (!behavior) return [];
       return propertiesMapToSchema({
-        properties: behaviorMetadataProperties,
-        defaultValueProperties: behaviorMetadataProperties,
+        // Use the behavior properties (and not the metadata ones) so that
+        // properties adapting themselves to the current values (labels,
+        // visibility...) are properly displayed.
+        properties: behavior.getProperties(),
+        defaultValueProperties: behaviorMetadata.getProperties(),
         getPropertyValue: (instance, name) =>
           instance
             .getProperties()
@@ -168,16 +95,16 @@ export const CompactBehaviorPropertiesEditor = ({
         object,
         layersContainer,
         visibility: 'All',
+        shouldDisabledFieldsWithMixedValues: true,
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       schemaRecomputeTrigger,
-      initialInstance,
+      behaviorPtr,
       behaviorMetadata,
       object,
       layersContainer,
-      behavior,
-      project,
     ]
   );
 
@@ -187,7 +114,7 @@ export const CompactBehaviorPropertiesEditor = ({
         project={project}
         object={object}
         schema={propertiesSchema}
-        instances={[behavior]}
+        instances={behaviors}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         placeholder={<Trans>Nothing to configure for this behavior.</Trans>}
@@ -197,7 +124,7 @@ export const CompactBehaviorPropertiesEditor = ({
                 getSchemaWithOpenFullEditorButton({
                   schema,
                   fullEditorLabel: behaviorMetadata.getOpenFullEditorLabel(),
-                  behavior,
+                  behavior: behaviors[0],
                   onOpenFullEditor,
                 })
             : null

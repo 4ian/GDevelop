@@ -8,6 +8,16 @@ import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer'
 import ReadOnlyTreeViewRow from './ReadOnlyTreeViewRow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import {
+  type StickyRow,
+  STICKY_ROWS_DEFAULT_MAX_COUNT,
+  computeParentIndexes,
+  computeStickyRows,
+  areStickyRowsEqual,
+  getStickyAncestorsHeight,
+  findSurfaceBackgroundColor,
+} from './StickyRows';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 export const navigationKeys = [
   'ArrowDown',
@@ -138,6 +148,11 @@ type Props<Item> = {|
     onGetItemInside: (item: Item) => ?Item,
     onGetItemOutside: (item: Item) => ?Item,
   |},
+  /**
+   * If true, the ancestors (folders, root sections) of the first visible item
+   * are kept displayed as sticky rows at the top of the list when scrolling.
+   */
+  enableStickyAncestors?: boolean,
 |};
 
 const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
@@ -164,6 +179,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     forceAllOpened,
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
+    enableStickyAncestors,
   }: Props<Item>,
   ref: ReadOnlyTreeViewInterface<Item>
   // $FlowFixMe[missing-local-annot]
@@ -379,23 +395,186 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     [flattenOpened, items, searchText]
   );
 
+  const getRowHeight = React.useCallback(
+    (index: number) => getItemHeight(flattenedData[index].item),
+    [getItemHeight, flattenedData]
+  );
+
+  // Top offset of each row (rows have variable heights).
+  const rowTops: Array<number> = React.useMemo(
+    () => {
+      if (!enableStickyAncestors) return [];
+      const rowTops: Array<number> = new Array(flattenedData.length);
+      let top = 0;
+      for (let index = 0; index < flattenedData.length; index++) {
+        rowTops[index] = top;
+        top += getRowHeight(index);
+      }
+      return rowTops;
+    },
+    [enableStickyAncestors, flattenedData, getRowHeight]
+  );
+
+  const getRowIndexAt = React.useCallback(
+    (offset: number) => {
+      // Binary search of the last row starting at or before the offset.
+      let low = 0;
+      let high = rowTops.length - 1;
+      let result = -1;
+      while (low <= high) {
+        const middle = (low + high) >> 1;
+        if (rowTops[middle] <= offset) {
+          result = middle;
+          low = middle + 1;
+        } else {
+          high = middle - 1;
+        }
+      }
+      return result;
+    },
+    [rowTops]
+  );
+
+  const parentIndexes = React.useMemo(
+    () => (enableStickyAncestors ? computeParentIndexes(flattenedData) : []),
+    [enableStickyAncestors, flattenedData]
+  );
+  const [stickyRows, setStickyRows] = React.useState<StickyRow[]>([]);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [surfaceBackgroundColor, setSurfaceBackgroundColor] = React.useState<
+    string | null
+  >(null);
+  const hasStickyRows = stickyRows.length > 0;
+  // The sticky rows must be opaque, matching the surface (panel, dialog...)
+  // the tree view is displayed on: measure it when they appear (and re-measure
+  // if the theme changes).
+  React.useLayoutEffect(
+    () => {
+      if (!enableStickyAncestors || !hasStickyRows) return;
+      const backgroundColor = findSurfaceBackgroundColor(containerRef.current);
+      setSurfaceBackgroundColor(existingBackgroundColor =>
+        existingBackgroundColor === backgroundColor
+          ? existingBackgroundColor
+          : backgroundColor
+      );
+    },
+    [enableStickyAncestors, hasStickyRows, gdevelopTheme]
+  );
+  const scrollOffsetRef = React.useRef<number>(0);
+  const listOuterRef = React.useRef<?HTMLDivElement>(null);
+
+  const updateStickyRows = React.useCallback(
+    () => {
+      if (!enableStickyAncestors) return;
+      const newStickyRows = computeStickyRows({
+        flattenedData,
+        parentIndexes,
+        scrollOffset: scrollOffsetRef.current,
+        listHeight: height,
+        maxCount: STICKY_ROWS_DEFAULT_MAX_COUNT,
+        getRowTop: index => rowTops[index],
+        getRowHeight,
+        getRowIndexAt,
+      });
+      setStickyRows(stickyRows =>
+        areStickyRowsEqual(stickyRows, newStickyRows)
+          ? stickyRows
+          : newStickyRows
+      );
+    },
+    [
+      enableStickyAncestors,
+      flattenedData,
+      parentIndexes,
+      height,
+      rowTops,
+      getRowHeight,
+      getRowIndexAt,
+    ]
+  );
+
+  // useLayoutEffect so that, when the tree changes (folder collapsed,
+  // search...), the sticky rows are recomputed before the browser paints:
+  // they hold indexes in flattenedData that could be stale.
+  React.useLayoutEffect(
+    () => {
+      updateStickyRows();
+    },
+    [updateStickyRows]
+  );
+
+  const onScroll = React.useCallback(
+    ({ scrollOffset }: {| scrollOffset: number |}) => {
+      scrollOffsetRef.current = scrollOffset;
+      updateStickyRows();
+    },
+    [updateStickyRows]
+  );
+
+  const onClickStickyRow = React.useCallback(
+    (rowRank: number, flattenedDataIndex: number) => {
+      const list = listRef.current;
+      if (!list) return;
+      // Reveal the item: scroll so that the actual row lands exactly below
+      // its own sticky ancestors (at which point it is no longer sticky itself).
+      const stickyAncestorsHeight = stickyRows
+        .slice(0, rowRank)
+        .reduce((total, row) => total + row.height, 0);
+      list.scrollTo(
+        Math.max(0, rowTops[flattenedDataIndex] - stickyAncestorsHeight)
+      );
+    },
+    [stickyRows, rowTops]
+  );
+
   const scrollToItemFromId = React.useCallback(
     (itemId: string, placement?: 'smart' | 'start' = 'smart') => {
       const list = listRef.current;
       if (list) {
         const index = flattenedData.findIndex(node => node.id === itemId);
         if (index >= 0) {
+          const scrollCommand = !enableStickyAncestors
+            ? () => list.scrollToItem(index, placement)
+            : () => {
+                // Scroll so that the item is not covered by its sticky ancestors.
+                const stickyRowsHeight = getStickyAncestorsHeight({
+                  parentIndexes,
+                  index,
+                  maxCount: STICKY_ROWS_DEFAULT_MAX_COUNT,
+                  listHeight: height,
+                  getRowHeight,
+                });
+                const itemTop = rowTops[index];
+                const itemBottom = itemTop + getRowHeight(index);
+                const scrollOffset = scrollOffsetRef.current;
+                if (
+                  placement === 'start' ||
+                  itemTop < scrollOffset + stickyRowsHeight
+                ) {
+                  list.scrollTo(Math.max(0, itemTop - stickyRowsHeight));
+                } else if (itemBottom > scrollOffset + height) {
+                  list.scrollTo(itemBottom - height);
+                }
+                // Otherwise, the item is already entirely visible below the
+                // sticky rows: don't scroll.
+              };
           if (isRendered) {
-            list.scrollToItem(index, placement);
+            scrollCommand();
           } else {
-            bufferedScrollingCommandRef.current = () => {
-              list.scrollToItem(index, placement);
-            };
+            bufferedScrollingCommandRef.current = scrollCommand;
           }
         }
       }
     },
-    [flattenedData, isRendered]
+    [
+      flattenedData,
+      isRendered,
+      enableStickyAncestors,
+      parentIndexes,
+      height,
+      rowTops,
+      getRowHeight,
+    ]
   );
 
   const scrollToItem = React.useCallback(
@@ -700,6 +879,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         // $FlowFixMe[incompatible-type]
         itemData={itemData}
         ref={listRef}
+        outerRef={listOuterRef}
+        onScroll={enableStickyAncestors ? onScroll : undefined}
         // Keep overscanCount relatively high so that:
         // - during in-app tutorials we make sure the tooltip displayer finds
         //   the elements to highlight
@@ -708,6 +889,60 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       >
         {ReadOnlyTreeViewRow}
       </VariableSizeList>
+      {enableStickyAncestors && stickyRows.length > 0 && (
+        <div
+          className={classes.stickyRowsContainer}
+          style={{
+            height:
+              stickyRows[stickyRows.length - 1].top +
+              stickyRows[stickyRows.length - 1].height,
+            // Do not cover the scrollbar of the list, if any.
+            right: listOuterRef.current
+              ? listOuterRef.current.offsetWidth -
+                listOuterRef.current.clientWidth
+              : 0,
+          }}
+        >
+          {stickyRows
+            .map((stickyRow, rowRank) => {
+              const node = flattenedData[stickyRow.index];
+              // The sticky rows can reference rows that no longer exist
+              // during the render following a change of the tree - they
+              // are recomputed in a layout effect, before painting.
+              if (!node) return null;
+              return (
+                <div
+                  key={node.id}
+                  className={classes.stickyRow}
+                  style={{
+                    top: stickyRow.top,
+                    height: stickyRow.height,
+                    backgroundColor: surfaceBackgroundColor || undefined,
+                  }}
+                  onClick={() => onClickStickyRow(rowRank, stickyRow.index)}
+                >
+                  <ReadOnlyTreeViewRow
+                    index={stickyRow.index}
+                    style={{ height: stickyRow.height }}
+                    data={{
+                      ...itemData,
+                      // When collapsing from a sticky row, also reveal the
+                      // actual row so the user does not lose their position.
+                      onOpen: (node, index) => {
+                        onOpen(node, index);
+                        onClickStickyRow(rowRank, stickyRow.index);
+                      },
+                    }}
+                    isSticky
+                  />
+                </div>
+              );
+            })
+            // Render in reverse DOM order so that, during the "push"
+            // transition, the deepest row slides under its ancestors.
+            .reverse()}
+        </div>
+      )}
     </div>
   );
 };

@@ -310,6 +310,99 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(instances[1].getY()).to.be(234);
   });
 
+  it('can hide then show again an instance at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    expect(scene.getInstancesOf('MyObject')[0].isVisible()).to.be(true);
+
+    // Mark the instance as hidden at start (the serializer only writes the
+    // attribute when true).
+    const hiddenProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123, hidden: true }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      hiddenProjectData,
+      [],
+      runtimeGame
+    );
+    expect(scene.getInstancesOf('MyObject')[0].isVisible()).to.be(false);
+
+    // Mark it as visible again: the attribute is absent from the data, like
+    // the serializer produces.
+    const visibleAgainProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      hiddenProjectData,
+      visibleAgainProjectData,
+      [],
+      runtimeGame
+    );
+    expect(scene.getInstancesOf('MyObject')[0].isVisible()).to.be(true);
+  });
+
+  it('keeps instances hidden at start visible when in the in-game editor', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    // Simulate the in-game editor (where hidden instances must stay visible,
+    // to be seen and manipulated).
+    runtimeGame.isInGameEdition = () => true;
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const hiddenProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123, hidden: true }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      hiddenProjectData,
+      [],
+      runtimeGame
+    );
+    // The instance is hidden at start, but stays visible in the editor.
+    expect(scene.getInstancesOf('MyObject')[0].isVisible()).to.be(true);
+  });
+
   it('can move instances of a global object at hot-reload', async () => {
     const oldProjectData = createProjectData({
       globalObjects: [createSpriteData({ name: 'MyGlobalObject' })],

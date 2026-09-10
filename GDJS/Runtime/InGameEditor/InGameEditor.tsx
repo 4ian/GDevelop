@@ -265,6 +265,48 @@ namespace gdjs {
     // Keep the pickers intact for interaction - they're invisible anyway
   }
 
+  /**
+   * Remove the near-infinite white guide lines shown by the Three.js TransformControls
+   * when an axis is hovered or dragged (helpers named X/Y/Z for translate/scale,
+   * AXIS for rotate). They cross the whole scene, which is distracting -
+   * especially when manipulating small objects.
+   */
+  function patchAxisGuideLinesOnTransformControlsGizmos(
+    controls: THREE_ADDONS.TransformControls
+  ) {
+    const gizmo = (controls as any)._gizmo;
+    if (!gizmo || !gizmo.helper) return;
+
+    // Only the axis guide lines are removed: the other helpers (START/END/DELTA,
+    // giving a discreet feedback of the movement while dragging) are kept.
+    const guideLineNamesByMode = {
+      translate: ['X', 'Y', 'Z'],
+      rotate: ['AXIS'],
+      scale: ['X', 'Y', 'Z'],
+    };
+
+    Object.keys(guideLineNamesByMode).forEach((mode) => {
+      const helperGroup = gizmo.helper[mode];
+      if (!helperGroup || !helperGroup.children) return;
+
+      const guideLines = helperGroup.children.filter((child) =>
+        guideLineNamesByMode[mode].includes(child.name)
+      );
+
+      guideLines.forEach((guideLine) => {
+        helperGroup.remove(guideLine);
+        // Geometries and materials are cloned per handle by TransformControls,
+        // so they can safely be disposed.
+        if (guideLine.geometry) guideLine.geometry.dispose();
+        if (Array.isArray(guideLine.material)) {
+          guideLine.material.forEach((material) => material.dispose());
+        } else if (guideLine.material) {
+          guideLine.material.dispose();
+        }
+      });
+    });
+  }
+
   const getSvgIconUrl = (game: RuntimeGame, resourceName: string) => {
     const resource = game.getResourceLoader().getResource(resourceName);
     if (!resource) return '';
@@ -548,6 +590,22 @@ namespace gdjs {
 
   const snap = (value: float, size: float, offset: float) =>
     size ? offset + size * Math.round((value - offset) / size) : value;
+
+  /**
+   * Convert a scale ratio to the ratio giving a size whose far edge
+   * (origin + size) is on the grid. The size is kept at least 1.
+   */
+  const getScaleSnappedOnGrid = (
+    origin: float,
+    initialSize: float,
+    scale: float,
+    snapPosition: (position: float) => float
+  ): float => {
+    if (initialSize <= 0) return scale;
+    const snappedEdge = snapPosition(origin + initialSize * Math.abs(scale));
+    const snappedSize = Math.max(1, snappedEdge - origin);
+    return snappedSize / initialSize;
+  };
 
   class Selection {
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
@@ -849,6 +907,10 @@ namespace gdjs {
     private _selection = new Selection();
     private _selectionBoxes: Map<RuntimeObject, ObjectSelectionBoxHelper> =
       new Map();
+    // Markers displayed on instances that are hidden when the scene starts
+    // (which stay visible in the editor).
+    private _hiddenInstanceMarkers: Map<RuntimeObject, THREE.Sprite> =
+      new Map();
     private _objectMover = new ObjectMover(this);
 
     private _wasMouseLeftButtonPressed = false;
@@ -1130,6 +1192,7 @@ namespace gdjs {
       this._selectedLayerName = '';
       // Clear any reference to `RuntimeObject` from the unloaded scene.
       this._selectionBoxes.clear();
+      this._hiddenInstanceMarkers.clear();
       this._selectionControls = null;
       this._draggedNewObject = null;
       this._draggedSelectedObject = null;
@@ -2073,6 +2136,107 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Display a crossed-eye marker on every instance that is hidden when the
+     * scene starts: those instances stay visible in the editor (so they can
+     * be seen and manipulated), and the marker is what tells them apart.
+     */
+    private _updateHiddenInstanceMarkers() {
+      const editedInstanceContainer = this.getEditedInstanceContainer();
+      const stillHiddenObjects = new Set<RuntimeObject>();
+      if (editedInstanceContainer) {
+        for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
+          if (!object.persistentUuid) continue;
+          const instanceData = this._getInstanceData(object.persistentUuid);
+          if (!instanceData || !instanceData.hidden) continue;
+
+          const objectLayer = this.getEditorLayer(object.getLayer());
+          const threeGroup =
+            objectLayer && objectLayer.getRenderer().getThreeGroup();
+          if (!threeGroup) continue;
+
+          let marker = this._hiddenInstanceMarkers.get(object);
+          if (!marker) {
+            marker = makeHiddenInstanceMarker(this._runtimeGame);
+            this._hiddenInstanceMarkers.set(object, marker);
+          }
+          // Also handles the object having changed of layer.
+          if (marker.parent !== threeGroup) {
+            threeGroup.add(marker);
+          }
+          const width = object.getWidth();
+          const height = object.getHeight();
+          const depth = is3D(object) ? object.getDepth() : 0;
+          const boundingRadius =
+            Math.sqrt(width * width + height * height + depth * depth) / 2;
+
+          // The marker size follows the size of the object (so it never
+          // dwarfs a small object seen from afar, and stays legible on a big
+          // object seen from close), within absolute limits.
+          let markerSize = Math.min(Math.max(boundingRadius * 0.4, 16), 128);
+
+          // Start from the true center of the object (the world can be
+          // navigated from any angle in 3D)...
+          marker.position.set(
+            object.getCenterXInScene(),
+            object.getCenterYInScene(),
+            is3D(object) ? object.getZ() + object.getDepth() / 2 : 0
+          );
+          // ...then move the marker towards the camera, just out of the
+          // object's bounding sphere: on screen it stays at the center of the
+          // object, but the object can't occlude its own marker - while
+          // other objects in front of it properly do (the marker is
+          // depth-tested).
+          const threeCamera = objectLayer.getRenderer().getThreeCamera();
+          if (threeCamera) {
+            const cameraLocalPosition = threeGroup.worldToLocal(
+              threeCamera.getWorldPosition(temporaryVector3)
+            );
+            const towardsCamera = cameraLocalPosition.sub(marker.position);
+            const cameraDistance = towardsCamera.length();
+            if (cameraDistance > 0) {
+              // Don't go past the camera if it's inside the bounding sphere.
+              const offset = Math.min(
+                boundingRadius * 1.05,
+                cameraDistance * 0.9
+              );
+              marker.position.addScaledVector(
+                towardsCamera.multiplyScalar(1 / cameraDistance),
+                offset
+              );
+
+              // When the camera gets close to a (big) object, the marker
+              // would take a lot of space on screen: cap its size to a
+              // fraction of the viewport height.
+              if (threeCamera instanceof THREE.PerspectiveCamera) {
+                const markerCameraDistance = Math.max(
+                  cameraDistance - offset,
+                  1
+                );
+                const viewportWorldHeightAtMarker =
+                  2 *
+                  markerCameraDistance *
+                  Math.tan(THREE.MathUtils.degToRad(threeCamera.fov / 2));
+                markerSize = Math.min(
+                  markerSize,
+                  viewportWorldHeightAtMarker * 0.05
+                );
+              }
+            }
+          }
+          marker.scale.set(markerSize, markerSize, 1);
+          stillHiddenObjects.add(object);
+        }
+      }
+
+      this._hiddenInstanceMarkers.forEach((marker, object) => {
+        if (!stillHiddenObjects.has(object)) {
+          marker.removeFromParent();
+          this._hiddenInstanceMarkers.delete(object);
+        }
+      });
+    }
+
     private _updateSelectionOutline({
       objectUnderCursor,
     }: {
@@ -2246,6 +2410,9 @@ namespace gdjs {
             patchNegativeAxisHandlesOnTransformControlsGizmos(
               threeTransformControls
             );
+            patchAxisGuideLinesOnTransformControlsGizmos(
+              threeTransformControls
+            );
 
             threeTransformControls.rotation.order = 'ZYX';
             threeTransformControls.scale.y = -1;
@@ -2273,6 +2440,9 @@ namespace gdjs {
             let initialObjectX = 0;
             let initialObjectY = 0;
             let initialObjectZ = 0;
+            let initialObjectWidth = 0;
+            let initialObjectHeight = 0;
+            let initialObjectDepth = 0;
             const initialDummyPosition = new THREE.Vector3();
             const initialDummyRotation = new THREE.Euler();
             const initialDummyScale = new THREE.Vector3();
@@ -2291,6 +2461,11 @@ namespace gdjs {
                 initialObjectY = lastEditableSelectedObject.getY();
                 initialObjectZ = is3D(lastEditableSelectedObject)
                   ? lastEditableSelectedObject.getZ()
+                  : 0;
+                initialObjectWidth = lastEditableSelectedObject.getWidth();
+                initialObjectHeight = lastEditableSelectedObject.getHeight();
+                initialObjectDepth = is3D(lastEditableSelectedObject)
+                  ? lastEditableSelectedObject.getDepth()
                   : 0;
                 initialDummyPosition.copy(dummyThreeObject.position);
                 initialDummyRotation.copy(dummyThreeObject.rotation);
@@ -2371,6 +2546,71 @@ namespace gdjs {
                 threeTransformControls.axis.length === 1
                   ? 1
                   : 0.2;
+              let scaleX =
+                1 +
+                (dummyThreeObject.scale.x / initialDummyScale.x - 1) *
+                  scaleDamping;
+              let scaleY =
+                1 +
+                (dummyThreeObject.scale.y / initialDummyScale.y - 1) *
+                  scaleDamping;
+              let scaleZ =
+                1 +
+                (dummyThreeObject.scale.z / initialDummyScale.z - 1) *
+                  scaleDamping;
+              if (
+                this._transformControlsMode === 'scale' &&
+                threeTransformControls.axis &&
+                this._editorGrid.isSpanningEnabled(inputManager)
+              ) {
+                // The scale gizmo is anchored on the object origin, so snap the
+                // opposite edge on the grid (like the 2D editor resize handles).
+                const getSnappedScaleX = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectX,
+                    initialObjectWidth,
+                    scaleX,
+                    (x) => this._editorGrid.getSnappedX(x)
+                  );
+                const getSnappedScaleY = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectY,
+                    initialObjectHeight,
+                    scaleY,
+                    (y) => this._editorGrid.getSnappedY(y)
+                  );
+                const getSnappedScaleZ = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectZ,
+                    initialObjectDepth,
+                    scaleZ,
+                    (z) => this._editorGrid.getSnappedZ(z)
+                  );
+                if (threeTransformControls.axis === 'XYZ') {
+                  // Uniform scaling: like the 2D proportional resize, snap the
+                  // biggest side and apply the same ratio to the others.
+                  const uniformScale =
+                    initialObjectWidth >= initialObjectHeight &&
+                    initialObjectWidth >= initialObjectDepth
+                      ? getSnappedScaleX()
+                      : initialObjectHeight >= initialObjectDepth
+                        ? getSnappedScaleY()
+                        : getSnappedScaleZ();
+                  scaleX = uniformScale;
+                  scaleY = uniformScale;
+                  scaleZ = uniformScale;
+                } else {
+                  if (threeTransformControls.axis.includes('X')) {
+                    scaleX = getSnappedScaleX();
+                  }
+                  if (threeTransformControls.axis.includes('Y')) {
+                    scaleY = getSnappedScaleY();
+                  }
+                  if (threeTransformControls.axis.includes('Z')) {
+                    scaleZ = getSnappedScaleZ();
+                  }
+                }
+              }
               this._selectionControlsMovementTotalDelta = {
                 translationX,
                 translationY,
@@ -2384,18 +2624,9 @@ namespace gdjs {
                 rotationZ: -gdjs.toDegrees(
                   dummyThreeObject.rotation.z - initialDummyRotation.z
                 ),
-                scaleX:
-                  1 +
-                  (dummyThreeObject.scale.x / initialDummyScale.x - 1) *
-                    scaleDamping,
-                scaleY:
-                  1 +
-                  (dummyThreeObject.scale.y / initialDummyScale.y - 1) *
-                    scaleDamping,
-                scaleZ:
-                  1 +
-                  (dummyThreeObject.scale.z / initialDummyScale.z - 1) *
-                    scaleDamping,
+                scaleX,
+                scaleY,
+                scaleZ,
               };
 
               this._hasSelectionActuallyMoved =
@@ -2479,7 +2710,8 @@ namespace gdjs {
           this._editorGrid.setTreeScene(threeScene);
         }
         this._editorGrid.setVisible(
-          this._transformControlsMode === 'translate'
+          this._transformControlsMode === 'translate' ||
+            this._transformControlsMode === 'scale'
         );
       }
     }
@@ -2658,6 +2890,9 @@ namespace gdjs {
           depth: depth === defaultDepth ? undefined : depth,
           locked: oldData ? oldData.locked : false,
           sealed: oldData ? oldData.sealed : false,
+          // Not modified by the InGameEditor (which always shows instances,
+          // even those hidden at start), but must be preserved:
+          hidden: oldData ? oldData.hidden : undefined,
           // TODO: how to transmit/should we transmit other properties?
           numberProperties: [],
           stringProperties: [],
@@ -3549,6 +3784,7 @@ namespace gdjs {
       this._updateSelectionBox();
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
+      this._updateHiddenInstanceMarkers();
       // Custom objects only update their position at the end of the frame
       // because they don't override position setters like built-in objects do.
       // Since the instance position is not yet set when `onCreated` is called,
@@ -3997,8 +4233,8 @@ namespace gdjs {
     }
 
     getSnappedZ(z: float): float {
-      const { gridDepth, gridOffsetY } = this;
-      return snap(z, gridDepth || 0, gridOffsetY);
+      const { gridDepth, gridOffsetZ } = this;
+      return snap(z, gridDepth || 0, gridOffsetZ);
     }
 
     isSpanningEnabled(
@@ -5009,6 +5245,79 @@ namespace gdjs {
         cameraIndex
       );
     }
+  };
+
+  const temporaryVector3 = new THREE.Vector3();
+
+  // The material is shared by all the markers, and stays invisible until the
+  // icon texture is loaded.
+  let hiddenInstanceMarkerMaterial: THREE.SpriteMaterial | null = null;
+  let hiddenInstanceMarkerTextureLoadStarted = false;
+
+  const getOrLoadHiddenInstanceMarkerMaterial = (
+    game: RuntimeGame
+  ): THREE.SpriteMaterial => {
+    if (!hiddenInstanceMarkerMaterial) {
+      hiddenInstanceMarkerMaterial = new THREE.SpriteMaterial({
+        // The marker has a size in the world, based on the size of the object
+        // (see `_updateHiddenInstanceMarkers`): like the object, it gets
+        // smaller when far away and bigger when close.
+        sizeAttenuation: true,
+        // The marker is depth-tested: an object between the camera and the
+        // hidden instance occludes its marker (the marker is moved towards the
+        // camera, out of the instance itself, so the instance can't occlude
+        // its own marker - see `_updateHiddenInstanceMarkers`). Writing the
+        // depth also protects the marker from the plane showing the 2D
+        // objects, which is rendered afterwards (with
+        // `renderOrder = Number.MAX_SAFE_INTEGER`).
+        depthTest: true,
+        depthWrite: true,
+        // Discard the fully transparent pixels of the marker, so they don't
+        // write the depth (which would punch an invisible rectangle in the
+        // plane showing the 2D objects, rendered afterwards).
+        alphaTest: 0.1,
+        transparent: true,
+        // Nothing to show until the icon texture is loaded.
+        visible: false,
+      });
+    }
+    if (!hiddenInstanceMarkerTextureLoadStarted) {
+      hiddenInstanceMarkerTextureLoadStarted = true;
+
+      const url = getSvgIconUrl(game, 'InGameEditor-HiddenInstanceIcon');
+      if (url) {
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+        image.onload = () => {
+          if (!hiddenInstanceMarkerMaterial) return;
+
+          // Rasterize the SVG at a fixed resolution (its intrinsic size is
+          // small), so the texture stays crisp at the biggest marker sizes.
+          const size = 128;
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          const context = canvas.getContext('2d');
+          if (!context) return;
+          context.drawImage(image, 0, 0, size, size);
+
+          hiddenInstanceMarkerMaterial.map = new THREE.CanvasTexture(canvas);
+          hiddenInstanceMarkerMaterial.visible = true;
+          hiddenInstanceMarkerMaterial.needsUpdate = true;
+        };
+        image.src = url;
+      }
+    }
+    return hiddenInstanceMarkerMaterial;
+  };
+
+  const makeHiddenInstanceMarker = (game: RuntimeGame): THREE.Sprite => {
+    const marker = new THREE.Sprite(
+      getOrLoadHiddenInstanceMarkerMaterial(game)
+    );
+    // Never picked by the editor raycasts (used to select objects).
+    marker.raycast = () => {};
+    return marker;
   };
 
   class ObjectSelectionBoxHelper {

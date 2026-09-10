@@ -431,6 +431,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -463,6 +464,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -495,6 +497,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [buttonV2ExtensionShortHeader],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -529,6 +532,7 @@ describe('InstallAsset', () => {
         ],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -568,6 +572,7 @@ describe('InstallAsset', () => {
           incompatibleButtonV4ExtensionShortHeader,
         ],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -602,6 +607,7 @@ describe('InstallAsset', () => {
           incompatibleFlashExtensionShortHeader,
         ],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: true,
       });
     });
@@ -665,6 +671,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -700,6 +707,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -735,6 +743,7 @@ describe('InstallAsset', () => {
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [buttonV2ExtensionShortHeader],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -772,6 +781,7 @@ describe('InstallAsset', () => {
         ],
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: false,
       });
     });
@@ -813,6 +823,7 @@ describe('InstallAsset', () => {
           incompatibleButtonV4ExtensionShortHeader,
         ],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: true,
       });
     });
@@ -851,6 +862,7 @@ describe('InstallAsset', () => {
           incompatibleFlashExtensionShortHeader,
         ],
         safeToUpdateExtensions: [],
+        unknownExtensionDependencies: [],
         isGDevelopUpdateNeeded: true,
       });
     });
@@ -1001,6 +1013,7 @@ describe('InstallAsset', () => {
             breakingChangesExtensionShortHeaders: [],
             incompatibleWithIdeExtensionShortHeaders: [],
             safeToUpdateExtensions: [],
+            unknownExtensionDependencies: [],
             isGDevelopUpdateNeeded: false,
           },
           shouldUpdateExtension: true,
@@ -1039,6 +1052,7 @@ describe('InstallAsset', () => {
             breakingChangesExtensionShortHeaders: [],
             incompatibleWithIdeExtensionShortHeaders: [],
             safeToUpdateExtensions: [],
+            unknownExtensionDependencies: [],
             isGDevelopUpdateNeeded: false,
           },
           shouldUpdateExtension: true,
@@ -1082,6 +1096,7 @@ describe('InstallAsset', () => {
           breakingChangesExtensionShortHeaders: [],
           incompatibleWithIdeExtensionShortHeaders: [],
           safeToUpdateExtensions: [],
+          unknownExtensionDependencies: [],
           isGDevelopUpdateNeeded: false,
         },
         shouldUpdateExtension: true,

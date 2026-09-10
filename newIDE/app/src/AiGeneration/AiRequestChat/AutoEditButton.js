@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Paper from '../../UI/Paper';
 import classes from './AutoEditButton.module.css';
@@ -38,13 +37,14 @@ const AutoEditButton = ({
     style={{ ...styles.paper, opacity: disabled ? 0.5 : 1 }}
   >
     <ButtonBase onClick={onToggle} disabled={disabled} style={styles.button}>
-      <Trans>Auto edit</Trans>
+      {/* Not translated on purpose: keeps the button compact across locales. */}
+      Auto edit
       <span
         className={`${classes.statusPill} ${
           isAutoEditEnabled ? classes.statusPillOn : classes.statusPillOff
         }`}
       >
-        {isAutoEditEnabled ? <Trans>On</Trans> : <Trans>Off</Trans>}
+        {isAutoEditEnabled ? 'On' : 'Off'}
       </span>
     </ButtonBase>
   </Paper>

@@ -54,16 +54,19 @@ type Props = {|
   onCancel: () => void,
   onSubmit: () => void,
   open: boolean,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   i18n: I18nType,
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  editEventsFunctionParameter: VariableDialogOpeningProps => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
+  editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 /**

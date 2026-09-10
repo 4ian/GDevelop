@@ -27,12 +27,20 @@ export const Default = (): React.Node => (
       globalObjectsContainer={testProject.project.getObjects()}
       objectsContainer={testProject.testLayout.getObjects()}
       initialInstances={testProject.testLayout.getInitialInstances()}
+      layersContainer={testProject.testLayout.getLayers()}
       objectGroup={testProject.group2}
       isVariableListLocked={false}
       isObjectListLocked={false}
+      isBehaviorListLocked={false}
       eventsFunctionsExtension={null}
       eventsBasedObject={null}
       onEditObjectGroup={action('onEditObjectGroup')}
+      onWillInstallExtension={action('onWillInstallExtension')}
+      onExtensionInstalled={action('onExtensionInstalled')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
+      onUpdateBehaviorsSharedData={action('onUpdateBehaviorsSharedData')}
       resourceManagementProps={fakeResourceManagementProps}
     />
   </DragAndDropContextProvider>
@@ -48,12 +56,20 @@ export const WithLongObjectNames = (): React.Node => (
       globalObjectsContainer={testProject.project.getObjects()}
       objectsContainer={testProject.testLayout.getObjects()}
       initialInstances={testProject.testLayout.getInitialInstances()}
+      layersContainer={testProject.testLayout.getLayers()}
       objectGroup={testProject.group4WithLongsNames}
       isVariableListLocked={false}
       isObjectListLocked={false}
+      isBehaviorListLocked={false}
       eventsFunctionsExtension={null}
       eventsBasedObject={null}
       onEditObjectGroup={action('onEditObjectGroup')}
+      onWillInstallExtension={action('onWillInstallExtension')}
+      onExtensionInstalled={action('onExtensionInstalled')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
+      onUpdateBehaviorsSharedData={action('onUpdateBehaviorsSharedData')}
       resourceManagementProps={fakeResourceManagementProps}
     />
   </DragAndDropContextProvider>
@@ -69,12 +85,20 @@ export const Empty = (): React.Node => (
       globalObjectsContainer={testProject.project.getObjects()}
       objectsContainer={testProject.testLayout.getObjects()}
       initialInstances={testProject.testLayout.getInitialInstances()}
+      layersContainer={testProject.testLayout.getLayers()}
       objectGroup={testProject.emptyGroup}
       isVariableListLocked={false}
       isObjectListLocked={false}
+      isBehaviorListLocked={false}
       eventsFunctionsExtension={null}
       eventsBasedObject={null}
       onEditObjectGroup={action('onEditObjectGroup')}
+      onWillInstallExtension={action('onWillInstallExtension')}
+      onExtensionInstalled={action('onExtensionInstalled')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
+      onUpdateBehaviorsSharedData={action('onUpdateBehaviorsSharedData')}
       resourceManagementProps={fakeResourceManagementProps}
     />
   </DragAndDropContextProvider>

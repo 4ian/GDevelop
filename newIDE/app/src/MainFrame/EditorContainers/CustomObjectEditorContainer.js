@@ -3,11 +3,14 @@ import * as React from 'react';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import {
   registerOnResourceExternallyChangedCallback,
@@ -26,6 +29,10 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
+import {
+  parseCustomObjectEditorTabName,
+  getObjectTypeFromCustomObjectEditorTabName,
+} from '../../Utils/CustomObjectEditorTabName';
 
 const gd: libGDevelop = global.gd;
 
@@ -40,9 +47,15 @@ const styles = {
 export class CustomObjectEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
   _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
     gd.ObjectsContainer.Function
   );
+
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -57,6 +70,15 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // goes from true to false (in which case PIXI rendering is halted). If isActive was false
     // and remains false, it's safe to stop update here (PIXI rendering is already halted).
     return this.props.isActive || nextProps.isActive;
+  }
+
+  componentDidUpdate(prevProps: RenderEditorContainerProps): void {
+    if (
+      this.props.project !== prevProps.project ||
+      this.props.projectItemName !== prevProps.projectItemName
+    ) {
+      this._rebuildProjectScopedContainersAccessor();
+    }
   }
 
   componentDidMount() {
@@ -77,6 +99,25 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       eventsBasedObjectType: projectItemName || null,
       eventsBasedObjectVariantName: this.getVariantName(),
     });
+  }
+
+  _rebuildProjectScopedContainersAccessor() {
+    const { project } = this.props;
+    const eventsFunctionsExtension = this.getEventsFunctionsExtension();
+    const eventsBasedObject = this.getEventsBasedObject();
+    const variant = this.getVariant();
+    if (project && eventsFunctionsExtension && eventsBasedObject && variant) {
+      this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        {
+          project,
+          eventsFunctionsExtension,
+          eventsBasedObject,
+        },
+        this._objectsContainer
+      );
+    } else {
+      this._projectScopedContainersAccessor = null;
+    }
   }
 
   componentWillUnmount() {
@@ -189,6 +230,14 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // No thing to be done.
   }
 
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
+    // No thing to be done: `changes.scene` is always a real project layout,
+    // and this editor's own object dialog (if any) is scoped to the custom
+    // object variant's private objects container, which can't be targeted by
+    // this notification. Revisit if object deletion is ever extended to
+    // event-based-object children.
+  }
+
   onObjectGroupsModifiedOutsideEditor(
     changes: ObjectGroupsOutsideEditorChanges
   ) {
@@ -209,7 +258,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;
-    const extensionName = projectItemName.split('::')[0] || '';
+    const { extensionName } = parseCustomObjectEditorTabName(projectItemName);
 
     if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
       return null;
@@ -231,7 +280,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const extension = this.getEventsFunctionsExtension();
     if (!extension) return null;
 
-    const eventsBasedObjectName = projectItemName.split('::')[1] || '';
+    const {
+      objectName: eventsBasedObjectName,
+    } = parseCustomObjectEditorTabName(projectItemName);
 
     if (!extension.getEventsBasedObjects().has(eventsBasedObjectName)) {
       return null;
@@ -241,18 +292,16 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   getEventsBasedObjectType(): string {
     const { projectItemName } = this.props;
-    return (
-      (projectItemName &&
-        projectItemName.split('::')[0] +
-          '::' +
-          projectItemName.split('::')[1]) ||
-      ''
-    );
+    return projectItemName
+      ? getObjectTypeFromCustomObjectEditorTabName(projectItemName)
+      : '';
   }
 
   getVariantName(): string {
     const { projectItemName } = this.props;
-    return (projectItemName && projectItemName.split('::')[2]) || '';
+    return projectItemName
+      ? parseCustomObjectEditorTabName(projectItemName).variantName
+      : '';
   }
 
   getVariant(): ?gdEventsBasedObjectVariant {
@@ -262,7 +311,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const eventsBasedObject = this.getEventsBasedObject();
     if (!eventsBasedObject) return null;
 
-    const variantName = projectItemName.split('::')[2] || '';
+    const { variantName } = parseCustomObjectEditorTabName(projectItemName);
     return eventsBasedObject.getVariants().hasVariantNamed(variantName)
       ? eventsBasedObject.getVariants().getVariant(variantName)
       : eventsBasedObject.getDefaultVariant();
@@ -293,14 +342,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const variant = this.getVariant();
     if (!variant) return null;
 
-    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      {
-        project,
-        eventsFunctionsExtension,
-        eventsBasedObject,
-      },
-      this._objectsContainer
-    );
+    if (!this._projectScopedContainersAccessor) {
+      return null;
+    }
 
     return (
       <div style={styles.container}>
@@ -317,7 +361,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           unsavedChanges={this.props.unsavedChanges}
           ref={editor => (this.editor = editor)}
           project={project}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          projectScopedContainersAccessor={
+            this._projectScopedContainersAccessor
+          }
           layout={null}
           eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}
@@ -370,6 +416,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           }
           onWillInstallExtension={this.props.onWillInstallExtension}
           onExtensionInstalled={this.props.onExtensionInstalled}
+          onCreateNewExtensionWithBehavior={null}
           onDeleteEventsBasedObjectVariant={
             this.props.onDeleteEventsBasedObjectVariant
           }

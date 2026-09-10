@@ -84,6 +84,7 @@ const usePurchaseMarketingPlan = ({
       if (currentCreditsAmount < planCreditsAmount) {
         openCreditsPackageDialog({
           missingCredits: planCreditsAmount - currentCreditsAmount,
+          placementId: 'game-featuring',
         });
         return;
       }

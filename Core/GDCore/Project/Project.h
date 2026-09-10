@@ -16,6 +16,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesContainer.h"
+#include "GDCore/Project/TestsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Watermark.h"
 #include "GDCore/Project/MemoryTrackedRegistry.h"
@@ -568,7 +569,7 @@ class GD_CORE_API Project {
    * first platform supporting the object is used.
    */
   std::shared_ptr<gd::BaseEvent> CreateEvent(
-      const gd::String& type, const gd::String& platformName = "");
+      const gd::String& type, const gd::String& platformName = "") const;
   ///@}
 
   /** \name Layouts management
@@ -759,6 +760,21 @@ class GD_CORE_API Project {
    * \brief Delete external events named "name".
    */
   void RemoveExternalEvents(const gd::String& name);
+  ///@}
+
+  /** \name Tests management
+   * Members functions related to the tests of the project.
+   */
+  ///@{
+  /**
+   * \brief Return a reference to the tests of the project.
+   */
+  gd::TestsContainer& GetTests() { return tests; }
+
+  /**
+   * \brief Return a const reference to the tests of the project.
+   */
+  const gd::TestsContainer& GetTests() const { return tests; }
   ///@}
 
   /** \name External layout management
@@ -1194,6 +1210,7 @@ class GD_CORE_API Project {
   gd::Watermark watermark;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;  ///< List of all externals events
+  gd::TestsContainer tests;  ///< The tests of the project.
   ExtensionProperties
       extensionProperties;  ///< The properties of the extensions.
   gd::WholeProjectDiagnosticReport wholeProjectDiagnosticReport;

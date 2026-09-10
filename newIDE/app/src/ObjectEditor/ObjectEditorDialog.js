@@ -66,6 +66,9 @@ type Props = {|
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string
@@ -113,6 +116,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     onComputeAllVariableNames,
     onWillInstallExtension,
     onExtensionInstalled,
+    onCreateNewExtensionWithBehavior,
     onOpenEventBasedObjectEditor,
     onOpenEventBasedObjectVariantEditor,
     onDeleteEventsBasedObjectVariant,
@@ -125,17 +129,17 @@ const InnerDialog = (props: InnerDialogProps) => {
   const [objectName, setObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
 
-  // Reset variable UUIDs for changeset tracking. This must happen before
-  // the cancelable editor hook serializes the object, so that both the
-  // serialized "original" state and the in-memory "new" state share
+  // Ensure variable UUIDs are set for changeset tracking. This must happen
+  // before the cancelable editor hook serializes the object, so that both
+  // the serialized "original" state and the in-memory "new" state share
   // the same UUIDs when changes are applied.
-  // We only reset variable UUIDs (not the object's own UUID).
-  // This can be removed once we decide to persist variable UUIDs in the project file.
-  // (and make sure they are properly reset when a variable is added/copied/pasted/etc).
-  const variableUuidsResetRef = React.useRef(false);
-  if (!variableUuidsResetRef.current) {
-    object.getVariables().resetPersistentUuid();
-    variableUuidsResetRef.current = true;
+  // Variables persistent UUIDs are persisted in the project file, so they
+  // must be kept stable: only set them for variables not having one yet.
+  // We only touch variable UUIDs (not the object's own UUID).
+  const variableUuidsEnsuredRef = React.useRef(false);
+  if (!variableUuidsEnsuredRef.current) {
+    object.getVariables().ensurePersistentUuids();
+    variableUuidsEnsuredRef.current = true;
   }
 
   const {
@@ -146,14 +150,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   } = useSerializableObjectCancelableEditor({
     serializableObject: object,
     useProjectToUnserialize: project,
-    onCancel: React.useCallback(
-      () => {
-        // Clear variable UUIDs to avoid them being persisted in the project file.
-        object.getVariables().clearPersistentUuid();
-        onCancel();
-      },
-      [object, onCancel]
-    ),
+    onCancel,
   });
 
   const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(
@@ -209,15 +206,12 @@ const InnerDialog = (props: InnerDialogProps) => {
       originalSerializedVariables
     );
     if (eventsBasedObject) {
-      gd.ObjectVariableHelper.applyChangesToVariants(
+      gd.ObjectRefactorer.applyChangesToVariants(
         eventsBasedObject,
         object.getName(),
         changeset
       );
     }
-
-    // Clear variable UUIDs to avoid them being persisted in the project file.
-    object.getVariables().clearPersistentUuid();
 
     // Do the renaming *after* applying changes, as "withSerializableObject"
     // HOC will unserialize the object to apply modifications, which will
@@ -372,7 +366,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       ) : null}
       {currentTab === 'behaviors' && (
         <BehaviorsEditor
-          object={object}
+          objects={[object]}
           isChildObject={!!eventsBasedObject}
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
@@ -387,6 +381,12 @@ const InnerDialog = (props: InnerDialogProps) => {
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
           onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
+          onCreateNewExtensionWithBehavior={(project, object) => {
+            if (onCreateNewExtensionWithBehavior) {
+              onApply();
+              onCreateNewExtensionWithBehavior(project, object);
+            }
+          }}
           isListLocked={isBehaviorListLocked}
         />
       )}

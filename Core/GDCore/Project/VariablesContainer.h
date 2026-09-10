@@ -154,6 +154,17 @@ class GD_CORE_API VariablesContainer {
    * \brief Call the callback for each variable with a name matching the specified search.
    */
   void ForEachVariableMatchingSearch(const gd::String& search, std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const;
+
+  /**
+   * \brief Clear the "mixed values" marker on all the variables of the
+   * container (see `gd::Variable::ClearMixedValues`).
+   *
+   * This marker is only relevant for the temporary variables containers built
+   * by the editor to display the variables shared by several objects. It must
+   * never be kept on variables stored in a project (object variables,
+   * instance variables...).
+   */
+  void ClearMixedValues();
   ///@}
 
   /** \name Saving and loading
@@ -175,6 +186,14 @@ class GD_CORE_API VariablesContainer {
    * the same variables between serialization.
    */
   VariablesContainer& ResetPersistentUuid();
+
+  /**
+   * \brief Set the persistent UUID of the container and all its variables
+   * if they are not set already - contrary to `ResetPersistentUuid`,
+   * existing UUIDs are preserved (so that they stay stable across
+   * serializations, avoiding useless changes in the project file).
+   */
+  VariablesContainer& EnsurePersistentUuids();
 
   /**
    * \brief Remove the persistent UUID - when the variables no

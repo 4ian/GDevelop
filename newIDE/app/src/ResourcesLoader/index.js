@@ -84,8 +84,7 @@ const isLocalFile = (urlOrFilename: string) => {
  * (notably images).
  */
 export default class ResourcesLoader {
-  // $FlowFixMe[missing-local-annot]
-  static _cache = (new UrlsCache(): UrlsCache);
+  static _cache: UrlsCache = new UrlsCache();
 
   /**
    * Remove the specified resources resolved URLs from the cache. Useful if the
@@ -136,7 +135,6 @@ export default class ResourcesLoader {
         .resolve(projectPath, urlOrFilename)
         .replace(/\\/g, '/');
 
-      console.info('Caching resolved local filename:', resourceAbsolutePath);
       return this._cache.cacheLocalFileUrl(
         project,
         urlOrFilename,
@@ -178,7 +176,6 @@ export default class ResourcesLoader {
     );
     if (cachedUrl) return cachedUrl;
 
-    console.info('Caching resolved url:', urlWithParameters);
     return this._cache.cacheUrl(project, urlWithParameters);
   }
 

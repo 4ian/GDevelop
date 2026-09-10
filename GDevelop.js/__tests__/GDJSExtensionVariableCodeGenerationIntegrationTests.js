@@ -299,7 +299,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push number action', function () {
-    extension.getSceneVariables().insertNew('MyVariable', 0).castTo('Array');
+    extension.getSceneVariables().insertNew('MyVariable', 0).castTo('array');
     const runtimeScene = generateAndRunActionsForFunction([
       {
         type: { value: 'PushNumber' },
@@ -316,7 +316,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push string action', function () {
-    extension.getSceneVariables().insertNew('MyVariable', 0).castTo('Array');
+    extension.getSceneVariables().insertNew('MyVariable', 0).castTo('array');
     const runtimeScene = generateAndRunActionsForFunction([
       {
         type: { value: 'PushString' },
@@ -333,7 +333,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push boolean action', function () {
-    extension.getSceneVariables().insertNew('MyVariable', 0).castTo('Array');
+    extension.getSceneVariables().insertNew('MyVariable', 0).castTo('array');
     const runtimeScene = generateAndRunActionsForFunction([
       {
         type: { value: 'PushBoolean' },
@@ -350,7 +350,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push variable action', function () {
-    extension.getSceneVariables().insertNew('MyVariable', 0).castTo('Array');
+    extension.getSceneVariables().insertNew('MyVariable', 0).castTo('array');
     extension.getSceneVariables().insertNew('MyOtherVariable', 0).setValue(123);
     const runtimeScene = generateAndRunActionsForFunction([
       {

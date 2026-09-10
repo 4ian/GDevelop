@@ -16,8 +16,7 @@ type Props = {|
   isForEditor?: boolean,
 |};
 
-// $FlowFixMe[missing-local-annot]
-const shouldDisplayDialogForLogs = logs =>
+const shouldDisplayDialogForLogs = (logs: Array<HotReloaderLog>) =>
   logs.filter(log => log.kind === 'error' || log.kind === 'fatal').length > 0;
 
 export default function HotReloadLogsDialog({

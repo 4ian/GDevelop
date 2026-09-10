@@ -1,0 +1,113 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 6px;
+  min-width: 0;
+  /* The height is fixed so that a chip changing status (and so changing its
+  icon, or showing a spinner) never moves the layout around it. */
+  height: 26px;
+  padding: 0 10px 0 6px;
+  border-radius: 999px;
+  /* The status color is set by the tones below and used by the icon
+  (via currentColor), the label and the translucent background. */
+  color: var(--theme-text-default-color);
+  background-color: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.chip.small {
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px 0 4px;
+}
+
+/* A box of a fixed size for the icon, so that an icon, a spinner or a dot all
+take the same room. */
+.iconSlot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.chip.small .iconSlot {
+  width: 16px;
+  height: 16px;
+}
+
+.iconSlot svg {
+  font-size: 18px;
+}
+
+.chip.small .iconSlot svg {
+  font-size: 16px;
+}
+
+.iconOnly {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.iconOnly svg {
+  font-size: 18px;
+}
+
+.neutral {
+  color: var(--theme-text-secondary-color);
+}
+
+.success {
+  color: var(--theme-success-color);
+}
+
+.error {
+  color: var(--theme-error-color);
+}
+
+.warning {
+  color: var(--theme-warning-color);
+}
+
+.info {
+  color: var(--theme-info-color);
+}
+
+.progress {
+  color: var(--theme-primary-light);
+}
+
+.dot {
+  box-sizing: border-box;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  opacity: 0.7;
+}
+
+.spinner {
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  animation: status-chip-spin 0.8s linear infinite;
+}
+
+.chip.small .spinner {
+  width: 11px;
+  height: 11px;
+}
+
+@keyframes status-chip-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

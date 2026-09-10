@@ -23,6 +23,7 @@ import {
   getGameUrl,
   type Game,
 } from '../Utils/GDevelopServices/Game';
+import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import Card from '../UI/Card';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
@@ -46,6 +47,7 @@ import { Column, Line, Spacer } from '../UI/Grid';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import IconButton from '../UI/IconButton';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import History from '../UI/CustomSvgIcons/History';
 import WarningRound from '../UI/CustomSvgIcons/WarningRound';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
@@ -110,6 +112,12 @@ const styles = {
     justifyContent: 'center',
   },
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },
+  erasureInfo: { display: 'flex', gap: 4, alignItems: 'center' },
+  erasureIconContainer: {
+    fontSize: 16,
+    display: 'flex',
+    alignItems: 'center',
+  },
   title: {
     ...textEllipsisStyle,
     overflowWrap: 'break-word',
@@ -167,6 +175,7 @@ const getProjectItemLabel = (
 export type DashboardItem = {|
   game?: Game, // A project can not be published, and thus not have a game.
   projectFiles?: Array<FileMetadataAndStorageProviderName>, // A game can have no or multiple projects.
+  deletedCloudProject?: CloudProjectWithUserAccessInfo, // A deleted cloud project, displayed with limited info and a restore action.
 |};
 
 type Props = {|
@@ -190,6 +199,7 @@ type Props = {|
   onRegisterProject: (
     file: FileMetadataAndStorageProviderName
   ) => Promise<?Game>,
+  onRestoreProject?: () => Promise<void>,
 |};
 
 const GameDashboardCard = ({
@@ -209,12 +219,15 @@ const GameDashboardCard = ({
   onRefreshGames,
   onDeleteCloudProject,
   onRegisterProject,
+  onRestoreProject,
 }: Props): React.Node => {
   useOnResize(useForceUpdate());
+  const [isRestoring, setIsRestoring] = React.useState(false);
   const projectsList = React.useMemo(() => dashboardItem.projectFiles || [], [
     dashboardItem.projectFiles,
   ]);
   const game = dashboardItem.game;
+  const deletedCloudProject = dashboardItem.deletedCloudProject;
   const projectFileMetadataAndStorageProviderName = projectsList.length
     ? projectsList[0]
     : null;
@@ -225,7 +238,7 @@ const GameDashboardCard = ({
     : null;
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { profile, onOpenLoginDialog } = authenticatedUser;
+  const { profile, onOpenLoginDialog, limits } = authenticatedUser;
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);
   const {
     showAlert,
@@ -246,6 +259,8 @@ const GameDashboardCard = ({
     ? game.gameName
     : projectFileMetadataAndStorageProviderName
     ? projectFileMetadataAndStorageProviderName.fileMetadata.name
+    : deletedCloudProject
+    ? deletedCloudProject.name
     : null;
 
   const { isMobile, windowSize, isLandscape } = useResponsiveWindowSize();
@@ -260,6 +275,9 @@ const GameDashboardCard = ({
     : null;
 
   const renderPublicInfo = () => {
+    // A deleted project has no public info to display.
+    if (deletedCloudProject) return null;
+
     const DiscoverabilityIcon =
       game && game.discoverable && gameUrl ? Visibility : VisibilityOff;
     const AdsIcon = game && game.displayAdsOnGamePage ? DollarCoin : Cross;
@@ -353,7 +371,27 @@ const GameDashboardCard = ({
   );
 
   const renderLastModification = (i18n: I18nType) =>
-    projectFileMetadataAndStorageProviderName ? (
+    deletedCloudProject ? (
+      <LineStackLayout noMargin expand>
+        <Text color="secondary" noMargin size="body-small">
+          <Trans>Deleted on:</Trans>
+        </Text>
+        <Tooltip
+          placement="right"
+          title={getDetailedProjectDisplayDate(
+            i18n,
+            Date.parse(deletedCloudProject.deletedAt || '')
+          )}
+        >
+          <Text color="secondary" noMargin size="body-small">
+            {getProjectDisplayDate(
+              i18n,
+              Date.parse(deletedCloudProject.deletedAt || '')
+            )}
+          </Text>
+        </Tooltip>
+      </LineStackLayout>
+    ) : projectFileMetadataAndStorageProviderName ? (
       <LastModificationInfo
         file={projectFileMetadataAndStorageProviderName}
         lastModifiedInfo={lastModifiedInfo}
@@ -388,6 +426,9 @@ const GameDashboardCard = ({
     ) : null;
 
   const renderStorageProvider = (i18n: I18nType) => {
+    // Don't display any storage provider information for a deleted project.
+    if (deletedCloudProject) return null;
+
     const icon = itemStorageProvider ? (
       itemStorageProvider.renderIcon ? (
         itemStorageProvider.renderIcon({
@@ -470,6 +511,79 @@ const GameDashboardCard = ({
   };
 
   const renderAdditionalActions = () => {
+    if (deletedCloudProject) {
+      const retentionInDays = limits
+        ? limits.capabilities.cloudProjects.deletedProjectRetentionInDays
+        : null;
+      const restorationTimeWindowInSeconds = limits
+        ? limits.capabilities.cloudProjects
+            .projectRestorationTimeWindowInSeconds
+        : null;
+      const deletedAt = deletedCloudProject.deletedAt;
+      const millisecondsSinceDeletion = deletedAt
+        ? Date.now() - Date.parse(deletedAt)
+        : null;
+      const daysLeftBeforeErasure =
+        retentionInDays != null && millisecondsSinceDeletion != null
+          ? Math.ceil(
+              (retentionInDays * 24 * 3600 * 1000 - millisecondsSinceDeletion) /
+                (24 * 3600 * 1000)
+            )
+          : null;
+      // When the user can only restore the project during a grace period
+      // shorter than the retention (i.e: without a subscription), show the
+      // time left to restore instead of the time left before erasure.
+      const minutesLeftToRestore =
+        restorationTimeWindowInSeconds != null &&
+        restorationTimeWindowInSeconds !== -1 &&
+        retentionInDays != null &&
+        restorationTimeWindowInSeconds < retentionInDays * 24 * 3600 &&
+        millisecondsSinceDeletion != null &&
+        millisecondsSinceDeletion < restorationTimeWindowInSeconds * 1000
+          ? Math.ceil(
+              (restorationTimeWindowInSeconds * 1000 -
+                millisecondsSinceDeletion) /
+                (60 * 1000)
+            )
+          : null;
+
+      // Keep the button so the layout stays the same, but no action is possible
+      // on a deleted project.
+      return (
+        <LineStackLayout noMargin alignItems="center">
+          {(minutesLeftToRestore != null ||
+            (daysLeftBeforeErasure != null && daysLeftBeforeErasure > 0)) && (
+            <div style={styles.erasureInfo}>
+              <div style={styles.erasureIconContainer}>
+                <History
+                  htmlColor={gdevelopTheme.text.color.secondary}
+                  fontSize="inherit"
+                />
+              </div>
+              <Text color="secondary" noMargin size="body-small">
+                {minutesLeftToRestore != null ? (
+                  minutesLeftToRestore === 1 ? (
+                    <Trans>1 min left to restore</Trans>
+                  ) : (
+                    <Trans>{minutesLeftToRestore} min left to restore</Trans>
+                  )
+                ) : daysLeftBeforeErasure === 1 ? (
+                  <Trans>1 day left before erasure</Trans>
+                ) : (
+                  <Trans>
+                    {daysLeftBeforeErasure} days left before erasure
+                  </Trans>
+                )}
+              </Text>
+            </div>
+          )}
+          <IconButton size="small" disabled>
+            <ThreeDotsMenu />
+          </IconButton>
+        </LineStackLayout>
+      );
+    }
+
     return (
       <ElementWithMenu
         element={
@@ -636,6 +750,37 @@ const GameDashboardCard = ({
   );
 
   const renderButtons = ({ fullWidth }: {| fullWidth: boolean |}) => {
+    if (deletedCloudProject) {
+      return (
+        <div style={styles.buttonsContainer}>
+          <LineStackLayout noMargin>
+            <FlatButton
+              primary
+              fullWidth={fullWidth}
+              label={<Trans>Manage</Trans>}
+              onClick={() => {}}
+              disabled
+            />
+            <RaisedButton
+              primary
+              fullWidth={fullWidth}
+              label={<Trans>Restore project</Trans>}
+              onClick={async () => {
+                if (!onRestoreProject) return;
+                try {
+                  setIsRestoring(true);
+                  await onRestoreProject();
+                } finally {
+                  setIsRestoring(false);
+                }
+              }}
+              disabled={disabled || isRestoring || !onRestoreProject}
+            />
+          </LineStackLayout>
+        </div>
+      );
+    }
+
     const openProjectLabel = isCurrentProjectOpened ? (
       <Trans>Save</Trans>
     ) : (

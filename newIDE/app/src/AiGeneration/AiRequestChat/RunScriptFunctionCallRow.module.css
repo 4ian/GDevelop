@@ -1,0 +1,195 @@
+.scriptDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 1px solid var(--theme-list-item-separator-color);
+  padding-left: 8px;
+  margin-bottom: 4px;
+  min-width: 0;
+}
+
+/* Sections (script, operations, console, result) */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  min-width: 0;
+}
+
+.sectionHeader:hover {
+  opacity: 0.8;
+}
+
+.sectionHeader:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.sectionChevron {
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background-color: var(--theme-list-item-hover-background-color);
+  flex-shrink: 0;
+}
+
+.sectionContent {
+  padding: 2px 0 4px 16px;
+  min-width: 0;
+}
+
+/* Operations */
+
+.recordsList {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recordRow {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recordHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 0;
+  min-width: 0;
+  outline: none;
+}
+
+.recordHeaderClickable {
+  cursor: pointer;
+}
+
+.recordHeaderClickable:hover {
+  opacity: 0.8;
+}
+
+.recordHeaderClickable:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.dotSuccess {
+  background-color: var(--theme-message-valid-color);
+}
+
+.dotError {
+  background-color: var(--theme-message-error-color);
+}
+
+.dotUnchanged {
+  border: 1.5px solid var(--theme-message-valid-color);
+  opacity: 0.7;
+}
+
+/* Clamping the text of a row with `-webkit-line-clamp` rather than
+   `white-space: nowrap`: a never-wrapping text would make the whole chat as
+   wide as its longest line. */
+.oneLine > * {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.recordName {
+  flex-shrink: 0;
+  max-width: 55%;
+  min-width: 0;
+}
+
+.recordMessage {
+  flex: 1;
+  min-width: 0;
+  opacity: 0.8;
+}
+
+.recordCount {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.recordChevron {
+  display: flex;
+  align-items: center;
+  opacity: 0.5;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.recordDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px 0 4px 12px;
+  min-width: 0;
+}
+
+.recordGroupContent {
+  padding-left: 12px;
+  min-width: 0;
+}
+
+/* Text and code blocks */
+
+.textBlock {
+  padding: 6px 8px;
+  border: 1px solid var(--theme-list-item-separator-color);
+  border-radius: 4px;
+  background-color: var(--theme-surface-canvas-background-color);
+  max-height: 180px;
+  overflow: auto;
+  user-select: text;
+  min-width: 0;
+}
+
+.errorBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 8px;
+  margin: 2px 0 4px 0;
+  border-radius: 0 4px 4px 0;
+  border-left: 2px solid var(--theme-message-error-color);
+  /* A red tint that stays discreet on both light and dark themes. */
+  background-color: rgba(255, 82, 82, 0.1);
+  min-width: 0;
+  user-select: text;
+}

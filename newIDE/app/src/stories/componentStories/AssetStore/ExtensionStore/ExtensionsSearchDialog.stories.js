@@ -69,7 +69,7 @@ export const Default = (): React.Node => {
             <ExtensionsSearchDialog
               project={testProject.project}
               onClose={action('onClose')}
-              onCreateNew={action('onCreateNew')}
+              onCreateNewExtension={action('onCreateNew')}
               onWillInstallExtension={action('extension will be installed')}
               onExtensionInstalled={action('onExtensionInstalled')}
             />
@@ -115,7 +115,7 @@ export const WithServerSideError = (): React.Node => {
             <ExtensionsSearchDialog
               project={testProject.project}
               onClose={action('onClose')}
-              onCreateNew={action('onCreateNew')}
+              onCreateNewExtension={action('onCreateNew')}
               onWillInstallExtension={action('extension will be installed')}
               onExtensionInstalled={action('onExtensionInstalled')}
             />

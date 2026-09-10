@@ -20,7 +20,7 @@ type CommonProps = {|
   value: string,
 
   // Context
-  project?: gdProject,
+  project: gdProject,
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
@@ -57,7 +57,10 @@ export type ParameterFieldProps = {|
   // The index of the parameter in the instruction or expression.
   parameterIndex?: number,
   onInstructionTypeChanged?: () => void,
-  editEventsFunctionParameter?: VariableDialogOpeningProps => void,
+  editEventsFunctionParameter?: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog?:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 export type FieldFocusFunction = (

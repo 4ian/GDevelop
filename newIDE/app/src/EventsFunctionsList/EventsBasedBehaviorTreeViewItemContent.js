@@ -22,6 +22,8 @@ import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Add from '../UI/CustomSvgIcons/Add';
 import { expandAllSubfolders } from './EventsFunctionFolderTreeViewItemContent';
 
+const gd: libGDevelop = global.gd;
+
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
 const styles = {
@@ -56,6 +58,16 @@ export type EventsBasedBehaviorCallbacks = {|
     eventsBasedBehavior: gdEventsBasedBehavior,
     sourceExtensionName: string,
     sourceEventsBasedBehaviorName: string
+  ) => void,
+  moveEventsBasedBehaviorTo: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    (destinationExtensionName: string) => void
+  ) => void,
+  onEventsBasedBehaviorMoved: (
+    oldExtensionName: string,
+    newExtensionName: string,
+    oldObjectName: string,
+    newObjectName: string
   ) => void,
 |};
 
@@ -136,11 +148,12 @@ export class EventsBasedBehaviorTreeViewItemContent
     return null;
   }
 
-  onSelect(): void {
+  // Must stay side-effect free: also triggered when a drag starts.
+  onSelect(): void {}
+
+  onClick(): void {
     this.props.onSelectEventsBasedBehavior(this.eventsBasedBehavior);
   }
-
-  onClick(): void {}
 
   rename(newName: string): void {
     if (this.eventsBasedBehavior.getName() === newName) return;
@@ -153,6 +166,56 @@ export class EventsBasedBehaviorTreeViewItemContent
 
         this._onEventsBasedBehaviorModified();
         this.props.onEventsBasedBehaviorRenamed(this.eventsBasedBehavior);
+      }
+    );
+  }
+
+  _moveTo(): void {
+    const { eventsBasedBehaviorsList, project } = this.props;
+
+    this.props.moveEventsBasedBehaviorTo(
+      this.eventsBasedBehavior,
+      destinationExtensionName => {
+        const extension = project.getEventsFunctionsExtension(
+          destinationExtensionName
+        );
+        const eventsBasedBehavior = extension
+          .getEventsBasedBehaviors()
+          .insertNew(
+            newNameGenerator(this.eventsBasedBehavior.getName(), name =>
+              extension.getEventsBasedBehaviors().has(name)
+            ),
+            extension.getEventsBasedBehaviors().getCount()
+          );
+        unserializeFromJSObject(
+          eventsBasedBehavior,
+          serializeToJSObject(this.eventsBasedBehavior),
+          'unserializeFrom',
+          project
+        );
+        const oldExtensionName = this.props.eventsFunctionsExtension.getName();
+        const newExtensionName = extension.getName();
+        const oldObjectName = this.eventsBasedBehavior.getName();
+        const newObjectName = eventsBasedBehavior.getName();
+        gd.WholeProjectRefactorer.moveEventsBasedBehavior(
+          project,
+          this.props.eventsFunctionsExtension,
+          oldExtensionName,
+          newExtensionName,
+          oldObjectName,
+          newObjectName
+        );
+        // Rebuild tabs with the newly created custom object.
+        this.props.onEventsBasedBehaviorMoved(
+          oldExtensionName,
+          newExtensionName,
+          oldObjectName,
+          newObjectName
+        );
+        // We can now safely remove the old custom object
+        // since it's no longer used in the UI.
+        eventsBasedBehaviorsList.remove(this.eventsBasedBehavior.getName());
+        this._onEventsBasedBehaviorModified();
       }
     );
   }
@@ -194,6 +257,10 @@ export class EventsBasedBehaviorTreeViewItemContent
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
         click: () => this._togglePrivate(),
+      },
+      {
+        label: i18n._(t`Move to...`),
+        click: () => this._moveTo(),
       },
       {
         type: 'separator',

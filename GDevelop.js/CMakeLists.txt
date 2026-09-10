@@ -23,7 +23,7 @@ elseif("${GDEVELOPJS_BUILD_VARIANT}" STREQUAL "debug-assertions")
 	# Debug with assertions: no optimization.
 	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g --profiling") # Debugging + profiling support
 elseif("${GDEVELOPJS_BUILD_VARIANT}" STREQUAL "debug-sanitizers")
-	# Debug with sanitizers: no optimization.
+	# Debug with sanitizers (note: -O3 from the Release build type still applies at compile time).
 	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g --profiling") # Debugging + profiling support
 	add_compile_options(-fsanitize=address) # Uncomment to auto-detect occurences of memory bugs (memory leak, use after free, overflows, ...) - also enable linking below!
 	# add_compile_options(-fsanitize=undefined) # Uncomment to auto-detect occurences of undefined behavior - also enable linking below!
@@ -111,6 +111,8 @@ elseif("${GDEVELOPJS_BUILD_VARIANT}" STREQUAL "debug-assertions")
 	# target_link_libraries(--memoryprofiler) # Uncomment for interactive memory profiling
 elseif("${GDEVELOPJS_BUILD_VARIANT}" STREQUAL "debug-sanitizers")
 	message(STATUS "'debug-sanitizers' variant: enabling ASAN and other sanitizers")
+	target_link_libraries(GD "-O1") # Some optimization at link time (default is -O0), to make the tests run a bit faster in CI.
+	target_link_libraries(GD "-s INITIAL_MEMORY=512MB") # Start with a large heap: ASan needs a lot of memory (256MB quarantine for freed allocations, shadow memory) and growing the memory repeatedly has a cost. Overrides TOTAL_MEMORY set above.
 	target_link_libraries(GD "-fsanitize=address") # Uncomment to auto-detect occurences of memory bugs (memory leak, use after free, overflows, ...) - also enable compiling above!
 	# target_link_libraries(GD "-fsanitize=undefined") # Uncomment to auto-detect occurences of undefined behavior - also enable compiling above!
 	target_link_libraries(GD "-fsanitize=null") # Uncomment to auto-detect occurences of undefined behavior - also enable compiling above!

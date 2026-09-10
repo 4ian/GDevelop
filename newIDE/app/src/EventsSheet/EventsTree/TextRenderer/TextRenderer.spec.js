@@ -1,7 +1,11 @@
 // @flow
 import { makeTestProject } from '../../../fixtures/TestProject';
 import { unserializeFromJSObject } from '../../../Utils/Serializer';
-import { renderNonTranslatedEventsAsText } from '.';
+import {
+  renderNonTranslatedEventsAsText,
+  renderNonTranslatedEventsAsTextWithErrors,
+  eventsTextRenderingErrorText,
+} from '.';
 
 const gd: libGDevelop = global.gd;
 
@@ -615,6 +619,96 @@ describe('EventsTree/TextRenderer', () => {
         </event-6>"
       `);
     } finally {
+      project.delete();
+    }
+  });
+
+  it('renders a link event', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = new gd.EventsList();
+      unserializeFromJSObject(
+        eventsList,
+        [
+          {
+            type: 'BuiltinCommonInstructions::Link',
+            target: 'MyExternalEvents',
+            include: { includeConfig: 0 },
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      const {
+        text,
+        renderingErrors,
+      } = renderNonTranslatedEventsAsTextWithErrors({
+        eventsList,
+      });
+
+      expect(renderingErrors).toEqual([]);
+      expect(text).toContain('type="link"');
+      expect(text).toContain(
+        '(link to events in events sheet called "MyExternalEvents")'
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('degrades gracefully and reports errors when an event/instruction fails to render', () => {
+    const { project } = makeTestProject(gd);
+    // `any` alias to override the non-writable gd binding.
+    const sentenceFormatterClass: any = gd.InstructionSentenceFormatter;
+    const realFormatterProvider = sentenceFormatterClass.get;
+    try {
+      const eventsList = new gd.EventsList();
+      unserializeFromJSObject(
+        eventsList,
+        [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'Show' },
+                parameters: ['MySpriteObject', ''],
+              },
+            ],
+          },
+          {
+            type: 'BuiltinCommonInstructions::Comment',
+            comment: 'This comment must still be rendered',
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      // Force instruction rendering to throw.
+      sentenceFormatterClass.get = () => ({
+        getAsFormattedText: () => {
+          throw new Error('Simulated rendering failure');
+        },
+      });
+
+      const {
+        text,
+        renderingErrors,
+      } = renderNonTranslatedEventsAsTextWithErrors({
+        eventsList,
+      });
+
+      expect(text).not.toBe(eventsTextRenderingErrorText);
+      expect(text).toContain('(this action could not be rendered)');
+      expect(text).toContain('This comment must still be rendered');
+
+      expect(renderingErrors).toHaveLength(1);
+      expect(renderingErrors[0].message).toBe('Simulated rendering failure');
+      expect(renderingErrors[0].path).toContain('action 0');
+    } finally {
+      sentenceFormatterClass.get = realFormatterProvider;
       project.delete();
     }
   });

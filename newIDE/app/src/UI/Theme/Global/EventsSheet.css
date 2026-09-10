@@ -68,6 +68,15 @@
   border: var(--event-sheet-selectable-selected-border) !important;
 }
 
+.gd-events-sheet .selectable.ready-to-drag {
+  background-color: var(--event-sheet-selectable-background-color);
+  position: relative;
+  z-index: 1;
+  transform: scale(1.02);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 100ms ease-out, box-shadow 100ms ease-out;
+}
+
 /**
  * Large selectable area (events)
  */

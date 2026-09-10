@@ -22,7 +22,6 @@ type UseGenerateEventsReturnType = {
   generateEvents: ({
     eventsDescription: string | null,
     eventBatches: Array<EventBatch> | null,
-    existingEventsAsText: string,
     existingEventsJson: string | null,
     extensionNamesList: string,
     objectsList: string,
@@ -48,7 +47,6 @@ export const useGenerateEvents = ({
       eventBatches,
       extensionNamesList,
       objectsList,
-      existingEventsAsText,
       existingEventsJson,
       placementHint,
       relatedAiRequestId,
@@ -59,7 +57,6 @@ export const useGenerateEvents = ({
       eventBatches: Array<EventBatch> | null,
       extensionNamesList: string,
       objectsList: string,
-      existingEventsAsText: string,
       existingEventsJson: string | null,
       placementHint: string | null,
       relatedAiRequestId: string,
@@ -105,7 +102,6 @@ export const useGenerateEvents = ({
               eventBatches,
               extensionNamesList,
               objectsList,
-              existingEventsAsText,
               placementHint,
               relatedAiRequestId,
               estimatedComplexity,
@@ -121,7 +117,7 @@ export const useGenerateEvents = ({
 
         // Poll with exponential backoff (fast initially, capped), bounded by a
         // total time budget rather than a fixed attempt count.
-        const maxTotalWaitMs = 60000;
+        const maxTotalWaitMs = 180000;
         const maxPollIntervalMs = 5000;
         const startTime = Date.now();
         let pollIntervalMs = 1000;

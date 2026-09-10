@@ -129,13 +129,14 @@ type Props = {|
 
 const MAX_ERRORS_COUNT = 10;
 
-const extractErrors = (
+export const extractErrors = (
   platform: gdPlatform,
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   expressionType: string,
   parameterMetadata: ?gdParameterMetadata,
   expressionNode: gdExpressionNode,
+  objectName: string,
   showDeprecatedInstructionWarning:
     | 'no'
     | 'icon'
@@ -149,6 +150,7 @@ const extractErrors = (
     gd.JsPlatform.get(),
     projectScopedContainersAccessor.get(),
     expressionType,
+    objectName,
     parameterMetadata ? parameterMetadata.getExtraInfo() : ''
   );
   expressionNode.visit(expressionValidator);
@@ -232,6 +234,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       this._fieldElementWidth = this._field.getFieldWidth();
       this._inputElement = this._field ? this._field.getInputNode() : null;
     }
+    this._enqueueValidation();
   }
 
   componentWillUnmount() {
@@ -494,6 +497,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       expressionType,
       parameterMetadata,
       expressionNode,
+      '',
       showDeprecatedInstructionWarning
     );
     const extraErrorText = onExtractAdditionalErrors

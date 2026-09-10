@@ -237,6 +237,9 @@ bool Variable::InsertAtIndex(const gd::Variable& variable, const size_t index) {
   if (type != Type::Array) return false;
   hasMixedValues = false;
   auto newVariable = std::make_shared<gd::Variable>(variable);
+  // The "mixed values" marker is an editor-only, display state: a variable
+  // stored in a container must always have an actual value.
+  newVariable->ClearMixedValues();
   if (index < childrenArray.size()) {
     childrenArray.insert(childrenArray.begin() + index, newVariable);
   } else {
@@ -252,6 +255,9 @@ bool Variable::InsertChild(const gd::String& name,
   }
   hasMixedValues = false;
   children[name] = std::make_shared<gd::Variable>(variable);
+  // The "mixed values" marker is an editor-only, display state: a variable
+  // stored in a container must always have an actual value.
+  children[name]->ClearMixedValues();
   return true;
 };
 
@@ -318,12 +324,10 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
     } else if (type == Type::Boolean) {
       SetBool(element.GetBoolAttribute("value", false, "Value"));
     }
-  } else {
+  } else if (type == Type::Structure || type == Type::Array) {
     const SerializerElement& childrenElement =
         element.GetChild("children", 0, "Children");
     childrenElement.ConsiderAsArrayOf("variable", "Variable");
-    if (childrenElement.GetChildrenCount() == 0) return;
-
     for (int i = 0; i < childrenElement.GetChildrenCount(); ++i) {
       const SerializerElement& childElement = childrenElement.GetChild(i);
       if (type == Type::Structure) {
@@ -334,6 +338,10 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
         PushNew().UnserializeFrom(childElement);
     }
   }
+  // The editor-only "mixed values" marker is restored last, and whatever the
+  // type is: a variable marked as having mixed values has no children to read
+  // (they are cleared by MarkAsMixedValues), and a variable with entirely
+  // mixed types ("mixed" type) has no value and no children either.
   if (element.GetBoolAttribute("hasMixedValues", false)) {
     MarkAsMixedValues();
   }
@@ -346,6 +354,17 @@ Variable& Variable::ResetPersistentUuid() {
   }
   for (auto& it : childrenArray) {
     it->ResetPersistentUuid();
+  }
+  return *this;
+}
+
+Variable& Variable::EnsurePersistentUuid() {
+  if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
+  for (auto& it : children) {
+    it.second->EnsurePersistentUuid();
+  }
+  for (auto& it : childrenArray) {
+    it->EnsurePersistentUuid();
   }
   return *this;
 }
@@ -492,6 +511,21 @@ bool Variable::operator!=(const gd::Variable &variable) const {
 void Variable::MarkAsMixedValues() {
   hasMixedValues = true;
   ClearChildren();
+}
+
+void Variable::ClearMixedValues() {
+  hasMixedValues = false;
+  if (type == Type::MixedTypes) {
+    // A variable with entirely mixed types has no meaningful value:
+    // default to a number.
+    CastTo(Type::Number);
+  }
+  for (auto& it : children) {
+    it.second->ClearMixedValues();
+  }
+  for (auto& child : childrenArray) {
+    child->ClearMixedValues();
+  }
 }
 
 }  // namespace gd

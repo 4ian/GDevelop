@@ -8,6 +8,7 @@ import Subheader from '../UI/Subheader';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import ColorField from '../UI/ColorField';
+import { CompactBitmaskField } from '../UI/CompactBitmaskField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -79,18 +80,24 @@ const styles = {
   },
 };
 
-const getDisabled = ({
+export const getDisabled = ({
   instances,
   field,
+  mixedValues,
 }: {|
   instances: Instances,
   field: ValueField,
+  mixedValues: boolean,
 |}): boolean => {
-  return typeof field.disabled === 'boolean'
-    ? field.disabled
-    : typeof field.disabled === 'function'
-    ? field.disabled(instances)
-    : false;
+  const disabled =
+    typeof field.disabled === 'boolean'
+      ? field.disabled
+      : typeof field.disabled === 'function'
+      ? field.disabled(instances)
+      : 'never';
+  return (
+    (disabled === 'onValuesDifferent' && mixedValues) || disabled === 'always'
+  );
 };
 
 export const hasMixedValues = ({
@@ -110,7 +117,7 @@ export const hasMixedValues = ({
   if (!getValue) return false;
 
   const value = getValue(instances[0]);
-  for (var i = 1; i < instances.length; ++i) {
+  for (let i = 1; i < instances.length; ++i) {
     if (value !== getValue(instances[i])) {
       return true;
     }
@@ -127,27 +134,19 @@ export const hasMixedValues = ({
 export const getFieldValue = ({
   instances,
   field,
-  mixedValueFallback,
 }: {|
   instances: Instances,
   field: ValueField | Title,
-  mixedValueFallback?: any,
 |}): any => {
   if (!instances[0]) {
     console.log(
       'getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
     );
-    return mixedValueFallback;
+    return undefined;
   }
   const { getValue, defaultValue } = field;
   if (!getValue) return null;
 
-  if (
-    typeof mixedValueFallback !== 'undefined' &&
-    hasMixedValues({ instances, field })
-  ) {
-    return mixedValueFallback;
-  }
   let value = getValue(instances[0]);
   if (value === null) {
     value = defaultValue;
@@ -253,7 +252,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, !!newValue));
               _onInstancesModified(instances);
             }}
-            disabled={getDisabled({ instances, field })}
+            disabled={getDisabled({ instances, field, mixedValues: false })}
           />
         );
       } else if (field.valueType === 'number') {
@@ -277,7 +276,7 @@ const PropertiesEditor = ({
             }}
             type="number"
             style={styles.field}
-            disabled={getDisabled({ instances, field })}
+            disabled={getDisabled({ instances, field, mixedValues: false })}
             endAdornment={
               endAdornment && (
                 <Tooltip title={endAdornment.tooltipContent}>
@@ -309,6 +308,24 @@ const PropertiesEditor = ({
             />
           </Column>
         );
+      } else if (field.valueType === 'bitmask') {
+        const { setValue, firstBit, bitCount } = field;
+        return (
+          <Column key={field.name} expand noMargin>
+            <CompactBitmaskField
+              id={field.name}
+              label={getFieldLabel({ instances, field })}
+              markdownDescription={getFieldDescription(field)}
+              value={getFieldValue({ instances, field })}
+              firstBit={firstBit}
+              bitCount={bitCount}
+              onChange={newValue => {
+                instances.forEach(i => setValue(i, newValue));
+                _onInstancesModified(instances);
+              }}
+            />
+          </Column>
+        );
       } else if (field.valueType === 'multilinestring') {
         const { setValue } = field;
         return (
@@ -333,16 +350,20 @@ const PropertiesEditor = ({
           onEditButtonClick,
           setValue,
         } = field;
+        const mixedValues = hasMixedValues({ instances, field });
         return (
           <TextFieldWithButtonLayout
             key={field.name}
             renderTextField={() => (
               <SemiControlledTextField
-                value={getFieldValue({
-                  instances,
-                  field,
-                  mixedValueFallback: '(Multiple values)',
-                })}
+                value={
+                  mixedValues
+                    ? '(Multiple values)'
+                    : getFieldValue({
+                        instances,
+                        field,
+                      })
+                }
                 id={field.name}
                 floatingLabelText={getFieldLabel({ instances, field })}
                 floatingLabelFixed
@@ -352,7 +373,7 @@ const PropertiesEditor = ({
                   _onInstancesModified(instances);
                 }}
                 style={styles.field}
-                disabled={getDisabled({ instances, field })}
+                disabled={getDisabled({ instances, field, mixedValues })}
               />
             )}
             renderButton={style =>
@@ -417,20 +438,24 @@ const PropertiesEditor = ({
             }}
             // $FlowFixMe[incompatible-type]
             style={styles.field}
-            disabled={getDisabled({ instances, field })}
+            disabled={getDisabled({ instances, field, mixedValues: false })}
           >
             {children}
           </SelectField>
         );
       } else if (field.valueType === 'string') {
         const { setValue } = field;
+        const mixedValues = hasMixedValues({ instances, field });
         return (
           <SelectField
-            value={getFieldValue({
-              instances,
-              field,
-              mixedValueFallback: '(Multiple values)',
-            })}
+            value={
+              mixedValues
+                ? '(Multiple values)'
+                : getFieldValue({
+                    instances,
+                    field,
+                  })
+            }
             key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
@@ -441,7 +466,7 @@ const PropertiesEditor = ({
             }}
             // $FlowFixMe[incompatible-type]
             style={styles.field}
-            disabled={getDisabled({ instances, field })}
+            disabled={getDisabled({ instances, field, mixedValues })}
           >
             {children}
           </SelectField>
@@ -458,11 +483,13 @@ const PropertiesEditor = ({
 
       const choices = field.getChoices();
       const { setValue } = field;
-      const value = getFieldValue({
-        instances,
-        field,
-        mixedValueFallback: '(Multiple values)',
-      });
+      const mixedValues = hasMixedValues({ instances, field });
+      const value = mixedValues
+        ? '(Multiple values)'
+        : getFieldValue({
+            instances,
+            field,
+          });
 
       return (
         <SemiControlledAutoComplete
@@ -538,6 +565,7 @@ const PropertiesEditor = ({
     }
 
     const { setValue } = field;
+    const mixedValues = hasMixedValues({ instances, field });
     return (
       <ResourceSelectorWithThumbnail
         key={field.name}
@@ -545,11 +573,14 @@ const PropertiesEditor = ({
         projectScopedContainersAccessor={projectScopedContainersAccessor}
         resourceManagementProps={resourceManagementProps}
         resourceKind={field.resourceKind}
-        resourceName={getFieldValue({
-          instances,
-          field,
-          mixedValueFallback: '(Multiple values)', //TODO
-        })}
+        resourceName={
+          mixedValues
+            ? '(Multiple values)' //TODO
+            : getFieldValue({
+                instances,
+                field,
+              })
+        }
         onChange={newValue => {
           instances.forEach(i => setValue(i, newValue));
           _onInstancesModified(instances);
@@ -566,15 +597,19 @@ const PropertiesEditor = ({
     }
 
     const { setValue } = field;
+    const mixedValues = hasMixedValues({ instances, field });
     return (
       <LeaderboardIdPropertyField
         key={field.name}
         project={project}
-        value={getFieldValue({
-          instances,
-          field,
-          mixedValueFallback: '(Multiple values)', //TODO
-        })}
+        value={
+          mixedValues
+            ? '(Multiple values)' //TODO
+            : getFieldValue({
+                instances,
+                field,
+              })
+        }
         onChange={newValue => {
           instances.forEach(i => setValue(i, newValue));
           _onInstancesModified(instances);

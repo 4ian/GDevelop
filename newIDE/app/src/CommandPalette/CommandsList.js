@@ -30,11 +30,15 @@ export type CommandName =
   | 'OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG'
   | 'OPEN_PROJECT_RESOURCES'
   | 'OPEN_SEARCH_EXTENSIONS_DIALOG'
+  | 'IMPORT_EXTENSION'
   | 'OPEN_GLOBAL_SEARCH'
   | 'OPEN_LAYOUT'
   | 'OPEN_EXTERNAL_EVENTS'
   | 'OPEN_EXTERNAL_LAYOUT'
   | 'OPEN_EXTENSION'
+  | 'OPEN_GAMEPLAY_TEST'
+  | 'RUN_GAMEPLAY_TEST'
+  | 'RUN_ALL_GAMEPLAY_TESTS'
   | 'OPEN_SCENE_PROPERTIES'
   | 'OPEN_SCENE_VARIABLES'
   | 'OPEN_OBJECTS_PANEL'
@@ -70,7 +74,8 @@ export type CommandName =
   | 'SEARCH_EVENTS'
   | 'OPEN_EXTENSION_SETTINGS'
   | 'OPEN_PROFILE'
-  | 'OPEN_MEMORY_TRACKER_REGISTRY';
+  | 'OPEN_MEMORY_TRACKER_REGISTRY'
+  | 'INSTALL_CLI_IN_PATH';
 
 export const commandAreas = {
   GENERAL: (t`General`: any),
@@ -185,6 +190,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'IDE',
     displayText: t`Restart 3D editor`,
   },
+  INSTALL_CLI_IN_PATH: {
+    area: 'IDE',
+    displayText: t`Install GDevelop CLI in PATH`,
+    noShortcut: true,
+  },
 
   // Project manager commands
   OPEN_PROJECT_PROPERTIES: {
@@ -211,6 +221,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'PROJECT',
     displayText: t`Search/import extensions`,
   },
+  IMPORT_EXTENSION: {
+    area: 'PROJECT',
+    displayText: t`Import extension...`,
+    noShortcut: true,
+  },
   OPEN_GLOBAL_SEARCH: {
     area: 'IDE',
     displayText: t`Global search (search in project)`,
@@ -227,6 +242,18 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Open external layout...`,
   },
   OPEN_EXTENSION: { area: 'IDE', displayText: t`Open extension...` },
+  OPEN_GAMEPLAY_TEST: {
+    area: 'IDE',
+    displayText: t`Open gameplay test...`,
+  },
+  RUN_GAMEPLAY_TEST: {
+    area: 'PROJECT',
+    displayText: t`Run gameplay test...`,
+  },
+  RUN_ALL_GAMEPLAY_TESTS: {
+    area: 'PROJECT',
+    displayText: t`Run all gameplay tests`,
+  },
 
   // Scene editor commands
   OPEN_SCENE_PROPERTIES: {

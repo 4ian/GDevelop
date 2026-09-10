@@ -128,8 +128,7 @@ const gameTypes = [
   'megaman',
 ];
 
-// $FlowFixMe[missing-local-annot]
-const startWithVowel = word =>
+const startWithVowel = (word: string) =>
   ['a', 'e', 'i', 'o', 'u'].includes(word[0].toLowerCase());
 const formatWordWithAdaptedDeterminer = (word: string) =>
   `${startWithVowel(word) ? 'an' : 'a'} ${word}`;

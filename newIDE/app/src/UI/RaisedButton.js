@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { type ButtonInterface } from './Button';
-import { Spacer } from './Grid';
+import { ButtonSpacer } from './Grid';
 import classes from './RaisedButton.module.css';
 import classNames from 'classnames';
 
@@ -91,10 +91,10 @@ const RaisedButton: React.ComponentType<{
         ref={ref}
       >
         {icon}
-        {!!icon && !!label && <Spacer />}
+        {!!icon && !!label && <ButtonSpacer />}
         {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
         {label ? <span>{label}</span> : null}
-        {!!rightIcon && !!label && <Spacer />}
+        {!!rightIcon && !!label && <ButtonSpacer />}
         {rightIcon}
       </Button>
     );

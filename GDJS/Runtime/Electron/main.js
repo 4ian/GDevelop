@@ -5,6 +5,19 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, shell, Menu } = require('electron');
 
+// Chromium reads gamepads through Windows.Gaming.Input, which does not enumerate
+// the virtual controller that Steam Input creates (Steam suppresses XInput,
+// DirectInput and HID, then feeds its own pad to the game). Games launched
+// through Steam with Steam Input enabled therefore see no gamepad at all,
+// including on Steam Deck. Falling back to Chromium's XInput fetcher fixes it.
+// Must be set before the app is ready.
+if (process.platform === 'win32') {
+  app.commandLine.appendSwitch(
+    'disable-features',
+    'EnableWindowsGamingInputDataFetcher'
+  );
+}
+
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
 

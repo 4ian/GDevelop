@@ -175,20 +175,13 @@ const createValidationWorker = (
       const parameterType = parameterMetadata.getType();
       const value = instruction.getParameter(parameterIndex).getPlainString();
 
-      // Skip validation for layer parameter with empty value (default layer)
-      if (parameterType === 'layer' && value === '') {
-        return;
-      }
-
       // Skip codeOnly parameters
       if (parameterMetadata.isCodeOnly()) {
         return;
       }
 
-      // Skip optional parameters with empty values (they will use defaults)
-      if (value === '' && parameterMetadata.isOptional()) {
-        return;
-      }
+      // Empty layer parameters (base layer) and empty optional parameters are
+      // considered valid directly by `InstructionValidator`.
 
       // Skip parameters with empty values that have default values
       if (value === '' && parameterMetadata.getDefaultValue() !== '') {
@@ -207,8 +200,7 @@ const createValidationWorker = (
         projectScopedContainers,
         instruction,
         metadata,
-        parameterIndex,
-        value
+        parameterIndex
       );
 
       if (!isValid) {

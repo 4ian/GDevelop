@@ -8,6 +8,10 @@ import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import TreeViewRow, { TREE_VIEW_ROW_HEIGHT } from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
+import { makeDropTarget } from '../DragAndDrop/DropTarget';
+import { useAutoScrollDuringAnyDrag } from '../DragAndDrop/UseAutoScrollDuringDrag';
+import { useIsDragging } from '../DragAndDrop/UseIsDragging';
+import DropIndicator from '../SortableVirtualizedItemList/DropIndicator';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
@@ -209,6 +213,36 @@ type Props<Item> = {|
    */
   enableStickyAncestors?: boolean,
 |};
+
+type DropPosition = 'before' | 'inside' | 'after';
+
+/**
+ * Where an item dropped in the empty space below the last row goes: after the
+ * last top level item (top level being the children of the root items, if
+ * any), or inside the last root item if it has nothing displayed.
+ */
+const getEndOfListDropTarget = <Item: ItemBaseAttributes>(
+  flattenedData: FlattenedNode<Item>[]
+): ?{| node: FlattenedNode<Item>, where: DropPosition |} => {
+  if (flattenedData.length === 0) return null;
+  let index = flattenedData.length - 1;
+  let node = flattenedData[index];
+  if (node.item.isRoot) return { node, where: 'inside' };
+  while (node.depth > 0) {
+    let parentIndex = index - 1;
+    while (parentIndex >= 0 && flattenedData[parentIndex].depth >= node.depth) {
+      parentIndex--;
+    }
+    if (parentIndex < 0 || flattenedData[parentIndex].item.isRoot) break;
+    index = parentIndex;
+    node = flattenedData[index];
+  }
+  return { node, where: 'after' };
+};
+
+// Space added below the last row while dragging, so that an item can be
+// dropped at the end of a list filling its whole height.
+const END_OF_LIST_DROP_ZONE_HEIGHT = TREE_VIEW_ROW_HEIGHT;
 
 const InnerTreeView = <Item: ItemBaseAttributes>(
   {
@@ -476,6 +510,48 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
   const scrollOffsetRef = React.useRef<number>(0);
   const listOuterRef = React.useRef<?HTMLDivElement>(null);
 
+  useAutoScrollDuringAnyDrag(() => listOuterRef.current);
+
+  // Only consider the items of this tree view (not the ones dragged from
+  // other components).
+  const isDraggingItem = useIsDragging(reactDndType);
+  const isDraggingItemRef = React.useRef(false);
+  isDraggingItemRef.current = isDraggingItem;
+  // Stable component (rows would be unmounted otherwise) reading the drag
+  // state from a ref.
+  const listInnerElementType = React.useMemo(
+    () =>
+      React.forwardRef<{ style: Object }, HTMLDivElement>(
+        ({ style, ...otherProps }, ref) => (
+          <div
+            ref={ref}
+            style={{
+              ...style,
+              height:
+                parseFloat(style.height) +
+                (isDraggingItemRef.current ? END_OF_LIST_DROP_ZONE_HEIGHT : 0),
+              // react-window disables pointer events while scrolling: rows
+              // must stay drop targets while the list auto scrolls during a drag.
+              pointerEvents: isDraggingItemRef.current
+                ? undefined
+                : style.pointerEvents,
+            }}
+            {...otherProps}
+          />
+        )
+      ),
+    []
+  );
+
+  const endOfListDropTarget = React.useMemo(
+    () => getEndOfListDropTarget(flattenedData),
+    [flattenedData]
+  );
+  const EndOfListDropTarget = React.useMemo(
+    () => makeDropTarget<Item>(reactDndType),
+    [reactDndType]
+  );
+
   const updateStickyRows = React.useCallback(
     () => {
       if (!enableStickyAncestors) return;
@@ -511,9 +587,9 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
   const onScroll = React.useCallback(
     ({ scrollOffset }: {| scrollOffset: number |}) => {
       scrollOffsetRef.current = scrollOffset;
-      updateStickyRows();
+      if (enableStickyAncestors) updateStickyRows();
     },
-    [updateStickyRows]
+    [enableStickyAncestors, updateStickyRows]
   );
 
   const onClickStickyRow = React.useCallback(
@@ -869,95 +945,149 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     ]
   );
 
+  const renderList = () => (
+    <>
+      <FixedSizeList
+        height={height}
+        itemCount={flattenedData.length}
+        itemSize={TREE_VIEW_ROW_HEIGHT}
+        width={typeof width === 'number' ? width : '100%'}
+        itemKey={index => flattenedData[index].id}
+        // Flow does not seem to accept the generic used in FixedSizeList
+        // can itself use a generic.
+        // $FlowFixMe[incompatible-type]
+        itemData={itemData}
+        ref={listRef}
+        outerRef={listOuterRef}
+        onScroll={onScroll}
+        innerElementType={listInnerElementType}
+        // Keep overscanCount relatively high so that:
+        // - during in-app tutorials we make sure the tooltip displayer finds
+        //   the elements to highlight
+        // - on mobile it avoids jumping screens. This can happen when an item
+        //   name is edited, the keyboard opens and reduces the window height
+        //   making the item disappear (because of virtualization).
+        overscanCount={20}
+      >
+        {TreeViewRow}
+      </FixedSizeList>
+      {enableStickyAncestors && stickyRows.length > 0 && (
+        <div
+          className={classes.stickyRowsContainer}
+          style={{
+            height:
+              stickyRows[stickyRows.length - 1].top +
+              stickyRows[stickyRows.length - 1].height,
+            // Do not cover the scrollbar of the list, if any.
+            right: listOuterRef.current
+              ? listOuterRef.current.offsetWidth -
+                listOuterRef.current.clientWidth
+              : 0,
+          }}
+        >
+          {stickyRows
+            .map((stickyRow, rowRank) => {
+              const node = flattenedData[stickyRow.index];
+              // The sticky rows can reference rows that no longer exist
+              // during the render following a change of the tree - they
+              // are recomputed in a layout effect, before painting.
+              if (!node) return null;
+              return (
+                <div
+                  key={node.id}
+                  className={classes.stickyRow}
+                  style={{
+                    top: stickyRow.top,
+                    height: stickyRow.height,
+                    backgroundColor: surfaceBackgroundColor || undefined,
+                  }}
+                  onClick={() => onClickStickyRow(rowRank, stickyRow.index)}
+                >
+                  <TreeViewRow
+                    index={stickyRow.index}
+                    style={{ height: TREE_VIEW_ROW_HEIGHT }}
+                    // Flow does not seem to accept the generic used in
+                    // FixedSizeList can itself use a generic.
+                    // $FlowFixMe[incompatible-type]
+                    data={{
+                      ...itemData,
+                      // When collapsing from a sticky row, also reveal the
+                      // actual row so the user does not lose their position.
+                      onOpen: node => {
+                        onOpen(node);
+                        onClickStickyRow(rowRank, stickyRow.index);
+                      },
+                    }}
+                    isSticky
+                  />
+                </div>
+              );
+            })
+            // Render in reverse DOM order so that, during the "push"
+            // transition, the deepest row slides under its ancestors.
+            .reverse()}
+        </div>
+      )}
+    </>
+  );
+
   return (
     <>
-      <div
-        tabIndex={0}
-        className={classes.treeView}
-        onKeyDown={onKeyDown}
-        ref={containerRef}
+      <EndOfListDropTarget
+        canDrop={() =>
+          !!endOfListDropTarget &&
+          (canMoveSelectionToItem
+            ? canMoveSelectionToItem(
+                endOfListDropTarget.node.item,
+                endOfListDropTarget.where
+              )
+            : true)
+        }
+        drop={monitor => {
+          // Only handle drops in the empty space below the rows: when a row
+          // refuses the drop (an item dropped on itself...), the drop must
+          // not fall through to the end of the list.
+          if (!monitor.isOver({ shallow: true })) return;
+          if (endOfListDropTarget)
+            onMoveSelectionToItem(
+              endOfListDropTarget.node.item,
+              endOfListDropTarget.where
+            );
+        }}
       >
-        <FixedSizeList
-          height={height}
-          itemCount={flattenedData.length}
-          itemSize={TREE_VIEW_ROW_HEIGHT}
-          width={typeof width === 'number' ? width : '100%'}
-          itemKey={index => flattenedData[index].id}
-          // Flow does not seem to accept the generic used in FixedSizeList
-          // can itself use a generic.
-          // $FlowFixMe[incompatible-type]
-          itemData={itemData}
-          ref={listRef}
-          outerRef={listOuterRef}
-          onScroll={enableStickyAncestors ? onScroll : undefined}
-          // Keep overscanCount relatively high so that:
-          // - during in-app tutorials we make sure the tooltip displayer finds
-          //   the elements to highlight
-          // - on mobile it avoids jumping screens. This can happen when an item
-          //   name is edited, the keyboard opens and reduces the window height
-          //   making the item disappear (because of virtualization).
-          overscanCount={20}
-        >
-          {TreeViewRow}
-        </FixedSizeList>
-        {enableStickyAncestors && stickyRows.length > 0 && (
-          <div
-            className={classes.stickyRowsContainer}
-            style={{
-              height:
-                stickyRows[stickyRows.length - 1].top +
-                stickyRows[stickyRows.length - 1].height,
-              // Do not cover the scrollbar of the list, if any.
-              right: listOuterRef.current
-                ? listOuterRef.current.offsetWidth -
-                  listOuterRef.current.clientWidth
-                : 0,
-            }}
-          >
-            {stickyRows
-              .map((stickyRow, rowRank) => {
-                const node = flattenedData[stickyRow.index];
-                // The sticky rows can reference rows that no longer exist
-                // during the render following a change of the tree - they
-                // are recomputed in a layout effect, before painting.
-                if (!node) return null;
-                return (
+        {({ connectDropTarget, isOver, canDrop }) =>
+          connectDropTarget(
+            <div
+              tabIndex={0}
+              className={classes.treeView}
+              onKeyDown={onKeyDown}
+              ref={containerRef}
+            >
+              {renderList()}
+              {/* The pointer is in the empty space below the last row. */}
+              {isOver &&
+                endOfListDropTarget &&
+                endOfListDropTarget.where === 'after' && (
                   <div
-                    key={node.id}
-                    className={classes.stickyRow}
+                    className={classes.endOfListDropIndicator}
                     style={{
-                      top: stickyRow.top,
-                      height: stickyRow.height,
-                      backgroundColor: surfaceBackgroundColor || undefined,
+                      top:
+                        Math.min(
+                          flattenedData.length * TREE_VIEW_ROW_HEIGHT -
+                            scrollOffsetRef.current,
+                          height
+                        ) - 1,
+                      left:
+                        endOfListDropTarget.node.depth * (isMobile ? 12 : 16),
                     }}
-                    onClick={() => onClickStickyRow(rowRank, stickyRow.index)}
                   >
-                    <TreeViewRow
-                      index={stickyRow.index}
-                      style={{ height: TREE_VIEW_ROW_HEIGHT }}
-                      // Flow does not seem to accept the generic used in
-                      // FixedSizeList can itself use a generic.
-                      // $FlowFixMe[incompatible-type]
-                      data={{
-                        ...itemData,
-                        // When collapsing from a sticky row, also reveal the
-                        // actual row so the user does not lose their position.
-                        onOpen: node => {
-                          onOpen(node);
-                          onClickStickyRow(rowRank, stickyRow.index);
-                        },
-                      }}
-                      isSticky
-                    />
+                    <DropIndicator canDrop={canDrop} />
                   </div>
-                );
-              })
-              // Render in reverse DOM order so that, during the "push"
-              // transition, the deepest row slides under its ancestors.
-              .reverse()}
-          </div>
-        )}
-      </div>
+                )}
+            </div>
+          )
+        }
+      </EndOfListDropTarget>
       <ContextMenu
         ref={contextMenuRef}
         buildMenuTemplate={(i18n, options) =>

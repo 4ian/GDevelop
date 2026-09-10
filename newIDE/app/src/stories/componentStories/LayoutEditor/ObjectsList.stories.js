@@ -21,6 +21,8 @@ import { BundleStoreStateProvider } from '../../../AssetStore/Bundles/BundleStor
 import { PrivateGameTemplateStoreStateProvider } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
+import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope';
+import { type ObjectFolderOrObjectWithContext } from '../../../ObjectsList/EnumerateObjectFolderOrObject';
 
 export default {
   title: 'LayoutEditor/ObjectsList',
@@ -320,3 +322,66 @@ export const Locked = (): React.Node => (
     </DragAndDropContextProvider>
   </AssetStoreProviders>
 );
+
+const longSceneName = 'ObjectsListLongScene';
+
+/**
+ * A scene with many objects and a folder at the end, to test dragging objects:
+ * the list must scroll when an object is dragged close to its top or bottom
+ * edge, and an object can be dropped after the last folder.
+ */
+const getOrCreateLongScene = (): gdLayout => {
+  const { project } = testProject;
+  if (project.hasLayoutNamed(longSceneName)) {
+    return project.getLayout(longSceneName);
+  }
+  const layout = project.insertNewLayout(
+    longSceneName,
+    project.getLayoutsCount()
+  );
+  const objects = layout.getObjects();
+  for (let i = 0; i < 30; i++) {
+    objects.insertNewObject(project, 'Sprite', `Object${i}`, i);
+  }
+  const folder = objects.getRootFolder().insertNewFolder('LastFolder', 30);
+  for (let i = 0; i < 3; i++) {
+    objects.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      `ObjectInFolder${i}`,
+      folder,
+      i
+    );
+  }
+  return layout;
+};
+
+export const LongListWithFolderAtTheEnd = (): React.Node => {
+  const layout = React.useMemo(getOrCreateLongScene, []);
+  // Keep the selection, so that the selected objects can be dragged.
+  const [selection, setSelection] = React.useState<
+    Array<ObjectFolderOrObjectWithContext>
+  >([]);
+  return (
+    <AssetStoreProviders>
+      <DragAndDropContextProvider>
+        <div style={{ height: 400 }}>
+          <ObjectsList
+            {...getSharedProps()}
+            layout={layout}
+            objectsContainer={layout.getObjects()}
+            projectScopedContainersAccessor={
+              new ProjectScopedContainersAccessor({
+                project: testProject.project,
+                layout,
+              })
+            }
+            selectedObjectFolderOrObjectsWithContext={selection}
+            onObjectFolderOrObjectsWithContextSelected={setSelection}
+            isListLocked={false}
+          />
+        </div>
+      </DragAndDropContextProvider>
+    </AssetStoreProviders>
+  );
+};

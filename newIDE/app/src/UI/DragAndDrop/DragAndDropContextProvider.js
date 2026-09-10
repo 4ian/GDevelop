@@ -58,6 +58,82 @@ const EndDragOnTouchCancel = ({
   return null;
 };
 
+/**
+ * Touch events are always dispatched to the element the finger first touched.
+ * If this element is removed from the document during a drag (a virtualized
+ * list unmounts the dragged row once auto scrolling moved it out of view),
+ * the events don't reach the drag backend anymore: the drag can't be updated
+ * or ended, and auto scrolling never stops. Keep this element in the document
+ * until the drag ends (the backend only handles the removal of the drag
+ * source itself, not of one of its ancestors).
+ */
+const KeepTouchedElementConnectedDuringDrag = ({
+  documentToWatch,
+}: {|
+  documentToWatch: Document,
+|}) => {
+  const dragDropManager = useDragDropManager();
+  React.useEffect(
+    () => {
+      let touchedElement: ?Element = null;
+      let observer: ?MutationObserver = null;
+      let hiddenContainer: ?HTMLElement = null;
+
+      const onTouchStart = (event: TouchEvent) => {
+        touchedElement = event.target instanceof Element ? event.target : null;
+      };
+      const onTouchEnd = () => {
+        touchedElement = null;
+      };
+      const stopWatching = () => {
+        if (observer) observer.disconnect();
+        observer = null;
+        if (hiddenContainer) hiddenContainer.remove();
+        hiddenContainer = null;
+      };
+      const reconnectTouchedElement = () => {
+        const element = touchedElement;
+        if (!element || element.isConnected) return;
+        let detachedRoot: Node = element;
+        while (detachedRoot.parentNode) detachedRoot = detachedRoot.parentNode;
+        if (!hiddenContainer) {
+          const container = documentToWatch.createElement('div');
+          container.style.display = 'none';
+          documentToWatch.body && documentToWatch.body.appendChild(container);
+          hiddenContainer = container;
+        }
+        hiddenContainer.appendChild(detachedRoot);
+      };
+
+      const monitor = dragDropManager.getMonitor();
+      const onStateChange = () => {
+        if (!monitor.isDragging()) {
+          stopWatching();
+          return;
+        }
+        // Not a touch drag, or already watching.
+        if (observer || !touchedElement || !touchedElement.isConnected) return;
+        observer = new MutationObserver(reconnectTouchedElement);
+        observer.observe(documentToWatch, { childList: true, subtree: true });
+      };
+
+      documentToWatch.addEventListener('touchstart', onTouchStart, true);
+      documentToWatch.addEventListener('touchend', onTouchEnd, true);
+      documentToWatch.addEventListener('touchcancel', onTouchEnd, true);
+      const unsubscribe = monitor.subscribeToStateChange(onStateChange);
+      return () => {
+        documentToWatch.removeEventListener('touchstart', onTouchStart, true);
+        documentToWatch.removeEventListener('touchend', onTouchEnd, true);
+        documentToWatch.removeEventListener('touchcancel', onTouchEnd, true);
+        unsubscribe();
+        stopWatching();
+      };
+    },
+    [dragDropManager, documentToWatch]
+  );
+  return null;
+};
+
 type Props = {|
   children: React.Node,
 
@@ -106,6 +182,9 @@ const DragAndDropContextProvider = ({
       context={backendContext}
     >
       <EndDragOnTouchCancel
+        documentToWatch={window ? window.document : document}
+      />
+      <KeepTouchedElementConnectedDuringDrag
         documentToWatch={window ? window.document : document}
       />
       {children}

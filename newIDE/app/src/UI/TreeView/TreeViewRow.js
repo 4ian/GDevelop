@@ -273,7 +273,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                     COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT
                     ? 'before'
                     : y - containerYPosition <=
-                      TREE_VIEW_ROW_HEIGHT +
+                      TREE_VIEW_ROW_HEIGHT -
                         COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT
                     ? 'inside'
                     : 'after'

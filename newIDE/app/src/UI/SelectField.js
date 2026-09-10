@@ -15,13 +15,34 @@ const INVALID_VALUE = '';
 const stopPropagation = event => event.stopPropagation();
 
 // $FlowFixMe[missing-local-annot]
-const useSelectStyles = textAlign =>
-  makeStyles({
+const useSelectStyles = (textAlign, hasStartAdornment) =>
+  makeStyles(theme => ({
     root: {
       textAlign: textAlign || 'left',
       cursor: 'default',
+      // When there is a start adornment, the focus highlight is displayed on the
+      // whole input (see `useInputStyles`) instead of only on the native select.
+      ...(hasStartAdornment
+        ? { '&:focus': { backgroundColor: 'transparent' } }
+        : {}),
     },
-  })();
+  }))();
+
+// $FlowFixMe[missing-local-annot]
+const useInputStyles = hasStartAdornment =>
+  makeStyles(theme => ({
+    root: hasStartAdornment
+      ? {
+          // Same highlight as the one of Material-UI native select on focus.
+          '&:focus-within': {
+            backgroundColor:
+              theme.palette.type === 'light'
+                ? 'rgba(0, 0, 0, 0.05)'
+                : 'rgba(255, 255, 255, 0.05)',
+          },
+        }
+      : {},
+  }))();
 
 export type SelectFieldInterface = {|
   focus: FieldFocusFunction,
@@ -85,7 +106,9 @@ const SelectField: React.ComponentType<{
   React.useImperativeHandle(ref, () => ({
     focus,
   }));
-  const selectStyles = useSelectStyles(props.textAlign);
+  const hasStartAdornment = !!props.startAdornment;
+  const selectStyles = useSelectStyles(props.textAlign, hasStartAdornment);
+  const inputStyles = useInputStyles(hasStartAdornment);
 
   const onChange = props.onChange || undefined;
 
@@ -144,6 +167,7 @@ const SelectField: React.ComponentType<{
             style: props.inputStyle,
             disableUnderline: !!props.disableUnderline,
             startAdornment: props.startAdornment,
+            classes: inputStyles,
           }}
           InputLabelProps={{
             shrink: true,

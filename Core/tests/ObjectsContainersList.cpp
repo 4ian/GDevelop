@@ -825,3 +825,129 @@ TEST_CASE("ObjectContainersList (GetAnimationNamesOfObject)", "[common]") {
     REQUIRE(animationNames.size() == 2);
   }
 }
+
+TEST_CASE("ObjectContainersList (scene group shadowing a global group)",
+          "[common]") {
+  // A scene group having the same name as a global group is an inconsistency
+  // that the editor tries to avoid, but it can exist in projects. In this
+  // case, the scene group shadows the global one (the global group is
+  // considered as not existing in this scene), consistently across all the
+  // helpers - including ExpandObjectName, which is used to generate the code
+  // of events.
+
+  SECTION("An empty scene group shadows a global group having objects") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Object &globalObject = project.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "GlobalObject", 0);
+    globalObject.AddNewBehavior(project, "MyExtension::MyBehavior",
+                                "MyBehavior");
+    globalObject.GetVariables().InsertNew("MyVariable", 0);
+    auto &globalGroup =
+        project.GetObjects().GetObjectGroups().InsertNew("Group", 0);
+    globalGroup.AddObject(globalObject.GetName());
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    layout.GetObjects().GetObjectGroups().InsertNew("Group", 0);
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(objectsContainersList.GetTypeOfObject("Group") == "");
+    REQUIRE(objectsContainersList.GetBehaviorsOfObject("Group", true).empty());
+    REQUIRE(objectsContainersList.GetTypeOfBehaviorInObjectOrGroup(
+                "Group", "MyBehavior", true) == "");
+    REQUIRE(!objectsContainersList.HasBehaviorInObjectOrGroup("Group",
+                                                              "MyBehavior"));
+    REQUIRE(objectsContainersList
+                .GetBehaviorNamesInObjectOrGroup(
+                    "Group", "MyExtension::MyBehavior", true)
+                .empty());
+    REQUIRE(objectsContainersList.HasObjectOrGroupWithVariableNamed(
+                "Group", "MyVariable") ==
+            gd::ObjectsContainersList::VariableExistence::GroupIsEmpty);
+    REQUIRE(objectsContainersList.ExpandObjectName("Group", "").empty());
+  }
+
+  SECTION("A scene group having objects shadows a global group") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Object &globalObject = project.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "GlobalObject", 0);
+    globalObject.AddNewBehavior(project, "MyExtension::MyBehavior",
+                                "MyBehavior");
+    auto &globalGroup =
+        project.GetObjects().GetObjectGroups().InsertNew("Group", 0);
+    globalGroup.AddObject(globalObject.GetName());
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &sceneObject = layout.GetObjects().InsertNewObject(
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "SceneObject",
+        0);
+    sceneObject.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
+                               "MyOtherBehavior");
+    auto &sceneGroup =
+        layout.GetObjects().GetObjectGroups().InsertNew("Group", 0);
+    sceneGroup.AddObject(sceneObject.GetName());
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(objectsContainersList.GetTypeOfObject("Group") ==
+            "MyExtension::FakeObjectWithDefaultBehavior");
+
+    const auto behaviors =
+        objectsContainersList.GetBehaviorsOfObject("Group", true);
+    REQUIRE(std::find(behaviors.begin(), behaviors.end(), "MyOtherBehavior") !=
+            behaviors.end());
+    REQUIRE(std::find(behaviors.begin(), behaviors.end(), "MyBehavior") ==
+            behaviors.end());
+
+    REQUIRE(objectsContainersList.GetTypeOfBehaviorInObjectOrGroup(
+                "Group", "MyOtherBehavior", true) ==
+            "MyExtension::MyOtherBehavior");
+    REQUIRE(objectsContainersList.GetTypeOfBehaviorInObjectOrGroup(
+                "Group", "MyBehavior", true) == "");
+    REQUIRE(objectsContainersList.HasBehaviorInObjectOrGroup(
+        "Group", "MyOtherBehavior"));
+    REQUIRE(!objectsContainersList.HasBehaviorInObjectOrGroup("Group",
+                                                              "MyBehavior"));
+
+    const auto expandedObjects =
+        objectsContainersList.ExpandObjectName("Group", "");
+    REQUIRE(expandedObjects.size() == 1);
+    REQUIRE(expandedObjects[0] == "SceneObject");
+  }
+
+  SECTION("A global group is used when the scene has no group with its name") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Object &globalObject = project.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "GlobalObject", 0);
+    globalObject.AddNewBehavior(project, "MyExtension::MyBehavior",
+                                "MyBehavior");
+    auto &globalGroup =
+        project.GetObjects().GetObjectGroups().InsertNew("Group", 0);
+    globalGroup.AddObject(globalObject.GetName());
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+
+    auto objectsContainersList = gd::ObjectsContainersList::
+        MakeNewObjectsContainersListForProjectAndLayout(project, layout);
+
+    REQUIRE(objectsContainersList.GetTypeOfObject("Group") ==
+            "MyExtension::Sprite");
+    const auto behaviors =
+        objectsContainersList.GetBehaviorsOfObject("Group", true);
+    REQUIRE(behaviors.size() == 1);
+    REQUIRE(behaviors[0] == "MyBehavior");
+    REQUIRE(objectsContainersList.GetTypeOfBehaviorInObjectOrGroup(
+                "Group", "MyBehavior", true) == "MyExtension::MyBehavior");
+  }
+}

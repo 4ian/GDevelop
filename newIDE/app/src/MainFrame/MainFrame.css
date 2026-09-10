@@ -91,6 +91,11 @@ body {
   padding-left: var(--safe-area-inset-left);
 }
 
+/* Add right padding to fit on screen, useful for drawers on non square screens ("notch"). */
+.safe-area-aware-right-container {
+  padding-right: var(--safe-area-inset-right);
+}
+
 /* Helper for avoiding the soft keyboard. See also `getAvoidSoftKeyboardStyle`. */
 .avoid-soft-keyboard {
   transform: translateY(calc(-1 * var(--softKeyboardBottomOffset)));

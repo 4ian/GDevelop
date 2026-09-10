@@ -18,7 +18,7 @@ const styles = {
 };
 
 type Props = {|
-  project: ?gdProject,
+  project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -99,6 +99,23 @@ const ObjectGroupEditor = ({
   return (
     <ColumnStackLayout noMargin>
       {renderExplanation()}
+      <Paper style={styles.objectSelector} background="medium">
+        <Column noMargin>
+          <ObjectSelector
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            value={objectName}
+            excludedObjectOrGroupNames={groupObjectNames}
+            onChange={setObjectName}
+            onChoose={addObject}
+            openOnFocus
+            noGroups
+            hintText={t`Choose an object to add to the group`}
+            fullWidth
+            disabled={isObjectListLocked}
+          />
+        </Column>
+      </Paper>
       <List>
         {groupObjectNames.map(objectName => {
           let object = getObjectByName(
@@ -133,23 +150,6 @@ const ObjectGroupEditor = ({
           );
         })}
       </List>
-      <Paper style={styles.objectSelector} background="medium">
-        <Column noMargin>
-          <ObjectSelector
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            value={objectName}
-            excludedObjectOrGroupNames={groupObjectNames}
-            onChange={setObjectName}
-            onChoose={addObject}
-            openOnFocus
-            noGroups
-            hintText={t`Choose an object to add to the group`}
-            fullWidth
-            disabled={isObjectListLocked}
-          />
-        </Column>
-      </Paper>
     </ColumnStackLayout>
   );
 };

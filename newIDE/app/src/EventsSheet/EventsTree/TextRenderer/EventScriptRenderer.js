@@ -600,6 +600,12 @@ export const renderEventAsEventScriptLines = ({
       lines.push(
         `${bodyIndent}# ... ${eventsCount} sub-event(s) (${instructionsCount} action(s)) not shown: read event_ids: ["event-${eventPath}"] to see them.`
       );
+      // A group must contain at least one event for the parser: the marker
+      // is a comment, so make the (collapsed) body explicit with `pass` to
+      // keep the rendering valid EventScript.
+      if (event.getType() === 'BuiltinCommonInstructions::Group') {
+        lines.push(`${bodyIndent}pass`);
+      }
     }
   }
 

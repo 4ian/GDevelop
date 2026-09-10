@@ -1223,7 +1223,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     return [
                       new PlaceHolderTreeViewItem(
                         extensionsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new function.`)
+                        i18n._(t`Start by adding a new extension.`)
                       ),
                     ];
                   }

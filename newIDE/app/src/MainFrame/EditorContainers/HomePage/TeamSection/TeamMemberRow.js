@@ -32,7 +32,9 @@ const styles = {
   copyIconContainer: { opacity: 0.7, display: 'flex' },
 };
 
-const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{}>('team-groups');
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{}>('team-groups', {
+  touchDragStart: 'immediate',
+});
 
 type Props = {|
   member: User,

@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  flex-shrink: 0;
+  overflow: hidden;
+  /* The width and the content slide together, so that the panel looks like
+     sliding in and out rather than being cropped. */
+  transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0s linear 220ms;
+  visibility: hidden;
+}
+
+.containerOpen {
+  visibility: visible;
+  transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1), visibility 0s;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 0;
+  transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contentClosedLeft {
+  transform: translateX(-100%);
+}
+
+.contentClosedRight {
+  transform: translateX(100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .containerOpen,
+  .content {
+    transition: none;
+  }
+}

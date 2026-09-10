@@ -18,6 +18,8 @@ import {
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
+const gd: libGDevelop = global.gd;
+
 const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 
 export type ExtensionTreeViewItemCallbacks = {|
@@ -200,11 +202,14 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
       clipboardContent,
       'eventsFunctionsExtension'
     );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedEventsFunctionsExtension) return;
+    const oldName = SafeExtractor.extractStringProperty(
+      clipboardContent,
+      'name'
+    );
+    if (!oldName || !copiedEventsFunctionsExtension) return;
 
     const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(oldName, name =>
       isExtensionNameTaken(name, project)
     );
 
@@ -219,9 +224,15 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
       'unserializeFrom',
       project
     );
-    newEventsFunctionsExtension.setName(newName); // Unserialization has overwritten the name.
-    if (newName !== name) {
+    // Unserialization has overwritten the name.
+    newEventsFunctionsExtension.setName(newName);
+    if (newName !== oldName) {
       newEventsFunctionsExtension.setOrigin('', '');
+      gd.WholeProjectRefactorer.updateExtensionNameInExtension(
+        project,
+        newEventsFunctionsExtension,
+        oldName
+      );
     }
 
     this._onProjectItemModified();

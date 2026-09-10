@@ -75,6 +75,7 @@ const makeResult = (
   durationMs: 0,
   loadingMs: 0,
   timeoutMs: 0,
+  hiddenStallMs: 0,
   gameTimeMs: 0,
   assertions: [],
   errors: [],
@@ -136,8 +137,6 @@ const PropertiesPanelStory = ({
           isRunning={!!isRunning}
           runningFrame={runningFrame || null}
           lastResult={lastResult || null}
-          onRunTest={action('run test')}
-          onStopTest={action('stop test')}
           onEditWithAi={action('edit with AI')}
           onTestModified={action('test modified')}
         />

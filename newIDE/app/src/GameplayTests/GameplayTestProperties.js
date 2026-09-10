@@ -1,10 +1,5 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
-import {
-  buildRunTestSpeedMenuTemplate,
-  type GameplayTestRunSpeedOptions,
-} from './GameplayTestEditorToolbar';
-import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line, Spacer, marginsSize } from '../UI/Grid';
@@ -21,7 +16,6 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { getRelativeOrAbsoluteDisplayDate } from '../Utils/DateDisplay';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
-import StopIcon from '../UI/CustomSvgIcons/Stop';
 import CheckIcon from '../UI/CustomSvgIcons/Check';
 import CrossIcon from '../UI/CustomSvgIcons/Cross';
 import RobotIcon from '../ProjectCreation/RobotIcon';
@@ -122,16 +116,14 @@ type Props = {|
   /** The frame currently reached by the running test, if known. */
   runningFrame?: number | null,
   lastResult: GameplayTestResult | null,
-  onRunTest: (options: GameplayTestRunSpeedOptions) => void | Promise<void>,
-  onStopTest: () => void,
   onEditWithAi: () => void,
   onTestModified: () => void,
 |};
 
 /**
- * The properties panel of a gameplay test: its name/description, the button to
- * run it and everything showing the outcome of the last run (status,
- * assertions, errors, console logs and screenshots).
+ * The properties panel of a gameplay test: its name/description and everything
+ * showing the outcome of the last run (status, assertions, errors, console
+ * logs and screenshots). The test itself is run from the toolbar button.
  */
 export const GameplayTestProperties = ({
   test,
@@ -139,8 +131,6 @@ export const GameplayTestProperties = ({
   isRunning,
   runningFrame,
   lastResult,
-  onRunTest,
-  onStopTest,
   onEditWithAi,
   onTestModified,
 }: Props): React.Node => {
@@ -224,15 +214,10 @@ export const GameplayTestProperties = ({
                 <Trans>Test of the extension {scope.extensionName}</Trans>
               )}
             </Text>
-            {isRunning ? (
+            {/* The test is run and stopped from the toolbar button, which stays
+                visible even when this panel is closed. */}
+            {isRunning && (
               <ColumnStackLayout noMargin>
-                <FlatButton
-                  fullWidth
-                  primary
-                  leftIcon={<StopIcon />}
-                  label={<Trans>Stop the test</Trans>}
-                  onClick={onStopTest}
-                />
                 <Line noMargin alignItems="center">
                   <LinearProgress variant="indeterminate" />
                 </Line>
@@ -244,17 +229,6 @@ export const GameplayTestProperties = ({
                   )}
                 </Text>
               </ColumnStackLayout>
-            ) : (
-              <RaisedButtonWithSplitMenu
-                primary
-                fullWidth
-                icon={<PreviewIcon />}
-                label={<Trans>Run the test</Trans>}
-                onClick={() => onRunTest({ speedFactor: null })}
-                buildMenuTemplate={i18n =>
-                  buildRunTestSpeedMenuTemplate(i18n, onRunTest)
-                }
-              />
             )}
             <FlatButton
               fullWidth

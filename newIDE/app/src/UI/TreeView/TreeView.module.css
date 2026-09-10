@@ -95,10 +95,18 @@
 .rowContainer:hover:not(.selected) {
   background-color: var(--theme-list-item-hover-background-color);
 }
+/* On touch screens, the row held by the finger, ready to be dragged. */
+.rowContainer.readyToDrag {
+  position: relative;
+  z-index: 1;
+  transform: scale(1.03);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+  background-color: var(--theme-list-item-hover-background-color);
+  transition: transform 100ms ease-out, box-shadow 100ms ease-out;
+}
 
 .itemName,
-.itemDescription,
-.itemNameInput {
+.itemDescription {
   font-family: var(--gdevelop-modern-font-family) !important;
   font-size: 14px;
 }
@@ -120,7 +128,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   user-select: none;
-  color: var(--theme-text-secondary-color)
+  color: var(--theme-text-secondary-color);
 }
 
 .itemName.placeholder {
@@ -139,35 +147,6 @@
 }
 .thumbnail {
   margin-right: 6px;
-}
-
-.itemNameInput {
-  outline: none;
-  border: none;
-  padding: 0;
-  background-image: none;
-  background-color: transparent;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  color: inherit;
-  width: 100%;
-}
-
-.itemNameInputContainer:before {
-  bottom: -1px;
-  left: 0;
-  content: '\00a0';
-  width: 100%;
-  border-bottom: 1px solid var(--theme-text-default-color);
-  display: block;
-  position: absolute;
-  height: 1px;
-}
-
-.itemNameInputContainer {
-  position: relative;
-  flex: 1;
 }
 
 @keyframes wiggle {

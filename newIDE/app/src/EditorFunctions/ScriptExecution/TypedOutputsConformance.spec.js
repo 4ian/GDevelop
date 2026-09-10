@@ -24,6 +24,7 @@ const TESTED_TYPED_FUNCTION_NAMES = [
   'inspect_scene_properties_layers_effects',
   'inspect_project_properties_resources',
   'read_events_source',
+  'read_game_project_json',
   'add_behavior',
 ];
 
@@ -235,6 +236,18 @@ describe('typed outputs conformance (script API declared reads)', () => {
     validateResultAgainstSchema(second, 'add_behavior');
     // Re-running a script must give the same usable name, not an empty list.
     expect(second.addedBehaviors).toEqual(first.addedBehaviors);
+  });
+
+  it('read_game_project_json output conforms', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.read_game_project_json.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { path: 'scenes[*].sceneName' },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(result, 'read_game_project_json');
+    expect(result.result).toEqual(['TestScene']);
   });
 
   it('read_events_source output conforms', async () => {

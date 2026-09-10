@@ -11,24 +11,20 @@ import Folder from '../CustomSvgIcons/Folder';
 import ListIcon from '../ListIcon';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import classes from './TreeView.module.css';
-import {
-  shouldCloseOrCancel,
-  shouldValidate,
-} from '../KeyboardShortcuts/InteractionKeys';
+import { shouldCloseOrCancel } from '../KeyboardShortcuts/InteractionKeys';
 import ThreeDotsMenu from '../CustomSvgIcons/ThreeDotsMenu';
 import { type ItemData, type ItemBaseAttributes, navigationKeys } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import { useDragDropManager } from 'react-dnd';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
+import { LONG_PRESS_DELAY_ON_HELD_ITEM } from '../DragAndDrop/TouchDragDelay';
+import HoldForMenuProgress from '../DragAndDrop/HoldForMenuProgress';
 import classNames from 'classnames';
 import { TreeViewRightPrimaryButton } from './TreeViewRightPrimaryButton';
-
-// $FlowFixMe[missing-local-annot]
-const stopPropagation = e => e.stopPropagation();
+import InlineRenameInput from '../InlineRenameInput';
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
-const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 600;
 export const TREE_VIEW_ROW_HEIGHT = 32;
 const COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT = 6;
 
@@ -40,84 +36,6 @@ const onInputKeyDown = (event: KeyboardEvent) => {
     // Prevent closing dialog if TreeView is displayed in dialog.
     event.stopPropagation();
   }
-};
-
-const SemiControlledRowInput = ({
-  initialValue,
-  onEndRenaming,
-  onBlur,
-}: {
-  initialValue: string,
-  onEndRenaming: (newName: string) => void,
-  onBlur: () => void,
-}) => {
-  const [value, setValue] = React.useState<string>(initialValue);
-  const inputRef = React.useRef<?HTMLInputElement>(null);
-
-  /**
-   * When mounting the component, focus and select content.
-   * We use setTimeout to ensure this runs after any deferred focus restoration
-   * from MUI Modal (used by the context menu on web), which runs in a useEffect
-   * cleanup. Without this, MUI's focus restoration steals focus from the input
-   * right after it mounts (introduced in React 18).
-   */
-  React.useEffect(() => {
-    const id = setTimeout(() => {
-      const input = inputRef.current;
-      if (input) {
-        // We focus and select the text here, and not with autoFocus on the input,
-        // to avoid issues with focus restoration from MUI Modal (used by the context menu on web)
-        input.focus();
-        input.select();
-      }
-    }, 0);
-    return () => clearTimeout(id);
-  }, []);
-
-  /**
-   * When unmounting the component, call onBlur. If props.onBlur is called
-   * at the end of onKeyUp, focus might before the component is mounted.
-   * This would trigger the blur callback on the input, calling onEndRenaming
-   * with the current value, even if the user hit Escape key and expected the
-   * initialValue to be set.
-   */
-  React.useEffect(
-    () => {
-      return onBlur;
-    },
-    [onBlur]
-  );
-
-  return (
-    <div className={classes.itemNameInputContainer}>
-      <input
-        ref={inputRef}
-        type="text"
-        className={classes.itemNameInput}
-        value={value}
-        spellCheck={false}
-        onChange={e => {
-          setValue(e.currentTarget.value);
-        }}
-        onClick={stopPropagation}
-        onDoubleClick={stopPropagation}
-        onContextMenu={stopPropagation}
-        onBlur={() => {
-          onEndRenaming(value);
-        }}
-        onKeyDown={onInputKeyDown}
-        onKeyUp={e => {
-          if (shouldCloseOrCancel(e)) {
-            // Prevent closing dialog if TreeView is displayed in dialog.
-            e.preventDefault();
-            onEndRenaming(initialValue);
-          } else if (shouldValidate(e)) {
-            onEndRenaming(value);
-          }
-        }}
-      />
-    </div>
-  );
 };
 
 // $FlowFixMe[missing-local-annot]
@@ -188,7 +106,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
   const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
     openContextMenu,
     {
-      delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
+      delay: LONG_PRESS_DELAY_ON_HELD_ITEM,
     }
   );
 
@@ -202,7 +120,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
         if (!isSticky) onOpen(node);
         return;
       }
-      onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
+      onSelect({
+        node,
+        exclusive: !(event.metaKey || event.ctrlKey || event.shiftKey),
+        extendFromAnchor: event.shiftKey,
+      });
       onClick(node);
     },
     [onClick, onSelect, node, onOpen, isSticky]
@@ -219,10 +141,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
 
   const selectAndOpenContextMenu = React.useCallback(
     (event: MouseEvent) => {
-      if (!node.item.isRoot) onClickItem(event);
+      // In multi-select mode, preserve an existing selection when right-clicking
+      // one of its rows. In single-select mode always (re-)select the row so
+      // that the context menu always operates on the correct item.
+      if (!node.item.isRoot && !(data.multiSelect && node.selected))
+        onClickItem(event);
       openContextMenu(event);
     },
-    [node, onClickItem, openContextMenu]
+    [node, data.multiSelect, onClickItem, openContextMenu]
   );
 
   const setIsStayingOver = React.useCallback(
@@ -380,6 +306,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
           connectDragPreview,
           isOver,
           canDrop,
+          isReadyToDrag,
         }) => {
           setIsStayingOver(isOver, canDrop);
 
@@ -429,10 +356,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
               {renamedItemId === node.id &&
               !isSticky &&
               typeof node.name === 'string' ? (
-                <SemiControlledRowInput
+                <InlineRenameInput
                   initialValue={node.name}
                   onEndRenaming={endRenaming}
                   onBlur={onBlurField}
+                  onKeyDown={onInputKeyDown}
                 />
               ) : (
                 <span
@@ -598,6 +526,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                 dropIndicatorClassName,
                 {
                   [classes.selected]: node.selected,
+                  [classes.readyToDrag]: isReadyToDrag,
                 }
               )}
               aria-selected={node.selected}
@@ -605,6 +534,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
               {...dataObjectToProps(node.dataset)}
             >
               {dragSource}
+              {isReadyToDrag && <HoldForMenuProgress />}
             </div>
           );
 

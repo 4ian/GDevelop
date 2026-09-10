@@ -109,8 +109,34 @@ type AiRequestToolOptions = {
   watchPollingIntervalInMs?: number,
 };
 
+/**
+ * Why an AI request failed, as reported by the API. The code is used to tell
+ * the user what happened and what they can do about it (see AiRequestErrorRow).
+ */
+export type AiRequestError = {
+  code: string,
+  message: string,
+};
+
+/**
+ * How much of the context (the "memory" of the conversation) an AI request
+ * uses, as estimated by the API.
+ */
+export type AiRequestContextStats = {
+  // Rough estimate of the tokens consumed by the conversation so far.
+  totalTokens: number,
+  // The share of the context budget used, from 0 to 1 (it can exceed 1 once
+  // the budget is passed, the AI is then asked to wrap up).
+  usedPercentage: number,
+};
+
 export type AiRequest = {
   id: string,
+  // The name given by the user to the chat. Without one, the first user
+  // message stands for it.
+  title?: string | null,
+  // When the user archived the chat, hiding it from the active chats.
+  archivedAt?: string | null,
   createdAt: string,
   updatedAt: string,
   userId: string,
@@ -126,10 +152,14 @@ export type AiRequest = {
   forkedAfterNewMessageId?: string | null,
   parentAiRequestId?: string | null,
 
-  error: {
-    code: string,
-    message: string,
-  } | null,
+  error: AiRequestError | null,
+  contextStats?: AiRequestContextStats | null,
+
+  // How many times the request was continued after a failure without making
+  // any progress in between, and the number of messages it had then: the API
+  // refuses to continue it again past MAX_AI_REQUEST_RETRIES_IN_A_ROW.
+  retriesInARowCount?: number,
+  retriedAfterMessagesCount?: number,
 
   output?: Array<AiRequestMessage>,
 
@@ -225,7 +255,6 @@ export type AiGeneratedEvent = {
   eventBatches: Array<AiGeneratedEventBatch> | null,
   extensionNamesList: string,
   objectsList: string,
-  existingEventsAsText: string,
   existingEventsJson: string | null,
   existingEventsJsonUserRelativeKey: string | null,
 
@@ -358,36 +387,118 @@ export const getAiRequestStatuses = async (
   });
 };
 
-export const getAiRequests = async (
+/**
+ * An AI request as the chat history lists it: enough to show and open it,
+ * without its conversation. Opening it loads the `AiRequest`.
+ */
+export type AiRequestSummary = {
+  id: string,
+  title: string | null,
+  archivedAt: string | null,
+  gameId: string | null,
+  createdAt: string,
+  updatedAt: string,
+  userId: string,
+  status: GenerationStatus,
+  mode?: 'chat' | 'agent' | 'orchestrator',
+  error: AiRequestError | null,
+  forkedFromAiRequestId: string | null,
+  parentAiRequestId: string | null,
+  totalPriceInCredits: number | null,
+  lastUserMessagePriceInCredits: number | null,
+  firstUserMessage: AiRequestUserMessage | null,
+  lastMessage: AiRequestMessage | null,
+  outputMessagesCount: number,
+};
+
+export const getAiRequestSummary = (aiRequest: AiRequest): AiRequestSummary => {
+  const output = aiRequest.output || [];
+  const firstMessage = output.length > 0 ? output[0] : null;
+  return {
+    id: aiRequest.id,
+    title: aiRequest.title || null,
+    archivedAt: aiRequest.archivedAt || null,
+    gameId: aiRequest.gameId || null,
+    createdAt: aiRequest.createdAt,
+    updatedAt: aiRequest.updatedAt,
+    userId: aiRequest.userId,
+    status: aiRequest.status,
+    mode: aiRequest.mode,
+    error: aiRequest.error,
+    forkedFromAiRequestId: aiRequest.forkedFromAiRequestId || null,
+    parentAiRequestId: aiRequest.parentAiRequestId || null,
+    totalPriceInCredits:
+      aiRequest.totalPriceInCredits !== undefined
+        ? aiRequest.totalPriceInCredits
+        : null,
+    lastUserMessagePriceInCredits:
+      aiRequest.lastUserMessagePriceInCredits !== undefined
+        ? aiRequest.lastUserMessagePriceInCredits
+        : null,
+    firstUserMessage:
+      firstMessage &&
+      firstMessage.type === 'message' &&
+      firstMessage.role === 'user'
+        ? firstMessage
+        : null,
+    lastMessage: output.length > 0 ? output[output.length - 1] : null,
+    outputMessagesCount: output.length,
+  };
+};
+
+/** Which chats to list: the active ones, the archived ones or all of them. */
+export type AiRequestSummariesFilter = 'active' | 'archived' | 'all';
+
+const archivedParameterByFilter = {
+  active: 'false',
+  archived: 'true',
+  all: 'any',
+};
+
+export const getAiRequestSummaries = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
     forceUri,
+    filter,
+    gameId,
   }: {|
     userId: string,
+    // The URI of the page to fetch, which carries the filter and the game (or
+    // null for the first page).
     forceUri: ?string,
+    filter: AiRequestSummariesFilter,
+    // Only the chats made on this game.
+    gameId?: ?string,
   |}
 ): Promise<{
-  aiRequests: Array<AiRequest>,
+  aiRequestSummaries: Array<AiRequestSummary>,
   nextPageUri: ?string,
 }> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const uri = forceUri || '/ai-request';
+  const uri = forceUri || '/ai-request-summary';
 
   // $FlowFixMe[incompatible-type]
   const response = await apiClient.get(uri, {
     headers: {
       Authorization: authorizationHeader,
     },
-    params: forceUri ? { userId } : { userId, perPage: 10 },
+    params: forceUri
+      ? { userId }
+      : {
+          userId,
+          perPage: 10,
+          archived: archivedParameterByFilter[filter],
+          gameId: gameId || undefined,
+        },
   });
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
   return {
-    aiRequests: ensureIsArray({
+    aiRequestSummaries: ensureIsArray({
       data: response.data,
-      endpointName: '/ai-request of Generation API',
+      endpointName: '/ai-request-summary of Generation API',
     }),
     nextPageUri,
   };
@@ -537,6 +648,27 @@ export const addMessageToAiRequest = async (
   });
 };
 
+/**
+ * Continue a failed AI request from where it stopped: nothing is added to the
+ * conversation, the AI picks up from the last message it managed to write.
+ */
+export const retryAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/ai-request/${aiRequestId}/action/retry`,
+    {},
+    { params: { userId }, headers: { Authorization: authorizationHeader } }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id}/action/retry of Generation API',
+  });
+};
+
 export const suspendAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
   { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
@@ -551,6 +683,52 @@ export const suspendAiRequest = async (
     data: response.data,
     propertyName: 'id',
     endpointName: '/ai-request/{id}/action/suspend of Generation API',
+  });
+};
+
+/**
+ * Update what the user can set on an AI request: its title (`null` removes
+ * it, its first user message is then shown as its name) and whether it's
+ * archived.
+ */
+export const updateAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    title,
+    archived,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    title?: string | null,
+    archived?: boolean,
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const attributes: { title?: string | null, archived?: boolean } = {};
+  if (title !== undefined) attributes.title = title;
+  if (archived !== undefined) attributes.archived = archived;
+  const response = await apiClient.patch(
+    `/ai-request/${aiRequestId}`,
+    attributes,
+    { params: { userId }, headers: { Authorization: authorizationHeader } }
+  );
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/ai-request/{id} of Generation API',
+  });
+};
+
+export const deleteAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await apiClient.delete(`/ai-request/${aiRequestId}`, {
+    params: { userId },
+    headers: { Authorization: authorizationHeader },
   });
 };
 
@@ -702,7 +880,6 @@ export const createAiGeneratedEvent = async (
     eventBatches,
     extensionNamesList,
     objectsList,
-    existingEventsAsText,
     existingEventsJson,
     existingEventsJsonUserRelativeKey,
     placementHint,
@@ -719,7 +896,6 @@ export const createAiGeneratedEvent = async (
     eventBatches: Array<AiGeneratedEventBatch> | null,
     extensionNamesList: string,
     objectsList: string,
-    existingEventsAsText: string,
     existingEventsJson: string | null,
     existingEventsJsonUserRelativeKey: string | null,
     placementHint: string | null,
@@ -741,7 +917,6 @@ export const createAiGeneratedEvent = async (
       eventBatches,
       extensionNamesList,
       objectsList,
-      existingEventsAsText,
       existingEventsJson,
       existingEventsJsonUserRelativeKey,
       placementHint,

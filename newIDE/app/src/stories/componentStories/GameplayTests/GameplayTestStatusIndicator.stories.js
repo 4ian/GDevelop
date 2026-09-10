@@ -24,6 +24,7 @@ const allStatuses: Array<GameplayTestDisplayStatus> = [
   'failed',
   'error',
   'timeout',
+  'paused',
   'stopped',
 ];
 
@@ -39,6 +40,31 @@ export const AllStatuses = (): React.Node => (
         </Text>
       </LineStackLayout>
     ))}
+  </ColumnStackLayout>
+);
+
+/**
+ * Whatever the status shows - an icon, a spinner, a dot - the chip keeps the
+ * same height, so that a test being run never moves the layout around it.
+ */
+export const SameHeightWhateverTheStatus = (): React.Node => (
+  <ColumnStackLayout>
+    <Text noMargin color="secondary" size="body-small">
+      Default size
+    </Text>
+    <LineStackLayout noMargin alignItems="center">
+      {allStatuses.map(status => (
+        <GameplayTestStatusChip key={status} status={status} />
+      ))}
+    </LineStackLayout>
+    <Text noMargin color="secondary" size="body-small">
+      Small size
+    </Text>
+    <LineStackLayout noMargin alignItems="center">
+      {allStatuses.map(status => (
+        <GameplayTestStatusChip key={status} status={status} size="small" />
+      ))}
+    </LineStackLayout>
   </ColumnStackLayout>
 );
 

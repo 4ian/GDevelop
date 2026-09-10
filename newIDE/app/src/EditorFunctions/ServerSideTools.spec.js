@@ -73,11 +73,6 @@ describe('server-side handled tools', () => {
     );
   });
 
-  it('read_game_project_json is a no-op returning success (the backend computes the result)', async () => {
-    const result = await launch('read_game_project_json');
-    expect(result.success).toBe(true);
-  });
-
   it('keeps old tool names as aliases of the new implementations', () => {
     expect(editorFunctions.create_object).toBe(
       editorFunctions.create_or_replace_object

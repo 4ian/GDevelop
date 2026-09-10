@@ -19,6 +19,7 @@ export const OperatorFieldString = (): React.Node => (
     initialValue=""
     render={(value, onChange) => (
       <OperatorField
+        project={testProject.project}
         scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
@@ -39,6 +40,7 @@ export const OperatorFieldNumber = (): React.Node => (
     initialValue=""
     render={(value, onChange) => (
       <OperatorField
+        project={testProject.project}
         scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
@@ -59,6 +61,7 @@ export const OperatorFieldColor = (): React.Node => (
     initialValue=""
     render={(value, onChange) => (
       <OperatorField
+        project={testProject.project}
         scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
@@ -77,6 +80,7 @@ export const OperatorFieldUnknownType = (): React.Node => (
     initialValue=""
     render={(value, onChange) => (
       <OperatorField
+        project={testProject.project}
         scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}

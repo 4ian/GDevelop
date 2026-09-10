@@ -12,6 +12,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "catch.hpp"
 
 TEST_CASE("Variable", "[common][variables]") {
@@ -170,5 +171,49 @@ TEST_CASE("Variable", "[common][variables]") {
     REQUIRE(variable.GetPersistentUuid() == uuid);
     REQUIRE(variable.GetChild("MyChild").GetPersistentUuid() == childUuid);
     REQUIRE(variable.GetChild("MyNewChild").GetPersistentUuid() != "");
+  }
+  SECTION("Serialization keeps the editor-only \"mixed values\" marker") {
+    // The editor merges the variables of the objects of a group into a
+    // temporary container, marking the variables that don't have the same
+    // value (or type) on all objects as having "mixed values". This container
+    // is copied and snapshotted through serialization, so the marker must
+    // survive a serialization round trip - including for the variables that
+    // have no value and no children to read (a structure marked as having
+    // mixed values, as the marker clears its children, or a variable with
+    // entirely mixed types).
+    gd::Variable numberVariable;
+    numberVariable.SetValue(123);
+    numberVariable.MarkAsMixedValues();
+
+    gd::Variable structureVariable;
+    structureVariable.GetChild("MyChild").SetValue(456);
+    structureVariable.MarkAsMixedValues();
+
+    gd::Variable mixedTypesVariable;
+    mixedTypesVariable.CastTo(gd::Variable::Type::MixedTypes);
+
+    gd::SerializerElement element;
+    numberVariable.SerializeTo(element.AddChild("number"));
+    structureVariable.SerializeTo(element.AddChild("structure"));
+    mixedTypesVariable.SerializeTo(element.AddChild("mixedTypes"));
+
+    gd::Variable unserializedNumberVariable;
+    unserializedNumberVariable.UnserializeFrom(element.GetChild("number"));
+    REQUIRE(unserializedNumberVariable.GetType() == gd::Variable::Type::Number);
+    REQUIRE(unserializedNumberVariable.HasMixedValues());
+
+    gd::Variable unserializedStructureVariable;
+    unserializedStructureVariable.UnserializeFrom(
+        element.GetChild("structure"));
+    REQUIRE(unserializedStructureVariable.GetType() ==
+            gd::Variable::Type::Structure);
+    REQUIRE(unserializedStructureVariable.HasMixedValues());
+
+    gd::Variable unserializedMixedTypesVariable;
+    unserializedMixedTypesVariable.UnserializeFrom(
+        element.GetChild("mixedTypes"));
+    REQUIRE(unserializedMixedTypesVariable.GetType() ==
+            gd::Variable::Type::MixedTypes);
+    REQUIRE(unserializedMixedTypesVariable.HasMixedValues());
   }
 }

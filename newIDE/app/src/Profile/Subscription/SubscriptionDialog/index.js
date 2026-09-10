@@ -113,7 +113,6 @@ export default function SubscriptionDialog({
 
   const {
     buyUpdateOrCancelPlan,
-    isChangingSubscription,
     cancelReasonDialogOpen,
     setCancelReasonDialogOpen,
   } = useBuyUpdateOrCancelPlan({
@@ -123,8 +122,7 @@ export default function SubscriptionDialog({
     dialogVariant: 'standard',
   });
 
-  const isLoading =
-    authenticatedUser.loginState === 'loggingIn' || isChangingSubscription;
+  const isLoading = authenticatedUser.loginState === 'loggingIn';
 
   const isPlanValid = hasValidSubscriptionPlan(authenticatedUser.subscription);
 

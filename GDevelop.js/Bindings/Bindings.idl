@@ -2819,6 +2819,10 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_UpdateExtensionNameInExtension(
+      [Ref] Project project,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString sourceExtensionName);
     void STATIC_UpdateExtensionNameInEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2834,6 +2838,13 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_MoveEventsFunction(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldFunctionName,
+      [Const] DOMString newFunctionName);
     void STATIC_RenameBehaviorEventsFunction(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2912,6 +2923,13 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_MoveEventsBasedBehavior(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldBehaviorName,
+      [Const] DOMString newBehaviorName);
     void STATIC_UpdateBehaviorNameInEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2920,8 +2938,15 @@ interface WholeProjectRefactorer {
     void STATIC_RenameEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
-      [Const] DOMString oldName,
-      [Const] DOMString newName);
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
+    void STATIC_MoveEventsBasedObject(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
     void STATIC_UpdateObjectNameInEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -3103,6 +3128,10 @@ interface InstructionValidator {
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
     long parameterIndex);
+  [Const, Value] DOMString STATIC_GetObjectNameForParameter(
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const] DOMString parameterType);
 };
 
 interface ObjectTools {
@@ -3128,6 +3157,20 @@ interface PropertyFunctionGenerator {
     void STATIC_GenerateExpressionSkeleton([Ref] Project project, [Ref] EventsFunction eventsFunction);
     void STATIC_UpdateReturnActionType([Ref] Project project, [Ref] EventsFunction eventsFunction);
 
+};
+
+interface ChildObjectForwardFunctionGenerator {
+    void STATIC_GenerateChildObjectForwardFunctions(
+        [Const, Ref] Project project,
+        [Const, Ref] EventsFunctionsExtension extension,
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString childObjectName);
+    boolean STATIC_HasAnyChildCustomObject(
+        [Const, Ref] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
+    [Value] VectorString STATIC_GetChildCustomObjectNames(
+        [Const, Ref] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
 };
 
 interface UsedExtensionsResult {
@@ -3279,6 +3322,7 @@ interface ExpressionValidator {
         [Const, Ref] Platform platform,
         [Const, Ref] ProjectScopedContainers projectScopedContainers,
         [Const] DOMString rootType,
+        [Const] DOMString rootObjectName,
         [Const] DOMString extraInfo);
 
     [Const, Ref] VectorExpressionParserError GetAllErrors();

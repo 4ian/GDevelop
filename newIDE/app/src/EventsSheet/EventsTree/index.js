@@ -62,8 +62,10 @@ const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
 
+// Events are dragged from their handle (the colored bar on their left).
 const EventDragSourceAndDropTarget = makeDragSourceAndDropTarget<SortableTreeNode>(
-  eventsSheetEventsDnDType
+  eventsSheetEventsDnDType,
+  { touchDragStart: 'immediate' }
 );
 const EventDropTarget = makeDropTarget<SortableTreeNode>(
   eventsSheetEventsDnDType

@@ -4,12 +4,16 @@ import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
 import { AiRequestChat } from '../../../../AiGeneration/AiRequestChat';
 import { type AiRequest } from '../../../../Utils/GDevelopServices/Generation';
+import { MAX_AI_REQUEST_RETRIES_IN_A_ROW } from '../../../../AiGeneration/AiRequestUtils';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import FixedWidthFlexContainer from '../../../FixedWidthFlexContainer';
 import {
   agentAiRequest,
   agentAiRequestWithFailedAndIgnoredFunctionCallOutputs,
   agentAiRequestWithFunctionCallToDo,
+  contextTooLargeAiRequestError,
+  internalAiRequestError,
+  repeatedToolCallLoopAiRequestError,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
 import { action } from '@storybook/addon-actions';
 import {
@@ -27,6 +31,8 @@ import PreferencesContext, {
 } from '../../../../MainFrame/Preferences/PreferencesContext';
 import { CreditsPackageStoreStateProvider } from '../../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
+import RaisedButton from '../../../../UI/RaisedButton';
+import { Column, Line } from '../../../../UI/Grid';
 
 // Chat and Agent modes were merged into a single "orchestrator" mode: these
 // stories exercise that unique mode (the conversational replies, the function
@@ -719,6 +725,78 @@ export const ErrorLaunchingFollowupAiRequest = (): React.Node => (
   />
 );
 
+// The request itself stopped on an error: the chat offers to continue it where
+// it stopped, or to start over in a new chat.
+export const AiRequestStoppedOnError = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      status: 'error',
+      error: internalAiRequestError,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
+// The conversation is too large for the AI model: continuing it is not offered
+// (it would fail again), starting a new chat is.
+export const AiRequestStoppedOnErrorWithContextTooLarge = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      status: 'error',
+      error: contextTooLargeAiRequestError,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
+export const AiRequestStoppedOnErrorWithRepeatedToolCallLoop = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      status: 'error',
+      error: repeatedToolCallLoopAiRequestError,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
+// Already retried the maximum number of times in a row, without anything
+// being written to the conversation in between: the chat stops offering it.
+export const AiRequestStoppedOnErrorWithExhaustedRetries = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      status: 'error',
+      error: internalAiRequestError,
+      retriesInARowCount: MAX_AI_REQUEST_RETRIES_IN_A_ROW,
+      retriedAfterMessagesCount: (aiRequestWithAiResponses.output || []).length,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
+export const AiRequestStoppedOnErrorWithoutRetry = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{ ...aiRequestWithAiResponses, status: 'error' }}
+  />
+);
+
+// The request was made for another project than the one opened: it cannot be
+// continued (the project sent to the AI would not be the right one).
+export const AiRequestStoppedOnErrorForAnotherProject = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...aiRequestWithAiResponses,
+      gameId: 'another-project-game-id',
+      status: 'error',
+      error: internalAiRequestError,
+    }}
+    onRetryAfterError={async () => action('onRetryAfterError')()}
+  />
+);
+
 // Quota limits
 // ------------
 
@@ -983,5 +1061,58 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSta
       automaticallyUseCreditsForAiRequests={false}
       availableCredits={0}
     />
+  );
+};
+
+// The situation a user got stuck in, in an ongoing conversation: their AI usage
+// allowance is exhausted, they already accepted to pay with GDevelop credits but
+// have none left, so the banner is shown at the end of the chat and the send
+// button is disabled. Buying credits (the button below stands for the purchase
+// dialog refreshing the limits) must make the banner go away and the message
+// sendable, without closing and reopening the chat.
+export const QuotaLimitsReachedThenCreditsBought = (): React.Node => {
+  const quota = {
+    limitReached: true,
+    current: 100,
+    max: 100,
+    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    period: '7days',
+  };
+  const [availableCredits, setAvailableCredits] = React.useState<number>(0);
+
+  return (
+    <Column noMargin>
+      <Line noMargin>
+        <RaisedButton
+          primary
+          label={
+            availableCredits === 0
+              ? 'Simulate buying 500 credits'
+              : 'Simulate spending every credit'
+          }
+          onClick={() => setAvailableCredits(availableCredits === 0 ? 500 : 0)}
+        />
+      </Line>
+      <WrappedChatComponent
+        aiRequest={agentAiRequest}
+        quota={quota}
+        availableCredits={availableCredits}
+        authenticatedUser={{
+          ...defaultAuthenticatedUserWithNoSubscription,
+          limits: {
+            ...limitsForNoSubscriptionUser,
+            credits: {
+              userBalance: {
+                amount: availableCredits,
+              },
+            },
+            quotas: {
+              'consumed-ai-credits': quota,
+            },
+          },
+        }}
+        automaticallyUseCreditsForAiRequests={true}
+      />
+    </Column>
   );
 };

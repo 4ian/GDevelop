@@ -45,7 +45,12 @@ import {
   getSimplifiedVariable,
   getSimplifiedVariablesContainer,
   getVariableTypeAsString,
+  makeSimplifiedProjectBuilder,
 } from './SimplifiedProject/SimplifiedProject';
+import {
+  navigateSimplifiedProjectJson,
+  type ArrayItemsFilter,
+} from './SimplifiedProject/SimplifiedProjectReader';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import {
@@ -159,6 +164,9 @@ export type EditorFunctionGenericOutput = {|
     lastCalledFunctionName: string | null,
   |} | null,
   message?: string,
+  // `read_game_project_json` output payload: the value at the requested path
+  // of the simplified project (its shape entirely depends on the path).
+  result?: any,
   // `run_gameplay_test` output payload. Present only for gameplay test runs.
   status?: string,
   testName?: string,
@@ -272,7 +280,6 @@ export type EventsGenerationOptions = {|
   eventBatches: Array<EventBatch> | null,
   extensionNamesList: string,
   objectsList: string,
-  existingEventsAsText: string,
   existingEventsJson: string | null,
   placementHint: string | null,
   relatedAiRequestId: string,
@@ -5726,9 +5733,8 @@ const addSceneEvents: EditorFunction = {
     const scene = project.getLayout(sceneName);
     const currentSceneEvents = scene.getEvents();
 
-    const existingEventsAsText = renderNonTranslatedEventsAsText({
-      eventsList: currentSceneEvents,
-    });
+    // The existing events are sent as JSON only: the generation backend
+    // renders them itself (as a bounded EventScript view) for its model.
     const existingEventsJson =
       toolOptions && toolOptions.includeEventsJson
         ? serializeToJSON(currentSceneEvents)
@@ -5833,7 +5839,6 @@ const addSceneEvents: EditorFunction = {
           eventBatches: parsedEventBatches,
           extensionNamesList,
           objectsList,
-          existingEventsAsText,
           existingEventsJson,
           placementHint,
           relatedAiRequestId,
@@ -8776,11 +8781,52 @@ const readGameProjectJson: EditorFunction = {
       text: <Trans>Inspect the game structure.</Trans>,
     };
   },
-  // No-op: the function call output is sent to the backend along with an
-  // up-to-date game project JSON, which the backend uses to compute the
-  // actual read result.
-  launchFunction: async ({ args }) => {
-    return { success: true };
+  launchFunction: async ({ project, args }) => {
+    const simplifiedProject = makeSimplifiedProjectBuilder(
+      gd
+    ).getSimplifiedProject(project, {});
+
+    // An empty path returns the whole project (limited by maxDepth anyway).
+    const path =
+      typeof (args && args.path) === 'string' ? String(args.path) : '';
+    const filter: ArrayItemsFilter | null =
+      args && args.filter && typeof args.filter === 'object'
+        ? args.filter
+        : null;
+    const maxDepth =
+      args && typeof args.maxDepth === 'number' ? args.maxDepth : 2;
+    const maxStringLength =
+      args && typeof args.maxStringLength === 'number'
+        ? args.maxStringLength
+        : 200;
+    const offset = args && typeof args.offset === 'number' ? args.offset : 0;
+    const limit =
+      args && typeof args.limit === 'number' ? args.limit : undefined;
+    const countOnly = !!(args && args.countOnly === true);
+
+    const navigationResult = navigateSimplifiedProjectJson({
+      project: simplifiedProject,
+      path,
+      filter,
+      offset,
+      limit,
+      countOnly,
+      maxDepth,
+      maxStringLength,
+    });
+
+    if (!navigationResult.success) {
+      return { success: false, message: navigationResult.message };
+    }
+
+    if (navigationResult.truncationWarning) {
+      return {
+        success: true,
+        result: navigationResult.result,
+        message: navigationResult.truncationWarning,
+      };
+    }
+    return { success: true, result: navigationResult.result };
   },
   modifiesProject: false,
 };

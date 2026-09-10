@@ -701,6 +701,7 @@ const EventsFunctionsList = React.forwardRef<
       onDeleteEventsBasedObject,
       onRenameEventsBasedObject,
       onEventsBasedObjectRenamed,
+      onEventsBasedObjectMoved,
       onEventsBasedObjectPasted,
       onAddEventsBasedObject,
       onOpenGameplayTest,
@@ -716,6 +717,11 @@ const EventsFunctionsList = React.forwardRef<
       onSelectExtensionSceneVariables,
       onOpenCustomObjectEditor,
       onEventBasedObjectTypeChanged,
+      moveEventsBasedObjectTo,
+      moveEventsBasedBehaviorTo,
+      onEventsBasedBehaviorMoved,
+      moveEventsFunctionTo,
+      onEventsFunctionMoved,
     }: Props,
     ref
   ) => {
@@ -1289,6 +1295,8 @@ const EventsFunctionsList = React.forwardRef<
         onEventsFunctionAdded,
         addFolder,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+        moveEventsFunctionTo,
+        onEventsFunctionMoved,
       }),
       [
         treeItemProps,
@@ -1299,6 +1307,8 @@ const EventsFunctionsList = React.forwardRef<
         onEventsFunctionAdded,
         addFolder,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+        moveEventsFunctionTo,
+        onEventsFunctionMoved,
       ]
     );
 
@@ -1314,6 +1324,8 @@ const EventsFunctionsList = React.forwardRef<
           setSelectedFunctionFolderOrFunction.current,
         onEventsFunctionAdded,
         onSelectEventsFunction,
+        moveEventsFunctionTo,
+        onEventsFunctionMoved,
       }),
       [
         treeItemProps,
@@ -1324,6 +1336,8 @@ const EventsFunctionsList = React.forwardRef<
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
         onEventsFunctionAdded,
         onSelectEventsFunction,
+        moveEventsFunctionTo,
+        onEventsFunctionMoved,
       ]
     );
 
@@ -1341,6 +1355,8 @@ const EventsFunctionsList = React.forwardRef<
         addNewEventsFunction,
         addFolder,
         expandFolders,
+        moveEventsBasedBehaviorTo,
+        onEventsBasedBehaviorMoved,
       }),
       [
         treeItemProps,
@@ -1353,6 +1369,8 @@ const EventsFunctionsList = React.forwardRef<
         addNewEventsFunction,
         addFolder,
         expandFolders,
+        moveEventsBasedBehaviorTo,
+        onEventsBasedBehaviorMoved,
       ]
     );
 
@@ -1373,6 +1391,8 @@ const EventsFunctionsList = React.forwardRef<
         expandFolders,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
+        moveEventsBasedObjectTo,
+        onEventsBasedObjectMoved,
       }),
       [
         treeItemProps,
@@ -1388,6 +1408,8 @@ const EventsFunctionsList = React.forwardRef<
         expandFolders,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
+        moveEventsBasedObjectTo,
+        onEventsBasedObjectMoved,
       ]
     );
 
@@ -1534,29 +1556,6 @@ const EventsFunctionsList = React.forwardRef<
           {
             isRoot: true,
             content: new LabelTreeViewItemContent(
-              extensionTestsRootFolderId,
-              i18n._(t`Gameplay tests`),
-              {
-                icon: <Add />,
-                label: i18n._(t`Add a gameplay test`),
-                click: addNewGameplayTest,
-              }
-            ),
-            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-              return gameplayTestTreeViewItems.length === 0
-                ? [
-                    new PlaceHolderTreeViewItem(
-                      extensionTestsEmptyPlaceholderId,
-                      i18n._(t`Start by adding a new gameplay test.`)
-                    ),
-                  ]
-                : // $FlowFixMe[incompatible-type]
-                  gameplayTestTreeViewItems;
-            },
-          },
-          {
-            isRoot: true,
-            content: new LabelTreeViewItemContent(
               extensionFunctionsRootFolderId,
               i18n._(t`Functions`),
               {
@@ -1624,6 +1623,29 @@ const EventsFunctionsList = React.forwardRef<
                   functionTreeViewItemProps: freeFunctionProps,
                 });
               });
+            },
+          },
+          {
+            isRoot: true,
+            content: new LabelTreeViewItemContent(
+              extensionTestsRootFolderId,
+              i18n._(t`Gameplay tests`),
+              {
+                icon: <Add />,
+                label: i18n._(t`Add a gameplay test`),
+                click: addNewGameplayTest,
+              }
+            ),
+            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+              return gameplayTestTreeViewItems.length === 0
+                ? [
+                    new PlaceHolderTreeViewItem(
+                      extensionTestsEmptyPlaceholderId,
+                      i18n._(t`Start by adding a new gameplay test.`)
+                    ),
+                  ]
+                : // $FlowFixMe[incompatible-type]
+                  gameplayTestTreeViewItems;
             },
           },
         ].filter(Boolean);

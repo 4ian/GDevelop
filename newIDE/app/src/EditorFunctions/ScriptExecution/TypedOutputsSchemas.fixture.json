@@ -353,6 +353,24 @@
         "eventScript"
       ]
     },
+    "read_game_project_json": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "result": {
+          "$rawType": "any"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success"
+      ]
+    },
     "add_behavior": {
       "type": "object",
       "openEnded": true,

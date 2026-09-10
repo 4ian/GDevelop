@@ -224,4 +224,35 @@ describe('EventScriptRenderer', () => {
       project.delete();
     }
   });
+
+  it('keeps a collapsed group valid EventScript with an explicit `pass`', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::Group',
+          name: 'My group',
+          events: sceneStartSerializedEvents,
+        },
+      ]);
+
+      const { text, renderingErrors } = renderEventsAsEventScript({
+        eventsList,
+        subEventsDepth: 0,
+      });
+
+      expect(renderingErrors).toEqual([]);
+      // A group must contain at least one event for the parser: the marker
+      // alone (a comment) would not do.
+      expect(text).toBe(
+        [
+          'group "My group":  # event-0',
+          '  # ... 2 sub-event(s) (3 action(s)) not shown: read event_ids: ["event-0"] to see them.',
+          '  pass',
+        ].join('\n')
+      );
+    } finally {
+      project.delete();
+    }
+  });
 });

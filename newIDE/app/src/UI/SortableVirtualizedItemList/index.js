@@ -47,7 +47,8 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
   _list: ?List;
   // $FlowFixMe[missing-local-annot]
   DragSourceAndDropTarget = (makeDragSourceAndDropTarget<Item>(
-    this.props.reactDndType
+    this.props.reactDndType,
+    { touchDragStart: 'afterHold' }
   ): any);
 
   forceUpdateGrid() {

@@ -34,7 +34,8 @@ const gd: libGDevelop = global.gd;
 
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
-  'spine-animations-list'
+  'spine-animations-list',
+  { touchDragStart: 'immediate' }
 );
 
 const styles = {

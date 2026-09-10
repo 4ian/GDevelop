@@ -180,10 +180,7 @@ type Props = {|
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
   resourceManagementProps: ResourceManagementProps,
-  openInstructionOrExpression: (
-    extension: gdPlatformExtension,
-    type: string
-  ) => void,
+  openInstructionOrExpression: (type: string) => void,
   onCreateEventsFunction: (
     extensionName: string,
     eventsFunction: gdEventsFunction
@@ -2518,9 +2515,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               if (this._eventsTree) this._eventsTree.forceEventsUpdate();
             }}
             resourceManagementProps={this.props.resourceManagementProps}
-            openInstructionOrExpression={(extension, type) => {
+            openInstructionOrExpression={type => {
               this.closeInstructionEditor();
-              this.props.openInstructionOrExpression(extension, type);
+              this.props.openInstructionOrExpression(type);
             }}
             canPasteInstructions={
               this.state.editedInstruction.isCondition

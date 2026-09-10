@@ -19,7 +19,9 @@ namespace gdjs {
 
           constructor() {
             this.shaderPass = new THREE_ADDONS.ShaderPass(
-              THREE_ADDONS.HueSaturationShader
+              gdjs.PixiFiltersTools.clampThreeShaderOutput(
+                THREE_ADDONS.HueSaturationShader
+              )
             );
             this._isEnabled = false;
           }

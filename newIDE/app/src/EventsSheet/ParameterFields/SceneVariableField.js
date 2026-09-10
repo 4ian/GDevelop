@@ -76,7 +76,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <React.Fragment>
         <VariableField
-          isObjectVariable={false}
           variablesContainers={variablesContainers}
           enumerateVariables={enumerateSceneVariables}
           parameterMetadata={props.parameterMetadata}
@@ -89,6 +88,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           openVariableEditorDialog={setVariableEditorOpen}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
+          project={project}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
           id={

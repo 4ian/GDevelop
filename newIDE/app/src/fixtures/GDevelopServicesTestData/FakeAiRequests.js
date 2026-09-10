@@ -1,5 +1,8 @@
 // @flow
-import type { AiRequest } from '../../Utils/GDevelopServices/Generation';
+import type {
+  AiRequest,
+  AiRequestError,
+} from '../../Utils/GDevelopServices/Generation';
 
 // $FlowFixMe[incompatible-type]
 export const agentAiRequest: AiRequest = {
@@ -1128,4 +1131,24 @@ export const agentAiRequestWithFailedAndIgnoredFunctionCallOutputs: AiRequest = 
       'a1c039caba27a4190b2a1674607ba306294828f3781c3a33cbcc908929840b48',
     finalModelPublicId: 'g2f1-g',
   },
+};
+
+/**
+ * The errors reported by the API on a failed AI request. Their codes are what
+ * the editor uses to tell the user what happened and what they can do about it
+ * (see AiRequestErrorRow).
+ */
+export const internalAiRequestError: AiRequestError = {
+  code: 'internal-error',
+  message: 'Internal error while handling the AI request.',
+};
+export const contextTooLargeAiRequestError: AiRequestError = {
+  code: 'context-too-large',
+  message:
+    'The conversation and project are too large for the AI model. Start a new chat, or simplify the project.',
+};
+export const repeatedToolCallLoopAiRequestError: AiRequestError = {
+  code: 'repeated-tool-call-loop',
+  message:
+    'The same tool call was repeated too many times: the AI request was stopped.',
 };

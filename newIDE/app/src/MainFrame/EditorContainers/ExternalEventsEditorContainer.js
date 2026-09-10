@@ -37,6 +37,7 @@ import {
 import Background from '../../UI/Background';
 import type { EventPath } from '../../Utils/EventPath';
 import type { SearchFilterParams } from '../../Utils/Search';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 
 const styles = {
   container: {
@@ -56,12 +57,20 @@ export class ExternalEventsEditorContainer extends React.Component<
   State
 > {
   editor: ?EventsSheetInterface;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
+  _scope: EventsScope | null = null;
+  _associatedLayoutName: string | null = null;
   resourceExternallyChangedCallbackId: ?string;
 
   // $FlowFixMe[missing-local-annot]
   state = {
     externalPropertiesDialogOpen: false,
   };
+
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
@@ -70,11 +79,46 @@ export class ExternalEventsEditorContainer extends React.Component<
     return this.props.isActive || nextProps.isActive;
   }
 
+  componentDidUpdate(prevProps: RenderEditorContainerProps): void {
+    const associatedLayoutName = this.getAssociatedLayoutName();
+    if (
+      this.props.project !== prevProps.project ||
+      this.props.projectItemName !== prevProps.projectItemName ||
+      this._associatedLayoutName !== associatedLayoutName
+    ) {
+      this._associatedLayoutName = associatedLayoutName;
+      this._rebuildProjectScopedContainersAccessor();
+    }
+  }
+
   componentDidMount() {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
   }
+
+  _rebuildProjectScopedContainersAccessor() {
+    const { project } = this.props;
+    if (project) {
+      // The scene can be null when users didn't choose an associated scene yet.
+      const externalEvents = this.getExternalEvents();
+      const scene = this.getLayout();
+      this._scope = {
+        project,
+        layout: scene,
+        externalEvents,
+      };
+      this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        {
+          project,
+          layout: scene,
+        }
+      );
+    } else {
+      this._projectScopedContainersAccessor = null;
+    }
+  }
+
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
@@ -198,7 +242,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     return project.getLayout(layoutName);
   }
 
-  getAssociatedLayoutName(): ?string {
+  getAssociatedLayoutName(): string | null {
     const { project } = this.props;
     if (!project) return null;
 
@@ -224,6 +268,7 @@ export class ExternalEventsEditorContainer extends React.Component<
       },
       () => this.updateToolbar()
     );
+    this._rebuildProjectScopedContainersAccessor();
   };
 
   openExternalPropertiesDialog = () => {
@@ -254,17 +299,19 @@ export class ExternalEventsEditorContainer extends React.Component<
     const { project, projectItemName } = this.props;
     const externalEvents = this.getExternalEvents();
     const layout = this.getLayout();
+    const scope = this._scope;
+    const projectScopedContainersAccessor = this
+      ._projectScopedContainersAccessor;
 
-    if (!externalEvents || !project) {
+    if (
+      !externalEvents ||
+      !project ||
+      !scope ||
+      !projectScopedContainersAccessor
+    ) {
       //TODO: Error component
       return <div>No external events called {projectItemName} found!</div>;
     }
-
-    const scope = {
-      project,
-      layout,
-      externalEvents,
-    };
 
     return (
       <div style={styles.container}>
@@ -279,14 +326,10 @@ export class ExternalEventsEditorContainer extends React.Component<
             onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
             unsavedChanges={this.props.unsavedChanges}
             project={project}
-            // $FlowFixMe[incompatible-type]
             scope={scope}
             globalObjectsContainer={project.getObjects()}
             objectsContainer={layout.getObjects()}
-            projectScopedContainersAccessor={
-              // $FlowFixMe[incompatible-type]
-              new ProjectScopedContainersAccessor(scope)
-            }
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}
             settingsIcon={editSceneIconReactNode}

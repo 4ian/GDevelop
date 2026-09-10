@@ -24,6 +24,7 @@ import CompactPropertiesEditorRowField from './CompactPropertiesEditorRowField';
 import CompactToggleButtons from '../UI/CompactToggleButtons';
 import { CompactToggleField } from '../UI/CompactToggleField';
 import { CompactTextAreaField } from '../UI/CompactTextAreaField';
+import { CompactBitmaskField } from '../UI/CompactBitmaskField';
 import { CompactColorField } from '../UI/CompactColorField';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import { CompactResourceSelectorWithThumbnail } from '../ResourcesList/CompactResourceSelectorWithThumbnail';
@@ -398,6 +399,31 @@ const CompactPropertiesEditor = ({
           >
             {field.renderIcon(value)}
           </IconButton>
+        );
+      } else if (field.valueType === 'bitmask') {
+        const { setValue, firstBit, bitCount } = field;
+        const mixedValues = hasMixedValues({ instances, field });
+        return (
+          <CompactBitmaskField
+            key={field.name}
+            id={field.name}
+            label={getFieldLabel({ instances, field })}
+            markdownDescription={getFieldDescription(field)}
+            value={mixedValues ? 0 : getFieldValue({ instances, field })}
+            firstBit={firstBit}
+            bitCount={bitCount}
+            onChange={newValue => {
+              instances.forEach(i => setValue(i, newValue));
+              onFieldChanged({
+                instances,
+                hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
+              });
+            }}
+            disabled={getDisabled({ instances, field, mixedValues })}
+            labelColor={
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
+            }
+          />
         );
       } else if (field.valueType === 'multilinestring') {
         const { setValue } = field;

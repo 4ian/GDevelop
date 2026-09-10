@@ -179,15 +179,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <React.Fragment>
         <VariableField
-          forceDeclaration={
-            instruction &&
-            gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
-              instruction.getType()
-            )
-          }
           project={project}
           instruction={instruction}
-          isObjectVariable={true}
           variablesContainers={variablesContainers}
           enumerateVariables={enumerateObjectVariables}
           parameterMetadata={props.parameterMetadata}

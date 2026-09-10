@@ -95,6 +95,20 @@ const CompactObjectGroupEditor = ({
               }
             />
           ) : null}
+          <CompactObjectSelector
+            id="add-object-to-group"
+            label=""
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            value={objectName}
+            excludedObjectOrGroupNames={groupObjectNames}
+            onChange={setObjectName}
+            onChoose={addObject}
+            noGroups
+            hintText={t`Choose an object to add to the group`}
+            fullWidth
+            disabled={isObjectListLocked}
+          />
           <List>
             {groupObjectNames.map(objectName => {
               let object = getObjectByName(
@@ -129,20 +143,6 @@ const CompactObjectGroupEditor = ({
               );
             })}
           </List>
-          <CompactObjectSelector
-            id="add-object-to-group"
-            label=""
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            value={objectName}
-            excludedObjectOrGroupNames={groupObjectNames}
-            onChange={setObjectName}
-            onChoose={addObject}
-            noGroups
-            hintText={t`Choose an object to add to the group`}
-            fullWidth
-            disabled={isObjectListLocked}
-          />
         </ColumnStackLayout>
       )}
     </I18n>

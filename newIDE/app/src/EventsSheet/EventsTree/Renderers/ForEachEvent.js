@@ -281,6 +281,7 @@ export default class ForEachEvent extends React.Component<
         gd.JsPlatform.get(),
         this.props.projectScopedContainersAccessor.get(),
         'number',
+        '',
         ''
       );
       orderByExpression.getRootNode().visit(orderByValidator);
@@ -294,6 +295,7 @@ export default class ForEachEvent extends React.Component<
         gd.JsPlatform.get(),
         this.props.projectScopedContainersAccessor.get(),
         'number',
+        '',
         ''
       );
       limitExpression.getRootNode().visit(limitValidator);

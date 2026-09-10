@@ -5,9 +5,49 @@ import {
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
   type AiRequestPlan,
+  type AiRequestSummary,
+  type AiRequestUserMessage,
 } from '../Utils/GDevelopServices/Generation';
 import { type EditorFunctionCallResult } from '../EditorFunctions';
 import { type RelatedAiRequestLastMessages } from '../EditorFunctions';
+
+/** The text typed by the user in one of their messages. */
+export const getUserRequestText = (message: AiRequestUserMessage): string =>
+  message.content
+    .filter(content => content.type === 'user_request')
+    .map(content => content.text)
+    .join(' ');
+
+/**
+ * The name of a chat: the title the user gave to it, or its first message
+ * otherwise. Empty when the chat has neither.
+ */
+export const getAiRequestSummaryTitle = (
+  aiRequestSummary: AiRequestSummary
+): string =>
+  aiRequestSummary.title ||
+  (aiRequestSummary.firstUserMessage
+    ? getUserRequestText(aiRequestSummary.firstUserMessage)
+    : '');
+
+/**
+ * Maximum number of times a failed AI request can be continued without making
+ * any progress in between - kept in sync with the API, which is what really
+ * enforces it.
+ */
+export const MAX_AI_REQUEST_RETRIES_IN_A_ROW = 3;
+
+/**
+ * Whether the API would still accept to continue this failed request, so that
+ * a retry is only offered when it can work. Like the API, the retries only
+ * count while nothing was written to the conversation in between.
+ */
+export const canRetryAiRequest = (aiRequest: AiRequest): boolean =>
+  aiRequest.status === 'error' &&
+  !(
+    aiRequest.retriedAfterMessagesCount === (aiRequest.output || []).length &&
+    (aiRequest.retriesInARowCount || 0) >= MAX_AI_REQUEST_RETRIES_IN_A_ROW
+  );
 
 export const getFunctionCallToFunctionCallOutputMap = ({
   aiRequest,

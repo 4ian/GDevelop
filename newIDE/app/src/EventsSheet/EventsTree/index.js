@@ -46,7 +46,7 @@ import getTutorial from '../../Hints/getTutorial';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { DropContainer } from './DropContainer';
-import { useAutoScrollDuringDrag } from '../../UI/DragAndDrop/UseAutoScrollDuringDrag';
+import { useAutoScrollDuringAnyDrag } from '../../UI/DragAndDrop/UseAutoScrollDuringDrag';
 import {
   isDescendant,
   isElseEventValid,
@@ -513,7 +513,9 @@ const EventsTree: React.ComponentType<{
 
   const [draggedNode, setDraggedNode] = React.useState(null);
   const lastKnownScrollPosition = React.useRef(0);
-  const { startAutoScroll, stopAutoScroll } = useAutoScrollDuringDrag(
+  // Scroll when events, but also instructions or variable declarations,
+  // are dragged close to the edges.
+  useAutoScrollDuringAnyDrag(
     () => (_list.current ? _list.current.container : null),
     { maxSpeed: 900 }
   );
@@ -630,12 +632,11 @@ const EventsTree: React.ComponentType<{
       // closure) and skips the cleanup. Calling unconditionally is safe: React
       // deduplicates the null→null state update, and _restoreFoldedNodes is a
       // no-op when no nodes were temporarily unfolded.
-      stopAutoScroll();
       setDraggedNode(null);
       _restoreFoldedNodes();
       forceUpdate();
     },
-    [stopAutoScroll, _restoreFoldedNodes, forceUpdate]
+    [_restoreFoldedNodes, forceUpdate]
   );
 
   // Position-based height snapshot. Used as a fallback in _getRowHeight when
@@ -952,11 +953,8 @@ const EventsTree: React.ComponentType<{
           highlightedAiGeneratedEventIds={props.highlightedAiGeneratedEventIds}
           node={node}
           isDragged={isDragged}
-          onBeginDrag={() => {
-            // $FlowFixMe[incompatible-type]
-            setDraggedNode(node);
-            startAutoScroll();
-          }}
+          // $FlowFixMe[incompatible-type]
+          onBeginDrag={() => setDraggedNode(node)}
           onEndDrag={_onEndDrag}
           onTemporaryUnfoldNode={isOverLazy =>
             temporaryUnfoldNode(isOverLazy, node)

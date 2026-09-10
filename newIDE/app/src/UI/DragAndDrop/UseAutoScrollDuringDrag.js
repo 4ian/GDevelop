@@ -19,9 +19,11 @@ const POINTER_SLACK = 50;
  *
  * Call `startAutoScroll` in `beginDrag` and `stopAutoScroll` in `endDrag`.
  */
+type AutoScrollOptions = {| edgeSize?: number, maxSpeed?: number |};
+
 export const useAutoScrollDuringDrag = (
   getContainer: () => ?HTMLElement,
-  options?: {| edgeSize?: number, maxSpeed?: number |}
+  options?: AutoScrollOptions
 ): {|
   startAutoScroll: () => void,
   stopAutoScroll: () => void,
@@ -30,6 +32,10 @@ export const useAutoScrollDuringDrag = (
   const edgeSize = (options && options.edgeSize) || DEFAULT_EDGE_SIZE;
   const maxSpeed = (options && options.maxSpeed) || DEFAULT_MAX_SPEED;
   const animationFrameId = React.useRef<AnimationFrameID | null>(null);
+  // Keep the returned callbacks stable even if `getContainer` is an inline
+  // function, so that they can be used as effect dependencies.
+  const getContainerRef = React.useRef(getContainer);
+  getContainerRef.current = getContainer;
 
   const stopAutoScroll = React.useCallback(() => {
     if (animationFrameId.current !== null) {
@@ -53,7 +59,7 @@ export const useAutoScrollDuringDrag = (
             : Math.min(MAX_FRAME_DURATION, (frameTime - lastFrameTime) / 1000);
         lastFrameTime = frameTime;
 
-        const container = getContainer();
+        const container = getContainerRef.current();
         const offset = monitor.getClientOffset();
         if (container && offset) {
           const rect = container.getBoundingClientRect();
@@ -92,11 +98,49 @@ export const useAutoScrollDuringDrag = (
       };
       animationFrameId.current = requestAnimationFrame(scrollIfCloseToAnEdge);
     },
-    [getContainer, dragDropManager, stopAutoScroll, edgeSize, maxSpeed]
+    [dragDropManager, stopAutoScroll, edgeSize, maxSpeed]
   );
 
   // Ensure the loop is stopped if the component is unmounted during a drag.
   React.useEffect(() => stopAutoScroll, [stopAutoScroll]);
 
   return { startAutoScroll, stopAutoScroll };
+};
+
+/**
+ * Same as `useAutoScrollDuringDrag`, but for containers where several kinds
+ * of items can be dragged (possibly from other components): auto scrolling
+ * runs during any drag, without having to call `startAutoScroll` and
+ * `stopAutoScroll` from each drag source.
+ */
+export const useAutoScrollDuringAnyDrag = (
+  getContainer: () => ?HTMLElement,
+  options?: AutoScrollOptions
+) => {
+  const dragDropManager = useDragDropManager();
+  const { startAutoScroll, stopAutoScroll } = useAutoScrollDuringDrag(
+    getContainer,
+    options
+  );
+
+  React.useEffect(
+    () => {
+      const monitor = dragDropManager.getMonitor();
+      let isAutoScrolling = false;
+      const updateAutoScroll = () => {
+        if (monitor.isDragging() === isAutoScrolling) return;
+        isAutoScrolling = monitor.isDragging();
+        if (isAutoScrolling) startAutoScroll();
+        else stopAutoScroll();
+      };
+      // A drag could already be in progress.
+      updateAutoScroll();
+      const unsubscribe = monitor.subscribeToStateChange(updateAutoScroll);
+      return () => {
+        unsubscribe();
+        stopAutoScroll();
+      };
+    },
+    [dragDropManager, startAutoScroll, stopAutoScroll]
+  );
 };

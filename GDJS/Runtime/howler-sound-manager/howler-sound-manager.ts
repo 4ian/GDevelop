@@ -106,6 +106,12 @@ namespace gdjs {
     private _rate: float;
 
     /**
+     * Set to true when stop() is called so that a pending deferred play
+     * (scheduled via `once('load', ...)`) does not start the sound.
+     */
+    private _stopped: boolean = false;
+
+    /**
      * An array of callbacks to call once the sound starts to play.
      */
     private _oncePlay: Array<HowlCallback> = [];
@@ -179,7 +185,10 @@ namespace gdjs {
           this._oncePlay.forEach((func) => func(newID));
           this._onPlay = [];
           this._oncePlay = [];
-        } else this._howl.once('load', () => this.play()); // Play only once the howl is fully loaded
+        } else
+          this._howl.once('load', () => {
+            if (!this._stopped) this.play();
+          }); // Play only once the howl is fully loaded
       } catch (error) {
         handleHowlerSoundMethodError(error, 'play');
       }
@@ -205,6 +214,7 @@ namespace gdjs {
      */
     stop(): this {
       try {
+        this._stopped = true;
         if (this._id !== null && this.isActualId()) this._howl.stop(this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'stop');
@@ -219,6 +229,7 @@ namespace gdjs {
      * to preload the sounds.
      */
     playing(): boolean {
+      if (this._stopped) return false;
       const isSoundPlaying =
         this._id !== null ? this._howl.playing(this._id) : true;
       return (

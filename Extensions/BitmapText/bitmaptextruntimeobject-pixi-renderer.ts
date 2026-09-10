@@ -156,26 +156,26 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      if (this._object.isWrapping() && this.getWidth() !== 0) {
-        const alignmentX =
-          this._object._textAlign === 'right'
-            ? 1
-            : this._object._textAlign === 'center'
-              ? 0.5
-              : 0;
+      const alignmentX =
+        this._object._textAlign === 'right'
+          ? 1
+          : this._object._textAlign === 'center'
+            ? 0.5
+            : 0;
+      const renderedWidth = this.getWidth();
+      const objectWidth = this._object.isWrapping()
+        ? this._object.getWrappingWidth()
+        : renderedWidth;
+      const textLeftOffset = this._object.isWrapping()
+        ? (objectWidth - renderedWidth) * alignmentX
+        : 0;
+      const centerX = this._object._rotationCenter
+        ? this._object._rotationCenter[0]
+        : objectWidth / 2;
 
-        const width = this._object.getWrappingWidth();
-        const renderedWidth = this.getWidth();
-
-        // A vector from the custom size center to the renderer center.
-        const centerToCenterX = (width - renderedWidth) * (alignmentX - 0.5);
-
-        this._pixiObject.position.x = this._object.x + width / 2;
-        this._pixiObject.anchor.x = 0.5 - centerToCenterX / renderedWidth;
-      } else {
-        this._pixiObject.position.x = this._object.x + this.getWidth() / 2;
-        this._pixiObject.anchor.x = 0.5;
-      }
+      this._pixiObject.position.x = this._object.getDrawableX() + centerX;
+      this._pixiObject.anchor.x =
+        renderedWidth !== 0 ? (centerX - textLeftOffset) / renderedWidth : 0;
 
       const alignmentY =
         this._object._verticalTextAlignment === 'bottom'
@@ -183,9 +183,15 @@ namespace gdjs {
           : this._object._verticalTextAlignment === 'center'
             ? 0.5
             : 0;
-      this._pixiObject.position.y =
-        this._object.y + this.getHeight() * (0.5 - alignmentY);
-      this._pixiObject.anchor.y = 0.5;
+      const renderedHeight = this.getHeight();
+      const textTopOffset = renderedHeight * alignmentY;
+      const centerY = this._object._rotationCenter
+        ? this._object._rotationCenter[1]
+        : renderedHeight / 2;
+
+      this._pixiObject.position.y = this._object.y + centerY - textTopOffset;
+      this._pixiObject.anchor.y =
+        renderedHeight !== 0 ? centerY / renderedHeight : 0;
     }
 
     updateAngle(): void {

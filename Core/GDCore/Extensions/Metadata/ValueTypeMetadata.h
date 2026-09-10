@@ -227,6 +227,7 @@ class GD_CORE_API ValueTypeMetadata {
       return parameterType == "string" || parameterType == "layer" ||
              parameterType == "color" || parameterType == "file" ||
              parameterType == "stringWithSelector" ||
+             parameterType == "easing" ||
              parameterType == "sceneName" ||
              parameterType == "layerEffectName" ||
              parameterType == "layerEffectParameterName" ||

@@ -59,6 +59,8 @@ type Props = {|
 
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
+  // Displayed at the start of the field, before the selected value.
+  startAdornment?: React.Node,
 
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
@@ -141,6 +143,7 @@ const SelectField: React.ComponentType<{
           InputProps={{
             style: props.inputStyle,
             disableUnderline: !!props.disableUnderline,
+            startAdornment: props.startAdornment,
           }}
           InputLabelProps={{
             shrink: true,

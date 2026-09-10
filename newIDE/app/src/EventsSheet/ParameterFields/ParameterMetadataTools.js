@@ -1,4 +1,5 @@
 // @flow
+import { isEasingChoiceList } from '../../Utils/Easings';
 import { type ExpressionParameters } from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 const gd: libGDevelop = global.gd;
@@ -170,4 +171,24 @@ export const getParameterChoiceValues = (
   }
 
   return [];
+};
+
+/**
+ * Some extensions (notably community extensions) declare a list of easings
+ * as a generic list of choices ("stringWithSelector"). Consider them as
+ * "easing" so that they are displayed with a preview of the curve.
+ */
+export const getSpecializedParameterFieldType = (
+  fieldType: string,
+  parameterMetadata: ?gdParameterMetadata
+): string => {
+  if (
+    fieldType === 'stringWithSelector' &&
+    parameterMetadata &&
+    isEasingChoiceList(getParameterChoiceValues(parameterMetadata))
+  ) {
+    return 'easing';
+  }
+
+  return fieldType;
 };

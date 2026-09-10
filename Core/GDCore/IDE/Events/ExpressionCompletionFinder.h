@@ -959,7 +959,8 @@ class GD_CORE_API ExpressionCompletionFinder
 
           if (eagerlyCompleteIfExactMatch && variableName == search) {
             AddEagerCompletionForVariableChildren(
-                variable, variableName, variablesContainer.GetSourceType(), location);
+                variable, variableName, variablesContainer.GetSourceType(),
+                location);
           }
         });
   }
@@ -985,7 +986,8 @@ class GD_CORE_API ExpressionCompletionFinder
 
           if (eagerlyCompleteIfExactMatch && variableName == search) {
             AddEagerCompletionForVariableChildren(
-                variable, variableName, gd::VariablesContainer::Object, location);
+                variable, variableName, gd::VariablesContainer::Object,
+                location);
           }
         });
   }

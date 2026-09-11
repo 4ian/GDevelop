@@ -31,6 +31,8 @@ import { MarkdownText } from '../UI/MarkdownText';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { canBenefitFromSocialRole } from '../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
+import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 
 const CommunityLinksLines = ({
   communityLinks,
@@ -80,6 +82,24 @@ const ProfileDetails = ({
           { ...authenticatedUser.profile, email: firebaseUser.email }
         : null,
     [authenticatedUser.profile, firebaseUser]
+  );
+  const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
+  const { privateGameTemplateListingDatas } = React.useContext(
+    PrivateGameTemplateStoreContext
+  );
+  // A seller has at least one product listed on the store.
+  const isSeller = React.useMemo(
+    () => {
+      if (!profile) return false;
+      const listingDatas = [
+        ...(privateAssetPackListingDatas || []),
+        ...(privateGameTemplateListingDatas || []),
+      ];
+      return listingDatas.some(
+        listingData => listingData.sellerId === profile.id
+      );
+    },
+    [profile, privateAssetPackListingDatas, privateGameTemplateListingDatas]
   );
   const hideSocials =
     !!authenticatedUser.limits &&
@@ -477,6 +497,17 @@ const ProfileDetails = ({
                 }
                 leftIcon={<ShareExternal />}
               />
+              {isSeller && (
+                <FlatButton
+                  label={<Trans>See my sales</Trans>}
+                  onClick={() =>
+                    Window.openExternalURL(
+                      GDevelopGamesPlatform.getSellerSalesUrl()
+                    )
+                  }
+                  leftIcon={<ShareExternal />}
+                />
+              )}
             </ResponsiveLineStackLayout>
           </ColumnStackLayout>
         </ResponsiveLineStackLayout>

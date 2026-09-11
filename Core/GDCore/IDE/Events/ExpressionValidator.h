@@ -526,6 +526,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       message = _("You must enter a variable name.");
     } else if (parentType == Type::Object) {
       message = _("You must enter a valid object name.");
+    } else if (!currentParameterExtraInfo) {
+      message = _("You must enter a valid expression inside the brackets.");
     } else {
       // It can't happen.
       message = _("You must enter a valid expression.");

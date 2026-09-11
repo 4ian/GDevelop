@@ -938,6 +938,16 @@ class GD_CORE_API ExpressionCompletionFinder
         completions.push_back(description);
       }
     }
+    if (variable.GetType() == gd::Variable::Structure ||
+        variable.GetType() == gd::Variable::Array) {
+      ExpressionCompletionDescription description(
+          ExpressionCompletionDescription::Variable,
+          location.GetStartPosition(), location.GetEndPosition());
+      description.SetCompletion(variableName + "[]");
+      description.SetVariableType(variable.GetType());
+      description.SetVariableScope(variableScope);
+      completions.push_back(description);
+    }
   }
 
   void AddCompletionsForVariablesMatchingSearch(

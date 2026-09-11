@@ -50,6 +50,11 @@ import {
   type SceneTreeViewItemCallbacks,
 } from './SceneTreeViewItemContent';
 import {
+  SceneFolderTreeViewItemContent,
+  getSceneFolderTreeViewItemId,
+  type SceneFolderTreeViewItemProps,
+} from './SceneFolderTreeViewItemContent';
+import {
   ExtensionTreeViewItemContent,
   getExtensionTreeViewItemId,
   type ExtensionTreeViewItemProps,
@@ -154,7 +159,9 @@ export interface TreeViewItemContent {
   paste(): void;
   cut(): void;
   getIndex(): number;
-  moveAt(destinationIndex: number): void;
+  // `targetFolder` is only used by the items of the scenes folder structure,
+  // to move an item into another folder than its current parent.
+  moveAt(destinationIndex: number, targetFolder?: gdLayoutFolderOrLayout): void;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
   getRootId(): string;
 }
@@ -192,6 +199,54 @@ class LeafTreeViewItem implements TreeViewItem {
   }
 }
 
+class FolderTreeViewItem implements TreeViewItem {
+  content: TreeViewItemContent;
+  getChildrenFunc: (i18n: I18nType) => ?Array<TreeViewItem>;
+
+  constructor(
+    content: TreeViewItemContent,
+    getChildrenFunc: (i18n: I18nType) => ?Array<TreeViewItem>
+  ) {
+    this.content = content;
+    this.getChildrenFunc = getChildrenFunc;
+  }
+
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    return this.getChildrenFunc(i18n);
+  }
+}
+
+/**
+ * Build the tree view items of the children of a folder of the scenes folder
+ * structure (folders and scenes, in the order they are stored).
+ */
+const buildSceneFolderChildren = (
+  folder: gdLayoutFolderOrLayout,
+  sceneTreeViewItemProps: SceneTreeViewItemProps,
+  sceneFolderTreeViewItemProps: SceneFolderTreeViewItemProps
+): Array<TreeViewItem> =>
+  mapFor(0, folder.getChildrenCount(), i => {
+    const child = folder.getChildAt(i);
+    if (child.isFolder()) {
+      return new FolderTreeViewItem(
+        new SceneFolderTreeViewItemContent(child, sceneFolderTreeViewItemProps),
+        () =>
+          buildSceneFolderChildren(
+            child,
+            sceneTreeViewItemProps,
+            sceneFolderTreeViewItemProps
+          )
+      );
+    }
+    return new LeafTreeViewItem(
+      new SceneTreeViewItemContent(
+        child.getLayout(),
+        child,
+        sceneTreeViewItemProps
+      )
+    );
+  });
+
 // $FlowFixMe[incompatible-type]
 class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
@@ -219,12 +274,17 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   constructor(
     id: string,
     label: string | React.Node,
-    rightButton?: MenuButton
+    rightButton?: MenuButton,
+    // When given, this replaces the menu built from the right button, for
+    // roots offering more than the single action of their right button.
+    buildMenuTemplateFunction?: (i18n: I18nType) => Array<MenuItemTemplate>
   ) {
     this.id = id;
     this.label = label;
-    this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
-      rightButton
+    this.buildMenuTemplateFunction = (i18n: I18nType, index: number) => {
+      if (buildMenuTemplateFunction) return buildMenuTemplateFunction(i18n);
+
+      return rightButton
         ? [
             {
               id: rightButton.id,
@@ -233,6 +293,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
             },
           ]
         : [];
+    };
     this.rightButton = rightButton;
   }
 
@@ -532,6 +593,12 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       }
     }, []);
 
+    const expandFolders = React.useCallback((folderIds: Array<string>) => {
+      if (treeViewRef.current) {
+        treeViewRef.current.openItems(folderIds);
+      }
+    }, []);
+
     const [
       projectPropertiesDialogOpen,
       setProjectPropertiesDialogOpen,
@@ -698,6 +765,27 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         editName(sceneItemId);
       },
       [project, onProjectItemModified, editName, scrollToItem, onSceneAdded]
+    );
+
+    const addNewFolder = React.useCallback(
+      () => {
+        if (!project) return;
+
+        const layoutsRootFolder = project.getLayoutsRootFolder();
+        const newFolder = layoutsRootFolder.insertNewFolder(
+          'NewFolder',
+          layoutsRootFolder.getChildrenCount()
+        );
+
+        onProjectItemModified();
+
+        const folderItemId = getSceneFolderTreeViewItemId(newFolder);
+        expandFolders([scenesRootFolderId]);
+
+        // We focus it so the user can edit the name directly.
+        editName(folderItemId);
+      },
+      [project, onProjectItemModified, editName, expandFolders]
     );
 
     const onCreateNewExtension = React.useCallback(
@@ -950,6 +1038,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               onOpenLayout,
               onOpenLayoutProperties,
               openSceneVariables,
+              onProjectItemModified,
+              expandFolders,
             }
           : null,
       [
@@ -968,6 +1058,32 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onOpenLayout,
         onOpenLayoutProperties,
         openSceneVariables,
+        onProjectItemModified,
+        expandFolders,
+      ]
+    );
+
+    const sceneFolderTreeViewItemProps = React.useMemo<?SceneFolderTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              project,
+              forceUpdateList,
+              editName,
+              scrollToItem,
+              showDeleteConfirmation,
+              onProjectItemModified,
+              expandFolders,
+            }
+          : null,
+      [
+        project,
+        forceUpdateList,
+        editName,
+        scrollToItem,
+        showDeleteConfirmation,
+        onProjectItemModified,
+        expandFolders,
       ]
     );
 
@@ -1119,6 +1235,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       (i18n: I18nType): Array<TreeViewItem> => {
         return !project ||
           !sceneTreeViewItemProps ||
+          !sceneFolderTreeViewItemProps ||
           !extensionTreeViewItemProps ||
           !externalEventsTreeViewItemProps ||
           !externalLayoutTreeViewItemProps ||
@@ -1182,7 +1299,18 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       addNewScene(index, i18n);
                     },
                     id: 'add-new-scene-button',
-                  }
+                  },
+                  (i18n: I18nType) => [
+                    {
+                      label: i18n._(t`Add a scene`),
+                      click: () =>
+                        addNewScene(project.getLayoutsCount() - 1, i18n),
+                    },
+                    {
+                      label: i18n._(t`Add a folder`),
+                      click: addNewFolder,
+                    },
+                  ]
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   if (project.getLayoutsCount() === 0) {
@@ -1193,16 +1321,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       ),
                     ];
                   }
-                  return mapFor(
-                    0,
-                    project.getLayoutsCount(),
-                    i =>
-                      new LeafTreeViewItem(
-                        new SceneTreeViewItemContent(
-                          project.getLayoutAt(i),
-                          sceneTreeViewItemProps
-                        )
-                      )
+                  return buildSceneFolderChildren(
+                    project.getLayoutsRootFolder(),
+                    sceneTreeViewItemProps,
+                    sceneFolderTreeViewItemProps
                   );
                 },
               },
@@ -1371,6 +1493,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         openSearchExtensionDialog,
         project,
         sceneTreeViewItemProps,
+        sceneFolderTreeViewItemProps,
+        addNewFolder,
       ]
     );
 
@@ -1396,9 +1520,22 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           return;
         }
         const selectedItem = selectedItems[0];
-        selectedItem.content.moveAt(
-          destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
-        );
+        const destinationContent = destinationItem.content;
+        if (
+          where === 'inside' &&
+          destinationContent instanceof SceneFolderTreeViewItemContent
+        ) {
+          // Dropping on a scenes folder puts the item at the end of it.
+          const destinationFolder = destinationContent.getFolder();
+          selectedItem.content.moveAt(
+            destinationFolder.getChildrenCount(),
+            destinationFolder
+          );
+        } else {
+          selectedItem.content.moveAt(
+            destinationContent.getIndex() + (where === 'after' ? 1 : 0)
+          );
+        }
         onTreeModified(true);
       },
       [onTreeModified, selectedItems]

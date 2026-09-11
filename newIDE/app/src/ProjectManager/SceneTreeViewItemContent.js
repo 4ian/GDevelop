@@ -18,6 +18,11 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
+import {
+  buildMoveToFolderSubmenu,
+  moveNewSceneToFolder,
+} from './SceneTreeViewHelpers';
 
 const SCENE_CLIPBOARD_KIND = 'Layout';
 
@@ -53,6 +58,8 @@ export type SceneTreeViewItemProps = {|
   project: gdProject,
   onOpenLayoutProperties: (layout: ?gdLayout) => void,
   openSceneVariables: (layout: ?gdLayout) => void,
+  onProjectItemModified: () => void,
+  expandFolders: (folderIds: Array<string>) => void,
 |};
 
 export const getSceneTreeViewItemId = (scene: gdLayout): string => {
@@ -63,15 +70,37 @@ export const getSceneTreeViewItemId = (scene: gdLayout): string => {
 
 export class SceneTreeViewItemContent implements TreeViewItemContent {
   scene: gdLayout;
+  // The node of the scenes folder structure holding this scene. Keeping it
+  // avoids searching the whole tree every time the position of the scene or
+  // its parent folder is needed.
+  layoutFolderOrLayout: gdLayoutFolderOrLayout;
   props: SceneTreeViewItemProps;
 
-  constructor(scene: gdLayout, props: SceneTreeViewItemProps) {
+  constructor(
+    scene: gdLayout,
+    layoutFolderOrLayout: gdLayoutFolderOrLayout,
+    props: SceneTreeViewItemProps
+  ) {
     this.scene = scene;
+    this.layoutFolderOrLayout = layoutFolderOrLayout;
     this.props = props;
   }
 
+  getLayoutFolderOrLayout(): gdLayoutFolderOrLayout {
+    return this.layoutFolderOrLayout;
+  }
+
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === scenesRootFolderId;
+    if (itemContent.getId() === scenesRootFolderId) return true;
+
+    let currentParent = this.layoutFolderOrLayout.getParent();
+    while (!currentParent.isRootFolder()) {
+      if (getSceneFolderTreeViewItemId(currentParent) === itemContent.getId()) {
+        return true;
+      }
+      currentParent = currentParent.getParent();
+    }
+    return false;
   }
 
   getRootId(): string {
@@ -114,6 +143,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       return;
     }
     this.props.onRenameLayout(oldName, newName);
+    this.props.forceUpdateList();
   }
 
   edit(): void {
@@ -121,6 +151,9 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
+    const { project } = this.props;
+    const layoutFolderOrLayout = this.layoutFolderOrLayout;
+
     return [
       {
         label: i18n._(t`Open scene editor`),
@@ -159,6 +192,19 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Set as start scene`),
         enabled: !this._isFirstScene(),
         click: () => this._setProjectFirstScene(this.scene.getName()),
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: i18n._(t`Move to folder`),
+        submenu: buildMoveToFolderSubmenu(
+          i18n,
+          project,
+          layoutFolderOrLayout,
+          () => this._onFolderStructureModified(),
+          () => this._addFolderInParent()
+        ),
       },
       {
         type: 'separator',
@@ -226,23 +272,55 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
+    // Removing the layout from the project also removes it from the scenes
+    // folder structure, so nothing else has to be done here.
     this.props.onDeleteLayout(this.scene);
   }
 
   getIndex(): number {
-    return this.props.project.getLayoutPosition(this.scene.getName());
+    return this.layoutFolderOrLayout
+      .getParent()
+      .getChildPosition(this.layoutFolderOrLayout);
   }
 
-  moveAt(destinationIndex: number): void {
-    const originIndex = this.getIndex();
-    if (destinationIndex !== originIndex) {
-      this.props.project.moveLayout(
+  moveAt(
+    destinationIndex: number,
+    targetFolder?: gdLayoutFolderOrLayout
+  ): void {
+    const currentParentFolder = this.layoutFolderOrLayout.getParent();
+    const destinationFolder = targetFolder || currentParentFolder;
+
+    if (destinationFolder === currentParentFolder) {
+      const originIndex = this.getIndex();
+      if (destinationIndex === originIndex) return;
+      currentParentFolder.moveChild(
         originIndex,
         // When moving the item down, it must not be counted.
         destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
       );
-      this._onProjectItemModified();
+    } else {
+      currentParentFolder.moveLayoutFolderOrLayoutToAnotherFolder(
+        this.layoutFolderOrLayout,
+        destinationFolder,
+        destinationIndex
+      );
     }
+
+    this._onFolderStructureModified();
+  }
+
+  /**
+   * A scene added to the project is put at the root of the folder structure:
+   * move it right after this scene, so that a copy or a duplicate stays next
+   * to the scene it was made from.
+   */
+  _placeNewSceneNextToThisOne(newSceneName: string): void {
+    moveNewSceneToFolder(
+      this.props.project,
+      newSceneName,
+      this.layoutFolderOrLayout.getParent(),
+      this.getIndex() + 1
+    );
   }
 
   copy(): void {
@@ -273,14 +351,19 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       project.hasLayoutNamed(name)
     );
 
-    const newScene = project.insertNewLayout(newName, this.getIndex() + 1);
+    const newScene = project.insertNewLayout(
+      newName,
+      project.getLayoutsCount()
+    );
 
     unserializeFromJSObject(newScene, copiedScene, 'unserializeFrom', project);
     // Unserialization has overwritten the name.
     newScene.setName(newName);
     newScene.updateBehaviorsSharedData(project);
 
-    this._onProjectItemModified();
+    this._placeNewSceneNextToThisOne(newName);
+
+    this._onFolderStructureModified();
     this.props.editName(getSceneTreeViewItemId(newScene));
     this.props.onSceneAdded();
   }
@@ -291,7 +374,10 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       project.hasLayoutNamed(name)
     );
 
-    const newScene = project.insertNewLayout(newName, this.getIndex() + 1);
+    const newScene = project.insertNewLayout(
+      newName,
+      project.getLayoutsCount()
+    );
 
     unserializeFromJSObject(
       newScene,
@@ -303,7 +389,9 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     newScene.setName(newName);
     newScene.updateBehaviorsSharedData(project);
 
-    this._onProjectItemModified();
+    this._placeNewSceneNextToThisOne(newName);
+
+    this._onFolderStructureModified();
     this.props.editName(getSceneTreeViewItemId(newScene));
     this.props.onSceneAdded();
   }
@@ -312,6 +400,33 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.props.forceUpdate();
+  }
+
+  /**
+   * Add a new folder next to this scene and start editing its name, like the
+   * objects list does.
+   */
+  _addFolderInParent(): void {
+    const parentFolder = this.layoutFolderOrLayout.getParent();
+    const newFolder = parentFolder.insertNewFolder('NewFolder', 0);
+
+    this._onFolderStructureModified();
+    this.props.expandFolders([
+      parentFolder.isRootFolder()
+        ? scenesRootFolderId
+        : getSceneFolderTreeViewItemId(parentFolder),
+    ]);
+    // We focus it so the user can edit the name directly.
+    this.props.editName(getSceneFolderTreeViewItemId(newFolder));
+  }
+
+  /**
+   * The tree view caches the children of each item, so it must also be told to
+   * rebuild them when the folder structure itself changed.
+   */
+  _onFolderStructureModified() {
+    this._onProjectItemModified();
+    this.props.forceUpdateList();
   }
 
   getRightButton(i18n: I18nType): any {

@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <!-- On desktop app, this title is used to know if the user is focused on the
+    main window (IDE) or on another window (preview or external editor).
+    Should this be changed, you should also change ElectronMainMenu.js -->
+    <title>GDevelop Image Editor (Piskel)</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="gdide://external/utils/external-editor-header.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="gdide://external/piskel/piskel-style.css"
+    />
+  </head>
+
+  <body>
+    <div id="external-editor-header"></div>
+    <iframe id="piskel-frame"></iframe>
+    <script type="module" src="gdide://external/piskel/piskel-main.js"></script>
+  </body>
+</html>

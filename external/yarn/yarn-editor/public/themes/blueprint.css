@@ -1,0 +1,323 @@
+/*-- Scrollbar ------------------------------------------------------------------ */
+
+::-webkit-scrollbar-thumb:hover {
+  background: orange;
+  border: 1px solid orange;
+}
+
+
+/*-- Menu ------------------------------------------------------------------ */
+.app-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background-color: white;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.app-menu .menu {
+  display: block;
+  float: left;
+  margin-left: 10px;
+  border-radius: 2px;
+  box-shadow: 0;
+  font-size: 0.9em;
+  color: #666;
+  cursor: pointer;
+}
+
+.title {
+  box-sizing: border-box;
+  padding: 5px;
+  width: fit-content;
+  min-width: 100px;
+  line-height: 20px;
+  font-weight: bold;
+  float: left;
+}
+
+.menu .dropdown {
+  color: gray;
+  background-color: white;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+}
+
+.menu .dropdown .item:hover {
+  background: orange;
+  color: black;
+}
+
+.menu .dropdown .item:active {
+  background: orange;
+  color: black;
+}
+
+.menu:hover .title {
+  background: orange;
+  color: black;
+}
+
+.menu:active .title {
+  background: orange;
+  color: #555;
+}
+
+.menu-icon {
+  color: orange;
+}
+
+.menu .dropdown .item:hover .menu-icon {
+  color: black;
+}
+
+.add-link {
+  box-shadow: 0 0 1px 1px #e8e8e8;
+}
+
+.add-link:hover {
+  background: orange;
+}
+
+#linkHelperMenuFilter {
+  border-right: 2px solid orange;
+  border-left: 2px solid orange;
+}
+
+/*-- Search ------------------------------------------------------------------ */
+.app-search {
+  position: absolute;
+  top: 0;
+  right: 10px;
+}
+
+.app-search input {
+  font-family: 'Lucida Console', Monaco, monospace;
+}
+
+.app-search input[type='checkbox'] {
+  cursor: pointer;
+}
+
+.app-search .search-field {
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 1px solid darkgray;
+}
+
+.app-search .dropdown .item {
+  display: block;
+  box-sizing: border-box;
+  padding: 7px;
+}
+
+/*-- ----------------------------------------------------------------------- */
+
+#app-bg {
+/* .nodes-holder { */
+  width:5000px;
+  height:5000px;
+  background-color: CornflowerBlue;
+  background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+}
+
+#marquee {
+  display: none;
+  border: 1px double white;
+  background-color: white;
+  background-color: rgba(255, 255, 255, .1);
+}
+
+.node-editor .form {
+  top: 2.5%;
+}
+
+.node-editor .form .bbcode-toolbar .bbcode-button:hover {
+  background: orange;
+}
+
+.node {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
+}
+
+.node.selected {
+  border: inherit;
+  background-color: orange;
+  color: black;
+}
+.node .body {
+  padding: 0 5px 0 5px;
+}
+.node.selected .body {
+  background-color: orange;
+  color: black;
+}
+.node .title {
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+.node .tags {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  border: 0;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  background: inherit;
+}
+.node .tags:empty {
+  display:none;
+}
+.node .tags span {
+  padding: 1px 5px 1px 5px;
+  margin: 0 0 0 2px;
+  border-radius: 15px;
+  background-color: #E0D6C5;
+  color: #8D8374;
+}
+
+/* SPECIAL CHECKBOX START */
+.styled-checkbox input:checked + label {
+  background-color: #FBCEB1;
+  border: 2px solid orange;
+}
+
+.styled-checkbox input:checked + label.transcribe-button {
+  background-color: #EFC7C7;
+  border: 2px solid #DC8484;
+}
+
+.settings-icon {
+  color: orange;
+}
+
+.tag-style-1 {
+  border: 1px solid red;
+  background-color: red !important;
+  color: yellow !important;
+}
+.tag-style-2 {
+  border: 1px solid #6EA5E0 !important;
+  background-color: #6EA5E0 !important;
+  color: black !important;
+}
+.tag-style-3 {
+  background-color: #9EDE74 !important;
+}
+.tag-style-4 {
+  background-color: #FFE374 !important;
+}
+.tag-style-5 {
+  background-color: #F7A666 !important;
+}
+.tag-style-6 {
+  background-color: #C47862 !important;
+}
+.tag-style-7 {
+  background-color: #97E1E9 !important;
+}
+.tag-style-8 {
+  background-color: #576574 !important;
+  color: white;
+}
+.tag-style-9 {
+  background-color: black !important;
+  color: white;
+}
+.title-style-1 {
+  background-color: white;
+  color: black;
+}
+.title-style-2 {
+  background-color: #FF6B6B;
+  color: white;
+}
+.title-style-3 {
+  background-color: #1CD1A1;
+  color: white;
+}
+.title-style-4 {
+  background-color: #2E86DE;
+  color: white;
+}
+.title-style-5 {
+  background-color: #FECA57;
+  color: white;
+}
+.title-style-6 {
+  background-color: #5F27CD;
+  color: white;
+}
+.title-style-7 {
+  background-color: #D15519;
+  color: white;
+}
+.title-style-8 {
+  background-color: #576574;
+  color: white;
+}
+.title-style-9 {
+  background-color: black;
+  color: white;
+}
+
+.app-info {
+  color: #153d58;
+}
+/*-- Canvas Buttons ------------------------------------------------------- */
+.app-add-node {
+  color: grey;
+}
+
+.app-add-node:hover {
+  color: orange;
+}
+
+.app-button span {
+  color: grey;
+}
+
+.app-button span:hover {
+  color: orange;
+}
+
+/* --------------------------- Narrow overrides -----------------------------*/
+@media only screen and (max-width: 600px) {
+  .app-menu {
+    box-shadow: 0 0;
+  }
+
+  .app-search {
+    position: absolute;
+    top: 26px;
+    left: 0px;
+    width: 100%;
+    background-color: white;
+    padding: 5px 10px 5px 5px;
+    z-index: 10000;
+  }
+
+  .app-search > input {
+    padding: unset;
+    width: 170px;
+  }
+}
+
+.grid-canvas {
+  color: lightgrey;
+}
+
+.arrows {
+  color: white;
+}

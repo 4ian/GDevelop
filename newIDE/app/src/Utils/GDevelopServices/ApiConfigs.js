@@ -24,6 +24,8 @@ export const GDevelopGamesPlatform = {
     username
       ? `https://gd.games/${username}${isDev ? '?dev=true' : ''}`
       : `https://gd.games/user/${userId}${isDev ? '?dev=true' : ''}`,
+  getSellerSalesUrl: (): string =>
+    `https://gd.games/seller/sales${isDev ? '?dev=true' : ''}`,
 };
 
 export const GDevelopFirebaseConfig = {

@@ -4025,6 +4025,16 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "Missing a closing bracket. Add a closing bracket for each opening bracket.");
     }
+    SECTION("empty brackets") {
+      auto node = parser.ParseExpression("myVariable[]");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+            "You must enter a valid expression inside the brackets.");
+    }
     SECTION("number instead") {
       auto node = parser.ParseExpression("1234");
       REQUIRE(node != nullptr);

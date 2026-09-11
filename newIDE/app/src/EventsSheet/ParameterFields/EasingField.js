@@ -9,9 +9,8 @@ import StringWithSelectorField, {
   renderInlineStringWithSelector,
   type ChoiceAdornmentContext,
 } from './StringWithSelectorField';
-import { getParameterChoiceValues } from './ParameterMetadataTools';
+import { getEasingChoices } from './ParameterMetadataTools';
 import EasingPreview from '../../UI/EasingPreview';
-import { allEasingNames } from '../../Utils/Easings';
 
 const previewSizes = {
   field: { width: 40, height: 24 },
@@ -23,21 +22,6 @@ const previewSizes = {
 const eventsSheetPreviewStyle = {
   verticalAlign: 'middle',
   marginLeft: 4,
-};
-
-/**
- * The easings that can be chosen for a parameter. A parameter of type "easing"
- * can leave its list of choices empty to allow all the easings.
- */
-export const getEasingChoices = (
-  parameterMetadata: ?gdParameterMetadata
-): Array<string> => {
-  if (!parameterMetadata || !parameterMetadata.getExtraInfo()) {
-    return allEasingNames;
-  }
-
-  const choices = getParameterChoiceValues(parameterMetadata);
-  return choices.length > 0 ? choices : allEasingNames;
 };
 
 const renderEasingPreview = (

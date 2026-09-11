@@ -1,5 +1,5 @@
 // @flow
-import { isEasingChoiceList } from '../../Utils/Easings';
+import { isEasingChoiceList, allEasingNames } from '../../Utils/Easings';
 import { type ExpressionParameters } from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 const gd: libGDevelop = global.gd;
@@ -191,4 +191,19 @@ export const getSpecializedParameterFieldType = (
   }
 
   return fieldType;
+};
+
+/**
+ * The easings that can be chosen for a parameter. A parameter of type "easing"
+ * can leave its list of choices empty to allow all the easings.
+ */
+export const getEasingChoices = (
+  parameterMetadata: ?gdParameterMetadata
+): Array<string> => {
+  if (!parameterMetadata || !parameterMetadata.getExtraInfo()) {
+    return allEasingNames;
+  }
+
+  const choices = getParameterChoiceValues(parameterMetadata);
+  return choices.length > 0 ? choices : allEasingNames;
 };

@@ -350,6 +350,14 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(camera.getCameraY(runtimeScene, '', 0)).to.be(660);
   });
 
+  it('can tween a layer camera Z position', () => {
+    const layer = runtimeScene.getLayer('');
+    layer.setCameraZ(200, 45);
+    tween.tweenCameraZ(runtimeScene, 'MyTween', 600, '', 'linear', 0.25);
+    checkProgress(6, () => layer.getCameraZ(45));
+    expect(layer.getCameraZ(45)).to.be(440);
+  });
+
   it('can tween a layer camera zoom', () => {
     camera.setCameraZoom(runtimeScene, 200, '', 0);
     tween.tweenCameraZoom2(runtimeScene, 'MyTween', 600, '', 'linear', 0.25);

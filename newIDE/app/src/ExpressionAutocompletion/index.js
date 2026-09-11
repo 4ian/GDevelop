@@ -14,8 +14,10 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
-import { getParameterChoiceAutocompletions } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
-import { getEasingChoices } from '../EventsSheet/ParameterFields/EasingField';
+import {
+  getParameterChoiceAutocompletions,
+  getEasingChoices,
+} from '../EventsSheet/ParameterFields/ParameterMetadataTools';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';

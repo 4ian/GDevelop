@@ -217,6 +217,7 @@ namespace gdjs {
       | string;
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
+    _renderAtDisplayResolution: boolean;
     _pixelsRounding: boolean;
     _antialiasingMode: 'none' | 'MSAA';
     _isAntialisingEnabledOnMobile: boolean;
@@ -351,6 +352,8 @@ namespace gdjs {
       this._adaptGameResolutionAtRuntime =
         this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
+      this._renderAtDisplayResolution =
+        !!data.properties.renderAtDisplayResolution;
       this._pixelsRounding = this._data.properties.pixelsRounding;
       this._antialiasingMode = this._data.properties.antialiasingMode;
       this._isAntialisingEnabledOnMobile =
@@ -877,6 +880,14 @@ namespace gdjs {
      */
     getScaleMode(): 'linear' | 'nearest' {
       return this._scaleMode;
+    }
+
+    /**
+     * Return true if the game must be rendered with one texel per screen pixel
+     * instead of being rendered at the game resolution and stretched by the browser.
+     */
+    getRenderAtDisplayResolution(): boolean {
+      return this._renderAtDisplayResolution;
     }
 
     /**

@@ -25,6 +25,11 @@ namespace gdjs {
      * if location is not specified.
      */
     private static _DEFAULT_LEFT_VARIANT_KEYS: integer[] = [16, 17, 18, 91];
+
+    /**
+     * The `KeyboardEvent.location` of keys on the numeric keypad.
+     */
+    private static _NUMPAD_LOCATION: integer = 3;
     private _pressedKeys: Hashtable<boolean>;
     private _justPressedKeys: Hashtable<boolean>;
     private _releasedKeys: Hashtable<boolean>;
@@ -111,11 +116,24 @@ namespace gdjs {
      *
      * @param keyCode The raw key code
      * @param location The location
+     * @param code The KeyboardEvent.code, used to know if the key really is on
+     * the numpad when a numpad location is reported.
      */
     static getLocationAwareKeyCode(
       keyCode: number,
-      location: number | null | undefined
+      location: number | null | undefined,
+      code?: string | null
     ): integer {
+      if (
+        location === InputManager._NUMPAD_LOCATION &&
+        code &&
+        !code.startsWith('Numpad')
+      ) {
+        // macOS sets the "numeric pad" modifier flag for the arrow keys, which makes
+        // WebKit (Safari) report them with a numpad location. Only `code` tells the
+        // numpad keys apart from the arrow keys, so trust it over the location.
+        location = 0;
+      }
       if (location) {
         // If it is a numpad number, do not modify it.
         if (96 <= keyCode && keyCode <= 105) {
@@ -135,11 +153,13 @@ namespace gdjs {
      * 2 for right keys, and 3 for numpad keys.
      * @param keyCode The raw key code associated to the key press.
      * @param location The location of the event.
+     * @param code The KeyboardEvent.code of the event.
      */
-    onKeyPressed(keyCode: number, location?: number): void {
+    onKeyPressed(keyCode: number, location?: number, code?: string): void {
       const locationAwareKeyCode = InputManager.getLocationAwareKeyCode(
         keyCode,
-        location
+        location,
+        code
       );
       this._pressedKeys.put(locationAwareKeyCode, true);
       this._justPressedKeys.put(locationAwareKeyCode, true);
@@ -152,11 +172,13 @@ namespace gdjs {
      * 2 for right keys, and 3 for numpad keys.
      * @param keyCode The raw key code associated to the key release.
      * @param location The location of the event.
+     * @param code The KeyboardEvent.code of the event.
      */
-    onKeyReleased(keyCode: number, location?: number): void {
+    onKeyReleased(keyCode: number, location?: number, code?: string): void {
       const locationAwareKeyCode = InputManager.getLocationAwareKeyCode(
         keyCode,
-        location
+        location,
+        code
       );
       this._pressedKeys.put(locationAwareKeyCode, false);
       this._justPressedKeys.put(locationAwareKeyCode, false);
@@ -170,6 +192,11 @@ namespace gdjs {
      */
     releaseAllPressedKeys(): void {
       for (const locationAwareKeyCode in this._pressedKeys.items) {
+        // Keys keep an entry once released, so only the keys actually held down
+        // must be made to go through the release state.
+        if (!this._pressedKeys.items[locationAwareKeyCode]) {
+          continue;
+        }
         this._pressedKeys.put(locationAwareKeyCode, false);
         this._justPressedKeys.put(locationAwareKeyCode, false);
         this._releasedKeys.put(locationAwareKeyCode, true);
@@ -425,6 +452,23 @@ namespace gdjs {
     _setMouseButtonReleased(buttonCode: number): void {
       this._pressedMouseButtons[buttonCode] = false;
       this._releasedMouseButtons[buttonCode] = true;
+    }
+
+    /**
+     * Release all the mouse buttons that are currently pressed.
+     */
+    releaseAllPressedMouseButtons(): void {
+      for (
+        let buttonCode = 0;
+        buttonCode < this._pressedMouseButtons.length;
+        buttonCode++
+      ) {
+        if (this._pressedMouseButtons[buttonCode]) {
+          // Go through `onMouseButtonReleased` so that the touch simulated by
+          // the left button is ended too.
+          this.onMouseButtonReleased(buttonCode);
+        }
+      }
     }
 
     /**

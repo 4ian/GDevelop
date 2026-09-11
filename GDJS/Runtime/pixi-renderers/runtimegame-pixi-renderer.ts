@@ -62,6 +62,8 @@ namespace gdjs {
 
     _wasDisposed: boolean = false;
 
+    _unregisterFocusListeners: (() => void) | null = null;
+
     /**
      * @param game The game that is being rendered
      * @param forceFullscreen If fullscreen should be always activated
@@ -753,7 +755,7 @@ namespace gdjs {
           return;
         }
 
-        manager.onKeyPressed(e.keyCode, e.location);
+        manager.onKeyPressed(e.keyCode, e.location, e.code);
       };
       document.onkeyup = (e) => {
         if (isFocusingDomElement()) {
@@ -770,11 +772,11 @@ namespace gdjs {
             // This means the key would be considered as "stuck" from the game's perspective
             // it would never be released unless it's pressed and released again (without meta).
             // Out of caution, we simulate a release of the key that were pressed with meta key.
-            for (const {
-              location,
-              keyCode,
-            } of keysPressedWithMetaPressedByCode.values()) {
-              manager.onKeyReleased(keyCode, location);
+            for (const [
+              code,
+              { location, keyCode },
+            ] of keysPressedWithMetaPressedByCode) {
+              manager.onKeyReleased(keyCode, location, code);
             }
             keysPressedWithMetaPressedByCode.clear();
           }
@@ -792,7 +794,32 @@ namespace gdjs {
           e.preventDefault();
         }
 
-        manager.onKeyReleased(e.keyCode, e.location);
+        manager.onKeyReleased(e.keyCode, e.location, e.code);
+      };
+
+      // No "keyup" or "mouseup" is received for the keys and mouse buttons that are
+      // still held down when the game loses the focus (when switching to another
+      // window or tab), which would leave them stuck in a pressed state.
+      // Release them all instead.
+      const releaseAllPressedInputs = () => {
+        keysPressedWithMetaPressedByCode.clear();
+        manager.releaseAllPressedKeys();
+        manager.releaseAllPressedMouseButtons();
+      };
+      const onBlur = () => {
+        releaseAllPressedInputs();
+      };
+      const onVisibilityChange = () => {
+        // On mobile, switching to another app can hide the game without blurring it.
+        if (document.visibilityState === 'hidden') {
+          releaseAllPressedInputs();
+        }
+      };
+      window.addEventListener('blur', onBlur);
+      document.addEventListener('visibilitychange', onVisibilityChange);
+      this._unregisterFocusListeners = () => {
+        window.removeEventListener('blur', onBlur);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
       };
 
       // Mouse:
@@ -1099,11 +1126,16 @@ namespace gdjs {
     /**
      * Dispose the renderers (PixiJS and/or Three.js) as well as DOM elements
      * used for the game (the canvas, if specified, and the additional DOM container
-     * created on top of it to allow display HTML elements, for example for text inputs).
+     * created on top of it to allow display HTML elements, for example for text inputs),
+     * and the events listeners registered on the window and document.
      *
      * @param removeCanvas If true, the canvas will be removed from the DOM.
      */
     dispose(removeCanvas?: boolean) {
+      if (this._unregisterFocusListeners) {
+        this._unregisterFocusListeners();
+        this._unregisterFocusListeners = null;
+      }
       this._pixiRenderer?.destroy();
       this._threeRenderer?.dispose();
       this._pixiRenderer = null;

@@ -32,6 +32,8 @@ import TrueFalseField, {
 import ExpressionField from './ParameterFields/ExpressionField';
 import StringField from './ParameterFields/StringField';
 import StringWithSelectorField from './ParameterFields/StringWithSelectorField';
+import EasingField, { renderInlineEasing } from './ParameterFields/EasingField';
+import { getSpecializedParameterFieldType } from './ParameterFields/ParameterMetadataTools';
 import NumberWithChoicesField from './ParameterFields/NumberWithChoicesField';
 import BehaviorField from './ParameterFields/BehaviorField';
 import AnyVariableField, {
@@ -114,6 +116,7 @@ const components: {
   expression: ExpressionField,
   string: StringField,
   stringWithSelector: StringWithSelectorField,
+  easing: EasingField,
   numberWithChoices: NumberWithChoicesField,
   behavior: BehaviorField,
   variable: AnyVariableField,
@@ -175,6 +178,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   relationalOperator: renderInlineRelationalOperator,
   leaderboardId: renderInlineLeaderboardIdField,
   color: renderInlineColor,
+  easing: renderInlineEasing,
 };
 const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   mouse: t`Mouse button`,
@@ -188,6 +192,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   number: t`Number`,
   string: t`String`,
   stringWithSelector: t`String`,
+  easing: t`Easing`,
   numberWithChoices: t`Number`,
   behavior: t`Behavior`,
   anyvar: t`Variable`,
@@ -225,10 +230,13 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
 
 const ParameterRenderingService = {
   components,
-  getParameterComponent: (rawType: string): ParameterField => {
+  getParameterComponent: (
+    rawType: string,
+    parameterMetadata?: ?gdParameterMetadata
+  ): ParameterField => {
     const fieldType = gd.ParameterMetadata.isObject(rawType)
       ? 'object'
-      : rawType;
+      : getSpecializedParameterFieldType(rawType, parameterMetadata);
 
     // $FlowFixMe[invalid-computed-prop]
     if (components.hasOwnProperty(fieldType)) return components[fieldType];
@@ -240,7 +248,10 @@ const ParameterRenderingService = {
       ? 'object'
       : valueTypeMetadata.isResource()
       ? 'resource'
-      : valueTypeMetadata.getName();
+      : getSpecializedParameterFieldType(
+          valueTypeMetadata.getName(),
+          props.parameterMetadata
+        );
 
     const inlineRenderer =
       inlineRenderers[fieldType] || inlineRenderers.default;

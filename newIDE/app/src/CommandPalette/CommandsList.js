@@ -1,6 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import Window from '../Utils/Window';
 
 export type CommandName =
   | 'QUIT_APP'
@@ -75,17 +76,47 @@ export type CommandName =
   | 'OPEN_EXTENSION_SETTINGS'
   | 'OPEN_PROFILE'
   | 'OPEN_MEMORY_TRACKER_REGISTRY'
-  | 'INSTALL_CLI_IN_PATH';
+  | 'INSTALL_CLI_IN_PATH'
+  | 'TILEMAP_FREEHAND_BRUSH'
+  | 'TILEMAP_RECTANGLE_PAINT'
+  | 'TILEMAP_FILL_BUCKET'
+  | 'TILEMAP_TILE_PICKER'
+  | 'TILEMAP_ERASE'
+  | 'TILEMAP_FLIP_HORIZONTALLY'
+  | 'TILEMAP_FLIP_VERTICALLY'
+  | 'IN_GAME_EDITOR_TRANSLATE_MODE'
+  | 'IN_GAME_EDITOR_ROTATE_MODE'
+  | 'IN_GAME_EDITOR_SCALE_MODE'
+  | 'IN_GAME_EDITOR_FOCUS_ON_SELECTION'
+  | 'IN_GAME_EDITOR_MOVE_CAMERA_FORWARD'
+  | 'IN_GAME_EDITOR_MOVE_CAMERA_BACKWARD'
+  | 'IN_GAME_EDITOR_MOVE_CAMERA_LEFT'
+  | 'IN_GAME_EDITOR_MOVE_CAMERA_RIGHT'
+  | 'IN_GAME_EDITOR_MOVE_CAMERA_UP'
+  | 'IN_GAME_EDITOR_MOVE_CAMERA_DOWN'
+  | 'IN_GAME_EDITOR_ORBIT_CAMERA';
 
 export const commandAreas = {
   GENERAL: (t`General`: any),
-  IDE: (t`IDE`: any),
   PROJECT: (t`Project`: any),
   SCENE: (t`Scene`: any),
+  SCENE_3D: (t`3D Editor`: any),
+  TILEMAP: (t`Tilemap tools`: any),
   EVENTS: (t`Events`: any),
+  // Only displayed when the IDE runs in development mode.
+  DEVELOPER: (t`Developer`: any),
 };
 
-type CommandArea = $Keys<typeof commandAreas>;
+export type CommandArea = $Keys<typeof commandAreas>;
+
+/**
+ * The areas of the commands displayed to the user, in order: the developer
+ * area is only displayed in development mode.
+ */
+export const getDisplayedCommandAreaNames = (): Array<CommandArea> =>
+  Object.keys(commandAreas).filter(
+    areaName => areaName !== 'DEVELOPER' || Window.isDev()
+  );
 
 type CommandMetadata = {|
   area: CommandArea,
@@ -93,6 +124,13 @@ type CommandMetadata = {|
   noShortcut?: boolean, // If true, command won't show up in shortcuts list
   ghost?: boolean, // If true, command won't show up in palette
   handledByElectron?: boolean, // If true, command shortcut is handled by Electron in desktop app
+  /**
+   * If true, the shortcut is handled by the in-game editor (the game running
+   * in the embedded preview), which has the keyboard focus when it's used.
+   * The IDE ignores these shortcuts, and the ones without modifier can't
+   * clash with the IDE ones.
+   */
+  handledByInGameEditor?: boolean,
 |};
 
 const commandsList: { [CommandName]: CommandMetadata } = {
@@ -103,12 +141,12 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     handledByElectron: true,
   },
   OPEN_PROJECT_MANAGER: {
-    area: 'IDE',
+    area: 'GENERAL',
     displayText: t`Open project manager`,
     handledByElectron: true,
   },
   OPEN_PROFILE: {
-    area: 'IDE',
+    area: 'GENERAL',
     displayText: t`Open My Profile`,
   },
   LAUNCH_NEW_PREVIEW: { area: 'PROJECT', displayText: t`Launch new preview` },
@@ -132,7 +170,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'PROJECT',
     displayText: t`Show diagnostic report`,
   },
-  OPEN_HOME_PAGE: { area: 'IDE', displayText: t`Show Home` },
+  OPEN_HOME_PAGE: { area: 'GENERAL', displayText: t`Show Home` },
   CREATE_NEW_PROJECT: {
     area: 'GENERAL',
     displayText: t`Create a new project`,
@@ -182,16 +220,16 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Open recent project...`,
   },
   OPEN_COMMAND_PALETTE: {
-    area: 'IDE',
+    area: 'GENERAL',
     displayText: t`Open command palette`,
     ghost: true,
   },
   RESTART_IN_GAME_EDITOR: {
-    area: 'IDE',
+    area: 'SCENE_3D',
     displayText: t`Restart 3D editor`,
   },
   INSTALL_CLI_IN_PATH: {
-    area: 'IDE',
+    area: 'GENERAL',
     displayText: t`Install GDevelop CLI in PATH`,
     noShortcut: true,
   },
@@ -227,23 +265,23 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     noShortcut: true,
   },
   OPEN_GLOBAL_SEARCH: {
-    area: 'IDE',
+    area: 'GENERAL',
     displayText: t`Global search (search in project)`,
   },
 
   // Tab-opening commands
-  OPEN_LAYOUT: { area: 'IDE', displayText: t`Open scene...` },
+  OPEN_LAYOUT: { area: 'GENERAL', displayText: t`Open scene...` },
   OPEN_EXTERNAL_EVENTS: {
-    area: 'IDE',
+    area: 'GENERAL',
     displayText: t`Open external events...`,
   },
   OPEN_EXTERNAL_LAYOUT: {
-    area: 'IDE',
+    area: 'GENERAL',
     displayText: t`Open external layout...`,
   },
-  OPEN_EXTENSION: { area: 'IDE', displayText: t`Open extension...` },
+  OPEN_EXTENSION: { area: 'GENERAL', displayText: t`Open extension...` },
   OPEN_GAMEPLAY_TEST: {
-    area: 'IDE',
+    area: 'GENERAL',
     displayText: t`Open gameplay test...`,
   },
   RUN_GAMEPLAY_TEST: {
@@ -388,11 +426,123 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Open extension settings`,
   },
 
+  // Tile map painting tools (shown when painting a tile map in the scene editor)
+  TILEMAP_FREEHAND_BRUSH: {
+    area: 'TILEMAP',
+    displayText: t`Freehand tile brush`,
+  },
+  TILEMAP_RECTANGLE_PAINT: {
+    area: 'TILEMAP',
+    displayText: t`Rectangle tile paint`,
+  },
+  TILEMAP_FILL_BUCKET: {
+    area: 'TILEMAP',
+    displayText: t`Tile fill bucket`,
+  },
+  TILEMAP_TILE_PICKER: {
+    area: 'TILEMAP',
+    displayText: t`Tile picker`,
+  },
+  TILEMAP_ERASE: {
+    area: 'TILEMAP',
+    displayText: t`Tile eraser`,
+  },
+  TILEMAP_FLIP_HORIZONTALLY: {
+    area: 'TILEMAP',
+    displayText: t`Flip tile horizontally`,
+  },
+  TILEMAP_FLIP_VERTICALLY: {
+    area: 'TILEMAP',
+    displayText: t`Flip tile vertically`,
+  },
+
+  // In-game (3D) editor commands. Their shortcuts are handled by the game
+  // running in the embedded preview: the IDE only sends them the shortcuts.
+  IN_GAME_EDITOR_TRANSLATE_MODE: {
+    area: 'SCENE_3D',
+    displayText: t`Move tool`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_ROTATE_MODE: {
+    area: 'SCENE_3D',
+    displayText: t`Rotate tool`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_SCALE_MODE: {
+    area: 'SCENE_3D',
+    displayText: t`Scale tool`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_FOCUS_ON_SELECTION: {
+    area: 'SCENE_3D',
+    displayText: t`Focus the camera on the selection`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_MOVE_CAMERA_FORWARD: {
+    area: 'SCENE_3D',
+    displayText: t`Move the camera forward`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_MOVE_CAMERA_BACKWARD: {
+    area: 'SCENE_3D',
+    displayText: t`Move the camera backward`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_MOVE_CAMERA_LEFT: {
+    area: 'SCENE_3D',
+    displayText: t`Move the camera to the left`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_MOVE_CAMERA_RIGHT: {
+    area: 'SCENE_3D',
+    displayText: t`Move the camera to the right`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_MOVE_CAMERA_UP: {
+    area: 'SCENE_3D',
+    displayText: t`Move the camera up`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_MOVE_CAMERA_DOWN: {
+    area: 'SCENE_3D',
+    displayText: t`Move the camera down`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+  IN_GAME_EDITOR_ORBIT_CAMERA: {
+    area: 'SCENE_3D',
+    displayText: t`Orbit mode`,
+    ghost: true,
+    handledByInGameEditor: true,
+  },
+
   // Debug commands
   OPEN_MEMORY_TRACKER_REGISTRY: {
-    area: 'IDE',
+    area: 'DEVELOPER',
     displayText: t`Open memory tracker registry`,
+    // A tool for the developers of GDevelop: hidden from the palette (and
+    // from the shortcuts list, like the whole area) in production.
+    ghost: !Window.isDev(),
   },
 };
+
+/**
+ * The names of the commands whose shortcuts are handled by the in-game editor.
+ * The shortcuts of these commands are sent to the in-game editor (see
+ * `InGameEditorSettings`) instead of being handled by the IDE.
+ */
+export const getCommandNamesHandledByInGameEditor = (): Array<CommandName> =>
+  Object.keys(commandsList).filter(
+    commandName => !!commandsList[commandName].handledByInGameEditor
+  );
 
 export default commandsList;

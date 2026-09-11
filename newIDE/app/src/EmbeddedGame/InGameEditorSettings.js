@@ -1,6 +1,11 @@
 // @flow
 import * as React from 'react';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { useShortcutMap } from '../KeyboardShortcuts';
+import {
+  getCommandNamesHandledByInGameEditor,
+  type CommandName,
+} from '../CommandPalette/CommandsList';
 
 export type InGameEditorSettings = {
   theme: {
@@ -10,7 +15,15 @@ export type InGameEditorSettings = {
     toolbarSeparatorColor: string,
     textColorPrimary: string,
   },
+  /**
+   * The shortcuts handled by the in-game editor, by command name, in the same
+   * format as the IDE shortcuts (for example "Shift+KeyW"). An empty string
+   * means that the command has no shortcut.
+   */
+  shortcuts: { [CommandName]: string },
 };
+
+const commandNamesHandledByInGameEditor = getCommandNamesHandledByInGameEditor();
 
 /**
  * Generate the settings sent to the in-game editor, either at preview launch
@@ -25,6 +38,19 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
   const toolbarSeparatorColor = gdevelopTheme.toolbar.separatorColor;
   const textColorPrimary = gdevelopTheme.text.color.primary;
 
+  const shortcutMap = useShortcutMap();
+  const shortcuts = React.useMemo(
+    () =>
+      commandNamesHandledByInGameEditor.reduce(
+        (shortcuts: { [CommandName]: string }, commandName) => {
+          shortcuts[commandName] = shortcutMap[commandName] || '';
+          return shortcuts;
+        },
+        {}
+      ),
+    [shortcutMap]
+  );
+
   const inGameEditorSettings = React.useMemo<InGameEditorSettings>(
     () => ({
       theme: {
@@ -34,6 +60,7 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
         toolbarSeparatorColor,
         textColorPrimary,
       },
+      shortcuts,
     }),
     [
       iconButtonSelectedBackgroundColor,
@@ -41,6 +68,7 @@ export const useInGameEditorSettings = (): InGameEditorSettings => {
       toolbarBackgroundColor,
       toolbarSeparatorColor,
       textColorPrimary,
+      shortcuts,
     ]
   );
 

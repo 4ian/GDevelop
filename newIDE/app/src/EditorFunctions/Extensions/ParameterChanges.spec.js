@@ -7,8 +7,8 @@ import {
   type ToolScope,
 } from '../Scope';
 import {
-  applyParameterChanges,
   applyParameterSpecs,
+  applyPlannedParameterChanges,
   getPlannedUserParametersCount,
   planParameterChanges,
   PARAMETER_TYPES,
@@ -171,12 +171,19 @@ describe('ParameterChanges', () => {
       functionResult.eventsFunction
     );
     try {
-      return applyParameterChanges({
+      // Every change is checked first: nothing is applied when one is refused.
+      const plannedChangesResult = planParameterChanges({
+        resolvedScope,
+        eventsFunction: functionResult.eventsFunction,
+        changes,
+      });
+      if (!plannedChangesResult.success) return plannedChangesResult;
+      return applyPlannedParameterChanges({
         project,
         resolvedScope,
         eventsFunction: functionResult.eventsFunction,
         accessor,
-        changes,
+        plannedChanges: plannedChangesResult.plannedChanges,
       });
     } finally {
       dispose();

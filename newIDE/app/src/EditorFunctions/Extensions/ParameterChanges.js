@@ -671,39 +671,6 @@ export const planParameterChanges = ({
 };
 
 /**
- * Create, edit, move and delete the parameters of a function, updating the
- * events using them. Every change is checked first: nothing is applied when
- * one of them is refused.
- */
-export const applyParameterChanges = ({
-  project,
-  resolvedScope,
-  eventsFunction,
-  accessor,
-  changes,
-}: {|
-  project: gdProject,
-  resolvedScope: ResolvedScope,
-  eventsFunction: gdEventsFunction,
-  accessor: ProjectScopedContainersAccessor,
-  changes: Array<ParameterChange>,
-|}): ParameterChangesResult => {
-  const plannedChangesResult = planParameterChanges({
-    resolvedScope,
-    eventsFunction,
-    changes,
-  });
-  if (!plannedChangesResult.success) return plannedChangesResult;
-  return applyPlannedParameterChanges({
-    project,
-    resolvedScope,
-    eventsFunction,
-    accessor,
-    plannedChanges: plannedChangesResult.plannedChanges,
-  });
-};
-
-/**
  * The objects declared by the parameters of the function, taken from the
  * project scoped containers themselves: the refactorers only rename an object
  * parameter in the events when they are given that very container.

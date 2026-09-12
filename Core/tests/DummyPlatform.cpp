@@ -489,6 +489,21 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
           "GetVariableAsNumber", "Get me a variable value", "", "", "")
       .AddParameter("scenevar", "Scene variable")
       .SetFunctionName("returnVariable");
+  extension
+      ->AddExpression(
+          "GetAnyVariableAsNumber", "Get me a variable value", "", "", "")
+      .AddParameter("variable", "Variable")
+      .SetFunctionName("getAnyVariableAsNumber");
+  extension
+      ->AddExpression(
+          "GetPrimitiveVariableAsNumber", "Get me a variable value", "", "", "")
+      .AddParameter("variable", "Variable", "primitive")
+      .SetFunctionName("getPrimitiveVariableAsNumber");
+  extension
+      ->AddExpression(
+          "GetCollectionVariableAsNumber", "Get me a variable value", "", "", "")
+      .AddParameter("variable", "Variable", "collection")
+      .SetFunctionName("getCollectionVariableAsNumber");
   extension->AddStrExpression("ToString", "ToString", "", "", "")
       .AddParameter("expression", "Number to convert to string")
       .SetFunctionName("toString");

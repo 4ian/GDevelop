@@ -1008,8 +1008,9 @@ class GD_CORE_API ExpressionCompletionFinder
           bool isCollection =
               (variable.GetType() == gd::Variable::Type::Structure ||
                variable.GetType() == gd::Variable::Type::Array);
-          if ((variableTypeConstraint != "collection" && !isCollection) ||
-              (variableTypeConstraint != "primitive" && isCollection)) {
+          // Primitive children might be found inside collection children.
+          // So, we always show children that are collections.
+          if (variableTypeConstraint != "collection" && !isCollection) {
             ExpressionCompletionDescription description(
                 ExpressionCompletionDescription::Variable,
                 location.GetStartPosition(), location.GetEndPosition());
@@ -1125,8 +1126,9 @@ class GD_CORE_API ExpressionCompletionFinder
           bool isCollection =
               (variable.GetType() == gd::Variable::Type::Structure ||
                variable.GetType() == gd::Variable::Type::Array);
-          if ((extraInfo == "collection" && !isCollection) ||
-              (extraInfo == "primitive" && isCollection)) {
+          // Primitive children might be found inside collection children.
+          // So, we always show children that are collections.
+          if (extraInfo == "collection" && !isCollection) {
             return;
           }
           ExpressionCompletionDescription description(

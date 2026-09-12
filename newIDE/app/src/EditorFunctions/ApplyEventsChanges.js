@@ -1,5 +1,8 @@
 // @flow
-import { unserializeFromJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import {
   type AiGeneratedEventChange,
   type AiGeneratedEventUndeclaredVariable,
@@ -7,6 +10,7 @@ import {
 } from '../Utils/GDevelopServices/Generation';
 import { mapFor } from '../Utils/MapFor';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
+import { updateBehaviorsSharedDataInScope, type ResolvedScope } from './Scope';
 import type { EventPath } from '../Utils/EventPath';
 
 const gd: libGDevelop = global.gd;
@@ -164,6 +168,58 @@ const getEventByPath = (
   );
   // Bounds check already done by getParentListAndIndex for 'access'
   return parentList.getEventAt(eventIndexInParentList);
+};
+
+const JS_CODE_EVENT_TYPE = 'BuiltinCommonInstructions::JsCode';
+
+/**
+ * The settings of a JavaScript code event that the events generation never
+ * describes: it always serializes the default ones. When such an event replaces
+ * an existing one, they are kept from the replaced event.
+ */
+const JS_CODE_EVENT_SETTINGS_KEPT_WHEN_REPLACED = [
+  'useStrict',
+  'eventsSheetExpanded',
+];
+
+/**
+ * True for the operations replacing an existing event by the generated one.
+ */
+const isEventReplacedByGeneratedEvents = (operationName: string): boolean =>
+  operationName === 'insert_and_replace_event' ||
+  operationName === 'replace_entire_event_and_sub_events' ||
+  operationName === 'replace_event_but_keep_existing_sub_events';
+
+/**
+ * When a generated JavaScript code event replaces an existing one, keep the
+ * settings of the replaced event that the generation can't describe. This is done
+ * on the serialized generated events, as these settings have no setter in the editor.
+ */
+const keepReplacedJsCodeEventSettings = ({
+  rootEventsList,
+  replacedEventPath,
+  generatedEventsContent,
+}: {|
+  rootEventsList: gdEventsList,
+  replacedEventPath: EventPath,
+  generatedEventsContent: Array<Object>,
+|}): void => {
+  const generatedEvent = generatedEventsContent[0];
+  if (!generatedEvent || generatedEvent.type !== JS_CODE_EVENT_TYPE) return;
+
+  let replacedEvent = null;
+  try {
+    replacedEvent = getEventByPath(rootEventsList, replacedEventPath);
+  } catch (error) {
+    // An invalid path is reported when the operation is applied.
+    return;
+  }
+  if (replacedEvent.getType() !== JS_CODE_EVENT_TYPE) return;
+
+  const serializedReplacedEvent = serializeToJSObject(replacedEvent);
+  JS_CODE_EVENT_SETTINGS_KEPT_WHEN_REPLACED.forEach(settingName => {
+    generatedEvent[settingName] = serializedReplacedEvent[settingName];
+  });
 };
 
 type EventOperationType =
@@ -392,6 +448,13 @@ export const applyEventsChanges = (
 
       if (generatedEvents && operationName !== 'delete_event') {
         const eventsListContent = JSON.parse(generatedEvents);
+        if (parsedPath && isEventReplacedByGeneratedEvents(operationName)) {
+          keepReplacedJsCodeEventSettings({
+            rootEventsList: sceneEvents,
+            replacedEventPath: parsedPath,
+            generatedEventsContent: eventsListContent,
+          });
+        }
         localEventsToInsert = new gd.EventsList();
         unserializeFromJSObject(
           localEventsToInsert,
@@ -916,82 +979,181 @@ export const applyEventsChanges = (
   return { applied, errors };
 };
 
+/**
+ * The variables container an undeclared variable must be declared in: the
+ * project or the scene for a scene, the two containers of the extension for
+ * a function of an extension (there is no scene nor project variable
+ * reachable from a function). Null when the scope has no such container, or
+ * when the required scope is not one the generator can ask for.
+ */
+const getUndeclaredVariableContainer = (
+  project: gdProject,
+  resolvedScope: ResolvedScope,
+  requiredScope: string
+): gdVariablesContainer | null => {
+  const isGlobal = requiredScope === 'global';
+  const isScene = requiredScope === 'scene' || requiredScope === 'none';
+  if (!isGlobal && !isScene) return null;
+
+  const { layout, eventsFunctionsExtension } = resolvedScope;
+  if (layout) {
+    return isGlobal ? project.getVariables() : layout.getVariables();
+  }
+  if (eventsFunctionsExtension) {
+    // Inside a function, the extension variables are the only ones that can
+    // be declared. The generator is not supposed to ask for any (it emits a
+    // diagnostic naming the parameters, properties and extension variables
+    // instead), but a variable must never end up in a wrong container.
+    return isGlobal
+      ? eventsFunctionsExtension.getGlobalVariables()
+      : eventsFunctionsExtension.getSceneVariables();
+  }
+  return null;
+};
+
+const castVariableToType = (variable: gdVariable, type: string) => {
+  const lowerCaseType = type.toLowerCase();
+  variable.castTo(
+    lowerCaseType === 'string'
+      ? 'string'
+      : lowerCaseType === 'boolean'
+      ? 'boolean'
+      : lowerCaseType === 'array'
+      ? 'array'
+      : lowerCaseType === 'structure'
+      ? 'structure'
+      : 'number'
+  );
+};
+
 export const addUndeclaredVariables = ({
   project,
-  scene,
+  resolvedScope,
   undeclaredVariables,
 }: {|
   project: gdProject,
-  scene: gdLayout,
+  resolvedScope: ResolvedScope,
   undeclaredVariables: Array<AiGeneratedEventUndeclaredVariable>,
 |}) => {
   undeclaredVariables.forEach(variable => {
     const { name, type, requiredScope } = variable;
-    let newVariable = null;
-    if (requiredScope === 'global') {
-      if (!project.getVariables().has(name)) {
-        newVariable = project.getVariables().insertNew(name, 0);
-      }
-    } else if (requiredScope === 'scene' || requiredScope === 'none') {
-      if (!scene.getVariables().has(name)) {
-        newVariable = scene.getVariables().insertNew(name, 0);
-      }
-    } else {
+    const variablesContainer = getUndeclaredVariableContainer(
+      project,
+      resolvedScope,
+      requiredScope
+    );
+    if (!variablesContainer) {
       console.warn(
         `Unknown requiredScope for undeclared variable: ${name}. Skipping.`
       );
+      return;
     }
 
-    if (newVariable && type) {
-      const lowerCaseType = type.toLowerCase();
-      newVariable.castTo(
-        lowerCaseType === 'string'
-          ? 'string'
-          : lowerCaseType === 'boolean'
-          ? 'boolean'
-          : lowerCaseType === 'array'
-          ? 'array'
-          : lowerCaseType === 'structure'
-          ? 'structure'
-          : 'number'
+    if (variablesContainer.has(name)) return;
+    const newVariable = variablesContainer.insertNew(name, 0);
+    if (type) castVariableToType(newVariable, type);
+  });
+};
+
+/**
+ * The child objects a name designates inside a function of an extension: a
+ * child object of the custom object owning the function, or every child of a
+ * group of them. Empty for `Object` and for the object parameters of the
+ * function: they are picked at runtime and own no variable nor behavior (the
+ * generator is told to use a `behavior` parameter or a property instead).
+ */
+const getChildObjectsInScope = (
+  resolvedScope: ResolvedScope,
+  objectName: string
+): Array<gdObject> => {
+  const { eventsBasedObject } = resolvedScope;
+  if (!eventsBasedObject) return [];
+  // The children of the default variant hold the structure of the custom
+  // object: the named variants are complied to them afterwards.
+  const childObjects = eventsBasedObject.getObjects();
+  if (childObjects.hasObjectNamed(objectName)) {
+    return [childObjects.getObject(objectName)];
+  }
+  const objectGroups = childObjects.getObjectGroups();
+  if (objectGroups.has(objectName)) {
+    return objectGroups
+      .get(objectName)
+      .getAllObjectsNames()
+      .toJSArray()
+      .filter(childName => childObjects.hasObjectNamed(childName))
+      .map(childName => childObjects.getObject(childName));
+  }
+  return [];
+};
+
+const setupVariable = (variable: gdVariable, type: string | null) => {
+  if (!type) {
+    return;
+  }
+  castVariableToType(variable, type);
+};
+
+/**
+ * Declare the object variables of a generated event inside a function of an
+ * extension: only a child object of the custom object owning the function can
+ * receive them.
+ */
+const addChildObjectUndeclaredVariables = ({
+  resolvedScope,
+  objectName,
+  undeclaredVariables,
+}: {|
+  resolvedScope: ResolvedScope,
+  objectName: string,
+  undeclaredVariables: Array<AiGeneratedEventUndeclaredVariable>,
+|}) => {
+  const childObjects = getChildObjectsInScope(resolvedScope, objectName);
+  if (childObjects.length === 0) {
+    console.warn(
+      `Object "${objectName}" is not a child object of ${
+        resolvedScope.label
+      }: its variable(s) cannot be declared there. Skipping.`
+    );
+    return;
+  }
+
+  undeclaredVariables.forEach(undeclaredVariable => {
+    childObjects.forEach(childObject => {
+      const variablesContainer = childObject.getVariables();
+      if (variablesContainer.has(undeclaredVariable.name)) return;
+      setupVariable(
+        variablesContainer.insertNew(undeclaredVariable.name, 0),
+        undeclaredVariable.type
       );
-    }
+    });
   });
 };
 
 export const addObjectUndeclaredVariables = ({
   project,
-  scene,
+  resolvedScope,
   objectName,
   undeclaredVariables,
 }: {|
   project: gdProject,
-  scene: gdLayout,
+  resolvedScope: ResolvedScope,
   objectName: string,
   undeclaredVariables: Array<AiGeneratedEventUndeclaredVariable>,
 |}) => {
+  const scene = resolvedScope.layout;
+  if (!scene) {
+    addChildObjectUndeclaredVariables({
+      resolvedScope,
+      objectName,
+      undeclaredVariables,
+    });
+    return;
+  }
+
   const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
     project,
     scene
   );
-
-  const setupVariable = (variable: gdVariable, type: string | null) => {
-    if (!type) {
-      return;
-    }
-    const lowerCaseType = type.toLowerCase();
-    variable.castTo(
-      lowerCaseType === 'string'
-        ? 'string'
-        : lowerCaseType === 'boolean'
-        ? 'boolean'
-        : lowerCaseType === 'array'
-        ? 'array'
-        : lowerCaseType === 'structure'
-        ? 'structure'
-        : 'number'
-    );
-  };
 
   const addVariableForObjectsOfGroup = (
     group: gdObjectGroup,
@@ -1078,17 +1240,121 @@ export const addObjectUndeclaredVariables = ({
   });
 };
 
-export const addMissingObjectBehaviors = ({
+/**
+ * Whether a missing behavior can be added at all: an unknown type or a
+ * default capability (always there, not addable) is skipped with a warning.
+ */
+const canAddMissingBehavior = (
+  project: gdProject,
+  missingBehavior: AiGeneratedEventMissingObjectBehavior,
+  objectName: string
+): boolean => {
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    project.getCurrentPlatform(),
+    missingBehavior.type
+  );
+
+  if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+    console.warn(`Unknown behavior type: "${missingBehavior.type}". Skipping.`);
+    return false;
+  }
+
+  if (isBehaviorDefaultCapability(behaviorMetadata)) {
+    console.warn(
+      `Behavior "${missingBehavior.name}" of type "${
+        missingBehavior.type
+      }" is a default capability and cannot be added to object "${objectName}".`
+    );
+    return false;
+  }
+
+  return true;
+};
+
+const addBehaviorToObject = (
+  project: gdProject,
+  object: gdObject,
+  behaviorName: string,
+  behaviorType: string
+) => {
+  if (object.hasBehaviorNamed(behaviorName)) {
+    return;
+  }
+
+  gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+    project,
+    object,
+    behaviorType,
+    behaviorName
+  );
+};
+
+/**
+ * Add the behaviors a generated event needs to a child object of the custom
+ * object owning the function. `Object` and the object parameters never get
+ * one: a parameter cannot receive a behavior (the fix is a `behavior`
+ * parameter or a `Behavior` property of the object/behavior).
+ */
+const addMissingChildObjectBehaviors = ({
   project,
-  scene,
+  resolvedScope,
   objectName,
   missingBehaviors,
 }: {|
   project: gdProject,
-  scene: gdLayout,
+  resolvedScope: ResolvedScope,
   objectName: string,
   missingBehaviors: Array<AiGeneratedEventMissingObjectBehavior>,
 |}) => {
+  const childObjects = getChildObjectsInScope(resolvedScope, objectName);
+  if (childObjects.length === 0) {
+    console.warn(
+      `Object "${objectName}" is not a child object of ${
+        resolvedScope.label
+      }: behavior(s) cannot be added to it (a parameter or "Object" cannot have a behavior added). Skipping.`
+    );
+    return;
+  }
+
+  missingBehaviors.forEach(missingBehavior => {
+    if (!canAddMissingBehavior(project, missingBehavior, objectName)) return;
+
+    childObjects.forEach(childObject => {
+      addBehaviorToObject(
+        project,
+        childObject,
+        missingBehavior.name,
+        missingBehavior.type
+      );
+    });
+  });
+  // A child object can be used in any scene: refresh the shared data of the
+  // whole project (there is no scene to refresh here).
+  updateBehaviorsSharedDataInScope(project, resolvedScope);
+};
+
+export const addMissingObjectBehaviors = ({
+  project,
+  resolvedScope,
+  objectName,
+  missingBehaviors,
+}: {|
+  project: gdProject,
+  resolvedScope: ResolvedScope,
+  objectName: string,
+  missingBehaviors: Array<AiGeneratedEventMissingObjectBehavior>,
+|}) => {
+  const scene = resolvedScope.layout;
+  if (!scene) {
+    addMissingChildObjectBehaviors({
+      project,
+      resolvedScope,
+      objectName,
+      missingBehaviors,
+    });
+    return;
+  }
+
   const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
     project,
     scene
@@ -1099,23 +1365,6 @@ export const addMissingObjectBehaviors = ({
     .getBehaviorsOfObject(objectName, true)
     .toJSArray();
 
-  const addBehaviorToObject = (
-    object: gdObject,
-    behaviorName: string,
-    behaviorType: string
-  ) => {
-    if (object.hasBehaviorNamed(behaviorName)) {
-      return;
-    }
-
-    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
-      project,
-      object,
-      behaviorType,
-      behaviorName
-    );
-  };
-
   const addBehaviorToObjectGroup = (
     group: gdObjectGroup,
     behaviorName: string,
@@ -1125,10 +1374,10 @@ export const addMissingObjectBehaviors = ({
     objectNames.forEach(objectName => {
       if (scene.getObjects().hasObjectNamed(objectName)) {
         const object = scene.getObjects().getObject(objectName);
-        addBehaviorToObject(object, behaviorName, behaviorType);
+        addBehaviorToObject(project, object, behaviorName, behaviorType);
       } else if (project.getObjects().hasObjectNamed(objectName)) {
         const object = project.getObjects().getObject(objectName);
-        addBehaviorToObject(object, behaviorName, behaviorType);
+        addBehaviorToObject(project, object, behaviorName, behaviorType);
       }
     });
   };
@@ -1139,30 +1388,16 @@ export const addMissingObjectBehaviors = ({
       return;
     }
 
-    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-      project.getCurrentPlatform(),
-      missingBehavior.type
-    );
-
-    if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
-      console.warn(
-        `Unknown behavior type: "${missingBehavior.type}". Skipping.`
-      );
-      return;
-    }
-
-    if (isBehaviorDefaultCapability(behaviorMetadata)) {
-      console.warn(
-        `Behavior "${missingBehavior.name}" of type "${
-          missingBehavior.type
-        }" is a default capability and cannot be added to object "${objectName}".`
-      );
-      return;
-    }
+    if (!canAddMissingBehavior(project, missingBehavior, objectName)) return;
 
     if (scene.getObjects().hasObjectNamed(objectName)) {
       const object = scene.getObjects().getObject(objectName);
-      addBehaviorToObject(object, missingBehavior.name, missingBehavior.type);
+      addBehaviorToObject(
+        project,
+        object,
+        missingBehavior.name,
+        missingBehavior.type
+      );
     } else if (
       scene
         .getObjects()
@@ -1181,7 +1416,12 @@ export const addMissingObjectBehaviors = ({
       );
     } else if (project.getObjects().hasObjectNamed(objectName)) {
       const object = project.getObjects().getObject(objectName);
-      addBehaviorToObject(object, missingBehavior.name, missingBehavior.type);
+      addBehaviorToObject(
+        project,
+        object,
+        missingBehavior.name,
+        missingBehavior.type
+      );
     } else if (
       project
         .getObjects()

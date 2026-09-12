@@ -10,6 +10,7 @@ import type {
   ObjectsOutsideEditorChanges,
   ObjectGroupsOutsideEditorChanges,
   WillDeleteObjectChanges,
+  ExtensionsOutsideEditorChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type HotReloadSteps } from '../../EmbeddedGame/EmbeddedGameFrame';
@@ -97,6 +98,10 @@ export class GlobalEventsSearchEditorContainer extends React.Component<RenderEdi
   }
 
   onWillDeleteObject(changes: WillDeleteObjectChanges) {
+    // Nothing to do.
+  }
+
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
     // Nothing to do.
   }
 

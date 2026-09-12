@@ -21,6 +21,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -1918,6 +1919,71 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
+  SECTION("Variant removed (in events-based object)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().InsertNew(
+            "MyEventsBasedObject", 0);
+    eventsBasedObject.GetVariants().InsertNewVariant("Dark", 0);
+    eventsBasedObject.GetVariants().InsertNewVariant("Light", 1);
+    const gd::String customObjectType =
+        "MyEventsExtension::MyEventsBasedObject";
+
+    auto setVariant = [](gd::Object &object, const gd::String &variantName) {
+      auto *configuration = dynamic_cast<gd::CustomObjectConfiguration *>(
+          &object.GetConfiguration());
+      REQUIRE(configuration != nullptr);
+      configuration->SetVariantName(variantName);
+    };
+    auto getVariant = [](const gd::Object &object) {
+      return dynamic_cast<const gd::CustomObjectConfiguration &>(
+                 object.GetConfiguration())
+          .GetVariantName();
+    };
+
+    // A scene object, a global object and a child of another events-based
+    // object use the "Dark" variant; one more object uses "Light".
+    auto &layout = project.InsertNewLayout("Scene", 0);
+    auto &sceneObject = layout.GetObjects().InsertNewObject(
+        project, customObjectType, "SceneObject", 0);
+    setVariant(sceneObject, "Dark");
+    auto &lightObject = layout.GetObjects().InsertNewObject(
+        project, customObjectType, "LightObject", 1);
+    setVariant(lightObject, "Light");
+    auto &globalObject = project.GetObjects().InsertNewObject(
+        project, customObjectType, "GlobalObject", 0);
+    setVariant(globalObject, "Dark");
+    auto &parentEventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().InsertNew("Parent", 1);
+    auto &childObject = parentEventsBasedObject.GetObjects().InsertNewObject(
+        project, customObjectType, "Child", 0);
+    setVariant(childObject, "Dark");
+    parentEventsBasedObject.GetVariants().InsertVariant(
+        parentEventsBasedObject.GetDefaultVariant(), 0);
+    auto &parentVariant = parentEventsBasedObject.GetVariants().GetVariant(0);
+    parentVariant.SetName("ParentVariant");
+
+    gd::WholeProjectRefactorer::RemoveEventsBasedObjectVariant(
+        project, eventsExtension, eventsBasedObject, "Dark");
+
+    REQUIRE(eventsBasedObject.GetVariants().HasVariantNamed("Dark") == false);
+    REQUIRE(eventsBasedObject.GetVariants().HasVariantNamed("Light") == true);
+    REQUIRE(getVariant(sceneObject) == "");
+    REQUIRE(getVariant(globalObject) == "");
+    REQUIRE(getVariant(childObject) == "");
+    REQUIRE(getVariant(parentVariant.GetObjects().GetObject("Child")) == "");
+    REQUIRE(getVariant(lightObject) == "Light");
+
+    // The default variant can't be removed.
+    gd::WholeProjectRefactorer::RemoveEventsBasedObjectVariant(
+        project, eventsExtension, eventsBasedObject, "");
+    REQUIRE(eventsBasedObject.GetVariants().GetVariantsCount() == 1);
+  }
+
   SECTION("Object deleted (in events-based object)") {
     SECTION("Groups") {
       gd::Project project;
@@ -2820,6 +2886,188 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedObject.GetObjectStringWith1Param(0)])");
   }
 
+  SECTION("(Free function) object parameter of a getter renamed (in the events "
+          "of its action with operator)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &getter = eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "MyScoreExpression", 0);
+    getter.SetFunctionType(gd::EventsFunction::Expression);
+    getter.GetParameters()
+        .AddNewParameter("MyObject")
+        .GetValueTypeMetadata()
+        .SetName("objectList")
+        .SetExtraInfo("MyExtension::Sprite");
+    // The setter declares no parameter: its events use the ones of its getter.
+    auto &setter = eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "SetMyScoreExpression", 1);
+    setter.SetFunctionType(gd::EventsFunction::ActionWithOperator);
+    setter.SetGetterName("MyScoreExpression");
+    auto &instruction = CreateInstructionWithObjectParameter(
+        project, setter.GetEvents(), "MyObject");
+    auto &instruction2 = CreateInstructionWithNumberParameter(
+        project, setter.GetEvents(), "MyObject.GetObjectStringWith1Param(0)");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, setter, parametersObjectsContainer,
+            parameterVariablesContainer, parameterResourcesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, setter, parametersObjectsContainer,
+        "MyObject", "MyRenamedObject");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedObject");
+    REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
+            "MyRenamedObject.GetObjectStringWith1Param(0)");
+  }
+
+  SECTION("(Free function) number parameter of a getter renamed (in the events "
+          "of its action with operator)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &getter = eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "MyScoreExpression", 0);
+    getter.SetFunctionType(gd::EventsFunction::Expression);
+    getter.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    auto &setter = eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "SetMyScoreExpression", 1);
+    setter.SetFunctionType(gd::EventsFunction::ActionWithOperator);
+    setter.SetGetterName("MyScoreExpression");
+    auto &instruction = CreateInstructionWithNumberParameter(
+        project, setter.GetEvents(), "MyParameter + Value");
+    auto &instruction2 = CreateNumberVariableSetterAction(
+        project, setter.GetEvents(), "MyParameter", "123");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, setter, parametersObjectsContainer,
+            parameterVariablesContainer, parameterResourcesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, setter, parametersObjectsContainer,
+        "MyParameter", "MyRenamedParameter");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedParameter + Value");
+    REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
+            "MyRenamedParameter");
+  }
+
+  SECTION("(Free function) behavior parameter of a getter renamed (in the "
+          "events of its action with operator)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &getter = eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "MyScoreExpression", 0);
+    getter.SetFunctionType(gd::EventsFunction::Expression);
+    getter.GetParameters()
+        .AddNewParameter("MyObject")
+        .GetValueTypeMetadata()
+        .SetName("objectList")
+        .SetExtraInfo("MyExtension::Sprite");
+    getter.GetParameters()
+        .AddNewParameter("MyBehavior")
+        .GetValueTypeMetadata()
+        .SetName("behavior")
+        .SetExtraInfo("MyExtension::MyBehavior");
+    // The parameters the events of the setter use are the ones of the getter
+    // with a generated "Value" first: the object of the behavior parameter
+    // must be found in that list.
+    auto &setter = eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "SetMyScoreExpression", 1);
+    setter.SetFunctionType(gd::EventsFunction::ActionWithOperator);
+    setter.SetGetterName("MyScoreExpression");
+    auto &instruction = CreateInstructionWithBehaviorParameter(
+        project, setter.GetEvents(), "MyObject", "MyBehavior");
+    auto &instruction2 = CreateInstructionWithNumberParameter(
+        project, setter.GetEvents(),
+        "MyObject.MyBehavior::GetBehaviorStringWith1Param(0)");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, setter, parametersObjectsContainer,
+            parameterVariablesContainer, parameterResourcesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, setter, parametersObjectsContainer,
+        "MyBehavior", "MyRenamedBehavior");
+
+    REQUIRE(instruction.GetParameter(1).GetPlainString() ==
+            "MyRenamedBehavior");
+    REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
+            "MyObject.MyRenamedBehavior::GetBehaviorStringWith1Param(0)");
+  }
+
+  SECTION("(Free function) parameter type of a getter changed (in the events "
+          "of its action with operator)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &getter = eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "MyScoreExpression", 0);
+    getter.SetFunctionType(gd::EventsFunction::Expression);
+    getter.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    auto &setter = eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "SetMyScoreExpression", 1);
+    setter.SetFunctionType(gd::EventsFunction::ActionWithOperator);
+    setter.SetGetterName("MyScoreExpression");
+    // The type switcher already resolves the parameter through the scoped
+    // containers: this guards that the setter keeps being handled.
+    // The parameter was of type "string".
+    auto &instruction = CreateStringVariableSetterAction(
+        project, setter.GetEvents(), "MyParameter", "123");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, setter, parametersObjectsContainer,
+            parameterVariablesContainer, parameterResourcesContainer);
+    gd::WholeProjectRefactorer::ChangeParameterType(
+        project, projectScopedContainers, setter, parametersObjectsContainer,
+        "MyParameter");
+
+    REQUIRE(instruction.GetType() == "SetNumberVariable");
+  }
+
   SECTION("(Free function) object parameter not renamed (in variable parameter)") {
     gd::Project project;
     gd::Platform platform;
@@ -2980,6 +3228,31 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(action.GetParameter(1).GetPlainString() == "Second parameter");
       REQUIRE(action.GetParameter(2).GetPlainString() == "Third parameter");
       REQUIRE(action.GetParameter(3).GetPlainString() == "First parameter");
+    }
+  }
+
+  SECTION("(Free function) events action with operator parameter moved") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    // The parameters of the action come from its getter: the generated
+    // action takes an operator and a value before them (the indexes given
+    // count the code-only "scene" parameter, like for any free function).
+    gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
+        project, eventsExtension, "MyEventsFunctionActionWithOperator", 1, 2);
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      auto &action = static_cast<const gd::StandardEvent &>(
+                         eventsList->GetEvent(FreeActionWithOperator))
+                         .GetActions()
+                         .Get(0);
+      REQUIRE(action.GetParameter(0).GetPlainString() == "scene");
+      REQUIRE(action.GetParameter(1).GetPlainString() == "+");
+      REQUIRE(action.GetParameter(2).GetPlainString() == "2");
+      REQUIRE(action.GetParameter(3).GetPlainString() == "222");
+      REQUIRE(action.GetParameter(4).GetPlainString() == "111");
     }
   }
 
@@ -3827,6 +4100,35 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
+  SECTION("(Events based behavior) events action with operator parameter moved") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    // The generated action takes an operator and a value after the object and
+    // the behavior, before the parameters of the getter.
+    gd::WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
+        project, eventsExtension, eventsBasedBehavior,
+        "MyBehaviorEventsFunctionActionWithOperator", 2, 3);
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      auto &action = static_cast<const gd::StandardEvent &>(
+                         eventsList->GetEvent(BehaviorActionWithOperator))
+                         .GetActions()
+                         .Get(0);
+      REQUIRE(action.GetParameter(0).GetPlainString() ==
+              "ObjectWithMyBehavior");
+      REQUIRE(action.GetParameter(1).GetPlainString() == "MyBehavior");
+      REQUIRE(action.GetParameter(2).GetPlainString() == "+");
+      REQUIRE(action.GetParameter(3).GetPlainString() == "5");
+      REQUIRE(action.GetParameter(4).GetPlainString() == "222");
+      REQUIRE(action.GetParameter(5).GetPlainString() == "111");
+    }
+  }
+
   SECTION("(Events based object) events action parameter moved") {
     gd::Project project;
     gd::Platform platform;
@@ -3850,6 +4152,33 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(action.GetParameter(1).GetPlainString() == "Second parameter");
       REQUIRE(action.GetParameter(2).GetPlainString() == "Third parameter");
       REQUIRE(action.GetParameter(3).GetPlainString() == "First parameter");
+    }
+  }
+
+  SECTION("(Events based object) events action with operator parameter moved") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().Get("MyEventsBasedObject");
+
+    // The generated action takes an operator and a value after the object,
+    // before the parameters of the getter.
+    gd::WholeProjectRefactorer::MoveObjectEventsFunctionParameter(
+        project, eventsExtension, eventsBasedObject,
+        "MyObjectEventsFunctionActionWithOperator", 1, 2);
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      auto &action = static_cast<const gd::StandardEvent &>(
+                         eventsList->GetEvent(ObjectActionWithOperator))
+                         .GetActions()
+                         .Get(0);
+      REQUIRE(action.GetParameter(0).GetPlainString() == "MyCustomObject");
+      REQUIRE(action.GetParameter(1).GetPlainString() == "+");
+      REQUIRE(action.GetParameter(2).GetPlainString() == "5");
+      REQUIRE(action.GetParameter(3).GetPlainString() == "222");
+      REQUIRE(action.GetParameter(4).GetPlainString() == "111");
     }
   }
 

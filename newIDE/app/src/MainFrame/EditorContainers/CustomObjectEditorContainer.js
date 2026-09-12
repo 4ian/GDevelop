@@ -10,6 +10,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import {
@@ -222,26 +223,50 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // No thing to be done.
   }
 
+  /** True when the changes target the variant of the custom object edited here. */
+  _isTargetingThisVariant(changes: {
+    +eventsBasedObject?: ?gdEventsBasedObject,
+    +variantName?: ?string,
+    ...
+  }): boolean {
+    const eventsBasedObject = this.getEventsBasedObject();
+    return (
+      !!eventsBasedObject &&
+      changes.eventsBasedObject === eventsBasedObject &&
+      (changes.variantName || '') === this.getVariantName()
+    );
+  }
+
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
-    // No thing to be done.
+    if (!this._isTargetingThisVariant(changes)) return;
+    if (this.editor) this.editor.onInstancesModifiedOutsideEditor();
   }
 
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
-    // No thing to be done.
+    if (!this._isTargetingThisVariant(changes)) return;
+    if (this.editor) this.editor.onObjectsModifiedOutsideEditor();
   }
 
   onWillDeleteObject(changes: WillDeleteObjectChanges) {
-    // No thing to be done: `changes.scene` is always a real project layout,
-    // and this editor's own object dialog (if any) is scoped to the custom
-    // object variant's private objects container, which can't be targeted by
-    // this notification. Revisit if object deletion is ever extended to
-    // event-based-object children.
+    if (!this._isTargetingThisVariant(changes)) return;
+    if (this.editor) this.editor.onWillDeleteObject(changes);
   }
 
   onObjectGroupsModifiedOutsideEditor(
     changes: ObjectGroupsOutsideEditorChanges
   ) {
-    // No thing to be done.
+    if (!this._isTargetingThisVariant(changes)) return;
+    if (this.editor) this.editor.onObjectGroupsModifiedOutsideEditor();
+  }
+
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
+    const extensionName = this.getEventsFunctionsExtensionName();
+    if (!extensionName || !changes.extensionNames.includes(extensionName)) {
+      return;
+    }
+    // The properties and children of the edited object may have changed.
+    this._rebuildProjectScopedContainersAccessor();
+    this.forceUpdateEditor();
   }
 
   saveUiSettings = () => {

@@ -98,7 +98,7 @@ public:
     return Move(oldIndex, newIndex);
   };
   std::size_t
-  GetParameterPosition(const gd::ParameterMetadata &parameterMetadata) {
+  GetParameterPosition(const gd::ParameterMetadata &parameterMetadata) const {
     return GetPosition(parameterMetadata);
   };
 

@@ -624,6 +624,30 @@ describe('CustomFunctionFunctions', () => {
       ]);
     });
 
+    it('places the operator and the value before the parameters of the getter in the call form of its setter', async () => {
+      await launchFunction(createCustomFunction, project, {
+        scope: objectScope,
+        function_name: 'Speed',
+        function_type: 'Expression',
+        parameters: [{ name: 'Factor', type: 'expression' }],
+      });
+
+      const { output } = await launchFunction(createCustomFunction, project, {
+        scope: objectScope,
+        function_name: 'SetSpeed',
+        function_type: 'ActionWithOperator',
+        getter_name: 'Speed',
+      });
+
+      expect(output.success).toBe(true);
+      // The generated action is `[Object, operator, value, Factor]`
+      // (`MetadataDeclarationHelper`): the hint follows that layout.
+      expect(output.callForms).toEqual([
+        'MyExt::MyButton::SetSpeed(Object, =, Value, Factor)',
+        'read the value with Object.Speed(Factor)',
+      ]);
+    });
+
     it('refuses an action with operator whose getter does not exist', async () => {
       const { output } = await launchFunction(createCustomFunction, project, {
         scope: objectScope,

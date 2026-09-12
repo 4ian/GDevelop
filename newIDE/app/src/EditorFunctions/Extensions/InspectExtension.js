@@ -522,11 +522,13 @@ export const getCallFormsAndInstructionType = (
   }
 
   if (functionType === 'ActionWithOperator' && simplifiedFunction.getterName) {
+    // The getter is called with its own parameters (named after its
+    // declaration, like the setter form above).
     const getterForm = getExpressionCallForm(
       platform,
       context,
       simplifiedFunction.getterName,
-      []
+      getterFunction ? getterFunction.parameters : []
     );
     if (getterForm) forms.push(`read the value with ${getterForm}`);
   }

@@ -358,10 +358,13 @@ const renderDeclaredInstructionCallForm = (
       : context.owner === 'object'
       ? ['Object']
       : [];
+  // The generated metadata inserts the operator and the value BEFORE the user
+  // parameters (`MetadataDeclarationHelper`), so a setter whose getter takes
+  // parameters is called `Set(Object, =, Value, Param)`.
   const callArguments = [
     ...implicitArguments,
-    ...getUserParameterNames(context, parameters),
     ...(operator ? [operator, 'Value'] : []),
+    ...getUserParameterNames(context, parameters),
   ];
   return `${
     simplifiedFunction.isAsync ? 'await ' : ''

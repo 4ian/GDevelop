@@ -496,7 +496,7 @@ describe('scope of the events and variables functions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toBe(
-        'Object or group "Ghost" not found in custom object "UI::Dialog" (default variant). Existing child objects: "Back", "Label".'
+        'Object or group "Ghost" not found in custom object "UI::Dialog" (default variant). Existing child objects: "Back", "Label". The custom object itself holds properties, not variables (see `change_custom_object`).'
       );
     });
 

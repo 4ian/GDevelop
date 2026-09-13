@@ -9146,7 +9146,7 @@ const resolveVariablesContainers = ({
         ? `Object or group "${object_name}" not found globally. Did you forget to specify scene_name?`
         : `Object or group "${object_name}" not found in ${label}. Existing child objects: ${
             childObjectNames.length > 0 ? childObjectNames.join(', ') : 'none'
-          }.`
+          }. The custom object itself holds properties, not variables (see \`change_custom_object\`).`
     );
   }
   const concernedObjects = concerned.objects;

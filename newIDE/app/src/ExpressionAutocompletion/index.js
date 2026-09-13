@@ -14,7 +14,10 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
-import { getParameterChoiceAutocompletions } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
+import {
+  getParameterChoiceAutocompletions,
+  getEasingChoices,
+} from '../EventsSheet/ParameterFields/ParameterMetadataTools';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
@@ -306,6 +309,10 @@ const getAutocompletionsForText = function(
     autocompletionTexts = getParameterChoiceAutocompletions(
       completionDescription.getParameterMetadata()
     ).map(autocompletion => autocompletion.completion);
+  } else if (type === 'easing') {
+    autocompletionTexts = getEasingChoices(
+      completionDescription.getParameterMetadata()
+    ).map(choice => `"${choice}"`);
   } else if (type === 'objectPointName') {
     const objectName: string = completionDescription.getObjectName();
     if (!objectName) {

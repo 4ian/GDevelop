@@ -110,7 +110,8 @@ const InlineParameterEditor = ({
         parameterIndex
       );
       const ParameterComponent = ParameterRenderingService.getParameterComponent(
-        parameterMetadata.getType()
+        parameterMetadata.getType(),
+        parameterMetadata
       );
       setParameterComponent(ParameterComponent);
       setParameterMetadata(parameterMetadata);

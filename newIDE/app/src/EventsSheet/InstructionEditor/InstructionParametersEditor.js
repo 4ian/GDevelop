@@ -384,7 +384,8 @@ const InstructionParametersEditor: React.ComponentType<{
 
                     const parameterMetadataType = parameterMetadata.getType();
                     const ParameterComponent = ParameterRenderingService.getParameterComponent(
-                      parameterMetadataType
+                      parameterMetadataType,
+                      parameterMetadata
                     );
 
                     // Track the field count on screen, to affect the ref to the

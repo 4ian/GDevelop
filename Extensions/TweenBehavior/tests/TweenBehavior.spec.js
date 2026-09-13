@@ -244,6 +244,42 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(object.getX()).to.be(123);
   });
 
+  it('can play a tween with a duration of 0', () => {
+    object.setPosition(200, 300);
+
+    behavior.addObjectPositionXTween2('MyTween', 600, 'linear', 0, false);
+
+    // Tween actions don't change the value directly.
+    expect(object.getX()).to.be(200);
+    expect(behavior.getValue('MyTween')).to.be(200);
+    expect(behavior.isPlaying('MyTween')).to.be(true);
+    expect(behavior.hasFinished('MyTween')).to.be(false);
+
+    // The tween reaches the end on its first step.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(behavior.isPlaying('MyTween')).to.be(false);
+    expect(behavior.hasFinished('MyTween')).to.be(true);
+    expect(object.getX()).to.be(600);
+    expect(behavior.getValue('MyTween')).to.be(600);
+    expect(behavior.getProgress('MyTween')).to.be(1);
+
+    // The value is not set to the targeted value over and over
+    // after the tween is finished.
+    object.setX(123);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getX()).to.be(123);
+  });
+
+  it('can remove the object at the end of a tween with a duration of 0', () => {
+    object.setPosition(200, 300);
+
+    behavior.addObjectPositionXTween2('MyTween', 600, 'linear', 0, true);
+
+    expect(runtimeScene.getInstancesCountOnScene('Object')).to.be(1);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(runtimeScene.getInstancesCountOnScene('Object')).to.be(0);
+  });
+
   it('can remove the object at the end', () => {
     object.setPosition(200, 300);
 

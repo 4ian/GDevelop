@@ -28,6 +28,24 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
   });
 
+  it('can play a tween with a duration of 0', () => {
+    camera.setCameraRotation(runtimeScene, 200, '', 0);
+    tween.tweenCameraRotation2(runtimeScene, 'MyTween', 600, '', 'linear', 0);
+
+    // Tween actions don't change the value directly.
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(200);
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(true);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(false);
+
+    // The tween reaches the end on its first step.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(tween.sceneTweenIsPlaying(runtimeScene, 'MyTween')).to.be(false);
+    expect(tween.sceneTweenHasFinished(runtimeScene, 'MyTween')).to.be(true);
+    expect(camera.getCameraRotation(runtimeScene, '', 0)).to.be(600);
+    expect(tween.getValue(runtimeScene, 'MyTween')).to.be(600);
+    expect(tween.getProgress(runtimeScene, 'MyTween')).to.be(1);
+  });
+
   it('can play a tween till the end', () => {
     camera.setCameraRotation(runtimeScene, 200, '', 0);
     tween.tweenCameraRotation2(

@@ -316,7 +316,7 @@ const WindowPortal = ({
 function copyStyleElementToDocument(
   sourceStyleEl: HTMLElement,
   targetDocument: Document
-) {
+): HTMLElement {
   const newStyle = targetDocument.createElement('style');
 
   // Copy data attributes that MUI/JSS uses to identify style sheets.
@@ -346,6 +346,7 @@ function copyStyleElementToDocument(
   }
 
   if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+  return newStyle;
 }
 
 /**
@@ -354,19 +355,26 @@ function copyStyleElementToDocument(
 function copyLinkElementToDocument(
   sourceLinkEl: HTMLLinkElement,
   targetDocument: Document
-) {
+): HTMLElement {
   const newLink = targetDocument.createElement('link');
   newLink.rel = 'stylesheet';
   newLink.href = sourceLinkEl.href;
   if (sourceLinkEl.type) newLink.type = sourceLinkEl.type;
 
   if (targetDocument.head) targetDocument.head.appendChild(newLink);
+  return newLink;
 }
 
 /**
  * Copy all <style> and <link rel="stylesheet"> elements from the
  * source document to the target document. This ensures Material-UI
  * injected styles and CSS files are available in the new window.
+ *
+ * Copies are tracked so that when the source document removes a style
+ * (Material-UI/JSS constantly attaches and detaches sheets as components
+ * mount and unmount), the copy is removed too. Otherwise the target
+ * document accumulates thousands of dead <style> elements over time,
+ * making every style recalculation slower and slower.
  */
 function copyDocumentStyles(
   sourceDocument: Document,
@@ -374,37 +382,44 @@ function copyDocumentStyles(
 ): MutationObserver | null {
   if (!sourceDocument || !targetDocument) return null;
 
+  const copiedElements: Map<Node, HTMLElement> = new Map();
+
+  const copyNode = (node: Node) => {
+    if (node.nodeName === 'STYLE') {
+      copiedElements.set(
+        node,
+        copyStyleElementToDocument((node: any), targetDocument)
+      );
+    } else if (
+      node.nodeName === 'LINK' &&
+      node instanceof HTMLLinkElement &&
+      node.rel === 'stylesheet'
+    ) {
+      copiedElements.set(node, copyLinkElementToDocument(node, targetDocument));
+    }
+  };
+
+  const removeCopiedNode = (node: Node) => {
+    const copiedElement = copiedElements.get(node);
+    if (!copiedElement) return;
+    copiedElements.delete(node);
+    copiedElement.remove();
+  };
+
   // Copy <style> elements (Material-UI injects styles this way).
-  const styleElements = sourceDocument.querySelectorAll('style');
-  styleElements.forEach(styleEl => {
-    copyStyleElementToDocument(styleEl, targetDocument);
-  });
+  sourceDocument.querySelectorAll('style').forEach(copyNode);
 
   // Copy <link rel="stylesheet"> elements.
-  const linkElements = sourceDocument.querySelectorAll(
-    'link[rel="stylesheet"]'
-  );
-  linkElements.forEach(linkEl => {
-    if (!(linkEl instanceof HTMLLinkElement)) return;
-    copyLinkElementToDocument(linkEl, targetDocument);
-  });
+  sourceDocument.querySelectorAll('link[rel="stylesheet"]').forEach(copyNode);
 
   // Set up a MutationObserver to copy new <style> and <link> elements as
   // they are added (Material-UI adds styles lazily when components mount,
-  // and webpack may add <link> elements for dynamically loaded CSS chunks).
+  // and webpack may add <link> elements for dynamically loaded CSS chunks),
+  // and to remove the copies when the originals are removed.
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
-      mutation.addedNodes.forEach(node => {
-        if (node.nodeName === 'STYLE') {
-          copyStyleElementToDocument((node: any), targetDocument);
-        } else if (
-          node.nodeName === 'LINK' &&
-          node instanceof HTMLLinkElement &&
-          node.rel === 'stylesheet'
-        ) {
-          copyLinkElementToDocument(node, targetDocument);
-        }
-      });
+      mutation.removedNodes.forEach(removeCopiedNode);
+      mutation.addedNodes.forEach(copyNode);
     });
   });
   if (sourceDocument.head)

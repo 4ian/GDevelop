@@ -1140,6 +1140,7 @@ const createOrReplaceObject: EditorFunction = {
     ensureExtensionsUpToDate,
     searchAndInstallAsset,
     onObjectsModifiedOutsideEditor,
+    onExtensionsModifiedOutsideEditor,
     onWillInstallExtension,
     onExtensionInstalled,
     PixiResourcesLoader,
@@ -1220,6 +1221,31 @@ const createOrReplaceObject: EditorFunction = {
         eventsFunctionsExtension,
         eventsBasedObject
       );
+    };
+
+    // A custom object draws its children with a 2D or a 3D renderer, chosen
+    // by its `isRenderedIn3D` setting: 3D children in a 2D one are not
+    // usable, and a 3D behavior on it breaks the game. Its first child
+    // decides, when the setting was left to its default.
+    const enable3DRenderingForAFirst3DChild = (child: gdObject): string => {
+      if (!eventsBasedObject || !eventsFunctionsExtension) return '';
+      if (eventsBasedObject.isRenderedIn3D()) return '';
+      if (scopeObjects.getObjectsCount() !== 1) return '';
+      const childMetadata = gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        child.getType()
+      );
+      if (
+        gd.MetadataProvider.isBadObjectMetadata(childMetadata) ||
+        !childMetadata.isRenderedIn3D()
+      )
+        return '';
+      eventsBasedObject.markAsRenderedIn3D(true);
+      onExtensionsModifiedOutsideEditor({
+        extensionNames: [eventsFunctionsExtension.getName()],
+        needsCodeRegeneration: true,
+      });
+      return ` The custom object "${eventsFunctionsExtension.getName()}::${eventsBasedObject.getName()}" is now rendered in 3D, as its first child is a 3D object.`;
     };
 
     const updateBehaviorsSharedDataForTarget = () => {
@@ -1373,6 +1399,9 @@ const createOrReplaceObject: EditorFunction = {
 
             if (createdObjects.length === 1) {
               const object = createdObjects[0];
+              const renderedIn3DNotice = enable3DRenderingForAFirst3DChild(
+                object
+              );
               const renamedNotice =
                 object.getName() !== targetObjectName
                   ? ` (requested name "${targetObjectName}" was taken; use "${object.getName()}" from now on)`
@@ -1380,7 +1409,7 @@ const createOrReplaceObject: EditorFunction = {
               const result: EditorFunctionGenericOutput = {
                 success: true,
                 message: [
-                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}${getUsedAssetText(
+                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}${renderedIn3DNotice}${getUsedAssetText(
                     assetShortHeader
                   )}`,
                   getPropertiesText(object),
@@ -1486,6 +1515,7 @@ const createOrReplaceObject: EditorFunction = {
         targetObjectsContainer.getObjectsCount()
       );
       complyAfterChildObjectAdded();
+      const renderedIn3DNotice = enable3DRenderingForAFirst3DChild(object);
       // /!\ Tell the editor that some objects have potentially been modified (and even removed).
       // This will force the objects panel to refresh.
       onObjectsModifiedOutsideEditor({
@@ -1500,7 +1530,7 @@ const createOrReplaceObject: EditorFunction = {
       const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
-          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.${scratchNotice}`,
+          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.${scratchNotice}${renderedIn3DNotice}`,
           getPropertiesText(object),
         ].join(' '),
       };
@@ -1698,6 +1728,7 @@ const createOrReplaceObject: EditorFunction = {
       // Update behaviors shared data for the scene where the object was duplicated.
       updateBehaviorsSharedDataForTarget();
       complyAfterChildObjectAdded();
+      const renderedIn3DNotice = enable3DRenderingForAFirst3DChild(newObject);
 
       // /!\ Tell the editor that some objects have potentially been modified (and even removed).
       // This will force the objects panel to refresh.
@@ -1713,7 +1744,7 @@ const createOrReplaceObject: EditorFunction = {
         ? 'global objects'
         : resolvedScope.label;
       return makeGenericSuccess(
-        `Duplicated "${duplicatedObjectName}" (${fromText}) as "${newObject.getName()}" (${toText}); same type/behaviors/properties/effects.`
+        `Duplicated "${duplicatedObjectName}" (${fromText}) as "${newObject.getName()}" (${toText}); same type/behaviors/properties/effects.${renderedIn3DNotice}`
       );
     };
 
@@ -2752,6 +2783,27 @@ const resolveObjectsFromContextAndName = ({
  * game (a 3D physics body on an object without depth crashes at runtime).
  * Returns the first capability the object lacks, if any.
  */
+// The capabilities a custom object of the project gets from its settings.
+const CUSTOM_OBJECT_SETTING_NAME_BY_CAPABILITY_TYPE: {
+  [capabilityType: string]: string,
+} = {
+  'Scene3D::Base3DBehavior': 'isRenderedIn3D',
+  'AnimatableCapability::AnimatableBehavior': 'isAnimatable',
+  'TextContainerCapability::TextContainerBehavior': 'isTextContainer',
+};
+
+const getCustomObjectCapabilityHint = (
+  project: gdProject,
+  object: gdObject,
+  capabilityType: string
+): string => {
+  const settingName =
+    CUSTOM_OBJECT_SETTING_NAME_BY_CAPABILITY_TYPE[capabilityType];
+  if (!settingName || !isTypeOfProjectExtension(project, object.getType()))
+    return '';
+  return ` A custom object gets it when its "${settingName}" setting is "true" (\`change_custom_object\`, \`changed_settings\`).`;
+};
+
 const getMissingRequiredCapability = (
   platform: gdPlatform,
   behaviorMetadata: gdBehaviorMetadata,
@@ -3022,7 +3074,13 @@ const addBehavior: EditorFunction = {
         warnings.push(
           `Behavior "${behaviorName}" (type "${behavior_type}") needs a capability that "${objectName}" (type "${object.getType()}") does not have: "${
             missingCapability.label
-          }" (${missingCapability.type}). It cannot be added to this object.`
+          }" (${
+            missingCapability.type
+          }). It cannot be added to this object.${getCustomObjectCapabilityHint(
+            project,
+            object,
+            missingCapability.type
+          )}`
         );
         continue;
       }

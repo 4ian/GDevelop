@@ -283,5 +283,29 @@ describe('add_behavior', () => {
         false
       );
     });
+
+    it('tells which setting gives a custom object of the project the capability', async () => {
+      const extension = project.insertNewEventsFunctionsExtension('UI', 0);
+      extension.getEventsBasedObjects().insertNew('Dialog', 0);
+      testScene
+        .getObjects()
+        .insertNewObject(project, 'UI::Dialog', 'MyDialog', 1);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyDialog',
+            behavior_type: 'FakeAnimatedBehavior::AnimatedBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain(
+        'needs a capability that "MyDialog" (type "UI::Dialog") does not have: "Objects with animations" (AnimatableCapability::AnimatableBehavior). It cannot be added to this object. A custom object gets it when its "isAnimatable" setting is "true" (`change_custom_object`, `changed_settings`).'
+      );
+    });
   });
 });

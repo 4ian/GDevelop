@@ -1,6 +1,10 @@
 // @flow
 import { makeTestExtensions } from '../fixtures/TestExtensions';
-import { editorFunctions, type EditorFunctionGenericOutput } from './index';
+import {
+  editorFunctions,
+  type EditorFunctionGenericOutput,
+  type LaunchFunctionOptionsWithProject,
+} from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
 import {
   BOTH_GIVEN_DISAGREE_MESSAGE,
@@ -756,5 +760,97 @@ describe('Objects and behaviors in a custom object variant', () => {
         'Fill',
       ]);
     });
+  });
+});
+
+describe('3D rendering of a custom object decided by its first child', () => {
+  let project: gdProject;
+  let widget: gdEventsBasedObject;
+  const widgetScope = {
+    type: 'custom_object_variant',
+    extension_name: 'UI',
+    custom_object_name: 'Widget',
+    variant_name: '',
+  };
+
+  beforeEach(() => {
+    makeTestExtensions(gd);
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    const { extension } = createFakeProjectWithCustomObject(project);
+    widget = extension.getEventsBasedObjects().insertNew('Widget', 1);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const createChild = (
+    options: LaunchFunctionOptionsWithProject,
+    objectName: string,
+    objectType: string
+  ) =>
+    editorFunctions.create_or_replace_object.launchFunction({
+      ...options,
+      args: {
+        scope: widgetScope,
+        object_name: objectName,
+        object_type: objectType,
+      },
+    });
+
+  it('enables the 3D rendering when the first child is a 3D object', async () => {
+    const options = makeFakeLaunchFunctionOptionsWithProject(project);
+    const result: EditorFunctionGenericOutput = await createChild(
+      options,
+      'Body',
+      'FakeScene3D::Cube3DObject'
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'The custom object "UI::Widget" is now rendered in 3D, as its first child is a 3D object.'
+    );
+    expect(widget.isRenderedIn3D()).toBe(true);
+    // The object code is regenerated: it is drawn with the 3D renderer.
+    expect(options.onExtensionsModifiedOutsideEditor).toHaveBeenCalledWith({
+      extensionNames: ['UI'],
+      needsCodeRegeneration: true,
+    });
+  });
+
+  it('keeps the 2D rendering when the first child is a 2D object, whatever comes next', async () => {
+    const options = makeFakeLaunchFunctionOptionsWithProject(project);
+    const first: EditorFunctionGenericOutput = await createChild(
+      options,
+      'Back',
+      'Sprite'
+    );
+    expect(first.success).toBe(true);
+    expect(first.message).not.toContain('rendered in 3D');
+
+    const second: EditorFunctionGenericOutput = await createChild(
+      options,
+      'Body',
+      'FakeScene3D::Cube3DObject'
+    );
+    expect(second.success).toBe(true);
+    expect(second.message).not.toContain('rendered in 3D');
+    expect(widget.isRenderedIn3D()).toBe(false);
+    expect(options.onExtensionsModifiedOutsideEditor).not.toHaveBeenCalled();
+  });
+
+  it('says nothing when the custom object is already rendered in 3D', async () => {
+    widget.markAsRenderedIn3D(true);
+    const options = makeFakeLaunchFunctionOptionsWithProject(project);
+    const result: EditorFunctionGenericOutput = await createChild(
+      options,
+      'Body',
+      'FakeScene3D::Cube3DObject'
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).not.toContain('rendered in 3D');
+    expect(options.onExtensionsModifiedOutsideEditor).not.toHaveBeenCalled();
   });
 });

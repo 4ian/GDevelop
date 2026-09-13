@@ -2519,6 +2519,46 @@ const resolveObjectsFromContextAndName = ({
 /**
  * Adds a behavior to an object (or to all objects of a group) in a scene.
  */
+/**
+ * A behavior can require capabilities of its object: hidden behaviors that
+ * objects of a kind have by default (the 3D one, the animatable one...). The
+ * IDE hides such a behavior for an object without them, as adding it breaks the
+ * game (a 3D physics body on an object without depth crashes at runtime).
+ * Returns the first capability the object lacks, if any.
+ */
+const getMissingRequiredCapability = (
+  platform: gdPlatform,
+  behaviorMetadata: gdBehaviorMetadata,
+  object: gdObject
+): ?{| type: string, label: string |} => {
+  const objectBehaviorTypes = object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .map(name => object.getBehavior(name).getTypeName());
+  for (const requiredType of behaviorMetadata
+    .getRequiredBehaviorTypes()
+    .toJSArray()) {
+    const requiredMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      platform,
+      requiredType
+    );
+    // A visible required behavior is added along with the behavior (see
+    // `addBehaviorAndRequiredBehaviors`): only a capability must be there.
+    if (
+      gd.MetadataProvider.isBadBehaviorMetadata(requiredMetadata) ||
+      !requiredMetadata.isHidden()
+    )
+      continue;
+    if (!objectBehaviorTypes.includes(requiredType)) {
+      return {
+        type: requiredType,
+        label: requiredMetadata.getFullName() || requiredType,
+      };
+    }
+  }
+  return null;
+};
+
 const addBehavior: EditorFunction = {
   renderForEditor: ({ project, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -2718,6 +2758,20 @@ const addBehavior: EditorFunction = {
       ) {
         warnings.push(
           `Behavior "${behaviorName}" (type "${behavior_type}") requires object type "${behaviorMetadata.getObjectType()}"; "${objectName}" is not.`
+        );
+        continue;
+      }
+
+      const missingCapability = getMissingRequiredCapability(
+        project.getCurrentPlatform(),
+        behaviorMetadata,
+        object
+      );
+      if (missingCapability) {
+        warnings.push(
+          `Behavior "${behaviorName}" (type "${behavior_type}") needs a capability that "${objectName}" (type "${object.getType()}") does not have: "${
+            missingCapability.label
+          }" (${missingCapability.type}). It cannot be added to this object.`
         );
         continue;
       }

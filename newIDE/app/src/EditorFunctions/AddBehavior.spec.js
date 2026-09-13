@@ -140,4 +140,148 @@ describe('add_behavior', () => {
     expect(result.message).toContain('is a default capability');
     expect(result.message).toContain('cannot be added to "MyCube"');
   });
+  describe('capabilities required by the behavior', () => {
+    const getSceneObject = (name: string) =>
+      testScene.getObjects().getObject(name);
+
+    it('refuses a behavior requiring the 3D capability on an object without it', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_type: 'FakePhysics3D::Physics3DBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain(
+        'Behavior "Physics3D" (type "FakePhysics3D::Physics3DBehavior") needs a capability that "MySprite" (type "Sprite") does not have: "3D capability" (FakeScene3D::Base3DBehavior). It cannot be added to this object.'
+      );
+      expect(getSceneObject('MySprite').hasBehaviorNamed('Physics3D')).toBe(
+        false
+      );
+      // The capability was not added either.
+      expect(
+        getSceneObject('MySprite')
+          .getAllBehaviorNames()
+          .toJSArray()
+      ).not.toContain('Object3D');
+    });
+
+    it('adds a behavior requiring the 3D capability to a 3D object', async () => {
+      testScene
+        .getObjects()
+        .insertNewObject(project, 'FakeScene3D::Model3DObject', 'MyModel', 1);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyModel',
+            behavior_type: 'FakePhysics3D::Physics3DBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Added behavior "Physics3D" (type "FakePhysics3D::Physics3DBehavior") to "MyModel"'
+      );
+      const model = getSceneObject('MyModel');
+      expect(model.hasBehaviorNamed('Physics3D')).toBe(true);
+      // The capability the object had by default is used, not duplicated.
+      expect(
+        model
+          .getAllBehaviorNames()
+          .toJSArray()
+          .filter(
+            name =>
+              model.getBehavior(name).getTypeName() ===
+              'FakeScene3D::Base3DBehavior'
+          )
+      ).toEqual(['Object3D']);
+    });
+
+    it('checks the other capabilities the same way (a Sprite is animatable, a 3D model is not)', async () => {
+      testScene
+        .getObjects()
+        .insertNewObject(project, 'FakeScene3D::Model3DObject', 'MyModel', 1);
+      const options = makeFakeLaunchFunctionOptionsWithProject(project);
+
+      const onSprite: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...options,
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_type: 'FakeAnimatedBehavior::AnimatedBehavior',
+          },
+        }
+      );
+      expect(onSprite.success).toBe(true);
+      expect(getSceneObject('MySprite').hasBehaviorNamed('Animated')).toBe(
+        true
+      );
+
+      const onModel: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...options,
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyModel',
+            behavior_type: 'FakeAnimatedBehavior::AnimatedBehavior',
+          },
+        }
+      );
+      expect(onModel.success).toBe(false);
+      expect(onModel.message).toContain(
+        'needs a capability that "MyModel" (type "FakeScene3D::Model3DObject") does not have: "Objects with animations" (AnimatableCapability::AnimatableBehavior)'
+      );
+      expect(getSceneObject('MyModel').hasBehaviorNamed('Animated')).toBe(
+        false
+      );
+    });
+
+    it('adds the behavior to the compatible objects of a group and warns about the others', async () => {
+      testScene
+        .getObjects()
+        .insertNewObject(project, 'FakeScene3D::Model3DObject', 'MyModel', 1);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .insertNew('Things', 0);
+      group.addObject('MySprite');
+      group.addObject('MyModel');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Things',
+            behavior_type: 'FakePhysics3D::Physics3DBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Done with warnings.');
+      expect(result.message).toContain(
+        'Added behavior "Physics3D" (type "FakePhysics3D::Physics3DBehavior") to "MyModel"'
+      );
+      expect(result.message).toContain(
+        'needs a capability that "MySprite" (type "Sprite") does not have: "3D capability" (FakeScene3D::Base3DBehavior). It cannot be added to this object.'
+      );
+      expect(getSceneObject('MyModel').hasBehaviorNamed('Physics3D')).toBe(
+        true
+      );
+      expect(getSceneObject('MySprite').hasBehaviorNamed('Physics3D')).toBe(
+        false
+      );
+    });
+  });
 });

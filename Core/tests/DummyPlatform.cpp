@@ -588,6 +588,24 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("objectvar", _("Variable"))
       .SetFunctionName("returnVariable");
+  object
+      .AddExpression("GetPrimitiveObjectVariableAsNumber",
+                     "Get an object variable value",
+                     "",
+                     "",
+                     "")
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("objectvar", _("Variable"), "primitive")
+      .SetFunctionName("returnVariable");
+  object
+      .AddExpression("GetCollectionObjectVariableAsNumber",
+                     "Get an object variable value",
+                     "",
+                     "",
+                     "")
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("objectvar", _("Variable"), "collection")
+      .SetFunctionName("returnVariable");
   object.AddExpression("GetObjectNumber", "Get number from object", "", "", "")
       .AddParameter("object", _("Object"), "Sprite")
       .SetFunctionName("getObjectNumber");

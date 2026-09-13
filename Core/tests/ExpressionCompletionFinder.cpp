@@ -412,7 +412,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
                                   54) == expectedCompletions);
       }
     }
-    SECTION("Variable partial name") {
+    SECTION("Object variable partial name") {
       SECTION("Object function with a variable as argument") {
         // clang-format off
         std::vector<gd::String> expectedCompletions{
@@ -448,6 +448,130 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
         REQUIRE(getCompletionsFor("number",
                                   "MyObject.GetCollectionObjectVariableAsNumber(my",
                                   45) == expectedCompletions);
+      }
+    }
+    SECTION("Object variable full name") {
+      SECTION("Object function with a variable as argument") {
+        // clang-format off
+        std::vector<gd::String> expectedCompletions{
+            "{ 3, no type, 5, no prefix, myObjectStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, myObjectStructure.myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myObjectStructure.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myObjectStructure[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+        };
+        // clang-format on
+        REQUIRE(getCompletionsFor(
+                    "number", "MyObject.GetObjectVariableAsNumber(myObjectStructure",
+                    35) == expectedCompletions);
+      }
+      SECTION("Object function with a primitive variable as argument") {
+        // clang-format off
+        std::vector<gd::String> expectedCompletions{
+            "{ 3, no type, 5, no prefix, myObjectStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, myObjectStructure.myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            // The structure is suggested because one of its children might be a number.
+            "{ 3, no type, 5, no prefix, myObjectStructure.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myObjectStructure[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+        };
+        // clang-format on
+        REQUIRE(getCompletionsFor(
+                    "number",
+                    "MyObject.GetPrimitiveObjectVariableAsNumber(myObjectStructure",
+                    44) == expectedCompletions);
+      }
+      SECTION("Object function with a collection variable as argument") {
+        // clang-format off
+        std::vector<gd::String> expectedCompletions{
+            "{ 3, no type, 5, no prefix, myObjectStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myObjectStructure.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myObjectStructure[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+        };
+        // clang-format on
+        REQUIRE(getCompletionsFor(
+                    "number",
+                    "MyObject.GetCollectionObjectVariableAsNumber(myObjectStructure",
+                    45) == expectedCompletions);
+      }
+    }
+    SECTION("Object child variable partial name") {
+      SECTION("Object function with a variable as argument") {
+        // clang-format off
+        std::vector<gd::String> expectedCompletions{
+            "{ 3, no type, 3, no prefix, myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+        };
+        // clang-format on
+        REQUIRE(getCompletionsFor(
+                    "number",
+                    "MyObject.GetObjectVariableAsNumber(myObjectStructure.",
+                    52) == expectedCompletions);
+      }
+      SECTION("Object function with a primitive variable as argument") {
+        // clang-format off
+        std::vector<gd::String> expectedCompletions{
+            "{ 3, no type, 3, no prefix, myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            // The structure is suggested because one of its children might be a number.
+            "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+        };
+        // clang-format on
+        REQUIRE(getCompletionsFor(
+                    "number",
+                    "MyObject.GetPrimitiveObjectVariableAsNumber(myObjectStructure.",
+                    61) == expectedCompletions);
+      }
+      SECTION("Object function with a collection variable as argument") {
+        // clang-format off
+        std::vector<gd::String> expectedCompletions{
+            "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+        };
+        // clang-format on
+        REQUIRE(getCompletionsFor(
+                    "number",
+                    "MyObject.GetCollectionObjectVariableAsNumber(myObjectStructure.",
+                    62) == expectedCompletions);
+      }
+    }
+    SECTION("Object child variable full name") {
+      SECTION("Object function with a variable as argument") {
+        // clang-format off
+        std::vector<gd::String> expectedCompletions{
+            "{ 3, no type, 3, no prefix, myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, myStructureChild.myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myStructureChild.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myStructureChild[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+        };
+        // clang-format on
+        REQUIRE(getCompletionsFor("number",
+                                  "MyObject.GetObjectVariableAsNumber(myObjectStructure.myStructureChild",
+                                  53) == expectedCompletions);
+      }
+      SECTION("Object function with a primitive variable as argument") {
+        // clang-format off
+        std::vector<gd::String> expectedCompletions{
+            "{ 3, no type, 3, no prefix, myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, myStructureChild.myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            // The structure is suggested because one of its children might be a number.
+            "{ 3, no type, 5, no prefix, myStructureChild.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myStructureChild[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+        };
+        // clang-format on
+        REQUIRE(getCompletionsFor("number",
+                                  "MyObject.GetPrimitiveObjectVariableAsNumber(myObjectStructure.myStructureChild",
+                                  62) == expectedCompletions);
+      }
+      SECTION("Object function with a collection variable as argument") {
+        // clang-format off
+        std::vector<gd::String> expectedCompletions{
+            "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myStructureChild.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myStructureChild[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+        };
+        // clang-format on
+        REQUIRE(getCompletionsFor("number",
+                                  "MyObject.GetCollectionObjectVariableAsNumber(myObjectStructure.myStructureChild",
+                                  63) == expectedCompletions);
       }
     }
     SECTION("Function with a Layer as argument") {

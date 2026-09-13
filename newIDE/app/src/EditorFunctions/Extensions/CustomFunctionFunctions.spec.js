@@ -581,6 +581,37 @@ describe('CustomFunctionFunctions', () => {
       ).toBe(false);
     });
 
+    it('accepts an expression type repeating what a StringExpression returns', async () => {
+      const { output } = await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Subtitle',
+        function_type: 'StringExpression',
+        expression_type: 'string',
+      });
+
+      expect(output.success).toBe(true);
+      expect(
+        getFreeFunction('Subtitle')
+          .getExpressionType()
+          .getName()
+      ).toBe('string');
+    });
+
+    it('refuses an expression type contradicting what a StringExpression returns', async () => {
+      const { output } = await launchFunction(createCustomFunction, project, {
+        scope: extensionScope,
+        function_name: 'Count',
+        function_type: 'StringExpression',
+        expression_type: 'number',
+      });
+
+      expect(output.success).toBe(false);
+      expect(output.message).toContain('already returns a string');
+      expect(
+        extension.getEventsFunctions().hasEventsFunctionNamed('Count')
+      ).toBe(false);
+    });
+
     it('creates a condition with the skeleton returning a boolean', async () => {
       const { output } = await launchFunction(createCustomFunction, project, {
         scope: extensionScope,

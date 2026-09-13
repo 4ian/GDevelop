@@ -324,7 +324,7 @@ describe('add_or_edit_variable (instance scope)', () => {
       args,
     });
 
-  it('sets a variable on a single instance, leaving the others and the object untouched', async () => {
+  it('sets a variable on a single instance and declares it on the object, leaving the other instances untouched', async () => {
     const result = await addOrEditVariable({
       variable_scope: 'instance',
       scene_name: 'TestScene',
@@ -337,6 +337,10 @@ describe('add_or_edit_variable (instance scope)', () => {
     expect(result.message).toContain('Added instance');
     expect(result.message).toContain(`"${getIdOf(doorInstance1)}" (Door)`);
     expect(result.message).toContain('variable "LevelNumber" (Number) = 3');
+    expect(result.message).toContain(
+      'Declared "LevelNumber" (Number) on object "Door" too'
+    );
+    expect(result.message).toContain('events read it with `Door.LevelNumber`');
 
     expect(doorInstance1.getVariables().has('LevelNumber')).toBe(true);
     expect(
@@ -345,16 +349,92 @@ describe('add_or_edit_variable (instance scope)', () => {
         .get('LevelNumber')
         .getValue()
     ).toBe(3);
-    // The other instances and the shared object variables are untouched.
+    // The object declares the variable (with the default value of its type):
+    // an instance can only hold its own value of a variable of its object.
+    const doorVariables = testScene
+      .getObjects()
+      .getObject('Door')
+      .getVariables();
+    expect(doorVariables.has('LevelNumber')).toBe(true);
+    expect(doorVariables.get('LevelNumber').getType()).toBe(gd.Variable.Number);
+    expect(doorVariables.get('LevelNumber').getValue()).toBe(0);
+    // The other instances (and other objects) are untouched.
     expect(doorInstance2.getVariables().has('LevelNumber')).toBe(false);
     expect(playerInstance.getVariables().has('LevelNumber')).toBe(false);
     expect(
       testScene
         .getObjects()
-        .getObject('Door')
+        .getObject('Player')
         .getVariables()
         .has('LevelNumber')
     ).toBe(false);
+  });
+
+  it('leaves the object alone when it already declares the variable', async () => {
+    const doorObject = testScene.getObjects().getObject('Door');
+    doorObject
+      .getVariables()
+      .insertNew('Locked', 0)
+      .setBool(true);
+
+    const result = await addOrEditVariable({
+      variable_scope: 'instance',
+      scene_name: 'TestScene',
+      instance_id: getIdOf(doorInstance1),
+      variable_name_or_path: 'Locked',
+      value: 'false',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.message).not.toContain('Declared');
+    expect(
+      doorObject
+        .getVariables()
+        .get('Locked')
+        .getBool()
+    ).toBe(true);
+    expect(
+      doorInstance1
+        .getVariables()
+        .get('Locked')
+        .getBool()
+    ).toBe(false);
+  });
+
+  it('declares the root of a nested path on the object, as an empty structure', async () => {
+    const result = await addOrEditVariable({
+      variable_scope: 'instance',
+      scene_name: 'TestScene',
+      instance_id: getIdOf(doorInstance1),
+      variables: [
+        { variable_name_or_path: 'Stats.Health', value: '10' },
+        { variable_name_or_path: 'Greeting', value: 'Hello' },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Declared "Stats" (Structure) on object "Door" too'
+    );
+    expect(result.message).toContain(
+      'Declared "Greeting" (String) on object "Door" too'
+    );
+
+    const doorVariables = testScene
+      .getObjects()
+      .getObject('Door')
+      .getVariables();
+    expect(doorVariables.get('Stats').getType()).toBe(gd.Variable.Structure);
+    expect(doorVariables.get('Stats').getChildrenCount()).toBe(0);
+    expect(doorVariables.get('Greeting').getType()).toBe(gd.Variable.String);
+    expect(doorVariables.get('Greeting').getString()).toBe('');
+    expect(
+      doorInstance1
+        .getVariables()
+        .get('Stats')
+        .getChild('Health')
+        .getValue()
+    ).toBe(10);
   });
 
   it('sets several variables (including nested paths) on one instance', async () => {
@@ -481,5 +561,121 @@ describe('add_or_edit_variable (instance scope)', () => {
 
     expect(result.success).toBe(true);
     expect(JSON.stringify(result.variables)).toContain('LevelNumber');
+  });
+});
+
+describe('add_or_edit_variable (instance scope, in a variant of a custom object)', () => {
+  let project: gdProject;
+  let eventsBasedObject: gdEventsBasedObject;
+  let defaultBackInstance: gdInitialInstance;
+  let darkBackInstance: gdInitialInstance;
+
+  const getIdOf = (instance: gdInitialInstance): string =>
+    instance.getPersistentUuid().slice(0, 10);
+  const getBackVariables = (variantName: string): gdVariablesContainer =>
+    (variantName === ''
+      ? eventsBasedObject.getDefaultVariant()
+      : eventsBasedObject.getVariants().getVariant(variantName)
+    )
+      .getObjects()
+      .getObject('Back')
+      .getVariables();
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('UI', 0);
+    eventsBasedObject = extension
+      .getEventsBasedObjects()
+      .insertNew('Dialog', 0);
+    const defaultVariant = eventsBasedObject.getDefaultVariant();
+    defaultVariant.getObjects().insertNewObject(project, 'Sprite', 'Back', 0);
+    const darkVariant = eventsBasedObject
+      .getVariants()
+      .insertNewVariant('Dark', 0);
+    gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+      project,
+      eventsBasedObject
+    );
+    defaultBackInstance = defaultVariant
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    defaultBackInstance.setObjectName('Back');
+    darkBackInstance = darkVariant
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    darkBackInstance.setObjectName('Back');
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const addOrEditVariable = async (args: any) =>
+    editorFunctions.add_or_edit_variable.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args,
+    });
+
+  it('declares the variable on the child object of the default variant, followed by the named variants', async () => {
+    const result = await addOrEditVariable({
+      scope: {
+        type: 'custom_object_variant',
+        extension_name: 'UI',
+        custom_object_name: 'Dialog',
+        variant_name: '',
+      },
+      variable_scope: 'instance',
+      instance_id: getIdOf(defaultBackInstance),
+      variable_name_or_path: 'Glow',
+      value: 'true',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Declared "Glow" (Boolean) on object "Back" too'
+    );
+    expect(
+      defaultBackInstance
+        .getVariables()
+        .get('Glow')
+        .getBool()
+    ).toBe(true);
+    expect(getBackVariables('').has('Glow')).toBe(true);
+    expect(
+      getBackVariables('')
+        .get('Glow')
+        .getBool()
+    ).toBe(false);
+    // The named variant complied with the new structure.
+    expect(getBackVariables('Dark').has('Glow')).toBe(true);
+  });
+
+  it('declares the variable on the default variant when the instance is in a named variant', async () => {
+    const result = await addOrEditVariable({
+      scope: {
+        type: 'custom_object_variant',
+        extension_name: 'UI',
+        custom_object_name: 'Dialog',
+        variant_name: 'Dark',
+      },
+      variable_scope: 'instance',
+      instance_id: getIdOf(darkBackInstance),
+      variable_name_or_path: 'Depth',
+      value: '2',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Declared "Depth" (Number) on object "Back" too'
+    );
+    expect(
+      darkBackInstance
+        .getVariables()
+        .get('Depth')
+        .getValue()
+    ).toBe(2);
+    expect(getBackVariables('').has('Depth')).toBe(true);
+    expect(getBackVariables('Dark').has('Depth')).toBe(true);
   });
 });

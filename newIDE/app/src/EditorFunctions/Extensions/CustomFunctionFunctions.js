@@ -227,6 +227,14 @@ const readExpressionType = (
   if (rawExpressionType === undefined || rawExpressionType === null)
     return { success: true, value: null };
   if (!EXPRESSION_TYPE_FUNCTION_TYPES.includes(functionTypeName)) {
+    // A `StringExpression` says what it returns: an `expression_type` that
+    // repeats it is accepted (and ignored).
+    if (
+      functionTypeName === 'StringExpression' &&
+      normalizeExpressionType(rawExpressionType) === 'string'
+    ) {
+      return { success: true, value: null };
+    }
     return {
       success: false,
       message:
@@ -234,7 +242,7 @@ const readExpressionType = (
           EXPRESSION_TYPE_FUNCTION_TYPES
         )} (got "${functionTypeName}")` +
         (functionTypeName === 'StringExpression'
-          ? ', and a "StringExpression" already returns a string.'
+          ? ', and a "StringExpression" already returns a string (for a number, use an "Expression" with `expression_type: "number"`).'
           : '.'),
     };
   }

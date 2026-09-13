@@ -1010,7 +1010,7 @@ class GD_CORE_API ExpressionCompletionFinder
                variable.GetType() == gd::Variable::Type::Array);
           // Primitive children might be found inside collection children.
           // So, we always show children that are collections.
-          if (variableTypeConstraint != "collection" && !isCollection) {
+          if (variableTypeConstraint != "collection" || isCollection) {
             ExpressionCompletionDescription description(
                 ExpressionCompletionDescription::Variable,
                 location.GetStartPosition(), location.GetEndPosition());

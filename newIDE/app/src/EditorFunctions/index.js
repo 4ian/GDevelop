@@ -7986,6 +7986,9 @@ type VariablesContainersResolution = {|
   failure: EditorFunctionGenericOutput | null,
   variablesContainers: Array<gdVariablesContainer>,
   scopeDescription: string,
+  // For the `instance` scope: the objects of the matched instances (a variable
+  // of an instance must be declared on its object). Empty for other scopes.
+  instancesObjects: Array<gdObject>,
 |};
 
 // Resolve a variable scope to the variables container(s) to act on. A group
@@ -8009,6 +8012,7 @@ const resolveVariablesContainers = ({
     failure: makeGenericFailure(message),
     variablesContainers: [],
     scopeDescription: '',
+    instancesObjects: [],
   });
 
   if (variable_scope === 'instance') {
@@ -8059,6 +8063,17 @@ const resolveVariablesContainers = ({
             .slice(0, 10)}" (${instance.getObjectName()})`
       )
       .join(', ');
+    const instancesObjectsByName: Map<string, gdObject> = new Map();
+    matchedInstances.forEach(instance => {
+      const objectName = instance.getObjectName();
+      if (instancesObjectsByName.has(objectName)) return;
+      const object = getObjectByName(
+        project.getObjects(),
+        layout.getObjects(),
+        objectName
+      );
+      if (object) instancesObjectsByName.set(objectName, object);
+    });
     return {
       failure: null,
       variablesContainers: matchedInstances.map(instance =>
@@ -8067,6 +8082,7 @@ const resolveVariablesContainers = ({
       scopeDescription: `instance${
         matchedInstances.length > 1 ? 's' : ''
       } ${instancesLabel} of scene "${scene_name}"`,
+      instancesObjects: [...instancesObjectsByName.values()],
     };
   }
 
@@ -8081,6 +8097,7 @@ const resolveVariablesContainers = ({
       failure: null,
       variablesContainers: [project.getLayout(scene_name).getVariables()],
       scopeDescription: `scene "${scene_name}"`,
+      instancesObjects: [],
     };
   } else if (variable_scope === 'object' || variable_scope === 'group') {
     if (!object_name) {
@@ -8142,18 +8159,66 @@ const resolveVariablesContainers = ({
       scopeDescription: scene_name
         ? `scene "${scene_name}" ${objectOrGroupLabel}`
         : `global ${objectOrGroupLabel}`,
+      instancesObjects: [],
     };
   } else if (variable_scope === 'global') {
     return {
       failure: null,
       variablesContainers: [project.getVariables()],
       scopeDescription: 'global',
+      instancesObjects: [],
     };
   }
 
   return fail(
     `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\`, \`instance\` or \`global\`.`
   );
+};
+
+// An instance can only hold its own value of a variable of its object: a
+// variable set on an instance is declared on the object too when missing (with
+// the default value of its type), so events can read it (`Door.Locked`) and
+// every instance of the object has the same variables. Returns one line per
+// object on which the variable was declared.
+const declareInstanceVariableOnObjects = ({
+  variablePath,
+  instanceVariablesContainer,
+  instancesObjects,
+}: {|
+  variablePath: string,
+  instanceVariablesContainer: gdVariablesContainer,
+  instancesObjects: Array<gdObject>,
+|}): Array<string> => {
+  const rootVariableName = variablePath.split(/[.[]/)[0].trim();
+  if (!rootVariableName || !instanceVariablesContainer.has(rootVariableName)) {
+    return [];
+  }
+  const variableType = getVariableTypeAsString(
+    gd,
+    instanceVariablesContainer.get(rootVariableName)
+  );
+  if (variableType === 'unknown') return [];
+
+  return instancesObjects
+    .filter(object => !object.getVariables().has(rootVariableName))
+    .map(object => {
+      const objectVariables = object.getVariables();
+      const objectVariable = objectVariables.insertNew(
+        rootVariableName,
+        objectVariables.count()
+      );
+      // A new variable is the number 0: casting it to a string would give
+      // "0", so the default value of the type is set explicitly.
+      if (variableType === 'String') {
+        objectVariable.setString('');
+      } else if (variableType === 'Boolean') {
+        objectVariable.setBool(false);
+      } else {
+        objectVariable.castTo(variableType.toLowerCase());
+      }
+      const objectName = object.getName();
+      return `Declared "${rootVariableName}" (${variableType}) on object "${objectName}" too: an instance variable must be declared on its object (the other "${objectName}" instances keep the default value; events read it with \`${objectName}.${rootVariableName}\`).`;
+    });
 };
 
 const addOrEditVariable: EditorFunction = {
@@ -8324,7 +8389,11 @@ const addOrEditVariable: EditorFunction = {
       instance_id,
     });
     if (resolved.failure) return resolved.failure;
-    const { variablesContainers, scopeDescription } = resolved;
+    const {
+      variablesContainers,
+      scopeDescription,
+      instancesObjects,
+    } = resolved;
 
     const changes = [];
     const warnings = [];
@@ -8413,6 +8482,15 @@ const addOrEditVariable: EditorFunction = {
           ? `Added ${scopeDescription} variable "${variable_name_or_path}" (${variableType}) = ${truncatedValue}`
           : `Edited ${scopeDescription} variable "${variable_name_or_path}" = ${truncatedValue}`
       );
+      if (variable_scope === 'instance') {
+        changes.push(
+          ...declareInstanceVariableOnObjects({
+            variablePath: variable_name_or_path,
+            instanceVariablesContainer: variablesContainers[0],
+            instancesObjects,
+          })
+        );
+      }
     }
 
     // One line per change (so a single variable keeps its original message),

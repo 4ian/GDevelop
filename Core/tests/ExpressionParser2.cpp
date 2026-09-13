@@ -89,6 +89,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   auto &mySpriteObject = layout1.GetObjects().InsertNewObject(
       project, "MyExtension::Sprite", "MySpriteObject", 1);
+  mySpriteObject.GetVariables().InsertNew("MyObjectVariable");
+  mySpriteObject.GetVariables().InsertNew("MyObjectStructureVariable").GetChild("MyChild");
+  mySpriteObject.GetVariables().Get("MyObjectStructureVariable").GetChild("MyChildStructure").GetChild("MyChild");
+  mySpriteObject.GetVariables().Get("MyObjectStructureVariable").GetChild("MyChildStructure").GetChild("MyChildStructure2").GetChild("MyChild");
   mySpriteObject.GetVariables().InsertNew("MyVariable");
   mySpriteObject.GetVariables().InsertNew("MyVariable2");
   mySpriteObject.GetVariables().InsertNew("MyVariable3");
@@ -2425,6 +2429,62 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     RequireNoError(validator);
   }
 
+  SECTION("Valid scene variable structure in a variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetAnyVariableAsNumber(MySceneStructureVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Valid scene variable structure in a collection variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetCollectionVariableAsNumber(MySceneStructureVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid number scene variable in a collection variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetCollectionVariableAsNumber(MySceneVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "A structure or an array is expected but this variable is a value.");
+  }
+
+  SECTION("Invalid scene variable structure in a primitive variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetPrimitiveVariableAsNumber(MySceneStructureVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
+  }
+
+  SECTION("Valid number scene variable in a primitive variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetPrimitiveVariableAsNumber(MySceneVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
   SECTION("Invalid scene variables structure in expression (2 levels)") {
     auto node =
         parser.ParseExpression("MySceneStructureVariable.MyChildStructure");
@@ -2443,6 +2503,62 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     gd::ExpressionValidator validator(platform, projectScopedContainers,
                                       "variable");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Valid scene variable structure in a variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetAnyVariableAsNumber(MySceneStructureVariable.MyChildStructure)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Valid scene variable structure in a collection variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetCollectionVariableAsNumber(MySceneStructureVariable.MyChildStructure)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid number scene variable in a collection variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetCollectionVariableAsNumber(MySceneStructureVariable.MyChild)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "A structure or an array is expected but this variable is a value.");
+  }
+
+  SECTION("Invalid scene variable structure in a primitive variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetPrimitiveVariableAsNumber(MySceneStructureVariable.MyChildStructure)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
+  }
+
+  SECTION("Valid number scene variable in a primitive variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetPrimitiveVariableAsNumber(MySceneStructureVariable.MyChild)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
     node->Visit(validator);
     RequireNoError(validator);
   }
@@ -2469,6 +2585,62 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     RequireNoError(validator);
   }
 
+  SECTION("Valid scene variable structure in a variable parameter of a function (3 levels)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetAnyVariableAsNumber(MySceneStructureVariable.MyChildStructure.MyChildStructure2)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Valid scene variable structure in a collection variable parameter of a function (3 levels)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetCollectionVariableAsNumber(MySceneStructureVariable.MyChildStructure.MyChildStructure2)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid number scene variable in a collection variable parameter of a function (3 levels)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetCollectionVariableAsNumber(MySceneStructureVariable.MyChildStructure.MyChild)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "A structure or an array is expected but this variable is a value.");
+  }
+
+  SECTION("Invalid scene variable structure in a primitive variable parameter of a function (3 levels)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetPrimitiveVariableAsNumber(MySceneStructureVariable.MyChildStructure.MyChildStructure2)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
+  }
+
+  SECTION("Valid number scene variable in a primitive variable parameter of a function (3 level)") {
+    auto node = parser.ParseExpression(
+        "MyExtension::GetPrimitiveVariableAsNumber(MySceneStructureVariable.MyChildStructure.MyChild)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
   SECTION("Invalid object variables structure in expression (1 level)") {
     auto node =
         parser.ParseExpression("MyObject.MyObjectStructureVariable");
@@ -2486,6 +2658,62 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     gd::ExpressionValidator validator(platform, projectScopedContainers,
                                       "objectvar");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Valid object variable structure in a variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetObjectVariableAsNumber(MyObjectStructureVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Valid object variable structure in a collection variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetCollectionObjectVariableAsNumber(MyObjectStructureVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid number object variable in a collection variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetCollectionObjectVariableAsNumber(MyObjectVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "A structure or an array is expected but this variable is a value.");
+  }
+
+  SECTION("Invalid object variable structure in a primitive variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetPrimitiveObjectVariableAsNumber(MyObjectStructureVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
+  }
+
+  SECTION("Valid object number variable in a primitive variable parameter of a function (1 level)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetPrimitiveObjectVariableAsNumber(MyObjectVariable)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
     node->Visit(validator);
     RequireNoError(validator);
   }
@@ -2512,6 +2740,62 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     RequireNoError(validator);
   }
 
+  SECTION("Valid object variable structure in a variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChildStructure)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Valid object variable structure in a collection variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetCollectionObjectVariableAsNumber(MyObjectStructureVariable.MyChildStructure)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid number object variable in a collection variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetCollectionObjectVariableAsNumber(MyObjectStructureVariable.MyChild)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "A structure or an array is expected but this variable is a value.");
+  }
+
+  SECTION("Invalid object variable structure in a primitive variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetPrimitiveObjectVariableAsNumber(MyObjectStructureVariable.MyChildStructure)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
+  }
+
+  SECTION("Valid number object variable in a primitive variable parameter of a function (2 levels)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetPrimitiveObjectVariableAsNumber(MyObjectStructureVariable.MyChild)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
   SECTION("Invalid object variables structure in expression (3 levels)") {
     auto node =
         parser.ParseExpression("MyObject.MyObjectStructureVariable.MyChildStructure.MyChildStructure2");
@@ -2530,6 +2814,62 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     gd::ExpressionValidator validator(platform, projectScopedContainers,
                                       "objectvar");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Valid object variable structure in a variable parameter of a function (3 levels)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChildStructure.MyChildStructure2)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Valid object variable structure in a collection variable parameter of a function (3 levels)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetCollectionObjectVariableAsNumber(MyObjectStructureVariable.MyChildStructure.MyChildStructure2)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid number object variable in a collection variable parameter of a function (3 levels)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetCollectionObjectVariableAsNumber(MyObjectStructureVariable.MyChildStructure.MyChild)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "A structure or an array is expected but this variable is a value.");
+  }
+
+  SECTION("Invalid object variable structure in a primitive variable parameter of a function (3 levels)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetPrimitiveObjectVariableAsNumber(MyObjectStructureVariable.MyChildStructure.MyChildStructure2)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
+  }
+
+  SECTION("Valid number object variable in a primitive variable parameter of a function (3 level)") {
+    auto node = parser.ParseExpression(
+        "MySpriteObject.GetPrimitiveObjectVariableAsNumber(MyObjectStructureVariable.MyChildStructure.MyChild)");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
     node->Visit(validator);
     RequireNoError(validator);
   }

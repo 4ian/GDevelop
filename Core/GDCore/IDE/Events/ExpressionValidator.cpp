@@ -13,13 +13,10 @@
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
-#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
-#include "GDCore/Project/Layout.h"
 #include "GDCore/Project/ObjectsContainersList.h"
-#include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Project/VariablesContainersList.h"
@@ -96,6 +93,26 @@ void ExpressionValidator::ValidateLastChildVariable(
       RaiseTypeError(_("You need to specify the name of the child variable "
                        "to access. For example: `MyVariable[0]`."),
                      childNameLocation);
+    }
+  } else if ((parentType == Type::Variable ||
+              parentType == Type::ObjectVariable ||
+              parentType == Type::LegacyVariable) &&
+             currentParameterExtraInfo && type != Variable::Unknown) {
+    bool isCollection = type == Variable::Structure || type == Variable::Array;
+    if (*currentParameterExtraInfo == "collection" && !isCollection) {
+      RaiseTypeError(_("A structure or an array is expected but this "
+                       "variable is a value."),
+                     childNameLocation, false);
+    } else if (*currentParameterExtraInfo == "primitive" && isCollection) {
+      if (type == Variable::Structure) {
+        RaiseTypeError(_("You need to specify the name of the child variable "
+                         "to access. For example: `MyVariable.child`."),
+                       childNameLocation, false);
+      } else if (type == Variable::Array) {
+        RaiseTypeError(_("You need to specify the name of the child variable "
+                         "to access. For example: `MyVariable[0]`."),
+                       childNameLocation, false);
+      }
     }
   }
   // Number, string or boolean variables can be used in expressions.

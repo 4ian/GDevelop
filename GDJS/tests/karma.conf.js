@@ -175,6 +175,28 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3D.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3DRenderer.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Base3DBehavior.js',
+      // Jolt is loaded by Physics3DRuntimeBehavior.js with a dynamic import,
+      // so it's only served (the .wasm is fetched by the .js next to it).
+      {
+        pattern:
+          './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/jolt-physics.wasm.js',
+        watched: true,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
+        pattern:
+          './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/jolt-physics.wasm.wasm',
+        watched: true,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/Physics3DTools.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/PhysicsCar3DRuntimeBehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/TweenManager.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/tweentools.js',

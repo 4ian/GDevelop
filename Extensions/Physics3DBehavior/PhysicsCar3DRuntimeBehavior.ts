@@ -68,6 +68,9 @@ namespace gdjs {
     _hasFrontWheelDrive: boolean;
     _pitchRollAngleMax: float;
 
+    /** Only used when the car is not subject to any gravity. */
+    private static readonly defaultSuspensionFrequency = 1.5;
+
     // Mutable configuration
 
     _engineTorqueMax: float;
@@ -896,6 +899,24 @@ namespace gdjs {
       const suspensionMinLength = wheelRadius;
       const suspensionMaxLength = 1.5 * suspensionMinLength;
 
+      // Jolt's default suspension frequency (1.5 Hz) is meant for a car with a
+      // suspension travel of about 10 cm under the earth gravity. The travel
+      // given to the wheels here is much shorter, and the gravity can be scaled
+      // up by the physics behavior, so the springs would stay fully compressed:
+      // the car would rest on the hard end of its suspension and shake while
+      // driving instead of being carried by the springs.
+      //
+      // Choose a frequency that makes the springs settle around the middle of
+      // their travel: at rest, a spring sinks by `gravity / (2 * PI * f)²`.
+      const suspensionTravel = suspensionMaxLength - suspensionMinLength;
+      const effectiveGravity =
+        behavior._sharedData.getGravityMagnitude() *
+        Math.abs(behavior.gravityScale);
+      const suspensionFrequency =
+        suspensionTravel > 0 && effectiveGravity > 0
+          ? Math.sqrt((2 * effectiveGravity) / suspensionTravel) / (2 * Math.PI)
+          : PhysicsCar3DRuntimeBehavior.defaultSuspensionFrequency;
+
       const constraint = this._vehicleController.GetConstraint();
       const fl = constraint.GetWheel(0).GetSettings();
       fl.mPosition = this.getVec3(
@@ -930,6 +951,7 @@ namespace gdjs {
         wheel.mWidth = wheelWidth;
         wheel.mSuspensionMinLength = suspensionMinLength;
         wheel.mSuspensionMaxLength = suspensionMaxLength;
+        wheel.mSuspensionSpring.mFrequency = suspensionFrequency;
         wheel.mMaxBrakeTorque = this._brakeTorqueMax;
         if (index >= 2) {
           wheel.mMaxHandBrakeTorque = this._handBrakeTorqueMax;

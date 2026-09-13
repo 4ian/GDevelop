@@ -90,6 +90,22 @@ namespace gdjs {
     private _physics3DHooks: Array<gdjs.Physics3DRuntimeBehavior.Physics3DHook> =
       [];
 
+    /**
+     * Jolt only bounces bodies that approach each other faster than
+     * `mMinVelocityForRestitution` (1 m/s). A body that already gains a
+     * comparable speed from gravity during a single collision step always
+     * reaches its contacts above this threshold: a bouncy body laying on the
+     * floor is then given its speed back at every bounce and never comes to
+     * rest.
+     *
+     * Collision steps are split so that gravity doesn't accelerate bodies by
+     * more than this, which keeps resting contacts below the threshold.
+     */
+    private static readonly maxVelocityGainPerCollisionStep = 0.5;
+
+    /** Avoid to slow down the game too much when the gravity is extreme. */
+    private static readonly maxCollisionStepCount = 4;
+
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
       this.gravityX = sharedData.gravityX;
@@ -257,12 +273,50 @@ namespace gdjs {
       this._registeredBehaviors.delete(physicsBehavior);
     }
 
+    getGravityMagnitude(): float {
+      return Math.sqrt(
+        this.gravityX * this.gravityX +
+          this.gravityY * this.gravityY +
+          this.gravityZ * this.gravityZ
+      );
+    }
+
+    /**
+     * The number of collision steps Jolt splits a frame into.
+     *
+     * A step must stay short enough for the simulation to be stable:
+     * - bodies must not move too far from one step to the next
+     * - gravity must not accelerate bodies too much during a step, or bouncy
+     *   bodies never come to rest (see `maxVelocityGainPerCollisionStep`).
+     *
+     * @param strongestGravity The strongest gravity a moving body of this world
+     * is subject to, in m/s².
+     */
+    getCollisionStepCount(deltaTime: float, strongestGravity: float): integer {
+      const gravityStepCount = Math.ceil(
+        (deltaTime * strongestGravity) /
+          Physics3DSharedData.maxVelocityGainPerCollisionStep
+      );
+      const durationStepCount = deltaTime > 1.0 / 55.0 ? 2 : 1;
+      return Math.min(
+        Physics3DSharedData.maxCollisionStepCount,
+        Math.max(1, gravityStepCount, durationStepCount)
+      );
+    }
+
     step(deltaTime: float): void {
+      let maxGravityScale = 0;
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior._contactsStartedThisFrame.length = 0;
         physicsBehavior._contactsEndedThisFrame.length = 0;
       }
       for (const physicsBehavior of this._registeredBehaviors) {
+        if (!physicsBehavior.isStatic()) {
+          maxGravityScale = Math.max(
+            maxGravityScale,
+            Math.abs(physicsBehavior.gravityScale)
+          );
+        }
         physicsBehavior.updateBodyFromObject();
         const owner = physicsBehavior.owner3D;
         if (physicsBehavior.isKinematic() && owner.hasEstimatedVelocity()) {
@@ -280,8 +334,11 @@ namespace gdjs {
         physics3DHook.doBeforePhysicsStep(deltaTime);
       }
 
-      const numSteps = deltaTime > 1.0 / 55.0 ? 2 : 1;
-      this.jolt.Step(deltaTime, numSteps);
+      const strongestGravity = this.getGravityMagnitude() * maxGravityScale;
+      this.jolt.Step(
+        deltaTime,
+        this.getCollisionStepCount(deltaTime, strongestGravity)
+      );
       this.stepped = true;
 
       // It's important that updateBodyFromObject and updateObjectFromBody are

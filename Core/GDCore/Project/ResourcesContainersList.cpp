@@ -52,12 +52,9 @@ ResourcesContainersList ResourcesContainersList::
   resourcesContainersList.Push(project.GetResourcesManager());
 
   gd::EventsFunctionTools::PropertiesToResourcesContainer(
+      eventsBasedBehavior.GetPropertyDescriptors(),
       eventsBasedBehavior.GetSharedPropertyDescriptors(),
       propertyResourcesContainer);
-  resourcesContainersList.Push(propertyResourcesContainer);
-
-  gd::EventsFunctionTools::PropertiesToResourcesContainer(
-      eventsBasedBehavior.GetPropertyDescriptors(), propertyResourcesContainer);
   resourcesContainersList.Push(propertyResourcesContainer);
 
   gd::EventsFunctionTools::ParametersToResourcesContainer(

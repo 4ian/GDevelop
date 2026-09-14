@@ -3,6 +3,7 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
+import { getIDEVersion } from '../../Version';
 import {
   ensureIsArray,
   ensureObjectHasProperty,
@@ -212,6 +213,7 @@ export const buildElectron = (
           userId,
           key,
           type: 'electron-build',
+          gdevelopVersion: getIDEVersion(),
           targets: targets.join(','),
           gameId,
           filename: getBuildExtensionlessFilename(options),
@@ -249,6 +251,7 @@ export const buildWeb = (
           userId,
           key,
           type: 'web-build',
+          gdevelopVersion: getIDEVersion(),
           targets: 's3',
           gameId,
           payWithCredits,
@@ -294,6 +297,7 @@ export const buildCordovaAndroid = (
             userId,
             key,
             type: 'cordova-build',
+            gdevelopVersion: getIDEVersion(),
             targets: targets.join(','),
             gameId,
             filename: getBuildExtensionlessFilename(options),
@@ -339,6 +343,7 @@ export const buildCordovaIos = (
             userId,
             key,
             type: 'cordova-ios-build',
+            gdevelopVersion: getIDEVersion(),
             targets: targets.join(','),
             gameId,
             filename: getBuildExtensionlessFilename(options),

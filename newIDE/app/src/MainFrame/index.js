@@ -203,6 +203,7 @@ import {
   type LaunchDebuggerAndPreviewOptions,
 } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import WatchedVariablesPanel from '../EventsExecutionTracking/WatchedVariablesPanel';
+import EventsExecutionTrackingContext from '../EventsExecutionTracking/EventsExecutionTrackingContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
@@ -653,6 +654,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     clearInGameEditorExtensionErrors,
     hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
+  const eventsExecutionTrackingStore = React.useContext(
+    EventsExecutionTrackingContext
+  );
   useEventsExecutionTracking({
     previewDebuggerServer,
     playSpeed: debuggerPlaySpeed,
@@ -1243,6 +1247,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     async (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
+      // The watched variables are those of this project: they mean nothing
+      // in the next one.
+      eventsExecutionTrackingStore.clearWatchedExpressions();
+      setIsWatchedVariablesPanelOpen(false);
 
       console.info('Closing project...');
       const previewLauncher = _previewLauncher.current;
@@ -1301,6 +1309,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewDebuggerServer,
       currentProjectRef,
       eventsFunctionsExtensionsState,
+      eventsExecutionTrackingStore,
       setHasProjectOpened,
       setState,
       sealUnsavedChanges,
@@ -1655,14 +1664,20 @@ const MainFrame = (props: Props): React.MixedElement => {
         if (error.name === 'CloudProjectReadingError') {
           setCloudProjectFileMetadataToRecover(fileMetadata);
         } else {
-          console.error('Failed to open the project:', error);
-          const errorMessage = getOpenErrorMessage
+          console.error(
+            `Failed to open the project "${fileMetadata.fileIdentifier}":`,
+            error
+          );
+          const errorMessageDescriptor = getOpenErrorMessage
             ? getOpenErrorMessage(error)
             : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;
+          const errorMessage = i18n._(errorMessageDescriptor);
 
           await showAlert({
             title: t`Unable to open the project`,
-            message: errorMessage,
+            message: t`Could not open "${
+              fileMetadata.fileIdentifier
+            }". ${errorMessage}`,
           });
           throw error;
         }

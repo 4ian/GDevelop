@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
+import { t } from '@lingui/macro';
+import SearchBar from '../UI/SearchBar';
+import classes from './InspectorsList.module.css';
 import get from 'lodash/get';
 import ReadOnlyTreeView, {
   type ReadOnlyTreeViewInterface,
@@ -35,9 +38,19 @@ type InspectorTreeItem = {|
 
 const ITEM_HEIGHT = 32;
 const getItemId = (item: InspectorTreeItem) => item.id;
-const getItemName = (item: InspectorTreeItem) => item.label;
 const getItemHeight = () => ITEM_HEIGHT;
-const shouldApplySearchToItem = () => true;
+
+/** The row: the icon of what it is, then its label. */
+const getItemName = (item: InspectorTreeItem) => (
+  <span className={classes.row}>
+    {item.description.icon && (
+      <span className={classes.rowIcon}>{item.description.icon}</span>
+    )}
+    <span className={classes.rowLabel} title={item.label}>
+      {item.label}
+    </span>
+  </span>
+);
 
 const buildItems = (
   data: GameData,
@@ -86,7 +99,9 @@ const InspectorsList = ({
         children = buildItems(item.data, getSubInspectors, item.fullPath);
         childrenCache.set(item.id, children);
       }
-      return children;
+      // An object without instance, a scene without variable: nothing to
+      // open, so the row is shown as a leaf rather than an empty folder.
+      return children.length ? children : null;
     },
     [childrenCache]
   );
@@ -120,6 +135,16 @@ const InspectorsList = ({
     [items, selectedId, getItemChildren]
   );
 
+  const [searchText, setSearchText] = React.useState<string>('');
+  const lowerCaseSearchText = searchText.trim().toLowerCase();
+  // The rows are rendered nodes, not texts: the match is done here on the
+  // label, and the tree is told to keep the matching rows (`false`).
+  const shouldApplySearchToItem = React.useCallback(
+    (item: InspectorTreeItem) =>
+      !lowerCaseSearchText ||
+      !item.label.toLowerCase().includes(lowerCaseSearchText),
+    [lowerCaseSearchText]
+  );
   const treeViewRef = React.useRef<?ReadOnlyTreeViewInterface<InspectorTreeItem>>(
     null
   );
@@ -138,32 +163,50 @@ const InspectorsList = ({
   if (!gameData) return null;
 
   return (
-    <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
-      <AutoSizer>
-        {({ height, width }) => (
-          <ReadOnlyTreeView
-            ref={treeViewRef}
-            height={height}
-            width={width}
-            items={items}
-            estimatedItemSize={ITEM_HEIGHT}
-            getItemHeight={getItemHeight}
-            shouldApplySearchToItem={shouldApplySearchToItem}
-            getItemName={getItemName}
-            getItemId={getItemId}
-            getItemChildren={getItemChildren}
-            selectedItems={selectedItems}
-            onClickItem={onClickItem}
-            initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-            enableStickyAncestors
-            onSelectItems={(selectedTreeItems: Array<InspectorTreeItem>) => {
-              const item = selectedTreeItems[0];
-              if (item) onChooseInspector(item.description, item.fullPath);
-            }}
-            multiSelect={false}
-          />
-        )}
-      </AutoSizer>
+    <div
+      style={{
+        flex: 1,
+        minHeight: 0,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div className={classes.searchBar}>
+        <SearchBar
+          value={searchText}
+          onChange={setSearchText}
+          onRequestSearch={() => {}}
+          placeholder={t`Search an object, an instance...`}
+        />
+      </div>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
+        <AutoSizer>
+          {({ height, width }) => (
+            <ReadOnlyTreeView
+              ref={treeViewRef}
+              height={height}
+              width={width}
+              items={items}
+              estimatedItemSize={ITEM_HEIGHT}
+              getItemHeight={getItemHeight}
+              shouldApplySearchToItem={shouldApplySearchToItem}
+              searchText={lowerCaseSearchText}
+              getItemName={getItemName}
+              getItemId={getItemId}
+              getItemChildren={getItemChildren}
+              selectedItems={selectedItems}
+              onClickItem={onClickItem}
+              initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+              enableStickyAncestors
+              onSelectItems={(selectedTreeItems: Array<InspectorTreeItem>) => {
+                const item = selectedTreeItems[0];
+                if (item) onChooseInspector(item.description, item.fullPath);
+              }}
+              multiSelect={false}
+            />
+          )}
+        </AutoSizer>
+      </div>
     </div>
   );
 };

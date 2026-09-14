@@ -12,9 +12,9 @@ export default React.memo(props => (
     <path
       d="m12.75 10.25v-6.5l-7 10h5.5v6.5l7-10z"
       stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.5"
     />
   </SvgIcon>
 ));

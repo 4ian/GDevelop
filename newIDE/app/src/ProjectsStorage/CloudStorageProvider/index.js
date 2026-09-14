@@ -49,6 +49,9 @@ export default ({
 
     const fileIdentifier = appArguments[POSITIONAL_ARGUMENTS_KEY][0];
     if (isURL(fileIdentifier)) return null;
+    // Ignore arguments that don't look like cloud project IDs (e.g., "app"
+    // from "electron app" in development mode). Cloud IDs are UUIDs.
+    if (fileIdentifier.length < 10) return null;
 
     return {
       fileIdentifier,

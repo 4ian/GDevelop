@@ -234,6 +234,13 @@ type DialogProps = {|
    */
   exceptionallyStillAllowRenderingInstancesEditors?: boolean,
 
+  /**
+   * Indicates that the floating panels (the watched variables of the debugger)
+   * can still be used while this dialog is opened. Without this, the focus trap
+   * of the dialog takes the focus back and typing in a panel is impossible.
+   */
+  allowInteractionWithFloatingPanels?: boolean,
+
   children: React.Node, // The content of the dialog
 
   // Display:
@@ -274,6 +281,7 @@ const DialogWithoutWindowSizeProvider = ({
   id,
   cannotBeDismissed,
   exceptionallyStillAllowRenderingInstancesEditors,
+  allowInteractionWithFloatingPanels,
   fullscreen,
   noPadding,
   actionsFullWidthOnMobile,
@@ -449,6 +457,7 @@ const DialogWithoutWindowSizeProvider = ({
           : getDefaultMaxWidthFromSize(windowSize)
       }
       disableBackdropClick={false}
+      disableEnforceFocus={allowInteractionWithFloatingPanels}
       onKeyDown={handleKeyDown}
       container={portalContainer}
     >

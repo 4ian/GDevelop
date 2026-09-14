@@ -1,0 +1,171 @@
+/* Flexbox row for the inspector tree. */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  min-width: 0;
+  width: 100%;
+}
+
+.row:hover {
+  background-color: var(--theme-list-item-hover-background-color);
+}
+
+.rowName {
+  flex: 0 1 auto;
+  min-width: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--theme-text-secondary-color);
+}
+
+.rowIcon svg {
+  font-size: 16px;
+}
+
+.rowSeparator {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.rowValue,
+.rowValue p {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  color: var(--theme-text-secondary-color);
+}
+
+/* The tree takes all the height left by the panel and scrolls on its own. */
+.tree {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  position: relative;
+}
+
+/* Container for the sticky rows, rendered via portal outside the AutoSizer. */
+.stickyContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.stickyContainer > * {
+  pointer-events: auto;
+}
+
+/* Ensure sticky rows container is visible above the scrolling list. */
+.tree [class*='stickyRowsContainer'] {
+  width: 100%;
+  z-index: 10 !important;
+  pointer-events: auto;
+}
+
+.tree [class*='stickyRow'] {
+  width: 100% !important;
+}
+
+/* Lower z-index on the VariableSizeList container so sticky rows appear above. */
+.tree [class*='treeView'] > div[style*='overflow'] {
+  z-index: 1 !important;
+  position: relative !important;
+}
+
+/* How many rows a folded section holds. */
+.rowCount {
+  flex-shrink: 0;
+  color: var(--theme-text-secondary-color);
+  opacity: 0.7;
+}
+
+.rowHint,
+.rowHint p {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  font-style: italic;
+}
+
+/* Override TreeView styles so that .row takes the full width. */
+.tree [class*='fullHeightFlexContainer'] {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding-right: 0 !important;
+}
+
+.tree [class*='rowContainer'] {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.tree [class*='fullSpaceContainer'] {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.tree [class*='rowContent'] {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.tree [class*='rowContentSide'] {
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0;
+  padding-right: 0 !important;
+}
+
+.tree [class*='itemTextContainer'] {
+  display: block !important;
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0;
+}
+
+.tree [class*='itemName'] {
+  display: flex !important;
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0;
+}
+
+.tree .row {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The search bar above the tree, the tree taking the rest of the height. */
+.treeWithSearch {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Breathing room around the search bar, like the lists of the editors. */
+.searchBar {
+  flex-shrink: 0;
+  padding: 4px 8px 8px 8px;
+}

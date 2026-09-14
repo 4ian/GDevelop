@@ -33,3 +33,13 @@
   min-width: 0;
   min-height: 0;
 }
+
+/* The inspected element fills the pane: its tree scrolls, not the pane. */
+.inspectorDetailsContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  padding: 0 8px 8px 8px;
+}

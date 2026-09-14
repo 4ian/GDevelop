@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { VariableSizeList } from 'react-window';
 import memoizeOne from 'memoize-one';
 import classes from './TreeView.module.css';
@@ -153,6 +154,12 @@ type Props<Item> = {|
    * are kept displayed as sticky rows at the top of the list when scrolling.
    */
   enableStickyAncestors?: boolean,
+  /**
+   * If provided, the sticky rows are rendered into this element via a portal
+   * instead of inside the tree view. Useful when the tree is inside a container
+   * that clips overflow (like AutoSizer).
+   */
+  stickyPortalTarget?: ?HTMLElement,
 |};
 
 const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
@@ -180,6 +187,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
     enableStickyAncestors,
+    stickyPortalTarget,
   }: Props<Item>,
   ref: ReadOnlyTreeViewInterface<Item>
   // $FlowFixMe[missing-local-annot]
@@ -505,6 +513,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 
   const onScroll = React.useCallback(
     ({ scrollOffset }: {| scrollOffset: number |}) => {
+      scrollOffsetRef.current = scrollOffset;
       scrollOffsetRef.current = scrollOffset;
       updateStickyRows();
     },
@@ -860,6 +869,55 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     ]
   );
 
+  const stickyRowsElement =
+    enableStickyAncestors && stickyRows.length > 0 ? (
+      <div
+        className={classes.stickyRowsContainer}
+        style={{
+          height:
+            stickyRows[stickyRows.length - 1].top +
+            stickyRows[stickyRows.length - 1].height,
+          // Do not cover the scrollbar of the list, if any.
+          right: listOuterRef.current
+            ? listOuterRef.current.offsetWidth -
+              listOuterRef.current.clientWidth
+            : 0,
+        }}
+      >
+        {stickyRows
+          .map((stickyRow, rowRank) => {
+            const node = flattenedData[stickyRow.index];
+            if (!node) return null;
+            return (
+              <div
+                key={node.id}
+                className={classes.stickyRow}
+                style={{
+                  top: stickyRow.top,
+                  height: stickyRow.height,
+                  backgroundColor: surfaceBackgroundColor || undefined,
+                }}
+                onClick={() => onClickStickyRow(rowRank, stickyRow.index)}
+              >
+                <ReadOnlyTreeViewRow
+                  index={stickyRow.index}
+                  style={{ height: stickyRow.height }}
+                  data={{
+                    ...itemData,
+                    onOpen: (node, index) => {
+                      onOpen(node, index);
+                      onClickStickyRow(rowRank, stickyRow.index);
+                    },
+                  }}
+                  isSticky
+                />
+              </div>
+            );
+          })
+          .reverse()}
+      </div>
+    ) : null;
+
   return (
     <div
       tabIndex={0}
@@ -867,6 +925,9 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       onKeyDown={onKeyDown}
       ref={containerRef}
     >
+      {stickyPortalTarget
+        ? ReactDOM.createPortal(stickyRowsElement, stickyPortalTarget)
+        : stickyRowsElement}
       <VariableSizeList
         height={height}
         itemCount={flattenedData.length}
@@ -889,60 +950,6 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       >
         {ReadOnlyTreeViewRow}
       </VariableSizeList>
-      {enableStickyAncestors && stickyRows.length > 0 && (
-        <div
-          className={classes.stickyRowsContainer}
-          style={{
-            height:
-              stickyRows[stickyRows.length - 1].top +
-              stickyRows[stickyRows.length - 1].height,
-            // Do not cover the scrollbar of the list, if any.
-            right: listOuterRef.current
-              ? listOuterRef.current.offsetWidth -
-                listOuterRef.current.clientWidth
-              : 0,
-          }}
-        >
-          {stickyRows
-            .map((stickyRow, rowRank) => {
-              const node = flattenedData[stickyRow.index];
-              // The sticky rows can reference rows that no longer exist
-              // during the render following a change of the tree - they
-              // are recomputed in a layout effect, before painting.
-              if (!node) return null;
-              return (
-                <div
-                  key={node.id}
-                  className={classes.stickyRow}
-                  style={{
-                    top: stickyRow.top,
-                    height: stickyRow.height,
-                    backgroundColor: surfaceBackgroundColor || undefined,
-                  }}
-                  onClick={() => onClickStickyRow(rowRank, stickyRow.index)}
-                >
-                  <ReadOnlyTreeViewRow
-                    index={stickyRow.index}
-                    style={{ height: stickyRow.height }}
-                    data={{
-                      ...itemData,
-                      // When collapsing from a sticky row, also reveal the
-                      // actual row so the user does not lose their position.
-                      onOpen: (node, index) => {
-                        onOpen(node, index);
-                        onClickStickyRow(rowRank, stickyRow.index);
-                      },
-                    }}
-                    isSticky
-                  />
-                </div>
-              );
-            })
-            // Render in reverse DOM order so that, during the "push"
-            // transition, the deepest row slides under its ancestors.
-            .reverse()}
-        </div>
-      )}
     </div>
   );
 };

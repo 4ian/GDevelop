@@ -1753,7 +1753,6 @@ storiesOf('DebuggerContent', module)
           onRequestResourcesDebugState={async () => {}}
           isDebuggerConnected={false}
           isDebuggerPaused={false}
-          isProfilerAccessAllowed={true}
           logsManager={consoleTestData}
           onOpenedEditorsChanged={() => {}}
         />
@@ -1778,7 +1777,6 @@ storiesOf('DebuggerContent', module)
           onRequestResourcesDebugState={async () => {}}
           isDebuggerConnected={false}
           isDebuggerPaused={false}
-          isProfilerAccessAllowed={true}
           logsManager={consoleTestData}
           onOpenedEditorsChanged={() => {}}
         />

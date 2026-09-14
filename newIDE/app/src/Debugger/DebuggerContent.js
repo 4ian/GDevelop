@@ -9,13 +9,14 @@ import EditorMosaic, {
 } from '../UI/EditorMosaic';
 import Background from '../UI/Background';
 import RaisedButton from '../UI/RaisedButton';
-import { Column, Line } from '../UI/Grid';
+import { Line } from '../UI/Grid';
 import InspectorsList from './InspectorsList';
 import {
   getInspectorDescriptions,
   type InspectorDescription,
   type EditFunction,
   type CallFunction,
+  type ReadValuesFunction,
 } from './GDJSInspectorDescriptions';
 import InspectedValue from './Inspectors/InspectedValue';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -33,8 +34,6 @@ import { ProfilerRecordingStore } from './ProfilerRecording/ProfilerRecordingSto
 import { type DebuggerId } from '../ExportAndShare/PreviewLauncher.flow';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import MiniToolbar from '../UI/MiniToolbar';
-import ScrollView from '../UI/ScrollView';
-import Text from '../UI/Text';
 import classes from './DebuggerContent.module.css';
 
 type Props = {|
@@ -51,10 +50,10 @@ type Props = {|
   debuggerId: DebuggerId,
   resourcesDebugSnapshot: ?ResourcesDebugSnapshot,
   onRequestResourcesDebugState: () => Promise<void>,
+  /** Call functions on what is at this path in the running game (the expressions of behaviors). */
+  onReadValues: ReadValuesFunction,
   isDebuggerConnected: boolean,
   isDebuggerPaused: boolean,
-  /** False when the profiler, performance and resources panels are not for this user. */
-  isProfilerAccessAllowed: boolean,
   logsManager: LogsManager,
   onOpenedEditorsChanged: () => void,
 |};
@@ -231,10 +230,10 @@ export default class DebuggerContent extends React.Component<Props, State> {
       debuggerId,
       resourcesDebugSnapshot,
       onInspectPath,
+      onReadValues,
       onRequestResourcesDebugState,
       isDebuggerConnected,
       isDebuggerPaused,
-      isProfilerAccessAllowed,
       logsManager,
     } = this.props;
     const {
@@ -244,16 +243,6 @@ export default class DebuggerContent extends React.Component<Props, State> {
       memoryLimitMegabytes,
       inspectorListWidth,
     } = this.state;
-    const renderRestrictedPanel = () => (
-      <Background>
-        <EmptyMessage>
-          <Trans>
-            The profiling tools are reserved to the GDevelop team. Log in with
-            an allowed account to use them.
-          </Trans>
-        </EmptyMessage>
-      </Background>
-    );
     const memoryLimitBytes = getMemoryLimitBytes(
       resourcesDebugSnapshot ? resourcesDebugSnapshot.state : null,
       memoryLimitMegabytes
@@ -292,11 +281,6 @@ export default class DebuggerContent extends React.Component<Props, State> {
                     primary
                   />
                 </Line>
-                <Column noMargin>
-                  <Text noMargin size="body-small" color="secondary">
-                    <Trans>Scene content</Trans>
-                  </Text>
-                </Column>
                 <InspectorsList
                   gameData={gameData}
                   getInspectorDescriptions={getInspectorDescriptions}
@@ -317,37 +301,36 @@ export default class DebuggerContent extends React.Component<Props, State> {
                 onMouseDown={this._startInspectorResize}
               />
               <div className={classes.inspectorDetails}>
-                <ScrollView>
-                  <Column>
-                    {selectedInspector ? (
-                      <InspectedValue
-                        selectedInspector={selectedInspector}
-                        selectedInspectorFullPath={selectedInspectorFullPath}
-                        gameData={gameData}
-                        onInspectPath={onInspectPath}
-                        // The values are only followed while recording, like
-                        // every other statistic of the debugger.
-                        isLive={isDebuggerConnected && profilingInProgress}
-                        rawMode={rawMode}
-                        onCall={onCall}
-                        onEdit={onEdit}
-                      />
-                    ) : (
-                      <EmptyMessage>
-                        {gameData ? (
-                          <Trans>
-                            Choose an element to inspect in the list on the left
-                          </Trans>
-                        ) : (
-                          <Trans>
-                            Pause the game (from the toolbar) or hit refresh (on
-                            the left) to inspect the game
-                          </Trans>
-                        )}
-                      </EmptyMessage>
-                    )}
-                  </Column>
-                </ScrollView>
+                <div className={classes.inspectorDetailsContent}>
+                  {selectedInspector ? (
+                    <InspectedValue
+                      selectedInspector={selectedInspector}
+                      selectedInspectorFullPath={selectedInspectorFullPath}
+                      gameData={gameData}
+                      onInspectPath={onInspectPath}
+                      // The values are only followed while recording, like
+                      // every other statistic of the debugger.
+                      isLive={isDebuggerConnected && profilingInProgress}
+                      rawMode={rawMode}
+                      onCall={onCall}
+                      onEdit={onEdit}
+                      onReadValues={onReadValues}
+                    />
+                  ) : (
+                    <EmptyMessage>
+                      {gameData ? (
+                        <Trans>
+                          Choose an element to inspect in the list on the left
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          Pause the game (from the toolbar) or hit refresh (on
+                          the left) to inspect the game
+                        </Trans>
+                      )}
+                    </EmptyMessage>
+                  )}
+                </div>
               </div>
             </div>
             <MiniToolbar>
@@ -373,61 +356,52 @@ export default class DebuggerContent extends React.Component<Props, State> {
       profiler: {
         type: 'secondary',
         title: t`Profiler`,
-        renderEditor: () =>
-          !isProfilerAccessAllowed ? (
-            renderRestrictedPanel()
-          ) : (
-            <Profiler
-              profilingInProgress={profilingInProgress}
-              recordingStore={profilerRecordingStore}
-              debuggerId={debuggerId}
-            />
-          ),
+        renderEditor: () => (
+          <Profiler
+            profilingInProgress={profilingInProgress}
+            recordingStore={profilerRecordingStore}
+            debuggerId={debuggerId}
+          />
+        ),
       },
       performance: {
         type: 'secondary',
         title: t`Performance`,
-        renderEditor: () =>
-          !isProfilerAccessAllowed ? (
-            renderRestrictedPanel()
-          ) : (
-            <Performance
-              recordingStore={profilerRecordingStore}
-              debuggerId={debuggerId}
-              profilingInProgress={profilingInProgress}
-              memoryLimitBytes={memoryLimitBytes || null}
-            />
-          ),
+        renderEditor: () => (
+          <Performance
+            recordingStore={profilerRecordingStore}
+            debuggerId={debuggerId}
+            profilingInProgress={profilingInProgress}
+            memoryLimitBytes={memoryLimitBytes || null}
+          />
+        ),
       },
       resources: {
         type: 'secondary',
         title: t`Resources`,
-        renderEditor: () =>
-          !isProfilerAccessAllowed ? (
-            renderRestrictedPanel()
-          ) : (
-            <ResourcesPanel
-              resourcesDebugState={
-                resourcesDebugSnapshot ? resourcesDebugSnapshot.state : null
-              }
-              lastError={
-                resourcesDebugSnapshot ? resourcesDebugSnapshot.lastError : null
-              }
-              onRefresh={onRequestResourcesDebugState}
-              // The resources are watched while recording, like the other
-              // statistics of the debugger: pausing the game freezes the
-              // panel too, and clearing empties it for good.
-              isPollingEnabled={
-                isDebuggerConnected && !isDebuggerPaused && profilingInProgress
-              }
-              recordingStore={profilerRecordingStore}
-              debuggerId={debuggerId}
-              artificialLimitMegabytes={memoryLimitMegabytes}
-              onChangeArtificialLimitMegabytes={megabytes =>
-                this.setState({ memoryLimitMegabytes: megabytes })
-              }
-            />
-          ),
+        renderEditor: () => (
+          <ResourcesPanel
+            resourcesDebugState={
+              resourcesDebugSnapshot ? resourcesDebugSnapshot.state : null
+            }
+            lastError={
+              resourcesDebugSnapshot ? resourcesDebugSnapshot.lastError : null
+            }
+            onRefresh={onRequestResourcesDebugState}
+            // The resources are watched while recording, like the other
+            // statistics of the debugger: pausing the game freezes the
+            // panel too, and clearing empties it for good.
+            isPollingEnabled={
+              isDebuggerConnected && !isDebuggerPaused && profilingInProgress
+            }
+            recordingStore={profilerRecordingStore}
+            debuggerId={debuggerId}
+            artificialLimitMegabytes={memoryLimitMegabytes}
+            onChangeArtificialLimitMegabytes={megabytes =>
+              this.setState({ memoryLimitMegabytes: megabytes })
+            }
+          />
+        ),
       },
       console: {
         type: 'secondary',

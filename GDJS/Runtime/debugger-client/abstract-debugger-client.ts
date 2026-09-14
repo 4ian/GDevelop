@@ -142,13 +142,22 @@ namespace gdjs {
     return value;
   };
 
+  /**
+   * The scene the debugger talks about. While editing in the game, the scene
+   * being edited is held by the editor and not by the scene stack.
+   */
+  const getCurrentSceneForDebugger = (
+    runtimeGame: gdjs.RuntimeGame
+  ): gdjs.RuntimeScene | null | undefined =>
+    runtimeGame.isInGameEdition()
+      ? runtimeGame.getInGameEditor()?.getCurrentScene()
+      : runtimeGame.getSceneStack().getCurrentScene();
+
   const buildGameCrashReport = (
     exception: Error,
     runtimeGame: gdjs.RuntimeGame
   ) => {
-    const currentScene = runtimeGame.isInGameEdition()
-      ? runtimeGame.getInGameEditor()?.getCurrentScene()
-      : runtimeGame.getSceneStack().getCurrentScene();
+    const currentScene = getCurrentSceneForDebugger(runtimeGame);
     const sceneNames = runtimeGame.isInGameEdition()
       ? [currentScene?.getName()]
       : runtimeGame.getSceneStack().getAllSceneNames();
@@ -369,6 +378,12 @@ namespace gdjs {
           that.sendExpressionValues(data.messageId, data.payload.codes);
         } else if (data.command === 'inspector.dump') {
           that.sendInspectedValue(data.messageId, data.payload.path);
+        } else if (data.command === 'inspector.call') {
+          that.sendCalledValues(
+            data.messageId,
+            data.payload.path,
+            data.payload.calls
+          );
         } else if (data.command === 'resources.dump') {
           that.sendResourcesDebugState(data.messageId);
         } else if (data.command === 'hotReload') {
@@ -902,7 +917,7 @@ namespace gdjs {
     }
 
     sendRuntimeGameStatus(): void {
-      const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
+      const currentScene = getCurrentSceneForDebugger(this._runtimegame);
       this._sendMessage(
         circularSafeStringify({
           command: 'status',
@@ -1037,6 +1052,66 @@ namespace gdjs {
     }
 
     /**
+     * Call, on what is at the given path in the running game, the functions
+     * asked by the editor and send back what they return, as an answer to
+     * `inspector.call`. This is how the inspector reads the values of the
+     * expressions of a behavior: each expression is a method of it.
+     *
+     * The code-only arguments an expression takes (the current scene) are
+     * filled here, as the generated code of the events would do.
+     */
+    sendCalledValues(
+      messageId: number,
+      path: string[],
+      calls: Array<{
+        /** Relative to what is at `path`: a behavior of the inspected object. */
+        path: string[];
+        functionName: string;
+        codeOnlyArguments: string[];
+      }>
+    ): void {
+      const resolvePath = (from: any, keys: string[]): any => {
+        let value = from;
+        for (const key of keys || []) {
+          if (value === null || value === undefined) break;
+          value = value[key];
+        }
+        return value;
+      };
+      const inspectedElement = resolvePath(this._runtimegame, path);
+
+      const payload = (calls || []).map((call) => {
+        const target = resolvePath(inspectedElement, call.path);
+        if (!target || typeof target[call.functionName] !== 'function') {
+          return { error: 'Not a function of the inspected element.' };
+        }
+        try {
+          const args = (call.codeOnlyArguments || []).map((argumentKind) => {
+            if (argumentKind === 'currentScene') {
+              return (
+                target._runtimeScene ||
+                this._runtimegame.getSceneStack().getCurrentScene()
+              );
+            }
+            throw new Error(`Unsupported argument "${argumentKind}".`);
+          });
+          return { value: target[call.functionName].apply(target, args) };
+        } catch (error) {
+          return { error: String(error) };
+        }
+      });
+
+      this._sendMessage(
+        circularSafeStringify(
+          { command: 'inspector.called', messageId, payload },
+          this._getDumpReplacer(),
+          /* Expressions return numbers and strings: anything deeper is a mistake. */
+          3
+        )
+      );
+    }
+
+    /**
      * Send logs from the hot reloader to the server.
      * @param logs The hot reloader logs.
      */
@@ -1058,7 +1133,7 @@ namespace gdjs {
      * and send back its value and the values of the variables it uses.
      */
     sendExpressionValues(messageId: number, codes: string[]): void {
-      const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
+      const currentScene = getCurrentSceneForDebugger(this._runtimegame);
 
       // Everything is evaluated in one go: the editor watches several
       // expressions at once and must not pay a round trip for each of them.

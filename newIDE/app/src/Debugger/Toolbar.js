@@ -162,6 +162,17 @@ export class Toolbar extends React.PureComponent<Props> {
             },
           ]
         : []),
+      // A closed game whose recording is kept: its record button is disabled,
+      // and its menu with it, so clearing is offered here.
+      ...(!hasDebugger && canClear
+        ? [
+            { type: 'separator' },
+            {
+              label: i18n._(t`Clear the recorded data`),
+              click: onClear,
+            },
+          ]
+        : []),
     ];
 
     const recordMenuTemplate = (i18n: I18nType): Array<MenuItemTemplate> => [

@@ -75,24 +75,6 @@ autoUpdater.autoDownload = false;
 let mainWindows = new Set();
 let mainWindow = null; // Primary window reference for backwards compatibility
 
-/**
- * On Windows and macOS, the windows of the app are excluded from screenshots
- * and screen recordings (they appear black): the whole app is kept private
- * while the profiling tools are being tested. Nothing can lift this
- * protection at runtime, not even the renderer: there is no IPC to disable it.
- *
- * Development builds are left capturable, so that the tools being worked on
- * can be shown in screenshots and videos.
- */
-const protectWindowContent = browserWindow => {
-  if (isDev) return;
-  if (process.platform !== 'win32' && process.platform !== 'darwin') return;
-  try {
-    browserWindow.setContentProtection(true);
-  } catch (error) {
-    log.error('Unable to protect the content of the window:', error);
-  }
-};
 let windowCounter = 0; // Counter for creating unique session partitions
 
 const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
@@ -252,7 +234,6 @@ function createNewWindow(windowArgs = args) {
 
   const newWindow = new BrowserWindow(options);
   if (!isIntegrated && !isCliWindow) newWindow.maximize();
-  protectWindowContent(newWindow);
 
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;

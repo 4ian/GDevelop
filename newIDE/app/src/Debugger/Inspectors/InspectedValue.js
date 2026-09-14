@@ -9,6 +9,7 @@ import {
   type InspectorDescription,
   type EditFunction,
   type CallFunction,
+  type ReadValuesFunction,
 } from '../GDJSInspectorDescriptions';
 
 /**
@@ -30,6 +31,7 @@ type Props = {|
   rawMode: boolean,
   onCall: CallFunction,
   onEdit: EditFunction,
+  onReadValues: ReadValuesFunction,
 |};
 
 /**
@@ -49,6 +51,7 @@ const InspectedValue = ({
   rawMode,
   onCall,
   onEdit,
+  onReadValues,
 }: Props): React.Node => {
   const [liveValue, setLiveValue] = React.useState<Object | void>(undefined);
   const pathKey = selectedInspectorFullPath.join('.');
@@ -106,6 +109,8 @@ const InspectedValue = ({
         onCall(selectedInspectorFullPath.concat(path), args),
       onEdit: (path, newValue) =>
         onEdit(selectedInspectorFullPath.concat(path), newValue),
+      onReadValues: (path, calls) =>
+        onReadValues(selectedInspectorFullPath.concat(path), calls),
     });
   } catch (error) {
     console.error(

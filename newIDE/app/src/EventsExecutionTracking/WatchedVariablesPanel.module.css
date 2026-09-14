@@ -1,6 +1,9 @@
 .content {
   display: flex;
   flex-direction: column;
+  /* The list of variables scrolls on its own, filling the panel. */
+  height: 100%;
+  box-sizing: border-box;
   padding: 4px 8px 8px 8px;
   gap: 4px;
   font-family: var(--gdevelop-classic-font-family);
@@ -12,14 +15,22 @@
   gap: 4px;
 }
 
-/* Same columns on every row, so that icons, names and values line up. */
+.addRowField {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Flexbox row for better adaptation to TreeView indentation. */
 .row {
-  display: grid;
-  grid-template-columns: 24px minmax(0, 2fr) 1px minmax(0, 3fr) 28px;
+  display: flex;
   align-items: center;
-  column-gap: 6px;
+  justify-content: flex-start;
+  gap: 6px;
   padding: 2px 4px;
   border-radius: 4px;
+  min-width: 0;
+  width: 100%;
+  position: relative;
 }
 
 .row:hover {
@@ -27,46 +38,133 @@
 }
 
 .rowIcon {
+  flex-shrink: 0;
+  width: 18px;
   font-size: 18px;
   color: var(--theme-text-secondary-color);
 }
 
 .rowName {
-  min-width: 0;
+  flex: 0 1 auto;
+  min-width: 30px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.rowType {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--theme-text-secondary-color);
+  opacity: 0.6;
 }
 
 /* A variable that does not exist (anymore) in the project or in the game. */
 .row.missing .rowName {
-  text-decoration: line-through;
-  color: var(--theme-text-secondary-color);
+  text-decoration: line-through 2px;
+  color: var(--theme-error-color);
+  opacity: 0.7;
 }
 
 .rowSeparator {
-  align-self: stretch;
-  background-color: var(--theme-dialog-separator-color);
+  flex: 1 0 0;
+  min-width: 0;
 }
 
-.rowValue {
-  min-width: 0;
+.rowValue,
+.rowValue p {
+  flex: 0 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: right;
   color: var(--theme-text-secondary-color);
 }
 
-/* The delete button only shows up on the hovered row. */
+/* The delete button is always in the layout to avoid shifting, but invisible until hover. */
 .rowDelete {
-  opacity: 0;
+  flex-shrink: 0;
+  width: 28px;
+  visibility: hidden;
 }
 
 .row:hover .rowDelete,
 .rowDelete:focus-within {
-  opacity: 1;
+  visibility: visible;
 }
 
 .rowValue.error {
   color: var(--theme-error-color);
+}
+
+/* The rows are virtualized: the list takes the height left by the panel. */
+.tree {
+  flex: 1;
+  min-height: 120px;
+  display: flex;
+  min-width: 0;
+  width: 100%;
+}
+
+/* Override TreeView styles so that .row takes the full width.
+   Use attribute selectors because CSS modules hash the class names. */
+.tree [class*="fullHeightFlexContainer"] {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding-right: 0 !important;
+}
+
+.tree [class*="rowContainer"] {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.tree [class*="fullSpaceContainer"] {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.tree [class*="rowContent"] {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.tree [class*="rowContentSide"] {
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0;
+  padding-right: 0 !important;
+}
+
+.tree [class*="itemTextContainer"] {
+  display: block !important;
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0;
+}
+
+.tree [class*="itemName"] {
+  display: flex !important;
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0;
+}
+
+/* The row fills the width left by the arrow of the tree view. */
+.tree .row {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Nothing watched yet: the hint and the help sit in the middle of the panel. */
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
 }

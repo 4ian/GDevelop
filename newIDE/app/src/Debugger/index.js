@@ -12,6 +12,8 @@ import Text from '../UI/Text';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import Background from '../UI/Background';
+import AlertMessage from '../UI/AlertMessage';
+import FlatButton from '../UI/FlatButton';
 import {
   type PreviewDebuggerServer,
   type DebuggerId,
@@ -20,10 +22,10 @@ import {
 import { type Log, LogsManager } from './DebuggerConsole';
 import { ProfilerRecordingStore } from './ProfilerRecording/ProfilerRecordingStore';
 import { type ResourcesDebugState } from './Resources/ResourcesDebugTypes';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { isProfilerAccessAllowed } from './ProfilerAccess';
-import Window from '../Utils/Window';
-import classes from './Debugger.module.css';
+import {
+  type InspectorCall,
+  type InspectorCallResult,
+} from './GDJSInspectorDescriptions';
 import {
   type DebuggerPlaySpeed,
   type LaunchDebuggerAndPreviewOptions,
@@ -92,21 +94,15 @@ type State = {|
   debuggerStatus: { [DebuggerId]: DebuggerStatus },
   selectedId: DebuggerId,
   logs: { [DebuggerId]: Array<Log> },
-  /** True for a moment after a screenshot key was pressed: the panels are hidden. */
-  isScreenshotShieldShown: boolean,
   /** Start recording the game as soon as it is restarted. */
   shouldRecordOnLaunch: boolean,
   shouldClearOnRecord: boolean,
 |};
 
-/** How long the panels stay hidden after a screenshot key was pressed. */
-const SCREENSHOT_SHIELD_DURATION_MS = 2000;
-
 /**
  * Start the debugger server, listen to commands received and issue commands to it.
  */
 export default class Debugger extends React.Component<Props, State> {
-  static contextType: typeof AuthenticatedUserContext = AuthenticatedUserContext;
   // $FlowFixMe[missing-local-annot]
   state = {
     debuggerServerState: (this.props.previewDebuggerServer.getServerState():
@@ -122,50 +118,9 @@ export default class Debugger extends React.Component<Props, State> {
     debuggerStatus: {},
     selectedId: '0',
     logs: {},
-    isScreenshotShieldShown: false,
     shouldRecordOnLaunch: false,
     shouldClearOnRecord: true,
   };
-  _screenshotShieldTimeoutId: ?TimeoutID = null;
-  _wasProfilerAccessAllowed: boolean = false;
-
-  /**
-   * The profiler, performance and resources panels are for the allowed users
-   * only (everyone in development).
-   */
-  _isProfilerAccessAllowed = (): boolean =>
-    isProfilerAccessAllowed(
-      this.context ? this.context.profile : null,
-      Window.isDev()
-    );
-
-  /**
-   * The screenshot shield: the window is protected against captures by the
-   * system (desktop app on Windows), and the panels are hidden for a moment
-   * when a screenshot key is pressed (the only thing a page can notice).
-   */
-  _onWindowKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== 'PrintScreen' && event.key !== 'Snapshot') return;
-    this._showScreenshotShield();
-  };
-
-  _onWindowKeyUp = (event: KeyboardEvent) => {
-    // Print Screen is only reported on key up by some browsers.
-    if (event.key !== 'PrintScreen' && event.key !== 'Snapshot') return;
-    this._showScreenshotShield();
-  };
-
-  _showScreenshotShield = () => {
-    if (this._screenshotShieldTimeoutId) {
-      clearTimeout(this._screenshotShieldTimeoutId);
-    }
-    this.setState({ isScreenshotShieldShown: true });
-    this._screenshotShieldTimeoutId = setTimeout(() => {
-      this._screenshotShieldTimeoutId = null;
-      this.setState({ isScreenshotShieldShown: false });
-    }, SCREENSHOT_SHIELD_DURATION_MS);
-  };
-
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
   /**
    * The games to record as soon as they say they are running: the ones just
@@ -206,12 +161,10 @@ export default class Debugger extends React.Component<Props, State> {
         recordingStore={this._profilerRecordingStore}
         debuggerId={selectedId}
         profilingInProgress={!!this.state.profilingInProgress[selectedId]}
-        canRecord={
-          this._hasSelectedDebugger() && this._isProfilerAccessAllowed()
-        }
+        canRecord={this._hasSelectedDebugger()}
         onStartRecording={() => this._startProfiler(this.state.selectedId)}
         onStopRecording={() => this._stopProfiler(this.state.selectedId)}
-        canClear={this._hasSelectedDebugger()}
+        canClear={this._canShowSelectedDebugger()}
         onClear={() => this._clear(this.state.selectedId)}
         canRestart={this._hasSelectedDebugger()}
         onRestart={() => this._restart(this.state.selectedId)}
@@ -229,7 +182,7 @@ export default class Debugger extends React.Component<Props, State> {
             () => this.updateToolbar()
           )
         }
-        canOpenInspector={this._hasSelectedDebugger()}
+        canOpenInspector={this._canShowSelectedDebugger()}
         isInspectorShown={
           !!selectedDebuggerContents &&
           selectedDebuggerContents.isInspectorShown()
@@ -238,9 +191,7 @@ export default class Debugger extends React.Component<Props, State> {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].toggleInspector();
         }}
-        canOpenProfiler={
-          this._hasSelectedDebugger() && this._isProfilerAccessAllowed()
-        }
+        canOpenProfiler={this._canShowSelectedDebugger()}
         isProfilerShown={
           !!selectedDebuggerContents &&
           selectedDebuggerContents.isProfilerShown()
@@ -249,7 +200,7 @@ export default class Debugger extends React.Component<Props, State> {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].toggleProfiler();
         }}
-        canOpenConsole={this._hasSelectedDebugger()}
+        canOpenConsole={this._canShowSelectedDebugger()}
         isConsoleShown={
           !!selectedDebuggerContents &&
           selectedDebuggerContents.isConsoleShown()
@@ -258,9 +209,7 @@ export default class Debugger extends React.Component<Props, State> {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].toggleConsole();
         }}
-        canOpenPerformance={
-          this._hasSelectedDebugger() && this._isProfilerAccessAllowed()
-        }
+        canOpenPerformance={this._canShowSelectedDebugger()}
         isPerformanceShown={
           !!selectedDebuggerContents &&
           selectedDebuggerContents.isPerformanceShown()
@@ -269,9 +218,7 @@ export default class Debugger extends React.Component<Props, State> {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].togglePerformance();
         }}
-        canOpenResources={
-          this._hasSelectedDebugger() && this._isProfilerAccessAllowed()
-        }
+        canOpenResources={this._canShowSelectedDebugger()}
         isResourcesShown={
           !!selectedDebuggerContents &&
           selectedDebuggerContents.isResourcesShown()
@@ -286,28 +233,11 @@ export default class Debugger extends React.Component<Props, State> {
 
   componentDidMount() {
     this._registerServerCallbacks();
-    this._wasProfilerAccessAllowed = this._isProfilerAccessAllowed();
-    window.addEventListener('keydown', this._onWindowKeyDown);
-    window.addEventListener('keyup', this._onWindowKeyUp);
-  }
-
-  componentDidUpdate() {
-    // The user logged in or out: the toolbar and the panels follow.
-    const isProfilerAccessAllowed = this._isProfilerAccessAllowed();
-    if (isProfilerAccessAllowed !== this._wasProfilerAccessAllowed) {
-      this._wasProfilerAccessAllowed = isProfilerAccessAllowed;
-      this.updateToolbar();
-    }
   }
 
   componentWillUnmount() {
     if (this.state.unregisterDebuggerServerCallbacks) {
       this.state.unregisterDebuggerServerCallbacks();
-    }
-    window.removeEventListener('keydown', this._onWindowKeyDown);
-    window.removeEventListener('keyup', this._onWindowKeyUp);
-    if (this._screenshotShieldTimeoutId) {
-      clearTimeout(this._screenshotShieldTimeoutId);
     }
   }
 
@@ -342,50 +272,50 @@ export default class Debugger extends React.Component<Props, State> {
         );
       },
       onConnectionClosed: ({ id, debuggerIds }) => {
-        this._debuggerLogs.delete(id);
-        this._profilerRecordingStore.clear(id);
+        const status = this.state.debuggerStatus[id];
+        // What a closed game recorded stays readable, until it is cleared or
+        // another game is launched. A game embedded in an editor, or a game
+        // that never said it was running, has nothing worth keeping.
+        const isKept = !!status && !status.isInGameEdition;
+        if (!isKept) {
+          this._forgetDebugger(id);
+        } else if (this.state.profilingInProgress[id]) {
+          // The game will not say it stopped recording: its recording ends
+          // with its last frame.
+          this._profilerRecordingStore.onStopped(id, null);
+        }
         this.setState(
-          ({
-            selectedId,
-            debuggerGameData,
-            profilingInProgress,
-            resourcesDebugSnapshots,
-            debuggerStatus,
-          }) => {
-            // Remove any data bound to the instance that might have been stored.
-            // Otherwise this would be a memory leak.
-            if (debuggerGameData[id]) delete debuggerGameData[id];
-            if (profilingInProgress[id]) delete profilingInProgress[id];
-            if (resourcesDebugSnapshots[id]) delete resourcesDebugSnapshots[id];
-            if (debuggerStatus[id]) delete debuggerStatus[id];
-
-            return {
-              debuggerIds,
-              selectedId:
-                selectedId !== id
-                  ? selectedId
-                  : debuggerIds.length
-                  ? debuggerIds[debuggerIds.length - 1]
-                  : selectedId,
-              debuggerGameData,
-              profilingInProgress,
-              resourcesDebugSnapshots,
-              debuggerStatus,
-            };
-          },
+          ({ selectedId, profilingInProgress }) => ({
+            debuggerIds,
+            profilingInProgress: isKept
+              ? { ...profilingInProgress, [id]: false }
+              : profilingInProgress,
+            // A kept game stays selected. Otherwise another running game is
+            // selected, never the game embedded in the editor.
+            selectedId:
+              selectedId !== id || isKept
+                ? selectedId
+                : this._pickRunningDebuggerId(debuggerIds) || selectedId,
+          }),
           () => this.updateToolbar()
         );
       },
       onConnectionOpened: ({ id, debuggerIds }) => {
+        const isPreview = previewDebuggerServer
+          .getExistingPreviewDebuggerIds()
+          .includes(id);
+        // A new game replaces what the closed ones recorded.
+        if (isPreview) this._forgetClosedDebuggers(debuggerIds);
         // The game is not ready to record yet: it is when it sends its status.
         if (this.state.shouldRecordOnLaunch) {
           this._recordOnConnectionIds.add(id);
         }
         this.setState(
-          {
+          state => ({
             debuggerIds,
-            selectedId: id,
-          },
+            // The game embedded in the editor is never what is debugged.
+            selectedId: isPreview ? id : state.selectedId,
+          }),
           () => this.updateToolbar()
         );
       },
@@ -464,6 +394,11 @@ export default class Debugger extends React.Component<Props, State> {
         }),
         () => this.updateToolbar()
       );
+    } else if (
+      data.command === 'inspector.dumped' ||
+      data.command === 'inspector.called'
+    ) {
+      // Answered to the inspector (see `sendMessageWithResponse`).
     } else if (data.command === 'resources.dumped') {
       // Answered to `_requestResourcesDebugState` (see `sendMessageWithResponse`).
     } else if (data.command === 'expressionValue') {
@@ -537,7 +472,6 @@ export default class Debugger extends React.Component<Props, State> {
 
   _startProfiler = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
-    if (!this._isProfilerAccessAllowed()) return;
     // Recording again starts from a blank slate, unless asked otherwise.
     if (this.state.shouldClearOnRecord && !this.state.profilingInProgress[id]) {
       this._forgetRecordedData(id);
@@ -559,6 +493,11 @@ export default class Debugger extends React.Component<Props, State> {
    */
   _clear = (id: DebuggerId) => {
     if (this.state.profilingInProgress[id]) this._stopProfiler(id);
+    if (!this.state.debuggerIds.includes(id)) {
+      // Clearing a closed game leaves nothing of it.
+      this._forgetDebugger(id);
+      return;
+    }
     this._forgetRecordedData(id);
   };
 
@@ -574,6 +513,61 @@ export default class Debugger extends React.Component<Props, State> {
       return { debuggerGameData, resourcesDebugSnapshots };
     });
   };
+
+  /**
+   * Forget everything about a game: what it recorded and its status, so that
+   * it disappears from the debugger.
+   */
+  _forgetDebugger = (id: DebuggerId) => {
+    this._forgetRecordedData(id);
+    this._debuggerLogs.delete(id);
+    this.setState(
+      state => {
+        const debuggerStatus = { ...state.debuggerStatus };
+        const profilingInProgress = { ...state.profilingInProgress };
+        delete debuggerStatus[id];
+        delete profilingInProgress[id];
+        return { debuggerStatus, profilingInProgress };
+      },
+      () => this.updateToolbar()
+    );
+  };
+
+  /**
+   * Forget the games that were closed and whose data was kept: a new game
+   * replaces them, so that recordings do not pile up.
+   */
+  _forgetClosedDebuggers = (connectedDebuggerIds: Array<DebuggerId>) => {
+    Object.keys(this.state.debuggerStatus)
+      .filter(id => !connectedDebuggerIds.includes(id))
+      .forEach(id => this._forgetDebugger(id));
+  };
+
+  /** The last game running in a preview, ignoring the game embedded in the editor. */
+  _pickRunningDebuggerId = (debuggerIds: Array<DebuggerId>): ?DebuggerId => {
+    const { debuggerStatus } = this.state;
+    for (let index = debuggerIds.length - 1; index >= 0; index--) {
+      const id = debuggerIds[index];
+      const status = debuggerStatus[id];
+      if (!status || !status.isInGameEdition) return id;
+    }
+    return null;
+  };
+
+  /**
+   * True when the selected game was closed but what it recorded is kept: the
+   * panels stay readable until they are cleared or another game is launched.
+   */
+  _hasKeptDataForSelectedDebugger = (): boolean => {
+    const { selectedId, debuggerIds, debuggerStatus } = this.state;
+    if (debuggerIds.includes(selectedId)) return false;
+    const status = debuggerStatus[selectedId];
+    return !!status && !status.isInGameEdition;
+  };
+
+  /** True when there is something to show: a running game, or a closed one whose data is kept. */
+  _canShowSelectedDebugger = (): boolean =>
+    this._hasSelectedDebugger() || this._hasKeptDataForSelectedDebugger();
 
   /**
    * Restart the game from scratch: caches emptied, resources downloaded
@@ -605,7 +599,31 @@ export default class Debugger extends React.Component<Props, State> {
         { command: 'inspector.dump', payload: { path } },
         id
       );
-      return answer.payload || null;
+      // `0`, `""` and `false` are values to show, not missing answers.
+      return answer.payload !== undefined ? answer.payload : null;
+    } catch (error) {
+      // The game did not answer in time (closed, or busy).
+      return null;
+    }
+  };
+
+  /**
+   * Call functions on what is at the given path in the running game (the
+   * expressions of the behaviors of an inspected object) and read what they
+   * return. Resolves to null if the game did not answer.
+   */
+  _readValues = async (
+    id: DebuggerId,
+    path: Array<string>,
+    calls: Array<InspectorCall>
+  ): Promise<Array<InspectorCallResult> | null> => {
+    const { previewDebuggerServer } = this.props;
+    try {
+      const answer = await previewDebuggerServer.sendMessageWithResponse(
+        { command: 'inspector.call', payload: { path, calls } },
+        id
+      );
+      return Array.isArray(answer.payload) ? answer.payload : null;
     } catch (error) {
       // The game did not answer in time (closed, or busy).
       return null;
@@ -706,10 +724,8 @@ export default class Debugger extends React.Component<Props, State> {
     // The debugger server is only started when a preview is launched, so a
     // stopped server is displayed like a started one without any preview
     // running (it will be started as soon as a preview is launched).
-    // A recording can only be started on a preview that is running and that
-    // the user is allowed to profile.
-    const canRecord =
-      this._hasSelectedDebugger() && this._isProfilerAccessAllowed();
+    // A recording can only be started on a preview that is running.
+    const canRecord = this._hasSelectedDebugger();
     const isRecording = !!profilingInProgress[selectedId];
 
     return (
@@ -734,13 +750,11 @@ export default class Debugger extends React.Component<Props, State> {
           enabled={canRecord && isRecording}
           command={{ handler: () => this._stopProfiler(selectedId) }}
         />
-        {this.state.isScreenshotShieldShown && (
-          <div className={classes.screenshotShield} />
-        )}
         <Column expand noMargin>
           <DebuggerSelector
             selectedId={selectedId}
             debuggerStatus={debuggerStatus}
+            connectedDebuggerIds={debuggerIds}
             onChooseDebugger={id =>
               this.setState(
                 {
@@ -750,7 +764,23 @@ export default class Debugger extends React.Component<Props, State> {
               )
             }
           />
-          {this._hasSelectedDebugger() ? (
+          {this._hasKeptDataForSelectedDebugger() && (
+            <AlertMessage
+              kind="info"
+              renderRightButton={() => (
+                <FlatButton
+                  label={<Trans>Clear</Trans>}
+                  onClick={() => this._clear(selectedId)}
+                />
+              )}
+            >
+              <Trans>
+                This game was closed. What it recorded is kept until it is
+                cleared or another game is launched.
+              </Trans>
+            </AlertMessage>
+          )}
+          {this._canShowSelectedDebugger() ? (
             <DebuggerContent
               ref={debuggerContent =>
                 (this._debuggerContents[selectedId] = debuggerContent)
@@ -760,6 +790,9 @@ export default class Debugger extends React.Component<Props, State> {
               onPause={() => this._pause(selectedId)}
               onRefresh={() => this._refresh(selectedId)}
               onInspectPath={path => this._inspectPath(selectedId, path)}
+              onReadValues={(path, calls) =>
+                this._readValues(selectedId, path, calls)
+              }
               onEdit={(path, args) => this._edit(selectedId, path, args)}
               onCall={(path, args) => this._call(selectedId, path, args)}
               profilingInProgress={!!profilingInProgress[selectedId]}
@@ -769,7 +802,6 @@ export default class Debugger extends React.Component<Props, State> {
               onRequestResourcesDebugState={() =>
                 this._requestResourcesDebugState(selectedId)
               }
-              isProfilerAccessAllowed={this._isProfilerAccessAllowed()}
               isDebuggerConnected={debuggerIds.includes(selectedId)}
               isDebuggerPaused={
                 !!debuggerStatus[selectedId] &&

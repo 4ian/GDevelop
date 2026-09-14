@@ -12,6 +12,8 @@ import {
 type Props = {|
   selectedId: DebuggerId,
   debuggerStatus: { [DebuggerId]: DebuggerStatus },
+  /** The games still running: the others were closed, their data is kept. */
+  connectedDebuggerIds: Array<DebuggerId>,
   onChooseDebugger: DebuggerId => void,
 |};
 
@@ -33,7 +35,11 @@ export default class DebuggerSelector extends React.Component<Props, void> {
           >
             {debuggerIdsWithoutInGameEdition.map(id => {
               const status = this.props.debuggerStatus[id];
-              const statusText = status.isPaused ? t`Paused` : t`Playing`;
+              const statusText = !this.props.connectedDebuggerIds.includes(id)
+                ? t`Closed`
+                : status.isPaused
+                ? t`Paused`
+                : t`Playing`;
 
               return (
                 <SelectOption

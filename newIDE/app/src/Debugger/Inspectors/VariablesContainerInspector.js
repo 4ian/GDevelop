@@ -1,141 +1,86 @@
 // @flow
 import * as React from 'react';
-import ReactJsonView from 'react-json-view';
+import mapValues from 'lodash/mapValues';
 import {
   type EditFunction,
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
+import InspectorTreeView, {
+  buildValueItems,
+  type InspectorItem,
+} from './InspectorTreeView';
 import {
-  transformVariablesContainer,
+  tooDeeplyNestedMessage,
   type DebuggerVariable as Variable,
-  type DebuggerVariablesContainer as VariablesContainer,
+  type DebuggerVariablesContainer,
 } from './DebuggerVariable';
 
-/**
- * Returns the list of properties to access the variable at the specified path in the specified variables container.
- * Also returns the variable already living there.
- */
-const constructPathToVariable = (
-  editPath: Array<string>,
-  variablesContainer: VariablesContainer
-): {| path: ?Array<string>, variable: ?Variable |} => {
-  const variableInContainerName = editPath.shift();
-  const path = ['_variables', 'items', variableInContainerName];
-  // $FlowFixMe[incompatible-type]
-  let variable = variablesContainer._variables.items[variableInContainerName];
-  let skip = false;
+export type VariablesContainer = DebuggerVariablesContainer;
 
-  for (const variableName of editPath) {
-    // Skip every second key as it is the "value"
-    // key which is displayed only for better user
-    // experience but doesn't really exists
-    skip = !skip;
-    if (skip) continue;
+// The runtime debugger client replaces anything nested too deeply by this string.
+const maxDepthReachedPlaceholder = '[Max depth reached]';
 
-    // Walk down in the children of the collection.
-    if (variable._type === 'structure') {
-      path.push('_children', variableName);
-      variable = variable._children[variableName];
-    } else if (variable._type === 'array') {
-      path.push('_childrenArray', variableName);
-      variable = variable._childrenArray[parseInt(variableName, 10)];
-    }
-    // Bad path: abort.
-    else return { path: null, variable: null };
-  }
-
-  // $FlowFixMe[incompatible-type]
-  return { path, variable };
+/** A variable of the game as a plain value: the shape the inspector reads. */
+// $FlowFixMe[recursive-definition]
+// $FlowFixMe[definition-cycle]
+const toPlainValue = (variable: Variable | string): any => {
+  if (!variable) return null;
+  if (
+    typeof variable !== 'object' ||
+    variable._type === maxDepthReachedPlaceholder
+  )
+    return tooDeeplyNestedMessage;
+  if (variable._type === 'string') return variable._str;
+  if (variable._type === 'number') return variable._value;
+  if (variable._type === 'boolean') return variable._bool;
+  if (variable._type === 'structure')
+    return variable._children === maxDepthReachedPlaceholder
+      ? tooDeeplyNestedMessage
+      : mapValues(variable._children, toPlainValue);
+  if (variable._type === 'array')
+    return variable._childrenArray === maxDepthReachedPlaceholder
+      ? tooDeeplyNestedMessage
+      : variable._childrenArray.map(toPlainValue);
+  return null;
 };
 
-// $FlowFixMe[missing-local-annot]
-const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
-  if (!variablesContainer) return;
+/** The variables of a container, one row each (a folder for a collection). */
+export const buildVariablesItems = (
+  parentId: string,
+  variablesContainer: ?VariablesContainer
+): ?Array<InspectorItem> => {
+  if (
+    !variablesContainer ||
+    !variablesContainer._variables ||
+    !variablesContainer._variables.items
+  )
+    return null;
 
-  // Reconstruct the variable to edit from the path
-  const { path, variable } = constructPathToVariable(
-    edit.namespace,
-    variablesContainer
+  return buildValueItems(
+    parentId,
+    mapValues(variablesContainer._variables.items, toPlainValue)
   );
-  if (!path) {
-    console.error('Invalid path passed to the debugger: ', edit);
-    return false;
-  }
-  if (!variable) {
-    console.error("Variable doesn't exist: ", edit);
-    return false;
-  }
-
-  if (edit.name === 'type') {
-    path.push('castTo');
-    if (
-      edit.new_value === 'string' ||
-      edit.new_value === 'number' ||
-      edit.new_value === 'boolean' ||
-      edit.new_value === 'structure' ||
-      edit.new_value === 'array'
-    ) {
-      if (edit.new_value !== variable._type) onCall(path, [edit.new_value]);
-    } else {
-      console.error('Invalid type name: ' + edit.new_value);
-      return false;
-    }
-  } else if (edit.name === 'value') {
-    // Validate data type
-    if (variable._type === 'string' && typeof edit.new_value !== 'string')
-      edit.new_value = '' + edit.new_value;
-    else if (
-      variable._type === 'number' &&
-      typeof edit.new_value !== 'number'
-    ) {
-      edit.new_value = parseFloat(edit.new_value);
-      if (isNaN(edit.new_value)) {
-        console.error(`Cannot set variable of type number to NaN!`);
-        return false;
-      }
-    } else if (
-      variable._type === 'boolean' &&
-      typeof edit.new_value !== 'boolean'
-    )
-      edit.new_value =
-        typeof edit.new_value === 'string'
-          ? edit.new_value.toLowerCase() !== 'false' && edit.new_value !== '0'
-          : !!edit.new_value;
-    else if (variable._type === 'structure' || variable._type === 'array') {
-      console.error('Cannot set the value of a collection.');
-      return false;
-    }
-
-    path.push('setValue');
-    onCall(path, [edit.new_value]);
-  }
-
-  return true;
 };
 
 type Props = {|
   variablesContainer: ?VariablesContainer,
-  onCall: CallFunction,
-  onEdit: EditFunction,
+  // Kept for the callers: the rows are read-only for now.
+  onCall?: CallFunction,
+  onEdit?: EditFunction,
 |};
 
-const VariablesContainerInspector = (props: Props): React.Node => (
-  <ReactJsonView
-    collapsed={false}
-    name={false}
-    src={
-      props.variablesContainer
-        ? transformVariablesContainer(props.variablesContainer)
-        : null
-    }
-    enableClipboard={false}
-    displayDataTypes={false}
-    displayObjectSize={false}
-    onEdit={edit => handleEdit(edit, props)}
-    groupArraysAfterLength={50}
-    theme="monokai"
-    validationMessage="Invalid value"
-  />
-);
+const VariablesContainerInspector = ({
+  variablesContainer,
+}: Props): React.Node => {
+  const items = React.useMemo(
+    () => buildVariablesItems('variables', variablesContainer),
+    [variablesContainer]
+  );
+  return variablesContainer ? (
+    <InspectorTreeView items={items || []} />
+  ) : (
+    <InspectorTreeView src={null} />
+  );
+};
 
 export default VariablesContainerInspector;

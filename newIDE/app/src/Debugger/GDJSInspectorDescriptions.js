@@ -3,10 +3,33 @@ import * as React from 'react';
 import RuntimeObjectInspector from './Inspectors/RuntimeObjectInspector';
 import VariablesContainerInspector from './Inspectors/VariablesContainerInspector';
 import RuntimeSceneInspector from './Inspectors/RuntimeSceneInspector';
+import ObjectDataInspector from './Inspectors/ObjectDataInspector';
+import GlobalVariableIcon from '../UI/CustomSvgIcons/GlobalVariable';
+import SceneVariableIcon from '../UI/CustomSvgIcons/SceneVariable';
+import SceneIcon from '../UI/CustomSvgIcons/Scene';
+import InstancesListIcon from '../UI/CustomSvgIcons/InstancesList';
+import InstanceIcon from '../UI/CustomSvgIcons/Instance';
+import Object2dIcon from '../UI/CustomSvgIcons/Object2d';
+import Object3dIcon from '../UI/CustomSvgIcons/Object3d';
 
 export type GameData = any;
 export type EditFunction = (path: Array<string>, newValue: any) => boolean;
 export type CallFunction = (path: Array<string>, args: Array<any>) => boolean;
+
+/** A function the inspector asks the game to call, to read what it returns. */
+export type InspectorCall = {|
+  /** Relative to the inspected element: `['_behaviors', '0']` for its first behavior. */
+  path: Array<string>,
+  functionName: string,
+  /** The arguments the generated code fills by itself (`currentScene`). */
+  codeOnlyArguments: Array<string>,
+|};
+export type InspectorCallResult = {| value?: any, error?: string |};
+/** Call functions on what is at this path in the running game. Null if the game did not answer. */
+export type ReadValuesFunction = (
+  path: Array<string>,
+  calls: Array<InspectorCall>
+) => Promise<Array<InspectorCallResult> | null>;
 
 export type InspectorDescriptionsGetter = (
   gameData: GameData
@@ -14,12 +37,15 @@ export type InspectorDescriptionsGetter = (
 
 export type InspectorDescription = {|
   label: string,
+  /** Shown before the label in the list, to tell at a glance what it is. */
+  icon?: React.Node,
   key: string | Array<string>,
   renderInspector: (
     gameData: GameData,
     {
       onCall: CallFunction,
       onEdit: EditFunction,
+      onReadValues: ReadValuesFunction,
     }
   ) => React.Node,
   getSubInspectors?: InspectorDescriptionsGetter,
@@ -36,6 +62,7 @@ export const getInspectorDescriptions = (
   return [
     {
       label: 'Global variables',
+      icon: <GlobalVariableIcon />,
       key: '_variables',
       renderInspector: (gameData, { onCall, onEdit }) => (
         <VariablesContainerInspector
@@ -47,6 +74,7 @@ export const getInspectorDescriptions = (
     },
     {
       label: 'Scenes',
+      icon: <SceneIcon />,
       key: ['_sceneStack', '_stack'],
       renderInspector: () => null,
       initiallyOpen: true,
@@ -55,6 +83,7 @@ export const getInspectorDescriptions = (
 
         return gdjsStack.map((runtimeScene, index) => ({
           label: runtimeScene._name,
+          icon: <SceneIcon />,
           key: index,
           renderInspector: (gameData, { onCall, onEdit }) => (
             <RuntimeSceneInspector
@@ -67,6 +96,7 @@ export const getInspectorDescriptions = (
           getSubInspectors: runtimeScene => [
             {
               label: 'Scene variables',
+              icon: <SceneVariableIcon />,
               key: `_variables`,
               renderInspector: (gameData, { onCall, onEdit }) => (
                 <VariablesContainerInspector
@@ -78,6 +108,7 @@ export const getInspectorDescriptions = (
             },
             {
               label: 'Instances',
+              icon: <InstancesListIcon />,
               key: `_instances`,
               renderInspector: () => null,
               initiallyOpen: true,
@@ -95,8 +126,27 @@ export const getInspectorDescriptions = (
                     label: `${objectName} (${
                       instances.items[objectName].length
                     })`,
+                    // A 3D object carries a Z: the icon tells 2D from 3D.
+                    icon: instances.items[objectName].some(
+                      runtimeObject =>
+                        runtimeObject && typeof runtimeObject._z !== 'undefined'
+                    ) ? (
+                      <Object3dIcon />
+                    ) : (
+                      <Object2dIcon />
+                    ),
                     key: ['items', objectName],
-                    renderInspector: () => null,
+                    // The object itself: what its instances start from.
+                    renderInspector: instancesList => (
+                      <ObjectDataInspector
+                        objectData={
+                          runtimeScene._objects && runtimeScene._objects.items
+                            ? runtimeScene._objects.items[objectName]
+                            : null
+                        }
+                        instances={instancesList}
+                      />
+                    ),
                     getSubInspectors: instancesList =>
                       instancesList
                         ? instancesList
@@ -104,15 +154,17 @@ export const getInspectorDescriptions = (
                             .map((runtimeObject, index) => {
                               return {
                                 label: `#${runtimeObject.id}`,
+                                icon: <InstanceIcon />,
                                 key: index,
                                 renderInspector: (
                                   gameData,
-                                  { onCall, onEdit }
+                                  { onCall, onEdit, onReadValues }
                                 ) => (
                                   <RuntimeObjectInspector
                                     runtimeObject={gameData}
                                     onCall={onCall}
                                     onEdit={onEdit}
+                                    onReadValues={onReadValues}
                                   />
                                 ),
                               };

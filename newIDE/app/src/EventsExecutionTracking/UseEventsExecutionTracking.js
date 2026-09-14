@@ -65,13 +65,28 @@ export const useEventsExecutionTracking = ({
           if (
             previewDebuggerServer.getExistingPreviewDebuggerIds().includes(id)
           ) {
+            // What the previous game showed is replaced by this one.
+            store.clear();
+            store.setHighlightsPersistent(false);
             sendTrackingCommand(id);
           }
         },
-        onConnectionClosed: ({ debuggerIds }) => {
-          if (debuggerIds.length === 0) store.clear();
+        onConnectionClosed: () => {
+          // The last frame of a closed game stays shown, like the frame of a
+          // paused game: nothing else runs until another preview starts.
+          if (
+            previewDebuggerServer.getExistingPreviewDebuggerIds().length === 0
+          ) {
+            store.setHighlightsPersistent(true);
+            store.setRunningSceneName(null);
+          }
         },
-        onHandleParsedMessage: ({ parsedMessage }) => {
+        onHandleParsedMessage: ({ id, parsedMessage }) => {
+          // Only previews are followed, not the games embedded in the editor.
+          if (
+            !previewDebuggerServer.getExistingPreviewDebuggerIds().includes(id)
+          )
+            return;
           const payload = parsedMessage.payload;
           if (parsedMessage.command === 'eventsExecutionTracker.output') {
             if (payload) store.ingest(payload);
@@ -80,6 +95,9 @@ export const useEventsExecutionTracking = ({
             // debugger, which then advances it frame by frame) keeps its last
             // frame highlighted, as nothing else will run.
             store.setHighlightsPersistent(!!(payload && payload.isPaused));
+            if (payload && !payload.isInGameEdition) {
+              store.setRunningSceneName(payload.sceneName || null);
+            }
           }
         },
       });

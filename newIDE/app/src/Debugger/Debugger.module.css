@@ -1,7 +1,0 @@
-/* Covers the whole debugger for a moment when a screenshot key is pressed. */
-.screenshotShield {
-  position: absolute;
-  inset: 0;
-  z-index: 10000;
-  background-color: #000;
-}

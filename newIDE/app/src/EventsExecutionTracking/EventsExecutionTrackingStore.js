@@ -1,5 +1,8 @@
 // @flow
-import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
+import {
+  type PreviewDebuggerServer,
+  type DebuggerId,
+} from '../ExportAndShare/PreviewLauncher.flow';
 
 /**
  * The speed a game plays at while debugged: normal, or slowed down to see the
@@ -85,6 +88,21 @@ export class EventsExecutionTrackingStore {
    */
   _isDebuggerOpened: boolean = false;
 
+  /**
+   * The scene the running preview reports being in, so that the variables
+   * offered and read are those of the scene actually playing, whatever the
+   * scene opened in the editor.
+   */
+  _runningSceneName: string | null = null;
+
+  setRunningSceneName(sceneName: string | null): void {
+    this._runningSceneName = sceneName;
+  }
+
+  getRunningSceneName(): string | null {
+    return this._runningSceneName;
+  }
+
   setDebuggerOpened(isDebuggerOpened: boolean): void {
     this._isDebuggerOpened = isDebuggerOpened;
   }
@@ -120,6 +138,11 @@ export class EventsExecutionTrackingStore {
     this._watchedExpressions = [...this._watchedExpressions, expression];
   }
 
+  /** The watched variables belong to a project: closing it forgets them. */
+  clearWatchedExpressions(): void {
+    this._watchedExpressions = [];
+  }
+
   removeWatchedExpression(expression: string): void {
     this._watchedExpressions = this._watchedExpressions.filter(
       watchedExpression => watchedExpression !== expression
@@ -130,12 +153,20 @@ export class EventsExecutionTrackingStore {
     this._previewDebuggerServer = previewDebuggerServer;
   }
 
+  /**
+   * The preview to ask for values. Only a real preview is considered: a game
+   * embedded in an editor answers on the same channel, but much faster (it is
+   * in the same process), so it would always win the race and answer for a
+   * scene that is not the one being debugged.
+   */
+  _getTargetPreviewDebuggerId(): ?DebuggerId {
+    if (!this._previewDebuggerServer) return null;
+    const previewDebuggerIds = this._previewDebuggerServer.getExistingPreviewDebuggerIds();
+    return previewDebuggerIds.length > 0 ? previewDebuggerIds[0] : null;
+  }
+
   hasRunningPreview(): boolean {
-    return (
-      this._isDebuggerOpened &&
-      !!this._previewDebuggerServer &&
-      this._previewDebuggerServer.getExistingPreviewDebuggerIds().length > 0
-    );
+    return this._isDebuggerOpened && this._getTargetPreviewDebuggerId() != null;
   }
 
   /**
@@ -146,14 +177,20 @@ export class EventsExecutionTrackingStore {
   async evaluateExpressions(
     codes: Array<string>
   ): Promise<Array<ExpressionEvaluation | null> | null> {
-    if (!this._previewDebuggerServer || !this.hasRunningPreview()) return null;
+    const previewDebuggerServer = this._previewDebuggerServer;
+    const debuggerId = this._getTargetPreviewDebuggerId();
+    if (!previewDebuggerServer || !this._isDebuggerOpened || debuggerId == null)
+      return null;
     if (!codes.length) return [];
 
     try {
-      const answer = await this._previewDebuggerServer.sendMessageWithResponse({
-        command: 'evaluateExpression',
-        payload: { codes },
-      });
+      const answer = await previewDebuggerServer.sendMessageWithResponse(
+        {
+          command: 'evaluateExpression',
+          payload: { codes },
+        },
+        debuggerId
+      );
       return answer.payload || null;
     } catch (error) {
       // The preview did not answer in time (closed, paused...).

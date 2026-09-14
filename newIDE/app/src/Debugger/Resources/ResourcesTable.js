@@ -28,14 +28,19 @@ import {
 } from './ResourcesDebugTypes';
 import classes from './Resources.module.css';
 
+/**
+ * The words of the runtime, not those of the network: a game reads most of its
+ * resources from the disk or from a cache, where nothing is "downloaded".
+ * `loaded` also means "received, not parsed yet", which "Downloaded" hid.
+ */
 export const getStatusLabel = (status: ResourceLoadStatus): React.Node => {
   switch (status) {
     case 'not-loaded':
       return <Trans>Not loaded</Trans>;
     case 'loading':
-      return <Trans>Downloading</Trans>;
+      return <Trans>Loading</Trans>;
     case 'loaded':
-      return <Trans>Downloaded</Trans>;
+      return <Trans>Loaded</Trans>;
     case 'processing':
       return <Trans>Processing</Trans>;
     case 'ready':
@@ -44,6 +49,24 @@ export const getStatusLabel = (status: ResourceLoadStatus): React.Node => {
       return <Trans>Error</Trans>;
     default:
       return status;
+  }
+};
+
+/** What a status means, for the ones that are not obvious. */
+export const getStatusDescription = (
+  status: ResourceLoadStatus
+): React.Node => {
+  switch (status) {
+    case 'loaded':
+      return <Trans>Received, not parsed yet.</Trans>;
+    case 'processing':
+      return (
+        <Trans>Being parsed by the game (decoded, sent to the GPU...).</Trans>
+      );
+    case 'ready':
+      return <Trans>Usable by the game.</Trans>;
+    default:
+      return null;
   }
 };
 
@@ -206,16 +229,28 @@ const ResourcesTable = ({
                   dataKey="status"
                   width={110}
                   headerRenderer={renderSortableHeader}
-                  cellRenderer={({ rowData }) => (
-                    <StatusChip
-                      tone={getStatusTone(rowData.status)}
-                      loading={
-                        rowData.status === 'loading' ||
-                        rowData.status === 'processing'
-                      }
-                      label={getStatusLabel(rowData.status)}
-                    />
-                  )}
+                  cellRenderer={({ rowData }) => {
+                    const statusDescription = getStatusDescription(
+                      rowData.status
+                    );
+                    const statusChip = (
+                      <StatusChip
+                        tone={getStatusTone(rowData.status)}
+                        loading={
+                          rowData.status === 'loading' ||
+                          rowData.status === 'processing'
+                        }
+                        label={getStatusLabel(rowData.status)}
+                      />
+                    );
+                    return statusDescription ? (
+                      <Tooltip title={statusDescription}>
+                        <span>{statusChip}</span>
+                      </Tooltip>
+                    ) : (
+                      statusChip
+                    );
+                  }}
                 />
                 <RVColumn
                   label={i18n._(t`Size`)}

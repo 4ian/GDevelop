@@ -587,25 +587,16 @@ describe('Objects and behaviors in a custom object variant', () => {
   describe('behaviors of a child object', () => {
     it('does not return sharedProperties for a child of a custom object', async () => {
       const options = makeFakeLaunchFunctionOptionsWithProject(project);
-      const addResult: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
-        {
-          ...options,
-          args: {
-            scope: defaultVariantScope,
-            object_name: 'Back',
-            behavior_type: 'PhysicsBehavior::PhysicsBehavior',
-            behavior_name: 'Physics',
-          },
-        }
-      );
-      expect(addResult.success).toBe(true);
-      expect(addResult.addedBehaviors).toEqual([
-        {
-          objectName: 'Back',
-          behaviorName: 'Physics',
-          behaviorType: 'PhysicsBehavior::PhysicsBehavior',
-        },
-      ]);
+      // A behavior with shared data. `add_behavior` refuses it on a child
+      // object (the editor does not offer it there), so it is put directly.
+      project
+        .getEventsFunctionsExtension('UI')
+        .getEventsBasedObjects()
+        .get('Dialog')
+        .getDefaultVariant()
+        .getObjects()
+        .getObject('Back')
+        .addNewBehavior(project, 'PhysicsBehavior::PhysicsBehavior', 'Physics');
 
       const result: EditorFunctionGenericOutput = await editorFunctions.inspect_behavior_properties.launchFunction(
         {

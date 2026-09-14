@@ -537,21 +537,25 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       '',
       'MIT'
     );
-    extension.addBehavior(
-      'Physics3DBehavior',
-      'Fake 3D physics',
-      'Physics3D',
-      'A fake 3D physics behavior, for 3D objects only.',
-      '',
-      'res/functions/extension_black.svg',
-      'Physics3DBehavior', // Class name is the name, actually unused
-      makeFakeBehaviorRequiring(
-        gd,
-        'FakeScene3D::Base3DBehavior',
-        '3D capability'
-      ),
-      new gd.BehaviorsSharedData()
-    );
+    extension
+      .addBehavior(
+        'Physics3DBehavior',
+        'Fake 3D physics',
+        'Physics3D',
+        'A fake 3D physics behavior, for 3D objects only.',
+        '',
+        'res/functions/extension_black.svg',
+        'Physics3DBehavior', // Class name is the name, actually unused
+        makeFakeBehaviorRequiring(
+          gd,
+          'FakeScene3D::Base3DBehavior',
+          '3D capability'
+        ),
+        new gd.BehaviorsSharedData()
+      )
+      // Like the real physics engines: not offered on the children of a
+      // custom object.
+      .markAsIrrelevantForChildObjects();
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }

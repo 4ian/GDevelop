@@ -2773,8 +2773,29 @@ const resolveObjectsFromContextAndName = ({
 };
 
 /**
- * Adds a behavior to an object (or to all objects of a group) in a scene.
+ * Whether a behavior can be added to a child object of a custom object: the
+ * behavior itself and the behaviors it requires must all be relevant for child
+ * objects (`BehaviorMetadata::MarkAsIrrelevantForChildObjects` in the engine).
  */
+const isBehaviorRelevantForChildObjects = (
+  platform: gdPlatform,
+  behaviorMetadata: gdBehaviorMetadata
+): boolean =>
+  behaviorMetadata.isRelevantForChildObjects() &&
+  behaviorMetadata
+    .getRequiredBehaviorTypes()
+    .toJSArray()
+    .every(requiredBehaviorType => {
+      const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        platform,
+        requiredBehaviorType
+      );
+      return (
+        gd.MetadataProvider.isBadBehaviorMetadata(requiredBehaviorMetadata) ||
+        requiredBehaviorMetadata.isRelevantForChildObjects()
+      );
+    });
+
 /**
  * A behavior can require capabilities of its object: hidden behaviors that
  * objects of a kind have by default (the 3D one, the animatable one...). The
@@ -2836,6 +2857,9 @@ const getMissingRequiredCapability = (
   return null;
 };
 
+/**
+ * Adds a behavior to an object (or to all objects of a group) in a scene.
+ */
 const addBehavior: EditorFunction = {
   renderForEditor: ({ project, args, editorCallbacks }) => {
     const scene_name = getSceneNameFromArgs(args);
@@ -2994,6 +3018,24 @@ const addBehavior: EditorFunction = {
     const behaviorName =
       optionalBehaviorName || behaviorMetadata.getDefaultName();
     const isDefaultCapability = isBehaviorDefaultCapability(behaviorMetadata);
+
+    // What the editor enforces in its behavior list: a behavior marked as
+    // irrelevant for child objects (the physics engines, the NavMesh
+    // pathfinding) is not offered on the children of a custom object.
+    const { eventsBasedObject, eventsFunctionsExtension } = resolvedScope;
+    if (
+      eventsBasedObject &&
+      eventsFunctionsExtension &&
+      !isBehaviorRelevantForChildObjects(
+        project.getCurrentPlatform(),
+        behaviorMetadata
+      )
+    ) {
+      const customObjectType = `${eventsFunctionsExtension.getName()}::${eventsBasedObject.getName()}`;
+      return makeGenericFailure(
+        `Behavior "${behaviorName}" (type "${behavior_type}") cannot be added to "${object_name}": it is not usable on a child object of a custom object (the editor does not offer it there). Add it to an object placed in a scene instead: the custom object "${customObjectType}" itself, or the object to simulate.`
+      );
+    }
 
     const changes = [];
     const warnings = [];

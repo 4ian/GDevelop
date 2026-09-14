@@ -308,6 +308,43 @@ describe('add_behavior', () => {
       );
     });
 
+    it('refuses a behavior the editor does not offer on the children of a custom object', async () => {
+      const extension = project.insertNewEventsFunctionsExtension('UI', 0);
+      const dialog = extension.getEventsBasedObjects().insertNew('Dialog', 0);
+      dialog
+        .getDefaultVariant()
+        .getObjects()
+        .insertNewObject(project, 'FakeScene3D::Model3DObject', 'Body', 0);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scope: {
+              type: 'custom_object_variant',
+              extension_name: 'UI',
+              custom_object_name: 'Dialog',
+              variant_name: '',
+            },
+            object_name: 'Body',
+            behavior_type: 'FakePhysics3D::Physics3DBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toBe(
+        'Behavior "Physics3D" (type "FakePhysics3D::Physics3DBehavior") cannot be added to "Body": it is not usable on a child object of a custom object (the editor does not offer it there). Add it to an object placed in a scene instead: the custom object "UI::Dialog" itself, or the object to simulate.'
+      );
+      expect(
+        dialog
+          .getDefaultVariant()
+          .getObjects()
+          .getObject('Body')
+          .hasBehaviorNamed('Physics3D')
+      ).toBe(false);
+    });
+
     it('adds a behavior of an extension of the project without looking it up in the store registry', async () => {
       const extension = project.insertNewEventsFunctionsExtension('UI', 0);
       extension.getEventsBasedBehaviors().insertNew('Glow', 0);

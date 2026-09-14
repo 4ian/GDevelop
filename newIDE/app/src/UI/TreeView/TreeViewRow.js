@@ -83,6 +83,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
     'before' | 'after' | 'inside'
   >('before');
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  // With mouse events, the browser fires a click when a drag ends on the row
+  // it started from (the item was dropped back in place). Such a click must
+  // not trigger the row action (opening the item...).
+  const hasDragJustEndedRef = React.useRef<boolean>(false);
   const dragDropManager = useDragDropManager();
   const openContextMenu = React.useCallback(
     // $FlowFixMe[missing-local-annot]
@@ -114,6 +118,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
     // $FlowFixMe[missing-local-annot]
     event => {
       if (!node || node.item.isPlaceholder) return;
+      if (hasDragJustEndedRef.current) return;
       if (node.item.isRoot) {
         // A sticky root row does not collapse on click: the click reveals the
         // actual row instead (handled by the sticky rows container).
@@ -249,6 +254,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
           renamedItemId !== node.id
         }
+        endDrag={() => {
+          hasDragJustEndedRef.current = true;
+        }}
         canDrop={canDrop ? () => canDrop(node.item, whereToDrop) : () => true}
         drop={() => {
           onDrop(node.item, whereToDrop);
@@ -519,6 +527,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                   ? getItemHtmlId(node.item, index)
                   : undefined
               }
+              onMouseDown={() => {
+                hasDragJustEndedRef.current = false;
+              }}
               onClick={onClickItem}
               onDoubleClick={onDoubleClickItem}
               className={classNames(

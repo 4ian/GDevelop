@@ -57,6 +57,8 @@ import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
+import { shouldCloseOrCancel } from '../UI/KeyboardShortcuts/InteractionKeys';
+import isDialogOpen from '../UI/OpenedDialogChecker';
 import {
   getInstanceInLayoutWithPersistentUuid,
   getInstancesInLayoutForObject,
@@ -1391,6 +1393,42 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
     this._sendSelectedInstances();
     this._selectObjectOfInstances(instances);
+  };
+
+  /**
+   * Deselect everything (instances, objects, layers, object groups), so that
+   * the properties panel goes back to the scene properties.
+   */
+  deselectAll = () => {
+    this.instancesSelection.clearSelection();
+    this._onInstancesSelected([]);
+  };
+
+  _onKeyDown = (event: SyntheticKeyboardEvent<HTMLDivElement>) => {
+    if (!shouldCloseOrCancel(event)) return;
+
+    const { target } = event;
+    // $FlowFixMe[prop-missing] - target is an Element (possibly from a popped-out window).
+    if (target.closest('textarea, input, [contenteditable="true"]')) {
+      return; // Escape is handled by the field being edited.
+    }
+    // $FlowFixMe[prop-missing]
+    if (isDialogOpen(target.ownerDocument)) return;
+
+    // Escape first cancels what is in progress, then deselects everything.
+    const { editorDisplay } = this;
+    if (
+      editorDisplay &&
+      editorDisplay.instancesHandlers.cancelClickInterception()
+    ) {
+      return;
+    }
+    if (this.state.tileMapTileSelection) {
+      this.onSelectTileMapTile(null);
+      return;
+    }
+
+    this.deselectAll();
   };
 
   _selectObjectOfInstances = (instances: Array<gdInitialInstance>) => {
@@ -3084,6 +3122,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   style={styles.container}
                   id="scene-editor"
                   data-active={isActive ? 'true' : undefined}
+                  onKeyDown={this._onKeyDown}
                 >
                   <UseSceneEditorCommands
                     project={project}

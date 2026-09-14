@@ -107,6 +107,19 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
 gd::String InstructionValidator::GetObjectNameForParameter(
     const gd::ProjectScopedContainers projectScopedContainers,
     const gd::Instruction &instruction, const gd::String &parameterType) {
+  // TODO Always check object variables but raise non-fatal errors for legacy
+  // instructions that are still used.
+  // - For no longer used legacy instructions, `extraInfo` should declared to
+  // "AllowUndeclaredVariable".
+  // - Legacy variable setters `extraInfo` should be overriden with
+  // "AllowUndeclaredVariable" outside of custom objects instead of passing an
+  // empty object name.
+  // - Behaviors still use undeclared object variables, checks should be
+  // disabled completely for non-switchable instructions.
+  // - Undeclared variable errors in switchable instructions must stay fatal
+  // error, so a boolean should be passed to ExpressionValidator.
+  // See gd::ExpressionValidator::rootObjectName
+
   // New object variable instructions require the variable to be
   // declared while legacy ones don't.
   // For legacy variable instruction, we pass an empty object name.

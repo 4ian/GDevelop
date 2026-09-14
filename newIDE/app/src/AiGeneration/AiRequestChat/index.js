@@ -320,6 +320,24 @@ export const AiRequestChat: React.ComponentType<{
       setAiConfigurationPresetId,
     ] = React.useState<string | null>(null);
 
+    // When a chat is opened, show the reasoning level it was created with,
+    // so a chat started elsewhere (e.g. from the home page) or reopened later
+    // does not fall back to the default preset. Keyed on the request id so the
+    // user can still change the level while the request is being updated.
+    const openedAiRequestId = aiRequest ? aiRequest.id : null;
+    const openedAiRequestPresetId =
+      aiRequest && aiRequest.aiConfiguration
+        ? aiRequest.aiConfiguration.presetId
+        : null;
+    React.useEffect(
+      () => {
+        if (!openedAiRequestId || !openedAiRequestPresetId) return;
+        setAiConfigurationPresetId(openedAiRequestPresetId);
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [openedAiRequestId]
+    );
+
     React.useEffect(
       () => {
         if (!aiConfigurationPresetsWithAvailability.length) return;

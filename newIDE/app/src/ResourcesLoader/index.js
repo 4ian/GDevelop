@@ -1,6 +1,7 @@
 // @flow
 import { addGDevelopResourceTokenIfRequired } from '../Utils/CrossOrigin';
 import optionalRequire from '../Utils/OptionalRequire';
+import { encodeLocalFileNameForUrl } from '../Utils/PercentEncodedFileName';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -138,7 +139,7 @@ export default class ResourcesLoader {
       return this._cache.cacheLocalFileUrl(
         project,
         urlOrFilename,
-        'file://' + resourceAbsolutePath,
+        'file://' + encodeLocalFileNameForUrl(resourceAbsolutePath),
         !!disableCacheBurst
       );
     }

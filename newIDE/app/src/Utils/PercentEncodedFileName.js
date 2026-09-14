@@ -35,3 +35,26 @@ export const decodePercentEncodedFileName = (fileName: string): string => {
 
   return decodedFileName;
 };
+
+const isUrlWithScheme = (urlOrFilename: string): boolean =>
+  /^(https?|ftp|file|data|blob):/i.test(urlOrFilename);
+
+/**
+ * Percent-encode the characters of a local file path that have a special
+ * meaning in a URL ("%", "#" and "?"), so that a file named for example
+ * "Track #3.wav" can be requested as a URL without being truncated at the "#"
+ * (which starts the URL fragment). Other characters are left untouched as
+ * browsers encode them automatically. URLs are left untouched as they are
+ * already encoded.
+ *
+ * Duplicated in the game engine (`gdjs.encodeLocalFileNameForUrl` in
+ * GDJS/Runtime/ResourceLoader.ts): keep both in sync.
+ */
+export const encodeLocalFileNameForUrl = (urlOrFilename: string): string => {
+  if (isUrlWithScheme(urlOrFilename)) return urlOrFilename;
+
+  return urlOrFilename
+    .replace(/%/g, '%25')
+    .replace(/#/g, '%23')
+    .replace(/\?/g, '%3F');
+};

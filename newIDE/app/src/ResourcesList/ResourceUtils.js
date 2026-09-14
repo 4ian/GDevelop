@@ -1,5 +1,4 @@
 // @flow
-import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
@@ -31,24 +30,24 @@ export const createOrUpdateResource = (
  * Get the local path of a resource. This works by asking the ResourcesLoader
  * for the resource URL, then stripping anything that is specific to a URL.
  */
+/**
+ * Get the absolute path on disk of a local resource. This is computed from
+ * the resource file (not from the URL given by `ResourcesLoader`, which is
+ * percent-encoded to be usable by the browser).
+ */
 export const getLocalResourceFullPath = (
   project: gdProject,
   resourceName: string
-): any => {
-  let resourcePath = ResourcesLoader.getResourceFullUrl(
-    project,
-    resourceName,
-    {}
-  ).substring(7 /* Remove "file://" from the URL to get a local path */);
+): string => {
+  const resourcesManager = project.getResourcesManager();
+  if (!resourcesManager.hasResource(resourceName)) return '';
 
-  if (resourcePath.indexOf('?cache=') !== -1) {
-    // Remove, if needed, the cache bursting argument from the URL.
-    resourcePath = resourcePath.substring(
-      0,
-      resourcePath.lastIndexOf('?cache=')
-    );
-  }
-  return resourcePath;
+  const resourceFile = resourcesManager.getResource(resourceName).getFile();
+  if (!path || isURL(resourceFile)) return resourceFile;
+
+  return path
+    .resolve(path.dirname(project.getProjectFile()), resourceFile)
+    .replace(/\\/g, '/');
 };
 
 export const isPathInProjectFolder = (

@@ -311,6 +311,49 @@ describe('Objects and behaviors in a custom object variant', () => {
       expect(getDefaultVariantObjects().hasObjectNamed('Object')).toBe(false);
     });
 
+    it('creates a child of a custom object type of the project without looking it up in the store registry', async () => {
+      const extension = project.getEventsFunctionsExtension('UI');
+      const wrapper = extension.getEventsBasedObjects().insertNew('Wrapper', 1);
+      const options = makeFakeLaunchFunctionOptionsWithProject(project);
+      // The registry knows nothing about the project's own extensions.
+      const ensureExtensionInstalled = jest.fn(
+        async (_options: mixed): Promise<void> => {
+          throw new Error(
+            'Extension "UI" does not exist in the extension registry.'
+          );
+        }
+      );
+      // What the editor does: regenerate the extensions, so that the metadata
+      // of a custom object authored a moment ago exists.
+      const ensureExtensionsUpToDate = jest.fn(() => {
+        options.reloadExtensionMetadata('UI');
+        return Promise.resolve();
+      });
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...options,
+          ensureExtensionInstalled,
+          ensureExtensionsUpToDate,
+          args: {
+            scope: { ...defaultVariantScope, custom_object_name: 'Wrapper' },
+            object_name: 'InnerDialog',
+            object_type: 'UI::Dialog',
+          },
+        }
+      );
+
+      expect(ensureExtensionInstalled).not.toHaveBeenCalled();
+      expect(ensureExtensionsUpToDate).toHaveBeenCalled();
+      expect(result.success).toBe(true);
+      expect(
+        wrapper
+          .getDefaultVariant()
+          .getObjects()
+          .hasObjectNamed('InnerDialog')
+      ).toBe(true);
+    });
+
     it('refuses a child whose type is the custom object itself, or depends on it', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {

@@ -1468,8 +1468,13 @@ const createOrReplaceObject: EditorFunction = {
           `Could not install asset for "${targetObjectName}", and no "object_type" provided to create from scratch.`
         );
       }
-      // Ensure the extension for this object type is installed.
-      if (candidateType.includes('::')) {
+      // A custom object of the project may have just been authored: its
+      // metadata only exists once the extensions are regenerated. It is not
+      // in the store registry, so there is nothing to install for it.
+      if (isTypeOfProjectExtension(project, candidateType)) {
+        await ensureExtensionsUpToDate();
+      } else if (candidateType.includes('::')) {
+        // Ensure the extension for this object type is installed.
         const extensionName = candidateType.split('::')[0];
         try {
           await ensureExtensionInstalled({
@@ -1486,12 +1491,6 @@ const createOrReplaceObject: EditorFunction = {
             `Could not install extension "${extensionName}": ${error.message}`
           );
         }
-      }
-
-      // A custom object of the project may have just been authored: its
-      // metadata only exists once the extensions are regenerated.
-      if (isTypeOfProjectExtension(project, candidateType)) {
-        await ensureExtensionsUpToDate();
       }
       // Ensure the object type is valid.
       const objectMetadata = gd.MetadataProvider.getObjectMetadata(
@@ -2956,8 +2955,13 @@ const addBehavior: EditorFunction = {
       );
     }
 
-    // Ensure the extension for this behavior is installed.
-    if (behavior_type.includes('::')) {
+    // A behavior of an extension of the project may have just been authored:
+    // its metadata only exists once the extensions are regenerated. It is not
+    // in the store registry, so there is nothing to install for it.
+    if (isTypeOfProjectExtension(project, behavior_type)) {
+      await ensureExtensionsUpToDate();
+    } else if (behavior_type.includes('::')) {
+      // Ensure the extension for this behavior is installed.
       const extensionName = behavior_type.split('::')[0];
       try {
         await ensureExtensionInstalled({
@@ -2974,12 +2978,6 @@ const addBehavior: EditorFunction = {
           `Could not install extension "${extensionName}": ${error.message}`
         );
       }
-    }
-
-    // A behavior of an extension of the project may have just been authored:
-    // its metadata only exists once the extensions are regenerated.
-    if (isTypeOfProjectExtension(project, behavior_type)) {
-      await ensureExtensionsUpToDate();
     }
     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
       project.getCurrentPlatform(),

@@ -307,5 +307,43 @@ describe('add_behavior', () => {
         'needs a capability that "MyDialog" (type "UI::Dialog") does not have: "Objects with animations" (AnimatableCapability::AnimatableBehavior). It cannot be added to this object. A custom object gets it when its "isAnimatable" setting is "true" (`change_custom_object`, `changed_settings`).'
       );
     });
+
+    it('adds a behavior of an extension of the project without looking it up in the store registry', async () => {
+      const extension = project.insertNewEventsFunctionsExtension('UI', 0);
+      extension.getEventsBasedBehaviors().insertNew('Glow', 0);
+      const options = makeFakeLaunchFunctionOptionsWithProject(project);
+      // The registry knows nothing about the project's own extensions.
+      const ensureExtensionInstalled = jest.fn(
+        async (_options: mixed): Promise<void> => {
+          throw new Error(
+            'Extension "UI" does not exist in the extension registry.'
+          );
+        }
+      );
+      // What the editor does: regenerate the extensions, so that the metadata
+      // of a behavior authored a moment ago exists.
+      const ensureExtensionsUpToDate = jest.fn(() => {
+        options.reloadExtensionMetadata('UI');
+        return Promise.resolve();
+      });
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...options,
+          ensureExtensionInstalled,
+          ensureExtensionsUpToDate,
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_type: 'UI::Glow',
+          },
+        }
+      );
+
+      expect(ensureExtensionInstalled).not.toHaveBeenCalled();
+      expect(ensureExtensionsUpToDate).toHaveBeenCalled();
+      expect(result.success).toBe(true);
+      expect(getSceneObject('MySprite').hasBehaviorNamed('Glow')).toBe(true);
+    });
   });
 });

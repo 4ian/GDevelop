@@ -284,6 +284,30 @@ module.exports = {
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCamera2');
 
+    extension
+      .addAction(
+        'TweenCameraZ',
+        _('Tween the camera Z position'),
+        _('Tweens the camera Z position from the current one to a new one.'),
+        _(
+          'Tween the Z position of camera on layer _PARAM3_ to _PARAM2_ with easing _PARAM4_ over _PARAM5_ seconds as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .addParameter('expression', _('Target Z position'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .addParameter('easing', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenCameraZ');
+
     // deprecated
     extension
       .addAction(

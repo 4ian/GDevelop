@@ -987,13 +987,9 @@ namespace gdjs {
       }
 
       /**
-       * What the harness noticed about the game while building the result.
-       *
-       * A custom object with no child in it renders NOTHING: its variant
-       * declares child objects but no instance of them was placed, so the
-       * object is invisible and falls back to a 1x1x1 size. Assertions on the
-       * properties driving it all pass while nothing is on screen, so the
-       * harness reports it by itself.
+       * What the harness noticed about the game by itself, whatever the test
+       * asserted: a test can pass on the values it checks while the game is
+       * in a state nobody would call working.
        */
       private _getWarnings(): Array<string> {
         const currentScene = this._runtimeGame
@@ -1003,7 +999,10 @@ namespace gdjs {
         const warnings: Array<string> = [];
         const reportedObjectNames = new Set<string>();
 
-        /** Report the custom objects with no child, `object` included. */
+        /**
+         * Report the custom objects with no child, `object` included: they
+         * render nothing at all and fall back to a 1x1x1 size.
+         */
         const checkObject = (
           object: gdjs.RuntimeObject,
           path: string,

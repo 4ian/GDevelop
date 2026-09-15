@@ -634,9 +634,9 @@ const injectObjectSizeInfo = (
 };
 
 const INSTANCE_POSITION_SEMANTICS_MESSAGE =
-  'Each instance x;y;z is its ORIGIN and rotations turn around its CENTER: both are given per object by `objectSizeInfo` (`originX/Y/Z` and `centerX/Y/Z`, offsets from the minimum corner of the object box, `null` when unknown). ' +
-  'With the usual origin 0;0;0 (the minimum corner) an instance occupies x to x+width, y to y+height and (in 3D) z to z+depth; a 3D model often has another origin (its `originLocation`/`centerLocation` property, possibly the origin the model was authored with). ' +
-  'To center an instance A on top of an instance B: A.x = B.x - A.originX + (B.width - A.width)/2 + B.originX, same on Y, and A.z = B.z - B.originZ + B.depth + A.originZ.';
+  'Each instance x;y;z is its ORIGIN, and rotations turn around the point `objectSizeInfo` gives as `centerX/Y/Z` - neither is necessarily the middle of the object box. ' +
+  '`originX/Y/Z` and `centerX/Y/Z` are offsets from the minimum corner of that box: with the usual origin 0;0;0 an instance occupies x to x+width, y to y+height and (in 3D) z to z+depth, while a 3D model usually has both elsewhere (its `originLocation`/`centerLocation` property, possibly the origin the model was authored with). ' +
+  'To center an instance A on top of an instance B: A.x = B.x - B.originX + (B.width - A.width)/2 + A.originX, same on Y, and A.z = B.z - B.originZ + B.depth + A.originZ.';
 
 // Inside a custom object, positions are local to it: without this the AI
 // would place children in scene coordinates.
@@ -699,7 +699,7 @@ const getVariantWithoutInstancesNotice = (
   const childObjectsCount = objectsContainer.getObjectsCount();
   if (childObjectsCount === 0 || initialInstances.getInstancesCount() > 0)
     return '';
-  return ` /!\\ ${label} has ${childObjectsCount} child object(s) but NO instance placed: it renders NOTHING and its size falls back to 1x1x1. Place them with \`put_3d_instances\`/\`put_2d_instances\` on this same \`custom_object_variant\` scope.`;
+  return ` ${label} has ${childObjectsCount} child object(s) but no instance placed: it renders nothing and its size falls back to 1x1x1. Place them with \`put_3d_instances\`/\`put_2d_instances\` on this same \`custom_object_variant\` scope.`;
 };
 
 const VARIANT_WITHOUT_INSTANCES_HINT_CODE = 'custom-object-has-no-instance';
@@ -718,7 +718,7 @@ const addVariantWithoutInstancesHint = (
     code: VARIANT_WITHOUT_INSTANCES_HINT_CODE,
     message: `${
       resolvedScope.label
-    } had child objects but no instance of them: a custom object renders its child INSTANCES, and with none it is invisible and 1x1x1. Check that each child now has at least one instance (\`describe_instances\` on this \`custom_object_variant\` scope, \`put_3d_instances\`/\`put_2d_instances\` to place them), then set its default size with \`change_custom_object({ fit_area_to_children })\`.`,
+    } had child objects but no instance of them: a custom object renders its child instances, and with none it renders nothing. Check that each child now has at least one instance (\`describe_instances\` on this \`custom_object_variant\` scope, \`put_3d_instances\`/\`put_2d_instances\` to place them), then set its default size with \`change_custom_object({ fit_area_to_children })\`.`,
     objectNames: [],
   };
   output.hints = output.hints ? [...output.hints, hint] : [hint];

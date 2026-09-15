@@ -187,7 +187,7 @@ describe('Objects and behaviors in a custom object variant', () => {
       );
       // The variant still has child objects and no instance of them.
       expect(deleteOnDefaultVariant.message).toContain(
-        'has 2 child object(s) but NO instance placed'
+        'has 2 child object(s) but no instance placed'
       );
 
       // ...and the named variant inherits them.

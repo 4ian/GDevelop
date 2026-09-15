@@ -215,16 +215,20 @@ export const getObjectSizeInfo = (
   }
 
   if (objectType === 'Scene3D::Model3DObject') {
-    const config = gd.asModel3DConfiguration(objectConfiguration);
-    const width = config.getWidth();
-    const height = config.getHeight();
-    const depth = config.getDepth();
+    const properties = objectConfiguration.getProperties();
+    const getNumberProperty = (name: string) =>
+      properties.has(name)
+        ? parseFloat(properties.get(name).getValue()) || 0
+        : 0;
+    const width = getNumberProperty('width');
+    const height = getNumberProperty('height');
+    const depth = getNumberProperty('depth');
     // A 3D model has neither its origin at the minimum corner nor its center
     // at the middle of the box by default: both follow its `originLocation`
     // and `centerLocation`, which can be the origin the model was authored
-    // with - known only once the model is loaded
+    // with - known only once the model is read
     // (`ensureModel3DOriginPointLoaded`), the usual values until then.
-    const { originPoint, centerPoint } = getModel3DLocationPoints(config);
+    const { originPoint, centerPoint } = getModel3DLocationPoints(object);
     const sizes = [width, height, depth];
     const atSize = (
       point: LocationPoint,

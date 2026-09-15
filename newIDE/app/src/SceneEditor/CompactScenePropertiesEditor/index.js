@@ -80,284 +80,306 @@ type Props = {|
   onBehaviorSharedDataModified?: (?FieldModificationContext) => void,
 |};
 
-export const CompactScenePropertiesEditor = ({
-  project,
-  resourceManagementProps,
-  scene,
-  openSceneVariables,
-  onBackgroundColorChanged,
-  projectScopedContainersAccessor,
-  unsavedChanges,
-  i18n,
-  historyHandler,
-  onScenePropertiesModified,
-  onBehaviorSharedDataModified,
-}: Props): React.Node => {
-  const forceUpdate = useForceUpdate();
-  const variablesListRef = React.useRef<?VariablesListInterface>(null);
+export type CompactScenePropertiesEditorInterface = {|
+  revealVariable: (nodeId: string) => void,
+|};
 
-  const allVisibleBehaviors = scene
-    .getAllBehaviorSharedDataNames()
-    .toJSArray()
-    .map(behaviorName => scene.getBehaviorSharedData(behaviorName))
-    .filter(
-      behaviorSharedData =>
-        behaviorSharedData
-          .getProperties()
-          .keys()
-          .size() > 0
+export const CompactScenePropertiesEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<CompactScenePropertiesEditorInterface>,
+}> = React.forwardRef<Props, CompactScenePropertiesEditorInterface>(
+  (
+    {
+      project,
+      resourceManagementProps,
+      scene,
+      openSceneVariables,
+      onBackgroundColorChanged,
+      projectScopedContainersAccessor,
+      unsavedChanges,
+      i18n,
+      historyHandler,
+      onScenePropertiesModified,
+      onBehaviorSharedDataModified,
+    }: Props,
+    ref
+  ) => {
+    const forceUpdate = useForceUpdate();
+    const variablesListRef = React.useRef<?VariablesListInterface>(null);
+
+    React.useImperativeHandle(ref, () => ({
+      revealVariable: (nodeId: string) => {
+        if (variablesListRef.current)
+          variablesListRef.current.revealVariable(nodeId);
+      },
+    }));
+
+    const allVisibleBehaviors = scene
+      .getAllBehaviorSharedDataNames()
+      .toJSArray()
+      .map(behaviorName => scene.getBehaviorSharedData(behaviorName))
+      .filter(
+        behaviorSharedData =>
+          behaviorSharedData
+            .getProperties()
+            .keys()
+            .size() > 0
+      );
+
+    const helpLink = getHelpLink('/interface/scene-editor/');
+
+    const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+    const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
+    const scrollKey = 'scene-' + scene.ptr;
+
+    const persistedPanelStateId = scene.getName();
+
+    const onScroll = usePersistedScrollPosition({
+      project,
+      scrollViewRef,
+      scrollKey,
+      persistedPanelStateId,
+      persistedPanelStateType: 'scene',
+    });
+    const {
+      isSectionFolded,
+      setSectionFolded,
+      toggleSectionFolded,
+    } = usePersistedCollapsedSection({
+      project,
+      persistedPanelStateId,
+      persistedPanelStateType: 'scene',
+      foldedByDefault: true,
+    });
+
+    // Variable refactoring: snapshot on mount, apply on unmount/scene change.
+    const { onVariablesUpdated } = useVariablesContainerRefactoring({
+      project,
+      variablesContainer: scene.getVariables(),
+      initialInstances: null,
+      objectName: null,
+      eventsBasedObject: null,
+      enabled: true,
+      objectGroup: null,
+      objectsContainer: null,
+      globalObjectsContainer: null,
+    });
+
+    const propertiesSchema = React.useMemo(
+      () => {
+        if (schemaRecomputeTrigger) {
+          // schemaRecomputeTrigger allows to invalidate the schema when required.
+        }
+        return makeSchema({
+          i18n,
+          onBackgroundColorChanged,
+        });
+      },
+      [schemaRecomputeTrigger, i18n, onBackgroundColorChanged]
     );
 
-  const helpLink = getHelpLink('/interface/scene-editor/');
-
-  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
-  const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
-  const scrollKey = 'scene-' + scene.ptr;
-
-  const persistedPanelStateId = scene.getName();
-
-  const onScroll = usePersistedScrollPosition({
-    project,
-    scrollViewRef,
-    scrollKey,
-    persistedPanelStateId,
-    persistedPanelStateType: 'scene',
-  });
-  const {
-    isSectionFolded,
-    setSectionFolded,
-    toggleSectionFolded,
-  } = usePersistedCollapsedSection({
-    project,
-    persistedPanelStateId,
-    persistedPanelStateType: 'scene',
-    foldedByDefault: true,
-  });
-
-  // Variable refactoring: snapshot on mount, apply on unmount/scene change.
-  const { onVariablesUpdated } = useVariablesContainerRefactoring({
-    project,
-    variablesContainer: scene.getVariables(),
-    initialInstances: null,
-    objectName: null,
-    eventsBasedObject: null,
-    enabled: true,
-    objectGroup: null,
-    objectsContainer: null,
-    globalObjectsContainer: null,
-  });
-
-  const propertiesSchema = React.useMemo(
-    () => {
-      if (schemaRecomputeTrigger) {
-        // schemaRecomputeTrigger allows to invalidate the schema when required.
-      }
-      return makeSchema({
-        i18n,
-        onBackgroundColorChanged,
-      });
-    },
-    [schemaRecomputeTrigger, i18n, onBackgroundColorChanged]
-  );
-
-  return (
-    <ErrorBoundary
-      componentTitle={<Trans>Scene properties</Trans>}
-      scope="scene-editor-scene-properties"
-    >
-      <ScrollView
-        ref={scrollViewRef}
-        autoHideScrollbar
-        style={styles.scrollView}
-        key={scrollKey}
-        onScroll={onScroll}
+    return (
+      <ErrorBoundary
+        componentTitle={<Trans>Scene properties</Trans>}
+        scope="scene-editor-scene-properties"
       >
-        <Column expand noMargin id="scene-properties-editor" noOverflowParent>
-          <ColumnStackLayout expand noOverflowParent>
-            <LineStackLayout
-              noMargin
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <LineStackLayout noMargin alignItems="center">
-                <SceneIcon style={styles.icon} />
-                <Text size="body" noMargin>
-                  {scene.getName()}
-                </Text>
-                {helpLink && (
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      Window.openExternalURL(helpLink);
-                    }}
-                  >
-                    <Help style={styles.icon} />
-                  </IconButton>
-                )}
-              </LineStackLayout>
-            </LineStackLayout>
-          </ColumnStackLayout>
-          <TopLevelCollapsibleSection
-            title={<Trans>Properties</Trans>}
-            isFolded={isSectionFolded('properties')}
-            toggleFolded={() => toggleSectionFolded('properties')}
-            renderContent={() => (
-              <ColumnStackLayout noMargin noOverflowParent>
-                <CompactPropertiesEditorByVisibility
-                  project={project}
-                  schema={propertiesSchema}
-                  instances={[scene]}
-                  onInstancesModified={(instances, context) => {
-                    if (onScenePropertiesModified)
-                      onScenePropertiesModified(context);
-                  }}
-                  resourceManagementProps={resourceManagementProps}
-                  placeholder=""
-                  onRefreshAllFields={forceRecomputeSchema}
-                />
-              </ColumnStackLayout>
-            )}
-          />
-          <TopLevelCollapsibleSection
-            title={<Trans>Behaviors</Trans>}
-            isFolded={isSectionFolded('behaviors')}
-            toggleFolded={() => toggleSectionFolded('behaviors')}
-            renderContent={() =>
-              allVisibleBehaviors.length === 0 ? (
-                <Column>
-                  <EmptyMessage>
-                    <Trans>
-                      No behavior on this scene has properties that can be
-                      configured. Behaviors are added on objects, and their
-                      scene-wide properties, if any, are displayed here.
-                    </Trans>
-                  </EmptyMessage>
-                </Column>
-              ) : (
-                <ColumnStackLayout noMargin>
-                  {allVisibleBehaviors.map(behaviorSharedData => {
-                    const behaviorTypeName = behaviorSharedData.getTypeName();
-                    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                      gd.JsPlatform.get(),
-                      behaviorTypeName
-                    );
-                    const iconUrl = behaviorMetadata.getIconFilename();
-
-                    const isEmpty =
-                      propertiesMapToSchema({
-                        properties: behaviorSharedData.getProperties(),
-                        defaultValueProperties: behaviorMetadata
-                          ? behaviorMetadata.getSharedProperties()
-                          : null,
-                        getPropertyValue: () => '',
-                        onUpdateProperty: noop,
-                        layersContainer: null,
-                        shouldDisabledFieldsWithMixedValues: false,
-                      }).length === 0;
-                    return (
-                      !isEmpty && (
-                        <CollapsibleSubPanel
-                          key={behaviorSharedData.ptr}
-                          renderContent={() => (
-                            <CompactBehaviorSharedDataPropertiesEditor
-                              project={project}
-                              behaviorMetadata={behaviorMetadata}
-                              behaviorSharedData={behaviorSharedData}
-                              resourceManagementProps={resourceManagementProps}
-                              onBehaviorSharedDataModified={
-                                onBehaviorSharedDataModified
-                              }
-                            />
-                          )}
-                          isFolded={behaviorSharedData.isFolded()}
-                          toggleFolded={() => {
-                            behaviorSharedData.setFolded(
-                              !behaviorSharedData.isFolded()
-                            );
-                            forceUpdate();
-                          }}
-                          titleIcon={
-                            iconUrl ? (
-                              <IconContainer
-                                src={iconUrl}
-                                alt={behaviorMetadata.getFullName()}
-                                size={16}
-                              />
-                            ) : null
-                          }
-                          title={behaviorSharedData.getName()}
-                        />
-                      )
-                    );
-                  })}
-                </ColumnStackLayout>
-              )
-            }
-          />
-          <TopLevelCollapsibleSection
-            title={<Trans>Scene Variables</Trans>}
-            isFolded={isSectionFolded('variables')}
-            toggleFolded={() => toggleSectionFolded('variables')}
-            onOpenFullEditor={() => openSceneVariables()}
-            onAdd={() => {
-              if (variablesListRef.current) {
-                variablesListRef.current.addVariable();
-              }
-              setSectionFolded('variables', false);
-            }}
-            renderContentAsHiddenWhenFolded={
-              true /* Allows to keep a ref to the variables list for add button to work. */
-            }
-            noContentMargin
-            renderContent={() => (
-              <VariablesList
-                ref={variablesListRef}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                directlyStoreValueChangesWhileEditing
-                variablesContainer={scene.getVariables()}
-                areObjectVariables
-                size="compact"
-                onComputeAllVariableNames={() =>
-                  EventsRootVariablesFinder.findAllLayoutVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    scene
-                  )
-                }
-                historyHandler={historyHandler}
-                onVariablesUpdated={onVariablesUpdated}
-                toolbarIconStyle={styles.icon}
-                compactEmptyPlaceholderText={
-                  <Trans>
-                    There are no{' '}
-                    <Link
-                      href={sceneVariablesHelpLink}
-                      onClick={() =>
-                        Window.openExternalURL(sceneVariablesHelpLink)
-                      }
+        <ScrollView
+          ref={scrollViewRef}
+          autoHideScrollbar
+          style={styles.scrollView}
+          key={scrollKey}
+          onScroll={onScroll}
+        >
+          <Column expand noMargin id="scene-properties-editor" noOverflowParent>
+            <ColumnStackLayout expand noOverflowParent>
+              <LineStackLayout
+                noMargin
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <LineStackLayout noMargin alignItems="center">
+                  <SceneIcon style={styles.icon} />
+                  <Text size="body" noMargin>
+                    {scene.getName()}
+                  </Text>
+                  {helpLink && (
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        Window.openExternalURL(helpLink);
+                      }}
                     >
-                      variables
-                    </Link>{' '}
-                    on this scene.
-                  </Trans>
+                      <Help style={styles.icon} />
+                    </IconButton>
+                  )}
+                </LineStackLayout>
+              </LineStackLayout>
+            </ColumnStackLayout>
+            <TopLevelCollapsibleSection
+              title={<Trans>Properties</Trans>}
+              isFolded={isSectionFolded('properties')}
+              toggleFolded={() => toggleSectionFolded('properties')}
+              renderContent={() => (
+                <ColumnStackLayout noMargin noOverflowParent>
+                  <CompactPropertiesEditorByVisibility
+                    project={project}
+                    schema={propertiesSchema}
+                    instances={[scene]}
+                    onInstancesModified={(instances, context) => {
+                      if (onScenePropertiesModified)
+                        onScenePropertiesModified(context);
+                    }}
+                    resourceManagementProps={resourceManagementProps}
+                    placeholder=""
+                    onRefreshAllFields={forceRecomputeSchema}
+                  />
+                </ColumnStackLayout>
+              )}
+            />
+            <TopLevelCollapsibleSection
+              title={<Trans>Behaviors</Trans>}
+              isFolded={isSectionFolded('behaviors')}
+              toggleFolded={() => toggleSectionFolded('behaviors')}
+              renderContent={() =>
+                allVisibleBehaviors.length === 0 ? (
+                  <Column>
+                    <EmptyMessage>
+                      <Trans>
+                        No behavior on this scene has properties that can be
+                        configured. Behaviors are added on objects, and their
+                        scene-wide properties, if any, are displayed here.
+                      </Trans>
+                    </EmptyMessage>
+                  </Column>
+                ) : (
+                  <ColumnStackLayout noMargin>
+                    {allVisibleBehaviors.map(behaviorSharedData => {
+                      const behaviorTypeName = behaviorSharedData.getTypeName();
+                      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                        gd.JsPlatform.get(),
+                        behaviorTypeName
+                      );
+                      const iconUrl = behaviorMetadata.getIconFilename();
+
+                      const isEmpty =
+                        propertiesMapToSchema({
+                          properties: behaviorSharedData.getProperties(),
+                          defaultValueProperties: behaviorMetadata
+                            ? behaviorMetadata.getSharedProperties()
+                            : null,
+                          getPropertyValue: () => '',
+                          onUpdateProperty: noop,
+                          layersContainer: null,
+                          shouldDisabledFieldsWithMixedValues: false,
+                        }).length === 0;
+                      return (
+                        !isEmpty && (
+                          <CollapsibleSubPanel
+                            key={behaviorSharedData.ptr}
+                            renderContent={() => (
+                              <CompactBehaviorSharedDataPropertiesEditor
+                                project={project}
+                                behaviorMetadata={behaviorMetadata}
+                                behaviorSharedData={behaviorSharedData}
+                                resourceManagementProps={
+                                  resourceManagementProps
+                                }
+                                onBehaviorSharedDataModified={
+                                  onBehaviorSharedDataModified
+                                }
+                              />
+                            )}
+                            isFolded={behaviorSharedData.isFolded()}
+                            toggleFolded={() => {
+                              behaviorSharedData.setFolded(
+                                !behaviorSharedData.isFolded()
+                              );
+                              forceUpdate();
+                            }}
+                            titleIcon={
+                              iconUrl ? (
+                                <IconContainer
+                                  src={iconUrl}
+                                  alt={behaviorMetadata.getFullName()}
+                                  size={16}
+                                />
+                              ) : null
+                            }
+                            title={behaviorSharedData.getName()}
+                          />
+                        )
+                      );
+                    })}
+                  </ColumnStackLayout>
+                )
+              }
+            />
+            <TopLevelCollapsibleSection
+              id="scene-variables-section"
+              title={<Trans>Scene Variables</Trans>}
+              isFolded={isSectionFolded('variables')}
+              toggleFolded={() => toggleSectionFolded('variables')}
+              onOpenFullEditor={() => openSceneVariables()}
+              onAdd={() => {
+                if (variablesListRef.current) {
+                  variablesListRef.current.addVariable();
                 }
-                isListLocked={false}
-              />
-            )}
-          />
-          <LargeSpacer />
-          <Line>
-            <EmptyMessage>
-              <Trans>
-                Click on an instance on the canvas or an object in the list to
-                display their properties.
-              </Trans>
-            </EmptyMessage>
-          </Line>
-        </Column>
-      </ScrollView>
-    </ErrorBoundary>
-  );
-};
+                setSectionFolded('variables', false);
+              }}
+              renderContentAsHiddenWhenFolded={
+                true /* Allows to keep a ref to the variables list for add button to work. */
+              }
+              noContentMargin
+              renderContent={() => (
+                <VariablesList
+                  ref={variablesListRef}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
+                  directlyStoreValueChangesWhileEditing
+                  variablesContainer={scene.getVariables()}
+                  areObjectVariables
+                  size="compact"
+                  onComputeAllVariableNames={() =>
+                    EventsRootVariablesFinder.findAllLayoutVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      scene
+                    )
+                  }
+                  historyHandler={historyHandler}
+                  onVariablesUpdated={onVariablesUpdated}
+                  toolbarIconStyle={styles.icon}
+                  compactEmptyPlaceholderText={
+                    <Trans>
+                      There are no{' '}
+                      <Link
+                        href={sceneVariablesHelpLink}
+                        onClick={() =>
+                          Window.openExternalURL(sceneVariablesHelpLink)
+                        }
+                      >
+                        variables
+                      </Link>{' '}
+                      on this scene.
+                    </Trans>
+                  }
+                  isListLocked={false}
+                />
+              )}
+            />
+            <LargeSpacer />
+            <Line>
+              <EmptyMessage>
+                <Trans>
+                  Click on an instance on the canvas or an object in the list to
+                  display their properties.
+                </Trans>
+              </EmptyMessage>
+            </Line>
+          </Column>
+        </ScrollView>
+      </ErrorBoundary>
+    );
+  }
+);

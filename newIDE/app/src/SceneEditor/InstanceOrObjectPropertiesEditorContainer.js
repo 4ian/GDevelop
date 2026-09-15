@@ -3,18 +3,27 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import Paper from '../UI/Paper';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { CompactInstancePropertiesEditor } from '../InstancesEditor/CompactInstancePropertiesEditor';
+import {
+  CompactInstancePropertiesEditor,
+  type CompactInstancePropertiesEditorInterface,
+} from '../InstancesEditor/CompactInstancePropertiesEditor';
 import { Trans, Plural } from '@lingui/macro';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HistoryHandler } from '../VariablesList/VariablesList';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
-import { CompactObjectPropertiesEditor } from '../ObjectEditor/CompactObjectPropertiesEditor';
+import {
+  CompactObjectPropertiesEditor,
+  type CompactObjectPropertiesEditorInterface,
+} from '../ObjectEditor/CompactObjectPropertiesEditor';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
 import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/CompactEventsBasedObjectVariantPropertiesEditor';
-import { CompactScenePropertiesEditor } from './CompactScenePropertiesEditor';
+import {
+  CompactScenePropertiesEditor,
+  type CompactScenePropertiesEditorInterface,
+} from './CompactScenePropertiesEditor';
 import Rectangle from '../Utils/Rectangle';
 import { type LastSelectionType } from './EditorsDisplay.flow';
 import { type FieldModificationContext } from '../CompactPropertiesEditor';
@@ -123,6 +132,7 @@ type Props = {|
 export type InstanceOrObjectPropertiesEditorInterface = {|
   forceUpdate: () => void,
   getEditorTitle: () => React.Node,
+  revealVariable: (nodeId: string) => void,
 |};
 
 export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
@@ -132,6 +142,15 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
   (props, ref) => {
     const forceUpdate = useForceUpdate();
     const compactObjectGroupPropertiesEditorRef = React.useRef<?CompactObjectGroupPropertiesEditorInterface>(
+      null
+    );
+    const compactObjectPropertiesEditorRef = React.useRef<?CompactObjectPropertiesEditorInterface>(
+      null
+    );
+    const compactInstancePropertiesEditorRef = React.useRef<?CompactInstancePropertiesEditorInterface>(
+      null
+    );
+    const compactScenePropertiesEditorRef = React.useRef<?CompactScenePropertiesEditorInterface>(
       null
     );
     React.useImperativeHandle<InstanceOrObjectPropertiesEditorInterface>(
@@ -166,6 +185,14 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
           ) : (
             <Trans>Scene properties</Trans>
           ),
+        revealVariable: (nodeId: string) => {
+          if (compactObjectPropertiesEditorRef.current)
+            compactObjectPropertiesEditorRef.current.revealVariable(nodeId);
+          else if (compactInstancePropertiesEditorRef.current)
+            compactInstancePropertiesEditorRef.current.revealVariable(nodeId);
+          else if (compactScenePropertiesEditorRef.current)
+            compactScenePropertiesEditorRef.current.revealVariable(nodeId);
+        },
       })
     );
 
@@ -240,6 +267,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       <Paper background="dark" square style={styles.paper}>
         {!!instances.length && lastSelectionType === 'instance' ? (
           <CompactInstancePropertiesEditor
+            ref={compactInstancePropertiesEditorRef}
             instances={instances}
             editObjectInPropertiesPanel={editObjectInPropertiesPanel}
             onInstancesModified={onInstancesModified}
@@ -262,6 +290,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
           objects.length === 1 &&
           selectedObjectFolderOrObjectsCount === 1 ? (
           <CompactObjectPropertiesEditor
+            ref={compactObjectPropertiesEditorRef}
             objects={objects}
             onEditObject={onEditObject}
             onObjectsModified={onObjectsModified}
@@ -365,6 +394,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
           />
         ) : layout ? (
           <CompactScenePropertiesEditor
+            ref={compactScenePropertiesEditorRef}
             scene={layout}
             resourceManagementProps={resourceManagementProps}
             project={project}

@@ -89,6 +89,9 @@ export type SimplifiedCustomObjectVariant = {|
   // carry this variant's values.
   childObjects: Array<SimplifiedObject>,
   instancesDescription: string,
+  // Set when child objects are declared but no instance of them is placed:
+  // the custom object then renders nothing at all.
+  hasNoChildInstance?: true,
 |};
 
 export type SimplifiedCustomObject = {|
@@ -108,6 +111,8 @@ export type SimplifiedCustomObject = {|
   objectGroups?: Array<SimplifiedObjectGroup>,
   layers: Array<SimplifiedLayer>,
   instancesDescription: string,
+  // Same as on a variant: child objects declared, no instance of them placed.
+  hasNoChildInstance?: true,
   variants?: Array<SimplifiedCustomObjectVariant>,
 |};
 
@@ -341,6 +346,16 @@ export const getSimplifiedArea = (
   maxZ: container.getAreaMaxZ(),
 });
 
+/**
+ * A custom object renders its child instances: a variant declaring child
+ * objects with no instance of them placed renders nothing at all.
+ */
+const hasChildObjectsButNoInstance = (
+  variant: gdEventsBasedObjectVariant
+): boolean =>
+  variant.getObjects().getObjectsCount() > 0 &&
+  variant.getInitialInstances().getInstancesCount() === 0;
+
 export const getSimplifiedDependencies = (
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ): Array<SimplifiedExtensionDependency> => {
@@ -460,6 +475,8 @@ export const makeSimplifiedExtensionsBuilder = (
         'custom-object'
       ),
     };
+    if (hasChildObjectsButNoInstance(variant))
+      simplifiedVariant.hasNoChildInstance = true;
     if (variant.getAssetStoreAssetId())
       simplifiedVariant.assetStoreAssetId = variant.getAssetStoreAssetId();
     if (variant.getAssetStoreOriginalName())
@@ -496,6 +513,8 @@ export const makeSimplifiedExtensionsBuilder = (
       simplifiedObject.fullName = eventsBasedObject.getFullName();
     if (eventsBasedObject.getDescription())
       simplifiedObject.description = eventsBasedObject.getDescription();
+    if (hasChildObjectsButNoInstance(eventsBasedObject.getDefaultVariant()))
+      simplifiedObject.hasNoChildInstance = true;
     if (eventsBasedObject.getDefaultName())
       simplifiedObject.defaultName = eventsBasedObject.getDefaultName();
     if (eventsBasedObject.isRenderedIn3D())

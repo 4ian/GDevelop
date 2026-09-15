@@ -139,6 +139,7 @@ describe('SimplifiedProject', () => {
                   },
                 ],
                 "functions": Array [],
+                "hasNoChildInstance": true,
                 "instancesDescription": "There are no instances of child objects placed in this variant of the custom object - it is empty.",
                 "layers": Array [
                   Object {
@@ -245,6 +246,7 @@ describe('SimplifiedProject', () => {
                     "parameters": Array [],
                   },
                 ],
+                "hasNoChildInstance": true,
                 "instancesDescription": "There are no instances of child objects placed in this variant of the custom object - it is empty.",
                 "layers": Array [
                   Object {
@@ -2324,6 +2326,7 @@ describe('SimplifiedProject', () => {
                         ],
                       },
                     ],
+                    "hasNoChildInstance": true,
                     "instancesDescription": "There are no instances of child objects placed in this variant of the custom object - it is empty.",
                     "layers": Array [
                       Object {

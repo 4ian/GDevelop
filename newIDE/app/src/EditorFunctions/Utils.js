@@ -4,6 +4,7 @@ import { mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { type EditorFunctionGenericOutput } from './index';
+import { getModel3DObjectSizeInfo } from './Model3DSizeInfo';
 
 const gd: libGDevelop = global.gd;
 
@@ -13,6 +14,8 @@ export type ObjectSizeInfo = {|
   width: number | null,
   height: number | null,
   depth: number | null,
+  // Offsets from the minimum corner of the object box: `origin*` is the point
+  // an instance x;y;z positions, `center*` the point rotations turn around.
   originX: number,
   originY: number,
   originZ: number | null,
@@ -209,21 +212,7 @@ export const getObjectSizeInfo = (
   }
 
   if (objectType === 'Scene3D::Model3DObject') {
-    const config = gd.asModel3DConfiguration(objectConfiguration);
-    const width = config.getWidth();
-    const height = config.getHeight();
-    const depth = config.getDepth();
-    return {
-      width,
-      height,
-      depth,
-      originX: 0,
-      originY: 0,
-      originZ: 0,
-      centerX: width / 2,
-      centerY: height / 2,
-      centerZ: depth / 2,
-    };
+    return getModel3DObjectSizeInfo(object, project);
   }
 
   // Events-based (custom) objects: derive size from their declared area.

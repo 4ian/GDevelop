@@ -95,6 +95,10 @@ import {
   shouldHideProperty,
   type ObjectSizeInfo,
 } from './Utils';
+import {
+  ensureModel3DMeasurementLoaded,
+  ensureModel3DMeasurementsLoaded,
+} from './Model3DSizeInfo';
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
 import {
@@ -630,13 +634,20 @@ const injectObjectSizeInfo = (
 };
 
 const INSTANCE_POSITION_SEMANTICS_MESSAGE =
-  'Each instance x;y;z is its origin, NOT its center. Unless `objectSizeInfo` indicates a custom origin, the origin is the minimum corner: an instance occupies x to x+width, y to y+height and (in 3D) z to z+depth, so its center is at position + size/2. To center an instance A on top of an instance B: A.x = B.x + (B.width - A.width)/2, A.y = B.y + (B.height - A.height)/2, A.z = B.z + B.depth.';
+  'Instance x;y;z specify the origin position before rotation or flipping. ' +
+  '`objectSizeInfo.originX/Y/Z` and `centerX/Y/Z` are offsets from the minimum corner of the unrotated, unflipped object box, at the default size. The center point is the rotation pivot and need not be the geometric midpoint. ' +
+  'For a resized instance, scale each origin and center offset by instanceSize/defaultSize on that axis, when the default size is known and nonzero. In the formulas below, A.originX/Y/Z and B.originX/Y/Z mean these scaled offsets, and width/height/depth mean actual instance dimensions. ' +
+  'Before rotation or flipping, an instance occupies x-originX to x-originX+width, and likewise on Y and Z. Its rotation pivot is at position-origin+center. ' +
+  'For unrotated, unflipped instances in the same coordinate space, center the bounding box of A above that of B using: A.x = B.x - B.originX + (B.width - A.width)/2 + A.originX; A.y = B.y - B.originY + (B.height - A.height)/2 + A.originY; A.z = B.z - B.originZ + B.depth + A.originZ. ' +
+  'For rotated or flipped instances, compute the transformed bounds before positioning them.';
 
 // Inside a custom object, positions are local to it: without this the AI
 // would place children in scene coordinates.
 const CUSTOM_OBJECT_INSTANCE_POSITION_SEMANTICS_MESSAGE =
   'These instances are the children of a custom object: they live in its local space, where (0;0) is the position of the custom object (they are never scene coordinates). ' +
   'The default size of the custom object is its area (areaMinX to areaMaxX, areaMinY to areaMaxY, areaMinZ to areaMaxZ) when the variant defines one, otherwise the bounding box of the children. ' +
+  'The custom object turns around the CENTER of that area, so make the area symmetric (areaMin = -areaMax on an axis) for an object rotating around its own position, like a turret. ' +
+  '`change_custom_object({ fit_area_to_children })` sets the area from the children for you. ' +
   'Resizing an instance of the custom object scales its children proportionally, unless `isInnerAreaFollowingParentSize` is set (children then keep their position and the area follows the parent size - the UI/layout case). ' +
   'Rotation and flipping are applied by the parent, and in 3D the z of a child is relative to the z of the parent. ' +
   'Layers are internal to the custom object (at runtime children are reported on the layer of the parent) and the z-order of children is relative inside the parent. ' +
@@ -676,6 +687,45 @@ const getOccupiedSpaceDescription = (
       return `${axes[i]} ${round(min)} to ${round(min + sizeOnAxis)}`;
     })
     .join(', ');
+};
+
+// A custom object renders its child INSTANCES, not its child objects: a
+// variant declaring children with no instance placed renders nothing at all
+// (and the engine falls back to a 1x1x1 size, so nothing is visible and no
+// geometry is right). Said on every edit of such a variant, because the AI
+// reads the result of its last call more surely than the project.
+const getVariantWithoutInstancesNotice = (
+  resolvedScope: ResolvedScope
+): string => {
+  const { variant, objectsContainer, initialInstances, label } = resolvedScope;
+  if (!variant || !objectsContainer || !initialInstances) return '';
+  const childObjectsCount = objectsContainer.getObjectsCount();
+  if (childObjectsCount === 0 || initialInstances.getInstancesCount() > 0)
+    return '';
+  return ` ${label} has ${childObjectsCount} child object(s) but no instance placed: it renders nothing and its size falls back to 1x1x1. Place them with \`put_3d_instances\`/\`put_2d_instances\` on this same \`custom_object_variant\` scope.`;
+};
+
+const VARIANT_WITHOUT_INSTANCES_HINT_CODE = 'custom-object-has-no-instance';
+
+/**
+ * The same warning, as a hint aggregated across a whole script. Hints are
+ * reported after the script ran, when instances may have been placed since:
+ * it asks for a check instead of stating a state that could be stale.
+ */
+const addVariantWithoutInstancesHint = (
+  output: EditorFunctionGenericOutput,
+  resolvedScope: ResolvedScope
+): EditorFunctionGenericOutput => {
+  if (!getVariantWithoutInstancesNotice(resolvedScope)) return output;
+  const hint: HintEntry = {
+    code: VARIANT_WITHOUT_INSTANCES_HINT_CODE,
+    message: `${
+      resolvedScope.label
+    } had child objects but no instance of them: a custom object renders its child instances, and with none it renders nothing. Check that each child now has at least one instance (\`describe_instances\` on this \`custom_object_variant\` scope, \`put_3d_instances\`/\`put_2d_instances\` to place them), then set its default size with \`change_custom_object({ fit_area_to_children })\`.`,
+    objectNames: [],
+  };
+  output.hints = output.hints ? [...output.hints, hint] : [hint];
+  return output;
 };
 
 const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
@@ -1411,18 +1461,26 @@ const createOrReplaceObject: EditorFunction = {
                 message: [
                   `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}${renderedIn3DNotice}${getUsedAssetText(
                     assetShortHeader
-                  )}`,
+                  )}${getVariantWithoutInstancesNotice(resolvedScope)}`,
                   getPropertiesText(object),
                 ].join(' '),
               };
-              return injectObjectSizeInfo(result, {
-                [object.getName()]: getObjectSizeInfo(
-                  object,
-                  project,
-                  PixiResourcesLoader,
-                  assetShortHeader
-                ),
-              });
+              await ensureModel3DMeasurementLoaded(
+                object,
+                project,
+                PixiResourcesLoader
+              );
+              return addVariantWithoutInstancesHint(
+                injectObjectSizeInfo(result, {
+                  [object.getName()]: getObjectSizeInfo(
+                    object,
+                    project,
+                    PixiResourcesLoader,
+                    assetShortHeader
+                  ),
+                }),
+                resolvedScope
+              );
             }
 
             return makeGenericSuccess(
@@ -1430,7 +1488,9 @@ const createOrReplaceObject: EditorFunction = {
                 .map(
                   object => `"${object.getName()}" (type "${object.getType()}")`
                 )
-                .join(', ')}.${getUsedAssetText(assetShortHeader)}`
+                .join(', ')}.${getUsedAssetText(
+                assetShortHeader
+              )}${getVariantWithoutInstancesNotice(resolvedScope)}`
             );
           } else {
             if (asset_id) {
@@ -1529,17 +1589,27 @@ const createOrReplaceObject: EditorFunction = {
       const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
-          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.${scratchNotice}${renderedIn3DNotice}`,
+          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.${scratchNotice}${renderedIn3DNotice}${getVariantWithoutInstancesNotice(
+            resolvedScope
+          )}`,
           getPropertiesText(object),
         ].join(' '),
       };
-      return injectObjectSizeInfo(scratchResult, {
-        [targetObjectName]: getObjectSizeInfo(
-          object,
-          project,
-          PixiResourcesLoader
-        ),
-      });
+      await ensureModel3DMeasurementLoaded(
+        object,
+        project,
+        PixiResourcesLoader
+      );
+      return addVariantWithoutInstancesHint(
+        injectObjectSizeInfo(scratchResult, {
+          [targetObjectName]: getObjectSizeInfo(
+            object,
+            project,
+            PixiResourcesLoader
+          ),
+        }),
+        resolvedScope
+      );
     };
 
     const replaceExistingObject = async () => {
@@ -1743,7 +1813,9 @@ const createOrReplaceObject: EditorFunction = {
         ? 'global objects'
         : resolvedScope.label;
       return makeGenericSuccess(
-        `Duplicated "${duplicatedObjectName}" (${fromText}) as "${newObject.getName()}" (${toText}); same type/behaviors/properties/effects.${renderedIn3DNotice}`
+        `Duplicated "${duplicatedObjectName}" (${fromText}) as "${newObject.getName()}" (${toText}); same type/behaviors/properties/effects.${renderedIn3DNotice}${getVariantWithoutInstancesNotice(
+          resolvedScope
+        )}`
       );
     };
 
@@ -2295,6 +2367,7 @@ const inspectObjectPropertiesEffects: EditorFunction = {
     if (inspectParts.length > 0) {
       output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
     }
+    await ensureModel3DMeasurementLoaded(object, project, PixiResourcesLoader);
     injectObjectSizeInfo(output, {
       [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
     });
@@ -2602,7 +2675,14 @@ const changeObjectPropertiesEffects: EditorFunction = {
         isNewObjectTypeUsed: false,
       });
 
-      return makeGenericSuccess(`Deleted object "${object_name}".`);
+      return addVariantWithoutInstancesHint(
+        makeGenericSuccess(
+          `Deleted object "${object_name}".${getVariantWithoutInstancesNotice(
+            resolvedScope
+          )}`
+        ),
+        resolvedScope
+      );
     }
 
     const warnings: Array<string> = [];
@@ -3917,6 +3997,35 @@ const describeInstances: EditorFunction = {
     const instances = [];
     const objectSizeInfoByName: { [string]: ObjectSizeInfo | null } = {};
 
+    const isInstanceDescribed = (instance: gdInitialInstance) =>
+      objectNames.size === 0 ||
+      objectNames.has(instance.getObjectName().toLowerCase());
+    const getInstanceObject = (instance: gdInitialInstance) =>
+      getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        instance.getObjectName()
+      );
+
+    // The origin of a 3D model is read from the model file: load the models of
+    // the described objects first, so their `objectSizeInfo` is not truncated.
+    const describedObjects: Array<gdObject> = [];
+    mapFor(0, layersContainer.getLayersCount(), i => {
+      const layerName = layersContainer.getLayerAt(i).getName();
+      getInstancesInLayoutForLayer(initialInstances, layerName).forEach(
+        instance => {
+          if (!isInstanceDescribed(instance)) return;
+          const object = getInstanceObject(instance);
+          if (object) describedObjects.push(object);
+        }
+      );
+    });
+    await ensureModel3DMeasurementsLoaded(
+      describedObjects,
+      project,
+      PixiResourcesLoader
+    );
+
     // For each layer
     mapFor(0, layersContainer.getLayersCount(), i => {
       const layer = layersContainer.getLayerAt(i);
@@ -3924,19 +4033,12 @@ const describeInstances: EditorFunction = {
 
       getInstancesInLayoutForLayer(initialInstances, layerName).forEach(
         instance => {
-          if (
-            objectNames.size > 0 &&
-            !objectNames.has(instance.getObjectName().toLowerCase())
-          ) {
+          if (!isInstanceDescribed(instance)) {
             return;
           }
 
           const objectName = instance.getObjectName();
-          const object = getObjectByName(
-            globalObjectsContainer,
-            objectsContainer,
-            objectName
-          );
+          const object = getInstanceObject(instance);
 
           const sizeInfo = object
             ? getObjectSizeInfo(object, project, PixiResourcesLoader)
@@ -4191,6 +4293,12 @@ const put2dInstances: EditorFunction = {
           object_name
         )) ||
       null;
+    if (namedObject)
+      await ensureModel3DMeasurementLoaded(
+        namedObject,
+        project,
+        PixiResourcesLoader
+      );
     const objectSizeInfo = namedObject
       ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
       : null;
@@ -4903,9 +5011,15 @@ const put2dInstances: EditorFunction = {
       onInstancesModifiedOutsideEditor({
         ...getOutsideEditorChangesTarget(resolvedScope),
       });
+      // Placing a 3D object with the 2D tool works, but every instance lands
+      // at z = 0: say it, so a deliberate elevation is not silently lost.
+      const is3dObjectNotice =
+        namedObject && objectSizeInfo && objectSizeInfo.depth !== null
+          ? ` "${namedObject.getName()}" is a 3D object: new instances are created at z = 0 (use \`put_3d_instances\` to set their z and depth).`
+          : '';
       const put2dResult: EditorFunctionGenericOutput = {
         success: true,
-        message: changes.join(' '),
+        message: `${changes.join(' ')}${is3dObjectNotice}`,
       };
       if (object_name && objectSizeInfo)
         injectObjectSizeInfo(put2dResult, { [object_name]: objectSizeInfo });
@@ -5107,6 +5221,12 @@ const put3dInstances: EditorFunction = {
           object_name
         )) ||
       null;
+    if (namedObject)
+      await ensureModel3DMeasurementLoaded(
+        namedObject,
+        project,
+        PixiResourcesLoader
+      );
     const objectSizeInfo = namedObject
       ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
       : null;

@@ -408,6 +408,10 @@ namespace gdjs {
       gameTimeMs: number;
       assertions: Array<GameplayTestAssertion>;
       errors: Array<string>;
+      /** Problems the harness itself noticed in the game, whatever the
+       * assertions of the test did or did not check (a custom object
+       * rendering nothing, for instance). Never a failure by itself. */
+      warnings: Array<string>;
       consoleLogs: Array<GameplayTestLog>;
       eventLog: Array<GameplayTestEvent>;
       finalState: {
@@ -463,6 +467,7 @@ namespace gdjs {
     const MAX_ASSERTIONS = 200;
     const MAX_EVENT_LOG_ENTRIES = 500;
     const MAX_ERRORS = 20;
+    const MAX_WARNINGS = 20;
     const SCREENSHOT_MAX_SIZE = 512;
     const DEFAULT_FRAME_DT_MS = 1000 / 60;
     /** Deepest `children` nesting a snapshot can expose (nested custom
@@ -979,6 +984,65 @@ namespace gdjs {
           }
         }
         return objectCounts;
+      }
+
+      /**
+       * What the harness noticed about the game by itself, whatever the test
+       * asserted: a test can pass on the values it checks while the game is
+       * in a state nobody would call working.
+       */
+      private _getWarnings(): Array<string> {
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        if (!currentScene) return [];
+        const warnings: Array<string> = [];
+        const reportedObjectNames = new Set<string>();
+
+        /**
+         * Report the custom objects with no child in them, `object` included:
+         * they render nothing at all and fall back to a 1x1x1 size.
+         */
+        const checkObject = (
+          object: gdjs.RuntimeObject,
+          path: string,
+          depth: integer
+        ): void => {
+          if (warnings.length >= MAX_WARNINGS) return;
+          const anyObject = object as any;
+          if (typeof anyObject.getChildrenContainer !== 'function') return;
+          const children: Array<gdjs.RuntimeObject> = anyObject
+            .getChildrenContainer()
+            .getAdhocListOfAllInstances();
+          if (children.length === 0) {
+            if (reportedObjectNames.has(path)) return;
+            reportedObjectNames.add(path);
+            warnings.push(
+              `"${path}" is a custom object with no child in it: it renders nothing. Either its variant declares child objects with no instance of them placed (it then also falls back to a 1x1x1 size), or its children were all destroyed while the test ran.`
+            );
+            return;
+          }
+          if (depth >= MAX_CHILDREN_DEPTH) return;
+          for (const child of children) {
+            checkObject(child, `${path}.${child.getName()}`, depth + 1);
+          }
+        };
+
+        const objectNames: Array<string> = [];
+        const instances = (currentScene as any)._instances as Hashtable<
+          Array<gdjs.RuntimeObject>
+        >;
+        instances.keys(objectNames);
+        for (const objectName of objectNames) {
+          // Every instance: two instances of the same object can hold
+          // different children by the time the test ends.
+          for (const object of instances.get(objectName)) {
+            checkObject(object, objectName, 0);
+            if (warnings.length >= MAX_WARNINGS) break;
+          }
+          if (warnings.length >= MAX_WARNINGS) break;
+        }
+        return warnings;
       }
 
       private _trackChangesAfterStep(): void {
@@ -3501,6 +3565,7 @@ namespace gdjs {
           gameTimeMs: Math.round(this._gameTimeMs),
           assertions: this._assertions,
           errors: errors.slice(0, MAX_ERRORS),
+          warnings: this._getWarnings(),
           consoleLogs: this._consoleLogs,
           eventLog: this._eventLog,
           finalState: {

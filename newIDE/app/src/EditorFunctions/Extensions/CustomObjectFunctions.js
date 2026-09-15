@@ -28,6 +28,11 @@ import {
   listQuoted,
   getRequestedNewName,
 } from './NameHelpers';
+import {
+  fitCustomObjectAreaToChildren,
+  FIT_AREA_MODES,
+  type FitAreaMode,
+} from './FitAreaToChildren';
 import { applyPropertyChanges, type PropertyChange } from './PropertyChanges';
 
 const gd: libGDevelop = global.gd;
@@ -697,6 +702,8 @@ export const changeCustomObject: EditorFunction = {
     onExtensionsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
     onWillDeleteExtensionItem,
+    onInstancesModifiedOutsideEditor,
+    PixiResourcesLoader,
   }) => {
     const extension_name = extractRequiredString(args, 'extension_name');
     const custom_object_name = extractRequiredString(
@@ -782,6 +789,19 @@ export const changeCustomObject: EditorFunction = {
           )}.`
         );
       }
+    }
+    const fitAreaToChildren = SafeExtractor.extractStringProperty(
+      args,
+      'fit_area_to_children'
+    );
+    const fitAreaMode: FitAreaMode | null =
+      FIT_AREA_MODES.find(mode => mode === fitAreaToChildren) || null;
+    if (fitAreaToChildren !== null && fitAreaMode === null) {
+      return makeGenericFailure(
+        `Unknown \`fit_area_to_children\` mode "${fitAreaToChildren}": use ${listQuoted(
+          FIT_AREA_MODES
+        )}.`
+      );
     }
     const requestedNewName = getRequestedNewName(args, custom_object_name);
     let newCustomObjectName = null;
@@ -887,6 +907,23 @@ export const changeCustomObject: EditorFunction = {
       );
     }
 
+    if (fitAreaMode !== null) {
+      messages.push(
+        ...(await fitCustomObjectAreaToChildren({
+          project,
+          eventsBasedObject,
+          mode: fitAreaMode,
+          pixiResourcesLoader: PixiResourcesLoader,
+        }))
+      );
+      changedCount++;
+      // The children were moved: refresh the editors showing them.
+      onInstancesModifiedOutsideEditor({
+        scene: null,
+        eventsBasedObject,
+      });
+    }
+
     if (newCustomObjectName) {
       gd.WholeProjectRefactorer.renameEventsBasedObject(
         project,
@@ -912,7 +949,7 @@ export const changeCustomObject: EditorFunction = {
     if (changedCount === 0) {
       return {
         success: true,
-        message: `Nothing to change on the custom object "${finalObjectType}": pass \`changed_settings\`, \`changed_properties\`, \`changed_variants\`, \`forward_child_object_functions\`, \`new_name\` or \`delete_this_custom_object\`.`,
+        message: `Nothing to change on the custom object "${finalObjectType}": pass \`changed_settings\`, \`changed_properties\`, \`changed_variants\`, \`fit_area_to_children\`, \`forward_child_object_functions\`, \`new_name\` or \`delete_this_custom_object\`.`,
         extensionName: extension_name,
         customObjectName,
         objectType: finalObjectType,
@@ -930,6 +967,7 @@ export const changeCustomObject: EditorFunction = {
       propertyChanges.length === 0 &&
       plannedVariants.changes.length === 0 &&
       childObjectNames.length === 0 &&
+      fitAreaMode === null &&
       !newCustomObjectName &&
       plannedSettings.changes.every(change =>
         METADATA_ONLY_SETTING_NAMES.includes(change.settingName)

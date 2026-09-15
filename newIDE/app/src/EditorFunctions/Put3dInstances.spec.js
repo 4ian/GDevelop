@@ -412,3 +412,176 @@ describe('put_3d_instances (instances_hidden)', () => {
     expect(created.isHidden()).toBe(true);
   });
 });
+
+describe('put_3d_instances (brush_position_anchor)', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  // A custom object whose area is symmetric on X and Y and starts at 0 on Z:
+  // its origin is in the middle of its width and its height, and at the bottom
+  // of its depth - like the 3D models a scene is built from.
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('Kit', 0);
+    const turret = extension.getEventsBasedObjects().insertNew('Turret', 0);
+    turret.markAsRenderedIn3D(true);
+    turret.setAreaMinX(-60);
+    turret.setAreaMaxX(60);
+    turret.setAreaMinY(-40);
+    turret.setAreaMaxY(40);
+    turret.setAreaMinZ(0);
+    turret.setAreaMaxZ(70);
+    testScene = project.insertNewLayout('TestScene', 0);
+    testScene.getObjects().insertNewObject(project, 'Kit::Turret', 'Turret', 0);
+    testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 1);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const putInstances = async (args: any) =>
+    await editorFunctions.put_3d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Turret',
+        layer_name: '',
+        brush_kind: 'point',
+        new_instances_count: 1,
+        ...args,
+      },
+    });
+
+  const getPlacedInstance = () => {
+    const instances = [];
+    const functor = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe[cannot-write]
+    functor.invoke = instancePtr => {
+      const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
+        instancePtr,
+        gd.InitialInstance
+      );
+      instances.push({
+        id: instance.getPersistentUuid().slice(0, 10),
+        position: [instance.getX(), instance.getY(), instance.getZ()],
+      });
+    };
+    // $FlowFixMe[incompatible-type]
+    testScene.getInitialInstances().iterateOverInstances(functor);
+    functor.delete();
+    return instances[0];
+  };
+
+  const getPlacedPosition = () => {
+    const placed = getPlacedInstance();
+    return placed ? placed.position : undefined;
+  };
+
+  it('places instances by their origin without an anchor', async () => {
+    const result = await putInstances({ brush_position: '0,0,0' });
+
+    expect(result.success).toBe(true);
+    expect(getPlacedPosition()).toEqual([0, 0, 0]);
+  });
+
+  it('centers the box of the instances on the position', async () => {
+    const result = await putInstances({
+      brush_position: '0,0,0',
+      brush_position_anchor: 'center',
+    });
+
+    expect(result.success).toBe(true);
+    // The origin is already in the middle on X and Y: only Z moves, by half
+    // the depth of the object.
+    expect(getPlacedPosition()).toEqual([0, 0, -35]);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'anchored by their center on 0, 0, 0, origin at this position, each occupies X -60 to 60, Y -40 to 40, Z -35 to 35'
+      )
+    );
+  });
+
+  it('rests the instances on the position with the bottom_center anchor', async () => {
+    const result = await putInstances({
+      brush_position: '10,20,30',
+      brush_position_anchor: 'bottom_center',
+    });
+
+    expect(result.success).toBe(true);
+    expect(getPlacedPosition()).toEqual([10, 20, 30]);
+  });
+
+  it('puts the minimum corner of the box on the position', async () => {
+    const result = await putInstances({
+      brush_position: '0,0,0',
+      brush_position_anchor: 'min_corner',
+    });
+
+    expect(result.success).toBe(true);
+    expect(getPlacedPosition()).toEqual([60, 40, 0]);
+  });
+
+  it('scales the origin of the object to the size of the instances', async () => {
+    const result = await putInstances({
+      brush_position: '0,0,0',
+      brush_position_anchor: 'min_corner',
+      instances_size: '60,40,35',
+    });
+
+    expect(result.success).toBe(true);
+    expect(getPlacedPosition()).toEqual([30, 20, 0]);
+  });
+
+  it('moves an existing instance by its anchor, at the size it has', async () => {
+    await putInstances({
+      brush_position: '0,0,0',
+      instances_size: '60,40,35',
+    });
+    const placed = getPlacedInstance();
+    expect(placed.position).toEqual([0, 0, 0]);
+
+    const result = await putInstances({
+      brush_position: '100,100,100',
+      brush_position_anchor: 'center',
+      new_instances_count: 0,
+      existing_instance_ids: placed.id,
+    });
+
+    // Half the default size: its box is 60x40x35 around the position.
+    expect(result.success).toBe(true);
+    expect(getPlacedPosition()).toEqual([100, 100, 82.5]);
+  });
+
+  it('refuses an anchor when the box of the object is unknown', async () => {
+    const result = await putInstances({
+      object_name: 'Player',
+      brush_position: '0,0,0',
+      brush_position_anchor: 'center',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        '`brush_position_anchor: "center"` needs the box of "Player", which is unknown'
+      )
+    );
+    expect(getPlacedPosition()).toBe(undefined);
+  });
+
+  it('refuses an anchor it does not know', async () => {
+    const result = await putInstances({
+      brush_position: '0,0,0',
+      brush_position_anchor: 'top_left',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        '`brush_position_anchor` must be one of: origin, min_corner, center, bottom_center (got "top_left").'
+      )
+    );
+  });
+});

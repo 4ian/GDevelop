@@ -30,12 +30,30 @@ type Box = {| min: Array<number>, max: Array<number> |};
 
 const roundBound = (value: number): number => Math.round(value * 1e6) / 1e6;
 
-// The box of the children, or the child objects whose size could not be
-// measured: moving the children and writing an area on a guessed size would
-// silently shrink the custom object to nothing.
-type ChildInstancesBox =
-  | {| box: Box | null, unmeasurableObjectNames: [] |}
-  | {| box: null, unmeasurableObjectNames: Array<string> |};
+const roundCoordinate = (value: number): number =>
+  Math.round(value * 100) / 100;
+
+// What the instances of one child object occupy, all of them together.
+type ChildBox = {| objectName: string, box: Box, instancesCount: number |};
+
+// The box of the children (`box` is null when there is no instance at all), or
+// the child objects whose size could not be measured: moving the children and
+// writing an area on a guessed size would silently shrink the custom object to
+// nothing, so nothing is done when there is any.
+type ChildInstancesBox = {|
+  box: Box | null,
+  unmeasurableObjectNames: Array<string>,
+  childBoxes: Array<ChildBox>,
+|};
+
+const growBox = (box: Box | null, added: Box): Box => {
+  if (!box) return { min: [...added.min], max: [...added.max] };
+  for (let axis = 0; axis < 3; axis++) {
+    box.min[axis] = Math.min(box.min[axis], added.min[axis]);
+    box.max[axis] = Math.max(box.max[axis], added.max[axis]);
+  }
+  return box;
+};
 
 const forEachInstance = (
   variant: gdEventsBasedObjectVariant,
@@ -133,6 +151,7 @@ const getChildInstancesBox = (
   const objects = variant.getObjects();
   let box: Box | null = null;
   const unmeasurableObjectNames: Array<string> = [];
+  const childBoxes: Array<ChildBox> = [];
 
   forEachInstance(variant, instance => {
     const objectName = instance.getObjectName();
@@ -198,26 +217,64 @@ const getChildInstancesBox = (
     );
 
     const instanceBox = getInstanceBox(instance, minimumCorner, size, center);
-    const currentBox = box;
-    if (!currentBox) {
-      box = { min: [...instanceBox.min], max: [...instanceBox.max] };
+    box = growBox(box, instanceBox);
+    const childBox = childBoxes.find(
+      candidate => candidate.objectName === objectName
+    );
+    if (childBox) {
+      growBox(childBox.box, instanceBox);
+      childBox.instancesCount++;
     } else {
-      for (let axis = 0; axis < 3; axis++) {
-        currentBox.min[axis] = Math.min(
-          currentBox.min[axis],
-          instanceBox.min[axis]
-        );
-        currentBox.max[axis] = Math.max(
-          currentBox.max[axis],
-          instanceBox.max[axis]
-        );
-      }
+      childBoxes.push({
+        objectName,
+        box: growBox(null, instanceBox),
+        instancesCount: 1,
+      });
     }
   });
 
   if (unmeasurableObjectNames.length > 0)
-    return { box: null, unmeasurableObjectNames };
-  return { box, unmeasurableObjectNames: [] };
+    return { box: null, unmeasurableObjectNames, childBoxes: [] };
+  return { box, unmeasurableObjectNames: [], childBoxes };
+};
+
+// At most this many child objects are described: the boxes are there to be
+// compared with each other, which nobody does over a long list.
+const MAX_DESCRIBED_CHILD_BOXES = 10;
+
+/**
+ * Where the children ended up, so that a part meant to be centered on another
+ * (a turret on a hull) can be seen not to be. Each child object is given the
+ * box of all of its instances, moved like them.
+ */
+const getChildBoxesDescription = (
+  childBoxes: Array<ChildBox>,
+  offsets: Array<number>,
+  axesCount: number
+): string => {
+  if (childBoxes.length === 0) return '';
+  const axes = ['X', 'Y', 'Z'];
+  const described = childBoxes
+    .slice(0, MAX_DESCRIBED_CHILD_BOXES)
+    .map(({ objectName, box, instancesCount }) => {
+      const bounds = [];
+      const middle = [];
+      for (let axis = 0; axis < axesCount; axis++) {
+        const min = box.min[axis] + offsets[axis];
+        const max = box.max[axis] + offsets[axis];
+        bounds.push(
+          `${axes[axis]} ${roundCoordinate(min)} to ${roundCoordinate(max)}`
+        );
+        middle.push(roundCoordinate((min + max) / 2));
+      }
+      return `"${objectName}"${
+        instancesCount > 1 ? ` (${instancesCount} instances)` : ''
+      } ${bounds.join(', ')}, middle ${middle.join(';')}`;
+    });
+  const notDescribedCount = childBoxes.length - described.length;
+  return `Children: ${described.join('; ')}${
+    notDescribedCount > 0 ? ` and ${notDescribedCount} more` : ''
+  }.`;
 };
 
 /**
@@ -234,7 +291,7 @@ const fitVariantAreaToChildren = (
   variantLabel: string,
   pixiResourcesLoader: any
 ): string | null => {
-  const { box, unmeasurableObjectNames } = getChildInstancesBox(
+  const { box, unmeasurableObjectNames, childBoxes } = getChildInstancesBox(
     project,
     variant,
     pixiResourcesLoader
@@ -299,16 +356,35 @@ const fitVariantAreaToChildren = (
   variant.setAreaMaxY(areaMax[1]);
   variant.setAreaMaxZ(areaMax[2]);
 
-  const area = isRenderedIn3D
-    ? `${areaMin[0]};${areaMin[1]};${areaMin[2]} to ${areaMax[0]};${
-        areaMax[1]
-      };${areaMax[2]}`
-    : `${areaMin[0]};${areaMin[1]} to ${areaMax[0]};${areaMax[1]}`;
-  return `Fitted the area of ${variantLabel} to its children: ${area}${
+  const axesCount = isRenderedIn3D ? 3 : 2;
+  const formatPoint = (point: Array<number>): string =>
+    point
+      .slice(0, axesCount)
+      .map(roundCoordinate)
+      .join(';');
+  const area = `${formatPoint(areaMin)} to ${formatPoint(areaMax)}`;
+  const zeroPoint = formatPoint([0, 0, 0]);
+  // The custom object turns around the center of its area, wherever its own
+  // position is: said with the area, the one moment the agent can act on it.
+  const areaCenter = areaMin.map((min, axis) => (min + areaMax[axis]) / 2);
+  const rotationCenter =
     mode === 'centered_on_origin'
-      ? ' (children moved so (0;0;0) is their center, which is also the center of rotation of the custom object)'
-      : ' (children moved so (0;0;0) is their minimum corner)'
-  }.`;
+      ? `Its center of rotation is now its own position (${zeroPoint}).`
+      : `It turns around the center of that area, ${formatPoint(
+          areaCenter
+        )} from its own position (\`centered_on_origin\` puts the two together).`;
+
+  return [
+    `Fitted the area of ${variantLabel} to its children: ${area}${
+      mode === 'centered_on_origin'
+        ? ` (children moved so (${zeroPoint}) is their center)`
+        : ` (children moved so (${zeroPoint}) is their minimum corner)`
+    }.`,
+    rotationCenter,
+    getChildBoxesDescription(childBoxes, offsets, axesCount),
+  ]
+    .filter(Boolean)
+    .join(' ');
 };
 
 /**

@@ -480,3 +480,98 @@ describe('put_2d_instances (instances_hidden)', () => {
     expect(created.isHidden()).toBe(true);
   });
 });
+
+describe('put_2d_instances (brush_position_anchor)', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  // A custom object whose area is symmetric on X and starts at 0 on Y: its
+  // origin is in the middle of its width and at the top of its height.
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('UI', 0);
+    const panel = extension.getEventsBasedObjects().insertNew('Panel', 0);
+    panel.setAreaMinX(-50);
+    panel.setAreaMaxX(50);
+    panel.setAreaMinY(0);
+    panel.setAreaMaxY(40);
+    testScene = project.insertNewLayout('TestScene', 0);
+    testScene.getObjects().insertNewObject(project, 'UI::Panel', 'Panel', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const putInstances = async (args: any) =>
+    await editorFunctions.put_2d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Panel',
+        layer_name: '',
+        brush_kind: 'point',
+        new_instances_count: 1,
+        ...args,
+      },
+    });
+
+  const getPlacedPosition = () => {
+    const positions = [];
+    const functor = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe[cannot-write]
+    functor.invoke = instancePtr => {
+      const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
+        instancePtr,
+        gd.InitialInstance
+      );
+      positions.push([instance.getX(), instance.getY()]);
+    };
+    // $FlowFixMe[incompatible-type]
+    testScene.getInitialInstances().iterateOverInstances(functor);
+    functor.delete();
+    return positions[0];
+  };
+
+  it('centers the box of the instances on the position', async () => {
+    const result = await putInstances({
+      brush_position: '100,100',
+      brush_position_anchor: 'center',
+    });
+
+    expect(result.success).toBe(true);
+    // The origin is already in the middle of the width: only Y moves.
+    expect(getPlacedPosition()).toEqual([100, 80]);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'anchored by their center on 100, 100, origin at this position, each occupies X 50 to 150, Y 80 to 120'
+      )
+    );
+  });
+
+  it('puts the minimum corner of the box on the position', async () => {
+    const result = await putInstances({
+      brush_position: '0,0',
+      brush_position_anchor: 'min_corner',
+    });
+
+    expect(result.success).toBe(true);
+    expect(getPlacedPosition()).toEqual([50, 0]);
+  });
+
+  it('refuses the anchors of 3D objects', async () => {
+    const result = await putInstances({
+      brush_position: '0,0',
+      brush_position_anchor: 'bottom_center',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        '`brush_position_anchor` must be one of: origin, min_corner, center (got "bottom_center").'
+      )
+    );
+  });
+});

@@ -519,6 +519,10 @@ describe('CustomObjectFunctions', () => {
           maxY: 100,
           maxZ: 0,
         });
+        // It turns around its middle (50;10 from its corner), so its corner
+        // goes to (-40;40) for the box it occupies to start at the origin.
+        expect(instance.getX()).toBe(-40);
+        expect(instance.getY()).toBe(40);
       });
 
       it('refuses to fit when the size of a child is unknown, and moves nothing', async () => {

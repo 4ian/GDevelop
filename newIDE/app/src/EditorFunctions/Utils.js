@@ -212,7 +212,7 @@ export const getObjectSizeInfo = (
   }
 
   if (objectType === 'Scene3D::Model3DObject') {
-    return getModel3DObjectSizeInfo(object);
+    return getModel3DObjectSizeInfo(object, project);
   }
 
   // Events-based (custom) objects: derive size from their declared area.

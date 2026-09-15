@@ -2,7 +2,10 @@
 import * as THREE from 'three';
 import { mapFor } from '../../Utils/MapFor';
 import { getObjectSizeInfo } from '../Utils';
-import { ensureModel3DMeasurementsLoaded } from '../Model3DSizeInfo';
+import {
+  ensureModel3DMeasurementsLoaded,
+  isModel3DObjectMeasured,
+} from '../Model3DSizeInfo';
 
 const gd: libGDevelop = global.gd;
 
@@ -134,11 +137,16 @@ const getChildInstancesBox = (
   forEachInstance(variant, instance => {
     const objectName = instance.getObjectName();
     if (!objects.hasObjectNamed(objectName)) return;
-    const sizeInfo = getObjectSizeInfo(
-      objects.getObject(objectName),
-      project,
-      pixiResourcesLoader
-    );
+    const object = objects.getObject(objectName);
+    // A 3D model that could not be read is given the dimensions and the origin
+    // it configures, which are a guess: no instance size makes up for an
+    // unknown model origin.
+    if (!isModel3DObjectMeasured(object, project)) {
+      if (!unmeasurableObjectNames.includes(objectName))
+        unmeasurableObjectNames.push(objectName);
+      return;
+    }
+    const sizeInfo = getObjectSizeInfo(object, project, pixiResourcesLoader);
     const defaultSizes = sizeInfo
       ? [sizeInfo.width, sizeInfo.height, sizeInfo.depth]
       : [null, null, null];
@@ -171,24 +179,22 @@ const getChildInstancesBox = (
     const centers: Array<number | null> = sizeInfo
       ? [sizeInfo.centerX, sizeInfo.centerY, sizeInfo.centerZ]
       : [null, null, null];
-    // The origin and the center are given for the default size: scale them to
-    // the size this instance really has. An unknown center is the middle of
-    // the box (what every object without one does).
-    const atInstanceSize = (
-      value: number | null,
-      axis: number,
-      fallback: number
-    ): number => {
+    // The origin and the center are given for the default size of the object:
+    // scale them to the size this instance really has.
+    const atInstanceSize = (value: number, axis: number): number => {
       const defaultSize = defaultSizes[axis];
-      const scale =
-        defaultSize !== null && defaultSize > 0 ? size[axis] / defaultSize : 1;
-      return (value === null ? fallback : value) * scale;
+      return defaultSize !== null && defaultSize > 0
+        ? (value * size[axis]) / defaultSize
+        : value;
     };
-    const minimumCorner: Array<number> = positions.map(
-      (position, axis) => position - atInstanceSize(origins[axis], axis, 0)
-    );
+    const minimumCorner: Array<number> = positions.map((position, axis) => {
+      const origin = origins[axis];
+      return position - (origin === null ? 0 : atInstanceSize(origin, axis));
+    });
+    // An object with no center of its own turns around the middle of what it
+    // occupies, which is known in the size of the instance itself.
     const center: Array<number> = centers.map((value, axis) =>
-      atInstanceSize(value, axis, (defaultSizes[axis] || 0) / 2)
+      value === null ? size[axis] / 2 : atInstanceSize(value, axis)
     );
 
     const instanceBox = getInstanceBox(instance, minimumCorner, size, center);

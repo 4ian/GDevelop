@@ -84,16 +84,46 @@ type Model3DMeasurement = {|
   modelOriginPoint: [number, number, number],
 |};
 
-// Measurements by model resource and everything else changing the box, each
-// kept with the model it was made on: the loader hands a new one when its
-// cache was burst or the resource reloaded, which invalidates the measurement.
-const measurementsByKey: Map<
-  string,
-  {| gltfScene: any, measurement: Model3DMeasurement |}
-> = new Map();
-// The measurements being read, so that concurrent calls for the same model
-// (`describe_instances` asks for one per instance) read it once.
-const pendingMeasurementsByKey: Map<string, Promise<void>> = new Map();
+// What was measured of the models of ONE project, by model resource and
+// everything else changing the box. Each measurement is kept with the model it
+// was made on: the loader hands a new one when its cache was burst or the
+// resource reloaded, which invalidates the measurement.
+type ProjectMeasurements = {|
+  measured: Map<string, {| gltfScene: any, measurement: Model3DMeasurement |}>,
+  // The measurements being read, so that concurrent calls for the same model
+  // (`describe_instances` asks for one per instance) read it once.
+  pending: Map<string, Promise<void>>,
+|};
+
+// Per project, so that two projects using the same resource name never share a
+// measurement and nothing (the models included) is held after a project is
+// closed.
+const measurementsByProject: WeakMap<
+  gdProject,
+  ProjectMeasurements
+> = new WeakMap();
+
+const getProjectMeasurements = (project: gdProject): ProjectMeasurements => {
+  const projectMeasurements = measurementsByProject.get(project);
+  if (projectMeasurements) return projectMeasurements;
+  const newProjectMeasurements: ProjectMeasurements = {
+    measured: new Map(),
+    pending: new Map(),
+  };
+  measurementsByProject.set(project, newProjectMeasurements);
+  return newProjectMeasurements;
+};
+
+/** What was measured of a model for a project, without remembering the read. */
+const findMeasurement = (
+  project: gdProject,
+  settings: Model3DSettings
+): Model3DMeasurement | null => {
+  const projectMeasurements = measurementsByProject.get(project);
+  if (!projectMeasurements) return null;
+  const measured = projectMeasurements.measured.get(getModelKey(settings));
+  return measured ? measured.measurement : null;
+};
 
 const getModelKey = (settings: Model3DSettings): string =>
   [
@@ -125,11 +155,12 @@ const measureModel = (
   ];
   return {
     modelSize: [modelSize[0], modelSize[1], modelSize[2]],
+    // Where the origin of the model (0;0;0) sits in the box it was measured in.
     modelOriginPoint: [
-      modelSize[0] < epsilon ? 0 : -boundingBox.min.x / modelSize[0],
+      modelSize[0] < epsilon ? 0 : (0 - boundingBox.min.x) / modelSize[0],
       // The model is flipped on the Y axis by the renderer.
       modelSize[1] < epsilon ? 1 : 1 + boundingBox.min.y / modelSize[1],
-      modelSize[2] < epsilon ? 0 : -boundingBox.min.z / modelSize[2],
+      modelSize[2] < epsilon ? 0 : (0 - boundingBox.min.z) / modelSize[2],
     ],
   };
 };
@@ -147,8 +178,9 @@ export const ensureModel3DMeasurementLoaded = (
 ): Promise<void> => {
   const settings = getModel3DSettings(object);
   if (!settings) return Promise.resolve();
+  const { measured, pending } = getProjectMeasurements(project);
   const key = getModelKey(settings);
-  const pendingMeasurement = pendingMeasurementsByKey.get(key);
+  const pendingMeasurement = pending.get(key);
   if (pendingMeasurement) return pendingMeasurement;
 
   const measuring = (async () => {
@@ -157,21 +189,26 @@ export const ensureModel3DMeasurementLoaded = (
         project,
         settings.modelResourceName
       );
-      if (!gltf || !gltf.scene) return;
-      const measured = measurementsByKey.get(key);
-      if (!measured || measured.gltfScene !== gltf.scene) {
-        measurementsByKey.set(key, {
+      if (!gltf || !gltf.scene) {
+        measured.delete(key);
+        return;
+      }
+      const alreadyMeasured = measured.get(key);
+      if (!alreadyMeasured || alreadyMeasured.gltfScene !== gltf.scene) {
+        measured.set(key, {
           gltfScene: gltf.scene,
           measurement: measureModel(gltf.scene, settings),
         });
       }
     } catch (error) {
-      // The model is unavailable (missing resource, unreadable file...).
+      // The model became unreadable (missing resource, unreadable file...):
+      // what was measured on the previous one no longer describes it.
+      measured.delete(key);
     } finally {
-      pendingMeasurementsByKey.delete(key);
+      pending.delete(key);
     }
   })();
-  pendingMeasurementsByKey.set(key, measuring);
+  pending.set(key, measuring);
   return measuring;
 };
 
@@ -199,31 +236,31 @@ export const ensureModel3DMeasurementsLoaded = async (
  * dimensions and the usual origin and center are given back.
  */
 export const getModel3DObjectSizeInfo = (
-  object: gdObject
+  object: gdObject,
+  project: gdProject
 ): ObjectSizeInfo | null => {
   const settings = getModel3DSettings(object);
   if (!settings) return null;
-  const measured = measurementsByKey.get(getModelKey(settings));
-  const measurement = measured ? measured.measurement : null;
+  const measurement = findMeasurement(project, settings);
 
   // `_updateDefaultTransformation`: the model fitted in the configured
   // dimensions, keeping its proportions.
   let size = settings.configuredSize;
   if (measurement && settings.keepAspectRatio) {
-    const scaleRatio = Math.min(
+    let scaleRatio = Math.min(
       ...measurement.modelSize.map((modelSize, axis) =>
         modelSize < epsilon
           ? Number.POSITIVE_INFINITY
           : settings.configuredSize[axis] / modelSize
       )
     );
-    if (Number.isFinite(scaleRatio)) {
-      size = [
-        scaleRatio * measurement.modelSize[0],
-        scaleRatio * measurement.modelSize[1],
-        scaleRatio * measurement.modelSize[2],
-      ];
-    }
+    // A model with no extent at all: the runtime keeps it at its own size.
+    if (!Number.isFinite(scaleRatio)) scaleRatio = 1;
+    size = [
+      scaleRatio * measurement.modelSize[0],
+      scaleRatio * measurement.modelSize[1],
+      scaleRatio * measurement.modelSize[2],
+    ];
   }
 
   const atSize = (location: string, axis: number, fallback: number): number => {
@@ -246,8 +283,27 @@ export const getModel3DObjectSizeInfo = (
   };
 };
 
-/** For tests: forget every model read so far. */
-export const clearModel3DMeasurementsCache = () => {
-  measurementsByKey.clear();
-  pendingMeasurementsByKey.clear();
+/**
+ * Whether the size, origin and center given for a 3D model object are measured
+ * on its model, or still the guess made before it is read. Exact without the
+ * model only when nothing about the object depends on its geometry.
+ *
+ * Callers computing positions from these values (rather than showing them)
+ * must check it: an unread model has neither its fitted size nor the origin it
+ * was authored with, and no instance size can make up for them.
+ */
+export const isModel3DObjectMeasured = (
+  object: gdObject,
+  project: gdProject
+): boolean => {
+  const settings = getModel3DSettings(object);
+  if (!settings) return true;
+  if (findMeasurement(project, settings)) return true;
+  const dependsOnModel = (location: string) =>
+    getPointForLocation(location).some(fraction => fraction === null);
+  return (
+    !settings.keepAspectRatio &&
+    !dependsOnModel(settings.originLocation) &&
+    !dependsOnModel(settings.centerLocation)
+  );
 };

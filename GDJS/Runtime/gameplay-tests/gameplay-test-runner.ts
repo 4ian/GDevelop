@@ -1018,7 +1018,7 @@ namespace gdjs {
             if (reportedObjectNames.has(path)) return;
             reportedObjectNames.add(path);
             warnings.push(
-              `"${path}" is a custom object with no child in it: it renders nothing and its size is 1x1x1. Either its variant declares child objects with no instance of them placed, or its children were all destroyed while the test ran.`
+              `"${path}" is a custom object with no child in it: it renders nothing. Either its variant declares child objects with no instance of them placed (it then also falls back to a 1x1x1 size), or its children were all destroyed while the test ran.`
             );
             return;
           }

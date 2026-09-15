@@ -187,6 +187,18 @@ namespace gdjs {
     }
 
     /**
+     * Check if the target of an effect is a layer of a scene, as opposed to an
+     * object or a layer of a custom object. Only these cover the whole screen.
+     */
+    const isSceneLayer = function (target: EffectsTarget): boolean {
+      if (!target.getRuntimeLayer) {
+        return false;
+      }
+      const instanceContainer = target.getRuntimeLayer().getInstanceContainer();
+      return instanceContainer === instanceContainer.getScene();
+    };
+
+    /**
      * An effect used to manipulate a Pixi filter.
      * @category Core Engine > Effects
      */
@@ -218,6 +230,20 @@ namespace gdjs {
           | undefined;
         if (!rendererObject) {
           return false;
+        }
+        if (isSceneLayer(target)) {
+          // The area on which the effect is applied is the whole screen
+          // (see `LayerPixiRenderer`). Let PixiJS apply it a bit outside of the
+          // screen too (as much as the effect needs to read pixels around
+          // each pixel):
+          // - PixiJS renders the layer in a texture taken from a pool, which is
+          //   often bigger than the area asked for. Effects reading the
+          //   neighbor pixels (blurs notably) would otherwise read the empty
+          //   part of this texture, which shows up as a seam on the right and
+          //   bottom edges of the screen.
+          // - what is just outside of the screen is then properly taken into
+          //   account by these effects.
+          this.pixiFilter.autoFit = false;
         }
         rendererObject.filters = (rendererObject.filters || []).concat(
           this.pixiFilter

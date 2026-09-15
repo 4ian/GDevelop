@@ -48,6 +48,7 @@ declare class gdWholeProjectRefactorer {
   static objectRemovedInEventsFunction(project: gdProject, eventsFunction: gdEventsFunction, objectName: string): void;
   static objectOrGroupRenamedInEventsBasedObject(project: gdProject, projectScopedContainers: gdProjectScopedContainers, eventsBasedObject: gdEventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsBasedObject(project: gdProject, eventsBasedObject: gdEventsBasedObject, objectName: string): void;
+  static removeEventsBasedObjectVariant(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, variantName: string): void;
   static globalObjectOrGroupRenamed(project: gdProject, oldName: string, newName: string, isObjectGroup: boolean): void;
   static globalObjectRemoved(project: gdProject, objectName: string): void;
   static behaviorsAddedToGlobalObject(project: gdProject, objectName: string): void;

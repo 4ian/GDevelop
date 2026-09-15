@@ -5,6 +5,15 @@ import {
   buildExtensionSummary,
   type ExtensionSummary,
 } from './ExtensionSummary';
+import { type FunctionAuthoringScope } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
+import {
+  makeSimplifiedExtensionsBuilder,
+  getSimplifiedTests,
+  type SimplifiedExtension,
+  type SimplifiedCustomObject,
+  type SimplifiedCustomBehavior,
+  type SimplifiedCustomObjectVariant,
+} from './SimplifiedExtensions';
 
 export type SimplifiedBehavior = {|
   behaviorName: string,
@@ -18,7 +27,7 @@ export type SimplifiedVariable = {|
   variableChildren?: Array<SimplifiedVariable>,
 |};
 
-type SimplifiedObject = {|
+export type SimplifiedObject = {|
   objectName: string,
   objectType: string,
   behaviors?: Array<SimplifiedBehavior>,
@@ -26,7 +35,7 @@ type SimplifiedObject = {|
   animationNames?: string,
 |};
 
-type SimplifiedObjectGroup = {|
+export type SimplifiedObjectGroup = {|
   objectGroupName: string,
   objectGroupType: string,
   objectNames: Array<string>,
@@ -34,7 +43,7 @@ type SimplifiedObjectGroup = {|
   variables?: Array<SimplifiedVariable>,
 |};
 
-type SimplifiedLayer = {|
+export type SimplifiedLayer = {|
   layerName: string,
   position: number,
   isBaseLayer?: boolean,
@@ -56,7 +65,7 @@ type SimplifiedResource = {|
   metadata?: string,
 |};
 
-type SimplifiedTest = {|
+export type SimplifiedTest = {|
   testName: string,
   type: string,
   description?: string,
@@ -65,7 +74,7 @@ type SimplifiedTest = {|
   lastRunAt?: number,
 |};
 
-type SimplifiedProject = {|
+export type SimplifiedProject = {|
   properties: {|
     name: string,
     gameResolutionWidth: number,
@@ -80,6 +89,8 @@ type SimplifiedProject = {|
   globalVariables: Array<SimplifiedVariable>,
   resources: Array<SimplifiedResource>,
   tests?: Array<SimplifiedTest>,
+  // Declarations of the events-based extensions of the project (never their events).
+  extensions: Array<SimplifiedExtension>,
 |};
 
 type ProjectSpecificExtensionsSummary = {|
@@ -184,17 +195,42 @@ export const getSimplifiedVariablesContainer = (
   }).filter(Boolean);
 };
 
-export const makeSimplifiedProjectBuilder = (
-  gd: libGDevelop
-): {
+/**
+ * Options of the extensions summary sent to the AI: by default the private
+ * members of the extensions are left out (they can't be called from outside).
+ * `authoringScope` tells where the events being written are authored, so that
+ * exactly the private members callable from there are described.
+ */
+export type ProjectSpecificExtensionsSummaryOptions = {|
+  authoringScope?: FunctionAuthoringScope | null,
+|};
+
+export type SimplifiedProjectBuilder = {|
   getProjectSpecificExtensionsSummary: (
-    project: gdProject
+    project: gdProject,
+    options?: ProjectSpecificExtensionsSummaryOptions
   ) => ProjectSpecificExtensionsSummary,
   getSimplifiedProject: (
     project: gdProject,
     options: SimplifiedProjectOptions
   ) => SimplifiedProject,
-} => {
+  getSimplifiedExtension: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension
+  ) => SimplifiedExtension,
+  getSimplifiedCustomObject: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => SimplifiedCustomObject,
+  getSimplifiedCustomBehavior: (
+    eventsBasedBehavior: gdEventsBasedBehavior
+  ) => SimplifiedCustomBehavior,
+  getSimplifiedCustomObjectVariant: (
+    variant: gdEventsBasedObjectVariant
+  ) => SimplifiedCustomObjectVariant,
+|};
+
+export const makeSimplifiedProjectBuilder = (
+  gd: libGDevelop
+): SimplifiedProjectBuilder => {
   const getSimplifiedObject = (object: gdObject): SimplifiedObject => {
     const objectVariables = getSimplifiedVariablesContainer(
       gd,
@@ -323,7 +359,11 @@ export const makeSimplifiedProjectBuilder = (
     });
   };
 
-  const getInstancesDescription = (scene: gdLayout): string => {
+  const getInstancesDescription = (
+    initialInstances: gdInitialInstancesContainer,
+    layersContainer: gdLayersContainer,
+    containerKind: 'scene' | 'custom-object'
+  ): string => {
     let isEmpty = true;
     const instancesCountPerLayer: { [string]: { [string]: number } } = {};
 
@@ -348,17 +388,19 @@ export const makeSimplifiedProjectBuilder = (
       isEmpty = false;
     };
     // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
-    scene.getInitialInstances().iterateOverInstances(instancesListerFunctor);
+    initialInstances.iterateOverInstances(instancesListerFunctor);
     instancesListerFunctor.delete();
 
     if (isEmpty) {
-      return 'There are no instances of objects placed on the scene - the scene is empty.';
+      return containerKind === 'scene'
+        ? 'There are no instances of objects placed on the scene - the scene is empty.'
+        : 'There are no instances of child objects placed in this variant of the custom object - it is empty.';
     }
 
-    const layersContainer = scene.getLayers();
-
     return [
-      `On the scene, there are:`,
+      containerKind === 'scene'
+        ? `On the scene, there are:`
+        : `In this variant of the custom object, there are:`,
       ...mapFor(0, layersContainer.getLayersCount(), i => {
         const layer = layersContainer.getLayerAt(i);
         const layerName = layer.getName();
@@ -374,9 +416,20 @@ export const makeSimplifiedProjectBuilder = (
         ].join('\n');
       }),
       '',
-      `Inspect instances on the scene to get more details if needed.`,
+      containerKind === 'scene'
+        ? `Inspect instances on the scene to get more details if needed.`
+        : `Inspect instances of this variant to get more details if needed.`,
     ].join('\n');
   };
+
+  const simplifiedExtensionsBuilder = makeSimplifiedExtensionsBuilder(gd, {
+    getSimplifiedObjectsJson,
+    getSimplifiedObjectGroups,
+    getSimplifiedLayers,
+    getInstancesDescription,
+    getSimplifiedVariablesContainer: container =>
+      getSimplifiedVariablesContainer(gd, container),
+  });
 
   const getSimplifiedScene = (
     project: gdProject,
@@ -396,7 +449,11 @@ export const makeSimplifiedProjectBuilder = (
       ),
       sceneVariables: getSimplifiedVariablesContainer(gd, scene.getVariables()),
       layers: getSimplifiedLayers(scene.getLayers()),
-      instancesOnSceneDescription: getInstancesDescription(scene),
+      instancesOnSceneDescription: getInstancesDescription(
+        scene.getInitialInstances(),
+        scene.getLayers(),
+        'scene'
+      ),
     };
   };
 
@@ -442,33 +499,22 @@ export const makeSimplifiedProjectBuilder = (
         gd,
         project.getVariables()
       ),
+      extensions: simplifiedExtensionsBuilder.getSimplifiedExtensions(project),
     };
 
-    const projectTests = project.getTests();
-    if (projectTests.getTestsCount() > 0) {
-      simplifiedProject.tests = mapFor(0, projectTests.getTestsCount(), i => {
-        const test = projectTests.getTestAt(i);
-        const simplifiedTest: SimplifiedTest = {
-          testName: test.getName(),
-          type: test.getType(),
-        };
-        if (test.getDescription())
-          simplifiedTest.description = test.getDescription();
-        if (test.getSource()) simplifiedTest.source = test.getSource();
-        if (test.getLastRunStatus()) {
-          simplifiedTest.lastRunStatus = test.getLastRunStatus();
-          simplifiedTest.lastRunAt = test.getLastRunAt();
-        }
-        return simplifiedTest;
-      });
+    const projectTests = getSimplifiedTests(project.getTests());
+    if (projectTests.length > 0) {
+      simplifiedProject.tests = projectTests;
     }
 
     return simplifiedProject;
   };
 
   const getProjectSpecificExtensionsSummary = (
-    project: gdProject
+    project: gdProject,
+    options?: ProjectSpecificExtensionsSummaryOptions
   ): ProjectSpecificExtensionsSummary => {
+    const authoringScope = (options && options.authoringScope) || null;
     const startTime = Date.now();
     const platform = project.getCurrentPlatform();
     const allExtensions = platform.getAllPlatformExtensions();
@@ -503,6 +549,7 @@ export const makeSimplifiedProjectBuilder = (
           gd,
           eventsFunctionsExtension,
           extension,
+          authoringScope,
         });
       }),
     };
@@ -517,5 +564,15 @@ export const makeSimplifiedProjectBuilder = (
     return extensionsSummary;
   };
 
-  return { getSimplifiedProject, getProjectSpecificExtensionsSummary };
+  return {
+    getSimplifiedProject,
+    getProjectSpecificExtensionsSummary,
+    getSimplifiedExtension: simplifiedExtensionsBuilder.getSimplifiedExtension,
+    getSimplifiedCustomObject:
+      simplifiedExtensionsBuilder.getSimplifiedCustomObject,
+    getSimplifiedCustomBehavior:
+      simplifiedExtensionsBuilder.getSimplifiedCustomBehavior,
+    getSimplifiedCustomObjectVariant:
+      simplifiedExtensionsBuilder.getSimplifiedCustomObjectVariant,
+  };
 };

@@ -79,6 +79,7 @@ const makeResult = (
   gameTimeMs: 0,
   assertions: [],
   errors: [],
+  warnings: [],
   consoleLogs: [],
   eventLog: [],
   finalState: null,

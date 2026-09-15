@@ -81,6 +81,102 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
   );
 };
 
+/**
+ * Where events are being authored, identified by names: the extension being
+ * edited and, when the events are those of a function owned by a custom behavior
+ * or a custom object, this owner. Null when authoring outside of any extension
+ * (a scene, an external events sheet).
+ */
+export type FunctionAuthoringScope = {|
+  extensionName: string,
+  customBehaviorName?: ?string,
+  customObjectName?: ?string,
+|};
+
+/**
+ * Where a function (an instruction or an expression) is declared, and whether it
+ * is private.
+ */
+export type FunctionDeclarationScope = {|
+  extensionName: string,
+  isPrivate: boolean,
+  // The full type ("Extension::Name") of the custom behavior or object owning
+  // the function, with whether this owner itself is private.
+  behaviorMetadata: ?{ name: string, isPrivate: boolean },
+  objectMetadata: ?{ name: string, isPrivate: boolean },
+|};
+
+/**
+ * Whether a function can be called from the given authoring scope. A private
+ * function is only callable where it is declared: a free function anywhere in its
+ * extension, a method of a custom behavior or object only while authoring this
+ * very behavior or object. The public functions of a private behavior or object
+ * stay callable within their extension.
+ */
+export const isFunctionCallableInAuthoringScope = (
+  {
+    extensionName,
+    isPrivate,
+    behaviorMetadata,
+    objectMetadata,
+  }: FunctionDeclarationScope,
+  authoringScope: ?FunctionAuthoringScope
+): boolean => {
+  return !!(
+    (!isPrivate &&
+      (!behaviorMetadata || !behaviorMetadata.isPrivate) &&
+      (!objectMetadata || !objectMetadata.isPrivate)) ||
+    // The instruction or expression is marked as "private":
+    // we now compare its scope (where it was declared) and the current scope
+    // (where we are) to see if we should filter it or not.
+
+    // Show private behavior functions when editing the behavior
+    (behaviorMetadata &&
+      authoringScope &&
+      authoringScope.customBehaviorName &&
+      gd.PlatformExtension.getBehaviorFullType(
+        authoringScope.extensionName,
+        authoringScope.customBehaviorName
+      ) === behaviorMetadata.name) ||
+    (objectMetadata &&
+      authoringScope &&
+      authoringScope.customObjectName &&
+      gd.PlatformExtension.getObjectFullType(
+        authoringScope.extensionName,
+        authoringScope.customObjectName
+      ) === objectMetadata.name) ||
+    // When editing the extension...
+    (authoringScope &&
+      authoringScope.extensionName === extensionName &&
+      // ...show public functions of a private behavior
+      (!isPrivate ||
+        // ...show private non-behavior functions
+        (!behaviorMetadata && !objectMetadata)))
+  );
+};
+
+/**
+ * The authoring scope of events being edited, as named in `EventsScope`.
+ */
+export const getFunctionAuthoringScope = (
+  scope: EventsScope
+): FunctionAuthoringScope | null => {
+  const {
+    eventsBasedBehavior,
+    eventsBasedObject,
+    eventsFunctionsExtension,
+  } = scope;
+  if (!eventsFunctionsExtension) return null;
+
+  return {
+    extensionName: eventsFunctionsExtension.getName(),
+    customBehaviorName: eventsBasedBehavior
+      ? eventsBasedBehavior.getName()
+      : null,
+    customObjectName: eventsBasedObject ? eventsBasedObject.getName() : null,
+  };
+};
+
 const isFunctionVisibleInGivenScope = (
   enumeratedInstructionOrExpressionMetadata: EnumeratedInstructionOrExpressionMetadata,
   scope: EventsScope
@@ -90,11 +186,6 @@ const isFunctionVisibleInGivenScope = (
     objectMetadata,
     extension,
   } = enumeratedInstructionOrExpressionMetadata.scope;
-  const {
-    eventsBasedBehavior,
-    eventsBasedObject,
-    eventsFunctionsExtension,
-  } = scope;
 
   return !!(
     ((enumeratedInstructionOrExpressionMetadata.isRelevantForLayoutEvents &&
@@ -105,36 +196,16 @@ const isFunctionVisibleInGivenScope = (
         scope.eventsFunction &&
         scope.eventsFunction.isAsync()) ||
       (enumeratedInstructionOrExpressionMetadata.isRelevantForCustomObjectEvents &&
-        eventsBasedObject)) &&
+        scope.eventsBasedObject)) &&
     // Check visibility.
-    ((!enumeratedInstructionOrExpressionMetadata.isPrivate &&
-      (!behaviorMetadata || !behaviorMetadata.isPrivate) &&
-      (!objectMetadata || !objectMetadata.isPrivate)) ||
-      // The instruction or expression is marked as "private":
-      // we now compare its scope (where it was declared) and the current scope
-      // (where we are) to see if we should filter it or not.
-
-      // Show private behavior functions when editing the behavior
-      (behaviorMetadata &&
-        eventsBasedBehavior &&
-        eventsFunctionsExtension &&
-        gd.PlatformExtension.getBehaviorFullType(
-          eventsFunctionsExtension.getName(),
-          eventsBasedBehavior.getName()
-        ) === behaviorMetadata.name) ||
-      (objectMetadata &&
-        eventsBasedObject &&
-        eventsFunctionsExtension &&
-        gd.PlatformExtension.getObjectFullType(
-          eventsFunctionsExtension.getName(),
-          eventsBasedObject.getName()
-        ) === objectMetadata.name) ||
-      // When editing the extension...
-      (eventsFunctionsExtension &&
-        eventsFunctionsExtension.getName() === extension.name &&
-        // ...show public functions of a private behavior
-        (!enumeratedInstructionOrExpressionMetadata.isPrivate ||
-          // ...show private non-behavior functions
-          (!behaviorMetadata && !objectMetadata))))
+    isFunctionCallableInAuthoringScope(
+      {
+        extensionName: extension.name,
+        isPrivate: enumeratedInstructionOrExpressionMetadata.isPrivate,
+        behaviorMetadata,
+        objectMetadata,
+      },
+      getFunctionAuthoringScope(scope)
+    )
   );
 };

@@ -93,10 +93,14 @@ describe('buildExposedScriptFunctions', () => {
     });
 
     expect(result.success).toBe(true);
+    // The legacy `scene_name` is mapped to a `scope` before the call.
     expect(received).toEqual({
       i18n: 'FAKE_I18N',
       toolOptions: null,
-      args: { scene_name: 'Level1' },
+      args: {
+        scene_name: 'Level1',
+        scope: { type: 'scene', scene_name: 'Level1' },
+      },
       project: 'FAKE_PROJECT',
     });
   });

@@ -3064,6 +3064,11 @@ interface WholeProjectRefactorer {
         [Ref] Project project,
         [Ref] EventsBasedObject eventsBasedObject,
         [Const] DOMString objectName);
+    void STATIC_RemoveEventsBasedObjectVariant(
+        [Ref] Project project,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString variantName);
     void STATIC_GlobalObjectOrGroupRenamed([Ref] Project project, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
     void STATIC_GlobalObjectRemoved(
         [Ref] Project project,

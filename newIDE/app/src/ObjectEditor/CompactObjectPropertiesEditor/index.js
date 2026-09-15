@@ -104,6 +104,7 @@ export type TitleBarButton = {|
 |};
 
 export const CollapsibleSubPanel = ({
+  id,
   renderContent,
   isFolded,
   toggleFolded,
@@ -111,6 +112,7 @@ export const CollapsibleSubPanel = ({
   titleIcon,
   titleBarButtons,
 }: {|
+  id?: string,
   renderContent: () => React.Node,
   isFolded: boolean,
   toggleFolded: () => void,
@@ -118,7 +120,7 @@ export const CollapsibleSubPanel = ({
   title: string,
   titleBarButtons?: Array<TitleBarButton>,
 |}): React.Node => (
-  <Paper background="medium">
+  <Paper id={id} background="medium">
     <Line expand>
       <ColumnStackLayout noMargin expand noOverflowParent>
         <LineStackLayout noMargin justifyContent="space-between">
@@ -239,720 +241,751 @@ type Props = {|
   isBehaviorListLocked: boolean,
 |};
 
-export const CompactObjectPropertiesEditor = ({
-  project,
-  resourceManagementProps,
-  layout,
-  eventsFunctionsExtension,
-  eventsBasedObject,
-  onUpdateBehaviorsSharedData,
-  objectsContainer,
-  globalObjectsContainer,
-  initialInstances,
-  layersContainer,
-  projectScopedContainersAccessor,
-  unsavedChanges,
-  i18n,
-  objects,
-  onEditObject,
-  onObjectsModified,
-  onEffectAdded,
-  historyHandler,
-  onOpenEventBasedObjectVariantEditor,
-  onDeleteEventsBasedObjectVariant,
-  onWillInstallExtension,
-  onExtensionInstalled,
-  onCreateNewExtensionWithBehavior,
-  isVariableListLocked,
-  isBehaviorListLocked,
-}: Props): React.Node => {
-  const forceUpdate = useForceUpdate();
-  const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
-  const [
-    duplicateAndEditVariantDialogOpen,
-    setDuplicateAndEditVariantDialogOpen,
-  ] = React.useState(false);
-  const { showDeleteConfirmation } = useAlertDialog();
-  const variablesListRef = React.useRef<?VariablesListInterface>(null);
-  const object = objects[0];
-  const variablesContainer = exceptionallyGuardAgainstDeadObject(
-    object.getVariables()
-  );
-  const objectConfiguration = object.getConfiguration();
+export type CompactObjectPropertiesEditorInterface = {|
+  revealVariable: (nodeId: string) => void,
+|};
 
-  // Don't use a memo for this because metadata from custom objects are built
-  // from event-based object when extensions are refreshed after an extension
-  // installation.
-  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-    project.getCurrentPlatform(),
-    object.getType()
-  );
-  const is3DObject = !!objectMetadata && objectMetadata.isRenderedIn3D();
-  const fullEditorLabel = objectMetadata
-    ? objectMetadata.getOpenFullEditorLabel()
-    : null;
+export const CompactObjectPropertiesEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<CompactObjectPropertiesEditorInterface>,
+}> = React.forwardRef<Props, CompactObjectPropertiesEditorInterface>(
+  (
+    {
+      project,
+      resourceManagementProps,
+      layout,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      onUpdateBehaviorsSharedData,
+      objectsContainer,
+      globalObjectsContainer,
+      initialInstances,
+      layersContainer,
+      projectScopedContainersAccessor,
+      unsavedChanges,
+      i18n,
+      objects,
+      onEditObject,
+      onObjectsModified,
+      onEffectAdded,
+      historyHandler,
+      onOpenEventBasedObjectVariantEditor,
+      onDeleteEventsBasedObjectVariant,
+      onWillInstallExtension,
+      onExtensionInstalled,
+      onCreateNewExtensionWithBehavior,
+      isVariableListLocked,
+      isBehaviorListLocked,
+    }: Props,
+    ref
+  ) => {
+    const forceUpdate = useForceUpdate();
+    const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(
+      false
+    );
+    const [
+      duplicateAndEditVariantDialogOpen,
+      setDuplicateAndEditVariantDialogOpen,
+    ] = React.useState(false);
+    const { showDeleteConfirmation } = useAlertDialog();
+    const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
-  // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
-  // and associated methods are redefined in JS, they have different arguments (
-  // see ObjectJsImplementation C++ implementation). If called directly here from JS,
-  // the arguments will be mismatched. To workaround this, always cast the object to
-  // a base gdObject to ensure C++ methods are called.
-  const objectConfigurationAsGd = gd.castObject(
-    // $FlowFixMe[incompatible-exact]
-    objectConfiguration,
-    gd.ObjectConfiguration
-  );
+    React.useImperativeHandle(ref, () => ({
+      revealVariable: (nodeId: string) => {
+        if (variablesListRef.current)
+          variablesListRef.current.revealVariable(nodeId);
+      },
+    }));
+    const object = objects[0];
+    const variablesContainer = exceptionallyGuardAgainstDeadObject(
+      object.getVariables()
+    );
+    const objectConfiguration = object.getConfiguration();
 
-  // Behaviors:
-  const allVisibleBehaviorNames = getAllVisibleBehaviorNames([object]);
-  const allVisibleBehaviors = allVisibleBehaviorNames.map(behaviorName =>
-    object.getBehavior(behaviorName)
-  );
-  const {
-    openNewBehaviorDialog,
-    newBehaviorDialog,
-    removeBehavior,
-  } = useManageObjectBehaviors({
-    project,
-    projectScopedContainersAccessor,
-    objects: [object],
-    isChildObject: !layout,
-    eventsFunctionsExtension,
-    onUpdate: forceUpdate,
-    onBehaviorsUpdated: forceUpdate,
-    onUpdateBehaviorsSharedData,
-    onWillInstallExtension,
-    onExtensionInstalled,
-    onCreateNewExtensionWithBehavior,
-    allVisibleBehaviorNames,
-  });
-
-  // Events based object children:
-  /** The events-based object according to the selected object type.
-   *
-   * This is not the same as `eventsBasedObject` which is the events-based
-   * object of the edited variant.
-   */
-  const customObjectEventsBasedObject = project.hasEventsBasedObject(
-    objectConfiguration.getType()
-  )
-    ? project.getEventsBasedObject(objectConfiguration.getType())
-    : null;
-  const customObjectConfiguration = customObjectEventsBasedObject
-    ? gd.asCustomObjectConfiguration(objectConfiguration)
-    : null;
-  const variantName = customObjectConfiguration
-    ? getVariantName(customObjectEventsBasedObject, customObjectConfiguration)
-    : '';
-
-  const customObjectExtensionName = customObjectConfiguration
-    ? gd.PlatformExtension.getExtensionFromFullObjectType(
-        customObjectConfiguration.getType()
-      )
-    : null;
-  const customObjectExtension =
-    customObjectExtensionName &&
-    project.hasEventsFunctionsExtensionNamed(customObjectExtensionName)
-      ? project.getEventsFunctionsExtension(customObjectExtensionName)
+    // Don't use a memo for this because metadata from custom objects are built
+    // from event-based object when extensions are refreshed after an extension
+    // installation.
+    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+      project.getCurrentPlatform(),
+      object.getType()
+    );
+    const is3DObject = !!objectMetadata && objectMetadata.isRenderedIn3D();
+    const fullEditorLabel = objectMetadata
+      ? objectMetadata.getOpenFullEditorLabel()
       : null;
 
-  const shouldDisplayEventsBasedObjectChildren =
-    customObjectConfiguration &&
-    (customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
-      (!variantName &&
-        customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration()));
-  const shouldDisplayVariant = customObjectConfiguration
-    ? !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration()
-    : false;
+    // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
+    // and associated methods are redefined in JS, they have different arguments (
+    // see ObjectJsImplementation C++ implementation). If called directly here from JS,
+    // the arguments will be mismatched. To workaround this, always cast the object to
+    // a base gdObject to ensure C++ methods are called.
+    const objectConfigurationAsGd = gd.castObject(
+      // $FlowFixMe[incompatible-exact]
+      objectConfiguration,
+      gd.ObjectConfiguration
+    );
 
-  const helpLink = getHelpLink(objectMetadata.getHelpPath());
+    // Behaviors:
+    const allVisibleBehaviorNames = getAllVisibleBehaviorNames([object]);
+    const allVisibleBehaviors = allVisibleBehaviorNames.map(behaviorName =>
+      object.getBehavior(behaviorName)
+    );
+    const {
+      openNewBehaviorDialog,
+      newBehaviorDialog,
+      removeBehavior,
+    } = useManageObjectBehaviors({
+      project,
+      projectScopedContainersAccessor,
+      objects: [object],
+      isChildObject: !layout,
+      eventsFunctionsExtension,
+      onUpdate: forceUpdate,
+      onBehaviorsUpdated: forceUpdate,
+      onUpdateBehaviorsSharedData,
+      onWillInstallExtension,
+      onExtensionInstalled,
+      onCreateNewExtensionWithBehavior,
+      allVisibleBehaviorNames,
+    });
 
-  const openFullEditor = React.useCallback(
-    () => onEditObject(object, 'properties'),
-    [object, onEditObject]
-  );
+    // Events based object children:
+    /** The events-based object according to the selected object type.
+     *
+     * This is not the same as `eventsBasedObject` which is the events-based
+     * object of the edited variant.
+     */
+    const customObjectEventsBasedObject = project.hasEventsBasedObject(
+      objectConfiguration.getType()
+    )
+      ? project.getEventsBasedObject(objectConfiguration.getType())
+      : null;
+    const customObjectConfiguration = customObjectEventsBasedObject
+      ? gd.asCustomObjectConfiguration(objectConfiguration)
+      : null;
+    const variantName = customObjectConfiguration
+      ? getVariantName(customObjectEventsBasedObject, customObjectConfiguration)
+      : '';
 
-  const editVariant = React.useCallback(
-    () => {
-      if (
-        !isVariantEditable(
+    const customObjectExtensionName = customObjectConfiguration
+      ? gd.PlatformExtension.getExtensionFromFullObjectType(
+          customObjectConfiguration.getType()
+        )
+      : null;
+    const customObjectExtension =
+      customObjectExtensionName &&
+      project.hasEventsFunctionsExtensionNamed(customObjectExtensionName)
+        ? project.getEventsFunctionsExtension(customObjectExtensionName)
+        : null;
+
+    const shouldDisplayEventsBasedObjectChildren =
+      customObjectConfiguration &&
+      (customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
+        (!variantName &&
+          customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration()));
+    const shouldDisplayVariant = customObjectConfiguration
+      ? !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration()
+      : false;
+
+    const helpLink = getHelpLink(objectMetadata.getHelpPath());
+
+    const openFullEditor = React.useCallback(
+      () => onEditObject(object, 'properties'),
+      [object, onEditObject]
+    );
+
+    const editVariant = React.useCallback(
+      () => {
+        if (
+          !isVariantEditable(
+            customObjectConfiguration,
+            customObjectEventsBasedObject,
+            customObjectExtension
+          )
+        ) {
+          setDuplicateAndEditVariantDialogOpen(true);
+          return;
+        }
+        customObjectExtension &&
+          customObjectEventsBasedObject &&
+          customObjectConfiguration &&
+          onOpenEventBasedObjectVariantEditor &&
+          onOpenEventBasedObjectVariantEditor(
+            customObjectExtension.getName(),
+            customObjectEventsBasedObject.getName(),
+            customObjectConfiguration.getVariantName()
+          );
+      },
+      [
+        customObjectConfiguration,
+        onOpenEventBasedObjectVariantEditor,
+        customObjectExtension,
+        customObjectEventsBasedObject,
+      ]
+    );
+
+    const doDuplicateVariant = React.useCallback(
+      (i18n: I18nType, newName: string) => {
+        duplicateVariant(
+          newName,
           customObjectConfiguration,
           customObjectEventsBasedObject,
-          customObjectExtension
-        )
-      ) {
-        setDuplicateAndEditVariantDialogOpen(true);
-        return;
-      }
-      customObjectExtension &&
-        customObjectEventsBasedObject &&
-        customObjectConfiguration &&
-        onOpenEventBasedObjectVariantEditor &&
-        onOpenEventBasedObjectVariantEditor(
-          customObjectExtension.getName(),
-          customObjectEventsBasedObject.getName(),
-          customObjectConfiguration.getVariantName()
+          customObjectExtension,
+          project,
+          i18n
         );
-    },
-    [
-      customObjectConfiguration,
-      onOpenEventBasedObjectVariantEditor,
-      customObjectExtension,
-      customObjectEventsBasedObject,
-    ]
-  );
-
-  const doDuplicateVariant = React.useCallback(
-    (i18n: I18nType, newName: string) => {
-      duplicateVariant(
-        newName,
+        setNewVariantDialogOpen(false);
+        forceUpdate();
+      },
+      [
         customObjectConfiguration,
         customObjectEventsBasedObject,
         customObjectExtension,
+        forceUpdate,
         project,
-        i18n
-      );
-      setNewVariantDialogOpen(false);
-      forceUpdate();
-    },
-    [
-      customObjectConfiguration,
-      customObjectEventsBasedObject,
-      customObjectExtension,
-      forceUpdate,
-      project,
-    ]
-  );
+      ]
+    );
 
-  const duplicateAndEditVariant = React.useCallback(
-    (i18n: I18nType, newName: string) => {
-      duplicateVariant(
-        newName,
+    const duplicateAndEditVariant = React.useCallback(
+      (i18n: I18nType, newName: string) => {
+        duplicateVariant(
+          newName,
+          customObjectConfiguration,
+          customObjectEventsBasedObject,
+          customObjectExtension,
+          project,
+          i18n
+        );
+        setDuplicateAndEditVariantDialogOpen(false);
+        forceUpdate();
+        editVariant();
+      },
+      [
         customObjectConfiguration,
         customObjectEventsBasedObject,
         customObjectExtension,
+        forceUpdate,
         project,
-        i18n
-      );
-      setDuplicateAndEditVariantDialogOpen(false);
-      forceUpdate();
-      editVariant();
-    },
-    [
-      customObjectConfiguration,
-      customObjectEventsBasedObject,
-      customObjectExtension,
-      forceUpdate,
-      project,
-      editVariant,
-    ]
-  );
+        editVariant,
+      ]
+    );
 
-  const doDeleteVariant = React.useCallback(
-    async () => {
-      const hasConfirmedDeletion = await showDeleteConfirmation({
-        title: t`Remove variant`,
-        message: t`Are you sure you want to remove this variant from your project? This can't be undone.`,
-      });
-      if (!hasConfirmedDeletion) {
-        return;
-      }
-      deleteVariant(
+    const doDeleteVariant = React.useCallback(
+      async () => {
+        const hasConfirmedDeletion = await showDeleteConfirmation({
+          title: t`Remove variant`,
+          message: t`Are you sure you want to remove this variant from your project? This can't be undone.`,
+        });
+        if (!hasConfirmedDeletion) {
+          return;
+        }
+        deleteVariant(
+          customObjectConfiguration,
+          customObjectEventsBasedObject,
+          customObjectExtension,
+          project,
+          onDeleteEventsBasedObjectVariant
+        );
+        forceUpdate();
+      },
+      [
         customObjectConfiguration,
         customObjectEventsBasedObject,
-        customObjectExtension,
+        forceUpdate,
+        onDeleteEventsBasedObjectVariant,
         project,
-        onDeleteEventsBasedObjectVariant
-      );
-      forceUpdate();
-    },
-    [
-      customObjectConfiguration,
-      customObjectEventsBasedObject,
-      forceUpdate,
-      onDeleteEventsBasedObjectVariant,
+        customObjectExtension,
+        showDeleteConfirmation,
+      ]
+    );
+
+    const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+    const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
+    const scrollKey = objects
+      .map((instance: gdObject) => '' + instance.ptr)
+      .join(';');
+
+    const persistedPanelStateId = object.getPersistentUuid();
+
+    const onScroll = usePersistedScrollPosition({
       project,
-      customObjectExtension,
-      showDeleteConfirmation,
-    ]
-  );
+      scrollViewRef,
+      scrollKey,
+      persistedPanelStateId: persistedPanelStateId,
+      persistedPanelStateType: 'object',
+    });
+    const {
+      isSectionFolded,
+      setSectionFolded,
+      toggleSectionFolded,
+    } = usePersistedCollapsedSection({
+      project,
+      persistedPanelStateId: persistedPanelStateId,
+      persistedPanelStateType: 'object',
+    });
 
-  const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
-  const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
-  const scrollKey = objects
-    .map((instance: gdObject) => '' + instance.ptr)
-    .join(';');
+    // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
+    const { onVariablesUpdated } = useVariablesContainerRefactoring({
+      project,
+      variablesContainer: object.getVariables(),
+      initialInstances,
+      objectName: object.getName(),
+      eventsBasedObject,
+      enabled: objects.length === 1,
+      objectGroup: null,
+      objectsContainer: null,
+      globalObjectsContainer: null,
+    });
 
-  const persistedPanelStateId = object.getPersistentUuid();
+    const propertiesSchema = React.useMemo(
+      () => {
+        if (schemaRecomputeTrigger) {
+          // schemaRecomputeTrigger allows to invalidate the schema when required.
+        }
+        const properties = objectConfigurationAsGd.getProperties();
+        const schema = propertiesMapToSchema({
+          properties,
+          defaultValueProperties: customObjectEventsBasedObject
+            ? customObjectEventsBasedObject.getPropertyDescriptors()
+            : // We can't access default values for built-in objects.
+              null,
+          getPropertyValue: ({ objectConfiguration }, name) =>
+            objectConfiguration
+              .getProperties()
+              .get(name)
+              .getValue(),
+          onUpdateProperty: ({ objectConfiguration }, name, value) => {
+            objectConfiguration.updateProperty(name, value);
+            onObjectsModified([object], { fieldName: name });
+          },
+          object,
+          layersContainer,
+          visibility: 'All',
+          shouldDisabledFieldsWithMixedValues: false,
+        });
 
-  const onScroll = usePersistedScrollPosition({
-    project,
-    scrollViewRef,
-    scrollKey,
-    persistedPanelStateId: persistedPanelStateId,
-    persistedPanelStateType: 'object',
-  });
-  const {
-    isSectionFolded,
-    setSectionFolded,
-    toggleSectionFolded,
-  } = usePersistedCollapsedSection({
-    project,
-    persistedPanelStateId: persistedPanelStateId,
-    persistedPanelStateType: 'object',
-  });
-
-  // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
-  const { onVariablesUpdated } = useVariablesContainerRefactoring({
-    project,
-    variablesContainer: object.getVariables(),
-    initialInstances,
-    objectName: object.getName(),
-    eventsBasedObject,
-    enabled: objects.length === 1,
-    objectGroup: null,
-    objectsContainer: null,
-    globalObjectsContainer: null,
-  });
-
-  const propertiesSchema = React.useMemo(
-    () => {
-      if (schemaRecomputeTrigger) {
-        // schemaRecomputeTrigger allows to invalidate the schema when required.
-      }
-      const properties = objectConfigurationAsGd.getProperties();
-      const schema = propertiesMapToSchema({
-        properties,
-        defaultValueProperties: customObjectEventsBasedObject
-          ? customObjectEventsBasedObject.getPropertyDescriptors()
-          : // We can't access default values for built-in objects.
-            null,
-        getPropertyValue: ({ objectConfiguration }, name) =>
-          objectConfiguration
-            .getProperties()
-            .get(name)
-            .getValue(),
-        onUpdateProperty: ({ objectConfiguration }, name, value) => {
-          objectConfiguration.updateProperty(name, value);
-          onObjectsModified([object], { fieldName: name });
-        },
+        if (layout && layout.getObjects().hasObjectNamed(object.getName())) {
+          schema.push(getResourcesPreloadingField({ i18n }));
+        }
+        return schema;
+      },
+      [
+        schemaRecomputeTrigger,
+        objectConfigurationAsGd,
+        customObjectEventsBasedObject,
         object,
         layersContainer,
-        visibility: 'All',
-        shouldDisabledFieldsWithMixedValues: false,
-      });
+        layout,
+        onObjectsModified,
+        i18n,
+      ]
+    );
 
-      if (layout && layout.getObjects().hasObjectNamed(object.getName())) {
-        schema.push(getResourcesPreloadingField({ i18n }));
-      }
-      return schema;
-    },
-    [
-      schemaRecomputeTrigger,
-      objectConfigurationAsGd,
-      customObjectEventsBasedObject,
-      object,
-      layersContainer,
-      layout,
-      onObjectsModified,
-      i18n,
-    ]
-  );
-
-  return (
-    <ErrorBoundary
-      componentTitle={<Trans>Object properties</Trans>}
-      scope="scene-editor-object-properties"
-    >
-      <ScrollView
-        ref={scrollViewRef}
-        autoHideScrollbar
-        style={styles.scrollView}
-        key={scrollKey}
-        onScroll={onScroll}
+    return (
+      <ErrorBoundary
+        componentTitle={<Trans>Object properties</Trans>}
+        scope="scene-editor-object-properties"
       >
-        <Column expand noMargin id="object-properties-editor" noOverflowParent>
-          <ColumnStackLayout expand noOverflowParent>
-            <LineStackLayout
-              noMargin
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <LineStackLayout noMargin alignItems="center">
-                {is3DObject ? (
-                  <Object3d style={styles.icon} />
-                ) : (
-                  <Object2d style={styles.icon} />
-                )}
-                <Text size="body" noMargin>
-                  <Trans>{objectMetadata.getFullName()}</Trans>
-                </Text>
-                {helpLink && (
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      Window.openExternalURL(helpLink);
-                    }}
-                  >
-                    <Help style={styles.icon} />
-                  </IconButton>
-                )}
-              </LineStackLayout>
-            </LineStackLayout>
-            <CompactTextField
-              value={object.getName()}
-              onChange={() => {}}
-              disabled
-            />
-          </ColumnStackLayout>
-          <TopLevelCollapsibleSection
-            title={<Trans>Properties</Trans>}
-            isFolded={isSectionFolded('properties')}
-            toggleFolded={() => toggleSectionFolded('properties')}
-            onOpenFullEditor={openFullEditor}
-            renderContent={() => (
-              <ColumnStackLayout noMargin noOverflowParent>
-                <CompactPropertiesEditorByVisibility
-                  project={project}
-                  object={object}
-                  schema={propertiesSchema}
-                  instances={[
-                    { object, objectConfiguration: objectConfigurationAsGd },
-                  ]}
-                  onInstancesModified={() => {
-                    // TODO: undo/redo?
-                  }}
-                  resourceManagementProps={resourceManagementProps}
-                  placeholder={<Trans>This object has no properties.</Trans>}
-                  customizeBasicSchema={schema =>
-                    getSchemaWithOpenFullEditorButton({
-                      schema,
-                      fullEditorLabel,
-                      object,
-                      onEditObject,
-                    })
-                  }
-                  onRefreshAllFields={forceRecomputeSchema}
-                />
-                {shouldDisplayVariant && (
-                  <ColumnStackLayout noMargin noOverflowParent>
-                    <LineStackLayout noMargin justifyContent="space-between">
-                      <Text size="body" noMargin>
-                        <Trans>Variant</Trans>
-                      </Text>
-                      <LineStackLayout noMargin>
-                        <IconButton
-                          key={'delete-variant'}
-                          size="small"
-                          onClick={doDeleteVariant}
-                          disabled={!variantName}
-                        >
-                          <Trash style={styles.icon} />
-                        </IconButton>
-                        <IconButton
-                          key={'duplicate-variant'}
-                          size="small"
-                          onClick={() => setNewVariantDialogOpen(true)}
-                        >
-                          <Add style={styles.icon} />
-                        </IconButton>
-                        <IconButton
-                          key={'edit-variant'}
-                          size="small"
-                          onClick={editVariant}
-                        >
-                          <Edit style={styles.icon} />
-                        </IconButton>
-                      </LineStackLayout>
-                    </LineStackLayout>
-                    <CompactSelectField
-                      key={'variant-name'}
-                      value={variantName}
-                      onChange={(newValue: string) => {
-                        customObjectConfiguration &&
-                          customObjectConfiguration.setVariantName(newValue);
-                        onObjectsModified([object]);
-                        forceUpdate();
+        <ScrollView
+          ref={scrollViewRef}
+          autoHideScrollbar
+          style={styles.scrollView}
+          key={scrollKey}
+          onScroll={onScroll}
+        >
+          <Column
+            expand
+            noMargin
+            id="object-properties-editor"
+            noOverflowParent
+          >
+            <ColumnStackLayout expand noOverflowParent>
+              <LineStackLayout
+                noMargin
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <LineStackLayout noMargin alignItems="center">
+                  {is3DObject ? (
+                    <Object3d style={styles.icon} />
+                  ) : (
+                    <Object2d style={styles.icon} />
+                  )}
+                  <Text size="body" noMargin>
+                    <Trans>{objectMetadata.getFullName()}</Trans>
+                  </Text>
+                  {helpLink && (
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        Window.openExternalURL(helpLink);
                       }}
                     >
-                      <SelectOption
-                        key="default-variant"
-                        value=""
-                        label={t`Default`}
-                      />
-                      {customObjectEventsBasedObject &&
-                        mapFor(
-                          0,
-                          customObjectEventsBasedObject
-                            .getVariants()
-                            .getVariantsCount(),
-                          i => {
-                            if (!customObjectEventsBasedObject) {
-                              return null;
-                            }
-                            const variant = customObjectEventsBasedObject
-                              .getVariants()
-                              .getVariantAt(i);
-                            return (
-                              <SelectOption
-                                key={'variant-' + variant.getName()}
-                                value={variant.getName()}
-                                label={variant.getName()}
-                              />
-                            );
-                          }
-                        )}
-                    </CompactSelectField>
-                  </ColumnStackLayout>
-                )}
-                {shouldDisplayEventsBasedObjectChildren &&
-                  customObjectConfiguration &&
-                  !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
-                    <ChildrenOverridingDepreciationAlert />
+                      <Help style={styles.icon} />
+                    </IconButton>
                   )}
-                {customObjectEventsBasedObject &&
-                  customObjectConfiguration &&
-                  shouldDisplayEventsBasedObjectChildren &&
-                  mapFor(
-                    0,
-                    customObjectEventsBasedObject
-                      .getObjects()
-                      .getObjectsCount(),
-                    i => {
-                      const childObject = customObjectEventsBasedObject
-                        .getObjects()
-                        .getObjectAt(i);
-                      const childObjectName = childObject.getName();
-                      const isFolded = customObjectConfiguration.isChildObjectFolded(
-                        childObjectName
-                      );
-                      return (
-                        <CollapsibleSubPanel
-                          key={i}
-                          renderContent={() => (
-                            <ChildObjectPropertiesEditor
-                              key={i}
-                              project={project}
-                              resourceManagementProps={resourceManagementProps}
-                              unsavedChanges={unsavedChanges}
-                              customObjectConfiguration={
-                                customObjectConfiguration
-                              }
-                              childObject={childObject}
-                              onEditObject={openFullEditor}
-                            />
-                          )}
-                          isFolded={isFolded}
-                          toggleFolded={() => {
-                            customObjectConfiguration.setChildObjectFolded(
-                              childObjectName,
-                              !isFolded
-                            );
-                            forceUpdate();
-                          }}
-                          title={childObjectName}
-                        />
-                      );
-                    }
-                  )}
-              </ColumnStackLayout>
-            )}
-          />
-          <TopLevelCollapsibleSection
-            title={<Trans>Behaviors</Trans>}
-            isFolded={isSectionFolded('behaviors')}
-            toggleFolded={() => toggleSectionFolded('behaviors')}
-            onOpenFullEditor={() => onEditObject(object, 'behaviors')}
-            onAdd={isBehaviorListLocked ? null : openNewBehaviorDialog}
-            renderContent={() => (
-              <ColumnStackLayout noMargin>
-                {!allVisibleBehaviors.length && (
-                  <Text size="body2" align="center" color="secondary">
-                    <Trans>
-                      There are no{' '}
-                      <Link
-                        href={behaviorsHelpLink}
-                        onClick={() =>
-                          Window.openExternalURL(behaviorsHelpLink)
-                        }
-                      >
-                        behaviors
-                      </Link>{' '}
-                      on this object.
-                    </Trans>
-                  </Text>
-                )}
-                {allVisibleBehaviors.map(behavior => {
-                  const behaviorTypeName = behavior.getTypeName();
-                  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                    gd.JsPlatform.get(),
-                    behaviorTypeName
-                  );
-                  const iconUrl = behaviorMetadata.getIconFilename();
-                  const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
-                    behaviorTypeName
-                  );
-                  return (
-                    <CollapsibleSubPanel
-                      key={behavior.ptr}
-                      renderContent={() => (
-                        <CompactBehaviorComponent
-                          project={project}
-                          behaviorMetadata={behaviorMetadata}
-                          behaviors={[behavior]}
-                          object={object}
-                          layersContainer={layersContainer}
-                          onBehaviorUpdated={() =>
-                            onObjectsModified([object], {
-                              fieldName: behavior.getName(),
-                            })
-                          }
-                          resourceManagementProps={resourceManagementProps}
-                          onOpenFullEditor={() =>
-                            onEditObject(object, 'behaviors')
-                          }
-                        />
-                      )}
-                      isFolded={behavior.isFolded()}
-                      toggleFolded={() => {
-                        behavior.setFolded(!behavior.isFolded());
-                        forceUpdate();
-                      }}
-                      titleIcon={
-                        iconUrl ? (
-                          <IconContainer
-                            src={iconUrl}
-                            alt={behaviorMetadata.getFullName()}
-                            size={16}
-                          />
-                        ) : null
-                      }
-                      title={behavior.getName()}
-                      titleBarButtons={
-                        isBehaviorListLocked
-                          ? []
-                          : [
-                              {
-                                id: 'remove-behavior',
-                                icon: RemoveIcon,
-                                label: t`Remove behavior`,
-                                onClick: () => {
-                                  removeBehavior(behavior.getName());
-                                },
-                              },
-                            ]
-                      }
-                    />
-                  );
-                })}
-              </ColumnStackLayout>
-            )}
-          />
-          {variablesContainer && (
+                </LineStackLayout>
+              </LineStackLayout>
+              <CompactTextField
+                value={object.getName()}
+                onChange={() => {}}
+                disabled
+              />
+            </ColumnStackLayout>
             <TopLevelCollapsibleSection
-              title={<Trans>Object Variables</Trans>}
-              isFolded={isSectionFolded('variables')}
-              toggleFolded={() => toggleSectionFolded('variables')}
-              onOpenFullEditor={() => onEditObject(object, 'variables')}
-              onAdd={
-                isVariableListLocked
-                  ? null
-                  : () => {
-                      if (variablesListRef.current) {
-                        variablesListRef.current.addVariable();
-                      }
-                      setSectionFolded('variables', false);
-                    }
-              }
-              renderContentAsHiddenWhenFolded={
-                true /* Allows to keep a ref to the variables list for add button to work. */
-              }
-              noContentMargin
+              title={<Trans>Properties</Trans>}
+              isFolded={isSectionFolded('properties')}
+              toggleFolded={() => toggleSectionFolded('properties')}
+              onOpenFullEditor={openFullEditor}
               renderContent={() => (
-                <VariablesList
-                  ref={variablesListRef}
+                <ColumnStackLayout noMargin noOverflowParent>
+                  <CompactPropertiesEditorByVisibility
+                    project={project}
+                    object={object}
+                    schema={propertiesSchema}
+                    instances={[
+                      { object, objectConfiguration: objectConfigurationAsGd },
+                    ]}
+                    onInstancesModified={() => {
+                      // TODO: undo/redo?
+                    }}
+                    resourceManagementProps={resourceManagementProps}
+                    placeholder={<Trans>This object has no properties.</Trans>}
+                    customizeBasicSchema={schema =>
+                      getSchemaWithOpenFullEditorButton({
+                        schema,
+                        fullEditorLabel,
+                        object,
+                        onEditObject,
+                      })
+                    }
+                    onRefreshAllFields={forceRecomputeSchema}
+                  />
+                  {shouldDisplayVariant && (
+                    <ColumnStackLayout noMargin noOverflowParent>
+                      <LineStackLayout noMargin justifyContent="space-between">
+                        <Text size="body" noMargin>
+                          <Trans>Variant</Trans>
+                        </Text>
+                        <LineStackLayout noMargin>
+                          <IconButton
+                            key={'delete-variant'}
+                            size="small"
+                            onClick={doDeleteVariant}
+                            disabled={!variantName}
+                          >
+                            <Trash style={styles.icon} />
+                          </IconButton>
+                          <IconButton
+                            key={'duplicate-variant'}
+                            size="small"
+                            onClick={() => setNewVariantDialogOpen(true)}
+                          >
+                            <Add style={styles.icon} />
+                          </IconButton>
+                          <IconButton
+                            key={'edit-variant'}
+                            size="small"
+                            onClick={editVariant}
+                          >
+                            <Edit style={styles.icon} />
+                          </IconButton>
+                        </LineStackLayout>
+                      </LineStackLayout>
+                      <CompactSelectField
+                        key={'variant-name'}
+                        value={variantName}
+                        onChange={(newValue: string) => {
+                          customObjectConfiguration &&
+                            customObjectConfiguration.setVariantName(newValue);
+                          onObjectsModified([object]);
+                          forceUpdate();
+                        }}
+                      >
+                        <SelectOption
+                          key="default-variant"
+                          value=""
+                          label={t`Default`}
+                        />
+                        {customObjectEventsBasedObject &&
+                          mapFor(
+                            0,
+                            customObjectEventsBasedObject
+                              .getVariants()
+                              .getVariantsCount(),
+                            i => {
+                              if (!customObjectEventsBasedObject) {
+                                return null;
+                              }
+                              const variant = customObjectEventsBasedObject
+                                .getVariants()
+                                .getVariantAt(i);
+                              return (
+                                <SelectOption
+                                  key={'variant-' + variant.getName()}
+                                  value={variant.getName()}
+                                  label={variant.getName()}
+                                />
+                              );
+                            }
+                          )}
+                      </CompactSelectField>
+                    </ColumnStackLayout>
+                  )}
+                  {shouldDisplayEventsBasedObjectChildren &&
+                    customObjectConfiguration &&
+                    !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
+                      <ChildrenOverridingDepreciationAlert />
+                    )}
+                  {customObjectEventsBasedObject &&
+                    customObjectConfiguration &&
+                    shouldDisplayEventsBasedObjectChildren &&
+                    mapFor(
+                      0,
+                      customObjectEventsBasedObject
+                        .getObjects()
+                        .getObjectsCount(),
+                      i => {
+                        const childObject = customObjectEventsBasedObject
+                          .getObjects()
+                          .getObjectAt(i);
+                        const childObjectName = childObject.getName();
+                        const isFolded = customObjectConfiguration.isChildObjectFolded(
+                          childObjectName
+                        );
+                        return (
+                          <CollapsibleSubPanel
+                            key={i}
+                            renderContent={() => (
+                              <ChildObjectPropertiesEditor
+                                key={i}
+                                project={project}
+                                resourceManagementProps={
+                                  resourceManagementProps
+                                }
+                                unsavedChanges={unsavedChanges}
+                                customObjectConfiguration={
+                                  customObjectConfiguration
+                                }
+                                childObject={childObject}
+                                onEditObject={openFullEditor}
+                              />
+                            )}
+                            isFolded={isFolded}
+                            toggleFolded={() => {
+                              customObjectConfiguration.setChildObjectFolded(
+                                childObjectName,
+                                !isFolded
+                              );
+                              forceUpdate();
+                            }}
+                            title={childObjectName}
+                          />
+                        );
+                      }
+                    )}
+                </ColumnStackLayout>
+              )}
+            />
+            <TopLevelCollapsibleSection
+              id="behaviors-section"
+              title={<Trans>Behaviors</Trans>}
+              isFolded={isSectionFolded('behaviors')}
+              toggleFolded={() => toggleSectionFolded('behaviors')}
+              onOpenFullEditor={() => onEditObject(object, 'behaviors')}
+              onAdd={isBehaviorListLocked ? null : openNewBehaviorDialog}
+              renderContent={() => (
+                <ColumnStackLayout noMargin>
+                  {!allVisibleBehaviors.length && (
+                    <Text size="body2" align="center" color="secondary">
+                      <Trans>
+                        There are no{' '}
+                        <Link
+                          href={behaviorsHelpLink}
+                          onClick={() =>
+                            Window.openExternalURL(behaviorsHelpLink)
+                          }
+                        >
+                          behaviors
+                        </Link>{' '}
+                        on this object.
+                      </Trans>
+                    </Text>
+                  )}
+                  {allVisibleBehaviors.map(behavior => {
+                    const behaviorTypeName = behavior.getTypeName();
+                    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                      gd.JsPlatform.get(),
+                      behaviorTypeName
+                    );
+                    const iconUrl = behaviorMetadata.getIconFilename();
+                    const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                      behaviorTypeName
+                    );
+                    return (
+                      <CollapsibleSubPanel
+                        key={behavior.ptr}
+                        id={`behavior-panel-${behavior.getName()}`}
+                        renderContent={() => (
+                          <CompactBehaviorComponent
+                            project={project}
+                            behaviorMetadata={behaviorMetadata}
+                            behaviors={[behavior]}
+                            object={object}
+                            layersContainer={layersContainer}
+                            onBehaviorUpdated={() =>
+                              onObjectsModified([object], {
+                                fieldName: behavior.getName(),
+                              })
+                            }
+                            resourceManagementProps={resourceManagementProps}
+                            onOpenFullEditor={() =>
+                              onEditObject(object, 'behaviors')
+                            }
+                          />
+                        )}
+                        isFolded={behavior.isFolded()}
+                        toggleFolded={() => {
+                          behavior.setFolded(!behavior.isFolded());
+                          forceUpdate();
+                        }}
+                        titleIcon={
+                          iconUrl ? (
+                            <IconContainer
+                              src={iconUrl}
+                              alt={behaviorMetadata.getFullName()}
+                              size={16}
+                            />
+                          ) : null
+                        }
+                        title={behavior.getName()}
+                        titleBarButtons={
+                          isBehaviorListLocked
+                            ? []
+                            : [
+                                {
+                                  id: 'remove-behavior',
+                                  icon: RemoveIcon,
+                                  label: t`Remove behavior`,
+                                  onClick: () => {
+                                    removeBehavior(behavior.getName());
+                                  },
+                                },
+                              ]
+                        }
+                      />
+                    );
+                  })}
+                </ColumnStackLayout>
+              )}
+            />
+            {variablesContainer && (
+              <TopLevelCollapsibleSection
+                id="object-variables-section"
+                title={<Trans>Object Variables</Trans>}
+                isFolded={isSectionFolded('variables')}
+                toggleFolded={() => toggleSectionFolded('variables')}
+                onOpenFullEditor={() => onEditObject(object, 'variables')}
+                onAdd={
+                  isVariableListLocked
+                    ? null
+                    : () => {
+                        if (variablesListRef.current) {
+                          variablesListRef.current.addVariable();
+                        }
+                        setSectionFolded('variables', false);
+                      }
+                }
+                renderContentAsHiddenWhenFolded={
+                  true /* Allows to keep a ref to the variables list for add button to work. */
+                }
+                noContentMargin
+                renderContent={() => (
+                  <VariablesList
+                    ref={variablesListRef}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    directlyStoreValueChangesWhileEditing
+                    variablesContainer={object.getVariables()}
+                    areObjectVariables
+                    size="compact"
+                    onComputeAllVariableNames={() =>
+                      object && layout
+                        ? EventsRootVariablesFinder.findAllObjectVariables(
+                            project.getCurrentPlatform(),
+                            project,
+                            layout,
+                            object.getName()
+                          )
+                        : []
+                    }
+                    historyHandler={historyHandler}
+                    onVariablesUpdated={onVariablesUpdated}
+                    toolbarIconStyle={styles.icon}
+                    compactEmptyPlaceholderText={
+                      <Trans>
+                        There are no{' '}
+                        <Link
+                          href={objectVariablesHelpLink}
+                          onClick={() =>
+                            Window.openExternalURL(objectVariablesHelpLink)
+                          }
+                        >
+                          variables
+                        </Link>{' '}
+                        on this object.
+                      </Trans>
+                    }
+                    isListLocked={isVariableListLocked}
+                  />
+                )}
+              />
+            )}
+            {objectMetadata &&
+              objectMetadata.hasDefaultBehavior(
+                'EffectCapability::EffectBehavior'
+              ) && (
+                <CompactEffectsListEditor
+                  layerRenderingType={'2d'}
+                  target={'object'}
+                  project={project}
+                  resourceManagementProps={resourceManagementProps}
                   projectScopedContainersAccessor={
                     projectScopedContainersAccessor
                   }
-                  directlyStoreValueChangesWhileEditing
-                  variablesContainer={object.getVariables()}
-                  areObjectVariables
-                  size="compact"
-                  onComputeAllVariableNames={() =>
-                    object && layout
-                      ? EventsRootVariablesFinder.findAllObjectVariables(
-                          project.getCurrentPlatform(),
-                          project,
-                          layout,
-                          object.getName()
-                        )
-                      : []
-                  }
-                  historyHandler={historyHandler}
-                  onVariablesUpdated={onVariablesUpdated}
-                  toolbarIconStyle={styles.icon}
-                  compactEmptyPlaceholderText={
-                    <Trans>
-                      There are no{' '}
-                      <Link
-                        href={objectVariablesHelpLink}
-                        onClick={() =>
-                          Window.openExternalURL(objectVariablesHelpLink)
-                        }
-                      >
-                        variables
-                      </Link>{' '}
-                      on this object.
-                    </Trans>
-                  }
-                  isListLocked={isVariableListLocked}
+                  unsavedChanges={unsavedChanges}
+                  i18n={i18n}
+                  effectsContainer={object.getEffects()}
+                  onEffectsUpdated={() => onObjectsModified([object])}
+                  onOpenFullEditor={() => onEditObject(object, 'effects')}
+                  onEffectAdded={onEffectAdded}
+                  persistedPanelStateId={persistedPanelStateId}
                 />
               )}
-            />
-          )}
-          {objectMetadata &&
-            objectMetadata.hasDefaultBehavior(
-              'EffectCapability::EffectBehavior'
-            ) && (
-              <CompactEffectsListEditor
-                layerRenderingType={'2d'}
-                target={'layer'}
-                project={project}
-                resourceManagementProps={resourceManagementProps}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                unsavedChanges={unsavedChanges}
-                i18n={i18n}
-                effectsContainer={object.getEffects()}
-                onEffectsUpdated={() => onObjectsModified([object])}
-                onOpenFullEditor={() => onEditObject(object, 'effects')}
-                onEffectAdded={onEffectAdded}
-                persistedPanelStateId={persistedPanelStateId}
-              />
-            )}
-        </Column>
-      </ScrollView>
-      {newBehaviorDialog}
-      {newVariantDialogOpen && customObjectEventsBasedObject && (
-        <NewVariantDialog
-          initialName={variantName || i18n._(t`New variant`)}
-          onApply={name => doDuplicateVariant(i18n, name)}
-          onCancel={() => {
-            setNewVariantDialogOpen(false);
-          }}
-        />
-      )}
-      {duplicateAndEditVariantDialogOpen && customObjectEventsBasedObject && (
-        <NewVariantDialog
-          isDuplicationBeforeEdition
-          initialName={variantName || i18n._(t`New variant`)}
-          onApply={name => duplicateAndEditVariant(i18n, name)}
-          onCancel={() => {
-            setDuplicateAndEditVariantDialogOpen(false);
-          }}
-        />
-      )}
-    </ErrorBoundary>
-  );
-};
+          </Column>
+        </ScrollView>
+        {newBehaviorDialog}
+        {newVariantDialogOpen && customObjectEventsBasedObject && (
+          <NewVariantDialog
+            initialName={variantName || i18n._(t`New variant`)}
+            onApply={name => doDuplicateVariant(i18n, name)}
+            onCancel={() => {
+              setNewVariantDialogOpen(false);
+            }}
+          />
+        )}
+        {duplicateAndEditVariantDialogOpen && customObjectEventsBasedObject && (
+          <NewVariantDialog
+            isDuplicationBeforeEdition
+            initialName={variantName || i18n._(t`New variant`)}
+            onApply={name => duplicateAndEditVariant(i18n, name)}
+            onCancel={() => {
+              setDuplicateAndEditVariantDialogOpen(false);
+            }}
+          />
+        )}
+      </ErrorBoundary>
+    );
+  }
+);

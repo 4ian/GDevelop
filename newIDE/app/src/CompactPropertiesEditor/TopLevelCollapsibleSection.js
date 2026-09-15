@@ -14,6 +14,7 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { styles } from '../ObjectEditor/CompactObjectPropertiesEditor';
 
 type Props = {
+  id?: string,
   title: React.Node,
   isFolded: boolean,
   toggleFolded: () => void,
@@ -25,6 +26,7 @@ type Props = {
 };
 
 export const TopLevelCollapsibleSection = ({
+  id,
   title,
   isFolded,
   toggleFolded,
@@ -36,7 +38,7 @@ export const TopLevelCollapsibleSection = ({
 }: Props): React.Node => (
   <>
     <Separator />
-    <Column noOverflowParent>
+    <Column noOverflowParent id={id}>
       <LineStackLayout alignItems="center" justifyContent="space-between">
         <LineStackLayout noMargin alignItems="center">
           <IconButton size="small" onClick={toggleFolded}>
@@ -64,7 +66,7 @@ export const TopLevelCollapsibleSection = ({
         </Line>
       </LineStackLayout>
     </Column>
-    <Column noMargin={noContentMargin}>
+    <Column noMargin={noContentMargin} id={id ? `${id}-content` : undefined}>
       {isFolded ? (
         renderContentAsHiddenWhenFolded ? (
           <div style={styles.hiddenContent}>{renderContent()}</div>

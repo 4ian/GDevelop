@@ -4,10 +4,7 @@ import { mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { type EditorFunctionGenericOutput } from './index';
-import {
-  getModel3DLocationPoints,
-  type LocationPoint,
-} from './Model3DSizeInfo';
+import { getModel3DObjectSizeInfo } from './Model3DSizeInfo';
 
 const gd: libGDevelop = global.gd;
 
@@ -215,40 +212,7 @@ export const getObjectSizeInfo = (
   }
 
   if (objectType === 'Scene3D::Model3DObject') {
-    const properties = objectConfiguration.getProperties();
-    const getNumberProperty = (name: string) =>
-      properties.has(name)
-        ? parseFloat(properties.get(name).getValue()) || 0
-        : 0;
-    const width = getNumberProperty('width');
-    const height = getNumberProperty('height');
-    const depth = getNumberProperty('depth');
-    // A 3D model has neither its origin at the minimum corner nor its center
-    // at the middle of the box by default: both follow its `originLocation`
-    // and `centerLocation`, which can be the origin the model was authored
-    // with - known only once the model is read
-    // (`ensureModel3DOriginPointLoaded`), the usual values until then.
-    const { originPoint, centerPoint } = getModel3DLocationPoints(object);
-    const sizes = [width, height, depth];
-    const atSize = (
-      point: LocationPoint,
-      axis: number,
-      fallback: number
-    ): number => {
-      const fraction = point[axis];
-      return fraction === null ? fallback : fraction * sizes[axis];
-    };
-    return {
-      width,
-      height,
-      depth,
-      originX: atSize(originPoint, 0, 0),
-      originY: atSize(originPoint, 1, 0),
-      originZ: atSize(originPoint, 2, 0),
-      centerX: atSize(centerPoint, 0, width / 2),
-      centerY: atSize(centerPoint, 1, height / 2),
-      centerZ: atSize(centerPoint, 2, depth / 2),
-    };
+    return getModel3DObjectSizeInfo(object);
   }
 
   // Events-based (custom) objects: derive size from their declared area.

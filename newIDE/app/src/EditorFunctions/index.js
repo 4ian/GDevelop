@@ -96,8 +96,8 @@ import {
   type ObjectSizeInfo,
 } from './Utils';
 import {
-  ensureModel3DOriginPointLoaded,
-  ensureModel3DOriginPointsLoaded,
+  ensureModel3DMeasurementLoaded,
+  ensureModel3DMeasurementsLoaded,
 } from './Model3DSizeInfo';
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
@@ -1462,7 +1462,7 @@ const createOrReplaceObject: EditorFunction = {
                   getPropertiesText(object),
                 ].join(' '),
               };
-              await ensureModel3DOriginPointLoaded(
+              await ensureModel3DMeasurementLoaded(
                 object,
                 project,
                 PixiResourcesLoader
@@ -1592,7 +1592,7 @@ const createOrReplaceObject: EditorFunction = {
           getPropertiesText(object),
         ].join(' '),
       };
-      await ensureModel3DOriginPointLoaded(
+      await ensureModel3DMeasurementLoaded(
         object,
         project,
         PixiResourcesLoader
@@ -2364,7 +2364,7 @@ const inspectObjectPropertiesEffects: EditorFunction = {
     if (inspectParts.length > 0) {
       output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
     }
-    await ensureModel3DOriginPointLoaded(object, project, PixiResourcesLoader);
+    await ensureModel3DMeasurementLoaded(object, project, PixiResourcesLoader);
     injectObjectSizeInfo(output, {
       [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
     });
@@ -4017,7 +4017,7 @@ const describeInstances: EditorFunction = {
         }
       );
     });
-    await ensureModel3DOriginPointsLoaded(
+    await ensureModel3DMeasurementsLoaded(
       describedObjects,
       project,
       PixiResourcesLoader
@@ -4291,7 +4291,7 @@ const put2dInstances: EditorFunction = {
         )) ||
       null;
     if (namedObject)
-      await ensureModel3DOriginPointLoaded(
+      await ensureModel3DMeasurementLoaded(
         namedObject,
         project,
         PixiResourcesLoader
@@ -5219,7 +5219,7 @@ const put3dInstances: EditorFunction = {
         )) ||
       null;
     if (namedObject)
-      await ensureModel3DOriginPointLoaded(
+      await ensureModel3DMeasurementLoaded(
         namedObject,
         project,
         PixiResourcesLoader

@@ -492,6 +492,76 @@ describe('CustomObjectFunctions', () => {
         });
       });
 
+      it('takes the rotation of an instance into account', async () => {
+        const dialog = getEventsBasedObject('UI', 'Dialog');
+        // A 100x20 child turned by 90 degrees occupies 20x100.
+        const instance = addChildWithInstanceAt(
+          dialog,
+          'Bar',
+          { x: 0, y: 0, z: 0 },
+          100
+        );
+        instance.setCustomHeight(20);
+        instance.setAngle(90);
+
+        const result = await launchChangeCustomObject({
+          extension_name: 'UI',
+          custom_object_name: 'Dialog',
+          fit_area_to_children: 'min_at_origin',
+        });
+
+        expect(result.success).toBe(true);
+        expect(getArea(dialog)).toEqual({
+          minX: 0,
+          minY: 0,
+          minZ: 0,
+          maxX: 20,
+          maxY: 100,
+          maxZ: 0,
+        });
+      });
+
+      it('refuses to fit when the size of a child is unknown, and moves nothing', async () => {
+        const dialog = getEventsBasedObject('UI', 'Dialog');
+        // A text has no size of its own until an instance gives it one.
+        dialog
+          .getObjects()
+          .insertNewObject(
+            project,
+            'TextObject::Text',
+            'Label',
+            dialog.getObjects().getObjectsCount()
+          );
+        const instance = dialog
+          .getInitialInstances()
+          .insertNewInitialInstance();
+        instance.setObjectName('Label');
+        instance.setLayer('');
+        instance.setX(30);
+        instance.setY(40);
+
+        const result = await launchChangeCustomObject({
+          extension_name: 'UI',
+          custom_object_name: 'Dialog',
+          fit_area_to_children: 'min_at_origin',
+        });
+
+        expect(result.success).toBe(true);
+        expect(result.message).toContain('was NOT fitted');
+        expect(result.message).toContain('"Label"');
+        // Neither the area nor the children were touched.
+        expect(getArea(dialog)).toEqual({
+          minX: 0,
+          minY: 0,
+          minZ: 0,
+          maxX: 64,
+          maxY: 64,
+          maxZ: 64,
+        });
+        expect(instance.getX()).toBe(30);
+        expect(instance.getY()).toBe(40);
+      });
+
       it('refuses an unknown mode', async () => {
         const result = await launchChangeCustomObject({
           extension_name: 'UI',

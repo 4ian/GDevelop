@@ -1000,8 +1000,8 @@ namespace gdjs {
         const reportedObjectNames = new Set<string>();
 
         /**
-         * Report the custom objects with no child, `object` included: they
-         * render nothing at all and fall back to a 1x1x1 size.
+         * Report the custom objects with no child in them, `object` included:
+         * they render nothing at all and fall back to a 1x1x1 size.
          */
         const checkObject = (
           object: gdjs.RuntimeObject,
@@ -1018,7 +1018,7 @@ namespace gdjs {
             if (reportedObjectNames.has(path)) return;
             reportedObjectNames.add(path);
             warnings.push(
-              `"${path}" is a custom object with NO child in it: it renders nothing (its variant has child objects but no instance of them placed, so its size is 1x1x1). Everything it is made of is invisible.`
+              `"${path}" is a custom object with no child in it: it renders nothing and its size is 1x1x1. Either its variant declares child objects with no instance of them placed, or its children were all destroyed while the test ran.`
             );
             return;
           }
@@ -1034,10 +1034,11 @@ namespace gdjs {
         >;
         instances.keys(objectNames);
         for (const objectName of objectNames) {
-          // One instance per object name: they all share the same children.
-          const objectInstances = instances.get(objectName);
-          if (objectInstances.length > 0) {
-            checkObject(objectInstances[0], objectName, 0);
+          // Every instance: two instances of the same object can hold
+          // different children by the time the test ends.
+          for (const object of instances.get(objectName)) {
+            checkObject(object, objectName, 0);
+            if (warnings.length >= MAX_WARNINGS) break;
           }
           if (warnings.length >= MAX_WARNINGS) break;
         }

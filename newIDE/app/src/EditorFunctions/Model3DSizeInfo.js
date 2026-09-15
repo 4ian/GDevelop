@@ -1,15 +1,17 @@
 // @flow
 import { getModel3DBoundingBox } from '../ObjectsRendering/Model3DBoundingBox';
-
-/**
- * Where the origin (the point an instance x;y;z positions) and the center (the
- * point rotations turn around) of a 3D model are, as a fraction of the object
- * size on each axis. `null` on an axis means "the origin the model was authored
- * with", only known once the model file itself is read.
- */
-export type LocationPoint = [number | null, number | null, number | null];
+import { type ObjectSizeInfo } from './Utils';
 
 const MODEL_3D_OBJECT_TYPE = 'Scene3D::Model3DObject';
+
+const epsilon = 1 / (1 << 16);
+
+/**
+ * A point of a 3D model as a fraction of its size on each axis. `null` on an
+ * axis means "the origin the model was authored with", only known once the
+ * model file itself is read.
+ */
+type LocationPoint = [number | null, number | null, number | null];
 
 // Same locations as `gdjs.Model3DRuntimeObject` (`getPointForLocation`).
 const getPointForLocation = (location: string): LocationPoint => {
@@ -31,14 +33,18 @@ const getPointForLocation = (location: string): LocationPoint => {
 };
 
 /**
- * The configuration values needed to measure a model, read through the
- * properties of the object: they are the same for every object configuration,
- * where a cast to `gd.Model3DObjectConfiguration` would reinterpret the memory
- * of an object that only has the type of a 3D model (its extension not loaded,
- * an object created before it was installed...).
+ * What a 3D model object configures, read through the properties of its
+ * configuration: they are the same for every object configuration, where a
+ * cast to `gd.Model3DObjectConfiguration` would reinterpret the memory of an
+ * object that only has the type of a 3D model (its extension not loaded, an
+ * object created before it was installed...).
  */
 type Model3DSettings = {|
   modelResourceName: string,
+  // The dimensions configured on the object, which are the ones it really has
+  // only when `keepAspectRatio` is false.
+  configuredSize: [number, number, number],
+  keepAspectRatio: boolean,
   rotationX: number,
   rotationY: number,
   rotationZ: number,
@@ -56,6 +62,12 @@ const getModel3DSettings = (object: gdObject): Model3DSettings | null => {
   if (!modelResourceName) return null;
   return {
     modelResourceName,
+    configuredSize: [
+      getNumber('width'),
+      getNumber('height'),
+      getNumber('depth'),
+    ],
+    keepAspectRatio: getString('keepAspectRatio') === 'true',
     rotationX: getNumber('rotationX'),
     rotationY: getNumber('rotationY'),
     rotationZ: getNumber('rotationZ'),
@@ -64,12 +76,24 @@ const getModel3DSettings = (object: gdObject): Model3DSettings | null => {
   };
 };
 
-// The origin of a model inside its box, as a fraction of its size, keyed by the
-// model resource and everything changing that box. Filled by
-// `ensureModel3DOriginPointLoaded`, read synchronously afterwards.
-const modelOriginPointsByKey: { [string]: [number, number, number] } = {};
+/** What reading a model file tells about it, whatever the object using it. */
+type Model3DMeasurement = {|
+  // The size of the model once rotated as the object configures it.
+  modelSize: [number, number, number],
+  // Where the origin of the model is in that size, as a fraction of it.
+  modelOriginPoint: [number, number, number],
+|};
 
-const epsilon = 1 / (1 << 16);
+// Measurements by model resource and everything else changing the box, each
+// kept with the model it was made on: the loader hands a new one when its
+// cache was burst or the resource reloaded, which invalidates the measurement.
+const measurementsByKey: Map<
+  string,
+  {| gltfScene: any, measurement: Model3DMeasurement |}
+> = new Map();
+// The measurements being read, so that concurrent calls for the same model
+// (`describe_instances` asks for one per instance) read it once.
+const pendingMeasurementsByKey: Map<string, Promise<void>> = new Map();
 
 const getModelKey = (settings: Model3DSettings): string =>
   [
@@ -81,104 +105,149 @@ const getModelKey = (settings: Model3DSettings): string =>
   ].join('|');
 
 /**
- * The origin of the model inside its bounding box, as a fraction of its size.
- * Same computation as `_updateDefaultTransformation` in
+ * Measure a model as `_updateDefaultTransformation` does in
  * `gdjs.Model3DRuntimeObject3DRenderer`.
  */
-const computeModelOriginPoint = (
+const measureModel = (
   gltfScene: any,
   settings: Model3DSettings
-): [number, number, number] => {
+): Model3DMeasurement => {
   const boundingBox = getModel3DBoundingBox(gltfScene, {
     rotationX: settings.rotationX,
     rotationY: settings.rotationY,
     rotationZ: settings.rotationZ,
     keepsModelOrigin: settings.originLocation === 'ModelOrigin',
   });
-  const modelWidth = boundingBox.max.x - boundingBox.min.x;
-  const modelHeight = boundingBox.max.y - boundingBox.min.y;
-  const modelDepth = boundingBox.max.z - boundingBox.min.z;
-
-  return [
-    modelWidth < epsilon ? 0 : -boundingBox.min.x / modelWidth,
-    // The model is flipped on the Y axis by the renderer.
-    modelHeight < epsilon ? 1 : 1 + boundingBox.min.y / modelHeight,
-    modelDepth < epsilon ? 0 : -boundingBox.min.z / modelDepth,
+  const modelSize = [
+    boundingBox.max.x - boundingBox.min.x,
+    boundingBox.max.y - boundingBox.min.y,
+    boundingBox.max.z - boundingBox.min.z,
   ];
+  return {
+    modelSize: [modelSize[0], modelSize[1], modelSize[2]],
+    modelOriginPoint: [
+      modelSize[0] < epsilon ? 0 : -boundingBox.min.x / modelSize[0],
+      // The model is flipped on the Y axis by the renderer.
+      modelSize[1] < epsilon ? 1 : 1 + boundingBox.min.y / modelSize[1],
+      modelSize[2] < epsilon ? 0 : -boundingBox.min.z / modelSize[2],
+    ],
+  };
 };
 
 /**
- * Read the 3D model of `object` (if it is one) so that its origin can be given
- * synchronously by `getModel3DLocationPoints`. Never throws: a model that
- * cannot be read simply leaves its origin unknown.
+ * Read the 3D model of `object` (if it is one), so that its real size, origin
+ * and center can be given synchronously by `getModel3DObjectSizeInfo`
+ * afterwards. Never throws: a model that cannot be read leaves the object
+ * measured by what it configures only.
  */
-export const ensureModel3DOriginPointLoaded = async (
+export const ensureModel3DMeasurementLoaded = (
   object: gdObject,
   project: gdProject,
   pixiResourcesLoader: any
 ): Promise<void> => {
   const settings = getModel3DSettings(object);
-  if (!settings || modelOriginPointsByKey[getModelKey(settings)]) return;
-  try {
-    const gltf = await pixiResourcesLoader.get3DModel(
-      project,
-      settings.modelResourceName
-    );
-    if (!gltf || !gltf.scene) return;
-    modelOriginPointsByKey[getModelKey(settings)] = computeModelOriginPoint(
-      gltf.scene,
-      settings
-    );
-  } catch (error) {
-    // The model is unavailable (missing resource, unreadable file...).
-  }
+  if (!settings) return Promise.resolve();
+  const key = getModelKey(settings);
+  const pendingMeasurement = pendingMeasurementsByKey.get(key);
+  if (pendingMeasurement) return pendingMeasurement;
+
+  const measuring = (async () => {
+    try {
+      const gltf = await pixiResourcesLoader.get3DModel(
+        project,
+        settings.modelResourceName
+      );
+      if (!gltf || !gltf.scene) return;
+      const measured = measurementsByKey.get(key);
+      if (!measured || measured.gltfScene !== gltf.scene) {
+        measurementsByKey.set(key, {
+          gltfScene: gltf.scene,
+          measurement: measureModel(gltf.scene, settings),
+        });
+      }
+    } catch (error) {
+      // The model is unavailable (missing resource, unreadable file...).
+    } finally {
+      pendingMeasurementsByKey.delete(key);
+    }
+  })();
+  pendingMeasurementsByKey.set(key, measuring);
+  return measuring;
 };
 
-/** Same as {@link ensureModel3DOriginPointLoaded}, for several objects. */
-export const ensureModel3DOriginPointsLoaded = async (
+/** Same as {@link ensureModel3DMeasurementLoaded}, for several objects. */
+export const ensureModel3DMeasurementsLoaded = async (
   objects: Array<gdObject>,
   project: gdProject,
   pixiResourcesLoader: any
 ): Promise<void> => {
   await Promise.all(
-    objects.map(object =>
-      ensureModel3DOriginPointLoaded(object, project, pixiResourcesLoader)
+    [...new Set(objects)].map(object =>
+      ensureModel3DMeasurementLoaded(object, project, pixiResourcesLoader)
     )
   );
 };
 
 /**
- * The origin and the center of a 3D model object, as fractions of its size.
- * The axes that are the origin of the model itself are `null` until the model
- * is read by `ensureModel3DOriginPointLoaded`, and for an object that is not a
- * 3D model at all.
+ * The default size, origin and center of a 3D model object, or null when it is
+ * not one.
+ *
+ * Neither is what the object configures: `keepAspectRatio` fits the dimensions
+ * to the model, and the origin and the center follow `originLocation` and
+ * `centerLocation`, which are usually the origin the model was authored with.
+ * Until the model is read (`ensureModel3DMeasurementLoaded`), the configured
+ * dimensions and the usual origin and center are given back.
  */
-export const getModel3DLocationPoints = (
+export const getModel3DObjectSizeInfo = (
   object: gdObject
-): {| originPoint: LocationPoint, centerPoint: LocationPoint |} => {
+): ObjectSizeInfo | null => {
   const settings = getModel3DSettings(object);
-  const modelOriginPoint = settings
-    ? modelOriginPointsByKey[getModelKey(settings)]
-    : null;
-  const resolve = (location: string): LocationPoint => {
-    const point = getPointForLocation(location);
-    if (!modelOriginPoint) return point;
-    return [
-      point[0] === null ? modelOriginPoint[0] : point[0],
-      point[1] === null ? modelOriginPoint[1] : point[1],
-      point[2] === null ? modelOriginPoint[2] : point[2],
-    ];
+  if (!settings) return null;
+  const measured = measurementsByKey.get(getModelKey(settings));
+  const measurement = measured ? measured.measurement : null;
+
+  // `_updateDefaultTransformation`: the model fitted in the configured
+  // dimensions, keeping its proportions.
+  let size = settings.configuredSize;
+  if (measurement && settings.keepAspectRatio) {
+    const scaleRatio = Math.min(
+      ...measurement.modelSize.map((modelSize, axis) =>
+        modelSize < epsilon
+          ? Number.POSITIVE_INFINITY
+          : settings.configuredSize[axis] / modelSize
+      )
+    );
+    if (Number.isFinite(scaleRatio)) {
+      size = [
+        scaleRatio * measurement.modelSize[0],
+        scaleRatio * measurement.modelSize[1],
+        scaleRatio * measurement.modelSize[2],
+      ];
+    }
+  }
+
+  const atSize = (location: string, axis: number, fallback: number): number => {
+    const fraction = getPointForLocation(location)[axis];
+    if (fraction !== null) return fraction * size[axis];
+    if (!measurement) return fallback;
+    return measurement.modelOriginPoint[axis] * size[axis];
   };
 
   return {
-    originPoint: resolve(settings ? settings.originLocation : ''),
-    centerPoint: resolve(settings ? settings.centerLocation : ''),
+    width: size[0],
+    height: size[1],
+    depth: size[2],
+    originX: atSize(settings.originLocation, 0, 0),
+    originY: atSize(settings.originLocation, 1, 0),
+    originZ: atSize(settings.originLocation, 2, 0),
+    centerX: atSize(settings.centerLocation, 0, size[0] / 2),
+    centerY: atSize(settings.centerLocation, 1, size[1] / 2),
+    centerZ: atSize(settings.centerLocation, 2, size[2] / 2),
   };
 };
 
-/** For tests: forget every model origin read so far. */
-export const clearModel3DOriginPointsCache = () => {
-  for (const key in modelOriginPointsByKey) {
-    delete modelOriginPointsByKey[key];
-  }
+/** For tests: forget every model read so far. */
+export const clearModel3DMeasurementsCache = () => {
+  measurementsByKey.clear();
+  pendingMeasurementsByKey.clear();
 };

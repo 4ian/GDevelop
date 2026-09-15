@@ -1,7 +1,8 @@
 // @flow
+import * as THREE from 'three';
 import { mapFor } from '../../Utils/MapFor';
 import { getObjectSizeInfo } from '../Utils';
-import { ensureModel3DOriginPointsLoaded } from '../Model3DSizeInfo';
+import { ensureModel3DMeasurementsLoaded } from '../Model3DSizeInfo';
 
 const gd: libGDevelop = global.gd;
 
@@ -24,6 +25,15 @@ export const FIT_AREA_MODES: Array<FitAreaMode> = [
 
 type Box = {| min: Array<number>, max: Array<number> |};
 
+const roundBound = (value: number): number => Math.round(value * 1e6) / 1e6;
+
+// The box of the children, or the child objects whose size could not be
+// measured: moving the children and writing an area on a guessed size would
+// silently shrink the custom object to nothing.
+type ChildInstancesBox =
+  | {| box: Box | null, unmeasurableObjectNames: [] |}
+  | {| box: null, unmeasurableObjectNames: Array<string> |};
+
 const forEachInstance = (
   variant: gdEventsBasedObjectVariant,
   callback: (instance: gdInitialInstance) => void
@@ -45,18 +55,81 @@ const forEachInstance = (
   functor.delete();
 };
 
+const getVariantObjects = (
+  variant: gdEventsBasedObjectVariant
+): Array<gdObject> => {
+  const objects = variant.getObjects();
+  return mapFor(0, objects.getObjectsCount(), i => objects.getObjectAt(i));
+};
+
 /**
- * The box occupied by the child instances of a variant, in the local space of
- * the custom object. Rotations are ignored (the box is axis-aligned on the
- * unrotated children), like the "Fit to content" button of the editor.
+ * The box an instance occupies, rotated and flipped as it is placed: the same
+ * transformations as `getInstanceAABB` in the instances editor, plus the 3D
+ * rotations. Everything turns around the center of the instance, which is
+ * `centerX/Y/Z` from its minimum corner - not the middle of its box.
  */
+const getInstanceBox = (
+  instance: gdInitialInstance,
+  minimumCorner: Array<number>,
+  size: Array<number>,
+  center: Array<number>
+): Box => {
+  const maximumCorner = minimumCorner.map((min, axis) => min + size[axis]);
+  const flips = [
+    instance.isFlippedX(),
+    instance.isFlippedY(),
+    instance.isFlippedZ(),
+  ];
+  const rotations = [
+    instance.getRotationX(),
+    instance.getRotationY(),
+    instance.getAngle(),
+  ];
+  if (!flips.some(Boolean) && !rotations.some(rotation => rotation !== 0)) {
+    return { min: minimumCorner, max: maximumCorner };
+  }
+
+  const centerInSpace = minimumCorner.map((min, axis) => min + center[axis]);
+  const box = new THREE.Box3(
+    new THREE.Vector3(...minimumCorner),
+    new THREE.Vector3(...maximumCorner)
+  );
+  // A flip mirrors the box around the center, which moves it when the center
+  // is not the middle of the box.
+  flips.forEach((isFlipped, axis) => {
+    if (!isFlipped) return;
+    const min = 2 * centerInSpace[axis] - box.max.getComponent(axis);
+    const max = 2 * centerInSpace[axis] - box.min.getComponent(axis);
+    box.min.setComponent(axis, min);
+    box.max.setComponent(axis, max);
+  });
+
+  const toCenter = new THREE.Vector3(...centerInSpace);
+  // `Box3.applyMatrix4` transforms the 8 corners and takes their bounds.
+  box.translate(toCenter.clone().negate());
+  box.applyMatrix4(
+    new THREE.Matrix4().makeRotationFromEuler(
+      new THREE.Euler(
+        (rotations[0] * Math.PI) / 180,
+        (rotations[1] * Math.PI) / 180,
+        (rotations[2] * Math.PI) / 180,
+        'ZYX'
+      )
+    )
+  );
+  box.translate(toCenter);
+  return { min: box.min.toArray(), max: box.max.toArray() };
+};
+
+/** The box occupied by the child instances of a variant, in its local space. */
 const getChildInstancesBox = (
   project: gdProject,
   variant: gdEventsBasedObjectVariant,
   pixiResourcesLoader: any
-): Box | null => {
+): ChildInstancesBox => {
   const objects = variant.getObjects();
   let box: Box | null = null;
+  const unmeasurableObjectNames: Array<string> = [];
 
   forEachInstance(variant, instance => {
     const objectName = instance.getObjectName();
@@ -69,45 +142,76 @@ const getChildInstancesBox = (
     const defaultSizes = sizeInfo
       ? [sizeInfo.width, sizeInfo.height, sizeInfo.depth]
       : [null, null, null];
-    const origins = sizeInfo
-      ? [sizeInfo.originX, sizeInfo.originY, sizeInfo.originZ]
-      : [null, null, null];
-    const sizes = [
-      instance.hasCustomSize() ? instance.getCustomWidth() : defaultSizes[0],
-      instance.hasCustomSize() ? instance.getCustomHeight() : defaultSizes[1],
-      instance.hasCustomDepth() ? instance.getCustomDepth() : defaultSizes[2],
-    ];
-    const positions = [instance.getX(), instance.getY(), instance.getZ()];
-
-    const instanceMin = [0, 0, 0];
-    const instanceMax = [0, 0, 0];
-    for (let axis = 0; axis < 3; axis++) {
-      const size = sizes[axis] || 0;
-      const defaultSize = defaultSizes[axis];
-      const origin = origins[axis] || 0;
-      // The origin is given for the default size: scale it to the actual one.
-      const originOffset =
-        defaultSize && defaultSize > 0 ? origin * (size / defaultSize) : origin;
-      instanceMin[axis] = positions[axis] - originOffset;
-      instanceMax[axis] = instanceMin[axis] + size;
+    const width = instance.hasCustomSize()
+      ? instance.getCustomWidth()
+      : defaultSizes[0];
+    const height = instance.hasCustomSize()
+      ? instance.getCustomHeight()
+      : defaultSizes[1];
+    const depth = instance.hasCustomDepth()
+      ? instance.getCustomDepth()
+      : defaultSizes[2];
+    // A text without a custom size, a 3D model that could not be read: their
+    // size is not known, so neither is the box they occupy (`depth` is null
+    // for every 2D object, which is not a missing measure).
+    if (width === null || height === null) {
+      if (!unmeasurableObjectNames.includes(objectName))
+        unmeasurableObjectNames.push(objectName);
+      return;
     }
+    const positions: Array<number> = [
+      instance.getX(),
+      instance.getY(),
+      instance.getZ(),
+    ];
+    const size: Array<number> = [width, height, depth || 0];
+    const origins: Array<number | null> = sizeInfo
+      ? [sizeInfo.originX, sizeInfo.originY, sizeInfo.originZ]
+      : [0, 0, 0];
+    const centers: Array<number | null> = sizeInfo
+      ? [sizeInfo.centerX, sizeInfo.centerY, sizeInfo.centerZ]
+      : [null, null, null];
+    // The origin and the center are given for the default size: scale them to
+    // the size this instance really has. An unknown center is the middle of
+    // the box (what every object without one does).
+    const atInstanceSize = (
+      value: number | null,
+      axis: number,
+      fallback: number
+    ): number => {
+      const defaultSize = defaultSizes[axis];
+      const scale =
+        defaultSize !== null && defaultSize > 0 ? size[axis] / defaultSize : 1;
+      return (value === null ? fallback : value) * scale;
+    };
+    const minimumCorner: Array<number> = positions.map(
+      (position, axis) => position - atInstanceSize(origins[axis], axis, 0)
+    );
+    const center: Array<number> = centers.map((value, axis) =>
+      atInstanceSize(value, axis, (defaultSizes[axis] || 0) / 2)
+    );
+
+    const instanceBox = getInstanceBox(instance, minimumCorner, size, center);
     const currentBox = box;
     if (!currentBox) {
-      box = { min: [...instanceMin], max: [...instanceMax] };
+      box = { min: [...instanceBox.min], max: [...instanceBox.max] };
     } else {
       for (let axis = 0; axis < 3; axis++) {
         currentBox.min[axis] = Math.min(
           currentBox.min[axis],
-          instanceMin[axis]
+          instanceBox.min[axis]
         );
         currentBox.max[axis] = Math.max(
           currentBox.max[axis],
-          instanceMax[axis]
+          instanceBox.max[axis]
         );
       }
     }
   });
-  return box;
+
+  if (unmeasurableObjectNames.length > 0)
+    return { box: null, unmeasurableObjectNames };
+  return { box, unmeasurableObjectNames: [] };
 };
 
 /**
@@ -124,8 +228,24 @@ const fitVariantAreaToChildren = (
   variantLabel: string,
   pixiResourcesLoader: any
 ): string | null => {
-  const box = getChildInstancesBox(project, variant, pixiResourcesLoader);
+  const { box, unmeasurableObjectNames } = getChildInstancesBox(
+    project,
+    variant,
+    pixiResourcesLoader
+  );
+  if (unmeasurableObjectNames.length > 0) {
+    return `The area of ${variantLabel} was NOT fitted: the size of ${unmeasurableObjectNames
+      .map(objectName => `"${objectName}"`)
+      .join(
+        ', '
+      )} is unknown (an object with no size of its own, or a 3D model that could not be read). Give their instances a size (\`instances_size\`), or set the area by hand with \`changed_settings\`.`;
+  }
   if (!box) return null;
+
+  // A rotation leaves the bounds a fraction of a pixel off (a 90 degrees
+  // rotation gives a width of 20.0000000001), which would round the area up.
+  box.min = box.min.map(roundBound);
+  box.max = box.max.map(roundBound);
 
   const sizes = [
     box.max[0] - box.min[0],
@@ -195,40 +315,42 @@ export const fitCustomObjectAreaToChildren = async ({
   mode: FitAreaMode,
   pixiResourcesLoader: any,
 |}): Promise<Array<string>> => {
-  const objects = eventsBasedObject.getObjects();
-  // The origin of a 3D model comes from the model file: load them, otherwise
-  // the box of the children would be computed on unknown origins.
-  await ensureModel3DOriginPointsLoaded(
-    mapFor(0, objects.getObjectsCount(), i => objects.getObjectAt(i)),
-    project,
-    pixiResourcesLoader
-  );
-
   const isRenderedIn3D = eventsBasedObject.isRenderedIn3D();
-  const messages: Array<string> = [];
-  const defaultVariantMessage = fitVariantAreaToChildren(
+  const variants = eventsBasedObject.getVariants();
+  const variantsToFit = [
+    {
+      variant: eventsBasedObject.getDefaultVariant(),
+      label: 'the default variant',
+    },
+    ...mapFor(0, variants.getVariantsCount(), i => {
+      const variant = variants.getVariantAt(i);
+      return { variant, label: `the variant "${variant.getName()}"` };
+    }),
+  ];
+
+  // The size and the origin of a 3D model come from the model file, and every
+  // variant configures its own children: read them all before measuring.
+  await ensureModel3DMeasurementsLoaded(
+    variantsToFit.reduce(
+      (objects, { variant }) => [...objects, ...getVariantObjects(variant)],
+      []
+    ),
     project,
-    eventsBasedObject.getDefaultVariant(),
-    isRenderedIn3D,
-    mode,
-    'the default variant',
     pixiResourcesLoader
   );
-  if (defaultVariantMessage) messages.push(defaultVariantMessage);
 
-  const variants = eventsBasedObject.getVariants();
-  mapFor(0, variants.getVariantsCount(), i => {
-    const variant = variants.getVariantAt(i);
-    const message = fitVariantAreaToChildren(
-      project,
-      variant,
-      isRenderedIn3D,
-      mode,
-      `the variant "${variant.getName()}"`,
-      pixiResourcesLoader
-    );
-    if (message) messages.push(message);
-  });
+  const messages = variantsToFit
+    .map(({ variant, label }) =>
+      fitVariantAreaToChildren(
+        project,
+        variant,
+        isRenderedIn3D,
+        mode,
+        label,
+        pixiResourcesLoader
+      )
+    )
+    .filter(Boolean);
 
   if (messages.length === 0) {
     messages.push(

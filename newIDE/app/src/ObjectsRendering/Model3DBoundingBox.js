@@ -33,18 +33,22 @@ export const getModel3DBoundingBox = (
   |}
 ): any => {
   const savedRotation = threeObject.rotation.clone();
-  threeObject.rotation.order = 'ZYX';
-  threeObject.rotation.set(
-    (rotationX * Math.PI) / 180,
-    (rotationY * Math.PI) / 180,
-    (rotationZ * Math.PI) / 180
-  );
-  threeObject.updateMatrixWorld(true);
-
-  const boundingBox = new THREE.Box3().setFromObject(threeObject);
-
-  threeObject.rotation.copy(savedRotation);
-  threeObject.updateMatrixWorld(true);
+  let boundingBox;
+  try {
+    threeObject.rotation.order = 'ZYX';
+    threeObject.rotation.set(
+      (rotationX * Math.PI) / 180,
+      (rotationY * Math.PI) / 180,
+      (rotationZ * Math.PI) / 180
+    );
+    threeObject.updateMatrixWorld(true);
+    boundingBox = new THREE.Box3().setFromObject(threeObject);
+  } finally {
+    // A measurement that throws must not leave the model rotated: it is
+    // shared with everything else showing it.
+    threeObject.rotation.copy(savedRotation);
+    threeObject.updateMatrixWorld(true);
+  }
 
   if (keepsModelOrigin) {
     boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));

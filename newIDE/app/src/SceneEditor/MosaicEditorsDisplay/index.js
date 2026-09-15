@@ -124,11 +124,18 @@ const MosaicEditorsDisplay: React.ComponentType<{
       if (instanceOrObjectPropertiesEditorRef.current)
         instanceOrObjectPropertiesEditorRef.current.forceUpdate();
     }, []);
+    const revealPropertiesVariable = React.useCallback((nodeId: string) => {
+      if (instanceOrObjectPropertiesEditorRef.current)
+        instanceOrObjectPropertiesEditorRef.current.revealVariable(nodeId);
+    }, []);
     const forceUpdateInstancesList = React.useCallback(() => {
       if (instancesListRef.current) instancesListRef.current.forceUpdate();
     }, []);
     const forceUpdateObjectsList = React.useCallback(() => {
       if (objectsListRef.current) objectsListRef.current.forceUpdateList();
+    }, []);
+    const scrollObjectsListToObject = React.useCallback((object: gdObject) => {
+      if (objectsListRef.current) objectsListRef.current.scrollToObject(object);
     }, []);
     const forceUpdateObjectGroupsList = React.useCallback(() => {
       if (objectGroupsListRef.current)
@@ -229,7 +236,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
         getName: () => 'mosaic',
         forceUpdateInstancesList,
         forceUpdatePropertiesEditor,
+        revealPropertiesVariable,
         forceUpdateObjectsList,
+        scrollObjectsListToObject,
         forceUpdateObjectGroupsList,
         scrollObjectGroupsListToObjectGroup,
         forceUpdateLayersList,

@@ -28,6 +28,11 @@ class ExpressionMetadata;
 
 namespace gd {
 
+  struct TypeAndExtraInfo {
+  const gd::String& type;
+  const gd::String& extraInfo;
+};
+
 /**
  * \brief Find the type of the expression or sub-expression that a given node
  * represents.
@@ -59,6 +64,21 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     return typeFinder.GetType();
   }
 
+  /**
+   * \brief Helper function to find the type of the expression or
+   * sub-expression that a given node represents.
+   */
+  static const gd::TypeAndExtraInfo GetTypeAndExtraInfo(
+      const gd::Platform &platform,
+      const gd::ProjectScopedContainers &projectScopedContainers,
+      const gd::String &rootType, gd::ExpressionNode &node) {
+    gd::ExpressionTypeFinder typeFinder(platform, projectScopedContainers,
+                                        rootType);
+    node.Visit(typeFinder);
+    return {.type = typeFinder.GetType(),
+            .extraInfo = typeFinder.GetExtraInfo()};
+  }
+
   virtual ~ExpressionTypeFinder(){};
 
  protected:
@@ -73,6 +93,10 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
 
   const gd::String &GetType() {
     return gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(type);
+  };
+
+  const gd::String &GetExtraInfo() {
+    return extraInfo;
   };
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
@@ -149,6 +173,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
       }
       else {
         type = parameterMetadata->GetType();
+        extraInfo = parameterMetadata->GetExtraInfo();
       }
     }
   }
@@ -183,6 +208,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   static const gd::String numberOrStringType;
 
   gd::String type;
+  gd::String extraInfo;
   ExpressionNode *child;
 
   const gd::Platform &platform;

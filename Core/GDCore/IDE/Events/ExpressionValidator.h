@@ -11,7 +11,6 @@
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/VariablesContainersList.h"
 #include "GDCore/Project/VariablesContainer.h"
@@ -21,8 +20,6 @@ class Expression;
 class ObjectsContainer;
 class VariablesContainer;
 class Platform;
-class ParameterMetadata;
-class ExpressionMetadata;
 class VariablesContainersList;
 class ProjectScopedContainers;
 }  // namespace gd
@@ -458,7 +455,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       bool isRootVariableDeclared =
           CheckVariableExistence(node.location, node.identifierName,
                                  !node.childIdentifierName.empty());
-      if (isRootVariableDeclared && !node.childIdentifierName.empty()) {
+      if (isRootVariableDeclared) {
         ValidateObjectVariableOrVariableOrProperty(
             node.identifierName, node.identifierNameLocation,
             node.childIdentifierName, node.childIdentifierNameLocation, false);
@@ -526,6 +523,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       message = _("You must enter a variable name.");
     } else if (parentType == Type::Object) {
       message = _("You must enter a valid object name.");
+    } else if (!currentParameterExtraInfo) {
+      message = _("You must enter a valid expression inside the brackets.");
     } else {
       // It can't happen.
       message = _("You must enter a valid expression.");

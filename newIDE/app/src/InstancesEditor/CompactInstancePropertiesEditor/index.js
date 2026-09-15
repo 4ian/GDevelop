@@ -17,6 +17,7 @@ import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import VariablesList, {
   type HistoryHandler,
+  type VariablesListInterface,
 } from '../../VariablesList/VariablesList';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ErrorBoundary from '../../UI/ErrorBoundary';
@@ -70,6 +71,7 @@ const noRefreshOfAllFields = () => {
 };
 
 export const StatefulCollapsibleSubPanel = ({
+  id,
   renderContent,
   isInitiallyFolded,
   onToggleFolded,
@@ -77,6 +79,7 @@ export const StatefulCollapsibleSubPanel = ({
   titleIcon,
   titleBarButtons,
 }: {|
+  id?: string,
   renderContent: () => React.Node,
   isInitiallyFolded: boolean,
   onToggleFolded?: () => void,
@@ -98,6 +101,7 @@ export const StatefulCollapsibleSubPanel = ({
 
   return (
     <CollapsibleSubPanel
+      id={id}
       renderContent={renderContent}
       isFolded={isFolded}
       toggleFolded={toggleFolded}
@@ -131,444 +135,481 @@ type Props = {|
   onSelectTileMapTile: (?TileMapTileSelection) => void,
 |};
 
-export const CompactInstancePropertiesEditor = ({
-  instances,
-  i18n,
-  project,
-  resourceManagementProps,
-  layout,
-  objectsContainer,
-  globalObjectsContainer,
-  layersContainer,
-  unsavedChanges,
-  historyHandler,
-  editObjectInPropertiesPanel,
-  onGetInstanceSize,
-  editInstanceVariables,
-  onInstancesModified,
-  projectScopedContainersAccessor,
-  tileMapTileSelection,
-  onSelectTileMapTile,
-}: Props): null | React.Node => {
-  const forceUpdate = useForceUpdate();
-  const instance = instances[0];
+export type CompactInstancePropertiesEditorInterface = {|
+  revealVariable: (nodeId: string) => void,
+|};
 
-  const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
-  /**
-   * TODO: multiple instances support for variables list. Expected behavior should be:
-   * - if instances of different objects, do not show
-   * - if instances of same object, show only variables in common (inherited variables
-   * obviously plus instance-wise variables with same name).
-   */
-  const shouldDisplayVariablesList = instances.length === 1;
-  const variablesContainer = shouldDisplayVariablesList
-    ? exceptionallyGuardAgainstDeadObject(instance.getVariables())
-    : null;
-
-  const onScrollY = React.useCallback((deltaY: number) => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollBy(deltaY);
-    }
-  }, []);
-
-  const scrollKey = instances
-    .map((instance: gdInitialInstance) => '' + instance.ptr)
-    .join(';');
-
-  const persistedPanelStateId = React.useMemo(
-    () => {
-      if (!instances.length || !scrollKey) return null;
-
-      const selectedObjectForScroll = getObjectByName(
-        globalObjectsContainer,
-        objectsContainer,
-        instances[0].getObjectName()
-      );
-
-      return selectedObjectForScroll
-        ? selectedObjectForScroll.getPersistentUuid()
-        : null;
-    },
-    [globalObjectsContainer, instances, scrollKey, objectsContainer]
-  );
-
-  const onScroll = usePersistedScrollPosition({
-    project,
-    scrollViewRef,
-    scrollKey,
-    persistedPanelStateId: persistedPanelStateId,
-    persistedPanelStateType: 'instances-of-object',
-  });
-  const { isSectionFolded, toggleSectionFolded } = usePersistedCollapsedSection(
+export const CompactInstancePropertiesEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<CompactInstancePropertiesEditorInterface>,
+}> = React.forwardRef<Props, CompactInstancePropertiesEditorInterface>(
+  (
     {
+      instances,
+      i18n,
+      project,
+      resourceManagementProps,
+      layout,
+      objectsContainer,
+      globalObjectsContainer,
+      layersContainer,
+      unsavedChanges,
+      historyHandler,
+      editObjectInPropertiesPanel,
+      onGetInstanceSize,
+      editInstanceVariables,
+      onInstancesModified,
+      projectScopedContainersAccessor,
+      tileMapTileSelection,
+      onSelectTileMapTile,
+    }: Props,
+    ref
+  ) => {
+    const forceUpdate = useForceUpdate();
+    const instance = instances[0];
+
+    const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
+    const variablesListRef = React.useRef<?VariablesListInterface>(null);
+
+    React.useImperativeHandle(ref, () => ({
+      revealVariable: (nodeId: string) => {
+        if (variablesListRef.current)
+          variablesListRef.current.revealVariable(nodeId);
+      },
+    }));
+
+    /**
+     * TODO: multiple instances support for variables list. Expected behavior should be:
+     * - if instances of different objects, do not show
+     * - if instances of same object, show only variables in common (inherited variables
+     * obviously plus instance-wise variables with same name).
+     */
+    const shouldDisplayVariablesList = instances.length === 1;
+    const variablesContainer = shouldDisplayVariablesList
+      ? exceptionallyGuardAgainstDeadObject(instance.getVariables())
+      : null;
+
+    const onScrollY = React.useCallback((deltaY: number) => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollBy(deltaY);
+      }
+    }, []);
+
+    const scrollKey = instances
+      .map((instance: gdInitialInstance) => '' + instance.ptr)
+      .join(';');
+
+    const persistedPanelStateId = React.useMemo(
+      () => {
+        if (!instances.length || !scrollKey) return null;
+
+        const selectedObjectForScroll = getObjectByName(
+          globalObjectsContainer,
+          objectsContainer,
+          instances[0].getObjectName()
+        );
+
+        return selectedObjectForScroll
+          ? selectedObjectForScroll.getPersistentUuid()
+          : null;
+      },
+      [globalObjectsContainer, instances, scrollKey, objectsContainer]
+    );
+
+    const onScroll = usePersistedScrollPosition({
+      project,
+      scrollViewRef,
+      scrollKey,
+      persistedPanelStateId: persistedPanelStateId,
+      persistedPanelStateType: 'instances-of-object',
+    });
+    const {
+      isSectionFolded,
+      toggleSectionFolded,
+    } = usePersistedCollapsedSection({
       project,
       persistedPanelStateId: persistedPanelStateId,
       persistedPanelStateType: 'instances-of-object',
-    }
-  );
+    });
 
-  const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
-    object?: gdObject,
-    instanceSchema?: Schema,
-    allVisibleBehaviors: Array<string> | null,
-  |}>(
-    () => {
-      if (!instance)
-        return {
-          object: undefined,
-          instanceSchema: undefined,
-          allVisibleBehaviors: null,
-        };
+    const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
+      object?: gdObject,
+      instanceSchema?: Schema,
+      allVisibleBehaviors: Array<string> | null,
+    |}>(
+      () => {
+        if (!instance)
+          return {
+            object: undefined,
+            instanceSchema: undefined,
+            allVisibleBehaviors: null,
+          };
 
-      const objectsMap = new Map<string, gdObject>();
-      for (const instance of instances) {
-        const associatedObjectName = instance.getObjectName();
-        if (objectsMap.has(associatedObjectName)) {
-          continue;
+        const objectsMap = new Map<string, gdObject>();
+        for (const instance of instances) {
+          const associatedObjectName = instance.getObjectName();
+          if (objectsMap.has(associatedObjectName)) {
+            continue;
+          }
+          const object = getObjectByName(
+            globalObjectsContainer,
+            objectsContainer,
+            associatedObjectName
+          );
+          if (object) {
+            objectsMap.set(associatedObjectName, object);
+          }
         }
-        const object = getObjectByName(
-          globalObjectsContainer,
-          objectsContainer,
-          associatedObjectName
+        const objects = [...objectsMap.values()];
+        const object = objects[0];
+        if (!object) {
+          return {
+            object: undefined,
+            instanceSchema: undefined,
+            allVisibleBehaviors: null,
+          };
+        }
+
+        const properties = instance.getCustomProperties(
+          globalObjectsContainer || objectsContainer,
+          objectsContainer
         );
-        if (object) {
-          objectsMap.set(associatedObjectName, object);
-        }
-      }
-      const objects = [...objectsMap.values()];
-      const object = objects[0];
-      if (!object) {
-        return {
-          object: undefined,
-          instanceSchema: undefined,
-          allVisibleBehaviors: null,
-        };
-      }
 
-      const properties = instance.getCustomProperties(
-        globalObjectsContainer || objectsContainer,
-        objectsContainer
-      );
-
-      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-        project.getCurrentPlatform(),
-        object.getType()
-      );
-      const is3DInstance = objectMetadata.isRenderedIn3D();
-      const hasOpacity = objectMetadata.hasDefaultBehavior(
-        'OpacityCapability::OpacityBehavior'
-      );
-      const canBeFlippedXY = objectMetadata.hasDefaultBehavior(
-        'FlippableCapability::FlippableBehavior'
-      );
-      const canBeFlippedZ = objectMetadata.hasDefaultBehavior(
-        'Scene3D::Base3DBehavior'
-      );
-      const instanceSchemaForCustomProperties = propertiesMapToSchema({
-        properties,
-        // We can't access default values for instance custom properties.
-        defaultValueProperties: null,
-        getPropertyValue: (instance: gdInitialInstance, name: string) =>
-          instance
-            .getCustomProperties(
+        const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+          project.getCurrentPlatform(),
+          object.getType()
+        );
+        const is3DInstance = objectMetadata.isRenderedIn3D();
+        const hasOpacity = objectMetadata.hasDefaultBehavior(
+          'OpacityCapability::OpacityBehavior'
+        );
+        const canBeFlippedXY = objectMetadata.hasDefaultBehavior(
+          'FlippableCapability::FlippableBehavior'
+        );
+        const canBeFlippedZ = objectMetadata.hasDefaultBehavior(
+          'Scene3D::Base3DBehavior'
+        );
+        const instanceSchemaForCustomProperties = propertiesMapToSchema({
+          properties,
+          // We can't access default values for instance custom properties.
+          defaultValueProperties: null,
+          getPropertyValue: (instance: gdInitialInstance, name: string) =>
+            instance
+              .getCustomProperties(
+                globalObjectsContainer || objectsContainer,
+                objectsContainer
+              )
+              .get(name)
+              .getValue(),
+          onUpdateProperty: (instance: gdInitialInstance, name, value) =>
+            instance.updateCustomProperty(
+              name,
+              value,
               globalObjectsContainer || objectsContainer,
               objectsContainer
-            )
-            .get(name)
-            .getValue(),
-        onUpdateProperty: (instance: gdInitialInstance, name, value) =>
-          instance.updateCustomProperty(
-            name,
-            value,
-            globalObjectsContainer || objectsContainer,
-            objectsContainer
-          ),
-        layersContainer,
-        shouldDisabledFieldsWithMixedValues: false,
-      });
+            ),
+          layersContainer,
+          shouldDisabledFieldsWithMixedValues: false,
+        });
 
-      const reorderedInstanceSchemaForCustomProperties = reorderInstanceSchemaForCustomProperties(
-        instanceSchemaForCustomProperties,
-        i18n
-      );
-      const instanceSchema = makeSchema({
+        const reorderedInstanceSchemaForCustomProperties = reorderInstanceSchemaForCustomProperties(
+          instanceSchemaForCustomProperties,
+          i18n
+        );
+        const instanceSchema = makeSchema({
+          i18n,
+          is3DInstance,
+          hasOpacity,
+          canBeFlippedXY,
+          canBeFlippedZ,
+          onGetInstanceSize,
+          onEditObject: editObjectInPropertiesPanel,
+          layersContainer,
+          forceUpdate,
+        }).concat(reorderedInstanceSchemaForCustomProperties);
+        return {
+          object,
+          instanceSchema,
+          allVisibleBehaviors: getAllVisibleBehaviorNames(objects),
+        };
+      },
+      [
+        instance,
+        globalObjectsContainer,
+        objectsContainer,
+        project,
+        layersContainer,
         i18n,
-        is3DInstance,
-        hasOpacity,
-        canBeFlippedXY,
-        canBeFlippedZ,
         onGetInstanceSize,
-        onEditObject: editObjectInPropertiesPanel,
-        layersContainer,
+        editObjectInPropertiesPanel,
         forceUpdate,
-      }).concat(reorderedInstanceSchemaForCustomProperties);
-      return {
-        object,
-        instanceSchema,
-        allVisibleBehaviors: getAllVisibleBehaviorNames(objects),
-      };
-    },
-    [
-      instance,
-      globalObjectsContainer,
-      objectsContainer,
-      project,
-      layersContainer,
-      i18n,
-      onGetInstanceSize,
-      editObjectInPropertiesPanel,
-      forceUpdate,
-      instances,
-    ]
-  );
+        instances,
+      ]
+    );
 
-  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(
-    object
-      ? instances.every(instance => !instance.hasAnyOverriddenProperty(object))
-      : true
-  );
+    const shouldDisplayTileSetVisualizer =
+      !!object && object.getType() === 'TileMap::SimpleTileMap';
 
-  const shouldDisplayTileSetVisualizer =
-    !!object && object.getType() === 'TileMap::SimpleTileMap';
+    React.useEffect(
+      () => {
+        if (!shouldDisplayTileSetVisualizer) {
+          // Reset tile map tile selection if tile set visualizer should
+          // not be displayed (an instance that is not a tile map is selected).
+          onSelectTileMapTile(null);
+        }
+        // Reset tile map tile selection if the component is unmounted
+        // (Useful when component is unmounted on an Undo user command).
+        return () => onSelectTileMapTile(null);
+      },
+      [shouldDisplayTileSetVisualizer, onSelectTileMapTile]
+    );
 
-  React.useEffect(
-    () => {
-      if (!shouldDisplayTileSetVisualizer) {
-        // Reset tile map tile selection if tile set visualizer should
-        // not be displayed (an instance that is not a tile map is selected).
+    React.useEffect(
+      () => {
         onSelectTileMapTile(null);
-      }
-      // Reset tile map tile selection if the component is unmounted
-      // (Useful when component is unmounted on an Undo user command).
-      return () => onSelectTileMapTile(null);
-    },
-    [shouldDisplayTileSetVisualizer, onSelectTileMapTile]
-  );
+      },
+      // Reset tile map tile selection if instance changes.
+      [instance.ptr, onSelectTileMapTile]
+    );
 
-  React.useEffect(
-    () => {
-      onSelectTileMapTile(null);
-    },
-    // Reset tile map tile selection if instance changes.
-    [instance.ptr, onSelectTileMapTile]
-  );
+    if (!object || !instance || !instanceSchema) return null;
 
-  if (!object || !instance || !instanceSchema) return null;
-
-  return (
-    <ErrorBoundary
-      componentTitle={<Trans>Instance properties</Trans>}
-      scope="scene-editor-instance-properties"
-    >
-      <ScrollView
-        ref={scrollViewRef}
-        autoHideScrollbar
-        style={styles.scrollView}
-        key={scrollKey}
-        onScroll={onScroll}
+    return (
+      <ErrorBoundary
+        componentTitle={<Trans>Instance properties</Trans>}
+        scope="scene-editor-instance-properties"
       >
-        <Column expand noMargin id="instance-properties-editor">
-          <Column>
-            <CompactPropertiesEditor
-              unsavedChanges={unsavedChanges}
-              schema={instanceSchema}
-              instances={instances}
-              onInstancesModified={onInstancesModified}
-              onRefreshAllFields={noRefreshOfAllFields}
-            />
-            <Spacer />
-          </Column>
-          {shouldDisplayTileSetVisualizer && (
-            <>
-              <Separator />
-              <Column>
-                <Line alignItems="center" justifyContent="space-between">
-                  <Text size="sub-title" noMargin>
-                    <Trans>Tilemap painter</Trans>
-                  </Text>
-                </Line>
-                <TileSetVisualizer
-                  project={project}
-                  objectConfiguration={object.getConfiguration()}
-                  tileMapTileSelection={tileMapTileSelection}
-                  onSelectTileMapTile={onSelectTileMapTile}
-                  showPaintingToolbar
-                  allowMultipleSelection={false}
-                  onScrollY={onScrollY}
-                  allowRectangleSelection
-                  interactive
-                />
-              </Column>
-            </>
-          )}
-          {allVisibleBehaviors ? (
-            <TopLevelCollapsibleSection
-              title={<Trans>Behaviors</Trans>}
-              isFolded={isBehaviorsFolded}
-              toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
-              renderContent={() => (
-                <ColumnStackLayout noMargin>
-                  {!allVisibleBehaviors.length && (
-                    <Text size="body2" align="center" color="secondary">
-                      <Trans>
-                        There are no{' '}
-                        <Link
-                          href={behaviorsHelpLink}
-                          onClick={() =>
-                            Window.openExternalURL(behaviorsHelpLink)
-                          }
-                        >
-                          behaviors
-                        </Link>{' '}
-                        on this object instance.
-                      </Trans>
+        <ScrollView
+          ref={scrollViewRef}
+          autoHideScrollbar
+          style={styles.scrollView}
+          key={scrollKey}
+          onScroll={onScroll}
+        >
+          <Column expand noMargin id="instance-properties-editor">
+            <Column>
+              <CompactPropertiesEditor
+                unsavedChanges={unsavedChanges}
+                schema={instanceSchema}
+                instances={instances}
+                onInstancesModified={onInstancesModified}
+                onRefreshAllFields={noRefreshOfAllFields}
+              />
+              <Spacer />
+            </Column>
+            {shouldDisplayTileSetVisualizer && (
+              <>
+                <Separator />
+                <Column>
+                  <Line alignItems="center" justifyContent="space-between">
+                    <Text size="sub-title" noMargin>
+                      <Trans>Tilemap painter</Trans>
                     </Text>
-                  )}
-                  {allVisibleBehaviors.map(behaviorName => {
-                    if (!object.hasBehaviorNamed(behaviorName)) {
-                      return null;
-                    }
-                    const behaviorTypeName = object
-                      .getBehavior(behaviorName)
-                      .getTypeName();
-                    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                      gd.JsPlatform.get(),
-                      behaviorTypeName
-                    );
-                    const iconUrl = behaviorMetadata.getIconFilename();
-                    const CompactInstanceBehaviorComponent = CompactInstanceBehaviorsEditorService.getEditor(
-                      behaviorTypeName
-                    );
-                    const instancesAndBehaviors = instances
-                      .map(initialInstance => {
-                        const object = getObjectByName(
-                          globalObjectsContainer,
-                          objectsContainer,
-                          initialInstance.getObjectName()
-                        );
-                        if (!object || !object.hasBehaviorNamed(behaviorName)) {
-                          return null;
-                        }
-                        return {
-                          initialInstance,
-                          behavior: object.getBehavior(behaviorName),
-                        };
-                      })
-                      .filter(Boolean);
-                    if (instancesAndBehaviors.length === 0) {
-                      return null;
-                    }
-                    return (
-                      <StatefulCollapsibleSubPanel
-                        key={instancesAndBehaviors[0].behavior.ptr}
-                        renderContent={
-                          notOverridableBehaviorTypes.includes(behaviorTypeName)
-                            ? () => (
-                                <Column expand>
-                                  <EmptyMessage>
-                                    <Trans>
-                                      This behavior can't be setup per instance.
-                                    </Trans>
-                                  </EmptyMessage>
-                                </Column>
-                              )
-                            : () => (
-                                <CompactInstanceBehaviorComponent
-                                  project={project}
-                                  behaviorMetadata={behaviorMetadata}
-                                  object={object}
-                                  layersContainer={layersContainer}
-                                  instancesAndBehaviors={instancesAndBehaviors}
-                                  onBehaviorUpdated={() => {
-                                    for (const {
-                                      initialInstance,
-                                      behavior,
-                                    } of instancesAndBehaviors) {
-                                      if (
-                                        initialInstance.hasBehaviorOverridingNamed(
-                                          behaviorName
-                                        ) &&
-                                        !initialInstance.hasAnyOverriddenPropertyForBehavior(
-                                          behavior
-                                        )
-                                      ) {
-                                        initialInstance.removeBehaviorOverriding(
-                                          behaviorName
-                                        );
-                                        // Update the view to stop using
-                                        // the removed behavior overriding.
-                                        forceUpdate();
-                                      }
-                                    }
-                                  }}
-                                  resourceManagementProps={
-                                    resourceManagementProps
-                                  }
-                                />
-                              )
-                        }
-                        isInitiallyFolded={instancesAndBehaviors.every(
-                          ({ initialInstance, behavior }) =>
-                            !initialInstance.hasAnyOverriddenPropertyForBehavior(
-                              behavior
+                  </Line>
+                  <TileSetVisualizer
+                    project={project}
+                    objectConfiguration={object.getConfiguration()}
+                    tileMapTileSelection={tileMapTileSelection}
+                    onSelectTileMapTile={onSelectTileMapTile}
+                    showPaintingToolbar
+                    allowMultipleSelection={false}
+                    onScrollY={onScrollY}
+                    allowRectangleSelection
+                    interactive
+                  />
+                </Column>
+              </>
+            )}
+            {allVisibleBehaviors ? (
+              <TopLevelCollapsibleSection
+                id="behaviors-section"
+                title={<Trans>Behaviors</Trans>}
+                isFolded={isSectionFolded('behaviors')}
+                toggleFolded={() => toggleSectionFolded('behaviors')}
+                renderContent={() => (
+                  <ColumnStackLayout noMargin>
+                    {!allVisibleBehaviors.length && (
+                      <Text size="body2" align="center" color="secondary">
+                        <Trans>
+                          There are no{' '}
+                          <Link
+                            href={behaviorsHelpLink}
+                            onClick={() =>
+                              Window.openExternalURL(behaviorsHelpLink)
+                            }
+                          >
+                            behaviors
+                          </Link>{' '}
+                          on this object instance.
+                        </Trans>
+                      </Text>
+                    )}
+                    {allVisibleBehaviors.map(behaviorName => {
+                      if (!object.hasBehaviorNamed(behaviorName)) {
+                        return null;
+                      }
+                      const behaviorTypeName = object
+                        .getBehavior(behaviorName)
+                        .getTypeName();
+                      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                        gd.JsPlatform.get(),
+                        behaviorTypeName
+                      );
+                      const iconUrl = behaviorMetadata.getIconFilename();
+                      const CompactInstanceBehaviorComponent = CompactInstanceBehaviorsEditorService.getEditor(
+                        behaviorTypeName
+                      );
+                      const instancesAndBehaviors = instances
+                        .map(initialInstance => {
+                          const object = getObjectByName(
+                            globalObjectsContainer,
+                            objectsContainer,
+                            initialInstance.getObjectName()
+                          );
+                          if (
+                            !object ||
+                            !object.hasBehaviorNamed(behaviorName)
+                          ) {
+                            return null;
+                          }
+                          return {
+                            initialInstance,
+                            behavior: object.getBehavior(behaviorName),
+                          };
+                        })
+                        .filter(Boolean);
+                      if (instancesAndBehaviors.length === 0) {
+                        return null;
+                      }
+                      return (
+                        <StatefulCollapsibleSubPanel
+                          key={instancesAndBehaviors[0].behavior.ptr}
+                          id={`behavior-panel-${behaviorName}`}
+                          renderContent={
+                            notOverridableBehaviorTypes.includes(
+                              behaviorTypeName
                             )
-                        )}
-                        titleIcon={
-                          iconUrl ? (
-                            <IconContainer
-                              src={iconUrl}
-                              alt={behaviorMetadata.getFullName()}
-                              size={16}
-                            />
-                          ) : null
-                        }
-                        title={behaviorName}
-                      />
-                    );
-                  })}
-                </ColumnStackLayout>
-              )}
-            />
-          ) : null}
-          {object && shouldDisplayVariablesList && variablesContainer ? (
-            <TopLevelCollapsibleSection
-              title={<Trans>Instance Variables</Trans>}
-              isFolded={isSectionFolded('variables')}
-              toggleFolded={() => toggleSectionFolded('variables')}
-              onOpenFullEditor={() => editInstanceVariables(instance)}
-              noContentMargin
-              renderContent={() => (
-                <VariablesList
-                  projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
-                  }
-                  directlyStoreValueChangesWhileEditing
-                  inheritedVariablesContainer={object.getVariables()}
-                  variablesContainer={variablesContainer}
-                  areObjectVariables
-                  size="compact"
-                  onComputeAllVariableNames={() =>
-                    object && layout
-                      ? EventsRootVariablesFinder.findAllObjectVariables(
-                          project.getCurrentPlatform(),
-                          project,
-                          layout,
-                          object.getName()
-                        )
-                      : []
-                  }
-                  historyHandler={historyHandler}
-                  toolbarIconStyle={styles.icon}
-                  compactEmptyPlaceholderText={
-                    <Trans>There are no variables on this instance.</Trans>
-                  }
-                  isListLocked={true}
-                />
-              )}
-            />
-          ) : null}
-        </Column>
-      </ScrollView>
-    </ErrorBoundary>
-  );
-};
+                              ? () => (
+                                  <Column expand>
+                                    <EmptyMessage>
+                                      <Trans>
+                                        This behavior can't be setup per
+                                        instance.
+                                      </Trans>
+                                    </EmptyMessage>
+                                  </Column>
+                                )
+                              : () => (
+                                  <CompactInstanceBehaviorComponent
+                                    project={project}
+                                    behaviorMetadata={behaviorMetadata}
+                                    object={object}
+                                    layersContainer={layersContainer}
+                                    instancesAndBehaviors={
+                                      instancesAndBehaviors
+                                    }
+                                    onBehaviorUpdated={() => {
+                                      for (const {
+                                        initialInstance,
+                                        behavior,
+                                      } of instancesAndBehaviors) {
+                                        if (
+                                          initialInstance.hasBehaviorOverridingNamed(
+                                            behaviorName
+                                          ) &&
+                                          !initialInstance.hasAnyOverriddenPropertyForBehavior(
+                                            behavior
+                                          )
+                                        ) {
+                                          initialInstance.removeBehaviorOverriding(
+                                            behaviorName
+                                          );
+                                          // Update the view to stop using
+                                          // the removed behavior overriding.
+                                          forceUpdate();
+                                        }
+                                      }
+                                      if (onInstancesModified) {
+                                        onInstancesModified(
+                                          instancesAndBehaviors.map(
+                                            ({ initialInstance }) =>
+                                              initialInstance
+                                          ),
+                                          { fieldName: behaviorName }
+                                        );
+                                      }
+                                    }}
+                                    resourceManagementProps={
+                                      resourceManagementProps
+                                    }
+                                  />
+                                )
+                          }
+                          isInitiallyFolded={instancesAndBehaviors.every(
+                            ({ initialInstance, behavior }) =>
+                              !initialInstance.hasAnyOverriddenPropertyForBehavior(
+                                behavior
+                              )
+                          )}
+                          titleIcon={
+                            iconUrl ? (
+                              <IconContainer
+                                src={iconUrl}
+                                alt={behaviorMetadata.getFullName()}
+                                size={16}
+                              />
+                            ) : null
+                          }
+                          title={behaviorName}
+                        />
+                      );
+                    })}
+                  </ColumnStackLayout>
+                )}
+              />
+            ) : null}
+            {object && shouldDisplayVariablesList && variablesContainer ? (
+              <TopLevelCollapsibleSection
+                id="instance-variables-section"
+                title={<Trans>Instance Variables</Trans>}
+                isFolded={isSectionFolded('variables')}
+                toggleFolded={() => toggleSectionFolded('variables')}
+                onOpenFullEditor={() => editInstanceVariables(instance)}
+                noContentMargin
+                renderContent={() => (
+                  <VariablesList
+                    ref={variablesListRef}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    directlyStoreValueChangesWhileEditing
+                    inheritedVariablesContainer={object.getVariables()}
+                    variablesContainer={variablesContainer}
+                    areObjectVariables
+                    size="compact"
+                    onComputeAllVariableNames={() =>
+                      object && layout
+                        ? EventsRootVariablesFinder.findAllObjectVariables(
+                            project.getCurrentPlatform(),
+                            project,
+                            layout,
+                            object.getName()
+                          )
+                        : []
+                    }
+                    historyHandler={historyHandler}
+                    toolbarIconStyle={styles.icon}
+                    compactEmptyPlaceholderText={
+                      <Trans>There are no variables on this instance.</Trans>
+                    }
+                    isListLocked={true}
+                  />
+                )}
+              />
+            ) : null}
+          </Column>
+        </ScrollView>
+      </ErrorBoundary>
+    );
+  }
+);

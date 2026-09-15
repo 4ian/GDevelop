@@ -457,6 +457,7 @@ export type ObjectsListInterface = {|
   forceUpdateList: () => void,
   openNewObjectDialog: () => void,
   closeNewObjectDialog: () => void,
+  scrollToObject: (object: gdObject) => void,
 |};
 
 type Props = {|
@@ -615,6 +616,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       closeNewObjectDialog: () => {
         setNewObjectDialogOpen(null);
+      },
+      scrollToObject: (object: gdObject) => {
+        scrollToItem(getObjectTreeViewItemId(object));
       },
     }));
 

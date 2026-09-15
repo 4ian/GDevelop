@@ -401,6 +401,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
             ) : (
               <Column expand noMargin noOverflowParent>
                 <TopLevelCollapsibleSection
+                  id="group-objects-section"
                   title={<Trans>Objects</Trans>}
                   isFolded={isSectionFolded('objects')}
                   toggleFolded={() => toggleSectionFolded('objects')}
@@ -539,6 +540,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
                   )}
                 />
                 <TopLevelCollapsibleSection
+                  id="group-variables-section"
                   title={<Trans>Object Variables</Trans>}
                   isFolded={isSectionFolded('variables')}
                   toggleFolded={() => toggleSectionFolded('variables')}

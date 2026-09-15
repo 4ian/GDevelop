@@ -141,6 +141,7 @@ export const CompactEffectsListEditor = ({
   return (
     <>
       <TopLevelCollapsibleSection
+        id={`${target}-effects-section`}
         title={
           target === 'object' ? (
             <Trans>Effects</Trans>
@@ -205,6 +206,7 @@ export const CompactEffectsListEditor = ({
             {effects.map(({ effect, effectMetadata }) => (
               <CollapsibleSubPanel
                 key={effect.ptr}
+                id={`effect-panel-${effect.getName()}`}
                 renderContent={() => (
                   <ColumnStackLayout noMargin expand noOverflowParent>
                     <Text

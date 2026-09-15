@@ -1705,9 +1705,7 @@ module.exports = {
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
-      .setHint(
-        "Tweening opacity only works on 2D objects, it has no effect/won't run on 3D objects."
-      )
+      .setHidden()
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
@@ -1724,6 +1722,42 @@ module.exports = {
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectOpacityTween2');
+
+    behavior
+      .addScopedAction(
+        'AddObjectOpacityTween3',
+        _('Tween object opacity'),
+        _(
+          'Tweens the object opacity from its current value to a new one (note: the value shall stay between 0 and 255).'
+        ),
+        _(
+          'Tween the opacity of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_ and destroy: _PARAM7_'
+        ),
+        _('Visibility'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter(
+        'behavior',
+        _('Opacity capability'),
+        'OpacityCapability::OpacityBehavior'
+      )
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('expression', _('To opacity'), '', false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addObjectOpacityTween3');
 
     behavior
       .addScopedAction(

@@ -613,7 +613,8 @@ describe('gdjs.TweenRuntimeBehavior', () => {
 
   it('can tween the opacity', () => {
     sprite.setOpacity(128);
-    spriteBehavior.addObjectOpacityTween2(
+    spriteBehavior.addObjectOpacityTween3(
+      null,
       'MyTween',
       255,
       'linear',

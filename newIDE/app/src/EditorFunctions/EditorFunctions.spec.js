@@ -3976,7 +3976,9 @@ describe('editorFunctions', () => {
       expect(instances[0].height).toBe(48);
       expect(instances[0].depth).toBe(64);
       expect(result.positionSemantics).toEqual(
-        expect.stringContaining('origin, NOT its center')
+        expect.stringContaining(
+          'its ORIGIN and rotations turn around its CENTER'
+        )
       );
       expect(result.objectSizeInfo).toEqual({ Player: null });
     });

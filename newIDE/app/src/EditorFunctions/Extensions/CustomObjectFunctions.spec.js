@@ -398,6 +398,124 @@ describe('CustomObjectFunctions', () => {
       ).toBe(false);
     });
 
+    describe('fit_area_to_children', () => {
+      // A child with an instance of a known size, so the expected area is
+      // exact (the size is set on the instance: the fake platform of the
+      // tests gives no default size to a 3D object).
+      const addChildWithInstanceAt = (
+        eventsBasedObject: gdEventsBasedObject,
+        objectName: string,
+        position: { x: number, y: number, z: number },
+        size: number
+      ) => {
+        eventsBasedObject
+          .getObjects()
+          .insertNewObject(
+            project,
+            'Sprite',
+            objectName,
+            eventsBasedObject.getObjects().getObjectsCount()
+          );
+
+        const instance = eventsBasedObject
+          .getInitialInstances()
+          .insertNewInitialInstance();
+        instance.setObjectName(objectName);
+        instance.setLayer('');
+        instance.setX(position.x);
+        instance.setY(position.y);
+        instance.setZ(position.z);
+        instance.setHasCustomSize(true);
+        instance.setCustomWidth(size);
+        instance.setCustomHeight(size);
+        instance.setHasCustomDepth(true);
+        instance.setCustomDepth(size);
+        return instance;
+      };
+
+      const getArea = (eventsBasedObject: gdEventsBasedObject) => {
+        const variant = eventsBasedObject.getDefaultVariant();
+        return {
+          minX: variant.getAreaMinX(),
+          minY: variant.getAreaMinY(),
+          minZ: variant.getAreaMinZ(),
+          maxX: variant.getAreaMaxX(),
+          maxY: variant.getAreaMaxY(),
+          maxZ: variant.getAreaMaxZ(),
+        };
+      };
+
+      it('sets the area from the children, with their minimum corner at the origin', async () => {
+        const dialog = getEventsBasedObject('UI', 'Dialog');
+        dialog.markAsRenderedIn3D(true);
+        addChildWithInstanceAt(dialog, 'Body', { x: 10, y: 10, z: 0 }, 40);
+        addChildWithInstanceAt(dialog, 'Top', { x: 20, y: 20, z: 40 }, 20);
+
+        const result = await launchChangeCustomObject({
+          extension_name: 'UI',
+          custom_object_name: 'Dialog',
+          fit_area_to_children: 'min_at_origin',
+        });
+
+        expect(result.success).toBe(true);
+        // Children spanning 10..50 on X and Y, 0..60 on Z, moved to start at 0.
+        expect(getArea(dialog)).toEqual({
+          minX: 0,
+          minY: 0,
+          minZ: 0,
+          maxX: 40,
+          maxY: 40,
+          maxZ: 60,
+        });
+      });
+
+      it('centers the children on the origin, so the object turns around its own position', async () => {
+        const dialog = getEventsBasedObject('UI', 'Dialog');
+        dialog.markAsRenderedIn3D(true);
+        addChildWithInstanceAt(dialog, 'Body', { x: 10, y: 10, z: 0 }, 40);
+
+        const result = await launchChangeCustomObject({
+          extension_name: 'UI',
+          custom_object_name: 'Dialog',
+          fit_area_to_children: 'centered_on_origin',
+        });
+
+        expect(result.success).toBe(true);
+        // A symmetric area: its center (the center of rotation) is the origin.
+        expect(getArea(dialog)).toEqual({
+          minX: -20,
+          minY: -20,
+          minZ: -20,
+          maxX: 20,
+          maxY: 20,
+          maxZ: 20,
+        });
+      });
+
+      it('refuses an unknown mode', async () => {
+        const result = await launchChangeCustomObject({
+          extension_name: 'UI',
+          custom_object_name: 'Dialog',
+          fit_area_to_children: 'around_the_origin',
+        });
+
+        expect(result.success).toBe(false);
+        expect(result.message).toContain('around_the_origin');
+        expect(result.message).toContain('min_at_origin');
+      });
+
+      it('says when there is no child instance to fit the area to', async () => {
+        const result = await launchChangeCustomObject({
+          extension_name: 'UI',
+          custom_object_name: 'Dialog',
+          fit_area_to_children: 'min_at_origin',
+        });
+
+        expect(result.success).toBe(true);
+        expect(result.message).toContain('no variant of this custom object');
+      });
+    });
+
     describe('changed_variants', () => {
       it('creates a variant as a copy of the default variant', async () => {
         // A copy brings the instances and the layers of its source.

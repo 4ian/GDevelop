@@ -62,6 +62,9 @@ export type GameplayTestResult = {
   gameTimeMs: number,
   assertions: Array<GameplayTestAssertion>,
   errors: Array<string>,
+  // Problems the harness itself noticed in the game, whatever the assertions
+  // checked (a custom object rendering nothing...). Not a failure by itself.
+  warnings: Array<string>,
   consoleLogs: Array<{ level: 'log' | 'warn' | 'error', message: string }>,
   eventLog: Array<Object>,
   finalState: Object | null,
@@ -189,6 +192,7 @@ const makeResultWithoutRun = (
   gameTimeMs: 0,
   assertions: [],
   errors: [errorMessage],
+  warnings: [],
   consoleLogs: [],
   eventLog: [],
   finalState: null,
@@ -219,6 +223,7 @@ export const makeGameplayTestResultReadableOutput = (
   gameTimeMs: result.gameTimeMs,
   assertions: result.assertions,
   errors: result.errors,
+  warnings: result.warnings || [],
   consoleLogs: result.consoleLogs.map(log => `[${log.level}] ${log.message}`),
   eventLog: result.eventLog,
   finalState: result.finalState,

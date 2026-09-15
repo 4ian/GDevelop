@@ -108,6 +108,66 @@ const getMeasurementUnitNames = (): Array<string> =>
     gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(index).getName()
   );
 
+// The measurement units the AI writes instead of the GDevelop ones. Only
+// names with a single obvious GDevelop equivalent: anything else is refused
+// with the list of the existing units.
+const MEASUREMENT_UNIT_ALIASES: { [string]: string } = {
+  degreepersecond: 'AngularSpeed',
+  degreespersecond: 'AngularSpeed',
+  degpersec: 'AngularSpeed',
+  degpers: 'AngularSpeed',
+  angularvelocity: 'AngularSpeed',
+  rotationspeed: 'AngularSpeed',
+  pixelpersecond: 'PixelSpeed',
+  pixelspersecond: 'PixelSpeed',
+  pxpers: 'PixelSpeed',
+  speed: 'PixelSpeed',
+  pixelpersecondpersecond: 'PixelAcceleration',
+  pixelpersecondsquared: 'PixelAcceleration',
+  acceleration: 'PixelAcceleration',
+  degree: 'DegreeAngle',
+  degrees: 'DegreeAngle',
+  deg: 'DegreeAngle',
+  angle: 'DegreeAngle',
+  pixel: 'Pixel',
+  pixels: 'Pixel',
+  px: 'Pixel',
+  second: 'Second',
+  seconds: 'Second',
+  sec: 'Second',
+  s: 'Second',
+  time: 'Second',
+  duration: 'Second',
+  number: 'Dimensionless',
+  none: 'Dimensionless',
+  force: 'Newton',
+};
+
+// "Degree/Second", "deg per sec", "degrees_per_second"... all normalize to
+// the same key.
+const normalizeMeasurementUnitName = (name: string): string =>
+  name
+    .toLowerCase()
+    .replace(/\^2|²/g, 'squared')
+    .replace(/\//g, 'per')
+    .replace(/[^a-z]/g, '')
+    .replace(/perseconds\b/, 'persecond');
+
+/**
+ * The GDevelop measurement unit meant by `requestedName`, or null when no
+ * single one is meant. Matches the real units first (so a correct name is
+ * never rewritten), then the aliases above.
+ */
+const findMeasurementUnitName = (requestedName: string): string | null => {
+  const normalized = normalizeMeasurementUnitName(requestedName);
+  if (!normalized) return null;
+  const existingName = getMeasurementUnitNames().find(
+    name => normalizeMeasurementUnitName(name) === normalized
+  );
+  if (existingName) return existingName;
+  return MEASUREMENT_UNIT_ALIASES[normalized] || null;
+};
+
 const setExtraInfoString = (
   property: gdNamedPropertyDescriptor,
   value: string
@@ -408,12 +468,13 @@ export const applyPropertyChanges = (
     }
 
     if (requestedMeasurementUnit !== undefined) {
-      if (
-        typeof requestedMeasurementUnit !== 'string' ||
-        !gd.MeasurementUnit.hasDefaultMeasurementUnitNamed(
-          requestedMeasurementUnit
-        )
-      ) {
+      // "Degree/Second", "pixels per second"... are the names of the units,
+      // not the GDevelop ones: resolve them instead of failing the call.
+      const measurementUnitName =
+        typeof requestedMeasurementUnit === 'string'
+          ? findMeasurementUnitName(requestedMeasurementUnit)
+          : null;
+      if (!measurementUnitName) {
         return makeFailure(
           `Measurement unit "${String(
             requestedMeasurementUnit
@@ -422,6 +483,8 @@ export const applyPropertyChanges = (
           )}.`
         );
       }
+      // The applied value: the result message names the unit that was set.
+      change.measurement_unit = measurementUnitName;
     }
 
     const booleanFields = [

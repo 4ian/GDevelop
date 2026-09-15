@@ -4,6 +4,10 @@ import { mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { type EditorFunctionGenericOutput } from './index';
+import {
+  getModel3DLocationPoints,
+  type LocationPoint,
+} from './Model3DSizeInfo';
 
 const gd: libGDevelop = global.gd;
 
@@ -13,6 +17,8 @@ export type ObjectSizeInfo = {|
   width: number | null,
   height: number | null,
   depth: number | null,
+  // Offsets from the minimum corner of the object box: `origin*` is the point
+  // an instance x;y;z positions, `center*` the point rotations turn around.
   originX: number,
   originY: number,
   originZ: number | null,
@@ -213,16 +219,31 @@ export const getObjectSizeInfo = (
     const width = config.getWidth();
     const height = config.getHeight();
     const depth = config.getDepth();
+    // A 3D model has neither its origin at the minimum corner nor its center
+    // at the middle of the box by default: both follow its `originLocation`
+    // and `centerLocation`, which can be the origin the model was authored
+    // with - known only once the model is loaded
+    // (`ensureModel3DOriginPointLoaded`), the usual values until then.
+    const { originPoint, centerPoint } = getModel3DLocationPoints(config);
+    const sizes = [width, height, depth];
+    const atSize = (
+      point: LocationPoint,
+      axis: number,
+      fallback: number
+    ): number => {
+      const fraction = point[axis];
+      return fraction === null ? fallback : fraction * sizes[axis];
+    };
     return {
       width,
       height,
       depth,
-      originX: 0,
-      originY: 0,
-      originZ: 0,
-      centerX: width / 2,
-      centerY: height / 2,
-      centerZ: depth / 2,
+      originX: atSize(originPoint, 0, 0),
+      originY: atSize(originPoint, 1, 0),
+      originZ: atSize(originPoint, 2, 0),
+      centerX: atSize(centerPoint, 0, width / 2),
+      centerY: atSize(centerPoint, 1, height / 2),
+      centerZ: atSize(centerPoint, 2, depth / 2),
     };
   }
 

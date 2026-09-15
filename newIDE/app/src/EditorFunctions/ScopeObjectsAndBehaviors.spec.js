@@ -182,7 +182,13 @@ describe('Objects and behaviors in a custom object variant', () => {
         }
       );
       expect(deleteOnDefaultVariant.success).toBe(true);
-      expect(deleteOnDefaultVariant.message).toBe('Deleted object "Label".');
+      expect(deleteOnDefaultVariant.message).toContain(
+        'Deleted object "Label".'
+      );
+      // The variant still has child objects and no instance of them.
+      expect(deleteOnDefaultVariant.message).toContain(
+        'has 2 child object(s) but NO instance placed'
+      );
 
       // ...and the named variant inherits them.
       expect(getObjectNames(getDefaultVariantObjects())).toEqual([
@@ -250,7 +256,7 @@ describe('Objects and behaviors in a custom object variant', () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe(
+      expect(result.message).toContain(
         'Duplicated "Player" (scene "Level") as "PlayerAvatar" (custom object "UI::Dialog" (default variant)); same type/behaviors/properties/effects.'
       );
       expect(getObjectNames(getDefaultVariantObjects())).toEqual([

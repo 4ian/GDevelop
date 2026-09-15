@@ -424,6 +424,18 @@ describe('PropertyChanges', () => {
       expect(message).toContain('Measurement unit "Furlong" does not exist');
       expect(message).toContain('"Pixel"');
     });
+
+    it('resolves the unit names the AI writes to the GDevelop ones', () => {
+      const result = expectSuccess(
+        changeObjectProperties([
+          { property_name: 'Size', measurement_unit: 'Degree/Second' },
+        ])
+      );
+
+      expect(result.messages.join(' ')).toContain(
+        'measurement unit "AngularSpeed"'
+      );
+    });
   });
 
   describe('deleting properties', () => {

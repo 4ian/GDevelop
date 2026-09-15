@@ -246,6 +246,7 @@ import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
+import { useResourcesAccessRefresh } from './UseResourcesAccessRefresh';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -763,6 +764,11 @@ const MainFrame = (props: Props): React.MixedElement => {
     isProjectSplitInMultipleFiles: currentProject
       ? currentProject.isFolderProject()
       : false,
+  });
+  const { ensureCanAccessResources } = useResourcesAccessRefresh({
+    project: currentProject,
+    fileMetadata: currentFileMetadata,
+    getStorageProviderOperations,
   });
 
   const gamesList = useGamesList();
@@ -2894,7 +2900,12 @@ const MainFrame = (props: Props): React.MixedElement => {
       ]);
 
       try {
-        await eventsFunctionsExtensionsState.ensureLoadFinished();
+        await Promise.all([
+          eventsFunctionsExtensionsState.ensureLoadFinished(),
+          // The preview will load all the resources of the project: ensure
+          // the credentials to access them (if any) are still valid.
+          ensureCanAccessResources(),
+        ]);
 
         const startTime = Date.now();
         let inAppTutorialMessageInPreview = { message: '', position: '' };
@@ -3003,6 +3014,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       autosaveProjectIfNeeded,
       authenticatedUser.profile,
       eventsFunctionsExtensionsState,
+      ensureCanAccessResources,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
       preferences.values.openDiagnosticReportAutomatically,

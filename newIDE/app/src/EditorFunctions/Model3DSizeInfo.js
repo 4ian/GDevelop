@@ -196,16 +196,21 @@ export const ensureModel3DMeasurementLoaded = (
         project,
         settings.modelResourceName
       );
-      const measurement =
-        gltf && gltf.scene ? measureModel(gltf.scene, settings) : null;
+      if (!gltf || !gltf.scene) {
+        measured.delete(key);
+        return;
+      }
+      // The very same model as the one already measured: nothing changed about
+      // it, and measuring it again would only walk it for the same numbers.
+      const alreadyMeasured = measured.get(key);
+      if (alreadyMeasured && alreadyMeasured.gltfScene === gltf.scene) return;
+
+      const measurement = measureModel(gltf.scene, settings);
       if (!measurement) {
         measured.delete(key);
         return;
       }
-      const alreadyMeasured = measured.get(key);
-      if (!alreadyMeasured || alreadyMeasured.gltfScene !== gltf.scene) {
-        measured.set(key, { gltfScene: gltf.scene, measurement });
-      }
+      measured.set(key, { gltfScene: gltf.scene, measurement });
     } catch (error) {
       // The model became unreadable (missing resource, unreadable file...):
       // what was measured on the previous one no longer describes it.

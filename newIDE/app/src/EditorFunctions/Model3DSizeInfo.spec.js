@@ -272,6 +272,24 @@ describe('Model3DSizeInfo', () => {
       expect(updateMatrixWorld).toHaveBeenCalledTimes(2);
     });
 
+    it('measures a model once for repeated reads of it', async () => {
+      const project: any = {};
+      const object: any = makeModel3DObject(makeModel3DObjectProperties());
+      const model = makeModel([4, 2, 2], [1, 0.5, 1]);
+      const updateMatrixWorld = jest.spyOn(model, 'updateMatrixWorld');
+      const loader = makeLoader(model);
+
+      for (let readCount = 0; readCount < 20; readCount++) {
+        await ensureModel3DMeasurementLoaded(object, project, loader);
+      }
+
+      // The loader hands the same model every time: it is measured once.
+      expect(updateMatrixWorld).toHaveBeenCalledTimes(2);
+      expect(getModel3DObjectSizeInfo(object, project)).toMatchObject({
+        originX: 25,
+      });
+    });
+
     it('measures the model again when the loader hands another one', async () => {
       const project: any = {};
       const object: any = makeModel3DObject(makeModel3DObjectProperties());

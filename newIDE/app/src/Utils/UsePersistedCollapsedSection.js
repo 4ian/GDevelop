@@ -13,12 +13,14 @@ type Props = {|
     | 'objectGroup'
     | 'layer',
   persistedPanelStateId: string | null,
+  foldedByDefault?: boolean,
 |};
 
 export const usePersistedCollapsedSection = ({
   project,
   persistedPanelStateType,
   persistedPanelStateId,
+  foldedByDefault,
 }: Props): {
   isSectionFolded: (sectionId: string) => boolean,
   setSectionFolded: (sectionId: string, isCollapsed: boolean) => void,
@@ -32,18 +34,26 @@ export const usePersistedCollapsedSection = ({
 
   const isSectionFolded = React.useCallback(
     (sectionId: string): boolean => {
+      const defaultValue = !!foldedByDefault;
       const editorStateForProject = getEditorStateForProject(projectId);
-      if (!editorStateForProject || !persistedPanelStateId) return false;
+      if (!editorStateForProject || !persistedPanelStateId) return defaultValue;
 
-      return editorStateForProject.propertiesPanel[persistedPanelStateType]?.[
-        persistedPanelStateId
-      ]?.collapsedSections[sectionId];
+      const panelStates =
+        editorStateForProject.propertiesPanel[persistedPanelStateType];
+      const panelState = panelStates
+        ? panelStates[persistedPanelStateId]
+        : null;
+      if (!panelState) return defaultValue;
+
+      const persistedValue = panelState.collapsedSections[sectionId];
+      return persistedValue === undefined ? defaultValue : persistedValue;
     },
     [
       getEditorStateForProject,
       persistedPanelStateId,
       persistedPanelStateType,
       projectId,
+      foldedByDefault,
     ]
   );
 
@@ -51,25 +61,30 @@ export const usePersistedCollapsedSection = ({
     (sectionId: string, isCollapsed: boolean): void => {
       if (!persistedPanelStateId) return;
       const currentEditorState = getEditorStateForProject(projectId);
+      const currentPropertiesPanel = currentEditorState
+        ? currentEditorState.propertiesPanel
+        : null;
+      const currentPanelStates = currentPropertiesPanel
+        ? currentPropertiesPanel[persistedPanelStateType]
+        : null;
+      const currentPanelState = currentPanelStates
+        ? currentPanelStates[persistedPanelStateId]
+        : null;
 
       const panelState: EditorStateForPropertyPanel = {
         scrollPosition: 0,
-        ...currentEditorState?.propertiesPanel[persistedPanelStateType]?.[
-          persistedPanelStateId
-        ],
+        ...currentPanelState,
         collapsedSections: {
-          ...currentEditorState?.propertiesPanel[persistedPanelStateType]?.[
-            persistedPanelStateId
-          ]?.collapsedSections,
+          ...(currentPanelState ? currentPanelState.collapsedSections : null),
           [sectionId]: isCollapsed,
         },
       };
 
       setEditorStateForProject(projectId, {
         propertiesPanel: {
-          ...currentEditorState?.propertiesPanel,
+          ...currentPropertiesPanel,
           [persistedPanelStateType]: {
-            ...currentEditorState?.propertiesPanel[persistedPanelStateType],
+            ...currentPanelStates,
             [persistedPanelStateId]: panelState,
           },
         },

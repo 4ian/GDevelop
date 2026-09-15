@@ -141,7 +141,7 @@ const getModelKey = (settings: Model3DSettings): string =>
 const measureModel = (
   gltfScene: any,
   settings: Model3DSettings
-): Model3DMeasurement => {
+): Model3DMeasurement | null => {
   const boundingBox = getModel3DBoundingBox(gltfScene, {
     rotationX: settings.rotationX,
     rotationY: settings.rotationY,
@@ -153,6 +153,10 @@ const measureModel = (
     boundingBox.max.y - boundingBox.min.y,
     boundingBox.max.z - boundingBox.min.z,
   ];
+  // A model with nothing to show has an empty box (its bounds are infinite):
+  // there is nothing to measure, and every size computed from it would be
+  // meaningless rather than merely approximate.
+  if (!modelSize.every(size => Number.isFinite(size))) return null;
   return {
     modelSize: [modelSize[0], modelSize[1], modelSize[2]],
     // Where the origin of the model (0;0;0) sits in the box it was measured in.
@@ -183,22 +187,24 @@ export const ensureModel3DMeasurementLoaded = (
   const pendingMeasurement = pending.get(key);
   if (pendingMeasurement) return pendingMeasurement;
 
-  const measuring = (async () => {
+  // Started in a microtask, so that the pending entry below is in place before
+  // anything can clear it: a loader throwing synchronously would otherwise
+  // leave a settled promise behind and never let a later call read the model.
+  const measuring = Promise.resolve().then(async () => {
     try {
       const gltf = await pixiResourcesLoader.get3DModel(
         project,
         settings.modelResourceName
       );
-      if (!gltf || !gltf.scene) {
+      const measurement =
+        gltf && gltf.scene ? measureModel(gltf.scene, settings) : null;
+      if (!measurement) {
         measured.delete(key);
         return;
       }
       const alreadyMeasured = measured.get(key);
       if (!alreadyMeasured || alreadyMeasured.gltfScene !== gltf.scene) {
-        measured.set(key, {
-          gltfScene: gltf.scene,
-          measurement: measureModel(gltf.scene, settings),
-        });
+        measured.set(key, { gltfScene: gltf.scene, measurement });
       }
     } catch (error) {
       // The model became unreadable (missing resource, unreadable file...):
@@ -207,7 +213,7 @@ export const ensureModel3DMeasurementLoaded = (
     } finally {
       pending.delete(key);
     }
-  })();
+  });
   pending.set(key, measuring);
   return measuring;
 };
@@ -296,8 +302,10 @@ export const isModel3DObjectMeasured = (
   object: gdObject,
   project: gdProject
 ): boolean => {
+  if (object.getType() !== MODEL_3D_OBJECT_TYPE) return true;
+  // A 3D model naming no resource has no geometry to answer for at all.
   const settings = getModel3DSettings(object);
-  if (!settings) return true;
+  if (!settings) return false;
   if (findMeasurement(project, settings)) return true;
   const dependsOnModel = (location: string) =>
     getPointForLocation(location).some(fraction => fraction === null);

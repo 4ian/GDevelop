@@ -67,6 +67,11 @@ const makeLoader = (model: any) => ({
 const failingLoader = {
   get3DModel: () => Promise.reject(new Error('unreadable model')),
 };
+const throwingLoader = {
+  get3DModel: () => {
+    throw new Error('unreadable model');
+  },
+};
 
 describe('Model3DSizeInfo', () => {
   describe('getModel3DObjectSizeInfo', () => {
@@ -165,7 +170,11 @@ describe('Model3DSizeInfo', () => {
         project,
         loader
       );
-      await ensureModel3DMeasurementLoaded(positionedByItsCorner, project, loader);
+      await ensureModel3DMeasurementLoaded(
+        positionedByItsCorner,
+        project,
+        loader
+      );
 
       // The geometry is 2x2x2 at x 2..4: holding the origin makes it 4 wide.
       expect(
@@ -216,6 +225,15 @@ describe('Model3DSizeInfo', () => {
         makeLoader(OFF_CENTER_MODEL)
       );
       expect(isModel3DObjectMeasured(object, project)).toBe(true);
+    });
+
+    it('is false for a model naming no resource', () => {
+      const project: any = {};
+      const object: any = makeModel3DObject(
+        makeModel3DObjectProperties({ modelResourceName: '' })
+      );
+
+      expect(isModel3DObjectMeasured(object, project)).toBe(false);
     });
 
     it('is true without the model when nothing depends on its geometry', () => {
@@ -291,6 +309,46 @@ describe('Model3DSizeInfo', () => {
 
       await ensureModel3DMeasurementLoaded(object, project, failingLoader);
       expect(isModel3DObjectMeasured(object, project)).toBe(false);
+    });
+
+    it('lets a read be tried again after a loader throwing on the spot', async () => {
+      const project: any = {};
+      const object: any = makeModel3DObject(makeModel3DObjectProperties());
+
+      await ensureModel3DMeasurementLoaded(object, project, throwingLoader);
+      expect(isModel3DObjectMeasured(object, project)).toBe(false);
+
+      // The throw must not have left the read marked as still running.
+      await ensureModel3DMeasurementLoaded(
+        object,
+        project,
+        makeLoader(OFF_CENTER_MODEL)
+      );
+      expect(isModel3DObjectMeasured(object, project)).toBe(true);
+    });
+
+    it('measures nothing on a model with nothing to show', async () => {
+      const project: any = {};
+      const object: any = makeModel3DObject(
+        makeModel3DObjectProperties({
+          // The box of an empty model is infinite: it has no size to read.
+          originLocation: 'TopLeft',
+          keepAspectRatio: 'true',
+        })
+      );
+
+      await ensureModel3DMeasurementLoaded(
+        object,
+        project,
+        makeLoader(new THREE.Group())
+      );
+
+      expect(isModel3DObjectMeasured(object, project)).toBe(false);
+      expect(getModel3DObjectSizeInfo(object, project)).toMatchObject({
+        width: 100,
+        height: 50,
+        depth: 50,
+      });
     });
 
     it('never shares a measurement between two projects', async () => {

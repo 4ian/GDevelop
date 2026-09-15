@@ -247,6 +247,11 @@ const fitVariantAreaToChildren = (
       )} is unknown (an object with no size of its own, or a 3D model that could not be read). Give their instances a size (\`instances_size\`), or set the area by hand with \`changed_settings\`.`;
   }
   if (!box) return null;
+  // Nothing is moved on a box that is not a real one: every coordinate written
+  // from here (the area, the position of every child) would be meaningless.
+  if (![...box.min, ...box.max].every(bound => Number.isFinite(bound))) {
+    return `The area of ${variantLabel} was NOT fitted: the box of its children could not be computed from their sizes.`;
+  }
 
   // A rotation leaves the bounds a fraction of a pixel off (a 90 degrees
   // rotation gives a width of 20.0000000001), which would round the area up.

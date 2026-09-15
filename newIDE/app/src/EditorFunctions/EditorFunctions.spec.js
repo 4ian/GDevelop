@@ -3977,7 +3977,7 @@ describe('editorFunctions', () => {
       expect(instances[0].depth).toBe(64);
       expect(result.positionSemantics).toEqual(
         expect.stringContaining(
-          'rotations turn around the point `objectSizeInfo` gives as `centerX/Y/Z`'
+          'The center point is the rotation pivot and need not be the geometric midpoint.'
         )
       );
       expect(result.objectSizeInfo).toEqual({ Player: null });

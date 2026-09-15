@@ -634,9 +634,12 @@ const injectObjectSizeInfo = (
 };
 
 const INSTANCE_POSITION_SEMANTICS_MESSAGE =
-  'Each instance x;y;z is its ORIGIN, and rotations turn around the point `objectSizeInfo` gives as `centerX/Y/Z` - neither is necessarily the middle of the object box. ' +
-  '`originX/Y/Z` and `centerX/Y/Z` are offsets from the minimum corner of that box: with the usual origin 0;0;0 an instance occupies x to x+width, y to y+height and (in 3D) z to z+depth, while a 3D model usually has both elsewhere (its `originLocation`/`centerLocation` property, possibly the origin the model was authored with). ' +
-  'To center an instance A on top of an instance B: A.x = B.x - B.originX + (B.width - A.width)/2 + A.originX, same on Y, and A.z = B.z - B.originZ + B.depth + A.originZ.';
+  'Instance x;y;z specify the origin position before rotation or flipping. ' +
+  '`objectSizeInfo.originX/Y/Z` and `centerX/Y/Z` are offsets from the minimum corner of the unrotated, unflipped object box, at the default size. The center point is the rotation pivot and need not be the geometric midpoint. ' +
+  'For a resized instance, scale each origin and center offset by instanceSize/defaultSize on that axis, when the default size is known and nonzero. In the formulas below, A.originX/Y/Z and B.originX/Y/Z mean these scaled offsets, and width/height/depth mean actual instance dimensions. ' +
+  'Before rotation or flipping, an instance occupies x-originX to x-originX+width, and likewise on Y and Z. Its rotation pivot is at position-origin+center. ' +
+  'For unrotated, unflipped instances in the same coordinate space, center the bounding box of A above that of B using: A.x = B.x - B.originX + (B.width - A.width)/2 + A.originX; A.y = B.y - B.originY + (B.height - A.height)/2 + A.originY; A.z = B.z - B.originZ + B.depth + A.originZ. ' +
+  'For rotated or flipped instances, compute the transformed bounds before positioning them.';
 
 // Inside a custom object, positions are local to it: without this the AI
 // would place children in scene coordinates.

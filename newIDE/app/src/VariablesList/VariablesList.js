@@ -338,6 +338,7 @@ const VariableRow = React.memo<VariableRowProps>(
                   [classes.selected]: isSelected,
                 })}
                 style={{ marginLeft: indent }}
+                data-variable-node-id={nodeId}
                 aria-selected={isSelected}
                 aria-expanded={isExpanded}
                 onPointerUp={event => {
@@ -617,6 +618,7 @@ const VariableRow = React.memo<VariableRowProps>(
 
 export type VariablesListInterface = {|
   addVariable: () => void,
+  revealVariable: (nodeId: string) => void,
 |};
 
 const VariablesList: React.ComponentType<{
@@ -1917,6 +1919,9 @@ const VariablesList: React.ComponentType<{
 
   React.useImperativeHandle(ref, () => ({
     addVariable,
+    revealVariable: (nodeId: string) => {
+      setVariableToReveal({ nodeId, fieldToFocus: null });
+    },
   }));
 
   // The whole tree of variables is flattened into the list of rows to display,

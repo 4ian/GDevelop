@@ -1872,6 +1872,37 @@ describe('gdjs.gameplayTests', () => {
       expect(tankCanon.x).to.be(140);
     });
 
+    it('warns about a getNearby radius that keeps everything and covers the screen', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+      harness.spawn('MyObject', 100, 200);
+      await harness.stepFrames(1);
+
+      // The game is 800x600: a 100000px radius is not a proximity check.
+      harness.getNearby('CombinedTank', 'MyObject', 100000);
+
+      expect(harness._runWarnings.length).to.be(1);
+      expect(harness._runWarnings[0]).to.contain(
+        'kept every instance of "CombinedTank"'
+      );
+      expect(harness._runWarnings[0]).to.contain(
+        'larger than the whole screen (1000px diagonal)'
+      );
+    });
+
+    it('says nothing about a radius that leaves an instance out, or one the screen holds', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+      harness.spawn('MyObject', 100, 200);
+      harness.spawn('CombinedTank', 50000, 200, undefined, 'UI');
+      await harness.stepFrames(1);
+
+      // Far bigger than the screen, but it does tell the two tanks apart.
+      harness.getNearby('CombinedTank', 'MyObject', 2000);
+      // Keeps everything, but within what the screen shows.
+      harness.getNearby('MyObject', 'CombinedTank', 900);
+
+      expect(harness._runWarnings.length).to.be(0);
+    });
+
     it('moves a point with the Z and Z scale of a parent without a THREE object', () => {
       const harness = makeStartedHarness(makeRuntimeGame());
       // A 3D custom object places its children at

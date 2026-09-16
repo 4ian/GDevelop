@@ -674,6 +674,9 @@ namespace gdjs {
       _startTimeMs: number = 0;
       _stopped: boolean = false;
       _assertions: Array<GameplayTestAssertion> = [];
+      /** What the harness noticed about the test itself while it ran (see
+       * `_addRunWarning`), reported with the warnings about the game. */
+      _runWarnings: Array<string> = [];
       _consoleLogs: Array<GameplayTestLog> = [];
       _consoleLogsTotalChars: number = 0;
       _eventLog: Array<GameplayTestEvent> = [];
@@ -984,6 +987,41 @@ namespace gdjs {
           }
         }
         return objectCounts;
+      }
+
+      /**
+       * Something noticed while the test ran, reported once whatever the
+       * assertions said.
+       */
+      private _addRunWarning(message: string): void {
+        if (this._runWarnings.length >= MAX_WARNINGS) return;
+        if (this._runWarnings.indexOf(message) !== -1) return;
+        this._runWarnings.push(message);
+      }
+
+      /**
+       * A `getNearby` radius that cannot tell anything apart: it reaches
+       * further than the whole screen AND let every instance through, so a
+       * check on what it returns passes wherever the game put them.
+       */
+      private _warnOnUnselectiveRadius(
+        objectName: string,
+        referenceObjectName: string,
+        radius: float,
+        keptCount: integer,
+        instancesCount: integer
+      ): void {
+        if (keptCount < instancesCount) return;
+        const screenDiagonal = Math.hypot(
+          this._runtimeGame.getGameResolutionWidth(),
+          this._runtimeGame.getGameResolutionHeight()
+        );
+        if (!(radius > screenDiagonal)) return;
+        this._addRunWarning(
+          `getNearby("${objectName}", "${referenceObjectName}", ${radius}) kept every instance of "${objectName}": that radius is larger than the whole screen (${Math.round(
+            screenDiagonal
+          )}px diagonal), so it says nothing about where they are. Use a radius of the size of what is being checked.`
+        );
       }
 
       /**
@@ -2239,8 +2277,9 @@ namespace gdjs {
         const reference = this._makeObjectSnapshot(referenceInstances[0], 0);
         const referenceZ = reference.centerZ || 0;
 
+        const instances = this._getInstances(objectName);
         const nearby: Array<GameplayTestNearbyObjectSnapshot> = [];
-        for (const object of this._getInstances(objectName)) {
+        for (const object of instances) {
           const snapshot = this._makeObjectSnapshot(object, childrenDepth);
           const relativeX = snapshot.centerX - reference.centerX;
           const relativeY = snapshot.centerY - reference.centerY;
@@ -2263,6 +2302,13 @@ namespace gdjs {
           });
         }
         nearby.sort((a, b) => a.distance - b.distance);
+        this._warnOnUnselectiveRadius(
+          objectName,
+          referenceObjectName,
+          radius,
+          nearby.length,
+          instances.length
+        );
         return nearby;
       }
 
@@ -3565,7 +3611,7 @@ namespace gdjs {
           gameTimeMs: Math.round(this._gameTimeMs),
           assertions: this._assertions,
           errors: errors.slice(0, MAX_ERRORS),
-          warnings: this._getWarnings(),
+          warnings: [...this._runWarnings, ...this._getWarnings()],
           consoleLogs: this._consoleLogs,
           eventLog: this._eventLog,
           finalState: {

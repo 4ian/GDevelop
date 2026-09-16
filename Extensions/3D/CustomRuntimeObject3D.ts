@@ -116,8 +116,10 @@ namespace gdjs {
       if (networkSyncData.ry !== undefined)
         this.setRotationY(networkSyncData.ry);
       if (networkSyncData.ifz !== undefined) this.flipZ(networkSyncData.ifz);
-      if (networkSyncData.ccz !== undefined)
+      if (networkSyncData.ccz !== undefined) {
         this._customCenterZ = networkSyncData.ccz;
+        this.invalidateTransformation();
+      }
     }
 
     /**
@@ -441,6 +443,7 @@ namespace gdjs {
       if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         this._innerArea.min[2] *= scaleZ;
         this._innerArea.max[2] *= scaleZ;
+        this.invalidateTransformation();
       } else {
         this.setScaleZ(scaleZ);
       }

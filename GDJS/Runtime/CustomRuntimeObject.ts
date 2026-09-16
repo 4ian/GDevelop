@@ -92,9 +92,16 @@ namespace gdjs {
     private _customCenter: FloatPoint | null = null;
     private _localTransformation: gdjs.AffineTransformation =
       new gdjs.AffineTransformation();
-    private _localInverseTransformation: gdjs.AffineTransformation =
-      new gdjs.AffineTransformation();
-    private _isLocalTransformationDirty: boolean = true;
+    /**
+     * Bumped by `invalidateTransformation` every time anything the
+     * transformation is built from changes. Each consumer keeps the revision
+     * it last used (the matrices below, the renderer its own dirty flag), so
+     * one of them reading the transformation never leaves another stale.
+     */
+    private _transformationRevision: integer = 1;
+    private _computedTransformationRevision: integer = 0;
+    private static _temporaryPoint: FloatPoint = [0, 0];
+    private static _temporaryCoefficients: FloatPoint = [0, 0];
     _type: string;
 
     /**
@@ -162,6 +169,7 @@ namespace gdjs {
         this._innerArea.max[0] = usedVariantData.areaMaxX;
         this._innerArea.max[1] = usedVariantData.areaMaxY;
         this._innerArea.max[2] = usedVariantData.areaMaxZ;
+        this.invalidateTransformation();
       }
       this._instanceContainer.loadFrom(customObjectData, usedVariantData);
     }
@@ -402,8 +410,9 @@ namespace gdjs {
 
     onChildrenLocationChanged() {
       this._isUntransformedHitBoxesDirty = true;
-      this.invalidateHitboxes();
-      this.getRenderer().update();
+      // An object with no fixed area is as big as its children: they moved,
+      // so its center of rotation - and its transformation - moved with them.
+      this.invalidateTransformation();
     }
 
     override updateHitBoxes(): void {
@@ -505,17 +514,40 @@ namespace gdjs {
      * @returns the affine transformation.
      */
     getLocalTransformation(): gdjs.AffineTransformation {
-      if (this._isLocalTransformationDirty) {
+      if (
+        this._computedTransformationRevision !== this._transformationRevision
+      ) {
         this._updateLocalTransformation();
       }
       return this._localTransformation;
     }
 
-    getLocalInverseTransformation(): gdjs.AffineTransformation {
-      if (this._isLocalTransformationDirty) {
-        this._updateLocalTransformation();
-      }
-      return this._localInverseTransformation;
+    /**
+     * Everything the transformation of the object is built from (its position,
+     * its angle, its scales, its flips, its center of rotation and the area
+     * its children live in) changed: the matrices are recomputed on the next
+     * read, the hit boxes are invalidated and the renderer is told to update
+     * itself. Every mutator goes through this: a consumer forgotten here is a
+     * transformation read (or drawn) from values that no longer exist.
+     */
+    invalidateTransformation(): void {
+      this._transformationRevision++;
+      this.invalidateHitboxes();
+      this.getRenderer().update();
+    }
+
+    /**
+     * Whether a position of the space containing this object has a place of
+     * its own inside it. A scale of 0 on X or Y collapses everything inside
+     * the object onto a line (or a point), and every position outside of it
+     * lands on that same line.
+     *
+     * Only X and Y: a position given to an object (the cursor, a touch) is a
+     * position of the plane containing it. A 3D custom object flattened by a
+     * scale of 0 on Z keeps its children where they are on that plane.
+     */
+    isTransformationInvertibleOnXAndY(): boolean {
+      return this._scaleX !== 0 && this._scaleY !== 0;
     }
 
     _updateLocalTransformation() {
@@ -535,9 +567,7 @@ namespace gdjs {
       }
       this._localTransformation.scale(absScaleX, absScaleY);
 
-      this._localInverseTransformation.copyFrom(this._localTransformation);
-      this._localInverseTransformation.invert();
-      this._isLocalTransformationDirty = false;
+      this._computedTransformationRevision = this._transformationRevision;
     }
 
     /**
@@ -556,10 +586,38 @@ namespace gdjs {
       y: float,
       destination: FloatPoint
     ) {
-      const source = destination;
-      source[0] = x;
-      source[1] = y;
-      this.getLocalInverseTransformation().transform(source, destination);
+      // The transformation of the object is `point -> M point + t`, where
+      // `M = rotation * flips * scales` and `t` is everything else (the center
+      // of rotation and the flip offsets included): `t` is where the local
+      // (0;0) lands. The rotation and the flips keep lengths, so they are
+      // always undone exactly; only a scale can collapse an axis, and the
+      // local coordinate of a collapsed axis is answered as 0 (every point of
+      // it has the same image: none of them is more the point than another).
+      const temporaryPoint = gdjs.CustomRuntimeObject._temporaryPoint;
+      temporaryPoint[0] = 0;
+      temporaryPoint[1] = 0;
+      this.getLocalTransformation().transform(temporaryPoint, temporaryPoint);
+      const deltaX = x - temporaryPoint[0];
+      const deltaY = y - temporaryPoint[1];
+
+      // The same coefficients the transformation was built with: a right
+      // angle gives exactly 0 and 1 on both ways, so a point on the edge of
+      // an object comes back exactly on it.
+      const coefficients = gdjs.CustomRuntimeObject._temporaryCoefficients;
+      gdjs.AffineTransformation.setRotationCoefficients(
+        (this.angle * Math.PI) / 180,
+        coefficients
+      );
+      const cos = coefficients[0];
+      const sin = coefficients[1];
+      const rotatedX = cos * deltaX + sin * deltaY;
+      const rotatedY = cos * deltaY - sin * deltaX;
+      const unflippedX = this._flippedX ? -rotatedX : rotatedX;
+      const unflippedY = this._flippedY ? -rotatedY : rotatedY;
+      const absScaleX = Math.abs(this._scaleX);
+      const absScaleY = Math.abs(this._scaleY);
+      destination[0] = absScaleX === 0 ? 0 : unflippedX / absScaleX;
+      destination[1] = absScaleY === 0 ? 0 : unflippedY / absScaleY;
     }
 
     override getDrawableX(): float {
@@ -740,8 +798,7 @@ namespace gdjs {
       this._customCenter[0] = x;
       this._customCenter[1] = y;
 
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
+      this.invalidateTransformation();
     }
 
     hasCustomRotationCenter(): boolean {
@@ -777,6 +834,7 @@ namespace gdjs {
       if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         this._innerArea.min[0] *= scaleX;
         this._innerArea.max[0] *= scaleX;
+        this.invalidateTransformation();
       } else {
         this.setScaleX(scaleX);
       }
@@ -791,6 +849,7 @@ namespace gdjs {
       if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         this._innerArea.min[1] *= scaleY;
         this._innerArea.max[1] *= scaleY;
+        this.invalidateTransformation();
       } else {
         this.setScaleY(scaleY);
       }
@@ -812,8 +871,7 @@ namespace gdjs {
         return;
       }
       this.x = x;
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
+      this.invalidateTransformation();
       this.getRenderer().updateX();
     }
 
@@ -822,8 +880,7 @@ namespace gdjs {
         return;
       }
       this.y = y;
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
+      this.invalidateTransformation();
       this.getRenderer().updateY();
     }
 
@@ -832,8 +889,7 @@ namespace gdjs {
         return;
       }
       this.angle = angle;
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
+      this.invalidateTransformation();
       this.getRenderer().updateAngle();
     }
 
@@ -858,9 +914,7 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.invalidateTransformation();
     }
 
     /**
@@ -880,9 +934,7 @@ namespace gdjs {
         return;
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.invalidateTransformation();
     }
 
     /**
@@ -902,8 +954,7 @@ namespace gdjs {
         return;
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.invalidateTransformation();
     }
 
     /**
@@ -974,8 +1025,7 @@ namespace gdjs {
       if (enable !== this._flippedX) {
         this._scaleX *= -1;
         this._flippedX = enable;
-        this.invalidateHitboxes();
-        this.getRenderer().update();
+        this.invalidateTransformation();
       }
     }
 
@@ -983,8 +1033,7 @@ namespace gdjs {
       if (enable !== this._flippedY) {
         this._scaleY *= -1;
         this._flippedY = enable;
-        this.invalidateHitboxes();
-        this.getRenderer().update();
+        this.invalidateTransformation();
       }
     }
 

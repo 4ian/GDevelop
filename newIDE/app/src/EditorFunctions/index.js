@@ -98,7 +98,14 @@ import {
 import {
   ensureModel3DMeasurementLoaded,
   ensureModel3DMeasurementsLoaded,
+  isModel3DObjectMeasured,
 } from './Model3DSizeInfo';
+import {
+  getAnchorOffset,
+  INSTANCE_ANCHORS_2D,
+  INSTANCE_ANCHORS_3D,
+  type InstanceAnchor,
+} from './InstanceAnchor';
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
 import {
@@ -644,21 +651,35 @@ const INSTANCE_POSITION_SEMANTICS_MESSAGE =
 // Inside a custom object, positions are local to it: without this the AI
 // would place children in scene coordinates.
 const CUSTOM_OBJECT_INSTANCE_POSITION_SEMANTICS_MESSAGE =
-  'These instances are the children of a custom object: they live in its local space, where (0;0) is the position of the custom object (they are never scene coordinates). ' +
+  'These instances are the children of a custom object: they live in its own space, where (0;0) is its origin (they are never scene coordinates). ' +
   'The default size of the custom object is its area (areaMinX to areaMaxX, areaMinY to areaMaxY, areaMinZ to areaMaxZ) when the variant defines one, otherwise the bounding box of the children. ' +
-  'The custom object turns around the CENTER of that area, so make the area symmetric (areaMin = -areaMax on an axis) for an object rotating around its own position, like a turret. ' +
+  'The custom object turns around the CENTER of that area (unless its own events set another center of rotation), so make the area symmetric (areaMin = -areaMax on an axis) for an object rotating around its own position, like a turret. ' +
+  'At runtime the custom object places its children with its whole transform (its position, its angle around that center of rotation, its scale and its flips): a position taken out of the custom object (returned by one of its functions, given to a scene action) is NOT a scene position until it is converted with all of these. ' +
   '`change_custom_object({ fit_area_to_children })` sets the area from the children for you. ' +
   'Resizing an instance of the custom object scales its children proportionally, unless `isInnerAreaFollowingParentSize` is set (children then keep their position and the area follows the parent size - the UI/layout case). ' +
   'Rotation and flipping are applied by the parent, and in 3D the z of a child is relative to the z of the parent. ' +
   'Layers are internal to the custom object (at runtime children are reported on the layer of the parent) and the z-order of children is relative inside the parent. ' +
   INSTANCE_POSITION_SEMANTICS_MESSAGE;
 
+const roundPosition = (value: number) => Math.round(value * 100) / 100;
+
+/** The size an instance really has, falling back on the one of its object. */
+const getInstanceSize = (
+  instance: gdInitialInstance,
+  objectSize: $ReadOnlyArray<number>
+): Array<number> =>
+  objectSize.map((size, axis) => {
+    if (axis === 2)
+      return instance.hasCustomDepth() ? instance.getCustomDepth() : size;
+    if (!instance.hasCustomSize()) return size;
+    return axis === 0 ? instance.getCustomWidth() : instance.getCustomHeight();
+  });
+
 const getOccupiedSpaceDescription = (
   position: $ReadOnlyArray<number>,
   size: $ReadOnlyArray<number>,
   objectSizeInfo: ObjectSizeInfo | null
 ): string => {
-  const round = (value: number) => Math.round(value * 100) / 100;
   const axes = ['X', 'Y', 'Z'];
   const originOffsets = [0, 0, 0];
   if (objectSizeInfo) {
@@ -684,9 +705,70 @@ const getOccupiedSpaceDescription = (
   return size
     .map((sizeOnAxis, i) => {
       const min = position[i] - originOffsets[i];
-      return `${axes[i]} ${round(min)} to ${round(min + sizeOnAxis)}`;
+      return `${axes[i]} ${roundPosition(min)} to ${roundPosition(
+        min + sizeOnAxis
+      )}`;
     })
     .join(', ');
+};
+
+/**
+ * The anchor a `put_2d_instances`/`put_3d_instances` call asks for, checked
+ * against the anchors of that brush and against what is known of the object:
+ * any anchor but `origin` needs its box, which an object with no size of its
+ * own or a 3D model that could not be read does not give.
+ */
+const resolveInstanceAnchor = ({
+  args,
+  allowedAnchors,
+  object,
+  objectName,
+  project,
+  objectSizeInfo,
+  size,
+}: {|
+  args: any,
+  allowedAnchors: $ReadOnlyArray<string>,
+  object: gdObject | null,
+  objectName: string | null,
+  project: gdProject,
+  objectSizeInfo: ObjectSizeInfo | null,
+  size: $ReadOnlyArray<number> | null,
+|}):
+  | {| success: true, anchor: InstanceAnchor |}
+  | {| success: false, failure: EditorFunctionGenericOutput |} => {
+  const anchorName = SafeExtractor.extractStringProperty(
+    args,
+    'brush_position_anchor'
+  );
+  if (!anchorName) return { success: true, anchor: 'origin' };
+  if (!allowedAnchors.includes(anchorName)) {
+    return {
+      success: false,
+      failure: makeGenericFailure(
+        `\`brush_position_anchor\` must be one of: ${allowedAnchors.join(
+          ', '
+        )} (got "${anchorName}").`
+      ),
+    };
+  }
+  const anchor = ((anchorName: any): InstanceAnchor);
+  if (anchor === 'origin') return { success: true, anchor };
+
+  const isModelRead = !object || isModel3DObjectMeasured(object, project);
+  if (!size || !isModelRead || !getAnchorOffset(anchor, size, objectSizeInfo)) {
+    return {
+      success: false,
+      failure: makeGenericFailure(
+        `\`brush_position_anchor: "${anchor}"\` needs the box of ${
+          objectName ? `"${objectName}"` : 'the object'
+        }, which is unknown${
+          isModelRead ? '' : ' (its 3D model could not be read)'
+        }. Give the instances a size with \`instances_size\`, or place them by their \`origin\` (the default anchor).`
+      ),
+    };
+  }
+  return { success: true, anchor };
 };
 
 // A custom object renders its child INSTANCES, not its child objects: a
@@ -4458,6 +4540,29 @@ const put2dInstances: EditorFunction = {
       const brushEndPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
         brush_end_position
       );
+      const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
+        instances_size
+      );
+      // The size the instances will have, which scales the origin and the
+      // anchor offsets of the object.
+      const effectiveSize =
+        instancesSize ||
+        (objectSizeInfo &&
+        objectSizeInfo.width !== null &&
+        objectSizeInfo.height !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height]
+          : null);
+      const anchorResolution = resolveInstanceAnchor({
+        args,
+        allowedAnchors: INSTANCE_ANCHORS_2D,
+        object: namedObject,
+        objectName: object_name,
+        project,
+        objectSizeInfo,
+        size: effectiveSize,
+      });
+      if (anchorResolution.success === false) return anchorResolution.failure;
+      const { anchor } = anchorResolution;
 
       // The `line` and `grid` brushes need an end position to spread instances.
       // Fail early (before creating any instance) so the caller retries with a
@@ -4717,9 +4822,6 @@ const put2dInstances: EditorFunction = {
         // The "none" brush keeps existing instances in place.
       }
 
-      const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
-        instances_size
-      );
       const instancesRotation = SafeExtractor.extractNumberProperty(
         args,
         'instances_rotation'
@@ -4753,6 +4855,34 @@ const put2dInstances: EditorFunction = {
         }
       });
 
+      // The brush placed the instances by their anchor: move each of them to
+      // put its origin (what its position really is) there, at the size it
+      // ended up with.
+      if (anchor !== 'origin' && isPlacementBrush && effectiveSize) {
+        modifiedAndCreatedInstances.forEach(instance => {
+          const offsets = getAnchorOffset(
+            anchor,
+            getInstanceSize(instance, effectiveSize),
+            objectSizeInfo
+          );
+          if (!offsets) return;
+          instance.setX(instance.getX() + offsets[0]);
+          instance.setY(instance.getY() + offsets[1]);
+        });
+      }
+
+      // The position the instances really hold, which the brush position only
+      // is when they are placed by their origin.
+      const anchorOffsets =
+        anchor === 'origin' || !effectiveSize
+          ? null
+          : getAnchorOffset(anchor, effectiveSize, objectSizeInfo);
+      const originBrushPosition = anchorOffsets
+        ? brushPosition.map((value, axis) =>
+            roundPosition(value + anchorOffsets[axis])
+          )
+        : brushPosition;
+
       // Track specific changes that were made
       if (newInstancesCount > 0) {
         const attrs = [];
@@ -4766,20 +4896,17 @@ const put2dInstances: EditorFunction = {
           attrs.push(instancesHidden ? 'hidden at start' : 'visible at start');
         if (instances_z_order !== null)
           attrs.push(`z-order ${instances_z_order}`);
-        const effectiveSize = instancesSize
-          ? instancesSize
-          : objectSizeInfo &&
-            objectSizeInfo.width !== null &&
-            objectSizeInfo.height !== null
-          ? [objectSizeInfo.width, objectSizeInfo.height]
-          : null;
+        if (anchor !== 'origin')
+          attrs.push(
+            `anchored by their ${anchor} on ${brushPosition.join(', ')}`
+          );
         if (
           (brush_kind === 'point' || brush_kind === 'none') &&
           effectiveSize
         ) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
-              brushPosition,
+              originBrushPosition,
               effectiveSize,
               objectSizeInfo
             )}`
@@ -4795,7 +4922,7 @@ const put2dInstances: EditorFunction = {
             createdInstanceIds.length > 1 ? 's' : ''
           }: ${createdInstanceIds.join(
             ', '
-          )}) using ${brush_kind} brush at ${brushPosition.join(
+          )}) using ${brush_kind} brush at ${originBrushPosition.join(
             ', '
           )} on ${getLayerNameForMessage(layerName)}${
             attrs.length > 0 ? ` (${attrs.join(', ')})` : ''
@@ -5388,6 +5515,30 @@ const put3dInstances: EditorFunction = {
       const brushEndPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
         brush_end_position
       );
+      const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
+        instances_size
+      );
+      // The size the instances will have, which scales the origin and the
+      // anchor offsets of the object.
+      const effectiveSize =
+        instancesSizeArray ||
+        (objectSizeInfo &&
+        objectSizeInfo.width !== null &&
+        objectSizeInfo.height !== null &&
+        objectSizeInfo.depth !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
+          : null);
+      const anchorResolution = resolveInstanceAnchor({
+        args,
+        allowedAnchors: INSTANCE_ANCHORS_3D,
+        object: namedObject,
+        objectName: object_name,
+        project,
+        objectSizeInfo,
+        size: effectiveSize,
+      });
+      if (anchorResolution.success === false) return anchorResolution.failure;
+      const { anchor } = anchorResolution;
 
       // The `line` brush needs an end position to spread instances. Fail early
       // (before creating any instance) so the caller retries with a valid
@@ -5606,9 +5757,6 @@ const put3dInstances: EditorFunction = {
         // The "none" brush keeps existing instances in place.
       }
 
-      const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
-        instances_size
-      );
       const instancesRotationArray = instances_rotation
         ? instances_rotation.split(',').map(coord => parseFloat(coord) || 0)
         : null;
@@ -5635,6 +5783,35 @@ const put3dInstances: EditorFunction = {
         }
       });
 
+      // The brush placed the instances by their anchor: move each of them to
+      // put its origin (what its position really is) there, at the size it
+      // ended up with.
+      if (anchor !== 'origin' && isPlacementBrush && effectiveSize) {
+        modifiedAndCreatedInstances.forEach(instance => {
+          const offsets = getAnchorOffset(
+            anchor,
+            getInstanceSize(instance, effectiveSize),
+            objectSizeInfo
+          );
+          if (!offsets) return;
+          instance.setX(instance.getX() + offsets[0]);
+          instance.setY(instance.getY() + offsets[1]);
+          instance.setZ(instance.getZ() + offsets[2]);
+        });
+      }
+
+      // The position the instances really hold, which the brush position only
+      // is when they are placed by their origin.
+      const anchorOffsets =
+        anchor === 'origin' || !effectiveSize
+          ? null
+          : getAnchorOffset(anchor, effectiveSize, objectSizeInfo);
+      const originBrushPosition = anchorOffsets
+        ? brushPosition.map((value, axis) =>
+            roundPosition(value + anchorOffsets[axis])
+          )
+        : brushPosition;
+
       // Track specific changes that were made
       if (newInstancesCount > 0) {
         const attrs = [];
@@ -5652,21 +5829,17 @@ const put3dInstances: EditorFunction = {
           );
         if (instancesHidden !== null)
           attrs.push(instancesHidden ? 'hidden at start' : 'visible at start');
-        const effectiveSize = instancesSizeArray
-          ? instancesSizeArray
-          : objectSizeInfo &&
-            objectSizeInfo.width !== null &&
-            objectSizeInfo.height !== null &&
-            objectSizeInfo.depth !== null
-          ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
-          : null;
+        if (anchor !== 'origin')
+          attrs.push(
+            `anchored by their ${anchor} on ${brushPosition.join(', ')}`
+          );
         if (
           (brush_kind === 'point' || brush_kind === 'none') &&
           effectiveSize
         ) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
-              brushPosition,
+              originBrushPosition,
               effectiveSize,
               objectSizeInfo
             )}`
@@ -5682,7 +5855,7 @@ const put3dInstances: EditorFunction = {
             createdInstanceIds.length > 1 ? 's' : ''
           }: ${createdInstanceIds.join(
             ', '
-          )}) using ${brush_kind} brush at ${brushPosition.join(
+          )}) using ${brush_kind} brush at ${originBrushPosition.join(
             ', '
           )} on ${getLayerNameForMessage(layerName)}${
             attrs.length > 0 ? ` (${attrs.join(', ')})` : ''

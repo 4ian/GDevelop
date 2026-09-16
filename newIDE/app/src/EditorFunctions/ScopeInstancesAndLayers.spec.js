@@ -269,9 +269,7 @@ describe('scoped instances, layers and groups', () => {
       expect(describeResult.instancesForScopeLabel).toBe(
         'custom object "UI::Dialog" (default variant)'
       );
-      expect(describeResult.positionSemantics).toContain(
-        '(0;0) is the position of the custom object'
-      );
+      expect(describeResult.positionSemantics).toContain('(0;0) is its origin');
       expect((describeResult.instances || []).map(({ name }) => name)).toEqual([
         'Back',
       ]);

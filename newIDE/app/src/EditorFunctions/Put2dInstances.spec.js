@@ -498,6 +498,9 @@ describe('put_2d_instances (brush_position_anchor)', () => {
     panel.setAreaMaxY(40);
     testScene = project.insertNewLayout('TestScene', 0);
     testScene.getObjects().insertNewObject(project, 'UI::Panel', 'Panel', 0);
+    testScene
+      .getObjects()
+      .insertNewObject(project, 'TextObject::Text', 'Title', 1);
   });
 
   afterEach(() => {
@@ -559,6 +562,34 @@ describe('put_2d_instances (brush_position_anchor)', () => {
 
     expect(result.success).toBe(true);
     expect(getPlacedPosition()).toEqual([50, 0]);
+  });
+
+  it('refuses an anchor on an object with no size of its own, until the instances get one', async () => {
+    // A text is as big as what it displays: nothing knows its box here.
+    const refused = await putInstances({
+      object_name: 'Title',
+      brush_position: '100,100',
+      brush_position_anchor: 'center',
+    });
+
+    expect(refused.success).toBe(false);
+    expect(refused.message).toEqual(
+      expect.stringContaining(
+        '`brush_position_anchor: "center"` needs the box of "Title", which is unknown. Give the instances a size with `instances_size`'
+      )
+    );
+
+    const sized = await putInstances({
+      object_name: 'Title',
+      brush_position: '100,100',
+      brush_position_anchor: 'center',
+      instances_size: '200,40',
+    });
+
+    expect(sized.success).toBe(true);
+    // A text is positioned by the corner of its box: centering it moves it by
+    // half the size given to its instances.
+    expect(getPlacedPosition()).toEqual([0, 80]);
   });
 
   it('refuses the anchors of 3D objects', async () => {

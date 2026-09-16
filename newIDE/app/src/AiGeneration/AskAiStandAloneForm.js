@@ -118,9 +118,11 @@ export const AskAiStandAloneForm = ({
     async ({
       name,
       exampleSlug,
+      starterThemeId,
     }: {|
       name: string,
       exampleSlug: string | null,
+      starterThemeId?: string | null,
     |}) => {
       const newProjectSetup: NewProjectSetup = {
         projectName: name,
@@ -130,6 +132,7 @@ export const AskAiStandAloneForm = ({
         // ensure the Ask AI editor is opened once the project is created.
         forceOpenAskAiEditor: true,
         creationSource: 'ai-agent-request',
+        starterThemeId,
       };
 
       if (exampleSlug) {
@@ -138,12 +141,15 @@ export const AskAiStandAloneForm = ({
           header => header.slug === exampleSlug
         );
         if (exampleShortHeader) {
-          const { createdProject } = await onCreateProjectFromExample({
+          const {
+            createdProject,
+            appliedThemeId,
+          } = await onCreateProjectFromExample({
             exampleShortHeader,
             newProjectSetup,
             i18n,
           });
-          return { exampleSlug, createdProject };
+          return { exampleSlug, createdProject, appliedThemeId };
         }
 
         // The example was not found - still create an empty project.
@@ -151,7 +157,7 @@ export const AskAiStandAloneForm = ({
 
       const { createdProject } = await onCreateEmptyProject(newProjectSetup);
 
-      return { exampleSlug: null, createdProject };
+      return { exampleSlug: null, createdProject, appliedThemeId: null };
     },
     [onCreateProjectFromExample, onCreateEmptyProject, i18n]
   );

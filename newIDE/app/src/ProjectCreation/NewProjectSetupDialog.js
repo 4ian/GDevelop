@@ -103,6 +103,9 @@ export type NewProjectSetup = {|
   openQuickCustomizationDialog?: boolean,
   forceOpenAskAiEditor?: boolean,
   creationSource: NewProjectCreationSource,
+  // Re-skin the starter with this theme while it is created, so the project
+  // opens with its themed assets and never shows the placeholder art.
+  starterThemeId?: ?string,
 |};
 
 export type ExampleProjectSetup = {|

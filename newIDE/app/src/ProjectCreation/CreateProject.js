@@ -9,6 +9,7 @@ import {
   type NewProjectCreationSource,
 } from './NewProjectSetupDialog';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
+import { getStarterThemeTransform } from './StarterTheme';
 const gd: libGDevelop = global.gd;
 
 // Metadata for the `new_game_creation` analytics event. The event itself is sent
@@ -26,6 +27,9 @@ export type NewProjectSource = {|
   fileMetadata: ?FileMetadata,
   templateSlug?: ?string,
   analyticsMetadata: NewProjectAnalyticsMetadata,
+  // Applied to the downloaded template before it is loaded.
+  transformContent?: ?(content: Object) => void,
+  starterThemeId?: ?string,
 |};
 
 const getNewProjectSourceFromUrl = (
@@ -162,9 +166,12 @@ export const createNewProjectFromExampleShortHeader = async ({
   newProjectSetup,
 }: ExampleProjectSetup): Promise<?NewProjectSource> => {
   try {
-    const example = await retryIfFailed({ times: 3 }, () =>
-      getExample(exampleShortHeader)
-    );
+    const starterThemeId = newProjectSetup.starterThemeId;
+    // Fetched alongside the example so theming costs no extra waiting time.
+    const [example, starterThemeTransform] = await Promise.all([
+      retryIfFailed({ times: 3 }, () => getExample(exampleShortHeader)),
+      getStarterThemeTransform(starterThemeId),
+    ]);
     const creationSource = newProjectSetup.creationSource;
 
     const newProjectSource = getNewProjectSourceFromUrl(
@@ -180,6 +187,10 @@ export const createNewProjectFromExampleShortHeader = async ({
       }
     );
     newProjectSource.templateSlug = exampleShortHeader.slug;
+    if (starterThemeTransform) {
+      newProjectSource.transformContent = starterThemeTransform;
+      newProjectSource.starterThemeId = starterThemeId;
+    }
     return newProjectSource;
   } catch (error) {
     showErrorBox({

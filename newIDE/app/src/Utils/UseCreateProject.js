@@ -42,6 +42,9 @@ import { TutorialContext } from '../Tutorial/TutorialContext';
 
 export type CreateProjectResult = {|
   createdProject: gdProject | null,
+  // The theme the starter assets were replaced with, when one was requested
+  // and could be applied.
+  appliedThemeId?: string | null,
 |};
 
 type Props = {|
@@ -73,6 +76,7 @@ type Props = {|
       openingMessage?: ?MessageDescriptor,
       ignoreAutoSave?: boolean,
       doNotTrackAsProjectOpened?: boolean,
+      transformContent?: ?(content: Object) => void,
     |}
   ) => Promise<?State>,
   onProjectSaved: (fileMetadata: ?FileMetadata) => void,
@@ -183,6 +187,7 @@ const useCreateProject = ({
             // project is based on - it must not be reported as the user
             // re-opening an existing project.
             doNotTrackAsProjectOpened: true,
+            transformContent: newProjectSource.transformContent,
           });
         }
 
@@ -334,7 +339,12 @@ const useCreateProject = ({
           },
         });
 
-        return { createdProject: currentProject };
+        return {
+          createdProject: currentProject,
+          appliedThemeId: newProjectSource.transformContent
+            ? newProjectSource.starterThemeId
+            : null,
+        };
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();
         const errorMessage = getWriteErrorMessage

@@ -492,6 +492,88 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
     });
 
+    describe('toParent / fromParent', function () {
+      /**
+       * A custom object placed, turned, scaled and flipped: every part of its
+       * transformation is in play in the conversions below.
+       */
+      const makeTransformedCustomObject = async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setPosition(16, 8);
+        customObject.setAngle(30);
+        customObject.setScaleX(2);
+        customObject.setScaleY(3);
+        customObject.flipX(true);
+        customObject.setRotationCenter(7, 11);
+        return customObject;
+      };
+
+      it('puts a point of the inside where the object puts its children', async () => {
+        const customObject = await makeTransformedCustomObject();
+        /** @type {FloatPoint} */
+        const point = [0, 0];
+        customObject.applyObjectTransformation(10, 20, point);
+
+        expect(customObject.toParentX(10, 20)).to.be(point[0]);
+        expect(customObject.toParentY(10, 20)).to.be(point[1]);
+      });
+
+      it('brings a point of the containing space back inside', async () => {
+        const customObject = await makeTransformedCustomObject();
+        const parentX = customObject.toParentX(10, 20);
+        const parentY = customObject.toParentY(10, 20);
+
+        expect(customObject.fromParentX(parentX, parentY)).to.be.within(
+          10 - 1e-3,
+          10 + 1e-3
+        );
+        expect(customObject.fromParentY(parentX, parentY)).to.be.within(
+          20 - 1e-3,
+          20 + 1e-3
+        );
+      });
+
+      it('crosses one boundary at a time', async () => {
+        const customObject = await makeTransformedCustomObject();
+        // The conversion is the transformation of THIS object only: the point
+        // it gives is in the space containing it, which is the scene here.
+        /** @type {FloatPoint} */
+        const point = [0, 0];
+        customObject.applyObjectTransformation(0, 0, point);
+        expect(customObject.toParentX(0, 0)).to.be(point[0]);
+        expect(customObject.toParentY(0, 0)).to.be(point[1]);
+      });
+
+      it('answers a collapsed object with the closest point it can reach', async () => {
+        const customObject = await makeTransformedCustomObject();
+        customObject.setScaleX(0);
+
+        const parentX = customObject.toParentX(10, 20);
+        const parentY = customObject.toParentY(10, 20);
+        // X collapsed: every point of that axis has the same image, and 0
+        // answers for all of them. Y is untouched.
+        expect(customObject.fromParentX(parentX, parentY)).to.be(0);
+        expect(customObject.fromParentY(parentX, parentY)).to.be.within(
+          20 - 1e-3,
+          20 + 1e-3
+        );
+      });
+
+      it('follows a change made just before it, with nothing rendered in between', async () => {
+        const customObject = await makeTransformedCustomObject();
+        const before = customObject.toParentX(10, 20);
+
+        customObject.setX(customObject.getX() + 100);
+
+        // The transformation is stored in a Float32Array: compared with a
+        // tolerance, never bit for bit.
+        expect(customObject.toParentX(10, 20)).to.be.within(
+          before + 100 - 1e-3,
+          before + 100 + 1e-3
+        );
+      });
+    });
+
     describe('a collapsed object (a scale of 0)', function () {
       it('answers the closest point it can reach, never NaN', async () => {
         const { customObject } = await makeCustomObjectWith2Children();

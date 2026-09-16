@@ -10,7 +10,9 @@ namespace gdjs {
    * @see gdjs.CustomRuntimeObject
    * @category Core Engine > Instance Container
    */
-  export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstanceContainer {
+  export class CustomRuntimeObjectInstanceContainer
+    extends gdjs.RuntimeInstanceContainer
+  {
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _runtimeScene: gdjs.RuntimeScene;
     /** The parent container that contains the object associated with this container. */
@@ -429,6 +431,21 @@ namespace gdjs {
       position = this._parent
         .getLayer(this._customObject.getLayer())
         .convertCoords(x, y, 0, position);
+      if (!Number.isFinite(position[0]) || !Number.isFinite(position[1])) {
+        // A custom object containing this one has already answered that no
+        // position of it is inside: nothing of this one is either, and
+        // converting it again would only turn it into NaN.
+        return position;
+      }
+      if (!this._customObject.isTransformationInvertibleOnXAndY()) {
+        // A scale of 0 collapsed the object: every position outside of it maps
+        // onto the same line (or point) inside it, which would put every child
+        // under the cursor at once. Nothing of a collapsed object is under any
+        // position: answered as a position no child can contain.
+        position[0] = Number.POSITIVE_INFINITY;
+        position[1] = Number.POSITIVE_INFINITY;
+        return position;
+      }
       this._customObject.applyObjectInverseTransformation(
         position[0],
         position[1],

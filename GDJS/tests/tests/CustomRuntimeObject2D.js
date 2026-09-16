@@ -406,6 +406,178 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
     });
 
+    describe('transformation freshness', function () {
+      /** The point the object puts its local (x ; y) at, as it is now. */
+      const convert = (customObject, x, y) => {
+        /** @type {FloatPoint} */
+        const point = [0, 0];
+        customObject.applyObjectTransformation(x, y, point);
+        return point;
+      };
+
+      /** The same point, from a transformation recomputed on the spot. */
+      const convertAfterRecomputing = (customObject, x, y) => {
+        customObject._updateLocalTransformation();
+        return convert(customObject, x, y);
+      };
+
+      /**
+       * Every mutator must leave the transformation of the object to
+       * recompute: a value read before it (the cache is warmed here, as a
+       * frame being rendered would) must never survive the change.
+       */
+      const expectFreshAfter = async (changeCustomObject) => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setPosition(16, 8);
+        customObject.setAngle(90);
+        // Warm the cached transformation, like a read or a rendered frame.
+        convert(customObject, 10, 20);
+
+        changeCustomObject(customObject);
+
+        expect(convert(customObject, 10, 20)).to.eql(
+          convertAfterRecomputing(customObject, 10, 20)
+        );
+      };
+
+      it('is fresh after the scale changed', async () => {
+        await expectFreshAfter((customObject) => customObject.setScaleX(3));
+        await expectFreshAfter((customObject) => customObject.setScaleY(2));
+        await expectFreshAfter((customObject) => customObject.setScale(4));
+      });
+
+      it('is fresh after a flip', async () => {
+        await expectFreshAfter((customObject) => customObject.flipX(true));
+        await expectFreshAfter((customObject) => customObject.flipY(true));
+      });
+
+      it('is fresh after the center of rotation changed', async () => {
+        await expectFreshAfter((customObject) =>
+          customObject.setRotationCenter(0, 0)
+        );
+      });
+
+      it('is fresh after the children moved', async () => {
+        const { customObject, leftSprite } =
+          await makeCustomObjectWith2Children();
+        customObject.setAngle(90);
+        convert(customObject, 10, 20);
+
+        // The object has no fixed area here: its children are its bounds, so
+        // moving one of them moves its center of rotation.
+        leftSprite.setPosition(-100, -50);
+
+        expect(convert(customObject, 10, 20)).to.eql(
+          convertAfterRecomputing(customObject, 10, 20)
+        );
+      });
+
+      it('is what the renderer draws', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setPosition(16, 8);
+        customObject.setAngle(30);
+        customObject.setScaleX(2);
+        customObject.setScaleY(3);
+        customObject.flipX(true);
+        customObject.setRotationCenter(7, 11);
+
+        customObject.getRenderer().ensureUpToDate();
+        const container = customObject.getRendererObject();
+        container.transform.updateLocalTransform();
+        const drawn = container.localTransform.apply({ x: 10, y: 20 });
+
+        const converted = convert(customObject, 10, 20);
+        expect(converted[0]).to.be.within(drawn.x - 1e-3, drawn.x + 1e-3);
+        expect(converted[1]).to.be.within(drawn.y - 1e-3, drawn.y + 1e-3);
+      });
+    });
+
+    describe('a collapsed object (a scale of 0)', function () {
+      it('answers the closest point it can reach, never NaN', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setPosition(16, 8);
+        customObject.setScaleX(0);
+
+        /** @type {FloatPoint} */
+        const point = [0, 0];
+        customObject.applyObjectInverseTransformation(100, 40, point);
+
+        expect(Number.isFinite(point[0])).to.be(true);
+        expect(Number.isFinite(point[1])).to.be(true);
+        // Nothing of the object is on X anymore: 0 answers for every point of
+        // the collapsed axis. Y is untouched and still exact.
+        expect(point[0]).to.be(0);
+        /** @type {FloatPoint} */
+        const inverseOfTheOrigin = [0, 0];
+        customObject.applyObjectInverseTransformation(
+          16,
+          8,
+          inverseOfTheOrigin
+        );
+        expect(inverseOfTheOrigin[1]).to.be(0);
+      });
+
+      it('brings a point back exactly where it was at a right angle', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setPosition(100, 100);
+        customObject.setRotationCenter(0, 0);
+        customObject.setAngle(90);
+
+        /** @type {FloatPoint} */
+        const point = [0, 0];
+        customObject.applyObjectTransformation(0, 32, point);
+        /** @type {FloatPoint} */
+        const back = [0, 0];
+        customObject.applyObjectInverseTransformation(point[0], point[1], back);
+
+        // Exactly, not nearly: a point on the edge of a child would otherwise
+        // come back a fraction of a pixel outside of it, and the cursor would
+        // miss it.
+        expect(back[0]).to.be(0);
+        expect(back[1]).to.be(32);
+      });
+
+      it('answers a position that is nowhere with one that is nowhere, never NaN', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        const instanceContainer = customObject._instanceContainer;
+        customObject.setPosition(16, 8);
+        customObject.setAngle(90);
+
+        // What a collapsed custom object containing this one answers for the
+        // cursor: nothing of it is under any position, so nothing of this one
+        // is either. The layer between the two may give it another value that
+        // is not a position (the camera turns an infinity into a NaN): what
+        // matters is that no child is under it, and that the object does not
+        // make one up.
+        const converted = instanceContainer.convertCoords(
+          Number.POSITIVE_INFINITY,
+          Number.POSITIVE_INFINITY,
+          workingPoint
+        );
+
+        expect(Number.isFinite(converted[0])).to.be(false);
+        expect(Number.isFinite(converted[1])).to.be(false);
+      });
+
+      it('keeps its children out of reach of the cursor', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        const instanceContainer = customObject._instanceContainer;
+        customObject.setPosition(16, 8);
+
+        expect(instanceContainer.convertCoords(16, 8, workingPoint)).to.eql([
+          0, 0,
+        ]);
+
+        customObject.setScaleY(0);
+
+        // Every position of the scene would otherwise land on the same line
+        // inside the object, putting all of its children under the cursor.
+        const converted = instanceContainer.convertCoords(16, 8, workingPoint);
+        expect(converted[0]).to.be(Number.POSITIVE_INFINITY);
+        expect(converted[1]).to.be(Number.POSITIVE_INFINITY);
+      });
+    });
+
     describe('convertInverseCoords', function () {
       it('can transform a point to the scene', async () => {
         const { customObject } = await makeCustomObjectWith2Children();

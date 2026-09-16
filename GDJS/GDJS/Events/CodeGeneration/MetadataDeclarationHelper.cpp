@@ -1399,6 +1399,63 @@ void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
         .MarkAsAdvanced()
         .SetPrivate()
         .SetFunctionName("setRotationCenter");
+
+    // Crossing the boundary of the object, one object at a time: the children
+    // of a custom object have their own coordinates, which mean nothing
+    // outside of it. 3D objects have none of these until the transformation
+    // of the engine is read from the object itself: the one used here ignores
+    // the rotations around X and Y.
+    objectMetadata
+        .AddExpression(
+            "ToParentX",
+            _("X of a point of the inside, outside"),
+            _("the X position, in the space containing this object, of a "
+              "point given inside it (where its children are positioned)"),
+            _("Position ❯ Coordinates"),
+            "res/actions/position_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X position, inside this object"))
+        .AddParameter("number", _("Y position, inside this object"))
+        .SetFunctionName("toParentX");
+
+    objectMetadata
+        .AddExpression(
+            "ToParentY",
+            _("Y of a point of the inside, outside"),
+            _("the Y position, in the space containing this object, of a "
+              "point given inside it (where its children are positioned)"),
+            _("Position ❯ Coordinates"),
+            "res/actions/position_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X position, inside this object"))
+        .AddParameter("number", _("Y position, inside this object"))
+        .SetFunctionName("toParentY");
+
+    objectMetadata
+        .AddExpression(
+            "FromParentX",
+            _("X of a point of the outside, inside"),
+            _("the X position, inside this object (where its children are "
+              "positioned), of a point given in the space containing it"),
+            _("Position ❯ Coordinates"),
+            "res/actions/position_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X position, in the space containing this object"))
+        .AddParameter("number", _("Y position, in the space containing this object"))
+        .SetFunctionName("fromParentX");
+
+    objectMetadata
+        .AddExpression(
+            "FromParentY",
+            _("Y of a point of the outside, inside"),
+            _("the Y position, inside this object (where its children are "
+              "positioned), of a point given in the space containing it"),
+            _("Position ❯ Coordinates"),
+            "res/actions/position_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X position, in the space containing this object"))
+        .AddParameter("number", _("Y position, in the space containing this object"))
+        .SetFunctionName("fromParentY");
   }
 }
 

@@ -571,6 +571,54 @@ namespace gdjs {
     }
 
     /**
+     * The X of a point of the inside of this object (the space its children
+     * live in), in the space containing this object - the scene when this
+     * object is in one, the custom object holding it otherwise. The boundary
+     * of one object is crossed: to reach the scene from a child of a child,
+     * convert again with the object containing this one.
+     *
+     * @param x The X position of the point, inside this object.
+     * @param y The Y position of the point, inside this object.
+     */
+    toParentX(x: float, y: float): float {
+      const point = gdjs.CustomRuntimeObject._temporaryPoint;
+      this.applyObjectTransformation(x, y, point);
+      return point[0];
+    }
+
+    /** The Y of {@link gdjs.CustomRuntimeObject.toParentX}. */
+    toParentY(x: float, y: float): float {
+      const point = gdjs.CustomRuntimeObject._temporaryPoint;
+      this.applyObjectTransformation(x, y, point);
+      return point[1];
+    }
+
+    /**
+     * The X of a point of the space containing this object, inside this object
+     * (the space its children live in): the other way round of
+     * {@link gdjs.CustomRuntimeObject.toParentX}.
+     *
+     * A scale of 0 collapsed the object: the point is then the closest one it
+     * can reach, with 0 on every collapsed axis (see
+     * {@link gdjs.CustomRuntimeObject.applyObjectInverseTransformation}).
+     *
+     * @param x The X position of the point, in the space containing this object.
+     * @param y The Y position of the point, in the space containing this object.
+     */
+    fromParentX(x: float, y: float): float {
+      const point = gdjs.CustomRuntimeObject._temporaryPoint;
+      this.applyObjectInverseTransformation(x, y, point);
+      return point[0];
+    }
+
+    /** The Y of {@link gdjs.CustomRuntimeObject.fromParentX}. */
+    fromParentY(x: float, y: float): float {
+      const point = gdjs.CustomRuntimeObject._temporaryPoint;
+      this.applyObjectInverseTransformation(x, y, point);
+      return point[1];
+    }
+
+    /**
      * Return an array containing the coordinates of the point passed as parameter
      * in object local coordinates (as opposed to the parent coordinate coordinates).
      *

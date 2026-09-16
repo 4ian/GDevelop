@@ -1211,7 +1211,18 @@ describe('MetadataDeclarationHelper', () => {
       objectMetadata.getAllExpressions().keys().toJSArray()
     ).toContainAll([
       // Deprecated
-      'ScaleX', 'ScaleY', 'Opacity']);
+      'ScaleX',
+      'ScaleY',
+      'Opacity',
+      // Crossing the boundary of the object, with a point of its own plane.
+      'ToParentX',
+      'ToParentY',
+      'FromParentX',
+      'FromParentY',
+    ]);
+    const toParentX = objectMetadata.getAllExpressions().get('ToParentX');
+    // The object, then the X and the Y of the point.
+    expect(toParentX.getParametersCount()).toBe(3);
 
     expectArray(
       objectMetadata.getAllStrExpressions().keys().toJSArray()

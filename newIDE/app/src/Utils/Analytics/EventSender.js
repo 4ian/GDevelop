@@ -145,7 +145,7 @@ const getAppMetadata = () => ({
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
   if (isDev) {
     // Uncomment to inspect analytics in development.
-    // console.log(`Should have sent analytics event "${name}"`, metadata);
+    console.log(`Should have sent analytics event "${name}"`, metadata);
     return;
   }
 
@@ -514,6 +514,32 @@ export const sendHelpSearch = (searchText: string) => {
   recordEvent('help_search', {
     searchText,
   });
+};
+
+export const sendAssetStoreHomeClicked = () => {
+  recordEvent('asset_store_home_clicked');
+};
+
+export const sendAssetStoreCategorySelected = (options: {|
+  categoryName: string,
+  categoryKind: 'shop-category' | 'tag' | 'folder',
+|}) => {
+  recordEvent('asset_store_category_selected', options);
+};
+
+export type AppliedAssetStoreFilter = {|
+  name: string,
+  values: Array<string>,
+|};
+
+export const sendAssetStoreSearch = (options: {|
+  searchText: string,
+  resultsCount: number,
+  searchLocation: 'home' | 'category' | 'search-results',
+  categoryName: string | null,
+  appliedFilters: Array<AppliedAssetStoreFilter>,
+|}) => {
+  recordEvent('asset_store_search', options);
 };
 
 export const sendErrorMessage = (
@@ -913,6 +939,18 @@ export const sendPlaySectionOpened = () => {
   }
 
   recordEvent('play-section-opened');
+};
+
+const canSendStoreSectionOpened = makeCanSendEvent({
+  minimumTimeBetweenEvents: 1000 * 60 * 60 * 2, // Only once every 2 hours.
+});
+
+export const sendStoreSectionOpened = () => {
+  if (!canSendStoreSectionOpened('store-section-opened')) {
+    return;
+  }
+
+  recordEvent('store-section-opened');
 };
 
 export const sendAiRequestStarted = (metadata: {|

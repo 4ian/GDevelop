@@ -339,6 +339,8 @@ namespace gdjs {
     polygonOrigin: string;
     polygon: gdjs.Polygon | null;
     density: float;
+    /** Mass in kilograms, or 0 to compute the mass from the density and the shape. */
+    massOverride: float;
     friction: float;
     restitution: float;
     linearDamping: float;
@@ -409,6 +411,7 @@ namespace gdjs {
           ? Physics2RuntimeBehavior.getPolygon(behaviorData.vertices)
           : null;
       this.density = behaviorData.density;
+      this.massOverride = behaviorData.massOverride || 0;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
       this.linearDamping = Math.max(0, behaviorData.linearDamping);
@@ -475,6 +478,9 @@ namespace gdjs {
       }
       if (behaviorData.density !== undefined) {
         this.setDensity(behaviorData.density);
+      }
+      if (behaviorData.massOverride !== undefined) {
+        this.setMassOverride(behaviorData.massOverride);
       }
       if (behaviorData.friction !== undefined) {
         this.setFriction(behaviorData.friction);
@@ -878,6 +884,7 @@ namespace gdjs {
       // Destroy the old shape
       body.DestroyFixture(body.GetFixtureList());
       body.CreateFixture(this.createShape());
+      this._applyMassOverride();
 
       // Update cached size
       this._objectOldWidth = this.owner.getWidth();
@@ -943,6 +950,7 @@ namespace gdjs {
       this._body = this._sharedData.world.CreateBody(bodyDef);
       this._body.CreateFixture(this.createShape());
       this._body.gdjsAssociatedBehavior = this;
+      this._applyMassOverride();
 
       // Update cached size
       this._objectOldWidth = this.owner.getWidth();
@@ -1120,6 +1128,7 @@ namespace gdjs {
 
       // Update body type
       body.SetType(Box2D.b2_dynamicBody);
+      this._applyMassOverride();
       body.SetAwake(true);
     }
 
@@ -1205,6 +1214,7 @@ namespace gdjs {
       }
       const body = this._body!;
       body.SetFixedRotation(this.fixedRotation);
+      this._applyMassOverride();
     }
 
     isSleepingAllowed(): boolean {
@@ -1258,6 +1268,76 @@ namespace gdjs {
       // Update the body density
       body.GetFixtureList().SetDensity(this.density);
       body.ResetMassData();
+      this._applyMassOverride();
+    }
+
+    getMassOverride(): float {
+      return this.massOverride;
+    }
+
+    /**
+     * Set the mass of the body (in kilograms), ignoring its density and shape.
+     * @param mass The mass in kilograms, or 0 to compute the mass from the density and the shape.
+     */
+    setMassOverride(mass: float): void {
+      // Non-negative values only
+      if (!(mass > 0)) {
+        mass = 0;
+      }
+
+      // Check if there is no modification
+      if (this.massOverride === mass) {
+        return;
+      }
+
+      // Change mass override
+      this.massOverride = mass;
+
+      // If there is no body, set a new one
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      // Recompute the mass from the density and apply the override if any.
+      body.ResetMassData();
+      this._applyMassOverride();
+    }
+
+    /**
+     * Override the mass computed by Box2D from the fixture density
+     * with `massOverride` (when greater than 0).
+     * The rotational inertia is scaled to match the new mass,
+     * and the center of mass is kept.
+     */
+    private _applyMassOverride(): void {
+      if (!(this.massOverride > 0) || this._body === null) {
+        return;
+      }
+      const body = this._body;
+      // Only dynamic bodies have a mass.
+      if (body.GetType() !== Box2D.b2_dynamicBody) {
+        return;
+      }
+      const fixture = body.GetFixtureList();
+      if (!fixture) {
+        return;
+      }
+
+      // Compute the mass properties of the shape for a density of 1
+      // (the actual density may be 0, which would give a null inertia).
+      const massData = new Box2D.b2MassData();
+      fixture.GetShape().ComputeMass(massData, 1);
+      const unitMass = massData.get_mass();
+      if (unitMass > 0) {
+        massData.set_I((massData.get_I() * this.massOverride) / unitMass);
+      } else {
+        // Shapes without area (edges) have no rotational inertia.
+        massData.set_I(0);
+      }
+      massData.set_mass(this.massOverride);
+      body.SetMassData(massData);
+      Box2D.destroy(massData);
     }
 
     getFriction(): float {

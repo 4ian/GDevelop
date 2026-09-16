@@ -493,6 +493,9 @@ namespace gdjs {
       if (behaviorData.density !== undefined) {
         this.setDensity(behaviorData.density);
       }
+      if (behaviorData.massOverride !== undefined) {
+        this.setMassOverride(behaviorData.massOverride);
+      }
       if (behaviorData.friction !== undefined) {
         this.setFriction(behaviorData.friction);
       }

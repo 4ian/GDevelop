@@ -622,6 +622,13 @@ namespace gdjs {
       }
     }
 
+    remove(object: gdjs.RuntimeObject) {
+      const index = this._selectedObjects.indexOf(object);
+      if (index >= 0) {
+        this._selectedObjects.splice(index, 1);
+      }
+    }
+
     clear() {
       this._selectedObjects = [];
     }
@@ -2076,14 +2083,16 @@ namespace gdjs {
       const inputManager = this._runtimeGame.getInputManager();
 
       if (shouldDeleteSelection(inputManager)) {
-        const removedObjects = this._selection.getSelectedObjects();
-        removedObjects.forEach((object) => {
-          object.deleteFromScene();
-        });
-        this._selection.clear();
-        this._sendSelectionUpdate({
-          removedObjects,
-        });
+        const removedObjects = this._getDeletableSelectedObjects();
+        if (removedObjects.length > 0) {
+          removedObjects.forEach((object) => {
+            object.deleteFromScene();
+            this._selection.remove(object);
+          });
+          this._sendSelectionUpdate({
+            removedObjects,
+          });
+        }
       }
 
       if (inputManager.wasKeyJustPressed(ESC_KEY)) {
@@ -3430,15 +3439,22 @@ namespace gdjs {
       this._addInstances(instances);
     }
 
+    private _getDeletableSelectedObjects(): Array<gdjs.RuntimeObject> {
+      return this._selection
+        .getSelectedObjects()
+        .filter((object) => !this.isInstanceLocked(object));
+    }
+
     deleteSelection() {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
-      this._removeInstances(this._selection.getSelectedObjects());
-      for (const object of this._selection.getSelectedObjects()) {
+      const removedObjects = this._getDeletableSelectedObjects();
+      this._removeInstances(removedObjects);
+      for (const object of removedObjects) {
         object.deleteFromScene();
+        this._selection.remove(object);
       }
-      this._selection.clear();
     }
 
     private _getClosestIntersectionUnderCursor(

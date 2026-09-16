@@ -46,10 +46,7 @@ import { EducationCard } from '../LearnSection/EducationCard';
 import UserSVG from '../../../../UI/CustomSvgIcons/User';
 import { copyTextToClipboard } from '../../../../Utils/Clipboard';
 import ManageEducationAccountDialog from './ManageEducationAccountDialog';
-import AdvancedStudentOptionsDialog from './AdvancedStudentOptionsDialog';
-import TeamAvailableSeats from './TeamAvailableSeats';
-import IconButton from '../../../../UI/IconButton';
-import Settings from '../../../../UI/CustomSvgIcons/Settings';
+import StudentsAiToggle from './StudentsAiToggle';
 
 const PADDING = 16;
 
@@ -114,10 +111,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     const [
       manageSeatsDialogOpen,
       setManageSeatsDialogOpen,
-    ] = React.useState<boolean>(false);
-    const [
-      advancedStudentOptionsDialogOpen,
-      setAdvancedStudentOptionsDialogOpen,
     ] = React.useState<boolean>(false);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
@@ -302,24 +295,15 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           expand
           justifyContent="space-between"
         >
-          <TeamAvailableSeats />
-          <LineStackLayout noMargin alignItems="center">
-            <RaisedButton
-              primary
-              label={
-                isMobile ? <Trans>Manage</Trans> : <Trans>Manage seats</Trans>
-              }
-              icon={<UserSVG fontSize="small" />}
-              onClick={() => setManageSeatsDialogOpen(true)}
-            />
-            <IconButton
-              size="small"
-              tooltip={t`Advanced student options`}
-              onClick={() => setAdvancedStudentOptionsDialogOpen(true)}
-            >
-              <Settings />
-            </IconButton>
-          </LineStackLayout>
+          <StudentsAiToggle />
+          <RaisedButton
+            primary
+            label={
+              isMobile ? <Trans>Manage</Trans> : <Trans>Manage seats</Trans>
+            }
+            icon={<UserSVG fontSize="small" />}
+            onClick={() => setManageSeatsDialogOpen(true)}
+          />
         </LineStackLayout>
       </div>
     );
@@ -554,11 +538,6 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         {manageSeatsDialogOpen && (
           <ManageEducationAccountDialog
             onClose={() => setManageSeatsDialogOpen(false)}
-          />
-        )}
-        {advancedStudentOptionsDialogOpen && (
-          <AdvancedStudentOptionsDialog
-            onClose={() => setAdvancedStudentOptionsDialogOpen(false)}
           />
         )}
       </>

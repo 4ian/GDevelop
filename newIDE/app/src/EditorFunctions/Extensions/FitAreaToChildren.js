@@ -364,13 +364,14 @@ const fitVariantAreaToChildren = (
       .join(';');
   const area = `${formatPoint(areaMin)} to ${formatPoint(areaMax)}`;
   const zeroPoint = formatPoint([0, 0, 0]);
-  // The custom object turns around the center of its area, wherever its own
-  // position is: said with the area, the one moment the agent can act on it.
+  // The custom object turns around the center of its area (unless its own
+  // events move that center at runtime): said with the area, the one moment
+  // the agent can act on it.
   const areaCenter = areaMin.map((min, axis) => (min + areaMax[axis]) / 2);
   const rotationCenter =
     mode === 'centered_on_origin'
-      ? `Its center of rotation is now its own position (${zeroPoint}).`
-      : `It turns around the center of that area, ${formatPoint(
+      ? `Its center of rotation, the center of that area unless its events set another one, is now its own position (${zeroPoint}).`
+      : `Its center of rotation, the center of that area unless its events set another one, is at ${formatPoint(
           areaCenter
         )} from its own position (\`centered_on_origin\` puts the two together).`;
 

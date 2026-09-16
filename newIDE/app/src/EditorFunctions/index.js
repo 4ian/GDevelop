@@ -651,9 +651,10 @@ const INSTANCE_POSITION_SEMANTICS_MESSAGE =
 // Inside a custom object, positions are local to it: without this the AI
 // would place children in scene coordinates.
 const CUSTOM_OBJECT_INSTANCE_POSITION_SEMANTICS_MESSAGE =
-  'These instances are the children of a custom object: they live in its local space, where (0;0) is the position of the custom object (they are never scene coordinates). ' +
+  'These instances are the children of a custom object: they live in its own space, where (0;0) is its origin (they are never scene coordinates). ' +
   'The default size of the custom object is its area (areaMinX to areaMaxX, areaMinY to areaMaxY, areaMinZ to areaMaxZ) when the variant defines one, otherwise the bounding box of the children. ' +
-  'The custom object turns around the CENTER of that area, so make the area symmetric (areaMin = -areaMax on an axis) for an object rotating around its own position, like a turret. ' +
+  'The custom object turns around the CENTER of that area (unless its own events set another center of rotation), so make the area symmetric (areaMin = -areaMax on an axis) for an object rotating around its own position, like a turret. ' +
+  'At runtime the custom object places its children with its whole transform (its position, its angle around that center of rotation, its scale and its flips): a position taken out of the custom object (returned by one of its functions, given to a scene action) is NOT a scene position until it is converted with all of these. ' +
   '`change_custom_object({ fit_area_to_children })` sets the area from the children for you. ' +
   'Resizing an instance of the custom object scales its children proportionally, unless `isInnerAreaFollowingParentSize` is set (children then keep their position and the area follows the parent size - the UI/layout case). ' +
   'Rotation and flipping are applied by the parent, and in 3D the z of a child is relative to the z of the parent. ' +

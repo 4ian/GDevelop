@@ -464,7 +464,7 @@ describe('CustomObjectFunctions', () => {
           'Fitted the area of the default variant to its children: 0;0;0 to 40;40;60 (children moved so (0;0;0) is their minimum corner).'
         );
         expect(result.message).toContain(
-          'It turns around the center of that area, 20;20;30 from its own position'
+          'Its center of rotation, the center of that area unless its events set another one, is at 20;20;30 from its own position'
         );
         expect(result.message).toContain(
           'Children: "Body" X 0 to 40, Y 0 to 40, Z 0 to 40, middle 20;20;20; "Top" X 10 to 30, Y 10 to 30, Z 40 to 60, middle 20;20;50.'
@@ -493,7 +493,7 @@ describe('CustomObjectFunctions', () => {
 
         expect(result.success).toBe(true);
         expect(result.message).toContain(
-          'Its center of rotation is now its own position (0;0;0).'
+          'Its center of rotation, the center of that area unless its events set another one, is now its own position (0;0;0).'
         );
         // A symmetric area: its center (the center of rotation) is the origin.
         expect(getArea(dialog)).toEqual({

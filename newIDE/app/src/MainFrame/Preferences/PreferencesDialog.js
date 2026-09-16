@@ -6,7 +6,7 @@ import React from 'react';
 import { Divider } from '@material-ui/core';
 import FlatButton from '../../UI/FlatButton';
 import HelpButton from '../../UI/HelpButton';
-import LocalFolderPicker from '../../UI/LocalFolderPicker';
+import CompactLocalFolderPicker from '../../UI/CompactLocalFolderPicker';
 import SelectOption from '../../UI/SelectOption';
 import { CompactToggleField } from '../../UI/CompactToggleField';
 import Dialog from '../../UI/Dialog';
@@ -1197,8 +1197,7 @@ const PreferencesDialog = ({
               id: 'new-projects-default-folder',
               label: i18n._(t`Default folder for new projects`),
               renderControl: () => (
-                <LocalFolderPicker
-                  fullWidth
+                <CompactLocalFolderPicker
                   value={values.newProjectsDefaultFolder}
                   onChange={setNewProjectsDefaultFolder}
                   type="default-workspace"

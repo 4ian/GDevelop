@@ -98,7 +98,7 @@ namespace gdjs {
      * it last used (the matrices below, the renderer its own dirty flag), so
      * one of them reading the transformation never leaves another stale.
      */
-    private _transformationRevision: integer = 1;
+    protected _transformationRevision: integer = 1;
     private _computedTransformationRevision: integer = 0;
     private static _temporaryPoint: FloatPoint = [0, 0];
     private static _temporaryCoefficients: FloatPoint = [0, 0];
@@ -579,15 +579,18 @@ namespace gdjs {
      *
      * @param x The X position of the point, inside this object.
      * @param y The Y position of the point, inside this object.
+     * @param z The Z position of the point, which a 2D custom object ignores
+     * (its children have no Z of their own). 3D custom objects override these
+     * conversions with their own transformation.
      */
-    toParentX(x: float, y: float): float {
+    toParentX(x: float, y: float, z: float = 0): float {
       const point = gdjs.CustomRuntimeObject._temporaryPoint;
       this.applyObjectTransformation(x, y, point);
       return point[0];
     }
 
     /** The Y of {@link gdjs.CustomRuntimeObject.toParentX}. */
-    toParentY(x: float, y: float): float {
+    toParentY(x: float, y: float, z: float = 0): float {
       const point = gdjs.CustomRuntimeObject._temporaryPoint;
       this.applyObjectTransformation(x, y, point);
       return point[1];
@@ -604,15 +607,16 @@ namespace gdjs {
      *
      * @param x The X position of the point, in the space containing this object.
      * @param y The Y position of the point, in the space containing this object.
+     * @param z The Z position of the point, ignored by a 2D custom object.
      */
-    fromParentX(x: float, y: float): float {
+    fromParentX(x: float, y: float, z: float = 0): float {
       const point = gdjs.CustomRuntimeObject._temporaryPoint;
       this.applyObjectInverseTransformation(x, y, point);
       return point[0];
     }
 
     /** The Y of {@link gdjs.CustomRuntimeObject.fromParentX}. */
-    fromParentY(x: float, y: float): float {
+    fromParentY(x: float, y: float, z: float = 0): float {
       const point = gdjs.CustomRuntimeObject._temporaryPoint;
       this.applyObjectInverseTransformation(x, y, point);
       return point[1];

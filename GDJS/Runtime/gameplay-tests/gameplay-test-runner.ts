@@ -2084,12 +2084,10 @@ namespace gdjs {
        *
        * It is read from the object itself, so it is exactly the one the game
        * renders - no transformation of the engine is re-derived here:
-       * - a 3D custom object composes its pivot, its Euler rotation (X/Y/Z),
-       *   its scales and its flips in the matrix of its THREE group (see
-       *   `CustomRuntimeObject3DRenderer._updateThreeGroup`). The renderer is
-       *   brought up to date and the matrix recomputed, so a transformation
-       *   changed since the last rendered frame is applied (a stale matrix
-       *   would report the previous position of every descendant);
+       * - a 3D custom object holds it (`getLocalTransformation3D`: pivot,
+       *   Euler rotation (X/Y/Z), scales and flips), and its renderer draws
+       *   that same transformation. A copy is taken: the object keeps
+       *   changing while the test runs;
        * - a 2D custom object has a complete affine transformation
        *   (`applyObjectTransformation`: pivot, angle, scales, flips),
        *   completed by the placement of the children on the Z axis when the
@@ -2099,21 +2097,13 @@ namespace gdjs {
         object: gdjs.RuntimeObject
       ): (point: GameplayTestPoint3D) => void {
         const anyObject = object as any;
-        const threeObject3D: THREE.Object3D | null =
+        const transformation3D: THREE.Matrix4 | null =
           typeof THREE !== 'undefined' &&
-          typeof anyObject.get3DRendererObject === 'function'
-            ? anyObject.get3DRendererObject() || null
+          typeof anyObject.getLocalTransformation3D === 'function'
+            ? anyObject.getLocalTransformation3D() || null
             : null;
-        if (threeObject3D) {
-          const renderer = anyObject.getRenderer();
-          if (renderer && typeof renderer.ensureUpToDate === 'function') {
-            // The game may have moved the object since the last rendered
-            // frame: put the THREE group back in sync with it...
-            renderer.ensureUpToDate();
-          }
-          // ...and recompute the matrix from it.
-          threeObject3D.updateMatrix();
-          const matrix = threeObject3D.matrix.clone();
+        if (transformation3D) {
+          const matrix = transformation3D.clone();
           const vector = new THREE.Vector3();
           return (point) => {
             vector.set(point.x, point.y, point.z).applyMatrix4(matrix);

@@ -186,6 +186,14 @@ private:
       gd::PlatformExtension &extension, gd::ObjectMetadata &objectMetadata,
       const gd::EventsBasedObject &eventsBasedObject);
 
+  /**
+   * Declare the expressions converting a point from the inside of a custom
+   * object to the space containing it, and the other way round.
+   */
+  static void DeclareObjectCoordinateConversions(
+      gd::ObjectMetadata &objectMetadata, const gd::String &objectType,
+      bool isRenderedIn3D);
+
   static const gd::String defaultExtensionIconPath;
 
   /**

@@ -51,6 +51,23 @@ describe('gdjs.CustomRuntimeObject3D', function () {
     };
   };
 
+  /** A custom object with every part of its transformation in play. */
+  const makeTransformedCustomObject3D = async () => {
+    const { customObject } = await makeCustomObject3D();
+    customObject.setPosition(16, 8);
+    customObject.setZ(24);
+    customObject.setAngle(30);
+    customObject.setRotationX(20);
+    customObject.setRotationY(-40);
+    customObject.setScaleX(2);
+    customObject.setScaleY(3);
+    customObject.setScaleZ(0.5);
+    customObject.flipX(true);
+    customObject.flipZ(true);
+    customObject.setRotationCenter3D(7, 11, 5);
+    return customObject;
+  };
+
   it('can translate, scale and rotate', async () => {
     const { customObject } = await makeCustomObject3D();
 
@@ -117,23 +134,6 @@ describe('gdjs.CustomRuntimeObject3D', function () {
 
   describe('toParent / fromParent', function () {
     const tolerance = 1e-3;
-
-    /** A custom object with every part of its transformation in play. */
-    const makeTransformedCustomObject3D = async () => {
-      const { customObject } = await makeCustomObject3D();
-      customObject.setPosition(16, 8);
-      customObject.setZ(24);
-      customObject.setAngle(30);
-      customObject.setRotationX(20);
-      customObject.setRotationY(-40);
-      customObject.setScaleX(2);
-      customObject.setScaleY(3);
-      customObject.setScaleZ(0.5);
-      customObject.flipX(true);
-      customObject.flipZ(true);
-      customObject.setRotationCenter3D(7, 11, 5);
-      return customObject;
-    };
 
     const expectNear = (value, expected) =>
       expect(value).to.be.within(expected - tolerance, expected + tolerance);
@@ -227,6 +227,133 @@ describe('gdjs.CustomRuntimeObject3D', function () {
       expect(customObject.getRotationX()).to.be.within(-0.1, 0.1);
       expect(customObject.getRotationY()).to.be.within(-30.1, -29.9);
       expect(customObject.getAngle()).to.be.within(89.9, 90.1);
+    });
+  });
+
+  describe('transformation cost', function () {
+    const tolerance = 1e-3;
+
+    const expectNear = (actual, expected) =>
+      expect(actual).to.be.within(expected - tolerance, expected + tolerance);
+
+    /** How many times `run` used the given methods. */
+    const countCalls = (spied, run) => {
+      const spies = spied.map(([holder, name]) => sinon.spy(holder, name));
+      try {
+        run();
+        return spies.map((spy) => spy.callCount);
+      } finally {
+        spies.forEach((spy) => spy.restore());
+      }
+    };
+
+    it('converts back from the parent without any new trigonometry', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      const x = customObject.toParentX(10, 20, 30);
+      const y = customObject.toParentY(10, 20, 30);
+      const z = customObject.toParentZ(10, 20, 30);
+      // Warm both ways, like a frame that was already rendered.
+      customObject.fromParentX(x, y, z);
+
+      // The transformation of an object that did not change is never built
+      // again, however many points are converted with it.
+      const counts = countCalls(
+        [
+          [Math, 'cos'],
+          [Math, 'sin'],
+        ],
+        () => {
+          for (let i = 0; i < 100; i++) {
+            customObject.fromParentX(x, y, z);
+            customObject.fromParentY(x, y, z);
+            customObject.fromParentZ(x, y, z);
+          }
+        }
+      );
+
+      expect(counts).to.eql([0, 0]);
+      expectNear(customObject.fromParentX(x, y, z), 10);
+      expectNear(customObject.fromParentY(x, y, z), 20);
+      expectNear(customObject.fromParentZ(x, y, z), 30);
+    });
+
+    /**
+     * Every mutator must leave the conversion back from the parent to
+     * recompute too: a point converted to the parent and back must land where
+     * it started, with the values the object has now.
+     */
+    const expectRoundTripAfter = async (changeCustomObject) => {
+      const customObject = await makeTransformedCustomObject3D();
+      // Warm both ways, like a frame that was already rendered.
+      customObject.fromParentX(
+        customObject.toParentX(10, 20, 30),
+        customObject.toParentY(10, 20, 30),
+        customObject.toParentZ(10, 20, 30)
+      );
+
+      changeCustomObject(customObject);
+
+      const x = customObject.toParentX(10, 20, 30);
+      const y = customObject.toParentY(10, 20, 30);
+      const z = customObject.toParentZ(10, 20, 30);
+      expectNear(customObject.fromParentX(x, y, z), 10);
+      expectNear(customObject.fromParentY(x, y, z), 20);
+      expectNear(customObject.fromParentZ(x, y, z), 30);
+    };
+
+    it('converts back from the parent with what the object is now', async () => {
+      await expectRoundTripAfter((customObject) => customObject.setX(23));
+      await expectRoundTripAfter((customObject) => customObject.setZ(12));
+      await expectRoundTripAfter((customObject) => customObject.setAngle(90));
+      await expectRoundTripAfter((customObject) =>
+        customObject.setRotationX(45)
+      );
+      await expectRoundTripAfter((customObject) =>
+        customObject.setRotationY(-60)
+      );
+      await expectRoundTripAfter((customObject) =>
+        customObject.turnAroundZ(23)
+      );
+      await expectRoundTripAfter((customObject) => customObject.setScaleX(0.5));
+      await expectRoundTripAfter((customObject) => customObject.setScaleZ(2));
+      await expectRoundTripAfter((customObject) => customObject.setScale(1.5));
+      await expectRoundTripAfter((customObject) => customObject.flipY(true));
+      await expectRoundTripAfter((customObject) => customObject.flipZ(false));
+      await expectRoundTripAfter((customObject) =>
+        customObject.setRotationCenter3D(17, -9, 4)
+      );
+      await expectRoundTripAfter((customObject) =>
+        customObject.setDepth(customObject.getDepth() * 2)
+      );
+    });
+
+    it('is not built again when a child of an object with an area of its own moves', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      const child = customObject
+        .getChildrenContainer()
+        .getInstancesOf('MySprite')[0];
+      const beforeX = customObject.toParentX(10, 20, 30);
+      const beforeZ = customObject.toParentZ(10, 20, 30);
+      const beforeBounds = JSON.stringify(customObject.getAABB());
+      customObject.getRenderer().ensureUpToDate();
+
+      const counts = countCalls(
+        [[customObject, '_updateLocalTransformation3D']],
+        () => {
+          child.setPosition(-200, 140);
+          customObject.toParentX(10, 20, 30);
+          customObject.getHitBoxes();
+        }
+      );
+
+      // The object has an area of its own: its center of rotation stays where
+      // it is, so what it contains moved and it did not.
+      expect(counts).to.eql([0]);
+      expect(customObject.toParentX(10, 20, 30)).to.be(beforeX);
+      expect(customObject.toParentZ(10, 20, 30)).to.be(beforeZ);
+      // Its hit boxes - and the ones of whatever contains it - still follow
+      // its children.
+      expect(JSON.stringify(customObject.getAABB())).not.to.be(beforeBounds);
     });
   });
 });

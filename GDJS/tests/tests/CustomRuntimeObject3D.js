@@ -114,4 +114,119 @@ describe('gdjs.CustomRuntimeObject3D', function () {
     expect(customObject.getDrawableY()).to.be(16 - 200 * 1.5);
     expect(customObject.getDrawableZ()).to.be(32 - 300 * 0.5);
   });
+
+  describe('toParent / fromParent', function () {
+    const tolerance = 1e-3;
+
+    /** A custom object with every part of its transformation in play. */
+    const makeTransformedCustomObject3D = async () => {
+      const { customObject } = await makeCustomObject3D();
+      customObject.setPosition(16, 8);
+      customObject.setZ(24);
+      customObject.setAngle(30);
+      customObject.setRotationX(20);
+      customObject.setRotationY(-40);
+      customObject.setScaleX(2);
+      customObject.setScaleY(3);
+      customObject.setScaleZ(0.5);
+      customObject.flipX(true);
+      customObject.flipZ(true);
+      customObject.setRotationCenter3D(7, 11, 5);
+      return customObject;
+    };
+
+    const expectNear = (value, expected) =>
+      expect(value).to.be.within(expected - tolerance, expected + tolerance);
+
+    it('puts a point of the inside where the renderer draws it', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+
+      // The renderer composes the transformation of its THREE group on its
+      // own: the two must agree, or the conversions answer for an object the
+      // game does not show.
+      customObject.getRenderer().ensureUpToDate();
+      const threeObject = customObject.get3DRendererObject();
+      threeObject.updateMatrix();
+      const drawn = new THREE.Vector3(10, 20, 30).applyMatrix4(
+        threeObject.matrix
+      );
+
+      expectNear(customObject.toParentX(10, 20, 30), drawn.x);
+      expectNear(customObject.toParentY(10, 20, 30), drawn.y);
+      expectNear(customObject.toParentZ(10, 20, 30), drawn.z);
+    });
+
+    it('brings a point of the containing space back inside', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      const parentX = customObject.toParentX(10, 20, 30);
+      const parentY = customObject.toParentY(10, 20, 30);
+      const parentZ = customObject.toParentZ(10, 20, 30);
+
+      expectNear(customObject.fromParentX(parentX, parentY, parentZ), 10);
+      expectNear(customObject.fromParentY(parentX, parentY, parentZ), 20);
+      expectNear(customObject.fromParentZ(parentX, parentY, parentZ), 30);
+    });
+
+    it('answers a collapsed axis with the closest point it can reach', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      customObject.setScaleY(0);
+
+      const parentX = customObject.toParentX(10, 20, 30);
+      const parentY = customObject.toParentY(10, 20, 30);
+      const parentZ = customObject.toParentZ(10, 20, 30);
+
+      expect(customObject.fromParentY(parentX, parentY, parentZ)).to.be(0);
+      expectNear(customObject.fromParentX(parentX, parentY, parentZ), 10);
+      expectNear(customObject.fromParentZ(parentX, parentY, parentZ), 30);
+    });
+
+    it('answers a point, never NaN, when every axis is collapsed', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      customObject.setScale(0);
+      customObject.setScaleZ(0);
+
+      expect(customObject.fromParentX(100, 200, 300)).to.be(0);
+      expect(customObject.fromParentY(100, 200, 300)).to.be(0);
+      expect(customObject.fromParentZ(100, 200, 300)).to.be(0);
+    });
+
+    it('follows a change made just before it, with nothing rendered in between', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      customObject.getRenderer().ensureUpToDate();
+      const before = customObject.toParentZ(10, 20, 30);
+
+      customObject.setZ(customObject.getZ() + 100);
+
+      expectNear(customObject.toParentZ(10, 20, 30), before + 100);
+    });
+  });
+
+  describe('turning around an axis of the scene', function () {
+    it('turns from the rotations set before it, with nothing rendered in between', async () => {
+      const { customObject } = await makeCustomObject3D();
+      customObject.getRenderer().ensureUpToDate();
+
+      customObject.setRotationX(45);
+      customObject.turnAroundY(10);
+
+      // The turn used to be composed with what the renderer last drew, which
+      // was still the object at rest: the 45 degrees were lost.
+      expect(customObject.getRotationX()).to.be.within(44.9, 45.1);
+      expect(customObject.getRotationY()).to.be.within(9.9, 10.1);
+    });
+
+    it('turns around the axes of the scene, not its own', async () => {
+      const { customObject } = await makeCustomObject3D();
+      customObject.setAngle(90);
+
+      customObject.turnAroundX(30);
+
+      // Turned by 90 degrees on Z, a turn around the X of the scene is a turn
+      // around the Y of the object - the same the renderer gave with
+      // `Object3D.rotateOnWorldAxis`.
+      expect(customObject.getRotationX()).to.be.within(-0.1, 0.1);
+      expect(customObject.getRotationY()).to.be.within(-30.1, -29.9);
+      expect(customObject.getAngle()).to.be.within(89.9, 90.1);
+    });
+  });
 });

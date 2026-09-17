@@ -1261,6 +1261,24 @@ describe('MetadataDeclarationHelper', () => {
     expect(extension.getExtensionObjectsTypes().at(0)).toBe('MyObject');
     const objectMetadata = extension.getObjectMetadata('MyObject');
 
+    const expressionNames = objectMetadata
+      .getAllExpressions()
+      .keys()
+      .toJSArray();
+    // A 3D custom object converts a point of 3 coordinates, on 3 axes.
+    ['ToParent', 'FromParent'].forEach((conversion) =>
+      ['X', 'Y', 'Z'].forEach((axis) => {
+        const expressionName = conversion + axis;
+        expect(expressionNames).toContain(expressionName);
+        expect(
+          objectMetadata
+            .getAllExpressions()
+            .get(expressionName)
+            .getParametersCount()
+        ).toBe(4);
+      })
+    );
+
     expectArray(
       objectMetadata.getDefaultBehaviors().toNewVectorString().toJSArray()
     ).toContainAll([

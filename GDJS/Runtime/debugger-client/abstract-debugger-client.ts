@@ -41,7 +41,10 @@ namespace gdjs {
     cycleReplacer?: DebuggerClientCycleReplacer,
     maxDepth?: number
   ): DebuggerClientCycleReplacer => {
-    const stack: Array<string> = [],
+    // The chain of objects currently being serialized, from the root
+    // to the object holding the current property, and the property keys
+    // used to reach each of them.
+    const stack: Array<any> = [],
       keys: Array<string> = [];
     if (cycleReplacer === undefined || cycleReplacer === null) {
       cycleReplacer = function (key, value) {
@@ -54,24 +57,38 @@ namespace gdjs {
       };
     }
 
+    // `this` is the object holding the property being serialized.
     return function (key: string, value: any): any {
-      if (stack.length > 0) {
-        const thisPos = stack.indexOf(this);
-        ~thisPos ? stack.splice(thisPos + 1) : stack.push(this);
-        ~thisPos ? keys.splice(thisPos, Infinity, key) : keys.push(key);
-        if (maxDepth != null && thisPos > maxDepth) {
-          return '[Max depth reached]';
-        } else {
-          if (~stack.indexOf(value)) {
-            value = (cycleReplacer as DebuggerClientCycleReplacer).call(
-              this,
-              key,
-              value
-            );
-          }
-        }
-      } else {
+      if (stack.length === 0) {
+        // First call: the root object itself.
         stack.push(value);
+        return replacer == null ? value : replacer.call(this, key, value);
+      }
+
+      const holderPosition = stack.indexOf(this);
+      const isHolderAlreadyInStack = holderPosition !== -1;
+      if (isHolderAlreadyInStack) {
+        // Back to an object already seen: drop everything deeper than it.
+        stack.splice(holderPosition + 1);
+        keys.splice(holderPosition, Infinity, key);
+      } else {
+        // Entered a new nested object.
+        stack.push(this);
+        keys.push(key);
+      }
+
+      const depth = isHolderAlreadyInStack ? holderPosition : stack.length - 1;
+      if (maxDepth != null && depth > maxDepth) {
+        return '[Max depth reached]';
+      }
+
+      const isCircularReference = stack.indexOf(value) !== -1;
+      if (isCircularReference) {
+        value = (cycleReplacer as DebuggerClientCycleReplacer).call(
+          this,
+          key,
+          value
+        );
       }
       return replacer == null ? value : replacer.call(this, key, value);
     };
@@ -87,7 +104,7 @@ namespace gdjs {
    * @param [spaces] - The number of spaces for indentation.
    * @param [cycleReplacer] - Function used to replace circular references with a new value.
    */
-  const circularSafeStringify = (
+  export const circularSafeStringify = (
     obj: any,
     replacer?: DebuggerClientCycleReplacer,
     maxDepth?: number,
@@ -805,7 +822,7 @@ namespace gdjs {
           return value;
         },
         /* Limit maximum depth to prevent any crashes */
-        18
+        22
       );
       const serializationDuration = Date.now() - serializationStartTime;
       logger.log(

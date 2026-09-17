@@ -40,7 +40,24 @@ namespace gdjs {
      */
     private _rotationY: float = 0;
     private _customCenterZ: float = 0;
+    /**
+     * Where this object puts a point of its inside (the space its children
+     * live in) in the space containing it: scales and flips, the Euler
+     * rotation in the `ZYX` order around the center of rotation, and the
+     * position of the object.
+     *
+     * The renderer composes the same transformation for its THREE group
+     * (`gdjs.CustomRuntimeObject3DRenderer._updateThreeGroup`), which is what
+     * the game shows: a test compares the two on every kind of object.
+     */
+    private _localTransformation3D = new THREE.Matrix4();
+    private _computedTransformation3DRevision: integer = 0;
     private static _temporaryVector = new THREE.Vector3();
+    private static _temporaryScale = new THREE.Vector3();
+    private static _temporaryEuler = new THREE.Euler(0, 0, 0, 'ZYX');
+    private static _temporaryQuaternion = new THREE.Quaternion();
+    private static _temporaryConversionVector = new THREE.Vector3();
+    private static _temporaryTurnQuaternion = new THREE.Quaternion();
 
     private _hasEstimatedVelocity = false;
     private _estimatedVelocityX: float = 0;
@@ -128,7 +145,7 @@ namespace gdjs {
     setZ(z: float): void {
       if (z === this._z) return;
       this._z = z;
-      this.getRenderer().updatePosition();
+      this.invalidateTransformation();
     }
 
     /**
@@ -218,6 +235,7 @@ namespace gdjs {
      */
     setRotationX(angle: float): void {
       this._rotationX = angle;
+      this.invalidateTransformation();
       this.getRenderer().updateRotation();
     }
 
@@ -228,7 +246,178 @@ namespace gdjs {
      */
     setRotationY(angle: float): void {
       this._rotationY = angle;
+      this.invalidateTransformation();
       this.getRenderer().updateRotation();
+    }
+
+    /** The orientation of the object, as the `ZYX` Euler angles it is made of. */
+    private _getRotation(): THREE.Euler {
+      return gdjs.CustomRuntimeObject3D._temporaryEuler.set(
+        gdjs.toRad(this._rotationX),
+        gdjs.toRad(this._rotationY),
+        gdjs.toRad(this.angle)
+      );
+    }
+
+    /**
+     * The transformation of the object, recomputed from what it is made of
+     * when any of them changed (see
+     * {@link gdjs.CustomRuntimeObject.invalidateTransformation}).
+     */
+    getLocalTransformation3D(): THREE.Matrix4 {
+      if (
+        this._computedTransformation3DRevision !== this._transformationRevision
+      ) {
+        this._updateLocalTransformation3D();
+      }
+      return this._localTransformation3D;
+    }
+
+    private _updateLocalTransformation3D(): void {
+      const scaleX = this.getScaleX();
+      const scaleY = this.getScaleY();
+      const scaleZ = this.getScaleZ();
+      const pivotX = this.getUnscaledCenterX() * scaleX;
+      const pivotY = this.getUnscaledCenterY() * scaleY;
+      const pivotZ = this.getUnscaledCenterZ() * scaleZ;
+
+      const rotation = this._getRotation();
+      // The object turns around its center of rotation, which the position
+      // of the transformation puts back where it was.
+      const position = gdjs.CustomRuntimeObject3D._temporaryVector
+        .set(
+          this.isFlippedX() ? pivotX : -pivotX,
+          this.isFlippedY() ? pivotY : -pivotY,
+          this.isFlippedZ() ? pivotZ : -pivotZ
+        )
+        .applyEuler(rotation);
+      position.x += this.getX() + pivotX;
+      position.y += this.getY() + pivotY;
+      position.z += this.getZ() + pivotZ;
+
+      this._localTransformation3D.compose(
+        position,
+        gdjs.CustomRuntimeObject3D._temporaryQuaternion.setFromEuler(rotation),
+        gdjs.CustomRuntimeObject3D._temporaryScale.set(
+          this.isFlippedX() ? -scaleX : scaleX,
+          this.isFlippedY() ? -scaleY : scaleY,
+          this.isFlippedZ() ? -scaleZ : scaleZ
+        )
+      );
+      this._computedTransformation3DRevision = this._transformationRevision;
+    }
+
+    /**
+     * A point of the inside of this object (the space its children live in),
+     * in the space containing this object - the scene when this object is in
+     * one, the custom object holding it otherwise. The boundary of one object
+     * is crossed.
+     */
+    private _applyTransformation3D(
+      x: float,
+      y: float,
+      z: float,
+      destination: THREE.Vector3
+    ): THREE.Vector3 {
+      return destination
+        .set(x, y, z)
+        .applyMatrix4(this.getLocalTransformation3D());
+    }
+
+    /**
+     * The other way round of {@link _applyTransformation3D}.
+     *
+     * A scale of 0 collapses the object on an axis: every point of the space
+     * containing it has the same place inside it on that axis, so 0 answers
+     * for all of them - the closest point the object can reach. Nothing is
+     * ever divided by zero.
+     */
+    private _applyInverseTransformation3D(
+      x: float,
+      y: float,
+      z: float,
+      destination: THREE.Vector3
+    ): THREE.Vector3 {
+      const transformation = this.getLocalTransformation3D();
+      const position =
+        gdjs.CustomRuntimeObject3D._temporaryVector.setFromMatrixPosition(
+          transformation
+        );
+      const rotation = gdjs.CustomRuntimeObject3D._temporaryQuaternion
+        .setFromEuler(this._getRotation())
+        .conjugate();
+      destination
+        .set(x - position.x, y - position.y, z - position.z)
+        .applyQuaternion(rotation);
+
+      const scales = [this.getScaleX(), this.getScaleY(), this.getScaleZ()];
+      const flips = [this.isFlippedX(), this.isFlippedY(), this.isFlippedZ()];
+      for (let axis = 0; axis < 3; axis++) {
+        const scale = scales[axis];
+        destination.setComponent(
+          axis,
+          scale === 0
+            ? 0
+            : destination.getComponent(axis) / (flips[axis] ? -scale : scale)
+        );
+      }
+      return destination;
+    }
+
+    override toParentX(x: float, y: float, z: float = 0): float {
+      return this._applyTransformation3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).x;
+    }
+
+    override toParentY(x: float, y: float, z: float = 0): float {
+      return this._applyTransformation3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).y;
+    }
+
+    /** The Z of {@link gdjs.CustomRuntimeObject3D.toParentX}. */
+    toParentZ(x: float, y: float, z: float = 0): float {
+      return this._applyTransformation3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).z;
+    }
+
+    override fromParentX(x: float, y: float, z: float = 0): float {
+      return this._applyInverseTransformation3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).x;
+    }
+
+    override fromParentY(x: float, y: float, z: float = 0): float {
+      return this._applyInverseTransformation3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).y;
+    }
+
+    /** The Z of {@link gdjs.CustomRuntimeObject3D.fromParentX}. */
+    fromParentZ(x: float, y: float, z: float = 0): float {
+      return this._applyInverseTransformation3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).z;
     }
 
     /**
@@ -254,14 +443,7 @@ namespace gdjs {
      * @param deltaAngle the rotation angle
      */
     turnAroundX(deltaAngle: float): void {
-      const axisX = gdjs.CustomRuntimeObject3D._temporaryVector;
-      axisX.set(1, 0, 0);
-
-      const mesh = this.get3DRendererObject();
-      mesh.rotateOnWorldAxis(axisX, gdjs.toRad(deltaAngle));
-      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
-      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
-      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+      this._turnAroundAxis(1, 0, 0, deltaAngle);
     }
 
     /**
@@ -269,14 +451,7 @@ namespace gdjs {
      * @param deltaAngle the rotation angle
      */
     turnAroundY(deltaAngle: float): void {
-      const axisY = gdjs.CustomRuntimeObject3D._temporaryVector;
-      axisY.set(0, 1, 0);
-
-      const mesh = this.get3DRendererObject();
-      mesh.rotateOnWorldAxis(axisY, gdjs.toRad(deltaAngle));
-      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
-      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
-      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+      this._turnAroundAxis(0, 1, 0, deltaAngle);
     }
 
     /**
@@ -284,14 +459,43 @@ namespace gdjs {
      * @param deltaAngle the rotation angle
      */
     turnAroundZ(deltaAngle: float): void {
-      const axisZ = gdjs.CustomRuntimeObject3D._temporaryVector;
-      axisZ.set(0, 0, 1);
+      this._turnAroundAxis(0, 0, 1, deltaAngle);
+    }
 
-      const mesh = this.get3DRendererObject();
-      mesh.rotateOnWorldAxis(axisZ, gdjs.toRad(deltaAngle));
-      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
-      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
-      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+    /**
+     * Turn the object around an axis of the scene, from the orientation it
+     * holds - not from the one the renderer last drew, which is behind by
+     * every rotation made since (a `setRotationX` followed by a `turnAroundY`
+     * in the same frame used to lose the first one).
+     */
+    private _turnAroundAxis(
+      axisX: float,
+      axisY: float,
+      axisZ: float,
+      deltaAngle: float
+    ): void {
+      const rotation =
+        gdjs.CustomRuntimeObject3D._temporaryQuaternion.setFromEuler(
+          this._getRotation()
+        );
+      // The axis is one of the scene: the turn is applied to the orientation
+      // of the object, not composed with it in its own space.
+      rotation.premultiply(
+        gdjs.CustomRuntimeObject3D._temporaryTurnQuaternion.setFromAxisAngle(
+          gdjs.CustomRuntimeObject3D._temporaryVector.set(axisX, axisY, axisZ),
+          gdjs.toRad(deltaAngle)
+        )
+      );
+      const turnedRotation =
+        gdjs.CustomRuntimeObject3D._temporaryEuler.setFromQuaternion(
+          rotation,
+          'ZYX'
+        );
+      this._rotationX = gdjs.toDegrees(turnedRotation.x);
+      this._rotationY = gdjs.toDegrees(turnedRotation.y);
+      this.setAngle(gdjs.toDegrees(turnedRotation.z));
+      this.invalidateTransformation();
+      this.getRenderer().updateRotation();
     }
 
     getForwardX(): float {
@@ -421,6 +625,7 @@ namespace gdjs {
      */
     setRotationCenter3D(x: float, y: float, z: float) {
       this._customCenterZ = z;
+      // Invalidates the transformation for the three axes at once.
       this.setRotationCenter(x, y);
     }
 
@@ -476,7 +681,7 @@ namespace gdjs {
         return;
       }
       this._scaleZ = newScale * (this._flippedZ ? -1 : 1);
-      this.getRenderer().updateSize();
+      this.invalidateTransformation();
     }
 
     /**
@@ -507,7 +712,7 @@ namespace gdjs {
         return;
       }
       this._flippedZ = enable;
-      this.getRenderer().updateSize();
+      this.invalidateTransformation();
     }
 
     isFlippedZ(): boolean {

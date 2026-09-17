@@ -225,7 +225,7 @@ const EditedObjectGroupEditorDialog = ({
           />
         ))}
       {currentTab === 'variables' && (
-        <Column expand noMargin>
+        <Column expand noMargin noOverflowParent>
           {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (
             <Line>
               <Column noMargin expand>

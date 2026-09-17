@@ -391,7 +391,7 @@ const InnerDialog = (props: InnerDialogProps) => {
         />
       )}
       {currentTab === 'variables' && (
-        <Column expand noMargin>
+        <Column expand noMargin noOverflowParent>
           {object.getVariables().count() > 0 && DismissableTutorialMessage && (
             <Line>
               <Column noMargin expand>

@@ -52,6 +52,16 @@ namespace gdjs {
      */
     private _localTransformation3D = new THREE.Matrix4();
     private _computedTransformation3DRevision: integer = 0;
+    /**
+     * What the inverse transformation is made of: where the local (0;0;0)
+     * lands, the rotation of the object the other way round, and its scales
+     * with the sign of its flips. They are read far more often than they
+     * change, so they are kept from one read to the next.
+     */
+    private _inverseTransformationPosition = new THREE.Vector3();
+    private _inverseTransformationRotation = new THREE.Quaternion();
+    private _inverseTransformationScale = new THREE.Vector3(1, 1, 1);
+    private _computedInverseTransformation3DRevision: integer = 0;
     private static _temporaryVector = new THREE.Vector3();
     private static _temporaryScale = new THREE.Vector3();
     private static _temporaryEuler = new THREE.Euler(0, 0, 0, 'ZYX');
@@ -338,30 +348,46 @@ namespace gdjs {
       z: float,
       destination: THREE.Vector3
     ): THREE.Vector3 {
-      const transformation = this.getLocalTransformation3D();
-      const position =
-        gdjs.CustomRuntimeObject3D._temporaryVector.setFromMatrixPosition(
-          transformation
-        );
-      const rotation = gdjs.CustomRuntimeObject3D._temporaryQuaternion
-        .setFromEuler(this._getRotation())
-        .conjugate();
+      if (
+        this._computedInverseTransformation3DRevision !==
+        this._transformationRevision
+      ) {
+        this._updateInverseTransformation3D();
+      }
+      const position = this._inverseTransformationPosition;
       destination
         .set(x - position.x, y - position.y, z - position.z)
-        .applyQuaternion(rotation);
+        .applyQuaternion(this._inverseTransformationRotation);
 
-      const scales = [this.getScaleX(), this.getScaleY(), this.getScaleZ()];
-      const flips = [this.isFlippedX(), this.isFlippedY(), this.isFlippedZ()];
-      for (let axis = 0; axis < 3; axis++) {
-        const scale = scales[axis];
-        destination.setComponent(
-          axis,
-          scale === 0
-            ? 0
-            : destination.getComponent(axis) / (flips[axis] ? -scale : scale)
-        );
-      }
-      return destination;
+      const scale = this._inverseTransformationScale;
+      return destination.set(
+        scale.x === 0 ? 0 : destination.x / scale.x,
+        scale.y === 0 ? 0 : destination.y / scale.y,
+        scale.z === 0 ? 0 : destination.z / scale.z
+      );
+    }
+
+    /**
+     * What {@link _applyInverseTransformation3D} undoes. The position is read
+     * from the transformation itself and the rotation from the same angles it
+     * was built with, so the two ways can never be built from different
+     * values.
+     */
+    private _updateInverseTransformation3D(): void {
+      this._inverseTransformationPosition.setFromMatrixPosition(
+        this.getLocalTransformation3D()
+      );
+      this._inverseTransformationRotation
+        .setFromEuler(this._getRotation())
+        .conjugate();
+      this._inverseTransformationScale.set(
+        this.isFlippedX() ? -this.getScaleX() : this.getScaleX(),
+        this.isFlippedY() ? -this.getScaleY() : this.getScaleY(),
+        this.isFlippedZ() ? -this.getScaleZ() : this.getScaleZ()
+      );
+
+      this._computedInverseTransformation3DRevision =
+        this._transformationRevision;
     }
 
     override toParentX(x: float, y: float, z: float = 0): float {

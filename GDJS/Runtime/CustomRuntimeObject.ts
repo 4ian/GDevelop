@@ -100,6 +100,17 @@ namespace gdjs {
      */
     protected _transformationRevision: integer = 1;
     private _computedTransformationRevision: integer = 0;
+    /**
+     * What the inverse transformation is made of: where the local (0;0) lands
+     * and the coefficients of the rotation of the object. They are read far
+     * more often than they change (the cursor is converted for every object
+     * under it, every frame), so they are kept from one read to the next.
+     */
+    private _inverseTranslationX: float = 0;
+    private _inverseTranslationY: float = 0;
+    private _inverseRotationCosine: float = 1;
+    private _inverseRotationSine: float = 0;
+    private _computedInverseTransformationRevision: integer = 0;
     private static _temporaryPoint: FloatPoint = [0, 0];
     private static _temporaryCoefficients: FloatPoint = [0, 0];
     _type: string;
@@ -410,9 +421,26 @@ namespace gdjs {
 
     onChildrenLocationChanged() {
       this._isUntransformedHitBoxesDirty = true;
-      // An object with no fixed area is as big as its children: they moved,
-      // so its center of rotation - and its transformation - moved with them.
-      this.invalidateTransformation();
+      if (this._isCenterOfRotationFollowingChildren()) {
+        // An object with no fixed area is as big as its children: they moved,
+        // so its center of rotation - and its transformation - moved with them.
+        this.invalidateTransformation();
+      } else {
+        // The object itself did not move: only what it contains did, which
+        // changes its hit boxes (and the ones of the objects containing it)
+        // but leaves its transformation as it was.
+        this.invalidateHitboxes();
+      }
+    }
+
+    /**
+     * Whether the center of rotation of the object - what its transformation
+     * and its renderer turn it around - is the middle of its children. An
+     * object given an area of its own (or a center of rotation) keeps it
+     * wherever its children go.
+     */
+    private _isCenterOfRotationFollowingChildren(): boolean {
+      return !this._customCenter && !this._innerArea;
     }
 
     override updateHitBoxes(): void {
@@ -531,9 +559,20 @@ namespace gdjs {
      * transformation read (or drawn) from values that no longer exist.
      */
     invalidateTransformation(): void {
+      this._invalidateTransformationWithoutRendererUpdate();
+      this.getRenderer().update();
+    }
+
+    /**
+     * Same as {@link gdjs.CustomRuntimeObject.invalidateTransformation}, for a
+     * mutator that tells the renderer what changed on its own (`updateX`,
+     * `updateY`, `updateAngle`): the renderer writes that one value on its
+     * container instead of building it again, and a build asked for earlier
+     * (a scale, a center of rotation...) is still pending.
+     */
+    private _invalidateTransformationWithoutRendererUpdate(): void {
       this._transformationRevision++;
       this.invalidateHitboxes();
-      this.getRenderer().update();
     }
 
     /**
@@ -645,12 +684,40 @@ namespace gdjs {
       // always undone exactly; only a scale can collapse an axis, and the
       // local coordinate of a collapsed axis is answered as 0 (every point of
       // it has the same image: none of them is more the point than another).
+      if (
+        this._computedInverseTransformationRevision !==
+        this._transformationRevision
+      ) {
+        this._updateInverseTransformation();
+      }
+      const deltaX = x - this._inverseTranslationX;
+      const deltaY = y - this._inverseTranslationY;
+
+      const cos = this._inverseRotationCosine;
+      const sin = this._inverseRotationSine;
+      const rotatedX = cos * deltaX + sin * deltaY;
+      const rotatedY = cos * deltaY - sin * deltaX;
+      const unflippedX = this._flippedX ? -rotatedX : rotatedX;
+      const unflippedY = this._flippedY ? -rotatedY : rotatedY;
+      const absScaleX = Math.abs(this._scaleX);
+      const absScaleY = Math.abs(this._scaleY);
+      destination[0] = absScaleX === 0 ? 0 : unflippedX / absScaleX;
+      destination[1] = absScaleY === 0 ? 0 : unflippedY / absScaleY;
+    }
+
+    /**
+     * What {@link gdjs.CustomRuntimeObject.applyObjectInverseTransformation}
+     * undoes: where the local (0;0) lands, and the coefficients the rotation
+     * was built with. They are read from the transformation itself, so the two
+     * ways can never be built from different values.
+     */
+    private _updateInverseTransformation(): void {
       const temporaryPoint = gdjs.CustomRuntimeObject._temporaryPoint;
       temporaryPoint[0] = 0;
       temporaryPoint[1] = 0;
       this.getLocalTransformation().transform(temporaryPoint, temporaryPoint);
-      const deltaX = x - temporaryPoint[0];
-      const deltaY = y - temporaryPoint[1];
+      this._inverseTranslationX = temporaryPoint[0];
+      this._inverseTranslationY = temporaryPoint[1];
 
       // The same coefficients the transformation was built with: a right
       // angle gives exactly 0 and 1 on both ways, so a point on the edge of
@@ -660,16 +727,11 @@ namespace gdjs {
         (this.angle * Math.PI) / 180,
         coefficients
       );
-      const cos = coefficients[0];
-      const sin = coefficients[1];
-      const rotatedX = cos * deltaX + sin * deltaY;
-      const rotatedY = cos * deltaY - sin * deltaX;
-      const unflippedX = this._flippedX ? -rotatedX : rotatedX;
-      const unflippedY = this._flippedY ? -rotatedY : rotatedY;
-      const absScaleX = Math.abs(this._scaleX);
-      const absScaleY = Math.abs(this._scaleY);
-      destination[0] = absScaleX === 0 ? 0 : unflippedX / absScaleX;
-      destination[1] = absScaleY === 0 ? 0 : unflippedY / absScaleY;
+      this._inverseRotationCosine = coefficients[0];
+      this._inverseRotationSine = coefficients[1];
+
+      this._computedInverseTransformationRevision =
+        this._transformationRevision;
     }
 
     override getDrawableX(): float {
@@ -923,7 +985,7 @@ namespace gdjs {
         return;
       }
       this.x = x;
-      this.invalidateTransformation();
+      this._invalidateTransformationWithoutRendererUpdate();
       this.getRenderer().updateX();
     }
 
@@ -932,7 +994,7 @@ namespace gdjs {
         return;
       }
       this.y = y;
-      this.invalidateTransformation();
+      this._invalidateTransformationWithoutRendererUpdate();
       this.getRenderer().updateY();
     }
 
@@ -941,7 +1003,7 @@ namespace gdjs {
         return;
       }
       this.angle = angle;
-      this.invalidateTransformation();
+      this._invalidateTransformationWithoutRendererUpdate();
       this.getRenderer().updateAngle();
     }
 

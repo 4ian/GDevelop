@@ -463,8 +463,6 @@ describe('gdjs.CustomRuntimeObject', function () {
         customObject.setAngle(90);
         convert(customObject, 10, 20);
 
-        // The object has no fixed area here: its children are its bounds, so
-        // moving one of them moves its center of rotation.
         leftSprite.setPosition(-100, -50);
 
         expect(convert(customObject, 10, 20)).to.eql(
@@ -489,6 +487,179 @@ describe('gdjs.CustomRuntimeObject', function () {
         const converted = convert(customObject, 10, 20);
         expect(converted[0]).to.be.within(drawn.x - 1e-3, drawn.x + 1e-3);
         expect(converted[1]).to.be.within(drawn.y - 1e-3, drawn.y + 1e-3);
+      });
+    });
+
+    describe('transformation cost', function () {
+      const tolerance = 1e-3;
+
+      /** A custom object with every part of its transformation in play. */
+      const makeTransformedCustomObject = async () => {
+        const made = await makeCustomObjectWith2Children();
+        made.customObject.setPosition(900, 400);
+        made.customObject.setAngle(31);
+        made.customObject.setScaleX(2);
+        made.customObject.setScaleY(3);
+        made.customObject.flipX(true);
+        made.customObject.setRotationCenter(7, 11);
+        return made;
+      };
+
+      const expectNear = (actual, expected) =>
+        expect(actual).to.be.within(expected - tolerance, expected + tolerance);
+
+      /** How many times `run` used the given methods. */
+      const countCalls = (spied, run) => {
+        const spies = spied.map(([holder, name]) => sinon.spy(holder, name));
+        try {
+          run();
+          return spies.map((spy) => spy.callCount);
+        } finally {
+          spies.forEach((spy) => spy.restore());
+        }
+      };
+
+      it('converts back from the parent without any new trigonometry', async () => {
+        const { customObject } = await makeTransformedCustomObject();
+        const x = customObject.toParentX(10, 20);
+        const y = customObject.toParentY(10, 20);
+        // Warm both ways, like a frame that was already rendered.
+        customObject.fromParentX(x, y);
+
+        // The cursor is converted by every object it may be over, on every
+        // frame: an object that did not change builds nothing again.
+        const counts = countCalls(
+          [
+            [Math, 'cos'],
+            [Math, 'sin'],
+          ],
+          () => {
+            for (let i = 0; i < 100; i++) {
+              customObject.fromParentX(x, y);
+              customObject.fromParentY(x, y);
+            }
+          }
+        );
+
+        expect(counts).to.eql([0, 0]);
+        expectNear(customObject.fromParentX(x, y), 10);
+        expectNear(customObject.fromParentY(x, y), 20);
+      });
+
+      /**
+       * Every mutator must leave the conversion back from the parent to
+       * recompute too: a point converted to the parent and back must land
+       * where it started, with the values the object has now.
+       */
+      const expectRoundTripAfter = async (changeCustomObject) => {
+        const { customObject } = await makeTransformedCustomObject();
+        // Warm both ways, like a frame that was already rendered.
+        customObject.fromParentX(
+          customObject.toParentX(10, 20),
+          customObject.toParentY(10, 20)
+        );
+
+        changeCustomObject(customObject);
+
+        const x = customObject.toParentX(10, 20);
+        const y = customObject.toParentY(10, 20);
+        expectNear(customObject.fromParentX(x, y), 10);
+        expectNear(customObject.fromParentY(x, y), 20);
+      };
+
+      it('converts back from the parent with what the object is now', async () => {
+        await expectRoundTripAfter((customObject) => customObject.setX(23));
+        await expectRoundTripAfter((customObject) => customObject.setY(47));
+        await expectRoundTripAfter((customObject) => customObject.setAngle(90));
+        await expectRoundTripAfter((customObject) =>
+          customObject.setScaleX(0.5)
+        );
+        await expectRoundTripAfter((customObject) => customObject.setScaleY(4));
+        await expectRoundTripAfter((customObject) => customObject.setScale(2));
+        await expectRoundTripAfter((customObject) => customObject.flipX(false));
+        await expectRoundTripAfter((customObject) => customObject.flipY(true));
+        await expectRoundTripAfter((customObject) =>
+          customObject.setRotationCenter(-13, 29)
+        );
+        await expectRoundTripAfter((customObject) =>
+          customObject.setWidth(customObject.getWidth() * 1.2)
+        );
+        await expectRoundTripAfter((customObject) =>
+          customObject.setHeight(customObject.getHeight() * 0.8)
+        );
+      });
+
+      /** Where the renderer draws a point of the inside of the object. */
+      const drawn = (customObject, x, y) => {
+        customObject.getRenderer().ensureUpToDate();
+        const container = customObject.getRendererObject();
+        container.transform.updateLocalTransform();
+        return container.localTransform.apply({ x, y });
+      };
+
+      it('moves without building the container of the renderer again', async () => {
+        const { customObject } = await makeTransformedCustomObject();
+        drawn(customObject, 10, 20);
+
+        const counts = countCalls(
+          [[customObject.getRenderer(), '_updatePIXIContainer']],
+          () => {
+            customObject.setX(51);
+            customObject.setY(72);
+            customObject.setAngle(67);
+            customObject.getRenderer().ensureUpToDate();
+          }
+        );
+
+        // Only the position and the angle of the container changed: the
+        // renderer writes them, where everything else it is built from (the
+        // pivot, the scales, the flips) is untouched.
+        expect(counts).to.eql([0]);
+        const point = drawn(customObject, 10, 20);
+        expectNear(point.x, customObject.toParentX(10, 20));
+        expectNear(point.y, customObject.toParentY(10, 20));
+      });
+
+      it('keeps a container build asked for earlier while it moves', async () => {
+        const { customObject } = await makeTransformedCustomObject();
+        drawn(customObject, 10, 20);
+
+        // The center of rotation is the pivot of the container: it needs the
+        // whole container built again, which moving must not take away.
+        customObject.setRotationCenter(-13, 29);
+        customObject.setX(51);
+        customObject.setAngle(67);
+
+        const point = drawn(customObject, 10, 20);
+        expectNear(point.x, customObject.toParentX(10, 20));
+        expectNear(point.y, customObject.toParentY(10, 20));
+      });
+
+      it('is not built again when a child of an object with an area of its own moves', async () => {
+        const { customObject, leftSprite } =
+          await makeTransformedCustomObject();
+        const beforeX = customObject.toParentX(10, 20);
+        const beforeY = customObject.toParentY(10, 20);
+        const beforeBounds = JSON.stringify(customObject.getAABB());
+        drawn(customObject, 10, 20);
+
+        const counts = countCalls(
+          [[customObject, '_updateLocalTransformation']],
+          () => {
+            leftSprite.setPosition(-200, 140);
+            customObject.toParentX(10, 20);
+            customObject.getHitBoxes();
+          }
+        );
+
+        // The object has an area of its own: its center of rotation stays
+        // where it is, so what it contains moved and it did not.
+        expect(counts).to.eql([0]);
+        expect(customObject.toParentX(10, 20)).to.be(beforeX);
+        expect(customObject.toParentY(10, 20)).to.be(beforeY);
+        // Its hit boxes - and the ones of whatever contains it - still follow
+        // its children.
+        expect(JSON.stringify(customObject.getAABB())).not.to.be(beforeBounds);
       });
     });
 
@@ -619,7 +790,7 @@ describe('gdjs.CustomRuntimeObject', function () {
         expect(back[1]).to.be(32);
       });
 
-      it('answers a position that is nowhere with one that is nowhere, never NaN', async () => {
+      it('answers a position that is nowhere with one that is nowhere', async () => {
         const { customObject } = await makeCustomObjectWith2Children();
         const instanceContainer = customObject._instanceContainer;
         customObject.setPosition(16, 8);

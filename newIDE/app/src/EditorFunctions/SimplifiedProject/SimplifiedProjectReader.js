@@ -217,33 +217,112 @@ export const applyTokenBudget = ({
 
 /**
  * A filter over the items of an array: `property` names the item property to
- * compare, and exactly one of `value` (strict equality on the stringified
- * value), `contains` or `startsWith` (both case-insensitive on the
- * stringified value) gives the comparison. When several are given, the most
- * specific wins (value, then startsWith, then contains).
+ * compare (omitted when the items are plain values, like the names given by a
+ * path ending in `[*].objectName`), and exactly one of `value` (strict
+ * equality on the stringified value), `contains` or `startsWith` (both
+ * case-insensitive on the stringified value) gives the comparison. When
+ * several are given, the most specific wins (value, then startsWith, then
+ * contains).
  */
 export type ArrayItemsFilter = {
-  property: string,
+  property?: string,
   value?: string,
   contains?: string,
   startsWith?: string,
 };
 
-export const matchesFilter = (item: any, filter: ArrayItemsFilter): boolean => {
-  if (!item || typeof item !== 'object') return false;
-  const itemValue = String(item[filter.property]);
-  if (filter.value !== undefined) return itemValue === String(filter.value);
+type FilterComparison = {|
+  kind: 'value' | 'startsWith' | 'contains',
+  text: string,
+|};
+
+/** The comparison a filter makes, or null when it has none. */
+const getFilterComparison = (
+  filter: ArrayItemsFilter
+): FilterComparison | null => {
+  if (filter.value !== undefined) {
+    return { kind: 'value', text: String(filter.value) };
+  }
   if (filter.startsWith !== undefined) {
-    return itemValue
-      .toLowerCase()
-      .startsWith(String(filter.startsWith).toLowerCase());
+    return {
+      kind: 'startsWith',
+      text: String(filter.startsWith).toLowerCase(),
+    };
   }
   if (filter.contains !== undefined) {
-    return itemValue
-      .toLowerCase()
-      .includes(String(filter.contains).toLowerCase());
+    return { kind: 'contains', text: String(filter.contains).toLowerCase() };
   }
-  return false;
+  return null;
+};
+
+const matchesFilterComparison = (
+  value: any,
+  comparison: FilterComparison
+): boolean => {
+  const text = String(value);
+  if (comparison.kind === 'value') return text === comparison.text;
+  if (comparison.kind === 'startsWith') {
+    return text.toLowerCase().startsWith(comparison.text);
+  }
+  return text.toLowerCase().includes(comparison.text);
+};
+
+const hasFilterProperty = (filter: ArrayItemsFilter): boolean =>
+  typeof filter.property === 'string' && filter.property !== '';
+
+export const matchesFilter = (item: any, filter: ArrayItemsFilter): boolean => {
+  const comparison = getFilterComparison(filter);
+  if (!comparison) return false;
+  if (!hasFilterProperty(filter)) {
+    // No property: the items are plain values, compared themselves.
+    return (
+      item !== null &&
+      item !== undefined &&
+      typeof item !== 'object' &&
+      matchesFilterComparison(item, comparison)
+    );
+  }
+  if (!item || typeof item !== 'object') return false;
+  return matchesFilterComparison(item[String(filter.property)], comparison);
+};
+
+/**
+ * Keep the items of an array matching the filter. A filter that cannot be
+ * applied is refused instead of being ignored: an unfiltered result taken for
+ * a filtered one is acted upon (an agent asked for the objects "containing
+ * zombie", got them all, and deleted them all).
+ */
+export const applyArrayItemsFilter = (
+  items: Array<any>,
+  filter: ArrayItemsFilter
+):
+  | {| success: true, result: Array<any> |}
+  | {| success: false, message: string |} => {
+  if (!getFilterComparison(filter)) {
+    return {
+      success: false,
+      message:
+        'The filter needs one of `value`, `contains` or `startsWith` to compare with. Nothing was returned.',
+    };
+  }
+  if (!hasFilterProperty(filter)) {
+    const objectItem = items.find(
+      item => item && typeof item === 'object' && !Array.isArray(item)
+    );
+    if (objectItem) {
+      return {
+        success: false,
+        message: `The filter needs \`property\` to say which property of the items to compare (the items have: ${Object.keys(
+          objectItem
+        ).join(', ') ||
+          '(none)'}). Nothing was returned: without \`property\`, only arrays of plain values (like a path ending in \`[*].objectName\`) are filtered.`,
+      };
+    }
+  }
+  return {
+    success: true,
+    result: items.filter(item => matchesFilter(item, filter)),
+  };
 };
 
 export type PathStep =
@@ -320,6 +399,48 @@ export const parsePath = (path: string): Array<PathStep> => {
   }
 
   return steps;
+};
+
+/**
+ * The results of the remaining steps applied to the items of the last wildcard
+ * of a path, filtered:
+ * - the steps end on arrays (`scenes[*].objects`): each array is filtered;
+ * - the filter names a `property`: the ITEMS are filtered before the steps
+ *   project them (`objects[*].objectName` filtered on `objectName` gives the
+ *   matching names);
+ * - no `property`: the projected plain values are filtered
+ *   (`objects[*].objectName` with `contains`).
+ */
+const filterWildcardResults = ({
+  items,
+  results,
+  filter,
+}: {|
+  items: Array<any>,
+  results: Array<any>,
+  filter: ArrayItemsFilter,
+|}):
+  | {| success: true, result: Array<any> |}
+  | {| success: false, message: string |} => {
+  if (results.length > 0 && results.every(result => Array.isArray(result))) {
+    const filteredResults = [];
+    for (const result of results) {
+      const filtered = applyArrayItemsFilter(result, filter);
+      if (!filtered.success) return filtered;
+      filteredResults.push(filtered.result);
+    }
+    return { success: true, result: filteredResults };
+  }
+  if (hasFilterProperty(filter)) {
+    const filteredItems = applyArrayItemsFilter(items, filter);
+    if (!filteredItems.success) return filteredItems;
+    const keptItems = new Set(filteredItems.result);
+    return {
+      success: true,
+      result: results.filter((result, index) => keptItems.has(items[index])),
+    };
+  }
+  return applyArrayItemsFilter(results, filter);
 };
 
 /**
@@ -401,36 +522,48 @@ const walkSteps = ({
       }
 
       if (i + 1 < steps.length) {
-        // Apply remaining steps to each item.
+        // Apply remaining steps to each item. The filter applies to the last
+        // array of the path: a later wildcard, else what the remaining steps
+        // end on (see `filterWildcardResults`).
+        const hasLaterWildcard = steps
+          .slice(i + 1)
+          .some(laterStep => laterStep.type === 'wildcard');
         const results = [];
         for (const item of value) {
           const sub = walkSteps({
             current: item,
             steps,
             startIndex: i + 1,
-            filter,
+            filter: hasLaterWildcard ? filter : null,
             maxDepth,
           });
           if (!sub.success) return sub;
           results.push(sub.result);
         }
+        if (filter && !hasLaterWildcard) {
+          return filterWildcardResults({ items: value, results, filter });
+        }
         return { success: true, result: results };
       }
 
       // Terminal wildcard — apply filter if provided, then truncate.
-      let filtered = value;
-      if (filter && filter.property) {
-        const nonNullFilter = filter;
-        filtered = filtered.filter(item => matchesFilter(item, nonNullFilter));
+      if (filter) {
+        const filtered = applyArrayItemsFilter(value, filter);
+        if (!filtered.success) return filtered;
+        return {
+          success: true,
+          result: truncateToDepth(filtered.result, maxDepth),
+        };
       }
-      return { success: true, result: truncateToDepth(filtered, maxDepth) };
+      return { success: true, result: truncateToDepth(value, maxDepth) };
     }
   }
 
   // Apply filter to the final result if it's an array and filter is provided.
-  if (Array.isArray(value) && filter && filter.property) {
-    const nonNullFilter = filter;
-    value = value.filter(item => matchesFilter(item, nonNullFilter));
+  if (Array.isArray(value) && filter) {
+    const filtered = applyArrayItemsFilter(value, filter);
+    if (!filtered.success) return filtered;
+    value = filtered.result;
   }
 
   return { success: true, result: truncateToDepth(value, maxDepth) };

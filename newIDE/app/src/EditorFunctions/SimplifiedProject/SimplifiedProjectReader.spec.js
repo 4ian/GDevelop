@@ -83,6 +83,78 @@ describe('navigateSimplifiedProjectJson', () => {
     ).toEqual({ success: true, result: 'world' });
   });
 
+  it('filters the plain values a path ends on without `property`', () => {
+    expect(
+      navigateSimplifiedProjectJson({
+        project: fakeProject,
+        path: 'scenes[*].sceneName',
+        filter: { contains: 'level' },
+        maxDepth: 2,
+      })
+    ).toEqual({
+      success: true,
+      result: ['Level1', 'Level2', 'BossLevel', 'Level3'],
+    });
+  });
+
+  it('filters the items of the last wildcard on `property` before the remaining steps project them', () => {
+    expect(
+      navigateSimplifiedProjectJson({
+        project: fakeProject,
+        path: 'scenes[1].objects[*].objectName',
+        filter: { property: 'objectName', contains: 'play' },
+        maxDepth: 2,
+      })
+    ).toEqual({ success: true, result: ['Player'] });
+  });
+
+  it('filters the arrays the remaining steps end on', () => {
+    expect(
+      navigateSimplifiedProjectJson({
+        project: fakeProject,
+        path: 'scenes[*].objects',
+        filter: { property: 'objectName', value: 'Enemy' },
+        maxDepth: 3,
+      })
+    ).toEqual({
+      success: true,
+      result: [[], [{ objectName: 'Enemy', objectType: 'Sprite' }], [], [], []],
+    });
+  });
+
+  it('refuses a filter without `property` on objects instead of returning them all', () => {
+    // An agent once asked for the objects "containing zombie" this way, got
+    // every object of the scene back, and deleted them all.
+    for (const path of ['scenes[1].objects', 'scenes[1].objects[*]']) {
+      const result = navigateSimplifiedProjectJson({
+        project: fakeProject,
+        path,
+        filter: { contains: 'zombie' },
+        maxDepth: 2,
+      });
+      expect(result.success).toBe(false);
+      if (result.success) throw new Error('unreachable');
+      expect(result.message).toContain('The filter needs `property`');
+      expect(result.message).toContain('the items have: objectName');
+      expect(result.message).toContain('Nothing was returned');
+    }
+  });
+
+  it('refuses a filter with nothing to compare with', () => {
+    expect(
+      navigateSimplifiedProjectJson({
+        project: fakeProject,
+        path: 'scenes',
+        filter: { property: 'sceneName' },
+        maxDepth: 2,
+      })
+    ).toEqual({
+      success: false,
+      message:
+        'The filter needs one of `value`, `contains` or `startsWith` to compare with. Nothing was returned.',
+    });
+  });
+
   it('filters with contains (case-insensitive)', () => {
     const result = navigateSimplifiedProjectJson({
       project: fakeProject,

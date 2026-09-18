@@ -199,6 +199,20 @@ export class ProfilerRecordingStore {
     this._notify(true);
   }
 
+  /**
+   * Give the recording of a preview to another one: what a closed game
+   * recorded stays on screen when the next one is launched, until it records
+   * something of its own. Nothing is moved onto a preview that already
+   * recorded.
+   */
+  transfer(fromDebuggerId: DebuggerId, toDebuggerId: DebuggerId) {
+    const recording = this._recordings.get(fromDebuggerId);
+    if (!recording || this._recordings.has(toDebuggerId)) return;
+    this._recordings.delete(fromDebuggerId);
+    this._recordings.set(toDebuggerId, recording);
+    this._notify(true);
+  }
+
   clear(debuggerId: DebuggerId) {
     if (this._recordings.delete(debuggerId)) {
       this._notify(true);

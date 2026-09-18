@@ -13,6 +13,7 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import Background from '../UI/Background';
 import AlertMessage from '../UI/AlertMessage';
+import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import FlatButton from '../UI/FlatButton';
 import {
   type PreviewDebuggerServer,
@@ -312,8 +313,8 @@ export default class Debugger extends React.Component<Props, State> {
         const isPreview = previewDebuggerServer
           .getExistingPreviewDebuggerIds()
           .includes(id);
-        // A new game replaces what the closed ones recorded.
-        if (isPreview) this._forgetClosedDebuggers(debuggerIds);
+        // A new game takes over what the closed ones left on screen.
+        if (isPreview) this._carryOverClosedDebuggersData(id, debuggerIds);
         // The game is not ready to record yet: it is when it sends its status.
         if (this.state.shouldRecordOnLaunch) {
           this._recordOnConnectionIds.add(id);
@@ -562,13 +563,43 @@ export default class Debugger extends React.Component<Props, State> {
   };
 
   /**
-   * Forget the games that were closed and whose data was kept: a new game
-   * replaces them, so that recordings do not pile up.
+   * A game was just launched: the last values of the game it replaces are
+   * given to it, so that the panels keep showing what they showed until the
+   * new game sends its own. The closed games are then forgotten, so that
+   * recordings do not pile up. The logs are not carried over: a console is
+   * the story of one run, and mixing two of them would read as one.
    */
-  _forgetClosedDebuggers = (connectedDebuggerIds: Array<DebuggerId>) => {
-    Object.keys(this.state.debuggerStatus)
-      .filter(id => !connectedDebuggerIds.includes(id))
-      .forEach(id => this._forgetDebugger(id));
+  _carryOverClosedDebuggersData = (
+    newDebuggerId: DebuggerId,
+    connectedDebuggerIds: Array<DebuggerId>
+  ) => {
+    const closedIds = Object.keys(this.state.debuggerStatus).filter(
+      id => !connectedDebuggerIds.includes(id)
+    );
+    // The last one closed is the one that was being read.
+    const previousId = closedIds[closedIds.length - 1];
+    if (previousId !== undefined && previousId !== newDebuggerId) {
+      this._profilerRecordingStore.transfer(previousId, newDebuggerId);
+      this.setState(state => {
+        const debuggerGameData = { ...state.debuggerGameData };
+        const resourcesDebugSnapshots = { ...state.resourcesDebugSnapshots };
+        if (
+          debuggerGameData[previousId] &&
+          debuggerGameData[newDebuggerId] === undefined
+        ) {
+          debuggerGameData[newDebuggerId] = debuggerGameData[previousId];
+        }
+        if (
+          resourcesDebugSnapshots[previousId] &&
+          resourcesDebugSnapshots[newDebuggerId] === undefined
+        ) {
+          resourcesDebugSnapshots[newDebuggerId] =
+            resourcesDebugSnapshots[previousId];
+        }
+        return { debuggerGameData, resourcesDebugSnapshots };
+      });
+    }
+    closedIds.forEach(id => this._forgetDebugger(id));
   };
 
   /** The last game running in a preview, ignoring the game embedded in the editor. */
@@ -792,6 +823,17 @@ export default class Debugger extends React.Component<Props, State> {
               )
             }
           />
+          {/* What the numbers of every panel are worth knowing: the game is
+              watched, and being watched costs it. */}
+          <DismissableAlertMessage
+            kind="info"
+            identifier="debugger-slows-the-game-down"
+          >
+            <Trans>
+              A game watched by the debugger sends a lot of data, and recording
+              asks for more: it can run slower than it would on its own.
+            </Trans>
+          </DismissableAlertMessage>
           {this._hasKeptDataForSelectedDebugger() && (
             <AlertMessage
               kind="info"

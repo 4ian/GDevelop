@@ -3,6 +3,7 @@ import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import Background from '../../UI/Background';
 import EmptyMessage from '../../UI/EmptyMessage';
+import StartRecordingPlaceholder from '../StartRecordingPlaceholder';
 import Text from '../../UI/Text';
 import SearchBar from '../../UI/SearchBar';
 import Chip from '../../UI/Chip';
@@ -42,6 +43,8 @@ type Props = {|
   isPollingEnabled: boolean,
   recordingStore: ProfilerRecordingStore,
   debuggerId: DebuggerId,
+  canRecord: boolean,
+  onStartRecording: () => void,
   /** The artificial memory limit, shared with the performance panel. */
   artificialLimitMegabytes: ?number,
   onChangeArtificialLimitMegabytes: (?number) => void,
@@ -69,6 +72,8 @@ const ResourcesPanel = ({
   isPollingEnabled,
   recordingStore,
   debuggerId,
+  canRecord,
+  onStartRecording,
   artificialLimitMegabytes,
   onChangeArtificialLimitMegabytes,
 }: Props): React.Node => {
@@ -157,6 +162,21 @@ const ResourcesPanel = ({
     // Named in lower case: the identifier of a message is the sentence
     // itself, so an interpolated value must read well inside it.
     const errorMessage = lastError;
+    if (!lastError && !isPollingEnabled) {
+      // Nothing was recorded yet: the button that fills this panel is right
+      // here, as in the profiler and the performance panels.
+      return (
+        <StartRecordingPlaceholder
+          description={
+            <Trans>
+              Record a running preview to see the resources it loads.
+            </Trans>
+          }
+          canRecord={canRecord}
+          onStartRecording={onStartRecording}
+        />
+      );
+    }
     return (
       <Background>
         <EmptyMessage>
@@ -165,12 +185,8 @@ const ResourcesPanel = ({
               The game did not answer: it may be too old to report its
               resources. ({errorMessage})
             </Trans>
-          ) : isPollingEnabled ? (
-            <Trans>Waiting for the game to report its resources...</Trans>
           ) : (
-            <Trans>
-              Record a running preview to see the resources it loads.
-            </Trans>
+            <Trans>Waiting for the game to report its resources...</Trans>
           )}
         </EmptyMessage>
       </Background>

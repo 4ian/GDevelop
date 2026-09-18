@@ -494,6 +494,7 @@ const InstructionEditorDialog = ({
           true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
         }
         id="instruction-editor-dialog"
+        allowInteractionWithFloatingPanels
       >
         <SelectColumns
           columnsRenderer={{

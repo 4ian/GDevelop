@@ -44,7 +44,8 @@ export type AlertMessageIdentifier =
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name';
+  | 'project-should-have-unique-package-name'
+  | 'debugger-slows-the-game-down';
 
 export type EditorMosaicName =
   | 'scene-editor'

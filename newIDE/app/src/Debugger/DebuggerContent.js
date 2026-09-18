@@ -404,6 +404,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
             }
             recordingStore={profilerRecordingStore}
             debuggerId={debuggerId}
+            canRecord={canRecord}
+            onStartRecording={onStartRecording}
             artificialLimitMegabytes={memoryLimitMegabytes}
             onChangeArtificialLimitMegabytes={megabytes =>
               this.setState({ memoryLimitMegabytes: megabytes })

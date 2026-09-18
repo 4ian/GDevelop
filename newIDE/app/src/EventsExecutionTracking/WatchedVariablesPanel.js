@@ -35,6 +35,8 @@ import {
   type InstanceEvaluation,
 } from './EventsExecutionTrackingStore';
 import InstanceVariableIcon from '../UI/CustomSvgIcons/InstanceVariable';
+// The same icon as the button opening the expression editor.
+import ExpressionIcon from '@material-ui/icons/Functions';
 import FirstInstanceVariableIcon from '../UI/CustomSvgIcons/FirstInstanceVariable';
 import classes from './WatchedVariablesPanel.module.css';
 
@@ -282,6 +284,45 @@ const getWatchedExpressionType = (
       error
     );
     return 'string';
+  }
+};
+
+/**
+ * Whether the platform can read the expression at all: an expression naming
+ * something that does not exist is generated as the default value of its
+ * type, a `0` or an empty text that reads as a real value.
+ */
+const isWatchedExpressionValid = (
+  expression: string,
+  projectScopedContainers: gdProjectScopedContainers
+): boolean => {
+  try {
+    const type = getWatchedExpressionTypeOrThrow(
+      expression,
+      projectScopedContainers
+    );
+    // A variable path was resolved against the project: it exists.
+    if (type === 'variable' || type === 'number') return true;
+    // Read as a text only because it is not a valid number: it still has to
+    // be a valid text.
+    const stringValidator = new gd.ExpressionValidator(
+      gd.JsPlatform.get(),
+      projectScopedContainers,
+      'string',
+      '',
+      ''
+    );
+    const parser = new gd.ExpressionParser2();
+    const expressionNode = parser.parseExpression(expression);
+    expressionNode.get().visit(stringValidator);
+    const isValidString = stringValidator.getFatalErrors().size() === 0;
+    stringValidator.delete();
+    parser.delete();
+    return isValidString;
+  } catch (error) {
+    console.error(`Unable to validate "${expression}":`, error);
+    // Shown as it is rather than struck through on a doubt.
+    return true;
   }
 };
 
@@ -554,12 +595,22 @@ const WatchedVariablesPanel = ({
           layoutCodeGenerator.setEvaluateForAllInstances(
             perInstanceExpressions.includes(expression)
           );
-          return layoutCodeGenerator.generateExpressionEvaluationCode(
+          const type = getWatchedExpressionType(
+            expression,
+            projectScopedContainers
+          );
+          const generatedCode = layoutCodeGenerator.generateExpressionEvaluationCode(
             layout,
-            getWatchedExpressionType(expression, projectScopedContainers),
+            type,
             expression,
             ''
           );
+          // TEMPORARY, to be removed: which code a watched expression runs.
+          console.info(
+            `[watched] "${expression}" (${type}):
+${generatedCode}`
+          );
+          return generatedCode;
         } catch (error) {
           console.error(
             `Unable to generate the code watching "${expression}":`,
@@ -574,10 +625,10 @@ const WatchedVariablesPanel = ({
       let isCancelled = false;
       const refresh = async () => {
         if (!store.hasRunningPreview()) {
-          if (!isCancelled) {
-            setHasRunningPreview(false);
-            setEvaluations({});
-          }
+          // The values of the game that just closed stay on screen, until the
+          // next one sends its own: a panel emptied on exit loses exactly
+          // what was being read.
+          if (!isCancelled) setHasRunningPreview(false);
           return;
         }
         if (!isCancelled) setHasRunningPreview(true);
@@ -612,6 +663,19 @@ const WatchedVariablesPanel = ({
     ]
   );
 
+  const invalidExpressions = React.useMemo(
+    () => {
+      if (!projectScopedContainers) return new Set<string>();
+      return new Set(
+        watchedExpressions.filter(
+          expression =>
+            !isWatchedExpressionValid(expression, projectScopedContainers)
+        )
+      );
+    },
+    [watchedExpressions, projectScopedContainers]
+  );
+
   // One item per watched variable, then one per child of a structure or of
   // an array, built again at each refresh from the values of the game.
   // Root items are prefixed with "root:" to avoid id collisions with children
@@ -629,6 +693,7 @@ const WatchedVariablesPanel = ({
         const isMissing =
           (sourceType === gd.VariablesContainer.Unknown &&
             !expression.includes('(')) ||
+          invalidExpressions.has(expression) ||
           (!!evaluation &&
             !evaluation.error &&
             evaluation.result === undefined);
@@ -688,7 +753,13 @@ const WatchedVariablesPanel = ({
               : null),
         };
       }),
-    [watchedExpressions, projectScopedContainers, evaluations, searchText]
+    [
+      watchedExpressions,
+      projectScopedContainers,
+      evaluations,
+      searchText,
+      invalidExpressions,
+    ]
   );
 
   // What the search keeps: a watched variable whose name matches, or one
@@ -787,7 +858,15 @@ const WatchedVariablesPanel = ({
         </div>
       );
     }
-    const VariableIcon = getVariableSourceIcon(item.sourceType);
+    // An expression is not a variable of an unknown source: it has its own
+    // icon, where the source icon would show the cross of what it could not
+    // resolve.
+    const VariableIcon =
+      item.expression &&
+      item.sourceType === gd.VariablesContainer.Unknown &&
+      item.expression.includes('(')
+        ? ExpressionIcon
+        : getVariableSourceIcon(item.sourceType);
     const hasSeveralInstances =
       !!item.expression && (item.instancesCount || 0) > 1;
     return (
@@ -837,7 +916,7 @@ const WatchedVariablesPanel = ({
           ) : (
             <span className={classes.rowFirstInstance} />
           )}
-          {item.hasValue && (
+          {item.hasValue && !item.isMissing && (
             <span className={classes.rowType}>
               {React.createElement(
                 getVariableTypeToIcon()[getValueType(item.value)],

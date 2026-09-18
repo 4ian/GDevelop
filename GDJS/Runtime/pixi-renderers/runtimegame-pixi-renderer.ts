@@ -1026,6 +1026,84 @@ namespace gdjs {
     }
 
     /**
+     * The WebGL draw calls counted since the last read, or null when nobody
+     * asked to count them.
+     *
+     * PixiJS 7 has no draw call counter of its own at the renderer level (the
+     * `drawCalls` of the bundle belong to `GraphicsGeometry`, and the batch
+     * renderer is minified), so the drawing entry points of the WebGL context
+     * are wrapped, and only while a recording runs.
+     */
+    private _countedDrawCalls: integer | null = null;
+    /** The unwrapped functions, put back when the counting stops. */
+    private _originalDrawFunctions: Array<{
+      name: string;
+      originalFunction: Function;
+    }> | null = null;
+
+    private _getWebGLContext(): any {
+      const pixiRenderer: any = this._pixiRenderer;
+      return pixiRenderer && pixiRenderer.gl ? pixiRenderer.gl : null;
+    }
+
+    /**
+     * Count the draw calls made through the WebGL context, until
+     * `stopCountingDrawCalls` puts the context back as it was. Wrapping the
+     * context is not free, which is why it only ever happens while the user
+     * records.
+     */
+    startCountingDrawCalls(): void {
+      if (this._originalDrawFunctions) return;
+      const gl = this._getWebGLContext();
+      if (!gl) return;
+
+      this._countedDrawCalls = 0;
+      this._originalDrawFunctions = [];
+      const drawFunctionNames = [
+        'drawElements',
+        'drawArrays',
+        'drawElementsInstanced',
+        'drawArraysInstanced',
+      ];
+      for (const name of drawFunctionNames) {
+        const originalFunction = gl[name];
+        if (typeof originalFunction !== 'function') continue;
+        this._originalDrawFunctions.push({ name, originalFunction });
+        const renderer = this;
+        gl[name] = function (...args) {
+          if (renderer._countedDrawCalls !== null) renderer._countedDrawCalls++;
+          return originalFunction.apply(this, args);
+        };
+      }
+    }
+
+    /**
+     * Put the WebGL context back as it was. Anything that captured a wrapped
+     * function before this point would keep counting, which is why the
+     * wrapping is kept to the drawing entry points only.
+     */
+    stopCountingDrawCalls(): void {
+      const originalDrawFunctions = this._originalDrawFunctions;
+      if (!originalDrawFunctions) return;
+      const gl = this._getWebGLContext();
+      if (gl) {
+        for (const { name, originalFunction } of originalDrawFunctions) {
+          gl[name] = originalFunction;
+        }
+      }
+      this._originalDrawFunctions = null;
+      this._countedDrawCalls = null;
+    }
+
+    /** The draw calls counted since the last read, and starts again from 0. */
+    takeCountedDrawCalls(): integer | null {
+      if (this._countedDrawCalls === null) return null;
+      const countedDrawCalls = this._countedDrawCalls;
+      this._countedDrawCalls = 0;
+      return countedDrawCalls;
+    }
+
+    /**
      * Get the Three.js renderer for the game - if any.
      */
     getThreeRenderer(): THREE.WebGLRenderer | null {

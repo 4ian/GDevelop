@@ -74,6 +74,95 @@ describe('gdjs.Profiler', () => {
     expect(averages.subsections['render'].time).to.be(4);
   });
 
+  it('records the sub-sections opened inside the render', () => {
+    const { profiler, chunks, advance } = makeProfilerWithFakeClock();
+
+    profiler.beginFrame();
+    profiler.begin('render');
+    advance(1);
+    profiler.begin('state resets');
+    advance(1);
+    profiler.end('state resets');
+    profiler.begin('layer "Lighting"');
+    advance(6);
+    profiler.begin('post-processing');
+    advance(4);
+    profiler.end('post-processing');
+    profiler.end('layer "Lighting"');
+    profiler.end('render');
+    profiler.endFrame();
+    profiler.flushChunk();
+
+    // "render is 75% of the frame" says nothing; "the Lighting layer is most
+    // of the render" is what the user can act on.
+    const averages = profiler.getFramesAverageMeasures();
+    const renderMeasures = averages.subsections['render'];
+    expect(renderMeasures.time).to.be(12);
+    expect(renderMeasures.subsections['state resets'].time).to.be(1);
+    expect(renderMeasures.subsections['layer "Lighting"'].time).to.be(10);
+    expect(
+      renderMeasures.subsections['layer "Lighting"'].subsections[
+        'post-processing'
+      ].time
+    ).to.be(4);
+  });
+
+  it('empties the renderer accumulators at each sample', () => {
+    const { profiler, chunks, advance } = makeProfilerWithFakeClock();
+
+    const playFrames = (framesCount, drawCalls) => {
+      for (let index = 0; index < framesCount; index++) {
+        profiler.beginFrame();
+        advance(16);
+        // The same order as `RuntimeScene.renderAndStep`: the renderer is
+        // read before the frame is closed, so its numbers land in the chunk
+        // that frame belongs to.
+        profiler.record3DRendererInfo({
+          render: { calls: drawCalls, triangles: drawCalls * 100 },
+        });
+        profiler.record2DDrawCalls(drawCalls * 2);
+        profiler.endFrame();
+      }
+    };
+
+    // A chunk is sent every 30 frames, each one carrying a sample.
+    playFrames(30, 10);
+    playFrames(30, 20);
+    profiler.flushChunk();
+
+    expect(chunks.length).to.be(2);
+    const firstSample = chunks[0].samples[0];
+    const secondSample = chunks[1].samples[0];
+    // The second sample covers its own frames only: without emptying the
+    // accumulators it would average the whole run and never move.
+    expect(firstSample.drawCalls3DPerFrame).to.be(10);
+    expect(secondSample.drawCalls3DPerFrame).to.be(20);
+    expect(firstSample.triangles3DPerFrame).to.be(1000);
+    expect(secondSample.triangles3DPerFrame).to.be(2000);
+    expect(firstSample.drawCalls2DPerFrame).to.be(20);
+    expect(secondSample.drawCalls2DPerFrame).to.be(40);
+
+    // The averages over the whole run are kept apart, for the summary sent
+    // when the recording stops.
+    const stats = profiler.getStats();
+    expect(Math.round(stats.averageDrawCallsCount)).to.be(15);
+  });
+
+  it('reports nothing rather than zero when the renderer said nothing', () => {
+    const { profiler, chunks, advance } = makeProfilerWithFakeClock();
+
+    profiler.beginFrame();
+    advance(16);
+    profiler.endFrame();
+    profiler.flushChunk();
+
+    const sample = chunks[0].samples[0];
+    // A 2D only game has no 3D renderer: a zero would claim it drew nothing.
+    expect(sample.drawCalls3DPerFrame).to.be(null);
+    expect(sample.triangles3DPerFrame).to.be(null);
+    expect(sample.drawCalls2DPerFrame).to.be(null);
+  });
+
   it('sends a chunk every 30 frames and keeps averages and maximums over any number of frames', () => {
     const { profiler, chunks, advance } = makeProfilerWithFakeClock();
 

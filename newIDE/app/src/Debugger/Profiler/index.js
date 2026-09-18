@@ -13,6 +13,7 @@ import ScrollView from '../../UI/ScrollView';
 import Text from '../../UI/Text';
 import LinearProgress from '../../UI/LinearProgress';
 import { type DebuggerId } from '../../ExportAndShare/PreviewLauncher.flow';
+import { type ProfilerMeasuresSection } from '..';
 import {
   ProfilerRecordingStore,
   useProfilerRecording,
@@ -30,6 +31,53 @@ import {
 } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import StartRecordingPlaceholder from '../StartRecordingPlaceholder';
 import classes from './Profiler.module.css';
+
+/** Above this share of the frame, `render` is worth saying something about. */
+const HEAVY_RENDER_SHARE = 0.5;
+/** Above this share of the render, one section is what to look at first. */
+const DOMINANT_SECTION_SHARE = 0.4;
+
+/**
+ * What the measures say to do, when they say something clear. Only the
+ * render is covered: it is the section that carries no meaning on its own,
+ * every other one being named after the events it runs.
+ */
+const getRenderAdvice = (measures: ?ProfilerMeasuresSection): React.Node => {
+  if (!measures || !measures.time) return null;
+  const renderSection = measures.subsections['render'];
+  if (!renderSection || !renderSection.time) return null;
+  if (renderSection.time < measures.time * HEAVY_RENDER_SHARE) return null;
+
+  let heaviestName = null;
+  let heaviestTime = 0;
+  for (const name in renderSection.subsections) {
+    const subsection = renderSection.subsections[name];
+    if (subsection.time > heaviestTime) {
+      heaviestTime = subsection.time;
+      heaviestName = name;
+    }
+  }
+  const renderPercent = Math.round((renderSection.time / measures.time) * 100);
+  if (
+    !heaviestName ||
+    heaviestTime < renderSection.time * DOMINANT_SECTION_SHARE
+  ) {
+    return (
+      <Trans>
+        Rendering takes {renderPercent}% of the frame, spread over its sections:
+        fewer objects on screen, or fewer layers, is what brings it down.
+      </Trans>
+    );
+  }
+  const heaviestPercent = Math.round((heaviestTime / renderSection.time) * 100);
+  const heaviestSectionName = heaviestName;
+  return (
+    <Trans>
+      Rendering takes {renderPercent}% of the frame, and {heaviestPercent}% of
+      that goes into "{heaviestSectionName}": that is what to look at first.
+    </Trans>
+  );
+};
 
 type Props = {|
   profilingInProgress: boolean,
@@ -89,6 +137,11 @@ const Profiler = ({
         : null,
     [baselineRecording]
   );
+  // What to conclude, when there is something to conclude: a number nobody
+  // can act on is noise, and `render` at 75% was exactly that.
+  const renderAdvice = React.useMemo(() => getRenderAdvice(measures), [
+    measures,
+  ]);
   const frameStats = React.useMemo(() => getFrameStats(framesInRange), [
     framesInRange,
   ]);
@@ -172,6 +225,11 @@ const Profiler = ({
                 profilerMeasures={measures}
                 baselineMeasures={baselineMeasures}
               />
+              {renderAdvice && (
+                <Text noMargin size="body-small" color="secondary">
+                  {renderAdvice}
+                </Text>
+              )}
             </div>
           </div>
         ) : recording && recording.legacyOutput && !profilingInProgress ? (

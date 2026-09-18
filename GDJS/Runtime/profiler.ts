@@ -105,6 +105,28 @@ namespace gdjs {
     texturesCount: integer | null;
     /** `WebGLRenderer.info.memory.geometries`, or null without 3D renderer. */
     geometriesCount: integer | null;
+    /**
+     * The counters below are nullable on purpose: an older game engine sends
+     * none of them, and a recording read back from a file may have been
+     * written before they existed. A missing counter is shown as a dash, and
+     * never as a zero.
+     */
+    /** Draw calls made by the 3D renderer, per frame over the chunk. */
+    drawCalls3DPerFrame: float | null;
+    /** Triangles drawn by the 3D renderer, per frame over the chunk. */
+    triangles3DPerFrame: float | null;
+    /** Draw calls made by the 2D renderer, per frame over the chunk. */
+    drawCalls2DPerFrame: float | null;
+    /** Layers rendered by the 2D renderer on the last frame. */
+    rendered2DLayersCount: integer | null;
+    /** Layers rendered by the 3D renderer on the last frame. */
+    rendered3DLayersCount: integer | null;
+    /** Objects handed to the renderers on the last frame. */
+    renderedObjectsCount: integer | null;
+    /** Textures PixiJS is holding, all layers and scenes together. */
+    managedTexturesCount: integer | null;
+    /** How many times PixiJS ran its texture garbage collector. */
+    textureGarbageCollectionsCount: integer | null;
   };
 
   /**
@@ -232,6 +254,18 @@ namespace gdjs {
     /** How many frames the two sums above cover. */
     _rendererInfoFramesCount: integer = 0;
 
+    /**
+     * The same counters, emptied at each sample rather than at the end of the
+     * run: the panels draw them over time, and the averages over the whole
+     * run are kept apart, for the summary sent when the recording stops.
+     */
+    _sampleDrawCallsSum: integer = 0;
+    _sampleTrianglesSum: integer = 0;
+    _sampleRendererInfoFramesCount: integer = 0;
+    /** Draw calls of the 2D renderer, counted only while recording. */
+    _sample2DDrawCallsSum: integer = 0;
+    _sample2DDrawCallsFramesCount: integer = 0;
+
     _geometriesCount: integer = 0;
     _texturesCount: integer = 0;
 
@@ -291,6 +325,15 @@ namespace gdjs {
       sampleProvider: (() => ProfilerPerformanceSampleSource | null) | null
     ): void {
       this._sampleProvider = sampleProvider;
+    }
+
+    /**
+     * The draw calls the 2D renderer made on one frame. Counted by the game
+     * renderer, which wraps the WebGL context only while recording.
+     */
+    record2DDrawCalls(drawCallsCount: integer): void {
+      this._sample2DDrawCallsSum += drawCallsCount;
+      this._sample2DDrawCallsFramesCount++;
     }
 
     /** Called once when the recording reaches its maximum duration. */
@@ -490,6 +533,26 @@ namespace gdjs {
           logger.warn('Error while sampling performance counters: ' + error);
         }
       }
+      // `WebGLRenderer.info` is reset by the renderer on every frame and the
+      // profiler sums it, so the accumulators are emptied here: a sample
+      // covers the frames since the previous one, not the whole run.
+      const sampleFramesCount = this._sampleRendererInfoFramesCount;
+      const drawCalls3DPerFrame = sampleFramesCount
+        ? this._sampleDrawCallsSum / sampleFramesCount
+        : null;
+      const triangles3DPerFrame = sampleFramesCount
+        ? this._sampleTrianglesSum / sampleFramesCount
+        : null;
+      this._sampleDrawCallsSum = 0;
+      this._sampleTrianglesSum = 0;
+      this._sampleRendererInfoFramesCount = 0;
+
+      const drawCalls2DPerFrame = this._sample2DDrawCallsFramesCount
+        ? this._sample2DDrawCallsSum / this._sample2DDrawCallsFramesCount
+        : null;
+      this._sample2DDrawCallsSum = 0;
+      this._sample2DDrawCallsFramesCount = 0;
+
       return {
         atGameTimeMs: Profiler._roundMs(this._getGameTimeMs()),
         fps: Math.round(fps * 10) / 10,
@@ -498,6 +561,25 @@ namespace gdjs {
         estimatedGpuMemoryBytes: source ? source.estimatedGpuMemoryBytes : null,
         texturesCount: source ? source.texturesCount : null,
         geometriesCount: source ? source.geometriesCount : null,
+        drawCalls3DPerFrame:
+          drawCalls3DPerFrame == null
+            ? null
+            : Math.round(drawCalls3DPerFrame * 10) / 10,
+        triangles3DPerFrame:
+          triangles3DPerFrame == null
+            ? null
+            : Math.round(triangles3DPerFrame),
+        drawCalls2DPerFrame:
+          drawCalls2DPerFrame == null
+            ? null
+            : Math.round(drawCalls2DPerFrame * 10) / 10,
+        rendered2DLayersCount: source ? source.rendered2DLayersCount : null,
+        rendered3DLayersCount: source ? source.rendered3DLayersCount : null,
+        renderedObjectsCount: source ? source.renderedObjectsCount : null,
+        managedTexturesCount: source ? source.managedTexturesCount : null,
+        textureGarbageCollectionsCount: source
+          ? source.textureGarbageCollectionsCount
+          : null,
       };
     }
 
@@ -621,6 +703,9 @@ namespace gdjs {
         this._drawCallsSum += rendererInfo.render.calls;
         this._trianglesSum += rendererInfo.render.triangles;
         this._rendererInfoFramesCount++;
+        this._sampleDrawCallsSum += rendererInfo.render.calls;
+        this._sampleTrianglesSum += rendererInfo.render.triangles;
+        this._sampleRendererInfoFramesCount++;
       }
       if (rendererInfo.memory) {
         this._geometriesCount = rendererInfo.memory.geometries;

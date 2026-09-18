@@ -121,6 +121,10 @@ const getStats = (
     return null;
   };
   const stats: Array<Stat> = [];
+  // Named in lower case: the identifier of a message is the sentence itself.
+  const renderedObjectsLabel = formatNumber(
+    getLastSampleValue(samples, sample => sample.renderedObjectsCount) || 0
+  );
 
   stats.push({
     label: <Trans>Frames</Trans>,
@@ -259,18 +263,39 @@ const getStats = (
     ),
   });
 
-  // Sent by the engine when the recording stops.
+  // Sent by the engine when the recording stops. The counters below prefer
+  // the samples, which arrive while the game runs: reading only the summary
+  // left every card on a dash for the whole recording, and forever on a game
+  // that renders no 3D at all.
   const legacyStats = recording.legacyOutput
     ? recording.legacyOutput.stats
     : null;
   const formatLegacyNumber = (value: ?number): string =>
     value != null ? formatNumber(value) : '-';
+  /** The average of a counter over the samples that carry it. */
+  const getSampledAverage = (
+    sampleList: Array<ProfilerPerformanceSample>,
+    read: ProfilerPerformanceSample => ?number
+  ): ?number => {
+    let sum = 0;
+    let count = 0;
+    for (const sample of sampleList) {
+      const value = read(sample);
+      if (value != null) {
+        sum += value;
+        count++;
+      }
+    }
+    return count ? sum / count : null;
+  };
+
+  const drawCalls3D =
+    getSampledAverage(samples, sample => sample.drawCalls3DPerFrame) ??
+    (legacyStats ? legacyStats.averageDrawCallsCount : null);
   stats.push({
     label: <Trans>3D draw calls</Trans>,
-    value: formatLegacyNumber(
-      legacyStats ? legacyStats.averageDrawCallsCount : null
-    ),
-    note: <Trans>per frame, on average over the run</Trans>,
+    value: formatLegacyNumber(drawCalls3D),
+    note: <Trans>per frame, on average over the selection</Trans>,
     help: (
       <Trans>
         How many times per frame the game asks the graphics card to draw
@@ -279,17 +304,107 @@ const getStats = (
         distinct models, bring this number down.
       </Trans>
     ),
+    comparison: getComparisonNode(
+      drawCalls3D,
+      getSampledAverage(baselineSamples, sample => sample.drawCalls3DPerFrame),
+      value => formatNumber(value)
+    ),
   });
+  const drawCalls2D = getSampledAverage(
+    samples,
+    sample => sample.drawCalls2DPerFrame
+  );
+  stats.push({
+    label: <Trans>2D draw calls</Trans>,
+    value: formatLegacyNumber(drawCalls2D),
+    note: <Trans>per frame, on average over the selection</Trans>,
+    help: (
+      <Trans>
+        How many times per frame the game asks the graphics card to draw
+        something in 2D. This is what batching reduces: sprites sharing one
+        atlas and one blend mode are drawn together, sprites that do not each
+        cost a call of their own. Alternating between two atlases, or changing
+        the blend mode of one object, breaks a batch in two.
+      </Trans>
+    ),
+    comparison: getComparisonNode(
+      drawCalls2D,
+      getSampledAverage(baselineSamples, sample => sample.drawCalls2DPerFrame),
+      value => formatNumber(value)
+    ),
+  });
+  const triangles3D =
+    getSampledAverage(samples, sample => sample.triangles3DPerFrame) ??
+    (legacyStats ? legacyStats.averageTrianglesCount : null);
   stats.push({
     label: <Trans>3D triangles</Trans>,
-    value: formatLegacyNumber(
-      legacyStats ? legacyStats.averageTrianglesCount : null
-    ),
-    note: <Trans>per frame, on average over the run</Trans>,
+    value: formatLegacyNumber(triangles3D),
+    note: <Trans>per frame, on average over the selection</Trans>,
     help: (
       <Trans>
         How much geometry is drawn each frame. Unless it reaches millions, it is
         rarely what slows a game down: look at the draw calls first.
+      </Trans>
+    ),
+    comparison: getComparisonNode(
+      triangles3D,
+      getSampledAverage(baselineSamples, sample => sample.triangles3DPerFrame),
+      value => formatNumber(value)
+    ),
+  });
+  const managedTextures = getLastSampleValue(
+    samples,
+    sample => sample.managedTexturesCount
+  );
+  const renderedObjects = getLastSampleValue(
+    samples,
+    sample => sample.renderedObjectsCount
+  );
+  stats.push({
+    label: <Trans>Textures held by the 2D renderer</Trans>,
+    value: formatLegacyNumber(managedTextures),
+    note:
+      renderedObjects != null ? (
+        <Trans>for {renderedObjectsLabel} objects rendered</Trans>
+      ) : null,
+    help: (
+      <Trans>
+        How many distinct textures the 2D renderer is holding. Many more
+        textures than objects rendered is the signature of a missing atlas: each
+        image of its own forces the renderer to start a new batch, and the draw
+        calls above climb with it.
+      </Trans>
+    ),
+    comparison: getComparisonNode(
+      managedTextures,
+      getLastSampleValue(
+        baselineSamples,
+        sample => sample.managedTexturesCount
+      ),
+      value => formatNumber(value)
+    ),
+  });
+  const rendered2DLayers = getLastSampleValue(
+    samples,
+    sample => sample.rendered2DLayersCount
+  );
+  const rendered3DLayers = getLastSampleValue(
+    samples,
+    sample => sample.rendered3DLayersCount
+  );
+  stats.push({
+    label: <Trans>Layers rendered (2D / 3D)</Trans>,
+    value: `${formatLegacyNumber(rendered2DLayers)} / ${formatLegacyNumber(
+      rendered3DLayers
+    )}`,
+    note: <Trans>on the last frame measured</Trans>,
+    help: (
+      <Trans>
+        How many layers each renderer drew on the last frame. Every switch
+        between the 2D and the 3D renderer costs a reset of the graphics state:
+        the profiler, on the left, shows it as the "state resets" section.
+        Grouping the objects so that the two renderers alternate less often
+        makes that section shrink.
       </Trans>
     ),
   });

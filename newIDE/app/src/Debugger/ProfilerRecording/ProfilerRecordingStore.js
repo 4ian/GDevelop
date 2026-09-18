@@ -26,6 +26,19 @@ export type ProfilerPerformanceSample = {|
   estimatedGpuMemoryBytes: ?number,
   texturesCount: ?number,
   geometriesCount: ?number,
+  /**
+   * Every counter below is optional: an older game engine sends none of
+   * them, and a recording read back from a file may have been written before
+   * they existed. A missing counter is shown as a dash, never as a zero.
+   */
+  drawCalls3DPerFrame?: ?number,
+  triangles3DPerFrame?: ?number,
+  drawCalls2DPerFrame?: ?number,
+  rendered2DLayersCount?: ?number,
+  rendered3DLayersCount?: ?number,
+  renderedObjectsCount?: ?number,
+  managedTexturesCount?: ?number,
+  textureGarbageCollectionsCount?: ?number,
 |};
 
 export type ProfilerChunkPayload = {|

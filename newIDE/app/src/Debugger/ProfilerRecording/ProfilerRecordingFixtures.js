@@ -26,6 +26,12 @@ const sectionNames = [
   'objects (pre-render, effects update)',
   'layers (effects update)',
   'render',
+  // The sub-sections the renderer opens inside `render`.
+  'state resets',
+  'base layer',
+  'layer "Lighting"',
+  'post-processing',
+  'debug draw',
 ];
 
 /**
@@ -82,6 +88,19 @@ export const makeFakeRecordingStore = (
     push(9, 0, 0.3);
     cursor += 0.3;
     push(10, 0, renderMs);
+    // Inside the render: the heavy one is the lighting layer, which is what
+    // the advice under the table is meant to point at.
+    const resetsMs = renderMs * 0.1;
+    const baseLayerMs = renderMs * 0.2;
+    const lightingMs = renderMs * 0.55;
+    const postProcessingMs = renderMs * 0.1;
+    push(11, 1, resetsMs);
+    cursor += resetsMs;
+    push(12, 1, baseLayerMs);
+    cursor += baseLayerMs;
+    push(13, 1, lightingMs);
+    push(14, 2, postProcessingMs);
+    cursor += lightingMs;
 
     frames.push({
       frameIndex,
@@ -116,6 +135,14 @@ export const makeFakeRecordingStore = (
       ),
       texturesCount: progress < 0.4 ? 12 : 30,
       geometriesCount: 4,
+      drawCalls3DPerFrame: Math.round(20 + progress * 30),
+      triangles3DPerFrame: Math.round(12000 + progress * 8000),
+      drawCalls2DPerFrame: Math.round(60 + progress * 90),
+      rendered2DLayersCount: 3,
+      rendered3DLayersCount: 1,
+      renderedObjectsCount: Math.round(120 + progress * 200),
+      managedTexturesCount: progress < 0.4 ? 40 : 180,
+      textureGarbageCollectionsCount: Math.round(progress * 3),
     });
   }
 

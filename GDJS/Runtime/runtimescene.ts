@@ -447,11 +447,19 @@ namespace gdjs {
         profiler.end('render');
       }
       if (profiler) {
-        const threeRenderer = this._runtimeGame
-          .getRenderer()
-          .getThreeRenderer();
+        const gameRenderer = this._runtimeGame.getRenderer();
+        const threeRenderer = gameRenderer.getThreeRenderer();
         if (threeRenderer) {
           profiler.record3DRendererInfo(threeRenderer.info);
+        }
+        const countedDrawCalls = gameRenderer.takeCountedDrawCalls();
+        if (countedDrawCalls !== null) {
+          // What Three.js drew is already reported on its own: what is left
+          // is what PixiJS drew, which is the number nobody could measure.
+          const drawCalls3D = threeRenderer
+            ? threeRenderer.info.render.calls
+            : 0;
+          profiler.record2DDrawCalls(Math.max(0, countedDrawCalls - drawCalls3D));
         }
       }
       if (profiler) {
@@ -503,7 +511,9 @@ namespace gdjs {
         );
       }
 
-      this._renderer.render();
+      // The renderer cuts `render` into sections of its own while a
+      // recording runs, and pays nothing for it the rest of the time.
+      this._renderer.render(profiler);
     }
 
     /**

@@ -1770,6 +1770,9 @@ namespace gdjs {
       }
       this._profiler = profiler;
       this._onProfilerStopped = options.onStopped || null;
+      // The WebGL context is wrapped only while recording: this is the one
+      // measure of the panel that costs the game something.
+      this._renderer.startCountingDrawCalls();
       return true;
     }
 
@@ -1784,6 +1787,7 @@ namespace gdjs {
       const onProfilerStopped = this._onProfilerStopped;
       this._profiler = null;
       this._onProfilerStopped = null;
+      this._renderer.stopCountingDrawCalls();
       stoppedProfiler.flushChunk();
       stoppedProfiler.setOnChunk(null);
       if (onProfilerStopped) {
@@ -1804,6 +1808,30 @@ namespace gdjs {
           : null;
       const threeRenderer = this._renderer.getThreeRenderer();
       const rendererMemory = threeRenderer ? threeRenderer.info.memory : null;
+
+      // What the last frame rendered, straight from the renderer of the
+      // running scene. Null when no scene runs, rather than zero: nothing was
+      // measured, which is not the same as nothing being rendered.
+      const currentScene = this._sceneStack.getCurrentScene();
+      const sceneRenderer = currentScene ? currentScene.getRenderer() : null;
+      const layerMetrics =
+        sceneRenderer && sceneRenderer.getLayerRenderingMetrics
+          ? sceneRenderer.getLayerRenderingMetrics()
+          : null;
+
+      // PixiJS holds every texture it was given, and runs a garbage
+      // collector of its own: 300 managed textures for 12 sprites is the
+      // signature of a missing atlas.
+      const pixiRenderer: any = this._renderer.getPIXIRenderer();
+      const pixiTextureSystem =
+        pixiRenderer && pixiRenderer.texture ? pixiRenderer.texture : null;
+      const managedTextures =
+        pixiTextureSystem && pixiTextureSystem.managedTextures
+          ? pixiTextureSystem.managedTextures
+          : null;
+      const textureGarbageCollector =
+        pixiRenderer && pixiRenderer.textureGC ? pixiRenderer.textureGC : null;
+
       return {
         usedJSHeapBytes:
           performanceMemory && performanceMemory.usedJSHeapSize !== undefined
@@ -1818,6 +1846,25 @@ namespace gdjs {
           .getEstimatedGpuMemoryBytes(),
         texturesCount: rendererMemory ? rendererMemory.textures : null,
         geometriesCount: rendererMemory ? rendererMemory.geometries : null,
+        // Summed by the profiler over the frames of the chunk, not here.
+        drawCalls3DPerFrame: null,
+        triangles3DPerFrame: null,
+        drawCalls2DPerFrame: null,
+        rendered2DLayersCount: layerMetrics
+          ? layerMetrics.rendered2DLayersCount
+          : null,
+        rendered3DLayersCount: layerMetrics
+          ? layerMetrics.rendered3DLayersCount
+          : null,
+        renderedObjectsCount: layerMetrics
+          ? layerMetrics.renderedObjectsCount
+          : null,
+        managedTexturesCount: managedTextures ? managedTextures.length : null,
+        textureGarbageCollectionsCount:
+          textureGarbageCollector &&
+          typeof textureGarbageCollector.count === 'number'
+            ? textureGarbageCollector.count
+            : null,
       };
     }
 

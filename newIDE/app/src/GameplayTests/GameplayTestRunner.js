@@ -168,6 +168,16 @@ const setRunInProgress = (running: boolean) => {
 /** Non-hook variant, for code outside React components. */
 export const getIsGameplayTestRunInProgress = (): boolean => isRunInProgress;
 
+/** Non-hook variant of the subscription, for class components. */
+export const subscribeToGameplayTestRunInProgress = (
+  listener: () => void
+): (() => void) => {
+  runInProgressListeners.add(listener);
+  return () => {
+    runInProgressListeners.delete(listener);
+  };
+};
+
 export const useIsGameplayTestRunInProgress = (): boolean => {
   const [running, setRunning] = React.useState(isRunInProgress);
   React.useEffect(() => {

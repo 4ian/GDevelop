@@ -15,10 +15,19 @@ namespace gdjs {
     private _layerRenderingMetrics: {
       rendered2DLayersCount: number;
       rendered3DLayersCount: number;
+      /** Objects handed to the renderers this frame, across every layer. */
+      renderedObjectsCount: number;
     } = {
       rendered2DLayersCount: 0,
       rendered3DLayersCount: 0,
+      renderedObjectsCount: 0,
     };
+    /**
+     * Set only while a recording runs: `render` is a single section of the
+     * profiler, which says nothing about what to fix when it dominates a
+     * frame. The sections opened below cut it by layer and by kind of work.
+     */
+    private _profiler: gdjs.Profiler | null = null;
     private _backgroundColor: THREE.Color | null = null;
 
     constructor(
@@ -62,7 +71,28 @@ namespace gdjs {
       // TODO (3D): call the method with the same name on RuntimeLayers so they can dispose?
     }
 
-    render() {
+    /** Opens a section of the profiler, and does nothing when not recording. */
+    private _beginSection(sectionName: string) {
+      if (this._profiler) this._profiler.begin(sectionName);
+    }
+
+    private _endSection(sectionName: string) {
+      if (this._profiler) this._profiler.end(sectionName);
+    }
+
+    /** What a layer is called in the profiler: its name, or the base layer. */
+    private static _getLayerSectionName(runtimeLayer: gdjs.RuntimeLayer) {
+      const layerName = runtimeLayer.getName();
+      return layerName ? 'layer "' + layerName + '"' : 'base layer';
+    }
+
+    /**
+     * @param profiler Set while a recording runs, to cut `render` into the
+     * sections that say where the time goes. Null the rest of the time: the
+     * game must pay nothing for this.
+     */
+    render(profiler?: gdjs.Profiler | null) {
+      this._profiler = profiler || null;
       const runtimeGameRenderer = this._runtimeGameRenderer;
       if (!runtimeGameRenderer) return;
 
@@ -86,6 +116,7 @@ namespace gdjs {
 
       this._layerRenderingMetrics.rendered2DLayersCount = 0;
       this._layerRenderingMetrics.rendered3DLayersCount = 0;
+      this._layerRenderingMetrics.renderedObjectsCount = 0;
 
       if (threeRenderer) {
         // Layered 2D, 3D or 2D+3D rendering.
@@ -105,12 +136,21 @@ namespace gdjs {
         // might have changed some WebGL states already. Reset the state for the very first frame.
         // And, out of caution, keep doing it for every frame.
         // TODO (3D): optimization - check if this can be done only on the very first frame.
+        this._beginSection('state resets');
         threeRenderer.resetState();
+        this._endSection('state resets');
 
         // Render each layer one by one.
         for (let i = 0; i < this._runtimeScene._orderedLayers.length; ++i) {
           const runtimeLayer = this._runtimeScene._orderedLayers[i];
           if (!runtimeLayer.isVisible()) continue;
+
+          // Named after the layer: "60% of the render in the Lighting layer"
+          // is something the user can act on, "render is 75%" is not.
+          const layerSectionName = RuntimeScenePixiRenderer._getLayerSectionName(
+            runtimeLayer
+          );
+          this._beginSection(layerSectionName);
 
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
           const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
@@ -128,8 +168,10 @@ namespace gdjs {
 
             if (lastRenderWas3D) {
               // Ensure the state is clean for PixiJS to render.
+              this._beginSection('state resets');
               threeRenderer.resetState();
               pixiRenderer.reset();
+              this._endSection('state resets');
             }
 
             if (isFirstRender) {
@@ -155,6 +197,12 @@ namespace gdjs {
 
             pixiRenderer.render(pixiContainer, { clear: false });
             this._layerRenderingMetrics.rendered2DLayersCount++;
+            if (this._profiler && pixiContainer) {
+              // Only counted while recording: walking the children of every
+              // layer on every frame is not free.
+              this._layerRenderingMetrics.renderedObjectsCount +=
+                pixiContainer.children ? pixiContainer.children.length : 0;
+            }
 
             lastRenderWas3D = false;
           } else {
@@ -178,10 +226,13 @@ namespace gdjs {
                 if (layerHas2DObjectsToRender) {
                   if (lastRenderWas3D) {
                     // Ensure the state is clean for PixiJS to render.
+                    this._beginSection('state resets');
                     threeRenderer.resetState();
                     pixiRenderer.reset();
+                    this._endSection('state resets');
                   }
 
+                  this._beginSection('2D rendered into the 3D world');
                   // Do the rendering of the PixiJS objects of the layer on the render texture.
                   // Then, update the texture of the plane showing the PixiJS rendering,
                   // so that the 2D rendering made by PixiJS can be shown in the 3D world.
@@ -192,6 +243,7 @@ namespace gdjs {
                     pixiRenderer
                   );
                   this._layerRenderingMetrics.rendered2DLayersCount++;
+                  this._endSection('2D rendered into the 3D world');
 
                   lastRenderWas3D = false;
                 }
@@ -203,8 +255,10 @@ namespace gdjs {
               if (!lastRenderWas3D) {
                 // It's important to reset the internal WebGL state of PixiJS, then Three.js
                 // to ensure the 3D rendering is made properly by Three.js
+                this._beginSection('state resets');
                 pixiRenderer.reset();
                 threeRenderer.resetState();
+                this._endSection('state resets');
               }
 
               if (isFirstRender) {
@@ -243,7 +297,11 @@ namespace gdjs {
                 // layers rendered before this one must remain visible).
                 const clearAlpha = threeRenderer.getClearAlpha();
                 threeRenderer.setClearAlpha(0);
+                // Told apart from a plain 3D render: an effect added on a
+                // layer can cost more than everything it is applied to.
+                this._beginSection('post-processing');
                 threeEffectComposer.render();
+                this._endSection('post-processing');
                 threeRenderer.setClearAlpha(clearAlpha);
               } else {
                 threeRenderer.render(threeScene, threeCamera);
@@ -254,6 +312,8 @@ namespace gdjs {
               lastRenderWas3D = true;
             }
           }
+
+          this._endSection(layerSectionName);
         }
 
         const debugContainer = this._runtimeScene
@@ -261,9 +321,11 @@ namespace gdjs {
           .getRendererObject();
 
         if (debugContainer) {
+          this._beginSection('debug draw');
           threeRenderer.resetState();
           pixiRenderer.reset();
           pixiRenderer.render(debugContainer);
+          this._endSection('debug draw');
           lastRenderWas3D = false;
         }
 
@@ -281,9 +343,15 @@ namespace gdjs {
         // Render lights in render textures first.
         for (const runtimeLayer of this._runtimeScene._orderedLayers) {
           if (runtimeLayer.isLightingLayer()) {
+            // Told apart: lights are rendered on a texture of their own, and
+            // a lighting layer is often what makes a 2D game slow.
+            const lightingSectionName =
+              RuntimeScenePixiRenderer._getLayerSectionName(runtimeLayer);
+            this._beginSection(lightingSectionName);
             // Render the lights on the render texture used then by the lighting Sprite.
             const runtimeLayerRenderer = runtimeLayer.getRenderer();
             runtimeLayerRenderer.renderOnPixiRenderTexture(pixiRenderer);
+            this._endSection(lightingSectionName);
           }
         }
 
@@ -291,10 +359,12 @@ namespace gdjs {
 
         // Render all the layers then.
         // TODO: replace by a loop like in 3D?
+        this._beginSection('all 2D layers');
         pixiRenderer.background.color = this._runtimeScene.getBackgroundColor();
         pixiRenderer.render(this._pixiContainer, {
           clear: this._runtimeScene.getClearCanvas(),
         });
+        this._endSection('all 2D layers');
         this._layerRenderingMetrics.rendered2DLayersCount++;
       }
 
@@ -306,8 +376,20 @@ namespace gdjs {
         this._showCursorAtNextRender = false;
       }
 
-      // Uncomment to check the number of 2D&3D rendering done
-      // console.log(this._layerRenderingMetrics);
+      this._profiler = null;
+    }
+
+    /**
+     * What the last frame rendered: how many layers went through each
+     * renderer, and how many objects were handed to them. Read by the
+     * profiler while recording, and by nothing else.
+     */
+    getLayerRenderingMetrics(): {
+      rendered2DLayersCount: number;
+      rendered3DLayersCount: number;
+      renderedObjectsCount: number;
+    } {
+      return this._layerRenderingMetrics;
     }
 
     /**

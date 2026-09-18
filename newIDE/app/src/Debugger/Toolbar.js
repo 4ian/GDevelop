@@ -24,6 +24,7 @@ import IconButton from '../UI/IconButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import FlatButtonWithSplitMenu from '../UI/FlatButtonWithSplitMenu';
 import { RecordingStatusChip } from './RecordingControls';
+import { useIsGameplayTestRunInProgress } from '../GameplayTests/GameplayTestRunner';
 import { ProfilerRecordingStore } from './ProfilerRecording/ProfilerRecordingStore';
 import { type DebuggerId } from '../ExportAndShare/PreviewLauncher.flow';
 
@@ -87,9 +88,13 @@ type Props = {|
  * The toolbar of the debugger, in four groups: the status of the recording,
  * the controls of the game, the recording, and the panels.
  */
-export class Toolbar extends React.PureComponent<Props> {
+export class ToolbarContent extends React.PureComponent<{|
+  ...Props,
+  isGameplayTestRunInProgress: boolean,
+|}> {
   render(): any {
     const {
+      isGameplayTestRunInProgress,
       hasDebugger,
       onLaunchDebuggerAndPreview,
       onClosePreviews,
@@ -241,6 +246,7 @@ export class Toolbar extends React.PureComponent<Props> {
               onClick={() => onLaunchDebuggerAndPreview()}
               icon={<PlayIcon />}
               label={<Trans>Debugger</Trans>}
+              disabled={isGameplayTestRunInProgress}
               buildMenuTemplate={gameMenuTemplate}
             />
           ) : canPause ? (
@@ -249,6 +255,7 @@ export class Toolbar extends React.PureComponent<Props> {
               onClick={onPause}
               icon={<PauseIcon />}
               label={<Trans>Pause the game</Trans>}
+              disabled={isGameplayTestRunInProgress}
               buildMenuTemplate={gameMenuTemplate}
             />
           ) : (
@@ -257,7 +264,7 @@ export class Toolbar extends React.PureComponent<Props> {
               onClick={onPlay}
               icon={<PlayIcon />}
               label={<Trans>Resume the game</Trans>}
-              disabled={!canPlay}
+              disabled={!canPlay || isGameplayTestRunInProgress}
               buildMenuTemplate={gameMenuTemplate}
             />
           )}
@@ -265,7 +272,7 @@ export class Toolbar extends React.PureComponent<Props> {
             size="small"
             color="default"
             onClick={onStepFrame}
-            disabled={!canStepFrame}
+            disabled={!canStepFrame || isGameplayTestRunInProgress}
             tooltip={t`Advance one frame`}
           >
             <SkipForwardIcon />
@@ -275,7 +282,7 @@ export class Toolbar extends React.PureComponent<Props> {
             <FlatButtonWithSplitMenu
               primary
               onClick={onStopRecording}
-              disabled={!canRecord}
+              disabled={!canRecord || isGameplayTestRunInProgress}
               icon={<StopIcon />}
               label={<Trans>Stop recording</Trans>}
               buildMenuTemplate={recordMenuTemplate}
@@ -285,7 +292,7 @@ export class Toolbar extends React.PureComponent<Props> {
             <RaisedButtonWithSplitMenu
               primary
               onClick={onStartRecording}
-              disabled={!canRecord}
+              disabled={!canRecord || isGameplayTestRunInProgress}
               icon={<RecordIcon />}
               label={<Trans>Record</Trans>}
               buildMenuTemplate={recordMenuTemplate}
@@ -359,5 +366,17 @@ export class Toolbar extends React.PureComponent<Props> {
     );
   }
 }
+
+/**
+ * While a gameplay test runs, the game belongs to the test: pausing it,
+ * stepping it, recording it or launching another preview would all interfere
+ * with the run, exactly as the preview buttons do.
+ */
+export const Toolbar = (props: Props): React.Node => (
+  <ToolbarContent
+    {...props}
+    isGameplayTestRunInProgress={useIsGameplayTestRunInProgress()}
+  />
+);
 
 export default Toolbar;

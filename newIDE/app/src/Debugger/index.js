@@ -32,6 +32,10 @@ import {
   type LaunchDebuggerAndPreviewOptions,
 } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import { UseCommandHook } from '../CommandPalette/CommandHooks';
+import {
+  getIsGameplayTestRunInProgress,
+  subscribeToGameplayTestRunInProgress,
+} from '../GameplayTests/GameplayTestRunner';
 import EventsExecutionTrackingContext from '../EventsExecutionTracking/EventsExecutionTrackingContext';
 import {
   type DebuggerRecordingMetadata,
@@ -169,6 +173,7 @@ export default class Debugger extends React.Component<Props, State> {
    */
   _recordOnConnectionIds: Set<DebuggerId> = new Set();
   _debuggerLogs: Map<DebuggerId, LogsManager> = new Map();
+  _unsubscribeFromGameplayTestRun: ?() => void = null;
   // The recordings of the profiler, out of the state: chunks arrive twice a
   // second and the panels re-render on their own.
   _profilerRecordingStore: ProfilerRecordingStore = new ProfilerRecordingStore();
@@ -280,11 +285,22 @@ export default class Debugger extends React.Component<Props, State> {
 
   componentDidMount() {
     this._registerServerCallbacks();
+    // A gameplay test starting or ending changes what can be done to the
+    // game: the buttons that act on it follow.
+    this._unsubscribeFromGameplayTestRun = subscribeToGameplayTestRunInProgress(
+      () => {
+        this.forceUpdate();
+        this.updateToolbar();
+      }
+    );
   }
 
   componentWillUnmount() {
     if (this.state.unregisterDebuggerServerCallbacks) {
       this.state.unregisterDebuggerServerCallbacks();
+    }
+    if (this._unsubscribeFromGameplayTestRun) {
+      this._unsubscribeFromGameplayTestRun();
     }
   }
 
@@ -992,8 +1008,10 @@ export default class Debugger extends React.Component<Props, State> {
     // The debugger server is only started when a preview is launched, so a
     // stopped server is displayed like a started one without any preview
     // running (it will be started as soon as a preview is launched).
-    // A recording can only be started on a preview that is running.
-    const canRecord = this._hasSelectedDebugger();
+    // A recording can only be started on a preview that is running, and not
+    // while a gameplay test owns the game (as for the toolbar buttons).
+    const canRecord =
+      this._hasSelectedDebugger() && !getIsGameplayTestRunInProgress();
     const isRecording = !!profilingInProgress[selectedId];
 
     return (

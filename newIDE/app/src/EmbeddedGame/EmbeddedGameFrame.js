@@ -5,6 +5,7 @@ import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.fl
 import { objectWithContextReactDndType } from '../ObjectsList';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import Text from '../UI/Text';
+import RaisedButton from '../UI/RaisedButton';
 import classes from './EmbeddedGameFrame.module.css';
 import { type DropTargetMonitor } from 'react-dnd';
 import { registerOpenedDialogsCountCallback } from '../UI/Dialog';
@@ -204,6 +205,13 @@ type Props = {|
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 
+/**
+ * How long the game frame is given to tell the editor that it started, before offering
+ * to load it again. The game announces itself as soon as its code is loaded, before any
+ * resource is loaded, so this only has to cover the loading of the game code.
+ */
+const GAME_FRAME_START_TIMEOUT_MS = 15000;
+
 const noHotReloadSteps = {
   shouldReloadProjectData: false,
   shouldReloadLibraries: false,
@@ -224,6 +232,15 @@ export const EmbeddedGameFrame = ({
   const [
     isPointerEventsPrevented,
     setIsPointerEventsPrevented,
+  ] = React.useState(false);
+  // The preview location is identical for every preview of a session, so it can't be
+  // used on its own to navigate the iframe again: this identifies a single load of the
+  // frame, and changing it is what actually reloads the game.
+  const [gameFrameLoadId, setGameFrameLoadId] = React.useState<number>(0);
+  const [isGameFrameStarted, setIsGameFrameStarted] = React.useState(false);
+  const [
+    hasGameFrameStartTimedOut,
+    setHasGameFrameStartTimedOut,
   ] = React.useState(false);
   const iframeRef = React.useRef<HTMLIFrameElement | null>(null);
   // $FlowFixMe[incompatible-type]
@@ -266,6 +283,13 @@ export const EmbeddedGameFrame = ({
         options: AttachToPreviewOptions
       ): void => {
         setPreviewIndexHtmlLocation(options.previewIndexHtmlLocation);
+        // No game is running in the frame, so this is a new game to load rather than a
+        // hot-reload: navigate the iframe again. Without this, a load that failed (a
+        // navigation that never completed, files that could not be served...) would
+        // stay failed forever, as the location alone never changes.
+        if (!isGameFrameStarted) {
+          setGameFrameLoadId(loadId => loadId + 1);
+        }
         const iframe = iframeRef.current;
         if (iframe) {
           iframe.contentWindow.focus();
@@ -499,8 +523,84 @@ export const EmbeddedGameFrame = ({
       previewIndexHtmlLocation,
       onLaunchPreviewForInGameEdition,
       enabled,
+      isGameFrameStarted,
     ]
   );
+
+  const iframeSource = previewIndexHtmlLocation
+    ? `${previewIndexHtmlLocation}?gameFrameLoadId=${gameFrameLoadId}`
+    : '';
+
+  // Wait for the game to announce itself. "Started" and "waited for too long" are kept
+  // separate on purpose: a game that answers late (a big project on a slow device)
+  // dismisses the message by itself, without anything having to cancel the timeout.
+  React.useEffect(
+    () => {
+      if (!iframeSource) return undefined;
+
+      setIsGameFrameStarted(false);
+      setHasGameFrameStartTimedOut(false);
+      const timeoutId = setTimeout(
+        () => setHasGameFrameStartTimedOut(true),
+        GAME_FRAME_START_TIMEOUT_MS
+      );
+      return () => clearTimeout(timeoutId);
+    },
+    [iframeSource]
+  );
+
+  React.useEffect(
+    () => {
+      if (!previewDebuggerServer) return undefined;
+
+      return previewDebuggerServer.registerCallbacks({
+        onErrorReceived: () => {},
+        onServerStateChanged: () => {},
+        onConnectionClosed: () => {},
+        onConnectionOpened: () => {},
+        onConnectionErrored: () => {},
+        onHandleParsedMessage: ({ id, parsedMessage }) => {
+          // Any status from the game proves it is running - but only if it comes from
+          // the load being waited for, and not from one that is being replaced.
+          if (
+            id === 'embedded-game-frame' &&
+            parsedMessage.command === 'status' &&
+            parsedMessage.payload &&
+            parsedMessage.payload.gameFrameLoadId === String(gameFrameLoadId)
+          ) {
+            setIsGameFrameStarted(true);
+          }
+        },
+      });
+    },
+    [previewDebuggerServer, gameFrameLoadId]
+  );
+
+  React.useEffect(
+    () => {
+      if (previewDebuggerServer)
+        previewDebuggerServer.setEmbeddedGameFrameReady(isGameFrameStarted);
+    },
+    [previewDebuggerServer, isGameFrameStarted]
+  );
+
+  const onReloadGameFrame = React.useCallback(() => {
+    const lastPreviewInGameEditorTarget = lastPreviewContainer.current;
+    if (!lastPreviewInGameEditorTarget) {
+      setGameFrameLoadId(loadId => loadId + 1);
+      return;
+    }
+
+    // Launch a whole new preview: the files served to the frame could be the problem.
+    switchToSceneEdition({
+      ...lastPreviewInGameEditorTarget,
+      shouldReloadProjectData: true,
+      shouldReloadLibraries: true,
+      shouldReloadResources: true,
+      shouldHardReload: true,
+      reasons: ['reloaded-after-game-frame-did-not-start'],
+    });
+  }, []);
 
   // A game loaded in the frame adds its whole memory to the one used by the editor.
   React.useEffect(
@@ -635,7 +735,7 @@ export const EmbeddedGameFrame = ({
         <iframe
           ref={iframeRef}
           title="Game Preview"
-          src={previewIndexHtmlLocation}
+          src={iframeSource}
           tabIndex={0}
           style={{
             position: 'absolute',
@@ -708,6 +808,18 @@ export const EmbeddedGameFrame = ({
             );
           }}
         </DropTarget>
+        {hasGameFrameStartTimedOut && !isGameFrameStarted && (
+          <div className={classes.notStartedOverlay}>
+            <Text color="inherit" align="center">
+              <Trans>The game preview did not start.</Trans>
+            </Text>
+            <RaisedButton
+              primary
+              label={<Trans>Reload</Trans>}
+              onClick={onReloadGameFrame}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

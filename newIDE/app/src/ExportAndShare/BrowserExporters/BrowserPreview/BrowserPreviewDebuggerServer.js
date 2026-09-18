@@ -18,6 +18,7 @@ const existingPreviewWindows: {
 } = {};
 
 let embbededGameFrameWindow: WindowProxy | null = null;
+let isEmbeddedGameFrameReady = false;
 let gameplayTestFrameWindow: WindowProxy | null = null;
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
@@ -26,8 +27,12 @@ const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingPreviewDebuggerIds(),
 ];
 
+// A frame that has a location loaded but no game running in it yet (or a game that
+// failed to start) can't be hot-reloaded: messages sent to it are silently lost.
 const getExistingEmbeddedGameFrameDebuggerIds = (): Array<DebuggerId> =>
-  embbededGameFrameWindow ? ['embedded-game-frame'] : [];
+  embbededGameFrameWindow && isEmbeddedGameFrameReady
+    ? ['embedded-game-frame']
+    : [];
 
 const getExistingGameplayTestFrameDebuggerIds = (): Array<DebuggerId> =>
   gameplayTestFrameWindow ? ['gameplay-test-frame'] : [];
@@ -205,6 +210,21 @@ class BrowserPreviewDebuggerServer {
     );
     embbededGameFrameWindow = window;
   }
+  setEmbeddedGameFrameReady(isReady: boolean) {
+    if (isEmbeddedGameFrameReady === isReady) return;
+
+    isEmbeddedGameFrameReady = isReady;
+    if (isReady) {
+      callbacksList.forEach(({ onConnectionOpened }) =>
+        onConnectionOpened({
+          id: 'embedded-game-frame',
+          debuggerIds: getExistingDebuggerIds(),
+        })
+      );
+    } else {
+      notifyConnectionClosed('embedded-game-frame');
+    }
+  }
   registerGameplayTestFrame(window: WindowProxy) {
     if (window === gameplayTestFrameWindow) return;
 
@@ -249,6 +269,7 @@ class BrowserPreviewDebuggerServer {
       'Unregistered the embedded game frame window in the debugger server.'
     );
     embbededGameFrameWindow = null;
+    isEmbeddedGameFrameReady = false;
     notifyConnectionClosed('embedded-game-frame');
   }
   closeAllConnections() {
@@ -275,6 +296,7 @@ class BrowserPreviewDebuggerServer {
 
     if (embbededGameFrameWindow) {
       embbededGameFrameWindow = null;
+      isEmbeddedGameFrameReady = false;
       notifyConnectionClosed('embedded-game-frame');
     }
 

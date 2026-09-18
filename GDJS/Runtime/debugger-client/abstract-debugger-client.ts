@@ -14,6 +14,19 @@ namespace gdjs {
     'gameplayTest.stop',
   ]);
 
+  /**
+   * The identifier of the frame "load" the game is running in, as put in the URL by
+   * the editor. Sent along the status so that the editor can tell a status coming from
+   * the load it is waiting for from a leftover one sent by a previous load.
+   */
+  const getGameFrameLoadId = (): string | null => {
+    try {
+      return new URLSearchParams(window.location.search).get('gameFrameLoadId');
+    } catch (error) {
+      return null;
+    }
+  };
+
   const originalConsole = {
     log: console.log,
     info: console.info,
@@ -734,7 +747,10 @@ namespace gdjs {
     }
 
     sendRuntimeGameStatus(): void {
-      const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
+      // The status is also sent as soon as the debugger client is connected, at which
+      // point the game is still being constructed and has no scene stack yet.
+      const sceneStack = this._runtimegame.getSceneStack();
+      const currentScene = sceneStack ? sceneStack.getCurrentScene() : null;
       this._sendMessage(
         circularSafeStringify({
           command: 'status',
@@ -742,6 +758,7 @@ namespace gdjs {
             isPaused: this._runtimegame.isPaused(),
             isInGameEdition: this._runtimegame.isInGameEdition(),
             sceneName: currentScene ? currentScene.getName() : null,
+            gameFrameLoadId: getGameFrameLoadId(),
           },
         })
       );

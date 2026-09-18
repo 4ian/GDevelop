@@ -867,19 +867,24 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
         .FindAndReplace("*", "");
   };
 
-  auto makeOrientationPreference = [&project]() {
-    const gd::String &orientation = project.GetOrientation();
-    if (orientation != "landscape" && orientation != "portrait") {
-      return gd::String("");
-    }
+  const gd::String &orientation = project.GetOrientation();
+  const bool isOrientationLocked =
+      orientation == "landscape" || orientation == "portrait";
 
-    // Declare the orientation at build time so that the native app only
-    // supports it. This is required on iPad: an app declaring support for all
-    // orientations is a "multitasking" app, for which iOS ignores any
-    // orientation lock requested at runtime.
-    return "<preference name=\"Orientation\" value=\"" + orientation +
-           "\" />";
-  };
+  // Declare the orientation at build time so that the native app only supports
+  // it, as iOS ignores an orientation lock requested at runtime.
+  const gd::String orientationPreference =
+      isOrientationLocked
+          ? "<preference name=\"Orientation\" value=\"" + orientation + "\" />"
+          : "";
+
+  // Opt out of iPad multitasking, which requires all orientations to be
+  // supported (ITMS-90474) and ignores the declared orientation.
+  const gd::String iosOrientationLock =
+      isOrientationLocked
+          ? "<edit-config file=\"*-Info.plist\" mode=\"merge\" "
+            "target=\"UIRequiresFullScreen\">\n<true/>\n</edit-config>"
+          : "";
 
   gd::String str =
       fs.ReadFile(gdjsRoot + "/Runtime/Cordova/config.xml")
@@ -892,8 +897,9 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
           .FindAndReplace("GDJS_PROJECTVERSION", project.GetVersion())
           .FindAndReplace("<!-- GDJS_ICONS_ANDROID -->", makeIconsAndroid())
           .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos())
-          .FindAndReplace("<!-- GDJS_ORIENTATION -->",
-                          makeOrientationPreference());
+          .FindAndReplace("<!-- GDJS_IOS_ORIENTATION_LOCK -->",
+                          iosOrientationLock)
+          .FindAndReplace("<!-- GDJS_ORIENTATION -->", orientationPreference);
 
   gd::String plugins = "";
   auto dependenciesAndExtensions =

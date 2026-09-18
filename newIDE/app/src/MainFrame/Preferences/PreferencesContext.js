@@ -49,7 +49,7 @@ export type AlertMessageIdentifier =
 export type EditorMosaicName =
   | 'scene-editor'
   | 'debugger'
-  | 'debugger-v2'
+  | 'debugger-v3'
   | 'resources-editor'
   | 'events-functions-extension-editor'
   | 'gameplay-test-editor';
@@ -253,6 +253,8 @@ export type PreferencesValues = {|
   takeScreenshotOnPreview: boolean,
   gameplayTestFramePosition: {| left: number, bottom: number |} | null,
   gameplayTestFrameZoomFactor: number | null,
+  watchedVariablesPanelPosition: {| left: number, bottom: number |} | null,
+  watchedVariablesPanelSize: {| width: number, height: number |} | null,
   showAiAskButtonInTitleBar: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
   automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
@@ -386,6 +388,14 @@ export type Preferences = {|
     bottom: number,
   |}) => void,
   setGameplayTestFrameZoomFactor: (zoomFactor: number) => void,
+  setWatchedVariablesPanelPosition: (position: {|
+    left: number,
+    bottom: number,
+  |}) => void,
+  setWatchedVariablesPanelSize: (size: {|
+    width: number,
+    height: number,
+  |}) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
   setAutomaticallyApplyAiRequestEditsForProjectId: (
@@ -459,6 +469,8 @@ export const initialPreferences = {
     takeScreenshotOnPreview: true,
     gameplayTestFramePosition: null,
     gameplayTestFrameZoomFactor: null,
+    watchedVariablesPanelPosition: null,
+    watchedVariablesPanelSize: null,
     showAiAskButtonInTitleBar: true,
     automaticallyUseCreditsForAiRequests: false,
     automaticallyApplyAiRequestEditsByProjectId: {},
@@ -555,6 +567,14 @@ export const initialPreferences = {
     bottom: number,
   |}) => {},
   setGameplayTestFrameZoomFactor: (zoomFactor: number) => {},
+  setWatchedVariablesPanelPosition: (position: {|
+    left: number,
+    bottom: number,
+  |}) => {},
+  setWatchedVariablesPanelSize: (size: {|
+    width: number,
+    height: number,
+  |}) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
   setAutomaticallyApplyAiRequestEditsForProjectId: (

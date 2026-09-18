@@ -137,6 +137,8 @@ export const getInitialPreferences = (): {
   takeScreenshotOnPreview: boolean,
   gameplayTestFramePosition: {| left: number, bottom: number |} | null,
   gameplayTestFrameZoomFactor: number | null,
+  watchedVariablesPanelPosition: {| left: number, bottom: number |} | null,
+  watchedVariablesPanelSize: {| width: number, height: number |} | null,
   themeName: any,
   use3DEditor: any,
   useBackgroundSerializerForSaving: boolean,
@@ -412,6 +414,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ): any),
     // $FlowFixMe[method-unbinding]
     setGameplayTestFrameZoomFactor: (this._setGameplayTestFrameZoomFactor.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setWatchedVariablesPanelPosition: (this._setWatchedVariablesPanelPosition.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setWatchedVariablesPanelSize: (this._setWatchedVariablesPanelSize.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
@@ -1460,6 +1470,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           gameplayTestFrameZoomFactor: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setWatchedVariablesPanelPosition(newValue: {|
+    left: number,
+    bottom: number,
+  |}) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          watchedVariablesPanelPosition: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setWatchedVariablesPanelSize(newValue: {| width: number, height: number |}) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          watchedVariablesPanelSize: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

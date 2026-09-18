@@ -44,6 +44,17 @@
   color: var(--theme-text-secondary-color);
 }
 
+/* Next to a value read on the first instance of several: the icon carries
+the meaning on its own, in the colour of the rest of the row. */
+.rowFirstInstance {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  margin-left: 4px;
+  font-size: 16px;
+  cursor: help;
+}
+
 .rowName {
   flex: 0 1 auto;
   min-width: 30px;
@@ -83,6 +94,13 @@
 }
 
 /* The delete button is always in the layout to avoid shifting, but invisible until hover. */
+/* How many instances the object has, and the switch to read them all. Always
+visible, unlike the delete button: it is a value, not an action. */
+.rowFilter {
+  flex-shrink: 0;
+  width: 28px;
+}
+
 .rowDelete {
   flex-shrink: 0;
   width: 28px;
@@ -109,42 +127,42 @@
 
 /* Override TreeView styles so that .row takes the full width.
    Use attribute selectors because CSS modules hash the class names. */
-.tree [class*="fullHeightFlexContainer"] {
+.tree [class*='fullHeightFlexContainer'] {
   width: 100% !important;
   box-sizing: border-box !important;
   padding-right: 0 !important;
 }
 
-.tree [class*="rowContainer"] {
+.tree [class*='rowContainer'] {
   width: 100% !important;
   flex: 1 !important;
 }
 
-.tree [class*="fullSpaceContainer"] {
+.tree [class*='fullSpaceContainer'] {
   width: 100% !important;
   flex: 1 !important;
 }
 
-.tree [class*="rowContent"] {
+.tree [class*='rowContent'] {
   width: 100% !important;
   flex: 1 !important;
 }
 
-.tree [class*="rowContentSide"] {
+.tree [class*='rowContentSide'] {
   width: 100% !important;
   flex: 1 !important;
   min-width: 0;
   padding-right: 0 !important;
 }
 
-.tree [class*="itemTextContainer"] {
+.tree [class*='itemTextContainer'] {
   display: block !important;
   width: 100% !important;
   flex: 1 !important;
   min-width: 0;
 }
 
-.tree [class*="itemName"] {
+.tree [class*='itemName'] {
   display: flex !important;
   width: 100% !important;
   flex: 1 !important;

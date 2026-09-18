@@ -138,6 +138,11 @@ type Props<Item> = {|
    * Callback called when a folder is collapsed (folded).
    */
   onCollapseItem?: (Item: Item) => void,
+  /**
+   * Callback called when a folder is opened (unfolded): what it contains can
+   * then be fetched, instead of being paid for while it is closed.
+   */
+  onOpenItem?: (Item: Item) => void,
   searchText?: string,
   selectedItems: $ReadOnlyArray<Item>,
   onClickItem?: Item => void,
@@ -183,6 +188,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     onSelectItems,
     multiSelect,
     onCollapseItem,
+    onOpenItem,
     forceAllOpened,
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
@@ -343,6 +349,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         }
       } else {
         if (node.collapsed) {
+          if (onOpenItem) onOpenItem(node.item);
           setOpenedNodeIds([...openedNodeIds, node.id]);
         } else {
           if (!forceAllOpened) {
@@ -359,6 +366,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       isSearching,
       forceAllOpened,
       onCollapseItem,
+      onOpenItem,
     ]
   );
 

@@ -66,6 +66,10 @@ type Props = {|
   initialPosition?: Position,
   initialSize?: Size,
   minSize?: Size,
+  /** Called once the panel has been moved, to remember where it was left. */
+  onPositionChanged?: Position => void,
+  /** Called once the panel has been resized, to remember its size. */
+  onSizeChanged?: Size => void,
 |};
 
 /**
@@ -80,6 +84,8 @@ const FloatingPanel = ({
   initialPosition,
   initialSize,
   minSize,
+  onPositionChanged,
+  onSizeChanged,
 }: Props): React.Node => {
   const effectiveMinSize = minSize || { width: 240, height: 120 };
   const [position, setPosition] = React.useState<Position>(
@@ -105,6 +111,15 @@ const FloatingPanel = ({
     size: Size,
     direction: ResizeDirection,
   |} | null>(null);
+
+  // A position restored from a previous session can be outside of a window
+  // that has since been made smaller: bring the panel back in view.
+  React.useEffect(() => {
+    setPosition(currentPosition =>
+      clampPositionToWindow(currentPosition, size)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onPointerDown = React.useCallback(
     (event: PointerEvent) => {
@@ -144,13 +159,17 @@ const FloatingPanel = ({
     [size]
   );
 
-  const onPointerUp = React.useCallback((event: PointerEvent) => {
-    const origin = dragOrigin.current;
-    if (!origin || origin.pointerId !== event.pointerId) return;
+  const onPointerUp = React.useCallback(
+    (event: PointerEvent) => {
+      const origin = dragOrigin.current;
+      if (!origin || origin.pointerId !== event.pointerId) return;
 
-    dragOrigin.current = null;
-    setIsDragging(false);
-  }, []);
+      dragOrigin.current = null;
+      setIsDragging(false);
+      if (onPositionChanged) onPositionChanged(position);
+    },
+    [position, onPositionChanged]
+  );
 
   const onResizePointerDown = React.useCallback(
     (direction: ResizeDirection, event: PointerEvent) => {
@@ -231,13 +250,19 @@ const FloatingPanel = ({
     [effectiveMinSize.width, effectiveMinSize.height]
   );
 
-  const onResizePointerUp = React.useCallback((event: PointerEvent) => {
-    const origin = resizeOrigin.current;
-    if (!origin || origin.pointerId !== event.pointerId) return;
+  const onResizePointerUp = React.useCallback(
+    (event: PointerEvent) => {
+      const origin = resizeOrigin.current;
+      if (!origin || origin.pointerId !== event.pointerId) return;
 
-    resizeOrigin.current = null;
-    setIsResizing(false);
-  }, []);
+      resizeOrigin.current = null;
+      setIsResizing(false);
+      if (onSizeChanged) onSizeChanged(size);
+      // Resizing from the left or bottom edges also moves the panel.
+      if (onPositionChanged) onPositionChanged(position);
+    },
+    [size, position, onSizeChanged, onPositionChanged]
+  );
 
   return (
     <div

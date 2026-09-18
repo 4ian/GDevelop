@@ -729,7 +729,7 @@ const PreferencesDialog = ({
             {
               id: 'debugger-layout',
               label: i18n._(t`Debugger layout`),
-              renderControl: () => renderResetLayoutButton('debugger-v2'),
+              renderControl: () => renderResetLayoutButton('debugger-v3'),
             },
             {
               id: 'resources-editor-layout',

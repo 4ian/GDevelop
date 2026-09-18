@@ -405,13 +405,17 @@ const LoadTimeline = ({
     setHoveredRow(row ? { row, x, y } : null);
   };
 
+  // Named in lower case: the identifier of a message is the sentence itself,
+  // so an interpolated value must read well inside it.
+  const resourcesCount = rows.length;
+
   return (
     <div className={classes.section}>
       <div className={classes.sectionTitleRow}>
         <Text noMargin size="body-small" color="secondary">
           <Trans>
-            When each resource was loaded ({rows.length} resources), since the
-            game started
+            When each resource was loaded ({resourcesCount} resources), since
+            the game started
           </Trans>
         </Text>
         <FlatButton

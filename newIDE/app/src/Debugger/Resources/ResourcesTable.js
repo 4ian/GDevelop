@@ -258,34 +258,41 @@ const ResourcesTable = ({
                   width={80}
                   headerRenderer={renderSortableHeader}
                   className={classNames('tableColumn', classes.numberCell)}
-                  cellRenderer={({ rowData }) => (
-                    <Tooltip
-                      title={
-                        rowData.decodedBytes == null &&
-                        rowData.transferBytes == null ? (
-                          <Trans>
-                            Unknown: the size could not be read for this file.
-                          </Trans>
-                        ) : (
-                          <Trans>
-                            Size of the file (
-                            {formatBytes(rowData.transferBytes)} transferred
-                            over the network)
-                          </Trans>
-                        )
-                      }
-                    >
-                      <div
-                        className={classNames(classes.cell, classes.numberCell)}
+                  cellRenderer={({ rowData }) => {
+                    const transferredSize = formatBytes(rowData.transferBytes);
+                    return (
+                      <Tooltip
+                        title={
+                          rowData.decodedBytes == null &&
+                          rowData.transferBytes == null ? (
+                            <Trans>
+                              Unknown: the size could not be read for this file.
+                            </Trans>
+                          ) : (
+                            // Named in lower case: the identifier of a message
+                            // is the sentence itself.
+                            <Trans>
+                              Size of the file ({transferredSize} transferred
+                              over the network)
+                            </Trans>
+                          )
+                        }
                       >
-                        {rowData.decodedBytes != null
-                          ? formatBytes(rowData.decodedBytes)
-                          : rowData.transferBytes != null
-                          ? formatBytes(rowData.transferBytes)
-                          : i18n._(t`unknown`)}
-                      </div>
-                    </Tooltip>
-                  )}
+                        <div
+                          className={classNames(
+                            classes.cell,
+                            classes.numberCell
+                          )}
+                        >
+                          {rowData.decodedBytes != null
+                            ? formatBytes(rowData.decodedBytes)
+                            : rowData.transferBytes != null
+                            ? formatBytes(rowData.transferBytes)
+                            : i18n._(t`unknown`)}
+                        </div>
+                      </Tooltip>
+                    );
+                  }}
                 />
                 <RVColumn
                   label={i18n._(t`Memory`)}

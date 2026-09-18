@@ -1,5 +1,5 @@
 // @flow
-import { darken, lighten } from '@material-ui/core/styles';
+import { darken, lighten, getContrastRatio } from '@material-ui/core/styles';
 import { type GDevelopTheme } from '../UI/Theme';
 
 /**
@@ -89,3 +89,67 @@ export const getSectionColor = (
   gdevelopTheme: GDevelopTheme,
   sectionName: string
 ): string => getCategoricalColor(gdevelopTheme, hashString(sectionName));
+
+/**
+ * The contrast ratio asked by WCAG 2.1 at the AAA level for the text of a
+ * label drawn over a colored background.
+ */
+const WCAG_AAA_CONTRAST_RATIO = 7;
+
+const BLACK_TEXT_COLOR = '#000000';
+const WHITE_TEXT_COLOR = '#ffffff';
+
+/** How much the background is pushed away from the text at each attempt. */
+const CONTRAST_ADJUSTMENT_STEP = 0.05;
+const MAXIMUM_CONTRAST_ADJUSTMENT = 0.95;
+
+/**
+ * Black or white, whichever reads best over this background. Both are tried
+ * because a light category color (a turquoise, a yellow) needs black text,
+ * while a dark one needs white text.
+ */
+export const getReadableTextColorOn = (backgroundColor: string): string =>
+  getContrastRatio(backgroundColor, BLACK_TEXT_COLOR) >=
+  getContrastRatio(backgroundColor, WHITE_TEXT_COLOR)
+    ? BLACK_TEXT_COLOR
+    : WHITE_TEXT_COLOR;
+
+/**
+ * The same color, darkened (or lightened) just enough for the text drawn over
+ * it to reach the AAA contrast ratio. The hue is kept, so that the categories
+ * stay as easy to tell apart as before.
+ */
+export const getBackgroundColorReadableWith = (
+  backgroundColor: string,
+  textColor: string
+): string => {
+  let adjustedColor = backgroundColor;
+  let adjustment = 0;
+  const isTextDark = textColor === BLACK_TEXT_COLOR;
+  while (
+    getContrastRatio(adjustedColor, textColor) < WCAG_AAA_CONTRAST_RATIO &&
+    adjustment < MAXIMUM_CONTRAST_ADJUSTMENT
+  ) {
+    adjustment += CONTRAST_ADJUSTMENT_STEP;
+    adjustedColor = isTextDark
+      ? lighten(backgroundColor, adjustment)
+      : darken(backgroundColor, adjustment);
+  }
+  return adjustedColor;
+};
+
+/**
+ * The background and the text color of a profiler section, guaranteed to be
+ * readable together (WCAG 2.1 AAA).
+ */
+export const getReadableSectionColors = (
+  gdevelopTheme: GDevelopTheme,
+  sectionName: string
+): {| backgroundColor: string, textColor: string |} => {
+  const baseColor = getSectionColor(gdevelopTheme, sectionName);
+  const textColor = getReadableTextColorOn(baseColor);
+  return {
+    backgroundColor: getBackgroundColorReadableWith(baseColor, textColor),
+    textColor,
+  };
+};

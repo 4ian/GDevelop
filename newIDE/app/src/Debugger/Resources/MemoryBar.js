@@ -96,20 +96,25 @@ const MemoryBar = ({
       <Trans>sum of the loaded resources</Trans>
     );
 
+  // Named in lower case: the identifier of a message is the sentence itself,
+  // so an interpolated value must read well inside it.
+  const knownMemory = formatBytes(memorySegments.knownBytes);
+  const memoryLimit = formatBytes(memorySegments.limitBytes);
+  const unknownResourcesCount = memorySegments.unknownResourcesCount;
+
   return (
     <div className={classes.section}>
       <div className={classes.sectionTitleRow}>
         <Text noMargin size="body-small" color="secondary">
           <Trans>
-            Estimated memory: {formatBytes(memorySegments.knownBytes)} of{' '}
-            {formatBytes(memorySegments.limitBytes)} ({limitDescription})
-            {memorySegments.unknownResourcesCount > 0 ? (
-              <Trans>
-                , plus {memorySegments.unknownResourcesCount} loaded resources
-                of unknown size
-              </Trans>
-            ) : null}
+            Estimated memory: {knownMemory} of {memoryLimit} ({limitDescription}
+            )
           </Trans>
+          {unknownResourcesCount > 0 ? (
+            <Trans>
+              , plus {unknownResourcesCount} loaded resources of unknown size
+            </Trans>
+          ) : null}
         </Text>
       </div>
       <div className={classes.memoryBarRow}>
@@ -129,8 +134,7 @@ const MemoryBar = ({
               </span>
             ) : (
               <Trans>
-                {memorySegments.unknownResourcesCount} loaded resources of
-                unknown size
+                {unknownResourcesCount} loaded resources of unknown size
               </Trans>
             );
             return (

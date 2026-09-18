@@ -46,6 +46,8 @@ type Props = {|
   /** Read what is at this path in the running game, for the live inspector. */
   onInspectPath: (path: Array<string>) => Promise<Object | null>,
   profilingInProgress: boolean,
+  canRecord: boolean,
+  onStartRecording: () => void,
   profilerRecordingStore: ProfilerRecordingStore,
   debuggerId: DebuggerId,
   resourcesDebugSnapshot: ?ResourcesDebugSnapshot,
@@ -226,6 +228,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
       onCall,
       onEdit,
       profilingInProgress,
+      canRecord,
+      onStartRecording,
       profilerRecordingStore,
       debuggerId,
       resourcesDebugSnapshot,
@@ -361,6 +365,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
             profilingInProgress={profilingInProgress}
             recordingStore={profilerRecordingStore}
             debuggerId={debuggerId}
+            canRecord={canRecord}
+            onStartRecording={onStartRecording}
           />
         ),
       },
@@ -373,6 +379,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
             debuggerId={debuggerId}
             profilingInProgress={profilingInProgress}
             memoryLimitBytes={memoryLimitBytes || null}
+            canRecord={canRecord}
+            onStartRecording={onStartRecording}
           />
         ),
       },
@@ -424,11 +432,11 @@ export default class DebuggerContent extends React.Component<Props, State> {
             centralNodeId="overview"
             initialNodes={
               // $FlowFixMe[incompatible-type]
-              getDefaultEditorMosaicNode('debugger-v2') ||
+              getDefaultEditorMosaicNode('debugger-v3') ||
               initialMosaicEditorNodes
             }
             onPersistNodes={node =>
-              setDefaultEditorMosaicNode('debugger-v2', node)
+              setDefaultEditorMosaicNode('debugger-v3', node)
             }
             onOpenedEditorsChanged={this._onOpenedEditorsChanged}
           />

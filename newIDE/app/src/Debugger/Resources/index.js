@@ -154,13 +154,16 @@ const ResourcesPanel = ({
     : null;
 
   if (!resourcesDebugState) {
+    // Named in lower case: the identifier of a message is the sentence
+    // itself, so an interpolated value must read well inside it.
+    const errorMessage = lastError;
     return (
       <Background>
         <EmptyMessage>
           {lastError ? (
             <Trans>
               The game did not answer: it may be too old to report its
-              resources. ({lastError})
+              resources. ({errorMessage})
             </Trans>
           ) : isPollingEnabled ? (
             <Trans>Waiting for the game to report its resources...</Trans>
@@ -180,6 +183,11 @@ const ResourcesPanel = ({
   const statusesWithResources: Array<ResourceLoadStatus> = resourceLoadStatuses.filter(
     status => (resourcesDebugState.totals.byStatus[status] || 0) > 0
   );
+  // Named in lower case: the identifier of a message is the sentence itself,
+  // so an interpolated value must read well inside it.
+  const shownResourcesCount = filteredRecords.length;
+  const allResourcesCount = resourcesDebugState.resources.length;
+  const shownMemory = formatBytes(filteredMemoryBytes);
 
   return (
     <Background>
@@ -266,9 +274,8 @@ const ResourcesPanel = ({
             <div className={classes.chipsEnd}>
               <Text noMargin size="body-small" color="secondary">
                 <Trans>
-                  {filteredRecords.length} of{' '}
-                  {resourcesDebugState.resources.length} resources,{' '}
-                  {formatBytes(filteredMemoryBytes)}
+                  {shownResourcesCount} of {allResourcesCount} resources,{' '}
+                  {shownMemory}
                 </Trans>
               </Text>
               <IconButton

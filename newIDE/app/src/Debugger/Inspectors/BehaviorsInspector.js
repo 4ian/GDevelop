@@ -269,14 +269,20 @@ export const useBehaviorsItems = (
   onReadValues: ReadValuesFunction,
   i18n: I18nType
 ): Array<InspectorItem> => {
+  // The dump of the game replaces what it could not send by a placeholder
+  // string, so what is given here is not always the expected array.
+  const behaviorsList = React.useMemo(
+    () => (Array.isArray(behaviors) ? behaviors : []),
+    [behaviors]
+  );
   // The expressions only depend on the types of the behaviors: they are
   // listed again only when these change, not at each refresh of the values.
-  const behaviorTypesKey = (behaviors || [])
+  const behaviorTypesKey = behaviorsList
     .map(behavior => (behavior && behavior.type) || '')
     .join('|');
   const descriptorsByBehavior = React.useMemo(
     () =>
-      (behaviors || []).map((behavior, index) =>
+      behaviorsList.map((behavior, index) =>
         behavior && behavior.type
           ? getExpressionDescriptors(behavior.type, index)
           : []
@@ -285,14 +291,14 @@ export const useBehaviorsItems = (
     [behaviorTypesKey]
   );
   const expressionValues = useExpressionValues(
-    behaviors,
+    behaviorsList,
     descriptorsByBehavior,
     onReadValues
   );
 
   return React.useMemo(
     () =>
-      (behaviors || []).map((behavior, index) => {
+      behaviorsList.map((behavior, index) => {
         const behaviorName = getBehaviorName(behavior, index);
         const behaviorId = `${parentId}/${behaviorName}`;
         const properties = getEditableProperties(behavior);
@@ -368,7 +374,7 @@ export const useBehaviorsItems = (
           }
         );
       }),
-    [parentId, behaviors, descriptorsByBehavior, expressionValues, i18n]
+    [parentId, behaviorsList, descriptorsByBehavior, expressionValues, i18n]
   );
 };
 

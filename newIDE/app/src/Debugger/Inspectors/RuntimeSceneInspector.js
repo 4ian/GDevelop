@@ -109,41 +109,46 @@ const RuntimeSceneInspectorTree = ({
   return (
     <React.Fragment>
       <InspectorTreeView items={items} />
-      {runtimeScene._objects && runtimeScene._objects.items && (
-        <Column noMargin>
-          <Text size="body2" color="secondary">
-            <Trans>
-              Create a new instance on the scene (will be at position 0;0):
-            </Trans>
-          </Text>
-          <TextFieldWithButtonLayout
-            noFloatingLabelText
-            renderTextField={() => (
-              <SemiControlledAutoComplete
-                hintText={t`Enter the name of the object`}
-                value={newObjectName}
-                onChange={setNewObjectName}
-                dataSource={Object.keys(runtimeScene._objects.items).map(
-                  objectName => ({
-                    text: objectName,
-                    value: objectName,
-                  })
-                )}
-                openOnFocus
-                fullWidth
-              />
-            )}
-            renderButton={style => (
-              <RaisedButton
-                style={style}
-                label={<Trans>Create</Trans>}
-                primary
-                onClick={() => onCall(['createObject'], [newObjectName])}
-              />
-            )}
-          />
-        </Column>
-      )}
+      {/* What the game could not send is replaced by a placeholder string in
+          the dump: only walk through real objects. */}
+      {runtimeScene._objects &&
+        typeof runtimeScene._objects === 'object' &&
+        runtimeScene._objects.items &&
+        typeof runtimeScene._objects.items === 'object' && (
+          <Column noMargin>
+            <Text size="body2" color="secondary">
+              <Trans>
+                Create a new instance on the scene (will be at position 0;0):
+              </Trans>
+            </Text>
+            <TextFieldWithButtonLayout
+              noFloatingLabelText
+              renderTextField={() => (
+                <SemiControlledAutoComplete
+                  hintText={t`Enter the name of the object`}
+                  value={newObjectName}
+                  onChange={setNewObjectName}
+                  dataSource={Object.keys(runtimeScene._objects.items).map(
+                    objectName => ({
+                      text: objectName,
+                      value: objectName,
+                    })
+                  )}
+                  openOnFocus
+                  fullWidth
+                />
+              )}
+              renderButton={style => (
+                <RaisedButton
+                  style={style}
+                  label={<Trans>Create</Trans>}
+                  primary
+                  onClick={() => onCall(['createObject'], [newObjectName])}
+                />
+              )}
+            />
+          </Column>
+        )}
     </React.Fragment>
   );
 };

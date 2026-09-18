@@ -19,10 +19,21 @@ export const buildTimersItems = (
   parentId: string,
   timersHashtable: ?TimersHashtable
 ): ?Array<InspectorItem> => {
-  if (!timersHashtable || !timersHashtable.items) return null;
+  if (
+    !timersHashtable ||
+    typeof timersHashtable !== 'object' ||
+    !timersHashtable.items ||
+    typeof timersHashtable.items !== 'object'
+  )
+    return null;
   const timers = {};
   Object.keys(timersHashtable.items).forEach(timerName => {
     const timer = timersHashtable.items[timerName];
+    if (!timer || typeof timer !== 'object') {
+      // A placeholder left by the dump: shown as is rather than read.
+      timers[timerName] = timer;
+      return;
+    }
     timers[timer._name || timerName] = {
       'Time (in seconds)': timer._time / 1000,
       'Is paused': timer._paused,

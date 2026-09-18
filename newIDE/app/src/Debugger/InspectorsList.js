@@ -2,9 +2,11 @@
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import SearchBar from '../UI/SearchBar';
 import classes from './InspectorsList.module.css';
-import get from 'lodash/get';
+import { getAtInspectorPath } from './inspectorPath';
 import ReadOnlyTreeView, {
   type ReadOnlyTreeViewInterface,
 } from '../UI/TreeView/ReadOnlyTreeView';
@@ -52,7 +54,20 @@ const getItemName = (item: InspectorTreeItem) => (
   </span>
 );
 
+/**
+ * What a row shows: a name coming from the game, or a wording of the editor
+ * translated here, so that the label is searched and sorted as it is read.
+ */
+const getDescriptionLabel = (
+  i18n: I18nType,
+  description: InspectorDescription
+): string =>
+  description.translatableLabel
+    ? i18n._(description.translatableLabel)
+    : description.label || '';
+
 const buildItems = (
+  i18n: I18nType,
   data: GameData,
   getInspectorDescriptions: InspectorDescriptionsGetter,
   parentPath: Array<string>
@@ -63,10 +78,10 @@ const buildItems = (
       const fullPath = parentPath.concat(description.key);
       return {
         id: fullPath.join('.'),
-        label: description.label,
+        label: getDescriptionLabel(i18n, description),
         description,
         fullPath,
-        data: get(data, description.key, null),
+        data: getAtInspectorPath(data, description.key),
       };
     });
 
@@ -74,15 +89,20 @@ const buildItems = (
  * The content of the running game (scenes, objects, variables, layers...) as
  * a tree, like the lists of the editors. Choosing an item shows its inspector.
  */
-const InspectorsList = ({
+const InspectorsListContent = ({
+  i18n,
   gameData,
   getInspectorDescriptions,
   selectedInspectorFullPath,
   onChooseInspector,
-}: Props): React.Node => {
+}: {|
+  ...Props,
+  i18n: I18nType,
+|}): React.Node => {
   const items = React.useMemo(
-    () => (gameData ? buildItems(gameData, getInspectorDescriptions, []) : []),
-    [gameData, getInspectorDescriptions]
+    () =>
+      gameData ? buildItems(i18n, gameData, getInspectorDescriptions, []) : [],
+    [i18n, gameData, getInspectorDescriptions]
   );
   // Children are computed once per item, for the whole dump (the cache is
   // renewed with the items, when the dump changes).
@@ -96,14 +116,14 @@ const InspectorsList = ({
       if (!getSubInspectors) return null;
       let children = childrenCache.get(item.id);
       if (!children) {
-        children = buildItems(item.data, getSubInspectors, item.fullPath);
+        children = buildItems(i18n, item.data, getSubInspectors, item.fullPath);
         childrenCache.set(item.id, children);
       }
       // An object without instance, a scene without variable: nothing to
       // open, so the row is shown as a leaf rather than an empty folder.
       return children.length ? children : null;
     },
-    [childrenCache]
+    [i18n, childrenCache]
   );
 
   const initiallyOpenedNodeIds = React.useMemo(
@@ -160,8 +180,8 @@ const InspectorsList = ({
     [getItemChildren]
   );
 
-  if (!gameData) return null;
-
+  // Never unmounted when the game data goes away: the tree would lose
+  // everything the user had opened, and get it back folded.
   return (
     <div
       style={{
@@ -210,5 +230,13 @@ const InspectorsList = ({
     </div>
   );
 };
+
+/**
+ * The tree needs the translations to build its rows: the labels are searched
+ * and shown as strings, not as React nodes.
+ */
+const InspectorsList = (props: Props): React.Node => (
+  <I18n>{({ i18n }) => <InspectorsListContent {...props} i18n={i18n} />}</I18n>
+);
 
 export default InspectorsList;

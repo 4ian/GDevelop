@@ -1,5 +1,8 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { makeInstancePathStep } from './inspectorPath';
 import RuntimeObjectInspector from './Inspectors/RuntimeObjectInspector';
 import VariablesContainerInspector from './Inspectors/VariablesContainerInspector';
 import RuntimeSceneInspector from './Inspectors/RuntimeSceneInspector';
@@ -36,7 +39,10 @@ export type InspectorDescriptionsGetter = (
 ) => Array<InspectorDescription>; //eslint-disable-line
 
 export type InspectorDescription = {|
-  label: string,
+  /** What a row shows, when it is a name coming from the game. */
+  label?: string,
+  /** What a row shows, when it is a fixed wording of the editor. */
+  translatableLabel?: MessageDescriptor,
   /** Shown before the label in the list, to tell at a glance what it is. */
   icon?: React.Node,
   key: string | Array<string>,
@@ -61,7 +67,7 @@ export const getInspectorDescriptions = (
 ): Array<InspectorDescription> => {
   return [
     {
-      label: 'Global variables',
+      translatableLabel: t`Global variables`,
       icon: <GlobalVariableIcon />,
       key: '_variables',
       renderInspector: (gameData, { onCall, onEdit }) => (
@@ -73,7 +79,7 @@ export const getInspectorDescriptions = (
       ),
     },
     {
-      label: 'Scenes',
+      translatableLabel: t`Scenes`,
       icon: <SceneIcon />,
       key: ['_sceneStack', '_stack'],
       renderInspector: () => null,
@@ -95,7 +101,7 @@ export const getInspectorDescriptions = (
           initiallyOpen: true,
           getSubInspectors: runtimeScene => [
             {
-              label: 'Scene variables',
+              translatableLabel: t`Scene variables`,
               icon: <SceneVariableIcon />,
               key: `_variables`,
               renderInspector: (gameData, { onCall, onEdit }) => (
@@ -107,7 +113,7 @@ export const getInspectorDescriptions = (
               ),
             },
             {
-              label: 'Instances',
+              translatableLabel: t`Instances`,
               icon: <InstancesListIcon />,
               key: `_instances`,
               renderInspector: () => null,
@@ -151,11 +157,14 @@ export const getInspectorDescriptions = (
                       instancesList
                         ? instancesList
                             .filter(runtimeObject => !!runtimeObject)
-                            .map((runtimeObject, index) => {
+                            .map(runtimeObject => {
                               return {
                                 label: `#${runtimeObject.id}`,
                                 icon: <InstanceIcon />,
-                                key: index,
+                                // By identifier, never by position: creating
+                                // or destroying an instance shifts the list,
+                                // and the selection would follow another one.
+                                key: makeInstancePathStep(runtimeObject.id),
                                 renderInspector: (
                                   gameData,
                                   { onCall, onEdit, onReadValues }

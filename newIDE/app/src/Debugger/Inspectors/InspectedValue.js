@@ -56,10 +56,28 @@ const InspectedValue = ({
   const [liveValue, setLiveValue] = React.useState<Object | void>(undefined);
   const pathKey = selectedInspectorFullPath.join('.');
 
+  // The debugger renders again for everything the recording brings in (the
+  // profiler chunks, the logs, the clock of the toolbar...), and gives a new
+  // function each time. Kept in a ref, it does not restart the polling below:
+  // otherwise the values were dropped and asked again on every render, and
+  // the inspector flickered between the snapshot and the live values.
+  const onInspectPathRef = React.useRef(onInspectPath);
+  onInspectPathRef.current = onInspectPath;
+  const pathRef = React.useRef(selectedInspectorFullPath);
+  pathRef.current = selectedInspectorFullPath;
+
   React.useEffect(
     () => {
+      // Only when what is watched changes: what was read for another element
+      // must not be shown for this one.
       setLiveValue(undefined);
-      if (!isLive || !selectedInspectorFullPath.length) return;
+    },
+    [pathKey, isLive]
+  );
+
+  React.useEffect(
+    () => {
+      if (!isLive || !pathKey) return;
 
       let isCancelled = false;
       let isInFlight = false;
@@ -68,7 +86,7 @@ const InspectedValue = ({
         if (isInFlight) return;
         isInFlight = true;
         try {
-          const value = await onInspectPath(selectedInspectorFullPath);
+          const value = await onInspectPathRef.current(pathRef.current);
           if (!isCancelled && value !== null) setLiveValue(value);
         } finally {
           isInFlight = false;
@@ -82,8 +100,7 @@ const InspectedValue = ({
         clearInterval(intervalId);
       };
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isLive, pathKey, onInspectPath]
+    [isLive, pathKey]
   );
 
   const value =

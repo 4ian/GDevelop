@@ -52,6 +52,8 @@
         <preference name="deployment-target" value="15.0" />
 
         <!-- GDJS_ICONS_IOS -->
+
+        <!-- GDJS_IOS_ORIENTATION_LOCK -->
     </platform>
 
     <preference name="AndroidXEnabled" value="true" />

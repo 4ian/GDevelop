@@ -33,6 +33,7 @@ describe('libGD.js - GDJS related tests', function () {
   </platform>
   <platform name="ios">
 <!-- GDJS_ICONS_IOS -->
+<!-- GDJS_IOS_ORIENTATION_LOCK -->
   </platform>
 <!-- GDJS_ORIENTATION -->
 <!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->
@@ -133,6 +134,9 @@ describe('libGD.js - GDJS related tests', function () {
   </platform>
   <platform name="ios">
 
+<edit-config file="*-Info.plist" mode="merge" target="UIRequiresFullScreen">
+<true/>
+</edit-config>
   </platform>
 <preference name="Orientation" value="landscape" />
 
@@ -179,6 +183,7 @@ describe('libGD.js - GDJS related tests', function () {
 
   </platform>
   <platform name="ios">
+
 
   </platform>
 
@@ -228,6 +233,9 @@ describe('libGD.js - GDJS related tests', function () {
   </platform>
   <platform name="ios">
 
+<edit-config file="*-Info.plist" mode="merge" target="UIRequiresFullScreen">
+<true/>
+</edit-config>
   </platform>
 <preference name="Orientation" value="landscape" />
 <plugin name=\"gdevelop-cordova-admob-plus\" spec=\"0.43.0\">

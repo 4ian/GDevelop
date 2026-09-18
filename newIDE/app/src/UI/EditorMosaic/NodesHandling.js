@@ -226,6 +226,12 @@ const harvestStacksAndSplits = (
 
 // Build canonical tree from stacks + central with *per-region* splits.
 // (No branch is created unless it has two real children - so no nulls/empties are emitted.)
+//
+// The shape is a column: the row of the side panels (left | central | right)
+// on top, the bottom region under it. The bottom region spans the whole width,
+// so that it stays at the bottom whatever happens to the central node: putting
+// it under the central node only would make it slide up next to the left panel
+// as soon as the central node is hidden.
 const buildCanonicalWithSplits = (
   centralId: string,
   stacks: Stacks,
@@ -242,67 +248,69 @@ const buildCanonicalWithSplits = (
   const { leftSplit, rightSplit, bottomSplit } = splits;
 
   // Start with the central core, carrying its own visibility.
-  let core: HidableNode = hidableNode(centralId, centralHidden);
+  const core: HidableNode = hidableNode(centralId, centralHidden);
 
-  // Attach bottom if present: column split (central over bottom).
-  if (bottomStack) {
-    core = hidableNode(
+  // Left | core | Right (core stays between).
+  let topRow: HidableNode = core;
+  if (leftStack && rightStack) {
+    const innerRow = hidableNode(
       {
-        direction: 'column',
+        direction: 'row',
         first: core.node,
-        second: bottomStack.node,
-        splitPercentage: bottomSplit != null ? bottomSplit : defaults.bottom,
+        second: rightStack.node,
+        splitPercentage: rightSplit != null ? rightSplit : defaults.right,
         firstHidden: core.hidden,
-        secondHidden: bottomStack.hidden,
+        secondHidden: rightStack.hidden,
       },
-      false
+      core.hidden && rightStack.hidden
+    );
+    topRow = hidableNode(
+      {
+        direction: 'row',
+        first: leftStack.node,
+        second: innerRow.node,
+        splitPercentage: leftSplit != null ? leftSplit : defaults.left,
+        firstHidden: leftStack.hidden,
+        secondHidden: innerRow.hidden,
+      },
+      leftStack.hidden && innerRow.hidden
+    );
+  } else if (leftStack) {
+    topRow = hidableNode(
+      {
+        direction: 'row',
+        first: leftStack.node,
+        second: core.node,
+        splitPercentage: leftSplit != null ? leftSplit : defaults.left,
+        firstHidden: leftStack.hidden,
+        secondHidden: core.hidden,
+      },
+      leftStack.hidden && core.hidden
+    );
+  } else if (rightStack) {
+    topRow = hidableNode(
+      {
+        direction: 'row',
+        first: core.node,
+        second: rightStack.node,
+        splitPercentage: rightSplit != null ? rightSplit : defaults.right,
+        firstHidden: core.hidden,
+        secondHidden: rightStack.hidden,
+      },
+      core.hidden && rightStack.hidden
     );
   }
 
-  // Attach left/right ensuring: Left | core | Right (core stays between).
-  if (leftStack && rightStack) {
-    const innerRow: EditorMosaicNode = {
-      direction: 'row',
-      first: core.node,
-      second: rightStack.node,
-      splitPercentage: rightSplit != null ? rightSplit : defaults.right,
-      firstHidden: core.hidden,
-      secondHidden: rightStack.hidden,
-    };
+  if (!bottomStack) return topRow.node;
 
-    return {
-      direction: 'row',
-      first: leftStack.node,
-      second: innerRow,
-      splitPercentage: leftSplit != null ? leftSplit : defaults.left,
-      firstHidden: leftStack.hidden,
-    };
-  }
-
-  if (leftStack && !rightStack) {
-    return {
-      direction: 'row',
-      first: leftStack.node,
-      second: core.node,
-      splitPercentage: leftSplit != null ? leftSplit : defaults.left,
-      firstHidden: leftStack.hidden,
-      secondHidden: core.hidden,
-    };
-  }
-
-  if (!leftStack && rightStack) {
-    return {
-      direction: 'row',
-      first: core.node,
-      second: rightStack.node,
-      splitPercentage: rightSplit != null ? rightSplit : defaults.right,
-      firstHidden: core.hidden,
-      secondHidden: rightStack.hidden,
-    };
-  }
-
-  // Only central (and maybe bottom already attached inside core)
-  return core.node;
+  return {
+    direction: 'column',
+    first: topRow.node,
+    second: bottomStack.node,
+    splitPercentage: bottomSplit != null ? bottomSplit : defaults.bottom,
+    firstHidden: topRow.hidden,
+    secondHidden: bottomStack.hidden,
+  };
 };
 
 // Convert any tree into canonical tree around centralId *without changing existing region splits*.
@@ -310,24 +318,10 @@ const ensureCanonicalPreserveSplits = (
   current: EditorMosaicNode,
   centralId: string
 ): EditorMosaicNode => {
-  // Quick path: already canonical with central in the middle?
-  if (
-    isBranch(current) &&
-    current.direction === 'row' &&
-    // $FlowFixMe[prop-missing]
-    isBranch(current.second) &&
-    current.second.direction === 'row' &&
-    // $FlowFixMe[prop-missing]
-    isBranch(current.second.first) &&
-    // $FlowFixMe[prop-missing]
-    current.second.first.direction === 'column' &&
-    // $FlowFixMe[prop-missing]
-    current.second.first.first === centralId
-  ) {
-    return current;
-  }
-
-  // Otherwise harvest and rebuild canonically, preserving any discovered splits.
+  // The tree is always harvested and rebuilt: the shape of the canonical tree
+  // (bottom region under the whole width) has to be enforced on the layouts
+  // saved by the previous versions too.
+  // The splits discovered along the way are preserved.
   const { stacks, splits, centralHidden } = harvestStacksAndSplits(
     current,
     centralId

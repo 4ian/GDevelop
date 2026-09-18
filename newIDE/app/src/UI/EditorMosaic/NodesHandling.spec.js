@@ -71,6 +71,33 @@ describe('NodesHandling', () => {
       expect(getVisibleLeaves(withPerformance)).not.toContain('console');
     });
 
+    it('keeps the bottom panels at the bottom when the central node is hidden', () => {
+      const nodes = makeDebuggerNodes();
+      // What the debugger does: the central node is hidden as soon as a panel
+      // is opened.
+      toggleLeafVisibility(nodes, 'overview');
+
+      const withPerformance = addNode(
+        nodes,
+        'performance',
+        'bottom',
+        'overview'
+      );
+      // The tree is a column: the inspector (and the hidden central node) on
+      // top, the bottom panels below, spanning the whole width.
+      expect(typeof withPerformance).not.toBe('string');
+      // $FlowFixMe[prop-missing] - checked just above.
+      expect(withPerformance.direction).toBe('column');
+      // $FlowFixMe[prop-missing]
+      expect(getVisibleLeaves(withPerformance.second).sort()).toEqual([
+        'console',
+        'performance',
+        'profiler',
+      ]);
+      // $FlowFixMe[prop-missing]
+      expect(getVisibleLeaves(withPerformance.first)).toEqual(['inspector']);
+    });
+
     it('can show again a panel that was hidden when another one was added', () => {
       const nodes = makeDebuggerNodes();
       toggleLeafVisibility(nodes, 'inspector');

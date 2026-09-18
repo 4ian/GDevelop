@@ -44,17 +44,20 @@ namespace gdjs {
    * @param [replacer] - A function called for each property on the object or array being stringified, with the property key and its value, and that returns the new value. If not specified, values are not altered.
    * @param [cycleReplacer] - Function used to replace circular references with a new value.
    * @param [maxDepth] - The maximum depth, after which values are replaced by a string ("[Max depth reached]"). If not specified, there is no maximum depth.
+   * @param [maxNodes] - The maximum number of objects and arrays walked through, after which values are replaced by a string ("[Dump too large]"). If not specified, there is no maximum.
    */
   const depthLimitedSerializer = (
     replacer?: DebuggerClientCycleReplacer,
     cycleReplacer?: DebuggerClientCycleReplacer,
-    maxDepth?: number
+    maxDepth?: number,
+    maxNodes?: number
   ): DebuggerClientCycleReplacer => {
     // The chain of objects currently being serialized, from the root
     // to the object holding the current property, and the property keys
     // used to reach each of them.
     const stack: Array<any> = [],
       keys: Array<string> = [];
+    let visitedNodesCount = 0;
     if (cycleReplacer === undefined || cycleReplacer === null) {
       cycleReplacer = function (key, value) {
         if (stack[0] === value) {
@@ -68,6 +71,15 @@ namespace gdjs {
 
     // `this` is the object holding the property being serialized.
     return function (key: string, value: any): any {
+      // A game holding a lot of objects, or a lot of variables, can make the
+      // whole dump so big that serializing it freezes the game for seconds.
+      // Past this budget the dump is cut short: an incomplete inspector is
+      // always better than a game nobody can play anymore.
+      if (value !== null && typeof value === 'object') {
+        if (maxNodes != null && ++visitedNodesCount > maxNodes) {
+          return '[Dump too large: not sent to the debugger]';
+        }
+      }
       if (stack.length === 0) {
         // First call: the root object itself.
         stack.push(value);
@@ -112,19 +124,66 @@ namespace gdjs {
    * @param [maxDepth] - The maximum depth, after which values are replaced by a string ("[Max depth reached]"). If not specified, there is no maximum depth.
    * @param [spaces] - The number of spaces for indentation.
    * @param [cycleReplacer] - Function used to replace circular references with a new value.
+   * @param [maxNodes] - The maximum number of objects and arrays walked through. If not specified, there is no maximum.
    */
   export const circularSafeStringify = (
     obj: any,
     replacer?: DebuggerClientCycleReplacer,
     maxDepth?: number,
     spaces?: number,
-    cycleReplacer?: DebuggerClientCycleReplacer
+    cycleReplacer?: DebuggerClientCycleReplacer,
+    maxNodes?: number
   ) => {
     return JSON.stringify(
       obj,
-      depthLimitedSerializer(replacer, cycleReplacer, maxDepth),
+      depthLimitedSerializer(replacer, cycleReplacer, maxDepth, maxNodes),
       spaces
     );
+  };
+
+  /**
+   * How many objects and arrays of the game are walked through when dumping it
+   * for the inspector. Large enough for any reasonable game, small enough that
+   * a refresh never freezes the preview for more than a moment.
+   */
+  const MAX_DUMPED_NODES_COUNT = 200000;
+
+  /**
+   * What marks a step of an inspector path as an instance of an object,
+   * looked up by its runtime identifier: `#42`. Instances are never
+   * addressed by their position in the list of the scene, which moves as soon
+   * as one is created or destroyed. Kept in sync with the editor, in
+   * `newIDE/app/src/Debugger/inspectorPath.js`.
+   */
+  const INSTANCE_PATH_PREFIX = '#';
+
+  /** One step down a path: an instance by its identifier, or a property. */
+  const resolveInspectorPathStep = (value: any, step: string): any => {
+    if (value === null || value === undefined) return undefined;
+
+    if (
+      typeof step === 'string' &&
+      step.charAt(0) === INSTANCE_PATH_PREFIX &&
+      Array.isArray(value)
+    ) {
+      const instanceId = Number(step.slice(INSTANCE_PATH_PREFIX.length));
+      if (!isNaN(instanceId)) {
+        return value.find(
+          (instance) => !!instance && instance.id === instanceId
+        );
+      }
+    }
+    return value[step];
+  };
+
+  /** What is at this path in the running game, `undefined` if nothing is. */
+  const resolveInspectorPath = (from: any, path: string[]): any => {
+    let value = from;
+    for (const step of path || []) {
+      if (value === null || value === undefined) return undefined;
+      value = resolveInspectorPathStep(value, step);
+    }
+    return value;
   };
 
   /** Replacer function for JSON.stringify to convert Error objects into plain objects that can be logged. */
@@ -858,15 +917,16 @@ namespace gdjs {
         logger.warn('No path specified, set operation from debugger aborted');
         return false;
       }
-      let object = this._runtimegame;
+      let object: any = this._runtimegame;
       let currentIndex = 0;
       while (currentIndex < path.length - 1) {
         const key = path[currentIndex];
-        if (!object || !object[key]) {
+        const nextObject = resolveInspectorPathStep(object, key);
+        if (!nextObject) {
           logger.error('Incorrect path specified. No ' + key + ' in ', object);
           return false;
         }
-        object = object[key];
+        object = nextObject;
         currentIndex++;
       }
 
@@ -896,15 +956,16 @@ namespace gdjs {
         logger.warn('No path specified, call operation from debugger aborted');
         return false;
       }
-      let object = this._runtimegame;
+      let object: any = this._runtimegame;
       let currentIndex = 0;
       while (currentIndex < path.length - 1) {
         const key = path[currentIndex];
-        if (!object || !object[key]) {
+        const nextObject = resolveInspectorPathStep(object, key);
+        if (!nextObject) {
           logger.error('Incorrect path specified. No ' + key + ' in ', object);
           return false;
         }
-        object = object[key];
+        object = nextObject;
         currentIndex++;
       }
       if (!object[path[currentIndex]]) {
@@ -994,7 +1055,11 @@ namespace gdjs {
         message,
         this._getDumpReplacer(),
         /* Limit maximum depth to prevent any crashes */
-        22
+        22,
+        undefined,
+        undefined,
+        /* Limit the size, so that a huge game does not freeze on a refresh */
+        MAX_DUMPED_NODES_COUNT
       );
       const serializationDuration = Date.now() - serializationStartTime;
       logger.log(
@@ -1018,11 +1083,7 @@ namespace gdjs {
     sendInspectedValue(messageId: number, path: string[]): void {
       let message: string;
       try {
-        let value: any = this._runtimegame;
-        for (const key of path || []) {
-          if (value === null || value === undefined) break;
-          value = value[key];
-        }
+        const value = resolveInspectorPath(this._runtimegame, path);
 
         message = circularSafeStringify(
           {
@@ -1070,18 +1131,10 @@ namespace gdjs {
         codeOnlyArguments: string[];
       }>
     ): void {
-      const resolvePath = (from: any, keys: string[]): any => {
-        let value = from;
-        for (const key of keys || []) {
-          if (value === null || value === undefined) break;
-          value = value[key];
-        }
-        return value;
-      };
-      const inspectedElement = resolvePath(this._runtimegame, path);
+      const inspectedElement = resolveInspectorPath(this._runtimegame, path);
 
       const payload = (calls || []).map((call) => {
-        const target = resolvePath(inspectedElement, call.path);
+        const target = resolveInspectorPath(inspectedElement, call.path);
         if (!target || typeof target[call.functionName] !== 'function') {
           return { error: 'Not a function of the inspected element.' };
         }
@@ -1137,8 +1190,12 @@ namespace gdjs {
 
       // Everything is evaluated in one go: the editor watches several
       // expressions at once and must not pay a round trip for each of them.
+      // `variables` is always there, even when the evaluation failed: the
+      // editor reads it without checking, and an exception in the tooltip
+      // takes the whole events sheet down with it.
       const payload = (codes || []).map((code) => {
-        if (!currentScene) return { error: 'No scene is running.' };
+        if (!currentScene)
+          return { error: 'No scene is running.', variables: {} };
 
         try {
           const evaluation = new Function('runtimeScene', 'gdjs', code)(
@@ -1151,9 +1208,22 @@ namespace gdjs {
               evaluation.variables[variableExpression]
             );
           }
-          return { result: toDebuggerValue(evaluation.result), variables };
+          // Only sent when the editor asked for every instance: a panel that
+          // does not show them must not pay for them on the channel.
+          const instances = evaluation.instances
+            ? evaluation.instances.map((instance) => ({
+                id: instance.id,
+                result: toDebuggerValue(instance.result),
+              }))
+            : undefined;
+          return {
+            result: toDebuggerValue(evaluation.result),
+            instancesCount: evaluation.instancesCount,
+            instances,
+            variables,
+          };
         } catch (error) {
-          return { error: String(error) };
+          return { error: String(error), variables: {} };
         }
       });
 

@@ -121,6 +121,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/affinetransformation.js',
 
       //Extensions:
+      './newIDE/app/resources/GDJS/Runtime/Extensions/DebuggerTools/debuggertools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/DraggableBehavior/draggableruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/AnchorBehavior/anchorruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/PlatformBehavior/platformerobjectruntimebehavior.js',

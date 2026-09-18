@@ -87,6 +87,32 @@ describe('gdjs.circularSafeStringify', function () {
     );
   });
 
+  it('stops serializing past the maximum number of nodes', function () {
+    const object = {
+      first: { value: 1 },
+      second: { value: 2 },
+      third: { value: 3 },
+    };
+
+    // The root, then "first" and "second": what comes after is cut short, so
+    // that a huge game never freezes the preview while it is serialized.
+    const serialized = JSON.parse(
+      gdjs.circularSafeStringify(
+        object,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        3
+      )
+    );
+    expect(serialized.first).to.eql({ value: 1 });
+    expect(serialized.second).to.eql({ value: 2 });
+    expect(serialized.third).to.be(
+      '[Dump too large: not sent to the debugger]'
+    );
+  });
+
   it('truncates deeply nested variables consistently', function () {
     const variablesContainer = new gdjs.VariablesContainer();
     const structure = variablesContainer.get('Root');

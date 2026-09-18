@@ -7,12 +7,18 @@ namespace gdjs {
     export namespace debuggerTools {
       /**
        * Stop the game execution.
+       *
+       * A breakpoint is there to look at the game as it is at this exact
+       * moment: any recording in progress is stopped with it, so that the
+       * panels of the debugger stop moving and can be read.
        * @param instanceContainer - The current container.
        */
       export const pause = function (
         instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
-        instanceContainer.getGame().pause(true);
+        const runtimeGame = instanceContainer.getGame();
+        runtimeGame.stopProfiler();
+        runtimeGame.pause(true);
       };
 
       /**

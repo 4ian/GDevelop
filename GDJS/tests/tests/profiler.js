@@ -212,3 +212,29 @@ describe('gdjs.Profiler', () => {
     expect(stoppedProfiler).to.be(profiler);
   });
 });
+
+describe('gdjs.evtTools.debuggerTools.pause', () => {
+  it('stops the recording of the game, so that the debugger stops moving', () => {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+
+    let stoppedProfiler = null;
+    expect(
+      runtimeGame.startProfiler({
+        onStopped: (profiler) => {
+          stoppedProfiler = profiler;
+        },
+      })
+    ).to.be(true);
+
+    // The "pause" action used as a breakpoint: the game stops, and so does
+    // what the debugger records, so that its panels can be read.
+    gdjs.evtTools.debuggerTools.pause(runtimeScene);
+
+    expect(runtimeGame.isPaused()).to.be(true);
+    expect(runtimeGame.getProfiler()).to.be(null);
+    expect(stoppedProfiler).not.to.be(null);
+
+    runtimeGame.pause(false);
+  });
+});

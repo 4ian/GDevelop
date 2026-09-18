@@ -41,6 +41,7 @@ module.exports = {
         _('Pause game execution (breakpoint)'),
         _(
           'This pauses the game, like a breakpoint: useful for inspecting the game state through the debugger. ' +
+            'Any recording in progress is stopped, so that the debugger shows the game as it is at this moment. ' +
             'Note that events will be still executed until the end before the game is paused.'
         ),
         _('Pause game execution (breakpoint)'),

@@ -24,6 +24,14 @@ namespace gdjs {
 
 namespace {
 /**
+ * How many instances at most are read when an expression is evaluated on all
+ * of them. The answer travels on the debugger channel every 300 ms, with a
+ * one second timeout: an unbounded list would make it miss its deadline on a
+ * scene holding thousands of instances.
+ */
+const std::size_t maxEvaluatedInstancesCount = 200;
+
+/**
  * Collect the text of every variable used in an expression (`Score`,
  * `Player.Life`, `Inventory["key"].count`...), in order of appearance.
  */
@@ -142,6 +150,61 @@ gd::String LayoutCodeGenerator::GenerateExpressionEvaluationCode(
 
   const gd::String resultCode = generateCode(type, expression, objectName);
 
+  // The object the expression reads, when it reads one: `Player.Life` names
+  // it before the dot, and an object variable is given its object apart.
+  const gd::String readObjectName = [&]() -> gd::String {
+    if (!objectName.empty()) return objectName;
+    if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      const auto dotPosition = expression.find('.');
+      if (dotPosition != gd::String::npos) {
+        const gd::String rootName = expression.substr(0, dotPosition);
+        if (objectsContainersList.HasObjectOrGroupNamed(rootName))
+          return rootName;
+      }
+    }
+    return gd::String("");
+  }();
+
+  // Reading every instance asks the generator for `ObjList[i]` instead of
+  // `ObjList[0]`, which it does as soon as an object is the current one. A
+  // group never matches the objects it expands to, so it is left out: its
+  // count is still reported, and its value stays that of the first instance.
+  const bool isEvaluatedForAllInstances =
+      evaluateForAllInstances && !readObjectName.empty() &&
+      objectsContainersList.HasObjectNamed(readObjectName);
+  gd::String instancesCode;
+  if (isEvaluatedForAllInstances) {
+    context.SetCurrentObject(readObjectName);
+    const gd::String perInstanceResultCode =
+        generateCode(type, expression, objectName);
+    // Back to no current object: the variables below must not depend on the
+    // instance being walked.
+    context.SetNoCurrentObject();
+
+    const gd::String objectListName =
+        codeGenerator.GetObjectListName(readObjectName, context);
+    instancesCode = "const gdjsEvaluatedInstances = [];\n"
+                    "for (let i = 0, len = Math.min(" +
+                    objectListName + ".length, " +
+                    gd::String::From(maxEvaluatedInstancesCount) +
+                    "); i < len; i++) {\n"
+                    "  gdjsEvaluatedInstances.push({ id: " +
+                    objectListName + "[i].id, result: " +
+                    perInstanceResultCode + " });\n"
+                    "}\n";
+  }
+
+  // The instances of the object are counted below: its list has to be
+  // declared like the ones the expression itself uses, or the generated code
+  // reads the length of a list that does not exist.
+  const std::vector<gd::String> countedObjectNames =
+      readObjectName.empty()
+          ? std::vector<gd::String>()
+          : objectsContainersList.ExpandObjectName(readObjectName);
+  for (const auto& countedObjectName : countedObjectNames) {
+    context.ObjectsListNeeded(countedObjectName);
+  }
+
   gd::String variablesCode;
   gd::ExpressionParser2 parser;
   auto rootNode = parser.ParseExpression(expression);
@@ -169,7 +232,27 @@ gd::String LayoutCodeGenerator::GenerateExpressionEvaluationCode(
                         "), " + objectListName + ");\n";
   }
 
-  return objectsListsCode + "return { result: " + resultCode +
+  // How many instances the object has, whether or not each of them is read:
+  // it is what tells the user that the value shown is one of several.
+  gd::String instancesCountCode = "0";
+  {
+    gd::String countCode;
+    for (const auto& realObjectName : countedObjectNames) {
+      if (!countCode.empty()) countCode += " + ";
+      // Defensive: a list that ended up not being declared (an object that
+      // does not exist anymore, for example) counts for nothing instead of
+      // making the whole evaluation fail.
+      const gd::String objectListName =
+          codeGenerator.GetObjectListName(realObjectName, context);
+      countCode += "(" + objectListName + " ? " + objectListName +
+                   ".length : 0)";
+    }
+    if (!countCode.empty()) instancesCountCode = countCode;
+  }
+
+  return objectsListsCode + instancesCode + "return { result: " + resultCode +
+         ", instancesCount: " + instancesCountCode + ", instances: " +
+         (isEvaluatedForAllInstances ? "gdjsEvaluatedInstances" : "null") +
          ", variables: {\n" + variablesCode + "} };\n";
 }
 gd::String LayoutCodeGenerator::GenerateLayoutCompleteCode(

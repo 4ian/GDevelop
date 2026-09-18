@@ -4404,6 +4404,7 @@ ParticleEmitterObject implements ObjectConfiguration;
 interface LayoutCodeGenerator {
     void LayoutCodeGenerator([Ref] Project project);
     void SetGenerateEventsExecutionTracking(boolean enable);
+    void SetEvaluateForAllInstances(boolean enable);
     [Const, Value] DOMString GenerateLayoutCompleteCode(
         [Const, Ref] Layout layout,
         [Ref] SetString includes,

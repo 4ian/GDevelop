@@ -18,8 +18,16 @@ describe('libGD.js - GDJS expression evaluation code generation integration test
     return { project, layout };
   };
 
-  const evaluate = (project, layout, type, expression, objectName = '') => {
+  const evaluate = (
+    project,
+    layout,
+    type,
+    expression,
+    objectName = '',
+    evaluateForAllInstances = false
+  ) => {
     const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+    layoutCodeGenerator.setEvaluateForAllInstances(evaluateForAllInstances);
     const code = layoutCodeGenerator.generateExpressionEvaluationCode(
       layout,
       type,
@@ -105,8 +113,11 @@ describe('libGD.js - GDJS expression evaluation code generation integration test
       ''
     );
     layoutCodeGenerator.delete();
-    // The variable is read from the (first) instance of the object.
+    // Asked for one value only: it is read from the first instance, and the
+    // number of instances is reported so that the editor can say so.
     expect(code).toContain('runtimeScene.getObjects("Door")');
+    expect(code).toContain('instancesCount:');
+    expect(code).toContain('instances: null');
     expect(code).toContain('getVariables()');
     expect(code).not.toContain('.get("Door")');
 
@@ -130,6 +141,109 @@ describe('libGD.js - GDJS expression evaluation code generation integration test
     expect(evaluation.result).toBe(42);
     // `Player` is an object, not a variable.
     expect(Object.keys(evaluation.variables)).toEqual(['Score']);
+
+    project.delete();
+  });
+
+  it('counts the instances of an object named apart from the expression', function () {
+    // What a parameter of an instruction acting on an object looks like: the
+    // object is given, but the expression itself does not mention it. Its
+    // list must still be declared, or counting its instances reads the length
+    // of a list that does not exist.
+    const { project, layout } = makeProject();
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+
+    const { code, evaluation } = evaluate(
+      project,
+      layout,
+      'number',
+      '10+10',
+      'Player'
+    );
+    expect(code).toContain('runtimeScene.getObjects("Player")');
+    expect(evaluation.result).toBe(20);
+    expect(evaluation.instancesCount).toBe(0);
+
+    project.delete();
+  });
+
+  it('reads only the first instance unless asked otherwise', function () {
+    const { project, layout } = makeProject();
+    const player = layout
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Player', 0);
+    player.getVariables().insertNew('Life', 0).setValue(100);
+
+    const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+    const code = layoutCodeGenerator.generateExpressionEvaluationCode(
+      layout,
+      'variable',
+      'Player.Life',
+      ''
+    );
+    layoutCodeGenerator.delete();
+
+    expect(code).toContain('[0].getVariables()');
+    expect(code).not.toContain('[i].getVariables()');
+  });
+
+  it('reads every instance when asked for it', function () {
+    const { project, layout } = makeProject();
+    const player = layout
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Player', 0);
+    player.getVariables().insertNew('Life', 0).setValue(100);
+
+    const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+    layoutCodeGenerator.setEvaluateForAllInstances(true);
+    const code = layoutCodeGenerator.generateExpressionEvaluationCode(
+      layout,
+      'variable',
+      'Player.Life',
+      ''
+    );
+    layoutCodeGenerator.delete();
+
+    // One value per instance, walked with a bounded loop, and the value of
+    // the first instance still returned on its own.
+    expect(code).toContain('[i].getVariables()');
+    expect(code).toContain('gdjsEvaluatedInstances');
+    expect(code).toContain('instances: gdjsEvaluatedInstances');
+    expect(code).toContain('Math.min(');
+    // The variables listed apart must not depend on the instance walked.
+    expect(code).toContain('[0].getVariables()');
+  });
+
+  it('leaves a group of objects in the first instance mode', function () {
+    const { project, layout } = makeProject();
+    const player = layout
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Player', 0);
+    player.getVariables().insertNew('Life', 0).setValue(100);
+    const enemy = layout
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Enemy', 1);
+    enemy.getVariables().insertNew('Life', 0).setValue(10);
+    const group = layout.getObjects().getObjectGroups().insertNew('Fighters', 0);
+    group.addObject('Player');
+    group.addObject('Enemy');
+
+    const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+    layoutCodeGenerator.setEvaluateForAllInstances(true);
+    const code = layoutCodeGenerator.generateExpressionEvaluationCode(
+      layout,
+      'variable',
+      'Fighters.Life',
+      ''
+    );
+    layoutCodeGenerator.delete();
+
+    // A group never matches the objects it expands to: the per instance mode
+    // is refused rather than silently reading one object of the group.
+    expect(code).toContain('instances: null');
+    expect(code).not.toContain('[i].getVariables()');
+    // Its instances are still counted, over every object of the group.
+    expect(code).toContain('instancesCount:');
 
     project.delete();
   });

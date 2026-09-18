@@ -124,6 +124,8 @@ export type FrameStats = {|
   durationMs: number,
   averageMs: number,
   maxMs: number,
+  /** When the slowest frame started, in game time (milliseconds). */
+  slowestFrameStartTimeMs: number,
   minMs: number,
   /** Frames per second, derived from the average frame duration. */
   fps: number,
@@ -137,6 +139,7 @@ export const getFrameStats = (frames: Array<ProfilerFrame>): FrameStats => {
       durationMs: 0,
       averageMs: 0,
       maxMs: 0,
+      slowestFrameStartTimeMs: 0,
       minMs: 0,
       fps: 0,
       slowFramesCount: 0,
@@ -144,11 +147,15 @@ export const getFrameStats = (frames: Array<ProfilerFrame>): FrameStats => {
   }
   let sumMs = 0;
   let maxMs = -Infinity;
+  let slowestFrameStartTimeMs = 0;
   let minMs = Infinity;
   let slowFramesCount = 0;
   for (const frame of frames) {
     sumMs += frame.frameDurationMs;
-    maxMs = Math.max(maxMs, frame.frameDurationMs);
+    if (frame.frameDurationMs > maxMs) {
+      maxMs = frame.frameDurationMs;
+      slowestFrameStartTimeMs = frame.frameStartTimeMs;
+    }
     minMs = Math.min(minMs, frame.frameDurationMs);
     if (frame.frameDurationMs > SLOW_FRAME_THRESHOLD_MS) slowFramesCount++;
   }
@@ -163,6 +170,7 @@ export const getFrameStats = (frames: Array<ProfilerFrame>): FrameStats => {
       firstFrame.frameStartTimeMs,
     averageMs,
     maxMs,
+    slowestFrameStartTimeMs,
     minMs,
     fps: averageMs > 0 ? 1000 / averageMs : 0,
     slowFramesCount,

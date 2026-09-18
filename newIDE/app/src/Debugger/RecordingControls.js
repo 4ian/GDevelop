@@ -55,13 +55,16 @@ export const RecordingStatusChip = ({
 }: StatusProps): React.Node => {
   const recording = useProfilerRecording(recordingStore, debuggerId);
   const durationMs = useRecordingClock(recording);
+  // Named in lower case: the identifier of the message is the sentence
+  // itself, so an interpolated value must read well inside it.
+  const clockDuration = formatClockDuration(durationMs);
 
   if (profilingInProgress) {
     return (
       <StatusChip
         tone="progress"
         loading
-        label={<Trans>Recording {formatClockDuration(durationMs)}</Trans>}
+        label={<Trans>Recording {clockDuration}</Trans>}
       />
     );
   }
@@ -74,7 +77,7 @@ export const RecordingStatusChip = ({
           recording.stoppedByCap ? (
             <Trans>Stopped after 5 min</Trans>
           ) : (
-            <Trans>Last recording {formatClockDuration(durationMs)}</Trans>
+            <Trans>Last recording {clockDuration}</Trans>
           )
         }
       />

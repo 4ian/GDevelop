@@ -31,6 +31,8 @@ import {
   type LaunchDebuggerAndPreviewOptions,
 } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import { UseCommandHook } from '../CommandPalette/CommandHooks';
+import EventsExecutionTrackingContext from '../EventsExecutionTracking/EventsExecutionTrackingContext';
+import { EventsExecutionTrackingStore } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 
 export type ResourcesDebugSnapshot = {|
   state: ?ResourcesDebugState,
@@ -103,6 +105,12 @@ type State = {|
  * Start the debugger server, listen to commands received and issue commands to it.
  */
 export default class Debugger extends React.Component<Props, State> {
+  /**
+   * The store fed by the previews, shared with the events sheets: clearing
+   * the recorded data must also clear the durations they show.
+   */
+  static contextType: React.Context<EventsExecutionTrackingStore> = EventsExecutionTrackingContext;
+
   // $FlowFixMe[missing-local-annot]
   state = {
     debuggerServerState: (this.props.previewDebuggerServer.getServerState():
@@ -367,9 +375,10 @@ export default class Debugger extends React.Component<Props, State> {
         }),
         () => this.updateToolbar()
       );
-      // A paused game (by the debugger, or by a "pause" action used as a
-      // breakpoint in the events) keeps its recording: each frame advanced by
-      // hand then records exactly one frame.
+      // A game paused from the debugger keeps its recording: each frame
+      // advanced by hand then records exactly one frame. The "pause" action
+      // used as a breakpoint in the events stops the recording instead: it is
+      // there to look at the game at one exact moment.
       if (data.payload && this._recordOnConnectionIds.has(id)) {
         this._recordOnConnectionIds.delete(id);
         this._startProfiler(id);
@@ -394,6 +403,11 @@ export default class Debugger extends React.Component<Props, State> {
         }),
         () => this.updateToolbar()
       );
+      // The inspector is not kept up to date while recording (it would be
+      // both costly and unreadable): once the recording is over, it is
+      // refreshed so that the panel shows the state the game ended on,
+      // instead of waiting for the user to hit "Refresh".
+      this._refresh(id);
     } else if (
       data.command === 'inspector.dumped' ||
       data.command === 'inspector.called'
@@ -472,9 +486,11 @@ export default class Debugger extends React.Component<Props, State> {
 
   _startProfiler = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
-    // Recording again starts from a blank slate, unless asked otherwise.
+    // Recording again starts from a blank slate, unless asked otherwise. What
+    // is inspected is kept: throwing it away would unmount the tree of the
+    // Inspector, folding everything the user had opened.
     if (this.state.shouldClearOnRecord && !this.state.profilingInProgress[id]) {
-      this._forgetRecordedData(id);
+      this._forgetRecordedData(id, { keepInspectedData: true });
     }
     // A paused game is left paused: each frame advanced by hand then records
     // exactly one frame, which is how the events are debugged frame by frame.
@@ -492,6 +508,8 @@ export default class Debugger extends React.Component<Props, State> {
    * user chooses when to record anew.
    */
   _clear = (id: DebuggerId) => {
+    // Asked explicitly: the durations shown on the events sheets go too.
+    this.context.clear();
     if (this.state.profilingInProgress[id]) this._stopProfiler(id);
     if (!this.state.debuggerIds.includes(id)) {
       // Clearing a closed game leaves nothing of it.
@@ -499,16 +517,26 @@ export default class Debugger extends React.Component<Props, State> {
       return;
     }
     this._forgetRecordedData(id);
+    // The Inspector was emptied: ask the game for its state again, instead of
+    // leaving an empty tree until the user hits refresh.
+    this._refresh(id);
   };
 
-  /** Forget the recording, logs, inspected data and resources of a preview. */
-  _forgetRecordedData = (id: DebuggerId) => {
+  /**
+   * Forget the recording, logs, inspected data and resources of a preview.
+   * `keepInspectedData` leaves the tree of the Inspector alone, for the
+   * clears that are not asked for by the user.
+   */
+  _forgetRecordedData = (
+    id: DebuggerId,
+    options: {| keepInspectedData: boolean |} = { keepInspectedData: false }
+  ) => {
     this._profilerRecordingStore.clear(id);
     this._getLogsManager(id).clear();
     this.setState(state => {
       const debuggerGameData = { ...state.debuggerGameData };
       const resourcesDebugSnapshots = { ...state.resourcesDebugSnapshots };
-      delete debuggerGameData[id];
+      if (!options.keepInspectedData) delete debuggerGameData[id];
       delete resourcesDebugSnapshots[id];
       return { debuggerGameData, resourcesDebugSnapshots };
     });
@@ -796,6 +824,8 @@ export default class Debugger extends React.Component<Props, State> {
               onEdit={(path, args) => this._edit(selectedId, path, args)}
               onCall={(path, args) => this._call(selectedId, path, args)}
               profilingInProgress={!!profilingInProgress[selectedId]}
+              canRecord={canRecord}
+              onStartRecording={() => this._startProfiler(selectedId)}
               profilerRecordingStore={this._profilerRecordingStore}
               debuggerId={selectedId}
               resourcesDebugSnapshot={resourcesDebugSnapshots[selectedId]}

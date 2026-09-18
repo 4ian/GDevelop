@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 import Profiler from '../../../Debugger/Profiler';
 import { ProfilerRecordingStore } from '../../../Debugger/ProfilerRecording/ProfilerRecordingStore';
@@ -14,6 +15,8 @@ export default {
 
 const profilerProps = {
   debuggerId: '0',
+  canRecord: true,
+  onStartRecording: action('start recording'),
 };
 
 const emptyStore = new ProfilerRecordingStore();

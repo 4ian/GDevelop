@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 import Performance from '../../../Debugger/Performance';
 import { ProfilerRecordingStore } from '../../../Debugger/ProfilerRecording/ProfilerRecordingStore';
@@ -19,6 +20,8 @@ export const NeverRecorded = (): React.Node => (
     <Performance
       recordingStore={emptyStore}
       debuggerId="0"
+      canRecord
+      onStartRecording={action('start recording')}
       profilingInProgress={false}
       memoryLimitBytes={null}
     />
@@ -30,6 +33,8 @@ export const WithARecording = (): React.Node => (
     <Performance
       recordingStore={recordingStore}
       debuggerId="0"
+      canRecord
+      onStartRecording={action('start recording')}
       profilingInProgress={false}
       memoryLimitBytes={256 * 1024 * 1024}
     />

@@ -109,6 +109,21 @@ describe('ProfilerRecordingAggregation', () => {
       expect(stats.minMs).toBe(16);
       expect(stats.slowFramesCount).toBe(1);
       expect(stats.durationMs).toBe(56);
+      expect(stats.slowestFrameStartTimeMs).toBe(16);
+    });
+
+    it('points at the first of the slowest frames', () => {
+      const stats = getFrameStats([
+        makeFrame(0, 0),
+        { ...makeFrame(1, 16), frameDurationMs: 40 },
+        { ...makeFrame(2, 56), frameDurationMs: 40 },
+      ]);
+      expect(stats.maxMs).toBe(40);
+      expect(stats.slowestFrameStartTimeMs).toBe(16);
+    });
+
+    it('has no slowest frame without any frame', () => {
+      expect(getFrameStats([]).slowestFrameStartTimeMs).toBe(0);
     });
 
     it('lists the scene changes', () => {

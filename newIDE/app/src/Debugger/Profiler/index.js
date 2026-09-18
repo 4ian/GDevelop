@@ -27,12 +27,15 @@ import {
   getTimelineMarkers,
   getShownRange,
 } from '../ProfilerRecording/ProfilerRecordingAggregation';
+import StartRecordingPlaceholder from '../StartRecordingPlaceholder';
 import classes from './Profiler.module.css';
 
 type Props = {|
   profilingInProgress: boolean,
   recordingStore: ProfilerRecordingStore,
   debuggerId: DebuggerId,
+  canRecord: boolean,
+  onStartRecording: () => void,
 |};
 
 /**
@@ -44,6 +47,8 @@ const Profiler = ({
   profilingInProgress,
   recordingStore,
   debuggerId,
+  canRecord,
+  onStartRecording,
 }: Props): React.Node => {
   const recording = useProfilerRecording(recordingStore, debuggerId);
   // The store appends to the recording in place: what changed is told by
@@ -71,6 +76,14 @@ const Profiler = ({
   const frameStats = React.useMemo(() => getFrameStats(framesInRange), [
     framesInRange,
   ]);
+  // Named in lower case: the identifier of the message is the sentence
+  // itself, so an interpolated value must read well inside it.
+  const rangeStart = shownRange ? formatGameTime(shownRange.fromMs) : '';
+  const rangeEnd = shownRange ? formatGameTime(shownRange.toMs) : '';
+  const shownFramesCount = frameStats.framesCount;
+  const averageDuration = formatMilliseconds(frameStats.averageMs);
+  const maxDuration = formatMilliseconds(frameStats.maxMs);
+  const slowFramesCount = frameStats.slowFramesCount;
   const markers = React.useMemo(
     () => (recording ? getTimelineMarkers(recording) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,11 +125,9 @@ const Profiler = ({
               <div className={classes.rangeSummary}>
                 <Text noMargin size="body-small" color="secondary">
                   <Trans>
-                    {formatGameTime(shownRange.fromMs)} to{' '}
-                    {formatGameTime(shownRange.toMs)} ({frameStats.framesCount}{' '}
-                    frames) - average {formatMilliseconds(frameStats.averageMs)}
-                    , max {formatMilliseconds(frameStats.maxMs)},{' '}
-                    {frameStats.slowFramesCount} slow frames
+                    {rangeStart} to {rangeEnd} ({shownFramesCount} frames) -
+                    average {averageDuration}, max {maxDuration},{' '}
+                    {slowFramesCount} slow frames
                   </Trans>
                 </Text>
                 {recording.selectedRange && (
@@ -156,20 +167,24 @@ const Profiler = ({
               />
             </div>
           </div>
-        ) : (
+        ) : profilingInProgress ? (
           <EmptyMessage>
-            {profilingInProgress ? (
-              <Trans>
-                Recording: the frames appear as they are played. Stop when you
-                have enough to look at.
-              </Trans>
-            ) : (
+            <Trans>
+              Recording: the frames appear as they are played. Stop when you
+              have enough to look at.
+            </Trans>
+          </EmptyMessage>
+        ) : (
+          <StartRecordingPlaceholder
+            description={
               <Trans>
                 Record while playing the game, then stop to explore what
                 happened in each frame.
               </Trans>
-            )}
-          </EmptyMessage>
+            }
+            canRecord={canRecord}
+            onStartRecording={onStartRecording}
+          />
         )}
       </ScrollView>
     </Background>

@@ -13,7 +13,7 @@ import {
   formatMilliseconds,
 } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import { useCanvasWithDevicePixelRatio } from '../useCanvasWithDevicePixelRatio';
-import { getSectionColor } from '../themeColors';
+import { getReadableSectionColors } from '../themeColors';
 import Paper from '../../UI/Paper';
 import classes from './Profiler.module.css';
 
@@ -139,7 +139,11 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
             hoveredSpan &&
             hoveredSpan.frame === frame &&
             hoveredSpan.spanIndex === spanIndex;
-          context.fillStyle = getSectionColor(gdevelopTheme, name);
+          const {
+            backgroundColor,
+            textColor: spanTextColor,
+          } = getReadableSectionColors(gdevelopTheme, name);
+          context.fillStyle = backgroundColor;
           context.fillRect(
             startX,
             y + 1,
@@ -157,7 +161,8 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
             );
           }
           if (spanWidth > MIN_TEXT_WIDTH_PX) {
-            context.fillStyle = gdevelopTheme.text.color.primary;
+            // Black or white, whichever reads on this span (WCAG 2.1 AAA).
+            context.fillStyle = spanTextColor;
             context.fillText(
               name,
               Math.max(2, startX) + 3,
@@ -263,13 +268,17 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
   };
 
   if (isTooManyFrames) {
+    // Named in lower case: the identifier of the message is the sentence
+    // itself, and a constant in capitals would end up read by the user.
+    const selectedFramesCount = frames.length;
+    const maxFramesCount = MAX_FRAMES_IN_FLAME_CHART;
     return (
       <div className={classes.flameChart}>
         <EmptyMessage>
           <Trans>
-            {frames.length} frames are selected: select fewer frames (at most{' '}
-            {MAX_FRAMES_IN_FLAME_CHART}) on the strip above to see them in
-            detail here. The table below still covers the whole selection.
+            {selectedFramesCount} frames are selected: select fewer frames (at
+            most {maxFramesCount}) on the strip above to see them in detail
+            here. The table below still covers the whole selection.
           </Trans>
         </EmptyMessage>
       </div>

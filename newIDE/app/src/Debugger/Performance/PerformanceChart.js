@@ -1,5 +1,5 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import type { I18n as I18nType } from '@lingui/core';
 import { type TimelineMarker } from '../ProfilerRecording/ProfilerRecordingAggregation';
@@ -56,19 +56,46 @@ const PerformanceTooltip = ({
   payload,
   label,
   format,
+  title,
 }: {|
   payload: ?Array<any>,
   label: number,
   format: number => string,
+  title: React.Node,
 |}) =>
   payload && payload.length > 0 && payload[0].value != null ? (
+    // Each piece on its own line, and each one said in full: the measure, its
+    // value with its unit, then when it was measured. Put together, the time
+    // and the value read as a single meaningless number.
     <Paper background="light" style={{ padding: '6px 10px' }}>
-      <Text noMargin size="body-small" color="secondary">
-        {formatGameTime(label)}
-      </Text>
-      <Text noMargin size="body-small">
-        {format(payload[0].value)}
-      </Text>
+      <div>
+        <Text noMargin size="body-small" color="secondary">
+          {title}
+        </Text>
+      </div>
+      <div>
+        <Text
+          noMargin
+          size="sub-title"
+          style={{ fontVariantNumeric: 'tabular-nums' }}
+        >
+          {format(payload[0].value)}
+        </Text>
+      </div>
+      <div>
+        <Text noMargin size="body-small" color="secondary">
+          <Trans>Time since the game started</Trans>
+        </Text>
+      </div>
+      <div>
+        <Text
+          noMargin
+          size="body-small"
+          style={{ fontVariantNumeric: 'tabular-nums' }}
+        >
+          {formatGameTime(label)}
+        </Text>
+      </div>
     </Paper>
   ) : null;
 
@@ -204,6 +231,7 @@ const PerformanceChart = ({
                           payload={props.payload}
                           label={props.label}
                           format={oneSeries.format}
+                          title={i18n._(oneSeries.title)}
                         />
                       )}
                     />

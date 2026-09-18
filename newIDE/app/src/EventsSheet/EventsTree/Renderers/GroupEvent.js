@@ -22,6 +22,7 @@ import { dataObjectToProps } from '../../../Utils/HTMLDataset';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../../../MainFrame/UnsavedChangesContext';
+import GroupEventExecutionTime from './GroupEventExecutionTime';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -161,6 +162,7 @@ export default class GroupEvent extends React.Component<
             ) : (
               <Trans>{`<Enter group name>`}</Trans>
             )}
+            <GroupEventExecutionTime />
           </span>
         )}
       </div>

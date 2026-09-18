@@ -58,6 +58,20 @@
   white-space: nowrap;
 }
 
+/* On the title bar of a group, whose background is a colour chosen by the
+user: the badge carries its own dark plate so that it stays readable on any
+of them, instead of borrowing the highlight colour of the theme. */
+.gd-events-sheet .group-execution-time {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.65em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
 /**
  * Scaffolding lines on the left
  */

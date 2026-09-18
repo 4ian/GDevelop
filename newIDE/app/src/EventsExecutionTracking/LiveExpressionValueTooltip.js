@@ -134,9 +134,11 @@ const LiveExpressionValueTooltip = ({
     [mousePosition]
   );
 
-  const variableExpressions = evaluation
-    ? Object.keys(evaluation.variables)
-    : [];
+  // An evaluation that failed only carries its error: the variables must not
+  // be taken for granted here, an exception in this tooltip would take the
+  // whole events sheet down with it.
+  const variableExpressions =
+    evaluation && evaluation.variables ? Object.keys(evaluation.variables) : [];
   // The value of a variable is already the result: don't repeat it.
   const hasDetailedVariables =
     variableExpressions.length > 0 &&
@@ -175,7 +177,7 @@ const LiveExpressionValueTooltip = ({
                         {variableExpression}
                         {' = '}
                         {formatEvaluationValue(
-                          evaluation.variables[variableExpression]
+                          (evaluation.variables || {})[variableExpression]
                         )}
                       </Text>
                     ))}

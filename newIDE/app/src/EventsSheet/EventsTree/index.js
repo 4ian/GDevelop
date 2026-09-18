@@ -19,7 +19,7 @@ import {
   executedEventHandle,
   icon,
 } from './ClassNames';
-import {
+import EventsExecutionTrackingContext, {
   TrackedEventPtrContext,
   useEventExecution,
 } from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
@@ -664,6 +664,25 @@ const EventsTree: React.ComponentType<{
   // defaultEventHeight.
   const heightsByRowIndex = React.useRef<{ [number]: number }>({});
 
+  // The parent of every event shown, so that the store can sum what a group
+  // took from what its sub-events reported. Filled while the rows are built,
+  // and read by the store only.
+  const parentEventPtrs = React.useRef<Map<number, number>>(new Map());
+  const eventsExecutionTrackingStore = React.useContext(
+    EventsExecutionTrackingContext
+  );
+  React.useEffect(
+    () => {
+      const followedEventPtrs = parentEventPtrs.current;
+      eventsExecutionTrackingStore.registerEventsHierarchy(followedEventPtrs);
+      return () =>
+        eventsExecutionTrackingStore.unregisterEventsHierarchy(
+          followedEventPtrs
+        );
+    },
+    [eventsExecutionTrackingStore]
+  );
+
   const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
   const getEventRow = React.useCallback(
     (searchedEvent: gdBaseEvent) => {
@@ -1013,9 +1032,12 @@ const EventsTree: React.ComponentType<{
     depth: number = 0,
     parentDisabled: boolean = false,
     parentAbsolutePath: Array<number> = [],
-    parentRelativePath: ?Array<number> = null
+    parentRelativePath: ?Array<number> = null,
+    parentEventPtr: number | null = null
   ) => {
     treeData.length = 0;
+    // The pointers of the deleted events must not be kept: they are reused.
+    if (depth === 0) parentEventPtrs.current.clear();
     mapFor(0, eventsList.getEventsCount(), i => {
       const event = eventsList.getEventAt(i);
       flattenedList.push(event);
@@ -1033,6 +1055,9 @@ const EventsTree: React.ComponentType<{
         : parentProjectScopedContainersAccessor;
 
       eventPtrToRowIndex.current['' + event.ptr] = absoluteIndex;
+      if (parentEventPtr !== null) {
+        parentEventPtrs.current.set(event.ptr, parentEventPtr);
+      }
 
       const isValidElseEvent =
         event.getType() === 'BuiltinCommonInstructions::Else'
@@ -1050,7 +1075,8 @@ const EventsTree: React.ComponentType<{
         depth + 1,
         disabled,
         currentAbsolutePath,
-        currentRelativePath
+        currentRelativePath,
+        event.ptr
       );
 
       treeData.push({

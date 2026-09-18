@@ -36,9 +36,36 @@ export type InstructionExecution = {|
   reportedAt: number,
 |};
 
+/**
+ * What an event took with everything under it: what a group shows, so that
+ * the heavy parts of a sheet can be found by reading the groups only.
+ */
+export type CumulatedEventExecution = {|
+  /** Duration of the event and of all its sub-events, in milliseconds. */
+  durationMs: number,
+  /** Its share of everything tracked in the last report, in percent. */
+  sharePercent: number,
+  /** When the execution was reported (`Date.now()`). */
+  reportedAt: number,
+|};
+
+/** The value an expression takes on one instance of the object it reads. */
+export type InstanceEvaluation = {|
+  /** The identifier of the instance in the running game (stable). */
+  id: number,
+  result: any,
+|};
+
 /** What the game answers when asked to evaluate an expression. */
 export type ExpressionEvaluation = {|
   result?: any,
+  /**
+   * How many instances the object read by the expression has. The value above
+   * is the one of the first of them: this is what says so.
+   */
+  instancesCount?: number,
+  /** Only when the editor asked for every instance, and up to a fixed count. */
+  instances?: ?Array<InstanceEvaluation>,
   /** The value of each variable used by the expression, keyed by its text. */
   variables: { [variableExpression: string]: any },
   error?: string,
@@ -46,6 +73,13 @@ export type ExpressionEvaluation = {|
 
 /** An executed instruction is highlighted for this long after being reported. */
 const HIGHLIGHT_DURATION_MS = 700;
+
+/**
+ * How much of a new value is taken into the smoothed one. Reports arrive
+ * every 100 ms: without smoothing, the number shown on a group flickers too
+ * fast to be read, let alone compared.
+ */
+const SMOOTHING_FACTOR = 0.3;
 
 /**
  * Build the id identifying an instruction in the code generated for a preview.
@@ -81,6 +115,17 @@ export class EventsExecutionTrackingStore {
    */
   _listenersByEventPtr: Map<number, Set<() => void>> = new Map();
   _expirationTimeoutId: TimeoutID | null = null;
+  /**
+   * What each event took with everything under it, so that a group can show
+   * what its sub-events cost without the game reporting anything more.
+   */
+  _cumulatedEventExecutions: Map<number, CumulatedEventExecution> = new Map();
+  /**
+   * The parent of each event, one map per events sheet showing a tree. The
+   * sheets fill their own map in place while they build their rows, and the
+   * store only reads it.
+   */
+  _parentEventPtrsBySheet: Set<Map<number, number>> = new Set();
   _previewDebuggerServer: ?PreviewDebuggerServer = null;
   /**
    * The values of the game are only read while it is debugged: a preview
@@ -103,8 +148,32 @@ export class EventsExecutionTrackingStore {
     return this._runningSceneName;
   }
 
+  /**
+   * Closing the debugger forgets what the previews reported: nobody is
+   * looking at the last frame anymore, and leaving it highlighted would keep
+   * durations shown on the events sheets forever.
+   */
   setDebuggerOpened(isDebuggerOpened: boolean): void {
+    if (this._isDebuggerOpened === isDebuggerOpened) return;
     this._isDebuggerOpened = isDebuggerOpened;
+    if (!isDebuggerOpened) {
+      this.setHighlightsPersistent(false);
+      this.clear();
+    }
+  }
+
+  /**
+   * The last preview was closed: its last frame stays shown as long as the
+   * debugger is opened (like a paused game), and is forgotten otherwise.
+   */
+  onAllPreviewsClosed(): void {
+    if (this._isDebuggerOpened) {
+      this.setHighlightsPersistent(true);
+    } else {
+      this.setHighlightsPersistent(false);
+      this.clear();
+    }
+    this.setRunningSceneName(null);
   }
   /**
    * When the game advances frame by frame, what a frame executed stays
@@ -247,8 +316,17 @@ export class EventsExecutionTrackingStore {
     eventDurations.forEach((durationMs, eventPtr) => {
       this._eventExecutions.set(eventPtr, { durationMs, reportedAt });
     });
+    const cumulatedEventPtrs = this._updateCumulatedExecutions(
+      eventDurations,
+      reportedAt
+    );
 
     this._notifyEvents(eventDurations.keys());
+    // A group is woken up by what its sub-events did, not by its own
+    // instructions: it has none.
+    this._notifyEvents(
+      cumulatedEventPtrs.filter(eventPtr => !eventDurations.has(eventPtr))
+    );
     if (previouslyShownEventPtrs) {
       this._notifyEvents(
         previouslyShownEventPtrs.filter(
@@ -259,6 +337,62 @@ export class EventsExecutionTrackingStore {
     if (!this._areHighlightsPersistent) this._scheduleExpiration();
   }
 
+  /**
+   * Sum what each event took with everything under it, by walking up the
+   * parents, and turn it into a share of everything tracked in this report.
+   * Returns every event whose cumulated value changed.
+   */
+  _updateCumulatedExecutions(
+    eventDurations: Map<number, number>,
+    reportedAt: number
+  ): Array<number> {
+    const rawDurations: Map<number, number> = new Map();
+    let totalDurationMs = 0;
+    eventDurations.forEach((durationMs, eventPtr) => {
+      totalDurationMs += durationMs;
+      // A tree cannot loop, but a stale hierarchy could: stop on a pointer
+      // already walked rather than spin forever.
+      const walkedEventPtrs = new Set();
+      let currentEventPtr = eventPtr;
+      while (currentEventPtr != null && !walkedEventPtrs.has(currentEventPtr)) {
+        walkedEventPtrs.add(currentEventPtr);
+        rawDurations.set(
+          currentEventPtr,
+          (rawDurations.get(currentEventPtr) || 0) + durationMs
+        );
+        currentEventPtr = this._getParentEventPtr(currentEventPtr);
+      }
+    });
+
+    const changedEventPtrs = Array.from(
+      new Set([
+        ...rawDurations.keys(),
+        ...this._cumulatedEventExecutions.keys(),
+      ])
+    );
+    const previousExecutions = this._cumulatedEventExecutions;
+    this._cumulatedEventExecutions = new Map();
+    rawDurations.forEach((rawDurationMs, eventPtr) => {
+      // Paused or frame by frame: the exact value of the frame is what is
+      // being looked at, smoothing it would be a lie.
+      const previousExecution = this._areHighlightsPersistent
+        ? null
+        : previousExecutions.get(eventPtr);
+      const durationMs = previousExecution
+        ? previousExecution.durationMs +
+          SMOOTHING_FACTOR * (rawDurationMs - previousExecution.durationMs)
+        : rawDurationMs;
+      this._cumulatedEventExecutions.set(eventPtr, {
+        durationMs,
+        sharePercent:
+          totalDurationMs > 0 ? (rawDurationMs / totalDurationMs) * 100 : 0,
+        reportedAt,
+      });
+    });
+
+    return changedEventPtrs;
+  }
+
   clear(): void {
     if (this._expirationTimeoutId) {
       clearTimeout(this._expirationTimeoutId);
@@ -266,13 +400,20 @@ export class EventsExecutionTrackingStore {
     }
     if (
       this._instructionExecutions.size === 0 &&
-      this._eventExecutions.size === 0
+      this._eventExecutions.size === 0 &&
+      this._cumulatedEventExecutions.size === 0
     ) {
       return;
     }
-    const shownEventPtrs = Array.from(this._eventExecutions.keys());
+    const shownEventPtrs = Array.from(
+      new Set([
+        ...this._eventExecutions.keys(),
+        ...this._cumulatedEventExecutions.keys(),
+      ])
+    );
     this._instructionExecutions.clear();
     this._eventExecutions.clear();
+    this._cumulatedEventExecutions.clear();
     this._notifyEvents(shownEventPtrs);
   }
 
@@ -290,6 +431,34 @@ export class EventsExecutionTrackingStore {
 
   getEventExecution(eventPtr: number): InstructionExecution | null {
     return this._eventExecutions.get(eventPtr) || null;
+  }
+
+  /**
+   * Follow the tree of an events sheet: the map is filled by the sheet itself
+   * while it builds its rows, and read here to sum what a group took.
+   */
+  registerEventsHierarchy(parentEventPtrs: Map<number, number>): void {
+    this._parentEventPtrsBySheet.add(parentEventPtrs);
+  }
+
+  unregisterEventsHierarchy(parentEventPtrs: Map<number, number>): void {
+    this._parentEventPtrsBySheet.delete(parentEventPtrs);
+  }
+
+  /**
+   * The event holding this one, whichever sheet shows it. An event only
+   * belongs to one sheet, so the first map knowing it answers.
+   */
+  _getParentEventPtr(eventPtr: number): number | null {
+    for (const parentEventPtrs of this._parentEventPtrsBySheet) {
+      const parentEventPtr = parentEventPtrs.get(eventPtr);
+      if (parentEventPtr != null) return parentEventPtr;
+    }
+    return null;
+  }
+
+  getCumulatedEventExecution(eventPtr: number): CumulatedEventExecution | null {
+    return this._cumulatedEventExecutions.get(eventPtr) || null;
   }
 
   /** Listen to what is reported about the instructions of one event. */
@@ -333,23 +502,41 @@ export class EventsExecutionTrackingStore {
       const expirationTime = Date.now() - HIGHLIGHT_DURATION_MS;
       let hasChanged = false;
 
+      // An instruction that expires concerns the event holding it: its row
+      // has to be woken up too, or the duration it shows never goes away.
+      const expiredEventPtrs = new Set();
       this._instructionExecutions.forEach((execution, id) => {
         if (execution.reportedAt <= expirationTime) {
           this._instructionExecutions.delete(id);
+          expiredEventPtrs.add(getEventPtrFromInstructionExecutionId(id));
           hasChanged = true;
         }
       });
-      const expiredEventPtrs = [];
       this._eventExecutions.forEach((execution, eventPtr) => {
         if (execution.reportedAt <= expirationTime) {
           this._eventExecutions.delete(eventPtr);
-          expiredEventPtrs.push(eventPtr);
+          expiredEventPtrs.add(eventPtr);
+          hasChanged = true;
+        }
+      });
+      this._cumulatedEventExecutions.forEach((execution, eventPtr) => {
+        if (execution.reportedAt <= expirationTime) {
+          this._cumulatedEventExecutions.delete(eventPtr);
+          expiredEventPtrs.add(eventPtr);
           hasChanged = true;
         }
       });
 
-      if (hasChanged) this._notifyEvents(expiredEventPtrs);
-      if (this._instructionExecutions.size > 0) this._scheduleExpiration();
+      if (hasChanged) this._notifyEvents(Array.from(expiredEventPtrs));
+      // Events are expired on their own: an events entry left alone, with no
+      // instruction under it anymore, must still be scheduled for expiration.
+      if (
+        this._instructionExecutions.size > 0 ||
+        this._eventExecutions.size > 0 ||
+        this._cumulatedEventExecutions.size > 0
+      ) {
+        this._scheduleExpiration();
+      }
     }, HIGHLIGHT_DURATION_MS);
   }
 }

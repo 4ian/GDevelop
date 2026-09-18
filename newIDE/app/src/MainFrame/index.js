@@ -1247,9 +1247,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     async (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
-      // The watched variables are those of this project: they mean nothing
-      // in the next one.
+      // The watched variables and the durations reported by the previews are
+      // those of this project: they mean nothing in the next one.
       eventsExecutionTrackingStore.clearWatchedExpressions();
+      eventsExecutionTrackingStore.clear();
       setIsWatchedVariablesPanelOpen(false);
 
       console.info('Closing project...');

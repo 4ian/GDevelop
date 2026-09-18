@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   EventsExecutionTrackingStore,
   type InstructionExecution,
+  type CumulatedEventExecution,
 } from './EventsExecutionTrackingStore';
 
 /**
@@ -110,4 +111,49 @@ export const useEventExecution = (
   );
 
   return useStoreSelection(eventPtr, select);
+};
+
+const areCumulatedExecutionsEqual = (
+  first: CumulatedEventExecution | null,
+  second: CumulatedEventExecution | null
+): boolean =>
+  first === second ||
+  (!!first &&
+    !!second &&
+    first.durationMs === second.durationMs &&
+    first.sharePercent === second.sharePercent &&
+    first.reportedAt === second.reportedAt);
+
+/**
+ * What an event took with everything under it, as reported for the last
+ * frames: what a group shows, its own instructions being none.
+ */
+export const useCumulatedEventExecution = (
+  eventPtr: number
+): CumulatedEventExecution | null => {
+  const store = React.useContext(EventsExecutionTrackingContext);
+  const [
+    execution,
+    setExecution,
+  ] = React.useState<CumulatedEventExecution | null>(() =>
+    store.getCumulatedEventExecution(eventPtr)
+  );
+
+  React.useEffect(
+    () => {
+      const update = () => {
+        const newExecution = store.getCumulatedEventExecution(eventPtr);
+        setExecution(previousExecution =>
+          areCumulatedExecutionsEqual(previousExecution, newExecution)
+            ? previousExecution
+            : newExecution
+        );
+      };
+      update();
+      return store.subscribe(eventPtr, update);
+    },
+    [store, eventPtr]
+  );
+
+  return execution;
 };

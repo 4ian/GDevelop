@@ -128,6 +128,35 @@ namespace gdjs {
       jpegBase64: string;
     };
 
+    /**
+     * The axis-aligned box, in SCENE coordinates, of a child of a custom
+     * object: the box of the child in the local space of its parent - its
+     * OWN complete transformation included (rotations around X, Y and Z,
+     * flips: a 3D child rotated around X is oriented in it) - with its
+     * corners moved through the COMPLETE transformation (pivots, rotations
+     * around X/Y/Z, scales, flips) of every custom object above it.
+     *
+     * This is the only size information of a child that accounts for its
+     * parents: `width`/`height`/`depth` stay the child's own local values
+     * (see `isLocalGeometry`).
+     *
+     * `minZ` and `maxZ` are 0 for a child without a Z in a 2D game.
+     */
+    export type GameplayTestWorldBounds = {
+      minX: float;
+      minY: float;
+      minZ: float;
+      maxX: float;
+      maxY: float;
+      maxZ: float;
+    };
+
+    /** An axis-aligned box in a LOCAL space (the space of the parent of an
+     * object, or the one of the children of a custom object): the same shape
+     * as `GameplayTestWorldBounds`, before the transformations of the
+     * parents are applied. */
+    type GameplayTestLocalBox = GameplayTestWorldBounds;
+
     export type GameplayTestObjectSnapshot = {
       id: integer;
       name: string;
@@ -164,7 +193,57 @@ namespace gdjs {
       };
       flippedX?: boolean;
       flippedY?: boolean;
+      /** Only on the snapshot of a CHILD of a custom object: a reminder that
+       * `width`, `height`, `depth`, `angle`, `rotationX` and `rotationY` are
+       * the child's OWN values, in the local space of its parent (they are
+       * neither scaled nor rotated by it), while the positions (`x`, `y`,
+       * `z`, `centerX`, `centerY`, `centerZ`) and `worldBounds` are in scene
+       * coordinates. */
+      isLocalGeometry?: boolean;
+      /** Only on the snapshot of a CHILD of a custom object: its box in
+       * SCENE coordinates (see `GameplayTestWorldBounds`) - the only size
+       * information of a child that accounts for its own complete
+       * transformation (rotations around X, Y and Z, flips) and for the
+       * transformations of its parents. */
+      worldBounds?: GameplayTestWorldBounds;
+      /** For a custom object, the snapshots of its children - children of
+       * the default depth 1; pass `childrenDepth` to go deeper (max 8) and
+       * reach the children of nested custom objects.
+       *
+       * The positions (x, y, z, centerX, centerY, centerZ) of a descendant
+       * are in scene coordinates: they are computed with the COMPLETE
+       * transformation (pivots, rotations around X/Y/Z, scales, flips) of
+       * every custom object above it. Its `worldBounds` is its box in scene
+       * coordinates. The sizes and angles (width, height, depth, angle,
+       * rotationX, rotationY) stay as the child reports them in the local
+       * space of its parent (`isLocalGeometry`), and the layer is the one of
+       * the top custom object. */
       children?: { [objectName: string]: Array<GameplayTestObjectSnapshot> };
+    };
+
+    /** A point moved from the local space of the children of a custom object
+     * to the scene space (see `GameplayTestChildrenSpace`). */
+    export type GameplayTestPoint3D = {
+      x: float;
+      y: float;
+      z: float;
+    };
+
+    /**
+     * How the children of a custom object are placed in the scene: the
+     * COMPLETE transformation of every custom object above them - the parent
+     * first, then each of its own parents - and the layer they all report.
+     *
+     * Applying `transformations` in order moves a point from the local space
+     * of these children to the scene space.
+     */
+    export type GameplayTestChildrenSpace = {
+      /** The transformation of each custom object above the children,
+       * innermost (their own parent) first. */
+      transformations: Array<(point: GameplayTestPoint3D) => void>;
+      /** The layer of the TOP custom object: the internal layers of a custom
+       * object mean nothing outside of it. */
+      layer: string;
     };
 
     export type GameplayTestNearbyObjectSnapshot =
@@ -179,6 +258,14 @@ namespace gdjs {
         right: boolean;
         bearingFromReference: float;
       };
+
+    /** Options of the methods returning object snapshots. */
+    export type GameplayTestSnapshotOptions = {
+      /** How deep the `children` of custom objects are snapshotted: 1 (the
+       * default) for the direct children, more (up to 8) to reach the
+       * children of nested custom objects, 0 for no `children` at all. */
+      childrenDepth?: integer;
+    };
 
     /**
      * The position of a target relative to a reference object (2D and 3D).
@@ -321,6 +408,10 @@ namespace gdjs {
       gameTimeMs: number;
       assertions: Array<GameplayTestAssertion>;
       errors: Array<string>;
+      /** Problems the harness itself noticed in the game, whatever the
+       * assertions of the test did or did not check (a custom object
+       * rendering nothing, for instance). Never a failure by itself. */
+      warnings: Array<string>;
       consoleLogs: Array<GameplayTestLog>;
       eventLog: Array<GameplayTestEvent>;
       finalState: {
@@ -376,8 +467,12 @@ namespace gdjs {
     const MAX_ASSERTIONS = 200;
     const MAX_EVENT_LOG_ENTRIES = 500;
     const MAX_ERRORS = 20;
+    const MAX_WARNINGS = 20;
     const SCREENSHOT_MAX_SIZE = 512;
     const DEFAULT_FRAME_DT_MS = 1000 / 60;
+    /** Deepest `children` nesting a snapshot can expose (nested custom
+     * objects), to keep snapshots bounded. */
+    const MAX_CHILDREN_DEPTH = 8;
 
     // Keys that must never throw on the self-describing state, so language
     // internals (JSON.stringify, await inspection, string coercion...) keep
@@ -455,6 +550,54 @@ namespace gdjs {
       return makeSelfDescribingState(state, ownerDescription);
     };
 
+    /** The 8 corners of an axis-aligned box. */
+    const makeBoxCorners = (
+      box: GameplayTestLocalBox
+    ): Array<GameplayTestPoint3D> => {
+      const corners: Array<GameplayTestPoint3D> = [];
+      for (const x of [box.minX, box.maxX]) {
+        for (const y of [box.minY, box.maxY]) {
+          for (const z of [box.minZ, box.maxZ]) {
+            corners.push({ x, y, z });
+          }
+        }
+      }
+      return corners;
+    };
+
+    /**
+     * A box moved to be relative to the point its object is rotated around,
+     * with the axes the object is flipped on mirrored: a flip is a negative
+     * scale around this very point in the renderers (see
+     * `RuntimeObject3DRenderer.updateSize`), which mirrors the box - and
+     * leaves a box centered on it, the usual case, unchanged.
+     */
+    const makeRelativeBox = (
+      box: GameplayTestLocalBox,
+      center: GameplayTestPoint3D,
+      flips: { x: boolean; y: boolean; z: boolean }
+    ): GameplayTestLocalBox => {
+      const minX = box.minX - center.x;
+      const minY = box.minY - center.y;
+      const minZ = box.minZ - center.z;
+      const maxX = box.maxX - center.x;
+      const maxY = box.maxY - center.y;
+      const maxZ = box.maxZ - center.z;
+      return {
+        minX: flips.x ? -maxX : minX,
+        minY: flips.y ? -maxY : minY,
+        minZ: flips.z ? -maxZ : minZ,
+        maxX: flips.x ? -minX : maxX,
+        maxY: flips.y ? -minY : maxY,
+        maxZ: flips.z ? -minZ : maxZ,
+      };
+    };
+
+    /** Whether an object is flipped on an axis (`isFlippedX`, `isFlippedY`
+     * or `isFlippedZ`) - false for an object that can't be flipped. */
+    const isFlippedOnAxis = (object: any, methodName: string): boolean =>
+      typeof object[methodName] === 'function' && !!object[methodName]();
+
     class GameplayTestAssertionError extends Error {
       isGameplayTestAssertionError = true;
     }
@@ -531,6 +674,9 @@ namespace gdjs {
       _startTimeMs: number = 0;
       _stopped: boolean = false;
       _assertions: Array<GameplayTestAssertion> = [];
+      /** What the harness noticed about the test itself while it ran (see
+       * `_addRunWarning`), reported with the warnings about the game. */
+      _runWarnings: Array<string> = [];
       _consoleLogs: Array<GameplayTestLog> = [];
       _consoleLogsTotalChars: number = 0;
       _eventLog: Array<GameplayTestEvent> = [];
@@ -841,6 +987,100 @@ namespace gdjs {
           }
         }
         return objectCounts;
+      }
+
+      /**
+       * Something noticed while the test ran, reported once whatever the
+       * assertions said.
+       */
+      private _addRunWarning(message: string): void {
+        if (this._runWarnings.length >= MAX_WARNINGS) return;
+        if (this._runWarnings.indexOf(message) !== -1) return;
+        this._runWarnings.push(message);
+      }
+
+      /**
+       * A `getNearby` radius that cannot tell anything apart: it reaches
+       * further than the whole screen AND let every instance through, so a
+       * check on what it returns passes wherever the game put them.
+       */
+      private _warnOnUnselectiveRadius(
+        objectName: string,
+        referenceObjectName: string,
+        radius: float,
+        keptCount: integer,
+        instancesCount: integer
+      ): void {
+        if (keptCount < instancesCount) return;
+        const screenDiagonal = Math.hypot(
+          this._runtimeGame.getGameResolutionWidth(),
+          this._runtimeGame.getGameResolutionHeight()
+        );
+        if (!(radius > screenDiagonal)) return;
+        this._addRunWarning(
+          `getNearby("${objectName}", "${referenceObjectName}", ${radius}) kept every instance of "${objectName}": that radius is larger than the whole screen (${Math.round(
+            screenDiagonal
+          )}px diagonal), so it says nothing about where they are. Use a radius of the size of what is being checked.`
+        );
+      }
+
+      /**
+       * What the harness noticed about the game by itself, whatever the test
+       * asserted: a test can pass on the values it checks while the game is
+       * in a state nobody would call working.
+       */
+      private _getWarnings(): Array<string> {
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        if (!currentScene) return [];
+        const warnings: Array<string> = [];
+        const reportedObjectNames = new Set<string>();
+
+        /**
+         * Report the custom objects with no child in them, `object` included:
+         * they render nothing at all and fall back to a 1x1x1 size.
+         */
+        const checkObject = (
+          object: gdjs.RuntimeObject,
+          path: string,
+          depth: integer
+        ): void => {
+          if (warnings.length >= MAX_WARNINGS) return;
+          const anyObject = object as any;
+          if (typeof anyObject.getChildrenContainer !== 'function') return;
+          const children: Array<gdjs.RuntimeObject> = anyObject
+            .getChildrenContainer()
+            .getAdhocListOfAllInstances();
+          if (children.length === 0) {
+            if (reportedObjectNames.has(path)) return;
+            reportedObjectNames.add(path);
+            warnings.push(
+              `"${path}" is a custom object with no child in it: it renders nothing. Either its variant declares child objects with no instance of them placed (it then also falls back to a 1x1x1 size), or its children were all destroyed while the test ran.`
+            );
+            return;
+          }
+          if (depth >= MAX_CHILDREN_DEPTH) return;
+          for (const child of children) {
+            checkObject(child, `${path}.${child.getName()}`, depth + 1);
+          }
+        };
+
+        const objectNames: Array<string> = [];
+        const instances = (currentScene as any)._instances as Hashtable<
+          Array<gdjs.RuntimeObject>
+        >;
+        instances.keys(objectNames);
+        for (const objectName of objectNames) {
+          // Every instance: two instances of the same object can hold
+          // different children by the time the test ends.
+          for (const object of instances.get(objectName)) {
+            checkObject(object, objectName, 0);
+            if (warnings.length >= MAX_WARNINGS) break;
+          }
+          if (warnings.length >= MAX_WARNINGS) break;
+        }
+        return warnings;
       }
 
       private _trackChangesAfterStep(): void {
@@ -1486,9 +1726,20 @@ namespace gdjs {
 
       // INSPECTION:
 
+      /**
+       * @param childrenDepth How deep the `children` of custom objects are
+       * snapshotted: 0 for none, N for children snapshotted with N-1 (so
+       * nested custom objects are reachable). Assumed already clamped to
+       * `MAX_CHILDREN_DEPTH` by the public methods.
+       * @param parentSpace How the object is placed in the scene, when it is
+       * a child of a custom object: its positions and world bounds are moved
+       * to scene coordinates with it (null for an object of the scene, whose
+       * positions already are in scene coordinates).
+       */
       private _makeObjectSnapshot(
         object: gdjs.RuntimeObject,
-        includeChildren: boolean
+        childrenDepth: number,
+        parentSpace: GameplayTestChildrenSpace | null = null
       ): GameplayTestObjectSnapshot {
         const anyObject = object as any;
         const stateInspectors = this._payload.stateInspectors || null;
@@ -1567,55 +1818,422 @@ namespace gdjs {
         if (typeof anyObject.isFlippedY === 'function') {
           snapshot.flippedY = anyObject.isFlippedY();
         }
+        if (parentSpace) {
+          this._moveSnapshotToSceneSpace(snapshot, object, parentSpace);
+        }
         if (
-          includeChildren &&
+          childrenDepth > 0 &&
           typeof anyObject.getChildrenContainer === 'function'
         ) {
           const childrenContainer: gdjs.RuntimeInstanceContainer =
             anyObject.getChildrenContainer();
+          const childrenSpace = this._makeChildrenSpace(object, parentSpace);
           const children: {
             [objectName: string]: Array<GameplayTestObjectSnapshot>;
           } = {};
-          const canTransformToScene =
-            typeof anyObject.applyObjectTransformation === 'function';
           for (const child of childrenContainer.getAdhocListOfAllInstances()) {
             const childName = child.getName();
             if (!children[childName]) children[childName] = [];
-            const childSnapshot = this._makeObjectSnapshot(child, false);
-            // The children live in the coordinates space of the custom
-            // object: convert to scene coordinates, like every other
-            // snapshot (so clicking a child at its centerX/centerY works).
-            if (canTransformToScene) {
-              const point: FloatPoint = [0, 0];
-              anyObject.applyObjectTransformation(
-                childSnapshot.x,
-                childSnapshot.y,
-                point
-              );
-              childSnapshot.x = point[0];
-              childSnapshot.y = point[1];
-              anyObject.applyObjectTransformation(
-                childSnapshot.centerX,
-                childSnapshot.centerY,
-                point
-              );
-              childSnapshot.centerX = point[0];
-              childSnapshot.centerY = point[1];
-              if (typeof anyObject.getZ === 'function') {
-                if (childSnapshot.z !== undefined)
-                  childSnapshot.z += anyObject.getZ();
-                if (childSnapshot.centerZ !== undefined)
-                  childSnapshot.centerZ += anyObject.getZ();
-              }
-            }
-            // The internal layer name of the parent means nothing outside
-            // of it: report the layer of the custom object itself.
-            childSnapshot.layer = object.getLayer();
-            children[childName].push(childSnapshot);
+            children[childName].push(
+              this._makeObjectSnapshot(child, childrenDepth - 1, childrenSpace)
+            );
           }
           snapshot.children = children;
         }
         return snapshot;
+      }
+
+      /**
+       * Move the positions of the snapshot of a CHILD of a custom object to
+       * scene coordinates (so clicking it at its centerX/centerY works), and
+       * describe its geometry there.
+       *
+       * Only the positions can be moved: under the rotations of the parents,
+       * no width/height/depth could describe the child (a rotated box has no
+       * width along the scene axes), so the sizes and angles stay the
+       * child's own local values - flagged with `isLocalGeometry` - and the
+       * world geometry is given as the axis-aligned `worldBounds`.
+       */
+      private _moveSnapshotToSceneSpace(
+        snapshot: GameplayTestObjectSnapshot,
+        object: gdjs.RuntimeObject,
+        space: GameplayTestChildrenSpace
+      ): void {
+        const point: GameplayTestPoint3D = {
+          x: snapshot.x,
+          y: snapshot.y,
+          z: snapshot.z === undefined ? 0 : snapshot.z,
+        };
+        this._transformPointToScene(space, point);
+        snapshot.x = point.x;
+        snapshot.y = point.y;
+        // A child without a Z (a 2D object) keeps none: only `worldBounds`
+        // tells where it is on the Z axis of its 3D parents.
+        if (snapshot.z !== undefined) snapshot.z = point.z;
+
+        point.x = snapshot.centerX;
+        point.y = snapshot.centerY;
+        point.z = snapshot.centerZ === undefined ? 0 : snapshot.centerZ;
+        this._transformPointToScene(space, point);
+        snapshot.centerX = point.x;
+        snapshot.centerY = point.y;
+        if (snapshot.centerZ !== undefined) snapshot.centerZ = point.z;
+
+        snapshot.worldBounds = this._makeWorldBounds(object, space);
+        snapshot.isLocalGeometry = true;
+        // The internal layers of a custom object mean nothing outside of it.
+        snapshot.layer = space.layer;
+      }
+
+      /**
+       * The box of `object` in scene coordinates: the 8 corners of its own
+       * box in the space of its parent - its OWN complete transformation
+       * included - moved through the complete transformation of every
+       * custom object above it.
+       */
+      private _makeWorldBounds(
+        object: gdjs.RuntimeObject,
+        space: GameplayTestChildrenSpace
+      ): GameplayTestWorldBounds {
+        const bounds: GameplayTestWorldBounds = {
+          minX: Number.MAX_VALUE,
+          minY: Number.MAX_VALUE,
+          minZ: Number.MAX_VALUE,
+          maxX: -Number.MAX_VALUE,
+          maxY: -Number.MAX_VALUE,
+          maxZ: -Number.MAX_VALUE,
+        };
+        for (const point of this._makeLocalBoxCorners(object)) {
+          this._transformPointToScene(space, point);
+          bounds.minX = Math.min(bounds.minX, point.x);
+          bounds.minY = Math.min(bounds.minY, point.y);
+          bounds.minZ = Math.min(bounds.minZ, point.z);
+          bounds.maxX = Math.max(bounds.maxX, point.x);
+          bounds.maxY = Math.max(bounds.maxY, point.y);
+          bounds.maxZ = Math.max(bounds.maxZ, point.z);
+        }
+        return bounds;
+      }
+
+      /**
+       * The 8 corners of the box of `object` in the space of its parent,
+       * with the COMPLETE transformation of the object itself applied to
+       * them.
+       *
+       * The boxes the runtime computes are not enough on their own: the
+       * axis-aligned `getAABB()` only accounts for the angle around Z, and
+       * `getUnrotatedAABBMinZ/MaxZ` for no rotation at all - so a 3D child
+       * rotated around X or Y would report the box it has when it is not
+       * rotated (a 10x6x4 box turned by 90 degrees around X is 10x4x6 in
+       * its parent). The transformation of the object is read from the
+       * object itself, never re-derived here.
+       */
+      private _makeLocalBoxCorners(
+        object: gdjs.RuntimeObject
+      ): Array<GameplayTestPoint3D> {
+        const anyObject = object as any;
+        if (
+          typeof anyObject.getChildrenContainer === 'function' &&
+          typeof anyObject.getInnerAreaMinX === 'function'
+        ) {
+          // A custom object (2D or 3D): its inner area is its box in the
+          // local space of its own children, so the transformation placing
+          // these children in the space of its parent - the very one used
+          // for their snapshots - moves it there.
+          const transformation = this._makeCustomObjectTransformation(object);
+          const corners = makeBoxCorners(this._getInnerAreaBox(object));
+          for (const corner of corners) transformation(corner);
+          return corners;
+        }
+        const rotation = this._get3DObjectRotation(object);
+        if (rotation) {
+          return this._make3DObjectBoxCorners(object, rotation);
+        }
+        // A 2D object: `getAABB()` is already its complete transformation
+        // (its angle around Z and its custom hit boxes included), and only
+        // its parents place it on the Z axis.
+        const localBox = object.getAABB();
+        const localZRange = this._getLocalZRange(object);
+        return makeBoxCorners({
+          minX: localBox.min[0],
+          minY: localBox.min[1],
+          minZ: localZRange.min,
+          maxX: localBox.max[0],
+          maxY: localBox.max[1],
+          maxZ: localZRange.max,
+        });
+      }
+
+      /**
+       * The box of a custom object in the local space of its children: its
+       * inner area, the box its own width, height and depth describe (see
+       * `CustomRuntimeObject.getUnscaledWidth`), with no Z for a 2D custom
+       * object.
+       */
+      private _getInnerAreaBox(
+        object: gdjs.RuntimeObject
+      ): GameplayTestLocalBox {
+        const anyObject = object as any;
+        const has3DInnerArea =
+          typeof anyObject.getInnerAreaMinZ === 'function' &&
+          typeof anyObject.getInnerAreaMaxZ === 'function';
+        return {
+          minX: anyObject.getInnerAreaMinX(),
+          minY: anyObject.getInnerAreaMinY(),
+          minZ: has3DInnerArea ? anyObject.getInnerAreaMinZ() : 0,
+          maxX: anyObject.getInnerAreaMaxX(),
+          maxY: anyObject.getInnerAreaMaxY(),
+          maxZ: has3DInnerArea ? anyObject.getInnerAreaMaxZ() : 0,
+        };
+      }
+
+      /**
+       * The Euler angles a 3D object (a cube, a 3D model...) is rotated
+       * with: the ones of its THREE object, in the `ZYX` order of the engine
+       * (`RuntimeObject3DRenderer.updateRotation`, called by every
+       * `setAngle`/`setRotationX`/`setRotationY`, keeps them in sync with
+       * the object). Null for anything else than a 3D object rendered with
+       * a THREE object.
+       */
+      private _get3DObjectRotation(
+        object: gdjs.RuntimeObject
+      ): THREE.Euler | null {
+        const anyObject = object as any;
+        if (
+          typeof THREE === 'undefined' ||
+          typeof anyObject.getRotationX !== 'function' ||
+          typeof anyObject.getRotationY !== 'function' ||
+          typeof anyObject.get3DRendererObject !== 'function'
+        ) {
+          return null;
+        }
+        const threeObject3D: THREE.Object3D | null =
+          anyObject.get3DRendererObject() || null;
+        return threeObject3D ? threeObject3D.rotation : null;
+      }
+
+      /**
+       * The 8 corners of the box of a 3D object in the space of its parent,
+       * oriented like the renderer orients it: the box the object has when
+       * it is not rotated, turned around the point the renderer places its
+       * THREE object at - its center (`getCenterXInScene()`...), which is
+       * also the point the engine rotates its hit boxes around - with
+       * `rotation`, whose `ZYX` order includes the angle around Z (hence the
+       * unrotated box, and not `getAABB()`).
+       */
+      private _make3DObjectBoxCorners(
+        object: gdjs.RuntimeObject,
+        rotation: THREE.Euler
+      ): Array<GameplayTestPoint3D> {
+        const anyObject = object as any;
+        const localZRange = this._getLocalZRange(object);
+        const center: GameplayTestPoint3D = {
+          x: object.getCenterXInScene(),
+          y: object.getCenterYInScene(),
+          z:
+            typeof anyObject.getCenterZInScene === 'function'
+              ? anyObject.getCenterZInScene()
+              : 0,
+        };
+        const relativeBox = makeRelativeBox(
+          {
+            minX: object.getDrawableX(),
+            minY: object.getDrawableY(),
+            minZ: localZRange.min,
+            maxX: object.getDrawableX() + object.getWidth(),
+            maxY: object.getDrawableY() + object.getHeight(),
+            maxZ: localZRange.max,
+          },
+          center,
+          {
+            x: isFlippedOnAxis(anyObject, 'isFlippedX'),
+            y: isFlippedOnAxis(anyObject, 'isFlippedY'),
+            z: isFlippedOnAxis(anyObject, 'isFlippedZ'),
+          }
+        );
+        const corners = makeBoxCorners(relativeBox);
+        const vector = new THREE.Vector3();
+        for (const corner of corners) {
+          vector.set(corner.x, corner.y, corner.z).applyEuler(rotation);
+          corner.x = vector.x + center.x;
+          corner.y = vector.y + center.y;
+          corner.z = vector.z + center.z;
+        }
+        return corners;
+      }
+
+      /**
+       * The Z range of an object in the space containing it (0 for an object
+       * without a Z: a 2D object).
+       */
+      private _getLocalZRange(object: gdjs.RuntimeObject): {
+        min: float;
+        max: float;
+      } {
+        const anyObject = object as any;
+        if (
+          typeof anyObject.getUnrotatedAABBMinZ === 'function' &&
+          typeof anyObject.getUnrotatedAABBMaxZ === 'function'
+        ) {
+          return {
+            min: anyObject.getUnrotatedAABBMinZ(),
+            max: anyObject.getUnrotatedAABBMaxZ(),
+          };
+        }
+        if (typeof anyObject.getZ === 'function') {
+          const z = anyObject.getZ();
+          return {
+            min: z,
+            max:
+              z +
+              (typeof anyObject.getDepth === 'function'
+                ? anyObject.getDepth()
+                : 0),
+          };
+        }
+        return { min: 0, max: 0 };
+      }
+
+      /**
+       * How the children of `object` (a custom object) are placed in the
+       * scene: its own complete transformation, followed by the ones already
+       * needed by `object` itself when it is nested in another custom object
+       * (`parentSpace`).
+       */
+      private _makeChildrenSpace(
+        object: gdjs.RuntimeObject,
+        parentSpace: GameplayTestChildrenSpace | null
+      ): GameplayTestChildrenSpace {
+        const transformations = [this._makeCustomObjectTransformation(object)];
+        if (parentSpace) {
+          transformations.push(...parentSpace.transformations);
+        }
+        return {
+          transformations,
+          // The internal layers of a custom object mean nothing outside of
+          // it: every descendant reports the layer of the top custom object.
+          layer: parentSpace ? parentSpace.layer : object.getLayer(),
+        };
+      }
+
+      /**
+       * The complete transformation of a custom object, moving a point from
+       * the local space of its children to the space containing it.
+       *
+       * It is read from the object itself, so it is exactly the one the game
+       * renders - no transformation of the engine is re-derived here:
+       * - a 3D custom object composes its pivot, its Euler rotation (X/Y/Z),
+       *   its scales and its flips in the matrix of its THREE group (see
+       *   `CustomRuntimeObject3DRenderer._updateThreeGroup`). The renderer is
+       *   brought up to date and the matrix recomputed, so a transformation
+       *   changed since the last rendered frame is applied (a stale matrix
+       *   would report the previous position of every descendant);
+       * - a 2D custom object has a complete affine transformation
+       *   (`applyObjectTransformation`: pivot, angle, scales, flips),
+       *   completed by the placement of the children on the Z axis when the
+       *   object has a Z but no THREE object.
+       */
+      private _makeCustomObjectTransformation(
+        object: gdjs.RuntimeObject
+      ): (point: GameplayTestPoint3D) => void {
+        const anyObject = object as any;
+        const threeObject3D: THREE.Object3D | null =
+          typeof THREE !== 'undefined' &&
+          typeof anyObject.get3DRendererObject === 'function'
+            ? anyObject.get3DRendererObject() || null
+            : null;
+        if (threeObject3D) {
+          const renderer = anyObject.getRenderer();
+          if (renderer && typeof renderer.ensureUpToDate === 'function') {
+            // The game may have moved the object since the last rendered
+            // frame: put the THREE group back in sync with it...
+            renderer.ensureUpToDate();
+          }
+          // ...and recompute the matrix from it.
+          threeObject3D.updateMatrix();
+          const matrix = threeObject3D.matrix.clone();
+          const vector = new THREE.Vector3();
+          return (point) => {
+            vector.set(point.x, point.y, point.z).applyMatrix4(matrix);
+            point.x = vector.x;
+            point.y = vector.y;
+            point.z = vector.z;
+          };
+        }
+        if (typeof anyObject.applyObjectTransformation === 'function') {
+          const transformedPoint: FloatPoint = [0, 0];
+          return (point) => {
+            anyObject.applyObjectTransformation(
+              point.x,
+              point.y,
+              transformedPoint
+            );
+            point.x = transformedPoint[0];
+            point.y = transformedPoint[1];
+            if (typeof anyObject.getZ === 'function') {
+              // Children of a 3D custom object are placed at the Z of their
+              // parent, scaled by its Z scale (see
+              // `CustomRuntimeObject3DRenderer._updateThreeGroup`).
+              const parentScaleZ =
+                typeof anyObject.getScaleZ === 'function'
+                  ? anyObject.getScaleZ()
+                  : 1;
+              point.z = anyObject.getZ() + point.z * parentScaleZ;
+            }
+          };
+        }
+        // An object without any transformation: its children are already in
+        // the space containing it.
+        return () => {};
+      }
+
+      /**
+       * Move a point from the local space of the children of a custom object
+       * to the scene space, applying the complete transformation of every
+       * custom object above them (the innermost one first).
+       */
+      private _transformPointToScene(
+        space: GameplayTestChildrenSpace,
+        point: GameplayTestPoint3D
+      ): void {
+        for (const transformation of space.transformations) {
+          transformation(point);
+        }
+      }
+
+      /**
+       * The children depth to use for a snapshot, from the caller options
+       * (default 1 - the direct children only), clamped to
+       * `MAX_CHILDREN_DEPTH`. Malformed options throw, so a mistake is
+       * never silently ignored.
+       */
+      private _getChildrenDepth(
+        options?: GameplayTestSnapshotOptions
+      ): integer {
+        if (options === undefined || options === null) return 1;
+        if (typeof options !== 'object' || Array.isArray(options)) {
+          throw new Error(
+            `Invalid snapshot options: expected an object like { childrenDepth: 2 }, but got ${JSON.stringify(
+              options
+            )}.`
+          );
+        }
+        const childrenDepth = options.childrenDepth;
+        if (childrenDepth === undefined) return 1;
+        if (
+          typeof childrenDepth !== 'number' ||
+          !Number.isFinite(childrenDepth)
+        ) {
+          throw new Error(
+            `Invalid childrenDepth: expected a number between 0 and ${MAX_CHILDREN_DEPTH}, but got ${JSON.stringify(
+              childrenDepth
+            )}.`
+          );
+        }
+        return Math.max(
+          0,
+          Math.min(MAX_CHILDREN_DEPTH, Math.floor(childrenDepth))
+        );
       }
 
       private _getInstances(objectName: string): Array<gdjs.RuntimeObject> {
@@ -1625,33 +2243,44 @@ namespace gdjs {
       /**
        * Get a state snapshot of all the instances of an object.
        * Instances are returned in an unspecified order.
+       *
+       * For a custom object, `children` holds the snapshots of its direct
+       * children: pass `{ childrenDepth: 2 }` (or more, up to 8) to also get
+       * the children of nested custom objects.
        */
-      getObjects(objectName: string): Array<GameplayTestObjectSnapshot> {
+      getObjects(
+        objectName: string,
+        options?: GameplayTestSnapshotOptions
+      ): Array<GameplayTestObjectSnapshot> {
+        const childrenDepth = this._getChildrenDepth(options);
         return this._getInstances(objectName).map((object) =>
-          this._makeObjectSnapshot(object, true)
+          this._makeObjectSnapshot(object, childrenDepth)
         );
       }
 
       /**
        * Get the instances of `objectName` within `radius` of the first
        * instance of `referenceObjectName`, sorted by distance.
+       *
+       * As in `getObjects`, `childrenDepth` (1 by default, 8 at most) sets
+       * how deep the `children` of custom objects are snapshotted.
        */
       getNearby(
         objectName: string,
         referenceObjectName: string,
-        radius: float
+        radius: float,
+        options?: GameplayTestSnapshotOptions
       ): Array<GameplayTestNearbyObjectSnapshot> {
+        const childrenDepth = this._getChildrenDepth(options);
         const referenceInstances = this._getInstances(referenceObjectName);
         if (referenceInstances.length === 0) return [];
-        const reference = this._makeObjectSnapshot(
-          referenceInstances[0],
-          false
-        );
+        const reference = this._makeObjectSnapshot(referenceInstances[0], 0);
         const referenceZ = reference.centerZ || 0;
 
+        const instances = this._getInstances(objectName);
         const nearby: Array<GameplayTestNearbyObjectSnapshot> = [];
-        for (const object of this._getInstances(objectName)) {
-          const snapshot = this._makeObjectSnapshot(object, true);
+        for (const object of instances) {
+          const snapshot = this._makeObjectSnapshot(object, childrenDepth);
           const relativeX = snapshot.centerX - reference.centerX;
           const relativeY = snapshot.centerY - reference.centerY;
           const relativeZ = (snapshot.centerZ || 0) - referenceZ;
@@ -1673,6 +2302,13 @@ namespace gdjs {
           });
         }
         nearby.sort((a, b) => a.distance - b.distance);
+        this._warnOnUnselectiveRadius(
+          objectName,
+          referenceObjectName,
+          radius,
+          nearby.length,
+          instances.length
+        );
         return nearby;
       }
 
@@ -2489,7 +3125,7 @@ namespace gdjs {
         if (layerName !== undefined) {
           object.setLayer(layerName);
         }
-        return this._makeObjectSnapshot(object, false);
+        return this._makeObjectSnapshot(object, 0);
       }
 
       /**
@@ -2975,6 +3611,7 @@ namespace gdjs {
           gameTimeMs: Math.round(this._gameTimeMs),
           assertions: this._assertions,
           errors: errors.slice(0, MAX_ERRORS),
+          warnings: [...this._runWarnings, ...this._getWarnings()],
           consoleLogs: this._consoleLogs,
           eventLog: this._eventLog,
           finalState: {

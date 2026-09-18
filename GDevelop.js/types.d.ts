@@ -2218,6 +2218,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static objectRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, objectName: string): void;
   static objectOrGroupRenamedInEventsBasedObject(project: Project, projectScopedContainers: ProjectScopedContainers, eventsBasedObject: EventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, objectName: string): void;
+  static removeEventsBasedObjectVariant(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, variantName: string): void;
   static globalObjectOrGroupRenamed(project: Project, oldName: string, newName: string, isObjectGroup: boolean): void;
   static globalObjectRemoved(project: Project, objectName: string): void;
   static behaviorsAddedToGlobalObject(project: Project, objectName: string): void;

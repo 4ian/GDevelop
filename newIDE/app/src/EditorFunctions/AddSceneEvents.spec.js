@@ -394,6 +394,52 @@ describe('add_scene_events', () => {
     expect(generateEvents).not.toHaveBeenCalled();
   });
 
+  it('sends the fenced source of a `js` event as the reference of a replace placement', async () => {
+    const scene = project.getLayout('TestScene');
+    const jsCodeEvent = gd.asJsCodeEvent(
+      scene
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 0)
+    );
+    jsCodeEvent.setInlineCode('runtimeScene.getGame().pause(true);');
+    jsCodeEvent.setParameterObjects('Player');
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const generateEvents = jest.fn().mockResolvedValue({
+      generationCompleted: true,
+      aiGeneratedEvent: makeFakeAiGeneratedEvent({}),
+    });
+
+    await editorFunctions.add_scene_events.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      generateEvents,
+      args: {
+        scene_name: 'TestScene',
+        extension_names_list: '',
+        objects_list: 'Player',
+        event_batches: [
+          {
+            events_description: 'Resume the game instead',
+            placement_relation: 'replace_event_but_keep_existing_sub_events',
+            placement_target_event_id: 'event-0',
+            expected_event_source: 'js(Player) """',
+          },
+        ],
+      },
+    });
+
+    // The backend compares the `expected_event_source` anchor against this
+    // source, character for character inside the fence.
+    const { eventBatches } = generateEvents.mock.calls[0][0];
+    expect(eventBatches[0].placementTargetEventSource).toBe(
+      [
+        'js(Player) """  # event-0',
+        'runtimeScene.getGame().pause(true);',
+        '"""',
+      ].join('\n')
+    );
+    expect(eventBatches[0].expectedEventSource).toBe('js(Player) """');
+  });
+
   it('fails when an extension required by the generated events cannot be installed', async () => {
     // $FlowFixMe[underconstrained-implicit-instantiation]
     const ensureExtensionInstalled = jest.fn();

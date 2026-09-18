@@ -1,4 +1,5 @@
 // @flow
+import { type ToolScope } from '../../EditorFunctions/Scope';
 import axios from 'axios';
 import { GDevelopAiCdn, GDevelopGenerationApi } from './ApiConfigs';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
@@ -875,6 +876,8 @@ export const createAiGeneratedEvent = async (
     gameProjectJsonUserRelativeKey,
     projectSpecificExtensionsSummaryJson,
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
+    scope,
+    functionName,
     sceneName,
     eventsDescription,
     eventBatches,
@@ -891,6 +894,10 @@ export const createAiGeneratedEvent = async (
     gameProjectJsonUserRelativeKey: string | null,
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
+    // Where the events are generated (a scene, or a function of an extension
+    // with `functionName`); `sceneName` stays for the API.
+    scope: ToolScope,
+    functionName: string | null,
     sceneName: string,
     eventsDescription: string | null,
     eventBatches: Array<AiGeneratedEventBatch> | null,
@@ -912,6 +919,8 @@ export const createAiGeneratedEvent = async (
       gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
+      scope,
+      functionName,
       sceneName,
       eventsDescription,
       eventBatches,

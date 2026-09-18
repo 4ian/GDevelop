@@ -2,6 +2,75 @@
 // $FlowFixMe[underconstrained-implicit-instantiation]
 let testExtensionsAdded = new WeakSet();
 
+/** A fake behavior implementation with no property. */
+const makeFakeBehaviorWithoutProperty = (
+  gd: libGDevelop
+): gdBehaviorJsImplementation => {
+  const fakeBehavior = new gd.BehaviorJsImplementation();
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.updateProperty = function(
+    behaviorContent,
+    propertyName,
+    newValue
+  ) {
+    return false;
+  };
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.getProperties = function(behaviorContent) {
+    return new gd.MapStringPropertyDescriptor();
+  };
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.initializeContent = function(behaviorContent) {};
+  return fakeBehavior;
+};
+
+/**
+ * A fake behavior implementation requiring another behavior on its object: a
+ * property of type "Behavior" holding the name of a behavior of the given
+ * type, like the real physics behaviors do for the 3D capability.
+ */
+const makeFakeBehaviorRequiring = (
+  gd: libGDevelop,
+  requiredBehaviorType: string,
+  label: string
+): gdBehaviorJsImplementation => {
+  const fakeBehavior = new gd.BehaviorJsImplementation();
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.updateProperty = function(
+    behaviorContent,
+    propertyName,
+    newValue
+  ) {
+    if (propertyName === 'requiredBehavior') {
+      behaviorContent.setStringAttribute('requiredBehavior', newValue);
+      return true;
+    }
+    return false;
+  };
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.getProperties = function(behaviorContent) {
+    const behaviorProperties = new gd.MapStringPropertyDescriptor();
+    behaviorProperties
+      .getOrCreate('requiredBehavior')
+      .setValue(behaviorContent.getStringAttribute('requiredBehavior'))
+      .setType('Behavior')
+      .setLabel(label)
+      .addExtraInfo(requiredBehaviorType);
+    return behaviorProperties;
+  };
+  // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
+  // $FlowFixMe[cannot-write]
+  fakeBehavior.initializeContent = function(behaviorContent) {
+    behaviorContent.setStringAttribute('requiredBehavior', '');
+  };
+  return fakeBehavior;
+};
+
 /**
  * Create dummy extensions into gd.JsPlatform
  * @param gd The GD instance to use to create the extensions and find the platform.
@@ -407,6 +476,113 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       )
       .setCategory('General')
       .markAsRenderedIn3D();
+
+    // The 3D capability every 3D object has by default (hidden, like the real
+    // `Scene3D::Base3DBehavior`), and a 3D model object having it.
+    extension
+      .addBehavior(
+        'Base3DBehavior',
+        '3D capability',
+        'Object3D',
+        'Fake 3D capability of 3D objects.',
+        '',
+        'res/conditions/3d_box.svg',
+        'Base3DBehavior', // Class name is the name, actually unused
+        makeFakeBehaviorWithoutProperty(gd),
+        new gd.BehaviorsSharedData()
+      )
+      .setHidden();
+
+    const Model3DObject = new gd.ObjectJsImplementation();
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    Model3DObject.getProperties = function(objectContent) {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      return objectProperties;
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    Model3DObject.getInitialInstanceProperties = function(
+      content,
+      instance,
+      project,
+      layout
+    ) {
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
+      return instanceProperties;
+    };
+    extension
+      .addObject(
+        'Model3DObject',
+        '3D Model',
+        'A 3D model',
+        'JsPlatform/Extensions/3d_model.svg',
+        Model3DObject
+      )
+      .setCategory('General')
+      .markAsRenderedIn3D()
+      .addDefaultBehavior('FakeScene3D::Base3DBehavior');
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    // Behaviors requiring a capability of their object (a property of type
+    // "Behavior" declares it): the 3D one, that only 3D objects have, and the
+    // animatable one, that a Sprite has but not a 3D model.
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'FakePhysics3D',
+      'Fake 3D physics',
+      'A fake behavior requiring the 3D capability of its object.',
+      '',
+      'MIT'
+    );
+    extension
+      .addBehavior(
+        'Physics3DBehavior',
+        'Fake 3D physics',
+        'Physics3D',
+        'A fake 3D physics behavior, for 3D objects only.',
+        '',
+        'res/functions/extension_black.svg',
+        'Physics3DBehavior', // Class name is the name, actually unused
+        makeFakeBehaviorRequiring(
+          gd,
+          'FakeScene3D::Base3DBehavior',
+          '3D capability'
+        ),
+        new gd.BehaviorsSharedData()
+      )
+      // Like the real physics engines: not offered on the children of a
+      // custom object.
+      .markAsIrrelevantForChildObjects();
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'FakeAnimatedBehavior',
+      'Fake animated behavior',
+      'A fake behavior requiring the animatable capability of its object.',
+      '',
+      'MIT'
+    );
+    extension.addBehavior(
+      'AnimatedBehavior',
+      'Fake animated behavior',
+      'Animated',
+      'A fake behavior playing animations, for animatable objects only.',
+      '',
+      'res/functions/extension_black.svg',
+      'AnimatedBehavior', // Class name is the name, actually unused
+      makeFakeBehaviorRequiring(
+        gd,
+        'AnimatableCapability::AnimatableBehavior',
+        'Animatable capability'
+      ),
+      new gd.BehaviorsSharedData()
+    );
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }

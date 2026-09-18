@@ -11,6 +11,8 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
+  type WillDeleteExtensionItemChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -111,8 +113,22 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
+  // The events of a function of this extension were changed outside of the
+  // editor (by the AI): refresh the events sheet showing them.
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
-    // No thing to be done.
+    const { eventsFunction, extensionName } = changes;
+    if (
+      !this.editor ||
+      !eventsFunction ||
+      !extensionName ||
+      extensionName !== this.getEventsFunctionsExtensionName()
+    ) {
+      return;
+    }
+    this.editor.onEventsModifiedOutsideEditor(
+      eventsFunction,
+      changes.newOrChangedAiGeneratedEventIds
+    );
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
@@ -137,6 +153,26 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     changes: ObjectGroupsOutsideEditorChanges
   ) {
     // No thing to be done.
+  }
+
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
+    const extensionName = this.getEventsFunctionsExtensionName();
+    if (!extensionName || !changes.extensionNames.includes(extensionName)) {
+      return;
+    }
+    if (this.editor) this.editor.refreshAfterOutsideChanges();
+  }
+
+  // Called before the item is removed from the extension, so the editor can
+  // release a selection pointing at it (it would be dangling afterwards).
+  // A variant is not selectable here: only its object would match.
+  onWillDeleteExtensionItem(changes: WillDeleteExtensionItemChanges) {
+    if (!this.editor || changes.kind === 'custom-object-variant') return;
+    this.editor.deselectIfSelected({
+      functionName: changes.functionName,
+      behaviorName: changes.behaviorName,
+      objectName: changes.objectName,
+    });
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {

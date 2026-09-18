@@ -474,6 +474,48 @@ namespace gdjs {
      * objects), to keep snapshots bounded. */
     const MAX_CHILDREN_DEPTH = 8;
 
+    /**
+     * Describe a value that should have been a string, for an error message:
+     * an object is shown (shortened) so the misplaced argument is
+     * recognizable, anything else by its type.
+     */
+    const describeNonStringValue = (value: unknown): string => {
+      if (value === null) return 'null';
+      if (typeof value !== 'object') return `a ${typeof value}`;
+      try {
+        return `an object (${JSON.stringify(value).slice(0, 80)})`;
+      } catch (error) {
+        return 'an object';
+      }
+    };
+
+    /**
+     * Whether a Three.js or PixiJS node, or one of its descendants, draws
+     * something by itself: a Three.js mesh, sprite, points, line or light,
+     * a PixiJS sprite, text, mesh or graphics (they carry a texture or a
+     * geometry). A plain group or container does not.
+     */
+    const hasRenderableDescendant = (node: any, depth: integer): boolean => {
+      if (!node || depth > MAX_CHILDREN_DEPTH) return false;
+      if (
+        node.isMesh ||
+        node.isSprite ||
+        node.isPoints ||
+        node.isLine ||
+        node.isLight ||
+        !!node.texture ||
+        !!node.geometry
+      ) {
+        return true;
+      }
+      const children: Array<unknown> = Array.isArray(node.children)
+        ? node.children
+        : [];
+      return children.some((child) =>
+        hasRenderableDescendant(child, depth + 1)
+      );
+    };
+
     // Keys that must never throw on the self-describing state, so language
     // internals (JSON.stringify, await inspection, string coercion...) keep
     // working transparently.
@@ -883,11 +925,28 @@ namespace gdjs {
             this._getHiddenStallTimeMs() >
           this._timeoutMs
         ) {
-          throw new GameplayTestTimeoutError(
-            `The test timed out after ${this._timeoutMs}ms ` +
-              '(wall-clock, loading and time spent hidden excluded).'
-          );
+          throw new GameplayTestTimeoutError(this._getTimeoutMessage());
         }
+      }
+
+      /**
+       * The message of a timeout. It tells about the time the page spent
+       * hidden, when there was some: a game frozen by the browser (a
+       * background tab, a covered window) is not a game that is slow or a
+       * test that waits for something impossible, and what to change is
+       * then the visibility of the preview, not the test nor the game.
+       */
+      _getTimeoutMessage(): string {
+        const hiddenStallMs = Math.round(this._getHiddenStallTimeMs());
+        const hiddenNote =
+          hiddenStallMs > 0
+            ? ` The game was also frozen for ${hiddenStallMs}ms because the preview page was hidden (a background tab or a covered window): that time was not counted, and says nothing about the game. Keep the preview visible while a test runs.`
+            : '';
+        return (
+          `The test timed out after ${this._timeoutMs}ms ` +
+          '(wall-clock, loading and time spent hidden excluded).' +
+          hiddenNote
+        );
       }
 
       /**
@@ -1039,7 +1098,10 @@ namespace gdjs {
 
         /**
          * Report the custom objects with no child in them, `object` included:
-         * they render nothing at all and fall back to a 1x1x1 size.
+         * they render nothing at all and fall back to a 1x1x1 size. Except
+         * the ones the JavaScript code of their extension draws (like the 3D
+         * particle emitters, rendered with Three.js): no child either, yet
+         * something on screen.
          */
         const checkObject = (
           object: gdjs.RuntimeObject,
@@ -1053,6 +1115,7 @@ namespace gdjs {
             .getChildrenContainer()
             .getAdhocListOfAllInstances();
           if (children.length === 0) {
+            if (this._isCustomObjectRenderedByCode(object)) return;
             if (reportedObjectNames.has(path)) return;
             reportedObjectNames.add(path);
             warnings.push(
@@ -1081,6 +1144,43 @@ namespace gdjs {
           if (warnings.length >= MAX_WARNINGS) break;
         }
         return warnings;
+      }
+
+      /**
+       * Whether a custom object without any child still renders something,
+       * because the JavaScript code of its extension draws it: either the
+       * code replaced the renderer of the object (the 3D particle emitters,
+       * lights and texts swap theirs for a Three.js object), or it added
+       * something to draw (a mesh, a sprite, a graphics...) in the container
+       * the stock renderer holds for the children.
+       */
+      private _isCustomObjectRenderedByCode(
+        object: gdjs.RuntimeObject
+      ): boolean {
+        const renderer = (object as any)._renderer;
+        if (!renderer) return false;
+        const anyGdjs = gdjs as any;
+        const isStockRenderer =
+          (typeof anyGdjs.CustomRuntimeObject2DRenderer !== 'undefined' &&
+            renderer instanceof anyGdjs.CustomRuntimeObject2DRenderer) ||
+          (typeof anyGdjs.CustomRuntimeObject3DRenderer !== 'undefined' &&
+            renderer instanceof anyGdjs.CustomRuntimeObject3DRenderer);
+        if (!isStockRenderer) return true;
+
+        // The containers hold the (empty) layers of the custom object, which
+        // are plain groups: only something that draws by itself counts.
+        const threeContainer =
+          typeof renderer.get3DRendererObject === 'function'
+            ? renderer.get3DRendererObject()
+            : null;
+        const pixiContainer =
+          typeof renderer.getRendererObject === 'function'
+            ? renderer.getRendererObject()
+            : null;
+        return (
+          hasRenderableDescendant(threeContainer, 0) ||
+          hasRenderableDescendant(pixiContainer, 0)
+        );
       }
 
       private _trackChangesAfterStep(): void {
@@ -2237,6 +2337,15 @@ namespace gdjs {
       }
 
       private _getInstances(objectName: string): Array<gdjs.RuntimeObject> {
+        if (typeof objectName !== 'string') {
+          // Asking the scene for a non-string name would register a phantom
+          // object list named "[object Object]" and silently find nothing.
+          throw new Error(
+            `Expected an object name (a string) but got ${describeNonStringValue(
+              objectName
+            )}. Pass the name of the object; the helpers taking a target (like lookTowardWithMouseDelta) take the reference object name FIRST, then the target.`
+          );
+        }
         return this._getCurrentScene().getObjects(objectName) || [];
       }
 
@@ -3822,22 +3931,26 @@ namespace gdjs {
       try {
         // A wall-clock watchdog, in case the script awaits something that
         // never resolves. Checked periodically (not a one-shot timer) so
-        // the time spent loading - which grows `_loadingTimeMs` - stays
-        // excluded from the budget. A synchronous infinite loop can NOT be
+        // the time spent loading - which grows `_loadingTimeMs` - and the
+        // time the page spent hidden (the browser then freezes the game,
+        // see `_installPageVisibilityTracking`) stay excluded from the
+        // budget, as they are in `_checkGuards`: a test in a background
+        // tab is not a test that timed out (the editor gives up on it as
+        // paused, on its side). A synchronous infinite loop can NOT be
         // interrupted (this is a limit of running in the same thread as
         // the game).
         let watchdogIntervalId: any = null;
         const watchdog = new Promise<never>((_, reject) => {
           watchdogIntervalId = setInterval(() => {
             if (
-              Date.now() - harness._startTimeMs - harness._loadingTimeMs >
+              Date.now() -
+                harness._startTimeMs -
+                harness._loadingTimeMs -
+                harness._getHiddenStallTimeMs() >
               harness._timeoutMs + 1000
             ) {
               reject(
-                new GameplayTestTimeoutError(
-                  `The test timed out after ${harness._timeoutMs}ms ` +
-                    '(wall-clock, loading time excluded).'
-                )
+                new GameplayTestTimeoutError(harness._getTimeoutMessage())
               );
             }
           }, 250);

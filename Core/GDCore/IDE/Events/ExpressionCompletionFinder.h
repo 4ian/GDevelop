@@ -642,7 +642,8 @@ class GD_CORE_API ExpressionCompletionFinder
             type,
             node.identifierNameLocation,
             eagerlyCompleteIfPossible);
-        if (!node.identifierNameDotLocation.IsValid()) {
+        if (!node.identifierNameDotLocation.IsValid() &&
+            !gd::ValueTypeMetadata::IsTypeExpression("variable", type)) {
           completions.push_back(
               ExpressionCompletionDescription::ForExpressionWithPrefix(
                   type,
@@ -1085,6 +1086,9 @@ class GD_CORE_API ExpressionCompletionFinder
         search,
         [&](const gd::String &objectName,
             const ObjectConfiguration *objectConfiguration) {
+          if (gd::ValueTypeMetadata::IsTypeExpression("variable", type)) {
+            return;
+          }
           ExpressionCompletionDescription description(
               ExpressionCompletionDescription::Object,
               location.GetStartPosition(),

@@ -331,6 +331,64 @@ describe('libGD.js - GDJS related tests', function () {
 
       expect(code).toMatch('elseEventsChainSatisfied');
     });
+    it('reports an invalid expression for each object of a group', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      for (const objectName of ['MyObjectA', 'MyObjectB']) {
+        const object = layout
+          .getObjects()
+          .insertNewObject(project, 'Sprite', objectName, 0);
+        object.getVariables().insertNew('MyVariable', 0).setValue(0);
+      }
+      const group = layout
+        .getObjects()
+        .getObjectGroups()
+        .insertNew('MyGroup', 0);
+      group.addObject('MyObjectA');
+      group.addObject('MyObjectB');
+
+      const evt = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      const action = new gd.Instruction();
+      action.setType('SetNumberObjectVariable');
+      action.setParametersCount(4);
+      action.setParameter(0, 'MyGroup');
+      action.setParameter(1, 'MyVariable');
+      action.setParameter(2, '=');
+      action.setParameter(3, 'MyGroup.UndeclaredVariable');
+      gd.asStandardEvent(evt).getActions().insert(action, 0);
+      action.delete();
+
+      const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+      const diagnosticReport = new gd.DiagnosticReport();
+      const code = layoutCodeGenerator.generateLayoutCompleteCode(
+        layout,
+        new gd.SetString(),
+        diagnosticReport,
+        true
+      );
+
+      // The action is generated once per object of the group, and the invalid
+      // expression is reported and replaced by a default value each time.
+      expect(diagnosticReport.count()).toBe(2);
+      expect(diagnosticReport.get(0).getActualValue()).toBe(
+        'UndeclaredVariable'
+      );
+      expect(diagnosticReport.get(1).getActualValue()).toBe(
+        'UndeclaredVariable'
+      );
+      expect(code).toMatch(
+        'gdjs.SceneCode.GDMyObjectAObjects1[i].returnVariable(gdjs.SceneCode.GDMyObjectAObjects1[i].getVariables().get("MyVariable")).setNumber(0);'
+      );
+      expect(code).toMatch(
+        'gdjs.SceneCode.GDMyObjectBObjects1[i].returnVariable(gdjs.SceneCode.GDMyObjectBObjects1[i].getVariables().get("MyVariable")).setNumber(0);'
+      );
+
+      diagnosticReport.delete();
+      layoutCodeGenerator.delete();
+      project.delete();
+    });
     it('does not generate code for improperly set up actions/conditions', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);

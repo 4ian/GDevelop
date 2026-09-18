@@ -1437,6 +1437,21 @@ describe('gdjs.gameplayTests', () => {
           [createChildInstanceData('Barrel3D_Inner', 30, 40)],
           128
         ),
+        // Custom objects declaring a child object but placing no instance
+        // of it (as the extensions rendered by their own JavaScript code
+        // do, like the 3D particle emitters): nothing in them at runtime.
+        createEventsBasedObjectData(
+          'EmptyShell',
+          [createPlainChildObjectData('UnusedChild')],
+          [],
+          64
+        ),
+        createEventsBasedObjectData(
+          'EmptyShell3D',
+          [createCube3DChildObjectData('UnusedCube3D')],
+          [],
+          64
+        ),
       ];
       // A chain of custom objects deeper than MAX_CHILDREN_DEPTH, to check
       // snapshots stop there: DeepLevel0 > Child > Child > ...
@@ -1477,6 +1492,7 @@ describe('gdjs.gameplayTests', () => {
         TANK_EXTENSION_NAME + '::TwinTank',
         TANK_EXTENSION_NAME + '::BoxTurret',
         TANK_EXTENSION_NAME + '::BoxTank',
+        TANK_EXTENSION_NAME + '::EmptyShell',
       ];
       for (let level = 0; level < DEEP_LEVELS_COUNT; level++) {
         types.push(TANK_EXTENSION_NAME + '::DeepLevel' + level);
@@ -1499,6 +1515,7 @@ describe('gdjs.gameplayTests', () => {
       const types3D = [
         TANK_EXTENSION_NAME + '::Barrel3D',
         TANK_EXTENSION_NAME + '::Turret3D',
+        TANK_EXTENSION_NAME + '::EmptyShell3D',
       ];
       for (const type of types3D) {
         if (gdjs.objectsTypes.containsKey(type)) continue;
@@ -1540,7 +1557,15 @@ describe('gdjs.gameplayTests', () => {
         ),
         createCustomObjectData('BoxTank', TANK_EXTENSION_NAME + '::BoxTank'),
         createCustomObjectData('Barrel3D', TANK_EXTENSION_NAME + '::Barrel3D'),
-        createCustomObjectData('Turret3D', TANK_EXTENSION_NAME + '::Turret3D')
+        createCustomObjectData('Turret3D', TANK_EXTENSION_NAME + '::Turret3D'),
+        createCustomObjectData(
+          'EmptyShell',
+          TANK_EXTENSION_NAME + '::EmptyShell'
+        ),
+        createCustomObjectData(
+          'EmptyShell3D',
+          TANK_EXTENSION_NAME + '::EmptyShell3D'
+        )
       );
       const projectData = gdjs.createProjectData({ layouts: [sceneData] });
       projectData.eventsFunctionsExtensions = [createTankExtensionData()];
@@ -2474,6 +2499,97 @@ describe('gdjs.gameplayTests', () => {
       expect(barrel.width).to.be(BARREL_AREA_SIZE);
       expect(barrel.rotationX).to.be(90);
       expect(barrel.isLocalGeometry).to.be(true);
+    });
+
+    it('rejects a non-string object name instead of looking up a phantom object', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+
+      // The mistake `lookTowardWithMouseDelta` invites: the target passed
+      // where the reference object name is expected.
+      expect(() =>
+        harness.getObjects(/** @type {any} */ ({ name: 'CombinedTank' }))
+      ).to.throwError(/Expected an object name \(a string\)/);
+      expect(
+        /** @type {any} */ (harness)
+          ._getCurrentScene()
+          .getAdhocListOfAllInstances()
+          .some(
+            /** @param {gdjs.RuntimeObject} object */ (object) =>
+              object.getName() === '[object Object]'
+          )
+      ).to.be(false);
+    });
+
+    describe('warnings on custom objects with no child', () => {
+      /**
+       * The warnings about `objectName` at the end of a run.
+       * @param {gdjs.gameplayTests.GameplayTestHarness} harness
+       * @param {string} objectName
+       */
+      const getWarningsAbout = (harness, objectName) =>
+        /** @type {Array<string>} */ (
+          /** @type {any} */ (harness)._getWarnings()
+        ).filter((warning) => warning.includes(`"${objectName}"`));
+
+      it('warns about a custom object with no child in it (2D and 3D)', async () => {
+        const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+        await harness.goToScene('Scene 1');
+        harness.spawn('EmptyShell', 100, 200);
+        harness.spawn('EmptyShell3D', 100, 200);
+        await harness.stepFrames(1);
+
+        expect(getWarningsAbout(harness, 'EmptyShell').length).to.be(1);
+        expect(getWarningsAbout(harness, 'EmptyShell')[0]).to.contain(
+          'renders nothing'
+        );
+        expect(getWarningsAbout(harness, 'EmptyShell3D').length).to.be(1);
+        // A custom object with children is fine.
+        expect(getWarningsAbout(harness, 'CombinedTank').length).to.be(0);
+      });
+
+      it('does not warn about a custom object whose renderer was replaced by the code of its extension', async () => {
+        const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+        await harness.goToScene('Scene 1');
+        harness.spawn('EmptyShell3D', 100, 200);
+        await harness.stepFrames(1);
+        const emptyShell3D = /** @type {any} */ (
+          harness.getRuntimeObject('EmptyShell3D')
+        );
+        if (!emptyShell3D) throw new Error('EmptyShell3D was not spawned.');
+
+        // What the ParticleEmitter3D extension does in `onCreated`: its own
+        // Three.js renderer takes the place of the stock one.
+        emptyShell3D._renderer = {
+          get3DRendererObject: () => new THREE.Object3D(),
+        };
+
+        expect(getWarningsAbout(harness, 'EmptyShell3D').length).to.be(0);
+      });
+
+      it('does not warn about a custom object whose code draws in its renderer container', async () => {
+        // The containers already hold the (empty) layers of the custom
+        // object: what tells a drawing apart is a mesh, a sprite, a graphics.
+        const harness = makeStartedHarness(makeRuntimeGameWithCustomObjects());
+        await harness.goToScene('Scene 1');
+        harness.spawn('EmptyShell', 100, 200);
+        harness.spawn('EmptyShell3D', 100, 200);
+        await harness.stepFrames(1);
+        const emptyShell = /** @type {any} */ (
+          harness.getRuntimeObject('EmptyShell')
+        );
+        const emptyShell3D = /** @type {any} */ (
+          harness.getRuntimeObject('EmptyShell3D')
+        );
+        if (!emptyShell || !emptyShell3D) {
+          throw new Error('The empty shells were not spawned.');
+        }
+
+        emptyShell.getRendererObject().addChild(new PIXI.Graphics());
+        emptyShell3D.get3DRendererObject().add(new THREE.Mesh());
+
+        expect(getWarningsAbout(harness, 'EmptyShell').length).to.be(0);
+        expect(getWarningsAbout(harness, 'EmptyShell3D').length).to.be(0);
+      });
     });
   });
 });

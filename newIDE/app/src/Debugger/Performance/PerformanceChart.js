@@ -42,6 +42,8 @@ type Props = {|
   markers: Array<TimelineMarker>,
   /** Drawn as a dashed line on the memory chart, like the limit of an offer. */
   memoryLimitBytes: ?number,
+  /** The samples of the recording pinned as the reference, if any. */
+  baselineSamples?: ?Array<ProfilerPerformanceSample>,
 |};
 
 type Series = {|
@@ -111,6 +113,7 @@ const PerformanceChart = ({
   onSelectRange,
   markers,
   memoryLimitBytes,
+  baselineSamples,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const tickStyle = {
@@ -127,6 +130,29 @@ const PerformanceChart = ({
       heapLimit = sample.jsHeapSizeLimitBytes;
     }
   }
+
+  // The reference is drawn on the time elapsed since the start of each
+  // recording, not on absolute game time: two runs taken weeks apart never
+  // start at the same moment of the game, and comparing them on the absolute
+  // axis would put them side by side instead of on top of each other.
+  const hasBaseline = !!baselineSamples && baselineSamples.length > 0;
+  const chartData = React.useMemo(
+    () => {
+      if (!baselineSamples || baselineSamples.length === 0) return samples;
+
+      const baselineStartMs = baselineSamples[0].atGameTimeMs;
+      const retimedBaselinePoints = baselineSamples.map(sample => ({
+        atGameTimeMs: bounds.fromMs + (sample.atGameTimeMs - baselineStartMs),
+        fpsBaseline: sample.fps,
+        usedJSHeapBytesBaseline: sample.usedJSHeapBytes,
+        estimatedGpuMemoryBytesBaseline: sample.estimatedGpuMemoryBytes,
+      }));
+      return [...samples, ...retimedBaselinePoints].sort(
+        (first, second) => first.atGameTimeMs - second.atGameTimeMs
+      );
+    },
+    [samples, baselineSamples, bounds.fromMs]
+  );
 
   const series: Array<Series> = [
     {
@@ -155,10 +181,10 @@ const PerformanceChart = ({
 
   const onBrushChange = (brush: { startIndex?: number, endIndex?: number }) => {
     if (brush.startIndex == null || brush.endIndex == null) return;
-    const firstSample = samples[brush.startIndex];
-    const lastSample = samples[brush.endIndex];
+    const firstSample = chartData[brush.startIndex];
+    const lastSample = chartData[brush.endIndex];
     if (!firstSample || !lastSample) return;
-    if (brush.startIndex === 0 && brush.endIndex === samples.length - 1) {
+    if (brush.startIndex === 0 && brush.endIndex === chartData.length - 1) {
       onSelectRange(null);
       return;
     }
@@ -184,7 +210,7 @@ const PerformanceChart = ({
                   height={CHART_HEIGHT + (isLast ? 40 : 0)}
                 >
                   <AreaChart
-                    data={samples}
+                    data={chartData}
                     margin={chartMargins}
                     syncId="debugger-performance"
                   >
@@ -321,6 +347,19 @@ const PerformanceChart = ({
                       isAnimationActive={false}
                       connectNulls
                     />
+                    {hasBaseline && (
+                      <Area
+                        type="monotone"
+                        dataKey={`${oneSeries.key}Baseline`}
+                        stroke={gdevelopTheme.chart.textColor}
+                        strokeDasharray="5 4"
+                        fill="none"
+                        strokeWidth={1.5}
+                        dot={false}
+                        isAnimationActive={false}
+                        connectNulls
+                      />
+                    )}
                     {isLast && (
                       <Brush
                         dataKey="atGameTimeMs"

@@ -118,6 +118,45 @@ export const aggregateFramesToMeasures = (
   return root;
 };
 
+/**
+ * The same tree of sections, holding the time of the run being looked at and
+ * the time of the reference it is compared to. A section missing from one
+ * side keeps a null time there: a group that was renamed must be shown as
+ * gone, not silently dropped.
+ */
+export type ComparedMeasuresSection = {|
+  time: ?number,
+  baselineTime: ?number,
+  subsections: { [name: string]: ComparedMeasuresSection },
+|};
+
+/**
+ * Pair the sections of two runs by name, so that what an optimisation
+ * changed can be read section by section.
+ */
+export const compareMeasures = (
+  measures: ?ProfilerMeasuresSection,
+  baselineMeasures: ?ProfilerMeasuresSection
+): ComparedMeasuresSection => {
+  const subsections = {};
+  const names = new Set([
+    ...Object.keys(measures ? measures.subsections : {}),
+    ...Object.keys(baselineMeasures ? baselineMeasures.subsections : {}),
+  ]);
+  names.forEach(name => {
+    subsections[name] = compareMeasures(
+      measures ? measures.subsections[name] : null,
+      baselineMeasures ? baselineMeasures.subsections[name] : null
+    );
+  });
+
+  return {
+    time: measures ? measures.time : null,
+    baselineTime: baselineMeasures ? baselineMeasures.time : null,
+    subsections,
+  };
+};
+
 export type FrameStats = {|
   framesCount: number,
   /** Game time covered by the frames, in milliseconds. */

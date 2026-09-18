@@ -1,6 +1,7 @@
 // @flow
 import {
   aggregateFramesToMeasures,
+  compareMeasures,
   findFirstFrameIndexAtOrAfter,
   formatClockDuration,
   formatGameTime,
@@ -187,6 +188,55 @@ describe('ProfilerRecordingAggregation', () => {
 
       store.clear('1');
       expect(store.getRecording('1')).toBeNull();
+    });
+  });
+
+  describe('compareMeasures', () => {
+    const makeMeasures = subsections => ({ time: 10, subsections });
+    const makeSection = time => ({ time, subsections: {} });
+
+    it('pairs the sections present on both sides', () => {
+      const compared = compareMeasures(
+        makeMeasures({ 'Group A': makeSection(4) }),
+        makeMeasures({ 'Group A': makeSection(6) })
+      );
+      expect(compared.subsections['Group A'].time).toBe(4);
+      expect(compared.subsections['Group A'].baselineTime).toBe(6);
+    });
+
+    it('keeps a section present on one side only', () => {
+      const compared = compareMeasures(
+        makeMeasures({ 'MyExt::Fn': makeSection(4) }),
+        makeMeasures({ 'Group A': makeSection(6) })
+      );
+      // A renamed group must be shown as gone on one side, never dropped.
+      expect(compared.subsections['MyExt::Fn'].time).toBe(4);
+      expect(compared.subsections['MyExt::Fn'].baselineTime).toBeNull();
+      expect(compared.subsections['Group A'].time).toBeNull();
+      expect(compared.subsections['Group A'].baselineTime).toBe(6);
+    });
+
+    it('walks down the whole tree', () => {
+      const compared = compareMeasures(
+        makeMeasures({
+          'Group A': { time: 4, subsections: { Nested: makeSection(1) } },
+        }),
+        makeMeasures({
+          'Group A': { time: 6, subsections: { Nested: makeSection(3) } },
+        })
+      );
+      const nested = compared.subsections['Group A'].subsections.Nested;
+      expect(nested.time).toBe(1);
+      expect(nested.baselineTime).toBe(3);
+    });
+
+    it('answers on a missing reference', () => {
+      const compared = compareMeasures(
+        makeMeasures({ 'Group A': makeSection(4) }),
+        null
+      );
+      expect(compared.baselineTime).toBeNull();
+      expect(compared.subsections['Group A'].baselineTime).toBeNull();
     });
   });
 });

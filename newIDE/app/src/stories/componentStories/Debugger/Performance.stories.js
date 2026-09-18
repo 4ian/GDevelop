@@ -14,6 +14,8 @@ export default {
 
 const emptyStore = new ProfilerRecordingStore();
 const recordingStore = makeFakeRecordingStore(60000);
+// A second run, to serve as the reference a recording is compared to.
+const baselineRecordingStore = makeFakeRecordingStore(45000, '0');
 
 export const NeverRecorded = (): React.Node => (
   <FixedHeightFlexContainer height={550}>
@@ -24,6 +26,20 @@ export const NeverRecorded = (): React.Node => (
       onStartRecording={action('start recording')}
       profilingInProgress={false}
       memoryLimitBytes={null}
+    />
+  </FixedHeightFlexContainer>
+);
+
+export const ComparedToABaseline = () => (
+  <FixedHeightFlexContainer height={700}>
+    <Performance
+      recordingStore={recordingStore}
+      debuggerId="0"
+      canRecord
+      onStartRecording={action('start recording')}
+      profilingInProgress={false}
+      memoryLimitBytes={256 * 1024 * 1024}
+      baselineRecording={baselineRecordingStore.getRecording('0')}
     />
   </FixedHeightFlexContainer>
 );

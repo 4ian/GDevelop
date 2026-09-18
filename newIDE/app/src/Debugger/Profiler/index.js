@@ -16,6 +16,7 @@ import { type DebuggerId } from '../../ExportAndShare/PreviewLauncher.flow';
 import {
   ProfilerRecordingStore,
   useProfilerRecording,
+  type ProfilerRecording,
 } from '../ProfilerRecording/ProfilerRecordingStore';
 import {
   aggregateFramesToMeasures,
@@ -36,6 +37,8 @@ type Props = {|
   debuggerId: DebuggerId,
   canRecord: boolean,
   onStartRecording: () => void,
+  /** The recording this one is compared to, when one was pinned. */
+  baselineRecording?: ?ProfilerRecording,
 |};
 
 /**
@@ -49,6 +52,7 @@ const Profiler = ({
   debuggerId,
   canRecord,
   onStartRecording,
+  baselineRecording,
 }: Props): React.Node => {
   const recording = useProfilerRecording(recordingStore, debuggerId);
   // The store appends to the recording in place: what changed is told by
@@ -72,6 +76,18 @@ const Profiler = ({
         ? aggregateFramesToMeasures(recording.names, framesInRange)
         : null,
     [recording, framesInRange]
+  );
+  // The reference is averaged over its whole run: the selection of the
+  // current one has no meaning in a recording taken weeks earlier.
+  const baselineMeasures = React.useMemo(
+    () =>
+      baselineRecording
+        ? aggregateFramesToMeasures(
+            baselineRecording.names,
+            baselineRecording.frames
+          )
+        : null,
+    [baselineRecording]
   );
   const frameStats = React.useMemo(() => getFrameStats(framesInRange), [
     framesInRange,
@@ -152,7 +168,10 @@ const Profiler = ({
                   selection
                 </Trans>
               </Text>
-              <MeasuresTable profilerMeasures={measures} />
+              <MeasuresTable
+                profilerMeasures={measures}
+                baselineMeasures={baselineMeasures}
+              />
             </div>
           </div>
         ) : recording && recording.legacyOutput && !profilingInProgress ? (

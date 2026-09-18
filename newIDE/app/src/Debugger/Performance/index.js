@@ -37,6 +37,39 @@ import profilerClasses from '../Profiler/Profiler.module.css';
 const formatNumber = (value: number): string =>
   Number.isFinite(value) ? (Math.round(value * 10) / 10).toLocaleString() : '-';
 
+/**
+ * How a number moved against the reference. `null` when one of the two sides
+ * was not measured: `usedJSHeapBytes` is absent outside of Chromium, and an
+ * empty cell says that, where a zero would claim they are equal.
+ */
+const getComparisonNode = (
+  value: ?number,
+  baselineValue: ?number,
+  format: number => string,
+  isLowerBetter: boolean = true
+): React.Node => {
+  if (value == null || baselineValue == null || baselineValue === 0) {
+    return null;
+  }
+  const deltaValue = value - baselineValue;
+  const deltaPercent = (deltaValue / baselineValue) * 100;
+  const sign = deltaValue > 0 ? '+' : '';
+  const formattedDelta = `${sign}${format(Math.abs(deltaValue))}`;
+  const formattedPercent = `${sign}${deltaPercent.toFixed(0)}%`;
+  const isBetter = isLowerBetter ? deltaValue < 0 : deltaValue > 0;
+  // Two whole sentences rather than an injected word: a translator needs the
+  // sentence, not a blank to fill.
+  return isBetter ? (
+    <Trans>
+      {formattedDelta} ({formattedPercent}) better than the reference
+    </Trans>
+  ) : (
+    <Trans>
+      {formattedDelta} ({formattedPercent}) worse than the reference
+    </Trans>
+  );
+};
+
 type Stat = {|
   label: React.Node,
   value: React.Node,
@@ -49,6 +82,8 @@ type Stat = {|
   help: React.Node,
   /** Set when clicking the card shows what it talks about in the profiler. */
   onClick?: () => void,
+  /** How this number moved against the reference, when one is pinned. */
+  comparison?: React.Node,
 |};
 
 /** Room kept around the slowest frame when it is selected in the profiler. */
@@ -62,12 +97,29 @@ const SLOWEST_FRAME_MARGIN_MS = 250;
  */
 const getStats = (
   recording: ProfilerRecording,
-  onSelectRange: (range: ?ProfilerRecordingRange) => void
+  onSelectRange: (range: ?ProfilerRecordingRange) => void,
+  baselineRecording: ?ProfilerRecording
 ): Array<Stat> => {
   const shownRange = getShownRange(recording);
   const frames = getFramesInRange(recording.frames, shownRange);
   const frameStats = getFrameStats(frames);
   const samples = getSamplesInRange(recording.samples, shownRange);
+  // The reference is taken over its whole run: a range selected on this
+  // recording means nothing in one taken weeks earlier.
+  const baselineFrameStats = baselineRecording
+    ? getFrameStats(baselineRecording.frames)
+    : null;
+  const baselineSamples = baselineRecording ? baselineRecording.samples : [];
+  const getLastSampleValue = (
+    sampleList: Array<ProfilerPerformanceSample>,
+    read: ProfilerPerformanceSample => ?number
+  ): ?number => {
+    for (let index = sampleList.length - 1; index >= 0; index--) {
+      const value = read(sampleList[index]);
+      if (value != null) return value;
+    }
+    return null;
+  };
   const stats: Array<Stat> = [];
 
   stats.push({
@@ -101,6 +153,13 @@ const getStats = (
         profiler, on the left, shows where that time goes.
       </Trans>
     ),
+    comparison: getComparisonNode(
+      hasFrames ? frameStats.averageMs : null,
+      baselineFrameStats && baselineFrameStats.averageMs
+        ? baselineFrameStats.averageMs
+        : null,
+      formatMilliseconds
+    ),
   });
   const hasSlowestFrame = hasFrames && frameStats.maxMs > 0;
   const slowestFrameTime = formatGameTime(frameStats.slowestFrameStartTimeMs);
@@ -121,6 +180,13 @@ const getStats = (
         the worst ones: what the events do at the beginning of the scene can
         usually be spread over the next frames instead.
       </Trans>
+    ),
+    comparison: getComparisonNode(
+      hasSlowestFrame ? frameStats.maxMs : null,
+      baselineFrameStats && baselineFrameStats.maxMs
+        ? baselineFrameStats.maxMs
+        : null,
+      formatMilliseconds
     ),
     onClick: hasSlowestFrame
       ? () =>
@@ -160,6 +226,11 @@ const getStats = (
         are created but never deleted.
       </Trans>
     ),
+    comparison: getComparisonNode(
+      lastSampleWithHeap ? lastSampleWithHeap.usedJSHeapBytes : null,
+      getLastSampleValue(baselineSamples, sample => sample.usedJSHeapBytes),
+      formatBytes
+    ),
   });
   const lastSampleWithGpu = [...samples]
     .reverse()
@@ -177,6 +248,14 @@ const getStats = (
         game fail to start on a low end phone: if it grows too much, use smaller
         images, or unload the scenes that are not played anymore.
       </Trans>
+    ),
+    comparison: getComparisonNode(
+      lastSampleWithGpu ? lastSampleWithGpu.estimatedGpuMemoryBytes : null,
+      getLastSampleValue(
+        baselineSamples,
+        sample => sample.estimatedGpuMemoryBytes
+      ),
+      formatBytes
     ),
   });
 
@@ -275,6 +354,8 @@ const getStats = (
 
 type Props = {|
   recordingStore: ProfilerRecordingStore,
+  /** The recording this one is compared to, when one was pinned. */
+  baselineRecording?: ?ProfilerRecording,
   canRecord: boolean,
   onStartRecording: () => void,
   debuggerId: DebuggerId,
@@ -294,6 +375,7 @@ const Performance = ({
   memoryLimitBytes,
   canRecord,
   onStartRecording,
+  baselineRecording,
 }: Props): React.Node => {
   const recording = useProfilerRecording(recordingStore, debuggerId);
   // The store appends to the recording in place: what changed is told by
@@ -309,7 +391,8 @@ const Performance = ({
     [recordingStore, debuggerId]
   );
   const stats = React.useMemo(
-    () => (recording ? getStats(recording, onSelectRange) : []),
+    () =>
+      recording ? getStats(recording, onSelectRange, baselineRecording) : [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       recording,
@@ -318,6 +401,7 @@ const Performance = ({
       selectedRange,
       legacyOutput,
       onSelectRange,
+      baselineRecording,
     ]
   );
   const markers = React.useMemo(
@@ -382,6 +466,9 @@ const Performance = ({
                 onSelectRange={onSelectRange}
                 markers={markers}
                 memoryLimitBytes={memoryLimitBytes}
+                baselineSamples={
+                  baselineRecording ? baselineRecording.samples : null
+                }
               />
             </div>
           )}
@@ -423,6 +510,11 @@ const Performance = ({
                   {stat.note && (
                     <Text noMargin size="body-small" color="secondary">
                       {stat.note}
+                    </Text>
+                  )}
+                  {stat.comparison && (
+                    <Text noMargin size="body-small" color="secondary">
+                      {stat.comparison}
                     </Text>
                   )}
                 </div>

@@ -81,6 +81,12 @@ bar stops, especially on a screen looked at from afar. */
   background-position: left center;
 }
 
+/* A section only one of the two runs has: still listed, so that a renamed
+group does not silently vanish from the comparison, but dimmed. */
+.oneSidedRow {
+  opacity: 0.55;
+}
+
 .nameCell {
   display: flex;
   align-items: center;

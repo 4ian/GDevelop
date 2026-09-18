@@ -33,7 +33,24 @@ import {
 } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import { UseCommandHook } from '../CommandPalette/CommandHooks';
 import EventsExecutionTrackingContext from '../EventsExecutionTracking/EventsExecutionTrackingContext';
+import {
+  type DebuggerRecordingMetadata,
+  DebuggerRecordingFileError,
+  getRecordingFromFile,
+  makeDebuggerRecordingFile,
+} from './Export/DebuggerRecordingFile';
+import {
+  exportDebuggerRecording,
+  importDebuggerRecording,
+} from './Export/DebuggerRecordingIO';
+import { getIDEVersion } from '../Version';
 import { EventsExecutionTrackingStore } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
+
+/**
+ * Under this many frames, an average says more about the moment it was taken
+ * than about the game: comparing to it is warned about.
+ */
+const MINIMUM_COMPARABLE_FRAMES_COUNT = 100;
 
 export type ResourcesDebugSnapshot = {|
   state: ?ResourcesDebugState,
@@ -100,6 +117,16 @@ type State = {|
   /** Start recording the game as soon as it is restarted. */
   shouldRecordOnLaunch: boolean,
   shouldClearOnRecord: boolean,
+  /**
+   * What each imported recording holds, kept apart from `debuggerStatus` so
+   * that launching a preview does not forget it: comparing two runs weeks
+   * apart is exactly when a preview is launched again.
+   */
+  importedRecordings: { [DebuggerId]: DebuggerRecordingMetadata },
+  /** The recording every panel compares the current one to, if any. */
+  baselineDebuggerId: ?DebuggerId,
+  /** What went wrong with the last import, shown until it is dismissed. */
+  importError: ?string,
 |};
 
 /**
@@ -129,7 +156,12 @@ export default class Debugger extends React.Component<Props, State> {
     logs: {},
     shouldRecordOnLaunch: false,
     shouldClearOnRecord: true,
+    importedRecordings: {},
+    baselineDebuggerId: null,
+    importError: null,
   };
+  /** Numbers the imported recordings, so that each has an id of its own. */
+  _importedRecordingsCount: number = 0;
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
   /**
    * The games to record as soon as they say they are running: the ones just
@@ -173,6 +205,12 @@ export default class Debugger extends React.Component<Props, State> {
         canRecord={this._hasSelectedDebugger()}
         onStartRecording={() => this._startProfiler(this.state.selectedId)}
         onStopRecording={() => this._stopProfiler(this.state.selectedId)}
+        canExportRecording={this._canShowSelectedDebugger()}
+        onExportRecording={() => this._exportRecording(this.state.selectedId)}
+        onImportRecording={this._importRecording}
+        canCompareToBaseline={this._canShowSelectedDebugger()}
+        isBaseline={this.state.baselineDebuggerId === this.state.selectedId}
+        onToggleBaseline={() => this._toggleBaseline(this.state.selectedId)}
         canClear={this._canShowSelectedDebugger()}
         onClear={() => this._clear(this.state.selectedId)}
         canRestart={this._hasSelectedDebugger()}
@@ -550,6 +588,15 @@ export default class Debugger extends React.Component<Props, State> {
   _forgetDebugger = (id: DebuggerId) => {
     this._forgetRecordedData(id);
     this._debuggerLogs.delete(id);
+    this.setState(state => {
+      const importedRecordings = { ...state.importedRecordings };
+      delete importedRecordings[id];
+      return {
+        importedRecordings,
+        baselineDebuggerId:
+          state.baselineDebuggerId === id ? null : state.baselineDebuggerId,
+      };
+    });
     this.setState(
       state => {
         const debuggerStatus = { ...state.debuggerStatus };
@@ -624,9 +671,115 @@ export default class Debugger extends React.Component<Props, State> {
     return !!status && !status.isInGameEdition;
   };
 
-  /** True when there is something to show: a running game, or a closed one whose data is kept. */
+  /** An imported recording, read only: nothing can be played or recorded on it. */
+  _isImportedDebugger = (id: DebuggerId): boolean =>
+    !!this.state.importedRecordings[id];
+
+  /**
+   * True when there is something to show: a running game, a closed one whose
+   * data is kept, or a recording read from a file.
+   */
   _canShowSelectedDebugger = (): boolean =>
-    this._hasSelectedDebugger() || this._hasKeptDataForSelectedDebugger();
+    this._hasSelectedDebugger() ||
+    this._hasKeptDataForSelectedDebugger() ||
+    this._isImportedDebugger(this.state.selectedId);
+
+  /**
+   * Write everything recorded about a preview to a file the user keeps where
+   * they want: nothing of the debugger is ever stored in the project.
+   */
+  _exportRecording = async (id: DebuggerId) => {
+    const { project } = this.props;
+    const resourcesDebugSnapshot = this.state.resourcesDebugSnapshots[id];
+    try {
+      const file = makeDebuggerRecordingFile({
+        projectName: project.getName(),
+        recording: this._profilerRecordingStore.getRecording(id),
+        resourcesDebugState: resourcesDebugSnapshot
+          ? resourcesDebugSnapshot.state
+          : null,
+        logs: this._getLogsManager(id).logs,
+      });
+      await exportDebuggerRecording(file);
+    } catch (error) {
+      console.error('Unable to export the recorded data:', error);
+      this.setState({
+        importError: 'The recorded data could not be written to a file.',
+      });
+    }
+  };
+
+  /**
+   * Read a recording from a file and show it as a game of its own, read
+   * only: it is selected right away, which is what the user asked for.
+   */
+  _importRecording = async () => {
+    let file;
+    try {
+      file = await importDebuggerRecording();
+    } catch (error) {
+      console.error('Unable to import a recording:', error);
+      this.setState({
+        importError:
+          error instanceof DebuggerRecordingFileError
+            ? error.message
+            : 'This file could not be read as a recording.',
+      });
+      return;
+    }
+    if (!file) return;
+
+    const recording = getRecordingFromFile(file);
+    if (!recording) {
+      this.setState({ importError: 'This recording holds no frames.' });
+      return;
+    }
+
+    const id = `imported:${++this._importedRecordingsCount}`;
+    this._profilerRecordingStore.setRecording(id, recording);
+    if (file.resources) {
+      const resourcesDebugState = file.resources;
+      this.setState(state => ({
+        resourcesDebugSnapshots: {
+          ...state.resourcesDebugSnapshots,
+          [id]: { state: resourcesDebugState, lastError: null },
+        },
+      }));
+    }
+    const logsManager = this._getLogsManager(id);
+    // The console keeps its logs newest first, and adding one puts it on
+    // top: they are replayed oldest first to come back in their own order.
+    logsManager.logs.length = 0;
+    file.logs
+      .slice()
+      .reverse()
+      .forEach(log => logsManager.addLog(log));
+
+    this.setState(
+      state => ({
+        importedRecordings: {
+          ...state.importedRecordings,
+          [id]: file ? file.metadata : state.importedRecordings[id],
+        },
+        selectedId: id,
+        importError: null,
+      }),
+      () => this.updateToolbar()
+    );
+  };
+
+  /**
+   * Keep a recording as the reference every panel compares to, so that what
+   * an optimisation changed is read as a difference and not from memory.
+   */
+  _toggleBaseline = (id: DebuggerId) => {
+    this.setState(
+      state => ({
+        baselineDebuggerId: state.baselineDebuggerId === id ? null : id,
+      }),
+      () => this.updateToolbar()
+    );
+  };
 
   /**
    * Restart the game from scratch: caches emptied, resources downloaded
@@ -750,7 +903,63 @@ export default class Debugger extends React.Component<Props, State> {
       profilingInProgress,
       resourcesDebugSnapshots,
       debuggerIds,
+      importedRecordings,
+      baselineDebuggerId,
+      importError,
     } = this.state;
+    const isImportedRecordingSelected = !!importedRecordings[selectedId];
+    // What each imported recording is called in the selector: the run it
+    // holds, not the file it came from, which the user may have renamed.
+    const importedRecordingLabels = {};
+    Object.keys(importedRecordings).forEach(id => {
+      const metadata = importedRecordings[id];
+      const date = (metadata.exportedAt || '').slice(0, 10);
+      importedRecordingLabels[id] = `${metadata.projectName ||
+        'Recording'} - ${date} (imported)`;
+    });
+    // Compared to another recording, unless it is the reference itself.
+    const baselineRecording =
+      baselineDebuggerId && baselineDebuggerId !== selectedId
+        ? this._profilerRecordingStore.getRecording(baselineDebuggerId)
+        : null;
+    // Two runs are only worth comparing when they were played on the same
+    // machine, by the same editor, and long enough to mean something.
+    const baselineMetadata = baselineDebuggerId
+      ? importedRecordings[baselineDebuggerId]
+      : null;
+    const comparisonWarnings = [];
+    if (baselineRecording) {
+      if (
+        baselineMetadata &&
+        baselineMetadata.ideVersion &&
+        baselineMetadata.ideVersion !== getIDEVersion()
+      ) {
+        comparisonWarnings.push(
+          <Trans key="ide-version">
+            The reference was recorded with another version of GDevelop.
+          </Trans>
+        );
+      }
+      if (
+        baselineMetadata &&
+        baselineMetadata.userAgent &&
+        typeof navigator !== 'undefined' &&
+        baselineMetadata.userAgent !== navigator.userAgent
+      ) {
+        comparisonWarnings.push(
+          <Trans key="user-agent">
+            The reference was recorded on another machine or browser.
+          </Trans>
+        );
+      }
+      if (baselineRecording.frames.length < MINIMUM_COMPARABLE_FRAMES_COUNT) {
+        comparisonWarnings.push(
+          <Trans key="short-reference">
+            The reference holds few frames: what it averages is unreliable.
+          </Trans>
+        );
+      }
+    }
 
     if (debuggerServerState === 'stopped' && debuggerServerError) {
       return (
@@ -814,6 +1023,7 @@ export default class Debugger extends React.Component<Props, State> {
             selectedId={selectedId}
             debuggerStatus={debuggerStatus}
             connectedDebuggerIds={debuggerIds}
+            importedRecordingLabels={importedRecordingLabels}
             onChooseDebugger={id =>
               this.setState(
                 {
@@ -834,6 +1044,38 @@ export default class Debugger extends React.Component<Props, State> {
               asks for more: it can run slower than it would on its own.
             </Trans>
           </DismissableAlertMessage>
+          {comparisonWarnings.length > 0 && (
+            <AlertMessage kind="warning">
+              {comparisonWarnings.map(warning => (
+                <div key={warning.key}>{warning}</div>
+              ))}
+            </AlertMessage>
+          )}
+          {importError && (
+            <AlertMessage
+              kind="error"
+              onHide={() => this.setState({ importError: null })}
+            >
+              {importError}
+            </AlertMessage>
+          )}
+          {isImportedRecordingSelected && (
+            <AlertMessage
+              kind="info"
+              renderRightButton={() => (
+                <FlatButton
+                  label={<Trans>Close</Trans>}
+                  onClick={() => this._clear(selectedId)}
+                />
+              )}
+            >
+              <Trans>
+                This recording was read from a file: it is read only, and it is
+                gone from the editor once closed. The file it came from is
+                untouched.
+              </Trans>
+            </AlertMessage>
+          )}
           {this._hasKeptDataForSelectedDebugger() && (
             <AlertMessage
               kind="info"
@@ -866,6 +1108,7 @@ export default class Debugger extends React.Component<Props, State> {
               onEdit={(path, args) => this._edit(selectedId, path, args)}
               onCall={(path, args) => this._call(selectedId, path, args)}
               profilingInProgress={!!profilingInProgress[selectedId]}
+              baselineRecording={baselineRecording}
               canRecord={canRecord}
               onStartRecording={() => this._startProfiler(selectedId)}
               profilerRecordingStore={this._profilerRecordingStore}

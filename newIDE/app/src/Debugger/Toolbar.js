@@ -57,6 +57,14 @@ type Props = {|
   canRecord: boolean,
   onStartRecording: () => void,
   onStopRecording: () => void,
+  // The recorded data, kept outside of the project: exported to a file the
+  // user stores where they want, and read back from it.
+  canExportRecording: boolean,
+  onExportRecording: () => void,
+  onImportRecording: () => void,
+  canCompareToBaseline: boolean,
+  isBaseline: boolean,
+  onToggleBaseline: () => void,
   // The panels.
   isInspectorShown: boolean,
   onToggleInspector: () => void,
@@ -109,6 +117,12 @@ export class Toolbar extends React.PureComponent<Props> {
       canRecord,
       onStartRecording,
       onStopRecording,
+      canExportRecording,
+      onExportRecording,
+      onImportRecording,
+      canCompareToBaseline,
+      isBaseline,
+      onToggleBaseline,
       onToggleInspector,
       canOpenInspector,
       isInspectorShown,
@@ -173,6 +187,14 @@ export class Toolbar extends React.PureComponent<Props> {
             },
           ]
         : []),
+      // Importing lives here rather than in the record menu: that one is
+      // disabled while no game runs, which is exactly when a recording taken
+      // weeks ago is opened.
+      { type: 'separator' },
+      {
+        label: i18n._(t`Import a recording…`),
+        click: onImportRecording,
+      },
     ];
 
     const recordMenuTemplate = (i18n: I18nType): Array<MenuItemTemplate> => [
@@ -181,6 +203,19 @@ export class Toolbar extends React.PureComponent<Props> {
         label: i18n._(t`Clear the recorded data when recording again`),
         checked: shouldClearOnRecord,
         click: onToggleClearOnRecord,
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Export the recorded data…`),
+        click: onExportRecording,
+        enabled: canExportRecording,
+      },
+      {
+        type: 'checkbox',
+        label: i18n._(t`Compare the other recordings to this one`),
+        checked: isBaseline,
+        click: onToggleBaseline,
+        enabled: canCompareToBaseline,
       },
       { type: 'separator' },
       {

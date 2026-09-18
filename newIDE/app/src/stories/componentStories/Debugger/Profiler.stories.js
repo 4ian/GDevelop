@@ -24,6 +24,8 @@ const recordingStore = new ProfilerRecordingStore();
 recordingStore.onStarted('0', { recordingId: 1, startedAtGameTimeMs: 2500 });
 const shortRecordingStore = makeFakeRecordingStore(5000);
 const longRecordingStore = makeFakeRecordingStore(120000);
+// A second run, to serve as the reference a recording is compared to.
+const baselineRecordingStore = makeFakeRecordingStore(7000, '0');
 
 export const NeverRecorded = (): React.Node => (
   <FixedHeightFlexContainer height={550}>
@@ -77,6 +79,17 @@ export const WithARecordingInAShortPanel = (): React.Node => (
 );
 
 /** The width of the profiler pane of the debugger, in its default layout. */
+export const ComparedToABaseline = () => (
+  <FixedHeightFlexContainer height={600}>
+    <Profiler
+      {...profilerProps}
+      recordingStore={shortRecordingStore}
+      profilingInProgress={false}
+      baselineRecording={baselineRecordingStore.getRecording('0')}
+    />
+  </FixedHeightFlexContainer>
+);
+
 export const WithARecordingInANarrowPanel = (): React.Node => (
   <FixedWidthFlexContainer width={340}>
     <FixedHeightFlexContainer height={550}>

@@ -213,6 +213,16 @@ export class ProfilerRecordingStore {
     this._notify(true);
   }
 
+  /**
+   * Put a whole recording in place, as read from a file. Chunks are not
+   * replayed: they would have to be cut up again and their name ids shifted,
+   * for a recording nothing will ever be appended to.
+   */
+  setRecording(debuggerId: DebuggerId, recording: ProfilerRecording) {
+    this._recordings.set(debuggerId, recording);
+    this._notify(true);
+  }
+
   clear(debuggerId: DebuggerId) {
     if (this._recordings.delete(debuggerId)) {
       this._notify(true);

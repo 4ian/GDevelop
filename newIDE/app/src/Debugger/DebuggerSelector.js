@@ -14,6 +14,8 @@ type Props = {|
   debuggerStatus: { [DebuggerId]: DebuggerStatus },
   /** The games still running: the others were closed, their data is kept. */
   connectedDebuggerIds: Array<DebuggerId>,
+  /** The recordings read from a file, named after the run they hold. */
+  importedRecordingLabels: { [DebuggerId]: string },
   onChooseDebugger: DebuggerId => void,
 |};
 
@@ -23,7 +25,9 @@ export default class DebuggerSelector extends React.Component<Props, void> {
     const debuggerIdsWithoutInGameEdition = debuggerIds.filter(
       id => !this.props.debuggerStatus[id].isInGameEdition
     );
-    const hasDebuggers = !!debuggerIdsWithoutInGameEdition.length;
+    const importedIds = Object.keys(this.props.importedRecordingLabels);
+    const hasDebuggers =
+      !!debuggerIdsWithoutInGameEdition.length || !!importedIds.length;
     return (
       <I18n>
         {({ i18n }) => (
@@ -49,6 +53,14 @@ export default class DebuggerSelector extends React.Component<Props, void> {
                 />
               );
             })}
+            {importedIds.map(id => (
+              <SelectOption
+                value={id}
+                key={id}
+                label={this.props.importedRecordingLabels[id]}
+                shouldNotTranslate
+              />
+            ))}
             {!hasDebuggers && (
               <SelectOption
                 value={0}

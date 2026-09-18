@@ -30,7 +30,10 @@ import ResourcesPanel from './Resources';
 import { getMemoryLimitBytes } from './Resources/ResourcesDebugTypes';
 import { DebuggerConsole, type LogsManager } from './DebuggerConsole';
 import { type ResourcesDebugSnapshot } from '.';
-import { ProfilerRecordingStore } from './ProfilerRecording/ProfilerRecordingStore';
+import {
+  ProfilerRecordingStore,
+  type ProfilerRecording,
+} from './ProfilerRecording/ProfilerRecordingStore';
 import { type DebuggerId } from '../ExportAndShare/PreviewLauncher.flow';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import MiniToolbar from '../UI/MiniToolbar';
@@ -46,6 +49,8 @@ type Props = {|
   /** Read what is at this path in the running game, for the live inspector. */
   onInspectPath: (path: Array<string>) => Promise<Object | null>,
   profilingInProgress: boolean,
+  /** The recording every panel compares this one to, if one was pinned. */
+  baselineRecording: ?ProfilerRecording,
   canRecord: boolean,
   onStartRecording: () => void,
   profilerRecordingStore: ProfilerRecordingStore,
@@ -228,6 +233,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
       onCall,
       onEdit,
       profilingInProgress,
+      baselineRecording,
       canRecord,
       onStartRecording,
       profilerRecordingStore,
@@ -367,6 +373,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
             debuggerId={debuggerId}
             canRecord={canRecord}
             onStartRecording={onStartRecording}
+            baselineRecording={baselineRecording}
           />
         ),
       },
@@ -381,6 +388,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
             memoryLimitBytes={memoryLimitBytes || null}
             canRecord={canRecord}
             onStartRecording={onStartRecording}
+            baselineRecording={baselineRecording}
           />
         ),
       },

@@ -13,14 +13,16 @@ import IconButton from '../UI/IconButton';
 import HelpButton from '../UI/HelpButton';
 import SemiControlledAutoComplete, {
   type DataSource,
+  type SemiControlledAutoCompleteInterface,
 } from '../UI/SemiControlledAutoComplete';
 import AddIcon from '../UI/CustomSvgIcons/Add';
-import SearchIcon from '../UI/CustomSvgIcons/Search';
+import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { tooltipEnterDelay } from '../UI/Tooltip';
 import SelectField from '../UI/SelectField';
-import TextField from '../UI/TextField';
 import SelectOption from '../UI/SelectOption';
 import TrashIcon from '../UI/CustomSvgIcons/Trash';
+import SceneIcon from '../UI/CustomSvgIcons/Scene';
+import CompactSearchBar from '../UI/CompactSearchBar';
 import { getVariableTypeToIcon } from '../VariablesList/VariableTypeSelector';
 import { enumerateVariablesOfContainersList } from '../EventsSheet/ParameterFields/EnumerateVariables';
 import { getVariableSourceIcon } from '../EventsSheet/ParameterFields/VariableField';
@@ -82,6 +84,8 @@ type WatchedItem = {|
   instancesCount?: ?number,
   /** On the last row: how many instances are not listed. */
   hiddenInstancesCount?: number,
+  /** How deep the tree view indents the row: 0 for a watched variable. */
+  depth: number,
   children: ?Array<WatchedItem>,
 |};
 
@@ -110,7 +114,8 @@ const getValueType = (value: any): Variable_Type => {
 const buildChildrenItems = (
   parentId: string,
   value: any,
-  isMissing: boolean
+  isMissing: boolean,
+  depth: number
 ): ?Array<WatchedItem> => {
   if (!isTree(value)) return null;
   const childrenNames = Array.isArray(value)
@@ -132,7 +137,8 @@ const buildChildrenItems = (
       hasValue: true,
       value: childValue,
       isMissing,
-      children: buildChildrenItems(id, childValue, isMissing),
+      depth,
+      children: buildChildrenItems(id, childValue, isMissing, depth + 1),
     };
   });
 };
@@ -147,14 +153,15 @@ const buildInstanceItems = (
   instances: Array<InstanceEvaluation>,
   sourceType: VariablesContainer_SourceType,
   isMissing: boolean,
-  filter: string
+  filter: string,
+  depth: number
 ): Array<WatchedItem> => {
   const lowerCaseFilter = filter.trim().toLowerCase();
   const matchingInstances = lowerCaseFilter
     ? instances.filter(
         instance =>
           String(instance.id).includes(lowerCaseFilter) ||
-          formatEvaluationValue(instance.result)
+          formatEvaluationValue(instance.result, 200, false)
             .toLowerCase()
             .includes(lowerCaseFilter)
       )
@@ -174,7 +181,8 @@ const buildInstanceItems = (
         hasValue: true,
         value: instance.result,
         isMissing,
-        children: buildChildrenItems(id, instance.result, isMissing),
+        depth,
+        children: buildChildrenItems(id, instance.result, isMissing, depth + 1),
       };
     });
 
@@ -191,11 +199,23 @@ const buildInstanceItems = (
       hasValue: false,
       value: undefined,
       isMissing: false,
+      depth,
       children: null,
     });
   }
   return items;
 };
+
+/**
+ * How much the tree view indents a row, in pixels. The column of the values is
+ * aligned on the panel, not on the row: it has to add back what the
+ * indentation took from the left of the row.
+ */
+const TREE_VIEW_INDENT_PER_DEPTH = 16;
+
+const getRowIndentStyle = (item: WatchedItem) => ({
+  '--row-indent': `${item.depth * TREE_VIEW_INDENT_PER_DEPTH}px`,
+});
 
 const variableNamesSort = (first: string, second: string) =>
   first.toLowerCase().localeCompare(second.toLowerCase());
@@ -385,13 +405,9 @@ const WatchedVariablesPanel = ({
   const [perInstanceExpressions, setPerInstanceExpressions] = React.useState<
     Array<string>
   >([]);
-  const [instancesFilter, setInstancesFilter] = React.useState<string>('');
-  // The filter takes a whole row of the panel: it is only there when asked
-  // for, from the row whose instances are listed.
-  const [
-    isInstancesFilterShown,
-    setIsInstancesFilterShown,
-  ] = React.useState<boolean>(false);
+  // Searches the watched variables by name, and the instances of an object by
+  // id or by value: one field for the whole panel.
+  const [searchText, setSearchText] = React.useState<string>('');
   const [runningSceneName, setRunningSceneName] = React.useState<string | null>(
     () => store.getRunningSceneName()
   );
@@ -426,6 +442,17 @@ const WatchedVariablesPanel = ({
     Array<string>
   >(() => store.getWatchedExpressions());
   const [newExpression, setNewExpression] = React.useState<string>('');
+  // The field reports what was typed just before asking for it to be applied,
+  // in the same run: the state is not up to date yet at that point, so the
+  // last value is kept here to be read right away. Without it, pressing Enter
+  // added the value of the previous keystroke, and the field had to be
+  // validated once more to be added.
+  const newExpressionRef = React.useRef<string>('');
+  // The field keeps its own value while it has the focus: emptying the state
+  // is not enough to clear what is written in it once it was added.
+  const newExpressionFieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(
+    null
+  );
   const [evaluations, setEvaluations] = React.useState<{
     [expression: string]: ExpressionEvaluation | null,
   }>({});
@@ -494,7 +521,10 @@ const WatchedVariablesPanel = ({
       if (!trimmedExpression) return;
       store.addWatchedExpression(trimmedExpression);
       setWatchedExpressions(store.getWatchedExpressions());
+      newExpressionRef.current = '';
       setNewExpression('');
+      if (newExpressionFieldRef.current)
+        newExpressionFieldRef.current.forceInputValueTo('');
     },
     [store]
   );
@@ -603,6 +633,11 @@ const WatchedVariablesPanel = ({
             !evaluation.error &&
             evaluation.result === undefined);
         const rootId = `root:${expression}`;
+        // A search naming the variable itself leaves its instances alone: it
+        // asks for that variable, not for some of its instances.
+        const doesNameMatchSearch = expression
+          .toLowerCase()
+          .includes(searchText.trim().toLowerCase());
         const instanceItems =
           evaluation && evaluation.instances
             ? buildInstanceItems(
@@ -610,7 +645,8 @@ const WatchedVariablesPanel = ({
                 evaluation.instances,
                 sourceType,
                 isMissing,
-                instancesFilter
+                doesNameMatchSearch ? '' : searchText,
+                1
               )
             : null;
         return {
@@ -623,6 +659,7 @@ const WatchedVariablesPanel = ({
           value: evaluation ? evaluation.result : undefined,
           instancesCount: evaluation ? evaluation.instancesCount : undefined,
           isMissing,
+          depth: 0,
           // Asked instance by instance: the instances replace the children of
           // the first one, which are shown under each of them instead. While
           // they are on their way, a placeholder stands for them: a row with
@@ -642,15 +679,32 @@ const WatchedVariablesPanel = ({
                     hasValue: false,
                     value: undefined,
                     isMissing: false,
+                    depth: 1,
                     children: null,
                   },
                 ]
               : evaluation
-              ? buildChildrenItems(rootId, evaluation.result, isMissing)
+              ? buildChildrenItems(rootId, evaluation.result, isMissing, 1)
               : null),
         };
       }),
-    [watchedExpressions, projectScopedContainers, evaluations, instancesFilter]
+    [watchedExpressions, projectScopedContainers, evaluations, searchText]
+  );
+
+  // What the search keeps: a watched variable whose name matches, or one
+  // whose instances still have a row matching, so that searching an id or a
+  // value finds the variable that holds it.
+  const shownItems = React.useMemo(
+    () => {
+      const lowerCaseSearchText = searchText.trim().toLowerCase();
+      if (!lowerCaseSearchText) return items;
+      return items.filter(
+        item =>
+          item.name.toLowerCase().includes(lowerCaseSearchText) ||
+          (item.children || []).length > 0
+      );
+    },
+    [items, searchText]
   );
 
   /**
@@ -700,7 +754,9 @@ const WatchedVariablesPanel = ({
       <Text noMargin size="body2" color="inherit">
         {isTree(item.value)
           ? summarizeTree(item.value)
-          : formatEvaluationValue(item.value)}
+          : // The icon of the type is right next to the value: the quotes
+            // around a string would only add noise.
+            formatEvaluationValue(item.value, 200, false)}
       </Text>
     );
   };
@@ -712,7 +768,7 @@ const WatchedVariablesPanel = ({
   const renderItemName = (item: WatchedItem) => {
     if (item.isPlaceholder) {
       return (
-        <div className={classes.row}>
+        <div className={classes.row} style={getRowIndentStyle(item)}>
           <span className={classes.rowIcon} />
           <Text noMargin size="body2" color="secondary">
             <Trans>Reading the instances...</Trans>
@@ -723,7 +779,7 @@ const WatchedVariablesPanel = ({
     if (item.isMoreRow) {
       const hiddenInstancesCount = item.hiddenInstancesCount || 0;
       return (
-        <div className={classes.row}>
+        <div className={classes.row} style={getRowIndentStyle(item)}>
           <span className={classes.rowIcon} />
           <Text noMargin size="body2" color="secondary">
             <Trans>and {hiddenInstancesCount} more</Trans>
@@ -732,11 +788,14 @@ const WatchedVariablesPanel = ({
       );
     }
     const VariableIcon = getVariableSourceIcon(item.sourceType);
+    const hasSeveralInstances =
+      !!item.expression && (item.instancesCount || 0) > 1;
     return (
       <div
         className={classNames(classes.row, {
           [classes.missing]: item.isMissing,
         })}
+        style={getRowIndentStyle(item)}
       >
         {/* The row carries the icon of what it watches: the kind of variable
             for a watched expression, the instance variable icon for each of
@@ -753,70 +812,55 @@ const WatchedVariablesPanel = ({
             {item.name}
           </Text>
         </span>
-        {item.hasValue && (
-          <span className={classes.rowType}>
-            {React.createElement(
-              getVariableTypeToIcon()[getValueType(item.value)],
-              {
-                fontSize: 'small',
-              }
-            )}
-          </span>
-        )}
         <span className={classes.rowSeparator} />
-        <span
-          className={classNames(classes.rowValue, {
-            [classes.error]: !!item.error,
-          })}
-          title={
-            item.error ||
-            (item.hasValue
-              ? formatEvaluationValue(item.value, 2000)
-              : undefined)
-          }
-        >
-          {renderValue(item)}
-        </span>
-        {item.expression && (item.instancesCount || 0) > 1 && (
-          <I18n>
-            {({ i18n }: {| i18n: I18nType |}) => (
-              <Tooltip
-                title={i18n._(
-                  t`The value of the first instance: unfold the row to see the value of each of them.`
-                )}
-                placement="bottom-end"
-                enterDelay={tooltipEnterDelay}
-              >
-                {/* Next to the value, where the doubt is: this value is the
-                    one of a single instance among several. */}
-                <span className={classes.rowFirstInstance}>
-                  <FirstInstanceVariableIcon />
-                </span>
-              </Tooltip>
-            )}
-          </I18n>
-        )}
-        {item.expression && (item.instancesCount || 0) > 1 && (
-          <span className={classes.rowFilter}>
-            <IconButton
-              size="small"
-              tooltip={
-                isInstancesFilterShown
-                  ? t`Hide the filter of the instances`
-                  : t`Filter the instances`
-              }
-              onClick={() => {
-                setIsInstancesFilterShown(wasShown => {
-                  // Leaving the filter hides what it was hiding.
-                  if (wasShown) setInstancesFilter('');
-                  return !wasShown;
-                });
-              }}
-            >
-              <SearchIcon />
-            </IconButton>
+        {/* The values all start at the same place, whatever the depth of the
+            row: they can be compared by reading straight down. */}
+        <span className={classes.rowValueColumn}>
+          {hasSeveralInstances ? (
+            <I18n>
+              {({ i18n }: {| i18n: I18nType |}) => (
+                <Tooltip
+                  title={i18n._(
+                    t`The value of the first instance: unfold the row to see the value of each of them.`
+                  )}
+                  placement="bottom-end"
+                  enterDelay={tooltipEnterDelay}
+                >
+                  {/* Next to the value, where the doubt is: this value is the
+                      one of a single instance among several. */}
+                  <span className={classes.rowFirstInstance}>
+                    <FirstInstanceVariableIcon />
+                  </span>
+                </Tooltip>
+              )}
+            </I18n>
+          ) : (
+            <span className={classes.rowFirstInstance} />
+          )}
+          {item.hasValue && (
+            <span className={classes.rowType}>
+              {React.createElement(
+                getVariableTypeToIcon()[getValueType(item.value)],
+                {
+                  fontSize: 'small',
+                }
+              )}
+            </span>
+          )}
+          <span
+            className={classNames(classes.rowValue, {
+              [classes.error]: !!item.error,
+            })}
+            title={
+              item.error ||
+              (item.hasValue
+                ? formatEvaluationValue(item.value, 2000, false)
+                : undefined)
+            }
+          >
+            {renderValue(item)}
           </span>
-        )}
+        </span>
 
         <span className={classes.rowDelete}>
           {item.expression && (
@@ -846,7 +890,18 @@ const WatchedVariablesPanel = ({
       onSizeChanged={setWatchedVariablesPanelSize}
     >
       <div className={classes.content}>
+        <div className={classes.searchRow}>
+          <CompactSearchBar
+            value={searchText}
+            onChange={setSearchText}
+            placeholder={t`Search a variable, an instance or a value`}
+          />
+        </div>
         <div className={classes.addRow}>
+          {/* The scene the values are read in, named by its icon. */}
+          <span className={classes.sceneIcon}>
+            <SceneIcon />
+          </span>
           <div className={classes.addRowField}>
             <SelectField
               margin="none"
@@ -882,16 +937,32 @@ const WatchedVariablesPanel = ({
               })}
             </SelectField>
           </div>
-          <div className={classes.addRowField}>
+          <div
+            className={classes.addRowField}
+            onKeyDown={event => {
+              // The autocomplete only applies on Ctrl+Enter, while a plain
+              // Enter is what anybody types to add what they just wrote.
+              if (shouldValidate(event))
+                addExpression(newExpressionRef.current);
+            }}
+          >
             <SemiControlledAutoComplete
+              ref={newExpressionFieldRef}
               margin="none"
               id="watched-variables-new-expression"
-              hintText={t`Variable to watch`}
+              hintText={t`Add a variable to watch`}
               value={newExpression}
-              onChange={setNewExpression}
+              onChange={value => {
+                newExpressionRef.current = value;
+                setNewExpression(value);
+              }}
               onChoose={addExpression}
-              onApply={() => addExpression(newExpression)}
+              onApply={() => addExpression(newExpressionRef.current)}
               dataSource={variablesDataSource}
+              // Reported at each keystroke, so that the button next to the
+              // field follows what is typed instead of waiting for the field
+              // to be validated or left.
+              commitOnInputChange
               openOnFocus
               fullWidth
             />
@@ -899,28 +970,12 @@ const WatchedVariablesPanel = ({
           <IconButton
             size="small"
             tooltip={t`Watch this variable`}
-            onClick={() => addExpression(newExpression)}
+            onClick={() => addExpression(newExpressionRef.current)}
             disabled={!newExpression.trim()}
           >
             <AddIcon />
           </IconButton>
         </div>
-        {/* Only when asked for from a row listing its instances: a filter
-            over nothing would just take room. */}
-        {isInstancesFilterShown && perInstanceExpressions.length > 0 && (
-          <div className={classes.addRow}>
-            <div className={classes.addRowField}>
-              <TextField
-                margin="none"
-                value={instancesFilter}
-                onChange={(event, value) => setInstancesFilter(value)}
-                translatableHintText={t`Filter the instances by id or value`}
-                autoFocus="desktop"
-                fullWidth
-              />
-            </div>
-          </div>
-        )}
         {watchedExpressions.length === 0 ? (
           <div className={classes.emptyState}>
             <Text size="body2" color="secondary" align="center">
@@ -940,7 +995,7 @@ const WatchedVariablesPanel = ({
                 <ReadOnlyTreeView
                   height={height}
                   width={width}
-                  items={items}
+                  items={shownItems}
                   estimatedItemSize={ITEM_HEIGHT}
                   getItemHeight={() => ITEM_HEIGHT}
                   shouldApplySearchToItem={() => true}

@@ -297,6 +297,7 @@ describe('SimplifiedProject', () => {
             "version": "1.0.0",
           },
         ],
+        "externalLayouts": Array [],
         "globalObjectGroups": Array [],
         "globalObjects": Array [
           Object {

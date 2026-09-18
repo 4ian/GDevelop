@@ -814,7 +814,9 @@ describe('scoped instances, layers and groups', () => {
     });
 
     it('refuses a scope type that is not allowed by the function', async () => {
-      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_scene_properties_layers_effects.launchFunction(
+      // Objects live in scenes and variants: an external layout only holds
+      // instances of the objects of its scene.
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
@@ -822,6 +824,7 @@ describe('scoped instances, layers and groups', () => {
               type: 'external_layout',
               external_layout_name: 'LevelChunk',
             },
+            object_name: 'Player',
           },
         }
       );

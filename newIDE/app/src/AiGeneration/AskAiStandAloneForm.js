@@ -160,7 +160,8 @@ export const AskAiStandAloneForm = ({
     () => ({
       onOpenLayout,
       onCreateProject,
-      // The stand-alone form has no extension editors to open.
+      // The stand-alone form has no external layout or extension editors to open.
+      onOpenExternalLayout: () => {},
       onOpenEventsFunctionsExtension: () => {},
       onOpenCustomObjectEditor: () => {},
     }),
@@ -566,6 +567,8 @@ export const AskAiStandAloneForm = ({
       editorFunctionCallResults: Array<EditorFunctionCallResult>,
       options: {|
         createdSceneNames?: Array<string>,
+        // Not opened by the stand-alone form (no editor to open them in).
+        createdExternalLayoutNames?: Array<string>,
         createdProject?: ?gdProject,
       |}
     ) => {

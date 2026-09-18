@@ -73,6 +73,7 @@ export type CappedRunScriptOutput = {|
   error: ScriptExecutionError | null,
   didModifyProject: boolean,
   newSceneNames: Array<string>,
+  newExternalLayoutNames: Array<string>,
 |};
 
 export const capScriptExecutionResult = (
@@ -159,5 +160,6 @@ export const capScriptExecutionResult = (
     error: result.error,
     didModifyProject,
     newSceneNames: result.newSceneNames || [],
+    newExternalLayoutNames: result.newExternalLayoutNames || [],
   };
 };

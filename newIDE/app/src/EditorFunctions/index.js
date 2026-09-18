@@ -109,6 +109,10 @@ import {
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
 import {
+  moveInstancesToScope,
+  type MoveInstancesOutputFields,
+} from './MoveInstances';
+import {
   getSceneNotFoundMessage,
   resolveScopeFromArgs,
   getNamedVariantRejection,
@@ -219,6 +223,9 @@ export type EditorFunctionGenericOutput = {|
   success: boolean,
   meta?: {
     newSceneNames?: Array<string>,
+    // External layouts created by the call (`create_scene` with
+    // `as_external_layout_of_scene`): opened by the editor like new scenes.
+    newExternalLayoutNames?: Array<string>,
     createdProject?: gdProject,
     // For `run_script`: true when ANY call the script made modified the
     // project (so the editor refreshes even if the script ultimately failed).
@@ -265,6 +272,12 @@ export type EditorFunctionGenericOutput = {|
   layers?: any,
   effects?: any,
   sceneNames?: Array<string>,
+  // `inspect_project_properties_resources`: the external layouts of the project.
+  externalLayouts?: Array<{|
+    name: string,
+    associatedScene: string,
+    instancesCount: number,
+  |}>,
   resources?: any,
   resourcesSummary?: any,
   behaviors?: Array<SimplifiedBehavior>,
@@ -334,6 +347,13 @@ export type EditorFunctionGenericOutput = {|
   instancesForExternalLayoutNamed?: string,
   instancesForScopeLabel?: string,
   propertiesLayersEffectsForScopeLabel?: string,
+  // `inspect_scene_properties_layers_effects` on an external layout: its
+  // name, with the layers of its associated scene (and a note saying so).
+  propertiesLayersEffectsForExternalLayoutNamed?: string,
+  layersNote?: string,
+  // `change_scene_properties_layers_effects_groups.move_instances`.
+  movedInstancesCount?: number,
+  movedInstancesCountByObjectName?: { [objectName: string]: number },
   // `inspect_scene_properties_layers_effects` on a custom object variant: a
   // variant has no scene properties, but an area, groups and an asset store id.
   isDefaultVariant?: boolean,
@@ -445,6 +465,7 @@ export type EditorCallbacks = {|
         | 'none',
     |}
   ) => void,
+  onOpenExternalLayout: (externalLayoutName: string) => void,
   onCreateProject: ({|
     name: string,
     exampleSlug: string | null,
@@ -7283,11 +7304,109 @@ See errors; verify event contents if needed.`
 };
 
 /**
- * Creates a new, empty scene
+ * `create_scene` with `as_external_layout_of_scene`: an external layout (a
+ * set of instances apart from a scene, using its objects and layers, created
+ * in the game by the "Create objects from an external layout" action).
+ */
+const createExternalLayout = ({
+  project,
+  externalLayoutName,
+  associatedSceneName,
+  ignoredArgumentNames,
+}: {|
+  project: gdProject,
+  externalLayoutName: string,
+  associatedSceneName: string,
+  ignoredArgumentNames: Array<string>,
+|}): EditorFunctionGenericOutput => {
+  if (!project.hasLayoutNamed(associatedSceneName)) {
+    return makeGenericFailure(
+      `${getSceneNotFoundMessage(
+        project,
+        associatedSceneName
+      )} \`as_external_layout_of_scene\` must name the existing scene whose objects and layers the external layout uses.`
+    );
+  }
+  // Scenes and external layouts have separate namespaces, but the same name
+  // for both is a recipe for confusion in the events (`Scene("X")` vs
+  // `CreateObjectsFromExternalLayout("X")`): refuse it.
+  if (project.hasLayoutNamed(externalLayoutName)) {
+    return makeGenericFailure(
+      `A scene is already named "${externalLayoutName}": choose another name for the external layout.`
+    );
+  }
+  const ignoredSuffix =
+    ignoredArgumentNames.length > 0
+      ? ` (${ignoredArgumentNames.join(
+          ', '
+        )} ignored: an external layout has no layers or properties of its own).`
+      : '';
+  const howToUseSuffix =
+    ` Its instances use the objects and layers of scene "${associatedSceneName}": place them with \`put_2d_instances\`/\`put_3d_instances\` (or move existing ones with \`change_scene_properties_layers_effects_groups.move_instances\`) using scope { type: "external_layout", external_layout_name: "${externalLayoutName}" }.` +
+    ` The scene creates them at runtime with the action \`CreateObjectsFromExternalLayout("${externalLayoutName}", 0, 0)\`.`;
+
+  if (project.hasExternalLayoutNamed(externalLayoutName)) {
+    const externalLayout = project.getExternalLayout(externalLayoutName);
+    const currentAssociatedSceneName = externalLayout.getAssociatedLayout();
+    if (currentAssociatedSceneName === associatedSceneName) {
+      return makeGenericSuccess(
+        `External layout "${externalLayoutName}" already exists (for scene "${associatedSceneName}").${ignoredSuffix}`
+      );
+    }
+    return makeGenericFailure(
+      `External layout "${externalLayoutName}" already exists${
+        currentAssociatedSceneName
+          ? ` and is associated with scene "${currentAssociatedSceneName}"`
+          : ' (with no associated scene)'
+      }. To change its scene, set its \`associatedScene\` property with \`change_scene_properties_layers_effects_groups\`.`
+    );
+  }
+
+  const externalLayout = project.insertNewExternalLayout(
+    externalLayoutName,
+    project.getExternalLayoutsCount()
+  );
+  externalLayout.setAssociatedLayout(associatedSceneName);
+  return {
+    success: true,
+    message:
+      `Created external layout "${externalLayoutName}" for scene "${associatedSceneName}".` +
+      ignoredSuffix +
+      howToUseSuffix,
+    meta: {
+      newExternalLayoutNames: [externalLayoutName],
+    },
+  };
+};
+
+/**
+ * Creates a new, empty scene (or, with `as_external_layout_of_scene`, an
+ * external layout of an existing scene).
  */
 const createScene: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const asExternalLayoutOfScene = SafeExtractor.extractStringProperty(
+      args,
+      'as_external_layout_of_scene'
+    );
+    if (asExternalLayoutOfScene) {
+      return {
+        text: (
+          <Trans>
+            Create external layout <b>{scene_name}</b> for scene{' '}
+            <b>{asExternalLayoutOfScene}</b>.{' '}
+            <Link
+              href="#"
+              onClick={() => editorCallbacks.onOpenExternalLayout(scene_name)}
+            >
+              Click to open it
+            </Link>
+            .
+          </Trans>
+        ),
+      };
+    }
 
     return {
       text: (
@@ -7324,6 +7443,22 @@ const createScene: EditorFunction = {
       args,
       'is_first_scene'
     );
+    const asExternalLayoutOfScene = SafeExtractor.extractStringProperty(
+      args,
+      'as_external_layout_of_scene'
+    );
+    if (asExternalLayoutOfScene) {
+      return createExternalLayout({
+        project,
+        externalLayoutName: scene_name,
+        associatedSceneName: asExternalLayoutOfScene,
+        ignoredArgumentNames: [
+          include_ui_layer ? 'include_ui_layer' : null,
+          background_color ? 'background_color' : null,
+          is_first_scene ? 'is_first_scene' : null,
+        ].filter(Boolean),
+      });
+    }
 
     const firstSceneSuffix = is_first_scene
       ? ' Also set as the first (startup) scene.'
@@ -7660,9 +7795,176 @@ const applyEffectChange = ({
   }
 };
 
-// The scopes owning layers, layer effects and object groups: a scene, or a
-// variant of a custom object (which has an area instead of scene properties).
-const PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES = OBJECTS_SCOPE_TYPES;
+// The scopes with properties: a scene (also owning layers, layer effects and
+// object groups), an external layout (only a name and an associated scene:
+// its layers and groups are those of the scene) or a variant of a custom
+// object (which has an area instead of scene properties).
+const PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES: Array<ToolScopeType> = [
+  'scene',
+  'external_layout',
+  'custom_object_variant',
+];
+
+/**
+ * The message refusing layer, effect or group changes through an external
+ * layout scope: they belong to its scene. Same text as the backend checker.
+ */
+const makeExternalLayoutHasNoLayersMessage = (
+  externalLayoutName: string,
+  sceneName: string
+): string =>
+  `Layers, layer effects and object groups belong to the associated scene "${sceneName}" of external layout "${externalLayoutName}": use scope { type: "scene", scene_name: "${sceneName}" } to change them. Nothing was changed.`;
+
+// The only properties of an external layout (`inspect_scene_properties_layers_effects`
+// returns them along with the layers of its scene).
+const EXTERNAL_LAYOUT_PROPERTY_NAMES = ['name', 'associatedScene'];
+
+/**
+ * The objects and layers used by the instances of an external layout that a
+ * scene does not have: re-associating it with that scene would leave these
+ * instances without object or layer.
+ */
+const getMissingObjectsAndLayersInScene = (
+  project: gdProject,
+  initialInstances: gdInitialInstancesContainer,
+  scene: gdLayout
+): {|
+  missingObjectNames: Array<string>,
+  missingLayerNames: Array<string>,
+|} => {
+  const missingObjectNames = new Set<string>();
+  const missingLayerNames = new Set<string>();
+  iterateOnInstances(initialInstances, instance => {
+    const objectName = instance.getObjectName();
+    if (
+      !scene.getObjects().hasObjectNamed(objectName) &&
+      !project.getObjects().hasObjectNamed(objectName)
+    ) {
+      missingObjectNames.add(objectName);
+    }
+    if (!scene.getLayers().hasLayerNamed(instance.getLayer())) {
+      missingLayerNames.add(instance.getLayer());
+    }
+  });
+  return {
+    missingObjectNames: [...missingObjectNames].sort(),
+    missingLayerNames: [...missingLayerNames].sort(),
+  };
+};
+
+/** Apply a `changed_properties` item to an external layout: `name` or `associatedScene`. */
+const applyExternalLayoutPropertyChange = ({
+  project,
+  externalLayout,
+  propertyName,
+  newValue,
+  changes,
+  warnings,
+  onProjectItemRenamedOutsideEditor,
+  onInstancesModifiedOutsideEditor,
+}: {|
+  project: gdProject,
+  externalLayout: gdExternalLayout,
+  propertyName: string,
+  newValue: string,
+  changes: Array<string>,
+  warnings: Array<string>,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
+|}) => {
+  if (isFuzzyMatch(propertyName, 'name')) {
+    const oldName = externalLayout.getName();
+    if (newValue === oldName) {
+      changes.push(`External layout already named "${newValue}".`);
+      return;
+    }
+    if (newValue.trim() === '') {
+      warnings.push(`An external layout name cannot be empty. Skipped.`);
+      return;
+    }
+    // Like scene names, external layout names are free text: only ensure
+    // unicity.
+    const newName = newNameGenerator(newValue, tentativeNewName =>
+      project.hasExternalLayoutNamed(tentativeNewName)
+    );
+    externalLayout.setName(newName);
+    gd.WholeProjectRefactorer.renameExternalLayout(project, oldName, newName);
+    onProjectItemRenamedOutsideEditor({
+      kind: 'external-layout',
+      oldName,
+      newName,
+    });
+    changes.push(
+      `Renamed external layout "${oldName}" to "${newName}" (the events creating its objects were updated).`
+    );
+    return;
+  }
+  if (isFuzzyMatch(propertyName, 'associatedScene')) {
+    const externalLayoutName = externalLayout.getName();
+    if (newValue === externalLayout.getAssociatedLayout()) {
+      changes.push(
+        `External layout "${externalLayoutName}" is already associated with scene "${newValue}".`
+      );
+      return;
+    }
+    if (!project.hasLayoutNamed(newValue)) {
+      warnings.push(
+        `${getSceneNotFoundMessage(
+          project,
+          newValue
+        )} External layout "${externalLayoutName}" was NOT re-associated.`
+      );
+      return;
+    }
+    const newScene = project.getLayout(newValue);
+    const {
+      missingObjectNames,
+      missingLayerNames,
+    } = getMissingObjectsAndLayersInScene(
+      project,
+      externalLayout.getInitialInstances(),
+      newScene
+    );
+    if (missingObjectNames.length > 0 || missingLayerNames.length > 0) {
+      warnings.push(
+        `External layout "${externalLayoutName}" was NOT associated with scene "${newValue}": its instances use ` +
+          [
+            missingObjectNames.length > 0
+              ? `objects this scene does not have (nor globally): ${missingObjectNames
+                  .map(name => `"${name}"`)
+                  .join(', ')}`
+              : null,
+            missingLayerNames.length > 0
+              ? `layers this scene does not have: ${missingLayerNames
+                  .map(name => `"${name}"`)
+                  .join(', ')}`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(' and ') +
+          `. Move or erase these instances first (or add the objects/layers to the scene).`
+      );
+      return;
+    }
+    externalLayout.setAssociatedLayout(newValue);
+    // The external layout editor, if open, now shows the objects and layers
+    // of the new scene.
+    onInstancesModifiedOutsideEditor({ scene: newScene, externalLayout });
+    changes.push(
+      `External layout "${externalLayoutName}" is now associated with scene "${newValue}".`
+    );
+    return;
+  }
+  warnings.push(
+    `Unknown external layout property: "${propertyName}". Skipped. An external layout only has ${EXTERNAL_LAYOUT_PROPERTY_NAMES.map(
+      name => `\`${name}\``
+    ).join(' and ')} (its layers and groups are those of its associated scene).`
+  );
+};
 
 /** The layers of a scope, with their effects: the same shape everywhere. */
 const describeLayersWithEffects = (
@@ -7759,7 +8061,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
     if (resolvedScope.success === false)
       return makeScopeFailureOutput(resolvedScope);
 
-    const { variant, eventsBasedObject } = resolvedScope;
+    const { variant, eventsBasedObject, externalLayout } = resolvedScope;
     if (variant && eventsBasedObject) {
       return inspectCustomObjectVariant(
         project,
@@ -7772,6 +8074,24 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
     const scene = resolvedScope.layout;
     if (!scene)
       return makeGenericFailure(`${resolvedScope.label} has no properties.`);
+    if (externalLayout) {
+      // An external layout has no properties of its own besides its name and
+      // scene: its instances use the layers (and objects) of that scene.
+      return {
+        success: true,
+        propertiesLayersEffectsForExternalLayoutNamed: externalLayout.getName(),
+        propertiesLayersEffectsForSceneNamed: scene.getName(),
+        properties: {
+          name: externalLayout.getName(),
+          associatedScene: scene.getName(),
+          instancesCount: externalLayout
+            .getInitialInstances()
+            .getInstancesCount(),
+        },
+        layers: describeLayersWithEffects(project, scene.getLayers()),
+        layersNote: `These are the layers of the associated scene "${scene.getName()}" (an external layout has none of its own): change them, their effects and the object groups with scope { type: "scene", scene_name: "${scene.getName()}" }.`,
+      };
+    }
     const layersContainer = scene.getLayers();
 
     // Mirror the runtime behavior: when `firstLayout` is not set (or names a
@@ -7942,6 +8262,20 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         ),
       };
     }
+    const moveInstances = SafeExtractor.extractObjectProperty(
+      args,
+      'move_instances'
+    );
+    if (moveInstances) {
+      return {
+        text: (
+          <Trans>
+            Move instances of scene <b>{scene_name}</b> to{' '}
+            {getScopeLabelFromArgs({ scope: moveInstances.to_scope })}.
+          </Trans>
+        ),
+      };
+    }
 
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
@@ -8052,13 +8386,22 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
 
     const scene = resolvedScope.layout;
-    const { variant, eventsBasedObject, layersContainer } = resolvedScope;
+    const {
+      variant,
+      eventsBasedObject,
+      layersContainer,
+      externalLayout,
+    } = resolvedScope;
     if (!layersContainer)
       return makeGenericFailure(`${resolvedScope.label} has no layers.`);
     // The label is read at message time: a rename in the same call must be
     // reflected by the messages that follow it.
     const getTargetLabel = () =>
-      scene ? `scene "${scene.getName()}"` : resolvedScope.label;
+      externalLayout
+        ? `external layout "${externalLayout.getName()}"`
+        : scene
+        ? `scene "${scene.getName()}"`
+        : resolvedScope.label;
 
     const deleteThisScene = SafeExtractor.extractBooleanProperty(
       args,
@@ -8067,6 +8410,20 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     if (deleteThisScene && !scene) {
       return makeGenericFailure(
         'A variant cannot be deleted here: use change_custom_object.changed_variants.'
+      );
+    }
+    if (deleteThisScene && externalLayout) {
+      // Same flow as a scene: let the editor close the tabs of the external
+      // layout while it still exists.
+      await onWillDeleteScene({ externalLayout });
+
+      const externalLayoutName = externalLayout.getName();
+      const instancesCount = externalLayout
+        .getInitialInstances()
+        .getInstancesCount();
+      project.removeExternalLayout(externalLayoutName);
+      return makeGenericSuccess(
+        `Deleted external layout "${externalLayoutName}" (${instancesCount} instance(s) removed with it). Events creating its objects with \`CreateObjectsFromExternalLayout("${externalLayoutName}", ...)\`, if any, still name it: update or remove them.`
       );
     }
     if (deleteThisScene && scene) {
@@ -8110,6 +8467,27 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       args,
       'changed_groups'
     );
+    const move_instances = SafeExtractor.extractObjectProperty(
+      args,
+      'move_instances'
+    );
+
+    // An external layout has no layers, effects or groups of its own: refuse
+    // before changing anything, instead of silently editing its scene.
+    if (
+      externalLayout &&
+      scene &&
+      [changed_layers, changed_layer_effects, changed_groups].some(
+        items => items && items.length > 0
+      )
+    ) {
+      return makeGenericFailure(
+        makeExternalLayoutHasNoLayersMessage(
+          externalLayout.getName(),
+          scene.getName()
+        )
+      );
+    }
 
     // Object groups are structural: a named variant inherits the ones of the
     // default variant instead of having its own.
@@ -8117,6 +8495,37 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       const namedVariantRejection = getNamedVariantRejection(resolvedScope);
       if (namedVariantRejection)
         return makeScopeFailureOutput(namedVariantRejection);
+    }
+
+    // The move comes first and is atomic: a refusal leaves the whole call
+    // unapplied, so "nothing was changed" is true. Names in `to_scope` are
+    // thus the ones before any rename of this call.
+    let moveInstancesOutput: MoveInstancesOutputFields | null = null;
+    if (move_instances) {
+      const moveResult = moveInstancesToScope({
+        project,
+        sourceScope: resolvedScope,
+        moveInstancesArgs: move_instances,
+      });
+      if (moveResult.success === false) {
+        return makeGenericFailure(moveResult.message);
+      }
+      if (moveResult.movedInstancesCount === 0) {
+        warnings.push(moveResult.message);
+      } else {
+        changes.push(moveResult.message);
+        moveInstancesOutput = {
+          movedInstancesCount: moveResult.movedInstancesCount,
+          movedInstancesCountByObjectName:
+            moveResult.movedInstancesCountByObjectName,
+        };
+        onInstancesModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(resolvedScope),
+        });
+        onInstancesModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(moveResult.targetScope),
+        });
+      }
     }
     // The groups of a custom object live on its default variant.
     const groupsObjectsContainer = eventsBasedObject
@@ -8158,6 +8567,19 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               warnings,
             });
           }
+          return;
+        }
+        if (externalLayout) {
+          applyExternalLayoutPropertyChange({
+            project,
+            externalLayout,
+            propertyName,
+            newValue,
+            changes,
+            warnings,
+            onProjectItemRenamedOutsideEditor,
+            onInstancesModifiedOutsideEditor,
+          });
           return;
         }
 
@@ -8805,12 +9227,14 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       return {
         success: true,
         message: ['Done.', ...changes].join('\n'),
+        ...(moveInstancesOutput || {}),
       };
     } else {
       return {
         success: true,
         message: ['Done with warnings.', ...changes].join('\n'),
         warnings: warnings.join('\n'),
+        ...(moveInstancesOutput || {}),
       };
     }
   },
@@ -8935,6 +9359,16 @@ const inspectProjectPropertiesResources: EditorFunction = {
       sceneNames: mapFor(0, project.getLayoutsCount(), i =>
         project.getLayoutAt(i).getName()
       ),
+      externalLayouts: mapFor(0, project.getExternalLayoutsCount(), i => {
+        const externalLayout = project.getExternalLayoutAt(i);
+        return {
+          name: externalLayout.getName(),
+          associatedScene: externalLayout.getAssociatedLayout(),
+          instancesCount: externalLayout
+            .getInitialInstances()
+            .getInstancesCount(),
+        };
+      }),
       resources,
       resourcesSummary,
       warnings: resourcesWarning,
@@ -10534,16 +10968,24 @@ const runScript: EditorFunction = {
       error: capped.error,
       meta: {
         didModifyProject: capped.didModifyProject,
-        // Forward scene names created inside the script so they auto-open, like
-        // a standalone create_scene call does.
+        // Forward the scenes and external layouts created inside the script
+        // so they auto-open, like a standalone create_scene call does.
         ...(capped.newSceneNames.length > 0
           ? { newSceneNames: capped.newSceneNames }
           : {}),
+        ...getNewExternalLayoutNamesMeta(capped.newExternalLayoutNames),
       },
     };
   },
   modifiesProject: true,
 };
+
+// A helper (not an inline conditional spread) keeps Flow from reasoning about
+// the product of two union spreads in the `meta` of `run_script`.
+const getNewExternalLayoutNamesMeta = (
+  newExternalLayoutNames: Array<string>
+): {| newExternalLayoutNames?: Array<string> |} =>
+  newExternalLayoutNames.length > 0 ? { newExternalLayoutNames } : {};
 
 const searchResourceStore: EditorFunction = {
   renderForEditor: ({ args }) => {

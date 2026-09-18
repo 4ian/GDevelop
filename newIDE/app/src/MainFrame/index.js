@@ -4156,6 +4156,21 @@ const MainFrame = (props: Props): React.MixedElement => {
           ),
         };
       }
+      if (kind === 'external-layout') {
+        return {
+          ...state,
+          editorTabs: getEditorTabsWithRenamedProjectItem(
+            state.editorTabs,
+            currentProject,
+            editorTab =>
+              getRenamedExternalLayoutTabProjectItemName(
+                editorTab,
+                oldName,
+                newName
+              )
+          ),
+        };
+      }
       if (kind === 'gameplay-test') {
         return {
           ...state,
@@ -4173,6 +4188,16 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
       return state;
     }).then(() => {
+      if (kind === 'external-layout') {
+        // The events creating its objects now name it differently.
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: false,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['renamed-external-layout'],
+        });
+      }
       if (kind === 'extension' || kind === 'custom-object') {
         // The renamed extension (or custom object) is used by the game under
         // its new name.
@@ -4197,9 +4222,14 @@ const MainFrame = (props: Props): React.MixedElement => {
   const onWillDeleteScene = async (
     changes: WillDeleteSceneChanges
   ): Promise<void> => {
+    const { scene, externalLayout } = changes;
     await setState(state => ({
       ...state,
-      editorTabs: closeLayoutTabs(state.editorTabs, changes.scene),
+      editorTabs: externalLayout
+        ? closeExternalLayoutTabs(state.editorTabs, externalLayout)
+        : scene
+        ? closeLayoutTabs(state.editorTabs, scene)
+        : state.editorTabs,
     }));
   };
 
@@ -6032,6 +6062,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     setPreviewedLayout: setPreviewedLayout,
     openExternalEvents: openExternalEvents,
     openLayout: openLayout,
+    openExternalLayout: openExternalLayout,
     openTemplateFromTutorial: openTemplateFromTutorial,
     openTemplateFromCourseChapter: openTemplateFromCourseChapter,
     previewDebuggerServer: previewDebuggerServer,

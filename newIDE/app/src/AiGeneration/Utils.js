@@ -114,7 +114,7 @@ export const useRefreshLimits = (
 // v14 adds gameplay tests (`run_tests` + the tester sub-agent).
 // v15 makes read_game_project_json a live, editor-side read (backend stops
 // overwriting its output) and exposes it to the edit/explorer script agents.
-export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v18';
+export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v19';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying
@@ -275,6 +275,7 @@ export const useProcessFunctionCalls = ({
     editorFunctionCallResults: Array<EditorFunctionCallResult>,
     options: {|
       createdSceneNames?: Array<string>,
+      createdExternalLayoutNames?: Array<string>,
       createdProject?: ?gdProject,
     |}
   ) => Promise<void>,
@@ -628,6 +629,7 @@ export const useProcessFunctionCalls = ({
         const {
           results,
           createdSceneNames,
+          createdExternalLayoutNames,
           createdProject,
         } = await processEditorFunctionCalls({
           project,
@@ -731,6 +733,7 @@ export const useProcessFunctionCalls = ({
 
         await onSendEditorFunctionCallResults(aiRequest.id, newResults, {
           createdSceneNames,
+          createdExternalLayoutNames,
           createdProject,
         });
       } finally {

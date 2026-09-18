@@ -33,6 +33,7 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   i18n: makeFakeI18n(),
   editorCallbacks: {
     onOpenLayout: jest.fn(),
+    onOpenExternalLayout: jest.fn(),
     onCreateProject: jest.fn(),
     onOpenEventsFunctionsExtension: jest.fn(),
     onOpenCustomObjectEditor: jest.fn(),

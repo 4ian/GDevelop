@@ -14,6 +14,10 @@ import {
   type PrivateGameTemplateListingData,
   type BundleListingData,
 } from '../../Utils/GDevelopServices/Shop';
+import {
+  getDefaultSearchItemRelevance,
+  type GetSearchItemRelevance,
+} from './SearchItemRelevance';
 
 type SearchableItem =
   | AssetShortHeader
@@ -126,7 +130,8 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
   searchItems: ?Array<SearchItem>,
   chosenCategory: ?ChosenCategory,
   chosenFilters: ?Set<string>,
-  searchFilters?: Array<SearchFilter<SearchItem>>
+  searchFilters?: Array<SearchFilter<SearchItem>>,
+  getSearchItemRelevance?: (searchItem: SearchItem) => number
 ): ?Array<SearchItem> => {
   if (!searchItems) return null;
 
@@ -178,16 +183,22 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
     });
 
   let sortedSearchItems = filteredSearchItems;
-  if (searchFilters) {
+  if (searchFilters || getSearchItemRelevance) {
     let pertinenceMin = 1;
     let pertinenceMax = 0;
     const weightedSearchItems = filteredSearchItems
       .map(searchItem => {
-        let pertinence = 1;
-        for (const searchFilter of searchFilters) {
-          pertinence *= searchFilter.getPertinence(searchItem);
-          if (pertinence === 0) {
-            return null;
+        // Seed the pertinence with the text search relevance so that whole-word
+        // matches are ranked above partial matches, then let the filters refine it.
+        let pertinence = getSearchItemRelevance
+          ? getSearchItemRelevance(searchItem)
+          : 1;
+        if (searchFilters) {
+          for (const searchFilter of searchFilters) {
+            pertinence *= searchFilter.getPertinence(searchItem);
+            if (pertinence === 0) {
+              return null;
+            }
           }
         }
         pertinenceMin = Math.min(pertinenceMin, pertinence);
@@ -229,7 +240,10 @@ export const useSearchItem = <SearchItem: SearchableItem>(
   searchText: string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: ?Set<string>,
-  searchFilters?: Array<SearchFilter<SearchItem>>
+  searchFilters?: Array<SearchFilter<SearchItem>>,
+  // Relevance of an item for the search: defined by the caller (which knows
+  // what is being searched), or this generic text-based default.
+  getSearchItemRelevance: GetSearchItemRelevance<SearchItem> = getDefaultSearchItemRelevance
 ): ?Array<SearchItem> => {
   const searchApiRef = React.useRef<?any>(null);
   const [searchResults, setSearchResults] = React.useState<?Array<SearchItem>>(
@@ -340,7 +354,13 @@ export const useSearchItem = <SearchItem: SearchableItem>(
                 partialSearchResults,
                 chosenCategory,
                 chosenFilters,
-                searchFilters
+                searchFilters,
+                searchItem =>
+                  getSearchItemRelevance(
+                    searchItem,
+                    getItemDescription(searchItem),
+                    searchText
+                  )
               )
             );
           });
@@ -363,6 +383,8 @@ export const useSearchItem = <SearchItem: SearchableItem>(
       chosenFilters,
       searchFilters,
       searchApi,
+      getItemDescription,
+      getSearchItemRelevance,
     ]
   );
 

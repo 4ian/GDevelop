@@ -58,6 +58,14 @@ type SimplifiedScene = {|
   instancesOnSceneDescription: string,
 |};
 
+// An external layout: instances placed apart from a scene (a level chunk, a
+// UI template...), using the objects and layers of its associated scene.
+export type SimplifiedExternalLayout = {|
+  externalLayoutName: string,
+  associatedSceneName: string,
+  instancesCount: number,
+|};
+
 type SimplifiedResource = {|
   name: string,
   type: string,
@@ -86,6 +94,10 @@ export type SimplifiedProject = {|
   globalObjects: Array<SimplifiedObject>,
   globalObjectGroups: Array<SimplifiedObjectGroup>,
   scenes: Array<SimplifiedScene>,
+  // The external layouts of the project (their instances are read with
+  // `describe_instances` on an `external_layout` scope). Absent from the
+  // projects sent by older editors.
+  externalLayouts: Array<SimplifiedExternalLayout>,
   globalVariables: Array<SimplifiedVariable>,
   resources: Array<SimplifiedResource>,
   tests?: Array<SimplifiedTest>,
@@ -472,6 +484,20 @@ export const makeSimplifiedProjectBuilder = (
 
       return getSimplifiedScene(project, scene);
     }).filter(Boolean);
+    const externalLayouts = mapFor(0, project.getExternalLayoutsCount(), i => {
+      const externalLayout = project.getExternalLayoutAt(i);
+      const associatedSceneName = externalLayout.getAssociatedLayout();
+      if (options.scopeToScene && associatedSceneName !== options.scopeToScene)
+        return null;
+
+      return {
+        externalLayoutName: externalLayout.getName(),
+        associatedSceneName,
+        instancesCount: externalLayout
+          .getInitialInstances()
+          .getInstancesCount(),
+      };
+    }).filter(Boolean);
 
     const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProject(
       project
@@ -495,6 +521,7 @@ export const makeSimplifiedProjectBuilder = (
         projectScopedContainers.getObjectsContainersList()
       ),
       scenes,
+      externalLayouts,
       globalVariables: getSimplifiedVariablesContainer(
         gd,
         project.getVariables()

@@ -170,6 +170,7 @@ export type EditorTabsPaneCommonProps = {|
         | 'none',
     |}
   ) => void,
+  openExternalLayout: (name: string) => void,
   openTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   openTemplateFromCourseChapter: (
     courseChapter: CourseChapter,
@@ -393,6 +394,7 @@ const EditorTabsPane: React.ComponentType<{
     setPreviewedLayout,
     openExternalEvents,
     openLayout,
+    openExternalLayout,
     openTemplateFromTutorial,
     openTemplateFromCourseChapter,
     previewDebuggerServer,
@@ -825,6 +827,7 @@ const EditorTabsPane: React.ComponentType<{
                       });
                     },
                     onOpenLayout: openLayout,
+                    onOpenExternalLayout: openExternalLayout,
                     onOpenTemplateFromTutorial: openTemplateFromTutorial,
                     onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,

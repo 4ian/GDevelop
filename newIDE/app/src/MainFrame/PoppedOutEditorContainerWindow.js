@@ -234,6 +234,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                           });
                         },
                         onOpenLayout: props.openLayout,
+                        onOpenExternalLayout: props.openExternalLayout,
                         onOpenTemplateFromTutorial:
                           props.openTemplateFromTutorial,
                         onOpenTemplateFromCourseChapter:

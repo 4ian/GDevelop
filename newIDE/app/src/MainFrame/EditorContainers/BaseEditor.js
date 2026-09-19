@@ -101,6 +101,7 @@ export type RenderEditorContainerProps = {|
     |}
   ) => void,
   onOpenEvents: (sceneName: string) => void,
+  onOpenExternalLayout: (externalLayoutName: string) => void,
   openInstructionOrExpression: (type: string) => void,
   onOpenCustomObjectEditor: (
     gdEventsFunctionsExtension,

@@ -546,6 +546,11 @@ class GD_CORE_API ExpressionCompletionFinder
         gd::ExpressionVariablePathFinder::GetLastParentOfNode(
             platform, projectScopedContainers, node);
 
+    const auto typeAndExtraInfo = gd::ExpressionTypeFinder::GetTypeAndExtraInfo(
+        platform, projectScopedContainers, rootType, node);
+    const auto type = typeAndExtraInfo.type;
+    const auto extraInfo = typeAndExtraInfo.extraInfo;
+
     // If no child, we're at the end of a variable (like `GrandChild` in
     // `Something.Child.GrandChild`) so we can complete eagerly children if we
     // can.
@@ -560,8 +565,12 @@ class GD_CORE_API ExpressionCompletionFinder
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     const auto& objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
-    auto type = gd::ExpressionTypeFinder::GetType(
+
+    const auto typeAndExtraInfo = gd::ExpressionTypeFinder::GetTypeAndExtraInfo(
         platform, projectScopedContainers, rootType, node);
+    const auto type = typeAndExtraInfo.type;
+    const auto extraInfo = typeAndExtraInfo.extraInfo;
+
     if (gd::ParameterMetadata::IsObject(type)) {
       // Only show completions of objects if an object is required.
       AddCompletionsForObjectMatchingSearch(

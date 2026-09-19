@@ -97,13 +97,13 @@ void ExpressionValidator::ValidateLastChildVariable(
   } else if ((parentType == Type::Variable ||
               parentType == Type::ObjectVariable ||
               parentType == Type::LegacyVariable) &&
-             currentParameterExtraInfo && type != Variable::Unknown) {
+             !currentParameterExtraInfo.empty() && type != Variable::Unknown) {
     bool isCollection = type == Variable::Structure || type == Variable::Array;
-    if (*currentParameterExtraInfo == "collection" && !isCollection) {
+    if (currentParameterExtraInfo == "collection" && !isCollection) {
       RaiseTypeError(_("A structure or an array is expected but this "
                        "variable is a value."),
                      childNameLocation, false);
-    } else if (*currentParameterExtraInfo == "primitive" && isCollection) {
+    } else if (currentParameterExtraInfo == "primitive" && isCollection) {
       if (type == Variable::Structure) {
         RaiseTypeError(_("You need to specify the name of the child variable "
                          "to access. For example: `MyVariable.child`."),
@@ -454,7 +454,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
       auto currentParentType = parentType;
       parentType = StringToType(parameterMetadata.GetType());
       auto parentParameterExtraInfo = currentParameterExtraInfo;
-      currentParameterExtraInfo = &parameterMetadata.GetExtraInfo();
+      currentParameterExtraInfo = parameterMetadata.GetExtraInfo();
       parameter->Visit(*this);
       currentParameterExtraInfo = parentParameterExtraInfo;
       parentType = currentParentType;

@@ -16,16 +16,11 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
       .SetExtensionInformation(
           "BuiltinExternalLayouts",
           _("External layouts"),
-          _("An external layout holds instances placed apart from a scene, "
-            "using the objects and layers of the scene it is associated "
-            "with. Its instances are not created when the scene starts: the "
-            "scene creates them when needed, with the action to create "
-            "objects from an external layout. Use external layouts to build "
-            "the levels of a game in a single scene (one external layout per "
-            "level, the level to load chosen by a variable), to reuse a set "
-            "of instances in one or several scenes (a UI panel, a room, an "
-            "enemy wave) or to spawn a prepared group of objects at a given "
-            "position."),
+          _("External layouts hold instances placed apart from a scene, "
+            "using the objects and layers of the scene they are associated "
+            "with. Their instances are created by the scene when needed "
+            "(the levels of a game built in a single scene, a reusable set "
+            "of instances)."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetShortDescription("Create objects from an external layout to reuse level sections or UI templates.")
@@ -49,32 +44,29 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
                    "again, so delete the previous instances (for example the "
                    "previous level) before loading new ones. Typical uses: "
                    "load the level chosen by a variable at the beginning of "
-                   "the scene, show a UI panel or spawn an enemy wave on "
-                   "demand."),
+                   "the scene, spawn a room or an enemy wave on demand. For "
+                   "a UI panel, a custom object is usually a better fit than "
+                   "an external layout (it is reusable, resizable and can "
+                   "hold its own logic); use an external layout for a "
+                   "simple, one-off UI screen."),
                  _("Create objects from the external layout named _PARAM1_ at position _PARAM2_;_PARAM3_;_PARAM4_"),
                  "",
                  "res/ribbon_default/externallayout32.png",
                  "res/ribbon_default/externallayout32.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("externalLayoutName", _("Name of the external layout"))
-      .AddParameter("expression",
-                    _("X position of the origin (added to the X position of "
-                      "every created instance, 0 to keep the positions of "
-                      "the external layout)"),
-                    "",
-                    true)
+      .AddParameter("expression", _("X position of the origin"), "", true)
+      .SetParameterLongDescription(
+          _("Added to the X position of every created instance (0 keeps the "
+            "positions of the external layout)."))
       .SetDefaultValue("0")
-      .AddParameter("expression",
-                    _("Y position of the origin (added to the Y position of "
-                      "every created instance)"),
-                    "",
-                    true)
+      .AddParameter("expression", _("Y position of the origin"), "", true)
+      .SetParameterLongDescription(
+          _("Added to the Y position of every created instance."))
       .SetDefaultValue("0")
-      .AddParameter("expression",
-                    _("Z position of the origin (added to the Z position of "
-                      "every created 3D instance)"),
-                    "",
-                    true)
+      .AddParameter("expression", _("Z position of the origin"), "", true)
+      .SetParameterLongDescription(
+          _("Added to the Z position of every created 3D instance."))
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 }

@@ -86,6 +86,13 @@ namespace gdjs {
     }
 
     private hasLoggedError: boolean = false;
+
+    dispose(): void {
+      if (this._ws) {
+        this._ws.close();
+      }
+    }
+
     protected _sendMessage(message: string) {
       if (!this._ws) {
         // The error can be logged only once, since logger.warn will call this function again,

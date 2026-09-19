@@ -11,7 +11,6 @@
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/VariablesContainersList.h"
 #include "GDCore/Project/VariablesContainer.h"
@@ -21,8 +20,6 @@ class Expression;
 class ObjectsContainer;
 class VariablesContainer;
 class Platform;
-class ParameterMetadata;
-class ExpressionMetadata;
 class VariablesContainersList;
 class ProjectScopedContainers;
 }  // namespace gd
@@ -48,7 +45,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         rootObjectName(rootObjectName_),
         childType(Type::Unknown),
         forbidsUsageOfBracketsBecauseParentIsObject(false),
-        currentParameterExtraInfo(&extraInfo_),
+        currentParameterExtraInfo(extraInfo_),
         variableObjectName(),
         variableObjectNameLocation() {};
   virtual ~ExpressionValidator(){};
@@ -417,8 +414,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     Type currentChildType = childType;
     parentType = Type::NumberOrString;
     auto parentParameterExtraInfo = currentParameterExtraInfo;
-    currentParameterExtraInfo = nullptr;
+    currentParameterExtraInfo = "";
+    isIntoBrackets = true;
     node.expression->Visit(*this);
+    isIntoBrackets = false;
     currentParameterExtraInfo = parentParameterExtraInfo;
     parentType = currentParentType;
     childType = currentChildType;
@@ -458,7 +457,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       bool isRootVariableDeclared =
           CheckVariableExistence(node.location, node.identifierName,
                                  !node.childIdentifierName.empty());
-      if (isRootVariableDeclared && !node.childIdentifierName.empty()) {
+      if (isRootVariableDeclared) {
         ValidateObjectVariableOrVariableOrProperty(
             node.identifierName, node.identifierNameLocation,
             node.childIdentifierName, node.childIdentifierNameLocation, false);
@@ -526,6 +525,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       message = _("You must enter a variable name.");
     } else if (parentType == Type::Object) {
       message = _("You must enter a valid object name.");
+    } else if (isIntoBrackets) {
+      message = _("You must enter a valid expression inside the brackets.");
     } else {
       // It can't happen.
       message = _("You must enter a valid expression.");
@@ -567,8 +568,7 @@ private:
 
   bool CheckVariableExistence(const ExpressionParserLocation &location,
                               const gd::String &name, bool hasChild) {
-    if (!currentParameterExtraInfo ||
-        *currentParameterExtraInfo != "AllowUndeclaredVariable") {
+    if (currentParameterExtraInfo != "AllowUndeclaredVariable") {
       bool isRootVariableDeclared = false;
       projectScopedContainers.MatchIdentifierWithName<void>(
           name,
@@ -734,7 +734,8 @@ private:
   gd::ExpressionParserLocation variableObjectNameLocation;
   const gd::Variable *parentVariable = nullptr;
   size_t variableChildDepth = 0;
-  const gd::String *currentParameterExtraInfo;
+  gd::String currentParameterExtraInfo;
+  bool isIntoBrackets = false;
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;
 };

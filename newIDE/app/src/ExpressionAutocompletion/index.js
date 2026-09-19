@@ -728,7 +728,7 @@ export const insertAutocompletionInExpression = (
         wordStartPosition,
       });
 
-  if (addParenthesis && hasVisibleParameters) {
+  if ((addParenthesis && hasVisibleParameters) || insertedWord.endsWith('[]')) {
     newAutocompletedExpression.caretLocation =
       newAutocompletedExpression.caretLocation - 1;
   }

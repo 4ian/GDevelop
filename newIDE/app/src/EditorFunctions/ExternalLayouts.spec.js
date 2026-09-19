@@ -169,43 +169,6 @@ describe('external layouts as a scope of the container tools', () => {
     });
   });
 
-  describe('inspect_scene_properties_layers_effects', () => {
-    it('returns the name, scene and instances count of an external layout, with the layers of its scene', async () => {
-      addInstance(
-        project.getExternalLayout('Level1').getInitialInstances(),
-        'Coin',
-        {
-          x: 0,
-          y: 0,
-        }
-      );
-      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_scene_properties_layers_effects.launchFunction(
-        {
-          ...makeFakeLaunchFunctionOptionsWithProject(project),
-          args: { scope: LEVEL1_SCOPE },
-        }
-      );
-
-      expect(result.success).toBe(true);
-      expect(result.propertiesLayersEffectsForExternalLayoutNamed).toBe(
-        'Level1'
-      );
-      expect(result.propertiesLayersEffectsForSceneNamed).toBe('Game');
-      expect(result.properties).toEqual({
-        name: 'Level1',
-        associatedScene: 'Game',
-        instancesCount: 1,
-      });
-      expect((result.layers || []).map(layer => layer.name)).toEqual([
-        '',
-        'Sky',
-      ]);
-      expect(result.layersNote).toContain(
-        'scope { type: "scene", scene_name: "Game" }'
-      );
-    });
-  });
-
   describe('change_scene_properties_layers_effects_groups', () => {
     it('renames an external layout, updating the events and the open tabs', async () => {
       const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
@@ -733,27 +696,12 @@ describe('external layouts as a scope of the container tools', () => {
   });
 
   describe('listing the external layouts', () => {
-    it('lists them in inspect_project_properties_resources and in the simplified project', async () => {
+    it('lists them in the simplified project (read with read_game_project_json)', async () => {
       addInstance(
         project.getExternalLayout('Level1').getInitialInstances(),
         'Coin',
-        {
-          x: 0,
-          y: 0,
-        }
+        { x: 0, y: 0 }
       );
-      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
-        {
-          ...makeFakeLaunchFunctionOptionsWithProject(project),
-          args: {},
-        }
-      );
-      expect(result.success).toBe(true);
-      expect(result.sceneNames).toEqual(['Game', 'Menu']);
-      expect(result.externalLayouts).toEqual([
-        { name: 'Level1', associatedScene: 'Game', instancesCount: 1 },
-      ]);
-
       const simplifiedProject = makeSimplifiedProjectBuilder(
         gd
       ).getSimplifiedProject(project, {});

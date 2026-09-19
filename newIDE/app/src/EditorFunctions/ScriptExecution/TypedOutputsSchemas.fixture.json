@@ -343,18 +343,15 @@
             },
             "gameResolutionHeight": {
               "type": "number"
-            },
-            "associatedScene": {
-              "type": "string",
-              "description": "External layouts only: the scene whose objects and layers the instances use."
-            },
-            "instancesCount": {
-              "type": "number",
-              "description": "External layouts only."
             }
           },
-          "description": "A scene has isFirstScene, backgroundColor and the game resolution; an external layout has associatedScene and instancesCount.",
-          "required": ["name"]
+          "required": [
+            "name",
+            "isFirstScene",
+            "backgroundColor",
+            "gameResolutionWidth",
+            "gameResolutionHeight"
+          ]
         },
         "layers": {
           "type": "array",
@@ -453,25 +450,6 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
-        },
-        "externalLayouts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "openEnded": true,
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "associatedScene": {
-                "type": "string"
-              },
-              "instancesCount": {
-                "type": "number"
-              }
-            },
-            "required": ["name", "associatedScene", "instancesCount"]
           }
         },
         "resources": {

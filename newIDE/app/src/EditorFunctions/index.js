@@ -272,12 +272,6 @@ export type EditorFunctionGenericOutput = {|
   layers?: any,
   effects?: any,
   sceneNames?: Array<string>,
-  // `inspect_project_properties_resources`: the external layouts of the project.
-  externalLayouts?: Array<{|
-    name: string,
-    associatedScene: string,
-    instancesCount: number,
-  |}>,
   resources?: any,
   resourcesSummary?: any,
   behaviors?: Array<SimplifiedBehavior>,
@@ -347,10 +341,6 @@ export type EditorFunctionGenericOutput = {|
   instancesForExternalLayoutNamed?: string,
   instancesForScopeLabel?: string,
   propertiesLayersEffectsForScopeLabel?: string,
-  // `inspect_scene_properties_layers_effects` on an external layout: its
-  // name, with the layers of its associated scene (and a note saying so).
-  propertiesLayersEffectsForExternalLayoutNamed?: string,
-  layersNote?: string,
   // `change_scene_properties_layers_effects_groups.move_instances`.
   movedInstancesCount?: number,
   movedInstancesCountByObjectName?: { [objectName: string]: number },
@@ -7795,10 +7785,14 @@ const applyEffectChange = ({
   }
 };
 
-// The scopes with properties: a scene (also owning layers, layer effects and
-// object groups), an external layout (only a name and an associated scene:
-// its layers and groups are those of the scene) or a variant of a custom
-// object (which has an area instead of scene properties).
+// The scopes `inspect_scene_properties_layers_effects` reads: a scene (its
+// properties, layers, layer effects and object groups) or a variant of a
+// custom object (which has an area instead of scene properties). An external
+// layout is read from the project JSON (`read_game_project_json`).
+const INSPECT_PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES = OBJECTS_SCOPE_TYPES;
+// The scopes `change_scene_properties_layers_effects_groups` changes: also an
+// external layout (only a name and an associated scene: its layers and groups
+// are those of the scene).
 const PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES: Array<ToolScopeType> = [
   'scene',
   'external_layout',
@@ -8056,12 +8050,12 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
   },
   launchFunction: async ({ project, args }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
-      allowedTypes: PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES,
+      allowedTypes: INSPECT_PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES,
     });
     if (resolvedScope.success === false)
       return makeScopeFailureOutput(resolvedScope);
 
-    const { variant, eventsBasedObject, externalLayout } = resolvedScope;
+    const { variant, eventsBasedObject } = resolvedScope;
     if (variant && eventsBasedObject) {
       return inspectCustomObjectVariant(
         project,
@@ -8074,24 +8068,6 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
     const scene = resolvedScope.layout;
     if (!scene)
       return makeGenericFailure(`${resolvedScope.label} has no properties.`);
-    if (externalLayout) {
-      // An external layout has no properties of its own besides its name and
-      // scene: its instances use the layers (and objects) of that scene.
-      return {
-        success: true,
-        propertiesLayersEffectsForExternalLayoutNamed: externalLayout.getName(),
-        propertiesLayersEffectsForSceneNamed: scene.getName(),
-        properties: {
-          name: externalLayout.getName(),
-          associatedScene: scene.getName(),
-          instancesCount: externalLayout
-            .getInitialInstances()
-            .getInstancesCount(),
-        },
-        layers: describeLayersWithEffects(project, scene.getLayers()),
-        layersNote: `These are the layers of the associated scene "${scene.getName()}" (an external layout has none of its own): change them, their effects and the object groups with scope { type: "scene", scene_name: "${scene.getName()}" }.`,
-      };
-    }
     const layersContainer = scene.getLayers();
 
     // Mirror the runtime behavior: when `firstLayout` is not set (or names a
@@ -9359,16 +9335,6 @@ const inspectProjectPropertiesResources: EditorFunction = {
       sceneNames: mapFor(0, project.getLayoutsCount(), i =>
         project.getLayoutAt(i).getName()
       ),
-      externalLayouts: mapFor(0, project.getExternalLayoutsCount(), i => {
-        const externalLayout = project.getExternalLayoutAt(i);
-        return {
-          name: externalLayout.getName(),
-          associatedScene: externalLayout.getAssociatedLayout(),
-          instancesCount: externalLayout
-            .getInitialInstances()
-            .getInstancesCount(),
-        };
-      }),
       resources,
       resourcesSummary,
       warnings: resourcesWarning,

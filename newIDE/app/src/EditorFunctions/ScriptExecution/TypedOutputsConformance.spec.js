@@ -236,29 +236,6 @@ describe('typed outputs conformance (script API declared reads)', () => {
     validateResultAgainstSchema(result, 'inspect_object_properties_effects');
   });
 
-  it('inspect_scene_properties_layers_effects output conforms for an external layout', async () => {
-    const result: EditorFunctionGenericOutput = await editorFunctions.inspect_scene_properties_layers_effects.launchFunction(
-      {
-        ...makeFakeLaunchFunctionOptionsWithProject(project),
-        args: {
-          scope: { type: 'external_layout', external_layout_name: 'Chunk' },
-        },
-      }
-    );
-    expect(result.success).toBe(true);
-    validateResultAgainstSchema(
-      result,
-      'inspect_scene_properties_layers_effects'
-    );
-    expect(result.properties).toEqual({
-      name: 'Chunk',
-      associatedScene: 'TestScene',
-      instancesCount: 0,
-    });
-    // The layers of the associated scene.
-    expect((result.layers || []).length).toBeGreaterThan(0);
-  });
-
   it('inspect_scene_properties_layers_effects output conforms', async () => {
     const result: EditorFunctionGenericOutput = await editorFunctions.inspect_scene_properties_layers_effects.launchFunction(
       {

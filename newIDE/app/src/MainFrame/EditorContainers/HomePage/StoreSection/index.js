@@ -18,6 +18,7 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 import { AssetStoreNavigatorContext } from '../../../../AssetStore/AssetStoreNavigator';
 import { type CourseCompletion } from '../UseCourses';
+import { sendStoreSectionOpened } from '../../../../Utils/Analytics/EventSender';
 
 type Props = {|
   project: ?gdProject,
@@ -57,6 +58,11 @@ const StoreSection = ({
     openedAssetShortHeader,
     selectedFolders,
   } = shopNavigationState.getCurrentPage();
+
+  React.useEffect(() => {
+    sendStoreSectionOpened();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const displayedAssetShortHeaders = React.useMemo(
     () => {

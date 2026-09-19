@@ -8,13 +8,18 @@ import SearchBar from '../UI/SearchBar';
 import { Column, Line, Spacer } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
 import Window from '../Utils/Window';
+import { useDebounce } from '../Utils/UseDebounce';
 import {
   sendAssetOpened,
   sendAssetPackInformationOpened,
   sendAssetPackOpened,
+  sendAssetStoreCategorySelected,
+  sendAssetStoreHomeClicked,
+  sendAssetStoreSearch,
   sendBundleInformationOpened,
   sendCourseInformationOpened,
   sendGameTemplateInformationOpened,
+  type AppliedAssetStoreFilter,
 } from '../Utils/Analytics/EventSender';
 import {
   type AssetShortHeader,
@@ -142,6 +147,7 @@ export const AssetStore: React.ComponentType<{
       fetchAssetsAndFilters,
       clearAllFilters: clearAllAssetStoreFilters,
       assetFiltersState,
+      assetPackFiltersState,
       getAssetShortHeaderFromId,
     } = React.useContext(AssetStoreContext);
 
@@ -219,6 +225,157 @@ export const AssetStore: React.ComponentType<{
     } = currentPage;
     const isOnHomePage = isHomePage(currentPage);
     const isOnSearchResultPage = isSearchResultPage(currentPage);
+
+    const getAppliedAssetStoreFilters = React.useCallback(
+      (): Array<AppliedAssetStoreFilter> => {
+        const appliedFilters = [];
+        if (assetFiltersState.animatedFilter.hasFilters()) {
+          const values = [];
+          if (assetFiltersState.animatedFilter.mustBeAnimated)
+            values.push('animated');
+          if (assetFiltersState.animatedFilter.mustHaveSeveralState)
+            values.push('multiple-states');
+          appliedFilters.push({ name: 'animation', values });
+        }
+        if (assetFiltersState.viewpointFilter.hasFilters()) {
+          appliedFilters.push({
+            name: 'viewpoint',
+            values: Array.from(assetFiltersState.viewpointFilter.tags),
+          });
+        }
+        if (assetFiltersState.dimensionFilter.hasFilters()) {
+          appliedFilters.push({
+            name: 'pixel_size',
+            values: [
+              `${assetFiltersState.dimensionFilter.dimensionMin}-${
+                assetFiltersState.dimensionFilter.dimensionMax
+              }`,
+            ],
+          });
+        }
+        if (assetFiltersState.objectTypeFilter.hasFilters()) {
+          appliedFilters.push({
+            name: 'object_type',
+            values: Array.from(assetFiltersState.objectTypeFilter.objectTypes),
+          });
+        }
+        if (assetFiltersState.colorFilter.hasFilters()) {
+          const color = assetFiltersState.colorFilter.color;
+          appliedFilters.push({
+            name: 'color',
+            values: color ? [`${color.r},${color.g},${color.b}`] : [],
+          });
+        }
+        if (assetFiltersState.licenseFilter.hasFilters()) {
+          appliedFilters.push({
+            name: 'license',
+            values: ['attribution-free'],
+          });
+        }
+        if (assetPackFiltersState.typeFilter.hasFilters()) {
+          const values = [];
+          if (assetPackFiltersState.typeFilter.isFree) values.push('free');
+          if (assetPackFiltersState.typeFilter.isPremium)
+            values.push('premium');
+          if (assetPackFiltersState.typeFilter.isOwned) values.push('owned');
+          appliedFilters.push({ name: 'pack_type', values });
+        }
+        if (filtersState.chosenFilters.size > 0) {
+          appliedFilters.push({
+            name: 'tags',
+            values: Array.from(filtersState.chosenFilters),
+          });
+        }
+        return appliedFilters;
+      },
+      [assetFiltersState, assetPackFiltersState, filtersState]
+    );
+
+    const getAssetStoreResultsCount = React.useCallback(
+      (): number =>
+        (assetShortHeadersSearchResults || []).length +
+        (publicAssetPacksSearchResults || []).length +
+        (privateAssetPackListingDatasSearchResults || []).length +
+        (privateGameTemplateListingDatasSearchResults || []).length +
+        (bundleListingDatasSearchResults || []).length,
+      [
+        assetShortHeadersSearchResults,
+        publicAssetPacksSearchResults,
+        privateAssetPackListingDatasSearchResults,
+        privateGameTemplateListingDatasSearchResults,
+        bundleListingDatasSearchResults,
+      ]
+    );
+
+    const getAssetStoreSearchLocation = React.useCallback(
+      (): 'home' | 'category' | 'search-results' =>
+        isOnHomePage
+          ? 'home'
+          : filtersState.chosenCategory
+          ? 'category'
+          : 'search-results',
+      [isOnHomePage, filtersState]
+    );
+
+    const getAssetStoreCategoryName = React.useCallback(
+      (): string | null =>
+        filtersState.chosenCategory
+          ? filtersState.chosenCategory.node.name
+          : openedShopCategory,
+      [filtersState, openedShopCategory]
+    );
+
+    const getAppliedAssetStoreFiltersKey = (
+      appliedFilters: Array<AppliedAssetStoreFilter>
+    ): string =>
+      appliedFilters
+        .map(filter => `${filter.name}:${filter.values.join('|')}`)
+        .join(',');
+
+    // Wait until the user has stopped typing/toggling filters for a while
+    // before sending the search event: the search bar itself already
+    // debounces by 250ms, which is only enough to avoid a request per
+    // keystroke, not to wait for the user to actually be done searching.
+    const sendDebouncedAssetStoreSearch = useDebounce(
+      (trimmedSearchText: string) => {
+        sendAssetStoreSearch({
+          searchText: trimmedSearchText,
+          resultsCount: getAssetStoreResultsCount(),
+          searchLocation: getAssetStoreSearchLocation(),
+          categoryName: getAssetStoreCategoryName(),
+          appliedFilters: getAppliedAssetStoreFilters(),
+        });
+      },
+      1000
+    );
+
+    const previousSearchSignatureRef = React.useRef<string>(
+      `${searchText.trim()}|${getAppliedAssetStoreFiltersKey(
+        getAppliedAssetStoreFilters()
+      )}`
+    );
+    React.useEffect(
+      () => {
+        const trimmedSearchText = searchText.trim();
+        const appliedFilters = getAppliedAssetStoreFilters();
+        const searchSignature = `${trimmedSearchText}|${getAppliedAssetStoreFiltersKey(
+          appliedFilters
+        )}`;
+        const previousSearchSignature = previousSearchSignatureRef.current;
+        previousSearchSignatureRef.current = searchSignature;
+
+        if (
+          searchSignature === previousSearchSignature ||
+          (!trimmedSearchText && appliedFilters.length === 0)
+        ) {
+          return;
+        }
+
+        sendDebouncedAssetStoreSearch(trimmedSearchText);
+      },
+      [searchText, getAppliedAssetStoreFilters, sendDebouncedAssetStoreSearch]
+    );
+
     const searchBar = React.useRef<?SearchBarInterface>(null);
     const shouldAutofocusSearchbar = useShouldAutofocusInput();
 
@@ -487,6 +644,10 @@ export const AssetStore: React.ComponentType<{
 
     const selectFolder = React.useCallback(
       (folderTag: string) => {
+        sendAssetStoreCategorySelected({
+          categoryName: folderTag,
+          categoryKind: 'folder',
+        });
         shopNavigationState.navigateInsideFolder(folderTag);
       },
       [shopNavigationState]
@@ -562,6 +723,10 @@ export const AssetStore: React.ComponentType<{
 
     const selectShopCategory = React.useCallback(
       (category: string) => {
+        sendAssetStoreCategorySelected({
+          categoryName: category,
+          categoryKind: 'shop-category',
+        });
         saveScrollPosition();
         shopNavigationState.openShopCategoryPage(category);
       },
@@ -593,6 +758,10 @@ export const AssetStore: React.ComponentType<{
             clearSearchText: true,
           });
         } else {
+          sendAssetStoreCategorySelected({
+            categoryName: tag,
+            categoryKind: 'tag',
+          });
           shopNavigationState.openTagPage(tag);
         }
         clearAllAssetStoreFilters();
@@ -744,6 +913,7 @@ export const AssetStore: React.ComponentType<{
                     key="back-discover"
                     tooltip={t`Back to discover`}
                     onClick={() => {
+                      sendAssetStoreHomeClicked();
                       setSearchText('');
                       const page = assetSwappedObject
                         ? shopNavigationState.openAssetSwapping()

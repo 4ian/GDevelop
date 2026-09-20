@@ -156,8 +156,14 @@ describe('scoped instances, layers and groups', () => {
       );
 
       expect(result.success).toBe(false);
+      // The layers of the associated scene are listed, so the next call can
+      // use an existing one instead of guessing another name.
       expect(result.message).toBe(
-        'Layer not found: NotALayer in external layout "LevelChunk".'
+        'Layer not found: NotALayer in external layout "LevelChunk". ' +
+          'Existing layers: "" (the base layer), "Background". ' +
+          'Use one of them, or add the layer first with ' +
+          '`change_scene_properties_layers_effects_groups` (a `changed_layers` ' +
+          'entry creates the layer when its `layer_name` does not exist yet).'
       );
       expect(
         project

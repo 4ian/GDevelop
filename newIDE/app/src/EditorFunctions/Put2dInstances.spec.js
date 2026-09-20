@@ -70,6 +70,33 @@ describe('put_2d_instances (modifications of existing instances)', () => {
     return result;
   };
 
+  it('lists the existing layers when the layer does not exist', async () => {
+    testScene.insertNewLayer('UI', testScene.getLayersCount());
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.put_2d_instances.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: 'HUD',
+          brush_kind: 'point',
+          brush_position: '10,20',
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toBe(
+      'Layer not found: HUD in scene "TestScene". ' +
+        'Existing layers: "" (the base layer), "UI". ' +
+        'Use one of them, or add the layer first with ' +
+        '`change_scene_properties_layers_effects_groups` (a `changed_layers` ' +
+        'entry creates the layer when its `layer_name` does not exist yet).'
+    );
+    expect(getInstances(testScene)).toHaveLength(0);
+  });
+
   it('moves an existing instance to a different layer with the none brush', async () => {
     testScene.insertNewLayer('UI', testScene.getLayersCount());
     await putInstances({

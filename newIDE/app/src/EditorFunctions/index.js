@@ -92,6 +92,7 @@ import {
   getObjectSizeInfoHints,
   getSimplifiedInstance,
   makeGenericFailure,
+  makeLayerNotFoundFailure,
   shouldHideProperty,
   type ObjectSizeInfo,
 } from './Utils';
@@ -4407,8 +4408,10 @@ const put2dInstances: EditorFunction = {
 
     // Check if layer exists (empty string is allowed for base layer)
     if (layerName !== '' && !layersContainer.hasLayerNamed(layerName)) {
-      return makeGenericFailure(
-        `Layer not found: ${layerName} in ${resolvedScope.label}.`
+      return makeLayerNotFoundFailure(
+        layerName,
+        resolvedScope.label,
+        layersContainer
       );
     }
 
@@ -5380,8 +5383,10 @@ const put3dInstances: EditorFunction = {
 
     // Check if layer exists (empty string is allowed for base layer)
     if (layerName !== '' && !layersContainer.hasLayerNamed(layerName)) {
-      return makeGenericFailure(
-        `Layer not found: ${layerName} in ${resolvedScope.label}.`
+      return makeLayerNotFoundFailure(
+        layerName,
+        resolvedScope.label,
+        layersContainer
       );
     }
 

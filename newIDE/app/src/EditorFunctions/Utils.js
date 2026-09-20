@@ -1,6 +1,6 @@
 // @flow
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
-import { mapVector } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { type EditorFunctionGenericOutput } from './index';
@@ -311,6 +311,32 @@ export const makeGenericFailure = (
   success: false,
   message,
 });
+
+/**
+ * The failure for a layer that does not exist, naming the layers that do.
+ *
+ * Without the list, the only way out of this error is to guess another name,
+ * and a conventional one ("UI", "Background", "HUD") is guessed again and
+ * again on scenes that only have a base layer. Listing the real layers and
+ * how to add one makes the next call the right one.
+ */
+export const makeLayerNotFoundFailure = (
+  layerName: string,
+  scopeLabel: string,
+  layersContainer: gdLayersContainer
+): EditorFunctionGenericOutput => {
+  const existingLayerNames = mapFor(0, layersContainer.getLayersCount(), i =>
+    layersContainer.getLayerAt(i).getName()
+  ).map(name => (name === '' ? '"" (the base layer)' : `"${name}"`));
+
+  return makeGenericFailure(
+    `Layer not found: ${layerName} in ${scopeLabel}. ` +
+      `Existing layers: ${existingLayerNames.join(', ')}. ` +
+      'Use one of them, or add the layer first with ' +
+      '`change_scene_properties_layers_effects_groups` (a `changed_layers` ' +
+      'entry creates the layer when its `layer_name` does not exist yet).'
+  );
+};
 
 export const shouldHideProperty = (property: gdPropertyDescriptor): boolean => {
   return (

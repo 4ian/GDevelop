@@ -42,6 +42,21 @@ const invalidScopeFailure = () =>
   );
 
 /**
+ * The test code asked for by a `run_gameplay_test` call, or null to run the
+ * stored test as-is.
+ *
+ * A blank `source` means "run the stored test": models routinely send
+ * `source: ""` instead of omitting the optional argument, and taking that
+ * literally would overwrite the stored test with an empty body (and run a
+ * no-op that reports "it did nothing"). An empty test body is never
+ * something to store nor to run, so it can safely be read as absent.
+ */
+const parseSourceArgument = (sourceArgument: mixed): string | null =>
+  typeof sourceArgument === 'string' && sourceArgument.trim()
+    ? sourceArgument
+    : null;
+
+/**
  * The output sent to the AI for a gameplay test run: the full result of the
  * run, with console logs flattened to strings.
  */
@@ -95,7 +110,7 @@ export const runGameplayTest: EditorFunction = {
     const testName = args.test_name || '';
     return {
       text:
-        args.source && args.persist !== false ? (
+        parseSourceArgument(args.source) !== null && args.persist !== false ? (
           <Trans>Save and run the gameplay test {testName}.</Trans>
         ) : (
           <Trans>Run the gameplay test {testName}.</Trans>
@@ -109,7 +124,7 @@ export const runGameplayTest: EditorFunction = {
     if (typeof testName !== 'string' || !testName) {
       return makeFailure('Missing or invalid `test_name` argument.');
     }
-    const source = typeof args.source === 'string' ? args.source : null;
+    const source = parseSourceArgument(args.source);
     const persist = args.persist !== false;
     const timeoutMs =
       typeof args.timeout_ms === 'number'
@@ -199,7 +214,7 @@ export const runGameplayTest: EditorFunction = {
   // neither does running an unsaved source with `persist: false` (temporary
   // probes and diagnostics).
   getModifiesProject: (args: Object) =>
-    typeof args.source === 'string' && args.persist !== false,
+    parseSourceArgument(args.source) !== null && args.persist !== false,
 };
 
 // Cap on the ordered test list returned after changes (mirrors the array

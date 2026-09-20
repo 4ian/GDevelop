@@ -118,8 +118,11 @@ const loadProjectEventsFunctionsExtension = (
 };
 
 /**
- * Get the list of mandatory include files when using the
- * extension.
+ * Get include files for extension lifecycle functions (onFirstSceneLoaded,
+ * onSceneLoaded, etc.) that self-register at load time and are never
+ * referenced via event sheet instructions. Non-lifecycle free functions
+ * are included only when actually referenced (transitive deps resolved
+ * during code generation).
  */
 const getExtensionIncludeFiles = (
   project: gdProject,
@@ -129,6 +132,14 @@ const getExtensionIncludeFiles = (
   const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
   return mapFor(0, freeEventsFunctions.getEventsFunctionsCount(), i => {
     const eventsFunction = freeEventsFunctions.getEventsFunctionAt(i);
+
+    if (
+      !gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
+        eventsFunction.getName()
+      )
+    ) {
+      return null;
+    }
 
     const functionName = gd.MetadataDeclarationHelper.getFreeFunctionCodeName(
       eventsFunctionsExtension,
@@ -434,7 +445,7 @@ const generateFreeFunctionMetadata = (
   );
   instructionOrExpression.addIncludeFile(functionFile);
 
-  // Always include the extension include files when using a free function.
+  // Include lifecycle function files so they self-register when the extension is loaded.
   codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
     instructionOrExpression.addIncludeFile(includeFile);
   });
@@ -544,7 +555,7 @@ function generateBehaviorMetadata(
 
   behaviorMetadata.addIncludeFile(includeFile);
 
-  // Always include the extension include files when using a behavior.
+  // Include lifecycle function files so they self-register when the extension is loaded.
   codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
     behaviorMetadata.addIncludeFile(includeFile);
   });
@@ -648,7 +659,7 @@ function generateObjectMetadata(
   // Objects may already have included files for 3D for instance.
   objectMetadata.addIncludeFile(includeFile);
 
-  // Always include the extension include files when using an object.
+  // Include lifecycle function files so they self-register when the extension is loaded.
   codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
     objectMetadata.addIncludeFile(includeFile);
   });

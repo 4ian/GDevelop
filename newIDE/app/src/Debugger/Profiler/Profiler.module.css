@@ -1,0 +1,159 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--theme-list-item-separator-color);
+}
+
+.progressBar {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  /* Never shrink: the content is scrolled instead of being squeezed. */
+  flex-shrink: 0;
+  gap: 20px;
+  padding: 16px 12px;
+  min-width: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: var(--theme-surface-alternate-canvas-background-color);
+}
+
+/* The tree of the sections measured during a frame. */
+
+.measuresTable {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: var(--gdevelop-modern-font-family);
+  background-color: var(--theme-surface-alternate-canvas-background-color);
+}
+
+.row {
+  display: grid;
+  /* The name takes the remaining room, the numbers keep a stable width. */
+  grid-template-columns: minmax(0, 1fr) 64px 64px 64px;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 12px 0 8px;
+  font-size: 13px;
+}
+
+.headerRow {
+  height: 30px;
+  font-size: 12px;
+  color: var(--theme-text-secondary-color);
+  border-bottom: 1px solid var(--theme-list-item-separator-color);
+}
+
+/* The share of the frame taken by a section is drawn as a bar filling the row
+from its left, so that the heaviest sections stand out while reading the tree.
+The share of the row is given by the `--profiler-share` variable. */
+.bodyRow {
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--theme-primary-light) 30%, transparent) 0
+      var(--profiler-share),
+    transparent var(--profiler-share)
+  );
+  /* Leave some room above and below, so that the bar does not read as a
+  selected row. */
+  background-repeat: no-repeat;
+  background-size: 100% 18px;
+  background-position: left center;
+}
+
+.bodyRow:nth-child(odd) {
+  background-color: color-mix(
+    in srgb,
+    var(--theme-text-default-color) 4%,
+    transparent
+  );
+}
+
+.bodyRow:hover {
+  background-color: var(--theme-list-item-hover-background-color);
+}
+
+.nameCell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rootRow .name {
+  font-weight: bold;
+}
+
+.numberCell {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--theme-text-secondary-color);
+  cursor: pointer;
+}
+
+.toggle:hover {
+  background-color: var(--theme-hover-background-color);
+  color: var(--theme-text-default-color);
+}
+
+.toggle svg {
+  font-size: 16px;
+}
+
+.togglePlaceholder {
+  flex-shrink: 0;
+  width: 20px;
+}

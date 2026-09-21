@@ -4,6 +4,8 @@ import {
   getFunctionCallsToProcess,
   getPendingSubAgentFunctionCalls,
   aiRequestPollSawActivity,
+  canRetryAiRequest,
+  MAX_AI_REQUEST_RETRIES_IN_A_ROW,
 } from './AiRequestUtils';
 import { type AiRequest } from '../Utils/GDevelopServices/Generation';
 
@@ -207,5 +209,51 @@ describe('aiRequestPollSawActivity', () => {
     const previous = makeRequestWithStatus('working', []);
     const fetched = makeRequestWithStatus('working', []);
     expect(aiRequestPollSawActivity(previous, fetched)).toBe(false);
+  });
+});
+
+describe('canRetryAiRequest', () => {
+  const makeErroredAiRequest = (overrides: Object): AiRequest => ({
+    ...makeAiRequest([{ messageId: 'm1' }]),
+    status: 'error',
+    ...overrides,
+  });
+
+  it('is true for a request that just failed', () => {
+    expect(canRetryAiRequest(makeErroredAiRequest({}))).toBe(true);
+  });
+
+  it('is false for a request that did not fail', () => {
+    expect(canRetryAiRequest(makeAiRequest([]))).toBe(false);
+  });
+
+  it('is false once the retries of this conversation are exhausted', () => {
+    expect(
+      canRetryAiRequest(
+        makeErroredAiRequest({
+          retriesInARowCount: MAX_AI_REQUEST_RETRIES_IN_A_ROW - 1,
+          retriedAfterMessagesCount: 1,
+        })
+      )
+    ).toBe(true);
+    expect(
+      canRetryAiRequest(
+        makeErroredAiRequest({
+          retriesInARowCount: MAX_AI_REQUEST_RETRIES_IN_A_ROW,
+          retriedAfterMessagesCount: 1,
+        })
+      )
+    ).toBe(false);
+  });
+
+  it('is true again when something was written to the conversation since', () => {
+    expect(
+      canRetryAiRequest(
+        makeErroredAiRequest({
+          retriesInARowCount: MAX_AI_REQUEST_RETRIES_IN_A_ROW,
+          retriedAfterMessagesCount: 0,
+        })
+      )
+    ).toBe(true);
   });
 });

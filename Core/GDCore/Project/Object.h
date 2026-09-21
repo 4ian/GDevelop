@@ -100,7 +100,18 @@ class GD_CORE_API Object {
 
   /** \brief Change the name of the object with the name passed as parameter.
    */
-  void SetName(const gd::String& name_) { name = name_; };
+  void SetName(const gd::String& name_) {
+    name = name_;
+    ++nameGeneration;
+  };
+
+  /**
+   * \brief Return a counter incremented each time any object is renamed.
+   *
+   * Used by gd::ObjectsContainer to know when its index of objects by name
+   * must be rebuilt, so that renaming an object (from anywhere) is always safe.
+   */
+  static std::size_t GetNameGeneration() { return nameGeneration; }
 
   /** \brief Return the name of the object.
    */
@@ -297,6 +308,8 @@ class GD_CORE_API Object {
                                       ///< useful for computing changesets.
   /** When set to `"manually"`, its resources are not preloaded with the scene. */
   gd::String resourcesPreloading = "with-scene";
+
+  static std::size_t nameGeneration;  ///< See GetNameGeneration.
 
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.

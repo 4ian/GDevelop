@@ -316,8 +316,6 @@ struct GenericStringRef {
 
     GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
 
-    GenericStringRef& operator=(const GenericStringRef& rhs) { s = rhs.s; length = rhs.length; }
-
     //! implicit conversion to plain CharType pointer
     operator const Ch *() const { return s; }
 
@@ -328,6 +326,8 @@ private:
     //! Disallow construction from non-const array
     template<SizeType N>
     GenericStringRef(CharType (&str)[N]) /* = delete */;
+    //! Copy assignment operator not permitted - immutable type
+    GenericStringRef& operator=(const GenericStringRef& rhs) /* = delete */;
 };
 
 //! Mark a character pointer as constant string

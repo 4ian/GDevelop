@@ -138,6 +138,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     ref={toolbarRef}
                     hidden={false}
                     showProjectButtons={false}
+                    showPreviewAndShareButtons={false}
                     canSave={props.canSave}
                     onSave={props.saveProject}
                     openShareDialog={() => props.openShareDialog()}
@@ -191,6 +192,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     >
                       {editorTab.renderEditorContainer({
                         editorId: editorTab.id,
+                        // The editor has its own window: a full width layout.
+                        paneIdentifier: 'center',
                         gameEditorMode: props.gameEditorMode,
                         setGameEditorMode: props.setGameEditorMode,
                         isActive: true,
@@ -220,6 +223,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         projectItemName: editorTab.projectItemName,
                         setPreviewedLayout: props.setPreviewedLayout,
                         onOpenAskAi: props.onOpenAskAi,
+                        gameplayTestsCallbacks: props.gameplayTestsCallbacks,
                         onCloseAskAi: props.onCloseAskAi,
                         onOpenExternalEvents: props.openExternalEvents,
                         onOpenEvents: (sceneName: string) => {
@@ -230,6 +234,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                           });
                         },
                         onOpenLayout: props.openLayout,
+                        onOpenExternalLayout: props.openExternalLayout,
                         onOpenTemplateFromTutorial:
                           props.openTemplateFromTutorial,
                         onOpenTemplateFromCourseChapter:
@@ -258,6 +263,11 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                           props.onRenamedEventsBasedObject,
                         onDeletedEventsBasedObject:
                           props.onDeletedEventsBasedObject,
+                        onEventsBasedObjectMoved:
+                          props.onEventsBasedObjectMoved,
+                        onEventsBasedBehaviorMoved:
+                          props.onEventsBasedBehaviorMoved,
+                        onEventsFunctionMoved: props.onEventsFunctionMoved,
                         openObjectEvents: props.openObjectEvents,
                         onNavigateToEventFromGlobalSearch:
                           props.onNavigateToEventFromGlobalSearch,
@@ -360,9 +370,17 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         onProjectItemRenamedOutsideEditor:
                           props.onProjectItemRenamedOutsideEditor,
                         onWillDeleteScene: props.onWillDeleteScene,
+                        onWillDeleteGameplayTest:
+                          props.onWillDeleteGameplayTest,
                         onWillDeleteObject: props.onWillDeleteObject,
+                        onExtensionsModifiedOutsideEditor:
+                          props.onExtensionsModifiedOutsideEditor,
+                        onWillDeleteExtensionItem:
+                          props.onWillDeleteExtensionItem,
                         onWillInstallExtension: props.onWillInstallExtension,
                         onExtensionInstalled: props.onExtensionInstalled,
+                        onCreateNewExtensionWithBehavior:
+                          props.onCreateNewExtensionWithBehavior,
                         onEffectAdded: props.onEffectAdded,
                         onObjectListsModified: props.onObjectListsModified,
                         onExternalLayoutAssociationChanged:

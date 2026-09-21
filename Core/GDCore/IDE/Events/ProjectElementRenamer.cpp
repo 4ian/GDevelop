@@ -15,7 +15,6 @@
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
-#include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"

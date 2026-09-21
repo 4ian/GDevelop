@@ -5,13 +5,13 @@
  */
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
@@ -176,6 +176,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   commonInstructionsExtension->AddEvent("Else", "Else event", "", "", "", std::make_shared<gd::ElseEvent>());
   commonInstructionsExtension->AddEvent("ForEachChildVariable", "For each child variable event", "", "", "", std::make_shared<gd::ForEachChildVariableEvent>());
   commonInstructionsExtension->AddEvent("Repeat", "Repeat event", "", "", "", std::make_shared<gd::RepeatEvent>());
+  commonInstructionsExtension->AddEvent("Comment", "Comment event", "", "", "", std::make_shared<gd::CommentEvent>());
 
   std::shared_ptr<gd::PlatformExtension> baseObjectExtension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
@@ -527,6 +528,16 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("string", "")
       .AddParameter("expression", "", "", true)
       .SetFunctionName("getNumberWith3Params");
+  extension
+      ->AddStrExpression(
+          "GetVariableString",
+          "Get string of object variable",
+          "",
+          "",
+          "")
+      .AddParameter("object", _("Object parameter"))
+      .AddParameter("objectvar", _("Variable for object"))
+      .SetFunctionName("getObjectVariableString");
   extension
       ->AddStrExpression(
           "GetStringWith2ObjectParamAnd2ObjectVarParam",

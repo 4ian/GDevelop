@@ -25,10 +25,14 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
+  type WillDeleteExtensionItemChanges,
 } from './OutsideEditorChanges';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
+import { normalizeLegacyArguments } from './Scope';
 
 type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
@@ -63,7 +67,18 @@ type ProcessEditorFunctionCallsOptions = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  onExtensionsModifiedOutsideEditor: (
+    changes: ExtensionsOutsideEditorChanges
+  ) => void,
+  ensureExtensionsUpToDate: () => Promise<void>,
+  reloadExtensionMetadata: (extensionName: string) => void,
+  onWillDeleteExtensionItem: (
+    changes: WillDeleteExtensionItemChanges
+  ) => Promise<void>,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
   ) => Promise<void>,
@@ -93,7 +108,12 @@ export const processEditorFunctionCalls = async ({
   onObjectGroupsModifiedOutsideEditor,
   onProjectItemRenamedOutsideEditor,
   onWillDeleteScene,
+  onWillDeleteGameplayTest,
   onWillDeleteObject,
+  onExtensionsModifiedOutsideEditor,
+  ensureExtensionsUpToDate,
+  reloadExtensionMetadata,
+  onWillDeleteExtensionItem,
   relatedAiRequestId,
   getRelatedAiRequestLastMessages,
   ensureExtensionInstalled,
@@ -105,10 +125,12 @@ export const processEditorFunctionCalls = async ({
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
+  createdExternalLayoutNames: Array<string>,
   createdProject: ?gdProject,
 |}> => {
   const results: Array<EditorFunctionCallResult> = [];
   const createdSceneNames: Array<string> = [];
+  const createdExternalLayoutNames: Array<string> = [];
   let createdProject: ?gdProject = null;
 
   for (const functionCall of functionCalls) {
@@ -182,6 +204,10 @@ export const processEditorFunctionCalls = async ({
         continue;
       }
 
+      // Legacy argument names (e.g. `scene_name`) are mapped to their current
+      // form once here, so the functions implement one version of the tools.
+      args = normalizeLegacyArguments(args);
+
       // Check if the function exists
       const editorFunction: EditorFunction | null =
         editorFunctions[name] || null;
@@ -215,7 +241,12 @@ export const processEditorFunctionCalls = async ({
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
         onWillDeleteScene,
+        onWillDeleteGameplayTest,
         onWillDeleteObject,
+        onExtensionsModifiedOutsideEditor,
+        ensureExtensionsUpToDate,
+        reloadExtensionMetadata,
+        onWillDeleteExtensionItem,
         ensureExtensionInstalled,
         onWillInstallExtension,
         onExtensionInstalled,
@@ -277,6 +308,9 @@ export const processEditorFunctionCalls = async ({
       if (meta && meta.newSceneNames) {
         createdSceneNames.push(...meta.newSceneNames);
       }
+      if (meta && meta.newExternalLayoutNames) {
+        createdExternalLayoutNames.push(...meta.newExternalLayoutNames);
+      }
       if (meta && meta.createdProject) {
         createdProject = meta.createdProject;
       }
@@ -290,5 +324,10 @@ export const processEditorFunctionCalls = async ({
     }
   }
 
-  return { results, createdSceneNames, createdProject };
+  return {
+    results,
+    createdSceneNames,
+    createdExternalLayoutNames,
+    createdProject,
+  };
 };

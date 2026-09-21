@@ -58,6 +58,7 @@ import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
+import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
 import { Trans } from '@lingui/macro';
 import { generateUUID } from 'three/src/math/MathUtils';
 import {
@@ -94,6 +95,7 @@ export type InstancesEditorShortcutsCallbacks = {|
   onShift1: () => void,
   onShift2: () => void,
   onShift3: () => void,
+  onFocusOnSelection: () => void,
 |};
 
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
@@ -190,6 +192,7 @@ export default class InstancesEditor extends Component<Props, State> {
   grid: Grid;
   background: Background;
   _unmounted = false;
+  _stopNativeAppActivity: (() => void) | null = null;
   _renderingPausedReasons: Set<string> = new Set();
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
@@ -246,7 +249,6 @@ export default class InstancesEditor extends Component<Props, State> {
     this.keyboardShortcuts = new KeyboardShortcuts({
       shortcutCallbacks: {
         onMove: this.moveSelection,
-        onEscape: this.onPressEscape,
         ...this.props.instancesEditorShortcutsCallbacks,
       },
     });
@@ -301,6 +303,10 @@ export default class InstancesEditor extends Component<Props, State> {
 
       gameCanvas = this.pixiRenderer.view;
     }
+
+    // Each instances editor keeps a WebGL context and its textures alive.
+    if (this._stopNativeAppActivity) this._stopNativeAppActivity();
+    this._stopNativeAppActivity = startNativeAppActivity('instances-editor');
 
     // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
     // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
@@ -664,6 +670,11 @@ export default class InstancesEditor extends Component<Props, State> {
     // This is an antipattern and is theoretically not needed, but help
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
+
+    if (this._stopNativeAppActivity) {
+      this._stopNativeAppActivity();
+      this._stopNativeAppActivity = null;
+    }
 
     // We've seen all those elements being undefined in some cases, so
     // by security, check that they are defined before deleting them.
@@ -1273,15 +1284,6 @@ export default class InstancesEditor extends Component<Props, State> {
     if (!shouldMoveView) {
       this.selectionRectangle.startSelectionRectangle(x, y);
     }
-
-    if (
-      !this.keyboardShortcuts.shouldMultiSelect() &&
-      !shouldMoveView &&
-      this.props.instancesSelection.hasSelectedInstances()
-    ) {
-      this.props.instancesSelection.clearSelection();
-      this.props.onInstancesSelected([]);
-    }
   };
 
   _onPanMove = (deltaX: number, deltaY: number, x: number, y: number) => {
@@ -1649,12 +1651,12 @@ export default class InstancesEditor extends Component<Props, State> {
     this.onInstancesMovedDebounced(unlockedSelectedInstances);
   };
 
-  onPressEscape = () => {
+  cancelClickInterception = (): boolean => {
     if (this.clickInterceptor && this.clickInterceptor.isIntercepting()) {
       this.clickInterceptor.cancelClickInterception();
-    } else if (this.props.tileMapTileSelection) {
-      this.props.onSelectTileMapTile(null);
+      return true;
     }
+    return false;
   };
 
   scrollBy(x: number, y: number) {

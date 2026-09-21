@@ -2,6 +2,7 @@
 declare class gdInstructionValidator {
   static validateParameter(platform: gdPlatform, projectScopedContainers: gdProjectScopedContainers, instruction: gdInstruction, metadata: gdInstructionMetadata, parameterIndex: number): gdParameterValidationResult;
   static isParameterValid(platform: gdPlatform, projectScopedContainers: gdProjectScopedContainers, instruction: gdInstruction, metadata: gdInstructionMetadata, parameterIndex: number): boolean;
+  static getObjectNameForParameter(projectScopedContainers: gdProjectScopedContainers, instruction: gdInstruction, parameterType: string): string;
   delete(): void;
   ptr: number;
 };

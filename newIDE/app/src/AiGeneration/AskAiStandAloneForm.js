@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
+import { canPayForAiRequest } from './AiRequestChat/Utils';
 import {
   addMessageToAiRequest,
   createAiRequest,
@@ -51,6 +52,7 @@ import Text from '../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import IconButton from '../UI/IconButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 
@@ -158,6 +160,10 @@ export const AskAiStandAloneForm = ({
     () => ({
       onOpenLayout,
       onCreateProject,
+      // The stand-alone form has no external layout or extension editors to open.
+      onOpenExternalLayout: () => {},
+      onOpenEventsFunctionsExtension: () => {},
+      onOpenCustomObjectEditor: () => {},
     }),
     [onOpenLayout, onCreateProject]
   );
@@ -277,15 +283,18 @@ export const AskAiStandAloneForm = ({
         let payWithCredits = false;
         if (quota && quota.limitReached && aiRequestPriceInCredits) {
           payWithCredits = true;
-          const doesNotHaveEnoughCreditsToContinue =
-            availableCredits < aiRequestPriceInCredits;
-          const cannotContinue =
-            !automaticallyUseCreditsForAiRequests ||
-            doesNotHaveEnoughCreditsToContinue;
-
-          if (cannotContinue) {
-            return;
-          }
+        }
+        // The same rule as the one enabling the send button, so the button
+        // can't offer to send a request this would silently drop.
+        if (
+          !canPayForAiRequest({
+            quota,
+            price: aiRequestPrice,
+            availableCredits,
+            automaticallyUseCreditsForAiRequests,
+          })
+        ) {
+          return;
         }
 
         // Request is now ready to be started.
@@ -382,6 +391,7 @@ export const AskAiStandAloneForm = ({
       })();
     },
     [
+      aiRequestPrice,
       aiRequestPriceInCredits,
       availableCredits,
       getAuthorizationHeader,
@@ -557,6 +567,8 @@ export const AskAiStandAloneForm = ({
       editorFunctionCallResults: Array<EditorFunctionCallResult>,
       options: {|
         createdSceneNames?: Array<string>,
+        // Not opened by the stand-alone form (no editor to open them in).
+        createdExternalLayoutNames?: Array<string>,
         createdProject?: ?gdProject,
       |}
     ) => {
@@ -569,6 +581,10 @@ export const AskAiStandAloneForm = ({
       });
     },
     [onSendMessage]
+  );
+
+  const eventsFunctionsExtensionsState = React.useContext(
+    EventsFunctionsExtensionsContext
   );
 
   const aiRequestsToProcess = React.useMemo(
@@ -591,7 +607,12 @@ export const AskAiStandAloneForm = ({
     onObjectGroupsModifiedOutsideEditor: () => {},
     onProjectItemRenamedOutsideEditor: () => {},
     onWillDeleteScene: () => Promise.resolve(),
+    onWillDeleteGameplayTest: () => Promise.resolve(),
     onWillDeleteObject: () => {},
+    eventsFunctionsExtensionsState,
+    // The stand-alone form has no editor tab to refresh.
+    onExtensionsModifiedOutsideEditor: () => {},
+    onWillDeleteExtensionItem: () => Promise.resolve(),
     onWillInstallExtension,
     onExtensionInstalled,
     isReadyToProcessFunctionCalls: true,

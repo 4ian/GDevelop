@@ -84,6 +84,8 @@ const ChangeEmailDialog = ({
             }
             fullWidth
             type="email"
+            name="email"
+            autoComplete="email"
             disabled={changeEmailInProgress}
             required
             onChange={(e, value) => {

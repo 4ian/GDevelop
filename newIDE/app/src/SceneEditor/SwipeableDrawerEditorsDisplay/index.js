@@ -266,6 +266,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
           clearHighlightedInstance: editor
             ? editor.clearHighlightedInstance
             : noop,
+          cancelClickInterception: editor
+            ? editor.cancelClickInterception
+            : () => false,
           resetInstanceRenderersFor: editor
             ? editor.resetInstanceRenderersFor
             : noop,
@@ -425,8 +428,8 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         }
                         onObjectCreated={props.onObjectCreated}
                         onObjectEdited={props.onObjectEdited}
-                        onObjectFolderOrObjectWithContextSelected={
-                          props.onObjectFolderOrObjectWithContextSelected
+                        onObjectFolderOrObjectsWithContextSelected={
+                          props.onObjectFolderOrObjectsWithContextSelected
                         }
                         onRenameObjectFolderOrObjectWithContextFinish={
                           props.onRenameObjectFolderOrObjectWithContextFinish
@@ -469,6 +472,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                           projectScopedContainersAccessor
                         }
                         objects={selectedObjects}
+                        selectedObjectFolderOrObjectsCount={
+                          props.selectedObjectFolderOrObjectsWithContext.length
+                        }
                         instances={selectedInstances}
                         layer={selectedLayer}
                         objectGroup={selectedObjectGroup}
@@ -489,6 +495,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         lastSelectionType={props.lastSelectionType}
                         onWillInstallExtension={props.onWillInstallExtension}
                         onExtensionInstalled={props.onExtensionInstalled}
+                        onCreateNewExtensionWithBehavior={
+                          props.onCreateNewExtensionWithBehavior
+                        }
                         onOpenEventBasedObjectVariantEditor={
                           props.onOpenEventBasedObjectVariantEditor
                         }

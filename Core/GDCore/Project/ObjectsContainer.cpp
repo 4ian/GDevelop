@@ -37,6 +37,7 @@ ObjectsContainer& ObjectsContainer::operator=(const ObjectsContainer& other) {
 void ObjectsContainer::Init(const gd::ObjectsContainer& other) {
   sourceType = other.sourceType;
   initialObjects = gd::Clone(other.initialObjects);
+  InvalidateObjectsByName();
   objectGroups = other.objectGroups;
   // The objects folders are not copied.
   // It's not an issue because the UI uses the serialization for duplication.
@@ -84,28 +85,34 @@ void ObjectsContainer::UnserializeObjectsFrom(
       std::cout << "WARNING: Unknown object type \"" << type << "\""
                 << std::endl;
   }
+  InvalidateObjectsByName();
+}
+
+gd::Object* ObjectsContainer::FindObject(const gd::String& name) const {
+  const std::size_t nameGeneration = gd::Object::GetNameGeneration();
+  if (!objectsByNameUpToDate || objectsByNameGeneration != nameGeneration) {
+    objectsByName.clear();
+    for (const auto& object : initialObjects) {
+      // If several objects have the same name, the first one wins (as it
+      // would with a linear search).
+      objectsByName.emplace(object->GetName(), object.get());
+    }
+    objectsByNameGeneration = nameGeneration;
+    objectsByNameUpToDate = true;
+  }
+
+  auto it = objectsByName.find(name);
+  return it == objectsByName.end() ? nullptr : it->second;
 }
 
 bool ObjectsContainer::HasObjectNamed(const gd::String& name) const {
-  return (find_if(initialObjects.begin(),
-                  initialObjects.end(),
-                  [&](const std::unique_ptr<gd::Object>& object) {
-                    return object->GetName() == name;
-                  }) != initialObjects.end());
+  return FindObject(name) != nullptr;
 }
 gd::Object& ObjectsContainer::GetObject(const gd::String& name) {
-  return *(*find_if(initialObjects.begin(),
-                    initialObjects.end(),
-                    [&](const std::unique_ptr<gd::Object>& object) {
-                      return object->GetName() == name;
-                    }));
+  return *FindObject(name);
 }
 const gd::Object& ObjectsContainer::GetObject(const gd::String& name) const {
-  return *(*find_if(initialObjects.begin(),
-                    initialObjects.end(),
-                    [&](const std::unique_ptr<gd::Object>& object) {
-                      return object->GetName() == name;
-                    }));
+  return *FindObject(name);
 }
 gd::Object& ObjectsContainer::GetObject(std::size_t index) {
   return *initialObjects[index];
@@ -130,6 +137,7 @@ gd::Object& ObjectsContainer::InsertNewObject(const gd::Project& project,
       position < initialObjects.size() ? initialObjects.begin() + position
                                        : initialObjects.end(),
       project.CreateObject(objectType, name))));
+  InvalidateObjectsByName();
 
   rootFolder->InsertObject(&newlyCreatedObject);
 
@@ -144,6 +152,7 @@ gd::Object& ObjectsContainer::InsertNewObjectInFolder(
     std::size_t position) {
   gd::Object& newlyCreatedObject = *(*(initialObjects.insert(
       initialObjects.end(), project.CreateObject(objectType, name))));
+  InvalidateObjectsByName();
 
   objectFolderOrObject.InsertObject(&newlyCreatedObject, position);
 
@@ -156,6 +165,7 @@ gd::Object& ObjectsContainer::InsertObject(const gd::Object& object,
       position < initialObjects.size() ? initialObjects.begin() + position
                                        : initialObjects.end(),
       std::unique_ptr<gd::Object>(object.Clone()))));
+  InvalidateObjectsByName();
 
   return newlyCreatedObject;
 }
@@ -167,6 +177,7 @@ void ObjectsContainer::MoveObject(std::size_t oldIndex, std::size_t newIndex) {
   std::unique_ptr<gd::Object> object = std::move(initialObjects[oldIndex]);
   initialObjects.erase(initialObjects.begin() + oldIndex);
   initialObjects.insert(initialObjects.begin() + newIndex, std::move(object));
+  InvalidateObjectsByName();
 }
 
 void ObjectsContainer::RemoveObject(const gd::String& name) {
@@ -181,11 +192,13 @@ void ObjectsContainer::RemoveObject(const gd::String& name) {
   rootFolder->RemoveRecursivelyObjectNamed(name);
 
   initialObjects.erase(objectIt);
+  InvalidateObjectsByName();
 }
 
 void ObjectsContainer::Clear() {
   rootFolder->Clear();
   initialObjects.clear();
+  InvalidateObjectsByName();
 }
 
 void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(
@@ -205,8 +218,10 @@ void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(
 
   std::unique_ptr<gd::Object> object = std::move(*objectIt);
   initialObjects.erase(objectIt);
+  InvalidateObjectsByName();
 
   newContainer.initialObjects.push_back(std::move(object));
+  newContainer.InvalidateObjectsByName();
 
   objectFolderOrObject.GetParent().MoveObjectFolderOrObjectToAnotherFolder(
       objectFolderOrObject, newParentFolder, newPosition);

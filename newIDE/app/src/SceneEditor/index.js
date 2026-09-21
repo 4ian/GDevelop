@@ -57,6 +57,8 @@ import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
+import { shouldCloseOrCancel } from '../UI/KeyboardShortcuts/InteractionKeys';
+import isDialogOpen from '../UI/OpenedDialogChecker';
 import {
   getInstanceInLayoutWithPersistentUuid,
   getInstancesInLayoutForObject,
@@ -249,6 +251,9 @@ type Props = {|
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,
@@ -1066,12 +1071,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     this.editObject(container.getObject(objectName), initialTab);
     if (shouldSelectTheObject) {
-      this._onObjectFolderOrObjectWithContextSelected({
-        objectFolderOrObject: container
-          .getRootFolder()
-          .getObjectNamed(objectName),
-        global,
-      });
+      this._onObjectFolderOrObjectsWithContextSelected([
+        {
+          objectFolderOrObject: container
+            .getRootFolder()
+            .getObjectNamed(objectName),
+          global,
+        },
+      ]);
     }
   };
 
@@ -1119,6 +1126,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       });
     }
     this.setState({ editedGroup: null, isCreatingNewGroup: false });
+    // The dialog may have changed the group objects and variables: make the
+    // properties panel re-read them.
+    this.forceUpdatePropertiesEditor();
   };
 
   setInstancesEditorSettings = (
@@ -1228,20 +1238,26 @@ export default class SceneEditor extends React.Component<Props, State> {
       });
   };
 
-  _onObjectFolderOrObjectWithContextSelected = (
-    objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext = null
+  _onObjectFolderOrObjectsWithContextSelected = (
+    objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext> = []
   ) => {
-    const selectedObjectFolderOrObjectsWithContext = [];
-    if (
-      objectFolderOrObjectWithContext &&
-      exceptionallyGuardAgainstDeadObject(
-        objectFolderOrObjectWithContext.objectFolderOrObject
-      )
-    ) {
-      selectedObjectFolderOrObjectsWithContext.push(
-        objectFolderOrObjectWithContext
-      );
-    }
+    const aliveObjectFolderOrObjectsWithContext = objectFolderOrObjectsWithContext.filter(
+      objectFolderOrObjectWithContext =>
+        exceptionallyGuardAgainstDeadObject(
+          objectFolderOrObjectWithContext.objectFolderOrObject
+        )
+    );
+
+    // The selection must stay within a single section (scene objects or
+    // global objects): keep only the items matching the first one's scope.
+    const selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext> =
+      aliveObjectFolderOrObjectsWithContext.length === 0
+        ? []
+        : aliveObjectFolderOrObjectsWithContext.filter(
+            objectFolderOrObjectWithContext =>
+              objectFolderOrObjectWithContext.global ===
+              aliveObjectFolderOrObjectsWithContext[0].global
+          );
 
     this.setState(
       {
@@ -1377,6 +1393,42 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
     this._sendSelectedInstances();
     this._selectObjectOfInstances(instances);
+  };
+
+  /**
+   * Deselect everything (instances, objects, layers, object groups), so that
+   * the properties panel goes back to the scene properties.
+   */
+  deselectAll = () => {
+    this.instancesSelection.clearSelection();
+    this._onInstancesSelected([]);
+  };
+
+  _onKeyDown = (event: SyntheticKeyboardEvent<HTMLDivElement>) => {
+    if (!shouldCloseOrCancel(event)) return;
+
+    const { target } = event;
+    // $FlowFixMe[prop-missing] - target is an Element (possibly from a popped-out window).
+    if (target.closest('textarea, input, [contenteditable="true"]')) {
+      return; // Escape is handled by the field being edited.
+    }
+    // $FlowFixMe[prop-missing]
+    if (isDialogOpen(target.ownerDocument)) return;
+
+    // Escape first cancels what is in progress, then deselects everything.
+    const { editorDisplay } = this;
+    if (
+      editorDisplay &&
+      editorDisplay.instancesHandlers.cancelClickInterception()
+    ) {
+      return;
+    }
+    if (this.state.tileMapTileSelection) {
+      this.onSelectTileMapTile(null);
+      return;
+    }
+
+    this.deselectAll();
   };
 
   _selectObjectOfInstances = (instances: Array<gdInitialInstance>) => {
@@ -1654,10 +1706,7 @@ export default class SceneEditor extends React.Component<Props, State> {
    */
   _addInstanceForNewObject = (newObjectName: string) => {
     const { newObjectInstanceSceneCoordinates } = this.state;
-    if (!newObjectInstanceSceneCoordinates) {
-      return;
-    }
-
+    if (!newObjectInstanceSceneCoordinates) return;
     this._addInstance(newObjectInstanceSceneCoordinates, newObjectName);
     this.setState({ newObjectInstanceSceneCoordinates: null });
   };
@@ -1669,23 +1718,32 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (objects.length === 0) {
       return;
     }
-    const object = objects[0];
-    const infoBarDetails = onObjectAdded({
-      object,
-      layersContainer: this.props.layersContainer,
-      globalObjectsContainer: this.props.globalObjectsContainer,
-      objectsContainer: this.props.objectsContainer,
-    });
-    if (infoBarDetails) {
-      this.setState({
-        additionalWorkInfoBar: infoBarDetails,
-        showAdditionalWorkInfoBar: true,
+    // Run the per-object-type additional work for every created object (for
+    // instance, a lighting layer is created for a light object): bulk paste
+    // and duplicate can create several objects at once.
+    objects.forEach(object => {
+      const infoBarDetails = onObjectAdded({
+        object,
+        layersContainer: this.props.layersContainer,
+        globalObjectsContainer: this.props.globalObjectsContainer,
+        objectsContainer: this.props.objectsContainer,
       });
-    }
+      if (infoBarDetails) {
+        this.setState({
+          additionalWorkInfoBar: infoBarDetails,
+          showAdditionalWorkInfoBar: true,
+        });
+      }
+    });
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
 
-    this._addInstanceForNewObject(object.getName());
+    // "Add under cursor" coordinates are only meaningful when a single new
+    // object is created through the dialog flow; bulk paste/duplicate should
+    // never auto-place stacked instances at the same position.
+    if (objects.length === 1) {
+      this._addInstanceForNewObject(objects[0].getName());
+    }
 
     this.props.onObjectListsModified({
       isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
@@ -2055,9 +2113,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     // Avoid triggering renaming refactoring if name has not really changed
     if (unifiedName === newName) {
-      this._onObjectFolderOrObjectWithContextSelected(
-        objectFolderOrObjectWithContext
-      );
+      this._onObjectFolderOrObjectsWithContextSelected([
+        objectFolderOrObjectWithContext,
+      ]);
       done(false);
       return;
     }
@@ -2072,9 +2130,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     const object = objectFolderOrObject.getObject();
 
     this._onRenameObjectFinish({ object, global }, newName);
-    this._onObjectFolderOrObjectWithContextSelected(
-      objectFolderOrObjectWithContext
-    );
+    this._onObjectFolderOrObjectsWithContextSelected([
+      objectFolderOrObjectWithContext,
+    ]);
     done(true);
   };
 
@@ -2303,6 +2361,26 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  /**
+   * Center the view on the last selected instance, without changing the zoom
+   * (same behavior as the "F" shortcut of the in-game (3D) editor).
+   */
+  focusOnSelection = () => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) {
+      return;
+    }
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    if (selectedInstances.length === 0) {
+      return;
+    }
+    editorDisplay.viewControls.centerViewOnLastInstance(selectedInstances);
+
+    if (this.props.gameEditorMode === 'embedded-game') {
+      changeViewPosition('centerViewOnLastSelectedInstance');
+    }
+  };
+
   getContextMenuZoomItems = (i18n: I18nType): any => {
     return [
       {
@@ -2314,6 +2392,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         label: i18n._(t`Zoom out`),
         click: this.zoomOut,
         accelerator: 'CmdOrCtrl+numsub',
+      },
+      {
+        label: i18n._(t`Focus on selection`),
+        click: this.focusOnSelection,
+        enabled: this.instancesSelection.hasSelectedInstances(),
+        accelerator: 'F',
       },
       {
         label: i18n._(t`Zoom to fit selection`),
@@ -3038,6 +3122,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   style={styles.container}
                   id="scene-editor"
                   data-active={isActive ? 'true' : undefined}
+                  onKeyDown={this._onKeyDown}
                 >
                   <UseSceneEditorCommands
                     project={project}
@@ -3130,8 +3215,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onObjectEdited={this._onObjectEdited}
                     onObjectsModified={this._onObjectsModified}
                     onEffectAdded={this.props.onEffectAdded}
-                    onObjectFolderOrObjectWithContextSelected={
-                      this._onObjectFolderOrObjectWithContextSelected
+                    onObjectFolderOrObjectsWithContextSelected={
+                      this._onObjectFolderOrObjectsWithContextSelected
                     }
                     onSetAsGlobalObject={this._onSetAsGlobalObject}
                     historyHandler={{
@@ -3166,6 +3251,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       onShift1: this.zoomToFitSelection,
                       onShift2: this.zoomToInitialPosition,
                       onShift3: this.zoomToFitContent,
+                      onFocusOnSelection: this.focusOnSelection,
                     }}
                     onInstancesAdded={this._onInstancesAddedAndSendToEditor3D}
                     onInstancesSelected={this._onInstancesSelected}
@@ -3191,6 +3277,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                     lastSelectionType={this.state.lastSelectionType}
                     onWillInstallExtension={this.props.onWillInstallExtension}
                     onExtensionInstalled={this.props.onExtensionInstalled}
+                    onCreateNewExtensionWithBehavior={
+                      this.props.onCreateNewExtensionWithBehavior
+                    }
                     editorViewPosition2D={this.editorViewPosition2D}
                     onEventsBasedObjectChildrenEdited={
                       this.props.onEventsBasedObjectChildrenEdited
@@ -3281,6 +3370,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                           this.props.onWillInstallExtension
                         }
                         onExtensionInstalled={this.props.onExtensionInstalled}
+                        onCreateNewExtensionWithBehavior={
+                          this.props.onCreateNewExtensionWithBehavior
+                        }
                         onOpenEventBasedObjectEditor={
                           this.props.onOpenEventBasedObjectEditor
                         }

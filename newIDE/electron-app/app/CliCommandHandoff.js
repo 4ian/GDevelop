@@ -6,7 +6,7 @@ const {
 } = require('./OpenProjectsRegistry');
 
 const argsParserOptions = {
-  boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
+  boolean: ['dev-tools', 'disable-update-check', 'keep-open', 'block-on-diagnostic-errors'],
   string: ['_', 'run-command', 'cmd-args'],
 };
 
@@ -17,13 +17,16 @@ const knownCliFlagNames = new Set(
     name => name !== '_'
   )
 );
+const booleanFlagNames = new Set(argsParserOptions.boolean);
 const parseGDevelopArgs = argv =>
   parseArgs(
-    argv.filter(
-      arg =>
-        !arg.startsWith('--') ||
-        knownCliFlagNames.has(arg.slice(2).split('=')[0])
-    ),
+    argv.filter(arg => {
+      if (!arg.startsWith('--')) return true;
+      const argName = arg.slice(2).split('=')[0];
+      if (knownCliFlagNames.has(argName)) return true;
+      // Allow --no-<known-bool-flag> (minimist negation syntax).
+      return argName.startsWith('no-') && booleanFlagNames.has(argName.slice(3));
+    }),
     argsParserOptions
   );
 

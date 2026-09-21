@@ -226,7 +226,7 @@ module.exports = {
         'CheckSaveExistsInStorage',
         _('Check if a save exists in device storage'),
         _(
-          'Check if a save with the given name exists in the device storage, and store the result (yes/no) in a variable. The check is asynchronous: use the condition "Save existence check completed" to know when the result is available.'
+          'Check if a save with the given name exists in the device storage, and store the result (true/false) in a variable. The check is asynchronous: use the condition "Save existence check completed" to know when the result is available.'
         ),
         _(
           'Check if save _PARAM1_ exists in device storage (result in _PARAM2_)'
@@ -239,7 +239,7 @@ module.exports = {
       .addParameter('string', _('Storage name of the save to check'), '', false)
       .addParameter(
         'variable',
-        _('Variable where to store the result (yes/no)'),
+        _('Variable where to store the result (true/false)'),
         '',
         false
       )

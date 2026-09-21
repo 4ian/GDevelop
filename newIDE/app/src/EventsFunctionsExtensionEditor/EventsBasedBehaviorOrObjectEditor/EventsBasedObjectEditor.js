@@ -18,12 +18,16 @@ import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
 import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
 import { CompactToggleField } from '../../UI/CompactToggleField';
 import { CompactIconField } from '../OptionsEditorDialog/CompactIconField';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import ChildObjectForwardFunctionGenerationDialog from './ChildObjectForwardFunctionGenerationDialog';
 
 const gd: libGDevelop = global.gd;
 
 const isDev = Window.isDev();
 
 type Props = {|
+  project: gdProject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   onOpenCustomObjectEditor: () => void,
@@ -34,6 +38,8 @@ type Props = {|
 |};
 
 export default function EventsBasedObjectEditor({
+  project,
+  projectScopedContainersAccessor,
   eventsFunctionsExtension,
   eventsBasedObject,
   onOpenCustomObjectEditor,
@@ -42,6 +48,10 @@ export default function EventsBasedObjectEditor({
 }: Props): React.Node {
   const forceUpdate = useForceUpdate();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [
+    isChildObjectForwardFunctionGenerationDialogShown,
+    setChildObjectForwardFunctionGenerationDialogShown,
+  ] = React.useState(false);
 
   const onChange = React.useCallback(
     () => {
@@ -51,6 +61,22 @@ export default function EventsBasedObjectEditor({
       forceUpdate();
     },
     [forceUpdate, unsavedChanges]
+  );
+
+  const generateChildObjectForwardFunctions = React.useCallback(
+    (childObjectName: string) => {
+      if (!childObjectName) {
+        return;
+      }
+      gd.ChildObjectForwardFunctionGenerator.generateChildObjectForwardFunctions(
+        project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        childObjectName
+      );
+      onChange();
+    },
+    [eventsBasedObject, eventsFunctionsExtension, onChange, project]
   );
 
   return (
@@ -237,12 +263,46 @@ export default function EventsBasedObjectEditor({
               />
             </Line>
           )}
+          {gd.ChildObjectForwardFunctionGenerator.hasAnyChildCustomObject(
+            project,
+            eventsBasedObject
+          ) ? (
+            <AlertMessage
+              kind="info"
+              renderRightButton={() => (
+                <RaisedButton
+                  label={<Trans>Generate functions</Trans>}
+                  onClick={() =>
+                    setChildObjectForwardFunctionGenerationDialogShown(true)
+                  }
+                />
+              )}
+            >
+              <Trans>
+                Some functions can be generated to forward child-object's
+                functions.
+              </Trans>
+            </AlertMessage>
+          ) : null}
           <Line noMargin>
             <HelpButton
               key="help"
               helpPagePath="/objects/custom-objects-prefab-template"
             />
           </Line>
+          {isChildObjectForwardFunctionGenerationDialogShown && (
+            <ChildObjectForwardFunctionGenerationDialog
+              project={project}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              onChoose={childObjectName => {
+                generateChildObjectForwardFunctions(childObjectName);
+                setChildObjectForwardFunctionGenerationDialogShown(false);
+              }}
+              onCancel={() =>
+                setChildObjectForwardFunctionGenerationDialogShown(false)
+              }
+            />
+          )}
         </ColumnStackLayout>
       )}
     </I18n>

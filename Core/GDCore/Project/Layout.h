@@ -454,6 +454,8 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout);
  * \note If a group contains only objects of a same type, then the group has
  * this type. Otherwise, it is considered as an object without any specific
  * type.
+ * \note A group of the layout shadows a global group with the same name:
+ * only the group of the layout is considered.
  * \deprecated Use gd::ObjectsContainersList::GetTypeOfObject instead.
  *
  * @return Type of the object/group.
@@ -484,10 +486,10 @@ GetBehaviorNamesInObjectOrGroup(const gd::ObjectsContainer& project,
                                 bool searchInGroups);
 
 /**
- * \brief Check if a behavior is a default one or doesn't exist in an object or
+ * \brief Check if a behavior is a default one and exists in an object or
  * all objects of a group.
  */
-bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
+bool GD_CORE_API HasDefaultBehavior(const gd::ObjectsContainer& project,
                                    const gd::ObjectsContainer& layout,
                                    gd::String objectOrGroupName,
                                    gd::String behaviorName,
@@ -517,6 +519,8 @@ gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
  * \brief Get behaviors of an object/group
  * \note The behaviors of a group are the behaviors which are found in common
  * when looking all the objects of the group.
+ * \note A group of the layout shadows a global group with the same name:
+ * only the group of the layout is considered.
  *
  * @return Vector containing names of behaviors
  */

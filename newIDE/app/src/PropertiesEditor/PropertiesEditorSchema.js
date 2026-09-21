@@ -93,6 +93,15 @@ export type PrimitiveValueField =
       ...ValueFieldCommonProperties,
     |}
   | {|
+      /** A number of which each bit is displayed as a toggle. */
+      valueType: 'bitmask',
+      getValue: Instance => number,
+      setValue: (instance: Instance, newValue: number) => void,
+      firstBit: number,
+      bitCount: number,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
       valueType: 'multilinestring',
       getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,

@@ -20,7 +20,7 @@ type CommonProps = {|
   value: string,
 
   // Context
-  project?: gdProject,
+  project: gdProject,
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,

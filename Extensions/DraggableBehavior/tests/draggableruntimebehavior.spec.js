@@ -126,6 +126,49 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       expect(object.getY()).to.be(700);
     });
 
+    it('does not stay dropped when deactivated on the drop frame', function () {
+      const inputManager = runtimeGame.getInputManager();
+      const behavior = /** @type {gdjs.DraggableRuntimeBehavior} */ (
+        object.getBehavior('Behavior1')
+      );
+      object.setPosition(450, 500);
+
+      runtimeScene.renderAndStep(1000 / 60);
+      inputManager.onFrameEnded();
+      inputManager.onMouseMove(450, 500);
+      inputManager.onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+      runtimeScene.renderAndStep(1000 / 60);
+      inputManager.onFrameEnded();
+      inputManager.onMouseMove(750, 600);
+      runtimeScene.renderAndStep(1000 / 60);
+      inputManager.onFrameEnded();
+      expect(behavior.isDragged()).to.be(true);
+
+      // Release, then deactivate the behavior in the events of the same frame.
+      inputManager.onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+      let wasJustDroppedDuringEvents = false;
+      runtimeScene.setEventsFunction(function () {
+        wasJustDroppedDuringEvents = behavior.wasJustDropped();
+        behavior.activate(false);
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+      inputManager.onFrameEnded();
+      runtimeScene.setEventsFunction(function () {});
+
+      expect(wasJustDroppedDuringEvents).to.be(true);
+      expect(behavior.isDragged()).to.be(false);
+      expect(behavior.wasJustDropped()).to.be(false);
+
+      runtimeScene.renderAndStep(1000 / 60);
+      inputManager.onFrameEnded();
+      expect(behavior.wasJustDropped()).to.be(false);
+
+      behavior.activate(true);
+      runtimeScene.renderAndStep(1000 / 60);
+      inputManager.onFrameEnded();
+      expect(behavior.wasJustDropped()).to.be(false);
+    });
+
     it('can drag an object without collision mask check', function () {
       object.setPosition(450, 500);
       object.setAngle(45);

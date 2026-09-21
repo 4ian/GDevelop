@@ -1799,7 +1799,6 @@ describe('editorFunctions', () => {
               'When the player presses space, play an explosion sound and show an explosion effect',
             extensionNamesList: '',
             objectsList: 'Player',
-            existingEventsAsText: '',
             existingEventsJson: null,
             existingEventsJsonUserRelativeKey: null,
             resultMessage: 'Successfully added explosion events.',
@@ -1904,7 +1903,6 @@ describe('editorFunctions', () => {
               'When the player presses space, play an explosion sound and the boss music',
             extensionNamesList: '',
             objectsList: 'Player',
-            existingEventsAsText: '',
             existingEventsJson: null,
             existingEventsJsonUserRelativeKey: null,
             resultMessage: 'Successfully added sound events.',
@@ -3978,7 +3976,9 @@ describe('editorFunctions', () => {
       expect(instances[0].height).toBe(48);
       expect(instances[0].depth).toBe(64);
       expect(result.positionSemantics).toEqual(
-        expect.stringContaining('origin, NOT its center')
+        expect.stringContaining(
+          'The center point is the rotation pivot and need not be the geometric midpoint.'
+        )
       );
       expect(result.objectSizeInfo).toEqual({ Player: null });
     });
@@ -6115,6 +6115,182 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('Resource not found: "ghost.png"');
+    });
+  });
+  describe('change_gameplay_tests', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      const tests = project.getTests();
+      tests.insertNewTest('First test', 0).setDescription('First.');
+      tests.insertNewTest('Second test', 1);
+      tests.insertNewTest('Debug test', 2);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a test (and notifies the editor first, so tabs can close)', async () => {
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...fakeOptions,
+          args: {
+            scope: { type: 'project' },
+            changes: [{ test_name: 'Debug test', delete_this_test: true }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Deleted the test "Debug test"');
+      expect(project.getTests().hasTestNamed('Debug test')).toBe(false);
+      expect(fakeOptions.onWillDeleteGameplayTest).toHaveBeenCalledWith({
+        gameplayTestProjectItemName: 'Debug test',
+      });
+      expect(result.tests).toEqual([
+        { test_name: 'First test', description: 'First.' },
+        { test_name: 'Second test', description: '' },
+      ]);
+    });
+
+    it('renames a test (and notifies the editor so tabs are renamed)', async () => {
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...fakeOptions,
+          args: {
+            scope: { type: 'project' },
+            changes: [
+              {
+                test_name: 'First test',
+                changed_properties: [
+                  { property_name: 'name', new_value: 'Renamed test' },
+                  { property_name: 'description', new_value: 'Updated.' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getTests().hasTestNamed('First test')).toBe(false);
+      expect(project.getTests().hasTestNamed('Renamed test')).toBe(true);
+      expect(
+        project
+          .getTests()
+          .getTest('Renamed test')
+          .getDescription()
+      ).toBe('Updated.');
+      expect(
+        fakeOptions.onProjectItemRenamedOutsideEditor
+      ).toHaveBeenCalledWith({
+        kind: 'gameplay-test',
+        oldName: 'First test',
+        newName: 'Renamed test',
+      });
+    });
+
+    it('refuses a rename colliding with an existing test', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scope: { type: 'project' },
+            changes: [
+              {
+                test_name: 'First test',
+                changed_properties: [
+                  { property_name: 'name', new_value: 'Second test' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('already exists');
+      expect(project.getTests().hasTestNamed('First test')).toBe(true);
+    });
+
+    it('reorders a test with the index property (clamped)', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scope: { type: 'project' },
+            changes: [
+              {
+                test_name: 'Debug test',
+                changed_properties: [
+                  { property_name: 'index', new_value: '0' },
+                ],
+              },
+              {
+                test_name: 'First test',
+                changed_properties: [
+                  { property_name: 'index', new_value: '999' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.tests).toEqual([
+        { test_name: 'Debug test', description: '' },
+        { test_name: 'Second test', description: '' },
+        { test_name: 'First test', description: 'First.' },
+      ]);
+    });
+
+    it('rejects an unknown test with the list of existing ones, and an unknown property', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scope: { type: 'project' },
+            changes: [
+              { test_name: 'Ghost test', delete_this_test: true },
+              {
+                test_name: 'First test',
+                changed_properties: [
+                  { property_name: 'source', new_value: 'await 1;' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Unknown test "Ghost test"');
+      expect(result.message).toContain('"First test"');
+      expect(result.message).toContain('Unknown property "source"');
+      // The valid part of the batch still reports the project as modified: no
+      // change was applied here, so it is not.
+      expect(result.meta && result.meta.didModifyProject).toBe(false);
+    });
+
+    it('fails on an unknown scope', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_gameplay_tests.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scope: { type: 'extension', extension_name: 'NotAnExtension' },
+            changes: [{ test_name: 'First test', delete_this_test: true }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('does not exist');
     });
   });
 });

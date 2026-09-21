@@ -8,6 +8,7 @@ const style = {
 type Props = {
   children: React.Node,
   height: number | string,
+  width?: number | string,
   alignItems?: 'center',
   justifyContent?: 'center',
 };
@@ -15,10 +16,13 @@ type Props = {
 const FixedHeightFlexContainer = ({
   children,
   height,
+  width,
   alignItems,
   justifyContent,
 }: Props): React.MixedElement => (
-  <div style={{ ...style, height, alignItems, justifyContent }}>{children}</div>
+  <div style={{ ...style, height, width, alignItems, justifyContent }}>
+    {children}
+  </div>
 );
 
 export default FixedHeightFlexContainer;

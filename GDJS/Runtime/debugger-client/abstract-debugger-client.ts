@@ -1,6 +1,19 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Debugger client');
 
+  /** The only debugger commands processed while a gameplay test is running:
+   * read-only inspection and the gameplay test commands themselves. Every
+   * other command is ignored (fail closed: a command added later cannot
+   * accidentally mutate the game state or stepping the harness owns). */
+  const DEBUGGER_COMMANDS_ALLOWED_DURING_GAMEPLAY_TESTS = new Set([
+    'refresh',
+    'getStatus',
+    'profiler.start',
+    'profiler.stop',
+    'gameplayTest.run',
+    'gameplayTest.stop',
+  ]);
+
   const originalConsole = {
     log: console.log,
     info: console.info,
@@ -28,7 +41,10 @@ namespace gdjs {
     cycleReplacer?: DebuggerClientCycleReplacer,
     maxDepth?: number
   ): DebuggerClientCycleReplacer => {
-    const stack: Array<string> = [],
+    // The chain of objects currently being serialized, from the root
+    // to the object holding the current property, and the property keys
+    // used to reach each of them.
+    const stack: Array<any> = [],
       keys: Array<string> = [];
     if (cycleReplacer === undefined || cycleReplacer === null) {
       cycleReplacer = function (key, value) {
@@ -41,24 +57,38 @@ namespace gdjs {
       };
     }
 
+    // `this` is the object holding the property being serialized.
     return function (key: string, value: any): any {
-      if (stack.length > 0) {
-        const thisPos = stack.indexOf(this);
-        ~thisPos ? stack.splice(thisPos + 1) : stack.push(this);
-        ~thisPos ? keys.splice(thisPos, Infinity, key) : keys.push(key);
-        if (maxDepth != null && thisPos > maxDepth) {
-          return '[Max depth reached]';
-        } else {
-          if (~stack.indexOf(value)) {
-            value = (cycleReplacer as DebuggerClientCycleReplacer).call(
-              this,
-              key,
-              value
-            );
-          }
-        }
-      } else {
+      if (stack.length === 0) {
+        // First call: the root object itself.
         stack.push(value);
+        return replacer == null ? value : replacer.call(this, key, value);
+      }
+
+      const holderPosition = stack.indexOf(this);
+      const isHolderAlreadyInStack = holderPosition !== -1;
+      if (isHolderAlreadyInStack) {
+        // Back to an object already seen: drop everything deeper than it.
+        stack.splice(holderPosition + 1);
+        keys.splice(holderPosition, Infinity, key);
+      } else {
+        // Entered a new nested object.
+        stack.push(this);
+        keys.push(key);
+      }
+
+      const depth = isHolderAlreadyInStack ? holderPosition : stack.length - 1;
+      if (maxDepth != null && depth > maxDepth) {
+        return '[Max depth reached]';
+      }
+
+      const isCircularReference = stack.indexOf(value) !== -1;
+      if (isCircularReference) {
+        value = (cycleReplacer as DebuggerClientCycleReplacer).call(
+          this,
+          key,
+          value
+        );
       }
       return replacer == null ? value : replacer.call(this, key, value);
     };
@@ -74,7 +104,7 @@ namespace gdjs {
    * @param [spaces] - The number of spaces for indentation.
    * @param [cycleReplacer] - Function used to replace circular references with a new value.
    */
-  const circularSafeStringify = (
+  export const circularSafeStringify = (
     obj: any,
     replacer?: DebuggerClientCycleReplacer,
     maxDepth?: number,
@@ -243,6 +273,30 @@ namespace gdjs {
       if (!data || !data.command) {
         // Not a command that's meant to be handled by the debugger, return silently to
         // avoid polluting the console.
+        return;
+      }
+
+      // While a gameplay test runs, the harness owns the game stepping and
+      // state: only read-only and gameplay test commands are processed (an
+      // unpause would make the main loop step in parallel, a hot-reload
+      // would reset instances mid-test).
+      if (
+        gdjs.gameplayTests &&
+        gdjs.gameplayTests.isGameplayTestRunning() &&
+        !DEBUGGER_COMMANDS_ALLOWED_DURING_GAMEPLAY_TESTS.has(data.command)
+      ) {
+        logger.warn(
+          `Ignored debugger command "${data.command}" while a gameplay test is running.`
+        );
+        this._sendMessage(
+          circularSafeStringify({
+            command: 'commandIgnored',
+            payload: {
+              ignoredCommand: data.command,
+              reason: 'gameplay-test-running',
+            },
+          })
+        );
         return;
       }
 
@@ -484,6 +538,37 @@ namespace gdjs {
         } else if (data.command === 'getSelectionAABB') {
           if (inGameEditor) {
             this.sendSelectionAABB(data.messageId);
+          }
+        } else if (data.command === 'gameplayTest.run') {
+          if (gdjs.gameplayTests) {
+            gdjs.gameplayTests
+              .runGameplayTest(runtimeGame, data.payload, (frame) => {
+                that.sendGameplayTestProgress(data.messageId, frame);
+              })
+              .then((result) => {
+                that.sendGameplayTestResult(data.messageId, result);
+              })
+              .catch((error) => {
+                // `runGameplayTest` is not supposed to throw - this is a
+                // safety net so the editor always gets an answer.
+                that.sendGameplayTestResult(data.messageId, {
+                  testName: (data.payload && data.payload.testName) || '',
+                  status: 'error',
+                  errors: ['Unexpected error while running the test: ' + error],
+                });
+              });
+          } else {
+            this.sendGameplayTestResult(data.messageId, {
+              testName: (data.payload && data.payload.testName) || '',
+              status: 'error',
+              errors: [
+                'Gameplay tests are not included in this preview - relaunch the preview from the editor.',
+              ],
+            });
+          }
+        } else if (data.command === 'gameplayTest.stop') {
+          if (gdjs.gameplayTests) {
+            gdjs.gameplayTests.stopCurrentGameplayTest();
           }
         } else if (data.command === 'hardReload') {
           // This usually means that the preview was modified so much that an entire reload
@@ -737,7 +822,7 @@ namespace gdjs {
           return value;
         },
         /* Limit maximum depth to prevent any crashes */
-        18
+        22
       );
       const serializationDuration = Date.now() - serializationStartTime;
       logger.log(
@@ -930,6 +1015,32 @@ namespace gdjs {
       );
     }
 
+    /**
+     * Send a progress update about the gameplay test being run.
+     */
+    sendGameplayTestProgress(messageId: number, frame: number): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'gameplayTest.progress',
+          messageId,
+          payload: { frame },
+        })
+      );
+    }
+
+    /**
+     * Send the result of a gameplay test run.
+     */
+    sendGameplayTestResult(messageId: number, result: Object): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'gameplayTest.result',
+          messageId,
+          payload: result,
+        })
+      );
+    }
+
     sendSelectionAABB(messageId: number): void {
       const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
@@ -982,7 +1093,7 @@ namespace gdjs {
      * @param stats Other measures done during the profiler run.
      */
     sendProfilerOutput(
-      framesAverageMeasures: FrameMeasure,
+      framesAverageMeasures: FrameMeasureOutput,
       stats: ProfilerStats
     ): void {
       this._sendMessage(

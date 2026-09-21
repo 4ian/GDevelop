@@ -1,12 +1,15 @@
 // @flow
 import { makeTestProject } from '../../../fixtures/TestProject';
+import { mapFor } from '../../../Utils/MapFor';
 import {
   buildEventScriptSourceView,
   renderEventSourceById,
 } from './EventScriptSourceView';
 import {
+  getSerializerFixtureNamed,
   makeEventsList,
   sceneStartSerializedEvents,
+  withoutEventIdAnnotations,
 } from './EventScriptTestHelpers';
 
 const gd: libGDevelop = global.gd;
@@ -31,6 +34,40 @@ describe('EventScriptSourceView', () => {
     },
     {
       type: 'BuiltinCommonInstructions::Standard',
+      conditions: [],
+      actions: [
+        { type: { value: 'Delete' }, parameters: ['MySpriteObject', ''] },
+      ],
+    },
+  ];
+
+  // A sheet mixing the fenced `js` events with regular ones: what a read of
+  // a scene using JavaScript looks like.
+  const mixedJsSerializedEvents = [
+    {
+      type: 'BuiltinCommonInstructions::JsCode',
+      inlineCode: 'runtimeScene.getGame().pause(true);',
+      parameterObjects: '',
+      useStrict: true,
+      eventsSheetExpanded: false,
+    },
+    {
+      type: 'BuiltinCommonInstructions::Standard',
+      conditions: [{ type: { value: 'DepartScene' }, parameters: [''] }],
+      actions: [],
+      events: [
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode: 'objects.forEach(object => object.setX(0));',
+          parameterObjects: 'MySpriteObject',
+          useStrict: true,
+          eventsSheetExpanded: false,
+        },
+      ],
+    },
+    {
+      type: 'BuiltinCommonInstructions::ForEach',
+      object: 'MySpriteObject',
       conditions: [],
       actions: [
         { type: { value: 'Delete' }, parameters: ['MySpriteObject', ''] },
@@ -349,10 +386,9 @@ describe('EventScriptSourceView', () => {
             { type: { value: 'Delete' }, parameters: ['MySpriteObject', ''] },
           ],
           events: [
-            {
-              type: 'BuiltinCommonInstructions::JsCode',
-              inlineCode: 'runtimeScene.setBackgroundColor(255, 0, 0);',
-            },
+            // The internal async event has no EventScript form (a `js`
+            // event has one: the fenced code block).
+            { type: 'BuiltinAsync::Async' },
           ],
         },
       ]);
@@ -364,11 +400,224 @@ describe('EventScriptSourceView', () => {
       });
 
       expect(view.text).toContain(
-        '# (event of type "BuiltinCommonInstructions::JsCode" cannot be shown as EventScript)  # event-0.0'
+        '# (event of type "BuiltinAsync::Async" cannot be shown as EventScript)  # event-0.0'
       );
       expect(view.notes.join(' ')).toContain(
         'cannot be expressed as EventScript'
       );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('shows `js` events with their fence in a whole-sheet read', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, mixedJsSerializedEvents);
+
+      const view = buildEventScriptSourceView({
+        eventsList,
+        maxChars: 10000,
+      });
+
+      expect(view.renderingErrors).toEqual([]);
+      // No "cannot be expressed as EventScript" note: a `js` event has an
+      // EventScript form now.
+      expect(view.notes).toEqual([]);
+      expect(view.selectedEventIds).toEqual(['event-0', 'event-1', 'event-2']);
+      expect(view.text).toBe(
+        [
+          'js """  # event-0',
+          'runtimeScene.getGame().pause(true);',
+          '"""',
+          'if DepartScene():  # event-1',
+          '  js(MySpriteObject) """  # event-1.0',
+          '  objects.forEach(object => object.setX(0));',
+          '  """',
+          'for each MySpriteObject:  # event-2',
+          '  Delete(MySpriteObject)',
+        ].join('\n')
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('renders the source of a `js` event by id, with its fence', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, mixedJsSerializedEvents);
+
+      // The `expected_event_source` anchor of a replace placement is this
+      // source: the code must appear exactly as stored (the backend
+      // compares it character for character).
+      expect(
+        renderEventSourceById({
+          eventsList,
+          eventIdOrGroupName: 'event-0',
+          includeSubEvents: false,
+        })
+      ).toBe(
+        [
+          'js """  # event-0',
+          'runtimeScene.getGame().pause(true);',
+          '"""',
+        ].join('\n')
+      );
+      expect(
+        renderEventSourceById({
+          eventsList,
+          eventIdOrGroupName: 'event-1',
+          includeSubEvents: true,
+        })
+      ).toBe(
+        [
+          'if DepartScene():  # event-1',
+          '  js(MySpriteObject) """  # event-1.0',
+          '  objects.forEach(object => object.setX(0));',
+          '  """',
+        ].join('\n')
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('renders a nested `js` event exactly like the shared conformance fixture', () => {
+    const { project } = makeTestProject(gd);
+    // The rendering is what the backend parser must read back: assert it
+    // against the EventScript of the shared fixture (the backend spec parses
+    // the same text back to the same events).
+    const fixture = getSerializerFixtureNamed(
+      'javascript code event as a sub-event, with quotes, `#`, blank lines and indentation in the code'
+    );
+    try {
+      const eventsList = makeEventsList(project, fixture.serializedEvents);
+
+      const source = renderEventSourceById({
+        eventsList,
+        eventIdOrGroupName: 'event-0',
+        includeSubEvents: true,
+      });
+
+      expect(withoutEventIdAnnotations(source || '')).toBe(
+        fixture.expectedEventScript.join('\n')
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('drops a `js` event whole rather than cutting inside its fence', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const longCode = mapFor(0, 20, index => `object.setX(${index});`).join(
+        '\n'
+      );
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            { type: { value: 'Delete' }, parameters: ['MySpriteObject', ''] },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode: longCode,
+          parameterObjects: 'MySpriteObject',
+          useStrict: true,
+          eventsSheetExpanded: false,
+        },
+      ]);
+
+      // Big enough for the first event, too small for the `js` one: it is
+      // dropped whole, with the usual truncation note.
+      const view = buildEventScriptSourceView({ eventsList, maxChars: 100 });
+      expect(view.truncated).toBe(true);
+      expect(view.selectedEventIds).toEqual(['event-0']);
+      expect(view.text).not.toContain('"""');
+      expect(view.notes.join(' ')).toContain('event-1');
+
+      // Not even the `js` event alone fits: the fence is still not cut in
+      // half (half a fence is not valid EventScript).
+      const jsOnlyView = buildEventScriptSourceView({
+        eventsList,
+        eventIds: ['event-1'],
+        maxChars: 100,
+      });
+      expect(jsOnlyView.truncated).toBe(true);
+      expect(jsOnlyView.text).toBe(
+        ['# ... 1 other event(s) here (event-0)', '# (output truncated)'].join(
+          '\n'
+        )
+      );
+      // Nothing of the event is shown: the note says so (reading it alone
+      // again would not help, only a bigger budget does).
+      expect(jsOnlyView.selectedEventIds).toEqual([]);
+      expect(jsOnlyView.notes.join(' ')).toContain(
+        'event-1 is not shown at all'
+      );
+      expect(jsOnlyView.notes.join(' ')).not.toContain('cut short');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('keeps a `js` event whole when it fits, dropping only what follows', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            { type: { value: 'Delete' }, parameters: ['MySpriteObject', ''] },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode: ['object.setX(0);', 'object.setY(0);'].join('\n'),
+          parameterObjects: 'MySpriteObject',
+          useStrict: true,
+          eventsSheetExpanded: false,
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            { type: { value: 'Delete' }, parameters: ['MySpriteObject', ''] },
+          ],
+        },
+      ]);
+
+      // The full source of the `js` event: a marker for the sibling before,
+      // the fence, a marker for the sibling after.
+      const fullText = buildEventScriptSourceView({
+        eventsList,
+        eventIds: ['event-1'],
+        maxChars: 10000,
+      }).text;
+      const trailingMarkerStart = fullText.lastIndexOf('\n# ... ');
+      expect(trailingMarkerStart).toBeGreaterThan(0);
+
+      // A budget that fits everything but the trailing marker: the fence is
+      // kept whole (its header, its code and its closing line).
+      const view = buildEventScriptSourceView({
+        eventsList,
+        eventIds: ['event-1'],
+        maxChars: trailingMarkerStart,
+      });
+      expect(view.truncated).toBe(true);
+      expect(view.selectedEventIds).toEqual(['event-1']);
+      expect(view.text).toBe(
+        [fullText.slice(0, trailingMarkerStart), '# (output truncated)'].join(
+          '\n'
+        )
+      );
+      expect(view.text).toContain('js(MySpriteObject) """  # event-1');
+      expect(view.text).toContain('object.setY(0);\n"""');
+      expect(view.text).not.toContain('(event-2)');
     } finally {
       project.delete();
     }

@@ -10,7 +10,7 @@ namespace gdjs {
    * Manages the common objects shared by objects having a
    * platform behavior: in particular, the platforms behaviors are required to
    * declare themselves (see PlatformObjectsManager.addPlatform) to the manager
-   * of their associated container (see PlatformRuntimeBehavior.getManager).
+   * of their associated container (see PlatformObjectsManager.getManager).
    * @category Behaviors > Platform
    */
   export class PlatformObjectsManager {

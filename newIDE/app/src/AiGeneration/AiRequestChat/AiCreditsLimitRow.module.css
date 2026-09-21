@@ -1,0 +1,192 @@
+.container {
+  /* Themes that don't define the premium accent still get a sensible one, so
+     the row never falls back to an invalid (dropped) color. */
+  --ai-credits-limit-teal: var(--theme-premium-teal, #3bf7f4);
+  --ai-credits-limit-orange: var(--theme-premium-orange, #ffbc57);
+  --ai-credits-limit-accent-text: var(
+    --theme-premium-accent-text-color,
+    #ffa929
+  );
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid
+    color-mix(in srgb, var(--ai-credits-limit-orange) 30%, transparent);
+  background-color: var(--theme-surface-alternate-canvas-background-color);
+  animation: aiCreditsLimitAppear 180ms ease-out;
+}
+
+/* The premium accent of the editor (teal to orange) as a thin bar on top: it
+   marks the row as an upsell without washing the whole surface in a color that
+   would fight with the text on light and dark themes alike. */
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    var(--ai-credits-limit-teal) 0%,
+    var(--ai-credits-limit-orange) 100%
+  );
+}
+
+/* A soft glow behind the badge, to give the row some depth. */
+.container::after {
+  content: '';
+  position: absolute;
+  top: -90px;
+  left: -60px;
+  width: 260px;
+  height: 200px;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--ai-credits-limit-teal) 16%, transparent),
+    transparent
+  );
+}
+
+@keyframes aiCreditsLimitAppear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container {
+    animation: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  /* Above the decorative glow. */
+  position: relative;
+}
+
+.headerTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+/* The kind of message, above the title: short, uppercase and tinted, so the
+   reason for the row is readable before the title. */
+.overline {
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ai-credits-limit-accent-text);
+}
+
+.premiumBadge,
+.creditsBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.premiumBadge {
+  background: linear-gradient(
+    135deg,
+    var(--ai-credits-limit-teal) 0%,
+    var(--ai-credits-limit-orange) 100%
+  );
+  color: var(--theme-premium-text-contrast-color, #1d1d26);
+}
+
+.creditsBadge {
+  background-color: color-mix(
+    in srgb,
+    var(--ai-credits-limit-orange) 25%,
+    transparent
+  );
+  color: var(--theme-text-default-color);
+}
+
+.bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+  position: relative;
+}
+
+.bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bulletIcon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 15px;
+  /* Aligns the icon with the first line of the (smaller) bullet text. */
+  padding-top: 2px;
+  color: var(--theme-success-color);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  position: relative;
+}
+
+/* The price of the featured plan and, when the yearly plan is cheaper, how much
+   is saved - right under the button that leads to it. */
+.priceLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.discountChip {
+  flex-shrink: 0;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.6;
+  white-space: nowrap;
+  background-color: var(--theme-success-color);
+  color: var(--theme-success-text-contrast-color);
+}

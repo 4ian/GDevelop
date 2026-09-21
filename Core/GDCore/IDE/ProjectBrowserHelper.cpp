@@ -451,6 +451,21 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
       propertyVariablesContainer, worker);
 }
 
+void ProjectBrowserHelper::ExposeEventsFunctionsExtensionFunctions(
+    gd::Project &project,
+    gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    ArbitraryEventsFunctionsWorker &worker) {
+  worker.Launch(eventsFunctionsExtension.GetEventsFunctions());
+  for (auto &&eventsBasedBehavior :
+       eventsFunctionsExtension.GetEventsBasedBehaviors().GetInternalVector()) {
+    worker.Launch(eventsBasedBehavior->GetEventsFunctions());
+  }
+  for (auto &&eventsBasedObject :
+       eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
+    worker.Launch(eventsBasedObject->GetEventsFunctions());
+  }
+}
+
 void ProjectBrowserHelper::ExposeProjectObjects(
     gd::Project &project, gd::ArbitraryObjectsWorker &worker) {
 

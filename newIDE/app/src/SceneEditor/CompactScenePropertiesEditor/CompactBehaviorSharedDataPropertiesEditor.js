@@ -28,10 +28,12 @@ export const CompactBehaviorSharedDataPropertiesEditor = ({
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
-      const behaviorMetadataSharedProperties = behaviorMetadata.getSharedProperties();
       return propertiesMapToSchema({
-        properties: behaviorMetadataSharedProperties,
-        defaultValueProperties: behaviorMetadataSharedProperties,
+        // Use the shared data properties (and not the metadata ones) so that
+        // properties adapting themselves to the current values (labels,
+        // visibility...) are properly displayed.
+        properties: behaviorSharedData.getProperties(),
+        defaultValueProperties: behaviorMetadata.getSharedProperties(),
         getPropertyValue: (instance, name) =>
           instance
             .getProperties()
@@ -46,7 +48,10 @@ export const CompactBehaviorSharedDataPropertiesEditor = ({
         shouldDisabledFieldsWithMixedValues: false,
       });
     },
-    [schemaRecomputeTrigger, behaviorMetadata]
+    // The shared data is identified by its pointer, as a new wrapper object is
+    // given at each render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [schemaRecomputeTrigger, behaviorSharedData.ptr, behaviorMetadata]
   );
 
   return (

@@ -131,7 +131,10 @@ export type PrivateGameTemplate = {|
   createdAt: string,
   tag: string,
   longDescription: string,
-  gamePreviewLink: string,
+  /** The id of the game published on gd.games showcasing this template. */
+  showcasedGameId?: ?string,
+  /** @deprecated Use `showcasedGameId` and check the game is published before building a link. */
+  gamePreviewLink?: ?string,
   includedTemplateIds?: Array<string>,
 |};
 

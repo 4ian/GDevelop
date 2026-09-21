@@ -70,6 +70,10 @@ const buildSW = () => {
         'external/zip.js/WebContent/zlib-asm/codecs.js', // zlib-asm codec for Zip.js
         'external/zlib-asm/zlib.js', // zlib-asm
 
+        // Draco decoder, used to read 3D models compressed with Draco.
+        'external/draco/gltf/draco_wasm_wrapper.js',
+        'external/draco/gltf/draco_decoder.wasm',
+
         // Monaco Editor (for JavaScript)
         'external/monaco-editor-min/vs/loader.js',
         'external/monaco-editor-min/vs/base/worker/workerMain.js',

@@ -55,6 +55,7 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
   gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
                                     codeGenerator.GetProjectScopedContainers(),
                                     rootType,
+                                    rootObjectName,
                                     extraInfo);
   node->Visit(validator);
   if (!validator.GetFatalErrors().empty()) {

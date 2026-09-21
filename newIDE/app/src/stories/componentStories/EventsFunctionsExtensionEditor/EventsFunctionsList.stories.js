@@ -32,17 +32,28 @@ export const Default = (): React.Node => (
         onSelectEventsBasedObject={action('object selected')}
         onDeleteEventsBasedObject={action('object deleted')}
         onRenameEventsBasedObject={action('rename object')}
+        moveEventsBasedObjectTo={action('move object')}
         onEventsBasedObjectRenamed={action('object renamed')}
+        onEventsBasedObjectMoved={action('object moved')}
         onEventsBasedObjectPasted={action('object pasted')}
         onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
         onAddEventsBasedObject={cb => cb({ isRenderedIn3D: false })}
         onEventBasedObjectTypeChanged={action('onEventBasedObjectTypeChanged')}
+        // Gameplay tests
+        onOpenGameplayTest={action('open gameplay test')}
+        onRenameGameplayTest={action('rename gameplay test')}
+        onDeleteGameplayTest={action('delete gameplay test')}
+        onRunGameplayTest={action('run gameplay test')}
         // Behaviors
         onSelectEventsBasedBehavior={action('behavior selected')}
         onDeleteEventsBasedBehavior={action('behavior deleted')}
         onRenameEventsBasedBehavior={action('rename behavior')}
+        moveEventsBasedBehaviorTo={action('move behavior')}
+        moveEventsFunctionTo={action('move function')}
         onEventsBasedBehaviorRenamed={action('behavior renamed')}
         onEventsBasedBehaviorPasted={action('behavior pasted')}
+        onEventsBasedBehaviorMoved={action('behavior moved')}
+        onEventsFunctionMoved={action('function moved')}
         // Free functions
         onSelectEventsFunction={action('function selected')}
         onDeleteEventsFunction={action('function deleted')}

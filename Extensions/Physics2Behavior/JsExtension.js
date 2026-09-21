@@ -219,6 +219,13 @@ module.exports = {
     physics2Behavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
+      // The shape decides which dimensions are meaningful and how they
+      // should be labelled, so these properties adapt themselves to it.
+      const shape = behaviorContent.getChild('shape').getStringValue();
+      const isCircleShape = shape === 'Circle';
+      const isEdgeShape = shape === 'Edge';
+      const isPolygonShape = shape === 'Polygon';
+
       behaviorProperties
         .getOrCreate('bodyType')
         .setValue(behaviorContent.getChild('bodyType').getStringValue())
@@ -283,12 +290,18 @@ module.exports = {
         .getOrCreate('shape')
         .setValue(behaviorContent.getChild('shape').getStringValue())
         .setType('Choice')
-        .setLabel('Shape')
+        .setLabel(_('Shape'))
+        .setDescription(
+          _(
+            'The shape used for collisions. It gives their meaning to the dimension properties. A polygon is defined by its "Vertices" and positioned according to "Polygon origin".'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
         .addChoice('Box', _('Box'))
         .addChoice('Circle', _('Circle'))
         .addChoice('Edge', _('Edge'))
-        .addChoice('Polygon', _('Polygon'));
+        .addChoice('Polygon', _('Polygon'))
+        .setHasImpactOnOtherProperties(true);
       behaviorProperties
         .getOrCreate('shapeDimensionA')
         .setValue(
@@ -299,9 +312,17 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Dimension A')
+        .setLabel(
+          isCircleShape ? _('Radius') : isEdgeShape ? _('Length') : _('Width')
+        )
+        .setDescription(
+          _(
+            'Width of the box, radius of the circle or length of the edge. Use 0 to follow the object size.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        // A polygon is defined by its vertices instead of dimensions.
+        .setHidden(isPolygonShape);
       behaviorProperties
         .getOrCreate('shapeDimensionB')
         .setValue(
@@ -311,10 +332,20 @@ module.exports = {
             .toString(10)
         )
         .setType('Number')
-        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Dimension B')
+        .setMeasurementUnit(
+          isEdgeShape
+            ? gd.MeasurementUnit.getDegreeAngle()
+            : gd.MeasurementUnit.getPixel()
+        )
+        .setLabel(isEdgeShape ? _('Angle') : _('Height'))
+        .setDescription(
+          _(
+            'Height of the box, or angle of the edge in degrees. Not used by a circle. Use 0 to follow the object height.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        // A circle only needs a radius and a polygon uses its vertices.
+        .setHidden(isPolygonShape || isCircleShape);
       behaviorProperties
         .getOrCreate('shapeOffsetX')
         .setValue(
@@ -322,9 +353,14 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Offset X')
+        .setLabel(_('Shape offset X'))
+        .setDescription(
+          _(
+            'Offset of the collision shape relative to the object center, on the X axis.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('shapeOffsetY')
         .setValue(
@@ -332,9 +368,14 @@ module.exports = {
         )
         .setType('Number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setLabel('Shape Offset Y')
+        .setLabel(_('Shape offset Y'))
+        .setDescription(
+          _(
+            'Offset of the collision shape relative to the object center, on the Y axis.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('polygonOrigin')
         .setValue(
@@ -343,12 +384,16 @@ module.exports = {
             : 'Center'
         )
         .setType('Choice')
-        .setLabel('Polygon Origin')
+        .setLabel(_('Polygon origin'))
+        .setDescription(
+          _('Point of the object the polygon vertices are relative to.')
+        )
         .addChoice('Center', _('Center'))
         .addChoice('Origin', _('Origin'))
         .addChoice('TopLeft', _('TopLeft'))
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        // Only used by the "Polygon" shape.
+        .setHidden(!isPolygonShape);
       behaviorProperties
         .getOrCreate('vertices')
         .setValue(
@@ -434,17 +479,31 @@ module.exports = {
       behaviorProperties
         .getOrCreate('layers')
         .setValue(behaviorContent.getChild('layers').getIntValue().toString(10))
-        .setType('Number')
-        .setLabel('Layers')
+        .setType('Bitmask')
+        .addExtraInfo('bitCount=16')
+        .setLabel(_('Layers'))
+        .setDescription(
+          _(
+            'Layers the object belongs to, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 16 which is 32768.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        .setGroup(_('Collision filtering'))
+        .setAdvanced(true);
       behaviorProperties
         .getOrCreate('masks')
         .setValue(behaviorContent.getChild('masks').getIntValue().toString(10))
-        .setType('Number')
-        .setLabel('Masks')
+        .setType('Bitmask')
+        .addExtraInfo('bitCount=16')
+        .setLabel(_('Masks'))
+        .setDescription(
+          _(
+            'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 16 which is 32768.'
+          )
+        )
         .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-        .setHidden(true); // Hidden as required to be changed in the full editor.
+        .setGroup(_('Collision filtering'))
+        .setAdvanced(true);
 
       return behaviorProperties;
     };

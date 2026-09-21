@@ -1,0 +1,211 @@
+/**
+ * Styles for the (virtualized) list of variables. All the rows have the exact
+ * same height, which is set by the component (see `VARIABLE_ROW_HEIGHT`), so
+ * that the position of a row can be computed without rendering it.
+ */
+
+.rowsContainer {
+  position: relative;
+}
+
+/* Every row is positioned at `index * VARIABLE_ROW_HEIGHT` of the container. */
+.rowContainer {
+  position: absolute;
+  /* Leave a thin gap on the sides, so that the rounded corners of the rows are
+     not stuck to the borders of the panel/dialog containing the list. */
+  left: 2px;
+  right: 2px;
+  /* Leave a thin gap between two rows. */
+  padding-bottom: 1px;
+  box-sizing: border-box;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 2px;
+  padding-right: 4px;
+  border-radius: 4px;
+  background-color: var(
+    --theme-surface-alternate-canvas-light-background-color
+  );
+  color: var(--theme-text-default-color);
+  /* The font is otherwise only set by the Text components, which the rows don't
+     use: the labels of a row would fall back to the font of the browser. */
+  font-family: var(--gdevelop-modern-font-family);
+}
+
+.row:not(.selected):hover::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 4px;
+  background-color: var(--theme-hover-background-color);
+  pointer-events: none;
+}
+
+.row.selected {
+  background-color: var(--theme-selection-background-color);
+  color: var(--theme-selection-color);
+}
+
+/* The type selector sets its own colors: make it follow the selected row. */
+.row.selected .typeSelector select,
+.row.selected .typeSelector svg {
+  color: var(--theme-selection-color);
+}
+
+.chevron {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 100%;
+  border-radius: 4px 0 0 4px;
+}
+
+.chevron svg {
+  font-size: 16px;
+}
+
+.dragHandle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  width: 16px;
+  color: var(--theme-text-secondary-color);
+  opacity: 0.5;
+}
+
+.row:hover .dragHandle {
+  opacity: 1;
+}
+
+.dragHandle svg {
+  font-size: 16px;
+}
+
+.nameField {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-left: 2px;
+}
+
+.rowRightSide {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.typeSelector {
+  flex: 0 0 auto;
+  /* Only the icon of the type is displayed. */
+  width: 30px;
+}
+
+.typeSelector.withTypeName {
+  width: 124px;
+}
+
+/* Clicking anywhere on the icon of the type opens the type selection: the
+   select itself is stretched over the icon, and made invisible. */
+.typeSelectorIconOnly {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 22px;
+  border-radius: 4px;
+}
+
+/* Show that the icon of the type can be clicked to change it. */
+.row:hover .typeSelectorIconOnly,
+.typeSelectorIconOnly:focus-within {
+  background-color: var(--theme-text-field-default-background-color);
+  outline: 1px solid var(--theme-text-field-hover-border-color);
+}
+
+.typeSelectorIconOnly svg {
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.typeSelectorIconOnly select {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  appearance: none;
+  border: none;
+  outline: none;
+}
+
+.typeSelectorReadOnly {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding-left: 4px;
+  overflow: hidden;
+}
+
+.typeSelectorReadOnly svg {
+  flex: 0 0 auto;
+  font-size: 18px;
+}
+
+.typeSelectorReadOnlyLabel {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--theme-text-secondary-color);
+}
+
+.valueField {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.valueLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.actionButton {
+  flex: 0 0 auto;
+}
+
+.actionButton svg {
+  font-size: 18px;
+}
+
+.dropIndicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dropIndicatorBefore {
+  top: -1px;
+}
+
+.dropIndicatorAfter {
+  bottom: -1px;
+}

@@ -21,6 +21,10 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
   while (project.GetExternalEventsCount() > 0)
     project.RemoveExternalEvents(project.GetExternalEvents(0).GetName());
 
+  // Tests are editor-only: their source is sent to the game at runtime by the
+  // test runner, so they are never included in exported or previewed games.
+  project.GetTests().ClearTests();
+
   gd::BehaviorDefaultFlagClearer behaviorDefaultFlagClearer;
   gd::WholeProjectBrowser wholeProjectBrowser;
   wholeProjectBrowser.ExposeObjects(project, behaviorDefaultFlagClearer);
@@ -63,6 +67,7 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
     }
     extension.GetEventsBasedBehaviors().Clear();
     extension.GetEventsFunctions().ClearEventsFunctions();
+    extension.GetTests().ClearTests();
   }
 }
 

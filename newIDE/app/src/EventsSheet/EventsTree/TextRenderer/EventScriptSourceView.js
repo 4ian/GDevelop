@@ -30,6 +30,58 @@ export type EventScriptSourceView = {|
   renderingErrors: Array<EventScriptRenderingError>,
 |};
 
+/**
+ * What a function of an extension can use, in names only: its parameters (the
+ * implicit `Object`/`Behavior` included), the properties of the behavior or
+ * object owning it, the child objects of a custom object and the variables of
+ * its extension. Enough to read or write its events without another call.
+ */
+export type ScopeSummary = {|
+  parameters: Array<{| name: string, type: string |}>,
+  properties: Array<string>,
+  childObjects?: Array<string>,
+  extensionVariables: {| global: Array<string>, scene: Array<string> |},
+|};
+
+/**
+ * The scope summary of a function as EventScript comment lines, to show at
+ * the top of its source. `#` lines are ignored by the EventScript parser, so
+ * the source stays valid if it is sent back as is.
+ */
+export const renderScopeSummaryHeaderLines = (
+  scopeSummary: ScopeSummary
+): Array<string> => {
+  const lines: Array<string> = [];
+
+  if (scopeSummary.parameters.length > 0) {
+    const parameters = scopeSummary.parameters
+      .map(parameter => `${parameter.name} (${parameter.type})`)
+      .join(', ');
+    lines.push(`# parameters: ${parameters}`);
+  }
+  if (scopeSummary.properties.length > 0) {
+    lines.push(`# properties: ${scopeSummary.properties.join(', ')}`);
+  }
+  const childObjects = scopeSummary.childObjects || [];
+  if (childObjects.length > 0) {
+    lines.push(`# child objects: ${childObjects.join(', ')}`);
+  }
+  const { extensionVariables } = scopeSummary;
+  const extensionVariablesParts = [
+    ...(extensionVariables.global.length > 0
+      ? [`global ${extensionVariables.global.join(', ')}`]
+      : []),
+    ...(extensionVariables.scene.length > 0
+      ? [`scene ${extensionVariables.scene.join(', ')}`]
+      : []),
+  ];
+  if (extensionVariablesParts.length > 0) {
+    lines.push(`# extension variables: ${extensionVariablesParts.join('; ')}`);
+  }
+
+  return lines;
+};
+
 const indexEvents = (
   eventsList: gdEventsList,
   parentPath: string,
@@ -52,6 +104,52 @@ const getParentPath = (path: string): string | null => {
 
 const isDescendantPath = (path: string, ancestorPath: string): boolean =>
   path.startsWith(ancestorPath + '.');
+
+// The header and the closing line of a `js """ ... """` fence, as the
+// renderer emits them (`disabled js(Enemies) """  # event-3`, then `"""` at
+// the indentation of the event).
+const JS_FENCE_HEADER_LINE = /^ *(disabled )?js(\([^)]*\))? """/;
+const JS_FENCE_CLOSING_LINE = /^ *"""/;
+
+/**
+ * Truncate a rendering to `maxChars`, cutting only at line boundaries and
+ * never inside a `js` fence: half a fence is not valid EventScript (and the
+ * code of a `js` event is compared character for character), so a `js`
+ * event is kept whole or dropped whole. Returns an empty string when even
+ * the first chunk does not fit.
+ */
+const truncateEventScriptTextWithoutCuttingFences = (
+  text: string,
+  maxChars: number
+): string => {
+  const lines = text.split('\n');
+  const keptLines: Array<string> = [];
+  let keptLength = 0;
+  let index = 0;
+  while (index < lines.length) {
+    // The chunk that must be kept or dropped as a whole: a `js` event (from
+    // its header to its closing fence), or a single line.
+    let chunkEnd = index + 1;
+    if (JS_FENCE_HEADER_LINE.test(lines[index])) {
+      while (
+        chunkEnd < lines.length &&
+        !JS_FENCE_CLOSING_LINE.test(lines[chunkEnd])
+      ) {
+        chunkEnd++;
+      }
+      // Include the closing line (an unterminated fence: the whole rest).
+      if (chunkEnd < lines.length) chunkEnd++;
+    }
+    const chunk = lines.slice(index, chunkEnd);
+    const chunkLength =
+      chunk.join('\n').length + (keptLines.length === 0 ? 0 : 1);
+    if (keptLength + chunkLength > maxChars) break;
+    keptLines.push(...chunk);
+    keptLength += chunkLength;
+    index = chunkEnd;
+  }
+  return keptLines.join('\n');
+};
 
 const compareDocumentOrder = (pathA: string, pathB: string): number => {
   const partsA = pathA.split('.').map(Number);
@@ -469,8 +567,31 @@ export const buildEventScriptSourceView = ({
       if (text.length <= maxChars) break;
     }
     if (text.length > maxChars) {
-      // A single event still overflowing: hard-truncate as a last resort.
-      text = text.slice(0, maxChars) + '\n# (output truncated)';
+      // A single event still overflowing: cut it as a last resort, between
+      // lines and never inside a `js` fence.
+      const keptText = truncateEventScriptTextWithoutCuttingFences(
+        text,
+        maxChars
+      );
+      text = keptText
+        ? `${keptText}\n# (output truncated)`
+        : '# (output truncated)';
+      const lastPath = keptPaths[keptPaths.length - 1];
+      const isLastEventShown = keptText
+        .split('\n')
+        .some(line => line.endsWith(`# event-${lastPath}`));
+      if (isLastEventShown) {
+        notes.push(
+          'Output too large: the source of the last event shown is cut short. Read it alone with `event_ids` (or raise `max_chars`) to get it in full.'
+        );
+      } else {
+        // A `js` event bigger than the budget is dropped whole (its code
+        // cannot be cut in half): say so, and do not claim it is shown.
+        keptPaths.pop();
+        notes.push(
+          `Output too large: event-${lastPath} is not shown at all (its source is larger than \`max_chars\`, and a \`js\` event cannot be cut in half). Raise \`max_chars\` to read it.`
+        );
+      }
     }
     if (droppedPaths.length > 0) {
       const droppedIds = droppedPaths.map(path => `event-${path}`);
@@ -486,9 +607,10 @@ export const buildEventScriptSourceView = ({
     truncated = true;
   }
 
-  // Some events (like JavaScript code events) have no EventScript form and
-  // are shown as `#` comments: replacing a subtree containing one from this
-  // source would silently lose it - warn the reader.
+  // A few event types have no EventScript form (internal ones like the
+  // async event, events of a removed extension) and are shown as `#`
+  // comments: replacing a subtree containing one from this source would
+  // silently lose it - warn the reader.
   if (text.includes('cannot be shown as EventScript')) {
     notes.push(
       'This selection contains event(s) that cannot be expressed as EventScript (shown as `#` comments). Do not use `replace_entire_event_and_sub_events` on a subtree containing them (they would be lost): use `replace_event_but_keep_existing_sub_events`, or edit around them.'

@@ -190,6 +190,8 @@ export type Team = {|
    * team. Keys mirror the `classrooms` capability of the limits.
    */
   classrooms?: ?{| hideAskAi: boolean |},
+  /** Days an archived member must wait before reactivation. 0 means no delay. */
+  minimumDelayBeforeReactivationInDays?: number,
 |};
 export type TeamGroup = {| id: string, name: string |};
 export type TeamInvitation = {|

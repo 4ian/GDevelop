@@ -5,59 +5,11 @@ import {
   type EditFunction,
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
-import mapValues from 'lodash/mapValues';
-
-// This mirrors the internals of gdjs.Variable.
-type Variable = {|
-  _type: 'string' | 'number' | 'boolean' | 'structure' | 'array',
-  _str: string,
-  _value: number,
-  _bool: boolean,
-  _children: { [string]: Variable },
-  _childrenArray: Array<Variable>,
-|};
-
-// This mirrors the internals of gdjs.VariablesContainer.
-type VariablesContainer = {|
-  _variables: { items: { [string]: Variable } },
-|};
-
-// $FlowFixMe[recursive-definition]
-// $FlowFixMe[definition-cycle]
-const transformVariable = (variable: Variable) => {
-  if (!variable) return null;
-
-  const transformedVariable: any = {
-    type: variable._type,
-    value: null,
-  };
-
-  if (variable._type === 'string') transformedVariable.value = variable._str;
-  else if (variable._type === 'number')
-    transformedVariable.value = variable._value;
-  else if (variable._type === 'boolean')
-    transformedVariable.value = variable._bool;
-  else if (variable._type === 'structure')
-    transformedVariable.value = mapValues(
-      variable._children,
-      transformVariable
-    );
-  else if (variable._type === 'array')
-    transformedVariable.value = variable._childrenArray.map(transformVariable);
-
-  return transformedVariable;
-};
-
-const transform = (variablesContainer: VariablesContainer) => {
-  if (
-    !variablesContainer ||
-    !variablesContainer._variables ||
-    !variablesContainer._variables.items
-  )
-    return null;
-
-  return mapValues(variablesContainer._variables.items, transformVariable);
-};
+import {
+  transformVariablesContainer,
+  type DebuggerVariable as Variable,
+  type DebuggerVariablesContainer as VariablesContainer,
+} from './DebuggerVariable';
 
 /**
  * Returns the list of properties to access the variable at the specified path in the specified variables container.
@@ -171,7 +123,11 @@ const VariablesContainerInspector = (props: Props): React.Node => (
   <ReactJsonView
     collapsed={false}
     name={false}
-    src={props.variablesContainer ? transform(props.variablesContainer) : null}
+    src={
+      props.variablesContainer
+        ? transformVariablesContainer(props.variablesContainer)
+        : null
+    }
     enableClipboard={false}
     displayDataTypes={false}
     displayObjectSize={false}

@@ -45,6 +45,9 @@ export type TestProject = {|
   testBehaviorEventsFunction: gdEventsFunction,
   testBehaviorLifecycleEventsFunction: gdEventsFunction,
   testEventsBasedObject: gdEventsBasedObject,
+  composedEventBasedObject: gdEventsBasedObject,
+  eventBasedObjectProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  composedEventBasedObjectProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
   testObjectEventsFunction: gdEventsFunction,
   layerWithEffects: gdLayer,
   layerWith3DEffects: gdLayer,
@@ -181,6 +184,30 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testObjectEventsFunction
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+  const composedEventBasedObject = buttonExtension
+    .getEventsBasedObjects()
+    .insertNew('ComposedEventBasedObject', 0);
+  composedEventBasedObject
+    .getObjects()
+    .insertNewObject(project, 'Button::PanelSpriteButton', 'Button', 0);
+
+  const eventBasedObjectProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+    {
+      project,
+      eventsFunctionsExtension: buttonExtension,
+      eventsBasedObject: buttonEventBasedObject,
+    },
+    new gd.ObjectsContainer(gd.ObjectsContainer.Function)
+  );
+  const composedEventBasedObjectProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+    {
+      project,
+      eventsFunctionsExtension: buttonExtension,
+      eventsBasedObject: composedEventBasedObject,
+    },
+    new gd.ObjectsContainer(gd.ObjectsContainer.Function)
+  );
 
   // Create and expose some objects
   const testLayout = project.insertNewLayout('TestLayout', 0);
@@ -1013,6 +1040,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testBehaviorEventsFunction,
     testBehaviorLifecycleEventsFunction,
     testEventsBasedObject: buttonEventBasedObject,
+    composedEventBasedObject,
+    eventBasedObjectProjectScopedContainersAccessor,
+    composedEventBasedObjectProjectScopedContainersAccessor,
     testObjectEventsFunction,
     layerWithEffects,
     layerWith3DEffects,

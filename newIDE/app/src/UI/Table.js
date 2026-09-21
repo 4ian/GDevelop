@@ -14,6 +14,8 @@ type TableCellCommonProps = {|
     paddingLeft?: number,
     paddingRight?: number,
     textAlign?: string,
+    // For columns of numbers, so digits line up between rows.
+    fontVariantNumeric?: string,
     wordBreak?: 'break-word',
     verticalAlign?: string,
     overflow?: string,

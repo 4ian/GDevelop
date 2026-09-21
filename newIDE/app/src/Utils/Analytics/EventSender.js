@@ -13,7 +13,12 @@ import { getBrowserLanguageOrLocale } from '../Language';
 import { type SubscriptionAnalyticsMetadata } from '../../Profile/Subscription/SubscriptionContext';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
-import { isMobile, isNativeMobileApp } from '../Platform';
+import {
+  isMobile,
+  isNativeMobileApp,
+  isNativeIos,
+  isNativeAndroid,
+} from '../Platform';
 import { retryIfFailed } from '../RetryIfFailed';
 import { type NewProjectCreationSource } from '../../ProjectCreation/NewProjectSetupDialog';
 import { isServiceWorkerSupported } from '../../ServiceWorkerSetup';
@@ -106,6 +111,34 @@ const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
 };
 
 /**
+ * Metadata about the app, added to every event. Note that `appKind` is `mobile-app` for both
+ * iOS and Android: use `appPlatform` to tell them apart.
+ */
+const getAppMetadata = () => ({
+  isInAppTutorialRunning: currentlyRunningInAppTutorial,
+  isInDesktopApp: isElectronApp,
+  isInWebApp: !isElectronApp && !isNativeMobileApp(),
+  isInNativeMobileApp: isNativeMobileApp(),
+  isInNativeIosApp: isNativeIos(),
+  isInNativeAndroidApp: isNativeAndroid(),
+  appKind: isElectronApp
+    ? 'desktop-app'
+    : isNativeMobileApp()
+    ? 'mobile-app'
+    : 'web-app',
+  appPlatform: isNativeIos()
+    ? 'ios'
+    : isNativeAndroid()
+    ? 'android'
+    : isElectronApp
+    ? 'desktop'
+    : 'web',
+  appVersion: getIDEVersion(),
+  appVersionWithHash: getIDEVersionWithHash(),
+  serviceWorkerSupported: isServiceWorkerSupported(),
+});
+
+/**
  * Used to send an event to the analytics.
  * This function will retry to send the event if the analytics service is not ready.
  */
@@ -131,25 +164,17 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
 
     posthog.capture(name, {
       ...metadata,
-      // Always add metadata about the app:
-      isInAppTutorialRunning: currentlyRunningInAppTutorial,
-      isInDesktopApp: isElectronApp,
-      isInWebApp: !isElectronApp,
-      appKind: isElectronApp
-        ? 'desktop-app'
-        : isNativeMobileApp()
-        ? 'mobile-app'
-        : 'web-app',
-      appVersion: getIDEVersion(),
-      appVersionWithHash: getIDEVersionWithHash(),
-      serviceWorkerSupported: isServiceWorkerSupported(),
+      ...getAppMetadata(),
     });
   })();
 
   (async () => {
     await ensureGDevelopEditorAnalyticsReady();
     if (gdevelopEditorAnalytics) {
-      await gdevelopEditorAnalytics.trackEvent(name, metadata || {});
+      await gdevelopEditorAnalytics.trackEvent(name, {
+        ...metadata,
+        ...getAppMetadata(),
+      });
     }
   })();
 };
@@ -509,6 +534,19 @@ export const sendErrorMessage = (
     rawError,
     errorId,
   });
+};
+
+/**
+ * Sent when the editor starts again after the previous session was interrupted (on mobile,
+ * when the system killed the WebView or the app: see NativeAppLifecycle.js).
+ */
+export const sendNativeAppRestart = (metadata: { [string]: any }) => {
+  recordEvent('native-app-restart', metadata);
+};
+
+/** Sent when the system warns the app that it's running low on memory. */
+export const sendNativeAppMemoryWarning = (metadata: { [string]: any }) => {
+  recordEvent('native-app-memory-warning', metadata);
 };
 
 export const sendSignupDone = (email: string) => {

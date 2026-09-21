@@ -34,6 +34,9 @@ export const Default = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={false}
     />
   </SerializedObjectDisplay>
@@ -56,6 +59,9 @@ export const WithoutAnyBehaviors = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={false}
     />
   </SerializedObjectDisplay>
@@ -78,6 +84,9 @@ export const Locked = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={true}
     />
   </SerializedObjectDisplay>
@@ -100,6 +109,9 @@ export const LockedWithoutAnyBehaviors = (): React.Node => (
       onBehaviorsUpdated={() => {}}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isListLocked={true}
     />
   </SerializedObjectDisplay>

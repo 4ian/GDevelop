@@ -1,0 +1,90 @@
+/* All the rules are scoped to the `button` element: Material UI resets the
+   background and the border of its ButtonBase in a stylesheet injected at
+   runtime, which would otherwise win over the class alone. */
+
+button.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 13px;
+  border: 1px solid var(--theme-list-item-separator-color);
+  background-color: var(--theme-surface-canvas-background-color);
+  color: var(--theme-text-default-color);
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color 150ms ease, border-color 150ms ease,
+    color 150ms ease;
+}
+
+button.button:hover {
+  background-color: var(--theme-list-item-hover-background-color);
+  border-color: var(--theme-text-secondary-color);
+}
+
+button.buttonFocusVisible {
+  outline: 2px solid var(--theme-text-field-active-border-color);
+  outline-offset: 2px;
+}
+
+button.button:disabled {
+  opacity: 0.5;
+}
+
+button.buttonPrimary {
+  border-color: transparent;
+  background-color: var(--theme-primary-light);
+  color: var(--theme-primary-text-contrast-color);
+}
+
+button.buttonPrimary:hover {
+  border-color: transparent;
+  background-color: var(--theme-primary-color);
+}
+
+button.buttonQuiet {
+  border-color: transparent;
+  background-color: transparent;
+  color: var(--theme-text-secondary-color);
+}
+
+button.buttonQuiet:hover {
+  border-color: transparent;
+  background-color: var(--theme-list-item-hover-background-color);
+  color: var(--theme-text-default-color);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+}
+
+.tooltipWrapper {
+  display: inline-flex;
+}
+
+/* For the action leading to a purchase (a subscription, credits): the premium
+   gradient used across the editor, so an upsell is recognizable at a glance. */
+button.buttonPremium {
+  border-color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--theme-premium-teal) 0%,
+    var(--theme-premium-orange) 100%
+  );
+  color: var(--theme-premium-text-contrast-color);
+  font-weight: bold;
+}
+
+button.buttonPremium:hover {
+  border-color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--theme-premium-teal-dark) 0%,
+    var(--theme-premium-orange-dark) 100%
+  );
+}

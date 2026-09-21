@@ -603,6 +603,7 @@ namespace gdjs {
         protected onFinish: () => void;
         protected timeSource: TimeSource;
         protected isPaused = false;
+        protected isFinished = false;
         protected tweenInformation: TweenInformation;
 
         constructor(
@@ -632,6 +633,13 @@ namespace gdjs {
             this.elapsedTime + this.timeSource.getElapsedTime() / 1000,
             this.totalDuration
           );
+          // A tween with a duration of 0 (or less) finishes on its first step.
+          // The tween is not considered finished at creation, so that
+          // `_updateValue` is called at least once to apply the targeted value
+          // and call `onFinish`.
+          if (this.elapsedTime >= this.totalDuration) {
+            this.isFinished = true;
+          }
           this._updateValue();
         }
 
@@ -643,11 +651,12 @@ namespace gdjs {
         }
 
         hasFinished(): boolean {
-          return this.elapsedTime === this.totalDuration;
+          return this.isFinished;
         }
 
         stop(jumpToDest: boolean): void {
           this.elapsedTime = this.totalDuration;
+          this.isFinished = true;
           if (jumpToDest) {
             this._updateValue();
           }
@@ -662,12 +671,17 @@ namespace gdjs {
         }
 
         getProgress(): float {
+          if (this.totalDuration <= 0) {
+            // Avoid a division by 0 for tweens with a duration of 0.
+            return this.isFinished ? 1 : 0;
+          }
           return this.elapsedTime / this.totalDuration;
         }
 
         // To be used for network synchronization.
         updateElapsedTime(newElapsedTime: float): void {
           this.elapsedTime = newElapsedTime;
+          this.isFinished = newElapsedTime >= this.totalDuration;
         }
 
         abstract getNetworkSyncData(): TweenInstanceNetworkSyncData<T>;

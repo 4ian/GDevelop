@@ -8,6 +8,7 @@ import Subheader from '../UI/Subheader';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import ColorField from '../UI/ColorField';
+import { CompactBitmaskField } from '../UI/CompactBitmaskField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -302,6 +303,24 @@ const PropertiesEditor = ({
                 const rgbString =
                   color.length === 0 ? '' : rgbOrHexToRGBString(color);
                 instances.forEach(i => setValue(i, rgbString));
+                _onInstancesModified(instances);
+              }}
+            />
+          </Column>
+        );
+      } else if (field.valueType === 'bitmask') {
+        const { setValue, firstBit, bitCount } = field;
+        return (
+          <Column key={field.name} expand noMargin>
+            <CompactBitmaskField
+              id={field.name}
+              label={getFieldLabel({ instances, field })}
+              markdownDescription={getFieldDescription(field)}
+              value={getFieldValue({ instances, field })}
+              firstBit={firstBit}
+              bitCount={bitCount}
+              onChange={newValue => {
+                instances.forEach(i => setValue(i, newValue));
                 _onInstancesModified(instances);
               }}
             />

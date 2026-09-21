@@ -47,6 +47,7 @@ const initialTeam: Team = {
   id: 'teamId',
   createdAt: 160,
   seats: 9,
+  minimumDelayBeforeReactivationInDays: 0,
 };
 
 const initialAdmins: Array<User> = [

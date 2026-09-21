@@ -19,7 +19,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 const gd: libGDevelop = global.gd;
 
 type Props = {|
-  project: ?gdProject,
+  project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   /** If specified, only this object type should be allowed to be selected. */
@@ -38,6 +38,8 @@ type Props = {|
 
   /** A list of object names to exclude from the autocomplete list (for example if they have already been selected). */
   excludedObjectOrGroupNames?: Array<string>,
+
+  requireCustomObject?: boolean,
 
   onChoose?: string => void,
   onChange: string => void,
@@ -66,19 +68,28 @@ export const getObjectsAndGroupsDataSource = ({
   allowedObjectType,
   requiredCapabilitiesBehaviorTypes,
   excludedObjectOrGroupNames,
+  requireCustomObject,
 }: {|
-  project: ?gdProject,
+  project: gdProject,
   objectsContainersList: gdObjectsContainersList,
   noGroups: ?boolean,
   allowedObjectType: ?string,
   requiredCapabilitiesBehaviorTypes?: Array<string>,
   excludedObjectOrGroupNames: ?Array<string>,
+  requireCustomObject: ?boolean,
 |}): DataSource => {
-  const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
+  let { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
     objectsContainersList,
     allowedObjectType || undefined,
     requiredCapabilitiesBehaviorTypes || []
   );
+
+  allObjectsList = requireCustomObject
+    ? allObjectsList.filter(({ object }) =>
+        project.hasEventsBasedObject(object.getType())
+      )
+    : allObjectsList;
+
   const objects = allObjectsList.map(({ object }) => {
     return {
       text: object.getName(),
@@ -105,19 +116,20 @@ export const getObjectsAndGroupsDataSource = ({
         };
       });
 
-  const fullList =
+  let fullList =
     groups.length === 0
       ? objects
       : [...objects, { type: 'separator' }, ...groups];
 
-  return excludedObjectOrGroupNames
-    ? // $FlowFixMe[incompatible-type]
-      fullList.filter(
+  fullList = excludedObjectOrGroupNames
+    ? fullList.filter(
         //$FlowFixMe[incompatible-type]
         ({ value }) => !excludedObjectOrGroupNames.includes(value)
       )
-    : // $FlowFixMe[incompatible-type]
-      fullList;
+    : fullList;
+
+  // $FlowFixMe[incompatible-type]
+  return fullList;
 };
 
 export const checkHasRequiredBehaviors = ({
@@ -193,6 +205,7 @@ const ObjectSelector: React.ComponentType<{
     onApply,
     id,
     excludedObjectOrGroupNames,
+    requireCustomObject,
     hintText,
     requiredCapabilitiesBehaviorTypes,
     requiredVisibleBehaviorTypes,
@@ -211,6 +224,7 @@ const ObjectSelector: React.ComponentType<{
     allowedObjectType,
     requiredCapabilitiesBehaviorTypes,
     excludedObjectOrGroupNames,
+    requireCustomObject,
   });
 
   const hasValidChoice =

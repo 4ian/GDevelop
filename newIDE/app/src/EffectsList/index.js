@@ -64,11 +64,13 @@ const EFFECTS_CLIPBOARD_KIND = 'Effects';
 
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget2D = makeDragSourceAndDropTarget(
-  '2d-effects-list'
+  '2d-effects-list',
+  { touchDragStart: 'immediate' }
 );
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget3D = makeDragSourceAndDropTarget(
-  '3d-effects-list'
+  '3d-effects-list',
+  { touchDragStart: 'immediate' }
 );
 
 const styles = {

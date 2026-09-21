@@ -9,6 +9,9 @@ namespace gdjs {
     !!attachment &&
     attachment instanceof spine.PointAttachment;
 
+  /** `renderMeshes` is private in the Spine typings, but it must be wrapped. */
+  type SpineWithRenderMeshes = { renderMeshes: () => void };
+
   /**
    * @category Renderers > Spine
    */
@@ -16,6 +19,9 @@ namespace gdjs {
     private _object: gdjs.SpineRuntimeObject;
     private _rendererObject: spine.Spine | PIXI.Container;
     private _isAnimationComplete = true;
+    private _areMeshesOutdated = true;
+    private _areScaledLocalBoundsOutdated = true;
+    private _scaledLocalBounds = { x: 0, y: 0, width: 0, height: 0 };
 
     /**
      * @param runtimeObject The object to render
@@ -29,6 +35,7 @@ namespace gdjs {
       this._rendererObject = this.constructRendererObject();
       if (isSpine(this._rendererObject)) {
         this._rendererObject.autoUpdate = false;
+        this._cacheMeshesUntilPoseChanges(this._rendererObject);
       }
 
       this.updatePosition();
@@ -42,6 +49,44 @@ namespace gdjs {
         .addRendererObject(this._rendererObject, runtimeObject.getZOrder());
     }
 
+    /**
+     * `Spine.updateTransform` regenerates every mesh of the skeleton, which is
+     * the most expensive thing a Spine object does. PixiJS calls it both when
+     * the local bounds are read (to update the AABB) and when the scene graph
+     * is rendered, but the meshes only depend on the skeleton pose: make the
+     * extra calls a no-op until the pose changes.
+     */
+    private _cacheMeshesUntilPoseChanges(spineObject: spine.Spine): void {
+      const spineObjectWithRenderMeshes =
+        spineObject as unknown as SpineWithRenderMeshes;
+      const renderMeshes = spineObjectWithRenderMeshes.renderMeshes;
+
+      if (typeof renderMeshes !== 'function') {
+        throw new Error(
+          'Spine.renderMeshes is missing: the mesh caching of SpineRuntimeObjectPixiRenderer must be updated for this version of the Spine runtime.'
+        );
+      }
+
+      spineObjectWithRenderMeshes.renderMeshes = () => {
+        if (!this._areMeshesOutdated) {
+          return;
+        }
+
+        this._areMeshesOutdated = false;
+        renderMeshes.call(spineObject);
+      };
+
+      const previousAfterUpdateWorldTransforms =
+        spineObject.afterUpdateWorldTransforms;
+
+      spineObject.afterUpdateWorldTransforms = (object) => {
+        previousAfterUpdateWorldTransforms(object);
+
+        this._areMeshesOutdated = true;
+        this._areScaledLocalBoundsOutdated = true;
+      };
+    }
+
     updateAnimation(timeDelta: float) {
       if (!isSpine(this._rendererObject)) {
         return;
@@ -53,15 +98,42 @@ namespace gdjs {
       return this._rendererObject;
     }
 
-    getOriginOffset(): PIXI.Point {
-      if (!isSpine(this._rendererObject)) return new PIXI.Point(0, 0);
+    /**
+     * The local bounds of the skeleton, scaled to the object size. Reading them
+     * walks every mesh of the skeleton, so they are only recomputed when the
+     * pose or the scale changed. The returned object must not be modified.
+     *
+     * The Spine `boundsProvider` is not used for this: none of its
+     * implementations returns the bounds of the current frame, and setting one
+     * disables `interactiveChildren` and overwrites `hitArea`.
+     */
+    private _getScaledLocalBounds(): {
+      x: float;
+      y: float;
+      width: float;
+      height: float;
+    } {
+      if (this._areScaledLocalBoundsOutdated) {
+        this._areScaledLocalBoundsOutdated = false;
 
-      const localBounds = this._rendererObject.getLocalBounds(undefined, true);
+        const localBounds = this._rendererObject.getLocalBounds(
+          undefined,
+          true
+        );
+        const scaleX = this._rendererObject.scale.x;
+        const scaleY = this._rendererObject.scale.y;
+        const scaledLocalBounds = this._scaledLocalBounds;
+        scaledLocalBounds.x = localBounds.x * scaleX;
+        scaledLocalBounds.y = localBounds.y * scaleY;
+        scaledLocalBounds.width = localBounds.width * scaleX;
+        scaledLocalBounds.height = localBounds.height * scaleY;
+      }
 
-      return new PIXI.Point(
-        localBounds.x * this._rendererObject.scale.x,
-        localBounds.y * this._rendererObject.scale.y
-      );
+      return this._scaledLocalBounds;
+    }
+
+    getOriginOffset(): { x: float; y: float } {
+      return this._getScaledLocalBounds();
     }
 
     onDestroy(): void {
@@ -83,6 +155,7 @@ namespace gdjs {
       this._rendererObject.scale.y = this._object.isFlippedY()
         ? -scaleY
         : scaleY;
+      this._areScaledLocalBoundsOutdated = true;
     }
 
     updatePosition(): void {
@@ -99,31 +172,33 @@ namespace gdjs {
     }
 
     getWidth(): float {
-      return this._rendererObject.width;
+      return this._getScaledLocalBounds().width;
     }
 
     getHeight(): float {
-      return this._rendererObject.height;
+      return this._getScaledLocalBounds().height;
     }
 
     setWidth(width: float): void {
       this._rendererObject.width = width;
+      this._areScaledLocalBoundsOutdated = true;
     }
 
     setHeight(height: float): void {
       this._rendererObject.height = height;
+      this._areScaledLocalBoundsOutdated = true;
     }
 
     getUnscaledWidth(): float {
       return Math.abs(
-        (this._rendererObject.width * this._object._originalScale) /
+        (this.getWidth() * this._object._originalScale) /
           this._rendererObject.scale.x
       );
     }
 
     getUnscaledHeight(): float {
       return Math.abs(
-        (this._rendererObject.height * this._object._originalScale) /
+        (this.getHeight() * this._object._originalScale) /
           this._rendererObject.scale.y
       );
     }

@@ -56,7 +56,7 @@ export class EditableTileMap {
     dimY: integer,
     // TODO should the tile set be built internally?
     // It's not meant to change and it avoid to do a copy.
-    tileSet: Map<integer, TileDefinition>,
+    tileSet: Map<integer, TileDefinition>
   ) {
     this.tileWidth = tileWidth;
     this.tileHeight = tileHeight;
@@ -72,7 +72,7 @@ export class EditableTileMap {
       this.tileHeight,
       this.dimX,
       this.dimY,
-      this._tileSet,
+      this._tileSet
     );
     for (const layer of this._layers) {
       tileMap._layers.push(layer.clone(tileMap, layer.id));
@@ -98,7 +98,7 @@ export class EditableTileMap {
       tileSize: number;
       tileSetColumnCount: number;
       tileSetRowCount: number;
-    },
+    }
   ): EditableTileMap {
     const tileSet = new Map<number, TileDefinition>();
 
@@ -109,7 +109,7 @@ export class EditableTileMap {
       tileSetRowCount <= 0
     ) {
       throw new Error(
-        `Tilemap object badly configured. Tile size ${tileSize} is not compatible with atlas image dimensions, resulting in having ${tileSetColumnCount} columns and ${tileSetRowCount} rows.`,
+        `Tilemap object badly configured. Tile size ${tileSize} is not compatible with atlas image dimensions, resulting in having ${tileSetColumnCount} columns and ${tileSetRowCount} rows.`
       );
     }
     // TODO: Actually save and load tile set when useful.
@@ -124,7 +124,7 @@ export class EditableTileMap {
       tileSize || editableTileMapAsJsObject.tileHeight,
       editableTileMapAsJsObject.dimX || 1,
       editableTileMapAsJsObject.dimY || 1,
-      tileSet,
+      tileSet
     );
 
     if (editableTileMapAsJsObject.layers) {
@@ -133,8 +133,8 @@ export class EditableTileMap {
           EditableTileMapLayer.from(
             layerAsJsObject,
             tileMap,
-            (tileId) => tileId < tileSetColumnCount * tileSetRowCount,
-          ),
+            (tileId) => tileId < tileSetColumnCount * tileSetRowCount
+          )
         );
       });
     } else {
@@ -225,7 +225,7 @@ export class EditableTileMap {
     columnsToAppend: number,
     columnsToUnshift: number,
     rowsToAppend: number,
-    rowsToUnshift: number,
+    rowsToUnshift: number
   ): void {
     if (
       columnsToAppend < 0 ||
@@ -246,7 +246,7 @@ export class EditableTileMap {
           columnsToAppend,
           columnsToUnshift,
           rowsToAppend,
-          rowsToUnshift,
+          rowsToUnshift
         );
       }
     }
@@ -442,7 +442,7 @@ export class EditableTileMap {
   }
 
   trimEmptyColumnsAndRowToFitLayer(
-    layerId: integer,
+    layerId: integer
   ):
     | {
         poppedRows: number;
@@ -465,7 +465,7 @@ export class EditableTileMap {
           trimmingData.columnsToPop,
           trimmingData.columnsToShift,
           trimmingData.rowsToPop,
-          trimmingData.rowsToShift,
+          trimmingData.rowsToShift
         );
       }
     }
@@ -617,21 +617,21 @@ export class TileObject {
   setFlippedHorizontally(flippedHorizontally: boolean): void {
     this.tileId = FlippingHelper.setFlippedHorizontally(
       this.tileId,
-      flippedHorizontally,
+      flippedHorizontally
     );
   }
 
   setFlippedVertically(flippedVertically: boolean): void {
     this.tileId = FlippingHelper.setFlippedVertically(
       this.tileId,
-      flippedVertically,
+      flippedVertically
     );
   }
 
   setFlippedDiagonally(flippedDiagonally: boolean): void {
     this.tileId = FlippingHelper.setFlippedDiagonally(
       this.tileId,
-      flippedDiagonally,
+      flippedDiagonally
     );
   }
 
@@ -692,11 +692,11 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   static from(
     editableTileMapLayerAsJsObject: EditableTileMapLayerAsJsObject,
     tileMap: EditableTileMap,
-    isTileIdValid: (tileId: number) => boolean,
+    isTileIdValid: (tileId: number) => boolean
   ): EditableTileMapLayer {
     const layer = new EditableTileMapLayer(
       tileMap,
-      editableTileMapLayerAsJsObject.id,
+      editableTileMapLayerAsJsObject.id
     );
     layer.setAlpha(editableTileMapLayerAsJsObject.alpha);
     editableTileMapLayerAsJsObject.tiles.forEach((row: number[], y: number) =>
@@ -705,7 +705,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
         if (isTileIdValid(tileId)) {
           layer.setTileGID(x, y, tileGID);
         }
-      }),
+      })
     );
     return layer;
   }
@@ -723,8 +723,8 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
             // -1 corresponds to null value
             if (tileGID === undefined) return -1;
             return tileGID;
-          }),
-        ),
+          })
+        )
       ),
     };
   }
@@ -751,19 +751,19 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     columnsToPop: number,
     columnsToShift: number,
     rowsToPop: number,
-    rowsToShift: number,
+    rowsToShift: number
   ) {
     if (rowsToPop > 0 || rowsToShift > 0) {
       this._tiles = this._tiles.slice(
         rowsToShift,
-        rowsToPop ? -rowsToPop : undefined,
+        rowsToPop ? -rowsToPop : undefined
       );
     }
     if (columnsToPop > 0 || columnsToShift > 0) {
       this._tiles.forEach((row, rowIndex) => {
         this._tiles[rowIndex] = this._tiles[rowIndex].slice(
           columnsToShift,
-          columnsToPop ? -columnsToPop : undefined,
+          columnsToPop ? -columnsToPop : undefined
         );
       });
     }
@@ -773,14 +773,14 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     columnsToAppend: number,
     columnsToUnshift: number,
     rowsToAppend: number,
-    rowsToUnshift: number,
+    rowsToUnshift: number
   ) {
     const initialRowCount = this._tiles.length;
     const initialColumnCount = this._tiles[0].length;
     if (columnsToAppend > 0 || columnsToUnshift > 0) {
       this._tiles.forEach((row, rowIndex) => {
         const newRow = new Int32Array(
-          initialColumnCount + columnsToAppend + columnsToUnshift,
+          initialColumnCount + columnsToAppend + columnsToUnshift
         ).fill(0);
         newRow.set(row, columnsToUnshift);
         this._tiles[rowIndex] = newRow;
@@ -796,9 +796,9 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
           .fill(0)
           .map(() =>
             new Int32Array(
-              initialColumnCount + columnsToAppend + columnsToUnshift,
-            ).fill(0),
-          ),
+              initialColumnCount + columnsToAppend + columnsToUnshift
+            ).fill(0)
+          )
       );
 
       this._tiles.length = initialRowCount + rowsToAppend + rowsToUnshift;
@@ -809,7 +809,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
         rowIndex++
       ) {
         this._tiles[rowIndex] = new Int32Array(
-          initialColumnCount + columnsToAppend + columnsToUnshift,
+          initialColumnCount + columnsToAppend + columnsToUnshift
         ).fill(0);
       }
     }
@@ -970,7 +970,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   setFlippedHorizontally(
     x: integer,
     y: integer,
-    flippedHorizontally: boolean,
+    flippedHorizontally: boolean
   ): void {
     const tilesRow = this._tiles[y];
     if (!tilesRow || x >= tilesRow.length) {
@@ -984,7 +984,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     }
     tilesRow[x] = FlippingHelper.setFlippedHorizontally(
       tileId,
-      flippedHorizontally,
+      flippedHorizontally
     );
   }
 
@@ -996,7 +996,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   setFlippedVertically(
     x: integer,
     y: integer,
-    flippedVertically: boolean,
+    flippedVertically: boolean
   ): void {
     const tilesRow = this._tiles[y];
     if (!tilesRow || x >= tilesRow.length) {
@@ -1010,7 +1010,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     }
     tilesRow[x] = FlippingHelper.setFlippedVertically(
       tileId,
-      flippedVertically,
+      flippedVertically
     );
   }
 
@@ -1022,7 +1022,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   setFlippedDiagonally(
     x: integer,
     y: integer,
-    flippedDiagonally: boolean,
+    flippedDiagonally: boolean
   ): void {
     const tilesRow = this._tiles[y];
     if (!tilesRow || x >= tilesRow.length) {
@@ -1036,7 +1036,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     }
     tilesRow[x] = FlippingHelper.setFlippedDiagonally(
       tileId,
-      flippedDiagonally,
+      flippedDiagonally
     );
   }
 
@@ -1182,7 +1182,7 @@ export class TileDefinition {
   addHitBox(
     tag: string,
     polygon: PolygonVertices,
-    hasFullHitBox: boolean,
+    hasFullHitBox: boolean
   ): void {
     let taggedHitBox = this.taggedHitBoxes.find((hitbox) => hitbox.tag === tag);
     if (!taggedHitBox) {
@@ -1210,7 +1210,7 @@ export class TileDefinition {
    */
   getHitBoxes(tag: string): PolygonVertices[] | undefined {
     const taggedHitBox = this.taggedHitBoxes.find(
-      (hitbox) => hitbox.tag === tag,
+      (hitbox) => hitbox.tag === tag
     );
     return taggedHitBox && taggedHitBox.polygons;
   }
@@ -1222,7 +1222,7 @@ export class TileDefinition {
    */
   hasFullHitBox(tag: string): boolean {
     const taggedHitBox = this.taggedHitBoxes.find(
-      (hitbox) => hitbox.tag === tag,
+      (hitbox) => hitbox.tag === tag
     );
     return !!taggedHitBox && taggedHitBox.hasFullHitBox;
   }

@@ -9,6 +9,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
+import { dracoDecoderPath } from '../Utils/DracoDecoder';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 const gd: libGDevelop = global.gd;
 
@@ -174,7 +175,7 @@ const getOrCreateGltfLoader = () => {
   if (!gltfLoader) {
     gltfLoader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('./external/draco/gltf/');
+    dracoLoader.setDecoderPath(dracoDecoderPath);
     gltfLoader.setDRACOLoader(dracoLoader);
   }
   return gltfLoader;

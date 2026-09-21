@@ -1128,7 +1128,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       objectSimpleTileMap
     )
     .setCategory('General')
-    .setAssetStoreTag('Tilemap')
+    .setAssetStoreTag('tilemap')
     .setOpenFullEditorLabel(_('Edit tileset and collisions'))
     .addDefaultBehavior('TileMap::TileMapBehavior')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')

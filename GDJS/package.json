@@ -17,6 +17,7 @@
     "patch-package": "^6.4.7",
     "@esotericsoftware/spine-pixi-v7": "~4.2.116",
     "pixi.js": "7.4.2",
+    "recast-navigation": "0.43.1",
     "prettier": "3.4.2",
     "recursive-readdir": "^2.2.2",
     "shelljs": "^0.8.4",

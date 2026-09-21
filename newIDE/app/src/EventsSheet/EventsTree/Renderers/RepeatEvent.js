@@ -125,6 +125,7 @@ export default class RepeatEvent extends React.Component<
       gd.JsPlatform.get(),
       this.props.projectScopedContainersAccessor.get(),
       'number',
+      '',
       ''
     );
     expression.getRootNode().visit(expressionValidator);

@@ -26,6 +26,7 @@ import { DragHandleIcon } from '../../UI/DragHandle';
 import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
+import { getModel3DBoundingBox } from '../../ObjectsRendering/Model3DBoundingBox';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
@@ -38,7 +39,8 @@ const gd: libGDevelop = global.gd;
 
 // $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
-  'model3d-animations-list'
+  'model3d-animations-list',
+  { touchDragStart: 'immediate' }
 );
 
 const styles = {
@@ -218,23 +220,12 @@ const Model3DEditor = ({
       if (!model3D) {
         return null;
       }
-      // These formulas are also used in:
-      // - gdjs.Model3DRuntimeObject3DRenderer._updateDefaultTransformation
-      // - Model3DRendered2DInstance
-      model3D.rotation.set(
-        (rotationX * Math.PI) / 180,
-        (rotationY * Math.PI) / 180,
-        (rotationZ * Math.PI) / 180
-      );
-      model3D.updateMatrixWorld(true);
-      const boundingBox = new THREE.Box3().setFromObject(model3D);
-      if (originLocation === 'ModelOrigin') {
-        // Keep the origin as part of the model.
-        // For instance, a model can be 1 face of a cube and we want to keep the
-        // inside as part of the object even if it's just void.
-        // It also avoids to have the origin outside of the object box.
-        boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
-      }
+      const boundingBox = getModel3DBoundingBox(model3D, {
+        rotationX,
+        rotationY,
+        rotationZ,
+        keepsModelOrigin: originLocation === 'ModelOrigin',
+      });
       const sizeX = boundingBox.max.x - boundingBox.min.x;
       const sizeY = boundingBox.max.y - boundingBox.min.y;
       const sizeZ = boundingBox.max.z - boundingBox.min.z;

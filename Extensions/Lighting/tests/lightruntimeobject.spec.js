@@ -6,9 +6,10 @@
  * Utility function for adding light object for tests.
  * @param {gdjs.RuntimeScene} runtimeScene
  * @param {number} radius
+ * @param {string} [texture] Texture resource name ('' for an untextured light).
  * @returns {gdjs.LightRuntimeObject}
  */
-const addLightObject = (runtimeScene, radius) => {
+const addLightObject = (runtimeScene, radius, texture = '') => {
   const lightObj = new gdjs.LightRuntimeObject(runtimeScene, {
     name: 'lightObject',
     type: 'Lighting::LightObject',
@@ -18,7 +19,7 @@ const addLightObject = (runtimeScene, radius) => {
     content: {
       radius: radius,
       color: '#b4b4b4',
-      texture: '',
+      texture: texture,
       debugMode: false,
     },
   });
@@ -192,5 +193,45 @@ describe('Light with obstacles around it', function () {
     indexData.forEach((val, index) => {
       expect(indexBuffer[index]).to.be(val);
     });
+  });
+
+  it('Rotated untextured light ignores obstacles beyond its circular radius.', function () {
+    // An untextured light renders as a circle that never lights anything
+    // beyond ±radius whatever the angle, so an obstacle outside the
+    // ±radius box ([100, 300] x [100, 300]) must not trigger raycasting.
+    light.setPosition(200, 200);
+    light.setAngle(45);
+    obstacle.setPosition(320, 175);
+    runtimeScene.renderAndStep(1000 / 60);
+    light.update();
+
+    expect(light._renderer._computeLightVertices().length).to.be(0);
+  });
+
+  it('Rotated textured light is occluded by an obstacle beyond the unrotated radius box.', function () {
+    // A textured light's lit area is the light's square rotated by the
+    // object's angle: at 45°, it extends up to radius * sqrt(2) ≈ 141.42
+    // from the center along the axes. Place the obstacle outside the
+    // unrotated ±radius box ([100, 300] x [100, 300]) but inside the lit
+    // area: it must still be found and occlude the light.
+    const texturedLight = addLightObject(runtimeScene, 100, 'texture.png');
+    texturedLight.setPosition(200, 200);
+    texturedLight.setAngle(45);
+    obstacle.setPosition(320, 175);
+    runtimeScene.renderAndStep(1000 / 60);
+    texturedLight.update();
+
+    const vertices = texturedLight._renderer._computeLightVertices();
+    expect(vertices.length).to.be.greaterThan(0);
+    // Rays cast towards the obstacle stop on its left edge (x = 320)
+    // instead of reaching the boundary of the lit area.
+    expect(
+      vertices.some(
+        (vertex) =>
+          Math.abs(vertex[0] - 320) < 0.5 &&
+          vertex[1] >= 175 &&
+          vertex[1] <= 225
+      )
+    ).to.be(true);
   });
 });

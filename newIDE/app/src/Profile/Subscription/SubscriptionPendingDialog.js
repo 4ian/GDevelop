@@ -16,7 +16,10 @@ import TextField from '../../UI/TextField';
 import { discordUsernameConfig } from '../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import LeftLoader from '../../UI/LeftLoader';
-import { canBenefitFromSocialRole } from '../../Utils/GDevelopServices/Usage';
+import {
+  canBenefitFromSocialRole,
+  type Subscription,
+} from '../../Utils/GDevelopServices/Usage';
 
 type Props = {|
   onClose: () => void,
@@ -25,22 +28,43 @@ type Props = {|
   immediatelyShowSuccessMessage?: boolean,
 |};
 
+/**
+ * Identify a subscription, so that we can detect when it's replaced by a new one -
+ * even if the new one is for the same plan (for example: a change from a monthly
+ * to a yearly pricing, or from PayPal to Stripe). When a user changes their subscription,
+ * the existing one is kept until the new one is paid, so the plan id alone is not enough.
+ */
+const getSubscriptionIdentifier = (subscription: ?Subscription): string => {
+  if (!subscription || !subscription.planId) return '';
+  return [
+    subscription.planId,
+    subscription.pricingSystemId || '',
+    subscription.stripeSubscriptionId ||
+      subscription.paypalSubscriptionId ||
+      subscription.redemptionCode ||
+      '',
+    subscription.createdAt,
+  ].join('|');
+};
+
 export default function SubscriptionPendingDialog({
   onClose,
   authenticatedUser,
   onSuccess,
   immediatelyShowSuccessMessage,
 }: Props): React.Node {
-  const userPlanIdAtOpening = React.useRef<?string>(
-    !!authenticatedUser.subscription
-      ? authenticatedUser.subscription.planId
-      : null
+  const userSubscriptionIdentifierAtOpening = React.useRef<string>(
+    getSubscriptionIdentifier(authenticatedUser.subscription)
+  );
+  const userSubscriptionIdentifier = getSubscriptionIdentifier(
+    authenticatedUser.subscription
   );
   const userPlanId = !!authenticatedUser.subscription
     ? authenticatedUser.subscription.planId
     : null;
   const hasUserPlanChanged =
-    immediatelyShowSuccessMessage || userPlanId !== userPlanIdAtOpening.current;
+    immediatelyShowSuccessMessage ||
+    userSubscriptionIdentifier !== userSubscriptionIdentifierAtOpening.current;
   const canUserBenefitFromDiscordRole =
     !!authenticatedUser &&
     canBenefitFromSocialRole(authenticatedUser.subscription);

@@ -93,6 +93,10 @@
       "text-contrast-color": {
         "value": "#1D1D26",
         "comment": "Palette/Grey/100"
+      },
+      "accent-text-color": {
+        "value": "#FFA929",
+        "comment": "Readable on this theme's surfaces, for the text of a premium/upsell accent."
       }
     },
     "hover": {

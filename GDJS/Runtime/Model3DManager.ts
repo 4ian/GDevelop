@@ -38,7 +38,13 @@ namespace gdjs {
         this._loader = new THREE_ADDONS.GLTFLoader();
 
         this._dracoLoader = new THREE_ADDONS.DRACOLoader();
-        this._dracoLoader.setDecoderPath('./pixi-renderers/draco/gltf/');
+        // The Draco decoder files are shipped with the game engine files.
+        const runtimeFilesBaseUrl =
+          resourceLoader.getRuntimeGame().getAdditionalOptions()
+            .runtimeFilesBaseUrl || './';
+        this._dracoLoader.setDecoderPath(
+          runtimeFilesBaseUrl + 'pixi-renderers/draco/gltf/'
+        );
         this._loader.setDRACOLoader(this._dracoLoader);
 
         /**
@@ -153,7 +159,11 @@ namespace gdjs {
       this._loadedThreeModels.clear();
       this._downloadedArrayBuffers.clear();
       this._loader = null;
-      this._dracoLoader = null;
+      if (this._dracoLoader) {
+        // Release the web workers used to decode the compressed 3D models.
+        this._dracoLoader.dispose();
+        this._dracoLoader = null;
+      }
 
       if (this._invalidModel) {
         this._invalidModel.cameras = [];

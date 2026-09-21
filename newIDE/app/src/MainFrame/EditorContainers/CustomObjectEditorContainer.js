@@ -10,6 +10,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import {
@@ -47,9 +48,15 @@ const styles = {
 export class CustomObjectEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
   _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
     gd.ObjectsContainer.Function
   );
+
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -64,6 +71,15 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // goes from true to false (in which case PIXI rendering is halted). If isActive was false
     // and remains false, it's safe to stop update here (PIXI rendering is already halted).
     return this.props.isActive || nextProps.isActive;
+  }
+
+  componentDidUpdate(prevProps: RenderEditorContainerProps): void {
+    if (
+      this.props.project !== prevProps.project ||
+      this.props.projectItemName !== prevProps.projectItemName
+    ) {
+      this._rebuildProjectScopedContainersAccessor();
+    }
   }
 
   componentDidMount() {
@@ -84,6 +100,25 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       eventsBasedObjectType: projectItemName || null,
       eventsBasedObjectVariantName: this.getVariantName(),
     });
+  }
+
+  _rebuildProjectScopedContainersAccessor() {
+    const { project } = this.props;
+    const eventsFunctionsExtension = this.getEventsFunctionsExtension();
+    const eventsBasedObject = this.getEventsBasedObject();
+    const variant = this.getVariant();
+    if (project && eventsFunctionsExtension && eventsBasedObject && variant) {
+      this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        {
+          project,
+          eventsFunctionsExtension,
+          eventsBasedObject,
+        },
+        this._objectsContainer
+      );
+    } else {
+      this._projectScopedContainersAccessor = null;
+    }
   }
 
   componentWillUnmount() {
@@ -188,26 +223,50 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // No thing to be done.
   }
 
+  /** True when the changes target the variant of the custom object edited here. */
+  _isTargetingThisVariant(changes: {
+    +eventsBasedObject?: ?gdEventsBasedObject,
+    +variantName?: ?string,
+    ...
+  }): boolean {
+    const eventsBasedObject = this.getEventsBasedObject();
+    return (
+      !!eventsBasedObject &&
+      changes.eventsBasedObject === eventsBasedObject &&
+      (changes.variantName || '') === this.getVariantName()
+    );
+  }
+
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
-    // No thing to be done.
+    if (!this._isTargetingThisVariant(changes)) return;
+    if (this.editor) this.editor.onInstancesModifiedOutsideEditor();
   }
 
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
-    // No thing to be done.
+    if (!this._isTargetingThisVariant(changes)) return;
+    if (this.editor) this.editor.onObjectsModifiedOutsideEditor();
   }
 
   onWillDeleteObject(changes: WillDeleteObjectChanges) {
-    // No thing to be done: `changes.scene` is always a real project layout,
-    // and this editor's own object dialog (if any) is scoped to the custom
-    // object variant's private objects container, which can't be targeted by
-    // this notification. Revisit if object deletion is ever extended to
-    // event-based-object children.
+    if (!this._isTargetingThisVariant(changes)) return;
+    if (this.editor) this.editor.onWillDeleteObject(changes);
   }
 
   onObjectGroupsModifiedOutsideEditor(
     changes: ObjectGroupsOutsideEditorChanges
   ) {
-    // No thing to be done.
+    if (!this._isTargetingThisVariant(changes)) return;
+    if (this.editor) this.editor.onObjectGroupsModifiedOutsideEditor();
+  }
+
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
+    const extensionName = this.getEventsFunctionsExtensionName();
+    if (!extensionName || !changes.extensionNames.includes(extensionName)) {
+      return;
+    }
+    // The properties and children of the edited object may have changed.
+    this._rebuildProjectScopedContainersAccessor();
+    this.forceUpdateEditor();
   }
 
   saveUiSettings = () => {
@@ -308,14 +367,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const variant = this.getVariant();
     if (!variant) return null;
 
-    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      {
-        project,
-        eventsFunctionsExtension,
-        eventsBasedObject,
-      },
-      this._objectsContainer
-    );
+    if (!this._projectScopedContainersAccessor) {
+      return null;
+    }
 
     return (
       <div style={styles.container}>
@@ -332,7 +386,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           unsavedChanges={this.props.unsavedChanges}
           ref={editor => (this.editor = editor)}
           project={project}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          projectScopedContainersAccessor={
+            this._projectScopedContainersAccessor
+          }
           layout={null}
           eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}
@@ -385,6 +441,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           }
           onWillInstallExtension={this.props.onWillInstallExtension}
           onExtensionInstalled={this.props.onExtensionInstalled}
+          onCreateNewExtensionWithBehavior={null}
           onDeleteEventsBasedObjectVariant={
             this.props.onDeleteEventsBasedObjectVariant
           }

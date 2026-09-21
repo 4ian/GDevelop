@@ -52,9 +52,11 @@ namespace gdjs {
 
     // Options for the debug draw:
     _debugDrawEnabled: boolean = false;
+    _debugDrawShowHitBoxes: boolean = false;
     _debugDrawShowHiddenInstances: boolean = false;
     _debugDrawShowPointsNames: boolean = false;
     _debugDrawShowCustomPoints: boolean = false;
+    _debugDrawHooks: Array<(rendererObject: any) => void> = [];
 
     _onceTriggers: OnceTriggers;
 
@@ -243,9 +245,14 @@ namespace gdjs {
       }
 
       this._debugDrawEnabled = enableDebugDraw;
+      this._debugDrawShowHitBoxes = enableDebugDraw;
       this._debugDrawShowHiddenInstances = showHiddenInstances;
       this._debugDrawShowPointsNames = showPointsNames;
       this._debugDrawShowCustomPoints = showCustomPoints;
+    }
+
+    registerDebugDrawHook(render: (rendererObject: any) => void) {
+      this._debugDrawHooks.push(render);
     }
 
     /**

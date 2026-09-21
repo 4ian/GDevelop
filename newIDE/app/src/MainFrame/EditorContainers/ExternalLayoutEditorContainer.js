@@ -19,6 +19,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import ExternalPropertiesDialog, {
   type ExternalProperties,
@@ -59,10 +60,17 @@ export class ExternalLayoutEditorContainer extends React.Component<
 > {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
+  _associatedLayoutName: string | null = null;
   // $FlowFixMe[missing-local-annot]
   state = {
     externalPropertiesDialogOpen: false,
   };
+
+  constructor(props: RenderEditorContainerProps) {
+    super(props);
+    this._rebuildProjectScopedContainersAccessor();
+  }
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -77,6 +85,18 @@ export class ExternalLayoutEditorContainer extends React.Component<
     // goes from true to false (in which case PIXI rendering is halted). If isActive was false
     // and remains false, it's safe to stop update here (PIXI rendering is already halted).
     return this.props.isActive || nextProps.isActive;
+  }
+
+  componentDidUpdate(prevProps: RenderEditorContainerProps): void {
+    const associatedLayoutName = this.getAssociatedLayoutName();
+    if (
+      this.props.project !== prevProps.project ||
+      this.props.projectItemName !== prevProps.projectItemName ||
+      this._associatedLayoutName !== associatedLayoutName
+    ) {
+      this._associatedLayoutName = associatedLayoutName;
+      this._rebuildProjectScopedContainersAccessor();
+    }
   }
 
   componentDidMount() {
@@ -103,6 +123,22 @@ export class ExternalLayoutEditorContainer extends React.Component<
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
+  }
+
+  _rebuildProjectScopedContainersAccessor() {
+    const { project } = this.props;
+    if (project) {
+      // The scene can be null when users didn't choose an associated scene yet.
+      const scene = this.getLayout();
+      this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        {
+          project,
+          layout: scene,
+        }
+      );
+    } else {
+      this._projectScopedContainersAccessor = null;
+    }
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
@@ -239,7 +275,12 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 
   onInstancesModifiedOutsideEditor(changes: InstancesOutsideEditorChanges) {
-    if (changes.scene !== this.getLayout()) {
+    // Instances of an external layout: only this one is concerned. Instances
+    // of a scene: every external layout of the scene refreshes (as before).
+    const isConcerned = changes.externalLayout
+      ? changes.externalLayout === this.getExternalLayout()
+      : changes.scene === this.getLayout();
+    if (!isConcerned) {
       return;
     }
 
@@ -265,6 +306,26 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
     if (this.editor) {
       this.editor.onWillDeleteObject(changes);
+    }
+  }
+
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
+    const { project } = this.props;
+    const { editor } = this;
+    if (!project || !editor) return;
+
+    // The custom objects of the changed extensions may be rendered differently
+    // now (children, area or properties changed).
+    for (const extensionName of changes.extensionNames) {
+      if (!project.hasEventsFunctionsExtensionNamed(extensionName)) continue;
+      const eventsBasedObjects = project
+        .getEventsFunctionsExtension(extensionName)
+        .getEventsBasedObjects();
+      for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+        editor.forceUpdateCustomObjectRenderedInstances(
+          eventsBasedObjects.getAt(index)
+        );
+      }
     }
   }
 
@@ -300,7 +361,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return project.getLayout(layoutName);
   }
 
-  getAssociatedLayoutName(): ?string {
+  getAssociatedLayoutName(): string | null {
     const { project } = this.props;
     if (!project) return null;
 
@@ -326,6 +387,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       },
       () => this.updateToolbar()
     );
+    this._rebuildProjectScopedContainersAccessor();
     this.props.onExternalLayoutAssociationChanged();
   };
 
@@ -352,17 +414,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
 
-    if (!externalLayout || !project) {
+    if (!externalLayout || !project || !this._projectScopedContainersAccessor) {
       //TODO: Error component
       return <div>No external layout called {projectItemName} found!</div>;
     }
-
-    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      {
-        project,
-        layout,
-      }
-    );
 
     return (
       <div style={styles.container}>
@@ -381,7 +436,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             ref={editor => (this.editor = editor)}
             project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            projectScopedContainersAccessor={
+              this._projectScopedContainersAccessor
+            }
             layout={layout}
             externalLayout={externalLayout}
             eventsFunctionsExtension={null}
@@ -430,6 +487,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onEventsBasedObjectChildrenEdited={() => {}}
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
+            onCreateNewExtensionWithBehavior={
+              this.props.onCreateNewExtensionWithBehavior
+            }
             onDeleteEventsBasedObjectVariant={
               this.props.onDeleteEventsBasedObjectVariant
             }

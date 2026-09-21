@@ -1,0 +1,76 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid
+    color-mix(in srgb, var(--theme-message-error-color) 35%, transparent);
+  /* A red tint that stays discreet on both light and dark themes. */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--theme-message-error-color) 12%, transparent) 0%,
+    color-mix(in srgb, var(--theme-message-error-color) 4%, transparent) 55%,
+    transparent 100%
+  );
+  min-width: 0;
+  animation: aiRequestErrorAppear 180ms ease-out;
+}
+
+@keyframes aiRequestErrorAppear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container {
+    animation: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--theme-message-error-color);
+}
+
+.title {
+  flex-shrink: 0;
+}
+
+/* The error code sits at the end of the header line, out of the way of the
+   explanation but available when reporting the issue. */
+.errorCode {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin-left: auto;
+}
+
+/* Anywhere so a long code wraps instead of making the whole chat wider. */
+.errorCode > * {
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}

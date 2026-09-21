@@ -10,6 +10,9 @@
  * Draggable handle on the left of an event
  */
 .gd-events-sheet .move-handle {
+    /* Also prevents the browser from running its own selection auto-scroll
+       while an event is dragged. */
+    user-select: none;
     width: 10px;
     margin: 1px 0.5px;
     flex-grow: 0;

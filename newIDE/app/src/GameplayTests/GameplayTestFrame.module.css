@@ -1,0 +1,336 @@
+.container {
+  position: fixed;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  width: max-content;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--theme-dialog-separator-color);
+  background-color: var(--theme-dialog-background-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  /* Dragging the frame should never select the text of its title bar. */
+  user-select: none;
+}
+
+.container.minimized {
+  min-width: 220px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 6px;
+  min-width: 0;
+  background-color: var(--theme-surface-alternate-canvas-background-color);
+  border-bottom: 1px solid var(--theme-dialog-separator-color);
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.container.dragging .dragHandle {
+  cursor: grabbing;
+}
+
+.container.dragging,
+.container.resizing {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* Invisible handles on the borders and corners of the frame to resize it. */
+.resizeHandle {
+  position: absolute;
+  z-index: 10;
+  touch-action: none;
+}
+
+.resizeLeft,
+.resizeRight {
+  top: 10px;
+  bottom: 10px;
+  width: 5px;
+  cursor: ew-resize;
+}
+
+.resizeLeft {
+  left: 0;
+}
+
+.resizeRight {
+  right: 0;
+}
+
+.resizeTop,
+.resizeBottom {
+  left: 10px;
+  right: 10px;
+  height: 5px;
+  cursor: ns-resize;
+}
+
+.resizeTop {
+  top: 0;
+}
+
+.resizeBottom {
+  bottom: 0;
+}
+
+.resizeTopLeft,
+.resizeTopRight,
+.resizeBottomLeft,
+.resizeBottomRight {
+  width: 10px;
+  height: 10px;
+}
+
+.resizeTopLeft {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
+
+.resizeTopRight {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
+
+.resizeBottomLeft {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+}
+
+.resizeBottomRight {
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+}
+
+/* Two columns of three dots, hinting that the frame can be moved. */
+.grip {
+  flex-shrink: 0;
+  width: 6px;
+  height: 12px;
+  background-image: radial-gradient(
+    circle at center,
+    var(--theme-text-secondary-color) 1px,
+    transparent 1.2px
+  );
+  background-size: 3px 4px;
+  opacity: 0.6;
+}
+
+.dragHandle:hover .grip {
+  opacity: 1;
+}
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.headerIcon {
+  font-size: 16px;
+}
+
+.gameArea {
+  position: relative;
+  width: 320px;
+  height: 180px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+/*
+ * Holds the game window: always sized at exactly the game resolution, and
+ * only scaled to be displayed at the frame zoom.
+ */
+.gameScaler {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+/*
+ * When minimized, the game window is only clipped to a 1x1 pixel area:
+ * `display: none` (or a zero size) would stop `requestAnimationFrame` in
+ * the game - and so the test being run.
+ */
+.hiddenGameArea {
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.gameIframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+  /* The test simulates all the inputs itself: never let the user interact
+  with the game. */
+  pointer-events: none;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 8px 4px 6px;
+  background-color: var(--theme-surface-canvas-background-color);
+  border-top: 1px solid var(--theme-dialog-separator-color);
+}
+
+/*
+ * The banner shown when the run was frozen because the editor was in the
+ * background: it is the only sign the user gets that nothing was wrong with
+ * their game, so it must be noticed - and read - as soon as they come back.
+ *
+ * `width: 0` with `min-width: 100%` keeps it from widening the frame: the
+ * frame is sized by the game area (`width: max-content` on the container),
+ * and a banner longer than the game would otherwise stretch it.
+ */
+.hiddenPauseBanner {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 0;
+  min-width: 100%;
+  padding: 8px 4px 8px 10px;
+  overflow: hidden;
+  /* The tone color, used by the accent, the icon and the tint below. */
+  color: var(--theme-info-color);
+  background-color: color-mix(
+    in srgb,
+    currentColor 10%,
+    var(--theme-surface-alternate-canvas-background-color)
+  );
+  border-bottom: 1px solid
+    color-mix(in srgb, currentColor 35%, var(--theme-dialog-separator-color));
+  animation: gameplay-test-hidden-pause-in 260ms
+    cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+
+.hiddenPauseBanner.interrupted {
+  color: var(--theme-warning-color);
+}
+
+/* A gradient bar on the left edge, tying the banner to its tone. */
+.hiddenPauseBanner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    currentColor,
+    color-mix(in srgb, currentColor 25%, transparent)
+  );
+}
+
+@keyframes gameplay-test-hidden-pause-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hiddenPauseIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, currentColor 18%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.hiddenPauseIcon svg {
+  font-size: 14px;
+}
+
+/* A slow breathing halo, to catch the eye of someone coming back to the
+   editor without ever becoming distracting. */
+.hiddenPauseBanner:not(.interrupted) .hiddenPauseIcon {
+  animation: gameplay-test-hidden-pause-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes gameplay-test-hidden-pause-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 30%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 12%, transparent);
+  }
+}
+
+.hiddenPauseText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+  /* Let the explanation wrap on as many lines as it needs. */
+  overflow-wrap: anywhere;
+  padding-top: 2px;
+}
+
+/* The countdown of the banner dismissing itself, so its disappearance is
+   never a surprise. */
+.hiddenPauseCountdown {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: left center;
+  background-color: color-mix(in srgb, currentColor 45%, transparent);
+  animation: gameplay-test-hidden-pause-countdown linear forwards;
+}
+
+@keyframes gameplay-test-hidden-pause-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hiddenPauseBanner,
+  .hiddenPauseBanner:not(.interrupted) .hiddenPauseIcon,
+  .hiddenPauseCountdown {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}

@@ -207,7 +207,11 @@ declare module "react-dnd" {
 
   declare type DragDropMonitor = {
     isDragging(): boolean,
+    didDrop(): boolean,
+    getItem(): any,
+    getItemType(): mixed,
     getClientOffset(): ClientOffset | null,
+    subscribeToStateChange(listener: () => void): () => void,
     ...
   };
 

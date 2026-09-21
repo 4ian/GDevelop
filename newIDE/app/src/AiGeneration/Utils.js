@@ -8,8 +8,18 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
+  type WillDeleteExtensionItemChanges,
+  getOutsideEditorChangesTargetKey,
+  getSceneEventsOutsideEditorChangesKey,
 } from '../EditorFunctions/OutsideEditorChanges';
+import {
+  makeExtensionsOutsideEditorChangesAccumulator,
+  doExtensionChangesNeedCodeRegeneration,
+} from './ExtensionsOutsideEditorChangesAccumulator';
+import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
   getAiRequest,
   getAiRequestSuggestions,
@@ -101,7 +111,10 @@ export const useRefreshLimits = (
 // The tools of the orchestrator AND of the sub-agents it creates server-side.
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v13';
+// v14 adds gameplay tests (`run_tests` + the tester sub-agent).
+// v15 makes read_game_project_json a live, editor-side read (backend stops
+// overwriting its output) and exposes it to the edit/explorer script agents.
+export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v19';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying
@@ -130,7 +143,17 @@ const doesFunctionCallModifyProject = (
     editorFunctions[functionCall.name] ||
     editorFunctionsWithoutProject[functionCall.name] ||
     null;
-  return !!(editorFunctionDef && editorFunctionDef.modifiesProject);
+  if (!editorFunctionDef) return false;
+  if (editorFunctionDef.getModifiesProject) {
+    try {
+      return editorFunctionDef.getModifiesProject(
+        JSON.parse(functionCall.arguments)
+      );
+    } catch (error) {
+      return !!editorFunctionDef.modifiesProject;
+    }
+  }
+  return !!editorFunctionDef.modifiesProject;
 };
 
 /**
@@ -230,7 +253,11 @@ export const useProcessFunctionCalls = ({
   onObjectGroupsModifiedOutsideEditor,
   onProjectItemRenamedOutsideEditor,
   onWillDeleteScene,
+  onWillDeleteGameplayTest,
   onWillDeleteObject,
+  eventsFunctionsExtensionsState,
+  onExtensionsModifiedOutsideEditor,
+  onWillDeleteExtensionItem,
   onWillInstallExtension,
   onExtensionInstalled,
   isReadyToProcessFunctionCalls,
@@ -248,6 +275,7 @@ export const useProcessFunctionCalls = ({
     editorFunctionCallResults: Array<EditorFunctionCallResult>,
     options: {|
       createdSceneNames?: Array<string>,
+      createdExternalLayoutNames?: Array<string>,
       createdProject?: ?gdProject,
     |}
   ) => Promise<void>,
@@ -272,7 +300,19 @@ export const useProcessFunctionCalls = ({
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  // Used to regenerate the extensions changed by the AI (see
+  // `ensureExtensionsUpToDate` below).
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  onExtensionsModifiedOutsideEditor: (
+    changes: ExtensionsOutsideEditorChanges
+  ) => void,
+  onWillDeleteExtensionItem: (
+    changes: WillDeleteExtensionItemChanges
+  ) => Promise<void>,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
@@ -301,6 +341,7 @@ export const useProcessFunctionCalls = ({
     resourceManagementProps,
   });
   const { generateEvents } = useGenerateEvents({ project });
+  const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
 
   const { translatedObjectShortHeadersByType, fetchObjects } = React.useContext(
     ObjectStoreContext
@@ -504,30 +545,83 @@ export const useProcessFunctionCalls = ({
       // trigger an in-game editor hot reload. Firing them once per function
       // call would, for a batch of modifying calls (e.g. a sub-agent adding 20
       // objects), hot reload the editor 20 times. Instead, accumulate the
-      // changes per scene while the batch is processed, then flush a single
-      // coalesced notification per change type once it is done.
+      // changes per target (a scene, an external layout or a variant of a
+      // custom object) while the batch is processed, then flush a single
+      // coalesced notification per change type and target once it is done.
       const accumulatedSceneEventsChanges: Map<
-        gdLayout,
-        Set<string>
+        string,
+        SceneEventsOutsideEditorChanges
       > = new Map();
-      const accumulatedInstancesScenes: Set<gdLayout> = new Set();
-      const accumulatedObjectsChanges: Map<gdLayout, boolean> = new Map();
-      const accumulatedObjectGroupsScenes: Set<gdLayout> = new Set();
+      const accumulatedInstancesChanges: Map<
+        string,
+        InstancesOutsideEditorChanges
+      > = new Map();
+      const accumulatedObjectsChanges: Map<
+        string,
+        ObjectsOutsideEditorChanges
+      > = new Map();
+      const accumulatedObjectGroupsChanges: Map<
+        string,
+        ObjectGroupsOutsideEditorChanges
+      > = new Map();
+      const accumulatedExtensionsChanges = makeExtensionsOutsideEditorChangesAccumulator();
       const flushAccumulatedOutsideEditorChanges = () => {
-        accumulatedSceneEventsChanges.forEach((eventIds, scene) =>
-          onSceneEventsModifiedOutsideEditor({
-            scene,
-            newOrChangedAiGeneratedEventIds: eventIds,
-          })
+        accumulatedSceneEventsChanges.forEach(changes =>
+          onSceneEventsModifiedOutsideEditor(changes)
         );
-        accumulatedInstancesScenes.forEach(scene =>
-          onInstancesModifiedOutsideEditor({ scene })
+        accumulatedInstancesChanges.forEach(changes =>
+          onInstancesModifiedOutsideEditor(changes)
         );
-        accumulatedObjectsChanges.forEach((isNewObjectTypeUsed, scene) =>
-          onObjectsModifiedOutsideEditor({ scene, isNewObjectTypeUsed })
+        accumulatedObjectsChanges.forEach(changes =>
+          onObjectsModifiedOutsideEditor(changes)
         );
-        accumulatedObjectGroupsScenes.forEach(scene =>
-          onObjectGroupsModifiedOutsideEditor({ scene })
+        accumulatedObjectGroupsChanges.forEach(changes =>
+          onObjectGroupsModifiedOutsideEditor(changes)
+        );
+      };
+
+      // Regenerate the extensions changed so far, so the platform metadata (and
+      // the extensions summary sent with the next message) matches the project
+      // again. Awaited by the functions needing fresh metadata to continue, and
+      // at the end of the batch so nothing is left dirty.
+      const ensureExtensionsUpToDate = async () => {
+        if (accumulatedExtensionsChanges.isEmpty()) return;
+        const changes = accumulatedExtensionsChanges.flush();
+
+        if (project) {
+          if (doExtensionChangesNeedCodeRegeneration(changes)) {
+            await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+              project
+            );
+          } else {
+            changes.extensionNames.forEach(extensionName => {
+              if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+                return;
+              }
+              eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+                project,
+                project.getEventsFunctionsExtension(extensionName)
+              );
+            });
+          }
+        }
+
+        onExtensionsModifiedOutsideEditor(changes);
+        triggerUnsavedChanges();
+      };
+
+      // Regenerate the metadata of one extension, without generating its code
+      // and without flushing what the batch accumulated: a function that just
+      // changed an extension reads back how the editor now describes it.
+      const reloadExtensionMetadata = (extensionName: string) => {
+        if (
+          !project ||
+          !project.hasEventsFunctionsExtensionNamed(extensionName)
+        )
+          return;
+        eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+          project,
+          project.getEventsFunctionsExtension(extensionName)
         );
       };
 
@@ -535,6 +629,7 @@ export const useProcessFunctionCalls = ({
         const {
           results,
           createdSceneNames,
+          createdExternalLayoutNames,
           createdProject,
         } = await processEditorFunctionCalls({
           project,
@@ -558,33 +653,43 @@ export const useProcessFunctionCalls = ({
             getLastMessagesFromAiRequestOutput(aiRequest.output || []),
           generateEvents,
           onSceneEventsModifiedOutsideEditor: changes => {
-            const existingEventIds = accumulatedSceneEventsChanges.get(
-              changes.scene
-            );
-            if (existingEventIds) {
-              changes.newOrChangedAiGeneratedEventIds.forEach(eventId =>
-                existingEventIds.add(eventId)
+            const key = getSceneEventsOutsideEditorChangesKey(changes);
+            const existingChanges = accumulatedSceneEventsChanges.get(key);
+            if (existingChanges) {
+              changes.newOrChangedAiGeneratedEventIds.forEach(id =>
+                existingChanges.newOrChangedAiGeneratedEventIds.add(id)
               );
             } else {
-              accumulatedSceneEventsChanges.set(
-                changes.scene,
-                new Set(changes.newOrChangedAiGeneratedEventIds)
-              );
+              accumulatedSceneEventsChanges.set(key, {
+                ...changes,
+                newOrChangedAiGeneratedEventIds: new Set(
+                  changes.newOrChangedAiGeneratedEventIds
+                ),
+              });
             }
           },
           onInstancesModifiedOutsideEditor: changes => {
-            accumulatedInstancesScenes.add(changes.scene);
-          },
-          onObjectsModifiedOutsideEditor: changes => {
-            accumulatedObjectsChanges.set(
-              changes.scene,
-              accumulatedObjectsChanges.get(changes.scene) ||
-                false ||
-                changes.isNewObjectTypeUsed
+            accumulatedInstancesChanges.set(
+              getOutsideEditorChangesTargetKey(changes),
+              changes
             );
           },
+          onObjectsModifiedOutsideEditor: changes => {
+            const key = getOutsideEditorChangesTargetKey(changes);
+            const existingChanges = accumulatedObjectsChanges.get(key);
+            accumulatedObjectsChanges.set(key, {
+              ...changes,
+              isNewObjectTypeUsed:
+                (existingChanges
+                  ? existingChanges.isNewObjectTypeUsed
+                  : false) || changes.isNewObjectTypeUsed,
+            });
+          },
           onObjectGroupsModifiedOutsideEditor: changes => {
-            accumulatedObjectGroupsScenes.add(changes.scene);
+            accumulatedObjectGroupsChanges.set(
+              getOutsideEditorChangesTargetKey(changes),
+              changes
+            );
           },
           // Not coalesced: the tab rename must track the model rename, else the
           // open scene editor briefly looks up a now-missing layout name.
@@ -592,9 +697,20 @@ export const useProcessFunctionCalls = ({
           // Not coalesced: must run before the scene is actually deleted so
           // the tab can be closed while the gdLayout is still valid.
           onWillDeleteScene,
+          onWillDeleteGameplayTest,
           // Not coalesced: must run before the object is actually deleted so
           // editors can safely read it to close a dialog/panel referring to it.
           onWillDeleteObject,
+          // Coalesced per extension: regenerating the extensions once for the
+          // whole batch instead of once per call.
+          onExtensionsModifiedOutsideEditor: changes =>
+            accumulatedExtensionsChanges.add(changes),
+          ensureExtensionsUpToDate,
+          reloadExtensionMetadata,
+          // Not coalesced: must run before the extension (or one of its items)
+          // is actually deleted so the tabs and selections bound to it are
+          // released while it's still valid.
+          onWillDeleteExtensionItem,
           ensureExtensionInstalled,
           onWillInstallExtension,
           onExtensionInstalled,
@@ -617,6 +733,7 @@ export const useProcessFunctionCalls = ({
 
         await onSendEditorFunctionCallResults(aiRequest.id, newResults, {
           createdSceneNames,
+          createdExternalLayoutNames,
           createdProject,
         });
       } finally {
@@ -625,6 +742,17 @@ export const useProcessFunctionCalls = ({
         // the editor is still refreshed for whatever was modified even if the
         // batch was aborted or threw, matching the previous inline behavior.
         flushAccumulatedOutsideEditorChanges();
+
+        // Regenerate the extensions left dirty by the batch, so the project
+        // summary sent with the next message describes them as they are now.
+        try {
+          await ensureExtensionsUpToDate();
+        } catch (error) {
+          console.error(
+            'Error while reloading the extensions modified by the AI:',
+            error
+          );
+        }
 
         // Release the lock so these calls can be retried if needed
         // (e.g. after an error or a suspension).
@@ -647,7 +775,12 @@ export const useProcessFunctionCalls = ({
       onObjectGroupsModifiedOutsideEditor,
       onProjectItemRenamedOutsideEditor,
       onWillDeleteScene,
+      onWillDeleteGameplayTest,
       onWillDeleteObject,
+      eventsFunctionsExtensionsState,
+      onExtensionsModifiedOutsideEditor,
+      onWillDeleteExtensionItem,
+      triggerUnsavedChanges,
       ensureExtensionInstalled,
       onWillInstallExtension,
       onExtensionInstalled,
@@ -1402,6 +1535,8 @@ export type OpenAskAiOptions = {|
   aiRequestId?: string | null, // If null, a new request will be created.
   paneIdentifier?: 'left' | 'center' | 'right',
   continueProcessingFunctionCallsOnMount?: boolean,
+  // When set, a new chat is started with this text pre-filled in the input.
+  prefilledUserRequest?: string,
 |};
 
 export type NewAiRequestOptions = {|

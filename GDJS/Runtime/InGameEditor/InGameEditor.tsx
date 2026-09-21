@@ -2320,7 +2320,14 @@ namespace gdjs {
       // the origin point handle), not for the selection. A double click
       // anywhere but on the inspected model leaves the inspection.
       if (this._model3DInspector) {
-        if (inputManager.wasKeyJustPressed(F_KEY)) {
+        // The focus shortcut is the one of the editor, not a hardcoded key:
+        // master moved every shortcut behind `InGameEditorShortcuts`.
+        if (
+          this._shortcuts.wasJustPressed(
+            inputManager,
+            'IN_GAME_EDITOR_FOCUS_ON_SELECTION'
+          )
+        ) {
           // Focus on the active selection: the selected point, or the model.
           const [targetX, targetY, targetZ] =
             this._model3DInspector.getFocusTarget();

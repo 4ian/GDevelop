@@ -2475,6 +2475,39 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     RequireNoError(validator);
   }
 
+  // This is the parameter type used by the built-in "Value of a variable"
+  // condition (and its number/text/boolean variants).
+  SECTION("Invalid scene variable structure in a primitive "
+          "variableOrPropertyOrParameter parameter (1 level)") {
+    auto node = parser.ParseExpression("MySceneStructureVariable");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "variableOrPropertyOrParameter", "",
+                                      "primitive");
+    node->Visit(validator);
+    RequireNoFatalError(validator);
+    RequireAllErrorsCount(validator, 1);
+    REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "You need to specify the name of the child variable to access. For "
+            "example: `MyVariable.child`.");
+  }
+
+  // This is the parameter type used by the built-in "Change variable value"
+  // action (and its number/text/boolean variants).
+  SECTION("Invalid scene variable structure in a primitive "
+          "variableOrProperty parameter (1 level)") {
+    auto node = parser.ParseExpression("MySceneStructureVariable");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "variableOrProperty", "", "primitive");
+    node->Visit(validator);
+    RequireNoFatalError(validator);
+    RequireAllErrorsCount(validator, 1);
+    REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "You need to specify the name of the child variable to access. For "
+            "example: `MyVariable.child`.");
+  }
+
   SECTION("Valid scene variable structure in a variable parameter of a function (1 level)") {
     auto node = parser.ParseExpression(
         "MyExtension::GetAnyVariableAsNumber(MySceneStructureVariable)");
@@ -4657,6 +4690,23 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       RequireFatalErrorsCount(validator, 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+            "You must enter a valid expression inside the brackets.");
+    }
+    SECTION("empty expression after a nested bracket accessor") {
+      // While typing `myVariable[MySceneStructureVariable["MyChild"] + 1]`,
+      // the index expression is incomplete: the bracket specific message must
+      // still be used.
+      auto node = parser.ParseExpression(
+          "myVariable[MySceneStructureVariable[\"MyChild\"] + ]");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 2);
+      // The closing bracket is eaten by the empty expression.
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+            "Missing a closing bracket. Add a closing bracket for each opening bracket.");
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
             "You must enter a valid expression inside the brackets.");
     }
     SECTION("number instead") {

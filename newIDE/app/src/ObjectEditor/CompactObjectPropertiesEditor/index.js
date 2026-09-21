@@ -61,6 +61,7 @@ import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema'
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import {
+  type ActionButton,
   type Field,
   type FieldChoices,
 } from '../../PropertiesEditor/PropertiesEditorSchema';
@@ -632,12 +633,16 @@ export const CompactObjectPropertiesEditor = ({
                     );
                     // POC: edit the points of a 3D model in the in-game editor.
                     if (object.getType() === 'Scene3D::Model3DObject') {
-                      schemaWithButtons.push({
+                      const editPointsButton: ActionButton = {
                         label: i18n._(t`Edit points`),
+                        disabled: 'onValuesDifferent',
                         nonFieldType: 'button',
                         getIcon: style => <Object3d style={style} />,
-                        onClick: () => inspectModel3DObject(object.getName()),
-                      });
+                        getValue: ({ object }) => object.getName(),
+                        onClick: ({ object }) =>
+                          inspectModel3DObject(object.getName()),
+                      };
+                      schemaWithButtons.push(editPointsButton);
                     }
                     return schemaWithButtons;
                   }}

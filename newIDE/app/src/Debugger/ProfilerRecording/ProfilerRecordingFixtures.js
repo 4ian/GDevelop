@@ -32,6 +32,7 @@ const sectionNames = [
   'layer "Lighting"',
   'post-processing',
   'debug draw',
+  'filters',
 ];
 
 /**
@@ -100,6 +101,7 @@ export const makeFakeRecordingStore = (
     cursor += baseLayerMs;
     push(13, 1, lightingMs);
     push(14, 2, postProcessingMs);
+    push(16, 2, lightingMs * 0.4);
     cursor += lightingMs;
 
     frames.push({

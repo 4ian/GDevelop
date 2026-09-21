@@ -233,6 +233,25 @@ class GD_CORE_API ParameterMetadata {
   }
 
   /**
+   * rief Check if the value of a resource parameter is an expression
+   * computing a resource name, rather than the name of a resource.
+   *
+   * A resource parameter stores the bare name of the resource it points at
+   * (`Jump.mp3`), while every other kind of string parameter stores the
+   * literal with its quotes. The two are told apart by the quotes, exactly as
+   * `SceneNameField` does in the editor, which keeps every existing project
+   * working: their resource parameters hold bare names, and are untouched.
+   *
+   * A computed name is a concatenation or a function call, so it always
+   * carries a quote or a parenthesis. A bare identifier alone is read as a
+   * resource name, as it always was.
+   */
+  static bool IsResourceExpression(const gd::String &value) {
+    return value.find('"') != gd::String::npos ||
+           value.find('(') != gd::String::npos;
+  }
+
+  /**
    * \brief Return the expression type from the parameter type.
    * Declinations of "number" and "string" types (like "forceMultiplier" or
    * "sceneName") are replaced by "number" and "string".

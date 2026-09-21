@@ -24,6 +24,7 @@ declare class gdParameterMetadata {
   static isObject(param: string): boolean;
   static isBehavior(param: string): boolean;
   static isExpression(type_: string, parameterType: string): boolean;
+  static isResourceExpression(value: string): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

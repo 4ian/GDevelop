@@ -75,7 +75,7 @@ describe('gdjs.Profiler', () => {
   });
 
   it('records the sub-sections opened inside the render', () => {
-    const { profiler, chunks, advance } = makeProfilerWithFakeClock();
+    const { profiler, advance } = makeProfilerWithFakeClock();
 
     profiler.beginFrame();
     profiler.begin('render');

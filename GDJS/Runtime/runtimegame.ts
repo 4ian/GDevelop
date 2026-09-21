@@ -1770,9 +1770,11 @@ namespace gdjs {
       }
       this._profiler = profiler;
       this._onProfilerStopped = options.onStopped || null;
-      // The WebGL context is wrapped only while recording: this is the one
-      // measure of the panel that costs the game something.
+      // The WebGL context and the filter system are wrapped only while
+      // recording: these are the measures of the panel that cost the game
+      // something.
       this._renderer.startCountingDrawCalls();
+      this._renderer.startMeasuringFilters();
       return true;
     }
 
@@ -1788,6 +1790,7 @@ namespace gdjs {
       this._profiler = null;
       this._onProfilerStopped = null;
       this._renderer.stopCountingDrawCalls();
+      this._renderer.stopMeasuringFilters();
       stoppedProfiler.flushChunk();
       stoppedProfiler.setOnChunk(null);
       if (onProfilerStopped) {

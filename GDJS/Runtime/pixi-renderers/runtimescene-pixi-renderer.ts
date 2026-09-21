@@ -95,6 +95,9 @@ namespace gdjs {
       this._profiler = profiler || null;
       const runtimeGameRenderer = this._runtimeGameRenderer;
       if (!runtimeGameRenderer) return;
+      // The filters of the layers are rendered deep inside PixiJS: the game
+      // renderer reports them through the profiler given here.
+      runtimeGameRenderer.setProfilerForInstrumentation(this._profiler);
 
       const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
       if (!pixiRenderer) return;
@@ -376,6 +379,7 @@ namespace gdjs {
         this._showCursorAtNextRender = false;
       }
 
+      runtimeGameRenderer.setProfilerForInstrumentation(null);
       this._profiler = null;
     }
 

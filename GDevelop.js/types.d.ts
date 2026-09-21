@@ -1681,6 +1681,7 @@ export class ParameterMetadata extends EmscriptenObject {
   static isObject(param: string): boolean;
   static isBehavior(param: string): boolean;
   static isExpression(type_: string, parameterType: string): boolean;
+  static isResourceExpression(value: string): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
 }

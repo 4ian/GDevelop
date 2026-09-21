@@ -176,9 +176,10 @@ const ResourceSelector: React.ComponentType<{
       const isMissing =
         allResourcesNamesRef.current.indexOf(newResourceName) === -1;
 
-      if (!isMissing) {
-        _onChange(newResourceName);
-      }
+      // A name that is not one of the resources of the project is kept all
+      // the same: it can be a name the events compute, which only exists
+      // once the game runs. It is still shown as not found.
+      _onChange(newResourceName);
       setResourceName(newResourceName);
       if (autoCompleteRef.current)
         autoCompleteRef.current.forceInputValueTo(newResourceName);

@@ -399,6 +399,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
                  "res/actions/son.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("soundfile", _("Sound file (or sound resource name)"))
+      .SetParameterLongDescription(
+          _("A file name built by the events is not loaded with the scene: "
+            "preload it here, otherwise the first play of it will be late."))
       .MarkAsComplex();
 
   extension

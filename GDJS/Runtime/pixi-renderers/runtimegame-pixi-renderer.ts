@@ -1047,6 +1047,21 @@ namespace gdjs {
     }
 
     /**
+     * The profiler of the running recording, read by the wrapped functions
+     * below. Set by the renderer of the scene while it renders.
+     */
+    private _profilerForInstrumentation: gdjs.Profiler | null = null;
+    /** The unwrapped filter functions, put back when the counting stops. */
+    private _originalFilterFunctions: {
+      push: Function;
+      pop: Function;
+    } | null = null;
+
+    setProfilerForInstrumentation(profiler: gdjs.Profiler | null): void {
+      this._profilerForInstrumentation = profiler;
+    }
+
+    /**
      * Count the draw calls made through the WebGL context, until
      * `stopCountingDrawCalls` puts the context back as it was. Wrapping the
      * context is not free, which is why it only ever happens while the user
@@ -1093,6 +1108,68 @@ namespace gdjs {
       }
       this._originalDrawFunctions = null;
       this._countedDrawCalls = null;
+    }
+
+    /**
+     * Measure what the filters of the layers cost, as a section of the
+     * profiler of their own.
+     *
+     * An effect on a layer makes PixiJS render it into a texture and run the
+     * filter passes over it, all inside the single render call of the scene:
+     * without this, one layer with a blur can dominate the frame and nothing
+     * says so. Only the inside of `push` and `pop` is measured, never what is
+     * drawn between them: that is the content of the layer, not the filter.
+     */
+    startMeasuringFilters(): void {
+      if (this._originalFilterFunctions) return;
+      const pixiRenderer: any = this._pixiRenderer;
+      const filterSystem = pixiRenderer ? pixiRenderer.filter : null;
+      if (
+        !filterSystem ||
+        typeof filterSystem.push !== 'function' ||
+        typeof filterSystem.pop !== 'function'
+      ) {
+        return;
+      }
+
+      const originalPush = filterSystem.push;
+      const originalPop = filterSystem.pop;
+      this._originalFilterFunctions = { push: originalPush, pop: originalPop };
+
+      const gameRenderer = this;
+      filterSystem.push = function (...args) {
+        const profiler = gameRenderer._profilerForInstrumentation;
+        if (!profiler) return originalPush.apply(this, args);
+        profiler.begin('filters');
+        try {
+          return originalPush.apply(this, args);
+        } finally {
+          profiler.end('filters');
+        }
+      };
+      filterSystem.pop = function (...args) {
+        const profiler = gameRenderer._profilerForInstrumentation;
+        if (!profiler) return originalPop.apply(this, args);
+        profiler.begin('filters');
+        try {
+          return originalPop.apply(this, args);
+        } finally {
+          profiler.end('filters');
+        }
+      };
+    }
+
+    stopMeasuringFilters(): void {
+      const originalFilterFunctions = this._originalFilterFunctions;
+      if (!originalFilterFunctions) return;
+      const pixiRenderer: any = this._pixiRenderer;
+      const filterSystem = pixiRenderer ? pixiRenderer.filter : null;
+      if (filterSystem) {
+        filterSystem.push = originalFilterFunctions.push;
+        filterSystem.pop = originalFilterFunctions.pop;
+      }
+      this._originalFilterFunctions = null;
+      this._profilerForInstrumentation = null;
     }
 
     /** The draw calls counted since the last read, and starts again from 0. */

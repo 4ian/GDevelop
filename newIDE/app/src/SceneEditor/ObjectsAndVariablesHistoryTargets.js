@@ -50,7 +50,15 @@ export const getVariablesContainerHistoryTarget = (
 
     targetVariables.forEach(({ name, serialized }, index) => {
       if (variablesContainer.has(name)) {
-        unserializeFromJSObject(variablesContainer.get(name), serialized);
+        const variable = variablesContainer.get(name);
+        // Unserializing adds the children to the existing ones: without
+        // this, the children of an array would be duplicated (and the
+        // removed children of a structure would stay).
+        variable.clearChildren();
+        unserializeFromJSObject(variable, serialized);
+        const currentIndex = variablesContainer.getPosition(name);
+        if (currentIndex !== index)
+          variablesContainer.move(currentIndex, index);
       } else {
         const newVariable = variablesContainer.insertNew(name, index);
         unserializeFromJSObject(newVariable, serialized);
@@ -94,12 +102,20 @@ export const getObjectsContainerHistoryTarget = (
 
     targetObjects.forEach(({ name, type, serialized }, index) => {
       if (objectsContainer.hasObjectNamed(name)) {
-        unserializeFromJSObject(
-          objectsContainer.getObject(name),
-          serialized,
-          'unserializeFrom',
-          project
+        const object = objectsContainer.getObject(name);
+        // Unserializing adds (or updates) the behaviors, but never removes
+        // the ones that are not part of the restored object anymore.
+        const targetBehaviorNames = new Set(
+          ((serialized && serialized.behaviors) || []).map(
+            behavior => behavior.name
+          )
         );
+        object
+          .getAllBehaviorNames()
+          .toJSArray()
+          .filter(behaviorName => !targetBehaviorNames.has(behaviorName))
+          .forEach(behaviorName => object.removeBehavior(behaviorName));
+        unserializeFromJSObject(object, serialized, 'unserializeFrom', project);
       } else {
         const newObject = objectsContainer.insertNewObject(
           project,

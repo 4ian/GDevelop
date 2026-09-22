@@ -357,6 +357,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             historyHandler={historyHandler}
             onObjectGroupModified={onObjectGroupModified}
+            onObjectsModified={onObjectsModified}
             objectGroup={objectGroup}
             isObjectListLocked={isObjectGroupObjectListLocked}
             isBehaviorListLocked={isBehaviorListLocked}

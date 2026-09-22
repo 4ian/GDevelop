@@ -140,6 +140,23 @@ import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGrou
 
 const gd: libGDevelop = global.gd;
 
+// How the attributes of a serialized layer (as found in the history
+// snapshots) map to the field ids of `CompactLayerPropertiesSchema` (the
+// visibility and the lock of a layer are shown in the layers list instead).
+const serializedLayerKeyToPropertyFieldId: { [string]: string } = {
+  renderingType: 'Rendering type',
+  cameraType: 'Camera type',
+  defaultCameraBehavior: 'Default camera behavior',
+  camera3DFieldOfView: 'Field of view',
+  camera3DNearPlaneDistance: 'Near plane distance',
+  camera3DFarPlaneDistance: 'Far plane distance',
+  camera2DPlaneMaxDrawingDistance: 'Maximum 2D drawing distance',
+  followBaseLayerCamera: 'Automatically follow the base layer',
+  ambientLightColorR: 'Ambient light color',
+  ambientLightColorG: 'Ambient light color',
+  ambientLightColorB: 'Ambient light color',
+};
+
 // How the attributes of a serialized instance (as found in the history
 // snapshots) map to the field ids of the compact instance properties editor
 // (see `CompactInstancePropertiesSchema.js`).
@@ -1493,12 +1510,30 @@ export default class SceneEditor extends React.Component<Props, State> {
         return serializeToJSObject(this.props.initialInstances);
       },
       setValue: (value: Object) => {
+        // The default size of an instance is not serialized: it's reported
+        // by the 3D editor. Keep it, or the properties panel would show
+        // (and use) a size of 0 for the re-created instances.
+        const defaultSizes = new Map<string, [number, number, number]>();
+        this._forEachInstance(instance => {
+          defaultSizes.set(instance.getPersistentUuid(), [
+            instance.getDefaultWidth(),
+            instance.getDefaultHeight(),
+            instance.getDefaultDepth(),
+          ]);
+        });
         unserializeFromJSObject(
           this.props.initialInstances,
           value,
           'unserializeFrom',
           project
         );
+        this._forEachInstance(instance => {
+          const defaultSize = defaultSizes.get(instance.getPersistentUuid());
+          if (!defaultSize) return;
+          instance.setDefaultWidth(defaultSize[0]);
+          instance.setDefaultHeight(defaultSize[1]);
+          instance.setDefaultDepth(defaultSize[2]);
+        });
       },
     };
     targets.globalVariables = this._getVariablesContainerHistoryTarget(
@@ -1579,21 +1614,23 @@ export default class SceneEditor extends React.Component<Props, State> {
     object.getVariables().ensurePersistentUuids();
   };
 
-  _ensurePersistentUuidsOfInstances = () => {
+  _forEachInstance = (callback: (instance: gdInitialInstance) => void) => {
     const functor = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe[incompatible-type] - typing is not correct.
     // $FlowFixMe[cannot-write]
     functor.invoke = (instancePtr: number) => {
       // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
-      const instance: gdInitialInstance = gd.wrapPointer(
-        instancePtr,
-        gd.InitialInstance
-      );
-      instance.getVariables().ensurePersistentUuids();
+      callback(gd.wrapPointer(instancePtr, gd.InitialInstance));
     };
     // $FlowFixMe[incompatible-type] - typing is not correct.
     this.props.initialInstances.iterateOverInstances(functor);
     functor.delete();
+  };
+
+  _ensurePersistentUuidsOfInstances = () => {
+    this._forEachInstance(instance => {
+      instance.getVariables().ensurePersistentUuids();
+    });
   };
 
   _getVariablesContainerHistoryTarget = (
@@ -1787,16 +1824,19 @@ export default class SceneEditor extends React.Component<Props, State> {
           layersLocks: null,
         });
       });
-      this._sendSelectedInstances();
-      if (instancesToSelect.length > 0) {
-        // Update the selection state (lastSelectionType, the selected
-        // object...), so the properties panel actually shows the touched
-        // instance - mutating `instancesSelection` above is not enough on
-        // its own: nothing else would trigger a re-render of the editors
-        // reading the current selection from it.
+      // Instances only take over the panels when they are what the change
+      // touched. Otherwise they just stay selected on the canvas, and the
+      // panels show the object/group/layer that was edited.
+      const haveTouchedInstancesToShow =
+        changedOrAddedPersistentUuids.length > 0 &&
+        instancesToSelect.length > 0;
+      if (
+        haveTouchedInstancesToShow ||
+        !this._restoreSelectionByName(revealSelectionByName)
+      ) {
+        // Goes through the state (and not just `instancesSelection`), so
+        // the editors reading the selection are re-rendered.
         this._selectObjectOfInstances(instancesToSelect);
-      } else if (changedOrAddedPersistentUuids.length === 0) {
-        this._restoreSelectionByName(revealSelectionByName);
       }
       this.forceUpdatePropertiesEditor();
       this._ensureKeyboardFocusStaysInEditor();
@@ -1805,6 +1845,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.updateToolbar();
       this._sendHotReloadAllInstances();
       this._sendHotReloadLayers();
+      // After the instances: the 3D editor can only select the ones it has.
+      this._sendSelectedInstances();
 
       const renamedObjectName =
         command && command.type === 'renameObject'
@@ -1862,14 +1904,15 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   /**
    * Select again, after the history was applied, what was selected in the
-   * panels (objects were re-created: they are found by their name).
+   * panels (objects were re-created: they are found by their name). Return
+   * false if there was nothing to select in the panels (or it's gone).
    */
   _restoreSelectionByName = ({
     lastSelectionType,
     selectedObjectNames,
     selectedObjectGroupName,
     selectedLayerName,
-  }: SelectionByName) => {
+  }: SelectionByName): boolean => {
     const {
       objectsContainer,
       globalObjectsContainer,
@@ -1885,9 +1928,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           )
         )
         .filter(Boolean);
-      if (objectsWithContext.length > 0)
-        this._onObjectFolderOrObjectsWithContextSelected(objectsWithContext);
-    } else if (lastSelectionType === 'objectGroup' && selectedObjectGroupName) {
+      if (objectsWithContext.length === 0) return false;
+      this._onObjectFolderOrObjectsWithContextSelected(objectsWithContext);
+      return true;
+    }
+    if (lastSelectionType === 'objectGroup' && selectedObjectGroupName) {
       const groupName = selectedObjectGroupName;
       const groupsContainer = [
         objectsContainer.getObjectGroups(),
@@ -1895,16 +1940,19 @@ export default class SceneEditor extends React.Component<Props, State> {
           ? globalObjectsContainer.getObjectGroups()
           : null,
       ].find(groups => groups && groups.has(groupName));
-      if (groupsContainer)
-        this._onSelectObjectGroup(groupsContainer.get(groupName));
-    } else if (
+      if (!groupsContainer) return false;
+      this._onSelectObjectGroup(groupsContainer.get(groupName));
+      return true;
+    }
+    if (
       lastSelectionType === 'layer' &&
       typeof selectedLayerName === 'string'
     ) {
-      const layerName = selectedLayerName;
-      if (layersContainer.hasLayerNamed(layerName))
-        this._onSelectLayer(layersContainer.getLayer(layerName));
+      if (!layersContainer.hasLayerNamed(selectedLayerName)) return false;
+      this._onSelectLayer(layersContainer.getLayer(selectedLayerName));
+      return true;
     }
+    return false;
   };
 
   _applyHistoryCommand = (
@@ -4454,6 +4502,21 @@ export default class SceneEditor extends React.Component<Props, State> {
    * focus back in that case.
    */
   _ensureKeyboardFocusStaysInEditor = () => {
+    const containerElement = this._containerElement;
+    if (!containerElement) return;
+    const { activeElement } = document;
+    if (
+      activeElement &&
+      activeElement !== document.body &&
+      containerElement.contains(activeElement)
+    ) {
+      // The keyboard is already usable in the editor: don't move the focus
+      // (notably not to the embedded game while a shortcut is being typed
+      // in a panel: the game would not know about the modifier keys already
+      // held, and ignore the next undo/redo).
+      return;
+    }
+
     // In the 3D editor, the keyboard is handled by the embedded game: its
     // in-game editor has its own shortcuts (like "F" to focus the
     // selection) and forwards undo/redo & others back to the editor. Give
@@ -4465,16 +4528,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       return;
     }
 
-    const containerElement = this._containerElement;
-    if (!containerElement) return;
-    const { activeElement } = document;
-    if (
-      !activeElement ||
-      activeElement === document.body ||
-      !containerElement.contains(activeElement)
-    ) {
-      containerElement.focus();
-    }
+    containerElement.focus();
   };
 
   /**
@@ -4576,6 +4630,59 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   /**
+   * Flash the fields of a section of the properties panel, unfolding it
+   * first if needed (its fields are then only rendered a moment later).
+   * `onNoFieldFlashed` is called if none of the fields could be found.
+   */
+  _flashFieldsOfSection = (
+    sectionId: string,
+    fieldIds: Array<string>,
+    onNoFieldFlashed?: () => void
+  ) => {
+    const containerElement = this._containerElement;
+    if (!containerElement || fieldIds.length === 0) return;
+    this._unfoldSection(sectionId);
+
+    const retryDelayMs = 100;
+    const attempt = (remainingRetries: number) => {
+      let flashedAnyField = false;
+      fieldIds.forEach(fieldId => {
+        const element = this._findElementByAttribute(
+          containerElement,
+          'id',
+          fieldId
+        );
+        if (element && this._isElementVisible(element)) {
+          this._flashElement(element);
+          flashedAnyField = true;
+        }
+      });
+      if (flashedAnyField) return;
+      if (remainingRetries > 0) {
+        setTimeout(() => attempt(remainingRetries - 1), retryDelayMs);
+      } else if (onNoFieldFlashed) {
+        onNoFieldFlashed();
+      }
+    };
+    attempt(5);
+  };
+
+  /**
+   * Unfold a section of the properties panel (if it's folded), so that a
+   * change made inside can be revealed.
+   */
+  _unfoldSection = (sectionId: string) => {
+    const containerElement = this._containerElement;
+    if (!containerElement) return;
+    const unfoldButton = this._findElementByAttribute(
+      containerElement,
+      'id',
+      `${sectionId}-unfold-button`
+    );
+    if (unfoldButton) unfoldButton.click();
+  };
+
+  /**
    * Flash the rows of the variables (of an object, an instance, a scene...)
    * whose value changed, inside the section identified by `sectionId` - or
    * the section itself if none of the changed variables have a visible row
@@ -4599,6 +4706,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const changedNodeIds = getChangedVariableNodeIds(before, after);
     if (changedNodeIds.length === 0) return;
 
+    this._unfoldSection(sectionId);
     // The variables list only renders its visible rows: ask it to scroll to
     // the changed variable before looking it up in the DOM.
     editorDisplay.revealPropertiesVariable(changedNodeIds[0]);
@@ -4620,7 +4728,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           'data-variable-node-id',
           nodeId
         );
-        if (element) {
+        if (element && this._isElementVisible(element)) {
           this._flashElement(element);
           flashedAnyRow = true;
         }
@@ -4637,18 +4745,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     editorId: EditorId,
     before: ?Array<Object>,
     after: ?Array<Object>,
-    sectionId: string
+    getSectionId: (serializedEffect: Object) => string
   ) => {
     const { editorDisplay } = this;
     const containerElement = this._containerElement;
     if (!containerElement || !editorDisplay) return;
     if (!editorDisplay.isEditorVisible(editorId)) return;
-    const sectionElement = this._findElementByAttribute(
-      containerElement,
-      'id',
-      sectionId
-    );
-    if (!sectionElement || !this._isElementVisible(sectionElement)) return;
 
     (after || []).forEach(afterEffect => {
       const beforeEffect = findSerializedItemByName(before, afterEffect.name);
@@ -4658,6 +4760,15 @@ export default class SceneEditor extends React.Component<Props, State> {
         'name',
       ]);
       if (changedKeys.length === 0) return;
+
+      const sectionId = getSectionId(afterEffect);
+      this._unfoldSection(sectionId);
+      const sectionElement = this._findElementByAttribute(
+        containerElement,
+        'id',
+        sectionId
+      );
+      if (!sectionElement || !this._isElementVisible(sectionElement)) return;
 
       this._flashOrRetryThenFallback(() => {
         // See the comment in `_flashChangedVariableRows`: the content is a
@@ -4716,6 +4827,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
       if (changedKeys.length === 0) return;
 
+      this._unfoldSection('behaviors-section');
       this._flashOrRetryThenFallback(() => {
         const panelElement = this._findElementByAttribute(
           containerElement,
@@ -4759,6 +4871,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       after: ?Array<Object>,
     |}> = [];
     let anyBehaviorOverrideChanged = false;
+    const changedBehaviorNames = new Set<string>();
     changedOrAddedPersistentUuids.forEach(persistentUuid => {
       const beforeInstance = instancesByUuidBeforeChange.get(persistentUuid);
       const afterInstance = instancesByUuidAfterChange.get(persistentUuid);
@@ -4797,6 +4910,18 @@ export default class SceneEditor extends React.Component<Props, State> {
       ) {
         anyBehaviorOverrideChanged = true;
       }
+      // The properties of a behavior changed for this instance only.
+      const beforeOverridings = beforeInstance.behaviorOverridings || [];
+      const afterOverridings = afterInstance.behaviorOverridings || [];
+      [...beforeOverridings, ...afterOverridings].forEach(({ name }) => {
+        if (
+          JSON.stringify(findSerializedItemByName(beforeOverridings, name)) !==
+          JSON.stringify(findSerializedItemByName(afterOverridings, name))
+        ) {
+          changedBehaviorNames.add(name);
+          anyBehaviorOverrideChanged = true;
+        }
+      });
     });
     if (
       changedFieldIds.size === 0 &&
@@ -4828,13 +4953,30 @@ export default class SceneEditor extends React.Component<Props, State> {
           );
         });
         if (anyBehaviorOverrideChanged) {
+          this._unfoldSection('behaviors-section');
           const sectionElement = this._findElementByAttribute(
             containerElement,
             'id',
             'behaviors-section'
           );
           if (sectionElement && this._isElementVisible(sectionElement)) {
-            this._flashElement(sectionElement);
+            if (changedBehaviorNames.size === 0) {
+              this._flashElement(sectionElement);
+            }
+            changedBehaviorNames.forEach(behaviorName => {
+              this._flashOrRetryThenFallback(() => {
+                const panelElement = this._findElementByAttribute(
+                  containerElement,
+                  'id',
+                  `behavior-panel-${behaviorName}`
+                );
+                if (panelElement && this._isElementVisible(panelElement)) {
+                  this._flashElement(panelElement);
+                  return true;
+                }
+                return false;
+              }, sectionElement);
+            });
           }
         }
       });
@@ -4878,21 +5020,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             afterSerialized.content
           ),
         ];
-        let flashedAnyField = false;
-        changedFieldIds.forEach(fieldId => {
-          const element = this._findElementByAttribute(
-            containerElement,
-            'id',
-            fieldId
-          );
-          if (element && this._isElementVisible(element)) {
-            this._flashElement(element);
-            flashedAnyField = true;
-          }
-        });
-        if (!flashedAnyField && changedFieldIds.length > 0) {
-          this._flashObjectListRowByName(afterObject.name);
-        }
+        this._flashFieldsOfSection(
+          'object-properties-section',
+          changedFieldIds,
+          () => this._flashObjectListRowByName(afterObject.name)
+        );
 
         this._flashChangedBehaviorRows(
           beforeSerialized.behaviors,
@@ -4902,7 +5034,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           'properties',
           beforeSerialized.effects,
           afterSerialized.effects,
-          'object-effects-section'
+          () => 'object-effects-section'
         );
         this._flashChangedVariableRows(
           'object-variables-section',
@@ -4938,6 +5070,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
       if (changedKeys.length === 0) return;
 
+      this._unfoldSection('group-objects-section');
       const sectionElement = this._findElementByAttribute(
         containerElement,
         'id',
@@ -4973,23 +5106,28 @@ export default class SceneEditor extends React.Component<Props, State> {
           'effects',
           'name',
         ]);
-        changedKeys.forEach(key => {
-          const element = this._findElementByAttribute(
-            containerElement,
-            'id',
-            key
-          );
-          if (element && this._isElementVisible(element)) {
-            this._flashElement(element);
-          }
-        });
+        const changedFieldIds = new Set(
+          changedKeys
+            .map(key => serializedLayerKeyToPropertyFieldId[key])
+            .filter(Boolean)
+        );
+        this._flashFieldsOfSection('layer-properties-section', [
+          ...changedFieldIds,
+        ]);
       }
 
       this._flashChangedEffectRows(
-        'layers-list',
+        'properties',
         beforeLayer.effects,
         afterLayer.effects,
-        'layer-effects-section'
+        // A layer has a section for its 2D effects and one for its 3D ones.
+        serializedEffect =>
+          gd.MetadataProvider.getEffectMetadata(
+            this.props.project.getCurrentPlatform(),
+            serializedEffect.effectType
+          ).isMarkedAsOnlyWorkingFor3D()
+            ? 'layer-3d-effects-section'
+            : 'layer-2d-effects-section'
       );
     });
   };
@@ -5041,6 +5179,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         afterChange.layers
       );
     }
+
+    // The changed fields of the scene are not flashed (yet), but at least
+    // shown.
+    if (changedKeys.includes('sceneProperties'))
+      this._unfoldSection('scene-properties-section');
+    if (changedKeys.includes('behaviorsSharedData'))
+      this._unfoldSection('scene-behaviors-section');
 
     if (changedKeys.includes('sceneVariables')) {
       // Unlike an object's or an instance's `variables`/`initialVariables`
@@ -5214,7 +5359,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     // left first: the value still being edited is committed - and saved to
     // the history - before the undo/redo, so it's neither lost nor
     // re-applied on top of the undo/redo when the field is left later.
-    if (target instanceof HTMLInputElement) target.blur();
+    if (target instanceof HTMLInputElement) {
+      target.blur();
+      // Keep the keyboard here, for the next undo/redo.
+      if (this._containerElement) this._containerElement.focus();
+    }
 
     if (key === 'y' || evt.shiftKey) this.redo();
     else this.undo();

@@ -1905,9 +1905,10 @@ namespace gdjs {
         }
       } else {
         if (!newInstance.customSize && oldInstance.customSize) {
-          // The custom size was removed. Just flag the size as changed
-          // and hope the object will handle this in
-          // `extraInitializationFromInitialInstance`.
+          // The custom size was removed: go back to the original size.
+          runtimeObject.setWidth(runtimeObject.getOriginalWidth());
+          runtimeObject.setHeight(runtimeObject.getOriginalHeight());
+          somethingChanged = true;
           sizeChanged = true;
         }
       }
@@ -1924,9 +1925,9 @@ namespace gdjs {
           newInstance.depth === undefined &&
           oldInstance.depth !== undefined
         ) {
-          // The custom depth was removed. Just flag the depth as changed
-          // and hope the object will handle this in
-          // `extraInitializationFromInitialInstance`.
+          // The custom depth was removed: go back to the original depth.
+          runtimeObject.setDepth(runtimeObject.getOriginalDepth());
+          somethingChanged = true;
           sizeChanged = true;
         }
       }

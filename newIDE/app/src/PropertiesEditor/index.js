@@ -230,6 +230,7 @@ const PropertiesEditor = ({
       if (field.valueType === 'boolean') {
         const { setValue } = field;
         const description = getFieldDescription(field);
+        const mixedValues = hasMixedValues({ instances, field });
 
         return (
           <InlineCheckbox
@@ -247,7 +248,8 @@ const PropertiesEditor = ({
             }
             key={field.name}
             id={field.name}
-            checked={getFieldValue({ instances, field })}
+            checked={mixedValues ? false : getFieldValue({ instances, field })}
+            indeterminate={mixedValues}
             onCheck={(event, newValue) => {
               instances.forEach(i => setValue(i, !!newValue));
               _onInstancesModified(instances);

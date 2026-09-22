@@ -141,7 +141,12 @@ export const CompactEffectsListEditor = ({
   return (
     <>
       <TopLevelCollapsibleSection
-        id={`${target}-effects-section`}
+        // A layer has two of these sections: their ids must be different.
+        id={
+          target === 'layer'
+            ? `layer-${layerRenderingType}-effects-section`
+            : `${target}-effects-section`
+        }
         title={
           target === 'object' ? (
             <Trans>Effects</Trans>

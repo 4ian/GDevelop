@@ -84,6 +84,11 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   historyHandler?: HistoryHandler,
   onObjectGroupModified?: (?FieldModificationContext) => void,
+  // The behaviors of a group are the ones of its objects.
+  onObjectsModified?: (
+    objects: Array<gdObject>,
+    context: ?FieldModificationContext
+  ) => void,
 
   objectGroup: gdObjectGroup,
   isObjectListLocked: boolean,
@@ -132,6 +137,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
       unsavedChanges,
       historyHandler,
       onObjectGroupModified,
+      onObjectsModified,
       objectGroup,
       isObjectListLocked,
       isVariableListLocked,
@@ -228,6 +234,12 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
 
     // Behaviors:
     const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
+    // A behavior was added, removed or renamed.
+    const onBehaviorsUpdated = () => {
+      forceUpdate();
+      if (onObjectsModified)
+        onObjectsModified(objects, { fieldName: 'behaviors' });
+    };
     const {
       openNewBehaviorDialog,
       newBehaviorDialog,
@@ -239,7 +251,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
       isChildObject: !layout,
       eventsFunctionsExtension,
       onUpdate: forceUpdate,
-      onBehaviorsUpdated: forceUpdate,
+      onBehaviorsUpdated: onBehaviorsUpdated,
       onUpdateBehaviorsSharedData,
       onWillInstallExtension,
       onExtensionInstalled,
@@ -247,8 +259,47 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
       onCreateNewExtensionWithBehavior,
     });
 
+    // The variables of a group are only applied to its objects by the
+    // refactoring below, a moment after they are edited: save to the history
+    // once this is done - not when edited, or the step would miss the change.
+    const lastHistoryBatchKeyRef = React.useRef<?string>(null);
+    const applyPendingRefactoringOfPreviousChangesRef = React.useRef<
+      () => void
+    >(() => {});
+    const variablesHistoryHandler = React.useMemo(
+      () =>
+        historyHandler
+          ? {
+              ...historyHandler,
+              saveToHistory: (batchKey?: string) => {
+                // A change not to be merged with the previous ones: apply
+                // them now if they were still pending (which saves them to
+                // the history, with their own batch key).
+                if (!batchKey || batchKey !== lastHistoryBatchKeyRef.current) {
+                  applyPendingRefactoringOfPreviousChangesRef.current();
+                }
+                lastHistoryBatchKeyRef.current = batchKey;
+              },
+            }
+          : undefined,
+      [historyHandler]
+    );
+    const saveVariablesToHistory = React.useCallback(
+      () => {
+        if (!historyHandler) return;
+        historyHandler.saveToHistory(
+          lastHistoryBatchKeyRef.current || undefined
+        );
+      },
+      [historyHandler]
+    );
+
     // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
-    const { onVariablesUpdated } = useVariablesContainerRefactoring({
+    const {
+      onVariablesUpdated,
+      applyPendingRefactoringOfPreviousChanges,
+    } = useVariablesContainerRefactoring({
+      onRefactoringApplied: saveVariablesToHistory,
       project,
       variablesContainer: groupVariablesContainer,
       initialInstances,
@@ -259,6 +310,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
       globalObjectsContainer,
       objectName: null,
     });
+    applyPendingRefactoringOfPreviousChangesRef.current = applyPendingRefactoringOfPreviousChanges;
 
     const removeObject = React.useCallback(
       (objectName: string) => {
@@ -418,6 +470,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
                   )}
                 />
                 <TopLevelCollapsibleSection
+                  id="behaviors-section"
                   title={<Trans>Behaviors</Trans>}
                   isFolded={isSectionFolded('behaviors')}
                   toggleFolded={() => toggleSectionFolded('behaviors')}
@@ -457,6 +510,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
                         return (
                           <CollapsibleSubPanel
                             key={behaviors[0].ptr}
+                            id={`behavior-panel-${behaviorName}`}
                             renderContent={() => (
                               <CompactBehaviorComponent
                                 project={project}
@@ -464,7 +518,12 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
                                 behaviors={behaviors}
                                 object={null}
                                 layersContainer={layersContainer}
-                                onBehaviorUpdated={() => {}}
+                                onBehaviorUpdated={() => {
+                                  if (onObjectsModified)
+                                    onObjectsModified(objects, {
+                                      fieldName: behaviorName,
+                                    });
+                                }}
                                 resourceManagementProps={
                                   resourceManagementProps
                                 }
@@ -538,7 +597,7 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
                       variablesContainer={groupVariablesContainer}
                       areObjectVariables
                       size="compact"
-                      historyHandler={historyHandler}
+                      historyHandler={variablesHistoryHandler}
                       onVariablesUpdated={onVariablesUpdated}
                       toolbarIconStyle={styles.icon}
                       compactEmptyPlaceholderText={

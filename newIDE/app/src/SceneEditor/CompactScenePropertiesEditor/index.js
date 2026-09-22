@@ -224,6 +224,7 @@ export const CompactScenePropertiesEditor: React.ComponentType<{
               </LineStackLayout>
             </ColumnStackLayout>
             <TopLevelCollapsibleSection
+              id="scene-properties-section"
               title={<Trans>Properties</Trans>}
               isFolded={isSectionFolded('properties')}
               toggleFolded={() => toggleSectionFolded('properties')}
@@ -245,6 +246,7 @@ export const CompactScenePropertiesEditor: React.ComponentType<{
               )}
             />
             <TopLevelCollapsibleSection
+              id="scene-behaviors-section"
               title={<Trans>Behaviors</Trans>}
               isFolded={isSectionFolded('behaviors')}
               toggleFolded={() => toggleSectionFolded('behaviors')}

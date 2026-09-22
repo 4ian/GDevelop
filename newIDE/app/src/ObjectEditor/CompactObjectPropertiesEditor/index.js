@@ -337,6 +337,14 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
       object.getBehavior(behaviorName)
     );
     const isSynchronizedOverNetwork = isObjectSynchronizedOverNetwork(object);
+    // A behavior was added, removed or renamed.
+    const onBehaviorsUpdated = React.useCallback(
+      () => {
+        forceUpdate();
+        onObjectsModified([object], { fieldName: 'behaviors' });
+      },
+      [forceUpdate, onObjectsModified, object]
+    );
     const {
       openNewBehaviorDialog,
       newBehaviorDialog,
@@ -348,7 +356,7 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
       isChildObject: !layout,
       eventsFunctionsExtension,
       onUpdate: forceUpdate,
-      onBehaviorsUpdated: forceUpdate,
+      onBehaviorsUpdated: onBehaviorsUpdated,
       onUpdateBehaviorsSharedData,
       onWillInstallExtension,
       onExtensionInstalled,
@@ -644,6 +652,7 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
               />
             </ColumnStackLayout>
             <TopLevelCollapsibleSection
+              id="object-properties-section"
               title={<Trans>Properties</Trans>}
               isFolded={isSectionFolded('properties')}
               toggleFolded={() => toggleSectionFolded('properties')}

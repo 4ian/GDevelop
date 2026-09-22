@@ -41,7 +41,12 @@ export const TopLevelCollapsibleSection = ({
     <Column noOverflowParent id={id}>
       <LineStackLayout alignItems="center" justifyContent="space-between">
         <LineStackLayout noMargin alignItems="center">
-          <IconButton size="small" onClick={toggleFolded}>
+          <IconButton
+            size="small"
+            onClick={toggleFolded}
+            // Allows the scene editor to unfold the section to reveal a change.
+            id={id ? `${id}-${isFolded ? 'unfold' : 'fold'}-button` : undefined}
+          >
             {isFolded ? (
               <ChevronArrowRightWithRoundedBorder style={styles.icon} />
             ) : (

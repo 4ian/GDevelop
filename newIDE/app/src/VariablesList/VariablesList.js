@@ -1740,7 +1740,9 @@ const VariablesList: React.ComponentType<{
         }
       }
 
-      _onChange();
+      // The name can be applied at each keystroke: group them in a single
+      // undoable step (the node id changes with the name, not the pointer).
+      _onChange(`name:${variable.ptr}`);
       updateExpandedAndSelectedNodesFollowingNameChange(
         nodeId,
         safeAndUniqueNewName

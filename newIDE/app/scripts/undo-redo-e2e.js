@@ -628,11 +628,16 @@ class Editor {
       window.__highlightsObserver = new MutationObserver(mutations => {
         mutations.forEach(({ target }) => {
           if (!target.classList.contains('undo-redo-property-flash')) return;
-          const row = target.closest('[data-object-name]');
+          const objectRow = target.closest('[data-object-name]');
+          const groupRow = target.closest('[data-group-name]');
           window.__recordedHighlights.add(
             target.id ||
               target.getAttribute('data-variable-node-id') ||
-              (row ? `object-row:${row.getAttribute('data-object-name')}` : '?')
+              (objectRow
+                ? `object-row:${objectRow.getAttribute('data-object-name')}`
+                : groupRow
+                ? `group-row:${groupRow.getAttribute('data-group-name')}`
+                : '?')
           );
         });
       });
@@ -2395,8 +2400,8 @@ scenarios['undo highlights a select field of an instance'] = async editor => {
     expectEqual(await editor.getPanel(), 'group', 'panel after undo');
     expectEqual(await getMembersCount(), 2, 'members after undo');
     expectEqual(
-      await editor.getHighlights(),
-      ['group-objects-section'],
+      (await editor.getHighlights()).sort(),
+      ['group-objects-section', 'group-row:MyGroup'],
       'highlighted elements'
     );
   };
@@ -2933,6 +2938,117 @@ scenarios[
     );
   };
 }
+
+scenarios[
+  'undo of scene property changes highlights the properties'
+] = async editor => {
+  const panel = '#scene-properties-editor';
+  await clickSelectorIfPresent(
+    editor,
+    '#scene-properties-section-unfold-button'
+  );
+  const color = `${panel} [id="BackgroundColor"]`;
+  const title = `${panel} [id="WindowTitle"]`;
+  await editor.page.waitForSelector(color);
+  const initialColor = await editor.getFieldValue(color);
+  // The title is an "advanced" field, hidden by default.
+  await clickSelectorIfPresent(
+    editor,
+    `${panel} #show-advanced-properties-button`
+  );
+  await editor.page.waitForSelector(title);
+  await editor.setFieldValue(color, '10;20;30');
+  await editor.setFieldValue(title, 'My title');
+  expectEqual(await editor.getFieldValue(color), '10;20;30', 'color changed');
+
+  // Fold the section: the undo must reopen it - and show the advanced
+  // fields again, as the section is rendered again from scratch.
+  await clickSelectorIfPresent(editor, '#scene-properties-section-fold-button');
+  await editor.waitUntil(
+    'section folded',
+    async () => !(await isSelectorVisible(editor, color))
+  );
+  await editor.recordHighlights();
+  await editor.undo();
+  expectEqual(await editor.getHighlights(), ['WindowTitle'], 'first undo');
+  expectEqual(await isSelectorVisible(editor, title), true, 'title shown');
+  expectEqual(await editor.getFieldValue(title), '', 'title after undo');
+
+  await editor.recordHighlights();
+  await editor.undo();
+  expectEqual(await editor.getHighlights(), ['BackgroundColor'], 'second undo');
+  expectEqual(
+    await editor.getFieldValue(color),
+    initialColor,
+    'color after undo'
+  );
+};
+
+scenarios[
+  'undo of group changes selects the group and highlights its row'
+] = async editor => {
+  const { page } = editor;
+  await editor.openPanel('groups');
+  const groupRow = name => `#objects-groups-list [data-group-name="${name}"]`;
+  await page.waitForSelector(groupRow('MyGroup'));
+
+  // Rename from the list.
+  await (await page.$(groupRow('MyGroup'))).click();
+  await sleep(300);
+  await page.keyboard.press('F2');
+  await sleep(300);
+  await page.keyboard.type('RenamedGroup');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector(groupRow('RenamedGroup'));
+  await sleep(HISTORY_SAVE_DELAY);
+  await editor.deselectAll();
+
+  await editor.recordHighlights();
+  await editor.undo();
+  await page.waitForSelector(groupRow('MyGroup'));
+  expectEqual(await editor.getPanel(), 'group', 'panel after the rename undo');
+  const highlightsAfterRename = await editor.getHighlights();
+  expectEqual(
+    highlightsAfterRename.includes('group-row:MyGroup'),
+    true,
+    `group row highlighted after the rename undo (${highlightsAfterRename})`
+  );
+
+  // Add an object from the group panel.
+  await clickSelectorIfPresent(editor, '#group-objects-section-unfold-button');
+  const content = '#group-objects-section-content';
+  const countMembers = () =>
+    page.evaluate(
+      content =>
+        document
+          .querySelector(content)
+          .querySelectorAll('button[aria-label="remove"]').length,
+      content
+    );
+  await editor.waitUntil(
+    'members listed',
+    async () => (await countMembers()) === 1
+  );
+  await page.select(`${content} select`, 'OtherObject');
+  await editor.waitUntil(
+    'member added',
+    async () => (await countMembers()) === 2
+  );
+  await sleep(HISTORY_SAVE_DELAY);
+  await editor.deselectAll();
+
+  await editor.recordHighlights();
+  await editor.undo();
+  expectEqual(await editor.getPanel(), 'group', 'panel after the add undo');
+  expectEqual(await countMembers(), 1, 'members after undo');
+  const highlights = await editor.getHighlights();
+  expectEqual(
+    highlights.includes('group-row:MyGroup') &&
+      highlights.includes('group-objects-section'),
+    true,
+    `row and objects section highlighted after the add undo (${highlights})`
+  );
+};
 
 const makeUndoObjectDeletionScenario = is3D => async editor => {
   if (is3D) await editor.switchTo3D();

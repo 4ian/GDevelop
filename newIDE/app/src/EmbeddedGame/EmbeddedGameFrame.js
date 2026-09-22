@@ -111,6 +111,8 @@ let onSetCameraState:
 let onChangeViewPosition:
   | null
   | ((command: ChangeViewPositionCommand) => void) = null;
+// POC: open the inspection of a 3D model in the in-game editor.
+let onInspectModel3DObject: null | ((objectName: string) => void) = null;
 
 export const setEmbeddedGameFramePreviewLocation = ({
   previewIndexHtmlLocation,
@@ -163,6 +165,11 @@ export const preventGameFramePointerEvents = (enabled: boolean) => {
 export const changeViewPosition = (command: ChangeViewPositionCommand) => {
   if (!onChangeViewPosition) return;
   onChangeViewPosition(command);
+};
+
+export const inspectModel3DObject = (objectName: string) => {
+  if (!onInspectModel3DObject) return;
+  onInspectModel3DObject(objectName);
 };
 
 const logSwitchingInfo = ({
@@ -257,6 +264,40 @@ export const EmbeddedGameFrame = ({
         });
     },
     [previewDebuggerServer, inGameEditorSettings]
+  );
+
+  // POC: keep the game aware of the part of the frame that is not covered by
+  // the IDE panels, so the in-game editor can place its own UI there.
+  // Sent regularly (cheap): the hole moves with the panels, and the game can
+  // be restarted at any time.
+  React.useEffect(
+    () => {
+      if (!previewDebuggerServer) return;
+      const intervalId = setInterval(() => {
+        const iframe = iframeRef.current;
+        const holeRect = getActiveEmbeddedGameFrameHoleRect();
+        if (!iframe || !holeRect) return;
+        const frameRect = iframe.getBoundingClientRect();
+        if (!frameRect.width || !frameRect.height) return;
+
+        const visibleScreenArea = {
+          minX: (holeRect.left - frameRect.left) / frameRect.width,
+          minY: (holeRect.top - frameRect.top) / frameRect.height,
+          maxX: (holeRect.right - frameRect.left) / frameRect.width,
+          maxY: (holeRect.bottom - frameRect.top) / frameRect.height,
+        };
+        previewDebuggerServer
+          .getExistingEmbeddedGameFrameDebuggerIds()
+          .forEach((debuggerId: string) => {
+            previewDebuggerServer.sendMessage(debuggerId, {
+              command: 'setVisibleScreenArea',
+              payload: { visibleScreenArea },
+            });
+          });
+      }, 300);
+      return () => clearInterval(intervalId);
+    },
+    [previewDebuggerServer]
   );
 
   React.useEffect(
@@ -453,6 +494,17 @@ export const EmbeddedGameFrame = ({
               eventsBasedObjectType,
               eventsBasedObjectVariantName,
               cameraState3D: cameraStates.current.get(editorId),
+            });
+          });
+      };
+      onInspectModel3DObject = (objectName: string) => {
+        if (!previewDebuggerServer) return;
+        previewDebuggerServer
+          .getExistingEmbeddedGameFrameDebuggerIds()
+          .forEach(debuggerId => {
+            previewDebuggerServer.sendMessage(debuggerId, {
+              command: 'inspectModel3DObject',
+              payload: { objectName },
             });
           });
       };

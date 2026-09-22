@@ -34,24 +34,38 @@ namespace gdjs {
         | 'ObjectCenter'
         | 'BottomCenterZ'
         | 'BottomCenterY'
-        | 'TopLeft';
+        | 'TopLeft'
+        | 'Custom';
       centerLocation:
         | 'ModelOrigin'
         | 'ObjectCenter'
         | 'CenteredOnZ'
         | 'BottomCenterZ'
-        | 'BottomCenterY';
+        | 'BottomCenterY'
+        | 'Custom';
       animations: Model3DAnimation[];
       crossfadeDuration: float;
       isCastingShadow: boolean;
       isReceivingShadow: boolean;
+      /** Normalized points, used when the location is "Custom". */
+      customOriginX?: float;
+      customOriginY?: float;
+      customOriginZ?: float;
+      customCenterX?: float;
+      customCenterY?: float;
+      customCenterZ?: float;
     };
   }
 
   type LocationPoint = [float | null, float | null, float | null];
 
-  const getPointForLocation = (location: string): LocationPoint => {
+  const getPointForLocation = (
+    location: string,
+    customPoint?: LocationPoint
+  ): LocationPoint => {
     switch (location) {
+      case 'Custom':
+        return customPoint || [null, null, null];
       case 'ModelOrigin':
         return [null, null, null];
       case 'CenteredOnZ':
@@ -68,6 +82,33 @@ namespace gdjs {
         return [null, null, null];
     }
   };
+
+  const getCustomOriginPoint = (
+    content: Model3DObjectData['content']
+  ): LocationPoint => [
+    content.customOriginX || 0,
+    content.customOriginY || 0,
+    content.customOriginZ || 0,
+  ];
+
+  const getCustomCenterPoint = (
+    content: Model3DObjectData['content']
+  ): LocationPoint => [
+    content.customCenterX || 0,
+    content.customCenterY || 0,
+    content.customCenterZ || 0,
+  ];
+
+  const haveCustomPointsChanged = (
+    oldContent: Model3DObjectData['content'],
+    newContent: Model3DObjectData['content']
+  ): boolean =>
+    oldContent.customOriginX !== newContent.customOriginX ||
+    oldContent.customOriginY !== newContent.customOriginY ||
+    oldContent.customOriginZ !== newContent.customOriginZ ||
+    oldContent.customCenterX !== newContent.customCenterX ||
+    oldContent.customCenterY !== newContent.customCenterY ||
+    oldContent.customCenterZ !== newContent.customCenterZ;
 
   /**
    * A 3D object which displays a 3D model.
@@ -125,10 +166,12 @@ namespace gdjs {
       this._modelResourceName = objectData.content.modelResourceName;
       this._animations = objectData.content.animations;
       this._originPoint = getPointForLocation(
-        objectData.content.originLocation
+        objectData.content.originLocation,
+        getCustomOriginPoint(objectData.content)
       );
       this._centerPoint = getPointForLocation(
-        objectData.content.centerLocation
+        objectData.content.centerLocation,
+        getCustomCenterPoint(objectData.content)
       );
       this._renderer = new gdjs.Model3DRuntimeObjectRenderer(
         this,
@@ -202,20 +245,24 @@ namespace gdjs {
         oldObjectData.content.materialType !==
           newObjectData.content.materialType ||
         oldObjectData.content.centerLocation !==
-          newObjectData.content.centerLocation
+          newObjectData.content.centerLocation ||
+        haveCustomPointsChanged(oldObjectData.content, newObjectData.content)
       ) {
         // The center is applied to the model by `_updateModel`.
         this._centerPoint = getPointForLocation(
-          newObjectData.content.centerLocation
+          newObjectData.content.centerLocation,
+          getCustomCenterPoint(newObjectData.content)
         );
         this.onModelChanged(newObjectData);
       }
       if (
         oldObjectData.content.originLocation !==
-        newObjectData.content.originLocation
+          newObjectData.content.originLocation ||
+        haveCustomPointsChanged(oldObjectData.content, newObjectData.content)
       ) {
         this._originPoint = getPointForLocation(
-          newObjectData.content.originLocation
+          newObjectData.content.originLocation,
+          getCustomOriginPoint(newObjectData.content)
         );
         this._renderer.updatePosition();
       }

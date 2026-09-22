@@ -2,6 +2,7 @@
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 import React from 'react';
 import { AutoSizer } from 'react-virtualized';
@@ -75,6 +76,11 @@ const getSceneGroupsEmptyPlaceholder = (i18n: I18nType): EmptyPlaceholder => ({
 
 const getGroupWithContextName = (groupWithContext: GroupWithContext): string =>
   groupWithContext.group.getName();
+
+const getTreeViewItemDataSet = (item: TreeViewItem): ?HTMLDataset =>
+  item.isRoot || item.isPlaceholder
+    ? undefined
+    : { groupName: getGroupWithContextName(item) };
 
 const getTreeViewItemName = (item: TreeViewItem) =>
   item.isRoot || item.isPlaceholder ? item.label : item.group.getName();
@@ -722,6 +728,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         getItemChildren={getTreeViewItemChildren}
                         multiSelect={false}
                         getItemId={getTreeViewItemId}
+                        getItemDataset={getTreeViewItemDataSet}
                         onClickItem={onClickItem}
                         onEditItem={editItem}
                         selectedItems={

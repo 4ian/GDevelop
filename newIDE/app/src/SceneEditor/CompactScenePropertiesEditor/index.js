@@ -278,6 +278,7 @@ export const CompactScenePropertiesEditor: React.ComponentType<{
                         !isEmpty && (
                           <CollapsibleSubPanel
                             key={behaviorSharedData.ptr}
+                            id={`behavior-panel-${behaviorSharedData.getName()}`}
                             renderContent={() => (
                               <CompactBehaviorSharedDataPropertiesEditor
                                 project={project}

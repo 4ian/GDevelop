@@ -157,6 +157,18 @@ const serializedLayerKeyToPropertyFieldId: { [string]: string } = {
   ambientLightColorB: 'Ambient light color',
 };
 
+// Same for the scene properties (see `CompactScenePropertiesSchema` and the
+// `sceneProperties` history target).
+const scenePropertyKeyToPropertyFieldId: { [string]: string } = {
+  backgroundColorRed: 'BackgroundColor',
+  backgroundColorGreen: 'BackgroundColor',
+  backgroundColorBlue: 'BackgroundColor',
+  windowDefaultTitle: 'WindowTitle',
+  stopSoundsOnStartup: 'ShouldStopSoundsOnStartup',
+  resourcesPreloading: 'ResourcesPreloading',
+  resourcesUnloading: 'ResourcesUnloading',
+};
+
 // How the attributes of a serialized instance (as found in the history
 // snapshots) map to the field ids of the compact instance properties editor
 // (see `CompactInstancePropertiesSchema.js`).
@@ -1848,18 +1860,18 @@ export default class SceneEditor extends React.Component<Props, State> {
       // After the instances: the 3D editor can only select the ones it has.
       this._sendSelectedInstances();
 
-      const renamedObjectName =
-        command && command.type === 'renameObject'
-          ? direction === 'undo'
-            ? command.oldName
-            : command.newName
-          : null;
+      const renamedName = command
+        ? direction === 'undo'
+          ? command.oldName
+          : command.newName
+        : null;
       this._revealHistoryChanges(
         valueBeforeChange,
         newHistory.currentValue,
         changeContext,
         changedKeys,
-        renamedObjectName
+        command && command.type === 'renameObject' ? renamedName : null,
+        command && command.type === 'renameObjectGroup' ? renamedName : null
       );
     });
   };
@@ -4615,6 +4627,38 @@ export default class SceneEditor extends React.Component<Props, State> {
     setTimeout(tryFlash, 150);
   };
 
+  _flashObjectGroupsListRowByName = (groupName: string) => {
+    const containerElement = this._containerElement;
+    const { editorDisplay } = this;
+    if (!containerElement || !editorDisplay) return;
+    if (!editorDisplay.isEditorVisible('object-groups-list')) return;
+
+    const { objectsContainer, globalObjectsContainer } = this.props;
+    const groupsContainer = [
+      objectsContainer.getObjectGroups(),
+      globalObjectsContainer ? globalObjectsContainer.getObjectGroups() : null,
+    ].find(groups => groups && groups.has(groupName));
+    if (!groupsContainer) return;
+    const group = groupsContainer.get(groupName);
+    // Selecting the group shows its properties in the panel, so the change
+    // can be seen there too.
+    this._onSelectObjectGroup(group);
+    editorDisplay.scrollObjectGroupsListToObjectGroup(group);
+
+    this._flashOrRetryThenFallback(() => {
+      const element = this._findElementByAttribute(
+        containerElement,
+        'data-group-name',
+        groupName
+      );
+      if (element && this._isElementVisible(element)) {
+        this._flashElement(element);
+        return true;
+      }
+      return false;
+    }, containerElement);
+  };
+
   /**
    * Try `tryFlash` (which should flash whatever specific row/panel it can
    * find and return whether it found one), retrying for a bit if it found
@@ -4656,6 +4700,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._unfoldSection(sectionId);
 
     const retryDelayMs = 100;
+    let advancedFieldsShown = false;
     const attempt = (remainingRetries: number) => {
       let flashedAnyField = false;
       fieldIds.forEach(fieldId => {
@@ -4670,6 +4715,25 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
       });
       if (flashedAnyField) return;
+      // The field can be one of the "advanced" ones, hidden by default.
+      if (!advancedFieldsShown) {
+        const sectionContent = this._findElementByAttribute(
+          containerElement,
+          'id',
+          `${sectionId}-content`
+        );
+        const showMoreButton =
+          sectionContent &&
+          this._findElementByAttribute(
+            sectionContent,
+            'id',
+            'show-advanced-properties-button'
+          );
+        if (showMoreButton) {
+          showMoreButton.click();
+          advancedFieldsShown = true;
+        }
+      }
       if (remainingRetries > 0) {
         setTimeout(() => attempt(remainingRetries - 1), retryDelayMs);
       } else if (onNoFieldFlashed) {
@@ -5210,16 +5274,26 @@ export default class SceneEditor extends React.Component<Props, State> {
     const getGroups = (value: ?Object): Array<Object> =>
       (value && value.groups) || [];
     if (changedKeys.some(key => OBJECT_GROUPS_HISTORY_KEYS.includes(key))) {
-      this._flashChangedObjectGroupPropertyRows(
-        [
-          ...getGroups(beforeChange.objectGroups),
-          ...getGroups(beforeChange.globalObjectGroups),
-        ],
-        [
-          ...getGroups(afterChange.objectGroups),
-          ...getGroups(afterChange.globalObjectGroups),
-        ]
-      );
+      const groupsBefore = [
+        ...getGroups(beforeChange.objectGroups),
+        ...getGroups(beforeChange.globalObjectGroups),
+      ];
+      const groupsAfter = [
+        ...getGroups(afterChange.objectGroups),
+        ...getGroups(afterChange.globalObjectGroups),
+      ];
+      this._flashChangedObjectGroupPropertyRows(groupsBefore, groupsAfter);
+      // Show the groups that changed (or were added/renamed) in the list.
+      groupsAfter
+        .filter(
+          afterGroup =>
+            JSON.stringify(
+              findSerializedItemByName(groupsBefore, afterGroup.name)
+            ) !== JSON.stringify(afterGroup)
+        )
+        .forEach(afterGroup =>
+          this._flashObjectGroupsListRowByName(afterGroup.name)
+        );
     }
 
     if (changedKeys.includes('layers')) {
@@ -5229,12 +5303,30 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
     }
 
-    // The changed fields of the scene are not flashed (yet), but at least
-    // shown.
-    if (changedKeys.includes('sceneProperties'))
-      this._unfoldSection('scene-properties-section');
-    if (changedKeys.includes('behaviorsSharedData'))
-      this._unfoldSection('scene-behaviors-section');
+    if (changedKeys.includes('sceneProperties')) {
+      const changedFieldIds = new Set(
+        getChangedTopLevelKeys(
+          beforeChange.sceneProperties,
+          afterChange.sceneProperties
+        )
+          .map(key => scenePropertyKeyToPropertyFieldId[key])
+          .filter(Boolean)
+      );
+      this._flashFieldsOfSection('scene-properties-section', [
+        ...changedFieldIds,
+      ]);
+    }
+    if (changedKeys.includes('behaviorsSharedData')) {
+      const before = beforeChange.behaviorsSharedData || {};
+      const after = afterChange.behaviorsSharedData || {};
+      const changedBehaviorNames = Object.keys(after).filter(
+        name => JSON.stringify(before[name]) !== JSON.stringify(after[name])
+      );
+      this._flashFieldsOfSection(
+        'scene-behaviors-section',
+        changedBehaviorNames.map(name => `behavior-panel-${name}`)
+      );
+    }
 
     if (changedKeys.includes('sceneVariables')) {
       // Unlike an object's or an instance's `variables`/`initialVariables`
@@ -5288,7 +5380,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     valueAfterChange: ?Object,
     changeContext: ?HistoryChangeContext,
     changedKeys: Array<string>,
-    renamedObjectName: ?string
+    renamedObjectName: ?string,
+    renamedObjectGroupName: ?string
   ) => {
     const { editorDisplay } = this;
     if (!editorDisplay) return;
@@ -5334,6 +5427,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         this._flashChangedPropertyRows(beforeChange, afterChange, changedKeys);
         if (renamedObjectName) {
           this._flashObjectListRowByName(renamedObjectName);
+        }
+        if (renamedObjectGroupName) {
+          this._flashObjectGroupsListRowByName(renamedObjectGroupName);
         }
       });
     });

@@ -22,6 +22,9 @@ type Props = {
   ...Context,
   variablesContainer: gdVariablesContainer,
   enabled: boolean,
+  // Called once the changes made to the variables container were applied
+  // to the project.
+  onRefactoringApplied?: () => void,
 };
 
 /**
@@ -47,10 +50,17 @@ const useVariablesContainerRefactoring = ({
   objectGroup,
   objectsContainer,
   globalObjectsContainer,
+  onRefactoringApplied,
 }: Props): {|
   onVariablesUpdated: () => void,
+  // Apply now the refactoring of the changes made *before the last one*,
+  // if it is still pending - so that two changes that must stay separate
+  // (like for the history) are not applied as a single one.
+  applyPendingRefactoringOfPreviousChanges: () => void,
 |} => {
   const snapshotRef = React.useRef<gdSerializerElement | null>(null);
+  // The state of the variables container after the last change.
+  const lastChangeSnapshotRef = React.useRef<gdSerializerElement | null>(null);
   const timerRef = React.useRef<TimeoutID | null>(null);
 
   // Use refs for values that should not trigger the effect to re-run,
@@ -78,90 +88,101 @@ const useVariablesContainerRefactoring = ({
     variablesContainer
   );
   variablesContainerRef.current = variablesContainer;
+  const onRefactoringAppliedRef = React.useRef<?() => void>(
+    onRefactoringApplied
+  );
+  onRefactoringAppliedRef.current = onRefactoringApplied;
 
-  const applyPendingRefactoring = React.useCallback(() => {
-    const snapshot = snapshotRef.current;
-    const variablesContainer = exceptionallyGuardAgainstDeadObject(
-      variablesContainerRef.current
-    );
-    if (!snapshot || !variablesContainer) return;
-
-    try {
-      const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
-        snapshot,
-        variablesContainer
+  // `changedVariablesContainer` is the variables container with the changes
+  // to apply (by default, the edited one in its current state).
+  const applyPendingRefactoring = React.useCallback(
+    (changedVariablesContainer?: gdVariablesContainer) => {
+      const snapshot = snapshotRef.current;
+      const variablesContainer = exceptionallyGuardAgainstDeadObject(
+        changedVariablesContainer || variablesContainerRef.current
       );
+      if (!snapshot || !variablesContainer) return;
 
-      const {
-        project,
-        initialInstances,
-        objectName,
-        objectGroup,
-        eventsBasedObject,
-        objectsContainer,
-        globalObjectsContainer,
-      } = context.current;
-
-      if (objectGroup && initialInstances && objectsContainer) {
-        gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
-          project,
-          globalObjectsContainer || objectsContainer,
-          objectsContainer,
-          initialInstances,
-          variablesContainer,
-          objectGroup,
-          changeset,
-          snapshot
+      try {
+        const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+          snapshot,
+          variablesContainer
         );
-        if (eventsBasedObject) {
-          for (const objectName of objectGroup
-            .getAllObjectsNames()
-            .toJSArray()) {
+
+        const {
+          project,
+          initialInstances,
+          objectName,
+          objectGroup,
+          eventsBasedObject,
+          objectsContainer,
+          globalObjectsContainer,
+        } = context.current;
+
+        if (objectGroup && initialInstances && objectsContainer) {
+          gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
+            project,
+            globalObjectsContainer || objectsContainer,
+            objectsContainer,
+            initialInstances,
+            variablesContainer,
+            objectGroup,
+            changeset,
+            snapshot
+          );
+          if (eventsBasedObject) {
+            for (const objectName of objectGroup
+              .getAllObjectsNames()
+              .toJSArray()) {
+              gd.ObjectRefactorer.applyChangesToVariants(
+                eventsBasedObject,
+                objectName,
+                changeset
+              );
+            }
+          }
+        } else if (objectName && initialInstances) {
+          gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
+            project,
+            variablesContainer,
+            initialInstances,
+            objectName,
+            changeset,
+            snapshot
+          );
+          if (eventsBasedObject) {
             gd.ObjectRefactorer.applyChangesToVariants(
               eventsBasedObject,
               objectName,
               changeset
             );
           }
-        }
-      } else if (objectName && initialInstances) {
-        gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
-          project,
-          variablesContainer,
-          initialInstances,
-          objectName,
-          changeset,
-          snapshot
-        );
-        if (eventsBasedObject) {
-          gd.ObjectRefactorer.applyChangesToVariants(
-            eventsBasedObject,
-            objectName,
-            changeset
+        } else {
+          gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+            project,
+            variablesContainer,
+            changeset,
+            snapshot
           );
         }
-      } else {
-        gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
-          project,
-          variablesContainer,
-          changeset,
-          snapshot
-        );
+      } catch (error) {
+        console.error('Error applying variable refactoring:', error);
       }
-    } catch (error) {
-      console.error('Error applying variable refactoring:', error);
-    }
 
-    // Take a fresh snapshot for the next cycle. Only ensure UUIDs are set
-    // (for newly added variables) - existing UUIDs are preserved, as they
-    // are persisted in the project file and must stay stable to avoid
-    // useless changes in it.
-    snapshot.delete();
-    variablesContainer.ensurePersistentUuids();
-    const newSnapshot = new gd.SerializerElement();
-    variablesContainer.serializeTo(newSnapshot);
-    snapshotRef.current = newSnapshot;
-  }, []);
+      // Take a fresh snapshot for the next cycle. Only ensure UUIDs are set
+      // (for newly added variables) - existing UUIDs are preserved, as they
+      // are persisted in the project file and must stay stable to avoid
+      // useless changes in it.
+      snapshot.delete();
+      variablesContainer.ensurePersistentUuids();
+      const newSnapshot = new gd.SerializerElement();
+      variablesContainer.serializeTo(newSnapshot);
+      snapshotRef.current = newSnapshot;
+
+      if (onRefactoringAppliedRef.current) onRefactoringAppliedRef.current();
+    },
+    []
+  );
 
   React.useEffect(
     () => {
@@ -185,19 +206,52 @@ const useVariablesContainerRefactoring = ({
           timerRef.current = null;
         }
 
-        // Free the snapshot C++ memory.
+        // Free the snapshots C++ memory.
         if (snapshotRef.current) {
           snapshotRef.current.delete();
           snapshotRef.current = null;
+        }
+        if (lastChangeSnapshotRef.current) {
+          lastChangeSnapshotRef.current.delete();
+          lastChangeSnapshotRef.current = null;
         }
       };
     },
     [variablesContainer, enabled]
   );
 
+  const applyPendingRefactoringOfPreviousChanges = React.useCallback(
+    () => {
+      const lastChangeSnapshot = lastChangeSnapshotRef.current;
+      if (!timerRef.current || !lastChangeSnapshot) return;
+
+      // The edited container already has the last change: rebuild the
+      // container as it was just before.
+      const previousVariablesContainer = new gd.VariablesContainer(
+        variablesContainerRef.current.getSourceType()
+      );
+      previousVariablesContainer.unserializeFrom(lastChangeSnapshot);
+      applyPendingRefactoring(previousVariablesContainer);
+      previousVariablesContainer.delete();
+    },
+    [applyPendingRefactoring]
+  );
+
   const onVariablesUpdated = React.useCallback(
     () => {
       if (!snapshotRef.current) return;
+
+      const variablesContainer = exceptionallyGuardAgainstDeadObject(
+        variablesContainerRef.current
+      );
+      if (variablesContainer) {
+        if (lastChangeSnapshotRef.current)
+          lastChangeSnapshotRef.current.delete();
+        variablesContainer.ensurePersistentUuids();
+        const lastChangeSnapshot = new gd.SerializerElement();
+        variablesContainer.serializeTo(lastChangeSnapshot);
+        lastChangeSnapshotRef.current = lastChangeSnapshot;
+      }
 
       // Reset the debounce timer on each mutation.
       if (timerRef.current) {
@@ -211,7 +265,7 @@ const useVariablesContainerRefactoring = ({
     [applyPendingRefactoring]
   );
 
-  return { onVariablesUpdated };
+  return { onVariablesUpdated, applyPendingRefactoringOfPreviousChanges };
 };
 
 export default useVariablesContainerRefactoring;

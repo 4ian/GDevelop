@@ -180,6 +180,43 @@ describe('getObjectsContainerHistoryTarget', () => {
     project.delete();
   });
 
+  it('undoes and redoes the addition and the removal of a behavior', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const withoutBehavior = target.getValue();
+
+    player.addNewBehavior(
+      project,
+      'DestroyOutsideBehavior::DestroyOutside',
+      'DestroyOutside'
+    );
+    const withBehavior = target.getValue();
+
+    const hasBehavior = () =>
+      objectsContainer.getObject('Player').hasBehaviorNamed('DestroyOutside');
+    for (let i = 0; i < 2; i++) {
+      // Undo of the addition, or redo of a removal.
+      target.setValue(withoutBehavior);
+      expect(hasBehavior()).toBe(false);
+      // Redo of the addition, or undo of a removal.
+      target.setValue(withBehavior);
+      expect(hasBehavior()).toBe(true);
+    }
+    expect(objectsContainer.getObject('Player').ptr).toBe(player.ptr);
+
+    project.delete();
+  });
+
   it('restores the folder structure', () => {
     const { project, objectsContainer } = makeProject();
     const target = getObjectsContainerHistoryTarget(
@@ -352,6 +389,133 @@ describe('getVariablesContainerHistoryTarget', () => {
     target.setValue(after);
     expect(variablesContainer.get('Score').getValue()).toBe(10);
     expect(variablesContainer.get('Score').ptr).toBe(score.ptr);
+
+    project.delete();
+  });
+
+  it('restores the exact children of an array (no duplicated or leftover child)', () => {
+    const { project, variablesContainer } = makeContainer();
+    const array = variablesContainer.insertNew('MyArray', 0);
+    array.castTo('Array');
+    array.pushNew().setValue(1);
+    array.pushNew().setValue(2);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    array.getAtIndex(0).setValue(100);
+    array.pushNew().setValue(3);
+    const after = target.getValue();
+
+    const getValues = () => {
+      const values = [];
+      const restoredArray = variablesContainer.get('MyArray');
+      for (let i = 0; i < restoredArray.getChildrenCount(); i++)
+        values.push(restoredArray.getAtIndex(i).getValue());
+      return values;
+    };
+    target.setValue(before);
+    expect(getValues()).toEqual([1, 2]);
+    target.setValue(after);
+    expect(getValues()).toEqual([100, 2, 3]);
+    target.setValue(before);
+    expect(getValues()).toEqual([1, 2]);
+
+    project.delete();
+  });
+
+  it('leaves an array untouched when undoing/redoing a change to another variable', () => {
+    const { project, variablesContainer } = makeContainer();
+    const array = variablesContainer.insertNew('MyArray', 0);
+    array.castTo('Array');
+    array.pushNew().setValue(1);
+    array.pushNew().setValue(2);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    variablesContainer.insertNew('Score', 1).setValue(10);
+    const after = target.getValue();
+
+    for (let i = 0; i < 3; i++) {
+      target.setValue(before);
+      expect(variablesContainer.get('MyArray').getChildrenCount()).toBe(2);
+      target.setValue(after);
+      expect(variablesContainer.get('MyArray').getChildrenCount()).toBe(2);
+    }
+
+    project.delete();
+  });
+
+  it('restores the exact children of a structure (no leftover child)', () => {
+    const { project, variablesContainer } = makeContainer();
+    const structure = variablesContainer.insertNew('MyStructure', 0);
+    structure.castTo('Structure');
+    structure.getChild('A').setValue(1);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    structure.getChild('B').setValue(2);
+    const after = target.getValue();
+
+    const getNames = () =>
+      variablesContainer
+        .get('MyStructure')
+        .getAllChildrenNames()
+        .toJSArray()
+        .sort();
+    target.setValue(before);
+    expect(getNames()).toEqual(['A']);
+    target.setValue(after);
+    expect(getNames()).toEqual(['A', 'B']);
+
+    project.delete();
+  });
+
+  it('undoes and redoes the renaming of a child of a structure', () => {
+    const { project, variablesContainer } = makeContainer();
+    const structure = variablesContainer.insertNew('MyStructure', 0);
+    structure.castTo('Structure');
+    structure.getChild('Child').setValue(5);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    structure.renameChild('Child', 'Renamed');
+    const after = target.getValue();
+
+    const getNames = () =>
+      variablesContainer
+        .get('MyStructure')
+        .getAllChildrenNames()
+        .toJSArray();
+    for (let i = 0; i < 2; i++) {
+      target.setValue(before);
+      expect(getNames()).toEqual(['Child']);
+      expect(structure.getChild('Child').getValue()).toBe(5);
+      target.setValue(after);
+      expect(getNames()).toEqual(['Renamed']);
+    }
+
+    project.delete();
+  });
+
+  it('restores the order of the variables', () => {
+    const { project, variablesContainer } = makeContainer();
+    variablesContainer.insertNew('First', 0);
+    variablesContainer.insertNew('Second', 1);
+    const target = getVariablesContainerHistoryTarget(variablesContainer);
+    const before = target.getValue();
+
+    variablesContainer.move(0, 1);
+    const after = target.getValue();
+
+    const getNames = () => [
+      variablesContainer.getNameAt(0),
+      variablesContainer.getNameAt(1),
+    ];
+    expect(getNames()).toEqual(['Second', 'First']);
+    target.setValue(before);
+    expect(getNames()).toEqual(['First', 'Second']);
+    target.setValue(after);
+    expect(getNames()).toEqual(['Second', 'First']);
 
     project.delete();
   });

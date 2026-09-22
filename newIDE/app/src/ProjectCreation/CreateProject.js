@@ -9,7 +9,7 @@ import {
   type NewProjectCreationSource,
 } from './NewProjectSetupDialog';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
-import { getStarterThemeTransform } from './StarterTheme';
+import { getThemedStarterProjectFileUrl } from '../Utils/GDevelopServices/StarterTheme';
 const gd: libGDevelop = global.gd;
 
 // Metadata for the `new_game_creation` analytics event. The event itself is sent
@@ -27,8 +27,7 @@ export type NewProjectSource = {|
   fileMetadata: ?FileMetadata,
   templateSlug?: ?string,
   analyticsMetadata: NewProjectAnalyticsMetadata,
-  // Applied to the downloaded template before it is loaded.
-  transformContent?: ?(content: Object) => void,
+  // Set when the starter was opened from its copy re-skinned with this theme.
   starterThemeId?: ?string,
 |};
 
@@ -164,18 +163,24 @@ export const createNewProjectFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
   newProjectSetup,
+  environment,
 }: ExampleProjectSetup): Promise<?NewProjectSource> => {
   try {
+    const example = await retryIfFailed({ times: 3 }, () =>
+      getExample(exampleShortHeader)
+    );
     const starterThemeId = newProjectSetup.starterThemeId;
-    // Fetched alongside the example so theming costs no extra waiting time.
-    const [example, starterThemeTransform] = await Promise.all([
-      retryIfFailed({ times: 3 }, () => getExample(exampleShortHeader)),
-      getStarterThemeTransform(starterThemeId),
-    ]);
+    const themedProjectFileUrl = starterThemeId
+      ? await getThemedStarterProjectFileUrl({
+          starterSlug: exampleShortHeader.slug,
+          themeId: starterThemeId,
+          environment: environment || 'live',
+        })
+      : null;
     const creationSource = newProjectSetup.creationSource;
 
     const newProjectSource = getNewProjectSourceFromUrl(
-      example.projectFileUrl,
+      themedProjectFileUrl || example.projectFileUrl,
       {
         exampleUrl: example.projectFileUrl,
         exampleSlug: exampleShortHeader.slug,
@@ -187,10 +192,7 @@ export const createNewProjectFromExampleShortHeader = async ({
       }
     );
     newProjectSource.templateSlug = exampleShortHeader.slug;
-    if (starterThemeTransform) {
-      newProjectSource.transformContent = starterThemeTransform;
-      newProjectSource.starterThemeId = starterThemeId;
-    }
+    if (themedProjectFileUrl) newProjectSource.starterThemeId = starterThemeId;
     return newProjectSource;
   } catch (error) {
     showErrorBox({

@@ -1,110 +1,76 @@
 // @flow
 import axios from 'axios';
-import { GDevelopAssetCdn, GDevelopExampleCdn } from './ApiConfigs';
+import { GDevelopExampleCdn } from './ApiConfigs';
 import { retryIfFailed } from '../RetryIfFailed';
+import { type Environment } from './Asset';
 
 /**
- * Maps the placeholder art of the 3D starters to the "slots" a theme fills.
- * Published by the Examples repository, next to the examples database.
+ * The themes a starter can be created with. For each theme, the examples
+ * repository publishes a copy of every starter it covers, re-skinned with the
+ * theme's assets, next to the starter itself.
  */
-export type StarterPlaceholders = {|
+export type ThemedStarters = {|
   version: number,
-  slots: Array<{|
+  themes: Array<{|
     id: string,
-    kind: 'model' | 'texture',
-    label: string,
+    name: string,
+    description: string,
+    // Starter slug -> URL of its copy re-skinned with the theme.
+    starters: { [starterSlug: string]: string },
   |}>,
-  models: { [fileBaseName: string]: string },
-  textures: { [fileBaseName: string]: string },
-  ignoredTextures: Array<string>,
 |};
 
-export type StarterThemeResourceOrigin = {|
-  name: string,
-  identifier: string,
-|};
+// Only changes when a starter or a theme is published: kept for the session,
+// per environment so that switching to the staging assets reads them anew.
+const themedStartersPromises: {
+  [environment: string]: Promise<ThemedStarters>,
+} = {};
 
-/**
- * A model slot carries the serialized `content` of the asset's
- * Scene3D::Model3DObject (dimensions, rotation, material, animations) and the
- * file the project's model resource must point at.
- */
-export type StarterThemeModelSlot = {|
-  kind: 'model',
-  file: string,
-  objectContent: Object,
-  assetStoreId?: ?string,
-  origin?: ?StarterThemeResourceOrigin,
-|};
-
-export type StarterThemeTextureSlot = {|
-  kind: 'texture',
-  file: string,
-  origin?: ?StarterThemeResourceOrigin,
-|};
-
-export type StarterThemeSlot = StarterThemeModelSlot | StarterThemeTextureSlot;
-
-/**
- * Everything needed to re-skin a starter, in a single payload: it is fetched in
- * parallel with the template and applied before the project is loaded, so the
- * placeholder art is never displayed.
- */
-export type StarterTheme = {|
-  id: string,
-  name: string,
-  slots: { [slotId: string]: StarterThemeSlot },
-|};
-
-export type StarterThemeShortHeader = {|
-  id: string,
-  name: string,
-  description: string,
-|};
-
-// Both files change only when a starter or a theme is published: keep them for
-// the session so re-creating a project costs no extra request.
-let starterPlaceholdersPromise: ?Promise<StarterPlaceholders> = null;
-const starterThemePromises: { [themeId: string]: Promise<StarterTheme> } = {};
-
-export const getStarterPlaceholders = (): Promise<StarterPlaceholders> => {
-  if (!starterPlaceholdersPromise) {
-    starterPlaceholdersPromise = retryIfFailed({ times: 2 }, async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const response = await axios.get(
-        `${GDevelopExampleCdn.baseUrl.live}/starterPlaceholders.json`
-      );
-      return response.data;
-    }).catch(error => {
-      starterPlaceholdersPromise = null;
+export const getThemedStarters = (
+  environment: Environment
+): Promise<ThemedStarters> => {
+  if (!themedStartersPromises[environment]) {
+    themedStartersPromises[environment] = retryIfFailed(
+      { times: 2 },
+      async () => {
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        const response = await axios.get(
+          `${GDevelopExampleCdn.baseUrl[environment]}/themedStarters.json`
+        );
+        return response.data;
+      }
+    ).catch(error => {
+      delete themedStartersPromises[environment];
       throw error;
     });
   }
-  return starterPlaceholdersPromise;
+  return themedStartersPromises[environment];
 };
 
-export const getStarterTheme = (themeId: string): Promise<StarterTheme> => {
-  if (!starterThemePromises[themeId]) {
-    starterThemePromises[themeId] = retryIfFailed({ times: 2 }, async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const response = await axios.get(
-        `${GDevelopAssetCdn.baseUrl.live}/themes/${themeId}.json`
-      );
-      return response.data;
-    }).catch(error => {
-      delete starterThemePromises[themeId];
-      throw error;
-    });
+/**
+ * The project file of a starter re-skinned with a theme, or null if there is
+ * none (the starter is then created with its original assets). With the
+ * staging environment, a theme can be tried before it is published.
+ */
+export const getThemedStarterProjectFileUrl = async ({
+  starterSlug,
+  themeId,
+  environment,
+}: {|
+  starterSlug: string,
+  themeId: string,
+  environment: Environment,
+|}): Promise<?string> => {
+  try {
+    const themedStarters = await getThemedStarters(environment);
+    const theme = themedStarters.themes.find(theme => theme.id === themeId);
+    if (!theme) return null;
+    return theme.starters[starterSlug] || null;
+  } catch (error) {
+    console.error(
+      `Unable to find the "${themeId}" themed starters. The project will be created with its original assets.`,
+      error
+    );
+    return null;
   }
-  return starterThemePromises[themeId];
-};
-
-export const listStarterThemes = async (): Promise<
-  Array<StarterThemeShortHeader>
-> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${GDevelopAssetCdn.baseUrl.live}/themes/themes.json`
-  );
-  return response.data;
 };

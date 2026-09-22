@@ -39,6 +39,7 @@ import {
 } from './GDevelopServices/Asset';
 import { getDefaultRegisterGameProperties } from './UseGameAndBuildsManager';
 import { TutorialContext } from '../Tutorial/TutorialContext';
+import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
 
 export type CreateProjectResult = {|
   createdProject: gdProject | null,
@@ -76,7 +77,6 @@ type Props = {|
       openingMessage?: ?MessageDescriptor,
       ignoreAutoSave?: boolean,
       doNotTrackAsProjectOpened?: boolean,
-      transformContent?: ?(content: Object) => void,
     |}
   ) => Promise<?State>,
   onProjectSaved: (fileMetadata: ?FileMetadata) => void,
@@ -136,6 +136,9 @@ const useCreateProject = ({
     InAppTutorialContext
   );
   const { tutorials } = React.useContext(TutorialContext);
+  // Themed starters follow the "staging assets" switch of the asset store, so
+  // a theme can be tried before it is published.
+  const { environment } = React.useContext(AssetStoreContext);
 
   const initialiseProjectProperties = (
     project: gdProject,
@@ -187,7 +190,6 @@ const useCreateProject = ({
             // project is based on - it must not be reported as the user
             // re-opening an existing project.
             doNotTrackAsProjectOpened: true,
-            transformContent: newProjectSource.transformContent,
           });
         }
 
@@ -341,9 +343,7 @@ const useCreateProject = ({
 
         return {
           createdProject: currentProject,
-          appliedThemeId: newProjectSource.transformContent
-            ? newProjectSource.starterThemeId
-            : null,
+          appliedThemeId: newProjectSource.starterThemeId || null,
         };
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();
@@ -395,15 +395,16 @@ const useCreateProject = ({
       exampleProjectSetup: ExampleProjectSetup
     ): Promise<CreateProjectResult> => {
       beforeCreatingProject();
-      const newProjectSource = await createNewProjectFromExampleShortHeader(
-        exampleProjectSetup
-      );
+      const newProjectSource = await createNewProjectFromExampleShortHeader({
+        ...exampleProjectSetup,
+        environment,
+      });
       return await createProject(
         newProjectSource,
         exampleProjectSetup.newProjectSetup
       );
     },
-    [beforeCreatingProject, createProject]
+    [beforeCreatingProject, createProject, environment]
   );
 
   const createProjectFromPrivateGameTemplate = React.useCallback(

@@ -1462,9 +1462,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         // (loading a template/example that will be re-stamped with a new UUID).
         // In that case we must not report it as the user re-opening a project.
         doNotTrackAsProjectOpened?: boolean,
-        // Applied to the loaded content before it is unserialized, so the
-        // project is never displayed in its untransformed state.
-        transformContent?: ?(content: Object) => void,
       |}
     ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
@@ -1580,18 +1577,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
           return;
-        }
-
-        const transformContent = options && options.transformContent;
-        if (transformContent) {
-          try {
-            transformContent(content);
-          } catch (error) {
-            console.error(
-              'Unable to transform the project content. Opening it unchanged.',
-              error
-            );
-          }
         }
 
         const serializedProject = gd.Serializer.fromJSObject(content);

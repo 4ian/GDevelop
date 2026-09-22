@@ -33,6 +33,7 @@ import {
   dropDescendantsOfRemovedFolders,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
+import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
 import {
   hasObjectFolderOrObjectsInClipboard,
   pasteObjectFolderOrObjectsAndNotify,
@@ -618,6 +619,22 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setNewObjectDialogOpen(null);
       },
       scrollToObject: (object: gdObject) => {
+        // Open the folders containing the object first, so it's shown.
+        const objectFolderOrObjectWithContext = getObjectFolderOrObjectWithContextFromObjectName(
+          globalObjectsContainer,
+          objectsContainer,
+          object.getName()
+        );
+        if (objectFolderOrObjectWithContext && treeViewRef.current) {
+          treeViewRef.current.openItems([
+            objectFolderOrObjectWithContext.global
+              ? globalObjectsRootFolderId
+              : sceneObjectsRootFolderId,
+            ...getFoldersAscendanceWithoutRootFolder(
+              objectFolderOrObjectWithContext.objectFolderOrObject
+            ).map(folder => getObjectFolderTreeViewItemId(folder)),
+          ]);
+        }
         scrollToItem(getObjectTreeViewItemId(object));
       },
     }));

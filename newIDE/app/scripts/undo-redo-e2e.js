@@ -2784,6 +2784,156 @@ scenarios[
   );
 };
 
+scenarios[
+  'a pasted instance keeps its position after undo and redo'
+] = async editor => {
+  const { page } = editor;
+  const canvas = await page.$('#scene-editor canvas');
+  const box = await canvas.boundingBox();
+  // Center the view on the middle of the scene, at a known zoom.
+  await page.mouse.click(box.x + 20, box.y + 20);
+  await page.keyboard.down('Shift');
+  await page.keyboard.press('Digit2');
+  await page.keyboard.up('Shift');
+  await sleep(500);
+  const zoom = 700 / 800;
+  const toScreen = (sceneX, sceneY) => [
+    box.x + box.width / 2 + (sceneX - 400) * zoom,
+    box.y + box.height / 2 + (sceneY - 300) * zoom,
+  ];
+  // Select the instance of MyObject by clicking it, then copy it.
+  await page.mouse.click(...toScreen(297 + 10, 245 + 10));
+  await editor.waitUntil(
+    'instance selected',
+    async () => (await editor.getPanel()) === 'instance'
+  );
+  await page.keyboard.down('Control');
+  await page.keyboard.press('c');
+  await page.keyboard.up('Control');
+  // Paste it under the cursor, elsewhere on the canvas.
+  const [pasteX, pasteY] = toScreen(600, 450);
+  await page.mouse.move(pasteX, pasteY);
+  await sleep(200);
+  await page.keyboard.down('Control');
+  await page.keyboard.press('v');
+  await page.keyboard.up('Control');
+  await sleep(HISTORY_SAVE_DELAY);
+
+  const getInstances = () =>
+    editor.page.evaluate(() => {
+      const rows = Array.from(
+        document.querySelectorAll('.ReactVirtualized__Table__row')
+      );
+      return rows.map(row =>
+        Array.from(row.querySelectorAll('.tableColumn'))
+          .slice(0, 3)
+          .map(cell => cell.textContent.trim())
+          .join(' ')
+      );
+    });
+  await (await page.$('#toolbar-open-instances-list-panel-button')).click();
+  await page.waitForSelector('.ReactVirtualized__Table__row');
+  const findPasted = instances =>
+    instances.find(row => row.startsWith('MyObject') && !row.includes('297'));
+  const pasted = findPasted(await getInstances());
+  if (!pasted) throw new Error(`No pasted instance: ${await getInstances()}`);
+  if (pasted.includes(' 0 0'))
+    throw new Error(`The pasted instance is at the origin: ${pasted}`);
+
+  await editor.undo();
+  expectEqual(findPasted(await getInstances()), undefined, 'after undo');
+  await editor.redo();
+  expectEqual(findPasted(await getInstances()), pasted, 'after redo');
+};
+
+{
+  const name =
+    'undo/redo of moving an object to a folder reveals it, reopening the folder';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        { folderName: 'MyFolder', children: [{ objectName: 'OtherObject' }] },
+        { objectName: 'MyObject' },
+        { objectName: 'VariablesObject' },
+        { objectName: 'MyCube' },
+      ],
+    };
+  };
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    const folder = '#objects-list [data-folder-name="MyFolder"]';
+    const object = '#objects-list [data-object-name="MyObject"]';
+    const toggleFolder = () =>
+      page.evaluate(folder => {
+        document
+          .querySelector(folder)
+          .querySelector('button')
+          .click();
+      }, folder);
+    const getIndentation = selector =>
+      page.evaluate(selector => {
+        const element = document.querySelector(selector);
+        if (!element) return null;
+        const label = Array.from(element.querySelectorAll('span, p')).find(
+          element => element.children.length === 0
+        );
+        return Math.round(label.getBoundingClientRect().left);
+      }, selector);
+    const rootIndentation = await getIndentation(object);
+    const other = '#objects-list [data-object-name="OtherObject"]';
+    if (!(await exists(editor, other))) await toggleFolder();
+    await editor.waitUntil('folder open', () => exists(editor, other));
+
+    // Move the object to the folder.
+    await (await page.$(object)).click({ button: 'right' });
+    await editor.clickMenuItem(/^move to folder/i);
+    await editor.clickMenuItem(/^MyFolder$/);
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.waitUntil(
+      'object moved in the (open) folder',
+      async () => (await getIndentation(object)) > rootIndentation
+    );
+    // Fold the folder: the object is not shown anymore.
+    await toggleFolder();
+    await editor.waitUntil(
+      'folder folded',
+      async () => !(await exists(editor, object))
+    );
+
+    await editor.undo();
+    await editor.waitUntil('object shown after undo', () =>
+      exists(editor, object)
+    );
+    expectEqual(
+      await getIndentation(object),
+      rootIndentation,
+      'object back at the root after undo'
+    );
+
+    // Fold the folder again (if it was reopened by the undo).
+    if (await exists(editor, '#objects-list [data-object-name="OtherObject"]'))
+      await toggleFolder();
+    await editor.waitUntil(
+      'folder folded again',
+      async () =>
+        !(await exists(
+          editor,
+          '#objects-list [data-object-name="OtherObject"]'
+        ))
+    );
+    await editor.redo();
+    await editor.waitUntil('object shown after redo', () =>
+      exists(editor, object)
+    );
+    expectEqual(
+      (await getIndentation(object)) > rootIndentation,
+      true,
+      'object shown inside the reopened folder after redo'
+    );
+  };
+}
+
 const makeUndoObjectDeletionScenario = is3D => async editor => {
   if (is3D) await editor.switchTo3D();
   await editor.deleteObjectInList('MyCube');

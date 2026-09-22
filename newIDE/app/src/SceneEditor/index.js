@@ -2159,6 +2159,18 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
+    this._onInstancesAddedWithoutRecordingHistory(instances);
+    this._recordHistoryStep('ADD', { source: 'canvas' }, ['instances']);
+  };
+
+  /**
+   * Same as `_onInstancesAdded`, for when the instances are not in their
+   * final state yet (like a paste, which then moves them under the cursor):
+   * the history step must be recorded afterwards by the caller.
+   */
+  _onInstancesAddedWithoutRecordingHistory = (
+    instances: Array<gdInitialInstance>
+  ) => {
     let invisibleLayerOnWhichInstancesHaveJustBeenAdded = null;
     instances.forEach(instance => {
       if (invisibleLayerOnWhichInstancesHaveJustBeenAdded === null) {
@@ -2185,8 +2197,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         invisibleLayerOnWhichInstancesHaveJustBeenAdded
       );
     }
-
-    this._recordHistoryStep('ADD', { source: 'canvas' }, ['instances']);
   };
 
   onInstanceAddedOnInvisibleLayer = (layer: ?string) => {
@@ -4357,7 +4367,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     }
 
-    this._onInstancesAddedAndSendToEditor3D(newInstances);
+    this._onInstancesAddedWithoutRecordingHistory(newInstances);
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances({
       instances: newInstances,
@@ -4383,9 +4393,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           instance.setY(instance.getY() + position[1]);
         }
         editorDisplay.instancesHandlers.snapSelection(newInstances);
-        this._sendUpdatedInstances(newInstances);
       }
     }
+    // Only now that the instances are at their final position.
+    this._recordHistoryStep('ADD', { source: 'canvas' }, ['instances']);
+    this._sendAddedInstances(newInstances);
 
     // Immediately update the properties editor to ensure they keep no reference
     // to the deleted instances.
@@ -5268,6 +5280,43 @@ export default class SceneEditor extends React.Component<Props, State> {
         ]
       );
     }
+
+    // An object moved to another folder (or a folder deleted, moving its
+    // objects out): show the objects at their new place, opening their
+    // folder if needed.
+    ['objects', 'globalObjects'].forEach(key => {
+      const beforeFolders = beforeChange[key] && beforeChange[key].folders;
+      const afterFolders = afterChange[key] && afterChange[key].folders;
+      if (
+        !beforeFolders ||
+        !afterFolders ||
+        JSON.stringify(beforeFolders) === JSON.stringify(afterFolders)
+      )
+        return;
+      const getObjectFolderPaths = (
+        folder: Object,
+        path: string,
+        paths: { [string]: string }
+      ): { [string]: string } => {
+        (folder.children || []).forEach(child => {
+          if (child.objectName !== undefined) paths[child.objectName] = path;
+          else
+            getObjectFolderPaths(
+              child,
+              `${path}/${child.folderName || ''}`,
+              paths
+            );
+        });
+        return paths;
+      };
+      const beforePaths = getObjectFolderPaths(beforeFolders, '', {});
+      const afterPaths = getObjectFolderPaths(afterFolders, '', {});
+      Object.keys(afterPaths)
+        .filter(
+          objectName => beforePaths[objectName] !== afterPaths[objectName]
+        )
+        .forEach(objectName => this._flashObjectListRowByName(objectName));
+    });
 
     const getGroups = (value: ?Object): Array<Object> =>
       (value && value.groups) || [];

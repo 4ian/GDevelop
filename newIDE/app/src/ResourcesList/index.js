@@ -22,6 +22,7 @@ import { type ResourcesActionsMenuBuilder } from '../ProjectsStorage';
 import InfoBar from '../UI/Messages/InfoBar';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
+import { type ItemSelectionEvent } from '../UI/SortableVirtualizedItemList/ItemRow';
 
 const styles = {
   listContainer: {
@@ -65,9 +66,9 @@ export type ResourcesListInterface = {|
 
 type Props = {|
   project: gdProject,
-  selectedResource: ?gdResource,
-  onSelectResource: (resource: ?gdResource) => void,
-  onDeleteResource: (resource: gdResource) => Promise<void>,
+  selectedResources: Array<gdResource>,
+  onSelectResources: (resources: Array<gdResource>) => void,
+  onDeleteResources: (resources: Array<gdResource>) => Promise<void>,
   onRenameResource: (resource: gdResource, newName: string) => void,
   fileMetadata: ?FileMetadata,
   onRemoveUnusedResources: ResourceKind => void,
@@ -86,9 +87,9 @@ const ResourcesList: React.ComponentType<{
     (
       {
         project,
-        selectedResource,
-        onSelectResource,
-        onDeleteResource,
+        selectedResources,
+        onSelectResources,
+        onDeleteResources,
         onRenameResource,
         fileMetadata,
         onRemoveUnusedResources,
@@ -101,9 +102,15 @@ const ResourcesList: React.ComponentType<{
       const [searchText, setSearchText] = React.useState('');
       const [resourcesWithErrors, setResourcesWithErrors] = React.useState({});
       const [infoBarContent, setInfoBarContent] = React.useState(null);
-      const sortableListRef = React.useRef(null);
+      const sortableListRef = React.useRef<?SortableVirtualizedItemList<gdResource>>(
+        null
+      );
       const listContainerRef = React.useRef(null);
       const isNavigatingRef = React.useRef(false);
+      // Names are used instead of gdResource instances because the list of
+      // instances is re-created at each render.
+      const selectionAnchorResourceNameRef = React.useRef<?string>(null);
+      const focusedResourceNameRef = React.useRef<?string>(null);
 
       const resourcesManager = project.getResourcesManager();
       // Calculate on every render to avoid stale data after deletion/rename
@@ -113,11 +120,115 @@ const ResourcesList: React.ComponentType<{
         .map(resourceName => resourcesManager.getResource(resourceName));
       const filteredList = filterResourcesList(allResourcesList, searchText);
 
+      const isResourceSelected = React.useCallback(
+        (resource: gdResource) => {
+          const resourceName = resource.getName();
+          return selectedResources.some(
+            selectedResource => selectedResource.getName() === resourceName
+          );
+        },
+        [selectedResources]
+      );
+
+      const getFilteredListIndex = React.useCallback(
+        (resourceName: ?string) =>
+          resourceName
+            ? filteredList.findIndex(
+                resource => resource.getName() === resourceName
+              )
+            : -1,
+        [filteredList]
+      );
+
+      const selectRange = React.useCallback(
+        (anchorIndex: number, targetIndex: number) => {
+          onSelectResources(
+            filteredList.slice(
+              Math.min(anchorIndex, targetIndex),
+              Math.max(anchorIndex, targetIndex) + 1
+            )
+          );
+        },
+        [filteredList, onSelectResources]
+      );
+
+      const onItemSelected = React.useCallback(
+        (resource: ?gdResource, event?: ItemSelectionEvent) => {
+          if (!resource) {
+            selectionAnchorResourceNameRef.current = null;
+            focusedResourceNameRef.current = null;
+            onSelectResources([]);
+            return;
+          }
+          const resourceName = resource.getName();
+          focusedResourceNameRef.current = resourceName;
+
+          if (event && event.shiftKey) {
+            const anchorIndex = getFilteredListIndex(
+              selectionAnchorResourceNameRef.current
+            );
+            const targetIndex = getFilteredListIndex(resourceName);
+            if (anchorIndex !== -1 && targetIndex !== -1) {
+              selectRange(anchorIndex, targetIndex);
+              return;
+            }
+          }
+
+          selectionAnchorResourceNameRef.current = resourceName;
+          if (event && (event.ctrlKey || event.metaKey)) {
+            onSelectResources(
+              isResourceSelected(resource)
+                ? selectedResources.filter(
+                    selectedResource =>
+                      selectedResource.getName() !== resourceName
+                  )
+                : [...selectedResources, resource]
+            );
+            return;
+          }
+
+          const isTheOnlySelectedResource =
+            selectedResources.length === 1 && isResourceSelected(resource);
+          onSelectResources(isTheOnlySelectedResource ? [] : [resource]);
+        },
+        [
+          selectedResources,
+          onSelectResources,
+          isResourceSelected,
+          getFilteredListIndex,
+          selectRange,
+        ]
+      );
+
+      const selectAll = React.useCallback(
+        () => {
+          onSelectResources(filteredList);
+        },
+        [filteredList, onSelectResources]
+      );
+
+      const deselectAll = React.useCallback(
+        () => {
+          onItemSelected(null);
+        },
+        [onItemSelected]
+      );
+
       const deleteResource = React.useCallback(
         (resource: gdResource) => {
-          onDeleteResource(resource);
+          // Delete the whole selection if the resource is part of it.
+          onDeleteResources(
+            isResourceSelected(resource) ? selectedResources : [resource]
+          );
         },
-        [onDeleteResource]
+        [onDeleteResources, isResourceSelected, selectedResources]
+      );
+
+      const deleteSelection = React.useCallback(
+        () => {
+          if (selectedResources.length) onDeleteResources(selectedResources);
+        },
+        [onDeleteResources, selectedResources]
       );
 
       const editName = React.useCallback((resource: ?gdResource) => {
@@ -168,29 +279,33 @@ const ResourcesList: React.ComponentType<{
       );
 
       const moveSelector = React.useCallback(
-        (delta: number, filteredList: Array<gdResource>) => {
+        (delta: number, extendSelection: boolean) => {
           const resourceCount = filteredList.length;
-
           if (resourceCount === 0) return;
 
-          let nextIndex = 0;
-          if (selectedResource) {
-            const currentIndex = filteredList.indexOf(selectedResource);
-            if (currentIndex === -1) {
-              // Selected resource is not in filtered list, select the first one.
-              nextIndex = 0;
-            } else {
-              nextIndex = Math.max(
-                0,
-                Math.min(resourceCount - 1, currentIndex + delta)
-              );
-            }
+          const currentIndex = getFilteredListIndex(
+            focusedResourceNameRef.current
+          );
+          // If the focused resource is not in the filtered list, select the first one.
+          const nextIndex =
+            currentIndex === -1
+              ? 0
+              : Math.max(0, Math.min(resourceCount - 1, currentIndex + delta));
+          const nextResource = filteredList[nextIndex];
+          focusedResourceNameRef.current = nextResource.getName();
+
+          const anchorIndex = getFilteredListIndex(
+            selectionAnchorResourceNameRef.current
+          );
+          if (extendSelection && anchorIndex !== -1) {
+            selectRange(anchorIndex, nextIndex);
+            return;
           }
 
-          const nextResource = filteredList[nextIndex];
-          onSelectResource(nextResource);
+          selectionAnchorResourceNameRef.current = nextResource.getName();
+          onSelectResources([nextResource]);
         },
-        [selectedResource, onSelectResource]
+        [filteredList, onSelectResources, getFilteredListIndex, selectRange]
       );
 
       const handleKeyDown = React.useCallback(
@@ -210,7 +325,7 @@ const ResourcesList: React.ComponentType<{
           if (shouldNavigate) {
             // Throttle navigation to allow list to scroll and render
             isNavigatingRef.current = true;
-            moveSelector(event.key === 'ArrowDown' ? 1 : -1, filteredList);
+            moveSelector(event.key === 'ArrowDown' ? 1 : -1, event.shiftKey);
 
             setTimeout(() => {
               isNavigatingRef.current = false;
@@ -223,21 +338,47 @@ const ResourcesList: React.ComponentType<{
             keyboardShortcutsRef.current.onKeyDown(event);
           }
         },
-        [moveSelector, filteredList, renamedResource]
+        [moveSelector, renamedResource]
       );
 
       const moveSelectionTo = React.useCallback(
         (destinationResource: gdResource) => {
-          if (!selectedResource) return;
+          const destinationName = destinationResource.getName();
+          const selectedNames = new Set(
+            selectedResources
+              .map(resource => resource.getName())
+              .filter(name => name !== destinationName)
+          );
+          if (selectedNames.size === 0) return;
 
           const resourcesManager = project.getResourcesManager();
-          resourcesManager.moveResource(
-            resourcesManager.getResourcePosition(selectedResource.getName()),
-            resourcesManager.getResourcePosition(destinationResource.getName())
+          const allNames = resourcesManager.getAllResourceNames().toJSArray();
+          const destinationIndex = allNames.indexOf(destinationName);
+          if (destinationIndex === -1) return;
+
+          // Like a single resource move: the selection lands after the
+          // destination when moved down, before it when moved up.
+          const isMovingDown =
+            allNames.findIndex(name => selectedNames.has(name)) <
+            destinationIndex;
+          const remainingNames = allNames.filter(
+            name => !selectedNames.has(name)
           );
+          const insertionIndex =
+            remainingNames.indexOf(destinationName) + (isMovingDown ? 1 : 0);
+          const newOrder = [
+            ...remainingNames.slice(0, insertionIndex),
+            ...allNames.filter(name => selectedNames.has(name)),
+            ...remainingNames.slice(insertionIndex),
+          ];
+          newOrder.forEach((name, index) => {
+            const position = resourcesManager.getResourcePosition(name);
+            if (position !== index)
+              resourcesManager.moveResource(position, index);
+          });
           forceUpdateList();
         },
-        [project, selectedResource, forceUpdateList]
+        [project, selectedResources, forceUpdateList]
       );
 
       const renderResourceMenuTemplate = React.useCallback(
@@ -245,6 +386,20 @@ const ResourcesList: React.ComponentType<{
           resource: gdResource,
           _index: number
         ): Array<MenuItemTemplate> => {
+          const selectedResourcesCount =
+            isResourceSelected(resource) && selectedResources.length > 1
+              ? selectedResources.length
+              : 1;
+          if (selectedResourcesCount > 1) {
+            // Other actions only apply to a single resource.
+            return [
+              {
+                label: i18n._(t`Delete ${selectedResourcesCount} resources`),
+                click: () => deleteResource(resource),
+              },
+            ];
+          }
+
           let menu = [
             {
               label: i18n._(t`Rename`),
@@ -292,7 +447,7 @@ const ResourcesList: React.ComponentType<{
                 // $FlowFixMe[incompatible-type]
                 informUser: setInfoBarContent,
                 updateInterface: () => forceUpdateList(),
-                cleanUserSelectionOfResources: () => onSelectResource(null),
+                cleanUserSelectionOfResources: () => onSelectResources([]),
               })
             );
           }
@@ -306,8 +461,10 @@ const ResourcesList: React.ComponentType<{
           deleteResource,
           onRemoveUnusedResources,
           getResourceActionsSpecificToStorageProvider,
-          onSelectResource,
+          onSelectResources,
           forceUpdateList,
+          isResourceSelected,
+          selectedResources,
         ]
       );
 
@@ -332,8 +489,8 @@ const ResourcesList: React.ComponentType<{
       );
 
       // KeyboardShortcuts callbacks are set dynamically in useEffect below
-      // instead of here, because they depend on selectedResource which can change.
-      // This ensures the callbacks always use the current selectedResource.
+      // instead of here, because they depend on the selection which can change.
+      // This ensures the callbacks always use the current selection.
       const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
         new KeyboardShortcuts({
           shortcutCallbacks: {},
@@ -342,27 +499,28 @@ const ResourcesList: React.ComponentType<{
 
       React.useEffect(
         () => {
-          if (!selectedResource) return;
-          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-            deleteResource(selectedResource);
+          const keyboardShortcuts = keyboardShortcutsRef.current;
+          keyboardShortcuts.setShortcutCallback('onDelete', deleteSelection);
+          keyboardShortcuts.setShortcutCallback('onRename', () => {
+            if (selectedResources.length === 1) editName(selectedResources[0]);
           });
-          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
-            editName(selectedResource);
-          });
+          keyboardShortcuts.setShortcutCallback('onSelectAll', selectAll);
+          keyboardShortcuts.setShortcutCallback('onDeselectAll', deselectAll);
         },
-        [selectedResource, deleteResource, editName]
+        [selectedResources, deleteSelection, editName, selectAll, deselectAll]
       );
 
-      // Scroll to selected item when selection changes
+      // Scroll to the focused item when selection changes.
       React.useEffect(
         () => {
-          if (!selectedResource || !sortableListRef.current) return;
-
-          if (sortableListRef.current.scrollToItem) {
-            sortableListRef.current.scrollToItem(selectedResource);
-          }
+          const sortableList = sortableListRef.current;
+          if (!sortableList) return;
+          const focusedResource =
+            filteredList[getFilteredListIndex(focusedResourceNameRef.current)];
+          if (focusedResource) sortableList.scrollToItem(focusedResource);
         },
-        [selectedResource]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [selectedResources]
       );
 
       // Refocus list when rename ends (confirmed or canceled)
@@ -430,8 +588,8 @@ const ResourcesList: React.ComponentType<{
                       height={height}
                       getItemName={getResourceName}
                       getItemThumbnail={getResourceThumbnail}
-                      selectedItems={selectedResource ? [selectedResource] : []}
-                      onItemSelected={onSelectResource}
+                      selectedItems={selectedResources}
+                      onItemSelected={onItemSelected}
                       renamedItem={renamedResource}
                       onRename={renameResource}
                       onMoveSelectionToItem={moveSelectionTo}
@@ -457,12 +615,12 @@ const ResourcesList: React.ComponentType<{
       );
     }
   ),
-  // Prevent any update if project or selectedResource
+  // Prevent any update if project or selectedResources
   // are not changed. This is important to avoid
   // too many re-renders of the list.
   (prevProps, nextProps) =>
-    prevProps.project !== nextProps.project ||
-    prevProps.selectedResource !== nextProps.selectedResource
+    prevProps.project === nextProps.project &&
+    prevProps.selectedResources === nextProps.selectedResources
 );
 
 export default ResourcesList;

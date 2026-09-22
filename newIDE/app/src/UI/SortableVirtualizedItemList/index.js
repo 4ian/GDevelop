@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { List } from 'react-virtualized';
-import ItemRow from './ItemRow';
+import ItemRow, { type ItemSelectionEvent } from './ItemRow';
 import { AddListItem } from '../ListCommonItem';
 import { listItemWith32PxIconHeight, listItemWithoutIconHeight } from '../List';
 import {
@@ -30,7 +30,7 @@ type Props<Item> = {|
   getItemId?: (Item, index: number) => string,
   getItemData?: (Item, index: number) => HTMLDataset,
   isItemBold?: Item => boolean,
-  onItemSelected: (?Item) => void,
+  onItemSelected: (?Item, event?: ItemSelectionEvent) => void,
   onEditItem?: Item => void,
   renamedItem: ?Item,
   erroredItems?: { [string]: '' | 'error' | 'warning' },
@@ -211,10 +211,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                             }
                           }
 
-                          // Ensure we reselect the item even if it's already selected.
-                          // This prevents a bug where the connected preview is not
-                          // updated when the item is already selected.
-                          this.props.onItemSelected(item);
+                          // Select the dragged item, unless it's already part of
+                          // the selection (so that the whole selection is dragged).
+                          if (!isSelected) this.props.onItemSelected(item);
 
                           // We return the item name and thumbnail to be used by the
                           // drag preview. We can't use the item itself because it's

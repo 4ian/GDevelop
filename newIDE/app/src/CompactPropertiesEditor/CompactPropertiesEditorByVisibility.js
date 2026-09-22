@@ -170,6 +170,7 @@ export const CompactCollapsibleAdvancedSection = ({
     </ColumnStackLayout>
   ) : (
     <FlatButton
+      id="show-advanced-properties-button"
       fullWidth
       primary
       leftIcon={<ChevronArrowRight style={styles.icon} />}

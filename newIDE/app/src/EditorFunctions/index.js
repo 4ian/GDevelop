@@ -321,7 +321,6 @@ export type EditorFunctionGenericOutput = {|
 
   initializedProject?: boolean,
   initializedFromTemplateSlug?: string,
-  initializedWithThemeId?: string,
   eventsAsTextByScene?: { [string]: string },
 
   // Used for de-duplication of outputs:
@@ -461,11 +460,10 @@ export type EditorCallbacks = {|
   onCreateProject: ({|
     name: string,
     exampleSlug: string | null,
-    starterThemeId?: string | null,
+    projectFileUrl?: string | null,
   |}) => Promise<{|
     createdProject: gdProject | null,
     exampleSlug: string | null,
-    appliedThemeId?: string | null,
   |}>,
   onOpenEventsFunctionsExtension: (
     extensionName: string,
@@ -10668,7 +10666,12 @@ const initializeProject: EditorFunctionWithoutProject = {
       args,
       'also_read_existing_events'
     );
-    const theme = SafeExtractor.extractStringProperty(args, 'theme');
+    // Set by the backend when the template is to be opened from another file
+    // (its copy re-skinned with a theme).
+    const project_file_url = SafeExtractor.extractStringProperty(
+      args,
+      'project_file_url'
+    );
 
     try {
       const requestedExampleSlug = ['', 'none', 'empty'].includes(
@@ -10676,18 +10679,14 @@ const initializeProject: EditorFunctionWithoutProject = {
       )
         ? null
         : template_slug;
-      const requestedThemeId =
-        theme && !['', 'none'].includes(theme.toLowerCase()) ? theme : null;
-      const {
-        exampleSlug,
-        createdProject,
-        appliedThemeId,
-      } = await retryIfFailed({ times: 2 }, () =>
-        editorCallbacks.onCreateProject({
-          name: project_name,
-          exampleSlug: requestedExampleSlug,
-          starterThemeId: requestedThemeId,
-        })
+      const { exampleSlug, createdProject } = await retryIfFailed(
+        { times: 2 },
+        () =>
+          editorCallbacks.onCreateProject({
+            name: project_name,
+            exampleSlug: requestedExampleSlug,
+            projectFileUrl: requestedExampleSlug ? project_file_url : null,
+          })
       );
 
       if (!createdProject) {
@@ -10715,12 +10714,9 @@ const initializeProject: EditorFunctionWithoutProject = {
       }
 
       if (exampleSlug) {
-        output.message = appliedThemeId
-          ? `Initialized project from template "${exampleSlug}", with its assets replaced by the "${appliedThemeId}" theme.`
-          : `Initialized project from template "${exampleSlug}".`;
+        output.message = `Initialized project from template "${exampleSlug}".`;
         output.initializedProject = true;
         output.initializedFromTemplateSlug = exampleSlug;
-        if (appliedThemeId) output.initializedWithThemeId = appliedThemeId;
       } else {
         if (template_slug) {
           output.message = `Initialized empty project (1 scene).`;

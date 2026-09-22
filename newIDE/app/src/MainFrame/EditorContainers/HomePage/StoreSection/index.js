@@ -18,9 +18,6 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 import { AssetStoreNavigatorContext } from '../../../../AssetStore/AssetStoreNavigator';
 import { type CourseCompletion } from '../UseCourses';
-import Window from '../../../../Utils/Window';
-
-const isDev = Window.isDev();
 
 type Props = {|
   project: ?gdProject,
@@ -52,11 +49,9 @@ const StoreSection = ({
     setAssetShortHeadersToInstall,
   ] = React.useState<?Array<AssetShortHeader>>(null);
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
-  const {
-    assetShortHeadersSearchResults,
-    environment,
-    setEnvironment,
-  } = React.useContext(AssetStoreContext);
+  const { assetShortHeadersSearchResults } = React.useContext(
+    AssetStoreContext
+  );
   const {
     openedAssetPack,
     openedAssetShortHeader,
@@ -128,22 +123,6 @@ const StoreSection = ({
         onCourseOpen={onCourseOpen}
         getCourseCompletion={getCourseCompletion}
       />
-      {isDev && !openedAssetPack && !openedAssetShortHeader && (
-        <Line justifyContent="flex-end">
-          <RaisedButton
-            label={
-              environment === 'staging' ? (
-                <Trans>Show live assets</Trans>
-              ) : (
-                <Trans>Show staging assets</Trans>
-              )
-            }
-            onClick={() => {
-              setEnvironment(environment === 'staging' ? 'live' : 'staging');
-            }}
-          />
-        </Line>
-      )}
       {(openedAssetPack || openedAssetShortHeader) && (
         <Line justifyContent="flex-end">
           <RaisedButton

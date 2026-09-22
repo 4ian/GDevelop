@@ -72,13 +72,6 @@ export const GDevelopAssetCdn = {
   },
 };
 
-export const GDevelopExampleCdn = {
-  baseUrl: {
-    staging: 'https://resources.gdevelop-app.com/staging/examples-database',
-    live: 'https://resources.gdevelop-app.com/examples-database',
-  },
-};
-
 export const GDevelopAnalyticsApi = {
   baseUrl: ((isDev
     ? 'https://api-dev.gdevelop.io/analytics'

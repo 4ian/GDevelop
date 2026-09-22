@@ -37,7 +37,6 @@ import ResolutionOptions, {
   defaultCustomHeight,
 } from './ResolutionOptions';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
-import { type Environment } from '../Utils/GDevelopServices/Asset';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
@@ -104,17 +103,15 @@ export type NewProjectSetup = {|
   openQuickCustomizationDialog?: boolean,
   forceOpenAskAiEditor?: boolean,
   creationSource: NewProjectCreationSource,
-  // Create the starter from its copy re-skinned with this theme, if there is
-  // one, so the project opens with themed assets.
-  starterThemeId?: ?string,
+  // Open this file instead of the one of the example (a copy of the example
+  // with other assets, for instance).
+  projectFileUrl?: ?string,
 |};
 
 export type ExampleProjectSetup = {|
   exampleShortHeader: ExampleShortHeader,
   newProjectSetup: NewProjectSetup,
   i18n: I18nType,
-  // Which themed starters to use. Set by the editor, not by the caller.
-  environment?: Environment,
 |};
 
 type Props = {|

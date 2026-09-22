@@ -324,18 +324,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         async ({
           name,
           exampleSlug,
-          starterThemeId,
+          projectFileUrl,
         }: {|
           name: string,
           exampleSlug: string | null,
-          starterThemeId?: string | null,
+          projectFileUrl?: string | null,
         |}) => {
           const newProjectSetup: NewProjectSetup = {
             projectName: name,
             storageProvider: UrlStorageProvider,
             saveAsLocation: null,
             creationSource: 'ai-agent-request',
-            starterThemeId,
+            projectFileUrl,
           };
 
           if (exampleSlug) {
@@ -344,15 +344,12 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               header => header.slug === exampleSlug
             );
             if (exampleShortHeader) {
-              const {
-                createdProject,
-                appliedThemeId,
-              } = await onCreateProjectFromExample({
+              const { createdProject } = await onCreateProjectFromExample({
                 exampleShortHeader,
                 newProjectSetup,
                 i18n,
               });
-              return { exampleSlug, createdProject, appliedThemeId };
+              return { exampleSlug, createdProject };
             }
 
             // The example was not found - still create an empty project.
@@ -362,7 +359,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             newProjectSetup
           );
 
-          return { exampleSlug: null, createdProject, appliedThemeId: null };
+          return { exampleSlug: null, createdProject };
         },
         [onCreateProjectFromExample, onCreateEmptyProject, i18n]
       );

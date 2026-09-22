@@ -39,13 +39,9 @@ import {
 } from './GDevelopServices/Asset';
 import { getDefaultRegisterGameProperties } from './UseGameAndBuildsManager';
 import { TutorialContext } from '../Tutorial/TutorialContext';
-import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
 
 export type CreateProjectResult = {|
   createdProject: gdProject | null,
-  // The theme the starter assets were replaced with, when one was requested
-  // and could be applied.
-  appliedThemeId?: string | null,
 |};
 
 type Props = {|
@@ -136,9 +132,6 @@ const useCreateProject = ({
     InAppTutorialContext
   );
   const { tutorials } = React.useContext(TutorialContext);
-  // Themed starters follow the "staging assets" switch of the asset store, so
-  // a theme can be tried before it is published.
-  const { environment } = React.useContext(AssetStoreContext);
 
   const initialiseProjectProperties = (
     project: gdProject,
@@ -341,10 +334,7 @@ const useCreateProject = ({
           },
         });
 
-        return {
-          createdProject: currentProject,
-          appliedThemeId: newProjectSource.starterThemeId || null,
-        };
+        return { createdProject: currentProject };
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();
         const errorMessage = getWriteErrorMessage
@@ -395,16 +385,15 @@ const useCreateProject = ({
       exampleProjectSetup: ExampleProjectSetup
     ): Promise<CreateProjectResult> => {
       beforeCreatingProject();
-      const newProjectSource = await createNewProjectFromExampleShortHeader({
-        ...exampleProjectSetup,
-        environment,
-      });
+      const newProjectSource = await createNewProjectFromExampleShortHeader(
+        exampleProjectSetup
+      );
       return await createProject(
         newProjectSource,
         exampleProjectSetup.newProjectSetup
       );
     },
-    [beforeCreatingProject, createProject, environment]
+    [beforeCreatingProject, createProject]
   );
 
   const createProjectFromPrivateGameTemplate = React.useCallback(

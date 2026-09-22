@@ -51,7 +51,7 @@ describe('initialize_project (without project)', () => {
     expect(onCreateProject).toHaveBeenCalledWith({
       name: 'My Platformer',
       exampleSlug: 'starting-platformer',
-      starterThemeId: null,
+      projectFileUrl: null,
     });
     expect(result.success).toBe(true);
     expect(result.message).toBe(
@@ -83,12 +83,44 @@ describe('initialize_project (without project)', () => {
     expect(onCreateProject).toHaveBeenCalledWith({
       name: 'My Game',
       exampleSlug: null,
-      starterThemeId: null,
+      projectFileUrl: null,
     });
     expect(result.success).toBe(true);
     expect(result.message).toBe('Initialized empty project (1 scene).');
     expect(result.initializedProject).toBe(true);
     expect(result.initializedFromTemplateSlug).toBeUndefined();
+  });
+
+  it('opens the template from the file given by the backend', async () => {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const onCreateProject = jest.fn().mockResolvedValue({
+      exampleSlug: 'starting-3d-top-down-rpg',
+      createdProject,
+    });
+
+    const result: EditorFunctionGenericOutput = await editorFunctionsWithoutProject.initialize_project.launchFunction(
+      {
+        ...makeOptionsWithOnCreateProject(onCreateProject),
+        args: {
+          project_name: 'My Pirate Game',
+          template_slug: 'starting-3d-top-down-rpg',
+          theme: 'pirate',
+          project_file_url:
+            'https://example.com/starting-3d-top-down-rpg.theme-pirate.json',
+        },
+      }
+    );
+
+    expect(onCreateProject).toHaveBeenCalledWith({
+      name: 'My Pirate Game',
+      exampleSlug: 'starting-3d-top-down-rpg',
+      projectFileUrl:
+        'https://example.com/starting-3d-top-down-rpg.theme-pirate.json',
+    });
+    expect(result.success).toBe(true);
+    expect(result.message).toBe(
+      'Initialized project from template "starting-3d-top-down-rpg".'
+    );
   });
 
   it('reads the existing events of the created project when asked to', async () => {
@@ -158,92 +190,6 @@ describe('initialize_project (without project)', () => {
     expect(result.message).toBe(
       'Unable to initialize project (possibly a network error). Try again.'
     );
-  });
-
-  it('asks for the starter assets to be replaced by the requested theme', async () => {
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    const onCreateProject = jest.fn().mockResolvedValue({
-      exampleSlug: 'starting-3d-top-down-rpg',
-      createdProject,
-      appliedThemeId: 'pirate',
-    });
-
-    const result: EditorFunctionGenericOutput = await editorFunctionsWithoutProject.initialize_project.launchFunction(
-      {
-        ...makeOptionsWithOnCreateProject(onCreateProject),
-        args: {
-          project_name: 'My Pirate Game',
-          template_slug: 'starting-3d-top-down-rpg',
-          theme: 'pirate',
-        },
-      }
-    );
-
-    expect(onCreateProject).toHaveBeenCalledWith({
-      name: 'My Pirate Game',
-      exampleSlug: 'starting-3d-top-down-rpg',
-      starterThemeId: 'pirate',
-    });
-    expect(result.success).toBe(true);
-    expect(result.message).toBe(
-      'Initialized project from template "starting-3d-top-down-rpg", with its assets replaced by the "pirate" theme.'
-    );
-    expect(result.initializedWithThemeId).toBe('pirate');
-  });
-
-  it('asks for no theme when the theme is "none"', async () => {
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    const onCreateProject = jest.fn().mockResolvedValue({
-      exampleSlug: 'starting-platformer',
-      createdProject,
-    });
-
-    const result: EditorFunctionGenericOutput = await editorFunctionsWithoutProject.initialize_project.launchFunction(
-      {
-        ...makeOptionsWithOnCreateProject(onCreateProject),
-        args: {
-          project_name: 'My Game',
-          template_slug: 'starting-platformer',
-          theme: 'none',
-        },
-      }
-    );
-
-    expect(onCreateProject).toHaveBeenCalledWith({
-      name: 'My Game',
-      exampleSlug: 'starting-platformer',
-      starterThemeId: null,
-    });
-    expect(result.message).toBe(
-      'Initialized project from template "starting-platformer".'
-    );
-    expect(result.initializedWithThemeId).toBeUndefined();
-  });
-
-  it('still reports success when the theme could not be applied', async () => {
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    const onCreateProject = jest.fn().mockResolvedValue({
-      exampleSlug: 'starting-platformer',
-      createdProject,
-      appliedThemeId: null,
-    });
-
-    const result: EditorFunctionGenericOutput = await editorFunctionsWithoutProject.initialize_project.launchFunction(
-      {
-        ...makeOptionsWithOnCreateProject(onCreateProject),
-        args: {
-          project_name: 'My Game',
-          template_slug: 'starting-platformer',
-          theme: 'pirate',
-        },
-      }
-    );
-
-    expect(result.success).toBe(true);
-    expect(result.message).toBe(
-      'Initialized project from template "starting-platformer".'
-    );
-    expect(result.initializedWithThemeId).toBeUndefined();
   });
 });
 

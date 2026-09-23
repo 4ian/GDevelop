@@ -50,6 +50,12 @@ module.exports = function (config) {
     basePath: '../..',
     proxies: {
       '/base/tests-utils/': '/base/GDJS/tests/tests-utils/',
+      // Jolt is loaded with a dynamic `import('./jolt-physics.wasm.js')`,
+      // which is resolved relatively to the page, not to the script.
+      '/jolt-physics.wasm.js':
+        '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/jolt-physics.wasm.js',
+      '/jolt-physics.wasm.wasm':
+        '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/jolt-physics.wasm.wasm',
     },
     files: [
       './GDJS/tests/node_modules/expect.js/index.js',
@@ -176,6 +182,25 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3D.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3DRenderer.js',
+      {
+        pattern:
+          './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/jolt-physics.wasm.js',
+        watched: true,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
+        pattern:
+          './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/jolt-physics.wasm.wasm',
+        watched: true,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/Physics3DTools.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/PhysicsCharacter3DRuntimeBehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/TweenManager.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TweenBehavior/tweentools.js',

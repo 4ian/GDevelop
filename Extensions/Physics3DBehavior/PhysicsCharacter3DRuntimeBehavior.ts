@@ -104,6 +104,7 @@ namespace gdjs {
     private _timeSinceCurrentJumpStart: float = 0;
     private _jumpKeyHeldSinceJumpStart: boolean = false;
     private _hasReallyMoved: boolean = false;
+    private _wasOnFloor: boolean = false;
     private _oldPhysicsPosition: FloatPoint = [0, 0];
 
     // This is useful for extensions that need to know
@@ -694,11 +695,20 @@ namespace gdjs {
       );
       this.collisionChecker.updateContacts();
 
-      if (this.isOnFloor()) {
+      const isOnFloor = this.isOnFloor();
+      if (isOnFloor) {
         this._canJump = true;
         this._currentFallSpeed = 0;
         this._currentJumpSpeed = 0;
+      } else if (this._wasOnFloor && !this.isJumping()) {
+        // Only forbid jumping when starting to fall from a platform,
+        // not when falling during a jump. This is because the jump
+        // has already set `_canJump` to false and we don't want to reset
+        // it again because it could have been set back to `true` to allow
+        // for an "air jump".
+        this._canJump = false;
       }
+      this._wasOnFloor = isOnFloor;
 
       this._wasForwardKeyPressed = this._hasPressedForwardKey;
       this._wasBackwardKeyPressed = this._hasPressedBackwardKey;

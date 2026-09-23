@@ -41,7 +41,7 @@ export const AiAttachmentChip = ({
         className={classNames(classes.attachment, {
           [classes.errored]: !!error,
         })}
-        title={name}
+        title={error ? `${name}: ${i18n._(error)}` : name}
       >
         {thumbnailUrl ? (
           <img

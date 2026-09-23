@@ -956,15 +956,20 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                         : undefined
                     }
                   >
-                    <ChatMarkdownText
-                      // $FlowFixMe[incompatible-use]
-                      source={message.content
-                        .map(messageContent => messageContent.text)
-                        .join('\n')}
-                    />
-                    {message.attachments && message.attachments.length > 0 && (
-                      <AiMessageAttachments attachments={message.attachments} />
-                    )}
+                    <div>
+                      <ChatMarkdownText
+                        // $FlowFixMe[incompatible-use]
+                        source={message.content
+                          .map(messageContent => messageContent.text)
+                          .join('\n')}
+                      />
+                      {message.attachments &&
+                        message.attachments.length > 0 && (
+                          <AiMessageAttachments
+                            attachments={message.attachments}
+                          />
+                        )}
+                    </div>
                   </ChatBubble>
                 </Line>,
               ];

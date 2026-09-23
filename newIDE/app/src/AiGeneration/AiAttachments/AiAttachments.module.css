@@ -7,6 +7,7 @@
 
 .attachment {
   position: relative;
+  font-family: var(--gdevelop-modern-font-family);
   display: flex;
   align-items: center;
   gap: 6px;

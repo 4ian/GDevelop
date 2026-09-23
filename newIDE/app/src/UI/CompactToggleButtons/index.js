@@ -45,6 +45,8 @@ const CompactToggleButtons = ({
             <button
               className={classNames({
                 [classes.compactToggleButton]: true,
+                [classes.first]: index === 0,
+                [classes.last]: index === buttons.length - 1,
                 [classes.active]: button.isActive,
               })}
               onClick={button.onClick}

@@ -70,9 +70,15 @@ export const useAttachmentsForResources = ({
   const storeResourceFiles = React.useCallback(
     async () => {
       resourceManagementProps.onNewResourcesAdded();
-      // A project not saved yet has no storage: its files are stored when it
-      // is saved.
-      if (!fileMetadata) return false;
+      // A project not saved yet (or opened from a URL) has no storage for
+      // its files: they are stored when it is saved.
+      const storageProviderName = resourceManagementProps.getStorageProvider()
+        .internalName;
+      if (
+        !fileMetadata ||
+        (storageProviderName !== 'Cloud' && storageProviderName !== 'LocalFile')
+      )
+        return false;
       await resourceManagementProps.onFetchNewlyAddedResources();
       return true;
     },

@@ -3,8 +3,11 @@ import {
   allResourceKindsAndMetadata,
   createNewResource,
 } from '../ResourcesList/ResourceSource';
-import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
-import ResourcesLoader from '../ResourcesLoader';
+import {
+  applyResourceDefaults,
+  updateResourceJsonMetadata,
+} from '../ResourcesList/ResourceUtils';
+import { triggerOnResourceExternallyChanged } from '../MainFrame/ResourcesWatcher';
 import newNameGenerator from '../Utils/NewNameGenerator';
 
 export type AttachmentsForResources = {|
@@ -86,10 +89,18 @@ export const addOrReplaceResourcesFromAttachments = async ({
   const setResourceFile = (resource: gdResource, file: File): string => {
     const blobUrl = URL.createObjectURL(file);
     resource.setFile(blobUrl);
-    // The file is stored with a unique name, next to the others.
-    resource.setMetadata(
-      JSON.stringify({ extension: `.${getExtension(file.name)}` })
-    );
+    // The file is stored with a unique name, next to the others, made of the
+    // resource name and this extension.
+    const extension = `.${getExtension(file.name)}`;
+    updateResourceJsonMetadata(resource, {
+      extension: resource
+        .getName()
+        .toLowerCase()
+        .endsWith(extension)
+        ? ''
+        : extension,
+      localFilePath: undefined,
+    });
     return blobUrl;
   };
 
@@ -194,6 +205,9 @@ export const addOrReplaceResourcesFromAttachments = async ({
         return;
       }
       if (areFilesStored) URL.revokeObjectURL(blobUrl);
+      // Reload what displays the previous file of the resource.
+      if (previousFile)
+        triggerOnResourceExternallyChanged({ identifier: resource.getFile() });
       changes.push(description);
     }
   );
@@ -202,10 +216,5 @@ export const addOrReplaceResourcesFromAttachments = async ({
       'The project is not saved yet: the files will be stored in it when it is saved.'
     );
   }
-  ResourcesLoader.burstUrlsCacheForResources(
-    project,
-    appliedChanges.map(({ resourceName }) => resourceName)
-  );
-
   return { changes, warnings };
 };

@@ -4881,17 +4881,16 @@ const MainFrame = (props: Props): React.MixedElement => {
                   oldStorageProviderOperations,
                   authenticatedUser,
                 });
-              } else {
-                // A project never saved can have resources only in memory
-                // (files added by the AI or the user): store them.
-                await ensureResourcesAreFetched(() => ({
-                  project: upToDateProject,
-                  fileMetadata: newFileMetadata,
-                  storageProvider: newStorageProvider,
-                  storageProviderOperations: newStorageProviderOperations,
-                  authenticatedUser,
-                }));
               }
+              // Resources can be only in memory (files added by the AI in a
+              // project not saved yet, or opened from a URL): store them.
+              await ensureResourcesAreFetched(() => ({
+                project: upToDateProject,
+                fileMetadata: newFileMetadata,
+                storageProvider: newStorageProvider,
+                storageProviderOperations: newStorageProviderOperations,
+                authenticatedUser,
+              }));
             },
           }
         );

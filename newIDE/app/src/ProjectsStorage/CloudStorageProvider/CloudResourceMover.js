@@ -115,10 +115,7 @@ export const moveUrlResourcesToCloudProject = async ({
               ),
             });
           } else if (isBlobURL(resourceFile)) {
-            result.erroredResources.push({
-              resourceName: resource.getName(),
-              error: new Error('Unsupported blob URL.'),
-            });
+            // Uploaded by the resource fetcher, after the move.
             return;
           } else {
             // Public URL resource: nothing to do.

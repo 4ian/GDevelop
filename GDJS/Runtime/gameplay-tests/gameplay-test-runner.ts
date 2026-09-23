@@ -473,6 +473,85 @@ namespace gdjs {
     /** Deepest `children` nesting a snapshot can expose (nested custom
      * objects), to keep snapshots bounded. */
     const MAX_CHILDREN_DEPTH = 8;
+    /** A dynamic 3D physics body moving on X/Y over this many times the top
+     * speed of the fastest character of the scene is reported. */
+    const FAST_PHYSICS_BODY_CHARACTER_SPEED_RATIO = 2;
+    /** The speed over which a body is reported when the scene has no
+     * character to compare it with. */
+    const FAST_PHYSICS_BODY_SPEED_IN_METERS_PER_SECOND = 20;
+    /** The game time a body must spend over the limit to be reported: a kick
+     * or a collision gives a speed peak that lasts only an instant. */
+    const FAST_PHYSICS_BODY_MIN_DURATION_MS = 500;
+    /** The linear damping used in the example force of the warning: high
+     * enough for a body to reach its steady speed in a fraction of a second. */
+    const FAST_PHYSICS_BODY_EXAMPLE_LINEAR_DAMPING = 5;
+    const FAST_PHYSICS_BODY_EXAMPLE_SPEED = 200;
+
+    /** The fastest moment of the bodies of an object going over the speed
+     * limit, and what explains the speed. */
+    type FastPhysicsBody = {
+      durationMs: float;
+      topSpeed: float;
+      mass: float;
+      linearDamping: float;
+      worldScale: float;
+      characterName: string | null;
+      characterTopSpeed: float;
+    };
+
+    /**
+     * The top speed of the character behavior of an object (3D character or
+     * car, moved by its own speed settings), or null if it has none.
+     */
+    const getCharacterTopSpeed = (object: gdjs.RuntimeObject): float | null => {
+      let topSpeed: float | null = null;
+      for (const behavior of (object as any)._behaviors || []) {
+        if (
+          typeof behavior.getForwardSpeedMax !== 'function' ||
+          typeof behavior.getSidewaysSpeedMax !== 'function'
+        ) {
+          continue;
+        }
+        topSpeed = Math.max(
+          topSpeed || 0,
+          behavior.getForwardSpeedMax(),
+          behavior.getSidewaysSpeedMax()
+        );
+      }
+      return topSpeed;
+    };
+
+    const formatSignificantNumber = (value: float): string =>
+      String(parseFloat(value.toPrecision(2)));
+
+    const getFastPhysicsBodyWarning = (
+      objectName: string,
+      body: FastPhysicsBody
+    ): string => {
+      const comparison =
+        body.characterName !== null
+          ? `over ${FAST_PHYSICS_BODY_CHARACTER_SPEED_RATIO} times the top speed of the character "${body.characterName}" (${Math.round(body.characterTopSpeed)} px/s)`
+          : `over ${FAST_PHYSICS_BODY_SPEED_IN_METERS_PER_SECOND * body.worldScale} px/s`;
+      const mass = formatSignificantNumber(body.mass);
+      const dampingText =
+        body.linearDamping > 0
+          ? `its linear damping of ${formatSignificantNumber(body.linearDamping)} only stops its speed from growing at F / (${mass} × ${formatSignificantNumber(body.linearDamping)}) m/s`
+          : 'with no linear damping, nothing stops its speed from growing';
+      const exampleSpeed =
+        body.characterName !== null
+          ? Math.round(body.characterTopSpeed)
+          : FAST_PHYSICS_BODY_EXAMPLE_SPEED;
+      const exampleForce = formatSignificantNumber(
+        (body.mass * FAST_PHYSICS_BODY_EXAMPLE_LINEAR_DAMPING * exampleSpeed) /
+          body.worldScale
+      );
+      return (
+        `"${objectName}" (a dynamic 3D physics body) moved at up to ${Math.round(body.topSpeed)} px/s, ${comparison}, for ${(body.durationMs / 1000).toFixed(1)} s of the run: it is launched rather than moving, whatever the assertions checked. ` +
+        `Its mass is ${mass} kg: a force F accelerates it by F / ${mass} m/s² (1 m = ${body.worldScale} px) at each frame the force action runs, and ${dampingText}. ` +
+        `For a steady speed V (px/s), apply a force of about mass × linear damping × V / ${body.worldScale} with a linear damping of a few units (for example a force of ${exampleForce} for ${exampleSpeed} px/s with a linear damping of ${FAST_PHYSICS_BODY_EXAMPLE_LINEAR_DAMPING}), or set its linear velocity instead. ` +
+        'Never reuse a force value from another object: it only fits the mass it was chosen for. Ignore this if it must move this fast (a projectile).'
+      );
+    };
 
     /**
      * Describe a value that should have been a string, for an error message:
@@ -719,6 +798,9 @@ namespace gdjs {
       /** What the harness noticed about the test itself while it ran (see
        * `_addRunWarning`), reported with the warnings about the game. */
       _runWarnings: Array<string> = [];
+      /** The objects whose 3D physics bodies went over the speed limit (see
+       * `_sampleFastPhysicsBodies`), by object name. */
+      _fastPhysicsBodies: { [objectName: string]: FastPhysicsBody } = {};
       _consoleLogs: Array<GameplayTestLog> = [];
       _consoleLogsTotalChars: number = 0;
       _eventLog: Array<GameplayTestEvent> = [];
@@ -1143,6 +1225,15 @@ namespace gdjs {
           }
           if (warnings.length >= MAX_WARNINGS) break;
         }
+
+        for (const objectName in this._fastPhysicsBodies) {
+          if (warnings.length >= MAX_WARNINGS) break;
+          const fastPhysicsBody = this._fastPhysicsBodies[objectName];
+          if (fastPhysicsBody.durationMs < FAST_PHYSICS_BODY_MIN_DURATION_MS) {
+            continue;
+          }
+          warnings.push(getFastPhysicsBodyWarning(objectName, fastPhysicsBody));
+        }
         return warnings;
       }
 
@@ -1259,6 +1350,73 @@ namespace gdjs {
       }
 
       /**
+       * Note the dynamic 3D physics bodies moving far faster than the
+       * characters of the scene. A force applied at each frame keeps
+       * accelerating a light body: a test checking that an enemy gets closer
+       * to the player passes while the enemy is launched at them.
+       */
+      private _sampleFastPhysicsBodies(dtMs: float): void {
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        const sharedData = currentScene && currentScene.physics3DSharedData;
+        if (!sharedData) return;
+
+        let characterName: string | null = null;
+        let characterTopSpeed = 0;
+        const bodies: Array<gdjs.Physics3DRuntimeBehavior> = [];
+        for (const body of sharedData._registeredBehaviors) {
+          if (!body.isDynamic() || body.isBullet()) continue;
+          const topSpeed = getCharacterTopSpeed(body.owner);
+          if (topSpeed === null) {
+            bodies.push(body);
+          } else if (topSpeed > characterTopSpeed) {
+            characterTopSpeed = topSpeed;
+            characterName = body.owner.getName();
+          }
+        }
+        const speedLimit =
+          characterName !== null
+            ? characterTopSpeed * FAST_PHYSICS_BODY_CHARACTER_SPEED_RATIO
+            : FAST_PHYSICS_BODY_SPEED_IN_METERS_PER_SECOND *
+              sharedData.worldScale;
+
+        // Several instances of an object can be too fast in the same frame:
+        // the frame counts once in the duration of the object.
+        const objectNamesCountedThisFrame = new Set<string>();
+        for (const body of bodies) {
+          const speedX = body.getLinearVelocityX();
+          const speedY = body.getLinearVelocityY();
+          const speed = Math.sqrt(speedX * speedX + speedY * speedY);
+          if (speed <= speedLimit) continue;
+
+          const objectName = body.owner.getName();
+          const fastPhysicsBody = this._fastPhysicsBodies[objectName] || {
+            durationMs: 0,
+            topSpeed: 0,
+            mass: 0,
+            linearDamping: 0,
+            worldScale: sharedData.worldScale,
+            characterName,
+            characterTopSpeed,
+          };
+          this._fastPhysicsBodies[objectName] = fastPhysicsBody;
+          if (!objectNamesCountedThisFrame.has(objectName)) {
+            objectNamesCountedThisFrame.add(objectName);
+            fastPhysicsBody.durationMs += dtMs;
+          }
+          if (speed > fastPhysicsBody.topSpeed) {
+            fastPhysicsBody.topSpeed = speed;
+            fastPhysicsBody.mass = body.getMass();
+            fastPhysicsBody.linearDamping = body.getLinearDamping();
+            fastPhysicsBody.worldScale = sharedData.worldScale;
+            fastPhysicsBody.characterName = characterName;
+            fastPhysicsBody.characterTopSpeed = characterTopSpeed;
+          }
+        }
+      }
+
+      /**
        * Step a single game frame (game logic + rendering) with a fixed
        * time delta.
        */
@@ -1276,6 +1434,7 @@ namespace gdjs {
           this._worstStepTimeMs = stepTimeMs;
         }
         this._trackChangesAfterStep();
+        this._sampleFastPhysicsBodies(dtMs);
         this._drainPlayedSounds();
         if (this._onProgress && Date.now() - this._lastProgressTimeMs > 500) {
           this._lastProgressTimeMs = Date.now();

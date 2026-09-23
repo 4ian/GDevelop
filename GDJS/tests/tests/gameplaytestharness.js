@@ -2592,4 +2592,149 @@ describe('gdjs.gameplayTests', () => {
       });
     });
   });
+
+  describe('warnings on fast 3D physics bodies', () => {
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    beforeEach(async () => {
+      // Wait for the Jolt library to be loaded.
+      for (let index = 0; index < 400 && !window.Jolt; index++) {
+        await delay(5);
+      }
+      if (!window.Jolt) throw new Error('Timeout loading Jolt.');
+    });
+
+    /**
+     * @param {Object} overrides
+     */
+    const createPhysics3DBehaviorData = (overrides) => ({
+      name: 'Physics3D',
+      type: 'Physics3D::Physics3DBehavior',
+      bodyType: 'Dynamic',
+      bullet: false,
+      fixedRotation: true,
+      shape: 'Box',
+      meshShapeResourceName: '',
+      shapeOrientation: 'Z',
+      shapeDimensionA: 0,
+      shapeDimensionB: 0,
+      shapeDimensionC: 0,
+      shapeOffsetX: 0,
+      shapeOffsetY: 0,
+      shapeOffsetZ: 0,
+      massCenterOffsetX: 0,
+      massCenterOffsetY: 0,
+      massCenterOffsetZ: 0,
+      massOverride: 0,
+      density: 1,
+      friction: 0.3,
+      restitution: 0.1,
+      linearDamping: 0.1,
+      angularDamping: 0.1,
+      gravityScale: 1,
+      layers: (1 << 4) | (1 << 0),
+      masks: (1 << 4) | (1 << 0),
+      ...overrides,
+    });
+
+    /**
+     * @param {string} name
+     * @param {Array<Object>} behaviors
+     */
+    const createCube3DObjectData = (name, behaviors) =>
+      /** @type {any} */ ({
+        name,
+        type: 'Scene3D::Cube3DObject',
+        variables: [],
+        behaviors,
+        effects: [],
+        content: { width: 100, height: 100, depth: 100 },
+      });
+
+    /**
+     * A scene with no gravity, a 3D character running at 400px/s at most and
+     * an enemy of 1 kg (a 1 m cube of density 1).
+     */
+    const makeRuntimeGameWithCharacterAndEnemy = () => {
+      const sceneData = createSceneData('Scene 1');
+      sceneData.behaviorsSharedData = [
+        {
+          name: 'Physics3D',
+          type: 'Physics3D::Physics3DBehavior',
+          gravityX: 0,
+          gravityY: 0,
+          gravityZ: 0,
+          worldScale: 100,
+        },
+      ];
+      sceneData.objects.push(
+        createCube3DObjectData('Player', [
+          createPhysics3DBehaviorData({ shape: 'Capsule' }),
+          {
+            name: 'PhysicsCharacter3D',
+            type: 'Physics3D::PhysicsCharacter3D',
+            physics3D: 'Physics3D',
+            jumpHeight: 100,
+            jumpSustainTime: 0.3,
+            gravity: 800,
+            fallingSpeedMax: 450,
+            forwardAcceleration: 650,
+            forwardDeceleration: 1600,
+            forwardSpeedMax: 300,
+            sidewaysAcceleration: 650,
+            sidewaysDeceleration: 1600,
+            sidewaysSpeedMax: 400,
+            slopeMaxAngle: 50,
+            stairHeightMax: 20,
+            shouldBindObjectAndForwardAngle: true,
+            canBePushed: true,
+          },
+        ]),
+        createCube3DObjectData('Werewolf', [createPhysics3DBehaviorData({})])
+      );
+      return gdjs.getPixiRuntimeGame({ layouts: [sceneData] });
+    };
+
+    /**
+     * The warnings at the end of a run pushing the enemy with a force at
+     * each frame for 1.5 seconds, like an enemy chasing the player.
+     * @param {number} force
+     */
+    const getWarningsAfterPushingEnemy = async (force) => {
+      const harness = makeStartedHarness(
+        makeRuntimeGameWithCharacterAndEnemy()
+      );
+      await harness.goToScene('Scene 1');
+      harness.spawn('Player', 0, 0, 0);
+      harness.spawn('Werewolf', 1000, 0, 0);
+      const werewolf = harness.getRuntimeObject('Werewolf');
+      if (!werewolf) throw new Error('Werewolf was not spawned.');
+      /** @type {gdjs.Physics3DRuntimeBehavior} */
+      const physics3D = /** @type {any} */ (werewolf.getBehavior('Physics3D'));
+      for (let frame = 0; frame < 90; frame++) {
+        physics3D.applyForceAtCenter(-force, 0, 0);
+        await harness.stepFrames(1);
+      }
+      return /** @type {Array<string>} */ (
+        /** @type {any} */ (harness)._getWarnings()
+      );
+    };
+
+    it('warns about a body pushed far faster than the character, with its mass', async () => {
+      const warnings = await getWarningsAfterPushingEnemy(80);
+
+      expect(warnings.length).to.be(1);
+      expect(warnings[0]).to.contain('"Werewolf" (a dynamic 3D physics body)');
+      expect(warnings[0]).to.contain(
+        'the top speed of the character "Player" (400 px/s)'
+      );
+      expect(warnings[0]).to.contain('Its mass is 1 kg');
+    });
+
+    it('does not warn about a body pushed at a speed close to the one of the character', async () => {
+      const warnings = await getWarningsAfterPushingEnemy(2);
+
+      expect(warnings.length).to.be(0);
+    });
+  });
 });

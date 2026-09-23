@@ -324,15 +324,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         async ({
           name,
           exampleSlug,
+          projectFileUrl,
         }: {|
           name: string,
           exampleSlug: string | null,
+          projectFileUrl?: string | null,
         |}) => {
           const newProjectSetup: NewProjectSetup = {
             projectName: name,
             storageProvider: UrlStorageProvider,
             saveAsLocation: null,
             creationSource: 'ai-agent-request',
+            projectFileUrl,
           };
 
           if (exampleSlug) {

@@ -103,6 +103,9 @@ export type NewProjectSetup = {|
   openQuickCustomizationDialog?: boolean,
   forceOpenAskAiEditor?: boolean,
   creationSource: NewProjectCreationSource,
+  // Open this file instead of the one of the example (a copy of the example
+  // with other assets, for instance).
+  projectFileUrl?: ?string,
 |};
 
 export type ExampleProjectSetup = {|

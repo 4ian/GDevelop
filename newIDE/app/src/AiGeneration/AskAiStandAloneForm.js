@@ -118,9 +118,11 @@ export const AskAiStandAloneForm = ({
     async ({
       name,
       exampleSlug,
+      projectFileUrl,
     }: {|
       name: string,
       exampleSlug: string | null,
+      projectFileUrl?: string | null,
     |}) => {
       const newProjectSetup: NewProjectSetup = {
         projectName: name,
@@ -130,6 +132,7 @@ export const AskAiStandAloneForm = ({
         // ensure the Ask AI editor is opened once the project is created.
         forceOpenAskAiEditor: true,
         creationSource: 'ai-agent-request',
+        projectFileUrl,
       };
 
       if (exampleSlug) {

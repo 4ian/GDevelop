@@ -460,6 +460,7 @@ export type EditorCallbacks = {|
   onCreateProject: ({|
     name: string,
     exampleSlug: string | null,
+    projectFileUrl?: string | null,
   |}) => Promise<{|
     createdProject: gdProject | null,
     exampleSlug: string | null,
@@ -10665,6 +10666,12 @@ const initializeProject: EditorFunctionWithoutProject = {
       args,
       'also_read_existing_events'
     );
+    // Set by the backend when the template is to be opened from another file
+    // (its copy re-skinned with a theme).
+    const project_file_url = SafeExtractor.extractStringProperty(
+      args,
+      'project_file_url'
+    );
 
     try {
       const requestedExampleSlug = ['', 'none', 'empty'].includes(
@@ -10678,6 +10685,7 @@ const initializeProject: EditorFunctionWithoutProject = {
           editorCallbacks.onCreateProject({
             name: project_name,
             exampleSlug: requestedExampleSlug,
+            projectFileUrl: requestedExampleSlug ? project_file_url : null,
           })
       );
 

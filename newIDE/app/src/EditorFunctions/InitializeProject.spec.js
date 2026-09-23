@@ -51,6 +51,7 @@ describe('initialize_project (without project)', () => {
     expect(onCreateProject).toHaveBeenCalledWith({
       name: 'My Platformer',
       exampleSlug: 'starting-platformer',
+      projectFileUrl: null,
     });
     expect(result.success).toBe(true);
     expect(result.message).toBe(
@@ -82,11 +83,44 @@ describe('initialize_project (without project)', () => {
     expect(onCreateProject).toHaveBeenCalledWith({
       name: 'My Game',
       exampleSlug: null,
+      projectFileUrl: null,
     });
     expect(result.success).toBe(true);
     expect(result.message).toBe('Initialized empty project (1 scene).');
     expect(result.initializedProject).toBe(true);
     expect(result.initializedFromTemplateSlug).toBeUndefined();
+  });
+
+  it('opens the template from the file given by the backend', async () => {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const onCreateProject = jest.fn().mockResolvedValue({
+      exampleSlug: 'starting-3d-top-down-rpg',
+      createdProject,
+    });
+
+    const result: EditorFunctionGenericOutput = await editorFunctionsWithoutProject.initialize_project.launchFunction(
+      {
+        ...makeOptionsWithOnCreateProject(onCreateProject),
+        args: {
+          project_name: 'My Pirate Game',
+          template_slug: 'starting-3d-top-down-rpg',
+          theme: 'pirate',
+          project_file_url:
+            'https://example.com/starting-3d-top-down-rpg.theme-pirate.json',
+        },
+      }
+    );
+
+    expect(onCreateProject).toHaveBeenCalledWith({
+      name: 'My Pirate Game',
+      exampleSlug: 'starting-3d-top-down-rpg',
+      projectFileUrl:
+        'https://example.com/starting-3d-top-down-rpg.theme-pirate.json',
+    });
+    expect(result.success).toBe(true);
+    expect(result.message).toBe(
+      'Initialized project from template "starting-3d-top-down-rpg".'
+    );
   });
 
   it('reads the existing events of the created project when asked to', async () => {

@@ -11,7 +11,8 @@ import {
  * - read-only records (`inspect_*`/`describe_*`/`read_*`) keep only
  *   `{ message }` (their data must not re-enter the LLM context),
  * - project-modifying records keep their full output,
- * - `args` are truncated (2000 chars each, 30000 total),
+ * - `args` are truncated (2000 chars each, 30000 total), `raw_json` args
+ *   replaced by their size,
  * - `consoleLogs` are capped (100 lines / 8000 chars, with a dropped note).
  *
  * Also computes `didModifyProject` for the whole script (true when any record
@@ -24,6 +25,15 @@ const MAX_TOTAL_ARG_CHARS = 30000;
 const MAX_LOG_LINES = 100;
 const MAX_LOG_CHARS = 8000;
 const MAX_RETURN_VALUE_CHARS = 8000;
+
+// A raw configuration is sent back in the args of every write: keep only its
+// size, the rest of the args (scope, object, instance ids) stays readable.
+const redactRawJson = (key: string, value: any): any =>
+  key === 'raw_json' && value !== undefined && value !== null
+    ? `[raw JSON, ${
+        typeof value === 'string' ? value.length : JSON.stringify(value).length
+      } chars]`
+    : value;
 
 const truncationMarker = (length: number) =>
   `…[truncated from ${length} chars]`;
@@ -86,7 +96,7 @@ export const capScriptExecutionResult = (
       // Truncate args (kept for the UI `renderForEditor`), per-record and total.
       let cappedArgs = record.args;
       try {
-        const serialized = JSON.stringify(record.args);
+        const serialized = JSON.stringify(record.args, redactRawJson);
         if (serialized !== undefined) {
           if (totalArgChars >= MAX_TOTAL_ARG_CHARS) {
             // Whole-records budget already spent: keep only a marker.
@@ -96,6 +106,7 @@ export const capScriptExecutionResult = (
             cappedArgs = truncateSerialized(serialized, MAX_ARG_CHARS);
             totalArgChars += MAX_ARG_CHARS;
           } else {
+            cappedArgs = JSON.parse(serialized);
             totalArgChars += serialized.length;
           }
         }

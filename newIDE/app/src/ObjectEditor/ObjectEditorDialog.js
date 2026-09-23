@@ -9,6 +9,7 @@ import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs } from '../UI/Tabs';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
+import { useMarkObjectAsOpenedInEditor } from './ObjectsOpenedInEditor';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Column, Line } from '../UI/Grid';
 import { type EditorProps } from './Editors/EditorProps.flow';
@@ -152,6 +153,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     useProjectToUnserialize: project,
     onCancel,
   });
+  useMarkObjectAsOpenedInEditor(object);
 
   const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(
     false

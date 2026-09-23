@@ -147,6 +147,12 @@ import {
   type ToolScope,
 } from './Scope';
 import {
+  applyRawObjectConfiguration,
+  renameObjectAnimationsAndPoints,
+  getFrameImageSizes,
+  getRawJsonNote,
+} from './RawObjectConfiguration';
+import {
   createExtension,
   changeExtensionProperties,
 } from './Extensions/ExtensionFunctions';
@@ -315,6 +321,11 @@ export type EditorFunctionGenericOutput = {|
   callForms?: Array<string>,
   reminder?: string,
   animationNames?: string,
+  // `inspect_object_properties_effects` with `include_raw_json`.
+  rawJson?: Object,
+  frameImageSizes?: {
+    [imageName: string]: {| width: number, height: number |},
+  },
   // EventScript source view (see `read_events_source`):
   eventScript?: string,
   selectedEventIds?: Array<string>,
@@ -2513,6 +2524,18 @@ const inspectObjectPropertiesEffects: EditorFunction = {
       output.animationNames = animationNames.join(', ');
     }
 
+    if (SafeExtractor.extractBooleanProperty(args, 'include_raw_json')) {
+      const rawJson = serializeToJSObject(objectConfiguration);
+      output.rawJson = rawJson;
+      output.message = getRawJsonNote(object, rawJson);
+      const frameImageSizes = await getFrameImageSizes(
+        project,
+        rawJson,
+        PixiResourcesLoader
+      );
+      if (frameImageSizes) output.frameImageSizes = frameImageSizes;
+    }
+
     if (objectSupportsEffects(object)) {
       const effectsContainer = object.getEffects();
       output.effects = mapFor(0, effectsContainer.getEffectsCount(), i => {
@@ -2570,6 +2593,31 @@ const changeObjectPropertiesEffects: EditorFunction = {
         text: (
           <Trans>
             Remove object <b>{object_name}</b> (in scene {scene_name}).
+          </Trans>
+        ),
+      };
+    }
+    if (args && args.raw_json !== undefined && args.raw_json !== null) {
+      return {
+        text: (
+          <Trans>
+            Update the animations and settings of <b>{object_name}</b> (in scene{' '}
+            {scene_name}).
+          </Trans>
+        ),
+      };
+    }
+    if (
+      (SafeExtractor.extractArrayProperty(args, 'renamed_animations') || [])
+        .length > 0 ||
+      (SafeExtractor.extractArrayProperty(args, 'renamed_points') || [])
+        .length > 0
+    ) {
+      return {
+        text: (
+          <Trans>
+            Rename animations or points of <b>{object_name}</b> (in scene{' '}
+            {scene_name}).
           </Trans>
         ),
       };
@@ -2718,12 +2766,16 @@ const changeObjectPropertiesEffects: EditorFunction = {
     onInstancesModifiedOutsideEditor,
     onWillDeleteObject,
     searchAndInstallResources,
+    PixiResourcesLoader,
   }) => {
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
     const changed_effects =
       SafeExtractor.extractArrayProperty(args, 'changed_effects') || [];
+    const raw_json = args ? args.raw_json : undefined;
+    const renamed_animations = args ? args.renamed_animations : undefined;
+    const renamed_points = args ? args.renamed_points : undefined;
 
     const resolvedScope = resolveScopeFromArgs(project, args, {
       allowedTypes: OBJECTS_SCOPE_TYPES,
@@ -2759,6 +2811,73 @@ const changeObjectPropertiesEffects: EditorFunction = {
       args,
       'delete_this_object'
     );
+    const isRawJsonMode = raw_json !== undefined && raw_json !== null;
+    const isRenamesMode =
+      (renamed_animations !== undefined && renamed_animations !== null) ||
+      (renamed_points !== undefined && renamed_points !== null);
+    const isClassicMode =
+      changed_properties.length > 0 ||
+      changed_effects.length > 0 ||
+      !!deleteThisObject;
+    if (
+      [isRawJsonMode, isRenamesMode, isClassicMode].filter(Boolean).length > 1
+    ) {
+      return makeGenericFailure(
+        'Nothing was changed: `raw_json`, the renames (`renamed_animations`/`renamed_points`) and the other changes must be done in separate calls.'
+      );
+    }
+    if (isRawJsonMode && typeof raw_json !== 'string') {
+      return makeGenericFailure(
+        'Nothing was changed: `raw_json` must be a string: pass `JSON.stringify(rawJson)`.'
+      );
+    }
+    if (
+      isRenamesMode &&
+      (!Array.isArray(renamed_animations || []) ||
+        !Array.isArray(renamed_points || []))
+    ) {
+      return makeGenericFailure(
+        'Nothing was changed: `renamed_animations` and `renamed_points` must be arrays of {old_name, new_name}.'
+      );
+    }
+    if (isRawJsonMode || isRenamesMode) {
+      const result =
+        typeof raw_json === 'string'
+          ? await applyRawObjectConfiguration({
+              project,
+              resolvedScope,
+              object,
+              rawJson: raw_json,
+              PixiResourcesLoader,
+            })
+          : renameObjectAnimationsAndPoints({
+              project,
+              resolvedScope,
+              object,
+              renamedAnimations: renamed_animations || [],
+              renamedPoints: renamed_points || [],
+            });
+      if (!result.success) {
+        return makeGenericFailure(`Nothing was changed: ${result.message}`);
+      }
+      if (result.changes.length > 0) {
+        onObjectsModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(resolvedScope),
+          isNewObjectTypeUsed: false,
+        });
+      }
+      if (result.haveInstancesChanged) {
+        onInstancesModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(resolvedScope),
+        });
+      }
+      return makeMultipleChangesOutput(
+        result.changes,
+        result.warnings,
+        toolsVersion
+      );
+    }
+
     // Deleting a child object, or renaming it, changes the structure of the
     // custom object: only the default variant owns it.
     const isRenamingObject = changed_properties.some(changed_property => {

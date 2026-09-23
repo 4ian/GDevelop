@@ -304,6 +304,12 @@
             },
             "required": ["behaviorName", "behaviorType"]
           }
+        },
+        "rawJson": {
+          "$rawType": "{ [key: string]: any }"
+        },
+        "frameImageSizes": {
+          "$rawType": "{ [imageName: string]: { width: number; height: number } }"
         }
       },
       "required": ["properties", "behaviors"]

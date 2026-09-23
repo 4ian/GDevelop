@@ -1,5 +1,6 @@
 // @flow
 import { mapFor } from './MapFor';
+import { getInstancesInLayoutForObject } from './Layout';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -116,4 +117,94 @@ export const renameObjectPointReferences = (
       newName
     );
   }
+};
+
+/**
+ * The instances placed from the object configuration: in its scenes and the
+ * external layouts associated with them (for a global object, also the
+ * external layouts associated with no scene), or in the variant of the custom
+ * object holding the configuration (each variant has its own children).
+ */
+const getInstancesOfObject = (
+  context: ObjectReferencesContext,
+  eventsBasedObjectVariant: ?gdEventsBasedObjectVariant
+): Array<gdInitialInstance> => {
+  const { project, object } = context;
+  const objectName = object.getName();
+  const scenes = getScenesUsingObject(context);
+  if (!scenes) {
+    return eventsBasedObjectVariant
+      ? getInstancesInLayoutForObject(
+          eventsBasedObjectVariant.getInitialInstances(),
+          objectName
+        )
+      : [];
+  }
+  const associatedSceneNames = scenes.map(scene => scene.getName());
+  if (isGlobalObject(project, object)) associatedSceneNames.push('');
+  const externalLayouts = mapFor(0, project.getExternalLayoutsCount(), i =>
+    project.getExternalLayoutAt(i)
+  ).filter(externalLayout =>
+    associatedSceneNames.includes(externalLayout.getAssociatedLayout())
+  );
+  return [
+    ...scenes.map(scene => scene.getInitialInstances()),
+    ...externalLayouts.map(externalLayout =>
+      externalLayout.getInitialInstances()
+    ),
+  ].flatMap(initialInstances =>
+    getInstancesInLayoutForObject(initialInstances, objectName)
+  );
+};
+
+/**
+ * The instances starting with one of the animations of the object (see
+ * `getInstancesOfObject`). Empty for objects whose instances have no starting
+ * animation (3D models). To call before changing the animations: a custom
+ * object without animations has no starting animation.
+ */
+export const getInstancesWithStartingAnimation = (
+  context: ObjectReferencesContext,
+  eventsBasedObjectVariant: ?gdEventsBasedObjectVariant
+): Array<gdInitialInstance> => {
+  const instances = getInstancesOfObject(context, eventsBasedObjectVariant);
+  return instances.length > 0 &&
+    context.object
+      .getConfiguration()
+      .getInitialInstanceProperties(instances[0])
+      .has('animation')
+    ? instances
+    : [];
+};
+
+/**
+ * Keeps the starting animation of each instance after the object animations
+ * were reordered or removed: the instance keeps the animation of the same
+ * name, or starts with the first one when its animation was removed. Names
+ * must be unique and non-empty.
+ */
+export const remapStartingAnimations = (
+  instances: Array<gdInitialInstance>,
+  oldAnimationNames: Array<string>,
+  newAnimationNames: Array<string>
+): {| remappedInstancesCount: number, resetInstancesCount: number |} => {
+  let remappedInstancesCount = 0;
+  let resetInstancesCount = 0;
+  instances.forEach(instance => {
+    // The runtime truncates the index, and an instance without the property
+    // starts with the first animation (0).
+    const oldIndex = Math.trunc(instance.getRawDoubleProperty('animation'));
+    const animationName = oldAnimationNames[oldIndex];
+    // An index out of the list was already showing no animation of the list.
+    if (animationName === undefined) return;
+    const newIndex = newAnimationNames.indexOf(animationName);
+    if (newIndex === -1) {
+      instance.setRawDoubleProperty('animation', 0);
+      resetInstancesCount++;
+    } else if (newIndex !== oldIndex) {
+      instance.setRawDoubleProperty('animation', newIndex);
+      remappedInstancesCount++;
+    }
+  });
+  return { remappedInstancesCount, resetInstancesCount };
 };

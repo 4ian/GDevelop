@@ -71,7 +71,9 @@ namespace gdjs {
        * as possible.
        */
       speedFactor?: number;
-      /** Maximum number of screenshots kept. Default: 5. */
+      /** Maximum number of screenshots kept: the first one and the last
+       * ones. When the script takes none, one is taken when it ends.
+       * 0 disables screenshots. Default: 4. */
       maxScreenshots?: number;
       /**
        * When true, the game is left paused and muted when the test finishes,
@@ -423,6 +425,8 @@ namespace gdjs {
         sceneVariables: Array<Object>;
       };
       screenshots: Array<GameplayTestScreenshot>;
+      /** Screenshots taken, including the ones not kept in `screenshots`. */
+      screenshotsTakenCount: integer;
       /** The `stopProfiling()` summaries captured during the run. */
       profiles: Array<GameplayTestProfilingResult>;
       performance: {
@@ -450,7 +454,10 @@ namespace gdjs {
     // cost before the next one.
     const FAST_RUN_RENDER_DUTY_MULTIPLIER = 4;
     const MAX_PLAYED_SOUNDS = 500;
-    const DEFAULT_MAX_SCREENSHOTS = 5;
+    const DEFAULT_MAX_SCREENSHOTS = 4;
+    /** A hidden page gets no animation frame: capture the last rendered
+     * frame rather than waiting forever. */
+    const SCREENSHOT_RENDER_TIMEOUT_MS = 1000;
     const DEFAULT_PROBE_FRAMES = 30;
     const MAX_PROFILING_SECTIONS = 50;
     const MAX_PROFILING_TIMELINE_ENTRIES = 120;
@@ -468,7 +475,7 @@ namespace gdjs {
     const MAX_EVENT_LOG_ENTRIES = 500;
     const MAX_ERRORS = 20;
     const MAX_WARNINGS = 20;
-    const SCREENSHOT_MAX_SIZE = 512;
+    const SCREENSHOT_MAX_SIZE = 768;
     const DEFAULT_FRAME_DT_MS = 1000 / 60;
     /** Deepest `children` nesting a snapshot can expose (nested custom
      * objects), to keep snapshots bounded. */
@@ -766,6 +773,7 @@ namespace gdjs {
       _paceReferenceWallTimeMs: number = 0;
       _paceReferenceGameTimeMs: number = 0;
       _maxScreenshots: integer;
+      _screenshotsTakenCount: integer = 0;
       _totalStepTimeMs: number = 0;
       _worstStepTimeMs: number = 0;
       _lastTrackedSceneName: string | null = null;
@@ -3406,19 +3414,19 @@ namespace gdjs {
       }
 
       /**
-       * Take a screenshot of the game canvas (downscaled). It's returned
-       * in the test result.
+       * Take a screenshot of the game canvas (downscaled). The first one
+       * and the last ones are returned in the test result.
        */
       async takeScreenshot(label: string = ''): Promise<void> {
-        if (this._screenshots.length >= this._maxScreenshots) {
-          logger.warn(
-            `Ignoring screenshot "${label}": already ${this._maxScreenshots} screenshots taken.`
-          );
-          return;
-        }
+        if (this._maxScreenshots <= 0) return;
         // Let an animation frame happen so the canvas shows the current
         // state of the game (fast runs only render a few times per second).
-        await this._renderOnce();
+        await Promise.race([
+          this._renderOnce(),
+          new Promise((resolve) =>
+            setTimeout(resolve, SCREENSHOT_RENDER_TIMEOUT_MS)
+          ),
+        ]);
         const canvas = this._runtimeGame.getRenderer().getCanvas();
         if (!canvas) {
           logger.warn('No canvas found: unable to take a screenshot.');
@@ -3438,6 +3446,11 @@ namespace gdjs {
           if (!context) return;
           context.drawImage(canvas, 0, 0, targetWidth, targetHeight);
           const dataUrl = downscaledCanvas.toDataURL('image/jpeg', 0.7);
+          this._screenshotsTakenCount++;
+          if (this._screenshots.length >= this._maxScreenshots) {
+            // Keep the first one and the most recent ones.
+            this._screenshots.splice(this._maxScreenshots > 1 ? 1 : 0, 1);
+          }
           this._screenshots.push({
             label,
             frame: this._framesExecuted,
@@ -3732,6 +3745,7 @@ namespace gdjs {
               : [],
           },
           screenshots: this._screenshots,
+          screenshotsTakenCount: this._screenshotsTakenCount,
           profiles: this._profiles,
           performance:
             this._framesExecuted > 0
@@ -4015,6 +4029,15 @@ namespace gdjs {
           ]);
         }
       } finally {
+        // The end state is the most useful one to look at, whatever the
+        // outcome, so capture it when the script took no screenshot.
+        if (
+          harness._screenshotsTakenCount === 0 &&
+          !harness._stopped &&
+          runtimeGame.getRenderer().getCanvas()
+        ) {
+          await harness.takeScreenshot('End of the test');
+        }
         // Restore everything, whatever happened:
         try {
           harness.releaseAllInputs();
@@ -4042,6 +4065,7 @@ namespace gdjs {
         currentlyRunningHarness = null;
       }
 
+      result.screenshotsTakenCount = harness._screenshotsTakenCount;
       return result;
     };
   }

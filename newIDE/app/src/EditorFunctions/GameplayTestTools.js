@@ -130,8 +130,7 @@ export const runGameplayTest: EditorFunction = {
       typeof args.timeout_ms === 'number'
         ? Math.min(Math.max(args.timeout_ms, 1000), 120000)
         : undefined;
-    const screenshots =
-      args.screenshots === 'on-failure' ? 'on-failure' : 'off';
+    const screenshots = args.screenshots === 'off' ? 'off' : 'on';
 
     const testsContainer = getTestsContainer(project, scope);
     if (!testsContainer) {

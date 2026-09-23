@@ -186,6 +186,65 @@ describe('gdjs.gameplayTests', () => {
     ).to.be(false);
   });
 
+  describe('screenshots', () => {
+    const makeRuntimeGameWithCanvas = () => {
+      const runtimeGame = makeRuntimeGame();
+      runtimeGame
+        .getRenderer()
+        .createStandardCanvas(document.createElement('div'));
+      return runtimeGame;
+    };
+
+    it('keeps the first and the last 3 screenshots', async () => {
+      const result = await runTestScript(
+        makeRuntimeGameWithCanvas(),
+        `
+        await harness.goToScene('Scene 1');
+        for (let i = 1; i <= 6; i++) await harness.takeScreenshot('Shot ' + i);
+        `
+      );
+
+      expect(result.screenshots.map((screenshot) => screenshot.label)).to.eql([
+        'Shot 1',
+        'Shot 4',
+        'Shot 5',
+        'Shot 6',
+      ]);
+      expect(result.screenshotsTakenCount).to.be(6);
+      expect(result.screenshots[0].jpegBase64.length > 100).to.be(true);
+    });
+
+    it('takes a screenshot at the end when the script takes none, even on failure', async () => {
+      const result = await runTestScript(
+        makeRuntimeGameWithCanvas(),
+        `
+        await harness.goToScene('Scene 1');
+        harness.assert(false, 'This must fail');
+        `
+      );
+
+      expect(result.status).to.be('failed');
+      expect(result.screenshots.map((screenshot) => screenshot.label)).to.eql([
+        'End of the test',
+      ]);
+      expect(result.screenshotsTakenCount).to.be(1);
+    });
+
+    it('takes no screenshot when they are disabled', async () => {
+      const result = await runTestScript(
+        makeRuntimeGameWithCanvas(),
+        `
+        await harness.goToScene('Scene 1');
+        await harness.takeScreenshot('Ignored');
+        `,
+        { maxScreenshots: 0 }
+      );
+
+      expect(result.screenshots).to.eql([]);
+      expect(result.screenshotsTakenCount).to.be(0);
+    });
+  });
+
   it('reports a script error', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

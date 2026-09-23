@@ -258,7 +258,7 @@
         "instances": {
           "type": "array",
           "items": {
-            "$namedType": "SimplifiedInstance"
+            "$rawType": "SimplifiedInstance & { rawJson?: { [key: string]: any } }"
           }
         },
         "objectSizeInfo": {
@@ -309,7 +309,7 @@
           "$rawType": "{ [key: string]: any }"
         },
         "frameImageSizes": {
-          "$rawType": "{ [imageName: string]: { width: number; height: number } }"
+          "$rawType": "{ [image: string]: { width: number; height: number } }"
         }
       },
       "required": ["properties", "behaviors"]

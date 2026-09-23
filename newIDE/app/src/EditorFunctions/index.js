@@ -146,6 +146,7 @@ import {
   type ToolScopeType,
   type ToolScope,
 } from './Scope';
+import { getInstanceRawJson, applyInstancesRawJson } from './InstancesRawJson';
 import {
   applyRawObjectConfiguration,
   renameObjectAnimationsAndPoints,
@@ -4252,6 +4253,10 @@ const describeInstances: EditorFunction = {
 
     const filter_by_object_name =
       SafeExtractor.extractStringProperty(args, 'filter_by_object_name') || '';
+    const includeRawJson = !!SafeExtractor.extractBooleanProperty(
+      args,
+      'include_raw_json'
+    );
 
     const objectNames = new Set(
       filter_by_object_name
@@ -4317,7 +4322,15 @@ const describeInstances: EditorFunction = {
             ? sizeInfo
             : { width: 0, height: 0, depth: 0 };
 
-          instances.push(getSimplifiedInstance(instance, defaultSize));
+          const simplifiedInstance = getSimplifiedInstance(
+            instance,
+            defaultSize
+          );
+          instances.push(
+            includeRawJson
+              ? { ...simplifiedInstance, rawJson: getInstanceRawJson(instance) }
+              : simplifiedInstance
+          );
         }
       );
     });
@@ -4353,6 +4366,71 @@ const iterateOnInstances = (
   // $FlowFixMe[incompatible-type]
   initialInstances.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
+};
+
+/**
+ * Changes the data of instances that `put_2d_instances`/`put_3d_instances`
+ * don't set (starting animation, tile map, text input values, flips), from
+ * the `rawJson` returned by `describe_instances` with `include_raw_json`.
+ */
+const changeInstancesRawJson: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const changes = SafeExtractor.extractArrayProperty(args, 'changes') || [];
+    return {
+      text: (
+        <Trans>
+          Change the starting animation, tiles, flips or other data of{' '}
+          {changes.length} instance(s) in {getScopeLabelFromArgs(args)}.
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({
+    project,
+    args,
+    toolsVersion,
+    onInstancesModifiedOutsideEditor,
+  }) => {
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: INSTANCES_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+    const containers = getInstancesScopeContainers(resolvedScope);
+    if (!containers)
+      return makeGenericFailure(
+        `${resolvedScope.label} has no instances to change.`
+      );
+    const changes = SafeExtractor.extractArrayProperty(args, 'changes');
+    if (!changes || changes.length === 0) {
+      return makeGenericFailure(
+        'Nothing was changed: `changes` must be a non-empty list of {instance_id, raw_json}.'
+      );
+    }
+    const instances = [];
+    iterateOnInstances(containers.initialInstances, instance => {
+      instances.push(instance);
+    });
+    const result = applyInstancesRawJson({
+      project,
+      objectsContainer: containers.objectsContainer,
+      globalObjectsContainer: containers.globalObjectsContainer,
+      instances,
+      changes,
+    });
+    if (!result.success) {
+      return makeGenericFailure(`Nothing was changed: ${result.message}`);
+    }
+    if (result.changes.length > 0) {
+      onInstancesModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+      });
+    }
+    return makeMultipleChangesOutput(result.changes, [], toolsVersion);
+  },
+  modifiesProject: true,
 };
 
 // An id pointing at another object's instance is always a targeting mistake:
@@ -11409,6 +11487,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_behavior_properties: inspectBehaviorProperties,
   change_behavior_property: changeBehaviorProperty,
   describe_instances: describeInstances,
+  change_instances_raw_json: changeInstancesRawJson,
   put_2d_instances: put2dInstances,
   put_3d_instances: put3dInstances,
   read_scene_events: readSceneEvents,

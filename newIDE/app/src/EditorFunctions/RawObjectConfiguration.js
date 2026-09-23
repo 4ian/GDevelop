@@ -137,8 +137,8 @@ const isImageResource = (project: gdProject, name: any): boolean => {
 
 /**
  * The frames of a configuration and of its overridden children, as JSON
- * strings: frames written back unchanged are not validated again, so existing
- * data never prevents an edit of something else.
+ * strings: frames written back unchanged are not validated again, so invalid
+ * data in a frame only refuses an edit changing that frame.
  */
 const getFrameKeys = (configurationJson: Object): Set<string> =>
   new Set(

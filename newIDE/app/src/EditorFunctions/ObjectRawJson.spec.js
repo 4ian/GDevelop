@@ -324,6 +324,20 @@ describe('object raw JSON and renames', () => {
       expect(scene.getObjects().hasObjectNamed('Player')).toBe(true);
     });
 
+    it('ignores empty lists of renames given with other changes', async () => {
+      makePlayer(['Idle']);
+
+      const result = await change({
+        object_name: 'Player',
+        renamed_animations: [],
+        renamed_points: [],
+        changed_properties: [{ property_name: 'name', new_value: 'Hero' }],
+      });
+
+      expect(result.success).toBe(true);
+      expect(scene.getObjects().hasObjectNamed('Hero')).toBe(true);
+    });
+
     it('refuses to change an object open in the object editor', async () => {
       const player = makePlayer(['Idle']);
       const rawJson = await readRawJson('Player');

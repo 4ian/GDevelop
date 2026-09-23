@@ -2813,9 +2813,14 @@ const changeObjectPropertiesEffects: EditorFunction = {
       'delete_this_object'
     );
     const isRawJsonMode = raw_json !== undefined && raw_json !== null;
+    // An empty list of renames is ignored; a value that is not a list is
+    // refused below.
+    const hasRenames = (renames: mixed) =>
+      renames !== undefined &&
+      renames !== null &&
+      (!Array.isArray(renames) || renames.length > 0);
     const isRenamesMode =
-      (renamed_animations !== undefined && renamed_animations !== null) ||
-      (renamed_points !== undefined && renamed_points !== null);
+      hasRenames(renamed_animations) || hasRenames(renamed_points);
     const isClassicMode =
       changed_properties.length > 0 ||
       changed_effects.length > 0 ||

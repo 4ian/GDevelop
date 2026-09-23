@@ -26,6 +26,7 @@ const trackedClasses = [
   'EffectsContainer',
   'InitialInstancesContainer',
   'LayersContainer',
+  'LayoutFolderOrLayout',
   'ObjectFolderOrObject',
   'ObjectGroupsContainer',
   'ObjectsContainer',

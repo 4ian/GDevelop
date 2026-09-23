@@ -53,6 +53,8 @@ const makeVisionCopy = async (file: File): Promise<?Blob> => {
   const width = image.naturalWidth;
   const height = image.naturalHeight;
   const largestDimension = Math.max(width, height);
+  // An SVG without dimensions.
+  if (!largestDimension) return null;
   if (
     AI_READABLE_IMAGE_MIME_TYPES.includes(file.type) &&
     file.size < VISION_COPY_MIN_FILE_SIZE_IN_BYTES &&

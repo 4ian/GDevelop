@@ -186,6 +186,9 @@ export const CompactTextAreaFieldWithControls: React.ComponentType<{
     const handlePaste = React.useCallback(
       (e: SyntheticClipboardEvent<HTMLTextAreaElement>) => {
         if (!onPasteFiles) return;
+        // Text copied from some apps (a spreadsheet...) also comes as an
+        // image: paste it as text.
+        if (Array.from(e.clipboardData.types).includes('text/plain')) return;
         const files = Array.from(e.clipboardData.files);
         if (!files.length) return;
         e.preventDefault();

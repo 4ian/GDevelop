@@ -1088,6 +1088,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         clearApprovedEditBatches,
       } = useProcessFunctionCalls({
         project,
+        fileMetadata,
         resourceManagementProps,
         editorCallbacks,
         aiRequestsToProcess,

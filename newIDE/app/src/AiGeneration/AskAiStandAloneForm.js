@@ -602,6 +602,7 @@ export const AskAiStandAloneForm = ({
 
   const { onProcessFunctionCalls } = useProcessFunctionCalls({
     project,
+    fileMetadata,
     resourceManagementProps,
     editorCallbacks,
     aiRequestsToProcess,

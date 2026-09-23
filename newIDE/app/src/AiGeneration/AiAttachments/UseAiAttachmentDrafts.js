@@ -46,11 +46,16 @@ export const useAiAttachmentDrafts = (): {|
   }>({});
 
   const updateDraft = React.useCallback(
-    (aiRequestId: string, localId: string, changes: Partial<AiAttachmentDraft>) =>
+    (
+      aiRequestId: string,
+      localId: string,
+      changes: Partial<AiAttachmentDraft>
+    ) =>
       setDraftsPerAiRequestId(currentDraftsPerAiRequestId => ({
         ...currentDraftsPerAiRequestId,
         [aiRequestId]: (currentDraftsPerAiRequestId[aiRequestId] || []).map(
-          draft => (draft.localId === localId ? { ...draft, ...changes } : draft)
+          draft =>
+            draft.localId === localId ? { ...draft, ...changes } : draft
         ),
       })),
     []
@@ -58,15 +63,18 @@ export const useAiAttachmentDrafts = (): {|
 
   const addFiles = React.useCallback(
     (aiRequestId: string, files: Array<File>) => {
-      const existingDraftsCount = (draftsPerAiRequestId[aiRequestId] || [])
-        .length;
-      const newDrafts: Array<AiAttachmentDraft> = files.map((file, index) => {
+      const existingDraftsCount = (
+        draftsPerAiRequestId[aiRequestId] || []
+      ).filter(draft => draft.status !== 'error').length;
+      let validDraftsCount = existingDraftsCount;
+      const newDrafts: Array<AiAttachmentDraft> = files.map(file => {
         const error =
-          existingDraftsCount + index >= MAX_ATTACHMENTS_PER_MESSAGE
+          validDraftsCount >= MAX_ATTACHMENTS_PER_MESSAGE
             ? 'too-many'
             : !profile
             ? 'not-authenticated'
             : getFileError(file);
+        if (!error) validDraftsCount++;
         return {
           localId: makeTimestampedId(),
           file,

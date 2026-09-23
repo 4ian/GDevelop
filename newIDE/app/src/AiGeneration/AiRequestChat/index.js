@@ -670,6 +670,8 @@ export const AiRequestChat: React.ComponentType<{
 
         setHasTriedToSendWhileBlocked(cannotContinue);
         if (cannotContinue) return;
+        // The keyboard shortcut can send while the button is disabled.
+        if (shouldDisableButton) return;
 
         if (hasOpenedProject && standAloneForm) {
           const response = await showConfirmation({
@@ -697,6 +699,7 @@ export const AiRequestChat: React.ComponentType<{
         chosenOrDefaultAiConfigurationPresetId,
         scrollToBottom,
         cannotContinue,
+        shouldDisableButton,
         hasOpenedProject,
         showConfirmation,
         standAloneForm,
@@ -709,6 +712,8 @@ export const AiRequestChat: React.ComponentType<{
 
         setHasTriedToSendWhileBlocked(cannotContinue);
         if (cannotContinue) return;
+        // The keyboard shortcut can send while the button is disabled.
+        if (shouldDisableButton) return;
 
         return onSendUserMessage({
           userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
@@ -722,6 +727,7 @@ export const AiRequestChat: React.ComponentType<{
         uploadedAttachmentIds,
         scrollToBottom,
         cannotContinue,
+        shouldDisableButton,
       ]
     );
 

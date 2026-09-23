@@ -47,8 +47,9 @@ const useImageUrls = (attachments: Array<AiRequestAttachment>): ImageUrls => {
             if (!isMounted) return;
             const downloadedImageUrls: ImageUrls = {};
             downloads.forEach(download => {
-              downloadedImageUrls[download.attachmentId] =
-                download.error ? null : download.previewUrl;
+              downloadedImageUrls[download.attachmentId] = download.error
+                ? null
+                : download.previewUrl;
             });
             setImageUrls(currentImageUrls => ({
               ...currentImageUrls,

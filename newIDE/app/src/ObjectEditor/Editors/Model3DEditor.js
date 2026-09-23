@@ -34,6 +34,7 @@ import * as THREE from 'three';
 import { PropertyCheckbox, PropertyField } from './PropertyFields';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { ChoiceProperty } from '../../BehaviorsEditor/Editors/Physics2Editor';
+import { renameObjectAnimationReferences } from '../../Utils/ObjectAnimationsRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -427,24 +428,17 @@ const Model3DEditor = ({
 
       animation.setName(newName);
       if (object) {
-        if (layout) {
-          gd.WholeProjectRefactorer.renameObjectAnimationInScene(
+        renameObjectAnimationReferences(
+          {
             project,
-            layout,
             object,
-            currentName,
-            newName
-          );
-        } else if (eventsFunctionsExtension && eventsBasedObject) {
-          gd.WholeProjectRefactorer.renameObjectAnimationInEventsBasedObject(
-            project,
+            layout,
             eventsFunctionsExtension,
             eventsBasedObject,
-            object,
-            currentName,
-            newName
-          );
-        }
+          },
+          currentName,
+          newName
+        );
       }
       forceUpdate();
       if (onObjectUpdated) onObjectUpdated();

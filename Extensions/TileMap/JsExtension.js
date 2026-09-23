@@ -1111,7 +1111,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
 
     instanceProperties
       .getOrCreate('tilemap')
-      .setValue(instance.getRawStringProperty('tileMap'))
+      .setValue(instance.getRawStringProperty('tilemap'))
       .setType('string')
       .setLabel('Tilemap')
       .setHidden(true);

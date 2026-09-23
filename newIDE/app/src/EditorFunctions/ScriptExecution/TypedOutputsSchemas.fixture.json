@@ -258,7 +258,7 @@
         "instances": {
           "type": "array",
           "items": {
-            "$rawType": "SimplifiedInstance & { rawJson?: { [key: string]: any } }"
+            "$rawType": "SimplifiedInstance & { rawJson?: { numberProperties: Array<{ name: string; value: number }>; stringProperties: Array<{ name: string; value: string }>; flippedX: boolean; flippedY: boolean; flippedZ: boolean } }"
           }
         },
         "objectSizeInfo": {

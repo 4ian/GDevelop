@@ -2,6 +2,7 @@
 import * as React from 'react';
 import useStableValue from '../../Utils/useStableValue';
 import { ChatBubble } from './ChatBubble';
+import { AiMessageAttachments } from '../AiAttachments/AiMessageAttachments';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { ChatMarkdownText } from './ChatMarkdownText';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
@@ -961,6 +962,9 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                         .map(messageContent => messageContent.text)
                         .join('\n')}
                     />
+                    {message.attachments && message.attachments.length > 0 && (
+                      <AiMessageAttachments attachments={message.attachments} />
+                    )}
                   </ChatBubble>
                 </Line>,
               ];

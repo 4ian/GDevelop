@@ -83,6 +83,15 @@ export type AiRequestAssistantMessage = {
   projectVersionIdAfterMessage?: string,
 };
 
+export type AiRequestAttachment = {
+  attachmentId: string,
+  name: string,
+  mimeType: string,
+  size: number,
+  // How the AI reads the file: an image or a text (otherwise, only its name).
+  readableAs: 'image' | 'text' | null,
+};
+
 export type AiRequestUserMessage = {
   type: 'message',
   status: 'completed',
@@ -92,6 +101,7 @@ export type AiRequestUserMessage = {
     status: 'completed',
     text: string,
   }>,
+  attachments?: Array<AiRequestAttachment>,
   messageId?: string,
   projectVersionIdBeforeMessage?: string,
 };
@@ -510,6 +520,7 @@ export const createAiRequest = async (
   {
     userId,
     userRequest,
+    attachmentIds,
     gameProjectJson,
     gameProjectJsonUserRelativeKey,
     projectSpecificExtensionsSummaryJson,
@@ -525,6 +536,7 @@ export const createAiRequest = async (
   }: {|
     userId: string,
     userRequest: string,
+    attachmentIds: Array<string>,
     gameProjectJson: string | null,
     gameProjectJsonUserRelativeKey: string | null,
     projectSpecificExtensionsSummaryJson: string | null,
@@ -550,6 +562,7 @@ export const createAiRequest = async (
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
       userRequest,
+      attachmentIds,
       gameProjectJson,
       gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
@@ -587,6 +600,7 @@ export const addMessageToAiRequest = async (
     aiRequestId,
     functionCallOutputs,
     userMessage,
+    attachmentIds,
     gameId,
     projectVersionIdBeforeMessage,
     payWithCredits,
@@ -601,6 +615,7 @@ export const addMessageToAiRequest = async (
     userId: string,
     aiRequestId: string,
     userMessage: string,
+    attachmentIds?: Array<string>,
     gameId?: string,
     projectVersionIdBeforeMessage?: string | null,
     functionCallOutputs: Array<AiRequestFunctionCallOutput>,
@@ -621,6 +636,7 @@ export const addMessageToAiRequest = async (
       gdevelopVersionWithHash: getIDEVersionWithHash(),
       functionCallOutputs,
       userMessage,
+      attachmentIds,
       gameId,
       projectVersionIdBeforeMessage,
       payWithCredits: !!payWithCredits,
@@ -1133,6 +1149,81 @@ export const createAiUserContentPresignedUrls = async (
     data: response.data,
     endpointName:
       '/ai-user-content/action/create-presigned-urls of Generation API',
+  });
+};
+
+export type AiAttachmentUpload = {|
+  attachmentId: string,
+  uploadUrl: string,
+  visionCopyUploadUrl: string | null,
+|};
+
+export const createAiAttachmentUploadUrls = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    attachments,
+  }: {|
+    userId: string,
+    attachments: Array<{|
+      name: string,
+      mimeType: string,
+      size: number,
+      visionCopy: {| mimeType: string, size: number |} | null,
+    |}>,
+  |}
+): Promise<Array<AiAttachmentUpload>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/ai-user-content/action/create-attachment-upload-urls`,
+    { attachments },
+    {
+      params: { userId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+  return ensureIsArray({
+    data: response.data.attachments,
+    endpointName:
+      '/ai-user-content/action/create-attachment-upload-urls of Generation API',
+  });
+};
+
+export type AiAttachmentDownload =
+  | {|
+      attachmentId: string,
+      url: string,
+      // A downscaled copy for an image, if any (otherwise the file itself).
+      previewUrl: string,
+      name: string,
+      mimeType: string,
+      size: number,
+    |}
+  | {| attachmentId: string, error: 'not-found' |};
+
+export const createAiAttachmentDownloadUrls = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    attachmentIds,
+  }: {|
+    userId: string,
+    attachmentIds: Array<string>,
+  |}
+): Promise<Array<AiAttachmentDownload>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/ai-user-content/action/create-attachment-download-urls`,
+    { attachmentIds },
+    {
+      params: { userId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+  return ensureIsArray({
+    data: response.data.attachments,
+    endpointName:
+      '/ai-user-content/action/create-attachment-download-urls of Generation API',
   });
 };
 

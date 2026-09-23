@@ -1,0 +1,92 @@
+.attachmentsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 8px 0 8px;
+}
+
+.attachment {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  max-width: 200px;
+  padding: 0 4px 0 0;
+  border-radius: 6px;
+  background-color: var(--theme-hover-background-color);
+  overflow: hidden;
+}
+
+.attachment.errored {
+  outline: 1px solid var(--theme-error-color);
+}
+
+.attachmentThumbnail {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.attachmentThumbnail.clickable {
+  cursor: zoom-in;
+}
+
+.attachmentIcon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attachmentTexts {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.attachmentName {
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attachmentDetails {
+  font-size: 11px;
+  line-height: 14px;
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attachmentDetails.errored {
+  opacity: 1;
+  color: var(--theme-error-color);
+}
+
+.dropZone {
+  position: relative;
+}
+
+.dropZone.isDraggingFiles::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px dashed var(--theme-primary-color);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.messageImage {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 6px;
+  object-fit: contain;
+}

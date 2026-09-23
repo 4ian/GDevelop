@@ -625,6 +625,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             const {
               mode,
               userRequest,
+              attachmentIds,
               aiConfigurationPresetId,
             } = newAiRequestOptions;
             startNewAiRequest(null);
@@ -677,6 +678,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
               const aiRequest = await createAiRequest(getAuthorizationHeader, {
                 userRequest: userRequest,
+                attachmentIds,
                 userId: profile.id,
                 gameProjectJsonUserRelativeKey:
                   preparedAiUserContent.gameProjectJsonUserRelativeKey,
@@ -768,6 +770,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         async ({
           aiRequestId,
           userMessage,
+          attachmentIds,
           createdSceneNames,
           createdExternalLayoutNames,
           createdProject,
@@ -775,12 +778,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         }: {|
           aiRequestId: string,
           userMessage: string,
+          attachmentIds?: Array<string>,
           createdSceneNames?: Array<string>,
           createdExternalLayoutNames?: Array<string>,
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
         |}) => {
           if (!profile) return;
+          // Files can be sent without any text.
+          const hasUserMessage =
+            !!userMessage || !!(attachmentIds && attachmentIds.length);
 
           const aiRequestForMessage = aiRequests[aiRequestId];
           if (!aiRequestForMessage) return;
@@ -823,12 +830,12 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           }
 
           // If nothing to send, stop there.
-          if (functionCallOutputs.length === 0 && !userMessage) return;
+          if (functionCallOutputs.length === 0 && !hasUserMessage) return;
 
           // Paying with credits is only when a user message is sent (and quota is exhausted).
           let payWithCredits = false;
           if (
-            userMessage &&
+            hasUserMessage &&
             quota &&
             quota.limitReached &&
             aiRequestPriceInCredits
@@ -854,7 +861,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             // suggestions fetch so its "working" state can't keep the input
             // enabled while the real request runs.
             setIsFetchingSuggestions(false);
-            if (userMessage) setIsSendingUserMessage(true);
+            if (hasUserMessage) setIsSendingUserMessage(true);
 
             const upToDateProject = createdProject || project;
 
@@ -910,13 +917,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   : undefined,
                 payWithCredits,
                 userMessage,
+                attachmentIds,
                 // All requests made by the user are in orchestrator mode: set
                 // it (and the tools version) when a user message is sent, in
                 // case an older request made with another mode is being
                 // continued. Don't set it otherwise, as this can be a message
                 // sent to a sub-agent request (explorer or edit agent).
-                mode: userMessage ? 'orchestrator' : undefined,
-                toolsVersion: userMessage
+                mode: hasUserMessage ? 'orchestrator' : undefined,
+                toolsVersion: hasUserMessage
                   ? AI_ORCHESTRATOR_TOOLS_VERSION
                   : undefined,
               })
@@ -926,7 +934,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             setIsSendingUserMessage(false);
             clearEditorFunctionCallResults(aiRequest.id);
 
-            if (userMessage) {
+            if (hasUserMessage) {
               sendAiRequestMessageSent({
                 simplifiedProjectJsonLength: simplifiedProjectJson
                   ? simplifiedProjectJson.length
@@ -947,7 +955,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             setIsSendingUserMessage(false);
           }
 
-          if (userMessage && aiRequestId === selectedAiRequestId) {
+          if (hasUserMessage && aiRequestId === selectedAiRequestId) {
             const aiRequestChatRefCurrent = aiRequestChatRef.current;
             if (aiRequestChatRefCurrent) {
               aiRequestChatRefCurrent.resetUserInput('');
@@ -1717,13 +1725,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 onStartNewAiRequest={startNewAiRequest}
                 onSendUserMessage={async ({
                   userMessage,
+                  attachmentIds,
                 }: {|
                   userMessage: string,
+                  attachmentIds: Array<string>,
                 |}) => {
                   if (!selectedAiRequestId) return;
                   await onSendMessage({
                     aiRequestId: selectedAiRequestId,
                     userMessage,
+                    attachmentIds,
                     editorFunctionCallResults: selectedAiRequest
                       ? getEditorFunctionCallResults(selectedAiRequest.id) || []
                       : [],

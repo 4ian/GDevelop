@@ -1542,5 +1542,6 @@ export type OpenAskAiOptions = {|
 export type NewAiRequestOptions = {|
   mode: 'chat' | 'agent' | 'orchestrator',
   userRequest: string,
+  attachmentIds: Array<string>,
   aiConfigurationPresetId: string,
 |};

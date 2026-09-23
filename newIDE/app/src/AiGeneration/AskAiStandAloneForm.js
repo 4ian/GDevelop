@@ -269,7 +269,11 @@ export const AskAiStandAloneForm = ({
         // Read the options and reset them immediately to prevent the effect from firing
         // again if dependencies change during the async operations below (e.g. when
         // closeProject causes project to become null).
-        const { userRequest, aiConfigurationPresetId } = newAiRequestOptions;
+        const {
+          userRequest,
+          attachmentIds,
+          aiConfigurationPresetId,
+        } = newAiRequestOptions;
         startNewAiRequest(null);
 
         // Ensure the Ask AI pane is closed, to avoid multiple requests being sent
@@ -319,6 +323,7 @@ export const AskAiStandAloneForm = ({
 
           const aiRequest = await createAiRequest(getAuthorizationHeader, {
             userRequest: userRequest,
+            attachmentIds,
             userId: profile.id,
             gameProjectJsonUserRelativeKey:
               preparedAiUserContent.gameProjectJsonUserRelativeKey,
@@ -695,6 +700,7 @@ export const AskAiStandAloneForm = ({
           userMessage,
         }: {|
           userMessage: string,
+          attachmentIds: Array<string>,
         |}) => {
           if (!aiRequestIdForForm) return;
           await onSendMessage({

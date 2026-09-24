@@ -4745,7 +4745,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "Missing a closing bracket. Add a closing bracket for each opening bracket.");
       REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
-            "You must enter a valid expression inside the brackets.");
+            "You must enter a valid expression.");
     }
 
     SECTION("number in legacy scene variable parameter") {

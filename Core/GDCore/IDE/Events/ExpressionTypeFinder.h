@@ -27,7 +27,7 @@ class ExpressionMetadata;
 
 namespace gd {
 
-  struct TypeAndExtraInfo {
+struct TypeAndExtraInfo {
   const gd::String type;
   const gd::String extraInfo;
 };

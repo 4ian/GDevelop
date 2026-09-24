@@ -2452,6 +2452,32 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "A structure or an array is expected but this variable is a value.");
   }
 
+  SECTION("Invalid number scene variable in a collection variableOrProperty parameter (1 level)") {
+    auto node = parser.ParseExpression(
+        "MySceneVariable");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "variableOrProperty", "", "collection");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "A structure or an array is expected but this variable is a value.");
+  }
+
+  SECTION("Invalid number scene variable in a collection variableOrPropertyOrParameter parameter (1 level)") {
+    auto node = parser.ParseExpression(
+        "MySceneVariable");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "variableOrPropertyOrParameter", "", "collection");
+    node->Visit(validator);
+	  RequireNoFatalError(validator);
+	  RequireAllErrorsCount(validator, 1);
+	  REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "A structure or an array is expected but this variable is a value.");
+  }
+
   SECTION("Invalid scene variable structure in a primitive variable parameter (1 level)") {
     auto node = parser.ParseExpression(
         "MySceneStructureVariable");
@@ -4619,7 +4645,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Invalid variables") {
-    SECTION("empty variables") {
+    SECTION("empty legacy scene variable parameter") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
 
@@ -4629,6 +4655,51 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a variable name.");
     }
+
+    SECTION("empty variable parameter") {
+      auto node = parser.ParseExpression("");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a variable name.");
+    }
+
+    SECTION("empty variable parameter") {
+      auto node = parser.ParseExpression("");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a variable name.");
+    }
+
+    SECTION("empty variableOrProperty parameter") {
+      auto node = parser.ParseExpression("");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variableOrProperty");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a variable name.");
+    }
+
+    SECTION("empty variableOrPropertyOrParameter parameter") {
+      auto node = parser.ParseExpression("");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variableOrPropertyOrParameter");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a variable name.");
+    }
+
     SECTION("identifier in brackets") {
       auto node = parser.ParseExpression("myVariable[myChild]");
       REQUIRE(node != nullptr);
@@ -4639,6 +4710,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
     }
+
     SECTION("no closing bracket") {
       auto node = parser.ParseExpression("myVariable[\"myChild\"");
       REQUIRE(node != nullptr);
@@ -4649,6 +4721,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "Missing a closing bracket. Add a closing bracket for each opening bracket.");
     }
+
     SECTION("empty brackets") {
       auto node = parser.ParseExpression("myVariable[]");
       REQUIRE(node != nullptr);
@@ -4659,7 +4732,23 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "You must enter a valid expression inside the brackets.");
     }
-    SECTION("number instead") {
+
+    SECTION("empty expression after a nested bracket accessor") {
+      auto node = parser.ParseExpression(
+          "myVariable[MySceneStructureVariable[\"MyChild\"] + ]");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 2);
+      // TODO Fix empty nodes eating closing brackets.
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+            "Missing a closing bracket. Add a closing bracket for each opening bracket.");
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
+            "You must enter a valid expression inside the brackets.");
+    }
+
+    SECTION("number in legacy scene variable parameter") {
       auto node = parser.ParseExpression("1234");
       REQUIRE(node != nullptr);
 
@@ -4671,11 +4760,116 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "formula. You can only use this for structure or arrays, for "
               "example: Score[3].");
     }
-    SECTION("string instead") {
+
+    SECTION("number in variable parameter") {
+      auto node = parser.ParseExpression("1234");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[3].");
+    }
+
+    SECTION("number in variableOrProperty parameter") {
+      auto node = parser.ParseExpression("1234");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variableOrProperty");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[3].");
+    }
+
+    SECTION("number in variableOrPropertyOrParameter parameter") {
+      auto node = parser.ParseExpression("1234");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variableOrPropertyOrParameter");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[3].");
+    }
+
+    SECTION("number in object variable parameter") {
+      auto node = parser.ParseExpression("1234");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "objectvar");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[3].");
+    }
+
+    SECTION("string in legacy scene variable parameter") {
       auto node = parser.ParseExpression("\"text\"");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[\"Player1\"].");
+    }
+
+    SECTION("string in variable parameter") {
+      auto node = parser.ParseExpression("\"text\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[\"Player1\"].");
+    }
+
+    SECTION("string in variableOrProperty parameter") {
+      auto node = parser.ParseExpression("\"text\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variableOrProperty");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[\"Player1\"].");
+    }
+
+    SECTION("string in variableOrPropertyOrParameter parameter") {
+      auto node = parser.ParseExpression("\"text\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variableOrPropertyOrParameter");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "The variable name looks like you're building an expression or a "
+              "formula. You can only use this for structure or arrays, for "
+              "example: Score[\"Player1\"].");
+    }
+
+    SECTION("string in object variable parameter") {
+      auto node = parser.ParseExpression("\"text\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "objectvar");
       node->Visit(validator);
       RequireFatalErrorsCount(validator, 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
@@ -4777,12 +4971,64 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "the operator from the variable name.");
     }
 
+    SECTION("Variable with unary operator (in variableOrProperty parameter)") {
+      auto node = parser.ParseExpression("-MySceneVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "variableOrProperty");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -) can't be used in variable names. Remove "
+            "the operator from the variable name.");
+    }
+
+    SECTION("Variable with unary operator (in variableOrPropertyOrParameter parameter)") {
+      auto node = parser.ParseExpression("-MySceneVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "variableOrPropertyOrParameter");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -) can't be used in variable names. Remove "
+            "the operator from the variable name.");
+    }
+
     SECTION("Variable with operator") {
       auto node = parser.ParseExpression("MySceneVariable+MySceneVariable");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "variable");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -, /, *) can't be used in variable names. Remove "
+              "the operator from the variable name.");
+    }
+
+    SECTION("Variable with operator (in variableOrProperty parameter)") {
+      auto node = parser.ParseExpression("MySceneVariable+MySceneVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "variableOrProperty");
+      node->Visit(validator);
+      RequireFatalErrorsCount(validator, 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Operators (+, -, /, *) can't be used in variable names. Remove "
+              "the operator from the variable name.");
+    }
+
+    SECTION("Variable with operator (in variableOrPropertyOrParameter parameter)") {
+      auto node = parser.ParseExpression("MySceneVariable+MySceneVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "variableOrPropertyOrParameter");
       node->Visit(validator);
       RequireFatalErrorsCount(validator, 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==

@@ -95,6 +95,8 @@ void ExpressionValidator::ValidateLastChildVariable(
                      childNameLocation);
     }
   } else if ((parentType == Type::Variable ||
+              parentType == Type::VariableOrProperty ||
+              parentType == Type::VariableOrPropertyOrParameter ||
               parentType == Type::ObjectVariable ||
               parentType == Type::LegacyVariable) &&
              !currentParameterExtraInfo.empty() && type != Variable::Unknown) {

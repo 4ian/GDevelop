@@ -104,7 +104,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.leftHandSide->Visit(*this);
     const Type leftType = childType; // Store the type of the first operand.
 
-    if (parentType == Type::Variable || parentType == Type::ObjectVariable ||
+    if (parentType == Type::Variable ||
+        parentType == Type::VariableOrProperty ||
+        parentType == Type::VariableOrPropertyOrParameter ||
+        parentType == Type::ObjectVariable ||
         parentType == Type::LegacyVariable) {
       RaiseOperatorError(
           _("Operators (+, -, /, *) can't be used in variable names. Remove "
@@ -155,7 +158,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.factor->Visit(*this);
     const Type rightType = childType;
 
-    if (parentType == Type::Variable || parentType == Type::ObjectVariable ||
+    if (parentType == Type::Variable ||
+        parentType == Type::VariableOrProperty ||
+        parentType == Type::VariableOrPropertyOrParameter ||
+        parentType == Type::ObjectVariable ||
         parentType == Type::LegacyVariable) {
       RaiseTypeError(
           _("Operators (+, -) can't be used in variable names. Remove "
@@ -193,6 +199,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           _("You entered a number, but a text was expected (in quotes)."),
           node.location);
     } else if (parentType == Type::Variable ||
+               parentType == Type::VariableOrProperty ||
+               parentType == Type::VariableOrPropertyOrParameter ||
                parentType == Type::ObjectVariable ||
                parentType == Type::LegacyVariable) {
       RaiseTypeError(
@@ -215,6 +223,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       RaiseTypeError(_("You entered a text, but a number was expected."),
                      node.location);
     } else if (parentType == Type::Variable ||
+               parentType == Type::VariableOrProperty ||
+               parentType == Type::VariableOrPropertyOrParameter ||
                parentType == Type::ObjectVariable ||
                parentType == Type::LegacyVariable) {
       RaiseTypeError(
@@ -530,6 +540,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       message = _(
           "You must enter a text (between quotes) or a valid expression call.");
     } else if (parentType == Type::Variable ||
+               parentType == Type::VariableOrProperty ||
+               parentType == Type::VariableOrPropertyOrParameter ||
                parentType == Type::ObjectVariable ||
                parentType == Type::LegacyVariable) {
       message = _("You must enter a variable name.");

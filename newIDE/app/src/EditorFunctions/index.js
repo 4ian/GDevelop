@@ -777,14 +777,24 @@ const resolveInstanceAnchor = ({
 
   const isModelRead = !object || isModel3DObjectMeasured(object, project);
   if (!size || !isModelRead || !getAnchorOffset(anchor, size, objectSizeInfo)) {
+    const properties = object
+      ? object.getConfiguration().getProperties()
+      : null;
+    const hasNoModel =
+      !!properties &&
+      properties.has('modelResourceName') &&
+      !properties.get('modelResourceName').getValue();
+    const unknownBoxReason = isModelRead
+      ? ''
+      : hasNoModel
+      ? ' (it has no 3D model: set its `modelResourceName` property first)'
+      : ' (its 3D model could not be read)';
     return {
       success: false,
       failure: makeGenericFailure(
         `\`brush_position_anchor: "${anchor}"\` needs the box of ${
           objectName ? `"${objectName}"` : 'the object'
-        }, which is unknown${
-          isModelRead ? '' : ' (its 3D model could not be read)'
-        }. Give the instances a size with \`instances_size\`, or place them by their \`origin\` (the default anchor).`
+        }, which is unknown${unknownBoxReason}. Give the instances a size with \`instances_size\`, or place them by their \`origin\` (the default anchor).`
       ),
     };
   }
@@ -2890,6 +2900,15 @@ const changeObjectPropertiesEffects: EditorFunction = {
           });
         });
       }
+    }
+
+    // The 3D editor only sees the new properties when the objects are sent
+    // to it again.
+    if (changes.length > 0) {
+      onObjectsModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+        isNewObjectTypeUsed: false,
+      });
     }
 
     return {

@@ -2,6 +2,7 @@
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { editorFunctions, type EditorFunctionGenericOutput } from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
+import { type ObjectsOutsideEditorChanges } from './OutsideEditorChanges';
 
 const gd: libGDevelop = global.gd;
 
@@ -363,5 +364,33 @@ describe('change_object_properties_effects (effect rename, move and warnings)', 
 
     expect(result.success).toBe(false);
     expect(result.nothingChanged).toBeUndefined();
+  });
+
+  it('sends the changed object to the editors (the 3D editor included), only when something changed', async () => {
+    const onObjectsModifiedOutsideEditor = jest.fn<
+      [ObjectsOutsideEditorChanges],
+      void
+    >();
+    const changeEffect = (newEffectName: string) =>
+      editorFunctions.change_object_properties_effects.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        onObjectsModifiedOutsideEditor,
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          changed_effects: [
+            { effect_name: 'MySepia', new_effect_name: newEffectName },
+          ],
+        },
+      });
+
+    await changeEffect('MySepia');
+    expect(onObjectsModifiedOutsideEditor).not.toHaveBeenCalled();
+
+    await changeEffect('NewName');
+    expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledTimes(1);
+    expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith(
+      expect.objectContaining({ isNewObjectTypeUsed: false })
+    );
   });
 });

@@ -117,7 +117,7 @@ export const runGameplayTest: EditorFunction = {
         ),
     };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, toolsVersion }) => {
     const scope = parseScopeArgument(args.scope);
     if (!scope) return invalidScopeFailure();
     const testName = args.test_name;
@@ -130,8 +130,12 @@ export const runGameplayTest: EditorFunction = {
       typeof args.timeout_ms === 'number'
         ? Math.min(Math.max(args.timeout_ms, 1000), 120000)
         : undefined;
+    // From tools v20, screenshots are always taken: the AI sees them.
     const screenshots =
-      args.screenshots === 'on-failure' ? 'on-failure' : 'off';
+      parseInt(String(toolsVersion || '').replace('v', ''), 10) >= 20 ||
+      args.screenshots === 'on-failure'
+        ? 'on'
+        : 'off';
 
     const testsContainer = getTestsContainer(project, scope);
     if (!testsContainer) {

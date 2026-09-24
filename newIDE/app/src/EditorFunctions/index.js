@@ -66,6 +66,12 @@ import {
 } from '../ProjectCreation/CreateProject';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import {
+  type AttachmentsForResources,
+  type AttachmentResourceAddition,
+  type AttachmentResourceReplacement,
+  addOrReplaceResourcesFromAttachments,
+} from './AttachmentResources';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
 import type {
@@ -565,6 +571,7 @@ export type LaunchFunctionOptionsWithoutProject = {|
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
+  attachmentsForResources: AttachmentsForResources,
   /**
    * Returns the asset store tag for a given object type, when the type is
    * mainly meant to be picked from the asset store (e.g. premade UI objects).
@@ -725,6 +732,14 @@ const getOccupiedSpaceDescription = (
     .join(', ');
 };
 
+const isModel3DObjectWithoutModel = (object: gdObject): boolean => {
+  const properties = object.getConfiguration().getProperties();
+  return (
+    properties.has('modelResourceName') &&
+    !properties.get('modelResourceName').getValue()
+  );
+};
+
 /**
  * The anchor a `put_2d_instances`/`put_3d_instances` call asks for, checked
  * against the anchors of that brush and against what is known of the object:
@@ -770,14 +785,17 @@ const resolveInstanceAnchor = ({
 
   const isModelRead = !object || isModel3DObjectMeasured(object, project);
   if (!size || !isModelRead || !getAnchorOffset(anchor, size, objectSizeInfo)) {
+    const unknownBoxReason = isModelRead
+      ? ''
+      : object && isModel3DObjectWithoutModel(object)
+      ? ' (it has no 3D model: set its `modelResourceName` property first)'
+      : ' (its 3D model could not be read)';
     return {
       success: false,
       failure: makeGenericFailure(
         `\`brush_position_anchor: "${anchor}"\` needs the box of ${
           objectName ? `"${objectName}"` : 'the object'
-        }, which is unknown${
-          isModelRead ? '' : ' (its 3D model could not be read)'
-        }. Give the instances a size with \`instances_size\`, or place them by their \`origin\` (the default anchor).`
+        }, which is unknown${unknownBoxReason}. Give the instances a size with \`instances_size\`, or place them by their \`origin\` (the default anchor).`
       ),
     };
   }
@@ -2883,6 +2901,15 @@ const changeObjectPropertiesEffects: EditorFunction = {
           });
         });
       }
+    }
+
+    // The 3D editor only sees the new properties when the objects are sent
+    // to it again.
+    if (changes.length > 0) {
+      onObjectsModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+        isNewObjectTypeUsed: false,
+      });
     }
 
     return {
@@ -5355,12 +5382,39 @@ const put3dInstances: EditorFunction = {
       layersContainer,
     } = containers;
 
+    // An empty id would match every instance (`uuid.startsWith('')` is always
+    // true), so a trailing comma or a blank entry must never survive parsing.
+    const existingInstanceIds = existing_instance_ids
+      ? existing_instance_ids
+          .split(',')
+          .map(id => id.trim())
+          .filter(Boolean)
+      : [];
+
+    // Instances moved by their ids without `object_name` are sized (for the
+    // anchors and the space they occupy) by their object, when they share one.
+    const existingInstancesObjectNames = new Set<string>();
+    if (!object_name && existingInstanceIds.length > 0) {
+      iterateOnInstances(initialInstances, instance => {
+        if (
+          existingInstanceIds.some(id =>
+            instance.getPersistentUuid().startsWith(id)
+          )
+        )
+          existingInstancesObjectNames.add(instance.getObjectName());
+      });
+    }
+    const sizedObjectName =
+      object_name ||
+      (existingInstancesObjectNames.size === 1
+        ? Array.from(existingInstancesObjectNames)[0]
+        : null);
     const namedObject: gdObject | null =
-      (object_name &&
+      (sizedObjectName &&
         getObjectByName(
           globalObjectsContainer,
           objectsContainer,
-          object_name
+          sizedObjectName
         )) ||
       null;
     if (namedObject)
@@ -5390,15 +5444,6 @@ const put3dInstances: EditorFunction = {
         layersContainer
       );
     }
-
-    // An empty id would match every instance (`uuid.startsWith('')` is always
-    // true), so a trailing comma or a blank entry must never survive parsing.
-    const existingInstanceIds = existing_instance_ids
-      ? existing_instance_ids
-          .split(',')
-          .map(id => id.trim())
-          .filter(Boolean)
-      : [];
 
     if (brush_kind === 'erase') {
       const brushPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
@@ -5512,8 +5557,10 @@ const put3dInstances: EditorFunction = {
           .filter(Boolean)
           .join(' '),
       };
-      if (object_name && objectSizeInfo)
-        injectObjectSizeInfo(eraseResult, { [object_name]: objectSizeInfo });
+      if (sizedObjectName && objectSizeInfo)
+        injectObjectSizeInfo(eraseResult, {
+          [sizedObjectName]: objectSizeInfo,
+        });
       return eraseResult;
     } else {
       // An explicit `new_instances_count: 0` with no instances to modify means
@@ -5549,7 +5596,7 @@ const put3dInstances: EditorFunction = {
         args,
         allowedAnchors: INSTANCE_ANCHORS_3D,
         object: namedObject,
-        objectName: object_name,
+        objectName: sizedObjectName,
         project,
         objectSizeInfo,
         size: effectiveSize,
@@ -5945,10 +5992,29 @@ const put3dInstances: EditorFunction = {
       }
 
       if (movedPositionCount > 0) {
+        // Where a single moved instance ends up, so a wrong height (sunk or
+        // floating) shows without another describe_instances call.
+        const movedInstances = Array.from(existingInstanceStates.keys());
+        let occupiedSpace = '';
+        if (movedInstances.length === 1 && effectiveSize) {
+          const movedInstance = movedInstances[0];
+          const position = [
+            movedInstance.getX(),
+            movedInstance.getY(),
+            movedInstance.getZ(),
+          ];
+          occupiedSpace = ` (origin at ${position
+            .map(roundPosition)
+            .join(', ')}, it occupies ${getOccupiedSpaceDescription(
+            position,
+            getInstanceSize(movedInstance, effectiveSize),
+            objectSizeInfo
+          )})`;
+        }
         changes.push(
           `Repositioned ${movedPositionCount} instance${
             movedPositionCount > 1 ? 's' : ''
-          }${ofObjectsSuffix} using ${brush_kind} brush.`
+          }${ofObjectsSuffix} using ${brush_kind} brush${occupiedSpace}.`
         );
       }
 
@@ -6065,12 +6131,23 @@ const put3dInstances: EditorFunction = {
       onInstancesModifiedOutsideEditor({
         ...getOutsideEditorChangesTarget(resolvedScope),
       });
+      if (
+        namedObject &&
+        (newInstancesCount > 0 || movedPositionCount > 0) &&
+        isModel3DObjectWithoutModel(namedObject)
+      ) {
+        changes.push(
+          `"${namedObject.getName()}" has no 3D model yet: it shows as a box and its size is unknown. Set its \`modelResourceName\` property.`
+        );
+      }
       const put3dResult: EditorFunctionGenericOutput = {
         success: true,
         message: changes.join(' '),
       };
-      if (object_name && objectSizeInfo)
-        injectObjectSizeInfo(put3dResult, { [object_name]: objectSizeInfo });
+      if (sizedObjectName && objectSizeInfo)
+        injectObjectSizeInfo(put3dResult, {
+          [sizedObjectName]: objectSizeInfo,
+        });
       return put3dResult;
     }
   },
@@ -7734,6 +7811,28 @@ const applyEffectChange = ({
       }
 
       const lowercasedType = foundProperty.getType().toLowerCase();
+      if (lowercasedType === 'resource' && newValue) {
+        const resourcesManager = project.getResourcesManager();
+        if (!resourcesManager.hasResource(newValue)) {
+          warnings.push(
+            `"${propertyName}" of the "${currentEffectName}" effect -> "${newValue}": no such resource in the project (resources are listed by \`inspect_project_properties_resources\`, a file attached by the user must first be added with \`change_project_properties_resources\`). Skipped.`
+          );
+          return;
+        }
+        const expectedResourceKind = (
+          foundProperty.getExtraInfo().toJSArray()[0] || ''
+        ).toLowerCase();
+        const resourceKind = resourcesManager.getResource(newValue).getKind();
+        if (
+          expectedResourceKind &&
+          resourceKind.toLowerCase() !== expectedResourceKind
+        ) {
+          warnings.push(
+            `"${propertyName}" of the "${currentEffectName}" effect -> "${newValue}": the resource has kind "${resourceKind}" but expected "${expectedResourceKind}". Skipped.`
+          );
+          return;
+        }
+      }
       if (lowercasedType === 'number') {
         effect.setDoubleParameter(propertyName, parseFloat(newValue) || 0);
       } else if (lowercasedType === 'boolean') {
@@ -9363,6 +9462,24 @@ const changeProjectPropertiesResources: EditorFunction = {
       (changed_properties && changed_properties.length) || 0;
     const changedResourcesCount =
       (changed_resources && changed_resources.length) || 0;
+    const added_resources = SafeExtractor.extractArrayProperty(
+      args,
+      'added_resources'
+    );
+
+    if (added_resources && added_resources.length > 0) {
+      return {
+        text:
+          added_resources.length === 1 ? (
+            <Trans>Add an attached file to the project resources.</Trans>
+          ) : (
+            <Trans>
+              Add {added_resources.length} attached files to the project
+              resources.
+            </Trans>
+          ),
+      };
+    }
 
     if (changedPropertiesCount > 0 && changedResourcesCount > 0) {
       return {
@@ -9380,8 +9497,17 @@ const changeProjectPropertiesResources: EditorFunction = {
           changed_resources[0],
           'delete_this_resource'
         );
+        const replacingAttachmentId = SafeExtractor.extractStringProperty(
+          changed_resources[0],
+          'replace_file_with_attachment_id'
+        );
         return {
-          text: deleteThisResource ? (
+          text: replacingAttachmentId ? (
+            <Trans>
+              Replace the file of resource <b>{resourceName}</b> by an attached
+              file.
+            </Trans>
+          ) : deleteThisResource ? (
             <Trans>
               Remove resource <b>{resourceName}</b>.
             </Trans>
@@ -9415,7 +9541,12 @@ const changeProjectPropertiesResources: EditorFunction = {
       text: <Trans>Change {changedPropertiesCount} project properties.</Trans>,
     };
   },
-  launchFunction: async ({ project, args, toolsVersion }) => {
+  launchFunction: async ({
+    project,
+    args,
+    toolsVersion,
+    attachmentsForResources,
+  }) => {
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
       'changed_properties'
@@ -9424,17 +9555,53 @@ const changeProjectPropertiesResources: EditorFunction = {
       args,
       'changed_resources'
     );
+    const added_resources = SafeExtractor.extractArrayProperty(
+      args,
+      'added_resources'
+    );
     if (
       (!changed_properties || changed_properties.length === 0) &&
-      (!changed_resources || changed_resources.length === 0)
+      (!changed_resources || changed_resources.length === 0) &&
+      (!added_resources || added_resources.length === 0)
     ) {
       return makeGenericFailure(
-        'Missing or empty "changed_properties" and "changed_resources" arguments: at least one change must be provided.'
+        'Missing or empty "changed_properties", "changed_resources" and "added_resources" arguments: at least one change must be provided.'
       );
     }
 
     const changes = [];
     const warnings = [];
+    const attachmentResourceAdditions: Array<AttachmentResourceAddition> = [];
+    const attachmentResourceReplacements: Array<AttachmentResourceReplacement> = [];
+
+    if (added_resources)
+      added_resources.forEach(added_resource => {
+        const attachmentId = SafeExtractor.extractStringProperty(
+          added_resource,
+          'attachment_id'
+        );
+        if (!attachmentId) {
+          warnings.push(
+            `Missing "attachment_id" in added_resources item: ${JSON.stringify(
+              added_resource
+            )}. Skipped.`
+          );
+          return;
+        }
+        attachmentResourceAdditions.push({
+          attachmentId,
+          resourceName:
+            SafeExtractor.extractStringProperty(
+              added_resource,
+              'resource_name'
+            ) || null,
+          resourceKind:
+            SafeExtractor.extractStringProperty(
+              added_resource,
+              'resource_kind'
+            ) || null,
+        });
+      });
 
     if (changed_properties)
       changed_properties.forEach(changed_property => {
@@ -9646,6 +9813,18 @@ const changeProjectPropertiesResources: EditorFunction = {
           return;
         }
 
+        const replacingAttachmentId = SafeExtractor.extractStringProperty(
+          changed_resource,
+          'replace_file_with_attachment_id'
+        );
+        if (replacingAttachmentId) {
+          attachmentResourceReplacements.push({
+            attachmentId: replacingAttachmentId,
+            resourceName,
+          });
+          return;
+        }
+
         const resourcesManager = project.getResourcesManager();
         if (!resourcesManager.hasResource(resourceName)) {
           warnings.push(
@@ -9738,6 +9917,22 @@ const changeProjectPropertiesResources: EditorFunction = {
           `Renamed resource "${resourceName}" to "${newResourceName}" (objects and events using it were updated).`
         );
       });
+
+    if (
+      attachmentResourceAdditions.length > 0 ||
+      attachmentResourceReplacements.length > 0
+    ) {
+      const resourceChangesFromAttachments = await addOrReplaceResourcesFromAttachments(
+        {
+          project,
+          additions: attachmentResourceAdditions,
+          replacements: attachmentResourceReplacements,
+          attachmentsForResources,
+        }
+      );
+      changes.push(...resourceChangesFromAttachments.changes);
+      warnings.push(...resourceChangesFromAttachments.warnings);
+    }
 
     return makeMultipleChangesOutput(changes, warnings, toolsVersion);
   },

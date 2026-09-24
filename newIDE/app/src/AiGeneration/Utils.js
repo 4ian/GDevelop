@@ -50,6 +50,7 @@ import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
 import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
 import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
+import { useAttachmentsForResources } from './AiAttachments/UseAttachmentsForResources';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
 import { ObjectStoreContext } from '../AssetStore/ObjectStoreContext';
@@ -111,10 +112,7 @@ export const useRefreshLimits = (
 // The tools of the orchestrator AND of the sub-agents it creates server-side.
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
-// v14 adds gameplay tests (`run_tests` + the tester sub-agent).
-// v15 makes read_game_project_json a live, editor-side read (backend stops
-// overwriting its output) and exposes it to the edit/explorer script agents.
-export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v19';
+export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v20';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying
@@ -241,6 +239,7 @@ const getEditApprovalLabel = ({
 export const useProcessFunctionCalls = ({
   i18n,
   project,
+  fileMetadata,
   resourceManagementProps,
   editorCallbacks,
   aiRequestsToProcess,
@@ -267,6 +266,7 @@ export const useProcessFunctionCalls = ({
 }: {|
   i18n: I18nType,
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
   resourceManagementProps: ResourceManagementProps,
   editorCallbacks: EditorCallbacks,
   aiRequestsToProcess: Array<AiRequest>,
@@ -339,6 +339,10 @@ export const useProcessFunctionCalls = ({
   const { searchAndInstallResources } = useSearchAndInstallResource({
     project,
     resourceManagementProps,
+  });
+  const attachmentsForResources = useAttachmentsForResources({
+    resourceManagementProps,
+    fileMetadata,
   });
   const { generateEvents } = useGenerateEvents({ project });
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
@@ -716,6 +720,7 @@ export const useProcessFunctionCalls = ({
           onExtensionInstalled,
           searchAndInstallAsset,
           searchAndInstallResources,
+          attachmentsForResources,
           getAssetStoreTagForNewObject,
         });
 
@@ -786,6 +791,7 @@ export const useProcessFunctionCalls = ({
       onExtensionInstalled,
       searchAndInstallAsset,
       searchAndInstallResources,
+      attachmentsForResources,
       getAssetStoreTagForNewObject,
       generateEvents,
       onSendEditorFunctionCallResults,
@@ -1542,5 +1548,6 @@ export type OpenAskAiOptions = {|
 export type NewAiRequestOptions = {|
   mode: 'chat' | 'agent' | 'orchestrator',
   userRequest: string,
+  attachmentIds: Array<string>,
   aiConfigurationPresetId: string,
 |};

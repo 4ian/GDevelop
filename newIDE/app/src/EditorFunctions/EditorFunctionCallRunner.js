@@ -33,6 +33,7 @@ import {
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { normalizeLegacyArguments } from './Scope';
+import { type AttachmentsForResources } from './AttachmentResources';
 
 type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
@@ -90,6 +91,7 @@ type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
+  attachmentsForResources: AttachmentsForResources,
   getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
 
@@ -121,6 +123,7 @@ export const processEditorFunctionCalls = async ({
   onExtensionInstalled,
   searchAndInstallAsset,
   searchAndInstallResources,
+  attachmentsForResources,
   getAssetStoreTagForNewObject,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
@@ -252,6 +255,7 @@ export const processEditorFunctionCalls = async ({
         onExtensionInstalled,
         searchAndInstallAsset,
         searchAndInstallResources,
+        attachmentsForResources,
         getAssetStoreTagForNewObject,
         PixiResourcesLoader,
       };

@@ -464,6 +464,46 @@ export const ReadyAiRequest = (): React.Node => (
   />
 );
 
+// Files attached by the user (the image is not in this session, nor
+// downloadable: it shows as a file).
+export const ReadyAiRequestWithAttachments = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={{
+      ...fakeAiRequest,
+      output: [
+        {
+          type: 'message',
+          status: 'completed',
+          role: 'user',
+          content: [
+            {
+              type: 'user_request',
+              status: 'completed',
+              text: 'Use my logo on the title screen, and this music.',
+            },
+          ],
+          attachments: [
+            {
+              attachmentId: '01ARZ3NDEKTSV4RRFFQ69G5FAV',
+              name: 'logo.png',
+              mimeType: 'image/png',
+              size: 34000,
+              readableAs: 'image',
+            },
+            {
+              attachmentId: '01ARZ3NDEKTSV4RRFFQ69G5FAW',
+              name: 'title-screen-music.ogg',
+              mimeType: 'audio/ogg',
+              size: 1200000,
+              readableAs: null,
+            },
+          ],
+        },
+      ],
+    }}
+  />
+);
+
 export const ReadyAiRequestWithAiResponses = (): React.Node => (
   <WrappedChatComponent aiRequest={aiRequestWithAiResponses} />
 );

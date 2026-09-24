@@ -4870,7 +4870,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             onStartSaving: () =>
               _replaceSnackMessage(i18n._(t`Saving...`), null),
             onMoveResources: async ({ newFileMetadata }) => {
-              if (currentFileMetadata)
+              if (currentFileMetadata) {
                 await ensureResourcesAreMoved({
                   project: upToDateProject,
                   newFileMetadata,
@@ -4881,6 +4881,16 @@ const MainFrame = (props: Props): React.MixedElement => {
                   oldStorageProviderOperations,
                   authenticatedUser,
                 });
+              }
+              // Resources can be only in memory (files added by the AI in a
+              // project not saved yet, or opened from a URL): store them.
+              await ensureResourcesAreFetched(() => ({
+                project: upToDateProject,
+                fileMetadata: newFileMetadata,
+                storageProvider: newStorageProvider,
+                storageProviderOperations: newStorageProviderOperations,
+                authenticatedUser,
+              }));
             },
           }
         );
@@ -4977,6 +4987,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       getStorageProvider,
       preferences,
       ensureResourcesAreMoved,
+      ensureResourcesAreFetched,
       authenticatedUser,
       currentlyRunningInAppTutorial,
       showAlert,

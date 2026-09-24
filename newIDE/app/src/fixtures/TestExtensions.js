@@ -496,9 +496,28 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     const Model3DObject = new gd.ObjectJsImplementation();
     // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]
-    Model3DObject.getProperties = function(objectContent) {
+    // $FlowFixMe[missing-this-annot]
+    Model3DObject.updateProperty = function(propertyName, newValue) {
+      if (propertyName !== 'modelResourceName') return false;
+      this.content.modelResourceName = newValue;
+      return true;
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    // $FlowFixMe[missing-this-annot]
+    Model3DObject.getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
+      objectProperties
+        .getOrCreate('modelResourceName')
+        .setValue(this.content.modelResourceName)
+        .setType('resource')
+        .setLabel('3D model');
       return objectProperties;
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[prop-missing]
+    Model3DObject.content = {
+      modelResourceName: '',
     };
     // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]

@@ -64,6 +64,10 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
       ],
     });
   },
+  attachmentsForResources: {
+    getFiles: async () => ({}),
+    storeResourceFiles: async () => true,
+  },
   onObjectsModifiedOutsideEditor: jest.fn(),
   onWillDeleteScene: jest.fn(),
   onWillDeleteGameplayTest: jest.fn(),

@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import {
   type AiRequestAttachment,
-  createAiAttachmentDownloadUrls,
+  createAiAttachmentDownloads,
 } from '../../Utils/GDevelopServices/Generation';
 import { getFileOfUploadedAttachment } from './AiAttachmentsUpload';
 import { AiAttachmentChip } from './AiAttachmentChip';
@@ -39,17 +39,19 @@ const useImageUrls = (attachments: Array<AiRequestAttachment>): ImageUrls => {
 
       let isMounted = true;
       if (attachmentIdsToDownload.length && profile) {
-        createAiAttachmentDownloadUrls(getAuthorizationHeader, {
+        createAiAttachmentDownloads(getAuthorizationHeader, {
           userId: profile.id,
           attachmentIds: attachmentIdsToDownload,
         }).then(
-          downloads => {
+          attachmentDownloads => {
             if (!isMounted) return;
             const downloadedImageUrls: ImageUrls = {};
-            downloads.forEach(download => {
-              downloadedImageUrls[download.attachmentId] = download.error
+            attachmentDownloads.forEach(attachmentDownload => {
+              downloadedImageUrls[
+                attachmentDownload.attachmentId
+              ] = attachmentDownload.error
                 ? null
-                : download.previewUrl;
+                : attachmentDownload.previewUrl;
             });
             setImageUrls(currentImageUrls => ({
               ...currentImageUrls,

@@ -948,19 +948,21 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 outputLength: aiRequest.output ? aiRequest.output.length : 0,
               });
             }
+
+            // Only once sent: the text and the files stay to send them again
+            // after an error.
+            if (hasUserMessage && aiRequestId === selectedAiRequestId) {
+              const aiRequestChatRefCurrent = aiRequestChatRef.current;
+              if (aiRequestChatRefCurrent) {
+                aiRequestChatRefCurrent.resetUserInput('');
+                aiRequestChatRefCurrent.resetUserInput(aiRequestId);
+              }
+            }
           } catch (error) {
             console.error('Error while sending AI request message:', error);
             // TODO: update the label of the button to send again.
             setLastSendError(aiRequestId, error);
             setIsSendingUserMessage(false);
-          }
-
-          if (hasUserMessage && aiRequestId === selectedAiRequestId) {
-            const aiRequestChatRefCurrent = aiRequestChatRef.current;
-            if (aiRequestChatRefCurrent) {
-              aiRequestChatRefCurrent.resetUserInput('');
-              aiRequestChatRefCurrent.resetUserInput(aiRequestId);
-            }
           }
 
           // Refresh the user limits, to ensure quota and credits information

@@ -1158,14 +1158,14 @@ export type AiAttachmentUpload = {|
   visionCopyUploadUrl: string | null,
 |};
 
-export const createAiAttachmentUploadUrls = async (
+export const createAiAttachmentUploads = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
-    attachments,
+    files,
   }: {|
     userId: string,
-    attachments: Array<{|
+    files: Array<{|
       name: string,
       mimeType: string,
       size: number,
@@ -1175,17 +1175,17 @@ export const createAiAttachmentUploadUrls = async (
 ): Promise<Array<AiAttachmentUpload>> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
-    `/ai-user-content/action/create-attachment-upload-urls`,
-    { attachments },
+    `/ai-user-content/action/create-attachment-uploads`,
+    { files },
     {
       params: { userId },
       headers: { Authorization: authorizationHeader },
     }
   );
   return ensureIsArray({
-    data: response.data.attachments,
+    data: response.data.attachmentUploads,
     endpointName:
-      '/ai-user-content/action/create-attachment-upload-urls of Generation API',
+      '/ai-user-content/action/create-attachment-uploads of Generation API',
   });
 };
 
@@ -1201,7 +1201,7 @@ export type AiAttachmentDownload =
     |}
   | {| attachmentId: string, error: 'not-found' |};
 
-export const createAiAttachmentDownloadUrls = async (
+export const createAiAttachmentDownloads = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
@@ -1213,7 +1213,7 @@ export const createAiAttachmentDownloadUrls = async (
 ): Promise<Array<AiAttachmentDownload>> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
-    `/ai-user-content/action/create-attachment-download-urls`,
+    `/ai-user-content/action/create-attachment-downloads`,
     { attachmentIds },
     {
       params: { userId },
@@ -1221,9 +1221,9 @@ export const createAiAttachmentDownloadUrls = async (
     }
   );
   return ensureIsArray({
-    data: response.data.attachments,
+    data: response.data.attachmentDownloads,
     endpointName:
-      '/ai-user-content/action/create-attachment-download-urls of Generation API',
+      '/ai-user-content/action/create-attachment-downloads of Generation API',
   });
 };
 

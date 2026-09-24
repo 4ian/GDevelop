@@ -91,7 +91,7 @@ type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
-  attachments: AttachmentsForResources,
+  attachmentsForResources: AttachmentsForResources,
   getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
 
@@ -123,7 +123,7 @@ export const processEditorFunctionCalls = async ({
   onExtensionInstalled,
   searchAndInstallAsset,
   searchAndInstallResources,
-  attachments,
+  attachmentsForResources,
   getAssetStoreTagForNewObject,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
@@ -255,7 +255,7 @@ export const processEditorFunctionCalls = async ({
         onExtensionInstalled,
         searchAndInstallAsset,
         searchAndInstallResources,
-        attachments,
+        attachmentsForResources,
         getAssetStoreTagForNewObject,
         PixiResourcesLoader,
       };

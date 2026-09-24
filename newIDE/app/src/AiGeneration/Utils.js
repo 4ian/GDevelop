@@ -112,11 +112,6 @@ export const useRefreshLimits = (
 // The tools of the orchestrator AND of the sub-agents it creates server-side.
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
-// v14 adds gameplay tests (`run_tests` + the tester sub-agent).
-// v15 makes read_game_project_json a live, editor-side read (backend stops
-// overwriting its output) and exposes it to the edit/explorer script agents.
-// v20 shows images to the AI (files attached by the user, gameplay test
-// screenshots) and lets it add attached files to the project resources.
 export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v20';
 
 /**
@@ -345,7 +340,7 @@ export const useProcessFunctionCalls = ({
     project,
     resourceManagementProps,
   });
-  const attachments = useAttachmentsForResources({
+  const attachmentsForResources = useAttachmentsForResources({
     resourceManagementProps,
     fileMetadata,
   });
@@ -725,7 +720,7 @@ export const useProcessFunctionCalls = ({
           onExtensionInstalled,
           searchAndInstallAsset,
           searchAndInstallResources,
-          attachments,
+          attachmentsForResources,
           getAssetStoreTagForNewObject,
         });
 
@@ -796,7 +791,7 @@ export const useProcessFunctionCalls = ({
       onExtensionInstalled,
       searchAndInstallAsset,
       searchAndInstallResources,
-      attachments,
+      attachmentsForResources,
       getAssetStoreTagForNewObject,
       generateEvents,
       onSendEditorFunctionCallResults,

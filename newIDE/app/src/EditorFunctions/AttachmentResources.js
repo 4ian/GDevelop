@@ -61,17 +61,17 @@ export const addOrReplaceResourcesFromAttachments = async ({
   project,
   additions,
   replacements,
-  attachments,
+  attachmentsForResources,
 }: {|
   project: gdProject,
   additions: Array<AttachmentResourceAddition>,
   replacements: Array<AttachmentResourceReplacement>,
-  attachments: AttachmentsForResources,
+  attachmentsForResources: AttachmentsForResources,
 |}): Promise<{| changes: Array<string>, warnings: Array<string> |}> => {
   const changes = [];
   const warnings = [];
   const resourcesManager = project.getResourcesManager();
-  const files = await attachments.getFiles([
+  const files = await attachmentsForResources.getFiles([
     ...additions.map(({ attachmentId }) => attachmentId),
     ...replacements.map(({ attachmentId }) => attachmentId),
   ]);
@@ -187,7 +187,7 @@ export const addOrReplaceResourcesFromAttachments = async ({
 
   if (!appliedChanges.length) return { changes, warnings };
 
-  const areFilesStored = await attachments.storeResourceFiles();
+  const areFilesStored = await attachmentsForResources.storeResourceFiles();
   appliedChanges.forEach(
     ({ resourceName, blobUrl, previousFile, description }) => {
       const resource = resourcesManager.getResource(resourceName);

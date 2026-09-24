@@ -411,7 +411,7 @@ describe('change_project_properties_resources', () => {
     ) =>
       editorFunctions.change_project_properties_resources.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),
-        attachments: {
+        attachmentsForResources: {
           getFiles: async attachmentIds => {
             const files: { [attachmentId: string]: ?File } = {};
             attachmentIds.forEach(attachmentId => {

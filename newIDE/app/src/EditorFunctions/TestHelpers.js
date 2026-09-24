@@ -64,7 +64,7 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
       ],
     });
   },
-  attachments: {
+  attachmentsForResources: {
     getFiles: async () => ({}),
     storeResourceFiles: async () => true,
   },

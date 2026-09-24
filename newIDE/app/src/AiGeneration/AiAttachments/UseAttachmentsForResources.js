@@ -2,7 +2,8 @@
 import * as React from 'react';
 import axios from 'axios';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { createAiAttachmentDownloadUrls } from '../../Utils/GDevelopServices/Generation';
+import { createAiAttachmentDownloads } from '../../Utils/GDevelopServices/Generation';
+import { MAX_ATTACHMENTS_PER_MESSAGE } from './UseAiAttachmentDrafts';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { type FileMetadata } from '../../ProjectsStorage';
 import { type AttachmentsForResources } from '../../EditorFunctions/AttachmentResources';
@@ -37,31 +38,44 @@ export const useAttachmentsForResources = ({
     async (attachmentIds: Array<string>) => {
       const files: { [attachmentId: string]: ?File } = {};
       const attachmentIdsToDownload = [];
-      attachmentIds.forEach(attachmentId => {
+      new Set(attachmentIds).forEach(attachmentId => {
         const file = getFileOfUploadedAttachment(attachmentId);
         if (file) files[attachmentId] = file;
         else attachmentIdsToDownload.push(attachmentId);
       });
-      if (!attachmentIdsToDownload.length || !profile) return files;
+      if (!profile) return files;
 
-      const downloads = await createAiAttachmentDownloadUrls(
-        getAuthorizationHeader,
-        { userId: profile.id, attachmentIds: attachmentIdsToDownload }
-      );
-      await Promise.all(
-        downloads.map(async download => {
-          if (download.error) return;
-          try {
-            files[download.attachmentId] = await downloadFile({
-              url: download.url,
-              name: download.name,
-              mimeType: download.mimeType,
-            });
-          } catch (error) {
-            console.error('Unable to download an attachment:', error);
+      // The API gives the downloads of a few attachments at a time.
+      for (
+        let index = 0;
+        index < attachmentIdsToDownload.length;
+        index += MAX_ATTACHMENTS_PER_MESSAGE
+      ) {
+        const attachmentDownloads = await createAiAttachmentDownloads(
+          getAuthorizationHeader,
+          {
+            userId: profile.id,
+            attachmentIds: attachmentIdsToDownload.slice(
+              index,
+              index + MAX_ATTACHMENTS_PER_MESSAGE
+            ),
           }
-        })
-      );
+        );
+        await Promise.all(
+          attachmentDownloads.map(async attachmentDownload => {
+            if (attachmentDownload.error) return;
+            try {
+              files[attachmentDownload.attachmentId] = await downloadFile({
+                url: attachmentDownload.url,
+                name: attachmentDownload.name,
+                mimeType: attachmentDownload.mimeType,
+              });
+            } catch (error) {
+              console.error('Unable to download an attachment:', error);
+            }
+          })
+        );
+      }
       return files;
     },
     [profile, getAuthorizationHeader]

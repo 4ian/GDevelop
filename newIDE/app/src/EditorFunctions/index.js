@@ -571,7 +571,7 @@ export type LaunchFunctionOptionsWithoutProject = {|
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
-  attachments: AttachmentsForResources,
+  attachmentsForResources: AttachmentsForResources,
   /**
    * Returns the asset store tag for a given object type, when the type is
    * mainly meant to be picked from the asset store (e.g. premade UI objects).
@@ -9471,7 +9471,12 @@ const changeProjectPropertiesResources: EditorFunction = {
       text: <Trans>Change {changedPropertiesCount} project properties.</Trans>,
     };
   },
-  launchFunction: async ({ project, args, toolsVersion, attachments }) => {
+  launchFunction: async ({
+    project,
+    args,
+    toolsVersion,
+    attachmentsForResources,
+  }) => {
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
       'changed_properties'
@@ -9847,14 +9852,16 @@ const changeProjectPropertiesResources: EditorFunction = {
       attachmentResourceAdditions.length > 0 ||
       attachmentResourceReplacements.length > 0
     ) {
-      const attachmentResult = await addOrReplaceResourcesFromAttachments({
-        project,
-        additions: attachmentResourceAdditions,
-        replacements: attachmentResourceReplacements,
-        attachments,
-      });
-      changes.push(...attachmentResult.changes);
-      warnings.push(...attachmentResult.warnings);
+      const resourceChangesFromAttachments = await addOrReplaceResourcesFromAttachments(
+        {
+          project,
+          additions: attachmentResourceAdditions,
+          replacements: attachmentResourceReplacements,
+          attachmentsForResources,
+        }
+      );
+      changes.push(...resourceChangesFromAttachments.changes);
+      warnings.push(...resourceChangesFromAttachments.warnings);
     }
 
     return makeMultipleChangesOutput(changes, warnings, toolsVersion);

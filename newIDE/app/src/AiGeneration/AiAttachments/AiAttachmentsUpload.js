@@ -1,6 +1,6 @@
 // @flow
 import axios from 'axios';
-import { createAiAttachmentUploadUrls } from '../../Utils/GDevelopServices/Generation';
+import { createAiAttachmentUploads } from '../../Utils/GDevelopServices/Generation';
 
 // Beyond this, images are downscaled for the AI (the original is kept, to be
 // added to the project).
@@ -92,20 +92,23 @@ export const uploadAiAttachment = async ({
 |}): Promise<string> => {
   const mimeType = file.type || 'application/octet-stream';
   const visionCopy = await makeVisionCopy(file);
-  const [upload] = await createAiAttachmentUploadUrls(getAuthorizationHeader, {
-    userId,
-    attachments: [
-      {
-        name: file.name,
-        mimeType,
-        size: file.size,
-        visionCopy: visionCopy
-          ? { mimeType: visionCopy.type, size: visionCopy.size }
-          : null,
-      },
-    ],
-  });
-  const { attachmentId, uploadUrl, visionCopyUploadUrl } = upload;
+  const [attachmentUpload] = await createAiAttachmentUploads(
+    getAuthorizationHeader,
+    {
+      userId,
+      files: [
+        {
+          name: file.name,
+          mimeType,
+          size: file.size,
+          visionCopy: visionCopy
+            ? { mimeType: visionCopy.type, size: visionCopy.size }
+            : null,
+        },
+      ],
+    }
+  );
+  const { attachmentId, uploadUrl, visionCopyUploadUrl } = attachmentUpload;
   await Promise.all([
     axios.put<mixed>(uploadUrl, file, {
       headers: { 'Content-Type': mimeType },

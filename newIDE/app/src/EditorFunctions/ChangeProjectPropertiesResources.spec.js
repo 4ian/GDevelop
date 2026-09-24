@@ -382,14 +382,16 @@ describe('change_project_properties_resources', () => {
   });
 
   describe('files attached by the user', () => {
-    // The browser `File`, not exposed by the test environment.
-    const { File: NodeFile } = require('buffer');
-    const logoFile = new NodeFile(['fake png'], 'logo.png', {
-      type: 'image/png',
-    });
-    const fontFile = new NodeFile(['fake ttf'], 'title.ttf', {
-      type: 'font/ttf',
-    });
+    // The browser `File` is not in the test environment (nor in Node 16):
+    // a named Blob is what is read of it.
+    const { Blob: NodeBlob } = require('buffer');
+    const makeFile = (content: string, name: string, type: string) => {
+      const file = new NodeBlob([content], { type });
+      file.name = name;
+      return file;
+    };
+    const logoFile = makeFile('fake png', 'logo.png', 'image/png');
+    const fontFile = makeFile('fake ttf', 'title.ttf', 'font/ttf');
 
     /** Stores the in-memory files like the cloud or local storage would. */
     const storeResourceFilesInProject = async () => {

@@ -609,3 +609,56 @@ describe('put_3d_instances (brush_position_anchor)', () => {
     );
   });
 });
+
+describe('put_3d_instances (3D model objects)', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    makeTestExtensions(gd);
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+    testScene
+      .getObjects()
+      .insertNewObject(project, 'FakeScene3D::Model3DObject', 'Chicken', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const putChicken = async () =>
+    await editorFunctions.put_3d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Chicken',
+        layer_name: '',
+        brush_kind: 'point',
+        brush_position: '0,0,0',
+      },
+    });
+
+  it('warns when the object has no 3D model yet', async () => {
+    const result = await putChicken();
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      '"Chicken" has no 3D model yet: it shows as a box and its size is unknown. Set its `modelResourceName` property.'
+    );
+  });
+
+  it('does not warn once the object has its 3D model', async () => {
+    testScene
+      .getObjects()
+      .getObject('Chicken')
+      .getConfiguration()
+      .updateProperty('modelResourceName', 'Chicken.glb');
+
+    const result = await putChicken();
+
+    expect(result.success).toBe(true);
+    expect(result.message).not.toContain('has no 3D model yet');
+  });
+});

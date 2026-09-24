@@ -732,6 +732,14 @@ const getOccupiedSpaceDescription = (
     .join(', ');
 };
 
+const isModel3DObjectWithoutModel = (object: gdObject): boolean => {
+  const properties = object.getConfiguration().getProperties();
+  return (
+    properties.has('modelResourceName') &&
+    !properties.get('modelResourceName').getValue()
+  );
+};
+
 /**
  * The anchor a `put_2d_instances`/`put_3d_instances` call asks for, checked
  * against the anchors of that brush and against what is known of the object:
@@ -777,16 +785,9 @@ const resolveInstanceAnchor = ({
 
   const isModelRead = !object || isModel3DObjectMeasured(object, project);
   if (!size || !isModelRead || !getAnchorOffset(anchor, size, objectSizeInfo)) {
-    const properties = object
-      ? object.getConfiguration().getProperties()
-      : null;
-    const hasNoModel =
-      !!properties &&
-      properties.has('modelResourceName') &&
-      !properties.get('modelResourceName').getValue();
     const unknownBoxReason = isModelRead
       ? ''
-      : hasNoModel
+      : object && isModel3DObjectWithoutModel(object)
       ? ' (it has no 3D model: set its `modelResourceName` property first)'
       : ' (its 3D model could not be read)';
     return {
@@ -6130,6 +6131,15 @@ const put3dInstances: EditorFunction = {
       onInstancesModifiedOutsideEditor({
         ...getOutsideEditorChangesTarget(resolvedScope),
       });
+      if (
+        namedObject &&
+        (newInstancesCount > 0 || movedPositionCount > 0) &&
+        isModel3DObjectWithoutModel(namedObject)
+      ) {
+        changes.push(
+          `"${namedObject.getName()}" has no 3D model yet: it shows as a box and its size is unknown. Set its \`modelResourceName\` property.`
+        );
+      }
       const put3dResult: EditorFunctionGenericOutput = {
         success: true,
         message: changes.join(' '),

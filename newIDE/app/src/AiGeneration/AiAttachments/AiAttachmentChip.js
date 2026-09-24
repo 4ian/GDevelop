@@ -40,6 +40,7 @@ export const AiAttachmentChip = ({
       <div
         className={classNames(classes.attachment, {
           [classes.errored]: !!error,
+          [classes.removable]: !!onRemove,
         })}
         title={error ? `${name}: ${i18n._(error)}` : name}
       >

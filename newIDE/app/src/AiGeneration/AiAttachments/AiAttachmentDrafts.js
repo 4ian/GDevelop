@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';
+import classNames from 'classnames';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import {
   type AiAttachmentDraft,
@@ -58,7 +59,7 @@ export const AiAttachmentDrafts = ({ drafts, onRemove }: Props): React.Node => {
   if (!drafts.length) return null;
 
   return (
-    <div className={classes.attachmentsList}>
+    <div className={classNames(classes.attachmentsList, classes.draftsList)}>
       {drafts.map(draft => (
         <AiAttachmentChip
           key={draft.localId}

@@ -2,6 +2,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  padding-top: 6px;
+}
+
+/* In the text field, aligned with the text typed. */
+.attachmentsList.draftsList {
   padding: 6px 8px 0 8px;
 }
 
@@ -13,10 +18,15 @@
   gap: 6px;
   height: 40px;
   max-width: 200px;
-  padding: 0 4px 0 0;
+  /* As much space after the texts as before the file icon. */
+  padding: 0 14px 0 0;
   border-radius: 6px;
   background-color: var(--theme-hover-background-color);
   overflow: hidden;
+}
+
+.attachment.removable {
+  padding-right: 4px;
 }
 
 .attachment.errored {

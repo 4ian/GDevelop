@@ -12,7 +12,9 @@ import {
   getPublicAsset,
   isPixelArt,
   isPrivateAsset,
+  getEffectAssetMetadata,
 } from '../Utils/GDevelopServices/Asset';
+import { CorsAwareImage } from '../UI/CorsAwareImage';
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
@@ -64,6 +66,11 @@ const styles = {
   },
   arrowContainer: {
     padding: 6,
+  },
+  effectPreview: {
+    maxWidth: '100%',
+    maxHeight: '100%',
+    objectFit: 'contain',
   },
 };
 
@@ -261,9 +268,13 @@ export const AssetDetails: React.ComponentType<{
       asset && asset.objectAssets[0]
         ? getObjectAssetResourcesByName(asset.objectAssets[0])
         : {};
-    const assetAnimations = asset
-      ? asset.objectAssets[0].object.animations
-      : null;
+    const assetAnimations =
+      asset && asset.objectAssets[0]
+        ? asset.objectAssets[0].object.animations
+        : null;
+    const effectAssetMetadata = getEffectAssetMetadata(assetShortHeader);
+    const effectAsset =
+      asset && asset.effectAssets ? asset.effectAssets[0] : null;
     const animation = assetAnimations
       ? assetAnimations.find(({ name }) => name === selectedAnimationName)
       : null;
@@ -340,7 +351,21 @@ export const AssetDetails: React.ComponentType<{
           </Line>
           <ResponsiveLineStackLayout noMargin noResponsiveLandscape>
             <Column alignItems="center" justifyContent="center">
-              {assetShortHeader.objectType !== 'sprite' ? (
+              {effectAssetMetadata ? (
+                // An effect has a detailed preview after its thumbnail (the
+                // unfolded faces of a skybox).
+                <div style={styles.previewBackground}>
+                  <CorsAwareImage
+                    style={styles.effectPreview}
+                    src={
+                      assetShortHeader.previewImageUrls[
+                        assetShortHeader.previewImageUrls.length - 1
+                      ]
+                    }
+                    alt={assetShortHeader.name}
+                  />
+                </div>
+              ) : assetShortHeader.objectType !== 'sprite' ? (
                 <div style={styles.previewBackground}>
                   <AssetPreviewImage assetShortHeader={assetShortHeader} />
                 </div>
@@ -488,6 +513,35 @@ export const AssetDetails: React.ComponentType<{
                       allowParagraphs
                     />
                   </Text>
+                  {effectAssetMetadata && (
+                    <Text size="body">
+                      {effectAssetMetadata.isMarkedAsOnlyWorkingFor3D() ? (
+                        <Trans>
+                          A "{effectAssetMetadata.getFullName()}" effect, to add
+                          on a 3D layer of a scene.
+                        </Trans>
+                      ) : effectAssetMetadata.isMarkedAsOnlyWorkingFor2D() ? (
+                        <Trans>
+                          A "{effectAssetMetadata.getFullName()}" effect, to add
+                          on a 2D layer of a scene.
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          A "{effectAssetMetadata.getFullName()}" effect, to add
+                          on a layer of a scene.
+                        </Trans>
+                      )}{' '}
+                      {effectAssetMetadata.getDescription()}
+                    </Text>
+                  )}
+                  {effectAsset && (
+                    <Text size="body" displayInlineAsSpan>
+                      <Trans>Files:</Trans>{' '}
+                      {effectAsset.resources
+                        .map(resource => resource.name)
+                        .join(', ')}
+                    </Text>
+                  )}
                   <Line alignItems="center">
                     <div style={{ flexWrap: 'wrap' }}>
                       {assetShortHeader.tags.slice(0, 5).map((tag, index) => (

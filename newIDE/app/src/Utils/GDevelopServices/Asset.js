@@ -50,6 +50,19 @@ export type ObjectAsset = {|
   requiredExtensions?: Array<ExtensionDependency>,
 |};
 
+// An asset that is an effect to put on a layer, not an object.
+export type EffectAsset = {|
+  effect: {|
+    effectType: string,
+    name: string,
+    doubleParameters: { [string]: number },
+    stringParameters: { [string]: string },
+    booleanParameters: { [string]: boolean },
+  |},
+  resources: Array<any /*(serialized gdResource)*/>,
+  requiredExtensions?: Array<ExtensionDependency>,
+|};
+
 export type AssetShortHeader = {|
   id: string,
   name: string,
@@ -79,6 +92,7 @@ export type Asset = {|
   authorIds?: Array<string>,
   license: string,
   objectAssets: Array<ObjectAsset>,
+  effectAssets?: Array<EffectAsset>,
 |};
 
 export type PublicAssetPack = {|
@@ -406,6 +420,7 @@ export const listAllPublicAssets = async ({
 
   const {
     assetShortHeadersUrl,
+    effectShortHeadersUrl,
     filtersUrl,
     assetPacksUrl,
     assetCdn,
@@ -419,6 +434,8 @@ export const listAllPublicAssets = async ({
       assetCdn.baseUrl['staging'] || GDevelopAssetCdn.baseUrl['staging'];
   }
 
+  // Effects are published apart from objects, so that editors
+  // predating them never list them. The file can be missing on staging.
   const responsesData = await Promise.all([
     cdnClient
       .get(assetShortHeadersUrl)
@@ -432,13 +449,23 @@ export const listAllPublicAssets = async ({
       .get(assetPacksUrl)
       .then(response => response.data)
       .catch(e => e),
+    effectShortHeadersUrl
+      ? cdnClient
+          .get(effectShortHeadersUrl)
+          .then(response =>
+            Array.isArray(response.data)
+              ? response.data.filter(isEffectAsset)
+              : []
+          )
+          .catch(() => [])
+      : Promise.resolve([]),
   ]);
 
   if (responsesData.some(data => !data || data instanceof Error)) {
     throw new Error('Unexpected response from the assets endpoints.');
   }
 
-  const publicAssetShortHeaders = responsesData[0];
+  const publicAssetShortHeaders = [...responsesData[0], ...responsesData[3]];
   const publicFilters = responsesData[1];
   const publicAssetPacks = responsesData[2];
 
@@ -666,6 +693,40 @@ export const isPixelArt = (
   return assetOrAssetShortHeader.tags.some(tag => {
     return tag.toLowerCase() === 'pixel art';
   });
+};
+
+// An asset that is an effect to put on a layer, not an object: its
+// `objectType` is then the type of the effect. An effect type this editor does
+// not know (a store ahead of the editor) is not one it can install.
+export const getEffectAssetMetadata = (
+  assetOrAssetShortHeader: AssetShortHeader | Asset
+): gdEffectMetadata | null => {
+  const gd: libGDevelop = global.gd;
+  if (!gd) return null;
+  const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+    gd.JsPlatform.get(),
+    assetOrAssetShortHeader.objectType
+  );
+  return gd.MetadataProvider.isBadEffectMetadata(effectMetadata)
+    ? null
+    : effectMetadata;
+};
+
+export const isEffectAsset = (
+  assetOrAssetShortHeader: AssetShortHeader | Asset
+): boolean => !!getEffectAssetMetadata(assetOrAssetShortHeader);
+
+export const doesEffectWorkOnLayer = (
+  effectMetadata: gdEffectMetadata,
+  layerRenderingType: string
+): boolean => {
+  if (effectMetadata.isMarkedAsOnlyWorkingFor3D()) {
+    return layerRenderingType !== '2d';
+  }
+  if (effectMetadata.isMarkedAsOnlyWorkingFor2D()) {
+    return layerRenderingType !== '3d';
+  }
+  return true;
 };
 
 export const isPrivateAsset = (

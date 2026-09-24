@@ -1594,6 +1594,77 @@ export const fakePixelArtAsset1: Asset = {
   tags: ['space shooter', 'tag2', 'pixel art'],
 };
 
+const skyboxFaces = ['Front', 'Back', 'Left', 'Right', 'Top', 'Bottom'];
+export const fakeSkyboxAsset: Asset = {
+  id: 'e1d2c3b4a5968778695a4b3c2d1e0f1a2b3c4d5e6f708192a3b4c5d6e7f80910',
+  name: 'Sunny Day',
+  shortDescription: 'Skybox for a 3D layer.',
+  description: 'A sky to put on a 3D layer.',
+  previewImageUrls: [
+    'https://resources.gdevelop.io/resources-v2/preview/preview_skybox_Sunny Day.png',
+    'https://resources.gdevelop.io/resources-v2/preview/preview_skybox_Sunny Day_cross.png',
+  ],
+  animationsCount: 0,
+  maxFramesCount: 0,
+  height: 1024,
+  width: 1024,
+  objectType: 'Scene3D::Skybox',
+  gdevelopVersion: '5.5.0',
+  version: '1.0.0',
+  authors: ['test author'],
+  license: 'CC0',
+  tags: ['3d skyboxes', 'sky'],
+  dominantColors: [],
+  objectAssets: [],
+  effectAssets: [
+    {
+      effect: {
+        effectType: 'Scene3D::Skybox',
+        name: 'Skybox',
+        doubleParameters: {},
+        stringParameters: Object.fromEntries(
+          skyboxFaces.map(face => [
+            `${face.toLowerCase()}FaceResourceName`,
+            `Sunny Day_${face}.png`,
+          ])
+        ),
+        booleanParameters: {},
+      },
+      resources: skyboxFaces.map(face => ({
+        name: `Sunny Day_${face}.png`,
+        file: `https://asset-resources.gdevelop.io/public-resources/3D Skyboxes/${'a'.repeat(
+          64
+        )}_Sunny Day_${face}.png`,
+        kind: 'image',
+        smoothed: true,
+        userAdded: false,
+        origin: {
+          name: 'gdevelop-asset-store',
+          identifier: `https://asset-resources.gdevelop.io/public-resources/3D Skyboxes/${'a'.repeat(
+            64
+          )}_Sunny Day_${face}.png`,
+        },
+      })),
+      requiredExtensions: [],
+    },
+  ],
+};
+
+export const fakeSkyboxAssetShortHeader: AssetShortHeader = {
+  id: fakeSkyboxAsset.id,
+  name: fakeSkyboxAsset.name,
+  shortDescription: fakeSkyboxAsset.shortDescription,
+  previewImageUrls: fakeSkyboxAsset.previewImageUrls,
+  tags: fakeSkyboxAsset.tags,
+  license: fakeSkyboxAsset.license,
+  objectType: fakeSkyboxAsset.objectType,
+  animationsCount: 0,
+  maxFramesCount: 0,
+  width: 1024,
+  height: 1024,
+  dominantColors: [],
+};
+
 export const fakeAssetWithCustomObject: Asset = {
   id: '123',
   name: 'YellowButton',

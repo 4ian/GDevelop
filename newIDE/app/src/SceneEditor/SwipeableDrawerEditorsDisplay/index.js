@@ -427,6 +427,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                           )
                         }
                         onObjectCreated={props.onObjectCreated}
+                        onEffectAdded={props.onEffectAdded}
                         onObjectEdited={props.onObjectEdited}
                         onObjectFolderOrObjectsWithContextSelected={
                           props.onObjectFolderOrObjectsWithContextSelected

@@ -249,6 +249,7 @@ export const useProcessFunctionCalls = ({
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
+  onEffectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
   onProjectItemRenamedOutsideEditor,
   onWillDeleteScene,
@@ -293,6 +294,7 @@ export const useProcessFunctionCalls = ({
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  onEffectsModifiedOutsideEditor: () => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
@@ -330,7 +332,10 @@ export const useProcessFunctionCalls = ({
     project,
     i18n,
   });
-  const { searchAndInstallAsset } = useSearchAndInstallAsset({
+  const {
+    searchAndInstallAsset,
+    searchAndInstallEffectAsset,
+  } = useSearchAndInstallAsset({
     project,
     resourceManagementProps,
     onWillInstallExtension,
@@ -569,7 +574,12 @@ export const useProcessFunctionCalls = ({
         ObjectGroupsOutsideEditorChanges
       > = new Map();
       const accumulatedExtensionsChanges = makeExtensionsOutsideEditorChangesAccumulator();
+      let hasEffectsModified = false;
       const flushAccumulatedOutsideEditorChanges = () => {
+        if (hasEffectsModified) {
+          hasEffectsModified = false;
+          onEffectsModifiedOutsideEditor();
+        }
         accumulatedSceneEventsChanges.forEach(changes =>
           onSceneEventsModifiedOutsideEditor(changes)
         );
@@ -695,6 +705,10 @@ export const useProcessFunctionCalls = ({
               changes
             );
           },
+          // Coalesced: one reload of the game shown by the editor per batch.
+          onEffectsModifiedOutsideEditor: () => {
+            hasEffectsModified = true;
+          },
           // Not coalesced: the tab rename must track the model rename, else the
           // open scene editor briefly looks up a now-missing layout name.
           onProjectItemRenamedOutsideEditor,
@@ -719,6 +733,7 @@ export const useProcessFunctionCalls = ({
           onWillInstallExtension,
           onExtensionInstalled,
           searchAndInstallAsset,
+          searchAndInstallEffectAsset,
           searchAndInstallResources,
           attachmentsForResources,
           getAssetStoreTagForNewObject,
@@ -777,6 +792,7 @@ export const useProcessFunctionCalls = ({
       onSceneEventsModifiedOutsideEditor,
       onInstancesModifiedOutsideEditor,
       onObjectsModifiedOutsideEditor,
+      onEffectsModifiedOutsideEditor,
       onObjectGroupsModifiedOutsideEditor,
       onProjectItemRenamedOutsideEditor,
       onWillDeleteScene,
@@ -790,6 +806,7 @@ export const useProcessFunctionCalls = ({
       onWillInstallExtension,
       onExtensionInstalled,
       searchAndInstallAsset,
+      searchAndInstallEffectAsset,
       searchAndInstallResources,
       attachmentsForResources,
       getAssetStoreTagForNewObject,

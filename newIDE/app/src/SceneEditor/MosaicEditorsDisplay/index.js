@@ -511,6 +511,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   props.getValidatedObjectOrGroupName(newName, global, i18n)
                 }
                 onObjectCreated={props.onObjectCreated}
+                onEffectAdded={props.onEffectAdded}
                 onObjectEdited={props.onObjectEdited}
                 onObjectFolderOrObjectsWithContextSelected={
                   props.onObjectFolderOrObjectsWithContextSelected

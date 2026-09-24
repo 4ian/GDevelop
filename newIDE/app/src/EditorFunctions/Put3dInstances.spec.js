@@ -555,6 +555,30 @@ describe('put_3d_instances (brush_position_anchor)', () => {
     expect(getPlacedPosition()).toEqual([100, 100, 82.5]);
   });
 
+  it('moves an existing instance by its anchor without its object name, telling where it ends up', async () => {
+    await putInstances({
+      brush_position: '0,0,0',
+      instances_size: '60,40,35',
+    });
+    const placed = getPlacedInstance();
+
+    const result = await putInstances({
+      object_name: undefined,
+      brush_position: '100,100,0',
+      brush_position_anchor: 'bottom_center',
+      new_instances_count: 0,
+      existing_instance_ids: placed.id,
+    });
+
+    expect(result.success).toBe(true);
+    expect(getPlacedPosition()).toEqual([100, 100, 0]);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'Repositioned 1 instance of "Turret" using point brush (origin at 100, 100, 0, it occupies X 70 to 130, Y 80 to 120, Z 0 to 35).'
+      )
+    );
+  });
+
   it('refuses an anchor when the box of the object is unknown', async () => {
     const result = await putInstances({
       object_name: 'Player',

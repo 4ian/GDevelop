@@ -5381,12 +5381,39 @@ const put3dInstances: EditorFunction = {
       layersContainer,
     } = containers;
 
+    // An empty id would match every instance (`uuid.startsWith('')` is always
+    // true), so a trailing comma or a blank entry must never survive parsing.
+    const existingInstanceIds = existing_instance_ids
+      ? existing_instance_ids
+          .split(',')
+          .map(id => id.trim())
+          .filter(Boolean)
+      : [];
+
+    // Instances moved by their ids without `object_name` are sized (for the
+    // anchors and the space they occupy) by their object, when they share one.
+    const existingInstancesObjectNames = new Set<string>();
+    if (!object_name && existingInstanceIds.length > 0) {
+      iterateOnInstances(initialInstances, instance => {
+        if (
+          existingInstanceIds.some(id =>
+            instance.getPersistentUuid().startsWith(id)
+          )
+        )
+          existingInstancesObjectNames.add(instance.getObjectName());
+      });
+    }
+    const sizedObjectName =
+      object_name ||
+      (existingInstancesObjectNames.size === 1
+        ? Array.from(existingInstancesObjectNames)[0]
+        : null);
     const namedObject: gdObject | null =
-      (object_name &&
+      (sizedObjectName &&
         getObjectByName(
           globalObjectsContainer,
           objectsContainer,
-          object_name
+          sizedObjectName
         )) ||
       null;
     if (namedObject)
@@ -5416,15 +5443,6 @@ const put3dInstances: EditorFunction = {
         layersContainer
       );
     }
-
-    // An empty id would match every instance (`uuid.startsWith('')` is always
-    // true), so a trailing comma or a blank entry must never survive parsing.
-    const existingInstanceIds = existing_instance_ids
-      ? existing_instance_ids
-          .split(',')
-          .map(id => id.trim())
-          .filter(Boolean)
-      : [];
 
     if (brush_kind === 'erase') {
       const brushPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
@@ -5538,8 +5556,10 @@ const put3dInstances: EditorFunction = {
           .filter(Boolean)
           .join(' '),
       };
-      if (object_name && objectSizeInfo)
-        injectObjectSizeInfo(eraseResult, { [object_name]: objectSizeInfo });
+      if (sizedObjectName && objectSizeInfo)
+        injectObjectSizeInfo(eraseResult, {
+          [sizedObjectName]: objectSizeInfo,
+        });
       return eraseResult;
     } else {
       // An explicit `new_instances_count: 0` with no instances to modify means
@@ -5575,7 +5595,7 @@ const put3dInstances: EditorFunction = {
         args,
         allowedAnchors: INSTANCE_ANCHORS_3D,
         object: namedObject,
-        objectName: object_name,
+        objectName: sizedObjectName,
         project,
         objectSizeInfo,
         size: effectiveSize,
@@ -5971,10 +5991,29 @@ const put3dInstances: EditorFunction = {
       }
 
       if (movedPositionCount > 0) {
+        // Where a single moved instance ends up, so a wrong height (sunk or
+        // floating) shows without another describe_instances call.
+        const movedInstances = Array.from(existingInstanceStates.keys());
+        let occupiedSpace = '';
+        if (movedInstances.length === 1 && effectiveSize) {
+          const movedInstance = movedInstances[0];
+          const position = [
+            movedInstance.getX(),
+            movedInstance.getY(),
+            movedInstance.getZ(),
+          ];
+          occupiedSpace = ` (origin at ${position
+            .map(roundPosition)
+            .join(', ')}, it occupies ${getOccupiedSpaceDescription(
+            position,
+            getInstanceSize(movedInstance, effectiveSize),
+            objectSizeInfo
+          )})`;
+        }
         changes.push(
           `Repositioned ${movedPositionCount} instance${
             movedPositionCount > 1 ? 's' : ''
-          }${ofObjectsSuffix} using ${brush_kind} brush.`
+          }${ofObjectsSuffix} using ${brush_kind} brush${occupiedSpace}.`
         );
       }
 
@@ -6095,8 +6134,10 @@ const put3dInstances: EditorFunction = {
         success: true,
         message: changes.join(' '),
       };
-      if (object_name && objectSizeInfo)
-        injectObjectSizeInfo(put3dResult, { [object_name]: objectSizeInfo });
+      if (sizedObjectName && objectSizeInfo)
+        injectObjectSizeInfo(put3dResult, {
+          [sizedObjectName]: objectSizeInfo,
+        });
       return put3dResult;
     }
   },

@@ -1332,6 +1332,9 @@ export const getRawJsonNote = (
   if (getFramesJson(configurationJson).length > 0) {
     return `${usage} Frame coordinates are in image pixels (\`frameImageSizes\`); a custom collision mask needs \`hasCustomCollisionMask: true\` and \`adaptCollisionMaskAutomatically: false\`, with convex polygons. Rename animations or points with \`renamed_animations\`/\`renamed_points\` (they update the events).`;
   }
+  if (object.getType() === 'Sprite') {
+    return `${usage} An animation is \`{ name, directions: [{ looping, timeBetweenFrames, sprites: [{ image }] }] }\`, \`image\` being the name of an image resource (the other fields of a frame get their default values).`;
+  }
   if (object.getType() === SIMPLE_TILE_MAP_TYPE) {
     return `${usage} \`tilesWithHitBox\` lists the ids (row * columnCount + column in the atlas) of the tiles with a full-tile hit box. The painted tiles are stored on each instance (\`describe_instances\` with \`include_raw_json\`).`;
   }

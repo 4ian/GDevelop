@@ -1459,8 +1459,9 @@ const createOrReplaceObject: EditorFunction = {
     const getPropertiesText = (object: gdObject): string => {
       const properties = object.getConfiguration().getProperties();
       const propertiesList = formatPropertiesList(properties);
-      return propertiesList
-        ? `Properties: ${propertiesList}.`
+      if (propertiesList) return `Properties: ${propertiesList}.`;
+      return object.getType() === 'Sprite'
+        ? 'This object type has no editable object properties: its animations and their images are in its raw JSON (`inspect_object_properties_effects` with `include_raw_json`, then `raw_json` of `change_object_properties_effects`).'
         : 'This object type has no editable object properties.';
     };
 

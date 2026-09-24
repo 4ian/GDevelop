@@ -354,6 +354,97 @@ describe('object raw JSON and renames', () => {
     });
   });
 
+  describe('a Sprite created from scratch', () => {
+    // The browser `File` is not in the test environment: a named Blob is what
+    // is read of it.
+    const { Blob: NodeBlob } = require('buffer');
+    const attachmentsForResources = {
+      getFiles: async (attachmentIds: Array<string>) => {
+        const files: { [attachmentId: string]: ?File } = {};
+        attachmentIds.forEach(attachmentId => {
+          const file = new NodeBlob(['fake png'], { type: 'image/png' });
+          file.name = `${attachmentId}.png`;
+          files[attachmentId] = file;
+        });
+        return files;
+      },
+      // Stores the files like the cloud or local storage would.
+      storeResourceFiles: async () => {
+        const resourcesManager = project.getResourcesManager();
+        resourcesManager
+          .getAllResourceNames()
+          .toJSArray()
+          .forEach(name => {
+            const resource = resourcesManager.getResource(name);
+            if (resource.getFile().startsWith('blob:'))
+              resource.setFile(`https://project-resources/${name}`);
+          });
+        return true;
+      },
+    };
+
+    it('gets animations whose frames use images attached by the user', async () => {
+      const launchOptions = {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        attachmentsForResources,
+      };
+      await editorFunctions.create_or_replace_object.launchFunction({
+        ...launchOptions,
+        args: { scope: sceneScope, object_type: 'Sprite', object_name: 'Hero' },
+      });
+      await editorFunctions.change_project_properties_resources.launchFunction({
+        ...launchOptions,
+        args: {
+          added_resources: [
+            { attachment_id: 'run1', resource_name: 'HeroRun1' },
+            { attachment_id: 'run2', resource_name: 'HeroRun2' },
+          ],
+        },
+      });
+      const inspected = await inspect({ object_name: 'Hero' });
+      const rawJson = inspected.rawJson;
+      if (!rawJson) throw new Error('No rawJson returned.');
+      rawJson.animations = [
+        {
+          name: 'Idle',
+          directions: [{ sprites: [{ image: 'Frame100x240' }] }],
+        },
+        {
+          name: 'Run',
+          directions: [
+            {
+              looping: true,
+              timeBetweenFrames: 0.1,
+              sprites: [{ image: 'HeroRun1' }, { image: 'HeroRun2' }],
+            },
+          ],
+        },
+      ];
+
+      const result = await change({
+        object_name: 'Hero',
+        raw_json: JSON.stringify(rawJson),
+      });
+
+      expect(inspected.message).toContain('An animation is');
+      expect(result.success).toBe(true);
+      const animations = gd
+        .asSpriteConfiguration(
+          scene
+            .getObjects()
+            .getObject('Hero')
+            .getConfiguration()
+        )
+        .getAnimations();
+      expect(animations.getAnimationsCount()).toBe(2);
+      const runDirection = animations.getAnimation(1).getDirection(0);
+      expect(runDirection.getSpritesCount()).toBe(2);
+      expect(runDirection.getSprite(1).getImageName()).toBe('HeroRun2');
+      expect(runDirection.getTimeBetweenFrames()).toBeCloseTo(0.1);
+      expect(runDirection.isLooping()).toBe(true);
+    });
+  });
+
   describe('raw configuration read by the engine', () => {
     it('validates the frames the engine keeps, whatever the JSON has', async () => {
       const player = makePlayer(['Idle']);

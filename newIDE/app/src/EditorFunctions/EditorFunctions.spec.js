@@ -135,7 +135,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). This object type has no editable object properties."`
+        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). This object type has no editable object properties: its animations and their images are in its raw JSON (\`inspect_object_properties_effects\` with \`include_raw_json\`, then \`raw_json\` of \`change_object_properties_effects\`)."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({

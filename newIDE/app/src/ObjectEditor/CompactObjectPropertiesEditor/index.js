@@ -125,7 +125,13 @@ export const CollapsibleSubPanel = ({
       <ColumnStackLayout noMargin expand noOverflowParent>
         <LineStackLayout noMargin justifyContent="space-between">
           <Line noMargin alignItems="center">
-            <IconButton onClick={toggleFolded} size="small">
+            <IconButton
+              onClick={toggleFolded}
+              size="small"
+              id={
+                id ? `${id}-${isFolded ? 'unfold' : 'fold'}-button` : undefined
+              }
+            >
               {isFolded ? (
                 <ChevronArrowRight style={styles.icon} />
               ) : (

@@ -547,6 +547,7 @@ declare interface ProjectPropertiesData {
   packageName: string;
   projectFile: string;
   scaleMode: 'linear' | 'nearest';
+  renderAtDisplayResolution?: boolean;
   pixelsRounding: boolean;
   antialiasingMode: 'none' | 'MSAA';
   antialisingEnabledOnMobile: boolean;

@@ -1213,6 +1213,7 @@ namespace gdjs {
           const instances = evaluation.instances
             ? evaluation.instances.map((instance) => ({
                 id: instance.id,
+                objectName: instance.objectName,
                 result: toDebuggerValue(instance.result),
               }))
             : undefined;

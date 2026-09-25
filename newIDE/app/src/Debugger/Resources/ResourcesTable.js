@@ -17,11 +17,15 @@ import { renderSortableHeader } from '../../UI/VirtualizedTableSortableHeader';
 import { getDefaultResourceThumbnailForKind } from '../../ResourcesList';
 import { formatGameTime } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import {
+  compareResource,
   describeOrigin,
   formatBytes,
   formatDurationMs,
+  formatSignedDelta,
   getLoadDurationMs,
+  indexResourcesByName,
   sortResources,
+  type ResourceComparison,
   type ResourceLoadRecord,
   type ResourceLoadStatus,
   type ResourcesSortKey,
@@ -88,10 +92,31 @@ export const getStatusTone = (
   }
 };
 
+/**
+ * A difference with the reference. A resource the reference never had says
+ * so, rather than showing a dash that would read as "not measured".
+ */
+const renderComparisonCell = (
+  i18n: I18nType,
+  comparison: ResourceComparison,
+  formatComparison: ResourceComparison => string
+): React.Node => (
+  <div className={classNames(classes.cell, classes.numberCell)}>
+    {comparison.isMissingInBaseline
+      ? i18n._(t`new`)
+      : formatComparison(comparison)}
+  </div>
+);
+
 type Props = {|
   records: Array<ResourceLoadRecord>,
   selectedResourceName: ?string,
   onSelectResource: (?string) => void,
+  /**
+   * The resources of the recording pinned as the reference, if any: each row
+   * then says how it differs from the resource of the same name.
+   */
+  baselineRecords?: ?Array<ResourceLoadRecord>,
 |};
 
 const ROW_HEIGHT = 32;
@@ -105,6 +130,7 @@ const ResourcesTable = ({
   records,
   selectedResourceName,
   onSelectResource,
+  baselineRecords,
 }: Props): React.Node => {
   const [sortBy, setSortBy] = React.useState<ResourcesSortKey>(
     'estimatedMemoryBytes'
@@ -115,6 +141,10 @@ const ResourcesTable = ({
   const sortedRecords = React.useMemo(
     () => sortResources(records, sortBy, sortDirection),
     [records, sortBy, sortDirection]
+  );
+  const baselineRecordsByName = React.useMemo(
+    () => (baselineRecords ? indexResourcesByName(baselineRecords) : null),
+    [baselineRecords]
   );
 
   if (!records.length) {
@@ -321,6 +351,26 @@ const ResourcesTable = ({
                     </Tooltip>
                   )}
                 />
+                {baselineRecordsByName && (
+                  <RVColumn
+                    label={i18n._(t`Memory vs ref.`)}
+                    dataKey="memoryDelta"
+                    width={100}
+                    disableSort
+                    className={classNames('tableColumn', classes.numberCell)}
+                    cellRenderer={({ rowData }) =>
+                      renderComparisonCell(
+                        i18n,
+                        compareResource(rowData, baselineRecordsByName),
+                        comparison =>
+                          formatSignedDelta(
+                            comparison.memoryDeltaBytes,
+                            formatBytes
+                          )
+                      )
+                    }
+                  />
+                )}
                 <RVColumn
                   label={i18n._(t`Load time`)}
                   dataKey="loadDurationMs"
@@ -335,6 +385,26 @@ const ResourcesTable = ({
                     </div>
                   )}
                 />
+                {baselineRecordsByName && (
+                  <RVColumn
+                    label={i18n._(t`Load time vs ref.`)}
+                    dataKey="loadDurationDelta"
+                    width={110}
+                    disableSort
+                    className={classNames('tableColumn', classes.numberCell)}
+                    cellRenderer={({ rowData }) =>
+                      renderComparisonCell(
+                        i18n,
+                        compareResource(rowData, baselineRecordsByName),
+                        comparison =>
+                          formatSignedDelta(
+                            comparison.loadDurationDeltaMs,
+                            formatDurationMs
+                          )
+                      )
+                    }
+                  />
+                )}
                 <RVColumn
                   label={i18n._(t`Started at`)}
                   dataKey="loadStartedAtMs"

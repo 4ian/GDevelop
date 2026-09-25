@@ -11,6 +11,8 @@ import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
 import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
+import { Column } from '../../UI/Grid';
+import Text from '../../UI/Text';
 import { isResourceExpression } from './ResourceExpression';
 import {
   type ParameterFieldProps,
@@ -54,7 +56,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         ? `parameter-${props.parameterIndex}-audio-field`
         : undefined;
 
-    return (
+    const fieldWithButton = (
       <TextFieldWithButtonLayout
         renderTextField={() =>
           !isExpressionField ? (
@@ -108,6 +110,23 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
       />
+    );
+
+    if (!isExpressionField || props.isInline) return fieldWithButton;
+
+    // What the editor cannot know about a name computed while the game runs.
+    return (
+      <Column noMargin>
+        {fieldWithButton}
+        <Text size="body-small" color="secondary">
+          <Trans>
+            The expression must give the exact name of an audio resource. The
+            editor cannot know which one it is: the sound is not preloaded with
+            the scene (use a preload action if needed), and it is not seen when
+            removing unused resources or renaming resources.
+          </Trans>
+        </Text>
+      </Column>
     );
   }
 ): React.ComponentType<{

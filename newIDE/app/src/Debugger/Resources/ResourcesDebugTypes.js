@@ -130,6 +130,63 @@ export const getLoadDurationMs = (record: ResourceLoadRecord): ?number => {
   return endMs == null ? null : endMs - record.loadStartedAtMs;
 };
 
+/**
+ * How a resource compares to the same resource (by name) in the reference
+ * recording. `isMissingInBaseline` tells a resource the reference never had
+ * apart from one whose values could not be measured on either side.
+ */
+export type ResourceComparison = {|
+  isMissingInBaseline: boolean,
+  memoryDeltaBytes: ?number,
+  loadDurationDeltaMs: ?number,
+|};
+
+export const indexResourcesByName = (
+  records: Array<ResourceLoadRecord>
+): Map<string, ResourceLoadRecord> => {
+  const recordsByName = new Map();
+  records.forEach(record => recordsByName.set(record.name, record));
+  return recordsByName;
+};
+
+const subtractIfBothKnown = (value: ?number, baselineValue: ?number): ?number =>
+  value == null || baselineValue == null ? null : value - baselineValue;
+
+export const compareResource = (
+  record: ResourceLoadRecord,
+  baselineRecordsByName: Map<string, ResourceLoadRecord>
+): ResourceComparison => {
+  const baselineRecord = baselineRecordsByName.get(record.name);
+  if (!baselineRecord) {
+    return {
+      isMissingInBaseline: true,
+      memoryDeltaBytes: null,
+      loadDurationDeltaMs: null,
+    };
+  }
+  return {
+    isMissingInBaseline: false,
+    memoryDeltaBytes: subtractIfBothKnown(
+      record.estimatedMemoryBytes,
+      baselineRecord.estimatedMemoryBytes
+    ),
+    loadDurationDeltaMs: subtractIfBothKnown(
+      getLoadDurationMs(record),
+      getLoadDurationMs(baselineRecord)
+    ),
+  };
+};
+
+/** A difference with its sign, or a dash when it could not be measured. */
+export const formatSignedDelta = (
+  delta: ?number,
+  format: (value: number) => string
+): string => {
+  if (delta == null || !Number.isFinite(delta)) return '-';
+  if (delta === 0) return '=';
+  return `${delta > 0 ? '+' : '-'}${format(Math.abs(delta))}`;
+};
+
 /** A short text for an origin, used for sorting and searching (not translated). */
 export const describeOrigin = (origin: ?ResourceLoadOrigin): string => {
   if (!origin) return '';

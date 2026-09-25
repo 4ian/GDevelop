@@ -500,6 +500,12 @@ namespace gdjs {
   export class HowlerSoundManager implements gdjs.ResourceManager {
     _loadedMusics = new gdjs.ResourceCache<Howl>();
     _loadedSounds = new gdjs.ResourceCache<Howl>();
+    /**
+     * The names that matched no audio resource, warned about once each: a
+     * sound played every frame must not flood the console.
+     */
+    private _warnedUnknownAudioResourceNames: Set<string> = new Set();
+
     _availableResources: Record<string, ResourceData> = {};
     _globalVolume: float = 100;
     _sounds: Record<integer, HowlerSound> = {};
@@ -660,14 +666,26 @@ namespace gdjs {
      */
     private _getAudioResource = (resourceName: string): ResourceData => {
       const resource = this._resourceLoader.getResource(resourceName);
-      return resource && this.getResourceKinds().includes(resource.kind)
-        ? resource
-        : ({
-            file: resourceName,
-            kind: 'audio',
-            metadata: '',
-            name: resourceName,
-          } as ResourceData);
+      if (resource && this.getResourceKinds().includes(resource.kind)) {
+        return resource;
+      }
+      // The name is still tried as a file path, as it always was. When it
+      // comes from an expression, a typo would otherwise only surface as a
+      // loading error naming a file nobody asked for.
+      if (!this._warnedUnknownAudioResourceNames.has(resourceName)) {
+        this._warnedUnknownAudioResourceNames.add(resourceName);
+        logger.warn(
+          'No audio resource is named "' +
+            resourceName +
+            '": it is played as a file path instead. If this name is computed by an expression, check that it gives the exact name of an audio resource of the project.'
+        );
+      }
+      return {
+        file: resourceName,
+        kind: 'audio',
+        metadata: '',
+        name: resourceName,
+      } as ResourceData;
     };
 
     /**

@@ -48,6 +48,8 @@ type Props = {|
   /** The artificial memory limit, shared with the performance panel. */
   artificialLimitMegabytes: ?number,
   onChangeArtificialLimitMegabytes: (?number) => void,
+  /** The resources of the recording pinned as the reference, if any. */
+  baselineResourcesDebugState?: ?ResourcesDebugState,
 |};
 
 const toggleInArray = <T>(array: Array<T>, value: T): Array<T> =>
@@ -76,6 +78,7 @@ const ResourcesPanel = ({
   onStartRecording,
   artificialLimitMegabytes,
   onChangeArtificialLimitMegabytes,
+  baselineResourcesDebugState,
 }: Props): React.Node => {
   const [filters, setFilters] = React.useState<ResourcesFilters>(
     emptyResourcesFilters
@@ -313,6 +316,11 @@ const ResourcesPanel = ({
           onChangeArtificialLimitMegabytes={onChangeArtificialLimitMegabytes}
           selectedResourceName={selectedResourceName}
           onSelectResource={setSelectedResourceName}
+          baselineRecords={
+            baselineResourcesDebugState
+              ? baselineResourcesDebugState.resources
+              : null
+          }
         />
         <div className={classes.section} style={{ paddingBottom: 0 }}>
           <div className={classes.sectionTitleRow}>

@@ -1,12 +1,15 @@
 // @flow
 import {
+  compareResource,
   computeMemorySegments,
   describeOrigin,
   filterResources,
   formatBytes,
   formatDurationMs,
+  formatSignedDelta,
   getLoadDurationMs,
   getMemoryLimitBytes,
+  indexResourcesByName,
   sortResources,
   type ResourceLoadRecord,
   type ResourcesDebugState,
@@ -204,5 +207,70 @@ describe('ResourcesDebugTypes', () => {
     expect(getMemoryLimitBytes(state, 64)).toBe(64 * 1024 * 1024);
     expect(getMemoryLimitBytes(state, null)).toBe(8 * 1024 * 1024 * 1024);
     expect(getMemoryLimitBytes(null, null)).toBe(0);
+  });
+
+  describe('compareResource', () => {
+    it('gives the differences with the resource of the same name', () => {
+      const baselineRecordsByName = indexResourcesByName([
+        makeRecord({
+          name: 'Player',
+          estimatedMemoryBytes: 1000,
+          loadStartedAtMs: 0,
+          readyAtMs: 50,
+        }),
+      ]);
+      expect(
+        compareResource(
+          makeRecord({
+            name: 'Player',
+            estimatedMemoryBytes: 4000,
+            loadStartedAtMs: 100,
+            readyAtMs: 120,
+          }),
+          baselineRecordsByName
+        )
+      ).toEqual({
+        isMissingInBaseline: false,
+        memoryDeltaBytes: 3000,
+        loadDurationDeltaMs: -30,
+      });
+    });
+
+    it('tells a resource the reference did not have', () => {
+      expect(
+        compareResource(
+          makeRecord({ name: 'NewEnemy', estimatedMemoryBytes: 10 }),
+          indexResourcesByName([])
+        )
+      ).toEqual({
+        isMissingInBaseline: true,
+        memoryDeltaBytes: null,
+        loadDurationDeltaMs: null,
+      });
+    });
+
+    it('gives no difference for a value unknown on one side', () => {
+      const comparison = compareResource(
+        makeRecord({ name: 'Music', estimatedMemoryBytes: 10 }),
+        indexResourcesByName([
+          makeRecord({
+            name: 'Music',
+            estimatedMemoryBytes: null,
+            loadStartedAtMs: null,
+          }),
+        ])
+      );
+      expect(comparison.memoryDeltaBytes).toBe(null);
+      expect(comparison.loadDurationDeltaMs).toBe(null);
+    });
+  });
+
+  describe('formatSignedDelta', () => {
+    it('signs the difference, and marks what did not change', () => {
+      expect(formatSignedDelta(3000, formatBytes)).toBe('+3.00 kB');
+      expect(formatSignedDelta(-30, formatDurationMs)).toBe('-30 ms');
+      expect(formatSignedDelta(0, formatBytes)).toBe('=');
+      expect(formatSignedDelta(null, formatBytes)).toBe('-');
+    });
   });
 });

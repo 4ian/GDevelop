@@ -938,6 +938,10 @@ export default class Debugger extends React.Component<Props, State> {
       baselineDebuggerId && baselineDebuggerId !== selectedId
         ? this._profilerRecordingStore.getRecording(baselineDebuggerId)
         : null;
+    const baselineResourcesDebugSnapshot =
+      baselineDebuggerId && baselineDebuggerId !== selectedId
+        ? resourcesDebugSnapshots[baselineDebuggerId]
+        : null;
     // Two runs are only worth comparing when they were played on the same
     // machine, by the same editor, and long enough to mean something.
     const baselineMetadata = baselineDebuggerId
@@ -1132,6 +1136,11 @@ export default class Debugger extends React.Component<Props, State> {
               profilerRecordingStore={this._profilerRecordingStore}
               debuggerId={selectedId}
               resourcesDebugSnapshot={resourcesDebugSnapshots[selectedId]}
+              baselineResourcesDebugState={
+                baselineResourcesDebugSnapshot
+                  ? baselineResourcesDebugSnapshot.state
+                  : null
+              }
               onRequestResourcesDebugState={() =>
                 this._requestResourcesDebugState(selectedId)
               }

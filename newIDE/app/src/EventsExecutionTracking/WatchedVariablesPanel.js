@@ -159,10 +159,21 @@ const buildInstanceItems = (
   depth: number
 ): Array<WatchedItem> => {
   const lowerCaseFilter = filter.trim().toLowerCase();
+  // A group reads several objects: its instances are named after theirs.
+  const isOfSeveralObjects = instances.some(
+    instance =>
+      !!instance.objectName && instance.objectName !== instances[0].objectName
+  );
+  const getInstanceName = (instance: InstanceEvaluation): string =>
+    isOfSeveralObjects && instance.objectName
+      ? `${instance.objectName} #${instance.id}`
+      : `#${instance.id}`;
   const matchingInstances = lowerCaseFilter
     ? instances.filter(
         instance =>
-          String(instance.id).includes(lowerCaseFilter) ||
+          getInstanceName(instance)
+            .toLowerCase()
+            .includes(lowerCaseFilter) ||
           formatEvaluationValue(instance.result, 200, false)
             .toLowerCase()
             .includes(lowerCaseFilter)
@@ -176,7 +187,7 @@ const buildInstanceItems = (
       return {
         isInstance: true,
         id,
-        name: `#${instance.id}`,
+        name: getInstanceName(instance),
         expression: null,
         sourceType,
         error: null,

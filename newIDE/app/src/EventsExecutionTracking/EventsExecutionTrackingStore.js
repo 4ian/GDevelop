@@ -53,6 +53,11 @@ export type CumulatedEventExecution = {|
 export type InstanceEvaluation = {|
   /** The identifier of the instance in the running game (stable). */
   id: number,
+  /**
+   * The object the instance is of. Only worth showing for a group, whose
+   * instances are of several objects.
+   */
+  objectName?: string,
   result: any,
 |};
 

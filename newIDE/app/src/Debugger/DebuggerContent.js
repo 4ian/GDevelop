@@ -27,7 +27,10 @@ import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
 import Performance from './Performance';
 import ResourcesPanel from './Resources';
-import { getMemoryLimitBytes } from './Resources/ResourcesDebugTypes';
+import {
+  getMemoryLimitBytes,
+  type ResourcesDebugState,
+} from './Resources/ResourcesDebugTypes';
 import { DebuggerConsole, type LogsManager } from './DebuggerConsole';
 import { type ResourcesDebugSnapshot } from '.';
 import {
@@ -51,6 +54,7 @@ type Props = {|
   profilingInProgress: boolean,
   /** The recording every panel compares this one to, if one was pinned. */
   baselineRecording: ?ProfilerRecording,
+  baselineResourcesDebugState: ?ResourcesDebugState,
   canRecord: boolean,
   onStartRecording: () => void,
   profilerRecordingStore: ProfilerRecordingStore,
@@ -234,6 +238,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
       onEdit,
       profilingInProgress,
       baselineRecording,
+      baselineResourcesDebugState,
       canRecord,
       onStartRecording,
       profilerRecordingStore,
@@ -418,6 +423,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
             onChangeArtificialLimitMegabytes={megabytes =>
               this.setState({ memoryLimitMegabytes: megabytes })
             }
+            baselineResourcesDebugState={baselineResourcesDebugState}
           />
         ),
       },

@@ -165,35 +165,6 @@ gd::String LayoutCodeGenerator::GenerateExpressionEvaluationCode(
     return gd::String("");
   }();
 
-  // Reading every instance asks the generator for `ObjList[i]` instead of
-  // `ObjList[0]`, which it does as soon as an object is the current one. A
-  // group never matches the objects it expands to, so it is left out: its
-  // count is still reported, and its value stays that of the first instance.
-  const bool isEvaluatedForAllInstances =
-      evaluateForAllInstances && !readObjectName.empty() &&
-      objectsContainersList.HasObjectNamed(readObjectName);
-  gd::String instancesCode;
-  if (isEvaluatedForAllInstances) {
-    context.SetCurrentObject(readObjectName);
-    const gd::String perInstanceResultCode =
-        generateCode(type, expression, objectName);
-    // Back to no current object: the variables below must not depend on the
-    // instance being walked.
-    context.SetNoCurrentObject();
-
-    const gd::String objectListName =
-        codeGenerator.GetObjectListName(readObjectName, context);
-    instancesCode = "const gdjsEvaluatedInstances = [];\n"
-                    "for (let i = 0, len = Math.min(" +
-                    objectListName + ".length, " +
-                    gd::String::From(maxEvaluatedInstancesCount) +
-                    "); i < len; i++) {\n"
-                    "  gdjsEvaluatedInstances.push({ id: " +
-                    objectListName + "[i].id, result: " +
-                    perInstanceResultCode + " });\n"
-                    "}\n";
-  }
-
   // The instances of the object are counted below: its list has to be
   // declared like the ones the expression itself uses, or the generated code
   // reads the length of a list that does not exist.
@@ -203,6 +174,40 @@ gd::String LayoutCodeGenerator::GenerateExpressionEvaluationCode(
           : objectsContainersList.ExpandObjectName(readObjectName);
   for (const auto& countedObjectName : countedObjectNames) {
     context.ObjectsListNeeded(countedObjectName);
+  }
+
+  // Reading every instance asks the generator for `ObjList[i]` instead of
+  // `ObjList[0]`, which it does as soon as one of the objects the expression
+  // reads is the current one. A group is read object by object: each of its
+  // objects is made the current one in turn, and its instances are listed
+  // after those of the previous object, named after the object they are.
+  const bool isEvaluatedForAllInstances =
+      evaluateForAllInstances && !countedObjectNames.empty();
+  gd::String instancesCode;
+  if (isEvaluatedForAllInstances) {
+    instancesCode = "const gdjsEvaluatedInstances = [];\n";
+    for (const auto& realObjectName : countedObjectNames) {
+      context.SetCurrentObject(realObjectName);
+      const gd::String perInstanceResultCode =
+          generateCode(type, expression, objectName);
+      // Back to no current object: the variables below must not depend on
+      // the instance being walked.
+      context.SetNoCurrentObject();
+
+      const gd::String objectListName =
+          codeGenerator.GetObjectListName(realObjectName, context);
+      // The cap is shared by all the objects of a group: the answer travels
+      // on the debugger channel, whatever the number of objects.
+      instancesCode +=
+          "for (let i = 0, len = " + objectListName +
+          ".length; i < len && gdjsEvaluatedInstances.length < " +
+          gd::String::From(maxEvaluatedInstancesCount) + "; i++) {\n"
+          "  gdjsEvaluatedInstances.push({ id: " + objectListName +
+          "[i].id, objectName: " +
+          EventsCodeGenerator::ConvertToStringExplicit(realObjectName) +
+          ", result: " + perInstanceResultCode + " });\n"
+          "}\n";
+    }
   }
 
   gd::String variablesCode;

@@ -209,12 +209,12 @@ describe('libGD.js - GDJS expression evaluation code generation integration test
     expect(code).toContain('[i].getVariables()');
     expect(code).toContain('gdjsEvaluatedInstances');
     expect(code).toContain('instances: gdjsEvaluatedInstances');
-    expect(code).toContain('Math.min(');
+    expect(code).toContain('gdjsEvaluatedInstances.length < ');
     // The variables listed apart must not depend on the instance walked.
     expect(code).toContain('[0].getVariables()');
   });
 
-  it('leaves a group of objects in the first instance mode', function () {
+  it('reads every instance of every object of a group', function () {
     const { project, layout } = makeProject();
     const player = layout
       .getObjects()
@@ -238,10 +238,13 @@ describe('libGD.js - GDJS expression evaluation code generation integration test
     );
     layoutCodeGenerator.delete();
 
-    // A group never matches the objects it expands to: the per instance mode
-    // is refused rather than silently reading one object of the group.
-    expect(code).toContain('instances: null');
-    expect(code).not.toContain('[i].getVariables()');
+    // Each object of the group is walked in turn, its instances named after
+    // it, under one cap shared by the whole group.
+    expect(code).toContain('instances: gdjsEvaluatedInstances');
+    expect(code).toContain('[i].getVariables()');
+    expect(code).toContain('objectName: "Player"');
+    expect(code).toContain('objectName: "Enemy"');
+    expect(code.split('gdjsEvaluatedInstances.length < ').length - 1).toBe(2);
     // Its instances are still counted, over every object of the group.
     expect(code).toContain('instancesCount:');
 

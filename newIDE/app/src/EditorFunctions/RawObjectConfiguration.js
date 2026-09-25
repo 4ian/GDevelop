@@ -1324,6 +1324,52 @@ export const getFrameImageSizes = async (
   return frameImageSizes;
 };
 
+/**
+ * The animations in the file of a 3D model or a Spine object: the possible
+ * `source` of its animations.
+ */
+export const getModelAnimationSources = async (
+  project: gdProject,
+  configurationJson: Object,
+  PixiResourcesLoader: any
+): Promise<Array<string> | null> => {
+  const content = isPlainObject(configurationJson.content)
+    ? configurationJson.content
+    : {};
+  try {
+    if (
+      typeof content.modelResourceName === 'string' &&
+      content.modelResourceName
+    ) {
+      const gltf = await PixiResourcesLoader.get3DModel(
+        project,
+        content.modelResourceName
+      );
+      return gltf && Array.isArray(gltf.animations)
+        ? gltf.animations.map(animation => animation.name)
+        : null;
+    }
+    if (
+      typeof content.spineResourceName === 'string' &&
+      content.spineResourceName
+    ) {
+      const spine = await PixiResourcesLoader.createSpine(
+        project,
+        content.spineResourceName
+      );
+      if (!spine) return null;
+      const animationNames = spine.skeleton.data.animations.map(
+        animation => animation.name
+      );
+      spine.destroy();
+      return animationNames;
+    }
+  } catch (error) {
+    return null;
+  }
+  return null;
+};
+
 export const getRawJsonNote = (
   object: gdObject,
   configurationJson: Object
@@ -1337,6 +1383,12 @@ export const getRawJsonNote = (
   }
   if (object.getType() === SIMPLE_TILE_MAP_TYPE) {
     return `${usage} \`tilesWithHitBox\` lists the ids (row * columnCount + column in the atlas) of the tiles with a full-tile hit box. The painted tiles are stored on each instance (\`describe_instances\` with \`include_raw_json\`).`;
+  }
+  if (
+    isPlainObject(configurationJson.content) &&
+    Array.isArray(configurationJson.content.animations)
+  ) {
+    return `${usage} An animation is \`{ name, source, loop }\`, \`source\` being one of \`modelAnimationSources\`. Rename animations with \`renamed_animations\` (it updates the events).`;
   }
   if (getAnimationsJson(configurationJson).length > 0) {
     return `${usage} Rename animations with \`renamed_animations\` (it updates the events).`;

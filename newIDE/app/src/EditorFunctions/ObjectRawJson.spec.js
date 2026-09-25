@@ -8,6 +8,7 @@ import {
 } from '../Utils/Serializer';
 import { markObjectAsOpenedInEditor } from '../ObjectEditor/ObjectsOpenedInEditor';
 import { mapFor } from '../Utils/MapFor';
+import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -443,6 +444,35 @@ describe('object raw JSON and renames', () => {
       expect(runDirection.getTimeBetweenFrames()).toBeCloseTo(0.1);
       expect(runDirection.isLooping()).toBe(true);
     });
+  });
+
+  it('gives the animations in the file of a 3D model', async () => {
+    const robot = scene
+      .getObjects()
+      .insertNewObject(project, 'FakeScene3D::Model3DObject', 'Robot', 0);
+    robot.getConfiguration().updateProperty('modelResourceName', 'Robot.glb');
+
+    const result = await editorFunctions.inspect_object_properties_effects.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        PixiResourcesLoader: {
+          ...PixiResourcesLoaderMock,
+          get3DModel: async () => ({
+            animations: [{ name: 'Armature|Idle' }, { name: 'Armature|Run' }],
+          }),
+        },
+        args: {
+          scope: sceneScope,
+          object_name: 'Robot',
+          include_raw_json: true,
+        },
+      }
+    );
+
+    expect(result.modelAnimationSources).toEqual([
+      'Armature|Idle',
+      'Armature|Run',
+    ]);
   });
 
   describe('raw configuration read by the engine', () => {

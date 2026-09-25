@@ -151,6 +151,7 @@ import {
   applyRawObjectConfiguration,
   renameObjectAnimationsAndPoints,
   getFrameImageSizes,
+  getModelAnimationSources,
   getRawJsonNote,
 } from './RawObjectConfiguration';
 import {
@@ -327,6 +328,7 @@ export type EditorFunctionGenericOutput = {|
   frameImageSizes?: {
     [imageName: string]: {| width: number, height: number |},
   },
+  modelAnimationSources?: Array<string>,
   // EventScript source view (see `read_events_source`):
   eventScript?: string,
   selectedEventIds?: Array<string>,
@@ -2536,6 +2538,14 @@ const inspectObjectPropertiesEffects: EditorFunction = {
         PixiResourcesLoader
       );
       if (frameImageSizes) output.frameImageSizes = frameImageSizes;
+      const modelAnimationSources = await getModelAnimationSources(
+        project,
+        rawJson,
+        PixiResourcesLoader
+      );
+      if (modelAnimationSources) {
+        output.modelAnimationSources = modelAnimationSources;
+      }
     }
 
     if (objectSupportsEffects(object)) {

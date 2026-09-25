@@ -310,6 +310,10 @@
         },
         "frameImageSizes": {
           "$rawType": "{ [image: string]: { width: number; height: number } }"
+        },
+        "modelAnimationSources": {
+          "type": "array",
+          "items": { "type": "string" }
         }
       },
       "required": ["properties", "behaviors"]

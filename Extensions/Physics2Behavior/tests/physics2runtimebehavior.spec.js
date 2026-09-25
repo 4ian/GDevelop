@@ -414,6 +414,86 @@ describe('Physics2RuntimeBehavior', () => {
     });
   });
 
+  describe('Mass override', () => {
+    let runtimeScene;
+    beforeEach(() => {
+      [, runtimeScene] = createGameWithSceneWithPhysics2SharedData();
+    });
+
+    // The object is a 10x10 pixels box and the world scale is 1 pixel per meter,
+    // so the body is a 10m x 10m box: its mass is 100 kg for a density of 1.
+    const massFromDensity = 100;
+
+    it('computes the mass from the density when there is no mass override', () => {
+      const { behavior } = createObjectWithPhysicsBehavior(runtimeScene);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      expect(behavior.getMassOverride()).to.be(0);
+      expect(behavior.getMass()).to.be.within(
+        massFromDensity - 0.01,
+        massFromDensity + 0.01
+      );
+    });
+
+    it('uses the mass override property instead of the density', () => {
+      const { behavior } = createObjectWithPhysicsBehavior(runtimeScene, {
+        massOverride: 5,
+      });
+      runtimeScene.renderAndStep(1000 / 60);
+
+      expect(behavior.getMassOverride()).to.be(5);
+      expect(behavior.getMass()).to.be(5);
+
+      // The density has no effect on the mass while the override is set.
+      behavior.setDensity(3);
+      expect(behavior.getMass()).to.be(5);
+    });
+
+    it('can change or remove the mass override at runtime', () => {
+      const { behavior } = createObjectWithPhysicsBehavior(runtimeScene);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      behavior.setMassOverride(2);
+      expect(behavior.getMassOverride()).to.be(2);
+      expect(behavior.getMass()).to.be(2);
+
+      behavior.setMassOverride(0);
+      expect(behavior.getMassOverride()).to.be(0);
+      expect(behavior.getMass()).to.be.within(
+        massFromDensity - 0.01,
+        massFromDensity + 0.01
+      );
+
+      // Negative values are treated as no override.
+      behavior.setMassOverride(-4);
+      expect(behavior.getMassOverride()).to.be(0);
+    });
+
+    it('keeps the mass override when the body is changed or recreated', () => {
+      const { object, behavior } = createObjectWithPhysicsBehavior(
+        runtimeScene,
+        { massOverride: 5 }
+      );
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(behavior.getMass()).to.be(5);
+
+      // Box2D recomputes the mass when these are changed.
+      behavior.setFixedRotation(false);
+      expect(behavior.getMass()).to.be(5);
+      behavior.setShapeScale(2);
+      expect(behavior.getMass()).to.be(5);
+      behavior.setStatic();
+      behavior.setDynamic();
+      expect(behavior.getMass()).to.be(5);
+
+      // The body is recreated when the behavior is reactivated.
+      object.activateBehavior('Physics2', false);
+      object.activateBehavior('Physics2', true);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(behavior.getMass()).to.be(5);
+    });
+  });
+
   describe('Contacts computation', () => {
     let runtimeGame;
     let runtimeScene;

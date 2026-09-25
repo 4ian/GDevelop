@@ -155,6 +155,15 @@ module.exports = {
         return true;
       }
 
+      if (propertyName === 'massOverride') {
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getOrCreateChild('massOverride')
+          .setDoubleValue(newValueAsNumber);
+        return true;
+      }
+
       if (propertyName === 'friction') {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
@@ -416,6 +425,21 @@ module.exports = {
             'Define the weight of the object, according to its size. The bigger the density, the heavier the object.'
           )
         );
+      if (!behaviorContent.hasChild('massOverride')) {
+        behaviorContent.addChild('massOverride').setDoubleValue(0);
+      }
+      behaviorProperties
+        .getOrCreate('massOverride')
+        .setValue(
+          behaviorContent.getChild('massOverride').getDoubleValue().toString(10)
+        )
+        .setType('Number')
+        .setLabel(_('Mass override'))
+        .setDescription(
+          _(
+            'Force the mass of the object (in kilograms). Leave at 0 to use the density.'
+          )
+        );
       behaviorProperties
         .getOrCreate('friction')
         .setValue(
@@ -521,6 +545,7 @@ module.exports = {
       behaviorContent.addChild('polygonOrigin').setStringValue('Center');
       behaviorContent.addChild('vertices').considerAsArray();
       behaviorContent.addChild('density').setDoubleValue(1.0);
+      behaviorContent.addChild('massOverride').setDoubleValue(0);
       behaviorContent.addChild('friction').setDoubleValue(0.3);
       behaviorContent.addChild('restitution').setDoubleValue(0.1);
       behaviorContent.addChild('linearDamping').setDoubleValue(0.1);
@@ -1094,6 +1119,62 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .getCodeExtraInformation()
       .setFunctionName('getDensity');
+
+    aut
+      .addCondition(
+        'MassOverride',
+        _('Mass override'),
+        _('Compare the mass override of an object (in kilograms).'),
+        _('the _PARAM0_ mass override'),
+        _('Body settings'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions()
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('getMassOverride');
+
+    aut
+      .addAction(
+        'MassOverride',
+        _('Mass override'),
+        _(
+          'Change the mass override of an object (in kilograms). Set it to 0 to compute the mass from the density and the shape of the object.'
+        ),
+        _('the mass override'),
+        _('Body settings'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions()
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setMassOverride')
+      .setGetter('getMassOverride');
+
+    aut
+      .addExpression(
+        'MassOverride',
+        _('Mass override of the object'),
+        _(
+          'Get the mass override of an object (in kilograms). 0 means the mass is computed from the density and the shape of the object.'
+        ),
+        _('Body settings'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getMassOverride');
 
     aut
       .addCondition(

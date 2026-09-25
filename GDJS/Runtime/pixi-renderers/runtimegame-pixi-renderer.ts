@@ -756,13 +756,6 @@ namespace gdjs {
         manager.onKeyPressed(e.keyCode, e.location);
       };
       document.onkeyup = (e) => {
-        if (isFocusingDomElement()) {
-          // Bail out if the game canvas is not focused. For example,
-          // an `<input>` element can be focused, and needs to receive
-          // arrow keys events.
-          return;
-        }
-
         if (isMacLike) {
           if (e.code === 'MetaLeft' || e.code === 'MetaRight') {
             // Meta key is released. On macOS, a key pressed in combination with meta key, and
@@ -770,6 +763,10 @@ namespace gdjs {
             // This means the key would be considered as "stuck" from the game's perspective
             // it would never be released unless it's pressed and released again (without meta).
             // Out of caution, we simulate a release of the key that were pressed with meta key.
+            // This is done even if a DOM element is focused (see below): the keys were
+            // pressed for the game, and must be released for it whatever has the focus now
+            // (in the in-game editor, an undo/redo triggered by Cmd+Z moves the focus around
+            // before Cmd is released - a stuck Z would then ignore the next Cmd+Z).
             for (const {
               location,
               keyCode,
@@ -778,6 +775,26 @@ namespace gdjs {
             }
             keysPressedWithMetaPressedByCode.clear();
           }
+        }
+
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // arrow keys events.
+          // Still, a key that was pressed for the game (i.e. when it had the
+          // focus) must be released for it, or it would stay "pressed" until
+          // pressed again: the focus can move to a DOM element between the
+          // press and the release (in the in-game editor, an undo/redo
+          // triggered by Ctrl+Z moves the focus around before the keys are
+          // released - a stuck Z or Ctrl would then ignore the next Ctrl+Z).
+          const locationAwareKeyCode = gdjs.InputManager.getLocationAwareKeyCode(
+            e.keyCode,
+            e.location
+          );
+          if (manager.isKeyPressed(locationAwareKeyCode)) {
+            manager.onKeyReleased(e.keyCode, e.location);
+          }
+          return;
         }
 
         if (this._game.isInGameEdition()) {

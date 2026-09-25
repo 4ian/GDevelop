@@ -3,6 +3,7 @@ import {
   getChangedTopLevelKeys,
   findSerializedItemByName,
   getChangedVariableNodeIds,
+  hasRemovedVariables,
 } from './PropertyRowsFlashDiff';
 
 describe('getChangedTopLevelKeys', () => {
@@ -38,6 +39,42 @@ describe('findSerializedItemByName', () => {
   });
 });
 
+describe('hasRemovedVariables', () => {
+  it('detects removed variables at the top level and in structures/arrays', () => {
+    const variables = [
+      { name: 'Score', type: 'number', value: 0 },
+      {
+        name: 'Player',
+        type: 'structure',
+        children: [{ name: 'Life', type: 'number', value: 3 }],
+      },
+      {
+        name: 'Enemies',
+        type: 'array',
+        children: [{ type: 'number', value: 1 }],
+      },
+    ];
+    expect(hasRemovedVariables(variables, variables)).toBe(false);
+    expect(hasRemovedVariables(variables, variables.slice(1))).toBe(true);
+    expect(
+      hasRemovedVariables(variables, [
+        variables[0],
+        { name: 'Player', type: 'structure', children: [] },
+        variables[2],
+      ])
+    ).toBe(true);
+    expect(
+      hasRemovedVariables(variables, [
+        variables[0],
+        variables[1],
+        { name: 'Enemies', type: 'array', children: [] },
+      ])
+    ).toBe(true);
+    // Added ones are not removals.
+    expect(hasRemovedVariables(variables.slice(1), variables)).toBe(false);
+  });
+});
+
 describe('getChangedVariableNodeIds', () => {
   it('returns the node id of a top-level variable whose value changed', () => {
     const before = [{ name: 'Score', type: 'number', value: 0 }];
@@ -45,13 +82,37 @@ describe('getChangedVariableNodeIds', () => {
     expect(getChangedVariableNodeIds(before, after)).toEqual(['Score']);
   });
 
-  it('does not flag an added or removed variable', () => {
+  it('flags an added variable (but not a removed one, which has no row)', () => {
     const before = [{ name: 'Score', type: 'number', value: 0 }];
     const after = [
       { name: 'Score', type: 'number', value: 0 },
       { name: 'Lives', type: 'number', value: 3 },
     ];
-    expect(getChangedVariableNodeIds(before, after)).toEqual([]);
+    expect(getChangedVariableNodeIds(before, after)).toEqual(['Lives']);
+    expect(getChangedVariableNodeIds(after, before)).toEqual([]);
+  });
+
+  it('flags an added child of a structure and an added item of an array', () => {
+    const before = [
+      { name: 'Player', type: 'structure', children: [] },
+      { name: 'Enemies', type: 'array', children: [] },
+    ];
+    const after = [
+      {
+        name: 'Player',
+        type: 'structure',
+        children: [{ name: 'Life', type: 'number', value: 3 }],
+      },
+      {
+        name: 'Enemies',
+        type: 'array',
+        children: [{ type: 'number', value: 1 }],
+      },
+    ];
+    expect(getChangedVariableNodeIds(before, after)).toEqual([
+      'Player$.$Life',
+      'Enemies$.$0',
+    ]);
   });
 
   it('returns the nested node id of a changed structure child', () => {
@@ -104,7 +165,7 @@ describe('getChangedVariableNodeIds', () => {
     expect(getChangedVariableNodeIds(before, after)).toEqual(['X']);
   });
 
-  it('does not flag an array whose length changed (an add/remove within it)', () => {
+  it('flags the item added to an array (and nothing on a removal)', () => {
     const before = [
       { name: 'List', type: 'array', children: [{ type: 'number', value: 1 }] },
     ];
@@ -115,6 +176,7 @@ describe('getChangedVariableNodeIds', () => {
         children: [{ type: 'number', value: 1 }, { type: 'number', value: 2 }],
       },
     ];
-    expect(getChangedVariableNodeIds(before, after)).toEqual([]);
+    expect(getChangedVariableNodeIds(before, after)).toEqual(['List$.$1']);
+    expect(getChangedVariableNodeIds(after, before)).toEqual([]);
   });
 });

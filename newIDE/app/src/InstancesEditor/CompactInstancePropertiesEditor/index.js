@@ -195,8 +195,13 @@ export const CompactInstancePropertiesEditor: React.ComponentType<{
       }
     }, []);
 
+    // By persistent uuid, not pointer: an undo/redo re-creates the
+    // instances, and the panel must not be mounted again (flickering).
     const scrollKey = instances
-      .map((instance: gdInitialInstance) => '' + instance.ptr)
+      .map(
+        (instance: gdInitialInstance) =>
+          instance.getPersistentUuid() || '' + instance.ptr
+      )
       .join(';');
 
     const persistedPanelStateId = React.useMemo(

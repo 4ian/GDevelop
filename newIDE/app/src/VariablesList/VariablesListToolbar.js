@@ -99,6 +99,7 @@ const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
                   {props.isNarrow ? (
                     <IconButton
                       key={key}
+                      id={`variables-list-${key}-button`}
                       tooltip={tooltip}
                       onClick={onClick}
                       size="small"
@@ -109,6 +110,7 @@ const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
                   ) : (
                     <FlatButton
                       key={key}
+                      id={`variables-list-${key}-button`}
                       leftIcon={<Icon />}
                       disabled={disabled}
                       label={label}
@@ -141,6 +143,7 @@ const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
             {props.isNarrow ? (
               <IconButton
                 key="add-variable"
+                id="variables-list-add-button"
                 tooltip={t`Add variable`}
                 onClick={props.onAdd}
                 size="small"
@@ -151,6 +154,7 @@ const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
               <FlatButton
                 primary
                 key="add-variable"
+                id="variables-list-add-button"
                 onClick={props.onAdd}
                 label={<Trans>Add variable</Trans>}
                 leftIcon={<Add />}

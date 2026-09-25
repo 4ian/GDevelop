@@ -65,6 +65,7 @@ import {
   getChangedTopLevelKeys,
   findSerializedItemByName,
   getChangedVariableNodeIds,
+  hasRemovedVariables,
 } from './PropertyRowsFlashDiff';
 import { getIntermediateNamedItemsStates } from './GranularNamedItemsHistorySteps';
 
@@ -1328,10 +1329,19 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _closeObjectGroupEditorDialog = () => {
     const { editedGroup } = this.state;
-    const changeContext: HistoryChangeContext = {
-      source: 'panel',
-      editorId: 'object-groups-list',
-    };
+    const changeContext: HistoryChangeContext = editedGroup
+      ? {
+          source: 'panel',
+          editorId: 'properties',
+          // The dialog can be opened without selecting the group first.
+          revealSelection: {
+            lastSelectionType: 'objectGroup',
+            selectedObjectNames: [],
+            selectedObjectGroupName: editedGroup.getName(),
+            selectedLayerName: null,
+          },
+        }
+      : { source: 'panel', editorId: 'object-groups-list' };
     if (editedGroup) {
       const groupsKey = this.props.objectsContainer
         .getObjectGroups()
@@ -1759,14 +1769,14 @@ export default class SceneEditor extends React.Component<Props, State> {
         : currentSelectionByName;
 
     // /!\ Drop every reference to what the targets own: it can be deleted
-    // (or re-created) when the history is applied.
+    // (or re-created) when the history is applied. The state is not
+    // updated yet though: the selection is put back below, in the same
+    // update as the new history, so that the properties panel is never
+    // rendered with nothing selected in between (which would unmount it
+    // and mount it again - flickering). This relies on nothing being
+    // rendered between here and this update: applying the history is
+    // synchronous.
     this.instancesSelection.clearSelection();
-    this.setState({
-      selectedObjectFolderOrObjectsWithContext: [],
-      selectedObjectGroup: null,
-      selectedLayer: null,
-      tileMapTileSelection: null,
-    });
 
     if (command) this._applyHistoryCommand(command, direction);
 
@@ -1783,97 +1793,103 @@ export default class SceneEditor extends React.Component<Props, State> {
         REFACTORED_HISTORY_KEYS
       );
     }
-    this._setHistory(newHistory, () => {
-      // /!\ Force the instances editor to destroy and mount again the
-      // renderers to avoid keeping any references to existing instances
-      // (or objects).
-      if (this.editorDisplay)
-        this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
-
-      const haveObjectsChanged =
-        !!command ||
-        changedKeys.some(
-          key =>
-            OBJECTS_HISTORY_KEYS.includes(key) ||
-            OBJECT_GROUPS_HISTORY_KEYS.includes(key)
-        );
-      if (haveObjectsChanged) {
-        this.forceUpdateObjectsList();
-        this.forceUpdateObjectGroupsList();
-        if (changedKeys.some(key => OBJECTS_HISTORY_KEYS.includes(key))) {
-          // Behaviors may have been added/removed with the objects.
-          this.updateBehaviorsSharedData();
-          this._refreshHistoryValue(['behaviorsSharedData']);
-          this._hotReloadAllObjects();
-        }
-        this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
-      }
-
-      // Select the instances touched by the change, so it can be seen -
-      // notably in the 3D editor, where the camera is not moved (like
-      // other engines do: the change is revealed by the selection). If no
-      // instance was touched, restore the previous selection.
-      const { changedOrAddedPersistentUuids } = diffInstancesSnapshots(
-        valueBeforeChange.instances,
-        newHistory.currentValue.instances
-      );
-      const persistentUuidsToSelect =
-        changedOrAddedPersistentUuids.length > 0
-          ? changedOrAddedPersistentUuids
-          : selectedInstancesPersistentUuids;
-      const instancesToSelect = persistentUuidsToSelect
-        .map(persistentUuid =>
-          getInstanceInLayoutWithPersistentUuid(
-            this.props.initialInstances,
-            persistentUuid
-          )
+    // Select the instances touched by the change, so it can be seen -
+    // notably in the 3D editor, where the camera is not moved (like
+    // other engines do: the change is revealed by the selection). If no
+    // instance was touched, restore the previous selection.
+    const { changedOrAddedPersistentUuids } = diffInstancesSnapshots(
+      valueBeforeChange.instances,
+      newHistory.currentValue.instances
+    );
+    const persistentUuidsToSelect =
+      changedOrAddedPersistentUuids.length > 0
+        ? changedOrAddedPersistentUuids
+        : selectedInstancesPersistentUuids;
+    const instancesToSelect = persistentUuidsToSelect
+      .map(persistentUuid =>
+        getInstanceInLayoutWithPersistentUuid(
+          this.props.initialInstances,
+          persistentUuid
         )
-        .filter(Boolean);
-      instancesToSelect.forEach(instance => {
-        this.instancesSelection.selectInstance({
-          instance,
-          multiSelect: true,
-          layersLocks: null,
-        });
+      )
+      .filter(Boolean);
+    instancesToSelect.forEach(instance => {
+      this.instancesSelection.selectInstance({
+        instance,
+        multiSelect: true,
+        layersLocks: null,
       });
-      // Instances only take over the panels when they are what the change
-      // touched. Otherwise they just stay selected on the canvas, and the
-      // panels show the object/group/layer that was edited.
-      const haveTouchedInstancesToShow =
-        changedOrAddedPersistentUuids.length > 0 &&
-        instancesToSelect.length > 0;
-      if (
-        haveTouchedInstancesToShow ||
-        !this._restoreSelectionByName(revealSelectionByName)
-      ) {
-        // Goes through the state (and not just `instancesSelection`), so
-        // the editors reading the selection are re-rendered.
-        this._selectObjectOfInstances(instancesToSelect);
-      }
-      this.forceUpdatePropertiesEditor();
-      this._ensureKeyboardFocusStaysInEditor();
-
-      this.forceUpdateLayersList();
-      this.updateToolbar();
-      this._sendHotReloadAllInstances();
-      this._sendHotReloadLayers();
-      // After the instances: the 3D editor can only select the ones it has.
-      this._sendSelectedInstances();
-
-      const renamedName = command
-        ? direction === 'undo'
-          ? command.oldName
-          : command.newName
-        : null;
-      this._revealHistoryChanges(
-        valueBeforeChange,
-        newHistory.currentValue,
-        changeContext,
-        changedKeys,
-        command && command.type === 'renameObject' ? renamedName : null,
-        command && command.type === 'renameObjectGroup' ? renamedName : null
-      );
     });
+    // Instances only take over the panels when they are what the change
+    // touched. Otherwise they just stay selected on the canvas, and the
+    // panels show the object/group/layer that was edited.
+    const haveTouchedInstancesToShow =
+      changedOrAddedPersistentUuids.length > 0 && instancesToSelect.length > 0;
+    const selectionState =
+      (!haveTouchedInstancesToShow &&
+        this._getSelectionStateByName(revealSelectionByName)) ||
+      this._getSelectObjectOfInstancesState(instancesToSelect);
+
+    this._latestHistory = newHistory;
+    this.setState(
+      {
+        history: newHistory,
+        tileMapTileSelection: null,
+        ...selectionState,
+      },
+      () => {
+        // /!\ Force the instances editor to destroy and mount again the
+        // renderers to avoid keeping any references to existing instances
+        // (or objects).
+        if (this.editorDisplay)
+          this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+
+        const haveObjectsChanged =
+          !!command ||
+          changedKeys.some(
+            key =>
+              OBJECTS_HISTORY_KEYS.includes(key) ||
+              OBJECT_GROUPS_HISTORY_KEYS.includes(key)
+          );
+        if (haveObjectsChanged) {
+          this.forceUpdateObjectsList();
+          this.forceUpdateObjectGroupsList();
+          if (changedKeys.some(key => OBJECTS_HISTORY_KEYS.includes(key))) {
+            // Behaviors may have been added/removed with the objects.
+            this.updateBehaviorsSharedData();
+            this._refreshHistoryValue(['behaviorsSharedData']);
+            this._hotReloadAllObjects();
+          }
+          this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
+        }
+
+        this.forceUpdatePropertiesEditor();
+        this._ensureKeyboardFocusStaysInEditor();
+
+        this.forceUpdateLayersList();
+        this.updateToolbar();
+        this._sendHotReloadAllInstances();
+        this._sendHotReloadLayers();
+        if (changedKeys.includes('sceneProperties'))
+          this._sendSetBackgroundColor();
+        // After the instances: the 3D editor can only select the ones it has.
+        this._sendSelectedInstances();
+
+        const renamedName = command
+          ? direction === 'undo'
+            ? command.oldName
+            : command.newName
+          : null;
+        this._revealHistoryChanges(
+          valueBeforeChange,
+          newHistory.currentValue,
+          changeContext,
+          changedKeys,
+          command && command.type === 'renameObject' ? renamedName : null,
+          command && command.type === 'renameObjectGroup' ? renamedName : null
+        );
+      }
+    );
   };
 
   /**
@@ -1919,12 +1935,18 @@ export default class SceneEditor extends React.Component<Props, State> {
    * panels (objects were re-created: they are found by their name). Return
    * false if there was nothing to select in the panels (or it's gone).
    */
-  _restoreSelectionByName = ({
+  /**
+   * The state selecting again, after the history was applied, what was
+   * selected in the panels (objects were re-created: they are found by
+   * their name) - or null if there is nothing to select in the panels
+   * (or it's gone).
+   */
+  _getSelectionStateByName = ({
     lastSelectionType,
     selectedObjectNames,
     selectedObjectGroupName,
     selectedLayerName,
-  }: SelectionByName): boolean => {
+  }: SelectionByName): ?Partial<State> => {
     const {
       objectsContainer,
       globalObjectsContainer,
@@ -1940,9 +1962,13 @@ export default class SceneEditor extends React.Component<Props, State> {
           )
         )
         .filter(Boolean);
-      if (objectsWithContext.length === 0) return false;
-      this._onObjectFolderOrObjectsWithContextSelected(objectsWithContext);
-      return true;
+      if (objectsWithContext.length === 0) return null;
+      return {
+        lastSelectionType: 'object',
+        selectedObjectFolderOrObjectsWithContext: objectsWithContext,
+        selectedLayer: null,
+        selectedObjectGroup: null,
+      };
     }
     if (lastSelectionType === 'objectGroup' && selectedObjectGroupName) {
       const groupName = selectedObjectGroupName;
@@ -1952,19 +1978,27 @@ export default class SceneEditor extends React.Component<Props, State> {
           ? globalObjectsContainer.getObjectGroups()
           : null,
       ].find(groups => groups && groups.has(groupName));
-      if (!groupsContainer) return false;
-      this._onSelectObjectGroup(groupsContainer.get(groupName));
-      return true;
+      if (!groupsContainer) return null;
+      return {
+        selectedObjectGroup: groupsContainer.get(groupName),
+        lastSelectionType: 'objectGroup',
+        selectedLayer: null,
+        selectedObjectFolderOrObjectsWithContext: [],
+      };
     }
     if (
       lastSelectionType === 'layer' &&
       typeof selectedLayerName === 'string'
     ) {
-      if (!layersContainer.hasLayerNamed(selectedLayerName)) return false;
-      this._onSelectLayer(layersContainer.getLayer(selectedLayerName));
-      return true;
+      if (!layersContainer.hasLayerNamed(selectedLayerName)) return null;
+      return {
+        selectedLayer: layersContainer.getLayer(selectedLayerName),
+        lastSelectionType: 'layer',
+        selectedObjectGroup: null,
+        selectedObjectFolderOrObjectsWithContext: [],
+      };
     }
-    return false;
+    return null;
   };
 
   _applyHistoryCommand = (
@@ -2265,62 +2299,48 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.deselectAll();
   };
 
-  _selectObjectOfInstances = (instances: Array<gdInitialInstance>) => {
-    if (instances.length === 0) {
-      this.setState(
-        {
-          lastSelectionType: 'instance',
-          selectedObjectFolderOrObjectsWithContext: [],
-          selectedLayer: null,
-          selectedObjectGroup: null,
-        },
-        this.updateToolbar
-      );
-      return;
-    }
+  /** The state selecting (in the panels) the object of the given instances. */
+  _getSelectObjectOfInstancesState = (
+    instances: Array<gdInitialInstance>
+  ): Partial<State> => {
     const { globalObjectsContainer, objectsContainer } = this.props;
     // TODO: Find a way to select efficiently the ObjectFolderOrObject instances
     // representing all the instances selected.
     const lastSelectedInstance = instances[instances.length - 1];
-    const objectName = lastSelectedInstance.getObjectName();
-    if (
+    const objectName = lastSelectedInstance
+      ? lastSelectedInstance.getObjectName()
+      : null;
+    const container =
+      objectName &&
       globalObjectsContainer &&
       globalObjectsContainer.hasObjectNamed(objectName)
-    ) {
-      this.setState(
-        {
-          lastSelectionType: 'instance',
-          selectedObjectFolderOrObjectsWithContext: [
-            {
-              objectFolderOrObject: globalObjectsContainer
-                .getRootFolder()
-                .getObjectNamed(objectName),
-              global: true,
-            },
-          ],
-          selectedLayer: null,
-          selectedObjectGroup: null,
-        },
-        this.updateToolbar
-      );
-    } else if (objectsContainer.hasObjectNamed(objectName)) {
-      this.setState(
-        {
-          lastSelectionType: 'instance',
-          selectedObjectFolderOrObjectsWithContext: [
-            {
-              objectFolderOrObject: objectsContainer
-                .getRootFolder()
-                .getObjectNamed(objectName),
-              global: false,
-            },
-          ],
-          selectedLayer: null,
-          selectedObjectGroup: null,
-        },
-        this.updateToolbar
-      );
-    }
+        ? globalObjectsContainer
+        : objectName && objectsContainer.hasObjectNamed(objectName)
+        ? objectsContainer
+        : null;
+    return {
+      lastSelectionType: 'instance',
+      selectedObjectFolderOrObjectsWithContext:
+        container && objectName
+          ? [
+              {
+                objectFolderOrObject: container
+                  .getRootFolder()
+                  .getObjectNamed(objectName),
+                global: container === globalObjectsContainer,
+              },
+            ]
+          : [],
+      selectedLayer: null,
+      selectedObjectGroup: null,
+    };
+  };
+
+  _selectObjectOfInstances = (instances: Array<gdInitialInstance>) => {
+    this.setState(
+      this._getSelectObjectOfInstancesState(instances),
+      this.updateToolbar
+    );
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
@@ -3076,7 +3096,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateBehaviorsSharedData();
     this._recordGranularObjectHistorySteps(
       objectWithContext,
-      { source: 'panel', editorId: 'objects-list' },
+      {
+        source: 'panel',
+        editorId: 'properties',
+        // The dialog can be opened without selecting the object first.
+        revealSelection: {
+          lastSelectionType: 'object',
+          selectedObjectNames: [objectWithContext.object.getName()],
+          selectedObjectGroupName: null,
+          selectedLayerName: null,
+        },
+      },
       ['behaviorsSharedData']
     );
     if (this.props.unsavedChanges)
@@ -3277,7 +3307,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           // The history is saved by the layers list once it removed the
           // layer (see `_onLayersModified`), in a single step with the
           // instances removed above.
+          if (doRemove) this._removedLayerNameToReveal = layerName;
           done(doRemove);
+          this._removedLayerNameToReveal = null;
           // /!\ Force the instances editor to destroy and mount again the
           // renderers to avoid keeping any references to existing instances
           if (this.editorDisplay)
@@ -3345,11 +3377,31 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  // Set while a layer is removed: undoing the removal shows this layer.
+  _removedLayerNameToReveal: ?string = null;
+
   _onLayersModified = (hasAnyEffectBeenAdded: boolean) => {
+    const removedLayerName = this._removedLayerNameToReveal;
+    this._removedLayerNameToReveal = null;
     // Instances too: removing a layer removes its instances.
     this._recordHistoryStep(
       undefined,
-      { source: 'panel', editorId: 'layers-list' },
+      {
+        source: 'panel',
+        editorId: 'layers-list',
+        ...(typeof removedLayerName === 'string'
+          ? {
+              // Undoing the removal shows the layer back (it's not
+              // selected anymore at this point: give its name).
+              revealSelection: {
+                lastSelectionType: 'layer',
+                selectedObjectNames: [],
+                selectedObjectGroupName: null,
+                selectedLayerName: removedLayerName,
+              },
+            }
+          : {}),
+      },
       ['layers', 'instances']
     );
 
@@ -3391,6 +3443,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       selectedLayer: layer,
       lastSelectionType: 'layer',
       selectedObjectGroup: null,
+      // Don't keep references to objects that are not shown anymore (they
+      // can be deleted in the meantime).
+      selectedObjectFolderOrObjectsWithContext: [],
     });
   };
 
@@ -3399,6 +3454,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       selectedObjectGroup: objectGroup,
       lastSelectionType: 'objectGroup',
       selectedLayer: null,
+      selectedObjectFolderOrObjectsWithContext: [],
     });
   };
 
@@ -3408,6 +3464,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     done: boolean => void
   ) => {
     const { project, layout, eventsBasedObject, onObjectsDeleted } = this.props;
+    const deletedObjectNames = objectsWithContext.map(({ object }) =>
+      object.getName()
+    );
 
     objectsWithContext.forEach(objectWithContext => {
       const { object, global } = objectWithContext;
@@ -3455,7 +3514,18 @@ export default class SceneEditor extends React.Component<Props, State> {
     // to these targets.
     this._recordHistoryStep(
       'DELETE',
-      { source: 'panel', editorId: 'objects-list' },
+      {
+        source: 'panel',
+        editorId: 'objects-list',
+        // Undoing the deletion shows the objects back (they are not
+        // selected anymore at this point: give their names).
+        revealSelection: {
+          lastSelectionType: 'object',
+          selectedObjectNames: deletedObjectNames,
+          selectedObjectGroupName: null,
+          selectedLayerName: null,
+        },
+      },
       [...OBJECTS_HISTORY_KEYS, ...OBJECT_GROUPS_HISTORY_KEYS, 'instances']
     );
 
@@ -4744,6 +4814,98 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   /**
+   * Show the changed fields of a sub panel (a behavior or an effect) of a
+   * section of the properties panel: unfold the section, the sub panel and
+   * its advanced fields if needed - and flash the changed fields, or the
+   * sub panel itself if none of them can be found (the ids of the fields
+   * don't always follow the keys of the serialized content).
+   */
+  _revealChangedFieldsOfSubPanel = (
+    sectionId: string,
+    subPanelId: string,
+    changedKeys: Array<string>
+  ) => {
+    const containerElement = this._containerElement;
+    if (!containerElement) return;
+    this._unfoldSection(sectionId);
+
+    const retryDelayMs = 100;
+    let subPanelUnfolded = false;
+    let advancedFieldsShown = false;
+    const attempt = (remainingRetries: number) => {
+      const panelElement = this._findElementByAttribute(
+        containerElement,
+        'id',
+        subPanelId
+      );
+      if (panelElement && this._isElementVisible(panelElement)) {
+        if (!subPanelUnfolded) {
+          const unfoldButton = this._findElementByAttribute(
+            panelElement,
+            'id',
+            `${subPanelId}-unfold-button`
+          );
+          if (unfoldButton) {
+            unfoldButton.click();
+            subPanelUnfolded = true;
+            setTimeout(() => attempt(remainingRetries), retryDelayMs);
+            return;
+          }
+          subPanelUnfolded = true;
+        }
+        const fieldElements = changedKeys
+          .map(key => this._findFieldElementByKey(panelElement, key))
+          .filter(Boolean);
+        if (fieldElements.length > 0) {
+          fieldElements.forEach(element => this._flashElement(element));
+          return;
+        }
+        if (!advancedFieldsShown) {
+          const showMoreButton = this._findElementByAttribute(
+            panelElement,
+            'id',
+            'show-advanced-properties-button'
+          );
+          if (showMoreButton) {
+            showMoreButton.click();
+            advancedFieldsShown = true;
+            setTimeout(() => attempt(remainingRetries), retryDelayMs);
+            return;
+          }
+        }
+        this._flashElement(panelElement);
+        return;
+      }
+      if (remainingRetries > 0)
+        setTimeout(() => attempt(remainingRetries - 1), retryDelayMs);
+    };
+    attempt(10);
+  };
+
+  /**
+   * Find the field of the given serialized key in an element - the ids of
+   * the fields are the names of the properties, which usually only differ
+   * from the keys of the serialized content by their case.
+   */
+  _findFieldElementByKey = (
+    scopeElement: HTMLElement,
+    key: string
+  ): ?HTMLElement => {
+    const lowerCaseKey = key.toLowerCase();
+    const elements = scopeElement.querySelectorAll('[id]');
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i];
+      if (
+        element instanceof HTMLElement &&
+        element.id.toLowerCase() === lowerCaseKey &&
+        this._isElementVisible(element)
+      )
+        return element;
+    }
+    return null;
+  };
+
+  /**
    * Unfold a section of the properties panel (if it's folded), so that a
    * change made inside can be revealed.
    */
@@ -4780,7 +4942,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (!sectionElement || !this._isElementVisible(sectionElement)) return;
 
     const changedNodeIds = getChangedVariableNodeIds(before, after);
-    if (changedNodeIds.length === 0) return;
+    if (changedNodeIds.length === 0) {
+      // Removed variables have no row anymore: flash the section instead.
+      if (hasRemovedVariables(before, after)) {
+        this._unfoldSection(sectionId);
+        this._flashElement(sectionElement);
+      }
+      return;
+    }
 
     this._unfoldSection(sectionId);
     // The variables list only renders its visible rows: ask it to scroll to
@@ -4837,36 +5006,28 @@ export default class SceneEditor extends React.Component<Props, State> {
       ]);
       if (changedKeys.length === 0) return;
 
-      const sectionId = getSectionId(afterEffect);
-      this._unfoldSection(sectionId);
-      const sectionElement = this._findElementByAttribute(
-        containerElement,
-        'id',
-        sectionId
-      );
-      if (!sectionElement || !this._isElementVisible(sectionElement)) return;
-
-      this._flashOrRetryThenFallback(() => {
-        // See the comment in `_flashChangedVariableRows`: the content is a
-        // sibling of the section header, not a descendant of it.
-        const contentElement = this._findElementByAttribute(
-          containerElement,
-          'id',
-          `${sectionId}-content`
-        );
-        const panelElement =
-          contentElement &&
-          this._findElementByAttribute(
-            contentElement,
-            'id',
-            `effect-panel-${afterEffect.name}`
-          );
-        if (panelElement && this._isElementVisible(panelElement)) {
-          this._flashElement(panelElement);
-          return true;
+      // The parameters are grouped by type: find the ones that changed.
+      const changedParameterNames = [];
+      ['doubleParameters', 'stringParameters', 'booleanParameters'].forEach(
+        parametersKey => {
+          const beforeParameters = beforeEffect[parametersKey] || {};
+          const afterParameters = afterEffect[parametersKey] || {};
+          new Set([
+            ...Object.keys(beforeParameters),
+            ...Object.keys(afterParameters),
+          ]).forEach(parameterName => {
+            if (
+              beforeParameters[parameterName] !== afterParameters[parameterName]
+            )
+              changedParameterNames.push(parameterName);
+          });
         }
-        return false;
-      }, sectionElement);
+      );
+      this._revealChangedFieldsOfSubPanel(
+        getSectionId(afterEffect),
+        `effect-panel-${afterEffect.name}`,
+        changedParameterNames.length > 0 ? changedParameterNames : changedKeys
+      );
     });
   };
 
@@ -4903,19 +5064,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
       if (changedKeys.length === 0) return;
 
-      this._unfoldSection('behaviors-section');
-      this._flashOrRetryThenFallback(() => {
-        const panelElement = this._findElementByAttribute(
-          containerElement,
-          'id',
-          `behavior-panel-${afterBehavior.name}`
-        );
-        if (panelElement && this._isElementVisible(panelElement)) {
-          this._flashElement(panelElement);
-          return true;
-        }
-        return false;
-      }, sectionElement);
+      this._revealChangedFieldsOfSubPanel(
+        'behaviors-section',
+        `behavior-panel-${afterBehavior.name}`,
+        changedKeys
+      );
     });
   };
 
@@ -4947,7 +5100,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       after: ?Array<Object>,
     |}> = [];
     let anyBehaviorOverrideChanged = false;
-    const changedBehaviorNames = new Set<string>();
+    const changedKeysByBehaviorName = new Map<string, Array<string>>();
     changedOrAddedPersistentUuids.forEach(persistentUuid => {
       const beforeInstance = instancesByUuidBeforeChange.get(persistentUuid);
       const afterInstance = instancesByUuidAfterChange.get(persistentUuid);
@@ -4971,7 +5124,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         getChangedVariableNodeIds(
           beforeInstance.initialVariables,
           afterInstance.initialVariables
-        ).length > 0
+        ).length > 0 ||
+        // Removed variables (undoing an addition) are shown too.
+        hasRemovedVariables(
+          beforeInstance.initialVariables,
+          afterInstance.initialVariables
+        )
       ) {
         changedInstanceVariables.push({
           before: beforeInstance.initialVariables,
@@ -4990,11 +5148,25 @@ export default class SceneEditor extends React.Component<Props, State> {
       const beforeOverridings = beforeInstance.behaviorOverridings || [];
       const afterOverridings = afterInstance.behaviorOverridings || [];
       [...beforeOverridings, ...afterOverridings].forEach(({ name }) => {
+        const beforeOverriding = findSerializedItemByName(
+          beforeOverridings,
+          name
+        );
+        const afterOverriding = findSerializedItemByName(
+          afterOverridings,
+          name
+        );
         if (
-          JSON.stringify(findSerializedItemByName(beforeOverridings, name)) !==
-          JSON.stringify(findSerializedItemByName(afterOverridings, name))
+          JSON.stringify(beforeOverriding) !== JSON.stringify(afterOverriding)
         ) {
-          changedBehaviorNames.add(name);
+          changedKeysByBehaviorName.set(
+            name,
+            getChangedTopLevelKeys(
+              beforeOverriding || {},
+              afterOverriding || {},
+              ['name', 'type']
+            )
+          );
           anyBehaviorOverrideChanged = true;
         }
       });
@@ -5030,30 +5202,23 @@ export default class SceneEditor extends React.Component<Props, State> {
         });
         if (anyBehaviorOverrideChanged) {
           this._unfoldSection('behaviors-section');
-          const sectionElement = this._findElementByAttribute(
-            containerElement,
-            'id',
-            'behaviors-section'
-          );
-          if (sectionElement && this._isElementVisible(sectionElement)) {
-            if (changedBehaviorNames.size === 0) {
+          if (changedKeysByBehaviorName.size === 0) {
+            const sectionElement = this._findElementByAttribute(
+              containerElement,
+              'id',
+              'behaviors-section'
+            );
+            if (sectionElement && this._isElementVisible(sectionElement)) {
               this._flashElement(sectionElement);
             }
-            changedBehaviorNames.forEach(behaviorName => {
-              this._flashOrRetryThenFallback(() => {
-                const panelElement = this._findElementByAttribute(
-                  containerElement,
-                  'id',
-                  `behavior-panel-${behaviorName}`
-                );
-                if (panelElement && this._isElementVisible(panelElement)) {
-                  this._flashElement(panelElement);
-                  return true;
-                }
-                return false;
-              }, sectionElement);
-            });
           }
+          changedKeysByBehaviorName.forEach((changedKeys, behaviorName) => {
+            this._revealChangedFieldsOfSubPanel(
+              'behaviors-section',
+              `behavior-panel-${behaviorName}`,
+              changedKeys
+            );
+          });
         }
       });
     });
@@ -5080,6 +5245,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       if (!beforeObject) return;
       const beforeSerialized = beforeObject.serialized || {};
       const afterSerialized = afterObject.serialized || {};
+      if (JSON.stringify(beforeSerialized) === JSON.stringify(afterSerialized))
+        return;
+
+      // Show the object in the list too (opening its folder if needed).
+      this._flashObjectListRowByName(afterObject.name);
 
       if (editorDisplay.isEditorVisible('properties')) {
         const changedFieldIds = [
@@ -5098,8 +5268,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         ];
         this._flashFieldsOfSection(
           'object-properties-section',
-          changedFieldIds,
-          () => this._flashObjectListRowByName(afterObject.name)
+          changedFieldIds
         );
 
         this._flashChangedBehaviorRows(
@@ -5319,13 +5488,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (changedKeys.includes('behaviorsSharedData')) {
       const before = beforeChange.behaviorsSharedData || {};
       const after = afterChange.behaviorsSharedData || {};
-      const changedBehaviorNames = Object.keys(after).filter(
-        name => JSON.stringify(before[name]) !== JSON.stringify(after[name])
-      );
-      this._flashFieldsOfSection(
-        'scene-behaviors-section',
-        changedBehaviorNames.map(name => `behavior-panel-${name}`)
-      );
+      Object.keys(after)
+        .filter(
+          name => JSON.stringify(before[name]) !== JSON.stringify(after[name])
+        )
+        .forEach(name => {
+          this._revealChangedFieldsOfSubPanel(
+            'scene-behaviors-section',
+            `behavior-panel-${name}`,
+            getChangedTopLevelKeys(before[name] || {}, after[name] || {})
+          );
+        });
     }
 
     if (changedKeys.includes('sceneVariables')) {
@@ -5391,14 +5564,21 @@ export default class SceneEditor extends React.Component<Props, State> {
     // A change made in a panel is only visible there: open this panel. A
     // change made on the canvas is already visible: don't open anything.
     if (changeContext && changeContext.source === 'panel') {
-      if (
-        changeContext.editorId === 'properties' &&
+      const isAboutTheScene =
         changedKeys.some(key =>
           ['sceneProperties', 'sceneVariables', 'behaviorsSharedData'].includes(
             key
           )
-        )
-      ) {
+        ) &&
+        // A step about an object can carry the behaviors shared data with
+        // it (see `_onObjectEdited`): the object is what to show then.
+        !changedKeys.some(
+          key =>
+            OBJECTS_HISTORY_KEYS.includes(key) ||
+            OBJECT_GROUPS_HISTORY_KEYS.includes(key) ||
+            key === 'layers'
+        );
+      if (changeContext.editorId === 'properties' && isAboutTheScene) {
         // Scene properties are only shown in the properties panel when
         // nothing is selected: deselect so the change can be seen.
         this.instancesSelection.clearSelection();
@@ -6060,9 +6240,18 @@ export default class SceneEditor extends React.Component<Props, State> {
                       onApply={(hasAnyEffectBeenAdded: boolean) => {
                         const { editedLayer } = this.state;
                         if (editedLayer) {
+                          // The change is shown in the properties panel,
+                          // with the edited layer selected (the dialog can
+                          // be opened without selecting the layer first).
                           this._recordGranularLayerHistorySteps(editedLayer, {
                             source: 'panel',
-                            editorId: 'layers-list',
+                            editorId: 'properties',
+                            revealSelection: {
+                              lastSelectionType: 'layer',
+                              selectedObjectNames: [],
+                              selectedObjectGroupName: null,
+                              selectedLayerName: editedLayer.getName(),
+                            },
                           });
                         }
                         if (hasAnyEffectBeenAdded) {

@@ -406,6 +406,7 @@ const LayerEditorDialog = ({
                       commitOnBlur
                       fullWidth
                       errorText={camera3DNearPlaneDistanceError}
+                      id="Near plane distance"
                       onChange={onChangeCamera3DNearPlaneDistance}
                       value={layer.getCamera3DNearPlaneDistance().toString(10)}
                       floatingLabelText={<Trans>Near plane distance</Trans>}
@@ -415,6 +416,7 @@ const LayerEditorDialog = ({
                       commitOnBlur
                       fullWidth
                       errorText={camera3DFarPlaneDistanceError}
+                      id="Far plane distance"
                       onChange={onChangeCamera3DFarPlaneDistance}
                       value={layer.getCamera3DFarPlaneDistance().toString(10)}
                       floatingLabelText={<Trans>Far plane distance</Trans>}

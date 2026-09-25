@@ -51,10 +51,14 @@ export const getChangedVariableNodeIds = (
   const changedNodeIds: Array<string> = [];
   (after || []).forEach(afterVariable => {
     const beforeVariable = beforeByName.get(afterVariable.name);
-    if (!beforeVariable) return;
     const nodeId = parentNodeId
       ? `${parentNodeId}${variableTreeSeparator}${afterVariable.name}`
       : afterVariable.name;
+    // An added variable is a change to show too.
+    if (!beforeVariable) {
+      changedNodeIds.push(nodeId);
+      return;
+    }
     changedNodeIds.push(
       ...getChangedVariableOrChildrenNodeIds(
         beforeVariable,
@@ -73,11 +77,16 @@ const getChangedArrayVariableNodeIds = (
 ): Array<string> => {
   const beforeChildren = before || [];
   const afterChildren = after || [];
-  if (beforeChildren.length !== afterChildren.length) return [];
   const changedNodeIds: Array<string> = [];
   afterChildren.forEach((afterVariable, index) => {
     const beforeVariable = beforeChildren[index];
     const nodeId = `${parentNodeId}${variableTreeSeparator}${index}`;
+    // An added item is a change to show too. Items are matched by index:
+    // a removed item makes the ones after it look changed, which is fine.
+    if (!beforeVariable) {
+      changedNodeIds.push(nodeId);
+      return;
+    }
     changedNodeIds.push(
       ...getChangedVariableOrChildrenNodeIds(
         beforeVariable,
@@ -87,6 +96,35 @@ const getChangedArrayVariableNodeIds = (
     );
   });
   return changedNodeIds;
+};
+
+/**
+ * Whether the change removed variables (top level or children): the rows of
+ * removed variables can't be flashed, so their container is instead.
+ */
+export const hasRemovedVariables = (
+  before: ?Array<Object>,
+  after: ?Array<Object>
+): boolean => {
+  const afterByName = new Map(
+    (after || []).map(variable => [variable.name, variable])
+  );
+  return (before || []).some(beforeVariable => {
+    const afterVariable = afterByName.get(beforeVariable.name);
+    if (!afterVariable) return true;
+    if (beforeVariable.type !== afterVariable.type) return false;
+    if (afterVariable.type === 'structure')
+      return hasRemovedVariables(
+        beforeVariable.children,
+        afterVariable.children
+      );
+    if (afterVariable.type === 'array')
+      return (
+        (beforeVariable.children || []).length >
+        (afterVariable.children || []).length
+      );
+    return false;
+  });
 };
 
 const getChangedVariableOrChildrenNodeIds = (

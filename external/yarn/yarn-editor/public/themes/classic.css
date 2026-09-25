@@ -1,0 +1,216 @@
+/*-- General ------------------------------------------------------------------ */
+:root {
+  --yarnBg: #baf5f2;
+  --yarnFg: #00dcff;
+}
+
+#app-bg {
+  background: -webkit-linear-gradient(45deg, #ddc9b9 0%, #daf0f2 100%);
+}
+
+a {
+  color: #2f919a;
+  text-decoration: none;
+  transition: color 0.25s;
+}
+
+a:hover {
+  color: #000;
+}
+.styled-checkbox>label>svg,
+.bbcode-button>svg {
+  fill: #8a8a8a;
+}
+
+.styled-checkbox:active>label>svg,
+.styled-checkbox:hover>label>svg,
+.bbcode-button:hover >svg {
+  fill: #09292b;
+}
+
+/*-- Menu ------------------------------------------------------------------ */
+
+.app-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background-color: transparent;
+}
+
+.app-menu .menu {
+  display: block;
+  float: left;
+  margin-left: 10px;
+  border-radius: 2px;
+  box-shadow: 0;
+  font-size: 0.9em;
+  color: #666;
+  cursor: pointer;
+  background-color: white;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+  margin: 5px;
+}
+
+.title {
+  box-sizing: border-box;
+  padding: 5px;
+  width: fit-content;
+  min-width: 100px;
+  line-height: 20px;
+  font-weight: bold;
+  float: left;
+}
+
+.menu .dropdown {
+  color: #2e8074;
+  background-color: white;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+}
+
+.menu .dropdown .item:hover .menu-icon {
+  color: black;
+}
+
+.menu-icon {
+  color: #289aa5;
+}
+
+.settings-icon {
+  color: #289aa5;
+}
+
+/*-- Canvas Buttons ------------------------------------------------------- */
+.app-add-node {
+  color: grey;
+}
+
+.app-add-node:hover {
+  color: var(--yarnFg);
+}
+
+.app-button span {
+  color: grey;
+}
+
+.app-button span:hover {
+  color: var(--yarnFg);
+}
+
+.app-add-node, .app-button {
+  opacity: 0.7;
+}
+
+/*-- Search ----------------------------------------------------------------- */
+
+.app-search {
+  position: absolute;
+  top: 0;
+  right: 10px;
+}
+
+.app-search input {
+  font-family: 'Lucida Console', Monaco, monospace;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+.app-search .search-field {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.search-field:focus,
+.dropdown .item:hover {
+  background-color: var(--yarnBg);
+  color: black;
+}
+
+.app-search input[type='checkbox'] {
+  cursor: pointer;
+}
+
+.app-search .dropdown .item {
+  display: block;
+  box-sizing: border-box;
+  padding: 7px;
+}
+
+#openHelperMenu > span {
+  color: rgb(121 121 121);
+}
+/*-- Node ------------------------------------------------------------------ */
+
+.node.selected {
+  box-shadow: 0 0 0 2px #49eff1;
+}
+
+.node:hover {
+  box-shadow: 0 0 0 2px #49eff1;
+}
+
+.title-style-1 {
+  background-color: #EBEBEB;
+  color: black;
+}
+.title-style-2 {
+  background-color: #6EA5E0;
+}
+.title-style-3 {
+  background-color: #9EDE74;
+}
+.title-style-4 {
+  background-color: #FFE374;
+}
+
+.title-style-5 {
+  background-color: #F7A666;
+}
+.title-style-6 {
+  background-color: #C47862;
+}
+.title-style-7 {
+  background-color: #97E1E9;
+}
+.title-style-8 {
+  background-color: #576574;
+  color: white;
+}
+.title-style-9 {
+  background-color: black;
+  color: white;
+}
+
+.node.selected {
+  box-shadow: 0px 0px 0px 2px cyan;
+  border: none;
+}
+
+.app-info {
+  color: #b9786d;
+}
+/*-- ----------------------------Narrow overrides---------------------------- */
+
+@media only screen and (max-width: 600px) {
+  .app-menu {
+    box-shadow: 0 0;
+  }
+
+  .app-search {
+    position: absolute;
+    margin: 5px;
+    width: 50%;
+    padding: 5px 10px 5px 5px;
+    z-index: 10000;
+  }
+
+  .app-search input {
+    padding: unset;
+    width: 170px;
+  }
+}
+
+.grid-canvas {
+  color: grey;
+}

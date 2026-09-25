@@ -324,6 +324,7 @@ export const WithObjectsList = (): React.Node => (
                     cb
                   ) => cb(true)}
                   onObjectCreated={() => {}}
+                  onEffectAdded={() => {}}
                   onObjectEdited={() => {}}
                   onObjectFolderOrObjectsWithContextSelected={() => {}}
                   onSetAsGlobalObject={action('onSetAsGlobalObject')}

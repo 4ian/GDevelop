@@ -234,6 +234,7 @@ export const ObjectsListStory = (): React.Node => {
             onImportAssets={action('On import assets')}
             onAddObjectInstance={action('On add instance to the scene')}
             onObjectCreated={action('On object created')}
+            onEffectAdded={action('On effect added')}
             onObjectEdited={action('On object edited')}
             getValidatedObjectOrGroupName={(newName: string) => newName}
             onDeleteObjects={(objectsWithContext, cb) => cb(true)}

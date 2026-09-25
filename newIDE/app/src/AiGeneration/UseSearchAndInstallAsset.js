@@ -3,6 +3,8 @@ import * as React from 'react';
 import {
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
+  type EffectAssetSearchAndInstallOptions,
+  type EffectAssetSearchAndInstallResult,
 } from '../EditorFunctions';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
@@ -10,12 +12,17 @@ import {
   type AssetSearch,
 } from '../Utils/GDevelopServices/Generation';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
-import { useInstallAsset } from '../AssetStore/NewObjectDialog';
+import {
+  useInstallAsset,
+  useInstallEffectAsset,
+} from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
+import { isEffectAsset } from '../Utils/GDevelopServices/Asset';
 
 type _FuncReturnType = {
   searchAndInstallAsset: AssetSearchAndInstallOptions => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallEffectAsset: EffectAssetSearchAndInstallOptions => Promise<EffectAssetSearchAndInstallResult>,
 };
 
 export const useSearchAndInstallAsset = ({
@@ -39,8 +46,101 @@ export const useSearchAndInstallAsset = ({
     onWillInstallExtension,
     onExtensionInstalled,
   });
+  const installEffectAsset = useInstallEffectAsset({
+    project,
+    resourceManagementProps,
+  });
+
+  const searchAndInstallEffectAsset = React.useCallback(
+    async ({
+      effectsContainer,
+      effectName,
+      effectType,
+      exactOrPartialAssetId,
+      ...assetSearchOptions
+    }: EffectAssetSearchAndInstallOptions): Promise<EffectAssetSearchAndInstallResult> => {
+      if (!profile) throw new Error('User should be authenticated.');
+
+      let assetShortHeader = getAssetShortHeaderFromId(exactOrPartialAssetId);
+      if (!assetShortHeader) {
+        const assetSearch: AssetSearch = await retryIfFailed(
+          { times: 3, backoff: { initialDelay: 300, factor: 2 } },
+          () =>
+            createAssetSearch(getAuthorizationHeader, {
+              userId: profile.id,
+              objectType: effectType || '',
+              exactOrPartialAssetId,
+              searchTerms: '',
+              description: '',
+              twoDimensionalViewKind: '',
+              ...assetSearchOptions,
+            })
+        );
+        const chosenResult = assetSearch.results
+          ? assetSearch.results[0]
+          : null;
+        if (!chosenResult) {
+          return {
+            status: 'nothing-found',
+            message: `No asset found with id "${exactOrPartialAssetId}".`,
+            effect: null,
+            assetShortHeader: null,
+          };
+        }
+        assetShortHeader = chosenResult.asset;
+      }
+
+      if (!isEffectAsset(assetShortHeader)) {
+        return {
+          status: 'nothing-found',
+          message: `Asset with id "${exactOrPartialAssetId}" is a "${
+            assetShortHeader.objectType
+          }" object, not an effect.`,
+          effect: null,
+          assetShortHeader: null,
+        };
+      }
+      if (effectType && assetShortHeader.objectType !== effectType) {
+        return {
+          status: 'nothing-found',
+          message: `Asset with id "${exactOrPartialAssetId}" is a "${
+            assetShortHeader.objectType
+          }" effect, not a "${effectType}": leave the effect type out or give the one of the asset.`,
+          effect: null,
+          assetShortHeader: null,
+        };
+      }
+
+      const effect = await installEffectAsset({
+        assetShortHeader,
+        effectsContainer,
+        effectName,
+      });
+      if (!effect) {
+        return {
+          status: 'error',
+          message: 'Asset found but failed to install it.',
+          effect: null,
+          assetShortHeader: null,
+        };
+      }
+      return {
+        status: 'asset-installed',
+        message: 'Asset installed successfully.',
+        effect,
+        assetShortHeader,
+      };
+    },
+    [
+      installEffectAsset,
+      profile,
+      getAuthorizationHeader,
+      getAssetShortHeaderFromId,
+    ]
+  );
 
   return {
+    searchAndInstallEffectAsset,
     searchAndInstallAsset: React.useCallback(
       async ({
         objectsContainer,
@@ -59,6 +159,17 @@ export const useSearchAndInstallAsset = ({
             exactOrPartialAssetId
           );
           if (foundAssetShortHeader) {
+            if (isEffectAsset(foundAssetShortHeader)) {
+              return {
+                status: 'nothing-found',
+                message: `Asset with id "${exactOrPartialAssetId}" is a "${
+                  foundAssetShortHeader.objectType
+                }" effect, not an object: it is added as an effect of a layer.`,
+                createdObjects: [],
+                assetShortHeader: null,
+                isTheFirstOfItsTypeInProject: false,
+              };
+            }
             if (objectType && foundAssetShortHeader.objectType !== objectType) {
               return {
                 status: 'nothing-found',

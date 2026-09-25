@@ -48,7 +48,7 @@ describe('create_or_replace_object (additional cases)', () => {
 
     expect(result.success).toBe(false);
     expect(result.message).toBe(
-      'No asset found with id "non-existing-asset-id". Object not created.'
+      'No object found with id "non-existing-asset-id" (Object not found). Object not created.'
     );
     expect(testScene.getObjects().hasObjectNamed('MyAssetObject')).toBe(false);
   });

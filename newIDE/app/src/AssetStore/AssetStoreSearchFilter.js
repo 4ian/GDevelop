@@ -4,6 +4,7 @@ import {
   type AssetShortHeader,
   type PrivateAssetPack,
   type PublicAssetPack,
+  isEffectAsset,
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import {
@@ -18,6 +19,10 @@ export class TagAssetStoreSearchFilter extends TagSearchFilter<AssetShortHeader>
   }
 }
 
+// Stands for every effect asset (a skybox...) in an object types filter, as
+// the effects of the store are found by what the engine knows, not by a list.
+export const EFFECT_ASSETS_OBJECT_TYPE = 'effect';
+
 export class ObjectTypeAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
   objectTypes: Set<string>;
@@ -27,8 +32,10 @@ export class ObjectTypeAssetStoreSearchFilter
   }
 
   getPertinence(searchItem: AssetShortHeader): number {
-    return this.objectTypes.size === 0 ||
-      this.objectTypes.has(searchItem.objectType)
+    if (this.objectTypes.size === 0) return 1;
+    if (this.objectTypes.has(searchItem.objectType)) return 1;
+    return this.objectTypes.has(EFFECT_ASSETS_OBJECT_TYPE) &&
+      isEffectAsset(searchItem)
       ? 1
       : 0;
   }

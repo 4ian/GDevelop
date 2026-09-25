@@ -449,6 +449,26 @@ export type AssetSearchAndInstallOptions = {|
   lastAssistantMessages?: string[],
 |};
 
+// An asset that is an effect, installed on a layer.
+// Install an effect of the asset store on a layer, by its id. The
+// effect takes the type of the asset: `effectType`, when given, must match.
+export type EffectAssetSearchAndInstallOptions = {|
+  effectsContainer: gdEffectsContainer,
+  effectName: string,
+  effectType: string | null,
+  exactOrPartialAssetId: string,
+  relatedAiRequestId?: string | null,
+  lastUserMessage?: string | null,
+  lastAssistantMessages?: string[],
+|};
+
+export type EffectAssetSearchAndInstallResult = {|
+  status: 'asset-installed' | 'nothing-found' | 'error',
+  message: string,
+  effect: gdEffect | null,
+  assetShortHeader: AssetShortHeader | null,
+|};
+
 export type EditorCallbacks = {|
   onOpenLayout: (
     sceneName: string,
@@ -534,6 +554,8 @@ export type LaunchFunctionOptionsWithoutProject = {|
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  // The effects of a layer changed: the game shown by the editor reloads them.
+  onEffectsModifiedOutsideEditor: () => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
@@ -568,6 +590,9 @@ export type LaunchFunctionOptionsWithoutProject = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallEffectAsset: (
+    options: EffectAssetSearchAndInstallOptions
+  ) => Promise<EffectAssetSearchAndInstallResult>,
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
@@ -1608,7 +1633,7 @@ const createOrReplaceObject: EditorFunction = {
           } else {
             if (asset_id) {
               return makeGenericFailure(
-                `No asset found with id "${asset_id}". Object not created.`
+                `No object found with id "${asset_id}" (${message}). Object not created.`
               );
             }
 
@@ -8454,9 +8479,13 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     args,
     toolsVersion,
     onInstancesModifiedOutsideEditor,
+    onEffectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
     onWillDeleteScene,
+    searchAndInstallEffectAsset,
+    relatedAiRequestId,
+    getRelatedAiRequestLastMessages,
   }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
       allowedTypes: PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES,
@@ -8968,7 +8997,8 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     }
 
     if (changed_layer_effects) {
-      changed_layer_effects.forEach(changed_layer_effect => {
+      const changesCountBeforeLayerEffects = changes.length;
+      for (const changed_layer_effect of changed_layer_effects) {
         const layerName = SafeExtractor.extractStringProperty(
           changed_layer_effect,
           'layer_name'
@@ -8977,24 +9007,77 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           warnings.push(
             `Missing "layer_name" in changed_layer_effects item. Skipped.`
           );
-          return;
+          continue;
         }
         if (!layersContainer.hasLayerNamed(layerName)) {
           warnings.push(`Layer "${layerName}" not found. Effects skipped.`);
-          return;
+          continue;
         }
         const layer = layersContainer.getLayer(layerName);
+        const targetLabel = `layer "${layerName}"`;
+
+        // An effect taken from the store: install it first, then apply the
+        // rest of the change (rename, position, properties) on the effect.
+        let changedEffect = changed_layer_effect;
+        const asset_id = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'asset_id'
+        );
+        if (asset_id) {
+          const effectName = SafeExtractor.extractStringProperty(
+            changed_layer_effect,
+            'effect_name'
+          );
+          const effect_type = SafeExtractor.extractStringProperty(
+            changed_layer_effect,
+            'effect_type'
+          );
+          if (effectName === null) {
+            warnings.push(
+              `Missing "effect_name" in changed_layer_effects item. Skipped.`
+            );
+            continue;
+          }
+          const { status, message, effect } = await searchAndInstallEffectAsset(
+            {
+              effectsContainer: layer.getEffects(),
+              effectName,
+              effectType: effect_type || null,
+              exactOrPartialAssetId: asset_id,
+              relatedAiRequestId,
+              ...getRelatedAiRequestLastMessages(),
+            }
+          );
+          if (status !== 'asset-installed' || !effect) {
+            warnings.push(
+              `No effect could be added from the asset store on ${targetLabel} for "${effectName}": ${message}`
+            );
+            continue;
+          }
+          changes.push(
+            `Added the effect "${effect.getName()}" (${effect.getEffectType()}) from the asset store on ${targetLabel}, with its resources installed in the project.`
+          );
+          const {
+            effect_type: ignoredEffectType,
+            asset_id: ignoredAssetId,
+            ...remainingChange
+          } = changed_layer_effect;
+          changedEffect = { ...remainingChange, effect_name: effect.getName() };
+        }
 
         applyEffectChange({
           project,
           effectsContainer: layer.getEffects(),
-          changedEffect: changed_layer_effect,
-          targetLabel: `layer "${layerName}"`,
+          changedEffect,
+          targetLabel,
           changes,
           warnings,
           targetRenderingType: layer.getRenderingType(),
         });
-      });
+      }
+      if (changes.length > changesCountBeforeLayerEffects) {
+        onEffectsModifiedOutsideEditor();
+      }
     }
 
     if (changed_groups) {

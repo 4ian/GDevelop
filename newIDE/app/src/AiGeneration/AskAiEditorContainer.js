@@ -166,6 +166,7 @@ type Props = {|
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  onEffectsModifiedOutsideEditor: () => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
@@ -245,6 +246,7 @@ export type AskAiEditorInterface = {|
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  onEffectsModifiedOutsideEditor: () => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
@@ -297,6 +299,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
+        onEffectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
         onWillDeleteScene,
@@ -1100,6 +1103,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
+        onEffectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
         onWillDeleteScene,
@@ -1224,6 +1228,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onSceneEventsModifiedOutsideEditor: noop,
         onInstancesModifiedOutsideEditor: noop,
         onObjectsModifiedOutsideEditor: noop,
+        onEffectsModifiedOutsideEditor: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
         onWillDeleteObject: noop,
         onExtensionsModifiedOutsideEditor: noop,
@@ -1822,6 +1827,7 @@ export const renderAskAiEditorContainer = (
           props.onInstancesModifiedOutsideEditor
         }
         onObjectsModifiedOutsideEditor={props.onObjectsModifiedOutsideEditor}
+        onEffectsModifiedOutsideEditor={props.onEffectAdded}
         onObjectGroupsModifiedOutsideEditor={
           props.onObjectGroupsModifiedOutsideEditor
         }

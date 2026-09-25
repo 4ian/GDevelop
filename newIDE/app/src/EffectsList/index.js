@@ -9,7 +9,7 @@ import { LineStackLayout } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { mapFor } from '../Utils/MapFor';
-import RaisedButton from '../UI/RaisedButton';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
@@ -57,6 +57,7 @@ import InlineCheckbox from '../UI/InlineCheckbox';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 import PropertiesEditorByVisibility from '../PropertiesEditor/PropertiesEditorByVisibility';
+import EffectStoreDialog from '../AssetStore/EffectStoreDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -789,6 +790,9 @@ export default function EffectsList(props: Props): React.Node {
   } = props;
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const justAddedEffectElement = React.useRef<?any>(null);
+  const [isEffectStoreOpen, setIsEffectStoreOpen] = React.useState(false);
+  // The effects of the store go on layers; the store lists those the layer can take.
+  const canAddEffectFromStore = target === 'layer';
 
   const forceUpdate = useForceUpdate();
   const {
@@ -1095,22 +1099,41 @@ export default function EffectsList(props: Props): React.Node {
                     />
                   </LineStackLayout>
                   <LineStackLayout justifyContent="flex-end" expand>
-                    {props.layerRenderingType !== '2d' && (
-                      <RaisedButton
-                        primary
-                        label={<Trans>Add a 3D effect</Trans>}
-                        onClick={() => addEffect(true)}
-                        icon={<Add />}
-                      />
-                    )}
-                    {props.layerRenderingType !== '3d' && (
-                      <RaisedButton
-                        primary
-                        label={<Trans>Add a 2D effect</Trans>}
-                        onClick={() => addEffect(false)}
-                        icon={<Add />}
-                      />
-                    )}
+                    <RaisedButtonWithSplitMenu
+                      primary
+                      label={<Trans>Add an effect</Trans>}
+                      icon={<Add />}
+                      // The kind of effect the target most likely wants.
+                      onClick={() =>
+                        addEffect(props.layerRenderingType === '3d')
+                      }
+                      buildMenuTemplate={(i18n: I18nType) => [
+                        ...(props.layerRenderingType !== '2d'
+                          ? [
+                              {
+                                label: i18n._(t`Add a 3D effect`),
+                                click: () => addEffect(true),
+                              },
+                            ]
+                          : []),
+                        ...(props.layerRenderingType !== '3d'
+                          ? [
+                              {
+                                label: i18n._(t`Add a 2D effect`),
+                                click: () => addEffect(false),
+                              },
+                            ]
+                          : []),
+                        ...(canAddEffectFromStore
+                          ? [
+                              {
+                                label: i18n._(t`Add an effect from the store…`),
+                                click: () => setIsEffectStoreOpen(true),
+                              },
+                            ]
+                          : []),
+                      ]}
+                    />
                   </LineStackLayout>
                 </Line>
               </Column>
@@ -1163,7 +1186,30 @@ export default function EffectsList(props: Props): React.Node {
                   }}
                 />
               )}
+              {canAddEffectFromStore && (
+                <Line justifyContent="center">
+                  <ResponsiveFlatButton
+                    label={<Trans>Add an effect from the store</Trans>}
+                    onClick={() => setIsEffectStoreOpen(true)}
+                  />
+                </Line>
+              )}
             </Column>
+          )}
+          {isEffectStoreOpen && (
+            <EffectStoreDialog
+              project={project}
+              effectsContainer={effectsContainer}
+              layerRenderingType={props.layerRenderingType}
+              resourceManagementProps={props.resourceManagementProps}
+              onClose={({ effect }) => {
+                setIsEffectStoreOpen(false);
+                if (!effect) return;
+                forceUpdate();
+                onEffectsUpdated();
+                onEffectAdded();
+              }}
+            />
           )}
         </Column>
       )}

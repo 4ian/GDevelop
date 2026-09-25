@@ -4,6 +4,7 @@ import SectionContainer from '../SectionContainer';
 import { AssetStore } from '../../../../AssetStore';
 import { Line } from '../../../../UI/Grid';
 import RaisedButton from '../../../../UI/RaisedButton';
+import Text from '../../../../UI/Text';
 import { type ResourceManagementProps } from '../../../../ResourcesList/ResourceSource';
 import { Trans } from '@lingui/macro';
 import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
@@ -13,11 +14,15 @@ import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopS
 import {
   type AssetShortHeader,
   type Course,
+  isEffectAsset,
 } from '../../../../Utils/GDevelopServices/Asset';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 import { AssetStoreNavigatorContext } from '../../../../AssetStore/AssetStoreNavigator';
 import { type CourseCompletion } from '../UseCourses';
+import Window from '../../../../Utils/Window';
+
+const isDev = Window.isDev();
 
 type Props = {|
   project: ?gdProject,
@@ -49,25 +54,30 @@ const StoreSection = ({
     setAssetShortHeadersToInstall,
   ] = React.useState<?Array<AssetShortHeader>>(null);
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
-  const { assetShortHeadersSearchResults } = React.useContext(
-    AssetStoreContext
-  );
+  const {
+    assetShortHeadersSearchResults,
+    environment,
+    setEnvironment,
+  } = React.useContext(AssetStoreContext);
   const {
     openedAssetPack,
     openedAssetShortHeader,
     selectedFolders,
   } = shopNavigationState.getCurrentPage();
 
+  // The effects of the store are added to a layer from a scene: a pack (or a
+  // search) is added as a whole for its objects only.
   const displayedAssetShortHeaders = React.useMemo(
     () => {
-      return openedAssetShortHeader
+      return (openedAssetShortHeader
         ? [openedAssetShortHeader]
         : assetShortHeadersSearchResults
         ? getAssetShortHeadersToDisplay(
             assetShortHeadersSearchResults,
             selectedFolders
           )
-        : [];
+        : []
+      ).filter(assetShortHeader => !isEffectAsset(assetShortHeader));
     },
     [openedAssetShortHeader, assetShortHeadersSearchResults, selectedFolders]
   );
@@ -93,7 +103,7 @@ const StoreSection = ({
     () => {
       const currentPage = shopNavigationState.getCurrentPage();
       setAssetShortHeadersToInstall(
-        openedAssetShortHeader
+        (openedAssetShortHeader
           ? [openedAssetShortHeader]
           : assetShortHeadersSearchResults
           ? getAssetShortHeadersToDisplay(
@@ -102,6 +112,7 @@ const StoreSection = ({
               currentPage.pageBreakIndex || 0
             )
           : []
+        ).filter(assetShortHeader => !isEffectAsset(assetShortHeader))
       );
     },
     [
@@ -123,38 +134,65 @@ const StoreSection = ({
         onCourseOpen={onCourseOpen}
         getCourseCompletion={getCourseCompletion}
       />
-      {(openedAssetPack || openedAssetShortHeader) && (
+      {isDev && !openedAssetPack && !openedAssetShortHeader && (
         <Line justifyContent="flex-end">
           <RaisedButton
-            primary
-            onClick={() => {
-              if (!project) {
-                return; // TODO: create a project, await, and then show dialog.
-              }
-
-              openAssetPackInstallDialog();
-            }}
-            disabled={!project || !displayedAssetShortHeaders.length}
             label={
-              project ? (
-                openedAssetShortHeader ||
-                displayedAssetShortHeaders.length === 1 ? (
-                  <Trans>Add this asset to the project</Trans>
-                ) : (
-                  <Trans>Add these assets to the project</Trans>
-                )
-              ) : openedAssetShortHeader ||
-                displayedAssetShortHeaders.length === 1 ? (
-                <Trans>Create a project first to add this asset</Trans>
+              environment === 'staging' ? (
+                <Trans>Show live assets</Trans>
               ) : (
-                <Trans>
-                  Create a project first to add assets from the asset store
-                </Trans>
+                <Trans>Show staging assets</Trans>
               )
             }
+            onClick={() => {
+              setEnvironment(environment === 'staging' ? 'live' : 'staging');
+            }}
           />
         </Line>
       )}
+      {openedAssetShortHeader && isEffectAsset(openedAssetShortHeader) ? (
+        <Line justifyContent="flex-end">
+          <Text size="body">
+            <Trans>
+              An effect of the store is added from a scene: edit the effects of
+              one of its layers.
+            </Trans>
+          </Text>
+        </Line>
+      ) : null}
+      {(openedAssetPack || openedAssetShortHeader) &&
+        displayedAssetShortHeaders.length > 0 && (
+          <Line justifyContent="flex-end">
+            <RaisedButton
+              primary
+              onClick={() => {
+                if (!project) {
+                  return; // TODO: create a project, await, and then show dialog.
+                }
+
+                openAssetPackInstallDialog();
+              }}
+              disabled={!project || !displayedAssetShortHeaders.length}
+              label={
+                project ? (
+                  openedAssetShortHeader ||
+                  displayedAssetShortHeaders.length === 1 ? (
+                    <Trans>Add this asset to the project</Trans>
+                  ) : (
+                    <Trans>Add these assets to the project</Trans>
+                  )
+                ) : openedAssetShortHeader ||
+                  displayedAssetShortHeaders.length === 1 ? (
+                  <Trans>Create a project first to add this asset</Trans>
+                ) : (
+                  <Trans>
+                    Create a project first to add assets from the asset store
+                  </Trans>
+                )
+              }
+            />
+          </Line>
+        )}
       {project &&
         assetShortHeadersToInstall &&
         !!assetShortHeadersToInstall.length && (

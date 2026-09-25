@@ -3,6 +3,10 @@
 // TODO: PixiResourcesLoader is typed with "any" in the codebase. It should be typed
 // and then this mock and any function needing it can use this type.
 export const PixiResourcesLoaderMock = {
+  loadTextures: (
+    project: gdProject,
+    resourceNames: Array<string>
+  ): Promise<void> => Promise.resolve(),
   getPIXITexture: (
     project: gdProject,
     resourceName: string
@@ -12,6 +16,8 @@ export const PixiResourcesLoaderMock = {
         return { valid: true, width: 100, height: 240 };
       case 'Frame50x120':
         return { valid: true, width: 50, height: 120 };
+      case 'Atlas64x32':
+        return { valid: true, width: 64, height: 32 };
       default:
         return { valid: false, width: 0, height: 0 };
     }

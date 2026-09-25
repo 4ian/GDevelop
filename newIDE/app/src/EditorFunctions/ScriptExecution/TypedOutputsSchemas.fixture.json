@@ -258,7 +258,7 @@
         "instances": {
           "type": "array",
           "items": {
-            "$namedType": "SimplifiedInstance"
+            "$rawType": "SimplifiedInstance & { rawJson?: { numberProperties: Array<{ name: string; value: number }>; stringProperties: Array<{ name: string; value: string }>; flippedX: boolean; flippedY: boolean; flippedZ: boolean } }"
           }
         },
         "objectSizeInfo": {
@@ -304,6 +304,16 @@
             },
             "required": ["behaviorName", "behaviorType"]
           }
+        },
+        "rawJson": {
+          "$rawType": "{ [key: string]: any }"
+        },
+        "frameImageSizes": {
+          "$rawType": "{ [image: string]: { width: number; height: number } }"
+        },
+        "modelAnimationSources": {
+          "type": "array",
+          "items": { "type": "string" }
         }
       },
       "required": ["properties", "behaviors"]

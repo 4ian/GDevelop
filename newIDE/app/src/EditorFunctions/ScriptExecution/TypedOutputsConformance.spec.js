@@ -60,10 +60,19 @@ const resolve = (schema: any): any =>
   schema && schema.$namedType ? sharedTypes[schema.$namedType] : schema;
 
 // Validates a value against a (possibly $namedType) schema. `$rawType` fields
-// (e.g. `number | null`) are not strictly checked. Only declared fields are
-// checked; extra fields are allowed (all these types are open-ended).
+// (e.g. `number | null`) are not strictly checked, except an intersection with
+// a shared type (`SimplifiedInstance & {...}`), checked against that type.
+// Only declared fields are checked; extra fields are allowed (all these types
+// are open-ended).
 const validateValue = (value: any, schema: any, path: string): void => {
-  if (!schema || schema.$rawType) return;
+  if (!schema) return;
+  if (schema.$rawType) {
+    const sharedTypeName = schema.$rawType.split(' & ')[0];
+    if (sharedTypes[sharedTypeName]) {
+      validateValue(value, sharedTypes[sharedTypeName], path);
+    }
+    return;
+  }
   const resolved = resolve(schema);
   if (!resolved) throw new Error(`Unresolved schema at ${path}`);
 

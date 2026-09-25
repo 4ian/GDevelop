@@ -153,6 +153,39 @@ describe('capScriptExecutionResult', () => {
     expect(capped.didModifyProject).toBe(true);
   });
 
+  it('keeps only the size of raw JSON args, and the other args', async () => {
+    const editorFunctions = {
+      change_instances_raw_json: makeFakeEditorFunction({
+        modifiesProject: true,
+      }),
+    };
+    const exposed = buildExposedScriptFunctions({
+      editorFunctions,
+      editorFunctionsWithoutProject: {},
+      launchOptions: asCollaborators({}),
+      project: asProject({}),
+    });
+    const rawJson = JSON.stringify({ tiles: Array(5000).fill(-1) });
+    const result = await executeScript({
+      jsCode: `await change_instances_raw_json({ scope: { type: 'scene', scene_name: 'L' }, changes: [{ instance_id: 'abc', raw_json: ${JSON.stringify(
+        rawJson
+      )} }] });`,
+      exposedFunctions: exposed,
+    });
+
+    const capped = capScriptExecutionResult(result);
+
+    expect(capped.functionCallRecords[0].args).toEqual({
+      scope: { type: 'scene', scene_name: 'L' },
+      changes: [
+        {
+          instance_id: 'abc',
+          raw_json: `[raw JSON, ${rawJson.length} chars]`,
+        },
+      ],
+    });
+  });
+
   it('caps console logs with a truncation note', async () => {
     const jsCode = [
       'for (let i = 0; i < 150; i++) {',

@@ -64,6 +64,7 @@ import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { MarkdownText } from '../../../UI/MarkdownText';
 import ResponsiveFlatButton from '../../../UI/ResponsiveFlatButton';
 import propertiesMapToSchema from '../../../PropertiesEditor/PropertiesMapToSchema';
+import { renameObjectPointReferences } from '../../../Utils/ObjectAnimationsRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -835,24 +836,17 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
                   if (!object) {
                     return;
                   }
-                  if (layout) {
-                    gd.WholeProjectRefactorer.renameObjectPointInScene(
+                  renameObjectPointReferences(
+                    {
                       project,
-                      layout,
                       object,
-                      oldName,
-                      newName
-                    );
-                  } else if (eventsFunctionsExtension && eventsBasedObject) {
-                    gd.WholeProjectRefactorer.renameObjectPointInEventsBasedObject(
-                      project,
+                      layout,
                       eventsFunctionsExtension,
                       eventsBasedObject,
-                      object,
-                      oldName,
-                      newName
-                    );
-                  }
+                    },
+                    oldName,
+                    newName
+                  );
                 }}
               />
             </Dialog>

@@ -686,4 +686,66 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }
+  {
+    // Same type and data as the simple tile map of the TileMap extension: its
+    // settings are in the object, its painted tiles on each instance.
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'TileMap',
+      'Fake tile map',
+      'A fake grid-based map built from reusable tiles.',
+      '',
+      'MIT'
+    );
+    const simpleTileMapObject = new gd.ObjectJsImplementation();
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    simpleTileMapObject.getProperties = function() {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      return objectProperties;
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[prop-missing]
+    simpleTileMapObject.content = {
+      atlasImage: '',
+      rowCount: 1,
+      columnCount: 1,
+      tileSize: 8,
+      tilesWithHitBox: '',
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    simpleTileMapObject.getInitialInstanceProperties = function(instance) {
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
+      instanceProperties
+        .getOrCreate('tilemap')
+        .setValue(instance.getRawStringProperty('tilemap'))
+        .setType('string')
+        .setLabel('Tilemap')
+        .setHidden(true);
+      return instanceProperties;
+    };
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[cannot-write]
+    simpleTileMapObject.updateInitialInstanceProperty = function(
+      instance,
+      propertyName,
+      newValue
+    ) {
+      if (propertyName === 'tilemap') {
+        instance.setRawStringProperty('tilemap', newValue);
+        return true;
+      }
+      return false;
+    };
+    extension.addObject(
+      'SimpleTileMap',
+      'Tile map',
+      'Grid-based map built from reusable tiles.',
+      'JsPlatform/Extensions/tile_map.svg',
+      simpleTileMapObject
+    );
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
 };

@@ -146,6 +146,14 @@ import {
   type ToolScopeType,
   type ToolScope,
 } from './Scope';
+import { getInstanceRawJson, applyInstancesRawJson } from './InstancesRawJson';
+import {
+  applyRawObjectConfiguration,
+  renameObjectAnimationsAndPoints,
+  getFrameImageSizes,
+  getModelAnimationSources,
+  getRawJsonNote,
+} from './RawObjectConfiguration';
 import {
   createExtension,
   changeExtensionProperties,
@@ -315,6 +323,12 @@ export type EditorFunctionGenericOutput = {|
   callForms?: Array<string>,
   reminder?: string,
   animationNames?: string,
+  // `inspect_object_properties_effects` with `include_raw_json`.
+  rawJson?: Object,
+  frameImageSizes?: {
+    [imageName: string]: {| width: number, height: number |},
+  },
+  modelAnimationSources?: Array<string>,
   // EventScript source view (see `read_events_source`):
   eventScript?: string,
   selectedEventIds?: Array<string>,
@@ -1447,8 +1461,9 @@ const createOrReplaceObject: EditorFunction = {
     const getPropertiesText = (object: gdObject): string => {
       const properties = object.getConfiguration().getProperties();
       const propertiesList = formatPropertiesList(properties);
-      return propertiesList
-        ? `Properties: ${propertiesList}.`
+      if (propertiesList) return `Properties: ${propertiesList}.`;
+      return object.getType() === 'Sprite'
+        ? 'This object type has no editable object properties: its animations and their images are in its raw JSON (`inspect_object_properties_effects` with `include_raw_json`, then `raw_json` of `change_object_properties_effects`).'
         : 'This object type has no editable object properties.';
     };
 
@@ -2513,6 +2528,26 @@ const inspectObjectPropertiesEffects: EditorFunction = {
       output.animationNames = animationNames.join(', ');
     }
 
+    if (SafeExtractor.extractBooleanProperty(args, 'include_raw_json')) {
+      const rawJson = serializeToJSObject(objectConfiguration);
+      output.rawJson = rawJson;
+      output.message = getRawJsonNote(object, rawJson);
+      const frameImageSizes = await getFrameImageSizes(
+        project,
+        rawJson,
+        PixiResourcesLoader
+      );
+      if (frameImageSizes) output.frameImageSizes = frameImageSizes;
+      const modelAnimationSources = await getModelAnimationSources(
+        project,
+        rawJson,
+        PixiResourcesLoader
+      );
+      if (modelAnimationSources) {
+        output.modelAnimationSources = modelAnimationSources;
+      }
+    }
+
     if (objectSupportsEffects(object)) {
       const effectsContainer = object.getEffects();
       output.effects = mapFor(0, effectsContainer.getEffectsCount(), i => {
@@ -2570,6 +2605,31 @@ const changeObjectPropertiesEffects: EditorFunction = {
         text: (
           <Trans>
             Remove object <b>{object_name}</b> (in scene {scene_name}).
+          </Trans>
+        ),
+      };
+    }
+    if (args && args.raw_json !== undefined && args.raw_json !== null) {
+      return {
+        text: (
+          <Trans>
+            Update the animations and settings of <b>{object_name}</b> (in scene{' '}
+            {scene_name}).
+          </Trans>
+        ),
+      };
+    }
+    if (
+      (SafeExtractor.extractArrayProperty(args, 'renamed_animations') || [])
+        .length > 0 ||
+      (SafeExtractor.extractArrayProperty(args, 'renamed_points') || [])
+        .length > 0
+    ) {
+      return {
+        text: (
+          <Trans>
+            Rename animations or points of <b>{object_name}</b> (in scene{' '}
+            {scene_name}).
           </Trans>
         ),
       };
@@ -2718,12 +2778,16 @@ const changeObjectPropertiesEffects: EditorFunction = {
     onInstancesModifiedOutsideEditor,
     onWillDeleteObject,
     searchAndInstallResources,
+    PixiResourcesLoader,
   }) => {
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
     const changed_effects =
       SafeExtractor.extractArrayProperty(args, 'changed_effects') || [];
+    const raw_json = args ? args.raw_json : undefined;
+    const renamed_animations = args ? args.renamed_animations : undefined;
+    const renamed_points = args ? args.renamed_points : undefined;
 
     const resolvedScope = resolveScopeFromArgs(project, args, {
       allowedTypes: OBJECTS_SCOPE_TYPES,
@@ -2759,6 +2823,78 @@ const changeObjectPropertiesEffects: EditorFunction = {
       args,
       'delete_this_object'
     );
+    const isRawJsonMode = raw_json !== undefined && raw_json !== null;
+    // An empty list of renames is ignored; a value that is not a list is
+    // refused below.
+    const hasRenames = (renames: mixed) =>
+      renames !== undefined &&
+      renames !== null &&
+      (!Array.isArray(renames) || renames.length > 0);
+    const isRenamesMode =
+      hasRenames(renamed_animations) || hasRenames(renamed_points);
+    const isClassicMode =
+      changed_properties.length > 0 ||
+      changed_effects.length > 0 ||
+      !!deleteThisObject;
+    if (
+      [isRawJsonMode, isRenamesMode, isClassicMode].filter(Boolean).length > 1
+    ) {
+      return makeGenericFailure(
+        'Nothing was changed: `raw_json`, the renames (`renamed_animations`/`renamed_points`) and the other changes must be done in separate calls.'
+      );
+    }
+    if (isRawJsonMode && typeof raw_json !== 'string') {
+      return makeGenericFailure(
+        'Nothing was changed: `raw_json` must be a string: pass `JSON.stringify(rawJson)`.'
+      );
+    }
+    if (
+      isRenamesMode &&
+      (!Array.isArray(renamed_animations || []) ||
+        !Array.isArray(renamed_points || []))
+    ) {
+      return makeGenericFailure(
+        'Nothing was changed: `renamed_animations` and `renamed_points` must be arrays of {old_name, new_name}.'
+      );
+    }
+    if (isRawJsonMode || isRenamesMode) {
+      const result =
+        typeof raw_json === 'string'
+          ? await applyRawObjectConfiguration({
+              project,
+              resolvedScope,
+              object,
+              rawJson: raw_json,
+              PixiResourcesLoader,
+            })
+          : renameObjectAnimationsAndPoints({
+              project,
+              resolvedScope,
+              object,
+              renamedAnimations: renamed_animations || [],
+              renamedPoints: renamed_points || [],
+            });
+      if (!result.success) {
+        return makeGenericFailure(`Nothing was changed: ${result.message}`);
+      }
+      if (result.changes.length > 0) {
+        onObjectsModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(resolvedScope),
+          isNewObjectTypeUsed: false,
+        });
+      }
+      if (result.haveInstancesChanged) {
+        onInstancesModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(resolvedScope),
+        });
+      }
+      return makeMultipleChangesOutput(
+        result.changes,
+        result.warnings,
+        toolsVersion
+      );
+    }
+
     // Deleting a child object, or renaming it, changes the structure of the
     // custom object: only the default variant owns it.
     const isRenamingObject = changed_properties.some(changed_property => {
@@ -4133,6 +4269,10 @@ const describeInstances: EditorFunction = {
 
     const filter_by_object_name =
       SafeExtractor.extractStringProperty(args, 'filter_by_object_name') || '';
+    const includeRawJson = !!SafeExtractor.extractBooleanProperty(
+      args,
+      'include_raw_json'
+    );
 
     const objectNames = new Set(
       filter_by_object_name
@@ -4198,7 +4338,15 @@ const describeInstances: EditorFunction = {
             ? sizeInfo
             : { width: 0, height: 0, depth: 0 };
 
-          instances.push(getSimplifiedInstance(instance, defaultSize));
+          const simplifiedInstance = getSimplifiedInstance(
+            instance,
+            defaultSize
+          );
+          instances.push(
+            includeRawJson
+              ? { ...simplifiedInstance, rawJson: getInstanceRawJson(instance) }
+              : simplifiedInstance
+          );
         }
       );
     });
@@ -4234,6 +4382,71 @@ const iterateOnInstances = (
   // $FlowFixMe[incompatible-type]
   initialInstances.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
+};
+
+/**
+ * Changes the data of instances that `put_2d_instances`/`put_3d_instances`
+ * don't set (starting animation, tile map, text input values, flips), from
+ * the `rawJson` returned by `describe_instances` with `include_raw_json`.
+ */
+const changeInstancesRawJson: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const changes = SafeExtractor.extractArrayProperty(args, 'changes') || [];
+    return {
+      text: (
+        <Trans>
+          Change the starting animation, tiles, flips or other data of{' '}
+          {changes.length} instance(s) in {getScopeLabelFromArgs(args)}.
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({
+    project,
+    args,
+    toolsVersion,
+    onInstancesModifiedOutsideEditor,
+  }) => {
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: INSTANCES_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+    const containers = getInstancesScopeContainers(resolvedScope);
+    if (!containers)
+      return makeGenericFailure(
+        `${resolvedScope.label} has no instances to change.`
+      );
+    const changes = SafeExtractor.extractArrayProperty(args, 'changes');
+    if (!changes || changes.length === 0) {
+      return makeGenericFailure(
+        'Nothing was changed: `changes` must be a non-empty list of {instance_id, raw_json}.'
+      );
+    }
+    const instances = [];
+    iterateOnInstances(containers.initialInstances, instance => {
+      instances.push(instance);
+    });
+    const result = applyInstancesRawJson({
+      project,
+      objectsContainer: containers.objectsContainer,
+      globalObjectsContainer: containers.globalObjectsContainer,
+      instances,
+      changes,
+    });
+    if (!result.success) {
+      return makeGenericFailure(`Nothing was changed: ${result.message}`);
+    }
+    if (result.changes.length > 0) {
+      onInstancesModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+      });
+    }
+    return makeMultipleChangesOutput(result.changes, [], toolsVersion);
+  },
+  modifiesProject: true,
 };
 
 // An id pointing at another object's instance is always a targeting mistake:
@@ -11290,6 +11503,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_behavior_properties: inspectBehaviorProperties,
   change_behavior_property: changeBehaviorProperty,
   describe_instances: describeInstances,
+  change_instances_raw_json: changeInstancesRawJson,
   put_2d_instances: put2dInstances,
   put_3d_instances: put3dInstances,
   read_scene_events: readSceneEvents,

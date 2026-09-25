@@ -49,6 +49,7 @@ import { type ScrollViewInterface } from '../../../UI/ScrollView';
 import ThreeDotsMenu from '../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
 import MountOnFirstVisible from '../../../UI/MountOnFirstVisible';
+import { renameObjectAnimationReferences } from '../../../Utils/ObjectAnimationsRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -639,24 +640,17 @@ const AnimationList: React.ComponentType<{
 
         animation.setName(newName);
         if (object) {
-          if (layout) {
-            gd.WholeProjectRefactorer.renameObjectAnimationInScene(
+          renameObjectAnimationReferences(
+            {
               project,
-              layout,
               object,
-              currentName,
-              newName
-            );
-          } else if (eventsFunctionsExtension && eventsBasedObject) {
-            gd.WholeProjectRefactorer.renameObjectAnimationInEventsBasedObject(
-              project,
+              layout,
               eventsFunctionsExtension,
               eventsBasedObject,
-              object,
-              currentName,
-              newName
-            );
-          }
+            },
+            currentName,
+            newName
+          );
         }
         notifyAnimationsChanged();
         if (onObjectUpdated) onObjectUpdated();

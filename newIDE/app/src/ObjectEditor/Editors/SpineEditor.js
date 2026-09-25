@@ -29,6 +29,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { PropertyResourceSelector, PropertyField } from './PropertyFields';
 import AlertMessage from '../../UI/AlertMessage';
 import Window from '../../Utils/Window';
+import { renameObjectAnimationReferences } from '../../Utils/ObjectAnimationsRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -377,24 +378,17 @@ const SpineEditor = ({
 
       animation.setName(newName);
       if (object) {
-        if (layout) {
-          gd.WholeProjectRefactorer.renameObjectAnimationInScene(
+        renameObjectAnimationReferences(
+          {
             project,
-            layout,
             object,
-            currentName,
-            newName
-          );
-        } else if (eventsFunctionsExtension && eventsBasedObject) {
-          gd.WholeProjectRefactorer.renameObjectAnimationInEventsBasedObject(
-            project,
+            layout,
             eventsFunctionsExtension,
             eventsBasedObject,
-            object,
-            currentName,
-            newName
-          );
-        }
+          },
+          currentName,
+          newName
+        );
       }
       forceUpdate();
       if (onObjectUpdated) onObjectUpdated();

@@ -1541,15 +1541,22 @@ const createOrReplaceObject: EditorFunction = {
 
       // If no search_terms or asset_id were provided but the object type has
       // an `assetStoreTag` (i.e. the type is mainly meant to be picked from
-      // the asset store, e.g. premade UI objects), use the tag as default
-      // search terms.
+      // the asset store, e.g. premade UI objects or particle emitters), use the
+      // tag as default search terms, with the object name which often tells
+      // what is wanted (e.g. "Rain_3D" for a 3D particle emitter).
       let effectiveSearchTerms = search_terms;
       let assetSearchMissed = false;
       let assetStoreTag: string | null = null;
       if (candidateType && !effectiveSearchTerms && !asset_id) {
         assetStoreTag = getAssetStoreTagForNewObject(candidateType);
         if (assetStoreTag) {
-          effectiveSearchTerms = `${assetStoreTag}, default`;
+          const objectNameWords = targetObjectName
+            .replace(/_/g, ' ')
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .trim();
+          effectiveSearchTerms = [assetStoreTag, objectNameWords, 'default']
+            .filter(Boolean)
+            .join(', ');
         }
       }
 

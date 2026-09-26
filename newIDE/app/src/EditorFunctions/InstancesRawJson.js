@@ -116,7 +116,7 @@ const getRawJsonShapeError = (rawJson: any): ?string => {
       missingKeys.length > 0 ? ` (missing ${missingKeys.join(', ')})` : ''
     }${unknownKeys.length > 0 ? ` (unknown ${unknownKeys.join(', ')})` : ''}${
       hasPlacementKeys
-        ? '. The position, size, angle and rotation of instances are set with `put_2d_instances`/`put_3d_instances`'
+        ? '. The position, size, angle, rotation, layer and Z order of instances are set with `put_2d_instances`/`put_3d_instances`'
         : ''
     }`;
   }

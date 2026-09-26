@@ -425,48 +425,77 @@ const areSameNames = (names: Array<string>, otherNames: Array<string>) =>
  * which must go through `renamed_animations` to update the events.
  */
 const getAnimationNamesChangeError = ({
-  oldNames,
-  newNames,
+  oldAnimations,
+  newAnimations,
   structureLockedReason,
-  getNamesUsedInEvents,
+  namesUsedInEvents,
 }: {|
-  oldNames: Array<string>,
-  newNames: Array<string>,
+  oldAnimations: Array<Object>,
+  newAnimations: Array<Object>,
   structureLockedReason: ?string,
-  getNamesUsedInEvents: (names: Array<string>) => Set<string>,
+  namesUsedInEvents: Set<string>,
 |}): string | null => {
+  const oldNames = oldAnimations.map(animation => String(animation.name));
+  const newNames = newAnimations.map(animation => String(animation.name));
   if (areSameNames(oldNames, newNames)) return null;
   if (structureLockedReason) {
     return `Animation names and order can't change ${structureLockedReason} (only their content).`;
   }
-  const removedNames = [
-    ...new Set(
-      oldNames.filter(name => name !== '' && !newNames.includes(name))
-    ),
-  ];
   const addedNames = [
     ...new Set(
       newNames.filter(name => name !== '' && !oldNames.includes(name))
     ),
   ];
-  if (removedNames.length === 0 || addedNames.length === 0) return null;
-  const usedRemovedNames = [...getNamesUsedInEvents(removedNames)];
-  if (usedRemovedNames.length === 0) return null;
-  const exampleRenames = usedRemovedNames
-    .slice(0, addedNames.length)
-    .map(
-      (name, i) =>
-        `{ old_name: ${JSON.stringify(name)}, new_name: ${JSON.stringify(
-          addedNames[i]
-        )}, index: ${oldNames.indexOf(name)} }`
+  const usedRemovedNames = [
+    ...new Set(
+      oldNames.filter(
+        name =>
+          name !== '' && !newNames.includes(name) && namesUsedInEvents.has(name)
+      )
+    ),
+  ];
+  if (usedRemovedNames.length === 0 || addedNames.length === 0) return null;
+
+  // The new name of each removed animation: the added one at its position,
+  // else the added one with the same content.
+  const getContentKey = (animation: Object) =>
+    JSON.stringify({ ...animation, name: '' });
+  const pairedNames: Set<string> = new Set();
+  const renames = usedRemovedNames.map(oldName => {
+    const index = oldNames.indexOf(oldName);
+    const isUnpairedAddedName = (name: string) =>
+      addedNames.includes(name) && !pairedNames.has(name);
+    const sameContentAnimation = newAnimations.find(
+      animation =>
+        isUnpairedAddedName(String(animation.name)) &&
+        getContentKey(animation) === getContentKey(oldAnimations[index])
     );
+    const newName = isUnpairedAddedName(newNames[index])
+      ? newNames[index]
+      : sameContentAnimation
+      ? String(sameContentAnimation.name)
+      : null;
+    if (newName !== null) pairedNames.add(newName);
+    return `{ old_name: ${JSON.stringify(oldName)}, new_name: ${
+      newName !== null ? JSON.stringify(newName) : '<its new name>'
+    }, index: ${index} }`;
+  });
+  const sharedNames = usedRemovedNames.filter(
+    name => oldNames.indexOf(name) !== oldNames.lastIndexOf(name)
+  );
   return `Animations ${listNames(
     usedRemovedNames
   )}, used in the events, were removed while ${listNames(
     addedNames
-  )} were added. To rename, first call \`change_object_properties_effects\` with \`renamed_animations: [${exampleRenames.join(
+  )} were added. To rename, first call \`change_object_properties_effects\` with \`renamed_animations: [${renames.join(
     ', '
-  )}]\` (it updates the events), then write \`raw_json\` again. To really remove them, remove them in one call and add the new ones in another.`;
+  )}]\` (it updates the events), then write \`raw_json\` again. To really remove them, remove them in one call and add the new ones in another.${
+    sharedNames.length > 0
+      ? ` Several animations are named ${listNames(
+          sharedNames
+        )}: renaming one of them does not update the events.`
+      : ''
+  }`;
 };
 
 const getPointNamesChangeError = ({
@@ -566,10 +595,10 @@ const getChildrenContentNamesErrors = ({
     return [
       nestedOverridesError,
       getAnimationNamesChangeError({
-        oldNames: getAnimationNames(childJson),
-        newNames: getAnimationNames(savedChildJson),
+        oldAnimations: getAnimationsJson(childJson),
+        newAnimations: getAnimationsJson(savedChildJson),
         structureLockedReason,
-        getNamesUsedInEvents: () => new Set(),
+        namesUsedInEvents: new Set(),
       }),
       getPointNamesChangeError({
         oldNames: getPointNames(childJson),
@@ -769,6 +798,19 @@ export const applyRawObjectConfiguration = async ({
   const structureLockedReason = getNamedVariantLockedReason(resolvedScope);
   const oldAnimationNames = getAnimationNames(currentJson);
   const newAnimationNames = getAnimationNames(savedJson);
+  const removedAnimationNames = [
+    ...new Set(
+      oldAnimationNames.filter(
+        name => name !== '' && !newAnimationNames.includes(name)
+      )
+    ),
+  ];
+  const removedAnimationNamesUsedInEvents = structureLockedReason
+    ? new Set<string>()
+    : getNamesUsedInObjectEvents(
+        makeReferencesContext(project, resolvedScope, object),
+        removedAnimationNames
+      );
   const oldPointNames = getPointNames(currentJson);
   const newPointNames = getPointNames(savedJson);
   const { childrenContent } = savedJson;
@@ -802,14 +844,10 @@ export const applyRawObjectConfiguration = async ({
         )
       : []),
     getAnimationNamesChangeError({
-      oldNames: oldAnimationNames,
-      newNames: newAnimationNames,
+      oldAnimations: getAnimationsJson(currentJson),
+      newAnimations: getAnimationsJson(savedJson),
       structureLockedReason,
-      getNamesUsedInEvents: names =>
-        getNamesUsedInObjectEvents(
-          makeReferencesContext(project, resolvedScope, object),
-          names
-        ),
+      namesUsedInEvents: removedAnimationNamesUsedInEvents,
     }),
     getPointNamesChangeError({
       oldNames: oldPointNames,
@@ -830,12 +868,14 @@ export const applyRawObjectConfiguration = async ({
   const warnings = [];
   const ignoredKeys = [
     ...new Set(getIgnoredKeyPaths(configurationJson, savedJson, '')),
-  ].slice(0, MAX_LISTED_ERRORS);
+  ];
   if (ignoredKeys.length > 0) {
     warnings.push(
-      `Ignored keys: ${ignoredKeys.join(
-        ', '
-      )} (unknown for this object type, or equal to their default).`
+      `Ignored keys: ${ignoredKeys.slice(0, MAX_LISTED_ERRORS).join(', ')}${
+        ignoredKeys.length > MAX_LISTED_ERRORS
+          ? ` and ${ignoredKeys.length - MAX_LISTED_ERRORS} more`
+          : ''
+      } (unknown for this object type, or equal to their default).`
     );
   }
   if (isPlainObject(childrenContent)) {
@@ -889,23 +929,24 @@ export const applyRawObjectConfiguration = async ({
   unserializeFromJSObject(configuration, savedJson, 'unserializeFrom', project);
 
   const changes = [`Replaced the configuration of "${objectName}".`];
-  const removedAnimationNames = [
-    ...getNamesUsedInObjectEvents(
-      makeReferencesContext(project, resolvedScope, object),
-      [
-        ...new Set(
-          oldAnimationNames.filter(
-            name => name !== '' && !newAnimationNames.includes(name)
-          )
-        ),
-      ]
-    ),
-  ];
-  if (removedAnimationNames.length > 0) {
+  const usedRemovedAnimationNames = removedAnimationNames.filter(name =>
+    removedAnimationNamesUsedInEvents.has(name)
+  );
+  if (usedRemovedAnimationNames.length > 0) {
     warnings.push(
       `Removed animations ${listNames(
-        removedAnimationNames
+        usedRemovedAnimationNames
       )}: events referring to them were not changed.`
+    );
+  }
+  const unusedRemovedAnimationNames = removedAnimationNames.filter(
+    name => !removedAnimationNamesUsedInEvents.has(name)
+  );
+  if (unusedRemovedAnimationNames.length > 0) {
+    warnings.push(
+      `Removed animations ${listNames(
+        unusedRemovedAnimationNames
+      )}: not found in the events of the scenes of the object (other events may still use them).`
     );
   }
   const removedPointNames = [...oldPointNames].filter(

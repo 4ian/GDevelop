@@ -10,10 +10,15 @@ namespace gdjs {
     attrs: {
       style?: Partial<CSSStyleDeclaration>;
       onClick?: () => void;
-    },
+    } | null,
     ...nodes: (HTMLElement | string)[]
   ): HTMLElement {
     const node = document.createElement(tag);
+    // An element without any attribute (`<span>text</span>`) gets `null`.
+    if (!attrs) {
+      node.append(...nodes);
+      return node;
+    }
     Object.keys(attrs).forEach((key) => {
       if (key === 'style') {
         for (const [styleName, value] of Object.entries(attrs.style!)) {
@@ -671,6 +676,17 @@ namespace gdjs {
   const pressAndReleaseForClickDuration = 200;
   const timeBetweenClicksForDoubleClick = 400;
 
+  /** Axis of the bone boxes geometry (see Model3DInspector). */
+  const boneBoxAxis = new THREE.Vector3(0, 0, 1);
+
+  /** Part of the game frame not covered by the IDE panels, normalized (0 to 1). */
+  type VisibleScreenArea = {
+    minX: float;
+    minY: float;
+    maxX: float;
+    maxY: float;
+  };
+
   /** Get the identifiers of the touches that are currently active, without the mouse. */
   const getCurrentTouchIdentifiers = (inputManager: gdjs.InputManager) => {
     return inputManager
@@ -1111,6 +1127,21 @@ namespace gdjs {
     private _toolbar: Toolbar;
     private _inGameEditorSettings: InGameEditorSettings;
     private _shortcuts: InGameEditorShortcuts = new InGameEditorShortcuts();
+    // POC: inspector opened by double clicking a 3D model.
+    private _model3DInspector: Model3DInspector | null = null;
+    private _lastClickTimeWhileInspecting: number = 0;
+    // An instance created only for the inspection (the object had none in
+    // the scene), deleted when the inspection ends.
+    private _temporaryInspectedObject: gdjs.RuntimeObject | null = null;
+    // POC: the custom points of the inspected 3D models, per object name
+    // (they are not saved in the project yet).
+    private _savedInspectorPointsByObjectName = new Map<
+      string,
+      SavedInspectorPoints
+    >();
+    // The last visible area of the game frame sent by the IDE (the IDE
+    // panels float over the frame), used to place the inspector UI.
+    private _lastVisibleScreenArea: VisibleScreenArea | null = null;
 
     constructor(
       game: RuntimeGame,
@@ -1176,6 +1207,7 @@ namespace gdjs {
     }
 
     dispose(): void {
+      this._exitModel3DInspection();
       if (this._unregisterContextLostListener) {
         this._unregisterContextLostListener();
         this._unregisterContextLostListener = null;
@@ -1341,6 +1373,8 @@ namespace gdjs {
       eventsBasedObjectVariantName: string | null,
       editorCamera3D: EditorCameraState | null
     ) {
+      // The inspected model belongs to the scene being left.
+      this._exitModel3DInspection();
       if (this._currentScene) {
         this._currentScene.unloadScene();
         this._currentScene = null;
@@ -1698,6 +1732,10 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       if (this._innerArea) {
         this.zoomToFitArea(
           {
@@ -1733,6 +1771,10 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
@@ -1749,6 +1791,10 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       this.zoomToFitObjects(
         this._selection.getSelectedObjects(),
         visibleScreenArea,
@@ -1766,6 +1812,10 @@ namespace gdjs {
       },
       margin: float
     ) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       this._getEditorCamera().zoomToFitObjects(
         objects,
         visibleScreenArea,
@@ -1790,6 +1840,10 @@ namespace gdjs {
       },
       margin: float
     ) {
+      if (!this._lastVisibleScreenArea) {
+        // Fallback only: the IDE sends the real area (setVisibleScreenArea).
+        this._lastVisibleScreenArea = visibleScreenArea;
+      }
       if (!this._currentScene) return;
       this._getEditorCamera().zoomToFitArea(
         sceneArea,
@@ -2254,8 +2308,56 @@ namespace gdjs {
       }
 
       if (inputManager.wasKeyJustPressed(ESC_KEY)) {
+        if (this._model3DInspector) {
+          this._exitModel3DInspection();
+          return;
+        }
         this._selection.clear();
         this._sendSelectionUpdate();
+      }
+
+      // While a 3D model is inspected, clicks are for the inspector (to pick
+      // the origin point handle), not for the selection. A double click
+      // anywhere but on the inspected model leaves the inspection.
+      if (this._model3DInspector) {
+        // The focus shortcut is the one of the editor, not a hardcoded key:
+        // master moved every shortcut behind `InGameEditorShortcuts`.
+        if (
+          this._shortcuts.wasJustPressed(
+            inputManager,
+            'IN_GAME_EDITOR_FOCUS_ON_SELECTION'
+          )
+        ) {
+          // Focus on the active selection: the selected point, or the model.
+          const [targetX, targetY, targetZ] =
+            this._model3DInspector.getFocusTarget();
+          this._getEditorCamera().switchToOrbitAroundPosition(
+            targetX,
+            targetY,
+            targetZ
+          );
+        }
+        if (
+          inputManager.isMouseButtonReleased(0) &&
+          this._hasCursorStayedStillWhilePressed({ toleranceRadius: 10 })
+        ) {
+          const inspector = this._model3DInspector;
+          const now = Date.now();
+          const isDoubleClick =
+            now - this._lastClickTimeWhileInspecting <
+            timeBetweenClicksForDoubleClick;
+          this._lastClickTimeWhileInspecting = now;
+          if (
+            isDoubleClick &&
+            objectUnderCursor !== inspector.getObject() &&
+            !inspector.isCursorOnOriginHandle()
+          ) {
+            this._exitModel3DInspection();
+            return;
+          }
+          inspector.handleClick();
+        }
+        return;
       }
 
       // Left click: select the object under the cursor.
@@ -2283,8 +2385,13 @@ namespace gdjs {
             Date.now() - this._lastClickOnObjectUnderCursor.time <
               timeBetweenClicksForDoubleClick
           ) {
-            // Double click on the same object: edit the object.
-            objectToEdit = objectUnderCursor;
+            if (objectUnderCursor.type === 'Scene3D::Model3DObject') {
+              // Double click on a 3D model: inspect it inside the editor (POC).
+              this._enterModel3DInspection(objectUnderCursor);
+            } else {
+              // Double click on the same object: edit the object.
+              objectToEdit = objectUnderCursor;
+            }
 
             this._lastClickOnObjectUnderCursor = {
               object: null,
@@ -3921,8 +4028,16 @@ namespace gdjs {
         this._setupWebGLContextLostListener();
       }
 
-      const objectUnderCursor: gdjs.RuntimeObject | null =
+      let objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
+      if (
+        this._model3DInspector &&
+        objectUnderCursor !== this._model3DInspector.getObject()
+      ) {
+        // During an inspection, the other objects are greyed out and can't be
+        // hovered nor selected.
+        objectUnderCursor = null;
+      }
 
       this._runtimeGame.getSoundManager().muteEverything('in-game-editor');
 
@@ -3991,11 +4106,18 @@ namespace gdjs {
       this._handleShortcuts();
       this._updateMouseCursor();
 
+      if (this._model3DInspector) {
+        this._model3DInspector.update();
+      }
+
       const domElementContainer = this._runtimeGame
         .getRenderer()
         .getDomElementContainer();
       if (domElementContainer) {
         this._toolbar.render(domElementContainer);
+        if (this._model3DInspector) {
+          this._model3DInspector.render(domElementContainer);
+        }
       }
 
       // Prepare state of the mouse/cursor for the next frame.
@@ -4023,6 +4145,1561 @@ namespace gdjs {
 
     private _getEditorCamera(): EditorCamera {
       return this._editorCamera;
+    }
+
+    /**
+     * POC: open the inspector of a 3D model. Only one model can be inspected
+     * at a time, and the selection is dropped so that the only gizmo shown is
+     * the one of the origin point.
+     */
+    private _enterModel3DInspection(
+      object: gdjs.RuntimeObject,
+      options: { hideOtherObjects: boolean } = { hideOtherObjects: false }
+    ) {
+      if (!is3D(object)) return;
+      this._exitModel3DInspection();
+
+      const editedInstanceContainer = this.getEditedInstanceContainer();
+      const cameraLayer = this.getCameraLayer(object.getLayer());
+      if (!editedInstanceContainer || !cameraLayer) return;
+      const runtimeLayerRender = cameraLayer.getRenderer();
+      const threeCamera = runtimeLayerRender.getThreeCamera();
+      const threeScene = runtimeLayerRender.getThreeScene();
+      if (!threeCamera || !threeScene) return;
+
+      this._selection.clear();
+      this._removeSelectionControls();
+      this._sendSelectionUpdate();
+
+      this._model3DInspector = new Model3DInspector({
+        object,
+        threeScene,
+        threeCamera,
+        canvas: this._runtimeGame.getRenderer().getCanvas() || undefined,
+        allObjects: editedInstanceContainer.getAdhocListOfAllInstances(),
+        hideOtherObjects: options.hideOtherObjects,
+        getCursorNormalizedDeviceCoordinates: () => {
+          const inputManager = this._runtimeGame.getInputManager();
+          return this._getTempVector2d(
+            this._getNormalizedScreenX(inputManager.getCursorX()),
+            this._getNormalizedScreenY(inputManager.getCursorY())
+          );
+        },
+        getVisibleScreenArea: () => this._lastVisibleScreenArea,
+        onExit: () => this._exitModel3DInspection(),
+        loadSavedPoints: () =>
+          this._savedInspectorPointsByObjectName.get(object.getName()) || null,
+        storeSavedPoints: (savedPoints) =>
+          this._savedInspectorPointsByObjectName.set(
+            object.getName(),
+            savedPoints
+          ),
+        onObjectPropertiesChanged: (properties) => {
+          const debuggerClient = this._runtimeGame._debuggerClient;
+          if (!debuggerClient) return;
+          debuggerClient.sendObjectPropertiesChanges({
+            objectName: object.getName(),
+            properties,
+          });
+          // Keep the object data of the game in sync too: instances created
+          // later (like a temporary one) start from these values.
+          const objectData = editedInstanceContainer._objects.get(
+            object.getName()
+          ) as any;
+          if (objectData && objectData.content) {
+            for (const propertyName in properties) {
+              const value = properties[propertyName];
+              objectData.content[propertyName] =
+                propertyName === 'originLocation' ||
+                propertyName === 'centerLocation'
+                  ? value
+                  : parseFloat(value);
+            }
+          }
+          // The object position follows its origin: update the instance too
+          // (a temporary instance has no persistentUuid and is skipped).
+          const updatedInstances = [
+            this.getInstanceDataFromRuntimeObject(object),
+          ].filter(isDefined);
+          if (updatedInstances.length > 0) {
+            this._updateInstances(updatedInstances);
+            debuggerClient.sendInstanceChanges({
+              isSendingBackSelectionForDefaultSize: false,
+              updatedInstances,
+              addedInstances: [],
+              selectedInstances: [],
+              removedInstances: [],
+              objectNameToEdit: null,
+            });
+          }
+        },
+      });
+    }
+
+    /**
+     * POC: called by the IDE with the part of the game frame that is not
+     * covered by its panels, so that the in-game editor UI can be placed there.
+     */
+    setVisibleScreenArea(visibleScreenArea: VisibleScreenArea) {
+      this._lastVisibleScreenArea = visibleScreenArea;
+    }
+
+    /**
+     * POC: called by the IDE ("Edit points" button of a 3D model): inspect
+     * the first instance of the object in the scene.
+     */
+    inspectModel3DObject(objectName: string) {
+      const editedInstanceContainer = this.getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
+      const instances = editedInstanceContainer.getObjects(objectName);
+      if (instances && instances.length > 0) {
+        this._enterModel3DInspection(instances[0]);
+        return;
+      }
+
+      // No instance in the scene: create a temporary one, where the camera
+      // looks at, and delete it when the inspection ends.
+      const temporaryObject = editedInstanceContainer.createObject(objectName);
+      if (!temporaryObject) {
+        logger.warn(`Unknown object "${objectName}": nothing to inspect.`);
+        return;
+      }
+      // At the center of the view, alone (the other objects are hidden), with
+      // the camera looking at it.
+      const editorCamera = this._getEditorCamera();
+      temporaryObject.setX(editorCamera.getAnchorX());
+      temporaryObject.setY(editorCamera.getAnchorY());
+      if (is3D(temporaryObject)) {
+        temporaryObject.setZ(editorCamera.getAnchorZ());
+      }
+      this._enterModel3DInspection(temporaryObject, { hideOtherObjects: true });
+      editorCamera.switchToOrbitAroundObject(temporaryObject);
+      if (this._model3DInspector) {
+        this._temporaryInspectedObject = temporaryObject;
+      } else {
+        temporaryObject.deleteFromScene();
+      }
+    }
+
+    private _exitModel3DInspection() {
+      if (!this._model3DInspector) return;
+      this._model3DInspector.dispose();
+      this._model3DInspector = null;
+      if (this._temporaryInspectedObject) {
+        this._temporaryInspectedObject.deleteFromScene();
+        this._temporaryInspectedObject = null;
+      }
+    }
+  }
+
+  /**
+   * Append several children to an element. esbuild does not spread JSX
+   * children (`{...nodes}`), so lists are built with this instead.
+   */
+  const appendChildren = (
+    parent: HTMLElement,
+    children: Array<HTMLElement>
+  ): HTMLElement => {
+    for (const child of children) parent.appendChild(child);
+    return parent;
+  };
+
+  /**
+   * POC: inspect a 3D model inside the editor.
+   *
+   * Every other object of the scene is greyed out, the model origin point is
+   * shown as a sphere that can be picked and dragged with a gizmo (which
+   * changes the origin of the model without moving it), the bones of the model
+   * are shown as boxes, and a panel lists the content of the model.
+   */
+  /**
+   * A point of the inspected model shown as a draggable sphere: the origin
+   * point of the object, or a custom point (POC: not persisted).
+   */
+  type InspectorPoint = {
+    name: string;
+    isOrigin: boolean;
+    sphere: THREE.Mesh;
+    /**
+     * The element of the model the point is attached to (the model itself,
+     * a mesh or a bone): the point follows its position and orientation.
+     * `null` for the origin point.
+     */
+    parent: THREE.Object3D | null;
+    /** Position relatively to the parent, for a custom point. */
+    localPosition: THREE.Vector3 | null;
+    row: HTMLElement | null;
+    info: HTMLElement | null;
+  };
+
+  /**
+   * The custom points of an object as remembered by the editor between two
+   * inspections (POC: not saved in the project).
+   */
+  type SavedInspectorPoints = {
+    points: Array<SavedInspectorPoint>;
+    count: integer;
+  };
+
+  /**
+   * A custom point as remembered by the editor between two inspections.
+   */
+  type SavedInspectorPoint = {
+    name: string;
+    parentUuid: string;
+    parentName: string;
+    localPosition: [float, float, float];
+  };
+
+  class Model3DInspector {
+    private _object: RuntimeObjectWith3D;
+    private _threeScene: THREE.Scene;
+    private _threeCamera: THREE.Camera;
+    private _getCursorNormalizedDeviceCoordinates: () => THREE.Vector2;
+    private _getVisibleScreenArea: () => VisibleScreenArea | null;
+    private _onExit: () => void;
+    private _onObjectPropertiesChanged: (properties: {
+      [propertyName: string]: string;
+    }) => void;
+    private _loadSavedPoints: () => SavedInspectorPoints | null;
+    private _storeSavedPoints: (savedPoints: SavedInspectorPoints) => void;
+    private _raycaster = new THREE.Raycaster();
+
+    // What was changed on the other objects, to restore them on exit.
+    private _greyedMeshes: Array<{
+      mesh: THREE.Mesh;
+      material: THREE.Material | THREE.Material[];
+    }> = [];
+    private _greyedPixiObjects: Array<{
+      pixiObject: { alpha: number };
+      alpha: number;
+    }> = [];
+    private _hiddenThreeObjects: Array<{
+      threeObject: THREE.Object3D;
+      visible: boolean;
+    }> = [];
+    private _greyMaterial = new THREE.MeshBasicMaterial({
+      color: 0x8a8a8a,
+      transparent: true,
+      opacity: 0.35,
+      depthWrite: false,
+    });
+
+    // Handles: the origin point and the custom points, as spheres that can be
+    // picked and dragged with the gizmo.
+    private _points: Array<InspectorPoint> = [];
+    private _selectedPoint: InspectorPoint | null = null;
+    private _handleControls: THREE_ADDONS.TransformControls;
+    private _handleRadius: float;
+    private _customPointsCount = 0;
+
+    // Bones: the skeleton helper, and one box per bone shown when selected.
+    private _skeletonHelper: THREE.SkeletonHelper | null = null;
+    private _bonesGroup = new THREE.Group();
+    private _boneBoxes: Array<{ bone: THREE.Bone; box: THREE.Mesh }> = [];
+    private _tempVector3 = new THREE.Vector3();
+    private _tempVector3b = new THREE.Vector3();
+
+    // The element of the model highlighted from the tree: its meshes blink
+    // and get a bright blue outline.
+    private _blinkingMeshes: Array<THREE.Mesh> = [];
+    private _blinkingOriginalMaterials: Array<{
+      material: THREE.Material;
+      opacity: float;
+      transparent: boolean;
+    }> = [];
+    private _selectedRow: HTMLElement | null = null;
+    private _blinkTime: float = 0;
+    private _outlineShells: Array<THREE.Object3D> = [];
+    private _outlineMaterial = Model3DInspector._makeOutlineMaterial();
+
+    // DOM.
+    private _parent: HTMLElement | null = null;
+    private _renderedElements: {
+      banner: HTMLElement;
+      panel: HTMLElement;
+      pointCrumb: HTMLElement;
+      pointCrumbSeparator: HTMLElement;
+      pointsList: HTMLElement;
+      deletePointButton: HTMLButtonElement;
+    } | null = null;
+
+    constructor({
+      object,
+      threeScene,
+      threeCamera,
+      canvas,
+      allObjects,
+      hideOtherObjects,
+      getCursorNormalizedDeviceCoordinates,
+      getVisibleScreenArea,
+      onExit,
+      onObjectPropertiesChanged,
+      loadSavedPoints,
+      storeSavedPoints,
+    }: {
+      object: RuntimeObjectWith3D;
+      threeScene: THREE.Scene;
+      threeCamera: THREE.Camera;
+      canvas: HTMLCanvasElement | undefined;
+      allObjects: Array<gdjs.RuntimeObject>;
+      /** Hide the other objects entirely (for a temporary instance), instead of greying them out. */
+      hideOtherObjects: boolean;
+      getCursorNormalizedDeviceCoordinates: () => THREE.Vector2;
+      getVisibleScreenArea: () => VisibleScreenArea | null;
+      onExit: () => void;
+      onObjectPropertiesChanged: (properties: {
+        [propertyName: string]: string;
+      }) => void;
+      loadSavedPoints: () => SavedInspectorPoints | null;
+      storeSavedPoints: (savedPoints: SavedInspectorPoints) => void;
+    }) {
+      this._object = object;
+      this._threeScene = threeScene;
+      this._threeCamera = threeCamera;
+      this._getCursorNormalizedDeviceCoordinates =
+        getCursorNormalizedDeviceCoordinates;
+      this._getVisibleScreenArea = getVisibleScreenArea;
+      this._onExit = onExit;
+      this._onObjectPropertiesChanged = onObjectPropertiesChanged;
+      this._loadSavedPoints = loadSavedPoints;
+      this._storeSavedPoints = storeSavedPoints;
+
+      this._greyOutOtherObjects(allObjects, hideOtherObjects);
+
+      const objectSize = Math.max(
+        object.getWidth(),
+        object.getHeight(),
+        object.getDepth()
+      );
+      this._handleRadius = Math.min(20, Math.max(2, objectSize * 0.05));
+
+      // The origin point handle. By definition, it's at the object position.
+      this._points.push({
+        name: 'Origin point',
+        isOrigin: true,
+        sphere: this._makeHandleSphere(0xf2a63c),
+        parent: null,
+        localPosition: null,
+        row: null,
+        info: null,
+      });
+
+      this._buildSkeleton();
+      threeScene.add(this._bonesGroup);
+
+      // The gizmo moving the selected handle. Same setup as the selection controls.
+      const handleControls = new THREE_ADDONS.TransformControls(
+        threeCamera,
+        canvas
+      );
+      patchAxesOnTransformControlsGizmos(handleControls);
+      patchColorsOnTransformControlsGizmos(handleControls);
+      patchNegativeAxisHandlesOnTransformControlsGizmos(handleControls);
+      patchAxisGuideLinesOnTransformControlsGizmos(handleControls);
+      handleControls.rotation.order = 'ZYX';
+      handleControls.scale.y = -1;
+      handleControls.mode = 'translate';
+      handleControls.traverse((obj) => {
+        // @ts-ignore
+        obj.isTransformControls = true;
+      });
+      handleControls.visible = false;
+      handleControls.enabled = false;
+      handleControls.addEventListener('change', () => {
+        // The dragged point is applied live: the model never moves on screen.
+        if (handleControls.dragging && this._selectedPoint) {
+          this._applyDraggedHandle(this._selectedPoint);
+        }
+      });
+      handleControls.addEventListener('dragging-changed', (event) => {
+        // @ts-ignore - `value` is the new dragging state.
+        const isDragging: boolean = event.value;
+        if (
+          !isDragging &&
+          this._selectedPoint &&
+          this._selectedPoint.isOrigin
+        ) {
+          // Persist in the project once the drag is over (not at each frame).
+          this._persistPoints();
+        }
+      });
+      threeScene.add(handleControls);
+      this._handleControls = handleControls;
+
+      this._restoreCustomPoints();
+      this._addOrUpdateStyle();
+    }
+
+    getObject(): gdjs.RuntimeObject {
+      return this._object;
+    }
+
+    /**
+     * What the camera should focus on: the selected point, or the model.
+     */
+    getFocusTarget(): [float, float, float] {
+      if (this._selectedPoint) {
+        const position = this._selectedPoint.sphere.position;
+        return [position.x, position.y, position.z];
+      }
+      return [
+        this._object.getCenterXInScene(),
+        this._object.getCenterYInScene(),
+        this._object.getUnrotatedAABBMinZ(),
+      ];
+    }
+
+    private _getModel(): THREE.Object3D | null {
+      // @ts-ignore - _renderer and _threeObject are specific to Model3D.
+      const renderer = this._object._renderer;
+      return renderer && renderer._threeObject ? renderer._threeObject : null;
+    }
+
+    private _makeHandleSphere(color: integer): THREE.Mesh {
+      const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(this._handleRadius, 16, 12),
+        new THREE.MeshBasicMaterial({
+          color,
+          transparent: true,
+          opacity: 0.9,
+          depthTest: false,
+        })
+      );
+      sphere.renderOrder = 999;
+      // Directly in the scene, like the dummy object of the selection controls,
+      // so that its position is expressed in GDevelop coordinates.
+      this._threeScene.add(sphere);
+      return sphere;
+    }
+
+    private _greyOutOtherObjects(
+      allObjects: Array<gdjs.RuntimeObject>,
+      hideOtherObjects: boolean
+    ) {
+      for (const otherObject of allObjects) {
+        if (otherObject === this._object) continue;
+
+        const threeObject = otherObject.get3DRendererObject();
+        if (threeObject && hideOtherObjects) {
+          this._hiddenThreeObjects.push({
+            threeObject,
+            visible: threeObject.visible,
+          });
+          threeObject.visible = false;
+          continue;
+        }
+        if (threeObject) {
+          threeObject.traverse((child) => {
+            const mesh = child as THREE.Mesh;
+            // @ts-ignore
+            if (!mesh.isMesh || !mesh.material) return;
+            this._greyedMeshes.push({ mesh, material: mesh.material });
+            mesh.material = this._greyMaterial;
+          });
+          continue;
+        }
+
+        const pixiObject = otherObject.getRendererObject() as any;
+        if (pixiObject && typeof pixiObject.alpha === 'number') {
+          this._greyedPixiObjects.push({ pixiObject, alpha: pixiObject.alpha });
+          pixiObject.alpha = hideOtherObjects ? 0 : pixiObject.alpha * 0.3;
+        }
+      }
+    }
+
+    private _getModelBones(): Array<THREE.Bone> {
+      const bones: Array<THREE.Bone> = [];
+      const threeObject = this._object.get3DRendererObject();
+      if (!threeObject) return bones;
+      threeObject.traverse((child) => {
+        // @ts-ignore
+        if (child.isBone) bones.push(child as THREE.Bone);
+      });
+      return bones;
+    }
+
+    private _buildSkeleton() {
+      // The whole skeleton is drawn by the Three.js helper (it follows the
+      // animation and renders at the bones world positions).
+      const threeObject = this._object.get3DRendererObject();
+      if (threeObject) {
+        const skeletonHelper = new THREE.SkeletonHelper(threeObject);
+        const helperMaterial =
+          skeletonHelper.material as THREE.LineBasicMaterial;
+        helperMaterial.depthTest = false;
+        helperMaterial.transparent = true;
+        helperMaterial.opacity = 0.9;
+        skeletonHelper.renderOrder = 998;
+        // The helper computes its vertices relatively to root.matrixWorld and
+        // expects to be a child of the world root. The scene is mirrored
+        // (scale.y = -1), which would flip the skeleton: put the helper under a
+        // group cancelling the scene transformation, so that its matrixWorld is
+        // exactly root.matrixWorld.
+        const helperRoot = new THREE.Group();
+        helperRoot.matrixAutoUpdate = false;
+        this._threeScene.updateMatrix();
+        helperRoot.matrix.copy(this._threeScene.matrix).invert();
+        helperRoot.add(skeletonHelper);
+        this._threeScene.add(helperRoot);
+        this._skeletonHelper = skeletonHelper;
+      }
+
+      // One box per bone, only shown for the bone selected in the tree.
+      const boneMaterial = new THREE.MeshBasicMaterial({
+        color: 0x6bafff,
+        transparent: true,
+        opacity: 0.85,
+        depthTest: false,
+      });
+      // The box goes from the bone toward its first child (along +Z).
+      const boneGeometry = new THREE.BoxGeometry(1, 1, 1).translate(0, 0, 0.5);
+      for (const bone of this._getModelBones()) {
+        // One material per box, so that a single bone can be highlighted.
+        const box = new THREE.Mesh(boneGeometry, boneMaterial.clone());
+        box.renderOrder = 998;
+        box.visible = false;
+        this._bonesGroup.add(box);
+        this._boneBoxes.push({ bone, box });
+      }
+      boneMaterial.dispose();
+      this._bonesGroup.userData.thickness = Math.max(
+        1,
+        this._handleRadius * 0.5
+      );
+    }
+
+    private _updateBoneBoxes() {
+      const thickness: float = this._bonesGroup.userData.thickness;
+      for (const { bone, box } of this._boneBoxes) {
+        if (!box.visible) continue;
+        // The group has no transformation: scene local coordinates are the
+        // GDevelop ones, whatever the flip applied by the scene itself. All
+        // the maths are done in this space: `lookAt` can't be used, as the
+        // scene is mirrored (scale.y = -1) which breaks its rotation extraction.
+        const boneLocalPosition = this._threeScene.worldToLocal(
+          bone.getWorldPosition(this._tempVector3)
+        );
+        box.position.copy(boneLocalPosition);
+
+        const childBone = bone.children.find(
+          // @ts-ignore
+          (child) => child.isBone
+        ) as THREE.Bone | undefined;
+        if (childBone) {
+          const childLocalPosition = this._threeScene.worldToLocal(
+            childBone.getWorldPosition(this._tempVector3b)
+          );
+          const direction = childLocalPosition.sub(boneLocalPosition);
+          const length = direction.length();
+          if (length > 0.0001) {
+            direction.divideScalar(length);
+            // The box geometry goes along +Z from the bone to its child.
+            box.quaternion.setFromUnitVectors(boneBoxAxis, direction);
+          }
+          box.scale.set(thickness, thickness, Math.max(length, thickness));
+        } else {
+          box.quaternion.identity();
+          box.scale.set(thickness, thickness, thickness * 2);
+        }
+      }
+    }
+
+    /**
+     * Put the handles where their point is: the origin at the object position,
+     * the custom points at their position relatively to the model (they
+     * follow the model, whatever its transformation).
+     */
+    private _updateHandlesPositions() {
+      for (const point of this._points) {
+        if (this._handleControls.dragging && this._selectedPoint === point) {
+          continue;
+        }
+        if (point.isOrigin) {
+          point.sphere.position.set(
+            this._object.getX(),
+            this._object.getY(),
+            this._object.getZ()
+          );
+        } else if (point.parent && point.localPosition) {
+          const worldPosition = point.parent.localToWorld(
+            this._tempVector3.copy(point.localPosition)
+          );
+          point.sphere.position.copy(
+            this._threeScene.worldToLocal(worldPosition)
+          );
+        }
+      }
+    }
+
+    private _applyDraggedHandle(point: InspectorPoint) {
+      if (point.isOrigin) {
+        this._applyOriginFromSphere(point.sphere);
+        return;
+      }
+      // A custom point: remember where it is relatively to its parent.
+      if (!point.parent || !point.localPosition) return;
+      const worldPosition = this._threeScene.localToWorld(
+        this._tempVector3.copy(point.sphere.position)
+      );
+      point.localPosition.copy(point.parent.worldToLocal(worldPosition));
+      this._saveCustomPoints();
+    }
+
+    /**
+     * The origin sphere was dragged: make its position the new origin AND the
+     * new rotation pivot of the model, without moving the model itself.
+     */
+    private _applyOriginFromSphere(sphere: THREE.Mesh) {
+      const object = this._object;
+      const group = object.get3DRendererObject();
+      const model = this._getModel();
+      // @ts-ignore - _renderer is specific to Model3D.
+      const renderer = object._renderer;
+      if (!group || !model || !renderer.getCenterPoint) return;
+
+      // Where the sphere is, in the group local space (unit cube of the
+      // model, rotated and scaled by the group): this is the offset of the
+      // new origin relatively to the current pivot, in normalized units.
+      const sphereWorldPosition = this._threeScene.localToWorld(
+        this._tempVector3.copy(sphere.position)
+      );
+      const localOffset = group.worldToLocal(sphereWorldPosition);
+
+      // The model Y axis is flipped compared to the GDevelop normalized points.
+      const currentCenter: [float, float, float] = renderer.getCenterPoint();
+      const newPoint: [float, float, float] = [
+        currentCenter[0] + localOffset.x,
+        currentCenter[1] - localOffset.y,
+        currentCenter[2] + localOffset.z,
+      ];
+
+      // The new origin is also the rotation pivot. The model stays where it
+      // is on screen: the object position becomes the sphere position.
+      this._setModelPoints(newPoint, newPoint, localOffset, sphere.position);
+    }
+
+    /**
+     * Change the origin and center (rotation pivot) of the model, keeping the
+     * object position. `pivotOffset` is the offset of the new center from the
+     * current one, in the group local space (unit cube).
+     */
+    private _setModelPoints(
+      originPoint: Array<float | null>,
+      centerPoint: Array<float | null>,
+      pivotOffset: THREE.Vector3,
+      newObjectPosition: THREE.Vector3
+    ) {
+      const model = this._getModel();
+      if (!model) return;
+      // The model is offset inside its group so that the center is the group
+      // origin (and thus the rotation pivot)...
+      model.position.sub(pivotOffset);
+      // @ts-ignore - _originPoint and _centerPoint are specific to Model3D.
+      this._object._originPoint = [...originPoint];
+      // @ts-ignore
+      this._object._centerPoint = [...centerPoint];
+      // ...and the group is moved to the new pivot, so that the model does not
+      // move on screen. Setting the position also refreshes the renderer and
+      // the hitboxes.
+      this._object.setX(newObjectPosition.x);
+      this._object.setY(newObjectPosition.y);
+      this._object.setZ(newObjectPosition.z);
+    }
+
+    /**
+     * Save the points in the project: a "Custom" location with the
+     * coordinates, or the model origin when reset (a point is custom as soon
+     * as one of its coordinates is set). The object position is saved too,
+     * as it moves with the origin.
+     */
+    private _persistPoints() {
+      // @ts-ignore - _renderer, _originPoint and _centerPoint are specific to Model3D.
+      const renderer = this._object._renderer;
+      // @ts-ignore
+      const originPoint: Array<float | null> = this._object._originPoint;
+      // @ts-ignore
+      const centerPoint: Array<float | null> = this._object._centerPoint;
+      const isCustom = (point: Array<float | null>) =>
+        point.some((coordinate) => coordinate !== null);
+      const resolvedOrigin: [float, float, float] = renderer.getOriginPoint();
+      const properties: { [propertyName: string]: string } = {
+        originLocation: isCustom(originPoint) ? 'Custom' : 'ModelOrigin',
+        customOriginX: String(resolvedOrigin[0]),
+        customOriginY: String(resolvedOrigin[1]),
+        customOriginZ: String(resolvedOrigin[2]),
+      };
+      const resolvedCenter: [float, float, float] = renderer.getCenterPoint();
+      properties.centerLocation = isCustom(centerPoint)
+        ? 'Custom'
+        : 'ModelOrigin';
+      properties.customCenterX = String(resolvedCenter[0]);
+      properties.customCenterY = String(resolvedCenter[1]);
+      properties.customCenterZ = String(resolvedCenter[2]);
+      this._onObjectPropertiesChanged(properties);
+    }
+
+    /**
+     * Put back the origin (and the rotation pivot) as they were when the
+     * inspection started. Nothing else can move the object during the
+     * inspection, so restoring the saved state is exact.
+     */
+    private _resetOriginPoint() {
+      const object = this._object;
+      const group = object.get3DRendererObject();
+      // @ts-ignore - _renderer is specific to Model3D.
+      const renderer = object._renderer;
+      if (!group || !renderer || !renderer.getCenterPoint) return;
+
+      // Back to the origin of the 3D model file, for the origin and the pivot.
+      const modelOrigin: Array<float | null> = [null, null, null];
+      // getCenterPoint() returns a shared array: copy it before changing the points.
+      const resolvedCurrentCenter = renderer.getCenterPoint();
+      const currentCenter: [float, float, float] = [
+        resolvedCurrentCenter[0],
+        resolvedCurrentCenter[1],
+        resolvedCurrentCenter[2],
+      ];
+      // @ts-ignore - _centerPoint is specific to Model3D.
+      object._centerPoint = [...modelOrigin];
+      const newCenter: [float, float, float] = renderer.getCenterPoint();
+      const pivotOffset = new THREE.Vector3(
+        newCenter[0] - currentCenter[0],
+        -(newCenter[1] - currentCenter[1]),
+        newCenter[2] - currentCenter[2]
+      );
+      // The model stays on screen: the object goes where its file origin is.
+      const newObjectPosition = this._threeScene.worldToLocal(
+        group.localToWorld(pivotOffset.clone())
+      );
+      this._setModelPoints(
+        modelOrigin,
+        modelOrigin,
+        pivotOffset,
+        newObjectPosition
+      );
+      this._persistPoints();
+    }
+
+    /**
+     * Add a custom point on the model (POC: it only lives in the inspector),
+     * at the center of the model, and select it.
+     */
+    private _addCustomPoint() {
+      const model = this._getModel();
+      const group = this._object.get3DRendererObject();
+      if (!model || !group) return;
+      this._customPointsCount++;
+      const point = this._createCustomPoint(
+        'Point ' + this._customPointsCount,
+        model,
+        // The current rotation pivot, expressed relatively to the model.
+        model.worldToLocal(group.getWorldPosition(new THREE.Vector3()))
+      );
+      this._saveCustomPoints();
+      this._rebuildPanel();
+      this._updateHandlesPositions();
+      this._setSelectedPoint(point);
+    }
+
+    private _createCustomPoint(
+      name: string,
+      parent: THREE.Object3D,
+      localPosition: THREE.Vector3
+    ): InspectorPoint {
+      const point: InspectorPoint = {
+        name,
+        isOrigin: false,
+        sphere: this._makeHandleSphere(0x4cd964),
+        parent,
+        localPosition,
+        row: null,
+        info: null,
+      };
+      this._points.push(point);
+      return point;
+    }
+
+    /**
+     * Attach a custom point to another element of the model (dropped on it in
+     * the tree): it keeps its place on screen, but now follows the position
+     * and orientation of this element.
+     */
+    private _setPointParent(point: InspectorPoint, newParent: THREE.Object3D) {
+      if (point.isOrigin || !point.parent || !point.localPosition) return;
+      if (point.parent === newParent) return;
+      const worldPosition = point.parent.localToWorld(
+        this._tempVector3.copy(point.localPosition)
+      );
+      point.localPosition.copy(newParent.worldToLocal(worldPosition));
+      point.parent = newParent;
+      this._saveCustomPoints();
+      this._rebuildPanel();
+    }
+
+    /**
+     * POC: the custom points are kept on the runtime object, so that they are
+     * shown again when the model is inspected again (until the scene is
+     * reloaded).
+     */
+    private _saveCustomPoints() {
+      const savedPoints: Array<SavedInspectorPoint> = [];
+      for (const point of this._points) {
+        if (point.isOrigin || !point.parent || !point.localPosition) continue;
+        savedPoints.push({
+          name: point.name,
+          parentUuid: point.parent.uuid,
+          parentName: point.parent.name,
+          localPosition: [
+            point.localPosition.x,
+            point.localPosition.y,
+            point.localPosition.z,
+          ],
+        });
+      }
+      this._storeSavedPoints({
+        points: savedPoints,
+        count: this._customPointsCount,
+      });
+    }
+
+    private _restoreCustomPoints() {
+      const model = this._getModel();
+      const savedPoints = this._loadSavedPoints();
+      if (!model || !savedPoints) return;
+      this._customPointsCount = savedPoints.count;
+      for (const savedPoint of savedPoints.points) {
+        // The model can have been rebuilt (new uuids): fall back on the name.
+        let parent: THREE.Object3D | null = null;
+        let parentByName: THREE.Object3D | null = null;
+        model.traverse((child) => {
+          if (child.uuid === savedPoint.parentUuid) parent = child;
+          if (!parentByName && child.name === savedPoint.parentName)
+            parentByName = child;
+        });
+        this._createCustomPoint(
+          savedPoint.name,
+          parent || parentByName || model,
+          new THREE.Vector3(...savedPoint.localPosition)
+        );
+      }
+    }
+
+    /**
+     * Rebuild the whole panel (tree and points), on the next render.
+     */
+    private _rebuildPanel() {
+      if (!this._renderedElements) return;
+      this._renderedElements.banner.remove();
+      this._renderedElements.panel.remove();
+      this._renderedElements = null;
+      this._selectedRow = null;
+      for (const point of this._points) {
+        point.row = null;
+        point.info = null;
+      }
+    }
+
+    /**
+     * Delete the selected custom point (the origin can't be deleted).
+     */
+    private _deleteSelectedPoint() {
+      const point = this._selectedPoint;
+      if (!point || point.isOrigin) return;
+      this._setSelectedPoint(null);
+      point.sphere.removeFromParent();
+      point.sphere.geometry.dispose();
+      (point.sphere.material as THREE.Material).dispose();
+      this._points.splice(this._points.indexOf(point), 1);
+      this._saveCustomPoints();
+      this._rebuildPanel();
+    }
+
+    /**
+     * A click (without drag) happened: pick or unpick a handle.
+     */
+    handleClick() {
+      if (this._handleControls.dragging || this._handleControls.axis) {
+        // Click on the gizmo itself: keep the selection.
+        return;
+      }
+      this._setSelectedPoint(this._getPointUnderCursor());
+    }
+
+    /**
+     * True if the cursor is on a handle or on the gizmo.
+     */
+    isCursorOnOriginHandle(): boolean {
+      if (this._handleControls.dragging || !!this._handleControls.axis) {
+        return true;
+      }
+      return this._getPointUnderCursor() !== null;
+    }
+
+    private _getPointUnderCursor(): InspectorPoint | null {
+      this._raycaster.setFromCamera(
+        this._getCursorNormalizedDeviceCoordinates(),
+        this._threeCamera
+      );
+      const intersections = this._raycaster.intersectObjects(
+        this._points.map((point) => point.sphere),
+        false
+      );
+      if (intersections.length === 0) return null;
+      return (
+        this._points.find(
+          (point) => point.sphere === intersections[0].object
+        ) || null
+      );
+    }
+
+    private _setSelectedPoint(point: InspectorPoint | null) {
+      this._selectedPoint = point;
+      for (const otherPoint of this._points) {
+        const isSelected = otherPoint === point;
+        (otherPoint.sphere.material as THREE.MeshBasicMaterial).color.setHex(
+          isSelected ? 0xffd200 : otherPoint.isOrigin ? 0xf2a63c : 0x4cd964
+        );
+        if (otherPoint.row) {
+          otherPoint.row.classList.toggle(
+            'InGameEditor-Inspector-Selected',
+            isSelected
+          );
+        }
+      }
+      if (point) {
+        this._handleControls.attach(point.sphere);
+      } else {
+        this._handleControls.detach();
+      }
+      this._handleControls.visible = !!point;
+      this._handleControls.enabled = !!point;
+    }
+
+    update() {
+      this._updateHandlesPositions();
+      this._updateBoneBoxes();
+      this._updateBlinking();
+    }
+
+    /**
+     * Highlight an element of the model listed in the tree: the row is
+     * marked as selected, the meshes blink and get an outline. Clicking the
+     * row again stops.
+     */
+    private _setBlinkingElement(row: HTMLElement, meshes: Array<THREE.Mesh>) {
+      this._stopBlinking();
+      if (this._selectedRow === row) {
+        this._selectedRow = null;
+        return;
+      }
+      this._selectedRow = row;
+      row.classList.add('InGameEditor-Inspector-Selected');
+      this._blinkingMeshes = meshes;
+      this._blinkTime = 0;
+      const seenMaterials = new Set<THREE.Material>();
+      for (const mesh of meshes) {
+        const materials = Array.isArray(mesh.material)
+          ? mesh.material
+          : [mesh.material];
+        for (const material of materials) {
+          if (seenMaterials.has(material)) continue;
+          seenMaterials.add(material);
+          this._blinkingOriginalMaterials.push({
+            material,
+            opacity: material.opacity,
+            transparent: material.transparent,
+          });
+          material.transparent = true;
+        }
+        this._addOutlineShell(mesh);
+        // A bone box is hidden unless its bone is selected.
+        if (this._boneBoxes.some((entry) => entry.box === mesh)) {
+          mesh.visible = true;
+        }
+      }
+    }
+
+    /**
+     * Draw a bright blue outline around a mesh: a clone of it, rendered with
+     * its back faces only and pushed along the normals in the shader (after
+     * skinning, so it follows the animation). It's a child of the mesh, so it
+     * follows any transformation of it.
+     */
+    private _addOutlineShell(mesh: THREE.Mesh) {
+      const shell = mesh.clone();
+      shell.material = this._outlineMaterial;
+      shell.renderOrder = (mesh.renderOrder || 0) - 1;
+      shell.position.set(0, 0, 0);
+      shell.rotation.set(0, 0, 0);
+      shell.scale.set(1, 1, 1);
+      shell.children.length = 0;
+      shell.visible = true;
+      mesh.add(shell);
+      this._outlineShells.push(shell);
+    }
+
+    private static _makeOutlineMaterial(): THREE.MeshBasicMaterial {
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x00c8ff,
+        side: THREE.BackSide,
+        transparent: true,
+        opacity: 0.95,
+        depthWrite: false,
+      });
+      // Push the vertices along their normal by about 2 world pixels: the
+      // extrusion is expressed in object units, so it's divided by the object
+      // world scale (3D models are normalized in a unit cube and then scaled
+      // to their size in pixels).
+      material.onBeforeCompile = (shader) => {
+        shader.vertexShader = shader.vertexShader.replace(
+          '#include <skinning_vertex>',
+          '#include <skinning_vertex>\n' +
+            'transformed += objectNormal * (2.0 / length(modelMatrix[0].xyz));\n'
+        );
+      };
+      return material;
+    }
+
+    private _stopBlinking() {
+      if (this._selectedRow) {
+        this._selectedRow.classList.remove('InGameEditor-Inspector-Selected');
+      }
+      for (const { material, opacity, transparent } of this
+        ._blinkingOriginalMaterials) {
+        material.opacity = opacity;
+        material.transparent = transparent;
+        material.needsUpdate = true;
+      }
+      this._blinkingOriginalMaterials.length = 0;
+      this._blinkingMeshes.length = 0;
+      for (const shell of this._outlineShells) {
+        shell.removeFromParent();
+      }
+      this._outlineShells.length = 0;
+      for (const { box } of this._boneBoxes) {
+        box.visible = false;
+      }
+    }
+
+    private _updateBlinking() {
+      if (this._blinkingOriginalMaterials.length === 0) return;
+      this._blinkTime += 1 / 60;
+      // Between 15% and 100% opacity, twice per second.
+      const opacityFactor =
+        0.15 + 0.85 * Math.abs(Math.sin(this._blinkTime * Math.PI * 2));
+      for (const { material, opacity } of this._blinkingOriginalMaterials) {
+        material.opacity = opacity * opacityFactor;
+      }
+    }
+
+    private _addOrUpdateStyle() {
+      const id = 'InGameEditor-Model3DInspector-Style';
+      if (document.getElementById(id)) return;
+      const styleElement = document.createElement('style');
+      styleElement.id = id;
+      styleElement.textContent = `
+        .InGameEditor-Inspector-Banner, .InGameEditor-Inspector-Panel {
+          position: absolute;
+          color: var(--in-game-editor-theme-text-color-primary);
+          background-color: var(--in-game-editor-theme-toolbar-background-color);
+          font-family: system-ui, sans-serif;
+          font-size: 13px;
+          box-sizing: border-box;
+          pointer-events: auto;
+          opacity: 0.95;
+        }
+        /* Breadcrumb, top left of the visible area. */
+        .InGameEditor-Inspector-Banner {
+          top: 0;
+          left: 0;
+          height: 40px;
+          min-width: 380px;
+          padding: 0 14px;
+          border-radius: 0 0 8px 0;
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          cursor: pointer;
+        }
+        .InGameEditor-Inspector-Crumb {
+          text-decoration: underline;
+        }
+        .InGameEditor-Inspector-Crumb-Current {
+          font-weight: bold;
+        }
+        /* Tree of the model content, right side of the visible area. */
+        .InGameEditor-Inspector-Panel {
+          top: 40px;
+          right: 0;
+          bottom: 0;
+          width: 260px;
+          padding: 8px 10px;
+          overflow: auto;
+        }
+        /* Header, like the panels of the IDE: title left, icon buttons right. */
+        .InGameEditor-Inspector-PanelHeader {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          margin: -8px -10px 8px -10px;
+          padding: 6px 10px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+          font-weight: bold;
+        }
+        .InGameEditor-Inspector-PanelHeader-Actions {
+          display: flex;
+          gap: 2px;
+        }
+        .InGameEditor-Inspector-IconButton {
+          width: 26px;
+          height: 26px;
+          padding: 0;
+          font: inherit;
+          font-size: 15px;
+          line-height: 26px;
+          text-align: center;
+          color: inherit;
+          background: transparent;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .InGameEditor-Inspector-IconButton:hover:not(:disabled) {
+          background: rgba(255, 255, 255, 0.15);
+        }
+        .InGameEditor-Inspector-IconButton:disabled {
+          opacity: 0.3;
+          cursor: default;
+        }
+        .InGameEditor-Inspector-RowButton {
+          width: 18px;
+          height: 18px;
+          line-height: 18px;
+          font-size: 11px;
+          margin-left: 4px;
+          opacity: 0.6;
+        }
+        .InGameEditor-Inspector-Panel ul {
+          margin: 0;
+          padding-left: 14px;
+          list-style: none;
+        }
+        .InGameEditor-Inspector-Panel > ul {
+          padding-left: 0;
+        }
+        .InGameEditor-Inspector-Panel li {
+          line-height: 1.6;
+          white-space: nowrap;
+        }
+        .InGameEditor-Inspector-Selectable {
+          cursor: pointer;
+          border-radius: 4px;
+          padding: 0 4px;
+        }
+        .InGameEditor-Inspector-Selectable:hover {
+          background-color: rgba(255, 255, 255, 0.08);
+        }
+        .InGameEditor-Inspector-Selected {
+          background-color: rgba(242, 166, 60, 0.35);
+        }
+        .InGameEditor-Inspector-DropTarget {
+          outline: 1px dashed #00c8ff;
+        }
+        .InGameEditor-Inspector-Hint {
+          opacity: 0.6;
+          font-style: italic;
+        }
+      `;
+      document.head.appendChild(styleElement);
+    }
+
+    private _renderBoneTree(bone: THREE.Bone): HTMLElement {
+      const childBones = bone.children.filter(
+        // @ts-ignore
+        (child) => child.isBone
+      ) as Array<THREE.Bone>;
+      const boneBox = this._boneBoxes.find((entry) => entry.bone === bone);
+      const row = (
+        <span class="InGameEditor-Inspector-Selectable">
+          ▭ {bone.name || '(unnamed bone)'}
+        </span>
+      );
+      row.addEventListener('click', () =>
+        this._setBlinkingElement(row, boneBox ? [boneBox.box] : [])
+      );
+      this._makePointDropTarget(row, bone);
+      const item = <li>{row}</li>;
+      this._appendPointRowsOf(item, bone);
+      if (childBones.length > 0) {
+        item.appendChild(
+          appendChildren(
+            <ul />,
+            childBones.map((childBone) => this._renderBoneTree(childBone))
+          )
+        );
+      }
+      return item;
+    }
+
+    private _renderChildObjects(object3D: THREE.Object3D): HTMLElement {
+      const children = object3D.children.filter(
+        // @ts-ignore
+        (child) => !child.isBone && !this._outlineShells.includes(child)
+      );
+      return appendChildren(
+        <ul />,
+        children.map((child) => {
+          const row = (
+            <span class="InGameEditor-Inspector-Selectable">
+              {child.name || '(unnamed)'}{' '}
+              <span class="InGameEditor-Inspector-Hint">{child.type}</span>
+            </span>
+          );
+          row.addEventListener('click', () => {
+            // Blink every mesh of this element (a group blinks its content).
+            const meshes: Array<THREE.Mesh> = [];
+            child.traverse((descendant) => {
+              if (
+                (descendant as any).isMesh &&
+                !this._outlineShells.includes(descendant)
+              )
+                meshes.push(descendant as THREE.Mesh);
+            });
+            this._setBlinkingElement(row, meshes);
+          });
+          this._makePointDropTarget(row, child);
+          const item = <li>{row}</li>;
+          this._appendPointRowsOf(item, child);
+          if (child.children.length > 0) {
+            item.appendChild(this._renderChildObjects(child));
+          }
+          return item;
+        })
+      );
+    }
+
+    /**
+     * A row of the tree accepts a custom point dropped on it: the point is
+     * then attached to this element.
+     */
+    private _makePointDropTarget(row: HTMLElement, element: THREE.Object3D) {
+      row.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        row.classList.add('InGameEditor-Inspector-DropTarget');
+      });
+      row.addEventListener('dragleave', () => {
+        row.classList.remove('InGameEditor-Inspector-DropTarget');
+      });
+      row.addEventListener('drop', (event) => {
+        event.preventDefault();
+        row.classList.remove('InGameEditor-Inspector-DropTarget');
+        const pointIndex = Number(
+          event.dataTransfer ? event.dataTransfer.getData('text/plain') : ''
+        );
+        const point = this._points[pointIndex];
+        if (point) this._setPointParent(point, element);
+      });
+    }
+
+    /**
+     * The row of a point: selectable, and draggable onto an element of the tree.
+     */
+    private _renderPointRow(point: InspectorPoint): HTMLElement {
+      const info = <span class="InGameEditor-Inspector-Hint"></span>;
+      const row = (
+        <span class="InGameEditor-Inspector-Selectable">● {point.name}</span>
+      );
+      row.addEventListener('click', () =>
+        this._setSelectedPoint(this._selectedPoint === point ? null : point)
+      );
+      row.classList.toggle(
+        'InGameEditor-Inspector-Selected',
+        this._selectedPoint === point
+      );
+      if (!point.isOrigin) {
+        row.setAttribute('draggable', 'true');
+        row.setAttribute(
+          'title',
+          'Drag onto a mesh or a bone to attach the point to it'
+        );
+        row.addEventListener('dragstart', (event) => {
+          if (event.dataTransfer) {
+            event.dataTransfer.setData(
+              'text/plain',
+              String(this._points.indexOf(point))
+            );
+            event.dataTransfer.effectAllowed = 'move';
+          }
+        });
+      }
+      point.row = row;
+      point.info = info;
+      const item = (
+        <li>
+          {row} {info}
+        </li>
+      );
+      if (!point.isOrigin) {
+        // Delete the point right from its row.
+        const deleteButton = (
+          <button
+            class="InGameEditor-Inspector-IconButton InGameEditor-Inspector-RowButton"
+            title="Delete this point"
+          >
+            ✕
+          </button>
+        );
+        deleteButton.addEventListener('click', (event) => {
+          event.stopPropagation();
+          this._setSelectedPoint(point);
+          this._deleteSelectedPoint();
+        });
+        item.appendChild(deleteButton);
+      }
+      return item;
+    }
+
+    /**
+     * Add, under the row of an element of the model, the points attached to it.
+     */
+    private _appendPointRowsOf(item: HTMLElement, element: THREE.Object3D) {
+      const attachedPoints = this._points.filter(
+        (point) => !point.isOrigin && point.parent === element
+      );
+      if (attachedPoints.length === 0) return;
+      item.appendChild(
+        appendChildren(
+          <ul />,
+          attachedPoints.map((point) => this._renderPointRow(point))
+        )
+      );
+    }
+
+    /**
+     * (Re)build the rows of the points (origin and custom points).
+     */
+    private _renderPointsList() {
+      if (!this._renderedElements) return;
+      const model = this._getModel();
+      const { pointsList } = this._renderedElements;
+      pointsList.innerHTML = '';
+      for (const point of this._points) {
+        if (!point.isOrigin && point.parent !== model) continue;
+        pointsList.appendChild(this._renderPointRow(point));
+      }
+    }
+
+    render(parent: HTMLElement) {
+      if (this._renderedElements && this._parent !== parent) {
+        this._renderedElements.banner.remove();
+        this._renderedElements.panel.remove();
+        this._renderedElements = null;
+      }
+      this._parent = parent;
+
+      if (!this._renderedElements) {
+        const objectName = this._object.getName();
+        // Breadcrumb: "Scene › Bunny › Origin point" (the last crumb only
+        // while a point is selected). Clicking it leaves the inspection.
+        const pointCrumb = (
+          <span class="InGameEditor-Inspector-Crumb-Current" />
+        );
+        const pointCrumbSeparator = <span>›</span>;
+        const banner = (
+          <div
+            class="InGameEditor-Inspector-Banner"
+            onClick={() => this._onExit()}
+          >
+            <span class="InGameEditor-Inspector-Crumb">Scene</span>
+            <span>›</span>
+            <span class="InGameEditor-Inspector-Crumb">{objectName}</span>
+            {pointCrumbSeparator}
+            {pointCrumb}
+          </div>
+        );
+
+        // Header: the object name and the actions, like the IDE panels.
+        const makeIconButton = (
+          glyph: string,
+          title: string,
+          onClick: () => void
+        ): HTMLButtonElement => {
+          const button = (
+            <button class="InGameEditor-Inspector-IconButton" title={title}>
+              {glyph}
+            </button>
+          ) as HTMLButtonElement;
+          button.addEventListener('click', onClick);
+          return button;
+        };
+        const addPointButton = makeIconButton('+', 'Add a point', () =>
+          this._addCustomPoint()
+        );
+        const resetOriginButton = makeIconButton(
+          '↺',
+          'Reset the origin point to the one of the 3D model',
+          () => this._resetOriginPoint()
+        );
+        const deletePointButton = makeIconButton(
+          '✕',
+          'Delete the selected point',
+          () => this._deleteSelectedPoint()
+        );
+
+        // Tree of the model content: points, meshes, bones.
+        const rootBones = this._getModelBones().filter(
+          // @ts-ignore
+          (bone) => !bone.parent || !bone.parent.isBone
+        );
+        const threeObject = this._object.get3DRendererObject();
+        const pointsList = <ul />;
+        const panel = (
+          <div class="InGameEditor-Inspector-Panel">
+            <div class="InGameEditor-Inspector-PanelHeader">
+              <span>
+                {objectName}{' '}
+                <span class="InGameEditor-Inspector-Hint">3D model</span>
+              </span>
+              <span class="InGameEditor-Inspector-PanelHeader-Actions">
+                {addPointButton}
+                {resetOriginButton}
+                {deletePointButton}
+              </span>
+            </div>
+            <ul>
+              <li>
+                Points
+                {pointsList}
+              </li>
+              <li>
+                Meshes
+                {threeObject ? this._renderChildObjects(threeObject) : ''}
+              </li>
+              <li>
+                Bones ({String(this._boneBoxes.length)})
+                {appendChildren(
+                  <ul />,
+                  rootBones.length > 0
+                    ? rootBones.map((bone) => this._renderBoneTree(bone))
+                    : [<li class="InGameEditor-Inspector-Hint">No skeleton</li>]
+                )}
+              </li>
+            </ul>
+          </div>
+        );
+        parent.appendChild(banner);
+        parent.appendChild(panel);
+        this._renderedElements = {
+          banner,
+          panel,
+          pointCrumb,
+          pointCrumbSeparator,
+          pointsList,
+          deletePointButton,
+        };
+        this._renderPointsList();
+      }
+
+      const {
+        banner,
+        panel,
+        pointCrumb,
+        pointCrumbSeparator,
+        deletePointButton,
+      } = this._renderedElements;
+
+      // The IDE panels float over the game frame: stay in the area that is
+      // actually visible (normalized coordinates, sent by the IDE).
+      const visibleArea = this._getVisibleScreenArea() || {
+        minX: 0,
+        minY: 0,
+        maxX: 1,
+        maxY: 1,
+      };
+      banner.style.left = `${visibleArea.minX * 100}%`;
+      banner.style.top = `${visibleArea.minY * 100}%`;
+      panel.style.right = `${(1 - visibleArea.maxX) * 100}%`;
+      panel.style.top = `calc(${visibleArea.minY * 100}% + 40px)`;
+      panel.style.bottom = `${(1 - visibleArea.maxY) * 100}%`;
+
+      const selectedPoint = this._selectedPoint;
+      pointCrumb.textContent = selectedPoint ? selectedPoint.name : '';
+      pointCrumb.style.display = selectedPoint ? '' : 'none';
+      pointCrumbSeparator.style.display = selectedPoint ? '' : 'none';
+      deletePointButton.disabled = !selectedPoint || selectedPoint.isOrigin;
+
+      // @ts-ignore - _originPoint is specific to Model3DRuntimeObject.
+      const originPoint = this._object._originPoint as Array<float | null>;
+      const formatCoordinate = (value: float | null) =>
+        value === null ? 'auto' : value.toFixed(2);
+      for (const point of this._points) {
+        if (!point.info) continue;
+        if (point.isOrigin) {
+          point.info.textContent = `(${originPoint
+            .map(formatCoordinate)
+            .join(', ')}) at ${this._object.getX().toFixed(0)}, ${this._object
+            .getY()
+            .toFixed(0)}, ${this._object.getZ().toFixed(0)}`;
+        } else {
+          point.info.textContent = `at ${point.sphere.position.x.toFixed(
+            0
+          )}, ${point.sphere.position.y.toFixed(
+            0
+          )}, ${point.sphere.position.z.toFixed(0)}`;
+        }
+      }
+    }
+
+    dispose() {
+      this._stopBlinking();
+      this._outlineMaterial.dispose();
+      for (const { mesh, material } of this._greyedMeshes) {
+        mesh.material = material;
+      }
+      this._greyedMeshes.length = 0;
+      for (const { pixiObject, alpha } of this._greyedPixiObjects) {
+        pixiObject.alpha = alpha;
+      }
+      this._greyedPixiObjects.length = 0;
+      for (const { threeObject, visible } of this._hiddenThreeObjects) {
+        threeObject.visible = visible;
+      }
+      this._hiddenThreeObjects.length = 0;
+      this._greyMaterial.dispose();
+
+      this._handleControls.detach();
+      this._handleControls.removeFromParent();
+      this._handleControls.dispose();
+      for (const point of this._points) {
+        point.sphere.removeFromParent();
+        point.sphere.geometry.dispose();
+        (point.sphere.material as THREE.Material).dispose();
+      }
+      this._points.length = 0;
+      this._bonesGroup.removeFromParent();
+      if (this._skeletonHelper) {
+        const helperRoot = this._skeletonHelper.parent;
+        this._skeletonHelper.removeFromParent();
+        if (helperRoot) helperRoot.removeFromParent();
+        this._skeletonHelper.dispose();
+        this._skeletonHelper = null;
+      }
+      if (this._boneBoxes.length > 0) {
+        // The geometry is shared, the materials are not.
+        this._boneBoxes[0].box.geometry.dispose();
+        for (const { box } of this._boneBoxes) {
+          (box.material as THREE.Material).dispose();
+        }
+      }
+      this._boneBoxes.length = 0;
+
+      if (this._renderedElements) {
+        this._renderedElements.banner.remove();
+        this._renderedElements.panel.remove();
+        this._renderedElements = null;
+      }
     }
   }
 

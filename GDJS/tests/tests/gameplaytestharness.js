@@ -165,6 +165,42 @@ describe('gdjs.gameplayTests', () => {
     expect(result.gameTimeMs).to.be(Math.round((6 * 1000) / 60));
   });
 
+  it('summarizes the scene variables of the final state', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.setSceneVariable('Score', 42);
+      harness.setSceneVariable('Save', 'x'.repeat(10000));
+      const map = harness._getCurrentScene().getVariables().get('Map');
+      for (let i = 0; i < 1000; i++) map.getChild('cell' + i).setNumber(i);
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    const summaries = result.finalState.sceneVariables;
+    expect(summaries.find((variable) => variable.name === 'Score')).to.eql({
+      name: 'Score',
+      type: 'number',
+      value: 42,
+    });
+    expect(summaries.find((variable) => variable.name === 'Save')).to.eql({
+      name: 'Save',
+      type: 'string',
+      value: 'x'.repeat(100) + '…',
+    });
+    expect(summaries.find((variable) => variable.name === 'Map')).to.eql({
+      name: 'Map',
+      type: 'structure',
+      childrenCount: 1000,
+    });
+    expect(result.finalState.sceneVariablesNote).to.contain(
+      'harness.getSceneVariable(name)'
+    );
+    expect(JSON.stringify(result.finalState).length).to.be.below(2000);
+  });
+
   it('reports a failed assertion and stops the script immediately', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

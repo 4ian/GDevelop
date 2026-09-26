@@ -124,6 +124,15 @@ namespace gdjs {
       causeDetail?: string;
     };
 
+    /** A variable without its content: the value of a number, a boolean or
+     * a (cut) text, the size of a structure or an array. */
+    export type GameplayTestVariableSummary = {
+      name: string;
+      type: VariableType;
+      value?: string | float | boolean;
+      childrenCount?: integer;
+    };
+
     export type GameplayTestScreenshot = {
       label: string;
       frame: integer;
@@ -422,7 +431,9 @@ namespace gdjs {
         watchedObjects: {
           [objectName: string]: Array<GameplayTestObjectSnapshot>;
         };
-        sceneVariables: Array<Object>;
+        sceneVariables: Array<GameplayTestVariableSummary>;
+        /** Says how to read what the summaries leave out. */
+        sceneVariablesNote?: string;
       };
       screenshots: Array<GameplayTestScreenshot>;
       /** Screenshots taken, including the ones not kept in `screenshots`. */
@@ -480,6 +491,10 @@ namespace gdjs {
     /** Deepest `children` nesting a snapshot can expose (nested custom
      * objects), to keep snapshots bounded. */
     const MAX_CHILDREN_DEPTH = 8;
+    /** The scene variables of the final state are summarized: some games
+     * store large data in them (a map, a save...). */
+    const MAX_SUMMARIZED_VARIABLES = 50;
+    const MAX_SUMMARIZED_TEXT_LENGTH = 100;
 
     /**
      * Describe a value that should have been a string, for an error message:
@@ -3740,9 +3755,11 @@ namespace gdjs {
             sceneName: currentScene ? currentScene.getName() : '',
             objectCounts: this._getObjectCounts(),
             watchedObjects,
-            sceneVariables: currentScene
-              ? currentScene.getVariables().getNetworkSyncData({})
-              : [],
+            ...summarizeSceneVariables(
+              currentScene
+                ? currentScene.getVariables().getNetworkSyncData({})
+                : []
+            ),
           },
           screenshots: this._screenshots,
           screenshotsTakenCount: this._screenshotsTakenCount,
@@ -3760,6 +3777,45 @@ namespace gdjs {
         };
       }
     }
+
+    const summarizeSceneVariables = (
+      variables: Array<VariableNetworkSyncData>
+    ): {
+      sceneVariables: Array<GameplayTestVariableSummary>;
+      sceneVariablesNote?: string;
+    } => {
+      let isSomethingLeftOut = variables.length > MAX_SUMMARIZED_VARIABLES;
+      const sceneVariables = variables
+        .slice(0, MAX_SUMMARIZED_VARIABLES)
+        .map(({ name, type, value, children }) => {
+          if (type === 'structure' || type === 'array') {
+            isSomethingLeftOut = true;
+            return {
+              name,
+              type,
+              childrenCount: children ? children.length : 0,
+            };
+          }
+          if (
+            typeof value === 'string' &&
+            value.length > MAX_SUMMARIZED_TEXT_LENGTH
+          ) {
+            isSomethingLeftOut = true;
+            return {
+              name,
+              type,
+              value: value.slice(0, MAX_SUMMARIZED_TEXT_LENGTH) + '…',
+            };
+          }
+          return { name, type, value };
+        });
+      return isSomethingLeftOut
+        ? {
+            sceneVariables,
+            sceneVariablesNote: `Summarized (${variables.length} variables): read one in full with \`harness.getSceneVariable(name)\` in the test.`,
+          }
+        : { sceneVariables };
+    };
 
     /**
      * The gameplay test being currently run, if any.

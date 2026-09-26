@@ -269,7 +269,8 @@ export class ColorAssetStoreSearchFilter
   }
 }
 
-const toAssetStoreType = (type: string) => {
+/** The type of an object as the asset store names it. */
+export const toAssetStoreType = (type: string): string => {
   switch (type) {
     case 'Sprite':
       return 'sprite';

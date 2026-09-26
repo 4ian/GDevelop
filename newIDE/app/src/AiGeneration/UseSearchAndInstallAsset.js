@@ -18,6 +18,7 @@ import {
 } from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
+import { toAssetStoreType } from '../AssetStore/AssetStoreSearchFilter';
 import { isEffectAsset } from '../Utils/GDevelopServices/Asset';
 
 type _FuncReturnType = {
@@ -170,7 +171,10 @@ export const useSearchAndInstallAsset = ({
                 isTheFirstOfItsTypeInProject: false,
               };
             }
-            if (objectType && foundAssetShortHeader.objectType !== objectType) {
+            if (
+              objectType &&
+              foundAssetShortHeader.objectType !== toAssetStoreType(objectType)
+            ) {
               return {
                 status: 'nothing-found',
                 message: `Asset with id "${exactOrPartialAssetId}" has type "${

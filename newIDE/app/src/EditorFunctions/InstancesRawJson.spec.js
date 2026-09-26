@@ -192,7 +192,7 @@ describe('instances raw JSON', () => {
     [
       'an unknown key',
       (rawJson: Object) => ({ ...rawJson, x: 10 }),
-      'unknown x',
+      'unknown x). The position, size, angle and rotation of instances are set with `put_2d_instances`/`put_3d_instances`',
     ],
   ])(
     'refuses %s, changing nothing',

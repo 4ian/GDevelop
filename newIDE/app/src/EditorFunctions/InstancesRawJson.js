@@ -99,15 +99,26 @@ const getNamedValuesError = (
     : null;
 };
 
+// Keys an agent may try to set here, while they are set by `put_2d_instances`
+// and `put_3d_instances`.
+const PLACEMENT_KEY_REGEX = /^(x|y|z|angle|rotation[XYZ]?|width|height|depth|layer|zOrder)$/;
+
 const getRawJsonShapeError = (rawJson: any): ?string => {
   if (!isPlainObject(rawJson)) return 'it must be a JSON object';
   const keys = Object.keys(rawJson);
   const missingKeys = RAW_JSON_KEYS.filter(key => !keys.includes(key));
   const unknownKeys = keys.filter(key => !RAW_JSON_KEYS.includes(key));
   if (missingKeys.length > 0 || unknownKeys.length > 0) {
+    const hasPlacementKeys = unknownKeys.some(key =>
+      PLACEMENT_KEY_REGEX.test(key)
+    );
     return `it must have exactly the keys ${RAW_JSON_KEYS.join(', ')}${
       missingKeys.length > 0 ? ` (missing ${missingKeys.join(', ')})` : ''
-    }${unknownKeys.length > 0 ? ` (unknown ${unknownKeys.join(', ')})` : ''}`;
+    }${unknownKeys.length > 0 ? ` (unknown ${unknownKeys.join(', ')})` : ''}${
+      hasPlacementKeys
+        ? '. The position, size, angle and rotation of instances are set with `put_2d_instances`/`put_3d_instances`'
+        : ''
+    }`;
   }
   if (
     typeof rawJson.flippedX !== 'boolean' ||

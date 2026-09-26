@@ -327,6 +327,77 @@ export const useInstallEffectAsset = ({
   };
 };
 
+// Effects of the same group compete for the same thing of a layer (its
+// background, its fog): only one of them is displayed at a time.
+const effectTypeGroupsUniquePerLayer: Array<Array<string>> = [
+  ['Scene3D::Skybox'],
+  ['Scene3D::LinearFog', 'Scene3D::ExponentialFog'],
+];
+
+const findEffectCompetingWith = (
+  effectsContainer: gdEffectsContainer,
+  effectType: string
+): gdEffect | null => {
+  const competingEffectTypes = effectTypeGroupsUniquePerLayer.find(
+    effectTypes => effectTypes.includes(effectType)
+  );
+  if (!competingEffectTypes) return null;
+  for (let index = 0; index < effectsContainer.getEffectsCount(); index++) {
+    const effect = effectsContainer.getEffectAt(index);
+    if (competingEffectTypes.includes(effect.getEffectType())) return effect;
+  }
+  return null;
+};
+
+/**
+ * Choose the name of the effect to install an effect asset on: a new effect,
+ * or, if the user chooses to replace it, the existing one it would compete
+ * with (a second skybox or fog). Null if the user cancels.
+ */
+export const useChooseEffectNameForEffectAsset = (): (({|
+  assetShortHeader: AssetShortHeader,
+  effectsContainer: gdEffectsContainer,
+|}) => Promise<string | null>) => {
+  const { showYesNoCancel } = useAlertDialog();
+
+  return React.useCallback(
+    async ({
+      assetShortHeader,
+      effectsContainer,
+    }: {|
+      assetShortHeader: AssetShortHeader,
+      effectsContainer: gdEffectsContainer,
+    |}): Promise<string | null> => {
+      const effectMetadata = getEffectAssetMetadata(assetShortHeader);
+      const newEffectName = newNameGenerator(
+        effectMetadata ? effectMetadata.getFullName() : 'Effect',
+        name => effectsContainer.hasEffectNamed(name)
+      );
+      const competingEffect = findEffectCompetingWith(
+        effectsContainer,
+        assetShortHeader.objectType
+      );
+      if (!competingEffect) return newEffectName;
+
+      const competingEffectName = competingEffect.getName();
+      const answer = await showYesNoCancel({
+        title: t`Replace "${competingEffectName}"?`,
+        message: t`The layer already has the effect "${competingEffectName}" and only one of them can be displayed at a time. You can replace it, or add this one and keep the existing one (to switch between them by enabling and disabling them from the events).`,
+        yesButtonLabel: t`Replace`,
+        noButtonLabel: t`Add and keep the existing`,
+        cancelButtonLabel: t`Cancel`,
+      });
+      // showYesNoCancel resolves with 0 (yes), 1 (no) or 2 (cancel).
+      // $FlowFixMe[invalid-compare] - resolves to a number, not a boolean.
+      if (answer === 2) return null;
+      // Replacing keeps the name of the effect, so the events using it still work.
+      // $FlowFixMe[invalid-compare] - resolves to a number, not a boolean.
+      return answer === 0 ? competingEffectName : newEffectName;
+    },
+    [showYesNoCancel]
+  );
+};
+
 /**
  * The layers of a scene or custom object an effect of the asset store can be
  * put on, given what the effect can render on.
@@ -437,6 +508,7 @@ function NewObjectDialog({
     project,
     resourceManagementProps,
   });
+  const chooseEffectNameForEffectAsset = useChooseEffectNameForEffectAsset();
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);
@@ -473,13 +545,16 @@ function NewObjectDialog({
         const effectsContainer = layersContainer
           .getLayer(effectLayerName)
           .getEffects();
+        const effectName = await chooseEffectNameForEffectAsset({
+          assetShortHeader,
+          effectsContainer,
+        });
+        if (effectName === null) return false;
         setIsAssetBeingInstalled(true);
         const effect = await installEffectAssetOnLayer({
           assetShortHeader,
           effectsContainer,
-          effectName: newNameGenerator(effectMetadata.getFullName(), name =>
-            effectsContainer.hasEffectNamed(name)
-          ),
+          effectName,
         });
         setIsAssetBeingInstalled(false);
         if (effect && onLayerEffectAddedFromAssets)
@@ -500,6 +575,7 @@ function NewObjectDialog({
     [
       installAsset,
       installEffectAssetOnLayer,
+      chooseEffectNameForEffectAsset,
       onObjectsAddedFromAssets,
       onLayerEffectAddedFromAssets,
       objectsContainer,

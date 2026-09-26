@@ -8,11 +8,12 @@ import { AssetStore, type AssetStoreInterface } from '.';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import LoaderModal from '../UI/LoaderModal';
-import { useInstallEffectAsset } from './NewObjectDialog';
+import {
+  useInstallEffectAsset,
+  useChooseEffectNameForEffectAsset,
+} from './NewObjectDialog';
 import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 import { enumerateEffectsMetadata } from '../EffectsList/EnumerateEffects';
-import { getEffectAssetMetadata } from '../Utils/GDevelopServices/Asset';
-import newNameGenerator from '../Utils/NewNameGenerator';
 
 type Props = {|
   project: gdProject,
@@ -56,24 +57,23 @@ function EffectStoreDialog({
     project,
     resourceManagementProps,
   });
+  const chooseEffectNameForEffectAsset = useChooseEffectNameForEffectAsset();
 
   const installOpenedAsset = React.useCallback(
     async (): Promise<void> => {
       if (!openedAssetShortHeader) return;
 
-      // The effect is named after its type, numbered on clash.
-      const effectMetadata = getEffectAssetMetadata(openedAssetShortHeader);
-      const defaultEffectName = effectMetadata
-        ? effectMetadata.getFullName()
-        : 'Effect';
+      const effectName = await chooseEffectNameForEffectAsset({
+        assetShortHeader: openedAssetShortHeader,
+        effectsContainer,
+      });
+      if (effectName === null) return;
 
       setIsAssetBeingInstalled(true);
       const effect = await installEffectAsset({
         assetShortHeader: openedAssetShortHeader,
         effectsContainer,
-        effectName: newNameGenerator(defaultEffectName, name =>
-          effectsContainer.hasEffectNamed(name)
-        ),
+        effectName,
       });
       setIsAssetBeingInstalled(false);
       shopNavigationState.backToPreviousPage();
@@ -81,6 +81,7 @@ function EffectStoreDialog({
     },
     [
       installEffectAsset,
+      chooseEffectNameForEffectAsset,
       effectsContainer,
       openedAssetShortHeader,
       onClose,

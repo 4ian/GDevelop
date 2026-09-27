@@ -221,7 +221,7 @@ describe('create_or_replace_object (additional cases)', () => {
     expect(searchAndInstallAsset).toHaveBeenCalledTimes(1);
     expect(searchAndInstallAsset).toHaveBeenCalledWith(
       expect.objectContaining({
-        searchTerms: 'button, default',
+        searchTerms: 'button, My Button, default',
         objectName: 'MyButton',
         objectType: 'Sprite',
       })

@@ -201,6 +201,37 @@ describe('gdjs.gameplayTests', () => {
     expect(JSON.stringify(result.finalState).length).to.be.below(2000);
   });
 
+  it('summarizes the watched objects of the final state', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 2');
+      for (let i = 0; i < 30; i++) harness.spawn('MyObject', i, 0);
+      const first = harness.getObjects('MyObject')[0];
+      const inventory = harness
+        .getRuntimeObject(first.id)
+        .getVariables()
+        .get('Inventory');
+      for (let i = 0; i < 1000; i++) inventory.getChild('item' + i).setNumber(i);
+      harness.watch('MyObject');
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    const watched = result.finalState.watchedObjects['MyObject'];
+    expect(watched.length).to.be(20);
+    expect(
+      watched[0].variables.find((variable) => variable.name === 'Inventory')
+    ).to.eql({ name: 'Inventory', type: 'structure', childrenCount: 1000 });
+    expect(result.finalState.watchedObjectsNote).to.contain(
+      'harness.getObjects(name)'
+    );
+    expect(result.finalState.watchedObjectsNote).to.contain(
+      'harness.getObjectVariable(instanceId, variableName)'
+    );
+  });
+
   it('reports a failed assertion and stops the script immediately', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

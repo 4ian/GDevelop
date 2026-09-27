@@ -165,6 +165,73 @@ describe('gdjs.gameplayTests', () => {
     expect(result.gameTimeMs).to.be(Math.round((6 * 1000) / 60));
   });
 
+  it('summarizes the scene variables of the final state', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.setSceneVariable('Score', 42);
+      harness.setSceneVariable('Save', 'x'.repeat(10000));
+      const map = harness._getCurrentScene().getVariables().get('Map');
+      for (let i = 0; i < 1000; i++) map.getChild('cell' + i).setNumber(i);
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    const summaries = result.finalState.sceneVariables;
+    expect(summaries.find((variable) => variable.name === 'Score')).to.eql({
+      name: 'Score',
+      type: 'number',
+      value: 42,
+    });
+    expect(summaries.find((variable) => variable.name === 'Save')).to.eql({
+      name: 'Save',
+      type: 'string',
+      value: 'x'.repeat(100) + '…',
+    });
+    expect(summaries.find((variable) => variable.name === 'Map')).to.eql({
+      name: 'Map',
+      type: 'structure',
+      childrenCount: 1000,
+    });
+    expect(result.finalState.sceneVariablesNote).to.contain(
+      'harness.getSceneVariable(name)'
+    );
+    expect(JSON.stringify(result.finalState).length).to.be.below(2000);
+  });
+
+  it('summarizes the watched objects of the final state', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 2');
+      for (let i = 0; i < 30; i++) harness.spawn('MyObject', i, 0);
+      const first = harness.getObjects('MyObject')[0];
+      const inventory = harness
+        .getRuntimeObject(first.id)
+        .getVariables()
+        .get('Inventory');
+      for (let i = 0; i < 1000; i++) inventory.getChild('item' + i).setNumber(i);
+      harness.watch('MyObject');
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    const watched = result.finalState.watchedObjects['MyObject'];
+    expect(watched.length).to.be(20);
+    expect(
+      watched[0].variables.find((variable) => variable.name === 'Inventory')
+    ).to.eql({ name: 'Inventory', type: 'structure', childrenCount: 1000 });
+    expect(result.finalState.watchedObjectsNote).to.contain(
+      'harness.getObjects(name)'
+    );
+    expect(result.finalState.watchedObjectsNote).to.contain(
+      'harness.getObjectVariable(instanceId, variableName)'
+    );
+  });
+
   it('reports a failed assertion and stops the script immediately', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

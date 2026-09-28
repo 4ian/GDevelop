@@ -2,6 +2,7 @@
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { editorFunctions, type EditorFunctionGenericOutput } from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
+import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -174,7 +175,7 @@ describe('instances raw JSON', () => {
           { name: 'opacity', value: 128 },
         ],
       }),
-      'not a number property of this object (properties: animation). The position, size, angle, rotation, layer, Z order, opacity and visibility of instances are set with `put_2d_instances`/`put_3d_instances`.',
+      'not a number property of this object (properties: animation). The position, size, angle, rotation, layer, Z order and visibility of instances are set with `put_2d_instances`/`put_3d_instances`, their opacity with `put_2d_instances`.',
     ],
     [
       'a starting animation given as a key',
@@ -208,7 +209,7 @@ describe('instances raw JSON', () => {
     [
       'an unknown key',
       (rawJson: Object) => ({ ...rawJson, scaleX: 2 }),
-      'unknown scaleX). The position, size, angle, rotation, layer, Z order, opacity and visibility of instances are set with `put_2d_instances`/`put_3d_instances`',
+      'unknown scaleX). The position, size, angle, rotation, layer, Z order and visibility of instances are set with `put_2d_instances`/`put_3d_instances`',
     ],
   ])(
     'refuses %s, changing nothing',
@@ -398,8 +399,59 @@ describe('instances raw JSON', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toContain(
-        'Updated the atlas grid of "Ground" to 4 columns and 2 rows'
+        'Updated the atlas grid of "Ground" from 1x1 to 4 columns and 2 rows'
       );
+      expect(serializeToJSObject(configuration).content).toMatchObject({
+        columnCount: 4,
+        rowCount: 2,
+      });
+    });
+
+    it('keeps the stored grid when the atlas image fails to load', async () => {
+      const atlas = new gd.ImageResource();
+      atlas.setName('Missing.png');
+      project.getResourcesManager().addResource(atlas);
+      atlas.delete();
+      const configuration = scene
+        .getObjects()
+        .getObject('Ground')
+        .getConfiguration();
+      const configurationJson = serializeToJSObject(configuration);
+      unserializeFromJSObject(
+        configuration,
+        {
+          ...configurationJson,
+          content: { ...configurationJson.content, atlasImage: 'Missing.png' },
+        },
+        'unserializeFrom',
+        project
+      );
+      const rawJson = await readRawJson(tileMapInstance);
+      // Like the editor, which shows a placeholder image for a failed load.
+      const placeholderTexture = { valid: true, width: 192, height: 192 };
+
+      const result = await editorFunctions.change_instances_raw_json.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          PixiResourcesLoader: {
+            ...PixiResourcesLoaderMock,
+            getPIXITexture: () => placeholderTexture,
+            getInvalidPIXITexture: () => placeholderTexture,
+          },
+          args: {
+            scope: sceneScope,
+            changes: [
+              change(
+                tileMapInstance,
+                withTileMap(rawJson, makeTileMap(2, 2, 7))
+              ),
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).not.toContain('Updated the atlas grid');
       expect(serializeToJSObject(configuration).content).toMatchObject({
         columnCount: 4,
         rowCount: 2,
@@ -419,7 +471,11 @@ describe('instances raw JSON', () => {
     });
 
     it.each([
-      ['a tile out of the atlas', makeTileMap(2, 2, 8), 'the tile 8'],
+      [
+        'a tile out of the atlas',
+        makeTileMap(2, 2, 8),
+        'the tile 8: tiles are -1 (empty) or a tile id of the atlas of 4 columns and 2 rows (0 to 7, row * 4 + column)',
+      ],
       ['a tile that is not an integer', makeTileMap(2, 2, 1.5), 'the tile 1.5'],
       [
         'rows of the wrong length',

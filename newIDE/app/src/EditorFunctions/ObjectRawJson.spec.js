@@ -272,7 +272,7 @@ describe('object raw JSON and renames', () => {
           const frame = rawJson.animations[0].directions[0].sprites[0];
           frame.customCollisionMask = [[[0, 0], [10, 0], [10, 10], [0, 10]]];
         },
-        'have a `customCollisionMask` that is not a list of polygons, each being a list of vertices {x, y}',
+        'have a `customCollisionMask` that is not a list of polygons, each being a list of vertices {x, y} with number coordinates',
       ],
       [
         'a collision polygon not in a list',
@@ -284,7 +284,7 @@ describe('object raw JSON and renames', () => {
             { x: 10, y: 10 },
           ];
         },
-        'have a `customCollisionMask` that is not a list of polygons, each being a list of vertices {x, y}',
+        'have a `customCollisionMask` that is not a list of polygons, each being a list of vertices {x, y} with number coordinates',
       ],
       [
         'a frame image that is not a resource',

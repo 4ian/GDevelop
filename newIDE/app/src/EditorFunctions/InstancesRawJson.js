@@ -4,6 +4,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import getObjectByName from '../Utils/GetObjectByName';
+import { isObjectOpenedInEditor } from '../ObjectEditor/ObjectsOpenedInEditor';
 import {
   loadSimpleTileMapAtlasGrid,
   type AtlasGrid,
@@ -43,7 +44,7 @@ type TileMapResize = {|
 type TileMapAtlas = {|
   tileSize: number,
   grid: AtlasGrid,
-  isStoredGridOutdated: boolean,
+  storedGrid: AtlasGrid,
 |};
 type PlannedInstanceChange = {|
   object: gdObject,
@@ -116,7 +117,7 @@ const getNamedValuesError = (
 // and `put_3d_instances`.
 const PLACEMENT_KEY_REGEX = /^(x|y|z|angle|rotation[XYZ]?|width|height|depth|scale[XYZ]?|keepRatio|customSize|layer|zOrder|opacity|hidden)$/;
 const PLACEMENT_HINT =
-  'The position, size, angle, rotation, layer, Z order, opacity and visibility of instances are set with `put_2d_instances`/`put_3d_instances`';
+  'The position, size, angle, rotation, layer, Z order and visibility of instances are set with `put_2d_instances`/`put_3d_instances`, their opacity with `put_2d_instances`';
 
 const getRawJsonShapeError = (rawJson: any): ?string => {
   if (!isPlainObject(rawJson)) return 'it must be a JSON object';
@@ -187,7 +188,7 @@ const loadTileMapAtlas = async (
     !resourcesManager.hasResource(atlasImage) ||
     resourcesManager.getResource(atlasImage).getKind() !== 'image'
   ) {
-    return { tileSize, grid: storedGrid, isStoredGridOutdated: false };
+    return { tileSize, grid: storedGrid, storedGrid };
   }
   const atlasGrid = await loadSimpleTileMapAtlasGrid({
     project,
@@ -195,17 +196,16 @@ const loadTileMapAtlas = async (
     tileSize,
     PixiResourcesLoader,
   });
-  if (!atlasGrid.success) {
-    return { tileSize, grid: storedGrid, isStoredGridOutdated: false };
-  }
   return {
     tileSize,
-    grid: atlasGrid.grid,
-    isStoredGridOutdated:
-      atlasGrid.grid.columnCount !== columnCount ||
-      atlasGrid.grid.rowCount !== rowCount,
+    grid: atlasGrid.success ? atlasGrid.grid : storedGrid,
+    storedGrid,
   };
 };
+
+const isStoredGridOutdated = ({ grid, storedGrid }: TileMapAtlas): boolean =>
+  grid.columnCount !== storedGrid.columnCount ||
+  grid.rowCount !== storedGrid.rowCount;
 
 /**
  * A tile map as the editor paints it: one layer (id 0, the one painted by the
@@ -263,8 +263,8 @@ const getTileMapError = (tileMap: any, atlas: TileMapAtlas): ?string => {
       ) {
         return `\`tilemap\` has the tile ${String(
           tile
-        )}: tiles are -1 (empty) or a tile id of the atlas (0 to ${tilesCount -
-          1}, row * columnCount + column), with optional flip bits.`;
+        )}: tiles are -1 (empty) or a tile id of the atlas of ${columnCount} columns and ${rowCount} rows (0 to ${tilesCount -
+          1}, row * ${columnCount} + column), with optional flip bits.`;
       }
     }
   }
@@ -475,7 +475,7 @@ const resizeTileMapInstance = (
 const updateStoredAtlasGrid = (
   project: gdProject,
   object: gdObject,
-  { columnCount, rowCount }: AtlasGrid
+  { grid: { columnCount, rowCount }, storedGrid }: TileMapAtlas
 ): string => {
   const configuration = object.getConfiguration();
   const configurationJson = serializeToJSObject(configuration);
@@ -500,7 +500,11 @@ const updateStoredAtlasGrid = (
     'unserializeFrom',
     project
   );
-  return `Updated the atlas grid of "${object.getName()}" to ${columnCount} columns and ${rowCount} rows, as computed from its atlas image.`;
+  return `Updated the atlas grid of "${object.getName()}" from ${String(
+    storedGrid.columnCount
+  )}x${String(
+    storedGrid.rowCount
+  )} to ${columnCount} columns and ${rowCount} rows, as computed from its atlas image: the tiles already painted on its instances are read with it too (tile id = row * ${columnCount} + column).`;
 };
 
 /** Applies a planned change, returning whether the instance changed. */
@@ -521,6 +525,28 @@ const applyInstanceChange = ({
   instance.setFlippedZ(rawJson.flippedZ);
   if (tileMapResize) resizeTileMapInstance(instance, tileMapResize);
   return JSON.stringify(serializeToJSObject(instance)) !== serializedInstance;
+};
+
+/** The objects of the instances that `changes` target. */
+export const getChangedInstancesObjectNames = (
+  instances: Array<gdInitialInstance>,
+  changes: Array<any>
+): Array<string> => {
+  const instanceIds = changes
+    .filter(
+      change =>
+        isPlainObject(change) &&
+        typeof change.instance_id === 'string' &&
+        change.instance_id.length >= INSTANCE_ID_LENGTH
+    )
+    .map(change => change.instance_id);
+  return instances
+    .filter(instance =>
+      instanceIds.some(instanceId =>
+        instance.getPersistentUuid().startsWith(instanceId)
+      )
+    )
+    .map(instance => instance.getObjectName());
 };
 
 export const loadTileMapAtlases = async ({
@@ -655,6 +681,21 @@ export const applyInstancesRawJson = ({
     if (Array.isArray(plannedChange)) errors.push(...plannedChange);
     else plannedChanges.push(plannedChange);
   }
+  const outdatedGridObjects = [
+    ...new Map(
+      plannedChanges
+        .filter(({ tileMapResize }) => tileMapResize)
+        .map(({ object }) => [object.getName(), object])
+    ).values(),
+  ].filter(object => {
+    const tileMapAtlas = tileMapAtlases.get(object.getName());
+    return tileMapAtlas && isStoredGridOutdated(tileMapAtlas);
+  });
+  outdatedGridObjects.filter(isObjectOpenedInEditor).forEach(object => {
+    errors.push(
+      `"${object.getName()}" is open in the object editor, which will update its atlas grid: ask the user to close it, then retry.`
+    );
+  });
   if (errors.length > 0) {
     return {
       success: false,
@@ -665,19 +706,12 @@ export const applyInstancesRawJson = ({
   const changedInstanceIds = plannedChanges
     .filter(applyInstanceChange)
     .map(({ instanceId }) => `"${instanceId}"`);
-  const paintedTileMapObjects = new Map(
-    plannedChanges
-      .filter(({ tileMapResize }) => tileMapResize)
-      .map(({ object }) => [object.getName(), object])
-  );
-  const gridChanges = [...paintedTileMapObjects.values()]
-    .map(object => {
-      const tileMapAtlas = tileMapAtlases.get(object.getName());
-      return tileMapAtlas && tileMapAtlas.isStoredGridOutdated
-        ? updateStoredAtlasGrid(project, object, tileMapAtlas.grid)
-        : null;
-    })
-    .filter(Boolean);
+  const gridChanges = outdatedGridObjects.map(object => {
+    const tileMapAtlas = tileMapAtlases.get(object.getName());
+    return tileMapAtlas
+      ? updateStoredAtlasGrid(project, object, tileMapAtlas)
+      : '';
+  });
   return {
     success: true,
     changes: [

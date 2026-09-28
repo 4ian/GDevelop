@@ -29,7 +29,12 @@ export const loadSimpleTileMapAtlasGrid = async ({
     };
   }
   const texture = PixiResourcesLoader.getPIXITexture(project, atlasImage);
-  if (!texture || !texture.valid) {
+  // An image that fails to load is replaced by the "invalid texture" image.
+  if (
+    !texture ||
+    !texture.valid ||
+    texture === PixiResourcesLoader.getInvalidPIXITexture()
+  ) {
     return {
       success: false,
       error: `The atlas image "${atlasImage}" could not be loaded.`,

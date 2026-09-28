@@ -266,14 +266,17 @@ const getCollisionMasksShapeErrors = (
       (isPlainObject(json) ? getFramesJson(json) : [])
         .filter(
           ({ frame }) =>
-            Array.isArray(frame.customCollisionMask) &&
-            !frame.customCollisionMask.every(
-              polygon => Array.isArray(polygon) && polygon.every(isVertex)
+            frame.customCollisionMask !== undefined &&
+            !(
+              Array.isArray(frame.customCollisionMask) &&
+              frame.customCollisionMask.every(
+                polygon => Array.isArray(polygon) && polygon.every(isVertex)
+              )
             )
         )
         .map(
           ({ animationName }) =>
-            `The frames of animation "${animationName}"${location} have a \`customCollisionMask\` that is not a list of polygons, each being a list of vertices {x, y}.`
+            `The frames of animation "${animationName}"${location} have a \`customCollisionMask\` that is not a list of polygons, each being a list of vertices {x, y} with number coordinates.`
         )
     ),
   ]);

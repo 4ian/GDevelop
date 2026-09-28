@@ -148,6 +148,7 @@ import {
 } from './Scope';
 import {
   getInstanceRawJson,
+  getChangedInstancesObjectNames,
   loadTileMapAtlases,
   applyInstancesRawJson,
 } from './InstancesRawJson';
@@ -4438,21 +4439,22 @@ const changeInstancesRawJson: EditorFunction = {
         'Nothing was changed: `changes` must be a non-empty list of {instance_id, raw_json}.'
       );
     }
-    const instancesObjectNames = [];
-    iterateOnInstances(containers.initialInstances, instance => {
-      instancesObjectNames.push(instance.getObjectName());
-    });
+    const getInstances = () => {
+      const instances = [];
+      iterateOnInstances(containers.initialInstances, instance => {
+        instances.push(instance);
+      });
+      return instances;
+    };
     const tileMapAtlases = await loadTileMapAtlases({
       project,
       objectsContainer: containers.objectsContainer,
       globalObjectsContainer: containers.globalObjectsContainer,
-      objectNames: instancesObjectNames,
+      objectNames: getChangedInstancesObjectNames(getInstances(), changes),
       PixiResourcesLoader,
     });
-    const instances = [];
-    iterateOnInstances(containers.initialInstances, instance => {
-      instances.push(instance);
-    });
+    // Read again: the instances may have changed while the atlases loaded.
+    const instances = getInstances();
     const result = applyInstancesRawJson({
       project,
       objectsContainer: containers.objectsContainer,

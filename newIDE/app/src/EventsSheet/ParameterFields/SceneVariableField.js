@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import VariableField, {
-  renderVariableWithIcon,
-  type VariableFieldInterface,
-} from './VariableField';
+import VariableField, { renderVariableWithIcon } from './VariableField';
 import SceneVariablesDialog from '../../VariablesList/SceneVariablesDialog';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import {
@@ -18,7 +15,7 @@ const gd: libGDevelop = global.gd;
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?VariableFieldInterface>(null);
+    const field = React.useRef<?ParameterFieldInterface>(null);
     const [
       variableEditorOpen,
       setVariableEditorOpen,
@@ -56,7 +53,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onChange(selectedVariableName);
         }
         setVariableEditorOpen(null);
-        if (field.current) field.current.updateAutocompletions();
       },
       [onChange, value]
     );

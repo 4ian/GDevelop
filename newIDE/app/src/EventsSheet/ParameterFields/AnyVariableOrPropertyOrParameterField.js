@@ -4,7 +4,6 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, {
   getRootVariableName,
   renderVariableWithIcon,
-  type VariableFieldInterface,
 } from './VariableField';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
@@ -20,7 +19,7 @@ const gd: libGDevelop = global.gd;
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?VariableFieldInterface>(null);
+    const field = React.useRef<?ParameterFieldInterface>(null);
     const [
       variableEditorOpen,
       setVariableEditorOpen,
@@ -69,7 +68,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         // The variable editor may have refactor the events for a variable type
         // change which may have change the currently edited instruction type.
         if (onInstructionTypeChanged) onInstructionTypeChanged();
-        if (field.current) field.current.updateAutocompletions();
       },
       [onChange, onInstructionTypeChanged, value]
     );

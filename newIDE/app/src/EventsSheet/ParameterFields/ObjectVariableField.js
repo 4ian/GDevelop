@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import VariableField, {
-  renderVariableWithIcon,
-  type VariableFieldInterface,
-} from './VariableField';
+import VariableField, { renderVariableWithIcon } from './VariableField';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import ObjectVariablesDialog from '../../VariablesList/ObjectVariablesDialog';
 import ObjectGroupVariablesDialog from '../../VariablesList/ObjectGroupVariablesDialog';
@@ -58,7 +55,7 @@ export const getObjectOrGroupVariablesContainers = (
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectVariableField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?VariableFieldInterface>(null);
+    const field = React.useRef<?ParameterFieldInterface>(null);
     const [
       editorOpen,
       setEditorOpen,
@@ -145,7 +142,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         // The variable editor may have refactored the events for a variable type
         // change which may have changed the currently edited instruction type.
         if (onInstructionTypeChanged) onInstructionTypeChanged();
-        if (field.current) field.current.updateAutocompletions();
       },
       [onChange, onInstructionTypeChanged, value]
     );

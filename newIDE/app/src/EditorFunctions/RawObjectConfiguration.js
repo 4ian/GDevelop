@@ -125,6 +125,48 @@ const isConvexPolygon = (vertices: Array<{ x: number, y: number }>) => {
   return turnSign !== 0 && Math.abs(Math.abs(totalTurn) - 2 * Math.PI) < 1e-6;
 };
 
+/**
+ * The image resource the given name was likely meant to be: the same name with
+ * other slashes, doubled backslashes or another case, or else the only image
+ * with this file name.
+ */
+const getSimilarImageResourceName = (
+  project: gdProject,
+  name: any
+): string | null => {
+  if (typeof name !== 'string' || name === '') return null;
+  const resourcesManager = project.getResourcesManager();
+  const imageNames = resourcesManager
+    .getAllResourceNames()
+    .toJSArray()
+    .filter(
+      resourceName =>
+        resourcesManager.getResource(resourceName).getKind() === 'image'
+    );
+  const normalize = (resourceName: string) =>
+    resourceName.replace(/[\\/]+/g, '/').toLowerCase();
+  const normalizedName = normalize(name);
+  const sameNames = imageNames.filter(
+    imageName => normalize(imageName) === normalizedName
+  );
+  if (sameNames.length > 0) return sameNames[0];
+  const getFileName = (resourceName: string) =>
+    normalize(resourceName)
+      .split('/')
+      .pop();
+  const sameFileNames = imageNames.filter(
+    imageName => getFileName(imageName) === getFileName(name)
+  );
+  return sameFileNames.length === 1 ? sameFileNames[0] : null;
+};
+
+const getNotAnImageResourceHint = (project: gdProject, name: any): string => {
+  const similarName = getSimilarImageResourceName(project, name);
+  return similarName
+    ? ` Did you mean "${similarName}" (copy the name exactly as read)?`
+    : '';
+};
+
 const isImageResource = (project: gdProject, name: any): boolean => {
   const resourcesManager = project.getResourcesManager();
   return (
@@ -166,7 +208,10 @@ const getFramesErrors = (
       errors.push(
         `${frameLabel} uses "${String(
           frame.image
-        )}", which is not an image resource of the project.`
+        )}", which is not an image resource of the project.${getNotAnImageResourceHint(
+          project,
+          frame.image
+        )}`
       );
     }
     (Array.isArray(frame.customCollisionMask)
@@ -290,7 +335,10 @@ const prepareSimpleTileMapContent = async ({
       return [
         `\`content.atlasImage\` "${String(
           atlasImage
-        )}" is not an image resource of the project.`,
+        )}" is not an image resource of the project.${getNotAnImageResourceHint(
+          project,
+          atlasImage
+        )}`,
       ];
     }
     try {
@@ -370,30 +418,77 @@ const areSameNames = (names: Array<string>, otherNames: Array<string>) =>
   names.length === otherNames.length &&
   names.every((name, index) => name === otherNames[index]);
 
+/**
+ * Animations can be reordered, removed and added freely, unnamed ones
+ * included, except when named animations disappear while others appear: that
+ * is likely a rename, which must go through `renamed_animations` to update the
+ * events.
+ */
 const getAnimationNamesChangeError = ({
-  oldNames,
-  newNames,
+  oldAnimations,
+  newAnimations,
   structureLockedReason,
 }: {|
-  oldNames: Array<string>,
-  newNames: Array<string>,
+  oldAnimations: Array<Object>,
+  newAnimations: Array<Object>,
   structureLockedReason: ?string,
 |}): string | null => {
+  const oldNames = oldAnimations.map(animation => String(animation.name));
+  const newNames = newAnimations.map(animation => String(animation.name));
   if (areSameNames(oldNames, newNames)) return null;
   if (structureLockedReason) {
     return `Animation names and order can't change ${structureLockedReason} (only their content).`;
   }
-  const areUniqueAndNamed = (names: Array<string>) =>
-    names.every(name => name !== '') && new Set(names).size === names.length;
-  if (!areUniqueAndNamed(oldNames) || !areUniqueAndNamed(newNames)) {
-    return 'To reorder, remove or add animations, every animation must have a unique non-empty name: name them first with `renamed_animations` (use `index` for unnamed or same-named animations).';
-  }
-  return getRemovedAndAddedNamesError({
-    label: 'Animations',
-    renameParameter: 'renamed_animations',
-    oldNames,
-    newNames,
+  const addedNames = [
+    ...new Set(
+      newNames.filter(name => name !== '' && !oldNames.includes(name))
+    ),
+  ];
+  const removedNames = [
+    ...new Set(
+      oldNames.filter(name => name !== '' && !newNames.includes(name))
+    ),
+  ];
+  if (removedNames.length === 0 || addedNames.length === 0) return null;
+
+  // The new name of each removed animation: the added one at its position,
+  // else the added one with the same content.
+  const getContentKey = (animation: Object) =>
+    JSON.stringify({ ...animation, name: '' });
+  const pairedNames: Set<string> = new Set();
+  const renames = removedNames.map(oldName => {
+    const index = oldNames.indexOf(oldName);
+    const isUnpairedAddedName = (name: string) =>
+      addedNames.includes(name) && !pairedNames.has(name);
+    const sameContentAnimation = newAnimations.find(
+      animation =>
+        isUnpairedAddedName(String(animation.name)) &&
+        getContentKey(animation) === getContentKey(oldAnimations[index])
+    );
+    const newName = isUnpairedAddedName(newNames[index])
+      ? newNames[index]
+      : sameContentAnimation
+      ? String(sameContentAnimation.name)
+      : null;
+    if (newName !== null) pairedNames.add(newName);
+    return `{ old_name: ${JSON.stringify(oldName)}, new_name: ${
+      newName !== null ? JSON.stringify(newName) : '<its new name>'
+    }, index: ${index} }`;
   });
+  const sharedNames = removedNames.filter(
+    name => oldNames.indexOf(name) !== oldNames.lastIndexOf(name)
+  );
+  return `Animations ${listNames(removedNames)} were removed while ${listNames(
+    addedNames
+  )} were added. To rename, first call \`change_object_properties_effects\` with \`renamed_animations: [${renames.join(
+    ', '
+  )}]\` (it updates the events), then write \`raw_json\` again. To really remove them, remove them in one call and add the new ones in another.${
+    sharedNames.length > 0
+      ? ` Several animations are named ${listNames(
+          sharedNames
+        )}: renaming one of them does not update the events.`
+      : ''
+  }`;
 };
 
 const getPointNamesChangeError = ({
@@ -493,8 +588,8 @@ const getChildrenContentNamesErrors = ({
     return [
       nestedOverridesError,
       getAnimationNamesChangeError({
-        oldNames: getAnimationNames(childJson),
-        newNames: getAnimationNames(savedChildJson),
+        oldAnimations: getAnimationsJson(childJson),
+        newAnimations: getAnimationsJson(savedChildJson),
         structureLockedReason,
       }),
       getPointNamesChangeError({
@@ -503,6 +598,34 @@ const getChildrenContentNamesErrors = ({
         structureLockedReason,
       }),
     ].filter(Boolean);
+  });
+};
+
+/**
+ * The keys of a JSON absent from another one, at every depth: the keys the
+ * engine did not keep. Array items are compared by position, and written
+ * `[]` in the paths.
+ */
+const getIgnoredKeyPaths = (
+  json: mixed,
+  otherJson: mixed,
+  path: string
+): Array<string> => {
+  if (Array.isArray(json)) {
+    return Array.isArray(otherJson)
+      ? json.flatMap((item, index) =>
+          getIgnoredKeyPaths(item, otherJson[index], `${path}[]`)
+        )
+      : [];
+  }
+  if (!isPlainObject(json) || !isPlainObject(otherJson)) return [];
+  const jsonObject: Object = json;
+  const otherJsonObject: Object = otherJson;
+  return Object.keys(jsonObject).flatMap(key => {
+    const keyPath = path ? `${path}.${key}` : key;
+    return key in otherJsonObject
+      ? getIgnoredKeyPaths(jsonObject[key], otherJsonObject[key], keyPath)
+      : [keyPath];
   });
 };
 
@@ -700,8 +823,8 @@ export const applyRawObjectConfiguration = async ({
         )
       : []),
     getAnimationNamesChangeError({
-      oldNames: oldAnimationNames,
-      newNames: newAnimationNames,
+      oldAnimations: getAnimationsJson(currentJson),
+      newAnimations: getAnimationsJson(savedJson),
       structureLockedReason,
     }),
     getPointNamesChangeError({
@@ -721,12 +844,16 @@ export const applyRawObjectConfiguration = async ({
   }
 
   const warnings = [];
-  const ignoredKeys = getKeysAbsentFrom(configurationJson, savedJson);
+  const ignoredKeys = [
+    ...new Set(getIgnoredKeyPaths(configurationJson, savedJson, '')),
+  ];
   if (ignoredKeys.length > 0) {
     warnings.push(
-      `Ignored keys: ${ignoredKeys.join(
-        ', '
-      )} (unknown for this object type, or equal to their default).`
+      `Ignored keys: ${ignoredKeys.slice(0, MAX_LISTED_ERRORS).join(', ')}${
+        ignoredKeys.length > MAX_LISTED_ERRORS
+          ? ` and ${ignoredKeys.length - MAX_LISTED_ERRORS} more`
+          : ''
+      } (unknown for this object type, or equal to their default).`
     );
   }
   if (isPlainObject(childrenContent)) {
@@ -780,9 +907,13 @@ export const applyRawObjectConfiguration = async ({
   unserializeFromJSObject(configuration, savedJson, 'unserializeFrom', project);
 
   const changes = [`Replaced the configuration of "${objectName}".`];
-  const removedAnimationNames = oldAnimationNames.filter(
-    name => !newAnimationNames.includes(name)
-  );
+  const removedAnimationNames = [
+    ...new Set(
+      oldAnimationNames.filter(
+        name => name !== '' && !newAnimationNames.includes(name)
+      )
+    ),
+  ];
   if (removedAnimationNames.length > 0) {
     warnings.push(
       `Removed animations ${listNames(

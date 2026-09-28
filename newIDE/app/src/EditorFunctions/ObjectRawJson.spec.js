@@ -211,6 +211,21 @@ describe('object raw JSON and renames', () => {
       expect(result.message).toContain('Ignored keys: preScale, colour');
     });
 
+    it('warns about keys ignored inside the animations', async () => {
+      makePlayer(['Idle']);
+      const rawJson = await readRawJson('Player');
+      rawJson.animations[0].directions[0].sprites[0].tint = '255;0;0';
+
+      const result = await change({
+        object_name: 'Player',
+        raw_json: JSON.stringify(rawJson),
+      });
+
+      expect(result.message).toContain(
+        'Ignored keys: animations[].directions[].sprites[].tint'
+      );
+    });
+
     it.each([
       [
         'a missing key',
@@ -257,6 +272,13 @@ describe('object raw JSON and renames', () => {
           rawJson.animations[0].directions[0].sprites[0].image = 'Unknown.png';
         },
         '"Unknown.png", which is not an image resource',
+      ],
+      [
+        'a frame image written with another case',
+        (rawJson: Object) => {
+          rawJson.animations[0].directions[0].sprites[0].image = 'frame50x120';
+        },
+        'Did you mean "Frame50x120"',
       ],
       [
         'a point with a reserved name',
@@ -689,7 +711,7 @@ describe('object raw JSON and renames', () => {
       expect(outOfListInstance.getRawDoubleProperty('animation')).toBe(7);
     });
 
-    it('refuses an animation removed and another added in the same call', async () => {
+    it('refuses a rename done in raw JSON, with the recipe', async () => {
       const player = makePlayer(['Idle', 'Run']);
       const rawJson = await readRawJson('Player');
       rawJson.animations[1].name = 'Sprint';
@@ -700,14 +722,17 @@ describe('object raw JSON and renames', () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('use `renamed_animations`');
+      expect(result.message).toContain(
+        'renamed_animations: [{ old_name: "Run", new_name: "Sprint", index: 1 }]'
+      );
       expect(getAnimationNames(player)).toEqual(['Idle', 'Run']);
     });
 
-    it('refuses to reorder when an animation has no name', async () => {
-      makePlayer(['', 'Run']);
+    it('pairs each renamed animation with its new name in the recipe', async () => {
+      makePlayer(['Idle', 'Run']);
       const rawJson = await readRawJson('Player');
-      rawJson.animations.reverse();
+      rawJson.animations[0].name = 'idle';
+      rawJson.animations[1].name = 'run';
 
       const result = await change({
         object_name: 'Player',
@@ -715,7 +740,45 @@ describe('object raw JSON and renames', () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('unique non-empty name');
+      expect(result.message).toContain(
+        '{ old_name: "Run", new_name: "run", index: 1 }'
+      );
+    });
+
+    it('keeps the n-th unnamed animation of an instance when animations are added', async () => {
+      makePlayer(['', '']);
+      const instance = addInstance(scene.getInitialInstances(), 'Player', 1);
+      const rawJson = await readRawJson('Player');
+      rawJson.animations.unshift({ ...rawJson.animations[0], name: 'Jump' });
+
+      const result = await change({
+        object_name: 'Player',
+        raw_json: JSON.stringify(rawJson),
+      });
+
+      expect(result.success).toBe(true);
+      expect(instance.getRawDoubleProperty('animation')).toBe(2);
+    });
+
+    it('reorders and replaces unnamed animations', async () => {
+      const player = makePlayer(['', 'Run']);
+      const rawJson = await readRawJson('Player');
+      rawJson.animations.reverse();
+
+      const reordered = await change({
+        object_name: 'Player',
+        raw_json: JSON.stringify(rawJson),
+      });
+      rawJson.animations = [{ ...rawJson.animations[0], name: 'Run' }];
+      rawJson.animations.push({ ...rawJson.animations[0], name: 'Idle' });
+      const replaced = await change({
+        object_name: 'Player',
+        raw_json: JSON.stringify(rawJson),
+      });
+
+      expect(reordered.success).toBe(true);
+      expect(replaced.success).toBe(true);
+      expect(getAnimationNames(player)).toEqual(['Run', 'Idle']);
     });
   });
 

@@ -180,8 +180,8 @@ export const getInstancesWithStartingAnimation = (
 /**
  * Keeps the starting animation of each instance after the object animations
  * were reordered or removed: the instance keeps the animation of the same
- * name, or starts with the first one when its animation was removed. Names
- * must be unique and non-empty.
+ * name, or starts with the first one when its animation was removed. Among
+ * unnamed or same-named animations, the n-th of that name stays the n-th.
  */
 export const remapStartingAnimations = (
   instances: Array<gdInitialInstance>,
@@ -197,7 +197,14 @@ export const remapStartingAnimations = (
     const animationName = oldAnimationNames[oldIndex];
     // An index out of the list was already showing no animation of the list.
     if (animationName === undefined) return;
-    const newIndex = newAnimationNames.indexOf(animationName);
+    const occurrence = oldAnimationNames
+      .slice(0, oldIndex)
+      .filter(name => name === animationName).length;
+    const newIndexesOfName = newAnimationNames
+      .map((name, index) => (name === animationName ? index : -1))
+      .filter(index => index !== -1);
+    const newIndex =
+      occurrence < newIndexesOfName.length ? newIndexesOfName[occurrence] : -1;
     if (newIndex === -1) {
       instance.setRawDoubleProperty('animation', 0);
       resetInstancesCount++;

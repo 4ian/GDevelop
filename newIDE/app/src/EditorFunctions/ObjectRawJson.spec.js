@@ -628,7 +628,6 @@ describe('object raw JSON and renames', () => {
 
     it('starts instances with the first animation when theirs is removed', async () => {
       makePlayer(['Idle', 'Run']);
-      setEventsReferringTo(scene.getEvents(), 'Player');
       const runInstance = addInstance(scene.getInitialInstances(), 'Player', 1);
       const rawJson = await readRawJson('Player');
       rawJson.animations = [rawJson.animations[0]];
@@ -712,9 +711,8 @@ describe('object raw JSON and renames', () => {
       expect(outOfListInstance.getRawDoubleProperty('animation')).toBe(7);
     });
 
-    it('refuses a rename done in raw JSON when events use the old name, with the recipe', async () => {
+    it('refuses a rename done in raw JSON, with the recipe', async () => {
       const player = makePlayer(['Idle', 'Run']);
-      setEventsReferringTo(scene.getEvents(), 'Player');
       const rawJson = await readRawJson('Player');
       rawJson.animations[1].name = 'Sprint';
 
@@ -731,9 +729,7 @@ describe('object raw JSON and renames', () => {
     });
 
     it('pairs each renamed animation with its new name in the recipe', async () => {
-      // Only "Run" is used in the events, and both animations are renamed.
       makePlayer(['Idle', 'Run']);
-      setEventsReferringTo(scene.getEvents(), 'Player');
       const rawJson = await readRawJson('Player');
       rawJson.animations[0].name = 'idle';
       rawJson.animations[1].name = 'run';
@@ -747,54 +743,6 @@ describe('object raw JSON and renames', () => {
       expect(result.message).toContain(
         '{ old_name: "Run", new_name: "run", index: 1 }'
       );
-    });
-
-    it('finds the names used in the external events of the scene', async () => {
-      makePlayer(['Idle', 'Run']);
-      const externalEvents = project.insertNewExternalEvents('LevelLogic', 0);
-      externalEvents.setAssociatedLayout('Level1');
-      setEventsReferringTo(externalEvents.getEvents(), 'Player');
-      const rawJson = await readRawJson('Player');
-      rawJson.animations[1].name = 'Sprint';
-
-      const result = await change({
-        object_name: 'Player',
-        raw_json: JSON.stringify(rawJson),
-      });
-
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('renamed_animations');
-    });
-
-    it('finds a used name containing quotes', async () => {
-      makePlayer(['Idle', 'Say "hi"']);
-      unserializeFromJSObject(
-        scene.getEvents(),
-        [
-          {
-            type: 'BuiltinCommonInstructions::Standard',
-            conditions: [],
-            actions: [
-              {
-                type: { value: 'SetAnimationName' },
-                parameters: ['Player', '"Say \\"hi\\""'],
-              },
-            ],
-          },
-        ],
-        'unserializeFrom',
-        project
-      );
-      const rawJson = await readRawJson('Player');
-      rawJson.animations[1].name = 'Greet';
-
-      const result = await change({
-        object_name: 'Player',
-        raw_json: JSON.stringify(rawJson),
-      });
-
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('renamed_animations');
     });
 
     it('keeps the n-th unnamed animation of an instance when animations are added', async () => {
@@ -812,23 +760,8 @@ describe('object raw JSON and renames', () => {
       expect(instance.getRawDoubleProperty('animation')).toBe(2);
     });
 
-    it('replaces animations that no event uses', async () => {
-      const player = makePlayer(['Idle', 'Run']);
-      const rawJson = await readRawJson('Player');
-      rawJson.animations[1].name = 'Sprint';
-
-      const result = await change({
-        object_name: 'Player',
-        raw_json: JSON.stringify(rawJson),
-      });
-
-      expect(result.success).toBe(true);
-      expect(getAnimationNames(player)).toEqual(['Idle', 'Sprint']);
-    });
-
     it('reorders and replaces unnamed animations', async () => {
       const player = makePlayer(['', 'Run']);
-      setEventsReferringTo(scene.getEvents(), 'Player');
       const rawJson = await readRawJson('Player');
       rawJson.animations.reverse();
 

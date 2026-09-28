@@ -1,7 +1,6 @@
 // @flow
 import { mapFor } from './MapFor';
 import { getInstancesInLayoutForObject } from './Layout';
-import { serializeToJSObject } from './Serializer';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -41,58 +40,6 @@ const getScenesUsingObject = ({
     ).filter(scene => !scene.getObjects().hasObjectNamed(object.getName()));
   }
   return layout ? [layout] : null;
-};
-
-/**
- * The events that can refer to the object: the events of its scenes and their
- * external events, or the events of the custom object it is a child of.
- */
-const getEventsListsUsingObject = (
-  context: ObjectReferencesContext
-): Array<gdEventsList> => {
-  const { project, eventsBasedObject } = context;
-  const scenes = getScenesUsingObject(context);
-  if (scenes) {
-    const sceneNames = new Set(scenes.map(scene => scene.getName()));
-    return [
-      ...scenes.map(scene => scene.getEvents()),
-      ...mapFor(0, project.getExternalEventsCount(), i =>
-        project.getExternalEventsAt(i)
-      )
-        .filter(externalEvents =>
-          sceneNames.has(externalEvents.getAssociatedLayout())
-        )
-        .map(externalEvents => externalEvents.getEvents()),
-    ];
-  }
-  if (!eventsBasedObject) return [];
-  const eventsFunctions = eventsBasedObject.getEventsFunctions();
-  return mapFor(0, eventsFunctions.getEventsFunctionsCount(), i =>
-    eventsFunctions.getEventsFunctionAt(i).getEvents()
-  );
-};
-
-/**
- * The names, among the given ones, written as a text in the events that can
- * refer to the object. A name used for another object counts too: when in
- * doubt, a name is considered used.
- */
-export const getNamesUsedInObjectEvents = (
-  context: ObjectReferencesContext,
-  names: Array<string>
-): Set<string> => {
-  if (names.length === 0) return new Set();
-  const eventsTexts = getEventsListsUsingObject(context).map(eventsList =>
-    JSON.stringify(serializeToJSObject(eventsList))
-  );
-  return new Set(
-    names.filter(name => {
-      // The text "Name", with its quotes, as it appears in the JSON of the
-      // events.
-      const quotedName = JSON.stringify(JSON.stringify(name)).slice(1, -1);
-      return eventsTexts.some(eventsText => eventsText.includes(quotedName));
-    })
-  );
 };
 
 /**

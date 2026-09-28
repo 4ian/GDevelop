@@ -23,6 +23,7 @@ import {
   renderEventSourceById,
   renderScopeSummaryHeaderLines,
   type ScopeSummary,
+  type JsCodeExcerpt,
 } from '../EventsSheet/EventsTree/TextRenderer/EventScriptSourceView';
 import {
   addMissingObjectBehaviors,
@@ -337,6 +338,7 @@ export type EditorFunctionGenericOutput = {|
   // EventScript source view (see `read_events_source`):
   eventScript?: string,
   selectedEventIds?: Array<string>,
+  jsCodeExcerpt?: JsCodeExcerpt,
   truncated?: boolean,
   notes?: Array<string>,
   generatedEventsErrorDiagnostics?: string,
@@ -558,6 +560,9 @@ export type LaunchFunctionOptionsWithoutProject = {|
   // When true, `run_script` exposes only non-mutating functions (explorer
   // sub-agent scripts, which must stay read-only). Ignored by other functions.
   runScriptReadOnly?: boolean,
+  // True for a function called by a `run_script` script: its output stays in
+  // the script (only its logs reach the AI), so it can be larger.
+  +isCalledFromScript?: boolean,
   i18n: I18nType,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
@@ -6502,6 +6507,7 @@ export const noEventsInFunctionText = 'This function has no events.';
 const EVENTS_SOURCE_MAX_CHARS_DEFAULT = 12000;
 const EVENTS_SOURCE_MAX_CHARS_MINIMUM = 2000;
 const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
+const EVENTS_SOURCE_MAX_CHARS_LIMIT_IN_SCRIPT = 1000000;
 
 const getPropertyNames = (
   propertiesContainer: gdPropertiesContainer
@@ -6692,7 +6698,12 @@ const readEventsSource: EditorFunction = {
 
     return { text };
   },
-  launchFunction: async ({ project, args, ensureExtensionsUpToDate }) => {
+  launchFunction: async ({
+    project,
+    args,
+    ensureExtensionsUpToDate,
+    isCalledFromScript,
+  }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
       allowedTypes: ['scene', 'extension', 'custom_behavior', 'custom_object'],
     });
@@ -6732,9 +6743,15 @@ const readEventsSource: EditorFunction = {
     const maxChars = Math.max(
       EVENTS_SOURCE_MAX_CHARS_MINIMUM,
       Math.min(
-        EVENTS_SOURCE_MAX_CHARS_LIMIT,
+        isCalledFromScript
+          ? EVENTS_SOURCE_MAX_CHARS_LIMIT_IN_SCRIPT
+          : EVENTS_SOURCE_MAX_CHARS_LIMIT,
         maxCharsArgument || EVENTS_SOURCE_MAX_CHARS_DEFAULT
       )
+    );
+    const jsFromLine = SafeExtractor.extractNumberProperty(
+      args,
+      'js_from_line'
     );
 
     // In a function, what the events can use (parameters, properties, child
@@ -6752,6 +6769,7 @@ const readEventsSource: EditorFunction = {
     const {
       text,
       selectedEventIds,
+      jsCodeExcerpt,
       truncated,
       notes,
       renderingErrors,
@@ -6761,6 +6779,7 @@ const readEventsSource: EditorFunction = {
       searchText,
       objectNames,
       subEventsDepth,
+      jsFromLine,
       maxChars: Math.max(
         0,
         maxChars -
@@ -6794,6 +6813,7 @@ const readEventsSource: EditorFunction = {
         : eventScriptText,
       selectedEventIds,
     };
+    if (jsCodeExcerpt) output.jsCodeExcerpt = jsCodeExcerpt;
     if (truncated) output.truncated = true;
     if (notes.length > 0) output.notes = notes;
     if (renderingErrors.length > 0) {
@@ -11470,7 +11490,7 @@ const runScript: EditorFunction = {
     const exposedFunctions = buildExposedScriptFunctions({
       editorFunctions,
       editorFunctionsWithoutProject,
-      launchOptions,
+      launchOptions: { ...launchOptions, isCalledFromScript: true },
       project,
       allowedFunctionNames,
     });

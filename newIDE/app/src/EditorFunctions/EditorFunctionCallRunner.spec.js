@@ -20,10 +20,12 @@ describe('processEditorFunctionCalls', () => {
     functionCalls: Array<EditorFunctionCall>
   ) => {
     // The runner takes the same collaborators as launchFunction options,
-    // without `args` and `PixiResourcesLoader` (it provides those itself).
+    // without `args` and `PixiResourcesLoader` (it provides those itself)
+    // and `isCalledFromScript` (only set by `run_script`).
     const {
       args,
       PixiResourcesLoader,
+      isCalledFromScript,
       ...collaborators
     } = makeFakeLaunchFunctionOptionsWithoutProject();
     return {

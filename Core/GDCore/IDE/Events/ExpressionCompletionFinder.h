@@ -832,12 +832,14 @@ class GD_CORE_API ExpressionCompletionFinder
 
     AddCompletionsForAllIdentifiersMatchingSearch(
         node.text, type, "", node.location);
-    completions.push_back(
-        ExpressionCompletionDescription::ForExpressionWithPrefix(
-            type,
-            node.text,
-            node.location.GetStartPosition(),
-            node.location.GetEndPosition()));
+    if (!gd::ValueTypeMetadata::IsVariable(type)) {
+      completions.push_back(
+          ExpressionCompletionDescription::ForExpressionWithPrefix(
+              type,
+              node.text,
+              node.location.GetStartPosition(),
+              node.location.GetEndPosition()));
+    }
   }
 
  private:

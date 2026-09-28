@@ -1,8 +1,11 @@
 namespace gdjs {
   const logger = new gdjs.Logger('In-Game editor');
 
+  type HChild = HTMLElement | string | null | false | undefined;
+
   /**
    * A minimal utility to define DOM elements.
+   * Children can be arrays, and empty children (null, false) are skipped.
    * Also copied in InGameDebugger.tsx.
    */
   function h<K extends keyof HTMLElementTagNameMap>(
@@ -10,23 +13,28 @@ namespace gdjs {
     attrs: {
       style?: Partial<CSSStyleDeclaration>;
       onClick?: () => void;
-    },
-    ...nodes: (HTMLElement | string)[]
+    } | null,
+    ...nodes: (HChild | HChild[])[]
   ): HTMLElement {
     const node = document.createElement(tag);
-    Object.keys(attrs).forEach((key) => {
+    const attributes = attrs || {};
+    Object.keys(attributes).forEach((key) => {
       if (key === 'style') {
-        for (const [styleName, value] of Object.entries(attrs.style!)) {
+        for (const [styleName, value] of Object.entries(attributes.style!)) {
           node.style[styleName] = value;
         }
       } else if (key === 'onClick') {
-        node.addEventListener('click', attrs[key]!);
+        node.addEventListener('click', attributes[key]!);
       } else {
-        node.setAttribute(key, '' + attrs[key]);
+        node.setAttribute(key, '' + attributes[key]);
       }
     });
 
-    node.append(...nodes);
+    for (const child of nodes) {
+      for (const element of Array.isArray(child) ? child : [child]) {
+        if (element) node.append(element);
+      }
+    }
     return node;
   }
 
@@ -998,6 +1006,33 @@ namespace gdjs {
     return { forward };
   };
 
+  /**
+   * An item of a toolbar shown by an extension (see `InGameEditor.showToolbar`).
+   * @category In-Game Editor
+   */
+  export type InGameEditorToolbarItem =
+    | {
+        type: 'button';
+        id: string;
+        tooltip: string;
+        /** An icon (for example the data URL of an SVG), drawn with the color of texts. */
+        iconUrl?: string;
+        /** A color shown instead of an icon, for example to choose a color. */
+        color?: string;
+        isActive?: boolean;
+        onClick: () => void;
+      }
+    | {
+        type: 'slider';
+        id: string;
+        tooltip: string;
+        min: float;
+        max: float;
+        value: float;
+        onChange: (value: float) => void;
+      }
+    | { type: 'divider'; id: string };
+
   /** @category In-Game Editor */
   export class InGameEditor {
     private _editorId: string = '';
@@ -1112,6 +1147,11 @@ namespace gdjs {
     private _inGameEditorSettings: InGameEditorSettings;
     private _shortcuts: InGameEditorShortcuts = new InGameEditorShortcuts();
     private _isLeftMouseButtonCaptured = false;
+    private _requestedExtensionToolbars = new Map<
+      string,
+      Array<InGameEditorToolbarItem>
+    >();
+    private _extensionToolbars = new Map<string, ExtensionToolbar>();
 
     constructor(
       game: RuntimeGame,
@@ -1181,6 +1221,7 @@ namespace gdjs {
         this._unregisterContextLostListener();
         this._unregisterContextLostListener = null;
       }
+      this._renderExtensionToolbars(null);
     }
 
     /**
@@ -1828,6 +1869,42 @@ namespace gdjs {
      */
     captureLeftMouseButton(): void {
       this._isLeftMouseButtonCaptured = true;
+    }
+
+    /**
+     * Show a toolbar for a tool of an extension, below the editor toolbar and
+     * looking like it, during the next frame: call it at every frame while
+     * it must be shown. Items can be changed between frames: elements are
+     * only created again when the ids of the items change.
+     */
+    showToolbar(
+      toolbarId: string,
+      items: Array<InGameEditorToolbarItem>
+    ): void {
+      this._requestedExtensionToolbars.set(toolbarId, items);
+    }
+
+    private _renderExtensionToolbars(parent: HTMLElement | null): void {
+      for (const [toolbarId, toolbar] of this._extensionToolbars) {
+        if (!parent || !this._requestedExtensionToolbars.has(toolbarId)) {
+          toolbar.remove();
+          this._extensionToolbars.delete(toolbarId);
+        }
+      }
+      if (parent) {
+        let toolbarIndex = 0;
+        for (const [toolbarId, items] of this._requestedExtensionToolbars) {
+          let toolbar = this._extensionToolbars.get(toolbarId);
+          if (!toolbar) {
+            toolbar = new ExtensionToolbar(() => {
+              this._timeSinceLastInteraction = 0;
+            });
+            this._extensionToolbars.set(toolbarId, toolbar);
+          }
+          toolbar.render(parent, items, toolbarIndex++);
+        }
+      }
+      this._requestedExtensionToolbars.clear();
     }
 
     /**
@@ -2975,6 +3052,7 @@ namespace gdjs {
       } else {
         this._runtimeGame.getSoundManager().unmuteEverything('in-game-editor');
         this._removeSelectionControls();
+        this._renderExtensionToolbars(null);
 
         // Cleanup selection boxes
         this._selectionBoxes.forEach((box) => {
@@ -4060,6 +4138,7 @@ namespace gdjs {
         }
         this._currentScene.render();
       }
+      this._renderExtensionToolbars(domElementContainer);
 
       this._isFirstFrame = false;
     }
@@ -4164,6 +4243,15 @@ namespace gdjs {
           width: 1px;
           height: 24px;
           background-color: var(--in-game-editor-theme-toolbar-separator-color);
+        }
+        .InGameEditor-Toolbar-Button-Color {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+        }
+        .InGameEditor-Toolbar-Slider {
+          width: 80px;
+          accent-color: var(--in-game-editor-theme-icon-button-selected-background-color);
         }
       `;
     }
@@ -4332,6 +4420,132 @@ namespace gdjs {
         'InGameEditor-Toolbar-Button-Active',
         transformControlsMode === 'scale'
       );
+    }
+  }
+
+  /**
+   * A toolbar of an extension, below the editor toolbar.
+   */
+  class ExtensionToolbar {
+    private _container: HTMLElement | null = null;
+    private _itemElements: Array<HTMLElement> = [];
+    private _items: Array<InGameEditorToolbarItem> = [];
+    private _itemsLayout = '';
+    private _onInteraction: () => void;
+
+    constructor(onInteraction: () => void) {
+      this._onInteraction = onInteraction;
+    }
+
+    render(
+      parent: HTMLElement,
+      items: Array<InGameEditorToolbarItem>,
+      toolbarIndex: integer
+    ) {
+      this._items = items;
+      const itemsLayout = items.map((item) => item.type + item.id).join(',');
+      let container = this._container;
+      if (
+        !container ||
+        container.parentElement !== parent ||
+        itemsLayout !== this._itemsLayout
+      ) {
+        this.remove();
+        this._itemsLayout = itemsLayout;
+        container = this._createContainer(items);
+        parent.appendChild(container);
+        this._container = container;
+      }
+      container.style.top = 36 * (toolbarIndex + 1) + 'px';
+
+      items.forEach((item, index) => {
+        const element = this._itemElements[index];
+        if (item.type === 'button') {
+          element.title = item.tooltip;
+          element.classList.toggle(
+            'InGameEditor-Toolbar-Button-Active',
+            !!item.isActive
+          );
+          const content = element.firstElementChild as HTMLElement;
+          const mask = item.color
+            ? ''
+            : `url('${item.iconUrl}') center/contain no-repeat`;
+          content.className = item.color
+            ? 'InGameEditor-Toolbar-Button-Color'
+            : 'InGameEditor-Toolbar-Button-Icon';
+          content.style.backgroundColor = item.color || '';
+          content.style.setProperty('-webkit-mask', mask);
+          content.style.setProperty('mask', mask);
+        } else if (item.type === 'slider') {
+          const slider = element as HTMLInputElement;
+          slider.title = item.tooltip;
+          slider.min = '' + item.min;
+          slider.max = '' + item.max;
+          if (document.activeElement !== slider) {
+            slider.value = '' + item.value;
+          }
+        }
+      });
+    }
+
+    private _createContainer(
+      items: Array<InGameEditorToolbarItem>
+    ): HTMLElement {
+      this._itemElements = items.map((item, index) =>
+        this._createItemElement(item, index)
+      );
+      return (
+        <div class="InGameEditor-Toolbar-Centering-Container">
+          <div class="InGameEditor-Toolbar-Container">
+            <div class="InGameEditor-Toolbar-Container-Background" />
+            {this._itemElements}
+          </div>
+        </div>
+      );
+    }
+
+    private _createItemElement(
+      item: InGameEditorToolbarItem,
+      index: integer
+    ): HTMLElement {
+      if (item.type === 'divider') {
+        return <div class="InGameEditor-Toolbar-Divider" />;
+      }
+      if (item.type === 'slider') {
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.className = 'InGameEditor-Toolbar-Slider';
+        slider.step = 'any';
+        slider.addEventListener('input', () => {
+          this._onInteraction();
+          const currentItem = this._items[index];
+          if (currentItem.type === 'slider') {
+            currentItem.onChange(Number(slider.value));
+          }
+        });
+        // A focused element would receive the keyboard shortcuts of the editor.
+        slider.addEventListener('pointerup', () => slider.blur());
+        return slider;
+      }
+      const button = (
+        <button
+          class="InGameEditor-Toolbar-Button"
+          onClick={() => {
+            this._onInteraction();
+            const currentItem = this._items[index];
+            if (currentItem.type === 'button') currentItem.onClick();
+          }}
+        >
+          <span />
+        </button>
+      );
+      button.addEventListener('mousedown', (event) => event.preventDefault());
+      return button;
+    }
+
+    remove() {
+      if (this._container) this._container.remove();
+      this._container = null;
     }
   }
 

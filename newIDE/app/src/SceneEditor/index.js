@@ -429,6 +429,8 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             if (parsedMessage.command === 'updateInstances') {
               this.onReceiveInstanceChanges(parsedMessage.payload);
+            } else if (parsedMessage.command === 'updateObjectProperties') {
+              this.onReceiveObjectPropertiesChanges(parsedMessage.payload);
             } else if (parsedMessage.command === 'setCameraState') {
               setCameraState(parsedMessage.editorId, parsedMessage.payload);
             } else if (parsedMessage.command === 'openContextMenu') {
@@ -1571,6 +1573,38 @@ export default class SceneEditor extends React.Component<Props, State> {
           },
         });
       });
+  };
+
+  onReceiveObjectPropertiesChanges = ({
+    objectName,
+    properties,
+  }: {|
+    objectName: string,
+    properties: { [propertyName: string]: string },
+  |}) => {
+    const { globalObjectsContainer, objectsContainer } = this.props;
+    const object = getObjectByName(
+      globalObjectsContainer,
+      objectsContainer,
+      objectName
+    );
+    if (!object) return;
+
+    const objectConfiguration = object.getConfiguration();
+    let hasChanged = false;
+    for (const propertyName in properties) {
+      hasChanged =
+        objectConfiguration.updateProperty(
+          propertyName,
+          properties[propertyName]
+        ) || hasChanged;
+    }
+    if (!hasChanged) return;
+
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    this.forceUpdatePropertiesEditor();
+    this._onObjectsModified([object]);
   };
 
   _onObjectsModified = (objects: Array<gdObject>) => {

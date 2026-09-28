@@ -1111,6 +1111,7 @@ namespace gdjs {
     private _toolbar: Toolbar;
     private _inGameEditorSettings: InGameEditorSettings;
     private _shortcuts: InGameEditorShortcuts = new InGameEditorShortcuts();
+    private _isLeftMouseButtonCaptured = false;
 
     constructor(
       game: RuntimeGame,
@@ -1813,6 +1814,41 @@ namespace gdjs {
       return this._selection.getAABB();
     }
 
+    getSelectedObjects(): ReadonlyArray<gdjs.RuntimeObject> {
+      return this._selection.getSelectedObjects();
+    }
+
+    /**
+     * Let a tool from an extension (for example, a terrain brush) use the left
+     * mouse button during the next frame: clicks and drags won't select,
+     * box-select or move instances. Camera controls and shortcuts still work.
+     *
+     * Call it at every frame while the tool is used (for example from a
+     * callback registered with `gdjs.registerInGameEditorPostStepCallback`).
+     */
+    captureLeftMouseButton(): void {
+      this._isLeftMouseButtonCaptured = true;
+    }
+
+    /**
+     * Save new values for properties of an object, for example data authored
+     * with a tool from an extension. The object is then hot-reloaded, like
+     * after any change in the properties panel (so objects must ignore values
+     * they already have).
+     * @param objectName The name of an object of the edited scene (or a
+     * global object).
+     * @param properties The new values, by property name, written like in
+     * object properties (for example, "1" or "0" for booleans).
+     */
+    updateObjectProperties(
+      objectName: string,
+      properties: { [propertyName: string]: string }
+    ): void {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+      debuggerClient.sendObjectPropertiesChanges(objectName, properties);
+    }
+
     setSelectedObjects(persistentUuids: Array<string>) {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
@@ -1933,6 +1969,7 @@ namespace gdjs {
     private _shouldDragSelectedObject(): boolean {
       const inputManager = this._runtimeGame.getInputManager();
       return (
+        !this._isLeftMouseButtonCaptured &&
         isControlOrCmdPressed(inputManager) &&
         (!this._selectionControls ||
           !this._selectionControls.threeTransformControls.dragging)
@@ -2142,6 +2179,7 @@ namespace gdjs {
 
       if (
         inputManager.isMouseButtonPressed(0) &&
+        !this._isLeftMouseButtonCaptured &&
         !this._shouldDragSelectedObject() &&
         !isSpacePressed(inputManager) &&
         !hasMultipleTouches
@@ -2260,6 +2298,7 @@ namespace gdjs {
 
       // Left click: select the object under the cursor.
       if (
+        !this._isLeftMouseButtonCaptured &&
         !this._isTransformControlsHovered &&
         inputManager.isMouseButtonReleased(0) &&
         this._hasCursorStayedStillWhilePressed({ toleranceRadius: 10 })
@@ -2528,7 +2567,9 @@ namespace gdjs {
       // Space or multiple touches will hide the selection controls as they are
       // used to move the camera.
       const shouldHideSelectionControls =
-        isSpacePressed(inputManager) || hasMultipleTouches;
+        isSpacePressed(inputManager) ||
+        hasMultipleTouches ||
+        this._isLeftMouseButtonCaptured;
 
       // Remove the selection controls if the last selected object has changed
       // or if nothing movable is selected.
@@ -4009,6 +4050,8 @@ namespace gdjs {
       this._wasMouseMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
       this._previousCursorX = inputManager.getMouseX();
       this._previousCursorY = inputManager.getMouseY();
+      // Tools capture the button again at each frame if they still need it.
+      this._isLeftMouseButtonCaptured = false;
 
       if (this._currentScene) {
         this._currentScene._updateObjectsForInGameEditor();

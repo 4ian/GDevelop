@@ -1,4 +1,9 @@
-import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import {
+  GLTFLoader,
+  GLTF,
+  GLTFParser,
+  GLTFLoaderPlugin,
+} from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 
@@ -22,6 +27,8 @@ declare global {
     export {
       GLTFLoader,
       GLTF,
+      GLTFParser,
+      GLTFLoaderPlugin,
       DRACOLoader,
       SkeletonUtils,
       TransformControls,

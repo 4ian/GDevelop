@@ -18,6 +18,45 @@ import {
   customEasingExampleIdentifier,
   parseCubicBezierOrNull,
 } from '../../Utils/Easings';
+import CubicBezierEditorDialog from '../../UI/CubicBezierEditor/CubicBezierEditorDialog';
+import { getInitialCubicBezierPoints } from '../../UI/CubicBezierEditor/CubicBezierPresets';
+
+const getQuotedStringLiteralOrNull = (value: string): ?string => {
+  if (value.length < 2 || value[0] !== '"' || value[value.length - 1] !== '"') {
+    return null;
+  }
+  const literal = value.substring(1, value.length - 1);
+  if (literal.indexOf('"') !== -1) return null;
+  return literal;
+};
+
+/**
+ * Return the unquoted `cubic-bezier(...)` if the value is a valid custom
+ * easing literal (`"cubic-bezier(...)"`). Otherwise, return null.
+ */
+export const getCustomEasingIdentifierOrNull = (value: string): ?string => {
+  const literal = getQuotedStringLiteralOrNull(value);
+  return literal && parseCubicBezierOrNull(literal) ? literal : null;
+};
+
+/**
+ * Add the current value to the choices when it is a custom easing, so the
+ * field stays in select mode and can draw its preview.
+ */
+export const getEasingChoicesWithCustomValue = (
+  parameterMetadata: ?gdParameterMetadata,
+  value: string
+): Array<string> => {
+  const choices = getEasingChoices(parameterMetadata);
+  const customEasingIdentifier = getCustomEasingIdentifierOrNull(value);
+  if (
+    !customEasingIdentifier ||
+    choices.indexOf(customEasingIdentifier) !== -1
+  ) {
+    return choices;
+  }
+  return choices.concat(customEasingIdentifier);
+};
 
 const previewSizes = {
   field: { width: 40, height: 24 },
@@ -60,16 +99,44 @@ export const getCustomEasingHelperMarkdown = (i18n: I18nType): string => {
  */
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function EasingField(props: ParameterFieldProps, ref) {
+    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+    const customEasingIdentifier = getCustomEasingIdentifierOrNull(props.value);
+
     return (
       <I18n>
         {({ i18n }) => (
-          <StringWithSelectorField
-            ref={ref}
-            {...props}
-            choices={getEasingChoices(props.parameterMetadata)}
-            renderChoiceAdornment={renderEasingPreview}
-            helperMarkdownText={getCustomEasingHelperMarkdown(i18n)}
-          />
+          <>
+            <StringWithSelectorField
+              ref={ref}
+              {...props}
+              choices={getEasingChoicesWithCustomValue(
+                props.parameterMetadata,
+                props.value
+              )}
+              extraOptions={[
+                {
+                  label: customEasingIdentifier
+                    ? t`Edit custom curve...`
+                    : t`Custom curve...`,
+                  onClick: () => setIsDialogOpen(true),
+                },
+              ]}
+              renderChoiceAdornment={renderEasingPreview}
+              extraHelperMarkdownText={getCustomEasingHelperMarkdown(i18n)}
+            />
+            {isDialogOpen ? (
+              <CubicBezierEditorDialog
+                initialPoints={getInitialCubicBezierPoints(
+                  getQuotedStringLiteralOrNull(props.value)
+                )}
+                onApply={cubicBezier => {
+                  props.onChange(`"${cubicBezier}"`);
+                  setIsDialogOpen(false);
+                }}
+                onClose={() => setIsDialogOpen(false)}
+              />
+            ) : null}
+          </>
         )}
       </I18n>
     );
@@ -78,29 +145,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   ...ParameterFieldProps,
   +ref?: React.RefSetter<ParameterFieldInterface>,
 }>);
-
-/**
- * Add the current value to the choices when it is a valid custom literal
- * (`"cubic-bezier(...)"`), so the events sheet can draw its preview.
- */
-export const getEasingChoicesWithCustomValue = (
-  parameterMetadata: ?gdParameterMetadata,
-  value: string
-): Array<string> => {
-  const choices = getEasingChoices(parameterMetadata);
-  if (value.length < 2 || value[0] !== '"' || value[value.length - 1] !== '"') {
-    return choices;
-  }
-
-  const easingIdentifier = value.substring(1, value.length - 1);
-  if (
-    !parseCubicBezierOrNull(easingIdentifier) ||
-    choices.indexOf(easingIdentifier) !== -1
-  ) {
-    return choices;
-  }
-  return choices.concat(easingIdentifier);
-};
 
 export const renderInlineEasing = (
   props: ParameterInlineRendererProps

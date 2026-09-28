@@ -119,3 +119,23 @@ export const Easings = (): React.Node => {
     <Field initialValue='"easeOutBack"' parameterMetadata={parameterMetadata} />
   );
 };
+
+export const EasingCustomCurve = (): React.Node => {
+  const parameterMetadata = useParameterMetadata('easing', 'Easing', null);
+  return (
+    <Field
+      initialValue='"cubic-bezier(.91,.17,.08,.88)"'
+      parameterMetadata={parameterMetadata}
+    />
+  );
+};
+
+export const EasingExpression = (): React.Node => {
+  const parameterMetadata = useParameterMetadata('easing', 'Easing', null);
+  return (
+    <Field
+      initialValue='"cubic-bezier(" + ToString(Variable(X1)) + ",.1,.25,1)"'
+      parameterMetadata={parameterMetadata}
+    />
+  );
+};

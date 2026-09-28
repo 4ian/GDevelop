@@ -313,11 +313,9 @@ const getAutocompletionsForText = function(
   } else if (type === 'easing') {
     autocompletionTexts = getEasingChoices(
       completionDescription.getParameterMetadata()
-    ).map(choice => `"${choice}"`);
-    const customEasingCompletion = `"${customEasingExampleIdentifier}"`;
-    if (autocompletionTexts.indexOf(customEasingCompletion) === -1) {
-      autocompletionTexts.push(customEasingCompletion);
-    }
+    )
+      .concat(customEasingExampleIdentifier)
+      .map(choice => `"${choice}"`);
   } else if (type === 'objectPointName') {
     const objectName: string = completionDescription.getObjectName();
     if (!objectName) {

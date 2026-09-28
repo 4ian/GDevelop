@@ -329,19 +329,27 @@ export const createCubicBezierEasing = (
   };
 };
 
-const formatCubicBezierNumber = (value: number): string => {
+/** Round to the precision kept in a cubic-bezier value (3 decimals, no `-0`). */
+export const roundCubicBezierNumber = (value: number): number => {
   const rounded = Number(value.toFixed(CUBIC_BEZIER_DECIMALS));
-  const normalized = rounded === 0 ? 0 : rounded;
-  // Compact form: 0.91 -> .91, -0.56 -> -.56.
-  return String(normalized).replace(/^(-?)0\./, '$1.');
+  return rounded === 0 ? 0 : rounded;
 };
+
+const formatCubicBezierNumber = (value: number): string =>
+  // Compact form: 0.91 -> .91, -0.56 -> -.56.
+  String(roundCubicBezierNumber(value)).replace(/^(-?)0\./, '$1.');
 
 /** Return `cubic-bezier(.91,.17,.08,.88)`, with a maximum of 3 decimals. */
 export const formatCubicBezier = (points: CubicBezierPoints): string =>
   'cubic-bezier(' + points.map(formatCubicBezierNumber).join(',') + ')';
 
-/** CSS `ease`. Shown as the custom-curve example in the editor. */
-export const customEasingExampleIdentifier = 'cubic-bezier(.25,.1,.25,1)';
+/** CSS `ease`. */
+export const cssEasePoints: CubicBezierPoints = [0.25, 0.1, 0.25, 1];
+
+/** Shown as the custom-curve example in the editor. */
+export const customEasingExampleIdentifier: string = formatCubicBezier(
+  cssEasePoints
+);
 
 export const getNamedEasingFunction = (name: string): ?EasingFunction =>
   easingFunctions.hasOwnProperty(name) ? easingFunctions[name] : null;
@@ -354,6 +362,27 @@ export const getEasingFunction = (
   if (namedEasing) return namedEasing;
   const points = parseCubicBezierOrNull(easingIdentifier);
   return points ? createCubicBezierEasing(points) : null;
+};
+
+export type EasingValueRange = {| min: number, max: number |};
+
+/**
+ * Lowest and highest values of an easing, sampled over [0, 1]. The range always
+ * includes 0 and 1, so it is wider for easings that overshoot.
+ */
+export const getEasingValueRange = (
+  easingFunction: EasingFunction,
+  samplesCount: number
+): EasingValueRange => {
+  let min = 0;
+  let max = 1;
+  for (let i = 0; i <= samplesCount; i++) {
+    const value = easingFunction(i / samplesCount);
+    if (!Number.isFinite(value)) continue;
+    min = Math.min(min, value);
+    max = Math.max(max, value);
+  }
+  return { min, max };
 };
 
 /**

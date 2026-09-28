@@ -231,15 +231,13 @@ namespace gdjs {
       const customEasingCache = new Map<string, EasingFunction | null>();
       const logger = new gdjs.Logger('Tween');
 
-      /** Drop every cached custom easing. Named easings are not cached here. */
-      export const clearCustomEasingCache = (): void => {
-        customEasingCache.clear();
-      };
-
-      const deleteOldestCustomEasing = (): void => {
-        const oldestIdentifier = customEasingCache.keys().next().value;
-        if (oldestIdentifier !== undefined) {
-          customEasingCache.delete(oldestIdentifier);
+      // A Map iterates in insertion order: the first key is the least recently used.
+      const deleteLeastRecentlyUsedCustomEasing = (): void => {
+        const leastRecentlyUsedIdentifier = customEasingCache
+          .keys()
+          .next().value;
+        if (leastRecentlyUsedIdentifier !== undefined) {
+          customEasingCache.delete(leastRecentlyUsedIdentifier);
         }
       };
 
@@ -395,11 +393,13 @@ namespace gdjs {
 
         const cachedEasing = customEasingCache.get(easingIdentifier);
         if (cachedEasing !== undefined) {
+          customEasingCache.delete(easingIdentifier);
+          customEasingCache.set(easingIdentifier, cachedEasing);
           return cachedEasing;
         }
 
         if (customEasingCache.size >= CUSTOM_EASING_CACHE_MAX_ENTRIES) {
-          deleteOldestCustomEasing();
+          deleteLeastRecentlyUsedCustomEasing();
         }
 
         const points = parseCubicBezierOrNull(easingIdentifier);

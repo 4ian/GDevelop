@@ -5,10 +5,16 @@ import {
   customEasingExampleIdentifier,
   formatCubicBezier,
   getEasingFunction,
+  getEasingValueRange,
   isEasingChoiceList,
   parseCubicBezierOrNull,
+  roundCubicBezierNumber,
 } from './Easings';
 import { getEasingPreviewPaths } from '../UI/EasingPreview';
+
+// Shared with the runtime tests of the Tween extension.
+// $FlowFixMe[cannot-resolve-module] - outside of the Flow root.
+const cubicBezierEasingTestCases = require('../../../../Extensions/TweenBehavior/tests/CubicBezierEasingTestCases');
 
 describe('Easings', () => {
   it('has all the easings of the Tween extension', () => {
@@ -78,32 +84,29 @@ describe('Easings', () => {
     expect(isEasingChoiceList(['cubic-bezier(0,0,1,1)', 'linear'])).toBe(false);
   });
 
-  it('parses a cubic-bezier value', () => {
-    expect(parseCubicBezierOrNull('cubic-bezier(.91,.17,.08,.88)')).toEqual([
-      0.91,
-      0.17,
-      0.08,
-      0.88,
-    ]);
-    expect(
-      parseCubicBezierOrNull('  CUBIC-BEZIER( .91 , .17 , .08 , .88 )  ')
-    ).toEqual([0.91, 0.17, 0.08, 0.88]);
-    expect(parseCubicBezierOrNull('cubic-bezier(1e-1,2.5e1,1E0,-3)')).toEqual([
-      0.1,
-      25,
-      1,
-      -3,
-    ]);
+  it('parses a valid cubic-bezier value', () => {
+    cubicBezierEasingTestCases.validIdentifiers.forEach(
+      ([identifier, points]) => {
+        expect(parseCubicBezierOrNull(identifier)).toEqual(points);
+      }
+    );
   });
 
   it('rejects an invalid cubic-bezier value', () => {
-    expect(parseCubicBezierOrNull('cubic-bezier(-0.1,0,1,1)')).toBe(null);
-    expect(parseCubicBezierOrNull('cubic-bezier(0,0,1.1,1)')).toBe(null);
-    expect(parseCubicBezierOrNull('cubic-bezier(0,0,1)')).toBe(null);
-    expect(parseCubicBezierOrNull('cubic-bezier(0,0,1,1,0)')).toBe(null);
-    expect(parseCubicBezierOrNull('cubic-bezier(NaN,0,1,1)')).toBe(null);
-    expect(parseCubicBezierOrNull('')).toBe(null);
-    expect(parseCubicBezierOrNull('easeInQuad')).toBe(null);
+    cubicBezierEasingTestCases.invalidIdentifiers.forEach(identifier => {
+      expect(parseCubicBezierOrNull(identifier)).toBe(null);
+    });
+  });
+
+  it('computes the expected eased values', () => {
+    cubicBezierEasingTestCases.easingSamples.forEach(([points, samples]) => {
+      const easing = createCubicBezierEasing(points);
+      samples.forEach(([progress, expected]) => {
+        expect(Math.abs(easing(progress) - expected)).toBeLessThanOrEqual(
+          cubicBezierEasingTestCases.sampleTolerance
+        );
+      });
+    });
   });
 
   it('gives the same values as linear for cubic-bezier(0,0,1,1)', () => {
@@ -113,18 +116,23 @@ describe('Easings', () => {
     });
   });
 
-  it('matches CSS ease-in-out', () => {
-    const easing = createCubicBezierEasing([0.42, 0, 0.58, 1]);
-    const references = [
-      [0, 0],
-      [0.25, 0.129162],
-      [0.5, 0.5],
-      [0.75, 0.870838],
-      [1, 1],
-    ];
-    references.forEach(([progress, expected]) => {
-      expect(easing(progress)).toBeCloseTo(expected, 3);
+  it('computes the value range of an easing, including 0 and 1', () => {
+    expect(getEasingValueRange(easingFunctions.linear, 100)).toEqual({
+      min: 0,
+      max: 1,
     });
+
+    const range = getEasingValueRange(
+      createCubicBezierEasing([0.12, -4.27, 0.92, 5.48]),
+      200
+    );
+    expect(range.min).toBeCloseTo(-1.109, 2);
+    expect(range.max).toBeCloseTo(2.207, 2);
+  });
+
+  it('rounds a cubic-bezier number to 3 decimals, without -0', () => {
+    expect(roundCubicBezierNumber(0.91264)).toBe(0.913);
+    expect(Object.is(roundCubicBezierNumber(-0.0001), 0)).toBe(true);
   });
 
   it('returns exactly 0 at 0 and exactly 1 at 1', () => {

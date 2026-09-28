@@ -1,8 +1,12 @@
 // @flow
 import {
   easingFunctions,
+  createCubicBezierEasing,
+  customEasingExampleIdentifier,
+  formatCubicBezier,
   getEasingFunction,
   isEasingChoiceList,
+  parseCubicBezierOrNull,
 } from './Easings';
 import { getEasingPreviewPaths } from '../UI/EasingPreview';
 
@@ -71,6 +75,80 @@ describe('Easings', () => {
     expect(isEasingChoiceList(['linear'])).toBe(false);
     expect(isEasingChoiceList(['linear', 'Something else'])).toBe(false);
     expect(isEasingChoiceList([])).toBe(false);
+    expect(isEasingChoiceList(['cubic-bezier(0,0,1,1)', 'linear'])).toBe(false);
+  });
+
+  it('parses a cubic-bezier value', () => {
+    expect(parseCubicBezierOrNull('cubic-bezier(.91,.17,.08,.88)')).toEqual([
+      0.91,
+      0.17,
+      0.08,
+      0.88,
+    ]);
+    expect(
+      parseCubicBezierOrNull('  CUBIC-BEZIER( .91 , .17 , .08 , .88 )  ')
+    ).toEqual([0.91, 0.17, 0.08, 0.88]);
+    expect(parseCubicBezierOrNull('cubic-bezier(1e-1,2.5e1,1E0,-3)')).toEqual([
+      0.1,
+      25,
+      1,
+      -3,
+    ]);
+  });
+
+  it('rejects an invalid cubic-bezier value', () => {
+    expect(parseCubicBezierOrNull('cubic-bezier(-0.1,0,1,1)')).toBe(null);
+    expect(parseCubicBezierOrNull('cubic-bezier(0,0,1.1,1)')).toBe(null);
+    expect(parseCubicBezierOrNull('cubic-bezier(0,0,1)')).toBe(null);
+    expect(parseCubicBezierOrNull('cubic-bezier(0,0,1,1,0)')).toBe(null);
+    expect(parseCubicBezierOrNull('cubic-bezier(NaN,0,1,1)')).toBe(null);
+    expect(parseCubicBezierOrNull('')).toBe(null);
+    expect(parseCubicBezierOrNull('easeInQuad')).toBe(null);
+  });
+
+  it('gives the same values as linear for cubic-bezier(0,0,1,1)', () => {
+    const easing = createCubicBezierEasing([0, 0, 1, 1]);
+    [0, 0.25, 0.5, 0.75, 1].forEach(progress => {
+      expect(easing(progress)).toBe(easingFunctions.linear(progress));
+    });
+  });
+
+  it('matches CSS ease-in-out', () => {
+    const easing = createCubicBezierEasing([0.42, 0, 0.58, 1]);
+    const references = [
+      [0, 0],
+      [0.25, 0.129162],
+      [0.5, 0.5],
+      [0.75, 0.870838],
+      [1, 1],
+    ];
+    references.forEach(([progress, expected]) => {
+      expect(easing(progress)).toBeCloseTo(expected, 3);
+    });
+  });
+
+  it('returns exactly 0 at 0 and exactly 1 at 1', () => {
+    const easing = createCubicBezierEasing([0.91, 0.17, 0.08, 0.88]);
+    expect(easing(0)).toBe(0);
+    expect(easing(1)).toBe(1);
+  });
+
+  it('formats a cubic-bezier value', () => {
+    expect(formatCubicBezier([0.9126, 0.17, 0.08, 0.88])).toBe(
+      'cubic-bezier(.913,.17,.08,.88)'
+    );
+    expect(formatCubicBezier([0.5, -0.56, 0, 1])).toBe(
+      'cubic-bezier(.5,-.56,0,1)'
+    );
+    expect(formatCubicBezier([0.25, 0.1, 0.25, 1])).toBe(
+      customEasingExampleIdentifier
+    );
+    expect(parseCubicBezierOrNull(customEasingExampleIdentifier)).toEqual([
+      0.25,
+      0.1,
+      0.25,
+      1,
+    ]);
   });
 
   it('computes a preview path staying in the given box', () => {
@@ -88,5 +166,14 @@ describe('Easings', () => {
     expect(linearPaths.endGuideY).toBe(2);
 
     expect(getEasingPreviewPaths('unknown', 40, 28, 2)).toBe(null);
+
+    const customPaths = getEasingPreviewPaths(
+      'cubic-bezier(.34,1.56,.64,1)',
+      40,
+      28,
+      2
+    );
+    if (!customPaths) throw new Error('Expected paths to be computed.');
+    expect(customPaths.endGuideY).toBeGreaterThan(2);
   });
 });

@@ -124,6 +124,8 @@ type Props = {|
     style: Object,
     onChange: (newValue: string) => void,
   |}) => React.Node,
+  // When set, replaces the parameter long description under the field.
+  helperMarkdownText?: ?string,
   ...ParameterFieldProps,
 |};
 
@@ -580,9 +582,9 @@ export default class ExpressionField extends React.Component<Props, State> {
       : this.props.isInline
       ? undefined
       : '-'; // We're using multiline TextField, which does not support having no label.
-    const longDescription = parameterMetadata
-      ? parameterMetadata.getLongDescription()
-      : undefined;
+    const longDescription =
+      this.props.helperMarkdownText ||
+      (parameterMetadata ? parameterMetadata.getLongDescription() : undefined);
 
     const popoverStyle = {
       width: this._fieldElementWidth || 'auto',

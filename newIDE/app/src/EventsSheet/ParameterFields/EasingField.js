@@ -1,5 +1,8 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -11,6 +14,10 @@ import StringWithSelectorField, {
 } from './StringWithSelectorField';
 import { getEasingChoices } from './ParameterMetadataTools';
 import EasingPreview from '../../UI/EasingPreview';
+import {
+  customEasingExampleIdentifier,
+  parseCubicBezierOrNull,
+} from '../../Utils/Easings';
 
 const previewSizes = {
   field: { width: 40, height: 24 },
@@ -37,18 +44,34 @@ const renderEasingPreview = (
 );
 
 /**
+ * Syntax shown under the easing field. The value must stay a quoted string
+ * expression, including when it is pasted from cubic-bezier.com.
+ */
+export const getCustomEasingHelperMarkdown = (i18n: I18nType): string => {
+  const quotedExample = `"${customEasingExampleIdentifier}"`;
+  return i18n._(
+    t`For a custom curve, use an expression: ${quotedExample}. x1 and x2 must be between 0 and 1. y1 and y2 can be outside this range.`
+  );
+};
+
+/**
  * A field to choose an easing (as used by the Tween extension), showing a
  * preview of the curve of the selected easing.
  */
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function EasingField(props: ParameterFieldProps, ref) {
     return (
-      <StringWithSelectorField
-        ref={ref}
-        {...props}
-        choices={getEasingChoices(props.parameterMetadata)}
-        renderChoiceAdornment={renderEasingPreview}
-      />
+      <I18n>
+        {({ i18n }) => (
+          <StringWithSelectorField
+            ref={ref}
+            {...props}
+            choices={getEasingChoices(props.parameterMetadata)}
+            renderChoiceAdornment={renderEasingPreview}
+            helperMarkdownText={getCustomEasingHelperMarkdown(i18n)}
+          />
+        )}
+      </I18n>
     );
   }
 ): React.ComponentType<{
@@ -56,10 +79,36 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   +ref?: React.RefSetter<ParameterFieldInterface>,
 }>);
 
+/**
+ * Add the current value to the choices when it is a valid custom literal
+ * (`"cubic-bezier(...)"`), so the events sheet can draw its preview.
+ */
+export const getEasingChoicesWithCustomValue = (
+  parameterMetadata: ?gdParameterMetadata,
+  value: string
+): Array<string> => {
+  const choices = getEasingChoices(parameterMetadata);
+  if (value.length < 2 || value[0] !== '"' || value[value.length - 1] !== '"') {
+    return choices;
+  }
+
+  const easingIdentifier = value.substring(1, value.length - 1);
+  if (
+    !parseCubicBezierOrNull(easingIdentifier) ||
+    choices.indexOf(easingIdentifier) !== -1
+  ) {
+    return choices;
+  }
+  return choices.concat(easingIdentifier);
+};
+
 export const renderInlineEasing = (
   props: ParameterInlineRendererProps
 ): React.Node =>
   renderInlineStringWithSelector(props, {
-    choices: getEasingChoices(props.parameterMetadata),
+    choices: getEasingChoicesWithCustomValue(
+      props.parameterMetadata,
+      props.value
+    ),
     renderChoiceAdornment: renderEasingPreview,
   });

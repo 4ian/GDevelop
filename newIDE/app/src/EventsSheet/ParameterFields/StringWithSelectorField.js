@@ -45,7 +45,19 @@ export type StringWithSelectorFieldProps = {|
   // If specified, displayed next to each choice (an icon, a preview...). The
   // choices are then displayed in a menu instead of a native select.
   renderChoiceAdornment?: RenderChoiceAdornment,
+  // Shown under the field, after the parameter long description.
+  helperMarkdownText?: ?string,
 |};
+
+const joinHelperMarkdown = (
+  parameterLongDescription: ?string,
+  helperMarkdownText: ?string
+): ?string => {
+  const parts: Array<string> = [];
+  if (parameterLongDescription) parts.push(parameterLongDescription);
+  if (helperMarkdownText) parts.push(helperMarkdownText);
+  return parts.length > 0 ? parts.join('  \n') : null;
+};
 
 /**
  * If the value is one of the choices (i.e: `"choice"`), return the choice
@@ -66,6 +78,7 @@ export default (React.forwardRef<
   const {
     choices: choicesFromProps,
     renderChoiceAdornment,
+    helperMarkdownText: helperMarkdownTextFromProps,
     ...parameterFieldProps
   } = props;
   const {
@@ -128,8 +141,10 @@ export default (React.forwardRef<
     parameterIndex !== undefined
       ? `parameter-${parameterIndex}-string-with-selector`
       : undefined;
-  const helperMarkdownText =
-    (parameterMetadata && parameterMetadata.getLongDescription()) || null;
+  const helperMarkdownText = joinHelperMarkdown(
+    parameterMetadata && parameterMetadata.getLongDescription(),
+    helperMarkdownTextFromProps
+  );
 
   const renderSelectField = () =>
     renderChoiceAdornment ? (
@@ -186,6 +201,7 @@ export default (React.forwardRef<
             ref={field}
             id={fieldId}
             {...parameterFieldProps}
+            helperMarkdownText={helperMarkdownText}
             onChange={onChange}
           />
         )

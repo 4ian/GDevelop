@@ -10586,6 +10586,8 @@ const declareInstanceVariableOnObjects = ({
     });
 };
 
+const MAX_LISTED_VARIABLE_LINES = 20;
+
 const addOrEditVariable: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
     const variable_scope = extractRequiredString(args, 'variable_scope');
@@ -10922,8 +10924,21 @@ const addOrEditVariable: EditorFunction = {
     }
 
     // One line per change (so a single variable keeps its original message),
-    // with any warnings appended below.
-    const message = [...changes, ...warnings].join('\n');
+    // with any warnings appended below. Hundreds of values set one by one
+    // would repeat the request (or the same error) line by line: only the
+    // first ones are listed.
+    const listFirstLines = (lines: Array<string>, kind: string) =>
+      lines.length > MAX_LISTED_VARIABLE_LINES
+        ? [
+            ...lines.slice(0, MAX_LISTED_VARIABLE_LINES),
+            `... and ${lines.length -
+              MAX_LISTED_VARIABLE_LINES} more ${kind}, not listed.`,
+          ]
+        : lines;
+    const message = [
+      ...listFirstLines(changes, 'changes'),
+      ...listFirstLines(warnings, 'warnings'),
+    ].join('\n');
     if (changes.length === 0) {
       return makeGenericFailure(message || `No variable was changed.`);
     }

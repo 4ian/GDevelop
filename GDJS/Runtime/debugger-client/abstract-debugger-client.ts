@@ -584,6 +584,8 @@ namespace gdjs {
       }
     }
 
+    abstract dispose(): void;
+
     /**
      * Should be re-implemented by derived class to send a stringified message object
      * to the debugger server.

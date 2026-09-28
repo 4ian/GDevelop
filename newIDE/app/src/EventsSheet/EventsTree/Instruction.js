@@ -17,18 +17,15 @@ import {
   executedInstruction,
   instructionExecutionTime,
 } from './ClassNames';
-import {
-  TrackedEventPtrContext,
-  useInstructionExecution,
-} from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
-import { formatExecutionDuration } from '../../EventsExecutionTracking/EventsExecutionTrackingStore';
-import LiveExpressionValueTooltip from '../../EventsExecutionTracking/LiveExpressionValueTooltip';
+import { useInstructionExecution } from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
+import { formatExecutionDuration } from '../../EventsExecutionTracking/formatting';
+import { getLiveExpressionAttributes } from '../../EventsExecutionTracking/LiveExpressionValueTooltip';
 import { getLastObjectParameterValue } from '../ParameterFields/ParameterMetadataTools';
 import {
   type InstructionsListContext,
   type InstructionContext,
 } from '../SelectionHandler';
-import InstructionsList from './InstructionsList';
+import { InstructionsListWithoutExecutionTracking } from './InstructionsList';
 import DropIndicator from './DropIndicator';
 import ParameterRenderingService from '../ParameterRenderingService';
 import InvalidParameterValue from './InvalidParameterValue';
@@ -379,31 +376,24 @@ const Instruction = (props: Props): React.Node => {
             (valueTypeMetadata.isNumber() ||
               valueTypeMetadata.isString() ||
               valueTypeMetadata.isVariable());
-          const wrapWithLiveValue = (parameterElement: React.Node) =>
-            canShowLiveValue ? (
-              <LiveExpressionValueTooltip
-                key={i}
-                layout={scope.layout}
-                project={scope.project}
-                parameterType={parameterType}
-                expression={value}
-                objectName={getLastObjectParameterValue({
-                  instructionMetadata: metadata,
-                  instruction,
-                  expressionMetadata: null,
-                  expression: null,
-                  parameterIndex,
-                })}
-              >
-                {parameterElement}
-              </LiveExpressionValueTooltip>
-            ) : (
-              parameterElement
-            );
-
-          return wrapWithLiveValue(
+          return (
             <span
               key={i}
+              // Hovered, the value is shown by the tooltip of the events
+              // sheet (one for the whole sheet, not one per parameter).
+              {...(canShowLiveValue
+                ? getLiveExpressionAttributes({
+                    parameterType,
+                    expression: value,
+                    objectName: getLastObjectParameterValue({
+                      instructionMetadata: metadata,
+                      instruction,
+                      expressionMetadata: null,
+                      expression: null,
+                      parameterIndex,
+                    }),
+                  })
+                : null)}
               className={classNames({
                 [selectableArea]: true,
                 [instructionParameter]: true,
@@ -666,53 +656,45 @@ const Instruction = (props: Props): React.Node => {
                 {isOver && <DropIndicator canDrop={canDrop} />}
                 {instructionDragSourceDropTargetElement}
                 {metadata.canHaveSubInstructions() && (
-                  <TrackedEventPtrContext.Provider value={null}>
-                    <InstructionsList
-                      platform={props.platform}
-                      style={
-                        {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
-                      }
-                      className={subInstructionsContainer}
-                      instrsList={instruction.getSubInstructions()}
-                      areConditions={props.isCondition}
-                      selection={props.selection}
-                      onAddNewInstruction={props.onAddNewSubInstruction}
-                      onPasteInstructions={props.onPasteSubInstructions}
-                      onMoveToInstruction={props.onMoveToSubInstruction}
-                      onMoveToInstructionsList={
-                        props.onMoveToSubInstructionsList
-                      }
-                      onInstructionClick={props.onSubInstructionClick}
-                      onInstructionDoubleClick={
-                        props.onSubInstructionDoubleClick
-                      }
-                      onInstructionContextMenu={
-                        props.onSubInstructionContextMenu
-                      }
-                      onAddInstructionContextMenu={
-                        props.onAddSubInstructionContextMenu
-                      }
-                      onParameterClick={props.onSubParameterClick}
-                      addButtonLabel={<Trans>Add a sub-condition</Trans>}
-                      addButtonId="add-sub-condition-button"
-                      disabled={props.disabled}
-                      renderObjectThumbnail={props.renderObjectThumbnail}
-                      screenType={props.screenType}
-                      windowSize={props.windowSize}
-                      scope={props.scope}
-                      resourcesManager={props.resourcesManager}
-                      globalObjectsContainer={props.globalObjectsContainer}
-                      objectsContainer={props.objectsContainer}
-                      projectScopedContainersAccessor={
-                        props.projectScopedContainersAccessor
-                      }
-                      idPrefix={props.id}
-                      highlightedSearchText={props.highlightedSearchText}
-                      highlightedSearchMatchCase={
-                        props.highlightedSearchMatchCase
-                      }
-                    />
-                  </TrackedEventPtrContext.Provider>
+                  <InstructionsListWithoutExecutionTracking
+                    platform={props.platform}
+                    style={
+                      {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+                    }
+                    className={subInstructionsContainer}
+                    instrsList={instruction.getSubInstructions()}
+                    areConditions={props.isCondition}
+                    selection={props.selection}
+                    onAddNewInstruction={props.onAddNewSubInstruction}
+                    onPasteInstructions={props.onPasteSubInstructions}
+                    onMoveToInstruction={props.onMoveToSubInstruction}
+                    onMoveToInstructionsList={props.onMoveToSubInstructionsList}
+                    onInstructionClick={props.onSubInstructionClick}
+                    onInstructionDoubleClick={props.onSubInstructionDoubleClick}
+                    onInstructionContextMenu={props.onSubInstructionContextMenu}
+                    onAddInstructionContextMenu={
+                      props.onAddSubInstructionContextMenu
+                    }
+                    onParameterClick={props.onSubParameterClick}
+                    addButtonLabel={<Trans>Add a sub-condition</Trans>}
+                    addButtonId="add-sub-condition-button"
+                    disabled={props.disabled}
+                    renderObjectThumbnail={props.renderObjectThumbnail}
+                    screenType={props.screenType}
+                    windowSize={props.windowSize}
+                    scope={props.scope}
+                    resourcesManager={props.resourcesManager}
+                    globalObjectsContainer={props.globalObjectsContainer}
+                    objectsContainer={props.objectsContainer}
+                    projectScopedContainersAccessor={
+                      props.projectScopedContainersAccessor
+                    }
+                    idPrefix={props.id}
+                    highlightedSearchText={props.highlightedSearchText}
+                    highlightedSearchMatchCase={
+                      props.highlightedSearchMatchCase
+                    }
+                  />
                 )}
               </React.Fragment>
             );

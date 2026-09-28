@@ -1,6 +1,7 @@
 // @flow
 import {
   getPlainVariables,
+  getVariablePathInGame,
   tooDeeplyNestedMessage,
 } from './variablesContainerData';
 
@@ -82,5 +83,43 @@ describe('variablesContainerData', () => {
       getPlainVariables((({ _variables: '[Max depth reached]' }: any): any))
     ).toBe(null);
     expect(getPlainVariables(makeContainer('[Max depth reached]'))).toBe(null);
+  });
+
+  it('finds where a variable is in the game, to edit it', () => {
+    const container = makeContainer({
+      Score: { _type: 'number', _value: 12 },
+      List: {
+        _type: 'array',
+        _childrenArray: [{ _type: 'number', _value: 1 }],
+      },
+      Settings: {
+        _type: 'structure',
+        _children: { Volume: { _type: 'number', _value: 0.5 } },
+      },
+    });
+    expect(getVariablePathInGame(container, ['Score'])).toEqual([
+      '_variables',
+      'items',
+      'Score',
+    ]);
+    expect(getVariablePathInGame(container, ['Settings', 'Volume'])).toEqual([
+      '_variables',
+      'items',
+      'Settings',
+      '_children',
+      'Volume',
+    ]);
+    expect(getVariablePathInGame(container, ['List', '0'])).toEqual([
+      '_variables',
+      'items',
+      'List',
+      '_childrenArray',
+      '0',
+    ]);
+    // Nothing there: nothing to edit.
+    expect(getVariablePathInGame(container, ['Missing'])).toBe(null);
+    expect(getVariablePathInGame(container, ['Score', 'Child'])).toBe(null);
+    expect(getVariablePathInGame(container, ['List', '3'])).toBe(null);
+    expect(getVariablePathInGame(null, ['Score'])).toBe(null);
   });
 });

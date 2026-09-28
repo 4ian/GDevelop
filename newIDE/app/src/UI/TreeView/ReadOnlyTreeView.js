@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { VariableSizeList } from 'react-window';
 import memoizeOne from 'memoize-one';
+import classNames from 'classnames';
 import classes from './TreeView.module.css';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import ReadOnlyTreeViewRow from './ReadOnlyTreeViewRow';
@@ -165,6 +166,12 @@ type Props<Item> = {|
    * that clips overflow (like AutoSizer).
    */
   stickyPortalTarget?: ?HTMLElement,
+  /**
+   * If true, the content of the rows takes their whole width: what
+   * `getItemName` renders can then place something on the right of the row
+   * (a value...) instead of being as wide as the name.
+   */
+  fullWidthRows?: boolean,
 |};
 
 const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
@@ -194,6 +201,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     arrowKeyNavigationProps,
     enableStickyAncestors,
     stickyPortalTarget,
+    fullWidthRows,
   }: Props<Item>,
   ref: ReadOnlyTreeViewInterface<Item>
   // $FlowFixMe[missing-local-annot]
@@ -521,7 +529,6 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 
   const onScroll = React.useCallback(
     ({ scrollOffset }: {| scrollOffset: number |}) => {
-      scrollOffsetRef.current = scrollOffset;
       scrollOffsetRef.current = scrollOffset;
       updateStickyRows();
     },
@@ -880,7 +887,11 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   const stickyRowsElement =
     enableStickyAncestors && stickyRows.length > 0 ? (
       <div
-        className={classes.stickyRowsContainer}
+        className={classNames(classes.stickyRowsContainer, {
+          // The sticky rows can be rendered outside of the tree (see
+          // `stickyPortalTarget`): they carry the class on their own.
+          [classes.fullWidthRows]: fullWidthRows,
+        })}
         style={{
           height:
             stickyRows[stickyRows.length - 1].top +
@@ -895,6 +906,9 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         {stickyRows
           .map((stickyRow, rowRank) => {
             const node = flattenedData[stickyRow.index];
+            // The sticky rows can reference rows that no longer exist
+            // during the render following a change of the tree - they
+            // are recomputed in a layout effect, before painting.
             if (!node) return null;
             return (
               <div
@@ -912,6 +926,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
                   style={{ height: stickyRow.height }}
                   data={{
                     ...itemData,
+                    // When collapsing from a sticky row, also reveal the
+                    // actual row so the user does not lose their position.
                     onOpen: (node, index) => {
                       onOpen(node, index);
                       onClickStickyRow(rowRank, stickyRow.index);
@@ -922,6 +938,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
               </div>
             );
           })
+          // Render in reverse DOM order so that, during the "push"
+          // transition, the deepest row slides under its ancestors.
           .reverse()}
       </div>
     ) : null;
@@ -929,13 +947,12 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   return (
     <div
       tabIndex={0}
-      className={classes.treeView}
+      className={classNames(classes.treeView, {
+        [classes.fullWidthRows]: fullWidthRows,
+      })}
       onKeyDown={onKeyDown}
       ref={containerRef}
     >
-      {stickyPortalTarget
-        ? ReactDOM.createPortal(stickyRowsElement, stickyPortalTarget)
-        : stickyRowsElement}
       <VariableSizeList
         height={height}
         itemCount={flattenedData.length}
@@ -958,6 +975,11 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       >
         {ReadOnlyTreeViewRow}
       </VariableSizeList>
+      {/* After the list, as they always were: the order of the tabs and of
+          the queries on the rows is unchanged for the other trees. */}
+      {stickyPortalTarget
+        ? ReactDOM.createPortal(stickyRowsElement, stickyPortalTarget)
+        : stickyRowsElement}
     </div>
   );
 };

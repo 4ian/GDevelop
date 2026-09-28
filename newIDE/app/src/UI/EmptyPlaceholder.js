@@ -20,6 +20,8 @@ import { textEllipsisStyle } from './TextEllipsis';
 type Props = {|
   title: React.Node,
   description: React.Node,
+  /** Let a long description wrap on several lines, instead of cutting it. */
+  multilineDescription?: boolean,
   helpPagePath?: string,
   helpPageAnchor?: string,
   tutorialId?: string,
@@ -29,6 +31,8 @@ type Props = {|
   actionIcon?: React.Node,
   actionBuildSplitMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onAction: () => void,
+  /** Shows the action, but disabled (it cannot be done right now). */
+  actionDisabled?: boolean,
   secondaryActionLabel?: React.Node,
   secondaryActionIcon?: React.Node,
   onSecondaryAction?: () => void,
@@ -74,10 +78,14 @@ export const EmptyPlaceholder = (props: Props): React.Node => (
         <Text
           align="center"
           noMargin
-          style={{
-            ...textEllipsisStyle,
-            flex: 1,
-          }}
+          style={
+            props.multilineDescription
+              ? { flex: 1 }
+              : {
+                  ...textEllipsisStyle,
+                  flex: 1,
+                }
+          }
         >
           {props.description}
         </Text>
@@ -98,7 +106,7 @@ export const EmptyPlaceholder = (props: Props): React.Node => (
                 label={props.actionLabel}
                 primary
                 onClick={props.onAction}
-                disabled={!!props.isLoading}
+                disabled={!!props.isLoading || !!props.actionDisabled}
                 icon={
                   props.isLoading ? (
                     <CircularProgress size={24} />
@@ -116,7 +124,7 @@ export const EmptyPlaceholder = (props: Props): React.Node => (
                 label={props.actionLabel}
                 primary
                 onClick={props.onAction}
-                disabled={!!props.isLoading}
+                disabled={!!props.isLoading || !!props.actionDisabled}
                 icon={
                   props.isLoading ? (
                     <CircularProgress size={24} />

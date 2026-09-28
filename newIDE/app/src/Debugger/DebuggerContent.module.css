@@ -1,37 +1,16 @@
+/* Holds the mosaic of the inspector: the list and the inspected element. */
 .inspector {
+  position: relative;
   display: flex;
   flex: 1;
   min-height: 0;
   min-width: 0;
 }
 
-/* The list of what lives in the scene (objects, instances, variables...). */
-.sceneContentList {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  min-width: 0;
-  min-height: 0;
-}
-
-/* Dragged to resize the list. */
-.resizeHandle {
-  flex-shrink: 0;
-  width: 6px;
-  cursor: col-resize;
-  background-color: var(--theme-list-item-separator-color);
-}
-
-.resizeHandle:hover {
-  background-color: var(--theme-primary-light);
-}
-
-.inspectorDetails {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-  min-height: 0;
+/* The mosaic of the debugger already moves up when the soft keyboard opens:
+   moving the inspector too would move it twice. */
+.inspector :global(.mosaic.avoid-soft-keyboard) {
+  transform: none;
 }
 
 /* The inspected element fills the pane: its tree scrolls, not the pane. */

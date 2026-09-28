@@ -1,5 +1,12 @@
 .container {
   position: fixed;
+  /*
+   * Above the Material UI dialogs (1300) and snackbars (1400), so that the
+   * panel stays usable while an instruction or variables are edited. No theme
+   * token exists for it. It is the z-index of the Material UI tooltips on
+   * purpose: rendered after the panel, they still show over it, which a
+   * higher value (like `aboveMaterialUiMaxZIndex`) would prevent.
+   */
   z-index: 1500;
   display: flex;
   flex-direction: column;

@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import JsonTreeView from './JsonTreeView';
+import InspectorTreeView from './InspectorTreeView';
 import { type GameData } from '../GDJSInspectorDescriptions';
 import EmptyMessage from '../../UI/EmptyMessage';
 
@@ -13,7 +13,7 @@ type Props = {|
 
 /**
  * A very simple inspector that display the raw information given by the gameData
- * object.
+ * object. Every number, text and boolean can be changed in the running game.
  */
 const RawContentInspector = ({ gameData, onEdit }: Props): React.Node => (
   <React.Fragment>
@@ -23,7 +23,7 @@ const RawContentInspector = ({ gameData, onEdit }: Props): React.Node => (
         shown as is.
       </Trans>
     </EmptyMessage>
-    <JsonTreeView src={gameData} />
+    <InspectorTreeView src={gameData} onEditSrc={onEdit} />
   </React.Fragment>
 );
 

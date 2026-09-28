@@ -2,22 +2,50 @@
 import * as React from 'react';
 import Tooltip from '@material-ui/core/Tooltip';
 import Text from '../UI/Text';
-import EventsExecutionTrackingContext from './EventsExecutionTrackingContext';
+import { formatEvaluationValue } from './formatting';
 import {
-  formatEvaluationValue,
-  type ExpressionEvaluation,
-} from './EventsExecutionTrackingStore';
+  useLiveExpressionEvaluations,
+  type LiveExpression,
+} from './UseLiveExpressionEvaluations';
 import classes from './LiveExpressionValueTooltip.module.css';
 
-const gd: libGDevelop = global.gd;
-
-/** How often the value is refreshed while the parameter is hovered. */
-const REFRESH_INTERVAL_MS = 300;
 /** The tooltip follows the mouse, but not at every pixel. */
 const MOUSE_MOVE_THRESHOLD_PX = 8;
 const TOOLTIP_OFFSET_PX = 14;
 
+const EXPRESSION_ATTRIBUTE = 'data-live-expression';
+const PARAMETER_TYPE_ATTRIBUTE = 'data-live-expression-type';
+const OBJECT_NAME_ATTRIBUTE = 'data-live-expression-object';
+
+/**
+ * What a parameter of an instruction carries so that its value is shown when
+ * it is hovered: attributes read by the tooltip of the events sheet, instead
+ * of a tooltip (and its listeners) for every parameter of every instruction.
+ */
+export const getLiveExpressionAttributes = ({
+  parameterType,
+  expression,
+  objectName,
+}: {|
+  /** The type of the parameter ("number", "string", "variable", "scenevar"...). */
+  parameterType: string,
+  expression: string,
+  /** The object owning the variable, for object variables. */
+  objectName: ?string,
+|}): { [string]: string } => ({
+  [EXPRESSION_ATTRIBUTE]: expression,
+  [PARAMETER_TYPE_ATTRIBUTE]: parameterType,
+  [OBJECT_NAME_ATTRIBUTE]: objectName || '',
+});
+
 type MousePosition = {| x: number, y: number |};
+
+type HoveredExpression = {|
+  element: Element,
+  expression: string,
+  parameterType: string,
+  objectName: string,
+|};
 
 /**
  * An anchor for the tooltip at the position of the mouse (a "virtual element",
@@ -37,98 +65,125 @@ const makeMouseAnchor = (mousePosition: MousePosition) => ({
   }),
 });
 
+const findHoveredExpression = (target: EventTarget): ?HoveredExpression => {
+  if (!(target instanceof Element)) return null;
+  const element = target.closest(`[${EXPRESSION_ATTRIBUTE}]`);
+  if (!element) return null;
+  return {
+    element,
+    expression: element.getAttribute(EXPRESSION_ATTRIBUTE) || '',
+    parameterType: element.getAttribute(PARAMETER_TYPE_ATTRIBUTE) || '',
+    objectName: element.getAttribute(OBJECT_NAME_ATTRIBUTE) || '',
+  };
+};
+
 type Props = {|
-  children: React.Node,
+  /** The element holding the events sheet: its hovered parameters are followed. */
+  containerRef: {| current: ?HTMLElement |},
   /** The scene the events belong to. Values can't be read without one. */
   layout: ?gdLayout,
   project: gdProject,
-  /** The type of the parameter ("number", "string", "variable", "scenevar"...). */
-  parameterType: string,
-  expression: string,
-  /** The object owning the variable, for object variables. */
-  objectName: string | null,
 |};
 
 /**
- * Show, while the parameter is hovered and a preview is running, the value of
- * its expression in the game and the values of the variables it uses.
+ * Show, while a parameter of the events sheet is hovered and a preview is
+ * running, the value of its expression in the game and the values of the
+ * variables it uses. There is one for a whole events sheet.
  */
 const LiveExpressionValueTooltip = ({
-  children,
+  containerRef,
   layout,
   project,
-  parameterType,
-  expression,
-  objectName,
 }: Props): React.Node => {
-  const store = React.useContext(EventsExecutionTrackingContext);
-  const [isHovered, setIsHovered] = React.useState(false);
+  const [
+    hoveredExpression,
+    setHoveredExpression,
+  ] = React.useState<HoveredExpression | null>(null);
   const [
     mousePosition,
     setMousePosition,
   ] = React.useState<MousePosition | null>(null);
-  const [
-    evaluation,
-    setEvaluation,
-  ] = React.useState<ExpressionEvaluation | null>(null);
 
+  // The mouse is followed on the whole sheet with three listeners, whatever
+  // the number of parameters shown.
   React.useEffect(
     () => {
-      if (!isHovered || !layout || !store.hasRunningPreview()) return;
+      const container = containerRef.current;
+      if (!container) return;
 
-      // The code is generated once per hover: it depends on the events, not
-      // on the game state.
-      let code: string | null = null;
-      const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
-      try {
-        code = layoutCodeGenerator.generateExpressionEvaluationCode(
-          layout,
-          parameterType,
-          expression,
-          objectName || ''
+      const onMouseOver = (event: MouseEvent) => {
+        const newHoveredExpression = findHoveredExpression(event.target);
+        setHoveredExpression(previousHoveredExpression =>
+          previousHoveredExpression &&
+          newHoveredExpression &&
+          previousHoveredExpression.element === newHoveredExpression.element
+            ? previousHoveredExpression
+            : newHoveredExpression
         );
-      } catch (error) {
-        console.error(
-          `Unable to generate the code evaluating "${expression}" (${parameterType}):`,
-          error
-        );
-      } finally {
-        layoutCodeGenerator.delete();
-      }
-      if (code === null) return;
-      const generatedCode = code;
-
-      let isCancelled = false;
-      const refresh = async () => {
-        const newEvaluation = await store.evaluateExpression(generatedCode);
-        if (!isCancelled) setEvaluation(newEvaluation);
+        if (newHoveredExpression) {
+          setMousePosition({ x: event.clientX, y: event.clientY });
+        }
       };
-      refresh();
-      const intervalId = setInterval(refresh, REFRESH_INTERVAL_MS);
+      const onMouseMove = (event: MouseEvent) => {
+        setMousePosition(previousPosition =>
+          previousPosition &&
+          Math.abs(previousPosition.x - event.clientX) <
+            MOUSE_MOVE_THRESHOLD_PX &&
+          Math.abs(previousPosition.y - event.clientY) < MOUSE_MOVE_THRESHOLD_PX
+            ? previousPosition
+            : { x: event.clientX, y: event.clientY }
+        );
+      };
+      const onMouseLeave = () => setHoveredExpression(null);
 
+      container.addEventListener('mouseover', onMouseOver);
+      container.addEventListener('mousemove', onMouseMove);
+      container.addEventListener('mouseleave', onMouseLeave);
       return () => {
-        isCancelled = true;
-        clearInterval(intervalId);
-        setEvaluation(null);
+        container.removeEventListener('mouseover', onMouseOver);
+        container.removeEventListener('mousemove', onMouseMove);
+        container.removeEventListener('mouseleave', onMouseLeave);
       };
     },
-    [isHovered, layout, store, project, parameterType, expression, objectName]
+    [containerRef]
   );
 
-  const onMouseEnter = React.useCallback((event: MouseEvent) => {
-    setMousePosition({ x: event.clientX, y: event.clientY });
-    setIsHovered(true);
-  }, []);
-  const onMouseLeave = React.useCallback(() => setIsHovered(false), []);
-  const onMouseMove = React.useCallback((event: MouseEvent) => {
-    setMousePosition(previousPosition =>
-      previousPosition &&
-      Math.abs(previousPosition.x - event.clientX) < MOUSE_MOVE_THRESHOLD_PX &&
-      Math.abs(previousPosition.y - event.clientY) < MOUSE_MOVE_THRESHOLD_PX
-        ? previousPosition
-        : { x: event.clientX, y: event.clientY }
-    );
-  }, []);
+  const expression = hoveredExpression ? hoveredExpression.expression : null;
+  const parameterType = hoveredExpression
+    ? hoveredExpression.parameterType
+    : null;
+  const objectName = hoveredExpression ? hoveredExpression.objectName : null;
+
+  // Only the hovered parameter is followed: its code is generated once per
+  // hover, as it depends on the events, not on the game state.
+  // Keyed by what is evaluated: the value of the parameter hovered before
+  // is never shown for the one hovered now.
+  const liveExpressionKey = `${parameterType || ''}:${objectName ||
+    ''}:${expression || ''}`;
+  const liveExpressions: Array<LiveExpression> = React.useMemo(
+    () =>
+      expression !== null && parameterType !== null
+        ? [
+            {
+              key: liveExpressionKey,
+              expression,
+              parameterType,
+              objectName: objectName || '',
+            },
+          ]
+        : [],
+    [expression, parameterType, objectName, liveExpressionKey]
+  );
+  const { evaluations, previewStatus } = useLiveExpressionEvaluations({
+    project,
+    layout,
+    liveExpressions,
+  });
+  // Nothing is shown once the preview stops: the value would be the one of a
+  // game that does not run anymore.
+  const evaluation =
+    previewStatus === 'running' ? evaluations[liveExpressionKey] || null : null;
+
   const mouseAnchor = React.useMemo(
     () => (mousePosition ? makeMouseAnchor(mousePosition) : null),
     [mousePosition]
@@ -144,12 +199,12 @@ const LiveExpressionValueTooltip = ({
     variableExpressions.length > 0 &&
     !(
       variableExpressions.length === 1 &&
-      variableExpressions[0] === expression.trim()
+      variableExpressions[0] === (expression || '').trim()
     );
 
   return (
     <Tooltip
-      open={isHovered && !!evaluation && !!mouseAnchor}
+      open={!!hoveredExpression && !!evaluation && !!mouseAnchor}
       placement="bottom-start"
       classes={{ tooltip: classes.tooltip }}
       PopperProps={mouseAnchor ? { anchorEl: mouseAnchor } : undefined}
@@ -191,13 +246,8 @@ const LiveExpressionValueTooltip = ({
         )
       }
     >
-      <span
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onMouseMove={onMouseMove}
-      >
-        {children}
-      </span>
+      {/* The tooltip is anchored to the mouse: this is only its placeholder. */}
+      <span />
     </Tooltip>
   );
 };

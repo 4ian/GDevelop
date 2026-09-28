@@ -3,6 +3,8 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Debugger from '../../Debugger';
+import DebuggerSessionContext from '../../Debugger/DebuggerSessionContext';
+import PreferencesContext from '../Preferences/PreferencesContext';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
@@ -151,20 +153,31 @@ export class DebuggerEditorContainer extends React.Component<
 
     return (
       <React.Fragment>
-        <Debugger
-          project={project}
-          setToolbar={this.props.setToolbar}
-          previewDebuggerServer={previewDebuggerServer}
-          onLaunchDebuggerAndPreview={this.props.onLaunchDebuggerAndPreview}
-          onClosePreviews={this.props.onClosePreviews}
-          isWatchedVariablesPanelOpen={this.props.isWatchedVariablesPanelOpen}
-          onToggleWatchedVariablesPanel={
-            this.props.onToggleWatchedVariablesPanel
-          }
-          debuggerPlaySpeed={this.props.debuggerPlaySpeed}
-          setDebuggerPlaySpeed={this.props.setDebuggerPlaySpeed}
-          ref={editor => (this.editor = editor)}
-        />
+        {/* Read from a context rather than from the props: it is shared
+            with the main frame, whatever the window the debugger is in. */}
+        <DebuggerSessionContext.Consumer>
+          {debuggerSession => (
+            <PreferencesContext.Consumer>
+              {({
+                values,
+                setDebuggerShouldRecordOnLaunch,
+                setDebuggerShouldClearOnRecord,
+              }) => (
+                <Debugger
+                  project={project}
+                  setToolbar={this.props.setToolbar}
+                  previewDebuggerServer={previewDebuggerServer}
+                  debuggerSession={debuggerSession}
+                  shouldRecordOnLaunch={values.debuggerShouldRecordOnLaunch}
+                  setShouldRecordOnLaunch={setDebuggerShouldRecordOnLaunch}
+                  shouldClearOnRecord={values.debuggerShouldClearOnRecord}
+                  setShouldClearOnRecord={setDebuggerShouldClearOnRecord}
+                  ref={editor => (this.editor = editor)}
+                />
+              )}
+            </PreferencesContext.Consumer>
+          )}
+        </DebuggerSessionContext.Consumer>
         <SubscriptionChecker
           ref={subscriptionChecker =>
             (this._subscriptionChecker = subscriptionChecker)

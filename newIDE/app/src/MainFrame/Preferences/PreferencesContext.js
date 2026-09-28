@@ -50,7 +50,7 @@ export type AlertMessageIdentifier =
 export type EditorMosaicName =
   | 'scene-editor'
   | 'debugger'
-  | 'debugger-v3'
+  | 'debugger-inspector'
   | 'resources-editor'
   | 'events-functions-extension-editor'
   | 'gameplay-test-editor';
@@ -263,6 +263,10 @@ export type PreferencesValues = {|
   disableNpmScriptConfirmation: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
+  /** Start recording in the debugger as soon as the game is launched or restarted. */
+  debuggerShouldRecordOnLaunch: boolean,
+  /** Forget what the debugger recorded when a new recording is started. */
+  debuggerShouldClearOnRecord: boolean,
 |};
 
 /**
@@ -406,6 +410,8 @@ export type Preferences = {|
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
   setShowJsTypeError: (enabled: boolean) => void,
   setCanonicalEventSerialization: (enabled: boolean) => void,
+  setDebuggerShouldRecordOnLaunch: (enabled: boolean) => void,
+  setDebuggerShouldClearOnRecord: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -479,6 +485,8 @@ export const initialPreferences = {
     disableNpmScriptConfirmation: false,
     showJsTypeError: false,
     canonicalEventSerialization: false,
+    debuggerShouldRecordOnLaunch: false,
+    debuggerShouldClearOnRecord: true,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -585,6 +593,8 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
   setShowJsTypeError: (enabled: boolean) => {},
   setCanonicalEventSerialization: (enabled: boolean) => {},
+  setDebuggerShouldRecordOnLaunch: (enabled: boolean) => {},
+  setDebuggerShouldClearOnRecord: (enabled: boolean) => {},
 };
 
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(

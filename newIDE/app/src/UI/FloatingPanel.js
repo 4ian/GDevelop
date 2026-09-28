@@ -18,19 +18,60 @@ const windowTopMargin = windowMargin * 3;
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
 
+// How many floating panels are shown, for the dialogs that let the user type
+// in them (see `useIsAnyFloatingPanelOpened`).
+let openedFloatingPanelsCount = 0;
+const openedFloatingPanelsListeners: Set<() => void> = new Set();
+const notifyOpenedFloatingPanelsListeners = () =>
+  openedFloatingPanelsListeners.forEach(listener => listener());
+
+/**
+ * Whether a floating panel is shown. A dialog lets the focus go to it only
+ * then: otherwise, the dialog keeps the focus inside itself, as usual.
+ */
+export const useIsAnyFloatingPanelOpened = (): boolean => {
+  const [isAnyOpened, setIsAnyOpened] = React.useState<boolean>(
+    openedFloatingPanelsCount > 0
+  );
+  React.useEffect(() => {
+    const update = () => setIsAnyOpened(openedFloatingPanelsCount > 0);
+    openedFloatingPanelsListeners.add(update);
+    update();
+    return () => {
+      openedFloatingPanelsListeners.delete(update);
+    };
+  }, []);
+  return isAnyOpened;
+};
+
 type Position = {| left: number, bottom: number |};
 type Size = {| width: number, height: number |};
 
-const clampPositionToWindow = (position: Position, size: Size): Position => ({
+/**
+ * The window showing the element: the panel can be displayed in a window of
+ * its own (an editor popped out of the main window), whose size is not the
+ * one of the main window.
+ */
+const getOwnerWindow = (element: ?HTMLElement): any =>
+  (element && element.ownerDocument.defaultView) || window;
+
+const clampPositionToWindow = (
+  position: Position,
+  size: Size,
+  ownerWindow: any
+): Position => ({
   left: clamp(
     position.left,
     windowMargin,
-    Math.max(windowMargin, window.innerWidth - size.width - windowMargin)
+    Math.max(windowMargin, ownerWindow.innerWidth - size.width - windowMargin)
   ),
   bottom: clamp(
     position.bottom,
     windowMargin,
-    Math.max(windowMargin, window.innerHeight - size.height - windowTopMargin)
+    Math.max(
+      windowMargin,
+      ownerWindow.innerHeight - size.height - windowTopMargin
+    )
   ),
 });
 
@@ -97,6 +138,7 @@ const FloatingPanel = ({
   const [isMinimized, setIsMinimized] = React.useState<boolean>(false);
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
   const [isResizing, setIsResizing] = React.useState<boolean>(false);
+  const containerRef = React.useRef<?HTMLDivElement>(null);
   const dragOrigin = React.useRef<{|
     pointerId: number,
     clientX: number,
@@ -112,14 +154,41 @@ const FloatingPanel = ({
     direction: ResizeDirection,
   |} | null>(null);
 
+  React.useEffect(() => {
+    openedFloatingPanelsCount++;
+    notifyOpenedFloatingPanelsListeners();
+    return () => {
+      openedFloatingPanelsCount--;
+      notifyOpenedFloatingPanelsListeners();
+    };
+  }, []);
+
   // A position restored from a previous session can be outside of a window
   // that has since been made smaller: bring the panel back in view.
   React.useEffect(() => {
     setPosition(currentPosition =>
-      clampPositionToWindow(currentPosition, size)
+      clampPositionToWindow(
+        currentPosition,
+        size,
+        getOwnerWindow(containerRef.current)
+      )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // The same when the window showing the panel is made smaller.
+  React.useEffect(
+    () => {
+      const ownerWindow = getOwnerWindow(containerRef.current);
+      const onWindowResize = () =>
+        setPosition(currentPosition =>
+          clampPositionToWindow(currentPosition, size, ownerWindow)
+        );
+      ownerWindow.addEventListener('resize', onWindowResize);
+      return () => ownerWindow.removeEventListener('resize', onWindowResize);
+    },
+    [size]
+  );
 
   const onPointerDown = React.useCallback(
     (event: PointerEvent) => {
@@ -152,7 +221,8 @@ const FloatingPanel = ({
             // The panel is anchored to the bottom of the window.
             bottom: origin.position.bottom - (event.clientY - origin.clientY),
           },
-          size
+          size,
+          getOwnerWindow(containerRef.current)
         )
       );
     },
@@ -200,15 +270,16 @@ const FloatingPanel = ({
       const deltaX = event.clientX - origin.clientX;
       const deltaY = event.clientY - origin.clientY;
       const { direction } = origin;
+      const ownerWindow = getOwnerWindow(containerRef.current);
 
       // The window space available for the moving edges to grow into (the
       // others are anchored and stay in place).
       const maxWidth = direction.includes('left')
         ? origin.size.width + origin.position.left - windowMargin
-        : window.innerWidth - windowMargin - origin.position.left;
+        : ownerWindow.innerWidth - windowMargin - origin.position.left;
       const maxHeight = direction.includes('bottom')
         ? origin.size.height + origin.position.bottom - windowMargin
-        : window.innerHeight - windowTopMargin - origin.position.bottom;
+        : ownerWindow.innerHeight - windowTopMargin - origin.position.bottom;
 
       const newSize = { ...origin.size };
       if (direction.includes('left')) {
@@ -266,6 +337,7 @@ const FloatingPanel = ({
 
   return (
     <div
+      ref={containerRef}
       className={classNames({
         [classes.container]: true,
         [classes.dragging]: isDragging,

@@ -113,7 +113,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
             ],
           },
           {
-            label: i18n._(t`Kill the running previews`),
+            label: i18n._(t`Force kill previews`),
             click: onClosePreviews,
             enabled: hasPreviewsRunning,
           },

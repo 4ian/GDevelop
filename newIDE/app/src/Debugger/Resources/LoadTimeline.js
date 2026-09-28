@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import { LineStackLayout } from '../../UI/Layout';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import Text from '../../UI/Text';
 import FlatButton from '../../UI/FlatButton';
@@ -8,17 +9,17 @@ import { type ProfilerRecordingRange } from '../ProfilerRecording/ProfilerRecord
 import { formatGameTime } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import { useCanvasWithDevicePixelRatio } from '../useCanvasWithDevicePixelRatio';
 import { getResourceKindColor } from '../themeColors';
-import Paper from '../../UI/Paper';
+import { ChartTooltip, FloatingChartTooltip } from '../../UI/ChartTooltip';
 import {
   describeOrigin,
-  formatBytes,
-  formatDurationMs,
   getLoadDurationMs,
   type ResourceLoadRecord,
   type ResourcesDebugState,
 } from './ResourcesDebugTypes';
 import RangeBrush from '../RangeBrush';
+import { useTimelineViewport } from '../useTimelineViewport';
 import classes from './Resources.module.css';
+import { formatBytes, formatShortDuration } from '../../Utils/FormatMeasures';
 
 type Props = {|
   state: ResourcesDebugState,
@@ -35,7 +36,12 @@ type Props = {|
 const RULER_HEIGHT = 16;
 const ROW_HEIGHT = 6;
 const ROW_GAP = 1;
-const tooltipPaperStyle = { padding: '6px 8px', maxWidth: 280 };
+/** The narrowest view: a resource loaded instantly is still visible. */
+const MIN_VIEW_SPAN_MS = 10;
+/** Below this movement of the mouse, a drag is read as a click. */
+const CLICK_TOLERANCE_PX = 3;
+const TOOLTIP_MAX_WIDTH = 280;
+const TOOLTIP_ESTIMATED_HEIGHT = 70;
 
 type TimelineRow = {|
   record: ResourceLoadRecord,
@@ -63,6 +69,7 @@ const LoadTimeline = ({
     canvasRef,
     size,
     getContext,
+    getLocalPosition,
   } = useCanvasWithDevicePixelRatio();
   const [view, setView] = React.useState<?ProfilerRecordingRange>(null);
   const [hoveredRow, setHoveredRow] = React.useState<?{|
@@ -70,10 +77,10 @@ const LoadTimeline = ({
     x: number,
     y: number,
   |}>(null);
-  const panStartRef = React.useRef<?{|
-    x: number,
+  // The horizontal part of a drag is handled by the viewport, this is the
+  // vertical one (when the rows are zoomed).
+  const verticalPanStartRef = React.useRef<?{|
     y: number,
-    view: ProfilerRecordingRange,
     verticalScrollPx: number,
   |}>(null);
 
@@ -118,7 +125,7 @@ const LoadTimeline = ({
    */
   const clampViewToBounds = React.useCallback(
     (fromMs: number, toMs: number): ProfilerRecordingRange => {
-      const minimumSpanMs = 10;
+      const minimumSpanMs = MIN_VIEW_SPAN_MS;
       let clampedFrom = Math.max(bounds.fromMs, Math.min(fromMs, bounds.toMs));
       let clampedTo = Math.min(bounds.toMs, Math.max(toMs, bounds.fromMs));
       if (clampedTo - clampedFrom < minimumSpanMs) {
@@ -174,11 +181,21 @@ const LoadTimeline = ({
     },
     [focusRequest, rows] // eslint-disable-line react-hooks/exhaustive-deps
   );
-  const viewSpanMs = Math.max(1, shownView.toMs - shownView.fromMs);
-  const timeToX = React.useCallback(
-    (timeMs: number) => ((timeMs - shownView.fromMs) / viewSpanMs) * size.width,
-    [shownView.fromMs, viewSpanMs, size.width]
-  );
+  const {
+    viewSpanMs,
+    timeToX,
+    xToTime,
+    zoomAroundX,
+    startPan,
+    panTo,
+    endPan,
+  } = useTimelineViewport({
+    width: size.width,
+    bounds,
+    view: shownView,
+    onChangeView: setView,
+    minSpanMs: MIN_VIEW_SPAN_MS,
+  });
 
   // Vertical zoom: 1 fits every row in the strip, more makes rows taller
   // (and the strip scrollable).
@@ -308,16 +325,6 @@ const LoadTimeline = ({
     ]
   );
 
-  const getLocalPosition = (event: SyntheticMouseEvent<HTMLDivElement>) => {
-    const container = containerRef.current;
-    if (!container) return { x: 0, y: 0 };
-    const rectangle = container.getBoundingClientRect();
-    return {
-      x: event.clientX - rectangle.left,
-      y: event.clientY - rectangle.top,
-    };
-  };
-
   const findRowAt = (x: number, y: number): ?TimelineRow => {
     if (y < RULER_HEIGHT) return null;
     const rowIndex = Math.floor(
@@ -325,7 +332,7 @@ const LoadTimeline = ({
     );
     const row = rows[rowIndex];
     if (!row) return null;
-    const timeMs = shownView.fromMs + (x / size.width) * viewSpanMs;
+    const timeMs = xToTime(x);
     // A few pixels of tolerance, as bars can be thinner than a pixel.
     const toleranceMs = (3 / size.width) * viewSpanMs;
     return timeMs >= row.startMs - toleranceMs &&
@@ -365,36 +372,20 @@ const LoadTimeline = ({
       );
       return;
     }
-    const { x } = getLocalPosition(event);
-    const anchorMs = shownView.fromMs + (x / size.width) * viewSpanMs;
-    const zoomFactor = Math.exp(event.deltaY * 0.002);
-    const newSpanMs = Math.max(
-      10,
-      Math.min(bounds.toMs - bounds.fromMs, viewSpanMs * zoomFactor)
-    );
-    let fromMs = anchorMs - (x / size.width) * newSpanMs;
-    fromMs = Math.max(bounds.fromMs, Math.min(bounds.toMs - newSpanMs, fromMs));
-    setView({ fromMs, toMs: fromMs + newSpanMs });
+    zoomAroundX(getLocalPosition(event).x, event.deltaY);
   };
 
   const onMouseMove = (event: SyntheticMouseEvent<HTMLDivElement>) => {
     const { x, y } = getLocalPosition(event);
-    const panStart = panStartRef.current;
-    if (panStart && size.width) {
-      const deltaMs = ((panStart.x - x) / size.width) * viewSpanMs;
-      let fromMs = panStart.view.fromMs + deltaMs;
-      fromMs = Math.max(
-        bounds.fromMs,
-        Math.min(bounds.toMs - viewSpanMs, fromMs)
-      );
-      setView({ fromMs, toMs: fromMs + viewSpanMs });
+    const verticalPanStart = verticalPanStartRef.current;
+    if (verticalPanStart && panTo(x)) {
       // Dragging also scrolls vertically when the rows are zoomed.
       setVerticalScrollPx(
         Math.max(
           0,
           Math.min(
             maximumVerticalScrollPx,
-            panStart.verticalScrollPx + (panStart.y - y)
+            verticalPanStart.verticalScrollPx + (verticalPanStart.y - y)
           )
         )
       );
@@ -411,7 +402,11 @@ const LoadTimeline = ({
 
   return (
     <div className={classes.section}>
-      <div className={classes.sectionTitleRow}>
+      <LineStackLayout
+        noMargin
+        alignItems="center"
+        justifyContent="space-between"
+      >
         <Text noMargin size="body-small" color="secondary">
           <Trans>
             When each resource was loaded ({resourcesCount} resources), since
@@ -427,7 +422,7 @@ const LoadTimeline = ({
             setVerticalScrollPx(0);
           }}
         />
-      </div>
+      </LineStackLayout>
       <div
         ref={containerRef}
         className={classes.loadTimeline}
@@ -435,22 +430,21 @@ const LoadTimeline = ({
         onMouseDown={event => {
           if (event.button !== 0) return;
           const { x, y } = getLocalPosition(event);
-          panStartRef.current = {
-            x,
+          startPan(x);
+          verticalPanStartRef.current = {
             y,
-            view: shownView,
             verticalScrollPx: clampedVerticalScrollPx,
           };
         }}
         onMouseMove={onMouseMove}
         onMouseUp={event => {
-          const panStart = panStartRef.current;
-          panStartRef.current = null;
+          const panStartX = endPan();
+          verticalPanStartRef.current = null;
+          const { x, y } = getLocalPosition(event);
           if (
-            panStart &&
-            Math.abs(getLocalPosition(event).x - panStart.x) < 3
+            panStartX != null &&
+            Math.abs(x - panStartX) < CLICK_TOLERANCE_PX
           ) {
-            const { x, y } = getLocalPosition(event);
             const row = findRowAt(x, y);
             onSelectResource(
               row && row.record.name !== selectedResourceName
@@ -460,7 +454,8 @@ const LoadTimeline = ({
           }
         }}
         onMouseLeave={() => {
-          panStartRef.current = null;
+          endPan();
+          verticalPanStartRef.current = null;
           setHoveredRow(null);
         }}
         onDoubleClick={() => {
@@ -471,29 +466,33 @@ const LoadTimeline = ({
       >
         <canvas ref={canvasRef} className={classes.canvas} />
         {hoveredRow && (
-          <div
-            className={classes.tooltip}
-            style={{
-              left: Math.min(hoveredRow.x + 12, Math.max(0, size.width - 280)),
-              top: Math.min(hoveredRow.y + 14, Math.max(0, size.height - 70)),
-            }}
+          <FloatingChartTooltip
+            x={hoveredRow.x}
+            y={hoveredRow.y}
+            containerWidth={size.width}
+            containerHeight={size.height}
+            maxWidth={TOOLTIP_MAX_WIDTH}
+            estimatedHeight={TOOLTIP_ESTIMATED_HEIGHT}
           >
-            <Paper background="light" elevation={4} style={tooltipPaperStyle}>
-              <Text noMargin size="body-small">
-                {hoveredRow.row.record.name} ({hoveredRow.row.record.kind})
-              </Text>
+            <ChartTooltip
+              size="small"
+              title={`${hoveredRow.row.record.name} (${
+                hoveredRow.row.record.kind
+              })`}
+              maxWidth={TOOLTIP_MAX_WIDTH}
+            >
               <Text noMargin size="body-small" color="secondary">
                 {describeOrigin(hoveredRow.row.record.origin)} - started at{' '}
                 {formatGameTime(hoveredRow.row.startMs)}, took{' '}
-                {formatDurationMs(getLoadDurationMs(hoveredRow.row.record))}
+                {formatShortDuration(getLoadDurationMs(hoveredRow.row.record))}
                 {hoveredRow.row.record.estimatedMemoryBytes != null
                   ? ` - ${formatBytes(
                       hoveredRow.row.record.estimatedMemoryBytes
                     )}`
                   : ''}
               </Text>
-            </Paper>
-          </div>
+            </ChartTooltip>
+          </FloatingChartTooltip>
         )}
       </div>
       <RangeBrush

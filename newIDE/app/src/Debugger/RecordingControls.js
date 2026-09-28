@@ -11,28 +11,18 @@ import {
   useProfilerRecording,
   type ProfilerRecording,
 } from './ProfilerRecording/ProfilerRecordingStore';
-import {
-  formatClockDuration,
-  getRecordingTimeBounds,
-} from './ProfilerRecording/ProfilerRecordingAggregation';
+import { getRecordingTimeBounds } from './ProfilerRecording/ProfilerRecordingAggregation';
+import { formatClockDuration } from '../Utils/FormatMeasures';
+import { useInterval } from '../Utils/UseInterval';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 /** Re-render the elapsed time of a running recording this often. */
 const CLOCK_REFRESH_MS = 1000;
 
 const useRecordingClock = (recording: ?ProfilerRecording): number => {
-  const [, setTick] = React.useState(0);
+  const forceUpdate = useForceUpdate();
   const isRecording = !!recording && recording.status === 'recording';
-  React.useEffect(
-    () => {
-      if (!isRecording) return;
-      const intervalId = setInterval(
-        () => setTick(tick => tick + 1),
-        CLOCK_REFRESH_MS
-      );
-      return () => clearInterval(intervalId);
-    },
-    [isRecording]
-  );
+  useInterval(forceUpdate, isRecording ? CLOCK_REFRESH_MS : null);
   if (!recording) return 0;
   const bounds = getRecordingTimeBounds(recording);
   return bounds.toMs - bounds.fromMs;

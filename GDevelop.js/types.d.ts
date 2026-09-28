@@ -1681,7 +1681,6 @@ export class ParameterMetadata extends EmscriptenObject {
   static isObject(param: string): boolean;
   static isBehavior(param: string): boolean;
   static isExpression(type_: string, parameterType: string): boolean;
-  static isResourceExpression(value: string): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
 }
@@ -3262,7 +3261,8 @@ export class LayoutCodeGenerator extends EmscriptenObject {
 
 export class BehaviorCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateRuntimeBehaviorCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean, generateEventsExecutionTracking: boolean): string;
+  generateRuntimeBehaviorCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  setGenerateEventsExecutionTracking(enable: boolean): void;
   static getBehaviorPropertyGetterName(propertyName: string): string;
   static getBehaviorPropertySetterName(propertyName: string): string;
   static getBehaviorPropertyToggleFunctionName(propertyName: string): string;
@@ -3273,7 +3273,8 @@ export class BehaviorCodeGenerator extends EmscriptenObject {
 
 export class ObjectCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateRuntimeObjectCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean, generateEventsExecutionTracking: boolean): string;
+  generateRuntimeObjectCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  setGenerateEventsExecutionTracking(enable: boolean): void;
   static getObjectPropertyGetterName(propertyName: string): string;
   static getObjectPropertySetterName(propertyName: string): string;
   static getObjectPropertyToggleFunctionName(propertyName: string): string;
@@ -3281,7 +3282,8 @@ export class ObjectCodeGenerator extends EmscriptenObject {
 
 export class EventsFunctionsExtensionCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean, generateEventsExecutionTracking: boolean): string;
+  generateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean): string;
+  setGenerateEventsExecutionTracking(enable: boolean): void;
 }
 
 export class PreviewExportOptions extends EmscriptenObject {

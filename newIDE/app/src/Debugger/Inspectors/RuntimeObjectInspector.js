@@ -4,8 +4,9 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import InspectorTreeView, {
-  buildValueItems,
+  buildPropertiesItems,
   makeSection,
+  type InspectedProperty,
 } from './InspectorTreeView';
 import {
   type GameData,
@@ -28,30 +29,82 @@ type Props = {|
   onReadValues: ReadValuesFunction,
 |};
 
-/** Where the object is, in the order the user expects (not sorted). */
-const getGeneralProperties = (runtimeObject: GameData, i18n: I18nType) => {
+/**
+ * Where the object is, in the order the user expects (not sorted), each one
+ * changed in the game by the method of the object that the events use too.
+ */
+const getGeneralProperties = (
+  runtimeObject: GameData,
+  onCall: CallFunction,
+  i18n: I18nType
+): ?Array<InspectedProperty> => {
   if (!runtimeObject) return null;
-  const properties = {};
-  properties[i18n._(t`X position`)] = runtimeObject.x;
-  properties[i18n._(t`Y position`)] = runtimeObject.y;
+  const callWith = (methodName: string) => (newValue: any) =>
+    onCall([methodName], [newValue]);
   // TODO: Improve check to have more robust type checking
   const is3D = typeof runtimeObject._z !== 'undefined';
-  if (is3D) {
-    properties[i18n._(t`Z position`)] = runtimeObject._z;
-    properties[i18n._(t`Rotation around X axis`)] = runtimeObject._rotationX;
-    properties[i18n._(t`Rotation around Y axis`)] = runtimeObject._rotationY;
-    properties[i18n._(t`Rotation around Z axis (Angle)`)] = runtimeObject.angle;
-  } else {
-    properties[i18n._(t`Angle`)] = runtimeObject.angle;
-  }
-  properties[i18n._(t`Layer`)] = runtimeObject.layer;
-  properties[i18n._(t`Z order`)] = runtimeObject.zOrder;
-  properties[i18n._(t`Is hidden?`)] = runtimeObject.hidden;
-  return properties;
+  return [
+    {
+      name: i18n._(t`X position`),
+      value: runtimeObject.x,
+      onEdit: callWith('setX'),
+    },
+    {
+      name: i18n._(t`Y position`),
+      value: runtimeObject.y,
+      onEdit: callWith('setY'),
+    },
+    ...(is3D
+      ? [
+          {
+            name: i18n._(t`Z position`),
+            value: runtimeObject._z,
+            onEdit: callWith('setZ'),
+          },
+          {
+            name: i18n._(t`Rotation around X axis`),
+            value: runtimeObject._rotationX,
+            onEdit: callWith('setRotationX'),
+          },
+          {
+            name: i18n._(t`Rotation around Y axis`),
+            value: runtimeObject._rotationY,
+            onEdit: callWith('setRotationY'),
+          },
+          {
+            name: i18n._(t`Rotation around Z axis (Angle)`),
+            value: runtimeObject.angle,
+            onEdit: callWith('setAngle'),
+          },
+        ]
+      : [
+          {
+            name: i18n._(t`Angle`),
+            value: runtimeObject.angle,
+            onEdit: callWith('setAngle'),
+          },
+        ]),
+    {
+      name: i18n._(t`Layer`),
+      value: runtimeObject.layer,
+      onEdit: callWith('setLayer'),
+    },
+    {
+      name: i18n._(t`Z order`),
+      value: runtimeObject.zOrder,
+      onEdit: callWith('setZOrder'),
+    },
+    {
+      name: i18n._(t`Is hidden?`),
+      value: runtimeObject.hidden,
+      onEdit: callWith('hide'),
+    },
+  ];
 };
 
 const RuntimeObjectInspectorTree = ({
   runtimeObject,
+  onCall,
   onReadValues,
   i18n,
 }: {|
@@ -70,9 +123,10 @@ const RuntimeObjectInspectorTree = ({
       makeSection(
         'general',
         i18n._(t`General`),
-        buildValueItems('general', getGeneralProperties(runtimeObject, i18n), {
-          sorted: false,
-        }),
+        buildPropertiesItems(
+          'general',
+          getGeneralProperties(runtimeObject, onCall, i18n)
+        ),
         { isRoot: true, icon: <ObjectIcon /> }
       ),
       makeSection(
@@ -80,7 +134,9 @@ const RuntimeObjectInspectorTree = ({
         i18n._(t`Instance variables`),
         buildVariablesItems(
           'variables',
-          runtimeObject ? runtimeObject._variables : null
+          runtimeObject ? runtimeObject._variables : null,
+          onCall,
+          ['_variables']
         ),
         {
           isRoot: true,
@@ -107,7 +163,7 @@ const RuntimeObjectInspectorTree = ({
         }
       ),
     ],
-    [runtimeObject, behaviorsItems, i18n]
+    [runtimeObject, behaviorsItems, onCall, i18n]
   );
 
   return <InspectorTreeView items={items} />;

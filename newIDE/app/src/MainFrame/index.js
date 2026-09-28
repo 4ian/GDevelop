@@ -204,6 +204,7 @@ import {
 } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import WatchedVariablesPanel from '../EventsExecutionTracking/WatchedVariablesPanel';
 import EventsExecutionTrackingContext from '../EventsExecutionTracking/EventsExecutionTrackingContext';
+import DebuggerSessionContext from '../Debugger/DebuggerSessionContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
@@ -3043,6 +3044,11 @@ const MainFrame = (props: Props): React.MixedElement => {
 
           previewWindows,
         });
+        // The events sheets can show again what the game reports: its code
+        // was just generated from the events as they are now.
+        if (!isForInGameEdition) {
+          eventsExecutionTrackingStore.onEventsCodeGenerated();
+        }
 
         setPreviewLoading(null);
 
@@ -3095,6 +3101,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       authenticatedUser.profile,
       eventsFunctionsExtensionsState,
       ensureCanAccessResources,
+      eventsExecutionTrackingStore,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
       preferences.values.openDiagnosticReportAutomatically,
@@ -3527,6 +3534,24 @@ const MainFrame = (props: Props): React.MixedElement => {
       launchNewPreview({ isForDebugger: true });
     },
     [openDebugger, launchNewPreview, setDebuggerPlaySpeed]
+  );
+
+  const debuggerSession = React.useMemo(
+    () => ({
+      debuggerPlaySpeed,
+      setDebuggerPlaySpeed,
+      isWatchedVariablesPanelOpen,
+      onToggleWatchedVariablesPanel: toggleWatchedVariablesPanel,
+      onLaunchDebuggerAndPreview: launchDebuggerAndPreview,
+      onClosePreviews: closeAllPreviews,
+    }),
+    [
+      debuggerPlaySpeed,
+      isWatchedVariablesPanelOpen,
+      toggleWatchedVariablesPanel,
+      launchDebuggerAndPreview,
+      closeAllPreviews,
+    ]
   );
 
   const openInstructionOrExpression = (type: string) => {
@@ -6117,10 +6142,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId,
     hasPreviewsRunning: hasNonEditionPreviewsRunning,
     previewState: previewState,
-    debuggerPlaySpeed,
-    setDebuggerPlaySpeed,
-    isWatchedVariablesPanelOpen,
-    onToggleWatchedVariablesPanel: toggleWatchedVariablesPanel,
     checkedOutVersionStatus: checkedOutVersionStatus,
     canDoNetworkPreview:
       !!_previewLauncher.current &&
@@ -6365,55 +6386,59 @@ const MainFrame = (props: Props): React.MixedElement => {
       {// Render games platform frame before the editors, so the editor have priority
       // in what to display (ex: Loader of play section)
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
-      <PoppedOutWindows
-        {...editorTabsPaneProps}
-        onClose={onExternalWindowClose}
-        onPopIn={onPopInTab}
-      />
-      {/* Editors of the main window register their commands in their own
-      command manager, so that they stay separated from the ones of the popped
-      out windows (rendered above, outside of this provider): a keyboard
-      shortcut must always run the command of the window where it was pressed. */}
-      <WindowCommandsProvider>
-        <LeaderboardProvider
-          gameId={currentProject ? currentProject.getProjectUuid() : ''}
-        >
-          {renderNpmScriptConfirmDialog()}
-          <PanesContainer
-            hasEditorsInLeftPane={hasEditorsInLeftPane}
-            hasEditorsInRightPane={hasEditorsInRightPane}
-            onRequestDrawerClose={requestCloseAskAiDrawerInPane}
-            renderPane={({
-              paneIdentifier,
-              isLeftMostPane,
-              isRightMostPane,
-              isDrawer,
-              areSidePanesDrawers,
-              onSetPointerEventsNone,
-              onSetPaneDrawerState,
-              onRequestPaneClose,
-              drawerState,
-              rightPaneDrawerOpen,
-            }) => (
-              <EditorTabsPane
-                {...editorTabsPaneProps}
-                paneIdentifier={paneIdentifier}
-                isLeftMostPane={isLeftMostPane}
-                isRightMostPane={isRightMostPane}
-                isDrawer={isDrawer}
-                areSidePanesDrawers={areSidePanesDrawers}
-                onSetPointerEventsNone={onSetPointerEventsNone}
-                onSetPaneDrawerState={onSetPaneDrawerState}
-                onPopOutTab={onPopOutTab}
-                onRequestPaneClose={onRequestPaneClose}
-                drawerState={drawerState}
-                rightPaneDrawerOpen={rightPaneDrawerOpen}
-              />
-            )}
-          />
-        </LeaderboardProvider>
-        <CommandPalette ref={commandPaletteRef} />
-      </WindowCommandsProvider>
+      {/* The debugger, in the main window or popped out, shares its session
+      (play speed, watched variables, previews) with the main frame. */}
+      <DebuggerSessionContext.Provider value={debuggerSession}>
+        <PoppedOutWindows
+          {...editorTabsPaneProps}
+          onClose={onExternalWindowClose}
+          onPopIn={onPopInTab}
+        />
+        {/* Editors of the main window register their commands in their own
+        command manager, so that they stay separated from the ones of the popped
+        out windows (rendered above, outside of this provider): a keyboard
+        shortcut must always run the command of the window where it was pressed. */}
+        <WindowCommandsProvider>
+          <LeaderboardProvider
+            gameId={currentProject ? currentProject.getProjectUuid() : ''}
+          >
+            {renderNpmScriptConfirmDialog()}
+            <PanesContainer
+              hasEditorsInLeftPane={hasEditorsInLeftPane}
+              hasEditorsInRightPane={hasEditorsInRightPane}
+              onRequestDrawerClose={requestCloseAskAiDrawerInPane}
+              renderPane={({
+                paneIdentifier,
+                isLeftMostPane,
+                isRightMostPane,
+                isDrawer,
+                areSidePanesDrawers,
+                onSetPointerEventsNone,
+                onSetPaneDrawerState,
+                onRequestPaneClose,
+                drawerState,
+                rightPaneDrawerOpen,
+              }) => (
+                <EditorTabsPane
+                  {...editorTabsPaneProps}
+                  paneIdentifier={paneIdentifier}
+                  isLeftMostPane={isLeftMostPane}
+                  isRightMostPane={isRightMostPane}
+                  isDrawer={isDrawer}
+                  areSidePanesDrawers={areSidePanesDrawers}
+                  onSetPointerEventsNone={onSetPointerEventsNone}
+                  onSetPaneDrawerState={onSetPaneDrawerState}
+                  onPopOutTab={onPopOutTab}
+                  onRequestPaneClose={onRequestPaneClose}
+                  drawerState={drawerState}
+                  rightPaneDrawerOpen={rightPaneDrawerOpen}
+                />
+              )}
+            />
+          </LeaderboardProvider>
+          <CommandPalette ref={commandPaletteRef} />
+        </WindowCommandsProvider>
+      </DebuggerSessionContext.Provider>
       <LoaderModal
         showImmediately={showLoaderImmediately}
         showAfterDelay={showLoaderAfterDelay}

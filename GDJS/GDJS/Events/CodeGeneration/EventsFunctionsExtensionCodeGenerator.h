@@ -33,8 +33,15 @@ class EventsFunctionsExtensionCodeGenerator {
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime,
-      bool generateEventsExecutionTracking = false);
+      bool compilationForRuntime);
+
+  /**
+   * rief Also generate the code reporting the executed instructions to the
+   * debugger (only for the previews launched with the debugger).
+   */
+  void SetGenerateEventsExecutionTracking(bool enable) {
+    generateEventsExecutionTracking = enable;
+  }
 
  private:
   /**
@@ -46,6 +53,7 @@ class EventsFunctionsExtensionCodeGenerator {
       const gd::String& codeNamespace);
 
   gd::Project& project;
+  bool generateEventsExecutionTracking = false;
 };
 
 }  // namespace gdjs

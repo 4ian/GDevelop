@@ -2028,7 +2028,6 @@ interface ParameterMetadata {
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
     boolean STATIC_IsExpression([Const] DOMString type_, [Const] DOMString parameterType);
-    boolean STATIC_IsResourceExpression([Const] DOMString value);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -4427,8 +4426,8 @@ interface BehaviorCodeGenerator {
         [Const] DOMString codeNamespace,
         [Const, Ref] MapStringString behaviorMethodMangledNames,
         [Ref] SetString includes,
-        boolean compilationForRuntime,
-        boolean generateEventsExecutionTracking);
+        boolean compilationForRuntime);
+    void SetGenerateEventsExecutionTracking(boolean enable);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyToggleFunctionName([Const] DOMString propertyName);
@@ -4446,8 +4445,8 @@ interface ObjectCodeGenerator {
         [Const] DOMString codeNamespace,
         [Const, Ref] MapStringString objectMethodMangledNames,
         [Ref] SetString includes,
-        boolean compilationForRuntime,
-        boolean generateEventsExecutionTracking);
+        boolean compilationForRuntime);
+    void SetGenerateEventsExecutionTracking(boolean enable);
     [Const, Value] DOMString STATIC_GetObjectPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetObjectPropertySetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetObjectPropertyToggleFunctionName([Const] DOMString propertyName);
@@ -4456,7 +4455,8 @@ interface ObjectCodeGenerator {
 [Prefix="gdjs::"]
 interface EventsFunctionsExtensionCodeGenerator {
     void EventsFunctionsExtensionCodeGenerator([Ref] Project project);
-    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunctionsExtension extension, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime, boolean generateEventsExecutionTracking);
+    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunctionsExtension extension, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime);
+    void SetGenerateEventsExecutionTracking(boolean enable);
 };
 
 [Prefix="gdjs::"]

@@ -24,10 +24,7 @@ import {
   saveUiSettings,
 } from './EditorTabs/EditorTabsHandler';
 import { type PreviewState } from './PreviewState';
-import {
-  type DebuggerPlaySpeed,
-  type LaunchDebuggerAndPreviewOptions,
-} from '../EventsExecutionTracking/EventsExecutionTrackingStore';
+import { type LaunchDebuggerAndPreviewOptions } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
@@ -110,10 +107,6 @@ export type EditorTabsPaneCommonProps = {|
   isSharingEnabled: boolean,
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
-  debuggerPlaySpeed: DebuggerPlaySpeed,
-  setDebuggerPlaySpeed: DebuggerPlaySpeed => void,
-  isWatchedVariablesPanelOpen: boolean,
-  onToggleWatchedVariablesPanel: () => void,
   checkedOutVersionStatus: ?OpenedVersionStatus,
   canDoNetworkPreview: boolean,
   gamesPlatformFrameTools: GamesPlatformFrameTools,
@@ -380,10 +373,6 @@ const EditorTabsPane: React.ComponentType<{
     isSharingEnabled,
     hasPreviewsRunning,
     previewState,
-    debuggerPlaySpeed,
-    setDebuggerPlaySpeed,
-    isWatchedVariablesPanelOpen,
-    onToggleWatchedVariablesPanel,
     checkedOutVersionStatus,
     canDoNetworkPreview,
     gamesPlatformFrameTools,
@@ -849,12 +838,6 @@ const EditorTabsPane: React.ComponentType<{
                     onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,
                     hotReloadPreviewButtonProps,
-                    onLaunchDebuggerAndPreview: launchDebuggerAndPreview,
-                    onClosePreviews: closeAllPreviews,
-                    isWatchedVariablesPanelOpen,
-                    onToggleWatchedVariablesPanel,
-                    debuggerPlaySpeed,
-                    setDebuggerPlaySpeed,
                     onRestartInGameEditor,
                     showRestartInGameEditorAfterErrorButton,
                     resourceManagementProps,

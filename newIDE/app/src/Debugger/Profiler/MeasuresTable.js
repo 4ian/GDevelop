@@ -3,12 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import classNames from 'classnames';
-import {
-  AutoSizer,
-  Table as RVTable,
-  Column as RVColumn,
-  SortDirection,
-} from 'react-virtualized';
+import { Column as RVColumn, SortDirection } from 'react-virtualized';
 import { type ProfilerMeasuresSection } from '..';
 import {
   compareMeasures,
@@ -16,8 +11,16 @@ import {
 } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
-import { renderSortableHeader } from '../../UI/VirtualizedTableSortableHeader';
+import SortableVirtualizedTable, {
+  numberCellClassName,
+  useTableSort,
+} from '../../UI/SortableVirtualizedTable';
 import classes from './Profiler.module.css';
+import {
+  formatMilliseconds,
+  formatSignedDelta,
+  formatSignedPercent,
+} from '../../Utils/FormatMeasures';
 
 type Props = {|
   profilerMeasures: ?ProfilerMeasuresSection,
@@ -51,23 +54,19 @@ type ProfilerRowData = {|
 type SortKey = 'name' | 'time' | 'parentPercent' | 'totalPercent' | 'deltaMs';
 
 const ROW_HEIGHT = 28;
-const HEADER_HEIGHT = 30;
 const minimumWidths = { table: 360, name: 140, number: 72 };
 
-const formatTime = (row: ProfilerRowData) =>
-  row.time ? `${row.time.toFixed(2)} ms` : '?';
+const formatTime = (row: ProfilerRowData) => formatMilliseconds(row.time);
 const formatPercent = (row: ProfilerRowData, percent: number) =>
   row.time ? `${percent.toFixed(1)}%` : '-';
 /** A time that may be missing on one side: a dash, never a zero. */
-const formatOptionalTime = (timeMs: ?number) =>
-  timeMs == null ? '-' : `${timeMs.toFixed(2)} ms`;
+const formatOptionalTime = (timeMs: ?number) => formatMilliseconds(timeMs);
 /** Signed, so that lighter and heavier are told apart at a glance. */
 const formatDelta = (row: ProfilerRowData) => {
-  if (row.deltaMs == null) return '-';
-  const sign = row.deltaMs > 0 ? '+' : '';
-  const percent =
-    row.deltaPercent == null ? '' : ` (${sign}${row.deltaPercent.toFixed(0)}%)`;
-  return `${sign}${row.deltaMs.toFixed(2)} ms${percent}`;
+  const formattedDelta = formatSignedDelta(row.deltaMs, formatMilliseconds);
+  return row.deltaMs == null || row.deltaPercent == null
+    ? formattedDelta
+    : `${formattedDelta} (${formatSignedPercent(row.deltaPercent)})`;
 };
 
 /**
@@ -83,10 +82,7 @@ const MeasuresTable = ({
   const [collapsedPaths, setCollapsedPaths] = React.useState<{
     [string]: boolean,
   }>({});
-  const [sortBy, setSortBy] = React.useState<SortKey>('time');
-  const [sortDirection, setSortDirection] = React.useState<'ASC' | 'DESC'>(
-    SortDirection.DESC
-  );
+  const { sortBy, sortDirection, onSort } = useTableSort<SortKey>('time');
 
   const toggleSection = (path: string) => {
     setCollapsedPaths({ ...collapsedPaths, [path]: !collapsedPaths[path] });
@@ -198,59 +194,38 @@ const MeasuresTable = ({
 
   return (
     <div className={classes.measuresTable} style={{ height }}>
-      <AutoSizer>
-        {({ width, height: tableHeight }) => (
-          <RVTable
-            headerHeight={HEADER_HEIGHT}
-            height={tableHeight}
-            className="gd-table"
-            headerClassName="tableHeaderColumn"
-            headerStyle={{
-              backgroundColor: 'var(--table-header-background-color)',
-            }}
-            rowCount={rows.length}
-            rowGetter={({ index }) => rows[index]}
-            rowHeight={ROW_HEIGHT}
-            rowClassName={({ index }) =>
-              index < 0
-                ? 'tableHeaderRow'
-                : classNames(
-                    index % 2 === 0 ? 'tableEvenRow' : 'tableOddRow',
-                    classes.shareRow,
-                    { [classes.rootRow]: rows[index].depth === 0 },
-                    {
-                      // A section of one run only (a renamed group, a scene
-                      // that was not played): dimmed, never hidden.
-                      [classes.oneSidedRow]:
-                        isCompared &&
-                        (rows[index].ownTime == null ||
-                          rows[index].baselineTime == null),
-                    }
-                  )
+      <SortableVirtualizedTable
+        rows={rows}
+        rowHeight={ROW_HEIGHT}
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+        onSort={onSort}
+        getRowClassName={row =>
+          classNames(
+            classes.shareRow,
+            { [classes.rootRow]: row.depth === 0 },
+            {
+              // A section of one run only (a renamed group, a scene that was
+              // not played): dimmed, never hidden.
+              [classes.oneSidedRow]:
+                isCompared && (row.ownTime == null || row.baselineTime == null),
             }
-            rowStyle={({ index }) =>
-              index < 0
-                ? {}
-                : { '--profiler-share': `${rows[index].totalShare}%` }
-            }
-            onRowClick={({ rowData }) => {
-              if (rowData.hasSubsections) toggleSection(rowData.path);
-            }}
-            sort={({ sortBy: newSortBy, sortDirection: newSortDirection }) => {
-              setSortBy(newSortBy);
-              setSortDirection(newSortDirection);
-            }}
-            sortBy={sortBy}
-            sortDirection={sortDirection}
-            width={Math.max(width, minimumWidths.table)}
-          >
+          )
+        }
+        getRowStyle={row => ({ '--profiler-share': `${row.totalShare}%` })}
+        onRowClick={row => {
+          if (row.hasSubsections) toggleSection(row.path);
+        }}
+        minimumWidth={minimumWidths.table}
+      >
+        {width => (
+          <>
             <RVColumn
               label={<Trans>Section name</Trans>}
               dataKey="name"
               width={Math.max(width * 0.55, minimumWidths.name)}
               flexGrow={1}
               className="tableColumn"
-              headerRenderer={renderSortableHeader}
               cellRenderer={({ rowData }) => (
                 <span
                   className={classes.nameCell}
@@ -289,8 +264,7 @@ const MeasuresTable = ({
               label={<Trans>Time (ms)</Trans>}
               dataKey="time"
               width={Math.max(width * 0.15, minimumWidths.number)}
-              className={classNames('tableColumn', classes.numberCell)}
-              headerRenderer={renderSortableHeader}
+              className={classNames('tableColumn', numberCellClassName)}
               cellDataGetter={({ rowData }) => formatTime(rowData)}
             />
             <RVColumn
@@ -299,9 +273,8 @@ const MeasuresTable = ({
               width={Math.max(width * 0.15, minimumWidths.number)}
               className={classNames(
                 'tableColumn tableColumnSecondary',
-                classes.numberCell
+                numberCellClassName
               )}
-              headerRenderer={renderSortableHeader}
               cellDataGetter={({ rowData }) =>
                 formatPercent(rowData, rowData.parentPercent)
               }
@@ -312,9 +285,8 @@ const MeasuresTable = ({
               width={Math.max(width * 0.15, minimumWidths.number)}
               className={classNames(
                 'tableColumn tableColumnSecondary',
-                classes.numberCell
+                numberCellClassName
               )}
-              headerRenderer={renderSortableHeader}
               cellDataGetter={({ rowData }) =>
                 formatPercent(rowData, rowData.totalPercent)
               }
@@ -326,9 +298,8 @@ const MeasuresTable = ({
                 width={Math.max(width * 0.15, minimumWidths.number)}
                 className={classNames(
                   'tableColumn tableColumnSecondary',
-                  classes.numberCell
+                  numberCellClassName
                 )}
-                headerRenderer={renderSortableHeader}
                 cellDataGetter={({ rowData }) =>
                   formatOptionalTime(rowData.baselineTime)
                 }
@@ -339,14 +310,13 @@ const MeasuresTable = ({
                 label={<Trans>Difference</Trans>}
                 dataKey="deltaMs"
                 width={Math.max(width * 0.2, minimumWidths.number)}
-                className={classNames('tableColumn', classes.numberCell)}
-                headerRenderer={renderSortableHeader}
+                className={classNames('tableColumn', numberCellClassName)}
                 cellDataGetter={({ rowData }) => formatDelta(rowData)}
               />
             )}
-          </RVTable>
+          </>
         )}
-      </AutoSizer>
+      </SortableVirtualizedTable>
     </div>
   );
 };

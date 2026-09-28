@@ -1740,13 +1740,19 @@ storiesOf('DebuggerContent', module)
       <FixedHeightFlexContainer height={550}>
         <DebuggerContent
           gameData={debuggerGameDataDump}
+          isGameDataTruncated={false}
           onPause={action('on pause')}
           onPlay={action('on play')}
           onRefresh={action('on refresh')}
           onInspectPath={async () => null}
           onEdit={() => false}
           onCall={() => false}
+          onReadValues={async () => null}
           profilingInProgress={false}
+          baselineRecording={null}
+          baselineResourcesDebugState={null}
+          canRecord={false}
+          onStartRecording={action('on start recording')}
           profilerRecordingStore={makeFakeRecordingStore(5000)}
           debuggerId="0"
           resourcesDebugSnapshot={null}
@@ -1764,13 +1770,19 @@ storiesOf('DebuggerContent', module)
       <FixedHeightFlexContainer height={550}>
         <DebuggerContent
           gameData={null}
+          isGameDataTruncated={false}
           onPause={action('on pause')}
           onPlay={action('on play')}
           onRefresh={action('on refresh')}
           onInspectPath={async () => null}
           onEdit={() => false}
           onCall={() => false}
+          onReadValues={async () => null}
           profilingInProgress={true}
+          baselineRecording={null}
+          baselineResourcesDebugState={null}
+          canRecord={false}
+          onStartRecording={action('on start recording')}
           profilerRecordingStore={makeFakeRecordingStore(5000)}
           debuggerId="0"
           resourcesDebugSnapshot={null}

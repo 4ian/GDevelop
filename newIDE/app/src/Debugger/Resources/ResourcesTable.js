@@ -2,26 +2,21 @@
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import classNames from 'classnames';
-import {
-  AutoSizer,
-  Table as RVTable,
-  Column as RVColumn,
-  SortDirection,
-} from 'react-virtualized';
+import { Column as RVColumn } from 'react-virtualized';
 import Tooltip from '@material-ui/core/Tooltip';
 import { I18n } from '@lingui/react';
 import type { I18n as I18nType } from '@lingui/core';
 import StatusChip from '../../UI/StatusChip';
 import EmptyMessage from '../../UI/EmptyMessage';
-import { renderSortableHeader } from '../../UI/VirtualizedTableSortableHeader';
+import SortableVirtualizedTable, {
+  numberCellClassName,
+  useTableSort,
+} from '../../UI/SortableVirtualizedTable';
 import { getDefaultResourceThumbnailForKind } from '../../ResourcesList';
 import { formatGameTime } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import {
   compareResource,
   describeOrigin,
-  formatBytes,
-  formatDurationMs,
-  formatSignedDelta,
   getLoadDurationMs,
   indexResourcesByName,
   sortResources,
@@ -31,6 +26,11 @@ import {
   type ResourcesSortKey,
 } from './ResourcesDebugTypes';
 import classes from './Resources.module.css';
+import {
+  formatBytes,
+  formatShortDuration,
+  formatSignedDelta,
+} from '../../Utils/FormatMeasures';
 
 /**
  * The words of the runtime, not those of the network: a game reads most of its
@@ -101,7 +101,7 @@ const renderComparisonCell = (
   comparison: ResourceComparison,
   formatComparison: ResourceComparison => string
 ): React.Node => (
-  <div className={classNames(classes.cell, classes.numberCell)}>
+  <div className={classNames(classes.cell, numberCellClassName)}>
     {comparison.isMissingInBaseline
       ? i18n._(t`new`)
       : formatComparison(comparison)}
@@ -120,7 +120,6 @@ type Props = {|
 |};
 
 const ROW_HEIGHT = 32;
-const HEADER_HEIGHT = 30;
 
 /**
  * Every resource of the game with its state, in a table sorted by clicking
@@ -132,11 +131,8 @@ const ResourcesTable = ({
   onSelectResource,
   baselineRecords,
 }: Props): React.Node => {
-  const [sortBy, setSortBy] = React.useState<ResourcesSortKey>(
+  const { sortBy, sortDirection, onSort } = useTableSort<ResourcesSortKey>(
     'estimatedMemoryBytes'
-  );
-  const [sortDirection, setSortDirection] = React.useState<'ASC' | 'DESC'>(
-    SortDirection.DESC
   );
   const sortedRecords = React.useMemo(
     () => sortResources(records, sortBy, sortDirection),
@@ -159,56 +155,32 @@ const ResourcesTable = ({
     <I18n>
       {({ i18n }: {| i18n: I18nType |}) => (
         <div className={classes.table}>
-          <AutoSizer>
-            {({ width, height }) => (
-              <RVTable
-                width={width}
-                height={height}
-                headerHeight={HEADER_HEIGHT}
-                rowHeight={ROW_HEIGHT}
-                rowCount={sortedRecords.length}
-                rowGetter={({ index }) => sortedRecords[index]}
-                sort={({
-                  sortBy: newSortBy,
-                  sortDirection: newSortDirection,
-                }) => {
-                  setSortBy(newSortBy);
-                  setSortDirection(newSortDirection);
-                }}
-                sortBy={sortBy}
-                sortDirection={sortDirection}
-                className="gd-table"
-                headerClassName="tableHeaderColumn"
-                headerStyle={{
-                  backgroundColor: 'var(--table-header-background-color)',
-                }}
-                rowClassName={({ index }) =>
-                  index < 0
-                    ? 'tableHeaderRow'
-                    : sortedRecords[index].name === selectedResourceName
-                    ? 'tableSelectedRow'
-                    : index % 2 === 0
-                    ? 'tableEvenRow'
-                    : 'tableOddRow'
-                }
-                onRowClick={({ rowData }) =>
-                  onSelectResource(
-                    rowData.name === selectedResourceName ? null : rowData.name
+          <SortableVirtualizedTable
+            rows={sortedRecords}
+            rowHeight={ROW_HEIGHT}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            onSort={onSort}
+            isRowSelected={record => record.name === selectedResourceName}
+            onRowClick={record =>
+              onSelectResource(
+                record.name === selectedResourceName ? null : record.name
+              )
+            }
+            scrollToIndex={
+              selectedResourceName
+                ? sortedRecords.findIndex(
+                    record => record.name === selectedResourceName
                   )
-                }
-                scrollToIndex={
-                  selectedResourceName
-                    ? sortedRecords.findIndex(
-                        record => record.name === selectedResourceName
-                      )
-                    : undefined
-                }
-              >
+                : undefined
+            }
+          >
+            {() => (
+              <>
                 <RVColumn
                   label={i18n._(t`Kind`)}
                   dataKey="kind"
                   width={48}
-                  headerRenderer={renderSortableHeader}
                   cellRenderer={({ rowData }) => (
                     <Tooltip title={rowData.kind}>
                       <img
@@ -224,7 +196,6 @@ const ResourcesTable = ({
                   dataKey="name"
                   width={180}
                   flexGrow={2}
-                  headerRenderer={renderSortableHeader}
                   cellRenderer={({ rowData }) => (
                     <div
                       className={classNames('tableColumn', classes.cell)}
@@ -244,7 +215,6 @@ const ResourcesTable = ({
                   dataKey="file"
                   width={140}
                   flexGrow={2}
-                  headerRenderer={renderSortableHeader}
                   cellRenderer={({ rowData }) => (
                     <div
                       className={classNames('tableColumn', classes.cell)}
@@ -258,7 +228,6 @@ const ResourcesTable = ({
                   label={i18n._(t`Status`)}
                   dataKey="status"
                   width={110}
-                  headerRenderer={renderSortableHeader}
                   cellRenderer={({ rowData }) => {
                     const statusDescription = getStatusDescription(
                       rowData.status
@@ -286,8 +255,7 @@ const ResourcesTable = ({
                   label={i18n._(t`Size`)}
                   dataKey="transferBytes"
                   width={80}
-                  headerRenderer={renderSortableHeader}
-                  className={classNames('tableColumn', classes.numberCell)}
+                  className={classNames('tableColumn', numberCellClassName)}
                   cellRenderer={({ rowData }) => {
                     const transferredSize = formatBytes(rowData.transferBytes);
                     return (
@@ -311,7 +279,7 @@ const ResourcesTable = ({
                         <div
                           className={classNames(
                             classes.cell,
-                            classes.numberCell
+                            numberCellClassName
                           )}
                         >
                           {rowData.decodedBytes != null
@@ -328,8 +296,7 @@ const ResourcesTable = ({
                   label={i18n._(t`Memory`)}
                   dataKey="estimatedMemoryBytes"
                   width={90}
-                  headerRenderer={renderSortableHeader}
-                  className={classNames('tableColumn', classes.numberCell)}
+                  className={classNames('tableColumn', numberCellClassName)}
                   cellRenderer={({ rowData }) => (
                     <Tooltip
                       title={
@@ -344,7 +311,10 @@ const ResourcesTable = ({
                       }
                     >
                       <div
-                        className={classNames(classes.cell, classes.numberCell)}
+                        className={classNames(
+                          classes.cell,
+                          numberCellClassName
+                        )}
                       >
                         {formatBytes(rowData.estimatedMemoryBytes)}
                       </div>
@@ -357,7 +327,7 @@ const ResourcesTable = ({
                     dataKey="memoryDelta"
                     width={100}
                     disableSort
-                    className={classNames('tableColumn', classes.numberCell)}
+                    className={classNames('tableColumn', numberCellClassName)}
                     cellRenderer={({ rowData }) =>
                       renderComparisonCell(
                         i18n,
@@ -375,13 +345,12 @@ const ResourcesTable = ({
                   label={i18n._(t`Load time`)}
                   dataKey="loadDurationMs"
                   width={80}
-                  headerRenderer={renderSortableHeader}
-                  className={classNames('tableColumn', classes.numberCell)}
+                  className={classNames('tableColumn', numberCellClassName)}
                   cellRenderer={({ rowData }) => (
                     <div
-                      className={classNames(classes.cell, classes.numberCell)}
+                      className={classNames(classes.cell, numberCellClassName)}
                     >
-                      {formatDurationMs(getLoadDurationMs(rowData))}
+                      {formatShortDuration(getLoadDurationMs(rowData))}
                     </div>
                   )}
                 />
@@ -391,7 +360,7 @@ const ResourcesTable = ({
                     dataKey="loadDurationDelta"
                     width={110}
                     disableSort
-                    className={classNames('tableColumn', classes.numberCell)}
+                    className={classNames('tableColumn', numberCellClassName)}
                     cellRenderer={({ rowData }) =>
                       renderComparisonCell(
                         i18n,
@@ -399,7 +368,7 @@ const ResourcesTable = ({
                         comparison =>
                           formatSignedDelta(
                             comparison.loadDurationDeltaMs,
-                            formatDurationMs
+                            formatShortDuration
                           )
                       )
                     }
@@ -409,11 +378,10 @@ const ResourcesTable = ({
                   label={i18n._(t`Started at`)}
                   dataKey="loadStartedAtMs"
                   width={80}
-                  headerRenderer={renderSortableHeader}
-                  className={classNames('tableColumn', classes.numberCell)}
+                  className={classNames('tableColumn', numberCellClassName)}
                   cellRenderer={({ rowData }) => (
                     <div
-                      className={classNames(classes.cell, classes.numberCell)}
+                      className={classNames(classes.cell, numberCellClassName)}
                     >
                       {rowData.loadStartedAtMs != null
                         ? formatGameTime(rowData.loadStartedAtMs)
@@ -426,7 +394,6 @@ const ResourcesTable = ({
                   dataKey="origin"
                   width={150}
                   flexGrow={1}
-                  headerRenderer={renderSortableHeader}
                   cellRenderer={({ rowData }) => {
                     const requestersDescription = rowData.requesters
                       .map(describeOrigin)
@@ -456,9 +423,9 @@ const ResourcesTable = ({
                     );
                   }}
                 />
-              </RVTable>
+              </>
             )}
-          </AutoSizer>
+          </SortableVirtualizedTable>
         </div>
       )}
     </I18n>

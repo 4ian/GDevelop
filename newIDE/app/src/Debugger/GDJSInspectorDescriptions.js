@@ -99,91 +99,101 @@ export const getInspectorDescriptions = (
             />
           ),
           initiallyOpen: true,
-          getSubInspectors: runtimeScene => [
-            {
-              translatableLabel: t`Scene variables`,
-              icon: <SceneVariableIcon />,
-              key: `_variables`,
-              renderInspector: (gameData, { onCall, onEdit }) => (
-                <VariablesContainerInspector
-                  variablesContainer={gameData}
-                  onCall={onCall}
-                  onEdit={onEdit}
-                />
-              ),
-            },
-            {
-              translatableLabel: t`Instances`,
-              icon: <InstancesListIcon />,
-              key: `_instances`,
-              renderInspector: () => null,
-              initiallyOpen: true,
-              getSubInspectors: instances => {
-                if (!instances || !instances.items) return [];
-
-                return Object.keys(instances.items).map(objectName => {
-                  if (
-                    !instances.items[objectName] ||
-                    typeof instances.items[objectName].length === 'undefined'
-                  )
-                    return null;
-
-                  return {
-                    label: `${objectName} (${
-                      instances.items[objectName].length
-                    })`,
-                    // A 3D object carries a Z: the icon tells 2D from 3D.
-                    icon: instances.items[objectName].some(
-                      runtimeObject =>
-                        runtimeObject && typeof runtimeObject._z !== 'undefined'
-                    ) ? (
-                      <Object3dIcon />
-                    ) : (
-                      <Object2dIcon />
-                    ),
-                    key: ['items', objectName],
-                    // The object itself: what its instances start from.
-                    renderInspector: instancesList => (
-                      <ObjectDataInspector
-                        objectData={
-                          runtimeScene._objects && runtimeScene._objects.items
-                            ? runtimeScene._objects.items[objectName]
-                            : null
-                        }
-                        instances={instancesList}
+          // A scene paused under the current one is only named in the dump:
+          // it is read entirely when selected.
+          getSubInspectors: runtimeScene =>
+            runtimeScene && runtimeScene._isPausedSceneSummary
+              ? []
+              : [
+                  {
+                    translatableLabel: t`Scene variables`,
+                    icon: <SceneVariableIcon />,
+                    key: `_variables`,
+                    renderInspector: (gameData, { onCall, onEdit }) => (
+                      <VariablesContainerInspector
+                        variablesContainer={gameData}
+                        onCall={onCall}
+                        onEdit={onEdit}
                       />
                     ),
-                    getSubInspectors: instancesList =>
-                      instancesList
-                        ? instancesList
-                            .filter(runtimeObject => !!runtimeObject)
-                            .map(runtimeObject => {
-                              return {
-                                label: `#${runtimeObject.id}`,
-                                icon: <InstanceIcon />,
-                                // By identifier, never by position: creating
-                                // or destroying an instance shifts the list,
-                                // and the selection would follow another one.
-                                key: makeInstancePathStep(runtimeObject.id),
-                                renderInspector: (
-                                  gameData,
-                                  { onCall, onEdit, onReadValues }
-                                ) => (
-                                  <RuntimeObjectInspector
-                                    runtimeObject={gameData}
-                                    onCall={onCall}
-                                    onEdit={onEdit}
-                                    onReadValues={onReadValues}
-                                  />
-                                ),
-                              };
-                            })
-                        : [],
-                  };
-                });
-              },
-            },
-          ],
+                  },
+                  {
+                    translatableLabel: t`Instances`,
+                    icon: <InstancesListIcon />,
+                    key: `_instances`,
+                    renderInspector: () => null,
+                    initiallyOpen: true,
+                    getSubInspectors: instances => {
+                      if (!instances || !instances.items) return [];
+
+                      return Object.keys(instances.items).map(objectName => {
+                        if (
+                          !instances.items[objectName] ||
+                          typeof instances.items[objectName].length ===
+                            'undefined'
+                        )
+                          return null;
+
+                        return {
+                          label: `${objectName} (${
+                            instances.items[objectName].length
+                          })`,
+                          // A 3D object carries a Z: the icon tells 2D from 3D.
+                          icon: instances.items[objectName].some(
+                            runtimeObject =>
+                              runtimeObject &&
+                              typeof runtimeObject._z !== 'undefined'
+                          ) ? (
+                            <Object3dIcon />
+                          ) : (
+                            <Object2dIcon />
+                          ),
+                          key: ['items', objectName],
+                          // The object itself: what its instances start from.
+                          renderInspector: instancesList => (
+                            <ObjectDataInspector
+                              objectData={
+                                runtimeScene._objects &&
+                                runtimeScene._objects.items
+                                  ? runtimeScene._objects.items[objectName]
+                                  : null
+                              }
+                              instances={instancesList}
+                            />
+                          ),
+                          getSubInspectors: instancesList =>
+                            instancesList
+                              ? instancesList
+                                  .filter(runtimeObject => !!runtimeObject)
+                                  .map(runtimeObject => {
+                                    return {
+                                      label: `#${runtimeObject.id}`,
+                                      icon: <InstanceIcon />,
+                                      // By identifier, never by position: creating
+                                      // or destroying an instance shifts the list,
+                                      // and the selection would follow another one.
+                                      key: makeInstancePathStep(
+                                        runtimeObject.id
+                                      ),
+                                      renderInspector: (
+                                        gameData,
+                                        { onCall, onEdit, onReadValues }
+                                      ) => (
+                                        <RuntimeObjectInspector
+                                          runtimeObject={gameData}
+                                          onCall={onCall}
+                                          onEdit={onEdit}
+                                          onReadValues={onReadValues}
+                                        />
+                                      ),
+                                    };
+                                  })
+                              : [],
+                        };
+                      });
+                    },
+                  },
+                ],
         }));
       },
     },

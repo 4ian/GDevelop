@@ -5,6 +5,7 @@ import {
   type InstructionExecution,
   type CumulatedEventExecution,
 } from './EventsExecutionTrackingStore';
+import { useExternalStoreSelection } from '../Utils/UseExternalStoreSelection';
 
 /**
  * The store fed by the previews (see UseEventsExecutionTracking). There is a
@@ -37,45 +38,44 @@ const areExecutionsEqual = (
     first.durationMs === second.durationMs &&
     first.reportedAt === second.reportedAt);
 
+const areCumulatedExecutionsEqual = (
+  first: CumulatedEventExecution | null,
+  second: CumulatedEventExecution | null
+): boolean =>
+  first === second ||
+  (!!first &&
+    !!second &&
+    first.durationMs === second.durationMs &&
+    first.sharePercent === second.sharePercent &&
+    first.reportedAt === second.reportedAt);
+
 /**
  * Subscribe to what is reported about one event, re-rendering only when the
- * selected execution changes.
+ * selection changes.
  *
  * An events sheet mounts one of these per instruction: the subscription is
  * made for the event only, so that a report does not wake up the rows of the
  * whole sheet.
  */
-const useStoreSelection = (
+const useEventSelection = <Selection>(
   eventPtr: number | null,
-  select: (store: EventsExecutionTrackingStore) => InstructionExecution | null
-): InstructionExecution | null => {
+  select: (store: EventsExecutionTrackingStore) => Selection,
+  isEqual: (first: Selection, second: Selection) => boolean
+): Selection => {
   const store = React.useContext(EventsExecutionTrackingContext);
-  const [execution, setExecution] = React.useState<InstructionExecution | null>(
-    () => (eventPtr === null ? null : select(store))
+  const subscribe = React.useMemo(
+    () =>
+      eventPtr === null
+        ? null
+        : (listener: () => void) => store.subscribe(eventPtr, listener),
+    [store, eventPtr]
   );
+  const selectFromStore = React.useCallback(() => select(store), [
+    store,
+    select,
+  ]);
 
-  React.useEffect(
-    () => {
-      if (eventPtr === null) {
-        setExecution(null);
-        return;
-      }
-
-      const update = () => {
-        const newExecution = select(store);
-        setExecution(previousExecution =>
-          areExecutionsEqual(previousExecution, newExecution)
-            ? previousExecution
-            : newExecution
-        );
-      };
-      update();
-      return store.subscribe(eventPtr, update);
-    },
-    [store, eventPtr, select]
-  );
-
-  return execution;
+  return useExternalStoreSelection(subscribe, selectFromStore, isEqual);
 };
 
 /**
@@ -95,7 +95,7 @@ export const useInstructionExecution = (
     [eventPtr, isCondition, indexInList]
   );
 
-  return useStoreSelection(eventPtr, select);
+  return useEventSelection(eventPtr, select, areExecutionsEqual);
 };
 
 /**
@@ -110,19 +110,8 @@ export const useEventExecution = (
     [eventPtr]
   );
 
-  return useStoreSelection(eventPtr, select);
+  return useEventSelection(eventPtr, select, areExecutionsEqual);
 };
-
-const areCumulatedExecutionsEqual = (
-  first: CumulatedEventExecution | null,
-  second: CumulatedEventExecution | null
-): boolean =>
-  first === second ||
-  (!!first &&
-    !!second &&
-    first.durationMs === second.durationMs &&
-    first.sharePercent === second.sharePercent &&
-    first.reportedAt === second.reportedAt);
 
 /**
  * What an event took with everything under it, as reported for the last
@@ -131,29 +120,11 @@ const areCumulatedExecutionsEqual = (
 export const useCumulatedEventExecution = (
   eventPtr: number
 ): CumulatedEventExecution | null => {
-  const store = React.useContext(EventsExecutionTrackingContext);
-  const [
-    execution,
-    setExecution,
-  ] = React.useState<CumulatedEventExecution | null>(() =>
-    store.getCumulatedEventExecution(eventPtr)
+  const select = React.useCallback(
+    (store: EventsExecutionTrackingStore) =>
+      store.getCumulatedEventExecution(eventPtr),
+    [eventPtr]
   );
 
-  React.useEffect(
-    () => {
-      const update = () => {
-        const newExecution = store.getCumulatedEventExecution(eventPtr);
-        setExecution(previousExecution =>
-          areCumulatedExecutionsEqual(previousExecution, newExecution)
-            ? previousExecution
-            : newExecution
-        );
-      };
-      update();
-      return store.subscribe(eventPtr, update);
-    },
-    [store, eventPtr]
-  );
-
-  return execution;
+  return useEventSelection(eventPtr, select, areCumulatedExecutionsEqual);
 };

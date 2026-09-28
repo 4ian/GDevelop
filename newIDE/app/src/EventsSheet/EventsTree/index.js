@@ -23,7 +23,7 @@ import EventsExecutionTrackingContext, {
   TrackedEventPtrContext,
   useEventExecution,
 } from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
-import { formatExecutionDuration } from '../../EventsExecutionTracking/EventsExecutionTrackingStore';
+import { formatExecutionDuration } from '../../EventsExecutionTracking/formatting';
 import {
   type SelectionState,
   type EventContext,
@@ -64,6 +64,7 @@ import { useLongTouch } from '../../Utils/UseLongTouch';
 import { useDragDropManager } from 'react-dnd';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import LiveExpressionValueTooltip from '../../EventsExecutionTracking/LiveExpressionValueTooltip';
 
 const gd: libGDevelop = global.gd;
 
@@ -517,6 +518,7 @@ const EventsTree: React.ComponentType<{
   const forceUpdate = useForceUpdate();
 
   const _list = React.useRef<?any>(null);
+  const containerRef = React.useRef<?HTMLDivElement>(null);
   const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
 
   React.useLayoutEffect(
@@ -1312,6 +1314,7 @@ const EventsTree: React.ComponentType<{
 
   return (
     <div
+      ref={containerRef}
       style={{
         ...styles.container,
         fontSize: `${zoomLevel}px`,
@@ -1358,6 +1361,11 @@ const EventsTree: React.ComponentType<{
           // errors in never-scrolled-to rows.
           scrollToAlignment: 'smart',
         }}
+      />
+      <LiveExpressionValueTooltip
+        containerRef={containerRef}
+        layout={props.scope.layout}
+        project={props.project}
       />
     </div>
   );

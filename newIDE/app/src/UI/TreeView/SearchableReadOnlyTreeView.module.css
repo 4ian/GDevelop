@@ -1,0 +1,39 @@
+/* The search bar above the tree, the tree taking the rest of the height. */
+.container {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Breathing room around the search bar, like the lists of the editors. */
+.searchBar {
+  flex-shrink: 0;
+  padding: 4px 8px 8px 8px;
+}
+
+/* The tree takes all the height left by the panel and scrolls on its own. */
+.tree {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  position: relative;
+}
+
+/* Container for the sticky rows, rendered via portal outside the AutoSizer. */
+.stickyContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.stickyContainer > * {
+  pointer-events: auto;
+}

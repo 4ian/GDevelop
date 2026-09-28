@@ -3,10 +3,11 @@ import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import mapValues from 'lodash/mapValues';
 import InspectorTreeView, {
-  buildValueItems,
+  buildPropertiesItems,
+  makePropertiesFolderItem,
   makeSection,
+  type InspectedProperty,
 } from './InspectorTreeView';
 import {
   type GameData,
@@ -29,18 +30,47 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
-// $FlowFixMe[missing-local-annot]
-const getLayerProperties = (layer, i18n: I18nType) => {
-  if (!layer) return null;
-  const properties = {};
-  properties[i18n._(t`Camera X position`)] = layer._cameraX;
-  properties[i18n._(t`Camera Y position`)] = layer._cameraY;
-  properties[i18n._(t`Camera zoom`)] = layer._zoomFactor;
-  properties[i18n._(t`Camera rotation (in deg)`)] = layer._cameraRotation;
-  properties[i18n._(t`Time scale`)] = layer._timeScale;
-  properties[i18n._(t`Layer is hidden`)] = !!layer._hidden;
-  return properties;
-};
+/**
+ * The camera and the state of a layer, each one changed in the game by the
+ * method of the layer that the events use too.
+ */
+const getLayerProperties = (
+  // $FlowFixMe[unclear-type]
+  layer: Object,
+  callOnLayer: (methodName: string, newValue: any) => void,
+  i18n: I18nType
+): Array<InspectedProperty> => [
+  {
+    name: i18n._(t`Camera X position`),
+    value: layer._cameraX,
+    onEdit: newValue => callOnLayer('setCameraX', newValue),
+  },
+  {
+    name: i18n._(t`Camera Y position`),
+    value: layer._cameraY,
+    onEdit: newValue => callOnLayer('setCameraY', newValue),
+  },
+  {
+    name: i18n._(t`Camera zoom`),
+    value: layer._zoomFactor,
+    onEdit: newValue => callOnLayer('setCameraZoom', newValue),
+  },
+  {
+    name: i18n._(t`Camera rotation (in deg)`),
+    value: layer._cameraRotation,
+    onEdit: newValue => callOnLayer('setCameraRotation', newValue),
+  },
+  {
+    name: i18n._(t`Time scale`),
+    value: layer._timeScale,
+    onEdit: newValue => callOnLayer('setTimeScale', newValue),
+  },
+  {
+    name: i18n._(t`Layer is hidden`),
+    value: !!layer._hidden,
+    onEdit: newValue => callOnLayer('show', !newValue),
+  },
+];
 
 const RuntimeSceneInspectorTree = ({
   runtimeScene,
@@ -54,40 +84,56 @@ const RuntimeSceneInspectorTree = ({
 
   const items = React.useMemo(
     () => {
-      const generalProperties = {};
-      generalProperties[i18n._(t`Time scale`)] = runtimeScene._timeManager
-        ? runtimeScene._timeManager._timeScale
-        : null;
-      generalProperties[
-        i18n._(t`Actions waiting to be finished`)
-      ] = runtimeScene._asyncTasksManager
-        ? runtimeScene._asyncTasksManager.tasksWithCallback.length
-        : 0;
+      const generalProperties: Array<InspectedProperty> = [
+        {
+          name: i18n._(t`Time scale`),
+          value: runtimeScene._timeManager
+            ? runtimeScene._timeManager._timeScale
+            : null,
+          onEdit: newValue =>
+            onCall(['_timeManager', 'setTimeScale'], [newValue]),
+        },
+        {
+          name: i18n._(t`Actions waiting to be finished`),
+          value: runtimeScene._asyncTasksManager
+            ? runtimeScene._asyncTasksManager.tasksWithCallback.length
+            : 0,
+        },
+      ];
 
-      const layers =
+      const layersItems =
         runtimeScene._layers && runtimeScene._layers.items
-          ? mapValues(runtimeScene._layers.items, layer =>
-              getLayerProperties(layer, i18n)
-            )
+          ? Object.keys(runtimeScene._layers.items)
+              .filter(layerName => !!runtimeScene._layers.items[layerName])
+              .map(layerName =>
+                makePropertiesFolderItem(
+                  `layers/${layerName}`,
+                  layerName,
+                  getLayerProperties(
+                    runtimeScene._layers.items[layerName],
+                    (methodName, newValue) =>
+                      onCall(
+                        ['_layers', 'items', layerName, methodName],
+                        [newValue]
+                      ),
+                    i18n
+                  )
+                )
+              )
           : null;
 
       return [
         makeSection(
           'general',
           i18n._(t`General`),
-          buildValueItems('general', generalProperties, { sorted: false }),
+          buildPropertiesItems('general', generalProperties),
           { isRoot: true, icon: <EditSceneIcon /> }
         ),
-        makeSection(
-          'layers',
-          i18n._(t`Layers`),
-          buildValueItems('layers', layers, { sorted: false }),
-          {
-            isRoot: true,
-            emptyHint: i18n._(t`This scene has no layer.`),
-            icon: <LayersIcon />,
-          }
-        ),
+        makeSection('layers', i18n._(t`Layers`), layersItems, {
+          isRoot: true,
+          emptyHint: i18n._(t`This scene has no layer.`),
+          icon: <LayersIcon />,
+        }),
         makeSection(
           'timers',
           i18n._(t`Timers`),
@@ -103,7 +149,7 @@ const RuntimeSceneInspectorTree = ({
         ),
       ];
     },
-    [runtimeScene, i18n]
+    [runtimeScene, onCall, i18n]
   );
 
   return (

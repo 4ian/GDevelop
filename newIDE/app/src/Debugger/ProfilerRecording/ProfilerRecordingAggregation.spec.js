@@ -3,7 +3,6 @@ import {
   aggregateFramesToMeasures,
   compareMeasures,
   findFirstFrameIndexAtOrAfter,
-  formatClockDuration,
   formatGameTime,
   getFrameStats,
   getFramesInRange,
@@ -14,6 +13,7 @@ import {
   ProfilerRecordingStore,
   type ProfilerFrame,
 } from './ProfilerRecordingStore';
+import { formatClockDuration } from '../../Utils/FormatMeasures';
 
 const names = ['events', 'Group A', 'MyExt::Fn', 'render'];
 
@@ -228,6 +228,27 @@ describe('ProfilerRecordingAggregation', () => {
       const nested = compared.subsections['Group A'].subsections.Nested;
       expect(nested.time).toBe(1);
       expect(nested.baselineTime).toBe(3);
+    });
+
+    it('compares two games that have nothing in common', () => {
+      // Two recordings of two projects: no section of one is in the other.
+      const compared = compareMeasures(
+        makeMeasures({
+          'Game A group': { time: 4, subsections: { Nested: makeSection(1) } },
+        }),
+        makeMeasures({
+          'Game B group': { time: 6, subsections: { Other: makeSection(3) } },
+        })
+      );
+      expect(compared.time).toBe(10);
+      expect(compared.baselineTime).toBe(10);
+      const onlyInCurrent = compared.subsections['Game A group'];
+      expect(onlyInCurrent.baselineTime).toBeNull();
+      expect(onlyInCurrent.subsections.Nested.baselineTime).toBeNull();
+      const onlyInReference = compared.subsections['Game B group'];
+      expect(onlyInReference.time).toBeNull();
+      expect(onlyInReference.subsections.Other.time).toBeNull();
+      expect(onlyInReference.subsections.Other.baselineTime).toBe(3);
     });
 
     it('answers on a missing reference', () => {

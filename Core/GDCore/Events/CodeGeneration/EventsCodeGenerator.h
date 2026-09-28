@@ -505,6 +505,25 @@ class GD_CORE_API EventsCodeGenerator {
                                        std::size_t indexInList) const;
 
   /**
+   * rief Stop tracking the executed instructions, until
+   * ResumeInstructionExecutionTracking is called with the returned value.
+   *
+   * Used for the lists the editor shows no execution for (the sub-instructions
+   * of "And" and "Not", the conditions of a "While"): their indexes would give
+   * the same ids as the conditions of the event, and overwrite them.
+   */
+  gd::String SuspendInstructionExecutionTracking() {
+    gd::String suspendedEventExecutionId = currentEventExecutionId;
+    currentEventExecutionId = "";
+    return suspendedEventExecutionId;
+  }
+
+  void ResumeInstructionExecutionTracking(
+      const gd::String& suspendedEventExecutionId) {
+    currentEventExecutionId = suspendedEventExecutionId;
+  }
+
+  /**
    * \brief Get the namespace to be used to store code generated
    * objects/values/functions, with the extra "dot" at the end to be used to
    * access to a property/member.

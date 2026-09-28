@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
-import InstructionsList from '../InstructionsList';
+import InstructionsList, {
+  InstructionsListWithoutExecutionTracking,
+} from '../InstructionsList';
 import VariableDeclarationsList from '../VariableDeclarationsList';
 import classNames from 'classnames';
 import {
@@ -65,7 +67,7 @@ export default class WhileEvent extends React.Component<
         >
           <Trans>While these conditions are true:</Trans>
         </div>
-        <InstructionsList
+        <InstructionsListWithoutExecutionTracking
           platform={this.props.project.getCurrentPlatform()}
           instrsList={whileEvent.getWhileConditions()}
           style={

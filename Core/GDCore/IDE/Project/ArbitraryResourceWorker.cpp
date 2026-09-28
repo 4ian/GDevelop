@@ -241,12 +241,6 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
         }
 
         const String& parameterValue = parameterExpression.GetPlainString();
-        // A name computed by the events names no resource: it is only known
-        // once the game runs. Left alone, exactly as the parameters and the
-        // properties of the extensions below are.
-        if (gd::ParameterMetadata::IsResourceExpression(parameterValue)) {
-          return;
-        }
         const auto resourceSourceType =
             resourcesContainersList.GetResourcesContainerSourceType(
                 parameterValue);

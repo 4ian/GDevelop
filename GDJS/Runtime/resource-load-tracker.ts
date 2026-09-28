@@ -22,7 +22,12 @@ namespace gdjs {
    * @category Resources > Debugging
    */
   export type ResourceLoadStatus =
-    'not-loaded' | 'loading' | 'loaded' | 'processing' | 'ready' | 'error';
+    | 'not-loaded'
+    | 'loading'
+    | 'loaded'
+    | 'processing'
+    | 'ready'
+    | 'error';
 
   /**
    * Everything the debugger knows about one resource.
@@ -87,9 +92,16 @@ namespace gdjs {
     unloadHistory: Array<{ unloadedAtMs: float; reloadedAtMs?: float }>;
     transferBytes: integer | null;
     decodedBytes: integer | null;
+    /** The URL it was downloaded from, to read its size when asked for. */
+    fullUrl?: string;
+    /** Its size is read once, the first time the debugger asks for it. */
+    wasSizeRead: boolean;
   };
 
   const RESOURCE_TIMING_BUFFER_SIZE = 4096;
+
+  /** Scene changes kept for the timeline of the debugger. */
+  const MAX_SCENE_CHANGES_COUNT = 1000;
 
   /**
    * Remembers, for the debugger, when and why each resource was loaded, and
@@ -121,6 +133,9 @@ namespace gdjs {
 
     recordSceneChange(sceneName: string): void {
       this._sceneChanges.push({ atMs: this._getGameTimeMs(), sceneName });
+      if (this._sceneChanges.length > MAX_SCENE_CHANGES_COUNT) {
+        this._sceneChanges.shift();
+      }
     }
 
     getSceneChanges(): Array<{ atMs: float; sceneName: string }> {
@@ -137,6 +152,7 @@ namespace gdjs {
           unloadHistory: [],
           transferBytes: null,
           decodedBytes: null,
+          wasSizeRead: false,
         };
         this._trackedResources.set(resourceName, trackedResource);
       }
@@ -177,6 +193,21 @@ namespace gdjs {
       }
       trackedResource.status = 'loaded';
       trackedResource.loadedAtMs = this._getGameTimeMs();
+      // The size is only read when the debugger asks for the state
+      // (see `_readSizeOnce`): nothing is paid while the game loads.
+      trackedResource.fullUrl = fullUrl;
+      trackedResource.wasSizeRead = false;
+    }
+
+    /**
+     * Read the size of a downloaded resource, the first time the debugger asks
+     * for it: from the Resource Timing API, or else from the file itself.
+     */
+    private _readSizeOnce(trackedResource: TrackedResource): void {
+      if (trackedResource.wasSizeRead || !trackedResource.fullUrl) return;
+      trackedResource.wasSizeRead = true;
+
+      const fullUrl = trackedResource.fullUrl;
       const sizes = ResourceLoadTracker._readNetworkSizes(fullUrl);
       trackedResource.transferBytes = sizes.transferBytes;
       trackedResource.decodedBytes = sizes.decodedBytes;
@@ -196,7 +227,9 @@ namespace gdjs {
      * (served from the cache after its download, for local files).
      * Never throws: unknown stays unknown.
      */
-    private static async _fetchFileSize(fullUrl: string): Promise<integer | null> {
+    private static async _fetchFileSize(
+      fullUrl: string
+    ): Promise<integer | null> {
       if (typeof fetch !== 'function') return null;
       try {
         const headResponse = await fetch(fullUrl, { method: 'HEAD' });
@@ -284,6 +317,7 @@ namespace gdjs {
 
       for (const resource of resources) {
         const trackedResource = this._trackedResources.get(resource.name);
+        if (trackedResource) this._readSizeOnce(trackedResource);
         let metrics: ResourceDebugMetrics | null = null;
         try {
           metrics = getMetrics(resource);

@@ -974,12 +974,6 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
       argOutput = GeneratePropertyGetterWithoutCasting(
           propertiesContainerAndProperty.first,
           propertiesContainerAndProperty.second);
-    } else if (gd::ParameterMetadata::IsResourceExpression(resourceName)) {
-      // A name computed by the events rather than chosen in the editor: the
-      // value is a string expression, and is generated as one instead of
-      // being quoted as a literal.
-      argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-          *this, context, "string", parameter, lastObjectName);
     } else {
       argOutput = "\"" + ConvertToString(resourceName) + "\"";
     }

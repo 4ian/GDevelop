@@ -98,7 +98,23 @@ describe('gdjs.ResourceLoader debug state', () => {
     return resource;
   };
 
-  it('reports the status, the origin and the requesters of each resource', async () => {
+  /**
+   * @param {gdjs.ResourceLoader} resourceLoader
+   * @returns {gdjs.ResourcesDebugState}
+   */
+  const readDebugState = (resourceLoader) => {
+    const state = resourceLoader.getResourcesDebugState();
+    if (!state) throw new Error('The resources are not followed.');
+    return state;
+  };
+
+  /** The resources are only followed in previews: an exported game has no tracker. */
+  const makePreviewRuntimeGame = () =>
+    new gdjs.RuntimeGame(gdjs.createProjectData(gameSettings), {
+      isPreview: true,
+    });
+
+  it('follows nothing outside of previews', async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettings);
     const resourceLoader = runtimeGame.getResourceLoader();
@@ -107,8 +123,29 @@ describe('gdjs.ResourceLoader debug state', () => {
       mockedResourceManager
     );
 
+    expect(resourceLoader.getLoadTracker()).to.be(null);
+    expect(resourceLoader.getResourcesDebugState()).to.be(null);
+
+    // Loading still works without the tracker.
+    runtimeGame.loadFirstAssetsAndStartBackgroundLoading('Scene1');
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1.png');
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1-only.png');
+    mockedResourceManager.markPendingResourcesAsLoaded('shared.png');
+    await delay(10);
+    expect(resourceLoader.areSceneAssetsLoaded('Scene1')).to.be(true);
+  });
+
+  it('reports the status, the origin and the requesters of each resource', async () => {
+    const mockedResourceManager = new gdjs.MockedResourceManager();
+    const runtimeGame = makePreviewRuntimeGame();
+    const resourceLoader = runtimeGame.getResourceLoader();
+    resourceLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
+      mockedResourceManager
+    );
+
     // Nothing is loaded yet, but every resource is known.
-    let state = resourceLoader.getResourcesDebugState();
+    let state = readDebugState(resourceLoader);
     expect(state.resources.length).to.be(5);
     expect(state.totals.byStatus['not-loaded']).to.be(5);
     expect(state.totals.byKind['fake-resource-kind-for-testing-only']).to.be(5);
@@ -122,7 +159,7 @@ describe('gdjs.ResourceLoader debug state', () => {
 
     // The first scene is loading.
     runtimeGame.loadFirstAssetsAndStartBackgroundLoading('Scene1');
-    state = resourceLoader.getResourcesDebugState();
+    state = readDebugState(resourceLoader);
     const loadingResource = findResource(state, 'scene1.png');
     expect(loadingResource.status).to.be('loading');
     expect(loadingResource.origin).to.eql({
@@ -138,7 +175,7 @@ describe('gdjs.ResourceLoader debug state', () => {
     mockedResourceManager.markPendingResourcesAsLoaded('shared.png');
     await delay(10);
 
-    state = resourceLoader.getResourcesDebugState();
+    state = readDebugState(resourceLoader);
     const readyResource = findResource(state, 'scene1.png');
     expect(readyResource.status).to.be('ready');
     expect(typeof readyResource.loadedAtMs).to.be('number');
@@ -158,7 +195,7 @@ describe('gdjs.ResourceLoader debug state', () => {
 
     // The second scene is loading in background.
     await delay(20);
-    state = resourceLoader.getResourcesDebugState();
+    state = readDebugState(resourceLoader);
     const backgroundResource = findResource(state, 'scene2.png');
     expect(backgroundResource.status).to.be('loading');
     // The origin tells which scene asked for it (the foreground flag is
@@ -178,7 +215,7 @@ describe('gdjs.ResourceLoader debug state', () => {
 
   it('reports errors, retries and unloads', async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
-    const runtimeGame = gdjs.getPixiRuntimeGame(gameSettings);
+    const runtimeGame = makePreviewRuntimeGame();
     const resourceLoader = runtimeGame.getResourceLoader();
     resourceLoader.injectMockResourceManagerForTesting(
       'fake-resource-kind-for-testing-only',
@@ -191,7 +228,7 @@ describe('gdjs.ResourceLoader debug state', () => {
     mockedResourceManager.markPendingResourcesAsLoaded('shared.png');
     await delay(10);
 
-    let state = resourceLoader.getResourcesDebugState();
+    let state = readDebugState(resourceLoader);
     const failedResource = findResource(state, 'scene1.png');
     // The loader retried: the download is pending again.
     expect(mockedResourceManager.isResourceDownloadPending('scene1.png')).to.be(
@@ -205,7 +242,7 @@ describe('gdjs.ResourceLoader debug state', () => {
     mockedResourceManager.failPendingResource('scene1.png', 'HTTP 404 again');
     await delay(10);
 
-    state = resourceLoader.getResourcesDebugState();
+    state = readDebugState(resourceLoader);
     const stillFailedResource = findResource(state, 'scene1.png');
     expect(stillFailedResource.status).to.be('error');
     expect(stillFailedResource.errorMessage).to.be('HTTP 404 again');
@@ -218,7 +255,7 @@ describe('gdjs.ResourceLoader debug state', () => {
       unloadedSceneName: 'Scene1',
       newSceneName: null,
     });
-    state = resourceLoader.getResourcesDebugState();
+    state = readDebugState(resourceLoader);
     expect(findResource(state, 'shared.png').status).to.be('not-loaded');
     const unloadedResource = findResource(state, 'scene1-only.png');
     expect(unloadedResource.status).to.be('not-loaded');

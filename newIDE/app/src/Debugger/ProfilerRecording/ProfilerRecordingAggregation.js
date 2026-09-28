@@ -295,16 +295,3 @@ export const formatGameTime = (timeMs: number): string => {
   const seconds = (timeMs - minutes * 60000) / 1000;
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds.toFixed(1)}`;
 };
-
-/** Format a duration as "0:42" (minutes and seconds). */
-export const formatClockDuration = (durationMs: number): string => {
-  const totalSeconds = Math.max(0, Math.floor(durationMs / 1000));
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds - minutes * 60;
-  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-};
-
-export const formatMilliseconds = (durationMs: number): string =>
-  Number.isFinite(durationMs)
-    ? `${(Math.round(durationMs * 10) / 10).toLocaleString()} ms`
-    : '-';

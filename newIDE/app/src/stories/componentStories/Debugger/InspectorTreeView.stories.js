@@ -128,3 +128,39 @@ export const WithSections = () => (
     />
   </FixedHeightFlexContainer>
 );
+
+const makeManyValues = (count: number) => {
+  const values = {};
+  for (let index = 0; index < count; index++) {
+    values[`Value ${String(index).padStart(2, '0')}`] = index * 10;
+  }
+  return values;
+};
+
+/** Scroll the tree: the sections holding the first visible row stay on top. */
+export const WithManyRows = () => (
+  <FixedHeightFlexContainer height={250}>
+    <InspectorTreeView
+      items={[
+        makeSection(
+          'general',
+          'General',
+          [
+            makeSection(
+              'general/position',
+              'Position',
+              buildValueItems('general/position', makeManyValues(30))
+            ),
+          ],
+          { isRoot: true }
+        ),
+        makeSection(
+          'variables',
+          'Variables',
+          buildValueItems('variables', makeManyValues(30)),
+          { isRoot: true }
+        ),
+      ]}
+    />
+  </FixedHeightFlexContainer>
+);

@@ -49,6 +49,7 @@ const FrameStrip = ({
     canvasRef,
     size,
     getContext,
+    getLocalPosition,
   } = useCanvasWithDevicePixelRatio();
   const [dragRange, setDragRange] = React.useState<?ProfilerRecordingRange>(
     null
@@ -182,11 +183,8 @@ const FrameStrip = ({
     ]
   );
 
-  const getLocalX = (event: SyntheticMouseEvent<HTMLDivElement>) => {
-    const container = containerRef.current;
-    if (!container) return 0;
-    return event.clientX - container.getBoundingClientRect().left;
-  };
+  const getLocalX = (event: SyntheticMouseEvent<HTMLDivElement>) =>
+    getLocalPosition(event).x;
 
   const selectFrameAt = (timeMs: number) => {
     if (!frames.length) return;

@@ -30,12 +30,13 @@ namespace gdjs {
    */
   export class EventsExecutionTracker {
     /**
-     * The instruction being executed and when it started. Instructions are
-     * never nested (the generated code wraps each one of them separately),
-     * so a single pair is enough: no map to look up, nothing to allocate.
+     * The instructions being executed and when each one started, innermost
+     * last. They nest when an action calls a function of an extension whose
+     * events are tracked too. Two arrays reused frame after frame: nothing is
+     * allocated per instruction.
      */
-    private _startedInstructionId: string | null = null;
-    private _startedAt: float = 0;
+    private _startedInstructionIds: Array<string> = [];
+    private _startTimes: Array<float> = [];
     /** Durations of the instructions that ran since the last report. */
     private _durations: Map<string, float> = new Map();
     /** `null` until the first report, which is never delayed. */
@@ -66,21 +67,33 @@ namespace gdjs {
      * Called by the generated code just before an instruction runs.
      */
     begin(instructionExecutionId: string): void {
-      this._startedInstructionId = instructionExecutionId;
-      this._startedAt = this._getTimeNow();
+      this._startedInstructionIds.push(instructionExecutionId);
+      this._startTimes.push(this._getTimeNow());
     }
 
     /**
      * Called by the generated code just after an instruction ran.
      */
     end(instructionExecutionId: string): void {
-      if (this._startedInstructionId !== instructionExecutionId) return;
-
-      this._durations.set(
-        instructionExecutionId,
-        this._getTimeNow() - this._startedAt
-      );
-      this._startedInstructionId = null;
+      // Look for the matching start from the innermost one: an instruction
+      // left without its end (an exception thrown while it ran) is dropped
+      // instead of blocking the instructions around it.
+      for (
+        let index = this._startedInstructionIds.length - 1;
+        index >= 0;
+        index--
+      ) {
+        if (this._startedInstructionIds[index] !== instructionExecutionId) {
+          continue;
+        }
+        this._durations.set(
+          instructionExecutionId,
+          this._getTimeNow() - this._startTimes[index]
+        );
+        this._startedInstructionIds.length = index;
+        this._startTimes.length = index;
+        return;
+      }
     }
 
     /**

@@ -1194,8 +1194,6 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
-  InsertUnique(includesFiles, "resource-load-tracker.js");
-  InsertUnique(includesFiles, "events-execution-tracker.js");
   InsertUnique(includesFiles, "RuntimeInstanceContainer.js");
   InsertUnique(includesFiles, "runtimescene.js");
   InsertUnique(includesFiles, "scenestack.js");
@@ -1250,6 +1248,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
     InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
     InsertUnique(includesFiles, "debugger-client/InGameDebugger.js");
+    // Only what the debugger reads: never part of an exported game.
+    InsertUnique(includesFiles, "resource-load-tracker.js");
+    InsertUnique(includesFiles, "events-execution-tracker.js");
     // Gameplay tests can only be run when a debugger client is included
     // (i.e: during previews), as the test scripts are sent over the
     // debugger connection.

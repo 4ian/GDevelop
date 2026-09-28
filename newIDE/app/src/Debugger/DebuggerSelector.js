@@ -8,14 +8,18 @@ import {
   type DebuggerId,
   type DebuggerStatus,
 } from '../ExportAndShare/PreviewLauncher.flow';
+import { type DebuggerRecordingMetadata } from './Export/DebuggerRecordingFile';
 
 type Props = {|
   selectedId: DebuggerId,
   debuggerStatus: { [DebuggerId]: DebuggerStatus },
   /** The games still running: the others were closed, their data is kept. */
   connectedDebuggerIds: Array<DebuggerId>,
-  /** The recordings read from a file, named after the run they hold. */
-  importedRecordingLabels: { [DebuggerId]: string },
+  /**
+   * The recordings read from a file, named after the run they hold, not after
+   * the file (which the user may have renamed).
+   */
+  importedRecordings: { [DebuggerId]: DebuggerRecordingMetadata },
   onChooseDebugger: DebuggerId => void,
 |};
 
@@ -25,7 +29,7 @@ export default class DebuggerSelector extends React.Component<Props, void> {
     const debuggerIdsWithoutInGameEdition = debuggerIds.filter(
       id => !this.props.debuggerStatus[id].isInGameEdition
     );
-    const importedIds = Object.keys(this.props.importedRecordingLabels);
+    const importedIds = Object.keys(this.props.importedRecordings);
     const hasDebuggers =
       !!debuggerIdsWithoutInGameEdition.length || !!importedIds.length;
     return (
@@ -53,14 +57,18 @@ export default class DebuggerSelector extends React.Component<Props, void> {
                 />
               );
             })}
-            {importedIds.map(id => (
-              <SelectOption
-                value={id}
-                key={id}
-                label={this.props.importedRecordingLabels[id]}
-                shouldNotTranslate
-              />
-            ))}
+            {importedIds.map(id => {
+              const metadata = this.props.importedRecordings[id];
+              const projectName = metadata.projectName || i18n._(t`Recording`);
+              const date = (metadata.exportedAt || '').slice(0, 10);
+              return (
+                <SelectOption
+                  value={id}
+                  key={id}
+                  label={t`${projectName} - ${date} (imported)`}
+                />
+              );
+            })}
             {!hasDebuggers && (
               <SelectOption
                 value={0}

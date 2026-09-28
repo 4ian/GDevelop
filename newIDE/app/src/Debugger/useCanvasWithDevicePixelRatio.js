@@ -2,17 +2,23 @@
 import * as React from 'react';
 
 export type CanvasSize = {| width: number, height: number |};
+export type CanvasPosition = {| x: number, y: number |};
 
 /**
  * Size a canvas to its container, taking the device pixel ratio into account
  * so that drawings stay sharp. Returns the refs to attach and the size in CSS
  * pixels: the drawing context is already scaled, draw in CSS pixels.
+ * `getLocalPosition` gives where a mouse event happened, in the same pixels.
  */
 export const useCanvasWithDevicePixelRatio = (): {|
   containerRef: { current: null | HTMLDivElement },
   canvasRef: { current: null | HTMLCanvasElement },
   size: CanvasSize,
   getContext: () => CanvasRenderingContext2D | null,
+  getLocalPosition: (event: {
+    +clientX: number,
+    +clientY: number,
+  }) => CanvasPosition,
 |} => {
   const containerRef = React.useRef<null | HTMLDivElement>(null);
   const canvasRef = React.useRef<null | HTMLCanvasElement>(null);
@@ -57,5 +63,18 @@ export const useCanvasWithDevicePixelRatio = (): {|
     [size]
   );
 
-  return { containerRef, canvasRef, size, getContext };
+  const getLocalPosition = React.useCallback(
+    (event: { +clientX: number, +clientY: number }): CanvasPosition => {
+      const container = containerRef.current;
+      if (!container) return { x: 0, y: 0 };
+      const rectangle = container.getBoundingClientRect();
+      return {
+        x: event.clientX - rectangle.left,
+        y: event.clientY - rectangle.top,
+      };
+    },
+    []
+  );
+
+  return { containerRef, canvasRef, size, getContext, getLocalPosition };
 };

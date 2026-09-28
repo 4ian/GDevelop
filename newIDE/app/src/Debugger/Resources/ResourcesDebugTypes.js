@@ -94,30 +94,6 @@ export const emptyResourcesFilters: ResourcesFilters = {
   statuses: [],
 };
 
-const BYTES_UNITS = ['B', 'kB', 'MB', 'GB', 'TB'];
-
-/** Format bytes as "1.5 MB" (decimal units, one decimal above kB). */
-export const formatBytes = (bytes: ?number): string => {
-  if (bytes == null || !Number.isFinite(bytes)) return '-';
-  if (bytes < 1000) return `${Math.round(bytes)} B`;
-  let value = bytes;
-  let unitIndex = 0;
-  while (value >= 1000 && unitIndex < BYTES_UNITS.length - 1) {
-    value /= 1000;
-    unitIndex++;
-  }
-  return `${value < 10 ? value.toFixed(2) : value.toFixed(1)} ${
-    BYTES_UNITS[unitIndex]
-  }`;
-};
-
-/** Format a duration in milliseconds as "128 ms" or "2.3 s". */
-export const formatDurationMs = (durationMs: ?number): string => {
-  if (durationMs == null || !Number.isFinite(durationMs)) return '-';
-  if (durationMs < 1000) return `${Math.round(durationMs)} ms`;
-  return `${(durationMs / 1000).toFixed(2)} s`;
-};
-
 /** From the start of the download to the resource being usable. */
 export const getLoadDurationMs = (record: ResourceLoadRecord): ?number => {
   if (record.loadStartedAtMs == null) return null;
@@ -175,16 +151,6 @@ export const compareResource = (
       getLoadDurationMs(baselineRecord)
     ),
   };
-};
-
-/** A difference with its sign, or a dash when it could not be measured. */
-export const formatSignedDelta = (
-  delta: ?number,
-  format: (value: number) => string
-): string => {
-  if (delta == null || !Number.isFinite(delta)) return '-';
-  if (delta === 0) return '=';
-  return `${delta > 0 ? '+' : '-'}${format(Math.abs(delta))}`;
 };
 
 /** A short text for an origin, used for sorting and searching (not translated). */

@@ -23,8 +23,7 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
     const gd::String& codeNamespace,
     const std::map<gd::String, gd::String>& objectMethodMangledNames,
     std::set<gd::String>& includeFiles,
-    bool compilationForRuntime,
-    bool generateEventsExecutionTracking) {
+    bool compilationForRuntime) {
   auto& eventsFunctionsVector =
       eventsBasedObject.GetEventsFunctions().GetInternalVector();
 

@@ -195,8 +195,12 @@ namespace gdjs {
     /** The number of frames that have been measured */
     _framesCount: number = 0;
 
-    /** Total time of each captured frame, chronological, bounded. */
+    /**
+     * Total time of each captured frame, bounded: once full, the oldest one is
+     * overwritten (at `_oldestFrameTimeIndex`), nothing is shifted.
+     */
     _frameTimes: Array<float> = [];
+    _oldestFrameTimeIndex: integer = 0;
 
     /** A function to get the current time. If available, corresponds to performance.now(). */
     _getTimeNow: () => float;
@@ -443,9 +447,13 @@ namespace gdjs {
         this._currentFrameMeasure,
         this._aggregates
       );
-      this._frameTimes.push(this._currentFrameMeasure.time);
-      if (this._frameTimes.length > PROFILER_MAX_FRAME_TIMES_COUNT) {
-        this._frameTimes.shift();
+      if (this._frameTimes.length < PROFILER_MAX_FRAME_TIMES_COUNT) {
+        this._frameTimes.push(this._currentFrameMeasure.time);
+      } else {
+        this._frameTimes[this._oldestFrameTimeIndex] =
+          this._currentFrameMeasure.time;
+        this._oldestFrameTimeIndex =
+          (this._oldestFrameTimeIndex + 1) % PROFILER_MAX_FRAME_TIMES_COUNT;
       }
 
       const frameSpans = this._currentFrameSpans;
@@ -566,9 +574,7 @@ namespace gdjs {
             ? null
             : Math.round(drawCalls3DPerFrame * 10) / 10,
         triangles3DPerFrame:
-          triangles3DPerFrame == null
-            ? null
-            : Math.round(triangles3DPerFrame),
+          triangles3DPerFrame == null ? null : Math.round(triangles3DPerFrame),
         drawCalls2DPerFrame:
           drawCalls2DPerFrame == null
             ? null
@@ -670,7 +676,9 @@ namespace gdjs {
      * (bounded to the last `PROFILER_MAX_FRAME_TIMES_COUNT` frames).
      */
     getFrameTimes(): Array<float> {
-      return this._frameTimes.slice();
+      return this._frameTimes
+        .slice(this._oldestFrameTimeIndex)
+        .concat(this._frameTimes.slice(0, this._oldestFrameTimeIndex));
     }
 
     /**

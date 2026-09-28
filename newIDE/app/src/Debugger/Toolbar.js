@@ -5,11 +5,6 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
-import ProfilerIcon from '../UI/CustomSvgIcons/Profiler';
-import InspectorIcon from '../UI/CustomSvgIcons/Debug';
-import ConsoleIcon from '../UI/CustomSvgIcons/Console';
-import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
-import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
 import PauseIcon from '../UI/CustomSvgIcons/Pause';
 import RecordIcon from '../UI/CustomSvgIcons/Record';
@@ -27,6 +22,7 @@ import { RecordingStatusChip } from './RecordingControls';
 import { useIsGameplayTestRunInProgress } from '../GameplayTests/GameplayTestRunner';
 import { ProfilerRecordingStore } from './ProfilerRecording/ProfilerRecordingStore';
 import { type DebuggerId } from '../ExportAndShare/PreviewLauncher.flow';
+import { DEBUGGER_PANELS, type DebuggerPanelName } from './DebuggerPanels';
 
 type Props = {|
   // The game.
@@ -67,21 +63,9 @@ type Props = {|
   isBaseline: boolean,
   onToggleBaseline: () => void,
   // The panels.
-  isInspectorShown: boolean,
-  onToggleInspector: () => void,
-  canOpenInspector: boolean,
-  isProfilerShown: boolean,
-  onToggleProfiler: () => void,
-  canOpenProfiler: boolean,
-  isPerformanceShown: boolean,
-  onTogglePerformance: () => void,
-  canOpenPerformance: boolean,
-  isResourcesShown: boolean,
-  onToggleResources: () => void,
-  canOpenResources: boolean,
-  isConsoleShown: boolean,
-  onToggleConsole: () => void,
-  canOpenConsole: boolean,
+  canOpenPanels: boolean,
+  shownPanelNames: Array<DebuggerPanelName>,
+  onTogglePanel: DebuggerPanelName => void,
 |};
 
 /**
@@ -128,21 +112,9 @@ export class ToolbarContent extends React.PureComponent<{|
       canCompareToBaseline,
       isBaseline,
       onToggleBaseline,
-      onToggleInspector,
-      canOpenInspector,
-      isInspectorShown,
-      onToggleProfiler,
-      canOpenProfiler,
-      isProfilerShown,
-      onTogglePerformance,
-      canOpenPerformance,
-      isPerformanceShown,
-      onToggleResources,
-      canOpenResources,
-      isResourcesShown,
-      onToggleConsole,
-      canOpenConsole,
-      isConsoleShown,
+      canOpenPanels,
+      shownPanelNames,
+      onTogglePanel,
     } = this.props;
 
     // The menu of the main button: the speed the game plays at while debugged
@@ -311,56 +283,19 @@ export class ToolbarContent extends React.PureComponent<{|
             <VariableTreeIcon />
           </IconButton>
           <ToolbarSeparator />
-          <IconButton
-            size="small"
-            color="default"
-            onClick={onToggleInspector}
-            disabled={!canOpenInspector}
-            selected={isInspectorShown}
-            tooltip={t`Inspector`}
-          >
-            <InspectorIcon />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="default"
-            onClick={onToggleProfiler}
-            disabled={!canOpenProfiler}
-            selected={isProfilerShown}
-            tooltip={t`Profiler`}
-          >
-            <ProfilerIcon />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="default"
-            onClick={onTogglePerformance}
-            disabled={!canOpenPerformance}
-            selected={isPerformanceShown}
-            tooltip={t`Performance`}
-          >
-            <GraphsIcon />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="default"
-            onClick={onToggleResources}
-            disabled={!canOpenResources}
-            selected={isResourcesShown}
-            tooltip={t`Resources`}
-          >
-            <ProjectResourcesIcon />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="default"
-            onClick={onToggleConsole}
-            disabled={!canOpenConsole}
-            selected={isConsoleShown}
-            tooltip={t`Console`}
-          >
-            <ConsoleIcon />
-          </IconButton>
+          {DEBUGGER_PANELS.map(({ name, icon: PanelIcon, title }) => (
+            <IconButton
+              key={name}
+              size="small"
+              color="default"
+              onClick={() => onTogglePanel(name)}
+              disabled={!canOpenPanels}
+              selected={shownPanelNames.includes(name)}
+              tooltip={title}
+            >
+              <PanelIcon />
+            </IconButton>
+          ))}
         </ToolbarGroup>
       </React.Fragment>
     );

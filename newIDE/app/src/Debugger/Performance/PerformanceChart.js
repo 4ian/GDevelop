@@ -18,19 +18,16 @@ import {
 } from 'recharts';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import Text from '../../UI/Text';
-import Paper from '../../UI/Paper';
+import { ChartTooltip } from '../../UI/ChartTooltip';
+import { chartWidth, getChartsStyleFromTheme } from '../../UI/ChartsStyle';
 import {
   type ProfilerPerformanceSample,
   type ProfilerRecordingRange,
 } from '../ProfilerRecording/ProfilerRecordingStore';
 import { formatGameTime } from '../ProfilerRecording/ProfilerRecordingAggregation';
-import { formatBytes } from '../Resources/ResourcesDebugTypes';
 import classes from './Performance.module.css';
+import { formatBytes } from '../../Utils/FormatMeasures';
 
-// There is a known bug with recharts that causes the chart to not render if
-// the width is 100% in a flexbox component.
-// See https://github.com/recharts/recharts/issues/172
-const chartWidth = '99%';
 const chartMargins = { top: 6, bottom: 4, right: 16, left: 0 };
 const CHART_HEIGHT = 110;
 
@@ -69,36 +66,25 @@ const PerformanceTooltip = ({
     // Each piece on its own line, and each one said in full: the measure, its
     // value with its unit, then when it was measured. Put together, the time
     // and the value read as a single meaningless number.
-    <Paper background="light" style={{ padding: '6px 10px' }}>
-      <div>
-        <Text noMargin size="body-small" color="secondary">
-          {title}
-        </Text>
-      </div>
-      <div>
-        <Text
-          noMargin
-          size="sub-title"
-          style={{ fontVariantNumeric: 'tabular-nums' }}
-        >
-          {format(payload[0].value)}
-        </Text>
-      </div>
-      <div>
-        <Text noMargin size="body-small" color="secondary">
-          <Trans>Time since the game started</Trans>
-        </Text>
-      </div>
-      <div>
-        <Text
-          noMargin
-          size="body-small"
-          style={{ fontVariantNumeric: 'tabular-nums' }}
-        >
-          {formatGameTime(label)}
-        </Text>
-      </div>
-    </Paper>
+    <ChartTooltip size="small" title={title}>
+      <Text
+        noMargin
+        size="sub-title"
+        style={{ fontVariantNumeric: 'tabular-nums' }}
+      >
+        {format(payload[0].value)}
+      </Text>
+      <Text noMargin size="body-small" color="secondary">
+        <Trans>Time since the game started</Trans>
+      </Text>
+      <Text
+        noMargin
+        size="body-small"
+        style={{ fontVariantNumeric: 'tabular-nums' }}
+      >
+        {formatGameTime(label)}
+      </Text>
+    </ChartTooltip>
   ) : null;
 
 /**
@@ -117,7 +103,7 @@ const PerformanceChart = ({
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const tickStyle = {
-    fontFamily: gdevelopTheme.chart.fontFamily,
+    ...getChartsStyleFromTheme(gdevelopTheme).tickLabel,
     fontSize: 11,
     fill: gdevelopTheme.chart.textColor,
   };

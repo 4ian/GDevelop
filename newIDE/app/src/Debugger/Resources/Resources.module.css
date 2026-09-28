@@ -50,14 +50,6 @@
   min-width: 0;
 }
 
-.sectionTitleRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 0;
-}
-
 /* The memory bar: one segment per loaded resource. */
 
 .memoryBar {
@@ -181,13 +173,6 @@
   height: 100%;
 }
 
-.tooltip {
-  position: absolute;
-  z-index: 1;
-  max-width: 280px;
-  pointer-events: none;
-}
-
 /* The table. */
 
 .table {
@@ -201,11 +186,6 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 13px;
-}
-
-.numberCell {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
 .kindIcon {

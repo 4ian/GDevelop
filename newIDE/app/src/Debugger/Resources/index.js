@@ -1,6 +1,7 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
+import { LineStackLayout } from '../../UI/Layout';
 import Background from '../../UI/Background';
 import EmptyMessage from '../../UI/EmptyMessage';
 import StartRecordingPlaceholder from '../StartRecordingPlaceholder';
@@ -11,7 +12,7 @@ import IconButton from '../../UI/IconButton';
 import Refresh from '../../UI/CustomSvgIcons/Refresh';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
-import { useInterval } from '../../Utils/UseInterval';
+import { usePollingRequest } from '../../Utils/UsePollingRequest';
 import { type DebuggerId } from '../../ExportAndShare/PreviewLauncher.flow';
 import {
   ProfilerRecordingStore,
@@ -24,7 +25,6 @@ import ResourcesTable, { getStatusLabel } from './ResourcesTable';
 import {
   emptyResourcesFilters,
   filterResources,
-  formatBytes,
   getMemoryLimitBytes,
   resourceLoadStatuses,
   type ResourcesDebugState,
@@ -32,6 +32,7 @@ import {
   type ResourceLoadStatus,
 } from './ResourcesDebugTypes';
 import classes from './Resources.module.css';
+import { formatBytes } from '../../Utils/FormatMeasures';
 
 /** How often the game is asked for its resources while the panel is shown. */
 export const RESOURCES_POLLING_INTERVAL_MS = 1500;
@@ -108,33 +109,12 @@ const ResourcesPanel = ({
       });
     }
   };
-  const isRefreshInFlightRef = React.useRef(false);
   const recording = useProfilerRecording(recordingStore, debuggerId);
 
-  const refresh = React.useCallback(
-    async () => {
-      // A slow answer must not stack requests.
-      if (isRefreshInFlightRef.current) return;
-      isRefreshInFlightRef.current = true;
-      try {
-        await onRefresh();
-      } finally {
-        isRefreshInFlightRef.current = false;
-      }
-    },
-    [onRefresh]
-  );
-
-  React.useEffect(
-    () => {
-      if (isPollingEnabled) refresh();
-    },
-    [isPollingEnabled, refresh]
-  );
-  useInterval(
-    () => {
-      refresh();
-    },
+  // Asked at once when the polling starts, then at a pace: a slow answer
+  // does not stack requests.
+  const refreshNow = usePollingRequest(
+    onRefresh,
     isPollingEnabled ? RESOURCES_POLLING_INTERVAL_MS : null
   );
 
@@ -300,7 +280,7 @@ const ResourcesPanel = ({
               <IconButton
                 size="small"
                 tooltip={t`Refresh now`}
-                onClick={refresh}
+                onClick={refreshNow}
                 disabled={!isPollingEnabled}
               >
                 <Refresh />
@@ -323,7 +303,11 @@ const ResourcesPanel = ({
           }
         />
         <div className={classes.section} style={{ paddingBottom: 0 }}>
-          <div className={classes.sectionTitleRow}>
+          <LineStackLayout
+            noMargin
+            alignItems="center"
+            justifyContent="space-between"
+          >
             <IconButton
               size="small"
               onClick={() => setIsTimelineShown(!isTimelineShown)}
@@ -333,7 +317,7 @@ const ResourcesPanel = ({
             >
               {isTimelineShown ? <ChevronArrowBottom /> : <ChevronArrowRight />}
             </IconButton>
-          </div>
+          </LineStackLayout>
         </div>
         {isTimelineShown && (
           <LoadTimeline
@@ -347,6 +331,11 @@ const ResourcesPanel = ({
         )}
         <ResourcesTable
           records={filteredRecords}
+          baselineRecords={
+            baselineResourcesDebugState
+              ? baselineResourcesDebugState.resources
+              : null
+          }
           selectedResourceName={selectedResourceName}
           onSelectResource={setSelectedResourceName}
         />

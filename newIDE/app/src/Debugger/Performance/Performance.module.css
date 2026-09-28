@@ -14,3 +14,22 @@
   border-radius: 8px;
   background-color: var(--theme-surface-alternate-canvas-background-color);
 }
+
+/* The panel: the charts, then the summary. */
+.content {
+  display: flex;
+  flex-direction: column;
+  /* Never shrink: the content is scrolled instead of being squeezed. */
+  flex-shrink: 0;
+  gap: 20px;
+  padding: 16px 12px;
+  min-width: 0;
+}
+
+/* The cards of the summary. */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  min-width: 0;
+}

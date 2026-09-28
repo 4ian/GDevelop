@@ -2,9 +2,8 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Background from '../UI/Background';
-import { Column, Line } from '../UI/Grid';
-import Text from '../UI/Text';
-import RaisedButton from '../UI/RaisedButton';
+import { Line } from '../UI/Grid';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import RecordIcon from '../UI/CustomSvgIcons/Record';
 
 type Props = {|
@@ -26,23 +25,22 @@ const StartRecordingPlaceholder = ({
 }: Props): React.Node => (
   <Background>
     <Line expand justifyContent="center" alignItems="center">
-      <Column alignItems="center">
-        <Text align="center" color="secondary">
-          {description}
-        </Text>
-        <RaisedButton
-          primary
-          icon={<RecordIcon />}
-          label={<Trans>Record</Trans>}
-          disabled={!canRecord}
-          onClick={onStartRecording}
-        />
-        <Text align="center" size="body-small" color="secondary">
-          <Trans>
-            This button is also in the toolbar, at the top of the debugger.
-          </Trans>
-        </Text>
-      </Column>
+      <EmptyPlaceholder
+        title={<Trans>Nothing recorded yet</Trans>}
+        description={
+          <>
+            {description}{' '}
+            <Trans>
+              This button is also in the toolbar, at the top of the debugger.
+            </Trans>
+          </>
+        }
+        multilineDescription
+        actionLabel={<Trans>Record</Trans>}
+        actionIcon={<RecordIcon />}
+        actionDisabled={!canRecord}
+        onAction={onStartRecording}
+      />
     </Line>
   </Background>
 );

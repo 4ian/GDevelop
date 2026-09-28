@@ -1,18 +1,3 @@
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  gap: 8px;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--theme-list-item-separator-color);
-}
-
-.progressBar {
-  display: flex;
-  flex-shrink: 0;
-}
-
 .content {
   display: flex;
   flex-direction: column;
@@ -21,30 +6,6 @@
   gap: 20px;
   padding: 16px 12px;
   min-width: 0;
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px;
-  min-width: 0;
-}
-
-.statCard {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background-color: var(--theme-surface-alternate-canvas-background-color);
 }
 
 /* The tree of the sections measured during a frame (a `gd-table`, like the
@@ -104,12 +65,6 @@ group does not silently vanish from the comparison, but dimmed. */
   font-weight: bold;
 }
 
-.numberCell {
-  text-align: right;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
 .toggle {
   display: inline-flex;
   align-items: center;
@@ -141,13 +96,6 @@ group does not silently vanish from the comparison, but dimmed. */
 
 /* The timeline: the strip of frames, and the flame chart of the selection. */
 
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
 .frameStrip {
   position: relative;
   height: 72px;
@@ -176,13 +124,6 @@ group does not silently vanish from the comparison, but dimmed. */
   height: 100%;
 }
 
-.tooltip {
-  position: absolute;
-  z-index: 1;
-  max-width: 240px;
-  pointer-events: none;
-}
-
 .rangeSummary {
   display: flex;
   align-items: center;
@@ -195,24 +136,4 @@ group does not silently vanish from the comparison, but dimmed. */
 /* The tables of the debugger use the same font as the rest of its panels. */
 .measuresTable :global(.gd-table) {
   font-family: var(--gdevelop-modern-font-family);
-}
-
-/* The label of a stat card and its info icon, on the same line. */
-.statCardHeader {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-}
-
-.statCardHelp {
-  display: inline-flex;
-  align-items: center;
-  color: var(--theme-text-secondary-color);
-  cursor: help;
-  opacity: 0.7;
-}
-
-.statCardHelp:hover {
-  opacity: 1;
 }

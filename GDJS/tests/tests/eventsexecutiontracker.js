@@ -33,6 +33,43 @@ describe('gdjs.EventsExecutionTracker', () => {
     expect(durations['123:a0'] >= 0).to.be(true);
   });
 
+  it('measures an action calling a function whose events are tracked too', () => {
+    const { tracker, reports } = makeTracker(0);
+
+    tracker.begin('123:a0');
+    // The events of the function called by the action.
+    tracker.begin('456:c0');
+    tracker.end('456:c0');
+    tracker.begin('456:a0');
+    tracker.end('456:a0');
+    tracker.end('123:a0');
+
+    tracker.onFrameEnded();
+    const durations = reports[0].instructionDurations;
+    expect(Object.keys(durations).sort()).to.eql([
+      '123:a0',
+      '456:a0',
+      '456:c0',
+    ]);
+    // The action includes what the function did.
+    expect(durations['123:a0'] >= durations['456:a0']).to.be(true);
+  });
+
+  it('keeps measuring after an instruction left without its end', () => {
+    const { tracker, reports } = makeTracker(0);
+
+    tracker.begin('123:a0');
+    // An exception thrown in this one: its end is never called.
+    tracker.begin('456:a0');
+    tracker.end('123:a0');
+    tracker.begin('123:a1');
+    tracker.end('123:a1');
+
+    tracker.onFrameEnded();
+    const durations = reports[0].instructionDurations;
+    expect(Object.keys(durations).sort()).to.eql(['123:a0', '123:a1']);
+  });
+
   it('does not report anything when nothing ran', () => {
     const { tracker, reports } = makeTracker(0);
 

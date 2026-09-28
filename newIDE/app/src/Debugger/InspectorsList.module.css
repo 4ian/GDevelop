@@ -23,9 +23,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-/* Breathing room around the search bar, like the lists of the editors. */
-.searchBar {
-  flex-shrink: 0;
-  padding: 4px 8px 8px 8px;
-}

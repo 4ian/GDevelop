@@ -4,36 +4,18 @@ import {
   type PreviewDebuggerServer,
   type DebuggerId,
 } from '../../PreviewLauncher.flow';
+import {
+  makePreviewDebuggerServerSubscribers,
+  makePendingResponses,
+} from '../../PreviewDebuggerServerUtils';
 
 let debuggerServerState: 'started' | 'stopped' = 'stopped';
-const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
-
-/**
- * Notify all the subscribers of the debugger server. One of them failing (a
- * bug in a panel of the editor) must never prevent the others from receiving
- * what the preview sent.
- */
-const forEachCallbacks = (
-  // The callbacks can be asynchronous: what they return is not awaited.
-  notify: (callbacks: PreviewDebuggerServerCallbacks) => void | Promise<void>
-) => {
-  // Iterate on a copy: a subscriber can register or unregister while notified.
-  [...callbacksList].forEach(callbacks => {
-    try {
-      notify(callbacks);
-    } catch (error) {
-      console.error(
-        'Error while notifying a subscriber of the preview debugger server:',
-        error
-      );
-    }
-  });
-};
+const subscribers = makePreviewDebuggerServerSubscribers();
+const forEachCallbacks = subscribers.forEach;
 
 let nextDebuggerId = 0;
 
-const responseCallbacks = new Map<number, (value: Object) => void>();
-let nextMessageWithResponseId = 1;
+const pendingResponses = makePendingResponses();
 
 const existingPreviewWindows: {
   [DebuggerId]: WindowProxy,
@@ -140,11 +122,7 @@ class BrowserPreviewDebuggerServer {
 
       try {
         const parsedMessage = JSON.parse(event.data);
-        const answerCallback = responseCallbacks.get(parsedMessage.messageId);
-        if (answerCallback) {
-          answerCallback(parsedMessage);
-          responseCallbacks.delete(parsedMessage.messageId);
-        }
+        pendingResponses.resolve(parsedMessage);
         forEachCallbacks(({ onHandleParsedMessage }) =>
           onHandleParsedMessage({ id, parsedMessage })
         );
@@ -183,27 +161,12 @@ class BrowserPreviewDebuggerServer {
     debuggerId?: DebuggerId,
     timeoutMs?: number
   ): Promise<Object> {
-    const messageId = nextMessageWithResponseId;
-    nextMessageWithResponseId++;
-    const targetIds =
-      debuggerId != null ? [debuggerId] : getExistingDebuggerIds();
-    for (const id of targetIds) {
-      this.sendMessage(id, { ...message, messageId });
-    }
-
-    const timeout = timeoutMs || 1000;
-    const promise = new Promise<Object>((resolve, reject) => {
-      responseCallbacks.set(messageId, resolve);
-      setTimeout(() => {
-        reject(
-          new Error(
-            `Timeout while waiting for response from the debugger(s) for message with id ${messageId}.`
-          )
-        );
-        responseCallbacks.delete(messageId);
-      }, timeout);
+    return pendingResponses.send({
+      message,
+      targetIds: debuggerId != null ? [debuggerId] : getExistingDebuggerIds(),
+      sendMessage: (id, messageWithId) => this.sendMessage(id, messageWithId),
+      timeoutMs,
     });
-    return promise;
   }
   getServerState(): 'started' | 'stopped' {
     return debuggerServerState;
@@ -218,12 +181,7 @@ class BrowserPreviewDebuggerServer {
     return getExistingPreviewDebuggerIds();
   }
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void {
-    callbacksList.push(callbacks);
-
-    return () => {
-      const callbacksIndex = callbacksList.indexOf(callbacks);
-      if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
-    };
+    return subscribers.register(callbacks);
   }
   registerEmbeddedGameFrame(window: WindowProxy) {
     if (window === embbededGameFrameWindow) return;
@@ -311,7 +269,7 @@ class BrowserPreviewDebuggerServer {
       notifyConnectionClosed('gameplay-test-frame');
     }
 
-    responseCallbacks.clear();
+    pendingResponses.clear();
   }
 }
 export const browserPreviewDebuggerServer: PreviewDebuggerServer = new BrowserPreviewDebuggerServer();

@@ -365,6 +365,11 @@ const generateFreeFunction = (
       eventsFunction,
       codeGenerationContext.codeNamespacePrefix
     );
+    // Only for the previews launched with the debugger: an export compiles
+    // the extensions again without it (`ensureEventsExecutionInstrumentation`).
+    eventsFunctionsExtensionCodeGenerator.setGenerateEventsExecutionTracking(
+      !!options.instrumentEventsExecution
+    );
     let code;
     try {
       code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
@@ -375,8 +380,7 @@ const generateFreeFunction = (
         // For now, always generate functions for runtime (this disables
         // generation of profiling for groups (see EventsCodeGenerator))
         // as extensions generated can be used either for preview or export.
-        true,
-        !!options.instrumentEventsExecution
+        true
       );
     } catch (error) {
       console.error(
@@ -490,6 +494,11 @@ function generateBehavior(
       );
       const includeFiles = new gd.SetString();
       const behaviorCodeGenerator = new gd.BehaviorCodeGenerator(project);
+      // Only for the previews launched with the debugger: an export compiles
+      // the extensions again without it (`ensureEventsExecutionInstrumentation`).
+      behaviorCodeGenerator.setGenerateEventsExecutionTracking(
+        !!options.instrumentEventsExecution
+      );
       const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
         eventsFunctionsExtension,
         eventsBasedBehavior,
@@ -500,8 +509,7 @@ function generateBehavior(
         // For now, always generate functions for runtime (this disables
         // generation of profiling for groups (see EventsCodeGenerator))
         // as extensions generated can be used either for preview or export.
-        true,
-        !!options.instrumentEventsExecution
+        true
       );
       behaviorCodeGenerator.delete();
       behaviorMethodMangledNames.delete();
@@ -594,6 +602,11 @@ function generateObject(
       );
       const includeFiles = new gd.SetString();
       const objectCodeGenerator = new gd.ObjectCodeGenerator(project);
+      // Only for the previews launched with the debugger: an export compiles
+      // the extensions again without it (`ensureEventsExecutionInstrumentation`).
+      objectCodeGenerator.setGenerateEventsExecutionTracking(
+        !!options.instrumentEventsExecution
+      );
       const code = objectCodeGenerator.generateRuntimeObjectCompleteCode(
         eventsFunctionsExtension,
         eventsBasedObject,
@@ -604,8 +617,7 @@ function generateObject(
         // For now, always generate functions for runtime (this disables
         // generation of profiling for groups (see EventsCodeGenerator))
         // as extensions generated can be used either for preview or export.
-        true,
-        !!options.instrumentEventsExecution
+        true
       );
       objectCodeGenerator.delete();
       objectMethodMangledNames.delete();

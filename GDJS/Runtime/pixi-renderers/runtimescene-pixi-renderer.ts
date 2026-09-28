@@ -100,7 +100,10 @@ namespace gdjs {
       runtimeGameRenderer.setProfilerForInstrumentation(this._profiler);
 
       const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
-      if (!pixiRenderer) return;
+      if (!pixiRenderer) {
+        this._stopInstrumenting(runtimeGameRenderer);
+        return;
+      }
 
       const threeRenderer = this._threeRenderer;
 
@@ -115,7 +118,10 @@ namespace gdjs {
       // It is therefore left to the VR extension to call the VR rendering method whenever
       // the headset require a new image, we'll just disable rendering when stepping to
       // not interfere with the headset's rendering.
-      if (threeRenderer && threeRenderer.xr.isPresenting) return;
+      if (threeRenderer && threeRenderer.xr.isPresenting) {
+        this._stopInstrumenting(runtimeGameRenderer);
+        return;
+      }
 
       this._layerRenderingMetrics.rendered2DLayersCount = 0;
       this._layerRenderingMetrics.rendered3DLayersCount = 0;
@@ -150,9 +156,10 @@ namespace gdjs {
 
           // Named after the layer: "60% of the render in the Lighting layer"
           // is something the user can act on, "render is 75%" is not.
-          const layerSectionName = RuntimeScenePixiRenderer._getLayerSectionName(
-            runtimeLayer
-          );
+          // Only built while recording: nothing to pay otherwise.
+          const layerSectionName = this._profiler
+            ? RuntimeScenePixiRenderer._getLayerSectionName(runtimeLayer)
+            : '';
           this._beginSection(layerSectionName);
 
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
@@ -348,8 +355,9 @@ namespace gdjs {
           if (runtimeLayer.isLightingLayer()) {
             // Told apart: lights are rendered on a texture of their own, and
             // a lighting layer is often what makes a 2D game slow.
-            const lightingSectionName =
-              RuntimeScenePixiRenderer._getLayerSectionName(runtimeLayer);
+            const lightingSectionName = this._profiler
+              ? RuntimeScenePixiRenderer._getLayerSectionName(runtimeLayer)
+              : '';
             this._beginSection(lightingSectionName);
             // Render the lights on the render texture used then by the lighting Sprite.
             const runtimeLayerRenderer = runtimeLayer.getRenderer();
@@ -379,6 +387,13 @@ namespace gdjs {
         this._showCursorAtNextRender = false;
       }
 
+      this._stopInstrumenting(runtimeGameRenderer);
+    }
+
+    /** The profiler given to `render` is only kept while rendering. */
+    private _stopInstrumenting(
+      runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer
+    ) {
       runtimeGameRenderer.setProfilerForInstrumentation(null);
       this._profiler = null;
     }

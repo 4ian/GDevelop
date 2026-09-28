@@ -4,7 +4,7 @@ import {
   TrackedEventPtrContext,
   useCumulatedEventExecution,
 } from '../../../EventsExecutionTracking/EventsExecutionTrackingContext';
-import { formatExecutionDuration } from '../../../EventsExecutionTracking/EventsExecutionTrackingStore';
+import { formatExecutionDuration } from '../../../EventsExecutionTracking/formatting';
 import { groupExecutionTime } from '../ClassNames';
 
 /**

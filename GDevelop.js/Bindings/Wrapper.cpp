@@ -618,7 +618,6 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior
 #define STATIC_IsExpression IsExpression
-#define STATIC_IsResourceExpression IsResourceExpression
 #define STATIC_IsTypeObject IsTypeObject
 #define STATIC_IsTypeBehavior IsTypeBehavior
 #define STATIC_IsTypeExpression IsTypeExpression

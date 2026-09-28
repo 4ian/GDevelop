@@ -71,6 +71,23 @@ export const mosaicContainsNode = (
 };
 
 /**
+ * Whether a layout saved in the preferences can still be shown: it only names
+ * editors that exist, and holds the central node. A layout saved by an older
+ * version of an editor can name panels that are gone, which cannot be shown.
+ */
+export const isMosaicNodeUsable = (
+  node: ?EditorMosaicNode,
+  editorNames: Array<string>,
+  centralNodeId?: string
+): boolean => {
+  if (!node) return false;
+  const leaves = getLeaves(node);
+  if (!leaves.length || leaves.some(leaf => !editorNames.includes(leaf)))
+    return false;
+  return !centralNodeId || leaves.includes(centralNodeId);
+};
+
+/**
  * Fill missing `splitPercentage` with `50`.
  */
 const fillMissingSplitPercentage = (currentNode: EditorMosaicNode) => {

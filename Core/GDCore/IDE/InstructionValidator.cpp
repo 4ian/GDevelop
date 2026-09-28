@@ -97,12 +97,8 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
   } else if (gd::ParameterMetadata::IsExpression("resource", parameterType)) {
     const auto &resourceName =
         instruction.GetParameter(parameterIndex).GetPlainString();
-    // A name computed by the events names no resource of the project: it is
-    // only known once the game runs, so it is not underlined as invalid.
-    result.isValid =
-        gd::ParameterMetadata::IsResourceExpression(resourceName) ||
-        projectScopedContainers.GetResourcesContainersList().HasResourceNamed(
-            resourceName);
+    result.isValid = projectScopedContainers.GetResourcesContainersList()
+                         .HasResourceNamed(resourceName);
   }
 
   return result;

@@ -1910,6 +1910,8 @@ namespace gdjs {
     ): void {
       this._throwIfDisposed();
       this.stopEventsExecutionTracking();
+      // Only included in the previews launched with a debugger.
+      if (typeof gdjs.EventsExecutionTracker !== 'function') return;
       gdjs.eventsExecutionTracker = new gdjs.EventsExecutionTracker(onReport);
     }
 

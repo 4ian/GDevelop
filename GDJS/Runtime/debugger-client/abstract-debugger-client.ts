@@ -1,10 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Debugger client');
 
-  /** The only debugger commands processed while a gameplay test is running:
-   * read-only inspection and the gameplay test commands themselves. Every
-   * other command is ignored (fail closed: a command added later cannot
-   * accidentally mutate the game state or stepping the harness owns). */
   /** What the editor reads: a variable becomes a plain value. */
   const toDebuggerValue = (value: unknown) => {
     if (value instanceof gdjs.Variable) {
@@ -13,6 +9,10 @@ namespace gdjs {
     return value;
   };
 
+  /** The only debugger commands processed while a gameplay test is running:
+   * read-only inspection and the gameplay test commands themselves. Every
+   * other command is ignored (fail closed: a command added later cannot
+   * accidentally mutate the game state or stepping the harness owns). */
   const DEBUGGER_COMMANDS_ALLOWED_DURING_GAMEPLAY_TESTS = new Set([
     'refresh',
     'getStatus',
@@ -77,7 +77,7 @@ namespace gdjs {
       // always better than a game nobody can play anymore.
       if (value !== null && typeof value === 'object') {
         if (maxNodes != null && ++visitedNodesCount > maxNodes) {
-          return '[Dump too large: not sent to the debugger]';
+          return DUMP_TOO_LARGE_PLACEHOLDER;
         }
       }
       if (stack.length === 0) {
@@ -147,6 +147,20 @@ namespace gdjs {
    * a refresh never freezes the preview for more than a moment.
    */
   const MAX_DUMPED_NODES_COUNT = 200000;
+
+  /** What replaces what is past `MAX_DUMPED_NODES_COUNT`. */
+  const DUMP_TOO_LARGE_PLACEHOLDER =
+    '[Dump too large: not sent to the debugger]';
+
+  /** How many compiled expressions of the editor are kept (see `sendExpressionValues`). */
+  const MAX_COMPILED_EXPRESSION_EVALUATIONS_COUNT = 100;
+
+  /** How deep the whole game is serialized (see `sendRuntimeGameDump`). */
+  const MAX_GAME_DUMP_DEPTH = 22;
+  /** How deep the element selected in the inspector is serialized. */
+  const MAX_INSPECTED_VALUE_DEPTH = 8;
+  /** Expressions of behaviors return numbers and strings: deeper is a mistake. */
+  const MAX_CALLED_VALUES_DEPTH = 3;
 
   /**
    * What marks a step of an inspector path as an instance of an object,
@@ -271,6 +285,14 @@ namespace gdjs {
   export abstract class AbstractDebuggerClient {
     _runtimegame: gdjs.RuntimeGame;
     _hotReloader: gdjs.HotReloader;
+    /**
+     * The expressions watched by the editor, compiled once: the same ones are
+     * evaluated again several times per second.
+     */
+    private _compiledExpressionEvaluations = new Map<
+      string,
+      (runtimeScene: gdjs.RuntimeScene, gdjsNamespace: typeof gdjs) => any
+    >();
     _originalConsole = originalConsole;
     _inGameDebugger: gdjs.InGameDebugger;
 
@@ -396,19 +418,7 @@ namespace gdjs {
         } else if (data.command === 'call') {
           that.call(data.path, data.args);
         } else if (data.command === 'profiler.start') {
-          runtimeGame.startProfiler({
-            onChunk: (chunk) => {
-              that.sendProfilerChunk(chunk);
-            },
-            onStopped: (stoppedProfiler) => {
-              // Kept for the tools reading only the averages (MCP, tests).
-              that.sendProfilerOutput(
-                stoppedProfiler.getFramesAverageMeasures(),
-                stoppedProfiler.getStats()
-              );
-              that.sendProfilerStopped(stoppedProfiler);
-            },
-          });
+          that.startProfilerAndReport();
           const profiler = runtimeGame.getProfiler();
           if (profiler) {
             // Answered even when a recording was already running (`wasStarted`
@@ -434,7 +444,11 @@ namespace gdjs {
         } else if (data.command === 'stepFrame') {
           runtimeGame.stepOneFrame();
         } else if (data.command === 'evaluateExpression') {
-          that.sendExpressionValues(data.messageId, data.payload.codes);
+          that.sendExpressionValues(
+            data.messageId,
+            data.payload.codes,
+            data.payload.maxInstancesCount
+          );
         } else if (data.command === 'inspector.dump') {
           that.sendInspectedValue(data.messageId, data.payload.path);
         } else if (data.command === 'inspector.call') {
@@ -907,6 +921,25 @@ namespace gdjs {
     }
 
     /**
+     * What holds the last step of a path starting from the {@link RuntimeGame}
+     * instance (instances are found by their identifier, see
+     * `resolveInspectorPathStep`). `null`, and logged, if the path is wrong.
+     */
+    private _getHolderOfPath(path: string[]): any {
+      let object: any = this._runtimegame;
+      for (let index = 0; index < path.length - 1; index++) {
+        const key = path[index];
+        const nextObject = resolveInspectorPathStep(object, key);
+        if (!nextObject) {
+          logger.error('Incorrect path specified. No ' + key + ' in ', object);
+          return null;
+        }
+        object = nextObject;
+      }
+      return object;
+    }
+
+    /**
      * Update a value, specified by a path starting from the {@link RuntimeGame} instance.
      * @param path - The path to the variable, starting from {@link RuntimeGame}.
      * @param newValue - The new value.
@@ -917,18 +950,9 @@ namespace gdjs {
         logger.warn('No path specified, set operation from debugger aborted');
         return false;
       }
-      let object: any = this._runtimegame;
-      let currentIndex = 0;
-      while (currentIndex < path.length - 1) {
-        const key = path[currentIndex];
-        const nextObject = resolveInspectorPathStep(object, key);
-        if (!nextObject) {
-          logger.error('Incorrect path specified. No ' + key + ' in ', object);
-          return false;
-        }
-        object = nextObject;
-        currentIndex++;
-      }
+      const object = this._getHolderOfPath(path);
+      if (!object) return false;
+      const currentIndex = path.length - 1;
 
       // Ensure the newValue is properly typed to avoid breaking anything in
       // the game engine.
@@ -956,18 +980,9 @@ namespace gdjs {
         logger.warn('No path specified, call operation from debugger aborted');
         return false;
       }
-      let object: any = this._runtimegame;
-      let currentIndex = 0;
-      while (currentIndex < path.length - 1) {
-        const key = path[currentIndex];
-        const nextObject = resolveInspectorPathStep(object, key);
-        if (!nextObject) {
-          logger.error('Incorrect path specified. No ' + key + ' in ', object);
-          return false;
-        }
-        object = nextObject;
-        currentIndex++;
-      }
+      const object = this._getHolderOfPath(path);
+      if (!object) return false;
+      const currentIndex = path.length - 1;
       if (!object[path[currentIndex]]) {
         logger.error('Unable to call', path);
         return false;
@@ -992,14 +1007,21 @@ namespace gdjs {
     }
 
     /**
-     * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
-     */
-    /**
      * The replacer used when serializing (a part of) the running game: it
      * removes what is too big, circular or useless for the debugger.
      */
-    private _getDumpReplacer(): (key: string, value: any) => any {
+    private _getDumpReplacer({
+      summarizePausedScenes,
+    }: { summarizePausedScenes?: boolean } = {}): (
+      key: string,
+      value: any
+    ) => any {
       const that = this;
+      // The scenes paused under the current one are only named: the editor
+      // reads one of them (with `inspector.dump`) when it is selected.
+      const currentScene = summarizePausedScenes
+        ? getCurrentSceneForDebugger(that._runtimegame)
+        : null;
       const excludedValues = [that._runtimegame.getGameData()];
       const excludedKeys = [
         // Exclude reference to the debugger
@@ -1043,24 +1065,42 @@ namespace gdjs {
         ) {
           return '[Removed from the debugger]';
         }
+        if (
+          currentScene &&
+          value instanceof gdjs.RuntimeScene &&
+          value !== currentScene
+        ) {
+          return { _name: value.getName(), _isPausedSceneSummary: true };
+        }
         return value;
       };
     }
 
+    /**
+     * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
+     */
     sendRuntimeGameDump(): void {
-      const message = { command: 'dump', payload: this._runtimegame };
       const serializationStartTime = Date.now();
 
-      const stringifiedMessage = circularSafeStringify(
-        message,
-        this._getDumpReplacer(),
-        /* Limit maximum depth to prevent any crashes */
-        22,
+      // The game is serialized alone (one level less than in the message),
+      // so that the message can say whether it had to be cut short.
+      const stringifiedGame = circularSafeStringify(
+        this._runtimegame,
+        this._getDumpReplacer({ summarizePausedScenes: true }),
+        MAX_GAME_DUMP_DEPTH - 1,
         undefined,
         undefined,
         /* Limit the size, so that a huge game does not freeze on a refresh */
         MAX_DUMPED_NODES_COUNT
       );
+      const isTruncated =
+        stringifiedGame.indexOf(DUMP_TOO_LARGE_PLACEHOLDER) !== -1;
+      const stringifiedMessage =
+        '{"command":"dump","isTruncated":' +
+        (isTruncated ? 'true' : 'false') +
+        ',"payload":' +
+        stringifiedGame +
+        '}';
       const serializationDuration = Date.now() - serializationStartTime;
       logger.log(
         'RuntimeGame serialization took ' + serializationDuration + 'ms'
@@ -1092,8 +1132,10 @@ namespace gdjs {
             payload: value === undefined ? null : value,
           },
           this._getDumpReplacer(),
-          /* Limit maximum depth to prevent any crashes */
-          8
+          MAX_INSPECTED_VALUE_DEPTH,
+          undefined,
+          undefined,
+          MAX_DUMPED_NODES_COUNT
         );
       } catch (error) {
         logger.error(
@@ -1158,8 +1200,7 @@ namespace gdjs {
         circularSafeStringify(
           { command: 'inspector.called', messageId, payload },
           this._getDumpReplacer(),
-          /* Expressions return numbers and strings: anything deeper is a mistake. */
-          3
+          MAX_CALLED_VALUES_DEPTH
         )
       );
     }
@@ -1185,7 +1226,11 @@ namespace gdjs {
      * expression (see `LayoutCodeGenerator::GenerateExpressionEvaluationCode`)
      * and send back its value and the values of the variables it uses.
      */
-    sendExpressionValues(messageId: number, codes: string[]): void {
+    sendExpressionValues(
+      messageId: number,
+      codes: string[],
+      maxInstancesCount?: integer
+    ): void {
       const currentScene = getCurrentSceneForDebugger(this._runtimegame);
 
       // Everything is evaluated in one go: the editor watches several
@@ -1198,7 +1243,7 @@ namespace gdjs {
           return { error: 'No scene is running.', variables: {} };
 
         try {
-          const evaluation = new Function('runtimeScene', 'gdjs', code)(
+          const evaluation = this._getCompiledExpressionEvaluation(code)(
             currentScene,
             gdjs
           );
@@ -1210,8 +1255,13 @@ namespace gdjs {
           }
           // Only sent when the editor asked for every instance: a panel that
           // does not show them must not pay for them on the channel.
-          const instances = evaluation.instances
-            ? evaluation.instances.map((instance) => ({
+          // The editor says how many it shows: the others are not sent.
+          const shownInstances =
+            evaluation.instances && typeof maxInstancesCount === 'number'
+              ? evaluation.instances.slice(0, maxInstancesCount)
+              : evaluation.instances;
+          const instances = shownInstances
+            ? shownInstances.map((instance) => ({
                 id: instance.id,
                 objectName: instance.objectName,
                 result: toDebuggerValue(instance.result),
@@ -1237,6 +1287,27 @@ namespace gdjs {
       );
     }
 
+    private _getCompiledExpressionEvaluation(
+      code: string
+    ): (runtimeScene: gdjs.RuntimeScene, gdjsNamespace: typeof gdjs) => any {
+      let compiledEvaluation = this._compiledExpressionEvaluations.get(code);
+      if (!compiledEvaluation) {
+        // Only what is watched right now is kept: a handful of expressions.
+        if (
+          this._compiledExpressionEvaluations.size >=
+          MAX_COMPILED_EXPRESSION_EVALUATIONS_COUNT
+        ) {
+          this._compiledExpressionEvaluations.clear();
+        }
+        compiledEvaluation = new Function('runtimeScene', 'gdjs', code) as (
+          runtimeScene: gdjs.RuntimeScene,
+          gdjsNamespace: typeof gdjs
+        ) => any;
+        this._compiledExpressionEvaluations.set(code, compiledEvaluation);
+      }
+      return compiledEvaluation;
+    }
+
     /**
      * Send a snapshot of every resource of the game with its loading state,
      * as an answer to the `resources.dump` command.
@@ -1246,7 +1317,9 @@ namespace gdjs {
       try {
         payload = this._runtimegame
           .getResourceLoader()
-          .getResourcesDebugState();
+          .getResourcesDebugState() || {
+          error: 'The resources are only followed in previews.',
+        };
       } catch (error) {
         payload = { error: String(error) };
       }
@@ -1268,7 +1341,7 @@ namespace gdjs {
       output: EventsExecutionTrackerOutput
     ): void {
       this._sendMessage(
-        circularSafeStringify({
+        JSON.stringify({
           command: 'eventsExecutionTracker.output',
           payload: output,
         })
@@ -1276,11 +1349,32 @@ namespace gdjs {
     }
 
     /**
+     * Start recording the game, and send what is recorded to the editor: the
+     * chunks while it records, the averages and the end when it stops.
+     * @returns false if a recording was already running (it is kept).
+     */
+    startProfilerAndReport(): boolean {
+      return this._runtimegame.startProfiler({
+        onChunk: (chunk) => {
+          this.sendProfilerChunk(chunk);
+        },
+        onStopped: (stoppedProfiler) => {
+          // Kept for the tools reading only the averages (MCP, tests).
+          this.sendProfilerOutput(
+            stoppedProfiler.getFramesAverageMeasures(),
+            stoppedProfiler.getStats()
+          );
+          this.sendProfilerStopped(stoppedProfiler);
+        },
+      });
+    }
+
+    /**
      * Callback called when profiling is starting.
      */
     sendProfilerStarted(profiler: gdjs.Profiler): void {
       this._sendMessage(
-        circularSafeStringify({
+        JSON.stringify({
           command: 'profiler.started',
           payload: {
             recordingId: profiler.getRecordingId(),
@@ -1308,7 +1402,7 @@ namespace gdjs {
      */
     sendProfilerStopped(profiler: gdjs.Profiler): void {
       this._sendMessage(
-        circularSafeStringify({
+        JSON.stringify({
           command: 'profiler.stopped',
           payload: {
             recordingId: profiler.getRecordingId(),

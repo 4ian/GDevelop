@@ -173,7 +173,11 @@ namespace gdjs {
 
     private privateResourceManager = new PrivateResourceManager(this);
     /** Remembers when, why and how each resource was loaded (for the debugger). */
-    private _loadTracker: gdjs.ResourceLoadTracker;
+    /**
+     * What the debugger reads about the resources. Only in previews: the
+     * tracker is not even part of an exported game.
+     */
+    private _loadTracker: gdjs.ResourceLoadTracker | null;
     /**
      * When set (by a hard reload asked to start from scratch), added to the
      * URL of every resource so that the HTTP cache is bypassed.
@@ -220,19 +224,24 @@ namespace gdjs {
     ) {
       this._runtimeGame = runtimeGame;
       this._globalResources = globalResources;
-      this._loadTracker = new gdjs.ResourceLoadTracker(() =>
-        runtimeGame.getGameTimeMs()
-      );
+      const loadTracker =
+        runtimeGame.isPreview() &&
+        typeof gdjs.ResourceLoadTracker === 'function'
+          ? new gdjs.ResourceLoadTracker(() => runtimeGame.getGameTimeMs())
+          : null;
+      this._loadTracker = loadTracker;
       if (typeof location !== 'undefined' && location.search) {
         this._resourcesCacheBurst = new URLSearchParams(location.search).get(
           'resourcesCacheBurst'
         );
       }
-      gdjs.registerRuntimeSceneLoadedCallback((runtimeScene) => {
-        if (runtimeScene.getGame() === this._runtimeGame) {
-          this._loadTracker.recordSceneChange(runtimeScene.getName());
-        }
-      });
+      if (loadTracker) {
+        gdjs.registerRuntimeSceneLoadedCallback((runtimeScene) => {
+          if (runtimeScene.getGame() === this._runtimeGame) {
+            loadTracker.recordSceneChange(runtimeScene.getName());
+          }
+        });
+      }
 
       // These 3 attributes are filled by `setResources`.
       this.setResources(resourceDataArray, globalResources, layoutDataArray);
@@ -314,7 +323,7 @@ namespace gdjs {
       }
 
       this.privateResourceManager._resources.clear();
-      this._loadTracker.reset();
+      if (this._loadTracker) this._loadTracker.reset();
       for (const resourceData of resourceDataArray) {
         if (!resourceData.file) {
           // Empty string or missing `file` field: not a valid resource, let's entirely ignore it.
@@ -666,7 +675,7 @@ namespace gdjs {
       return this.privateResourceManager._resources.get(resourceName) || null;
     }
 
-    getLoadTracker(): gdjs.ResourceLoadTracker {
+    getLoadTracker(): gdjs.ResourceLoadTracker | null {
       return this._loadTracker;
     }
 
@@ -743,10 +752,12 @@ namespace gdjs {
      * A snapshot of every resource of the game with its loading state, for
      * the debugger. Cheap enough to be polled every second or so.
      */
-    getResourcesDebugState(): ResourcesDebugState {
+    getResourcesDebugState(): ResourcesDebugState | null {
+      const loadTracker = this._loadTracker;
+      if (!loadTracker) return null;
       const requestersByResourceName = this._getRequestersByResourceName();
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      return this._loadTracker.buildDebugState(
+      return loadTracker.buildDebugState(
         this.privateResourceManager._resources.values(),
         (resourceName) => requestersByResourceName.get(resourceName) || [],
         (resource) => {
@@ -1121,20 +1132,20 @@ namespace gdjs {
             resource.name +
             '".'
         );
-        loadTracker.onLoadFailed(
+        loadTracker?.onLoadFailed(
           resource.name,
           'Unknown resource kind: "' + resource.kind + '".'
         );
         return;
       }
-      loadTracker.onProcessingStarted(resource.name);
+      loadTracker?.onProcessingStarted(resource.name);
       try {
         await resourceManager.processResource(resource.name);
       } catch (error) {
-        loadTracker.onProcessFailed(resource.name, error);
+        loadTracker?.onProcessFailed(resource.name, error);
         throw error;
       }
-      loadTracker.onReady(resource.name);
+      loadTracker?.onReady(resource.name);
     }
 
     /**
@@ -1156,21 +1167,21 @@ namespace gdjs {
             resource.name +
             '".'
         );
-        loadTracker.onLoadFailed(
+        loadTracker?.onLoadFailed(
           resource.name,
           'Unknown resource kind: "' + resource.kind + '".'
         );
         return;
       }
-      loadTracker.onLoadStarted(resource.name, origin);
+      loadTracker?.onLoadStarted(resource.name, origin);
       try {
         await resourceManager.loadResource(resource.name);
       } catch (error) {
         // The loading queue retries a few times: the tracker keeps the last error.
-        loadTracker.onLoadFailed(resource.name, error);
+        loadTracker?.onLoadFailed(resource.name, error);
         throw error;
       }
-      loadTracker.onLoaded(
+      loadTracker?.onLoaded(
         resource.name,
         this.resourceLoader.getFullUrl(resource.file)
       );
@@ -1187,7 +1198,7 @@ namespace gdjs {
             `Unloading of resources of kind ${resourceData.kind} : ${resourceName}`
           );
           resourceManager.unloadResource(resourceData);
-          this.resourceLoader.getLoadTracker().onUnloaded(resourceName);
+          this.resourceLoader.getLoadTracker()?.onUnloaded(resourceName);
         }
       }
     }

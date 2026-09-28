@@ -11,6 +11,8 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import Background from '../../UI/Background';
 import ScrollView from '../../UI/ScrollView';
 import Text from '../../UI/Text';
+import { Line } from '../../UI/Grid';
+import { ColumnStackLayout } from '../../UI/Layout';
 import LinearProgress from '../../UI/LinearProgress';
 import { type DebuggerId } from '../../ExportAndShare/PreviewLauncher.flow';
 import { type ProfilerMeasuresSection } from '..';
@@ -22,7 +24,6 @@ import {
 import {
   aggregateFramesToMeasures,
   formatGameTime,
-  formatMilliseconds,
   getFrameStats,
   getFramesInRange,
   getRecordingTimeBounds,
@@ -31,6 +32,7 @@ import {
 } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import StartRecordingPlaceholder from '../StartRecordingPlaceholder';
 import classes from './Profiler.module.css';
+import { formatMilliseconds } from '../../Utils/FormatMeasures';
 
 /** Above this share of the frame, `render` is worth saying something about. */
 const HEAVY_RENDER_SHARE = 0.5;
@@ -164,9 +166,9 @@ const Profiler = ({
   return (
     <Background>
       {profilingInProgress && (
-        <div className={classes.progressBar}>
+        <Line noMargin neverShrink>
           <LinearProgress style={{ height: 2 }} />
-        </div>
+        </Line>
       )}
       <ScrollView
         autoHideScrollbar
@@ -176,7 +178,7 @@ const Profiler = ({
       >
         {recording && bounds && shownRange && hasFrames ? (
           <div className={classes.content}>
-            <div className={classes.timeline}>
+            <ColumnStackLayout noMargin noOverflowParent>
               <I18n>
                 {({ i18n }) => (
                   <FrameStrip
@@ -213,8 +215,8 @@ const Profiler = ({
                 names={recording.names}
                 range={shownRange}
               />
-            </div>
-            <div className={classes.section}>
+            </ColumnStackLayout>
+            <ColumnStackLayout noMargin noOverflowParent>
               <Text noMargin size="body-small" color="secondary">
                 <Trans>
                   Time spent in each section of a frame, averaged over the
@@ -230,19 +232,19 @@ const Profiler = ({
                   {renderAdvice}
                 </Text>
               )}
-            </div>
+            </ColumnStackLayout>
           </div>
         ) : recording && recording.legacyOutput && !profilingInProgress ? (
           // A game engine too old to send frames: only the averages.
           <div className={classes.content}>
-            <div className={classes.section}>
+            <ColumnStackLayout noMargin noOverflowParent>
               <Text noMargin size="body-small" color="secondary">
                 <Trans>Time spent in each section of a frame</Trans>
               </Text>
               <MeasuresTable
                 profilerMeasures={recording.legacyOutput.framesAverageMeasures}
               />
-            </div>
+            </ColumnStackLayout>
           </div>
         ) : profilingInProgress ? (
           <EmptyMessage>

@@ -1,9 +1,9 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import EditorMosaic, {
+  isMosaicNodeUsable,
   type EditorMosaicInterface,
   type EditorMosaicNode,
 } from '../UI/EditorMosaic';
@@ -20,6 +20,7 @@ import {
 } from './GDJSInspectorDescriptions';
 import InspectedValue from './Inspectors/InspectedValue';
 import EmptyMessage from '../UI/EmptyMessage';
+import AlertMessage from '../UI/AlertMessage';
 import Checkbox from '../UI/Checkbox';
 import Flash from '@material-ui/icons/FlashOn';
 import FlashOff from '@material-ui/icons/FlashOff';
@@ -41,9 +42,13 @@ import { type DebuggerId } from '../ExportAndShare/PreviewLauncher.flow';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import MiniToolbar from '../UI/MiniToolbar';
 import classes from './DebuggerContent.module.css';
+import { DEBUGGER_PANELS, type DebuggerPanelName } from './DebuggerPanels';
+import { DEFAULT_INSPECTOR_LIST_SPLIT_PERCENTAGE } from './DebuggerConstants';
 
 type Props = {|
   gameData: ?any,
+  /** The game was too large to be sent whole: parts of it are missing. */
+  isGameDataTruncated: boolean,
   onEdit: EditFunction,
   onCall: CallFunction,
   onPlay: () => void,
@@ -75,12 +80,7 @@ type State = {|
   rawMode: boolean,
   /** The artificial memory limit set in the resources panel (MB). */
   memoryLimitMegabytes: ?number,
-  /** The width of the list of the scene content, in the inspector. */
-  inspectorListWidth: number,
 |};
-
-const MINIMUM_INSPECTOR_LIST_WIDTH = 160;
-const MAXIMUM_INSPECTOR_LIST_WIDTH = 640;
 
 const initialMosaicEditorNodes: EditorMosaicNode = {
   direction: 'column',
@@ -100,6 +100,18 @@ const initialMosaicEditorNodes: EditorMosaicNode = {
 };
 
 /**
+ * The inspector is a mosaic of its own: the list of the scene content and the
+ * inspected element, resized with the same splitter as the panels, and whose
+ * proportions are kept in the preferences.
+ */
+const initialInspectorMosaicNodes: EditorMosaicNode = {
+  direction: 'row',
+  first: 'inspector-list',
+  second: 'inspector-details',
+  splitPercentage: DEFAULT_INSPECTOR_LIST_SPLIT_PERCENTAGE,
+};
+
+/**
  * The debugger interface: show the list of inspectors for a game, along with the
  * currently selected inspector.
  */
@@ -109,11 +121,9 @@ export default class DebuggerContent extends React.Component<Props, State> {
     selectedInspectorFullPath: [],
     rawMode: false,
     memoryLimitMegabytes: null,
-    inspectorListWidth: 280,
   };
 
   _editors: ?EditorMosaicInterface = null;
-  _inspectorResizeStart: ?{| x: number, width: number |} = null;
 
   /**
    * The central node of the mosaic ("overview") only shows a hint when no
@@ -142,97 +152,19 @@ export default class DebuggerContent extends React.Component<Props, State> {
     this._updateOverviewVisibility();
   }
 
-  _startInspectorResize = (event: SyntheticMouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    this._inspectorResizeStart = {
-      x: event.clientX,
-      width: this.state.inspectorListWidth,
-    };
-    window.addEventListener('mousemove', this._onInspectorResize);
-    window.addEventListener('mouseup', this._stopInspectorResize);
-  };
+  isPanelShown = (panelName: DebuggerPanelName): boolean =>
+    !!this._editors && this._editors.getOpenedEditorNames().includes(panelName);
 
-  _onInspectorResize = (event: MouseEvent) => {
-    const resizeStart = this._inspectorResizeStart;
-    if (!resizeStart) return;
-    const inspectorListWidth = Math.max(
-      MINIMUM_INSPECTOR_LIST_WIDTH,
-      Math.min(
-        MAXIMUM_INSPECTOR_LIST_WIDTH,
-        resizeStart.width + event.clientX - resizeStart.x
-      )
-    );
-    this.setState({ inspectorListWidth });
-  };
-
-  _stopInspectorResize = () => {
-    this._inspectorResizeStart = null;
-    window.removeEventListener('mousemove', this._onInspectorResize);
-    window.removeEventListener('mouseup', this._stopInspectorResize);
-  };
-
-  componentWillUnmount() {
-    this._stopInspectorResize();
-  }
-
-  isProfilerShown = (): any => {
-    return (
-      !!this._editors &&
-      this._editors.getOpenedEditorNames().includes('profiler')
-    );
-  };
-
-  isConsoleShown = (): any => {
-    return (
-      !!this._editors &&
-      this._editors.getOpenedEditorNames().includes('console')
-    );
-  };
-
-  isInspectorShown = (): any => {
-    return (
-      !!this._editors &&
-      this._editors.getOpenedEditorNames().includes('inspector')
-    );
-  };
-
-  isPerformanceShown = (): any => {
-    return (
-      !!this._editors &&
-      this._editors.getOpenedEditorNames().includes('performance')
-    );
-  };
-
-  isResourcesShown = (): any => {
-    return (
-      !!this._editors &&
-      this._editors.getOpenedEditorNames().includes('resources')
-    );
-  };
-
-  toggleInspector = () => {
-    if (this._editors) this._editors.toggleEditor('inspector', 'left');
-  };
-
-  toggleProfiler = () => {
-    if (this._editors) this._editors.toggleEditor('profiler', 'bottom');
-  };
-
-  toggleConsole = () => {
-    if (this._editors) this._editors.toggleEditor('console', 'bottom');
-  };
-
-  togglePerformance = () => {
-    if (this._editors) this._editors.toggleEditor('performance', 'bottom');
-  };
-
-  toggleResources = () => {
-    if (this._editors) this._editors.toggleEditor('resources', 'bottom');
+  togglePanel = (panelName: DebuggerPanelName) => {
+    const panel = DEBUGGER_PANELS.find(({ name }) => name === panelName);
+    if (this._editors && panel)
+      this._editors.toggleEditor(panel.name, panel.position);
   };
 
   render(): any {
     const {
       gameData,
+      isGameDataTruncated,
       onRefresh,
       onCall,
       onEdit,
@@ -256,12 +188,189 @@ export default class DebuggerContent extends React.Component<Props, State> {
       selectedInspectorFullPath,
       rawMode,
       memoryLimitMegabytes,
-      inspectorListWidth,
     } = this.state;
     const memoryLimitBytes = getMemoryLimitBytes(
       resourcesDebugSnapshot ? resourcesDebugSnapshot.state : null,
       memoryLimitMegabytes
     );
+
+    const inspectorEditors = {
+      'inspector-list': {
+        type: 'secondary',
+        noTitleBar: true,
+        renderEditor: () => (
+          <Background>
+            <Line justifyContent="center">
+              <RaisedButton
+                label={<Trans>Refresh</Trans>}
+                onClick={onRefresh}
+                disabled={!isDebuggerConnected}
+                primary
+              />
+            </Line>
+            {isGameDataTruncated && (
+              <AlertMessage kind="warning">
+                <Trans>
+                  The game is too large to be sent whole to the debugger: the
+                  elements marked with a warning are missing. Select an element
+                  to read it entirely.
+                </Trans>
+              </AlertMessage>
+            )}
+            <InspectorsList
+              gameData={gameData}
+              getInspectorDescriptions={getInspectorDescriptions}
+              selectedInspectorFullPath={selectedInspectorFullPath}
+              onChooseInspector={(
+                selectedInspector,
+                selectedInspectorFullPath
+              ) =>
+                this.setState({
+                  selectedInspector,
+                  selectedInspectorFullPath,
+                })
+              }
+            />
+          </Background>
+        ),
+      },
+      'inspector-details': {
+        type: 'primary',
+        noTitleBar: true,
+        renderEditor: () => (
+          <Background>
+            <div className={classes.inspectorDetailsContent}>
+              {selectedInspector ? (
+                <InspectedValue
+                  selectedInspector={selectedInspector}
+                  selectedInspectorFullPath={selectedInspectorFullPath}
+                  gameData={gameData}
+                  onInspectPath={onInspectPath}
+                  // Followed as long as the game is connected, recording
+                  // or not: the game still runs when a recording stops.
+                  isLive={isDebuggerConnected}
+                  isGamePaused={isDebuggerPaused}
+                  rawMode={rawMode}
+                  onCall={onCall}
+                  onEdit={onEdit}
+                  onReadValues={onReadValues}
+                />
+              ) : (
+                <EmptyMessage>
+                  {gameData ? (
+                    <Trans>
+                      Choose an element to inspect in the list on the left
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      Pause the game (from the toolbar) or hit refresh (on the
+                      left) to inspect the game
+                    </Trans>
+                  )}
+                </EmptyMessage>
+              )}
+            </div>
+          </Background>
+        ),
+      },
+    };
+
+    const renderPanel: { [DebuggerPanelName]: () => React.Node } = {
+      inspector: () => (
+        <Background>
+          <div className={classes.inspector}>
+            <PreferencesContext.Consumer>
+              {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
+                <EditorMosaic
+                  // $FlowFixMe[incompatible-type]
+                  editors={inspectorEditors}
+                  centralNodeId="inspector-details"
+                  initialNodes={
+                    isMosaicNodeUsable(
+                      getDefaultEditorMosaicNode('debugger-inspector'),
+                      Object.keys(inspectorEditors),
+                      'inspector-details'
+                    )
+                      ? // $FlowFixMe[incompatible-type]
+                        getDefaultEditorMosaicNode('debugger-inspector')
+                      : initialInspectorMosaicNodes
+                  }
+                  onPersistNodes={node =>
+                    setDefaultEditorMosaicNode('debugger-inspector', node)
+                  }
+                />
+              )}
+            </PreferencesContext.Consumer>
+          </div>
+          <MiniToolbar>
+            <Line justifyContent="space-between" alignItems="center" noMargin>
+              <HelpButton helpPagePath="/interface/debugger" />
+              <div>
+                <Checkbox
+                  checkedIcon={<Flash />}
+                  uncheckedIcon={<FlashOff />}
+                  checked={rawMode}
+                  onCheck={(e, enabled) =>
+                    this.setState({
+                      rawMode: enabled,
+                    })
+                  }
+                />
+              </div>
+            </Line>
+          </MiniToolbar>
+        </Background>
+      ),
+      profiler: () => (
+        <Profiler
+          profilingInProgress={profilingInProgress}
+          recordingStore={profilerRecordingStore}
+          debuggerId={debuggerId}
+          canRecord={canRecord}
+          onStartRecording={onStartRecording}
+          baselineRecording={baselineRecording}
+        />
+      ),
+      performance: () => (
+        <Performance
+          recordingStore={profilerRecordingStore}
+          debuggerId={debuggerId}
+          profilingInProgress={profilingInProgress}
+          memoryLimitBytes={memoryLimitBytes || null}
+          canRecord={canRecord}
+          onStartRecording={onStartRecording}
+          baselineRecording={baselineRecording}
+        />
+      ),
+      resources: () => (
+        <ResourcesPanel
+          resourcesDebugState={
+            resourcesDebugSnapshot ? resourcesDebugSnapshot.state : null
+          }
+          lastError={
+            resourcesDebugSnapshot ? resourcesDebugSnapshot.lastError : null
+          }
+          onRefresh={onRequestResourcesDebugState}
+          // Followed as long as the game is connected and running,
+          // recording or not: a paused game loads nothing.
+          isPollingEnabled={isDebuggerConnected && !isDebuggerPaused}
+          recordingStore={profilerRecordingStore}
+          debuggerId={debuggerId}
+          canRecord={canRecord}
+          onStartRecording={onStartRecording}
+          artificialLimitMegabytes={memoryLimitMegabytes}
+          onChangeArtificialLimitMegabytes={megabytes =>
+            this.setState({ memoryLimitMegabytes: megabytes })
+          }
+          baselineResourcesDebugState={baselineResourcesDebugState}
+        />
+      ),
+      console: () => (
+        <Background>
+          <DebuggerConsole logsManager={logsManager || []} />
+        </Background>
+      ),
+    };
 
     const editors = {
       overview: {
@@ -278,165 +387,14 @@ export default class DebuggerContent extends React.Component<Props, State> {
           </Background>
         ),
       },
-      inspector: {
-        type: 'secondary',
-        title: t`Inspector`,
-        renderEditor: () => (
-          <Background>
-            <div className={classes.inspector}>
-              <div
-                className={classes.sceneContentList}
-                style={{ width: inspectorListWidth }}
-              >
-                <Line justifyContent="center">
-                  <RaisedButton
-                    label={<Trans>Refresh</Trans>}
-                    onClick={onRefresh}
-                    disabled={!isDebuggerConnected}
-                    primary
-                  />
-                </Line>
-                <InspectorsList
-                  gameData={gameData}
-                  getInspectorDescriptions={getInspectorDescriptions}
-                  selectedInspectorFullPath={selectedInspectorFullPath}
-                  onChooseInspector={(
-                    selectedInspector,
-                    selectedInspectorFullPath
-                  ) =>
-                    this.setState({
-                      selectedInspector,
-                      selectedInspectorFullPath,
-                    })
-                  }
-                />
-              </div>
-              <div
-                className={classes.resizeHandle}
-                onMouseDown={this._startInspectorResize}
-              />
-              <div className={classes.inspectorDetails}>
-                <div className={classes.inspectorDetailsContent}>
-                  {selectedInspector ? (
-                    <InspectedValue
-                      selectedInspector={selectedInspector}
-                      selectedInspectorFullPath={selectedInspectorFullPath}
-                      gameData={gameData}
-                      onInspectPath={onInspectPath}
-                      // The values are only followed while recording, like
-                      // every other statistic of the debugger.
-                      isLive={isDebuggerConnected && profilingInProgress}
-                      rawMode={rawMode}
-                      onCall={onCall}
-                      onEdit={onEdit}
-                      onReadValues={onReadValues}
-                    />
-                  ) : (
-                    <EmptyMessage>
-                      {gameData ? (
-                        <Trans>
-                          Choose an element to inspect in the list on the left
-                        </Trans>
-                      ) : (
-                        <Trans>
-                          Pause the game (from the toolbar) or hit refresh (on
-                          the left) to inspect the game
-                        </Trans>
-                      )}
-                    </EmptyMessage>
-                  )}
-                </div>
-              </div>
-            </div>
-            <MiniToolbar>
-              <Line justifyContent="space-between" alignItems="center" noMargin>
-                <HelpButton helpPagePath="/interface/debugger" />
-                <div>
-                  <Checkbox
-                    checkedIcon={<Flash />}
-                    uncheckedIcon={<FlashOff />}
-                    checked={rawMode}
-                    onCheck={(e, enabled) =>
-                      this.setState({
-                        rawMode: enabled,
-                      })
-                    }
-                  />
-                </div>
-              </Line>
-            </MiniToolbar>
-          </Background>
-        ),
-      },
-      profiler: {
-        type: 'secondary',
-        title: t`Profiler`,
-        renderEditor: () => (
-          <Profiler
-            profilingInProgress={profilingInProgress}
-            recordingStore={profilerRecordingStore}
-            debuggerId={debuggerId}
-            canRecord={canRecord}
-            onStartRecording={onStartRecording}
-            baselineRecording={baselineRecording}
-          />
-        ),
-      },
-      performance: {
-        type: 'secondary',
-        title: t`Performance`,
-        renderEditor: () => (
-          <Performance
-            recordingStore={profilerRecordingStore}
-            debuggerId={debuggerId}
-            profilingInProgress={profilingInProgress}
-            memoryLimitBytes={memoryLimitBytes || null}
-            canRecord={canRecord}
-            onStartRecording={onStartRecording}
-            baselineRecording={baselineRecording}
-          />
-        ),
-      },
-      resources: {
-        type: 'secondary',
-        title: t`Resources`,
-        renderEditor: () => (
-          <ResourcesPanel
-            resourcesDebugState={
-              resourcesDebugSnapshot ? resourcesDebugSnapshot.state : null
-            }
-            lastError={
-              resourcesDebugSnapshot ? resourcesDebugSnapshot.lastError : null
-            }
-            onRefresh={onRequestResourcesDebugState}
-            // The resources are watched while recording, like the other
-            // statistics of the debugger: pausing the game freezes the
-            // panel too, and clearing empties it for good.
-            isPollingEnabled={
-              isDebuggerConnected && !isDebuggerPaused && profilingInProgress
-            }
-            recordingStore={profilerRecordingStore}
-            debuggerId={debuggerId}
-            canRecord={canRecord}
-            onStartRecording={onStartRecording}
-            artificialLimitMegabytes={memoryLimitMegabytes}
-            onChangeArtificialLimitMegabytes={megabytes =>
-              this.setState({ memoryLimitMegabytes: megabytes })
-            }
-            baselineResourcesDebugState={baselineResourcesDebugState}
-          />
-        ),
-      },
-      console: {
-        type: 'secondary',
-        title: t`Console`,
-        renderEditor: () => (
-          <Background>
-            <DebuggerConsole logsManager={logsManager || []} />
-          </Background>
-        ),
-      },
     };
+    DEBUGGER_PANELS.forEach(({ name, title }) => {
+      editors[name] = {
+        type: 'secondary',
+        title,
+        renderEditor: renderPanel[name],
+      };
+    });
 
     return (
       <PreferencesContext.Consumer>
@@ -447,12 +405,19 @@ export default class DebuggerContent extends React.Component<Props, State> {
             editors={editors}
             centralNodeId="overview"
             initialNodes={
-              // $FlowFixMe[incompatible-type]
-              getDefaultEditorMosaicNode('debugger-v3') ||
-              initialMosaicEditorNodes
+              // A layout saved by an older debugger names panels that are
+              // gone: the default one is used instead.
+              isMosaicNodeUsable(
+                getDefaultEditorMosaicNode('debugger'),
+                Object.keys(editors),
+                'overview'
+              )
+                ? // $FlowFixMe[incompatible-type]
+                  getDefaultEditorMosaicNode('debugger')
+                : initialMosaicEditorNodes
             }
             onPersistNodes={node =>
-              setDefaultEditorMosaicNode('debugger-v3', node)
+              setDefaultEditorMosaicNode('debugger', node)
             }
             onOpenedEditorsChanged={this._onOpenedEditorsChanged}
           />

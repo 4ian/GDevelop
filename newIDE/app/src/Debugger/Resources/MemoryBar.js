@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import { LineStackLayout } from '../../UI/Layout';
 import classNames from 'classnames';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import Text from '../../UI/Text';
@@ -9,13 +10,13 @@ import FlatButton from '../../UI/FlatButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
   computeMemorySegments,
-  formatBytes,
   getMemoryBytesByKind,
   type ResourceLoadRecord,
   type ResourcesDebugState,
 } from './ResourcesDebugTypes';
 import { getResourceKindColor } from '../themeColors';
 import classes from './Resources.module.css';
+import { formatBytes } from '../../Utils/FormatMeasures';
 
 type Props = {|
   state: ResourcesDebugState,
@@ -104,7 +105,11 @@ const MemoryBar = ({
 
   return (
     <div className={classes.section}>
-      <div className={classes.sectionTitleRow}>
+      <LineStackLayout
+        noMargin
+        alignItems="center"
+        justifyContent="space-between"
+      >
         <Text noMargin size="body-small" color="secondary">
           <Trans>
             Estimated memory: {knownMemory} of {memoryLimit} ({limitDescription}
@@ -116,7 +121,7 @@ const MemoryBar = ({
             </Trans>
           ) : null}
         </Text>
-      </div>
+      </LineStackLayout>
       <div className={classes.memoryBarRow}>
         <div
           className={classNames(classes.memoryBar, {

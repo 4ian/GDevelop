@@ -1,5 +1,6 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire';
+import { openBlobDownloadUrl } from '../../Utils/BlobDownloadUrlHolder';
 import {
   type DebuggerRecordingFile,
   DebuggerRecordingFileError,
@@ -41,15 +42,10 @@ const chooseSaveFilePath = async (
 };
 
 const downloadAsFile = (fileName: string, content: string) => {
+  if (!document.body) throw new Error("Document body couldn't be found.");
   const blob = new Blob([content], { type: 'application/json' });
   const blobUrl = URL.createObjectURL(blob);
-  const adhocLink = document.createElement('a');
-  adhocLink.href = blobUrl;
-  adhocLink.download = fileName;
-  if (!document.body) throw new Error("Document body couldn't be found.");
-  document.body.appendChild(adhocLink);
-  adhocLink.click();
-  adhocLink.remove();
+  openBlobDownloadUrl(blobUrl, fileName);
   URL.revokeObjectURL(blobUrl);
 };
 

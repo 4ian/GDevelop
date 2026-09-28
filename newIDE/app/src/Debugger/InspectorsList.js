@@ -1,15 +1,12 @@
 // @flow
 import * as React from 'react';
-import { AutoSizer } from 'react-virtualized';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import SearchBar from '../UI/SearchBar';
 import classes from './InspectorsList.module.css';
 import { getAtInspectorPath } from './inspectorPath';
-import ReadOnlyTreeView, {
-  type ReadOnlyTreeViewInterface,
-} from '../UI/TreeView/ReadOnlyTreeView';
+import { type ReadOnlyTreeViewInterface } from '../UI/TreeView/ReadOnlyTreeView';
+import SearchableReadOnlyTreeView from '../UI/TreeView/SearchableReadOnlyTreeView';
 import {
   type InspectorDescription,
   type InspectorDescriptionsGetter,
@@ -41,6 +38,8 @@ type InspectorTreeItem = {|
 const ITEM_HEIGHT = 32;
 const getItemId = (item: InspectorTreeItem) => item.id;
 const getItemHeight = () => ITEM_HEIGHT;
+// The rows are rendered nodes, not texts: the search is done on the label.
+const getItemSearchedTexts = (item: InspectorTreeItem) => [item.label];
 
 /** The row: the icon of what it is, then its label. */
 const getItemName = (item: InspectorTreeItem) => (
@@ -155,16 +154,6 @@ const InspectorsListContent = ({
     [items, selectedId, getItemChildren]
   );
 
-  const [searchText, setSearchText] = React.useState<string>('');
-  const lowerCaseSearchText = searchText.trim().toLowerCase();
-  // The rows are rendered nodes, not texts: the match is done here on the
-  // label, and the tree is told to keep the matching rows (`false`).
-  const shouldApplySearchToItem = React.useCallback(
-    (item: InspectorTreeItem) =>
-      !lowerCaseSearchText ||
-      !item.label.toLowerCase().includes(lowerCaseSearchText),
-    [lowerCaseSearchText]
-  );
   const treeViewRef = React.useRef<?ReadOnlyTreeViewInterface<InspectorTreeItem>>(
     null
   );
@@ -183,51 +172,25 @@ const InspectorsListContent = ({
   // Never unmounted when the game data goes away: the tree would lose
   // everything the user had opened, and get it back folded.
   return (
-    <div
-      style={{
-        flex: 1,
-        minHeight: 0,
-        display: 'flex',
-        flexDirection: 'column',
+    <SearchableReadOnlyTreeView
+      ref={treeViewRef}
+      searchPlaceholder={t`Search an object, an instance...`}
+      getItemSearchedTexts={getItemSearchedTexts}
+      items={items}
+      estimatedItemSize={ITEM_HEIGHT}
+      getItemHeight={getItemHeight}
+      getItemName={getItemName}
+      getItemId={getItemId}
+      getItemChildren={getItemChildren}
+      selectedItems={selectedItems}
+      onClickItem={onClickItem}
+      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+      onSelectItems={(selectedTreeItems: Array<InspectorTreeItem>) => {
+        const item = selectedTreeItems[0];
+        if (item) onChooseInspector(item.description, item.fullPath);
       }}
-    >
-      <div className={classes.searchBar}>
-        <SearchBar
-          value={searchText}
-          onChange={setSearchText}
-          onRequestSearch={() => {}}
-          placeholder={t`Search an object, an instance...`}
-        />
-      </div>
-      <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <ReadOnlyTreeView
-              ref={treeViewRef}
-              height={height}
-              width={width}
-              items={items}
-              estimatedItemSize={ITEM_HEIGHT}
-              getItemHeight={getItemHeight}
-              shouldApplySearchToItem={shouldApplySearchToItem}
-              searchText={lowerCaseSearchText}
-              getItemName={getItemName}
-              getItemId={getItemId}
-              getItemChildren={getItemChildren}
-              selectedItems={selectedItems}
-              onClickItem={onClickItem}
-              initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-              enableStickyAncestors
-              onSelectItems={(selectedTreeItems: Array<InspectorTreeItem>) => {
-                const item = selectedTreeItems[0];
-                if (item) onChooseInspector(item.description, item.fullPath);
-              }}
-              multiSelect={false}
-            />
-          )}
-        </AutoSizer>
-      </div>
-    </div>
+      multiSelect={false}
+    />
   );
 };
 

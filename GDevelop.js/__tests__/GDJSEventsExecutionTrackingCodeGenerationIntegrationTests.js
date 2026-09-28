@@ -164,6 +164,76 @@ describe('libGD.js - GDJS events execution tracking code generation integration 
     project.delete();
   });
 
+  it('gives each tracked condition its own id, sub-instructions and "While" conditions left out', function () {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    layout.getVariables().insertNew('Counter', 0).setValue(0);
+    const counterIsPositive = {
+      type: { value: 'NumberVariable' },
+      parameters: ['Counter', '>=', '0'],
+    };
+    layout.getEvents().unserializeFrom(
+      project,
+      gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            {
+              type: { value: 'BuiltinCommonInstructions::And' },
+              parameters: [],
+              subInstructions: [counterIsPositive, counterIsPositive],
+            },
+            counterIsPositive,
+          ],
+          actions: [],
+          events: [],
+        },
+        {
+          type: 'BuiltinCommonInstructions::While',
+          whileConditions: [
+            {
+              type: { value: 'NumberVariable' },
+              parameters: ['Counter', '<', '0'],
+            },
+          ],
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['Counter', '+', '1'],
+            },
+          ],
+          events: [],
+        },
+      ])
+    );
+    const standardEventPtr = layout.getEvents().getEventAt(0).ptr;
+    const whileEventPtr = layout.getEvents().getEventAt(1).ptr;
+
+    const previewCode = generateLayoutCode(project, layout, false);
+    const countOccurrences = (searchedText) =>
+      previewCode.split(searchedText).length - 1;
+    // The "And" and the condition after it, each once: the conditions inside
+    // the "And" do not reuse their ids.
+    expect(
+      countOccurrences(
+        `gdjs.eventsExecutionTracker.begin("${standardEventPtr}:c0")`
+      )
+    ).toBe(1);
+    expect(
+      countOccurrences(
+        `gdjs.eventsExecutionTracker.begin("${standardEventPtr}:c1")`
+      )
+    ).toBe(1);
+    // The conditions of the "While" are not tracked, its actions are.
+    expect(previewCode).not.toContain(`"${whileEventPtr}:c0"`);
+    expect(previewCode).toContain(
+      `gdjs.eventsExecutionTracker.begin("${whileEventPtr}:a0")`
+    );
+
+    project.delete();
+  });
+
   it('only reports the instructions that were executed', function () {
     const { project, layout, externalEvents } = makeProjectWithEvents();
     const events = layout.getEvents();
@@ -245,6 +315,9 @@ describe('libGD.js - GDJS events execution tracking code generation integration 
       const codeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
         project
       );
+      codeGenerator.setGenerateEventsExecutionTracking(
+        generateEventsExecutionTracking
+      );
       const includeFiles = new gd.SetString();
       const code = codeGenerator.generateFreeEventsFunctionCompleteCode(
         eventsFunctionsExtension,
@@ -252,8 +325,7 @@ describe('libGD.js - GDJS events execution tracking code generation integration 
         'functionNamespace',
         includeFiles,
         // The extensions are always compiled "for runtime" by the editor.
-        true,
-        generateEventsExecutionTracking
+        true
       );
       codeGenerator.delete();
       includeFiles.delete();

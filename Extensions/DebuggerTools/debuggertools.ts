@@ -34,16 +34,7 @@ namespace gdjs {
         const debuggerClient = runtimeGame.getDebuggerClient();
         if (!debuggerClient) return;
 
-        const wasStarted = runtimeGame.startProfiler({
-          onChunk: (chunk) => debuggerClient.sendProfilerChunk(chunk),
-          onStopped: (stoppedProfiler) => {
-            debuggerClient.sendProfilerOutput(
-              stoppedProfiler.getFramesAverageMeasures(),
-              stoppedProfiler.getStats()
-            );
-            debuggerClient.sendProfilerStopped(stoppedProfiler);
-          },
-        });
+        const wasStarted = debuggerClient.startProfilerAndReport();
         const profiler = runtimeGame.getProfiler();
         if (wasStarted && profiler) {
           debuggerClient.sendProfilerStarted(profiler);

@@ -40,8 +40,15 @@ class BehaviorCodeGenerator {
       const gd::String& codeNamespace,
       const std::map<gd::String, gd::String>& behaviorMethodMangledNames,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false,
-      bool generateEventsExecutionTracking = false);
+      bool compilationForRuntime = false);
+
+  /**
+   * rief Also generate the code reporting the executed instructions to the
+   * debugger (only for the previews launched with the debugger).
+   */
+  void SetGenerateEventsExecutionTracking(bool enable) {
+    generateEventsExecutionTracking = enable;
+  }
 
   /**
    * \brief Generate the name of the method to get the value of the property
@@ -176,6 +183,7 @@ class BehaviorCodeGenerator {
   gd::String GenerateDoStepPreEventsPreludeCode();
 
   gd::Project& project;
+  bool generateEventsExecutionTracking = false;
 
   static gd::String doStepPreEventsFunctionName;
 };

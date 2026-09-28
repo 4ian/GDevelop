@@ -121,3 +121,15 @@ export const Empty = () => (
     />
   </FixedHeightFlexContainer>
 );
+
+/** Scroll the list: the scene holding the first visible row stays on top. */
+export const SmallHeight = () => (
+  <FixedHeightFlexContainer height={160}>
+    <InspectorsList
+      gameData={mockGameData}
+      getInspectorDescriptions={mockGetInspectorDescriptions}
+      selectedInspectorFullPath={[]}
+      onChooseInspector={action('onChooseInspector')}
+    />
+  </FixedHeightFlexContainer>
+);

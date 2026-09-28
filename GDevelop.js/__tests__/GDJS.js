@@ -304,9 +304,7 @@ describe('libGD.js - GDJS related tests', function () {
 
       const standardCondition = new gd.Instruction();
       standardCondition.setType('BuiltinCommonInstructions::Always');
-      gd.asStandardEvent(standardEvent)
-        .getConditions()
-        .insert(standardCondition, 0);
+      gd.asStandardEvent(standardEvent).getConditions().insert(standardCondition, 0);
       standardCondition.delete();
 
       const standardAction = new gd.Instruction();
@@ -613,17 +611,16 @@ describe('libGD.js - GDJS related tests', function () {
 
       const namespace = 'gdjs.eventsFunction.myTest';
       const extension = new gd.EventsFunctionsExtension();
-      const eventsFunctionsExtensionCodeGenerator =
-        new gd.EventsFunctionsExtensionCodeGenerator(project);
-      const code =
-        eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-          extension,
-          eventsFunction,
-          namespace,
-          includeFiles,
-          true,
-          false
-        );
+      const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+        project
+      );
+      const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+        extension,
+        eventsFunction,
+        namespace,
+        includeFiles,
+        true
+      );
 
       // Check that the function name is properly generated
       expect(code).toMatch(namespace + '.func = function(');
@@ -718,17 +715,16 @@ describe('libGD.js - GDJS related tests', function () {
       gd.asRepeatEvent(evt).getActions().insert(action, 0);
 
       const namespace = 'gdjs.eventsFunction.myTest';
-      const eventsFunctionsExtensionCodeGenerator =
-        new gd.EventsFunctionsExtensionCodeGenerator(project);
-      const code =
-        eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-          new gd.EventsFunctionsExtension(),
-          eventsFunction,
-          namespace,
-          includeFiles,
-          true,
-          false
-        );
+      const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
+        project
+      );
+      const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+        new gd.EventsFunctionsExtension(),
+        eventsFunction,
+        namespace,
+        includeFiles,
+        true
+      );
 
       // Check that the function name is properly generated
       expect(code).toMatch(namespace + '.func = function(');

@@ -4,9 +4,6 @@ import {
   computeMemorySegments,
   describeOrigin,
   filterResources,
-  formatBytes,
-  formatDurationMs,
-  formatSignedDelta,
   getLoadDurationMs,
   getMemoryLimitBytes,
   indexResourcesByName,
@@ -14,6 +11,11 @@ import {
   type ResourceLoadRecord,
   type ResourcesDebugState,
 } from './ResourcesDebugTypes';
+import {
+  formatBytes,
+  formatShortDuration,
+  formatSignedDelta,
+} from '../../Utils/FormatMeasures';
 
 const makeRecord = (
   overrides: Partial<ResourceLoadRecord>
@@ -43,8 +45,8 @@ describe('ResourcesDebugTypes', () => {
     expect(formatBytes(1500)).toBe('1.50 kB');
     expect(formatBytes(4 * 1000 * 1000)).toBe('4.00 MB');
     expect(formatBytes(12.5 * 1000 * 1000 * 1000)).toBe('12.5 GB');
-    expect(formatDurationMs(128)).toBe('128 ms');
-    expect(formatDurationMs(2300)).toBe('2.30 s');
+    expect(formatShortDuration(128)).toBe('128 ms');
+    expect(formatShortDuration(2300)).toBe('2.30 s');
   });
 
   it('computes the load duration up to the resource being ready', () => {
@@ -268,7 +270,7 @@ describe('ResourcesDebugTypes', () => {
   describe('formatSignedDelta', () => {
     it('signs the difference, and marks what did not change', () => {
       expect(formatSignedDelta(3000, formatBytes)).toBe('+3.00 kB');
-      expect(formatSignedDelta(-30, formatDurationMs)).toBe('-30 ms');
+      expect(formatSignedDelta(-30, formatShortDuration)).toBe('-30 ms');
       expect(formatSignedDelta(0, formatBytes)).toBe('=');
       expect(formatSignedDelta(null, formatBytes)).toBe('-');
     });

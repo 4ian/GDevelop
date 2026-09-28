@@ -33,6 +33,7 @@ import {
   TitleBarRightSafeMargins,
 } from './TitleBarSafeMargins';
 import PortalContainerContext from './PortalContainerContext';
+import { useIsAnyFloatingPanelOpened } from './FloatingPanel';
 
 let openedDialogsCount = 0;
 
@@ -238,6 +239,7 @@ type DialogProps = {|
    * Indicates that the floating panels (the watched variables of the debugger)
    * can still be used while this dialog is opened. Without this, the focus trap
    * of the dialog takes the focus back and typing in a panel is impossible.
+   * The focus trap is only lifted while a floating panel is shown.
    */
   allowInteractionWithFloatingPanels?: boolean,
 
@@ -290,6 +292,7 @@ const DialogWithoutWindowSizeProvider = ({
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const isAnyFloatingPanelOpened = useIsAnyFloatingPanelOpened();
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
   const { windowSize, isMobile } = useResponsiveWindowSize();
   const hasActions =
@@ -457,7 +460,9 @@ const DialogWithoutWindowSizeProvider = ({
           : getDefaultMaxWidthFromSize(windowSize)
       }
       disableBackdropClick={false}
-      disableEnforceFocus={allowInteractionWithFloatingPanels}
+      disableEnforceFocus={
+        !!allowInteractionWithFloatingPanels && isAnyFloatingPanelOpened
+      }
       onKeyDown={handleKeyDown}
       container={portalContainer}
     >

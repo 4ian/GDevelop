@@ -20,7 +20,7 @@ export type VariablesContainer = {|
  * What the runtime puts in place of a value it could not send: too deep,
  * circular, or past the size the dump is allowed to reach.
  */
-const isTruncated = (value: any): boolean =>
+export const isTruncated = (value: any): boolean =>
   typeof value === 'string' &&
   (value === '[Max depth reached]' ||
     value.startsWith('[Circular ') ||
@@ -77,4 +77,39 @@ export const getPlainVariables = (
     return null;
 
   return mapValues(variablesContainer._variables.items, toPlainValue);
+};
+
+/**
+ * Where a variable is in the running game, from the container: the path to
+ * call its methods (`setValue`...) with the `call` command of the debugger.
+ *
+ * `valuePath` is the path of its value in what `getPlainVariables` returns
+ * (the name of the variable, then the names or indexes of its children).
+ * `null` when the path leads to no variable of the container.
+ */
+export const getVariablePathInGame = (
+  variablesContainer: ?VariablesContainer,
+  valuePath: Array<string>
+): ?Array<string> => {
+  if (!getPlainVariables(variablesContainer) || valuePath.length === 0)
+    return null;
+  // $FlowFixMe[incompatible-use] - checked by getPlainVariables.
+  const items = variablesContainer._variables.items;
+  const [variableName, ...childrenNames] = valuePath;
+  let variable: ?Variable = items[variableName];
+  const pathInGame = ['_variables', 'items', variableName];
+
+  for (const childName of childrenNames) {
+    if (!variable || typeof variable !== 'object') return null;
+    if (variable._type === 'structure' && variable._children) {
+      pathInGame.push('_children', childName);
+      variable = variable._children[childName];
+    } else if (variable._type === 'array' && variable._childrenArray) {
+      pathInGame.push('_childrenArray', childName);
+      variable = variable._childrenArray[parseInt(childName, 10)];
+    } else {
+      return null;
+    }
+  }
+  return variable && typeof variable === 'object' ? pathInGame : null;
 };

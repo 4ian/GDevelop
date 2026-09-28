@@ -1,9 +1,10 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
-import SearchBar from '../../UI/SearchBar';
 import * as React from 'react';
-import { AutoSizer } from 'react-virtualized';
-import ReadOnlyTreeView from '../../UI/TreeView/ReadOnlyTreeView';
+import SearchableReadOnlyTreeView from '../../UI/TreeView/SearchableReadOnlyTreeView';
+import InspectedValueField from './InspectedValueField';
+import WarningIcon from '../../UI/CustomSvgIcons/Warning';
+import { isTruncated, tooDeeplyNestedMessage } from './variablesContainerData';
 import EmptyMessage from '../../UI/EmptyMessage';
 import Text from '../../UI/Text';
 import { getVariableTypeToIcon } from '../../VariablesList/VariableTypeSelector';
@@ -41,8 +42,30 @@ export type InspectorItem = {|
   icon?: React.Node,
   /** The icon of an extension (a behavior...), shown before the name. */
   iconUrl?: string,
+  /**
+   * Values only: set when the value can be changed in the running game. It is
+   * then shown in a field instead of a text.
+   */
+  onEditValue?: (newValue: any) => void,
   children: ?Array<InspectorItem>,
 |};
+
+/** Changes, in the running game, what is at a path of a value shown. */
+export type EditValueAtPath = (path: Array<string>, newValue: any) => void;
+
+/** A named value of the game, shown in the order given. */
+export type InspectedProperty = {|
+  name: string,
+  value: any,
+  /** Set when the value can be changed in the running game. */
+  onEdit?: (newValue: any) => void,
+|};
+
+/** Only these can be changed in a field: not a structure, not `null`. */
+const isEditableValue = (value: any): boolean =>
+  typeof value === 'number' ||
+  typeof value === 'string' ||
+  typeof value === 'boolean';
 
 export const isTree = (value: any): boolean =>
   typeof value === 'object' && value !== null;
@@ -70,18 +93,31 @@ export const formatValue = (value: any): string => {
 const namesSort = (first: string, second: string) =>
   first.toLowerCase().localeCompare(second.toLowerCase());
 
+type ValueItemsOptions = {|
+  sorted?: boolean,
+  /** Makes the values editable: called with the path of the edited value. */
+  editAt?: ?EditValueAtPath,
+  /** Where `value` is, in what `editAt` receives. */
+  path?: Array<string>,
+|};
+
 /** A row for a value: a leaf, or a folder holding its children. */
 export const makeValueItem = (
   id: string,
   name: string,
-  value: any
+  value: any,
+  { editAt, path = [] }: ValueItemsOptions = {}
 ): InspectorItem => ({
   id,
   name,
   kind: 'value',
   value,
   openWithSingleClick: true,
-  children: buildValueItems(id, value),
+  onEditValue:
+    editAt && isEditableValue(value)
+      ? newValue => editAt(path, newValue)
+      : undefined,
+  children: buildValueItems(id, value, { editAt, path }),
 });
 
 /**
@@ -91,7 +127,7 @@ export const makeValueItem = (
 export const buildValueItems = (
   parentId: string,
   value: any,
-  { sorted = true }: {| sorted?: boolean |} = {}
+  { sorted = true, editAt, path = [] }: ValueItemsOptions = {}
 ): ?Array<InspectorItem> => {
   if (!isTree(value)) return null;
   const childrenNames = Array.isArray(value)
@@ -102,8 +138,45 @@ export const buildValueItems = (
   if (childrenNames.length === 0) return null;
 
   return childrenNames.map(childName =>
-    makeValueItem(`${parentId}/${childName}`, childName, value[childName])
+    makeValueItem(`${parentId}/${childName}`, childName, value[childName], {
+      editAt,
+      path: [...path, childName],
+    })
   );
+};
+
+/**
+ * Named values as rows, in the order given, each one editable when it says
+ * how to change it in the game.
+ */
+export const buildPropertiesItems = (
+  parentId: string,
+  properties: ?Array<InspectedProperty>
+): ?Array<InspectorItem> => {
+  if (!properties || properties.length === 0) return null;
+  return properties.map(({ name, value, onEdit }) => ({
+    ...makeValueItem(`${parentId}/${name}`, name, value),
+    onEditValue: onEdit && isEditableValue(value) ? onEdit : undefined,
+  }));
+};
+
+/**
+ * A folder of named values (the properties of a layer...), summarized by its
+ * number of values like any other structure.
+ */
+export const makePropertiesFolderItem = (
+  id: string,
+  name: string,
+  properties: Array<InspectedProperty>
+): InspectorItem => {
+  const summarizedValue = {};
+  properties.forEach(property => {
+    summarizedValue[property.name] = property.value;
+  });
+  return {
+    ...makeValueItem(id, name, summarizedValue),
+    children: buildPropertiesItems(id, properties),
+  };
 };
 
 /** A named, foldable group of rows. */
@@ -151,6 +224,20 @@ export const makeHintItem = (
   children: null,
 });
 
+const getItemHeight = (item: InspectorItem) =>
+  item.isRoot ? ROOT_ITEM_HEIGHT : ITEM_HEIGHT;
+const getItemId = (item: InspectorItem) => item.id;
+const getItemChildren = (item: InspectorItem) => item.children;
+
+/**
+ * The rows are rendered nodes: the search is done on the name, and on the
+ * value of a leaf.
+ */
+const getItemSearchedTexts = (item: InspectorItem) => [
+  item.name,
+  item.kind === 'value' && !isTree(item.value) ? formatValue(item.value) : null,
+];
+
 const collectOpenedIds = (
   items: Array<InspectorItem>,
   openedIds: Array<string>
@@ -167,6 +254,8 @@ type Props = {|
   items?: ?Array<InspectorItem>,
   /** A value to show as rows, for the raw data. Exclusive with `items`. */
   src?: any,
+  /** Makes the values of `src` editable. */
+  onEditSrc?: ?EditValueAtPath,
   missingValueLabel?: React.Node,
 |};
 
@@ -179,43 +268,20 @@ type Props = {|
 const InspectorTreeView = ({
   items: givenItems,
   src,
+  onEditSrc,
   missingValueLabel,
 }: Props): React.Node => {
-  const stickyContainerRef = React.useRef<?HTMLDivElement>(null);
   const items: Array<InspectorItem> = React.useMemo(
     () => {
       if (givenItems) return givenItems;
-      return buildValueItems('root', src) || [];
+      return buildValueItems('root', src, { editAt: onEditSrc }) || [];
     },
-    [givenItems, src]
+    [givenItems, src, onEditSrc]
   );
 
   // The sections asked to be open are unfolded when the inspector is shown,
   // and the user is then free to fold them: the tree is created again when
   // another element is inspected (see `key` below).
-  const [searchText, setSearchText] = React.useState<string>('');
-  const lowerCaseSearchText = searchText.trim().toLowerCase();
-
-  // The tree only compares a text name to the search: the rows here are
-  // rendered nodes, so the match is done on the name and the value instead,
-  // and the tree is told to keep the matching rows (`false` = do not filter).
-  const shouldApplySearchToItem = React.useCallback(
-    (item: InspectorItem) => {
-      if (!lowerCaseSearchText) return true;
-      if (item.name.toLowerCase().includes(lowerCaseSearchText)) return false;
-      if (
-        item.kind === 'value' &&
-        !isTree(item.value) &&
-        formatValue(item.value)
-          .toLowerCase()
-          .includes(lowerCaseSearchText)
-      )
-        return false;
-      return true;
-    },
-    [lowerCaseSearchText]
-  );
-
   const initiallyOpenedNodeIds = React.useMemo(
     () => collectOpenedIds(items, []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -290,14 +356,24 @@ const InspectorTreeView = ({
           </Text>
         </span>
         <span className={classes.rowSeparator} />
-        <span
-          className={classes.rowValue}
-          title={isFolder ? undefined : formatValue(item.value)}
-        >
-          <Text noMargin size="body2" color="secondary" allowSelection>
-            {isFolder ? summarizeTree(item.value) : formatValue(item.value)}
-          </Text>
-        </span>
+        {(isTruncated(item.value) || item.value === tooDeeplyNestedMessage) && (
+          // Never shown as if it were the value: the game could not send it.
+          <span className={classes.rowIcon} title={item.value}>
+            <WarningIcon fontSize="small" />
+          </span>
+        )}
+        {item.onEditValue ? (
+          <InspectedValueField value={item.value} onEdit={item.onEditValue} />
+        ) : (
+          <span
+            className={classes.rowValue}
+            title={isFolder ? undefined : formatValue(item.value)}
+          >
+            <Text noMargin size="body2" color="secondary" allowSelection>
+              {isFolder ? summarizeTree(item.value) : formatValue(item.value)}
+            </Text>
+          </span>
+        )}
       </div>
     );
   }, []);
@@ -320,43 +396,21 @@ const InspectorTreeView = ({
   }
 
   return (
-    <div className={classes.treeWithSearch}>
-      <div className={classes.searchBar}>
-        <SearchBar
-          value={searchText}
-          onChange={setSearchText}
-          onRequestSearch={() => {}}
-          placeholder={t`Search a property, a variable, a value...`}
-        />
-      </div>
-      <div className={classes.tree}>
-        <div ref={stickyContainerRef} className={classes.stickyContainer} />
-        <AutoSizer>
-          {({ height, width }) => (
-            <ReadOnlyTreeView
-              height={height}
-              width={width}
-              items={items}
-              estimatedItemSize={ITEM_HEIGHT}
-              getItemHeight={item =>
-                item.isRoot ? ROOT_ITEM_HEIGHT : ITEM_HEIGHT
-              }
-              searchText={lowerCaseSearchText}
-              shouldApplySearchToItem={shouldApplySearchToItem}
-              getItemName={renderItemName}
-              getItemId={item => item.id}
-              getItemChildren={item => item.children}
-              initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-              selectedItems={noSelection}
-              onSelectItems={() => {}}
-              multiSelect={false}
-              enableStickyAncestors
-              stickyPortalTarget={stickyContainerRef.current}
-            />
-          )}
-        </AutoSizer>
-      </div>
-    </div>
+    <SearchableReadOnlyTreeView
+      searchPlaceholder={t`Search a property, a variable, a value...`}
+      getItemSearchedTexts={getItemSearchedTexts}
+      items={items}
+      estimatedItemSize={ITEM_HEIGHT}
+      getItemHeight={getItemHeight}
+      getItemName={renderItemName}
+      getItemId={getItemId}
+      getItemChildren={getItemChildren}
+      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+      selectedItems={noSelection}
+      onSelectItems={() => {}}
+      multiSelect={false}
+      fullWidthRows
+    />
   );
 };
 

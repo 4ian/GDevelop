@@ -57,6 +57,26 @@ describe('EventsExecutionTrackingStore', () => {
     });
   });
 
+  describe('events modified while a preview runs', () => {
+    it('shows nothing until the code of the game is generated again', () => {
+      const store = new EventsExecutionTrackingStore();
+      store.ingest(makeOutput(42, 1.5));
+      expect(store.getEventExecution(42)).not.toBeNull();
+
+      // The event is deleted, and a new one takes its address: the game,
+      // still running the old code, reports the old event under this address.
+      store.onEventsModified();
+      expect(store.getEventExecution(42)).toBeNull();
+      store.ingest(makeOutput(42, 1.5));
+      expect(store.getEventExecution(42)).toBeNull();
+
+      // Launched or hot-reloaded: the addresses match the events again.
+      store.onEventsCodeGenerated();
+      store.ingest(makeOutput(42, 2));
+      expect(store.getEventExecution(42)).not.toBeNull();
+    });
+  });
+
   describe('setDebuggerOpened', () => {
     it('forgets everything when the debugger is closed', () => {
       const store = new EventsExecutionTrackingStore();
@@ -199,6 +219,43 @@ describe('EventsExecutionTrackingStore', () => {
 
       expect(store.getEventExecution(42)).toBeNull();
       expect(listener).toHaveBeenCalled();
+    });
+  });
+
+  describe('watched expressions', () => {
+    it('notifies the listeners when an expression is added or removed', () => {
+      const store = new EventsExecutionTrackingStore();
+      const listener = jest.fn();
+      const unsubscribe = store.subscribeToWatchedExpressions(listener);
+
+      store.addWatchedExpression('Score');
+      store.addWatchedExpression('Score');
+      expect(store.getWatchedExpressions()).toEqual(['Score']);
+      expect(listener).toHaveBeenCalledTimes(1);
+
+      store.removeWatchedExpression('Score');
+      expect(store.getWatchedExpressions()).toEqual([]);
+      expect(listener).toHaveBeenCalledTimes(2);
+
+      unsubscribe();
+      store.addWatchedExpression('Lives');
+      expect(listener).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('running scene', () => {
+    it('notifies the listeners when the running scene changes', () => {
+      const store = new EventsExecutionTrackingStore();
+      const listener = jest.fn();
+      store.subscribeToRunningSceneName(listener);
+
+      store.setRunningSceneName('Level 1');
+      store.setRunningSceneName('Level 1');
+      expect(listener).toHaveBeenCalledTimes(1);
+
+      store.onAllPreviewsClosed();
+      expect(store.getRunningSceneName()).toBeNull();
+      expect(listener).toHaveBeenCalledTimes(2);
     });
   });
 });

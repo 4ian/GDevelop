@@ -8,14 +8,13 @@ import {
   type ProfilerFrame,
   type ProfilerRecordingRange,
 } from '../ProfilerRecording/ProfilerRecordingStore';
-import {
-  formatGameTime,
-  formatMilliseconds,
-} from '../ProfilerRecording/ProfilerRecordingAggregation';
+import { formatGameTime } from '../ProfilerRecording/ProfilerRecordingAggregation';
 import { useCanvasWithDevicePixelRatio } from '../useCanvasWithDevicePixelRatio';
 import { getReadableSectionColors } from '../themeColors';
-import Paper from '../../UI/Paper';
+import { useTimelineViewport } from '../useTimelineViewport';
+import { ChartTooltip, FloatingChartTooltip } from '../../UI/ChartTooltip';
 import classes from './Profiler.module.css';
+import { formatMilliseconds } from '../../Utils/FormatMeasures';
 
 type Props = {|
   frames: Array<ProfilerFrame>,
@@ -28,7 +27,9 @@ export const MAX_FRAMES_IN_FLAME_CHART = 120;
 const RULER_HEIGHT = 18;
 const ROW_HEIGHT = 18;
 const MIN_TEXT_WIDTH_PX = 30;
-const tooltipPaperStyle = { padding: '6px 8px', maxWidth: 240 };
+/** The narrowest view the wheel can zoom to. */
+const MIN_VIEW_SPAN_MS = 0.05;
+const TOOLTIP_MAX_WIDTH = 240;
 
 type HoveredSpan = {|
   frame: ProfilerFrame,
@@ -49,13 +50,25 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
     canvasRef,
     size,
     getContext,
+    getLocalPosition,
   } = useCanvasWithDevicePixelRatio();
   const [view, setView] = React.useState<ProfilerRecordingRange>(range);
   const [hoveredSpan, setHoveredSpan] = React.useState<?HoveredSpan>(null);
-  const panStartRef = React.useRef<?{|
-    x: number,
-    view: ProfilerRecordingRange,
-  |}>(null);
+  const {
+    viewSpanMs,
+    timeToX,
+    xToTime,
+    zoomAroundX,
+    startPan,
+    panTo,
+    endPan,
+  } = useTimelineViewport({
+    width: size.width,
+    bounds: range,
+    view,
+    onChangeView: setView,
+    minSpanMs: MIN_VIEW_SPAN_MS,
+  });
 
   // Look at the whole selection whenever it changes.
   React.useEffect(
@@ -63,12 +76,6 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
       setView(range);
     },
     [range.fromMs, range.toMs] // eslint-disable-line react-hooks/exhaustive-deps
-  );
-
-  const viewSpanMs = Math.max(0.001, view.toMs - view.fromMs);
-  const timeToX = React.useCallback(
-    (timeMs: number) => ((timeMs - view.fromMs) / viewSpanMs) * size.width,
-    [view.fromMs, viewSpanMs, size.width]
   );
 
   const maxDepth = React.useMemo(
@@ -187,20 +194,10 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
     ]
   );
 
-  const getLocalPosition = (event: SyntheticMouseEvent<HTMLDivElement>) => {
-    const container = containerRef.current;
-    if (!container) return { x: 0, y: 0 };
-    const rectangle = container.getBoundingClientRect();
-    return {
-      x: event.clientX - rectangle.left,
-      y: event.clientY - rectangle.top,
-    };
-  };
-
   const findSpanAt = (x: number, y: number): ?HoveredSpan => {
     if (y < RULER_HEIGHT) return null;
     const depth = Math.floor((y - RULER_HEIGHT) / ROW_HEIGHT);
-    const timeMs = view.fromMs + (x / size.width) * viewSpanMs;
+    const timeMs = xToTime(x);
     for (const frame of frames) {
       if (
         timeMs < frame.frameStartTimeMs ||
@@ -229,42 +226,21 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
   const onWheel = (event: SyntheticWheelEvent<HTMLDivElement>) => {
     if (!size.width) return;
     event.preventDefault();
-    const { x } = getLocalPosition(event);
-    const anchorMs = view.fromMs + (x / size.width) * viewSpanMs;
-    const zoomFactor = Math.exp(event.deltaY * 0.002);
-    const newSpanMs = Math.max(
-      0.05,
-      Math.min(range.toMs - range.fromMs, viewSpanMs * zoomFactor)
-    );
-    let fromMs = anchorMs - (x / size.width) * newSpanMs;
-    fromMs = Math.max(range.fromMs, Math.min(range.toMs - newSpanMs, fromMs));
-    setView({ fromMs, toMs: fromMs + newSpanMs });
+    zoomAroundX(getLocalPosition(event).x, event.deltaY);
   };
 
   const onMouseDown = (event: SyntheticMouseEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
-    panStartRef.current = { x: getLocalPosition(event).x, view };
+    startPan(getLocalPosition(event).x);
   };
 
   const onMouseMove = (event: SyntheticMouseEvent<HTMLDivElement>) => {
     const { x, y } = getLocalPosition(event);
-    const panStart = panStartRef.current;
-    if (panStart && size.width) {
-      const deltaMs = ((panStart.x - x) / size.width) * viewSpanMs;
-      let fromMs = panStart.view.fromMs + deltaMs;
-      fromMs = Math.max(
-        range.fromMs,
-        Math.min(range.toMs - viewSpanMs, fromMs)
-      );
-      setView({ fromMs, toMs: fromMs + viewSpanMs });
+    if (panTo(x)) {
       setHoveredSpan(null);
       return;
     }
     setHoveredSpan(findSpanAt(x, y));
-  };
-
-  const endPan = () => {
-    panStartRef.current = null;
   };
 
   if (isTooManyFrames) {
@@ -298,7 +274,9 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
       onWheel={onWheel}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
-      onMouseUp={endPan}
+      onMouseUp={() => {
+        endPan();
+      }}
       onMouseLeave={() => {
         endPan();
         setHoveredSpan(null);
@@ -307,17 +285,18 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
     >
       <canvas ref={canvasRef} className={classes.canvas} />
       {hoveredSpan && hoveredName != null && (
-        <div
-          className={classes.tooltip}
-          style={{
-            left: Math.min(hoveredSpan.x + 12, Math.max(0, size.width - 240)),
-            top: hoveredSpan.y + 14,
-          }}
+        <FloatingChartTooltip
+          x={hoveredSpan.x}
+          y={hoveredSpan.y}
+          containerWidth={size.width}
+          containerHeight={size.height}
+          maxWidth={TOOLTIP_MAX_WIDTH}
         >
-          <Paper background="light" elevation={4} style={tooltipPaperStyle}>
-            <Text noMargin size="body-small">
-              {hoveredName}
-            </Text>
+          <ChartTooltip
+            size="small"
+            title={hoveredName}
+            maxWidth={TOOLTIP_MAX_WIDTH}
+          >
             <Text noMargin size="body-small" color="secondary">
               {formatMilliseconds(
                 hoveredSpan.frame.durationsMs[hoveredSpan.spanIndex]
@@ -334,8 +313,8 @@ const FlameChart = ({ frames, names, range }: Props): React.Node => {
                   hoveredSpan.frame.startsMs[hoveredSpan.spanIndex]
               )}
             </Text>
-          </Paper>
-        </div>
+          </ChartTooltip>
+        </FloatingChartTooltip>
       )}
     </div>
   );

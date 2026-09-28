@@ -144,6 +144,8 @@ export const getInitialPreferences = (): {
   useBackgroundSerializerForSaving: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
+  debuggerShouldRecordOnLaunch: boolean,
+  debuggerShouldClearOnRecord: boolean,
   useGDJSDevelopmentWatcher: boolean,
   useShortcutToClosePreviewWindow: boolean,
   userShortcutMap: {},
@@ -444,6 +446,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowJsTypeError: (this._setShowJsTypeError.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setCanonicalEventSerialization: (this._setCanonicalEventSerialization.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setDebuggerShouldRecordOnLaunch: (this._setDebuggerShouldRecordOnLaunch.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setDebuggerShouldClearOnRecord: (this._setDebuggerShouldClearOnRecord.bind(
       this
     ): any),
   };
@@ -1336,6 +1346,24 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, canonicalEventSerialization: newValue },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setDebuggerShouldRecordOnLaunch(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, debuggerShouldRecordOnLaunch: newValue },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setDebuggerShouldClearOnRecord(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, debuggerShouldClearOnRecord: newValue },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

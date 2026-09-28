@@ -27,10 +27,6 @@ import {
   type InspectorCall,
   type InspectorCallResult,
 } from './GDJSInspectorDescriptions';
-import {
-  type DebuggerPlaySpeed,
-  type LaunchDebuggerAndPreviewOptions,
-} from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import { UseCommandHook } from '../CommandPalette/CommandHooks';
 import {
   getIsGameplayTestRunInProgress,
@@ -47,14 +43,21 @@ import {
   exportDebuggerRecording,
   importDebuggerRecording,
 } from './Export/DebuggerRecordingIO';
-import { getIDEVersion } from '../Version';
 import { EventsExecutionTrackingStore } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
-
-/**
- * Under this many frames, an average says more about the moment it was taken
- * than about the game: comparing to it is warned about.
- */
-const MINIMUM_COMPARABLE_FRAMES_COUNT = 100;
+import ComparisonWarnings from './ComparisonWarnings';
+import {
+  getRecordingsState,
+  forgetRecordedData,
+  forgetDebugger,
+  getClosedDebuggerIds,
+  getCarriedOverDebuggerId,
+  carryOverClosedDebuggersData,
+  addImportedRecording,
+  pickRunningDebuggerId,
+} from './DebuggerRecordingsState';
+import { DEBUGGER_PANELS, type DebuggerPanelName } from './DebuggerPanels';
+import { type DebuggerSession } from './DebuggerSessionContext';
+import { RESOURCES_DUMP_TIMEOUT_MS } from './DebuggerConstants';
 
 export type ResourcesDebugSnapshot = {|
   state: ?ResourcesDebugState,
@@ -98,13 +101,19 @@ type Props = {|
   project: gdProject,
   setToolbar: React.Node => void,
   previewDebuggerServer: PreviewDebuggerServer,
-  onLaunchDebuggerAndPreview: (?LaunchDebuggerAndPreviewOptions) => void,
-  onClosePreviews: () => void,
-  isWatchedVariablesPanelOpen: boolean,
-  onToggleWatchedVariablesPanel: () => void,
-  debuggerPlaySpeed: DebuggerPlaySpeed,
-  setDebuggerPlaySpeed: DebuggerPlaySpeed => void,
+  debuggerSession: DebuggerSession,
+  /** Start recording the game as soon as it is launched or restarted. */
+  shouldRecordOnLaunch: boolean,
+  setShouldRecordOnLaunch: boolean => void,
+  shouldClearOnRecord: boolean,
+  setShouldClearOnRecord: boolean => void,
 |};
+
+/** What an answer of the game holds, or why there is none. */
+type GameAnswer = {| payload: any, error: ?Error |};
+
+/** For the messages that need nothing to be done when received. */
+const ignoreMessage = () => {};
 
 type State = {|
   debuggerServerState: 'started' | 'starting' | 'stopped',
@@ -113,14 +122,13 @@ type State = {|
   unregisterDebuggerServerCallbacks: ?() => void,
 
   debuggerGameData: { [DebuggerId]: any },
+  /** The games whose last state was too large to be sent whole. */
+  truncatedGameDataIds: { [DebuggerId]: boolean },
   profilingInProgress: { [DebuggerId]: boolean },
   resourcesDebugSnapshots: { [DebuggerId]: ResourcesDebugSnapshot },
   debuggerStatus: { [DebuggerId]: DebuggerStatus },
   selectedId: DebuggerId,
   logs: { [DebuggerId]: Array<Log> },
-  /** Start recording the game as soon as it is restarted. */
-  shouldRecordOnLaunch: boolean,
-  shouldClearOnRecord: boolean,
   /**
    * What each imported recording holds, kept apart from `debuggerStatus` so
    * that launching a preview does not forget it: comparing two runs weeks
@@ -153,13 +161,12 @@ export default class Debugger extends React.Component<Props, State> {
     debuggerIds: (this.props.previewDebuggerServer.getExistingDebuggerIds(): Array<DebuggerId>),
     unregisterDebuggerServerCallbacks: null,
     debuggerGameData: {},
+    truncatedGameDataIds: {},
     profilingInProgress: {},
     resourcesDebugSnapshots: {},
     debuggerStatus: {},
     selectedId: '0',
     logs: {},
-    shouldRecordOnLaunch: false,
-    shouldClearOnRecord: true,
     importedRecordings: {},
     baselineDebuggerId: null,
     importError: null,
@@ -180,6 +187,7 @@ export default class Debugger extends React.Component<Props, State> {
 
   updateToolbar = () => {
     const { selectedId, debuggerStatus } = this.state;
+    const { debuggerSession } = this.props;
 
     const selectedDebuggerContents = this._debuggerContents[
       this.state.selectedId
@@ -192,14 +200,18 @@ export default class Debugger extends React.Component<Props, State> {
     this.props.setToolbar(
       <Toolbar
         hasDebugger={this._hasSelectedDebugger()}
-        onLaunchDebuggerAndPreview={this.props.onLaunchDebuggerAndPreview}
-        onClosePreviews={this.props.onClosePreviews}
+        onLaunchDebuggerAndPreview={debuggerSession.onLaunchDebuggerAndPreview}
+        onClosePreviews={debuggerSession.onClosePreviews}
         canStepFrame={this._hasSelectedDebugger() && isSelectedDebuggerPaused}
         onStepFrame={() => this._stepFrame(this.state.selectedId)}
-        isWatchedVariablesPanelOpen={this.props.isWatchedVariablesPanelOpen}
-        onToggleWatchedVariablesPanel={this.props.onToggleWatchedVariablesPanel}
-        debuggerPlaySpeed={this.props.debuggerPlaySpeed}
-        setDebuggerPlaySpeed={this.props.setDebuggerPlaySpeed}
+        isWatchedVariablesPanelOpen={
+          debuggerSession.isWatchedVariablesPanelOpen
+        }
+        onToggleWatchedVariablesPanel={
+          debuggerSession.onToggleWatchedVariablesPanel
+        }
+        debuggerPlaySpeed={debuggerSession.debuggerPlaySpeed}
+        setDebuggerPlaySpeed={debuggerSession.setDebuggerPlaySpeed}
         onPlay={() => this._play(this.state.selectedId)}
         onPause={() => this._pause(this.state.selectedId)}
         canPlay={this._hasSelectedDebugger() && isSelectedDebuggerPaused}
@@ -220,67 +232,33 @@ export default class Debugger extends React.Component<Props, State> {
         onClear={() => this._clear(this.state.selectedId)}
         canRestart={this._hasSelectedDebugger()}
         onRestart={() => this._restart(this.state.selectedId)}
-        shouldRecordOnLaunch={this.state.shouldRecordOnLaunch}
+        shouldRecordOnLaunch={this.props.shouldRecordOnLaunch}
         onToggleRecordOnLaunch={() =>
-          this.setState(
-            state => ({ shouldRecordOnLaunch: !state.shouldRecordOnLaunch }),
-            () => this.updateToolbar()
-          )
+          this.props.setShouldRecordOnLaunch(!this.props.shouldRecordOnLaunch)
         }
-        shouldClearOnRecord={this.state.shouldClearOnRecord}
+        shouldClearOnRecord={this.props.shouldClearOnRecord}
         onToggleClearOnRecord={() =>
-          this.setState(
-            state => ({ shouldClearOnRecord: !state.shouldClearOnRecord }),
-            () => this.updateToolbar()
-          )
+          this.props.setShouldClearOnRecord(!this.props.shouldClearOnRecord)
         }
-        canOpenInspector={this._canShowSelectedDebugger()}
-        isInspectorShown={
-          !!selectedDebuggerContents &&
-          selectedDebuggerContents.isInspectorShown()
+        canOpenPanels={this._canShowSelectedDebugger()}
+        shownPanelNames={
+          selectedDebuggerContents
+            ? DEBUGGER_PANELS.map(({ name }) => name).filter(name =>
+                selectedDebuggerContents.isPanelShown(name)
+              )
+            : []
         }
-        onToggleInspector={() => {
-          if (this._debuggerContents[this.state.selectedId])
-            this._debuggerContents[this.state.selectedId].toggleInspector();
-        }}
-        canOpenProfiler={this._canShowSelectedDebugger()}
-        isProfilerShown={
-          !!selectedDebuggerContents &&
-          selectedDebuggerContents.isProfilerShown()
-        }
-        onToggleProfiler={() => {
-          if (this._debuggerContents[this.state.selectedId])
-            this._debuggerContents[this.state.selectedId].toggleProfiler();
-        }}
-        canOpenConsole={this._canShowSelectedDebugger()}
-        isConsoleShown={
-          !!selectedDebuggerContents &&
-          selectedDebuggerContents.isConsoleShown()
-        }
-        onToggleConsole={() => {
-          if (this._debuggerContents[this.state.selectedId])
-            this._debuggerContents[this.state.selectedId].toggleConsole();
-        }}
-        canOpenPerformance={this._canShowSelectedDebugger()}
-        isPerformanceShown={
-          !!selectedDebuggerContents &&
-          selectedDebuggerContents.isPerformanceShown()
-        }
-        onTogglePerformance={() => {
-          if (this._debuggerContents[this.state.selectedId])
-            this._debuggerContents[this.state.selectedId].togglePerformance();
-        }}
-        canOpenResources={this._canShowSelectedDebugger()}
-        isResourcesShown={
-          !!selectedDebuggerContents &&
-          selectedDebuggerContents.isResourcesShown()
-        }
-        onToggleResources={() => {
-          if (this._debuggerContents[this.state.selectedId])
-            this._debuggerContents[this.state.selectedId].toggleResources();
-        }}
+        onTogglePanel={this._togglePanel}
       />
     );
+  };
+
+  _togglePanel = (panelName: DebuggerPanelName) => {
+    const selectedDebuggerContents = this._debuggerContents[
+      this.state.selectedId
+    ];
+    if (selectedDebuggerContents)
+      selectedDebuggerContents.togglePanel(panelName);
   };
 
   componentDidMount() {
@@ -295,7 +273,30 @@ export default class Debugger extends React.Component<Props, State> {
     );
   }
 
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    // The events sheets read the values of the preview chosen here.
+    if (prevState.selectedId !== this.state.selectedId) {
+      this.context.setTargetDebuggerId(this.state.selectedId);
+    }
+    // The toolbar is built once, when asked: it follows what the main frame
+    // and the preferences change (the callbacks change on every render of
+    // the main frame, and are not compared).
+    const { debuggerSession } = this.props;
+    const previousDebuggerSession = prevProps.debuggerSession;
+    if (
+      previousDebuggerSession.debuggerPlaySpeed !==
+        debuggerSession.debuggerPlaySpeed ||
+      previousDebuggerSession.isWatchedVariablesPanelOpen !==
+        debuggerSession.isWatchedVariablesPanelOpen ||
+      prevProps.shouldRecordOnLaunch !== this.props.shouldRecordOnLaunch ||
+      prevProps.shouldClearOnRecord !== this.props.shouldClearOnRecord
+    ) {
+      this.updateToolbar();
+    }
+  }
+
   componentWillUnmount() {
+    this.context.setTargetDebuggerId(null);
     if (this.state.unregisterDebuggerServerCallbacks) {
       this.state.unregisterDebuggerServerCallbacks();
     }
@@ -358,7 +359,10 @@ export default class Debugger extends React.Component<Props, State> {
             selectedId:
               selectedId !== id || isKept
                 ? selectedId
-                : this._pickRunningDebuggerId(debuggerIds) || selectedId,
+                : pickRunningDebuggerId(
+                    debuggerIds,
+                    this.state.debuggerStatus
+                  ) || selectedId,
           }),
           () => this.updateToolbar()
         );
@@ -370,7 +374,7 @@ export default class Debugger extends React.Component<Props, State> {
         // A new game takes over what the closed ones left on screen.
         if (isPreview) this._carryOverClosedDebuggersData(id, debuggerIds);
         // The game is not ready to record yet: it is when it sends its status.
-        if (this.state.shouldRecordOnLaunch) {
+        if (this.props.shouldRecordOnLaunch) {
           this._recordOnConnectionIds.add(id);
         }
         this.setState(
@@ -412,15 +416,23 @@ export default class Debugger extends React.Component<Props, State> {
     });
   };
 
-  _handleMessage = (id: DebuggerId, data: any) => {
-    if (data.command === 'dump') {
+  /** What is done with each message sent by a game, by command. */
+  _messageHandlers: {
+    [command: string]: (id: DebuggerId, data: any) => void,
+  } = {
+    dump: (id, data) => {
       this.setState({
         debuggerGameData: {
           ...this.state.debuggerGameData,
           [id]: data.payload,
         },
+        truncatedGameDataIds: {
+          ...this.state.truncatedGameDataIds,
+          [id]: !!data.isTruncated,
+        },
       });
-    } else if (data.command === 'status') {
+    },
+    status: (id, data) => {
       this.setState(
         state => ({
           debuggerStatus: {
@@ -438,9 +450,11 @@ export default class Debugger extends React.Component<Props, State> {
         this._recordOnConnectionIds.delete(id);
         this._startProfiler(id);
       }
-    } else if (data.command === 'profiler.output') {
+    },
+    'profiler.output': (id, data) => {
       this._profilerRecordingStore.onOutput(id, data.payload);
-    } else if (data.command === 'profiler.started') {
+    },
+    'profiler.started': (id, data) => {
       this._profilerRecordingStore.onStarted(id, data.payload);
       this.setState(
         state => ({
@@ -448,9 +462,11 @@ export default class Debugger extends React.Component<Props, State> {
         }),
         () => this.updateToolbar()
       );
-    } else if (data.command === 'profiler.chunk') {
+    },
+    'profiler.chunk': (id, data) => {
       this._profilerRecordingStore.onChunk(id, data.payload);
-    } else if (data.command === 'profiler.stopped') {
+    },
+    'profiler.stopped': (id, data) => {
       this._profilerRecordingStore.onStopped(id, data.payload);
       this.setState(
         state => ({
@@ -458,36 +474,41 @@ export default class Debugger extends React.Component<Props, State> {
         }),
         () => this.updateToolbar()
       );
-      // The inspector is not kept up to date while recording (it would be
-      // both costly and unreadable): once the recording is over, it is
-      // refreshed so that the panel shows the state the game ended on,
-      // instead of waiting for the user to hit "Refresh".
-      this._refresh(id);
-    } else if (
-      data.command === 'inspector.dumped' ||
-      data.command === 'inspector.called'
-    ) {
-      // Answered to the inspector (see `sendMessageWithResponse`).
-    } else if (data.command === 'resources.dumped') {
-      // Answered to `_requestResourcesDebugState` (see `sendMessageWithResponse`).
-    } else if (data.command === 'expressionValue') {
-      // Answered to the events sheets (see EventsExecutionTracking).
-    } else if (data.command === 'hotReloader.logs') {
-      // Nothing to do.
-    } else if (data.command === 'updateInstances') {
-      // Nothing to do.
-    } else if (data.command === 'eventsExecutionTracker.output') {
-      // Handled by the events sheets (see EventsExecutionTracking).
-    } else if (data.command === 'console.log') {
+      // Nothing is asked to the game here: the inspector follows the
+      // selected element by itself, and the whole game is only sent on an
+      // explicit refresh or pause.
+    },
+    // Answered to the inspector (see `_requestFromGame`).
+    'inspector.dumped': ignoreMessage,
+    'inspector.called': ignoreMessage,
+    // Answered to `_requestResourcesDebugState` (see `_requestFromGame`).
+    'resources.dumped': ignoreMessage,
+    // Answered to the events sheets (see EventsExecutionTracking).
+    expressionValue: ignoreMessage,
+    'hotReloader.logs': ignoreMessage,
+    updateInstances: ignoreMessage,
+    // Handled by the events sheets (see EventsExecutionTracking).
+    'eventsExecutionTracker.output': ignoreMessage,
+    'console.log': (id, data) => {
       // Filter out unavoidable warnings that do not concern non-engine devs.
       if (isUnavoidableLibraryWarning(data.payload)) return;
       this._getLogsManager(id).addLog(data.payload);
-    } else {
+    },
+  };
+
+  _handleMessage = (id: DebuggerId, data: any) => {
+    // Own properties only: a command named like a method of every object
+    // (`toString`...) is unknown too.
+    if (
+      !Object.prototype.hasOwnProperty.call(this._messageHandlers, data.command)
+    ) {
       console.warn(
         'Unknown command received from debugger client:',
         data.command
       );
+      return;
     }
+    this._messageHandlers[data.command](id, data);
   };
 
   _play = (id: DebuggerId) => {
@@ -522,8 +543,8 @@ export default class Debugger extends React.Component<Props, State> {
       path,
       newValue,
     });
-
-    setTimeout(() => this._refresh(id), 100);
+    // The inspector reads the edited element again by itself: the whole game
+    // is not asked for.
     return true;
   };
 
@@ -534,8 +555,8 @@ export default class Debugger extends React.Component<Props, State> {
       path,
       args,
     });
-
-    setTimeout(() => this._refresh(id), 100);
+    // The inspector reads the edited element again by itself: the whole game
+    // is not asked for.
     return true;
   };
 
@@ -544,7 +565,7 @@ export default class Debugger extends React.Component<Props, State> {
     // Recording again starts from a blank slate, unless asked otherwise. What
     // is inspected is kept: throwing it away would unmount the tree of the
     // Inspector, folding everything the user had opened.
-    if (this.state.shouldClearOnRecord && !this.state.profilingInProgress[id]) {
+    if (this.props.shouldClearOnRecord && !this.state.profilingInProgress[id]) {
       this._forgetRecordedData(id, { keepInspectedData: true });
     }
     // A paused game is left paused: each frame advanced by hand then records
@@ -571,10 +592,9 @@ export default class Debugger extends React.Component<Props, State> {
       this._forgetDebugger(id);
       return;
     }
+    // Everything is forgotten and starts again from scratch: the state of the
+    // game is only asked for again when the user refreshes or pauses.
     this._forgetRecordedData(id);
-    // The Inspector was emptied: ask the game for its state again, instead of
-    // leaving an empty tree until the user hits refresh.
-    this._refresh(id);
   };
 
   /**
@@ -588,13 +608,16 @@ export default class Debugger extends React.Component<Props, State> {
   ) => {
     this._profilerRecordingStore.clear(id);
     this._getLogsManager(id).clear();
-    this.setState(state => {
-      const debuggerGameData = { ...state.debuggerGameData };
-      const resourcesDebugSnapshots = { ...state.resourcesDebugSnapshots };
-      if (!options.keepInspectedData) delete debuggerGameData[id];
-      delete resourcesDebugSnapshots[id];
-      return { debuggerGameData, resourcesDebugSnapshots };
-    });
+    this.setState(state =>
+      forgetRecordedData(getRecordingsState(state), id, options)
+    );
+  };
+
+  /** The recording and the logs of a game, which live out of the state. */
+  _forgetDebuggerStores = (id: DebuggerId) => {
+    this._profilerRecordingStore.clear(id);
+    this._getLogsManager(id).clear();
+    this._debuggerLogs.delete(id);
   };
 
   /**
@@ -602,78 +625,41 @@ export default class Debugger extends React.Component<Props, State> {
    * it disappears from the debugger.
    */
   _forgetDebugger = (id: DebuggerId) => {
-    this._forgetRecordedData(id);
-    this._debuggerLogs.delete(id);
-    this.setState(state => {
-      const importedRecordings = { ...state.importedRecordings };
-      delete importedRecordings[id];
-      return {
-        importedRecordings,
-        baselineDebuggerId:
-          state.baselineDebuggerId === id ? null : state.baselineDebuggerId,
-      };
-    });
+    this._forgetDebuggerStores(id);
     this.setState(
-      state => {
-        const debuggerStatus = { ...state.debuggerStatus };
-        const profilingInProgress = { ...state.profilingInProgress };
-        delete debuggerStatus[id];
-        delete profilingInProgress[id];
-        return { debuggerStatus, profilingInProgress };
-      },
+      state => forgetDebugger(getRecordingsState(state), id),
       () => this.updateToolbar()
     );
   };
 
   /**
-   * A game was just launched: the last values of the game it replaces are
-   * given to it, so that the panels keep showing what they showed until the
-   * new game sends its own. The closed games are then forgotten, so that
-   * recordings do not pile up. The logs are not carried over: a console is
-   * the story of one run, and mixing two of them would read as one.
+   * A game was just launched: it takes over what the closed games left on
+   * screen (see `carryOverClosedDebuggersData`). The logs are not carried
+   * over: a console is the story of one run, and mixing two of them would
+   * read as one.
    */
   _carryOverClosedDebuggersData = (
     newDebuggerId: DebuggerId,
     connectedDebuggerIds: Array<DebuggerId>
   ) => {
-    const closedIds = Object.keys(this.state.debuggerStatus).filter(
-      id => !connectedDebuggerIds.includes(id)
+    const closedIds = getClosedDebuggerIds(
+      this.state.debuggerStatus,
+      connectedDebuggerIds
     );
-    // The last one closed is the one that was being read.
-    const previousId = closedIds[closedIds.length - 1];
-    if (previousId !== undefined && previousId !== newDebuggerId) {
+    const previousId = getCarriedOverDebuggerId(closedIds, newDebuggerId);
+    if (previousId != null) {
       this._profilerRecordingStore.transfer(previousId, newDebuggerId);
-      this.setState(state => {
-        const debuggerGameData = { ...state.debuggerGameData };
-        const resourcesDebugSnapshots = { ...state.resourcesDebugSnapshots };
-        if (
-          debuggerGameData[previousId] &&
-          debuggerGameData[newDebuggerId] === undefined
-        ) {
-          debuggerGameData[newDebuggerId] = debuggerGameData[previousId];
-        }
-        if (
-          resourcesDebugSnapshots[previousId] &&
-          resourcesDebugSnapshots[newDebuggerId] === undefined
-        ) {
-          resourcesDebugSnapshots[newDebuggerId] =
-            resourcesDebugSnapshots[previousId];
-        }
-        return { debuggerGameData, resourcesDebugSnapshots };
-      });
     }
-    closedIds.forEach(id => this._forgetDebugger(id));
-  };
-
-  /** The last game running in a preview, ignoring the game embedded in the editor. */
-  _pickRunningDebuggerId = (debuggerIds: Array<DebuggerId>): ?DebuggerId => {
-    const { debuggerStatus } = this.state;
-    for (let index = debuggerIds.length - 1; index >= 0; index--) {
-      const id = debuggerIds[index];
-      const status = debuggerStatus[id];
-      if (!status || !status.isInGameEdition) return id;
-    }
-    return null;
+    closedIds.forEach(id => this._forgetDebuggerStores(id));
+    this.setState(
+      state =>
+        carryOverClosedDebuggersData(
+          getRecordingsState(state),
+          newDebuggerId,
+          closedIds
+        ),
+      () => this.updateToolbar()
+    );
   };
 
   /**
@@ -753,15 +739,6 @@ export default class Debugger extends React.Component<Props, State> {
 
     const id = `imported:${++this._importedRecordingsCount}`;
     this._profilerRecordingStore.setRecording(id, recording);
-    if (file.resources) {
-      const resourcesDebugState = file.resources;
-      this.setState(state => ({
-        resourcesDebugSnapshots: {
-          ...state.resourcesDebugSnapshots,
-          [id]: { state: resourcesDebugState, lastError: null },
-        },
-      }));
-    }
     const logsManager = this._getLogsManager(id);
     // The console keeps its logs newest first, and adding one puts it on
     // top: they are replayed oldest first to come back in their own order.
@@ -771,12 +748,15 @@ export default class Debugger extends React.Component<Props, State> {
       .reverse()
       .forEach(log => logsManager.addLog(log));
 
+    const importedFile = file;
     this.setState(
       state => ({
-        importedRecordings: {
-          ...state.importedRecordings,
-          [id]: file ? file.metadata : state.importedRecordings[id],
-        },
+        ...addImportedRecording(
+          getRecordingsState(state),
+          id,
+          importedFile.metadata,
+          importedFile.resources
+        ),
         selectedId: id,
         importError: null,
       }),
@@ -813,6 +793,30 @@ export default class Debugger extends React.Component<Props, State> {
   };
 
   /**
+   * Ask the game something and wait for its answer: resolves to what the game
+   * answered, or to why it did not (closed, or busy, when it did not answer in
+   * time). Each caller chooses what a missing answer means.
+   */
+  _requestFromGame = async (
+    id: DebuggerId,
+    command: string,
+    payload?: Object,
+    timeoutMs?: number
+  ): Promise<GameAnswer> => {
+    const { previewDebuggerServer } = this.props;
+    try {
+      const answer = await previewDebuggerServer.sendMessageWithResponse(
+        payload === undefined ? { command } : { command, payload },
+        id,
+        timeoutMs
+      );
+      return { payload: answer.payload, error: null };
+    } catch (error) {
+      return { payload: undefined, error };
+    }
+  };
+
+  /**
    * Read what is at the given path in the running game (an object selected in
    * the inspector), so that its values can be refreshed while it runs.
    * Resolves to null if the game did not answer.
@@ -821,18 +825,11 @@ export default class Debugger extends React.Component<Props, State> {
     id: DebuggerId,
     path: Array<string>
   ): Promise<Object | null> => {
-    const { previewDebuggerServer } = this.props;
-    try {
-      const answer = await previewDebuggerServer.sendMessageWithResponse(
-        { command: 'inspector.dump', payload: { path } },
-        id
-      );
-      // `0`, `""` and `false` are values to show, not missing answers.
-      return answer.payload !== undefined ? answer.payload : null;
-    } catch (error) {
-      // The game did not answer in time (closed, or busy).
-      return null;
-    }
+    const { payload } = await this._requestFromGame(id, 'inspector.dump', {
+      path,
+    });
+    // `0`, `""` and `false` are values to show, not missing answers.
+    return payload !== undefined ? payload : null;
   };
 
   /**
@@ -845,17 +842,11 @@ export default class Debugger extends React.Component<Props, State> {
     path: Array<string>,
     calls: Array<InspectorCall>
   ): Promise<Array<InspectorCallResult> | null> => {
-    const { previewDebuggerServer } = this.props;
-    try {
-      const answer = await previewDebuggerServer.sendMessageWithResponse(
-        { command: 'inspector.call', payload: { path, calls } },
-        id
-      );
-      return Array.isArray(answer.payload) ? answer.payload : null;
-    } catch (error) {
-      // The game did not answer in time (closed, or busy).
-      return null;
-    }
+    const { payload } = await this._requestFromGame(id, 'inspector.call', {
+      path,
+      calls,
+    });
+    return Array.isArray(payload) ? payload : null;
   };
 
   /**
@@ -863,40 +854,39 @@ export default class Debugger extends React.Component<Props, State> {
    * snapshot is kept and the error is shown.
    */
   _requestResourcesDebugState = async (id: DebuggerId): Promise<void> => {
-    const { previewDebuggerServer } = this.props;
     const previousSnapshot = this.state.resourcesDebugSnapshots[id];
-    try {
-      const answer = await previewDebuggerServer.sendMessageWithResponse(
-        { command: 'resources.dump' },
-        id,
-        // A game with a lot of resources needs more than the default second
-        // to build and send its answer.
-        10000
-      );
-      const payload = answer.payload;
-      if (!payload || payload.error) {
-        throw new Error(payload ? payload.error : 'No payload in the answer.');
-      }
+    const { payload, error } = await this._requestFromGame(
+      id,
+      'resources.dump',
+      undefined,
+      RESOURCES_DUMP_TIMEOUT_MS
+    );
+    const errorMessage = error
+      ? error.message || String(error)
+      : !payload
+      ? 'No payload in the answer.'
+      : payload.error
+      ? String(payload.error)
+      : null;
+    if (errorMessage === null) {
       this.setState(state => ({
         resourcesDebugSnapshots: {
           ...state.resourcesDebugSnapshots,
           [id]: { state: payload, lastUpdatedAt: Date.now(), lastError: null },
         },
       }));
-    } catch (error) {
-      this.setState(state => ({
-        resourcesDebugSnapshots: {
-          ...state.resourcesDebugSnapshots,
-          [id]: {
-            state: previousSnapshot ? previousSnapshot.state : null,
-            lastUpdatedAt: previousSnapshot
-              ? previousSnapshot.lastUpdatedAt
-              : 0,
-            lastError: error.message || String(error),
-          },
-        },
-      }));
+      return;
     }
+    this.setState(state => ({
+      resourcesDebugSnapshots: {
+        ...state.resourcesDebugSnapshots,
+        [id]: {
+          state: previousSnapshot ? previousSnapshot.state : null,
+          lastUpdatedAt: previousSnapshot ? previousSnapshot.lastUpdatedAt : 0,
+          lastError: errorMessage,
+        },
+      },
+    }));
   };
 
   _hasSelectedDebugger = (): any => {
@@ -924,15 +914,6 @@ export default class Debugger extends React.Component<Props, State> {
       importError,
     } = this.state;
     const isImportedRecordingSelected = !!importedRecordings[selectedId];
-    // What each imported recording is called in the selector: the run it
-    // holds, not the file it came from, which the user may have renamed.
-    const importedRecordingLabels = {};
-    Object.keys(importedRecordings).forEach(id => {
-      const metadata = importedRecordings[id];
-      const date = (metadata.exportedAt || '').slice(0, 10);
-      importedRecordingLabels[id] = `${metadata.projectName ||
-        'Recording'} - ${date} (imported)`;
-    });
     // Compared to another recording, unless it is the reference itself.
     const baselineRecording =
       baselineDebuggerId && baselineDebuggerId !== selectedId
@@ -942,44 +923,12 @@ export default class Debugger extends React.Component<Props, State> {
       baselineDebuggerId && baselineDebuggerId !== selectedId
         ? resourcesDebugSnapshots[baselineDebuggerId]
         : null;
-    // Two runs are only worth comparing when they were played on the same
-    // machine, by the same editor, and long enough to mean something.
-    const baselineMetadata = baselineDebuggerId
-      ? importedRecordings[baselineDebuggerId]
+    const selectedMetadata = importedRecordings[selectedId];
+    const selectedProjectName = selectedMetadata
+      ? selectedMetadata.projectName
+      : this.props.project
+      ? this.props.project.getName()
       : null;
-    const comparisonWarnings = [];
-    if (baselineRecording) {
-      if (
-        baselineMetadata &&
-        baselineMetadata.ideVersion &&
-        baselineMetadata.ideVersion !== getIDEVersion()
-      ) {
-        comparisonWarnings.push(
-          <Trans key="ide-version">
-            The reference was recorded with another version of GDevelop.
-          </Trans>
-        );
-      }
-      if (
-        baselineMetadata &&
-        baselineMetadata.userAgent &&
-        typeof navigator !== 'undefined' &&
-        baselineMetadata.userAgent !== navigator.userAgent
-      ) {
-        comparisonWarnings.push(
-          <Trans key="user-agent">
-            The reference was recorded on another machine or browser.
-          </Trans>
-        );
-      }
-      if (baselineRecording.frames.length < MINIMUM_COMPARABLE_FRAMES_COUNT) {
-        comparisonWarnings.push(
-          <Trans key="short-reference">
-            The reference holds few frames: what it averages is unreliable.
-          </Trans>
-        );
-      }
-    }
 
     if (debuggerServerState === 'stopped' && debuggerServerError) {
       return (
@@ -1045,7 +994,7 @@ export default class Debugger extends React.Component<Props, State> {
             selectedId={selectedId}
             debuggerStatus={debuggerStatus}
             connectedDebuggerIds={debuggerIds}
-            importedRecordingLabels={importedRecordingLabels}
+            importedRecordings={importedRecordings}
             onChooseDebugger={id =>
               this.setState(
                 {
@@ -1066,12 +1015,16 @@ export default class Debugger extends React.Component<Props, State> {
               asks for more: it can run slower than it would on its own.
             </Trans>
           </DismissableAlertMessage>
-          {comparisonWarnings.length > 0 && (
-            <AlertMessage kind="warning">
-              {comparisonWarnings.map(warning => (
-                <div key={warning.key}>{warning}</div>
-              ))}
-            </AlertMessage>
+          {baselineRecording && (
+            <ComparisonWarnings
+              baselineMetadata={
+                baselineDebuggerId
+                  ? importedRecordings[baselineDebuggerId]
+                  : null
+              }
+              selectedProjectName={selectedProjectName}
+              baselineFramesCount={baselineRecording.frames.length}
+            />
           )}
           {importError && (
             <AlertMessage
@@ -1120,6 +1073,9 @@ export default class Debugger extends React.Component<Props, State> {
                 (this._debuggerContents[selectedId] = debuggerContent)
               }
               gameData={debuggerGameData[selectedId]}
+              isGameDataTruncated={
+                !!this.state.truncatedGameDataIds[selectedId]
+              }
               onPlay={() => this._play(selectedId)}
               onPause={() => this._pause(selectedId)}
               onRefresh={() => this._refresh(selectedId)}
@@ -1164,7 +1120,7 @@ export default class Debugger extends React.Component<Props, State> {
                 actionIcon={<PlayIcon />}
                 helpPagePath="/interface/debugger"
                 actionButtonId="start-preview-and-debugger-button"
-                onAction={this.props.onLaunchDebuggerAndPreview}
+                onAction={this.props.debuggerSession.onLaunchDebuggerAndPreview}
               />
             </Line>
           )}

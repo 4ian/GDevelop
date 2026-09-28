@@ -397,12 +397,6 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& rhs) override;
 
  private:
-  /**
-   * \param profilerSectionName When not empty (and not generating code for
-   * the runtime), the events of the function are wrapped in a profiler
-   * section with this name, so that the time spent in the function shows up
-   * in the profiler of previews.
-   */
   static gd::String GenerateEventsListCompleteFunctionCode(
       gdjs::EventsCodeGenerator& codeGenerator,
       gd::String fullyQualifiedFunctionName,
@@ -410,8 +404,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String functionPreEventsCode,
       const gd::EventsList& events,
       gd::String functionPostEventsCode,
-      gd::String functionReturnCode,
-      const gd::String& profilerSectionName = "");
+      gd::String functionReturnCode);
 
   /**
    * \brief Generate the declarations of all the booleans required to run

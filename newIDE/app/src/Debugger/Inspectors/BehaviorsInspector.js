@@ -198,7 +198,8 @@ const getExpressionDescriptors = (
 const useExpressionValues = (
   behaviors: ?Array<GameData>,
   descriptorsByBehavior: Array<Array<BehaviorExpressionDescriptor>>,
-  onReadValues: ReadValuesFunction
+  onReadValues: ReadValuesFunction,
+  i18n: I18nType
 ): Array<?{ [string]: any }> => {
   const [values, setValues] = React.useState<Array<?{ [string]: any }>>([]);
   // Read by the effect without re-running it: the callback changes at each
@@ -237,7 +238,7 @@ const useExpressionValues = (
             const behaviorValues =
               newValues[behaviorIndex] || (newValues[behaviorIndex] = {});
             behaviorValues[label] = result.error
-              ? `Error: ${result.error}`
+              ? i18n._(t`Error: ${result.error}`)
               : result.value === undefined
               ? null
               : result.value;
@@ -252,7 +253,7 @@ const useExpressionValues = (
         isCancelled = true;
       };
     },
-    [behaviors, descriptorsByBehavior]
+    [behaviors, descriptorsByBehavior, i18n]
   );
 
   return values;
@@ -293,7 +294,8 @@ export const useBehaviorsItems = (
   const expressionValues = useExpressionValues(
     behaviorsList,
     descriptorsByBehavior,
-    onReadValues
+    onReadValues,
+    i18n
   );
 
   return React.useMemo(

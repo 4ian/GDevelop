@@ -15,6 +15,7 @@ import { mapFor } from '../../Utils/MapFor';
 import classes from './ChatMarkdownText.module.css';
 import classNames from 'classnames';
 import Tooltip from '@material-ui/core/Tooltip';
+import PortalContainerContext from '../../UI/PortalContainerContext';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Text from '../../UI/Text';
 
@@ -149,6 +150,7 @@ export const ConceptLink = ({
   conceptMetadata,
   forceNoLink,
 }: ConceptLinkProps): null | React.Node => {
+  const portalContainer = React.useContext(PortalContainerContext);
   if (!conceptMetadata) return null;
 
   const helpLink = forceNoLink ? '' : getHelpLink(conceptMetadata.helpPath);
@@ -178,6 +180,8 @@ export const ConceptLink = ({
       ]}
       placement="bottom"
       PopperProps={{
+        // Passing PopperProps replaces the theme default container (see FullThemeProvider).
+        container: portalContainer,
         modifiers: {
           offset: {
             enabled: true,

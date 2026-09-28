@@ -9,6 +9,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Text from '../../UI/Text';
 import { MarkdownText } from '../../UI/MarkdownText';
 import { tooltipEnterDelay } from '../../UI/Tooltip';
+import PortalContainerContext from '../PortalContainerContext';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { shouldSubmit } from '../KeyboardShortcuts/InteractionKeys';
 
@@ -54,6 +55,7 @@ export const CompactTextAreaField = ({
   labelColor,
   onFocus,
 }: CompactTextAreaFieldProps): React.Node => {
+  const portalContainer = React.useContext(PortalContainerContext);
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const title = !markdownDescription
@@ -80,6 +82,8 @@ export const CompactTextAreaField = ({
               enterDelay={tooltipEnterDelay}
               placement="bottom"
               PopperProps={{
+                // Passing PopperProps replaces the theme default container (see FullThemeProvider).
+                container: portalContainer,
                 modifiers: {
                   offset: {
                     enabled: true,

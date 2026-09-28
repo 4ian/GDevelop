@@ -5,6 +5,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import classNames from 'classnames';
 import classes from './CompactTextField.module.css';
 import { tooltipEnterDelay } from '../Tooltip';
+import PortalContainerContext from '../PortalContainerContext';
 import useClickDragAsControl from './UseClickDragAsControl';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
@@ -84,6 +85,7 @@ const CompactTextField: React.ComponentType<{
     },
     ref
   ) => {
+    const portalContainer = React.useContext(PortalContainerContext);
     const idToUse = React.useRef<string>(id || makeTimestampedId());
     const inputRef = React.useRef<?HTMLInputElement>(null);
     const controlProps = useClickDragAsControl({
@@ -173,6 +175,8 @@ const CompactTextField: React.ComponentType<{
             enterDelay={tooltipEnterDelay}
             placement="bottom"
             PopperProps={{
+              // Passing PopperProps replaces the theme default container (see FullThemeProvider).
+              container: portalContainer,
               modifiers: {
                 offset: {
                   enabled: true,

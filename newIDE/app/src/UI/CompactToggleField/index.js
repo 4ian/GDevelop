@@ -4,6 +4,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Text from '../../UI/Text';
 import { MarkdownText } from '../../UI/MarkdownText';
 import { tooltipEnterDelay } from '../../UI/Tooltip';
+import PortalContainerContext from '../PortalContainerContext';
 import classes from './CompactToggleField.module.css';
 import classNames from 'classnames';
 
@@ -33,6 +34,7 @@ type Props = {|
 |};
 
 export const CompactToggleField = (props: Props): React.MixedElement => {
+  const portalContainer = React.useContext(PortalContainerContext);
   const title = props.hideTooltip
     ? null
     : !props.markdownDescription
@@ -103,6 +105,8 @@ export const CompactToggleField = (props: Props): React.MixedElement => {
           enterDelay={tooltipEnterDelay}
           placement="bottom"
           PopperProps={{
+            // Passing PopperProps replaces the theme default container (see FullThemeProvider).
+            container: portalContainer,
             modifiers: {
               offset: {
                 enabled: true,

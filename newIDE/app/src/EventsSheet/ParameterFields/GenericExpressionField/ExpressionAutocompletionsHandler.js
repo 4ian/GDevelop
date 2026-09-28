@@ -5,9 +5,21 @@ import {
   shouldValidate,
   shouldFocusNextField,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import ListIcon from '../../../UI/ListIcon';
+import SvgIcon from '@material-ui/core/SvgIcon';
+import { type MessageDescriptor } from '../../../Utils/i18n/MessageDescriptor.flow';
+
+export type AutocompletionAction = {
+  id: string,
+  translatableValue: MessageDescriptor,
+  // $FlowFixMe[prop-missing]
+  renderIcon: () => React.Element<typeof ListIcon | typeof SvgIcon>,
+  onClick: () => void,
+};
 
 export type AutocompletionsState = {|
   autocompletions: Array<ExpressionAutocompletion>,
+  additionalActions: Array<AutocompletionAction>,
   selectedCompletionIndex: number,
   renderEverything: boolean,
 |};
@@ -15,6 +27,7 @@ export type AutocompletionsState = {|
 export const getAutocompletionsInitialState = (): AutocompletionsState => {
   return {
     autocompletions: [],
+    additionalActions: [],
     selectedCompletionIndex: 0,
     // By default, only render some completions.
     // This is to avoid rendering a lot (100+) completions,
@@ -49,7 +62,8 @@ export const getRenderedAutocompletions = (
 
 export const setNewAutocompletions = (
   state: AutocompletionsState,
-  autocompletions: Array<ExpressionAutocompletion>
+  autocompletions: Array<ExpressionAutocompletion>,
+  additionalActions: Array<AutocompletionAction> = []
 ): AutocompletionsState => {
   const completionsChanged =
     state.autocompletions.length !== autocompletions.length;
@@ -61,6 +75,7 @@ export const setNewAutocompletions = (
 
   return {
     autocompletions,
+    additionalActions,
     selectedCompletionIndex,
     renderEverything: completionsChanged ? false : state.renderEverything,
   };
@@ -97,7 +112,9 @@ export const handleAutocompletionsKeyDown = (
     onUpdateAutocompletions();
   }
 
-  if (!state.autocompletions.length) return state;
+  const length = state.autocompletions.length + state.additionalActions.length;
+
+  if (length === 0) return state;
 
   if (event.key === 'ArrowDown') {
     event.preventDefault();
@@ -107,8 +124,7 @@ export const handleAutocompletionsKeyDown = (
       // If there is a browsing in the autocompletions,
       // we need to render all the completions.
       renderEverything: true,
-      selectedCompletionIndex:
-        (state.selectedCompletionIndex + 1) % state.autocompletions.length,
+      selectedCompletionIndex: (state.selectedCompletionIndex + 1) % length,
     };
   } else if (event.key === 'ArrowUp') {
     event.preventDefault();
@@ -119,8 +135,7 @@ export const handleAutocompletionsKeyDown = (
       // we need to render all the completions.
       renderEverything: true,
       selectedCompletionIndex:
-        (state.autocompletions.length + state.selectedCompletionIndex - 1) %
-        state.autocompletions.length,
+        (length + state.selectedCompletionIndex - 1) % length,
     };
   } else if (shouldCloseOrCancel(event)) {
     // Stop propagation to avoid closing the modal the

@@ -7,7 +7,6 @@ import RaisedButton from '../../UI/RaisedButton';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
-  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import classNames from 'classnames';
 import {
@@ -15,10 +14,6 @@ import {
   nameAndIconContainer,
   instructionParameter,
 } from '../EventsTree/ClassNames';
-import SemiControlledAutoComplete, {
-  type SemiControlledAutoCompleteInterface,
-  type DataSource,
-} from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import {
@@ -37,8 +32,6 @@ import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
 import VariableArrayIcon from '../../VariablesList/Icons/VariableArrayIcon';
 import VariableStructureIcon from '../../VariablesList/Icons/VariableStructureIcon';
 import UnknownTypeIcon from '../../UI/CustomSvgIcons/Cross';
-import { type EnumeratedVariable } from './EnumerateVariables';
-import { LineStackLayout } from '../../UI/Layout';
 import GlobalVariableIcon from '../../UI/CustomSvgIcons/GlobalVariable';
 import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
 import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
@@ -47,8 +40,8 @@ import PropertyIcon from '../../UI/CustomSvgIcons/Settings';
 import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
 import Add from '../../UI/CustomSvgIcons/Add';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
-import { extractErrors } from './GenericExpressionField';
-import { useDebounce } from '../../Utils/UseDebounce';
+import GenericExpressionField from './GenericExpressionField';
+import { type AutocompletionAction } from './GenericExpressionField/ExpressionAutocompletionsHandler';
 
 const gd: libGDevelop = global.gd;
 
@@ -73,7 +66,6 @@ type Props = {
     identifier: string,
     projectScopedContainers: gdProjectScopedContainers
   ) => VariablesContainer_SourceType,
-  enumerateVariables: () => Array<EnumeratedVariable>,
   openVariableEditorDialog: (VariableDialogOpeningProps => void) | null,
   editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
   openEventsBasedEntityPropertyEditorDialog:
@@ -163,14 +155,11 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       project,
       projectScopedContainersAccessor,
       variablesContainers,
-      enumerateVariables,
       instruction,
       value,
       onChange,
       isInline,
       parameterMetadata,
-      onRequestClose,
-      onApply,
       id,
       onInstructionTypeChanged,
       getVariableSourceFromIdentifier,
@@ -179,61 +168,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       openEventsBasedEntityPropertyEditorDialog,
     } = props;
 
-    const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
-    const [
-      autocompletionVariableNames,
-      setAutocompletionVariableNames,
-    ] = React.useState<DataSource>([]);
-    /**
-     * Can be called to set up or force updating the variables list.
-     */
-    const updateAutocompletions = React.useCallback(
-      () => {
-        setAutocompletionVariableNames(
-          enumerateVariables()
-            .map(variable =>
-              variable.isValidName
-                ? variable
-                : // Hide invalid variable names - they would not
-                  // be parsed correctly anyway.
-                  null
-            )
-            .filter(Boolean)
-            .map(variable => ({
-              text: variable.name,
-              value: variable.name,
-              renderIcon: () => {
-                const VariableSourceIcon = getVariableSourceIcon(
-                  variable.source
-                );
-                const VariableTypeIcon = getVariableTypeIcon(variable.type);
-                return (
-                  <LineStackLayout>
-                    <VariableSourceIcon fontSize="small" />
-                    <VariableTypeIcon fontSize="small" />
-                  </LineStackLayout>
-                );
-              },
-            }))
-        );
-      },
-      [enumerateVariables]
-    );
-
-    const focus: FieldFocusFunction = options => {
-      if (field.current) field.current.focus(options);
-    };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-      updateAutocompletions,
-    }));
-
-    React.useEffect(
-      () => {
-        updateAutocompletions();
-      },
-      [updateAutocompletions]
-    );
+    const field = React.useRef<?GenericExpressionField>(null);
 
     const openVariableEditor = React.useCallback(
       () => {
@@ -340,83 +275,6 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       ]
     );
 
-    const description = parameterMetadata
-      ? parameterMetadata.getDescription()
-      : undefined;
-
-    const [errorText, setErrorText] = React.useState<?string>(null);
-    const inputValue = React.useRef<string | null>(null);
-    const doValidation = React.useCallback(
-      () => {
-        if (!project || !parameterMetadata || !instruction) return null;
-
-        // Parsing can be time consuming (~1ms for simple expression,
-        // a few milliseconds for complex ones).
-
-        const parser = new gd.ExpressionParser2();
-        const expressionNode = parser
-          .parseExpression(inputValue.current || value)
-          .get();
-        const expressionType = parameterMetadata
-          .getValueTypeMetadata()
-          .getName();
-
-        const objectName = gd.InstructionValidator.getObjectNameForParameter(
-          projectScopedContainersAccessor.get(),
-          instruction,
-          expressionType
-        );
-        const { errorText } = extractErrors(
-          gd.JsPlatform.get(),
-          project,
-          projectScopedContainersAccessor,
-          expressionType,
-          parameterMetadata,
-          expressionNode,
-          objectName,
-          'no'
-        );
-
-        parser.delete();
-
-        setErrorText(errorText);
-      },
-      [
-        instruction,
-        parameterMetadata,
-        project,
-        projectScopedContainersAccessor,
-        value,
-      ]
-    );
-
-    const enqueueValidation = useDebounce(() => {
-      doValidation();
-    }, 250);
-
-    React.useEffect(
-      () => {
-        enqueueValidation();
-      },
-      [enqueueValidation]
-    );
-
-    const handleValueChange = React.useCallback(
-      (value: string) => {
-        inputValue.current = null;
-        onChange(value);
-      },
-      [onChange]
-    );
-
-    const handleInputValueChange = React.useCallback(
-      (value: string) => {
-        inputValue.current = value;
-        enqueueValidation();
-      },
-      [enqueueValidation]
-    );
-
     const isSwitchableInstruction =
       instruction &&
       gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
@@ -436,16 +294,13 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       variableType !== gd.Variable.Number &&
       variableType !== gd.Variable.String &&
       variableType !== gd.Variable.Boolean &&
-      !errorText &&
+      field.current &&
+      !field.current.hasAnyError() &&
       value;
 
-    const filterOptionById = React.useCallback(
-      (id: string) => {
-        // Access to the input directly because the value
-        // may not have been sent to onChange yet.
-        const fieldCurrentValue = field.current
-          ? field.current.getInputValue()
-          : value;
+    const onGetAdditionalActions = React.useCallback(
+      (fieldCurrentValue: string): Array<AutocompletionAction> => {
+        const actions = [];
 
         const variableSourceType = getVariableSourceFromIdentifier(
           fieldCurrentValue,
@@ -454,19 +309,90 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         const isVariableDeclared =
           variableSourceType !== gd.VariablesContainer.Unknown;
 
-        const optionIds = isVariableDeclared
-          ? variableSourceType === gd.VariablesContainer.Parameters
-            ? ['edit-parameters']
-            : variableSourceType === gd.VariablesContainer.Properties
-            ? ['edit-properties']
-            : ['edit-variables']
-          : fieldCurrentValue
-          ? ['add-parameter', 'add-property', 'add-variable']
-          : ['edit-or-add-properties', 'edit-or-add-variables'];
-
-        return optionIds.includes(id);
+        if (isVariableDeclared) {
+          if (variableSourceType === gd.VariablesContainer.Parameters) {
+            if (editEventsFunctionParameter) {
+              actions.push({
+                id: 'edit-parameters',
+                translatableValue: t`Edit parameters...`,
+                renderIcon: () => <Add />,
+                onClick: openParameterEditor,
+              });
+            }
+          } else if (variableSourceType === gd.VariablesContainer.Properties) {
+            if (openEventsBasedEntityPropertyEditorDialog) {
+              actions.push({
+                id: 'edit-properties',
+                translatableValue: t`Edit properties...`,
+                renderIcon: () => <Add />,
+                onClick: openPropertyEditor,
+              });
+            }
+          } else {
+            if (openVariableEditorDialog) {
+              actions.push({
+                id: 'edit-variables',
+                translatableValue: t`Edit variables...`,
+                renderIcon: () => <Add />,
+                onClick: openVariableEditor,
+              });
+            }
+          }
+        } else if (fieldCurrentValue) {
+          if (editEventsFunctionParameter) {
+            actions.push({
+              id: 'add-parameter',
+              translatableValue: t`Add parameter...`,
+              renderIcon: () => <Add />,
+              onClick: openParameterEditor,
+            });
+          }
+          if (openEventsBasedEntityPropertyEditorDialog) {
+            actions.push({
+              id: 'add-property',
+              translatableValue: t`Add property...`,
+              renderIcon: () => <Add />,
+              onClick: openPropertyEditor,
+            });
+          }
+          if (openVariableEditorDialog) {
+            actions.push({
+              id: 'add-variable',
+              translatableValue: t`Add variable...`,
+              renderIcon: () => <Add />,
+              onClick: openVariableEditor,
+            });
+          }
+        } else {
+          if (openEventsBasedEntityPropertyEditorDialog) {
+            actions.push({
+              id: 'edit-or-add-properties',
+              translatableValue: t`Edit or add properties...`,
+              renderIcon: () => <Add />,
+              onClick: openPropertyEditor,
+            });
+          }
+          if (openVariableEditorDialog) {
+            actions.push({
+              id: 'edit-or-add-variables',
+              translatableValue: t`Edit or add variables...`,
+              renderIcon: () => <Add />,
+              onClick: openVariableEditor,
+            });
+          }
+        }
+        return actions;
       },
-      [getVariableSourceFromIdentifier, projectScopedContainersAccessor, value]
+      [
+        editEventsFunctionParameter,
+        getVariableSourceFromIdentifier,
+        openEventsBasedEntityPropertyEditorDialog,
+        openParameterEditor,
+        openPropertyEditor,
+        openVariableEditor,
+        openVariableEditorDialog,
+        projectScopedContainersAccessor,
+      ]
     );
 
     return (
@@ -475,104 +401,42 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
           <ColumnStackLayout noMargin expand>
             <TextFieldWithButtonLayout
               renderTextField={() => (
-                <SemiControlledAutoComplete
-                  margin={isInline ? 'none' : 'dense'}
-                  floatingLabelText={description}
-                  helperMarkdownText={
+                <GenericExpressionField
+                  expressionType={
                     parameterMetadata
-                      ? parameterMetadata.getLongDescription()
-                      : undefined
+                      ? // $FlowFixMe[incompatible-type]
+                        parameterMetadata.getValueTypeMetadata().getName()
+                      : // $FlowFixMe[incompatible-type]
+                        ''
                   }
-                  errorText={errorText}
-                  fullWidth
-                  value={value}
-                  onChange={handleValueChange}
-                  onInputValueChange={handleInputValueChange}
-                  onRequestClose={onRequestClose}
-                  onApply={onApply}
-                  filterOptionById={filterOptionById}
-                  dataSource={[
-                    ...autocompletionVariableNames,
-                    ...(editEventsFunctionParameter
-                      ? [
-                          {
-                            id: 'edit-parameters',
-                            translatableValue: t`Edit parameters...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openParameterEditor,
-                          },
-                          {
-                            id: 'add-parameter',
-                            translatableValue: t`Add parameter...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openParameterEditor,
-                          },
-                        ]
-                      : []),
-                    ...(openEventsBasedEntityPropertyEditorDialog
-                      ? [
-                          {
-                            id: 'edit-properties',
-                            translatableValue: t`Edit properties...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openPropertyEditor,
-                          },
-                          {
-                            id: 'add-property',
-                            translatableValue: t`Add property...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openPropertyEditor,
-                          },
-                          {
-                            id: 'edit-or-add-properties',
-                            translatableValue: t`Edit or add properties...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openPropertyEditor,
-                          },
-                        ]
-                      : []),
-                    ...(openVariableEditorDialog
-                      ? [
-                          {
-                            id: 'edit-variables',
-                            translatableValue: t`Edit variables...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openVariableEditor,
-                          },
-                          {
-                            id: 'add-variable',
-                            translatableValue: t`Add variable...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openVariableEditor,
-                          },
-                          {
-                            id: 'edit-or-add-variables',
-                            translatableValue: t`Edit or add variables...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openVariableEditor,
-                          },
-                        ]
-                      : []),
-                  ]}
-                  openOnFocus={!isInline}
                   ref={field}
                   id={id}
+                  globalObjectsContainer={props.globalObjectsContainer}
+                  objectsContainer={props.objectsContainer}
+                  onChange={onChange}
+                  project={project}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
+                  scope={props.scope}
+                  value={value}
+                  instruction={props.instruction}
+                  instructionMetadata={props.instructionMetadata}
+                  parameterMetadata={parameterMetadata}
+                  expression={props.expression}
+                  expressionMetadata={props.expressionMetadata}
+                  parameterIndex={props.parameterIndex}
+                  onInstructionTypeChanged={onInstructionTypeChanged}
+                  editEventsFunctionParameter={editEventsFunctionParameter}
+                  openEventsBasedEntityPropertyEditorDialog={
+                    openEventsBasedEntityPropertyEditorDialog
+                  }
+                  isInline={isInline}
+                  onRequestClose={props.onRequestClose}
+                  onApply={props.onApply}
+                  resourceManagementProps={props.resourceManagementProps}
+                  parameterRenderingService={props.parameterRenderingService}
+                  onGetAdditionalActions={onGetAdditionalActions}
                 />
               )}
               renderButton={style =>

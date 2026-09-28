@@ -16,8 +16,6 @@ import {
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
-import { enumerateVariables } from './EnumerateVariables';
-import { intersectionBy } from 'lodash';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 const gd: libGDevelop = global.gd;
@@ -138,16 +136,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ]
     );
 
-    const enumerateObjectVariables = React.useCallback(
-      () =>
-        variablesContainers.length > 0
-          ? variablesContainers
-              .map(variablesContainer => enumerateVariables(variablesContainer))
-              .reduce((a, b) => intersectionBy(a, b, 'name'))
-          : [],
-      [variablesContainers]
-    );
-
     const onVariableEditorApply = React.useCallback(
       (selectedVariableName: string | null) => {
         if (selectedVariableName && selectedVariableName.startsWith(value)) {
@@ -182,7 +170,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           project={project}
           instruction={instruction}
           variablesContainers={variablesContainers}
-          enumerateVariables={enumerateObjectVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -206,6 +193,12 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
           openEventsBasedEntityPropertyEditorDialog={null}
+          instructionMetadata={props.instructionMetadata}
+          expression={props.expression}
+          expressionMetadata={props.expressionMetadata}
+          parameterIndex={props.parameterIndex}
+          resourceManagementProps={props.resourceManagementProps}
+          parameterRenderingService={props.parameterRenderingService}
         />
         {editorOpen &&
           project &&

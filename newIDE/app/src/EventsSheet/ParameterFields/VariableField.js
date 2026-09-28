@@ -7,6 +7,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import classNames from 'classnames';
 import {
@@ -72,11 +73,6 @@ type Props = {
     | (VariableDialogOpeningProps => void)
     | null,
 };
-
-export type VariableFieldInterface = {|
-  ...ParameterFieldInterface,
-  updateAutocompletions: () => void,
-|};
 
 export const getRootVariableName = (name: string): string => {
   const dotPosition = name.indexOf('.');
@@ -149,7 +145,7 @@ export const getVariableTypeIcon = (variableType: Variable_Type): any => {
 // ensure we 100% validate and can autocomplete what is entered (and we can have also a simpler
 // selector that offers the variables in the scope).
 
-export default (React.forwardRef<Props, VariableFieldInterface>(
+export default (React.forwardRef<Props, ParameterFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
       project,
@@ -169,6 +165,12 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
     } = props;
 
     const field = React.useRef<?GenericExpressionField>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
     const openVariableEditor = React.useCallback(
       () => {
@@ -496,7 +498,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
   }
 ): React.ComponentType<{
   ...Props,
-  +ref?: React.RefSetter<VariableFieldInterface>,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
 }>);
 
 export const renderVariableWithIcon = (

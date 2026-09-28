@@ -15,6 +15,7 @@ import {
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useInGameEditorSettings } from './InGameEditorSettings';
 import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
+import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -255,16 +256,9 @@ export const EmbeddedGameFrame = ({
     // fight with its focus trap.
     if (hasSomeDialogOpen.current) return;
 
-    const { activeElement } = document;
     // Nothing to do if the game is already focused, and don't interrupt the user while
     // a text is being edited (renaming an object, editing a property...).
-    if (
-      activeElement === iframe ||
-      // $FlowFixMe[prop-missing] - `closest` is available on the focused element.
-      (activeElement &&
-        activeElement.closest('textarea, input, [contenteditable="true"]'))
-    )
-      return;
+    if (document.activeElement === iframe || isUserTyping()) return;
 
     iframe.contentWindow.focus();
   }, []);

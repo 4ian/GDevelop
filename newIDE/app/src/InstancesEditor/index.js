@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import debounce from 'lodash/debounce';
 import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
 import KeyboardShortcuts, { MID_MOUSE_BUTTON } from '../UI/KeyboardShortcuts';
+import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
@@ -343,23 +344,13 @@ export default class InstancesEditor extends Component<Props, State> {
       event.preventDefault();
     };
     this.pixiRenderer.view.setAttribute('tabIndex', -1);
-    // Keyboard shortcuts are listened on the window rather than on the canvas, so that
-    // they also work when the canvas is only hovered and not focused (for example when
-    // the focus is still in the objects list), like the mouse wheel zoom already does.
-    // They are restricted to this editor by `_shouldHandleKeyboardShortcuts`, and the
-    // capture phase is used so that a focused component stopping the event propagation
-    // (the tree views handle the keyboard) can't prevent them from working.
+    // Listened on the window (in the capture phase, as tree views stop the propagation)
+    // so that shortcuts also work when the canvas is only hovered, like the wheel zoom.
     window.addEventListener('keydown', this.keyboardShortcuts.onKeyDown, true);
-    // Key releases are always handled, even when the canvas is not hovered anymore, so
-    // that a key released after leaving the canvas (which happens when moving the view
-    // up to its border) is not considered as still pressed. A key can also be released
-    // while the window is blurred (Alt+Tab...), in which case no `keyup` is received.
+    // Key releases are always handled, so that a key released outside the canvas or
+    // while the window is blurred is not considered as still pressed.
     window.addEventListener('keyup', this.keyboardShortcuts.onKeyUp, true);
     window.addEventListener('blur', this.keyboardShortcuts.resetModifiers);
-    this.pixiRenderer.view.addEventListener(
-      'mouseover',
-      this._onPointerOverCanvas
-    );
     this.pixiRenderer.view.addEventListener(
       'mousedown',
       this.keyboardShortcuts.onMouseDown
@@ -369,8 +360,7 @@ export default class InstancesEditor extends Component<Props, State> {
       this.keyboardShortcuts.onMouseUp
     );
     this.pixiRenderer.view.addEventListener('mousemove', event => {
-      // `mouseover` can be missed, for example if the canvas appears under a still cursor.
-      this._onPointerOverCanvas();
+      this._isPointerOverCanvas = true;
       if (onMouseMove) onMouseMove(event);
     });
     this.pixiRenderer.view.addEventListener('mouseout', event => {
@@ -678,10 +668,6 @@ export default class InstancesEditor extends Component<Props, State> {
     this.backgroundPixiContainer.addChild(this.background.getPixiObject());
   }
 
-  _onPointerOverCanvas = () => {
-    this._isPointerOverCanvas = true;
-  };
-
   /**
    * Keyboard shortcuts are handled when the canvas is hovered by the cursor, or when it
    * is focused - so that they can be used without having to click on the canvas first,
@@ -689,6 +675,12 @@ export default class InstancesEditor extends Component<Props, State> {
    */
   _shouldHandleKeyboardShortcuts = (): boolean =>
     !!this.pixiRenderer &&
+    // Don't handle shortcuts while a text is edited or a dialog is opened.
+    !isUserTyping() &&
+    !(
+      document.activeElement &&
+      document.activeElement.closest('[role="dialog"]')
+    ) &&
     (this._isPointerOverCanvas ||
       document.activeElement === this.pixiRenderer.view);
 

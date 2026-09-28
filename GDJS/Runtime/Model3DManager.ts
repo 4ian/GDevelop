@@ -52,68 +52,126 @@ namespace gdjs {
     }
   };
 
+  type SharedTextureEntry = {
+    key: string;
+    texture: Promise<THREE.Texture>;
+    source?: THREE.Source;
+  };
+
   /**
-   * The textures embedded in the loaded models, by hash of their bytes, with
-   * the models using each of them: a texture is disposed when the last model
-   * using it is unloaded.
+   * Cache reusable textures and manage the lifetime of model textures.
+   * Clone cached textures before assigning them to materials. Register each
+   * model's textures with retain, then release them when that model unloads.
    */
   class SharedTextureCache {
-    private _textures = new Map<string, Promise<THREE.Texture>>();
-    private _keys = new Map<THREE.Texture, string>();
-    private _users = new Map<string, Set<string>>();
+    private _textures = new Map<string, SharedTextureEntry>();
+    private _sources = new Map<
+      THREE.Source,
+      { entries: Set<SharedTextureEntry>; users: Set<string> }
+    >();
+    private _retainedTextures = new Set<THREE.Texture>();
 
+    /**
+     * Return the cached loading promise, or undefined if the key is absent.
+     * Clone the resulting texture before modifying it or using it in a material.
+     */
     get(key: string): Promise<THREE.Texture> | undefined {
-      return this._textures.get(key);
-    }
-
-    set(key: string, texture: Promise<THREE.Texture>): Promise<THREE.Texture> {
-      const registered = texture.then((texture) => {
-        this._keys.set(texture, key);
-        return texture;
-      });
-      this._textures.set(key, registered);
-      this._users.set(key, new Set());
-      return registered;
-    }
-
-    /** Record that a model uses a texture, if it is a shared one. */
-    retain(texture: THREE.Texture, resourceName: string): void {
-      const key = this._keys.get(texture);
-      if (key) this._users.get(key)!.add(resourceName);
+      const entry = this._textures.get(key);
+      return entry && entry.texture;
     }
 
     /**
-     * Record that a model does not use a texture anymore, and dispose the
-     * texture when nothing uses it: a texture that is not shared belongs to
-     * the model only.
+     * Cache a loading promise under an unused key identifying an image and its
+     * sampler settings. Call get first to reuse an existing entry.
+     * The returned promise preserves the loading result or error; null results
+     * and rejected promises are removed from the cache.
      */
-    release(texture: THREE.Texture, resourceName: string): void {
-      const key = this._keys.get(texture);
-      if (!key) {
-        texture.dispose();
-        return;
-      }
-      const users = this._users.get(key)!;
-      users.delete(resourceName);
-      if (users.size > 0) return;
-      texture.dispose();
-      this._textures.delete(key);
-      this._keys.delete(texture);
-      this._users.delete(key);
+    set(key: string, texture: Promise<THREE.Texture>): Promise<THREE.Texture> {
+      const entry: SharedTextureEntry = {
+        key,
+        texture: texture.then(
+          (texture) => {
+            // GLTFLoader returns null when an image cannot be decoded, despite
+            // its TypeScript declaration. Do not cache failed image loads.
+            if (!texture) {
+              this._removeEntry(key, entry);
+              return texture;
+            }
+            entry.source = texture.source;
+            let source = this._sources.get(texture.source);
+            if (!source) {
+              source = { entries: new Set(), users: new Set() };
+              this._sources.set(texture.source, source);
+            }
+            // GLTFLoader can also share a Source between different samplers
+            // within one model. Keep all of their cache entries together.
+            source.entries.add(entry);
+            return texture;
+          },
+          (error) => {
+            this._removeEntry(key, entry);
+            throw error;
+          }
+        ),
+      };
+      this._textures.set(key, entry);
+      return entry.texture;
     }
 
+    private _removeEntry(key: string, entry: SharedTextureEntry): void {
+      if (this._textures.get(key) !== entry) return;
+      this._textures.delete(key);
+      if (entry.source) {
+        const source = this._sources.get(entry.source);
+        if (source) {
+          source.entries.delete(entry);
+          if (source.entries.size === 0) this._sources.delete(entry.source);
+        }
+      }
+    }
+
+    /**
+     * Register a texture as used by the named model. Call for every texture in
+     * the model's materials after loading it. Repeated registration of the same
+     * texture and model has no additional effect.
+     */
+    retain(texture: THREE.Texture, resourceName: string): void {
+      this._retainedTextures.add(texture);
+      // UV transforms and channel overrides clone the Texture but keep its Source.
+      const source = this._sources.get(texture.source);
+      if (source) source.users.add(resourceName);
+    }
+
+    /**
+     * Dispose a retained texture when its model unloads. Pass the resource name
+     * used for retain and release all of that model's textures together.
+     * Cached images remain available while another retained model uses them.
+     * Releasing the same texture again has no effect.
+     */
+    release(texture: THREE.Texture, resourceName: string): void {
+      if (!this._retainedTextures.delete(texture)) return;
+      // Three.js reference-counts shared GPU allocations, so disposing this
+      // texture leaves allocations used by other model textures intact.
+      texture.dispose();
+      const source = this._sources.get(texture.source);
+      if (!source) return;
+      source.users.delete(resourceName);
+      if (source.users.size > 0) return;
+      source.entries.forEach((entry) => this._removeEntry(entry.key, entry));
+    }
+
+    /** Dispose all retained textures and clear the cache when the game ends. */
     dispose(): void {
-      this._keys.forEach((key, texture) => texture.dispose());
+      this._retainedTextures.forEach((texture) => texture.dispose());
+      this._retainedTextures.clear();
       this._textures.clear();
-      this._keys.clear();
-      this._users.clear();
+      this._sources.clear();
     }
   }
 
   /**
-   * Share the textures embedded in GLB files between the models of a game:
-   * the models of a pack all embed the same palette image, which would
-   * otherwise be decoded and uploaded to the GPU once per model.
+   * Load embedded GLB textures through a shared cache. Register one plugin per
+   * GLTFLoader parser, reusing the same cache across models.
    */
   class SharedTexturesGLTFPlugin implements THREE_ADDONS.GLTFLoaderPlugin {
     name = 'GDEVELOP_shared_textures';
@@ -125,6 +183,11 @@ namespace gdjs {
       this._textures = textures;
     }
 
+    /**
+     * Load the indexed texture with independently mutable settings.
+     * Return null to let GLTFLoader handle textures unsupported by this plugin.
+     * The returned promise resolves to null if the image cannot be decoded.
+     */
     loadTexture(textureIndex: number): Promise<THREE.Texture> | null {
       const json = this._parser.json;
       const textureDef = json.textures[textureIndex];
@@ -156,20 +219,30 @@ namespace gdjs {
                 this._parser.textureLoader
               )
             )
-          );
+          ).then((texture) => {
+            if (!texture) return texture;
+            // assignTexture changes colorSpace and may apply UV transforms.
+            // Never expose the cached template to those per-material changes.
+            // Cloning preserves the Source, allowing Three.js to share GPU
+            // allocations when the texture settings match.
+            const modelTexture = texture.clone();
+            this._parser.associations.set(modelTexture, {
+              textures: textureIndex,
+            });
+            return modelTexture;
+          });
         });
     }
   }
 
   /**
-   * Load GLB files (using `Three.js`), using the "model3D" resources
-   * registered in the game resources.
+   * Load, access, and unload the game's registered model3D resources.
+   * Call loadResource to download a GLB, then processResource to make it
+   * available through getModel.
    * @category Resources > 3D Models
    */
   export class Model3DManager implements gdjs.ResourceManager {
-    /**
-     * Map associating a resource name to the loaded Three.js model.
-     */
+    // Associate resource names with loaded Three.js models.
     private _loadedThreeModels = new gdjs.ResourceCache<THREE_ADDONS.GLTF>();
     private _downloadedArrayBuffers = new gdjs.ResourceCache<ArrayBuffer>();
     private _sharedTextures = new SharedTextureCache();

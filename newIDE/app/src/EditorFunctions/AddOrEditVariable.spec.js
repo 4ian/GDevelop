@@ -106,6 +106,43 @@ describe('add_or_edit_variable', () => {
     expect(project.getVariables().has('items')).toBe(false);
   });
 
+  it('lists only the first changes and warnings of a large batch', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.add_or_edit_variable.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'global',
+          variables: [
+            ...Array.from({ length: 300 }, (_, index) => ({
+              variable_name_or_path: `schools[${index}].name`,
+              value: `School ${index}`,
+            })),
+            ...Array.from({ length: 30 }, () => ({
+              variable_name_or_path: 'items[x]',
+              value: '1',
+            })),
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    const lines = (result.message || '').split('\n');
+    expect(lines).toHaveLength(42);
+    expect(lines[0]).toBe(
+      'Added global variable "schools[0].name" (String) = School 0'
+    );
+    expect(lines[20]).toBe('... and 280 more changes, not listed.');
+    expect(lines[21]).toContain('Could not change global variable "items[x]"');
+    expect(lines[41]).toBe('... and 10 more warnings, not listed.');
+    expect(
+      project
+        .getVariables()
+        .get('schools')
+        .getChildrenCount()
+    ).toBe(300);
+  });
+
   it('warns (and stores nothing) when a forced number has a non-numeric value', async () => {
     const result: EditorFunctionGenericOutput = await editorFunctions.add_or_edit_variable.launchFunction(
       {

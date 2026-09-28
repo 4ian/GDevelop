@@ -552,6 +552,11 @@ export default class ExpressionField extends React.Component<Props, State> {
       return;
     }
 
+    const isVariableParameter = gd.ValueTypeMetadata.isTypeExpression(
+      'variable',
+      expressionType
+    );
+
     const cursorPosition = this._inputElement
       ? this._inputElement.selectionStart
       : 0;
@@ -560,7 +565,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       projectScopedContainersAccessor.get(),
       expressionType,
       expressionNode,
-      cursorPosition - 1
+      isVariableParameter ? Math.max(0, cursorPosition - 1) : cursorPosition - 1
     );
 
     const newAutocompletions = getAutocompletionsFromDescriptions(

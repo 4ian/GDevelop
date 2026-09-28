@@ -146,7 +146,11 @@ import {
   type ToolScopeType,
   type ToolScope,
 } from './Scope';
-import { getInstanceRawJson, applyInstancesRawJson } from './InstancesRawJson';
+import {
+  getInstanceRawJson,
+  loadTileMapAtlases,
+  applyInstancesRawJson,
+} from './InstancesRawJson';
 import {
   applyRawObjectConfiguration,
   renameObjectAnimationsAndPoints,
@@ -4412,6 +4416,8 @@ const changeInstancesRawJson: EditorFunction = {
     project,
     args,
     toolsVersion,
+    PixiResourcesLoader,
+    onObjectsModifiedOutsideEditor,
     onInstancesModifiedOutsideEditor,
   }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
@@ -4432,6 +4438,17 @@ const changeInstancesRawJson: EditorFunction = {
         'Nothing was changed: `changes` must be a non-empty list of {instance_id, raw_json}.'
       );
     }
+    const instancesObjectNames = [];
+    iterateOnInstances(containers.initialInstances, instance => {
+      instancesObjectNames.push(instance.getObjectName());
+    });
+    const tileMapAtlases = await loadTileMapAtlases({
+      project,
+      objectsContainer: containers.objectsContainer,
+      globalObjectsContainer: containers.globalObjectsContainer,
+      objectNames: instancesObjectNames,
+      PixiResourcesLoader,
+    });
     const instances = [];
     iterateOnInstances(containers.initialInstances, instance => {
       instances.push(instance);
@@ -4442,9 +4459,16 @@ const changeInstancesRawJson: EditorFunction = {
       globalObjectsContainer: containers.globalObjectsContainer,
       instances,
       changes,
+      tileMapAtlases,
     });
     if (!result.success) {
       return makeGenericFailure(`Nothing was changed: ${result.message}`);
+    }
+    if (result.haveObjectsChanged) {
+      onObjectsModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+        isNewObjectTypeUsed: false,
+      });
     }
     if (result.changes.length > 0) {
       onInstancesModifiedOutsideEditor({

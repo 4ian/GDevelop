@@ -552,13 +552,44 @@ describe('EventScriptSourceView', () => {
           '\n'
         )
       );
-      // Nothing of the event is shown: the note says so (reading it alone
-      // again would not help, only a bigger budget does).
+      // Its code is given aside instead, as a range of lines.
       expect(jsOnlyView.selectedEventIds).toEqual([]);
-      expect(jsOnlyView.notes.join(' ')).toContain(
-        'event-1 is not shown at all'
-      );
+      expect(jsOnlyView.jsCodeExcerpt).toEqual({
+        eventId: 'event-1',
+        fromLine: 1,
+        toLine: 20,
+        totalLines: 20,
+        code: longCode,
+      });
+      expect(jsOnlyView.notes.join(' ')).toContain('`jsCodeExcerpt`');
       expect(jsOnlyView.notes.join(' ')).not.toContain('cut short');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('gives the start of a line of a `js` event longer than the budget', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const minifiedLine = 'x=1;'.repeat(2000);
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode: [minifiedLine, 'done();'].join('\n'),
+          parameterObjects: '',
+          useStrict: true,
+          eventsSheetExpanded: false,
+        },
+      ]);
+
+      const view = buildEventScriptSourceView({ eventsList, maxChars: 2000 });
+      const { jsCodeExcerpt } = view;
+      if (!jsCodeExcerpt) throw new Error('Expected a jsCodeExcerpt.');
+      expect(jsCodeExcerpt.toLine).toBe(1);
+      expect(minifiedLine.startsWith(jsCodeExcerpt.code)).toBe(true);
+      expect(jsCodeExcerpt.code.length).toBeLessThanOrEqual(2000);
+      expect(view.notes.join(' ')).toContain('only its start is shown');
+      expect(view.notes.join(' ')).toContain('`js_from_line: 2`');
     } finally {
       project.delete();
     }

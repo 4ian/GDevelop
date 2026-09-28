@@ -14,7 +14,6 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { enumerateVariablesOrPropertiesOrParametersOfContainersList } from './EnumerateVariables';
 import { mapFor } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
@@ -44,14 +43,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       editEventsFunctionParameter,
       openEventsBasedEntityPropertyEditorDialog,
     } = props;
-
-    const enumerateGlobalAndSceneVariables = React.useCallback(
-      () =>
-        enumerateVariablesOrPropertiesOrParametersOfContainersList(
-          projectScopedContainersAccessor.get().getVariablesContainersList()
-        ),
-      [projectScopedContainersAccessor]
-    );
 
     const variablesContainers = React.useMemo(
       () => {
@@ -102,7 +93,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           project={project}
           instruction={instruction}
           variablesContainers={variablesContainers}
-          enumerateVariables={enumerateGlobalAndSceneVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -126,6 +116,12 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           openEventsBasedEntityPropertyEditorDialog={
             openEventsBasedEntityPropertyEditorDialog || null
           }
+          instructionMetadata={props.instructionMetadata}
+          expression={props.expression}
+          expressionMetadata={props.expressionMetadata}
+          parameterIndex={props.parameterIndex}
+          resourceManagementProps={props.resourceManagementProps}
+          parameterRenderingService={props.parameterRenderingService}
         />
         {variableEditorOpen &&
           (variableSourceType === gd.VariablesContainer.Local ? (

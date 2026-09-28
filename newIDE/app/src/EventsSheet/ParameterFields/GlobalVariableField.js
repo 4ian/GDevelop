@@ -12,7 +12,6 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { enumerateVariables } from './EnumerateVariables';
 
 const gd: libGDevelop = global.gd;
 
@@ -39,18 +38,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project]
     );
 
-    const enumerateGlobaleVariables = React.useCallback(
-      () => {
-        return project ? enumerateVariables(project.getVariables()) : [];
-      },
-      [project]
-    );
-
     return (
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
-          enumerateVariables={enumerateGlobaleVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -67,6 +58,12 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
           openEventsBasedEntityPropertyEditorDialog={null}
+          instructionMetadata={props.instructionMetadata}
+          expression={props.expression}
+          expressionMetadata={props.expressionMetadata}
+          parameterIndex={props.parameterIndex}
+          resourceManagementProps={props.resourceManagementProps}
+          parameterRenderingService={props.parameterRenderingService}
         />
         {variableEditorOpen && project && (
           <GlobalVariablesDialog

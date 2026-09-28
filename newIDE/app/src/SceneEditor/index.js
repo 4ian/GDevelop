@@ -429,6 +429,8 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             if (parsedMessage.command === 'updateInstances') {
               this.onReceiveInstanceChanges(parsedMessage.payload);
+            } else if (parsedMessage.command === 'updateObjectProperties') {
+              this.onReceiveObjectPropertiesChanges(parsedMessage.payload);
             } else if (parsedMessage.command === 'setCameraState') {
               setCameraState(parsedMessage.editorId, parsedMessage.payload);
             } else if (parsedMessage.command === 'openContextMenu') {
@@ -473,6 +475,34 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   getInstancesEditorSettings(): any {
     return this.state.instancesEditorSettings;
+  }
+
+  /**
+   * POC: the in-game editor changed properties of an object (the points of a
+   * 3D model, see the model inspector). Write them in the project, without
+   * reloading the game (it already applied them).
+   */
+  onReceiveObjectPropertiesChanges(payload: {|
+    objectName: string,
+    properties: { [propertyName: string]: string },
+  |}) {
+    const { globalObjectsContainer, objectsContainer } = this.props;
+    const { objectName, properties } = payload;
+    const container = objectsContainer.hasObjectNamed(objectName)
+      ? objectsContainer
+      : globalObjectsContainer &&
+        globalObjectsContainer.hasObjectNamed(objectName)
+      ? globalObjectsContainer
+      : null;
+    if (!container) return;
+
+    const configuration = container.getObject(objectName).getConfiguration();
+    Object.keys(properties).forEach(propertyName => {
+      configuration.updateProperty(propertyName, properties[propertyName]);
+    });
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    this.forceUpdate();
   }
 
   onReceiveInstanceChanges(changes: InstanceChanges) {

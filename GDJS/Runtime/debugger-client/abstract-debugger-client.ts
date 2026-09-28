@@ -480,6 +480,21 @@ namespace gdjs {
             });
         } else if (data.command === 'cancelDragNewInstance') {
           if (inGameEditor) inGameEditor.cancelDragNewInstance();
+        } else if (data.command === 'inspectModel3DObject') {
+          // POC: "Edit points" button of a 3D model in the IDE.
+          if (inGameEditor && data.payload?.objectName) {
+            inGameEditor.inspectModel3DObject(data.payload.objectName);
+          }
+        } else if (data.command === 'inspectModel3DObject') {
+          // POC: "Edit points" button of a 3D model in the IDE.
+          if (inGameEditor && data.payload?.objectName) {
+            inGameEditor.inspectModel3DObject(data.payload.objectName);
+          }
+        } else if (data.command === 'setVisibleScreenArea') {
+          // POC: the part of the game frame not covered by the IDE panels.
+          if (inGameEditor && data.payload?.visibleScreenArea) {
+            inGameEditor.setVisibleScreenArea(data.payload.visibleScreenArea);
+          }
         } else if (data.command === 'setInGameEditorSettings') {
           if (inGameEditor && data.payload?.inGameEditorSettings) {
             inGameEditor.setInGameEditorSettings(
@@ -891,6 +906,27 @@ namespace gdjs {
       this._sendMessage(
         circularSafeStringify({
           command: 'updateInstances',
+          editorId: inGameEditor.getEditorId(),
+          payload: changes,
+        })
+      );
+    }
+
+    /**
+     * POC: the in-game editor changed properties of an object (the points of
+     * a 3D model): the IDE writes them in the project.
+     */
+    sendObjectPropertiesChanges(changes: {
+      objectName: string;
+      properties: { [propertyName: string]: string };
+    }): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'updateObjectProperties',
           editorId: inGameEditor.getEditorId(),
           payload: changes,
         })

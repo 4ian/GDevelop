@@ -23,7 +23,9 @@ Model3DObjectConfiguration::Model3DObjectConfiguration()
     : width(100), height(100), depth(100), rotationX(90), rotationY(0),
       rotationZ(90), modelResourceName(""), materialType("StandardWithoutMetalness"),
       originLocation("ModelOrigin"), centerLocation("CenteredOnZ"),
-      keepAspectRatio(true), crossfadeDuration(0.1f), isCastingShadow(true), isReceivingShadow(true) {}
+      keepAspectRatio(true), crossfadeDuration(0.1f), isCastingShadow(true), isReceivingShadow(true),
+      customOriginX(0), customOriginY(0), customOriginZ(0),
+      customCenterX(0), customCenterY(0), customCenterZ(0) {}
 
 bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
                                                 const gd::String &newValue) {
@@ -79,6 +81,8 @@ bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
       originLocation = "BottomCenterZ";
     else if (normalizedValue == "bottomcentery")
       originLocation = "BottomCenterY";
+    else if (normalizedValue == "custom")
+      originLocation = "Custom";
     else
       return false;
     return true;
@@ -95,8 +99,34 @@ bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
       centerLocation = "BottomCenterZ";
     else if (normalizedValue == "bottomcentery")
       centerLocation = "BottomCenterY";
+    else if (normalizedValue == "custom")
+      centerLocation = "Custom";
     else
       return false;
+    return true;
+  }
+  if (propertyName == "customOriginX") {
+    customOriginX = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "customOriginY") {
+    customOriginY = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "customOriginZ") {
+    customOriginZ = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "customCenterX") {
+    customCenterX = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "customCenterY") {
+    customCenterY = newValue.To<double>();
+    return true;
+  }
+  if (propertyName == "customCenterZ") {
+    customCenterZ = newValue.To<double>();
     return true;
   }
   if (propertyName == "keepAspectRatio") {
@@ -199,6 +229,7 @@ Model3DObjectConfiguration::GetProperties() const {
       .AddChoice("ObjectCenter", _("Object center"))
       .AddChoice("BottomCenterZ", _("Bottom center (Z)"))
       .AddChoice("BottomCenterY", _("Bottom center (Y)"))
+      .AddChoice("Custom", _("Custom (see coordinates below)"))
       .SetLabel(_("Origin point"))
       .SetGroup(_("Points"))
       .SetAdvanced(true);
@@ -211,9 +242,35 @@ Model3DObjectConfiguration::GetProperties() const {
       .AddChoice("CenteredOnZ", _("Centered on Z only"))
       .AddChoice("BottomCenterZ", _("Bottom center (Z)"))
       .AddChoice("BottomCenterY", _("Bottom center (Y)"))
+      .AddChoice("Custom", _("Custom (see coordinates below)"))
       .SetLabel(_("Center point"))
       .SetGroup(_("Points"))
       .SetAdvanced(true);
+
+  // Normalized coordinates (0 to 1, relatively to the model box), used when
+  // the location is "Custom". Set from the 3D model inspector of the editor.
+  auto addCustomPointProperty = [&objectProperties](const gd::String &name,
+                                                    const gd::String &label,
+                                                    double value) {
+    objectProperties[name]
+        .SetValue(gd::String::From(value))
+        .SetType("number")
+        .SetLabel(label)
+        .SetGroup(_("Points"))
+        .SetAdvanced(true);
+  };
+  addCustomPointProperty("customOriginX", _("Custom origin X (0 to 1)"),
+                         customOriginX);
+  addCustomPointProperty("customOriginY", _("Custom origin Y (0 to 1)"),
+                         customOriginY);
+  addCustomPointProperty("customOriginZ", _("Custom origin Z (0 to 1)"),
+                         customOriginZ);
+  addCustomPointProperty("customCenterX", _("Custom center X (0 to 1)"),
+                         customCenterX);
+  addCustomPointProperty("customCenterY", _("Custom center Y (0 to 1)"),
+                         customCenterY);
+  addCustomPointProperty("customCenterZ", _("Custom center Z (0 to 1)"),
+                         customCenterZ);
 
   objectProperties["crossfadeDuration"]
       .SetValue(gd::String::From(crossfadeDuration))
@@ -266,6 +323,12 @@ void Model3DObjectConfiguration::DoUnserializeFrom(
   materialType = content.GetStringAttribute("materialType");
   originLocation = content.GetStringAttribute("originLocation");
   centerLocation = content.GetStringAttribute("centerLocation");
+  customOriginX = content.GetDoubleAttribute("customOriginX", 0);
+  customOriginY = content.GetDoubleAttribute("customOriginY", 0);
+  customOriginZ = content.GetDoubleAttribute("customOriginZ", 0);
+  customCenterX = content.GetDoubleAttribute("customCenterX", 0);
+  customCenterY = content.GetDoubleAttribute("customCenterY", 0);
+  customCenterZ = content.GetDoubleAttribute("customCenterZ", 0);
   keepAspectRatio = content.GetBoolAttribute("keepAspectRatio");
   crossfadeDuration = content.GetDoubleAttribute("crossfadeDuration");
   isCastingShadow = content.GetBoolAttribute("isCastingShadow");
@@ -297,6 +360,12 @@ void Model3DObjectConfiguration::DoSerializeTo(
   content.SetAttribute("materialType", materialType);
   content.SetAttribute("originLocation", originLocation);
   content.SetAttribute("centerLocation", centerLocation);
+  content.SetAttribute("customOriginX", customOriginX);
+  content.SetAttribute("customOriginY", customOriginY);
+  content.SetAttribute("customOriginZ", customOriginZ);
+  content.SetAttribute("customCenterX", customCenterX);
+  content.SetAttribute("customCenterY", customCenterY);
+  content.SetAttribute("customCenterZ", customCenterZ);
   content.SetAttribute("keepAspectRatio", keepAspectRatio);
   content.SetAttribute("crossfadeDuration", crossfadeDuration);
   content.SetAttribute("isCastingShadow", isCastingShadow);

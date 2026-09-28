@@ -38,6 +38,7 @@ import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
 import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
+import { inspectModel3DObject } from '../../EmbeddedGame/EmbeddedGameFrame';
 import Help from '../../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
@@ -60,6 +61,7 @@ import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema'
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import {
+  type ActionButton,
   type Field,
   type FieldChoices,
 } from '../../PropertiesEditor/PropertiesEditorSchema';
@@ -620,14 +622,30 @@ export const CompactObjectPropertiesEditor = ({
                   }}
                   resourceManagementProps={resourceManagementProps}
                   placeholder={<Trans>This object has no properties.</Trans>}
-                  customizeBasicSchema={schema =>
-                    getSchemaWithOpenFullEditorButton({
-                      schema,
-                      fullEditorLabel,
-                      object,
-                      onEditObject,
-                    })
-                  }
+                  customizeBasicSchema={schema => {
+                    const schemaWithButtons = getSchemaWithOpenFullEditorButton(
+                      {
+                        schema,
+                        fullEditorLabel,
+                        object,
+                        onEditObject,
+                      }
+                    );
+                    // POC: edit the points of a 3D model in the in-game editor.
+                    if (object.getType() === 'Scene3D::Model3DObject') {
+                      const editPointsButton: ActionButton = {
+                        label: i18n._(t`Edit points`),
+                        disabled: 'onValuesDifferent',
+                        nonFieldType: 'button',
+                        getIcon: style => <Object3d style={style} />,
+                        getValue: ({ object }) => object.getName(),
+                        onClick: ({ object }) =>
+                          inspectModel3DObject(object.getName()),
+                      };
+                      schemaWithButtons.push(editPointsButton);
+                    }
+                    return schemaWithButtons;
+                  }}
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (

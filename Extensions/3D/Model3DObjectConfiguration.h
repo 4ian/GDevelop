@@ -182,6 +182,13 @@ private:
   gd::String materialType;
   gd::String originLocation;
   gd::String centerLocation;
+  // Normalized (0 to 1) points used when the location is "Custom".
+  double customOriginX;
+  double customOriginY;
+  double customOriginZ;
+  double customCenterX;
+  double customCenterY;
+  double customCenterZ;
 
   bool keepAspectRatio;
   bool isCastingShadow;

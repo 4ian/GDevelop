@@ -13,6 +13,7 @@ import {
 } from '../Utils/ObjectAnimationsRefactoring';
 import { isObjectOpenedInEditor } from '../ObjectEditor/ObjectsOpenedInEditor';
 import { type ResolvedScope } from './Scope';
+import { loadSimpleTileMapAtlasGrid } from './SimpleTileMapAtlasGrid';
 
 export type RawObjectChangeResult =
   | {|
@@ -242,6 +243,44 @@ const getFramesErrors = (
     return errors;
   });
 
+const isVertex = (vertex: any): boolean =>
+  isPlainObject(vertex) && isFiniteNumber(vertex.x) && isFiniteNumber(vertex.y);
+
+/**
+ * Checked on the written JSON: the engine reads a vertex written in another
+ * shape (like `[x, y]`) as (0, 0).
+ */
+const getCollisionMasksShapeErrors = (
+  configurationJson: Object
+): Array<string> =>
+  [
+    { location: '', json: configurationJson },
+    ...(isPlainObject(configurationJson.childrenContent)
+      ? Object.keys(configurationJson.childrenContent).map(childName => ({
+          location: ` of child "${childName}"`,
+          json: configurationJson.childrenContent[childName],
+        }))
+      : []),
+  ].flatMap(({ location, json }) => [
+    ...new Set(
+      (isPlainObject(json) ? getFramesJson(json) : [])
+        .filter(
+          ({ frame }) =>
+            frame.customCollisionMask !== undefined &&
+            !(
+              Array.isArray(frame.customCollisionMask) &&
+              frame.customCollisionMask.every(
+                polygon => Array.isArray(polygon) && polygon.every(isVertex)
+              )
+            )
+        )
+        .map(
+          ({ animationName }) =>
+            `The frames of animation "${animationName}"${location} have a \`customCollisionMask\` that is not a list of polygons, each being a list of vertices {x, y} with number coordinates.`
+        )
+    ),
+  ]);
+
 /**
  * The JSON parser accepts what the configurations can't store: numbers
  * overflowing to Infinity (`1e999`) and keys shadowing object methods.
@@ -341,24 +380,15 @@ const prepareSimpleTileMapContent = async ({
         )}`,
       ];
     }
-    try {
-      await PixiResourcesLoader.loadTextures(project, [atlasImage]);
-    } catch (error) {
-      return [`The atlas image "${atlasImage}" could not be loaded.`];
-    }
-    const texture = PixiResourcesLoader.getPIXITexture(project, atlasImage);
-    if (!texture || !texture.valid) {
-      return [`The atlas image "${atlasImage}" could not be loaded.`];
-    }
-    content.columnCount = Math.floor(texture.width / tileSize);
-    content.rowCount = Math.floor(texture.height / tileSize);
-    if (content.columnCount === 0 || content.rowCount === 0) {
-      return [
-        `The tile size ${tileSize} is larger than the atlas image (${
-          texture.width
-        }x${texture.height}).`,
-      ];
-    }
+    const atlasGrid = await loadSimpleTileMapAtlasGrid({
+      project,
+      atlasImage,
+      tileSize,
+      PixiResourcesLoader,
+    });
+    if (!atlasGrid.success) return [atlasGrid.error];
+    content.columnCount = atlasGrid.grid.columnCount;
+    content.rowCount = atlasGrid.grid.rowCount;
   }
   const { columnCount, rowCount, tilesWithHitBox } = content;
   if (
@@ -747,7 +777,10 @@ export const applyRawObjectConfiguration = async ({
       )}.`
     );
   }
-  const errors = getCustomObjectErrors(project, objectType, configurationJson);
+  const errors = [
+    ...getCollisionMasksShapeErrors(configurationJson),
+    ...getCustomObjectErrors(project, objectType, configurationJson),
+  ];
   if (
     objectType === SIMPLE_TILE_MAP_TYPE &&
     isPlainObject(configurationJson.content)

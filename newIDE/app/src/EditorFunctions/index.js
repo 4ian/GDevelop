@@ -146,7 +146,12 @@ import {
   type ToolScopeType,
   type ToolScope,
 } from './Scope';
-import { getInstanceRawJson, applyInstancesRawJson } from './InstancesRawJson';
+import {
+  getInstanceRawJson,
+  getChangedInstancesObjectNames,
+  loadTileMapAtlases,
+  applyInstancesRawJson,
+} from './InstancesRawJson';
 import {
   applyRawObjectConfiguration,
   renameObjectAnimationsAndPoints,
@@ -4412,6 +4417,8 @@ const changeInstancesRawJson: EditorFunction = {
     project,
     args,
     toolsVersion,
+    PixiResourcesLoader,
+    onObjectsModifiedOutsideEditor,
     onInstancesModifiedOutsideEditor,
   }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
@@ -4432,19 +4439,38 @@ const changeInstancesRawJson: EditorFunction = {
         'Nothing was changed: `changes` must be a non-empty list of {instance_id, raw_json}.'
       );
     }
-    const instances = [];
-    iterateOnInstances(containers.initialInstances, instance => {
-      instances.push(instance);
+    const getInstances = () => {
+      const instances = [];
+      iterateOnInstances(containers.initialInstances, instance => {
+        instances.push(instance);
+      });
+      return instances;
+    };
+    const tileMapAtlases = await loadTileMapAtlases({
+      project,
+      objectsContainer: containers.objectsContainer,
+      globalObjectsContainer: containers.globalObjectsContainer,
+      objectNames: getChangedInstancesObjectNames(getInstances(), changes),
+      PixiResourcesLoader,
     });
+    // Read again: the instances may have changed while the atlases loaded.
+    const instances = getInstances();
     const result = applyInstancesRawJson({
       project,
       objectsContainer: containers.objectsContainer,
       globalObjectsContainer: containers.globalObjectsContainer,
       instances,
       changes,
+      tileMapAtlases,
     });
     if (!result.success) {
       return makeGenericFailure(`Nothing was changed: ${result.message}`);
+    }
+    if (result.haveObjectsChanged) {
+      onObjectsModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+        isNewObjectTypeUsed: false,
+      });
     }
     if (result.changes.length > 0) {
       onInstancesModifiedOutsideEditor({

@@ -2,6 +2,7 @@
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { editorFunctions, type EditorFunctionGenericOutput } from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
+import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -163,7 +164,23 @@ describe('instances raw JSON', () => {
         ...rawJson,
         stringProperties: [{ name: 'placeholder', value: 'x' }],
       }),
-      'not a string property of this object',
+      'not a string property of this object (properties: animation). Instance variables are set with `add_or_edit_variable`',
+    ],
+    [
+      'an opacity given as a property',
+      (rawJson: Object) => ({
+        ...rawJson,
+        numberProperties: [
+          ...rawJson.numberProperties,
+          { name: 'opacity', value: 128 },
+        ],
+      }),
+      'not a number property of this object (properties: animation). The position, size, angle, rotation, layer, Z order and visibility of instances are set with `put_2d_instances`/`put_3d_instances`, their opacity with `put_2d_instances`.',
+    ],
+    [
+      'a starting animation given as a key',
+      (rawJson: Object) => ({ ...rawJson, animation: 0 }),
+      'The starting animation is the `animation` number property, in `numberProperties`',
     ],
     [
       'a property given twice',
@@ -191,8 +208,8 @@ describe('instances raw JSON', () => {
     ],
     [
       'an unknown key',
-      (rawJson: Object) => ({ ...rawJson, x: 10 }),
-      'unknown x). The position, size, angle, rotation, layer and Z order of instances are set with `put_2d_instances`/`put_3d_instances`',
+      (rawJson: Object) => ({ ...rawJson, scaleX: 2 }),
+      'unknown scaleX). The position, size, angle, rotation, layer, Z order and visibility of instances are set with `put_2d_instances`/`put_3d_instances`',
     ],
   ])(
     'refuses %s, changing nothing',
@@ -350,6 +367,97 @@ describe('instances raw JSON', () => {
       expect(tileMapInstance.getCustomHeight()).toBe(64);
     });
 
+    it('checks the tiles against the grid of the atlas image, and stores it', async () => {
+      const atlas = new gd.ImageResource();
+      atlas.setName('Atlas64x32');
+      project.getResourcesManager().addResource(atlas);
+      atlas.delete();
+      const configuration = scene
+        .getObjects()
+        .getObject('Ground')
+        .getConfiguration();
+      const configurationJson = serializeToJSObject(configuration);
+      unserializeFromJSObject(
+        configuration,
+        {
+          ...configurationJson,
+          content: {
+            ...configurationJson.content,
+            atlasImage: 'Atlas64x32',
+            columnCount: 1,
+            rowCount: 1,
+          },
+        },
+        'unserializeFrom',
+        project
+      );
+      const rawJson = await readRawJson(tileMapInstance);
+
+      const result = await changeInstances([
+        change(tileMapInstance, withTileMap(rawJson, makeTileMap(2, 2, 7))),
+      ]);
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Updated the atlas grid of "Ground" from 1x1 to 4 columns and 2 rows'
+      );
+      expect(serializeToJSObject(configuration).content).toMatchObject({
+        columnCount: 4,
+        rowCount: 2,
+      });
+    });
+
+    it('keeps the stored grid when the atlas image fails to load', async () => {
+      const atlas = new gd.ImageResource();
+      atlas.setName('Missing.png');
+      project.getResourcesManager().addResource(atlas);
+      atlas.delete();
+      const configuration = scene
+        .getObjects()
+        .getObject('Ground')
+        .getConfiguration();
+      const configurationJson = serializeToJSObject(configuration);
+      unserializeFromJSObject(
+        configuration,
+        {
+          ...configurationJson,
+          content: { ...configurationJson.content, atlasImage: 'Missing.png' },
+        },
+        'unserializeFrom',
+        project
+      );
+      const rawJson = await readRawJson(tileMapInstance);
+      // Like the editor, which shows a placeholder image for a failed load.
+      const placeholderTexture = { valid: true, width: 192, height: 192 };
+
+      const result = await editorFunctions.change_instances_raw_json.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          PixiResourcesLoader: {
+            ...PixiResourcesLoaderMock,
+            getPIXITexture: () => placeholderTexture,
+            getInvalidPIXITexture: () => placeholderTexture,
+          },
+          args: {
+            scope: sceneScope,
+            changes: [
+              change(
+                tileMapInstance,
+                withTileMap(rawJson, makeTileMap(2, 2, 7))
+              ),
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).not.toContain('Updated the atlas grid');
+      expect(serializeToJSObject(configuration).content).toMatchObject({
+        columnCount: 4,
+        rowCount: 2,
+      });
+    });
+
     it('lets a map painted for the first time take the size of its grid', async () => {
       tileMapInstance.setHasCustomSize(true);
       const rawJson = await readRawJson(tileMapInstance);
@@ -363,7 +471,11 @@ describe('instances raw JSON', () => {
     });
 
     it.each([
-      ['a tile out of the atlas', makeTileMap(2, 2, 8), 'the tile 8'],
+      [
+        'a tile out of the atlas',
+        makeTileMap(2, 2, 8),
+        'the tile 8: tiles are -1 (empty) or a tile id of the atlas of 4 columns and 2 rows (0 to 7, row * 4 + column)',
+      ],
       ['a tile that is not an integer', makeTileMap(2, 2, 1.5), 'the tile 1.5'],
       [
         'rows of the wrong length',

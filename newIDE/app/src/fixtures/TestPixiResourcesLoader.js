@@ -2,6 +2,8 @@
 
 // TODO: PixiResourcesLoader is typed with "any" in the codebase. It should be typed
 // and then this mock and any function needing it can use this type.
+const invalidTexture = { valid: false, width: 0, height: 0 };
+
 export const PixiResourcesLoaderMock = {
   loadTextures: (
     project: gdProject,
@@ -19,7 +21,12 @@ export const PixiResourcesLoaderMock = {
       case 'Atlas64x32':
         return { valid: true, width: 64, height: 32 };
       default:
-        return { valid: false, width: 0, height: 0 };
+        return invalidTexture;
     }
   },
+  getInvalidPIXITexture: (): {
+    height: number,
+    valid: boolean,
+    width: number,
+  } => invalidTexture,
 };

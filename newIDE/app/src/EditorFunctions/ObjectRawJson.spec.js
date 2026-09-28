@@ -267,6 +267,26 @@ describe('object raw JSON and renames', () => {
         'not convex',
       ],
       [
+        'a collision polygon with vertices written as pairs',
+        (rawJson: Object) => {
+          const frame = rawJson.animations[0].directions[0].sprites[0];
+          frame.customCollisionMask = [[[0, 0], [10, 0], [10, 10], [0, 10]]];
+        },
+        'have a `customCollisionMask` that is not a list of polygons, each being a list of vertices {x, y} with number coordinates',
+      ],
+      [
+        'a collision polygon not in a list',
+        (rawJson: Object) => {
+          const frame = rawJson.animations[0].directions[0].sprites[0];
+          frame.customCollisionMask = [
+            { x: 0, y: 0 },
+            { x: 10, y: 0 },
+            { x: 10, y: 10 },
+          ];
+        },
+        'have a `customCollisionMask` that is not a list of polygons, each being a list of vertices {x, y} with number coordinates',
+      ],
+      [
         'a frame image that is not a resource',
         (rawJson: Object) => {
           rawJson.animations[0].directions[0].sprites[0].image = 'Unknown.png';

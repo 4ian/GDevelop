@@ -1,6 +1,14 @@
 // @flow
-import { serializeToJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import getObjectByName from '../Utils/GetObjectByName';
+import { isObjectOpenedInEditor } from '../ObjectEditor/ObjectsOpenedInEditor';
+import {
+  loadSimpleTileMapAtlasGrid,
+  type AtlasGrid,
+} from './SimpleTileMapAtlasGrid';
 
 const gd: libGDevelop = global.gd;
 
@@ -33,7 +41,13 @@ type TileMapResize = {|
   oldDimensions: TileMapDimensions | null,
   newDimensions: TileMapDimensions,
 |};
+type TileMapAtlas = {|
+  tileSize: number,
+  grid: AtlasGrid,
+  storedGrid: AtlasGrid,
+|};
 type PlannedInstanceChange = {|
+  object: gdObject,
   instance: gdInitialInstance,
   instanceId: string,
   rawJson: InstanceRawJson,
@@ -41,7 +55,7 @@ type PlannedInstanceChange = {|
 |};
 
 export type InstancesRawJsonChangeResult =
-  | {| success: true, changes: Array<string> |}
+  | {| success: true, changes: Array<string>, haveObjectsChanged: boolean |}
   | {| success: false, message: string |};
 
 const isPlainObject = (value: any): boolean =>
@@ -101,7 +115,9 @@ const getNamedValuesError = (
 
 // Keys an agent may try to set here, while they are set by `put_2d_instances`
 // and `put_3d_instances`.
-const PLACEMENT_KEY_REGEX = /^(x|y|z|angle|rotation[XYZ]?|width|height|depth|layer|zOrder)$/;
+const PLACEMENT_KEY_REGEX = /^(x|y|z|angle|rotation[XYZ]?|width|height|depth|scale[XYZ]?|keepRatio|customSize|layer|zOrder|opacity|hidden)$/;
+const PLACEMENT_HINT =
+  'The position, size, angle, rotation, layer, Z order and visibility of instances are set with `put_2d_instances`/`put_3d_instances`, their opacity with `put_2d_instances`';
 
 const getRawJsonShapeError = (rawJson: any): ?string => {
   if (!isPlainObject(rawJson)) return 'it must be a JSON object';
@@ -115,10 +131,10 @@ const getRawJsonShapeError = (rawJson: any): ?string => {
     return `it must have exactly the keys ${RAW_JSON_KEYS.join(', ')}${
       missingKeys.length > 0 ? ` (missing ${missingKeys.join(', ')})` : ''
     }${unknownKeys.length > 0 ? ` (unknown ${unknownKeys.join(', ')})` : ''}${
-      hasPlacementKeys
-        ? '. The position, size, angle, rotation, layer and Z order of instances are set with `put_2d_instances`/`put_3d_instances`'
+      unknownKeys.includes('animation')
+        ? '. The starting animation is the `animation` number property, in `numberProperties`'
         : ''
-    }`;
+    }${hasPlacementKeys ? `. ${PLACEMENT_HINT}` : ''}`;
   }
   if (
     typeof rawJson.flippedX !== 'boolean' ||
@@ -154,12 +170,53 @@ const getTileMapDimensions = (
 };
 
 /**
+ * The tile size and grid of the atlas of a simple tile map: the grid is
+ * computed from the atlas image when it loads, else the stored one is used.
+ */
+const loadTileMapAtlas = async (
+  project: gdProject,
+  object: gdObject,
+  PixiResourcesLoader: any
+): Promise<TileMapAtlas> => {
+  const { tileSize, columnCount, rowCount, atlasImage } =
+    serializeToJSObject(object.getConfiguration()).content || {};
+  const storedGrid = { columnCount, rowCount };
+  const resourcesManager = project.getResourcesManager();
+  if (
+    !isPositiveNumber(tileSize) ||
+    typeof atlasImage !== 'string' ||
+    !resourcesManager.hasResource(atlasImage) ||
+    resourcesManager.getResource(atlasImage).getKind() !== 'image'
+  ) {
+    return { tileSize, grid: storedGrid, storedGrid };
+  }
+  const atlasGrid = await loadSimpleTileMapAtlasGrid({
+    project,
+    atlasImage,
+    tileSize,
+    PixiResourcesLoader,
+  });
+  return {
+    tileSize,
+    grid: atlasGrid.success ? atlasGrid.grid : storedGrid,
+    storedGrid,
+  };
+};
+
+const isStoredGridOutdated = ({ grid, storedGrid }: TileMapAtlas): boolean =>
+  grid.columnCount !== storedGrid.columnCount ||
+  grid.rowCount !== storedGrid.rowCount;
+
+/**
  * A tile map as the editor paints it: one layer (id 0, the one painted by the
  * editor and changed by the events), tiles from the atlas of the object. Its
  * tile size is not read (the object's is used).
  */
-const getTileMapError = (tileMap: any, objectContent: Object): ?string => {
-  const { tileSize, columnCount, rowCount } = objectContent;
+const getTileMapError = (tileMap: any, atlas: TileMapAtlas): ?string => {
+  const {
+    tileSize,
+    grid: { columnCount, rowCount },
+  } = atlas;
   const tilesCount = columnCount * rowCount;
   if (!isPositiveNumber(tileSize) || !isPositiveInteger(tilesCount)) {
     return 'the tile map object has no atlas grid: set its `atlasImage` and `tileSize` first (`change_object_properties_effects` with `raw_json`).';
@@ -206,8 +263,8 @@ const getTileMapError = (tileMap: any, objectContent: Object): ?string => {
       ) {
         return `\`tilemap\` has the tile ${String(
           tile
-        )}: tiles are -1 (empty) or a tile id of the atlas (0 to ${tilesCount -
-          1}, row * columnCount + column), with optional flip bits.`;
+        )}: tiles are -1 (empty) or a tile id of the atlas of ${columnCount} columns and ${rowCount} rows (0 to ${tilesCount -
+          1}, row * ${columnCount} + column), with optional flip bits.`;
       }
     }
   }
@@ -220,12 +277,14 @@ const getTileMapError = (tileMap: any, objectContent: Object): ?string => {
  */
 const getPropertyValueError = ({
   object,
+  tileMapAtlas,
   instance,
   name,
   value,
   valueType,
 }: {|
   object: gdObject,
+  tileMapAtlas: TileMapAtlas | null,
   instance: gdInitialInstance,
   name: string,
   value: number | string,
@@ -248,7 +307,13 @@ const getPropertyValueError = ({
     return `"${name}" is not a ${valueType} property of this object (properties: ${supportedProperties
       .keys()
       .toJSArray()
-      .join(', ') || 'none'}).`;
+      .join(', ') || 'none'}).${
+      PLACEMENT_KEY_REGEX.test(name)
+        ? ` ${PLACEMENT_HINT}.`
+        : propertyType === null
+        ? ' Instance variables are set with `add_or_edit_variable` (`variable_scope: "instance"`).'
+        : ''
+    }`;
   }
   if (name === 'animation') {
     const animationsCount = configuration.getAnimationsCount();
@@ -258,17 +323,14 @@ const getPropertyValueError = ({
         1}.`;
     }
   }
-  if (name === 'tilemap' && object.getType() === SIMPLE_TILE_MAP_TYPE) {
+  if (name === 'tilemap' && tileMapAtlas) {
     let tileMap;
     try {
       tileMap = JSON.parse(String(value));
     } catch (error) {
       return `\`tilemap\` is not valid JSON: ${error.message}`;
     }
-    return getTileMapError(
-      tileMap,
-      serializeToJSObject(configuration).content || {}
-    );
+    return getTileMapError(tileMap, tileMapAtlas);
   }
   return null;
 };
@@ -307,12 +369,14 @@ const getFlipsError = (
 const planInstanceChange = ({
   project,
   object,
+  tileMapAtlas,
   instance,
   instanceId,
   rawJson,
 }: {|
   project: gdProject,
   object: gdObject,
+  tileMapAtlas: TileMapAtlas | null,
   instance: gdInitialInstance,
   instanceId: string,
   rawJson: InstanceRawJson,
@@ -352,6 +416,7 @@ const planInstanceChange = ({
       if (currentValue && currentValue.value === value) return;
       const propertyError = getPropertyValueError({
         object,
+        tileMapAtlas,
         instance,
         name,
         value,
@@ -359,10 +424,7 @@ const planInstanceChange = ({
       });
       if (propertyError) {
         errors.push(propertyError);
-      } else if (
-        name === 'tilemap' &&
-        object.getType() === SIMPLE_TILE_MAP_TYPE
-      ) {
+      } else if (name === 'tilemap' && tileMapAtlas) {
         const { dimX, dimY } = JSON.parse(String(value));
         tileMapResize = {
           oldDimensions: currentValue
@@ -380,7 +442,7 @@ const planInstanceChange = ({
         error =>
           `Instance "${instanceId}" (object "${object.getName()}"): ${error}`
       )
-    : { instance, instanceId, rawJson, tileMapResize };
+    : { object, instance, instanceId, rawJson, tileMapResize };
 };
 
 /**
@@ -405,6 +467,46 @@ const resizeTileMapInstance = (
   );
 };
 
+/**
+ * Stores the grid computed from the atlas image in the object, as the object
+ * editor does when the image loads: the game draws only the tiles of the
+ * stored grid.
+ */
+const updateStoredAtlasGrid = (
+  project: gdProject,
+  object: gdObject,
+  { grid: { columnCount, rowCount }, storedGrid }: TileMapAtlas
+): string => {
+  const configuration = object.getConfiguration();
+  const configurationJson = serializeToJSObject(configuration);
+  const { tilesWithHitBox } = configurationJson.content;
+  const lastTileId = columnCount * rowCount - 1;
+  unserializeFromJSObject(
+    configuration,
+    {
+      ...configurationJson,
+      content: {
+        ...configurationJson.content,
+        columnCount,
+        rowCount,
+        tilesWithHitBox: String(tilesWithHitBox || '')
+          .split(',')
+          .filter(
+            tileId => tileId.trim() !== '' && Number(tileId) <= lastTileId
+          )
+          .join(','),
+      },
+    },
+    'unserializeFrom',
+    project
+  );
+  return `Updated the atlas grid of "${object.getName()}" from ${String(
+    storedGrid.columnCount
+  )}x${String(
+    storedGrid.rowCount
+  )} to ${columnCount} columns and ${rowCount} rows, as computed from its atlas image: the tiles already painted on its instances are read with it too (tile id = row * ${columnCount} + column).`;
+};
+
 /** Applies a planned change, returning whether the instance changed. */
 const applyInstanceChange = ({
   instance,
@@ -425,9 +527,63 @@ const applyInstanceChange = ({
   return JSON.stringify(serializeToJSObject(instance)) !== serializedInstance;
 };
 
+/** The objects of the instances that `changes` target. */
+export const getChangedInstancesObjectNames = (
+  instances: Array<gdInitialInstance>,
+  changes: Array<any>
+): Array<string> => {
+  const instanceIds = changes
+    .filter(
+      change =>
+        isPlainObject(change) &&
+        typeof change.instance_id === 'string' &&
+        change.instance_id.length >= INSTANCE_ID_LENGTH
+    )
+    .map(change => change.instance_id);
+  return instances
+    .filter(instance =>
+      instanceIds.some(instanceId =>
+        instance.getPersistentUuid().startsWith(instanceId)
+      )
+    )
+    .map(instance => instance.getObjectName());
+};
+
+export const loadTileMapAtlases = async ({
+  project,
+  objectsContainer,
+  globalObjectsContainer,
+  objectNames,
+  PixiResourcesLoader,
+}: {|
+  project: gdProject,
+  objectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
+  objectNames: Array<string>,
+  PixiResourcesLoader: any,
+|}): Promise<Map<string, TileMapAtlas>> => {
+  const tileMapAtlases: Map<string, TileMapAtlas> = new Map();
+  for (const objectName of new Set(objectNames)) {
+    const object = getObjectByName(
+      globalObjectsContainer,
+      objectsContainer,
+      objectName
+    );
+    if (object && object.getType() === SIMPLE_TILE_MAP_TYPE) {
+      tileMapAtlases.set(
+        objectName,
+        await loadTileMapAtlas(project, object, PixiResourcesLoader)
+      );
+    }
+  }
+  return tileMapAtlases;
+};
+
 /**
  * Replaces the raw data of instances (see `getInstanceRawJson`). Every change
- * is validated first: on any error, no instance changes.
+ * is validated first: on any error, no instance changes. The tile map atlases
+ * are loaded before (`loadTileMapAtlases`), so that nothing else can change
+ * the instances between their validation and the commit.
  */
 export const applyInstancesRawJson = ({
   project,
@@ -435,12 +591,14 @@ export const applyInstancesRawJson = ({
   globalObjectsContainer,
   instances,
   changes,
+  tileMapAtlases,
 }: {|
   project: gdProject,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   instances: Array<gdInitialInstance>,
   changes: Array<any>,
+  tileMapAtlases: Map<string, TileMapAtlas>,
 |}): InstancesRawJsonChangeResult => {
   const changedInstanceUuids: Array<string> = [];
   const plannedChanges = [];
@@ -512,6 +670,10 @@ export const applyInstancesRawJson = ({
     const plannedChange = planInstanceChange({
       project,
       object,
+      tileMapAtlas:
+        object.getType() === SIMPLE_TILE_MAP_TYPE
+          ? tileMapAtlases.get(object.getName()) || null
+          : null,
       instance,
       instanceId,
       rawJson,
@@ -519,6 +681,21 @@ export const applyInstancesRawJson = ({
     if (Array.isArray(plannedChange)) errors.push(...plannedChange);
     else plannedChanges.push(plannedChange);
   }
+  const outdatedGridObjects = [
+    ...new Map(
+      plannedChanges
+        .filter(({ tileMapResize }) => tileMapResize)
+        .map(({ object }) => [object.getName(), object])
+    ).values(),
+  ].filter(object => {
+    const tileMapAtlas = tileMapAtlases.get(object.getName());
+    return tileMapAtlas && isStoredGridOutdated(tileMapAtlas);
+  });
+  outdatedGridObjects.filter(isObjectOpenedInEditor).forEach(object => {
+    errors.push(
+      `"${object.getName()}" is open in the object editor, which will update its atlas grid: ask the user to close it, then retry.`
+    );
+  });
   if (errors.length > 0) {
     return {
       success: false,
@@ -529,15 +706,24 @@ export const applyInstancesRawJson = ({
   const changedInstanceIds = plannedChanges
     .filter(applyInstanceChange)
     .map(({ instanceId }) => `"${instanceId}"`);
+  const gridChanges = outdatedGridObjects.map(object => {
+    const tileMapAtlas = tileMapAtlases.get(object.getName());
+    return tileMapAtlas
+      ? updateStoredAtlasGrid(project, object, tileMapAtlas)
+      : '';
+  });
   return {
     success: true,
-    changes:
-      changedInstanceIds.length > 0
+    changes: [
+      ...(changedInstanceIds.length > 0
         ? [
             `Changed the data of ${
               changedInstanceIds.length
             } instance(s): ${changedInstanceIds.join(', ')}.`,
           ]
-        : [],
+        : []),
+      ...gridChanges,
+    ],
+    haveObjectsChanged: gridChanges.length > 0,
   };
 };

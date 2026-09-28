@@ -260,6 +260,13 @@ module.exports = function (config) {
         nocache: false,
       },
       {
+        pattern: './GDJS/tests/tests-utils/assets/*.glb',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
         pattern: './GDJS/tests/tests-utils/simple-tiled-map/*.json',
         watched: false,
         included: false,

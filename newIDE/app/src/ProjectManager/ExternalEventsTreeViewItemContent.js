@@ -3,13 +3,12 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard from '../Utils/Clipboard';
-import { SafeExtractor } from '../Utils/SafeExtractor';
+import { unserializeFromJSObject } from '../Utils/Serializer';
+import { ProjectItemInFolder } from './ProjectItemInFolder';
 import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
+  type ProjectItemFoldersKind,
+  type ProjectItemFolderOrItem,
+} from './ProjectItemFolders';
 import {
   type TreeViewItemContent,
   type TreeItemProps,
@@ -17,10 +16,9 @@ import {
 } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
-const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
-
 export type ExternalEventsTreeViewItemCallbacks = {|
-  onDeleteExternalEvents: gdExternalEvents => void,
+  // Resolves to true once removed (after the user confirmed).
+  onDeleteExternalEventsList: (Array<gdExternalEvents>) => Promise<boolean>,
   onRenameExternalEvents: (string, string) => void,
   onOpenExternalEvents: string => void,
 |};
@@ -33,6 +31,7 @@ export type ExternalEventsTreeViewItemCommonProps = {|
 export type ExternalEventsTreeViewItemProps = {|
   ...ExternalEventsTreeViewItemCommonProps,
   project: gdProject,
+  expandFolders: (folderIds: Array<string>) => void,
 |};
 
 export const getExternalEventsTreeViewItemId = (
@@ -43,20 +42,60 @@ export const getExternalEventsTreeViewItemId = (
   return `external-events-${externalEvents.ptr}`;
 };
 
+export const externalEventsFoldersKind: ProjectItemFoldersKind = {
+  name: 'external-events',
+  getRootId: () => externalEventsRootFolderId,
+  getRootFolder: project => project.getExternalEventsRootFolder(),
+  hasItemNamed: (project, name) => project.hasExternalEventsNamed(name),
+  getItemTreeViewItemId: getExternalEventsTreeViewItemId,
+  insertItemFromSerializedContent: (project, name, serializedItem) => {
+    const newExternalEvents = project.insertNewExternalEvents(
+      name,
+      project.getExternalEventsCount()
+    );
+    unserializeFromJSObject(
+      newExternalEvents,
+      serializedItem,
+      'unserializeFrom',
+      project
+    );
+    // Unserialization has overwritten the name.
+    newExternalEvents.setName(name);
+    return newExternalEvents;
+  },
+  legacyClipboard: { kind: 'External events', itemProperty: 'externalEvents' },
+  addItemLabel: t`Add external events`,
+  removeFolderMessage: t`The external events and folders it contains will be moved out of it, not removed. Do you want to continue?`,
+};
+
 export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   externalEvents: gdExternalEvents;
+  // The node of the folder structure holding this item.
+  folderOrItem: ProjectItemFolderOrItem;
+  inFolder: ProjectItemInFolder;
   props: ExternalEventsTreeViewItemProps;
 
   constructor(
     externalEvents: gdExternalEvents,
+    folderOrItem: ProjectItemFolderOrItem,
     props: ExternalEventsTreeViewItemProps
   ) {
     this.externalEvents = externalEvents;
+    this.folderOrItem = folderOrItem;
+    this.inFolder = new ProjectItemInFolder(
+      externalEventsFoldersKind,
+      folderOrItem,
+      props
+    );
     this.props = props;
   }
 
+  getFolderOrItem(): ProjectItemFolderOrItem {
+    return this.folderOrItem;
+  }
+
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === externalEventsRootFolderId;
+    return this.inFolder.isDescendantOf(itemContent);
   }
 
   getRootId(): string {
@@ -103,6 +142,10 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
+      this.inFolder.buildMoveToFolderMenuItem(i18n),
+      {
+        type: 'separator',
+      },
       {
         label: i18n._(t`Rename`),
         click: () => this.edit(),
@@ -126,12 +169,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
         click: () => this.cut(),
         accelerator: 'CmdOrCtrl+X',
       },
-      {
-        label: i18n._(t`Paste`),
-        enabled: Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
-      },
+      this.inFolder.buildPasteMenuItem(i18n, () => this.paste()),
       {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
@@ -144,32 +182,22 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this.props.onDeleteExternalEvents(this.externalEvents);
+    this.props.onDeleteExternalEventsList([this.externalEvents]);
   }
 
   getIndex(): number {
-    return this.props.project.getExternalEventsPosition(
-      this.externalEvents.getName()
-    );
+    return this.inFolder.getIndex();
   }
 
-  moveAt(destinationIndex: number): void {
-    const originIndex = this.getIndex();
-    if (destinationIndex !== originIndex) {
-      this.props.project.moveExternalEvents(
-        originIndex,
-        // When moving the item down, it must not be counted.
-        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
-      );
-      this._onProjectItemModified();
-    }
+  moveAt(
+    destinationIndex: number,
+    targetFolder?: ProjectItemFolderOrItem
+  ): void {
+    this.inFolder.moveAt(destinationIndex, targetFolder);
   }
 
   copy(): void {
-    Clipboard.set(EXTERNAL_EVENTS_CLIPBOARD_KIND, {
-      externalEvents: serializeToJSObject(this.externalEvents),
-      name: this.externalEvents.getName(),
-    });
+    this.inFolder.copy();
   }
 
   cut(): void {
@@ -178,48 +206,12 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    if (!Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)) return;
-
-    const clipboardContent = Clipboard.get(EXTERNAL_EVENTS_CLIPBOARD_KIND);
-    const copiedExternalEvents = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'externalEvents'
-    );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedExternalEvents) return;
-
-    const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
-      project.hasExternalEventsNamed(name)
-    );
-
-    const newExternalEvents = project.insertNewExternalEvents(
-      newName,
-      this.getIndex() + 1
-    );
-
-    unserializeFromJSObject(
-      newExternalEvents,
-      copiedExternalEvents,
-      'unserializeFrom',
-      project
-    );
-    // Unserialization has overwritten the name.
-    newExternalEvents.setName(newName);
-
-    this._onProjectItemModified();
-    this.props.editName(getExternalEventsTreeViewItemId(newExternalEvents));
+    this.inFolder.paste();
   }
 
   _duplicate(): void {
     this.copy();
     this.paste();
-  }
-
-  _onProjectItemModified() {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.props.forceUpdate();
   }
 
   getRightButton(i18n: I18nType): any {

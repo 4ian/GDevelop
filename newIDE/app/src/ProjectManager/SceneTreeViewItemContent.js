@@ -4,8 +4,6 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard from '../Utils/Clipboard';
-import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -18,8 +16,12 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-
-const SCENE_CLIPBOARD_KIND = 'Layout';
+import { ProjectItemInFolder } from './ProjectItemInFolder';
+import {
+  type ProjectItemFoldersKind,
+  type ProjectItemFolderOrItem,
+  moveNewItemToFolder,
+} from './ProjectItemFolders';
 
 const styles = {
   tooltip: { marginRight: 5, verticalAlign: 'bottom' },
@@ -27,7 +29,8 @@ const styles = {
 
 export type SceneTreeViewItemCallbacks = {|
   onSceneAdded: () => void,
-  onDeleteLayout: gdLayout => void,
+  // Resolves to true once removed (after the user confirmed).
+  onDeleteLayouts: (Array<gdLayout>) => Promise<boolean>,
   onRenameLayout: (string, string) => void,
   onOpenLayout: (
     name: string,
@@ -53,6 +56,8 @@ export type SceneTreeViewItemProps = {|
   project: gdProject,
   onOpenLayoutProperties: (layout: ?gdLayout) => void,
   openSceneVariables: (layout: ?gdLayout) => void,
+  onProjectItemModified: () => void,
+  expandFolders: (folderIds: Array<string>) => void,
 |};
 
 export const getSceneTreeViewItemId = (scene: gdLayout): string => {
@@ -61,17 +66,61 @@ export const getSceneTreeViewItemId = (scene: gdLayout): string => {
   return `scene-${scene.ptr}`;
 };
 
+export const sceneFoldersKind: ProjectItemFoldersKind = {
+  name: 'scene',
+  getRootId: () => scenesRootFolderId,
+  getRootFolder: project => project.getLayoutsRootFolder(),
+  hasItemNamed: (project, name) => project.hasLayoutNamed(name),
+  getItemTreeViewItemId: getSceneTreeViewItemId,
+  insertItemFromSerializedContent: (project, name, serializedLayout) => {
+    const newLayout = project.insertNewLayout(name, project.getLayoutsCount());
+    unserializeFromJSObject(
+      newLayout,
+      serializedLayout,
+      'unserializeFrom',
+      project
+    );
+    // Unserialization has overwritten the name.
+    newLayout.setName(name);
+    newLayout.updateBehaviorsSharedData(project);
+    return newLayout;
+  },
+  legacyClipboard: { kind: 'Layout', itemProperty: 'layout' },
+  addItemLabel: t`Add a scene`,
+  removeFolderMessage: t`The scenes and folders it contains will be moved out of it, not removed. Do you want to continue?`,
+};
+
 export class SceneTreeViewItemContent implements TreeViewItemContent {
   scene: gdLayout;
+  // The node of the scenes folder structure holding this scene. Keeping it
+  // avoids searching the whole tree every time the position of the scene or
+  // its parent folder is needed.
+  folderOrItem: ProjectItemFolderOrItem;
+  inFolder: ProjectItemInFolder;
   props: SceneTreeViewItemProps;
 
-  constructor(scene: gdLayout, props: SceneTreeViewItemProps) {
+  constructor(
+    scene: gdLayout,
+    folderOrItem: ProjectItemFolderOrItem,
+    props: SceneTreeViewItemProps
+  ) {
     this.scene = scene;
+    this.folderOrItem = folderOrItem;
+    this.inFolder = new ProjectItemInFolder(
+      sceneFoldersKind,
+      folderOrItem,
+      props,
+      () => props.onSceneAdded()
+    );
     this.props = props;
   }
 
+  getFolderOrItem(): ProjectItemFolderOrItem {
+    return this.folderOrItem;
+  }
+
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === scenesRootFolderId;
+    return this.inFolder.isDescendantOf(itemContent);
   }
 
   getRootId(): string {
@@ -114,6 +163,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       return;
     }
     this.props.onRenameLayout(oldName, newName);
+    this.props.forceUpdateList();
   }
 
   edit(): void {
@@ -163,6 +213,10 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       {
         type: 'separator',
       },
+      this.inFolder.buildMoveToFolderMenuItem(i18n),
+      {
+        type: 'separator',
+      },
       {
         label: i18n._(t`Rename`),
         click: () => this.edit(),
@@ -186,12 +240,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
         click: () => this.cut(),
         accelerator: 'CmdOrCtrl+X',
       },
-      {
-        label: i18n._(t`Paste`),
-        enabled: Clipboard.has(SCENE_CLIPBOARD_KIND),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
-      },
+      this.inFolder.buildPasteMenuItem(i18n, () => this.paste()),
       {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
@@ -226,30 +275,24 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this.props.onDeleteLayout(this.scene);
+    // Removing the layout from the project also removes it from the scenes
+    // folder structure, so nothing else has to be done here.
+    this.props.onDeleteLayouts([this.scene]);
   }
 
   getIndex(): number {
-    return this.props.project.getLayoutPosition(this.scene.getName());
+    return this.inFolder.getIndex();
   }
 
-  moveAt(destinationIndex: number): void {
-    const originIndex = this.getIndex();
-    if (destinationIndex !== originIndex) {
-      this.props.project.moveLayout(
-        originIndex,
-        // When moving the item down, it must not be counted.
-        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
-      );
-      this._onProjectItemModified();
-    }
+  moveAt(
+    destinationIndex: number,
+    targetFolder?: ProjectItemFolderOrItem
+  ): void {
+    this.inFolder.moveAt(destinationIndex, targetFolder);
   }
 
   copy(): void {
-    Clipboard.set(SCENE_CLIPBOARD_KIND, {
-      layout: serializeToJSObject(this.scene),
-      name: this.scene.getName(),
-    });
+    this.inFolder.copy();
   }
 
   cut(): void {
@@ -258,31 +301,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    if (!Clipboard.has(SCENE_CLIPBOARD_KIND)) return;
-
-    const clipboardContent = Clipboard.get(SCENE_CLIPBOARD_KIND);
-    const copiedScene = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'layout'
-    );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedScene) return;
-
-    const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
-      project.hasLayoutNamed(name)
-    );
-
-    const newScene = project.insertNewLayout(newName, this.getIndex() + 1);
-
-    unserializeFromJSObject(newScene, copiedScene, 'unserializeFrom', project);
-    // Unserialization has overwritten the name.
-    newScene.setName(newName);
-    newScene.updateBehaviorsSharedData(project);
-
-    this._onProjectItemModified();
-    this.props.editName(getSceneTreeViewItemId(newScene));
-    this.props.onSceneAdded();
+    this.inFolder.paste();
   }
 
   _duplicate(): void {
@@ -291,7 +310,17 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       project.hasLayoutNamed(name)
     );
 
-    const newScene = project.insertNewLayout(newName, this.getIndex() + 1);
+    const newScene = project.insertNewLayout(
+      newName,
+      project.getLayoutsCount()
+    );
+    moveNewItemToFolder(
+      sceneFoldersKind,
+      project,
+      newName,
+      this.folderOrItem.getParent(),
+      this.getIndex() + 1
+    );
 
     unserializeFromJSObject(
       newScene,
@@ -303,15 +332,9 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     newScene.setName(newName);
     newScene.updateBehaviorsSharedData(project);
 
-    this._onProjectItemModified();
+    this.inFolder.onFolderStructureModified();
     this.props.editName(getSceneTreeViewItemId(newScene));
     this.props.onSceneAdded();
-  }
-
-  _onProjectItemModified() {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.props.forceUpdate();
   }
 
   getRightButton(i18n: I18nType): any {

@@ -3,13 +3,12 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard from '../Utils/Clipboard';
-import { SafeExtractor } from '../Utils/SafeExtractor';
+import { unserializeFromJSObject } from '../Utils/Serializer';
+import { ProjectItemInFolder } from './ProjectItemInFolder';
 import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
+  type ProjectItemFoldersKind,
+  type ProjectItemFolderOrItem,
+} from './ProjectItemFolders';
 import {
   type TreeViewItemContent,
   type TreeItemProps,
@@ -17,11 +16,10 @@ import {
 } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
-const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
-
 export type ExternalLayoutTreeViewItemCallbacks = {|
   onExternalLayoutAdded: () => void,
-  onDeleteExternalLayout: gdExternalLayout => void,
+  // Resolves to true once removed (after the user confirmed).
+  onDeleteExternalLayouts: (Array<gdExternalLayout>) => Promise<boolean>,
   onRenameExternalLayout: (string, string) => void,
   onOpenExternalLayout: string => void,
 |};
@@ -34,6 +32,7 @@ export type ExternalLayoutTreeViewItemCommonProps = {|
 export type ExternalLayoutTreeViewItemProps = {|
   ...ExternalLayoutTreeViewItemCommonProps,
   project: gdProject,
+  expandFolders: (folderIds: Array<string>) => void,
 |};
 
 export const getExternalLayoutTreeViewItemId = (
@@ -44,20 +43,61 @@ export const getExternalLayoutTreeViewItemId = (
   return `external-layout-${externalLayout.ptr}`;
 };
 
+export const externalLayoutFoldersKind: ProjectItemFoldersKind = {
+  name: 'external-layout',
+  getRootId: () => externalLayoutsRootFolderId,
+  getRootFolder: project => project.getExternalLayoutsRootFolder(),
+  hasItemNamed: (project, name) => project.hasExternalLayoutNamed(name),
+  getItemTreeViewItemId: getExternalLayoutTreeViewItemId,
+  insertItemFromSerializedContent: (project, name, serializedItem) => {
+    const newExternalLayout = project.insertNewExternalLayout(
+      name,
+      project.getExternalLayoutsCount()
+    );
+    unserializeFromJSObject(
+      newExternalLayout,
+      serializedItem,
+      'unserializeFrom',
+      project
+    );
+    // Unserialization has overwritten the name.
+    newExternalLayout.setName(name);
+    return newExternalLayout;
+  },
+  legacyClipboard: { kind: 'External layout', itemProperty: 'externalLayout' },
+  addItemLabel: t`Add an external layout`,
+  removeFolderMessage: t`The external layouts and folders it contains will be moved out of it, not removed. Do you want to continue?`,
+};
+
 export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   externalLayout: gdExternalLayout;
+  // The node of the folder structure holding this item.
+  folderOrItem: ProjectItemFolderOrItem;
+  inFolder: ProjectItemInFolder;
   props: ExternalLayoutTreeViewItemProps;
 
   constructor(
     externalLayout: gdExternalLayout,
+    folderOrItem: ProjectItemFolderOrItem,
     props: ExternalLayoutTreeViewItemProps
   ) {
     this.externalLayout = externalLayout;
+    this.folderOrItem = folderOrItem;
+    this.inFolder = new ProjectItemInFolder(
+      externalLayoutFoldersKind,
+      folderOrItem,
+      props,
+      () => props.onExternalLayoutAdded()
+    );
     this.props = props;
   }
 
+  getFolderOrItem(): ProjectItemFolderOrItem {
+    return this.folderOrItem;
+  }
+
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === externalLayoutsRootFolderId;
+    return this.inFolder.isDescendantOf(itemContent);
   }
 
   getRootId(): string {
@@ -104,6 +144,10 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
+      this.inFolder.buildMoveToFolderMenuItem(i18n),
+      {
+        type: 'separator',
+      },
       {
         label: i18n._(t`Rename`),
         click: () => this.edit(),
@@ -127,12 +171,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
         click: () => this.cut(),
         accelerator: 'CmdOrCtrl+X',
       },
-      {
-        label: i18n._(t`Paste`),
-        enabled: Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
-      },
+      this.inFolder.buildPasteMenuItem(i18n, () => this.paste()),
       {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
@@ -145,32 +184,22 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this.props.onDeleteExternalLayout(this.externalLayout);
+    this.props.onDeleteExternalLayouts([this.externalLayout]);
   }
 
   getIndex(): number {
-    return this.props.project.getExternalLayoutPosition(
-      this.externalLayout.getName()
-    );
+    return this.inFolder.getIndex();
   }
 
-  moveAt(destinationIndex: number): void {
-    const originIndex = this.getIndex();
-    if (destinationIndex !== originIndex) {
-      this.props.project.moveExternalLayout(
-        originIndex,
-        // When moving the item down, it must not be counted.
-        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
-      );
-      this._onProjectItemModified();
-    }
+  moveAt(
+    destinationIndex: number,
+    targetFolder?: ProjectItemFolderOrItem
+  ): void {
+    this.inFolder.moveAt(destinationIndex, targetFolder);
   }
 
   copy(): void {
-    Clipboard.set(EXTERNAL_LAYOUT_CLIPBOARD_KIND, {
-      externalLayout: serializeToJSObject(this.externalLayout),
-      name: this.externalLayout.getName(),
-    });
+    this.inFolder.copy();
   }
 
   cut(): void {
@@ -179,49 +208,12 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    if (!Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)) return;
-
-    const clipboardContent = Clipboard.get(EXTERNAL_LAYOUT_CLIPBOARD_KIND);
-    const copiedExternalLayout = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'externalLayout'
-    );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedExternalLayout) return;
-
-    const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
-      project.hasExternalLayoutNamed(name)
-    );
-
-    const newExternalLayout = project.insertNewExternalLayout(
-      newName,
-      this.getIndex() + 1
-    );
-
-    unserializeFromJSObject(
-      newExternalLayout,
-      copiedExternalLayout,
-      'unserializeFrom',
-      project
-    );
-    // Unserialization has overwritten the name.
-    newExternalLayout.setName(newName);
-
-    this._onProjectItemModified();
-    this.props.editName(getExternalLayoutTreeViewItemId(newExternalLayout));
-    this.props.onExternalLayoutAdded();
+    this.inFolder.paste();
   }
 
   _duplicate(): void {
     this.copy();
     this.paste();
-  }
-
-  _onProjectItemModified() {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.props.forceUpdate();
   }
 
   getRightButton(i18n: I18nType): any {

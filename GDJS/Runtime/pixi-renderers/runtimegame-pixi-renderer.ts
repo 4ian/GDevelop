@@ -114,7 +114,9 @@ namespace gdjs {
           preserveDrawingBuffer: true, // Keep to true to allow screenshots.
         });
         this._threeRenderer.shadowMap.enabled = true;
-        this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        // PCFSoftShadowMap is deprecated since Three.js r180 and replaced by
+        // PCFShadowMap (with a warning) when rendering.
+        this._threeRenderer.shadowMap.type = THREE.PCFShadowMap;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),

@@ -151,18 +151,6 @@ ProjectItemFolderOrItem<ItemType>::InsertNewFolder(
 };
 
 template <class ItemType>
-ProjectItemFolderOrItem<ItemType>&
-ProjectItemFolderOrItem<ItemType>::GetOrCreateFolderChild(
-    const gd::String& name) {
-  for (std::size_t j = 0; j < children.size(); j++) {
-    if (children[j]->IsFolder()) {
-      if (children[j]->GetFolderName() == name) return *children[j];
-    };
-  }
-  return InsertNewFolder(name, children.size());
-}
-
-template <class ItemType>
 void ProjectItemFolderOrItem<ItemType>::RemoveRecursivelyItemNamed(
     const gd::String& name) {
   if (IsFolder()) {
@@ -281,6 +269,20 @@ void ProjectItemFolderOrItem<ItemType>::SerializeTo(
   } else {
     element.SetAttribute("itemName", GetItem().GetName());
   }
+}
+
+template <class ItemType>
+void ProjectItemFolderOrItem<ItemType>::UnserializeFromChildOf(
+    const SerializerElement& parentElement,
+    const gd::String& childName,
+    const std::function<ItemType*(const gd::String&)>& findItem,
+    const std::vector<std::unique_ptr<ItemType>>& items) {
+  if (parentElement.HasChild(childName)) {
+    UnserializeFrom(parentElement.GetChild(childName, 0), findItem);
+  } else {
+    Clear();
+  }
+  AddMissingItems(items);
 }
 
 template <class ItemType>

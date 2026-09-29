@@ -14,7 +14,6 @@ declare class gdExternalEventsFolderOrExternalEvents {
   getChildPosition(child: gdExternalEventsFolderOrExternalEvents): number;
   getParent(): gdExternalEventsFolderOrExternalEvents;
   insertNewFolder(name: string, newPosition: number): gdExternalEventsFolderOrExternalEvents;
-  getOrCreateFolderChild(name: string): gdExternalEventsFolderOrExternalEvents;
   moveFolderOrItemToAnotherFolder(folderOrItem: gdExternalEventsFolderOrExternalEvents, newParentFolder: gdExternalEventsFolderOrExternalEvents, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: gdExternalEventsFolderOrExternalEvents): void;

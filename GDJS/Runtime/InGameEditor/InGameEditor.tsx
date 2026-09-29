@@ -2333,12 +2333,15 @@ namespace gdjs {
           if (!isShiftPressed(inputManager)) {
             this._selection.clear();
           }
-          const layer = this.getEditorLayer(this._selectedLayerName);
-          if (layer && layer.isVisible() && !layer._initialLayerData.isLocked) {
-            for (const object of objects) {
-              if (!this.isInstanceSealed(object)) {
-                this._selection.add(object);
-              }
+          for (const object of objects) {
+            const layer = this.getEditorLayer(object.getLayer());
+            if (
+              layer &&
+              layer.isVisible() &&
+              !layer._initialLayerData.isLocked &&
+              !this.isInstanceSealed(object)
+            ) {
+              this._selection.add(object);
             }
           }
           this._sendSelectionUpdate();
@@ -2398,6 +2401,7 @@ namespace gdjs {
           const layer = this.getEditorLayer(objectUnderCursor.getLayer());
           if (
             layer &&
+            layer.isVisible() &&
             !layer._initialLayerData.isLocked &&
             !this.isInstanceSealed(objectUnderCursor)
           ) {
@@ -3837,9 +3841,10 @@ namespace gdjs {
 
       currentScene.getAllLayerNames(layerNames);
       layerNames.forEach((layerName) => {
-        const runtimeLayerRender = currentScene
-          .getLayer(layerName)
-          .getRenderer();
+        const runtimeLayer = currentScene.getLayer(layerName);
+        // Three.js raycasting ignores the visibility of objects.
+        if (!runtimeLayer.isVisible()) return;
+        const runtimeLayerRender = runtimeLayer.getRenderer();
         const threeCamera = runtimeLayerRender.getThreeCamera();
         const threeGroup = runtimeLayerRender.getThreeGroup();
         if (!threeCamera || !threeGroup) return;
@@ -3945,6 +3950,7 @@ namespace gdjs {
             continue;
           }
           const layer = editedInstanceContainer.getLayer(object.getLayer());
+          if (!layer.isVisible()) continue;
           const layerIndex =
             editedInstanceContainer._orderedLayers.indexOf(layer);
           if (

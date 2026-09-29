@@ -9,6 +9,7 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 
 export const curveEditorPadding = 16;
 const curveEditorStep = 0.01;
+const curveEditorLargeStep = 0.1;
 const defaultYMin = -0.5;
 const defaultYMax = 1.5;
 // Extra range so a handle past the default window stays inside the graph.
@@ -68,10 +69,7 @@ export const getVisibleYRange = (
   return { yMin, yMax };
 };
 
-/**
- * Move one control point to a pointer position in SVG user space.
- * `skipRounding` is set when Alt is held.
- */
+/** Move one control point to a pointer position in SVG user space. */
 export const getPointsFromPointerPosition = ({
   points,
   handleIndex,
@@ -104,7 +102,7 @@ const moveControlPoint = (
   key: string,
   shiftKey: boolean
 ): CubicBezierPoints => {
-  const step = shiftKey ? 0.1 : curveEditorStep;
+  const step = shiftKey ? curveEditorLargeStep : curveEditorStep;
   let dx = 0;
   let dy = 0;
   if (key === 'ArrowLeft') dx = -step;

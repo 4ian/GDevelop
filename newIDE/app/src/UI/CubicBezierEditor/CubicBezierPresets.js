@@ -10,12 +10,14 @@ export type CubicBezierPreset = {|
   points: CubicBezierPoints,
 |};
 
+const linearPoints: CubicBezierPoints = [0, 0, 1, 1];
+
 export const cssCubicBezierPresets: Array<CubicBezierPreset> = [
   { name: 'ease', points: cssEasePoints },
   { name: 'ease-in', points: [0.42, 0, 1, 1] },
   { name: 'ease-out', points: [0, 0, 0.58, 1] },
   { name: 'ease-in-out', points: [0.42, 0, 0.58, 1] },
-  { name: 'linear', points: [0, 0, 1, 1] },
+  { name: 'linear', points: linearPoints },
 ];
 
 // Bézier approximations from https://easings.net (maximum error 0.05).
@@ -46,6 +48,15 @@ const namedEasingApproximations: { [string]: CubicBezierPoints } = {
   easeInOutBack: [0.68, -0.6, 0.32, 1.6],
 };
 
+// Named easings whose formula is identical to another named easing.
+const namedEasingAliases: { [string]: string } = {
+  swingFrom: 'easeInBack',
+  swingTo: 'easeOutBack',
+  swingFromTo: 'easeInOutBack',
+  easeFrom: 'easeInQuart',
+  easeFromTo: 'easeInOutQuart',
+};
+
 export const namedEasingApproximationPresets: Array<CubicBezierPreset> = Object.keys(
   namedEasingApproximations
 ).map(name => ({
@@ -66,5 +77,10 @@ export const getInitialCubicBezierPoints = (
   if (!easingIdentifier) return cssEasePoints;
   const customPoints = parseCubicBezierOrNull(easingIdentifier);
   if (customPoints) return customPoints;
-  return getNamedEasingApproximation(easingIdentifier) || cssEasePoints;
+  if (easingIdentifier === 'linear') return linearPoints;
+  return (
+    getNamedEasingApproximation(
+      namedEasingAliases[easingIdentifier] || easingIdentifier
+    ) || cssEasePoints
+  );
 };

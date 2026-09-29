@@ -84,7 +84,10 @@ const Track = ({
         key={tickValue}
         style={{
           ...styles.tick,
-          left: getTrackLeft(getTrackPosition(tickValue, range), 1),
+          left: getTrackLeft(
+            getTrackPosition(tickValue, range),
+            styles.tick.width / 2
+          ),
         }}
       />
     ))}
@@ -92,7 +95,10 @@ const Track = ({
       style={{
         ...styles.dot,
         backgroundColor: color,
-        left: getTrackLeft(getTrackPosition(value, range), 8),
+        left: getTrackLeft(
+          getTrackPosition(value, range),
+          styles.dot.width / 2
+        ),
       }}
     />
   </div>
@@ -179,7 +185,6 @@ const CubicBezierAnimatedPreview = ({
     [customEasing, referenceEasing]
   );
 
-  // A handle release plays the preview once, unless reduced motion is set.
   React.useEffect(
     () => {
       if (playToken === 0 || prefersReducedMotion()) return;

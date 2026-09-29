@@ -43,4 +43,23 @@ describe('CubicBezierPresets', () => {
     expect(getInitialCubicBezierPoints('bounce')).toEqual(cssEasePoints);
     expect(getInitialCubicBezierPoints(null)).toEqual(cssEasePoints);
   });
+
+  it('starts linear from a straight line', () => {
+    expect(getInitialCubicBezierPoints('linear')).toEqual([0, 0, 1, 1]);
+  });
+
+  it('starts an alias from the approximation of its identical easing', () => {
+    [
+      ['swingFrom', 'easeInBack'],
+      ['swingTo', 'easeOutBack'],
+      ['swingFromTo', 'easeInOutBack'],
+      ['easeFrom', 'easeInQuart'],
+      ['easeFromTo', 'easeInOutQuart'],
+    ].forEach(([alias, easingName]) => {
+      expect(getInitialCubicBezierPoints(alias)).toEqual(
+        getInitialCubicBezierPoints(easingName)
+      );
+      expect(getInitialCubicBezierPoints(alias)).not.toEqual(cssEasePoints);
+    });
+  });
 });

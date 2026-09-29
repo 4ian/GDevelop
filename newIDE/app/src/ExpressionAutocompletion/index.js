@@ -22,6 +22,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
 import { filterStringListWithPrefix } from '../Utils/ListFiltering';
+import { customEasingExampleIdentifier } from '../Utils/Easings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
@@ -312,7 +313,9 @@ const getAutocompletionsForText = function(
   } else if (type === 'easing') {
     autocompletionTexts = getEasingChoices(
       completionDescription.getParameterMetadata()
-    ).map(choice => `"${choice}"`);
+    )
+      .concat(customEasingExampleIdentifier)
+      .map(choice => `"${choice}"`);
   } else if (type === 'objectPointName') {
     const objectName: string = completionDescription.getObjectName();
     if (!objectName) {

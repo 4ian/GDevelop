@@ -167,6 +167,10 @@ const CubicBezierCurveEditor = ({
   const toSvgX = (x: number): number => curveEditorPadding + x * drawable;
   const toSvgY = (y: number): number =>
     curveEditorPadding + ((yMax - y) / (yMax - yMin)) * drawable;
+  const boxLeft = toSvgX(0);
+  const boxRight = toSvgX(1);
+  const boxTop = toSvgY(1);
+  const boxBottom = toSvgY(0);
 
   const [x1, y1, x2, y2] = points;
   const guideColor = gdevelopTheme.text.color.disabled;
@@ -338,28 +342,26 @@ const CubicBezierCurveEditor = ({
             style={{ cursor: 'crosshair' }}
             onPointerDown={onBackgroundPointerDown}
           />
-          {[0, 1].map(guideY => (
-            <line
-              key={guideY}
-              x1={0}
-              x2={size}
-              y1={toSvgY(guideY)}
-              y2={toSvgY(guideY)}
-              stroke={guideColor}
-              strokeDasharray="4 4"
-              pointerEvents="none"
-            />
-          ))}
-          <rect
-            x={toSvgX(0)}
-            y={toSvgY(1)}
-            width={toSvgX(1) - toSvgX(0)}
-            height={toSvgY(0) - toSvgY(1)}
-            fill="none"
-            stroke={guideColor}
-            strokeDasharray="4 4"
-            pointerEvents="none"
-          />
+          {([
+            [boxLeft, boxTop, boxRight, boxTop],
+            [boxLeft, boxBottom, boxRight, boxBottom],
+            [boxLeft, boxTop, boxLeft, boxBottom],
+            [boxRight, boxTop, boxRight, boxBottom],
+          ]: Array<[number, number, number, number]>).map(
+            ([x1, y1, x2, y2], index) => (
+              <line
+                key={index}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke={guideColor}
+                strokeDasharray="4 4"
+                strokeLinecap="butt"
+                pointerEvents="none"
+              />
+            )
+          )}
           {handles.map(renderHandleLine)}
           <path
             d={`M ${toSvgX(0)} ${toSvgY(0)} C ${toSvgX(x1)} ${toSvgY(

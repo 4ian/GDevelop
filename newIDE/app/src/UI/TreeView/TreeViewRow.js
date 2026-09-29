@@ -41,28 +41,6 @@ const onInputKeyDown = (event: KeyboardEvent) => {
 // $FlowFixMe[missing-local-annot]
 const memoized = memoizeOne((initialValue, callback) => callback());
 
-/**
- * Tell the row whether something is dragged over it, once rendered: the drop
- * target only knows it while rendering, when the row can't be updated.
- */
-const ReportDropTargetHover = ({
-  isOver,
-  canDrop,
-  onChange,
-}: {|
-  isOver: boolean,
-  canDrop: boolean,
-  onChange: (isOver: boolean, canDrop: boolean) => void,
-|}) => {
-  React.useEffect(
-    () => {
-      onChange(isOver, canDrop);
-    },
-    [isOver, canDrop, onChange]
-  );
-  return null;
-};
-
 type Props<Item> = {|
   index: number,
   style: any,
@@ -338,6 +316,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
           canDrop,
           isReadyToDrag,
         }) => {
+          setIsStayingOver(isOver, canDrop);
+
           const isRenaming = renamedItemId === node.id;
 
           let itemRow = (
@@ -577,11 +557,6 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                   node.item.isRoot && index > 0 && !isSticky,
               })}
             >
-              <ReportDropTargetHover
-                isOver={isOver}
-                canDrop={canDrop}
-                onChange={setIsStayingOver}
-              />
               {dropTarget}
             </div>
           );

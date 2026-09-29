@@ -93,18 +93,6 @@ TEST_CASE("ProjectItemFolderOrItem", "[common]") {
     REQUIRE(childFolder.IsADescendantOf(parentFolder));
   }
 
-  SECTION("GetOrCreateFolderChild reuses an existing folder") {
-    gd::Project project;
-    auto& rootFolder = project.GetLayoutsRootFolder();
-
-    auto& folder = rootFolder.GetOrCreateFolderChild("MyFolder");
-    REQUIRE(rootFolder.GetChildrenCount() == 1);
-
-    auto& sameFolder = rootFolder.GetOrCreateFolderChild("MyFolder");
-    REQUIRE(&folder == &sameFolder);
-    REQUIRE(rootFolder.GetChildrenCount() == 1);
-  }
-
   SECTION("External layouts, external events and tests have folders") {
     gd::Project project;
     project.InsertNewExternalLayout("ExternalLayout1", 0);
@@ -207,6 +195,48 @@ TEST_CASE("ProjectItemFolderOrItem", "[common]") {
     REQUIRE(loadedRootFolder.GetChildrenCount() == 2);
     REQUIRE(loadedRootFolder.HasItemNamed("Scene1"));
     REQUIRE(loadedRootFolder.HasItemNamed("Scene2"));
+  }
+
+  SECTION("The other folder structures are saved, loaded and rebuilt") {
+    gd::Project project;
+    project.InsertNewExternalLayout("ExternalLayout1", 0);
+    project.InsertNewExternalEvents("ExternalEvents1", 0);
+    project.GetTests().InsertNewTest("Test1", 0);
+    project.GetExternalLayoutsRootFolder().InsertNewFolder("LayoutsFolder", 0);
+    project.GetExternalEventsRootFolder().InsertNewFolder("EventsFolder", 0);
+    project.GetTests().GetRootFolder().InsertNewFolder("TestsFolder", 0);
+
+    gd::SerializerElement element;
+    project.SerializeTo(element);
+
+    gd::Project loadedProject;
+    loadedProject.UnserializeFrom(element);
+    REQUIRE(loadedProject.GetExternalLayoutsRootFolder().GetChildrenCount() ==
+            2);
+    REQUIRE(loadedProject.GetExternalLayoutsRootFolder()
+                .GetChildAt(0)
+                .GetFolderName() == "LayoutsFolder");
+    REQUIRE(loadedProject.GetExternalEventsRootFolder()
+                .GetChildAt(0)
+                .GetFolderName() == "EventsFolder");
+    REQUIRE(loadedProject.GetTests().GetRootFolder().GetChildAt(0)
+                .GetFolderName() == "TestsFolder");
+    REQUIRE(loadedProject.GetTests().GetRootFolder().HasItemNamed("Test1"));
+
+    // Saved before the folder structures existed: every item is at the root.
+    element.RemoveChild("externalLayoutsFolderStructure");
+    element.RemoveChild("externalEventsFolderStructure");
+    element.RemoveChild("testsFolderStructure");
+    gd::Project oldProject;
+    oldProject.UnserializeFrom(element);
+    REQUIRE(oldProject.GetExternalLayoutsRootFolder().GetChildrenCount() == 1);
+    REQUIRE(oldProject.GetExternalLayoutsRootFolder().HasItemNamed(
+        "ExternalLayout1"));
+    REQUIRE(oldProject.GetExternalEventsRootFolder().GetChildrenCount() == 1);
+    REQUIRE(oldProject.GetExternalEventsRootFolder().HasItemNamed(
+        "ExternalEvents1"));
+    REQUIRE(oldProject.GetTests().GetRootFolder().GetChildrenCount() == 1);
+    REQUIRE(oldProject.GetTests().GetRootFolder().HasItemNamed("Test1"));
   }
 
   SECTION("A copied project has all its layouts in the folder structure") {

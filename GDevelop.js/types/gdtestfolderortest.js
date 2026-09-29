@@ -14,7 +14,6 @@ declare class gdTestFolderOrTest {
   getChildPosition(child: gdTestFolderOrTest): number;
   getParent(): gdTestFolderOrTest;
   insertNewFolder(name: string, newPosition: number): gdTestFolderOrTest;
-  getOrCreateFolderChild(name: string): gdTestFolderOrTest;
   moveFolderOrItemToAnotherFolder(folderOrItem: gdTestFolderOrTest, newParentFolder: gdTestFolderOrTest, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: gdTestFolderOrTest): void;

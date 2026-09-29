@@ -94,37 +94,41 @@ describe('libGD.js', function () {
       // A new layout is added at the root of the folder structure.
       project.insertNewLayout('Scene1', 0);
       expect(rootFolder.getChildrenCount()).toBe(1);
-      expect(rootFolder.hasLayoutNamed('Scene1')).toBe(true);
-      expect(rootFolder.getChildAt(0).getLayout().getName()).toBe('Scene1');
+      expect(rootFolder.hasItemNamed('Scene1')).toBe(true);
+      expect(rootFolder.getChildAt(0).getItem().getName()).toBe('Scene1');
 
-      // A layout can be inserted directly in a folder.
+      // A layout can be moved in a folder.
       const folder = rootFolder.insertNewFolder('MyFolder', 0);
       expect(folder.isFolder()).toBe(true);
       expect(folder.getFolderName()).toBe('MyFolder');
-      const scene2 = project.insertNewLayoutInFolder('Scene2', folder, 0);
-      expect(project.hasLayoutNamed('Scene2')).toBe(true);
+      project.insertNewLayout('Scene2', 1);
+      rootFolder.moveFolderOrItemToAnotherFolder(
+        rootFolder.getItemChild('Scene2'),
+        folder,
+        0
+      );
       expect(folder.getChildrenCount()).toBe(1);
-      expect(folder.getChildAt(0).getLayout().getName()).toBe('Scene2');
+      expect(folder.getChildAt(0).getItem().getName()).toBe('Scene2');
       expect(folder.getChildAt(0).getParent()).toEqual(folder);
 
       // A layout can be moved from a folder to another.
-      const scene1Node = rootFolder.getLayoutChild('Scene1');
-      rootFolder.moveLayoutFolderOrLayoutToAnotherFolder(
+      const scene1Node = rootFolder.getItemChild('Scene1');
+      rootFolder.moveFolderOrItemToAnotherFolder(
         scene1Node,
         folder,
         0
       );
       expect(folder.getChildrenCount()).toBe(2);
-      expect(folder.getChildAt(0).getLayout().getName()).toBe('Scene1');
-      expect(rootFolder.hasLayoutNamed('Scene1')).toBe(true);
-      expect(rootFolder.getLayoutNamed('Scene1').getLayout().getName()).toBe(
+      expect(folder.getChildAt(0).getItem().getName()).toBe('Scene1');
+      expect(rootFolder.hasItemNamed('Scene1')).toBe(true);
+      expect(rootFolder.getItemNamed('Scene1').getItem().getName()).toBe(
         'Scene1'
       );
 
       // Removing a layout removes it from the folder structure.
       project.removeLayout('Scene2');
       expect(folder.getChildrenCount()).toBe(1);
-      expect(rootFolder.hasLayoutNamed('Scene2')).toBe(false);
+      expect(rootFolder.hasItemNamed('Scene2')).toBe(false);
 
       project.removeLayout('Scene1');
       expect(folder.getChildrenCount()).toBe(0);

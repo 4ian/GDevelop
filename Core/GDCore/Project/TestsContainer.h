@@ -5,10 +5,13 @@
  */
 #pragma once
 
+#include <memory>
 #include <vector>
 
+#include "GDCore/Project/ProjectItemFolderOrItem.h"
 #include "GDCore/Project/Test.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
 
 namespace gd {
@@ -26,9 +29,13 @@ namespace gd {
  */
 class GD_CORE_API TestsContainer : private SerializableWithNameList<gd::Test> {
  public:
-  TestsContainer() {}
+  TestsContainer()
+      : rootFolder(gd::make_unique<gd::TestFolderOrTest>("__ROOT")) {}
 
-  TestsContainer(const TestsContainer& other) { Init(other); }
+  TestsContainer(const TestsContainer& other)
+      : rootFolder(gd::make_unique<gd::TestFolderOrTest>("__ROOT")) {
+    Init(other);
+  }
 
   TestsContainer& operator=(const TestsContainer& other) {
     if (this != &other) {
@@ -83,13 +90,23 @@ class GD_CORE_API TestsContainer : private SerializableWithNameList<gd::Test> {
   std::size_t GetTestsCount() const { return GetCount(); }
 
   gd::Test& InsertNewTest(const gd::String& name, std::size_t position) {
-    return InsertNew(name, position);
+    gd::Test& newTest = InsertNew(name, position);
+    rootFolder->InsertItem(&newTest);
+    return newTest;
   }
   gd::Test& InsertTest(const gd::Test& test, std::size_t position) {
-    return Insert(test, position);
+    gd::Test& newTest = Insert(test, position);
+    rootFolder->InsertItem(&newTest);
+    return newTest;
   }
-  void RemoveTest(const gd::String& name) { return Remove(name); }
-  void ClearTests() { return Clear(); }
+  void RemoveTest(const gd::String& name) {
+    rootFolder->RemoveRecursivelyItemNamed(name);
+    return Remove(name);
+  }
+  void ClearTests() {
+    rootFolder->Clear();
+    return Clear();
+  }
   void MoveTest(std::size_t oldIndex, std::size_t newIndex) {
     return Move(oldIndex, newIndex);
   };
@@ -126,7 +143,28 @@ class GD_CORE_API TestsContainer : private SerializableWithNameList<gd::Test> {
    * \brief Unserialize the tests.
    */
   void UnserializeTestsFrom(const SerializerElement& element) {
-    return UnserializeElementsFrom("test", element);
+    rootFolder->Clear();
+    UnserializeElementsFrom("test", element);
+    rootFolder->AddMissingItems(elements);
+  };
+
+  /**
+   * \brief Return the root folder used to organize the tests in folders.
+   */
+  gd::TestFolderOrTest& GetRootFolder() { return *rootFolder; }
+
+  void SerializeFolderStructureTo(SerializerElement& element) const {
+    rootFolder->SerializeTo(element);
+  };
+
+  /**
+   * \brief Unserialize the folder structure, once the tests are unserialized.
+   */
+  void UnserializeFolderStructureFrom(const SerializerElement& element) {
+    rootFolder->UnserializeFrom(element, [this](const gd::String& name) {
+      return HasTestNamed(name) ? &GetTest(name) : nullptr;
+    });
+    rootFolder->AddMissingItems(elements);
   };
   ///@}
 
@@ -136,8 +174,16 @@ class GD_CORE_API TestsContainer : private SerializableWithNameList<gd::Test> {
    * Don't forget to update me if members were changed!
    */
   void Init(const gd::TestsContainer& other) {
-    return SerializableWithNameList<gd::Test>::Init(other);
+    // The folder structure is not copied (it points to the tests of the other
+    // container): rebuild a flat structure so that every test stays reachable.
+    rootFolder->Clear();
+    SerializableWithNameList<gd::Test>::Init(other);
+    rootFolder->AddMissingItems(elements);
   };
+
+ private:
+  std::unique_ptr<gd::TestFolderOrTest>
+      rootFolder;  ///< Folder structure used to organize the tests.
 };
 
 }  // namespace gd

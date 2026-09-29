@@ -681,33 +681,97 @@ export class Project extends EmscriptenObject {
   getWholeProjectDiagnosticReport(): WholeProjectDiagnosticReport;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;
-  insertNewLayoutInFolder(name: string, folder: LayoutFolderOrLayout, position: number): Layout;
   getLayoutsRootFolder(): LayoutFolderOrLayout;
+  getExternalLayoutsRootFolder(): ExternalLayoutFolderOrExternalLayout;
+  getExternalEventsRootFolder(): ExternalEventsFolderOrExternalEvents;
 }
 
 export class LayoutFolderOrLayout extends EmscriptenObject {
   constructor();
   isFolder(): boolean;
   isRootFolder(): boolean;
-  getLayout(): Layout;
+  getItem(): Layout;
   getFolderName(): string;
   setFolderName(name: string): void;
-  hasLayoutNamed(name: string): boolean;
-  getLayoutNamed(name: string): LayoutFolderOrLayout;
+  hasItemNamed(name: string): boolean;
+  getItemNamed(name: string): LayoutFolderOrLayout;
   getChildrenCount(): number;
   getChildAt(pos: number): LayoutFolderOrLayout;
-  getLayoutChild(name: string): LayoutFolderOrLayout;
+  getItemChild(name: string): LayoutFolderOrLayout;
   getChildPosition(child: LayoutFolderOrLayout): number;
   getParent(): LayoutFolderOrLayout;
-  insertLayout(layout: Layout, position: number): void;
   insertNewFolder(name: string, newPosition: number): LayoutFolderOrLayout;
   getOrCreateFolderChild(name: string): LayoutFolderOrLayout;
-  moveLayoutFolderOrLayoutToAnotherFolder(layoutFolderOrLayout: LayoutFolderOrLayout, newParentFolder: LayoutFolderOrLayout, newPosition: number): void;
+  moveFolderOrItemToAnotherFolder(folderOrItem: LayoutFolderOrLayout, newParentFolder: LayoutFolderOrLayout, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: LayoutFolderOrLayout): void;
-  removeRecursivelyLayoutNamed(name: string): void;
-  isADescendantOf(otherLayoutFolderOrLayout: LayoutFolderOrLayout): boolean;
-  clear(): void;
+  isADescendantOf(otherFolderOrItem: LayoutFolderOrLayout): boolean;
+}
+
+export class ExternalLayoutFolderOrExternalLayout extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getItem(): ExternalLayout;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasItemNamed(name: string): boolean;
+  getItemNamed(name: string): ExternalLayoutFolderOrExternalLayout;
+  getChildrenCount(): number;
+  getChildAt(pos: number): ExternalLayoutFolderOrExternalLayout;
+  getItemChild(name: string): ExternalLayoutFolderOrExternalLayout;
+  getChildPosition(child: ExternalLayoutFolderOrExternalLayout): number;
+  getParent(): ExternalLayoutFolderOrExternalLayout;
+  insertNewFolder(name: string, newPosition: number): ExternalLayoutFolderOrExternalLayout;
+  getOrCreateFolderChild(name: string): ExternalLayoutFolderOrExternalLayout;
+  moveFolderOrItemToAnotherFolder(folderOrItem: ExternalLayoutFolderOrExternalLayout, newParentFolder: ExternalLayoutFolderOrExternalLayout, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: ExternalLayoutFolderOrExternalLayout): void;
+  isADescendantOf(otherFolderOrItem: ExternalLayoutFolderOrExternalLayout): boolean;
+}
+
+export class ExternalEventsFolderOrExternalEvents extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getItem(): ExternalEvents;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasItemNamed(name: string): boolean;
+  getItemNamed(name: string): ExternalEventsFolderOrExternalEvents;
+  getChildrenCount(): number;
+  getChildAt(pos: number): ExternalEventsFolderOrExternalEvents;
+  getItemChild(name: string): ExternalEventsFolderOrExternalEvents;
+  getChildPosition(child: ExternalEventsFolderOrExternalEvents): number;
+  getParent(): ExternalEventsFolderOrExternalEvents;
+  insertNewFolder(name: string, newPosition: number): ExternalEventsFolderOrExternalEvents;
+  getOrCreateFolderChild(name: string): ExternalEventsFolderOrExternalEvents;
+  moveFolderOrItemToAnotherFolder(folderOrItem: ExternalEventsFolderOrExternalEvents, newParentFolder: ExternalEventsFolderOrExternalEvents, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: ExternalEventsFolderOrExternalEvents): void;
+  isADescendantOf(otherFolderOrItem: ExternalEventsFolderOrExternalEvents): boolean;
+}
+
+export class TestFolderOrTest extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getItem(): Test;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasItemNamed(name: string): boolean;
+  getItemNamed(name: string): TestFolderOrTest;
+  getChildrenCount(): number;
+  getChildAt(pos: number): TestFolderOrTest;
+  getItemChild(name: string): TestFolderOrTest;
+  getChildPosition(child: TestFolderOrTest): number;
+  getParent(): TestFolderOrTest;
+  insertNewFolder(name: string, newPosition: number): TestFolderOrTest;
+  getOrCreateFolderChild(name: string): TestFolderOrTest;
+  moveFolderOrItemToAnotherFolder(folderOrItem: TestFolderOrTest, newParentFolder: TestFolderOrTest, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: TestFolderOrTest): void;
+  isADescendantOf(otherFolderOrItem: TestFolderOrTest): boolean;
 }
 
 export class ObjectsContainersList extends EmscriptenObject {
@@ -972,6 +1036,7 @@ export class TestsContainer extends EmscriptenObject {
   removeTest(name: string): void;
   clearTests(): void;
   moveTest(oldIndex: number, newIndex: number): void;
+  getRootFolder(): TestFolderOrTest;
   getTestsCount(): number;
   getTestPosition(test: Test): number;
 }

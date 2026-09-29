@@ -124,6 +124,8 @@ declare class gdProject {
   getWholeProjectDiagnosticReport(): gdWholeProjectDiagnosticReport;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;
+  insertNewLayoutInFolder(name: string, folder: gdLayoutFolderOrLayout, position: number): gdLayout;
+  getLayoutsRootFolder(): gdLayoutFolderOrLayout;
   delete(): void;
   ptr: number;
 };

@@ -86,6 +86,52 @@ describe('libGD.js', function () {
       expect(project.hasLayoutNamed('Scene')).toBe(false);
     });
 
+    it('handles the layouts folder structure', function () {
+      const rootFolder = project.getLayoutsRootFolder();
+      expect(rootFolder.isFolder()).toBe(true);
+      expect(rootFolder.isRootFolder()).toBe(true);
+
+      // A new layout is added at the root of the folder structure.
+      project.insertNewLayout('Scene1', 0);
+      expect(rootFolder.getChildrenCount()).toBe(1);
+      expect(rootFolder.hasLayoutNamed('Scene1')).toBe(true);
+      expect(rootFolder.getChildAt(0).getLayout().getName()).toBe('Scene1');
+
+      // A layout can be inserted directly in a folder.
+      const folder = rootFolder.insertNewFolder('MyFolder', 0);
+      expect(folder.isFolder()).toBe(true);
+      expect(folder.getFolderName()).toBe('MyFolder');
+      const scene2 = project.insertNewLayoutInFolder('Scene2', folder, 0);
+      expect(project.hasLayoutNamed('Scene2')).toBe(true);
+      expect(folder.getChildrenCount()).toBe(1);
+      expect(folder.getChildAt(0).getLayout().getName()).toBe('Scene2');
+      expect(folder.getChildAt(0).getParent()).toEqual(folder);
+
+      // A layout can be moved from a folder to another.
+      const scene1Node = rootFolder.getLayoutChild('Scene1');
+      rootFolder.moveLayoutFolderOrLayoutToAnotherFolder(
+        scene1Node,
+        folder,
+        0
+      );
+      expect(folder.getChildrenCount()).toBe(2);
+      expect(folder.getChildAt(0).getLayout().getName()).toBe('Scene1');
+      expect(rootFolder.hasLayoutNamed('Scene1')).toBe(true);
+      expect(rootFolder.getLayoutNamed('Scene1').getLayout().getName()).toBe(
+        'Scene1'
+      );
+
+      // Removing a layout removes it from the folder structure.
+      project.removeLayout('Scene2');
+      expect(folder.getChildrenCount()).toBe(1);
+      expect(rootFolder.hasLayoutNamed('Scene2')).toBe(false);
+
+      project.removeLayout('Scene1');
+      expect(folder.getChildrenCount()).toBe(0);
+      rootFolder.removeFolderChild(folder);
+      expect(rootFolder.getChildrenCount()).toBe(0);
+    });
+
     it('handles external events', function () {
       expect(project.hasExternalEventsNamed('My events')).toBe(false);
 

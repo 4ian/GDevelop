@@ -11,6 +11,7 @@
 
 #include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Project/ExtensionProperties.h"
+#include "GDCore/Project/LayoutFolderOrLayout.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -609,14 +610,20 @@ class GD_CORE_API Project {
   std::size_t GetLayoutPosition(const gd::String& name) const;
 
   /**
-   * Change the position of the specified layout.
+   * Change the position of the specified layout in the layouts list.
+   *
+   * \note This has no effect on the order shown to the user, which is given by
+   * the layouts folder structure (see GetLayoutsRootFolder).
    */
   void MoveLayout(std::size_t oldIndex, std::size_t newIndex);
 
   /**
-   * \brief Swap the specified layouts.
+   * \brief Swap the specified layouts in the layouts list.
    *
    * Do nothing if indexes are not correct.
+   *
+   * \note This has no effect on the order shown to the user, which is given by
+   * the layouts folder structure (see GetLayoutsRootFolder).
    */
   void SwapLayouts(std::size_t first, std::size_t second);
 
@@ -646,9 +653,45 @@ class GD_CORE_API Project {
   gd::Layout& InsertLayout(const Layout& layout, std::size_t position);
 
   /**
+   * \brief Add a new empty layout called "name" at the given position in the
+   * given folder of the layouts folder structure.
+   *
+   * \note The new layout is added at the end of the layouts list: the position
+   * in the folder structure is what defines the order shown to the user.
+   */
+  gd::Layout& InsertNewLayoutInFolder(const gd::String& name,
+                                      gd::LayoutFolderOrLayout& folder,
+                                      std::size_t position);
+
+  /**
    * \brief Delete layout named "name".
    */
   void RemoveLayout(const gd::String& name);
+
+  /**
+   * \brief Return the root folder used to organize the layouts (scenes) in
+   * folders.
+   */
+  gd::LayoutFolderOrLayout& GetLayoutsRootFolder() {
+    return *layoutsRootFolder;
+  }
+
+  /**
+   * \brief Return the root folder used to organize the layouts (scenes) in
+   * folders.
+   */
+  const gd::LayoutFolderOrLayout& GetLayoutsRootFolder() const {
+    return *layoutsRootFolder;
+  }
+
+  /**
+   * \brief Add in the root folder any layout that is not already somewhere in
+   * the folder structure.
+   *
+   * This is used for projects saved before the folder structure existed, and
+   * to be robust to a folder structure that would not contain all the layouts.
+   */
+  void AddMissingLayoutsInRootFolder();
 
   ///@}
 
@@ -1169,6 +1212,8 @@ class GD_CORE_API Project {
               ///< at runtime (behavior before
               ///< 5.6.267).
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
+  std::unique_ptr<gd::LayoutFolderOrLayout>
+      layoutsRootFolder;  ///< Folder structure used to organize the scenes.
   gd::VariablesContainer variables;  ///< Initial global variables
   gd::ObjectsContainer objectsContainer;
   std::vector<std::unique_ptr<gd::ExternalLayout> >

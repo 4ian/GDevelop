@@ -846,11 +846,10 @@ const resolveInstanceAnchor = ({
   return { success: true, anchor };
 };
 
-// A custom object renders its child INSTANCES, not its child objects: a
-// variant declaring children with no instance placed renders nothing at all
-// (and the engine falls back to a 1x1x1 size, so nothing is visible and no
-// geometry is right). Said on every edit of such a variant, because the AI
-// reads the result of its last call more surely than the project.
+// Missing initial instances can be a mistake for custom objects composed of
+// children, but are intentional for extensions that draw directly or create
+// children at runtime. Report the observation without claiming a rendering
+// failure or telling the AI to add instances unconditionally.
 const getVariantWithoutInstancesNotice = (
   resolvedScope: ResolvedScope
 ): string => {
@@ -859,7 +858,7 @@ const getVariantWithoutInstancesNotice = (
   const childObjectsCount = objectsContainer.getObjectsCount();
   if (childObjectsCount === 0 || initialInstances.getInstancesCount() > 0)
     return '';
-  return ` ${label} has ${childObjectsCount} child object(s) but no instance placed: it renders nothing and its size falls back to 1x1x1. Place them with \`put_3d_instances\`/\`put_2d_instances\` on this same \`custom_object_variant\` scope.`;
+  return ` ${label} has ${childObjectsCount} child object(s) but no initial instance placed. This can be intentional if extension code draws the object or creates children at runtime. If it relies on placed child instances, add them with \`put_3d_instances\`/\`put_2d_instances\` on this same \`custom_object_variant\` scope.`;
 };
 
 const VARIANT_WITHOUT_INSTANCES_HINT_CODE = 'custom-object-has-no-instance';
@@ -878,7 +877,7 @@ const addVariantWithoutInstancesHint = (
     code: VARIANT_WITHOUT_INSTANCES_HINT_CODE,
     message: `${
       resolvedScope.label
-    } had child objects but no instance of them: a custom object renders its child instances, and with none it renders nothing. Check that each child now has at least one instance (\`describe_instances\` on this \`custom_object_variant\` scope, \`put_3d_instances\`/\`put_2d_instances\` to place them), then set its default size with \`change_custom_object({ fit_area_to_children })\`.`,
+    } had child objects but no initial instance of them. This can be intentional if extension code draws the object or creates children at runtime. If it relies on placed child instances, check them with \`describe_instances\` on this \`custom_object_variant\` scope, place missing instances with \`put_3d_instances\`/\`put_2d_instances\`, then set its default size with \`change_custom_object({ fit_area_to_children })\`.`,
     objectNames: [],
   };
   output.hints = output.hints ? [...output.hints, hint] : [hint];

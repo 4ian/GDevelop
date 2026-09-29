@@ -701,7 +701,6 @@ export class LayoutFolderOrLayout extends EmscriptenObject {
   getChildPosition(child: LayoutFolderOrLayout): number;
   getParent(): LayoutFolderOrLayout;
   insertNewFolder(name: string, newPosition: number): LayoutFolderOrLayout;
-  getOrCreateFolderChild(name: string): LayoutFolderOrLayout;
   moveFolderOrItemToAnotherFolder(folderOrItem: LayoutFolderOrLayout, newParentFolder: LayoutFolderOrLayout, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: LayoutFolderOrLayout): void;
@@ -723,7 +722,6 @@ export class ExternalLayoutFolderOrExternalLayout extends EmscriptenObject {
   getChildPosition(child: ExternalLayoutFolderOrExternalLayout): number;
   getParent(): ExternalLayoutFolderOrExternalLayout;
   insertNewFolder(name: string, newPosition: number): ExternalLayoutFolderOrExternalLayout;
-  getOrCreateFolderChild(name: string): ExternalLayoutFolderOrExternalLayout;
   moveFolderOrItemToAnotherFolder(folderOrItem: ExternalLayoutFolderOrExternalLayout, newParentFolder: ExternalLayoutFolderOrExternalLayout, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ExternalLayoutFolderOrExternalLayout): void;
@@ -745,7 +743,6 @@ export class ExternalEventsFolderOrExternalEvents extends EmscriptenObject {
   getChildPosition(child: ExternalEventsFolderOrExternalEvents): number;
   getParent(): ExternalEventsFolderOrExternalEvents;
   insertNewFolder(name: string, newPosition: number): ExternalEventsFolderOrExternalEvents;
-  getOrCreateFolderChild(name: string): ExternalEventsFolderOrExternalEvents;
   moveFolderOrItemToAnotherFolder(folderOrItem: ExternalEventsFolderOrExternalEvents, newParentFolder: ExternalEventsFolderOrExternalEvents, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ExternalEventsFolderOrExternalEvents): void;
@@ -767,7 +764,6 @@ export class TestFolderOrTest extends EmscriptenObject {
   getChildPosition(child: TestFolderOrTest): number;
   getParent(): TestFolderOrTest;
   insertNewFolder(name: string, newPosition: number): TestFolderOrTest;
-  getOrCreateFolderChild(name: string): TestFolderOrTest;
   moveFolderOrItemToAnotherFolder(folderOrItem: TestFolderOrTest, newParentFolder: TestFolderOrTest, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: TestFolderOrTest): void;

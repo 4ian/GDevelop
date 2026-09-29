@@ -4,21 +4,11 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { unserializeFromJSObject } from '../Utils/Serializer';
-import { addFolderIn } from './ProjectItemFolderTreeViewItemContent';
+import { ProjectItemInFolder } from './ProjectItemInFolder';
 import {
   type ProjectItemFoldersKind,
-  buildMoveToFolderSubmenu,
-  getFolderOrItemTreeViewItemId,
-  isFolderOrItemDescendantOf,
-  getFolderOrItemIndex,
-  moveFolderOrItemAt,
+  type ProjectItemFolderOrItem,
 } from './ProjectItemFolders';
-import {
-  copyFolderOrItemToClipboard,
-  pasteFolderOrItemsFromClipboard,
-  hasFolderOrItemsInClipboard,
-  getPasteMenuLabel,
-} from './ProjectItemFoldersClipboard';
 import {
   type TreeViewItemContent,
   type TreeItemProps,
@@ -29,7 +19,11 @@ import IconButton from '../UI/IconButton';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
 
 export type GameplayTestTreeViewItemCallbacks = {|
-  onDeleteGameplayTest: gdTest => void,
+  // Resolves to true once removed (after the user confirmed).
+  onDeleteGameplayTests: (
+    Array<gdTest>,
+    options?: {| folderName?: string |}
+  ) => Promise<boolean>,
   onRenameGameplayTest: (string, string) => void,
   onOpenGameplayTest: string => void,
   onRunGameplayTest: string => void | Promise<void>,
@@ -69,35 +63,36 @@ export const gameplayTestFoldersKind: ProjectItemFoldersKind = {
   },
   legacyClipboard: { kind: 'Gameplay test', itemProperty: 'test' },
   addItemLabel: t`Add a gameplay test`,
-  removeFolderMessage: t`The gameplay tests and folders it contains will be moved out of it, not removed. Do you want to continue?`,
 };
 
 export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
   test: gdTest;
   // The node of the folder structure holding this item.
-  folderOrItem: gdTestFolderOrTest;
+  folderOrItem: ProjectItemFolderOrItem;
+  inFolder: ProjectItemInFolder;
   props: GameplayTestTreeViewItemProps;
 
   constructor(
     test: gdTest,
-    folderOrItem: gdTestFolderOrTest,
+    folderOrItem: ProjectItemFolderOrItem,
     props: GameplayTestTreeViewItemProps
   ) {
     this.test = test;
     this.folderOrItem = folderOrItem;
+    this.inFolder = new ProjectItemInFolder(
+      gameplayTestFoldersKind,
+      folderOrItem,
+      props
+    );
     this.props = props;
   }
 
-  getFolderOrItem(): gdTestFolderOrTest {
+  getFolderOrItem(): ProjectItemFolderOrItem {
     return this.folderOrItem;
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return isFolderOrItemDescendantOf(
-      gameplayTestFoldersKind,
-      this.folderOrItem,
-      itemContent
-    );
+    return this.inFolder.isDescendantOf(itemContent);
   }
 
   getRootId(): string {
@@ -151,17 +146,7 @@ export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
       {
         type: 'separator',
       },
-      {
-        label: i18n._(t`Move to folder`),
-        submenu: buildMoveToFolderSubmenu(
-          i18n,
-          gameplayTestFoldersKind,
-          this.props.project,
-          this.folderOrItem,
-          () => this._onFolderStructureModified(),
-          () => this._addFolderInParent()
-        ),
-      },
+      this.inFolder.buildMoveToFolderMenuItem(i18n),
       {
         type: 'separator',
       },
@@ -188,12 +173,7 @@ export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
         click: () => this.cut(),
         accelerator: 'CmdOrCtrl+X',
       },
-      {
-        label: getPasteMenuLabel(i18n, gameplayTestFoldersKind),
-        enabled: hasFolderOrItemsInClipboard(gameplayTestFoldersKind),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
-      },
+      this.inFolder.buildPasteMenuItem(i18n, () => this.paste()),
       {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
@@ -217,20 +197,22 @@ export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this.props.onDeleteGameplayTest(this.test);
+    this.props.onDeleteGameplayTests([this.test]);
   }
 
   getIndex(): number {
-    return getFolderOrItemIndex(this.folderOrItem);
+    return this.inFolder.getIndex();
   }
 
-  moveAt(destinationIndex: number, targetFolder?: gdTestFolderOrTest): void {
-    moveFolderOrItemAt(this.folderOrItem, destinationIndex, targetFolder);
-    this._onFolderStructureModified();
+  moveAt(
+    destinationIndex: number,
+    targetFolder?: ProjectItemFolderOrItem
+  ): void {
+    this.inFolder.moveAt(destinationIndex, targetFolder);
   }
 
   copy(): void {
-    copyFolderOrItemToClipboard(gameplayTestFoldersKind, this.folderOrItem);
+    this.inFolder.copy();
   }
 
   cut(): void {
@@ -239,52 +221,12 @@ export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    const pastedContent = pasteFolderOrItemsFromClipboard({
-      kind: gameplayTestFoldersKind,
-      project: this.props.project,
-      destinationFolder: this.folderOrItem.getParent(),
-      positionInFolder: this.getIndex() + 1,
-    });
-    if (!pastedContent) return;
-
-    this._onFolderStructureModified();
-    const firstPastedItem = pastedContent.topLevelFolderOrItems[0];
-    if (firstPastedItem) {
-      this.props.editName(
-        getFolderOrItemTreeViewItemId(gameplayTestFoldersKind, firstPastedItem)
-      );
-    }
+    this.inFolder.paste();
   }
 
   _duplicate(): void {
     this.copy();
     this.paste();
-  }
-
-  _onProjectItemModified() {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.props.forceUpdate();
-  }
-
-  _addFolderInParent(): void {
-    addFolderIn(
-      {
-        ...this.props,
-        kind: gameplayTestFoldersKind,
-        onProjectItemModified: () => this._onProjectItemModified(),
-      },
-      this.folderOrItem.getParent()
-    );
-  }
-
-  /**
-   * The tree view caches the children of each item, so it must also be told to
-   * rebuild them when the folder structure itself changed.
-   */
-  _onFolderStructureModified() {
-    this._onProjectItemModified();
-    this.props.forceUpdateList();
   }
 
   getRightButton(i18n: I18nType): any {

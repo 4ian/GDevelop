@@ -897,6 +897,23 @@ namespace gdjs {
       );
     }
 
+    sendObjectPropertiesChanges(
+      objectName: string,
+      properties: { [propertyName: string]: string }
+    ): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'updateObjectProperties',
+          editorId: inGameEditor.getEditorId(),
+          payload: { objectName, properties },
+        })
+      );
+    }
+
     sendOpenContextMenu(cursorX: float, cursorY: float): void {
       const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {

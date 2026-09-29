@@ -16,14 +16,22 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
-import { buildMoveToFolderSubmenu } from './SceneTreeViewHelpers';
+import { addFolderIn } from './ProjectItemFolderTreeViewItemContent';
 import {
-  copySceneFolderOrLayoutToClipboard,
-  pasteSceneFolderOrLayoutsFromClipboard,
-  hasSceneFolderOrLayoutsInClipboard,
+  type ProjectItemFoldersKind,
+  buildMoveToFolderSubmenu,
+  getFolderOrItemTreeViewItemId,
+  isFolderOrItemDescendantOf,
+  getFolderOrItemIndex,
+  moveFolderOrItemAt,
+  moveNewItemToFolder,
+} from './ProjectItemFolders';
+import {
+  copyFolderOrItemToClipboard,
+  pasteFolderOrItemsFromClipboard,
+  hasFolderOrItemsInClipboard,
   getPasteMenuLabel,
-} from './SceneFolderOrLayoutsClipboard';
+} from './ProjectItemFoldersClipboard';
 
 const styles = {
   tooltip: { marginRight: 5, verticalAlign: 'bottom' },
@@ -67,6 +75,30 @@ export const getSceneTreeViewItemId = (scene: gdLayout): string => {
   return `scene-${scene.ptr}`;
 };
 
+export const sceneFoldersKind: ProjectItemFoldersKind = {
+  name: 'scene',
+  getRootId: () => scenesRootFolderId,
+  getRootFolder: project => project.getLayoutsRootFolder(),
+  hasItemNamed: (project, name) => project.hasLayoutNamed(name),
+  getItemTreeViewItemId: getSceneTreeViewItemId,
+  insertItemFromSerializedContent: (project, name, serializedLayout) => {
+    const newLayout = project.insertNewLayout(name, project.getLayoutsCount());
+    unserializeFromJSObject(
+      newLayout,
+      serializedLayout,
+      'unserializeFrom',
+      project
+    );
+    // Unserialization has overwritten the name.
+    newLayout.setName(name);
+    newLayout.updateBehaviorsSharedData(project);
+    return newLayout;
+  },
+  legacyClipboard: { kind: 'Layout', itemProperty: 'layout' },
+  addItemLabel: t`Add a scene`,
+  removeFolderMessage: t`The scenes and folders it contains will be moved out of it, not removed. Do you want to continue?`,
+};
+
 export class SceneTreeViewItemContent implements TreeViewItemContent {
   scene: gdLayout;
   // The node of the scenes folder structure holding this scene. Keeping it
@@ -85,21 +117,16 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
-  getLayoutFolderOrLayout(): gdLayoutFolderOrLayout {
+  getFolderOrItem(): gdLayoutFolderOrLayout {
     return this.layoutFolderOrLayout;
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    if (itemContent.getId() === scenesRootFolderId) return true;
-
-    let currentParent = this.layoutFolderOrLayout.getParent();
-    while (!currentParent.isRootFolder()) {
-      if (getSceneFolderTreeViewItemId(currentParent) === itemContent.getId()) {
-        return true;
-      }
-      currentParent = currentParent.getParent();
-    }
-    return false;
+    return isFolderOrItemDescendantOf(
+      sceneFoldersKind,
+      this.layoutFolderOrLayout,
+      itemContent
+    );
   }
 
   getRootId(): string {
@@ -199,6 +226,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Move to folder`),
         submenu: buildMoveToFolderSubmenu(
           i18n,
+          sceneFoldersKind,
           project,
           layoutFolderOrLayout,
           () => this._onFolderStructureModified(),
@@ -232,8 +260,8 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
         accelerator: 'CmdOrCtrl+X',
       },
       {
-        label: getPasteMenuLabel(i18n),
-        enabled: hasSceneFolderOrLayoutsInClipboard(),
+        label: getPasteMenuLabel(i18n, sceneFoldersKind),
+        enabled: hasFolderOrItemsInClipboard(sceneFoldersKind),
         click: () => this.paste(),
         accelerator: 'CmdOrCtrl+V',
       },
@@ -277,39 +305,23 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   getIndex(): number {
-    return this.layoutFolderOrLayout
-      .getParent()
-      .getChildPosition(this.layoutFolderOrLayout);
+    return getFolderOrItemIndex(this.layoutFolderOrLayout);
   }
 
   moveAt(
     destinationIndex: number,
     targetFolder?: gdLayoutFolderOrLayout
   ): void {
-    const currentParentFolder = this.layoutFolderOrLayout.getParent();
-    const destinationFolder = targetFolder || currentParentFolder;
-
-    if (destinationFolder === currentParentFolder) {
-      const originIndex = this.getIndex();
-      if (destinationIndex === originIndex) return;
-      currentParentFolder.moveChild(
-        originIndex,
-        // When moving the item down, it must not be counted.
-        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
-      );
-    } else {
-      currentParentFolder.moveLayoutFolderOrLayoutToAnotherFolder(
-        this.layoutFolderOrLayout,
-        destinationFolder,
-        destinationIndex
-      );
-    }
-
+    moveFolderOrItemAt(
+      this.layoutFolderOrLayout,
+      destinationIndex,
+      targetFolder
+    );
     this._onFolderStructureModified();
   }
 
   copy(): void {
-    copySceneFolderOrLayoutToClipboard(this.layoutFolderOrLayout);
+    copyFolderOrItemToClipboard(sceneFoldersKind, this.layoutFolderOrLayout);
   }
 
   cut(): void {
@@ -318,7 +330,8 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    const pastedContent = pasteSceneFolderOrLayoutsFromClipboard({
+    const pastedContent = pasteFolderOrItemsFromClipboard({
+      kind: sceneFoldersKind,
       project: this.props.project,
       destinationFolder: this.layoutFolderOrLayout.getParent(),
       positionInFolder: this.getIndex() + 1,
@@ -326,15 +339,13 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     if (!pastedContent) return;
 
     this._onFolderStructureModified();
-    const firstPastedItem = pastedContent.topLevelLayoutFolderOrLayouts[0];
+    const firstPastedItem = pastedContent.topLevelFolderOrItems[0];
     if (firstPastedItem) {
       this.props.editName(
-        firstPastedItem.isFolder()
-          ? getSceneFolderTreeViewItemId(firstPastedItem)
-          : getSceneTreeViewItemId(firstPastedItem.getLayout())
+        getFolderOrItemTreeViewItemId(sceneFoldersKind, firstPastedItem)
       );
     }
-    if (pastedContent.createdLayouts.length > 0) this.props.onSceneAdded();
+    if (pastedContent.createdItems.length > 0) this.props.onSceneAdded();
   }
 
   _duplicate(): void {
@@ -343,7 +354,13 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       project.hasLayoutNamed(name)
     );
 
-    const newScene = project.insertNewLayoutInFolder(
+    const newScene = project.insertNewLayout(
+      newName,
+      project.getLayoutsCount()
+    );
+    moveNewItemToFolder(
+      sceneFoldersKind,
+      project,
       newName,
       this.layoutFolderOrLayout.getParent(),
       this.getIndex() + 1
@@ -370,22 +387,11 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   }
 
-  /**
-   * Add a new folder next to this scene and start editing its name, like the
-   * objects list does.
-   */
   _addFolderInParent(): void {
-    const parentFolder = this.layoutFolderOrLayout.getParent();
-    const newFolder = parentFolder.insertNewFolder('NewFolder', 0);
-
-    this._onFolderStructureModified();
-    this.props.expandFolders([
-      parentFolder.isRootFolder()
-        ? scenesRootFolderId
-        : getSceneFolderTreeViewItemId(parentFolder),
-    ]);
-    // We focus it so the user can edit the name directly.
-    this.props.editName(getSceneFolderTreeViewItemId(newFolder));
+    addFolderIn(
+      { ...this.props, kind: sceneFoldersKind },
+      this.layoutFolderOrLayout.getParent()
+    );
   }
 
   /**

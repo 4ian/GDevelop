@@ -96,6 +96,9 @@ declare class libGDevelop {
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
   LayoutFolderOrLayout: Class<gdLayoutFolderOrLayout>;
+  ExternalLayoutFolderOrExternalLayout: Class<gdExternalLayoutFolderOrExternalLayout>;
+  ExternalEventsFolderOrExternalEvents: Class<gdExternalEventsFolderOrExternalEvents>;
+  TestFolderOrTest: Class<gdTestFolderOrTest>;
   ObjectsContainersList_VariableExistence: Class<ObjectsContainersList_VariableExistence>;
   ObjectsContainersList: Class<gdObjectsContainersList>;
   ProjectScopedContainers: Class<gdProjectScopedContainers>;

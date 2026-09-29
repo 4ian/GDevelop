@@ -11,7 +11,7 @@
 
 #include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Project/ExtensionProperties.h"
-#include "GDCore/Project/LayoutFolderOrLayout.h"
+#include "GDCore/Project/ProjectItemFolderOrItem.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -653,17 +653,6 @@ class GD_CORE_API Project {
   gd::Layout& InsertLayout(const Layout& layout, std::size_t position);
 
   /**
-   * \brief Add a new empty layout called "name" at the given position in the
-   * given folder of the layouts folder structure.
-   *
-   * \note The new layout is added at the end of the layouts list: the position
-   * in the folder structure is what defines the order shown to the user.
-   */
-  gd::Layout& InsertNewLayoutInFolder(const gd::String& name,
-                                      gd::LayoutFolderOrLayout& folder,
-                                      std::size_t position);
-
-  /**
    * \brief Delete layout named "name".
    */
   void RemoveLayout(const gd::String& name);
@@ -683,15 +672,6 @@ class GD_CORE_API Project {
   const gd::LayoutFolderOrLayout& GetLayoutsRootFolder() const {
     return *layoutsRootFolder;
   }
-
-  /**
-   * \brief Add in the root folder any layout that is not already somewhere in
-   * the folder structure.
-   *
-   * This is used for projects saved before the folder structure existed, and
-   * to be robust to a folder structure that would not contain all the layouts.
-   */
-  void AddMissingLayoutsInRootFolder();
 
   ///@}
 
@@ -803,6 +783,14 @@ class GD_CORE_API Project {
    * \brief Delete external events named "name".
    */
   void RemoveExternalEvents(const gd::String& name);
+
+  /**
+   * \brief Return the root folder used to organize the external events in
+   * folders.
+   */
+  gd::ExternalEventsFolderOrExternalEvents& GetExternalEventsRootFolder() {
+    return *externalEventsRootFolder;
+  }
   ///@}
 
   /** \name Tests management
@@ -901,6 +889,14 @@ class GD_CORE_API Project {
    * \brief Delete external layout named "name".
    */
   void RemoveExternalLayout(const gd::String& name);
+
+  /**
+   * \brief Return the root folder used to organize the external layouts in
+   * folders.
+   */
+  gd::ExternalLayoutFolderOrExternalLayout& GetExternalLayoutsRootFolder() {
+    return *externalLayoutsRootFolder;
+  }
 
   /**
    * Set the first layout of the project.
@@ -1218,6 +1214,9 @@ class GD_CORE_API Project {
   gd::ObjectsContainer objectsContainer;
   std::vector<std::unique_ptr<gd::ExternalLayout> >
       externalLayouts;  ///< List of all externals layouts
+  std::unique_ptr<gd::ExternalLayoutFolderOrExternalLayout>
+      externalLayoutsRootFolder;  ///< Folder structure used to organize the
+                                  ///< external layouts.
   std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >
       eventsFunctionsExtensions;
   gd::ResourcesContainer
@@ -1255,6 +1254,9 @@ class GD_CORE_API Project {
   gd::Watermark watermark;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;  ///< List of all externals events
+  std::unique_ptr<gd::ExternalEventsFolderOrExternalEvents>
+      externalEventsRootFolder;  ///< Folder structure used to organize the
+                                 ///< external events.
   gd::TestsContainer tests;  ///< The tests of the project.
   ExtensionProperties
       extensionProperties;  ///< The properties of the extensions.

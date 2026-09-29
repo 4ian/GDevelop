@@ -708,33 +708,97 @@ interface Project {
     boolean STATIC_IsNameSafe([Const] DOMString name);
     [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
 
-    [Ref] Layout InsertNewLayoutInFolder([Const] DOMString name, [Ref] LayoutFolderOrLayout folder, unsigned long position);
     [Ref] LayoutFolderOrLayout GetLayoutsRootFolder();
+    [Ref] ExternalLayoutFolderOrExternalLayout GetExternalLayoutsRootFolder();
+    [Ref] ExternalEventsFolderOrExternalEvents GetExternalEventsRootFolder();
 };
 
 interface LayoutFolderOrLayout {
     void LayoutFolderOrLayout();
     boolean IsFolder();
     boolean IsRootFolder();
-    [Ref] Layout GetLayout();
+    [Ref] Layout GetItem();
     [Const, Ref] DOMString GetFolderName();
     void SetFolderName([Const] DOMString name);
-    boolean HasLayoutNamed([Const] DOMString name);
-    [Ref] LayoutFolderOrLayout GetLayoutNamed([Const] DOMString name);
+    boolean HasItemNamed([Const] DOMString name);
+    [Ref] LayoutFolderOrLayout GetItemNamed([Const] DOMString name);
     unsigned long GetChildrenCount();
     [Ref] LayoutFolderOrLayout GetChildAt(unsigned long pos);
-    [Ref] LayoutFolderOrLayout GetLayoutChild([Const] DOMString name);
+    [Ref] LayoutFolderOrLayout GetItemChild([Const] DOMString name);
     unsigned long GetChildPosition([Const, Ref] LayoutFolderOrLayout child);
     [Ref] LayoutFolderOrLayout GetParent();
-    void InsertLayout(Layout layout, unsigned long position);
     [Ref] LayoutFolderOrLayout InsertNewFolder([Const] DOMString name, unsigned long newPosition);
     [Ref] LayoutFolderOrLayout GetOrCreateFolderChild([Const] DOMString name);
-    void MoveLayoutFolderOrLayoutToAnotherFolder([Ref] LayoutFolderOrLayout layoutFolderOrLayout, [Ref] LayoutFolderOrLayout newParentFolder, unsigned long newPosition);
+    void MoveFolderOrItemToAnotherFolder([Ref] LayoutFolderOrLayout folderOrItem, [Ref] LayoutFolderOrLayout newParentFolder, unsigned long newPosition);
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] LayoutFolderOrLayout childToRemove);
-    void RemoveRecursivelyLayoutNamed([Const] DOMString name);
-    boolean IsADescendantOf([Const, Ref] LayoutFolderOrLayout otherLayoutFolderOrLayout);
-    void Clear();
+    boolean IsADescendantOf([Const, Ref] LayoutFolderOrLayout otherFolderOrItem);
+};
+
+interface ExternalLayoutFolderOrExternalLayout {
+    void ExternalLayoutFolderOrExternalLayout();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] ExternalLayout GetItem();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasItemNamed([Const] DOMString name);
+    [Ref] ExternalLayoutFolderOrExternalLayout GetItemNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] ExternalLayoutFolderOrExternalLayout GetChildAt(unsigned long pos);
+    [Ref] ExternalLayoutFolderOrExternalLayout GetItemChild([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] ExternalLayoutFolderOrExternalLayout child);
+    [Ref] ExternalLayoutFolderOrExternalLayout GetParent();
+    [Ref] ExternalLayoutFolderOrExternalLayout InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    [Ref] ExternalLayoutFolderOrExternalLayout GetOrCreateFolderChild([Const] DOMString name);
+    void MoveFolderOrItemToAnotherFolder([Ref] ExternalLayoutFolderOrExternalLayout folderOrItem, [Ref] ExternalLayoutFolderOrExternalLayout newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] ExternalLayoutFolderOrExternalLayout childToRemove);
+    boolean IsADescendantOf([Const, Ref] ExternalLayoutFolderOrExternalLayout otherFolderOrItem);
+};
+
+interface ExternalEventsFolderOrExternalEvents {
+    void ExternalEventsFolderOrExternalEvents();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] ExternalEvents GetItem();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasItemNamed([Const] DOMString name);
+    [Ref] ExternalEventsFolderOrExternalEvents GetItemNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] ExternalEventsFolderOrExternalEvents GetChildAt(unsigned long pos);
+    [Ref] ExternalEventsFolderOrExternalEvents GetItemChild([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] ExternalEventsFolderOrExternalEvents child);
+    [Ref] ExternalEventsFolderOrExternalEvents GetParent();
+    [Ref] ExternalEventsFolderOrExternalEvents InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    [Ref] ExternalEventsFolderOrExternalEvents GetOrCreateFolderChild([Const] DOMString name);
+    void MoveFolderOrItemToAnotherFolder([Ref] ExternalEventsFolderOrExternalEvents folderOrItem, [Ref] ExternalEventsFolderOrExternalEvents newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] ExternalEventsFolderOrExternalEvents childToRemove);
+    boolean IsADescendantOf([Const, Ref] ExternalEventsFolderOrExternalEvents otherFolderOrItem);
+};
+
+interface TestFolderOrTest {
+    void TestFolderOrTest();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] Test GetItem();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasItemNamed([Const] DOMString name);
+    [Ref] TestFolderOrTest GetItemNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] TestFolderOrTest GetChildAt(unsigned long pos);
+    [Ref] TestFolderOrTest GetItemChild([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] TestFolderOrTest child);
+    [Ref] TestFolderOrTest GetParent();
+    [Ref] TestFolderOrTest InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    [Ref] TestFolderOrTest GetOrCreateFolderChild([Const] DOMString name);
+    void MoveFolderOrItemToAnotherFolder([Ref] TestFolderOrTest folderOrItem, [Ref] TestFolderOrTest newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] TestFolderOrTest childToRemove);
+    boolean IsADescendantOf([Const, Ref] TestFolderOrTest otherFolderOrItem);
 };
 
 enum ObjectsContainersList_VariableExistence {
@@ -1154,6 +1218,7 @@ interface TestsContainer {
     void RemoveTest([Const] DOMString name);
     void ClearTests();
     void MoveTest(unsigned long oldIndex, unsigned long newIndex);
+    [Ref] TestFolderOrTest GetRootFolder();
     unsigned long GetTestsCount();
     unsigned long GetTestPosition([Const, Ref] Test test);
 };

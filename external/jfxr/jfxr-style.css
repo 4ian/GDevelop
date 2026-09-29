@@ -1,0 +1,20 @@
+/**
+ * Additional styles for the embedded Jsfx editor
+ */
+
+html,
+body {
+  font-family: Helvetica;
+  margin: 0;
+  height: 100%;
+  overflow-y: hidden;
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+}
+
+#jfxr-frame {
+  flex: 1;
+  border: none;
+  overflow-y: hidden;
+}

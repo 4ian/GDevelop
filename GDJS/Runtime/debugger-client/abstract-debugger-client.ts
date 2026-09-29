@@ -499,6 +499,10 @@ namespace gdjs {
           if (inGameEditor) {
             inGameEditor.zoomToFitContent(data.payload.visibleScreenArea);
           }
+        } else if (data.command === 'setVisibleScreenArea') {
+          if (inGameEditor) {
+            inGameEditor.setVisibleScreenArea(data.payload.visibleScreenArea);
+          }
         } else if (data.command === 'setSelectedLayer') {
           if (inGameEditor) {
             inGameEditor.setSelectedLayerName(data.payload.layerName);

@@ -582,6 +582,13 @@ namespace gdjs {
     return gdjs.Base3DHandler.is3D(object);
   };
 
+  type ScreenArea = {
+    minX: float;
+    minY: float;
+    maxX: float;
+    maxY: float;
+  };
+
   type AABB3D = {
     min: Point3D;
     max: Point3D;
@@ -1051,6 +1058,16 @@ namespace gdjs {
     private _editedLayerDataList: LayerData[] = [];
     private _selectedLayerName: string = '';
     private _innerArea: AABB3D | null = null;
+    /**
+     * The part of the game frame that is not covered by the editor panels,
+     * in ratios of the game frame size.
+     */
+    private _visibleScreenArea: ScreenArea = {
+      minX: 0,
+      minY: 0,
+      maxX: 1,
+      maxY: 1,
+    };
     private _threeInnerArea: THREE.Object3D | null = null;
     private _unregisterContextLostListener: (() => void) | null = null;
     private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
@@ -1756,6 +1773,7 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      this.setVisibleScreenArea(visibleScreenArea);
       if (this._innerArea) {
         this.zoomToFitArea(
           {
@@ -1791,6 +1809,7 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      this.setVisibleScreenArea(visibleScreenArea);
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
@@ -1807,6 +1826,7 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      this.setVisibleScreenArea(visibleScreenArea);
       this.zoomToFitObjects(
         this._selection.getSelectedObjects(),
         visibleScreenArea,
@@ -1983,13 +2003,20 @@ namespace gdjs {
       this._getEditorCamera().switchToOrbitAroundObject(object);
     }
 
+    setVisibleScreenArea(visibleScreenArea: ScreenArea) {
+      this._visibleScreenArea = visibleScreenArea;
+    }
+
     private _focusOnSelection() {
-      // TODO Use the center of the AABB of the whole selection instead
-      const selectedObject = this._selection.getLastSelectedObject();
-      if (!selectedObject) {
+      const selectedObjects = this._selection.getSelectedObjects();
+      if (selectedObjects.length === 0) {
         return;
       }
-      this._getEditorCamera().switchToOrbitAroundObject(selectedObject);
+      this._getEditorCamera().frameObjectsInScreenArea(
+        selectedObjects,
+        this._visibleScreenArea,
+        0.1
+      );
     }
 
     private _handleCameraMovement() {
@@ -4915,6 +4942,168 @@ namespace gdjs {
     setOrbitDistance(distance: number): void {
       this.orbitCameraControl.distance = distance;
       this.onHasCameraChanged();
+    }
+
+    /**
+     * Move the camera, keeping its orientation, so that the AABB of the objects
+     * fits in the given area of the screen (e.g. the space between the editor panels).
+     *
+     * @param objects The objects to frame.
+     * @param screenArea The area where to frame the objects, in ratios of the screen size.
+     * @param margin The ratio of the screen area size kept empty on each side.
+     */
+    frameObjectsInScreenArea(
+      objects: Array<RuntimeObject>,
+      screenArea: ScreenArea,
+      margin: float
+    ): void {
+      if (objects.length === 0) return;
+      let minX = Number.MAX_VALUE;
+      let minY = Number.MAX_VALUE;
+      let minZ = Number.MAX_VALUE;
+      let maxX = -Number.MAX_VALUE;
+      let maxY = -Number.MAX_VALUE;
+      let maxZ = -Number.MAX_VALUE;
+      for (const object of objects) {
+        const aabb = object.getAABB();
+        minX = Math.min(minX, aabb.min[0]);
+        minY = Math.min(minY, aabb.min[1]);
+        minZ = Math.min(minZ, is3D(object) ? object.getUnrotatedAABBMinZ() : 0);
+        maxX = Math.max(maxX, aabb.max[0]);
+        maxY = Math.max(maxY, aabb.max[1]);
+        maxZ = Math.max(maxZ, is3D(object) ? object.getUnrotatedAABBMaxZ() : 0);
+      }
+      const centerX = (minX + maxX) / 2;
+      const centerY = (minY + maxY) / 2;
+      const centerZ = (minZ + maxZ) / 2;
+
+      // Keep the orientation of the camera that is currently used.
+      const activeCamera = this.getActiveCamera();
+      const yaw = gdjs.toRad(activeCamera.rotationAngle + 90);
+      const elevation = gdjs.toRad(activeCamera.elevationAngle);
+      const forward: Point3D = [
+        -Math.cos(yaw) * Math.cos(elevation),
+        -Math.sin(yaw) * Math.cos(elevation),
+        -Math.sin(elevation),
+      ];
+      const right: Point3D = [Math.sin(yaw), -Math.cos(yaw), 0];
+      // up = forward x right
+      const up: Point3D = [
+        forward[1] * right[2] - forward[2] * right[1],
+        forward[2] * right[0] - forward[0] * right[2],
+        forward[0] * right[1] - forward[1] * right[0],
+      ];
+
+      // Express the AABB corners in the camera basis, relatively to the AABB center.
+      const cornersRight: Array<float> = [];
+      const cornersUp: Array<float> = [];
+      const cornersDepth: Array<float> = [];
+      for (const cornerX of [minX, maxX]) {
+        for (const cornerY of [minY, maxY]) {
+          for (const cornerZ of [minZ, maxZ]) {
+            const deltaX = cornerX - centerX;
+            const deltaY = cornerY - centerY;
+            const deltaZ = cornerZ - centerZ;
+            cornersRight.push(
+              deltaX * right[0] + deltaY * right[1] + deltaZ * right[2]
+            );
+            cornersUp.push(deltaX * up[0] + deltaY * up[1] + deltaZ * up[2]);
+            cornersDepth.push(
+              deltaX * forward[0] + deltaY * forward[1] + deltaZ * forward[2]
+            );
+          }
+        }
+      }
+
+      // The screen area in normalized device coordinates (y going up), with the margin.
+      const areaWidth = screenArea.maxX - screenArea.minX;
+      const areaHeight = screenArea.maxY - screenArea.minY;
+      if (areaWidth <= 0 || areaHeight <= 0) return;
+      const ndcLeft = 2 * (screenArea.minX + margin * areaWidth) - 1;
+      const ndcRight = 2 * (screenArea.maxX - margin * areaWidth) - 1;
+      const ndcTop = 1 - 2 * (screenArea.minY + margin * areaHeight);
+      const ndcBottom = 1 - 2 * (screenArea.maxY - margin * areaHeight);
+
+      const runtimeGame = this.editor.getRuntimeGame();
+      const aspectRatio =
+        runtimeGame.getGameResolutionWidth() /
+        runtimeGame.getGameResolutionHeight();
+      const tanHalfVerticalFov = Math.tan(0.5 * gdjs.toRad(editorCameraFov));
+      const tanHalfHorizontalFov = tanHalfVerticalFov * aspectRatio;
+
+      // For a camera distance, the range of camera offsets (along one screen axis)
+      // that keeps every corner inside [ndcMin, ndcMax], or null if there is none.
+      const getOffsetRange = (
+        distance: float,
+        cornerOffsets: Array<float>,
+        tanHalfFov: float,
+        ndcMin: float,
+        ndcMax: float
+      ): [float, float] | null => {
+        let offsetMin = -Number.MAX_VALUE;
+        let offsetMax = Number.MAX_VALUE;
+        for (let index = 0; index < cornerOffsets.length; index++) {
+          const halfExtent = (distance + cornersDepth[index]) * tanHalfFov;
+          offsetMin = Math.max(
+            offsetMin,
+            cornerOffsets[index] - ndcMax * halfExtent
+          );
+          offsetMax = Math.min(
+            offsetMax,
+            cornerOffsets[index] - ndcMin * halfExtent
+          );
+        }
+        return offsetMin <= offsetMax ? [offsetMin, offsetMax] : null;
+      };
+      const getOffsetRanges = (distance: float) => {
+        const rightRange = getOffsetRange(
+          distance,
+          cornersRight,
+          tanHalfHorizontalFov,
+          ndcLeft,
+          ndcRight
+        );
+        const upRange = getOffsetRange(
+          distance,
+          cornersUp,
+          tanHalfVerticalFov,
+          ndcBottom,
+          ndcTop
+        );
+        return rightRange && upRange ? { rightRange, upRange } : null;
+      };
+
+      // Find the smallest distance for which the corners fit (the fitting is monotonic).
+      const minimumDistance = 10;
+      let nearDistance = Math.max(
+        minimumDistance,
+        -Math.min(...cornersDepth) + minimumDistance
+      );
+      let farDistance = nearDistance;
+      while (!getOffsetRanges(farDistance) && farDistance < 1e9) {
+        nearDistance = farDistance;
+        farDistance *= 2;
+      }
+      for (let iteration = 0; iteration < 40; iteration++) {
+        const middleDistance = (nearDistance + farDistance) / 2;
+        if (getOffsetRanges(middleDistance)) {
+          farDistance = middleDistance;
+        } else {
+          nearDistance = middleDistance;
+        }
+      }
+      const offsetRanges = getOffsetRanges(farDistance);
+      if (!offsetRanges) return;
+      const rightOffset =
+        (offsetRanges.rightRange[0] + offsetRanges.rightRange[1]) / 2;
+      const upOffset = (offsetRanges.upRange[0] + offsetRanges.upRange[1]) / 2;
+
+      this.switchToOrbitAroundPosition(
+        centerX + rightOffset * right[0] + upOffset * up[0],
+        centerY + rightOffset * right[1] + upOffset * up[1],
+        centerZ + rightOffset * right[2] + upOffset * up[2]
+      );
+      this.setOrbitDistance(farDistance);
     }
 
     step(): void {

@@ -59,15 +59,19 @@ import {
   type ProjectItemFolderOrItem,
   addFolderIn,
   getFolderTreeViewItemId,
-  getItemsInFolder,
+  enumerateItemsInFolder,
   getTopLevelFolderOrItems,
-  groupInNewFolder,
-  moveFolderOrItemsAt,
+  getSelectionTopLevelItems,
   removeFolderWithoutItems,
   getParentFolderTreeViewItemId,
   moveNewItemToFolder,
+  getClosestVisibleParentId,
+  getFoldersAscendanceWithoutRootFolder,
 } from './ProjectItemFolders';
-import { copyFolderOrItemsToClipboard } from './ProjectItemFoldersClipboard';
+import {
+  copyFolderOrItemsToClipboard,
+  getUniqueFolderName,
+} from './ProjectItemFoldersClipboard';
 import {
   ExtensionTreeViewItemContent,
   getExtensionTreeViewItemId,
@@ -270,6 +274,9 @@ const projectItemFoldersKinds: Array<ProjectItemFoldersKind> = [
   gameplayTestFoldersKind,
 ];
 
+const getProjectItemFoldersKind = (rootId: string): ?ProjectItemFoldersKind =>
+  projectItemFoldersKinds.find(kind => kind.getRootId() === rootId);
+
 /**
  * The children of the root of a section organized in folders, or its
  * placeholder when the section is empty.
@@ -277,8 +284,9 @@ const projectItemFoldersKinds: Array<ProjectItemFoldersKind> = [
 const buildFoldersSectionChildren = (
   emptyPlaceholder: TreeViewItem,
   buildItemContent: (itemNode: ProjectItemFolderOrItem) => TreeViewItemContent,
-  folderTreeViewItemProps: ProjectItemFolderTreeViewItemProps
+  folderTreeViewItemProps: ?ProjectItemFolderTreeViewItemProps
 ): Array<TreeViewItem> => {
+  if (!folderTreeViewItemProps) return [];
   const rootFolder = folderTreeViewItemProps.kind.getRootFolder(
     folderTreeViewItemProps.project
   );
@@ -666,6 +674,21 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       }
     }, []);
 
+    const animateClosestVisibleParent = React.useCallback(
+      (kind: ProjectItemFoldersKind, folderOrItem: ProjectItemFolderOrItem) => {
+        const treeView = treeViewRef.current;
+        if (!treeView) return;
+        treeView.animateItemFromId(
+          getClosestVisibleParentId(
+            kind,
+            treeView.areItemsOpenFromId,
+            folderOrItem
+          )
+        );
+      },
+      []
+    );
+
     const [
       projectPropertiesDialogOpen,
       setProjectPropertiesDialogOpen,
@@ -798,6 +821,42 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         }
       },
       [isMobile]
+    );
+
+    // The props of the folders of a kind are built with the tree, which needs
+    // `onNewFolderCreated`: they are read from this ref to select a new folder.
+    const getFolderTreeViewItemPropsRef = React.useRef<?(
+      kind: ProjectItemFoldersKind
+    ) => ?ProjectItemFolderTreeViewItemProps>(null);
+
+    const onNewFolderCreated = React.useCallback(
+      (kind: ProjectItemFoldersKind, newFolder: ProjectItemFolderOrItem) => {
+        const getFolderTreeViewItemProps =
+          getFolderTreeViewItemPropsRef.current;
+        const folderTreeViewItemProps = getFolderTreeViewItemProps
+          ? getFolderTreeViewItemProps(kind)
+          : null;
+        if (folderTreeViewItemProps) {
+          setSelectedItems([
+            new FolderTreeViewItem(
+              new ProjectItemFolderTreeViewItemContent(
+                newFolder,
+                folderTreeViewItemProps
+              ),
+              () => []
+            ),
+          ]);
+        }
+        const itemsToOpen = getFoldersAscendanceWithoutRootFolder(
+          newFolder
+        ).map(folder => getFolderTreeViewItemId(kind, folder));
+        itemsToOpen.push(kind.getRootId());
+        expandFolders(itemsToOpen);
+
+        editName(getFolderTreeViewItemId(kind, newFolder));
+        forceUpdateList();
+      },
+      [expandFolders, editName, forceUpdateList]
     );
 
     /**
@@ -1119,6 +1178,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               openSceneVariables,
               onProjectItemModified,
               expandFolders,
+              onMovedFolderOrItemToAnotherFolder: animateClosestVisibleParent,
+              onNewFolderCreated,
             }
           : null,
       [
@@ -1139,6 +1200,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         openSceneVariables,
         onProjectItemModified,
         expandFolders,
+        animateClosestVisibleParent,
+        onNewFolderCreated,
       ]
     );
 
@@ -1157,6 +1220,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               showDeleteConfirmation,
               onProjectItemModified,
               expandFolders,
+              onMovedFolderOrItemToAnotherFolder: animateClosestVisibleParent,
+              onNewFolderCreated,
               // A removed folder is destroyed: it must not stay selected, or
               // the shortcuts (paste...) would act on it.
               onFolderRemoved: () => setSelectedItems([]),
@@ -1174,6 +1239,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         showDeleteConfirmation,
         onProjectItemModified,
         expandFolders,
+        animateClosestVisibleParent,
+        onNewFolderCreated,
       ]
     );
 
@@ -1202,9 +1269,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       |} => {
         if (selectedItems.length === 0) return null;
         const rootId = selectedItems[0].content.getRootId();
-        const kind = projectItemFoldersKinds.find(
-          folderKind => folderKind.getRootId() === rootId
-        );
+        const kind = getProjectItemFoldersKind(rootId);
         if (!kind) return null;
 
         const folderOrItems = getTopLevelFolderOrItems(
@@ -1224,30 +1289,32 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
      */
     const groupSelectionInFolder = React.useCallback(
       () => {
+        if (!project) return;
         const selection = getSelectedFolderOrItems();
         if (!selection) return;
-        const { kind, folderOrItems } = selection;
+        const { kind, folderOrItems: topLevelFolderOrItems } = selection;
 
-        const grouping = groupInNewFolder(folderOrItems);
-        if (!grouping) return;
-        const { newFolder, parentFolder } = grouping;
-
+        const rootFolder = kind.getRootFolder(project);
+        const uniqueName = getUniqueFolderName(rootFolder, 'NewFolder');
+        const newFolder = rootFolder.insertNewFolder(uniqueName, 0);
+        topLevelFolderOrItems.forEach(folderOrItem => {
+          const currentParent = folderOrItem.getParent();
+          currentParent.moveFolderOrItemToAnotherFolder(
+            folderOrItem,
+            newFolder,
+            newFolder.getChildrenCount()
+          );
+        });
+        animateClosestVisibleParent(kind, newFolder);
         onProjectItemModified();
-        forceUpdateList();
-        const newFolderId = getFolderTreeViewItemId(kind, newFolder);
-        expandFolders([
-          getParentFolderTreeViewItemId(kind, parentFolder),
-          newFolderId,
-        ]);
-        // We focus it so the user can edit the name directly.
-        editName(newFolderId);
+        onNewFolderCreated(kind, newFolder);
       },
       [
+        project,
         getSelectedFolderOrItems,
         onProjectItemModified,
-        forceUpdateList,
-        expandFolders,
-        editName,
+        animateClosestVisibleParent,
+        onNewFolderCreated,
       ]
     );
 
@@ -1288,7 +1355,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         const items = [];
         folderOrItems.forEach(folderOrItem => {
           if (folderOrItem.isFolder())
-            items.push(...getItemsInFolder(folderOrItem));
+            items.push(...enumerateItemsInFolder(folderOrItem));
           else items.push(folderOrItem.getItem());
         });
 
@@ -1398,6 +1465,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               editName,
               scrollToItem,
               expandFolders,
+              onMovedFolderOrItemToAnotherFolder: animateClosestVisibleParent,
+              onNewFolderCreated,
               onDeleteExternalEventsList,
               onRenameExternalEvents,
               onOpenExternalEvents,
@@ -1414,6 +1483,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         editName,
         scrollToItem,
         expandFolders,
+        animateClosestVisibleParent,
+        onNewFolderCreated,
         onDeleteExternalEventsList,
         onRenameExternalEvents,
         onOpenExternalEvents,
@@ -1434,6 +1505,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               editName,
               scrollToItem,
               expandFolders,
+              onMovedFolderOrItemToAnotherFolder: animateClosestVisibleParent,
+              onNewFolderCreated,
               onExternalLayoutAdded,
               onDeleteExternalLayouts,
               onRenameExternalLayout,
@@ -1451,6 +1524,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         editName,
         scrollToItem,
         expandFolders,
+        animateClosestVisibleParent,
+        onNewFolderCreated,
         onExternalLayoutAdded,
         onDeleteExternalLayouts,
         onRenameExternalLayout,
@@ -1472,6 +1547,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               editName,
               scrollToItem,
               expandFolders,
+              onMovedFolderOrItemToAnotherFolder: animateClosestVisibleParent,
+              onNewFolderCreated,
               onDeleteGameplayTests,
               onRenameGameplayTest,
               onOpenGameplayTest,
@@ -1489,12 +1566,88 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         editName,
         scrollToItem,
         expandFolders,
+        animateClosestVisibleParent,
+        onNewFolderCreated,
         onDeleteGameplayTests,
         onRenameGameplayTest,
         onOpenGameplayTest,
         onRunGameplayTest,
       ]
     );
+
+    const getFolderTreeViewItemProps = React.useCallback(
+      (kind: ProjectItemFoldersKind): ?ProjectItemFolderTreeViewItemProps => {
+        if (!project || !folderTreeViewItemCommonProps) return null;
+        if (kind === sceneFoldersKind) {
+          return {
+            ...folderTreeViewItemCommonProps,
+            kind: sceneFoldersKind,
+            addItemInFolder: (folder, i18n) =>
+              addNewScene(project.getLayoutsCount() - 1, i18n, folder),
+            onItemsAdded: onSceneAdded,
+            deleteItems: onDeleteLayouts,
+          };
+        }
+        if (kind === externalEventsFoldersKind) {
+          return {
+            ...folderTreeViewItemCommonProps,
+            kind: externalEventsFoldersKind,
+            addItemInFolder: (folder, i18n) =>
+              addExternalEvents(
+                project.getExternalEventsCount() - 1,
+                i18n,
+                folder
+              ),
+            onItemsAdded: () => {},
+            deleteItems: onDeleteExternalEventsList,
+          };
+        }
+        if (kind === externalLayoutFoldersKind) {
+          return {
+            ...folderTreeViewItemCommonProps,
+            kind: externalLayoutFoldersKind,
+            addItemInFolder: (folder, i18n) =>
+              addExternalLayout(
+                project.getExternalLayoutsCount() - 1,
+                i18n,
+                folder
+              ),
+            onItemsAdded: onExternalLayoutAdded,
+            deleteItems: onDeleteExternalLayouts,
+          };
+        }
+        if (kind === gameplayTestFoldersKind) {
+          return {
+            ...folderTreeViewItemCommonProps,
+            kind: gameplayTestFoldersKind,
+            addItemInFolder: (folder, i18n) =>
+              addGameplayTest(
+                project.getTests().getTestsCount() - 1,
+                i18n,
+                folder
+              ),
+            onItemsAdded: () => {},
+            deleteItems: onDeleteGameplayTests,
+          };
+        }
+        return null;
+      },
+      [
+        project,
+        folderTreeViewItemCommonProps,
+        addNewScene,
+        onSceneAdded,
+        onDeleteLayouts,
+        addExternalEvents,
+        onDeleteExternalEventsList,
+        addExternalLayout,
+        onExternalLayoutAdded,
+        onDeleteExternalLayouts,
+        addGameplayTest,
+        onDeleteGameplayTests,
+      ]
+    );
+    getFolderTreeViewItemPropsRef.current = getFolderTreeViewItemProps;
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
@@ -1583,18 +1736,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         itemNode,
                         sceneTreeViewItemProps
                       ),
-                    {
-                      ...folderTreeViewItemCommonProps,
-                      kind: sceneFoldersKind,
-                      addItemInFolder: (folder, i18n) =>
-                        addNewScene(
-                          project.getLayoutsCount() - 1,
-                          i18n,
-                          folder
-                        ),
-                      onItemsAdded: onSceneAdded,
-                      deleteItems: onDeleteLayouts,
-                    }
+                    getFolderTreeViewItemProps(sceneFoldersKind)
                   );
                 },
               },
@@ -1669,18 +1811,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         itemNode,
                         externalEventsTreeViewItemProps
                       ),
-                    {
-                      ...folderTreeViewItemCommonProps,
-                      kind: externalEventsFoldersKind,
-                      addItemInFolder: (folder, i18n) =>
-                        addExternalEvents(
-                          project.getExternalEventsCount() - 1,
-                          i18n,
-                          folder
-                        ),
-                      onItemsAdded: () => {},
-                      deleteItems: onDeleteExternalEventsList,
-                    }
+                    getFolderTreeViewItemProps(externalEventsFoldersKind)
                   );
                 },
               },
@@ -1721,18 +1852,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         itemNode,
                         externalLayoutTreeViewItemProps
                       ),
-                    {
-                      ...folderTreeViewItemCommonProps,
-                      kind: externalLayoutFoldersKind,
-                      addItemInFolder: (folder, i18n) =>
-                        addExternalLayout(
-                          project.getExternalLayoutsCount() - 1,
-                          i18n,
-                          folder
-                        ),
-                      onItemsAdded: onExternalLayoutAdded,
-                      deleteItems: onDeleteExternalLayouts,
-                    }
+                    getFolderTreeViewItemProps(externalLayoutFoldersKind)
                   );
                 },
               },
@@ -1772,18 +1892,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         itemNode,
                         gameplayTestTreeViewItemProps
                       ),
-                    {
-                      ...folderTreeViewItemCommonProps,
-                      kind: gameplayTestFoldersKind,
-                      addItemInFolder: (folder, i18n) =>
-                        addGameplayTest(
-                          project.getTests().getTestsCount() - 1,
-                          i18n,
-                          folder
-                        ),
-                      onItemsAdded: () => {},
-                      deleteItems: onDeleteGameplayTests,
-                    }
+                    getFolderTreeViewItemProps(gameplayTestFoldersKind)
                   );
                 },
               },
@@ -1806,13 +1915,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         project,
         sceneTreeViewItemProps,
         folderTreeViewItemCommonProps,
-        onDeleteLayouts,
-        onDeleteExternalLayouts,
-        onDeleteExternalEventsList,
-        onDeleteGameplayTests,
+        getFolderTreeViewItemProps,
         addNewFolder,
-        onSceneAdded,
-        onExternalLayoutAdded,
       ]
     );
 
@@ -1831,72 +1935,169 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [selectedItems]
     );
 
+    const moveMultipleSelectionTo = React.useCallback(
+      (
+        i18n: I18nType,
+        destinationItem: TreeViewItem,
+        where: 'before' | 'inside' | 'after'
+      ) => {
+        const topLevelSelectedItems = getSelectionTopLevelItems(
+          selectedItems,
+          item => item.content.getFolderOrItem()
+        );
+        if (topLevelSelectedItems.length === 0) return;
+
+        const destinationFolderOrItem = destinationItem.content.getFolderOrItem();
+        if (!destinationFolderOrItem) return;
+        const kind = getProjectItemFoldersKind(
+          destinationItem.content.getRootId()
+        );
+        if (!kind) return;
+
+        const allSameSection = topLevelSelectedItems.every(
+          item =>
+            item.content.getRootId() === destinationItem.content.getRootId()
+        );
+        if (!allSameSection) return;
+
+        // Do not move anything inside one of the selected folders (or into
+        // itself).
+        if (
+          topLevelSelectedItems.some(
+            item =>
+              // Destination is a descendant of a selected folder.
+              destinationItem.content.isDescendantOf(item.content) ||
+              // Destination is the selected folder itself (isDescendantOf is
+              // false for the node itself in C++, so we must check separately).
+              destinationItem.content.getId() === item.content.getId()
+          )
+        ) {
+          return;
+        }
+
+        let parent;
+        if (where === 'inside' && destinationFolderOrItem.isFolder()) {
+          parent = destinationFolderOrItem;
+        } else {
+          parent = destinationFolderOrItem.getParent();
+        }
+
+        let position =
+          where === 'inside'
+            ? 0
+            : destinationItem.content.getIndex() + (where === 'after' ? 1 : 0);
+
+        topLevelSelectedItems.forEach(item => {
+          const folderOrItem = item.content.getFolderOrItem();
+          if (!folderOrItem) return;
+          const currentParent = folderOrItem.getParent();
+          if (currentParent === parent) {
+            const fromIndex = currentParent.getChildPosition(folderOrItem);
+            let toIndex = position;
+            if (toIndex > fromIndex) toIndex -= 1;
+            currentParent.moveChild(fromIndex, toIndex);
+            position = toIndex + 1;
+          } else {
+            currentParent.moveFolderOrItemToAnotherFolder(
+              folderOrItem,
+              parent,
+              position
+            );
+            position += 1;
+          }
+        });
+
+        animateClosestVisibleParent(kind, parent);
+        onProjectItemModified();
+        onTreeModified(true);
+      },
+      [
+        selectedItems,
+        onProjectItemModified,
+        onTreeModified,
+        animateClosestVisibleParent,
+      ]
+    );
+
     const moveSelectionTo = React.useCallback(
       (
         i18n: I18nType,
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
-        if (selectedItems.length === 0) {
+        if (destinationItem.isRoot) {
           return;
         }
-        const destinationContent = destinationItem.content;
-        const selection = getSelectedFolderOrItems();
-        if (selection && selection.folderOrItems.length > 1) {
-          // Several nodes are moved together, in their order, where the
-          // dragged node would have gone.
-          const destinationFolderOrItem = destinationContent.getFolderOrItem();
-          if (!destinationFolderOrItem) return;
-          if (
-            where === 'inside' &&
-            destinationContent instanceof ProjectItemFolderTreeViewItemContent
-          ) {
-            moveFolderOrItemsAt(
-              selection.folderOrItems,
-              destinationFolderOrItem.getChildrenCount(),
-              destinationFolderOrItem
-            );
-          } else {
-            moveFolderOrItemsAt(
-              selection.folderOrItems,
-              destinationContent.getIndex() + (where === 'after' ? 1 : 0),
-              destinationFolderOrItem.getParent()
-            );
-          }
-          onProjectItemModified();
-          onTreeModified(true);
+        if (selectedItems.length > 1) {
+          moveMultipleSelectionTo(i18n, destinationItem, where);
+          return;
+        }
+        if (selectedItems.length !== 1) {
           return;
         }
         const selectedItem = selectedItems[0];
-        if (
-          where === 'inside' &&
-          destinationContent instanceof ProjectItemFolderTreeViewItemContent
-        ) {
-          // Dropping on a folder puts the item at the end of it.
-          const destinationFolder = destinationContent.getFolder();
+        const selectedFolderOrItem = selectedItem.content.getFolderOrItem();
+        if (!selectedFolderOrItem) {
+          // Items not organized in folders (extensions) are only reordered.
           selectedItem.content.moveAt(
-            destinationFolder.getChildrenCount(),
-            destinationFolder
+            destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
           );
-        } else {
-          // Dropping before or after an item organized in folders moves the
-          // dragged item in the folder of this item, which may not be the
-          // folder the dragged item comes from.
-          const destinationFolderOrItem = destinationContent.getFolderOrItem();
-          selectedItem.content.moveAt(
-            destinationContent.getIndex() + (where === 'after' ? 1 : 0),
-            destinationFolderOrItem
-              ? destinationFolderOrItem.getParent()
-              : undefined
-          );
+          onTreeModified(true);
+          return;
         }
+        if (destinationItem.content.getId() === selectedItem.content.getId()) {
+          return;
+        }
+
+        const destinationFolderOrItem = destinationItem.content.getFolderOrItem();
+        if (!destinationFolderOrItem) {
+          return;
+        }
+        const kind = getProjectItemFoldersKind(
+          selectedItem.content.getRootId()
+        );
+        if (!kind) {
+          return;
+        }
+
+        let parent;
+        if (where === 'inside' && destinationFolderOrItem.isFolder()) {
+          parent = destinationFolderOrItem;
+        } else {
+          parent = destinationFolderOrItem.getParent();
+        }
+        const selectedFolderOrItemParent = selectedFolderOrItem.getParent();
+        if (parent === selectedFolderOrItemParent) {
+          const fromIndex = selectedItem.content.getIndex();
+          let toIndex = destinationItem.content.getIndex();
+          if (toIndex > fromIndex) toIndex -= 1;
+          if (where === 'after') toIndex += 1;
+          selectedFolderOrItemParent.moveChild(fromIndex, toIndex);
+        } else {
+          if (destinationItem.content.isDescendantOf(selectedItem.content)) {
+            return;
+          }
+          const position =
+            where === 'inside'
+              ? 0
+              : destinationItem.content.getIndex() +
+                (where === 'after' ? 1 : 0);
+          selectedFolderOrItemParent.moveFolderOrItemToAnotherFolder(
+            selectedFolderOrItem,
+            parent,
+            position
+          );
+          animateClosestVisibleParent(kind, parent);
+        }
+        onProjectItemModified();
         onTreeModified(true);
       },
       [
         onTreeModified,
         selectedItems,
-        getSelectedFolderOrItems,
         onProjectItemModified,
+        moveMultipleSelectionTo,
+        animateClosestVisibleParent,
       ]
     );
 

@@ -9,7 +9,7 @@ import {
   type ProjectItemFoldersKind,
   type ProjectItemFolderOrItem,
   getFolderTreeViewItemId,
-  getItemsInFolder,
+  enumerateItemsInFolder,
   removeFolderWithoutItems,
 } from './ProjectItemFolders';
 import { ProjectItemInFolder } from './ProjectItemInFolder';
@@ -21,6 +21,14 @@ export type ProjectItemFolderTreeViewItemProps = {|
   // Called once the folder is removed (it is then destroyed).
   onFolderRemoved: () => void,
   expandFolders: (folderIds: Array<string>) => void,
+  onMovedFolderOrItemToAnotherFolder: (
+    kind: ProjectItemFoldersKind,
+    destinationFolder: ProjectItemFolderOrItem
+  ) => void,
+  onNewFolderCreated: (
+    kind: ProjectItemFoldersKind,
+    newFolder: ProjectItemFolderOrItem
+  ) => void,
   addItemInFolder: (folder: ProjectItemFolderOrItem, i18n: I18nType) => void,
   // Called when items were created by a paste.
   onItemsAdded: () => void,
@@ -163,7 +171,7 @@ export class ProjectItemFolderTreeViewItemContent
    * holding no item (only empty folders, or nothing) is removed at once.
    */
   delete(): void {
-    const items = getItemsInFolder(this.folder);
+    const items = enumerateItemsInFolder(this.folder);
     if (items.length === 0) {
       this._removeFolderWithoutItems();
       return;

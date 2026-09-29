@@ -2,11 +2,9 @@
 import {
   type ProjectItemFolderOrItem,
   getFolderOrItemIndex,
-  getItemsInFolder,
-  groupInNewFolder,
-  hasAnyItemInFolder,
+  enumerateItemsInFolder,
+  getTopLevelFolderOrItems,
   moveFolderOrItemAt,
-  moveFolderOrItemsAt,
   removeFolderWithoutItems,
 } from './ProjectItemFolders';
 
@@ -51,32 +49,6 @@ describe('ProjectItemFolders', () => {
     project.delete();
   });
 
-  it('moves several nodes together, in their order', () => {
-    const project = makeProjectWithScenes(['A', 'B', 'C', 'D']);
-    const rootFolder = project.getLayoutsRootFolder();
-    const folder = rootFolder.insertNewFolder('Folder', 4);
-    moveFolderOrItemAt(rootFolder.getItemChild('D'), 0, folder);
-
-    // Moved inside the folder, before its first item.
-    moveFolderOrItemsAt(
-      [rootFolder.getItemChild('C'), rootFolder.getItemChild('A')],
-      0,
-      folder
-    );
-    expect(getChildrenNames(rootFolder)).toEqual(['B', '[Folder]']);
-    expect(getChildrenNames(folder)).toEqual(['C', 'A', 'D']);
-
-    // Moved down in their own folder.
-    moveFolderOrItemsAt(
-      [folder.getItemChild('C'), folder.getItemChild('A')],
-      3,
-      folder
-    );
-    expect(getChildrenNames(folder)).toEqual(['D', 'C', 'A']);
-
-    project.delete();
-  });
-
   it('tells if a folder holds an item, even deep inside', () => {
     const project = makeProjectWithScenes(['A']);
     const rootFolder = project.getLayoutsRootFolder();
@@ -84,10 +56,10 @@ describe('ProjectItemFolders', () => {
     const subFolder = folder.insertNewFolder('SubFolder', 0);
 
     // Only empty folders: nothing would be moved out by removing it.
-    expect(hasAnyItemInFolder(folder)).toBe(false);
+    expect(enumerateItemsInFolder(folder)).toHaveLength(0);
 
     moveFolderOrItemAt(rootFolder.getItemChild('A'), 0, subFolder);
-    expect(hasAnyItemInFolder(folder)).toBe(true);
+    expect(enumerateItemsInFolder(folder)).toHaveLength(1);
 
     project.delete();
   });
@@ -100,10 +72,9 @@ describe('ProjectItemFolders', () => {
     moveFolderOrItemAt(rootFolder.getItemChild('A'), 1, folder);
     moveFolderOrItemAt(rootFolder.getItemChild('B'), 0, subFolder);
 
-    expect(getItemsInFolder(folder).map(scene => scene.getName())).toEqual([
-      'B',
-      'A',
-    ]);
+    expect(
+      enumerateItemsInFolder(folder).map(scene => scene.getName())
+    ).toEqual(['B', 'A']);
 
     project.delete();
   });
@@ -120,37 +91,20 @@ describe('ProjectItemFolders', () => {
     project.delete();
   });
 
-  it('groups nodes in a new folder created where the first one was', () => {
-    const project = makeProjectWithScenes(['A', 'B', 'C', 'D']);
-    const rootFolder = project.getLayoutsRootFolder();
-
-    const grouping = groupInNewFolder([
-      rootFolder.getItemChild('B'),
-      rootFolder.getItemChild('D'),
-    ]);
-    if (!grouping) throw new Error('Nothing was grouped.');
-
-    expect(grouping.parentFolder.isRootFolder()).toBe(true);
-    expect(getChildrenNames(rootFolder)).toEqual(['A', '[NewFolder]', 'C']);
-    expect(getChildrenNames(grouping.newFolder)).toEqual(['B', 'D']);
-
-    project.delete();
-  });
-
-  it('leaves a node inside another grouped node where it is', () => {
+  it('keeps only the nodes that are not inside another selected folder', () => {
     const project = makeProjectWithScenes(['A', 'B']);
     const rootFolder = project.getLayoutsRootFolder();
     const folder = rootFolder.insertNewFolder('Folder', 2);
     moveFolderOrItemAt(rootFolder.getItemChild('B'), 0, folder);
 
-    const grouping = groupInNewFolder([folder, folder.getItemChild('B')]);
-    if (!grouping) throw new Error('Nothing was grouped.');
+    const itemB = folder.getItemChild('B');
+    const itemA = rootFolder.getItemChild('A');
+    expect(getTopLevelFolderOrItems([folder, itemB, itemA])).toEqual([
+      folder,
+      itemA,
+    ]);
+    expect(getTopLevelFolderOrItems([])).toEqual([]);
 
-    expect(getChildrenNames(rootFolder)).toEqual(['A', '[NewFolder]']);
-    expect(getChildrenNames(grouping.newFolder)).toEqual(['[Folder]']);
-    expect(getChildrenNames(folder)).toEqual(['B']);
-
-    expect(groupInNewFolder([])).toBe(null);
     project.delete();
   });
 });

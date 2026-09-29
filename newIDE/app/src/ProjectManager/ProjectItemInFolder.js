@@ -24,6 +24,14 @@ import {
 type ProjectItemInFolderProps = {
   ...TreeItemProps,
   expandFolders: (folderIds: Array<string>) => void,
+  onMovedFolderOrItemToAnotherFolder: (
+    kind: ProjectItemFoldersKind,
+    destinationFolder: ProjectItemFolderOrItem
+  ) => void,
+  onNewFolderCreated: (
+    kind: ProjectItemFoldersKind,
+    newFolder: ProjectItemFolderOrItem
+  ) => void,
   // Given the props of the item, which hold its own callbacks too.
   ...
 };
@@ -125,15 +133,18 @@ export class ProjectItemInFolder {
     this.props.forceUpdateList();
   }
 
-  /** Add a new folder in the given folder, and start editing its name. */
-  addFolderIn(parentFolder: ProjectItemFolderOrItem): void {
+  /**
+   * Add a new folder in the given folder, or right after the given item, and
+   * start editing its name.
+   */
+  addFolderIn(selectedFolderOrItem: ProjectItemFolderOrItem): void {
     addFolderIn(
       {
         ...this.props,
         kind: this.kind,
         onProjectItemModified: () => this.onProjectItemModified(),
       },
-      parentFolder
+      selectedFolderOrItem
     );
   }
 
@@ -145,7 +156,13 @@ export class ProjectItemInFolder {
         this.kind,
         this.props.project,
         this.folderOrItem,
-        () => this.onFolderStructureModified(),
+        destinationFolder => {
+          this.props.onMovedFolderOrItemToAnotherFolder(
+            this.kind,
+            destinationFolder
+          );
+          this.onFolderStructureModified();
+        },
         () => this.addFolderIn(this.folderOrItem.getParent())
       ),
     };

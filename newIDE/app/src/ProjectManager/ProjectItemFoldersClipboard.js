@@ -10,6 +10,7 @@ import {
   type ProjectItemFoldersKind,
   type ProjectItemFolderOrItem,
   moveNewItemToFolder,
+  getTopLevelFolderOrItems,
 } from './ProjectItemFolders';
 
 type SerializedItemNode = {|
@@ -52,13 +53,41 @@ const serializeFolderOrItemNode = (
   };
 };
 
+type ClipboardPayload = {|
+  items: Array<SerializedNode>,
+|};
+
+/**
+ * Serialize items to an in-memory payload without touching the OS clipboard.
+ * Must be called while the C++ objects are still alive (before any deletion).
+ * Returns null when the effective top-level selection is empty.
+ */
+export const serializeFolderOrItemsForClipboard = (
+  folderOrItems: Array<ProjectItemFolderOrItem>
+): ClipboardPayload | null => {
+  const topLevelFolderOrItems = getTopLevelFolderOrItems(folderOrItems);
+  if (topLevelFolderOrItems.length === 0) return null;
+  return {
+    items: topLevelFolderOrItems.map(serializeFolderOrItemNode),
+  };
+};
+
+/**
+ * Write a previously serialized payload to the OS clipboard.
+ */
+export const writeFolderOrItemsToClipboard = (
+  kind: ProjectItemFoldersKind,
+  payload: ClipboardPayload
+): void => {
+  Clipboard.set(getClipboardKind(kind), payload);
+};
+
 export const copyFolderOrItemsToClipboard = (
   kind: ProjectItemFoldersKind,
   folderOrItems: Array<ProjectItemFolderOrItem>
 ): void => {
-  Clipboard.set(getClipboardKind(kind), {
-    items: folderOrItems.map(serializeFolderOrItemNode),
-  });
+  const payload = serializeFolderOrItemsForClipboard(folderOrItems);
+  if (payload) writeFolderOrItemsToClipboard(kind, payload);
 };
 
 export const copyFolderOrItemToClipboard = (
@@ -132,7 +161,7 @@ export const getPasteMenuLabel = (
   return i18n._(t`Paste ${content.items.length} items`);
 };
 
-const getUniqueFolderName = (
+export const getUniqueFolderName = (
   parentFolder: ProjectItemFolderOrItem,
   desiredName: string
 ): string => {

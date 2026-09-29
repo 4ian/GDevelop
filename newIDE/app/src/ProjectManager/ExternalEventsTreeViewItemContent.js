@@ -35,6 +35,14 @@ export type ExternalEventsTreeViewItemProps = {|
   ...ExternalEventsTreeViewItemCommonProps,
   project: gdProject,
   expandFolders: (folderIds: Array<string>) => void,
+  onMovedFolderOrItemToAnotherFolder: (
+    kind: ProjectItemFoldersKind,
+    destinationFolder: ProjectItemFolderOrItem
+  ) => void,
+  onNewFolderCreated: (
+    kind: ProjectItemFoldersKind,
+    newFolder: ProjectItemFolderOrItem
+  ) => void,
 |};
 
 export const getExternalEventsTreeViewItemId = (

@@ -5,6 +5,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type TreeViewItemContent } from '.';
 import { mapFor } from '../Utils/MapFor';
+import { removeSubFolders } from '../Utils/Folders';
 
 /**
  * A node of the folder structure of a list of project items: the API shared
@@ -94,45 +95,44 @@ export const getParentFolderTreeViewItemId = (
     ? kind.getRootId()
     : getFolderTreeViewItemId(kind, folder);
 
+/**
+ * Whether a node is inside the node shown by a tree view item, the root folder
+ * being shown by the root item of the kind.
+ */
 export const isFolderOrItemDescendantOf = (
   kind: ProjectItemFoldersKind,
   folderOrItem: ProjectItemFolderOrItem,
   itemContent: TreeViewItemContent
 ): boolean => {
+  // The nodes of another kind are in another folder structure.
+  if (itemContent.getRootId() !== kind.getRootId()) return false;
   if (itemContent.getId() === kind.getRootId()) return true;
-
-  let currentParent = folderOrItem.getParent();
-  while (!currentParent.isRootFolder()) {
-    if (getFolderTreeViewItemId(kind, currentParent) === itemContent.getId()) {
-      return true;
-    }
-    currentParent = currentParent.getParent();
-  }
-  return false;
+  const otherFolderOrItem = itemContent.getFolderOrItem();
+  return !!otherFolderOrItem && folderOrItem.isADescendantOf(otherFolderOrItem);
 };
 
-/** Whether an item is in this folder, or in one of its folders. */
-export const hasAnyItemInFolder = (
-  folder: ProjectItemFolderOrItem
-): boolean => {
-  for (let index = 0; index < folder.getChildrenCount(); index++) {
-    const child = folder.getChildAt(index);
-    if (!child.isFolder() || hasAnyItemInFolder(child)) return true;
-  }
-  return false;
+const recursivelyEnumerateItemsInFolder = (
+  folder: ProjectItemFolderOrItem,
+  result: Array<any>
+) => {
+  mapFor(0, folder.getChildrenCount(), i => {
+    const child = folder.getChildAt(i);
+    if (!child.isFolder()) {
+      result.push(child.getItem());
+    } else {
+      recursivelyEnumerateItemsInFolder(child, result);
+    }
+  });
 };
 
 /** The items of a folder and of its folders, in the order they are shown. */
-export const getItemsInFolder = (
+export const enumerateItemsInFolder = (
   folder: ProjectItemFolderOrItem
 ): Array<any> => {
-  const items = [];
-  for (let index = 0; index < folder.getChildrenCount(); index++) {
-    const child = folder.getChildAt(index);
-    if (child.isFolder()) items.push(...getItemsInFolder(child));
-    else items.push(child.getItem());
-  }
-  return items;
+  if (!folder.isFolder()) return [];
+  const result: Array<any> = [];
+  recursivelyEnumerateItemsInFolder(folder, result);
+  return result;
 };
 
 /**
@@ -142,13 +142,45 @@ export const getItemsInFolder = (
 export const removeFolderWithoutItems = (
   folder: ProjectItemFolderOrItem
 ): void => {
-  if (hasAnyItemInFolder(folder)) return;
-  // Collected first, as removing them changes the indices while iterating.
-  const subFolders = mapFor(0, folder.getChildrenCount(), index =>
-    folder.getChildAt(index)
-  );
-  subFolders.forEach(subFolder => removeFolderWithoutItems(subFolder));
+  if (enumerateItemsInFolder(folder).length > 0) return;
+  removeSubFolders(folder);
   folder.getParent().removeFolderChild(folder);
+};
+
+export const getFoldersAscendanceWithoutRootFolder = (
+  folderOrItem: ProjectItemFolderOrItem
+): Array<ProjectItemFolderOrItem> => {
+  if (folderOrItem.isRootFolder()) return [];
+  const parent = folderOrItem.getParent();
+  if (parent.isRootFolder()) return [];
+  return [parent, ...getFoldersAscendanceWithoutRootFolder(parent)];
+};
+
+/**
+ * Return the id of the tree view item showing a node, or of its first
+ * collapsed parent when it's hidden, like the other trees do to animate a
+ * moved item.
+ */
+export const getClosestVisibleParentId = (
+  kind: ProjectItemFoldersKind,
+  areItemsOpenFromId: (itemIds: Array<string>) => Array<boolean>,
+  folderOrItem: ProjectItemFolderOrItem
+): string => {
+  const topToBottomAscendanceId = [
+    kind.getRootId(),
+    ...getFoldersAscendanceWithoutRootFolder(folderOrItem)
+      .reverse()
+      .map(parent => getFolderTreeViewItemId(kind, parent)),
+  ];
+  const topToBottomAscendanceOpenness = areItemsOpenFromId(
+    topToBottomAscendanceId
+  );
+  const firstClosedFolderIndex = topToBottomAscendanceOpenness.indexOf(false);
+  if (firstClosedFolderIndex === -1) {
+    // If all parents are open, return the node given as input.
+    return getFolderOrItemTreeViewItemId(kind, folderOrItem);
+  }
+  return topToBottomAscendanceId[firstClosedFolderIndex];
 };
 
 export const getFolderOrItemIndex = (
@@ -184,65 +216,41 @@ export const moveFolderOrItemAt = (
 };
 
 /**
- * The nodes that are not inside another one of the nodes: a node inside a
- * folder of the list moves (or is copied, or removed) with it.
+ * Keep items whose ancestors are not also selected. A folder in the selection
+ * already carries its content, so descendants must not be operated on twice.
+ * Uses a Set of selected ptrs and one parent-chain walk per item (O(n · depth)).
  */
+export const getSelectionTopLevelItems = <T>(
+  items: $ReadOnlyArray<T>,
+  getFolderOrItem: (item: T) => ?ProjectItemFolderOrItem
+): Array<T> => {
+  const selectedPtrs = new Set<number>();
+  const resolved: Array<{|
+    item: T,
+    folderOrItem: ProjectItemFolderOrItem,
+  |}> = [];
+  items.forEach(item => {
+    const folderOrItem = getFolderOrItem(item);
+    if (!folderOrItem) return;
+    selectedPtrs.add(folderOrItem.ptr);
+    resolved.push({ item, folderOrItem });
+  });
+  return resolved
+    .filter(({ folderOrItem }) => {
+      let ancestor = folderOrItem.getParent();
+      while (!ancestor.isRootFolder()) {
+        if (selectedPtrs.has(ancestor.ptr)) return false;
+        ancestor = ancestor.getParent();
+      }
+      return true;
+    })
+    .map(({ item }) => item);
+};
+
 export const getTopLevelFolderOrItems = (
   folderOrItems: Array<ProjectItemFolderOrItem>
 ): Array<ProjectItemFolderOrItem> =>
-  folderOrItems.filter(
-    folderOrItem =>
-      !folderOrItems.some(
-        otherFolderOrItem =>
-          otherFolderOrItem !== folderOrItem &&
-          folderOrItem.isADescendantOf(otherFolderOrItem)
-      )
-  );
-
-/**
- * Move nodes, one after the other in the order given, at the given position
- * of `targetFolder`.
- */
-export const moveFolderOrItemsAt = (
-  folderOrItems: Array<ProjectItemFolderOrItem>,
-  destinationIndex: number,
-  targetFolder: ProjectItemFolderOrItem
-): void => {
-  let nextIndex = destinationIndex;
-  getTopLevelFolderOrItems(folderOrItems).forEach(folderOrItem => {
-    moveFolderOrItemAt(folderOrItem, nextIndex, targetFolder);
-    // The next one goes right after it, wherever it ended up.
-    nextIndex = getFolderOrItemIndex(folderOrItem) + 1;
-  });
-};
-
-/**
- * Move nodes of a same folder structure in a new folder, created where the
- * first of them is. A node inside another one of the nodes moves with it, so
- * it is left where it is. Returns null when there is nothing to move.
- */
-export const groupInNewFolder = (
-  folderOrItems: Array<ProjectItemFolderOrItem>
-): ?{|
-  newFolder: ProjectItemFolderOrItem,
-  parentFolder: ProjectItemFolderOrItem,
-|} => {
-  const topLevelFolderOrItems = getTopLevelFolderOrItems(folderOrItems);
-  if (topLevelFolderOrItems.length === 0) return null;
-
-  const firstFolderOrItem = topLevelFolderOrItems[0];
-  const parentFolder = firstFolderOrItem.getParent();
-  const newFolder = parentFolder.insertNewFolder(
-    'NewFolder',
-    getFolderOrItemIndex(firstFolderOrItem)
-  );
-  topLevelFolderOrItems.forEach((folderOrItem, index) => {
-    folderOrItem
-      .getParent()
-      .moveFolderOrItemToAnotherFolder(folderOrItem, newFolder, index);
-  });
-  return { newFolder, parentFolder };
-};
+  getSelectionTopLevelItems(folderOrItems, folderOrItem => folderOrItem);
 
 /**
  * Move a newly inserted item (that is at the root of the folder structure)
@@ -268,7 +276,7 @@ type EnumeratedFolder = {|
   folder: ProjectItemFolderOrItem,
 |};
 
-const enumerateFoldersInFolder = (
+const recursivelyEnumerateFoldersInFolder = (
   folder: ProjectItemFolderOrItem,
   prefix: string,
   result: Array<EnumeratedFolder>
@@ -283,9 +291,18 @@ const enumerateFoldersInFolder = (
         path: newPrefix,
         folder: child,
       });
-      enumerateFoldersInFolder(child, newPrefix, result);
+      recursivelyEnumerateFoldersInFolder(child, newPrefix, result);
     }
   });
+};
+
+export const enumerateFoldersInFolder = (
+  folder: ProjectItemFolderOrItem
+): Array<EnumeratedFolder> => {
+  if (!folder.isFolder()) return [];
+  const result: Array<EnumeratedFolder> = [];
+  recursivelyEnumerateFoldersInFolder(folder, '', result);
+  return result;
 };
 
 /**
@@ -300,14 +317,14 @@ export const buildMoveToFolderSubmenu = (
   kind: ProjectItemFoldersKind,
   project: gdProject,
   itemToMove: ProjectItemFolderOrItem,
-  onMoved: () => void,
+  onMoved: (destinationFolder: ProjectItemFolderOrItem) => void,
   onAddFolder: () => void
 ): Array<MenuItemTemplate> => {
   const rootFolder = kind.getRootFolder(project);
   const foldersAndPaths: Array<EnumeratedFolder> = [
     { path: i18n._(t`Root folder`), folder: rootFolder },
+    ...enumerateFoldersInFolder(rootFolder),
   ];
-  enumerateFoldersInFolder(rootFolder, '', foldersAndPaths);
 
   const currentParent = itemToMove.getParent();
   const filteredFoldersAndPaths = foldersAndPaths.filter(
@@ -323,7 +340,7 @@ export const buildMoveToFolderSubmenu = (
       click: () => {
         if (folder === currentParent) return;
         currentParent.moveFolderOrItemToAnotherFolder(itemToMove, folder, 0);
-        onMoved();
+        onMoved(folder);
       },
     })),
     { type: 'separator' },
@@ -335,34 +352,39 @@ export const buildMoveToFolderSubmenu = (
 };
 
 /**
- * Add a new folder at the top of the given folder and start editing its name,
- * like the objects list does.
+ * Add a new folder like the objects list does: at the top of the selected
+ * folder, or right after the selected item.
  */
 export const addFolderIn = (
   {
     kind,
     onProjectItemModified,
-    forceUpdateList,
     expandFolders,
-    editName,
+    onNewFolderCreated,
   }: {
     kind: ProjectItemFoldersKind,
     onProjectItemModified: () => void,
-    // The tree view caches the children of each item, so it must be told to
-    // rebuild them when the folder structure itself changed.
-    forceUpdateList: () => void,
     expandFolders: (folderIds: Array<string>) => void,
-    editName: (itemId: string) => void,
+    onNewFolderCreated: (
+      kind: ProjectItemFoldersKind,
+      newFolder: ProjectItemFolderOrItem
+    ) => void,
     // Given the props of a tree view item, which hold much more.
     ...
   },
-  parentFolder: ProjectItemFolderOrItem
+  selectedFolderOrItem: ProjectItemFolderOrItem
 ): void => {
-  const newFolder = parentFolder.insertNewFolder('NewFolder', 0);
-
+  let newFolder;
+  if (selectedFolderOrItem.isFolder()) {
+    newFolder = selectedFolderOrItem.insertNewFolder('NewFolder', 0);
+    expandFolders([getParentFolderTreeViewItemId(kind, selectedFolderOrItem)]);
+  } else {
+    const parentFolder = selectedFolderOrItem.getParent();
+    newFolder = parentFolder.insertNewFolder(
+      'NewFolder',
+      parentFolder.getChildPosition(selectedFolderOrItem) + 1
+    );
+  }
   onProjectItemModified();
-  forceUpdateList();
-  expandFolders([getParentFolderTreeViewItemId(kind, parentFolder)]);
-  // We focus it so the user can edit the name directly.
-  editName(getFolderTreeViewItemId(kind, newFolder));
+  onNewFolderCreated(kind, newFolder);
 };

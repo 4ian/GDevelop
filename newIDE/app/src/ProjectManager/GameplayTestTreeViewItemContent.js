@@ -38,6 +38,14 @@ export type GameplayTestTreeViewItemProps = {|
   ...GameplayTestTreeViewItemCommonProps,
   project: gdProject,
   expandFolders: (folderIds: Array<string>) => void,
+  onMovedFolderOrItemToAnotherFolder: (
+    kind: ProjectItemFoldersKind,
+    destinationFolder: ProjectItemFolderOrItem
+  ) => void,
+  onNewFolderCreated: (
+    kind: ProjectItemFoldersKind,
+    newFolder: ProjectItemFolderOrItem
+  ) => void,
 |};
 
 export const getGameplayTestTreeViewItemId = (test: gdTest): string => {

@@ -61,6 +61,14 @@ export type SceneTreeViewItemProps = {|
   openSceneVariables: (layout: ?gdLayout) => void,
   onProjectItemModified: () => void,
   expandFolders: (folderIds: Array<string>) => void,
+  onMovedFolderOrItemToAnotherFolder: (
+    kind: ProjectItemFoldersKind,
+    destinationFolder: ProjectItemFolderOrItem
+  ) => void,
+  onNewFolderCreated: (
+    kind: ProjectItemFoldersKind,
+    newFolder: ProjectItemFolderOrItem
+  ) => void,
 |};
 
 export const getSceneTreeViewItemId = (scene: gdLayout): string => {

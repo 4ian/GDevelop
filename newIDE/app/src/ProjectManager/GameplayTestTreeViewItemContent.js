@@ -3,13 +3,12 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard from '../Utils/Clipboard';
-import { SafeExtractor } from '../Utils/SafeExtractor';
+import { unserializeFromJSObject } from '../Utils/Serializer';
+import { ProjectItemInFolder } from './ProjectItemInFolder';
 import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
+  type ProjectItemFoldersKind,
+  type ProjectItemFolderOrItem,
+} from './ProjectItemFolders';
 import {
   type TreeViewItemContent,
   type TreeItemProps,
@@ -19,10 +18,12 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import IconButton from '../UI/IconButton';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
 
-const GAMEPLAY_TEST_CLIPBOARD_KIND = 'Gameplay test';
-
 export type GameplayTestTreeViewItemCallbacks = {|
-  onDeleteGameplayTest: gdTest => void,
+  // Resolves to true once removed (after the user confirmed).
+  onDeleteGameplayTests: (
+    Array<gdTest>,
+    options?: {| folderName?: string |}
+  ) => Promise<boolean>,
   onRenameGameplayTest: (string, string) => void,
   onOpenGameplayTest: string => void,
   onRunGameplayTest: string => void | Promise<void>,
@@ -36,6 +37,7 @@ export type GameplayTestTreeViewItemCommonProps = {|
 export type GameplayTestTreeViewItemProps = {|
   ...GameplayTestTreeViewItemCommonProps,
   project: gdProject,
+  expandFolders: (folderIds: Array<string>) => void,
 |};
 
 export const getGameplayTestTreeViewItemId = (test: gdTest): string => {
@@ -44,17 +46,53 @@ export const getGameplayTestTreeViewItemId = (test: gdTest): string => {
   return `gameplay-test-${test.ptr}`;
 };
 
+export const gameplayTestFoldersKind: ProjectItemFoldersKind = {
+  name: 'gameplay-test',
+  getRootId: () => gameplayTestsRootFolderId,
+  getRootFolder: project => project.getTests().getRootFolder(),
+  hasItemNamed: (project, name) => project.getTests().hasTestNamed(name),
+  getItemTreeViewItemId: getGameplayTestTreeViewItemId,
+  insertItemFromSerializedContent: (project, name, serializedItem) => {
+    const newTest = project
+      .getTests()
+      .insertNewTest(name, project.getTests().getTestsCount());
+    unserializeFromJSObject(newTest, serializedItem, 'unserializeFrom');
+    // Unserialization has overwritten the name.
+    newTest.setName(name);
+    return newTest;
+  },
+  legacyClipboard: { kind: 'Gameplay test', itemProperty: 'test' },
+  addItemLabel: t`Add a gameplay test`,
+};
+
 export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
   test: gdTest;
+  // The node of the folder structure holding this item.
+  folderOrItem: ProjectItemFolderOrItem;
+  inFolder: ProjectItemInFolder;
   props: GameplayTestTreeViewItemProps;
 
-  constructor(test: gdTest, props: GameplayTestTreeViewItemProps) {
+  constructor(
+    test: gdTest,
+    folderOrItem: ProjectItemFolderOrItem,
+    props: GameplayTestTreeViewItemProps
+  ) {
     this.test = test;
+    this.folderOrItem = folderOrItem;
+    this.inFolder = new ProjectItemInFolder(
+      gameplayTestFoldersKind,
+      folderOrItem,
+      props
+    );
     this.props = props;
   }
 
+  getFolderOrItem(): ProjectItemFolderOrItem {
+    return this.folderOrItem;
+  }
+
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === gameplayTestsRootFolderId;
+    return this.inFolder.isDescendantOf(itemContent);
   }
 
   getRootId(): string {
@@ -108,6 +146,10 @@ export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
       {
         type: 'separator',
       },
+      this.inFolder.buildMoveToFolderMenuItem(i18n),
+      {
+        type: 'separator',
+      },
       {
         label: i18n._(t`Rename`),
         click: () => this.edit(),
@@ -131,12 +173,7 @@ export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
         click: () => this.cut(),
         accelerator: 'CmdOrCtrl+X',
       },
-      {
-        label: i18n._(t`Paste`),
-        enabled: Clipboard.has(GAMEPLAY_TEST_CLIPBOARD_KIND),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
-      },
+      this.inFolder.buildPasteMenuItem(i18n, () => this.paste()),
       {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
@@ -160,30 +197,22 @@ export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this.props.onDeleteGameplayTest(this.test);
+    this.props.onDeleteGameplayTests([this.test]);
   }
 
   getIndex(): number {
-    return this.props.project.getTests().getTestPosition(this.test);
+    return this.inFolder.getIndex();
   }
 
-  moveAt(destinationIndex: number): void {
-    const originIndex = this.getIndex();
-    if (destinationIndex !== originIndex) {
-      this.props.project.getTests().moveTest(
-        originIndex,
-        // When moving the item down, it must not be counted.
-        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
-      );
-      this._onProjectItemModified();
-    }
+  moveAt(
+    destinationIndex: number,
+    targetFolder?: ProjectItemFolderOrItem
+  ): void {
+    this.inFolder.moveAt(destinationIndex, targetFolder);
   }
 
   copy(): void {
-    Clipboard.set(GAMEPLAY_TEST_CLIPBOARD_KIND, {
-      test: serializeToJSObject(this.test),
-      name: this.test.getName(),
-    });
+    this.inFolder.copy();
   }
 
   cut(): void {
@@ -192,42 +221,12 @@ export class GameplayTestTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    if (!Clipboard.has(GAMEPLAY_TEST_CLIPBOARD_KIND)) return;
-
-    const clipboardContent = Clipboard.get(GAMEPLAY_TEST_CLIPBOARD_KIND);
-    const copiedTest = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'test'
-    );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedTest) return;
-
-    const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
-      project.getTests().hasTestNamed(name)
-    );
-
-    const newTest = project
-      .getTests()
-      .insertNewTest(newName, this.getIndex() + 1);
-
-    unserializeFromJSObject(newTest, copiedTest, 'unserializeFrom');
-    // Unserialization has overwritten the name.
-    newTest.setName(newName);
-
-    this._onProjectItemModified();
-    this.props.editName(getGameplayTestTreeViewItemId(newTest));
+    this.inFolder.paste();
   }
 
   _duplicate(): void {
     this.copy();
     this.paste();
-  }
-
-  _onProjectItemModified() {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.props.forceUpdate();
   }
 
   getRightButton(i18n: I18nType): any {

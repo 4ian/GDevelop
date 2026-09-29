@@ -5,7 +5,8 @@
  */
 namespace gdjs {
   export interface AbstractRuntimeObject3D
-    extends gdjs.RuntimeObject,
+    extends
+      gdjs.RuntimeObject,
       gdjs.Base3DHandler,
       gdjs.Resizable,
       gdjs.Scalable,
@@ -65,6 +66,35 @@ namespace gdjs {
     /** The [x,y] coordinates of the bottom right point */
     max: FloatPoint;
   };
+
+  /**
+   * The triangles of the surface of an object (see `RuntimeObject.getSurfaceMesh`).
+   * @category Core Engine > Object
+   */
+  export type SurfaceMeshTriangles = {
+    /**
+     * The X, Y and Z positions of the vertices, in the scene (or the custom
+     * object) containing the object, like `getCenterXInScene`.
+     */
+    positions: Float32Array;
+    /**
+     * The 3 vertex indices of each triangle, in the order giving a normal,
+     * `(b - a) x (c - a)`, going out of the surface (up for a ground).
+     */
+    indices: Uint32Array;
+  };
+
+  /**
+   * The exact shape of an object, for features needing more than its box,
+   * like navigation meshes.
+   * @category Core Engine > Object
+   */
+  export interface SurfaceMesh {
+    /** A number changing each time the triangles change, including when the object moves. */
+    getVersion(): integer;
+    /** Compute the triangles: call it only when the version has changed. */
+    getTriangles(): SurfaceMeshTriangles;
+  }
 
   /**
    * @category Core Engine > Object
@@ -284,6 +314,7 @@ namespace gdjs {
      */
     protected _behaviorsTable: Hashtable<gdjs.RuntimeBehavior>;
     protected _timers: Hashtable<gdjs.Timer>;
+    private _surfaceMesh: gdjs.SurfaceMesh | null = null;
 
     /**
      * @param instanceContainer The scene or custom object the object belongs to.
@@ -404,6 +435,7 @@ namespace gdjs {
       this.aabb.max[1] = 0;
       this._variables = new gdjs.VariablesContainer(objectData.variables);
       this.clearForces();
+      this._surfaceMesh = null;
 
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
@@ -1088,6 +1120,22 @@ namespace gdjs {
      */
     getZOrder(): float {
       return this.zOrder;
+    }
+
+    /**
+     * The exact shape of the object, if the object (or the extension defining
+     * it) gives one. It's used by features needing more than the object box,
+     * like navigation meshes.
+     */
+    getSurfaceMesh(): gdjs.SurfaceMesh | null {
+      return this._surfaceMesh;
+    }
+
+    /**
+     * Give the exact shape of the object (see `getSurfaceMesh`).
+     */
+    setSurfaceMesh(surfaceMesh: gdjs.SurfaceMesh | null): void {
+      this._surfaceMesh = surfaceMesh;
     }
 
     /**

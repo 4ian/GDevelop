@@ -928,14 +928,13 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
   // `InsertNewLayout` added all the layouts at the root of the folder
   // structure: replace it by the saved one, if any.
-  if (element.HasChild("layoutsFolderStructure")) {
-    layoutsRootFolder->UnserializeFrom(
-        element.GetChild("layoutsFolderStructure", 0),
-        [this](const gd::String& name) {
-          return HasLayoutNamed(name) ? &GetLayout(name) : nullptr;
-        });
-  }
-  layoutsRootFolder->AddMissingItems(scenes);
+  layoutsRootFolder->UnserializeFromChildOf(
+      element,
+      "layoutsFolderStructure",
+      [this](const gd::String& name) {
+        return HasLayoutNamed(name) ? &GetLayout(name) : nullptr;
+      },
+      scenes);
 
   externalEvents.clear();
   externalEventsRootFolder->Clear();
@@ -951,24 +950,20 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         GetExternalEventsCount());
     externalEvents.UnserializeFrom(*this, externalEventElement);
   }
-  if (element.HasChild("externalEventsFolderStructure")) {
-    externalEventsRootFolder->UnserializeFrom(
-        element.GetChild("externalEventsFolderStructure", 0),
-        [this](const gd::String& name) {
-          return HasExternalEventsNamed(name) ? &GetExternalEvents(name)
-                                              : nullptr;
-        });
-  }
-  externalEventsRootFolder->AddMissingItems(externalEvents);
+  externalEventsRootFolder->UnserializeFromChildOf(
+      element,
+      "externalEventsFolderStructure",
+      [this](const gd::String& name) {
+        return HasExternalEventsNamed(name) ? &GetExternalEvents(name)
+                                            : nullptr;
+      },
+      externalEvents);
 
   tests.ClearTests();
   if (element.HasChild("tests")) {
     tests.UnserializeTestsFrom(element.GetChild("tests"));
   }
-  if (element.HasChild("testsFolderStructure")) {
-    tests.UnserializeFolderStructureFrom(
-        element.GetChild("testsFolderStructure", 0));
-  }
+  tests.UnserializeFolderStructureFromChildOf(element, "testsFolderStructure");
 
   externalLayouts.clear();
   externalLayoutsRootFolder->Clear();
@@ -983,15 +978,14 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         InsertNewExternalLayout("", GetExternalLayoutsCount());
     newExternalLayout.UnserializeFrom(*this, externalLayoutElement);
   }
-  if (element.HasChild("externalLayoutsFolderStructure")) {
-    externalLayoutsRootFolder->UnserializeFrom(
-        element.GetChild("externalLayoutsFolderStructure", 0),
-        [this](const gd::String& name) {
-          return HasExternalLayoutNamed(name) ? &GetExternalLayout(name)
-                                              : nullptr;
-        });
-  }
-  externalLayoutsRootFolder->AddMissingItems(externalLayouts);
+  externalLayoutsRootFolder->UnserializeFromChildOf(
+      element,
+      "externalLayoutsFolderStructure",
+      [this](const gd::String& name) {
+        return HasExternalLayoutNamed(name) ? &GetExternalLayout(name)
+                                            : nullptr;
+      },
+      externalLayouts);
 }
 
 void Project::UnserializeAndInsertExtensionsFrom(

@@ -14,7 +14,6 @@ declare class gdExternalLayoutFolderOrExternalLayout {
   getChildPosition(child: gdExternalLayoutFolderOrExternalLayout): number;
   getParent(): gdExternalLayoutFolderOrExternalLayout;
   insertNewFolder(name: string, newPosition: number): gdExternalLayoutFolderOrExternalLayout;
-  getOrCreateFolderChild(name: string): gdExternalLayoutFolderOrExternalLayout;
   moveFolderOrItemToAnotherFolder(folderOrItem: gdExternalLayoutFolderOrExternalLayout, newParentFolder: gdExternalLayoutFolderOrExternalLayout, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: gdExternalLayoutFolderOrExternalLayout): void;

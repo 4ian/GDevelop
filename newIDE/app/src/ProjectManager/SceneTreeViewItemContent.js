@@ -16,22 +16,12 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import { addFolderIn } from './ProjectItemFolderTreeViewItemContent';
+import { ProjectItemInFolder } from './ProjectItemInFolder';
 import {
   type ProjectItemFoldersKind,
-  buildMoveToFolderSubmenu,
-  getFolderOrItemTreeViewItemId,
-  isFolderOrItemDescendantOf,
-  getFolderOrItemIndex,
-  moveFolderOrItemAt,
+  type ProjectItemFolderOrItem,
   moveNewItemToFolder,
 } from './ProjectItemFolders';
-import {
-  copyFolderOrItemToClipboard,
-  pasteFolderOrItemsFromClipboard,
-  hasFolderOrItemsInClipboard,
-  getPasteMenuLabel,
-} from './ProjectItemFoldersClipboard';
 
 const styles = {
   tooltip: { marginRight: 5, verticalAlign: 'bottom' },
@@ -39,7 +29,8 @@ const styles = {
 
 export type SceneTreeViewItemCallbacks = {|
   onSceneAdded: () => void,
-  onDeleteLayout: gdLayout => void,
+  // Resolves to true once removed (after the user confirmed).
+  onDeleteLayouts: (Array<gdLayout>) => Promise<boolean>,
   onRenameLayout: (string, string) => void,
   onOpenLayout: (
     name: string,
@@ -104,29 +95,32 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   // The node of the scenes folder structure holding this scene. Keeping it
   // avoids searching the whole tree every time the position of the scene or
   // its parent folder is needed.
-  layoutFolderOrLayout: gdLayoutFolderOrLayout;
+  folderOrItem: ProjectItemFolderOrItem;
+  inFolder: ProjectItemInFolder;
   props: SceneTreeViewItemProps;
 
   constructor(
     scene: gdLayout,
-    layoutFolderOrLayout: gdLayoutFolderOrLayout,
+    folderOrItem: ProjectItemFolderOrItem,
     props: SceneTreeViewItemProps
   ) {
     this.scene = scene;
-    this.layoutFolderOrLayout = layoutFolderOrLayout;
+    this.folderOrItem = folderOrItem;
+    this.inFolder = new ProjectItemInFolder(
+      sceneFoldersKind,
+      folderOrItem,
+      props,
+      () => props.onSceneAdded()
+    );
     this.props = props;
   }
 
-  getFolderOrItem(): gdLayoutFolderOrLayout {
-    return this.layoutFolderOrLayout;
+  getFolderOrItem(): ProjectItemFolderOrItem {
+    return this.folderOrItem;
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return isFolderOrItemDescendantOf(
-      sceneFoldersKind,
-      this.layoutFolderOrLayout,
-      itemContent
-    );
+    return this.inFolder.isDescendantOf(itemContent);
   }
 
   getRootId(): string {
@@ -177,9 +171,6 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
-    const { project } = this.props;
-    const layoutFolderOrLayout = this.layoutFolderOrLayout;
-
     return [
       {
         label: i18n._(t`Open scene editor`),
@@ -222,17 +213,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       {
         type: 'separator',
       },
-      {
-        label: i18n._(t`Move to folder`),
-        submenu: buildMoveToFolderSubmenu(
-          i18n,
-          sceneFoldersKind,
-          project,
-          layoutFolderOrLayout,
-          () => this._onFolderStructureModified(),
-          () => this._addFolderInParent()
-        ),
-      },
+      this.inFolder.buildMoveToFolderMenuItem(i18n),
       {
         type: 'separator',
       },
@@ -259,12 +240,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
         click: () => this.cut(),
         accelerator: 'CmdOrCtrl+X',
       },
-      {
-        label: getPasteMenuLabel(i18n, sceneFoldersKind),
-        enabled: hasFolderOrItemsInClipboard(sceneFoldersKind),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
-      },
+      this.inFolder.buildPasteMenuItem(i18n, () => this.paste()),
       {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
@@ -301,27 +277,22 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   delete(): void {
     // Removing the layout from the project also removes it from the scenes
     // folder structure, so nothing else has to be done here.
-    this.props.onDeleteLayout(this.scene);
+    this.props.onDeleteLayouts([this.scene]);
   }
 
   getIndex(): number {
-    return getFolderOrItemIndex(this.layoutFolderOrLayout);
+    return this.inFolder.getIndex();
   }
 
   moveAt(
     destinationIndex: number,
-    targetFolder?: gdLayoutFolderOrLayout
+    targetFolder?: ProjectItemFolderOrItem
   ): void {
-    moveFolderOrItemAt(
-      this.layoutFolderOrLayout,
-      destinationIndex,
-      targetFolder
-    );
-    this._onFolderStructureModified();
+    this.inFolder.moveAt(destinationIndex, targetFolder);
   }
 
   copy(): void {
-    copyFolderOrItemToClipboard(sceneFoldersKind, this.layoutFolderOrLayout);
+    this.inFolder.copy();
   }
 
   cut(): void {
@@ -330,22 +301,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    const pastedContent = pasteFolderOrItemsFromClipboard({
-      kind: sceneFoldersKind,
-      project: this.props.project,
-      destinationFolder: this.layoutFolderOrLayout.getParent(),
-      positionInFolder: this.getIndex() + 1,
-    });
-    if (!pastedContent) return;
-
-    this._onFolderStructureModified();
-    const firstPastedItem = pastedContent.topLevelFolderOrItems[0];
-    if (firstPastedItem) {
-      this.props.editName(
-        getFolderOrItemTreeViewItemId(sceneFoldersKind, firstPastedItem)
-      );
-    }
-    if (pastedContent.createdItems.length > 0) this.props.onSceneAdded();
+    this.inFolder.paste();
   }
 
   _duplicate(): void {
@@ -362,7 +318,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       sceneFoldersKind,
       project,
       newName,
-      this.layoutFolderOrLayout.getParent(),
+      this.folderOrItem.getParent(),
       this.getIndex() + 1
     );
 
@@ -376,31 +332,9 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     newScene.setName(newName);
     newScene.updateBehaviorsSharedData(project);
 
-    this._onFolderStructureModified();
+    this.inFolder.onFolderStructureModified();
     this.props.editName(getSceneTreeViewItemId(newScene));
     this.props.onSceneAdded();
-  }
-
-  _onProjectItemModified() {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.props.forceUpdate();
-  }
-
-  _addFolderInParent(): void {
-    addFolderIn(
-      { ...this.props, kind: sceneFoldersKind },
-      this.layoutFolderOrLayout.getParent()
-    );
-  }
-
-  /**
-   * The tree view caches the children of each item, so it must also be told to
-   * rebuild them when the folder structure itself changed.
-   */
-  _onFolderStructureModified() {
-    this._onProjectItemModified();
-    this.props.forceUpdateList();
   }
 
   getRightButton(i18n: I18nType): any {

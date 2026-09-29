@@ -4,21 +4,11 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { unserializeFromJSObject } from '../Utils/Serializer';
-import { addFolderIn } from './ProjectItemFolderTreeViewItemContent';
+import { ProjectItemInFolder } from './ProjectItemInFolder';
 import {
   type ProjectItemFoldersKind,
-  buildMoveToFolderSubmenu,
-  getFolderOrItemTreeViewItemId,
-  isFolderOrItemDescendantOf,
-  getFolderOrItemIndex,
-  moveFolderOrItemAt,
+  type ProjectItemFolderOrItem,
 } from './ProjectItemFolders';
-import {
-  copyFolderOrItemToClipboard,
-  pasteFolderOrItemsFromClipboard,
-  hasFolderOrItemsInClipboard,
-  getPasteMenuLabel,
-} from './ProjectItemFoldersClipboard';
 import {
   type TreeViewItemContent,
   type TreeItemProps,
@@ -28,7 +18,8 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 
 export type ExternalLayoutTreeViewItemCallbacks = {|
   onExternalLayoutAdded: () => void,
-  onDeleteExternalLayout: gdExternalLayout => void,
+  // Resolves to true once removed (after the user confirmed).
+  onDeleteExternalLayouts: (Array<gdExternalLayout>) => Promise<boolean>,
   onRenameExternalLayout: (string, string) => void,
   onOpenExternalLayout: string => void,
 |};
@@ -81,29 +72,32 @@ export const externalLayoutFoldersKind: ProjectItemFoldersKind = {
 export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   externalLayout: gdExternalLayout;
   // The node of the folder structure holding this item.
-  folderOrItem: gdExternalLayoutFolderOrExternalLayout;
+  folderOrItem: ProjectItemFolderOrItem;
+  inFolder: ProjectItemInFolder;
   props: ExternalLayoutTreeViewItemProps;
 
   constructor(
     externalLayout: gdExternalLayout,
-    folderOrItem: gdExternalLayoutFolderOrExternalLayout,
+    folderOrItem: ProjectItemFolderOrItem,
     props: ExternalLayoutTreeViewItemProps
   ) {
     this.externalLayout = externalLayout;
     this.folderOrItem = folderOrItem;
+    this.inFolder = new ProjectItemInFolder(
+      externalLayoutFoldersKind,
+      folderOrItem,
+      props,
+      () => props.onExternalLayoutAdded()
+    );
     this.props = props;
   }
 
-  getFolderOrItem(): gdExternalLayoutFolderOrExternalLayout {
+  getFolderOrItem(): ProjectItemFolderOrItem {
     return this.folderOrItem;
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return isFolderOrItemDescendantOf(
-      externalLayoutFoldersKind,
-      this.folderOrItem,
-      itemContent
-    );
+    return this.inFolder.isDescendantOf(itemContent);
   }
 
   getRootId(): string {
@@ -150,17 +144,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
-      {
-        label: i18n._(t`Move to folder`),
-        submenu: buildMoveToFolderSubmenu(
-          i18n,
-          externalLayoutFoldersKind,
-          this.props.project,
-          this.folderOrItem,
-          () => this._onFolderStructureModified(),
-          () => this._addFolderInParent()
-        ),
-      },
+      this.inFolder.buildMoveToFolderMenuItem(i18n),
       {
         type: 'separator',
       },
@@ -187,12 +171,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
         click: () => this.cut(),
         accelerator: 'CmdOrCtrl+X',
       },
-      {
-        label: getPasteMenuLabel(i18n, externalLayoutFoldersKind),
-        enabled: hasFolderOrItemsInClipboard(externalLayoutFoldersKind),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
-      },
+      this.inFolder.buildPasteMenuItem(i18n, () => this.paste()),
       {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
@@ -205,23 +184,22 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   delete(): void {
-    this.props.onDeleteExternalLayout(this.externalLayout);
+    this.props.onDeleteExternalLayouts([this.externalLayout]);
   }
 
   getIndex(): number {
-    return getFolderOrItemIndex(this.folderOrItem);
+    return this.inFolder.getIndex();
   }
 
   moveAt(
     destinationIndex: number,
-    targetFolder?: gdExternalLayoutFolderOrExternalLayout
+    targetFolder?: ProjectItemFolderOrItem
   ): void {
-    moveFolderOrItemAt(this.folderOrItem, destinationIndex, targetFolder);
-    this._onFolderStructureModified();
+    this.inFolder.moveAt(destinationIndex, targetFolder);
   }
 
   copy(): void {
-    copyFolderOrItemToClipboard(externalLayoutFoldersKind, this.folderOrItem);
+    this.inFolder.copy();
   }
 
   cut(): void {
@@ -230,57 +208,12 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    const pastedContent = pasteFolderOrItemsFromClipboard({
-      kind: externalLayoutFoldersKind,
-      project: this.props.project,
-      destinationFolder: this.folderOrItem.getParent(),
-      positionInFolder: this.getIndex() + 1,
-    });
-    if (!pastedContent) return;
-
-    this._onFolderStructureModified();
-    const firstPastedItem = pastedContent.topLevelFolderOrItems[0];
-    if (firstPastedItem) {
-      this.props.editName(
-        getFolderOrItemTreeViewItemId(
-          externalLayoutFoldersKind,
-          firstPastedItem
-        )
-      );
-    }
-    if (pastedContent.createdItems.length > 0)
-      this.props.onExternalLayoutAdded();
+    this.inFolder.paste();
   }
 
   _duplicate(): void {
     this.copy();
     this.paste();
-  }
-
-  _onProjectItemModified() {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.props.forceUpdate();
-  }
-
-  _addFolderInParent(): void {
-    addFolderIn(
-      {
-        ...this.props,
-        kind: externalLayoutFoldersKind,
-        onProjectItemModified: () => this._onProjectItemModified(),
-      },
-      this.folderOrItem.getParent()
-    );
-  }
-
-  /**
-   * The tree view caches the children of each item, so it must also be told to
-   * rebuild them when the folder structure itself changed.
-   */
-  _onFolderStructureModified() {
-    this._onProjectItemModified();
-    this.props.forceUpdateList();
   }
 
   getRightButton(i18n: I18nType): any {

@@ -9,29 +9,26 @@ import { mapFor } from '../Utils/MapFor';
 import {
   type ProjectItemFoldersKind,
   type ProjectItemFolderOrItem,
-  buildMoveToFolderSubmenu,
   getFolderTreeViewItemId,
-  getFolderOrItemTreeViewItemId,
-  getParentFolderTreeViewItemId,
-  isFolderOrItemDescendantOf,
-  getFolderOrItemIndex,
-  moveFolderOrItemAt,
+  getItemsInFolder,
+  hasAnyItemInFolder,
+  removeFolderWithoutItems,
 } from './ProjectItemFolders';
-import {
-  copyFolderOrItemToClipboard,
-  pasteFolderOrItemsFromClipboard,
-  hasFolderOrItemsInClipboard,
-  getPasteMenuLabel,
-} from './ProjectItemFoldersClipboard';
+import { ProjectItemInFolder } from './ProjectItemInFolder';
 
 export type ProjectItemFolderTreeViewItemProps = {|
   ...TreeItemProps,
   kind: ProjectItemFoldersKind,
   onProjectItemModified: () => void,
+  // Called once the folder is removed (it is then destroyed).
+  onFolderRemoved: () => void,
   expandFolders: (folderIds: Array<string>) => void,
   addItemInFolder: (folder: ProjectItemFolderOrItem, i18n: I18nType) => void,
   // Called when items were created by a paste.
   onItemsAdded: () => void,
+  // Remove items of this kind from the project, once the user confirmed.
+  // Resolves to true if they were removed.
+  deleteItems: (items: Array<any>) => Promise<boolean>,
 |};
 
 /**
@@ -42,6 +39,7 @@ export class ProjectItemFolderTreeViewItemContent
   implements TreeViewItemContent {
   folder: ProjectItemFolderOrItem;
   props: ProjectItemFolderTreeViewItemProps;
+  inFolder: ProjectItemInFolder;
 
   constructor(
     folder: ProjectItemFolderOrItem,
@@ -49,14 +47,16 @@ export class ProjectItemFolderTreeViewItemContent
   ) {
     this.folder = folder;
     this.props = props;
+    this.inFolder = new ProjectItemInFolder(
+      props.kind,
+      folder,
+      props,
+      props.onItemsAdded
+    );
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return isFolderOrItemDescendantOf(
-      this.props.kind,
-      this.folder,
-      itemContent
-    );
+    return this.inFolder.isDescendantOf(itemContent);
   }
 
   getRootId(): string {
@@ -106,8 +106,7 @@ export class ProjectItemFolderTreeViewItemContent
   }
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
-    const { project, kind } = this.props;
-    const currentParent = this.folder.getParent();
+    const { kind } = this.props;
 
     return [
       {
@@ -120,17 +119,7 @@ export class ProjectItemFolderTreeViewItemContent
         click: () => this.delete(),
         accelerator: 'Backspace',
       },
-      {
-        label: i18n._(t`Move to folder`),
-        submenu: buildMoveToFolderSubmenu(
-          i18n,
-          kind,
-          project,
-          this.folder,
-          () => this._onFolderStructureModified(),
-          () => this._addFolderIn(currentParent)
-        ),
-      },
+      this.inFolder.buildMoveToFolderMenuItem(i18n),
       {
         type: 'separator',
       },
@@ -144,12 +133,7 @@ export class ProjectItemFolderTreeViewItemContent
         click: () => this.cut(),
         accelerator: 'CmdOrCtrl+X',
       },
-      {
-        label: getPasteMenuLabel(i18n, kind),
-        enabled: hasFolderOrItemsInClipboard(kind),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
-      },
+      this.inFolder.buildPasteMenuItem(i18n, () => this.paste()),
       {
         type: 'separator',
       },
@@ -159,7 +143,7 @@ export class ProjectItemFolderTreeViewItemContent
       },
       {
         label: i18n._(t`Add a folder`),
-        click: () => this._addFolderIn(this.folder),
+        click: () => this.inFolder.addFolderIn(this.folder),
       },
     ];
   }
@@ -175,14 +159,14 @@ export class ProjectItemFolderTreeViewItemContent
   delete(): void {
     const { showDeleteConfirmation, kind } = this.props;
     const parent = this.folder.getParent();
-    const childrenCount = this.folder.getChildrenCount();
-
     // Removing a folder never removes the items it contains: they are moved
     // back to the parent folder, so that an item can only ever be deleted
-    // explicitly, one by one.
-    if (childrenCount === 0) {
-      parent.removeFolderChild(this.folder);
-      this._onFolderStructureModified();
+    // explicitly, one by one. A folder holding no item (only empty folders,
+    // or nothing) is removed at once, without asking.
+    if (!hasAnyItemInFolder(this.folder)) {
+      removeFolderWithoutItems(this.folder);
+      this.props.onFolderRemoved();
+      this.inFolder.onFolderStructureModified();
       return;
     }
 
@@ -208,88 +192,52 @@ export class ProjectItemFolderTreeViewItemContent
       });
 
       parent.removeFolderChild(this.folder);
-
-      this._onFolderStructureModified();
+      this.props.onFolderRemoved();
+      this.inFolder.onFolderStructureModified();
     });
   }
 
   getIndex(): number {
-    return getFolderOrItemIndex(this.folder);
+    return this.inFolder.getIndex();
   }
 
   moveAt(
     destinationIndex: number,
     targetFolder?: ProjectItemFolderOrItem
   ): void {
-    moveFolderOrItemAt(this.folder, destinationIndex, targetFolder);
-    this._onFolderStructureModified();
+    this.inFolder.moveAt(destinationIndex, targetFolder);
   }
 
   copy(): void {
-    copyFolderOrItemToClipboard(this.props.kind, this.folder);
+    this.inFolder.copy();
   }
 
+  /**
+   * Cutting a folder removes it with everything it holds, the items included
+   * (they are in the clipboard, to be pasted elsewhere), once the user
+   * confirmed the removal of these items.
+   */
   cut(): void {
     this.copy();
-    this.delete();
+    const items = getItemsInFolder(this.folder);
+    if (items.length === 0) {
+      this.delete();
+      return;
+    }
+    this.props.deleteItems(items).then(isRemoved => {
+      if (!isRemoved) return;
+      // The removed items left their folders: only empty folders remain.
+      removeFolderWithoutItems(this.folder);
+      this.props.onFolderRemoved();
+      this.inFolder.onFolderStructureModified();
+    });
   }
 
+  /** Pasting on a folder puts what was copied at its end. */
   paste(): void {
-    const { kind, project } = this.props;
-    const pastedContent = pasteFolderOrItemsFromClipboard({
-      kind,
-      project,
-      destinationFolder: this.folder,
+    this.inFolder.paste({
+      folder: this.folder,
       positionInFolder: this.folder.getChildrenCount(),
     });
-    if (!pastedContent) return;
-
-    this._onFolderStructureModified();
-    this.props.expandFolders([this.getId()]);
-    const firstPastedItem = pastedContent.topLevelFolderOrItems[0];
-    if (firstPastedItem) {
-      this.props.editName(getFolderOrItemTreeViewItemId(kind, firstPastedItem));
-    }
-    if (pastedContent.createdItems.length > 0) this.props.onItemsAdded();
-  }
-
-  _addFolderIn(parentFolder: ProjectItemFolderOrItem): void {
-    addFolderIn(this.props, parentFolder);
-  }
-
-  _onFolderStructureModified(): void {
-    this.props.onProjectItemModified();
-    this.props.forceUpdateList();
   }
 }
-
-/**
- * Add a new folder at the top of the given folder and start editing its name,
- * like the objects list does.
- */
-export const addFolderIn = (
-  {
-    kind,
-    onProjectItemModified,
-    forceUpdateList,
-    expandFolders,
-    editName,
-  }: {
-    kind: ProjectItemFoldersKind,
-    onProjectItemModified: () => void,
-    // The tree view caches the children of each item, so it must be told to
-    // rebuild them when the folder structure itself changed.
-    forceUpdateList: () => void,
-    expandFolders: (folderIds: Array<string>) => void,
-    editName: (itemId: string) => void,
-  },
-  parentFolder: ProjectItemFolderOrItem
-): void => {
-  const newFolder = parentFolder.insertNewFolder('NewFolder', 0);
-
-  onProjectItemModified();
-  forceUpdateList();
-  expandFolders([getParentFolderTreeViewItemId(kind, parentFolder)]);
-  // We focus it so the user can edit the name directly.
-  editName(getFolderTreeViewItemId(kind, newFolder));
-};

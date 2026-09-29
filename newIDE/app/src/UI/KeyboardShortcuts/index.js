@@ -18,6 +18,7 @@ const A_KEY = 65;
 const C_KEY = 67;
 const D_KEY = 68;
 const F_KEY = 70;
+const G_KEY = 71;
 const V_KEY = 86;
 const X_KEY = 88;
 const Y_KEY = 89;
@@ -40,6 +41,7 @@ type ShortcutCallbacks = {|
   onCut?: () => void | Promise<void>,
   onPaste?: () => void | Promise<void>,
   onDuplicate?: () => void | Promise<void>,
+  onGroupInFolder?: () => void | Promise<void>,
   onUndo?: () => void | Promise<void>,
   onRedo?: () => void | Promise<void>,
   onSearch?: () => void | Promise<void>,
@@ -262,6 +264,7 @@ export default class KeyboardShortcuts {
       onCut,
       onPaste,
       onDuplicate,
+      onGroupInFolder,
       onSelectAll,
       onDeselectAll,
       onUndo,
@@ -315,6 +318,14 @@ export default class KeyboardShortcuts {
     if (onDuplicate && this._isControlOrCmdPressed() && evt.which === D_KEY) {
       evt.preventDefault();
       onDuplicate();
+    }
+    if (
+      onGroupInFolder &&
+      this._isControlOrCmdPressed() &&
+      evt.which === G_KEY
+    ) {
+      evt.preventDefault();
+      onGroupInFolder();
     }
     if (
       onDeselectAll &&

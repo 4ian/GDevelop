@@ -2911,6 +2911,8 @@ namespace gdjs {
                 // Three.js computes the scale as a ratio of the pointer distances
                 // to the gizmo, which barely changes the size of small objects.
                 // Use the pointer movement in the object local axes instead.
+                // The pointer positions are in the Three.js world, so they are
+                // converted back to scene units with the world scale.
                 const { pointStart, pointEnd } = threeTransformControls as any;
                 dummyThreeObject.matrixWorld.decompose(
                   scaleDragWorldPosition,
@@ -2920,17 +2922,20 @@ namespace gdjs {
                 scaleDragWorldQuaternion.invert();
                 scaleDragLocalStart
                   .copy(pointStart)
-                  .applyQuaternion(scaleDragWorldQuaternion);
+                  .applyQuaternion(scaleDragWorldQuaternion)
+                  .multiplyScalar(worldScale);
                 scaleDragLocalEnd
                   .copy(pointEnd)
-                  .applyQuaternion(scaleDragWorldQuaternion);
+                  .applyQuaternion(scaleDragWorldQuaternion)
+                  .multiplyScalar(worldScale);
                 // Moving away from the gizmo center enlarges the object,
                 // whichever side of the axis the handle is on.
                 const getSizeDelta = (start: float, end: float) =>
                   (end - start) * (start < 0 ? -1 : 1);
                 const uniformSizeDelta =
-                  (pointEnd as THREE.Vector3).length() -
-                  (pointStart as THREE.Vector3).length();
+                  ((pointEnd as THREE.Vector3).length() -
+                    (pointStart as THREE.Vector3).length()) *
+                  worldScale;
                 const isUniform = threeTransformControls.axis === 'XYZ';
                 const editorGrid = this._editorGrid;
 

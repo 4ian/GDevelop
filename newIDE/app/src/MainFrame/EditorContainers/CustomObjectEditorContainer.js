@@ -446,6 +446,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
             this.props.onDeleteEventsBasedObjectVariant
           }
           onEffectAdded={this.props.onEffectAdded}
+          onLayerRenamedOrRemoved={this.props.onLayerRenamedOrRemoved}
           onObjectListsModified={this.props.onObjectListsModified}
           triggerHotReloadInGameEditorIfNeeded={
             this.props.triggerHotReloadInGameEditorIfNeeded

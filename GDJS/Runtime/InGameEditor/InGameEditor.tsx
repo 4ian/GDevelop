@@ -1397,6 +1397,8 @@ namespace gdjs {
       // The 3D scene is rebuilt and the inner area marker is lost in the process.
       this._threeInnerArea = null;
       this._innerArea = null;
+      const previousEditorId = this._editorId;
+      const previousSelectedLayerName = this._selectedLayerName;
       this._selectedLayerName = '';
       // Clear any reference to `RuntimeObject` from the unloaded scene.
       this._selectionBoxes.clear();
@@ -1530,6 +1532,13 @@ namespace gdjs {
 
       // Try to keep object selection in case the same scene is reloaded.
       this.setSelectedObjects(selectedObjectIds);
+      if (
+        this._editorId === previousEditorId &&
+        this._editedInstanceContainer &&
+        this._editedInstanceContainer.hasLayer(previousSelectedLayerName)
+      ) {
+        this._selectedLayerName = previousSelectedLayerName;
+      }
       this._isFirstFrame = true;
     }
 

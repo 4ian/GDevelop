@@ -75,7 +75,7 @@ export type SceneEditorsDisplayProps = {|
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, done: (boolean) => void) => void,
-  onLayerRenamed: () => void,
+  onLayerRenamed: (oldName: string, newName: string) => void,
   onLayersModified: () => void,
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,

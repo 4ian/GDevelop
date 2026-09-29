@@ -260,6 +260,7 @@ type Props = {|
     variant: gdEventsBasedObjectVariant
   ) => void,
   onEffectAdded: () => void,
+  onLayerRenamedOrRemoved: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
 
@@ -1849,6 +1850,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           }
 
           done(doRemove);
+          if (doRemove) {
+            this.props.onLayerRenamedOrRemoved();
+          }
           // /!\ Force the instances editor to destroy and mount again the
           // renderers to avoid keeping any references to existing instances
           if (this.editorDisplay)
@@ -1864,8 +1868,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  _onLayerRenamed = () => {
+  _onLayerRenamed = (oldName: string, newName: string) => {
     this.forceUpdatePropertiesEditor();
+    this.props.onLayerRenamedOrRemoved();
+    if (this.state.chosenLayer === oldName) {
+      this._onChooseLayer(newName);
+    }
   };
 
   _sendHotReloadLayers = () => {

@@ -2312,6 +2312,20 @@ const MainFrame = (props: Props): React.MixedElement => {
     [notifyChangesToInGameEditor]
   );
 
+  const onLayerRenamedOrRemoved = React.useCallback(
+    () => {
+      // Instances can have been moved to another layer or deleted.
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['layer-renamed-or-removed'],
+      });
+    },
+    [notifyChangesToInGameEditor]
+  );
+
   const onObjectListsModified = React.useCallback(
     ({ isNewObjectTypeUsed }: { isNewObjectTypeUsed: boolean }) => {
       notifyChangesToInGameEditor({
@@ -6137,6 +6151,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onExtensionInstalled: onExtensionInstalled,
     onCreateNewExtensionWithBehavior: onCreateNewExtensionWithBehavior,
     onEffectAdded: onEffectAdded,
+    onLayerRenamedOrRemoved: onLayerRenamedOrRemoved,
     onObjectListsModified: onObjectListsModified,
     onExternalLayoutAssociationChanged,
     gamesList: gamesList,

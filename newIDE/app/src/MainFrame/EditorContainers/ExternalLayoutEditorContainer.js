@@ -494,6 +494,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
               this.props.onDeleteEventsBasedObjectVariant
             }
             onEffectAdded={this.props.onEffectAdded}
+            onLayerRenamedOrRemoved={this.props.onLayerRenamedOrRemoved}
             onObjectListsModified={this.props.onObjectListsModified}
             triggerHotReloadInGameEditorIfNeeded={
               this.props.triggerHotReloadInGameEditorIfNeeded

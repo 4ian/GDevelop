@@ -742,18 +742,23 @@ namespace gdjs {
     size ? offset + size * Math.round((value - offset) / size) : value;
 
   /**
-   * Convert a scale ratio to the ratio giving a size whose far edge
-   * (origin + size) is on the grid. The size is kept at least 1.
+   * Return the scale ratio giving a size whose far edge (origin + size) is
+   * on the grid after moving it by `sizeDelta`.
+   * The size is kept at least one grid cell.
+   *
+   * The delta is additive (like the 2D editor resize handles) so that
+   * small objects can be enlarged without dragging far away from the gizmo.
    */
   const getScaleSnappedOnGrid = (
     origin: float,
     initialSize: float,
-    scale: float,
+    sizeDelta: float,
+    cellSize: float,
     snapPosition: (position: float) => float
   ): float => {
-    if (initialSize <= 0) return scale;
-    const snappedEdge = snapPosition(origin + initialSize * Math.abs(scale));
-    const snappedSize = Math.max(1, snappedEdge - origin);
+    if (initialSize <= 0) return 1;
+    const snappedEdge = snapPosition(origin + initialSize + sizeDelta);
+    const snappedSize = Math.max(cellSize || 1, snappedEdge - origin);
     return snappedSize / initialSize;
   };
 
@@ -1392,6 +1397,8 @@ namespace gdjs {
       // The 3D scene is rebuilt and the inner area marker is lost in the process.
       this._threeInnerArea = null;
       this._innerArea = null;
+      const previousEditorId = this._editorId;
+      const previousSelectedLayerName = this._selectedLayerName;
       this._selectedLayerName = '';
       // Clear any reference to `RuntimeObject` from the unloaded scene.
       this._selectionBoxes.clear();
@@ -1525,6 +1532,13 @@ namespace gdjs {
 
       // Try to keep object selection in case the same scene is reloaded.
       this.setSelectedObjects(selectedObjectIds);
+      if (
+        this._editorId === previousEditorId &&
+        this._editedInstanceContainer &&
+        this._editedInstanceContainer.hasLayer(previousSelectedLayerName)
+      ) {
+        this._selectedLayerName = previousSelectedLayerName;
+      }
       this._isFirstFrame = true;
     }
 
@@ -2328,12 +2342,15 @@ namespace gdjs {
           if (!isShiftPressed(inputManager)) {
             this._selection.clear();
           }
-          const layer = this.getEditorLayer(this._selectedLayerName);
-          if (layer && layer.isVisible() && !layer._initialLayerData.isLocked) {
-            for (const object of objects) {
-              if (!this.isInstanceSealed(object)) {
-                this._selection.add(object);
-              }
+          for (const object of objects) {
+            const layer = this.getEditorLayer(object.getLayer());
+            if (
+              layer &&
+              layer.isVisible() &&
+              !layer._initialLayerData.isLocked &&
+              !this.isInstanceSealed(object)
+            ) {
+              this._selection.add(object);
             }
           }
           this._sendSelectionUpdate();
@@ -2393,6 +2410,7 @@ namespace gdjs {
           const layer = this.getEditorLayer(objectUnderCursor.getLayer());
           if (
             layer &&
+            layer.isVisible() &&
             !layer._initialLayerData.isLocked &&
             !this.isInstanceSealed(objectUnderCursor)
           ) {
@@ -2736,6 +2754,11 @@ namespace gdjs {
             const initialDummyPosition = new THREE.Vector3();
             const initialDummyRotation = new THREE.Euler();
             const initialDummyScale = new THREE.Vector3();
+            const scaleDragWorldPosition = new THREE.Vector3();
+            const scaleDragWorldQuaternion = new THREE.Quaternion();
+            const scaleDragWorldScale = new THREE.Vector3();
+            const scaleDragLocalStart = new THREE.Vector3();
+            const scaleDragLocalEnd = new THREE.Vector3();
             threeTransformControls.addEventListener('change', (e) => {
               if (!threeTransformControls.dragging) {
                 this._selectionControlsMovementTotalDelta = null;
@@ -2853,30 +2876,74 @@ namespace gdjs {
                 threeTransformControls.axis &&
                 this._editorGrid.isSpanningEnabled(inputManager)
               ) {
+                // Three.js computes the scale as a ratio of the pointer distances
+                // to the gizmo, which barely changes the size of small objects.
+                // Use the pointer movement in the object local axes instead.
+                const { pointStart, pointEnd } = threeTransformControls as any;
+                dummyThreeObject.matrixWorld.decompose(
+                  scaleDragWorldPosition,
+                  scaleDragWorldQuaternion,
+                  scaleDragWorldScale
+                );
+                scaleDragWorldQuaternion.invert();
+                scaleDragLocalStart
+                  .copy(pointStart)
+                  .applyQuaternion(scaleDragWorldQuaternion);
+                scaleDragLocalEnd
+                  .copy(pointEnd)
+                  .applyQuaternion(scaleDragWorldQuaternion);
+                // Moving away from the gizmo center enlarges the object,
+                // whichever side of the axis the handle is on.
+                const getSizeDelta = (start: float, end: float) =>
+                  (end - start) * (start < 0 ? -1 : 1);
+                const uniformSizeDelta =
+                  (pointEnd as THREE.Vector3).length() -
+                  (pointStart as THREE.Vector3).length();
+                const isUniform = threeTransformControls.axis === 'XYZ';
+                const editorGrid = this._editorGrid;
+
                 // The scale gizmo is anchored on the object origin, so snap the
                 // opposite edge on the grid (like the 2D editor resize handles).
                 const getSnappedScaleX = () =>
                   getScaleSnappedOnGrid(
                     initialObjectX,
                     initialObjectWidth,
-                    scaleX,
-                    (x) => this._editorGrid.getSnappedX(x)
+                    isUniform
+                      ? uniformSizeDelta
+                      : getSizeDelta(
+                          scaleDragLocalStart.x,
+                          scaleDragLocalEnd.x
+                        ),
+                    editorGrid.gridWidth,
+                    (x) => editorGrid.getSnappedX(x)
                   );
                 const getSnappedScaleY = () =>
                   getScaleSnappedOnGrid(
                     initialObjectY,
                     initialObjectHeight,
-                    scaleY,
-                    (y) => this._editorGrid.getSnappedY(y)
+                    isUniform
+                      ? uniformSizeDelta
+                      : getSizeDelta(
+                          scaleDragLocalStart.y,
+                          scaleDragLocalEnd.y
+                        ),
+                    editorGrid.gridHeight,
+                    (y) => editorGrid.getSnappedY(y)
                   );
                 const getSnappedScaleZ = () =>
                   getScaleSnappedOnGrid(
                     initialObjectZ,
                     initialObjectDepth,
-                    scaleZ,
-                    (z) => this._editorGrid.getSnappedZ(z)
+                    isUniform
+                      ? uniformSizeDelta
+                      : getSizeDelta(
+                          scaleDragLocalStart.z,
+                          scaleDragLocalEnd.z
+                        ),
+                    editorGrid.gridDepth,
+                    (z) => editorGrid.getSnappedZ(z)
                   );
-                if (threeTransformControls.axis === 'XYZ') {
+                if (isUniform) {
                   // Uniform scaling: like the 2D proportional resize, snap the
                   // biggest side and apply the same ratio to the others.
                   const uniformScale =
@@ -3783,9 +3850,10 @@ namespace gdjs {
 
       currentScene.getAllLayerNames(layerNames);
       layerNames.forEach((layerName) => {
-        const runtimeLayerRender = currentScene
-          .getLayer(layerName)
-          .getRenderer();
+        const runtimeLayer = currentScene.getLayer(layerName);
+        // Three.js raycasting ignores the visibility of objects.
+        if (!runtimeLayer.isVisible()) return;
+        const runtimeLayerRender = runtimeLayer.getRenderer();
         const threeCamera = runtimeLayerRender.getThreeCamera();
         const threeGroup = runtimeLayerRender.getThreeGroup();
         if (!threeCamera || !threeGroup) return;
@@ -3891,6 +3959,7 @@ namespace gdjs {
             continue;
           }
           const layer = editedInstanceContainer.getLayer(object.getLayer());
+          if (!layer.isVisible()) continue;
           const layerIndex =
             editedInstanceContainer._orderedLayers.indexOf(layer);
           if (

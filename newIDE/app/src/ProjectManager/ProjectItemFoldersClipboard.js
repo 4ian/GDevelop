@@ -52,14 +52,19 @@ const serializeFolderOrItemNode = (
   };
 };
 
+export const copyFolderOrItemsToClipboard = (
+  kind: ProjectItemFoldersKind,
+  folderOrItems: Array<ProjectItemFolderOrItem>
+): void => {
+  Clipboard.set(getClipboardKind(kind), {
+    items: folderOrItems.map(serializeFolderOrItemNode),
+  });
+};
+
 export const copyFolderOrItemToClipboard = (
   kind: ProjectItemFoldersKind,
   folderOrItem: ProjectItemFolderOrItem
-): void => {
-  Clipboard.set(getClipboardKind(kind), {
-    items: [serializeFolderOrItemNode(folderOrItem)],
-  });
-};
+): void => copyFolderOrItemsToClipboard(kind, [folderOrItem]);
 
 export const hasFolderOrItemsInClipboard = (
   kind: ProjectItemFoldersKind

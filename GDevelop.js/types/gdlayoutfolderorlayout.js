@@ -14,7 +14,6 @@ declare class gdLayoutFolderOrLayout {
   getChildPosition(child: gdLayoutFolderOrLayout): number;
   getParent(): gdLayoutFolderOrLayout;
   insertNewFolder(name: string, newPosition: number): gdLayoutFolderOrLayout;
-  getOrCreateFolderChild(name: string): gdLayoutFolderOrLayout;
   moveFolderOrItemToAnotherFolder(folderOrItem: gdLayoutFolderOrLayout, newParentFolder: gdLayoutFolderOrLayout, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: gdLayoutFolderOrLayout): void;

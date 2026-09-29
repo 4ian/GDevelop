@@ -111,7 +111,6 @@ class ProjectItemFolderOrItem {
   void InsertItem(ItemType* insertedItem, std::size_t position = (size_t)-1);
   ProjectItemFolderOrItem& InsertNewFolder(const gd::String& newFolderName,
                                            std::size_t position);
-  ProjectItemFolderOrItem& GetOrCreateFolderChild(const gd::String& name);
 
   bool IsADescendantOf(const ProjectItemFolderOrItem& otherFolderOrItem);
   std::size_t GetChildPosition(const ProjectItemFolderOrItem& child) const;
@@ -141,6 +140,18 @@ class ProjectItemFolderOrItem {
   void UnserializeFrom(
       const SerializerElement& element,
       const std::function<ItemType*(const gd::String&)>& findItem);
+
+  /**
+   * \brief Unserialize the folder structure saved in the child `childName` of
+   * `parentElement` if any (otherwise the folder is emptied), then insert at
+   * its end the items of the list it does not hold: projects saved before the
+   * folders existed, or edited by hand, still show all their items.
+   */
+  void UnserializeFromChildOf(
+      const SerializerElement& parentElement,
+      const gd::String& childName,
+      const std::function<ItemType*(const gd::String&)>& findItem,
+      const std::vector<std::unique_ptr<ItemType>>& items);
   ///@}
 
  private:

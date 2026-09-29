@@ -21,6 +21,18 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   gd::Project project;
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
+  project.GetVariables().InsertNew("myGlobalVariable");
+  {
+    auto &structureVariable = project.GetVariables().InsertNew("myGlobalStructure");
+    structureVariable.GetChild("myNumberChild").SetValue(0);
+    structureVariable.GetChild("myStructureChild")
+        .GetChild("myNumberChild")
+        .SetValue(0);
+    structureVariable.GetChild("myStructureChild")
+        .GetChild("myStructureChild")
+        .GetChild("myNumberChild")
+        .SetValue(0);
+  }
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
   layout1.GetVariables().InsertNew("myVariable");
   {
@@ -56,12 +68,15 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
 
   auto getCompletionsFor = [&](const gd::String& type,
                                const gd::String& expression,
-                               size_t location) {
+                               size_t location,
+                               const gd::String& rootExtraInfo = "",
+                               const gd::String& rootObjectName = "") {
     auto node = parser.ParseExpression(expression);
     REQUIRE(node != nullptr);
     auto completions =
         gd::ExpressionCompletionFinder::GetCompletionDescriptionsFor(
-            platform, projectScopedContainers, type, *node, location);
+            platform, projectScopedContainers, type, rootExtraInfo,
+            rootObjectName, *node, location);
 
     std::vector<gd::String> completionsAsString;
     for (const auto& completion : completions) {
@@ -79,6 +94,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
           "{ 0, string, 3, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
           "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("string", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -92,6 +109,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
           "{ 0, number, 3, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
           "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("number", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -105,6 +124,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
           "{ 0, number|string, 3, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
           "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("number|string", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -121,6 +142,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
           "{ 0, string, 3, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
           "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("string", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -143,6 +166,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
           "{ 0, number, 3, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
           "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("number", "My", 0, 2).ToString()
       };
       // clang-format on
@@ -197,7 +222,80 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     REQUIRE(getCompletionsFor("string", "\"a\" + ", 5) ==
             expectedEmptyCompletions);
   }
-
+  SECTION("Empty parameter") {
+    SECTION("Empty variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("variable", "", 0) == expectedCompletions);
+    }
+    SECTION("Empty variableOrProperty parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("variableOrProperty", "", 0) ==
+              expectedCompletions);
+    }
+    SECTION("Empty variableOrPropertyOrParameter parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("variableOrPropertyOrParameter", "", 0) ==
+              expectedCompletions);
+    }
+    SECTION("Empty object variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myObjectVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myObjectStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("objectvar", "", 0, "", "MyObject") ==
+              expectedCompletions);
+    }
+    SECTION("Empty object variable parameter with unknown object") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{};
+      // clang-format on
+      REQUIRE(getCompletionsFor("objectvar", "", 0) ==
+              expectedCompletions);
+    }
+    SECTION("Empty legacy scene variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("scenevar", "", 0) ==
+              expectedCompletions);
+    }
+    SECTION("Empty legacy global variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("globalvar", "", 0) ==
+              expectedCompletions);
+    }
+  }
   SECTION("Free function") {
     SECTION("Test 1") {
       std::vector<gd::String> expectedCompletions{
@@ -233,6 +331,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
           "{ 0, unknown, 3, no prefix, MyObject, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, with object configuration }",
           "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           gd::ExpressionCompletionDescription::ForExpressionWithPrefix("unknown", "My", 9, 10).ToString()
       };
       // clang-format on
@@ -256,6 +356,8 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
         std::vector<gd::String> expectedCompletions{
             "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
         };
         // clang-format on
         REQUIRE(getCompletionsFor("number",
@@ -268,6 +370,9 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
             "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             // The structure is suggested because one of its children might be a number.
             "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            // The structure is suggested because one of its children might be a number.
+            "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
         };
         // clang-format on
         REQUIRE(getCompletionsFor(
@@ -278,6 +383,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
         // clang-format off
         std::vector<gd::String> expectedCompletions{
             "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
         };
         // clang-format on
         REQUIRE(getCompletionsFor(

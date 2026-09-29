@@ -108,7 +108,12 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
     variableNode = &node;
     node.parent->Visit(*this);
   }
-  void OnVisitEmptyNode(EmptyNode& node) override {}
+  void OnVisitEmptyNode(EmptyNode& node) override {
+    if (node.parent == nullptr) {
+      objectName = rootObjectName;
+      return;
+    }
+  }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {}

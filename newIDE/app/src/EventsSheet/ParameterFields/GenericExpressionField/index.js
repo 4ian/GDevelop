@@ -564,6 +564,8 @@ export default class ExpressionField extends React.Component<Props, State> {
       gd.JsPlatform.get(),
       projectScopedContainersAccessor.get(),
       expressionType,
+      parameterMetadata ? parameterMetadata.getExtraInfo() : '',
+      objectName,
       expressionNode,
       isVariableParameter ? Math.max(0, cursorPosition - 1) : cursorPosition - 1
     );

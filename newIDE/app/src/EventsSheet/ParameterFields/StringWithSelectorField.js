@@ -5,10 +5,12 @@ import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
   type FieldFocusFunction,
+  getParameterHelperMarkdownText,
 } from './ParameterFieldCommons';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import RichSelectField, {
   type RichSelectFieldInterface,
+  type RichSelectFieldExtraOption,
 } from '../../UI/RichSelectField';
 
 import GenericExpressionField from './GenericExpressionField';
@@ -42,16 +44,19 @@ export type StringWithSelectorFieldProps = {|
   ...ParameterFieldProps,
   // The choices to display. If not specified, they are read from the parameter metadata.
   choices?: Array<string>,
-  // If specified, displayed next to each choice (an icon, a preview...). The
-  // choices are then displayed in a menu instead of a native select.
+  // If specified, displayed next to each choice (an icon, a preview...).
   renderChoiceAdornment?: RenderChoiceAdornment,
+  // Actions shown after the choices, below a divider.
+  extraOptions?: Array<RichSelectFieldExtraOption>,
+  // Shown under the field, after the parameter long description.
+  extraHelperMarkdownText?: ?string,
 |};
 
 /**
  * If the value is one of the choices (i.e: `"choice"`), return the choice
  * (without quotes). Otherwise, return null.
  */
-const getSelectedChoice = (
+export const getSelectedChoice = (
   value: string,
   choices: Array<string>
 ): string | null => {
@@ -66,6 +71,8 @@ export default (React.forwardRef<
   const {
     choices: choicesFromProps,
     renderChoiceAdornment,
+    extraOptions,
+    extraHelperMarkdownText,
     ...parameterFieldProps
   } = props;
   const {
@@ -116,7 +123,7 @@ export default (React.forwardRef<
   };
 
   // $FlowFixMe[missing-local-annot]
-  const onChangeSelectValue = (event, value) => {
+  const onChangeSelectValue = event => {
     onChange(event.target.value);
   };
 
@@ -128,11 +135,13 @@ export default (React.forwardRef<
     parameterIndex !== undefined
       ? `parameter-${parameterIndex}-string-with-selector`
       : undefined;
-  const helperMarkdownText =
-    (parameterMetadata && parameterMetadata.getLongDescription()) || null;
+  const helperMarkdownText = getParameterHelperMarkdownText(
+    parameterMetadata,
+    extraHelperMarkdownText
+  );
 
   const renderSelectField = () =>
-    renderChoiceAdornment ? (
+    renderChoiceAdornment || extraOptions ? (
       <RichSelectField
         ref={field}
         id={fieldId}
@@ -146,11 +155,11 @@ export default (React.forwardRef<
         options={choices.map(choice => ({
           value: `"${choice}"`,
           label: choice,
-          adornment: renderChoiceAdornment(
-            choice,
-            isInline ? 'inlineField' : 'field'
-          ),
+          adornment: renderChoiceAdornment
+            ? renderChoiceAdornment(choice, isInline ? 'inlineField' : 'field')
+            : undefined,
         }))}
+        extraOptions={extraOptions}
       />
     ) : (
       <SelectField
@@ -186,6 +195,7 @@ export default (React.forwardRef<
             ref={field}
             id={fieldId}
             {...parameterFieldProps}
+            extraHelperMarkdownText={extraHelperMarkdownText}
             onChange={onChange}
           />
         )

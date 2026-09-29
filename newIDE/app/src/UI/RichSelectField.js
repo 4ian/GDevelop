@@ -15,6 +15,10 @@ const INVALID_VALUE = '';
 // $FlowFixMe[missing-local-annot]
 const stopPropagation = event => event.stopPropagation();
 
+// Menu item values of the extra options. They are never passed to `onChange`.
+const getExtraOptionValue = (index: number): string =>
+  `__rich_select_field_extra_option_${index}__`;
+
 const styles = {
   option: {
     display: 'flex',
@@ -22,6 +26,10 @@ const styles = {
     gap: 12,
     // Avoid the default min-height of 48px, which is too big to display options.
     minHeight: 36,
+  },
+  dividerOption: {
+    minHeight: 0,
+    padding: 0,
   },
   adornment: {
     display: 'flex',
@@ -56,6 +64,12 @@ export type RichSelectFieldOption = {|
   adornment?: React.Node,
 |};
 
+/** An action shown after the options, below a divider. It is not a choice. */
+export type RichSelectFieldExtraOption = {|
+  label: MessageDescriptor,
+  onClick: () => void,
+|};
+
 export type RichSelectFieldInterface = {|
   focus: FieldFocusFunction,
 |};
@@ -64,6 +78,7 @@ type Props = {|
   value: string,
   onChange: (value: string) => void,
   options: Array<RichSelectFieldOption>,
+  extraOptions?: Array<RichSelectFieldExtraOption>,
   fullWidth?: boolean,
   disabled?: boolean,
   stopPropagationOnClick?: boolean,
@@ -109,6 +124,29 @@ const RichSelectField: React.ComponentType<{
     <MarkdownText source={props.helperMarkdownText} />
   ) : null;
 
+  const extraOptions = props.extraOptions || [];
+  const onChange = (value: string) => {
+    const extraOption = extraOptions.find(
+      (option, index) => getExtraOptionValue(index) === value
+    );
+    if (extraOption) {
+      extraOption.onClick();
+      return;
+    }
+    props.onChange(value);
+  };
+
+  const renderMenuItem = ({
+    value,
+    label,
+    adornment,
+  }: RichSelectFieldOption) => (
+    <MenuItem key={value} value={value} style={styles.option}>
+      {adornment ? <span style={styles.adornment}>{adornment}</span> : null}
+      <span>{label}</span>
+    </MenuItem>
+  );
+
   const renderValue = (value: string): React.Node => {
     const option = props.options.find(option => option.value === value);
     if (!option) return null;
@@ -139,9 +177,7 @@ const RichSelectField: React.ComponentType<{
           error={!!props.errorText}
           value={displayedValue}
           onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
-          onChange={event => {
-            props.onChange(event.target.value);
-          }}
+          onChange={event => onChange(event.target.value)}
           InputLabelProps={{
             shrink: true,
           }}
@@ -167,18 +203,21 @@ const RichSelectField: React.ComponentType<{
           }}
           inputRef={inputRef}
         >
-          {props.options.map(option => (
+          {props.options.map(renderMenuItem)}
+          {extraOptions.length > 0 ? (
             <MenuItem
-              key={option.value}
-              value={option.value}
-              style={styles.option}
-            >
-              {option.adornment ? (
-                <span style={styles.adornment}>{option.adornment}</span>
-              ) : null}
-              <span>{option.label}</span>
-            </MenuItem>
-          ))}
+              key="extra-options-divider"
+              disabled
+              divider
+              style={styles.dividerOption}
+            />
+          ) : null}
+          {extraOptions.map((option, index) =>
+            renderMenuItem({
+              value: getExtraOptionValue(index),
+              label: i18n._(option.label),
+            })
+          )}
         </TextField>
       )}
     </I18n>

@@ -1026,6 +1026,8 @@ namespace gdjs {
         type: 'slider';
         id: string;
         tooltip: string;
+        /** An icon shown before the slider, as a visual label. */
+        iconUrl?: string;
         min: float;
         max: float;
         value: float;
@@ -1874,8 +1876,11 @@ namespace gdjs {
     /**
      * Show a toolbar for a tool of an extension, below the editor toolbar and
      * looking like it, during the next frame: call it at every frame while
-     * it must be shown. Items can be changed between frames: elements are
-     * only created again when the ids of the items change.
+     * it must be shown.
+     *
+     * Items can be created again at every frame from the state of the tool:
+     * elements are only created again when the types or ids of the items
+     * change, and events call the functions of the latest items.
      */
     showToolbar(
       toolbarId: string,
@@ -4249,6 +4254,15 @@ namespace gdjs {
           height: 16px;
           border-radius: 50%;
         }
+        .InGameEditor-Toolbar-Slider-Container {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .InGameEditor-Toolbar-Slider-Container .InGameEditor-Toolbar-Button-Icon {
+          width: 16px;
+          height: 16px;
+        }
         .InGameEditor-Toolbar-Slider {
           width: 80px;
           accent-color: var(--in-game-editor-theme-icon-button-selected-background-color);
@@ -4424,6 +4438,25 @@ namespace gdjs {
   }
 
   /**
+   * Show an icon (drawn with the color of texts), a color, or nothing.
+   */
+  const updateToolbarIcon = (
+    element: HTMLElement,
+    iconUrl: string | undefined,
+    color?: string
+  ) => {
+    const mask =
+      iconUrl && !color ? `url('${iconUrl}') center/contain no-repeat` : '';
+    element.className = color
+      ? 'InGameEditor-Toolbar-Button-Color'
+      : 'InGameEditor-Toolbar-Button-Icon';
+    element.style.display = iconUrl || color ? '' : 'none';
+    element.style.backgroundColor = color || '';
+    element.style.setProperty('-webkit-mask', mask);
+    element.style.setProperty('mask', mask);
+  };
+
+  /**
    * A toolbar of an extension, below the editor toolbar.
    */
   class ExtensionToolbar {
@@ -4466,19 +4499,18 @@ namespace gdjs {
             'InGameEditor-Toolbar-Button-Active',
             !!item.isActive
           );
-          const content = element.firstElementChild as HTMLElement;
-          const mask = item.color
-            ? ''
-            : `url('${item.iconUrl}') center/contain no-repeat`;
-          content.className = item.color
-            ? 'InGameEditor-Toolbar-Button-Color'
-            : 'InGameEditor-Toolbar-Button-Icon';
-          content.style.backgroundColor = item.color || '';
-          content.style.setProperty('-webkit-mask', mask);
-          content.style.setProperty('mask', mask);
+          updateToolbarIcon(
+            element.firstElementChild as HTMLElement,
+            item.iconUrl,
+            item.color
+          );
         } else if (item.type === 'slider') {
-          const slider = element as HTMLInputElement;
-          slider.title = item.tooltip;
+          element.title = item.tooltip;
+          updateToolbarIcon(
+            element.firstElementChild as HTMLElement,
+            item.iconUrl
+          );
+          const slider = element.lastElementChild as HTMLInputElement;
           slider.min = '' + item.min;
           slider.max = '' + item.max;
           if (document.activeElement !== slider) {
@@ -4525,7 +4557,12 @@ namespace gdjs {
         });
         // A focused element would receive the keyboard shortcuts of the editor.
         slider.addEventListener('pointerup', () => slider.blur());
-        return slider;
+        return (
+          <div class="InGameEditor-Toolbar-Slider-Container">
+            <span />
+            {slider}
+          </div>
+        );
       }
       const button = (
         <button

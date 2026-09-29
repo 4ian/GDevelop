@@ -1125,11 +1125,10 @@ namespace gdjs {
         const reportedObjectNames = new Set<string>();
 
         /**
-         * Report the custom objects with no child in them, `object` included:
-         * they render nothing at all and fall back to a 1x1x1 size. Except
-         * the ones the JavaScript code of their extension draws (like the 3D
-         * particle emitters, rendered with Three.js): no child either, yet
-         * something on screen.
+         * Report custom objects with no child instances at the end of the
+         * test, `object` included. Skip known custom rendering, and describe
+         * the observed state without assuming that it is a rendering bug:
+         * extension code can draw elsewhere or create children dynamically.
          */
         const checkObject = (
           object: gdjs.RuntimeObject,
@@ -1143,11 +1142,11 @@ namespace gdjs {
             .getChildrenContainer()
             .getAdhocListOfAllInstances();
           if (children.length === 0) {
-            if (this._isCustomObjectRenderedByCode(object)) return;
+            if (this._hasCustomRendering(object)) return;
             if (reportedObjectNames.has(path)) return;
             reportedObjectNames.add(path);
             warnings.push(
-              `"${path}" is a custom object with no child in it: it renders nothing. Either its variant declares child objects with no instance of them placed (it then also falls back to a 1x1x1 size), or its children were all destroyed while the test ran.`
+              `"${path}" has no child instances at the end of the test. Check whether its variant is missing initial instances or its children were destroyed. This can be intentional for objects rendered by extension code or creating children dynamically; it does not prove a rendering failure.`
             );
             return;
           }
@@ -1175,24 +1174,27 @@ namespace gdjs {
       }
 
       /**
-       * Whether a custom object without any child still renders something,
-       * because the JavaScript code of its extension draws it: either the
-       * code replaced the renderer of the object (the 3D particle emitters,
-       * lights and texts swap theirs for a Three.js object), or it added
+       * Whether a custom object may render independently of its child
+       * instances: either extension code replaced or subclassed its renderer
+       * (3D particle emitters draw through a shared layer renderer), or added
        * something to draw (a mesh, a sprite, a graphics...) in the container
        * the stock renderer holds for the children.
        */
-      private _isCustomObjectRenderedByCode(
-        object: gdjs.RuntimeObject
-      ): boolean {
+      private _hasCustomRendering(object: gdjs.RuntimeObject): boolean {
         const renderer = (object as any)._renderer;
         if (!renderer) return false;
         const anyGdjs = gdjs as any;
+        // `instanceof` also accepts extension subclasses, such as
+        // ParticleEmitter3DRenderer. Their meshes can live outside the
+        // object's renderer tree, so only inspect the exact stock classes.
+        const rendererPrototype = Object.getPrototypeOf(renderer);
         const isStockRenderer =
           (typeof anyGdjs.CustomRuntimeObject2DRenderer !== 'undefined' &&
-            renderer instanceof anyGdjs.CustomRuntimeObject2DRenderer) ||
+            rendererPrototype ===
+              anyGdjs.CustomRuntimeObject2DRenderer.prototype) ||
           (typeof anyGdjs.CustomRuntimeObject3DRenderer !== 'undefined' &&
-            renderer instanceof anyGdjs.CustomRuntimeObject3DRenderer);
+            rendererPrototype ===
+              anyGdjs.CustomRuntimeObject3DRenderer.prototype);
         if (!isStockRenderer) return true;
 
         // The containers hold the (empty) layers of the custom object, which

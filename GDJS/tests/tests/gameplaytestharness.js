@@ -2666,7 +2666,7 @@ describe('gdjs.gameplayTests', () => {
 
         expect(getWarningsAbout(harness, 'EmptyShell').length).to.be(1);
         expect(getWarningsAbout(harness, 'EmptyShell')[0]).to.contain(
-          'renders nothing'
+          'has no child instances at the end of the test'
         );
         expect(getWarningsAbout(harness, 'EmptyShell3D').length).to.be(1);
         // A custom object with children is fine.
@@ -2691,6 +2691,50 @@ describe('gdjs.gameplayTests', () => {
 
         expect(getWarningsAbout(harness, 'EmptyShell3D').length).to.be(0);
       });
+
+      for (const is3D of [false, true]) {
+        it(`does not warn about a ${is3D ? '3D' : '2D'} renderer subclass drawing outside the custom object's children`, async () => {
+          const harness = makeStartedHarness(
+            makeRuntimeGameWithCustomObjects()
+          );
+          await harness.goToScene('Scene 1');
+          const objectName = is3D ? 'EmptyShell3D' : 'EmptyShell';
+          harness.spawn(objectName, 100, 200);
+          await harness.stepFrames(1);
+          const object = /** @type {any} */ (
+            harness.getRuntimeObject(objectName)
+          );
+          if (!object) throw new Error(`${objectName} was not spawned.`);
+
+          const BaseRenderer = is3D
+            ? gdjs.CustomRuntimeObject3DRenderer
+            : gdjs.CustomRuntimeObject2DRenderer;
+          class ExtensionRenderer extends BaseRenderer {}
+          object._renderer = new ExtensionRenderer(
+            object,
+            object.getChildrenContainer(),
+            object.getInstanceContainer()
+          );
+
+          // ParticleEmitter3D uses a subclass of the stock renderer, but
+          // its emitter is an empty Object3D: the meshes are drawn by a
+          // shared batch renderer on the layer, outside the emitter tree.
+          // The same arrangement is possible with a PixiJS renderer.
+          const layerRenderer = object
+            .getInstanceContainer()
+            .getLayer(object.getLayer())
+            .getRenderer();
+          if (is3D) {
+            object._renderer._threeGroup = new THREE.Object3D();
+            layerRenderer.add3DRendererObject(new THREE.Mesh());
+          } else {
+            layerRenderer.addRendererObject(new PIXI.Graphics(), 0);
+          }
+
+          expect(object._renderer instanceof BaseRenderer).to.be(true);
+          expect(getWarningsAbout(harness, objectName).length).to.be(0);
+        });
+      }
 
       it('does not warn about a custom object whose code draws in its renderer container', async () => {
         // The containers already hold the (empty) layers of the custom

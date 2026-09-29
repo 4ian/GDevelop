@@ -89,8 +89,8 @@ export type SimplifiedCustomObjectVariant = {|
   // carry this variant's values.
   childObjects: Array<SimplifiedObject>,
   instancesDescription: string,
-  // Set when child objects are declared but no instance of them is placed:
-  // the custom object then renders nothing at all.
+  // Set when child objects are declared but no initial instance is placed.
+  // Extension code can still draw the object or create children at runtime.
   hasNoChildInstance?: true,
 |};
 
@@ -347,8 +347,9 @@ export const getSimplifiedArea = (
 });
 
 /**
- * A custom object renders its child instances: a variant declaring child
- * objects with no instance of them placed renders nothing at all.
+ * Whether a variant declares child objects but places no initial instances.
+ * This says nothing about rendering performed by extension code or children
+ * created at runtime.
  */
 const hasChildObjectsButNoInstance = (
   variant: gdEventsBasedObjectVariant

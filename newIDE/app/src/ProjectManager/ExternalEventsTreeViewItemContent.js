@@ -4,21 +4,8 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { unserializeFromJSObject } from '../Utils/Serializer';
-import { addFolderIn } from './ProjectItemFolderTreeViewItemContent';
-import {
-  type ProjectItemFoldersKind,
-  buildMoveToFolderSubmenu,
-  getFolderOrItemTreeViewItemId,
-  isFolderOrItemDescendantOf,
-  getFolderOrItemIndex,
-  moveFolderOrItemAt,
-} from './ProjectItemFolders';
-import {
-  copyFolderOrItemToClipboard,
-  pasteFolderOrItemsFromClipboard,
-  hasFolderOrItemsInClipboard,
-  getPasteMenuLabel,
-} from './ProjectItemFoldersClipboard';
+import { ProjectItemInFolder } from './ProjectItemInFolder';
+import { type ProjectItemFoldersKind } from './ProjectItemFolders';
 import {
   type TreeViewItemContent,
   type TreeItemProps,
@@ -81,6 +68,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   externalEvents: gdExternalEvents;
   // The node of the folder structure holding this item.
   folderOrItem: gdExternalEventsFolderOrExternalEvents;
+  inFolder: ProjectItemInFolder;
   props: ExternalEventsTreeViewItemProps;
 
   constructor(
@@ -90,6 +78,11 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   ) {
     this.externalEvents = externalEvents;
     this.folderOrItem = folderOrItem;
+    this.inFolder = new ProjectItemInFolder(
+      externalEventsFoldersKind,
+      folderOrItem,
+      props
+    );
     this.props = props;
   }
 
@@ -98,11 +91,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return isFolderOrItemDescendantOf(
-      externalEventsFoldersKind,
-      this.folderOrItem,
-      itemContent
-    );
+    return this.inFolder.isDescendantOf(itemContent);
   }
 
   getRootId(): string {
@@ -149,17 +138,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
-      {
-        label: i18n._(t`Move to folder`),
-        submenu: buildMoveToFolderSubmenu(
-          i18n,
-          externalEventsFoldersKind,
-          this.props.project,
-          this.folderOrItem,
-          () => this._onFolderStructureModified(),
-          () => this._addFolderInParent()
-        ),
-      },
+      this.inFolder.buildMoveToFolderMenuItem(i18n),
       {
         type: 'separator',
       },
@@ -186,12 +165,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
         click: () => this.cut(),
         accelerator: 'CmdOrCtrl+X',
       },
-      {
-        label: getPasteMenuLabel(i18n, externalEventsFoldersKind),
-        enabled: hasFolderOrItemsInClipboard(externalEventsFoldersKind),
-        click: () => this.paste(),
-        accelerator: 'CmdOrCtrl+V',
-      },
+      this.inFolder.buildPasteMenuItem(i18n, () => this.paste()),
       {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
@@ -208,19 +182,18 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   getIndex(): number {
-    return getFolderOrItemIndex(this.folderOrItem);
+    return this.inFolder.getIndex();
   }
 
   moveAt(
     destinationIndex: number,
     targetFolder?: gdExternalEventsFolderOrExternalEvents
   ): void {
-    moveFolderOrItemAt(this.folderOrItem, destinationIndex, targetFolder);
-    this._onFolderStructureModified();
+    this.inFolder.moveAt(destinationIndex, targetFolder);
   }
 
   copy(): void {
-    copyFolderOrItemToClipboard(externalEventsFoldersKind, this.folderOrItem);
+    this.inFolder.copy();
   }
 
   cut(): void {
@@ -229,55 +202,12 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    const pastedContent = pasteFolderOrItemsFromClipboard({
-      kind: externalEventsFoldersKind,
-      project: this.props.project,
-      destinationFolder: this.folderOrItem.getParent(),
-      positionInFolder: this.getIndex() + 1,
-    });
-    if (!pastedContent) return;
-
-    this._onFolderStructureModified();
-    const firstPastedItem = pastedContent.topLevelFolderOrItems[0];
-    if (firstPastedItem) {
-      this.props.editName(
-        getFolderOrItemTreeViewItemId(
-          externalEventsFoldersKind,
-          firstPastedItem
-        )
-      );
-    }
+    this.inFolder.paste();
   }
 
   _duplicate(): void {
     this.copy();
     this.paste();
-  }
-
-  _onProjectItemModified() {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.props.forceUpdate();
-  }
-
-  _addFolderInParent(): void {
-    addFolderIn(
-      {
-        ...this.props,
-        kind: externalEventsFoldersKind,
-        onProjectItemModified: () => this._onProjectItemModified(),
-      },
-      this.folderOrItem.getParent()
-    );
-  }
-
-  /**
-   * The tree view caches the children of each item, so it must also be told to
-   * rebuild them when the folder structure itself changed.
-   */
-  _onFolderStructureModified() {
-    this._onProjectItemModified();
-    this.props.forceUpdateList();
   }
 
   getRightButton(i18n: I18nType): any {

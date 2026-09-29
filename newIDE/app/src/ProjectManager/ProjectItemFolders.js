@@ -123,6 +123,41 @@ export const moveFolderOrItemAt = (
 };
 
 /**
+ * Move nodes of a same folder structure in a new folder, created where the
+ * first of them is. A node inside another one of the nodes moves with it, so
+ * it is left where it is. Returns null when there is nothing to move.
+ */
+export const groupInNewFolder = (
+  folderOrItems: Array<ProjectItemFolderOrItem>
+): ?{|
+  newFolder: ProjectItemFolderOrItem,
+  parentFolder: ProjectItemFolderOrItem,
+|} => {
+  const topLevelFolderOrItems = folderOrItems.filter(
+    folderOrItem =>
+      !folderOrItems.some(
+        otherFolderOrItem =>
+          otherFolderOrItem !== folderOrItem &&
+          folderOrItem.isADescendantOf(otherFolderOrItem)
+      )
+  );
+  if (topLevelFolderOrItems.length === 0) return null;
+
+  const firstFolderOrItem = topLevelFolderOrItems[0];
+  const parentFolder = firstFolderOrItem.getParent();
+  const newFolder = parentFolder.insertNewFolder(
+    'NewFolder',
+    getFolderOrItemIndex(firstFolderOrItem)
+  );
+  topLevelFolderOrItems.forEach((folderOrItem, index) => {
+    folderOrItem
+      .getParent()
+      .moveFolderOrItemToAnotherFolder(folderOrItem, newFolder, index);
+  });
+  return { newFolder, parentFolder };
+};
+
+/**
  * Move a newly inserted item (that is at the root of the folder structure)
  * into the given folder, and return its node.
  */
@@ -210,4 +245,35 @@ export const buildMoveToFolderSubmenu = (
       click: onAddFolder,
     },
   ];
+};
+
+/**
+ * Add a new folder at the top of the given folder and start editing its name,
+ * like the objects list does.
+ */
+export const addFolderIn = (
+  {
+    kind,
+    onProjectItemModified,
+    forceUpdateList,
+    expandFolders,
+    editName,
+  }: {
+    kind: ProjectItemFoldersKind,
+    onProjectItemModified: () => void,
+    // The tree view caches the children of each item, so it must be told to
+    // rebuild them when the folder structure itself changed.
+    forceUpdateList: () => void,
+    expandFolders: (folderIds: Array<string>) => void,
+    editName: (itemId: string) => void,
+  },
+  parentFolder: ProjectItemFolderOrItem
+): void => {
+  const newFolder = parentFolder.insertNewFolder('NewFolder', 0);
+
+  onProjectItemModified();
+  forceUpdateList();
+  expandFolders([getParentFolderTreeViewItemId(kind, parentFolder)]);
+  // We focus it so the user can edit the name directly.
+  editName(getFolderTreeViewItemId(kind, newFolder));
 };

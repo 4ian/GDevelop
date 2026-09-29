@@ -2423,7 +2423,7 @@ export class VectorExpressionCompletionDescription extends EmscriptenObject {
 }
 
 export class ExpressionCompletionFinder extends EmscriptenObject {
-  static getCompletionDescriptionsFor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, node: ExpressionNode, location: number): VectorExpressionCompletionDescription;
+  static getCompletionDescriptionsFor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, rootExtraInfo: string, rootObjectName: string, node: ExpressionNode, location: number): VectorExpressionCompletionDescription;
   getCompletionDescriptions(): VectorExpressionCompletionDescription;
 }
 

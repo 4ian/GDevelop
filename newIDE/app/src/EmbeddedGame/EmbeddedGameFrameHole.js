@@ -31,6 +31,23 @@ const notifyActiveEmbeddedGameFrameHoleCountCallbacks = () => {
   );
 };
 
+let embeddedGameFrameHoleResizeCallbacks: Array<() => void> = [];
+export const registerEmbeddedGameFrameHoleResizeCallback = (
+  callback: () => void
+): (() => void) => {
+  embeddedGameFrameHoleResizeCallbacks.push(callback);
+  return () => {
+    embeddedGameFrameHoleResizeCallbacks.splice(
+      embeddedGameFrameHoleResizeCallbacks.indexOf(callback),
+      1
+    );
+  };
+};
+
+const notifyEmbeddedGameFrameHoleResizeCallbacks = () => {
+  embeddedGameFrameHoleResizeCallbacks.forEach(callback => callback());
+};
+
 export const getActiveEmbeddedGameFrameHoleRect = (): ?ClientRect => {
   // There is only one embedded game frame hole active at a time,
   // so we don't need to check if the parent scene editor is active.
@@ -67,8 +84,27 @@ export const EmbeddedGameFrameHole = (props: Props): React.MixedElement => {
     [props.isActive]
   );
 
+  // Notify when the hole is resized (panels opened, closed or resized), so that
+  // the in-game editor knows the part of the game frame that is visible.
+  const holeRef = React.useRef<HTMLDivElement | null>(null);
+  React.useEffect(
+    () => {
+      const hole = holeRef.current;
+      if (!props.isActive || !hole || typeof ResizeObserver === 'undefined')
+        return;
+
+      const resizeObserver = new ResizeObserver(
+        notifyEmbeddedGameFrameHoleResizeCallbacks
+      );
+      resizeObserver.observe(hole);
+      return () => resizeObserver.disconnect();
+    },
+    [props.isActive]
+  );
+
   return (
     <div
+      ref={holeRef}
       style={{
         height: `calc(100% - ${props.marginBottom || 0}px)`,
         display: 'flex',

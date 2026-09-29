@@ -240,6 +240,8 @@ const translateTypeToHumanReadableDescription = type => {
   if (caseInsensitiveCheck(type, 'boolean')) return '🔘 Boolean';
   if (caseInsensitiveCheck(type, 'color')) return '🎨 Color';
   if (caseInsensitiveCheck(type, 'resource')) return '🗂️ Resource';
+  if (caseInsensitiveCheck(type, 'bitmask'))
+    return '🔢 Bitmask, one bit per option (Number)';
 
   return type;
 };
@@ -1168,7 +1170,9 @@ const generateExtensionRawText = (
                 ].join(' ');
               }),
               '',
-              effectMetadata.getHelpPath() ? generateReadMoreLink(effectMetadata.getHelpPath()) : '',
+              effectMetadata.getHelpPath()
+                ? generateReadMoreLink(effectMetadata.getHelpPath())
+                : '',
               '',
             ].join(`\n`),
           };

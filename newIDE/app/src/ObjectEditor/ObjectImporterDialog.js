@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
@@ -8,7 +8,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import Upload from '../UI/CustomSvgIcons/Upload';
-import { listArchiveFiles, getFileBlob } from '../Utils/BrowserArchiver';
+import { listArchiveFiles, openArchive } from '../Utils/BrowserArchiver';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import path from 'path-browserify';
 import Checkbox from '../UI/Checkbox';
@@ -22,11 +22,13 @@ import semverGreaterThan from 'semver/functions/gt';
 import semverValid from 'semver/functions/valid';
 import { addSerializedExtensionsToProject } from '../AssetStore/ExtensionStore/InstallExtension';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import LoaderModal from '../UI/LoaderModal';
+import { GenericRetryableProcessWithProgressDialog } from '../Utils/UseGenericRetryableProcessWithProgress';
 import AlertMessage from '../UI/AlertMessage';
 import { getOrCreate } from '../Utils/Map';
 import { unserializeResourceFromJSObject } from '../Utils/Serializer';
 import { complyVariantsToEventsBasedObjectOf } from '../AssetStore/InstallAsset';
+import { isURL, isBlobURL } from '../ResourcesList/ResourceUtils';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -119,6 +121,14 @@ class ObjectTreeNode {
       }
     }
     return objects;
+  }
+
+  getObjectCount(): number {
+    let objectCount = this.objects.length;
+    for (const folder of this.folders.values()) {
+      objectCount += folder.getObjectCount();
+    }
+    return objectCount;
   }
 
   // eslint-disable-next-line no-use-before-define
@@ -394,6 +404,81 @@ type Props = {|
   onClose: () => void,
 |};
 
+/**
+ * Return the path of a resource file inside the archive.
+ * Resources stored as URLs are exported under their URL, but zip entries
+ * can't contain consecutive slashes ("https://" is stored as "https:/").
+ */
+const getResourceArchivePath = (resourceFile: string): string =>
+  ('resources/' + resourceFile).replace(/\\/g, '/').replace(/\/+/g, '/');
+
+type LoadingStep =
+  | 'opening-pack'
+  | 'reading-pack-objects'
+  | 'reading-selected-objects'
+  | 'importing-resources'
+  | 'installing-extensions'
+  | 'adding-objects';
+
+type LoadingProgress = {|
+  step: LoadingStep,
+  /** Number of the item being processed in the step, starting at 1. */
+  loadedCount: number,
+  totalCount: number,
+  /**
+   * Progress of the whole action, from 0 to 100. Import steps share it,
+   * so that the bar doesn't go back to 0 between them.
+   */
+  progress: number,
+|};
+
+const getProgress = (processedCount: number, totalCount: number): number =>
+  (100 * processedCount) / Math.max(1, totalCount);
+
+const getLoadingMessage = ({
+  step,
+  loadedCount,
+  totalCount,
+}: LoadingProgress): React.Node => {
+  switch (step) {
+    case 'opening-pack':
+      return <Trans>Opening the pack...</Trans>;
+    case 'reading-pack-objects':
+      return (
+        <Trans>
+          Reading the objects of the pack ({loadedCount}/{totalCount})
+        </Trans>
+      );
+    case 'reading-selected-objects':
+      return (
+        <Trans>
+          Reading the selected objects ({loadedCount}/{totalCount})
+        </Trans>
+      );
+    case 'importing-resources':
+      return (
+        <Trans>
+          Importing the files used by the objects ({loadedCount}/{totalCount})
+        </Trans>
+      );
+    case 'installing-extensions':
+      return (
+        <Trans>
+          Installing extensions ({loadedCount}/{totalCount})
+        </Trans>
+      );
+    case 'adding-objects':
+    default:
+      return (
+        <Trans>
+          Adding objects ({loadedCount}/{totalCount})
+        </Trans>
+      );
+  }
+};
+
+class ImportCancelledError extends Error {}
+
 const ObjectImporterDialog = ({
   project,
   objectsContainer,
@@ -404,12 +489,64 @@ const ObjectImporterDialog = ({
   onClose,
 }: Props): React.Node => {
   const openAssetFile = useOpenAssetFile();
+  const forceUpdate = useForceUpdate();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
 
+  const { showAlert } = useAlertDialog();
   const [isLoading, setLoading] = React.useState(false);
+  const [
+    loadingProgress,
+    setLoadingProgress,
+  ] = React.useState<?LoadingProgress>(null);
+  const [isCancelable, setCancelable] = React.useState(false);
+  const isCancelRequestedRef = React.useRef(false);
+  const throwIfCancelRequested = React.useCallback(() => {
+    if (isCancelRequestedRef.current) {
+      throw new ImportCancelledError();
+    }
+  }, []);
+
+  /**
+   * Run a step of the import and display any error in a dialog
+   * instead of leaving an unhandled promise rejection.
+   */
+  const runWithErrorAlert = React.useCallback(
+    (step: () => Promise<void>) => async () => {
+      isCancelRequestedRef.current = false;
+      setCancelable(true);
+      try {
+        await step();
+      } catch (error) {
+        setLoading(false);
+        setLoadingProgress(null);
+        if (error instanceof ImportCancelledError) {
+          console.info('[ObjectImporter] Cancelled by the user.');
+          return;
+        }
+        console.error('Error while importing assets:', error);
+        await showAlert({
+          title: t`Could not import assets`,
+          message:
+            t`An error happened while importing the assets:` +
+            '\n' +
+            String((error && error.message) || error),
+        });
+      } finally {
+        setCancelable(false);
+      }
+    },
+    [showAlert]
+  );
   const [assetPackBlob, setAssetPackBlob] = React.useState<Blob | null>(null);
+  const [
+    archiveFilePaths,
+    setArchiveFilePaths,
+  ] = React.useState<Set<string> | null>(null);
+  const [missingFilePaths, setMissingFilePaths] = React.useState<Array<string>>(
+    []
+  );
   const [
     objectTreeRoot,
     setObjectTreeRoot,
@@ -431,10 +568,23 @@ const ObjectImporterDialog = ({
         onClose();
         return;
       }
+      // The file count is unknown until the archive is listed.
+      setLoadingProgress({
+        step: 'opening-pack',
+        loadedCount: 0,
+        totalCount: 0,
+        progress: 0,
+      });
+      console.info(
+        `[ObjectImporter] Listing the files of the pack (${
+          assetPackBlob.size
+        } bytes)...`
+      );
       const allFilePaths = await listArchiveFiles({
         archiveBlob: assetPackBlob,
         onProgress: (count, total) => {},
       });
+      console.info(`[ObjectImporter] ${allFilePaths.length} files listed.`);
       const allObjectsList = allFilePaths
         .filter(
           filePath =>
@@ -477,18 +627,91 @@ const ObjectImporterDialog = ({
           isSelected: true,
         });
       }
+      const archiveReader = await openArchive(assetPackBlob);
+      console.info('[ObjectImporter] Pack opened, reading its objects...');
+      const allFilePathsSet = new Set<string>(allFilePaths);
+      const missingFilePathsSet = new Set<string>();
+      let readAssetCount = 0;
+      for (const { filePath } of allObjectsList) {
+        throwIfCancelRequested();
+        readAssetCount++;
+        setLoadingProgress({
+          step: 'reading-pack-objects',
+          loadedCount: readAssetCount,
+          totalCount: allObjectsList.length,
+          progress: getProgress(readAssetCount, allObjectsList.length),
+        });
+        try {
+          const assetBlob: Blob = await archiveReader.getFileBlob(
+            filePath,
+            'application/json'
+          );
+          const assetContainer: {
+            objectAssets: Array<ObjectAsset>,
+          } = JSON.parse(await assetBlob.text());
+          for (const objectAsset of assetContainer.objectAssets) {
+            for (const resource of objectAsset.resources || []) {
+              const resourceFilePath = getResourceArchivePath(resource.file);
+              // A resource stored as a URL can still be loaded from its URL.
+              if (
+                !isURL(resource.file) &&
+                !allFilePathsSet.has(resourceFilePath)
+              ) {
+                missingFilePathsSet.add(resourceFilePath);
+              }
+            }
+            for (const { extensionName } of objectAsset.requiredExtensions ||
+              []) {
+              const extensionFilePath = `extensions/${extensionName}.json`;
+              if (
+                !allFilePathsSet.has(extensionFilePath) &&
+                !project.hasEventsFunctionsExtensionNamed(extensionName)
+              ) {
+                missingFilePathsSet.add(extensionFilePath);
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`Unable to read the asset "${filePath}":`, error);
+          missingFilePathsSet.add(filePath);
+        }
+      }
+      await archiveReader.close();
+      setArchiveFilePaths(allFilePathsSet);
+      setMissingFilePaths([...missingFilePathsSet]);
+      if (missingFilePathsSet.size > 0) {
+        showAlert({
+          title: t`Some files are missing from this pack`,
+          message:
+            t`The assets using these files will be imported without them:` +
+            '\n' +
+            [...missingFilePathsSet]
+              .map(filePath => '- ' + filePath)
+              .join('\n'),
+        });
+      }
+
       const objectTreeRoot = new ObjectTreeNode();
       for (const { objectFolderPath, objects } of objectsByFolder) {
         const subFolder = objectTreeRoot.getOrCreateSubFolders(
           objectFolderPath
         );
-        subFolder.objects = objects;
+        // Archive entries are not sorted by folder: the same folder can come
+        // back several times, so its objects must be appended.
+        subFolder.objects.push(...objects);
       }
+      console.info('[ObjectImporter] Pack opened:', {
+        archiveFileCount: allFilePaths.length,
+        assetFileCount: allObjectsList.length,
+        assetFilePaths: allObjectsList.map(({ filePath }) => filePath),
+        missingFilePaths: [...missingFilePathsSet],
+      });
+      setLoadingProgress(null);
       setAssetPackBlob(assetPackBlob);
       setObjectTreeRoot(objectTreeRoot);
       setLoading(false);
     },
-    [onClose, openAssetFile]
+    [onClose, openAssetFile, project, showAlert, throwIfCancelRequested]
   );
 
   /**
@@ -505,21 +728,28 @@ const ObjectImporterDialog = ({
         onClose();
         return;
       }
+      console.info('[ObjectImporter] Reading the selected assets...');
       setLoading(true);
       const objectAssets: Array<{|
         objectAsset: ObjectAsset,
         folderPathElements: Array<string>,
       |}> = [];
-      for (const {
-        filePath,
-        folderPathElements,
-      } of objectTreeRoot.getAllSelectedObjects()) {
-        const assetBlob: Blob = await getFileBlob({
-          archiveBlob: assetPackBlob,
-          filePath,
-          contentType: 'application/json',
-          onProgress: () => {},
+      const archiveReader = await openArchive(assetPackBlob);
+      const selectedObjects = objectTreeRoot.getAllSelectedObjects();
+      let readSelectedAssetCount = 0;
+      for (const { filePath, folderPathElements } of selectedObjects) {
+        throwIfCancelRequested();
+        readSelectedAssetCount++;
+        setLoadingProgress({
+          step: 'reading-selected-objects',
+          loadedCount: readSelectedAssetCount,
+          totalCount: selectedObjects.length,
+          progress: getProgress(readSelectedAssetCount, selectedObjects.length),
         });
+        const assetBlob: Blob = await archiveReader.getFileBlob(
+          filePath,
+          'application/json'
+        );
         const assetContainer: { objectAssets: [ObjectAsset] } = JSON.parse(
           await assetBlob.text()
         );
@@ -528,6 +758,7 @@ const ObjectImporterDialog = ({
         }
       }
 
+      await archiveReader.close();
       const conflictedVariantsByObjectType = new Map<string, VariantsUpdate>();
       /** Map of serialized `gdEventsBasedObjectVariant` */
       const newVariantsByObjectType = new Map<string, Map<string, any>>();
@@ -631,6 +862,18 @@ const ObjectImporterDialog = ({
           }
         }
       }
+      console.info('[ObjectImporter] Selected assets analyzed:', {
+        selectedObjectCount: objectAssets.length,
+        selectedObjects: objectAssets.map(
+          ({ objectAsset, folderPathElements }) =>
+            [...folderPathElements, objectAsset.object.name].join('/')
+        ),
+        newExtensionNames,
+        conflictedExtensions,
+        newVariantTypes: [...newVariantsByObjectType.keys()],
+        conflictedVariantTypes: [...conflictedVariantsByObjectType.keys()],
+      });
+      setLoadingProgress(null);
       setAssetPackContent({
         objectAssets,
         newVariantsByObjectType,
@@ -640,7 +883,7 @@ const ObjectImporterDialog = ({
       });
       setLoading(false);
     },
-    [assetPackBlob, objectTreeRoot, onClose, project]
+    [assetPackBlob, objectTreeRoot, onClose, project, throwIfCancelRequested]
   );
 
   /**
@@ -652,6 +895,7 @@ const ObjectImporterDialog = ({
       if (!assetPackBlob || !assetPackContent) {
         return;
       }
+      console.info('[ObjectImporter] Importing the assets...');
       setLoading(true);
       const {
         objectAssets,
@@ -687,55 +931,132 @@ const ObjectImporterDialog = ({
       }
       let hasAddedAnyResource = false;
       const resourcesManager: gdResourcesContainer = project.getResourcesManager();
-      for (const [resourceName, serializedResource] of allRequiredResources) {
-        if (resourcesManager.hasResource(resourceName)) {
-          continue;
-        }
-        const resourceKindMetadata = allResourceKindsAndMetadata.find(
-          resourceKind => resourceKind.kind === serializedResource.kind
-        );
-        if (!resourceKindMetadata) {
-          console.error(
-            `Resource of kind "${serializedResource.kind}" is not supported.`
-          );
-          continue;
-        }
-        // The resource does not exist yet, add it. Note that the "origin" will be preserved.
-        const newResource = resourceKindMetadata.createNewResource();
-        unserializeResourceFromJSObject(newResource, serializedResource);
-
-        const resourceBlob: Blob = await getFileBlob({
-          archiveBlob: assetPackBlob,
-          filePath: 'resources/' + newResource.getFile().replace('\\', '/'),
-          contentType: '',
-          onProgress: () => {},
-        });
-        newResource.setFile(URL.createObjectURL(resourceBlob));
-
-        resourcesManager.addResource(newResource);
-        hasAddedAnyResource = true;
-        newResource.delete();
-      }
-
-      /** List of serialized `gdEventsFunctionsExtension` */
-      const serializedExtensions: Array<any> = [];
-      for (const extensionName of [
+      const extensionNamesToInstall = [
         ...newExtensionNames,
         ...replacingExtensionNames,
-      ]) {
-        const extensionBlob: Blob = await getFileBlob({
-          archiveBlob: assetPackBlob,
-          filePath: `extensions/${extensionName}.json`,
-          contentType: '',
-          onProgress: () => {},
-        });
-        const serializedExtension = JSON.parse(await extensionBlob.text());
-        serializedExtensions.push(serializedExtension);
+      ];
+      // Resources are only added to the project once every file is read,
+      // so that cancelling the import leaves the project untouched.
+      const pendingResources: Array<{|
+        resourceName: string,
+        resource: gdResource,
+      |}> = [];
+      const releasePendingResources = () => {
+        for (const { resource } of pendingResources) {
+          if (isBlobURL(resource.getFile())) {
+            URL.revokeObjectURL(resource.getFile());
+          }
+          resource.delete();
+        }
+        pendingResources.length = 0;
+      };
+      /** List of serialized `gdEventsFunctionsExtension` */
+      const serializedExtensions: Array<any> = [];
+      const importItemCount =
+        allRequiredResources.size +
+        extensionNamesToInstall.length +
+        objectAssets.length;
+      let importedItemCount = 0;
+      const getImportProgress = () =>
+        getProgress(++importedItemCount, importItemCount);
+      const archiveReader = await openArchive(assetPackBlob);
+      try {
+        let importedResourceCount = 0;
+        for (const [resourceName, serializedResource] of allRequiredResources) {
+          throwIfCancelRequested();
+          setLoadingProgress({
+            step: 'importing-resources',
+            loadedCount: ++importedResourceCount,
+            totalCount: allRequiredResources.size,
+            progress: getImportProgress(),
+          });
+          if (resourcesManager.hasResource(resourceName)) {
+            continue;
+          }
+          const resourceKindMetadata = allResourceKindsAndMetadata.find(
+            resourceKind => resourceKind.kind === serializedResource.kind
+          );
+          if (!resourceKindMetadata) {
+            console.error(
+              `Resource of kind "${serializedResource.kind}" is not supported.`
+            );
+            continue;
+          }
+          // The resource does not exist yet, add it. Note that the "origin" will be preserved.
+          const newResource = resourceKindMetadata.createNewResource();
+          unserializeResourceFromJSObject(newResource, serializedResource);
+
+          const resourceFilePath = getResourceArchivePath(
+            newResource.getFile()
+          );
+          if (archiveFilePaths && archiveFilePaths.has(resourceFilePath)) {
+            const resourceBlob: Blob = await archiveReader.getFileBlob(
+              resourceFilePath,
+              ''
+            );
+            newResource.setFile(URL.createObjectURL(resourceBlob));
+          } else if (!isURL(newResource.getFile())) {
+            console.warn(
+              `The archive doesn't contain the file of the resource "${resourceName}": ${resourceFilePath}`
+            );
+          }
+          // Otherwise, the resource is kept with its URL.
+
+          pendingResources.push({ resourceName, resource: newResource });
+        }
+
+        let readExtensionCount = 0;
+        for (const extensionName of extensionNamesToInstall) {
+          throwIfCancelRequested();
+          setLoadingProgress({
+            step: 'installing-extensions',
+            loadedCount: ++readExtensionCount,
+            totalCount: extensionNamesToInstall.length,
+            progress: getImportProgress(),
+          });
+          const extensionFilePath = `extensions/${extensionName}.json`;
+          if (!archiveFilePaths || !archiveFilePaths.has(extensionFilePath)) {
+            console.warn(
+              `The archive doesn't contain the extension: ${extensionFilePath}`
+            );
+            continue;
+          }
+          const extensionBlob: Blob = await archiveReader.getFileBlob(
+            extensionFilePath,
+            ''
+          );
+          const serializedExtension = JSON.parse(await extensionBlob.text());
+          serializedExtensions.push(serializedExtension);
+        }
+        throwIfCancelRequested();
+      } catch (error) {
+        releasePendingResources();
+        throw error;
+      } finally {
+        await archiveReader.close();
       }
+
+      // From here, the project is modified: the import can't be cancelled.
+      setCancelable(false);
+      for (const { resourceName, resource } of pendingResources) {
+        console.info(
+          '[ObjectImporter] Resource added:',
+          resourceName,
+          resource.getFile()
+        );
+        resourcesManager.addResource(resource);
+        resource.delete();
+        hasAddedAnyResource = true;
+      }
+      pendingResources.length = 0;
       const installedExtensionNames = serializedExtensions.map(
         extensions => extensions.name
       );
       onWillInstallExtension(installedExtensionNames);
+      console.info(
+        '[ObjectImporter] Installing extensions:',
+        installedExtensionNames
+      );
       await addSerializedExtensionsToProject(
         eventsFunctionsExtensionsState,
         project,
@@ -744,10 +1065,18 @@ const ObjectImporterDialog = ({
       );
       onExtensionInstalled(installedExtensionNames);
 
+      console.info('[ObjectImporter] Adding variants.');
       addOrReplaceVariants(project, newVariantsByObjectType);
       addOrReplaceVariants(project, replacingVariantsByObjectType);
 
+      let addedObjectCount = 0;
       for (const { objectAsset, folderPathElements } of objectAssets) {
+        setLoadingProgress({
+          step: 'adding-objects',
+          loadedCount: ++addedObjectCount,
+          totalCount: objectAssets.length,
+          progress: getImportProgress(),
+        });
         const objectType: ?string = objectAsset.object.type;
         if (!objectType) {
           console.log('An object has no type specified');
@@ -778,9 +1107,11 @@ const ObjectImporterDialog = ({
         );
         // The name was overwritten after unserialization.
         object.setName(newName);
+        console.info('[ObjectImporter] Object added:', newName, objectType);
         object.resetPersistentUuid();
       }
 
+      console.info('[ObjectImporter] Import done.');
       onClose();
       setLoading(false);
       if (hasAddedAnyResource) {
@@ -796,11 +1127,13 @@ const ObjectImporterDialog = ({
     },
     [
       assetPackBlob,
+      archiveFilePaths,
       assetPackContent,
       eventsFunctionsExtensionsState,
       objectsContainer,
       onClose,
       onEventsBasedObjectChildrenEdited,
+      throwIfCancelRequested,
       onExtensionInstalled,
       onWillInstallExtension,
       project,
@@ -810,12 +1143,17 @@ const ObjectImporterDialog = ({
 
   React.useEffect(
     () => {
-      chooseAndListAssetPackFile();
+      runWithErrorAlert(chooseAndListAssetPackFile)();
     },
     // Open the file chooser dialog only once.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+
+  const selectedObjectCount = objectTreeRoot
+    ? objectTreeRoot.getAllSelectedObjects().length
+    : 0;
+  const totalObjectCount = objectTreeRoot ? objectTreeRoot.getObjectCount() : 0;
 
   return (
     <Dialog
@@ -831,7 +1169,7 @@ const ObjectImporterDialog = ({
             label={<Trans>Import</Trans>}
             primary
             keyboardFocused={true}
-            onClick={importAssets}
+            onClick={runWithErrorAlert(importAssets)}
             key="import"
           />
         ) : (
@@ -839,7 +1177,7 @@ const ObjectImporterDialog = ({
             label={<Trans>Next</Trans>}
             primary
             keyboardFocused={true}
-            onClick={checkAssetsConflictWithProject}
+            onClick={runWithErrorAlert(checkAssetsConflictWithProject)}
             key="check-assets"
           />
         ),
@@ -856,6 +1194,21 @@ const ObjectImporterDialog = ({
             beforehand.
           </Trans>
         </AlertMessage>
+        {missingFilePaths.length > 0 && (
+          <AlertMessage kind="warning">
+            <Text noMargin>
+              <Trans>
+                Some files are missing from this pack. The assets using them
+                will be imported without these files:
+              </Trans>
+            </Text>
+            {missingFilePaths.map(missingFilePath => (
+              <Text noMargin key={missingFilePath}>
+                {'- ' + missingFilePath}
+              </Text>
+            ))}
+          </AlertMessage>
+        )}
         {assetPackContent ? (
           <ExtensionAndVariantChooser
             conflictedExtensions={assetPackContent.conflictedExtensions}
@@ -868,10 +1221,15 @@ const ObjectImporterDialog = ({
             <Text size="block-title">
               <Trans>Assets</Trans>
             </Text>
-            <Text>Choose the assets to import.</Text>
+            <Text>
+              <Trans>
+                Choose the assets to import ({selectedObjectCount}/
+                {totalObjectCount} selected).
+              </Trans>
+            </Text>
             <SelectableObjectTreeNode
               node={objectTreeRoot}
-              onSelectionChanged={() => {}}
+              onSelectionChanged={forceUpdate}
             />
           </ColumnStackLayout>
         ) : (
@@ -880,11 +1238,30 @@ const ObjectImporterDialog = ({
               icon={<Upload />}
               primary
               label={<Trans>Choose a pack</Trans>}
-              onClick={chooseAndListAssetPackFile}
+              onClick={runWithErrorAlert(chooseAndListAssetPackFile)}
             />
           </Column>
         )}
-        {isLoading ? <LoaderModal showImmediately /> : null}
+        {isLoading ? (
+          <GenericRetryableProcessWithProgressDialog
+            title={<Trans>Importing assets</Trans>}
+            message={
+              loadingProgress ? getLoadingMessage(loadingProgress) : null
+            }
+            progress={loadingProgress ? loadingProgress.progress : 0}
+            result={null}
+            genericError={null}
+            onAbandon={null}
+            onRetry={null}
+            onCancel={
+              isCancelable
+                ? () => {
+                    isCancelRequestedRef.current = true;
+                  }
+                : null
+            }
+          />
+        ) : null}
       </ColumnStackLayout>
     </Dialog>
   );

@@ -168,7 +168,7 @@ export const createNewProjectFromExampleShortHeader = async ({
     const creationSource = newProjectSetup.creationSource;
 
     const newProjectSource = getNewProjectSourceFromUrl(
-      example.projectFileUrl,
+      newProjectSetup.projectFileUrl || example.projectFileUrl,
       {
         exampleUrl: example.projectFileUrl,
         exampleSlug: exampleShortHeader.slug,

@@ -1047,7 +1047,7 @@ module.exports = {
             'Enabling texture transparency has an impact on rendering performance.'
           )
         )
-        .setGroup(_('Texture'));
+        .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('facesOrientation')
@@ -1092,7 +1092,7 @@ module.exports = {
         .setValue(objectContent.tint || '255;255;255')
         .setType('Color')
         .setLabel(_('Tint'))
-        .setGroup(_('Texture'));
+        .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('frontFaceResourceName')

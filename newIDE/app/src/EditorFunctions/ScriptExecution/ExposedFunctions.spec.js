@@ -93,10 +93,14 @@ describe('buildExposedScriptFunctions', () => {
     });
 
     expect(result.success).toBe(true);
+    // The legacy `scene_name` is mapped to a `scope` before the call.
     expect(received).toEqual({
       i18n: 'FAKE_I18N',
       toolOptions: null,
-      args: { scene_name: 'Level1' },
+      args: {
+        scene_name: 'Level1',
+        scope: { type: 'scene', scene_name: 'Level1' },
+      },
       project: 'FAKE_PROJECT',
     });
   });
@@ -147,6 +151,39 @@ describe('capScriptExecutionResult', () => {
     expect(modifyingRecord.didModifyProject).toBe(true);
     // The whole script modified the project.
     expect(capped.didModifyProject).toBe(true);
+  });
+
+  it('keeps only the size of raw JSON args, and the other args', async () => {
+    const editorFunctions = {
+      change_instances_raw_json: makeFakeEditorFunction({
+        modifiesProject: true,
+      }),
+    };
+    const exposed = buildExposedScriptFunctions({
+      editorFunctions,
+      editorFunctionsWithoutProject: {},
+      launchOptions: asCollaborators({}),
+      project: asProject({}),
+    });
+    const rawJson = JSON.stringify({ tiles: Array(5000).fill(-1) });
+    const result = await executeScript({
+      jsCode: `await change_instances_raw_json({ scope: { type: 'scene', scene_name: 'L' }, changes: [{ instance_id: 'abc', raw_json: ${JSON.stringify(
+        rawJson
+      )} }] });`,
+      exposedFunctions: exposed,
+    });
+
+    const capped = capScriptExecutionResult(result);
+
+    expect(capped.functionCallRecords[0].args).toEqual({
+      scope: { type: 'scene', scene_name: 'L' },
+      changes: [
+        {
+          instance_id: 'abc',
+          raw_json: `[raw JSON, ${rawJson.length} chars]`,
+        },
+      ],
+    });
   });
 
   it('caps console logs with a truncation note', async () => {

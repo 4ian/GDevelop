@@ -81,7 +81,7 @@ type ListItemRightButtonProps =
 // We support a subset of the props supported by Material-UI v0.x ListItem
 // They should be self descriptive - refer to Material UI docs otherwise.
 type ListItemProps = {|
-  onClick?: ?() => void | Promise<void>,
+  onClick?: ?(event: SyntheticMouseEvent<HTMLElement>) => void | Promise<void>,
   onDoubleClick?: (event: DoubleClickMouseEvent) => void,
   primaryText: ?React.Node,
   secondaryText?: React.Node,
@@ -293,10 +293,10 @@ export const ListItem: React.ComponentType<{
       );
     } else {
       const isItemOpen = props.open === undefined ? isOpen : props.open;
-      const onClickItem = () => {
+      const onClickItem = (event: SyntheticMouseEvent<HTMLElement>) => {
         setIsOpen(!isItemOpen);
         if (props.onClick) {
-          props.onClick();
+          props.onClick(event);
         }
       };
       return (

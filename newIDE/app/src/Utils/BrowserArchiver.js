@@ -215,6 +215,74 @@ export const listArchiveFiles = async ({
   });
 };
 
+export type ArchiveReader = {|
+  getFileBlob: (filePath: string, contentType: string) => Promise<Blob>,
+  close: () => Promise<void>,
+|};
+
+/**
+ * Open an archive once to read several files from it,
+ * instead of reading the whole archive index for each file.
+ */
+export const openArchive = async (
+  archiveBlob: Blob
+): Promise<ArchiveReader> => {
+  const zipJs: ZipJs = await initializeZipJs();
+
+  return new Promise((resolve, reject) => {
+    let isOpened = false;
+    // Zip.js reports reading errors through the reader error callback,
+    // so the file being read must be rejected from there.
+    let rejectCurrentFile: ?(error: any) => void = null;
+    zipJs.createReader(
+      // $FlowFixMe[invalid-constructor]
+      new zipJs.BlobReader(archiveBlob),
+      function(zipReader) {
+        zipReader.getEntries(entries => {
+          const entriesByFilePath = new Map(
+            entries.map(entry => [entry.filename, entry])
+          );
+          isOpened = true;
+          resolve({
+            getFileBlob: (filePath: string, contentType: string) =>
+              new Promise((resolveFile, rejectFile) => {
+                const entry = entriesByFilePath.get(filePath);
+                if (!entry) {
+                  rejectFile(
+                    new Error(`The archive doesn't contain: ${filePath}`)
+                  );
+                  return;
+                }
+                rejectCurrentFile = rejectFile;
+                entry.getData(
+                  // $FlowFixMe[invalid-constructor]
+                  new zipJs.BlobWriter(contentType),
+                  blob => {
+                    rejectCurrentFile = null;
+                    resolveFile(blob);
+                  }
+                );
+              }),
+            close: () =>
+              new Promise(resolveClose => {
+                zipReader.close(resolveClose);
+              }),
+          });
+        });
+      },
+      error => {
+        console.error('Error while reading zip:', error);
+        if (!isOpened) {
+          reject(error);
+        } else if (rejectCurrentFile) {
+          rejectCurrentFile(error);
+          rejectCurrentFile = null;
+        }
+      }
+    );
+  });
+};
+
 export const getFileBlob = async ({
   archiveBlob,
   filePath,

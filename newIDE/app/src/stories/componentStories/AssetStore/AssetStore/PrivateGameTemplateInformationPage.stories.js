@@ -14,6 +14,7 @@ import {
   client as assetApiAxiosClient,
   type PrivateGameTemplate,
 } from '../../../../Utils/GDevelopServices/Asset';
+import { client as gameApiAxiosClient } from '../../../../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from '../../../../Profile/AuthenticatedUserContext';
@@ -90,6 +91,7 @@ const privateGameTemplate1: PrivateGameTemplate = {
   createdAt: '2022-09-14T12:27:27.173Z',
   tag: 'french game',
   longDescription: 'This is the best game template about french food',
+  showcasedGameId: 'published-game-id',
   gamePreviewLink: 'https://gamepreview.gdevelop-app.com',
 };
 
@@ -138,6 +140,8 @@ const privateGameTemplate2: PrivateGameTemplate = {
   createdAt: '2022-09-14T12:27:27.173Z',
   tag: 'french sounds',
   longDescription: 'This is the best game template about french sounds',
+  // This game is not published (anymore) on gd.games: no "Try it online" button.
+  showcasedGameId: 'unpublished-game-id',
   gamePreviewLink: 'https://gamepreview.gdevelop-app.com',
 };
 
@@ -195,7 +199,6 @@ const privateGameTemplateBundle: PrivateGameTemplate = {
   createdAt: '2022-09-14T12:27:27.173Z',
   tag: 'french bundle',
   longDescription: 'This is the best bundle about french games',
-  gamePreviewLink: 'https://gamepreview.gdevelop-app.com',
 };
 
 const allPrivateGameTemplateListingData = [
@@ -264,6 +267,34 @@ const PrivateGameTemplateInformationPageStory = ({
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
+  const gameServiceMock = new MockAdapter(gameApiAxiosClient, {
+    delayResponse,
+  });
+  gameServiceMock
+    .onGet('/public-game/published-game-id')
+    .reply(200, {
+      id: 'published-game-id',
+      gameName: 'French Game',
+      authorName: 'Seller',
+      publicWebBuildId: 'some-build-id',
+      userSlug: 'seller',
+      gameSlug: 'french-game',
+      owners: [],
+      authors: [],
+      playWithKeyboard: true,
+      playWithGamepad: false,
+      playWithMobile: false,
+      orientation: 'default',
+      displayAdsOnGamePage: false,
+      donateLink: null,
+    })
+    .onGet('/public-game/unpublished-game-id')
+    .reply(404, null)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
 
   return (
     <PrivateGameTemplateStoreContext.Provider
@@ -327,6 +358,13 @@ export const Default = (): React.Node => (
 export const ForABundle = (): React.Node => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplateBundleListingData}
+  />
+);
+
+// The showcase game is not published on gd.games: no "Try it online" button.
+export const ForGameTemplateWithUnpublishedGame = (): React.Node => (
+  <PrivateGameTemplateInformationPageStory
+    privateGameTemplateListingData={privateGameTemplate2ListingData}
   />
 );
 

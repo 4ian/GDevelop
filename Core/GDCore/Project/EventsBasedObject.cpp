@@ -88,4 +88,10 @@ void EventsBasedObject::UnserializeDefaultVariantFrom(
   defaultVariant.SetName("");
 }
 
+bool EventsBasedObject::IsObjectLifecycleEventsFunction(
+    const gd::String &functionName) {
+  return functionName == "onCreated" || functionName == "doStepPostEvents" ||
+         functionName == "onDestroy" || functionName == "onHotReloading";
+}
+
 }  // namespace gd

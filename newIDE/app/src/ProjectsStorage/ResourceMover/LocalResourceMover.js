@@ -63,10 +63,7 @@ export const moveAllLocalResourcesToCloudResources = async ({
               // (as the project is a local project). Still, ignore this.
               return null;
             } else if (isBlobURL(resourceFile)) {
-              result.erroredResources.push({
-                resourceName: resource.getName(),
-                error: new Error('Unsupported blob URL.'),
-              });
+              // Written by the resource fetcher, after the move.
               return null;
             } else {
               // Public URL resource: nothing to do.

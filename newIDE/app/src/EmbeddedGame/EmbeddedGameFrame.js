@@ -11,9 +11,12 @@ import { registerOpenedDialogsCountCallback } from '../UI/Dialog';
 import {
   getActiveEmbeddedGameFrameHoleRect,
   registerActiveEmbeddedGameFrameHoleCountCallback,
+  registerEmbeddedGameFrameHoleResizeCallback,
 } from './EmbeddedGameFrameHole';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useInGameEditorSettings } from './InGameEditorSettings';
+import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
+import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -240,6 +243,77 @@ export const EmbeddedGameFrame = ({
       shortcutCallbacks: {},
     })
   );
+  const hasSomeDialogOpen = React.useRef<boolean>(false);
+
+  // The game is displayed in an iframe, which is a separate document: it only receives
+  // the keyboard events if it has the focus. Give it the focus as soon as it is hovered,
+  // so that the in-game editor shortcuts (notably space to move the view) can be used
+  // without having to click on the game first.
+  const focusGameFrameOnHover = React.useCallback(() => {
+    const iframe = iframeRef.current;
+    if (!iframe || !iframe.contentWindow) return;
+
+    // A dialog can be opened on top of the game, or show it through a "hole": don't
+    // fight with its focus trap.
+    if (hasSomeDialogOpen.current) return;
+
+    // Nothing to do if the game is already focused, and don't interrupt the user while
+    // a text is being edited (renaming an object, editing a property...).
+    if (document.activeElement === iframe || isUserTyping()) return;
+
+    iframe.contentWindow.focus();
+  }, []);
+
+  // Send the part of the game frame that is not covered by the editor panels,
+  // either with a command changing the view or so that the in-game editor
+  // can use it later (e.g. to focus on the selection).
+  const sendVisibleScreenArea = React.useCallback(
+    (command: ChangeViewPositionCommand | 'setVisibleScreenArea') => {
+      const iframe = iframeRef.current;
+      if (!iframe || !previewDebuggerServer) return;
+
+      const embeddedGameFrameRect = iframe.getBoundingClientRect();
+      const embeddedGameFrameHoleRect = getActiveEmbeddedGameFrameHoleRect();
+      if (
+        !embeddedGameFrameHoleRect ||
+        !embeddedGameFrameRect.width ||
+        !embeddedGameFrameRect.height
+      )
+        return;
+
+      const visibleScreenArea = {
+        minX:
+          (embeddedGameFrameHoleRect.left - embeddedGameFrameRect.left) /
+          embeddedGameFrameRect.width,
+        minY:
+          (embeddedGameFrameHoleRect.top - embeddedGameFrameRect.top) /
+          embeddedGameFrameRect.height,
+        maxX:
+          (embeddedGameFrameHoleRect.right - embeddedGameFrameRect.left) /
+          embeddedGameFrameRect.width,
+        maxY:
+          (embeddedGameFrameHoleRect.bottom - embeddedGameFrameRect.top) /
+          embeddedGameFrameRect.height,
+      };
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command,
+            payload: { visibleScreenArea },
+          });
+        });
+    },
+    [previewDebuggerServer]
+  );
+
+  React.useEffect(
+    () =>
+      registerEmbeddedGameFrameHoleResizeCallback(() =>
+        sendVisibleScreenArea('setVisibleScreenArea')
+      ),
+    [sendVisibleScreenArea]
+  );
 
   const inGameEditorSettings = useInGameEditorSettings();
   React.useEffect(
@@ -412,6 +486,7 @@ export const EmbeddedGameFrame = ({
                 editorCamera3D: cameraStates.current.get(editorId),
               });
             });
+          sendVisibleScreenArea('setVisibleScreenArea');
         }
       };
       onSwitchInGameEditorIfNoHotReloadIsNeeded = ({
@@ -454,43 +529,10 @@ export const EmbeddedGameFrame = ({
               cameraState3D: cameraStates.current.get(editorId),
             });
           });
+        sendVisibleScreenArea('setVisibleScreenArea');
       };
       onChangeViewPosition = (command: ChangeViewPositionCommand) => {
-        const iframe = iframeRef.current;
-        if (!iframe) return;
-
-        const embeddedGameFrameRect = iframe.getBoundingClientRect();
-        const embeddedGameFrameHoleRect = getActiveEmbeddedGameFrameHoleRect();
-        if (!embeddedGameFrameHoleRect || !embeddedGameFrameRect) return;
-
-        if (!previewDebuggerServer) return;
-        previewDebuggerServer
-          .getExistingEmbeddedGameFrameDebuggerIds()
-          .forEach(debuggerId => {
-            previewDebuggerServer.sendMessage(debuggerId, {
-              command,
-              payload: {
-                visibleScreenArea: {
-                  minX:
-                    (embeddedGameFrameHoleRect.left -
-                      embeddedGameFrameRect.left) /
-                    embeddedGameFrameRect.width,
-                  minY:
-                    (embeddedGameFrameHoleRect.top -
-                      embeddedGameFrameRect.top) /
-                    embeddedGameFrameRect.height,
-                  maxX:
-                    (embeddedGameFrameHoleRect.right -
-                      embeddedGameFrameRect.left) /
-                    embeddedGameFrameRect.width,
-                  maxY:
-                    (embeddedGameFrameHoleRect.bottom -
-                      embeddedGameFrameRect.top) /
-                    embeddedGameFrameRect.height,
-                },
-              },
-            });
-          });
+        sendVisibleScreenArea(command);
       };
     },
     [
@@ -498,7 +540,18 @@ export const EmbeddedGameFrame = ({
       previewIndexHtmlLocation,
       onLaunchPreviewForInGameEdition,
       enabled,
+      sendVisibleScreenArea,
     ]
+  );
+
+  // A game loaded in the frame adds its whole memory to the one used by the editor.
+  React.useEffect(
+    () => {
+      if (!previewIndexHtmlLocation) return undefined;
+
+      return startNativeAppActivity('embedded-in-game-editor');
+    },
+    [previewIndexHtmlLocation]
   );
 
   // Register the iframe window in the debugger as soon as the iframe is shown.
@@ -568,7 +621,6 @@ export const EmbeddedGameFrame = ({
 
   React.useEffect(
     () => {
-      let hasSomeDialogOpen = false;
       let hasSomeEmbeddedGameFrameHoleActive = false;
 
       const sendInGameEditorVisibleStatus = () => {
@@ -579,7 +631,8 @@ export const EmbeddedGameFrame = ({
               previewDebuggerServer.sendMessage(debuggerId, {
                 command: 'setVisibleStatus',
                 visible:
-                  !hasSomeDialogOpen && hasSomeEmbeddedGameFrameHoleActive,
+                  !hasSomeDialogOpen.current &&
+                  hasSomeEmbeddedGameFrameHoleActive,
               });
             });
         }
@@ -587,7 +640,7 @@ export const EmbeddedGameFrame = ({
 
       const unregisterDialogOpenCallback = registerOpenedDialogsCountCallback(
         ({ openedDialogsCount }) => {
-          hasSomeDialogOpen = openedDialogsCount > 0;
+          hasSomeDialogOpen.current = openedDialogsCount > 0;
           sendInGameEditorVisibleStatus();
         }
       );
@@ -626,6 +679,9 @@ export const EmbeddedGameFrame = ({
           title="Game Preview"
           src={previewIndexHtmlLocation}
           tabIndex={0}
+          // Listened on the iframe itself and not on its container, so that the overlay
+          // covering it (drop target, pointer events blocker) doesn't take the focus.
+          onMouseOver={focusGameFrameOnHover}
           style={{
             position: 'absolute',
             top: 0,

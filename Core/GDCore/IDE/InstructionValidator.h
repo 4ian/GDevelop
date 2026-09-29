@@ -63,6 +63,10 @@ public:
 
   static gd::String GetRootVariableName(const gd::String &name);
 
+  static gd::String GetObjectNameForParameter(
+      const gd::ProjectScopedContainers projectScopedContainers,
+      const gd::Instruction &instruction, const gd::String &parameterType);
+
 private:
   static bool
   HasRequiredBehaviors(const gd::Instruction &instruction,

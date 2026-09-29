@@ -6,8 +6,8 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import GenericExpressionField from './GenericExpressionField';
 import { renderInlineDefaultField } from './DefaultField';
+import GenericExpressionField from './GenericExpressionField';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import { rgbStringAndAlphaToRGBColor } from '../../Utils/ColorTransformer';
 
@@ -15,23 +15,14 @@ const inlineColorPickerStyle = {
   width: 'var(--icon-size)',
   height: 'var(--icon-size)',
   verticalAlign: 'sub',
+  pointerEvents: 'none', // Prevents the color picker from being interactive in the inline renderer, otherwise the focus is steal by the popover react component and the color picker is visible but unsusable.
 };
-
-let wasSwatchClicked = false;
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ColorExpressionField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
-
-    const [shouldOnlyShowColorPicker] = React.useState(() => {
-      const openedFromSwatchClick = wasSwatchClicked;
-      wasSwatchClicked = false;
-      return !!props.isInline && openedFromSwatchClick;
-    });
-
     const focus: FieldFocusFunction = options => {
-      if (!shouldOnlyShowColorPicker && field.current)
-        field.current.focus(options);
+      if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
       focus,
@@ -45,7 +36,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           <ColorPicker
             style={style}
             disableAlpha
-            initiallyOpen={shouldOnlyShowColorPicker}
             color={rgbStringAndAlphaToRGBColor(props.value)}
             onChangeComplete={color => {
               onChange(
@@ -73,6 +63,11 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   +ref?: React.RefSetter<ParameterFieldInterface>,
 }>);
 
+/**
+ * Display the color of the parameter next to its value, as a small square.
+ * This is only a preview: the color is edited by opening the parameter, like
+ * any other one.
+ */
 export const renderInlineColor = (
   props: ParameterInlineRendererProps
 ): React.Node => {
@@ -84,15 +79,11 @@ export const renderInlineColor = (
   return (
     <>
       {renderInlineDefaultField(props)}{' '}
-      <span onClick={() => (wasSwatchClicked = true)}>
-        <ColorPicker
-          size="compact"
-          disableAlpha
-          readOnly
-          color={rgbColor}
-          style={inlineColorPickerStyle}
-        />
-      </span>
+      <ColorPicker
+        size="compact"
+        color={rgbColor}
+        style={inlineColorPickerStyle}
+      />
     </>
   );
 };

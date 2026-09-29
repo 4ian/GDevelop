@@ -3,7 +3,9 @@ import {
   haveSamePoints,
   allAnimationSpritesHaveSamePointsAs,
   copyAnimationsSpritePoints,
-  deleteSpritesFromAnimation,
+  deleteSpritesByIndexes,
+  duplicateSpritesByIndexes,
+  getSpriteIndexAfterMove,
   haveSameCollisionMasks,
   allObjectSpritesHaveSamePointsAs,
 } from './SpriteObjectHelper';
@@ -228,35 +230,76 @@ describe('SpriteObjectHelper', () => {
     });
   });
 
-  it('can remove sprites using the sprites pointers', () => {
-    const animation1 = new gd.Animation();
-    animation1.setUseMultipleDirections(true);
-    animation1.setDirectionsCount(2);
-    const emptySprite = new gd.Sprite();
-    animation1.getDirection(0).addSprite(emptySprite);
-    animation1.getDirection(0).addSprite(emptySprite);
-    animation1.getDirection(0).addSprite(emptySprite);
-    animation1.getDirection(1).addSprite(emptySprite);
-    animation1.getDirection(1).addSprite(emptySprite);
+  const makeDirectionWithSprites = (imageNames: Array<string>) => {
+    const direction = new gd.Direction();
+    imageNames.forEach(imageName => {
+      const sprite = new gd.Sprite();
+      sprite.setImageName(imageName);
+      direction.addSprite(sprite);
+      sprite.delete();
+    });
+    return direction;
+  };
 
-    const sprite1 = animation1.getDirection(0).getSprite(0);
-    const sprite2 = animation1.getDirection(0).getSprite(1);
-    const sprite3 = animation1.getDirection(0).getSprite(2);
-    sprite1.setImageName('sprite1.png');
-    sprite2.setImageName('sprite2.png');
-    sprite3.setImageName('sprite3.png');
-    deleteSpritesFromAnimation(animation1, {
-      [sprite1.ptr]: true,
-      [sprite3.ptr]: true,
+  const getDirectionImageNames = (direction: gdDirection): Array<string> => {
+    const imageNames = [];
+    for (let i = 0; i < direction.getSpritesCount(); i++) {
+      imageNames.push(direction.getSprite(i).getImageName());
+    }
+    return imageNames;
+  };
+
+  it('can remove sprites by their indexes', () => {
+    const direction = makeDirectionWithSprites([
+      'sprite1.png',
+      'sprite2.png',
+      'sprite3.png',
+    ]);
+
+    // Pass indexes unsorted on purpose: the helper must delete them
+    // from the highest to the lowest.
+    deleteSpritesByIndexes(direction, [0, 2]);
+
+    expect(getDirectionImageNames(direction)).toEqual(['sprite2.png']);
+    direction.delete();
+  });
+
+  it('can duplicate sprites by their indexes', () => {
+    const direction = makeDirectionWithSprites([
+      'sprite1.png',
+      'sprite2.png',
+      'sprite3.png',
+    ]);
+
+    duplicateSpritesByIndexes(direction, [0, 2]);
+
+    expect(getDirectionImageNames(direction)).toEqual([
+      'sprite1.png',
+      'sprite1.png',
+      'sprite2.png',
+      'sprite3.png',
+      'sprite3.png',
+    ]);
+    direction.delete();
+  });
+
+  describe('getSpriteIndexAfterMove', () => {
+    it('gives the new index of each item after a forward move', () => {
+      // Items: A B C D E. Move B (1) to position 3: A C D B E.
+      expect(getSpriteIndexAfterMove(0, 1, 3)).toBe(0); // A
+      expect(getSpriteIndexAfterMove(1, 1, 3)).toBe(3); // B (the moved item)
+      expect(getSpriteIndexAfterMove(2, 1, 3)).toBe(1); // C
+      expect(getSpriteIndexAfterMove(3, 1, 3)).toBe(2); // D
+      expect(getSpriteIndexAfterMove(4, 1, 3)).toBe(4); // E
     });
 
-    expect(animation1.getDirection(0).getSpritesCount()).toBe(1);
-    expect(
-      animation1
-        .getDirection(0)
-        .getSprite(0)
-        .getImageName()
-    ).toBe('sprite2.png');
-    expect(animation1.getDirection(1).getSpritesCount()).toBe(2);
+    it('gives the new index of each item after a backward move', () => {
+      // Items: A B C D E. Move D (3) to position 1: A D B C E.
+      expect(getSpriteIndexAfterMove(0, 3, 1)).toBe(0); // A
+      expect(getSpriteIndexAfterMove(1, 3, 1)).toBe(2); // B
+      expect(getSpriteIndexAfterMove(2, 3, 1)).toBe(3); // C
+      expect(getSpriteIndexAfterMove(3, 3, 1)).toBe(1); // D (the moved item)
+      expect(getSpriteIndexAfterMove(4, 3, 1)).toBe(4); // E
+    });
   });
 });

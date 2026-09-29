@@ -134,5 +134,41 @@ describe('DownloadFileSaveAsDialog', () => {
         }
       `);
     });
+
+    it('writes the files only in memory (a project not saved yet) in the copy', async () => {
+      if (!project)
+        throw new Error('Missing project, test is not properly setup.');
+      const resourcesManager = project.getResourcesManager();
+      const newResource = new gd.ImageResource();
+      newResource.setName('Logo');
+      newResource.setFile('blob:http://localhost/1234');
+      newResource.setMetadata(JSON.stringify({ extension: '.png' }));
+      resourcesManager.addResource(newResource);
+      newResource.delete();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onAddBlobFile = jest.fn();
+      mockFn(downloadUrlsToBlobs).mockImplementationOnce(({ urlContainers }) =>
+        urlContainers.map(({ filename, resource }) => ({
+          item: { resource, filename },
+          error: null,
+          blob: { blob: 'this-is-a-fake-blob' },
+        }))
+      );
+
+      await downloadResourcesAsBlobs({
+        // $FlowFixMe[incompatible-type]
+        project,
+        onAddBlobFile,
+        onProgress: () => {},
+      });
+
+      expect(onAddBlobFile).toHaveBeenCalledWith({
+        blob: { blob: 'this-is-a-fake-blob' },
+        filePath: 'assets/image/Logo.png',
+      });
+      expect(resourcesManager.getResource('Logo').getFile()).toBe(
+        'assets/image/Logo.png'
+      );
+    });
   });
 });

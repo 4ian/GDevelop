@@ -32,4 +32,6 @@ namespace gd {
   const gd::String ExpressionTypeFinder::stringType = "string";
   const gd::String ExpressionTypeFinder::numberOrStringType = "number|string";
 
+  const gd::String ExpressionTypeFinder::emptyExtraInfo = "";
+
 }  // namespace gd

@@ -117,6 +117,56 @@ export type AddAssetOutput = {|
   createdObjects: Array<gdObject>,
 |};
 
+/**
+ * Install an asset that is an effect on the given effects container:
+ * its images become resources, and the effect named `effectName` (created if
+ * it does not exist) shows them.
+ */
+export const installEffectAsset = ({
+  asset,
+  project,
+  effectsContainer,
+  effectName,
+}: {|
+  asset: Asset,
+  project: gdProject,
+  effectsContainer: gdEffectsContainer,
+  effectName: string,
+|}): gdEffect => {
+  const effectAsset = asset.effectAssets ? asset.effectAssets[0] : null;
+  if (!effectAsset) throw new Error('The asset is not an effect.');
+
+  const resourceNewNames: { [string]: string } = {};
+  effectAsset.resources.forEach(serializedResource => {
+    installResource(project, asset, serializedResource, resourceNewNames);
+  });
+
+  const effect = effectsContainer.hasEffectNamed(effectName)
+    ? effectsContainer.getEffect(effectName)
+    : effectsContainer.insertNewEffect(
+        effectName,
+        effectsContainer.getEffectsCount()
+      );
+  effect.setEffectType(effectAsset.effect.effectType);
+  effect.clearParameters();
+  const {
+    doubleParameters,
+    stringParameters,
+    booleanParameters,
+  } = effectAsset.effect;
+  Object.keys(doubleParameters).forEach(name => {
+    effect.setDoubleParameter(name, doubleParameters[name]);
+  });
+  Object.keys(booleanParameters).forEach(name => {
+    effect.setBooleanParameter(name, booleanParameters[name]);
+  });
+  Object.keys(stringParameters).forEach(name => {
+    const value = stringParameters[name];
+    effect.setStringParameter(name, resourceNewNames[value] || value);
+  });
+  return effect;
+};
+
 export type InstallAssetOutput = {|
   createdObjects: Array<gdObject>,
   isTheFirstOfItsTypeInProject: boolean,

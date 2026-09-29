@@ -126,6 +126,15 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newName);
 
   /**
+   * \brief Refactor extension events after the extension has been pasted or
+   * duplicated.
+   */
+  static void UpdateExtensionNameInExtension(
+      gd::Project &project,
+      gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &sourceExtensionName);
+
+  /**
    * \brief Refactor behavior events after the behavior has been placed in a new
    * extension.
    */
@@ -159,6 +168,19 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newFunctionName);
 
   /**
+   * \brief Refactor the project **before** an events function is moved.
+   *
+   * \warning Do move the specified function after calling this.
+   * This is because the function is expected to have its old name for the
+   * refactoring.
+   */
+  static void MoveEventsFunction(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName, const gd::String &newExtensionName,
+      const gd::String &oldFunctionName, const gd::String &newFunctionName);
+
+  /**
    * \brief Refactor the project **before** an events function of a behavior is
    * renamed.
    *
@@ -190,6 +212,11 @@ class GD_CORE_API WholeProjectRefactorer {
 
   /**
    * \brief Refactor the function **before** a parameter is renamed.
+   *
+   * \note The parameter is searched in `projectScopedContainers` (the
+   * parameters the events resolve against), not in the declaration of
+   * `eventsFunction`: the events of an "ActionWithOperator" use the parameters
+   * of its getter. Nothing is done when no parameter of that name is in scope.
    *
    * \warning Do the renaming of the specified parameter after calling this.
    * This is because the function is expected to have its old name for the
@@ -385,6 +412,19 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newBehaviorName);
 
   /**
+   * \brief Refactor the project **before** a behavior is moved.
+   *
+   * \warning Move the specified behavior after calling this.
+   * This is because the behavior is expected to have its old name for the
+   * refactoring.
+   */
+  static void MoveEventsBasedBehavior(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName, const gd::String &newExtensionName,
+      const gd::String &oldBehaviorName, const gd::String &newBehaviorName);
+
+  /**
    * \brief Refactor events-based behavior events after the events-based
    * behavior has been duplicated.
    */
@@ -402,10 +442,22 @@ class GD_CORE_API WholeProjectRefactorer {
    * refactoring.
    */
   static void RenameEventsBasedObject(
-      gd::Project& project,
-      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
-      const gd::String& oldObjectName,
-      const gd::String& newObjectName);
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldObjectName, const gd::String &newObjectName);
+
+  /**
+   * \brief Refactor the project **before** an object is moved.
+   *
+   * \warning Do move the specified object after calling this.
+   * This is because the object is expected to have its old name for the
+   * refactoring.
+   */
+  static void MoveEventsBasedObject(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName, const gd::String &newExtensionName,
+      const gd::String &oldObjectName, const gd::String &newObjectName);
 
   /**
    * \brief Refactor events-based object events after the events-based object
@@ -563,6 +615,17 @@ class GD_CORE_API WholeProjectRefactorer {
       gd::Project& project,
       gd::EventsBasedObject& eventsBasedObject,
       const gd::String& objectName);
+
+  /**
+   * \brief Remove a variant of an events-based object: every object of the
+   * project using this variant (in scenes, global objects and children of
+   * other events-based objects) uses the default variant instead.
+   */
+  static void RemoveEventsBasedObjectVariant(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      gd::EventsBasedObject& eventsBasedObject,
+      const gd::String& variantName);
 
   /**
    * \brief Refactor the events function after an object or group is renamed
@@ -770,9 +833,10 @@ class GD_CORE_API WholeProjectRefactorer {
    * This is because the behavior is expected to have its old name for the
    * refactoring.
    */
-  static void RenameEventsBasedBehavior(
+  static void MoveEventsBasedBehavior(
       gd::Project &project,
-      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName,
+      const gd::String &newExtensionName,
       const gd::EventsBasedBehavior &eventsBasedBehavior,
       const gd::String &oldBehaviorName,
       const gd::String &newBehaviorName,
@@ -785,9 +849,9 @@ class GD_CORE_API WholeProjectRefactorer {
    * This is because the object is expected to have its old name for the
    * refactoring.
    */
-  static void RenameEventsBasedObject(
+  static void MoveEventsBasedObject(
       gd::Project &project,
-      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldExtensionName, const gd::String &newExtensionName,
       const gd::EventsBasedObject &eventsBasedObject,
       const gd::String &oldObjectName, const gd::String &newObjectName,
       const gd::ProjectBrowser &projectBrowser);

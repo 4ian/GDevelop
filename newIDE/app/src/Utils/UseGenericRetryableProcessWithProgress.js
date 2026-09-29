@@ -29,6 +29,12 @@ type GenericRetryableProcessWithProgressProps = {|
   onAbandon: ?() => void,
   onRetry: ?() => void,
   genericError: ?Error,
+  /** Defaults to "Importing project resources". */
+  title?: React.Node,
+  /** Displayed above the progress bar while there is no error. */
+  message?: React.Node,
+  /** Display a cancel button while the process is running. */
+  onCancel?: ?() => void,
 |};
 
 const styles = {
@@ -44,14 +50,24 @@ export const GenericRetryableProcessWithProgressDialog = ({
   onAbandon,
   onRetry,
   genericError,
+  title,
+  message,
+  onCancel,
 }: GenericRetryableProcessWithProgressProps): React.Node => {
   const hasErrors =
     (result && result.erroredResources.length > 0) || !!genericError;
 
   return (
     <Dialog
-      title={<Trans>Importing project resources</Trans>}
+      title={title || <Trans>Importing project resources</Trans>}
       actions={[
+        onCancel ? (
+          <FlatButton
+            label={<Trans>Cancel</Trans>}
+            onClick={onCancel}
+            key="cancel"
+          />
+        ) : null,
         onAbandon ? (
           <FlatButton
             label={<Trans>Retry</Trans>}
@@ -83,7 +99,9 @@ export const GenericRetryableProcessWithProgressDialog = ({
               can retry (recommended) or continue despite the errors. In this
               case, the project might be missing some resources.
             </Trans>
-          ) : null}
+          ) : (
+            message || null
+          )}
         </Text>
         <Line noMargin expand>
           <LinearProgress
@@ -162,6 +180,10 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
   ) => Promise<GenericRetryableProcessWithProgressResults>,
 |}): UseGenericRetryableProcessWithProgressOutput<DoProcessOptions> => {
   const [progress, setProgress] = React.useState(0);
+  const [processedCount, setProcessedCount] = React.useState<?{|
+    count: number,
+    total: number,
+  |}>(null);
   const [genericError, setGenericError] = React.useState(null);
   const [isFetching, setIsFetching] = React.useState(false);
   const [
@@ -177,6 +199,7 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
   const ensureProcessIsDone = React.useCallback(
     async (options: DoProcessOptions) => {
       setProgress(0);
+      setProcessedCount(null);
       setOnRetry(null);
       setOnAbandon(null);
       setResult(null);
@@ -189,6 +212,7 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
       try {
         newResult = await onDoProcess(options, (count, total) => {
           setProgress((count / total) * 100);
+          setProcessedCount({ count, total });
         });
 
         setProgress(100);
@@ -240,6 +264,13 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
       return (
         <GenericRetryableProcessWithProgressDialog
           progress={progress}
+          message={
+            processedCount ? (
+              <Trans>
+                Resources: {processedCount.count}/{processedCount.total}
+              </Trans>
+            ) : null
+          }
           result={result}
           genericError={genericError}
           onAbandon={onAbandon}
@@ -247,7 +278,15 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
         />
       );
     },
-    [isFetching, progress, result, onAbandon, onRetry, genericError]
+    [
+      isFetching,
+      progress,
+      processedCount,
+      result,
+      onAbandon,
+      onRetry,
+      genericError,
+    ]
   );
 
   return React.useMemo(

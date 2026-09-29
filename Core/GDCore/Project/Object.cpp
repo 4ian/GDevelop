@@ -20,6 +20,8 @@
 
 namespace gd {
 
+std::size_t Object::nameGeneration = 0;
+
 Object::~Object() {}
 
 Object::Object(const gd::String& name_,
@@ -47,7 +49,7 @@ void Object::Init(const gd::Object& object) {
 
 void Object::CopyWithoutConfiguration(const gd::Object& object) {
   persistentUuid = object.persistentUuid;
-  name = object.name;
+  SetName(object.name);
   assetStoreId = object.assetStoreId;
   objectVariables = object.objectVariables;
   effectsContainer = object.effectsContainer;
@@ -95,7 +97,7 @@ void Object::UnserializeFrom(gd::Project& project,
 
   SetType(element.GetStringAttribute("type"));
   assetStoreId = element.GetStringAttribute("assetStoreId");
-  name = element.GetStringAttribute("name", name, "nom");
+  SetName(element.GetStringAttribute("name", name, "nom"));
   resourcesPreloading = element.GetStringAttribute("resourcesPreloading", "with-scene");
 
   objectVariables.UnserializeFrom(

@@ -18,6 +18,28 @@ namespace gdjs {
       return arr.indexOf(value) !== -1 ? value : min;
     };
 
+    /**
+     * Wrap a Three.js shader so that its output colors are never negative.
+     * Negative colors become NaN in the sRGB conversion done by the output pass,
+     * which is rendered as garbage by some mobile GPUs (e.g. Mali).
+     */
+    export const clampThreeShaderOutput = <
+      T extends { fragmentShader: string },
+    >(
+      shader: T
+    ): T => ({
+      ...shader,
+      fragmentShader:
+        shader.fragmentShader.replace(
+          /void\s+main\s*\(\s*\)/,
+          'void unclampedMain()'
+        ) +
+        '\nvoid main() {\n' +
+        '  unclampedMain();\n' +
+        '  gl_FragColor.rgb = max(gl_FragColor.rgb, 0.0);\n' +
+        '}\n',
+    });
+
     const _filterCreators: {
       [filterName: string]: FilterCreator;
     } = {};

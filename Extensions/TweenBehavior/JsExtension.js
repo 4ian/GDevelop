@@ -83,7 +83,7 @@ module.exports = {
         '',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('From value'))
       .addParameter('expression', _('To value'))
@@ -115,7 +115,7 @@ module.exports = {
       .addParameter('expression', _('Initial value'), '', false)
       .addParameter('expression', _('Final value'), '', false)
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
@@ -142,7 +142,7 @@ module.exports = {
       .addParameter('scenevar', _('The variable to tween'), '', false)
       .addParameter('expression', _('Final value'), '', false)
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
@@ -166,7 +166,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .addParameter('scenevar', _('The variable to tween'), '', false)
       .addParameter('expression', _('Final value'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
@@ -192,7 +192,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('From value'), '', false)
       .addParameter('expression', _('To value'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter('yesorno', _('Exponential interpolation'), '', false)
@@ -221,7 +221,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('From value'), '', false)
       .addParameter('expression', _('To value'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter('yesorno', _('Exponential interpolation'), '', false)
@@ -253,7 +253,7 @@ module.exports = {
       .addParameter('expression', _('Target Y position'), '', false)
       .addParameter('layer', _('Layer'), '', true)
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
@@ -276,13 +276,37 @@ module.exports = {
       .addParameter('expression', _('Target X position'), '', false)
       .addParameter('expression', _('Target Y position'), '', false)
       .addParameter('layer', _('Layer'), '', true)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCamera2');
+
+    extension
+      .addAction(
+        'TweenCameraZ',
+        _('Tween the camera Z position'),
+        _('Tweens the camera Z position from the current one to a new one.'),
+        _(
+          'Tween the Z position of camera on layer _PARAM3_ to _PARAM2_ with easing _PARAM4_ over _PARAM5_ seconds as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .addParameter('expression', _('Target Z position'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .addParameter('easing', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenCameraZ');
 
     // deprecated
     extension
@@ -303,7 +327,7 @@ module.exports = {
       .addParameter('expression', _('Target zoom'), '', false)
       .addParameter('layer', _('Layer'), '', true)
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
@@ -325,7 +349,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .addParameter('expression', _('Target zoom'), '', false)
       .addParameter('layer', _('Layer'), '', true)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
@@ -352,7 +376,7 @@ module.exports = {
       .addParameter('expression', _('Target rotation (in degrees)'), '', false)
       .addParameter('layer', _('Layer'), '', true)
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
@@ -374,7 +398,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
       .addParameter('expression', _('Target rotation (in degrees)'), '', false)
       .addParameter('layer', _('Layer'), '', true)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
@@ -402,7 +426,7 @@ module.exports = {
       .addParameter('layer', _('Layer'), '', true)
       .addParameter('layerEffectName', _('Effect name'))
       .addParameter('layerEffectParameterName', _('Property name'))
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
@@ -430,7 +454,7 @@ module.exports = {
       .addParameter('layer', _('Layer'), '', true)
       .addParameter('layerEffectName', _('Effect name'))
       .addParameter('layerEffectParameterName', _('Property name'))
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .getCodeExtraInformation()
@@ -652,7 +676,7 @@ module.exports = {
       .addParameter('objectvar', _('Object variable'), '', false)
       .addParameter('expression', _('From value'), '', false)
       .addParameter('expression', _('To value'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -686,7 +710,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('objectvar', _('Object variable'), '', false)
       .addParameter('expression', _('To value'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -718,7 +742,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('objectvar', _('Object variable'), '', false)
       .addParameter('expression', _('To value'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -750,7 +774,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('From value'), '', false)
       .addParameter('expression', _('To value'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter('yesorno', _('Exponential interpolation'), '', false)
@@ -784,7 +808,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To X'), '', false)
       .addParameter('expression', _('To Y'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -814,7 +838,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To X'), '', false)
       .addParameter('expression', _('To Y'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -847,7 +871,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To X'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -878,7 +902,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To X'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -911,7 +935,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To Z'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -943,7 +967,7 @@ module.exports = {
       .addParameter('behavior', _('3D capability'), 'Scene3D::Base3DBehavior')
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To Z'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -974,7 +998,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To width'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1003,7 +1027,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To width'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1034,7 +1058,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To height'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1063,7 +1087,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To height'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1096,7 +1120,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To depth'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1128,7 +1152,7 @@ module.exports = {
       .addParameter('behavior', _('3D capability'), 'Scene3D::Base3DBehavior')
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To depth'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1161,7 +1185,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To Y'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1192,7 +1216,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To Y'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1223,7 +1247,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To angle (in degrees)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1252,7 +1276,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To angle (in degrees)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1284,7 +1308,7 @@ module.exports = {
       .addParameter('behavior', _('3D capability'), 'Scene3D::Base3DBehavior')
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To angle (in degrees)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1316,7 +1340,7 @@ module.exports = {
       .addParameter('behavior', _('3D capability'), 'Scene3D::Base3DBehavior')
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To angle (in degrees)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1350,7 +1374,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale X'), '', false)
       .addParameter('expression', _('To scale Y'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1386,7 +1410,7 @@ module.exports = {
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale X'), '', false)
       .addParameter('expression', _('To scale Y'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1419,7 +1443,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1454,7 +1478,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale X'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1487,7 +1511,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale X'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1522,7 +1546,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale Y'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1555,7 +1579,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale Y'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1590,7 +1614,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To character size'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1621,7 +1645,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To character size'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1654,7 +1678,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To opacity'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1681,14 +1705,12 @@ module.exports = {
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
-      .setHint(
-        "Tweening opacity only works on 2D objects, it has no effect/won't run on 3D objects."
-      )
+      .setHidden()
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To opacity'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1700,6 +1722,42 @@ module.exports = {
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectOpacityTween2');
+
+    behavior
+      .addScopedAction(
+        'AddObjectOpacityTween3',
+        _('Tween object opacity'),
+        _(
+          'Tweens the object opacity from its current value to a new one (note: the value shall stay between 0 and 255).'
+        ),
+        _(
+          'Tween the opacity of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_ and destroy: _PARAM7_'
+        ),
+        _('Visibility'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter(
+        'behavior',
+        _('Opacity capability'),
+        'OpacityCapability::OpacityBehavior'
+      )
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('expression', _('To opacity'), '', false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration (in seconds)'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addObjectOpacityTween3');
 
     behavior
       .addScopedAction(
@@ -1726,7 +1784,7 @@ module.exports = {
       .addParameter('expression', _('To value'), '', false)
       .addParameter('objectEffectName', _('Effect name'))
       .addParameter('objectEffectParameterName', _('Property name'))
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1764,7 +1822,7 @@ module.exports = {
       .addParameter('color', _('To color'), '', false)
       .addParameter('objectEffectName', _('Effect name'))
       .addParameter('objectEffectParameterName', _('Property name'))
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1797,7 +1855,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('color', _('To color'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1838,7 +1896,7 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('color', _('To color'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(
@@ -1897,7 +1955,7 @@ module.exports = {
         false
       )
       .setDefaultValue('-1')
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in milliseconds)'), '', false)
       .addParameter(
@@ -1944,7 +2002,7 @@ module.exports = {
         false
       )
       .setDefaultValue('-1')
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .addParameter('easing', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
       .addParameter(

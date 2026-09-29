@@ -5,6 +5,7 @@ import { action } from '@storybook/addon-actions';
 import {
   GameplayTestFrameLayout,
   type GameplayTestFrameRunStatus,
+  type GameplayTestFrameHiddenPause,
 } from '../../../GameplayTests/GameplayTestFrame';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
@@ -21,23 +22,26 @@ const styles = {
   storyContainer: { height: 460, position: 'relative' },
   fakeGame: {
     display: 'flex',
-    flex: 1,
+    width: '100%',
+    height: '100%',
     alignItems: 'flex-end',
     background: 'linear-gradient(to bottom, #4f28cd, #95c6ff)',
   },
+  // Sized for the fake game resolution below (displayed zoomed out by 4
+  // when the frame is at its default size).
   fakeGameGround: {
     width: '100%',
-    height: 32,
+    height: 128,
     backgroundColor: '#16cf89',
     position: 'relative',
   },
   fakeGamePlayer: {
     position: 'absolute',
-    bottom: 32,
-    left: 60,
-    width: 20,
-    height: 28,
-    borderRadius: 3,
+    bottom: 128,
+    left: 240,
+    width: 80,
+    height: 112,
+    borderRadius: 12,
     backgroundColor: '#ffbc57',
   },
 };
@@ -66,12 +70,20 @@ const makeRunStatus = (
 const FrameStory = ({
   runStatus,
   initiallyMinimized,
+  initialHiddenPause,
 }: {|
   runStatus: GameplayTestFrameRunStatus | null,
   initiallyMinimized?: boolean,
+  initialHiddenPause?: GameplayTestFrameHiddenPause,
 |}) => {
   const [isMinimized, setIsMinimized] = React.useState<boolean>(
     !!initiallyMinimized
+  );
+  const [
+    hiddenPause,
+    setHiddenPause,
+  ] = React.useState<GameplayTestFrameHiddenPause | null>(
+    initialHiddenPause || null
   );
   return (
     <div style={styles.storyContainer}>
@@ -84,9 +96,15 @@ const FrameStory = ({
       </Column>
       <GameplayTestFrameLayout
         runStatus={runStatus}
+        hiddenPause={hiddenPause}
+        onDismissHiddenPause={() => {
+          action('hidden pause dismissed')();
+          setHiddenPause(null);
+        }}
         isMinimized={isMinimized}
         onToggleMinimized={() => setIsMinimized(!isMinimized)}
         onStopRequested={action('stop requested')}
+        gameResolution={{ width: 1280, height: 720 }}
       >
         <FakeGameView />
       </GameplayTestFrameLayout>
@@ -135,4 +153,30 @@ export const Failed = (): React.Node => (
 
 export const Minimized = (): React.Node => (
   <FrameStory runStatus={makeRunStatus({})} initiallyMinimized />
+);
+
+export const PausedWhileInTheBackgroundThenResumed = (): React.Node => (
+  <FrameStory
+    runStatus={makeRunStatus({ frame: 512 })}
+    initialHiddenPause={{ pausedMs: 47000, isRunInterrupted: false }}
+  />
+);
+
+export const InterruptedAfterTooLongInTheBackground = (): React.Node => (
+  <FrameStory
+    runStatus={makeRunStatus({
+      status: 'paused',
+      frame: 512,
+      durationMs: 312000,
+    })}
+    initialHiddenPause={{ pausedMs: 300000, isRunInterrupted: true }}
+  />
+);
+
+export const PausedWhileMinimized = (): React.Node => (
+  <FrameStory
+    runStatus={makeRunStatus({ frame: 512 })}
+    initialHiddenPause={{ pausedMs: 8000, isRunInterrupted: false }}
+    initiallyMinimized
+  />
 );

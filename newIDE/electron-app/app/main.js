@@ -177,6 +177,13 @@ function createNewWindow(windowArgs = args) {
       // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
       contextIsolation: false,
+      // Keep timers and `requestAnimationFrame` running at full speed when
+      // the window is minimized or covered by another window (Chromium
+      // otherwise throttles timers to once a minute and stops animation
+      // frames entirely). The editor keeps working in the background: the
+      // AI agent keeps running its turns, and gameplay tests - which need
+      // animation frames to step the game - keep progressing.
+      backgroundThrottling: false,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#000',

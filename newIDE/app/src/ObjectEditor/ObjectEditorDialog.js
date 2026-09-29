@@ -9,6 +9,7 @@ import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs } from '../UI/Tabs';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
+import { useMarkObjectAsOpenedInEditor } from './ObjectsOpenedInEditor';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Column, Line } from '../UI/Grid';
 import { type EditorProps } from './Editors/EditorProps.flow';
@@ -66,6 +67,9 @@ type Props = {|
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string
@@ -113,6 +117,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     onComputeAllVariableNames,
     onWillInstallExtension,
     onExtensionInstalled,
+    onCreateNewExtensionWithBehavior,
     onOpenEventBasedObjectEditor,
     onOpenEventBasedObjectVariantEditor,
     onDeleteEventsBasedObjectVariant,
@@ -148,6 +153,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     useProjectToUnserialize: project,
     onCancel,
   });
+  useMarkObjectAsOpenedInEditor(object);
 
   const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(
     false
@@ -377,11 +383,17 @@ const InnerDialog = (props: InnerDialogProps) => {
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
           onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
+          onCreateNewExtensionWithBehavior={(project, object) => {
+            if (onCreateNewExtensionWithBehavior) {
+              onApply();
+              onCreateNewExtensionWithBehavior(project, object);
+            }
+          }}
           isListLocked={isBehaviorListLocked}
         />
       )}
       {currentTab === 'variables' && (
-        <Column expand noMargin>
+        <Column expand noMargin noOverflowParent>
           {object.getVariables().count() > 0 && DismissableTutorialMessage && (
             <Line>
               <Column noMargin expand>

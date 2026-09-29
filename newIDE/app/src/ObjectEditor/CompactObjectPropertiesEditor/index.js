@@ -228,6 +228,9 @@ type Props = {|
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   isVariableListLocked: boolean,
   isBehaviorListLocked: boolean,
 |};
@@ -255,6 +258,7 @@ export const CompactObjectPropertiesEditor = ({
   onDeleteEventsBasedObjectVariant,
   onWillInstallExtension,
   onExtensionInstalled,
+  onCreateNewExtensionWithBehavior,
   isVariableListLocked,
   isBehaviorListLocked,
 }: Props): React.Node => {
@@ -315,6 +319,7 @@ export const CompactObjectPropertiesEditor = ({
     onUpdateBehaviorsSharedData,
     onWillInstallExtension,
     onExtensionInstalled,
+    onCreateNewExtensionWithBehavior,
     allVisibleBehaviorNames,
   });
 

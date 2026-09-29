@@ -44,7 +44,7 @@ const styles = {
 };
 
 type State = {|
-  selectedResource: ?gdResource,
+  selectedResources: Array<gdResource>,
 |};
 
 type Props = {|
@@ -81,7 +81,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   // $FlowFixMe[missing-local-annot]
   resourcesLoader = ResourcesLoader;
   state: State = {
-    selectedResource: null,
+    selectedResources: [],
   };
 
   componentDidMount() {
@@ -115,60 +115,71 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         }
         onToggleProperties={this.toggleProperties}
         isPropertiesShown={openedEditorNames.includes('properties')}
-        canDelete={!!this.state.selectedResource}
+        canDelete={this.state.selectedResources.length > 0}
         onDeleteSelection={() =>
-          this.deleteResource(this.state.selectedResource)
+          this.deleteResources(this.state.selectedResources)
         }
       />
     );
   };
 
-  deleteResource = async (resource: ?gdResource) => {
+  deleteResources = async (resources: Array<gdResource>) => {
     const { project, onDeleteResource } = this.props;
-    if (!resource) return;
+    if (!resources.length) return;
 
+    const resourcesCount = resources.length;
     const context: ConfirmState = this.context;
     const answer = await new Promise(resolve => {
       context.showConfirmDialog({
-        title: t`Remove resource`,
-        message: t`Are you sure you want to remove this resource? This can't be undone.`,
+        title: resourcesCount > 1 ? t`Remove resources` : t`Remove resource`,
+        message:
+          resourcesCount > 1
+            ? t`Are you sure you want to remove these ${resourcesCount} resources? This can't be undone.`
+            : t`Are you sure you want to remove this resource? This can't be undone.`,
         callback: resolve,
       });
     });
     if (!answer) return;
 
     const resourcesManager = project.getResourcesManager();
-    const currentIndex = resourcesManager.getResourcePosition(
-      resource.getName()
+    const firstRemovedIndex = Math.min(
+      ...resources.map(resource =>
+        resourcesManager.getResourcePosition(resource.getName())
+      )
     );
 
-    onDeleteResource(resource, doRemove => {
-      if (!doRemove || !resource) return;
-
-      resourcesManager.removeResource(resource.getName());
-
-      const newCount = resourcesManager.count();
-      const nextResourceToSelect =
-        newCount > 0
-          ? resourcesManager.getResourceAt(Math.min(currentIndex, newCount - 1))
-          : null;
-
-      this.setState(
-        {
-          selectedResource: nextResourceToSelect,
-        },
-        () => {
-          const resourcesList = this._resourcesList;
-          if (resourcesList) {
-            resourcesList.forceUpdateList();
-            resourcesList.focusList();
-          }
-          const propertiesEditor = this._propertiesEditor;
-          if (propertiesEditor) propertiesEditor.forceUpdate();
-          this.updateToolbar();
-        }
+    for (const resource of resources) {
+      // Read the name before the removal, as the resource is destroyed by it.
+      const resourceName = resource.getName();
+      const doRemove = await new Promise(resolve =>
+        onDeleteResource(resource, resolve)
       );
-    });
+      if (doRemove) resourcesManager.removeResource(resourceName);
+    }
+
+    const newCount = resourcesManager.count();
+    const nextResourceToSelect =
+      newCount > 0
+        ? resourcesManager.getResourceAt(
+            Math.min(firstRemovedIndex, newCount - 1)
+          )
+        : null;
+
+    this.setState(
+      {
+        selectedResources: nextResourceToSelect ? [nextResourceToSelect] : [],
+      },
+      () => {
+        const resourcesList = this._resourcesList;
+        if (resourcesList) {
+          resourcesList.forceUpdateList();
+          resourcesList.focusList();
+        }
+        const propertiesEditor = this._propertiesEditor;
+        if (propertiesEditor) propertiesEditor.forceUpdate();
+        this.updateToolbar();
+      }
+    );
   };
 
   renameResource = (resource: gdResource, newName: string) => {
@@ -203,9 +214,9 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   _removeUnusedResources = (resourceKind: ResourceKind) => {
     const { project } = this.props;
-    const selectedResourceName = this.state.selectedResource
-      ? this.state.selectedResource.getName()
-      : null;
+    const selectedResourceNames = this.state.selectedResources.map(resource =>
+      resource.getName()
+    );
 
     const removedResourceNames = gd.ProjectResourcesAdder.getAllUseless(
       project,
@@ -220,12 +231,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     gd.ProjectResourcesAdder.removeAllUseless(project, resourceKind);
 
-    // The selectedResource might be *invalid* now if it was removed.
-    // Be sure to drop the reference to it if that's the case.
-    // $FlowFixMe[incompatible-type]
-    if (removedResourceNames.includes(selectedResourceName)) {
-      this._onResourceSelected(null);
-    }
+    this._dropRemovedResourcesFromSelection(
+      selectedResourceNames,
+      removedResourceNames
+    );
 
     // Force update of the resources list as otherwise it could render
     // resources that were just deleted.
@@ -236,9 +245,9 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   _removeAllResourcesWithInvalidPath = () => {
     const { project } = this.props;
-    const selectedResourceName = this.state.selectedResource
-      ? this.state.selectedResource.getName()
-      : null;
+    const selectedResourceNames = this.state.selectedResources.map(resource =>
+      resource.getName()
+    );
 
     const resourcesManager = project.getResourcesManager();
     const removedResourceNames = resourcesManager
@@ -253,12 +262,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
       console.info('Removed due to invalid path: ' + resourceName);
     });
 
-    // The selectedResource might be *invalid* now if it was removed.
-    // Be sure to drop the reference to it if that's the case.
-    // $FlowFixMe[incompatible-type]
-    if (removedResourceNames.includes(selectedResourceName)) {
-      this._onResourceSelected(null);
-    }
+    this._dropRemovedResourcesFromSelection(
+      selectedResourceNames,
+      removedResourceNames
+    );
 
     // Force update of the resources list as otherwise it could render
     // resources that were just deleted.
@@ -277,10 +284,30 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     this.editorMosaic.toggleEditor('properties', 'left');
   };
 
-  _onResourceSelected = (selectedResource: ?gdResource) => {
+  /**
+   * Selected resources that were removed are now *invalid* (their memory
+   * was freed). Drop them from the selection without accessing them.
+   * `selectedResourceNames` must have been read before the removal.
+   */
+  _dropRemovedResourcesFromSelection = (
+    selectedResourceNames: Array<string>,
+    removedResourceNames: Array<string>
+  ) => {
+    const remainingSelectedResources = this.state.selectedResources.filter(
+      (resource, index) =>
+        !removedResourceNames.includes(selectedResourceNames[index])
+    );
+    if (
+      remainingSelectedResources.length !== this.state.selectedResources.length
+    ) {
+      this._onResourcesSelected(remainingSelectedResources);
+    }
+  };
+
+  _onResourcesSelected = (selectedResources: Array<gdResource>) => {
     this.setState(
       {
-        selectedResource,
+        selectedResources,
       },
       () => {
         if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
@@ -298,7 +325,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   render(): any {
     const { project, resourceManagementProps, fileMetadata } = this.props;
-    const { selectedResource } = this.state;
+    const { selectedResources } = this.state;
     const resourcesActionsMenuBuilder = resourceManagementProps.getStorageProviderResourceOperations();
 
     const editors = {
@@ -309,8 +336,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           <I18n>
             {({ i18n }) => (
               <ResourcePropertiesEditor
-                key={selectedResource ? selectedResource.ptr : undefined}
-                resources={selectedResource ? [selectedResource] : []}
+                key={selectedResources
+                  .map(resource => '' + resource.ptr)
+                  .join(';')}
+                resources={selectedResources}
                 project={project}
                 resourcesLoader={this.resourcesLoader}
                 ref={propertiesEditor =>
@@ -335,10 +364,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           <ResourcesList
             project={project}
             fileMetadata={fileMetadata}
-            onDeleteResource={this.deleteResource}
+            onDeleteResources={this.deleteResources}
             onRenameResource={this.renameResource}
-            onSelectResource={this._onResourceSelected}
-            selectedResource={selectedResource}
+            onSelectResources={this._onResourcesSelected}
+            selectedResources={selectedResources}
             ref={resourcesList => (this._resourcesList = resourcesList)}
             onRemoveUnusedResources={this._removeUnusedResources}
             onRemoveAllResourcesWithInvalidPath={

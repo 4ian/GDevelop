@@ -45,6 +45,9 @@ export const CustomObject = (): React.Node => (
       openBehaviorEvents={() => action('Open behavior events')}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       onOpenEventBasedObjectEditor={() =>
         action('Open event-based object editor')
       }
@@ -90,6 +93,9 @@ export const StandardObject = (): React.Node => (
       openBehaviorEvents={() => action('Open behavior events')}
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       onOpenEventBasedObjectEditor={() =>
         action('Open event-based object editor')
       }
@@ -144,6 +150,9 @@ export const LockedStandardObject = (): React.Node => (
       }
       onWillInstallExtension={action('extension will be installed')}
       onExtensionInstalled={action('extension installed')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       isBehaviorListLocked={true}
       isVariableListLocked={true}
     />

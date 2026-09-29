@@ -11,6 +11,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type WillDeleteObjectChanges,
+  type ExtensionsOutsideEditorChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type HotReloadSteps } from '../../EmbeddedGame/EmbeddedGameFrame';
@@ -153,6 +154,10 @@ export class GameplayTestEditorContainer extends React.Component<
     // No thing to be done.
   }
 
+  onExtensionsModifiedOutsideEditor(changes: ExtensionsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
   onObjectGroupsModifiedOutsideEditor(
     changes: ObjectGroupsOutsideEditorChanges
   ) {
@@ -260,8 +265,6 @@ export class GameplayTestEditorContainer extends React.Component<
           isRunning={this.state.isRunning}
           runningFrame={this.state.runningFrame}
           lastResult={this.state.lastResult}
-          onRunTest={this.runTest}
-          onStopTest={this.stopTest}
           onEditWithAi={this.editWithAi}
           onTestModified={this.onTestModified}
           onOpenedEditorsChanged={() => this.updateToolbar()}

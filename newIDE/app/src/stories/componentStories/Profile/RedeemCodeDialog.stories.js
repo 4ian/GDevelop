@@ -2,7 +2,10 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import RedeemCodeDialog from '../../../Profile/RedeemCodeDialog';
-import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
+import {
+  fakeSilverAuthenticatedUser,
+  fakeGoldWithPurchaselyAuthenticatedUser,
+} from '../../../fixtures/GDevelopServicesTestData';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import { GDevelopUsageApi } from '../../../Utils/GDevelopServices/ApiConfigs';
@@ -82,6 +85,31 @@ export const CannotBeRedeemedAnymoreError = (): React.Node => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const SubscriptionHandledByPurchaselyError = (): React.Node => {
+  // The dialog is expected to warn the user upfront (subscription is handled
+  // by Purchasely) and prevent the redemption without even calling the API -
+  // this mock is here in case the button is somehow clicked/submitted anyway.
+  const mock = new MockAdapter(axios, { delayResponse: 100 });
+  mock
+    .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
+    .reply(400, {
+      code: 'redemption-code/subscription-handled-by-purchasely',
+    })
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+
+  return (
+    <AuthenticatedUserContext.Provider
+      value={fakeGoldWithPurchaselyAuthenticatedUser}
+    >
       <RedeemCodeDialog onClose={action('onClose')} />
     </AuthenticatedUserContext.Provider>
   );

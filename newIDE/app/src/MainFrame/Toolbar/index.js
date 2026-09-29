@@ -150,7 +150,9 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               projectPath={props.projectPath}
               triggerNpmScript={props.triggerNpmScript}
             />
-            {props.showPreviewAndShareButtons ? (
+            {/* When there is no preview button (a gameplay test), the editor
+            toolbar provides its own centered group taking its place. */}
+            {props.showPreviewAndShareButtons && (
               <ToolbarGroup>
                 <Spacer />
                 <PreviewAndShareButtons
@@ -171,8 +173,6 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 />
                 <Spacer />
               </ToolbarGroup>
-            ) : (
-              <ToolbarGroup />
             )}
           </>
         ) : null}

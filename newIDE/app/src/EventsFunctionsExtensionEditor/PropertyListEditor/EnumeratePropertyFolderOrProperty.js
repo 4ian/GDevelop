@@ -75,19 +75,6 @@ export const enumerateFoldersInContainer = (
   return result;
 };
 
-export const getPropertiesInFolder = (
-  propertyFolderOrProperty: gdPropertyFolderOrProperty
-): gdNamedPropertyDescriptor[] => {
-  if (!propertyFolderOrProperty.isFolder()) return [];
-  return mapFor(0, propertyFolderOrProperty.getChildrenCount(), i => {
-    const child = propertyFolderOrProperty.getChildAt(i);
-    if (child.isFolder()) {
-      return null;
-    }
-    return child.getProperty();
-  }).filter(Boolean);
-};
-
 export const getFoldersAscendanceWithoutRootFolder = (
   propertyFolderOrProperty: gdPropertyFolderOrProperty
 ): gdPropertyFolderOrProperty[] => {

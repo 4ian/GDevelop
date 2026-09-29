@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type StoryDecorator } from '@storybook/react';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
+import { loadExtension } from '../JsExtensionsLoader';
 import { makeTestProject, type TestProject } from '../fixtures/TestProject';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 const initializeGDevelopJs = global.initializeGDevelopJs;
@@ -52,6 +53,26 @@ const GDevelopJsInitializer = ({ children }: GDevelopJsInitializerProps) => {
 
       // Prepare test extensions
       makeTestExtensions(gd);
+
+      // Also load some real extensions, useful to display realistic events
+      // (for example: tween actions with easings) in the stories.
+      const platform = gd.JsPlatform.get();
+      if (!platform.isExtensionLoaded('Tween')) {
+        const result = loadExtension(
+          str => str,
+          gd,
+          platform,
+          // $FlowFixMe[cannot-resolve-module]
+          require('GDJS-for-web-app-only/Runtime/Extensions/TweenBehavior/JsExtension.js')
+        );
+        if (result.error) {
+          console.error(
+            'Unable to load the Tween extension for the stories:',
+            result.message,
+            result.rawError
+          );
+        }
+      }
 
       // Prepare a test project object, that we are also **updating** as stories
       // already got a reference to it.

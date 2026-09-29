@@ -20,7 +20,10 @@ type Props = {|
   onChangeParameter: (index: number, value: string) => void,
   parameterRenderingService?: {
     components: any,
-    getParameterComponent: (type: string) => any,
+    getParameterComponent: (
+      type: string,
+      parameterMetadata?: ?gdParameterMetadata
+    ) => any,
   },
 |};
 
@@ -66,7 +69,8 @@ const ExpressionParametersEditor = ({
       {mapFor(0, expressionMetadata.getParametersCount(), i => {
         const parameterMetadata = expressionMetadata.getParameter(i);
         const ParameterComponent = parameterRenderingService.getParameterComponent(
-          parameterMetadata.getType()
+          parameterMetadata.getType(),
+          parameterMetadata
         );
 
         if (parameterMetadata.isCodeOnly()) return null;

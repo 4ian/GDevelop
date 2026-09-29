@@ -66,6 +66,7 @@ const CurrentUsageDisplayer = ({
       if (currentCreditsAmount < usageCreditPrice) {
         openCreditsPackageDialog({
           missingCredits: usageCreditPrice - currentCreditsAmount,
+          placementId: 'profile',
         });
         return;
       }

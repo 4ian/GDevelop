@@ -1223,7 +1223,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     return [
                       new PlaceHolderTreeViewItem(
                         extensionsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new function.`)
+                        i18n._(t`Start by adding a new extension.`)
                       ),
                     ];
                   }
@@ -1634,7 +1634,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       project={project}
                       onClose={() => setExtensionsSearchDialogOpen(false)}
                       onWillInstallExtension={onWillInstallExtension}
-                      onCreateNew={() => {
+                      onCreateNewExtension={() => {
                         onCreateNewExtension(project, i18n);
                       }}
                       onExtensionInstalled={onExtensionInstalled}

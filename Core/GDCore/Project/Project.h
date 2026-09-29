@@ -569,7 +569,7 @@ class GD_CORE_API Project {
    * first platform supporting the object is used.
    */
   std::shared_ptr<gd::BaseEvent> CreateEvent(
-      const gd::String& type, const gd::String& platformName = "");
+      const gd::String& type, const gd::String& platformName = "") const;
   ///@}
 
   /** \name Layouts management

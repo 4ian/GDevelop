@@ -22,7 +22,6 @@ import {
   type GameplayTestScope,
 } from './GameplayTestRunner';
 import { GameplayTestProperties } from './GameplayTestProperties';
-import { type GameplayTestRunSpeedOptions } from './GameplayTestEditorToolbar';
 
 export type GameplayTestEditorInterface = {|
   forceUpdate: () => void,
@@ -44,8 +43,6 @@ type Props = {|
   isRunning: boolean,
   runningFrame: number | null,
   lastResult: GameplayTestResult | null,
-  onRunTest: (options: GameplayTestRunSpeedOptions) => void | Promise<void>,
-  onStopTest: () => void,
   onEditWithAi: () => void,
   onTestModified: () => void,
   onOpenedEditorsChanged: () => void,
@@ -66,8 +63,6 @@ const GameplayTestEditor: React.ComponentType<{
       isRunning,
       runningFrame,
       lastResult,
-      onRunTest,
-      onStopTest,
       onEditWithAi,
       onTestModified,
     } = props;
@@ -115,8 +110,6 @@ const GameplayTestEditor: React.ComponentType<{
           isRunning={isRunning}
           runningFrame={runningFrame}
           lastResult={lastResult}
-          onRunTest={onRunTest}
-          onStopTest={onStopTest}
           onEditWithAi={onEditWithAi}
           onTestModified={onTestModified}
         />

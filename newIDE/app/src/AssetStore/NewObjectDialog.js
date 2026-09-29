@@ -1,6 +1,7 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
@@ -15,6 +16,7 @@ import { AssetStoreContext } from './AssetStoreContext';
 import AssetPackInstallDialog from './AssetPackInstallDialog';
 import {
   installPublicAsset,
+  installEffectAsset,
   checkRequiredExtensionsUpdateForAssets,
   type InstallAssetOutput,
   complyVariantsToEventsBasedObjectOf,
@@ -25,7 +27,13 @@ import {
   type AssetShortHeader,
   getPublicAsset,
   isPrivateAsset,
+  isEffectAsset,
+  getEffectAssetMetadata,
+  doesEffectWorkOnLayer,
 } from '../Utils/GDevelopServices/Asset';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import enumerateLayers from '../LayersList/EnumerateLayers';
+import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
 import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -253,6 +261,163 @@ export const useInstallAsset = ({
   };
 };
 
+/**
+ * Install an asset that is an effect on a layer.
+ */
+export const useInstallEffectAsset = ({
+  project,
+  resourceManagementProps,
+}: {|
+  project: ?gdProject,
+  resourceManagementProps: ResourceManagementProps,
+|}): (({
+  assetShortHeader: AssetShortHeader,
+  effectsContainer: gdEffectsContainer,
+  effectName: string,
+}) => Promise<gdEffect | null>) => {
+  const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
+  const { openedAssetPack } = shopNavigationState.getCurrentPage();
+  const { showAlert } = useAlertDialog();
+  const fetchAssets = useFetchAssets();
+
+  return async ({
+    assetShortHeader,
+    effectsContainer,
+    effectName,
+  }: {|
+    assetShortHeader: AssetShortHeader,
+    effectsContainer: gdEffectsContainer,
+    effectName: string,
+  |}): Promise<gdEffect | null> => {
+    if (!project) {
+      return null;
+    }
+    try {
+      const assets = await fetchAssets([assetShortHeader]);
+      const effect = installEffectAsset({
+        asset: assets[0],
+        project,
+        effectsContainer,
+        effectName,
+      });
+      sendAssetAddedToProject({
+        id: assetShortHeader.id,
+        name: assetShortHeader.name,
+        assetPackName: openedAssetPack ? openedAssetPack.name : null,
+        assetPackTag: openedAssetPack ? openedAssetPack.tag : null,
+        assetPackId:
+          openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
+        assetPackKind: 'public',
+      });
+
+      await resourceManagementProps.onFetchNewlyAddedResources();
+      resourceManagementProps.onNewResourcesAdded();
+
+      return effect;
+    } catch (error) {
+      console.error('Error while installing the asset:', error);
+      showAlert({
+        title: t`Could not install the asset`,
+        message: t`There was an error while installing the asset "${
+          assetShortHeader.name
+        }". Verify your internet connection or try again later.`,
+      });
+      return null;
+    }
+  };
+};
+
+// Effects of the same group compete for the same thing of a layer (its
+// background, its fog): only one of them is displayed at a time.
+const effectTypeGroupsUniquePerLayer: Array<Array<string>> = [
+  ['Scene3D::Skybox'],
+  ['Scene3D::LinearFog', 'Scene3D::ExponentialFog'],
+];
+
+const findEffectCompetingWith = (
+  effectsContainer: gdEffectsContainer,
+  effectType: string
+): gdEffect | null => {
+  const competingEffectTypes = effectTypeGroupsUniquePerLayer.find(
+    effectTypes => effectTypes.includes(effectType)
+  );
+  if (!competingEffectTypes) return null;
+  for (let index = 0; index < effectsContainer.getEffectsCount(); index++) {
+    const effect = effectsContainer.getEffectAt(index);
+    if (competingEffectTypes.includes(effect.getEffectType())) return effect;
+  }
+  return null;
+};
+
+/**
+ * Choose the name of the effect to install an effect asset on: a new effect,
+ * or, if the user chooses to replace it, the existing one it would compete
+ * with (a second skybox or fog). Null if the user cancels.
+ */
+export const useChooseEffectNameForEffectAsset = (): (({|
+  assetShortHeader: AssetShortHeader,
+  effectsContainer: gdEffectsContainer,
+|}) => Promise<string | null>) => {
+  const { showYesNoCancel } = useAlertDialog();
+
+  return React.useCallback(
+    async ({
+      assetShortHeader,
+      effectsContainer,
+    }: {|
+      assetShortHeader: AssetShortHeader,
+      effectsContainer: gdEffectsContainer,
+    |}): Promise<string | null> => {
+      const effectMetadata = getEffectAssetMetadata(assetShortHeader);
+      const newEffectName = newNameGenerator(
+        effectMetadata ? effectMetadata.getFullName() : 'Effect',
+        name => effectsContainer.hasEffectNamed(name)
+      );
+      const competingEffect = findEffectCompetingWith(
+        effectsContainer,
+        assetShortHeader.objectType
+      );
+      if (!competingEffect) return newEffectName;
+
+      const competingEffectName = competingEffect.getName();
+      const answer = await showYesNoCancel({
+        title: t`Replace "${competingEffectName}"?`,
+        message: t`The layer already has the effect "${competingEffectName}" and only one of them can be displayed at a time. You can replace it, or add this one and keep the existing one (to switch between them by enabling and disabling them from the events).`,
+        yesButtonLabel: t`Replace`,
+        noButtonLabel: t`Add and keep the existing`,
+        cancelButtonLabel: t`Cancel`,
+      });
+      // showYesNoCancel resolves with 0 (yes), 1 (no) or 2 (cancel).
+      // $FlowFixMe[invalid-compare] - resolves to a number, not a boolean.
+      if (answer === 2) return null;
+      // Replacing keeps the name of the effect, so the events using it still work.
+      // $FlowFixMe[invalid-compare] - resolves to a number, not a boolean.
+      return answer === 0 ? competingEffectName : newEffectName;
+    },
+    [showYesNoCancel]
+  );
+};
+
+/**
+ * The layers of a scene or custom object an effect of the asset store can be
+ * put on, given what the effect can render on.
+ */
+const enumerateLayersForEffectAsset = (
+  layersContainer: gdLayersContainer | null,
+  assetShortHeader: ?AssetShortHeader
+): Array<{| value: string, label: string, labelIsUserDefined: boolean |}> => {
+  const effectMetadata = assetShortHeader
+    ? getEffectAssetMetadata(assetShortHeader)
+    : null;
+  if (!layersContainer || !effectMetadata) return [];
+  return enumerateLayers(layersContainer).filter(layer =>
+    doesEffectWorkOnLayer(
+      effectMetadata,
+      layersContainer.getLayer(layer.value).getRenderingType()
+    )
+  );
+};
+
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
@@ -263,6 +428,7 @@ type Props = {|
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectsAddedFromAssets: InstallAssetOutput => void,
+  onLayerEffectAddedFromAssets?: () => void,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -278,6 +444,7 @@ function NewObjectDialog({
   onClose,
   onCreateNewObject,
   onObjectsAddedFromAssets,
+  onLayerEffectAddedFromAssets,
   targetObjectFolderOrObjectWithContext,
   onWillInstallExtension,
   onExtensionInstalled,
@@ -337,14 +504,63 @@ function NewObjectDialog({
     onWillInstallExtension,
     onExtensionInstalled,
   });
+  const installEffectAssetOnLayer = useInstallEffectAsset({
+    project,
+    resourceManagementProps,
+  });
+  const chooseEffectNameForEffectAsset = useChooseEffectNameForEffectAsset();
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);
   const installExtension = useInstallExtension();
 
+  // An effect of the asset store is not an object: it goes on a layer.
+  const layersContainer: gdLayersContainer | null = layout
+    ? layout.getLayers()
+    : eventsBasedObject
+    ? eventsBasedObject.getLayers()
+    : null;
+  const effectLayers = enumerateLayersForEffectAsset(
+    layersContainer,
+    openedAssetShortHeader
+  );
+  const isOpenedAssetEffect =
+    !!openedAssetShortHeader && isEffectAsset(openedAssetShortHeader);
+
   const onInstallAsset = React.useCallback(
-    async (assetShortHeader: AssetShortHeader): Promise<boolean> => {
+    async (
+      assetShortHeader: AssetShortHeader,
+      effectLayerName?: string
+    ): Promise<boolean> => {
       if (!assetShortHeader) return false;
+
+      const effectMetadata = getEffectAssetMetadata(assetShortHeader);
+      if (effectMetadata) {
+        if (
+          !layersContainer ||
+          effectLayerName === undefined ||
+          !layersContainer.hasLayerNamed(effectLayerName)
+        )
+          return false;
+        const effectsContainer = layersContainer
+          .getLayer(effectLayerName)
+          .getEffects();
+        const effectName = await chooseEffectNameForEffectAsset({
+          assetShortHeader,
+          effectsContainer,
+        });
+        if (effectName === null) return false;
+        setIsAssetBeingInstalled(true);
+        const effect = await installEffectAssetOnLayer({
+          assetShortHeader,
+          effectsContainer,
+          effectName,
+        });
+        setIsAssetBeingInstalled(false);
+        if (effect && onLayerEffectAddedFromAssets)
+          onLayerEffectAddedFromAssets();
+        return !!effect;
+      }
 
       setIsAssetBeingInstalled(true);
       const installAssetOutput = await installAsset({
@@ -356,7 +572,15 @@ function NewObjectDialog({
       if (installAssetOutput) onObjectsAddedFromAssets(installAssetOutput);
       return !!installAssetOutput;
     },
-    [installAsset, onObjectsAddedFromAssets, objectsContainer]
+    [
+      installAsset,
+      installEffectAssetOnLayer,
+      chooseEffectNameForEffectAsset,
+      onObjectsAddedFromAssets,
+      onLayerEffectAddedFromAssets,
+      objectsContainer,
+      layersContainer,
+    ]
   );
 
   const onInstallEmptyCustomObject = React.useCallback(
@@ -410,13 +634,15 @@ function NewObjectDialog({
     ]
   );
 
+  // The effects of the store are each added to a layer of their own: a pack
+  // (or a search) is added as a whole for its objects only.
   const displayedAssetShortHeaders = React.useMemo(
     () => {
       return assetShortHeadersSearchResults
         ? getAssetShortHeadersToDisplay(
             assetShortHeadersSearchResults,
             selectedFolders
-          )
+          ).filter(assetShortHeader => !isEffectAsset(assetShortHeader))
         : [];
     },
     [assetShortHeadersSearchResults, selectedFolders]
@@ -431,7 +657,7 @@ function NewObjectDialog({
               assetShortHeadersSearchResults,
               currentPage.selectedFolders,
               currentPage.pageBreakIndex || 0
-            )
+            ).filter(assetShortHeader => !isEffectAsset(assetShortHeader))
           : []
       );
     },
@@ -441,22 +667,46 @@ function NewObjectDialog({
   const mainAction =
     currentTab === 'asset-store' ? (
       openedAssetPack ? (
-        <RaisedButton
-          key="add-all-assets"
-          primary
-          label={
-            displayedAssetShortHeaders.length === 1 ? (
-              <Trans>Add this asset to my scene</Trans>
-            ) : (
-              <Trans>Add these assets to my scene</Trans>
-            )
-          }
-          onClick={openAssetPackInstallDialog}
-          disabled={
-            !displayedAssetShortHeaders ||
-            displayedAssetShortHeaders.length === 0
-          }
-        />
+        displayedAssetShortHeaders.length ? (
+          <RaisedButton
+            key="add-all-assets"
+            primary
+            label={
+              displayedAssetShortHeaders.length === 1 ? (
+                <Trans>Add this asset to my scene</Trans>
+              ) : (
+                <Trans>Add these assets to my scene</Trans>
+              )
+            }
+            onClick={openAssetPackInstallDialog}
+          />
+        ) : null
+      ) : openedAssetShortHeader && isOpenedAssetEffect ? (
+        effectLayers.length ? (
+          <RaisedButtonWithMenu
+            key="add-effect"
+            primary
+            label={
+              isAssetBeingInstalled ? (
+                <Trans>Adding...</Trans>
+              ) : (
+                <Trans>Add to a layer</Trans>
+              )
+            }
+            disabled={isAssetBeingInstalled}
+            buildMenuTemplate={(i18n: I18nType) =>
+              effectLayers.map(layer => ({
+                label: layer.labelIsUserDefined
+                  ? layer.label
+                  : i18n._(t`Base layer`),
+                click: () => {
+                  onInstallAsset(openedAssetShortHeader, layer.value);
+                },
+              }))
+            }
+            id="add-asset-button"
+          />
+        ) : null
       ) : openedAssetShortHeader ? (
         <RaisedButton
           key="add-asset"

@@ -305,10 +305,14 @@ class GD_CORE_API ExpressionParser2 {
     SkipAllWhitespaces();
     if (CheckIfChar(IsOpeningSquareBracket)) {
       SkipChar();
+      
+      SkipAllWhitespaces();
+      bool isEmptyBrackets = CheckIfChar(IsClosingSquareBracket);
+
       auto child = gd::make_unique<VariableBracketAccessorNode>(Expression());
       child->expression->parent = child.get();
 
-      if (!CheckIfChar(IsClosingSquareBracket)) {
+      if (!CheckIfChar(IsClosingSquareBracket) && !isEmptyBrackets) {
         child->diagnostic =
             RaiseSyntaxError(_("Missing a closing bracket. Add a closing "
                                "bracket for each opening bracket."));

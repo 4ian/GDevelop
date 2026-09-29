@@ -1,0 +1,67 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 4px;
+}
+
+.bits {
+  display: grid;
+  /* The number of columns is given by the component, so that bits are laid
+     out on rows of at most 8, like they are usually read. */
+  gap: 2px;
+  padding: 2px;
+  border-radius: 4px;
+  background-color: var(--theme-text-field-default-background-color);
+  /* Keep the toggles at the same size whatever the number of bits, but let
+     them shrink rather than overflow in a narrow panel. */
+  width: fit-content;
+  max-width: 100%;
+}
+
+.bit {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  height: 20px;
+  width: 100%;
+  min-width: 0px;
+  border-radius: 3px;
+  background-color: transparent;
+  color: var(--theme-text-default-color);
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 0.1s linear, color 0.1s linear;
+}
+
+.bit:hover {
+  background-color: var(--theme-hover-background-color);
+}
+
+.bit.enabled {
+  background-color: var(--theme-primary-color);
+  color: var(--theme-primary-text-contrast-color);
+}
+
+.bit:focus-visible {
+  outline: 1px solid var(--theme-text-field-active-border-color);
+  outline-offset: -1px;
+}
+
+.container.disabled .bit {
+  color: var(--theme-text-field-disabled-color);
+  cursor: default;
+}
+
+.container.disabled .bit:hover {
+  background-color: transparent;
+}
+
+.container.disabled .bit.enabled {
+  background-color: var(--theme-text-field-disabled-color);
+  color: var(--theme-text-field-default-background-color);
+}

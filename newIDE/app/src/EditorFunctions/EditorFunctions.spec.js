@@ -135,7 +135,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). This object type has no editable object properties."`
+        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). This object type has no editable object properties: its animations and their images are in its raw JSON (\`inspect_object_properties_effects\` with \`include_raw_json\`, then \`raw_json\` of \`change_object_properties_effects\`)."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -1799,7 +1799,6 @@ describe('editorFunctions', () => {
               'When the player presses space, play an explosion sound and show an explosion effect',
             extensionNamesList: '',
             objectsList: 'Player',
-            existingEventsAsText: '',
             existingEventsJson: null,
             existingEventsJsonUserRelativeKey: null,
             resultMessage: 'Successfully added explosion events.',
@@ -1904,7 +1903,6 @@ describe('editorFunctions', () => {
               'When the player presses space, play an explosion sound and the boss music',
             extensionNamesList: '',
             objectsList: 'Player',
-            existingEventsAsText: '',
             existingEventsJson: null,
             existingEventsJsonUserRelativeKey: null,
             resultMessage: 'Successfully added sound events.',
@@ -3978,7 +3976,9 @@ describe('editorFunctions', () => {
       expect(instances[0].height).toBe(48);
       expect(instances[0].depth).toBe(64);
       expect(result.positionSemantics).toEqual(
-        expect.stringContaining('origin, NOT its center')
+        expect.stringContaining(
+          'The center point is the rotation pivot and need not be the geometric midpoint.'
+        )
       );
       expect(result.objectSizeInfo).toEqual({ Player: null });
     });

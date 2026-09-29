@@ -728,7 +728,6 @@ interface LayoutFolderOrLayout {
     unsigned long GetChildPosition([Const, Ref] LayoutFolderOrLayout child);
     [Ref] LayoutFolderOrLayout GetParent();
     [Ref] LayoutFolderOrLayout InsertNewFolder([Const] DOMString name, unsigned long newPosition);
-    [Ref] LayoutFolderOrLayout GetOrCreateFolderChild([Const] DOMString name);
     void MoveFolderOrItemToAnotherFolder([Ref] LayoutFolderOrLayout folderOrItem, [Ref] LayoutFolderOrLayout newParentFolder, unsigned long newPosition);
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] LayoutFolderOrLayout childToRemove);
@@ -750,7 +749,6 @@ interface ExternalLayoutFolderOrExternalLayout {
     unsigned long GetChildPosition([Const, Ref] ExternalLayoutFolderOrExternalLayout child);
     [Ref] ExternalLayoutFolderOrExternalLayout GetParent();
     [Ref] ExternalLayoutFolderOrExternalLayout InsertNewFolder([Const] DOMString name, unsigned long newPosition);
-    [Ref] ExternalLayoutFolderOrExternalLayout GetOrCreateFolderChild([Const] DOMString name);
     void MoveFolderOrItemToAnotherFolder([Ref] ExternalLayoutFolderOrExternalLayout folderOrItem, [Ref] ExternalLayoutFolderOrExternalLayout newParentFolder, unsigned long newPosition);
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] ExternalLayoutFolderOrExternalLayout childToRemove);
@@ -772,7 +770,6 @@ interface ExternalEventsFolderOrExternalEvents {
     unsigned long GetChildPosition([Const, Ref] ExternalEventsFolderOrExternalEvents child);
     [Ref] ExternalEventsFolderOrExternalEvents GetParent();
     [Ref] ExternalEventsFolderOrExternalEvents InsertNewFolder([Const] DOMString name, unsigned long newPosition);
-    [Ref] ExternalEventsFolderOrExternalEvents GetOrCreateFolderChild([Const] DOMString name);
     void MoveFolderOrItemToAnotherFolder([Ref] ExternalEventsFolderOrExternalEvents folderOrItem, [Ref] ExternalEventsFolderOrExternalEvents newParentFolder, unsigned long newPosition);
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] ExternalEventsFolderOrExternalEvents childToRemove);
@@ -794,7 +791,6 @@ interface TestFolderOrTest {
     unsigned long GetChildPosition([Const, Ref] TestFolderOrTest child);
     [Ref] TestFolderOrTest GetParent();
     [Ref] TestFolderOrTest InsertNewFolder([Const] DOMString name, unsigned long newPosition);
-    [Ref] TestFolderOrTest GetOrCreateFolderChild([Const] DOMString name);
     void MoveFolderOrItemToAnotherFolder([Ref] TestFolderOrTest folderOrItem, [Ref] TestFolderOrTest newParentFolder, unsigned long newPosition);
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] TestFolderOrTest childToRemove);

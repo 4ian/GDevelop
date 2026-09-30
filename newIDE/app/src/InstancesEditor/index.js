@@ -318,6 +318,11 @@ export default class InstancesEditor extends Component<Props, State> {
 
     // Add the renderer view element to the DOM
     canvasArea.appendChild(gameCanvas);
+    this.statusBar = new StatusBar({
+      container: canvasArea,
+      getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
+      isPointerOverCanvas: () => this._isPointerOverCanvas,
+    });
 
     this.pixiRenderer.view.style.outline = 'none';
 
@@ -361,6 +366,7 @@ export default class InstancesEditor extends Component<Props, State> {
     );
     this.pixiRenderer.view.addEventListener('mousemove', event => {
       this._isPointerOverCanvas = true;
+      this._onMouseMove(event.offsetX, event.offsetY);
       if (onMouseMove) onMouseMove(event);
     });
     this.pixiRenderer.view.addEventListener('mouseout', event => {
@@ -421,11 +427,6 @@ export default class InstancesEditor extends Component<Props, State> {
       }
 
       this._onUpBackground(event.data.global.x, event.data.global.y);
-    });
-    this.backgroundArea.addEventListener('globalmousemove', event => {
-      const cursorX = event.data.global.x || 0;
-      const cursorY = event.data.global.y || 0;
-      this._onMouseMove(cursorX, cursorY);
     });
     this.backgroundArea.addEventListener('panmove', (event: PanMoveEvent) =>
       this._onPanMove(
@@ -538,9 +539,6 @@ export default class InstancesEditor extends Component<Props, State> {
     if (this.windowMask) {
       this.uiPixiContainer.removeChild(this.windowMask.getPixiObject());
     }
-    if (this.statusBar) {
-      this.uiPixiContainer.removeChild(this.statusBar.getPixiObject());
-    }
     if (this.background) {
       this.backgroundPixiContainer.removeChild(this.background.getPixiObject());
     }
@@ -639,11 +637,6 @@ export default class InstancesEditor extends Component<Props, State> {
       viewPosition: this.viewPosition,
       instancesEditorSettings: this.props.instancesEditorSettings,
     });
-    this.statusBar = new StatusBar({
-      width: this.props.width,
-      height: this.props.height,
-      getLastCursorSceneCoordinates: this.getLastCursorSceneCoordinates,
-    });
     this.profilerBar = new ProfilerBar();
 
     this.uiPixiContainer.addChild(this.selectionRectangle.getPixiObject());
@@ -657,7 +650,6 @@ export default class InstancesEditor extends Component<Props, State> {
     );
     this.uiPixiContainer.addChild(this.tileMapPaintingPreview.getPixiObject());
     this.uiPixiContainer.addChild(this.clickInterceptor.getPixiObject());
-    this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
     this.uiPixiContainer.addChild(this.profilerBar.getPixiObject());
 
     this.background = new Background({
@@ -770,7 +762,6 @@ export default class InstancesEditor extends Component<Props, State> {
         );
       }
       this.viewPosition.resize(width, height);
-      this.statusBar.resize(width, height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, width, height);
       this.background.resize(width, height);
 

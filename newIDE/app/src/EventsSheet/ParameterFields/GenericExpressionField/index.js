@@ -268,7 +268,6 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   };
 
-  // TODO Is it really useful?
   getInputValue = (): string => {
     if (!this._inputElement) {
       return '';

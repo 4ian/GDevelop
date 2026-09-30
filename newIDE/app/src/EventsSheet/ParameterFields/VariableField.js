@@ -434,6 +434,7 @@ export default (React.forwardRef<Props, ParameterFieldInterface>(
                     openEventsBasedEntityPropertyEditorDialog
                   }
                   isInline={isInline}
+                  shouldHideExpressionListButton={true}
                   onRequestClose={props.onRequestClose}
                   onApply={props.onApply}
                   resourceManagementProps={props.resourceManagementProps}

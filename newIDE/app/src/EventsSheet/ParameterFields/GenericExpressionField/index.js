@@ -801,22 +801,23 @@ export default class ExpressionField extends React.Component<Props, State> {
                       style,
                       onChange: this._handleBlur,
                     })}
-                  {!this.props.isInline && (
-                    <RaisedButton
-                      id={`open-${expressionType}-expression-popover-button`}
-                      icon={<Functions />}
-                      label={
-                        expressionType === 'string'
-                          ? '"ABC"'
-                          : expressionType === 'number'
-                          ? '123'
-                          : ''
-                      }
-                      primary
-                      style={style}
-                      onClick={this._openExpressionPopover}
-                    />
-                  )}
+                  {!this.props.isInline &&
+                    !this.props.shouldHideExpressionListButton && (
+                      <RaisedButton
+                        id={`open-${expressionType}-expression-popover-button`}
+                        icon={<Functions />}
+                        label={
+                          expressionType === 'string'
+                            ? '"ABC"'
+                            : expressionType === 'number'
+                            ? '123'
+                            : ''
+                        }
+                        primary
+                        style={style}
+                        onClick={this._openExpressionPopover}
+                      />
+                    )}
                 </React.Fragment>
               )}
             />

@@ -3347,6 +3347,15 @@ namespace gdjs {
       return !!instanceData && !!instanceData.sealed;
     }
 
+    /**
+     * Instances hidden at start stay visible in the editor, but extensions
+     * can use this to disable what can't be shown as "hidden" (like lights).
+     */
+    isInstanceHiddenAtStart(object: gdjs.RuntimeObject): boolean {
+      const instanceData = this._getInstanceData(object.persistentUuid);
+      return !!instanceData && !!instanceData.hidden;
+    }
+
     private _addInstances(addedInstances: Array<InstanceData>) {
       for (const addedInstance of addedInstances) {
         this._editedInstanceDataList.push(addedInstance);

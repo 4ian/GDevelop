@@ -30,6 +30,7 @@ namespace gdjs {
           private _light: THREE.DirectionalLight;
           private _shadowMapDirty = true;
           private _shadowCameraDirty = true;
+          private _shadowCameraInverseWorldScale: float = 0;
           private _shadowCameraHelper: THREE.CameraHelper | null;
 
           constructor() {
@@ -47,12 +48,16 @@ namespace gdjs {
           }
 
           private _updateShadowCamera(scene: gdjs.RuntimeScene): void {
-            if (!this._shadowCameraDirty) {
+            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
+            // The world scale can be changed in the editor.
+            if (
+              !this._shadowCameraDirty &&
+              this._shadowCameraInverseWorldScale === inverseWorldScale
+            ) {
               return;
             }
             this._shadowCameraDirty = false;
-
-            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
+            this._shadowCameraInverseWorldScale = inverseWorldScale;
             const frustumSize = this._frustumSize * inverseWorldScale;
 
             this._light.shadow.camera.near = 1 * inverseWorldScale;
@@ -62,6 +67,8 @@ namespace gdjs {
             this._light.shadow.camera.left = -frustumSize / 2;
             this._light.shadow.camera.top = frustumSize / 2;
             this._light.shadow.camera.bottom = -frustumSize / 2;
+            // Three.js only updates it when the shadow map is created.
+            this._light.shadow.camera.updateProjectionMatrix();
           }
 
           private _updateShadowMapSize(): void {

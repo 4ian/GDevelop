@@ -540,6 +540,7 @@ const Model3DEditor = ({
             <SemiControlledTextField
               floatingLabelFixed
               floatingLabelText={<Trans>Scaling factor</Trans>}
+              type="number"
               onChange={value => setScale(parseFloat(value) || 0)}
               value={
                 scale === null ? '' : removeTrailingZeroes(scale.toPrecision(5))

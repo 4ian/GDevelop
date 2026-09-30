@@ -133,8 +133,12 @@ const Cube3DEditor = ({
                 commitOnBlur
                 floatingLabelFixed
                 floatingLabelText={property.getLabel()}
-                onChange={value => onChangeProperty(propertyName, value)}
+                onChange={value => {
+                  if (isNaN(parseFloat(value))) return;
+                  onChangeProperty(propertyName, value);
+                }}
                 value={property.getValue()}
+                type="number"
                 endAdornment={
                   <Tooltip title={endAdornment.tooltipContent}>
                     <InputAdornment position="end">

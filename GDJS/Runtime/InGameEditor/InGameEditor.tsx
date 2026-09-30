@@ -3813,6 +3813,7 @@ namespace gdjs {
               );
             }
             runtimeObject.extraInitializationFromInitialInstance(instance);
+            gdjs.RuntimeObject.applyInGameEditorMinimumOpacity(runtimeObject);
           }
         });
       this._updateInstances(instances);

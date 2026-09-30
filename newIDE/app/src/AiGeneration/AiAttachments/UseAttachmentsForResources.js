@@ -4,10 +4,21 @@ import axios from 'axios';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { createAiAttachmentDownloads } from '../../Utils/GDevelopServices/Generation';
 import { MAX_ATTACHMENTS_PER_MESSAGE } from './UseAiAttachmentDrafts';
+import { t } from '@lingui/macro';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
-import { type FileMetadata } from '../../ProjectsStorage';
-import { type AttachmentsForResources } from '../../EditorFunctions/AttachmentResources';
+import {
+  type FileMetadata,
+  type StorageProvider,
+  type SaveAsLocation,
+} from '../../ProjectsStorage';
+import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
+import {
+  type AttachmentsForResources,
+  type ResourceFilesStorage,
+} from '../../EditorFunctions/AttachmentResources';
 import { getFileOfUploadedAttachment } from './AiAttachmentsUpload';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { isNativeMobileApp } from '../../Utils/Platform';
 
 const downloadFile = async ({
   url,
@@ -22,17 +33,34 @@ const downloadFile = async ({
   return new File([response.data], name, { type: mimeType });
 };
 
+const canStorageProviderStoreResourceFiles = (
+  storageProvider: StorageProvider
+): boolean =>
+  storageProvider.internalName === 'Cloud' ||
+  storageProvider.internalName === 'LocalFile';
+
 /** The files attached to the AI, for the functions making resources of them. */
 export const useAttachmentsForResources = ({
+  project,
   resourceManagementProps,
   fileMetadata,
+  onSaveProjectAsWithStorageProvider,
 }: {|
+  project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
+  onSaveProjectAsWithStorageProvider?: (
+    options: ?{|
+      requestedStorageProvider?: StorageProvider,
+      forcedSavedAsLocation?: SaveAsLocation,
+      createdProject?: gdProject,
+    |}
+  ) => Promise<?FileMetadata>,
 |}): AttachmentsForResources => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
+  const { showConfirmation } = useAlertDialog();
 
   const getFiles = React.useCallback(
     async (attachmentIds: Array<string>) => {
@@ -81,22 +109,60 @@ export const useAttachmentsForResources = ({
     [profile, getAuthorizationHeader]
   );
 
-  const storeResourceFiles = React.useCallback(
-    async () => {
-      resourceManagementProps.onNewResourcesAdded();
-      // A project not saved yet (or opened from a URL) has no storage for
-      // its files: they are stored when it is saved.
-      const storageProviderName = resourceManagementProps.getStorageProvider()
-        .internalName;
-      if (
-        !fileMetadata ||
-        (storageProviderName !== 'Cloud' && storageProviderName !== 'LocalFile')
-      )
-        return false;
-      await resourceManagementProps.onFetchNewlyAddedResources();
-      return true;
+  const saveProjectInCloudIfUserAgrees = React.useCallback(
+    async (): Promise<boolean> => {
+      if (!project || !onSaveProjectAsWithStorageProvider) return false;
+      const shouldSave = await showConfirmation({
+        title: t`Save your project`,
+        message: t`Your project must be saved in the cloud to add the files you attached. Save it now?`,
+        confirmButtonLabel: t`Save`,
+      });
+      if (!shouldSave) return false;
+
+      // Saving it also stores the files of its resources.
+      const newFileMetadata = await onSaveProjectAsWithStorageProvider({
+        requestedStorageProvider: CloudStorageProvider,
+        forcedSavedAsLocation: { name: project.getName() },
+      });
+      return (
+        !!newFileMetadata &&
+        canStorageProviderStoreResourceFiles(
+          resourceManagementProps.getStorageProvider()
+        )
+      );
     },
-    [resourceManagementProps, fileMetadata]
+    [
+      project,
+      onSaveProjectAsWithStorageProvider,
+      showConfirmation,
+      resourceManagementProps,
+    ]
+  );
+
+  const storeResourceFiles = React.useCallback(
+    async (): Promise<ResourceFilesStorage> => {
+      resourceManagementProps.onNewResourcesAdded();
+      if (
+        fileMetadata &&
+        canStorageProviderStoreResourceFiles(
+          resourceManagementProps.getStorageProvider()
+        )
+      ) {
+        await resourceManagementProps.onFetchNewlyAddedResources();
+        return 'stored';
+      }
+
+      // A project not saved yet (or opened from a URL) has no storage for its
+      // files. On desktop and on the web, they are kept in memory, where the
+      // previews can read them, until the project is saved. On the mobile
+      // app, the previews can't read them and they are lost if the app is
+      // closed: the project must be saved first.
+      if (!isNativeMobileApp()) return 'stored-when-project-is-saved';
+      if (!(await saveProjectInCloudIfUserAgrees())) return 'project-not-saved';
+      await resourceManagementProps.onFetchNewlyAddedResources();
+      return 'stored';
+    },
+    [resourceManagementProps, fileMetadata, saveProjectInCloudIfUserAgrees]
   );
 
   return React.useMemo(() => ({ getFiles, storeResourceFiles }), [

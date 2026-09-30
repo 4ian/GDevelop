@@ -341,6 +341,30 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
                   "number", "MyExtension::GetCollectionVariableAsNumber(my",
                   43) == expectedCompletions);
     }
+    SECTION("Legacy scene variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("scenevar", "my", 0) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number",
+                                "MyExtension::GetVariableAsNumber(my",
+                                33) == expectedCompletions);
+    }
+    SECTION("Legacy global variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myGlobalVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("globalvar", "my", 0) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number",
+                                "MyExtension::GetGlobalVariableAsNumber(my",
+                                40) == expectedCompletions);
+    }
   }
   SECTION("Variable full name") {
     SECTION("Variable parameter") {
@@ -390,6 +414,34 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
                   "MyExtension::GetCollectionVariableAsNumber(myStructure",
                   43) == expectedCompletions);
     }
+    SECTION("Legacy scene variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myStructure.myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructure.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructure[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("scenevar", "myStructure", 0) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number",
+                                "MyExtension::GetVariableAsNumber(myStructure",
+                                33) == expectedCompletions);
+    }
+    SECTION("Legacy global variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 5, no prefix, myGlobalStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myGlobalStructure.myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myGlobalStructure[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("globalvar", "myGlobalStructure", 0) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number",
+                                "MyExtension::GetGlobalVariableAsNumber(myGlobalStructure",
+                                40) == expectedCompletions);
+    }
   }
   SECTION("Child variable partial name") {
     SECTION("Variable parameter") {
@@ -433,6 +485,30 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
                   "number",
                   "MyExtension::GetCollectionVariableAsNumber(myStructure.",
                   54) == expectedCompletions);
+    }
+    SECTION("Legacy scene variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("scenevar", "myStructure.", 11) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number",
+                                "MyExtension::GetVariableAsNumber(myStructure.",
+                                44) == expectedCompletions);
+    }
+    SECTION("Legacy global variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("globalvar", "myGlobalStructure.", 17) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number",
+                                "MyExtension::GetGlobalVariableAsNumber(myGlobalStructure.",
+                                56) == expectedCompletions);
     }
   }
   SECTION("Child variable full name") {
@@ -485,6 +561,36 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
                                 "MyExtension::GetCollectionVariableAsNumber("
                                 "myStructure.myStructureChild",
                                 54) == expectedCompletions);
+    }
+    SECTION("Legacy scene variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myStructureChild.myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructureChild.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructureChild[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("scenevar", "myStructure.myStructureChild", 11) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number",
+                                "MyExtension::GetVariableAsNumber(myStructure.myStructureChild",
+                                44) == expectedCompletions);
+    }
+    SECTION("Legacy global variable parameter") {
+      // clang-format off
+      std::vector<gd::String> expectedCompletions{
+          "{ 3, no type, 3, no prefix, myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 3, no prefix, myStructureChild.myNumberChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructureChild.myStructureChild, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          "{ 3, no type, 5, no prefix, myStructureChild[], no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }"
+      };
+      // clang-format on
+      REQUIRE(getCompletionsFor("globalvar", "myGlobalStructure.myStructureChild", 17) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number",
+                                "MyExtension::GetGlobalVariableAsNumber(myGlobalStructure.myStructureChild",
+                                56) == expectedCompletions);
     }
   }
   SECTION("Object variable partial name") {
@@ -717,17 +823,6 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       // clang-format on
       REQUIRE(getCompletionsFor("string", "Function(My", 10) ==
               expectedCompletions);
-    }
-    SECTION("Function with a legacy variable as argument") {
-      // clang-format off
-      std::vector<gd::String> expectedCompletions{
-          "{ 3, no type, 3, no prefix, myVariable, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-          "{ 3, no type, 5, no prefix, myStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-      };
-      // clang-format on
-      REQUIRE(getCompletionsFor("number",
-                                "MyExtension::GetVariableAsNumber(my",
-                                33) == expectedCompletions);
     }
     SECTION("Function with a Layer as argument") {
       // clang-format off

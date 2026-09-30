@@ -40,7 +40,7 @@ export const allResourceKindsAndMetadata = [
   {
     kind: 'audio',
     displayName: (t`Audio`: any),
-    fileExtensions: ['aac', 'wav', 'mp3', 'ogg'],
+    fileExtensions: ['aac', 'm4a', 'wav', 'mp3', 'ogg'],
     createNewResource: (): gdAudioResource => new gd.AudioResource(),
   },
   {

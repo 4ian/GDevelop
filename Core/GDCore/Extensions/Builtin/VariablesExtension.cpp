@@ -34,7 +34,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "",
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
-      .AddParameter("variableOrPropertyOrParameter", _("Variable"))
+      .AddParameter("variableOrPropertyOrParameter", _("Variable"), "primitive")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions());
 
@@ -46,7 +46,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "",
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
-      .AddParameter("variableOrPropertyOrParameter", _("Variable"))
+      .AddParameter("variableOrPropertyOrParameter", _("Variable"), "primitive")
       .UseStandardRelationalOperatorParameters(
           "string", ParameterOptions::MakeNewOptions());
 
@@ -59,7 +59,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "",
           "res/conditions/var24.png",
           "res/conditions/var.png")
-      .AddParameter("variableOrPropertyOrParameter", _("Variable"))
+      .AddParameter("variableOrPropertyOrParameter", _("Variable"), "primitive")
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
       // This parameter allows to keep the operand expression
@@ -74,7 +74,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "",
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("variableOrProperty", _("Variable"))
+      .AddParameter("variableOrProperty", _("Variable"), "primitive")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions());
 
@@ -86,7 +86,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "",
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("variableOrProperty", _("Variable"))
+      .AddParameter("variableOrProperty", _("Variable"), "primitive")
       .UseStandardOperatorParameters("string",
                                      ParameterOptions::MakeNewOptions());
 
@@ -99,7 +99,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "",
           "res/conditions/var24.png",
           "res/conditions/var.png")
-      .AddParameter("variableOrProperty", _("Variable"))
+      .AddParameter("variableOrProperty", _("Variable"), "primitive")
       .AddParameter("operator", _("Value"), "boolean")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
@@ -114,7 +114,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("Arrays and structures"),
           "res/conditions/var24.png",
           "res/conditions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
@@ -129,7 +129,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     _("Arrays and structures"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
-      .AddParameter("variable", _("Variable"))
+      .AddParameter("variable", _("Variable"), "collection")
       .AddParameter("string", _("Name of the child"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
@@ -143,7 +143,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("Arrays and structures"),
           "res/actions/var24.png",
           "res/actions/var.png")
-      .AddParameter("variable", _("Structure variable"))
+      .AddParameter("variable", _("Structure variable"), "collection")
       .AddParameter("string", _("Child's name"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
@@ -157,7 +157,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  _("Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("variable", _("Structure or array variable"))
+      .AddParameter("variable", _("Structure or array variable"), "collection")
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
@@ -170,7 +170,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  _("Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .AddParameter("variable", _("Variable with the content to add"))
       .SetParameterLongDescription(
           _("The content of the variable will *be copied* and added at the "
@@ -187,7 +187,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("Arrays and structures"),
           "res/actions/var24.png",
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .AddParameter("string", _("Text to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
@@ -200,7 +200,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  _("Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .AddParameter("expression", _("Number to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
@@ -213,7 +213,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  _("Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .AddParameter("trueorfalse", _("Boolean to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
@@ -228,7 +228,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  _("Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .AddParameter("expression", _("Index to remove"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
@@ -241,7 +241,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a text (string)."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   extension
@@ -252,7 +252,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a number."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   extension
@@ -263,7 +263,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a text (string)."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   extension
@@ -274,7 +274,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a number."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Array variable"), "collection")
       .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   // Legacy instructions

@@ -205,6 +205,10 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
                   />
                 ) : eventsBasedObject ? (
                   <EventsBasedObjectEditor
+                    project={project}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
                     eventsFunctionsExtension={eventsFunctionsExtension}
                     eventsBasedObject={eventsBasedObject}
                     unsavedChanges={unsavedChanges}

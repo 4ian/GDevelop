@@ -2,6 +2,7 @@
 import { type ExposedScriptFunction } from './ScriptRunner';
 import { NON_SCRIPTABLE_FUNCTION_NAMES } from './NonScriptableFunctionNames';
 import { type LaunchFunctionCollaborators } from '..';
+import { normalizeLegacyArguments } from '../Scope';
 
 /**
  * Builds the list of editor functions exposed to a `run_script` script, from
@@ -56,7 +57,11 @@ export const buildExposedScriptFunctions = ({
       name,
       modifiesProject: !!editorFunction.modifiesProject,
       launch: (args: any) =>
-        editorFunction.launchFunction({ ...launchOptions, args, project }),
+        editorFunction.launchFunction({
+          ...launchOptions,
+          args: normalizeLegacyArguments(args),
+          project,
+        }),
     });
   }
 
@@ -69,7 +74,10 @@ export const buildExposedScriptFunctions = ({
       name,
       modifiesProject: !!editorFunctionWithoutProject.modifiesProject,
       launch: (args: any) =>
-        editorFunctionWithoutProject.launchFunction({ ...launchOptions, args }),
+        editorFunctionWithoutProject.launchFunction({
+          ...launchOptions,
+          args: normalizeLegacyArguments(args),
+        }),
     });
   }
 

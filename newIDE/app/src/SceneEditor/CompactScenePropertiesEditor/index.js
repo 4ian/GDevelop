@@ -128,6 +128,7 @@ export const CompactScenePropertiesEditor = ({
     project,
     persistedPanelStateId,
     persistedPanelStateType: 'scene',
+    foldedByDefault: true,
   });
 
   // Variable refactoring: snapshot on mount, apply on unmount/scene change.
@@ -219,12 +220,22 @@ export const CompactScenePropertiesEditor = ({
               </ColumnStackLayout>
             )}
           />
-          {allVisibleBehaviors.length > 0 && (
-            <TopLevelCollapsibleSection
-              title={<Trans>Behaviors</Trans>}
-              isFolded={isSectionFolded('behaviors')}
-              toggleFolded={() => toggleSectionFolded('behaviors')}
-              renderContent={() => (
+          <TopLevelCollapsibleSection
+            title={<Trans>Behaviors</Trans>}
+            isFolded={isSectionFolded('behaviors')}
+            toggleFolded={() => toggleSectionFolded('behaviors')}
+            renderContent={() =>
+              allVisibleBehaviors.length === 0 ? (
+                <Column>
+                  <EmptyMessage>
+                    <Trans>
+                      No behavior on this scene has properties that can be
+                      configured. Behaviors are added on objects, and their
+                      scene-wide properties, if any, are displayed here.
+                    </Trans>
+                  </EmptyMessage>
+                </Column>
+              ) : (
                 <ColumnStackLayout noMargin>
                   {allVisibleBehaviors.map(behaviorSharedData => {
                     const behaviorTypeName = behaviorSharedData.getTypeName();
@@ -279,9 +290,9 @@ export const CompactScenePropertiesEditor = ({
                     );
                   })}
                 </ColumnStackLayout>
-              )}
-            />
-          )}
+              )
+            }
+          />
           <TopLevelCollapsibleSection
             title={<Trans>Scene Variables</Trans>}
             isFolded={isSectionFolded('variables')}

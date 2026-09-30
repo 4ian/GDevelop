@@ -43,6 +43,9 @@ const styles = {
   errorMeta: {
     fontFamily: '"Lucida Console", Monaco, monospace',
     opacity: 0.75,
+    // A function name can be longer than the row: break it rather than
+    // overflowing the chat.
+    overflowWrap: 'anywhere',
   },
   count: {
     fontVariantNumeric: 'tabular-nums',

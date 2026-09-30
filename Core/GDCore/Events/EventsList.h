@@ -66,7 +66,7 @@ class GD_CORE_API EventsList {
    * \param position Insertion position. If the position is invalid, the object
    * is inserted at the end of the objects list.
    */
-  gd::BaseEvent& InsertNewEvent(gd::Project& project,
+  gd::BaseEvent& InsertNewEvent(const gd::Project& project,
                                 const gd::String& eventType,
                                 size_t position = (size_t)-1);
 

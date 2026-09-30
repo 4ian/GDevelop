@@ -134,6 +134,8 @@ export const getInitialPreferences = (): {
   showExperimentalExtensions: boolean,
   showInAppTutorialDeveloperMode: boolean,
   takeScreenshotOnPreview: boolean,
+  gameplayTestFramePosition: {| left: number, bottom: number |} | null,
+  gameplayTestFrameZoomFactor: number | null,
   themeName: any,
   use3DEditor: any,
   useBackgroundSerializerForSaving: boolean,
@@ -393,6 +395,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setGamesDashboardOrderBy: (this._setGamesDashboardOrderBy.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setTakeScreenshotOnPreview: (this._setTakeScreenshotOnPreview.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setGameplayTestFramePosition: (this._setGameplayTestFramePosition.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setGameplayTestFrameZoomFactor: (this._setGameplayTestFrameZoomFactor.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
@@ -1402,6 +1412,30 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           takeScreenshotOnPreview: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setGameplayTestFramePosition(newValue: {| left: number, bottom: number |}) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          gameplayTestFramePosition: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setGameplayTestFrameZoomFactor(newValue: number) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          gameplayTestFrameZoomFactor: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

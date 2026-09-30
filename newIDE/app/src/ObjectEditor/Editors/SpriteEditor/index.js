@@ -31,6 +31,7 @@ import {
   setCollisionMaskOnAllFrames,
 } from './Utils/SpriteObjectHelper';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import { renameObjectPointReferences } from '../../../Utils/ObjectAnimationsRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -297,24 +298,17 @@ export default function SpriteEditor({
                   if (!object) {
                     return;
                   }
-                  if (layout) {
-                    gd.WholeProjectRefactorer.renameObjectPointInScene(
+                  renameObjectPointReferences(
+                    {
                       project,
-                      layout,
                       object,
-                      oldName,
-                      newName
-                    );
-                  } else if (eventsFunctionsExtension && eventsBasedObject) {
-                    gd.WholeProjectRefactorer.renameObjectPointInEventsBasedObject(
-                      project,
+                      layout,
                       eventsFunctionsExtension,
                       eventsBasedObject,
-                      object,
-                      oldName,
-                      newName
-                    );
-                  }
+                    },
+                    oldName,
+                    newName
+                  );
                 }}
               />
             </Dialog>

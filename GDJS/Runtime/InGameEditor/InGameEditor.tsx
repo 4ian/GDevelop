@@ -1,8 +1,11 @@
 namespace gdjs {
   const logger = new gdjs.Logger('In-Game editor');
 
+  type HChild = HTMLElement | string | null | false | undefined;
+
   /**
    * A minimal utility to define DOM elements.
+   * Children can be arrays, and empty children (null, false) are skipped.
    * Also copied in InGameDebugger.tsx.
    */
   function h<K extends keyof HTMLElementTagNameMap>(
@@ -10,23 +13,28 @@ namespace gdjs {
     attrs: {
       style?: Partial<CSSStyleDeclaration>;
       onClick?: () => void;
-    },
-    ...nodes: (HTMLElement | string)[]
+    } | null,
+    ...nodes: (HChild | HChild[])[]
   ): HTMLElement {
     const node = document.createElement(tag);
-    Object.keys(attrs).forEach((key) => {
+    const attributes = attrs || {};
+    Object.keys(attributes).forEach((key) => {
       if (key === 'style') {
-        for (const [styleName, value] of Object.entries(attrs.style!)) {
+        for (const [styleName, value] of Object.entries(attributes.style!)) {
           node.style[styleName] = value;
         }
       } else if (key === 'onClick') {
-        node.addEventListener('click', attrs[key]!);
+        node.addEventListener('click', attributes[key]!);
       } else {
-        node.setAttribute(key, '' + attrs[key]);
+        node.setAttribute(key, '' + attributes[key]);
       }
     });
 
-    node.append(...nodes);
+    for (const child of nodes) {
+      for (const element of Array.isArray(child) ? child : [child]) {
+        if (element) node.append(element);
+      }
+    }
     return node;
   }
 
@@ -265,6 +273,48 @@ namespace gdjs {
     // Keep the pickers intact for interaction - they're invisible anyway
   }
 
+  /**
+   * Remove the near-infinite white guide lines shown by the Three.js TransformControls
+   * when an axis is hovered or dragged (helpers named X/Y/Z for translate/scale,
+   * AXIS for rotate). They cross the whole scene, which is distracting -
+   * especially when manipulating small objects.
+   */
+  function patchAxisGuideLinesOnTransformControlsGizmos(
+    controls: THREE_ADDONS.TransformControls
+  ) {
+    const gizmo = (controls as any)._gizmo;
+    if (!gizmo || !gizmo.helper) return;
+
+    // Only the axis guide lines are removed: the other helpers (START/END/DELTA,
+    // giving a discreet feedback of the movement while dragging) are kept.
+    const guideLineNamesByMode = {
+      translate: ['X', 'Y', 'Z'],
+      rotate: ['AXIS'],
+      scale: ['X', 'Y', 'Z'],
+    };
+
+    Object.keys(guideLineNamesByMode).forEach((mode) => {
+      const helperGroup = gizmo.helper[mode];
+      if (!helperGroup || !helperGroup.children) return;
+
+      const guideLines = helperGroup.children.filter((child) =>
+        guideLineNamesByMode[mode].includes(child.name)
+      );
+
+      guideLines.forEach((guideLine) => {
+        helperGroup.remove(guideLine);
+        // Geometries and materials are cloned per handle by TransformControls,
+        // so they can safely be disposed.
+        if (guideLine.geometry) guideLine.geometry.dispose();
+        if (Array.isArray(guideLine.material)) {
+          guideLine.material.forEach((material) => material.dispose());
+        } else if (guideLine.material) {
+          guideLine.material.dispose();
+        }
+      });
+    });
+  }
+
   const getSvgIconUrl = (game: RuntimeGame, resourceName: string) => {
     const resource = game.getResourceLoader().getResource(resourceName);
     if (!resource) return '';
@@ -295,15 +345,7 @@ namespace gdjs {
   const RIGHT_CTRL_KEY = gdjs.InputManager.getLocationAwareKeyCode(CTRL_KEY, 2);
   const LEFT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(91, 1);
   const RIGHT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(93, 2);
-  const W_KEY = 87;
-  const A_KEY = 65;
   const C_KEY = 67;
-  const S_KEY = 83;
-  const D_KEY = 68;
-  const Q_KEY = 81;
-  const E_KEY = 69;
-  const F_KEY = 70;
-  const O_KEY = 79;
   const V_KEY = 86;
   const X_KEY = 88;
   const Y_KEY = 89;
@@ -311,10 +353,150 @@ namespace gdjs {
   const ESC_KEY = 27;
   const EQUAL_KEY = 187;
   const MINUS_KEY = 189;
-  const KEY_DIGIT_1 = 49;
-  const KEY_DIGIT_2 = 50;
-  const KEY_DIGIT_3 = 51;
   const ROTATION_SNAP_DEGREES = 45;
+
+  /**
+   * The key codes of the keys that can be used in a shortcut, by the name of
+   * the key in the IDE shortcuts (the `code` of the keyboard events).
+   */
+  const shortcutKeyCodes: { [code: string]: integer } = {
+    Tab: 9,
+    Space: 32,
+    Comma: 188,
+    Equal: 187,
+    Minus: 189,
+    // The input manager stores the numpad keys with their location.
+    NumpadAdd: gdjs.InputManager.getLocationAwareKeyCode(107, 3),
+    NumpadSubtract: gdjs.InputManager.getLocationAwareKeyCode(109, 3),
+  };
+  for (let letterIndex = 0; letterIndex < 26; letterIndex++) {
+    shortcutKeyCodes['Key' + String.fromCharCode(65 + letterIndex)] =
+      65 + letterIndex;
+  }
+  for (let digit = 0; digit <= 9; digit++) {
+    shortcutKeyCodes['Digit' + digit] = 48 + digit;
+  }
+  for (let functionKeyIndex = 1; functionKeyIndex <= 12; functionKeyIndex++) {
+    shortcutKeyCodes['F' + functionKeyIndex] = 111 + functionKeyIndex;
+  }
+
+  /**
+   * A shortcut parsed from the IDE format (for example "CmdOrCtrl+Shift+KeyW"):
+   * the key code of the key and the modifiers that must be pressed with it.
+   */
+  type ParsedShortcut = {
+    keyCode: integer;
+    ctrlOrCmd: boolean;
+    shift: boolean;
+    alt: boolean;
+  };
+
+  const parseShortcut = (shortcutString: string): ParsedShortcut | null => {
+    if (!shortcutString) return null;
+
+    const parsedShortcut: ParsedShortcut = {
+      keyCode: 0,
+      ctrlOrCmd: false,
+      shift: false,
+      alt: false,
+    };
+    for (const shortcutPart of shortcutString.split('+')) {
+      if (shortcutPart === 'CmdOrCtrl') parsedShortcut.ctrlOrCmd = true;
+      else if (shortcutPart === 'Shift') parsedShortcut.shift = true;
+      else if (shortcutPart === 'Alt') parsedShortcut.alt = true;
+      else if (shortcutKeyCodes[shortcutPart] !== undefined)
+        parsedShortcut.keyCode = shortcutKeyCodes[shortcutPart];
+      else return null;
+    }
+    return parsedShortcut.keyCode ? parsedShortcut : null;
+  };
+
+  /**
+   * The keyboard shortcuts of the in-game editor, sent by the IDE (which owns
+   * their default values, see `DefaultShortcuts.js`) and customizable there.
+   * The keys of the shortcuts are checked with the input manager of the game.
+   */
+  class InGameEditorShortcuts {
+    private _parsedShortcuts: { [commandName: string]: ParsedShortcut } = {};
+
+    /**
+     * Set the shortcuts sent by the IDE. A command that is not listed, or
+     * whose shortcut can't be parsed, has no shortcut.
+     */
+    update(shortcuts: { [commandName: string]: string }): void {
+      this._parsedShortcuts = {};
+      for (const commandName in shortcuts) {
+        const parsedShortcut = parseShortcut(shortcuts[commandName]);
+        if (parsedShortcut) this._parsedShortcuts[commandName] = parsedShortcut;
+      }
+    }
+
+    private _areModifiersMatching(
+      inputManager: gdjs.InputManager,
+      parsedShortcut: ParsedShortcut,
+      ignoreShift: boolean
+    ): boolean {
+      return (
+        isControlOrCmdPressed(inputManager) === parsedShortcut.ctrlOrCmd &&
+        isAltPressed(inputManager) === parsedShortcut.alt &&
+        (ignoreShift || isShiftPressed(inputManager) === parsedShortcut.shift)
+      );
+    }
+
+    /**
+     * Check if the shortcut of a command is pressed (held down).
+     * `ignoreShift` allows Shift to be used as an extra modifier (for example
+     * to move the camera faster) without preventing the shortcut to match.
+     */
+    isPressed(
+      inputManager: gdjs.InputManager,
+      commandName: string,
+      ignoreShift: boolean = false
+    ): boolean {
+      const parsedShortcut = this._parsedShortcuts[commandName];
+      if (!parsedShortcut) return false;
+
+      return (
+        inputManager.isKeyPressed(parsedShortcut.keyCode) &&
+        this._areModifiersMatching(inputManager, parsedShortcut, ignoreShift)
+      );
+    }
+
+    /**
+     * Check if the shortcut of a command was just pressed during this frame.
+     */
+    wasJustPressed(
+      inputManager: gdjs.InputManager,
+      commandName: string
+    ): boolean {
+      const parsedShortcut = this._parsedShortcuts[commandName];
+      if (!parsedShortcut) return false;
+
+      return (
+        inputManager.wasKeyJustPressed(parsedShortcut.keyCode) &&
+        this._areModifiersMatching(inputManager, parsedShortcut, false)
+      );
+    }
+
+    /**
+     * Check if a key, with the modifiers currently pressed, is the shortcut of
+     * a command: such a key must not be forwarded to the IDE.
+     */
+    isShortcutKey(inputManager: gdjs.InputManager, keyCode: integer): boolean {
+      for (const commandName in this._parsedShortcuts) {
+        const parsedShortcut = this._parsedShortcuts[commandName];
+        // Shift makes the camera move faster: it's not part of these shortcuts.
+        const ignoreShift = moveCameraCommandNames.indexOf(commandName) !== -1;
+        if (
+          parsedShortcut.keyCode === keyCode &&
+          this._areModifiersMatching(inputManager, parsedShortcut, ignoreShift)
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
 
   const exceptionallyGetKeyCodeFromLocationAwareKeyCode = (
     locationAwareKeyCode: number
@@ -353,6 +535,12 @@ namespace gdjs {
       toolbarSeparatorColor: string;
       textColorPrimary: string;
     };
+    /**
+     * The shortcuts handled by the in-game editor, by command name, in the
+     * format of the IDE shortcuts (for example "Shift+KeyW"). A command that
+     * is not listed keeps its default shortcut, an empty string removes it.
+     */
+    shortcuts?: { [commandName: string]: string };
   };
 
   const defaultInGameEditorSettings: InGameEditorSettings = {
@@ -363,6 +551,7 @@ namespace gdjs {
       toolbarSeparatorColor: 'black',
       textColorPrimary: 'black',
     },
+    shortcuts: {},
   };
 
   let hasWindowFocus = true;
@@ -391,6 +580,13 @@ namespace gdjs {
 
   const is3D = (object: gdjs.RuntimeObject): object is RuntimeObjectWith3D => {
     return gdjs.Base3DHandler.is3D(object);
+  };
+
+  type ScreenArea = {
+    minX: float;
+    minY: float;
+    maxX: float;
+    maxY: float;
   };
 
   type AABB3D = {
@@ -528,26 +724,50 @@ namespace gdjs {
     return true;
   };
 
-  const freeCameraKeys = [
-    LEFT_KEY,
-    RIGHT_KEY,
-    UP_KEY,
-    DOWN_KEY,
-    W_KEY,
-    S_KEY,
-    A_KEY,
-    D_KEY,
-    Q_KEY,
-    E_KEY,
+  const arrowKeys = [LEFT_KEY, RIGHT_KEY, UP_KEY, DOWN_KEY];
+  const moveCameraCommandNames = [
+    'IN_GAME_EDITOR_MOVE_CAMERA_FORWARD',
+    'IN_GAME_EDITOR_MOVE_CAMERA_BACKWARD',
+    'IN_GAME_EDITOR_MOVE_CAMERA_LEFT',
+    'IN_GAME_EDITOR_MOVE_CAMERA_RIGHT',
+    'IN_GAME_EDITOR_MOVE_CAMERA_UP',
+    'IN_GAME_EDITOR_MOVE_CAMERA_DOWN',
   ];
-  const shouldSwitchToFreeCamera = (inputManager: gdjs.InputManager) =>
-    !isControlOrCmdPressed(inputManager) &&
-    !isAltPressed(inputManager) &&
-    !isShiftPressed(inputManager) &&
-    freeCameraKeys.some((key) => inputManager.isKeyPressed(key));
+  const shouldSwitchToFreeCamera = (
+    inputManager: gdjs.InputManager,
+    shortcuts: InGameEditorShortcuts
+  ) =>
+    (!isControlOrCmdPressed(inputManager) &&
+      !isAltPressed(inputManager) &&
+      !isShiftPressed(inputManager) &&
+      arrowKeys.some((key) => inputManager.isKeyPressed(key))) ||
+    moveCameraCommandNames.some((commandName) =>
+      shortcuts.isPressed(inputManager, commandName, true)
+    );
 
   const snap = (value: float, size: float, offset: float) =>
     size ? offset + size * Math.round((value - offset) / size) : value;
+
+  /**
+   * Return the scale ratio giving a size whose far edge (origin + size) is
+   * on the grid after moving it by `sizeDelta`.
+   * The size is kept at least one grid cell.
+   *
+   * The delta is additive (like the 2D editor resize handles) so that
+   * small objects can be enlarged without dragging far away from the gizmo.
+   */
+  const getScaleSnappedOnGrid = (
+    origin: float,
+    initialSize: float,
+    sizeDelta: float,
+    cellSize: float,
+    snapPosition: (position: float) => float
+  ): float => {
+    if (initialSize <= 0) return 1;
+    const snappedEdge = snapPosition(origin + initialSize + sizeDelta);
+    const snappedSize = Math.max(cellSize || 1, snappedEdge - origin);
+    return snappedSize / initialSize;
+  };
 
   class Selection {
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
@@ -561,6 +781,13 @@ namespace gdjs {
     addAll(objects: RuntimeObject[]) {
       for (const object of objects) {
         this.add(object);
+      }
+    }
+
+    remove(object: gdjs.RuntimeObject) {
+      const index = this._selectedObjects.indexOf(object);
+      if (index >= 0) {
+        this._selectedObjects.splice(index, 1);
       }
     }
 
@@ -791,6 +1018,35 @@ namespace gdjs {
     return { forward };
   };
 
+  /**
+   * An item of a toolbar shown by an extension (see `InGameEditor.showToolbar`).
+   * @category In-Game Editor
+   */
+  export type InGameEditorToolbarItem =
+    | {
+        type: 'button';
+        id: string;
+        tooltip: string;
+        /** An icon (for example the data URL of an SVG), drawn with the color of texts. */
+        iconUrl?: string;
+        /** A color shown instead of an icon, for example to choose a color. */
+        color?: string;
+        isActive?: boolean;
+        onClick: () => void;
+      }
+    | {
+        type: 'slider';
+        id: string;
+        tooltip: string;
+        /** An icon shown before the slider, as a visual label. */
+        iconUrl?: string;
+        min: float;
+        max: float;
+        value: float;
+        onChange: (value: float) => void;
+      }
+    | { type: 'divider'; id: string };
+
   /** @category In-Game Editor */
   export class InGameEditor {
     private _editorId: string = '';
@@ -802,6 +1058,16 @@ namespace gdjs {
     private _editedLayerDataList: LayerData[] = [];
     private _selectedLayerName: string = '';
     private _innerArea: AABB3D | null = null;
+    /**
+     * The part of the game frame that is not covered by the editor panels,
+     * in ratios of the game frame size.
+     */
+    private _visibleScreenArea: ScreenArea = {
+      minX: 0,
+      minY: 0,
+      maxX: 1,
+      maxY: 1,
+    };
     private _threeInnerArea: THREE.Object3D | null = null;
     private _unregisterContextLostListener: (() => void) | null = null;
     private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
@@ -903,6 +1169,13 @@ namespace gdjs {
     private _instancesEditorSettings: InstancesEditorSettings | null = null;
     private _toolbar: Toolbar;
     private _inGameEditorSettings: InGameEditorSettings;
+    private _shortcuts: InGameEditorShortcuts = new InGameEditorShortcuts();
+    private _isLeftMouseButtonCaptured = false;
+    private _requestedExtensionToolbars = new Map<
+      string,
+      Array<InGameEditorToolbarItem>
+    >();
+    private _extensionToolbars = new Map<string, ExtensionToolbar>();
 
     constructor(
       game: RuntimeGame,
@@ -972,9 +1245,19 @@ namespace gdjs {
         this._unregisterContextLostListener();
         this._unregisterContextLostListener = null;
       }
+      this._renderExtensionToolbars(null);
+    }
+
+    /**
+     * The keyboard shortcuts of the in-game editor, as customized in the IDE.
+     */
+    getShortcuts(): InGameEditorShortcuts {
+      return this._shortcuts;
     }
 
     private _applyInGameEditorSettings() {
+      this._shortcuts.update(this._inGameEditorSettings.shortcuts || {});
+
       if (typeof document === 'undefined') return;
 
       const rootElement = document.documentElement;
@@ -1131,6 +1414,8 @@ namespace gdjs {
       // The 3D scene is rebuilt and the inner area marker is lost in the process.
       this._threeInnerArea = null;
       this._innerArea = null;
+      const previousEditorId = this._editorId;
+      const previousSelectedLayerName = this._selectedLayerName;
       this._selectedLayerName = '';
       // Clear any reference to `RuntimeObject` from the unloaded scene.
       this._selectionBoxes.clear();
@@ -1264,6 +1549,13 @@ namespace gdjs {
 
       // Try to keep object selection in case the same scene is reloaded.
       this.setSelectedObjects(selectedObjectIds);
+      if (
+        this._editorId === previousEditorId &&
+        this._editedInstanceContainer &&
+        this._editedInstanceContainer.hasLayer(previousSelectedLayerName)
+      ) {
+        this._selectedLayerName = previousSelectedLayerName;
+      }
       this._isFirstFrame = true;
     }
 
@@ -1481,6 +1773,7 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      this.setVisibleScreenArea(visibleScreenArea);
       if (this._innerArea) {
         this.zoomToFitArea(
           {
@@ -1516,6 +1809,7 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      this.setVisibleScreenArea(visibleScreenArea);
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
@@ -1532,6 +1826,7 @@ namespace gdjs {
       maxX: number;
       maxY: number;
     }) {
+      this.setVisibleScreenArea(visibleScreenArea);
       this.zoomToFitObjects(
         this._selection.getSelectedObjects(),
         visibleScreenArea,
@@ -1596,6 +1891,80 @@ namespace gdjs {
       return this._selection.getAABB();
     }
 
+    getSelectedObjects(): ReadonlyArray<gdjs.RuntimeObject> {
+      return this._selection.getSelectedObjects();
+    }
+
+    /**
+     * Let a tool from an extension (for example, a terrain brush) use the left
+     * mouse button during the next frame: clicks and drags won't select,
+     * box-select or move instances. Camera controls and shortcuts still work.
+     *
+     * Call it at every frame while the tool is used (for example from a
+     * callback registered with `gdjs.registerInGameEditorPostStepCallback`).
+     */
+    captureLeftMouseButton(): void {
+      this._isLeftMouseButtonCaptured = true;
+    }
+
+    /**
+     * Show a toolbar for a tool of an extension, below the editor toolbar and
+     * looking like it, during the next frame: call it at every frame while
+     * it must be shown.
+     *
+     * Items can be created again at every frame from the state of the tool:
+     * elements are only created again when the types or ids of the items
+     * change, and events call the functions of the latest items.
+     */
+    showToolbar(
+      toolbarId: string,
+      items: Array<InGameEditorToolbarItem>
+    ): void {
+      this._requestedExtensionToolbars.set(toolbarId, items);
+    }
+
+    private _renderExtensionToolbars(parent: HTMLElement | null): void {
+      for (const [toolbarId, toolbar] of this._extensionToolbars) {
+        if (!parent || !this._requestedExtensionToolbars.has(toolbarId)) {
+          toolbar.remove();
+          this._extensionToolbars.delete(toolbarId);
+        }
+      }
+      if (parent) {
+        let toolbarIndex = 0;
+        for (const [toolbarId, items] of this._requestedExtensionToolbars) {
+          let toolbar = this._extensionToolbars.get(toolbarId);
+          if (!toolbar) {
+            toolbar = new ExtensionToolbar(() => {
+              this._timeSinceLastInteraction = 0;
+            });
+            this._extensionToolbars.set(toolbarId, toolbar);
+          }
+          toolbar.render(parent, items, toolbarIndex++);
+        }
+      }
+      this._requestedExtensionToolbars.clear();
+    }
+
+    /**
+     * Save new values for properties of an object, for example data authored
+     * with a tool from an extension. The object is then hot-reloaded, like
+     * after any change in the properties panel (so objects must ignore values
+     * they already have).
+     * @param objectName The name of an object of the edited scene (or a
+     * global object).
+     * @param properties The new values, by property name, written like in
+     * object properties (for example, "1" or "0" for booleans).
+     */
+    updateObjectProperties(
+      objectName: string,
+      properties: { [propertyName: string]: string }
+    ): void {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+      debuggerClient.sendObjectPropertiesChanges(objectName, properties);
+    }
+
     setSelectedObjects(persistentUuids: Array<string>) {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
@@ -1634,13 +2003,20 @@ namespace gdjs {
       this._getEditorCamera().switchToOrbitAroundObject(object);
     }
 
+    setVisibleScreenArea(visibleScreenArea: ScreenArea) {
+      this._visibleScreenArea = visibleScreenArea;
+    }
+
     private _focusOnSelection() {
-      // TODO Use the center of the AABB of the whole selection instead
-      const selectedObject = this._selection.getLastSelectedObject();
-      if (!selectedObject) {
+      const selectedObjects = this._selection.getSelectedObjects();
+      if (selectedObjects.length === 0) {
         return;
       }
-      this._getEditorCamera().switchToOrbitAroundObject(selectedObject);
+      this._getEditorCamera().frameObjectsInScreenArea(
+        selectedObjects,
+        this._visibleScreenArea,
+        0.1
+      );
     }
 
     private _handleCameraMovement() {
@@ -1649,13 +2025,19 @@ namespace gdjs {
       if (!currentScene) return;
 
       const selectedObject = this._selection.getLastSelectedObject();
-      if (inputManager.isKeyPressed(F_KEY) && selectedObject) {
+      if (
+        selectedObject &&
+        this._shortcuts.isPressed(
+          inputManager,
+          'IN_GAME_EDITOR_FOCUS_ON_SELECTION'
+        )
+      ) {
         this._focusOnSelection();
       }
 
       if (
         !this._getEditorCamera().isFreeCamera() &&
-        shouldSwitchToFreeCamera(inputManager)
+        shouldSwitchToFreeCamera(inputManager, this._shortcuts)
       ) {
         this._getEditorCamera().switchToFreeCamera();
       }
@@ -1710,6 +2092,7 @@ namespace gdjs {
     private _shouldDragSelectedObject(): boolean {
       const inputManager = this._runtimeGame.getInputManager();
       return (
+        !this._isLeftMouseButtonCaptured &&
         isControlOrCmdPressed(inputManager) &&
         (!this._selectionControls ||
           !this._selectionControls.threeTransformControls.dragging)
@@ -1919,6 +2302,7 @@ namespace gdjs {
 
       if (
         inputManager.isMouseButtonPressed(0) &&
+        !this._isLeftMouseButtonCaptured &&
         !this._shouldDragSelectedObject() &&
         !isSpacePressed(inputManager) &&
         !hasMultipleTouches
@@ -1985,12 +2369,15 @@ namespace gdjs {
           if (!isShiftPressed(inputManager)) {
             this._selection.clear();
           }
-          const layer = this.getEditorLayer(this._selectedLayerName);
-          if (layer && layer.isVisible() && !layer._initialLayerData.isLocked) {
-            for (const object of objects) {
-              if (!this.isInstanceSealed(object)) {
-                this._selection.add(object);
-              }
+          for (const object of objects) {
+            const layer = this.getEditorLayer(object.getLayer());
+            if (
+              layer &&
+              layer.isVisible() &&
+              !layer._initialLayerData.isLocked &&
+              !this.isInstanceSealed(object)
+            ) {
+              this._selection.add(object);
             }
           }
           this._sendSelectionUpdate();
@@ -2018,14 +2405,16 @@ namespace gdjs {
       const inputManager = this._runtimeGame.getInputManager();
 
       if (shouldDeleteSelection(inputManager)) {
-        const removedObjects = this._selection.getSelectedObjects();
-        removedObjects.forEach((object) => {
-          object.deleteFromScene();
-        });
-        this._selection.clear();
-        this._sendSelectionUpdate({
-          removedObjects,
-        });
+        const removedObjects = this._getDeletableSelectedObjects();
+        if (removedObjects.length > 0) {
+          removedObjects.forEach((object) => {
+            object.deleteFromScene();
+            this._selection.remove(object);
+          });
+          this._sendSelectionUpdate({
+            removedObjects,
+          });
+        }
       }
 
       if (inputManager.wasKeyJustPressed(ESC_KEY)) {
@@ -2035,6 +2424,7 @@ namespace gdjs {
 
       // Left click: select the object under the cursor.
       if (
+        !this._isLeftMouseButtonCaptured &&
         !this._isTransformControlsHovered &&
         inputManager.isMouseButtonReleased(0) &&
         this._hasCursorStayedStillWhilePressed({ toleranceRadius: 10 })
@@ -2047,6 +2437,7 @@ namespace gdjs {
           const layer = this.getEditorLayer(objectUnderCursor.getLayer());
           if (
             layer &&
+            layer.isVisible() &&
             !layer._initialLayerData.isLocked &&
             !this.isInstanceSealed(objectUnderCursor)
           ) {
@@ -2303,7 +2694,9 @@ namespace gdjs {
       // Space or multiple touches will hide the selection controls as they are
       // used to move the camera.
       const shouldHideSelectionControls =
-        isSpacePressed(inputManager) || hasMultipleTouches;
+        isSpacePressed(inputManager) ||
+        hasMultipleTouches ||
+        this._isLeftMouseButtonCaptured;
 
       // Remove the selection controls if the last selected object has changed
       // or if nothing movable is selected.
@@ -2352,6 +2745,10 @@ namespace gdjs {
             patchNegativeAxisHandlesOnTransformControlsGizmos(
               threeTransformControls
             );
+            patchAxisGuideLinesOnTransformControlsGizmos(
+              threeTransformControls
+            );
+
             threeTransformControls.getHelper().rotation.order = 'ZYX';
             const worldScale = this._currentScene
               ? this._currentScene.getRenderer3DWorldScale()
@@ -2383,9 +2780,17 @@ namespace gdjs {
             let initialObjectX = 0;
             let initialObjectY = 0;
             let initialObjectZ = 0;
+            let initialObjectWidth = 0;
+            let initialObjectHeight = 0;
+            let initialObjectDepth = 0;
             const initialDummyPosition = new THREE.Vector3();
             const initialDummyRotation = new THREE.Euler();
             const initialDummyScale = new THREE.Vector3();
+            const scaleDragWorldPosition = new THREE.Vector3();
+            const scaleDragWorldQuaternion = new THREE.Quaternion();
+            const scaleDragWorldScale = new THREE.Vector3();
+            const scaleDragLocalStart = new THREE.Vector3();
+            const scaleDragLocalEnd = new THREE.Vector3();
             threeTransformControls.addEventListener('change', (e) => {
               if (!threeTransformControls.dragging) {
                 this._selectionControlsMovementTotalDelta = null;
@@ -2401,6 +2806,11 @@ namespace gdjs {
                 initialObjectY = lastEditableSelectedObject.getY();
                 initialObjectZ = is3D(lastEditableSelectedObject)
                   ? lastEditableSelectedObject.getZ()
+                  : 0;
+                initialObjectWidth = lastEditableSelectedObject.getWidth();
+                initialObjectHeight = lastEditableSelectedObject.getHeight();
+                initialObjectDepth = is3D(lastEditableSelectedObject)
+                  ? lastEditableSelectedObject.getDepth()
                   : 0;
                 initialDummyPosition.copy(dummyThreeObject.position);
                 initialDummyRotation.copy(dummyThreeObject.rotation);
@@ -2481,6 +2891,120 @@ namespace gdjs {
                 threeTransformControls.axis.length === 1
                   ? 1
                   : 0.2;
+              let scaleX =
+                1 +
+                (dummyThreeObject.scale.x / initialDummyScale.x - 1) *
+                  scaleDamping;
+              let scaleY =
+                1 +
+                (dummyThreeObject.scale.y / initialDummyScale.y - 1) *
+                  scaleDamping;
+              let scaleZ =
+                1 +
+                (dummyThreeObject.scale.z / initialDummyScale.z - 1) *
+                  scaleDamping;
+              if (
+                this._transformControlsMode === 'scale' &&
+                threeTransformControls.axis &&
+                this._editorGrid.isSpanningEnabled(inputManager)
+              ) {
+                // Three.js computes the scale as a ratio of the pointer distances
+                // to the gizmo, which barely changes the size of small objects.
+                // Use the pointer movement in the object local axes instead.
+                // The pointer positions are in the Three.js world, so they are
+                // converted back to scene units with the world scale.
+                const { pointStart, pointEnd } = threeTransformControls as any;
+                dummyThreeObject.matrixWorld.decompose(
+                  scaleDragWorldPosition,
+                  scaleDragWorldQuaternion,
+                  scaleDragWorldScale
+                );
+                scaleDragWorldQuaternion.invert();
+                scaleDragLocalStart
+                  .copy(pointStart)
+                  .applyQuaternion(scaleDragWorldQuaternion)
+                  .multiplyScalar(worldScale);
+                scaleDragLocalEnd
+                  .copy(pointEnd)
+                  .applyQuaternion(scaleDragWorldQuaternion)
+                  .multiplyScalar(worldScale);
+                // Moving away from the gizmo center enlarges the object,
+                // whichever side of the axis the handle is on.
+                const getSizeDelta = (start: float, end: float) =>
+                  (end - start) * (start < 0 ? -1 : 1);
+                const uniformSizeDelta =
+                  ((pointEnd as THREE.Vector3).length() -
+                    (pointStart as THREE.Vector3).length()) *
+                  worldScale;
+                const isUniform = threeTransformControls.axis === 'XYZ';
+                const editorGrid = this._editorGrid;
+
+                // The scale gizmo is anchored on the object origin, so snap the
+                // opposite edge on the grid (like the 2D editor resize handles).
+                const getSnappedScaleX = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectX,
+                    initialObjectWidth,
+                    isUniform
+                      ? uniformSizeDelta
+                      : getSizeDelta(
+                          scaleDragLocalStart.x,
+                          scaleDragLocalEnd.x
+                        ),
+                    editorGrid.gridWidth,
+                    (x) => editorGrid.getSnappedX(x)
+                  );
+                const getSnappedScaleY = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectY,
+                    initialObjectHeight,
+                    isUniform
+                      ? uniformSizeDelta
+                      : getSizeDelta(
+                          scaleDragLocalStart.y,
+                          scaleDragLocalEnd.y
+                        ),
+                    editorGrid.gridHeight,
+                    (y) => editorGrid.getSnappedY(y)
+                  );
+                const getSnappedScaleZ = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectZ,
+                    initialObjectDepth,
+                    isUniform
+                      ? uniformSizeDelta
+                      : getSizeDelta(
+                          scaleDragLocalStart.z,
+                          scaleDragLocalEnd.z
+                        ),
+                    editorGrid.gridDepth,
+                    (z) => editorGrid.getSnappedZ(z)
+                  );
+                if (isUniform) {
+                  // Uniform scaling: like the 2D proportional resize, snap the
+                  // biggest side and apply the same ratio to the others.
+                  const uniformScale =
+                    initialObjectWidth >= initialObjectHeight &&
+                    initialObjectWidth >= initialObjectDepth
+                      ? getSnappedScaleX()
+                      : initialObjectHeight >= initialObjectDepth
+                        ? getSnappedScaleY()
+                        : getSnappedScaleZ();
+                  scaleX = uniformScale;
+                  scaleY = uniformScale;
+                  scaleZ = uniformScale;
+                } else {
+                  if (threeTransformControls.axis.includes('X')) {
+                    scaleX = getSnappedScaleX();
+                  }
+                  if (threeTransformControls.axis.includes('Y')) {
+                    scaleY = getSnappedScaleY();
+                  }
+                  if (threeTransformControls.axis.includes('Z')) {
+                    scaleZ = getSnappedScaleZ();
+                  }
+                }
+              }
               this._selectionControlsMovementTotalDelta = {
                 translationX,
                 translationY,
@@ -2494,18 +3018,9 @@ namespace gdjs {
                 rotationZ: -gdjs.toDegrees(
                   dummyThreeObject.rotation.z - initialDummyRotation.z
                 ),
-                scaleX:
-                  1 +
-                  (dummyThreeObject.scale.x / initialDummyScale.x - 1) *
-                    scaleDamping,
-                scaleY:
-                  1 +
-                  (dummyThreeObject.scale.y / initialDummyScale.y - 1) *
-                    scaleDamping,
-                scaleZ:
-                  1 +
-                  (dummyThreeObject.scale.z / initialDummyScale.z - 1) *
-                    scaleDamping,
+                scaleX,
+                scaleY,
+                scaleZ,
               };
 
               this._hasSelectionActuallyMoved =
@@ -2589,7 +3104,8 @@ namespace gdjs {
           this._editorGrid.setTreeScene(threeScene);
         }
         this._editorGrid.setVisible(
-          this._transformControlsMode === 'translate'
+          this._transformControlsMode === 'translate' ||
+            this._transformControlsMode === 'scale'
         );
       }
     }
@@ -2647,6 +3163,7 @@ namespace gdjs {
       } else {
         this._runtimeGame.getSoundManager().unmuteEverything('in-game-editor');
         this._removeSelectionControls();
+        this._renderExtensionToolbars(null);
 
         // Cleanup selection boxes
         this._selectionBoxes.forEach((box) => {
@@ -3030,6 +3547,9 @@ namespace gdjs {
         const keyCode =
           exceptionallyGetKeyCodeFromLocationAwareKeyCode(locationAwareKeyCode);
 
+        // A shortcut of the in-game editor is handled here, not by the IDE.
+        if (this._shortcuts.isShortcutKey(inputManager, keyCode)) continue;
+
         const debuggerClient = this._runtimeGame._debuggerClient;
         if (debuggerClient) {
           debuggerClient.sendKeyboardShortcut({
@@ -3310,15 +3830,22 @@ namespace gdjs {
       this._addInstances(instances);
     }
 
+    private _getDeletableSelectedObjects(): Array<gdjs.RuntimeObject> {
+      return this._selection
+        .getSelectedObjects()
+        .filter((object) => !this.isInstanceLocked(object));
+    }
+
     deleteSelection() {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
-      this._removeInstances(this._selection.getSelectedObjects());
-      for (const object of this._selection.getSelectedObjects()) {
+      const removedObjects = this._getDeletableSelectedObjects();
+      this._removeInstances(removedObjects);
+      for (const object of removedObjects) {
         object.deleteFromScene();
+        this._selection.remove(object);
       }
-      this._selection.clear();
     }
 
     private _getClosestIntersectionUnderCursor(
@@ -3362,9 +3889,10 @@ namespace gdjs {
 
       currentScene.getAllLayerNames(layerNames);
       layerNames.forEach((layerName) => {
-        const runtimeLayerRender = currentScene
-          .getLayer(layerName)
-          .getRenderer();
+        const runtimeLayer = currentScene.getLayer(layerName);
+        // Three.js raycasting ignores the visibility of objects.
+        if (!runtimeLayer.isVisible()) return;
+        const runtimeLayerRender = runtimeLayer.getRenderer();
         const threeCamera = runtimeLayerRender.getThreeCamera();
         const threeGroup = runtimeLayerRender.getThreeGroup();
         if (!threeCamera || !threeGroup) return;
@@ -3475,6 +4003,7 @@ namespace gdjs {
             continue;
           }
           const layer = editedInstanceContainer.getLayer(object.getLayer());
+          if (!layer.isVisible()) continue;
           const layerIndex =
             editedInstanceContainer._orderedLayers.indexOf(layer);
           if (
@@ -3543,11 +4072,26 @@ namespace gdjs {
 
     private _handleTransformControlsMode() {
       const inputManager = this._runtimeGame.getInputManager();
-      if (inputManager.wasKeyJustPressed(KEY_DIGIT_1)) {
+      if (
+        this._shortcuts.wasJustPressed(
+          inputManager,
+          'IN_GAME_EDITOR_TRANSLATE_MODE'
+        )
+      ) {
         this._setTransformControlsMode('translate');
-      } else if (inputManager.wasKeyJustPressed(KEY_DIGIT_2)) {
+      } else if (
+        this._shortcuts.wasJustPressed(
+          inputManager,
+          'IN_GAME_EDITOR_ROTATE_MODE'
+        )
+      ) {
         this._setTransformControlsMode('rotate');
-      } else if (inputManager.wasKeyJustPressed(KEY_DIGIT_3)) {
+      } else if (
+        this._shortcuts.wasJustPressed(
+          inputManager,
+          'IN_GAME_EDITOR_SCALE_MODE'
+        )
+      ) {
         this._setTransformControlsMode('scale');
       }
     }
@@ -3702,6 +4246,8 @@ namespace gdjs {
       this._wasMouseMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
       this._previousCursorX = inputManager.getMouseX();
       this._previousCursorY = inputManager.getMouseY();
+      // Tools capture the button again at each frame if they still need it.
+      this._isLeftMouseButtonCaptured = false;
 
       if (this._currentScene) {
         this._currentScene._updateObjectsForInGameEditor();
@@ -3710,6 +4256,7 @@ namespace gdjs {
         }
         this._currentScene.render();
       }
+      this._renderExtensionToolbars(domElementContainer);
 
       this._isFirstFrame = false;
     }
@@ -3814,6 +4361,24 @@ namespace gdjs {
           width: 1px;
           height: 24px;
           background-color: var(--in-game-editor-theme-toolbar-separator-color);
+        }
+        .InGameEditor-Toolbar-Button-Color {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+        }
+        .InGameEditor-Toolbar-Slider-Container {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .InGameEditor-Toolbar-Slider-Container .InGameEditor-Toolbar-Button-Icon {
+          width: 16px;
+          height: 16px;
+        }
+        .InGameEditor-Toolbar-Slider {
+          width: 80px;
+          accent-color: var(--in-game-editor-theme-icon-button-selected-background-color);
         }
       `;
     }
@@ -3985,6 +4550,155 @@ namespace gdjs {
     }
   }
 
+  /**
+   * Show an icon (drawn with the color of texts), a color, or nothing.
+   */
+  const updateToolbarIcon = (
+    element: HTMLElement,
+    iconUrl: string | undefined,
+    color?: string
+  ) => {
+    const mask =
+      iconUrl && !color ? `url('${iconUrl}') center/contain no-repeat` : '';
+    element.className = color
+      ? 'InGameEditor-Toolbar-Button-Color'
+      : 'InGameEditor-Toolbar-Button-Icon';
+    element.style.display = iconUrl || color ? '' : 'none';
+    element.style.backgroundColor = color || '';
+    element.style.setProperty('-webkit-mask', mask);
+    element.style.setProperty('mask', mask);
+  };
+
+  /**
+   * A toolbar of an extension, below the editor toolbar.
+   */
+  class ExtensionToolbar {
+    private _container: HTMLElement | null = null;
+    private _itemElements: Array<HTMLElement> = [];
+    private _items: Array<InGameEditorToolbarItem> = [];
+    private _itemsLayout = '';
+    private _onInteraction: () => void;
+
+    constructor(onInteraction: () => void) {
+      this._onInteraction = onInteraction;
+    }
+
+    render(
+      parent: HTMLElement,
+      items: Array<InGameEditorToolbarItem>,
+      toolbarIndex: integer
+    ) {
+      this._items = items;
+      const itemsLayout = items.map((item) => item.type + item.id).join(',');
+      let container = this._container;
+      if (
+        !container ||
+        container.parentElement !== parent ||
+        itemsLayout !== this._itemsLayout
+      ) {
+        this.remove();
+        this._itemsLayout = itemsLayout;
+        container = this._createContainer(items);
+        parent.appendChild(container);
+        this._container = container;
+      }
+      container.style.top = 36 * (toolbarIndex + 1) + 'px';
+
+      items.forEach((item, index) => {
+        const element = this._itemElements[index];
+        if (item.type === 'button') {
+          element.title = item.tooltip;
+          element.classList.toggle(
+            'InGameEditor-Toolbar-Button-Active',
+            !!item.isActive
+          );
+          updateToolbarIcon(
+            element.firstElementChild as HTMLElement,
+            item.iconUrl,
+            item.color
+          );
+        } else if (item.type === 'slider') {
+          element.title = item.tooltip;
+          updateToolbarIcon(
+            element.firstElementChild as HTMLElement,
+            item.iconUrl
+          );
+          const slider = element.lastElementChild as HTMLInputElement;
+          slider.min = '' + item.min;
+          slider.max = '' + item.max;
+          if (document.activeElement !== slider) {
+            slider.value = '' + item.value;
+          }
+        }
+      });
+    }
+
+    private _createContainer(
+      items: Array<InGameEditorToolbarItem>
+    ): HTMLElement {
+      this._itemElements = items.map((item, index) =>
+        this._createItemElement(item, index)
+      );
+      return (
+        <div class="InGameEditor-Toolbar-Centering-Container">
+          <div class="InGameEditor-Toolbar-Container">
+            <div class="InGameEditor-Toolbar-Container-Background" />
+            {this._itemElements}
+          </div>
+        </div>
+      );
+    }
+
+    private _createItemElement(
+      item: InGameEditorToolbarItem,
+      index: integer
+    ): HTMLElement {
+      if (item.type === 'divider') {
+        return <div class="InGameEditor-Toolbar-Divider" />;
+      }
+      if (item.type === 'slider') {
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.className = 'InGameEditor-Toolbar-Slider';
+        slider.step = 'any';
+        slider.addEventListener('input', () => {
+          this._onInteraction();
+          const currentItem = this._items[index];
+          if (currentItem.type === 'slider') {
+            currentItem.onChange(Number(slider.value));
+          }
+        });
+        // A focused element would receive the keyboard shortcuts of the editor.
+        slider.addEventListener('pointerup', () => slider.blur());
+        return (
+          <div class="InGameEditor-Toolbar-Slider-Container">
+            <span />
+            {slider}
+          </div>
+        );
+      }
+      const button = (
+        <button
+          class="InGameEditor-Toolbar-Button"
+          onClick={() => {
+            this._onInteraction();
+            const currentItem = this._items[index];
+            if (currentItem.type === 'button') currentItem.onClick();
+          }}
+        >
+          <span />
+        </button>
+      );
+      button.addEventListener('mousedown', (event) => event.preventDefault());
+      return button;
+    }
+
+    remove() {
+      if (this._container) this._container.remove();
+      this._container = null;
+    }
+  }
+
   class EditorGrid {
     editor: gdjs.InGameEditor;
     gridHelper: THREE.GridHelper;
@@ -4118,8 +4832,8 @@ namespace gdjs {
     }
 
     getSnappedZ(z: float): float {
-      const { gridDepth, gridOffsetY } = this;
-      return snap(z, gridDepth || 0, gridOffsetY);
+      const { gridDepth, gridOffsetZ } = this;
+      return snap(z, gridDepth || 0, gridOffsetZ);
     }
 
     isSpanningEnabled(
@@ -4247,6 +4961,168 @@ namespace gdjs {
       this.onHasCameraChanged();
     }
 
+    /**
+     * Move the camera, keeping its orientation, so that the AABB of the objects
+     * fits in the given area of the screen (e.g. the space between the editor panels).
+     *
+     * @param objects The objects to frame.
+     * @param screenArea The area where to frame the objects, in ratios of the screen size.
+     * @param margin The ratio of the screen area size kept empty on each side.
+     */
+    frameObjectsInScreenArea(
+      objects: Array<RuntimeObject>,
+      screenArea: ScreenArea,
+      margin: float
+    ): void {
+      if (objects.length === 0) return;
+      let minX = Number.MAX_VALUE;
+      let minY = Number.MAX_VALUE;
+      let minZ = Number.MAX_VALUE;
+      let maxX = -Number.MAX_VALUE;
+      let maxY = -Number.MAX_VALUE;
+      let maxZ = -Number.MAX_VALUE;
+      for (const object of objects) {
+        const aabb = object.getAABB();
+        minX = Math.min(minX, aabb.min[0]);
+        minY = Math.min(minY, aabb.min[1]);
+        minZ = Math.min(minZ, is3D(object) ? object.getUnrotatedAABBMinZ() : 0);
+        maxX = Math.max(maxX, aabb.max[0]);
+        maxY = Math.max(maxY, aabb.max[1]);
+        maxZ = Math.max(maxZ, is3D(object) ? object.getUnrotatedAABBMaxZ() : 0);
+      }
+      const centerX = (minX + maxX) / 2;
+      const centerY = (minY + maxY) / 2;
+      const centerZ = (minZ + maxZ) / 2;
+
+      // Keep the orientation of the camera that is currently used.
+      const activeCamera = this.getActiveCamera();
+      const yaw = gdjs.toRad(activeCamera.rotationAngle + 90);
+      const elevation = gdjs.toRad(activeCamera.elevationAngle);
+      const forward: Point3D = [
+        -Math.cos(yaw) * Math.cos(elevation),
+        -Math.sin(yaw) * Math.cos(elevation),
+        -Math.sin(elevation),
+      ];
+      const right: Point3D = [Math.sin(yaw), -Math.cos(yaw), 0];
+      // up = forward x right
+      const up: Point3D = [
+        forward[1] * right[2] - forward[2] * right[1],
+        forward[2] * right[0] - forward[0] * right[2],
+        forward[0] * right[1] - forward[1] * right[0],
+      ];
+
+      // Express the AABB corners in the camera basis, relatively to the AABB center.
+      const cornersRight: Array<float> = [];
+      const cornersUp: Array<float> = [];
+      const cornersDepth: Array<float> = [];
+      for (const cornerX of [minX, maxX]) {
+        for (const cornerY of [minY, maxY]) {
+          for (const cornerZ of [minZ, maxZ]) {
+            const deltaX = cornerX - centerX;
+            const deltaY = cornerY - centerY;
+            const deltaZ = cornerZ - centerZ;
+            cornersRight.push(
+              deltaX * right[0] + deltaY * right[1] + deltaZ * right[2]
+            );
+            cornersUp.push(deltaX * up[0] + deltaY * up[1] + deltaZ * up[2]);
+            cornersDepth.push(
+              deltaX * forward[0] + deltaY * forward[1] + deltaZ * forward[2]
+            );
+          }
+        }
+      }
+
+      // The screen area in normalized device coordinates (y going up), with the margin.
+      const areaWidth = screenArea.maxX - screenArea.minX;
+      const areaHeight = screenArea.maxY - screenArea.minY;
+      if (areaWidth <= 0 || areaHeight <= 0) return;
+      const ndcLeft = 2 * (screenArea.minX + margin * areaWidth) - 1;
+      const ndcRight = 2 * (screenArea.maxX - margin * areaWidth) - 1;
+      const ndcTop = 1 - 2 * (screenArea.minY + margin * areaHeight);
+      const ndcBottom = 1 - 2 * (screenArea.maxY - margin * areaHeight);
+
+      const runtimeGame = this.editor.getRuntimeGame();
+      const aspectRatio =
+        runtimeGame.getGameResolutionWidth() /
+        runtimeGame.getGameResolutionHeight();
+      const tanHalfVerticalFov = Math.tan(0.5 * gdjs.toRad(editorCameraFov));
+      const tanHalfHorizontalFov = tanHalfVerticalFov * aspectRatio;
+
+      // For a camera distance, the range of camera offsets (along one screen axis)
+      // that keeps every corner inside [ndcMin, ndcMax], or null if there is none.
+      const getOffsetRange = (
+        distance: float,
+        cornerOffsets: Array<float>,
+        tanHalfFov: float,
+        ndcMin: float,
+        ndcMax: float
+      ): [float, float] | null => {
+        let offsetMin = -Number.MAX_VALUE;
+        let offsetMax = Number.MAX_VALUE;
+        for (let index = 0; index < cornerOffsets.length; index++) {
+          const halfExtent = (distance + cornersDepth[index]) * tanHalfFov;
+          offsetMin = Math.max(
+            offsetMin,
+            cornerOffsets[index] - ndcMax * halfExtent
+          );
+          offsetMax = Math.min(
+            offsetMax,
+            cornerOffsets[index] - ndcMin * halfExtent
+          );
+        }
+        return offsetMin <= offsetMax ? [offsetMin, offsetMax] : null;
+      };
+      const getOffsetRanges = (distance: float) => {
+        const rightRange = getOffsetRange(
+          distance,
+          cornersRight,
+          tanHalfHorizontalFov,
+          ndcLeft,
+          ndcRight
+        );
+        const upRange = getOffsetRange(
+          distance,
+          cornersUp,
+          tanHalfVerticalFov,
+          ndcBottom,
+          ndcTop
+        );
+        return rightRange && upRange ? { rightRange, upRange } : null;
+      };
+
+      // Find the smallest distance for which the corners fit (the fitting is monotonic).
+      const minimumDistance = 10;
+      let nearDistance = Math.max(
+        minimumDistance,
+        -Math.min(...cornersDepth) + minimumDistance
+      );
+      let farDistance = nearDistance;
+      while (!getOffsetRanges(farDistance) && farDistance < 1e9) {
+        nearDistance = farDistance;
+        farDistance *= 2;
+      }
+      for (let iteration = 0; iteration < 40; iteration++) {
+        const middleDistance = (nearDistance + farDistance) / 2;
+        if (getOffsetRanges(middleDistance)) {
+          farDistance = middleDistance;
+        } else {
+          nearDistance = middleDistance;
+        }
+      }
+      const offsetRanges = getOffsetRanges(farDistance);
+      if (!offsetRanges) return;
+      const rightOffset =
+        (offsetRanges.rightRange[0] + offsetRanges.rightRange[1]) / 2;
+      const upOffset = (offsetRanges.upRange[0] + offsetRanges.upRange[1]) / 2;
+
+      this.switchToOrbitAroundPosition(
+        centerX + rightOffset * right[0] + upOffset * up[0],
+        centerY + rightOffset * right[1] + upOffset * up[1],
+        centerZ + rightOffset * right[2] + upOffset * up[2]
+      );
+      this.setOrbitDistance(farDistance);
+    }
+
     step(): void {
       const runtimeGame = this.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
@@ -4288,7 +5164,10 @@ namespace gdjs {
       }
       // With touches, 3 touches will orbit around the point "in front of the camera".
       if (
-        (touchCount === 3 || inputManager.isKeyPressed(O_KEY)) &&
+        (touchCount === 3 ||
+          this.editor
+            .getShortcuts()
+            .isPressed(inputManager, 'IN_GAME_EDITOR_ORBIT_CAMERA')) &&
         this.isFreeCamera()
       ) {
         const maxDistance = 4000; // Large enough to orbit quickly on most parts of a level.
@@ -4874,7 +5753,9 @@ namespace gdjs {
         }
 
         // Movement with the keyboard:
-        // Either arrow keys (move in the camera plane) or WASD ("FPS move" + Q/E for up/down).
+        // Either arrow keys (move in the camera plane) or the customizable
+        // shortcuts (by default WASD for a "FPS move" + Q/E for up/down).
+        // Shift makes the camera move faster.
         const moveSpeed = isShiftPressed(inputManager) ? 48 : 6;
 
         if (
@@ -4893,29 +5774,35 @@ namespace gdjs {
           if (inputManager.isKeyPressed(DOWN_KEY)) {
             moveCameraByVector(up, -moveSpeed);
           }
-          // Forward/back
-          if (inputManager.isKeyPressed(W_KEY)) {
-            moveCameraByVector(forward, moveSpeed);
-          }
-          if (inputManager.isKeyPressed(S_KEY)) {
-            moveCameraByVector(forward, -moveSpeed);
-          }
+        }
 
-          // Left/right (strafe)
-          if (inputManager.isKeyPressed(A_KEY)) {
-            moveCameraByVector(right, -moveSpeed);
-          }
-          if (inputManager.isKeyPressed(D_KEY)) {
-            moveCameraByVector(right, moveSpeed);
-          }
+        const shortcuts = this._editorCamera.editor.getShortcuts();
+        const isMoveCameraShortcutPressed = (commandName: string) =>
+          shortcuts.isPressed(inputManager, commandName, true);
+        // Forward/back
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_FORWARD')) {
+          moveCameraByVector(forward, moveSpeed);
+        }
+        if (
+          isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_BACKWARD')
+        ) {
+          moveCameraByVector(forward, -moveSpeed);
+        }
 
-          // Up/down
-          if (inputManager.isKeyPressed(Q_KEY)) {
-            moveCameraByVector(up, -moveSpeed);
-          }
-          if (inputManager.isKeyPressed(E_KEY)) {
-            moveCameraByVector(up, moveSpeed);
-          }
+        // Left/right (strafe)
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_LEFT')) {
+          moveCameraByVector(right, -moveSpeed);
+        }
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_RIGHT')) {
+          moveCameraByVector(right, moveSpeed);
+        }
+
+        // Up/down
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_DOWN')) {
+          moveCameraByVector(up, -moveSpeed);
+        }
+        if (isMoveCameraShortcutPressed('IN_GAME_EDITOR_MOVE_CAMERA_UP')) {
+          moveCameraByVector(up, moveSpeed);
         }
 
         // Movement with keyboard: zoom in/out.

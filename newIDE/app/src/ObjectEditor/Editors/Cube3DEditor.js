@@ -23,6 +23,11 @@ import AlertMessage from '../../UI/AlertMessage';
 import { hasLight } from './Model3DEditor';
 import { PropertyCheckbox } from './PropertyFields';
 import { mapVector } from '../../Utils/MapFor';
+import ColorField from '../../UI/ColorField';
+import {
+  rgbColorToRGBString,
+  rgbStringAndAlphaToRGBColor,
+} from '../../Utils/ColorTransformer';
 
 const facesProperties = [
   {
@@ -248,6 +253,42 @@ const Cube3DEditor = ({
             </AlertMessage>
           )}
       </ColumnStackLayout>
+      <Text size="block-title" noMargin>
+        <Trans>Textures</Trans>
+      </Text>
+      <ResponsiveLineStackLayout expand noColumnMargin noResponsiveLandscape>
+        <ColorField
+          floatingLabelText={properties.get('tint').getLabel()}
+          disableAlpha
+          fullWidth
+          color={properties.get('tint').getValue()}
+          onChange={color => {
+            const rgbColor = rgbStringAndAlphaToRGBColor(color);
+            if (rgbColor) {
+              onChangeProperty('tint', rgbColorToRGBString(rgbColor));
+            }
+          }}
+        />
+        <SemiControlledTextField
+          commitOnBlur
+          floatingLabelFixed
+          fullWidth
+          type="number"
+          floatingLabelText={properties.get('tileScale').getLabel()}
+          helperMarkdownText={properties.get('tileScale').getDescription()}
+          disabled={
+            !facesProperties.some(
+              faceProperty =>
+                properties
+                  .get(faceProperty.resourceRepeatProperty)
+                  .getValue() === 'true'
+            )
+          }
+          onChange={value => onChangeProperty('tileScale', value)}
+          value={properties.get('tileScale').getValue()}
+          id="cube3d-object-tileScale"
+        />
+      </ResponsiveLineStackLayout>
       {facesProperties.map(faceProperty => (
         <React.Fragment key={faceProperty.id}>
           <Text size="block-title">{faceProperty.blockName}</Text>

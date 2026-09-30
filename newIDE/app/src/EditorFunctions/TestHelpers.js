@@ -1,13 +1,29 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
-import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
+import {
+  fakeAssetShortHeader1,
+  fakeSkyboxAssetShortHeader,
+} from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
+import {
+  reloadProjectEventsFunctionsExtensionMetadata,
+  type EventsFunctionCodeWriter,
+} from '../EventsFunctionsExtensionsLoader';
 import {
   type LaunchFunctionOptionsWithProject,
   type LaunchFunctionOptionsWithoutProject,
 } from './index';
 
 const gd: libGDevelop = global.gd;
+
+// The editor writes the generated code to files: the tests only need the
+// metadata, so nothing is actually written.
+export const makeFakeEventsFunctionCodeWriter = (): EventsFunctionCodeWriter => ({
+  getIncludeFileFor: (functionName: string) => `${functionName}.js`,
+  writeFunctionCode: () => Promise.resolve(),
+  writeBehaviorCode: () => Promise.resolve(),
+  writeObjectCode: () => Promise.resolve(),
+});
 
 // $FlowFixMe[incompatible-type]
 export const makeFakeI18n = (fakeI18n?: any): I18nType => ({
@@ -20,7 +36,10 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   i18n: makeFakeI18n(),
   editorCallbacks: {
     onOpenLayout: jest.fn(),
+    onOpenExternalLayout: jest.fn(),
     onCreateProject: jest.fn(),
+    onOpenEventsFunctionsExtension: jest.fn(),
+    onOpenCustomObjectEditor: jest.fn(),
   },
   relatedAiRequestId: 'fake-ai-request-id',
   getRelatedAiRequestLastMessages: () => ({
@@ -37,6 +56,7 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   },
   ensureExtensionInstalled: jest.fn(),
   searchAndInstallAsset: jest.fn(),
+  searchAndInstallEffectAsset: jest.fn(),
   searchAndInstallResources: async () => {
     return Promise.resolve({
       results: [
@@ -48,10 +68,20 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
       ],
     });
   },
+  attachmentsForResources: {
+    getFiles: async () => ({}),
+    storeResourceFiles: async () => true,
+  },
   onObjectsModifiedOutsideEditor: jest.fn(),
+  onEffectsModifiedOutsideEditor: jest.fn(),
   onWillDeleteScene: jest.fn(),
   onWillDeleteGameplayTest: jest.fn(),
   onWillDeleteObject: jest.fn(),
+  onExtensionsModifiedOutsideEditor: jest.fn(),
+  ensureExtensionsUpToDate: jest.fn(() => Promise.resolve()),
+  // Without a project there is no extension to reload.
+  reloadExtensionMetadata: jest.fn(),
+  onWillDeleteExtensionItem: jest.fn(() => Promise.resolve()),
   onWillInstallExtension: jest.fn(),
   onExtensionInstalled: jest.fn(),
   getAssetStoreTagForNewObject: () => null,
@@ -63,6 +93,17 @@ export const makeFakeLaunchFunctionOptionsWithProject = (
 ): LaunchFunctionOptionsWithProject => ({
   ...makeFakeLaunchFunctionOptionsWithoutProject(),
   project,
+  // Really regenerated, like in the editor: the specs then read the call forms
+  // from the platform metadata, as the AI does.
+  reloadExtensionMetadata: jest.fn((extensionName: string) => {
+    if (!project.hasEventsFunctionsExtensionNamed(extensionName)) return;
+    reloadProjectEventsFunctionsExtensionMetadata(
+      project,
+      project.getEventsFunctionsExtension(extensionName),
+      makeFakeEventsFunctionCodeWriter(),
+      makeFakeI18n()
+    );
+  }),
   searchAndInstallAsset: async ({
     objectsContainer,
     objectName,
@@ -86,6 +127,27 @@ export const makeFakeLaunchFunctionOptionsWithProject = (
       createdObjects: [object],
       assetShortHeader: fakeAssetShortHeader1,
       isTheFirstOfItsTypeInProject,
+    });
+  },
+  searchAndInstallEffectAsset: async ({
+    effectsContainer,
+    effectName,
+    effectType,
+  }) => {
+    const effect = effectsContainer.hasEffectNamed(effectName)
+      ? effectsContainer.getEffect(effectName)
+      : effectsContainer.insertNewEffect(
+          effectName,
+          effectsContainer.getEffectsCount()
+        );
+    effect.setEffectType(effectType || 'Scene3D::Skybox');
+    effect.setStringParameter('frontFaceResourceName', 'FakeSky_Front.png');
+
+    return Promise.resolve({
+      status: 'asset-installed',
+      message: 'Skybox installed',
+      effect,
+      assetShortHeader: fakeSkyboxAssetShortHeader,
     });
   },
 });

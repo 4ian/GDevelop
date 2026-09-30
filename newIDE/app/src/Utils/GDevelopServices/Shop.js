@@ -124,6 +124,8 @@ export type PrivateGameTemplateListingData = {|
   ...CreditsClaimableAttributes,
   productType: 'GAME_TEMPLATE',
   listing: 'GAME_TEMPLATE',
+  /** The id of the game published on gd.games showcasing this template. */
+  showcasedGameId?: ?string,
 |};
 
 export type CreditsPackageListingData = {|

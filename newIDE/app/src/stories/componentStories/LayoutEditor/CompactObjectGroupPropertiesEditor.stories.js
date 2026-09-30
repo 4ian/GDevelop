@@ -37,6 +37,9 @@ export const Default = (): React.Node => (
       onEditObjectGroup={action('onEditObjectGroup')}
       onWillInstallExtension={action('onWillInstallExtension')}
       onExtensionInstalled={action('onExtensionInstalled')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       onUpdateBehaviorsSharedData={action('onUpdateBehaviorsSharedData')}
       resourceManagementProps={fakeResourceManagementProps}
     />
@@ -63,6 +66,9 @@ export const WithLongObjectNames = (): React.Node => (
       onEditObjectGroup={action('onEditObjectGroup')}
       onWillInstallExtension={action('onWillInstallExtension')}
       onExtensionInstalled={action('onExtensionInstalled')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       onUpdateBehaviorsSharedData={action('onUpdateBehaviorsSharedData')}
       resourceManagementProps={fakeResourceManagementProps}
     />
@@ -89,6 +95,9 @@ export const Empty = (): React.Node => (
       onEditObjectGroup={action('onEditObjectGroup')}
       onWillInstallExtension={action('onWillInstallExtension')}
       onExtensionInstalled={action('onExtensionInstalled')}
+      onCreateNewExtensionWithBehavior={action(
+        'onCreateNewExtensionWithBehavior'
+      )}
       onUpdateBehaviorsSharedData={action('onUpdateBehaviorsSharedData')}
       resourceManagementProps={fakeResourceManagementProps}
     />

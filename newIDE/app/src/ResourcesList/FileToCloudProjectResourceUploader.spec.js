@@ -5,7 +5,7 @@ import { getInputAcceptedMimesAndExtensions } from './FileToCloudProjectResource
 describe('FileToCloudProjectResourceUploader', () => {
   it('gives the accepted mime/extensions for an input', () => {
     expect(getInputAcceptedMimesAndExtensions('audio')).toMatchInlineSnapshot(
-      `"audio/aac,audio/x-wav,audio/mpeg,audio/mp3,audio/ogg,.aac,.wav,.mp3,.ogg"`
+      `"audio/aac,audio/x-m4a,audio/mp4,audio/x-wav,audio/mpeg,audio/mp3,audio/ogg,.aac,.m4a,.wav,.mp3,.ogg"`
     );
     expect(
       getInputAcceptedMimesAndExtensions('bitmapFont')

@@ -24,11 +24,11 @@ export namespace TiledTileMapLoader {
    */
   export function load(
     tiledTileMap: TiledTileMap,
-    pako: any,
+    pako: any
   ): EditableTileMap | null {
     if (!tiledTileMap.tiledversion) {
       console.warn(
-        "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?",
+        "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
       );
 
       return null;
@@ -41,7 +41,7 @@ export namespace TiledTileMapLoader {
       if (tiledTileSet.tiles) {
         for (const tile of tiledTileSet.tiles) {
           const tileDefinition = new TileDefinition(
-            tile.animation ? tile.animation.length : 0,
+            tile.animation ? tile.animation.length : 0
           );
           const tileClass = tile.type || tile.class;
           if (tile.objectgroup && tile.objectgroup.objects) {
@@ -103,15 +103,15 @@ export namespace TiledTileMapLoader {
             ];
             tileDefinition.addHitBox(tileClass, polygon, true);
           }
-          definitions.set(
-            getTileIdFromTiledGUI(firstGid + tile.id),
-            tileDefinition,
-          );
+          const tileId = getTileIdFromTiledGUI(firstGid + tile.id);
+          if (tileId !== undefined) {
+            definitions.set(tileId, tileDefinition);
+          }
         }
       }
       for (let tileIndex = 0; tileIndex < tiledTileSet.tilecount; tileIndex++) {
         const tileId = getTileIdFromTiledGUI(firstGid + tileIndex);
-        if (tileId && !definitions.has(tileId)) {
+        if (tileId !== undefined && !definitions.has(tileId)) {
           definitions.set(tileId, new TileDefinition(0));
         }
       }
@@ -122,20 +122,20 @@ export namespace TiledTileMapLoader {
       tiledTileMap.tileheight,
       tiledTileMap.width,
       tiledTileMap.height,
-      definitions,
+      definitions
     );
 
     const firstTileSet = tiledTileMap.tilesets[0];
     if (firstTileSet) {
       editableTileMap.setTileSetColumnCount(firstTileSet.columns);
       editableTileMap.setTileSetRowCount(
-        Math.ceil(firstTileSet.tilecount / firstTileSet.columns),
+        Math.ceil(firstTileSet.tilecount / firstTileSet.columns)
       );
     }
 
     for (const tiledLayer of tiledTileMap.layers) {
       if (tiledLayer.type === "objectgroup") {
-        const objectLayer = editableTileMap.addObjectLayer(tiledLayer.id);
+        const objectLayer = editableTileMap.addObjectLayer(tiledLayer.id || 0);
         objectLayer.setVisible(tiledLayer.visible);
         if (tiledLayer.objects) {
           for (const tiledObject of tiledLayer.objects) {
@@ -147,15 +147,17 @@ export namespace TiledTileMapLoader {
               continue;
             }
             const tileGid = extractTileUidFlippedStates(tiledObject.gid);
-            const object = new TileObject(
-              tiledObject.x,
-              tiledObject.y,
-              tileGid.id,
-            );
-            objectLayer.add(object);
-            object.setFlippedHorizontally(tileGid.flippedHorizontally);
-            object.setFlippedVertically(tileGid.flippedVertically);
-            object.setFlippedDiagonally(tileGid.flippedDiagonally);
+            if (tileGid.id) {
+              const object = new TileObject(
+                tiledObject.x,
+                tiledObject.y,
+                tileGid.id
+              );
+              objectLayer.add(object);
+              object.setFlippedHorizontally(tileGid.flippedHorizontally);
+              object.setFlippedVertically(tileGid.flippedVertically);
+              object.setFlippedDiagonally(tileGid.flippedDiagonally);
+            }
           }
         }
       } else if (tiledLayer.type === "tilelayer") {
@@ -172,7 +174,7 @@ export namespace TiledTileMapLoader {
         }
         if (layerData) {
           const collisionTileLayer = editableTileMap.addNewTileLayer(
-            tiledLayer.id,
+            tiledLayer.id || 0
           );
           collisionTileLayer.setAlpha(tiledLayer.opacity);
           collisionTileLayer.setVisible(tiledLayer.visible);
@@ -190,17 +192,17 @@ export namespace TiledTileMapLoader {
                 collisionTileLayer.setFlippedHorizontally(
                   x,
                   y,
-                  tileUid.flippedHorizontally,
+                  tileUid.flippedHorizontally
                 );
                 collisionTileLayer.setFlippedVertically(
                   x,
                   y,
-                  tileUid.flippedVertically,
+                  tileUid.flippedVertically
                 );
                 collisionTileLayer.setFlippedDiagonally(
                   x,
                   y,
-                  tileUid.flippedDiagonally,
+                  tileUid.flippedDiagonally
                 );
               }
               tileSlotIndex += 1;

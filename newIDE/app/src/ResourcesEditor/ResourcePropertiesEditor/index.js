@@ -30,6 +30,7 @@ import { Spacer } from '../../UI/Grid';
 import ScrollView from '../../UI/ScrollView';
 import { ColumnStackLayout } from '../../UI/Layout';
 import AlertMessage from '../../UI/AlertMessage';
+import Text from '../../UI/Text';
 import { triggerOnResourceExternallyChanged } from '../../MainFrame/ResourcesWatcher';
 
 type Props = {|
@@ -110,17 +111,61 @@ const buildCustomPropertyField = (
 
 const buildCustomPropertiesSchema = (
   resourceCustomPropertyConfigs: Array<ResourceCustomPropertyConfig>,
-  resourceKind: string,
+  resourceKinds: Array<string>,
   forceUpdate: () => void
 ): Schema =>
   resourceCustomPropertyConfigs
-    .filter(
-      config =>
-        !config.resourceKinds ||
-        config.resourceKinds.length === 0 ||
-        config.resourceKinds.includes(resourceKind)
-    )
+    .filter(config => {
+      const configResourceKinds = config.resourceKinds;
+      return (
+        !configResourceKinds ||
+        configResourceKinds.length === 0 ||
+        resourceKinds.every(resourceKind =>
+          configResourceKinds.includes(resourceKind)
+        )
+      );
+    })
     .map(config => buildCustomPropertyField(config, forceUpdate));
+
+const getPropertyNamesSharedByAllResources = (
+  resources: Array<gdResource>
+): Set<string> => {
+  let sharedPropertyNames: ?Set<string> = null;
+  for (const resource of resources) {
+    const propertyNames = resource
+      .getProperties()
+      .keys()
+      .toJSArray();
+    const previousSharedPropertyNames = sharedPropertyNames;
+    sharedPropertyNames = new Set(
+      previousSharedPropertyNames
+        ? propertyNames.filter(name => previousSharedPropertyNames.has(name))
+        : propertyNames
+    );
+  }
+  return sharedPropertyNames || new Set();
+};
+
+const keepOnlyFieldsNamed = (schema: Schema, fieldNames: Set<string>): Schema =>
+  schema.reduce((fields, field) => {
+    // $FlowFixMe[prop-missing] - Only "row" and "column" fields have children.
+    const children: ?Array<Field> = field.children;
+    if (children) {
+      const filteredChildren = keepOnlyFieldsNamed(children, fieldNames);
+      if (filteredChildren.length) {
+        // $FlowFixMe[incompatible-type] - The field is a "row" or "column".
+        fields.push({ ...field, children: filteredChildren });
+      }
+    } else if (
+      // $FlowFixMe[prop-missing] - Not all fields have a name.
+      !field.name ||
+      // $FlowFixMe[prop-missing]
+      fieldNames.has(field.name)
+    ) {
+      fields.push(field);
+    }
+    return fields;
+  }, []);
 
 const renderEmpty = () => {
   return (
@@ -212,48 +257,53 @@ const ResourcePropertiesEditor: React.ComponentType<{
       ]
     );
 
+    const isMultipleSelection = resources.length > 1;
+
     const schema: Schema = React.useMemo(
-      () => [
-        {
-          name: i18n._(t`Resource name`),
-          valueType: 'string',
-          disabled: () => 'always',
-          getValue: (resource: gdResource) => resource.getName(),
-          setValue: (resource: gdResource, newValue: string) =>
-            resource.setName(newValue),
-        },
-        {
-          name: i18n._(t`File`),
-          valueType: 'string',
-          getValue: (resource: gdResource) => resource.getFile(),
-          setValue: (resource: gdResource, newValue: string) => {
-            resource.setFile(newValue);
-            triggerOnResourceExternallyChanged({
-              identifier: newValue,
-            });
-          },
-          onEditButtonClick: () => {
-            const firstResourceSource = resourceSources[0];
-            if (firstResourceSource) chooseResourcePath(firstResourceSource);
-          },
-          onEditButtonBuildMenuTemplate:
-            resourceSources.length > 1
-              ? (i18n: I18nType) =>
-                  resourceSources.map(source => ({
-                    label: i18n._(source.displayName),
-                    click: () => chooseResourcePath(source),
-                  }))
-              : undefined,
-        },
-      ],
-      [resourceSources, chooseResourcePath, i18n]
+      () =>
+        isMultipleSelection
+          ? []
+          : [
+              {
+                name: i18n._(t`Resource name`),
+                valueType: 'string',
+                disabled: () => 'always',
+                getValue: (resource: gdResource) => resource.getName(),
+                setValue: (resource: gdResource, newValue: string) =>
+                  resource.setName(newValue),
+              },
+              {
+                name: i18n._(t`File`),
+                valueType: 'string',
+                getValue: (resource: gdResource) => resource.getFile(),
+                setValue: (resource: gdResource, newValue: string) => {
+                  resource.setFile(newValue);
+                  triggerOnResourceExternallyChanged({
+                    identifier: newValue,
+                  });
+                },
+                onEditButtonClick: () => {
+                  const firstResourceSource = resourceSources[0];
+                  if (firstResourceSource)
+                    chooseResourcePath(firstResourceSource);
+                },
+                onEditButtonBuildMenuTemplate:
+                  resourceSources.length > 1
+                    ? (i18n: I18nType) =>
+                        resourceSources.map(source => ({
+                          label: i18n._(source.displayName),
+                          click: () => chooseResourcePath(source),
+                        }))
+                    : undefined,
+              },
+            ],
+      [resourceSources, chooseResourcePath, i18n, isMultipleSelection]
     );
 
     const renderResourcesProperties = React.useCallback(
       () => {
-        //TODO: Multiple resources support
         const properties = resources[0].getProperties();
-        const resourceSchema = propertiesMapToSchema({
+        const fullResourceSchema = propertiesMapToSchema({
           properties,
           defaultValueProperties: null,
           getPropertyValue: (resource, name) =>
@@ -268,28 +318,63 @@ const ResourcePropertiesEditor: React.ComponentType<{
           layersContainer: null,
           shouldDisabledFieldsWithMixedValues: false,
         });
+        // Resources of different kinds can be selected together: only show
+        // the properties they all have.
+        const resourceSchema = isMultipleSelection
+          ? keepOnlyFieldsNamed(
+              fullResourceSchema,
+              getPropertyNamesSharedByAllResources(resources)
+            )
+          : fullResourceSchema;
 
-        const resourceKind = resources[0].getKind();
+        const resourceKinds: Array<string> = [
+          ...new Set(resources.map(resource => resource.getKind())),
+        ];
         const customPropertiesSchema = buildCustomPropertiesSchema(
           resourceManagementProps.resourceCustomPropertyConfigs,
-          resourceKind,
+          resourceKinds,
           forceUpdate
         );
 
+        const fullSchema = schema
+          .concat(resourceSchema)
+          .concat(customPropertiesSchema);
+
         return (
-          <PropertiesEditor
-            schema={schema
-              .concat(resourceSchema)
-              .concat(customPropertiesSchema)}
-            instances={resources}
-          />
+          <ColumnStackLayout noMargin expand>
+            {isMultipleSelection && (
+              <Text>
+                <Trans>
+                  {resources.length} resources selected. Changes will be applied
+                  to all of them.
+                </Trans>
+              </Text>
+            )}
+            {isMultipleSelection && fullSchema.length === 0 ? (
+              <EmptyMessage>
+                <Trans>
+                  These resources are of different kinds and have no property in
+                  common. Select resources of the same kind to edit their
+                  properties together.
+                </Trans>
+              </EmptyMessage>
+            ) : (
+              <PropertiesEditor schema={fullSchema} instances={resources} />
+            )}
+          </ColumnStackLayout>
         );
       },
-      [resources, schema, forceUpdate, resourceManagementProps]
+      [
+        resources,
+        schema,
+        forceUpdate,
+        resourceManagementProps,
+        isMultipleSelection,
+      ]
     );
 
     const renderPreview = () => {
-      if (!resources || !resources.length) return;
+      if (resources.length !== 1) return;
 
       return (
         <ResourcePreview

@@ -421,6 +421,10 @@ const ManageEducationAccountDialog = ({
     async (activate: boolean) => {
       if (selectedUserIds.length === 0) return;
       setBatchControlError(null);
+      const minimumDelayBeforeReactivationInDays =
+        team && team.minimumDelayBeforeReactivationInDays
+          ? team.minimumDelayBeforeReactivationInDays
+          : 0;
 
       try {
         if (!activate) {
@@ -428,7 +432,10 @@ const ManageEducationAccountDialog = ({
             title: t`Archive ${selectedUserIds.length} accounts?`,
             confirmButtonLabel: t`Archive ${selectedUserIds.length} accounts`,
             dismissButtonLabel: t`Cancel`,
-            message: t`Projects in disabled accounts will not be deleted. All disabled accounts can be reactivated after 15 days.`,
+            message:
+              minimumDelayBeforeReactivationInDays > 0
+                ? t`Projects in disabled accounts will not be deleted. All disabled accounts can be reactivated after ${minimumDelayBeforeReactivationInDays} days.`
+                : t`Projects in disabled accounts will not be deleted. All disabled accounts can be reactivated at any time.`,
             level: 'info',
             maxWidth: 'xs',
           });
@@ -467,7 +474,7 @@ const ManageEducationAccountDialog = ({
                 You have to wait
                 {extractedStatusAndCode.data
                   ? extractedStatusAndCode.data.daysToWait
-                  : 15}
+                  : minimumDelayBeforeReactivationInDays}
                 days before you can reactivate an archived account.
               </Trans>
             );
@@ -501,7 +508,13 @@ const ManageEducationAccountDialog = ({
         }
       }
     },
-    [onActivateMembers, onRefreshMembers, selectedUserIds, showConfirmation]
+    [
+      onActivateMembers,
+      onRefreshMembers,
+      selectedUserIds,
+      showConfirmation,
+      team,
+    ]
   );
 
   const groupedMembers = groupMembersByGroupId({

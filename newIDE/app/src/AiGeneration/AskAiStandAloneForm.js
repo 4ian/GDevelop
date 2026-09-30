@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
+import { canPayForAiRequest } from './AiRequestChat/Utils';
 import {
   addMessageToAiRequest,
   createAiRequest,
@@ -51,6 +52,7 @@ import Text from '../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import IconButton from '../UI/IconButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 
@@ -116,9 +118,11 @@ export const AskAiStandAloneForm = ({
     async ({
       name,
       exampleSlug,
+      projectFileUrl,
     }: {|
       name: string,
       exampleSlug: string | null,
+      projectFileUrl?: string | null,
     |}) => {
       const newProjectSetup: NewProjectSetup = {
         projectName: name,
@@ -128,6 +132,7 @@ export const AskAiStandAloneForm = ({
         // ensure the Ask AI editor is opened once the project is created.
         forceOpenAskAiEditor: true,
         creationSource: 'ai-agent-request',
+        projectFileUrl,
       };
 
       if (exampleSlug) {
@@ -158,6 +163,10 @@ export const AskAiStandAloneForm = ({
     () => ({
       onOpenLayout,
       onCreateProject,
+      // The stand-alone form has no external layout or extension editors to open.
+      onOpenExternalLayout: () => {},
+      onOpenEventsFunctionsExtension: () => {},
+      onOpenCustomObjectEditor: () => {},
     }),
     [onOpenLayout, onCreateProject]
   );
@@ -260,7 +269,11 @@ export const AskAiStandAloneForm = ({
         // Read the options and reset them immediately to prevent the effect from firing
         // again if dependencies change during the async operations below (e.g. when
         // closeProject causes project to become null).
-        const { userRequest, aiConfigurationPresetId } = newAiRequestOptions;
+        const {
+          userRequest,
+          attachmentIds,
+          aiConfigurationPresetId,
+        } = newAiRequestOptions;
         startNewAiRequest(null);
 
         // Ensure the Ask AI pane is closed, to avoid multiple requests being sent
@@ -277,15 +290,18 @@ export const AskAiStandAloneForm = ({
         let payWithCredits = false;
         if (quota && quota.limitReached && aiRequestPriceInCredits) {
           payWithCredits = true;
-          const doesNotHaveEnoughCreditsToContinue =
-            availableCredits < aiRequestPriceInCredits;
-          const cannotContinue =
-            !automaticallyUseCreditsForAiRequests ||
-            doesNotHaveEnoughCreditsToContinue;
-
-          if (cannotContinue) {
-            return;
-          }
+        }
+        // The same rule as the one enabling the send button, so the button
+        // can't offer to send a request this would silently drop.
+        if (
+          !canPayForAiRequest({
+            quota,
+            price: aiRequestPrice,
+            availableCredits,
+            automaticallyUseCreditsForAiRequests,
+          })
+        ) {
+          return;
         }
 
         // Request is now ready to be started.
@@ -307,6 +323,7 @@ export const AskAiStandAloneForm = ({
 
           const aiRequest = await createAiRequest(getAuthorizationHeader, {
             userRequest: userRequest,
+            attachmentIds,
             userId: profile.id,
             gameProjectJsonUserRelativeKey:
               preparedAiUserContent.gameProjectJsonUserRelativeKey,
@@ -382,6 +399,7 @@ export const AskAiStandAloneForm = ({
       })();
     },
     [
+      aiRequestPrice,
       aiRequestPriceInCredits,
       availableCredits,
       getAuthorizationHeader,
@@ -557,6 +575,8 @@ export const AskAiStandAloneForm = ({
       editorFunctionCallResults: Array<EditorFunctionCallResult>,
       options: {|
         createdSceneNames?: Array<string>,
+        // Not opened by the stand-alone form (no editor to open them in).
+        createdExternalLayoutNames?: Array<string>,
         createdProject?: ?gdProject,
       |}
     ) => {
@@ -571,6 +591,10 @@ export const AskAiStandAloneForm = ({
     [onSendMessage]
   );
 
+  const eventsFunctionsExtensionsState = React.useContext(
+    EventsFunctionsExtensionsContext
+  );
+
   const aiRequestsToProcess = React.useMemo(
     () => (aiRequestForForm ? [aiRequestForForm] : []),
     [aiRequestForForm]
@@ -578,6 +602,7 @@ export const AskAiStandAloneForm = ({
 
   const { onProcessFunctionCalls } = useProcessFunctionCalls({
     project,
+    fileMetadata,
     resourceManagementProps,
     editorCallbacks,
     aiRequestsToProcess,
@@ -588,11 +613,16 @@ export const AskAiStandAloneForm = ({
     onSceneEventsModifiedOutsideEditor: () => {},
     onInstancesModifiedOutsideEditor: () => {},
     onObjectsModifiedOutsideEditor: () => {},
+    onEffectsModifiedOutsideEditor: () => {},
     onObjectGroupsModifiedOutsideEditor: () => {},
     onProjectItemRenamedOutsideEditor: () => {},
     onWillDeleteScene: () => Promise.resolve(),
     onWillDeleteGameplayTest: () => Promise.resolve(),
     onWillDeleteObject: () => {},
+    eventsFunctionsExtensionsState,
+    // The stand-alone form has no editor tab to refresh.
+    onExtensionsModifiedOutsideEditor: () => {},
+    onWillDeleteExtensionItem: () => Promise.resolve(),
     onWillInstallExtension,
     onExtensionInstalled,
     isReadyToProcessFunctionCalls: true,
@@ -672,6 +702,7 @@ export const AskAiStandAloneForm = ({
           userMessage,
         }: {|
           userMessage: string,
+          attachmentIds: Array<string>,
         |}) => {
           if (!aiRequestIdForForm) return;
           await onSendMessage({

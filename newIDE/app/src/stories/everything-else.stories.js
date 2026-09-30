@@ -48,8 +48,6 @@ import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildStepsProgress from '../ExportAndShare/Builds/BuildStepsProgress';
-import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
-import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ColorField from '../UI/ColorField';
@@ -107,7 +105,6 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
-import PreferencesDialog from '../MainFrame/Preferences/PreferencesDialog';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
@@ -1207,6 +1204,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"GUI"'}
       render={(value, onChange) => (
         <LayerField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1245,6 +1243,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"TestLayout"'}
       render={(value, onChange) => (
         <SceneNameField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1319,6 +1318,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <SceneVariableField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1336,6 +1336,7 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <ObjectVariableField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1353,6 +1354,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1370,6 +1372,7 @@ storiesOf('ParameterFields', module)
       initialValue={'"123;342;345"'}
       render={(value, onChange) => (
         <ColorExpressionField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1388,6 +1391,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <TrueFalseField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1406,6 +1410,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <YesNoField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1424,6 +1429,7 @@ storiesOf('ParameterFields', module)
       initialValue={''}
       render={(value, onChange) => (
         <ForceMultiplierField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1441,6 +1447,7 @@ storiesOf('ParameterFields', module)
       initialValue={'0.8'}
       render={(value, onChange) => (
         <ForceMultiplierField
+          project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
           onChange={onChange}
@@ -1770,66 +1777,6 @@ storiesOf('DebuggerContent', module)
   ));
 
 // $FlowFixMe[invalid-export]
-storiesOf('Profiler', module)
-  .add('without profiler output', () => (
-    <DragAndDropContextProvider>
-      <FixedHeightFlexContainer height={550}>
-        <Profiler
-          onStart={action('start profiler')}
-          onStop={action('stop profiler')}
-          profilerOutput={null}
-          profilingInProgress={false}
-        />
-      </FixedHeightFlexContainer>
-    </DragAndDropContextProvider>
-  ))
-  .add('without profiler output, while profiling', () => (
-    <DragAndDropContextProvider>
-      <FixedHeightFlexContainer height={550}>
-        <Profiler
-          onStart={action('start profiler')}
-          onStop={action('stop profiler')}
-          profilerOutput={null}
-          profilingInProgress={true}
-        />
-      </FixedHeightFlexContainer>
-    </DragAndDropContextProvider>
-  ))
-  .add('with profiler output', () => (
-    <DragAndDropContextProvider>
-      <FixedHeightFlexContainer height={550}>
-        <Profiler
-          onStart={action('start profiler')}
-          onStop={action('stop profiler')}
-          profilerOutput={profilerOutputsTestData}
-          profilingInProgress={false}
-        />
-      </FixedHeightFlexContainer>
-    </DragAndDropContextProvider>
-  ))
-  .add('with profiler output, while profiling', () => (
-    <DragAndDropContextProvider>
-      <FixedHeightFlexContainer height={550}>
-        <Profiler
-          onStart={action('start profiler')}
-          onStop={action('stop profiler')}
-          profilerOutput={profilerOutputsTestData}
-          profilingInProgress={true}
-        />
-      </FixedHeightFlexContainer>
-    </DragAndDropContextProvider>
-  ));
-
-// $FlowFixMe[invalid-export]
-storiesOf('MeasuresTable', module).add('default', () => (
-  <div style={{ height: 250 }}>
-    <MeasuresTable
-      profilerMeasures={profilerOutputsTestData.framesAverageMeasures}
-    />
-  </div>
-));
-
-// $FlowFixMe[invalid-export]
 storiesOf('AboutDialog', module).add('default', () => (
   <AboutDialog
     open
@@ -2057,6 +2004,9 @@ storiesOf('InstructionEditorDialog', module)
           onPasteInstructions={action('paste instructions')}
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
+          onCreateNewExtensionWithBehavior={action(
+            'onCreateNewExtensionWithBehavior'
+          )}
           editEventsFunctionParameter={action('editEventsFunctionParameter')}
           openEventsBasedEntityPropertyEditorDialog={action(
             'openEventsBasedEntityPropertyEditorDialog'
@@ -2089,6 +2039,9 @@ storiesOf('InstructionEditorDialog', module)
           onPasteInstructions={action('paste instructions')}
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
+          onCreateNewExtensionWithBehavior={action(
+            'onCreateNewExtensionWithBehavior'
+          )}
           editEventsFunctionParameter={action('editEventsFunctionParameter')}
           openEventsBasedEntityPropertyEditorDialog={action(
             'openEventsBasedEntityPropertyEditorDialog'
@@ -2130,6 +2083,9 @@ storiesOf('InstructionEditorDialog', module)
             onPasteInstructions={action('paste instructions')}
             onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('extension installed')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
             editEventsFunctionParameter={action('editEventsFunctionParameter')}
             openEventsBasedEntityPropertyEditorDialog={action(
               'openEventsBasedEntityPropertyEditorDialog'
@@ -2182,6 +2138,9 @@ storiesOf('InstructionEditorMenu', module)
                 onPasteInstructions={action('paste instructions')}
                 onWillInstallExtension={action('extension will be installed')}
                 onExtensionInstalled={action('extension installed')}
+                onCreateNewExtensionWithBehavior={action(
+                  'onCreateNewExtensionWithBehavior'
+                )}
                 editEventsFunctionParameter={action(
                   'editEventsFunctionParameter'
                 )}
@@ -2466,18 +2425,3 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       }
     />
   ));
-
-// $FlowFixMe[invalid-export]
-storiesOf('PreferencesDialog', module).add('default', () => (
-  <I18n>
-    {({ i18n }) => (
-      <PreferencesDialog
-        i18n={i18n}
-        onClose={action('onClose')}
-        onOpenQuickCustomizationDialog={action(
-          'onOpenQuickCustomizationDialog'
-        )}
-      />
-    )}
-  </I18n>
-));

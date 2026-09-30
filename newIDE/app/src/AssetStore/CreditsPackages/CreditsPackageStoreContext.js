@@ -7,10 +7,19 @@ import {
 import CreditsPackagesDialog from '../../Credits/CreditsPackagesDialog';
 import CreditsUsageDialog from '../../Credits/CreditsUsageDialog';
 import { CREDITS_PACKAGES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import {
+  resolveCreditsPackageDialogDisplay,
+  type CreditsPackagePlacementId,
+  type CreditsPackageDialogVariant,
+} from '../../Credits/CreditsPackagesDialogDisplay';
 
 type CreditsPackageDialogOpeningOptions = {|
   missingCredits?: number,
   showCalloutTip?: boolean,
+  // Where the dialog is opened from: decides the wording of the dialog (and is
+  // used to A/B test it, see `CreditsPackagesDialogDisplay`).
+  placementId?: CreditsPackagePlacementId,
 |};
 
 type CreditsUsageDialogOptions = {|
@@ -66,6 +75,11 @@ export const CreditsPackageStoreStateProvider = ({
   ] = React.useState<boolean>(false);
   const [missingCredits, setMissingCredits] = React.useState<?number>(null);
   const [showCalloutTip, setShowCalloutTip] = React.useState<boolean>(false);
+  const [
+    dialogVariant,
+    setDialogVariant,
+  ] = React.useState<CreditsPackageDialogVariant>('standard');
+  const { limits } = React.useContext(AuthenticatedUserContext);
 
   const [
     creditsUsageDialogConfig,
@@ -130,9 +144,17 @@ export const CreditsPackageStoreStateProvider = ({
       setShowCalloutTip(
         options && options.showCalloutTip ? options.showCalloutTip : false
       );
+      // The A/B test config is served with the user limits (fetched once at
+      // startup for authenticated users). Absent for anonymous users or older
+      // backends, in which case the placement's default wording is used.
+      const { dialogVariant } = resolveCreditsPackageDialogDisplay({
+        placementId: (options && options.placementId) || 'unknown',
+        displayConfig: limits ? limits.creditsPackageDialogDisplayConfig : null,
+      });
+      setDialogVariant(dialogVariant);
       setIsCreditsPackageDialogOpen(true);
     },
-    []
+    [limits]
   );
 
   const suggestedPackage: ?CreditsPackageListingData = React.useMemo(
@@ -212,6 +234,7 @@ export const CreditsPackageStoreStateProvider = ({
           suggestedPackage={suggestedPackage}
           missingCredits={missingCredits}
           showCalloutTip={showCalloutTip}
+          dialogVariant={dialogVariant}
         />
       )}
       {creditsUsageDialogConfig && (

@@ -9,11 +9,50 @@
 # to avoid sharing secrets.
 
 version: 2.1
+parameters:
+  # Run *every* visual monkey test, even on a branch. Set it when triggering a
+  # pipeline (CircleCI UI or API) to check everything without waiting for the
+  # change to land on `master`.
+  run-all-visual-tests:
+    type: boolean
+    default: false
+  # Number of parallel containers the visual monkey tests are split across.
+  all-visual-tests-parallelism:
+    type: integer
+    default: 4
+  # Same, for a branch (which only runs the tests related to its changes).
+  changed-visual-tests-parallelism:
+    type: integer
+    default: 2
 orbs:
   aws-cli: circleci/aws-cli@2.0.6
   macos: circleci/macos@2.5.1 # For Rosetta (see below)
   node: circleci/node@7.1.0 # For a recent npm version (see below)
   win: circleci/windows@5.1.0
+commands:
+  # Used by the visual monkey tests jobs on a "changed" scope: stop the job
+  # (before anything expensive) when no test of the suite is related to what
+  # the branch changes. A change to the tests themselves relates every test.
+  halt-unless-a-visual-test-is-related-to-the-changes:
+    parameters:
+      scope:
+        type: enum
+        enum: ['all', 'changed']
+      suite:
+        type: enum
+        enum: ['storybook', 'editor']
+    steps:
+      - run:
+          name: Stop here if no test is related to the changes
+          command: |
+            if [ "<< parameters.scope >>" != "changed" ]; then exit 0; fi
+            git fetch --depth=50 origin master
+            cd newIDE/visual-tests
+            PUPPETEER_SKIP_DOWNLOAD=1 npm install --no-audit --no-fund --silent
+            if [ -z "$(node run.js --suite=<< parameters.suite >> --list-names --only-changed --base-ref=origin/master)" ]; then
+              echo "No visual monkey test of the << parameters.suite >> suite is related to these changes."
+              circleci-agent step halt
+            fi
 jobs:
   # Build the **entire** app for macOS (including the GDevelop.js library).
   build-macos:
@@ -715,6 +754,268 @@ jobs:
           path: ./cli-html5-export-artifacts
           destination: cli-html5-export-artifacts
 
+  # Visual monkey tests: manipulate an editor in a real browser and check that
+  # nothing is broken (see newIDE/visual-tests/README.md).
+  #
+  # The "storybook" suite needs a built Storybook, which is built once here and
+  # shared with the containers running the tests.
+  build-storybook-for-visual-tests:
+    parameters:
+      scope:
+        description: >
+          "all" runs every test. "changed" only runs the tests related to what
+          the branch changes - and nothing at all if it changes nothing related.
+        type: enum
+        enum: ['all', 'changed']
+        default: 'all'
+    resource_class: large
+    docker:
+      - image: cimg/node:24.13.0
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+
+      - halt-unless-a-visual-test-is-related-to-the-changes:
+          scope: << parameters.scope >>
+          suite: 'storybook'
+
+      - restore_cache:
+          keys:
+            - gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - gd-linux-nodejs-dependencies-v2-
+
+      - run:
+          name: Install GDevelop IDE dependencies
+          command: cd newIDE/app && npm install
+
+      - run:
+          name: Build Storybook
+          no_output_timeout: 20m
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/app && npm run build-storybook
+
+      - persist_to_workspace:
+          root: newIDE/app
+          paths:
+            - build-storybook
+
+  run-visual-monkey-tests-storybook-linux:
+    parameters:
+      scope:
+        type: enum
+        enum: ['all', 'changed']
+        default: 'all'
+      parallelism:
+        description: Number of containers the tests are split across.
+        type: integer
+        default: 1
+    parallelism: << parameters.parallelism >>
+    resource_class: large
+    docker:
+      - image: cimg/node:24.13.0
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+
+      - halt-unless-a-visual-test-is-related-to-the-changes:
+          scope: << parameters.scope >>
+          suite: 'storybook'
+
+      - attach_workspace:
+          at: newIDE/app
+
+      # The tests run in the Chrome that `npm install` downloads for Puppeteer
+      # (see newIDE/visual-tests/package.json), which needs these libraries.
+      - run:
+          name: Install the libraries Chrome needs
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              libnss3 \
+              libasound2t64 \
+              libgbm1 \
+              libgtk-3-0 \
+              libxss1 \
+              libatk-bridge2.0-0 \
+              libdrm2 \
+              libxkbcommon0
+
+      - restore_cache:
+          keys:
+            - gd-visual-tests-dependencies-v1-{{ checksum "newIDE/visual-tests/package.json" }}
+
+      - run:
+          name: Install the visual tests dependencies (and the Chrome to run them in)
+          # The install of "Stop here if no test is related to the changes"
+          # skipped the Chrome download, and npm does not re-run the postinstall
+          # of an already installed Puppeteer: run it explicitly (it does
+          # nothing when Chrome is already in the restored cache).
+          command: |
+            cd newIDE/visual-tests
+            npm install --no-audit --no-fund
+            node node_modules/puppeteer/install.mjs
+
+      - save_cache:
+          paths:
+            - newIDE/visual-tests/node_modules
+            - ~/.cache/puppeteer
+          key: gd-visual-tests-dependencies-v1-{{ checksum "newIDE/visual-tests/package.json" }}
+
+      - run:
+          name: List the tests to run
+          command: |
+            cd newIDE/visual-tests
+            if [ "<< parameters.scope >>" = "changed" ]; then
+              node run.js --suite=storybook --list-names --only-changed --base-ref=origin/master > /tmp/tests.txt
+            else
+              node run.js --suite=storybook --list-names > /tmp/tests.txt
+            fi
+            echo "Tests to run:"
+            cat /tmp/tests.txt
+
+      - run:
+          name: Split the tests across the parallel containers
+          # Balanced using the durations recorded by `store_test_results` on the
+          # previous runs (falls back to an even split the first time).
+          command: |
+            if [ -s /tmp/tests.txt ]; then
+              circleci tests split --split-by=timings --timings-type=filename \
+                < /tmp/tests.txt > /tmp/tests-for-this-container.txt
+            else
+              : > /tmp/tests-for-this-container.txt
+            fi
+            echo "Tests for this container:"
+            cat /tmp/tests-for-this-container.txt
+
+      - run:
+          name: Run the visual monkey tests on Storybook
+          no_output_timeout: 30m
+          # The failure is reported by the last step of the job, so that the
+          # results and the screenshots of a failing run are uploaded first.
+          command: |
+            set +e
+            cd newIDE/visual-tests
+            node run.js --suite=storybook \
+              --tests-file=/tmp/tests-for-this-container.txt \
+              --artifacts-dir=/tmp/visual-tests-artifacts \
+              --junit-path=/tmp/visual-tests-results/results.xml
+            echo $? > /tmp/visual-tests-exit-code
+
+      - store_test_results:
+          path: /tmp/visual-tests-results
+      - store_artifacts:
+          path: /tmp/visual-tests-artifacts
+          destination: visual-tests
+
+      - run:
+          name: Report whether the visual monkey tests passed
+          command: exit "$(cat /tmp/visual-tests-exit-code)"
+
+  # Visual monkey tests, "editor" suite: smoke tests using a real, packaged
+  # version of the app (like run-cli-html5-export-linux does) opening a real
+  # example game.
+  #
+  # Without a local build (so on a branch), the tests run against the latest
+  # portable build of `master` on S3: they then exercise the tests of the
+  # branch, not its changes to the app itself - those are only tested by the
+  # jobs following build-linux, on the branches building the app.
+  run-visual-monkey-tests-editor-linux:
+    parameters:
+      scope:
+        description: >
+          "all" runs every test. "changed" only runs the tests related to what
+          the branch changes - and nothing at all if it changes nothing related.
+        type: enum
+        enum: ['all', 'changed']
+        default: 'all'
+      use-local-build:
+        description: When true, attach the workspace produced by build-linux and use its portable zip instead of downloading the latest one from S3.
+        type: boolean
+        default: false
+    resource_class: medium
+    docker:
+      - image: cimg/node:24.13.0
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+
+      - halt-unless-a-visual-test-is-related-to-the-changes:
+          scope: << parameters.scope >>
+          suite: 'editor'
+
+      - when:
+          condition: << parameters.use-local-build >>
+          steps:
+            - attach_workspace:
+                at: ~/GDevelop/build-linux-workspace
+
+      # Runtime libraries required by Electron (headless still needs nss /
+      # alsa to even start up).
+      - run:
+          name: Install Electron runtime dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              libnss3 \
+              libasound2t64 \
+              libgbm1 \
+              libgtk-3-0 \
+              libxss1 \
+              libatk-bridge2.0-0 \
+              libdrm2 \
+              libxkbcommon0 \
+              xvfb
+
+      - run:
+          name: Install the visual tests dependencies
+          command: cd newIDE/visual-tests && npm install --no-audit --no-fund
+
+      - run:
+          name: Run the visual monkey tests on the real editor
+          # The editor is a GUI app: it needs a display, even to run headless.
+          # The failure is reported by the last step of the job, so that the
+          # results and the screenshots of a failing run are uploaded first.
+          no_output_timeout: 30m
+          command: |
+            set +e
+            cd newIDE/visual-tests
+            if [ "<< parameters.use-local-build >>" = "true" ]; then
+              ZIP_PATH=$(ls ~/GDevelop/build-linux-workspace/gdevelop-*.zip | grep -v -- '-arm64' | head -1)
+              if [ -z "$ZIP_PATH" ]; then
+                echo "No portable zip found in the build-linux workspace." >&2
+                exit 1
+              fi
+              echo "Using the locally built portable zip: $ZIP_PATH"
+              EXTRA_ARGS="--gdevelop-zip=$ZIP_PATH"
+            else
+              echo "No local build available; the latest portable zip of master will be downloaded."
+              EXTRA_ARGS="--gdevelop-branch=master"
+            fi
+            if [ "<< parameters.scope >>" = "changed" ]; then
+              EXTRA_ARGS="$EXTRA_ARGS --only-changed --base-ref=origin/master"
+            fi
+            xvfb-run -a --server-args="-screen 0 1500x1000x24" \
+              node run.js --suite=editor $EXTRA_ARGS \
+              --artifacts-dir=/tmp/visual-tests-artifacts \
+              --junit-path=/tmp/visual-tests-results/results.xml
+            echo $? > /tmp/visual-tests-exit-code
+
+      - store_test_results:
+          path: /tmp/visual-tests-results
+      - store_artifacts:
+          path: /tmp/visual-tests-artifacts
+          destination: visual-tests
+
+      - run:
+          name: Report whether the visual monkey tests passed
+          command: exit "$(cat /tmp/visual-tests-exit-code)"
+
 workflows:
   gdevelop_js-wasm-extra-checks:
     jobs:
@@ -766,6 +1067,19 @@ workflows:
                 - master
                 - stable
                 - /experimental-build.*/
+      # Right after build-linux, run the visual monkey tests of the real
+      # editor against the portable zip it just produced.
+      - run-visual-monkey-tests-editor-linux:
+          name: visual-monkey-tests-editor-linux
+          use-local-build: true
+          requires:
+            - build-linux
+          filters:
+            branches:
+              only:
+                - master
+                - stable
+                - /experimental-build.*/
       - build-windows:
           requires:
             - build-gdevelop_js-wasm-only
@@ -786,10 +1100,10 @@ workflows:
       #           - stable
       #           - /experimental-build.*/
 
-  # Daily end-to-end test of the GDevelop CLI HTML5 export. Runs every day
-  # at 16:00 UTC (4pm UTC) against the latest portable build uploaded to S3
-  # for master.
-  daily-cli-html5-export-linux:
+  # Daily end-to-end tests running against the latest portable build uploaded
+  # to S3 for master: the CLI HTML5 export, and the visual monkey tests
+  # manipulating the editor. Runs every day at 16:00 UTC (4pm UTC).
+  daily-end-to-end-tests:
     triggers:
       - schedule:
           cron: "0 16 * * *"
@@ -799,3 +1113,66 @@ workflows:
                 - master
     jobs:
       - run-cli-html5-export-linux
+      - run-visual-monkey-tests-editor-linux
+
+  # On `master`/`stable` (or when explicitly asked for): manipulate the editors
+  # in a real browser and check that nothing is broken, with every test.
+  # (`master`, `stable` and the experimental builds also run the editor suite
+  # against the build build-linux just produced, in the main workflow.)
+  all-visual-tests:
+    when:
+      or:
+        - equal: [master, << pipeline.git.branch >>]
+        - equal: [stable, << pipeline.git.branch >>]
+        - << pipeline.parameters.run-all-visual-tests >>
+    jobs:
+      - build-storybook-for-visual-tests:
+          name: visual-tests-storybook-build-all
+          scope: 'all'
+      - run-visual-monkey-tests-storybook-linux:
+          name: visual-tests-storybook-all
+          scope: 'all'
+          parallelism: << pipeline.parameters.all-visual-tests-parallelism >>
+          requires:
+            - visual-tests-storybook-build-all
+      # On a branch forced with `run-all-visual-tests`: every test of the
+      # editor suite too, against the latest portable build of `master`.
+      - run-visual-monkey-tests-editor-linux:
+          name: visual-tests-editor-all
+          scope: 'all'
+          filters:
+            branches:
+              ignore:
+                - master
+                - stable
+                - /experimental-build.*/
+
+  # On a branch / Pull Request: only run the tests related to what it changes
+  # (nothing at all when it changes nothing related to them). The editor suite
+  # runs against the latest portable build of `master` (a branch builds no
+  # app), so it exercises the tests of the branch, not its changes to the app.
+  changed-visual-tests:
+    when:
+      and:
+        - not:
+            equal: [master, << pipeline.git.branch >>]
+        - not:
+            equal: [stable, << pipeline.git.branch >>]
+        - not: << pipeline.parameters.run-all-visual-tests >>
+    jobs:
+      - build-storybook-for-visual-tests:
+          name: visual-tests-storybook-build-changed
+          scope: 'changed'
+      - run-visual-monkey-tests-storybook-linux:
+          name: visual-tests-storybook-changed
+          scope: 'changed'
+          parallelism: << pipeline.parameters.changed-visual-tests-parallelism >>
+          requires:
+            - visual-tests-storybook-build-changed
+      - run-visual-monkey-tests-editor-linux:
+          name: visual-tests-editor-changed
+          scope: 'changed'
+          filters:
+            branches:
+              ignore:
+                - /experimental-build.*/

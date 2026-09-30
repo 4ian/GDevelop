@@ -75,7 +75,7 @@ export type SceneEditorsDisplayProps = {|
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, done: (boolean) => void) => void,
-  onLayerRenamed: () => void,
+  onLayerRenamed: (oldName: string, newName: string) => void,
   onLayersModified: () => void,
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,
@@ -92,8 +92,8 @@ export type SceneEditorsDisplayProps = {|
     objectWithContext: ObjectWithContext,
     hasResourceChanged: boolean
   ) => void,
-  onObjectFolderOrObjectWithContextSelected: (
-    ?ObjectFolderOrObjectWithContext
+  onObjectFolderOrObjectsWithContextSelected: (
+    Array<ObjectFolderOrObjectWithContext>
   ) => void,
   onSetAsGlobalObject: (object: gdObject) => void,
   onExportAssets: () => void,
@@ -137,6 +137,9 @@ export type SceneEditorsDisplayProps = {|
   ) => boolean,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
 
   updateBehaviorsSharedData: () => void,
   onInstancesAdded: (Array<gdInitialInstance>) => void,
@@ -213,6 +216,7 @@ export type SceneEditorsDisplayInterface = {|
       layer: string
     ) => Array<gdInitialInstance>,
     clearHighlightedInstance: () => void,
+    cancelClickInterception: () => boolean,
     resetInstanceRenderersFor: (objectName: string) => void,
     forceRemountInstancesRenderers: () => void,
     addSerializedInstances: ({|

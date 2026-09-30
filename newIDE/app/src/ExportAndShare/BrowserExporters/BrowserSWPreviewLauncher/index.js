@@ -312,6 +312,12 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         setGameplayTestFramePreviewLocation({
           previewIndexHtmlLocation:
             outputDir + '/index.html?previewId=' + previewId,
+          // The game window of the frame is fixed at the project
+          // resolution: the frame only zooms its display.
+          gameResolution: {
+            width: project.getGameResolutionWidth(),
+            height: project.getGameResolutionHeight(),
+          },
         });
       } else if (shouldHotReload) {
         const projectDataElement = new gd.SerializerElement();

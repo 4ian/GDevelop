@@ -4,7 +4,7 @@ import {
   getInstancesInLayoutForLayer,
   renameLayoutInProject,
 } from '../Utils/Layout';
-import { mapFor, mapVector } from '../Utils/MapFor';
+import { mapFor } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
@@ -21,6 +21,8 @@ import {
 import {
   buildEventScriptSourceView,
   renderEventSourceById,
+  renderScopeSummaryHeaderLines,
+  type ScopeSummary,
 } from '../EventsSheet/EventsTree/TextRenderer/EventScriptSourceView';
 import {
   addMissingObjectBehaviors,
@@ -45,7 +47,12 @@ import {
   getSimplifiedVariable,
   getSimplifiedVariablesContainer,
   getVariableTypeAsString,
+  makeSimplifiedProjectBuilder,
 } from './SimplifiedProject/SimplifiedProject';
+import {
+  navigateSimplifiedProjectJson,
+  type ArrayItemsFilter,
+} from './SimplifiedProject/SimplifiedProjectReader';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import {
@@ -59,10 +66,18 @@ import {
 } from '../ProjectCreation/CreateProject';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import {
+  type AttachmentsForResources,
+  type AttachmentResourceAddition,
+  type AttachmentResourceReplacement,
+  addOrReplaceResourcesFromAttachments,
+} from './AttachmentResources';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
 import type {
   SceneEventsOutsideEditorChanges,
+  ExtensionsOutsideEditorChanges,
+  WillDeleteExtensionItemChanges,
   InstancesOutsideEditorChanges,
   ObjectsOutsideEditorChanges,
   ObjectGroupsOutsideEditorChanges,
@@ -77,14 +92,99 @@ import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
 import {
+  extractRequiredString,
+  formatPropertiesList,
   getObjectSizeInfo,
   getObjectSizeInfoHints,
+  getSimplifiedInstance,
+  makeGenericFailure,
+  makeLayerNotFoundFailure,
+  shouldHideProperty,
   type ObjectSizeInfo,
 } from './Utils';
+import {
+  ensureModel3DMeasurementLoaded,
+  ensureModel3DMeasurementsLoaded,
+  isModel3DObjectMeasured,
+} from './Model3DSizeInfo';
+import {
+  getAnchorOffset,
+  INSTANCE_ANCHORS_2D,
+  INSTANCE_ANCHORS_3D,
+  type InstanceAnchor,
+} from './InstanceAnchor';
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
+import {
+  moveInstancesToScope,
+  type MoveInstancesOutputFields,
+} from './MoveInstances';
+import {
+  getSceneNotFoundMessage,
+  resolveScopeFromArgs,
+  getNamedVariantRejection,
+  getReadOnlyRejection,
+  complyVariantsAfterStructuralEdit,
+  getOutsideEditorChangesTarget,
+  OBJECTS_SCOPE_TYPES,
+  isTypeOfProjectExtension,
+  getScopeObjectsContainer,
+  getObjectLookupScopeText,
+  updateBehaviorsSharedDataInScope,
+  renameLayerInScope,
+  removeLayerInScope,
+  mergeLayersInScope,
+  withScopeObjectsContainersList,
+  makeScopeProjectScopedContainersAccessor,
+  getEventsFunctionInScope,
+  getFunctionsContainerOfScope,
+  getSceneNameFromArgs,
+  getScopeLabelFromArgs,
+  getFunctionTargetFromArgs,
+  type ResolvedScope,
+  type ScopeFailure,
+  type ToolScopeType,
+  type ToolScope,
+} from './Scope';
+import {
+  getInstanceRawJson,
+  getChangedInstancesObjectNames,
+  loadTileMapAtlases,
+  applyInstancesRawJson,
+} from './InstancesRawJson';
+import {
+  applyRawObjectConfiguration,
+  renameObjectAnimationsAndPoints,
+  getFrameImageSizes,
+  getModelAnimationSources,
+  getRawJsonNote,
+} from './RawObjectConfiguration';
+import {
+  createExtension,
+  changeExtensionProperties,
+} from './Extensions/ExtensionFunctions';
+import {
+  createCustomObject,
+  changeCustomObject,
+} from './Extensions/CustomObjectFunctions';
+import {
+  createCustomBehavior,
+  changeCustomBehavior,
+} from './Extensions/CustomBehaviorFunctions';
+import {
+  createCustomFunction,
+  changeCustomFunction,
+} from './Extensions/CustomFunctionFunctions';
 import { capScriptExecutionResult } from './ScriptExecution/CapScriptOutput';
 import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
+import {
+  inspectExtension,
+  type InspectedCustomBehavior,
+  type InspectedCustomObject,
+  type InspectedExtension,
+  type InspectedFunction,
+  type InspectedVariant,
+} from './Extensions/InspectExtension';
 
 export type HintEntry = {|
   code: string,
@@ -143,6 +243,9 @@ export type EditorFunctionGenericOutput = {|
   success: boolean,
   meta?: {
     newSceneNames?: Array<string>,
+    // External layouts created by the call (`create_scene` with
+    // `as_external_layout_of_scene`): opened by the editor like new scenes.
+    newExternalLayoutNames?: Array<string>,
     createdProject?: gdProject,
     // For `run_script`: true when ANY call the script made modified the
     // project (so the editor refreshes even if the script ultimately failed).
@@ -159,6 +262,9 @@ export type EditorFunctionGenericOutput = {|
     lastCalledFunctionName: string | null,
   |} | null,
   message?: string,
+  // `read_game_project_json` output payload: the value at the requested path
+  // of the simplified project (its shape entirely depends on the path).
+  result?: any,
   // `run_gameplay_test` output payload. Present only for gameplay test runs.
   status?: string,
   testName?: string,
@@ -200,8 +306,34 @@ export type EditorFunctionGenericOutput = {|
   // (capped), so renames/reorders/deletions are self-verifying.
   tests?: Array<{| test_name: string, description: string |}>,
   variables?: Array<SimplifiedVariable>,
+  // `inspect_extension` output payload: the extension level is always there,
+  // the other levels only when their selector argument is given.
+  extension?: InspectedExtension,
+  customObject?: InspectedCustomObject,
+  customBehavior?: InspectedCustomBehavior,
+  functionDeclaration?: InspectedFunction,
+  variant?: InspectedVariant,
+  // The extension authoring functions (`create_extension`,
+  // `change_extension_properties`, `create_custom_object`,
+  // `change_custom_object`): the FINAL names of what was created or changed.
+  extensionName?: string,
+  customObjectName?: string,
+  objectType?: string,
+  variantNames?: Array<string>,
+  // Custom behaviors and functions: the type to write in the events and, for
+  // a function, how to call it from EventScript.
+  customBehaviorName?: string,
+  behaviorType?: string,
+  functionType?: string,
+  callForms?: Array<string>,
   reminder?: string,
   animationNames?: string,
+  // `inspect_object_properties_effects` with `include_raw_json`.
+  rawJson?: Object,
+  frameImageSizes?: {
+    [imageName: string]: {| width: number, height: number |},
+  },
+  modelAnimationSources?: Array<string>,
   // EventScript source view (see `read_events_source`):
   eventScript?: string,
   selectedEventIds?: Array<string>,
@@ -218,10 +350,42 @@ export type EditorFunctionGenericOutput = {|
 
   // Used for de-duplication of outputs:
   eventsForSceneNamed?: string,
+  // `read_events_source` in a function of an extension: the scope read, the
+  // function read and what its events can use.
+  eventsForScopeLabel?: string,
+  functionName?: string,
+  scopeSummary?: ScopeSummary,
   instancesForSceneNamed?: string,
   instancesOnlyForObjectsNamed?: string, // Must be combined with `instancesForSceneNamed`.
   propertiesLayersEffectsForSceneNamed?: string,
   objectPropertiesDeduplicationKey?: string,
+
+  // Set instead of (or next to) the `*ForSceneNamed` fields when the scope is
+  // not a scene: the instances of an external layout, or a custom object
+  // variant (`scopeLabel` being the label of the scope: `custom object
+  // "UI::Dialog" (default variant)`).
+  instancesForExternalLayoutNamed?: string,
+  instancesForScopeLabel?: string,
+  propertiesLayersEffectsForScopeLabel?: string,
+  // `change_scene_properties_layers_effects_groups.move_instances`.
+  movedInstancesCount?: number,
+  movedInstancesCountByObjectName?: { [objectName: string]: number },
+  // `inspect_scene_properties_layers_effects` on a custom object variant: a
+  // variant has no scene properties, but an area, groups and an asset store id.
+  isDefaultVariant?: boolean,
+  area?: {|
+    minX: number,
+    minY: number,
+    minZ: number,
+    maxX: number,
+    maxY: number,
+    maxZ: number,
+  |},
+  objectGroups?: Array<{|
+    objectGroupName: string,
+    objectNames: Array<string>,
+  |}>,
+  assetStoreAssetId?: string,
 
   // Used when new resources are added by a function call:
   newlyAddedResources?: Array<SingleResourceSearchAndInstallResult>,
@@ -267,12 +431,16 @@ export type EventBatch = {|
 |};
 
 export type EventsGenerationOptions = {|
+  // Where the events are generated: a scene, or a function of an extension
+  // (`functionName` set). `sceneName` is the scene name (or '' for a
+  // function), kept for the generation API.
+  scope: ToolScope,
+  functionName: string | null,
   sceneName: string,
   eventsDescription: string | null,
   eventBatches: Array<EventBatch> | null,
   extensionNamesList: string,
   objectsList: string,
-  existingEventsAsText: string,
   existingEventsJson: string | null,
   placementHint: string | null,
   relatedAiRequestId: string,
@@ -300,6 +468,26 @@ export type AssetSearchAndInstallOptions = {|
   lastAssistantMessages?: string[],
 |};
 
+// An asset that is an effect, installed on a layer.
+// Install an effect of the asset store on a layer, by its id. The
+// effect takes the type of the asset: `effectType`, when given, must match.
+export type EffectAssetSearchAndInstallOptions = {|
+  effectsContainer: gdEffectsContainer,
+  effectName: string,
+  effectType: string | null,
+  exactOrPartialAssetId: string,
+  relatedAiRequestId?: string | null,
+  lastUserMessage?: string | null,
+  lastAssistantMessages?: string[],
+|};
+
+export type EffectAssetSearchAndInstallResult = {|
+  status: 'asset-installed' | 'nothing-found' | 'error',
+  message: string,
+  effect: gdEffect | null,
+  assetShortHeader: AssetShortHeader | null,
+|};
+
 export type EditorCallbacks = {|
   onOpenLayout: (
     sceneName: string,
@@ -313,13 +501,28 @@ export type EditorCallbacks = {|
         | 'none',
     |}
   ) => void,
+  onOpenExternalLayout: (externalLayoutName: string) => void,
   onCreateProject: ({|
     name: string,
     exampleSlug: string | null,
+    projectFileUrl?: string | null,
   |}) => Promise<{|
     createdProject: gdProject | null,
     exampleSlug: string | null,
   |}>,
+  onOpenEventsFunctionsExtension: (
+    extensionName: string,
+    options: {|
+      functionName?: string,
+      behaviorName?: string,
+      objectName?: string,
+    |}
+  ) => void,
+  onOpenCustomObjectEditor: (
+    extensionName: string,
+    objectName: string,
+    variantName: string
+  ) => void,
 |};
 
 export type ToolOptions = {
@@ -370,6 +573,8 @@ export type LaunchFunctionOptionsWithoutProject = {|
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  // The effects of a layer changed: the game shown by the editor reloads them.
+  onEffectsModifiedOutsideEditor: () => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
@@ -381,6 +586,21 @@ export type LaunchFunctionOptionsWithoutProject = {|
     changes: WillDeleteGameplayTestChanges
   ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  // Extensions authored by the AI (see `OutsideEditorChanges.js`): the
+  // changes are coalesced per batch, `ensureExtensionsUpToDate` flushes them
+  // (regenerating the extensions) when a function needs fresh metadata, and
+  // `onWillDeleteExtensionItem` must be awaited before a deletion.
+  onExtensionsModifiedOutsideEditor: (
+    changes: ExtensionsOutsideEditorChanges
+  ) => void,
+  ensureExtensionsUpToDate: () => Promise<void>,
+  // Regenerates the metadata of one extension: its declarations only (no code
+  // generation, and the code regeneration pending for the batch stays
+  // pending), so a function just changed is described as it is now.
+  reloadExtensionMetadata: (extensionName: string) => void,
+  onWillDeleteExtensionItem: (
+    changes: WillDeleteExtensionItemChanges
+  ) => Promise<void>,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
   ) => Promise<void>,
@@ -389,9 +609,13 @@ export type LaunchFunctionOptionsWithoutProject = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallEffectAsset: (
+    options: EffectAssetSearchAndInstallOptions
+  ) => Promise<EffectAssetSearchAndInstallResult>,
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
+  attachmentsForResources: AttachmentsForResources,
   /**
    * Returns the asset store tag for a given object type, when the type is
    * mainly meant to be picked from the asset store (e.g. premade UI objects).
@@ -468,47 +692,6 @@ export type EditorFunctionWithoutProject = {|
   getModifiesProject?: (args: any) => boolean,
 |};
 
-/**
- * Helper function to safely extract required string arguments
- */
-const extractRequiredString = (args: any, propertyName: string): string => {
-  const value = SafeExtractor.extractStringProperty(args, propertyName);
-  if (value === null) {
-    throw new Error(
-      `Missing or invalid required string argument: ${propertyName}`
-    );
-  }
-  return value;
-};
-
-const makeGenericFailure = (message: string): EditorFunctionGenericOutput => ({
-  success: false,
-  message,
-});
-
-const getSceneNotFoundMessage = (
-  project: gdProject,
-  sceneName: string
-): string => {
-  const sceneNames = mapFor(
-    0,
-    project.getLayoutsCount(),
-    i => `"${project.getLayoutAt(i).getName()}"`
-  );
-  return (
-    `Scene not found: "${sceneName}". ` +
-    (sceneNames.length > 0
-      ? `Scenes in this project: ${sceneNames.join(', ')}.`
-      : 'The project has no scenes.')
-  );
-};
-
-const makeSceneNotFoundFailure = (
-  project: gdProject,
-  sceneName: string
-): EditorFunctionGenericOutput =>
-  makeGenericFailure(getSceneNotFoundMessage(project, sceneName));
-
 const injectObjectSizeInfo = (
   output: EditorFunctionGenericOutput,
   objectSizeInfoByName: { [string]: ObjectSizeInfo | null }
@@ -522,14 +705,45 @@ const injectObjectSizeInfo = (
 };
 
 const INSTANCE_POSITION_SEMANTICS_MESSAGE =
-  'Each instance x;y;z is its origin, NOT its center. Unless `objectSizeInfo` indicates a custom origin, the origin is the minimum corner: an instance occupies x to x+width, y to y+height and (in 3D) z to z+depth, so its center is at position + size/2. To center an instance A on top of an instance B: A.x = B.x + (B.width - A.width)/2, A.y = B.y + (B.height - A.height)/2, A.z = B.z + B.depth.';
+  'Instance x;y;z specify the origin position before rotation or flipping. ' +
+  '`objectSizeInfo.originX/Y/Z` and `centerX/Y/Z` are offsets from the minimum corner of the unrotated, unflipped object box, at the default size. The center point is the rotation pivot and need not be the geometric midpoint. ' +
+  'For a resized instance, scale each origin and center offset by instanceSize/defaultSize on that axis, when the default size is known and nonzero. In the formulas below, A.originX/Y/Z and B.originX/Y/Z mean these scaled offsets, and width/height/depth mean actual instance dimensions. ' +
+  'Before rotation or flipping, an instance occupies x-originX to x-originX+width, and likewise on Y and Z. Its rotation pivot is at position-origin+center. ' +
+  'For unrotated, unflipped instances in the same coordinate space, center the bounding box of A above that of B using: A.x = B.x - B.originX + (B.width - A.width)/2 + A.originX; A.y = B.y - B.originY + (B.height - A.height)/2 + A.originY; A.z = B.z - B.originZ + B.depth + A.originZ. ' +
+  'For rotated or flipped instances, compute the transformed bounds before positioning them.';
+
+// Inside a custom object, positions are local to it: without this the AI
+// would place children in scene coordinates.
+const CUSTOM_OBJECT_INSTANCE_POSITION_SEMANTICS_MESSAGE =
+  'These instances are the children of a custom object: they live in its own space, where (0;0) is its origin (they are never scene coordinates). ' +
+  'The default size of the custom object is its area (areaMinX to areaMaxX, areaMinY to areaMaxY, areaMinZ to areaMaxZ) when the variant defines one, otherwise the bounding box of the children. ' +
+  'The custom object turns around the CENTER of that area (unless its own events set another center of rotation), so make the area symmetric (areaMin = -areaMax on an axis) for an object rotating around its own position, like a turret. ' +
+  'At runtime the custom object places its children with its whole transform (its position, its angle around that center of rotation, its scale and its flips): a position taken out of the custom object (returned by one of its functions, given to a scene action) is NOT a scene position until it is converted with all of these. ' +
+  '`change_custom_object({ fit_area_to_children })` sets the area from the children for you. ' +
+  'Resizing an instance of the custom object scales its children proportionally, unless `isInnerAreaFollowingParentSize` is set (children then keep their position and the area follows the parent size - the UI/layout case). ' +
+  'Rotation and flipping are applied by the parent, and in 3D the z of a child is relative to the z of the parent. ' +
+  'Layers are internal to the custom object (at runtime children are reported on the layer of the parent) and the z-order of children is relative inside the parent. ' +
+  INSTANCE_POSITION_SEMANTICS_MESSAGE;
+
+const roundPosition = (value: number) => Math.round(value * 100) / 100;
+
+/** The size an instance really has, falling back on the one of its object. */
+const getInstanceSize = (
+  instance: gdInitialInstance,
+  objectSize: $ReadOnlyArray<number>
+): Array<number> =>
+  objectSize.map((size, axis) => {
+    if (axis === 2)
+      return instance.hasCustomDepth() ? instance.getCustomDepth() : size;
+    if (!instance.hasCustomSize()) return size;
+    return axis === 0 ? instance.getCustomWidth() : instance.getCustomHeight();
+  });
 
 const getOccupiedSpaceDescription = (
   position: $ReadOnlyArray<number>,
   size: $ReadOnlyArray<number>,
   objectSizeInfo: ObjectSizeInfo | null
 ): string => {
-  const round = (value: number) => Math.round(value * 100) / 100;
   const axes = ['X', 'Y', 'Z'];
   const originOffsets = [0, 0, 0];
   if (objectSizeInfo) {
@@ -555,15 +769,134 @@ const getOccupiedSpaceDescription = (
   return size
     .map((sizeOnAxis, i) => {
       const min = position[i] - originOffsets[i];
-      return `${axes[i]} ${round(min)} to ${round(min + sizeOnAxis)}`;
+      return `${axes[i]} ${roundPosition(min)} to ${roundPosition(
+        min + sizeOnAxis
+      )}`;
     })
     .join(', ');
+};
+
+const isModel3DObjectWithoutModel = (object: gdObject): boolean => {
+  const properties = object.getConfiguration().getProperties();
+  return (
+    properties.has('modelResourceName') &&
+    !properties.get('modelResourceName').getValue()
+  );
+};
+
+/**
+ * The anchor a `put_2d_instances`/`put_3d_instances` call asks for, checked
+ * against the anchors of that brush and against what is known of the object:
+ * any anchor but `origin` needs its box, which an object with no size of its
+ * own or a 3D model that could not be read does not give.
+ */
+const resolveInstanceAnchor = ({
+  args,
+  allowedAnchors,
+  object,
+  objectName,
+  project,
+  objectSizeInfo,
+  size,
+}: {|
+  args: any,
+  allowedAnchors: $ReadOnlyArray<string>,
+  object: gdObject | null,
+  objectName: string | null,
+  project: gdProject,
+  objectSizeInfo: ObjectSizeInfo | null,
+  size: $ReadOnlyArray<number> | null,
+|}):
+  | {| success: true, anchor: InstanceAnchor |}
+  | {| success: false, failure: EditorFunctionGenericOutput |} => {
+  const anchorName = SafeExtractor.extractStringProperty(
+    args,
+    'brush_position_anchor'
+  );
+  if (!anchorName) return { success: true, anchor: 'origin' };
+  if (!allowedAnchors.includes(anchorName)) {
+    return {
+      success: false,
+      failure: makeGenericFailure(
+        `\`brush_position_anchor\` must be one of: ${allowedAnchors.join(
+          ', '
+        )} (got "${anchorName}").`
+      ),
+    };
+  }
+  const anchor = ((anchorName: any): InstanceAnchor);
+  if (anchor === 'origin') return { success: true, anchor };
+
+  const isModelRead = !object || isModel3DObjectMeasured(object, project);
+  if (!size || !isModelRead || !getAnchorOffset(anchor, size, objectSizeInfo)) {
+    const unknownBoxReason = isModelRead
+      ? ''
+      : object && isModel3DObjectWithoutModel(object)
+      ? ' (it has no 3D model: set its `modelResourceName` property first)'
+      : ' (its 3D model could not be read)';
+    return {
+      success: false,
+      failure: makeGenericFailure(
+        `\`brush_position_anchor: "${anchor}"\` needs the box of ${
+          objectName ? `"${objectName}"` : 'the object'
+        }, which is unknown${unknownBoxReason}. Give the instances a size with \`instances_size\`, or place them by their \`origin\` (the default anchor).`
+      ),
+    };
+  }
+  return { success: true, anchor };
+};
+
+// A custom object renders its child INSTANCES, not its child objects: a
+// variant declaring children with no instance placed renders nothing at all
+// (and the engine falls back to a 1x1x1 size, so nothing is visible and no
+// geometry is right). Said on every edit of such a variant, because the AI
+// reads the result of its last call more surely than the project.
+const getVariantWithoutInstancesNotice = (
+  resolvedScope: ResolvedScope
+): string => {
+  const { variant, objectsContainer, initialInstances, label } = resolvedScope;
+  if (!variant || !objectsContainer || !initialInstances) return '';
+  const childObjectsCount = objectsContainer.getObjectsCount();
+  if (childObjectsCount === 0 || initialInstances.getInstancesCount() > 0)
+    return '';
+  return ` ${label} has ${childObjectsCount} child object(s) but no instance placed: it renders nothing and its size falls back to 1x1x1. Place them with \`put_3d_instances\`/\`put_2d_instances\` on this same \`custom_object_variant\` scope.`;
+};
+
+const VARIANT_WITHOUT_INSTANCES_HINT_CODE = 'custom-object-has-no-instance';
+
+/**
+ * The same warning, as a hint aggregated across a whole script. Hints are
+ * reported after the script ran, when instances may have been placed since:
+ * it asks for a check instead of stating a state that could be stale.
+ */
+const addVariantWithoutInstancesHint = (
+  output: EditorFunctionGenericOutput,
+  resolvedScope: ResolvedScope
+): EditorFunctionGenericOutput => {
+  if (!getVariantWithoutInstancesNotice(resolvedScope)) return output;
+  const hint: HintEntry = {
+    code: VARIANT_WITHOUT_INSTANCES_HINT_CODE,
+    message: `${
+      resolvedScope.label
+    } had child objects but no instance of them: a custom object renders its child instances, and with none it renders nothing. Check that each child now has at least one instance (\`describe_instances\` on this \`custom_object_variant\` scope, \`put_3d_instances\`/\`put_2d_instances\` to place them), then set its default size with \`change_custom_object({ fit_area_to_children })\`.`,
+    objectNames: [],
+  };
+  output.hints = output.hints ? [...output.hints, hint] : [hint];
+  return output;
 };
 
 const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
   success: true,
   message,
 });
+
+/**
+ * A failure of the scope resolution (or of a scope rule), as the output of an
+ * editor function.
+ */
+const makeScopeFailureOutput = (
+  failure: ScopeFailure
+): EditorFunctionGenericOutput => makeGenericFailure(failure.message);
 
 // Always tell the AI which asset was chosen, so it can verify the result
 // matches the user's request without extra inspection calls. The animations
@@ -651,14 +984,6 @@ const truncateValue = (value: string, limit: number = TRUNCATION_LIMIT) => {
   if (value.length <= limit) return value;
   return `${value.slice(0, limit)}[...truncated - ${value.length -
     limit} more characters]`;
-};
-
-const shouldHideProperty = (property: gdPropertyDescriptor): boolean => {
-  return (
-    property.isHidden() ||
-    property.isDeprecated() ||
-    property.getType() === 'Behavior' // No need to mess around with the "required behaviors", they are automatically filled.
-  );
 };
 
 const serializeNamedProperty = (
@@ -863,122 +1188,6 @@ const verifyPropertyChange = ({
   };
 };
 
-// Compact unit string: prefer the short symbol (e.g. "px", "deg") if it's
-// shorter than the full unit name (e.g. "Pixel", "DegreeAngle"). Returns null
-// if the property has no unit.
-const getShortMeasurementUnit = (
-  measurementUnit: gdMeasurementUnit
-): string | null => {
-  if (measurementUnit.isUndefined()) return null;
-  const name = measurementUnit.getName();
-  let shortLabel = '';
-  try {
-    const elementsCount = measurementUnit.getElementsCount();
-    for (let i = 0; i < elementsCount; i++) {
-      const baseUnit = measurementUnit.getElementBaseUnit(i);
-      const power = measurementUnit.getElementPower(i);
-      const symbol = baseUnit.getSymbol();
-      if (!symbol) continue;
-      shortLabel +=
-        (shortLabel ? '·' : '') + symbol + (power === 1 ? '' : `^${power}`);
-    }
-  } catch (_) {
-    // Defensive: if anything goes wrong, fall back to the name.
-    return name;
-  }
-  if (!shortLabel) return name;
-  return shortLabel.length < name.length ? shortLabel : name;
-};
-
-const getPropertyChoices = (
-  property: gdPropertyDescriptor
-): Array<string> | null => {
-  if (property.getType().toLowerCase() !== 'choice') return null;
-  return [
-    ...mapVector(property.getChoices(), choice => choice.getValue()),
-    // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
-    ...property.getExtraInfo().toJSArray(),
-  ];
-};
-
-// Builds a compact textual listing of properties optimized for LLM consumption:
-// - Boolean values omit the type tag (the value already implies it).
-// - Empty-valued properties are grouped at the end ("Empty: a, b (resource), c (string)").
-// - Number units use a short symbol ("px") when shorter than the full name ("Pixel").
-const formatPropertiesList = (
-  properties: gdMapStringPropertyDescriptor
-): string => {
-  const propertyNames = properties.keys().toJSArray();
-
-  const nonEmptyParts: Array<string> = [];
-  const emptyByType: Map<string, Array<string>> = new Map();
-
-  for (const name of propertyNames) {
-    const property = properties.get(name);
-    if (shouldHideProperty(property)) continue;
-
-    const rawType = property.getType();
-    const type = rawType.toLowerCase();
-    const value = property.getValue();
-    const unit = getShortMeasurementUnit(property.getMeasurementUnit());
-    const choices = getPropertyChoices(property);
-
-    // Booleans are always "true"/"false" - never grouped as empty.
-    if (type === 'boolean') {
-      nonEmptyParts.push(`${name}: ${value || 'false'}`);
-      continue;
-    }
-
-    if (value === '' || value === undefined) {
-      // Group empty properties by their descriptor (type + optional unit/choices).
-      const choicesText = choices
-        ? `one of: [${choices.map(c => `"${c}"`).join(', ')}]`
-        : null;
-      const resourceKind =
-        type === 'resource'
-          ? (property.getExtraInfo().toJSArray()[0] || '').toLowerCase()
-          : '';
-      const emptyFontNote =
-        resourceKind === 'font' ? ' — the default font is used' : '';
-      const tag =
-        [type, choicesText, unit].filter(Boolean).join(', ') + emptyFontNote;
-      const list = emptyByType.get(tag) || [];
-      list.push(name);
-      emptyByType.set(tag, list);
-      continue;
-    }
-
-    if (type === 'number') {
-      nonEmptyParts.push(
-        unit ? `${name}: ${value} (${unit})` : `${name}: ${value}`
-      );
-      continue;
-    }
-
-    const information = [
-      type,
-      choices ? `one of: [${choices.map(c => `"${c}"`).join(', ')}]` : null,
-      unit,
-    ]
-      .filter(Boolean)
-      .join(', ');
-    nonEmptyParts.push(
-      information ? `${name}: ${value} (${information})` : `${name}: ${value}`
-    );
-  }
-
-  const emptyParts: Array<string> = [];
-  for (const [tag, names] of emptyByType.entries()) {
-    emptyParts.push(tag ? `${names.join(', ')} (${tag})` : names.join(', '));
-  }
-
-  const segments = [];
-  if (nonEmptyParts.length > 0) segments.push(nonEmptyParts.join(', '));
-  if (emptyParts.length > 0) segments.push(`Empty: ${emptyParts.join(', ')}`);
-
-  return segments.join('. ');
-};
-
 const listLabelAndValuesFromChangedProperties = (
   changed_properties: Array<any>
 ) => {
@@ -1003,12 +1212,46 @@ const listLabelAndValuesFromChangedProperties = (
     .filter(Boolean);
 };
 
+// In the events of a custom object, `Object` designates the custom object
+// itself: a child with this name would be unreachable.
+const RESERVED_CHILD_OBJECT_NAME = 'Object';
+
+/**
+ * A child object can't be of the type of the custom object holding it, nor of
+ * a type (transitively) holding it: this would be an infinite nesting.
+ */
+const getCircularChildTypeRejection = (
+  project: gdProject,
+  resolvedScope: ResolvedScope,
+  objectType: ?string
+): EditorFunctionGenericOutput | null => {
+  const { eventsBasedObject } = resolvedScope;
+  if (!eventsBasedObject || !objectType) return null;
+  if (!project.hasEventsBasedObject(objectType)) return null;
+
+  const childEventsBasedObject = project.getEventsBasedObject(objectType);
+  if (
+    !gd.EventsBasedObjectDependencyFinder.isDependentFromEventsBasedObject(
+      project,
+      childEventsBasedObject,
+      eventsBasedObject
+    )
+  ) {
+    return null;
+  }
+  return makeGenericFailure(
+    `Cannot use type "${objectType}" for a child of ${
+      resolvedScope.label
+    }: "${objectType}" is (or contains) this custom object, which would be circular.`
+  );
+};
+
 /**
  * Creates a new object (in the specified scene or globally), or replaces an existing one, or duplicates an existing one.
  */
 const createOrReplaceObject: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const object_name = extractRequiredString(args, 'object_name');
     const replaceExistingObject = SafeExtractor.extractBooleanProperty(
       args,
@@ -1018,6 +1261,26 @@ const createOrReplaceObject: EditorFunction = {
       args,
       'duplicated_object_name'
     );
+
+    if (!scene_name) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text: replaceExistingObject ? (
+          <Trans>
+            Replace <b>{object_name}</b> in {scopeLabel}.
+          </Trans>
+        ) : duplicatedObjectName ? (
+          <Trans>
+            Duplicate <b>{duplicatedObjectName}</b> as <b>{object_name}</b> in{' '}
+            {scopeLabel}.
+          </Trans>
+        ) : (
+          <Trans>
+            Add <b>{object_name}</b> to {scopeLabel}.
+          </Trans>
+        ),
+      };
+    }
 
     return {
       text: replaceExistingObject ? (
@@ -1081,14 +1344,15 @@ const createOrReplaceObject: EditorFunction = {
     relatedAiRequestId,
     getRelatedAiRequestLastMessages,
     ensureExtensionInstalled,
+    ensureExtensionsUpToDate,
     searchAndInstallAsset,
     onObjectsModifiedOutsideEditor,
+    onExtensionsModifiedOutsideEditor,
     onWillInstallExtension,
     onExtensionInstalled,
     PixiResourcesLoader,
     getAssetStoreTagForNewObject,
   }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = SafeExtractor.extractStringProperty(
       args,
       'object_type'
@@ -1106,10 +1370,6 @@ const createOrReplaceObject: EditorFunction = {
       args,
       'duplicated_object_name'
     );
-    const duplicatedObjectScene = SafeExtractor.extractStringProperty(
-      args,
-      'duplicated_object_scene'
-    );
     const description = SafeExtractor.extractStringProperty(
       args,
       'description'
@@ -1124,19 +1384,91 @@ const createOrReplaceObject: EditorFunction = {
       'two_dimensional_view_kind'
     );
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: OBJECTS_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+    // Creating, replacing, moving or duplicating a child object changes the
+    // structure of the custom object: only the default variant owns it.
+    const namedVariantRejection = getNamedVariantRejection(resolvedScope);
+    if (namedVariantRejection)
+      return makeScopeFailureOutput(namedVariantRejection);
+
+    const { eventsBasedObject, eventsFunctionsExtension } = resolvedScope;
+    const scopeObjects = getScopeObjectsContainer(resolvedScope);
+    const globalObjects = resolvedScope.globalObjectsContainer;
+    const isTargetScopeGlobal = target_object_scope === 'global';
+
+    if (eventsBasedObject) {
+      if (target_object_scope && target_object_scope !== 'scene') {
+        return makeGenericFailure(
+          `\`target_object_scope\` only applies to scenes: a child of ${
+            resolvedScope.label
+          } is always local to it.`
+        );
+      }
+      if (targetObjectName === RESERVED_CHILD_OBJECT_NAME) {
+        return makeGenericFailure(
+          `"${RESERVED_CHILD_OBJECT_NAME}" is a reserved child name: in the events of ${
+            resolvedScope.label
+          } it designates the custom object itself. Use another \`object_name\`.`
+        );
+      }
     }
 
-    const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
+    // Children added to the default variant must be mirrored in the named
+    // variants, and the object functions must get their new parameters.
+    const complyAfterChildObjectAdded = () => {
+      if (!eventsBasedObject || !eventsFunctionsExtension) return;
+      complyVariantsAfterStructuralEdit(project, resolvedScope);
+      gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+        eventsFunctionsExtension,
+        eventsBasedObject
+      );
+    };
+
+    // A custom object draws its children with a 2D or a 3D renderer, chosen
+    // by its `isRenderedIn3D` setting: 3D children in a 2D one are not
+    // usable, and a 3D behavior on it breaks the game. Its first child
+    // decides, when the setting was left to its default.
+    const enable3DRenderingForAFirst3DChild = (child: gdObject): string => {
+      if (!eventsBasedObject || !eventsFunctionsExtension) return '';
+      if (eventsBasedObject.isRenderedIn3D()) return '';
+      if (scopeObjects.getObjectsCount() !== 1) return '';
+      const childMetadata = gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        child.getType()
+      );
+      if (
+        gd.MetadataProvider.isBadObjectMetadata(childMetadata) ||
+        !childMetadata.isRenderedIn3D()
+      )
+        return '';
+      eventsBasedObject.markAsRenderedIn3D(true);
+      onExtensionsModifiedOutsideEditor({
+        extensionNames: [eventsFunctionsExtension.getName()],
+        needsCodeRegeneration: true,
+      });
+      return ` The custom object "${eventsFunctionsExtension.getName()}::${eventsBasedObject.getName()}" is now rendered in 3D, as its first child is a 3D object.`;
+    };
+
+    const updateBehaviorsSharedDataForTarget = () => {
+      if (isTargetScopeGlobal) {
+        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+      } else {
+        updateBehaviorsSharedDataInScope(project, resolvedScope);
+      }
+    };
 
     const getPropertiesText = (object: gdObject): string => {
       const properties = object.getConfiguration().getProperties();
       const propertiesList = formatPropertiesList(properties);
-      return propertiesList
-        ? `Properties: ${propertiesList}.`
+      if (propertiesList) return `Properties: ${propertiesList}.`;
+      return object.getType() === 'Sprite'
+        ? 'This object type has no editable object properties: its animations and their images are in its raw JSON (`inspect_object_properties_effects` with `include_raw_json`, then `raw_json` of `change_object_properties_effects`).'
         : 'This object type has no editable object properties.';
     };
 
@@ -1144,16 +1476,23 @@ const createOrReplaceObject: EditorFunction = {
     let existingTargetObject: gdObject | null = null;
     let isTargetObjectGlobal = false;
 
-    if (layoutObjects.hasObjectNamed(targetObjectName)) {
-      existingTargetObject = layoutObjects.getObject(targetObjectName);
-    } else if (globalObjects.hasObjectNamed(targetObjectName)) {
+    if (scopeObjects.hasObjectNamed(targetObjectName)) {
+      existingTargetObject = scopeObjects.getObject(targetObjectName);
+    } else if (
+      globalObjects &&
+      globalObjects.hasObjectNamed(targetObjectName)
+    ) {
       existingTargetObject = globalObjects.getObject(targetObjectName);
       isTargetObjectGlobal = true;
     }
 
+    const existingTargetObjectScopeText = isTargetObjectGlobal
+      ? 'globally'
+      : `in ${resolvedScope.label}`;
+
     let existingObjectShouldBeMoved = false;
     if (existingTargetObject) {
-      if (target_object_scope === 'global' && !isTargetObjectGlobal) {
+      if (isTargetScopeGlobal && !isTargetObjectGlobal) {
         existingObjectShouldBeMoved = true;
       } else if (target_object_scope === 'scene' && isTargetObjectGlobal) {
         existingObjectShouldBeMoved = true;
@@ -1173,12 +1512,17 @@ const createOrReplaceObject: EditorFunction = {
       existingTargetObjectType !== object_type
     ) {
       return makeGenericFailure(
-        `Object "${targetObjectName}" already exists ${
-          isTargetObjectGlobal ? 'globally' : `in scene "${scene_name}"`
-        } with type "${existingTargetObjectType}". Cannot (re)create as type "${object_type}".`
+        `Object "${targetObjectName}" already exists ${existingTargetObjectScopeText} with type "${existingTargetObjectType}". Cannot (re)create as type "${object_type}".`
       );
     }
     const candidateType = object_type || existingTargetObjectType || null;
+
+    const circularTypeRejection = getCircularChildTypeRejection(
+      project,
+      resolvedScope,
+      candidateType
+    );
+    if (circularTypeRejection) return circularTypeRejection;
 
     const createNewObject = async () => {
       if (existingTargetObject) {
@@ -1186,7 +1530,7 @@ const createOrReplaceObject: EditorFunction = {
         // /!\ Tell the editor that some objects have potentially been modified (and even removed).
         // This will force the objects panel to refresh.
         onObjectsModifiedOutsideEditor({
-          scene: layout,
+          ...getOutsideEditorChangesTarget(resolvedScope),
           isNewObjectTypeUsed: false, // No object was actually added.
         });
         return makeGenericSuccess(
@@ -1195,21 +1539,29 @@ const createOrReplaceObject: EditorFunction = {
       }
 
       const targetObjectsContainer =
-        target_object_scope === 'global' ? globalObjects : layoutObjects;
-      const targetScopeText =
-        target_object_scope === 'global' ? 'global' : `scene "${scene_name}"`;
+        isTargetScopeGlobal && globalObjects ? globalObjects : scopeObjects;
+      const targetScopeText = isTargetScopeGlobal
+        ? 'global'
+        : resolvedScope.label;
 
       // If no search_terms or asset_id were provided but the object type has
       // an `assetStoreTag` (i.e. the type is mainly meant to be picked from
-      // the asset store, e.g. premade UI objects), use the tag as default
-      // search terms.
+      // the asset store, e.g. premade UI objects or particle emitters), use the
+      // tag as default search terms, with the object name which often tells
+      // what is wanted (e.g. "Rain_3D" for a 3D particle emitter).
       let effectiveSearchTerms = search_terms;
       let assetSearchMissed = false;
       let assetStoreTag: string | null = null;
       if (candidateType && !effectiveSearchTerms && !asset_id) {
         assetStoreTag = getAssetStoreTagForNewObject(candidateType);
         if (assetStoreTag) {
-          effectiveSearchTerms = `${assetStoreTag}, default`;
+          const objectNameWords = targetObjectName
+            .replace(/_/g, ' ')
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .trim();
+          effectiveSearchTerms = [assetStoreTag, objectNameWords, 'default']
+            .filter(Boolean)
+            .join(', ');
         }
       }
 
@@ -1250,21 +1602,21 @@ const createOrReplaceObject: EditorFunction = {
           } else if (status === 'asset-installed') {
             // Update behaviors shared data for the scene where the object was created.
             // Assets from the store can come with behaviors that have shared data.
-            if (target_object_scope === 'global') {
-              gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
-            } else {
-              layout.updateBehaviorsSharedData(project);
-            }
+            updateBehaviorsSharedDataForTarget();
+            complyAfterChildObjectAdded();
 
             // /!\ Tell the editor that some objects have potentially been modified (and even removed).
             // This will force the objects panel to refresh.
             onObjectsModifiedOutsideEditor({
-              scene: layout,
+              ...getOutsideEditorChangesTarget(resolvedScope),
               isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
             });
 
             if (createdObjects.length === 1) {
               const object = createdObjects[0];
+              const renderedIn3DNotice = enable3DRenderingForAFirst3DChild(
+                object
+              );
               const renamedNotice =
                 object.getName() !== targetObjectName
                   ? ` (requested name "${targetObjectName}" was taken; use "${object.getName()}" from now on)`
@@ -1272,20 +1624,28 @@ const createOrReplaceObject: EditorFunction = {
               const result: EditorFunctionGenericOutput = {
                 success: true,
                 message: [
-                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}${getUsedAssetText(
+                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}${renderedIn3DNotice}${getUsedAssetText(
                     assetShortHeader
-                  )}`,
+                  )}${getVariantWithoutInstancesNotice(resolvedScope)}`,
                   getPropertiesText(object),
                 ].join(' '),
               };
-              return injectObjectSizeInfo(result, {
-                [object.getName()]: getObjectSizeInfo(
-                  object,
-                  project,
-                  PixiResourcesLoader,
-                  assetShortHeader
-                ),
-              });
+              await ensureModel3DMeasurementLoaded(
+                object,
+                project,
+                PixiResourcesLoader
+              );
+              return addVariantWithoutInstancesHint(
+                injectObjectSizeInfo(result, {
+                  [object.getName()]: getObjectSizeInfo(
+                    object,
+                    project,
+                    PixiResourcesLoader,
+                    assetShortHeader
+                  ),
+                }),
+                resolvedScope
+              );
             }
 
             return makeGenericSuccess(
@@ -1293,12 +1653,14 @@ const createOrReplaceObject: EditorFunction = {
                 .map(
                   object => `"${object.getName()}" (type "${object.getType()}")`
                 )
-                .join(', ')}.${getUsedAssetText(assetShortHeader)}`
+                .join(', ')}.${getUsedAssetText(
+                assetShortHeader
+              )}${getVariantWithoutInstancesNotice(resolvedScope)}`
             );
           } else {
             if (asset_id) {
               return makeGenericFailure(
-                `No asset found with id "${asset_id}". Object not created.`
+                `No object found with id "${asset_id}" (${message}). Object not created.`
               );
             }
 
@@ -1331,8 +1693,13 @@ const createOrReplaceObject: EditorFunction = {
           `Could not install asset for "${targetObjectName}", and no "object_type" provided to create from scratch.`
         );
       }
-      // Ensure the extension for this object type is installed.
-      if (candidateType.includes('::')) {
+      // A custom object of the project may have just been authored: its
+      // metadata only exists once the extensions are regenerated. It is not
+      // in the store registry, so there is nothing to install for it.
+      if (isTypeOfProjectExtension(project, candidateType)) {
+        await ensureExtensionsUpToDate();
+      } else if (candidateType.includes('::')) {
+        // Ensure the extension for this object type is installed.
         const extensionName = candidateType.split('::')[0];
         try {
           await ensureExtensionInstalled({
@@ -1350,7 +1717,6 @@ const createOrReplaceObject: EditorFunction = {
           );
         }
       }
-
       // Ensure the object type is valid.
       const objectMetadata = gd.MetadataProvider.getObjectMetadata(
         project.getCurrentPlatform(),
@@ -1372,10 +1738,12 @@ const createOrReplaceObject: EditorFunction = {
         targetObjectName,
         targetObjectsContainer.getObjectsCount()
       );
+      complyAfterChildObjectAdded();
+      const renderedIn3DNotice = enable3DRenderingForAFirst3DChild(object);
       // /!\ Tell the editor that some objects have potentially been modified (and even removed).
       // This will force the objects panel to refresh.
       onObjectsModifiedOutsideEditor({
-        scene: layout,
+        ...getOutsideEditorChangesTarget(resolvedScope),
         isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
       });
 
@@ -1386,17 +1754,27 @@ const createOrReplaceObject: EditorFunction = {
       const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
-          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.${scratchNotice}`,
+          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.${scratchNotice}${renderedIn3DNotice}${getVariantWithoutInstancesNotice(
+            resolvedScope
+          )}`,
           getPropertiesText(object),
         ].join(' '),
       };
-      return injectObjectSizeInfo(scratchResult, {
-        [targetObjectName]: getObjectSizeInfo(
-          object,
-          project,
-          PixiResourcesLoader
-        ),
-      });
+      await ensureModel3DMeasurementLoaded(
+        object,
+        project,
+        PixiResourcesLoader
+      );
+      return addVariantWithoutInstancesHint(
+        injectObjectSizeInfo(scratchResult, {
+          [targetObjectName]: getObjectSizeInfo(
+            object,
+            project,
+            PixiResourcesLoader
+          ),
+        }),
+        resolvedScope
+      );
     };
 
     const replaceExistingObject = async () => {
@@ -1419,11 +1797,10 @@ const createOrReplaceObject: EditorFunction = {
         );
       }
 
-      const objectsContainerWhereObjectWasFound = isTargetObjectGlobal
-        ? globalObjects
-        : layoutObjects;
+      const objectsContainerWhereObjectWasFound =
+        isTargetObjectGlobal && globalObjects ? globalObjects : scopeObjects;
       const targetObjectsContainer =
-        target_object_scope === 'global'
+        isTargetScopeGlobal && globalObjects
           ? globalObjects
           : objectsContainerWhereObjectWasFound;
 
@@ -1475,12 +1852,12 @@ const createOrReplaceObject: EditorFunction = {
           // /!\ Tell the editor that some objects have potentially been modified (and even removed).
           // This will force the objects panel to refresh.
           onObjectsModifiedOutsideEditor({
-            scene: layout,
+            ...getOutsideEditorChangesTarget(resolvedScope),
             isNewObjectTypeUsed: false, // The object type was not changed.
           });
           return makeGenericSuccess(
             `Replaced ${
-              isTargetObjectGlobal ? 'global' : `scene "${scene_name}"`
+              isTargetObjectGlobal ? 'global' : resolvedScope.label
             } object "${existingTargetObject.getName()}" with asset store object (same type "${existingTargetObject.getType()}").${getUsedAssetText(
               assetShortHeader
             )}`
@@ -1505,61 +1882,66 @@ const createOrReplaceObject: EditorFunction = {
       }
 
       return makeGenericFailure(
-        `No asset store match for "${targetObjectName}" in scene "${scene_name}". Instead, inspect and modify the object's properties to match what you need.`
+        `No asset store match for "${targetObjectName}" in ${
+          resolvedScope.label
+        }. Instead, inspect and modify the object's properties to match what you need.`
       );
     };
 
     const duplicateExistingObject = (
       duplicatedObjectName: string,
-      duplicatedObjectSceneName: string | null
+      duplicatedFromScope: ResolvedScope
     ) => {
       // `insertNewObject` does not enforce name uniqueness: duplicating onto a
       // taken name would silently corrupt the project with two objects sharing
       // the same name.
       if (existingTargetObject) {
         return makeGenericFailure(
-          `Object "${targetObjectName}" already exists ${
-            isTargetObjectGlobal ? 'globally' : `in scene "${scene_name}"`
-          }. Not duplicated. Use another \`object_name\`, or delete the existing object first.`
+          `Object "${targetObjectName}" already exists ${existingTargetObjectScopeText}. Not duplicated. Use another \`object_name\`, or delete the existing object first.`
         );
       }
 
-      if (
-        duplicatedObjectSceneName &&
-        !project.hasLayoutNamed(duplicatedObjectSceneName)
-      ) {
-        return makeGenericFailure(
-          `${getSceneNotFoundMessage(
-            project,
-            duplicatedObjectSceneName
-          )} Not duplicated.`
-        );
-      }
-
-      const duplicatedObjectScene = duplicatedObjectSceneName
-        ? project.getLayout(duplicatedObjectSceneName)
-        : layout;
-      const duplicatedObjectSceneObjects = duplicatedObjectScene.getObjects();
+      const duplicatedFromObjects = getScopeObjectsContainer(
+        duplicatedFromScope
+      );
+      const duplicatedFromGlobalObjects =
+        duplicatedFromScope.globalObjectsContainer;
 
       let isDuplicatedObjectGlobal = false;
       let duplicatedObject: gdObject | null = null;
-      if (duplicatedObjectSceneObjects.hasObjectNamed(duplicatedObjectName)) {
-        duplicatedObject = duplicatedObjectSceneObjects.getObject(
+      if (duplicatedFromObjects.hasObjectNamed(duplicatedObjectName)) {
+        duplicatedObject = duplicatedFromObjects.getObject(
           duplicatedObjectName
         );
-      } else if (globalObjects.hasObjectNamed(duplicatedObjectName)) {
-        duplicatedObject = globalObjects.getObject(duplicatedObjectName);
+      } else if (
+        duplicatedFromGlobalObjects &&
+        duplicatedFromGlobalObjects.hasObjectNamed(duplicatedObjectName)
+      ) {
+        duplicatedObject = duplicatedFromGlobalObjects.getObject(
+          duplicatedObjectName
+        );
         isDuplicatedObjectGlobal = true;
       }
 
       if (!duplicatedObject) {
         return makeGenericFailure(
-          `Object "${duplicatedObjectName}" not found in scene "${duplicatedObjectScene.getName()}" nor globally. Not duplicated.`
+          `Object "${duplicatedObjectName}" not found ${getObjectLookupScopeText(
+            duplicatedFromScope
+          )}. Not duplicated.`
         );
       }
 
+      const duplicatedCircularTypeRejection = getCircularChildTypeRejection(
+        project,
+        resolvedScope,
+        duplicatedObject.getType()
+      );
+      if (duplicatedCircularTypeRejection) {
+        return duplicatedCircularTypeRejection;
+      }
+
       const targetObjectsContainer =
-        target_object_scope === 'global' ? globalObjects : layoutObjects;
+        isTargetScopeGlobal && globalObjects ? globalObjects : scopeObjects;
 
       const serializedObject = serializeToJSObject(duplicatedObject);
       const newObject = targetObjectsContainer.insertNewObject(
@@ -1578,51 +1960,57 @@ const createOrReplaceObject: EditorFunction = {
       newObject.resetPersistentUuid();
 
       // Update behaviors shared data for the scene where the object was duplicated.
-      if (target_object_scope === 'global') {
-        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
-      } else {
-        layout.updateBehaviorsSharedData(project);
-      }
+      updateBehaviorsSharedDataForTarget();
+      complyAfterChildObjectAdded();
+      const renderedIn3DNotice = enable3DRenderingForAFirst3DChild(newObject);
 
       // /!\ Tell the editor that some objects have potentially been modified (and even removed).
       // This will force the objects panel to refresh.
       onObjectsModifiedOutsideEditor({
-        scene: layout,
+        ...getOutsideEditorChangesTarget(resolvedScope),
         isNewObjectTypeUsed: false, // The object type can't be new because it is duplicated.
       });
 
       const fromText = isDuplicatedObjectGlobal
         ? 'global objects'
-        : `scene "${duplicatedObjectScene.getName()}"`;
-      const toText =
-        target_object_scope === 'global'
-          ? 'global objects'
-          : `scene "${scene_name}"`;
+        : duplicatedFromScope.label;
+      const toText = isTargetScopeGlobal
+        ? 'global objects'
+        : resolvedScope.label;
       return makeGenericSuccess(
-        `Duplicated "${duplicatedObjectName}" (${fromText}) as "${newObject.getName()}" (${toText}); same type/behaviors/properties/effects.`
+        `Duplicated "${duplicatedObjectName}" (${fromText}) as "${newObject.getName()}" (${toText}); same type/behaviors/properties/effects.${renderedIn3DNotice}${getVariantWithoutInstancesNotice(
+          resolvedScope
+        )}`
       );
     };
 
     const moveExistingObject = () => {
-      const existingTargetObjectFolderOrObject = getObjectFolderOrObjectWithContextFromObjectName(
-        globalObjects,
-        layoutObjects,
-        existingTargetObject ? existingTargetObject.getName() : ''
-      );
-      if (!existingTargetObjectFolderOrObject || !existingTargetObject) {
+      const existingTargetObjectFolderOrObject =
+        globalObjects && existingTargetObject
+          ? getObjectFolderOrObjectWithContextFromObjectName(
+              globalObjects,
+              scopeObjects,
+              existingTargetObject.getName()
+            )
+          : null;
+      if (
+        !existingTargetObjectFolderOrObject ||
+        !existingTargetObject ||
+        !globalObjects
+      ) {
         throw new Error(
           "Internal error: can't locate the existing object to be moved."
         );
       }
 
-      if (target_object_scope === 'global' && !isTargetObjectGlobal) {
+      if (isTargetScopeGlobal && !isTargetObjectGlobal) {
         if (globalObjects.hasObjectNamed(existingTargetObject.getName())) {
           return makeGenericFailure(
             `Object "${existingTargetObject.getName()}" already exists globally. No change.`
           );
         }
 
-        layoutObjects.moveObjectFolderOrObjectToAnotherContainerInFolder(
+        scopeObjects.moveObjectFolderOrObjectToAnotherContainerInFolder(
           existingTargetObjectFolderOrObject.objectFolderOrObject,
           globalObjects,
           globalObjects.getRootFolder(),
@@ -1634,7 +2022,7 @@ const createOrReplaceObject: EditorFunction = {
         // /!\ Tell the editor that some objects have potentially been modified (and even removed).
         // This will force the objects panel to refresh.
         onObjectsModifiedOutsideEditor({
-          scene: layout,
+          ...getOutsideEditorChangesTarget(resolvedScope),
           isNewObjectTypeUsed: false, // The object type was not changed.
         });
 
@@ -1643,7 +2031,9 @@ const createOrReplaceObject: EditorFunction = {
         );
       } else if (target_object_scope === 'scene' && isTargetObjectGlobal) {
         return makeGenericFailure(
-          `"${existingTargetObject.getName()}" is global; global objects cannot be moved to scene "${scene_name}".`
+          `"${existingTargetObject.getName()}" is global; global objects cannot be moved to ${
+            resolvedScope.label
+          }.`
         );
       }
 
@@ -1657,10 +2047,27 @@ const createOrReplaceObject: EditorFunction = {
     } else if (shouldReplaceExistingObject) {
       return replaceExistingObject();
     } else if (duplicatedObjectName) {
-      return duplicateExistingObject(
-        duplicatedObjectName,
-        duplicatedObjectScene
+      // The duplicated object can come from another container than the target
+      // one (a scene object copied into a custom object as a child...).
+      const duplicatedFromScope = resolveScopeFromArgs(
+        project,
+        {
+          scope: args ? args.duplicated_object_scope : null,
+          duplicated_object_scene: args ? args.duplicated_object_scene : null,
+        },
+        {
+          // A scene, or a variant of a custom object (its child objects).
+          allowedTypes: OBJECTS_SCOPE_TYPES,
+          legacySceneNameField: 'duplicated_object_scene',
+          defaultScope: resolvedScope.scope,
+        }
       );
+      if (duplicatedFromScope.success === false) {
+        return makeGenericFailure(
+          `${duplicatedFromScope.message} Not duplicated.`
+        );
+      }
+      return duplicateExistingObject(duplicatedObjectName, duplicatedFromScope);
     } else {
       return createNewObject();
     }
@@ -1712,7 +2119,7 @@ type MissingLibraryResource = {|
  */
 const applyObjectPropertyChange = ({
   project,
-  layout,
+  resolvedScope,
   object,
   isGlobalObject,
   object_name,
@@ -1722,7 +2129,7 @@ const applyObjectPropertyChange = ({
   missingLibraryResources,
 }: {
   project: gdProject,
-  layout: gdLayout,
+  resolvedScope: ResolvedScope,
   object: gdObject,
   isGlobalObject: boolean,
   object_name: string,
@@ -1755,15 +2162,22 @@ const applyObjectPropertyChange = ({
       return;
     }
 
-    const objectsContainersList = gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+    const { layout, eventsBasedObject } = resolvedScope;
+    if (eventsBasedObject && newValue === RESERVED_CHILD_OBJECT_NAME) {
+      changes.push(
+        `"${RESERVED_CHILD_OBJECT_NAME}" is a reserved child name: in the events of ${
+          resolvedScope.label
+        } it designates the custom object itself. Skipped.`
+      );
+      return;
+    }
+    const newName = withScopeObjectsContainersList(
       project,
-      layout
-    );
-
-    const newName = newNameGenerator(
-      gd.Project.getSafeName(newValue),
-      tentativeNewName =>
-        objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
+      resolvedScope,
+      objectsContainersList =>
+        newNameGenerator(gd.Project.getSafeName(newValue), tentativeNewName =>
+          objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
+        )
     );
 
     if (layout) {
@@ -1783,9 +2197,25 @@ const applyObjectPropertyChange = ({
           /* isObjectGroup=*/ false
         );
       }
+    } else if (eventsBasedObject) {
+      const { accessor, dispose } = makeScopeProjectScopedContainersAccessor(
+        project,
+        resolvedScope,
+        null
+      );
+      try {
+        gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
+          project,
+          accessor.get(),
+          eventsBasedObject,
+          object.getName(),
+          newName,
+          /* isObjectGroup=*/ false
+        );
+      } finally {
+        dispose();
+      }
     }
-    // Note: gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject to be added here
-    // if events-based objects can be handled by AI one day.
 
     object.setName(newName);
 
@@ -1969,8 +2399,19 @@ const applyObjectPropertyChange = ({
  */
 const inspectObjectPropertiesEffects: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const object_name = extractRequiredString(args, 'object_name');
+
+    if (!scene_name) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text: (
+          <Trans>
+            Read <b>{object_name}</b>'s properties in {scopeLabel}.
+          </Trans>
+        ),
+      };
+    }
 
     return {
       text: (
@@ -1994,28 +2435,30 @@ const inspectObjectPropertiesEffects: EditorFunction = {
     };
   },
   launchFunction: async ({ project, args, PixiResourcesLoader }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: OBJECTS_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
 
-    const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
+    const scopeObjects = getScopeObjectsContainer(resolvedScope);
+    const globalObjects = resolvedScope.globalObjectsContainer;
 
     let object: gdObject | null = null;
 
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
+    if (scopeObjects.hasObjectNamed(object_name)) {
+      object = scopeObjects.getObject(object_name);
+    } else if (globalObjects && globalObjects.hasObjectNamed(object_name)) {
       object = globalObjects.getObject(object_name);
     }
 
     if (!object) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object not found: "${object_name}" ${getObjectLookupScopeText(
+          resolvedScope
+        )}.`
       );
     }
 
@@ -2077,18 +2520,44 @@ const inspectObjectPropertiesEffects: EditorFunction = {
       objectName: object_name,
       properties,
       behaviors,
-      objectPropertiesDeduplicationKey: [scene_name, object_name]
+      objectPropertiesDeduplicationKey: [
+        resolvedScope.scope.type === 'scene'
+          ? resolvedScope.scope.scene_name
+          : resolvedScope.label,
+        object_name,
+      ]
         .filter(Boolean)
         .join('-'),
     };
     if (inspectParts.length > 0) {
       output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
     }
+    await ensureModel3DMeasurementLoaded(object, project, PixiResourcesLoader);
     injectObjectSizeInfo(output, {
       [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
     });
     if (animationNames.length > 0) {
       output.animationNames = animationNames.join(', ');
+    }
+
+    if (SafeExtractor.extractBooleanProperty(args, 'include_raw_json')) {
+      const rawJson = serializeToJSObject(objectConfiguration);
+      output.rawJson = rawJson;
+      output.message = getRawJsonNote(object, rawJson);
+      const frameImageSizes = await getFrameImageSizes(
+        project,
+        rawJson,
+        PixiResourcesLoader
+      );
+      if (frameImageSizes) output.frameImageSizes = frameImageSizes;
+      const modelAnimationSources = await getModelAnimationSources(
+        project,
+        rawJson,
+        PixiResourcesLoader
+      );
+      if (modelAnimationSources) {
+        output.modelAnimationSources = modelAnimationSources;
+      }
     }
 
     if (objectSupportsEffects(object)) {
@@ -2122,18 +2591,57 @@ const inspectObjectPropertiesEffects: EditorFunction = {
  */
 const changeObjectPropertiesEffects: EditorFunction = {
   renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const object_name = extractRequiredString(args, 'object_name');
 
     const deleteThisObject = SafeExtractor.extractBooleanProperty(
       args,
       'delete_this_object'
     );
+    if (!scene_name) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text: deleteThisObject ? (
+          <Trans>
+            Remove object <b>{object_name}</b> (in {scopeLabel}).
+          </Trans>
+        ) : (
+          <Trans>
+            Update <b>{object_name}</b> (in {scopeLabel}).
+          </Trans>
+        ),
+      };
+    }
     if (deleteThisObject) {
       return {
         text: (
           <Trans>
             Remove object <b>{object_name}</b> (in scene {scene_name}).
+          </Trans>
+        ),
+      };
+    }
+    if (args && args.raw_json !== undefined && args.raw_json !== null) {
+      return {
+        text: (
+          <Trans>
+            Update the animations and settings of <b>{object_name}</b> (in scene{' '}
+            {scene_name}).
+          </Trans>
+        ),
+      };
+    }
+    if (
+      (SafeExtractor.extractArrayProperty(args, 'renamed_animations') || [])
+        .length > 0 ||
+      (SafeExtractor.extractArrayProperty(args, 'renamed_points') || [])
+        .length > 0
+    ) {
+      return {
+        text: (
+          <Trans>
+            Rename animations or points of <b>{object_name}</b> (in scene{' '}
+            {scene_name}).
           </Trans>
         ),
       };
@@ -2282,35 +2790,44 @@ const changeObjectPropertiesEffects: EditorFunction = {
     onInstancesModifiedOutsideEditor,
     onWillDeleteObject,
     searchAndInstallResources,
+    PixiResourcesLoader,
   }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
     const changed_effects =
       SafeExtractor.extractArrayProperty(args, 'changed_effects') || [];
+    const raw_json = args ? args.raw_json : undefined;
+    const renamed_animations = args ? args.renamed_animations : undefined;
+    const renamed_points = args ? args.renamed_points : undefined;
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: OBJECTS_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
 
-    const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
+    const { layout, eventsBasedObject } = resolvedScope;
+    const scopeObjects = getScopeObjectsContainer(resolvedScope);
+    const globalObjects = resolvedScope.globalObjectsContainer;
 
     let object: gdObject | null = null;
     let isGlobalObject = false;
 
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
+    if (scopeObjects.hasObjectNamed(object_name)) {
+      object = scopeObjects.getObject(object_name);
+    } else if (globalObjects && globalObjects.hasObjectNamed(object_name)) {
       object = globalObjects.getObject(object_name);
       isGlobalObject = true;
     }
 
     if (!object) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object not found: "${object_name}" ${getObjectLookupScopeText(
+          resolvedScope
+        )}.`
       );
     }
 
@@ -2318,33 +2835,140 @@ const changeObjectPropertiesEffects: EditorFunction = {
       args,
       'delete_this_object'
     );
+    const isRawJsonMode = raw_json !== undefined && raw_json !== null;
+    // An empty list of renames is ignored; a value that is not a list is
+    // refused below.
+    const hasRenames = (renames: mixed) =>
+      renames !== undefined &&
+      renames !== null &&
+      (!Array.isArray(renames) || renames.length > 0);
+    const isRenamesMode =
+      hasRenames(renamed_animations) || hasRenames(renamed_points);
+    const isClassicMode =
+      changed_properties.length > 0 ||
+      changed_effects.length > 0 ||
+      !!deleteThisObject;
+    if (
+      [isRawJsonMode, isRenamesMode, isClassicMode].filter(Boolean).length > 1
+    ) {
+      return makeGenericFailure(
+        'Nothing was changed: `raw_json`, the renames (`renamed_animations`/`renamed_points`) and the other changes must be done in separate calls.'
+      );
+    }
+    if (isRawJsonMode && typeof raw_json !== 'string') {
+      return makeGenericFailure(
+        'Nothing was changed: `raw_json` must be a string: pass `JSON.stringify(rawJson)`.'
+      );
+    }
+    if (
+      isRenamesMode &&
+      (!Array.isArray(renamed_animations || []) ||
+        !Array.isArray(renamed_points || []))
+    ) {
+      return makeGenericFailure(
+        'Nothing was changed: `renamed_animations` and `renamed_points` must be arrays of {old_name, new_name}.'
+      );
+    }
+    if (isRawJsonMode || isRenamesMode) {
+      const result =
+        typeof raw_json === 'string'
+          ? await applyRawObjectConfiguration({
+              project,
+              resolvedScope,
+              object,
+              rawJson: raw_json,
+              PixiResourcesLoader,
+            })
+          : renameObjectAnimationsAndPoints({
+              project,
+              resolvedScope,
+              object,
+              renamedAnimations: renamed_animations || [],
+              renamedPoints: renamed_points || [],
+            });
+      if (!result.success) {
+        return makeGenericFailure(`Nothing was changed: ${result.message}`);
+      }
+      if (result.changes.length > 0) {
+        onObjectsModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(resolvedScope),
+          isNewObjectTypeUsed: false,
+        });
+      }
+      if (result.haveInstancesChanged) {
+        onInstancesModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(resolvedScope),
+        });
+      }
+      return makeMultipleChangesOutput(
+        result.changes,
+        result.warnings,
+        toolsVersion
+      );
+    }
+
+    // Deleting a child object, or renaming it, changes the structure of the
+    // custom object: only the default variant owns it.
+    const isRenamingObject = changed_properties.some(changed_property => {
+      const propertyName = SafeExtractor.extractStringProperty(
+        changed_property,
+        'property_name'
+      );
+      return !!propertyName && isPropertyForChangingObjectName(propertyName);
+    });
+    if (deleteThisObject || isRenamingObject) {
+      const namedVariantRejection = getNamedVariantRejection(resolvedScope);
+      if (namedVariantRejection)
+        return makeScopeFailureOutput(namedVariantRejection);
+    }
+
     if (deleteThisObject) {
       // Let editors close any dialog referring to this object BEFORE it's
       // actually removed, while it's still safe to read it.
-      onWillDeleteObject({ scene: layout, objectName: object_name });
+      onWillDeleteObject({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+        objectName: object_name,
+      });
 
-      if (isGlobalObject) {
+      if (isGlobalObject && globalObjects) {
         gd.WholeProjectRefactorer.globalObjectRemoved(project, object_name);
         globalObjects.removeObject(object_name);
-      } else {
+      } else if (layout) {
         gd.WholeProjectRefactorer.objectRemovedInScene(
           project,
           layout,
           object_name
         );
-        layoutObjects.removeObject(object_name);
+        scopeObjects.removeObject(object_name);
+      } else if (eventsBasedObject) {
+        gd.WholeProjectRefactorer.objectRemovedInEventsBasedObject(
+          project,
+          eventsBasedObject,
+          object_name
+        );
+        scopeObjects.removeObject(object_name);
+        complyVariantsAfterStructuralEdit(project, resolvedScope);
       }
 
       // Refresh instances/objects lists AFTER the removal, so they reflect
       // the final state (the instances hot-reload payload in particular is
       // built synchronously from current data when this is called).
-      onInstancesModifiedOutsideEditor({ scene: layout });
+      onInstancesModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+      });
       onObjectsModifiedOutsideEditor({
-        scene: layout,
+        ...getOutsideEditorChangesTarget(resolvedScope),
         isNewObjectTypeUsed: false,
       });
 
-      return makeGenericSuccess(`Deleted object "${object_name}".`);
+      return addVariantWithoutInstancesHint(
+        makeGenericSuccess(
+          `Deleted object "${object_name}".${getVariantWithoutInstancesNotice(
+            resolvedScope
+          )}`
+        ),
+        resolvedScope
+      );
     }
 
     const warnings: Array<string> = [];
@@ -2355,7 +2979,7 @@ const changeObjectPropertiesEffects: EditorFunction = {
       if (!object) return;
       applyObjectPropertyChange({
         project,
-        layout,
+        resolvedScope,
         object,
         isGlobalObject,
         object_name,
@@ -2365,6 +2989,10 @@ const changeObjectPropertiesEffects: EditorFunction = {
         missingLibraryResources,
       });
     });
+    if (isRenamingObject) {
+      // The named variants inherit the children of the default one.
+      complyVariantsAfterStructuralEdit(project, resolvedScope);
+    }
 
     let newlyAddedResources = null;
     if (missingLibraryResources.length > 0) {
@@ -2406,7 +3034,7 @@ const changeObjectPropertiesEffects: EditorFunction = {
           if (!object) continue;
           applyObjectPropertyChange({
             project,
-            layout,
+            resolvedScope,
             object,
             isGlobalObject,
             object_name,
@@ -2448,6 +3076,15 @@ const changeObjectPropertiesEffects: EditorFunction = {
       }
     }
 
+    // The 3D editor only sees the new properties when the objects are sent
+    // to it again.
+    if (changes.length > 0) {
+      onObjectsModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+        isNewObjectTypeUsed: false,
+      });
+    }
+
     return {
       ...makeMultipleChangesOutput(changes, warnings, toolsVersion),
       ...(newlyAddedResources && newlyAddedResources.length > 0
@@ -2465,34 +3102,35 @@ const changeObjectPropertiesEffects: EditorFunction = {
  * `objects` contains all its (resolvable) member objects and `group` is set.
  */
 const resolveObjectsFromContextAndName = ({
-  project,
-  layout,
+  objectsContainer,
+  globalObjectsContainer,
   objectOrGroupName,
 }: {|
-  project: gdProject,
-  layout: gdLayout,
+  // The objects of the scope (a scene, the children of a custom object...).
+  objectsContainer: gdObjectsContainer,
+  // The global objects when visible from the scope (a scene), else null.
+  globalObjectsContainer: gdObjectsContainer | null,
   objectOrGroupName: string,
 |}): {|
   objects: Array<gdObject>,
   group: gdObjectGroup | null,
 |} | null => {
-  const layoutObjects = layout.getObjects();
-  const globalObjects = project.getObjects();
-
   const object = getObjectByName(
-    globalObjects,
-    layoutObjects,
+    globalObjectsContainer,
+    objectsContainer,
     objectOrGroupName
   );
   if (object) {
     return { objects: [object], group: null };
   }
 
-  const sceneGroups = layoutObjects.getObjectGroups();
-  const globalGroups = globalObjects.getObjectGroups();
-  const group = sceneGroups.has(objectOrGroupName)
-    ? sceneGroups.get(objectOrGroupName)
-    : globalGroups.has(objectOrGroupName)
+  const scopeGroups = objectsContainer.getObjectGroups();
+  const globalGroups = globalObjectsContainer
+    ? globalObjectsContainer.getObjectGroups()
+    : null;
+  const group = scopeGroups.has(objectOrGroupName)
+    ? scopeGroups.get(objectOrGroupName)
+    : globalGroups && globalGroups.has(objectOrGroupName)
     ? globalGroups.get(objectOrGroupName)
     : null;
   if (group) {
@@ -2500,7 +3138,7 @@ const resolveObjectsFromContextAndName = ({
       .getAllObjectsNames()
       .toJSArray()
       .map(objectName =>
-        getObjectByName(globalObjects, layoutObjects, objectName)
+        getObjectByName(globalObjectsContainer, objectsContainer, objectName)
       )
       .filter(Boolean);
     return { objects, group };
@@ -2510,11 +3148,97 @@ const resolveObjectsFromContextAndName = ({
 };
 
 /**
+ * Whether a behavior can be added to a child object of a custom object: the
+ * behavior itself and the behaviors it requires must all be relevant for child
+ * objects (`BehaviorMetadata::MarkAsIrrelevantForChildObjects` in the engine).
+ */
+const isBehaviorRelevantForChildObjects = (
+  platform: gdPlatform,
+  behaviorMetadata: gdBehaviorMetadata
+): boolean =>
+  behaviorMetadata.isRelevantForChildObjects() &&
+  behaviorMetadata
+    .getRequiredBehaviorTypes()
+    .toJSArray()
+    .every(requiredBehaviorType => {
+      const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        platform,
+        requiredBehaviorType
+      );
+      return (
+        gd.MetadataProvider.isBadBehaviorMetadata(requiredBehaviorMetadata) ||
+        requiredBehaviorMetadata.isRelevantForChildObjects()
+      );
+    });
+
+/**
+ * A behavior can require capabilities of its object: hidden behaviors that
+ * objects of a kind have by default (the 3D one, the animatable one...). The
+ * IDE hides such a behavior for an object without them, as adding it breaks the
+ * game (a 3D physics body on an object without depth crashes at runtime).
+ * Returns the first capability the object lacks, if any.
+ */
+// The capabilities a custom object of the project gets from its settings.
+const CUSTOM_OBJECT_SETTING_NAME_BY_CAPABILITY_TYPE: {
+  [capabilityType: string]: string,
+} = {
+  'Scene3D::Base3DBehavior': 'isRenderedIn3D',
+  'AnimatableCapability::AnimatableBehavior': 'isAnimatable',
+  'TextContainerCapability::TextContainerBehavior': 'isTextContainer',
+};
+
+const getCustomObjectCapabilityHint = (
+  project: gdProject,
+  object: gdObject,
+  capabilityType: string
+): string => {
+  const settingName =
+    CUSTOM_OBJECT_SETTING_NAME_BY_CAPABILITY_TYPE[capabilityType];
+  if (!settingName || !isTypeOfProjectExtension(project, object.getType()))
+    return '';
+  return ` A custom object gets it when its "${settingName}" setting is "true" (\`change_custom_object\`, \`changed_settings\`).`;
+};
+
+const getMissingRequiredCapability = (
+  platform: gdPlatform,
+  behaviorMetadata: gdBehaviorMetadata,
+  object: gdObject
+): ?{| type: string, label: string |} => {
+  const objectBehaviorTypes = object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .map(name => object.getBehavior(name).getTypeName());
+  for (const requiredType of behaviorMetadata
+    .getRequiredBehaviorTypes()
+    .toJSArray()) {
+    const requiredMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      platform,
+      requiredType
+    );
+    // A visible required behavior is added along with the behavior (see
+    // `addBehaviorAndRequiredBehaviors`): only a capability must be there.
+    if (
+      gd.MetadataProvider.isBadBehaviorMetadata(requiredMetadata) ||
+      !requiredMetadata.isHidden()
+    )
+      continue;
+    if (!objectBehaviorTypes.includes(requiredType)) {
+      return {
+        type: requiredType,
+        label: requiredMetadata.getFullName() || requiredType,
+      };
+    }
+  }
+  return null;
+};
+
+/**
  * Adds a behavior to an object (or to all objects of a group) in a scene.
  */
 const addBehavior: EditorFunction = {
   renderForEditor: ({ project, args, editorCallbacks }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
+    const scopeLabel = getScopeLabelFromArgs(args);
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_type = extractRequiredString(args, 'behavior_type');
     const optionalBehaviorName = SafeExtractor.extractStringProperty(
@@ -2527,6 +3251,16 @@ const addBehavior: EditorFunction = {
     let behaviorName = optionalBehaviorName || behavior_type;
 
     const makeText = (behaviorTypeLabel: string) => {
+      if (!scene_name) {
+        return {
+          text: (
+            <Trans>
+              Add {behaviorName} (<b>{behaviorTypeLabel}</b>) behavior to{' '}
+              <b>{object_name}</b> in {scopeLabel}.
+            </Trans>
+          ),
+        };
+      }
       return {
         text: (
           <Trans>
@@ -2576,10 +3310,10 @@ const addBehavior: EditorFunction = {
     args,
     toolsVersion,
     ensureExtensionInstalled,
+    ensureExtensionsUpToDate,
     onWillInstallExtension,
     onExtensionInstalled,
   }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_type = extractRequiredString(args, 'behavior_type');
     const optionalBehaviorName = SafeExtractor.extractStringProperty(
@@ -2587,22 +3321,31 @@ const addBehavior: EditorFunction = {
       'behavior_name'
     );
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
-
-    const layout = project.getLayout(scene_name);
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: OBJECTS_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+    // The behaviors of a child object are part of the structure of the custom
+    // object: only the default variant owns them.
+    const namedVariantRejection = getNamedVariantRejection(resolvedScope);
+    if (namedVariantRejection)
+      return makeScopeFailureOutput(namedVariantRejection);
 
     // `object_name` can designate an object or a group (in which case the
     // behavior is added to every object of the group).
     const concerned = resolveObjectsFromContextAndName({
-      project,
-      layout,
+      objectsContainer: getScopeObjectsContainer(resolvedScope),
+      globalObjectsContainer: resolvedScope.globalObjectsContainer || null,
       objectOrGroupName: object_name,
     });
     if (!concerned) {
       return makeGenericFailure(
-        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" ${getObjectLookupScopeText(
+          resolvedScope
+        )}.`
       );
     }
     if (concerned.objects.length === 0) {
@@ -2611,8 +3354,13 @@ const addBehavior: EditorFunction = {
       );
     }
 
-    // Ensure the extension for this behavior is installed.
-    if (behavior_type.includes('::')) {
+    // A behavior of an extension of the project may have just been authored:
+    // its metadata only exists once the extensions are regenerated. It is not
+    // in the store registry, so there is nothing to install for it.
+    if (isTypeOfProjectExtension(project, behavior_type)) {
+      await ensureExtensionsUpToDate();
+    } else if (behavior_type.includes('::')) {
+      // Ensure the extension for this behavior is installed.
       const extensionName = behavior_type.split('::')[0];
       try {
         await ensureExtensionInstalled({
@@ -2630,7 +3378,6 @@ const addBehavior: EditorFunction = {
         );
       }
     }
-
     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
       project.getCurrentPlatform(),
       behavior_type
@@ -2646,6 +3393,24 @@ const addBehavior: EditorFunction = {
     const behaviorName =
       optionalBehaviorName || behaviorMetadata.getDefaultName();
     const isDefaultCapability = isBehaviorDefaultCapability(behaviorMetadata);
+
+    // What the editor enforces in its behavior list: a behavior marked as
+    // irrelevant for child objects (the physics engines, the NavMesh
+    // pathfinding) is not offered on the children of a custom object.
+    const { eventsBasedObject, eventsFunctionsExtension } = resolvedScope;
+    if (
+      eventsBasedObject &&
+      eventsFunctionsExtension &&
+      !isBehaviorRelevantForChildObjects(
+        project.getCurrentPlatform(),
+        behaviorMetadata
+      )
+    ) {
+      const customObjectType = `${eventsFunctionsExtension.getName()}::${eventsBasedObject.getName()}`;
+      return makeGenericFailure(
+        `Behavior "${behaviorName}" (type "${behavior_type}") cannot be added to "${object_name}": it is not usable on a child object of a custom object (the editor does not offer it there). Add it to an object placed in a scene instead: the custom object "${customObjectType}" itself, or the object to simulate.`
+      );
+    }
 
     const changes = [];
     const warnings = [];
@@ -2715,6 +3480,26 @@ const addBehavior: EditorFunction = {
         continue;
       }
 
+      const missingCapability = getMissingRequiredCapability(
+        project.getCurrentPlatform(),
+        behaviorMetadata,
+        object
+      );
+      if (missingCapability) {
+        warnings.push(
+          `Behavior "${behaviorName}" (type "${behavior_type}") needs a capability that "${objectName}" (type "${object.getType()}") does not have: "${
+            missingCapability.label
+          }" (${
+            missingCapability.type
+          }). It cannot be added to this object.${getCustomObjectCapabilityHint(
+            project,
+            object,
+            missingCapability.type
+          )}`
+        );
+        continue;
+      }
+
       // Add the behavior
       gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
         project,
@@ -2737,7 +3522,9 @@ const addBehavior: EditorFunction = {
       );
       reportBehaviorOnObject(objectName);
     }
-    layout.updateBehaviorsSharedData(project);
+    updateBehaviorsSharedDataInScope(project, resolvedScope);
+    // The named variants inherit the behaviors of the default one.
+    complyVariantsAfterStructuralEdit(project, resolvedScope);
 
     return {
       ...makeMultipleChangesOutput(changes, warnings, toolsVersion),
@@ -2754,9 +3541,21 @@ const addBehavior: EditorFunction = {
  */
 const removeBehavior: EditorFunction = {
   renderForEditor: ({ args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
+
+    if (!scene_name) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text: (
+          <Trans>
+            Remove <b>{behavior_name}</b> behavior from <b>{object_name}</b> in{' '}
+            {scopeLabel}.
+          </Trans>
+        ),
+      };
+    }
 
     return {
       text: (
@@ -2768,26 +3567,34 @@ const removeBehavior: EditorFunction = {
     };
   },
   launchFunction: async ({ project, args, toolsVersion }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
-
-    const layout = project.getLayout(scene_name);
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: OBJECTS_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+    // The behaviors of a child object are part of the structure of the custom
+    // object: only the default variant owns them.
+    const namedVariantRejection = getNamedVariantRejection(resolvedScope);
+    if (namedVariantRejection)
+      return makeScopeFailureOutput(namedVariantRejection);
 
     // `object_name` can designate an object or a group (in which case the
     // behavior is removed from every object of the group that has it).
     const concerned = resolveObjectsFromContextAndName({
-      project,
-      layout,
+      objectsContainer: getScopeObjectsContainer(resolvedScope),
+      globalObjectsContainer: resolvedScope.globalObjectsContainer || null,
       objectOrGroupName: object_name,
     });
     if (!concerned) {
       return makeGenericFailure(
-        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" ${getObjectLookupScopeText(
+          resolvedScope
+        )}.`
       );
     }
 
@@ -2822,6 +3629,8 @@ const removeBehavior: EditorFunction = {
           : `Removed behavior "${behavior_name}" from "${objectName}".`
       );
     }
+    // The named variants inherit the behaviors of the default one.
+    complyVariantsAfterStructuralEdit(project, resolvedScope);
 
     return makeMultipleChangesOutput(changes, warnings, toolsVersion);
   },
@@ -2834,9 +3643,21 @@ const removeBehavior: EditorFunction = {
  */
 const inspectBehaviorProperties: EditorFunction = {
   renderForEditor: ({ args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
+
+    if (!scene_name) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text: (
+          <Trans>
+            Read <b>{behavior_name}</b>'s settings on <b>{object_name}</b> in{' '}
+            {scopeLabel}.
+          </Trans>
+        ),
+      };
+    }
 
     return {
       text: (
@@ -2848,27 +3669,29 @@ const inspectBehaviorProperties: EditorFunction = {
     };
   },
   launchFunction: async ({ project, args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
-
-    const layout = project.getLayout(scene_name);
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: OBJECTS_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const { layout } = resolvedScope;
 
     // `object_name` can designate an object or a group. For a group, the
     // behavior is shared in common by all its objects, so any of them can be
     // inspected: use the first object that has the behavior.
     const concerned = resolveObjectsFromContextAndName({
-      project,
-      layout,
+      objectsContainer: getScopeObjectsContainer(resolvedScope),
+      globalObjectsContainer: resolvedScope.globalObjectsContainer || null,
       objectOrGroupName: object_name,
     });
     if (!concerned) {
       return makeGenericFailure(
-        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" ${getObjectLookupScopeText(
+          resolvedScope
+        )}.`
       );
     }
 
@@ -2893,12 +3716,14 @@ const inspectBehaviorProperties: EditorFunction = {
       })
       .filter(Boolean);
 
+    // Behavior shared data only exists in a scene: a child of a custom object
+    // uses the shared data of the scene where the object is instantiated.
     const allBehaviorSharedDataNames = layout
-      .getAllBehaviorSharedDataNames()
-      .toJSArray();
+      ? layout.getAllBehaviorSharedDataNames().toJSArray()
+      : [];
 
     let sharedProperties: Array<{}> | void = undefined;
-    if (allBehaviorSharedDataNames.includes(behavior_name)) {
+    if (layout && allBehaviorSharedDataNames.includes(behavior_name)) {
       const behaviorSharedData = layout.getBehaviorSharedData(behavior_name);
       const behaviorSharedDataProperties = behaviorSharedData.getProperties();
       const behaviorSharedDataPropertyNames = behaviorSharedDataProperties
@@ -2935,7 +3760,7 @@ const inspectBehaviorProperties: EditorFunction = {
  */
 const changeBehaviorProperty: EditorFunction = {
   renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
 
@@ -2943,6 +3768,26 @@ const changeBehaviorProperty: EditorFunction = {
       args,
       'delete_this_behavior'
     );
+    const changed_properties =
+      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
+
+    if (!scene_name) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text: deleteThisBehavior ? (
+          <Trans>
+            Remove <b>{behavior_name}</b> behavior from <b>{object_name}</b> in{' '}
+            {scopeLabel}.
+          </Trans>
+        ) : (
+          <Trans>
+            Update {changed_properties.length} settings of behavior{' '}
+            {behavior_name} on object {object_name} (in {scopeLabel}).
+          </Trans>
+        ),
+      };
+    }
+
     if (deleteThisBehavior) {
       return {
         text: (
@@ -2953,9 +3798,6 @@ const changeBehaviorProperty: EditorFunction = {
         ),
       };
     }
-
-    const changed_properties =
-      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
     const renderChanges = (
       changes: Array<{ label: string, newValue: string }>
@@ -3019,8 +3861,8 @@ const changeBehaviorProperty: EditorFunction = {
     // `object_name` can designate an object or a group (which shares the
     // behavior in common): use any object having the behavior to read labels.
     const concerned = resolveObjectsFromContextAndName({
-      project,
-      layout,
+      objectsContainer: layout.getObjects(),
+      globalObjectsContainer: project.getObjects(),
       objectOrGroupName: object_name,
     });
     const object = concerned
@@ -3094,28 +3936,32 @@ const changeBehaviorProperty: EditorFunction = {
     return renderChanges(changes);
   },
   launchFunction: async ({ project, args, toolsVersion }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
     const changedProperties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
-
-    const layout = project.getLayout(scene_name);
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: OBJECTS_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+    const { layout } = resolvedScope;
 
     // `object_name` can designate an object or a group (in which case the
     // property is changed on the behavior of every object of the group).
     const concerned = resolveObjectsFromContextAndName({
-      project,
-      layout,
+      objectsContainer: getScopeObjectsContainer(resolvedScope),
+      globalObjectsContainer: resolvedScope.globalObjectsContainer || null,
       objectOrGroupName: object_name,
     });
     if (!concerned) {
       return makeGenericFailure(
-        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" ${getObjectLookupScopeText(
+          resolvedScope
+        )}.`
       );
     }
 
@@ -3124,6 +3970,12 @@ const changeBehaviorProperty: EditorFunction = {
       'delete_this_behavior'
     );
     if (deleteThisBehavior) {
+      // Removing a behavior of a child object changes the structure of the
+      // custom object: only the default variant owns it.
+      const namedVariantRejection = getNamedVariantRejection(resolvedScope);
+      if (namedVariantRejection)
+        return makeScopeFailureOutput(namedVariantRejection);
+
       const changes = [];
       const warnings = [];
       for (const object of concerned.objects) {
@@ -3154,6 +4006,8 @@ const changeBehaviorProperty: EditorFunction = {
             : `Removed behavior "${behavior_name}" from "${objectName}".`
         );
       }
+      // The named variants inherit the behaviors of the default one.
+      complyVariantsAfterStructuralEdit(project, resolvedScope);
 
       return makeMultipleChangesOutput(changes, warnings, toolsVersion);
     }
@@ -3172,13 +4026,15 @@ const changeBehaviorProperty: EditorFunction = {
     const behavior = objectsWithBehavior[0].getBehavior(behavior_name);
     const behaviorProperties = behavior.getProperties();
 
+    // Behavior shared data only exists in a scene: a child of a custom object
+    // uses the shared data of the scene where the object is instantiated.
     const allBehaviorSharedDataNames = layout
-      .getAllBehaviorSharedDataNames()
-      .toJSArray();
+      ? layout.getAllBehaviorSharedDataNames().toJSArray()
+      : [];
 
     let behaviorSharedData = null;
     let behaviorSharedDataProperties = null;
-    if (allBehaviorSharedDataNames.includes(behavior_name)) {
+    if (layout && allBehaviorSharedDataNames.includes(behavior_name)) {
       behaviorSharedData = layout.getBehaviorSharedData(behavior_name);
       behaviorSharedDataProperties = behaviorSharedData.getProperties();
     }
@@ -3295,7 +4151,11 @@ const changeBehaviorProperty: EditorFunction = {
           `Property "${propertyName}" not on behavior "${behavior_name}" of "${object_name}".${getAvailablePropertyNamesText(
             behaviorProperties,
             warnings
-          )}`
+          )}${
+            layout
+              ? ''
+              : ' Shared properties are per scene: change them in a scene using this object.'
+          }`
         );
       }
     });
@@ -3306,9 +4166,79 @@ const changeBehaviorProperty: EditorFunction = {
   modifiesProject: true,
 };
 
+// The scopes holding instances: a scene, the instances of an external layout
+// (with the objects and layers of its associated scene) or a variant of a
+// custom object (its children).
+const INSTANCES_SCOPE_TYPES: Array<ToolScopeType> = [
+  'scene',
+  'external_layout',
+  'custom_object_variant',
+];
+
+/**
+ * The containers `describe_instances` and `put_*_instances` work on. A scope
+ * of `INSTANCES_SCOPE_TYPES` always resolves to all of them.
+ */
+const getInstancesScopeContainers = (
+  resolvedScope: ResolvedScope
+): {|
+  objectsContainer: gdObjectsContainer,
+  globalObjectsContainer: gdObjectsContainer | null,
+  initialInstances: gdInitialInstancesContainer,
+  layersContainer: gdLayersContainer,
+|} | null => {
+  const {
+    objectsContainer,
+    globalObjectsContainer,
+    initialInstances,
+    layersContainer,
+  } = resolvedScope;
+  if (!objectsContainer || !initialInstances || !layersContainer) return null;
+  return {
+    objectsContainer,
+    globalObjectsContainer: globalObjectsContainer || null,
+    initialInstances,
+    layersContainer,
+  };
+};
+
+/** The instance position explanations to give for a scope. */
+const getPositionSemanticsForScope = (resolvedScope: ResolvedScope): string =>
+  resolvedScope.variant
+    ? CUSTOM_OBJECT_INSTANCE_POSITION_SEMANTICS_MESSAGE
+    : INSTANCE_POSITION_SEMANTICS_MESSAGE;
+
+/**
+ * The output fields telling which container the instances belong to: a scene
+ * (unchanged), an external layout (its instances, on its associated scene) or
+ * a variant of a custom object (which has no scene at all).
+ */
+const getInstancesScopeOutputFields = (
+  resolvedScope: ResolvedScope
+): {|
+  instancesForSceneNamed?: string,
+  instancesForExternalLayoutNamed?: string,
+  instancesForScopeLabel?: string,
+|} => {
+  const { layout, externalLayout } = resolvedScope;
+  if (externalLayout) {
+    return {
+      instancesForSceneNamed: layout ? layout.getName() : '',
+      instancesForExternalLayoutNamed: externalLayout.getName(),
+    };
+  }
+  if (layout) return { instancesForSceneNamed: layout.getName() };
+  return { instancesForScopeLabel: resolvedScope.label };
+};
+
 const describeInstances: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
+    if (!scene_name) {
+      return {
+        text: <Trans>Read instances in {getScopeLabelFromArgs(args)}.</Trans>,
+      };
+    }
 
     return {
       text: (
@@ -3332,9 +4262,29 @@ const describeInstances: EditorFunction = {
     };
   },
   launchFunction: async ({ project, args, PixiResourcesLoader }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: INSTANCES_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const containers = getInstancesScopeContainers(resolvedScope);
+    if (!containers)
+      return makeGenericFailure(
+        `${resolvedScope.label} has no instances to describe.`
+      );
+    const {
+      objectsContainer,
+      globalObjectsContainer,
+      initialInstances,
+      layersContainer,
+    } = containers;
+
     const filter_by_object_name =
       SafeExtractor.extractStringProperty(args, 'filter_by_object_name') || '';
+    const includeRawJson = !!SafeExtractor.extractBooleanProperty(
+      args,
+      'include_raw_json'
+    );
 
     const objectNames = new Set(
       filter_by_object_name
@@ -3343,39 +4293,51 @@ const describeInstances: EditorFunction = {
         .filter(Boolean)
     );
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
-
-    const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
-    const initialInstances = layout.getInitialInstances();
-
     const instances = [];
     const objectSizeInfoByName: { [string]: ObjectSizeInfo | null } = {};
 
+    const isInstanceDescribed = (instance: gdInitialInstance) =>
+      objectNames.size === 0 ||
+      objectNames.has(instance.getObjectName().toLowerCase());
+    const getInstanceObject = (instance: gdInitialInstance) =>
+      getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        instance.getObjectName()
+      );
+
+    // The origin of a 3D model is read from the model file: load the models of
+    // the described objects first, so their `objectSizeInfo` is not truncated.
+    const describedObjects: Array<gdObject> = [];
+    mapFor(0, layersContainer.getLayersCount(), i => {
+      const layerName = layersContainer.getLayerAt(i).getName();
+      getInstancesInLayoutForLayer(initialInstances, layerName).forEach(
+        instance => {
+          if (!isInstanceDescribed(instance)) return;
+          const object = getInstanceObject(instance);
+          if (object) describedObjects.push(object);
+        }
+      );
+    });
+    await ensureModel3DMeasurementsLoaded(
+      describedObjects,
+      project,
+      PixiResourcesLoader
+    );
+
     // For each layer
-    mapFor(0, layout.getLayersCount(), i => {
-      const layer = layout.getLayerAt(i);
+    mapFor(0, layersContainer.getLayersCount(), i => {
+      const layer = layersContainer.getLayerAt(i);
       const layerName = layer.getName();
 
       getInstancesInLayoutForLayer(initialInstances, layerName).forEach(
         instance => {
-          if (
-            objectNames.size > 0 &&
-            !objectNames.has(instance.getObjectName().toLowerCase())
-          ) {
+          if (!isInstanceDescribed(instance)) {
             return;
           }
 
           const objectName = instance.getObjectName();
-          let object = null;
-          if (layoutObjects.hasObjectNamed(objectName)) {
-            object = layoutObjects.getObject(objectName);
-          } else if (globalObjects.hasObjectNamed(objectName)) {
-            object = globalObjects.getObject(objectName);
-          }
+          const object = getInstanceObject(instance);
 
           const sizeInfo = object
             ? getObjectSizeInfo(object, project, PixiResourcesLoader)
@@ -3388,46 +4350,15 @@ const describeInstances: EditorFunction = {
             ? sizeInfo
             : { width: 0, height: 0, depth: 0 };
 
-          const width = instance.hasCustomSize()
-            ? instance.getCustomWidth()
-            : defaultSize
-            ? defaultSize.width
-            : null;
-          const height = instance.hasCustomSize()
-            ? instance.getCustomHeight()
-            : defaultSize
-            ? defaultSize.height
-            : null;
-          const depth = instance.hasCustomDepth()
-            ? instance.getCustomDepth()
-            : defaultSize
-            ? defaultSize.depth
-            : null;
-
-          const serializedInstance = serializeToJSObject(instance);
-          instances.push({
-            ...serializedInstance,
-            // Replace persistentUuid by id:
-            persistentUuid: undefined,
-            id: instance.getPersistentUuid().slice(0, 10),
-            // The serializer omits z when it's 0 - always expose it for 3D objects:
-            z: depth !== null ? instance.getZ() : undefined,
-            // Actual computed dimensions (accounting for default size when no custom size is set):
-            width,
-            height,
-            depth,
-            // Expose the per-instance variables (overrides of the object
-            // variables), but only when there are some, to keep the output
-            // compact. Absence means the instance uses the object variables.
-            initialVariables:
-              serializedInstance.initialVariables &&
-              serializedInstance.initialVariables.length > 0
-                ? serializedInstance.initialVariables
-                : undefined,
-            // For now, don't expose these:
-            numberProperties: undefined,
-            stringProperties: undefined,
-          });
+          const simplifiedInstance = getSimplifiedInstance(
+            instance,
+            defaultSize
+          );
+          instances.push(
+            includeRawJson
+              ? { ...simplifiedInstance, rawJson: getInstanceRawJson(instance) }
+              : simplifiedInstance
+          );
         }
       );
     });
@@ -3435,8 +4366,8 @@ const describeInstances: EditorFunction = {
     const result: EditorFunctionGenericOutput = {
       success: true,
       instances: instances,
-      instancesForSceneNamed: scene_name,
-      positionSemantics: INSTANCE_POSITION_SEMANTICS_MESSAGE,
+      ...getInstancesScopeOutputFields(resolvedScope),
+      positionSemantics: getPositionSemanticsForScope(resolvedScope),
     };
     if (objectNames.size > 0) {
       result.instancesOnlyForObjectsNamed = [...objectNames].sort().join(',');
@@ -3465,6 +4396,92 @@ const iterateOnInstances = (
   instanceGetter.delete();
 };
 
+/**
+ * Changes the data of instances that `put_2d_instances`/`put_3d_instances`
+ * don't set (starting animation, tile map, text input values, flips), from
+ * the `rawJson` returned by `describe_instances` with `include_raw_json`.
+ */
+const changeInstancesRawJson: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const changes = SafeExtractor.extractArrayProperty(args, 'changes') || [];
+    return {
+      text: (
+        <Trans>
+          Change the starting animation, tiles, flips or other data of{' '}
+          {changes.length} instance(s) in {getScopeLabelFromArgs(args)}.
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({
+    project,
+    args,
+    toolsVersion,
+    PixiResourcesLoader,
+    onObjectsModifiedOutsideEditor,
+    onInstancesModifiedOutsideEditor,
+  }) => {
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: INSTANCES_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+    const containers = getInstancesScopeContainers(resolvedScope);
+    if (!containers)
+      return makeGenericFailure(
+        `${resolvedScope.label} has no instances to change.`
+      );
+    const changes = SafeExtractor.extractArrayProperty(args, 'changes');
+    if (!changes || changes.length === 0) {
+      return makeGenericFailure(
+        'Nothing was changed: `changes` must be a non-empty list of {instance_id, raw_json}.'
+      );
+    }
+    const getInstances = () => {
+      const instances = [];
+      iterateOnInstances(containers.initialInstances, instance => {
+        instances.push(instance);
+      });
+      return instances;
+    };
+    const tileMapAtlases = await loadTileMapAtlases({
+      project,
+      objectsContainer: containers.objectsContainer,
+      globalObjectsContainer: containers.globalObjectsContainer,
+      objectNames: getChangedInstancesObjectNames(getInstances(), changes),
+      PixiResourcesLoader,
+    });
+    // Read again: the instances may have changed while the atlases loaded.
+    const instances = getInstances();
+    const result = applyInstancesRawJson({
+      project,
+      objectsContainer: containers.objectsContainer,
+      globalObjectsContainer: containers.globalObjectsContainer,
+      instances,
+      changes,
+      tileMapAtlases,
+    });
+    if (!result.success) {
+      return makeGenericFailure(`Nothing was changed: ${result.message}`);
+    }
+    if (result.haveObjectsChanged) {
+      onObjectsModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+        isNewObjectTypeUsed: false,
+      });
+    }
+    if (result.changes.length > 0) {
+      onInstancesModifiedOutsideEditor({
+        ...getOutsideEditorChangesTarget(resolvedScope),
+      });
+    }
+    return makeMultipleChangesOutput(result.changes, [], toolsVersion);
+  },
+  modifiesProject: true,
+};
+
 // An id pointing at another object's instance is always a targeting mistake:
 // fail loudly instead of silently modifying or erasing the wrong object.
 const makeWrongObjectInstanceIdsFailure = (
@@ -3485,7 +4502,7 @@ const makeWrongObjectInstanceIdsFailure = (
  */
 const put2dInstances: EditorFunction = {
   renderForEditor: ({ args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const object_name = SafeExtractor.extractStringProperty(
       args,
       'object_name'
@@ -3519,6 +4536,24 @@ const put2dInstances: EditorFunction = {
     const brushPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
       brush_position
     );
+
+    if (!scene_name) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text:
+          brush_kind === 'erase' ? (
+            <Trans>
+              Erase {existingInstanceCount} instance(s) in {scopeLabel}.
+            </Trans>
+          ) : (
+            <Trans>
+              Place {newInstancesCount} and move {existingInstanceCount}{' '}
+              <b>{object_name}</b> instance(s) (layer: {layer_name || 'base'})
+              in {scopeLabel}.
+            </Trans>
+          ),
+      };
+    }
 
     if (brush_kind === 'erase') {
       return {
@@ -3582,7 +4617,6 @@ const put2dInstances: EditorFunction = {
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = SafeExtractor.extractStringProperty(
       args,
       'object_name'
@@ -3625,22 +4659,39 @@ const put2dInstances: EditorFunction = {
       'instances_size'
     );
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: INSTANCES_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+    const containers = getInstancesScopeContainers(resolvedScope);
+    if (!containers)
+      return makeGenericFailure(
+        `${resolvedScope.label} has no instances to change.`
+      );
+    const {
+      objectsContainer,
+      globalObjectsContainer,
+      initialInstances,
+      layersContainer,
+    } = containers;
 
-    const layout = project.getLayout(scene_name);
-    const objectsContainer = layout.getObjects();
-    const globalObjects = project.getObjects();
-
-    let namedObject: gdObject | null = null;
-    if (object_name) {
-      if (objectsContainer.hasObjectNamed(object_name)) {
-        namedObject = objectsContainer.getObject(object_name);
-      } else if (globalObjects.hasObjectNamed(object_name)) {
-        namedObject = globalObjects.getObject(object_name);
-      }
-    }
+    const namedObject: gdObject | null =
+      (object_name &&
+        getObjectByName(
+          globalObjectsContainer,
+          objectsContainer,
+          object_name
+        )) ||
+      null;
+    if (namedObject)
+      await ensureModel3DMeasurementLoaded(
+        namedObject,
+        project,
+        PixiResourcesLoader
+      );
     const objectSizeInfo = namedObject
       ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
       : null;
@@ -3650,14 +4701,16 @@ const put2dInstances: EditorFunction = {
     const layerName =
       layer_name !== '' &&
       layer_name.trim().toLowerCase() === 'base' &&
-      !layout.hasLayerNamed(layer_name)
+      !layersContainer.hasLayerNamed(layer_name)
         ? ''
         : layer_name;
 
     // Check if layer exists (empty string is allowed for base layer)
-    if (layerName !== '' && !layout.hasLayerNamed(layerName)) {
-      return makeGenericFailure(
-        `Layer not found: ${layerName} in scene "${scene_name}".`
+    if (layerName !== '' && !layersContainer.hasLayerNamed(layerName)) {
+      return makeLayerNotFoundFailure(
+        layerName,
+        resolvedScope.label,
+        layersContainer
       );
     }
 
@@ -3669,8 +4722,6 @@ const put2dInstances: EditorFunction = {
           .map(id => id.trim())
           .filter(Boolean)
       : [];
-
-    const initialInstances = layout.getInitialInstances();
 
     if (brush_kind === 'erase') {
       const brushPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
@@ -3763,7 +4814,7 @@ const put2dInstances: EditorFunction = {
       // This will force the instances editor to destroy and mount again the
       // renderers to avoid keeping any references to existing instances, and also drop any selection.
       onInstancesModifiedOutsideEditor({
-        scene: layout,
+        ...getOutsideEditorChangesTarget(resolvedScope),
       });
       const eraseResult: EditorFunctionGenericOutput = {
         success: true,
@@ -3802,6 +4853,29 @@ const put2dInstances: EditorFunction = {
       const brushEndPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
         brush_end_position
       );
+      const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
+        instances_size
+      );
+      // The size the instances will have, which scales the origin and the
+      // anchor offsets of the object.
+      const effectiveSize =
+        instancesSize ||
+        (objectSizeInfo &&
+        objectSizeInfo.width !== null &&
+        objectSizeInfo.height !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height]
+          : null);
+      const anchorResolution = resolveInstanceAnchor({
+        args,
+        allowedAnchors: INSTANCE_ANCHORS_2D,
+        object: namedObject,
+        objectName: object_name,
+        project,
+        objectSizeInfo,
+        size: effectiveSize,
+      });
+      if (anchorResolution.success === false) return anchorResolution.failure;
+      const { anchor } = anchorResolution;
 
       // The `line` and `grid` brushes need an end position to spread instances.
       // Fail early (before creating any instance) so the caller retries with a
@@ -3890,13 +4964,11 @@ const put2dInstances: EditorFunction = {
         );
       }
 
-      if (
-        object_name &&
-        !objectsContainer.hasObjectNamed(object_name) &&
-        !project.getObjects().hasObjectNamed(object_name)
-      ) {
+      if (object_name && !namedObject) {
         return makeGenericFailure(
-          `Object "${object_name}" not in scene "${scene_name}". Use only existing objects (create them first if needed).`
+          `Object "${object_name}" not in ${
+            resolvedScope.label
+          }. Use only existing objects (create them first if needed).`
         );
       }
 
@@ -4063,9 +5135,6 @@ const put2dInstances: EditorFunction = {
         // The "none" brush keeps existing instances in place.
       }
 
-      const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
-        instances_size
-      );
       const instancesRotation = SafeExtractor.extractNumberProperty(
         args,
         'instances_rotation'
@@ -4099,6 +5168,34 @@ const put2dInstances: EditorFunction = {
         }
       });
 
+      // The brush placed the instances by their anchor: move each of them to
+      // put its origin (what its position really is) there, at the size it
+      // ended up with.
+      if (anchor !== 'origin' && isPlacementBrush && effectiveSize) {
+        modifiedAndCreatedInstances.forEach(instance => {
+          const offsets = getAnchorOffset(
+            anchor,
+            getInstanceSize(instance, effectiveSize),
+            objectSizeInfo
+          );
+          if (!offsets) return;
+          instance.setX(instance.getX() + offsets[0]);
+          instance.setY(instance.getY() + offsets[1]);
+        });
+      }
+
+      // The position the instances really hold, which the brush position only
+      // is when they are placed by their origin.
+      const anchorOffsets =
+        anchor === 'origin' || !effectiveSize
+          ? null
+          : getAnchorOffset(anchor, effectiveSize, objectSizeInfo);
+      const originBrushPosition = anchorOffsets
+        ? brushPosition.map((value, axis) =>
+            roundPosition(value + anchorOffsets[axis])
+          )
+        : brushPosition;
+
       // Track specific changes that were made
       if (newInstancesCount > 0) {
         const attrs = [];
@@ -4112,20 +5209,17 @@ const put2dInstances: EditorFunction = {
           attrs.push(instancesHidden ? 'hidden at start' : 'visible at start');
         if (instances_z_order !== null)
           attrs.push(`z-order ${instances_z_order}`);
-        const effectiveSize = instancesSize
-          ? instancesSize
-          : objectSizeInfo &&
-            objectSizeInfo.width !== null &&
-            objectSizeInfo.height !== null
-          ? [objectSizeInfo.width, objectSizeInfo.height]
-          : null;
+        if (anchor !== 'origin')
+          attrs.push(
+            `anchored by their ${anchor} on ${brushPosition.join(', ')}`
+          );
         if (
           (brush_kind === 'point' || brush_kind === 'none') &&
           effectiveSize
         ) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
-              brushPosition,
+              originBrushPosition,
               effectiveSize,
               objectSizeInfo
             )}`
@@ -4141,7 +5235,7 @@ const put2dInstances: EditorFunction = {
             createdInstanceIds.length > 1 ? 's' : ''
           }: ${createdInstanceIds.join(
             ', '
-          )}) using ${brush_kind} brush at ${brushPosition.join(
+          )}) using ${brush_kind} brush at ${originBrushPosition.join(
             ', '
           )} on ${getLayerNameForMessage(layerName)}${
             attrs.length > 0 ? ` (${attrs.join(', ')})` : ''
@@ -4355,11 +5449,17 @@ const put2dInstances: EditorFunction = {
       // This will force the instances editor to destroy and mount again the
       // renderers to avoid keeping any references to existing instances, and also drop any selection.
       onInstancesModifiedOutsideEditor({
-        scene: layout,
+        ...getOutsideEditorChangesTarget(resolvedScope),
       });
+      // Placing a 3D object with the 2D tool works, but every instance lands
+      // at z = 0: say it, so a deliberate elevation is not silently lost.
+      const is3dObjectNotice =
+        namedObject && objectSizeInfo && objectSizeInfo.depth !== null
+          ? ` "${namedObject.getName()}" is a 3D object: new instances are created at z = 0 (use \`put_3d_instances\` to set their z and depth).`
+          : '';
       const put2dResult: EditorFunctionGenericOutput = {
         success: true,
-        message: changes.join(' '),
+        message: `${changes.join(' ')}${is3dObjectNotice}`,
       };
       if (object_name && objectSizeInfo)
         injectObjectSizeInfo(put2dResult, { [object_name]: objectSizeInfo });
@@ -4377,7 +5477,7 @@ const put2dInstances: EditorFunction = {
  */
 const put3dInstances: EditorFunction = {
   renderForEditor: ({ args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const object_name = SafeExtractor.extractStringProperty(
       args,
       'object_name'
@@ -4411,6 +5511,24 @@ const put3dInstances: EditorFunction = {
     const brushPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
       brush_position
     );
+
+    if (!scene_name) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text:
+          brush_kind === 'erase' ? (
+            <Trans>
+              Erase {existingInstanceCount} instance(s) in {scopeLabel}.
+            </Trans>
+          ) : (
+            <Trans>
+              Place {newInstancesCount} and move {existingInstanceCount}{' '}
+              <b>{object_name}</b> instance(s) (layer: {layer_name || 'base'})
+              in {scopeLabel}.
+            </Trans>
+          ),
+      };
+    }
 
     if (brush_kind === 'erase') {
       return {
@@ -4474,7 +5592,6 @@ const put3dInstances: EditorFunction = {
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = SafeExtractor.extractStringProperty(
       args,
       'object_name'
@@ -4517,41 +5634,24 @@ const put3dInstances: EditorFunction = {
       'instances_rotation'
     );
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
-
-    const layout = project.getLayout(scene_name);
-    const objectsContainer = layout.getObjects();
-    const globalObjects = project.getObjects();
-
-    let namedObject: gdObject | null = null;
-    if (object_name) {
-      if (objectsContainer.hasObjectNamed(object_name)) {
-        namedObject = objectsContainer.getObject(object_name);
-      } else if (globalObjects.hasObjectNamed(object_name)) {
-        namedObject = globalObjects.getObject(object_name);
-      }
-    }
-    const objectSizeInfo = namedObject
-      ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
-      : null;
-
-    // Accept the frequent mistake of calling the base layer "base" (its real
-    // name is the empty string) when no layer with that literal name exists.
-    const layerName =
-      layer_name !== '' &&
-      layer_name.trim().toLowerCase() === 'base' &&
-      !layout.hasLayerNamed(layer_name)
-        ? ''
-        : layer_name;
-
-    // Check if layer exists (empty string is allowed for base layer)
-    if (layerName !== '' && !layout.hasLayerNamed(layerName)) {
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: INSTANCES_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+    const containers = getInstancesScopeContainers(resolvedScope);
+    if (!containers)
       return makeGenericFailure(
-        `Layer not found: ${layerName} in scene "${scene_name}".`
+        `${resolvedScope.label} has no instances to change.`
       );
-    }
+    const {
+      objectsContainer,
+      globalObjectsContainer,
+      initialInstances,
+      layersContainer,
+    } = containers;
 
     // An empty id would match every instance (`uuid.startsWith('')` is always
     // true), so a trailing comma or a blank entry must never survive parsing.
@@ -4562,7 +5662,59 @@ const put3dInstances: EditorFunction = {
           .filter(Boolean)
       : [];
 
-    const initialInstances = layout.getInitialInstances();
+    // Instances moved by their ids without `object_name` are sized (for the
+    // anchors and the space they occupy) by their object, when they share one.
+    const existingInstancesObjectNames = new Set<string>();
+    if (!object_name && existingInstanceIds.length > 0) {
+      iterateOnInstances(initialInstances, instance => {
+        if (
+          existingInstanceIds.some(id =>
+            instance.getPersistentUuid().startsWith(id)
+          )
+        )
+          existingInstancesObjectNames.add(instance.getObjectName());
+      });
+    }
+    const sizedObjectName =
+      object_name ||
+      (existingInstancesObjectNames.size === 1
+        ? Array.from(existingInstancesObjectNames)[0]
+        : null);
+    const namedObject: gdObject | null =
+      (sizedObjectName &&
+        getObjectByName(
+          globalObjectsContainer,
+          objectsContainer,
+          sizedObjectName
+        )) ||
+      null;
+    if (namedObject)
+      await ensureModel3DMeasurementLoaded(
+        namedObject,
+        project,
+        PixiResourcesLoader
+      );
+    const objectSizeInfo = namedObject
+      ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
+      : null;
+
+    // Accept the frequent mistake of calling the base layer "base" (its real
+    // name is the empty string) when no layer with that literal name exists.
+    const layerName =
+      layer_name !== '' &&
+      layer_name.trim().toLowerCase() === 'base' &&
+      !layersContainer.hasLayerNamed(layer_name)
+        ? ''
+        : layer_name;
+
+    // Check if layer exists (empty string is allowed for base layer)
+    if (layerName !== '' && !layersContainer.hasLayerNamed(layerName)) {
+      return makeLayerNotFoundFailure(
+        layerName,
+        resolvedScope.label,
+        layersContainer
+      );
+    }
 
     if (brush_kind === 'erase') {
       const brushPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
@@ -4657,7 +5809,7 @@ const put3dInstances: EditorFunction = {
       // This will force the instances editor to destroy and mount again the
       // renderers to avoid keeping any references to existing instances, and also drop any selection.
       onInstancesModifiedOutsideEditor({
-        scene: layout,
+        ...getOutsideEditorChangesTarget(resolvedScope),
       });
       const eraseResult: EditorFunctionGenericOutput = {
         success: true,
@@ -4676,8 +5828,10 @@ const put3dInstances: EditorFunction = {
           .filter(Boolean)
           .join(' '),
       };
-      if (object_name && objectSizeInfo)
-        injectObjectSizeInfo(eraseResult, { [object_name]: objectSizeInfo });
+      if (sizedObjectName && objectSizeInfo)
+        injectObjectSizeInfo(eraseResult, {
+          [sizedObjectName]: objectSizeInfo,
+        });
       return eraseResult;
     } else {
       // An explicit `new_instances_count: 0` with no instances to modify means
@@ -4696,6 +5850,30 @@ const put3dInstances: EditorFunction = {
       const brushEndPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
         brush_end_position
       );
+      const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
+        instances_size
+      );
+      // The size the instances will have, which scales the origin and the
+      // anchor offsets of the object.
+      const effectiveSize =
+        instancesSizeArray ||
+        (objectSizeInfo &&
+        objectSizeInfo.width !== null &&
+        objectSizeInfo.height !== null &&
+        objectSizeInfo.depth !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
+          : null);
+      const anchorResolution = resolveInstanceAnchor({
+        args,
+        allowedAnchors: INSTANCE_ANCHORS_3D,
+        object: namedObject,
+        objectName: sizedObjectName,
+        project,
+        objectSizeInfo,
+        size: effectiveSize,
+      });
+      if (anchorResolution.success === false) return anchorResolution.failure;
+      const { anchor } = anchorResolution;
 
       // The `line` brush needs an end position to spread instances. Fail early
       // (before creating any instance) so the caller retries with a valid
@@ -4776,13 +5954,11 @@ const put3dInstances: EditorFunction = {
         );
       }
 
-      if (
-        object_name &&
-        !objectsContainer.hasObjectNamed(object_name) &&
-        !project.getObjects().hasObjectNamed(object_name)
-      ) {
+      if (object_name && !namedObject) {
         return makeGenericFailure(
-          `Object "${object_name}" not in scene "${scene_name}". Use only existing objects (create them first if needed).`
+          `Object "${object_name}" not in ${
+            resolvedScope.label
+          }. Use only existing objects (create them first if needed).`
         );
       }
 
@@ -4916,9 +6092,6 @@ const put3dInstances: EditorFunction = {
         // The "none" brush keeps existing instances in place.
       }
 
-      const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
-        instances_size
-      );
       const instancesRotationArray = instances_rotation
         ? instances_rotation.split(',').map(coord => parseFloat(coord) || 0)
         : null;
@@ -4945,6 +6118,35 @@ const put3dInstances: EditorFunction = {
         }
       });
 
+      // The brush placed the instances by their anchor: move each of them to
+      // put its origin (what its position really is) there, at the size it
+      // ended up with.
+      if (anchor !== 'origin' && isPlacementBrush && effectiveSize) {
+        modifiedAndCreatedInstances.forEach(instance => {
+          const offsets = getAnchorOffset(
+            anchor,
+            getInstanceSize(instance, effectiveSize),
+            objectSizeInfo
+          );
+          if (!offsets) return;
+          instance.setX(instance.getX() + offsets[0]);
+          instance.setY(instance.getY() + offsets[1]);
+          instance.setZ(instance.getZ() + offsets[2]);
+        });
+      }
+
+      // The position the instances really hold, which the brush position only
+      // is when they are placed by their origin.
+      const anchorOffsets =
+        anchor === 'origin' || !effectiveSize
+          ? null
+          : getAnchorOffset(anchor, effectiveSize, objectSizeInfo);
+      const originBrushPosition = anchorOffsets
+        ? brushPosition.map((value, axis) =>
+            roundPosition(value + anchorOffsets[axis])
+          )
+        : brushPosition;
+
       // Track specific changes that were made
       if (newInstancesCount > 0) {
         const attrs = [];
@@ -4962,21 +6164,17 @@ const put3dInstances: EditorFunction = {
           );
         if (instancesHidden !== null)
           attrs.push(instancesHidden ? 'hidden at start' : 'visible at start');
-        const effectiveSize = instancesSizeArray
-          ? instancesSizeArray
-          : objectSizeInfo &&
-            objectSizeInfo.width !== null &&
-            objectSizeInfo.height !== null &&
-            objectSizeInfo.depth !== null
-          ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
-          : null;
+        if (anchor !== 'origin')
+          attrs.push(
+            `anchored by their ${anchor} on ${brushPosition.join(', ')}`
+          );
         if (
           (brush_kind === 'point' || brush_kind === 'none') &&
           effectiveSize
         ) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
-              brushPosition,
+              originBrushPosition,
               effectiveSize,
               objectSizeInfo
             )}`
@@ -4992,7 +6190,7 @@ const put3dInstances: EditorFunction = {
             createdInstanceIds.length > 1 ? 's' : ''
           }: ${createdInstanceIds.join(
             ', '
-          )}) using ${brush_kind} brush at ${brushPosition.join(
+          )}) using ${brush_kind} brush at ${originBrushPosition.join(
             ', '
           )} on ${getLayerNameForMessage(layerName)}${
             attrs.length > 0 ? ` (${attrs.join(', ')})` : ''
@@ -5065,10 +6263,29 @@ const put3dInstances: EditorFunction = {
       }
 
       if (movedPositionCount > 0) {
+        // Where a single moved instance ends up, so a wrong height (sunk or
+        // floating) shows without another describe_instances call.
+        const movedInstances = Array.from(existingInstanceStates.keys());
+        let occupiedSpace = '';
+        if (movedInstances.length === 1 && effectiveSize) {
+          const movedInstance = movedInstances[0];
+          const position = [
+            movedInstance.getX(),
+            movedInstance.getY(),
+            movedInstance.getZ(),
+          ];
+          occupiedSpace = ` (origin at ${position
+            .map(roundPosition)
+            .join(', ')}, it occupies ${getOccupiedSpaceDescription(
+            position,
+            getInstanceSize(movedInstance, effectiveSize),
+            objectSizeInfo
+          )})`;
+        }
         changes.push(
           `Repositioned ${movedPositionCount} instance${
             movedPositionCount > 1 ? 's' : ''
-          }${ofObjectsSuffix} using ${brush_kind} brush.`
+          }${ofObjectsSuffix} using ${brush_kind} brush${occupiedSpace}.`
         );
       }
 
@@ -5183,14 +6400,25 @@ const put3dInstances: EditorFunction = {
       // This will force the instances editor to destroy and mount again the
       // renderers to avoid keeping any references to existing instances, and also drop any selection.
       onInstancesModifiedOutsideEditor({
-        scene: layout,
+        ...getOutsideEditorChangesTarget(resolvedScope),
       });
+      if (
+        namedObject &&
+        (newInstancesCount > 0 || movedPositionCount > 0) &&
+        isModel3DObjectWithoutModel(namedObject)
+      ) {
+        changes.push(
+          `"${namedObject.getName()}" has no 3D model yet: it shows as a box and its size is unknown. Set its \`modelResourceName\` property.`
+        );
+      }
       const put3dResult: EditorFunctionGenericOutput = {
         success: true,
         message: changes.join(' '),
       };
-      if (object_name && objectSizeInfo)
-        injectObjectSizeInfo(put3dResult, { [object_name]: objectSizeInfo });
+      if (sizedObjectName && objectSizeInfo)
+        injectObjectSizeInfo(put3dResult, {
+          [sizedObjectName]: objectSizeInfo,
+        });
       return put3dResult;
     }
   },
@@ -5204,7 +6432,7 @@ export const noEventsInSceneText = 'This scene has no events.';
  */
 const readSceneEvents: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
 
     return {
       text: (
@@ -5228,12 +6456,13 @@ const readSceneEvents: EditorFunction = {
     };
   },
   launchFunction: async ({ project, args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: ['scene'],
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
-
+    const scene_name = resolvedScope.scope.scene_name || '';
     const scene = project.getLayout(scene_name);
     const events = scene.getEvents();
 
@@ -5268,9 +6497,108 @@ const readSceneEvents: EditorFunction = {
   modifiesProject: false,
 };
 
+export const noEventsInFunctionText = 'This function has no events.';
+
 const EVENTS_SOURCE_MAX_CHARS_DEFAULT = 12000;
 const EVENTS_SOURCE_MAX_CHARS_MINIMUM = 2000;
 const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
+
+const getPropertyNames = (
+  propertiesContainer: gdPropertiesContainer
+): Array<string> =>
+  mapFor(0, propertiesContainer.getCount(), i =>
+    propertiesContainer.getAt(i).getName()
+  );
+
+const getVariableNames = (
+  variablesContainer: gdVariablesContainer
+): Array<string> =>
+  mapFor(0, variablesContainer.count(), i => variablesContainer.getNameAt(i));
+
+const getObjectNames = (objectsContainer: gdObjectsContainer): Array<string> =>
+  mapFor(0, objectsContainer.getObjectsCount(), i =>
+    objectsContainer.getObjectAt(i).getName()
+  );
+
+const getScopeSummary = (
+  resolvedScope: ResolvedScope,
+  eventsFunction: gdEventsFunction
+): ScopeSummary => {
+  const {
+    eventsFunctionsExtension,
+    eventsBasedBehavior,
+    eventsBasedObject,
+  } = resolvedScope;
+  // What the events can use: the declared parameters, except for an
+  // `ActionWithOperator`, whose parameters GDevelop takes from its getter.
+  const functionsContainer = getFunctionsContainerOfScope(resolvedScope);
+  const parameters = functionsContainer
+    ? eventsFunction.getParametersForEvents(functionsContainer)
+    : eventsFunction.getParameters();
+
+  const summary: ScopeSummary = {
+    // Every parameter, the implicit Object/Behavior included: they are usable
+    // in the events under these names.
+    parameters: mapFor(0, parameters.getParametersCount(), i => {
+      const parameter = parameters.getParameterAt(i);
+      return { name: parameter.getName(), type: parameter.getType() };
+    }),
+    properties: eventsBasedBehavior
+      ? [
+          ...getPropertyNames(eventsBasedBehavior.getPropertyDescriptors()),
+          ...getPropertyNames(
+            eventsBasedBehavior.getSharedPropertyDescriptors()
+          ),
+        ]
+      : eventsBasedObject
+      ? getPropertyNames(eventsBasedObject.getPropertyDescriptors())
+      : [],
+    extensionVariables: {
+      global: eventsFunctionsExtension
+        ? getVariableNames(eventsFunctionsExtension.getGlobalVariables())
+        : [],
+      scene: eventsFunctionsExtension
+        ? getVariableNames(eventsFunctionsExtension.getSceneVariables())
+        : [],
+    },
+  };
+  if (eventsBasedObject) {
+    summary.childObjects = getObjectNames(eventsBasedObject.getObjects());
+  }
+  return summary;
+};
+
+/**
+ * The events to read: those of a scene, or those of the function named by
+ * `function_name` in an extension scope (with the function itself, to
+ * summarize what it can use).
+ */
+const getEventsSourceTarget = (
+  resolvedScope: ResolvedScope,
+  functionName: ?string
+):
+  | {|
+      success: true,
+      eventsList: gdEventsList,
+      eventsFunction: gdEventsFunction | null,
+    |}
+  | {| success: false, message: string |} => {
+  const { layout } = resolvedScope;
+  if (layout) {
+    return {
+      success: true,
+      eventsList: layout.getEvents(),
+      eventsFunction: null,
+    };
+  }
+  const result = getEventsFunctionInScope(resolvedScope, functionName);
+  if (result.success === false) return result;
+  return {
+    success: true,
+    eventsList: result.eventsFunction.getEvents(),
+    eventsFunction: result.eventsFunction,
+  };
+};
 
 /**
  * Reads the events of a scene as EventScript source (the exact syntax
@@ -5279,7 +6607,7 @@ const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
  */
 const readEventsSource: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const eventIds = SafeExtractor.extractStringArrayProperty(
       args,
       'event_ids'
@@ -5289,6 +6617,23 @@ const readEventsSource: EditorFunction = {
       args,
       'object_names'
     );
+
+    if (!scene_name) {
+      // A function of an extension: no editor link to it yet, so name the
+      // scope and the function being read.
+      const scopeLabel = getScopeLabelFromArgs(args);
+      const functionName =
+        SafeExtractor.extractStringProperty(args, 'function_name') || '';
+      return {
+        text: functionName ? (
+          <Trans>
+            Read events source of function {functionName} in {scopeLabel}.
+          </Trans>
+        ) : (
+          <Trans>Read events source in {scopeLabel}.</Trans>
+        ),
+      };
+    }
 
     const sceneLink = (
       <Link
@@ -5347,14 +6692,26 @@ const readEventsSource: EditorFunction = {
 
     return { text };
   },
-  launchFunction: async ({ project, args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+  launchFunction: async ({ project, args, ensureExtensionsUpToDate }) => {
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: ['scene', 'extension', 'custom_behavior', 'custom_object'],
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
+    const functionName = SafeExtractor.extractStringProperty(
+      args,
+      'function_name'
+    );
+    const target = getEventsSourceTarget(resolvedScope, functionName);
+    if (target.success === false) return makeScopeFailureOutput(target);
+    const { eventsList, eventsFunction } = target;
+    if (eventsFunction) {
+      // The instructions of a function edited earlier in this batch are
+      // rendered from the generated metadata: regenerate it first.
+      await ensureExtensionsUpToDate();
     }
 
-    const scene = project.getLayout(scene_name);
     const eventIds = SafeExtractor.extractStringArrayProperty(
       args,
       'event_ids'
@@ -5380,6 +6737,18 @@ const readEventsSource: EditorFunction = {
       )
     );
 
+    // In a function, what the events can use (parameters, properties, child
+    // objects, extension variables) is shown as `#` comment lines at the top
+    // of the source: the reader has everything at hand, and the source stays
+    // valid EventScript if it is sent back as is. They count against
+    // `max_chars` like the rest of the output.
+    const scopeSummary = eventsFunction
+      ? getScopeSummary(resolvedScope, eventsFunction)
+      : null;
+    const scopeSummaryHeaderText = scopeSummary
+      ? renderScopeSummaryHeaderLines(scopeSummary).join('\n')
+      : '';
+
     const {
       text,
       selectedEventIds,
@@ -5387,23 +6756,42 @@ const readEventsSource: EditorFunction = {
       notes,
       renderingErrors,
     } = buildEventScriptSourceView({
-      eventsList: scene.getEvents(),
+      eventsList,
       eventIds,
       searchText,
       objectNames,
       subEventsDepth,
-      maxChars,
+      maxChars: Math.max(
+        0,
+        maxChars -
+          (scopeSummaryHeaderText ? scopeSummaryHeaderText.length + 1 : 0)
+      ),
     });
+
+    // An empty `text` does NOT mean the scene has no events: a filter can
+    // match nothing on a populated sheet (the notes say which case it is).
+    // Only a truly empty sheet gets the "no events" text.
+    const eventScriptText =
+      text ||
+      (eventsList.getEventsCount() === 0
+        ? eventsFunction
+          ? noEventsInFunctionText
+          : noEventsInSceneText
+        : '');
 
     const output: EditorFunctionGenericOutput = {
       success: true,
-      eventsForSceneNamed: scene_name,
-      // An empty `text` does NOT mean the scene has no events: a filter can
-      // match nothing on a populated sheet (the notes say which case it
-      // is). Only a truly empty sheet gets the "no events" text.
-      eventScript:
-        text ||
-        (scene.getEvents().getEventsCount() === 0 ? noEventsInSceneText : ''),
+      ...(eventsFunction && scopeSummary
+        ? {
+            eventsForScopeLabel: resolvedScope.label,
+            functionName: eventsFunction.getName(),
+            scopeSummary,
+          }
+        : { eventsForSceneNamed: resolvedScope.scope.scene_name || '' }),
+      eventScript: scopeSummaryHeaderText
+        ? scopeSummaryHeaderText +
+          (eventScriptText ? `\n${eventScriptText}` : '')
+        : eventScriptText,
       selectedEventIds,
     };
     if (truncated) output.truncated = true;
@@ -5418,7 +6806,8 @@ const readEventsSource: EditorFunction = {
 };
 
 /**
- * Adds a new event to a scene's event sheet
+ * Generates events with the AI and applies them: in the events sheet of a
+ * scene, or in the events of a function of an extension (`function_name`).
  */
 const addSceneEvents: EditorFunction = {
   renderForEditor: ({
@@ -5427,7 +6816,7 @@ const addSceneEvents: EditorFunction = {
     editorCallbacks,
     editorFunctionCallResultOutput,
   }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
     const eventsDescription = SafeExtractor.extractStringProperty(
       args,
       'events_description'
@@ -5607,6 +6996,44 @@ const addSceneEvents: EditorFunction = {
       </ColumnStackLayout>
     ) : null;
 
+    if (!scene_name) {
+      // A function of an extension: name the function and link to it in the
+      // extension editor.
+      const functionTarget = getFunctionTargetFromArgs(args);
+      if (!functionTarget) {
+        return {
+          text: <Trans>Write events in {getScopeLabelFromArgs(args)}.</Trans>,
+          details,
+          hasDetailsToShow: true,
+        };
+      }
+      return {
+        text: (
+          <Trans>
+            Generate events in function{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenEventsFunctionsExtension(
+                  functionTarget.extensionName,
+                  {
+                    functionName: functionTarget.functionName,
+                    behaviorName: functionTarget.behaviorName,
+                    objectName: functionTarget.objectName,
+                  }
+                )
+              }
+            >
+              {functionTarget.functionReference}
+            </Link>
+            .
+          </Trans>
+        ),
+        details,
+        hasDetailsToShow: true,
+      };
+    }
+
     if (eventsDescription) {
       return {
         text: (
@@ -5685,12 +7112,13 @@ const addSceneEvents: EditorFunction = {
     relatedAiRequestId,
     generateEvents,
     onSceneEventsModifiedOutsideEditor,
+    onExtensionsModifiedOutsideEditor,
+    ensureExtensionsUpToDate,
     ensureExtensionInstalled,
     onWillInstallExtension,
     onExtensionInstalled,
     searchAndInstallResources,
   }) => {
-    const sceneName = extractRequiredString(args, 'scene_name');
     const eventsDescription = SafeExtractor.extractStringProperty(
       args,
       'events_description'
@@ -5715,23 +7143,94 @@ const addSceneEvents: EditorFunction = {
     const placementHint =
       SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
 
-    if (!project.hasLayoutNamed(sceneName)) {
-      return makeSceneNotFoundFailure(project, sceneName);
-    }
+    const functionNameArgument = SafeExtractor.extractStringProperty(
+      args,
+      'function_name'
+    );
+
+    /**
+     * The scope and the events to write in: those of the scene, or those of
+     * the function named by `function_name` in the extension scope. Everything
+     * is looked up again from the identifiers of the call, as the target can be
+     * deleted or renamed while the generation runs.
+     */
+    const resolveEventsTarget = ():
+      | ScopeFailure
+      | {|
+          success: true,
+          resolvedScope: ResolvedScope,
+          eventsList: gdEventsList,
+          eventsFunction: gdEventsFunction | null,
+        |} => {
+      const resolvedScope = resolveScopeFromArgs(project, args, {
+        allowedTypes: [
+          'scene',
+          'extension',
+          'custom_behavior',
+          'custom_object',
+        ],
+      });
+      if (resolvedScope.success === false) return resolvedScope;
+      if (!resolvedScope.layout) {
+        // Events written in a function of an extension: the extension must be
+        // editable (a store extension is read-only).
+        const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+        if (readOnlyRejection) return readOnlyRejection;
+      }
+      const eventsTarget = getEventsSourceTarget(
+        resolvedScope,
+        functionNameArgument
+      );
+      if (eventsTarget.success === false) return eventsTarget;
+
+      return {
+        success: true,
+        resolvedScope,
+        eventsList: eventsTarget.eventsList,
+        eventsFunction: eventsTarget.eventsFunction,
+      };
+    };
+
     if (!relatedAiRequestId) {
       return makeGenericFailure(
         'No related AI request ID found for events generation.'
       );
     }
-    const scene = project.getLayout(sceneName);
-    const currentSceneEvents = scene.getEvents();
 
-    const existingEventsAsText = renderNonTranslatedEventsAsText({
-      eventsList: currentSceneEvents,
-    });
+    // A refused call (unknown scene or function, extension of the store...)
+    // regenerates nothing: the target is checked first.
+    const checkedEventsTarget = resolveEventsTarget();
+    if (checkedEventsTarget.success === false)
+      return makeScopeFailureOutput(checkedEventsTarget);
+
+    // An extension may have been authored earlier in this batch: the generated
+    // metadata (and the extensions summary uploaded with this generation, the
+    // private functions of an edited extension included) must describe the
+    // extensions as they are now, whatever the scope. A no-op when nothing
+    // changed.
+    await ensureExtensionsUpToDate();
+
+    // The target is resolved AGAIN after the `await`: a Core object found
+    // before it may be gone when the code resumes (the function deleted or
+    // renamed meanwhile), so nothing found before is used.
+    const eventsTarget = resolveEventsTarget();
+    if (eventsTarget.success === false)
+      return makeScopeFailureOutput(eventsTarget);
+    const {
+      resolvedScope,
+      eventsList: currentEventsList,
+      eventsFunction,
+    } = eventsTarget;
+    const scene = resolvedScope.layout;
+    // A scene name is only sent for a scene (the generation API keeps it
+    // beside the scope for older editors).
+    const sceneName = scene ? resolvedScope.scope.scene_name || '' : '';
+
+    // The existing events are sent as JSON only: the generation backend
+    // renders them itself (as a bounded EventScript view) for its model.
     const existingEventsJson =
       toolOptions && toolOptions.includeEventsJson
-        ? serializeToJSON(currentSceneEvents)
+        ? serializeToJSON(currentEventsList)
         : null;
 
     const parsedEventBatches = eventBatches
@@ -5759,7 +7258,7 @@ const addSceneEvents: EditorFunction = {
           const renderedTargetEventSource =
             isReplacePlacement && placementTargetEventId
               ? renderEventSourceById({
-                  eventsList: currentSceneEvents,
+                  eventsList: currentEventsList,
                   eventIdOrGroupName: placementTargetEventId,
                   includeSubEvents: isReplaceEntirePlacement,
                 })
@@ -5828,12 +7327,13 @@ const addSceneEvents: EditorFunction = {
     try {
       const eventsGenerationResult: EventsGenerationResult = await generateEvents(
         {
+          scope: resolvedScope.scope,
+          functionName: eventsFunction ? eventsFunction.getName() : null,
           sceneName,
           eventsDescription,
           eventBatches: parsedEventBatches,
           extensionNamesList,
           objectsList,
-          existingEventsAsText,
           existingEventsJson,
           placementHint,
           relatedAiRequestId,
@@ -5928,11 +7428,55 @@ const addSceneEvents: EditorFunction = {
           }. Try again or a different approach.`
         );
       }
+
+      // The scope, the function and its events were resolved before the
+      // generation (and the extension installations) ran: the target may have
+      // been deleted or renamed since (another tool call, the user). Resolve
+      // everything again and only use these from now on, so that nothing is
+      // ever written to a target that is gone or is another one.
+      const upToDateEventsTarget = resolveEventsTarget();
+      if (upToDateEventsTarget.success === false) {
+        return makeAiGeneratedEventFailure(
+          `The events to write in are not available anymore: ${
+            upToDateEventsTarget.message
+          } Nothing was changed (no events, no variables, no behaviors). Check what the target became and retry.`
+        );
+      }
+      const {
+        resolvedScope: upToDateResolvedScope,
+        eventsList: upToDateEventsList,
+        eventsFunction: upToDateEventsFunction,
+      } = upToDateEventsTarget;
+      const extensionName = upToDateResolvedScope.eventsFunctionsExtension
+        ? upToDateResolvedScope.eventsFunctionsExtension.getName()
+        : '';
+
+      // A replacement was decided on the source of an event sent to the
+      // generation: refuse to apply it if this event changed meanwhile.
+      const changedPlacementBatch = (parsedEventBatches || []).find(
+        batch =>
+          batch.placementTargetEventSource &&
+          batch.placementTargetEventId &&
+          renderEventSourceById({
+            eventsList: upToDateEventsList,
+            eventIdOrGroupName: batch.placementTargetEventId,
+            includeSubEvents:
+              batch.placementRelation === 'replace_entire_event_and_sub_events',
+          }) !== batch.placementTargetEventSource
+      );
+      if (changedPlacementBatch) {
+        return makeAiGeneratedEventFailure(
+          `The event to replace ("${changedPlacementBatch.placementTargetEventId ||
+            ''}") changed while the events were being generated. Nothing was changed: read the events again and retry.`
+        );
+      }
+
       try {
+        let hasChangedChildObjects = false;
         for (const change of changes) {
           addUndeclaredVariables({
             project,
-            scene,
+            resolvedScope: upToDateResolvedScope,
             undeclaredVariables: change.undeclaredVariables,
           });
 
@@ -5944,10 +7488,11 @@ const addSceneEvents: EditorFunction = {
               change.undeclaredObjectVariables[objectName];
             addObjectUndeclaredVariables({
               project,
-              scene,
+              resolvedScope: upToDateResolvedScope,
               objectName,
               undeclaredVariables,
             });
+            hasChangedChildObjects = true;
           }
 
           const objectNamesWithMissingBehavior = Object.keys(
@@ -5957,16 +7502,22 @@ const addSceneEvents: EditorFunction = {
             const missingBehaviors = change.missingObjectBehaviors[objectName];
             addMissingObjectBehaviors({
               project,
-              scene,
+              resolvedScope: upToDateResolvedScope,
               objectName,
               missingBehaviors,
             });
+            hasChangedChildObjects = true;
           }
+        }
+        if (upToDateEventsFunction && hasChangedChildObjects) {
+          // The variables and behaviors of the child objects are part of the
+          // structure of the custom object: the named variants follow.
+          complyVariantsAfterStructuralEdit(project, upToDateResolvedScope);
         }
 
         const { applied, errors } = applyEventsChanges(
           project,
-          currentSceneEvents,
+          upToDateEventsList,
           changes,
           aiGeneratedEvent.id
         );
@@ -5986,10 +7537,25 @@ Events were not changed (extensions, variables or behaviors needed by them may h
           };
         }
 
-        onSceneEventsModifiedOutsideEditor({
-          scene,
-          newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
-        });
+        if (upToDateEventsFunction) {
+          onSceneEventsModifiedOutsideEditor({
+            scene: null,
+            eventsFunction: upToDateEventsFunction,
+            extensionName,
+            newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
+          });
+          // The code of the function changed: the extension must be
+          // regenerated before anything reads its metadata again.
+          onExtensionsModifiedOutsideEditor({
+            extensionNames: [extensionName],
+            needsCodeRegeneration: true,
+          });
+        } else {
+          onSceneEventsModifiedOutsideEditor({
+            scene: upToDateResolvedScope.layout,
+            newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
+          });
+        }
 
         // Search and install missing resources if any. This runs after the
         // events were applied: a failure here must NOT fail the whole call,
@@ -6082,11 +7648,109 @@ See errors; verify event contents if needed.`
 };
 
 /**
- * Creates a new, empty scene
+ * `create_scene` with `as_external_layout_of_scene`: an external layout (a
+ * set of instances apart from a scene, using its objects and layers, created
+ * in the game by the "Create objects from an external layout" action).
+ */
+const createExternalLayout = ({
+  project,
+  externalLayoutName,
+  associatedSceneName,
+  ignoredArgumentNames,
+}: {|
+  project: gdProject,
+  externalLayoutName: string,
+  associatedSceneName: string,
+  ignoredArgumentNames: Array<string>,
+|}): EditorFunctionGenericOutput => {
+  if (!project.hasLayoutNamed(associatedSceneName)) {
+    return makeGenericFailure(
+      `${getSceneNotFoundMessage(
+        project,
+        associatedSceneName
+      )} \`as_external_layout_of_scene\` must name the existing scene whose objects and layers the external layout uses.`
+    );
+  }
+  // Scenes and external layouts have separate namespaces, but the same name
+  // for both is a recipe for confusion in the events (`Scene("X")` vs
+  // `CreateObjectsFromExternalLayout("X")`): refuse it.
+  if (project.hasLayoutNamed(externalLayoutName)) {
+    return makeGenericFailure(
+      `A scene is already named "${externalLayoutName}": choose another name for the external layout.`
+    );
+  }
+  const ignoredSuffix =
+    ignoredArgumentNames.length > 0
+      ? ` (${ignoredArgumentNames.join(
+          ', '
+        )} ignored: an external layout has no layers or properties of its own).`
+      : '';
+  const howToUseSuffix =
+    ` Its instances use the objects and layers of scene "${associatedSceneName}": place them with \`put_2d_instances\`/\`put_3d_instances\` (or move existing ones with \`change_scene_properties_layers_effects_groups.move_instances\`) using scope { type: "external_layout", external_layout_name: "${externalLayoutName}" }.` +
+    ` The scene creates them at runtime with the action \`CreateObjectsFromExternalLayout("${externalLayoutName}", 0, 0)\`.`;
+
+  if (project.hasExternalLayoutNamed(externalLayoutName)) {
+    const externalLayout = project.getExternalLayout(externalLayoutName);
+    const currentAssociatedSceneName = externalLayout.getAssociatedLayout();
+    if (currentAssociatedSceneName === associatedSceneName) {
+      return makeGenericSuccess(
+        `External layout "${externalLayoutName}" already exists (for scene "${associatedSceneName}").${ignoredSuffix}`
+      );
+    }
+    return makeGenericFailure(
+      `External layout "${externalLayoutName}" already exists${
+        currentAssociatedSceneName
+          ? ` and is associated with scene "${currentAssociatedSceneName}"`
+          : ' (with no associated scene)'
+      }. To change its scene, set its \`associatedScene\` property with \`change_scene_properties_layers_effects_groups\`.`
+    );
+  }
+
+  const externalLayout = project.insertNewExternalLayout(
+    externalLayoutName,
+    project.getExternalLayoutsCount()
+  );
+  externalLayout.setAssociatedLayout(associatedSceneName);
+  return {
+    success: true,
+    message:
+      `Created external layout "${externalLayoutName}" for scene "${associatedSceneName}".` +
+      ignoredSuffix +
+      howToUseSuffix,
+    meta: {
+      newExternalLayoutNames: [externalLayoutName],
+    },
+  };
+};
+
+/**
+ * Creates a new, empty scene (or, with `as_external_layout_of_scene`, an
+ * external layout of an existing scene).
  */
 const createScene: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const asExternalLayoutOfScene = SafeExtractor.extractStringProperty(
+      args,
+      'as_external_layout_of_scene'
+    );
+    if (asExternalLayoutOfScene) {
+      return {
+        text: (
+          <Trans>
+            Create external layout <b>{scene_name}</b> for scene{' '}
+            <b>{asExternalLayoutOfScene}</b>.{' '}
+            <Link
+              href="#"
+              onClick={() => editorCallbacks.onOpenExternalLayout(scene_name)}
+            >
+              Click to open it
+            </Link>
+            .
+          </Trans>
+        ),
+      };
+    }
 
     return {
       text: (
@@ -6123,6 +7787,22 @@ const createScene: EditorFunction = {
       args,
       'is_first_scene'
     );
+    const asExternalLayoutOfScene = SafeExtractor.extractStringProperty(
+      args,
+      'as_external_layout_of_scene'
+    );
+    if (asExternalLayoutOfScene) {
+      return createExternalLayout({
+        project,
+        externalLayoutName: scene_name,
+        associatedSceneName: asExternalLayoutOfScene,
+        ignoredArgumentNames: [
+          include_ui_layer ? 'include_ui_layer' : null,
+          background_color ? 'background_color' : null,
+          is_first_scene ? 'is_first_scene' : null,
+        ].filter(Boolean),
+      });
+    }
 
     const firstSceneSuffix = is_first_scene
       ? ' Also set as the first (startup) scene.'
@@ -6402,6 +8082,28 @@ const applyEffectChange = ({
       }
 
       const lowercasedType = foundProperty.getType().toLowerCase();
+      if (lowercasedType === 'resource' && newValue) {
+        const resourcesManager = project.getResourcesManager();
+        if (!resourcesManager.hasResource(newValue)) {
+          warnings.push(
+            `"${propertyName}" of the "${currentEffectName}" effect -> "${newValue}": no such resource in the project (resources are listed by \`inspect_project_properties_resources\`, a file attached by the user must first be added with \`change_project_properties_resources\`). Skipped.`
+          );
+          return;
+        }
+        const expectedResourceKind = (
+          foundProperty.getExtraInfo().toJSArray()[0] || ''
+        ).toLowerCase();
+        const resourceKind = resourcesManager.getResource(newValue).getKind();
+        if (
+          expectedResourceKind &&
+          resourceKind.toLowerCase() !== expectedResourceKind
+        ) {
+          warnings.push(
+            `"${propertyName}" of the "${currentEffectName}" effect -> "${newValue}": the resource has kind "${resourceKind}" but expected "${expectedResourceKind}". Skipped.`
+          );
+          return;
+        }
+      }
       if (lowercasedType === 'number') {
         effect.setDoubleParameter(propertyName, parseFloat(newValue) || 0);
       } else if (lowercasedType === 'boolean') {
@@ -6459,9 +8161,260 @@ const applyEffectChange = ({
   }
 };
 
+// The scopes `inspect_scene_properties_layers_effects` reads: a scene (its
+// properties, layers, layer effects and object groups) or a variant of a
+// custom object (which has an area instead of scene properties). An external
+// layout is read from the project JSON (`read_game_project_json`).
+const INSPECT_PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES = OBJECTS_SCOPE_TYPES;
+// The scopes `change_scene_properties_layers_effects_groups` changes: also an
+// external layout (only a name and an associated scene: its layers and groups
+// are those of the scene).
+const PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES: Array<ToolScopeType> = [
+  'scene',
+  'external_layout',
+  'custom_object_variant',
+];
+
+/**
+ * The message refusing layer, effect or group changes through an external
+ * layout scope: they belong to its scene. Same text as the backend checker.
+ */
+const makeExternalLayoutHasNoLayersMessage = (
+  externalLayoutName: string,
+  sceneName: string
+): string =>
+  `Layers, layer effects and object groups belong to the associated scene "${sceneName}" of external layout "${externalLayoutName}": use scope { type: "scene", scene_name: "${sceneName}" } to change them. Nothing was changed.`;
+
+// The only properties of an external layout (`inspect_scene_properties_layers_effects`
+// returns them along with the layers of its scene).
+const EXTERNAL_LAYOUT_PROPERTY_NAMES = ['name', 'associatedScene'];
+
+/**
+ * The objects and layers used by the instances of an external layout that a
+ * scene does not have: re-associating it with that scene would leave these
+ * instances without object or layer.
+ */
+const getMissingObjectsAndLayersInScene = (
+  project: gdProject,
+  initialInstances: gdInitialInstancesContainer,
+  scene: gdLayout
+): {|
+  missingObjectNames: Array<string>,
+  missingLayerNames: Array<string>,
+|} => {
+  const missingObjectNames = new Set<string>();
+  const missingLayerNames = new Set<string>();
+  iterateOnInstances(initialInstances, instance => {
+    const objectName = instance.getObjectName();
+    if (
+      !scene.getObjects().hasObjectNamed(objectName) &&
+      !project.getObjects().hasObjectNamed(objectName)
+    ) {
+      missingObjectNames.add(objectName);
+    }
+    if (!scene.getLayers().hasLayerNamed(instance.getLayer())) {
+      missingLayerNames.add(instance.getLayer());
+    }
+  });
+  return {
+    missingObjectNames: [...missingObjectNames].sort(),
+    missingLayerNames: [...missingLayerNames].sort(),
+  };
+};
+
+/** Apply a `changed_properties` item to an external layout: `name` or `associatedScene`. */
+const applyExternalLayoutPropertyChange = ({
+  project,
+  externalLayout,
+  propertyName,
+  newValue,
+  changes,
+  warnings,
+  onProjectItemRenamedOutsideEditor,
+  onInstancesModifiedOutsideEditor,
+}: {|
+  project: gdProject,
+  externalLayout: gdExternalLayout,
+  propertyName: string,
+  newValue: string,
+  changes: Array<string>,
+  warnings: Array<string>,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
+  onInstancesModifiedOutsideEditor: (
+    changes: InstancesOutsideEditorChanges
+  ) => void,
+|}) => {
+  if (isFuzzyMatch(propertyName, 'name')) {
+    const oldName = externalLayout.getName();
+    if (newValue === oldName) {
+      changes.push(`External layout already named "${newValue}".`);
+      return;
+    }
+    if (newValue.trim() === '') {
+      warnings.push(`An external layout name cannot be empty. Skipped.`);
+      return;
+    }
+    // Like scene names, external layout names are free text: only ensure
+    // unicity.
+    const newName = newNameGenerator(newValue, tentativeNewName =>
+      project.hasExternalLayoutNamed(tentativeNewName)
+    );
+    externalLayout.setName(newName);
+    gd.WholeProjectRefactorer.renameExternalLayout(project, oldName, newName);
+    onProjectItemRenamedOutsideEditor({
+      kind: 'external-layout',
+      oldName,
+      newName,
+    });
+    changes.push(
+      `Renamed external layout "${oldName}" to "${newName}" (the events creating its objects were updated).`
+    );
+    return;
+  }
+  if (isFuzzyMatch(propertyName, 'associatedScene')) {
+    const externalLayoutName = externalLayout.getName();
+    if (newValue === externalLayout.getAssociatedLayout()) {
+      changes.push(
+        `External layout "${externalLayoutName}" is already associated with scene "${newValue}".`
+      );
+      return;
+    }
+    if (!project.hasLayoutNamed(newValue)) {
+      warnings.push(
+        `${getSceneNotFoundMessage(
+          project,
+          newValue
+        )} External layout "${externalLayoutName}" was NOT re-associated.`
+      );
+      return;
+    }
+    const newScene = project.getLayout(newValue);
+    const {
+      missingObjectNames,
+      missingLayerNames,
+    } = getMissingObjectsAndLayersInScene(
+      project,
+      externalLayout.getInitialInstances(),
+      newScene
+    );
+    if (missingObjectNames.length > 0 || missingLayerNames.length > 0) {
+      warnings.push(
+        `External layout "${externalLayoutName}" was NOT associated with scene "${newValue}": its instances use ` +
+          [
+            missingObjectNames.length > 0
+              ? `objects this scene does not have (nor globally): ${missingObjectNames
+                  .map(name => `"${name}"`)
+                  .join(', ')}`
+              : null,
+            missingLayerNames.length > 0
+              ? `layers this scene does not have: ${missingLayerNames
+                  .map(name => `"${name}"`)
+                  .join(', ')}`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(' and ') +
+          `. Move or erase these instances first (or add the objects/layers to the scene).`
+      );
+      return;
+    }
+    externalLayout.setAssociatedLayout(newValue);
+    // The external layout editor, if open, now shows the objects and layers
+    // of the new scene.
+    onInstancesModifiedOutsideEditor({ scene: newScene, externalLayout });
+    changes.push(
+      `External layout "${externalLayoutName}" is now associated with scene "${newValue}".`
+    );
+    return;
+  }
+  warnings.push(
+    `Unknown external layout property: "${propertyName}". Skipped. An external layout only has ${EXTERNAL_LAYOUT_PROPERTY_NAMES.map(
+      name => `\`${name}\``
+    ).join(' and ')} (its layers and groups are those of its associated scene).`
+  );
+};
+
+/** The layers of a scope, with their effects: the same shape everywhere. */
+const describeLayersWithEffects = (
+  project: gdProject,
+  layersContainer: gdLayersContainer
+) =>
+  mapFor(0, layersContainer.getLayersCount(), i => {
+    const layer = layersContainer.getLayerAt(i);
+    const effectsContainer = layer.getEffects();
+    return {
+      name: layer.getName(),
+      position: i,
+      visible: layer.getVisibility(),
+      effects: mapFor(0, effectsContainer.getEffectsCount(), j => {
+        const effect = effectsContainer.getEffectAt(j);
+        const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+          project.getCurrentPlatform(),
+          effect.getEffectType()
+        );
+
+        if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+          return null;
+        }
+
+        return {
+          effectName: effect.getName(),
+          effectType: effect.getEffectType(),
+          effectProperties: serializeEffectProperties(effect, effectMetadata),
+        };
+      }).filter(Boolean),
+    };
+  });
+
+const describeObjectGroups = (objectsContainer: gdObjectsContainer) => {
+  const groups = objectsContainer.getObjectGroups();
+  return mapFor(0, groups.count(), i => {
+    const group = groups.getAt(i);
+    return {
+      objectGroupName: group.getName(),
+      objectNames: group.getAllObjectsNames().toJSArray(),
+    };
+  });
+};
+
+/** A variant has no background color, resolution or startup flag: an area. */
+const inspectCustomObjectVariant = (
+  project: gdProject,
+  resolvedScope: ResolvedScope,
+  variant: gdEventsBasedObjectVariant,
+  eventsBasedObject: gdEventsBasedObject
+): EditorFunctionGenericOutput => {
+  const assetStoreAssetId = variant.getAssetStoreAssetId();
+  return {
+    success: true,
+    propertiesLayersEffectsForScopeLabel: resolvedScope.label,
+    isDefaultVariant: resolvedScope.isDefaultVariant,
+    area: {
+      minX: variant.getAreaMinX(),
+      minY: variant.getAreaMinY(),
+      minZ: variant.getAreaMinZ(),
+      maxX: variant.getAreaMaxX(),
+      maxY: variant.getAreaMaxY(),
+      maxZ: variant.getAreaMaxZ(),
+    },
+    layers: describeLayersWithEffects(project, variant.getLayers()),
+    objectGroups: describeObjectGroups(eventsBasedObject.getObjects()),
+    ...(assetStoreAssetId ? { assetStoreAssetId } : {}),
+  };
+};
+
 const inspectScenePropertiesLayersEffects: EditorFunction = {
   renderForEditor: ({ args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
+    if (!scene_name) {
+      return {
+        text: (
+          <Trans>Read the settings of {getScopeLabelFromArgs(args)}.</Trans>
+        ),
+      };
+    }
 
     return {
       text: (
@@ -6472,13 +8425,25 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
     };
   },
   launchFunction: async ({ project, args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: INSPECT_PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
+    const { variant, eventsBasedObject } = resolvedScope;
+    if (variant && eventsBasedObject) {
+      return inspectCustomObjectVariant(
+        project,
+        resolvedScope,
+        variant,
+        eventsBasedObject
+      );
     }
 
-    const scene = project.getLayout(scene_name);
+    const scene = resolvedScope.layout;
+    if (!scene)
+      return makeGenericFailure(`${resolvedScope.label} has no properties.`);
     const layersContainer = scene.getLayers();
 
     // Mirror the runtime behavior: when `firstLayout` is not set (or names a
@@ -6511,35 +8476,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
         gameScaleMode: project.getScaleMode(),
         gameName: project.getName(),
       },
-      layers: mapFor(0, layersContainer.getLayersCount(), i => {
-        const layer = layersContainer.getLayerAt(i);
-        const effectsContainer = layer.getEffects();
-        return {
-          name: layer.getName(),
-          position: i,
-          visible: layer.getVisibility(),
-          effects: mapFor(0, effectsContainer.getEffectsCount(), j => {
-            const effect = effectsContainer.getEffectAt(j);
-            const effectMetadata = gd.MetadataProvider.getEffectMetadata(
-              project.getCurrentPlatform(),
-              effect.getEffectType()
-            );
-
-            if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
-              return null;
-            }
-
-            return {
-              effectName: effect.getName(),
-              effectType: effect.getEffectType(),
-              effectProperties: serializeEffectProperties(
-                effect,
-                effectMetadata
-              ),
-            };
-          }).filter(Boolean),
-        };
-      }),
+      layers: describeLayersWithEffects(project, layersContainer),
     };
   },
   modifiesProject: false,
@@ -6562,9 +8499,107 @@ const parseBoolean = (
   return { valid: true, value: lowercaseValue === 'true' };
 };
 
+// The only "properties" a variant of a custom object has: its area (the
+// declaration settings live on the custom object itself).
+const CUSTOM_OBJECT_VARIANT_AREA_PROPERTY_NAMES = [
+  'areaMinX',
+  'areaMinY',
+  'areaMinZ',
+  'areaMaxX',
+  'areaMaxY',
+  'areaMaxZ',
+];
+
+const applyCustomObjectVariantPropertyChange = ({
+  variant,
+  propertyName,
+  newValue,
+  targetLabel,
+  changes,
+  warnings,
+}: {|
+  variant: gdEventsBasedObjectVariant,
+  propertyName: string,
+  newValue: string,
+  targetLabel: string,
+  changes: Array<string>,
+  warnings: Array<string>,
+|}) => {
+  const areaPropertyName = CUSTOM_OBJECT_VARIANT_AREA_PROPERTY_NAMES.find(
+    name => isFuzzyMatch(propertyName, name)
+  );
+  if (!areaPropertyName) {
+    warnings.push(
+      `Unknown custom object variant property: "${propertyName}". Skipped. A variant only has ${CUSTOM_OBJECT_VARIANT_AREA_PROPERTY_NAMES.join(
+        ', '
+      )} (the scene properties and the custom object settings are changed elsewhere).`
+    );
+    return;
+  }
+  const value = parseFloat(newValue);
+  if (!Number.isFinite(value)) {
+    warnings.push(
+      `"${areaPropertyName}" must be a number (got "${newValue}"). Skipped.`
+    );
+    return;
+  }
+  if (areaPropertyName === 'areaMinX') variant.setAreaMinX(value);
+  else if (areaPropertyName === 'areaMinY') variant.setAreaMinY(value);
+  else if (areaPropertyName === 'areaMinZ') variant.setAreaMinZ(value);
+  else if (areaPropertyName === 'areaMaxX') variant.setAreaMaxX(value);
+  else if (areaPropertyName === 'areaMaxY') variant.setAreaMaxY(value);
+  else variant.setAreaMaxZ(value);
+  changes.push(`Set ${areaPropertyName} to ${value} for ${targetLabel}.`);
+};
+
+/** Renaming an object group updates the events referring to it. */
+const objectOrGroupRenamedInScope = (
+  project: gdProject,
+  resolvedScope: ResolvedScope,
+  oldName: string,
+  newName: string
+) => {
+  const { layout, eventsBasedObject } = resolvedScope;
+  if (layout) {
+    gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
+      project,
+      layout,
+      oldName,
+      newName,
+      /* isObjectGroup=*/ true
+    );
+    return;
+  }
+  if (!eventsBasedObject) return;
+  const { accessor, dispose } = makeScopeProjectScopedContainersAccessor(
+    project,
+    resolvedScope,
+    null
+  );
+  try {
+    gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
+      project,
+      accessor.get(),
+      eventsBasedObject,
+      oldName,
+      newName,
+      /* isObjectGroup=*/ true
+    );
+  } finally {
+    dispose();
+  }
+};
+
 const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
+    if (!scene_name) {
+      return {
+        text: (
+          <Trans>Update the settings of {getScopeLabelFromArgs(args)}.</Trans>
+        ),
+      };
+    }
 
     const deleteThisScene = SafeExtractor.extractBooleanProperty(
       args,
@@ -6575,6 +8610,20 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         text: (
           <Trans>
             Remove scene <b>{scene_name}</b>.
+          </Trans>
+        ),
+      };
+    }
+    const moveInstances = SafeExtractor.extractObjectProperty(
+      args,
+      'move_instances'
+    );
+    if (moveInstances) {
+      return {
+        text: (
+          <Trans>
+            Move instances of scene <b>{scene_name}</b> to{' '}
+            {getScopeLabelFromArgs({ scope: moveInstances.to_scope })}.
           </Trans>
         ),
       };
@@ -6676,22 +8725,64 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     args,
     toolsVersion,
     onInstancesModifiedOutsideEditor,
+    onEffectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
     onWillDeleteScene,
+    searchAndInstallEffectAsset,
+    relatedAiRequestId,
+    getRelatedAiRequestLastMessages,
   }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: PROPERTIES_LAYERS_EFFECTS_SCOPE_TYPES,
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
 
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeSceneNotFoundFailure(project, scene_name);
-    }
-    const scene = project.getLayout(scene_name);
+    const scene = resolvedScope.layout;
+    const {
+      variant,
+      eventsBasedObject,
+      layersContainer,
+      externalLayout,
+    } = resolvedScope;
+    if (!layersContainer)
+      return makeGenericFailure(`${resolvedScope.label} has no layers.`);
+    // The label is read at message time: a rename in the same call must be
+    // reflected by the messages that follow it.
+    const getTargetLabel = () =>
+      externalLayout
+        ? `external layout "${externalLayout.getName()}"`
+        : scene
+        ? `scene "${scene.getName()}"`
+        : resolvedScope.label;
 
     const deleteThisScene = SafeExtractor.extractBooleanProperty(
       args,
       'delete_this_scene'
     );
-    if (deleteThisScene) {
+    if (deleteThisScene && !scene) {
+      return makeGenericFailure(
+        'A variant cannot be deleted here: use change_custom_object.changed_variants.'
+      );
+    }
+    if (deleteThisScene && externalLayout) {
+      // Same flow as a scene: let the editor close the tabs of the external
+      // layout while it still exists.
+      await onWillDeleteScene({ externalLayout });
+
+      const externalLayoutName = externalLayout.getName();
+      const instancesCount = externalLayout
+        .getInitialInstances()
+        .getInstancesCount();
+      project.removeExternalLayout(externalLayoutName);
+      return makeGenericSuccess(
+        `Deleted external layout "${externalLayoutName}" (${instancesCount} instance(s) removed with it). Events creating its objects with \`CreateObjectsFromExternalLayout("${externalLayoutName}", ...)\`, if any, still name it: update or remove them.`
+      );
+    }
+    if (deleteThisScene && scene) {
       // Let the editor close any tab bound to this scene BEFORE it's
       // actually deleted (mirrors the manual delete flow, which closes tabs
       // before removing the layout). This must be awaited: closing tabs
@@ -6699,6 +8790,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       // while the scene still exists in the project.
       await onWillDeleteScene({ scene });
 
+      const scene_name = scene.getName();
       const wasFirstLayout = project.getFirstLayout() === scene_name;
       if (wasFirstLayout) {
         project.setFirstLayout('');
@@ -6731,6 +8823,75 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       args,
       'changed_groups'
     );
+    const move_instances = SafeExtractor.extractObjectProperty(
+      args,
+      'move_instances'
+    );
+
+    // An external layout has no layers, effects or groups of its own: refuse
+    // before changing anything, instead of silently editing its scene.
+    if (
+      externalLayout &&
+      scene &&
+      [changed_layers, changed_layer_effects, changed_groups].some(
+        items => items && items.length > 0
+      )
+    ) {
+      return makeGenericFailure(
+        makeExternalLayoutHasNoLayersMessage(
+          externalLayout.getName(),
+          scene.getName()
+        )
+      );
+    }
+
+    // Object groups are structural: a named variant inherits the ones of the
+    // default variant instead of having its own.
+    if (changed_groups && changed_groups.length > 0) {
+      const namedVariantRejection = getNamedVariantRejection(resolvedScope);
+      if (namedVariantRejection)
+        return makeScopeFailureOutput(namedVariantRejection);
+    }
+
+    // The move comes first and is atomic: a refusal leaves the whole call
+    // unapplied, so "nothing was changed" is true. Names in `to_scope` are
+    // thus the ones before any rename of this call.
+    let moveInstancesOutput: MoveInstancesOutputFields | null = null;
+    if (move_instances) {
+      const moveResult = moveInstancesToScope({
+        project,
+        sourceScope: resolvedScope,
+        moveInstancesArgs: move_instances,
+      });
+      if (moveResult.success === false) {
+        return makeGenericFailure(moveResult.message);
+      }
+      if (moveResult.movedInstancesCount === 0) {
+        warnings.push(moveResult.message);
+      } else {
+        changes.push(moveResult.message);
+        moveInstancesOutput = {
+          movedInstancesCount: moveResult.movedInstancesCount,
+          movedInstancesCountByObjectName:
+            moveResult.movedInstancesCountByObjectName,
+        };
+        onInstancesModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(resolvedScope),
+        });
+        onInstancesModifiedOutsideEditor({
+          ...getOutsideEditorChangesTarget(moveResult.targetScope),
+        });
+      }
+    }
+    // The groups of a custom object live on its default variant.
+    const groupsObjectsContainer = eventsBasedObject
+      ? eventsBasedObject.getObjects()
+      : resolvedScope.objectsContainer;
+    // No global objects inside a custom object: the children only see each other.
+    const groupsGlobalObjectsContainer =
+      resolvedScope.globalObjectsContainer || null;
+    if (!groupsObjectsContainer)
+      return makeGenericFailure(`${resolvedScope.label} has no objects.`);
 
     if (changed_properties)
       changed_properties.forEach(changed_property => {
@@ -6748,6 +8909,33 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               changed_property
             )}. Skipped.`
           );
+          return;
+        }
+
+        if (!scene) {
+          if (variant) {
+            applyCustomObjectVariantPropertyChange({
+              variant,
+              propertyName,
+              newValue,
+              targetLabel: resolvedScope.label,
+              changes,
+              warnings,
+            });
+          }
+          return;
+        }
+        if (externalLayout) {
+          applyExternalLayoutPropertyChange({
+            project,
+            externalLayout,
+            propertyName,
+            newValue,
+            changes,
+            warnings,
+            onProjectItemRenamedOutsideEditor,
+            onInstancesModifiedOutsideEditor,
+          });
           return;
         }
 
@@ -6876,7 +9064,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           return;
         }
 
-        if (scene.hasLayerNamed(layerName)) {
+        if (layersContainer.hasLayerNamed(layerName)) {
           // `changed_layers: [{ layer_name: "HUD" }]` on an existing layer is
           // how an agent asks to MAKE SURE the layer exists — which it does.
           // Say so (like a rename to the current name does) instead of
@@ -6889,7 +9077,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             move_instances_to_layer === null
           ) {
             changes.push(
-              `Layer "${layerName}" already exists in scene "${scene.getName()}": nothing to change.`
+              `Layer "${layerName}" already exists in ${getTargetLabel()}: nothing to change.`
             );
             return;
           }
@@ -6898,9 +9086,9 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             // The base layer is named "", so only a null (not set) value means
             // "delete the instances of the layer".
             if (move_instances_to_layer !== null) {
-              if (!scene.hasLayerNamed(move_instances_to_layer)) {
+              if (!layersContainer.hasLayerNamed(move_instances_to_layer)) {
                 warnings.push(
-                  `Layer "${move_instances_to_layer}" does not exist in scene "${scene.getName()}": layer "${layerName}" was NOT deleted (its instances would have nowhere to go). The base layer is named "".`
+                  `Layer "${move_instances_to_layer}" does not exist in ${getTargetLabel()}: layer "${layerName}" was NOT deleted (its instances would have nowhere to go). The base layer is named "".`
                 );
                 return;
               }
@@ -6910,48 +9098,44 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                 );
                 return;
               }
-              gd.WholeProjectRefactorer.mergeLayersInScene(
+              mergeLayersInScope(
                 project,
-                scene,
+                resolvedScope,
                 layerName,
                 move_instances_to_layer
               );
             } else {
               // Note: some instances will be invalidated because of this.
-              gd.WholeProjectRefactorer.removeLayerInScene(
-                project,
-                scene,
-                layerName
-              );
+              removeLayerInScope(project, resolvedScope, layerName);
             }
-            scene.getLayers().removeLayer(layerName);
+            layersContainer.removeLayer(layerName);
             changes.push(
               move_instances_to_layer !== null
-                ? `Removed layer "${layerName}" for scene "${scene.getName()}" (instances moved to ${
+                ? `Removed layer "${layerName}" for ${getTargetLabel()} (instances moved to ${
                     move_instances_to_layer === ''
                       ? 'the base layer'
                       : `layer "${move_instances_to_layer}"`
                   }).`
-                : `Removed layer "${layerName}" for scene "${scene.getName()}" (its instances were removed too).`
+                : `Removed layer "${layerName}" for ${getTargetLabel()} (its instances were removed too).`
             );
           } else {
-            const layer = scene.getLayers().getLayer(layerName);
+            const layer = layersContainer.getLayer(layerName);
             if (new_layer_name) {
-              if (scene.hasLayerNamed(new_layer_name)) {
+              if (layersContainer.hasLayerNamed(new_layer_name)) {
                 warnings.push(
-                  `A layer named "${new_layer_name}" already exists in scene "${scene.getName()}": layer "${layerName}" was not renamed. To merge two layers, delete one with "delete_this_layer" and "move_instances_to_layer".`
+                  `A layer named "${new_layer_name}" already exists in ${getTargetLabel()}: layer "${layerName}" was not renamed. To merge two layers, delete one with "delete_this_layer" and "move_instances_to_layer".`
                 );
               } else {
                 layer.setName(new_layer_name);
-                gd.WholeProjectRefactorer.renameLayerInScene(
+                renameLayerInScope(
                   project,
-                  scene,
+                  resolvedScope,
                   layerName,
                   new_layer_name
                 );
                 currentLayerName = new_layer_name;
                 changes.push(
-                  `Renamed layer "${layerName}" to "${new_layer_name}" for scene "${scene.getName()}" (events and instances updated).`
+                  `Renamed layer "${layerName}" to "${new_layer_name}" for ${getTargetLabel()} (events and instances updated).`
                 );
               }
             }
@@ -6960,7 +9144,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               changes.push(
                 `Set layer "${currentLayerName}" initial visibility to ${
                   new_visibility ? 'visible' : 'hidden'
-                } for scene "${scene.getName()}".`
+                } for ${getTargetLabel()}.`
               );
             }
           }
@@ -6971,29 +9155,27 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               `"new_layer_position" was ignored: layer "${layerName}" was deleted.`
             );
           } else if (new_layer_position !== null) {
-            const currentLayerPosition = scene
-              .getLayers()
-              .getLayerPosition(currentLayerName);
+            const currentLayerPosition = layersContainer.getLayerPosition(
+              currentLayerName
+            );
             // `moveLayer` silently ignores an out-of-range target: clamp it
             // (as documented, an out-of-bounds position means "on top") and
             // report the real position.
             const clampedLayerPosition = Math.max(
               0,
-              Math.min(
-                new_layer_position,
-                scene.getLayers().getLayersCount() - 1
-              )
+              Math.min(new_layer_position, layersContainer.getLayersCount() - 1)
             );
             if (clampedLayerPosition === currentLayerPosition) {
               changes.push(
-                `Layer "${currentLayerName}" is already at position ${currentLayerPosition} for scene "${scene.getName()}".`
+                `Layer "${currentLayerName}" is already at position ${currentLayerPosition} for ${getTargetLabel()}.`
               );
             } else {
-              scene
-                .getLayers()
-                .moveLayer(currentLayerPosition, clampedLayerPosition);
+              layersContainer.moveLayer(
+                currentLayerPosition,
+                clampedLayerPosition
+              );
               changes.push(
-                `Moved layer "${currentLayerName}" to position ${clampedLayerPosition} for scene "${scene.getName()}".`
+                `Moved layer "${currentLayerName}" to position ${clampedLayerPosition} for ${getTargetLabel()}.`
               );
             }
           }
@@ -7002,30 +9184,26 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           // This will force the instances editor to destroy and mount again the
           // renderers to avoid keeping any references to existing instances, and also drop any selection.
           onInstancesModifiedOutsideEditor({
-            scene,
+            ...getOutsideEditorChangesTarget(resolvedScope),
           });
         } else {
           const existingLayerNames = mapFor(
             0,
-            scene.getLayers().getLayersCount(),
-            i =>
-              `"${scene
-                .getLayers()
-                .getLayerAt(i)
-                .getName()}"`
+            layersContainer.getLayersCount(),
+            i => `"${layersContainer.getLayerAt(i).getName()}"`
           ).join(', ');
 
           // A deletion or rename targeting a layer that does not exist is
           // always a wrong layer name: don't create a layer out of it.
           if (delete_this_layer) {
             warnings.push(
-              `Layer "${layerName}" not found in scene "${scene.getName()}": nothing was deleted. Existing layers are: ${existingLayerNames}.`
+              `Layer "${layerName}" not found in ${getTargetLabel()}: nothing was deleted. Existing layers are: ${existingLayerNames}.`
             );
             return;
           }
           if (new_layer_name) {
             warnings.push(
-              `Layer "${layerName}" not found in scene "${scene.getName()}": no layer was renamed. Existing layers are: ${existingLayerNames}. To create a new layer, pass its name as "layer_name" and do not set "new_layer_name".`
+              `Layer "${layerName}" not found in ${getTargetLabel()}: no layer was renamed. Existing layers are: ${existingLayerNames}. To create a new layer, pass its name as "layer_name" and do not set "new_layer_name".`
             );
             return;
           }
@@ -7040,26 +9218,19 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           }
           const insertionPosition =
             new_layer_position === null
-              ? scene.getLayers().getLayersCount()
+              ? layersContainer.getLayersCount()
               : new_layer_position;
-          scene.getLayers().insertNewLayer(layerName, insertionPosition);
+          layersContainer.insertNewLayer(layerName, insertionPosition);
           if (new_visibility !== null) {
-            scene
-              .getLayers()
-              .getLayer(layerName)
-              .setVisibility(new_visibility);
+            layersContainer.getLayer(layerName).setVisibility(new_visibility);
           }
           const newLayerNames = mapFor(
             0,
-            scene.getLayers().getLayersCount(),
-            i =>
-              `"${scene
-                .getLayers()
-                .getLayerAt(i)
-                .getName()}"`
+            layersContainer.getLayersCount(),
+            i => `"${layersContainer.getLayerAt(i).getName()}"`
           ).join(', ');
           changes.push(
-            `Layer "${layerName}" did not exist in scene "${scene.getName()}": created it at position ${insertionPosition}${
+            `Layer "${layerName}" did not exist in ${getTargetLabel()}: created it at position ${insertionPosition}${
               new_visibility === null
                 ? ''
                 : ` (initial visibility: ${
@@ -7072,7 +9243,8 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     }
 
     if (changed_layer_effects) {
-      changed_layer_effects.forEach(changed_layer_effect => {
+      const changesCountBeforeLayerEffects = changes.length;
+      for (const changed_layer_effect of changed_layer_effects) {
         const layerName = SafeExtractor.extractStringProperty(
           changed_layer_effect,
           'layer_name'
@@ -7081,28 +9253,81 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           warnings.push(
             `Missing "layer_name" in changed_layer_effects item. Skipped.`
           );
-          return;
+          continue;
         }
-        if (!scene.hasLayerNamed(layerName)) {
+        if (!layersContainer.hasLayerNamed(layerName)) {
           warnings.push(`Layer "${layerName}" not found. Effects skipped.`);
-          return;
+          continue;
         }
-        const layer = scene.getLayers().getLayer(layerName);
+        const layer = layersContainer.getLayer(layerName);
+        const targetLabel = `layer "${layerName}"`;
+
+        // An effect taken from the store: install it first, then apply the
+        // rest of the change (rename, position, properties) on the effect.
+        let changedEffect = changed_layer_effect;
+        const asset_id = SafeExtractor.extractStringProperty(
+          changed_layer_effect,
+          'asset_id'
+        );
+        if (asset_id) {
+          const effectName = SafeExtractor.extractStringProperty(
+            changed_layer_effect,
+            'effect_name'
+          );
+          const effect_type = SafeExtractor.extractStringProperty(
+            changed_layer_effect,
+            'effect_type'
+          );
+          if (effectName === null) {
+            warnings.push(
+              `Missing "effect_name" in changed_layer_effects item. Skipped.`
+            );
+            continue;
+          }
+          const { status, message, effect } = await searchAndInstallEffectAsset(
+            {
+              effectsContainer: layer.getEffects(),
+              effectName,
+              effectType: effect_type || null,
+              exactOrPartialAssetId: asset_id,
+              relatedAiRequestId,
+              ...getRelatedAiRequestLastMessages(),
+            }
+          );
+          if (status !== 'asset-installed' || !effect) {
+            warnings.push(
+              `No effect could be added from the asset store on ${targetLabel} for "${effectName}": ${message}`
+            );
+            continue;
+          }
+          changes.push(
+            `Added the effect "${effect.getName()}" (${effect.getEffectType()}) from the asset store on ${targetLabel}, with its resources installed in the project.`
+          );
+          const {
+            effect_type: ignoredEffectType,
+            asset_id: ignoredAssetId,
+            ...remainingChange
+          } = changed_layer_effect;
+          changedEffect = { ...remainingChange, effect_name: effect.getName() };
+        }
 
         applyEffectChange({
           project,
           effectsContainer: layer.getEffects(),
-          changedEffect: changed_layer_effect,
-          targetLabel: `layer "${layerName}"`,
+          changedEffect,
+          targetLabel,
           changes,
           warnings,
           targetRenderingType: layer.getRenderingType(),
         });
-      });
+      }
+      if (changes.length > changesCountBeforeLayerEffects) {
+        onEffectsModifiedOutsideEditor();
+      }
     }
 
     if (changed_groups) {
-      const groups = scene.getObjects().getObjectGroups();
+      const groups = groupsObjectsContainer.getObjectGroups();
       changed_groups.forEach(changed_group => {
         const groupName = SafeExtractor.extractStringProperty(
           changed_group,
@@ -7152,21 +9377,21 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           // is always a wrong group name: don't create a group out of it.
           if (deleteThisGroup) {
             warnings.push(
-              `Group "${groupName}" not found in scene "${scene.getName()}": nothing was deleted. Existing groups are: ${existingGroupNames ||
+              `Group "${groupName}" not found in ${getTargetLabel()}: nothing was deleted. Existing groups are: ${existingGroupNames ||
                 '(none)'}.`
             );
             return;
           }
           if (newGroupName) {
             warnings.push(
-              `Group "${groupName}" not found in scene "${scene.getName()}": no group was renamed. Existing groups are: ${existingGroupNames ||
+              `Group "${groupName}" not found in ${getTargetLabel()}: no group was renamed. Existing groups are: ${existingGroupNames ||
                 '(none)'}.`
             );
             return;
           }
           if (hasObjectsToRemove && !hasObjectsToAdd) {
             warnings.push(
-              `Group "${groupName}" not found in scene "${scene.getName()}": no objects were removed from it. Existing groups are: ${existingGroupNames ||
+              `Group "${groupName}" not found in ${getTargetLabel()}: no objects were removed from it. Existing groups are: ${existingGroupNames ||
                 '(none)'}.`
             );
             return;
@@ -7175,9 +9400,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           // its name was given, which is a request for a new empty group
           // (events can reference it before its objects exist).
           foundGroup = groups.insertNew(groupName, groups.count());
-          changes.push(
-            `Created group "${groupName}" in scene "${scene.getName()}".`
-          );
+          changes.push(`Created group "${groupName}" in ${getTargetLabel()}.`);
         } else {
           foundGroup = groups.get(groupName);
         }
@@ -7185,7 +9408,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         if (deleteThisGroup) {
           groups.remove(groupName);
           changes.push(
-            `Deleted group "${groupName}" from scene "${scene.getName()}".`
+            `Deleted group "${groupName}" from ${getTargetLabel()}.`
           );
         } else {
           if (newGroupName && newGroupName !== groupName) {
@@ -7195,25 +9418,26 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             // and an object) with the same name.
             if (
               resolveObjectsFromContextAndName({
-                project,
-                layout: scene,
+                objectsContainer: groupsObjectsContainer,
+                globalObjectsContainer: groupsGlobalObjectsContainer,
                 objectOrGroupName: newGroupName,
               })
             ) {
               warnings.push(
-                `An object or group named "${newGroupName}" already exists (in scene "${scene.getName()}" or globally): group "${groupName}" was NOT renamed.`
+                `An object or group named "${newGroupName}" already exists (in ${getTargetLabel()}${
+                  groupsGlobalObjectsContainer ? ' or globally' : ''
+                }): group "${groupName}" was NOT renamed.`
               );
             } else {
-              gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
+              objectOrGroupRenamedInScope(
                 project,
-                scene,
+                resolvedScope,
                 foundGroup.getName(),
-                newGroupName,
-                /* isObjectGroup=*/ true
+                newGroupName
               );
               foundGroup.setName(newGroupName);
               changes.push(
-                `Renamed group "${groupName}" to "${newGroupName}" in scene "${scene.getName()}".`
+                `Renamed group "${groupName}" to "${newGroupName}" in ${getTargetLabel()}.`
               );
             }
           }
@@ -7247,8 +9471,8 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               foundGroup.removeObject(objectName);
             });
 
-            const globalObjects = project.getObjects();
-            const sceneObjects = scene.getObjects();
+            const globalObjects = groupsGlobalObjectsContainer;
+            const sceneObjects = groupsObjectsContainer;
 
             // Capture the variables and behaviors shared in common by the group
             // (from its objects after removals, before additions), so that any
@@ -7256,14 +9480,23 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             // object group editor does. This keeps an object added to a group
             // consistent with the rest of the group (which is the "intersection"
             // of its objects: it shows the variables and behaviors in common).
-            const objectsContainersList = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+            const {
+              accessor,
+              dispose,
+            } = makeScopeProjectScopedContainersAccessor(
               project,
-              scene
-            ).getObjectsContainersList();
-            const groupVariablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
-              objectsContainersList,
-              foundGroup
+              resolvedScope,
+              null
             );
+            let groupVariablesContainer;
+            try {
+              groupVariablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
+                accessor.get().getObjectsContainersList(),
+                foundGroup
+              );
+            } finally {
+              dispose();
+            }
             const existingGroupObjects = foundGroup
               .getAllObjectsNames()
               .toJSArray()
@@ -7292,7 +9525,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                 for (const behaviorName of groupVisibleBehaviorNames) {
                   gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
                     project.getCurrentPlatform(),
-                    globalObjects,
+                    globalObjects || sceneObjects,
                     sceneObjects,
                     object,
                     foundGroup,
@@ -7301,7 +9534,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                 }
               } else {
                 warnings.push(
-                  `Object "${objectName}" not found in scene "${scene.getName()}", so it was not added to group "${groupName}".`
+                  `Object "${objectName}" not found in ${getTargetLabel()}, so it was not added to group "${groupName}".`
                 );
               }
             });
@@ -7310,7 +9543,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               .getAllObjectsNames()
               .toJSArray();
             changes.push(
-              `Group "${groupName}" in scene "${scene.getName()}" now contains ${
+              `Group "${groupName}" in ${getTargetLabel()} now contains ${
                 finalObjectNames.length
               } object(s): ${
                 finalObjectNames.length > 0
@@ -7378,9 +9611,13 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         }
       });
 
+      // The named variants of a custom object inherit the groups of the
+      // default variant.
+      complyVariantsAfterStructuralEdit(project, resolvedScope);
+
       // Notify the editor that object groups have been modified
       onObjectGroupsModifiedOutsideEditor({
-        scene,
+        ...getOutsideEditorChangesTarget(resolvedScope),
       });
     }
 
@@ -7400,12 +9637,14 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       return {
         success: true,
         message: ['Done.', ...changes].join('\n'),
+        ...(moveInstancesOutput || {}),
       };
     } else {
       return {
         success: true,
         message: ['Done with warnings.', ...changes].join('\n'),
         warnings: warnings.join('\n'),
+        ...(moveInstancesOutput || {}),
       };
     }
   },
@@ -7552,6 +9791,24 @@ const changeProjectPropertiesResources: EditorFunction = {
       (changed_properties && changed_properties.length) || 0;
     const changedResourcesCount =
       (changed_resources && changed_resources.length) || 0;
+    const added_resources = SafeExtractor.extractArrayProperty(
+      args,
+      'added_resources'
+    );
+
+    if (added_resources && added_resources.length > 0) {
+      return {
+        text:
+          added_resources.length === 1 ? (
+            <Trans>Add an attached file to the project resources.</Trans>
+          ) : (
+            <Trans>
+              Add {added_resources.length} attached files to the project
+              resources.
+            </Trans>
+          ),
+      };
+    }
 
     if (changedPropertiesCount > 0 && changedResourcesCount > 0) {
       return {
@@ -7569,8 +9826,17 @@ const changeProjectPropertiesResources: EditorFunction = {
           changed_resources[0],
           'delete_this_resource'
         );
+        const replacingAttachmentId = SafeExtractor.extractStringProperty(
+          changed_resources[0],
+          'replace_file_with_attachment_id'
+        );
         return {
-          text: deleteThisResource ? (
+          text: replacingAttachmentId ? (
+            <Trans>
+              Replace the file of resource <b>{resourceName}</b> by an attached
+              file.
+            </Trans>
+          ) : deleteThisResource ? (
             <Trans>
               Remove resource <b>{resourceName}</b>.
             </Trans>
@@ -7604,7 +9870,12 @@ const changeProjectPropertiesResources: EditorFunction = {
       text: <Trans>Change {changedPropertiesCount} project properties.</Trans>,
     };
   },
-  launchFunction: async ({ project, args, toolsVersion }) => {
+  launchFunction: async ({
+    project,
+    args,
+    toolsVersion,
+    attachmentsForResources,
+  }) => {
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
       'changed_properties'
@@ -7613,17 +9884,53 @@ const changeProjectPropertiesResources: EditorFunction = {
       args,
       'changed_resources'
     );
+    const added_resources = SafeExtractor.extractArrayProperty(
+      args,
+      'added_resources'
+    );
     if (
       (!changed_properties || changed_properties.length === 0) &&
-      (!changed_resources || changed_resources.length === 0)
+      (!changed_resources || changed_resources.length === 0) &&
+      (!added_resources || added_resources.length === 0)
     ) {
       return makeGenericFailure(
-        'Missing or empty "changed_properties" and "changed_resources" arguments: at least one change must be provided.'
+        'Missing or empty "changed_properties", "changed_resources" and "added_resources" arguments: at least one change must be provided.'
       );
     }
 
     const changes = [];
     const warnings = [];
+    const attachmentResourceAdditions: Array<AttachmentResourceAddition> = [];
+    const attachmentResourceReplacements: Array<AttachmentResourceReplacement> = [];
+
+    if (added_resources)
+      added_resources.forEach(added_resource => {
+        const attachmentId = SafeExtractor.extractStringProperty(
+          added_resource,
+          'attachment_id'
+        );
+        if (!attachmentId) {
+          warnings.push(
+            `Missing "attachment_id" in added_resources item: ${JSON.stringify(
+              added_resource
+            )}. Skipped.`
+          );
+          return;
+        }
+        attachmentResourceAdditions.push({
+          attachmentId,
+          resourceName:
+            SafeExtractor.extractStringProperty(
+              added_resource,
+              'resource_name'
+            ) || null,
+          resourceKind:
+            SafeExtractor.extractStringProperty(
+              added_resource,
+              'resource_kind'
+            ) || null,
+        });
+      });
 
     if (changed_properties)
       changed_properties.forEach(changed_property => {
@@ -7835,6 +10142,18 @@ const changeProjectPropertiesResources: EditorFunction = {
           return;
         }
 
+        const replacingAttachmentId = SafeExtractor.extractStringProperty(
+          changed_resource,
+          'replace_file_with_attachment_id'
+        );
+        if (replacingAttachmentId) {
+          attachmentResourceReplacements.push({
+            attachmentId: replacingAttachmentId,
+            resourceName,
+          });
+          return;
+        }
+
         const resourcesManager = project.getResourcesManager();
         if (!resourcesManager.hasResource(resourceName)) {
           warnings.push(
@@ -7928,6 +10247,22 @@ const changeProjectPropertiesResources: EditorFunction = {
         );
       });
 
+    if (
+      attachmentResourceAdditions.length > 0 ||
+      attachmentResourceReplacements.length > 0
+    ) {
+      const resourceChangesFromAttachments = await addOrReplaceResourcesFromAttachments(
+        {
+          project,
+          additions: attachmentResourceAdditions,
+          replacements: attachmentResourceReplacements,
+          attachmentsForResources,
+        }
+      );
+      changes.push(...resourceChangesFromAttachments.changes);
+      warnings.push(...resourceChangesFromAttachments.warnings);
+    }
+
     return makeMultipleChangesOutput(changes, warnings, toolsVersion);
   },
   modifiesProject: true,
@@ -7981,7 +10316,26 @@ type VariablesContainersResolution = {|
   failure: EditorFunctionGenericOutput | null,
   variablesContainers: Array<gdVariablesContainer>,
   scopeDescription: string,
+  // For the `instance` scope: the objects of the matched instances (a variable
+  // of an instance must be declared on its object). Empty for other scopes.
+  instancesObjects: Array<gdObject>,
 |};
+
+const ALL_VARIABLE_SCOPES = ['scene', 'object', 'group', 'instance', 'global'];
+
+// The `variable_scope` values a scope other than a scene can serve, and how to
+// get the ones it can't.
+const makeVariableScopeNotAvailableMessage = (
+  resolvedScope: ResolvedScope,
+  variable_scope: string
+): string =>
+  resolvedScope.scope.type === 'extension'
+    ? `variable_scope "${variable_scope}" is not available in ${
+        resolvedScope.label
+      }: use "scene" or "global" (the extension variables).`
+    : `variable_scope "${variable_scope}" is not available in ${
+        resolvedScope.label
+      }: use "object", "group" or "instance" (for the variables of the project, use scope { type: "project" } with variable_scope "global").`;
 
 // Resolve a variable scope to the variables container(s) to act on. A group
 // resolves to the container of every object in it (a group variable is shared
@@ -7989,14 +10343,14 @@ type VariablesContainersResolution = {|
 // exists). Returns a `failure` output to forward when the scope is invalid.
 const resolveVariablesContainers = ({
   project,
+  resolvedScope,
   variable_scope,
-  scene_name,
   object_name,
   instance_id,
 }: {|
   project: gdProject,
+  resolvedScope: ResolvedScope,
   variable_scope: string,
-  scene_name: ?string,
   object_name: ?string,
   instance_id: ?string,
 |}): VariablesContainersResolution => {
@@ -8004,14 +10358,59 @@ const resolveVariablesContainers = ({
     failure: makeGenericFailure(message),
     variablesContainers: [],
     scopeDescription: '',
+    instancesObjects: [],
   });
 
-  if (variable_scope === 'instance') {
-    if (!scene_name) {
-      return fail(`Missing "scene_name" (required for instance variables).`);
+  if (!ALL_VARIABLE_SCOPES.includes(variable_scope)) {
+    return fail(
+      `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\`, \`instance\` or \`global\`.`
+    );
+  }
+
+  const { scope, label, eventsFunctionsExtension } = resolvedScope;
+
+  // An extension owns two variables containers of its own, and nothing else.
+  if (scope.type === 'extension' && eventsFunctionsExtension) {
+    if (variable_scope === 'scene' || variable_scope === 'global') {
+      return {
+        failure: null,
+        instancesObjects: [],
+        variablesContainers: [
+          variable_scope === 'scene'
+            ? eventsFunctionsExtension.getSceneVariables()
+            : eventsFunctionsExtension.getGlobalVariables(),
+        ],
+        scopeDescription: `${label} ${variable_scope} variables`,
+      };
     }
-    if (!project.hasLayoutNamed(scene_name)) {
-      return fail(getSceneNotFoundMessage(project, scene_name));
+    return fail(
+      makeVariableScopeNotAvailableMessage(resolvedScope, variable_scope)
+    );
+  }
+
+  // The children of a custom object see no scene nor global variables.
+  if (
+    scope.type === 'custom_object_variant' &&
+    (variable_scope === 'scene' || variable_scope === 'global')
+  ) {
+    return fail(
+      makeVariableScopeNotAvailableMessage(resolvedScope, variable_scope)
+    );
+  }
+
+  if (variable_scope === 'global') {
+    return {
+      failure: null,
+      instancesObjects: [],
+      variablesContainers: [project.getVariables()],
+      scopeDescription: 'global',
+    };
+  }
+
+  if (variable_scope === 'instance') {
+    const { initialInstances } = resolvedScope;
+    if (!initialInstances) {
+      return fail(`Missing "scene_name" (required for instance variables).`);
     }
     const instanceId = instance_id ? instance_id.trim() : '';
     if (!instanceId) {
@@ -8020,13 +10419,12 @@ const resolveVariablesContainers = ({
       );
     }
 
-    const layout = project.getLayout(scene_name);
     let wrongObjectDescription = null;
     // The id is a prefix of the instance persistent uuid (like everywhere
     // else, see `describe_instances`) - it normally matches a single
     // instance.
     const matchedInstances: Array<gdInitialInstance> = [];
-    iterateOnInstances(layout.getInitialInstances(), instance => {
+    iterateOnInstances(initialInstances, instance => {
       if (!instance.getPersistentUuid().startsWith(instanceId)) return;
       if (object_name && instance.getObjectName() !== object_name) {
         wrongObjectDescription = `"${instanceId}" (instance of "${instance.getObjectName()}")`;
@@ -8042,7 +10440,7 @@ const resolveVariablesContainers = ({
     }
     if (matchedInstances.length === 0) {
       return fail(
-        `No instance with id "${instanceId}" found in scene "${scene_name}". Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance).`
+        `No instance with id "${instanceId}" found in ${label}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance).`
       );
     }
 
@@ -8054,102 +10452,167 @@ const resolveVariablesContainers = ({
             .slice(0, 10)}" (${instance.getObjectName()})`
       )
       .join(', ');
+    // The objects owning the matched instances: the objects of the scene (or
+    // the global ones), or the child objects of the custom object - held by
+    // its default variant, which the named variants follow.
+    const { eventsBasedObject } = resolvedScope;
+    const objectsOwningInstances: ?gdObjectsContainer = eventsBasedObject
+      ? eventsBasedObject.getDefaultVariant().getObjects()
+      : resolvedScope.objectsContainer;
+    const instancesObjectsByName: Map<string, gdObject> = new Map();
+    matchedInstances.forEach(instance => {
+      const objectName = instance.getObjectName();
+      if (instancesObjectsByName.has(objectName)) return;
+      const object = getObjectByName(
+        eventsBasedObject ? null : project.getObjects(),
+        objectsOwningInstances,
+        objectName
+      );
+      if (object) instancesObjectsByName.set(objectName, object);
+    });
     return {
       failure: null,
+      instancesObjects: [...instancesObjectsByName.values()],
       variablesContainers: matchedInstances.map(instance =>
         instance.getVariables()
       ),
       scopeDescription: `instance${
         matchedInstances.length > 1 ? 's' : ''
-      } ${instancesLabel} of scene "${scene_name}"`,
+      } ${instancesLabel} of ${label}`,
     };
   }
 
   if (variable_scope === 'scene') {
-    if (!scene_name) {
+    const { layout } = resolvedScope;
+    if (!layout) {
       return fail(`Missing "scene_name" (required for scene variable).`);
     }
-    if (!project.hasLayoutNamed(scene_name)) {
-      return fail(getSceneNotFoundMessage(project, scene_name));
-    }
     return {
       failure: null,
-      variablesContainers: [project.getLayout(scene_name).getVariables()],
-      scopeDescription: `scene "${scene_name}"`,
-    };
-  } else if (variable_scope === 'object' || variable_scope === 'group') {
-    if (!object_name) {
-      return fail(
-        `Missing "object_name" (required for an object or group variable).`
-      );
-    }
-
-    let concernedObjects: Array<gdObject> = [];
-    let isGroup = false;
-    if (scene_name) {
-      if (!project.hasLayoutNamed(scene_name)) {
-        return fail(getSceneNotFoundMessage(project, scene_name));
-      }
-      const concerned = resolveObjectsFromContextAndName({
-        project,
-        layout: project.getLayout(scene_name),
-        objectOrGroupName: object_name,
-      });
-      if (!concerned) {
-        return fail(
-          `Object or group "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`
-        );
-      }
-      concernedObjects = concerned.objects;
-      isGroup = !!concerned.group;
-    } else {
-      const globalObjects = project.getObjects();
-      if (globalObjects.hasObjectNamed(object_name)) {
-        concernedObjects = [globalObjects.getObject(object_name)];
-      } else if (globalObjects.getObjectGroups().has(object_name)) {
-        isGroup = true;
-        concernedObjects = globalObjects
-          .getObjectGroups()
-          .get(object_name)
-          .getAllObjectsNames()
-          .toJSArray()
-          .map(name => getObjectByName(globalObjects, null, name))
-          .filter(Boolean);
-      } else {
-        return fail(
-          `Object or group "${object_name}" not found globally. Did you forget to specify scene_name?`
-        );
-      }
-    }
-
-    if (concernedObjects.length === 0) {
-      return fail(`Group "${object_name}" has no object.`);
-    }
-
-    const objectOrGroupLabel = isGroup
-      ? `group "${object_name}"`
-      : `object "${object_name}"`;
-    return {
-      failure: null,
-      variablesContainers: concernedObjects.map(object =>
-        object.getVariables()
-      ),
-      scopeDescription: scene_name
-        ? `scene "${scene_name}" ${objectOrGroupLabel}`
-        : `global ${objectOrGroupLabel}`,
-    };
-  } else if (variable_scope === 'global') {
-    return {
-      failure: null,
-      variablesContainers: [project.getVariables()],
-      scopeDescription: 'global',
+      instancesObjects: [],
+      variablesContainers: [layout.getVariables()],
+      scopeDescription: label,
     };
   }
 
-  return fail(
-    `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\`, \`instance\` or \`global\`.`
-  );
+  // `object` and `group`: the objects of the scope (a scene, the global
+  // objects, the children of a custom object variant).
+  if (!object_name) {
+    return fail(
+      `Missing "object_name" (required for an object or group variable).`
+    );
+  }
+  const { objectsContainer, globalObjectsContainer } = resolvedScope;
+  const concerned = objectsContainer
+    ? resolveObjectsFromContextAndName({
+        objectsContainer,
+        globalObjectsContainer: globalObjectsContainer || null,
+        objectOrGroupName: object_name,
+      })
+    : null;
+  if (!concerned) {
+    const childObjectNames = objectsContainer
+      ? getObjectNames(objectsContainer).map(name => `"${name}"`)
+      : [];
+    return fail(
+      scope.type === 'scene'
+        ? `Object or group "${object_name}" not in ${label}. For a global object, omit scene_name.`
+        : scope.type === 'project'
+        ? `Object or group "${object_name}" not found globally. Did you forget to specify scene_name?`
+        : `Object or group "${object_name}" not found in ${label}. Existing child objects: ${
+            childObjectNames.length > 0 ? childObjectNames.join(', ') : 'none'
+          }. The custom object itself holds properties, not variables (see \`change_custom_object\`).`
+    );
+  }
+  const concernedObjects = concerned.objects;
+  if (concernedObjects.length === 0) {
+    return fail(`Group "${object_name}" has no object.`);
+  }
+
+  const objectOrGroupLabel = concerned.group
+    ? `group "${object_name}"`
+    : `object "${object_name}"`;
+  return {
+    failure: null,
+    instancesObjects: [],
+    variablesContainers: concernedObjects.map(object => object.getVariables()),
+    scopeDescription:
+      scope.type === 'project'
+        ? `global ${objectOrGroupLabel}`
+        : `${label} ${objectOrGroupLabel}`,
+  };
 };
+
+// True when the variable does not exist yet in at least one of the containers:
+// writing it would ADD it (a structural change on a custom object child).
+const isVariableMissingInSomeContainer = (
+  variablesContainers: Array<gdVariablesContainer>,
+  variablePath: string
+): boolean =>
+  variablesContainers.some(variablesContainer => {
+    try {
+      return !getVariableAtPath({ variablePath, variablesContainer });
+    } catch (error) {
+      // A malformed path is reported when the change is applied.
+      return false;
+    }
+  });
+
+// The scope label to show in the chat for a call that is not about a scene,
+// or null when the legacy scene texts apply (a scene, or no scope at all).
+const getNonSceneScopeLabelFromArgs = (args: any): string | null => {
+  if (getSceneNameFromArgs(args)) return null;
+  const label = getScopeLabelFromArgs(args);
+  return label === 'unknown scope' ? null : label;
+};
+
+// An instance can only hold its own value of a variable of its object: a
+// variable set on an instance is declared on the object too when missing (with
+// the default value of its type), so events can read it (`Door.Locked`) and
+// every instance of the object has the same variables. Returns one line per
+// object on which the variable was declared.
+const declareInstanceVariableOnObjects = ({
+  variablePath,
+  instanceVariablesContainer,
+  instancesObjects,
+}: {|
+  variablePath: string,
+  instanceVariablesContainer: gdVariablesContainer,
+  instancesObjects: Array<gdObject>,
+|}): Array<string> => {
+  const rootVariableName = variablePath.split(/[.[]/)[0].trim();
+  if (!rootVariableName || !instanceVariablesContainer.has(rootVariableName)) {
+    return [];
+  }
+  const variableType = getVariableTypeAsString(
+    gd,
+    instanceVariablesContainer.get(rootVariableName)
+  );
+  if (variableType === 'unknown') return [];
+
+  return instancesObjects
+    .filter(object => !object.getVariables().has(rootVariableName))
+    .map(object => {
+      const objectVariables = object.getVariables();
+      const objectVariable = objectVariables.insertNew(
+        rootVariableName,
+        objectVariables.count()
+      );
+      // A new variable is the number 0: casting it to a string would give
+      // "0", so the default value of the type is set explicitly.
+      if (variableType === 'String') {
+        objectVariable.setString('');
+      } else if (variableType === 'Boolean') {
+        objectVariable.setBool(false);
+      } else {
+        objectVariable.castTo(variableType.toLowerCase());
+      }
+      const objectName = object.getName();
+      return `Declared "${rootVariableName}" (${variableType}) on object "${objectName}" too: an instance variable must be declared on its object (the other "${objectName}" instances keep the default value; events read it with \`${objectName}.${rootVariableName}\`).`;
+    });
+};
+
+const MAX_LISTED_VARIABLE_LINES = 20;
 
 const addOrEditVariable: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
@@ -8158,7 +10621,8 @@ const addOrEditVariable: EditorFunction = {
       args,
       'object_name'
     );
-    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
+    const nonSceneScopeLabel = getNonSceneScopeLabelFromArgs(args);
     const operations = extractVariableOperations(args);
 
     const details = shouldShowDetails ? (
@@ -8179,6 +10643,25 @@ const addOrEditVariable: EditorFunction = {
         ))}
       </ColumnStackLayout>
     ) : null;
+
+    const variableNames = operations
+      .map(operation => operation.variable_name_or_path)
+      .filter(Boolean)
+      .join(', ');
+
+    // Variables of an extension or of a custom object: name the scope instead
+    // of a scene.
+    if (nonSceneScopeLabel) {
+      return {
+        text: (
+          <Trans>
+            Update variables <b>{variableNames}</b> of {nonSceneScopeLabel}.
+          </Trans>
+        ),
+        details,
+        hasDetailsToShow: true,
+      };
+    }
 
     if (operations.length === 1 && !operations[0].delete_this_variable) {
       const variable_name_or_path = operations[0].variable_name_or_path;
@@ -8236,10 +10719,6 @@ const addOrEditVariable: EditorFunction = {
       };
     }
 
-    const variableNames = operations
-      .map(operation => operation.variable_name_or_path)
-      .filter(Boolean)
-      .join(', ');
     if (variable_scope === 'scene') {
       return {
         text: (
@@ -8299,7 +10778,6 @@ const addOrEditVariable: EditorFunction = {
       args,
       'object_name'
     );
-    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
     const instance_id = SafeExtractor.extractStringProperty(
       args,
       'instance_id'
@@ -8311,15 +10789,53 @@ const addOrEditVariable: EditorFunction = {
       );
     }
 
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: ['project', 'scene', 'extension', 'custom_object_variant'],
+      // Without a scope, the variables are the ones of the project.
+      defaultScope: { type: 'project' },
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+    const readOnlyRejection = getReadOnlyRejection(resolvedScope);
+    if (readOnlyRejection) return makeScopeFailureOutput(readOnlyRejection);
+
     const resolved = resolveVariablesContainers({
       project,
+      resolvedScope,
       variable_scope,
-      scene_name,
       object_name,
       instance_id,
     });
     if (resolved.failure) return resolved.failure;
-    const { variablesContainers, scopeDescription } = resolved;
+    const {
+      variablesContainers,
+      scopeDescription,
+      instancesObjects,
+    } = resolved;
+
+    // Adding or deleting a variable of a child object changes the structure
+    // of the custom object: only the default variant owns it.
+    const isChildObjectVariableScope =
+      !!resolvedScope.variant &&
+      (variable_scope === 'object' || variable_scope === 'group');
+    if (isChildObjectVariableScope) {
+      const namedVariantRejection = getNamedVariantRejection(resolvedScope);
+      if (
+        namedVariantRejection &&
+        operations.some(
+          operation =>
+            !!operation.variable_name_or_path &&
+            (operation.delete_this_variable ||
+              isVariableMissingInSomeContainer(
+                variablesContainers,
+                operation.variable_name_or_path
+              ))
+        )
+      ) {
+        return makeScopeFailureOutput(namedVariantRejection);
+      }
+    }
+    let didChangeChildVariablesStructure = false;
 
     const changes = [];
     const warnings = [];
@@ -8359,6 +10875,8 @@ const addOrEditVariable: EditorFunction = {
           continue;
         }
         if (removed) {
+          if (isChildObjectVariableScope)
+            didChangeChildVariablesStructure = true;
           changes.push(
             `Deleted ${scopeDescription} variable "${variable_name_or_path}".`
           );
@@ -8402,17 +10920,51 @@ const addOrEditVariable: EditorFunction = {
         continue;
       }
 
+      if (addedNewVariable && isChildObjectVariableScope)
+        didChangeChildVariablesStructure = true;
+
       const truncatedValue = truncateValue(value);
       changes.push(
         addedNewVariable
           ? `Added ${scopeDescription} variable "${variable_name_or_path}" (${variableType}) = ${truncatedValue}`
           : `Edited ${scopeDescription} variable "${variable_name_or_path}" = ${truncatedValue}`
       );
+      if (variable_scope === 'instance') {
+        const declaredOnObjectsLines = declareInstanceVariableOnObjects({
+          variablePath: variable_name_or_path,
+          instanceVariablesContainer: variablesContainers[0],
+          instancesObjects,
+        });
+        // A child object of a custom object got a variable: a structural
+        // change, made on the default variant and followed by the others.
+        if (declaredOnObjectsLines.length > 0 && resolvedScope.variant)
+          didChangeChildVariablesStructure = true;
+        changes.push(...declaredOnObjectsLines);
+      }
+    }
+
+    // The named variants inherit the variables of the children of the
+    // default variant.
+    if (didChangeChildVariablesStructure) {
+      complyVariantsAfterStructuralEdit(project, resolvedScope);
     }
 
     // One line per change (so a single variable keeps its original message),
-    // with any warnings appended below.
-    const message = [...changes, ...warnings].join('\n');
+    // with any warnings appended below. Hundreds of values set one by one
+    // would repeat the request (or the same error) line by line: only the
+    // first ones are listed.
+    const listFirstLines = (lines: Array<string>, kind: string) =>
+      lines.length > MAX_LISTED_VARIABLE_LINES
+        ? [
+            ...lines.slice(0, MAX_LISTED_VARIABLE_LINES),
+            `... and ${lines.length -
+              MAX_LISTED_VARIABLE_LINES} more ${kind}, not listed.`,
+          ]
+        : lines;
+    const message = [
+      ...listFirstLines(changes, 'changes'),
+      ...listFirstLines(warnings, 'warnings'),
+    ].join('\n');
     if (changes.length === 0) {
       return makeGenericFailure(message || `No variable was changed.`);
     }
@@ -8429,15 +10981,31 @@ const inspectVariables: EditorFunction = {
       args,
       'object_name'
     );
-    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const scene_name = getSceneNameFromArgs(args);
+    const nonSceneScopeLabel = getNonSceneScopeLabelFromArgs(args);
 
-    if (variable_scope === 'object' || variable_scope === 'group') {
+    if (
+      nonSceneScopeLabel &&
+      (variable_scope === 'object' || variable_scope === 'group')
+    ) {
+      return {
+        text: (
+          <Trans>
+            Inspect <b>{object_name}</b>'s variables in {nonSceneScopeLabel}.
+          </Trans>
+        ),
+      };
+    } else if (variable_scope === 'object' || variable_scope === 'group') {
       return {
         text: (
           <Trans>
             Inspect <b>{object_name}</b>'s variables.
           </Trans>
         ),
+      };
+    } else if (nonSceneScopeLabel) {
+      return {
+        text: <Trans>Inspect the variables of {nonSceneScopeLabel}.</Trans>,
       };
     } else if (variable_scope === 'scene') {
       return {
@@ -8454,17 +11022,24 @@ const inspectVariables: EditorFunction = {
       args,
       'object_name'
     );
-    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
     const requestedPaths = (
       SafeExtractor.extractArrayProperty(args, 'variable_names_or_paths') || []
     )
       .map(entry => (typeof entry === 'string' ? entry : null))
       .filter(Boolean);
 
+    const resolvedScope = resolveScopeFromArgs(project, args, {
+      allowedTypes: ['project', 'scene', 'extension', 'custom_object_variant'],
+      // Without a scope, the variables are the ones of the project.
+      defaultScope: { type: 'project' },
+    });
+    if (resolvedScope.success === false)
+      return makeScopeFailureOutput(resolvedScope);
+
     const resolved = resolveVariablesContainers({
       project,
+      resolvedScope,
       variable_scope,
-      scene_name,
       object_name,
       instance_id: SafeExtractor.extractStringProperty(args, 'instance_id'),
     });
@@ -8630,6 +11205,12 @@ const initializeProject: EditorFunctionWithoutProject = {
       args,
       'also_read_existing_events'
     );
+    // Set by the backend when the template is to be opened from another file
+    // (its copy re-skinned with a theme).
+    const project_file_url = SafeExtractor.extractStringProperty(
+      args,
+      'project_file_url'
+    );
 
     try {
       const requestedExampleSlug = ['', 'none', 'empty'].includes(
@@ -8643,6 +11224,7 @@ const initializeProject: EditorFunctionWithoutProject = {
           editorCallbacks.onCreateProject({
             name: project_name,
             exampleSlug: requestedExampleSlug,
+            projectFileUrl: requestedExampleSlug ? project_file_url : null,
           })
       );
 
@@ -8776,11 +11358,52 @@ const readGameProjectJson: EditorFunction = {
       text: <Trans>Inspect the game structure.</Trans>,
     };
   },
-  // No-op: the function call output is sent to the backend along with an
-  // up-to-date game project JSON, which the backend uses to compute the
-  // actual read result.
-  launchFunction: async ({ args }) => {
-    return { success: true };
+  launchFunction: async ({ project, args }) => {
+    const simplifiedProject = makeSimplifiedProjectBuilder(
+      gd
+    ).getSimplifiedProject(project, {});
+
+    // An empty path returns the whole project (limited by maxDepth anyway).
+    const path =
+      typeof (args && args.path) === 'string' ? String(args.path) : '';
+    const filter: ArrayItemsFilter | null =
+      args && args.filter && typeof args.filter === 'object'
+        ? args.filter
+        : null;
+    const maxDepth =
+      args && typeof args.maxDepth === 'number' ? args.maxDepth : 2;
+    const maxStringLength =
+      args && typeof args.maxStringLength === 'number'
+        ? args.maxStringLength
+        : 200;
+    const offset = args && typeof args.offset === 'number' ? args.offset : 0;
+    const limit =
+      args && typeof args.limit === 'number' ? args.limit : undefined;
+    const countOnly = !!(args && args.countOnly === true);
+
+    const navigationResult = navigateSimplifiedProjectJson({
+      project: simplifiedProject,
+      path,
+      filter,
+      offset,
+      limit,
+      countOnly,
+      maxDepth,
+      maxStringLength,
+    });
+
+    if (!navigationResult.success) {
+      return { success: false, message: navigationResult.message };
+    }
+
+    if (navigationResult.truncationWarning) {
+      return {
+        success: true,
+        result: navigationResult.result,
+        message: navigationResult.truncationWarning,
+      };
+    }
+    return { success: true, result: navigationResult.result };
   },
   modifiesProject: false,
 };
@@ -8863,16 +11486,24 @@ const runScript: EditorFunction = {
       error: capped.error,
       meta: {
         didModifyProject: capped.didModifyProject,
-        // Forward scene names created inside the script so they auto-open, like
-        // a standalone create_scene call does.
+        // Forward the scenes and external layouts created inside the script
+        // so they auto-open, like a standalone create_scene call does.
         ...(capped.newSceneNames.length > 0
           ? { newSceneNames: capped.newSceneNames }
           : {}),
+        ...getNewExternalLayoutNamesMeta(capped.newExternalLayoutNames),
       },
     };
   },
   modifiesProject: true,
 };
+
+// A helper (not an inline conditional spread) keeps Flow from reasoning about
+// the product of two union spreads in the `meta` of `run_script`.
+const getNewExternalLayoutNamesMeta = (
+  newExternalLayoutNames: Array<string>
+): {| newExternalLayoutNames?: Array<string> |} =>
+  newExternalLayoutNames.length > 0 ? { newExternalLayoutNames } : {};
 
 const searchResourceStore: EditorFunction = {
   renderForEditor: ({ args }) => {
@@ -8920,6 +11551,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_behavior_properties: inspectBehaviorProperties,
   change_behavior_property: changeBehaviorProperty,
   describe_instances: describeInstances,
+  change_instances_raw_json: changeInstancesRawJson,
   put_2d_instances: put2dInstances,
   put_3d_instances: put3dInstances,
   read_scene_events: readSceneEvents,
@@ -8932,6 +11564,15 @@ export const editorFunctions: { [string]: EditorFunction } = {
   change_project_properties_resources: changeProjectPropertiesResources,
   add_or_edit_variable: addOrEditVariable,
   inspect_variables: inspectVariables,
+  inspect_extension: inspectExtension,
+  create_extension: createExtension,
+  change_extension_properties: changeExtensionProperties,
+  create_custom_object: createCustomObject,
+  change_custom_object: changeCustomObject,
+  create_custom_behavior: createCustomBehavior,
+  change_custom_behavior: changeCustomBehavior,
+  create_custom_function: createCustomFunction,
+  change_custom_function: changeCustomFunction,
   read_full_docs: readFullDocs,
   search_docs: searchDocs,
 

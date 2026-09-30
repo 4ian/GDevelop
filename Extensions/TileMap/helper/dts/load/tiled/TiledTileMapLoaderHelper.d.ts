@@ -13,7 +13,7 @@ export declare const decodeBase64LayerData: (
   tiledLayer: TiledLayer
 ) => number[];
 export type TiledGID = {
-  id: integer;
+  id: integer | undefined;
   flippedHorizontally: boolean;
   flippedVertically: boolean;
   flippedDiagonally: boolean;

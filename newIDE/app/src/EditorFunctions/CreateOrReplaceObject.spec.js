@@ -48,7 +48,7 @@ describe('create_or_replace_object (additional cases)', () => {
 
     expect(result.success).toBe(false);
     expect(result.message).toBe(
-      'No asset found with id "non-existing-asset-id". Object not created.'
+      'No object found with id "non-existing-asset-id" (Object not found). Object not created.'
     );
     expect(testScene.getObjects().hasObjectNamed('MyAssetObject')).toBe(false);
   });
@@ -221,7 +221,7 @@ describe('create_or_replace_object (additional cases)', () => {
     expect(searchAndInstallAsset).toHaveBeenCalledTimes(1);
     expect(searchAndInstallAsset).toHaveBeenCalledWith(
       expect.objectContaining({
-        searchTerms: 'button, default',
+        searchTerms: 'button, My Button, default',
         objectName: 'MyButton',
         objectType: 'Sprite',
       })

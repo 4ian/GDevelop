@@ -498,25 +498,34 @@ const ImagePreview = ({
       }
     : {};
 
+  // The image is sized explicitly rather than scaled with a CSS transform:
+  // on Windows, with a fractional device scale factor (e.g. a 110% text size),
+  // Chromium paints a transformed image slightly larger than its layout box,
+  // shifting it away from the overlay (points, collision masks) drawn on top.
+  const zoomedImageWidth =
+    imageWidth != null ? imageWidth * imageZoomFactor : undefined;
+  const zoomedImageHeight =
+    imageHeight != null ? imageHeight * imageZoomFactor : undefined;
+
   const imageContainerBorderStyle = {
     transform: `translate(${xOffset}px, ${yOffset}px)`,
     // Apply margin only once the container is loaded, to avoid a shift in the image
     outline: renderOverlay ? `1px solid ${frameBorderColor}` : undefined,
-    width: imageWidth != null ? imageWidth * imageZoomFactor : null,
-    height: imageHeight != null ? imageHeight * imageZoomFactor : null,
+    width: zoomedImageWidth,
+    height: zoomedImageHeight,
     transformOrigin: '0 0',
   };
 
   const imageContainerStyle = {
-    transform: `scale(${imageZoomFactor})`,
-    width: imageWidth,
-    height: imageHeight,
-    transformOrigin: '0 0',
+    width: zoomedImageWidth,
+    height: zoomedImageHeight,
     display: 'flex',
   };
 
   const imageStyle = {
     ...styles.spriteThumbnailImage,
+    width: zoomedImageWidth,
+    height: zoomedImageHeight,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
     cursor: forcedCursor,

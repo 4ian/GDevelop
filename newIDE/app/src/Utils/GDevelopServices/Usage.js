@@ -184,6 +184,21 @@ export type SubscriptionDialogDisplayConfig = {|
   placements: { [placementId: string]: SubscriptionDialogPlacementConfig },
 |};
 
+export type CreditsPackageDialogVariantConfig = {|
+  type: string,
+  weight: number,
+|};
+
+export type CreditsPackageDialogPlacementConfig = {|
+  variants: Array<CreditsPackageDialogVariantConfig>,
+|};
+
+export type CreditsPackageDialogDisplayConfig = {|
+  placements: {
+    [placementId: string]: CreditsPackageDialogPlacementConfig,
+  },
+|};
+
 /**
  * The limits communicated by the API for a user.
  */
@@ -197,6 +212,7 @@ export type Limits = {|
   },
   message: string | typeof undefined,
   subscriptionDialogDisplayConfig?: SubscriptionDialogDisplayConfig,
+  creditsPackageDialogDisplayConfig?: CreditsPackageDialogDisplayConfig,
 |};
 
 export type PlanDetails = {|

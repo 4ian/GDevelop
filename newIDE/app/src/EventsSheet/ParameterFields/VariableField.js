@@ -13,7 +13,6 @@ import classNames from 'classnames';
 import {
   icon,
   nameAndIconContainer,
-  instructionWarningParameter,
   instructionParameter,
 } from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete, {
@@ -46,10 +45,10 @@ import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
 import LocalVariableIcon from '../../UI/CustomSvgIcons/LocalVariable';
 import PropertyIcon from '../../UI/CustomSvgIcons/Settings';
 import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
-import Link from '../../UI/Link';
 import Add from '../../UI/CustomSvgIcons/Add';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
+import { extractErrors } from './GenericExpressionField';
+import { useDebounce } from '../../Utils/UseDebounce';
 
 const gd: libGDevelop = global.gd;
 
@@ -69,14 +68,12 @@ const getVariableTypeName = (
 
 type Props = {
   ...ParameterFieldProps,
-  isObjectVariable: boolean,
   variablesContainers: Array<gdVariablesContainer>,
   getVariableSourceFromIdentifier: (
     identifier: string,
     projectScopedContainers: gdProjectScopedContainers
   ) => VariablesContainer_SourceType,
   enumerateVariables: () => Array<EnumeratedVariable>,
-  forceDeclaration?: boolean,
   openVariableEditorDialog: (VariableDialogOpeningProps => void) | null,
   editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
   openEventsBasedEntityPropertyEditorDialog:
@@ -84,25 +81,10 @@ type Props = {
     | null,
 };
 
-type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
-
 export type VariableFieldInterface = {|
   ...ParameterFieldInterface,
   updateAutocompletions: () => void,
 |};
-
-export const VariableNameQuickAnalyzeResults: {
-  [string]: VariableNameQuickAnalyzeResult,
-} = {
-  OK: 0,
-  WRONG_QUOTE: 1,
-  WRONG_SPACE: 2,
-  WRONG_EXPRESSION: 3,
-  UNDECLARED_VARIABLE: 4,
-  NAME_COLLISION_WITH_OBJECT: 5,
-  PARAMETER_WITH_CHILD: 6,
-  PROPERTY_WITH_CHILD: 7,
-};
 
 export const getRootVariableName = (name: string): string => {
   const dotPosition = name.indexOf('.');
@@ -128,83 +110,6 @@ const isRootVariableDeclared = (
       variablesContainer.has(getRootVariableName(variableName))
     )
   );
-};
-
-// TODO: the entire VariableField could be reworked to be a "real" GenericExpressionField
-// (of type: "variable" or the legacy: "scenevar", "globalvar" or "objectvar"). This will
-// ensure we 100% validate and can autocomplete what is entered (and we can have also a simpler
-// selector that offers the variables in the scope).
-export const quicklyAnalyzeVariableName = (
-  name: string,
-  variablesContainers?: Array<gdVariablesContainer>,
-  getVariableSourceFromIdentifier?: (
-    identifier: string,
-    projectScopedContainers: gdProjectScopedContainers
-  ) => VariablesContainer_SourceType | null,
-  projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
-  isObjectVariable: boolean = false
-): VariableNameQuickAnalyzeResult => {
-  if (!name) return VariableNameQuickAnalyzeResults.OK;
-
-  for (let i = 0; i < name.length; ++i) {
-    const character = name[i];
-
-    if (character === '[') {
-      // This probably starts an expression, so stop the analysis.
-      break;
-    } else if (character === ' ') {
-      return VariableNameQuickAnalyzeResults.WRONG_SPACE;
-    } else if (character === '"') {
-      return VariableNameQuickAnalyzeResults.WRONG_QUOTE;
-    } else if (
-      character === '(' ||
-      character === '+' ||
-      character === '-' ||
-      character === '/' ||
-      character === '*'
-    ) {
-      return VariableNameQuickAnalyzeResults.WRONG_EXPRESSION;
-    }
-  }
-
-  const rootVariableName = getRootVariableName(name);
-  // Check at least the name of the root variable, it's the best we can do.
-  if (!isRootVariableDeclared(rootVariableName, variablesContainers)) {
-    return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
-  }
-
-  if (!projectScopedContainersAccessor) {
-    return VariableNameQuickAnalyzeResults.OK;
-  }
-  const projectScopedContainers = projectScopedContainersAccessor.get();
-
-  if (
-    !isObjectVariable &&
-    projectScopedContainers
-      .getObjectsContainersList()
-      .hasObjectOrGroupNamed(rootVariableName)
-  ) {
-    return VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT;
-  }
-
-  if (
-    name.length !== rootVariableName.length &&
-    getVariableSourceFromIdentifier
-  ) {
-    const variableSource = getVariableSourceFromIdentifier(
-      rootVariableName,
-      projectScopedContainers
-    );
-
-    if (variableSource === gd.VariablesContainer.Parameters) {
-      return VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD;
-    }
-    if (variableSource === gd.VariablesContainer.Properties) {
-      return VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD;
-    }
-  }
-
-  return VariableNameQuickAnalyzeResults.OK;
 };
 
 export const getVariableSourceIcon = (
@@ -247,6 +152,11 @@ export const getVariableTypeIcon = (variableType: Variable_Type): any => {
   }
 };
 
+// TODO: the entire VariableField could be reworked to be a "real" GenericExpressionField
+// (of type: "variable" or the legacy: "scenevar", "globalvar" or "objectvar"). This will
+// ensure we 100% validate and can autocomplete what is entered (and we can have also a simpler
+// selector that offers the variables in the scope).
+
 export default (React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
@@ -255,7 +165,6 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       variablesContainers,
       enumerateVariables,
       instruction,
-      forceDeclaration,
       value,
       onChange,
       isInline,
@@ -264,7 +173,6 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       onApply,
       id,
       onInstructionTypeChanged,
-      isObjectVariable,
       getVariableSourceFromIdentifier,
       openVariableEditorDialog,
       editEventsFunctionParameter,
@@ -436,68 +344,78 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       ? parameterMetadata.getDescription()
       : undefined;
 
-    const quicklyAnalysisResult = quicklyAnalyzeVariableName(
-      value,
-      variablesContainers,
-      getVariableSourceFromIdentifier,
-      projectScopedContainersAccessor,
-      isObjectVariable
+    const [errorText, setErrorText] = React.useState<?string>(null);
+    const inputValue = React.useRef<string | null>(null);
+    const doValidation = React.useCallback(
+      () => {
+        if (!project || !parameterMetadata || !instruction) return null;
+
+        // Parsing can be time consuming (~1ms for simple expression,
+        // a few milliseconds for complex ones).
+
+        const parser = new gd.ExpressionParser2();
+        const expressionNode = parser
+          .parseExpression(inputValue.current || value)
+          .get();
+        const expressionType = parameterMetadata
+          .getValueTypeMetadata()
+          .getName();
+
+        const objectName = gd.InstructionValidator.getObjectNameForParameter(
+          projectScopedContainersAccessor.get(),
+          instruction,
+          expressionType
+        );
+        const { errorText } = extractErrors(
+          gd.JsPlatform.get(),
+          project,
+          projectScopedContainersAccessor,
+          expressionType,
+          parameterMetadata,
+          expressionNode,
+          objectName,
+          'no'
+        );
+
+        parser.delete();
+
+        setErrorText(errorText);
+      },
+      [
+        instruction,
+        parameterMetadata,
+        project,
+        projectScopedContainersAccessor,
+        value,
+      ]
     );
 
-    const errorText =
-      quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_QUOTE ? (
-        <Trans>
-          It seems you entered a name with a quote. Variable names should not be
-          quoted.
-        </Trans>
-      ) : quicklyAnalysisResult ===
-        VariableNameQuickAnalyzeResults.WRONG_SPACE ? (
-        <Trans>
-          The variable name contains a space - this is not recommended. Prefer
-          to use underscores or uppercase letters to separate words.
-        </Trans>
-      ) : quicklyAnalysisResult ===
-        VariableNameQuickAnalyzeResults.WRONG_EXPRESSION ? (
-        <Trans>
-          The variable name looks like you're building an expression or a
-          formula. You can only use this for structure or arrays. For example:
-          Score[3].
-        </Trans>
-      ) : forceDeclaration &&
-        quicklyAnalysisResult ===
-          VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE ? (
-        <Trans>
-          This variable does not exist.{' '}
-          <Link onClick={openVariableEditor} href="#">
-            Click to add it.
-          </Link>
-        </Trans>
-      ) : forceDeclaration &&
-        quicklyAnalysisResult ===
-          VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT ? (
-        <Trans>
-          This variable has the same name as an object. Consider renaming one or
-          the other.
-        </Trans>
-      ) : forceDeclaration &&
-        quicklyAnalysisResult ===
-          VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD ? (
-        <Trans>Parameters can't have children.</Trans>
-      ) : forceDeclaration &&
-        quicklyAnalysisResult ===
-          VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD ? (
-        <Trans>Properties can't have children.</Trans>
-      ) : null;
-    const warningTranslatableText =
-      !forceDeclaration &&
-      quicklyAnalysisResult ===
-        VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
-        ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
-        : !forceDeclaration &&
-          quicklyAnalysisResult ===
-            VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT
-        ? t`This variable has the same name as an object. Consider renaming one or the other.`
-        : null;
+    const enqueueValidation = useDebounce(() => {
+      doValidation();
+    }, 250);
+
+    React.useEffect(
+      () => {
+        enqueueValidation();
+      },
+      [enqueueValidation]
+    );
+
+    const handleValueChange = React.useCallback(
+      (value: string) => {
+        inputValue.current = null;
+        onChange(value);
+      },
+      [onChange]
+    );
+
+    const handleInputValueChange = React.useCallback(
+      (value: string) => {
+        inputValue.current = value;
+        enqueueValidation();
+      },
+      [enqueueValidation]
+    );
 
     const isSwitchableInstruction =
       instruction &&
@@ -561,16 +479,15 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                   margin={isInline ? 'none' : 'dense'}
                   floatingLabelText={description}
                   helperMarkdownText={
-                    warningTranslatableText
-                      ? i18n._(warningTranslatableText)
-                      : parameterMetadata
+                    parameterMetadata
                       ? parameterMetadata.getLongDescription()
                       : undefined
                   }
                   errorText={errorText}
                   fullWidth
                   value={value}
-                  onChange={onChange}
+                  onChange={handleValueChange}
+                  onInputValueChange={handleInputValueChange}
                   onRequestClose={onRequestClose}
                   onApply={onApply}
                   filterOptionById={filterOptionById}
@@ -763,9 +680,6 @@ export const renderVariableWithIcon = (
       title={tooltip}
       className={classNames({
         [nameAndIconContainer]: true,
-        [instructionWarningParameter]:
-          quicklyAnalyzeVariableName(value) !==
-          VariableNameQuickAnalyzeResults.OK,
       })}
     >
       <IconAndNameContainer>

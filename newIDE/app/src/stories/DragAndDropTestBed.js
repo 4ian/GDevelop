@@ -7,7 +7,7 @@ type Props = {||};
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<{
   someData: string,
-}>('dnd-type1');
+}>('dnd-type1', { touchDragStart: 'afterHold' });
 
 const DragSourceAndDropTargetBox = ({ name }: {| name: string |}) => (
   <DragSourceAndDropTarget

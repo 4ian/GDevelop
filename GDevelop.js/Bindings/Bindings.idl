@@ -550,7 +550,7 @@ interface ObjectsContainer {
         [Const, Ref] ObjectsContainer layout,
         [Const] DOMString name,
         boolean searchInGroups);
-    boolean FREE_IsDefaultBehavior(
+    boolean FREE_HasDefaultBehavior(
         [Const, Ref] ObjectsContainer layout,
         [Const] DOMString objectOrGroupName,
         [Const] DOMString behaviorName,
@@ -731,9 +731,9 @@ interface ObjectsContainersList {
     [Const] DOMString objectOrGroupName,
     [Const] DOMString behaviorType,
     boolean searchInGroups);
-  boolean IsDefaultBehavior(
+  boolean HasDefaultBehavior(
     [Const] DOMString objectOrGroupName,
-    [Const] DOMString behaviorType,
+    [Const] DOMString behaviorName,
     boolean searchInGroups);
   [Value] VectorString GetAnimationNamesOfObject([Const] DOMString name);
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
@@ -2822,6 +2822,10 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_UpdateExtensionNameInExtension(
+      [Ref] Project project,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString sourceExtensionName);
     void STATIC_UpdateExtensionNameInEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2837,6 +2841,13 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_MoveEventsFunction(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldFunctionName,
+      [Const] DOMString newFunctionName);
     void STATIC_RenameBehaviorEventsFunction(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2915,6 +2926,13 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_MoveEventsBasedBehavior(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldBehaviorName,
+      [Const] DOMString newBehaviorName);
     void STATIC_UpdateBehaviorNameInEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2923,8 +2941,15 @@ interface WholeProjectRefactorer {
     void STATIC_RenameEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
-      [Const] DOMString oldName,
-      [Const] DOMString newName);
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
+    void STATIC_MoveEventsBasedObject(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldExtensionName,
+      [Const] DOMString newExtensionName,
+      [Const] DOMString oldObjectName,
+      [Const] DOMString newObjectName);
     void STATIC_UpdateObjectNameInEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -3042,6 +3067,11 @@ interface WholeProjectRefactorer {
         [Ref] Project project,
         [Ref] EventsBasedObject eventsBasedObject,
         [Const] DOMString objectName);
+    void STATIC_RemoveEventsBasedObjectVariant(
+        [Ref] Project project,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString variantName);
     void STATIC_GlobalObjectOrGroupRenamed([Ref] Project project, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
     void STATIC_GlobalObjectRemoved(
         [Ref] Project project,
@@ -3106,6 +3136,10 @@ interface InstructionValidator {
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
     long parameterIndex);
+  [Const, Value] DOMString STATIC_GetObjectNameForParameter(
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const] DOMString parameterType);
 };
 
 interface ObjectTools {
@@ -3131,6 +3165,20 @@ interface PropertyFunctionGenerator {
     void STATIC_GenerateExpressionSkeleton([Ref] Project project, [Ref] EventsFunction eventsFunction);
     void STATIC_UpdateReturnActionType([Ref] Project project, [Ref] EventsFunction eventsFunction);
 
+};
+
+interface ChildObjectForwardFunctionGenerator {
+    void STATIC_GenerateChildObjectForwardFunctions(
+        [Const, Ref] Project project,
+        [Const, Ref] EventsFunctionsExtension extension,
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString childObjectName);
+    boolean STATIC_HasAnyChildCustomObject(
+        [Const, Ref] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
+    [Value] VectorString STATIC_GetChildCustomObjectNames(
+        [Const, Ref] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
 };
 
 interface UsedExtensionsResult {
@@ -3282,6 +3330,7 @@ interface ExpressionValidator {
         [Const, Ref] Platform platform,
         [Const, Ref] ProjectScopedContainers projectScopedContainers,
         [Const] DOMString rootType,
+        [Const] DOMString rootObjectName,
         [Const] DOMString extraInfo);
 
     [Const, Ref] VectorExpressionParserError GetAllErrors();
@@ -3761,6 +3810,14 @@ interface EventsFunctionsExtension {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 
     boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString eventsFunctionName);
+};
+
+interface EventsFunctionsExtensionExtractor {
+    void EventsFunctionsExtensionExtractor();
+    [Ref] EventsBasedBehavior STATIC_CreateCustomBehaviorForObject(
+        [Const, Ref] Project project,
+        [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Ref] gdObject obj);
 };
 
 interface AbstractFileSystem {

@@ -169,9 +169,19 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
+  // The id can be shortened to its first characters (the AI is given 10 of
+  // them): it must then be the start of exactly one id.
   const getAssetShortHeaderFromId = React.useCallback(
-    (id: string): AssetShortHeader | null =>
-      (assetShortHeadersById && assetShortHeadersById[id]) || null,
+    (id: string): AssetShortHeader | null => {
+      if (!assetShortHeadersById) return null;
+      if (assetShortHeadersById[id]) return assetShortHeadersById[id];
+      const matchingIds = Object.keys(assetShortHeadersById).filter(fullId =>
+        fullId.startsWith(id)
+      );
+      return matchingIds.length === 1
+        ? assetShortHeadersById[matchingIds[0]]
+        : null;
+    },
     [assetShortHeadersById]
   );
   const [

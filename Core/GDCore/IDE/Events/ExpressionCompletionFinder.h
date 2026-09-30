@@ -1118,9 +1118,7 @@ class GD_CORE_API ExpressionCompletionFinder
       }
     } else {
       // Object function, behavior name, variable, object variable.
-      if (IsCaretOn(identifierNameLocation) ||
-          (gd::ValueTypeMetadata::IsTypeExpression("variable", type) &&
-           identifierName.empty())) {
+      if (IsCaretOn(identifierNameLocation) || identifierName.empty()) {
         // Don't attempt to complete children variables if there is
         // already a dot written (`MyVariable.`).
         bool eagerlyCompleteIfPossible =

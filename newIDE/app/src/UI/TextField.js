@@ -261,6 +261,28 @@ const TextField: React.ComponentType<{
     getCaretPosition,
   }));
 
+  // Chromium steps a focused number input on wheel, but before Chromium 152 the
+  // wheel event is not blocking, so the scrollable parent scrolls at the same time.
+  // A non-passive listener makes the event blocking, so the native handling
+  // prevents the scroll.
+  // See https://issues.chromium.org/issues/40709742 and https://issues.chromium.org/issues/40859979
+  // (fixed in Chromium 152 by https://chromium-review.googlesource.com/c/chromium/src/+/7901499).
+  // This can be removed once Electron ships Chromium 152+ (Electron 44).
+  const isNumberInput = props.type === 'number';
+  React.useEffect(
+    () => {
+      const input = inputRef.current;
+      if (!input || !isNumberInput) return;
+
+      const noop = () => {};
+      input.addEventListener('wheel', noop, { passive: false });
+      return () => {
+        input.removeEventListener('wheel', noop, { passive: false });
+      };
+    },
+    [isNumberInput]
+  );
+
   const onChange = props.onChange || undefined;
 
   const helperText = props.helperMarkdownText ? (

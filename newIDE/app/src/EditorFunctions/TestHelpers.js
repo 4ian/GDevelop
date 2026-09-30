@@ -70,7 +70,7 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   },
   attachmentsForResources: {
     getFiles: async () => ({}),
-    storeResourceFiles: async () => true,
+    storeResourceFiles: async () => 'stored',
   },
   onObjectsModifiedOutsideEditor: jest.fn(),
   onEffectsModifiedOutsideEditor: jest.fn(),

@@ -264,6 +264,7 @@ export const useProcessFunctionCalls = ({
   getIsAutoEditEnabled,
   suspendAiRequest,
   requestEditApproval,
+  onSaveProjectAsWithStorageProvider,
 }: {|
   i18n: I18nType,
   project: ?gdProject,
@@ -321,6 +322,15 @@ export const useProcessFunctionCalls = ({
   getIsAutoEditEnabled: () => boolean,
   suspendAiRequest: (aiRequestId: string) => Promise<void>,
   requestEditApproval: (request: EditApprovalRequest) => Promise<boolean>,
+  // Absent where the project can't be saved: the files attached by the user
+  // can then only be kept in memory.
+  onSaveProjectAsWithStorageProvider?: (
+    options: ?{|
+      requestedStorageProvider?: StorageProvider,
+      forcedSavedAsLocation?: SaveAsLocation,
+      createdProject?: gdProject,
+    |}
+  ) => Promise<?FileMetadata>,
 |}): {
   onProcessFunctionCalls: (
     aiRequest: AiRequest,
@@ -346,8 +356,10 @@ export const useProcessFunctionCalls = ({
     resourceManagementProps,
   });
   const attachmentsForResources = useAttachmentsForResources({
+    project,
     resourceManagementProps,
     fileMetadata,
+    onSaveProjectAsWithStorageProvider,
   });
   const { generateEvents } = useGenerateEvents({ project });
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);

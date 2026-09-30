@@ -918,7 +918,11 @@ namespace gdjs {
       );
     }
 
-    sendOpenContextMenu(cursorX: float, cursorY: float): void {
+    sendOpenContextMenu(
+      cursorX: float,
+      cursorY: float,
+      cursorScenePosition: [float, float, float] | null
+    ): void {
       const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
@@ -927,7 +931,7 @@ namespace gdjs {
         circularSafeStringify({
           command: 'openContextMenu',
           editorId: inGameEditor.getEditorId(),
-          payload: { cursorX, cursorY },
+          payload: { cursorX, cursorY, cursorScenePosition },
         })
       );
     }
@@ -988,7 +992,7 @@ namespace gdjs {
       );
     }
 
-    sendPaste(): void {
+    sendPaste(cursorScenePosition: [float, float, float] | null): void {
       const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
@@ -997,7 +1001,7 @@ namespace gdjs {
         circularSafeStringify({
           command: 'paste',
           editorId: inGameEditor.getEditorId(),
-          payload: {},
+          payload: { cursorScenePosition },
         })
       );
     }

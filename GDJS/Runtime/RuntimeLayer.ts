@@ -101,14 +101,11 @@ namespace gdjs {
       );
       // The in-game editor shows scene layers hidden in the game (like the 2D
       // editor), but hides layers hidden in the editor.
-      // Layers of custom objects are displayed like in the game: when a
-      // custom object variant is edited, the editor applies the visibility of
-      // its layers itself.
-      this._hidden =
-        instanceContainer.getGame().isInGameEdition() &&
-        instanceContainer instanceof gdjs.RuntimeScene
-          ? !!layerData.isHiddenInEditor
-          : !layerData.visibility;
+      // Layers of custom objects are displayed like in the game, unless their
+      // variant is the one being edited.
+      this._hidden = instanceContainer.isUsingEditorVisibility()
+        ? !!layerData.isHiddenInEditor
+        : !layerData.visibility;
       this._initialCamera3DFieldOfView = layerData.camera3DFieldOfView || 45;
       this._initialCamera3DNearPlaneDistance =
         layerData.camera3DNearPlaneDistance || 0.1;

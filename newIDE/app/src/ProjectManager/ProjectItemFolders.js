@@ -3,7 +3,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
-import { type TreeViewItemContent } from '.';
 import { mapFor } from '../Utils/MapFor';
 import { removeFolderAndSubFolders } from '../Utils/Folders';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
@@ -95,22 +94,6 @@ export const getParentFolderTreeViewItemId = (
   folder.isRootFolder()
     ? kind.getRootId()
     : getFolderTreeViewItemId(kind, folder);
-
-/**
- * Whether a node is inside the node shown by a tree view item, the root folder
- * being shown by the root item of the kind.
- */
-export const isFolderOrItemDescendantOf = (
-  kind: ProjectItemFoldersKind,
-  folderOrItem: ProjectItemFolderOrItem,
-  itemContent: TreeViewItemContent
-): boolean => {
-  // The nodes of another kind are in another folder structure.
-  if (itemContent.getRootId() !== kind.getRootId()) return false;
-  if (itemContent.getId() === kind.getRootId()) return true;
-  const otherFolderOrItem = itemContent.getFolderOrItem();
-  return !!otherFolderOrItem && folderOrItem.isADescendantOf(otherFolderOrItem);
-};
 
 const recursivelyEnumerateItemsInFolder = (
   folder: ProjectItemFolderOrItem,

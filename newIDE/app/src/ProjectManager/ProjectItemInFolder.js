@@ -9,7 +9,6 @@ import {
   buildMoveToFolderSubmenu,
   getFolderOrItemTreeViewItemId,
   getParentFolderTreeViewItemId,
-  isFolderOrItemDescendantOf,
   getFolderOrItemIndex,
   moveFolderOrItemAt,
 } from './ProjectItemFolders';
@@ -63,11 +62,12 @@ export class ProjectItemInFolder {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return isFolderOrItemDescendantOf(
-      this.kind,
-      this.folderOrItem,
-      itemContent
-    );
+    // The nodes of another kind are in another folder structure.
+    if (itemContent.getRootId() !== this.kind.getRootId()) return false;
+    // The root item of the kind shows the root folder.
+    if (itemContent.getId() === this.kind.getRootId()) return true;
+    const folderOrItem = itemContent.getFolderOrItem();
+    return !!folderOrItem && this.folderOrItem.isADescendantOf(folderOrItem);
   }
 
   getIndex(): number {

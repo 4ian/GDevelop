@@ -59,19 +59,13 @@ import {
   type ProjectItemFolderOrItem,
   addFolderIn,
   getFolderTreeViewItemId,
-  enumerateItemsInFolder,
-  getTopLevelFolderOrItems,
   getSelectionTopLevelItems,
-  removeFolderWithoutItems,
+  dropDescendantsOfRemovedFolders,
   getParentFolderTreeViewItemId,
   moveNewItemToFolder,
   getClosestVisibleParentId,
   getFoldersAscendanceWithoutRootFolder,
 } from './ProjectItemFolders';
-import {
-  copyFolderOrItemsToClipboard,
-  getUniqueFolderName,
-} from './ProjectItemFoldersClipboard';
 import {
   ExtensionTreeViewItemContent,
   getExtensionTreeViewItemId,
@@ -119,6 +113,9 @@ import { isMacLike } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { useProjectItemsSelection } from './UseProjectItemsSelection';
+import { getProjectItemFoldersKind } from './ProjectItemFoldersKinds';
+import { useBulkProjectItemsOperations } from './UseBulkProjectItemsOperations';
 
 const electron = optionalRequire('electron');
 
@@ -192,7 +189,7 @@ export interface TreeViewItemContent {
   getRootId(): string;
 }
 
-interface TreeViewItem {
+export interface TreeViewItem {
   isRoot?: boolean;
   isPlaceholder?: boolean;
   +content: TreeViewItemContent;
@@ -265,17 +262,6 @@ const buildFolderChildren = (
     }
     return new LeafTreeViewItem(buildItemContent(child));
   });
-
-/** Every kind of project item organized in folders. */
-const projectItemFoldersKinds: Array<ProjectItemFoldersKind> = [
-  sceneFoldersKind,
-  externalLayoutFoldersKind,
-  externalEventsFoldersKind,
-  gameplayTestFoldersKind,
-];
-
-const getProjectItemFoldersKind = (rootId: string): ?ProjectItemFoldersKind =>
-  projectItemFoldersKinds.find(kind => kind.getRootId() === rootId);
 
 /**
  * The children of the root of a section organized in folders, or its
@@ -549,9 +535,6 @@ const onClickItem = (item: TreeViewItem) => {
 const editItem = (item: TreeViewItem) => {
   item.content.edit();
 };
-const deleteItem = (item: TreeViewItem) => {
-  item.content.delete();
-};
 const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
   item.content.getRightButton(i18n);
 
@@ -635,9 +618,12 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     },
     ref
   ) => {
-    const [selectedItems, setSelectedItems] = React.useState<
-      Array<TreeViewItem>
-    >([]);
+    const {
+      selectedItems,
+      setSelectedItems,
+      getSelectedFolderOrItems,
+      onCollapseItem,
+    } = useProjectItemsSelection();
     const unsavedChanges = React.useContext(UnsavedChangesContext);
     const { triggerUnsavedChanges } = unsavedChanges;
     const preferences = React.useContext(PreferencesContext);
@@ -856,7 +842,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         editName(getFolderTreeViewItemId(kind, newFolder));
         forceUpdateList();
       },
-      [expandFolders, editName, forceUpdateList]
+      [expandFolders, editName, forceUpdateList, setSelectedItems]
     );
 
     /**
@@ -1234,6 +1220,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         gdevelopTheme,
         forceUpdate,
         forceUpdateList,
+        setSelectedItems,
         editName,
         scrollToItem,
         showDeleteConfirmation,
@@ -1256,145 +1243,25 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [folderTreeViewItemCommonProps]
     );
 
-    /**
-     * The selected nodes organized in folders, of the section of the first
-     * selected item (a selection spanning several sections acts on this one),
-     * without the nodes inside another selected folder. Null when the first
-     * selected item is not organized in folders (an extension...).
-     */
-    const getSelectedFolderOrItems = React.useCallback(
-      (): ?{|
-        kind: ProjectItemFoldersKind,
-        folderOrItems: Array<ProjectItemFolderOrItem>,
-      |} => {
-        if (selectedItems.length === 0) return null;
-        const rootId = selectedItems[0].content.getRootId();
-        const kind = getProjectItemFoldersKind(rootId);
-        if (!kind) return null;
-
-        const folderOrItems = getTopLevelFolderOrItems(
-          selectedItems
-            .filter(item => item.content.getRootId() === rootId)
-            .map(item => item.content.getFolderOrItem())
-            .filter(Boolean)
-        );
-        return folderOrItems.length > 0 ? { kind, folderOrItems } : null;
-      },
-      [selectedItems]
-    );
-
-    /**
-     * Move the selected items (of the same section) in a new folder, created
-     * where the first of them was.
-     */
-    const groupSelectionInFolder = React.useCallback(
-      () => {
-        if (!project) return;
-        const selection = getSelectedFolderOrItems();
-        if (!selection) return;
-        const { kind, folderOrItems: topLevelFolderOrItems } = selection;
-
-        const rootFolder = kind.getRootFolder(project);
-        const uniqueName = getUniqueFolderName(rootFolder, 'NewFolder');
-        const newFolder = rootFolder.insertNewFolder(uniqueName, 0);
-        topLevelFolderOrItems.forEach(folderOrItem => {
-          const currentParent = folderOrItem.getParent();
-          currentParent.moveFolderOrItemToAnotherFolder(
-            folderOrItem,
-            newFolder,
-            newFolder.getChildrenCount()
-          );
-        });
-        animateClosestVisibleParent(kind, newFolder);
-        onProjectItemModified();
-        onNewFolderCreated(kind, newFolder);
-      },
-      [
-        project,
-        getSelectedFolderOrItems,
-        onProjectItemModified,
-        animateClosestVisibleParent,
-        onNewFolderCreated,
-      ]
-    );
-
-    /** Remove items of a kind from the project, once the user confirmed. */
-    const deleteItemsOfKind = React.useCallback(
-      (kind: ProjectItemFoldersKind, items: Array<any>): Promise<boolean> => {
-        if (kind === sceneFoldersKind) return onDeleteLayouts(items);
-        if (kind === externalLayoutFoldersKind)
-          return onDeleteExternalLayouts(items);
-        if (kind === externalEventsFoldersKind)
-          return onDeleteExternalEventsList(items);
-        return onDeleteGameplayTests(items);
-      },
-      [
-        onDeleteLayouts,
-        onDeleteExternalLayouts,
-        onDeleteExternalEventsList,
-        onDeleteGameplayTests,
-      ]
-    );
-
-    /**
-     * Remove the selected items, and the selected folders with the items they
-     * hold, with a single confirmation listing all these items.
-     */
-    const deleteSelection = React.useCallback(
-      () => {
-        const selection = getSelectedFolderOrItems();
-        if (!selection || selection.folderOrItems.length === 1) {
-          // A single item or folder says it with its own words.
-          if (selectedItems.length > 0) deleteItem(selectedItems[0]);
-          return;
-        }
-        const { kind, folderOrItems } = selection;
-        const selectedFolders = folderOrItems.filter(folderOrItem =>
-          folderOrItem.isFolder()
-        );
-        const items = [];
-        folderOrItems.forEach(folderOrItem => {
-          if (folderOrItem.isFolder())
-            items.push(...enumerateItemsInFolder(folderOrItem));
-          else items.push(folderOrItem.getItem());
-        });
-
-        const removeSelectedFolders = () => {
-          // Their items are removed: only empty folders remain in them.
-          selectedFolders.forEach(removeFolderWithoutItems);
-          setSelectedItems([]);
-          onProjectItemModified();
-          forceUpdateList();
-        };
-        if (items.length === 0) {
-          removeSelectedFolders();
-          return;
-        }
-        deleteItemsOfKind(kind, items).then(isRemoved => {
-          if (isRemoved) removeSelectedFolders();
-          else setSelectedItems([]);
-        });
-      },
-      [
-        getSelectedFolderOrItems,
-        selectedItems,
-        deleteItemsOfKind,
-        onProjectItemModified,
-        forceUpdateList,
-      ]
-    );
-
-    const copySelection = React.useCallback(
-      () => {
-        const selection = getSelectedFolderOrItems();
-        if (selection) {
-          copyFolderOrItemsToClipboard(selection.kind, selection.folderOrItems);
-        } else if (selectedItems.length > 0) {
-          selectedItems[0].content.copy();
-        }
-      },
-      [getSelectedFolderOrItems, selectedItems]
-    );
+    const {
+      groupSelectionInFolder,
+      deleteSelection,
+      copySelection,
+    } = useBulkProjectItemsOperations({
+      project,
+      selectedItems,
+      setSelectedItems,
+      getSelectedFolderOrItems,
+      onDeleteLayouts,
+      onDeleteExternalLayouts,
+      onDeleteExternalEventsList,
+      onDeleteGameplayTests,
+      onProjectItemModified,
+      onTreeModified,
+      forceUpdateList,
+      animateClosestVisibleParent,
+      onNewFolderCreated,
+    });
 
     React.useEffect(
       () => {
@@ -2101,22 +1968,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ]
     );
 
-    /**
-     * Unselect item if one of the parent is collapsed (folded) so that the item
-     * does not stay selected and not visible to the user.
-     */
-    const onCollapseItem = React.useCallback(
-      (item: TreeViewItem) => {
-        if (selectedItems.length !== 1 || item.isPlaceholder) {
-          return;
-        }
-        if (selectedItems[0].content.isDescendantOf(item.content)) {
-          setSelectedItems([]);
-        }
-      },
-      [selectedItems]
-    );
-
     // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
@@ -2217,11 +2068,23 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                             onEditItem={editItem}
                             onCollapseItem={onCollapseItem}
                             selectedItems={selectedItems}
-                            onSelectItems={items => {
+                            onSelectItems={(items, removedItems) => {
                               const itemToSelect = items[0];
                               if (!itemToSelect) return;
                               if (itemToSelect.isRoot) return;
-                              setSelectedItems(items);
+                              // When a folder is explicitly deselected
+                              // (Ctrl+click), also drop its descendants that
+                              // a previous range had added to the selection.
+                              const removedFolderOrItems = (removedItems || [])
+                                .map(item => item.content.getFolderOrItem())
+                                .filter(Boolean);
+                              setSelectedItems(
+                                dropDescendantsOfRemovedFolders(
+                                  removedFolderOrItems,
+                                  items,
+                                  item => item.content.getFolderOrItem()
+                                )
+                              );
                             }}
                             onClickItem={onClickItem}
                             onRenameItem={renameItem}

@@ -6,6 +6,7 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type TreeViewItemContent } from '.';
 import { mapFor } from '../Utils/MapFor';
 import { removeSubFolders } from '../Utils/Folders';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 /**
  * A node of the folder structure of a list of project items: the API shared
@@ -145,6 +146,69 @@ export const removeFolderWithoutItems = (
   if (enumerateItemsInFolder(folder).length > 0) return;
   removeSubFolders(folder);
   folder.getParent().removeFolderChild(folder);
+};
+
+/**
+ * Remove from `next` the descendants of the folders explicitly deselected
+ * (Ctrl+click), that a previous range selection had added. Same rule as the
+ * objects list.
+ *
+ * `removedFolderOrItems` must be the nodes explicitly toggled off by the
+ * gesture (as reported by TreeView), NOT the difference between the previous
+ * and next selections: a plain click on the child of a selected folder also
+ * "removes" the folder from the selection, but the clicked child must stay
+ * selected.
+ */
+export const dropDescendantsOfRemovedFolders = <T>(
+  removedFolderOrItems: Array<ProjectItemFolderOrItem>,
+  next: Array<T>,
+  getFolderOrItem: T => ?ProjectItemFolderOrItem
+): Array<T> => {
+  const removedFolders = removedFolderOrItems.filter(folderOrItem =>
+    folderOrItem.isFolder()
+  );
+  if (removedFolders.length === 0) return next;
+  return next.filter(item => {
+    const folderOrItem = getFolderOrItem(item);
+    return (
+      !folderOrItem ||
+      !removedFolders.some(folder => folderOrItem.isADescendantOf(folder))
+    );
+  });
+};
+
+/**
+ * List all the items that would be deleted (recursively, for folders) if the
+ * given top-level selection was removed, without any duplicate.
+ * Call `getTopLevelFolderOrItems` first to ensure the input has no duplicates.
+ */
+export const getItemsToDeleteFromSelection = (
+  topLevelFolderOrItems: ReadonlyArray<ProjectItemFolderOrItem>
+): Array<any> => {
+  const items: Array<any> = [];
+  topLevelFolderOrItems.forEach(folderOrItem => {
+    if (folderOrItem.isFolder())
+      items.push(...enumerateItemsInFolder(folderOrItem));
+    else items.push(folderOrItem.getItem());
+  });
+  return items;
+};
+
+/**
+ * Remove the folders of the given top-level selection, once their items are
+ * removed. Their sub folders are removed first, as a folder can only be
+ * removed once empty. Same rule as the objects list.
+ */
+export const removeEmptyFoldersFromSelection = (
+  topLevelFolderOrItems: ReadonlyArray<ProjectItemFolderOrItem>
+): void => {
+  topLevelFolderOrItems.forEach(folderOrItem => {
+    // The items of the selection are already removed from the project: their
+    // nodes are destroyed, so they must not be accessed anymore.
+    const aliveNode = exceptionallyGuardAgainstDeadObject(folderOrItem);
+    if (!aliveNode || !aliveNode.isFolder()) return;
+    removeFolderWithoutItems(aliveNode);
+  });
 };
 
 export const getFoldersAscendanceWithoutRootFolder = (

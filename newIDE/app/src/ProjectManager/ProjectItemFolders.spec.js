@@ -6,6 +6,9 @@ import {
   getTopLevelFolderOrItems,
   moveFolderOrItemAt,
   removeFolderWithoutItems,
+  dropDescendantsOfRemovedFolders,
+  getItemsToDeleteFromSelection,
+  removeEmptyFoldersFromSelection,
 } from './ProjectItemFolders';
 
 const gd: libGDevelop = global.gd;
@@ -87,6 +90,45 @@ describe('ProjectItemFolders', () => {
 
     removeFolderWithoutItems(folder);
     expect(getChildrenNames(rootFolder)).toEqual(['A']);
+
+    project.delete();
+  });
+
+  it('lists the items to delete, and removes the emptied folders', () => {
+    const project = makeProjectWithScenes(['A', 'B', 'C']);
+    const rootFolder = project.getLayoutsRootFolder();
+    const folder = rootFolder.insertNewFolder('Folder', 3);
+    const subFolder = folder.insertNewFolder('SubFolder', 0);
+    moveFolderOrItemAt(rootFolder.getItemChild('B'), 0, subFolder);
+    const selection = [rootFolder.getItemChild('A'), folder];
+
+    const itemsToDelete = getItemsToDeleteFromSelection(selection);
+    expect(itemsToDelete.map(scene => scene.getName())).toEqual(['A', 'B']);
+
+    project.removeLayout('A');
+    project.removeLayout('B');
+    removeEmptyFoldersFromSelection(selection);
+    expect(getChildrenNames(rootFolder)).toEqual(['C']);
+
+    project.delete();
+  });
+
+  it('drops the descendants of an explicitly deselected folder', () => {
+    const project = makeProjectWithScenes(['A', 'B']);
+    const rootFolder = project.getLayoutsRootFolder();
+    const folder = rootFolder.insertNewFolder('Folder', 2);
+    moveFolderOrItemAt(rootFolder.getItemChild('A'), 0, folder);
+    const nodeOfA = folder.getItemChild('A');
+    const nodeOfB = rootFolder.getItemChild('B');
+    const identity = (node: ProjectItemFolderOrItem) => node;
+
+    expect(
+      dropDescendantsOfRemovedFolders([folder], [nodeOfA, nodeOfB], identity)
+    ).toEqual([nodeOfB]);
+    // Deselecting an item keeps the other nodes.
+    expect(
+      dropDescendantsOfRemovedFolders([nodeOfB], [nodeOfA], identity)
+    ).toEqual([nodeOfA]);
 
     project.delete();
   });

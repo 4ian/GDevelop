@@ -26,9 +26,13 @@ const trackedClasses = [
   'EffectsContainer',
   'InitialInstancesContainer',
   'LayersContainer',
+  'ExternalEventsFolderOrExternalEvents',
+  'ExternalLayoutFolderOrExternalLayout',
+  'LayoutFolderOrLayout',
   'ObjectFolderOrObject',
   'ObjectGroupsContainer',
   'ObjectsContainer',
+  'TestFolderOrTest',
   'VariablesContainer',
   'BaseEvent',
 ];

@@ -1324,7 +1324,7 @@ export default class InstancesEditor extends Component<Props, State> {
       const layer = layersContainer.getLayerAt(i);
       // $FlowFixMe[prop-missing]
       layersLocks[layersContainer.getLayerAt(i).getName()] =
-        !layer.getVisibility() || layer.isLocked();
+        layer.isHiddenInEditor() || layer.isLocked();
     }
     return layersLocks;
   };

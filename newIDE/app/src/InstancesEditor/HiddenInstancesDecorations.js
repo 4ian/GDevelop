@@ -57,7 +57,8 @@ export default class HiddenInstancesDecorations {
         instancePtr,
         gd.InitialInstance
       );
-      if (!instance.isHidden()) return;
+      // Instances hidden in the editor are not displayed at all.
+      if (!instance.isHidden() || instance.isHiddenInEditor()) return;
       if (!this._isOnVisibleLayer(instance)) return;
 
       const canvasRectangle = transformRect(
@@ -96,7 +97,7 @@ export default class HiddenInstancesDecorations {
   _isOnVisibleLayer(instance: gdInitialInstance): boolean {
     const layerName = instance.getLayer();
     if (!this.layersContainer.hasLayerNamed(layerName)) return true;
-    return this.layersContainer.getLayer(layerName).getVisibility();
+    return !this.layersContainer.getLayer(layerName).isHiddenInEditor();
   }
 
   /**

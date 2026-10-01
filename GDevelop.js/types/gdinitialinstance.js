@@ -23,6 +23,8 @@ declare class gdInitialInstance {
   setShouldKeepRatio(keepRatio: boolean): void;
   isHidden(): boolean;
   setHidden(hidden: boolean): void;
+  isHiddenInEditor(): boolean;
+  setHiddenInEditor(hiddenInEditor: boolean): void;
   getZOrder(): number;
   setZOrder(zOrder: number): void;
   getOpacity(): number;

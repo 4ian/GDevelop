@@ -11,6 +11,8 @@ import { ColumnStackLayout } from '../../UI/Layout';
 import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
 import VisibilityIcon from '../../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../../UI/CustomSvgIcons/VisibilityOff';
+import CameraIcon from '../../UI/CustomSvgIcons/Camera';
+import CameraOffIcon from '../../UI/CustomSvgIcons/CameraOff';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { mapFor } from '../../Utils/MapFor';
 import {
@@ -245,8 +247,24 @@ export const CompactEffectsListEditor = ({
               titleBarButtons={[
                 {
                   id: 'effect-visibility',
-                  icon: effect.isEnabled() ? VisibilityIcon : VisibilityOffIcon,
-                  label: effect.isEnabled() ? t`Hide effect` : t`Show effect`,
+                  icon: effect.isHiddenInEditor()
+                    ? VisibilityOffIcon
+                    : VisibilityIcon,
+                  label: effect.isHiddenInEditor()
+                    ? t`Show effect in the editor`
+                    : t`Hide effect in the editor`,
+                  onClick: () => {
+                    effect.setHiddenInEditor(!effect.isHiddenInEditor());
+                    onEffectsUpdated();
+                    forceUpdate();
+                  },
+                },
+                {
+                  id: 'effect-visibility-in-game',
+                  icon: effect.isEnabled() ? CameraIcon : CameraOffIcon,
+                  label: effect.isEnabled()
+                    ? t`Disable effect in the game`
+                    : t`Enable effect in the game`,
                   onClick: () => {
                     effect.setEnabled(!effect.isEnabled());
                     onEffectsUpdated();

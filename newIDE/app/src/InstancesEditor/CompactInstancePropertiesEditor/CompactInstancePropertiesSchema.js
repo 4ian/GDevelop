@@ -30,6 +30,8 @@ import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import Visibility from '../../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
+import Camera from '../../UI/CustomSvgIcons/Camera';
+import CameraOff from '../../UI/CustomSvgIcons/CameraOff';
 import Restore from '../../UI/CustomSvgIcons/Restore';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
@@ -178,6 +180,33 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}): Field => ({
       defaultValue: i18n._(t`Different objects`),
     },
     {
+      name: 'Hide instance in editor',
+      getLabel: (instance: gdInitialInstance) =>
+        instance.isHiddenInEditor()
+          ? i18n._(t`Hidden in the editor`)
+          : i18n._(t`Visible in the editor`),
+      valueType: 'enumIcon',
+      renderIcon: value =>
+        value === 'hidden' ? (
+          <VisibilityOff style={styles.icon} />
+        ) : (
+          <Visibility style={styles.icon} />
+        ),
+      isHighlighted: value => value === 'hidden',
+      getValue: (instance: gdInitialInstance) =>
+        instance.isHiddenInEditor() ? 'hidden' : 'visible',
+      setValue: (
+        instance: gdInitialInstance,
+        newValue: 'hidden' | 'visible'
+      ) => {
+        instance.setHiddenInEditor(newValue === 'hidden');
+      },
+      getNextValue: (
+        currentValue: 'hidden' | 'visible'
+      ): 'hidden' | 'visible' =>
+        currentValue === 'hidden' ? 'visible' : 'hidden',
+    },
+    {
       name: 'Hide instance',
       getLabel: (instance: gdInitialInstance) =>
         instance.isHidden()
@@ -186,9 +215,9 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}): Field => ({
       valueType: 'enumIcon',
       renderIcon: value =>
         value === 'hidden' ? (
-          <VisibilityOff style={styles.icon} />
+          <CameraOff style={styles.icon} />
         ) : (
-          <Visibility style={styles.icon} />
+          <Camera style={styles.icon} />
         ),
       isHighlighted: value => value === 'hidden',
       getValue: (instance: gdInitialInstance) =>

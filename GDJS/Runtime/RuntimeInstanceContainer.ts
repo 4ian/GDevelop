@@ -391,11 +391,10 @@ namespace gdjs {
           // 2D editor).
           // Instances hidden in the editor are only hidden in the in-game
           // editor. Children of custom objects are always displayed (like in
-          // the 2D editor): when a custom object variant is edited, the editor
-          // hides them itself.
+          // the 2D editor), unless their variant is the one being edited.
           if (
             this.getGame().isInGameEdition()
-              ? instanceData.hiddenInEditor && this instanceof gdjs.RuntimeScene
+              ? instanceData.hiddenInEditor && this.isUsingEditorVisibility()
               : instanceData.hidden
           ) {
             newObject.hide(true);
@@ -409,16 +408,33 @@ namespace gdjs {
     }
 
     /**
+     * Check if the instances, layers and effects of this container are
+     * displayed according to their visibility in the editor, instead of the
+     * one in the game.
+     *
+     * It's the case for the scene and the custom object variant edited in the
+     * in-game editor. Other custom objects are displayed like in the game.
+     */
+    isUsingEditorVisibility(): boolean {
+      const game = this.getGame();
+      if (!game.isInGameEdition()) return false;
+      if (this instanceof gdjs.RuntimeScene) return true;
+      const inGameEditor = game.getInGameEditor();
+      return (
+        !!inGameEditor && inGameEditor.getEditedInstanceContainer() === this
+      );
+    }
+
+    /**
      * Check if an effect of an object or a layer of this container must be
      * disabled.
      *
      * The in-game editor applies the effects disabled in the game (like
      * instances hidden at start are shown), but not the effects hidden in the
-     * editor. Custom objects are displayed like in the game.
+     * editor.
      */
     isEffectDisabled(effectData: EffectData): boolean {
-      return this.getGame().isInGameEdition() &&
-        this instanceof gdjs.RuntimeScene
+      return this.isUsingEditorVisibility()
         ? !!effectData.hiddenInEditor
         : !!effectData.disabled;
     }

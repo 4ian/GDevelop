@@ -1454,13 +1454,24 @@ namespace gdjs {
               sceneAndCustomObject;
             this._currentScene = scene;
             this._editedInstanceContainer = customObjectInstanceContainer;
-            // The edited variant layers follow the editor visibility, not
-            // the in-game one.
+            // The edited variant layers, instances and effects follow the
+            // editor visibility, not the in-game one. They were created before
+            // the container was known as edited, so apply it now.
             for (const layerData of editedLayerDataList) {
-              if (customObjectInstanceContainer.hasLayer(layerData.name)) {
-                customObjectInstanceContainer
-                  .getLayer(layerData.name)
-                  .show(!layerData.isHiddenInEditor);
+              if (!customObjectInstanceContainer.hasLayer(layerData.name)) {
+                continue;
+              }
+              const layer = customObjectInstanceContainer.getLayer(
+                layerData.name
+              );
+              layer.show(!layerData.isHiddenInEditor);
+              for (const effectData of layerData.effects) {
+                if (layer.hasEffect(effectData.name)) {
+                  layer.enableEffect(
+                    effectData.name,
+                    !customObjectInstanceContainer.isEffectDisabled(effectData)
+                  );
+                }
               }
             }
             for (const object of customObjectInstanceContainer.getAdhocListOfAllInstances()) {
@@ -1469,6 +1480,21 @@ namespace gdjs {
               );
               if (instanceData && instanceData.hiddenInEditor) {
                 object.hide(true);
+              }
+              const objectData = customObjectInstanceContainer._objects.get(
+                object.getName()
+              );
+              if (objectData) {
+                for (const effectData of objectData.effects) {
+                  if (object.hasEffect(effectData.name)) {
+                    object.enableEffect(
+                      effectData.name,
+                      !customObjectInstanceContainer.isEffectDisabled(
+                        effectData
+                      )
+                    );
+                  }
+                }
               }
             }
           }

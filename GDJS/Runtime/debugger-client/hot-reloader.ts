@@ -1520,7 +1520,7 @@ namespace gdjs {
       runtimeLayer: gdjs.RuntimeLayer
     ): void {
       // Properties
-      if (this._runtimeGame.isInGameEdition()) {
+      if (runtimeLayer.getInstanceContainer().isUsingEditorVisibility()) {
         if (!oldLayer.isHiddenInEditor !== !newLayer.isHiddenInEditor) {
           runtimeLayer.show(!newLayer.isHiddenInEditor);
         }
@@ -1890,8 +1890,12 @@ namespace gdjs {
       if (this._runtimeGame.isInGameEdition()) {
         // Instances hidden at start are not hidden in the in-game editor:
         // they must stay visible to be seen and manipulated. Only instances
-        // hidden in the editor are hidden.
-        if (!oldInstance.hiddenInEditor !== !newInstance.hiddenInEditor) {
+        // hidden in the editor are hidden (children of custom objects are
+        // always displayed, unless their variant is the one being edited).
+        if (
+          runtimeObject.getInstanceContainer().isUsingEditorVisibility() &&
+          !oldInstance.hiddenInEditor !== !newInstance.hiddenInEditor
+        ) {
           runtimeObject.hide(!!newInstance.hiddenInEditor);
           somethingChanged = true;
         }

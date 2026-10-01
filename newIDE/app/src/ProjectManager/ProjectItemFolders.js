@@ -5,7 +5,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type TreeViewItemContent } from '.';
 import { mapFor } from '../Utils/MapFor';
-import { removeSubFolders } from '../Utils/Folders';
+import { removeFolderAndSubFolders } from '../Utils/Folders';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 /**
@@ -137,18 +137,6 @@ export const enumerateItemsInFolder = (
 };
 
 /**
- * Remove a folder holding no item: its empty folders first, as a folder can
- * only be removed once empty.
- */
-export const removeFolderWithoutItems = (
-  folder: ProjectItemFolderOrItem
-): void => {
-  if (enumerateItemsInFolder(folder).length > 0) return;
-  removeSubFolders(folder);
-  folder.getParent().removeFolderChild(folder);
-};
-
-/**
  * Remove from `next` the descendants of the folders explicitly deselected
  * (Ctrl+click), that a previous range selection had added. Same rule as the
  * objects list.
@@ -207,7 +195,7 @@ export const removeEmptyFoldersFromSelection = (
     // nodes are destroyed, so they must not be accessed anymore.
     const aliveNode = exceptionallyGuardAgainstDeadObject(folderOrItem);
     if (!aliveNode || !aliveNode.isFolder()) return;
-    removeFolderWithoutItems(aliveNode);
+    removeFolderAndSubFolders(aliveNode);
   });
 };
 

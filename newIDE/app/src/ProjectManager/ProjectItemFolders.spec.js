@@ -5,11 +5,11 @@ import {
   enumerateItemsInFolder,
   getTopLevelFolderOrItems,
   moveFolderOrItemAt,
-  removeFolderWithoutItems,
   dropDescendantsOfRemovedFolders,
   getItemsToDeleteFromSelection,
   removeEmptyFoldersFromSelection,
 } from './ProjectItemFolders';
+import { removeFolderAndSubFolders } from '../Utils/Folders';
 
 const gd: libGDevelop = global.gd;
 
@@ -88,7 +88,7 @@ describe('ProjectItemFolders', () => {
     const folder = rootFolder.insertNewFolder('Folder', 1);
     folder.insertNewFolder('SubFolder', 0).insertNewFolder('SubSubFolder', 0);
 
-    removeFolderWithoutItems(folder);
+    removeFolderAndSubFolders(folder);
     expect(getChildrenNames(rootFolder)).toEqual(['A']);
 
     project.delete();

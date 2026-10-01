@@ -10,9 +10,9 @@ import {
   type ProjectItemFolderOrItem,
   getFolderTreeViewItemId,
   enumerateItemsInFolder,
-  removeFolderWithoutItems,
 } from './ProjectItemFolders';
 import { ProjectItemInFolder } from './ProjectItemInFolder';
+import { removeFolderAndSubFolders } from '../Utils/Folders';
 
 export type ProjectItemFolderTreeViewItemProps = {|
   ...TreeItemProps,
@@ -185,7 +185,7 @@ export class ProjectItemFolderTreeViewItemContent
   }
 
   _removeFolderWithoutItems(): void {
-    removeFolderWithoutItems(this.folder);
+    removeFolderAndSubFolders(this.folder);
     this.props.onFolderRemoved();
     this.inFolder.onFolderStructureModified();
   }

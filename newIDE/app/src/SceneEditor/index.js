@@ -1342,7 +1342,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     instances.forEach(instance => {
       if (invisibleLayerOnWhichInstancesHaveJustBeenAdded === null) {
         const layer = this.props.layersContainer.getLayer(instance.getLayer());
-        if (!layer.getVisibility()) {
+        if (layer.isHiddenInEditor()) {
           invisibleLayerOnWhichInstancesHaveJustBeenAdded = instance.getLayer();
         }
       }

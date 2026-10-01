@@ -9,6 +9,8 @@ declare class gdEffect {
   isFolded(): boolean;
   setEnabled(val: boolean): void;
   isEnabled(): boolean;
+  setHiddenInEditor(val: boolean): void;
+  isHiddenInEditor(): boolean;
   setDoubleParameter(name: string, value: number): void;
   getDoubleParameter(name: string): number;
   hasDoubleParameter(name: string): boolean;

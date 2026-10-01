@@ -1155,6 +1155,8 @@ interface Effect {
   boolean IsFolded();
   void SetEnabled(boolean val);
   boolean IsEnabled();
+  void SetHiddenInEditor(boolean val);
+  boolean IsHiddenInEditor();
 
   void SetDoubleParameter([Const] DOMString name, double value);
   double GetDoubleParameter([Const] DOMString name);
@@ -1205,6 +1207,8 @@ interface Layer {
     [Const, Ref] DOMString GetDefaultCameraBehavior();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
+    void SetHiddenInEditor(boolean isHiddenInEditor);
+    boolean IsHiddenInEditor();
     void SetLocked(boolean isLocked);
     boolean IsLocked();
     void SetLightingLayer(boolean lightingLayer);
@@ -1530,6 +1534,8 @@ interface InitialInstance {
     void SetShouldKeepRatio(boolean keepRatio);
     boolean IsHidden();
     void SetHidden(boolean hidden);
+    boolean IsHiddenInEditor();
+    void SetHiddenInEditor(boolean hiddenInEditor);
     long GetZOrder();
     void SetZOrder(long zOrder);
     long GetOpacity();

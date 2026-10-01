@@ -99,7 +99,16 @@ namespace gdjs {
       this._defaultCameraBehavior = getDefaultCameraBehaviorFromString(
         layerData.defaultCameraBehavior || 'top-left-anchored-if-never-moved'
       );
-      this._hidden = !layerData.visibility;
+      // The in-game editor shows scene layers hidden in the game (like the 2D
+      // editor), but hides layers hidden in the editor.
+      // Layers of custom objects are displayed like in the game: when a
+      // custom object variant is edited, the editor applies the visibility of
+      // its layers itself.
+      this._hidden =
+        instanceContainer.getGame().isInGameEdition() &&
+        instanceContainer instanceof gdjs.RuntimeScene
+          ? !!layerData.isHiddenInEditor
+          : !layerData.visibility;
       this._initialCamera3DFieldOfView = layerData.camera3DFieldOfView || 45;
       this._initialCamera3DNearPlaneDistance =
         layerData.camera3DNearPlaneDistance || 0.1;
@@ -127,7 +136,7 @@ namespace gdjs {
       for (let i = 0; i < layerData.effects.length; ++i) {
         const effectData = layerData.effects[i];
         this.addEffect(effectData);
-        if (effectData.disabled) {
+        if (instanceContainer.isEffectDisabled(effectData)) {
           this.enableEffect(effectData.name, false);
         }
       }

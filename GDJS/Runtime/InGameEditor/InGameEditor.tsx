@@ -1456,6 +1456,23 @@ namespace gdjs {
               sceneAndCustomObject;
             this._currentScene = scene;
             this._editedInstanceContainer = customObjectInstanceContainer;
+            // The edited variant layers follow the editor visibility, not
+            // the in-game one.
+            for (const layerData of editedLayerDataList) {
+              if (customObjectInstanceContainer.hasLayer(layerData.name)) {
+                customObjectInstanceContainer
+                  .getLayer(layerData.name)
+                  .show(!layerData.isHiddenInEditor);
+              }
+            }
+            for (const object of customObjectInstanceContainer.getAdhocListOfAllInstances()) {
+              const instanceData = editedInstanceDataList.find(
+                (data) => data.persistentUuid === object.persistentUuid
+              );
+              if (instanceData && instanceData.hiddenInEditor) {
+                object.hide(true);
+              }
+            }
           }
           this.setInstancesEditorSettings(
             eventsBasedObjectVariantData.editionSettings
@@ -2503,7 +2520,12 @@ namespace gdjs {
         for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
           if (!object.persistentUuid) continue;
           const instanceData = this._getInstanceData(object.persistentUuid);
-          if (!instanceData || !instanceData.hidden) continue;
+          if (
+            !instanceData ||
+            !instanceData.hidden ||
+            instanceData.hiddenInEditor
+          )
+            continue;
 
           const objectLayer = this.getEditorLayer(object.getLayer());
           const threeGroup =
@@ -3312,6 +3334,7 @@ namespace gdjs {
           // Not modified by the InGameEditor (which always shows instances,
           // even those hidden at start), but must be preserved:
           hidden: oldData ? oldData.hidden : undefined,
+          hiddenInEditor: oldData ? oldData.hiddenInEditor : undefined,
           // TODO: how to transmit/should we transmit other properties?
           numberProperties: [],
           stringProperties: [],
@@ -3378,7 +3401,11 @@ namespace gdjs {
 
     isInstanceSealed(object: gdjs.RuntimeObject): boolean {
       const instanceData = this._getInstanceData(object.persistentUuid);
-      return !!instanceData && !!instanceData.sealed;
+      // Instances hidden in the editor can't be selected by clicking on them.
+      return (
+        !!instanceData &&
+        (!!instanceData.sealed || !!instanceData.hiddenInEditor)
+      );
     }
 
     /**
@@ -3836,6 +3863,9 @@ namespace gdjs {
             }
             runtimeObject.setAngle(instance.angle);
             runtimeObject.setLayer(instance.layer);
+            // Instances hidden at start stay visible in the editor: only the
+            // ones hidden in the editor are hidden.
+            runtimeObject.hide(!!instance.hiddenInEditor);
             if (is3D(runtimeObject)) {
               runtimeObject.setZ(instance.z === undefined ? 0 : instance.z);
               runtimeObject.setRotationX(

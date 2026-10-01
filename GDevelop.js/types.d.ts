@@ -963,6 +963,8 @@ export class Effect extends EmscriptenObject {
   isFolded(): boolean;
   setEnabled(val: boolean): void;
   isEnabled(): boolean;
+  setHiddenInEditor(val: boolean): void;
+  isHiddenInEditor(): boolean;
   setDoubleParameter(name: string, value: number): void;
   getDoubleParameter(name: string): number;
   hasDoubleParameter(name: string): boolean;
@@ -1009,6 +1011,8 @@ export class Layer extends EmscriptenObject {
   getDefaultCameraBehavior(): string;
   setVisibility(visible: boolean): void;
   getVisibility(): boolean;
+  setHiddenInEditor(isHiddenInEditor: boolean): void;
+  isHiddenInEditor(): boolean;
   setLocked(isLocked: boolean): void;
   isLocked(): boolean;
   setLightingLayer(lightingLayer: boolean): void;
@@ -1283,6 +1287,8 @@ export class InitialInstance extends EmscriptenObject {
   setShouldKeepRatio(keepRatio: boolean): void;
   isHidden(): boolean;
   setHidden(hidden: boolean): void;
+  isHiddenInEditor(): boolean;
+  setHiddenInEditor(hiddenInEditor: boolean): void;
   getZOrder(): number;
   setZOrder(zOrder: number): void;
   getOpacity(): number;

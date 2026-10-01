@@ -282,6 +282,9 @@ describe('libGD.js', function () {
       layer.setVisibility(false);
       expect(layer.getName()).toBe('GUI');
       expect(layer.getVisibility()).toBe(false);
+      expect(layer.isHiddenInEditor()).toBe(false);
+      layer.setHiddenInEditor(true);
+      expect(layer.isHiddenInEditor()).toBe(true);
 
       layer.delete();
     });
@@ -337,6 +340,7 @@ describe('libGD.js', function () {
 
       layer.setName('GUI');
       layer.setVisibility(false);
+      layer.setHiddenInEditor(true);
       layer.getEffects().insertNewEffect('MyEffect', 0);
       layer.setCameraCount(1);
 
@@ -349,6 +353,7 @@ describe('libGD.js', function () {
 
         expect(layer2.getName()).toBe('GUI');
         expect(layer2.getVisibility()).toBe(false);
+        expect(layer2.isHiddenInEditor()).toBe(true);
         expect(layer2.getEffects().getEffectsCount()).toBe(1);
         expect(layer2.getEffects().getEffectAt(0).getName()).toBe('MyEffect');
         expect(layer2.getCameraCount()).toBe(1);
@@ -356,6 +361,37 @@ describe('libGD.js', function () {
 
       layer.delete();
       layer2.delete();
+    });
+    it('keeps a layer hidden in the game but shown in the editor', function () {
+      const layer = new gd.Layer();
+      const layer2 = new gd.Layer();
+      layer.setVisibility(false);
+      layer.setHiddenInEditor(false);
+
+      const element = new gd.SerializerElement();
+      layer.serializeTo(element);
+      layer2.unserializeFrom(element);
+
+      expect(layer2.getVisibility()).toBe(false);
+      expect(layer2.isHiddenInEditor()).toBe(false);
+
+      layer.delete();
+      layer2.delete();
+    });
+    it('hides in the editor the layers hidden by old projects', function () {
+      const layer = new gd.Layer();
+      // Projects saved with GD <= 5.6.283 have no "isHiddenInEditor".
+      layer.unserializeFrom(
+        gd.Serializer.fromJSObject({ name: 'GUI', visibility: false })
+      );
+      expect(layer.isHiddenInEditor()).toBe(true);
+
+      layer.unserializeFrom(
+        gd.Serializer.fromJSObject({ name: 'GUI', visibility: true })
+      );
+      expect(layer.isHiddenInEditor()).toBe(false);
+
+      layer.delete();
     });
   });
 
@@ -385,6 +421,47 @@ describe('libGD.js', function () {
       effect.setBooleanParameter('SomeBoolean', false);
       expect(effect.getBooleanParameter('SomeBoolean')).toBe(false);
       expect(effect.getAllBooleanParameters().keys().size()).toBe(1);
+
+      effect.delete();
+    });
+    it('can be hidden in the editor and disabled in the game', function () {
+      const effect = new gd.Effect();
+      const effect2 = new gd.Effect();
+      expect(effect.isEnabled()).toBe(true);
+      expect(effect.isHiddenInEditor()).toBe(false);
+
+      effect.setEnabled(false);
+      const element = new gd.SerializerElement();
+      effect.serializeTo(element);
+      effect2.unserializeFrom(element);
+      expect(effect2.isEnabled()).toBe(false);
+      expect(effect2.isHiddenInEditor()).toBe(false);
+
+      effect.setEnabled(true);
+      effect.setHiddenInEditor(true);
+      const element2 = new gd.SerializerElement();
+      effect.serializeTo(element2);
+      effect2.unserializeFrom(element2);
+      expect(effect2.isEnabled()).toBe(true);
+      expect(effect2.isHiddenInEditor()).toBe(true);
+
+      element.delete();
+      element2.delete();
+      effect.delete();
+      effect2.delete();
+    });
+    it('hides in the editor the effects disabled by old projects', function () {
+      const effect = new gd.Effect();
+      // Projects saved with GD <= 5.6.283 have no "hiddenInEditor".
+      effect.unserializeFrom(
+        gd.Serializer.fromJSObject({
+          name: 'MyEffect',
+          effectType: 'Sepia',
+          disabled: true,
+        })
+      );
+      expect(effect.isEnabled()).toBe(false);
+      expect(effect.isHiddenInEditor()).toBe(true);
 
       effect.delete();
     });
@@ -815,6 +892,9 @@ describe('libGD.js', function () {
       expect(initialInstance.isHidden()).toBe(false);
       initialInstance.setHidden(true);
       expect(initialInstance.isHidden()).toBe(true);
+      expect(initialInstance.isHiddenInEditor()).toBe(false);
+      initialInstance.setHiddenInEditor(true);
+      expect(initialInstance.isHiddenInEditor()).toBe(true);
       initialInstance.setHasCustomSize(true);
       expect(initialInstance.hasCustomSize()).toBe(true);
       initialInstance.setCustomWidth(34);
@@ -861,6 +941,7 @@ describe('libGD.js', function () {
       expect(initialInstance2.getLayer()).toBe('MyLayer');
       expect(initialInstance2.isLocked()).toBe(true);
       expect(initialInstance2.isHidden()).toBe(true);
+      expect(initialInstance2.isHiddenInEditor()).toBe(true);
       expect(initialInstance2.hasCustomSize()).toBe(true);
       expect(initialInstance2.hasCustomDepth()).toBe(false);
       expect(initialInstance2.getCustomWidth()).toBe(34);

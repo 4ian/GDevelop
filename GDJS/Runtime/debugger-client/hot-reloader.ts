@@ -1386,17 +1386,27 @@ namespace gdjs {
                 hotReloadSucceeded =
                   runtimeObject.updateAllEffectParameters(newEffectData) &&
                   hotReloadSucceeded;
-                if (oldEffectData.disabled !== newEffectData.disabled) {
+                const instanceContainer = runtimeObject.getInstanceContainer();
+                const isNewEffectDisabled =
+                  instanceContainer.isEffectDisabled(newEffectData);
+                if (
+                  instanceContainer.isEffectDisabled(oldEffectData) !==
+                  isNewEffectDisabled
+                ) {
                   runtimeObject.enableEffect(
                     newEffectData.name,
-                    !newEffectData.disabled
+                    !isNewEffectDisabled
                   );
                 }
               } else {
                 // Another effect type was applied
                 runtimeObject.removeEffect(oldEffectData.name);
                 runtimeObject.addEffect(newEffectData);
-                if (newEffectData.disabled) {
+                if (
+                  runtimeObject
+                    .getInstanceContainer()
+                    .isEffectDisabled(newEffectData)
+                ) {
                   runtimeObject.enableEffect(newEffectData.name, false);
                 }
               }
@@ -1422,7 +1432,11 @@ namespace gdjs {
           runtimeObjects.forEach((runtimeObject) => {
             hotReloadSucceeded =
               runtimeObject.addEffect(newEffectData) && hotReloadSucceeded;
-            if (newEffectData.disabled) {
+            if (
+              runtimeObject
+                .getInstanceContainer()
+                .isEffectDisabled(newEffectData)
+            ) {
               runtimeObject.enableEffect(newEffectData.name, false);
             }
           });
@@ -1510,7 +1524,11 @@ namespace gdjs {
       runtimeLayer: gdjs.RuntimeLayer
     ): void {
       // Properties
-      if (oldLayer.visibility !== newLayer.visibility) {
+      if (this._runtimeGame.isInGameEdition()) {
+        if (!oldLayer.isHiddenInEditor !== !newLayer.isHiddenInEditor) {
+          runtimeLayer.show(!newLayer.isHiddenInEditor);
+        }
+      } else if (oldLayer.visibility !== newLayer.visibility) {
         runtimeLayer.show(newLayer.visibility);
       }
       if (newLayer.isLightingLayer) {
@@ -1605,7 +1623,11 @@ namespace gdjs {
               // Effect changed type, consider it was removed and added back.
               runtimeLayer.removeEffect(name);
               runtimeLayer.addEffect(newEffectData);
-              if (newEffectData.disabled) {
+              if (
+                runtimeLayer
+                  .getInstanceContainer()
+                  .isEffectDisabled(newEffectData)
+              ) {
                 runtimeLayer.enableEffect(newEffectData.name, false);
               }
             } else {
@@ -1627,7 +1649,9 @@ namespace gdjs {
         if (!oldEffectData && !runtimeLayer.hasEffect(name)) {
           // Effect was added
           runtimeLayer.addEffect(newEffectData);
-          if (newEffectData.disabled) {
+          if (
+            runtimeLayer.getInstanceContainer().isEffectDisabled(newEffectData)
+          ) {
             runtimeLayer.enableEffect(newEffectData.name, false);
           }
         }
@@ -1643,8 +1667,14 @@ namespace gdjs {
       runtimeLayer: gdjs.RuntimeLayer,
       effectName: string
     ): void {
-      if (oldEffectData.disabled !== newEffectData.disabled) {
-        runtimeLayer.enableEffect(newEffectData.name, !newEffectData.disabled);
+      const instanceContainer = runtimeLayer.getInstanceContainer();
+      const isNewEffectDisabled =
+        instanceContainer.isEffectDisabled(newEffectData);
+      if (
+        instanceContainer.isEffectDisabled(oldEffectData) !==
+        isNewEffectDisabled
+      ) {
+        runtimeLayer.enableEffect(newEffectData.name, !isNewEffectDisabled);
       }
       // We consider oldEffectData.effectType and newEffectData.effectType
       // are the same - it's responsibility of the caller to verify this.
@@ -1864,12 +1894,15 @@ namespace gdjs {
         runtimeObject.setLayer(newInstance.layer);
         somethingChanged = true;
       }
-      if (
+      if (this._runtimeGame.isInGameEdition()) {
         // Instances hidden at start are not hidden in the in-game editor:
-        // they must stay visible to be seen and manipulated.
-        !this._runtimeGame.isInGameEdition() &&
-        !oldInstance.hidden !== !newInstance.hidden
-      ) {
+        // they must stay visible to be seen and manipulated. Only instances
+        // hidden in the editor are hidden.
+        if (!oldInstance.hiddenInEditor !== !newInstance.hiddenInEditor) {
+          runtimeObject.hide(!!newInstance.hiddenInEditor);
+          somethingChanged = true;
+        }
+      } else if (!oldInstance.hidden !== !newInstance.hidden) {
         runtimeObject.hide(!!newInstance.hidden);
         somethingChanged = true;
       }

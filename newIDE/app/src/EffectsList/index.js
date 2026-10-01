@@ -54,6 +54,8 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import InlineCheckbox from '../UI/InlineCheckbox';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
+import CameraIcon from '../UI/CustomSvgIcons/Camera';
+import CameraOffIcon from '../UI/CustomSvgIcons/CameraOff';
 import PropertiesEditorByVisibility from '../PropertiesEditor/PropertiesEditorByVisibility';
 import NewEffectDialog from './NewEffectDialog';
 
@@ -245,6 +247,24 @@ const Effect = React.forwardRef((
               paddingSize="small"
               checkedIcon={<VisibilityIcon />}
               uncheckedIcon={<VisibilityOffIcon />}
+              checked={!effect.isHiddenInEditor()}
+              onCheck={(e, checked) => {
+                effect.setHiddenInEditor(!checked);
+                forceUpdate();
+              }}
+              tooltipOrHelperText={
+                effect.isHiddenInEditor() ? (
+                  <Trans>Show effect in the editor</Trans>
+                ) : (
+                  <Trans>Hide effect in the editor</Trans>
+                )
+              }
+            />
+            <InlineCheckbox
+              id="effect-visibility-in-game"
+              paddingSize="small"
+              checkedIcon={<CameraIcon />}
+              uncheckedIcon={<CameraOffIcon />}
               checked={effect.isEnabled()}
               onCheck={(e, checked) => {
                 effect.setEnabled(checked);
@@ -252,9 +272,9 @@ const Effect = React.forwardRef((
               }}
               tooltipOrHelperText={
                 effect.isEnabled() ? (
-                  <Trans>Hide effect</Trans>
+                  <Trans>Disable effect in the game</Trans>
                 ) : (
-                  <Trans>Show effect</Trans>
+                  <Trans>Enable effect in the game</Trans>
                 )
               }
             />

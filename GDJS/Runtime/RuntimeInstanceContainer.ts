@@ -389,7 +389,15 @@ namespace gdjs {
           // Instances hidden at start are not hidden in the in-game editor:
           // they must stay visible to be seen and manipulated (like in the
           // 2D editor).
-          if (instanceData.hidden && !this.getGame().isInGameEdition()) {
+          // Instances hidden in the editor are only hidden in the in-game
+          // editor. Children of custom objects are always displayed (like in
+          // the 2D editor): when a custom object variant is edited, the editor
+          // hides them itself.
+          if (
+            this.getGame().isInGameEdition()
+              ? instanceData.hiddenInEditor && this instanceof gdjs.RuntimeScene
+              : instanceData.hidden
+          ) {
             newObject.hide(true);
           }
           newObject
@@ -401,6 +409,21 @@ namespace gdjs {
           }
         }
       }
+    }
+
+    /**
+     * Check if an effect of an object or a layer of this container must be
+     * disabled.
+     *
+     * The in-game editor applies the effects disabled in the game (like
+     * instances hidden at start are shown), but not the effects hidden in the
+     * editor. Custom objects are displayed like in the game.
+     */
+    isEffectDisabled(effectData: EffectData): boolean {
+      return this.getGame().isInGameEdition() &&
+        this instanceof gdjs.RuntimeScene
+        ? !!effectData.hiddenInEditor
+        : !!effectData.disabled;
     }
 
     /**

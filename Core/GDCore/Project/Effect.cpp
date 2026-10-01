@@ -18,6 +18,9 @@ void Effect::SerializeTo(SerializerElement& element) const {
   if (!IsEnabled()) {
     element.SetBoolAttribute("disabled", true);
   }
+  // Always written: when it's missing, it's deduced from "disabled" (see
+  // UnserializeFrom).
+  element.SetBoolAttribute("hiddenInEditor", IsHiddenInEditor());
   SerializerElement& doubleParametersElement =
       element.AddChild("doubleParameters");
   for (auto& parameter : doubleParameters)
@@ -48,6 +51,9 @@ void Effect::UnserializeFrom(const SerializerElement& element) {
       ));
   SetFolded(element.GetBoolAttribute("folded", false));
   SetEnabled(!element.GetBoolAttribute("disabled", false));
+  // Compatibility with GD <= 5.6.283: a disabled effect was not applied in the
+  // editor either, so it stays hidden in the editor.
+  SetHiddenInEditor(element.GetBoolAttribute("hiddenInEditor", !IsEnabled()));
 
   doubleParameters.clear();
   const SerializerElement& doubleParametersElement =

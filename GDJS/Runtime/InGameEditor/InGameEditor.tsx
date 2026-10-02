@@ -5388,8 +5388,6 @@ namespace gdjs {
     distance: float = 800;
     private _isEnabled: boolean = true;
 
-    private _lastCursorX: float = 0;
-    private _lastCursorY: float = 0;
     private _wasMouseRightButtonPressed = false;
     private _wasMouseMiddleButtonPressed = false;
 
@@ -5413,7 +5411,6 @@ namespace gdjs {
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
-      const renderer = runtimeGame.getRenderer();
       const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
       const isMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
 
@@ -5428,13 +5425,11 @@ namespace gdjs {
             // The camera should not move the 1st frame
             this._wasMouseMiddleButtonPressed)
         ) {
-          // Use movement deltas when pointer is locked, otherwise use cursor position delta
-          const xDelta = renderer.isPointerLocked()
-            ? inputManager.getMouseMovementX()
-            : inputManager.getCursorX() - this._lastCursorX;
-          const yDelta = renderer.isPointerLocked()
-            ? inputManager.getMouseMovementY()
-            : inputManager.getCursorY() - this._lastCursorY;
+          // Movement is lock-aware: it uses the browser movement deltas when
+          // the pointer is locked, and the cursor position delta otherwise.
+          // See gdjs.InputManager.onMouseMove.
+          const xDelta = inputManager.getMouseMovementX();
+          const yDelta = inputManager.getMouseMovementY();
 
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
@@ -5507,8 +5502,6 @@ namespace gdjs {
 
       this._wasMouseRightButtonPressed = isRightButtonPressed;
       this._wasMouseMiddleButtonPressed = isMiddleButtonPressed;
-      this._lastCursorX = inputManager.getCursorX();
-      this._lastCursorY = inputManager.getCursorY();
     }
 
     getAnchorX(): float {
@@ -5643,8 +5636,6 @@ namespace gdjs {
     private _euler: THREE.Euler = new THREE.Euler(0, 0, 0, 'ZYX');
     private _rotationMatrix: THREE.Matrix4 = new THREE.Matrix4();
 
-    private _lastCursorX: float = 0;
-    private _lastCursorY: float = 0;
     private _wasMouseRightButtonPressed = false;
 
     // Touch gesture state
@@ -5669,7 +5660,6 @@ namespace gdjs {
     step(): void {
       const runtimeGame = this._editorCamera.editor.getRuntimeGame();
       const inputManager = runtimeGame.getInputManager();
-      const renderer = runtimeGame.getRenderer();
       const isRightButtonPressed = inputManager.isMouseButtonPressed(1);
       if (this._isEnabled) {
         const { right, up, forward } = this.getCameraVectors();
@@ -5804,13 +5794,11 @@ namespace gdjs {
             inputManager.isMouseButtonPressed(0)) ||
           (isShiftPressed(inputManager) && inputManager.isMouseButtonPressed(2))
         ) {
-          // Use movement deltas when pointer is locked, otherwise use cursor position delta
-          const xDelta = renderer.isPointerLocked()
-            ? inputManager.getMouseMovementX()
-            : inputManager.getCursorX() - this._lastCursorX;
-          const yDelta = renderer.isPointerLocked()
-            ? inputManager.getMouseMovementY()
-            : inputManager.getCursorY() - this._lastCursorY;
+          // Movement is lock-aware: it uses the browser movement deltas when
+          // the pointer is locked, and the cursor position delta otherwise.
+          // See gdjs.InputManager.onMouseMove.
+          const xDelta = inputManager.getMouseMovementX();
+          const yDelta = inputManager.getMouseMovementY();
           moveCameraByVector(up, yDelta);
           moveCameraByVector(right, -xDelta);
         }
@@ -5821,13 +5809,11 @@ namespace gdjs {
           // The camera should not move the 1st frame
           this._wasMouseRightButtonPressed
         ) {
-          // Use movement deltas when pointer is locked, otherwise use cursor position delta
-          const xDelta = renderer.isPointerLocked()
-            ? inputManager.getMouseMovementX()
-            : inputManager.getCursorX() - this._lastCursorX;
-          const yDelta = renderer.isPointerLocked()
-            ? inputManager.getMouseMovementY()
-            : inputManager.getCursorY() - this._lastCursorY;
+          // Movement is lock-aware: it uses the browser movement deltas when
+          // the pointer is locked, and the cursor position delta otherwise.
+          // See gdjs.InputManager.onMouseMove.
+          const xDelta = inputManager.getMouseMovementX();
+          const yDelta = inputManager.getMouseMovementY();
 
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
@@ -5839,8 +5825,6 @@ namespace gdjs {
         this._gestureActiveTouchIds = [];
       }
       this._wasMouseRightButtonPressed = isRightButtonPressed;
-      this._lastCursorX = inputManager.getCursorX();
-      this._lastCursorY = inputManager.getCursorY();
     }
 
     moveForward(distanceDelta: number) {

@@ -39,19 +39,19 @@ const getAiCreditsLeft = (quota: Quota) => {
   return { aiCreditsAvailable, percentage };
 };
 
-/** The date and time of the reset of the quota, or null if unknown or past. */
-const getResetDateAndTime = (
-  quota: Quota
+/** The date and time of a moment in the future, or null if unknown or past. */
+const getFutureDateAndTime = (
+  timestamp: ?number
 ): {| dateString: string, timeString: string |} | null => {
-  if (!quota.resetsAt) return null;
-  const resetDate = new Date(quota.resetsAt);
-  if (resetDate.getTime() - Date.now() <= 0) return null;
+  if (!timestamp) return null;
+  const date = new Date(timestamp);
+  if (date.getTime() - Date.now() <= 0) return null;
   return {
-    dateString: resetDate.toLocaleDateString(undefined, {
+    dateString: date.toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
     }),
-    timeString: resetDate.toLocaleTimeString(undefined, {
+    timeString: date.toLocaleTimeString(undefined, {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
@@ -59,8 +59,48 @@ const getResetDateAndTime = (
   };
 };
 
+/**
+ * In a rolling window, nothing resets: the credits of each request come back
+ * 30 days after it was made.
+ */
+const renderRollingMonthSentence = (quota: Quota): React.Node => {
+  const availableAgain = quota.limitReached
+    ? getFutureDateAndTime(quota.availableAgainAt)
+    : null;
+  if (availableAgain) {
+    const { dateString, timeString } = availableAgain;
+    return (
+      <Trans>
+        You can use AI credits again on {dateString} at {timeString}. The
+        credits of each request come back 30 days after it.
+      </Trans>
+    );
+  }
+  const nextCreditsBack = getFutureDateAndTime(quota.nextCreditsBackAt);
+  const fullyRestored = getFutureDateAndTime(quota.fullyRestoredAt);
+  if (nextCreditsBack && fullyRestored) {
+    const firstDate = nextCreditsBack.dateString;
+    const lastDate = fullyRestored.dateString;
+    return firstDate === lastDate ? (
+      <Trans>
+        The credits of each request come back 30 days after it: yours are all
+        back on {lastDate}.
+      </Trans>
+    ) : (
+      <Trans>
+        The credits of each request come back 30 days after it: the first ones
+        on {firstDate}, all of them on {lastDate}.
+      </Trans>
+    );
+  }
+  return <Trans>The credits of each request come back 30 days after it.</Trans>;
+};
+
 const renderResetSentence = (quota: Quota): React.Node => {
-  const resetDateAndTime = getResetDateAndTime(quota);
+  if (quota.period === '30days' && !quota.resetsAt) {
+    return renderRollingMonthSentence(quota);
+  }
+  const resetDateAndTime = getFutureDateAndTime(quota.resetsAt);
   if (!resetDateAndTime) {
     return quota.period === '7days' ? (
       <Trans>Your AI credits for the week.</Trans>

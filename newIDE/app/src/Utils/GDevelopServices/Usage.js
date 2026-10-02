@@ -164,6 +164,12 @@ export type Quota = {|
   max: number,
   period: '1day' | '30days' | '7days',
   resetsAt?: number,
+  /** Only for the 30 days quota: when the credits of the oldest request come back. */
+  nextCreditsBackAt?: number,
+  /** Only for the 30 days quota: when the credits of all the requests are back. */
+  fullyRestoredAt?: number,
+  /** Only for the 30 days quota, when the limit is reached: when enough credits are back to make a request again. */
+  availableAgainAt?: number,
 |};
 
 export type Quotas = {

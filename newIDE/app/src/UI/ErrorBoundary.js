@@ -68,6 +68,7 @@ type ErrorBoundaryScope =
   | 'gameplay-test-editor-properties'
   | 'variables-list'
   | 'new-object-dialog'
+  | 'new-effect-dialog'
   | 'object-details'
   | 'export-and-share'
   | 'project-manager'

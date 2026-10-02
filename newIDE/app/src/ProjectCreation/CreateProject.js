@@ -81,8 +81,6 @@ const getCompositeSlug = (
   creationSource: NewProjectCreationSource,
   exampleShortHeaderSlug: string
 ) => {
-  if (creationSource === 'quick-customization')
-    return `qc-${exampleShortHeaderSlug}`;
   if (creationSource === 'ai-agent-request')
     return `ai-${exampleShortHeaderSlug}`;
   if (creationSource === 'course-chapter')

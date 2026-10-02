@@ -727,16 +727,11 @@ export const sendEventsExtractedAsFunction = (metadata: {|
 };
 
 const canSendPreviewStarted = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 60 * 6, // Only once every 6 hours per preview kind (outside quick customization).
-});
-
-const canSendPreviewStartedForQuickCustomization = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 10, // Only once every 10 minutes per game for quick customization.
+  minimumTimeBetweenEvents: 1000 * 60 * 60 * 6, // Only once every 6 hours per preview kind.
 });
 
 export const sendPreviewStarted = (metadata: {|
   projectUuid: string,
-  quickCustomizationGameId: string | null,
   networkPreview: boolean,
   numberOfWindows: number,
   hotReload: boolean,
@@ -746,16 +741,6 @@ export const sendPreviewStarted = (metadata: {|
   previewLaunchDuration: number,
 |}) => {
   if (
-    metadata.quickCustomizationGameId &&
-    !canSendPreviewStartedForQuickCustomization(
-      metadata.quickCustomizationGameId
-    )
-  ) {
-    return;
-  }
-
-  if (
-    !metadata.quickCustomizationGameId &&
     !canSendPreviewStarted(
       JSON.stringify({
         networkPreview: metadata.networkPreview,
@@ -770,23 +755,6 @@ export const sendPreviewStarted = (metadata: {|
   }
 
   recordEvent('preview-started', metadata);
-};
-
-const canSendQuickCustomizationProgress = makeCanSendEvent({
-  // Send only one event per step every minute, to avoid sending too many events.
-  minimumTimeBetweenEvents: 1000 * 60 * 1,
-});
-
-export const sendQuickCustomizationProgress = (metadata: {|
-  stepName: string,
-  sourceGameId: string,
-  projectName: string,
-|}) => {
-  if (!canSendQuickCustomizationProgress(metadata.stepName)) {
-    return;
-  }
-
-  recordEvent('quick-customization-progress', metadata);
 };
 
 export const sendSocialFollowUpdated = (

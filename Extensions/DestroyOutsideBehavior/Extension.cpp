@@ -43,8 +43,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                        "CppPlatform/Extensions/destroyoutsideicon.png",
                        "DestroyOutsideBehavior",
                        std::make_shared<DestroyOutsideBehavior>(),
-                       std::shared_ptr<gd::BehaviorsSharedData>())
-          .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+                       std::shared_ptr<gd::BehaviorsSharedData>());
 
   aut.AddExpressionAndConditionAndAction(
          "number",

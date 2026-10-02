@@ -6142,8 +6142,6 @@ const MainFrame = (props: Props): React.MixedElement => {
             crashReportUploadLevel:
               preferences.values.previewCrashReportUploadLevel ||
               'exclude-javascript-code-events',
-            previewContext: 'preview',
-            sourceGameId: '',
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => {

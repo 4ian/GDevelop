@@ -13,7 +13,6 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
-#include "GDCore/Project/QuickCustomization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/UUID/UUID.h"

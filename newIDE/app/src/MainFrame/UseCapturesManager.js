@@ -25,22 +25,11 @@ const useCapturesManager = ({
   createCaptureOptionsForPreview: (
     launchCaptureOptions: ?LaunchCaptureOptions
   ) => Promise<CaptureOptions>,
-  getGameUnverifiedScreenshotUrls: (gameId: string) => Array<string>,
   getHotReloadPreviewLaunchCaptureOptions: (
     gameId: string
   ) => LaunchCaptureOptions | void,
   onCaptureFinished: (captureOptions: CaptureOptions) => Promise<void>,
-  onGameScreenshotsClaimed: () => void,
 } => {
-  const [
-    unverifiedGameScreenshots,
-    setUnverifiedGameScreenshots,
-  ] = React.useState<
-    Array<{|
-      projectUuid: string,
-      unverifiedPublicUrl: string,
-    |}>
-  >([]);
   const [
     lastPreviewScreenshotsTakenAt,
     setLastPreviewScreenshotsTakenAt,
@@ -165,46 +154,14 @@ const useCapturesManager = ({
               'Error while updating game with new screenshots:',
               error
             );
-            // Do not throw or save the screenshots.
+            // Do not throw.
           }
-          return;
         }
-
-        setUnverifiedGameScreenshots(unverifiedScreenshots => [
-          ...unverifiedScreenshots,
-          ...uploadedScreenshotPublicUrls.map(unverifiedPublicUrl => ({
-            projectUuid: projectId,
-            unverifiedPublicUrl,
-          })),
-        ]);
       } catch (error) {
         console.error('Error while handling finished capture options:', error);
       }
     },
     [project, gamesList, getAuthorizationHeader, profile]
-  );
-
-  const getGameUnverifiedScreenshotUrls = React.useCallback(
-    (gameId: string): string[] => {
-      return unverifiedGameScreenshots
-        .filter(screenshot => screenshot.projectUuid === gameId)
-        .map(screenshot => screenshot.unverifiedPublicUrl);
-    },
-    [unverifiedGameScreenshots]
-  );
-
-  const onGameScreenshotsClaimed = React.useCallback(
-    () => {
-      // Assume the current project is the one that screenshots were taken for.
-      if (!project) return;
-
-      setUnverifiedGameScreenshots(unverifiedScreenshots =>
-        unverifiedScreenshots.filter(
-          screenshot => screenshot.projectUuid !== project.getProjectUuid()
-        )
-      );
-    },
-    [project]
   );
 
   const getHotReloadPreviewLaunchCaptureOptions = React.useCallback(
@@ -224,8 +181,6 @@ const useCapturesManager = ({
   return {
     createCaptureOptionsForPreview,
     onCaptureFinished,
-    getGameUnverifiedScreenshotUrls,
-    onGameScreenshotsClaimed,
     getHotReloadPreviewLaunchCaptureOptions,
   };
 };

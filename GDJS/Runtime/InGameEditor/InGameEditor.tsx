@@ -1142,6 +1142,7 @@ namespace gdjs {
     // Dragged new object:
     private _draggedNewObject: gdjs.RuntimeObject | null = null;
     private _draggedSelectedObject: gdjs.RuntimeObject | null = null;
+    private _objectToDuplicateOnDrag: gdjs.RuntimeObject | null = null;
     private _draggedSelectedObjectInitialX: float = 0;
     private _draggedSelectedObjectInitialY: float = 0;
     private _draggedSelectedObjectInitialZ: float = 0;
@@ -1423,6 +1424,7 @@ namespace gdjs {
       this._selectionControls = null;
       this._draggedNewObject = null;
       this._draggedSelectedObject = null;
+      this._objectToDuplicateOnDrag = null;
       const selectedObjectIds = this._selection
         .getSelectedObjects()
         .map((object) => object.persistentUuid)
@@ -2115,6 +2117,13 @@ namespace gdjs {
         });
       }
 
+      if (
+        !inputManager.isMouseButtonPressed(0) ||
+        !this._shouldDragSelectedObject()
+      ) {
+        this._objectToDuplicateOnDrag = null;
+      }
+
       // Inspect then if a drag should be started or continued.
       if (!this._shouldDragSelectedObject()) {
         // We can early return as the rest is not applicable (we've already checked
@@ -2129,14 +2138,27 @@ namespace gdjs {
         inputManager.isMouseButtonPressed(0) &&
         !this._draggedSelectedObject
       ) {
-        // Start a new drag.
-        let object = this.getObjectUnderCursor();
-        if (object && this._selection.getSelectedObjects().includes(object)) {
-          if (isControlOrCmdPressed(inputManager)) {
-            object = this._duplicateSelectedObjects(object);
-            if (!object) {
-              return;
-            }
+        if (!this._objectToDuplicateOnDrag) {
+          const objectUnderCursor = this.getObjectUnderCursor();
+          if (
+            objectUnderCursor &&
+            this._selection.getSelectedObjects().includes(objectUnderCursor)
+          ) {
+            this._objectToDuplicateOnDrag = objectUnderCursor;
+          }
+        }
+        // Only duplicate once the cursor has moved, to avoid silently
+        // stacking a copy on the original with a Ctrl+click.
+        if (
+          this._objectToDuplicateOnDrag &&
+          !this._hasCursorStayedStillWhilePressed({ toleranceRadius: 3 })
+        ) {
+          const object = this._duplicateSelectedObjects(
+            this._objectToDuplicateOnDrag
+          );
+          this._objectToDuplicateOnDrag = null;
+          if (!object) {
+            return;
           }
           this._draggedSelectedObject = object;
           this._draggedSelectedObjectInitialX = object.getX();
@@ -3439,7 +3461,11 @@ namespace gdjs {
       const debuggerClient = this._runtimeGame._debuggerClient;
       if (!debuggerClient) return;
 
-      debuggerClient.sendOpenContextMenu(cursorX, cursorY);
+      debuggerClient.sendOpenContextMenu(
+        cursorX,
+        cursorY,
+        this._getCursorIn3D()
+      );
     }
 
     private _handleShortcuts() {
@@ -3501,7 +3527,7 @@ namespace gdjs {
     private _sendPaste() {
       const debuggerClient = this._runtimeGame._debuggerClient;
       if (!debuggerClient) return;
-      debuggerClient.sendPaste();
+      debuggerClient.sendPaste(this._getCursorIn3D());
     }
 
     private _sendCut() {

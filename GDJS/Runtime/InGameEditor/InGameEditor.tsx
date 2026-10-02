@@ -1456,6 +1456,49 @@ namespace gdjs {
               sceneAndCustomObject;
             this._currentScene = scene;
             this._editedInstanceContainer = customObjectInstanceContainer;
+            // The edited variant layers, instances and effects follow the
+            // editor visibility, not the in-game one. They were created before
+            // the container was known as edited, so apply it now.
+            for (const layerData of editedLayerDataList) {
+              if (!customObjectInstanceContainer.hasLayer(layerData.name)) {
+                continue;
+              }
+              const layer = customObjectInstanceContainer.getLayer(
+                layerData.name
+              );
+              layer.show(!layerData.isHiddenInEditor);
+              for (const effectData of layerData.effects) {
+                if (layer.hasEffect(effectData.name)) {
+                  layer.enableEffect(
+                    effectData.name,
+                    !customObjectInstanceContainer.isEffectDisabled(effectData)
+                  );
+                }
+              }
+            }
+            for (const object of customObjectInstanceContainer.getAdhocListOfAllInstances()) {
+              const instanceData = editedInstanceDataList.find(
+                (data) => data.persistentUuid === object.persistentUuid
+              );
+              if (instanceData && instanceData.hiddenInEditor) {
+                object.hide(true);
+              }
+              const objectData = customObjectInstanceContainer._objects.get(
+                object.getName()
+              );
+              if (objectData) {
+                for (const effectData of objectData.effects) {
+                  if (object.hasEffect(effectData.name)) {
+                    object.enableEffect(
+                      effectData.name,
+                      !customObjectInstanceContainer.isEffectDisabled(
+                        effectData
+                      )
+                    );
+                  }
+                }
+              }
+            }
           }
           this.setInstancesEditorSettings(
             eventsBasedObjectVariantData.editionSettings
@@ -2503,7 +2546,12 @@ namespace gdjs {
         for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
           if (!object.persistentUuid) continue;
           const instanceData = this._getInstanceData(object.persistentUuid);
-          if (!instanceData || !instanceData.hidden) continue;
+          if (
+            !instanceData ||
+            !instanceData.hidden ||
+            instanceData.hiddenInEditor
+          )
+            continue;
 
           const objectLayer = this.getEditorLayer(object.getLayer());
           const threeGroup =
@@ -3300,6 +3348,7 @@ namespace gdjs {
           // Not modified by the InGameEditor (which always shows instances,
           // even those hidden at start), but must be preserved:
           hidden: oldData ? oldData.hidden : undefined,
+          hiddenInEditor: oldData ? oldData.hiddenInEditor : undefined,
           // TODO: how to transmit/should we transmit other properties?
           numberProperties: [],
           stringProperties: [],
@@ -3366,7 +3415,11 @@ namespace gdjs {
 
     isInstanceSealed(object: gdjs.RuntimeObject): boolean {
       const instanceData = this._getInstanceData(object.persistentUuid);
-      return !!instanceData && !!instanceData.sealed;
+      // Instances hidden in the editor can't be selected by clicking on them.
+      return (
+        !!instanceData &&
+        (!!instanceData.sealed || !!instanceData.hiddenInEditor)
+      );
     }
 
     /**
@@ -3824,6 +3877,9 @@ namespace gdjs {
             }
             runtimeObject.setAngle(instance.angle);
             runtimeObject.setLayer(instance.layer);
+            // Instances hidden at start stay visible in the editor: only the
+            // ones hidden in the editor are hidden.
+            runtimeObject.hide(!!instance.hiddenInEditor);
             if (is3D(runtimeObject)) {
               runtimeObject.setZ(instance.z === undefined ? 0 : instance.z);
               runtimeObject.setRotationX(
@@ -3934,7 +3990,18 @@ namespace gdjs {
           true
         );
 
-        const firstIntersect = intersects[0];
+        // Ignore objects that are not displayed (like instances hidden in
+        // the editor).
+        const firstIntersect = intersects.find((intersect) => {
+          for (
+            let threeObject: THREE.Object3D | null = intersect.object;
+            threeObject && threeObject !== threeGroup;
+            threeObject = threeObject.parent
+          ) {
+            if (!threeObject.visible) return false;
+          }
+          return true;
+        });
         if (!firstIntersect) return;
 
         firstIntersectsByLayer[layerName] = {

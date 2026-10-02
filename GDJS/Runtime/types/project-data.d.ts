@@ -448,6 +448,8 @@ declare interface InstanceData extends InstancePersistentUuidData {
   sealed?: boolean;
   /** True if the instance starts hidden (it can be shown with the "Show" action). */
   hidden?: boolean;
+  /** True if the instance is hidden in the editor (no effect on the game). */
+  hiddenInEditor?: boolean;
   name: string;
 
   x: number;
@@ -491,6 +493,8 @@ declare interface LayerData {
   cameraType?: 'perspective' | 'orthographic';
   defaultCameraBehavior?: 'top-left-anchored-if-never-moved' | 'do-nothing';
   visibility: boolean;
+  /** True if the layer is hidden in the editor (no effect on the game). */
+  isHiddenInEditor?: boolean;
   cameras: CameraData[];
   effects: EffectData[];
   /** Used by `InGameEditor` to toggle effects */
@@ -522,6 +526,7 @@ declare interface EffectData {
   effectType: string;
   name: string;
   disabled?: boolean;
+  hiddenInEditor?: boolean;
   doubleParameters: {
     [name: string]: number;
   };

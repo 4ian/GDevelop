@@ -15,6 +15,8 @@ import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import Visibility from '../../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
+import Camera from '../../UI/CustomSvgIcons/Camera';
+import CameraOff from '../../UI/CustomSvgIcons/CameraOff';
 import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
 import Layers from '../../UI/CustomSvgIcons/Layers';
 import SortArrowUp from '../../UI/CustomSvgIcons/SortArrowUp';
@@ -38,6 +40,7 @@ type RenderedRowInfo = {
   name: string,
   locked: boolean,
   hidden: boolean,
+  hiddenInEditor: boolean,
   x: string,
   y: string,
   angle: string,
@@ -63,6 +66,18 @@ const styles = {
     backgroundColor: 'var(--table-header-background-color)',
   },
 };
+
+const headerIconStyle = { width: 18, height: 18, display: 'block' };
+
+// Centers the header icon above the cells' small IconButton (3px padding
+// around a 24px icon), so the columns of toggles are aligned with their header.
+const toggleColumnHeaderIconStyle = { ...headerIconStyle, margin: '0 6px' };
+
+const renderLayerCell = ({
+  rowData: { layer },
+}: {
+  rowData: RenderedRowInfo,
+}): React.Node => (layer ? layer : <Trans>Base layer</Trans>);
 
 const compareStrings = (x: string, y: string, direction: number): number => {
   x = x.toLowerCase();
@@ -157,6 +172,7 @@ class InstancesList extends Component<Props, State> {
           name,
           locked: instance.isLocked(),
           hidden: instance.isHidden(),
+          hiddenInEditor: instance.isHiddenInEditor(),
           x: toFixedWithoutTrailingZeros(instance.getX(), 2),
           y: toFixedWithoutTrailingZeros(instance.getY(), 2),
           angle: toFixedWithoutTrailingZeros(instance.getAngle(), 2),
@@ -214,7 +230,30 @@ class InstancesList extends Component<Props, State> {
           this.props.onInstancesModified([instance]);
         }}
       >
-        {instance.isHidden() ? <VisibilityOff /> : <Visibility />}
+        {instance.isHidden() ? <CameraOff /> : <Camera />}
+      </IconButton>
+    );
+  };
+
+  _renderVisibilityInEditorCell = ({
+    rowData: { instance },
+  }: {
+    rowData: RenderedRowInfo,
+  }): React.Node => {
+    return (
+      <IconButton
+        size="small"
+        tooltip={
+          instance.isHiddenInEditor()
+            ? t`Hidden in the editor`
+            : t`Visible in the editor`
+        }
+        onClick={() => {
+          instance.setHiddenInEditor(!instance.isHiddenInEditor());
+          this.props.onInstancesModified([instance]);
+        }}
+      >
+        {instance.isHiddenInEditor() ? <VisibilityOff /> : <Visibility />}
       </IconButton>
     );
   };
@@ -286,6 +325,12 @@ class InstancesList extends Component<Props, State> {
             return compareStrings(a.layer, b.layer, direction);
           case 'locked':
             return direction * (Number(a.locked) - Number(b.locked));
+          case 'hidden':
+            return direction * (Number(a.hidden) - Number(b.hidden));
+          case 'hiddenInEditor':
+            return (
+              direction * (Number(a.hiddenInEditor) - Number(b.hiddenInEditor))
+            );
           case 'zOrder':
             return direction * (parseFloat(a.zOrder) - parseFloat(b.zOrder));
 
@@ -386,7 +431,7 @@ class InstancesList extends Component<Props, State> {
                   label={
                     <RotateZ
                       titleAccess="Rotation (Z)"
-                      style={{ width: 18, height: 18, display: 'block' }}
+                      style={headerIconStyle}
                     />
                   }
                   dataKey="angle"
@@ -395,29 +440,50 @@ class InstancesList extends Component<Props, State> {
                   headerRenderer={renderSortableHeader}
                 />
                 <RVColumn
-                  label={
-                    <Layers
-                      titleAccess="Layer"
-                      style={{ width: 18, height: 18, display: 'block' }}
-                    />
-                  }
+                  label={<Layers titleAccess="Layer" style={headerIconStyle} />}
                   dataKey="layer"
                   width={Math.max(width * 0.2, minimumWidths.layerName)}
                   className={'tableColumn tableColumnSecondary'}
                   headerRenderer={renderSortableHeader}
+                  cellRenderer={renderLayerCell}
                 />
                 <RVColumn
-                  label=""
+                  label={
+                    <Visibility
+                      titleAccess="Visible in the editor"
+                      style={toggleColumnHeaderIconStyle}
+                    />
+                  }
+                  dataKey="hiddenInEditor"
+                  width={Math.max(width * 0.05, minimumWidths.numberProperty)}
+                  className={'tableColumn'}
+                  headerRenderer={renderSortableHeader}
+                  cellRenderer={this._renderVisibilityInEditorCell}
+                />
+                <RVColumn
+                  label={
+                    <Camera
+                      titleAccess="Visible when the scene starts"
+                      style={toggleColumnHeaderIconStyle}
+                    />
+                  }
                   dataKey="hidden"
                   width={Math.max(width * 0.05, minimumWidths.numberProperty)}
                   className={'tableColumn'}
+                  headerRenderer={renderSortableHeader}
                   cellRenderer={this._renderVisibilityCell}
                 />
                 <RVColumn
-                  label=""
+                  label={
+                    <Lock
+                      titleAccess="Locked"
+                      style={toggleColumnHeaderIconStyle}
+                    />
+                  }
                   dataKey="locked"
                   width={Math.max(width * 0.05, minimumWidths.numberProperty)}
                   className={'tableColumn'}
+                  headerRenderer={renderSortableHeader}
                   cellRenderer={this._renderLockCell}
                 />
               </RVTable>

@@ -2879,6 +2879,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           .get()
           .getObjectsContainersList()
           .hasObjectNamed(objectName),
+      doesLayerExistInContext: layerName =>
+        this.props.layersContainer.hasLayerNamed(layerName),
     });
 
     if (this.props.gameEditorMode === 'embedded-game') {

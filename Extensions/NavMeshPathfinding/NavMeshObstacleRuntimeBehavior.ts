@@ -38,7 +38,9 @@ namespace gdjs {
       ch: 10,
       walkableSlopeAngle: 50,
       walkableHeight: 15,
-      detailSampleMaxError: 50,
+      // In cell depths: the navmesh height is at most 1 cell away from the
+      // floors (for characters on hills).
+      detailSampleMaxError: 1,
       walkableClimb: 2,
       walkableRadius: 1,
     };
@@ -64,7 +66,6 @@ namespace gdjs {
       }
       this.cellSize = Math.max(0, sharedData.cellSize) || 10;
       this.cellDepth = sharedData.cellDepth;
-      this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;
       this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
       this.stairHeightMax = sharedData.stairHeightMax;
       this.walkableDepth = sharedData.walkableDepth;
@@ -126,7 +127,12 @@ namespace gdjs {
       const indices: Array<integer> = [];
       for (const obstacle of this.obstacles) {
         const object = obstacle.owner;
-        if (gdjs.Base3DHandler.is3D(object)) {
+        const firstObstacleIndex = indices.length;
+        // Surface meshes are in 3D: they are ignored by 2D navigation meshes.
+        const surfaceMesh = this.is3D ? object.getSurfaceMesh() : null;
+        if (surfaceMesh) {
+          this.addSurfaceMeshFor(surfaceMesh, positions, indices);
+        } else if (gdjs.Base3DHandler.is3D(object)) {
           if (isModel3D(object) && obstacle._shape === 'Mesh') {
             this.addMeshFor(object, obstacle, positions, indices);
           } else {
@@ -134,6 +140,9 @@ namespace gdjs {
           }
         } else if (!this.is3D) {
           this.addPolygonsFor(object, positions, indices);
+        }
+        if (obstacle._isObstacleOnly) {
+          this.makeTrianglesNotWalkable(positions, indices, firstObstacleIndex);
         }
       }
       if (!this.is3D) {
@@ -372,6 +381,63 @@ namespace gdjs {
       }
       for (const vertexIndex of cubeIndices) {
         indices.push(vertexIndex + indicesOffset);
+      }
+    }
+
+    /**
+     * Recast only walks on triangles facing up: flipped to face down, they
+     * still block characters but can't be walked on.
+     *
+     * Surfaces less than a step (`walkableClimb`) above a walkable floor are
+     * still merged with it by Recast: they stay walkable. Excluding them
+     * would need to mark their volume as not walkable during the build
+     * (`markBoxArea` in Recast, or tile cache obstacles).
+     */
+    private makeTrianglesNotWalkable(
+      positions: Array<float>,
+      indices: Array<integer>,
+      firstIndex: integer
+    ): void {
+      for (let index = firstIndex; index + 2 < indices.length; index += 3) {
+        const a = indices[index] * 3;
+        const b = indices[index + 1] * 3;
+        const c = indices[index + 2] * 3;
+        // Y of (b - a) x (c - a), Y being the top for Recast.
+        const normalY =
+          (positions[b + 2] - positions[a + 2]) *
+            (positions[c] - positions[a]) -
+          (positions[b] - positions[a]) * (positions[c + 2] - positions[a + 2]);
+        if (normalY > 0) {
+          indices[index] = indices[index + 1];
+          indices[index + 1] = a / 3;
+        }
+      }
+    }
+
+    private addSurfaceMeshFor(
+      surfaceMesh: gdjs.SurfaceMesh,
+      positions: Array<float>,
+      indices: Array<integer>
+    ): void {
+      const triangles = surfaceMesh.getTriangles();
+      const indicesOffset = Math.round(positions.length / 3);
+      const surfacePositions = triangles.positions;
+      for (let index = 0; index + 2 < surfacePositions.length; index += 3) {
+        // Y is the top for Recast
+        positions.push(
+          surfacePositions[index],
+          surfacePositions[index + 2],
+          surfacePositions[index + 1]
+        );
+      }
+      const surfaceIndices = triangles.indices;
+      for (let index = 0; index + 2 < surfaceIndices.length; index += 3) {
+        // Swapping Y and Z mirrors triangles: they are flipped back.
+        indices.push(
+          indicesOffset + surfaceIndices[index + 1],
+          indicesOffset + surfaceIndices[index],
+          indicesOffset + surfaceIndices[index + 2]
+        );
       }
     }
 
@@ -615,6 +681,9 @@ namespace gdjs {
   export class NavMeshObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
     _shape: string;
     _meshShapeResourceName: string;
+    _isObstacleOnly: boolean;
+    _oldSurfaceMesh: gdjs.SurfaceMesh | null = null;
+    _oldSurfaceMeshVersion: integer = 0;
 
     _oldX: float = 0;
     _oldY: float = 0;
@@ -636,6 +705,7 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
       this._shape = behaviorData.shape;
       this._meshShapeResourceName = behaviorData.meshShapeResourceName;
+      this._isObstacleOnly = !!behaviorData.obstacleOnly;
       this._manager = NavMeshObstaclesManager.getManager(instanceContainer);
 
       //Note that we can't use getX(), getWidth()... of owner here:
@@ -649,6 +719,10 @@ namespace gdjs {
       }
       if (behaviorData.meshShapeResourceName !== undefined) {
         this._meshShapeResourceName = behaviorData.meshShapeResourceName;
+        this._manager.invalidateNavMesh();
+      }
+      if (behaviorData.obstacleOnly !== undefined) {
+        this._isObstacleOnly = !!behaviorData.obstacleOnly;
         this._manager.invalidateNavMesh();
       }
       return true;
@@ -685,6 +759,18 @@ namespace gdjs {
         newDepth = this.owner.getDepth();
         newRotationX = this.owner.getRotationX();
         newRotationY = this.owner.getRotationY();
+      }
+      const surfaceMesh = this.owner.getSurfaceMesh();
+      const surfaceMeshVersion = surfaceMesh ? surfaceMesh.getVersion() : 0;
+      if (
+        surfaceMesh !== this._oldSurfaceMesh ||
+        surfaceMeshVersion !== this._oldSurfaceMeshVersion
+      ) {
+        this._oldSurfaceMesh = surfaceMesh;
+        this._oldSurfaceMeshVersion = surfaceMeshVersion;
+        if (this._registeredInManager) {
+          this._manager.invalidateNavMesh();
+        }
       }
       if (
         this._oldX !== newX ||

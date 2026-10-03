@@ -33,6 +33,106 @@ describe('processEditorFunctionCalls', () => {
     };
   };
 
+  it.each([false, true])(
+    'reports gameplay test mutations after a partial failure and a retry (script=%s)',
+    async asScript => {
+      // $FlowFixMe[invalid-constructor]
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const tests = project.getTests();
+      tests.insertNewTest('Original', 0);
+      tests.insertNewTest('Keep', 1);
+
+      const runChanges = async (
+        changes: Array<Object>,
+        stopAfterFailure: boolean = false
+      ) => {
+        const args = { scope: { type: 'project' }, changes };
+        return processEditorFunctionCalls(
+          makeRunnerOptions(project, [
+            {
+              call_id: 'change-tests',
+              name: asScript ? 'run_script' : 'change_gameplay_tests',
+              arguments: JSON.stringify(
+                asScript
+                  ? {
+                      js_code:
+                        `await change_gameplay_tests(${JSON.stringify(
+                          args
+                        )});` +
+                        (stopAfterFailure
+                          ? 'await change_gameplay_tests({scope: {type: "project"}, changes: [{test_name: "Keep", delete_this_test: true}]});'
+                          : ''),
+                    }
+                  : args
+              ),
+            },
+          ])
+        );
+      };
+
+      try {
+        const failed = await runChanges(
+          [
+            {
+              test_name: 'Original',
+              changed_properties: [
+                { property_name: 'name', new_value: 'Renamed' },
+                { property_name: 'unknown', new_value: 'invalid' },
+              ],
+            },
+          ],
+          true
+        );
+        expect(tests.hasTestNamed('Original')).toBe(false);
+        expect(tests.hasTestNamed('Renamed')).toBe(true);
+        expect(tests.hasTestNamed('Keep')).toBe(true);
+        expect(failed.results).toEqual([
+          expect.objectContaining({
+            status: 'finished',
+            success: false,
+            didModifyProject: true,
+          }),
+        ]);
+
+        // Retrying the already-applied rename changes nothing.
+        const retried = await runChanges([
+          {
+            test_name: 'Renamed',
+            changed_properties: [
+              { property_name: 'name', new_value: 'Renamed' },
+            ],
+          },
+        ]);
+        expect(retried.results).toEqual([
+          expect.objectContaining({
+            status: 'finished',
+            success: true,
+            didModifyProject: undefined,
+          }),
+        ]);
+
+        const changed = await runChanges([
+          {
+            test_name: 'Renamed',
+            changed_properties: [
+              { property_name: 'description', new_value: 'Updated' },
+            ],
+          },
+        ]);
+        expect(tests.getTest('Renamed').getDescription()).toBe('Updated');
+        expect(changed.results).toEqual([
+          expect.objectContaining({
+            status: 'finished',
+            success: true,
+            didModifyProject: true,
+          }),
+        ]);
+      } finally {
+        project.delete();
+      }
+    }
+  );
+
   it('reports a single failure and does not run the function when arguments are invalid JSON', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();

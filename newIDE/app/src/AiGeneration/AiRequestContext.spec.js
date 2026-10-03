@@ -23,6 +23,7 @@ import {
   useAiRequestHistory,
   type AiRequestContextState,
 } from './AiRequestContext';
+import { type EditApprovalRequest } from './Utils';
 import { act } from 'react-dom/test-utils';
 
 jest.mock('../Utils/GDevelopServices/Generation', () => ({
@@ -779,5 +780,111 @@ describe('AiRequestProvider opening a chat from the history', () => {
     expect(
       getContext(contextRef).aiRequestStorage.aiRequestLoadingStates['chat-1']
     ).toBeUndefined();
+  });
+});
+
+describe('AiRequestProvider edit approvals', () => {
+  let renderer = null;
+  const renderProviderToUnmount = () => {
+    const rendered = renderProvider();
+    renderer = rendered.renderer;
+    return rendered.contextRef;
+  };
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    mockFn(getAiRequestStatuses).mockReset();
+    mockFn(getAiRequestStatuses).mockResolvedValue([]);
+    mockFn(fetchAiSettings).mockReset();
+    mockFn(fetchAiSettings).mockResolvedValue(null);
+    mockFn(getAiRequestSummaries).mockReset();
+    mockFn(getAiRequestSummaries).mockResolvedValue({
+      aiRequestSummaries: [],
+      nextPageUri: null,
+    });
+  });
+
+  afterEach(() => {
+    act(() => {
+      if (renderer) renderer.unmount();
+    });
+    renderer = null;
+    jest.useRealTimers();
+  });
+
+  const getContext = (contextRef: {
+    current: AiRequestContextState | null,
+  }): AiRequestContextState => {
+    if (!contextRef.current) throw new Error('Context not captured');
+    return contextRef.current;
+  };
+
+  const makeEditApprovalRequest = (
+    aiRequestId: string
+  ): EditApprovalRequest => ({
+    aiRequestId,
+    callIds: [`${aiRequestId}-call`],
+    label: aiRequestId,
+  });
+
+  const requestEditApproval = (
+    contextRef: { current: AiRequestContextState | null },
+    aiRequestId: string
+  ): Array<boolean> => {
+    const answers: Array<boolean> = [];
+    act(() => {
+      getContext(contextRef)
+        .requestEditApproval(makeEditApprovalRequest(aiRequestId))
+        .then(accepted => {
+          answers.push(accepted);
+        });
+    });
+    return answers;
+  };
+
+  it('asks for the approvals of parallel sub-agents one after the other', async () => {
+    const contextRef = renderProviderToUnmount();
+
+    const firstTesterAnswers = requestEditApproval(contextRef, 'tester-1');
+    const secondTesterAnswers = requestEditApproval(contextRef, 'tester-2');
+    await act(async () => {
+      await flushPromises();
+    });
+    expect(getContext(contextRef).pendingEditApproval).toEqual(
+      makeEditApprovalRequest('tester-1')
+    );
+    expect(firstTesterAnswers).toEqual([]);
+    expect(secondTesterAnswers).toEqual([]);
+
+    await act(async () => {
+      getContext(contextRef).resolveEditApproval(true);
+      await flushPromises();
+    });
+    expect(firstTesterAnswers).toEqual([true]);
+    expect(getContext(contextRef).pendingEditApproval).toEqual(
+      makeEditApprovalRequest('tester-2')
+    );
+    expect(secondTesterAnswers).toEqual([]);
+
+    await act(async () => {
+      getContext(contextRef).resolveEditApproval(true);
+      await flushPromises();
+    });
+    expect(secondTesterAnswers).toEqual([true]);
+    expect(getContext(contextRef).pendingEditApproval).toBe(null);
+  });
+
+  it('stops asking for the waiting approvals once one is refused', async () => {
+    const contextRef = renderProviderToUnmount();
+
+    const firstTesterAnswers = requestEditApproval(contextRef, 'tester-1');
+    const secondTesterAnswers = requestEditApproval(contextRef, 'tester-2');
+    await act(async () => {
+      getContext(contextRef).resolveEditApproval(false);
+      await flushPromises();
+    });
+    expect(firstTesterAnswers).toEqual([false]);
+    expect(getContext(contextRef).pendingEditApproval).toBe(null);
+    expect(secondTesterAnswers).toEqual([]);
   });
 });

@@ -396,7 +396,7 @@ module.exports = {
         .addIncludeFile(
           'Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js'
         )
-        .addIncludeFile(
+        .addRequiredFile(
           'Extensions/NavMeshPathfinding/recast-navigation.wasm.js'
         )
         .addRequiredFile(
@@ -866,7 +866,7 @@ module.exports = {
         .addIncludeFile(
           'Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js'
         )
-        .addIncludeFile(
+        .addRequiredFile(
           'Extensions/NavMeshPathfinding/recast-navigation.wasm.js'
         )
         .addRequiredFile(
@@ -894,7 +894,9 @@ module.exports = {
       .addIncludeFile(
         'Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js'
       )
-      .addIncludeFile('Extensions/NavMeshPathfinding/recast-navigation.wasm.js')
+      // `recast-navigation.wasm.js` is an ES module loaded with `import()` by
+      // NavMeshCharacterRuntimeBehavior.js: it's a required file of the
+      // behaviors and must not be included as a classic script.
       .addIncludeFile(
         'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
       )

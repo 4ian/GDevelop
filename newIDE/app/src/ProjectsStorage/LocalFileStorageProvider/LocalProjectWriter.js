@@ -19,6 +19,10 @@ import {
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
+import {
+  extractProjectEditorSettings,
+  getEditorSettingsSidecarPath,
+} from './LocalEditorSettingsSidecar';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import SaveAsOptionsDialog from '../SaveAsOptionsDialog';
@@ -140,6 +144,21 @@ const writeProjectFiles = async ({
     });
   }
   const serializeEndTime = Date.now();
+
+  // Editor settings are user specific data: store them in a sidecar file (that
+  // can be gitignored and is not part of the game) rather than in the project
+  // file. This is done before writing the project file(s) so that a failure to
+  // write the sidecar does not lose the settings.
+  const editorSettings = extractProjectEditorSettings(serializedProjectObject);
+  if (editorSettings) {
+    await writeAndCheckFormattedJSONFile(
+      editorSettings,
+      getEditorSettingsSidecarPath(filePath)
+    );
+  } else if (fs) {
+    // Nothing to store: remove a sidecar file possibly left by a previous save.
+    await fs.remove(getEditorSettingsSidecarPath(filePath));
+  }
 
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {

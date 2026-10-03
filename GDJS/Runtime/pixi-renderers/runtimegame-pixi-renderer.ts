@@ -206,8 +206,12 @@ namespace gdjs {
 
       this._resizeCanvas();
 
-      // Handle scale mode.
-      if (this._game.getScaleMode() === 'nearest') {
+      // Handle scale mode. When rendering at display resolution, the canvas is not
+      // upscaled by the browser so there is nothing to make "pixelated".
+      if (
+        this._game.getScaleMode() === 'nearest' &&
+        !this._game.getRenderAtDisplayResolution()
+      ) {
         gameCanvas.style['image-rendering'] = '-moz-crisp-edges';
         gameCanvas.style['image-rendering'] = '-webkit-optimize-contrast';
         gameCanvas.style['image-rendering'] = '-webkit-crisp-edges';
@@ -287,27 +291,8 @@ namespace gdjs {
     private _resizeCanvas() {
       if (!this._pixiRenderer || !this._domElementsContainer) return;
 
-      // Set the Pixi (and/or Three) renderer size to the game size.
-      // There is no "smart" resizing to be done here: the rendering of the game
-      // should be done with the size set on the game.
-      if (
-        this._pixiRenderer.width !== this._game.getGameResolutionWidth() ||
-        this._pixiRenderer.height !== this._game.getGameResolutionHeight()
-      ) {
-        // TODO (3D): It might be useful to resize pixi view in 3D depending on FOV value
-        // to enable a mode where pixi always fills the whole screen.
-        this._pixiRenderer.resize(
-          this._game.getGameResolutionWidth(),
-          this._game.getGameResolutionHeight()
-        );
-
-        if (this._threeRenderer) {
-          this._threeRenderer.setSize(
-            this._game.getGameResolutionWidth(),
-            this._game.getGameResolutionHeight()
-          );
-        }
-      }
+      const gameResolutionWidth = this._game.getGameResolutionWidth();
+      const gameResolutionHeight = this._game.getGameResolutionHeight();
 
       // Set the canvas size.
       // Resizing is done according to the settings. This is a "CSS" resize
@@ -338,6 +323,43 @@ namespace gdjs {
         }
         canvasWidth *= factor;
         canvasHeight *= factor;
+      }
+
+      // Set the Pixi (and/or Three) renderer size to the game size.
+      // There is no "smart" resizing to be done here: the rendering of the game
+      // should be done with the size set on the game (all coordinates stay in game units).
+      // When rendering at display resolution, the renderer resolution is set so that
+      // the canvas has one texel per screen pixel: sprites keep their own texture
+      // sampling (nearest for non-smoothed images) while text, shapes and effects are
+      // rasterized at the screen resolution instead of being stretched by the browser.
+      const resolution =
+        this._game.getRenderAtDisplayResolution() &&
+        gameResolutionWidth > 0 &&
+        canvasWidth > 0
+          ? Math.round(canvasWidth * (window.devicePixelRatio || 1)) /
+            gameResolutionWidth
+          : 1;
+      if (
+        this._pixiRenderer.screen.width !== gameResolutionWidth ||
+        this._pixiRenderer.screen.height !== gameResolutionHeight ||
+        this._pixiRenderer.resolution !== resolution
+      ) {
+        // TODO (3D): It might be useful to resize pixi view in 3D depending on FOV value
+        // to enable a mode where pixi always fills the whole screen.
+        this._pixiRenderer.resolution = resolution;
+        // Filters render in intermediate textures: keep them at the same resolution.
+        PIXI.Filter.defaultResolution = resolution;
+        this._pixiRenderer.resize(gameResolutionWidth, gameResolutionHeight);
+
+        if (this._threeRenderer) {
+          // Three.js shares the canvas: its pixel ratio must match the Pixi resolution.
+          this._threeRenderer.setPixelRatio(resolution);
+          this._threeRenderer.setSize(
+            gameResolutionWidth,
+            gameResolutionHeight,
+            false
+          );
+        }
       }
 
       // Apply the calculations to the canvas element...

@@ -582,7 +582,42 @@ namespace gdjs {
         character._agent = null;
       }
     }
+
+    /**
+     * Free the navigation mesh and the crowd from the WebAssembly memory.
+     * The manager must not be used after this.
+     */
+    dispose(): void {
+      for (const character of this.characters) {
+        character._agent = null;
+      }
+      this.characters.clear();
+      this.obstacles.clear();
+      if (this.crowd) {
+        this.crowd.destroy();
+        this.crowd = null;
+      }
+      if (this.navMesh) {
+        this.navMesh.destroy();
+        this.navMesh = null;
+      }
+      if (this.debuggerRenderer) {
+        this.debuggerRenderer.dispose();
+        this.debuggerRenderer = null;
+      }
+    }
   }
+
+  gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
+    // Without this, the navigation mesh and the crowd of each unloaded scene
+    // would stay allocated in the WebAssembly memory.
+    const navMeshObstaclesManager = runtimeScene.navMeshObstaclesManager;
+    if (navMeshObstaclesManager) {
+      navMeshObstaclesManager.dispose();
+      // @ts-ignore The manager is set back to undefined like before its creation.
+      runtimeScene.navMeshObstaclesManager = undefined;
+    }
+  });
 
   /** @category Behaviors > NavMesh pathfinding */
   export namespace NavMeshObstaclesManager {

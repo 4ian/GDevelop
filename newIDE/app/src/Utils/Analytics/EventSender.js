@@ -202,6 +202,25 @@ export const installAnalyticsEvents = () => {
 };
 
 /**
+ * Must be called each time a document is loaded in an iframe of the editor that stays
+ * in the DOM while being navigated (the in-game editor and gameplay test frames, notably
+ * at each hard reload).
+ *
+ * The session recording keeps a reference to every document loaded in a same-origin
+ * iframe, until the iframe element is removed from the DOM. Without this, every
+ * previous game document would be retained, with all its memory (including
+ * WebAssembly memories, which are limited and end up failing to be allocated).
+ * Restarting the recording releases them.
+ */
+export const releaseSessionRecordingOfPreviousIframeDocuments = () => {
+  if (isDev || !posthogLoaded) return;
+  if (!posthog.sessionRecordingStarted()) return;
+
+  posthog.stopSessionRecording();
+  posthog.startSessionRecording();
+};
+
+/**
  * Must be called every time the user is fetched (and also even if the user turns out to be not connected).
  * This allows updating the user properties (like the language used, the version of the app, etc...)
  * and to identify the user if not already done.

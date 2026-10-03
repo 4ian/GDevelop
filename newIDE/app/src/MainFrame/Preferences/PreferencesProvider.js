@@ -118,6 +118,7 @@ export const getInitialPreferences = (): {
   lastLaunchedVersion: void,
   newFeaturesAcknowledgements: {},
   newObjectDialogDefaultTab: any,
+  newEffectDialogDefaultTab: string,
   newProjectsDefaultFolder: any,
   newProjectsDefaultStorageProviderName: string,
   openDiagnosticReportAutomatically: boolean,
@@ -273,6 +274,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ): any),
     // $FlowFixMe[method-unbinding]
     setNewObjectDialogDefaultTab: (this._setNewObjectDialogDefaultTab.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    getNewEffectDialogDefaultTab: (this._getNewEffectDialogDefaultTab.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setNewEffectDialogDefaultTab: (this._setNewEffectDialogDefaultTab.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
@@ -1146,6 +1155,21 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, newObjectDialogDefaultTab },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getNewEffectDialogDefaultTab(): any {
+    return this.state.values.newEffectDialogDefaultTab;
+  }
+
+  _setNewEffectDialogDefaultTab(
+    newEffectDialogDefaultTab: 'asset-store' | 'from-scratch'
+  ) {
+    this.setState(
+      state => ({
+        values: { ...state.values, newEffectDialogDefaultTab },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

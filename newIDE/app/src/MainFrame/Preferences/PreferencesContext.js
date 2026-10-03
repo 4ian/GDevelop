@@ -218,6 +218,7 @@ export type PreferencesValues = {|
   hasProjectOpened: boolean,
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
+  newEffectDialogDefaultTab: 'asset-store' | 'from-scratch',
   shareDialogDefaultTab: 'invite' | 'publish',
   isMenuBarHiddenInPreview: boolean,
   isAlwaysOnTopInPreview: boolean,
@@ -322,6 +323,8 @@ export type Preferences = {|
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
   getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
   setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
+  getNewEffectDialogDefaultTab: () => 'asset-store' | 'from-scratch',
+  setNewEffectDialogDefaultTab: ('asset-store' | 'from-scratch') => void,
   getShareDialogDefaultTab: () => 'invite' | 'publish',
   setShareDialogDefaultTab: ('invite' | 'publish') => void,
   getIsMenuBarHiddenInPreview: () => boolean,
@@ -425,6 +428,8 @@ export const initialPreferences = {
     newObjectDialogDefaultTab: ((electron
       ? 'new-object'
       : 'asset-store'): string),
+    // Show the effects of the store first, as they are not otherwise visible.
+    newEffectDialogDefaultTab: 'asset-store',
     shareDialogDefaultTab: 'publish',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
@@ -502,6 +507,8 @@ export const initialPreferences = {
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
   getNewObjectDialogDefaultTab: (): string => 'asset-store',
   setNewObjectDialogDefaultTab: () => {},
+  getNewEffectDialogDefaultTab: (): string => 'asset-store',
+  setNewEffectDialogDefaultTab: () => {},
   getShareDialogDefaultTab: (): string => 'invite',
   setShareDialogDefaultTab: () => {},
   getIsMenuBarHiddenInPreview: (): boolean => true,

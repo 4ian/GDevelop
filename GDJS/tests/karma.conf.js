@@ -1,5 +1,6 @@
 module.exports = function (config) {
   const testFiles = [
+    './Extensions/TweenBehavior/tests/CubicBezierEasingTestCases.js',
     './Extensions/**/tests/**.spec.js',
     './GDJS/tests/tests/**/*.js',
   ];

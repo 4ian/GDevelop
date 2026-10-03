@@ -1109,6 +1109,24 @@ module.exports = {
       aut
         .addExpressionAndConditionAndAction(
           'number',
+          'MassOverride',
+          _('Mass override'),
+          _(
+            'the object mass override (in kilograms). Set it to 0 to compute the mass from the density and volume of the shape.'
+          ),
+          _('the mass override'),
+          _('Body settings'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setMassOverride')
+        .setGetter('getMassOverride');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
           'ShapeOffsetX',
           _('Shape offset X'),
           _('the object shape offset on X.'),

@@ -87,7 +87,6 @@ describe('gdjs.EffectsManager', () => {
             },
           ],
           cameras: [],
-
           ambientLightColorR: 0,
           ambientLightColorG: 0,
           ambientLightColorB: 0,
@@ -103,6 +102,7 @@ describe('gdjs.EffectsManager', () => {
       name: 'Scene1',
       stopSoundsOnStartup: false,
       title: '',
+            renderer3DWorldScale: 100,
       behaviorsSharedData: [],
       objects: [],
       objectsGroups: [],

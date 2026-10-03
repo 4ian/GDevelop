@@ -16,6 +16,10 @@ namespace gdjs {
         }
         return new (class implements gdjs.PixiFiltersTools.Filter {
           fog: THREE.Fog;
+          // In scene units: the fog is converted to the Three.js world units
+          // before each rendering, as the world scale can change in the editor.
+          private _near: float = 200;
+          private _far: float = 2000;
 
           constructor() {
             this.fog = new THREE.Fog(0xffffff);
@@ -57,19 +61,28 @@ namespace gdjs {
             scene.fog = null;
             return true;
           }
-          updatePreRender(target: gdjs.EffectsTarget): any {}
+          updatePreRender(target: gdjs.EffectsTarget): any {
+            this._updateFogDistances();
+          }
+          private _updateFogDistances(): void {
+            const scene = target.getRuntimeScene().getScene();
+            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
+            this.fog.near = this._near * inverseWorldScale;
+            this.fog.far = this._far * inverseWorldScale;
+          }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'near') {
-              this.fog.near = value;
+              this._near = value;
             } else if (parameterName === 'far') {
-              this.fog.far = value;
+              this._far = value;
             }
+            this._updateFogDistances();
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'near') {
-              return this.fog.near;
+              return this._near;
             } else if (parameterName === 'far') {
-              return this.fog.far;
+              return this._far;
             }
             return 0;
           }
@@ -94,16 +107,17 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {}
           getNetworkSyncData(): LinearFogFilterNetworkSyncData {
             return {
-              n: this.fog.near,
-              f: this.fog.far,
+              n: this._near,
+              f: this._far,
               c: this.fog.color.getHex(),
             };
           }
           updateFromNetworkSyncData(
             data: LinearFogFilterNetworkSyncData
           ): void {
-            this.fog.near = data.n;
-            this.fog.far = data.f;
+            this._near = data.n;
+            this._far = data.f;
+            this._updateFogDistances();
             this.fog.color.setHex(data.c);
           }
         })();

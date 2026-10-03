@@ -15,6 +15,9 @@ namespace gdjs {
         }
         return new (class implements gdjs.PixiFiltersTools.Filter {
           fog: THREE.FogExp2;
+          // In scene units: the fog is converted to the Three.js world units
+          // before each rendering, as the world scale can change in the editor.
+          private _density: float = 0.0012;
 
           constructor() {
             this.fog = new THREE.FogExp2(0xffffff);
@@ -56,15 +59,23 @@ namespace gdjs {
             scene.fog = null;
             return true;
           }
-          updatePreRender(target: gdjs.EffectsTarget): any {}
+          updatePreRender(target: gdjs.EffectsTarget): any {
+            this._updateFogDensity();
+          }
+          private _updateFogDensity(): void {
+            const scene = target.getRuntimeScene().getScene();
+            const worldScale = scene.getRenderer3DWorldScale();
+            this.fog.density = this._density * worldScale;
+          }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'density') {
-              this.fog.density = value;
+              this._density = value;
+              this._updateFogDensity();
             }
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'density') {
-              return this.fog.density;
+              return this._density;
             }
             return 0;
           }
@@ -89,14 +100,15 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {}
           getNetworkSyncData(): ExponentialFogFilterNetworkSyncData {
             return {
-              d: this.fog.density,
+              d: this._density,
               c: this.fog.color.getHex(),
             };
           }
           updateFromNetworkSyncData(
             syncData: ExponentialFogFilterNetworkSyncData
           ): void {
-            this.fog.density = syncData.d;
+            this._density = syncData.d;
+            this._updateFogDensity();
             this.fog.color.setHex(syncData.c);
           }
         })();

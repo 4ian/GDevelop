@@ -55,7 +55,7 @@ namespace gdjs {
   type SharedTextureEntry = {
     key: string;
     texture: Promise<THREE.Texture>;
-    source?: THREE.Source;
+    source?: THREE.Source<unknown>;
   };
 
   /**
@@ -66,7 +66,7 @@ namespace gdjs {
   class SharedTextureCache {
     private _textures = new Map<string, SharedTextureEntry>();
     private _sources = new Map<
-      THREE.Source,
+      THREE.Source<unknown>,
       { entries: Set<SharedTextureEntry>; users: Set<string> }
     >();
     private _retainedTextures = new Set<THREE.Texture>();

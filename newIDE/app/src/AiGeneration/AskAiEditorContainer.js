@@ -1119,6 +1119,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         getIsAutoEditEnabled,
         suspendAiRequest,
         requestEditApproval,
+        onSaveProjectAsWithStorageProvider,
       });
 
       // Wrap onProcessFunctionCalls to bind the selected AI request for the chat UI.

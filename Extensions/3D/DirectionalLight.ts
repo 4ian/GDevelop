@@ -30,6 +30,7 @@ namespace gdjs {
           private _light: THREE.DirectionalLight;
           private _shadowMapDirty = true;
           private _shadowCameraDirty = true;
+          private _shadowCameraInverseWorldScale: float = 0;
           private _shadowCameraHelper: THREE.CameraHelper | null;
 
           constructor() {
@@ -46,18 +47,28 @@ namespace gdjs {
             this._light.shadow.camera.updateProjectionMatrix();
           }
 
-          private _updateShadowCamera(): void {
-            if (!this._shadowCameraDirty) {
+          private _updateShadowCamera(scene: gdjs.RuntimeScene): void {
+            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
+            // The world scale can be changed in the editor.
+            if (
+              !this._shadowCameraDirty &&
+              this._shadowCameraInverseWorldScale === inverseWorldScale
+            ) {
               return;
             }
             this._shadowCameraDirty = false;
+            this._shadowCameraInverseWorldScale = inverseWorldScale;
+            const frustumSize = this._frustumSize * inverseWorldScale;
 
-            this._light.shadow.camera.near = 1;
-            this._light.shadow.camera.far = this._distanceFromCamera + 10000;
-            this._light.shadow.camera.right = this._frustumSize / 2;
-            this._light.shadow.camera.left = -this._frustumSize / 2;
-            this._light.shadow.camera.top = this._frustumSize / 2;
-            this._light.shadow.camera.bottom = -this._frustumSize / 2;
+            this._light.shadow.camera.near = 1 * inverseWorldScale;
+            this._light.shadow.camera.far =
+              (this._distanceFromCamera + 10000) * inverseWorldScale;
+            this._light.shadow.camera.right = frustumSize / 2;
+            this._light.shadow.camera.left = -frustumSize / 2;
+            this._light.shadow.camera.top = frustumSize / 2;
+            this._light.shadow.camera.bottom = -frustumSize / 2;
+            // Three.js only updates it when the shadow map is created.
+            this._light.shadow.camera.updateProjectionMatrix();
           }
 
           private _updateShadowMapSize(): void {
@@ -124,8 +135,11 @@ namespace gdjs {
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
+            const scene = target.getRuntimeScene().getScene();
+            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
+
             // Apply any update to the camera or shadow map size.
-            this._updateShadowCamera();
+            this._updateShadowCamera(scene);
             this._updateShadowMapSize();
 
             // Avoid shadow acne due to depth buffer precision.
@@ -135,7 +149,8 @@ namespace gdjs {
                 : this._shadowMapSize < 2048
                   ? 1.25
                   : 1;
-            this._light.shadow.bias = -this._minimumShadowBias * biasMultiplier;
+            this._light.shadow.bias =
+              -this._minimumShadowBias * biasMultiplier * inverseWorldScale;
 
             // Apply update to the light position and its target.
             // By doing this, the shadows are "following" the GDevelop camera.
@@ -147,6 +162,8 @@ namespace gdjs {
             const y = layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
 
+            // Contrary to cameras, lights are within the scene so they already
+            // take world scale into account.
             const roundedX = Math.floor(x / 100) * 100;
             const roundedY = Math.floor(y / 100) * 100;
             const roundedZ = Math.floor(z / 100) * 100;
@@ -182,14 +199,13 @@ namespace gdjs {
                 roundedZ +
                 this._distanceFromCamera *
                   Math.sin(gdjs.toRad(this._elevation));
-
               this._light.position.set(posLightX, posLightY, posLightZ);
               this._light.target.position.set(roundedX, roundedY, roundedZ);
             }
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this._light.intensity = value;
+              this._light.intensity = value * Math.PI;
             } else if (parameterName === 'elevation') {
               this._elevation = value;
             } else if (parameterName === 'rotation') {
@@ -204,7 +220,7 @@ namespace gdjs {
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'intensity') {
-              return this._light.intensity;
+              return this._light.intensity / Math.PI;
             } else if (parameterName === 'elevation') {
               return this._elevation;
             } else if (parameterName === 'rotation') {

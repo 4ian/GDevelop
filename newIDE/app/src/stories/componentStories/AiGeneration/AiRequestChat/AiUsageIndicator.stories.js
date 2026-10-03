@@ -53,6 +53,29 @@ const quotaWithoutResetDate: Quota = {
   period: '7days',
 };
 
+const oneDayInMs = 1000 * 60 * 60 * 24;
+
+// Without a subscription, the AI credits are counted on a rolling month: the
+// credits of each request come back 30 days after it.
+const rollingMonthQuotaPartiallyConsumed: Quota = {
+  limitReached: false,
+  current: 25,
+  max: 40,
+  period: '30days',
+  nextCreditsBackAt: Date.now() + 3 * oneDayInMs,
+  fullyRestoredAt: Date.now() + 23 * oneDayInMs,
+};
+
+const rollingMonthQuotaLimitReached: Quota = {
+  limitReached: true,
+  current: 45,
+  max: 40,
+  period: '30days',
+  nextCreditsBackAt: Date.now() + 2 * oneDayInMs,
+  availableAgainAt: Date.now() + 5 * oneDayInMs,
+  fullyRestoredAt: Date.now() + 23 * oneDayInMs,
+};
+
 const price: UsagePrice = {
   priceInCredits: 5,
   variablePrice: {
@@ -230,5 +253,23 @@ export const PopoverWithoutResetDate = (): React.Node => (
     availableCredits={120}
     automaticallyUseCreditsForAiRequests={false}
     contextUsedRatio={0.5}
+  />
+);
+
+export const PopoverRollingMonthPartiallyConsumed = (): React.Node => (
+  <PopoverContent
+    quota={rollingMonthQuotaPartiallyConsumed}
+    availableCredits={0}
+    automaticallyUseCreditsForAiRequests={false}
+    contextUsedRatio={0.2}
+  />
+);
+
+export const PopoverRollingMonthLimitReached = (): React.Node => (
+  <PopoverContent
+    quota={rollingMonthQuotaLimitReached}
+    availableCredits={0}
+    automaticallyUseCreditsForAiRequests={false}
+    contextUsedRatio={0.2}
   />
 );

@@ -11,6 +11,7 @@ import { registerOpenedDialogsCountCallback } from '../UI/Dialog';
 import {
   getActiveEmbeddedGameFrameHoleRect,
   registerActiveEmbeddedGameFrameHoleCountCallback,
+  registerEmbeddedGameFrameHoleResizeCallback,
 } from './EmbeddedGameFrameHole';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useInGameEditorSettings } from './InGameEditorSettings';
@@ -263,6 +264,57 @@ export const EmbeddedGameFrame = ({
     iframe.contentWindow.focus();
   }, []);
 
+  // Send the part of the game frame that is not covered by the editor panels,
+  // either with a command changing the view or so that the in-game editor
+  // can use it later (e.g. to focus on the selection).
+  const sendVisibleScreenArea = React.useCallback(
+    (command: ChangeViewPositionCommand | 'setVisibleScreenArea') => {
+      const iframe = iframeRef.current;
+      if (!iframe || !previewDebuggerServer) return;
+
+      const embeddedGameFrameRect = iframe.getBoundingClientRect();
+      const embeddedGameFrameHoleRect = getActiveEmbeddedGameFrameHoleRect();
+      if (
+        !embeddedGameFrameHoleRect ||
+        !embeddedGameFrameRect.width ||
+        !embeddedGameFrameRect.height
+      )
+        return;
+
+      const visibleScreenArea = {
+        minX:
+          (embeddedGameFrameHoleRect.left - embeddedGameFrameRect.left) /
+          embeddedGameFrameRect.width,
+        minY:
+          (embeddedGameFrameHoleRect.top - embeddedGameFrameRect.top) /
+          embeddedGameFrameRect.height,
+        maxX:
+          (embeddedGameFrameHoleRect.right - embeddedGameFrameRect.left) /
+          embeddedGameFrameRect.width,
+        maxY:
+          (embeddedGameFrameHoleRect.bottom - embeddedGameFrameRect.top) /
+          embeddedGameFrameRect.height,
+      };
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command,
+            payload: { visibleScreenArea },
+          });
+        });
+    },
+    [previewDebuggerServer]
+  );
+
+  React.useEffect(
+    () =>
+      registerEmbeddedGameFrameHoleResizeCallback(() =>
+        sendVisibleScreenArea('setVisibleScreenArea')
+      ),
+    [sendVisibleScreenArea]
+  );
+
   const inGameEditorSettings = useInGameEditorSettings();
   React.useEffect(
     () => {
@@ -434,6 +486,7 @@ export const EmbeddedGameFrame = ({
                 editorCamera3D: cameraStates.current.get(editorId),
               });
             });
+          sendVisibleScreenArea('setVisibleScreenArea');
         }
       };
       onSwitchInGameEditorIfNoHotReloadIsNeeded = ({
@@ -476,43 +529,10 @@ export const EmbeddedGameFrame = ({
               cameraState3D: cameraStates.current.get(editorId),
             });
           });
+        sendVisibleScreenArea('setVisibleScreenArea');
       };
       onChangeViewPosition = (command: ChangeViewPositionCommand) => {
-        const iframe = iframeRef.current;
-        if (!iframe) return;
-
-        const embeddedGameFrameRect = iframe.getBoundingClientRect();
-        const embeddedGameFrameHoleRect = getActiveEmbeddedGameFrameHoleRect();
-        if (!embeddedGameFrameHoleRect || !embeddedGameFrameRect) return;
-
-        if (!previewDebuggerServer) return;
-        previewDebuggerServer
-          .getExistingEmbeddedGameFrameDebuggerIds()
-          .forEach(debuggerId => {
-            previewDebuggerServer.sendMessage(debuggerId, {
-              command,
-              payload: {
-                visibleScreenArea: {
-                  minX:
-                    (embeddedGameFrameHoleRect.left -
-                      embeddedGameFrameRect.left) /
-                    embeddedGameFrameRect.width,
-                  minY:
-                    (embeddedGameFrameHoleRect.top -
-                      embeddedGameFrameRect.top) /
-                    embeddedGameFrameRect.height,
-                  maxX:
-                    (embeddedGameFrameHoleRect.right -
-                      embeddedGameFrameRect.left) /
-                    embeddedGameFrameRect.width,
-                  maxY:
-                    (embeddedGameFrameHoleRect.bottom -
-                      embeddedGameFrameRect.top) /
-                    embeddedGameFrameRect.height,
-                },
-              },
-            });
-          });
+        sendVisibleScreenArea(command);
       };
     },
     [
@@ -520,6 +540,7 @@ export const EmbeddedGameFrame = ({
       previewIndexHtmlLocation,
       onLaunchPreviewForInGameEdition,
       enabled,
+      sendVisibleScreenArea,
     ]
   );
 

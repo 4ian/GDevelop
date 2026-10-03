@@ -182,6 +182,18 @@ const reachedDailyQuota: Quota = {
   resetsAt: new Date('2026-09-03T08:00:00Z').getTime(),
 };
 
+// The rolling month of AI credits of a user without a subscription, all
+// consumed: the credits of each request come back 30 days after it.
+const reachedRollingMonthQuota: Quota = {
+  limitReached: true,
+  current: 45,
+  max: 40,
+  period: '30days',
+  nextCreditsBackAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+  availableAgainAt: Date.now() + 1000 * 60 * 60 * 24 * 5,
+  fullyRestoredAt: Date.now() + 1000 * 60 * 60 * 24 * 23,
+};
+
 const aiCreditsLimitActions = {
   onUpgradeSubscription: action('onUpgradeSubscription'),
   onSwitchToGDevelopCredits: action('onSwitchToGDevelopCredits'),
@@ -198,6 +210,21 @@ export const AiCreditsLimitWithoutSubscription = (): React.Node => (
       availableCredits={0}
       canSwitchToGDevelopCredits={false}
       quota={reachedDailyQuota}
+      {...aiCreditsLimitActions}
+    />
+  </FixedWidthFlexContainer>
+);
+
+// Without a subscription, the AI credits come back progressively: the row
+// tells when enough of them are back to continue.
+export const AiCreditsLimitOnRollingMonth = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <AiCreditsLimitRow
+      suggestedSubscriptionPlan={fakeGoldSubscriptionPlanWithPricingSystems}
+      hasSubscription={false}
+      availableCredits={0}
+      canSwitchToGDevelopCredits={false}
+      quota={reachedRollingMonthQuota}
       {...aiCreditsLimitActions}
     />
   </FixedWidthFlexContainer>

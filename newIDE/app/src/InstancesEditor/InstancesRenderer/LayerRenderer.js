@@ -642,12 +642,13 @@ export default class LayerRenderer {
     threeScene.add(this._threeGroup);
 
     const light = new THREE.HemisphereLight();
+    light.intensity = Math.PI;
     light.color = new THREE.Color(1, 1, 1);
     light.groundColor = new THREE.Color(0.25, 0.25, 0.25);
     light.position.set(0, 0, 1);
     const lightGroup = new THREE.Group();
     lightGroup.rotation.order = 'ZYX';
-    lightGroup.rotation.x = Math.PI / 4;
+    lightGroup.rotation.x = -Math.PI / 4;
     lightGroup.add(light);
     threeScene.add(lightGroup);
 

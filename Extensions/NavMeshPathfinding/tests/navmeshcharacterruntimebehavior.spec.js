@@ -35,6 +35,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
         name: 'Scene1',
         stopSoundsOnStartup: false,
         title: '',
+        renderer3DWorldScale: 1,
         behaviorsSharedData: [],
         objects: [],
         objectsGroups: [],

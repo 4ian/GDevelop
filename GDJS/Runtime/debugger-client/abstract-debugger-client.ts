@@ -406,6 +406,27 @@ namespace gdjs {
               }
             }
           }
+        } else if (data.command === 'setRenderer3DWorldScale') {
+          if (inGameEditor) {
+            const editedInstanceContainer =
+              inGameEditor.getEditedInstanceContainer();
+            if (editedInstanceContainer) {
+              const renderer3DWorldScale = data.payload.renderer3DWorldScale;
+              if (
+                renderer3DWorldScale &&
+                editedInstanceContainer instanceof gdjs.RuntimeScene
+              ) {
+                const sceneData = runtimeGame.getSceneData(
+                  editedInstanceContainer.getScene().getName()
+                );
+                if (sceneData) {
+                  editedInstanceContainer.setRenderer3DWorldScale(
+                    renderer3DWorldScale
+                  );
+                }
+              }
+            }
+          }
         } else if (data.command === 'hotReloadAllInstances') {
           if (inGameEditor) {
             const editedInstanceContainer =
@@ -498,6 +519,10 @@ namespace gdjs {
         } else if (data.command === 'zoomToFitContent') {
           if (inGameEditor) {
             inGameEditor.zoomToFitContent(data.payload.visibleScreenArea);
+          }
+        } else if (data.command === 'setVisibleScreenArea') {
+          if (inGameEditor) {
+            inGameEditor.setVisibleScreenArea(data.payload.visibleScreenArea);
           }
         } else if (data.command === 'setSelectedLayer') {
           if (inGameEditor) {
@@ -914,7 +939,11 @@ namespace gdjs {
       );
     }
 
-    sendOpenContextMenu(cursorX: float, cursorY: float): void {
+    sendOpenContextMenu(
+      cursorX: float,
+      cursorY: float,
+      cursorScenePosition: [float, float, float] | null
+    ): void {
       const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
@@ -923,7 +952,7 @@ namespace gdjs {
         circularSafeStringify({
           command: 'openContextMenu',
           editorId: inGameEditor.getEditorId(),
-          payload: { cursorX, cursorY },
+          payload: { cursorX, cursorY, cursorScenePosition },
         })
       );
     }
@@ -984,7 +1013,7 @@ namespace gdjs {
       );
     }
 
-    sendPaste(): void {
+    sendPaste(cursorScenePosition: [float, float, float] | null): void {
       const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
         return;
@@ -993,7 +1022,7 @@ namespace gdjs {
         circularSafeStringify({
           command: 'paste',
           editorId: inGameEditor.getEditorId(),
-          payload: {},
+          payload: { cursorScenePosition },
         })
       );
     }

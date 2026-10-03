@@ -10,15 +10,22 @@ import {
 import { triggerOnResourceExternallyChanged } from '../MainFrame/ResourcesWatcher';
 import newNameGenerator from '../Utils/NewNameGenerator';
 
+export type ResourceFilesStorage =
+  | 'stored'
+  // Kept in memory, and stored when the project is saved.
+  | 'stored-when-project-is-saved'
+  // The project was not saved, and the files can't be kept in memory.
+  | 'project-not-saved';
+
 export type AttachmentsForResources = {|
   // The files attached by the user to the AI (null for an unknown or expired one).
   getFiles: (
     attachmentIds: Array<string>
   ) => Promise<{ [attachmentId: string]: ?File }>,
   // Stores the files of the resources just added or changed (uploaded to the
-  // cloud, or written in the project folder). Resolves to false when the
-  // project is not saved yet: they are then stored when it is saved.
-  storeResourceFiles: () => Promise<boolean>,
+  // cloud, or written in the project folder), asking the user to save the
+  // project first where files can't be kept in memory until it is saved.
+  storeResourceFiles: () => Promise<ResourceFilesStorage>,
 |};
 
 export type AttachmentResourceAddition = {|
@@ -187,30 +194,47 @@ export const addOrReplaceResourcesFromAttachments = async ({
 
   if (!appliedChanges.length) return { changes, warnings };
 
-  const areFilesStored = await attachmentsForResources.storeResourceFiles();
-  appliedChanges.forEach(
-    ({ resourceName, blobUrl, previousFile, description }) => {
+  const undoChange = ({
+    resourceName,
+    blobUrl,
+    previousFile,
+  }: AppliedChange) => {
+    if (previousFile) {
       const resource = resourcesManager.getResource(resourceName);
-      if (areFilesStored && resource.getFile() === blobUrl) {
-        if (previousFile) {
-          resource.setFile(previousFile.file);
-          resource.setMetadata(previousFile.metadata);
-        } else {
-          resourcesManager.removeResource(resourceName);
-        }
-        URL.revokeObjectURL(blobUrl);
-        warnings.push(
-          `The file for "${resourceName}" could not be stored in the project: nothing was changed.`
-        );
-        return;
-      }
-      if (areFilesStored) URL.revokeObjectURL(blobUrl);
-      // Reload what displays the previous file of the resource.
-      if (previousFile)
-        triggerOnResourceExternallyChanged({ identifier: resource.getFile() });
-      changes.push(description);
+      resource.setFile(previousFile.file);
+      resource.setMetadata(previousFile.metadata);
+    } else {
+      resourcesManager.removeResource(resourceName);
     }
-  );
+    URL.revokeObjectURL(blobUrl);
+  };
+
+  const resourceFilesStorage = await attachmentsForResources.storeResourceFiles();
+  if (resourceFilesStorage === 'project-not-saved') {
+    appliedChanges.forEach(undoChange);
+    warnings.push(
+      'The attached files were not added: the project must be saved (in the cloud) to store them, and the user did not save it, or saving it failed. Nothing was changed. Stop and ask the user to save their project, then try again.'
+    );
+    return { changes, warnings };
+  }
+
+  const areFilesStored = resourceFilesStorage === 'stored';
+  appliedChanges.forEach(appliedChange => {
+    const { resourceName, blobUrl, previousFile, description } = appliedChange;
+    const resource = resourcesManager.getResource(resourceName);
+    if (areFilesStored && resource.getFile() === blobUrl) {
+      undoChange(appliedChange);
+      warnings.push(
+        `The file for "${resourceName}" could not be stored in the project: nothing was changed.`
+      );
+      return;
+    }
+    if (areFilesStored) URL.revokeObjectURL(blobUrl);
+    // Reload what displays the previous file of the resource.
+    if (previousFile)
+      triggerOnResourceExternallyChanged({ identifier: resource.getFile() });
+    changes.push(description);
+  });
   if (!areFilesStored) {
     changes.push(
       'The project is not saved yet: the files will be stored in it when it is saved.'

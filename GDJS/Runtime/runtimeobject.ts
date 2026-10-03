@@ -486,6 +486,22 @@ namespace gdjs {
     static supportsReinitialization = false;
 
     /**
+     * Like in the 2D editor, transparent instances stay partially visible in
+     * the in-game editor so they can't be lost or misplaced.
+     */
+    static applyInGameEditorMinimumOpacity(object: gdjs.RuntimeObject): void {
+      const objectWithOpacity = object as gdjs.RuntimeObject &
+        Partial<gdjs.OpacityHandler>;
+      if (!objectWithOpacity.getOpacity || !objectWithOpacity.setOpacity) {
+        return;
+      }
+      const minimumOpacity = 255 / 2;
+      if (objectWithOpacity.getOpacity() < minimumOpacity) {
+        objectWithOpacity.setOpacity(minimumOpacity);
+      }
+    }
+
+    /**
      * Return the time elapsed since the last frame,
      * in milliseconds, for the object.
      *

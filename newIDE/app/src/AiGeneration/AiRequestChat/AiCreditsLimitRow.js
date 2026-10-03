@@ -29,24 +29,28 @@ const getFallbackBulletPoints = (): Array<React.Node> => [
   <Trans>Remove the export and publishing limits</Trans>,
 ];
 
-/**
- * When the usage resets, as a short date ("Sep 3"), or null if unknown or
- * already past.
- */
-const getResetDateString = (quota: ?Quota): string | null => {
-  if (!quota || !quota.resetsAt) return null;
-  const resetDate = new Date(quota.resetsAt);
-  if (resetDate.getTime() - Date.now() <= 0) return null;
-  return resetDate.toLocaleDateString(undefined, {
+/** A moment in the future as a short date ("Sep 3"), or null if unknown or past. */
+const getFutureDateString = (timestamp: ?number): string | null => {
+  if (!timestamp) return null;
+  const date = new Date(timestamp);
+  if (date.getTime() - Date.now() <= 0) return null;
+  return date.toLocaleDateString(undefined, {
     month: 'short',
     day: 'numeric',
   });
 };
 
 const renderResetSentence = (quota: ?Quota): React.Node => {
-  const resetDateString = getResetDateString(quota);
-  if (!resetDateString) return null;
   if (!quota) return null;
+  // In a rolling window, nothing resets: tell when enough credits are back.
+  const availableAgainDateString = getFutureDateString(quota.availableAgainAt);
+  if (availableAgainDateString) {
+    return (
+      <Trans>You can use the AI again on {availableAgainDateString}.</Trans>
+    );
+  }
+  const resetDateString = getFutureDateString(quota.resetsAt);
+  if (!resetDateString) return null;
   return quota.period === '1day' ? (
     <Trans>Your free AI usage comes back on {resetDateString}.</Trans>
   ) : quota.period === '7days' ? (

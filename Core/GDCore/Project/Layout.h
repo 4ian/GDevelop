@@ -380,6 +380,18 @@ class GD_CORE_API Layout {
    * `inherit` (default).
    */
   const gd::String& GetResourcesUnloading() const { return resourcesUnloading; }
+
+  /**
+   * Get the world scale used by the 3D renderer.
+   */
+  const double GetRenderer3DWorldScale() const { return renderer3DWorldScale; };
+
+  /**
+   * Set the world scale used by the 3D renderer.
+   */
+  void SetRenderer3DWorldScale(double worldScale) {
+    renderer3DWorldScale = worldScale;
+  };
   ///@}
 
   /** \name Saving and loading
@@ -429,6 +441,7 @@ class GD_CORE_API Layout {
 
   EventsList events;  ///< Scene events
   gd::EditorSettings editorSettings;
+  double renderer3DWorldScale = 100;
 
   /**
    * Initialize from another layout. Used by copy-ctor and assign-op.

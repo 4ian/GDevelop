@@ -20,6 +20,10 @@ on:
 jobs:
   build-storybook:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # To comment the links to the Storybook on the pull request.
+      pull-requests: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -59,6 +63,16 @@ jobs:
         run: |
           echo "Find the latest Storybook for this branch on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
           echo "Find the Storybook for this commit on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"
+
+      # Give direct access to the Storybook (and the stories added or modified)
+      # from the pull request of the branch, if any.
+      - name: Comment the links to the Storybook on the pull request
+        # Don't fail the build if commenting is not possible.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/comment-storybook-links-on-pull-request.js "$(git rev-parse --abbrev-ref HEAD)" "$(git rev-parse HEAD)"
+        working-directory: newIDE/app
 
       # Publish on Chromatic, only when manually launched (too costly to run on every commit).
       - name: Publish Storybook to Chromatic

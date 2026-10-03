@@ -26,6 +26,7 @@ const allowedPreferenceKeys: $ReadOnlyArray<
   'autoOpenMostRecentProject',
   'hasProjectOpened',
   'newObjectDialogDefaultTab',
+  'newEffectDialogDefaultTab',
   'shareDialogDefaultTab',
   'isMenuBarHiddenInPreview',
   'isAlwaysOnTopInPreview',

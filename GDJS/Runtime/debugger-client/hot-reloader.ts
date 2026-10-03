@@ -830,6 +830,7 @@ namespace gdjs {
         newLayoutData.v,
         newLayoutData.b
       );
+      runtimeScene.setRenderer3DWorldScale(newLayoutData.renderer3DWorldScale);
       if (oldLayoutData.title !== newLayoutData.title) {
         runtimeScene
           .getGame()
@@ -1990,6 +1991,9 @@ namespace gdjs {
       );
       if (numberPropertiesChanged || stringPropertiesChanged || sizeChanged) {
         runtimeObject.extraInitializationFromInitialInstance(newInstance);
+        if (this._runtimeGame.isInGameEdition()) {
+          gdjs.RuntimeObject.applyInGameEditorMinimumOpacity(runtimeObject);
+        }
         somethingChanged = true;
       }
       if (somethingChanged) {

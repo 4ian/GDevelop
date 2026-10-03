@@ -36,6 +36,8 @@ declare class gdLayout {
   getResourcesPreloading(): string;
   setResourcesUnloading(resourcesUnloading: string): void;
   getResourcesUnloading(): string;
+  setRenderer3DWorldScale(value: number): void;
+  getRenderer3DWorldScale(): number;
   delete(): void;
   ptr: number;
 };

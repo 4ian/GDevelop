@@ -2421,6 +2421,26 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Back face (Z-)'));
+      properties
+        .getOrCreate('environmentIntensity')
+        .setValue('1')
+        .setLabel(_('Environment light intensity'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Intensity of the light given by the skybox to 3D boxes and 3D models using a standard material. 0 disables it.'
+          )
+        );
+      properties
+        .getOrCreate('backgroundIntensity')
+        .setValue('1')
+        .setLabel(_('Background brightness'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Brightness of the skybox images shown in the background (1 shows them as they are).'
+          )
+        );
     }
     {
       const effect = extension

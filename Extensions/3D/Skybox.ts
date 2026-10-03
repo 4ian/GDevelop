@@ -1,5 +1,8 @@
 namespace gdjs {
-  interface SkyboxFilterNetworkSyncData {}
+  interface SkyboxFilterNetworkSyncData {
+    ei?: number;
+    bi?: number;
+  }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::Skybox',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -18,6 +21,8 @@ namespace gdjs {
             | THREE.Color
             | null = null;
           _isEnabled: boolean = false;
+          _environmentIntensity: float = 1;
+          _backgroundIntensity: float = 1;
 
           constructor() {
             this._cubeTexture = target
@@ -63,7 +68,30 @@ namespace gdjs {
               scene.environment = this._cubeTexture;
             }
             this._isEnabled = true;
+            this._updateEnvironmentIntensity();
+            this._updateBackgroundIntensity();
             return true;
+          }
+          private _updateEnvironmentIntensity(): void {
+            const scene = target.get3DRendererObject() as
+              | THREE.Scene
+              | null
+              | undefined;
+            // Another effect may have set the environment of the scene.
+            if (!scene || scene.environment !== this._cubeTexture) {
+              return;
+            }
+            scene.environmentIntensity = this._environmentIntensity;
+          }
+          private _updateBackgroundIntensity(): void {
+            const scene = target.get3DRendererObject() as
+              | THREE.Scene
+              | null
+              | undefined;
+            if (!scene || !this._isEnabled) {
+              return;
+            }
+            scene.backgroundIntensity = this._backgroundIntensity;
           }
           removeEffect(target: EffectsTarget): boolean {
             const scene = target.get3DRendererObject() as
@@ -75,12 +103,27 @@ namespace gdjs {
             }
             scene.background = this._oldBackground;
             scene.environment = null;
+            scene.environmentIntensity = 1;
+            scene.backgroundIntensity = 1;
             this._isEnabled = false;
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {}
-          updateDoubleParameter(parameterName: string, value: number): void {}
+          updateDoubleParameter(parameterName: string, value: number): void {
+            if (parameterName === 'environmentIntensity') {
+              this._environmentIntensity = value;
+              this._updateEnvironmentIntensity();
+            } else if (parameterName === 'backgroundIntensity') {
+              this._backgroundIntensity = value;
+              this._updateBackgroundIntensity();
+            }
+          }
           getDoubleParameter(parameterName: string): number {
+            if (parameterName === 'environmentIntensity') {
+              return this._environmentIntensity;
+            } else if (parameterName === 'backgroundIntensity') {
+              return this._backgroundIntensity;
+            }
             return 0;
           }
           updateStringParameter(parameterName: string, value: string): void {}
@@ -90,11 +133,23 @@ namespace gdjs {
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
           getNetworkSyncData(): SkyboxFilterNetworkSyncData {
-            return {};
+            return {
+              ei: this._environmentIntensity,
+              bi: this._backgroundIntensity,
+            };
           }
           updateFromNetworkSyncData(
             syncData: SkyboxFilterNetworkSyncData
-          ): void {}
+          ): void {
+            if (syncData.ei !== undefined) {
+              this._environmentIntensity = syncData.ei;
+              this._updateEnvironmentIntensity();
+            }
+            if (syncData.bi !== undefined) {
+              this._backgroundIntensity = syncData.bi;
+              this._updateBackgroundIntensity();
+            }
+          }
         })();
       }
     })()

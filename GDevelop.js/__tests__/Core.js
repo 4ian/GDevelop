@@ -839,6 +839,80 @@ describe('libGD.js', function () {
       ).toBe('2');
       expect(initialInstance.getRawDoubleProperty('animation')).toBe(2);
     });
+    it('Sprite object starting animation choices', function () {
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        layout.getObjects().getObject('MySpriteObject').getConfiguration()
+      );
+      const idleAnimation = new gd.Animation();
+      idleAnimation.setName('Idle');
+      spriteConfiguration.getAnimations().addAnimation(idleAnimation);
+      spriteConfiguration.getAnimations().addAnimation(new gd.Animation());
+      idleAnimation.delete();
+
+      const getChoices = () => {
+        const property = initialInstance
+          .getCustomProperties(project.getObjects(), layout.getObjects())
+          .get('animation');
+        expect(property.getType()).toBe('NumberWithChoices');
+        const choices = property.getChoices();
+        const result = [];
+        for (let i = 0; i < choices.size(); i++) {
+          result.push([choices.at(i).getValue(), choices.at(i).getLabel()]);
+        }
+        return result;
+      };
+      // The current animation is out of the list, so it's kept as a choice.
+      expect(getChoices()).toEqual([
+        ['0', 'Idle'],
+        ['1', ''],
+        ['2', ''],
+      ]);
+
+      initialInstance.updateCustomProperty(
+        'animation',
+        '1',
+        project.getObjects(),
+        layout.getObjects()
+      );
+      expect(getChoices()).toEqual([
+        ['0', 'Idle'],
+        ['1', ''],
+      ]);
+    });
+    it('3D model object starting animation', function () {
+      const model3DConfiguration = new gd.Model3DObjectConfiguration();
+      const instance = new gd.InitialInstance();
+      expect(
+        model3DConfiguration
+          .getInitialInstanceProperties(instance)
+          .has('animation')
+      ).toBe(false);
+
+      const animation = new gd.Model3DAnimation();
+      animation.setName('Idle');
+      model3DConfiguration.addAnimation(animation);
+      animation.setName('Run');
+      model3DConfiguration.addAnimation(animation);
+      animation.delete();
+
+      expect(
+        model3DConfiguration.updateInitialInstanceProperty(
+          instance,
+          'animation',
+          '1'
+        )
+      ).toBe(true);
+      expect(instance.getRawDoubleProperty('animation')).toBe(1);
+      const property = model3DConfiguration
+        .getInitialInstanceProperties(instance)
+        .get('animation');
+      expect(property.getValue()).toBe('1');
+      expect(property.getChoices().size()).toBe(2);
+      expect(property.getChoices().at(1).getLabel()).toBe('Run');
+
+      instance.delete();
+      model3DConfiguration.delete();
+    });
     it('can be serialized', function () {
       expect(initialInstance.serializeTo).not.toBe(undefined);
       expect(initialInstance.unserializeFrom).not.toBe(undefined);

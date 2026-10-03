@@ -165,9 +165,6 @@ namespace gdjs {
     /** The template slug that was used to create the project. */
     projectTemplateSlug?: string;
 
-    /** The source game id that was used to create the project. */
-    sourceGameId?: string;
-
     /** Any capture that should be done during the preview. */
     captureOptions?: CaptureOptions;
 

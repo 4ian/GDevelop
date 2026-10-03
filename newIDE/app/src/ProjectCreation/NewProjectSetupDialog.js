@@ -87,7 +87,6 @@ export const generateProjectName = (nameToAppend: ?string): string =>
 
 export type NewProjectCreationSource =
   | 'default'
-  | 'quick-customization'
   | 'ai-agent-request'
   | 'course-chapter'
   | 'in-app-tutorial';
@@ -100,7 +99,6 @@ export type NewProjectSetup = {|
   width?: number,
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
-  openQuickCustomizationDialog?: boolean,
   forceOpenAskAiEditor?: boolean,
   creationSource: NewProjectCreationSource,
   // Open this file instead of the one of the example (a copy of the example

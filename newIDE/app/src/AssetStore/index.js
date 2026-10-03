@@ -87,7 +87,6 @@ type Props = {|
   assetSwappedObject?: ?gdObject,
   // Only list the assets of these object types, without packs.
   fixedObjectTypes?: ?Array<string>,
-  minimalUI?: boolean,
 |};
 
 export type AssetStoreInterface = {|
@@ -134,7 +133,6 @@ export const AssetStore: React.ComponentType<{
       getCourseCompletion,
       assetSwappedObject,
       fixedObjectTypes,
-      minimalUI,
     }: Props,
     ref
   ) => {
@@ -771,42 +769,38 @@ export const AssetStore: React.ComponentType<{
           >
             <>
               <LineStackLayout alignItems="center">
-                {!(assetSwappedObject && minimalUI) && (
-                  <TextButton
-                    icon={<ChevronArrowLeft />}
-                    label={<Trans>Back</Trans>}
-                    onClick={onBack}
-                    disabled={shopNavigationState.isRootPage}
-                  />
-                )}
-                {!(assetSwappedObject && minimalUI) && (
-                  <IconButton
-                    id="home-button"
-                    key="back-discover"
-                    tooltip={t`Back to discover`}
-                    onClick={() => {
-                      setSearchText('');
-                      const page =
-                        assetSwappedObject || fixedObjectTypes
-                          ? shopNavigationState.openAssetSwapping()
-                          : shopNavigationState.openHome();
-                      setScrollUpdateIsNeeded(page);
-                      clearAllAssetStoreFilters();
-                      if (fixedObjectTypes) {
-                        assetFiltersState.setObjectTypeFilter(
-                          new ObjectTypeAssetStoreSearchFilter(
-                            new Set(fixedObjectTypes)
-                          )
-                        );
-                      }
-                      setIsFiltersPanelOpen(false);
-                    }}
-                    size="small"
-                    color="default"
-                  >
-                    <Home />
-                  </IconButton>
-                )}
+                <TextButton
+                  icon={<ChevronArrowLeft />}
+                  label={<Trans>Back</Trans>}
+                  onClick={onBack}
+                  disabled={shopNavigationState.isRootPage}
+                />
+                <IconButton
+                  id="home-button"
+                  key="back-discover"
+                  tooltip={t`Back to discover`}
+                  onClick={() => {
+                    setSearchText('');
+                    const page =
+                      assetSwappedObject || fixedObjectTypes
+                        ? shopNavigationState.openAssetSwapping()
+                        : shopNavigationState.openHome();
+                    setScrollUpdateIsNeeded(page);
+                    clearAllAssetStoreFilters();
+                    if (fixedObjectTypes) {
+                      assetFiltersState.setObjectTypeFilter(
+                        new ObjectTypeAssetStoreSearchFilter(
+                          new Set(fixedObjectTypes)
+                        )
+                      );
+                    }
+                    setIsFiltersPanelOpen(false);
+                  }}
+                  size="small"
+                  color="default"
+                >
+                  <Home />
+                </IconButton>
                 <Column expand useFullHeight noMargin>
                   <SearchBar
                     placeholder={
@@ -842,63 +836,58 @@ export const AssetStore: React.ComponentType<{
                     id="asset-store-search-bar"
                   />
                 </Column>
-                {!(assetSwappedObject && minimalUI) && (
-                  <IconButton
-                    onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
-                    disabled={!canShowFiltersPanel}
-                    selected={canShowFiltersPanel && isFiltersPanelOpen}
-                    size="small"
-                  >
-                    <Tune />
-                  </IconButton>
-                )}
+                <IconButton
+                  onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
+                  disabled={!canShowFiltersPanel}
+                  selected={canShowFiltersPanel && isFiltersPanelOpen}
+                  size="small"
+                >
+                  <Tune />
+                </IconButton>
               </LineStackLayout>
               <Spacer />
             </>
             {(openedAssetPack ||
               openedPrivateAssetPackListingData ||
-              filtersState.chosenCategory) &&
-              !(assetSwappedObject && minimalUI) && (
-                <Column noMargin>
-                  <Line
-                    justifyContent="space-between"
+              filtersState.chosenCategory) && (
+              <Column noMargin>
+                <Line
+                  justifyContent="space-between"
+                  noMargin
+                  alignItems="center"
+                >
+                  {!openedAssetPack && !openedPrivateAssetPackListingData && (
+                    // Only show the category name if we're not on an asset pack page.
+                    <>
+                      {/* Empty column to keep the category name centered. */}
+                      <Column expand noMargin />
+                      <Column expand alignItems="center">
+                        <Text size="block-title" noMargin>
+                          {filtersState.chosenCategory
+                            ? capitalize(filtersState.chosenCategory.node.name)
+                            : ''}
+                        </Text>
+                      </Column>
+                    </>
+                  )}
+                  <Column
+                    expand
+                    alignItems="flex-end"
                     noMargin
-                    alignItems="center"
+                    justifyContent="center"
                   >
-                    {!openedAssetPack && !openedPrivateAssetPackListingData && (
-                      // Only show the category name if we're not on an asset pack page.
-                      <>
-                        {/* Empty column to keep the category name centered. */}
-                        <Column expand noMargin />
-                        <Column expand alignItems="center">
-                          <Text size="block-title" noMargin>
-                            {filtersState.chosenCategory
-                              ? capitalize(
-                                  filtersState.chosenCategory.node.name
-                                )
-                              : ''}
-                          </Text>
-                        </Column>
-                      </>
-                    )}
-                    <Column
-                      expand
-                      alignItems="flex-end"
-                      noMargin
-                      justifyContent="center"
-                    >
-                      {openedAssetPack &&
-                      openedAssetPack.content &&
-                      doesAssetPackContainAudio(openedAssetPack) &&
-                      !isAssetPackAudioOnly(openedAssetPack) ? (
-                        <PrivateAssetPackAudioFilesDownloadButton
-                          assetPack={openedAssetPack}
-                        />
-                      ) : null}
-                    </Column>
-                  </Line>
-                </Column>
-              )}
+                    {openedAssetPack &&
+                    openedAssetPack.content &&
+                    doesAssetPackContainAudio(openedAssetPack) &&
+                    !isAssetPackAudioOnly(openedAssetPack) ? (
+                      <PrivateAssetPackAudioFilesDownloadButton
+                        assetPack={openedAssetPack}
+                      />
+                    ) : null}
+                  </Column>
+                </Line>
+              </Column>
+            )}
             <Line
               expand
               noMargin
@@ -969,10 +958,8 @@ export const AssetStore: React.ComponentType<{
                   onGoBackToFolderIndex={goBackToFolderIndex}
                   currentPage={shopNavigationState.getCurrentPage()}
                   onlyShowAssets={onlyShowAssets}
-                  hideDetails={!!assetSwappedObject && !!minimalUI}
                 />
-              ) : // Do not show the asset details if we're swapping an asset.
-              openedAssetShortHeader && !(assetSwappedObject && minimalUI) ? (
+              ) : openedAssetShortHeader ? (
                 <AssetDetails
                   ref={assetDetails}
                   onTagSelection={selectTag}

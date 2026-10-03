@@ -149,9 +149,6 @@ const PreferencesDialogStory = ({
           initialSection={initialSection}
           isDesktop={isDesktop}
           onClose={action('onClose')}
-          onOpenQuickCustomizationDialog={action(
-            'onOpenQuickCustomizationDialog'
-          )}
         />
       )}
     </I18n>

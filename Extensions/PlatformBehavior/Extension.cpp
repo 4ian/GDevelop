@@ -860,8 +860,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                          "CppPlatform/Extensions/platformicon.png",
                          "PlatformBehavior",
                          std::make_shared<PlatformBehavior>(),
-                         std::make_shared<gd::BehaviorsSharedData>())
-            .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+                         std::make_shared<gd::BehaviorsSharedData>());
 
     aut.AddAction("ChangePlatformType",
                   _("Platform type"),

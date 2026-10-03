@@ -166,7 +166,6 @@ namespace gdjs {
         location: window.location.href,
         projectTemplateSlug:
           runtimeGame.getAdditionalOptions().projectTemplateSlug,
-        sourceGameId: runtimeGame.getAdditionalOptions().sourceGameId,
       },
       gameState: {
         sceneNames,

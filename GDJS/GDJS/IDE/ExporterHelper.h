@@ -350,14 +350,6 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set the source game id that was used to create the project.
-   */
-  PreviewExportOptions &SetSourceGameId(const gd::String &sourceGameId_) {
-    sourceGameId = sourceGameId_;
-    return *this;
-  }
-
-  /**
    * \brief Set the capture options to be used for taking screenshots or videos
    * of the preview.
    */
@@ -415,7 +407,6 @@ struct PreviewExportOptions {
   gd::String previewContext;
   gd::String gdevelopVersionWithHash;
   gd::String projectTemplateSlug;
-  gd::String sourceGameId;
   gd::CaptureOptions captureOptions;
 };
 

@@ -664,7 +664,6 @@ export const ExampleTile = ({
   style,
   customTitle,
   centerTitle,
-  useQuickCustomizationThumbnail,
   disabled,
 }: {|
   exampleShortHeader: ExampleShortHeader | null,
@@ -673,7 +672,6 @@ export const ExampleTile = ({
   style?: any,
   customTitle?: string,
   centerTitle?: boolean,
-  useQuickCustomizationThumbnail?: boolean,
   disabled?: boolean,
 |}): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
@@ -682,15 +680,10 @@ export const ExampleTile = ({
     () => {
       if (!exampleShortHeader) return '';
       const firstPreviewUrl = exampleShortHeader.previewImageUrls[0] || '';
-      const quickCustomizationImageUrl =
-        exampleShortHeader.quickCustomizationImageUrl;
-      if (useQuickCustomizationThumbnail && quickCustomizationImageUrl) {
-        return quickCustomizationImageUrl;
-      }
 
       return firstPreviewUrl;
     },
-    [exampleShortHeader, useQuickCustomizationThumbnail]
+    [exampleShortHeader]
   );
 
   return (

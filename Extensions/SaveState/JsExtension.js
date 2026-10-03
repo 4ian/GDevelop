@@ -752,7 +752,6 @@ module.exports = {
         saveConfigurationBehavior,
         sharedData
       )
-      .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
       .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
       .addIncludeFile(
         'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'

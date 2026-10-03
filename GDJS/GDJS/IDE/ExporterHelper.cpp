@@ -475,10 +475,6 @@ void ExporterHelper::SerializeRuntimeGameOptions(
     runtimeGameOptions.AddChild("projectTemplateSlug")
         .SetStringValue(options.projectTemplateSlug);
   }
-  if (!options.sourceGameId.empty()) {
-    runtimeGameOptions.AddChild("sourceGameId")
-        .SetStringValue(options.sourceGameId);
-  }
 
   if (!options.captureOptions.IsEmpty()) {
     auto &captureOptionsElement = runtimeGameOptions.AddChild("captureOptions");

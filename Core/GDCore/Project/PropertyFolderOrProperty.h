@@ -10,7 +10,6 @@
 
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
-#include "GDCore/Project/QuickCustomization.h"
 
 namespace gd {
 class Project;

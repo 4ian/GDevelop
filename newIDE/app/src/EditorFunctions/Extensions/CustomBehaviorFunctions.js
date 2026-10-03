@@ -24,7 +24,6 @@ import {
 } from '../Scope';
 import { applyPropertyChanges, type PropertyChange } from './PropertyChanges';
 import {
-  getEnumSettingValue,
   getSafeUniqueName,
   parseBoolean,
   readOptionalBoolean,
@@ -42,10 +41,8 @@ const BEHAVIOR_SETTING_NAMES = [
   'description',
   'objectType',
   'isPrivate',
-  'quickCustomizationVisibility',
 ];
 const METADATA_ONLY_SETTING_NAMES = ['fullName', 'description'];
-const QUICK_CUSTOMIZATION_VISIBILITIES = ['default', 'visible', 'hidden'];
 
 const getBehaviorNames = (
   eventsFunctionsExtension: gdEventsFunctionsExtension
@@ -446,35 +443,6 @@ const planBehaviorSettings = (
       });
       continue;
     }
-    if (settingName === 'quickCustomizationVisibility') {
-      const parsedValue = getEnumSettingValue(
-        newValue,
-        QUICK_CUSTOMIZATION_VISIBILITIES,
-        settingName
-      );
-      if (!parsedValue.success)
-        return { success: false, message: parsedValue.message };
-      const visibilityName = parsedValue.value;
-      const visibility =
-        visibilityName === 'visible'
-          ? gd.QuickCustomization.Visible
-          : visibilityName === 'hidden'
-          ? gd.QuickCustomization.Hidden
-          : gd.QuickCustomization.Default;
-      plannedSettings.push({
-        settingName,
-        apply: () => {
-          if (
-            eventsBasedBehavior.getQuickCustomizationVisibility() === visibility
-          )
-            return null;
-          eventsBasedBehavior.setQuickCustomizationVisibility(visibility);
-          return `${settingName} set to "${visibilityName}"`;
-        },
-      });
-      continue;
-    }
-
     if (typeof newValue !== 'string') {
       return {
         success: false,

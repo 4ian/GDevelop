@@ -77,6 +77,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'number',
+        '',
+        '',
         expressionNode,
         1
       );
@@ -113,6 +115,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'number',
+        '',
+        '',
         expressionNode2,
         1
       );
@@ -153,6 +157,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'string',
+        '',
+        '',
         expressionNode,
         1
       );
@@ -211,6 +217,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'number',
+        '',
+        '',
         expressionNode,
         9
       );
@@ -249,6 +257,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'string',
+        '',
+        '',
         expressionNode,
         16
       );
@@ -291,6 +301,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'string',
+        '',
+        '',
         expressionNode,
         'MySpriteObjectWithBehaviors.Speed'.length - 1
       );
@@ -343,6 +355,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'number',
+        '',
+        '',
         expressionNode,
         24
       );
@@ -383,6 +397,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'number',
+        '',
+        '',
         expressionNode,
         28
       );
@@ -424,6 +440,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'number',
+        '',
+        '',
         expressionNode,
         28
       );
@@ -465,6 +483,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'number',
+        '',
+        '',
         expressionNode,
         28
       );
@@ -511,6 +531,8 @@ describe('ExpressionAutocompletion', () => {
         gd.JsPlatform.get(),
         projectScopedContainersAccessor.get(),
         'string',
+        '',
+        '',
         expressionNode,
         47
       );

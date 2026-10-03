@@ -39,6 +39,7 @@ import {
   handleAutocompletionsScroll,
   getRenderedAutocompletions,
   getNonRenderedCount,
+  type AutocompletionAction,
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
 import { ResponsiveWindowMeasurer } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -110,11 +111,22 @@ type State = {|
 |};
 
 type Props = {|
-  expressionType: 'number' | 'string',
+  expressionType:
+    | 'number'
+    | 'string'
+    | 'variable'
+    | 'variableOrProperty'
+    | 'variableOrPropertyOrParameter'
+    | 'objectvar'
+    | 'scenevar'
+    | 'globalvar',
   /** An optional callback that can be used to provide additional autocompletions. */
   onGetAdditionalAutocompletions?: (
     currentExpression: string
   ) => Array<ExpressionAutocompletion>,
+  onGetAdditionalActions?: (
+    currentExpression: string
+  ) => Array<AutocompletionAction>,
   /** An optional callback that can be used to show a custom error message. */
   onExtractAdditionalErrors?: (
     currentExpression: string,
@@ -255,6 +267,16 @@ export default class ExpressionField extends React.Component<Props, State> {
       this._enqueueValidation();
     }
   };
+
+  getInputValue = (): string => {
+    if (!this._inputElement) {
+      return '';
+    }
+    return this._inputElement.value;
+  };
+
+  hasAnyError = (): boolean =>
+    this.state.errorText && this.state.errorText.length > 0;
 
   _openExpressionPopover = () => {
     this.setState({
@@ -472,11 +494,12 @@ export default class ExpressionField extends React.Component<Props, State> {
       projectScopedContainersAccessor,
       expressionType,
       parameterMetadata,
+      instruction,
       scope,
       onGetAdditionalAutocompletions,
       onExtractAdditionalErrors,
     } = this.props;
-    if (!project) return null;
+    if (!project || !instruction) return null;
 
     const expression = this.state.validatedValue;
 
@@ -485,6 +508,12 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
+
+    const objectName = gd.InstructionValidator.getObjectNameForParameter(
+      projectScopedContainersAccessor.get(),
+      instruction,
+      expressionType
+    );
 
     const showDeprecatedInstructionWarning = this.context
       ? this.context.values.showDeprecatedInstructionWarning
@@ -497,7 +526,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       expressionType,
       parameterMetadata,
       expressionNode,
-      '',
+      objectName,
       showDeprecatedInstructionWarning
     );
     const extraErrorText = onExtractAdditionalErrors
@@ -522,6 +551,11 @@ export default class ExpressionField extends React.Component<Props, State> {
       return;
     }
 
+    const isVariableParameter = gd.ValueTypeMetadata.isTypeExpression(
+      'variable',
+      expressionType
+    );
+
     const cursorPosition = this._inputElement
       ? this._inputElement.selectionStart
       : 0;
@@ -529,8 +563,10 @@ export default class ExpressionField extends React.Component<Props, State> {
       gd.JsPlatform.get(),
       projectScopedContainersAccessor.get(),
       expressionType,
+      parameterMetadata ? parameterMetadata.getExtraInfo() : '',
+      objectName,
       expressionNode,
-      cursorPosition - 1
+      isVariableParameter ? Math.max(0, cursorPosition - 1) : cursorPosition - 1
     );
 
     const newAutocompletions = getAutocompletionsFromDescriptions(
@@ -552,13 +588,18 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     parser.delete();
 
+    const additionalActions = this.props.onGetAdditionalActions
+      ? this.props.onGetAdditionalActions(this.state.validatedValue)
+      : [];
+
     this.setState(state => ({
       errorText: formattedErrorText,
       errorHighlights,
       isOnlyWarning,
       autocompletions: setNewAutocompletions(
         state.autocompletions,
-        allNewAutocompletions
+        allNewAutocompletions,
+        additionalActions
       ),
     }));
   };
@@ -735,6 +776,9 @@ export default class ExpressionField extends React.Component<Props, State> {
                         selectedCompletionIndex={
                           this.state.autocompletions.selectedCompletionIndex
                         }
+                        additionalActions={
+                          this.state.autocompletions.additionalActions
+                        }
                         onScroll={this._onExpressionAutocompletionsScroll}
                         onChoose={expressionAutocompletion => {
                           this._insertAutocompletion(expressionAutocompletion);
@@ -757,22 +801,23 @@ export default class ExpressionField extends React.Component<Props, State> {
                       style,
                       onChange: this._handleBlur,
                     })}
-                  {!this.props.isInline && (
-                    <RaisedButton
-                      id={`open-${expressionType}-expression-popover-button`}
-                      icon={<Functions />}
-                      label={
-                        expressionType === 'string'
-                          ? '"ABC"'
-                          : expressionType === 'number'
-                          ? '123'
-                          : ''
-                      }
-                      primary
-                      style={style}
-                      onClick={this._openExpressionPopover}
-                    />
-                  )}
+                  {!this.props.isInline &&
+                    !this.props.shouldHideExpressionListButton && (
+                      <RaisedButton
+                        id={`open-${expressionType}-expression-popover-button`}
+                        icon={<Functions />}
+                        label={
+                          expressionType === 'string'
+                            ? '"ABC"'
+                            : expressionType === 'number'
+                            ? '123'
+                            : ''
+                        }
+                        primary
+                        style={style}
+                        onClick={this._openExpressionPopover}
+                      />
+                    )}
                 </React.Fragment>
               )}
             />

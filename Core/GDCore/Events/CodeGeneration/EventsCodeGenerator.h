@@ -391,6 +391,16 @@ class GD_CORE_API EventsCodeGenerator {
   gd::DiagnosticReport* GetDiagnosticReport() { return diagnosticReport; }
 
   /**
+   * \brief Return true if the validation of expressions can be skipped, because
+   * the instruction is generated again for another object of a group.
+   */
+  bool IsExpressionValidationSkipped() const {
+    return expressionValidationSkipped;
+  }
+
+  void SetExpressionValidationFailed() { expressionValidationFailed = true; }
+
+  /**
    * \brief Generate the full name for accessing to a boolean variable used for
    * conditions.
    *
@@ -879,6 +889,11 @@ class GD_CORE_API EventsCodeGenerator {
                                   ///< list function name.
 
   gd::DiagnosticReport* diagnosticReport;
+  bool expressionValidationSkipped;  ///< True when an instruction is generated
+                                     ///< for the next objects of a group, after
+                                     ///< its expressions were validated once.
+  bool expressionValidationFailed;   ///< True if an expression validation
+                                     ///< failed for the current instruction.
 };
 
 }  // namespace gd

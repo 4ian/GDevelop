@@ -386,6 +386,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
           GetObjectsContainersList().ExpandObjectName(
               objectName, context.GetCurrentObject());
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
+        expressionValidationFailed = false;
         // Set up the context
         gd::String objectType =
             GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
@@ -405,8 +406,13 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
               realObjects[i], objInfo, arguments, instrInfos, returnBoolean,
               condition.IsInverted(), context);
         }
+        // Expressions are validated against the group name, not the current
+        // object, so the result is the same for every object: validate them
+        // only once.
+        expressionValidationSkipped = !expressionValidationFailed;
         context.SetNoCurrentObject();
       }
+      expressionValidationSkipped = false;
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
     if (instrInfos.parameters.GetParametersCount() >= 2) {
@@ -424,6 +430,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
           MetadataProvider::GetBehaviorMetadata(platform, actualBehaviorType);
 
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
+        expressionValidationFailed = false;
         // Setup context
         AddIncludeFiles(autoInfo.includeFiles);
         context.SetCurrentObject(realObjects[i]);
@@ -438,8 +445,13 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
               realObjects[i], behaviorName, autoInfo, arguments, instrInfos,
               returnBoolean, condition.IsInverted(), context);
         }
+        // Expressions are validated against the group name, not the current
+        // object, so the result is the same for every object: validate them
+        // only once.
+        expressionValidationSkipped = !expressionValidationFailed;
         context.SetNoCurrentObject();
       }
+      expressionValidationSkipped = false;
     }
   } else {
     std::vector<std::pair<gd::String, gd::String> >
@@ -675,6 +687,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           GetObjectsContainersList().ExpandObjectName(
               objectName, context.GetCurrentObject());
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
+        expressionValidationFailed = false;
         // Setup context
         gd::String objectType =
             GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
@@ -694,8 +707,13 @@ gd::String EventsCodeGenerator::GenerateActionCode(
               realObjects[i], objInfo, functionCallName, arguments, instrInfos,
               context, optionalAsyncCallbackName, optionalAsyncCallbackId);
         }
+        // Expressions are validated against the group name, not the current
+        // object, so the result is the same for every object: validate them
+        // only once.
+        expressionValidationSkipped = !expressionValidationFailed;
         context.SetNoCurrentObject();
       }
+      expressionValidationSkipped = false;
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
     if (instrInfos.parameters.GetParametersCount() >= 2) {
@@ -713,6 +731,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
       AddIncludeFiles(autoInfo.includeFiles);
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
+        expressionValidationFailed = false;
         // Setup context
         context.SetCurrentObject(realObjects[i]);
         context.ObjectsListNeeded(realObjects[i]);
@@ -727,8 +746,13 @@ gd::String EventsCodeGenerator::GenerateActionCode(
               arguments, instrInfos, context, optionalAsyncCallbackName,
               optionalAsyncCallbackId);
         }
+        // Expressions are validated against the group name, not the current
+        // object, so the result is the same for every object: validate them
+        // only once.
+        expressionValidationSkipped = !expressionValidationFailed;
         context.SetNoCurrentObject();
       }
+      expressionValidationSkipped = false;
     }
   } else {
     vector<gd::String> arguments = GenerateParametersCodes(
@@ -1571,7 +1595,9 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
       eventsListNextUniqueId(0),
-      diagnosticReport(nullptr) {};
+      diagnosticReport(nullptr),
+      expressionValidationSkipped(false),
+      expressionValidationFailed(false) {};
 
 EventsCodeGenerator::EventsCodeGenerator(
     const gd::Platform& platform_,
@@ -1586,6 +1612,8 @@ EventsCodeGenerator::EventsCodeGenerator(
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
       eventsListNextUniqueId(0),
-      diagnosticReport(nullptr) {};
+      diagnosticReport(nullptr),
+      expressionValidationSkipped(false),
+      expressionValidationFailed(false) {};
 
 }  // namespace gd

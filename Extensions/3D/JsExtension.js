@@ -2535,15 +2535,30 @@ module.exports = {
       const effect = extension
         .addEffect('N8AO')
         .setFullName(_('Ambient occlusion'))
-        .setDescription(_('Shadow for ambient light.'))
+        .setDescription(
+          _(
+            'Darken the creases, holes and corners where the ambient light is blocked by nearby surfaces.'
+          )
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/N8AOEffect.js');
       const properties = effect.getProperties();
       properties
         .getOrCreate('radius')
-        .setValue('5')
+        .setValue('100')
         .setLabel(_('Radius'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _(
+            'Distance up to which surfaces darken each other. A radius close to the size of the objects gives the best results.'
+          )
+        );
+      properties
+        .getOrCreate('intensity')
+        .setValue('3')
+        .setLabel(_('Intensity'))
         .setType('number');
       properties
         .getOrCreate('distanceFalloff')
@@ -2554,27 +2569,29 @@ module.exports = {
           _(
             'How fast the ambient occlusion fades away with distance in proportion to its radius.'
           )
-        );
-      properties
-        .getOrCreate('intensity')
-        .setValue('5')
-        .setLabel(_('Intensity'))
-        .setType('number');
+        )
+        .setAdvanced(true);
       properties
         .getOrCreate('color')
         .setValue('0;0;0')
         .setLabel(_('Color'))
-        .setType('color');
+        .setType('color')
+        .setAdvanced(true);
       properties
         .getOrCreate('quality')
         .setValue('Performance')
-        .setLabel(_('Shadow quality'))
+        .setLabel(_('Quality'))
         .setType('choice')
-        .addChoice('Performance', _('Very low quality'))
-        .addChoice('Low', _('Low quality'))
-        .addChoice('Medium', _('Medium quality'))
-        .addChoice('High', _('High quality'))
-        .addChoice('Ultra', _('Ultra-high quality'));
+        .addChoice('Performance', _('Fastest (recommended for mobile)'))
+        .addChoice('Low', _('Low'))
+        .addChoice('Medium', _('Medium'))
+        .addChoice('High', _('High'))
+        .addChoice('Ultra', _('Ultra (slowest)'))
+        .setDescription(
+          _(
+            'Higher qualities use more samples, giving less noisy shadows but being slower to render.'
+          )
+        );
     }
     // Don't forget to update the alert condition in Model3DEditor.js when
     // adding a new light.

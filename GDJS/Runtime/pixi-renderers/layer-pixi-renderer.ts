@@ -383,6 +383,11 @@ namespace gdjs {
         return;
       }
       const oldRenderPass = this._threeEffectComposer.passes[0];
+      if (pass) {
+        // The pass was not resized with the composer while it was removed.
+        const renderTarget = this._threeEffectComposer.renderTarget1;
+        pass.setSize(renderTarget.width, renderTarget.height);
+      }
 
       this._threeEffectComposer.passes[0] = pass
         ? pass

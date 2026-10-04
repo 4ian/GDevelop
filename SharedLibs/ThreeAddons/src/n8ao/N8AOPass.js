@@ -76,6 +76,8 @@ class N8AOPass extends Pass {
          * depthAwareUpsampling: boolean,
          * autoRenderBeauty: boolean
          * colorMultiply: boolean,
+         * transparencyAware: boolean,
+         * accumulate: boolean,
          * neuralDenoise: boolean
          * }
          */
@@ -656,6 +658,10 @@ class N8AOPass extends Pass {
             }
             if (this.configuration.autoRenderBeauty) {
                 renderer.setRenderTarget(this.beautyRenderTarget);
+                // GDevelop renders with autoClear disabled, and Three.js only
+                // clears by itself when the background is a color: clear the
+                // previous frame (including its depth) explicitly.
+                renderer.clear(true, true, true);
                 renderer.render(this.scene, this.camera);
                 if (this.configuration.transparencyAware) {
                     this.renderTransparency(renderer);

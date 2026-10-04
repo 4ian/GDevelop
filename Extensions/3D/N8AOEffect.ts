@@ -18,6 +18,9 @@ namespace gdjs {
         return new (class implements gdjs.PixiFiltersTools.Filter {
           shaderPass: THREE_ADDONS.N8AOPass;
           _isEnabled: boolean;
+          // In scene units: converted to the Three.js world units before each
+          // rendering, as the world scale can change in the editor.
+          _radius: float = 50;
 
           constructor() {
             const layer = target.getRuntimeLayer!()!;
@@ -66,10 +69,24 @@ namespace gdjs {
             this._isEnabled = false;
             return true;
           }
-          updatePreRender(target: gdjs.EffectsTarget): any {}
+          updatePreRender(target: gdjs.EffectsTarget): any {
+            this._updateRadius();
+          }
+          _updateRadius(): void {
+            const aoRadius =
+              this._radius *
+              target
+                .getRuntimeScene()
+                .getScene()
+                .getRenderer3DInverseWorldScale();
+            if (this.shaderPass.configuration.aoRadius !== aoRadius) {
+              this.shaderPass.configuration.aoRadius = aoRadius;
+            }
+          }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'radius') {
-              this.shaderPass.configuration.aoRadius = value;
+              this._radius = value;
+              this._updateRadius();
             }
             if (parameterName === 'distanceFalloff') {
               this.shaderPass.configuration.distanceFalloff = value;
@@ -80,7 +97,7 @@ namespace gdjs {
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'radius') {
-              return this.shaderPass.configuration.aoRadius;
+              return this._radius;
             }
             if (parameterName === 'distanceFalloff') {
               return this.shaderPass.configuration.distanceFalloff;
@@ -92,7 +109,15 @@ namespace gdjs {
           }
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'quality') {
-              this.shaderPass.setQualityMode(value);
+              if (
+                value === 'Performance' ||
+                value === 'Low' ||
+                value === 'Medium' ||
+                value === 'High' ||
+                value === 'Ultra'
+              ) {
+                this.shaderPass.setQualityMode(value);
+              }
             }
             if (parameterName === 'color') {
               this.shaderPass.configuration.color = new THREE.Color(
@@ -114,14 +139,15 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {}
           getNetworkSyncData(): N8AOFilterNetworkSyncData {
             return {
-              r: this.shaderPass.configuration.aoRadius,
+              r: this._radius,
               d: this.shaderPass.configuration.distanceFalloff,
               i: this.shaderPass.configuration.intensity,
               c: this.shaderPass.configuration.color.getHex(),
             };
           }
           updateFromNetworkSyncData(data: N8AOFilterNetworkSyncData) {
-            this.shaderPass.configuration.aoRadius = data.r;
+            this._radius = data.r;
+            this._updateRadius();
             this.shaderPass.configuration.distanceFalloff = data.d;
             this.shaderPass.configuration.intensity = data.i;
             this.shaderPass.configuration.color.setHex(data.c);

@@ -713,6 +713,28 @@ namespace gdjs {
     }
 
     /**
+     * Change the order of the effects, which is the order of the
+     * post-processing passes of 3D layers. Effects not in the list are put
+     * after the others.
+     * @param effectNames The names of the effects, in their new order.
+     */
+    setEffectsOrder(effectNames: string[]): void {
+      const rendererEffects: Record<string, gdjs.PixiFiltersTools.Filter> = {};
+      for (const effectName of effectNames) {
+        if (this._rendererEffects[effectName]) {
+          rendererEffects[effectName] = this._rendererEffects[effectName];
+        }
+      }
+      for (const effectName in this._rendererEffects) {
+        if (!rendererEffects[effectName]) {
+          rendererEffects[effectName] = this._rendererEffects[effectName];
+        }
+      }
+      this._rendererEffects = rendererEffects;
+      this._renderer.updatePostProcessingPassesOrder();
+    }
+
+    /**
      * Remove the effect with the specified name
      * @param effectName The name of the effect.
      */

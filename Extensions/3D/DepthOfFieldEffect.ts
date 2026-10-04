@@ -192,7 +192,10 @@ namespace gdjs {
             }
             const layerRenderer = target.getRenderer();
             layerRenderer.setSceneDepthTextureNeeded(true);
-            layerRenderer.addPostProcessingPass(this.shaderPass);
+            layerRenderer.addPostProcessingPass(
+              this.shaderPass,
+              effectData.name
+            );
             this._isEnabled = true;
             return true;
           }

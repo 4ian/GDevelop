@@ -2446,7 +2446,9 @@ module.exports = {
       const effect = extension
         .addEffect('HueAndSaturation')
         .setFullName(_('Hue and saturation'))
-        .setDescription(_('Adjust hue and saturation.'))
+        .setDescription(
+          _('Adjust hue and saturation. Put it after the tone mapping, if any.')
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/HueAndSaturationEffect.js');
@@ -2469,7 +2471,9 @@ module.exports = {
       const effect = extension
         .addEffect('Exposure')
         .setFullName(_('Exposure'))
-        .setDescription(_('Adjust exposure.'))
+        .setDescription(
+          _('Adjust exposure. Put it before the tone mapping, if any.')
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/ExposureEffect.js');
@@ -2487,7 +2491,7 @@ module.exports = {
         .setFullName(_('Tone mapping'))
         .setDescription(
           _(
-            'Map the colors of the scene to the screen like a camera, to keep details in the brightest parts. Put it after the other effects.'
+            'Map the colors of the scene to the screen like a camera, to keep details in the brightest parts. Put it after the effects on the light of the scene (exposure, depth of field, bloom) and before the color adjustments (brightness and contrast, hue and saturation).'
           )
         )
         .markAsNotWorkingForObjects()
@@ -2515,7 +2519,11 @@ module.exports = {
       const effect = extension
         .addEffect('Bloom')
         .setFullName(_('Bloom'))
-        .setDescription(_('Make the brightest parts of the scene glow.'))
+        .setDescription(
+          _(
+            'Make the brightest parts of the scene glow. Put it before the tone mapping, if any.'
+          )
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/BloomEffect.js');
@@ -2547,7 +2555,11 @@ module.exports = {
       const effect = extension
         .addEffect('BrightnessAndContrast')
         .setFullName(_('Brightness and contrast.'))
-        .setDescription(_('Adjust brightness and contrast.'))
+        .setDescription(
+          _(
+            'Adjust brightness and contrast. Put it after the tone mapping, if any.'
+          )
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/BrightnessAndContrastEffect.js');
@@ -2633,7 +2645,7 @@ module.exports = {
         .setFullName(_('Depth of field'))
         .setDescription(
           _(
-            'Blur what is closer or further than the focus distance, like a camera lens.'
+            'Blur what is closer or further than the focus distance, like a camera lens. Put it before the bloom and the tone mapping, if any.'
           )
         )
         .markAsNotWorkingForObjects()

@@ -7,6 +7,11 @@
 namespace gdjs {
   const logger = new gdjs.Logger('LayerPixiRenderer');
 
+  type PostProcessingPass = {
+    pass: THREE_ADDONS.Pass;
+    effectName: string;
+  };
+
   const FRUSTUM_EDGES: Array<[number, number]> = [
     // near plane edges
     [0, 1],
@@ -220,6 +225,9 @@ namespace gdjs {
     private _sceneDepthRenderPass: THREE_ADDONS.SceneDepthRenderPass | null =
       null;
     private _sceneDepthTextureUsersCount = 0;
+    private _postProcessingPasses: PostProcessingPass[] = [];
+    // The antialiasing (if any) and output passes, after the effects.
+    private _threeFinalPasses: THREE_ADDONS.Pass[] = [];
     private _basis: Basis | null = null;
     private static matrix4: THREE.Matrix4 | null = null;
 
@@ -335,44 +343,59 @@ namespace gdjs {
       return this._threeEffectComposer;
     }
 
-    addPostProcessingPass(pass: THREE_ADDONS.Pass) {
+    /**
+     * Add a pass applying an effect after the rendering of the scene.
+     * Passes are applied in the order of the effects of the layer.
+     * @param pass The pass to add.
+     * @param effectName The name of the effect adding the pass.
+     */
+    addPostProcessingPass(pass: THREE_ADDONS.Pass, effectName: string) {
       if (!this._threeEffectComposer) {
         return;
       }
-      const game = this._layer.getRuntimeScene().getGame();
-      // TODO Keep the effects in the same order they are defined
-      // because the order matter for the final result.
-      // There is the same issue with 2D effects too.
-
-      // The composer contains:
-      // - RenderPass
-      // - inserted passes for effects
-      // - SMAAPass (optionally)
-      // - OutputPass
-      const index =
-        this._threeEffectComposer.passes.length -
-        (game.getAntialiasingMode() === 'none' ? 1 : 2);
-      this._threeEffectComposer.insertPass(pass, index);
+      const renderTarget = this._threeEffectComposer.renderTarget1;
+      pass.setSize(renderTarget.width, renderTarget.height);
+      this._postProcessingPasses.push({ pass, effectName });
+      this.updatePostProcessingPassesOrder();
     }
 
     removePostProcessingPass(pass: THREE_ADDONS.Pass) {
+      this._postProcessingPasses = this._postProcessingPasses.filter(
+        (postProcessingPass) => postProcessingPass.pass !== pass
+      );
+      this.updatePostProcessingPassesOrder();
+    }
+
+    /**
+     * Put the post-processing passes in the order of the effects of the layer.
+     */
+    updatePostProcessingPassesOrder() {
       if (!this._threeEffectComposer) {
         return;
       }
-      this._threeEffectComposer.removePass(pass);
+      const effectNames = Object.keys(this._layer.getRendererEffects());
+      this._postProcessingPasses.sort(
+        (a, b) =>
+          effectNames.indexOf(a.effectName) - effectNames.indexOf(b.effectName)
+      );
+
+      const passes = this._threeEffectComposer.passes;
+      passes.splice(
+        1,
+        passes.length - 1,
+        ...this._postProcessingPasses.map(({ pass }) => pass),
+        ...this._threeFinalPasses
+      );
     }
 
     hasPostProcessingPass() {
       if (!this._threeEffectComposer) {
         return false;
       }
-      if (this._threeEffectComposer.passes[0] !== this._threeRenderPass) {
-        return true;
-      }
-      const game = this._layer.getRuntimeScene().getGame();
-      // RenderPass, OutputPass and optionally SMAAPass are default passes.
-      const emptyCount = game.getAntialiasingMode() === 'none' ? 2 : 3;
-      return this._threeEffectComposer.passes.length > emptyCount;
+      return (
+        this._threeEffectComposer.passes[0] !== this._threeRenderPass ||
+        this._postProcessingPasses.length > 0
+      );
     }
 
     /**
@@ -502,8 +525,6 @@ namespace gdjs {
           const game = this._layer.getRuntimeScene().getGame();
           const threeRenderer = game.getRenderer().getThreeRenderer();
           if (threeRenderer) {
-            // When adding more default passes, make sure to update
-            // `addPostProcessingPass` and `hasPostProcessingPass` formulas.
             this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
               threeRenderer
             );
@@ -513,9 +534,12 @@ namespace gdjs {
             );
             this._threeEffectComposer.addPass(this._threeRenderPass);
             if (game.getAntialiasingMode() !== 'none') {
-              this._threeEffectComposer.addPass(new THREE_ADDONS.SMAAPass());
+              this._threeFinalPasses.push(new THREE_ADDONS.SMAAPass());
             }
-            this._threeEffectComposer.addPass(new THREE_ADDONS.OutputPass());
+            this._threeFinalPasses.push(new THREE_ADDONS.OutputPass());
+            for (const pass of this._threeFinalPasses) {
+              this._threeEffectComposer.addPass(pass);
+            }
           }
 
           if (

@@ -2483,6 +2483,36 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('ToneMapping')
+        .setFullName(_('Tone mapping'))
+        .setDescription(
+          _(
+            'Map the colors of the scene to the screen like a camera, to keep details in the brightest parts. Put it after the other effects.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ToneMappingEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('mode')
+        .setValue('Neutral')
+        .setLabel(_('Mode'))
+        .setType('choice')
+        .addChoice('Neutral', _('Neutral (keeps the colors of the scene)'))
+        .addChoice('ACESFilmic', _('ACES Filmic (cinematic, contrasted)'))
+        .addChoice('AgX', _('AgX (realistic, soft)'))
+        .addChoice('Reinhard', _('Reinhard'))
+        .addChoice('Cineon', _('Cineon'));
+      properties
+        .getOrCreate('exposure')
+        .setValue('1')
+        .setLabel(_('Exposure'))
+        .setType('number')
+        .setDescription(_('Brightness of the scene before the tone mapping.'));
+    }
+    {
+      const effect = extension
         .addEffect('Bloom')
         .setFullName(_('Bloom'))
         .setDescription(_('Make the brightest parts of the scene glow.'))

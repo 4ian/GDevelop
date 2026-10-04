@@ -559,7 +559,10 @@ describe('EventScriptSourceView', () => {
         fromLine: 1,
         toLine: 20,
         totalLines: 20,
-        code: longCode,
+        code: longCode
+          .split('\n')
+          .map((line, index) => `${index + 1}\t${line}`)
+          .join('\n'),
       });
       expect(jsOnlyView.notes.join(' ')).toContain('`jsCodeExcerpt`');
       expect(jsOnlyView.notes.join(' ')).not.toContain('cut short');
@@ -586,7 +589,7 @@ describe('EventScriptSourceView', () => {
       const { jsCodeExcerpt } = view;
       if (!jsCodeExcerpt) throw new Error('Expected a jsCodeExcerpt.');
       expect(jsCodeExcerpt.toLine).toBe(1);
-      expect(minifiedLine.startsWith(jsCodeExcerpt.code)).toBe(true);
+      expect(jsCodeExcerpt.code.startsWith('1\tx=1;x=1;')).toBe(true);
       expect(jsCodeExcerpt.code.length).toBeLessThanOrEqual(2000);
       expect(view.notes.join(' ')).toContain('only its start is shown');
       expect(view.notes.join(' ')).toContain('`js_from_line: 2`');

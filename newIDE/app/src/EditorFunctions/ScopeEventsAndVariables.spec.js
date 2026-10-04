@@ -655,7 +655,10 @@ describe('scope of the events and variables functions', () => {
             totalLines: lines.length,
           });
           expect(result.eventScript).not.toContain('value0');
-          readLines.push(...jsCodeExcerpt.code.split('\n'));
+          jsCodeExcerpt.code.split('\n').forEach((numberedLine, index) => {
+            expect(numberedLine).toMatch(new RegExp(`^${fromLine + index}\t`));
+            readLines.push(numberedLine.replace(/^\d+\t/, ''));
+          });
           fromLine = jsCodeExcerpt.toLine + 1;
           if (fromLine <= lines.length) {
             expect(result.notes).toContainEqual(
@@ -665,6 +668,38 @@ describe('scope of the events and variables functions', () => {
         }
         expect(calls).toBe(3);
         expect(readLines).toEqual(lines);
+      });
+
+      it('is searched line by line, with the lines around the matches', async () => {
+        const result = await readToast({ search: 'value2999 =' });
+        expect(result.jsCodeExcerpt).toEqual({
+          eventId: 'event-0',
+          fromLine: 2997,
+          toLine: 3000,
+          totalLines: lines.length,
+          code: [
+            '2997\tconst value2996 = 2996;',
+            '2998\tconst value2997 = 2997;',
+            '2999\tconst value2998 = 2998;',
+            '3000\tconst value2999 = 2999;',
+          ].join('\n'),
+        });
+
+        // Too many matches to fit: the note says where to continue.
+        const firstMatches = await readToast({ search: 'value1' });
+        const firstExcerpt = firstMatches.jsCodeExcerpt;
+        if (!firstExcerpt) throw new Error('Expected a jsCodeExcerpt.');
+        const nextLineMatch = (firstMatches.notes || [])
+          .join(' ')
+          .match(/`js_from_line: (\d+)`/);
+        if (!nextLineMatch) throw new Error('Expected a next js_from_line.');
+        const nextMatches = await readToast({
+          search: 'value1',
+          js_from_line: Number(nextLineMatch[1]),
+        });
+        const nextExcerpt = nextMatches.jsCodeExcerpt;
+        if (!nextExcerpt) throw new Error('Expected a jsCodeExcerpt.');
+        expect(nextExcerpt.fromLine).toBeGreaterThan(firstExcerpt.toLine - 4);
       });
 
       it('is read in full inside run_script', async () => {

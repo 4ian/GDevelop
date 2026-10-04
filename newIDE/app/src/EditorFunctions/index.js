@@ -19,6 +19,11 @@ import {
   type EventsTextRenderingError,
 } from '../EventsSheet/EventsTree/TextRenderer';
 import {
+  prepareEventSourceEdits,
+  renderEditedEventSnippet,
+  type PreparedEventSourceEdits,
+} from './EventSourceEdits';
+import {
   buildEventScriptSourceView,
   renderEventSourceById,
   renderScopeSummaryHeaderLines,
@@ -339,6 +344,8 @@ export type EditorFunctionGenericOutput = {|
   eventScript?: string,
   selectedEventIds?: Array<string>,
   jsCodeExcerpt?: JsCodeExcerpt,
+  // `generate_events` with `edits`: the numbered lines around the edits.
+  editedEventSnippets?: Array<{| eventId: string, snippet: string |}>,
   truncated?: boolean,
   notes?: Array<string>,
   generatedEventsErrorDiagnostics?: string,
@@ -7252,8 +7259,33 @@ const addSceneEvents: EditorFunction = {
         ? serializeToJSON(currentEventsList)
         : null;
 
+    // `edits` are applied here, to the current source of the event: the
+    // batch then replaces the event with the edited source, like an
+    // `event_script` would.
+    const preparedEventSourceEdits: Array<PreparedEventSourceEdits | null> = (
+      eventBatches || []
+    ).map((batch, index) =>
+      prepareEventSourceEdits({
+        eventsList: currentEventsList,
+        batch,
+        batchLabel:
+          eventBatches && eventBatches.length > 1 ? `Batch ${index + 1}: ` : '',
+      })
+    );
+    const editsFailureMessages = [];
+    for (const preparedEdits of preparedEventSourceEdits) {
+      if (preparedEdits && preparedEdits.success === false) {
+        editsFailureMessages.push(preparedEdits.message);
+      }
+    }
+    if (editsFailureMessages.length > 0) {
+      return makeGenericFailure(
+        `${editsFailureMessages.join('\n')}\nNothing was changed.`
+      );
+    }
+
     const parsedEventBatches = eventBatches
-      ? eventBatches.map(batch => {
+      ? eventBatches.map((batch, index) => {
           const placementRelation =
             SafeExtractor.extractStringProperty(batch, 'placement_relation') ||
             '(unspecified)';
@@ -7292,16 +7324,21 @@ const addSceneEvents: EditorFunction = {
               ? renderedTargetEventSource
               : null;
 
+          const preparedEdits = preparedEventSourceEdits[index];
+          const editedEventScript =
+            preparedEdits && preparedEdits.success
+              ? preparedEdits.eventScript
+              : null;
+
           return {
             eventsDescription:
               SafeExtractor.extractStringProperty(
                 batch,
                 'events_description'
               ) || '',
-            eventScript: SafeExtractor.extractStringProperty(
-              batch,
-              'event_script'
-            ),
+            eventScript:
+              editedEventScript ||
+              SafeExtractor.extractStringProperty(batch, 'event_script'),
             placementRelation,
             placementTargetEventId,
             placementExpectedParentEventId: SafeExtractor.extractStringProperty(
@@ -7312,10 +7349,14 @@ const addSceneEvents: EditorFunction = {
               batch,
               'placement_rationale'
             ),
-            expectedEventSource: SafeExtractor.extractStringProperty(
-              batch,
-              'expected_event_source'
-            ),
+            // The edits were applied to the current source of the event: it
+            // is what was read.
+            expectedEventSource: editedEventScript
+              ? placementTargetEventSource
+              : SafeExtractor.extractStringProperty(
+                  batch,
+                  'expected_event_source'
+                ),
             placementTargetEventSource,
           };
         })
@@ -7632,6 +7673,21 @@ See errors; verify event contents if needed.`
         };
         if (newlyAddedResources.length > 0) {
           output.newlyAddedResources = newlyAddedResources;
+        }
+        const editedEventSnippets = [];
+        for (const preparedEdits of preparedEventSourceEdits) {
+          if (preparedEdits && preparedEdits.success) {
+            editedEventSnippets.push({
+              eventId: preparedEdits.eventId,
+              snippet: renderEditedEventSnippet({
+                eventsList: upToDateEventsList,
+                preparedEdits,
+              }),
+            });
+          }
+        }
+        if (editedEventSnippets.length > 0) {
+          output.editedEventSnippets = editedEventSnippets;
         }
         if (errors.length > 0) {
           output.errors = errors;

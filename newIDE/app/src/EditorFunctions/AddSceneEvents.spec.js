@@ -1,6 +1,7 @@
 // @flow
 import { editorFunctions, type EditorFunctionGenericOutput } from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
+import { unserializeFromJSObject } from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -438,6 +439,185 @@ describe('add_scene_events', () => {
       ].join('\n')
     );
     expect(eventBatches[0].expectedEventSource).toBe('js(Player) """');
+  });
+
+  describe('edits', () => {
+    const launchWithEdits = (
+      generateEvents: any,
+      eventBatch: Object
+    ): Promise<EditorFunctionGenericOutput> =>
+      editorFunctions.generate_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        generateEvents,
+        args: {
+          scope: { type: 'scene', scene_name: 'TestScene' },
+          extension_names_list: '',
+          objects_list: 'Player',
+          event_batches: [
+            {
+              placement_relation: 'replace_event_but_keep_existing_sub_events',
+              placement_target_event_id: 'event-0',
+              placement_rationale: 'The same event.',
+              ...eventBatch,
+            },
+          ],
+        },
+      });
+
+    const addJsCodeEvent = (code: string) => {
+      const jsCodeEvent = gd.asJsCodeEvent(
+        project
+          .getLayout('TestScene')
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 0)
+      );
+      jsCodeEvent.setInlineCode(code);
+      jsCodeEvent.setParameterObjects('Player');
+    };
+
+    it('changes the code of a `js` event and returns the lines around the change', async () => {
+      addJsCodeEvent(
+        ['const a = 1;', 'const b = 2;', 'const c = 3;'].join('\n')
+      );
+      const editedCode = ['const a = 1;', 'const b = 20;', 'const c = 3;'].join(
+        '\n'
+      );
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn().mockResolvedValue({
+        generationCompleted: true,
+        aiGeneratedEvent: makeFakeAiGeneratedEvent({
+          operationName: 'replace_event_but_keep_existing_sub_events',
+          operationTargetEvent: 'event-0',
+          generatedEvents: JSON.stringify([
+            {
+              type: 'BuiltinCommonInstructions::JsCode',
+              inlineCode: editedCode,
+              parameterObjects: 'Player',
+              useStrict: true,
+              eventsSheetExpanded: false,
+            },
+          ]),
+        }),
+      });
+
+      const result = await launchWithEdits(generateEvents, {
+        edits: [{ old_string: 'const b = 2;', new_string: 'const b = 20;' }],
+      });
+
+      const { eventBatches } = generateEvents.mock.calls[0][0];
+      expect(eventBatches[0].eventScript).toBe(
+        ['js(Player) """  # event-0', editedCode, '"""'].join('\n')
+      );
+      expect(eventBatches[0].expectedEventSource).toBe(
+        eventBatches[0].placementTargetEventSource
+      );
+      expect(result.success).toBe(true);
+      expect(result.editedEventSnippets).toEqual([
+        {
+          eventId: 'event-0',
+          snippet: [
+            '1\tconst a = 1;',
+            '2\tconst b = 20;',
+            '3\tconst c = 3;',
+          ].join('\n'),
+        },
+      ]);
+    });
+
+    it('changes an event from a text copied with its indentation among the other events', async () => {
+      unserializeFromJSObject(
+        project.getLayout('TestScene').getEvents(),
+        [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [],
+            events: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [],
+                actions: [
+                  {
+                    type: { value: 'Delete' },
+                    parameters: ['MySpriteObject', ''],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+      const read = await editorFunctions.read_events_source.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scope: { type: 'scene', scene_name: 'TestScene' },
+          event_ids: ['event-0.0'],
+        },
+      });
+      const actionLine = (read.eventScript || '')
+        .split('\n')
+        .find(line => line.includes('MySpriteObject'));
+      if (!actionLine) throw new Error('Expected the action to be read.');
+      expect(actionLine.startsWith('    ')).toBe(true);
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
+
+      await launchWithEdits(generateEvents, {
+        placement_target_event_id: 'event-0.0',
+        edits: [
+          {
+            old_string: actionLine,
+            new_string: actionLine.replace('MySpriteObject', 'Player'),
+          },
+        ],
+      });
+
+      const { eventBatches } = generateEvents.mock.calls[0][0];
+      expect(eventBatches[0].eventScript.split('\n')).toContain(
+        `  ${actionLine.trim().replace('MySpriteObject', 'Player')}`
+      );
+      expect(eventBatches[0].eventScript).not.toContain('MySpriteObject');
+    });
+
+    it('changes nothing when an `old_string` is not found or found several times', async () => {
+      addJsCodeEvent(
+        ['const a = 1;', 'const a = 1;', 'const b = 2;'].join('\n')
+      );
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
+
+      const notFound = await launchWithEdits(generateEvents, {
+        edits: [{ old_string: 'const b = 2;\nconst c = 3;', new_string: '' }],
+      });
+      expect(notFound.success).toBe(false);
+      expect(notFound.message).toContain('is not in its current source');
+      expect(notFound.message).toContain(
+        'Its first line is found at line(s) 3'
+      );
+
+      const foundTwice = await launchWithEdits(generateEvents, {
+        edits: [{ old_string: 'const a = 1;', new_string: 'const a = 10;' }],
+      });
+      expect(foundTwice.success).toBe(false);
+      expect(foundTwice.message).toContain('found 2 times (at lines 1, 2)');
+      expect(generateEvents).not.toHaveBeenCalled();
+
+      await launchWithEdits(generateEvents, {
+        edits: [
+          {
+            old_string: 'const a = 1;',
+            new_string: 'const a = 10;',
+            replace_all: true,
+          },
+        ],
+      });
+      const { eventBatches } = generateEvents.mock.calls[0][0];
+      expect(eventBatches[0].eventScript).toContain(
+        ['const a = 10;', 'const a = 10;', 'const b = 2;'].join('\n')
+      );
+    });
   });
 
   it('fails when an extension required by the generated events cannot be installed', async () => {

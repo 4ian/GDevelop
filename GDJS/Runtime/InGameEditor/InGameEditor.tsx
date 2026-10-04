@@ -4004,8 +4004,9 @@ namespace gdjs {
     private _getCursorIn3D(
       excludedObjects?: Array<gdjs.RuntimeObject>
     ): Point3D | null {
-      const closestIntersect =
-        this._getClosestIntersectionUnderCursor({ excludedObjects });
+      const closestIntersect = this._getClosestIntersectionUnderCursor({
+        excludedObjects,
+      });
       if (closestIntersect) {
         return [
           closestIntersect.point.x,

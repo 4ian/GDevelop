@@ -2485,29 +2485,33 @@ module.exports = {
       const effect = extension
         .addEffect('Bloom')
         .setFullName(_('Bloom'))
-        .setDescription(_('Apply a bloom effect.'))
+        .setDescription(_('Make the brightest parts of the scene glow.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/BloomEffect.js');
       const properties = effect.getProperties();
       properties
         .getOrCreate('strength')
-        .setValue('1')
+        .setValue('0.5')
         .setLabel(_('Strength'))
         .setType('number')
         .setDescription(_('Between 0 and 3'));
       properties
         .getOrCreate('radius')
-        .setValue('0')
+        .setValue('0.4')
         .setLabel(_('Radius'))
         .setType('number')
         .setDescription(_('Between 0 and 1'));
       properties
         .getOrCreate('threshold')
-        .setValue('0')
+        .setValue('0.85')
         .setLabel(_('Threshold'))
         .setType('number')
-        .setDescription(_('Between 0 and 1'));
+        .setDescription(
+          _(
+            'Brightness from which pixels glow, between 0 and 1. With 0, the whole scene glows.'
+          )
+        );
     }
     {
       const effect = extension

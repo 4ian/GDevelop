@@ -24,6 +24,7 @@ import { ExposureShader } from 'three/examples/jsm/shaders/ExposureShader';
 
 import { N8AOPass } from '../../../SharedLibs/ThreeAddons/src/n8ao/N8AOPass.js';
 import { SceneDepthRenderPass } from '../../../SharedLibs/ThreeAddons/src/SceneDepthRenderPass.js';
+import { LowResolutionBloomPass } from '../../../SharedLibs/ThreeAddons/src/LowResolutionBloomPass.js';
 
 declare global {
   namespace THREE_ADDONS {
@@ -50,6 +51,7 @@ declare global {
       ExposureShader,
       N8AOPass,
       SceneDepthRenderPass,
+      LowResolutionBloomPass,
     };
   }
 }

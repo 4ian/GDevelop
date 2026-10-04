@@ -21,6 +21,7 @@ export { ShaderPass } from "./examples/jsm/postprocessing/ShaderPass";
 export { SMAAPass } from "./examples/jsm/postprocessing/SMAAPass";
 export { OutputPass } from "./examples/jsm/postprocessing/OutputPass";
 export { UnrealBloomPass } from "./examples/jsm/postprocessing/UnrealBloomPass";
+export { LowResolutionBloomPass } from "./LowResolutionBloomPass";
 
 export { BrightnessContrastShader } from "./examples/jsm/shaders/BrightnessContrastShader";
 export { HueSaturationShader } from "./examples/jsm/shaders/HueSaturationShader";

@@ -7,7 +7,8 @@ import {
 
 const gd: libGDevelop = global.gd;
 
-// The generation API refuses larger event scripts.
+// The generation API refuses larger event scripts (they are stored with the
+// generated events, in an item of 400KB at most).
 const MAX_EVENT_SCRIPT_LENGTH = 100000;
 const SNIPPET_CONTEXT_LINES = 3;
 const MAX_SNIPPET_LINES = 60;
@@ -31,6 +32,9 @@ type EditableEventSource = {|
   // The indentation of the event when it is read among the other events:
   // a text copied from there has it on every line.
   indentation: string,
+  // The code of a `js` event is changed directly: there is nothing to
+  // generate.
+  isJsCode: boolean,
   toEventScript: (text: string) => string,
 |};
 
@@ -39,6 +43,7 @@ export type PreparedEventSourceEdits =
   | {|
       success: true,
       eventId: string,
+      isJsCode: boolean,
       eventScript: string,
       editedText: string,
       editedRanges: Array<EditedRange>,
@@ -71,6 +76,7 @@ const getEditableEventSource = ({
       eventId,
       text: source,
       indentation: foundEvent.indentation,
+      isJsCode: false,
       toEventScript: text => text,
     };
   }
@@ -86,6 +92,7 @@ const getEditableEventSource = ({
       .getInlineCode()
       .replace(/\r\n/g, '\n'),
     indentation: foundEvent.indentation,
+    isJsCode: true,
     toEventScript: code =>
       [headerLine, ...(code === '' ? [] : [code]), closingLine].join('\n'),
   };
@@ -299,7 +306,10 @@ export const prepareEventSourceEdits = ({
   if (!editsResult.success) return fail(editsResult.message);
 
   const eventScript = editableEventSource.toEventScript(editsResult.text);
-  if (eventScript.length > MAX_EVENT_SCRIPT_LENGTH) {
+  if (
+    !editableEventSource.isJsCode &&
+    eventScript.length > MAX_EVENT_SCRIPT_LENGTH
+  ) {
     return fail(
       `The edited ${editableEventSource.eventId} is too large to be sent (${
         eventScript.length
@@ -309,11 +319,47 @@ export const prepareEventSourceEdits = ({
   return {
     success: true,
     eventId: editableEventSource.eventId,
+    isJsCode: editableEventSource.isJsCode,
     eventScript,
     editedText: editsResult.text,
     editedRanges: editsResult.editedRanges,
     includeSubEvents,
   };
+};
+
+/**
+ * An edit of `generate_events` as the lines it removes (`-`) and adds (`+`),
+ * to show it in the chat.
+ */
+export const formatEditAsDiff = (edit: any): string => {
+  const oldString =
+    edit && typeof edit.old_string === 'string' ? edit.old_string : '';
+  const newString =
+    edit && typeof edit.new_string === 'string' ? edit.new_string : '';
+  return [
+    ...oldString.split('\n').map(line => `- ${line}`),
+    ...newString.split('\n').map(line => `+ ${line}`),
+    ...(edit && edit.replace_all === true ? ['(every occurrence)'] : []),
+  ].join('\n');
+};
+
+/**
+ * Set the edited code on the `js` event: unlike the other events, nothing
+ * needs to be generated (so its size is not limited).
+ */
+export const applyJsCodeEdits = ({
+  eventsList,
+  preparedEdits: { eventId, editedText },
+}: {|
+  eventsList: gdEventsList,
+  preparedEdits: { eventId: string, editedText: string, ... },
+|}): void => {
+  const foundEvent = findEventByIdOrGroupName({
+    eventsList,
+    eventIdOrGroupName: eventId,
+  });
+  if (!foundEvent) return;
+  gd.asJsCodeEvent(foundEvent.event).setInlineCode(editedText);
 };
 
 /**

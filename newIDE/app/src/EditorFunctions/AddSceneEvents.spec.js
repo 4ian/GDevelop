@@ -475,41 +475,30 @@ describe('add_scene_events', () => {
       jsCodeEvent.setParameterObjects('Player');
     };
 
-    it('changes the code of a `js` event and returns the lines around the change', async () => {
+    const getJsCode = () =>
+      gd
+        .asJsCodeEvent(
+          project
+            .getLayout('TestScene')
+            .getEvents()
+            .getEventAt(0)
+        )
+        .getInlineCode();
+
+    it('changes the code of a `js` event directly and returns the lines around the change', async () => {
       addJsCodeEvent(
         ['const a = 1;', 'const b = 2;', 'const c = 3;'].join('\n')
       );
-      const editedCode = ['const a = 1;', 'const b = 20;', 'const c = 3;'].join(
-        '\n'
-      );
       // $FlowFixMe[underconstrained-implicit-instantiation]
-      const generateEvents = jest.fn().mockResolvedValue({
-        generationCompleted: true,
-        aiGeneratedEvent: makeFakeAiGeneratedEvent({
-          operationName: 'replace_event_but_keep_existing_sub_events',
-          operationTargetEvent: 'event-0',
-          generatedEvents: JSON.stringify([
-            {
-              type: 'BuiltinCommonInstructions::JsCode',
-              inlineCode: editedCode,
-              parameterObjects: 'Player',
-              useStrict: true,
-              eventsSheetExpanded: false,
-            },
-          ]),
-        }),
-      });
+      const generateEvents = jest.fn();
 
       const result = await launchWithEdits(generateEvents, {
         edits: [{ old_string: 'const b = 2;', new_string: 'const b = 20;' }],
       });
 
-      const { eventBatches } = generateEvents.mock.calls[0][0];
-      expect(eventBatches[0].eventScript).toBe(
-        ['js(Player) """  # event-0', editedCode, '"""'].join('\n')
-      );
-      expect(eventBatches[0].expectedEventSource).toBe(
-        eventBatches[0].placementTargetEventSource
+      expect(generateEvents).not.toHaveBeenCalled();
+      expect(getJsCode()).toBe(
+        ['const a = 1;', 'const b = 20;', 'const c = 3;'].join('\n')
       );
       expect(result.success).toBe(true);
       expect(result.editedEventSnippets).toEqual([
@@ -522,6 +511,65 @@ describe('add_scene_events', () => {
           ].join('\n'),
         },
       ]);
+    });
+
+    it('changes the code of a `js` event of any size', async () => {
+      const lines = Array.from(
+        { length: 20000 },
+        (_, index) => `const value${index} = ${index};`
+      );
+      addJsCodeEvent(lines.join('\n'));
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
+
+      const result = await launchWithEdits(generateEvents, {
+        edits: [
+          {
+            old_string: 'const value19999 = 19999;',
+            new_string: 'const value19999 = -1;',
+          },
+        ],
+      });
+
+      expect(result.success).toBe(true);
+      expect(getJsCode().length).toBeGreaterThan(400000);
+      expect(getJsCode().endsWith('const value19999 = -1;')).toBe(true);
+    });
+
+    it('refuses to mix the edits of a `js` event with batches generating events', async () => {
+      addJsCodeEvent('const a = 1;');
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
+
+      const result = await editorFunctions.generate_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        generateEvents,
+        args: {
+          scope: { type: 'scene', scene_name: 'TestScene' },
+          extension_names_list: '',
+          objects_list: '',
+          event_batches: [
+            {
+              placement_relation: 'replace_event_but_keep_existing_sub_events',
+              placement_target_event_id: 'event-0',
+              edits: [
+                { old_string: 'const a = 1;', new_string: 'const a = 2;' },
+              ],
+            },
+            {
+              placement_relation: 'append_to_end',
+              event_script: 'always:\n  pass',
+            },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain(
+        'in a `generate_events` call of their own'
+      );
+      expect(getJsCode()).toBe('const a = 1;');
+      expect(generateEvents).not.toHaveBeenCalled();
     });
 
     it('changes an event from a text copied with its indentation among the other events', async () => {
@@ -575,6 +623,7 @@ describe('add_scene_events', () => {
       });
 
       const { eventBatches } = generateEvents.mock.calls[0][0];
+      expect(eventBatches[0].isEventScriptFromEdits).toBe(true);
       expect(eventBatches[0].eventScript.split('\n')).toContain(
         `  ${actionLine.trim().replace('MySpriteObject', 'Player')}`
       );
@@ -613,8 +662,7 @@ describe('add_scene_events', () => {
           },
         ],
       });
-      const { eventBatches } = generateEvents.mock.calls[0][0];
-      expect(eventBatches[0].eventScript).toContain(
+      expect(getJsCode()).toBe(
         ['const a = 10;', 'const a = 10;', 'const b = 2;'].join('\n')
       );
     });

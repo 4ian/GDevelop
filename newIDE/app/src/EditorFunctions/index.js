@@ -19,6 +19,8 @@ import {
   type EventsTextRenderingError,
 } from '../EventsSheet/EventsTree/TextRenderer';
 import {
+  applyJsCodeEdits,
+  formatEditAsDiff,
   prepareEventSourceEdits,
   renderEditedEventSnippet,
   type PreparedEventSourceEdits,
@@ -437,6 +439,9 @@ export type EventBatch = {|
   // The actual current source of the target event, that the backend
   // compares the anchor against:
   placementTargetEventSource: string | null,
+  // `eventScript` was built from `edits` (its compile errors are always
+  // reported):
+  isEventScriptFromEdits: boolean,
 |};
 
 export type EventsGenerationOptions = {|
@@ -6885,6 +6890,8 @@ const addSceneEvents: EditorFunction = {
               batch,
               'event_script'
             );
+            const edits =
+              SafeExtractor.extractArrayProperty(batch, 'edits') || [];
             const placementRelation = SafeExtractor.extractStringProperty(
               batch,
               'placement_relation'
@@ -6932,6 +6939,21 @@ const addSceneEvents: EditorFunction = {
                     : {eventScript}
                   </Text>
                 )}
+                {edits.map((edit, index) => (
+                  <Text
+                    key={index}
+                    noMargin
+                    allowSelection
+                    color="secondary"
+                    size="body-small"
+                    style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                  >
+                    <b>
+                      <Trans>Edit</Trans>
+                    </b>
+                    {`:\n${formatEditAsDiff(edit)}`}
+                  </Text>
+                ))}
                 {placementRelation && (
                   <Text
                     noMargin
@@ -7284,6 +7306,58 @@ const addSceneEvents: EditorFunction = {
       );
     }
 
+    // The code of `js` events is changed directly (nothing to generate):
+    // such a call must only change `js` events, so that it stays atomic.
+    const jsCodeEdits = [];
+    for (const preparedEdits of preparedEventSourceEdits) {
+      if (preparedEdits && preparedEdits.success && preparedEdits.isJsCode) {
+        jsCodeEdits.push(preparedEdits);
+      }
+    }
+    if (jsCodeEdits.length > 0) {
+      if (jsCodeEdits.length !== preparedEventSourceEdits.length) {
+        return makeGenericFailure(
+          'The `edits` of a `js` event are applied directly, without generating events: give them in a `generate_events` call of their own, apart from the other batches. Nothing was changed.'
+        );
+      }
+      for (const preparedEdits of jsCodeEdits) {
+        applyJsCodeEdits({ eventsList: currentEventsList, preparedEdits });
+      }
+      if (eventsFunction) {
+        const extensionName = resolvedScope.eventsFunctionsExtension
+          ? resolvedScope.eventsFunctionsExtension.getName()
+          : '';
+        onSceneEventsModifiedOutsideEditor({
+          scene: null,
+          eventsFunction,
+          extensionName,
+          newOrChangedAiGeneratedEventIds: new Set(),
+        });
+        onExtensionsModifiedOutsideEditor({
+          extensionNames: [extensionName],
+          needsCodeRegeneration: true,
+        });
+      } else {
+        onSceneEventsModifiedOutsideEditor({
+          scene,
+          newOrChangedAiGeneratedEventIds: new Set(),
+        });
+      }
+      return {
+        success: true,
+        message: `Changed the code of the \`js\` event(s) ${jsCodeEdits
+          .map(preparedEdits => preparedEdits.eventId)
+          .join(', ')}.`,
+        editedEventSnippets: jsCodeEdits.map(preparedEdits => ({
+          eventId: preparedEdits.eventId,
+          snippet: renderEditedEventSnippet({
+            eventsList: currentEventsList,
+            preparedEdits,
+          }),
+        })),
+      };
+    }
+
     const parsedEventBatches = eventBatches
       ? eventBatches.map((batch, index) => {
           const placementRelation =
@@ -7358,6 +7432,7 @@ const addSceneEvents: EditorFunction = {
                   'expected_event_source'
                 ),
             placementTargetEventSource,
+            isEventScriptFromEdits: !!editedEventScript,
           };
         })
       : null;

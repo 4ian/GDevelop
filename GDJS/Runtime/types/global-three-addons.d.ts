@@ -23,6 +23,7 @@ import { HueSaturationShader } from 'three/examples/jsm/shaders/HueSaturationSha
 import { ExposureShader } from 'three/examples/jsm/shaders/ExposureShader';
 
 import { N8AOPass } from '../../../SharedLibs/ThreeAddons/src/n8ao/N8AOPass.js';
+import { SceneDepthRenderPass } from '../../../SharedLibs/ThreeAddons/src/SceneDepthRenderPass.js';
 
 declare global {
   namespace THREE_ADDONS {
@@ -48,6 +49,7 @@ declare global {
       HueSaturationShader,
       ExposureShader,
       N8AOPass,
+      SceneDepthRenderPass,
     };
   }
 }

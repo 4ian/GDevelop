@@ -2593,6 +2593,60 @@ module.exports = {
           )
         );
     }
+    {
+      const effect = extension
+        .addEffect('DepthOfField')
+        .setFullName(_('Depth of field'))
+        .setDescription(
+          _(
+            'Blur what is closer or further than the focus distance, like a camera lens.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/DepthOfFieldEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('focusDistance')
+        .setValue('500')
+        .setLabel(_('Focus distance'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _('Distance from the camera where the image is the sharpest.')
+        );
+      properties
+        .getOrCreate('focusRange')
+        .setValue('600')
+        .setLabel(_('Focus range'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _('Depth around the focus distance staying fully sharp.')
+        );
+      properties
+        .getOrCreate('transitionDistance')
+        .setValue('1500')
+        .setLabel(_('Transition distance'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _(
+            'Distance after the focus range over which the blur increases up to its maximum.'
+          )
+        );
+      properties
+        .getOrCreate('maxBlur')
+        .setValue('6')
+        .setLabel(_('Maximum blur'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _(
+            'Blur radius of the most out-of-focus parts, in pixels of the game resolution.'
+          )
+        );
+    }
     // Don't forget to update the alert condition in Model3DEditor.js when
     // adding a new light.
 

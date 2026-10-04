@@ -215,7 +215,11 @@ namespace gdjs {
       | null = null;
     private _threeCameraDirty: boolean = false;
     private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
-    private hasCustomRenderPass = false;
+    private _threeRenderPass: THREE_ADDONS.RenderPass | null = null;
+    private _customRenderPass: THREE_ADDONS.N8AOPass | null = null;
+    private _sceneDepthRenderPass: THREE_ADDONS.SceneDepthRenderPass | null =
+      null;
+    private _sceneDepthTextureUsersCount = 0;
     private _basis: Basis | null = null;
     private static matrix4: THREE.Matrix4 | null = null;
 
@@ -362,7 +366,7 @@ namespace gdjs {
       if (!this._threeEffectComposer) {
         return false;
       }
-      if (this.hasCustomRenderPass) {
+      if (this._threeEffectComposer.passes[0] !== this._threeRenderPass) {
         return true;
       }
       const game = this._layer.getRuntimeScene().getGame();
@@ -371,33 +375,69 @@ namespace gdjs {
       return this._threeEffectComposer.passes.length > emptyCount;
     }
 
-    setCustomRenderPass(pass: THREE_ADDONS.Pass | null) {
+    /**
+     * Replace the pass rendering the scene to compute the ambient occlusion.
+     * @param pass The pass rendering the scene, or null to use the default one.
+     */
+    setCustomRenderPass(pass: THREE_ADDONS.N8AOPass | null) {
+      this._customRenderPass = pass;
+      this._updateSceneRenderPass();
+    }
+
+    /**
+     * Declare that an effect needs the depth of the scene (see
+     * `getSceneDepthTexture`), or doesn't need it anymore.
+     */
+    setSceneDepthTextureNeeded(isNeeded: boolean) {
+      this._sceneDepthTextureUsersCount = Math.max(
+        0,
+        this._sceneDepthTextureUsersCount + (isNeeded ? 1 : -1)
+      );
+      this._updateSceneRenderPass();
+    }
+
+    /**
+     * @returns The depth of the scene rendered in this frame, if an effect
+     * declared it needed it with `setSceneDepthTextureNeeded`.
+     */
+    getSceneDepthTexture(): THREE.DepthTexture | null {
+      if (this._customRenderPass) {
+        return this._customRenderPass.beautyRenderTarget.depthTexture;
+      }
+      if (this._sceneDepthTextureUsersCount > 0 && this._sceneDepthRenderPass) {
+        return this._sceneDepthRenderPass.depthTexture;
+      }
+      return null;
+    }
+
+    private _updateSceneRenderPass() {
       if (
         !this._threeEffectComposer ||
+        !this._threeRenderPass ||
         !this._threeScene ||
         !this._threeCamera
       ) {
         return;
       }
-      if (!this.hasCustomRenderPass && !pass) {
+      let sceneRenderPass: THREE_ADDONS.Pass = this._threeRenderPass;
+      if (this._customRenderPass) {
+        sceneRenderPass = this._customRenderPass;
+      } else if (this._sceneDepthTextureUsersCount > 0) {
+        if (!this._sceneDepthRenderPass) {
+          this._sceneDepthRenderPass = new THREE_ADDONS.SceneDepthRenderPass(
+            this._threeScene,
+            this._threeCamera
+          );
+        }
+        sceneRenderPass = this._sceneDepthRenderPass;
+      }
+      if (this._threeEffectComposer.passes[0] === sceneRenderPass) {
         return;
       }
-      const oldRenderPass = this._threeEffectComposer.passes[0];
-      if (pass) {
-        // The pass was not resized with the composer while it was removed.
-        const renderTarget = this._threeEffectComposer.renderTarget1;
-        pass.setSize(renderTarget.width, renderTarget.height);
-      }
-
-      this._threeEffectComposer.passes[0] = pass
-        ? pass
-        : new THREE_ADDONS.RenderPass(this._threeScene, this._threeCamera);
-
-      if (!this.hasCustomRenderPass) {
-        // Dispose the default render pass
-        oldRenderPass.dispose();
-      }
-      this.hasCustomRenderPass = !!pass;
+      // The pass was not resized with the composer while it was not in it.
+      const renderTarget = this._threeEffectComposer.renderTarget1;
+      sceneRenderPass.setSize(renderTarget.width, renderTarget.height);
+      this._threeEffectComposer.passes[0] = sceneRenderPass;
     }
 
     /**
@@ -467,9 +507,11 @@ namespace gdjs {
             this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
               threeRenderer
             );
-            this._threeEffectComposer.addPass(
-              new THREE_ADDONS.RenderPass(this._threeScene, this._threeCamera)
+            this._threeRenderPass = new THREE_ADDONS.RenderPass(
+              this._threeScene,
+              this._threeCamera
             );
+            this._threeEffectComposer.addPass(this._threeRenderPass);
             if (game.getAntialiasingMode() !== 'none') {
               this._threeEffectComposer.addPass(new THREE_ADDONS.SMAAPass());
             }

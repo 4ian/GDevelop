@@ -4,6 +4,7 @@
  */
 
 export { N8AOPass } from "./n8ao/N8AOPass";
+export { SceneDepthRenderPass } from "./SceneDepthRenderPass";
 
 export { GLTFLoader } from "./examples/jsm/loaders/GLTFLoader";
 export { DRACOLoader } from "./examples/jsm/loaders/DRACOLoader";

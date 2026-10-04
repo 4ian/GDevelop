@@ -17,7 +17,6 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useInGameEditorSettings } from './InGameEditorSettings';
 import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
 import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
-import { releaseSessionRecordingOfPreviousIframeDocuments } from '../Utils/Analytics/EventSender';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -683,8 +682,6 @@ export const EmbeddedGameFrame = ({
           // Listened on the iframe itself and not on its container, so that the overlay
           // covering it (drop target, pointer events blocker) doesn't take the focus.
           onMouseOver={focusGameFrameOnHover}
-          // The iframe is navigated in place by each hard reload of the game.
-          onLoad={releaseSessionRecordingOfPreviousIframeDocuments}
           style={{
             position: 'absolute',
             top: 0,

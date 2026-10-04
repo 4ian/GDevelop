@@ -19,7 +19,6 @@ import {
 } from './GameplayTestStatusIndicator';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import classes from './GameplayTestFrame.module.css';
-import { releaseSessionRecordingOfPreviousIframeDocuments } from '../Utils/Analytics/EventSender';
 
 /**
  * Why and for how long a run was frozen because the editor was in the
@@ -902,8 +901,6 @@ export const GameplayTestFrame = ({
         // The test simulates all the inputs itself: never let the user
         // interact with (or focus) the game.
         className={classes.gameIframe}
-        // The iframe is navigated in place when a new test is launched while it's shown.
-        onLoad={releaseSessionRecordingOfPreviousIframeDocuments}
       />
     </GameplayTestFrameLayout>
   );

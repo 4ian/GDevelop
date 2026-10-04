@@ -198,26 +198,12 @@ export const installAnalyticsEvents = () => {
       posthogLoaded = true;
     },
     autocapture: false, // we disable autocapture because we want to control which events we send.
+    session_recording: {
+      // Iframes (in-game editor, gameplay tests) are not recorded: the recording would
+      // keep a reference to every document loaded in them (including game WebAssembly memories).
+      blockSelector: 'iframe',
+    },
   });
-};
-
-/**
- * Must be called each time a document is loaded in an iframe of the editor that stays
- * in the DOM while being navigated (the in-game editor and gameplay test frames, notably
- * at each hard reload).
- *
- * The session recording keeps a reference to every document loaded in a same-origin
- * iframe, until the iframe element is removed from the DOM. Without this, every
- * previous game document would be retained, with all its memory (including
- * WebAssembly memories, which are limited and end up failing to be allocated).
- * Restarting the recording releases them.
- */
-export const releaseSessionRecordingOfPreviousIframeDocuments = () => {
-  if (isDev || !posthogLoaded) return;
-  if (!posthog.sessionRecordingStarted()) return;
-
-  posthog.stopSessionRecording();
-  posthog.startSessionRecording();
 };
 
 /**

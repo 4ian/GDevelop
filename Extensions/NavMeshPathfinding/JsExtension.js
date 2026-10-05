@@ -262,8 +262,7 @@ module.exports = {
           .setValue(
             sharedContent.getChild('cellSize').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('cellDepth')
@@ -274,8 +273,7 @@ module.exports = {
           .setValue(
             sharedContent.getChild('cellDepth').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('slopeMaxAngle')
@@ -289,8 +287,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('stairHeightMax')
@@ -304,8 +301,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('walkableRadius')
@@ -323,8 +319,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('walkableDepth')
@@ -343,8 +338,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('speedScaleY')
@@ -359,8 +353,7 @@ module.exports = {
           .setValue(
             sharedContent.getChild('speedScaleY').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         return sharedProperties;
       };
@@ -812,7 +805,6 @@ module.exports = {
           .setValue(behaviorContent.getChild('shape').getStringValue())
           .setType('Choice')
           .setLabel('Shape')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addChoice('Box', _('Box'))
           .addChoice('Mesh', _('Mesh'));
         behaviorProperties

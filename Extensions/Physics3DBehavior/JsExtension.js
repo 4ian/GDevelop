@@ -299,7 +299,6 @@ module.exports = {
           .setValue(behaviorContent.getChild('object3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D capability')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Scene3D::Base3DBehavior');
 
         behaviorProperties
@@ -307,7 +306,6 @@ module.exports = {
           .setValue(behaviorContent.getChild('bodyType').getStringValue())
           .setType('Choice')
           .setLabel('Type')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addChoice('Static', _('Static'))
           .addChoice('Dynamic', _('Dynamic'))
           .addChoice('Kinematic', _('Kinematic'))
@@ -322,7 +320,6 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('bullet').getBoolValue() ? 'true' : 'false'
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setType('Boolean')
           .setLabel(_('Considered as a bullet'))
           .setDescription(
@@ -339,7 +336,6 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setType('Boolean')
           .setLabel('Fixed Rotation')
           .setDescription(
@@ -358,7 +354,6 @@ module.exports = {
               'The shape used for collisions. It gives their meaning to the dimension properties. A capsule or a cylinder is extended along the axis given by "Shape orientation" and a mesh uses the model given by "Simplified 3D model".'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addChoice('Box', _('Box'))
           .addChoice('Capsule', _('Capsule'))
           .addChoice('Sphere', _('Sphere'))
@@ -387,7 +382,6 @@ module.exports = {
           .setDescription(
             _('Axis along which the capsule or cylinder is extended.')
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addChoice('Z', _('Z'))
           .addChoice('Y', _('Y'))
           .addChoice('X', _('X'))
@@ -409,7 +403,6 @@ module.exports = {
               'Width of the box, or radius of the sphere, capsule or cylinder. Use 0 to follow the object size.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           // The "Mesh" shape uses a 3D model instead of dimensions.
           .setHidden(isMeshShape);
         behaviorProperties
@@ -428,7 +421,6 @@ module.exports = {
               'Height of the box, or size of the capsule or cylinder along its orientation axis. Not used by a sphere. Use 0 to follow the object size.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           // A sphere only needs a radius and a mesh uses a 3D model.
           .setHidden(isMeshShape || shape === 'Sphere');
         behaviorProperties
@@ -447,7 +439,6 @@ module.exports = {
               'Depth of the box. Only used by a box. Use 0 to follow the object depth.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           // Only a box has a third dimension to configure.
           .setHidden(!isBoxShape);
         if (!behaviorContent.hasChild('shapeOffsetX')) {
@@ -469,7 +460,6 @@ module.exports = {
               'Offset of the collision shape relative to the object center, on the X axis.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true);
         if (!behaviorContent.hasChild('shapeOffsetY')) {
           behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
@@ -490,7 +480,6 @@ module.exports = {
               'Offset of the collision shape relative to the object center, on the Y axis.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true);
         if (!behaviorContent.hasChild('shapeOffsetZ')) {
           behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
@@ -511,7 +500,6 @@ module.exports = {
               'Offset of the collision shape relative to the object center, on the Z axis.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetX')) {
           behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
@@ -532,7 +520,6 @@ module.exports = {
               'Offset of the center of mass relative to the object center, on the X axis.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetY')) {
           behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
@@ -553,7 +540,6 @@ module.exports = {
               'Offset of the center of mass relative to the object center, on the Y axis.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true);
         if (!behaviorContent.hasChild('massCenterOffsetZ')) {
           behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
@@ -574,7 +560,6 @@ module.exports = {
               'Offset of the center of mass relative to the object center, on the Z axis.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true);
         behaviorProperties
           .getOrCreate('density')
@@ -664,7 +649,6 @@ module.exports = {
               "Angular damping reduces an object's rotational speed over time, making its spins slow down smoothly."
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Movement'));
         behaviorProperties
           .getOrCreate('gravityScale')
@@ -682,7 +666,6 @@ module.exports = {
             )
           )
 
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Gravity'))
           .setAdvanced(true);
         behaviorProperties
@@ -701,7 +684,6 @@ module.exports = {
               'Layers the object belongs to, as a bitmask. Static objects use the layers 1 to 4 (1, 2, 4 and 8) and moving ones the layers 5 to 8 (16, 32, 64 and 128).'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Collision filtering'))
           .setAdvanced(true);
         behaviorProperties
@@ -717,7 +699,6 @@ module.exports = {
               'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 8 which is 128. Not used by static objects, which accept every collision.'
             )
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Collision filtering'))
           .setAdvanced(true)
           // Static objects accept every collision: it's the mask of the moving
@@ -1998,7 +1979,6 @@ module.exports = {
           .setValue(behaviorContent.getChild('physics3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D physics')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Physics3D::Physics3DBehavior');
 
         behaviorProperties
@@ -2014,7 +1994,6 @@ module.exports = {
         behaviorProperties
           .getOrCreate('jumpSustainTime')
           .setLabel(_('Jump sustain time'))
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Jump'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getSecond())
@@ -2146,8 +2125,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         if (!behaviorContent.hasChild('stairHeightMax')) {
           behaviorContent.addChild('stairHeightMax').setDoubleValue(20);
@@ -2164,8 +2142,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('shouldBindObjectAndForwardAngle')
@@ -2179,8 +2156,7 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         if (!behaviorContent.hasChild('canBePushed')) {
           behaviorContent.addChild('canBePushed').setBoolValue(true);
@@ -2195,8 +2171,7 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         return behaviorProperties;
       };
@@ -3142,7 +3117,6 @@ module.exports = {
           .setValue(behaviorContent.getChild('physics3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D physics')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Physics3D::Physics3DBehavior');
 
         behaviorProperties
@@ -3156,8 +3130,7 @@ module.exports = {
               .getChild('steerAngleMax')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('beginningSteerSpeed')
@@ -3170,8 +3143,7 @@ module.exports = {
               .getChild('beginningSteerSpeed')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('endSteerSpeed')
@@ -3184,8 +3156,7 @@ module.exports = {
               .getChild('endSteerSpeed')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('engineTorqueMax')
@@ -3238,8 +3209,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio1')
@@ -3249,8 +3219,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio1').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio2')
@@ -3260,8 +3229,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio2').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio3')
@@ -3271,8 +3239,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio3').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio4')
@@ -3282,8 +3249,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio4').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio5')
@@ -3293,8 +3259,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio5').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('gearRatio6')
@@ -3304,8 +3269,7 @@ module.exports = {
           .setValue(
             behaviorContent.getChild('gearRatio6').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('wheelRadius')
@@ -3318,8 +3282,7 @@ module.exports = {
               .getChild('wheelRadius')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('wheelWidth')
@@ -3329,8 +3292,7 @@ module.exports = {
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
             behaviorContent.getChild('wheelWidth').getDoubleValue().toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('backWheelOffsetX')
@@ -3345,8 +3307,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('frontWheelOffsetX')
@@ -3361,8 +3322,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('wheelOffsetY')
@@ -3377,8 +3337,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('wheelOffsetZ')
@@ -3393,8 +3352,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('brakeTorqueMax')
@@ -3406,8 +3364,7 @@ module.exports = {
               .getChild('brakeTorqueMax')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('handBrakeTorqueMax')
@@ -3419,8 +3376,7 @@ module.exports = {
               .getChild('handBrakeTorqueMax')
               .getDoubleValue()
               .toString(10)
-          )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          );
 
         behaviorProperties
           .getOrCreate('hasBackWheelDrive')
@@ -3429,12 +3385,10 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setType('Boolean')
           .setLabel(_('Back wheel drive'))
           .setGroup(_('Wheels'))
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('hasFrontWheelDrive')
@@ -3443,12 +3397,10 @@ module.exports = {
               ? 'true'
               : 'false'
           )
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setType('Boolean')
           .setLabel(_('Front wheel drive'))
           .setGroup(_('Wheels'))
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         behaviorProperties
           .getOrCreate('pitchRollAngleMax')
@@ -3462,8 +3414,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         return behaviorProperties;
       };

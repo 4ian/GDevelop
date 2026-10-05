@@ -113,7 +113,6 @@ import {
   type ExtensionsOutsideEditorChanges,
   type WillDeleteExtensionItemChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
-import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -237,7 +236,6 @@ import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
-import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
 import useCreateProject, {
   type UseCreateProjectReturnType,
 } from '../Utils/UseCreateProject';
@@ -260,7 +258,6 @@ import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
-import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizationDialog';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
@@ -434,7 +431,6 @@ export type Props = {|
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   initialExampleSlugToOpen: ?string,
-  quickPublishOnlineWebExporter: Exporter,
   i18n: I18n,
   useCliCommandRunner: ({|
     project: ?gdProject,
@@ -698,10 +694,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     fileMetadataOpeningMessage,
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
-  const [
-    quickCustomizationDialogOpenedFromGameId,
-    setQuickCustomizationDialogOpenedFromGameId,
-  ] = React.useState<?string>(null);
 
   const [gameEditorMode, setGameEditorMode] = React.useState<
     'embedded-game' | 'instances-editor'
@@ -747,7 +739,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     i18n,
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
-    quickPublishOnlineWebExporter,
     useCliCommandRunner,
     onExportHtml5External,
   } = props;
@@ -778,8 +769,6 @@ const MainFrame = (props: Props): React.MixedElement => {
   const {
     createCaptureOptionsForPreview,
     onCaptureFinished,
-    onGameScreenshotsClaimed,
-    getGameUnverifiedScreenshotUrls,
     getHotReloadPreviewLaunchCaptureOptions,
   } = useCapturesManager({ project: currentProject, gamesList });
 
@@ -1674,15 +1663,10 @@ const MainFrame = (props: Props): React.MixedElement => {
         }));
       }
       closeNewProjectDialog();
-      if (options.openQuickCustomizationDialog) {
-        setQuickCustomizationDialogOpenedFromGameId(oldProjectId);
-      } else {
-        // Replace leaderboards and configure multiplayer lobbies if needed.
-        // In the case of quick customization, this will be done later.
-        openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
-        configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
-      }
-      options.openAllScenes || options.openQuickCustomizationDialog
+      // Replace leaderboards and configure multiplayer lobbies if needed.
+      openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
+      configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
+      options.openAllScenes
         ? openAllScenes({
             currentProject: project,
             editorTabs,
@@ -2983,8 +2967,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         if (!isForInGameEdition)
           sendPreviewStarted({
             projectUuid: currentProject.getProjectUuid(),
-            quickCustomizationGameId:
-              quickCustomizationDialogOpenedFromGameId || null,
             networkPreview: !!networkPreview,
             hotReload: !!hotReload,
             projectDataOnlyExport:
@@ -3036,7 +3018,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       preferences.values.openDiagnosticReportAutomatically,
       currentlyRunningInAppTutorial,
       getAuthenticatedPlayerForPreview,
-      quickCustomizationDialogOpenedFromGameId,
       onCaptureFinished,
       createCaptureOptionsForPreview,
       inGameEditorSettings,
@@ -3158,22 +3139,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       hardReloadAllPreviews();
     },
     [hardReloadAllPreviews, launchPreview]
-  );
-
-  const launchQuickCustomizationPreview = React.useCallback(
-    () =>
-      launchPreview({
-        networkPreview: false,
-        launchCaptureOptions: {
-          screenshots: [
-            { delayTimeInSeconds: 1000 }, // Take one quickly in case the user closes the preview too fast.
-            { delayTimeInSeconds: 5000 }, // Take another one after longer into the game.
-          ],
-        },
-        hotReload: true,
-        shouldGenerateScenesEventsCode: false,
-      }),
-    [launchPreview]
   );
 
   const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = React.useMemo(
@@ -3435,7 +3400,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     [setStandaloneDialogOpen]
   );
 
-  const { navigateToRoute } = useHomePageSwitch({
+  useHomePageSwitch({
     openHomePage,
     closeDialogs: closeDialogsToOpenHomePage,
   });
@@ -5237,7 +5202,6 @@ const MainFrame = (props: Props): React.MixedElement => {
   const renderSaveReminder = useSaveReminder({
     onSave: saveProject,
     project: currentProject,
-    isInQuickCustomization: !!quickCustomizationDialogOpenedFromGameId,
   });
 
   /**
@@ -6178,10 +6142,6 @@ const MainFrame = (props: Props): React.MixedElement => {
             crashReportUploadLevel:
               preferences.values.previewCrashReportUploadLevel ||
               'exclude-javascript-code-events',
-            previewContext: quickCustomizationDialogOpenedFromGameId
-              ? 'preview-quick-customization'
-              : 'preview',
-            sourceGameId: quickCustomizationDialogOpenedFromGameId || '',
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => {
@@ -6412,11 +6372,6 @@ const MainFrame = (props: Props): React.MixedElement => {
             openPreferencesDialog(false);
             if (options.languageDidChange) _languageDidChange();
           }}
-          onOpenQuickCustomizationDialog={() =>
-            setQuickCustomizationDialogOpenedFromGameId(
-              'fake-source-game-id-for-testing'
-            )
-          }
         />
       )}
       {languageDialogOpen && (
@@ -6623,75 +6578,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       )}
       {standaloneDialogOpen && (
         <StandaloneDialog onClose={() => setStandaloneDialogOpen(false)} />
-      )}
-      {quickCustomizationDialogOpenedFromGameId && currentProject && (
-        <QuickCustomizationDialog
-          project={currentProject}
-          resourceManagementProps={resourceManagementProps}
-          onLaunchPreview={launchQuickCustomizationPreview}
-          onClose={async options => {
-            if (hasUnsavedChanges) {
-              const response = await showConfirmation({
-                title: t`Leave the customization?`,
-                message: t`Do you want to quit the customization? All your changes will be lost.`,
-                confirmButtonLabel: t`Leave`,
-              });
-
-              if (!response) {
-                return;
-              }
-            }
-
-            setQuickCustomizationDialogOpenedFromGameId(null);
-            await closeProject();
-            openHomePage();
-            if (!hasUnsavedChanges) {
-              navigateToRoute('build');
-            }
-          }}
-          onlineWebExporter={quickPublishOnlineWebExporter}
-          isRequiredToSaveAsNewCloudProject={() => {
-            const storageProvider = getStorageProvider();
-            return storageProvider.internalName !== 'Cloud';
-          }}
-          onSaveProject={async () => {
-            // Automatically try to save project to the cloud.
-            const storageProvider = getStorageProvider();
-            if (storageProvider.internalName === 'Cloud') {
-              saveProject();
-              return;
-            }
-
-            if (
-              !['Empty', 'UrlStorageProvider'].includes(
-                storageProvider.internalName
-              )
-            ) {
-              console.error(
-                `Unexpected storage provider ${
-                  storageProvider.internalName
-                } when saving project from quick customization dialog. Saving anyway as a new cloud project.`
-              );
-            }
-
-            saveProjectAsWithStorageProvider({
-              requestedStorageProvider: CloudStorageProvider,
-              forcedSavedAsLocation: {
-                name: currentProject.getName(),
-              },
-            });
-            return;
-          }}
-          isSavingProject={isSavingProject}
-          canClose
-          sourceGameId={quickCustomizationDialogOpenedFromGameId}
-          gameScreenshotUrls={getGameUnverifiedScreenshotUrls(
-            currentProject.getProjectUuid()
-          )}
-          onScreenshotsClaimed={onGameScreenshotsClaimed}
-          onWillInstallExtension={onWillInstallExtension}
-          onExtensionInstalled={onExtensionInstalled}
-        />
       )}
       {memoryTrackerRegistryDialogOpen && (
         <MemoryTrackedRegistryDialog

@@ -998,7 +998,6 @@ const serializeNamedProperty = (
     name,
     ...serializeToJSObject(property),
     group: undefined,
-    quickCustomizationVisibility: undefined,
     advanced: undefined,
     ...(isEmptyFontResource
       ? { hint: 'An empty font is valid: the default font is used.' }

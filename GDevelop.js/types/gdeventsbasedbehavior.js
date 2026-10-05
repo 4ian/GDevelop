@@ -10,8 +10,6 @@ declare class gdEventsBasedBehavior extends gdAbstractEventsBasedEntity {
   setHelpPath(helpPath: string): gdEventsBasedBehavior;
   setObjectType(fullName: string): gdEventsBasedBehavior;
   getObjectType(): string;
-  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): gdEventsBasedBehavior;
-  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   getSharedPropertyDescriptors(): gdPropertiesContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;

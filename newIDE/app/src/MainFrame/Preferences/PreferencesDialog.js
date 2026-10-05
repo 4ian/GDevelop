@@ -339,7 +339,6 @@ const styles = {
 type Props = {|
   i18n: I18n,
   onClose: (options: {| languageDidChange: boolean |}) => void,
-  onOpenQuickCustomizationDialog: () => void,
   /** The tab displayed when the dialog opens. Defaults to the preferences. */
   initialTab?: PreferencesTabName,
   /** The preferences section displayed when the dialog opens. Defaults to the general one. */
@@ -379,7 +378,6 @@ const SettingToggle = ({
 const PreferencesDialog = ({
   i18n,
   onClose,
-  onOpenQuickCustomizationDialog,
   initialTab,
   initialSection,
   isDesktop = !!electron,
@@ -1238,16 +1236,6 @@ const PreferencesDialog = ({
                   values.useGDJSDevelopmentWatcher,
                   setUseGDJSDevelopmentWatcher
                 ),
-            },
-            {
-              id: 'quick-customization',
-              label: i18n._(t`Quick customization`),
-              renderControl: () => (
-                <FlatButton
-                  onClick={onOpenQuickCustomizationDialog}
-                  label={<Trans>Open</Trans>}
-                />
-              ),
             },
           ],
         };

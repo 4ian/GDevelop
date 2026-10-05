@@ -105,7 +105,6 @@
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Project/VariablesContainersList.h>
-#include <GDCore/Project/QuickCustomization.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <GDCore/Serialization/BinarySerializer.h>
@@ -537,8 +536,6 @@ typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
 typedef std::vector<const gd::PropertyFolderOrProperty*> VectorPropertyFolderOrProperty;
 typedef std::vector<const gd::FunctionFolderOrFunction*> VectorFunctionFolderOrFunction;
 typedef std::vector<gd::Screenshot> VectorScreenshot;
-typedef QuickCustomization::Visibility
-    QuickCustomization_Visibility;
 typedef CustomObjectConfiguration::EdgeAnchor
     CustomObjectConfiguration_EdgeAnchor;
 

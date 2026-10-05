@@ -71,12 +71,6 @@ export enum ResourcesContainer_SourceType {
   Properties = 3,
 }
 
-export enum QuickCustomization_Visibility {
-  Default = 0,
-  Visible = 1,
-  Hidden = 2,
-}
-
 export enum ProjectDiagnostic_ErrorType {
   UndeclaredVariable = 0,
   MissingBehavior = 1,
@@ -527,8 +521,6 @@ export class ObjectFolderOrObject extends EmscriptenObject {
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ObjectFolderOrObject): void;
   isADescendantOf(otherObjectFolderOrObject: ObjectFolderOrObject): boolean;
-  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
-  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): void;
 }
 
 export class ObjectsContainer extends EmscriptenObject {
@@ -751,7 +743,6 @@ export class Behavior extends EmscriptenObject {
   isFolded(): boolean;
   setFolded(folded: boolean): void;
   isDefaultBehavior(): boolean;
-  getPropertiesQuickCustomizationVisibilities(): QuickCustomizationVisibilitiesContainer;
 }
 
 export class BehaviorJsImplementation extends Behavior {
@@ -771,7 +762,6 @@ export class BehaviorsSharedData extends EmscriptenObject {
   initializeContent(): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
-  getPropertiesQuickCustomizationVisibilities(): QuickCustomizationVisibilitiesContainer;
 }
 
 export class BehaviorSharedDataJsImplementation extends BehaviorsSharedData {
@@ -1098,8 +1088,6 @@ export class PropertyDescriptor extends EmscriptenObject {
   setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
   hasImpactOnOtherProperties(): boolean;
   setHasImpactOnOtherProperties(enable: boolean): PropertyDescriptor;
-  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
-  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): PropertyDescriptor;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   serializeValuesTo(element: SerializerElement): void;
@@ -1786,17 +1774,6 @@ export class InGameEditorResourceMetadata extends EmscriptenObject {
   setKind(kind: string): InGameEditorResourceMetadata;
 }
 
-export class QuickCustomization extends EmscriptenObject {
-  static Default = 0;
-  static Visible = 1;
-  static Hidden = 2;
-}
-
-export class QuickCustomizationVisibilitiesContainer extends EmscriptenObject {
-  set(name: string, visibility: QuickCustomization_Visibility): void;
-  get(name: string): QuickCustomization_Visibility;
-}
-
 export class Screenshot extends EmscriptenObject {
   getDelayTimeInSeconds(): number;
   setDelayTimeInSeconds(delayTimeInSeconds: number): void;
@@ -1851,8 +1828,6 @@ export class BehaviorMetadata extends EmscriptenObject {
   markAsIrrelevantForChildObjects(): BehaviorMetadata;
   isActivatedByDefaultInEditor(): boolean;
   markAsActivatedByDefaultInEditor(): BehaviorMetadata;
-  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
-  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): BehaviorMetadata;
   setOpenFullEditorLabel(label: string): BehaviorMetadata;
   getOpenFullEditorLabel(): string;
   get(): Behavior;
@@ -2569,8 +2544,6 @@ export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   setHelpPath(helpPath: string): EventsBasedBehavior;
   setObjectType(fullName: string): EventsBasedBehavior;
   getObjectType(): string;
-  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): EventsBasedBehavior;
-  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   getSharedPropertyDescriptors(): PropertiesContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
@@ -3339,7 +3312,6 @@ export class PreviewExportOptions extends EmscriptenObject {
   setPreviewContext(previewContext: string): PreviewExportOptions;
   setGDevelopVersionWithHash(gdevelopVersionWithHash: string): PreviewExportOptions;
   setProjectTemplateSlug(projectTemplateSlug: string): PreviewExportOptions;
-  setSourceGameId(sourceGameId: string): PreviewExportOptions;
   addScreenshotCapture(delayTimeInSeconds: number, signedUrl: string, publicUrl: string): PreviewExportOptions;
 }
 

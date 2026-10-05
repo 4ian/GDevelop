@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "GDCore/Project/MeasurementUnit.h"
-#include "GDCore/Project/QuickCustomization.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -51,8 +50,7 @@ class GD_CORE_API PropertyDescriptor {
         deprecated(false),
         advanced(false),
         hasImpactOnOtherProperties(false),
-        measurementUnit(gd::MeasurementUnit::GetUndefined()),
-        quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
+        measurementUnit(gd::MeasurementUnit::GetUndefined()) {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
@@ -62,8 +60,7 @@ class GD_CORE_API PropertyDescriptor {
         deprecated(false),
         advanced(false),
         hasImpactOnOtherProperties(false),
-        measurementUnit(gd::MeasurementUnit::GetUndefined()),
-        quickCustomizationVisibility(QuickCustomization::Visibility::Default) {
+        measurementUnit(gd::MeasurementUnit::GetUndefined()) {
         };
 
   /**
@@ -229,16 +226,6 @@ class GD_CORE_API PropertyDescriptor {
     return *this;
   }
 
-  QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
-    return quickCustomizationVisibility;
-  }
-
-  PropertyDescriptor& SetQuickCustomizationVisibility(
-      QuickCustomization::Visibility visibility) {
-    quickCustomizationVisibility = visibility;
-    return *this;
-  }
-
   /** \name Serialization
    */
   ///@{
@@ -282,7 +269,6 @@ class GD_CORE_API PropertyDescriptor {
   bool hasImpactOnOtherProperties;
   gd::MeasurementUnit
       measurementUnit;  //< The unit of measurement of the property vale.
-  QuickCustomization::Visibility quickCustomizationVisibility;
 };
 
 }  // namespace gd

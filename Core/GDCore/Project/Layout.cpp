@@ -24,7 +24,6 @@
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/QuickCustomization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Log.h"
@@ -283,22 +282,11 @@ void Layout::SerializeTo(SerializerElement& element) const {
     dataElement.SetAttribute("type", sharedData.GetTypeName());
     dataElement.SetAttribute("name", sharedData.GetName());
 
-    // Handle Quick Customization info.
+    // Compatibility with projects saved with the removed Quick Customization:
+    // the content can contain its former visibilities, remove them.
     dataElement.RemoveChild("propertiesQuickCustomizationVisibilities");
-    const QuickCustomizationVisibilitiesContainer&
-        propertiesQuickCustomizationVisibilities =
-            sharedData.GetPropertiesQuickCustomizationVisibilities();
-    if (!propertiesQuickCustomizationVisibilities.IsEmpty()) {
-      propertiesQuickCustomizationVisibilities.SerializeTo(
-          dataElement.AddChild("propertiesQuickCustomizationVisibilities"));
-    }
-    const QuickCustomization::Visibility visibility =
-        sharedData.GetQuickCustomizationVisibility();
-    if (visibility != QuickCustomization::Visibility::Default) {
-      dataElement.SetAttribute(
-          "quickCustomizationVisibility",
-          QuickCustomization::VisibilityAsString(visibility));
-    }
+    dataElement.RemoveAttribute("quickCustomizationVisibility");
+    // end of compatibility code
   }
 }
 
@@ -375,20 +363,6 @@ void Layout::UnserializeFrom(gd::Project& project,
       // end of compatibility code
       else {
         sharedData->UnserializeFrom(sharedDataElement);
-      }
-
-      // Handle Quick Customization info.
-      if (sharedDataElement.HasChild(
-              "propertiesQuickCustomizationVisibilities")) {
-        sharedData->GetPropertiesQuickCustomizationVisibilities()
-            .UnserializeFrom(sharedDataElement.GetChild(
-                "propertiesQuickCustomizationVisibilities"));
-      }
-      if (sharedDataElement.HasChild("quickCustomizationVisibility")) {
-        sharedData->SetQuickCustomizationVisibility(
-            QuickCustomization::StringAsVisibility(
-                sharedDataElement.GetStringAttribute(
-                    "quickCustomizationVisibility")));
       }
 
       behaviorsSharedData[name] = std::move(sharedData);

@@ -232,9 +232,8 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       previewExportOptions.setCrashReportUploadLevel(
         this.props.crashReportUploadLevel
       );
-      previewExportOptions.setPreviewContext(this.props.previewContext);
+      previewExportOptions.setPreviewContext('preview');
       previewExportOptions.setProjectTemplateSlug(project.getTemplateSlug());
-      previewExportOptions.setSourceGameId(this.props.sourceGameId);
 
       if (previewOptions.inAppTutorialMessageInPreview) {
         previewExportOptions.setInAppTutorialMessageInPreview(

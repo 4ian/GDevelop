@@ -163,22 +163,19 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetType("resource")
       .AddExtraInfo("font")
       .SetLabel(_("Font"))
-      .SetGroup(_("Font"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetGroup(_("Font"));
 
   objectProperties["bold"]
       .SetValue(bold ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Bold"))
-      .SetGroup(_("Font"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetGroup(_("Font"));
 
   objectProperties["italic"]
       .SetValue(italic ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Italic"))
-      .SetGroup(_("Font"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetGroup(_("Font"));
 
   objectProperties["color"]
       .SetValue(color)
@@ -194,8 +191,7 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .AddChoice("right", _("Right"))
       .SetLabel(_("Alignment"))
       .SetDescription(_("Alignment of the text when multiple lines are displayed"))
-      .SetGroup(_("Font"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetGroup(_("Font"));
 
   objectProperties["verticalTextAlignment"]
       .SetValue(verticalTextAlignment)
@@ -204,24 +200,21 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .AddChoice("center", _("Center"))
       .AddChoice("bottom", _("Bottom"))
       .SetLabel(_("Vertical alignment"))
-      .SetGroup(_("Font"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetGroup(_("Font"));
 
   objectProperties["isOutlineEnabled"]
       .SetValue(isOutlineEnabled ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Show outline"))
       .SetGroup(_("Outline"))
-      .SetAdvanced()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetAdvanced();
 
   objectProperties["outlineColor"]
       .SetValue(outlineColor)
       .SetType("color")
       .SetLabel(_("Color"))
       .SetGroup(_("Outline"))
-      .SetAdvanced()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetAdvanced();
 
   objectProperties["outlineThickness"]
       .SetValue(gd::String::From(outlineThickness))
@@ -229,24 +222,21 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetLabel(_("Thickness"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetGroup(_("Outline"))
-      .SetAdvanced()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetAdvanced();
 
   objectProperties["isShadowEnabled"]
       .SetValue(isShadowEnabled ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Show shadow"))
       .SetGroup(_("Shadow"))
-      .SetAdvanced()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetAdvanced();
 
   objectProperties["shadowColor"]
       .SetValue(shadowColor)
       .SetType("color")
       .SetLabel(_("Color"))
       .SetGroup(_("Shadow"))
-      .SetAdvanced()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetAdvanced();
 
   objectProperties["shadowOpacity"]
       .SetValue(gd::String::From(shadowOpacity))
@@ -254,8 +244,7 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetLabel(_("Opacity"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetGroup(_("Shadow"))
-      .SetAdvanced()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetAdvanced();
 
   objectProperties["shadowAngle"]
       .SetValue(gd::String::From(shadowAngle))
@@ -263,8 +252,7 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetLabel(_("Angle"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
       .SetGroup(_("Shadow"))
-      .SetAdvanced()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetAdvanced();
 
   objectProperties["shadowDistance"]
       .SetValue(gd::String::From(shadowDistance))
@@ -272,8 +260,7 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetLabel(_("Distance"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetGroup(_("Shadow"))
-      .SetAdvanced()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetAdvanced();
 
   objectProperties["shadowBlurRadius"]
       .SetValue(gd::String::From(shadowBlurRadius))
@@ -281,8 +268,7 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .SetLabel(_("Blur radius"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetGroup(_("Shadow"))
-      .SetAdvanced()
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      .SetAdvanced();
 
   return objectProperties;
 }

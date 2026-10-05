@@ -425,7 +425,31 @@ namespace gdjs {
       this.collisionChecker =
         new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
       this.owner3D = owner;
-      this._applyBehaviorData(behaviorData);
+      this.bodyType = behaviorData.bodyType;
+      this.bullet = behaviorData.bullet;
+      this.fixedRotation = behaviorData.fixedRotation;
+      this._shape = behaviorData.shape;
+      this.meshShapeResourceName = behaviorData.meshShapeResourceName || '';
+      this.shapeOrientation =
+        behaviorData.shape === 'Box' ? 'Z' : behaviorData.shapeOrientation;
+      this.shapeDimensionA = behaviorData.shapeDimensionA;
+      this.shapeDimensionB = behaviorData.shapeDimensionB;
+      this.shapeDimensionC = behaviorData.shapeDimensionC;
+      this.shapeOffsetX = behaviorData.shapeOffsetX || 0;
+      this.shapeOffsetY = behaviorData.shapeOffsetY || 0;
+      this.shapeOffsetZ = behaviorData.shapeOffsetZ || 0;
+      this.massCenterOffsetX = behaviorData.massCenterOffsetX || 0;
+      this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
+      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
+      this.density = Math.max(0.0001, behaviorData.density);
+      this.massOverride = behaviorData.massOverride || 0;
+      this.friction = behaviorData.friction;
+      this.restitution = behaviorData.restitution;
+      this.linearDamping = Math.max(0, behaviorData.linearDamping);
+      this.angularDamping = Math.max(0, behaviorData.angularDamping);
+      this.gravityScale = behaviorData.gravityScale;
+      this.layers = behaviorData.layers;
+      this.masks = behaviorData.masks;
       this._sharedData = Physics3DSharedData.getSharedData(
         instanceContainer.getScene(),
         behaviorData.name
@@ -1120,24 +1144,12 @@ namespace gdjs {
     override applyBehaviorOverriding(behaviorData): boolean {
       this._applyBehaviorData(behaviorData);
 
-      // Recreate the body if any shape-related property changed.
-      const shapeChanged =
-        'shape' in behaviorData ||
-        'shapeOrientation' in behaviorData ||
-        'shapeDimensionA' in behaviorData ||
-        'shapeDimensionB' in behaviorData ||
-        'shapeDimensionC' in behaviorData ||
-        'shapeOffsetX' in behaviorData ||
-        'shapeOffsetY' in behaviorData ||
-        'shapeOffsetZ' in behaviorData ||
-        'massCenterOffsetX' in behaviorData ||
-        'massCenterOffsetY' in behaviorData ||
-        'massCenterOffsetZ' in behaviorData ||
-        'meshShapeResourceName' in behaviorData ||
-        'bodyType' in behaviorData;
-      if (shapeChanged) {
-        this.recreateBody();
-      }
+      // Every property (shape, body type, layers, masks, friction, damping...)
+      // is read when the body is created, so recreating the body (and its
+      // shape) applies all of them. It's done lazily at the next update, which
+      // keeps the velocities, and does nothing if the body doesn't exist yet.
+      this._needToRecreateShape = true;
+      this._needToRecreateBody = true;
       return true;
     }
 

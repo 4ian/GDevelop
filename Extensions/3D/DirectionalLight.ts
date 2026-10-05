@@ -26,7 +26,7 @@ namespace gdjs {
           private _distanceFromCamera: float = 1500;
           private _frustumSize: float = 4000;
           private _isShadowFittedToCamera: boolean = false;
-          private _shadowDistance: float = 1000;
+          private _shadowDistance: float = 2000;
           private _shadowCenter = new THREE.Vector3();
           private _lightOffset = new THREE.Vector3();
           private _origin = new THREE.Vector3();

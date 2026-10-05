@@ -2311,7 +2311,7 @@ module.exports = {
         .setGroup(_('Shadows'));
       properties
         .getOrCreate('shadowDistance')
-        .setValue('1000')
+        .setValue('2000')
         .setLabel(_('Shadow distance'))
         .setDescription(
           _(

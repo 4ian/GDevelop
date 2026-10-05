@@ -655,10 +655,16 @@ describe('scope of the events and variables functions', () => {
             totalLines: lines.length,
           });
           expect(result.eventScript).not.toContain('value0');
-          jsCodeExcerpt.code.split('\n').forEach((numberedLine, index) => {
-            expect(numberedLine).toMatch(new RegExp(`^${fromLine + index}\t`));
-            readLines.push(numberedLine.replace(/^\d+\t/, ''));
-          });
+          const numberedLines = jsCodeExcerpt.code.split('\n');
+          const firstLineNumber = fromLine;
+          expect(
+            numberedLines.map(line => Number(line.split('\t')[0]))
+          ).toEqual(
+            numberedLines.map((line, index) => firstLineNumber + index)
+          );
+          readLines.push(
+            ...numberedLines.map(line => line.replace(/^\d+\t/, ''))
+          );
           fromLine = jsCodeExcerpt.toLine + 1;
           if (fromLine <= lines.length) {
             expect(result.notes).toContainEqual(

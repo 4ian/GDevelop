@@ -172,7 +172,7 @@ const applyEdits = ({
   | {| success: false, message: string |}
   | {| success: true, text: string, editedRanges: Array<EditedRange> |} => {
   let text = sourceText;
-  let editedRanges: Array<EditedRange> = [];
+  const editedRanges: Array<EditedRange> = [];
   for (let editIndex = 0; editIndex < edits.length; editIndex++) {
     const editLabel = `Edit ${editIndex + 1} of ${eventId}`;
     let { oldString, newString } = edits[editIndex];
@@ -226,18 +226,16 @@ const applyEdits = ({
       const index = indexes[i];
       text =
         text.slice(0, index) + newString + text.slice(index + oldString.length);
-      editedRanges = editedRanges.map(range =>
-        range.start > index
-          ? { start: range.start + lengthDifference, length: range.length }
-          : range
-      );
+      for (const range of editedRanges) {
+        if (range.start > index) range.start += lengthDifference;
+      }
     }
-    indexes.forEach((index, i) => {
+    for (let i = 0; i < indexes.length; i++) {
       editedRanges.push({
-        start: index + i * lengthDifference,
+        start: indexes[i] + i * lengthDifference,
         length: newString.length,
       });
-    });
+    }
   }
   return { success: true, text, editedRanges };
 };

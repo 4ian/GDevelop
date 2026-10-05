@@ -122,6 +122,7 @@ export type CompactObjectGroupPropertiesEditorInterface = {|
    * they must be recomputed to display changes made outside this editor.
    */
   refreshVariables: () => void,
+  revealVariable: (nodeId: string) => void,
 |};
 
 export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
@@ -190,6 +191,10 @@ export const CompactObjectGroupPropertiesEditor: React.ComponentType<{
       ref,
       () => ({
         refreshVariables: forceRecomputeGroupVariablesContainer,
+        revealVariable: (nodeId: string) => {
+          if (variablesListRef.current)
+            variablesListRef.current.revealVariable(nodeId);
+        },
       }),
       [forceRecomputeGroupVariablesContainer]
     );

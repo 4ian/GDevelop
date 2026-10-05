@@ -191,6 +191,10 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             compactObjectPropertiesEditorRef.current.revealVariable(nodeId);
           else if (compactInstancePropertiesEditorRef.current)
             compactInstancePropertiesEditorRef.current.revealVariable(nodeId);
+          else if (compactObjectGroupPropertiesEditorRef.current)
+            compactObjectGroupPropertiesEditorRef.current.revealVariable(
+              nodeId
+            );
           else if (compactScenePropertiesEditorRef.current)
             compactScenePropertiesEditorRef.current.revealVariable(nodeId);
         },

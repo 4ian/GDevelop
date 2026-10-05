@@ -19,10 +19,18 @@ import {
   type EventsTextRenderingError,
 } from '../EventsSheet/EventsTree/TextRenderer';
 import {
+  applyJsCodeEdits,
+  formatEditAsDiff,
+  prepareEventSourceEdits,
+  renderEditedEventSnippet,
+  type PreparedEventSourceEdits,
+} from './EventSourceEdits';
+import {
   buildEventScriptSourceView,
   renderEventSourceById,
   renderScopeSummaryHeaderLines,
   type ScopeSummary,
+  type JsCodeExcerpt,
 } from '../EventsSheet/EventsTree/TextRenderer/EventScriptSourceView';
 import {
   addMissingObjectBehaviors,
@@ -337,6 +345,13 @@ export type EditorFunctionGenericOutput = {|
   // EventScript source view (see `read_events_source`):
   eventScript?: string,
   selectedEventIds?: Array<string>,
+  jsCodeExcerpt?: JsCodeExcerpt,
+  // `generate_events` with `edits`: the numbered lines around the edits.
+  editedEventSnippets?: Array<{|
+    eventId: string,
+    replacements: string,
+    snippet: string,
+  |}>,
   truncated?: boolean,
   notes?: Array<string>,
   generatedEventsErrorDiagnostics?: string,
@@ -428,6 +443,9 @@ export type EventBatch = {|
   // The actual current source of the target event, that the backend
   // compares the anchor against:
   placementTargetEventSource: string | null,
+  // `eventScript` was built from `edits` (its compile errors are always
+  // reported):
+  isEventScriptFromEdits: boolean,
 |};
 
 export type EventsGenerationOptions = {|
@@ -558,6 +576,9 @@ export type LaunchFunctionOptionsWithoutProject = {|
   // When true, `run_script` exposes only non-mutating functions (explorer
   // sub-agent scripts, which must stay read-only). Ignored by other functions.
   runScriptReadOnly?: boolean,
+  // True for a function called by a `run_script` script: its output stays in
+  // the script (only its logs reach the AI), so it can be larger.
+  +isCalledFromScript?: boolean,
   i18n: I18nType,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
@@ -6500,6 +6521,7 @@ export const noEventsInFunctionText = 'This function has no events.';
 const EVENTS_SOURCE_MAX_CHARS_DEFAULT = 12000;
 const EVENTS_SOURCE_MAX_CHARS_MINIMUM = 2000;
 const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
+const EVENTS_SOURCE_MAX_CHARS_LIMIT_IN_SCRIPT = 1000000;
 
 const getPropertyNames = (
   propertiesContainer: gdPropertiesContainer
@@ -6690,7 +6712,12 @@ const readEventsSource: EditorFunction = {
 
     return { text };
   },
-  launchFunction: async ({ project, args, ensureExtensionsUpToDate }) => {
+  launchFunction: async ({
+    project,
+    args,
+    ensureExtensionsUpToDate,
+    isCalledFromScript,
+  }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
       allowedTypes: ['scene', 'extension', 'custom_behavior', 'custom_object'],
     });
@@ -6730,9 +6757,15 @@ const readEventsSource: EditorFunction = {
     const maxChars = Math.max(
       EVENTS_SOURCE_MAX_CHARS_MINIMUM,
       Math.min(
-        EVENTS_SOURCE_MAX_CHARS_LIMIT,
+        isCalledFromScript
+          ? EVENTS_SOURCE_MAX_CHARS_LIMIT_IN_SCRIPT
+          : EVENTS_SOURCE_MAX_CHARS_LIMIT,
         maxCharsArgument || EVENTS_SOURCE_MAX_CHARS_DEFAULT
       )
+    );
+    const jsFromLine = SafeExtractor.extractNumberProperty(
+      args,
+      'js_from_line'
     );
 
     // In a function, what the events can use (parameters, properties, child
@@ -6750,6 +6783,7 @@ const readEventsSource: EditorFunction = {
     const {
       text,
       selectedEventIds,
+      jsCodeExcerpt,
       truncated,
       notes,
       renderingErrors,
@@ -6759,6 +6793,7 @@ const readEventsSource: EditorFunction = {
       searchText,
       objectNames,
       subEventsDepth,
+      jsFromLine,
       maxChars: Math.max(
         0,
         maxChars -
@@ -6792,6 +6827,7 @@ const readEventsSource: EditorFunction = {
         : eventScriptText,
       selectedEventIds,
     };
+    if (jsCodeExcerpt) output.jsCodeExcerpt = jsCodeExcerpt;
     if (truncated) output.truncated = true;
     if (notes.length > 0) output.notes = notes;
     if (renderingErrors.length > 0) {
@@ -6857,6 +6893,8 @@ const addSceneEvents: EditorFunction = {
               batch,
               'event_script'
             );
+            const edits =
+              SafeExtractor.extractArrayProperty(batch, 'edits') || [];
             const placementRelation = SafeExtractor.extractStringProperty(
               batch,
               'placement_relation'
@@ -6904,6 +6942,21 @@ const addSceneEvents: EditorFunction = {
                     : {eventScript}
                   </Text>
                 )}
+                {edits.map((edit, index) => (
+                  <Text
+                    key={index}
+                    noMargin
+                    allowSelection
+                    color="secondary"
+                    size="body-small"
+                    style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                  >
+                    <b>
+                      <Trans>Edit</Trans>
+                    </b>
+                    {`:\n${formatEditAsDiff(edit)}`}
+                  </Text>
+                ))}
                 {placementRelation && (
                   <Text
                     noMargin
@@ -7231,8 +7284,86 @@ const addSceneEvents: EditorFunction = {
         ? serializeToJSON(currentEventsList)
         : null;
 
+    // `edits` are applied here, to the current source of the event: the
+    // batch then replaces the event with the edited source, like an
+    // `event_script` would.
+    const preparedEventSourceEdits: Array<PreparedEventSourceEdits | null> = (
+      eventBatches || []
+    ).map((batch, index) =>
+      prepareEventSourceEdits({
+        eventsList: currentEventsList,
+        batch,
+        batchLabel:
+          eventBatches && eventBatches.length > 1 ? `Batch ${index + 1}: ` : '',
+      })
+    );
+    const editsFailureMessages = [];
+    for (const preparedEdits of preparedEventSourceEdits) {
+      if (preparedEdits && preparedEdits.success === false) {
+        editsFailureMessages.push(preparedEdits.message);
+      }
+    }
+    if (editsFailureMessages.length > 0) {
+      return makeGenericFailure(
+        `${editsFailureMessages.join('\n')}\nNothing was changed.`
+      );
+    }
+
+    // The code of `js` events is changed directly (nothing to generate):
+    // such a call must only change `js` events, so that it stays atomic.
+    const jsCodeEdits = [];
+    for (const preparedEdits of preparedEventSourceEdits) {
+      if (preparedEdits && preparedEdits.success && preparedEdits.isJsCode) {
+        jsCodeEdits.push(preparedEdits);
+      }
+    }
+    if (jsCodeEdits.length > 0) {
+      if (jsCodeEdits.length !== preparedEventSourceEdits.length) {
+        return makeGenericFailure(
+          'The `edits` of a `js` event are applied directly, without generating events: give them in a `generate_events` call of their own, apart from the other batches. Nothing was changed.'
+        );
+      }
+      for (const preparedEdits of jsCodeEdits) {
+        applyJsCodeEdits({ eventsList: currentEventsList, preparedEdits });
+      }
+      if (eventsFunction) {
+        const extensionName = resolvedScope.eventsFunctionsExtension
+          ? resolvedScope.eventsFunctionsExtension.getName()
+          : '';
+        onSceneEventsModifiedOutsideEditor({
+          scene: null,
+          eventsFunction,
+          extensionName,
+          newOrChangedAiGeneratedEventIds: new Set(),
+        });
+        onExtensionsModifiedOutsideEditor({
+          extensionNames: [extensionName],
+          needsCodeRegeneration: true,
+        });
+      } else {
+        onSceneEventsModifiedOutsideEditor({
+          scene,
+          newOrChangedAiGeneratedEventIds: new Set(),
+        });
+      }
+      return {
+        success: true,
+        message: `Changed the code of the \`js\` event(s) ${jsCodeEdits
+          .map(preparedEdits => preparedEdits.eventId)
+          .join(', ')}.`,
+        editedEventSnippets: jsCodeEdits.map(preparedEdits => ({
+          eventId: preparedEdits.eventId,
+          replacements: preparedEdits.replacementsSummary,
+          snippet: renderEditedEventSnippet({
+            eventsList: currentEventsList,
+            preparedEdits,
+          }),
+        })),
+      };
+    }
+
     const parsedEventBatches = eventBatches
-      ? eventBatches.map(batch => {
+      ? eventBatches.map((batch, index) => {
           const placementRelation =
             SafeExtractor.extractStringProperty(batch, 'placement_relation') ||
             '(unspecified)';
@@ -7271,16 +7402,21 @@ const addSceneEvents: EditorFunction = {
               ? renderedTargetEventSource
               : null;
 
+          const preparedEdits = preparedEventSourceEdits[index];
+          const editedEventScript =
+            preparedEdits && preparedEdits.success
+              ? preparedEdits.eventScript
+              : null;
+
           return {
             eventsDescription:
               SafeExtractor.extractStringProperty(
                 batch,
                 'events_description'
               ) || '',
-            eventScript: SafeExtractor.extractStringProperty(
-              batch,
-              'event_script'
-            ),
+            eventScript:
+              editedEventScript ||
+              SafeExtractor.extractStringProperty(batch, 'event_script'),
             placementRelation,
             placementTargetEventId,
             placementExpectedParentEventId: SafeExtractor.extractStringProperty(
@@ -7291,11 +7427,16 @@ const addSceneEvents: EditorFunction = {
               batch,
               'placement_rationale'
             ),
-            expectedEventSource: SafeExtractor.extractStringProperty(
-              batch,
-              'expected_event_source'
-            ),
+            // The edits were applied to the current source of the event: it
+            // is what was read.
+            expectedEventSource: editedEventScript
+              ? placementTargetEventSource
+              : SafeExtractor.extractStringProperty(
+                  batch,
+                  'expected_event_source'
+                ),
             placementTargetEventSource,
+            isEventScriptFromEdits: !!editedEventScript,
           };
         })
       : null;
@@ -7611,6 +7752,22 @@ See errors; verify event contents if needed.`
         };
         if (newlyAddedResources.length > 0) {
           output.newlyAddedResources = newlyAddedResources;
+        }
+        const editedEventSnippets = [];
+        for (const preparedEdits of preparedEventSourceEdits) {
+          if (preparedEdits && preparedEdits.success) {
+            editedEventSnippets.push({
+              eventId: preparedEdits.eventId,
+              replacements: preparedEdits.replacementsSummary,
+              snippet: renderEditedEventSnippet({
+                eventsList: upToDateEventsList,
+                preparedEdits,
+              }),
+            });
+          }
+        }
+        if (editedEventSnippets.length > 0) {
+          output.editedEventSnippets = editedEventSnippets;
         }
         if (errors.length > 0) {
           output.errors = errors;
@@ -11468,7 +11625,7 @@ const runScript: EditorFunction = {
     const exposedFunctions = buildExposedScriptFunctions({
       editorFunctions,
       editorFunctionsWithoutProject,
-      launchOptions,
+      launchOptions: { ...launchOptions, isCalledFromScript: true },
       project,
       allowedFunctionNames,
     });

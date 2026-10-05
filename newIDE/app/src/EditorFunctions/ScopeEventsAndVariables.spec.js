@@ -616,6 +616,116 @@ describe('scope of the events and variables functions', () => {
       expect(result.eventScript).not.toBe(noEventsInSceneText);
     });
 
+    describe('a `js` event larger than `max_chars`', () => {
+      const lines = Array.from(
+        { length: 3000 },
+        (_, index) => `const value${index} = ${index};`
+      );
+      const readToast = (args: Object) =>
+        launch('read_events_source', {
+          scope: { type: 'extension', extension_name: 'UI' },
+          function_name: 'ShowToast',
+          ...args,
+        });
+
+      beforeEach(() => {
+        const jsCodeEvent = project
+          .getEventsFunctionsExtension('UI')
+          .getEventsFunctions()
+          .getEventsFunction('ShowToast')
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 0);
+        gd.asJsCodeEvent(jsCodeEvent).setInlineCode(lines.join('\n'));
+      });
+
+      it('is read by ranges of lines, following the notes', async () => {
+        const readLines: Array<string> = [];
+        let fromLine = 1;
+        let calls = 0;
+        while (fromLine <= lines.length && calls++ < 10) {
+          const result = await readToast({
+            max_chars: 30000,
+            js_from_line: fromLine,
+          });
+          const { jsCodeExcerpt } = result;
+          if (!jsCodeExcerpt) throw new Error('Expected a jsCodeExcerpt.');
+          expect(jsCodeExcerpt).toMatchObject({
+            eventId: 'event-0',
+            fromLine,
+            totalLines: lines.length,
+          });
+          expect(result.eventScript).not.toContain('value0');
+          const numberedLines = jsCodeExcerpt.code.split('\n');
+          const firstLineNumber = fromLine;
+          expect(
+            numberedLines.map(line => Number(line.split('\t')[0]))
+          ).toEqual(
+            numberedLines.map((line, index) => firstLineNumber + index)
+          );
+          readLines.push(
+            ...numberedLines.map(line => line.replace(/^\d+\t/, ''))
+          );
+          fromLine = jsCodeExcerpt.toLine + 1;
+          if (fromLine <= lines.length) {
+            expect(result.notes).toContainEqual(
+              expect.stringContaining(`\`js_from_line: ${fromLine}\``)
+            );
+          }
+        }
+        expect(calls).toBe(3);
+        expect(readLines).toEqual(lines);
+      });
+
+      it('is searched line by line, with the lines around the matches', async () => {
+        const result = await readToast({ search: 'value2999 =' });
+        expect(result.jsCodeExcerpt).toEqual({
+          eventId: 'event-0',
+          fromLine: 2997,
+          toLine: 3000,
+          totalLines: lines.length,
+          code: [
+            '2997\tconst value2996 = 2996;',
+            '2998\tconst value2997 = 2997;',
+            '2999\tconst value2998 = 2998;',
+            '3000\tconst value2999 = 2999;',
+          ].join('\n'),
+        });
+
+        // Too many matches to fit: the note says where to continue.
+        const firstMatches = await readToast({ search: 'value1' });
+        const firstExcerpt = firstMatches.jsCodeExcerpt;
+        if (!firstExcerpt) throw new Error('Expected a jsCodeExcerpt.');
+        const nextLineMatch = (firstMatches.notes || [])
+          .join(' ')
+          .match(/`js_from_line: (\d+)`/);
+        if (!nextLineMatch) throw new Error('Expected a next js_from_line.');
+        const nextMatches = await readToast({
+          search: 'value1',
+          js_from_line: Number(nextLineMatch[1]),
+        });
+        const nextExcerpt = nextMatches.jsCodeExcerpt;
+        if (!nextExcerpt) throw new Error('Expected a jsCodeExcerpt.');
+        expect(nextExcerpt.fromLine).toBeGreaterThan(firstExcerpt.toLine - 4);
+      });
+
+      it('is read in full inside run_script', async () => {
+        const result = await launch('run_script', {
+          js_code: `
+            const inScript = await read_events_source({
+              scope: { type: 'extension', extension_name: 'UI' },
+              function_name: 'ShowToast',
+              max_chars: 100000,
+            });
+            console.log(inScript.eventScript.includes('const value2999 = 2999;'), !!inScript.jsCodeExcerpt);
+          `,
+        });
+        expect(result.consoleLogs).toEqual(['true false']);
+
+        const alone = await readToast({ max_chars: 100000 });
+        expect(alone.jsCodeExcerpt).toBeDefined();
+      });
+    });
+
     it('fails when scene_name and scope disagree', async () => {
       const result = await launch('read_events_source', {
         scene_name: 'Level',

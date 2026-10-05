@@ -22,9 +22,20 @@ type EventNode = {|
  * ancestors of selected events shown as header lines and skipped siblings
  * shown as `# ...` markers).
  */
+export type JsCodeExcerpt = {|
+  eventId: string,
+  fromLine: number,
+  toLine: number,
+  totalLines: number,
+  code: string,
+|};
+
 export type EventScriptSourceView = {|
   text: string,
   selectedEventIds: Array<string>,
+  // A `js` event too large for `maxChars`: a range of lines of its code,
+  // outside `text` (which stays valid EventScript).
+  jsCodeExcerpt: JsCodeExcerpt | null,
   truncated: boolean,
   notes: Array<string>,
   renderingErrors: Array<EventScriptRenderingError>,
@@ -151,6 +162,239 @@ const truncateEventScriptTextWithoutCuttingFences = (
   return keptLines.join('\n');
 };
 
+const MIN_JS_CODE_EXCERPT_CHARS = 1000;
+const JS_SEARCH_CONTEXT_LINES = 3;
+const MAX_JS_SEARCH_LINE_LENGTH = 500;
+
+/**
+ * Lines prefixed with their number and a tab, like `cat -n`: the format coding
+ * agents read code in. `firstIndex` is the index of the first line (from 0).
+ */
+export const formatNumberedLines = (
+  lines: Array<string>,
+  firstIndex: number
+): Array<string> =>
+  lines.map((line, index) => `${firstIndex + index + 1}\t${line}`);
+
+const numberedLinesNote =
+  'Its lines are numbered: the number and the tab before each line are not part of the code (never copy them into `old_string`).';
+
+/**
+ * The lines of the code of a `js` event from `fromLine` that fit in
+ * `maxChars` (only the start of the first one when it is longer, like in
+ * minified code).
+ */
+const getJsCodeRangeExcerpt = ({
+  lines,
+  firstIndex,
+  eventId,
+  maxChars,
+  notePrefix,
+}: {|
+  lines: Array<string>,
+  firstIndex: number,
+  eventId: string,
+  maxChars: number,
+  notePrefix: string,
+|}): {| jsCodeExcerpt: JsCodeExcerpt, note: string |} => {
+  const keptLines: Array<string> = [];
+  let keptLength = 0;
+  for (let index = firstIndex; index < lines.length; index++) {
+    const numberedLine = `${index + 1}\t${lines[index]}`;
+    if (keptLength + numberedLine.length + 1 > maxChars) break;
+    keptLines.push(numberedLine);
+    keptLength += numberedLine.length + 1;
+  }
+  const isLineCut = keptLines.length === 0;
+  if (isLineCut) {
+    keptLines.push(
+      `${firstIndex + 1}\t${lines[firstIndex].slice(0, maxChars)}`
+    );
+  }
+
+  const toLine = firstIndex + keptLines.length;
+  const note = [
+    `${notePrefix}lines ${firstIndex +
+      1}-${toLine} of its code are in \`jsCodeExcerpt\` (read-only, not EventScript).`,
+    numberedLinesNote,
+    isLineCut
+      ? `Line ${toLine} is longer than \`max_chars\`: only its start is shown.`
+      : null,
+    toLine < lines.length
+      ? `Call again with \`js_from_line: ${toLine +
+          1}\` to read the next lines.`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  return {
+    jsCodeExcerpt: {
+      eventId,
+      fromLine: firstIndex + 1,
+      toLine,
+      totalLines: lines.length,
+      code: keptLines.join('\n'),
+    },
+    note,
+  };
+};
+
+/**
+ * The lines of the code of a `js` event containing `searchText` (from
+ * `firstIndex`), with a few lines around them, like `grep -n -C`: the
+ * separate blocks are separated by a `--` line.
+ */
+const getJsCodeSearchExcerpt = ({
+  lines,
+  firstIndex,
+  matchingIndexes,
+  searchText,
+  eventId,
+  maxChars,
+  notePrefix,
+}: {|
+  lines: Array<string>,
+  firstIndex: number,
+  matchingIndexes: Array<number>,
+  searchText: string,
+  eventId: string,
+  maxChars: number,
+  notePrefix: string,
+|}): {| jsCodeExcerpt: JsCodeExcerpt, note: string |} => {
+  const keptLines: Array<string> = [];
+  let keptLength = 0;
+  let firstShownIndex = matchingIndexes[0];
+  let lastShownIndex = -1;
+  let firstNotShownMatchIndex = null;
+  for (const matchIndex of matchingIndexes) {
+    if (matchIndex <= lastShownIndex) continue;
+    const blockStart = Math.max(
+      firstIndex,
+      matchIndex - JS_SEARCH_CONTEXT_LINES,
+      lastShownIndex + 1
+    );
+    const blockEnd = Math.min(
+      lines.length - 1,
+      matchIndex + JS_SEARCH_CONTEXT_LINES
+    );
+    const blockLines = [
+      ...(lastShownIndex !== -1 && blockStart > lastShownIndex + 1
+        ? ['--']
+        : []),
+      ...formatNumberedLines(
+        lines
+          .slice(blockStart, blockEnd + 1)
+          .map(line =>
+            line.length > MAX_JS_SEARCH_LINE_LENGTH
+              ? `${line.slice(0, MAX_JS_SEARCH_LINE_LENGTH)}…`
+              : line
+          ),
+        blockStart
+      ),
+    ];
+    const blockLength = blockLines.join('\n').length + 1;
+    if (keptLines.length > 0 && keptLength + blockLength > maxChars) {
+      firstNotShownMatchIndex = matchIndex;
+      break;
+    }
+    if (lastShownIndex === -1) firstShownIndex = blockStart;
+    keptLines.push(...blockLines);
+    keptLength += blockLength;
+    lastShownIndex = blockEnd;
+  }
+
+  const note = [
+    `${notePrefix}${
+      matchingIndexes.length
+    } line(s) of its code from line ${firstIndex +
+      1} contain "${searchText}": they are in \`jsCodeExcerpt\` with up to ${JS_SEARCH_CONTEXT_LINES} lines around them (read-only, not EventScript).`,
+    numberedLinesNote,
+    firstNotShownMatchIndex !== null
+      ? `Not all of them fit: call again with \`js_from_line: ${firstNotShownMatchIndex +
+          1}\` (and the same \`search\`) for the next ones.`
+      : null,
+    'Read a range of lines with `js_from_line` and no `search`.',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  return {
+    jsCodeExcerpt: {
+      eventId,
+      fromLine: firstShownIndex + 1,
+      toLine: lastShownIndex + 1,
+      totalLines: lines.length,
+      code: keptLines.join('\n'),
+    },
+    note,
+  };
+};
+
+/**
+ * A part of the code of a `js` event too large to be shown: the lines
+ * containing `searchText` when given, a range of lines otherwise.
+ */
+const getJsCodeExcerpt = ({
+  event,
+  path,
+  fromLine,
+  maxChars,
+  searchText,
+}: {|
+  event: gdBaseEvent,
+  path: string,
+  fromLine: number,
+  maxChars: number,
+  searchText: ?string,
+|}): {| jsCodeExcerpt: JsCodeExcerpt, note: string |} => {
+  const lines = gd
+    .asJsCodeEvent(event)
+    .getInlineCode()
+    .replace(/\r\n/g, '\n')
+    .split('\n');
+  const firstIndex = Math.min(Math.max(1, fromLine), lines.length) - 1;
+  const eventId = `event-${path}`;
+  const notePrefix = `Output too large: ${eventId} is a \`js\` event larger than \`max_chars\` (${
+    lines.length
+  } lines): `;
+
+  const trimmedSearchText = searchText ? searchText.trim() : '';
+  if (!trimmedSearchText) {
+    return getJsCodeRangeExcerpt({
+      lines,
+      firstIndex,
+      eventId,
+      maxChars,
+      notePrefix,
+    });
+  }
+  const lowerCaseSearchText = trimmedSearchText.toLowerCase();
+  const matchingIndexes = [];
+  for (let index = firstIndex; index < lines.length; index++) {
+    if (lines[index].toLowerCase().includes(lowerCaseSearchText)) {
+      matchingIndexes.push(index);
+    }
+  }
+  if (matchingIndexes.length === 0) {
+    return getJsCodeRangeExcerpt({
+      lines,
+      firstIndex,
+      eventId,
+      maxChars,
+      notePrefix: `${notePrefix}no line of its code from line ${firstIndex +
+        1} contains "${trimmedSearchText}", `,
+    });
+  }
+  return getJsCodeSearchExcerpt({
+    lines,
+    firstIndex,
+    matchingIndexes,
+    searchText: trimmedSearchText,
+    eventId,
+    maxChars,
+    notePrefix,
+  });
+};
+
 const compareDocumentOrder = (pathA: string, pathB: string): number => {
   const partsA = pathA.split('.').map(Number);
   const partsB = pathB.split('.').map(Number);
@@ -205,6 +449,32 @@ export const renderEventSourceById = ({
   eventIdOrGroupName: string,
   includeSubEvents: boolean,
 |}): string | null => {
+  const node = findEventByIdOrGroupName({ eventsList, eventIdOrGroupName });
+  if (!node) return null;
+  if (!includeSubEvents) {
+    return renderEventOwnTextForMatching(node.event, node.path);
+  }
+  const renderingErrors: Array<EventScriptRenderingError> = [];
+  return renderEventAsEventScriptLines({
+    event: node.event,
+    eventPath: node.path,
+    indent: '',
+    subEventsDepth: Number.MAX_SAFE_INTEGER,
+    renderingErrors,
+  }).join('\n');
+};
+
+/**
+ * The event of an id (`event-2.1`) or group name, with its path (`2.1`) and
+ * the indentation its lines have when it is shown among the other events.
+ */
+export const findEventByIdOrGroupName = ({
+  eventsList,
+  eventIdOrGroupName,
+}: {|
+  eventsList: gdEventsList,
+  eventIdOrGroupName: string,
+|}): {| event: gdBaseEvent, path: string, indentation: string |} | null => {
   const nodesByPath: Map<string, EventNode> = new Map();
   indexEvents(eventsList, '', nodesByPath);
   const paths = resolveEventIdOrGroupName(eventIdOrGroupName, nodesByPath);
@@ -212,17 +482,11 @@ export const renderEventSourceById = ({
   if (firstPath === undefined) return null;
   const node = nodesByPath.get(firstPath);
   if (!node) return null;
-  if (!includeSubEvents) {
-    return renderEventOwnTextForMatching(node.event, firstPath);
-  }
-  const renderingErrors: Array<EventScriptRenderingError> = [];
-  return renderEventAsEventScriptLines({
+  return {
     event: node.event,
-    eventPath: firstPath,
-    indent: '',
-    subEventsDepth: Number.MAX_SAFE_INTEGER,
-    renderingErrors,
-  }).join('\n');
+    path: firstPath,
+    indentation: INDENT.repeat(firstPath.split('.').length - 1),
+  };
 };
 
 /**
@@ -374,6 +638,7 @@ export const buildEventScriptSourceView = ({
   objectNames,
   subEventsDepth,
   maxChars,
+  jsFromLine,
 }: {|
   eventsList: gdEventsList,
   eventIds?: Array<string> | null,
@@ -381,6 +646,7 @@ export const buildEventScriptSourceView = ({
   objectNames?: Array<string> | null,
   subEventsDepth?: number | null,
   maxChars: number,
+  jsFromLine?: number | null,
 |}): EventScriptSourceView => {
   const notes: Array<string> = [];
   const renderingErrors: Array<EventScriptRenderingError> = [];
@@ -481,6 +747,7 @@ export const buildEventScriptSourceView = ({
     return {
       text: '',
       selectedEventIds: [],
+      jsCodeExcerpt: null,
       truncated: false,
       notes: [...notes, emptyResultNote],
       renderingErrors,
@@ -540,6 +807,7 @@ export const buildEventScriptSourceView = ({
   // `selectedEventIds` always describes what the returned text actually
   // shows: it is recomputed when trailing events are dropped below.
   let shownPaths = selectedPaths;
+  let jsCodeExcerpt = null;
   let text = '';
   let truncated = false;
   let fitted = false;
@@ -585,12 +853,32 @@ export const buildEventScriptSourceView = ({
           'Output too large: the source of the last event shown is cut short. Read it alone with `event_ids` (or raise `max_chars`) to get it in full.'
         );
       } else {
-        // A `js` event bigger than the budget is dropped whole (its code
-        // cannot be cut in half): say so, and do not claim it is shown.
+        // A `js` event bigger than the budget is not in `text` (half a fence
+        // is not valid EventScript): a range of lines of its code is given
+        // aside instead.
         keptPaths.pop();
-        notes.push(
-          `Output too large: event-${lastPath} is not shown at all (its source is larger than \`max_chars\`, and a \`js\` event cannot be cut in half). Raise \`max_chars\` to read it.`
-        );
+        const lastNode = nodesByPath.get(lastPath);
+        if (
+          lastNode &&
+          lastNode.event.getType() === 'BuiltinCommonInstructions::JsCode'
+        ) {
+          const excerpt = getJsCodeExcerpt({
+            event: lastNode.event,
+            path: lastPath,
+            fromLine: jsFromLine || 1,
+            searchText,
+            maxChars: Math.max(
+              MIN_JS_CODE_EXCERPT_CHARS,
+              maxChars - text.length
+            ),
+          });
+          jsCodeExcerpt = excerpt.jsCodeExcerpt;
+          notes.push(excerpt.note);
+        } else {
+          notes.push(
+            `Output too large: event-${lastPath} is not shown at all (its source is larger than \`max_chars\`). Raise \`max_chars\` to read it.`
+          );
+        }
       }
     }
     if (droppedPaths.length > 0) {
@@ -620,6 +908,7 @@ export const buildEventScriptSourceView = ({
   return {
     text,
     selectedEventIds: shownPaths.map(path => `event-${path}`),
+    jsCodeExcerpt,
     truncated,
     notes,
     renderingErrors,

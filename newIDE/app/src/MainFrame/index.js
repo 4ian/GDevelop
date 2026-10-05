@@ -1740,6 +1740,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     [openProjectManager]
   );
 
+  const maxListedRemovedItems = 10;
+
   /**
    * Ask before removing project items, with the delete dialog of the editor:
    * the usual sentence for a single one, followed by the list of their names
@@ -1747,6 +1749,7 @@ const MainFrame = (props: Props): React.MixedElement => {
    */
   const confirmItemsRemoval = ({
     names,
+    getOtherItemsLabel,
     title,
     singleItemMessage,
     getSeveralItemsMessage,
@@ -1754,6 +1757,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     getFolderMessage,
   }: {|
     names: Array<string>,
+    // Ends a list too long to be shown in full.
+    getOtherItemsLabel: (otherItemsCount: number) => MessageDescriptor,
     title: MessageDescriptor,
     singleItemMessage: MessageDescriptor,
     // The messages are Markdown: the names are given as a list.
@@ -1766,7 +1771,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     ) => MessageDescriptor,
   |}): Promise<boolean> => {
     // In the value, as the whitespace of the message is collapsed.
-    const namesList = '\n\n' + names.map(name => `- ${name}`).join('\n');
+    const shownNames = names.slice(0, maxListedRemovedItems);
+    const otherItemsCount = names.length - shownNames.length;
+    const listLines = shownNames.map(name => `- ${name}`);
+    if (otherItemsCount > 0)
+      listLines.push(`- ${i18n._(getOtherItemsLabel(otherItemsCount))}`);
+    const namesList = '\n\n' + listLines.join('\n');
     if (folderName != null) {
       return showDeleteConfirmation({
         title: t`Remove folder`,
@@ -1795,6 +1805,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
     const answer = await confirmItemsRemoval({
       names: layouts.map(layout => layout.getName()),
+      getOtherItemsLabel: count => t`And ${count} other scenes`,
       title: layouts.length === 1 ? t`Remove scene` : t`Remove scenes`,
       singleItemMessage: t`Are you sure you want to remove this scene? This can't be undone.`,
       getSeveralItemsMessage: namesList =>
@@ -1836,6 +1847,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
     const answer = await confirmItemsRemoval({
       names,
+      getOtherItemsLabel: count => t`And ${count} other external layouts`,
       title:
         names.length === 1
           ? t`Remove external layout`
@@ -1877,6 +1889,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
     const answer = await confirmItemsRemoval({
       names,
+      getOtherItemsLabel: count => t`And ${count} other external events`,
       title: t`Remove external events`,
       singleItemMessage: t`Are you sure you want to remove these external events? This can't be undone.`,
       getSeveralItemsMessage: namesList =>
@@ -1914,6 +1927,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     const testNames = tests.map(test => test.getName());
     const answer = await confirmItemsRemoval({
       names: testNames,
+      getOtherItemsLabel: count => t`And ${count} other gameplay tests`,
       title:
         testNames.length === 1
           ? t`Remove gameplay test`

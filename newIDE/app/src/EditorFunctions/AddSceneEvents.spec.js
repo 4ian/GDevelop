@@ -504,6 +504,7 @@ describe('add_scene_events', () => {
       expect(result.editedEventSnippets).toEqual([
         {
           eventId: 'event-0',
+          replacements: 'Edit 1 replaced 1 occurrence (line 2).',
           snippet: [
             '1\tconst a = 1;',
             '2\tconst b = 20;',
@@ -653,17 +654,25 @@ describe('add_scene_events', () => {
       expect(foundTwice.message).toContain('found 2 times (at lines 1, 2)');
       expect(generateEvents).not.toHaveBeenCalled();
 
-      await launchWithEdits(generateEvents, {
+      const replacedTwice = await launchWithEdits(generateEvents, {
         edits: [
           {
             old_string: 'const a = 1;',
             new_string: 'const a = 10;',
             replace_all: true,
           },
+          { old_string: 'const b = 2;', new_string: 'const b = 3;' },
         ],
       });
+      expect(
+        (replacedTwice.editedEventSnippets || []).map(
+          ({ replacements }) => replacements
+        )
+      ).toEqual([
+        'Edit 1 replaced 2 occurrences (lines 1, 2). Edit 2 replaced 1 occurrence (line 3).',
+      ]);
       expect(getJsCode()).toBe(
-        ['const a = 10;', 'const a = 10;', 'const b = 2;'].join('\n')
+        ['const a = 10;', 'const a = 10;', 'const b = 3;'].join('\n')
       );
     });
   });

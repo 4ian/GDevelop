@@ -20,7 +20,7 @@ type EventSourceEdit = {|
   replaceAll: boolean,
 |};
 
-type EditedRange = {| start: number, length: number |};
+type EditedRange = {| start: number, length: number, editIndex: number |};
 
 /**
  * What `edits` apply to: the code of a `js` event (numbered like
@@ -47,6 +47,7 @@ export type PreparedEventSourceEdits =
       eventScript: string,
       editedText: string,
       editedRanges: Array<EditedRange>,
+      replacementsSummary: string,
       includeSubEvents: boolean,
     |};
 
@@ -127,6 +128,31 @@ const listLineNumbers = (text: string, indexes: Array<number>): string =>
     .slice(0, MAX_LISTED_LINE_NUMBERS)
     .map(index => getLineNumber(text, index))
     .join(', ') + (indexes.length > MAX_LISTED_LINE_NUMBERS ? ', ...' : '');
+
+/**
+ * What each edit replaced, so that a too broad `old_string` (a `replace_all`
+ * matching more than intended) shows: "Edit 1 replaced 2 occurrences (lines
+ * 1, 2104)."
+ */
+const getReplacementsSummary = (
+  text: string,
+  editedRanges: Array<EditedRange>,
+  editsCount: number
+): string => {
+  const sentences = [];
+  for (let editIndex = 0; editIndex < editsCount; editIndex++) {
+    const starts = editedRanges
+      .filter(range => range.editIndex === editIndex)
+      .map(range => range.start)
+      .sort((a, b) => a - b);
+    sentences.push(
+      `Edit ${editIndex + 1} replaced ${starts.length} occurrence${
+        starts.length > 1 ? 's' : ''
+      } (line${starts.length > 1 ? 's' : ''} ${listLineNumbers(text, starts)}).`
+    );
+  }
+  return sentences.join(' ');
+};
 
 const getNotFoundHints = (text: string, oldString: string): Array<string> => {
   const hints = [];
@@ -234,6 +260,7 @@ const applyEdits = ({
       editedRanges.push({
         start: indexes[i] + i * lengthDifference,
         length: newString.length,
+        editIndex,
       });
     }
   }
@@ -321,6 +348,11 @@ export const prepareEventSourceEdits = ({
     eventScript,
     editedText: editsResult.text,
     editedRanges: editsResult.editedRanges,
+    replacementsSummary: getReplacementsSummary(
+      editsResult.text,
+      editsResult.editedRanges,
+      edits.length
+    ),
     includeSubEvents,
   };
 };

@@ -347,7 +347,11 @@ export type EditorFunctionGenericOutput = {|
   selectedEventIds?: Array<string>,
   jsCodeExcerpt?: JsCodeExcerpt,
   // `generate_events` with `edits`: the numbered lines around the edits.
-  editedEventSnippets?: Array<{| eventId: string, snippet: string |}>,
+  editedEventSnippets?: Array<{|
+    eventId: string,
+    replacements: string,
+    snippet: string,
+  |}>,
   truncated?: boolean,
   notes?: Array<string>,
   generatedEventsErrorDiagnostics?: string,
@@ -7350,6 +7354,7 @@ const addSceneEvents: EditorFunction = {
           .join(', ')}.`,
         editedEventSnippets: jsCodeEdits.map(preparedEdits => ({
           eventId: preparedEdits.eventId,
+          replacements: preparedEdits.replacementsSummary,
           snippet: renderEditedEventSnippet({
             eventsList: currentEventsList,
             preparedEdits,
@@ -7754,6 +7759,7 @@ See errors; verify event contents if needed.`
           if (preparedEdits && preparedEdits.success) {
             editedEventSnippets.push({
               eventId: preparedEdits.eventId,
+              replacements: preparedEdits.replacementsSummary,
               snippet: renderEditedEventSnippet({
                 eventsList: upToDateEventsList,
                 preparedEdits,

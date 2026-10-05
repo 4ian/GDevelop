@@ -3346,13 +3346,18 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
           }
 
-          // The history is saved by the layers list once it removed the
-          // layer (see `_onLayersModified`), in a single step with the
-          // instances removed above.
-          if (doRemove) this._removedLayerNameToReveal = layerName;
+          // The layers list removes the layer synchronously: one step with
+          // the instances removed above.
           done(doRemove);
-          this._removedLayerNameToReveal = null;
           if (doRemove) {
+            // Undoing the removal shows the layer back (it's not selected
+            // anymore at this point: give its name).
+            this._recordLayersAndInstancesStep({
+              lastSelectionType: 'layer',
+              selectedObjectNames: [],
+              selectedObjectGroupName: null,
+              selectedLayerName: layerName,
+            });
             this.props.onLayerRenamedOrRemoved();
           }
           // /!\ Force the instances editor to destroy and mount again the
@@ -3371,8 +3376,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onLayerRenamed = (oldName: string, newName: string) => {
-    // The history is saved by the layers list right after (see
-    // `_onLayersModified`).
+    // Instances too: they were moved to the renamed layer.
+    this._recordLayersAndInstancesStep(null);
     this.forceUpdatePropertiesEditor();
     this.props.onLayerRenamedOrRemoved();
     if (this.state.chosenLayer === oldName) {
@@ -3447,33 +3452,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  // Set while a layer is removed: undoing the removal shows this layer.
-  _removedLayerNameToReveal: ?string = null;
-
-  _onLayersModified = (hasAnyEffectBeenAdded: boolean) => {
-    const removedLayerName = this._removedLayerNameToReveal;
-    this._removedLayerNameToReveal = null;
-    // Instances too: removing a layer removes its instances.
+  _recordLayersAndInstancesStep = (revealSelection: ?SelectionByName) => {
     this._recordHistoryStep(
       undefined,
       {
         source: 'panel',
         editorId: 'layers-list',
-        ...(typeof removedLayerName === 'string'
-          ? {
-              // Undoing the removal shows the layer back (it's not
-              // selected anymore at this point: give its name).
-              revealSelection: {
-                lastSelectionType: 'layer',
-                selectedObjectNames: [],
-                selectedObjectGroupName: null,
-                selectedLayerName: removedLayerName,
-              },
-            }
-          : {}),
+        ...(revealSelection ? { revealSelection } : {}),
       },
       ['layers', 'instances']
     );
+  };
+
+  // Not called for a renamed or removed layer (see `_onLayerRenamed` and
+  // `_onRemoveLayer`).
+  _onLayersModified = (hasAnyEffectBeenAdded: boolean) => {
+    this._recordLayersAndInstancesStep(null);
 
     const { onEffectAdded } = this.props;
     if (hasAnyEffectBeenAdded) {

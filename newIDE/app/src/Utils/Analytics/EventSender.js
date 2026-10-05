@@ -198,6 +198,11 @@ export const installAnalyticsEvents = () => {
       posthogLoaded = true;
     },
     autocapture: false, // we disable autocapture because we want to control which events we send.
+    session_recording: {
+      // Iframes (in-game editor, gameplay tests) are not recorded: the recording would
+      // keep a reference to every document loaded in them (including game WebAssembly memories).
+      blockSelector: 'iframe',
+    },
   });
 };
 

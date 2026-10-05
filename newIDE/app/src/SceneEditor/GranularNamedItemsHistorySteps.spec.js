@@ -1,5 +1,9 @@
 // @flow
-import { getIntermediateNamedItemsStates } from './GranularNamedItemsHistorySteps';
+import {
+  getIntermediateNamedItemsStates,
+  getNamedItemsStateWithChangesApplied,
+  getSerializedObjectChangeKeys,
+} from './GranularNamedItemsHistorySteps';
 
 describe('getIntermediateNamedItemsStates', () => {
   it('returns nothing when nothing changed', () => {
@@ -107,5 +111,86 @@ describe('getIntermediateNamedItemsStates', () => {
     ];
     const states = getIntermediateNamedItemsStates(before, after);
     expect(states).toEqual([after]);
+  });
+});
+
+describe('getSerializedObjectChangeKeys', () => {
+  const object = {
+    name: 'Player',
+    width: 10,
+    animations: [{ name: 'Idle' }],
+    behaviors: [{ name: 'Physics', gravity: 9 }],
+    variables: [{ name: 'Life', value: 3 }],
+    effects: [],
+  };
+
+  it('returns nothing when nothing changed', () => {
+    expect(getSerializedObjectChangeKeys(object, { ...object })).toEqual([]);
+  });
+
+  it('names the changed, added and removed named items', () => {
+    expect(
+      getSerializedObjectChangeKeys(object, {
+        ...object,
+        behaviors: [{ name: 'Physics', gravity: 10 }, { name: 'Tween' }],
+        variables: [],
+      })
+    ).toEqual(['behaviors:Physics', 'behaviors:Tween', 'variables:Life']);
+  });
+
+  it('ignores a different order of the keys', () => {
+    expect(
+      getSerializedObjectChangeKeys(object, {
+        ...object,
+        behaviors: [{ gravity: 9, name: 'Physics' }],
+      })
+    ).toEqual([]);
+  });
+
+  it('names the other changed top-level keys', () => {
+    expect(
+      getSerializedObjectChangeKeys(object, {
+        ...object,
+        width: 20,
+        animations: [{ name: 'Idle' }, { name: 'Run' }],
+      })
+    ).toEqual(['width', 'animations']);
+  });
+});
+
+describe('getNamedItemsStateWithChangesApplied', () => {
+  const before = [{ name: 'A', value: 1 }, { name: 'B', value: 2 }];
+  const after = [{ name: 'A', value: 10 }, { name: 'C', value: 3 }];
+
+  it('applies nothing with no name', () => {
+    expect(
+      getNamedItemsStateWithChangesApplied(before, after, new Set())
+    ).toEqual(before);
+  });
+
+  it('applies the change, the addition or the removal of the given names only', () => {
+    expect(
+      getNamedItemsStateWithChangesApplied(before, after, new Set(['A']))
+    ).toEqual([{ name: 'A', value: 10 }, { name: 'B', value: 2 }]);
+    expect(
+      getNamedItemsStateWithChangesApplied(before, after, new Set(['C']))
+    ).toEqual([
+      { name: 'A', value: 1 },
+      { name: 'C', value: 3 },
+      { name: 'B', value: 2 },
+    ]);
+    expect(
+      getNamedItemsStateWithChangesApplied(before, after, new Set(['B']))
+    ).toEqual([{ name: 'A', value: 1 }]);
+  });
+
+  it('is exactly the final state with every name applied', () => {
+    expect(
+      getNamedItemsStateWithChangesApplied(
+        before,
+        after,
+        new Set(['A', 'B', 'C'])
+      )
+    ).toEqual(after);
   });
 });

@@ -44,6 +44,8 @@ type Props = {|
     hasAnyEffectBeenAdded: boolean
   ) => void,
   onCancel: () => void,
+  // Called after each change made to the object while the dialog is open.
+  onChange?: () => void,
 
   // Object renaming:
   onRename: string => void,
@@ -145,7 +147,7 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   const {
     onCancelChanges,
-    notifyOfChange,
+    notifyOfChange: notifyEditorOfChange,
     hasUnsavedChanges,
     getOriginalContentSerializedElement,
   } = useSerializableObjectCancelableEditor({
@@ -153,6 +155,14 @@ const InnerDialog = (props: InnerDialogProps) => {
     useProjectToUnserialize: project,
     onCancel,
   });
+  const { onChange } = props;
+  const notifyOfChange = React.useCallback(
+    () => {
+      notifyEditorOfChange();
+      if (onChange) onChange();
+    },
+    [notifyEditorOfChange, onChange]
+  );
   useMarkObjectAsOpenedInEditor(object);
 
   const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(

@@ -105,6 +105,7 @@ export const getObjectsContainerHistoryTarget = (
         const object = objectsContainer.getObject(name);
         // Unserializing adds (or updates) the behaviors, but never removes
         // the ones that are not part of the restored object anymore.
+        // Default (capability) behaviors are never serialized: keep them.
         const targetBehaviorNames = new Set(
           ((serialized && serialized.behaviors) || []).map(
             behavior => behavior.name
@@ -113,7 +114,11 @@ export const getObjectsContainerHistoryTarget = (
         object
           .getAllBehaviorNames()
           .toJSArray()
-          .filter(behaviorName => !targetBehaviorNames.has(behaviorName))
+          .filter(
+            behaviorName =>
+              !targetBehaviorNames.has(behaviorName) &&
+              !object.getBehavior(behaviorName).isDefaultBehavior()
+          )
           .forEach(behaviorName => object.removeBehavior(behaviorName));
         unserializeFromJSObject(object, serialized, 'unserializeFrom', project);
       } else {
@@ -173,6 +178,9 @@ export const getObjectGroupsContainerHistoryTarget = (
     targetGroups.forEach(({ name, serialized }, index) => {
       if (objectGroupsContainer.has(name)) {
         unserializeFromJSObject(objectGroupsContainer.get(name), serialized);
+        const currentIndex = objectGroupsContainer.getPosition(name);
+        if (currentIndex !== index)
+          objectGroupsContainer.move(currentIndex, index);
       } else {
         const newGroup = objectGroupsContainer.insertNew(name, index);
         unserializeFromJSObject(newGroup, serialized);

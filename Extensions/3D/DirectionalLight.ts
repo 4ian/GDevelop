@@ -25,9 +25,12 @@ namespace gdjs {
           private _minimumShadowBias: float = 0;
           private _distanceFromCamera: float = 1500;
           private _frustumSize: float = 4000;
+          private _isShadowFittedToCamera: boolean = false;
+          private _shadowDistance: float = 1000;
           private _shadowCenter = new THREE.Vector3();
           private _lightOffset = new THREE.Vector3();
           private _origin = new THREE.Vector3();
+          private _cameraFrustumCorner = new THREE.Vector3();
           private _shadowCameraRotation = new THREE.Matrix4();
           private _shadowCameraRight = new THREE.Vector3();
           private _shadowCameraUp = new THREE.Vector3();
@@ -36,7 +39,8 @@ namespace gdjs {
           private _isEnabled: boolean = false;
           private _light: THREE.DirectionalLight;
           private _shadowMapDirty = true;
-          private _shadowCameraDirty = true;
+          private _shadowCameraFrustumSize: float = 0;
+          private _shadowCameraLightDistance: float = 0;
           private _shadowCameraInverseWorldScale: float = 0;
           private _shadowCameraHelper: THREE.CameraHelper | null;
 
@@ -54,26 +58,31 @@ namespace gdjs {
             this._light.shadow.camera.updateProjectionMatrix();
           }
 
-          private _updateShadowCamera(scene: gdjs.RuntimeScene): void {
-            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
+          private _updateShadowCamera(
+            frustumSize: float,
+            lightDistance: float,
+            inverseWorldScale: float
+          ): void {
             // The world scale can be changed in the editor.
             if (
-              !this._shadowCameraDirty &&
+              this._shadowCameraFrustumSize === frustumSize &&
+              this._shadowCameraLightDistance === lightDistance &&
               this._shadowCameraInverseWorldScale === inverseWorldScale
             ) {
               return;
             }
-            this._shadowCameraDirty = false;
+            this._shadowCameraFrustumSize = frustumSize;
+            this._shadowCameraLightDistance = lightDistance;
             this._shadowCameraInverseWorldScale = inverseWorldScale;
-            const frustumSize = this._frustumSize * inverseWorldScale;
+            const halfFrustumSize = (frustumSize / 2) * inverseWorldScale;
 
             this._light.shadow.camera.near = 1 * inverseWorldScale;
             this._light.shadow.camera.far =
-              (this._distanceFromCamera + 10000) * inverseWorldScale;
-            this._light.shadow.camera.right = frustumSize / 2;
-            this._light.shadow.camera.left = -frustumSize / 2;
-            this._light.shadow.camera.top = frustumSize / 2;
-            this._light.shadow.camera.bottom = -frustumSize / 2;
+              (lightDistance + 10000) * inverseWorldScale;
+            this._light.shadow.camera.right = halfFrustumSize;
+            this._light.shadow.camera.left = -halfFrustumSize;
+            this._light.shadow.camera.top = halfFrustumSize;
+            this._light.shadow.camera.bottom = -halfFrustumSize;
             // Three.js only updates it when the shadow map is created.
             this._light.shadow.camera.updateProjectionMatrix();
           }
@@ -145,8 +154,6 @@ namespace gdjs {
             const scene = target.getRuntimeScene().getScene();
             const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
 
-            // Apply any update to the camera or shadow map size.
-            this._updateShadowCamera(scene);
             this._updateShadowMapSize();
 
             // Avoid shadow acne due to depth buffer precision.
@@ -165,21 +172,125 @@ namespace gdjs {
               return;
             }
             const layer = target.getRuntimeLayer();
-            // Contrary to cameras, lights are within the scene so they already
-            // take world scale into account.
-            this._shadowCenter.set(
-              layer.getCameraX(),
-              layer.getCameraY(),
-              layer.getCameraZ(layer.getInitialCamera3DFieldOfView())
+            const threeCamera = layer.getRenderer().getThreeCamera();
+            let frustumSize = this._frustumSize;
+            let lightDistance = this._distanceFromCamera;
+            if (this._isShadowFittedToCamera && threeCamera) {
+              const radius = this._fitShadowToCamera(
+                threeCamera,
+                inverseWorldScale
+              );
+              // Leave a texel on each side for the snapping to texels.
+              frustumSize =
+                (2 * radius * this._shadowMapSize) / (this._shadowMapSize - 2);
+              // Objects between the light and the visible area must cast
+              // shadows too.
+              lightDistance = this._distanceFromCamera + radius;
+            } else {
+              // Contrary to cameras, lights are within the scene so they
+              // already take world scale into account.
+              this._shadowCenter.set(
+                layer.getCameraX(),
+                layer.getCameraY(),
+                layer.getCameraZ(layer.getInitialCamera3DFieldOfView())
+              );
+            }
+            this._updateShadowCamera(
+              frustumSize,
+              lightDistance,
+              inverseWorldScale
             );
+            this._updateLightOffset(lightDistance);
+            this._snapShadowCenterToShadowMapTexels(frustumSize);
+            this._light.target.position.copy(this._shadowCenter);
+            this._light.position
+              .copy(this._shadowCenter)
+              .add(this._lightOffset);
+          }
+          /**
+           * Center the shadow on the part of the camera frustum closer than
+           * the shadow distance, so that the shadow map only covers what can
+           * be seen.
+           *
+           * The shadow covers the bounding sphere of this part of the frustum
+           * rather than its bounding box: the sphere size doesn't change when
+           * the camera turns, so the shadow map texels keep the same size and
+           * the edges of shadows don't flicker.
+           *
+           * @returns The radius of the sphere, in the scene coordinates.
+           */
+          private _fitShadowToCamera(
+            threeCamera: THREE.PerspectiveCamera | THREE.OrthographicCamera,
+            inverseWorldScale: float
+          ): float {
+            // The frustum is symmetric, so a corner of the near and far planes
+            // gives the distance of every corner to the view axis.
+            const near = threeCamera.near;
+            const far = threeCamera.far;
+            const nearCornerDistanceToAxis = this._cameraFrustumCorner
+              .set(1, 1, -1)
+              .applyMatrix4(threeCamera.projectionMatrixInverse)
+              .setZ(0)
+              .length();
+            const farCornerDistanceToAxis = this._cameraFrustumCorner
+              .set(1, 1, 1)
+              .applyMatrix4(threeCamera.projectionMatrixInverse)
+              .setZ(0)
+              .length();
+            const shadowFar = Math.max(
+              near,
+              Math.min(far, this._shadowDistance * inverseWorldScale)
+            );
+            const shadowFarCornerDistanceToAxis =
+              far > near
+                ? nearCornerDistanceToAxis +
+                  ((farCornerDistanceToAxis - nearCornerDistanceToAxis) *
+                    (shadowFar - near)) /
+                    (far - near)
+                : farCornerDistanceToAxis;
+
+            // The smallest sphere has its center on the view axis, at the same
+            // distance of the near and far corners, unless it's farther than
+            // the far corners.
+            const centerDepth =
+              shadowFar > near
+                ? gdjs.evtTools.common.clamp(
+                    (shadowFar * shadowFar +
+                      shadowFarCornerDistanceToAxis *
+                        shadowFarCornerDistanceToAxis -
+                      near * near -
+                      nearCornerDistanceToAxis * nearCornerDistanceToAxis) /
+                      (2 * (shadowFar - near)),
+                    near,
+                    shadowFar
+                  )
+                : near;
+            const radius = Math.max(
+              Math.hypot(centerDepth - near, nearCornerDistanceToAxis),
+              Math.hypot(shadowFar - centerDepth, shadowFarCornerDistanceToAxis)
+            );
+
+            // The camera is not in the scene: convert the center to the scene
+            // coordinates (scaled by the world scale and mirrored on Y).
+            threeCamera.updateMatrixWorld();
+            this._shadowCenter
+              .set(0, 0, -centerDepth)
+              .applyMatrix4(threeCamera.matrixWorld);
+            this._shadowCenter.set(
+              this._shadowCenter.x / inverseWorldScale,
+              -this._shadowCenter.y / inverseWorldScale,
+              this._shadowCenter.z / inverseWorldScale
+            );
+            return radius / inverseWorldScale;
+          }
+          private _updateLightOffset(lightDistance: float): void {
             if (this._top === 'Y-') {
               this._lightOffset.set(
-                this._distanceFromCamera *
+                lightDistance *
                   Math.cos(gdjs.toRad(-this._rotation + 90)) *
                   Math.cos(gdjs.toRad(this._elevation)),
-                -this._distanceFromCamera *
-                  Math.sin(gdjs.toRad(this._elevation)),
-                this._distanceFromCamera *
+                -lightDistance * Math.sin(gdjs.toRad(this._elevation)),
+                lightDistance *
                   Math.sin(gdjs.toRad(-this._rotation + 90)) *
                   Math.cos(gdjs.toRad(this._elevation))
               );
@@ -195,21 +306,16 @@ namespace gdjs {
               );
             } else {
               this._lightOffset.set(
-                this._distanceFromCamera *
+                lightDistance *
                   Math.cos(gdjs.toRad(this._rotation)) *
                   Math.cos(gdjs.toRad(this._elevation)),
-                this._distanceFromCamera *
+                lightDistance *
                   Math.sin(gdjs.toRad(this._rotation)) *
                   Math.cos(gdjs.toRad(this._elevation)),
-                this._distanceFromCamera * Math.sin(gdjs.toRad(this._elevation))
+                lightDistance * Math.sin(gdjs.toRad(this._elevation))
               );
               this._light.shadow.camera.up.copy(THREE.Object3D.DEFAULT_UP);
             }
-            this._snapShadowCenterToShadowMapTexels();
-            this._light.target.position.copy(this._shadowCenter);
-            this._light.position
-              .copy(this._shadowCenter)
-              .add(this._lightOffset);
           }
           /**
            * Move the shadow center by less than a texel so that the shadow map
@@ -217,7 +323,7 @@ namespace gdjs {
            * Otherwise, the edges of shadows flicker as they are rasterized
            * differently on each frame.
            */
-          private _snapShadowCenterToShadowMapTexels(): void {
+          private _snapShadowCenterToShadowMapTexels(frustumSize: float): void {
             // The shadow camera axes are computed like Three.js does in
             // `LightShadow.updateMatrices`, in world coordinates, where the Y
             // axis is the opposite of the scene one (the scene is mirrored on Y).
@@ -239,7 +345,7 @@ namespace gdjs {
             this._shadowCameraRight.y = -this._shadowCameraRight.y;
             this._shadowCameraUp.y = -this._shadowCameraUp.y;
 
-            const texelSize = this._frustumSize / this._shadowMapSize;
+            const texelSize = frustumSize / this._shadowMapSize;
             const right = this._shadowCenter.dot(this._shadowCameraRight);
             const up = this._shadowCenter.dot(this._shadowCameraUp);
             this._shadowCenter
@@ -261,10 +367,10 @@ namespace gdjs {
               this._rotation = value;
             } else if (parameterName === 'distanceFromCamera') {
               this._distanceFromCamera = value;
-              this._shadowCameraDirty = true;
             } else if (parameterName === 'frustumSize') {
               this._frustumSize = value;
-              this._shadowCameraDirty = true;
+            } else if (parameterName === 'shadowDistance') {
+              this._shadowDistance = value;
             } else if (parameterName === 'minimumShadowBias') {
               this._minimumShadowBias = value;
             } else if (parameterName === 'shadowIntensity') {
@@ -288,6 +394,8 @@ namespace gdjs {
               return this._distanceFromCamera;
             } else if (parameterName === 'frustumSize') {
               return this._frustumSize;
+            } else if (parameterName === 'shadowDistance') {
+              return this._shadowDistance;
             } else if (parameterName === 'minimumShadowBias') {
               return this._minimumShadowBias;
             } else if (parameterName === 'shadowIntensity') {
@@ -335,6 +443,8 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'isCastingShadow') {
               this._light.castShadow = value;
+            } else if (parameterName === 'isShadowFittedToCamera') {
+              this._isShadowFittedToCamera = value;
             }
           }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {

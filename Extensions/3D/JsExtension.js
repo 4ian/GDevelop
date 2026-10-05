@@ -2299,6 +2299,29 @@ module.exports = {
         .setType('choice')
         .setGroup(_('Shadows'));
       properties
+        .getOrCreate('isShadowFittedToCamera')
+        .setValue('false')
+        .setLabel(_('Fit shadows to the camera view'))
+        .setDescription(
+          _(
+            'Draw shadows only for what the camera sees, up to the shadow distance. Shadows are sharper, especially when the camera is close to the ground or tilted.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowDistance')
+        .setValue('1000')
+        .setLabel(_('Shadow distance'))
+        .setDescription(
+          _(
+            'Distance from the camera up to which shadows are drawn, when they are fitted to the camera view. The smaller it is, the sharper shadows are.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'));
+      properties
         .getOrCreate('shadowIntensity')
         .setValue('1')
         .setLabel(_('Shadow intensity'))
@@ -2336,6 +2359,11 @@ module.exports = {
         .getOrCreate('frustumSize')
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))
+        .setDescription(
+          _(
+            'Size of the area around the camera where shadows are drawn, when they are not fitted to the camera view.'
+          )
+        )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))
@@ -2344,6 +2372,11 @@ module.exports = {
         .getOrCreate('distanceFromCamera')
         .setValue('1500')
         .setLabel(_("Distance from layer's camera"))
+        .setDescription(
+          _(
+            'Objects farther than this from the area where shadows are drawn, towards the light, do not cast shadows.'
+          )
+        )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))

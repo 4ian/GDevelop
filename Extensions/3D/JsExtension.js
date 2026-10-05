@@ -2342,7 +2342,8 @@ module.exports = {
           )
         )
         .setType('number')
-        .setGroup(_('Shadows'));
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
       properties
         .getOrCreate('minimumShadowBias')
         .setValue('0')

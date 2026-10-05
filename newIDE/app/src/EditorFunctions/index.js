@@ -39,6 +39,7 @@ import {
   applyEventsChanges,
 } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
+import { setEffectDefaultParameters } from '../EffectsList/EnumerateEffects';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { runGameplayTest, changeGameplayTests } from './GameplayTestTools';
 import { Trans } from '@lingui/macro';
@@ -8161,6 +8162,7 @@ const applyEffectChange = ({
           new_effect_position || 0
         );
         newlyCreatedEffect.setEffectType(effect_type);
+        setEffectDefaultParameters(newlyCreatedEffect, effectMetadata);
       }
     } else if (
       delete_this_effect ||

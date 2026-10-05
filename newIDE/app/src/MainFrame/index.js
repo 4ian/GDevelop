@@ -23,6 +23,7 @@ import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
 import Window from '../Utils/Window';
+import { markLegacySkyboxes } from '../Utils/LegacySkyboxOrientation';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
@@ -1425,6 +1426,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       const startTime = Date.now();
       const newProject = gd.ProjectHelper.createNewGDJSProject();
       newProject.unserializeFrom(serializedProject);
+      markLegacySkyboxes(newProject);
       const duration = Date.now() - startTime;
       console.info(`Unserialization took ${duration.toFixed(2)} ms`);
 

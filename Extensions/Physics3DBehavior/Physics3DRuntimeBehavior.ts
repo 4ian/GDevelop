@@ -476,14 +476,96 @@ namespace gdjs {
     }
 
     override applyBehaviorOverriding(behaviorData): boolean {
-      this._applyBehaviorData(behaviorData);
+      if (behaviorData.bullet !== undefined) {
+        this.setBullet(behaviorData.bullet);
+      }
+      if (behaviorData.fixedRotation !== undefined) {
+        this.setFixedRotation(behaviorData.fixedRotation);
+      }
+      if (behaviorData.shapeDimensionA !== undefined) {
+        this.shapeDimensionA = behaviorData.shapeDimensionA;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shapeDimensionB !== undefined) {
+        this.shapeDimensionB = behaviorData.shapeDimensionB;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shapeDimensionC !== undefined) {
+        this.shapeDimensionC = behaviorData.shapeDimensionC;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shapeOffsetX !== undefined) {
+        this.setShapeOffsetX(behaviorData.shapeOffsetX);
+      }
+      if (behaviorData.shapeOffsetY !== undefined) {
+        this.setShapeOffsetY(behaviorData.shapeOffsetY);
+      }
+      if (behaviorData.shapeOffsetZ !== undefined) {
+        this.setShapeOffsetZ(behaviorData.shapeOffsetZ);
+      }
+      if (behaviorData.massCenterOffsetX !== undefined) {
+        this.massCenterOffsetX = behaviorData.massCenterOffsetX;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.massCenterOffsetY !== undefined) {
+        this.massCenterOffsetY = behaviorData.massCenterOffsetY;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.massCenterOffsetZ !== undefined) {
+        this.massCenterOffsetZ = behaviorData.massCenterOffsetZ;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.meshShapeResourceName !== undefined) {
+        this.meshShapeResourceName = behaviorData.meshShapeResourceName;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shape !== undefined) {
+        this._shape = behaviorData.shape;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shapeOrientation !== undefined) {
+        this.shapeOrientation = behaviorData.shapeOrientation;
+        this._needToRecreateShape = true;
+      }
+      if (this._shape === 'Box') {
+        this.shapeOrientation = 'Z';
+      }
+      if (behaviorData.density !== undefined) {
+        this.setDensity(behaviorData.density);
+      }
+      if (behaviorData.massOverride !== undefined) {
+        this.setMassOverride(behaviorData.massOverride);
+      }
+      if (behaviorData.friction !== undefined) {
+        this.setFriction(behaviorData.friction);
+      }
+      if (behaviorData.restitution !== undefined) {
+        this.setRestitution(behaviorData.restitution);
+      }
+      if (behaviorData.linearDamping !== undefined) {
+        this.setLinearDamping(behaviorData.linearDamping);
+      }
+      if (behaviorData.angularDamping !== undefined) {
+        this.setAngularDamping(behaviorData.angularDamping);
+      }
+      if (behaviorData.gravityScale !== undefined) {
+        this.setGravityScale(behaviorData.gravityScale);
+      }
 
-      // Every property (shape, body type, layers, masks, friction, damping...)
-      // is read when the body is created, so recreating the body (and its
-      // shape) applies all of them. It's done lazily at the next update, which
-      // keeps the velocities, and does nothing if the body doesn't exist yet.
-      this._needToRecreateShape = true;
-      this._needToRecreateBody = true;
+      // These properties can't be changed on an existing Jolt body:
+      // the body is recreated at the next update.
+      if (behaviorData.layers !== undefined) {
+        this.layers = behaviorData.layers;
+        this._needToRecreateBody = true;
+      }
+      if (behaviorData.masks !== undefined) {
+        this.masks = behaviorData.masks;
+        this._needToRecreateBody = true;
+      }
+      if (behaviorData.bodyType !== undefined) {
+        this.bodyType = behaviorData.bodyType;
+        this._needToRecreateBody = true;
+      }
       return true;
     }
 
@@ -1104,53 +1186,6 @@ namespace gdjs {
     ) {
       // Reset world step to update next frame
       this._sharedData.stepped = false;
-    }
-
-    private _applyBehaviorData(data: any): void {
-      if ('bodyType' in data) this.bodyType = data.bodyType;
-      if ('bullet' in data) this.bullet = data.bullet;
-      if ('fixedRotation' in data) this.fixedRotation = data.fixedRotation;
-
-      if ('shape' in data) {
-        this._shape = data.shape;
-        const orientation =
-          'shapeOrientation' in data
-            ? data.shapeOrientation
-            : this.shapeOrientation;
-        this.shapeOrientation = data.shape === 'Box' ? 'Z' : orientation;
-      } else if ('shapeOrientation' in data) {
-        this.shapeOrientation =
-          this._shape === 'Box' ? 'Z' : data.shapeOrientation;
-      }
-
-      if ('meshShapeResourceName' in data)
-        this.meshShapeResourceName = data.meshShapeResourceName || '';
-      if ('shapeDimensionA' in data)
-        this.shapeDimensionA = data.shapeDimensionA;
-      if ('shapeDimensionB' in data)
-        this.shapeDimensionB = data.shapeDimensionB;
-      if ('shapeDimensionC' in data)
-        this.shapeDimensionC = data.shapeDimensionC;
-      if ('shapeOffsetX' in data) this.shapeOffsetX = data.shapeOffsetX || 0;
-      if ('shapeOffsetY' in data) this.shapeOffsetY = data.shapeOffsetY || 0;
-      if ('shapeOffsetZ' in data) this.shapeOffsetZ = data.shapeOffsetZ || 0;
-      if ('massCenterOffsetX' in data)
-        this.massCenterOffsetX = data.massCenterOffsetX || 0;
-      if ('massCenterOffsetY' in data)
-        this.massCenterOffsetY = data.massCenterOffsetY || 0;
-      if ('massCenterOffsetZ' in data)
-        this.massCenterOffsetZ = data.massCenterOffsetZ || 0;
-      if ('density' in data) this.density = Math.max(0.0001, data.density);
-      if ('massOverride' in data) this.massOverride = data.massOverride || 0;
-      if ('friction' in data) this.friction = data.friction;
-      if ('restitution' in data) this.restitution = data.restitution;
-      if ('linearDamping' in data)
-        this.linearDamping = Math.max(0, data.linearDamping);
-      if ('angularDamping' in data)
-        this.angularDamping = Math.max(0, data.angularDamping);
-      if ('gravityScale' in data) this.gravityScale = data.gravityScale;
-      if ('layers' in data) this.layers = data.layers;
-      if ('masks' in data) this.masks = data.masks;
     }
 
     onObjectHotReloaded() {

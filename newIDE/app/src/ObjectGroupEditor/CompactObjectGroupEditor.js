@@ -129,12 +129,14 @@ const CompactObjectGroupEditor = ({
               return isObjectListLocked ? (
                 <ListItem
                   key={objectName}
+                  id={`group-object-${objectName}`}
                   primaryText={objectName}
                   leftIcon={icon}
                 />
               ) : (
                 <ListItem
                   key={objectName}
+                  id={`group-object-${objectName}`}
                   primaryText={objectName}
                   displayRemoveButton
                   onRemove={() => onObjectRemoved(objectName)}

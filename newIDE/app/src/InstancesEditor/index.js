@@ -121,6 +121,9 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onInstancesMoved: (instances: Array<gdInitialInstance>) => void,
   onInstancesResized: (instances: Array<gdInitialInstance>) => void,
   onInstancesRotated: (instances: Array<gdInitialInstance>) => void,
+  // The size of instances without custom size can be known late (a
+  // texture or a model loaded after a while): what displays it must update.
+  onInstancesDefaultSizeChanged: (instances: Array<gdInitialInstance>) => void,
   selectedObjectNames: Array<string>,
   onContextMenu: (
     x: number,
@@ -562,6 +565,7 @@ export default class InstancesEditor extends Component<Props, State> {
       onInstanceClicked: this._onInstanceClicked,
       onInstanceRightClicked: this._onInstanceRightClicked,
       onInstanceDoubleClicked: this._onInstanceDoubleClicked,
+      onInstanceDefaultSizeChanged: this._onInstanceDefaultSizeChanged,
       showObjectInstancesIn3D: this._showObjectInstancesIn3D,
     });
     this.selectionRectangle = new SelectionRectangle({
@@ -1389,6 +1393,19 @@ export default class InstancesEditor extends Component<Props, State> {
     if (this.props.onContextMenu) {
       this.props.onContextMenu(x, y, !!ignoreSelectedObjectNamesForContextMenu);
     }
+  };
+
+  _instancesWithChangedDefaultSize: Array<gdInitialInstance> = [];
+  _onInstanceDefaultSizeChanged = (instance: gdInitialInstance) => {
+    // Reported once per frame, for all the instances concerned.
+    if (this._instancesWithChangedDefaultSize.length === 0) {
+      requestAnimationFrame(() => {
+        const instances = this._instancesWithChangedDefaultSize;
+        this._instancesWithChangedDefaultSize = [];
+        this.props.onInstancesDefaultSizeChanged(instances);
+      });
+    }
+    this._instancesWithChangedDefaultSize.push(instance);
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {

@@ -245,7 +245,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         const answer = await showDeleteConfirmation({
           title: t`Remove group`,
-          message: t`Are you sure you want to remove this group? This can't be undone.`,
+          message: t`Are you sure you want to remove this group?`,
         });
         if (!answer) return;
 
@@ -370,7 +370,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         const answer = await showConfirmation({
           title: t`Set as global group`,
-          message: t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects. This action cannot be undone.
+          message: t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects.
 
             Do you want to set this as global group?`,
           confirmButtonLabel: t`Set as global`,

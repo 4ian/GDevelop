@@ -93,7 +93,7 @@ import { isMacLike } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
-import '../UI/UndoRedoFlash.css';
+import { flashElement } from '../UI/UndoRedoFlash';
 
 const electron = optionalRequire('electron');
 
@@ -720,10 +720,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             candidate => candidate.getAttribute(datasetAttribute) === name
           );
           if (!element) return;
-          element.classList.remove('undo-redo-property-flash');
-          // Force a reflow so re-adding the class restarts the animation.
-          void element.offsetWidth;
-          element.classList.add('undo-redo-property-flash');
+          flashElement(element);
         }, 100); // A few ms is enough for a new render to be done.
       },
     }));

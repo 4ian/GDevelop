@@ -162,7 +162,7 @@ const PointsEditor = ({
         const answer = await showConfirmation({
           title: t`Use same points for all animations?`,
           message: t`
-          Having the same points for all animations will erase and reset all the other animations points. This can't be undone. Are you sure you want to share these points amongst all the animations of the object?`,
+          Having the same points for all animations will erase and reset all the other animations points. Are you sure you want to share these points amongst all the animations of the object?`,
           confirmButtonLabel: t`Use same points`,
           dismissButtonLabel: t`Cancel`,
         });
@@ -184,7 +184,7 @@ const PointsEditor = ({
       if (enable) {
         const answer = await showConfirmation({
           title: t`Use same points for all frames?`,
-          message: t`Having the same points for all frames will erase and reset all the other frames points. This can't be undone. Are you sure you want to share these points amongst all the frames of the animation?`,
+          message: t`Having the same points for all frames will erase and reset all the other frames points. Are you sure you want to share these points amongst all the frames of the animation?`,
           confirmButtonLabel: t`Use same points`,
           dismissButtonLabel: t`Cancel`,
         });

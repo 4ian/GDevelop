@@ -35,7 +35,7 @@ export class BackgroundColorTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
-    return null;
+    return { backgroundColor: 'true' };
   }
 
   getThumbnail(): ?string {

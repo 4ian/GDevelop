@@ -1087,6 +1087,8 @@ namespace gdjs {
       object: gdjs.RuntimeObject;
       dummyThreeObject: THREE.Object3D;
       threeTransformControls: THREE_ADDONS.TransformControls;
+      /** Put the controls back on the object, after it was changed. */
+      syncWithObject: () => void;
     } | null = null;
     private _transformControlsMode: 'translate' | 'rotate' | 'scale' =
       'translate';
@@ -2813,30 +2815,33 @@ namespace gdjs {
             const scaleDragWorldScale = new THREE.Vector3();
             const scaleDragLocalStart = new THREE.Vector3();
             const scaleDragLocalEnd = new THREE.Vector3();
+            const syncDummyWithObject = () => {
+              this._selectionControlsMovementTotalDelta = null;
+
+              this._updateDummyLocation(
+                dummyThreeObject,
+                lastEditableSelectedObject,
+                threeTransformControls
+              );
+              // Reset the initial position to the current position, so that
+              // it's ready to be dragged again.
+              initialObjectX = lastEditableSelectedObject.getX();
+              initialObjectY = lastEditableSelectedObject.getY();
+              initialObjectZ = is3D(lastEditableSelectedObject)
+                ? lastEditableSelectedObject.getZ()
+                : 0;
+              initialObjectWidth = lastEditableSelectedObject.getWidth();
+              initialObjectHeight = lastEditableSelectedObject.getHeight();
+              initialObjectDepth = is3D(lastEditableSelectedObject)
+                ? lastEditableSelectedObject.getDepth()
+                : 0;
+              initialDummyPosition.copy(dummyThreeObject.position);
+              initialDummyRotation.copy(dummyThreeObject.rotation);
+              initialDummyScale.copy(dummyThreeObject.scale);
+            };
             threeTransformControls.addEventListener('change', (e) => {
               if (!threeTransformControls.dragging) {
-                this._selectionControlsMovementTotalDelta = null;
-
-                this._updateDummyLocation(
-                  dummyThreeObject,
-                  lastEditableSelectedObject,
-                  threeTransformControls
-                );
-                // Reset the initial position to the current position, so that
-                // it's ready to be dragged again.
-                initialObjectX = lastEditableSelectedObject.getX();
-                initialObjectY = lastEditableSelectedObject.getY();
-                initialObjectZ = is3D(lastEditableSelectedObject)
-                  ? lastEditableSelectedObject.getZ()
-                  : 0;
-                initialObjectWidth = lastEditableSelectedObject.getWidth();
-                initialObjectHeight = lastEditableSelectedObject.getHeight();
-                initialObjectDepth = is3D(lastEditableSelectedObject)
-                  ? lastEditableSelectedObject.getDepth()
-                  : 0;
-                initialDummyPosition.copy(dummyThreeObject.position);
-                initialDummyRotation.copy(dummyThreeObject.rotation);
-                initialDummyScale.copy(dummyThreeObject.scale);
+                syncDummyWithObject();
                 return;
               }
 
@@ -3056,9 +3061,19 @@ namespace gdjs {
               object: lastEditableSelectedObject,
               dummyThreeObject,
               threeTransformControls,
+              syncWithObject: syncDummyWithObject,
             };
           }
         }
+      }
+
+      // The object can have been changed by something else than the controls
+      // (a hot-reload after an undo/redo or an edit in the properties panel...).
+      if (
+        this._selectionControls &&
+        !this._selectionControls.threeTransformControls.dragging
+      ) {
+        this._selectionControls.syncWithObject();
       }
 
       if (

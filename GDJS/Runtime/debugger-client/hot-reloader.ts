@@ -1932,6 +1932,28 @@ namespace gdjs {
           sizeChanged = true;
         }
       }
+
+      // Check if flips changed (objects with the flippable capability).
+      const flippableObject =
+        runtimeObject as unknown as Partial<gdjs.Flippable>;
+      if (flippableObject.flipX && flippableObject.flipY) {
+        if (!!oldInstance.flippedX !== !!newInstance.flippedX) {
+          flippableObject.flipX(!!newInstance.flippedX);
+          somethingChanged = true;
+        }
+        if (!!oldInstance.flippedY !== !!newInstance.flippedY) {
+          flippableObject.flipY(!!newInstance.flippedY);
+          somethingChanged = true;
+        }
+      }
+      if (
+        gdjs.Base3DHandler &&
+        gdjs.Base3DHandler.is3D(runtimeObject) &&
+        !!oldInstance.flippedZ !== !!newInstance.flippedZ
+      ) {
+        runtimeObject.flipZ(!!newInstance.flippedZ);
+        somethingChanged = true;
+      }
       if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
         // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
         const oldCustomObjectData = oldObjectData as ObjectData &

@@ -491,6 +491,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   onInstancesMoved={props.onInstancesMoved}
                   onInstancesResized={props.onInstancesResized}
                   onInstancesRotated={props.onInstancesRotated}
+                  onInstancesDefaultSizeChanged={
+                    props.onInstancesDefaultSizeChanged
+                  }
                   selectedObjectNames={selectedObjectNames}
                   onContextMenu={props.onContextMenu}
                   isInstanceOf3DObject={props.isInstanceOf3DObject}

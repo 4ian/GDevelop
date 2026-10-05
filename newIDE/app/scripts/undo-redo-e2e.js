@@ -222,7 +222,11 @@ class Editor {
     const { page } = this;
     // Native confirmation dialogs (like when removing a behavior) block the
     // page until answered.
-    page.on('dialog', dialog => dialog.accept());
+    this.nativeDialogMessages = [];
+    page.on('dialog', dialog => {
+      this.nativeDialogMessages.push(dialog.message());
+      dialog.accept();
+    });
     // Crashes of the engine (like an access to a deleted object) must fail
     // any scenario.
     this.fatalErrors = [];
@@ -749,6 +753,52 @@ class Editor {
       const objects = scene.getObjects(objectName);
       return objects && objects.length ? objects[0].getWidth() : 'no object';
     }, objectName);
+  }
+
+  /** Run a function in the 3D editor's frame, with the in-game editor. */
+  evaluateIn3DEditor(fn, ...args) {
+    const frame = this.page
+      .frames()
+      .find(frame => /in-game-editor-preview/.test(frame.url()));
+    return frame.evaluate(
+      (fnSource, ...args) => {
+        const game = window.__game;
+        if (!game || !game._inGameEditor) return 'no game';
+        // eslint-disable-next-line no-new-func
+        return new Function('return ' + fnSource)()(
+          game._inGameEditor,
+          ...args
+        );
+      },
+      fn.toString(),
+      ...args
+    );
+  }
+
+  /**
+   * Whether the gizmo of the selection (move/rotate/scale tool) is shown
+   * and usable: visible, with finite, non-zero transforms.
+   */
+  getGizmoStateIn3DEditor() {
+    return this.evaluateIn3DEditor(editor => {
+      const controls = editor._selectionControls;
+      if (!controls) return 'no selection controls';
+      const helper = controls.threeTransformControls.getHelper();
+      const { dummyThreeObject } = controls;
+      const scale = dummyThreeObject.scale.toArray();
+      const problems = [];
+      if (!helper.visible) problems.push('helper hidden');
+      if (!scale.every(value => Number.isFinite(value) && value !== 0))
+        problems.push(`dummy scale ${scale.join()}`);
+      helper.updateMatrixWorld(true);
+      let hasNonFiniteMatrix = false;
+      helper.traverse(child => {
+        if (child.matrixWorld.elements.some(value => !Number.isFinite(value)))
+          hasNonFiniteMatrix = true;
+      });
+      if (hasNonFiniteMatrix) problems.push('non finite gizmo matrix');
+      return problems.length ? problems.join(', ') : 'ok';
+    });
   }
 
   /** Start recording the elements getting the undo/redo highlight. */
@@ -1407,6 +1457,121 @@ const makeDimensionsScenario = is3D => async editor => {
   expectEqual(await getDimensions(), ['150', '100', '100'], 'after redo');
   await expectWidthIn3DEditor(150, 'after redo');
 };
+const makeZeroSizeScenario = keepRatio => async editor => {
+  await editor.switchTo3D();
+  await editor.selectInstancesOf('MyCube');
+  const field = name => `#instance-properties-editor [id="${name}"]`;
+  const getDimensions = async () => [
+    await editor.getFieldValue(field('Width')),
+    await editor.getFieldValue(field('Height')),
+    await editor.getFieldValue(field('Depth')),
+  ];
+  await editor.waitUntil(
+    'default dimensions to be known',
+    async () => (await getDimensions()).join() === '100,100,100',
+    20000
+  );
+  if (keepRatio) {
+    await editor.page.click(field('Keep ratio'));
+    await sleep(HISTORY_SAVE_DELAY);
+  }
+  await editor.evaluateIn3DEditor(editor =>
+    editor._setTransformControlsMode('scale')
+  );
+  await editor.waitUntil(
+    'scale gizmo shown',
+    async () => (await editor.getGizmoStateIn3DEditor()) === 'ok',
+    15000
+  );
+
+  await editor.setFieldValue(field('Height'), '0');
+  expectEqual((await getDimensions())[1], '0', 'height set to 0');
+  await editor.waitUntil(
+    'size applied in the 3D editor',
+    async () =>
+      (await editor.getWidthIn3DEditor('MyCube')) === (keepRatio ? 0 : 100),
+    15000
+  );
+
+  await editor.recordHighlights();
+  await editor.undo();
+  expectEqual(await getDimensions(), ['100', '100', '100'], 'after undo');
+  const highlights = await editor.getHighlights();
+  expectEqual(
+    highlights.includes('Height'),
+    true,
+    `height highlighted (${highlights})`
+  );
+  await editor.waitUntil(
+    'size restored in the 3D editor',
+    async () => (await editor.getWidthIn3DEditor('MyCube')) === 100,
+    15000
+  );
+  let gizmoState = null;
+  try {
+    await editor.waitUntil(
+      'scale gizmo shown again',
+      async () =>
+        (gizmoState = await editor.getGizmoStateIn3DEditor()) === 'ok',
+      5000
+    );
+  } catch (error) {
+    expectEqual(gizmoState, 'ok', 'scale gizmo after undo');
+  }
+};
+if (with3D) {
+  scenarios[
+    'undo of a size set to 0 keeps the scale gizmo and highlights the height (3D editor)'
+  ] = makeZeroSizeScenario(false);
+  scenarios[
+    'undo of a size set to 0 with the ratio kept keeps the scale gizmo and highlights the height (3D editor)'
+  ] = makeZeroSizeScenario(true);
+}
+
+if (with3D) {
+  scenarios['undo/redo of a flip is shown in the 3D editor'] = async editor => {
+    await editor.switchTo3D();
+    await editor.selectInstancesOf('MyCube');
+    const isFlippedXIn3DEditor = () =>
+      editor.evaluateIn3DEditor(editor => {
+        const objects = editor._currentScene.getObjects('MyCube');
+        return objects && objects.length
+          ? objects[0].isFlippedX()
+          : 'no object';
+      });
+    await editor.waitUntil(
+      'object in the 3D editor',
+      async () => (await isFlippedXIn3DEditor()) === false,
+      20000
+    );
+    // The first flip button: X.
+    await editor.page.evaluate(() => {
+      document
+        .querySelector('#instance-properties-editor [id="Flip"]')
+        .querySelector('button')
+        .click();
+    });
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.waitUntil(
+      'flipped in the 3D editor',
+      async () => (await isFlippedXIn3DEditor()) === true,
+      15000
+    );
+    await editor.undo();
+    await editor.waitUntil(
+      'flip undone in the 3D editor',
+      async () => (await isFlippedXIn3DEditor()) === false,
+      15000
+    );
+    await editor.redo();
+    await editor.waitUntil(
+      'flip redone in the 3D editor',
+      async () => (await isFlippedXIn3DEditor()) === true,
+      15000
+    );
+  };
+}
+
 scenarios[
   'instance dimensions survive undo/redo (2D editor)'
 ] = makeDimensionsScenario(false);
@@ -2422,11 +2587,13 @@ scenarios['deleting and renaming a group can be undone'] = async editor => {
   await (await groupRow('MyGroup')).asElement().click({ button: 'right' });
   await editor.clickMenuItem(/^delete/i);
   await sleep(500);
-  if (await editor.page.$('[role="dialog"]'))
+  if (await editor.page.$('[role="dialog"]')) {
+    await expectNoUndoneClaimInDialog(editor, 'group deletion confirmation');
     await editor.clickButtonWithText(
       '[role="dialog"]',
       /^(confirm|delete|yes|remove)/
     );
+  }
   await editor.waitUntil(
     'group deleted',
     async () => !(await hasGroup('MyGroup'))
@@ -2516,6 +2683,241 @@ scenarios['renaming a layer can be undone'] = async editor => {
   await editor.redo();
   await editor.waitUntil('renamed again', () => hasLayer('RenamedLayer'));
   expectEqual(await hasLayer('Background'), false, 'old name after redo');
+};
+
+const clickEditorTab = async (editor, label) => {
+  const handle = await editor.page.evaluateHandle(label => {
+    const elements = Array.from(document.querySelectorAll('span, p, div'));
+    return elements.find(
+      element => element.children.length === 0 && element.textContent === label
+    );
+  }, label);
+  await handle.asElement().click();
+  await sleep(1500);
+};
+
+const getRunningFlashAnimationsCount = editor =>
+  editor.page.evaluate(
+    () =>
+      document
+        .getAnimations()
+        .filter(
+          animation =>
+            animation.animationName === 'undo-redo-property-flash' &&
+            animation.playState === 'running'
+        ).length
+  );
+
+scenarios[
+  'coming back to the scene tab does not flash the last undo again'
+] = async editor => {
+  const x = '#instance-properties-editor [id="X"]';
+  await editor.selectInstancesOf('MyObject');
+  await editor.setFieldValue(x, '450');
+  await editor.recordHighlights();
+  await editor.undo();
+  expectEqual(await editor.getHighlights(), ['X'], 'flashed by the undo');
+  // Let the flash end.
+  await editor.waitUntil(
+    'flash ended',
+    async () => (await getRunningFlashAnimationsCount(editor)) === 0
+  );
+
+  await clickEditorTab(editor, 'Scene (Events)');
+  await clickEditorTab(editor, 'Scene');
+  await editor.waitUntil('scene editor active again', () =>
+    editor.page.evaluate(
+      () => !!document.querySelector('#scene-editor[data-active]')
+    )
+  );
+  expectEqual(
+    await getRunningFlashAnimationsCount(editor),
+    0,
+    'flashes running after coming back'
+  );
+};
+
+/**
+ * The whole project serialized, plus every object serialized as the game
+ * gets it (with its default "capability" behaviors, which the project
+ * serialization leaves out). Keys are sorted so that two equal values
+ * give the same string.
+ */
+const getSerializedProject = editor =>
+  editor.page.evaluate(() => {
+    const element = document.getElementById('scene-editor');
+    const fiberKey = Object.keys(element).find(key =>
+      key.startsWith('__reactFiber$')
+    );
+    let fiber = fiberKey ? element[fiberKey] : null;
+    while (fiber && !(fiber.stateNode && fiber.stateNode.instancesSelection))
+      fiber = fiber.return;
+    const { project, objectsContainer } = fiber.stateNode.props;
+    const toJSObject = serialize => {
+      // eslint-disable-next-line no-undef
+      const serializedElement = new gd.SerializerElement();
+      serialize(serializedElement);
+      // eslint-disable-next-line no-undef
+      const json = gd.Serializer.toJSON(serializedElement);
+      serializedElement.delete();
+      return JSON.parse(json);
+    };
+    const objectsAsInGame = {};
+    for (let i = 0; i < objectsContainer.getObjectsCount(); i++) {
+      const object = objectsContainer.getObjectAt(i);
+      objectsAsInGame[object.getName()] = toJSObject(serializedElement =>
+        // eslint-disable-next-line no-undef
+        gd.BehaviorDefaultFlagClearer.serializeObjectWithCleanDefaultBehaviorFlags(
+          object,
+          serializedElement
+        )
+      );
+    }
+    const sortKeys = value =>
+      Array.isArray(value)
+        ? value.map(sortKeys)
+        : value && typeof value === 'object'
+        ? Object.fromEntries(
+            Object.keys(value)
+              .sort()
+              .map(key => [key, sortKeys(value[key])])
+          )
+        : value;
+    return JSON.stringify(
+      sortKeys({
+        project: toJSObject(serializedElement =>
+          project.serializeTo(serializedElement)
+        ),
+        objectsAsInGame,
+      })
+    );
+  });
+
+/**
+ * What the editor does after many edits (adding a behavior, undoing...):
+ * done once before comparing, so that it's not seen as a difference.
+ */
+const normalizeBehaviorsSharedData = editor =>
+  editor.page.evaluate(() => {
+    const element = document.getElementById('scene-editor');
+    const fiberKey = Object.keys(element).find(key =>
+      key.startsWith('__reactFiber$')
+    );
+    let fiber = fiberKey ? element[fiberKey] : null;
+    while (fiber && !(fiber.stateNode && fiber.stateNode.instancesSelection))
+      fiber = fiber.return;
+    // eslint-disable-next-line no-undef
+    gd.WholeProjectRefactorer.updateBehaviorsSharedData(
+      fiber.stateNode.props.project
+    );
+  });
+
+const clickIfPresent = (editor, selector) =>
+  editor.page.evaluate(selector => {
+    const element = document.querySelector(selector);
+    if (element) element.click();
+  }, selector);
+
+const exactUndoEdits = {
+  'object property': async editor => {
+    await editor.selectObjectInList('MyCube');
+    await clickIfPresent(editor, '#object-properties-section-unfold-button');
+    await editor.setFieldValue('#object-properties-editor [id="width"]', '200');
+  },
+  'object variable': async editor => {
+    await editor.selectObjectInList('VariablesObject');
+    await editor.unfoldVariablesSection(
+      '#object-properties-editor',
+      'object-variables-section'
+    );
+    await editor.setFieldValue(
+      '#object-properties-editor #variable-0-text-value',
+      '100'
+    );
+  },
+  'object behavior property': async editor => {
+    await editor.selectObjectInList('MyObject');
+    const panel = '#object-properties-editor';
+    const behaviorPanel = `${panel} [id="behavior-panel-DestroyOutside"]`;
+    const field = `${behaviorPanel} [id="extraBorder"]`;
+    await clickIfPresent(editor, `${panel} #behaviors-section-unfold-button`);
+    await editor.waitUntil('behavior listed', () =>
+      isSelectorVisible(editor, behaviorPanel)
+    );
+    if (!(await isSelectorVisible(editor, field))) {
+      await clickIfPresent(editor, `${behaviorPanel} button`);
+      await editor.waitUntil('behavior unfolded', () =>
+        isSelectorVisible(editor, field)
+      );
+    }
+    await editor.setFieldValue(field, '50');
+  },
+  'instance property': async editor => {
+    await editor.selectInstancesOf('MyObject');
+    await editor.setFieldValue('#instance-properties-editor [id="X"]', '450');
+  },
+  'instance variable': async editor => {
+    await editor.selectInstancesOf('MyObject');
+    await editor.unfoldVariablesSection(
+      '#instance-properties-editor',
+      'instance-variables-section'
+    );
+    await editor.setFieldValue(
+      '#instance-properties-editor #variable-0-text-value',
+      '100'
+    );
+  },
+};
+Object.keys(exactUndoEdits).forEach(kind => {
+  const name = `undo of an ${kind} change restores the project exactly`;
+  fixtureSetups[name] = behaviorFixtureSetup;
+  scenarios[name] = async editor => {
+    await normalizeBehaviorsSharedData(editor);
+    const before = await getSerializedProject(editor);
+    await exactUndoEdits[kind](editor);
+    await sleep(HISTORY_SAVE_DELAY);
+    const changed = await getSerializedProject(editor);
+    expectEqual(changed !== before, true, 'project changed by the edit');
+
+    await editor.undo();
+    const afterUndo = await getSerializedProject(editor);
+    if (afterUndo !== before)
+      throw new Error(
+        `Project differs after undo: ${describeJsonDifference(
+          before,
+          afterUndo
+        )}`
+      );
+    await editor.redo();
+    expectEqual(
+      await getSerializedProject(editor),
+      changed,
+      'project after redo'
+    );
+  };
+});
+
+/** The first path at which two serialized JSON values differ. */
+const describeJsonDifference = (expectedJson, actualJson) => {
+  const walk = (expected, actual, path) => {
+    if (JSON.stringify(expected) === JSON.stringify(actual)) return null;
+    if (
+      typeof expected !== 'object' ||
+      typeof actual !== 'object' ||
+      !expected ||
+      !actual
+    )
+      return `${path}: expected ${JSON.stringify(
+        expected
+      )}, got ${JSON.stringify(actual)}`;
+    const keys = new Set([...Object.keys(expected), ...Object.keys(actual)]);
+    for (const key of keys) {
+      const difference = walk(expected[key], actual[key], `${path}.${key}`);
+      if (difference) return difference;
+    }
+    return `${path}: differs`;
+  };
+  return walk(JSON.parse(expectedJson), JSON.parse(actualJson), 'project');
 };
 
 scenarios[
@@ -2657,10 +3059,20 @@ scenarios['undo highlights a select field of an instance'] = async editor => {
     await editor.undo();
     expectEqual(await editor.getPanel(), 'group', 'panel after undo');
     expectEqual(await getMembersCount(), 2, 'members after undo');
+    // The object put back in the group is highlighted, not the section.
+    expectEqual(
+      (await editor.getHighlights()).sort(),
+      ['group-object-OtherObject', 'group-row:MyGroup'],
+      'highlighted elements after undo'
+    );
+    await editor.recordHighlights();
+    await editor.redo();
+    expectEqual(await getMembersCount(), 1, 'members after redo');
+    // Its row is gone: the section is highlighted.
     expectEqual(
       (await editor.getHighlights()).sort(),
       ['group-objects-section', 'group-row:MyGroup'],
-      'highlighted elements'
+      'highlighted elements after redo'
     );
   };
 }
@@ -2960,6 +3372,1369 @@ const clickSelectorIfPresent = (editor, selector) =>
     );
     await editor.undo();
     expectEqual(await getValues(), ['0', '1'], 'after the second undo');
+  };
+}
+
+const getUndoStepsCount = editor =>
+  editor.page.evaluate(() => {
+    const element = document.getElementById('scene-editor');
+    const fiberKey = Object.keys(element).find(key =>
+      key.startsWith('__reactFiber$')
+    );
+    let fiber = fiberKey ? element[fiberKey] : null;
+    while (fiber && !(fiber.stateNode && fiber.stateNode.instancesSelection))
+      fiber = fiber.return;
+    return fiber.stateNode.state.history.previousActions.length;
+  });
+
+const clickDialogTab = async (editor, label) => {
+  await editor.page.evaluate(label => {
+    Array.from(
+      document.querySelectorAll(
+        '[role="dialog"] [role="tab"], [role="dialog"] button'
+      )
+    )
+      .find(element => element.textContent === label)
+      .click();
+  }, label);
+  await sleep(500);
+};
+
+const openObjectEditorDialogFromBehaviors = async editor => {
+  await editor.selectObjectInList('MyObject');
+  await clickSelectorIfPresent(editor, '#behaviors-section-unfold-button');
+  await editor.clickSectionHeaderButton('behaviors-section', 'open-editor');
+  await editor.page.waitForSelector('#object-editor-dialog');
+  await clickDialogTab(editor, 'Behaviors');
+};
+
+{
+  const name = 'object editor dialog records the changes in the order made';
+  fixtureSetups[name] = project => {
+    behaviorFixtureSetup(project);
+    project.layouts[0].objects[0].effects = [
+      {
+        name: 'MyEffect',
+        effectType: 'Sepia',
+        doubleParameters: { opacity: 1 },
+        stringParameters: {},
+        booleanParameters: {},
+      },
+    ];
+  };
+  scenarios[name] = async editor => {
+    const stepsBefore = await getUndoStepsCount(editor);
+    await openObjectEditorDialogFromBehaviors(editor);
+    await editor.setFieldValue('[role="dialog"] [id="extraBorder"]', '50');
+    await clickDialogTab(editor, 'Effects');
+    await editor.setFieldValue('[role="dialog"] [id="opacity"]', '0.5');
+    await clickDialogTab(editor, 'Behaviors');
+    await editor.setFieldValue('[role="dialog"] [id="extraBorder"]', '70');
+    await applyDialog(editor);
+    expectEqual(
+      (await getUndoStepsCount(editor)) - stepsBefore,
+      3,
+      'steps recorded by the dialog'
+    );
+
+    const getValues = async () => {
+      const { objectsAsInGame } = JSON.parse(
+        await getSerializedProject(editor)
+      );
+      const object = objectsAsInGame.MyObject;
+      return [
+        object.behaviors.find(({ name }) => name === 'DestroyOutside')
+          .extraBorder,
+        object.effects[0].doubleParameters.opacity,
+      ];
+    };
+    expectEqual(await getValues(), [70, 0.5], 'applied');
+    await editor.undo();
+    expectEqual(await getValues(), [50, 0.5], 'after the first undo');
+    await editor.undo();
+    expectEqual(await getValues(), [50, 1], 'after the second undo');
+    await editor.undo();
+    expectEqual(await getValues(), [0, 1], 'after the third undo');
+    await editor.redo();
+    expectEqual(await getValues(), [50, 1], 'after a redo');
+  };
+}
+
+scenarios[
+  'adding a behavior then editing it in the object editor dialog are two steps'
+] = async editor => {
+  const stepsBefore = await getUndoStepsCount(editor);
+  await openObjectEditorDialogFromBehaviors(editor);
+  await editor.page.click('[role="dialog"] #add-behavior-button');
+  await editor.page.waitForSelector(
+    '#behavior-item-DestroyOutsideBehavior--DestroyOutside'
+  );
+  await editor.page.click(
+    '#behavior-item-DestroyOutsideBehavior--DestroyOutside'
+  );
+  await editor.page.waitForSelector('[role="dialog"] [id="extraBorder"]');
+  await sleep(HISTORY_SAVE_DELAY);
+  const getBehavior = async () => {
+    const { objectsAsInGame } = JSON.parse(await getSerializedProject(editor));
+    return objectsAsInGame.MyObject.behaviors.find(
+      ({ name }) => name === 'DestroyOutside'
+    );
+  };
+  const defaultBorder = (await getBehavior()).extraBorder;
+  await editor.setFieldValue('[role="dialog"] [id="extraBorder"]', '50');
+  await applyDialog(editor);
+  expectEqual(
+    (await getUndoStepsCount(editor)) - stepsBefore,
+    2,
+    'steps recorded by the dialog'
+  );
+
+  expectEqual((await getBehavior()).extraBorder, 50, 'applied');
+  await editor.undo();
+  expectEqual(
+    (await getBehavior()).extraBorder,
+    defaultBorder,
+    'after the first undo'
+  );
+  await editor.undo();
+  expectEqual(await getBehavior(), undefined, 'after the second undo');
+};
+
+{
+  const name = 'cancelling the object editor dialog records no step';
+  fixtureSetups[name] = behaviorFixtureSetup;
+  scenarios[name] = async editor => {
+    const stepsBefore = await getUndoStepsCount(editor);
+    await openObjectEditorDialogFromBehaviors(editor);
+    await editor.setFieldValue('[role="dialog"] [id="extraBorder"]', '50');
+    // Long enough for the change to be recorded.
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.clickButtonWithText('#object-editor-dialog', /^cancel$/);
+    await sleep(500);
+    // A confirmation asks to confirm ("Cancel") or to continue editing.
+    if (await editor.page.$('#object-editor-dialog'))
+      await editor.clickButtonWithText(
+        '[role="dialog"]:not(#object-editor-dialog)',
+        /^cancel$/
+      );
+    await editor.waitUntil(
+      'dialog closed',
+      async () => !(await editor.page.$('#object-editor-dialog'))
+    );
+    expectEqual(
+      await getUndoStepsCount(editor),
+      stepsBefore,
+      'steps after cancelling'
+    );
+    expectEqual(
+      await editor.getFieldValue(
+        '#object-properties-editor [id="behavior-panel-DestroyOutside"] [id="extraBorder"]'
+      ),
+      '0',
+      'value after cancelling'
+    );
+  };
+}
+
+const getLayerAsInProject = async (editor, layerName) =>
+  JSON.parse(await getSerializedProject(editor)).project.layouts[0].layers.find(
+    ({ name }) => name === layerName
+  );
+
+const openLayerEditorDialogFromEffects = async editor => {
+  await editor.selectLayer('Background');
+  await clickSelectorIfPresent(
+    editor,
+    '#layer-2d-effects-section-unfold-button'
+  );
+  await editor.clickSectionHeaderButton(
+    'layer-2d-effects-section',
+    'open-editor'
+  );
+  await editor.page.waitForSelector('#layer-editor-dialog');
+};
+
+{
+  const name = 'layer editor dialog records the changes in the order made';
+  fixtureSetups[name] = effectsFixtureSetup;
+  scenarios[name] = async editor => {
+    const stepsBefore = await getUndoStepsCount(editor);
+    await openLayerEditorDialogFromEffects(editor);
+    await editor.setFieldValue('[role="dialog"] [id="opacity"]', '0.5');
+    await clickDialogTab(editor, 'Properties');
+    await editor.setFieldValue(
+      '[role="dialog"] [id="Far plane distance"]',
+      '5000'
+    );
+    await clickDialogTab(editor, 'Effects');
+    await editor.setFieldValue('[role="dialog"] [id="opacity"]', '0.7');
+    await applyDialog(editor);
+    expectEqual(
+      (await getUndoStepsCount(editor)) - stepsBefore,
+      3,
+      'steps recorded by the dialog'
+    );
+
+    const getValues = async () => {
+      const layer = await getLayerAsInProject(editor, 'Background');
+      return [
+        layer.effects.find(({ name }) => name === 'My2DEffect').doubleParameters
+          .opacity,
+        layer.camera3DFarPlaneDistance,
+      ];
+    };
+    expectEqual(await getValues(), [0.7, 5000], 'applied');
+    await editor.undo();
+    expectEqual(await getValues(), [0.5, 5000], 'after the first undo');
+    await editor.undo();
+    expectEqual(await getValues(), [0.5, 10000], 'after the second undo');
+    await editor.undo();
+    expectEqual(await getValues(), [1, 10000], 'after the third undo');
+    await editor.redo();
+    expectEqual(await getValues(), [0.5, 10000], 'after a redo');
+  };
+}
+
+{
+  const name = 'cancelling the layer editor dialog records no step';
+  fixtureSetups[name] = effectsFixtureSetup;
+  scenarios[name] = async editor => {
+    const stepsBefore = await getUndoStepsCount(editor);
+    await openLayerEditorDialogFromEffects(editor);
+    await editor.setFieldValue('[role="dialog"] [id="opacity"]', '0.5');
+    // Long enough for the change to be recorded.
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.clickButtonWithText('#layer-editor-dialog', /^cancel$/);
+    await sleep(500);
+    // A confirmation asks to confirm ("Cancel") or to continue editing.
+    if (await editor.page.$('#layer-editor-dialog'))
+      await editor.clickButtonWithText(
+        '[role="dialog"]:not(#layer-editor-dialog)',
+        /^cancel$/
+      );
+    await editor.waitUntil(
+      'dialog closed',
+      async () => !(await editor.page.$('#layer-editor-dialog'))
+    );
+    expectEqual(
+      await getUndoStepsCount(editor),
+      stepsBefore,
+      'steps after cancelling'
+    );
+    expectEqual(
+      (await getLayerAsInProject(editor, 'Background')).effects[0]
+        .doubleParameters.opacity,
+      1,
+      'value after cancelling'
+    );
+  };
+}
+
+{
+  const name =
+    'undo of a group variable change highlights the group, not its objects';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objectsGroups.push({
+      name: 'VariablesGroup',
+      objects: [{ name: 'VariablesObject' }],
+    });
+  };
+  scenarios[name] = async editor => {
+    await editor.selectGroup('VariablesGroup');
+    const panel = '#object-group-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'group-variables-section');
+    await editor.setFieldValue(`${panel} #variable-0-text-value`, '134');
+    // The groups panel, closed, is opened again to show the group.
+    await (await editor.page.$(
+      '#toolbar-open-object-groups-panel-button'
+    )).click();
+    await editor.waitUntil(
+      'groups panel closed',
+      async () => !(await editor.page.$('#objects-groups-list'))
+    );
+    await editor.recordHighlights();
+    await editor.undo();
+    await editor.waitUntil('groups panel opened', () =>
+      exists(editor, '#objects-groups-list')
+    );
+    const highlights = await editor.getHighlights();
+    expectEqual(await editor.getPanel(), 'group', 'panel after undo');
+    expectEqual(
+      highlights.includes('group-row:VariablesGroup'),
+      true,
+      `group row highlighted (${highlights})`
+    );
+    expectEqual(
+      highlights.includes('VarA'),
+      true,
+      `variable highlighted in the group panel (${highlights})`
+    );
+    expectEqual(
+      highlights.some(highlight => highlight.startsWith('object-row:')),
+      false,
+      `no object row highlighted (${highlights})`
+    );
+  };
+}
+
+{
+  const name =
+    'undo of a group behavior change highlights the group, not its objects';
+  fixtureSetups[name] = behaviorFixtureSetup;
+  scenarios[name] = async editor => {
+    await editor.selectGroup('MyGroup');
+    const panel = '#object-group-properties-editor';
+    const behaviorPanel = `${panel} [id="behavior-panel-DestroyOutside"]`;
+    const field = `${behaviorPanel} [id="extraBorder"]`;
+    await clickSelectorIfPresent(
+      editor,
+      `${panel} #behaviors-section-unfold-button`
+    );
+    await editor.waitUntil('behavior listed', () =>
+      isSelectorVisible(editor, behaviorPanel)
+    );
+    if (!(await isSelectorVisible(editor, field))) {
+      await clickSelectorIfPresent(editor, `${behaviorPanel} button`);
+      await editor.waitUntil('behavior unfolded', () =>
+        isSelectorVisible(editor, field)
+      );
+    }
+    await editor.setFieldValue(field, '50');
+    await editor.recordHighlights();
+    await editor.undo();
+    const highlights = await editor.getHighlights();
+    expectEqual(await editor.getPanel(), 'group', 'panel after undo');
+    expectEqual(
+      highlights.includes('group-row:MyGroup'),
+      true,
+      `group row highlighted (${highlights})`
+    );
+    expectEqual(
+      highlights.includes('extraBorder'),
+      true,
+      `behavior field highlighted in the group panel (${highlights})`
+    );
+    expectEqual(
+      highlights.some(highlight => highlight.startsWith('object-row:')),
+      false,
+      `no object row highlighted (${highlights})`
+    );
+  };
+}
+
+const makeBehaviorAdditionRemovalScenario = ({
+  select,
+  panel,
+}) => async editor => {
+  await select(editor);
+  const section = 'behaviors-section';
+  const behaviorPanel = `${panel} [id="behavior-panel-DestroyOutside"]`;
+  await clickSelectorIfPresent(editor, `#${section}-unfold-button`);
+
+  // Addition.
+  await editor.clickSectionHeaderButton(section, 'add');
+  await editor.page.waitForSelector(
+    '#behavior-item-DestroyOutsideBehavior--DestroyOutside'
+  );
+  await editor.page.click(
+    '#behavior-item-DestroyOutsideBehavior--DestroyOutside'
+  );
+  await editor.waitUntil('behavior added', () =>
+    isSelectorVisible(editor, behaviorPanel)
+  );
+  await sleep(HISTORY_SAVE_DELAY);
+  await editor.recordHighlights();
+  await editor.undo();
+  await editor.waitUntil(
+    'behavior removed by the undo',
+    async () => !(await editor.page.$(behaviorPanel))
+  );
+  // The object's row in the list flashes too, like for any object change.
+  const expectHighlight = async (highlight, description) => {
+    const highlights = await editor.getHighlights();
+    expectEqual(
+      highlights.includes(highlight),
+      true,
+      `${description} (${highlights})`
+    );
+  };
+  await expectHighlight(section, 'undo of an addition');
+  await editor.recordHighlights();
+  await editor.redo();
+  await editor.waitUntil('behavior back after the redo', () =>
+    isSelectorVisible(editor, behaviorPanel)
+  );
+  await expectHighlight('behavior-panel-DestroyOutside', 'redo of an addition');
+
+  // Removal.
+  editor.nativeDialogMessages = [];
+  await clickSelectorIfPresent(editor, `${behaviorPanel} #remove-behavior`);
+  await sleep(500);
+  if (await editor.page.$('[role="dialog"]'))
+    await editor.clickButtonWithText(
+      '[role="dialog"]',
+      /^(confirm|delete|yes|remove)/
+    );
+  await editor.waitUntil(
+    'behavior removed',
+    async () => !(await editor.page.$(behaviorPanel))
+  );
+  // The removal can be undone: the confirmation must not say otherwise.
+  expectEqual(
+    editor.nativeDialogMessages.some(message => /undone/i.test(message)),
+    false,
+    `confirmation message (${editor.nativeDialogMessages.join(' | ')})`
+  );
+  await sleep(HISTORY_SAVE_DELAY);
+  await editor.recordHighlights();
+  await editor.undo();
+  await editor.waitUntil('behavior back after the undo', () =>
+    isSelectorVisible(editor, behaviorPanel)
+  );
+  await expectHighlight('behavior-panel-DestroyOutside', 'undo of a removal');
+  await editor.recordHighlights();
+  await editor.redo();
+  await editor.waitUntil(
+    'behavior removed by the redo',
+    async () => !(await editor.page.$(behaviorPanel))
+  );
+  await expectHighlight(section, 'redo of a removal');
+};
+scenarios[
+  'undo/redo of a behavior addition and removal are highlighted'
+] = makeBehaviorAdditionRemovalScenario({
+  select: editor => editor.selectObjectInList('MyObject'),
+  panel: '#object-properties-editor',
+});
+scenarios[
+  'undo/redo of a group behavior addition and removal are highlighted'
+] = makeBehaviorAdditionRemovalScenario({
+  select: editor => editor.selectGroup('MyGroup'),
+  panel: '#object-group-properties-editor',
+});
+
+scenarios[
+  'undo/redo of a layer effect addition and removal are highlighted'
+] = async editor => {
+  await editor.selectLayer('Background');
+  const panel = '#layer-properties-editor';
+  const section = 'layer-2d-effects-section';
+  const effectPanel = `${panel} [id="effect-panel-Sepia"]`;
+  await clickSelectorIfPresent(editor, `#${section}-unfold-button`);
+  const expectHighlight = async (highlight, description) => {
+    const highlights = await editor.getHighlights();
+    expectEqual(
+      highlights.includes(highlight),
+      true,
+      `${description} (${highlights})`
+    );
+  };
+
+  // Addition.
+  await editor.clickSectionHeaderButton(section, 'add');
+  await editor.page.waitForSelector('#new-effect-dialog');
+  await editor.page.click('#new-effect-from-scratch-tab');
+  await editor.page.waitForSelector('#effect-item-Sepia');
+  await editor.page.click('#effect-item-Sepia');
+  await editor.waitUntil('effect added', () =>
+    isSelectorVisible(editor, effectPanel)
+  );
+  await sleep(HISTORY_SAVE_DELAY);
+  await editor.recordHighlights();
+  await editor.undo();
+  await editor.waitUntil(
+    'effect removed by the undo',
+    async () => !(await editor.page.$(effectPanel))
+  );
+  await expectHighlight(section, 'undo of an addition');
+  await editor.recordHighlights();
+  await editor.redo();
+  await editor.waitUntil('effect back after the redo', () =>
+    isSelectorVisible(editor, effectPanel)
+  );
+  await expectHighlight('effect-panel-Sepia', 'redo of an addition');
+
+  // Removal.
+  await clickSelectorIfPresent(editor, `${effectPanel} #remove-effect`);
+  await sleep(500);
+  if (await editor.page.$('[role="dialog"]'))
+    await editor.clickButtonWithText(
+      '[role="dialog"]',
+      /^(confirm|delete|yes|remove)/
+    );
+  await editor.waitUntil(
+    'effect removed',
+    async () => !(await editor.page.$(effectPanel))
+  );
+  await sleep(HISTORY_SAVE_DELAY);
+  await editor.recordHighlights();
+  await editor.undo();
+  await editor.waitUntil('effect back after the undo', () =>
+    isSelectorVisible(editor, effectPanel)
+  );
+  await expectHighlight('effect-panel-Sepia', 'undo of a removal');
+  await editor.recordHighlights();
+  await editor.redo();
+  await editor.waitUntil(
+    'effect removed by the redo',
+    async () => !(await editor.page.$(effectPanel))
+  );
+  await expectHighlight(section, 'redo of a removal');
+};
+
+/** The change confirmed by the open dialog can be undone: it must not say otherwise. */
+const expectNoUndoneClaimInDialog = async (editor, description) => {
+  const text = await editor.page.evaluate(
+    () => document.querySelector('[role="dialog"]').textContent
+  );
+  expectEqual(/undone/i.test(text), false, `${description} (${text})`);
+};
+
+scenarios['setting a group as global can be undone'] = async editor => {
+  await editor.openPanel('groups');
+  const row = '#objects-groups-list [data-group-name="MyGroup"]';
+  await editor.page.waitForSelector(row);
+  const getGroupScopes = async () => {
+    const { project } = JSON.parse(await getSerializedProject(editor));
+    const hasGroup = groups => groups.some(({ name }) => name === 'MyGroup');
+    return {
+      global: hasGroup(project.objectsGroups),
+      scene: hasGroup(project.layouts[0].objectsGroups),
+    };
+  };
+  expectEqual(
+    await getGroupScopes(),
+    { global: false, scene: true },
+    'initially'
+  );
+
+  await (await editor.page.$(row)).click({ button: 'right' });
+  await editor.clickMenuItem(/set as global group/i);
+  await editor.page.waitForSelector('[role="dialog"]');
+  await expectNoUndoneClaimInDialog(editor, 'set as global confirmation');
+  await editor.clickButtonWithText('[role="dialog"]', /^set as global$/i);
+  await editor.waitUntil(
+    'group set as global',
+    async () => (await getGroupScopes()).global
+  );
+  await sleep(HISTORY_SAVE_DELAY);
+  expectEqual(await getGroupScopes(), { global: true, scene: false }, 'global');
+
+  await editor.undo();
+  expectEqual(
+    await getGroupScopes(),
+    { global: false, scene: true },
+    'after undo'
+  );
+  await editor.redo();
+  expectEqual(
+    await getGroupScopes(),
+    { global: true, scene: false },
+    'after redo'
+  );
+};
+
+scenarios[
+  'undo of a background color change made in the layers panel highlights it there'
+] = async editor => {
+  await editor.openPanel('layers');
+  const row = '#layers-list [data-background-color]';
+  await editor.page.waitForSelector(row);
+  // The color swatch of the row opens a picker with a "hex" input.
+  await editor.page.click(`${row} div[style*="background"]`);
+  const hexInput = await editor.page.waitForSelector('.sketch-picker input');
+  await hexInput.click({ clickCount: 3 });
+  await editor.page.keyboard.type('102030');
+  await editor.page.keyboard.press('Enter');
+  await editor.page.keyboard.press('Escape');
+  await editor.waitUntil(
+    'picker closed',
+    async () => !(await editor.page.$('.sketch-picker'))
+  );
+  await sleep(HISTORY_SAVE_DELAY);
+  const getColor = async () => {
+    const { project } = JSON.parse(await getSerializedProject(editor));
+    const { r, v, b } = project.layouts[0];
+    return [r, v, b];
+  };
+  expectEqual(await getColor(), [16, 32, 48], 'color changed');
+
+  await editor.recordHighlights();
+  await editor.undo();
+  expectEqual(await getColor(), [209, 209, 209], 'color after undo');
+  const highlights = await editor.getHighlights();
+  expectEqual(
+    highlights.includes('background-color'),
+    true,
+    `layers panel row highlighted (${highlights})`
+  );
+  expectEqual(
+    highlights.includes('BackgroundColor'),
+    true,
+    `properties panel field highlighted (${highlights})`
+  );
+  await editor.recordHighlights();
+  await editor.redo();
+  expectEqual(await getColor(), [16, 32, 48], 'color after redo');
+  expectEqual(
+    (await editor.getHighlights()).includes('background-color'),
+    true,
+    'layers panel row highlighted after redo'
+  );
+};
+
+{
+  const name =
+    'undo/redo of a group variable addition and deletion are highlighted and shown';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objectsGroups.push({
+      name: 'VariablesGroup',
+      objects: [{ name: 'VariablesObject' }],
+    });
+  };
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await editor.selectGroup('VariablesGroup');
+    const panel = '#object-group-properties-editor';
+    const section = 'group-variables-section';
+    await editor.unfoldVariablesSection(panel, section);
+    const getNames = () => editor.getVariableNames(panel);
+    expectEqual(await getNames(), ['VarA', 'VarB'], 'initial variables');
+
+    // Addition.
+    await editor.clickSectionHeaderButton(section, 'add');
+    await sleep(HISTORY_SAVE_DELAY);
+    expectEqual((await getNames()).length, 3, 'variable added');
+    await editor.recordHighlights();
+    await editor.undo();
+    expectEqual((await getNames()).length, 2, 'variables after undo');
+    expectEqual(
+      (await editor.getHighlights()).includes(section),
+      true,
+      'undo of an addition'
+    );
+    await editor.recordHighlights();
+    await editor.redo();
+    expectEqual(
+      (await editor.getHighlights()).includes('Variable'),
+      true,
+      'redo of an addition'
+    );
+
+    // Deletion: select the row of VarA, delete it from the toolbar.
+    const row = await page.$(`${panel} [data-variable-node-id="VarA"]`);
+    const box = await row.boundingBox();
+    await page.mouse.click(box.x + box.width - 10, box.y + box.height / 2);
+    await sleep(200);
+    await page.evaluate(section => {
+      document
+        .getElementById(`${section}-content`)
+        .querySelector('#variables-list-delete-button')
+        .click();
+    }, section);
+    await editor.waitUntil(
+      'variable deleted',
+      async () => !(await getNames()).includes('VarA')
+    );
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.recordHighlights();
+    await editor.undo();
+    expectEqual((await getNames()).includes('VarA'), true, 'variable back');
+    expectEqual(
+      (await editor.getHighlights()).includes('VarA'),
+      true,
+      'undo of a deletion'
+    );
+    await editor.recordHighlights();
+    await editor.redo();
+    expectEqual(
+      (await editor.getHighlights()).includes(section),
+      true,
+      'redo of a deletion'
+    );
+  };
+}
+
+{
+  const name = 'group editor dialog makes one step per variable';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objectsGroups.push({
+      name: 'VariablesGroup',
+      objects: [{ name: 'VariablesObject' }],
+    });
+  };
+  scenarios[name] = async editor => {
+    await editor.selectGroup('VariablesGroup');
+    const panel = '#object-group-properties-editor';
+    const section = 'group-variables-section';
+    await editor.unfoldVariablesSection(panel, section);
+    await editor.clickSectionHeaderButton(section, 'open-editor');
+    await editor.page.waitForSelector('[role="dialog"] #variable-0-text-value');
+    await editor.setFieldValue('[role="dialog"] #variable-0-text-value', '100');
+    await editor.setFieldValue('[role="dialog"] #variable-1-text-value', '200');
+    await applyDialog(editor);
+
+    const getValues = async () => [
+      await editor.getFieldValue(`${panel} #variable-0-text-value`),
+      await editor.getFieldValue(`${panel} #variable-1-text-value`),
+    ];
+    expectEqual(await getValues(), ['100', '200'], 'applied');
+    await editor.undo();
+    const afterFirstUndo = await getValues();
+    expectEqual(
+      [afterFirstUndo[0] === '1', afterFirstUndo[1] === '2'].filter(Boolean)
+        .length,
+      1,
+      `one variable reverted by the first undo (${afterFirstUndo.join()})`
+    );
+    await editor.undo();
+    expectEqual(await getValues(), ['1', '2'], 'after the second undo');
+    await editor.redo();
+    await editor.redo();
+    expectEqual(await getValues(), ['100', '200'], 'after two redos');
+  };
+}
+
+/** Change the project as another editor would, while on the events tab. */
+const changeProjectFromTheEventsSheet = async (editor, change) => {
+  await clickEditorTab(editor, 'Scene (Events)');
+  await editor.page.evaluate(changeSource => {
+    const element = document.getElementById('scene-editor');
+    const fiberKey = Object.keys(element).find(key =>
+      key.startsWith('__reactFiber$')
+    );
+    let fiber = fiberKey ? element[fiberKey] : null;
+    while (fiber && !(fiber.stateNode && fiber.stateNode.instancesSelection))
+      fiber = fiber.return;
+    // eslint-disable-next-line no-new-func
+    new Function('props', 'gd', 'return ' + changeSource)(
+      fiber.stateNode.props,
+      // eslint-disable-next-line no-undef
+      gd
+    )(fiber.stateNode.props);
+  }, change.toString());
+  await clickEditorTab(editor, 'Scene');
+  await editor.waitUntil('scene editor active again', () =>
+    editor.page.evaluate(
+      () => !!document.querySelector('#scene-editor[data-active]')
+    )
+  );
+};
+
+scenarios[
+  'a variable created from the events sheet survives the undo of its edit'
+] = async editor => {
+  await changeProjectFromTheEventsSheet(editor, props =>
+    props.layout
+      .getVariables()
+      .insertNew('FromEvents', 0)
+      .setValue(5)
+  );
+  const panel = '#scene-properties-editor';
+  await editor.unfoldVariablesSection(panel, 'scene-variables-section');
+  await editor.waitUntil(
+    'variable shown',
+    async () => (await editor.getVariableNames(panel))[0] === 'FromEvents'
+  );
+  const field = `${panel} #variable-0-text-value`;
+  expectEqual(await editor.getFieldValue(field), '5', 'created value');
+  await editor.setFieldValue(field, '50');
+
+  await editor.undo();
+  expectEqual(
+    await editor.getVariableNames(panel),
+    ['FromEvents', 'VarA', 'VarB'],
+    'variables after undo'
+  );
+  expectEqual(await editor.getFieldValue(field), '5', 'value after undo');
+  await editor.redo();
+  expectEqual(await editor.getFieldValue(field), '50', 'value after redo');
+};
+
+scenarios[
+  'an object created from the events sheet survives the undo of another change'
+] = async editor => {
+  await changeProjectFromTheEventsSheet(editor, (props, gd) =>
+    props.objectsContainer.insertNewObject(
+      props.project,
+      'Sprite',
+      'FromEvents',
+      0
+    )
+  );
+  const row = '#objects-list [data-object-name="FromEvents"]';
+  await editor.page.waitForSelector(row);
+  await editor.selectObjectInList('MyCube');
+  await clickSelectorIfPresent(
+    editor,
+    '#object-properties-section-unfold-button'
+  );
+  const field = '#object-properties-editor [id="width"]';
+  await editor.setFieldValue(field, '200');
+
+  await editor.undo();
+  expectEqual(await editor.getFieldValue(field), '100', 'width after undo');
+  expectEqual(await exists(editor, row), true, 'object still there after undo');
+  await editor.redo();
+  expectEqual(await exists(editor, row), true, 'object still there after redo');
+};
+
+{
+  const name = 'scene properties dialog makes one step per scene behavior';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objects[0].behaviors = [
+      { name: 'Physics2', type: 'Physics2::Physics2Behavior' },
+    ];
+    project.layouts[0].behaviorsSharedData = [
+      {
+        name: 'Physics2',
+        type: 'Physics2::Physics2Behavior',
+        gravityX: 0,
+        gravityY: 9.8,
+        scaleX: 100,
+        scaleY: 100,
+        worldScale: 100,
+      },
+    ];
+  };
+  scenarios[name] = async editor => {
+    const getSharedData = async () => {
+      const { project } = JSON.parse(await getSerializedProject(editor));
+      return project.layouts[0].behaviorsSharedData.find(
+        ({ name }) => name === 'Physics2'
+      );
+    };
+    expectEqual((await getSharedData()).gravityY, 9.8, 'initial gravity');
+    const stepsBefore = await getUndoStepsCount(editor);
+
+    const canvas = await editor.page.$('#scene-editor canvas');
+    const box = await canvas.boundingBox();
+    await editor.page.mouse.click(
+      box.x + box.width / 2,
+      box.y + box.height / 2,
+      {
+        button: 'right',
+      }
+    );
+    await editor.clickMenuItem(/open scene properties/i);
+    await editor.page.waitForSelector('[role="dialog"] [id="gravityY"]');
+    await editor.setFieldValue('[role="dialog"] [id="gravityY"]', '5');
+    await editor.setFieldValue('[role="dialog"] [id="gravityX"]', '1');
+    await editor.clickButtonWithText('[role="dialog"]', /^ok$/i);
+    await editor.waitUntil(
+      'dialog closed',
+      async () => !(await editor.page.$('[role="dialog"]'))
+    );
+    await sleep(500);
+    expectEqual(
+      (await getUndoStepsCount(editor)) - stepsBefore,
+      1,
+      'steps recorded for the behavior'
+    );
+    const applied = await getSharedData();
+    expectEqual([applied.gravityX, applied.gravityY], [1, 5], 'applied');
+
+    await editor.undo();
+    const afterUndo = await getSharedData();
+    expectEqual(
+      [afterUndo.gravityX, afterUndo.gravityY],
+      [0, 9.8],
+      'after undo'
+    );
+    await editor.redo();
+    const afterRedo = await getSharedData();
+    expectEqual([afterRedo.gravityX, afterRedo.gravityY], [1, 5], 'after redo');
+  };
+}
+
+/** A glTF binary file of a 1x1x1 box mesh (the smallest model to load). */
+const makeBoxGlb = () => {
+  const positions = new Float32Array(
+    [
+      [0, 0, 0],
+      [1, 0, 0],
+      [1, 1, 0],
+      [0, 1, 0],
+      [0, 0, 1],
+      [1, 0, 1],
+      [1, 1, 1],
+      [0, 1, 1],
+    ].flat()
+  );
+  const indices = new Uint16Array(
+    [
+      [0, 2, 1],
+      [0, 3, 2],
+      [4, 5, 6],
+      [4, 6, 7],
+      [0, 1, 5],
+      [0, 5, 4],
+      [2, 3, 7],
+      [2, 7, 6],
+      [1, 2, 6],
+      [1, 6, 5],
+      [0, 4, 7],
+      [0, 7, 3],
+    ].flat()
+  );
+  const pad = buffer =>
+    Buffer.concat([buffer, Buffer.alloc((4 - (buffer.length % 4)) % 4)]);
+  const bin = pad(
+    Buffer.concat([Buffer.from(positions.buffer), Buffer.from(indices.buffer)])
+  );
+  const json = pad(
+    Buffer.from(
+      JSON.stringify({
+        asset: { version: '2.0' },
+        scene: 0,
+        scenes: [{ nodes: [0] }],
+        nodes: [{ mesh: 0 }],
+        meshes: [{ primitives: [{ attributes: { POSITION: 0 }, indices: 1 }] }],
+        accessors: [
+          {
+            bufferView: 0,
+            componentType: 5126,
+            count: 8,
+            type: 'VEC3',
+            min: [0, 0, 0],
+            max: [1, 1, 1],
+          },
+          { bufferView: 1, componentType: 5123, count: 36, type: 'SCALAR' },
+        ],
+        bufferViews: [
+          { buffer: 0, byteOffset: 0, byteLength: positions.byteLength },
+          {
+            buffer: 0,
+            byteOffset: positions.byteLength,
+            byteLength: indices.byteLength,
+          },
+        ],
+        buffers: [{ byteLength: bin.length }],
+      }).padEnd(0, ' ')
+    )
+  );
+  // The JSON chunk is padded with spaces, the binary one with zeros.
+  for (let i = json.length - 1; i >= 0 && json[i] === 0; i--) json[i] = 0x20;
+  const chunk = (type, data) => {
+    const header = Buffer.alloc(8);
+    header.writeUInt32LE(data.length, 0);
+    header.writeUInt32LE(type, 4);
+    return Buffer.concat([header, data]);
+  };
+  const jsonChunk = chunk(0x4e4f534a, json);
+  const binChunk = chunk(0x004e4942, bin);
+  const header = Buffer.alloc(12);
+  header.write('glTF', 0);
+  header.writeUInt32LE(2, 4);
+  header.writeUInt32LE(12 + jsonChunk.length + binChunk.length, 8);
+  return Buffer.concat([header, jsonChunk, binChunk]);
+};
+
+{
+  // A 3D model: its size is only known once the model is loaded.
+  const name =
+    'instance dimensions known late are shown after an undo (2D editor)';
+  fixtureSetups[name] = (project, { modelUrl }) => {
+    project.resources.resources.push({
+      kind: 'model3D',
+      name: 'model.glb',
+      file: modelUrl,
+      metadata: '',
+      userAdded: true,
+    });
+    project.layouts[0].objects.push({
+      name: 'ModelObject',
+      type: 'Scene3D::Model3DObject',
+      variables: [],
+      behaviors: [],
+      effects: [],
+      content: {
+        width: 100,
+        height: 100,
+        depth: 100,
+        keepAspectRatio: true,
+        modelResourceName: 'model.glb',
+        rotationX: 0,
+        rotationY: 0,
+        rotationZ: 0,
+        materialType: 'StandardWithoutMetalness',
+        originLocation: 'ModelOrigin',
+        centerLocation: 'ModelOrigin',
+        crossfadeDuration: 0.5,
+        animations: [],
+      },
+    });
+    project.layouts[0].instances.push({
+      name: 'ModelObject',
+      persistentUuid: '44444444-4444-4444-4444-444444444444',
+      x: 600,
+      y: 400,
+      layer: '',
+      zOrder: 3,
+      angle: 0,
+      customSize: false,
+      width: 0,
+      height: 0,
+      numberProperties: [],
+      stringProperties: [],
+      initialVariables: [],
+    });
+  };
+  scenarios[name] = async editor => {
+    // Selected while the model is still loading: the panel shows the
+    // placeholder size (1), and must show the real one once known, without
+    // any other action.
+    await editor.selectInstancesOf('ModelObject');
+    const field = name => `#instance-properties-editor [id="${name}"]`;
+    const getDimensions = async () =>
+      [
+        await editor.getFieldValue(field('Width')),
+        await editor.getFieldValue(field('Height')),
+        await editor.getFieldValue(field('Depth')),
+      ].join();
+    const expectSizeShown = async description => {
+      let dimensions = null;
+      try {
+        await editor.waitUntil(
+          description,
+          async () => (dimensions = await getDimensions()) === '100,100,100',
+          8000
+        );
+      } catch (error) {
+        expectEqual(dimensions, '100,100,100', description);
+      }
+    };
+    await expectSizeShown('model size shown once loaded');
+
+    // Same after an undo, which creates the renderers again.
+    await editor.setFieldValue(field('X'), '650');
+    await editor.undo();
+    expectEqual(await editor.getFieldValue(field('X')), '600', 'X after undo');
+    await expectSizeShown('model size shown again after the undo');
+  };
+}
+
+{
+  const name = 'moving a group in the groups list can be undone';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objectsGroups.push(
+      { name: 'GroupB', objects: [] },
+      { name: 'GroupC', objects: [] }
+    );
+  };
+  scenarios[name] = async editor => {
+    await editor.openPanel('groups');
+    const getOrder = () =>
+      editor.page.evaluate(() =>
+        Array.from(
+          document.querySelectorAll('#objects-groups-list [data-group-name]')
+        )
+          .map(element => element.getAttribute('data-group-name'))
+          .join()
+      );
+    await editor.waitUntil(
+      'groups listed',
+      async () => (await getOrder()) === 'MyGroup,GroupB,GroupC'
+    );
+    // What a drag and drop of the last group to the top does.
+    await editor.page.evaluate(() => {
+      const element = document.getElementById('scene-editor');
+      const fiberKey = Object.keys(element).find(key =>
+        key.startsWith('__reactFiber$')
+      );
+      let fiber = fiberKey ? element[fiberKey] : null;
+      while (fiber && !(fiber.stateNode && fiber.stateNode.instancesSelection))
+        fiber = fiber.return;
+      const sceneEditor = fiber.stateNode;
+      sceneEditor.props.objectsContainer.getObjectGroups().move(2, 0);
+      sceneEditor._onObjectGroupsModified();
+      sceneEditor.forceUpdateObjectGroupsList();
+    });
+    await editor.waitUntil(
+      'group moved',
+      async () => (await getOrder()) === 'GroupC,MyGroup,GroupB'
+    );
+
+    await editor.undo();
+    await editor.waitUntil(
+      'order restored by the undo',
+      async () => (await getOrder()) === 'MyGroup,GroupB,GroupC'
+    );
+    await editor.redo();
+    await editor.waitUntil(
+      'moved again by the redo',
+      async () => (await getOrder()) === 'GroupC,MyGroup,GroupB'
+    );
+  };
+}
+
+const scrollKeepingPanels = {
+  object: {
+    setup: project => {
+      project.layouts[0].objects[2].variables = makeManyVariables();
+    },
+    select: editor => editor.selectObjectInList('VariablesObject'),
+    panel: '#object-properties-editor',
+    section: 'object-variables-section',
+  },
+  instance: {
+    setup: project => {
+      project.layouts[0].instances[0].initialVariables = makeManyVariables();
+    },
+    select: editor => editor.selectInstancesOf('MyObject'),
+    panel: '#instance-properties-editor',
+    section: 'instance-variables-section',
+  },
+};
+Object.keys(scrollKeepingPanels).forEach(kind => {
+  const { setup, select, panel, section } = scrollKeepingPanels[kind];
+  const name = `undo of a ${kind} variable already on screen keeps the panel scroll position`;
+  fixtureSetups[name] = setup;
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await select(editor);
+    await editor.unfoldVariablesSection(panel, section);
+    const field = `${panel} #variable-10-text-value`;
+    // The panel's scrolling element (marked, to tell if it's mounted again).
+    const markScroller = () =>
+      page.evaluate(panel => {
+        let element = document.querySelector(panel);
+        while (
+          element &&
+          !(
+            element.scrollHeight > element.clientHeight &&
+            /auto|scroll/.test(getComputedStyle(element).overflowY)
+          )
+        )
+          element = element.parentElement;
+        if (element) element.setAttribute('data-e2e-scrolling-element', '1');
+        return !!element;
+      }, panel);
+    const scroller = '[data-e2e-scrolling-element]';
+    const getScrollTop = () =>
+      page.evaluate(
+        scroller => Math.round(document.querySelector(scroller).scrollTop),
+        scroller
+      );
+    // Scroll so that the row is at the given place of the visible area.
+    const placeRow = place =>
+      page.evaluate(
+        (scroller, field, place) => {
+          const scrolling = document.querySelector(scroller);
+          const row = document.querySelector(field);
+          const rowTop =
+            row.getBoundingClientRect().top -
+            scrolling.getBoundingClientRect().top +
+            scrolling.scrollTop;
+          const rowHeight = row.getBoundingClientRect().height;
+          scrolling.scrollTop =
+            place === 'top'
+              ? rowTop
+              : place === 'bottom'
+              ? rowTop + rowHeight - scrolling.clientHeight
+              : rowTop - scrolling.clientHeight / 2;
+        },
+        scroller,
+        field,
+        place
+      );
+    expectEqual(await markScroller(), true, 'scrolling element found');
+
+    // Wherever the row is on screen, the undo must not scroll the panel
+    // (nor mount it again).
+    for (const place of ['top', 'center', 'bottom']) {
+      await placeRow(place);
+      await sleep(300);
+      await editor.setFieldValue(field, place === 'top' ? '77' : '78');
+      const before = await getScrollTop();
+      await editor.undo();
+      await sleep(1500);
+      const isSame = await page.evaluate(
+        scroller => !!document.querySelector(scroller),
+        scroller
+      );
+      expectEqual(isSame, true, `panel kept mounted (row at the ${place})`);
+      // A row right at the top edge is partly under the sticky header of
+      // its section: the list legitimately scrolls it fully into view then
+      // (a few pixels). Anywhere else, no scroll at all.
+      const tolerance = place === 'top' ? 10 : 0;
+      const after = await getScrollTop();
+      expectEqual(
+        Math.abs(after - before) <= tolerance,
+        true,
+        `scroll position after undo (row at the ${place}): ${before} -> ${after}`
+      );
+    }
+  };
+});
+
+{
+  const name =
+    'the properties panel reopened by an undo is at the position it was closed';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objects[2].variables = makeManyVariables();
+  };
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await editor.selectObjectInList('VariablesObject');
+    const panel = '#object-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'object-variables-section');
+    // The panel's scrolling element: the outermost scrolling ancestor.
+    const withOutermostScroller = (fn, ...args) =>
+      page.evaluate(
+        (panel, fnSource, ...args) => {
+          let outermost = null;
+          for (
+            let element = document.querySelector(panel);
+            element;
+            element = element.parentElement
+          ) {
+            if (
+              element.scrollHeight > element.clientHeight &&
+              /auto|scroll/.test(getComputedStyle(element).overflowY)
+            )
+              outermost = element;
+          }
+          return outermost
+            ? // eslint-disable-next-line no-new-func
+              new Function('return ' + fnSource)()(outermost, ...args)
+            : null;
+        },
+        panel,
+        fn.toString(),
+        ...args
+      );
+    const getOutermostScrollTop = () =>
+      withOutermostScroller(element => Math.round(element.scrollTop));
+    const scrollOutermostBy = delta =>
+      withOutermostScroller((element, delta) => {
+        element.scrollTop += delta;
+      }, delta);
+    const field = `${panel} #variable-60-text-value`;
+    // Scroll the outermost scrolling ancestor far down: the row of the
+    // variable, rendered once visible, is then on screen.
+    await withOutermostScroller(element => {
+      element.scrollTop = 1300;
+    });
+    await page.waitForSelector(field);
+    await sleep(400);
+    await editor.setFieldValue(field, '77');
+    // A last scroll right before closing: it must be remembered too.
+    await scrollOutermostBy(40);
+    await sleep(50);
+    const closedAt = await getOutermostScrollTop();
+    await (await page.$('#toolbar-open-properties-panel-button')).click();
+    await editor.waitUntil('panel closed', async () => !(await page.$(panel)));
+
+    // The undo reopens the panel where it was closed: the changed variable
+    // is on screen there, so nothing scrolls.
+    await editor.undo();
+    await page.waitForSelector(panel);
+    const samples = [];
+    for (let i = 0; i < 12; i++) {
+      samples.push(await getOutermostScrollTop());
+      await sleep(100);
+    }
+    expectEqual(
+      samples.every(
+        sample => sample !== null && Math.abs(sample - closedAt) <= 10
+      ),
+      true,
+      `panel position after reopening (closed at ${closedAt}, seen: ${samples.join()})`
+    );
+  };
+}
+
+{
+  const name =
+    'the properties panel reopened by an undo scrolls to the field, then not on redo';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objects[2].variables = makeManyVariables();
+  };
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await editor.selectObjectInList('VariablesObject');
+    const panel = '#object-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'object-variables-section');
+    const withOutermostScroller = (fn, ...args) =>
+      page.evaluate(
+        (panel, fnSource, ...args) => {
+          let outermost = null;
+          for (
+            let element = document.querySelector(panel);
+            element;
+            element = element.parentElement
+          ) {
+            if (
+              element.scrollHeight > element.clientHeight &&
+              /auto|scroll/.test(getComputedStyle(element).overflowY)
+            )
+              outermost = element;
+          }
+          return outermost
+            ? // eslint-disable-next-line no-new-func
+              new Function('return ' + fnSource)()(outermost, ...args)
+            : null;
+        },
+        panel,
+        fn.toString(),
+        ...args
+      );
+    const getScrollTop = () =>
+      withOutermostScroller(element => Math.round(element.scrollTop));
+    const field = `${panel} #variable-10-text-value`;
+    const isFieldOnScreen = () =>
+      page.evaluate(field => {
+        const element = document.querySelector(field);
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        return rect.top >= 0 && rect.bottom <= window.innerHeight;
+      }, field);
+    const closePanel = async () => {
+      await (await page.$('#toolbar-open-properties-panel-button')).click();
+      await editor.waitUntil(
+        'panel closed',
+        async () => !(await page.$(panel))
+      );
+    };
+    const samplePositions = async () => {
+      const samples = [];
+      for (let i = 0; i < 10; i++) {
+        samples.push(await getScrollTop());
+        await sleep(100);
+      }
+      return samples;
+    };
+
+    // Change the variable, then scroll so that it's hidden, and close.
+    await editor.setFieldValue(field, '77');
+    await withOutermostScroller(element => {
+      element.scrollTop = 1300;
+    });
+    await sleep(400);
+    expectEqual(await isFieldOnScreen(), false, 'field hidden before closing');
+    await closePanel();
+
+    // Undo: the panel reopens and scrolls to show the field.
+    await editor.undo();
+    await page.waitForSelector(panel);
+    await editor.waitUntil('field shown by the undo', isFieldOnScreen);
+    await sleep(1000);
+    const positionAfterUndo = await getScrollTop();
+    await closePanel();
+
+    // Redo: the panel reopens where it was, the field is on screen: no scroll.
+    await editor.redo();
+    await page.waitForSelector(panel);
+    const samples = await samplePositions();
+    expectEqual(await isFieldOnScreen(), true, 'field on screen after redo');
+    expectEqual(
+      samples.every(
+        sample => sample !== null && Math.abs(sample - positionAfterUndo) <= 10
+      ),
+      true,
+      `no scroll after redo (after undo: ${positionAfterUndo}, seen: ${samples.join()})`
+    );
   };
 }
 
@@ -3774,6 +5549,18 @@ const scrollToVariablePanels = {
     panel: '#object-properties-editor',
     section: 'object-variables-section',
   },
+  group: {
+    setup: project => {
+      project.layouts[0].objects[2].variables = makeManyVariables();
+      project.layouts[0].objectsGroups.push({
+        name: 'VariablesGroup',
+        objects: [{ name: 'VariablesObject' }],
+      });
+    },
+    select: editor => editor.selectGroup('VariablesGroup'),
+    panel: '#object-group-properties-editor',
+    section: 'group-variables-section',
+  },
 };
 Object.keys(scrollToVariablePanels).forEach(kind => {
   const { setup, select, panel, section } = scrollToVariablePanels[kind];
@@ -4309,6 +6096,17 @@ Object.assign(scenarios, {
 const serveFixture = () =>
   new Promise(resolve => {
     const server = http.createServer((request, response) => {
+      if (request.url.startsWith('/model.glb')) {
+        // Slow, like a real model: its size is known late.
+        setTimeout(() => {
+          response.writeHead(200, {
+            'Content-Type': 'model/gltf-binary',
+            'Access-Control-Allow-Origin': '*',
+          });
+          response.end(makeBoxGlb());
+        }, 2000);
+        return;
+      }
       response.writeHead(200, {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -4318,7 +6116,10 @@ const serveFixture = () =>
         request.url.replace(/^\//, '').replace(/\.json$/, '')
       );
       const project = JSON.parse(JSON.stringify(fixtureProject));
-      if (fixtureSetups[scenarioName]) fixtureSetups[scenarioName](project);
+      if (fixtureSetups[scenarioName])
+        fixtureSetups[scenarioName](project, {
+          modelUrl: `http://${request.headers.host}/model.glb`,
+        });
       response.end(JSON.stringify(project));
     });
     server.listen(0, '127.0.0.1', () => resolve(server));

@@ -433,8 +433,7 @@ export const useManageObjectBehaviors = ({
 
   const removeBehavior = React.useCallback(
     (behaviorName: string) => {
-      let message =
-        "Are you sure you want to remove this behavior? This can't be undone.";
+      let message = 'Are you sure you want to remove this behavior?';
       const allDependentBehaviorsSet = new Set<string>();
       for (const object of objects) {
         const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(

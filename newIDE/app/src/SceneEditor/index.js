@@ -55,7 +55,7 @@ import {
   redoComposite,
 } from '../Utils/History';
 import { diffInstancesSnapshots } from '../Utils/InstancesSnapshotDiff';
-import '../UI/UndoRedoFlash.css';
+import { flashElement } from '../UI/UndoRedoFlash';
 import {
   getVariablesContainerHistoryTarget,
   getObjectsContainerHistoryTarget,
@@ -67,7 +67,12 @@ import {
   getChangedVariableNodeIds,
   hasRemovedVariables,
 } from './PropertyRowsFlashDiff';
-import { getIntermediateNamedItemsStates } from './GranularNamedItemsHistorySteps';
+import {
+  getIntermediateNamedItemsStates,
+  getNamedItemsStateWithChangesApplied,
+  getSerializedObjectChangeKeys,
+  stableStringify,
+} from './GranularNamedItemsHistorySteps';
 
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import {
@@ -173,7 +178,9 @@ const scenePropertyKeyToPropertyFieldId: { [string]: string } = {
 // How the attributes of a serialized instance (as found in the history
 // snapshots) map to the field ids of the compact instance properties editor
 // (see `CompactInstancePropertiesSchema.js`).
-const serializedInstanceKeyToPropertyFieldId: { [string]: string } = {
+const serializedInstanceKeyToPropertyFieldId: {
+  [string]: string | Array<string>,
+} = {
   x: 'X',
   y: 'Y',
   z: 'Z',
@@ -186,7 +193,7 @@ const serializedInstanceKeyToPropertyFieldId: { [string]: string } = {
   height: 'Height',
   depth: 'Depth',
   // Toggling the custom size is seen in the size fields.
-  customSize: 'Width',
+  customSize: ['Width', 'Height'],
   customDepth: 'Depth',
   hidden: 'Hide instance',
   locked: 'Lock instance',
@@ -321,11 +328,6 @@ const REFACTORED_HISTORY_KEYS = [
   'instances',
 ];
 // Targets that other editors (other scenes) can change too.
-const SHARED_HISTORY_KEYS = [
-  'globalObjects',
-  'globalObjectGroups',
-  'globalVariables',
-];
 // In development, check after each step that no target changed without
 // being declared (such a change would be silently reverted by an undo).
 const CHECK_UNDECLARED_HISTORY_CHANGES =
@@ -466,6 +468,9 @@ type CopyCutPasteOptions = {|
 
 const editSceneIconReactNode = <EditSceneIcon />;
 
+// Edits of the same thing made within this delay are one undoable step.
+const PANEL_HISTORY_SAVE_DELAY = 500;
+
 export default class SceneEditor extends React.Component<Props, State> {
   instancesSelection: InstancesSelection;
   contextMenu: ?ContextMenuInterface;
@@ -540,10 +545,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     // when switching between the 2D and 3D editors, which don't listen to
     // the keyboard on the same element.
     if (!prevProps.isActive && this.props.isActive) {
-      // Another editor may have changed the shared targets while this one
-      // was inactive: refresh them so the next step is based on their
+      // Another editor (the events sheet, the project manager, another
+      // scene tab...) may have changed the project while this one was
+      // inactive: refresh the targets so the next step is based on their
       // actual value (and an undo doesn't revert the other editor's change).
-      this._refreshHistoryValue(SHARED_HISTORY_KEYS);
+      this._refreshHistoryValuesFromProject();
     }
     if (
       (!prevProps.isActive && this.props.isActive) ||
@@ -1207,10 +1213,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   editLayerEffects = (layer: ?gdLayer) => {
+    if (layer) this._startLayerEditorDialogSession(layer);
     this.setState({ editedLayer: layer, editedLayerInitialTab: 'effects' });
   };
 
   editLayer = (layer: ?gdLayer) => {
+    if (layer) this._startLayerEditorDialogSession(layer);
     this.setState({ editedLayer: layer, editedLayerInitialTab: 'properties' });
   };
 
@@ -1229,17 +1237,20 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     const { project } = this.props;
     if (editedObject) {
+      const editedObjectWithContext = {
+        object: editedObject,
+        global: project.getObjects().hasObjectNamed(editedObject.getName()),
+      };
+      this._startObjectEditorDialogSession(editedObjectWithContext);
       this.setState(
         {
-          editedObjectWithContext: {
-            object: editedObject,
-            global: project.getObjects().hasObjectNamed(editedObject.getName()),
-          },
+          editedObjectWithContext,
           editedObjectInitialTab: initialTab || 'properties',
         },
         callback
       );
     } else {
+      this._endDialogEditSession();
       this.setState(
         {
           editedObjectWithContext: null,
@@ -1374,10 +1385,16 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
     }
     // The variables tab, if used, refactors the variables of every object of
-    // the group at once - recorded as a single step, separate from the
-    // membership changes above (splitting it further would mean grouping by
-    // variable name across every affected object).
-    this._recordHistoryStep(undefined, changeContext, OBJECTS_HISTORY_KEYS);
+    // the group at once: one step per variable, separate from the
+    // membership changes above.
+    if (editedGroup) {
+      this._recordGranularGroupVariablesHistorySteps(
+        editedGroup,
+        changeContext
+      );
+    } else {
+      this._recordHistoryStep(undefined, changeContext, OBJECTS_HISTORY_KEYS);
+    }
     if (editedGroup) {
       // TODO Set the `global` attribute correctly.
       this.props.onObjectGroupEdited({
@@ -1397,6 +1414,148 @@ export default class SceneEditor extends React.Component<Props, State> {
    * per object added or removed - instead of a single step covering the
    * whole group.
    */
+  /**
+   * Split a change made to the variables of the objects of a group (all at
+   * once, by an "Apply" of the group editor dialog) into one undoable step
+   * per variable name, applied to every object of the group.
+   */
+  _recordGranularGroupVariablesHistorySteps = (
+    group: gdObjectGroup,
+    changeContext: HistoryChangeContext
+  ) => {
+    this._flushPendingPanelHistorySave();
+    const groupObjectNames = new Set(group.getAllObjectsNames().toJSArray());
+    const beforeValue = this._getLatestHistory().currentValue;
+    const afterValue = this._serializeHistoryTargets(OBJECTS_HISTORY_KEYS);
+
+    // The variable names that changed on any object of the group, in the
+    // order of the variables of the objects.
+    const changedNames: Array<string> = [];
+    const addChangedNames = (
+      beforeVariables: Array<Object>,
+      afterVariables: Array<Object>
+    ) => {
+      const beforeByName = new Map(
+        beforeVariables.map(variable => [variable.name, variable])
+      );
+      const afterNames = new Set(afterVariables.map(({ name }) => name));
+      [...afterVariables, ...beforeVariables].forEach(variable => {
+        const { name } = variable;
+        if (changedNames.includes(name)) return;
+        const isChanged = afterNames.has(name)
+          ? stableStringify(beforeByName.get(name)) !==
+            stableStringify(variable)
+          : true;
+        if (isChanged) changedNames.push(name);
+      });
+    };
+    OBJECTS_HISTORY_KEYS.forEach(key => {
+      const beforeObjects = (beforeValue[key] || {}).objects || [];
+      ((afterValue[key] || {}).objects || []).forEach(afterObject => {
+        if (!groupObjectNames.has(afterObject.name)) return;
+        const beforeObject = findSerializedItemByName(
+          beforeObjects,
+          afterObject.name
+        );
+        if (!beforeObject) return;
+        addChangedNames(
+          (beforeObject.serialized || {}).variables || [],
+          (afterObject.serialized || {}).variables || []
+        );
+      });
+    });
+
+    if (changedNames.length === 0) {
+      // Nothing about the variables changed - but the objects could have
+      // been changed in another way: don't lose it.
+      this._recordHistoryStep(undefined, changeContext, OBJECTS_HISTORY_KEYS);
+      return;
+    }
+
+    const revealedChangeContext = this._withRevealSelection(changeContext);
+    const appliedNames: Set<string> = new Set();
+    changedNames.forEach(name => {
+      appliedNames.add(name);
+      const value: { [string]: Object } = {};
+      OBJECTS_HISTORY_KEYS.forEach(key => {
+        const beforeObjects = (beforeValue[key] || {}).objects || [];
+        const afterKeyValue = afterValue[key] || {};
+        value[key] = {
+          ...afterKeyValue,
+          objects: (afterKeyValue.objects || []).map(afterObject => {
+            const beforeObject = findSerializedItemByName(
+              beforeObjects,
+              afterObject.name
+            );
+            if (!groupObjectNames.has(afterObject.name) || !beforeObject)
+              return afterObject;
+            return {
+              ...afterObject,
+              serialized: {
+                ...afterObject.serialized,
+                variables: getNamedItemsStateWithChangesApplied(
+                  (beforeObject.serialized || {}).variables || [],
+                  (afterObject.serialized || {}).variables || [],
+                  appliedNames
+                ),
+              },
+            };
+          }),
+        };
+      });
+      this._setHistory(
+        savePartialValueToHistory(
+          this._getLatestHistory(),
+          value,
+          undefined,
+          revealedChangeContext
+        )
+      );
+    });
+    this.updateToolbar();
+    this._checkNoUndeclaredHistoryChange(OBJECTS_HISTORY_KEYS);
+  };
+
+  /**
+   * Split a change made to the behaviors shared data (all at once, by an
+   * "Apply" of the scene properties dialog) into one undoable step per
+   * behavior that changed.
+   */
+  _recordGranularBehaviorsSharedDataHistorySteps = (
+    changeContext: HistoryChangeContext
+  ) => {
+    this._flushPendingPanelHistorySave();
+    const before =
+      this._getLatestHistory().currentValue.behaviorsSharedData || {};
+    const after =
+      this._serializeHistoryTargets(['behaviorsSharedData'])
+        .behaviorsSharedData || {};
+    const changedNames = [
+      ...new Set([...Object.keys(before), ...Object.keys(after)]),
+    ].filter(
+      name => stableStringify(before[name]) !== stableStringify(after[name])
+    );
+    if (changedNames.length === 0) return;
+
+    const revealedChangeContext = this._withRevealSelection(changeContext);
+    let current = { ...before };
+    changedNames.forEach(name => {
+      current = { ...current };
+      if (name in after) current[name] = after[name];
+      else delete current[name];
+      this._setHistory(
+        savePartialValueToHistory(
+          this._getLatestHistory(),
+          { behaviorsSharedData: current },
+          undefined,
+          revealedChangeContext
+        )
+      );
+    });
+    this.updateToolbar();
+    this._checkNoUndeclaredHistoryChange(['behaviorsSharedData']);
+  };
+
   _recordGranularObjectGroupMembershipHistorySteps = (
     groupsKey: string,
     groupName: string,
@@ -2382,6 +2541,18 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendUpdatedInstances(instances);
   };
 
+  _onInstancesDefaultSizeChanged = (instances: Array<gdInitialInstance>) => {
+    // The properties panel shows the size of the selected instances.
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    if (
+      selectedInstances.some(selectedInstance =>
+        instances.some(instance => instance.ptr === selectedInstance.ptr)
+      )
+    ) {
+      this.forceUpdatePropertiesEditor();
+    }
+  };
+
   _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
     this._recordHistoryStep('EDIT', { source: 'canvas' }, ['instances'], () =>
       this.forceUpdatePropertiesEditor()
@@ -2519,13 +2690,34 @@ export default class SceneEditor extends React.Component<Props, State> {
    * (for targets changed outside of the history).
    */
   _refreshHistoryValue = (keys: Array<string>) => {
-    this._setHistory(
-      refreshCompositeHistoryValue(
-        this._getLatestHistory(),
-        this._getHistoryTargets(),
-        keys
-      )
+    const history = this._getLatestHistory();
+    const refreshedHistory = refreshCompositeHistoryValue(
+      history,
+      this._getHistoryTargets(),
+      keys
     );
+    // Nothing to do (and no "unsaved changes") when nothing changed.
+    if (
+      keys.every(
+        key =>
+          JSON.stringify(history.currentValue[key]) ===
+          JSON.stringify(refreshedHistory.currentValue[key])
+      )
+    )
+      return;
+    this._setHistory(refreshedHistory);
+  };
+
+  /**
+   * Called when this editor becomes active again: the project may have been
+   * changed by another editor meanwhile. What it changed is not undoable
+   * from here, but must never be reverted by the undo of a later step.
+   * (Not to be called while this editor is used: it would absorb a change
+   * of this editor made before its step is recorded.)
+   */
+  _refreshHistoryValuesFromProject = () => {
+    this._flushPendingPanelHistorySave();
+    this._refreshHistoryValue(Object.keys(this._getHistoryTargets()));
   };
 
   /**
@@ -2733,7 +2925,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
     // Everything else that changed (the object's own configuration, which
     // has no equivalent way to be split further) as one final step.
-    if (JSON.stringify(current) !== JSON.stringify(afterObject.serialized)) {
+    if (stableStringify(current) !== stableStringify(afterObject.serialized)) {
       objectStates.push(afterObject.serialized);
     }
 
@@ -2745,37 +2937,198 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     const revealedChangeContext = this._withRevealSelection(changeContext);
-    const extraKeysValue =
-      extraKeys.length > 0 ? this._serializeHistoryTargets(extraKeys) : {};
     objectStates.forEach((serializedObject, index) => {
       const isLastState = index === objectStates.length - 1;
-      this._setHistory(
-        savePartialValueToHistory(
-          this._getLatestHistory(),
-          {
-            [key]: {
-              objects: afterObjects.map(item =>
-                item.name === objectName
-                  ? {
-                      name: objectName,
-                      type: item.type,
-                      serialized: serializedObject,
-                    }
-                  : item
-              ),
-              folders: afterValue.folders,
-            },
-            ...(isLastState ? extraKeysValue : {}),
-          },
-          undefined,
-          revealedChangeContext
-        )
+      this._recordObjectStateHistoryStep(
+        objectWithContext,
+        serializedObject,
+        revealedChangeContext,
+        isLastState ? extraKeys : []
       );
     });
 
     this.updateToolbar();
     this._checkNoUndeclaredHistoryChange([key, ...extraKeys]);
   };
+
+  /**
+   * Record one step where the object is in the given serialized state
+   * (the other objects being as they are now).
+   */
+  _recordObjectStateHistoryStep = (
+    objectWithContext: ObjectWithContext,
+    serializedObject: Object,
+    changeContext: HistoryChangeContext,
+    extraKeys: Array<string>
+  ) => {
+    const key = objectWithContext.global ? 'globalObjects' : 'objects';
+    const objectName = objectWithContext.object.getName();
+    const currentValue = this._serializeHistoryTargets([key])[key] || {};
+    const extraKeysValue =
+      extraKeys.length > 0 ? this._serializeHistoryTargets(extraKeys) : {};
+    this._setHistory(
+      savePartialValueToHistory(
+        this._getLatestHistory(),
+        {
+          [key]: {
+            objects: (currentValue.objects || []).map(item =>
+              item.name === objectName
+                ? {
+                    name: objectName,
+                    type: item.type,
+                    serialized: serializedObject,
+                  }
+                : item
+            ),
+            folders: currentValue.folders,
+          },
+          ...extraKeysValue,
+        },
+        undefined,
+        changeContext
+      )
+    );
+  };
+
+  /**
+   * While an editor dialog (object, layer) is open, its changes are
+   * recorded as they are made: one step per edited thing (a behavior, a
+   * variable, an effect, the animations...), in order. Edits of the same
+   * thing made within a short time are one step (like typing in a field).
+   * Cancelling the dialog drops these steps.
+   */
+  _dialogEditSession: ?{|
+    historyAtOpen: HistoryState,
+    serialize: () => Object,
+    recordStep: (serialized: Object) => void,
+    lastSerialized: Object,
+    pendingChangeKeys: ?Array<string>,
+    timeoutId: ?TimeoutID,
+  |} = null;
+
+  _startDialogEditSession = ({
+    serialize,
+    recordStep,
+  }: {|
+    serialize: () => Object,
+    recordStep: (serialized: Object) => void,
+  |}) => {
+    this._endDialogEditSession();
+    this._flushPendingPanelHistorySave();
+    this._dialogEditSession = {
+      historyAtOpen: this._getLatestHistory(),
+      serialize,
+      recordStep,
+      lastSerialized: serialize(),
+      pendingChangeKeys: null,
+      timeoutId: null,
+    };
+  };
+
+  _endDialogEditSession = () => {
+    const session = this._dialogEditSession;
+    if (!session) return;
+    if (session.timeoutId) clearTimeout(session.timeoutId);
+    this._dialogEditSession = null;
+  };
+
+  _onDialogEditChange = () => {
+    const session = this._dialogEditSession;
+    if (!session) return;
+
+    const serialized = session.serialize();
+    const changeKeys = getSerializedObjectChangeKeys(
+      session.lastSerialized,
+      serialized
+    );
+    if (changeKeys.length === 0) return;
+
+    const { pendingChangeKeys } = session;
+    if (
+      pendingChangeKeys &&
+      JSON.stringify(pendingChangeKeys) !== JSON.stringify(changeKeys)
+    ) {
+      // Something else is edited: close the pending step at the state
+      // just before this change.
+      session.recordStep(session.lastSerialized);
+    }
+    session.lastSerialized = serialized;
+    session.pendingChangeKeys = changeKeys;
+    if (session.timeoutId) clearTimeout(session.timeoutId);
+    session.timeoutId = setTimeout(
+      this._flushDialogEditStep,
+      PANEL_HISTORY_SAVE_DELAY
+    );
+  };
+
+  _flushDialogEditStep = () => {
+    const session = this._dialogEditSession;
+    if (!session) return;
+    if (session.timeoutId) clearTimeout(session.timeoutId);
+    session.timeoutId = null;
+    if (!session.pendingChangeKeys) return;
+    session.pendingChangeKeys = null;
+    session.recordStep(session.lastSerialized);
+  };
+
+  _cancelDialogEditSession = () => {
+    const session = this._dialogEditSession;
+    if (!session) return;
+    this._endDialogEditSession();
+    if (this._getLatestHistory() !== session.historyAtOpen) {
+      this._setHistory(session.historyAtOpen);
+      this.updateToolbar();
+    }
+  };
+
+  _startObjectEditorDialogSession = (objectWithContext: ObjectWithContext) => {
+    const { object } = objectWithContext;
+    this._startDialogEditSession({
+      serialize: () => {
+        // Same as the history snapshot of an object.
+        this._ensurePersistentUuidsOfObject(object);
+        return serializeToJSObject(object);
+      },
+      recordStep: serializedObject => {
+        this.updateBehaviorsSharedData();
+        this._recordObjectStateHistoryStep(
+          objectWithContext,
+          serializedObject,
+          this._getObjectEditorDialogChangeContext(objectWithContext),
+          ['behaviorsSharedData']
+        );
+        this.updateToolbar();
+      },
+    });
+  };
+
+  _startLayerEditorDialogSession = (layer: gdLayer) => {
+    this._startDialogEditSession({
+      serialize: () => serializeToJSObject(layer),
+      recordStep: serializedLayer => {
+        this._recordLayerStateHistoryStep(
+          layer,
+          serializedLayer,
+          this._getLayerEditorDialogChangeContext(layer)
+        );
+        this.updateToolbar();
+      },
+    });
+  };
+
+  _getObjectEditorDialogChangeContext = (
+    objectWithContext: ObjectWithContext
+  ): HistoryChangeContext => ({
+    source: 'panel',
+    editorId: 'properties',
+    // The dialog can be opened without selecting the object first.
+    revealSelection: {
+      lastSelectionType: 'object',
+      selectedObjectNames: [objectWithContext.object.getName()],
+      selectedObjectGroupName: null,
+      selectedLayerName: null,
+    },
+  });
 
   /**
    * Split a change to a layer, made all at once by an "Apply" of the full
@@ -2815,7 +3168,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
     // Everything else that changed (the layer's own properties) as one
     // final step.
-    if (JSON.stringify(current) !== JSON.stringify(afterLayer)) {
+    if (stableStringify(current) !== stableStringify(afterLayer)) {
       layerStates.push(afterLayer);
     }
 
@@ -2823,23 +3176,57 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const revealedChangeContext = this._withRevealSelection(changeContext);
     layerStates.forEach(serializedLayer => {
-      this._setHistory(
-        savePartialValueToHistory(
-          this._getLatestHistory(),
-          {
-            layers: afterLayers.map(item =>
-              item.name === layerName ? serializedLayer : item
-            ),
-          },
-          undefined,
-          revealedChangeContext
-        )
+      this._recordLayerStateHistoryStep(
+        layer,
+        serializedLayer,
+        revealedChangeContext
       );
     });
 
     this.updateToolbar();
     this._checkNoUndeclaredHistoryChange(['layers']);
   };
+
+  /**
+   * Record one step where the layer is in the given serialized state (the
+   * other layers being as they are now).
+   */
+  _recordLayerStateHistoryStep = (
+    layer: gdLayer,
+    serializedLayer: Object,
+    changeContext: HistoryChangeContext
+  ) => {
+    const layerName = layer.getName();
+    const currentLayers =
+      this._serializeHistoryTargets(['layers']).layers || [];
+    this._setHistory(
+      savePartialValueToHistory(
+        this._getLatestHistory(),
+        {
+          layers: currentLayers.map(item =>
+            item.name === layerName ? serializedLayer : item
+          ),
+        },
+        undefined,
+        changeContext
+      )
+    );
+  };
+
+  // The change is shown in the properties panel, with the edited layer
+  // selected (the dialog can be opened without selecting the layer first).
+  _getLayerEditorDialogChangeContext = (
+    layer: gdLayer
+  ): HistoryChangeContext => ({
+    source: 'panel',
+    editorId: 'properties',
+    revealSelection: {
+      lastSelectionType: 'layer',
+      selectedObjectNames: [],
+      selectedObjectGroupName: null,
+      selectedLayerName: layer.getName(),
+    },
+  });
 
   _recordHistoryCommand = (
     command: HistoryCommand,
@@ -2950,7 +3337,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   // $FlowFixMe[missing-local-annot]
   _flushPendingPanelHistorySaveDebounced = (debounce(() => {
     this._flushPendingPanelHistorySave();
-  }, 500): any);
+  }, PANEL_HISTORY_SAVE_DELAY): any);
 
   /**
    * Return the value of the instances target, with the given instances
@@ -3136,19 +3523,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     }
     this.updateBehaviorsSharedData();
+    // Whatever was not recorded while the dialog was open (an edit made
+    // without notifying the dialog): nothing, usually.
     this._recordGranularObjectHistorySteps(
       objectWithContext,
-      {
-        source: 'panel',
-        editorId: 'properties',
-        // The dialog can be opened without selecting the object first.
-        revealSelection: {
-          lastSelectionType: 'object',
-          selectedObjectNames: [objectWithContext.object.getName()],
-          selectedObjectGroupName: null,
-          selectedLayerName: null,
-        },
-      },
+      this._getObjectEditorDialogChangeContext(objectWithContext),
       ['behaviorsSharedData']
     );
     if (this.props.unsavedChanges)
@@ -4730,15 +5109,35 @@ export default class SceneEditor extends React.Component<Props, State> {
     containerElement.focus();
   };
 
-  /**
-   * Restart the flash animation of an element (remove then re-add the
-   * class, with a reflow in between so the animation is seen again).
-   */
   _flashElement = (element: HTMLElement) => {
-    element.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    element.classList.remove('undo-redo-property-flash');
-    void element.offsetWidth;
-    element.classList.add('undo-redo-property-flash');
+    if (!this._isElementInView(element))
+      element.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    flashElement(element);
+  };
+
+  /**
+   * Whether the element is (nearly) entirely visible in its scrolling
+   * ancestors - scrolling to it would then only shift the panel by a few
+   * pixels, which looks like a glitch.
+   */
+  _isElementInView = (element: HTMLElement): boolean => {
+    const tolerance = 8;
+    const rect = element.getBoundingClientRect();
+    for (
+      let ancestor = element.parentElement;
+      ancestor;
+      ancestor = ancestor.parentElement
+    ) {
+      const { overflowY } = getComputedStyle(ancestor);
+      if (overflowY !== 'auto' && overflowY !== 'scroll') continue;
+      const ancestorRect = ancestor.getBoundingClientRect();
+      if (
+        rect.top < ancestorRect.top - tolerance ||
+        rect.bottom > ancestorRect.bottom + tolerance
+      )
+        return false;
+    }
+    return true;
   };
 
   _isElementVisible = (element: HTMLElement): boolean =>
@@ -4802,11 +5201,32 @@ export default class SceneEditor extends React.Component<Props, State> {
     setTimeout(tryFlash, 150);
   };
 
+  _flashLayersListBackgroundColorRow = () => {
+    const containerElement = this._containerElement;
+    const { editorDisplay } = this;
+    if (!containerElement || !editorDisplay) return;
+    if (!editorDisplay.isEditorVisible('layers-list')) return;
+
+    this._flashOrRetryThenFallback(() => {
+      const element = this._findElementByAttribute(
+        containerElement,
+        'data-background-color',
+        'true'
+      );
+      if (element && this._isElementVisible(element)) {
+        this._flashElement(element);
+        return true;
+      }
+      return false;
+    }, containerElement);
+  };
+
   _flashObjectGroupsListRowByName = (groupName: string) => {
     const containerElement = this._containerElement;
     const { editorDisplay } = this;
     if (!containerElement || !editorDisplay) return;
-    if (!editorDisplay.isEditorVisible('object-groups-list')) return;
+    // The groups panel is usually closed: open it to show the group.
+    editorDisplay.ensureEditorVisible('object-groups-list');
 
     const { objectsContainer, globalObjectsContainer } = this.props;
     const groupsContainer = [
@@ -5102,10 +5522,34 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (!containerElement || !editorDisplay) return;
     if (!editorDisplay.isEditorVisible(editorId)) return;
 
+    // Removed effects have no panel anymore: flash their section instead.
+    const afterNames = new Set((after || []).map(effect => effect.name));
+    new Set(
+      (before || [])
+        .filter(effect => !afterNames.has(effect.name))
+        .map(getSectionId)
+    ).forEach(sectionId => {
+      this._unfoldSection(sectionId);
+      const sectionElement = this._findElementByAttribute(
+        containerElement,
+        'id',
+        sectionId
+      );
+      if (sectionElement && this._isElementVisible(sectionElement))
+        this._flashElement(sectionElement);
+    });
+
     (after || []).forEach(afterEffect => {
       const beforeEffect = findSerializedItemByName(before, afterEffect.name);
-      // An added effect is already visible by appearing in the list.
-      if (!beforeEffect) return;
+      // An added effect: its whole panel.
+      if (!beforeEffect) {
+        this._revealChangedFieldsOfSubPanel(
+          getSectionId(afterEffect),
+          `effect-panel-${afterEffect.name}`,
+          []
+        );
+        return;
+      }
       const changedKeys = getChangedTopLevelKeys(beforeEffect, afterEffect, [
         'name',
       ]);
@@ -5155,19 +5599,26 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     if (!sectionElement || !this._isElementVisible(sectionElement)) return;
 
+    // Removed behaviors have no panel anymore: flash the section instead.
+    const afterNames = new Set((after || []).map(behavior => behavior.name));
+    if ((before || []).some(behavior => !afterNames.has(behavior.name))) {
+      this._unfoldSection('behaviors-section');
+      this._flashElement(sectionElement);
+    }
+
     (after || []).forEach(afterBehavior => {
       const beforeBehavior = findSerializedItemByName(
         before,
         afterBehavior.name
       );
-      // An added behavior is already visible by appearing in the list.
-      if (!beforeBehavior) return;
-      const changedKeys = getChangedTopLevelKeys(
-        beforeBehavior,
-        afterBehavior,
-        ['name', 'type']
-      );
-      if (changedKeys.length === 0) return;
+      // An added behavior: its whole panel.
+      const changedKeys = beforeBehavior
+        ? getChangedTopLevelKeys(beforeBehavior, afterBehavior, [
+            'name',
+            'type',
+          ])
+        : [];
+      if (beforeBehavior && changedKeys.length === 0) return;
 
       this._revealChangedFieldsOfSubPanel(
         'behaviors-section',
@@ -5221,8 +5672,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           JSON.stringify(beforeInstance[key]) !==
           JSON.stringify(afterInstance[key])
         ) {
-          const fieldId = serializedInstanceKeyToPropertyFieldId[key];
-          if (fieldId) changedFieldIds.add(fieldId);
+          const fieldIds = serializedInstanceKeyToPropertyFieldId[key];
+          if (fieldIds)
+            []
+              .concat(fieldIds)
+              .forEach(fieldId => changedFieldIds.add(fieldId));
         }
       });
       if (
@@ -5396,7 +5850,51 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   /**
-   * Flash the membership section of every group whose objects changed.
+   * Flash the group in the list and, in the group panel, the rows of what
+   * changed on its objects (the same for every object of the group: the
+   * first changed one is enough).
+   */
+  _flashChangedGroupObjectsPropertyRows = (
+    groupName: string,
+    objectsBefore: Array<Object>,
+    objectsAfter: Array<Object>
+  ) => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) return;
+    this._flashObjectGroupsListRowByName(groupName);
+    if (!editorDisplay.isEditorVisible('properties')) return;
+
+    const changedObject = objectsAfter.find(afterObject => {
+      const beforeObject = findSerializedItemByName(
+        objectsBefore,
+        afterObject.name
+      );
+      return (
+        beforeObject &&
+        stableStringify(beforeObject.serialized) !==
+          stableStringify(afterObject.serialized)
+      );
+    });
+    if (!changedObject) return;
+    const beforeSerialized =
+      (findSerializedItemByName(objectsBefore, changedObject.name) || {})
+        .serialized || {};
+    const afterSerialized = changedObject.serialized || {};
+    this._flashChangedBehaviorRows(
+      beforeSerialized.behaviors,
+      afterSerialized.behaviors
+    );
+    this._flashChangedVariableRows(
+      'group-variables-section',
+      beforeSerialized.variables,
+      afterSerialized.variables
+    );
+  };
+
+  /**
+   * Flash, in the membership section of every group whose objects changed,
+   * the rows of the objects added to it - or the section itself when
+   * objects were removed from it (their rows are gone).
    */
   _flashChangedObjectGroupPropertyRows = (
     groupsBefore: Array<Object>,
@@ -5407,18 +5905,21 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (!containerElement || !editorDisplay) return;
     if (!editorDisplay.isEditorVisible('properties')) return;
 
+    const getObjectNames = (group: Object): Array<string> =>
+      ((group.serialized || {}).objects || []).map(({ name }) => name);
     groupsAfter.forEach(afterGroup => {
       const beforeGroup = findSerializedItemByName(
         groupsBefore,
         afterGroup.name
       );
       if (!beforeGroup) return;
-      const changedKeys = getChangedTopLevelKeys(
-        beforeGroup.serialized,
-        afterGroup.serialized,
-        ['name']
+      const beforeNames = getObjectNames(beforeGroup);
+      const afterNames = getObjectNames(afterGroup);
+      const addedNames = afterNames.filter(name => !beforeNames.includes(name));
+      const hasRemovedObjects = beforeNames.some(
+        name => !afterNames.includes(name)
       );
-      if (changedKeys.length === 0) return;
+      if (addedNames.length === 0 && !hasRemovedObjects) return;
 
       this._unfoldSection('group-objects-section');
       const sectionElement = this._findElementByAttribute(
@@ -5426,9 +5927,24 @@ export default class SceneEditor extends React.Component<Props, State> {
         'id',
         'group-objects-section'
       );
-      if (sectionElement && this._isElementVisible(sectionElement)) {
-        this._flashElement(sectionElement);
-      }
+      if (!sectionElement || !this._isElementVisible(sectionElement)) return;
+      if (hasRemovedObjects) this._flashElement(sectionElement);
+      if (addedNames.length === 0) return;
+      this._flashOrRetryThenFallback(() => {
+        let flashedAnyRow = false;
+        addedNames.forEach(name => {
+          const element = this._findElementByAttribute(
+            containerElement,
+            'id',
+            `group-object-${name}`
+          );
+          if (element && this._isElementVisible(element)) {
+            this._flashElement(element);
+            flashedAnyRow = true;
+          }
+        });
+        return flashedAnyRow;
+      }, sectionElement);
     });
   };
 
@@ -5491,21 +6007,35 @@ export default class SceneEditor extends React.Component<Props, State> {
   _flashChangedPropertyRows = (
     beforeChange: Object,
     afterChange: Object,
-    changedKeys: Array<string>
+    changedKeys: Array<string>,
+    revealSelection: ?SelectionByName
   ) => {
     const getObjects = (value: ?Object): Array<Object> =>
       (value && value.objects) || [];
     if (changedKeys.some(key => OBJECTS_HISTORY_KEYS.includes(key))) {
-      this._flashChangedObjectPropertyRows(
-        [
-          ...getObjects(beforeChange.objects),
-          ...getObjects(beforeChange.globalObjects),
-        ],
-        [
-          ...getObjects(afterChange.objects),
-          ...getObjects(afterChange.globalObjects),
-        ]
-      );
+      const objectsBefore = [
+        ...getObjects(beforeChange.objects),
+        ...getObjects(beforeChange.globalObjects),
+      ];
+      const objectsAfter = [
+        ...getObjects(afterChange.objects),
+        ...getObjects(afterChange.globalObjects),
+      ];
+      // A change made to a group (its variables, its behaviors) is applied
+      // to its objects: show it on the group, not on each object.
+      const revealedGroupName =
+        revealSelection && revealSelection.lastSelectionType === 'objectGroup'
+          ? revealSelection.selectedObjectGroupName
+          : null;
+      if (revealedGroupName) {
+        this._flashChangedGroupObjectsPropertyRows(
+          revealedGroupName,
+          objectsBefore,
+          objectsAfter
+        );
+      } else {
+        this._flashChangedObjectPropertyRows(objectsBefore, objectsAfter);
+      }
     }
 
     // An object moved to another folder (or a folder deleted, moving its
@@ -5589,6 +6119,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       this._flashFieldsOfSection('scene-properties-section', [
         ...changedFieldIds,
       ]);
+      // The background color can also be changed from the layers list.
+      if (changedFieldIds.has('BackgroundColor'))
+        this._flashLayersListBackgroundColorRow();
     }
     if (changedKeys.includes('behaviorsSharedData')) {
       const before = beforeChange.behaviorsSharedData || {};
@@ -5709,7 +6242,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     // `_flashChangedInstancePropertyRows` above already does).
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        this._flashChangedPropertyRows(beforeChange, afterChange, changedKeys);
+        this._flashChangedPropertyRows(
+          beforeChange,
+          afterChange,
+          changedKeys,
+          changeContext && changeContext.source === 'panel'
+            ? changeContext.revealSelection
+            : null
+        );
         if (renamedObjectName) {
           this._flashObjectListRowByName(renamedObjectName);
         }
@@ -6047,6 +6587,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onInstancesMoved={this._onInstancesMovedAndSendToEditor3D}
                     onInstancesResized={this._onInstancesResized}
                     onInstancesRotated={this._onInstancesRotated}
+                    onInstancesDefaultSizeChanged={
+                      this._onInstancesDefaultSizeChanged
+                    }
                     isInstanceOf3DObject={this.isInstanceOf3DObject}
                     onSelectAllInstancesOfObjectInLayout={
                       this.onSelectAllInstancesOfObjectInLayout
@@ -6101,7 +6644,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                             editedObjectWithContext.object.getName()
                           );
                         }}
+                        onChange={this._onDialogEditChange}
                         onCancel={() => {
+                          this._cancelDialogEditSession();
                           if (editedObjectWithContext) {
                             this.props.onObjectEdited(
                               editedObjectWithContext,
@@ -6129,6 +6674,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                           // The editedObjectWithContext state must be reset
                           // because no hot-reload can happen while an object is edited.
                           const appliedObjectWithContext = editedObjectWithContext;
+                          this._flushDialogEditStep();
                           this.editObject(null, undefined, () => {
                             // When resource parameters changed an hot-reload is
                             // already triggered by _onObjectEdited.
@@ -6345,22 +6891,18 @@ export default class SceneEditor extends React.Component<Props, State> {
                       layer={this.state.editedLayer}
                       initialInstances={initialInstances}
                       initialTab={this.state.editedLayerInitialTab}
+                      onChange={this._onDialogEditChange}
                       onApply={(hasAnyEffectBeenAdded: boolean) => {
                         const { editedLayer } = this.state;
+                        this._flushDialogEditStep();
+                        this._endDialogEditSession();
                         if (editedLayer) {
-                          // The change is shown in the properties panel,
-                          // with the edited layer selected (the dialog can
-                          // be opened without selecting the layer first).
-                          this._recordGranularLayerHistorySteps(editedLayer, {
-                            source: 'panel',
-                            editorId: 'properties',
-                            revealSelection: {
-                              lastSelectionType: 'layer',
-                              selectedObjectNames: [],
-                              selectedObjectGroupName: null,
-                              selectedLayerName: editedLayer.getName(),
-                            },
-                          });
+                          // Whatever was not recorded while the dialog was
+                          // open: nothing, usually.
+                          this._recordGranularLayerHistorySteps(
+                            editedLayer,
+                            this._getLayerEditorDialogChangeContext(editedLayer)
+                          );
                         }
                         if (hasAnyEffectBeenAdded) {
                           // This triggers a full hot-reload. We don't need
@@ -6373,11 +6915,12 @@ export default class SceneEditor extends React.Component<Props, State> {
                           editedLayer: null,
                         });
                       }}
-                      onCancel={() =>
+                      onCancel={() => {
+                        this._cancelDialogEditSession();
                         this.setState({
                           editedLayer: null,
-                        })
-                      }
+                        });
+                      }}
                       hotReloadPreviewButtonProps={
                         this.props.hotReloadPreviewButtonProps
                       }
@@ -6390,11 +6933,18 @@ export default class SceneEditor extends React.Component<Props, State> {
                       layout={layout}
                       onClose={() => this.openSceneProperties(false)}
                       onApply={() => {
-                        this._recordHistoryStep(
-                          undefined,
-                          { source: 'panel', editorId: 'properties' },
-                          ['sceneProperties']
+                        const changeContext: HistoryChangeContext = {
+                          source: 'panel',
+                          editorId: 'properties',
+                        };
+                        // The behaviors shared data edited in the dialog:
+                        // one step per behavior, then the properties.
+                        this._recordGranularBehaviorsSharedDataHistorySteps(
+                          changeContext
                         );
+                        this._recordHistoryStep(undefined, changeContext, [
+                          'sceneProperties',
+                        ]);
                         this.openSceneProperties(false);
                       }}
                       onEditVariables={() => this.openSceneVariables(true)}

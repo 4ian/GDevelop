@@ -119,7 +119,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
         onClick={props.onSelectPoint}
         onRemove={() => {
           const answer = Window.showConfirmDialog(
-            "Are you sure you want to remove this point? This can't be undone."
+            'Are you sure you want to remove this point?'
           );
           if (!answer) return;
 

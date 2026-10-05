@@ -11,14 +11,21 @@ namespace gdjs {
       // `RecastNav.init` does nothing (and doesn't instantiate anything) if
       // Recast is already initialized, for instance if this script is
       // reloaded by the hot-reloader.
-      await RecastNav.init(async () => {
+      // The vendored `init` expects a function returning the module, but the
+      // typings of `@recast-navigation/core` declare the module itself.
+      const instantiateRecastModule = async () => {
         const module = await import('./recast-navigation.wasm.js');
         const initializeRecast = module.default;
         if (!initializeRecast) {
           throw new Error('No default export found in Recast.');
         }
         return initializeRecast();
-      });
+      };
+      await RecastNav.init(
+        instantiateRecastModule as unknown as Parameters<
+          typeof RecastNav.init
+        >[0]
+      );
     } catch (err) {
       console.error('Unable to load Recast navigation mesh library.', err);
       throw err;

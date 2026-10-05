@@ -6,142 +6,6 @@ namespace gdjs {
     mb: number;
   }
 
-  /**
-   * A bokeh blur adapted from Three.js `BokehShader`, with:
-   * - a range around the focus distance staying sharp,
-   * - a blur growing linearly over a transition distance,
-   * - samples weighted to avoid sharp objects bleeding on the blurred
-   *   background behind them.
-   */
-  const depthOfFieldShader = {
-    defines: {
-      PERSPECTIVE_CAMERA: 1,
-    },
-    uniforms: {
-      tDiffuse: { value: null },
-      tDepth: { value: null },
-      focusDistance: { value: 10.0 },
-      focusRange: { value: 1.0 },
-      transitionDistance: { value: 10.0 },
-      maxBlur: { value: 0.01 },
-      aspect: { value: 1.0 },
-      nearClip: { value: 1.0 },
-      farClip: { value: 1000.0 },
-    },
-    vertexShader: /* glsl */ `
-      varying vec2 vUv;
-
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }`,
-    fragmentShader: /* glsl */ `
-      #include <common>
-      #include <packing>
-
-      varying vec2 vUv;
-
-      uniform sampler2D tDiffuse;
-      uniform sampler2D tDepth;
-      uniform float focusDistance;
-      uniform float focusRange;
-      uniform float transitionDistance;
-      uniform float maxBlur;
-      uniform float aspect;
-      uniform float nearClip;
-      uniform float farClip;
-
-      float getDistance(const in vec2 uv) {
-        float depth = texture2D(tDepth, uv).x;
-        #if PERSPECTIVE_CAMERA == 1
-        return -perspectiveDepthToViewZ(depth, nearClip, farClip);
-        #else
-        return -orthographicDepthToViewZ(depth, nearClip, farClip);
-        #endif
-      }
-
-      float getBlur(const in float distance) {
-        float outOfFocusDistance =
-          abs(distance - focusDistance) - focusRange * 0.5;
-        return clamp(outOfFocusDistance / transitionDistance, 0.0, 1.0);
-      }
-
-      vec4 color;
-      float totalWeight;
-      float centerDistance;
-      float centerBlur;
-      vec2 blurRadius;
-
-      void addSample(const in vec2 offset) {
-        vec2 uv = vUv + offset * blurRadius;
-        float sampleDistance = getDistance(uv);
-        // A sharper object in front of the pixel must not be spread on it.
-        float weight = sampleDistance < centerDistance
-          ? clamp(getBlur(sampleDistance) / centerBlur, 0.0, 1.0)
-          : 1.0;
-        color += texture2D(tDiffuse, uv) * weight;
-        totalWeight += weight;
-      }
-
-      void main() {
-        color = texture2D(tDiffuse, vUv);
-        centerDistance = getDistance(vUv);
-        centerBlur = getBlur(centerDistance);
-        if (centerBlur <= 0.0) {
-          gl_FragColor = color;
-          return;
-        }
-        totalWeight = 1.0;
-        blurRadius = vec2(1.0, aspect) * maxBlur * centerBlur;
-
-        addSample(vec2( 0.0,    1.0  ));
-        addSample(vec2( 0.375,  0.925));
-        addSample(vec2( 0.725,  0.725));
-        addSample(vec2(-0.925,  0.375));
-        addSample(vec2( 1.0,    0.0  ));
-        addSample(vec2( 0.925, -0.375));
-        addSample(vec2( 0.725, -0.725));
-        addSample(vec2(-0.375, -0.925));
-        addSample(vec2( 0.0,   -1.0  ));
-        addSample(vec2(-0.375,  0.925));
-        addSample(vec2(-0.725,  0.725));
-        addSample(vec2( 0.925,  0.375));
-        addSample(vec2(-1.0,    0.0  ));
-        addSample(vec2(-0.925, -0.375));
-        addSample(vec2(-0.725, -0.725));
-        addSample(vec2( 0.375, -0.925));
-
-        addSample(vec2( 0.375,  0.925) * 0.9);
-        addSample(vec2(-0.925,  0.375) * 0.9);
-        addSample(vec2( 0.925, -0.375) * 0.9);
-        addSample(vec2(-0.375, -0.925) * 0.9);
-        addSample(vec2(-0.375,  0.925) * 0.9);
-        addSample(vec2( 0.925,  0.375) * 0.9);
-        addSample(vec2(-0.925, -0.375) * 0.9);
-        addSample(vec2( 0.375, -0.925) * 0.9);
-
-        addSample(vec2( 0.725,  0.725) * 0.7);
-        addSample(vec2( 1.0,    0.0  ) * 0.7);
-        addSample(vec2( 0.725, -0.725) * 0.7);
-        addSample(vec2( 0.0,   -1.0  ) * 0.7);
-        addSample(vec2(-0.725,  0.725) * 0.7);
-        addSample(vec2(-1.0,    0.0  ) * 0.7);
-        addSample(vec2(-0.725, -0.725) * 0.7);
-        addSample(vec2( 0.0,    1.0  ) * 0.7);
-
-        addSample(vec2( 0.725,  0.725) * 0.4);
-        addSample(vec2( 1.0,    0.0  ) * 0.4);
-        addSample(vec2( 0.725, -0.725) * 0.4);
-        addSample(vec2( 0.0,   -1.0  ) * 0.4);
-        addSample(vec2(-0.725,  0.725) * 0.4);
-        addSample(vec2(-1.0,    0.0  ) * 0.4);
-        addSample(vec2(-0.725, -0.725) * 0.4);
-        addSample(vec2( 0.0,    1.0  ) * 0.4);
-
-        gl_FragColor = color / totalWeight;
-      }`,
-  };
-
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::DepthOfField',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -153,7 +17,7 @@ namespace gdjs {
           return new gdjs.PixiFiltersTools.EmptyFilter();
         }
         return new (class implements gdjs.PixiFiltersTools.Filter {
-          shaderPass: THREE_ADDONS.ShaderPass;
+          shaderPass: THREE_ADDONS.DepthOfFieldPass;
           _isEnabled: boolean = false;
           // Distances are in scene units: they are converted to the Three.js
           // world units before each rendering, as the world scale can change.
@@ -164,9 +28,7 @@ namespace gdjs {
           _maxBlur: float = 6;
 
           constructor() {
-            this.shaderPass = new THREE_ADDONS.ShaderPass(
-              gdjs.PixiFiltersTools.clampThreeShaderOutput(depthOfFieldShader)
-            );
+            this.shaderPass = new THREE_ADDONS.DepthOfFieldPass();
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -228,16 +90,9 @@ namespace gdjs {
             uniforms.tDepth.value = depthTexture;
             uniforms.nearClip.value = camera.near;
             uniforms.farClip.value = camera.far;
-            const isPerspectiveCamera =
-              camera instanceof THREE.PerspectiveCamera;
-            if (
-              this.shaderPass.material.defines.PERSPECTIVE_CAMERA !==
-              (isPerspectiveCamera ? 1 : 0)
-            ) {
-              this.shaderPass.material.defines.PERSPECTIVE_CAMERA =
-                isPerspectiveCamera ? 1 : 0;
-              this.shaderPass.material.needsUpdate = true;
-            }
+            this.shaderPass.setPerspectiveCamera(
+              camera instanceof THREE.PerspectiveCamera
+            );
 
             const inverseWorldScale = target
               .getRuntimeScene()

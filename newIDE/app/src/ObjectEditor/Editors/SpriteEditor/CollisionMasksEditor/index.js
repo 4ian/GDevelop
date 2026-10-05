@@ -194,7 +194,7 @@ const CollisionMasksEditor = ({
       if (enable) {
         const answer = await showConfirmation({
           title: t`Use same collision mask for all animations?`,
-          message: t`Having the same collision masks for all animations will erase and reset all the other animations collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the animations of the object?`,
+          message: t`Having the same collision masks for all animations will erase and reset all the other animations collision masks. Are you sure you want to share these collision masks amongst all the animations of the object?`,
           confirmButtonLabel: t`Use same collision mask`,
           dismissButtonLabel: t`Cancel`,
         });
@@ -223,7 +223,7 @@ const CollisionMasksEditor = ({
         const answer = await showConfirmation({
           title: t`Use same collision mask for all frames?`,
           message: t`
-          Having the same collision masks for all frames will erase and reset all the other frames collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the frames of the animation?`,
+          Having the same collision masks for all frames will erase and reset all the other frames collision masks. Are you sure you want to share these collision masks amongst all the frames of the animation?`,
           confirmButtonLabel: t`Use same collision mask`,
           dismissButtonLabel: t`Cancel`,
         });

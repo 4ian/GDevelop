@@ -379,6 +379,32 @@ describe('change_scene_properties_layers_effects_groups', () => {
     expect(effects.hasEffectNamed('Sky2')).toBe(false);
   });
 
+  it('gives a new layer effect the default values of its parameters', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            {
+              layer_name: '',
+              effect_name: 'MySepia',
+              effect_type: 'FakeSepia',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(effects.getEffect('MySepia').getDoubleParameter('opacity')).toBe(1);
+  });
+
   it('renames a layer effect', async () => {
     const effects = testScene
       .getLayers()

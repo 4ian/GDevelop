@@ -5,6 +5,7 @@ import {
   renameLayoutInProject,
 } from '../Utils/Layout';
 import { mapFor } from '../Utils/MapFor';
+import { setEffectDefaultParameters } from '../EffectsList/EnumerateEffects';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
@@ -8161,6 +8162,7 @@ const applyEffectChange = ({
           new_effect_position || 0
         );
         newlyCreatedEffect.setEffectType(effect_type);
+        setEffectDefaultParameters(newlyCreatedEffect, effectMetadata);
       }
     } else if (
       delete_this_effect ||

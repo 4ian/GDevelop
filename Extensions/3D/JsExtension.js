@@ -2402,15 +2402,15 @@ module.exports = {
         .addExtraInfo('image')
         .setLabel(_('Left face (X-)'));
       properties
-        .getOrCreate('bottomFaceResourceName')
-        .setType('resource')
-        .addExtraInfo('image')
-        .setLabel(_('Bottom face (Y+)'));
-      properties
         .getOrCreate('topFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Top face (Y-)'));
+        .setLabel(_('Top face (Y+)'));
+      properties
+        .getOrCreate('bottomFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Bottom face (Y-)'));
       properties
         .getOrCreate('frontFaceResourceName')
         .setType('resource')
@@ -2421,6 +2421,23 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Back face (Z-)'));
+      properties
+        .getOrCreate('top')
+        .setValue('Z+')
+        .setLabel(_('3D world top'))
+        .setType('choice')
+        .addChoice('Z+', _('Z+ (most 3D games)'))
+        .addChoice('Y-', _('Y- (side view 3D games)'))
+        .addChoice(
+          'Legacy',
+          _('Legacy Z+ (deprecated, faces must be rotated by hand)')
+        )
+        .setGroup(_('Orientation'))
+        .setDescription(
+          _(
+            'With Z+ or Y-, the faces are the ones of a usual cube map, as exported by most tools.'
+          )
+        );
       properties
         .getOrCreate('environmentIntensity')
         .setValue('1')

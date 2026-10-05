@@ -182,6 +182,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3D.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3DRenderer.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/DirectionalLight.js',
       {
         pattern:
           './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/jolt-physics.wasm.js',

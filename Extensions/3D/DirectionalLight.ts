@@ -25,6 +25,13 @@ namespace gdjs {
           private _minimumShadowBias: float = 0;
           private _distanceFromCamera: float = 1500;
           private _frustumSize: float = 4000;
+          private _shadowCenter = new THREE.Vector3();
+          private _lightOffset = new THREE.Vector3();
+          private _origin = new THREE.Vector3();
+          private _shadowCameraRotation = new THREE.Matrix4();
+          private _shadowCameraRight = new THREE.Vector3();
+          private _shadowCameraUp = new THREE.Vector3();
+          private _shadowCameraForward = new THREE.Vector3();
 
           private _isEnabled: boolean = false;
           private _light: THREE.DirectionalLight;
@@ -158,50 +165,92 @@ namespace gdjs {
               return;
             }
             const layer = target.getRuntimeLayer();
-            const x = layer.getCameraX();
-            const y = layer.getCameraY();
-            const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
-
             // Contrary to cameras, lights are within the scene so they already
             // take world scale into account.
-            const roundedX = Math.floor(x / 100) * 100;
-            const roundedY = Math.floor(y / 100) * 100;
-            const roundedZ = Math.floor(z / 100) * 100;
+            this._shadowCenter.set(
+              layer.getCameraX(),
+              layer.getCameraY(),
+              layer.getCameraZ(layer.getInitialCamera3DFieldOfView())
+            );
             if (this._top === 'Y-') {
-              const posLightX =
-                roundedX +
+              this._lightOffset.set(
                 this._distanceFromCamera *
                   Math.cos(gdjs.toRad(-this._rotation + 90)) *
-                  Math.cos(gdjs.toRad(this._elevation));
-              const posLightY =
-                roundedY -
-                this._distanceFromCamera *
-                  Math.sin(gdjs.toRad(this._elevation));
-              const posLightZ =
-                roundedZ +
+                  Math.cos(gdjs.toRad(this._elevation)),
+                -this._distanceFromCamera *
+                  Math.sin(gdjs.toRad(this._elevation)),
                 this._distanceFromCamera *
                   Math.sin(gdjs.toRad(-this._rotation + 90)) *
-                  Math.cos(gdjs.toRad(this._elevation));
-              this._light.position.set(posLightX, posLightY, posLightZ);
-              this._light.target.position.set(roundedX, roundedY, roundedZ);
+                  Math.cos(gdjs.toRad(this._elevation))
+              );
+              // The default up vector (Y+ in world coordinates) is parallel to
+              // the light when the elevation is 90°, which makes the shadow
+              // camera orientation unstable. This horizontal axis is always
+              // orthogonal to the light and gives the same shadow frustum,
+              // turned by 90°.
+              this._light.shadow.camera.up.set(
+                Math.cos(gdjs.toRad(this._rotation)),
+                0,
+                -Math.sin(gdjs.toRad(this._rotation))
+              );
             } else {
-              const posLightX =
-                roundedX +
+              this._lightOffset.set(
                 this._distanceFromCamera *
                   Math.cos(gdjs.toRad(this._rotation)) *
-                  Math.cos(gdjs.toRad(this._elevation));
-              const posLightY =
-                roundedY +
+                  Math.cos(gdjs.toRad(this._elevation)),
                 this._distanceFromCamera *
                   Math.sin(gdjs.toRad(this._rotation)) *
-                  Math.cos(gdjs.toRad(this._elevation));
-              const posLightZ =
-                roundedZ +
-                this._distanceFromCamera *
-                  Math.sin(gdjs.toRad(this._elevation));
-              this._light.position.set(posLightX, posLightY, posLightZ);
-              this._light.target.position.set(roundedX, roundedY, roundedZ);
+                  Math.cos(gdjs.toRad(this._elevation)),
+                this._distanceFromCamera * Math.sin(gdjs.toRad(this._elevation))
+              );
+              this._light.shadow.camera.up.copy(THREE.Object3D.DEFAULT_UP);
             }
+            this._snapShadowCenterToShadowMapTexels();
+            this._light.target.position.copy(this._shadowCenter);
+            this._light.position
+              .copy(this._shadowCenter)
+              .add(this._lightOffset);
+          }
+          /**
+           * Move the shadow center by less than a texel so that the shadow map
+           * texels stay at the same place in the world when the camera moves.
+           * Otherwise, the edges of shadows flicker as they are rasterized
+           * differently on each frame.
+           */
+          private _snapShadowCenterToShadowMapTexels(): void {
+            // The shadow camera axes are computed like Three.js does in
+            // `LightShadow.updateMatrices`, in world coordinates, where the Y
+            // axis is the opposite of the scene one (the scene is mirrored on Y).
+            this._shadowCameraForward.set(
+              this._lightOffset.x,
+              -this._lightOffset.y,
+              this._lightOffset.z
+            );
+            this._shadowCameraRotation.lookAt(
+              this._shadowCameraForward,
+              this._origin,
+              this._light.shadow.camera.up
+            );
+            this._shadowCameraRotation.extractBasis(
+              this._shadowCameraRight,
+              this._shadowCameraUp,
+              this._shadowCameraForward
+            );
+            this._shadowCameraRight.y = -this._shadowCameraRight.y;
+            this._shadowCameraUp.y = -this._shadowCameraUp.y;
+
+            const texelSize = this._frustumSize / this._shadowMapSize;
+            const right = this._shadowCenter.dot(this._shadowCameraRight);
+            const up = this._shadowCenter.dot(this._shadowCameraUp);
+            this._shadowCenter
+              .addScaledVector(
+                this._shadowCameraRight,
+                Math.round(right / texelSize) * texelSize - right
+              )
+              .addScaledVector(
+                this._shadowCameraUp,
+                Math.round(up / texelSize) * texelSize - up
+              );
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
@@ -212,10 +261,20 @@ namespace gdjs {
               this._rotation = value;
             } else if (parameterName === 'distanceFromCamera') {
               this._distanceFromCamera = value;
+              this._shadowCameraDirty = true;
             } else if (parameterName === 'frustumSize') {
               this._frustumSize = value;
+              this._shadowCameraDirty = true;
             } else if (parameterName === 'minimumShadowBias') {
               this._minimumShadowBias = value;
+            } else if (parameterName === 'shadowIntensity') {
+              this._light.shadow.intensity = gdjs.evtTools.common.clamp(
+                value,
+                0,
+                1
+              );
+            } else if (parameterName === 'shadowSoftness') {
+              this._light.shadow.radius = Math.max(0, value);
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -231,6 +290,10 @@ namespace gdjs {
               return this._frustumSize;
             } else if (parameterName === 'minimumShadowBias') {
               return this._minimumShadowBias;
+            } else if (parameterName === 'shadowIntensity') {
+              return this._light.shadow.intensity;
+            } else if (parameterName === 'shadowSoftness') {
+              return this._light.shadow.radius;
             }
             return 0;
           }

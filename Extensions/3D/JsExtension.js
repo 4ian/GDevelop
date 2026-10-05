@@ -2299,6 +2299,28 @@ module.exports = {
         .setType('choice')
         .setGroup(_('Shadows'));
       properties
+        .getOrCreate('shadowIntensity')
+        .setValue('1')
+        .setLabel(_('Shadow intensity'))
+        .setDescription(
+          _(
+            'How dark the shadows are, from 0 (no shadow) to 1 (only lit by the other lights).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowSoftness')
+        .setValue('1')
+        .setLabel(_('Shadow softness'))
+        .setDescription(
+          _(
+            'How blurry the edges of shadows are, in texels of the shadow map. It has no impact on performance.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
         .getOrCreate('minimumShadowBias')
         .setValue('0')
         .setLabel(_('Shadow bias'))

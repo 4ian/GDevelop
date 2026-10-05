@@ -15,15 +15,15 @@ namespace gdjs {
           return new gdjs.PixiFiltersTools.EmptyFilter();
         }
         return new (class implements gdjs.PixiFiltersTools.Filter {
-          shaderPass: THREE_ADDONS.UnrealBloomPass;
+          shaderPass: THREE_ADDONS.LowResolutionBloomPass;
           _isEnabled: boolean;
 
           constructor() {
-            this.shaderPass = new THREE_ADDONS.UnrealBloomPass(
+            this.shaderPass = new THREE_ADDONS.LowResolutionBloomPass(
               new THREE.Vector2(256, 256),
-              1,
-              0,
-              0
+              0.5,
+              0.4,
+              0.85
             );
             this._isEnabled = false;
           }
@@ -45,7 +45,9 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return false;
             }
-            target.getRenderer().addPostProcessingPass(this.shaderPass);
+            target
+              .getRenderer()
+              .addPostProcessingPass(this.shaderPass, effectData.name);
             this._isEnabled = true;
             return true;
           }

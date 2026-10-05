@@ -1632,6 +1632,9 @@ namespace gdjs {
           }
         }
       });
+      runtimeLayer.setEffectsOrder(
+        newEffectsData.map((effectData) => effectData.name)
+      );
     }
 
     _hotReloadRuntimeLayerEffect(

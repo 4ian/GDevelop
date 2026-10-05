@@ -168,6 +168,7 @@ export type SceneEditorsDisplayProps = {|
   onInstancesMoved: (Array<gdInitialInstance>) => void,
   onInstancesResized: (Array<gdInitialInstance>) => void,
   onInstancesRotated: (Array<gdInitialInstance>) => void,
+  onInstancesDefaultSizeChanged: (Array<gdInitialInstance>) => void,
   isInstanceOf3DObject: gdInitialInstance => boolean,
   onSelectAllInstancesOfObjectInLayout: string => void,
 

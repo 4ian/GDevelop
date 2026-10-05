@@ -38,6 +38,7 @@ export default class InstancesRenderer {
   |}) => void;
   _showObjectInstancesIn3D: boolean;
   onInstanceDoubleClicked: gdInitialInstance => void;
+  onInstanceDefaultSizeChanged: gdInitialInstance => void;
   onOverInstance: gdInitialInstance => void;
   onOutInstance: gdInitialInstance => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
@@ -72,6 +73,7 @@ export default class InstancesRenderer {
     onInstanceClicked,
     onInstanceRightClicked,
     onInstanceDoubleClicked,
+    onInstanceDefaultSizeChanged,
     onOverInstance,
     onOutInstance,
     onMoveInstance,
@@ -95,6 +97,7 @@ export default class InstancesRenderer {
       y: number,
     |}) => void,
     onInstanceDoubleClicked: gdInitialInstance => void,
+    onInstanceDefaultSizeChanged: gdInitialInstance => void,
     onOverInstance: gdInitialInstance => void,
     onOutInstance: gdInitialInstance => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
@@ -113,6 +116,7 @@ export default class InstancesRenderer {
     this.onInstanceClicked = onInstanceClicked;
     this.onInstanceRightClicked = onInstanceRightClicked;
     this.onInstanceDoubleClicked = onInstanceDoubleClicked;
+    this.onInstanceDefaultSizeChanged = onInstanceDefaultSizeChanged;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
     this.onMoveInstance = onMoveInstance;
@@ -210,6 +214,7 @@ export default class InstancesRenderer {
         onInstanceClicked: this.onInstanceClicked,
         onInstanceRightClicked: this.onInstanceRightClicked,
         onInstanceDoubleClicked: this.onInstanceDoubleClicked,
+        onInstanceDefaultSizeChanged: this.onInstanceDefaultSizeChanged,
         onOverInstance: this.onOverInstance,
         onOutInstance: this.onOutInstance,
         onMoveInstance: this.onMoveInstance,

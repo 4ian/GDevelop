@@ -217,6 +217,46 @@ describe('getObjectsContainerHistoryTarget', () => {
     project.delete();
   });
 
+  it('keeps the default (capability) behaviors of an object across undo/redo', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    const defaultBehaviorNames = player
+      .getAllBehaviorNames()
+      .toJSArray()
+      .filter(name => player.getBehavior(name).isDefaultBehavior());
+    // A sprite has capability behaviors like "Scale", "Opacity", "Effect".
+    expect(defaultBehaviorNames).toContain('Scale');
+
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const before = target.getValue();
+    player
+      .getVariables()
+      .insertNew('Life', 0)
+      .setValue(10);
+    const after = target.getValue();
+
+    for (let i = 0; i < 2; i++) {
+      target.setValue(before);
+      target.setValue(after);
+    }
+    const object = objectsContainer.getObject('Player');
+    defaultBehaviorNames.forEach(name => {
+      expect(object.hasBehaviorNamed(name)).toBe(true);
+      expect(object.getBehavior(name).isDefaultBehavior()).toBe(true);
+    });
+
+    project.delete();
+  });
+
   it('restores the folder structure', () => {
     const { project, objectsContainer } = makeProject();
     const target = getObjectsContainerHistoryTarget(
@@ -323,6 +363,33 @@ describe('getObjectGroupsContainerHistoryTarget', () => {
     target.setValue(after);
     expect(objectGroupsContainer.get('Everyone').find('Player')).toBe(true);
     expect(objectGroupsContainer.get('Everyone').ptr).toBe(group.ptr);
+
+    project.delete();
+  });
+});
+
+describe('getObjectGroupsContainerHistoryTarget - order', () => {
+  it('restores the order of the groups', () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const groups = layout.getObjects().getObjectGroups();
+    groups.insertNew('A', 0);
+    groups.insertNew('B', 1);
+    groups.insertNew('C', 2);
+    const target = getObjectGroupsContainerHistoryTarget(groups);
+    const getNames = () =>
+      [0, 1, 2].map(index => groups.getAt(index).getName());
+
+    const before = target.getValue();
+    groups.move(2, 0);
+    expect(getNames()).toEqual(['C', 'A', 'B']);
+    const after = target.getValue();
+
+    target.setValue(before);
+    expect(getNames()).toEqual(['A', 'B', 'C']);
+    target.setValue(after);
+    expect(getNames()).toEqual(['C', 'A', 'B']);
 
     project.delete();
   });

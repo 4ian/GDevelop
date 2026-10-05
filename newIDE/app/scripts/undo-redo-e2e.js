@@ -5,6 +5,7 @@
  * Usage:
  *   node scripts/undo-redo-e2e.js [--url=http://localhost:3000]
  *     [--only=name1,name2] [--headed] [--list]
+ *   E2E_DEBUG=1 also prints the console errors and page errors.
  *
  * Chrome is found with the CHROME_PATH environment variable (or at its
  * default location). Each scenario runs in a fresh browser context, on a
@@ -237,8 +238,16 @@ class Editor {
       recordIfFatal(String(error.message || error))
     );
     page.on('console', message => {
-      if (message.type() === 'error') recordIfFatal(message.text());
+      if (message.type() === 'error') {
+        if (process.env.E2E_DEBUG)
+          console.log('CONSOLE', message.text().slice(0, 600));
+        recordIfFatal(message.text());
+      }
     });
+    if (process.env.E2E_DEBUG)
+      page.on('pageerror', error =>
+        console.log('PAGEERROR', String(error.stack || error).slice(0, 800))
+      );
     await page.evaluateOnNewDocument(() => {
       // Give access to the game running in the frame of the 3D editor.
       const captureGame = setInterval(() => {
@@ -420,8 +429,26 @@ class Editor {
       },
     }[name];
     if (await this.page.$(`#${listId}`)) return;
-    await (await this.page.$(`#${buttonId}`)).click();
-    await this.page.waitForSelector(`#${listId}`);
+    // The button toggles the panel: only click it while the panel is
+    // closed (its tooltip says "Open ..."), and retry, as a click can be
+    // lost while the editor is still settling.
+    await this.waitUntil(
+      `${name} panel`,
+      async () => {
+        if (await this.page.$(`#${listId}`)) return true;
+        const isClosed = await this.page.evaluate(
+          buttonId =>
+            /^open/i.test(
+              document.getElementById(buttonId).getAttribute('title') || ''
+            ),
+          buttonId
+        );
+        if (isClosed) await (await this.page.$(`#${buttonId}`)).click();
+        await sleep(500);
+        return !!(await this.page.$(`#${listId}`));
+      },
+      30000
+    );
   }
 
   async selectGroup(groupName) {
@@ -902,6 +929,14 @@ const scenarios = {
   'layer change is revealed even if an instance gets selected': async editor => {
     await editor.selectLayer('Background');
     await editor.clickSectionHeaderButton('layer-2d-effects-section', 'add');
+    await editor.page.waitForSelector('#new-effect-dialog');
+    await editor.page.click('#new-effect-from-scratch-tab');
+    await editor.page.waitForSelector('#effect-item-Sepia');
+    await editor.page.click('#effect-item-Sepia');
+    await editor.waitUntil(
+      'effect dialog closed',
+      async () => !(await editor.page.$('#new-effect-dialog'))
+    );
     await sleep(HISTORY_SAVE_DELAY);
     await editor.selectInstancesOf('MyObject');
 
@@ -2458,6 +2493,29 @@ scenarios['layers list changes can be undone'] = async editor => {
   await editor.waitUntil('layer back', () =>
     exists(editor, layerRow('Background'))
   );
+};
+
+scenarios['renaming a layer can be undone'] = async editor => {
+  const { page } = editor;
+  const hasLayer = name =>
+    exists(editor, `#layers-list [data-scene="${name}"]`);
+  await editor.openPanel('layers');
+  // A real click, to give the focus to the list for the rename shortcut.
+  await (await page.$('#layers-list [data-scene="Background"]')).click();
+  await sleep(300);
+  await page.keyboard.press('F2');
+  await sleep(300);
+  await page.keyboard.type('RenamedLayer');
+  await page.keyboard.press('Enter');
+  await editor.waitUntil('layer renamed', () => hasLayer('RenamedLayer'));
+  await sleep(HISTORY_SAVE_DELAY);
+
+  await editor.undo();
+  await editor.waitUntil('name restored', () => hasLayer('Background'));
+  expectEqual(await hasLayer('RenamedLayer'), false, 'new name after undo');
+  await editor.redo();
+  await editor.waitUntil('renamed again', () => hasLayer('RenamedLayer'));
+  expectEqual(await hasLayer('Background'), false, 'old name after redo');
 };
 
 scenarios[
@@ -4297,8 +4355,9 @@ const main = async () => {
   for (const name of names) {
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
+    let editor = null;
     try {
-      const editor = new Editor(page);
+      editor = new Editor(page);
       const startTime = Date.now();
       await editor.open(getProjectUrl(name));
       const loadedTime = Date.now();
@@ -4314,6 +4373,9 @@ const main = async () => {
     } catch (error) {
       failures.push(name);
       console.log(`FAIL  ${name}\n      ${error.message}`);
+      // A crash usually explains a timeout: say it.
+      if (editor && editor.fatalErrors.length)
+        console.log(`      Fatal error(s): ${editor.fatalErrors.join(' | ')}`);
     }
     await context.close();
   }

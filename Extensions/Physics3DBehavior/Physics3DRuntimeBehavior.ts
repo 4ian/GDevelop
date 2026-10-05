@@ -475,6 +475,18 @@ namespace gdjs {
       return tempQuat;
     }
 
+    override applyBehaviorOverriding(behaviorData): boolean {
+      this._applyBehaviorData(behaviorData);
+
+      // Every property (shape, body type, layers, masks, friction, damping...)
+      // is read when the body is created, so recreating the body (and its
+      // shape) applies all of them. It's done lazily at the next update, which
+      // keeps the velocities, and does nothing if the body doesn't exist yet.
+      this._needToRecreateShape = true;
+      this._needToRecreateBody = true;
+      return true;
+    }
+
     override getNetworkSyncData(
       options: GetNetworkSyncDataOptions
     ): Physics3DNetworkSyncData {
@@ -1139,18 +1151,6 @@ namespace gdjs {
       if ('gravityScale' in data) this.gravityScale = data.gravityScale;
       if ('layers' in data) this.layers = data.layers;
       if ('masks' in data) this.masks = data.masks;
-    }
-
-    override applyBehaviorOverriding(behaviorData): boolean {
-      this._applyBehaviorData(behaviorData);
-
-      // Every property (shape, body type, layers, masks, friction, damping...)
-      // is read when the body is created, so recreating the body (and its
-      // shape) applies all of them. It's done lazily at the next update, which
-      // keeps the velocities, and does nothing if the body doesn't exist yet.
-      this._needToRecreateShape = true;
-      this._needToRecreateBody = true;
-      return true;
     }
 
     onObjectHotReloaded() {

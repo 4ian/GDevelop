@@ -202,6 +202,8 @@ type Props = {|
     ...HotReloadSteps,
     editorCameraState3D: EditorCameraState | null,
   |}) => Promise<void>,
+  // Shown at the bottom of the game, above it (like indicators).
+  children?: React.Node,
 |};
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
@@ -218,6 +220,7 @@ export const EmbeddedGameFrame = ({
   previewDebuggerServer,
   onLaunchPreviewForInGameEdition,
   enabled,
+  children,
 }: Props): React.MixedElement => {
   const [
     previewIndexHtmlLocation,
@@ -753,6 +756,18 @@ export const EmbeddedGameFrame = ({
             );
           }}
         </DropTarget>
+        {enabled && children && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 12,
+              left: '50%',
+              transform: 'translateX(-50%)',
+            }}
+          >
+            {children}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -116,6 +116,29 @@ namespace gdjs {
 
       this._initializeFromObjectData(objectData);
 
+      if (parent.getGame().isInGameEdition()) {
+        // In the in-game editor, an error thrown by the events of the object
+        // is reported, and the editor goes on. The method is read at each
+        // call: the code of the object can be hot-reloaded.
+        for (const methodName of [
+          'onCreated',
+          'doStepPostEvents',
+          'onHotReloading',
+          'onDestroy',
+        ]) {
+          (this as any)[methodName] = (...args: any[]) => {
+            try {
+              return Object.getPrototypeOf(this)[methodName].apply(this, args);
+            } catch (error) {
+              parent.getGame().reportInGameEditorExtensionError(error, {
+                phase: methodName,
+                type: this._type,
+              });
+            }
+          };
+        }
+      }
+
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
     }

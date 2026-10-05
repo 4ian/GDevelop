@@ -1,0 +1,59 @@
+.trigger {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--theme-surface-canvas-background-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  font: inherit;
+  transition: transform 0.1s ease-in-out;
+}
+
+.trigger:hover {
+  transform: translateY(-1px);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--theme-warning-color);
+  outline-offset: 2px;
+}
+
+.content {
+  box-sizing: border-box;
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  padding: 16px;
+}
+
+.errors {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--theme-list-item-separator-color);
+}
+
+.error:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.message {
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--theme-surface-alternate-canvas-background-color);
+  color: var(--theme-text-default-color);
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}

@@ -99,6 +99,11 @@ import {
 } from './EditorTabs/EditorTabsRenaming';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { requestAskAiPrefill } from '../AiGeneration/AskAiPrefill';
+import {
+  isInGameEditorExtensionErrorFromStore,
+  getAskAiToFixInGameEditorExtensionErrorsText,
+} from '../InGameEditorExtensionErrors';
+import InGameEditorExtensionErrorsIndicator from '../InGameEditorExtensionErrors/InGameEditorExtensionErrorsIndicator';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
@@ -612,6 +617,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     clearGameHotReloadLogs,
     clearEditorHotReloadLogs,
     clearEditorUncaughtError,
+    inGameEditorExtensionErrors,
+    clearInGameEditorExtensionErrors,
     hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
   const {
@@ -1106,6 +1113,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         paneIdentifier,
         continueProcessingFunctionCallsOnMount,
         prefilledUserRequest,
+        prefillInCurrentChat,
       } = options || {};
       const newPaneIdentifier =
         paneIdentifier || (currentProject ? 'right' : 'center');
@@ -1113,7 +1121,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (prefilledUserRequest) {
         // Delivered to the Ask AI editor as soon as it's mounted (or
         // immediately if it already is).
-        requestAskAiPrefill(prefilledUserRequest);
+        requestAskAiPrefill({
+          userRequestText: prefilledUserRequest,
+          inCurrentChat: !!prefillInCurrentChat,
+        });
       }
 
       setState(state => {
@@ -6160,7 +6171,23 @@ const MainFrame = (props: Props): React.MixedElement => {
         enabled={gameEditorMode === 'embedded-game'}
         previewDebuggerServer={previewDebuggerServer || null}
         onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
-      />
+      >
+        <InGameEditorExtensionErrorsIndicator
+          errors={inGameEditorExtensionErrors}
+          isFromStore={error =>
+            isInGameEditorExtensionErrorFromStore(currentProject, error)
+          }
+          onAskAiToFix={() =>
+            openAskAi({
+              prefilledUserRequest: getAskAiToFixInGameEditorExtensionErrorsText(
+                inGameEditorExtensionErrors
+              ),
+              prefillInCurrentChat: true,
+            })
+          }
+          onDismiss={clearInGameEditorExtensionErrors}
+        />
+      </EmbeddedGameFrame>
       <GameplayTestFrame
         previewDebuggerServer={previewDebuggerServer || null}
         onStopRequested={stopRunningProjectGameplayTest}

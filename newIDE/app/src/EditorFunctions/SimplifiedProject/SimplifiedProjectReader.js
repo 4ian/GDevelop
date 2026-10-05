@@ -322,6 +322,59 @@ export const parsePath = (path: string): Array<PathStep> => {
   return steps;
 };
 
+const MAX_LISTED_ITEM_NAMES = 20;
+
+/** The key holding the name of the items of a list (`extensionName`, `name`...). */
+const findItemNameKey = (item: any): ?string =>
+  item && typeof item === 'object' && !Array.isArray(item)
+    ? Object.keys(item).find(
+        key => /^(name|[a-z]+Name)$/.test(key) && typeof item[key] === 'string'
+      )
+    : null;
+
+const renderPathSteps = (steps: Array<PathStep>): string =>
+  steps
+    .map((step, index) =>
+      step.type === 'key'
+        ? `${index === 0 ? '' : '.'}${step.key}`
+        : step.type === 'index'
+        ? `[${step.index}]`
+        : '[*]'
+    )
+    .join('');
+
+/**
+ * For a key missing in an item reached by its index in a list of named items
+ * (`extensions[0]`): which item it is, the other items, and how to read one
+ * by its name - reading the wrong item by index looks like "this key does
+ * not exist" otherwise.
+ */
+const describeIndexedItem = ({
+  items,
+  itemIndex,
+  listPath,
+}: {|
+  items: Array<any>,
+  itemIndex: number,
+  listPath: string,
+|}): string => {
+  const nameKey = findItemNameKey(items[itemIndex]);
+  if (!nameKey) return '';
+  const listedNames = items
+    .slice(0, MAX_LISTED_ITEM_NAMES)
+    .map((item, index) =>
+      item && typeof item[nameKey] === 'string'
+        ? `[${index}] "${item[nameKey]}"`
+        : `[${index}]`
+    );
+  const notListedCount = items.length - listedNames.length;
+  return ` ${listPath}[${itemIndex}] is the item with ${nameKey} "${
+    items[itemIndex][nameKey]
+  }". The items of ${listPath} are: ${listedNames.join(', ')}${
+    notListedCount > 0 ? ` (and ${notListedCount} more)` : ''
+  }. To read one by its name: { path: "${listPath}", filter: { property: "${nameKey}", value: "..." } }.`;
+};
+
 /**
  * Walk a value along pre-parsed path steps, applying an optional array
  * filter and depth-truncation on the result.
@@ -342,6 +395,9 @@ const walkSteps = ({
   | {| success: true, result: any |}
   | {| success: false, message: string |} => {
   let value: any = current;
+  // The list the last `[index]` step went into, to say which item a missing
+  // key was looked for in.
+  let lastIndexedList: Array<any> | null = null;
 
   for (let i = startIndex; i < steps.length; i++) {
     if (value === null || value === undefined) {
@@ -365,11 +421,20 @@ const walkSteps = ({
       // $FlowFixMe[method-unbinding] - deliberate `.call` on a foreign object.
       if (!Object.prototype.hasOwnProperty.call(value, step.key)) {
         const availableKeys = Object.keys(value);
+        const previousStep = steps[i - 1];
         return {
           success: false,
           message: `Key "${step.key}" not found. Available keys: ${
             availableKeys.length ? availableKeys.join(', ') : '(none)'
-          }.`,
+          }.${
+            lastIndexedList && previousStep && previousStep.type === 'index'
+              ? describeIndexedItem({
+                  items: lastIndexedList,
+                  itemIndex: previousStep.index,
+                  listPath: renderPathSteps(steps.slice(0, i - 1)),
+                })
+              : ''
+          }`,
         };
       }
       value = value[step.key];
@@ -390,6 +455,7 @@ const walkSteps = ({
           } items).`,
         };
       }
+      lastIndexedList = value;
       value = value[step.index];
     } else {
       // Wildcard [*]

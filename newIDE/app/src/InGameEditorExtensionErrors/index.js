@@ -3,7 +3,15 @@ import { isExtensionFromStore } from '../EditorFunctions/SimplifiedProject/Simpl
 import { type AiRequestFunctionCallOutput } from '../Utils/GDevelopServices/Generation';
 
 const MAX_ERRORS_GIVEN_TO_AI = 3;
-const MAX_STACK_LINES_GIVEN_TO_AI = 4;
+const MAX_CALL_CHAIN_LENGTH = 6;
+
+// The names generated for the functions of extensions, like
+// `gdjs.evtsExt__MyExtension__MyFunction.func` for a free function or
+// `gdjs.evtsExt__MyExtension__MyBehavior.MyBehavior.prototype.doStepPreEventsContext.func`
+// for a method (V8 can omit `prototype`).
+const extensionFunctionNameRegex = /^gdjs\.evtsExt__(.+?)__(.+?)\.(?:.+?\.(?:prototype\.)?(.+)Context\.)?func$/;
+// The generated names replace `_` with `_95`.
+const demangle = (mangledName: string) => mangledName.replace(/_95/g, '_');
 
 /**
  * An error thrown by the code of an extension while the in-game editor
@@ -54,16 +62,65 @@ export const getInGameEditorExtensionErrorOrigin = ({
     ? `${phase} of ${type}`
     : `${phase} of ${extensionName || 'an extension'}`;
 
+/**
+ * The functions of extensions in the stack of the error, from the outermost
+ * to where it was thrown, like
+ * "MyExtension::MyObject.doStepPostEvents → MyExtension::MyFunction → JavaScript code event".
+ * The locations in the generated code are left out: they point to nothing the
+ * AI can read.
+ */
+export const getInGameEditorExtensionErrorCallChain = (
+  stack: string
+): string | null => {
+  const functionNames = stack
+    .split('\n')
+    .map(line => {
+      const match = line.match(
+        /^\s*at (?:async )?([^\s(]+)(?: \[as ([^\]]+)\])?/
+      );
+      return match ? match[2] || match[1] : null;
+    })
+    .filter(Boolean);
+  const callChain: Array<string> = [];
+  functionNames.forEach((functionName, index) => {
+    const extensionFunctionMatch = functionName.match(
+      extensionFunctionNameRegex
+    );
+    const name = extensionFunctionMatch
+      ? `${demangle(extensionFunctionMatch[1])}::${demangle(
+          extensionFunctionMatch[2]
+        )}${
+          extensionFunctionMatch[3]
+            ? `.${demangle(extensionFunctionMatch[3])}`
+            : ''
+        }`
+      : functionName.startsWith('userFunc0x')
+      ? 'JavaScript code event'
+      : // Where the error was thrown, even outside of an extension.
+      index === 0
+      ? functionName
+      : null;
+    if (name && callChain[0] !== name) callChain.unshift(name);
+  });
+  if (callChain.length === 0) return null;
+  return (callChain.length > MAX_CALL_CHAIN_LENGTH
+    ? [...callChain.slice(0, 2), '…', ...callChain.slice(-3)]
+    : callChain
+  ).join(' → ');
+};
+
 /** The request pre-filled in the chat to ask the AI to fix the errors. */
 export const getAskAiToFixInGameEditorExtensionErrorsText = (
   errors: Array<InGameEditorExtensionError>
 ): string =>
   [
     'The scene editor reported errors in the code of extensions:',
-    ...errors.map(
-      error =>
-        `- ${getInGameEditorExtensionErrorOrigin(error)}: ${error.message}`
-    ),
+    ...errors.map(error => {
+      const callChain = getInGameEditorExtensionErrorCallChain(error.stack);
+      return `- ${getInGameEditorExtensionErrorOrigin(error)}: ${
+        error.message
+      }${callChain ? ` (in ${callChain})` : ''}`;
+    }),
     'Can you fix them?',
   ].join('\n');
 
@@ -117,10 +174,7 @@ export const addInGameEditorExtensionErrorsToFunctionCallOutputs = ({
               where: getInGameEditorExtensionErrorOrigin(error),
               message: error.message,
               timesThrown: error.count,
-              stack: error.stack
-                .split('\n')
-                .slice(0, MAX_STACK_LINES_GIVEN_TO_AI)
-                .join('\n'),
+              callChain: getInGameEditorExtensionErrorCallChain(error.stack),
             })),
             ...(errorsToGive.length > givenErrors.length
               ? { notShownCount: errorsToGive.length - givenErrors.length }

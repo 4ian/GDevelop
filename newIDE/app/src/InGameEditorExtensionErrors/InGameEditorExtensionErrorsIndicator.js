@@ -9,7 +9,6 @@ import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import WarningFilled from '../UI/CustomSvgIcons/WarningFilled';
-import Sparkle from '../UI/CustomSvgIcons/Sparkle';
 import {
   type InGameEditorExtensionError,
   getInGameEditorExtensionErrorOrigin,
@@ -113,7 +112,6 @@ const InGameEditorExtensionErrorsIndicator = ({
                 />
                 <RaisedButton
                   color="ai"
-                  icon={<Sparkle />}
                   label={<Trans>Ask the AI to fix</Trans>}
                   onClick={() => {
                     setAnchorElement(null);

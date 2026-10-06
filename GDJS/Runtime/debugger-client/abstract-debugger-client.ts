@@ -756,7 +756,7 @@ namespace gdjs {
             phase: origin.phase,
             type: origin.type || null,
             message,
-            stack: stack.split('\n').slice(0, 8).join('\n'),
+            stack: stack.split('\n').slice(0, 20).join('\n'),
             count: reportedError.count,
           },
         })

@@ -1,6 +1,7 @@
 // @flow
 import {
   addInGameEditorExtensionErrorsToFunctionCallOutputs,
+  getInGameEditorExtensionErrorCallChain,
   type InGameEditorExtensionError,
 } from '.';
 import { EXTENSION_STORE_ORIGIN_NAME } from '../EditorFunctions/SimplifiedProject/SimplifiedExtensions';
@@ -19,10 +20,13 @@ const createFakeError = (
   message: 'object.getFoo is not a function',
   stack: [
     'TypeError: object.getFoo is not a function',
-    '    at a (code.js:1:1)',
-    '    at b (code.js:2:1)',
-    '    at c (code.js:3:1)',
-    '    at d (code.js:4:1)',
+    '    at Object.GDJSInlineCode [as userFunc0x1a2b] (http://127.0.0.1/code1.js:2:110)',
+    '    at gdjs.evtsExt__MyExtension__Update_95Mesh.eventsList0 (http://127.0.0.1/code1.js:3:97)',
+    '    at gdjs.evtsExt__MyExtension__Update_95Mesh.func (http://127.0.0.1/code1.js:4:90)',
+    '    at gdjs.evtsExt__MyExtension__MyObject.MyObject.doStepPostEventsContext.eventsList0 (http://127.0.0.1/code2.js:7:139)',
+    '    at gdjs.evtsExt__MyExtension__MyObject.MyObject.doStepPostEventsContext.func (http://127.0.0.1/code2.js:8:179)',
+    '    at MyObject.doStepPostEvents (http://127.0.0.1/code2.js:5:173)',
+    '    at gdjs.CustomRuntimeObject3D.update (http://127.0.0.1/runtime.js:9:58)',
   ].join('\n'),
   count: 120,
   ...overrides,
@@ -89,12 +93,8 @@ describe('addInGameEditorExtensionErrorsToFunctionCallOutputs', () => {
       where: 'editorCallback of StoreExtension',
       message: 'Store extension failed',
       timesThrown: 1,
-      stack: [
-        'TypeError: object.getFoo is not a function',
-        '    at a (code.js:1:1)',
-        '    at b (code.js:2:1)',
-        '    at c (code.js:3:1)',
-      ].join('\n'),
+      callChain:
+        'MyExtension::MyObject.doStepPostEvents → MyExtension::Update_Mesh → JavaScript code event',
     });
     expect(lastOutput.inGameEditorErrors.errors[1]).toMatchObject({
       extensionName: 'MyExtension',
@@ -115,5 +115,35 @@ describe('addInGameEditorExtensionErrorsToFunctionCallOutputs', () => {
     });
 
     expect(result).toEqual({ functionCallOutputs, newlyGivenErrorIds: [] });
+  });
+});
+
+describe('getInGameEditorExtensionErrorCallChain', () => {
+  it('keeps where the error was thrown, even outside of an extension', () => {
+    expect(
+      getInGameEditorExtensionErrorCallChain(
+        [
+          "TypeError: Cannot read properties of undefined (reading 'getX')",
+          '    at gdjs.RuntimeObject.getAABB (http://127.0.0.1/runtime.js:1:1)',
+          '    at gdjs.evtsExt__MyExtension__MyBehavior.MyBehavior.prototype.onCreatedContext.func (http://127.0.0.1/code.js:2:1)',
+        ].join('\n')
+      )
+    ).toBe('MyExtension::MyBehavior.onCreated → gdjs.RuntimeObject.getAABB');
+  });
+
+  it('trims the middle of a long chain of functions', () => {
+    expect(
+      getInGameEditorExtensionErrorCallChain(
+        [
+          'Error: Too deep',
+          ...[7, 6, 5, 4, 3, 2, 1].map(
+            index =>
+              `    at gdjs.evtsExt__MyExtension__Function${index}.func (http://127.0.0.1/code.js:${index}:1)`
+          ),
+        ].join('\n')
+      )
+    ).toBe(
+      'MyExtension::Function1 → MyExtension::Function2 → … → MyExtension::Function5 → MyExtension::Function6 → MyExtension::Function7'
+    );
   });
 });

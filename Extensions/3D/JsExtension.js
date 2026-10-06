@@ -2362,13 +2362,13 @@ module.exports = {
         .setLabel(_('Shadow frustum size'))
         .setDescription(
           _(
-            'Size of the area around the camera where shadows are drawn, when they are not fitted to the camera view.'
+            'Size of the area around the camera where shadows are drawn, when they are not fitted to the camera view. Prefer fitting shadows to the camera view, which gives sharper shadows.'
           )
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))
-        .setAdvanced(true);
+        .setDeprecated(true);
       properties
         .getOrCreate('distanceFromCamera')
         .setValue('1500')

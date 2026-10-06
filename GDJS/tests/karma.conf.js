@@ -182,6 +182,10 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3D.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3DRenderer.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/BloomEffect.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/BrightnessAndContrastEffect.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/DepthOfFieldEffect.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/N8AOEffect.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/DirectionalLight.js',
       {
         pattern:
@@ -210,6 +214,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/B_firebasetools/*.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/outline-pixi-filter.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/pixi-filters/filter-outline.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/blur-pixi-filter.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/kawase-blur-pixi-filter.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/pixi-filters/filter-kawase-blur.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapcollisionmaskruntimeobject.js',

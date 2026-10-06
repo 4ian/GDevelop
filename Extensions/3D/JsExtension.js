@@ -2304,7 +2304,7 @@ module.exports = {
         .setLabel(_('Fit shadows to the camera view'))
         .setDescription(
           _(
-            'Draw shadows only for what the camera sees, up to the shadow distance. Shadows are sharper, especially when the camera is close to the ground or tilted.'
+            'Draw shadows only for what the camera sees, up to the shadow distance, for sharper shadows. Always recommended: this will become the only mode in the future.'
           )
         )
         .setType('boolean')
@@ -2375,7 +2375,7 @@ module.exports = {
         .setLabel(_("Distance from layer's camera"))
         .setDescription(
           _(
-            'Objects farther than this from the area where shadows are drawn, towards the light, do not cast shadows.'
+            'How far towards the sun objects can be and still cast shadows into the view. Objects farther than this do not cast shadows.'
           )
         )
         .setType('number')

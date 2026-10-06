@@ -11300,6 +11300,22 @@ const searchDocs: EditorFunction = {
   modifiesProject: false,
 };
 
+const readJavascriptReference: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const names = SafeExtractor.extractStringProperty(args, 'names');
+
+    return {
+      text: <Trans>Read the JavaScript reference of {names}.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to read the JavaScript reference - continue with your existing GDevelop knowledge.`
+    );
+  },
+  modifiesProject: false,
+};
+
 const getGameStarterSummary: EditorFunctionWithoutProject = {
   // Handled entirely on the backend to inform planning, but still shown in the
   // chat so the user can see the AI is studying a starter template.
@@ -11732,6 +11748,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   change_custom_function: changeCustomFunction,
   read_full_docs: readFullDocs,
   search_docs: searchDocs,
+  read_javascript_reference: readJavascriptReference,
 
   create_or_update_plan: createOrUpdatePlan,
 

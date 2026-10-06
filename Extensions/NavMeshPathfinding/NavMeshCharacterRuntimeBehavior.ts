@@ -31,7 +31,10 @@ namespace gdjs {
       throw err;
     }
   };
-  gdjs.registerAsynchronouslyLoadingLibraryPromise(loadRecast());
+  // `RecastNav` is defined by `recast-navigation-generators.js`, which can be
+  // loaded after this file (include files are sorted by name, and reloaded in
+  // parallel by the hot-reloader).
+  gdjs.registerAsynchronouslyLoadingLibrary(loadRecast);
 
   interface NavMeshCharacterNetworkSyncDataType {
     // Syncing the path and its position on it should be enough to have a good prediction.

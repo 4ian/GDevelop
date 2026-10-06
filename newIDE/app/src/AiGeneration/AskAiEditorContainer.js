@@ -23,6 +23,10 @@ import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import { canPayForAiRequest } from './AiRequestChat/Utils';
 import { registerAskAiPrefillListener } from './AskAiPrefill';
 import {
+  getLatestInGameEditorExtensionErrors,
+  addInGameEditorExtensionErrorsToFunctionCallOutputs,
+} from '../InGameEditorExtensionErrors';
+import {
   addMessageToAiRequest,
   createAiRequest,
   sendAiRequestFeedback,
@@ -410,6 +414,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       );
 
       const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
+      const givenInGameEditorExtensionErrorIds = React.useRef<Set<number>>(
+        new Set()
+      );
       const eventsFunctionsExtensionsState = React.useContext(
         EventsFunctionsExtensionsContext
       );
@@ -903,11 +910,27 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               triggerUnsavedChanges();
             }
 
+            // The errors of the code of extensions in the in-game editor are
+            // given to the orchestrator, which changes the project with the
+            // user.
+            const {
+              functionCallOutputs: functionCallOutputsToSend,
+              newlyGivenErrorIds,
+            } =
+              aiRequestForMessage.mode === 'orchestrator'
+                ? addInGameEditorExtensionErrorsToFunctionCallOutputs({
+                    functionCallOutputs,
+                    errors: getLatestInGameEditorExtensionErrors(),
+                    givenErrorIds: givenInGameEditorExtensionErrorIds.current,
+                    project: upToDateProject,
+                  })
+                : { functionCallOutputs, newlyGivenErrorIds: [] };
+
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
                 userId: profile.id,
                 aiRequestId,
-                functionCallOutputs,
+                functionCallOutputs: functionCallOutputsToSend,
                 gameProjectJsonUserRelativeKey:
                   preparedAiUserContent.gameProjectJsonUserRelativeKey,
                 gameProjectJson: preparedAiUserContent.gameProjectJson,
@@ -933,6 +956,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               })
             );
             updateAiRequest(aiRequest.id, () => aiRequest);
+            newlyGivenErrorIds.forEach(errorId =>
+              givenInGameEditorExtensionErrorIds.current.add(errorId)
+            );
             setSendingAiRequest(aiRequest.id, false);
             setIsSendingUserMessage(false);
             clearEditorFunctionCallResults(aiRequest.id);
@@ -1171,13 +1197,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       // elsewhere in the editor ("Edit with AI" buttons...).
       React.useEffect(
         () =>
-          registerAskAiPrefillListener((userRequestText: string) => {
-            onStartOrOpenChat({ aiRequestId: null });
+          registerAskAiPrefillListener(({ userRequestText, inCurrentChat }) => {
+            const aiRequestId =
+              inCurrentChat && selectedAiRequest ? selectedAiRequest.id : null;
+            if (!aiRequestId) onStartOrOpenChat({ aiRequestId: null });
             if (aiRequestChatRef.current) {
-              aiRequestChatRef.current.setUserInput(null, userRequestText);
+              aiRequestChatRef.current.setUserInput(
+                aiRequestId,
+                userRequestText
+              );
             }
           }),
-        [onStartOrOpenChat]
+        [onStartOrOpenChat, selectedAiRequest]
       );
 
       const onStartNewChat = React.useCallback(

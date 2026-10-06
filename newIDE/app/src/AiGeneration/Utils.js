@@ -1572,6 +1572,8 @@ export type OpenAskAiOptions = {|
   continueProcessingFunctionCallsOnMount?: boolean,
   // When set, a new chat is started with this text pre-filled in the input.
   prefilledUserRequest?: string,
+  // Pre-fill the chat being shown (if any) instead of starting a new one.
+  prefillInCurrentChat?: boolean,
 |};
 
 export type NewAiRequestOptions = {|

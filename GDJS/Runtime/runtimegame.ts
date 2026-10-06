@@ -1752,6 +1752,24 @@ namespace gdjs {
     }
 
     /**
+     * In the in-game editor, report an error thrown by the code of an
+     * extension, instead of letting it stop the editor.
+     * @param error What was thrown.
+     * @param origin Where: the phase (`onCreated`, `doStepPostEvents`...), and
+     * the type of the object or behavior running it, if any.
+     */
+    reportInGameEditorExtensionError(
+      error: unknown,
+      origin: { phase: string; type?: string }
+    ): void {
+      if (this._debuggerClient) {
+        this._debuggerClient.reportInGameEditorExtensionError(error, origin);
+      } else {
+        logger.error('Error in the code of an extension:', error);
+      }
+    }
+
+    /**
      * Return in-game editor.
      */
     getInGameEditor(): InGameEditor | null {

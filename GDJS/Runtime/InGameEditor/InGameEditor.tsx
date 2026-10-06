@@ -1937,9 +1937,15 @@ namespace gdjs {
         for (const [toolbarId, items] of this._requestedExtensionToolbars) {
           let toolbar = this._extensionToolbars.get(toolbarId);
           if (!toolbar) {
-            toolbar = new ExtensionToolbar(() => {
-              this._timeSinceLastInteraction = 0;
-            });
+            toolbar = new ExtensionToolbar(
+              () => {
+                this._timeSinceLastInteraction = 0;
+              },
+              (error) =>
+                this._runtimeGame.reportInGameEditorExtensionError(error, {
+                  phase: 'toolbar',
+                })
+            );
             this._extensionToolbars.set(toolbarId, toolbar);
           }
           toolbar.render(parent, items, toolbarIndex++);
@@ -4316,7 +4322,13 @@ namespace gdjs {
       if (this._currentScene) {
         this._currentScene._updateObjectsForInGameEditor();
         for (let i = 0; i < gdjs.callbacksInGameEditorPostStep.length; ++i) {
-          gdjs.callbacksInGameEditorPostStep[i](this);
+          try {
+            gdjs.callbacksInGameEditorPostStep[i](this);
+          } catch (error) {
+            this._runtimeGame.reportInGameEditorExtensionError(error, {
+              phase: 'editorCallback',
+            });
+          }
         }
         this._currentScene.render();
       }
@@ -4642,9 +4654,14 @@ namespace gdjs {
     private _items: Array<InGameEditorToolbarItem> = [];
     private _itemsLayout = '';
     private _onInteraction: () => void;
+    private _onItemError: (error: unknown) => void;
 
-    constructor(onInteraction: () => void) {
+    constructor(
+      onInteraction: () => void,
+      onItemError: (error: unknown) => void
+    ) {
       this._onInteraction = onInteraction;
+      this._onItemError = onItemError;
     }
 
     render(
@@ -4729,7 +4746,11 @@ namespace gdjs {
           this._onInteraction();
           const currentItem = this._items[index];
           if (currentItem.type === 'slider') {
-            currentItem.onChange(Number(slider.value));
+            try {
+              currentItem.onChange(Number(slider.value));
+            } catch (error) {
+              this._onItemError(error);
+            }
           }
         });
         // A focused element would receive the keyboard shortcuts of the editor.
@@ -4747,7 +4768,13 @@ namespace gdjs {
           onClick={() => {
             this._onInteraction();
             const currentItem = this._items[index];
-            if (currentItem.type === 'button') currentItem.onClick();
+            if (currentItem.type === 'button') {
+              try {
+                currentItem.onClick();
+              } catch (error) {
+                this._onItemError(error);
+              }
+            }
           }}
         >
           <span />

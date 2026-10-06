@@ -357,8 +357,21 @@ namespace gdjs {
         }
       }
 
+      const game = this._runtimeScene.getGame();
       for (let i = 0; i < this._behaviors.length; ++i) {
-        this._behaviors[i].onCreated();
+        const behavior = this._behaviors[i];
+        if (game.isInGameEdition()) {
+          try {
+            behavior.onCreated();
+          } catch (error) {
+            game.reportInGameEditorExtensionError(error, {
+              phase: 'onCreated',
+              type: behavior.type,
+            });
+          }
+        } else {
+          behavior.onCreated();
+        }
       }
     }
 
@@ -752,8 +765,21 @@ namespace gdjs {
       if (rendererObject3D) {
         theLayer.getRenderer().remove3DRendererObject(rendererObject3D);
       }
+      const game = this._runtimeScene.getGame();
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
-        this._behaviors[j].onDestroy();
+        const behavior = this._behaviors[j];
+        if (game.isInGameEdition()) {
+          try {
+            behavior.onDestroy();
+          } catch (error) {
+            game.reportInGameEditorExtensionError(error, {
+              phase: 'onDestroy',
+              type: behavior.type,
+            });
+          }
+        } else {
+          behavior.onDestroy();
+        }
       }
       this.destroyCallbacks.forEach((c) => c());
       this.clearEffects();

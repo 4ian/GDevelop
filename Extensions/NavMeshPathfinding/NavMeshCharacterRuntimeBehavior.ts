@@ -1,40 +1,25 @@
 namespace gdjs {
   const loadRecast = async () => {
     try {
-      // Give the module instantiated from `recast-navigation.wasm.wasm` to
-      // RecastNav. Without an implementation, `RecastNav.init` instantiates
-      // the "compat" build embedded (in base64) in
-      // `recast-navigation-generators.js`, so each game would create 2
-      // WebAssembly instances (each with its own memory) instead of 1.
-      // Previews of the in-game editor and gameplay tests run in the editor
-      // process: this halves the WebAssembly memory reserved by each preview.
-      // `RecastNav.init` does nothing (and doesn't instantiate anything) if
-      // Recast is already initialized, for instance if this script is
-      // reloaded by the hot-reloader.
+      const module = await import('./recast-navigation.wasm.js');
+      const initializeRecast = module.default;
+      if (!initializeRecast) {
+        throw new Error('No default export found in Recast.');
+      }
+
+      // Without it, RecastNav would instantiate a second WebAssembly module:
+      // the "compat" build embedded in `recast-navigation-generators.js`.
       // The vendored `init` expects a function returning the module, but the
       // typings of `@recast-navigation/core` declare the module itself.
-      const instantiateRecastModule = async () => {
-        const module = await import('./recast-navigation.wasm.js');
-        const initializeRecast = module.default;
-        if (!initializeRecast) {
-          throw new Error('No default export found in Recast.');
-        }
-        return initializeRecast();
-      };
       await RecastNav.init(
-        instantiateRecastModule as unknown as Parameters<
-          typeof RecastNav.init
-        >[0]
+        initializeRecast as unknown as Parameters<typeof RecastNav.init>[0]
       );
     } catch (err) {
       console.error('Unable to load Recast navigation mesh library.', err);
       throw err;
     }
   };
-  // `RecastNav` is defined by `recast-navigation-generators.js`, which can be
-  // loaded after this file (include files are sorted by name, and reloaded in
-  // parallel by the hot-reloader).
-  gdjs.registerAsynchronouslyLoadingLibrary(loadRecast);
+  gdjs.registerAsynchronouslyLoadingLibraryPromise(loadRecast());
 
   interface NavMeshCharacterNetworkSyncDataType {
     // Syncing the path and its position on it should be enough to have a good prediction.

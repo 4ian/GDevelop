@@ -796,22 +796,6 @@ namespace gdjs {
     asynchronouslyLoadingLibraryPromises.push(promise);
   };
 
-  const asynchronouslyLoadingLibraryLoaders: Array<() => Promise<any>> = [];
-
-  /**
-   * Register a function loading a third party library (required to load
-   * before launching the game). It's called when the game starts loading, once
-   * all the scripts of the game are loaded: unlike with
-   * `registerAsynchronouslyLoadingLibraryPromise`, the library can use what
-   * other scripts define, whatever their order.
-   * @category Core Engine > Game
-   */
-  export const registerAsynchronouslyLoadingLibrary = (
-    loadLibrary: () => Promise<any>
-  ): void => {
-    asynchronouslyLoadingLibraryLoaders.push(loadLibrary);
-  };
-
   /**
    * @returns a promise resolved when all all third party libraries, which need
    * to be loaded before the game startup, are loaded. If a library fails
@@ -821,11 +805,6 @@ namespace gdjs {
   export const getAllAsynchronouslyLoadingLibraryPromise = (): Promise<
     any[]
   > => {
-    for (const loadLibrary of asynchronouslyLoadingLibraryLoaders.splice(0)) {
-      asynchronouslyLoadingLibraryPromises.push(
-        Promise.resolve().then(loadLibrary)
-      );
-    }
     return Promise.all(asynchronouslyLoadingLibraryPromises);
   };
 }

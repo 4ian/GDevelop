@@ -151,7 +151,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/PathTools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/pathfindingruntimebehavior.js',
-      './newIDE/app/resources/GDJS/Runtime/Extensions/NavMeshPathfinding/recast-navigation-generators.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/NavMeshPathfinding/A_recast-navigation-generators.js',
       {
         pattern:
           './newIDE/app/resources/GDJS/Runtime/Extensions/NavMeshPathfinding/recast-navigation.wasm.js',

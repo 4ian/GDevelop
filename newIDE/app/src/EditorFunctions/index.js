@@ -40,6 +40,7 @@ import {
   applyEventsChanges,
 } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
+import { setEffectDefaultParameters } from '../EffectsList/EnumerateEffects';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { runGameplayTest, changeGameplayTests } from './GameplayTestTools';
 import { Trans } from '@lingui/macro';

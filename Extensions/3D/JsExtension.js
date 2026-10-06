@@ -2299,6 +2299,57 @@ module.exports = {
         .setType('choice')
         .setGroup(_('Shadows'));
       properties
+        .getOrCreate('shadowRenderingMode')
+        .setValue('centeredAroundCamera')
+        .addChoice('fittedToCameraView', _('Fitted to camera view (default)'))
+        .addChoice(
+          'centeredAroundCamera',
+          _("Centered around camera (legacy - don't use anymore)")
+        )
+        .setLabel(_('Rendering mode'))
+        .setDescription(
+          _(
+            'Fitted to camera view draws shadows only for what the camera sees, up to the shadow distance, for sharper shadows. The legacy mode will be removed in the future.'
+          )
+        )
+        .setType('choice')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowDistance')
+        .setValue('2000')
+        .setLabel(_('Shadow distance'))
+        .setDescription(
+          _(
+            'Distance from the camera up to which shadows are drawn. The smaller it is, the sharper shadows are. Not used by the legacy rendering mode.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowIntensity')
+        .setValue('1')
+        .setLabel(_('Shadow intensity'))
+        .setDescription(
+          _(
+            'How dark the shadows are, from 0 (no shadow) to 1 (only lit by the other lights).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowSoftness')
+        .setValue('1')
+        .setLabel(_('Shadow softness'))
+        .setDescription(
+          _(
+            'How blurry the edges of shadows are, in texels of the shadow map. It has no impact on performance.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
         .getOrCreate('minimumShadowBias')
         .setValue('0')
         .setLabel(_('Shadow bias'))
@@ -2314,14 +2365,24 @@ module.exports = {
         .getOrCreate('frustumSize')
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))
+        .setDescription(
+          _(
+            'Size of the area around the camera where shadows are drawn. Only used by the legacy rendering mode.'
+          )
+        )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))
-        .setAdvanced(true);
+        .setDeprecated(true);
       properties
         .getOrCreate('distanceFromCamera')
         .setValue('1500')
         .setLabel(_("Distance from layer's camera"))
+        .setDescription(
+          _(
+            'How far towards the sun objects can be and still cast shadows into the view. Objects farther than this do not cast shadows.'
+          )
+        )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))

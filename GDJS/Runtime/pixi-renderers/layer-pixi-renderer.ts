@@ -599,6 +599,12 @@ namespace gdjs {
             outputPass.material.blendEquation = THREE.AddEquation;
             outputPass.material.blendSrc = THREE.OneFactor;
             outputPass.material.blendDst = THREE.OneMinusSrcAlphaFactor;
+            // TODO: the composer blends transparency in linear space, unlike
+            // rendering without post-processing (in sRGB space), and the output
+            // pass converts premultiplied colors to sRGB. So semi-transparent
+            // pixels can be brighter than without effects, especially over
+            // the layers below. Fixing this needs a decision on which blending
+            // to match, keeping the light added by a bloom on transparent pixels.
             this._threeFinalPasses.push(outputPass);
             for (const pass of this._threeFinalPasses) {
               this._threeEffectComposer.addPass(pass);

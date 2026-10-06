@@ -396,7 +396,7 @@ module.exports = {
           'Extensions/NavMeshPathfinding/recast-navigation.wasm.wasm'
         )
         .addIncludeFile(
-          'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
+          'Extensions/NavMeshPathfinding/A_recast-navigation-generators.js'
         );
 
       aut
@@ -865,7 +865,7 @@ module.exports = {
           'Extensions/NavMeshPathfinding/recast-navigation.wasm.wasm'
         )
         .addIncludeFile(
-          'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
+          'Extensions/NavMeshPathfinding/A_recast-navigation-generators.js'
         );
     }
 
@@ -890,7 +890,7 @@ module.exports = {
       // NavMeshCharacterRuntimeBehavior.js: it's a required file of the
       // behaviors and must not be included as a classic script.
       .addIncludeFile(
-        'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
+        'Extensions/NavMeshPathfinding/A_recast-navigation-generators.js'
       )
       .addIncludeFile(
         'Extensions/NavMeshPathfinding/NavMeshDebugPixiRenderer.js'

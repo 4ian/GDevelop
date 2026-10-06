@@ -84,10 +84,10 @@ export const enumerateEffectNames = (
  * them.
  */
 const parameterValuesForNewEffects: {
-  [effectType: string]: {| booleanParameters: { [string]: boolean } |},
+  [effectType: string]: {| stringParameters: { [string]: string } |},
 } = {
   'Scene3D::DirectionalLight': {
-    booleanParameters: { isShadowFittedToCamera: true },
+    stringParameters: { shadowRenderingMode: 'fittedToCameraView' },
   },
 };
 
@@ -117,10 +117,10 @@ export const setEffectDefaultParameters = (
 
   const parameterValues = parameterValuesForNewEffects[effect.getEffectType()];
   if (parameterValues) {
-    Object.keys(parameterValues.booleanParameters).forEach(parameterName => {
-      effect.setBooleanParameter(
+    Object.keys(parameterValues.stringParameters).forEach(parameterName => {
+      effect.setStringParameter(
         parameterName,
-        parameterValues.booleanParameters[parameterName]
+        parameterValues.stringParameters[parameterName]
       );
     });
   }

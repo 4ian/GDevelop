@@ -414,6 +414,9 @@ namespace gdjs {
             if (parameterName === 'top') {
               this._top = value;
             }
+            if (parameterName === 'shadowRenderingMode') {
+              this._isShadowFittedToCamera = value === 'fittedToCameraView';
+            }
             if (parameterName === 'shadowQuality') {
               if (value === 'low' && this._shadowMapSize !== 512) {
                 this._shadowMapSize = 512;
@@ -443,8 +446,6 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'isCastingShadow') {
               this._light.castShadow = value;
-            } else if (parameterName === 'isShadowFittedToCamera') {
-              this._isShadowFittedToCamera = value;
             }
           }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {

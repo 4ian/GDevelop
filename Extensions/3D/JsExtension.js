@@ -2299,15 +2299,20 @@ module.exports = {
         .setType('choice')
         .setGroup(_('Shadows'));
       properties
-        .getOrCreate('isShadowFittedToCamera')
-        .setValue('false')
-        .setLabel(_('Fit shadows to the camera view'))
+        .getOrCreate('shadowRenderingMode')
+        .setValue('centeredAroundCamera')
+        .addChoice('fittedToCameraView', _('Fitted to camera view (default)'))
+        .addChoice(
+          'centeredAroundCamera',
+          _("Centered around camera (legacy - don't use anymore)")
+        )
+        .setLabel(_('Rendering mode'))
         .setDescription(
           _(
-            'Draw shadows only for what the camera sees, up to the shadow distance, for sharper shadows. Always recommended: this will become the only mode in the future.'
+            'Fitted to camera view draws shadows only for what the camera sees, up to the shadow distance, for sharper shadows. The legacy mode will be removed in the future.'
           )
         )
-        .setType('boolean')
+        .setType('choice')
         .setGroup(_('Shadows'));
       properties
         .getOrCreate('shadowDistance')
@@ -2315,7 +2320,7 @@ module.exports = {
         .setLabel(_('Shadow distance'))
         .setDescription(
           _(
-            'Distance from the camera up to which shadows are drawn, when they are fitted to the camera view. The smaller it is, the sharper shadows are.'
+            'Distance from the camera up to which shadows are drawn. The smaller it is, the sharper shadows are. Not used by the legacy rendering mode.'
           )
         )
         .setType('number')
@@ -2362,7 +2367,7 @@ module.exports = {
         .setLabel(_('Shadow frustum size'))
         .setDescription(
           _(
-            'Size of the area around the camera where shadows are drawn, when they are not fitted to the camera view. Prefer fitting shadows to the camera view, which gives sharper shadows.'
+            'Size of the area around the camera where shadows are drawn. Only used by the legacy rendering mode.'
           )
         )
         .setType('number')

@@ -3,17 +3,14 @@
 describe('Scene3D::DirectionalLight', () => {
   /**
    * @param {'Z+' | 'Y-'} top
-   * @param {{isShadowFittedToCamera?: boolean}} [options]
+   * @param {'fittedToCameraView' | 'centeredAroundCamera'} shadowRenderingMode
    * @returns {EffectData}
    */
-  const makeDirectionalLightEffectData = (
-    top,
-    { isShadowFittedToCamera = false } = {}
-  ) => ({
+  const makeDirectionalLightEffectData = (top, shadowRenderingMode) => ({
     name: 'Sun',
     effectType: 'Scene3D::DirectionalLight',
-    stringParameters: { top, shadowQuality: 'medium' },
-    booleanParameters: { isCastingShadow: true, isShadowFittedToCamera },
+    stringParameters: { top, shadowQuality: 'medium', shadowRenderingMode },
+    booleanParameters: { isCastingShadow: true },
     doubleParameters: {
       // A vertical light is a special case for the "Y-" top.
       elevation: top === 'Y-' ? 90 : 37,
@@ -104,10 +101,13 @@ describe('Scene3D::DirectionalLight', () => {
   };
 
   for (const top of /** @type {Array<'Z+' | 'Y-'>} */ (['Z+', 'Y-'])) {
-    for (const isShadowFittedToCamera of [false, true]) {
-      it(`keeps shadow map texels in place when the camera moves (top: ${top}, fitted to camera: ${isShadowFittedToCamera})`, () => {
+    for (const shadowRenderingMode of /** @type {Array<'fittedToCameraView' | 'centeredAroundCamera'>} */ ([
+      'fittedToCameraView',
+      'centeredAroundCamera',
+    ])) {
+      it(`keeps shadow map texels in place when the camera moves (top: ${top}, rendering mode: ${shadowRenderingMode})`, () => {
         const layer = make3DLayerWithEffect(
-          makeDirectionalLightEffectData(top, { isShadowFittedToCamera })
+          makeDirectionalLightEffectData(top, shadowRenderingMode)
         );
         const light = getDirectionalLight(layer);
         const shadowCaster = new THREE.Mesh(
@@ -136,7 +136,7 @@ describe('Scene3D::DirectionalLight', () => {
 
   it('covers what the camera sees up to the shadow distance, with a smaller shadow map area', () => {
     const layer = make3DLayerWithEffect(
-      makeDirectionalLightEffectData('Z+', { isShadowFittedToCamera: true })
+      makeDirectionalLightEffectData('Z+', 'fittedToCameraView')
     );
     const light = getDirectionalLight(layer);
     const threeCamera = layer.getRenderer().getThreeCamera();
@@ -186,7 +186,9 @@ describe('Scene3D::DirectionalLight', () => {
   });
 
   it('applies the shadow intensity and softness', () => {
-    const layer = make3DLayerWithEffect(makeDirectionalLightEffectData('Z+'));
+    const layer = make3DLayerWithEffect(
+      makeDirectionalLightEffectData('Z+', 'centeredAroundCamera')
+    );
     const light = getDirectionalLight(layer);
     expect(light.shadow.intensity).to.be(0.6);
     expect(light.shadow.radius).to.be(2.5);
@@ -198,7 +200,9 @@ describe('Scene3D::DirectionalLight', () => {
   });
 
   it('applies a shadow frustum size changed after the first rendering', () => {
-    const layer = make3DLayerWithEffect(makeDirectionalLightEffectData('Z+'));
+    const layer = make3DLayerWithEffect(
+      makeDirectionalLightEffectData('Z+', 'centeredAroundCamera')
+    );
     const light = getDirectionalLight(layer);
     renderLayer(layer);
     // The world scale is 100.

@@ -60,4 +60,37 @@ describe('gdjs.Layer', () => {
 		// The camera Z is still 0, it's not evaluated from the zoom factor.
 		expect(layer.getCameraZ(45)).to.be(0);
 	});
+
+	it('shows the 2D rendering of a 2D+3D layer on a plane covering the screen', () => {
+		const runtimeGameWithCanvas = gdjs.getPixiRuntimeGame();
+		runtimeGameWithCanvas
+			.getRenderer()
+			.createStandardCanvas(document.createElement('div'));
+		const runtimeSceneWithCanvas = new gdjs.RuntimeScene(runtimeGameWithCanvas);
+		const layer = new gdjs.Layer(
+			{ name: 'My layer', renderingType: '2d+3d', visibility: true, effects: [] },
+			runtimeSceneWithCanvas
+		);
+		layer.getRenderer().updatePosition();
+
+		const threeScene = layer.getRenderer().getThreeScene();
+		const camera = layer.getRenderer().getThreeCamera();
+		const plane = threeScene.children.find(
+			(child) => child.renderOrder === Number.MAX_SAFE_INTEGER
+		);
+		threeScene.updateMatrixWorld(true);
+		camera.updateMatrixWorld(true);
+		const projectedCorners = [[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]].map(
+			([x, y]) =>
+				new THREE.Vector3(x, y, 0).applyMatrix4(plane.matrixWorld).project(camera)
+		);
+		const xs = projectedCorners.map((corner) => corner.x);
+		const ys = projectedCorners.map((corner) => corner.y);
+
+		// The plane covers exactly the screen (from -1 to 1 in normalized coordinates).
+		expect(Math.min(...xs)).to.be.within(-1.001, -0.999);
+		expect(Math.max(...xs)).to.be.within(0.999, 1.001);
+		expect(Math.min(...ys)).to.be.within(-1.001, -0.999);
+		expect(Math.max(...ys)).to.be.within(0.999, 1.001);
+	});
 });

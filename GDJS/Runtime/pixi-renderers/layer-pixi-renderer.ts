@@ -858,10 +858,10 @@ namespace gdjs {
       // Interpolate Infinity→base via 1/w (bounded):
       const BIG = 1e12; // “practically infinite”
       const denom = Math.max(w, 1e-6);
-      const effectiveMaxH = Math.min(
-        BIG,
-        this._2DPlaneMaxDrawingDistance / denom
-      );
+      const maxDrawingDistance =
+        this._2DPlaneMaxDrawingDistance *
+        this._layer.getRuntimeScene().getRenderer3DInverseWorldScale();
+      const effectiveMaxH = Math.min(BIG, maxDrawingDistance / denom);
 
       // Apply the max height.
       if (effectiveMaxH < BIG) {
@@ -1006,27 +1006,36 @@ namespace gdjs {
 
           const [cx, cy] = this._get2DPlanePosition(boxH);
 
+          // The size and position are in the world coordinates, but the plane
+          // is in the scene, which is scaled by the inverse of the world scale
+          // and mirrored on Y.
+          const worldScale = this._layer
+            .getRuntimeScene()
+            .getRenderer3DWorldScale();
+          const planeWidth = boxW * worldScale;
+          const planeHeight = boxH * worldScale;
+          const planeX = cx * worldScale;
+          const planeY = -cy * worldScale;
+
           // Update the 2D plane size, position and rotation (so 2D remains upright).
           // Plane size (geometry is 1×1).
-          this._threePlaneMesh.scale.set(boxW, boxH, 1);
-          this._threePlaneMesh.position.set(cx, -cy, 0);
+          this._threePlaneMesh.scale.set(planeWidth, planeHeight, 1);
+          this._threePlaneMesh.position.set(planeX, planeY, 0);
           this._threePlaneMesh.rotation.set(0, 0, -angle);
 
           if (shouldRenderLayerIn3D) {
             // Update the 2D Pixi container size and rotation to match the "zoom" (which comes from the 2D plane size)
             // rotation and position.
-            effectivePixiZoom = this._layer.getWidth() / boxW; // == height/boxH
+            effectivePixiZoom = this._layer.getWidth() / planeWidth; // == height/planeHeight
             this._pixiContainer.scale.set(effectivePixiZoom, effectivePixiZoom);
             this._pixiContainer.rotation = angle;
 
-            const followX = cx;
-            const followY = -cy;
             const centerX2d =
-              followX * effectivePixiZoom * angleCosValue -
-              followY * effectivePixiZoom * angleSinValue;
+              planeX * effectivePixiZoom * angleCosValue -
+              planeY * effectivePixiZoom * angleSinValue;
             const centerY2d =
-              followX * effectivePixiZoom * angleSinValue +
-              followY * effectivePixiZoom * angleCosValue;
+              planeX * effectivePixiZoom * angleSinValue +
+              planeY * effectivePixiZoom * angleCosValue;
             this._pixiContainer.position.x =
               this._layer.getWidth() / 2 - centerX2d;
             this._pixiContainer.position.y =

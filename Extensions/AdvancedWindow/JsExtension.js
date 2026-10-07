@@ -362,14 +362,14 @@ module.exports = {
     extension
       .addAction(
         'SetFullScreenable',
-        _('Allow full-screening'),
-        _('Enables or disables full-screening of the window by the user.'),
-        _('Enable window full-screening: _PARAM0_'),
+        _('Allow fullscreen'),
+        _('Enables or disables fullscreen of the window by the user.'),
+        _('Allow window fullscreen: _PARAM0_'),
         _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
-      .addParameter('yesorno', _('Allow full-screening?'), '', false)
+      .addParameter('yesorno', _('Allow fullscreen?'), '', false)
       .setDefaultValue('true')
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -381,8 +381,8 @@ module.exports = {
     extension
       .addCondition(
         'IsFullScreenable',
-        _('Window full-screenable'),
-        _('Checks if the window can be full-screened.'),
+        _('Window can be set in fullscreen'),
+        _('Checks if the window can be set in fullscreen.'),
         _('The window can be set in fullscreen'),
         _('Windows, Linux, macOS'),
         'res/actions/window24.png',
@@ -495,7 +495,7 @@ module.exports = {
         'SetKiosk',
         _('Enable kiosk mode'),
         _(
-          'Puts the window in kiosk mode. This prevents the user from exiting fullscreen.'
+          'Enable or disable kiosk mode. This prevents the user from exiting fullscreen.'
         ),
         _('Enable kiosk mode: _PARAM0_'),
         _('Windows, Linux, macOS'),

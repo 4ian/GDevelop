@@ -79,8 +79,9 @@ const InstructionOrExpressionSelector = <
       new Fuse(instructionsInfo, {
         ...sharedFuseConfiguration,
         keys: [
-          { name: 'displayedName', weight: 2 },
+          { name: 'displayedName', weight: 5 },
           { name: 'fullGroupName', weight: 1 },
+          { name: 'description', weight: 3 },
         ],
       }),
     [instructionsInfo]
@@ -96,6 +97,7 @@ const InstructionOrExpressionSelector = <
             getFuseSearchQueryForMultipleKeys(searchText, [
               'displayedName',
               'fullGroupName',
+              'description',
             ])
           )
           .map(result => ({

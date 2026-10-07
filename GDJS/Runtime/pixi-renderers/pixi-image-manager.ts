@@ -121,6 +121,23 @@ namespace gdjs {
     }
 
     /**
+     * Return the image of a resource, to read its pixels (like a heightmap).
+     * Use `loadResource` to wait for it to be loaded.
+     * @param resourceName The name of the resource
+     * @returns The image, or null if it's not loaded (yet).
+     */
+    getImageSource(resourceName: string): HTMLImageElement | null {
+      const resource = this._getImageResource(resourceName);
+      const texture = resource && this._loadedTextures.get(resource);
+      if (!texture || texture.destroyed || !texture.valid) {
+        return null;
+      }
+      // @ts-ignore - source does exist on resource.
+      const image = texture.baseTexture.resource.source;
+      return image instanceof HTMLImageElement ? image : null;
+    }
+
+    /**
      * Return the PIXI texture associated to the specified resource name.
      * If not found in the loaded textures, this method will try to load it.
      * Warning: this method should only be used in specific cases that cannot rely on

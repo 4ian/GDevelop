@@ -112,7 +112,7 @@ export const useRefreshLimits = (
 // The tools of the orchestrator AND of the sub-agents it creates server-side.
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
-export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v21';
+export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v22';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying

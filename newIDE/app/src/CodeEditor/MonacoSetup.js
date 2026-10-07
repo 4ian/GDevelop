@@ -41,7 +41,11 @@ export const initializeCompletions = (monaco: any) => {
     checkJs: true,
   });
 
-  setupAutocompletions(monaco);
+  setupAutocompletions(monaco).catch(error => {
+    // No GDJS sources at hand (the web app, or a desktop build without them):
+    // the code editor works without autocompletions.
+    console.info('No GDJS autocompletions for the code editor:', error.message);
+  });
 };
 
 // The version of Monaco used does not support ignoring some diagnostics

@@ -20,6 +20,7 @@ export const NON_SCRIPTABLE_FUNCTION_NAMES: Set<string> = new Set([
   // Server-side tools (resolved in the Lambda):
   'read_full_docs',
   'search_docs',
+  'read_javascript_reference',
   'search_object_asset_store',
   'search_resource_store',
   'create_or_update_plan',

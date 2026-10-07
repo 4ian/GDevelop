@@ -155,6 +155,18 @@ export const handleAutocompletionsKeyDown = (
       // Stop propagation to avoid closing the modal the
       // field is contained in.
       event.stopPropagation();
+    } else {
+      const additionalAction =
+        state.additionalActions[
+          state.selectedCompletionIndex - state.autocompletions.length
+        ];
+      if (additionalAction) {
+        additionalAction.onClick();
+      }
+
+      // Stop propagation to avoid closing the modal the
+      // field is contained in.
+      event.stopPropagation();
     }
 
     // Avoid entering a new line or tabbing to the next field.

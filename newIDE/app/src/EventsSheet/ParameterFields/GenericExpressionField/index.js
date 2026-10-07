@@ -499,7 +499,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       onGetAdditionalAutocompletions,
       onExtractAdditionalErrors,
     } = this.props;
-    if (!project || !instruction) return null;
+    if (!project) return null;
 
     const expression = this.state.validatedValue;
 
@@ -509,11 +509,13 @@ export default class ExpressionField extends React.Component<Props, State> {
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
 
-    const objectName = gd.InstructionValidator.getObjectNameForParameter(
-      projectScopedContainersAccessor.get(),
-      instruction,
-      expressionType
-    );
+    const objectName = instruction
+      ? gd.InstructionValidator.getObjectNameForParameter(
+          projectScopedContainersAccessor.get(),
+          instruction,
+          expressionType
+        )
+      : '';
 
     const showDeprecatedInstructionWarning = this.context
       ? this.context.values.showDeprecatedInstructionWarning

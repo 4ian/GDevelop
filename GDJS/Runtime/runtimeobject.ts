@@ -5,8 +5,7 @@
  */
 namespace gdjs {
   export interface AbstractRuntimeObject3D
-    extends
-      gdjs.RuntimeObject,
+    extends gdjs.RuntimeObject,
       gdjs.Base3DHandler,
       gdjs.Resizable,
       gdjs.Scalable,
@@ -68,14 +67,11 @@ namespace gdjs {
   };
 
   /**
-   * The triangles of the surface of an object (see `RuntimeObject.getSurfaceMesh`).
+   * A surface given as triangles (see `gdjs.Surface`).
    * @category Core Engine > Object
    */
-  export type SurfaceMeshTriangles = {
-    /**
-     * The X, Y and Z positions of the vertices, in the scene (or the custom
-     * object) containing the object, like `getCenterXInScene`.
-     */
+  export type SurfaceTriangles = {
+    /** The X, Y and Z positions of the vertices, from 0 to 1 in the object box. */
     positions: Float32Array;
     /**
      * The 3 vertex indices of each triangle, in the order giving a normal,
@@ -85,15 +81,56 @@ namespace gdjs {
   };
 
   /**
-   * The exact shape of an object, for features needing more than its box,
-   * like navigation meshes.
+   * A surface given as the heights of a grid covering the object box (see
+   * `gdjs.Surface`).
    * @category Core Engine > Object
    */
-  export interface SurfaceMesh {
-    /** A number changing each time the triangles change, including when the object moves. */
+  export type SurfaceHeightField = {
+    /** The number of samples along X (at least 2), from the left of the box to its right. */
+    columns: integer;
+    /** The number of samples along Y (at least 2), from the top of the box to its bottom. */
+    rows: integer;
+    /**
+     * The heights, row after row, from 0 (bottom of the box) to 1 (top), or
+     * NaN where the surface has a hole.
+     */
+    heights: Float32Array;
+  };
+
+  /**
+   * A part of a surface, from 0 to 1 in the object box (see `gdjs.Surface`).
+   * @category Core Engine > Object
+   */
+  export type SurfaceArea = {
+    minX: float;
+    minY: float;
+    maxX: float;
+    maxY: float;
+  };
+
+  /**
+   * The exact shape of an object, used instead of its box by navigation
+   * meshes and physics engines. It's given as triangles or as a height field,
+   * whichever suits the object: each feature uses the one it handles best and
+   * converts the other.
+   *
+   * Positions are relative to the object box before its rotation, from 0 to 1
+   * on each axis: (0, 0, 0) is its left, top and bottom corner. This way, the
+   * surface follows the object size without changing.
+   * @category Core Engine > Object
+   */
+  export interface Surface {
+    /** A number changing each time the surface changes. */
     getVersion(): integer;
-    /** Compute the triangles: call it only when the version has changed. */
-    getTriangles(): SurfaceMeshTriangles;
+    /**
+     * The part of the surface that changed since a version, to only update
+     * this part, or null to update the whole surface.
+     */
+    getChangedArea(sinceVersion: integer): gdjs.SurfaceArea | null;
+    /** The triangles of the surface, or null if it's given as a height field. */
+    getTriangles(): gdjs.SurfaceTriangles | null;
+    /** The height field of the surface, or null if it's given as triangles. */
+    getHeightField(): gdjs.SurfaceHeightField | null;
   }
 
   /**
@@ -314,7 +351,7 @@ namespace gdjs {
      */
     protected _behaviorsTable: Hashtable<gdjs.RuntimeBehavior>;
     protected _timers: Hashtable<gdjs.Timer>;
-    private _surfaceMesh: gdjs.SurfaceMesh | null = null;
+    private _surface: gdjs.Surface | null = null;
 
     /**
      * @param instanceContainer The scene or custom object the object belongs to.
@@ -448,7 +485,7 @@ namespace gdjs {
       this.aabb.max[1] = 0;
       this._variables = new gdjs.VariablesContainer(objectData.variables);
       this.clearForces();
-      this._surfaceMesh = null;
+      this._surface = null;
 
       // Reinitialize behaviors.
       this._behaviorsTable.clear();
@@ -1166,18 +1203,18 @@ namespace gdjs {
 
     /**
      * The exact shape of the object, if the object (or the extension defining
-     * it) gives one. It's used by features needing more than the object box,
-     * like navigation meshes.
+     * it) gives one. It's used instead of the object box by navigation meshes
+     * and physics engines.
      */
-    getSurfaceMesh(): gdjs.SurfaceMesh | null {
-      return this._surfaceMesh;
+    getSurface(): gdjs.Surface | null {
+      return this._surface;
     }
 
     /**
-     * Give the exact shape of the object (see `getSurfaceMesh`).
+     * Give the exact shape of the object (see `getSurface`).
      */
-    setSurfaceMesh(surfaceMesh: gdjs.SurfaceMesh | null): void {
-      this._surfaceMesh = surfaceMesh;
+    setSurface(surface: gdjs.Surface | null): void {
+      this._surface = surface;
     }
 
     /**

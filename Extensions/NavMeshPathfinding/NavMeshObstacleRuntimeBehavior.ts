@@ -128,10 +128,10 @@ namespace gdjs {
       for (const obstacle of this.obstacles) {
         const object = obstacle.owner;
         const firstObstacleIndex = indices.length;
-        // Surface meshes are in 3D: they are ignored by 2D navigation meshes.
-        const surfaceMesh = this.is3D ? object.getSurfaceMesh() : null;
-        if (surfaceMesh) {
-          this.addSurfaceMeshFor(surfaceMesh, positions, indices);
+        // Surfaces are in 3D: they are ignored by 2D navigation meshes.
+        const surface = this.is3D ? object.getSurface() : null;
+        if (surface && gdjs.Base3DHandler.is3D(object)) {
+          this.addSurfaceFor(object, surface, positions, indices);
         } else if (gdjs.Base3DHandler.is3D(object)) {
           if (isModel3D(object) && obstacle._shape === 'Mesh') {
             this.addMeshFor(object, obstacle, positions, indices);
@@ -414,20 +414,42 @@ namespace gdjs {
       }
     }
 
-    private addSurfaceMeshFor(
-      surfaceMesh: gdjs.SurfaceMesh,
+    private addSurfaceFor(
+      object: gdjs.AbstractRuntimeObject3D,
+      surface: gdjs.Surface,
       positions: Array<float>,
       indices: Array<integer>
     ): void {
-      const triangles = surfaceMesh.getTriangles();
+      const heightField = surface.getHeightField();
+      const triangles = heightField
+        ? this.getHeightFieldTriangles(object, heightField)
+        : surface.getTriangles();
+      if (!triangles) {
+        this.addBoxFor(object, positions, indices);
+        return;
+      }
+      const point = new THREE.Vector3();
+      const euler = new THREE.Euler(
+        gdjs.toRad(object.getRotationX()),
+        gdjs.toRad(object.getRotationY()),
+        gdjs.toRad(object.getAngle()),
+        'ZYX'
+      );
       const indicesOffset = Math.round(positions.length / 3);
       const surfacePositions = triangles.positions;
       for (let index = 0; index + 2 < surfacePositions.length; index += 3) {
+        // Positions are from 0 to 1 in the object box, rotated around its center.
+        point.set(
+          (surfacePositions[index] - 0.5) * object.getWidth(),
+          (surfacePositions[index + 1] - 0.5) * object.getHeight(),
+          (surfacePositions[index + 2] - 0.5) * object.getDepth()
+        );
+        point.applyEuler(euler);
         // Y is the top for Recast
         positions.push(
-          surfacePositions[index],
-          surfacePositions[index + 2],
-          surfacePositions[index + 1]
+          object.getCenterXInScene() + point.x,
+          object.getCenterZInScene() + point.z,
+          object.getCenterYInScene() + point.y
         );
       }
       const surfaceIndices = triangles.indices;
@@ -439,6 +461,69 @@ namespace gdjs {
           indicesOffset + surfaceIndices[index + 2]
         );
       }
+    }
+
+    /**
+     * Recast samples triangles with cells of the navigation mesh: the height
+     * field is sampled with the same precision, skipping smaller details.
+     */
+    private getHeightFieldTriangles(
+      object: gdjs.AbstractRuntimeObject3D,
+      heightField: gdjs.SurfaceHeightField
+    ): gdjs.SurfaceTriangles {
+      const { columns, rows, heights } = heightField;
+      const cellSize = Math.max(
+        object.getWidth() / (columns - 1),
+        object.getHeight() / (rows - 1)
+      );
+      const step = Math.max(1, Math.floor(this.cellSize / cellSize));
+      const getSampledIndices = (count: integer) => {
+        const sampledIndices: Array<integer> = [];
+        for (let index = 0; index < count - 1; index += step) {
+          sampledIndices.push(index);
+        }
+        sampledIndices.push(count - 1);
+        return sampledIndices;
+      };
+      const sampledColumns = getSampledIndices(columns);
+      const sampledRows = getSampledIndices(rows);
+      const rowSize = sampledColumns.length;
+      const positions = new Float32Array(rowSize * sampledRows.length * 3);
+      for (let j = 0; j < sampledRows.length; j++) {
+        const row = sampledRows[j];
+        for (let i = 0; i < rowSize; i++) {
+          const column = sampledColumns[i];
+          const index = (j * rowSize + i) * 3;
+          positions[index] = column / (columns - 1);
+          positions[index + 1] = row / (rows - 1);
+          positions[index + 2] = heights[row * columns + column];
+        }
+      }
+      const cellIndices: Array<integer> = [];
+      for (let j = 0; j + 1 < sampledRows.length; j++) {
+        for (let i = 0; i + 1 < rowSize; i++) {
+          const a = j * rowSize + i;
+          const b = a + 1;
+          const c = a + rowSize;
+          const d = c + 1;
+          // Cells with a hole (NaN) are skipped.
+          if (
+            Number.isNaN(
+              positions[a * 3 + 2] +
+                positions[b * 3 + 2] +
+                positions[c * 3 + 2] +
+                positions[d * 3 + 2]
+            )
+          ) {
+            continue;
+          }
+          cellIndices.push(a, b, c, b, d, c);
+        }
+      }
+      for (let index = 2; index < positions.length; index += 3) {
+        if (Number.isNaN(positions[index])) positions[index] = 0;
+      }
+      return { positions, indices: new Uint32Array(cellIndices) };
     }
 
     private addMeshFor(
@@ -717,8 +802,8 @@ namespace gdjs {
     _shape: string;
     _meshShapeResourceName: string;
     _isObstacleOnly: boolean;
-    _oldSurfaceMesh: gdjs.SurfaceMesh | null = null;
-    _oldSurfaceMeshVersion: integer = 0;
+    _oldSurface: gdjs.Surface | null = null;
+    _oldSurfaceVersion: integer = 0;
 
     _oldX: float = 0;
     _oldY: float = 0;
@@ -795,14 +880,14 @@ namespace gdjs {
         newRotationX = this.owner.getRotationX();
         newRotationY = this.owner.getRotationY();
       }
-      const surfaceMesh = this.owner.getSurfaceMesh();
-      const surfaceMeshVersion = surfaceMesh ? surfaceMesh.getVersion() : 0;
+      const surface = this.owner.getSurface();
+      const surfaceVersion = surface ? surface.getVersion() : 0;
       if (
-        surfaceMesh !== this._oldSurfaceMesh ||
-        surfaceMeshVersion !== this._oldSurfaceMeshVersion
+        surface !== this._oldSurface ||
+        surfaceVersion !== this._oldSurfaceVersion
       ) {
-        this._oldSurfaceMesh = surfaceMesh;
-        this._oldSurfaceMeshVersion = surfaceMeshVersion;
+        this._oldSurface = surface;
+        this._oldSurfaceVersion = surfaceVersion;
         if (this._registeredInManager) {
           this._manager.invalidateNavMesh();
         }

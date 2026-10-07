@@ -55,6 +55,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   globalVariables = other.GetGlobalVariables();
   sceneVariables = other.GetSceneVariables();
   tests = other.tests;
+  namedEasings = other.namedEasings;
 }
 
 void EventsFunctionsExtension::SerializeTo(SerializerElement& element, bool isExternal) const {
@@ -111,6 +112,10 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element, bool isEx
 
   if (tests.GetTestsCount() > 0) {
     tests.SerializeTestsTo(element.AddChild("tests"));
+  }
+
+  if (namedEasings.GetNamedEasingsCount() > 0) {
+    namedEasings.SerializeNamedEasingsTo(element.AddChild("namedEasings"));
   }
 
   eventsBasedBehaviors.SerializeElementsTo(
@@ -271,6 +276,11 @@ void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
   tests.ClearTests();
   if (element.HasChild("tests")) {
     tests.UnserializeTestsFrom(element.GetChild("tests"));
+  }
+
+  namedEasings.ClearNamedEasings();
+  if (element.HasChild("namedEasings")) {
+    namedEasings.UnserializeNamedEasingsFrom(element.GetChild("namedEasings"));
   }
 
   eventsBasedBehaviors.UnserializeElementsFrom(

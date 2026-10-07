@@ -115,6 +115,8 @@ declare class libGDevelop {
   ExternalEvents: Class<gdExternalEvents>;
   Test: Class<gdTest>;
   TestsContainer: Class<gdTestsContainer>;
+  NamedEasing: Class<gdNamedEasing>;
+  NamedEasingsContainer: Class<gdNamedEasingsContainer>;
   ExternalLayout: Class<gdExternalLayout>;
   Effect: Class<gdEffect>;
   EffectsContainer: Class<gdEffectsContainer>;

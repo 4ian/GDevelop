@@ -1863,6 +1863,29 @@ void WholeProjectRefactorer::RenameLayout(gd::Project &project,
                                                 linkEventTargetRenamer);
 }
 
+void WholeProjectRefactorer::RenameNamedEasing(gd::Project &project,
+                                               const gd::String &oldName,
+                                               const gd::String &newName) {
+  if (oldName == newName || newName.empty() || oldName.empty())
+    return;
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "easing", oldName, newName);
+  gd::ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
+      project, projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameNamedEasingInEventsFunctionsExtension(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::String &oldName, const gd::String &newName) {
+  if (oldName == newName || newName.empty() || oldName.empty())
+    return;
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "easing", oldName, newName);
+  gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
+      project, eventsFunctionsExtension, projectElementRenamer);
+}
+
 void WholeProjectRefactorer::RenameExternalLayout(gd::Project &project,
                                                   const gd::String &oldName,
                                                   const gd::String &newName) {

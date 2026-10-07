@@ -660,6 +660,7 @@ interface Project {
     unsigned long GetExternalEventsPosition([Const] DOMString name);
 
     [Ref] TestsContainer GetTests();
+    [Ref] NamedEasingsContainer GetNamedEasings();
 
     boolean HasExternalLayoutNamed([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayout([Const] DOMString name);
@@ -805,6 +806,7 @@ interface ProjectScopedContainers {
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
   [Const, Ref] ResourcesContainersList GetResourcesContainersList();
+  [Const, Ref] NamedEasingsContainer GetNamedEasings();
 
   [Const, Ref] DOMString GetScopeSceneName();
   [Const, Ref] DOMString GetScopeExternalEventsName();
@@ -1124,6 +1126,31 @@ interface TestsContainer {
     void MoveTest(unsigned long oldIndex, unsigned long newIndex);
     unsigned long GetTestsCount();
     unsigned long GetTestPosition([Const, Ref] Test test);
+};
+
+interface NamedEasing {
+    void NamedEasing();
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+    void SetX1(double x1); double GetX1();
+    void SetY1(double y1); double GetY1();
+    void SetX2(double x2); double GetX2();
+    void SetY2(double y2); double GetY2();
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
+interface NamedEasingsContainer {
+    [Ref] NamedEasing InsertNewNamedEasing([Const] DOMString name, unsigned long pos);
+    [Ref] NamedEasing InsertNamedEasing([Const, Ref] NamedEasing easing, unsigned long pos);
+    boolean HasNamedEasingNamed([Const] DOMString name);
+    [Ref] NamedEasing GetNamedEasing([Const] DOMString name);
+    [Ref] NamedEasing GetNamedEasingAt(unsigned long pos);
+    void RemoveNamedEasing([Const] DOMString name);
+    void ClearNamedEasings();
+    void MoveNamedEasing(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetNamedEasingsCount();
+    unsigned long GetNamedEasingPosition([Const, Ref] NamedEasing easing);
 };
 
 interface ExternalLayout {
@@ -2931,6 +2958,15 @@ interface WholeProjectRefactorer {
       [Ref] Project project,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameNamedEasing(
+      [Ref] Project project,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameNamedEasingInEventsFunctionsExtension(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_RenameExternalLayout(
       [Ref] Project project,
       [Const] DOMString oldName,
@@ -3774,6 +3810,7 @@ interface EventsFunctionsExtension {
     [Ref] EventsBasedObjectsList GetEventsBasedObjects();
 
     [Ref] TestsContainer GetTests();
+    [Ref] NamedEasingsContainer GetNamedEasings();
 
     void SerializeTo([Ref] SerializerElement element);
     void SerializeToExternal([Ref] SerializerElement element);

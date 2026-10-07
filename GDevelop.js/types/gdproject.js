@@ -88,6 +88,7 @@ declare class gdProject {
   removeExternalEvents(name: string): void;
   getExternalEventsPosition(name: string): number;
   getTests(): gdTestsContainer;
+  getNamedEasings(): gdNamedEasingsContainer;
   hasExternalLayoutNamed(name: string): boolean;
   getExternalLayout(name: string): gdExternalLayout;
   getExternalLayoutAt(index: number): gdExternalLayout;

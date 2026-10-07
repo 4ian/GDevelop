@@ -13,6 +13,7 @@ declare class gdProjectScopedContainers {
   getObjectsContainersList(): gdObjectsContainersList;
   getVariablesContainersList(): gdVariablesContainersList;
   getResourcesContainersList(): gdResourcesContainersList;
+  getNamedEasings(): gdNamedEasingsContainer;
   getScopeSceneName(): string;
   getScopeExternalEventsName(): string;
   getScopeExtensionName(): string;

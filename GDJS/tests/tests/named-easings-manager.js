@@ -1,10 +1,12 @@
 // @ts-check
 
 describe('gdjs.NamedEasingsManager', () => {
+  /** @type {NamedEasingData} */
   const projectNamedEasing = {
     name: 'MyBounce',
     cubicBezier: [0.34, 1.56, 0.64, 1],
   };
+  /** @type {NamedEasingData} */
   const extensionNamedEasing = {
     name: 'ExtEase',
     cubicBezier: [0.25, 0.1, 0.25, 1],

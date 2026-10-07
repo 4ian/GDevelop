@@ -371,24 +371,26 @@ namespace gdjs {
       const velocity = agent.desiredVelocity();
       const velocityX = velocity.x;
       const velocityY = velocity.z;
-      if (
-        Math.abs(velocityX) + Math.abs(velocityY) > 0 &&
+      if (Math.abs(velocityX) + Math.abs(velocityY) > 0) {
         // Avoid to rotate strangely at the end of the path
-        (Math.abs(destinationX - newX) > 3 || Math.abs(destinationY - newY) > 3)
-      ) {
-        this._movementAngle = gdjs.evtTools.common.mod(
-          gdjs.toDegrees(Math.atan2(velocityY, velocityX)),
-          360
-        );
-      }
-      if (
-        this._rotateObject &&
-        this.owner.getAngle() !== this._movementAngle + this._angleOffset
-      ) {
-        this.owner.rotateTowardAngle(
-          this._movementAngle + this._angleOffset,
-          this._angularMaxSpeed
-        );
+        if (
+          Math.abs(destinationX - newX) > 3 ||
+          Math.abs(destinationY - newY) > 3
+        ) {
+          this._movementAngle = gdjs.evtTools.common.mod(
+            gdjs.toDegrees(Math.atan2(velocityY, velocityX)),
+            360
+          );
+        }
+        if (
+          this._rotateObject &&
+          this.owner.getAngle() !== this._movementAngle + this._angleOffset
+        ) {
+          this.owner.rotateTowardAngle(
+            this._movementAngle + this._angleOffset,
+            this._angularMaxSpeed
+          );
+        }
       }
       if (
         Math.abs(newX - destinationX) < 1 &&

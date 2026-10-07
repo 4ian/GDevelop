@@ -645,6 +645,7 @@ export class Project extends EmscriptenObject {
   removeExternalEvents(name: string): void;
   getExternalEventsPosition(name: string): number;
   getTests(): TestsContainer;
+  getNamedEasings(): NamedEasingsContainer;
   hasExternalLayoutNamed(name: string): boolean;
   getExternalLayout(name: string): ExternalLayout;
   getExternalLayoutAt(index: number): ExternalLayout;
@@ -715,6 +716,7 @@ export class ProjectScopedContainers extends EmscriptenObject {
   getObjectsContainersList(): ObjectsContainersList;
   getVariablesContainersList(): VariablesContainersList;
   getResourcesContainersList(): ResourcesContainersList;
+  getNamedEasings(): NamedEasingsContainer;
   getScopeSceneName(): string;
   getScopeExternalEventsName(): string;
   getScopeExtensionName(): string;
@@ -947,6 +949,35 @@ export class TestsContainer extends EmscriptenObject {
   moveTest(oldIndex: number, newIndex: number): void;
   getTestsCount(): number;
   getTestPosition(test: Test): number;
+}
+
+export class NamedEasing extends EmscriptenObject {
+  constructor();
+  setName(name: string): void;
+  getName(): string;
+  setX1(x1: number): void;
+  getX1(): number;
+  setY1(y1: number): void;
+  getY1(): number;
+  setX2(x2: number): void;
+  getX2(): number;
+  setY2(y2: number): void;
+  getY2(): number;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
+}
+
+export class NamedEasingsContainer extends EmscriptenObject {
+  insertNewNamedEasing(name: string, pos: number): NamedEasing;
+  insertNamedEasing(easing: NamedEasing, pos: number): NamedEasing;
+  hasNamedEasingNamed(name: string): boolean;
+  getNamedEasing(name: string): NamedEasing;
+  getNamedEasingAt(pos: number): NamedEasing;
+  removeNamedEasing(name: string): void;
+  clearNamedEasings(): void;
+  moveNamedEasing(oldIndex: number, newIndex: number): void;
+  getNamedEasingsCount(): number;
+  getNamedEasingPosition(easing: NamedEasing): number;
 }
 
 export class ExternalLayout extends EmscriptenObject {
@@ -2199,6 +2230,8 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static moveEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldExtensionName: string, newExtensionName: string, oldObjectName: string, newObjectName: string): void;
   static updateObjectNameInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, sourceObjectName: string): void;
   static renameLayout(project: Project, oldName: string, newName: string): void;
+  static renameNamedEasing(project: Project, oldName: string, newName: string): void;
+  static renameNamedEasingInEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static renameExternalLayout(project: Project, oldName: string, newName: string): void;
   static renameExternalEvents(project: Project, oldName: string, newName: string): void;
   static renameLayerInScene(project: Project, scene: Layout, oldName: string, newName: string): void;
@@ -2778,6 +2811,7 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getEventsBasedBehaviors(): EventsBasedBehaviorsList;
   getEventsBasedObjects(): EventsBasedObjectsList;
   getTests(): TestsContainer;
+  getNamedEasings(): NamedEasingsContainer;
   serializeTo(element: SerializerElement): void;
   serializeToExternal(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;

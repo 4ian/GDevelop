@@ -11,6 +11,7 @@ import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import RichSelectField, {
   type RichSelectFieldInterface,
   type RichSelectFieldExtraOption,
+  type RichSelectFieldOptionAction,
 } from '../../UI/RichSelectField';
 
 import GenericExpressionField from './GenericExpressionField';
@@ -23,6 +24,7 @@ import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 import { getParameterChoiceValues } from './ParameterMetadataTools';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import { renderInlineDefaultField } from './DefaultField';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 /**
  * Where a choice adornment is displayed: in the field of an instruction editor,
@@ -46,10 +48,20 @@ export type StringWithSelectorFieldProps = {|
   choices?: Array<string>,
   // If specified, displayed next to each choice (an icon, a preview...).
   renderChoiceAdornment?: RenderChoiceAdornment,
+  // Consecutive choices of different groups are separated by a divider, and
+  // the label of the group (from `choiceGroupLabels`), if any.
+  getChoiceGroup?: (choice: string) => string,
+  choiceGroupLabels?: { [group: string]: MessageDescriptor },
+  // If specified, a button shown at the end of a choice in the list.
+  getChoiceAction?: (choice: string) => ?RichSelectFieldOptionAction,
   // Actions shown after the choices, below a divider.
   extraOptions?: Array<RichSelectFieldExtraOption>,
   // Shown under the field, after the parameter long description.
   extraHelperMarkdownText?: ?string,
+  // Chosen when the value is empty. The first choice if not specified.
+  defaultChoice?: string,
+  // Return an error to show for the value, or null.
+  onExtractAdditionalErrors?: (value: string) => ?string,
 |};
 
 /**
@@ -71,8 +83,13 @@ export default (React.forwardRef<
   const {
     choices: choicesFromProps,
     renderChoiceAdornment,
+    getChoiceGroup,
+    choiceGroupLabels,
+    getChoiceAction,
     extraOptions,
     extraHelperMarkdownText,
+    defaultChoice,
+    onExtractAdditionalErrors,
     ...parameterFieldProps
   } = props;
   const {
@@ -112,10 +129,10 @@ export default (React.forwardRef<
   React.useEffect(
     () => {
       if (!isExpressionField && !value && choices.length > 0) {
-        onChange(`"${choices[0]}"`);
+        onChange(`"${defaultChoice || choices[0]}"`);
       }
     },
-    [choices, isExpressionField, onChange, value]
+    [choices, defaultChoice, isExpressionField, onChange, value]
   );
 
   const switchFieldType = () => {
@@ -139,9 +156,15 @@ export default (React.forwardRef<
     parameterMetadata,
     extraHelperMarkdownText
   );
+  const errorText = onExtractAdditionalErrors
+    ? onExtractAdditionalErrors(value)
+    : null;
 
   const renderSelectField = () =>
-    renderChoiceAdornment || extraOptions ? (
+    renderChoiceAdornment ||
+    getChoiceGroup ||
+    getChoiceAction ||
+    extraOptions ? (
       <RichSelectField
         ref={field}
         id={fieldId}
@@ -152,13 +175,17 @@ export default (React.forwardRef<
         floatingLabelText={fieldLabel}
         translatableHintText={t`Choose a value`}
         helperMarkdownText={helperMarkdownText}
+        errorText={errorText}
         options={choices.map(choice => ({
           value: `"${choice}"`,
           label: choice,
           adornment: renderChoiceAdornment
             ? renderChoiceAdornment(choice, isInline ? 'inlineField' : 'field')
             : undefined,
+          group: getChoiceGroup ? getChoiceGroup(choice) : undefined,
+          action: (getChoiceAction && getChoiceAction(choice)) || undefined,
         }))}
+        groupLabels={choiceGroupLabels}
         extraOptions={extraOptions}
       />
     ) : (
@@ -172,6 +199,7 @@ export default (React.forwardRef<
         floatingLabelText={fieldLabel}
         translatableHintText={t`Choose a value`}
         helperMarkdownText={helperMarkdownText}
+        errorText={errorText}
       >
         {choices.map(choice => (
           <SelectOption
@@ -196,6 +224,7 @@ export default (React.forwardRef<
             id={fieldId}
             {...parameterFieldProps}
             extraHelperMarkdownText={extraHelperMarkdownText}
+            onExtractAdditionalErrors={onExtractAdditionalErrors}
             onChange={onChange}
           />
         )

@@ -7,7 +7,7 @@ import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { formatCubicBezier, type CubicBezierPoints } from '../../Utils/Easings';
 import {
   cssCubicBezierPresets,
-  namedEasingApproximationPresets,
+  builtInEasingApproximationPresets,
   type CubicBezierPreset,
 } from './CubicBezierPresets';
 
@@ -19,7 +19,7 @@ export const presetGridWidth =
 
 const cubicBezierPresets = [
   ...cssCubicBezierPresets,
-  ...namedEasingApproximationPresets,
+  ...builtInEasingApproximationPresets,
 ];
 
 const samePoints = (

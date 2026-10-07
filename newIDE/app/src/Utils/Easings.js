@@ -351,15 +351,15 @@ export const customEasingExampleIdentifier: string = formatCubicBezier(
   cssEasePoints
 );
 
-export const getNamedEasingFunction = (name: string): ?EasingFunction =>
+export const getBuiltInEasingFunction = (name: string): ?EasingFunction =>
   easingFunctions.hasOwnProperty(name) ? easingFunctions[name] : null;
 
-/** Return a named easing or a custom easing. Return `null` if the identifier is not valid. */
+/** Return a built-in easing or a custom easing. Return `null` if the identifier is not valid. */
 export const getEasingFunction = (
   easingIdentifier: string
 ): ?EasingFunction => {
-  const namedEasing = getNamedEasingFunction(easingIdentifier);
-  if (namedEasing) return namedEasing;
+  const builtInEasing = getBuiltInEasingFunction(easingIdentifier);
+  if (builtInEasing) return builtInEasing;
   const points = parseCubicBezierOrNull(easingIdentifier);
   return points ? createCubicBezierEasing(points) : null;
 };
@@ -391,4 +391,4 @@ export const getEasingValueRange = (
  */
 export const isEasingChoiceList = (choices: Array<string>): boolean =>
   choices.length > 1 &&
-  choices.every(choice => !!getNamedEasingFunction(choice));
+  choices.every(choice => !!getBuiltInEasingFunction(choice));

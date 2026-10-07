@@ -23,6 +23,11 @@ import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/Spr
 import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
 import { filterStringListWithPrefix } from '../Utils/ListFiltering';
 import { customEasingExampleIdentifier } from '../Utils/Easings';
+import {
+  getEasingChoicesWithNamedEasings,
+  getNamedEasingNames,
+  getNamedEasingsContainerFromAccessor,
+} from '../Utils/NamedEasings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
@@ -311,8 +316,11 @@ const getAutocompletionsForText = function(
       completionDescription.getParameterMetadata()
     ).map(autocompletion => autocompletion.completion);
   } else if (type === 'easing') {
-    autocompletionTexts = getEasingChoices(
-      completionDescription.getParameterMetadata()
+    autocompletionTexts = getEasingChoicesWithNamedEasings(
+      getEasingChoices(completionDescription.getParameterMetadata()),
+      getNamedEasingNames(
+        getNamedEasingsContainerFromAccessor(projectScopedContainersAccessor)
+      )
     )
       .concat(customEasingExampleIdentifier)
       .map(choice => `"${choice}"`);

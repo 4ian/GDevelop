@@ -444,6 +444,7 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
 
     auto& parameterMetadata = expressionMetadata.GetParameters().GetParameter(i);
     if (!parameterMetadata.IsCodeOnly()) {
+      const bool isEasing = parameterMetadata.GetType() == "easing";
       if (nonCodeOnlyParameterIndex < parameters.size()) {
         auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
                                               codeGenerator.GetObjectsContainersList(),
@@ -451,7 +452,9 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
                                               *parameters[nonCodeOnlyParameterIndex].get());
         ExpressionCodeGenerator generator(parameterMetadata.GetType(), objectName, codeGenerator, context);
         parameters[nonCodeOnlyParameterIndex]->Visit(generator);
-        parametersCode += generator.GetOutput();
+        parametersCode += isEasing
+                              ? codeGenerator.GenerateEasingCode(generator.GetOutput())
+                              : generator.GetOutput();
       } else if (parameterMetadata.IsOptional()) {
         ExpressionCodeGenerator generator(parameterMetadata.GetType(), "", codeGenerator, context);
         // Optional parameters default value were not parsed at the time of the
@@ -460,7 +463,9 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
         auto node = parser.ParseExpression(parameterMetadata.GetDefaultValue());
 
         node->Visit(generator);
-        parametersCode += generator.GetOutput();
+        parametersCode += isEasing
+                              ? codeGenerator.GenerateEasingCode(generator.GetOutput())
+                              : generator.GetOutput();
       } else {
         parametersCode +=
             "/* Error during generation, parameter not existing in the nodes "

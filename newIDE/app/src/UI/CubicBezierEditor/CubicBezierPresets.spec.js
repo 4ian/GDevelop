@@ -2,19 +2,19 @@
 import {
   createCubicBezierEasing,
   cssEasePoints,
-  getNamedEasingFunction,
+  getBuiltInEasingFunction,
 } from '../../Utils/Easings';
 import {
   getInitialCubicBezierPoints,
-  namedEasingApproximationPresets,
+  builtInEasingApproximationPresets,
 } from './CubicBezierPresets';
 
 describe('CubicBezierPresets', () => {
-  it('keeps each approximation within 0.05 of its named easing', () => {
-    namedEasingApproximationPresets.forEach(preset => {
-      const namedEasing = getNamedEasingFunction(preset.name);
-      if (!namedEasing) {
-        throw new Error(`Missing named easing ${preset.name}`);
+  it('keeps each approximation within 0.05 of its built-in easing', () => {
+    builtInEasingApproximationPresets.forEach(preset => {
+      const builtInEasing = getBuiltInEasingFunction(preset.name);
+      if (!builtInEasing) {
+        throw new Error(`Missing built-in easing ${preset.name}`);
       }
       const approximation = createCubicBezierEasing(preset.points);
       let maxDifference = 0;
@@ -23,7 +23,7 @@ describe('CubicBezierPresets', () => {
         const progress = index / (sampleCount - 1);
         maxDifference = Math.max(
           maxDifference,
-          Math.abs(namedEasing(progress) - approximation(progress))
+          Math.abs(builtInEasing(progress) - approximation(progress))
         );
       }
       expect(maxDifference).toBeLessThanOrEqual(0.05);

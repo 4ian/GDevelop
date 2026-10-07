@@ -17,7 +17,7 @@ import {
   createCubicBezierEasing,
   easingFunctions,
   getEasingValueRange,
-  getNamedEasingFunction,
+  getBuiltInEasingFunction,
   type CubicBezierPoints,
   type EasingValueRange,
 } from '../../Utils/Easings';
@@ -168,7 +168,7 @@ const CubicBezierAnimatedPreview = ({
     points,
   ]);
   const referenceEasing =
-    getNamedEasingFunction(referenceEasingName) || easingFunctions.linear;
+    getBuiltInEasingFunction(referenceEasingName) || easingFunctions.linear;
   // Shared by both tracks, so that they can be compared.
   const trackRange = React.useMemo(
     () => {

@@ -21,7 +21,7 @@ export const cssCubicBezierPresets: Array<CubicBezierPreset> = [
 ];
 
 // Bézier approximations from https://easings.net (maximum error 0.05).
-const namedEasingApproximations: { [string]: CubicBezierPoints } = {
+const builtInEasingApproximations: { [string]: CubicBezierPoints } = {
   easeInSine: [0.12, 0, 0.39, 0],
   easeOutSine: [0.61, 1, 0.88, 1],
   easeInOutSine: [0.37, 0, 0.63, 1],
@@ -48,8 +48,8 @@ const namedEasingApproximations: { [string]: CubicBezierPoints } = {
   easeInOutBack: [0.68, -0.6, 0.32, 1.6],
 };
 
-// Named easings whose formula is identical to another named easing.
-const namedEasingAliases: { [string]: string } = {
+// Built-in easings whose formula is identical to another built-in easing.
+const builtInEasingAliases: { [string]: string } = {
   swingFrom: 'easeInBack',
   swingTo: 'easeOutBack',
   swingFromTo: 'easeInOutBack',
@@ -57,18 +57,19 @@ const namedEasingAliases: { [string]: string } = {
   easeFromTo: 'easeInOutQuart',
 };
 
-export const namedEasingApproximationPresets: Array<CubicBezierPreset> = Object.keys(
-  namedEasingApproximations
+export const builtInEasingApproximationPresets: Array<CubicBezierPreset> = Object.keys(
+  builtInEasingApproximations
 ).map(name => ({
   name,
-  points: namedEasingApproximations[name],
+  points: builtInEasingApproximations[name],
 }));
 
-export const getNamedEasingApproximation = (name: string): ?CubicBezierPoints =>
-  namedEasingApproximations[name] || null;
+export const getBuiltInEasingApproximation = (
+  name: string
+): ?CubicBezierPoints => builtInEasingApproximations[name] || null;
 
 /**
- * Control points the dialog starts from: CSS `ease` when the named easing has
+ * Control points the dialog starts from: CSS `ease` when the built-in easing has
  * no approximation. `easingIdentifier` is the unquoted parameter value, or null.
  */
 export const getInitialCubicBezierPoints = (
@@ -79,8 +80,8 @@ export const getInitialCubicBezierPoints = (
   if (customPoints) return customPoints;
   if (easingIdentifier === 'linear') return linearPoints;
   return (
-    getNamedEasingApproximation(
-      namedEasingAliases[easingIdentifier] || easingIdentifier
+    getBuiltInEasingApproximation(
+      builtInEasingAliases[easingIdentifier] || easingIdentifier
     ) || cssEasePoints
   );
 };

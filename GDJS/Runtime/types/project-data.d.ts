@@ -19,7 +19,13 @@ declare interface ProjectData {
   externalLayouts: ExternalLayoutData[];
   eventsFunctionsExtensions: EventsFunctionsExtensionData[];
   activatedByDefaultInEditorBehaviors?: Array<string>;
+  namedEasings?: NamedEasingData[];
 }
+
+declare type NamedEasingData = {
+  name: string;
+  cubicBezier: [number, number, number, number];
+};
 
 declare interface EventsFunctionsVariablesData {
   name: string;
@@ -383,6 +389,7 @@ declare interface EventsFunctionsExtensionData {
   eventsBasedObjects: EventsBasedObjectData[];
   globalVariables: RootVariableData[];
   sceneVariables: RootVariableData[];
+  namedEasings?: NamedEasingData[];
 }
 
 declare interface SceneAndExtensionsData {

@@ -129,6 +129,28 @@ describe('libGD.js', function () {
       expect(tests.getTestsCount()).toBe(0);
     });
 
+    it('handles named easings', function () {
+      const namedEasings = project.getNamedEasings();
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(false);
+
+      const namedEasing = namedEasings.insertNewNamedEasing('PopupOpen', 0);
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(true);
+      expect(namedEasings.getNamedEasingsCount()).toBe(1);
+      expect(namedEasing.getName()).toBe('PopupOpen');
+      namedEasing.setX1(0.34);
+      namedEasing.setY1(1.56);
+      namedEasing.setX2(0.64);
+      namedEasing.setY2(1);
+      expect(namedEasings.getNamedEasing('PopupOpen').getX1()).toBe(0.34);
+      expect(namedEasings.getNamedEasingAt(0).getY1()).toBe(1.56);
+      expect(namedEasings.getNamedEasing('PopupOpen').getX2()).toBe(0.64);
+      expect(namedEasings.getNamedEasingAt(0).getY2()).toBe(1);
+
+      namedEasings.removeNamedEasing('PopupOpen');
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(false);
+      expect(namedEasings.getNamedEasingsCount()).toBe(0);
+    });
+
     it('handles external layouts', function () {
       expect(project.hasExternalLayoutNamed('My layout')).toBe(false);
 
@@ -4981,6 +5003,30 @@ describe('libGD.js', function () {
       ]);
 
       project.delete();
+    });
+    it('handles named easings', function () {
+      const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
+      const namedEasings = eventsFunctionsExtension.getNamedEasings();
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(false);
+
+      const namedEasing = namedEasings.insertNewNamedEasing('PopupOpen', 0);
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(true);
+      expect(namedEasings.getNamedEasingsCount()).toBe(1);
+      expect(namedEasing.getName()).toBe('PopupOpen');
+      namedEasing.setX1(0.34);
+      namedEasing.setY1(1.56);
+      namedEasing.setX2(0.64);
+      namedEasing.setY2(1);
+      expect(namedEasings.getNamedEasing('PopupOpen').getX1()).toBe(0.34);
+      expect(namedEasings.getNamedEasingAt(0).getY1()).toBe(1.56);
+      expect(namedEasings.getNamedEasing('PopupOpen').getX2()).toBe(0.64);
+      expect(namedEasings.getNamedEasingAt(0).getY2()).toBe(1);
+
+      namedEasings.removeNamedEasing('PopupOpen');
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(false);
+      expect(namedEasings.getNamedEasingsCount()).toBe(0);
+
+      eventsFunctionsExtension.delete();
     });
   });
   describe('gd.EventsBasedBehavior', () => {

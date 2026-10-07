@@ -1573,6 +1573,15 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
          ConvertToStringExplicit(section) + "); }";
 }
 
+gd::String EventsCodeGenerator::GenerateEasingCode(
+    const gd::String& easingStringCode) {
+  return "runtimeScene.getGame().getNamedEasingsManager().resolve(" +
+         easingStringCode + ", " +
+         ConvertToStringExplicit(
+             GetProjectScopedContainers().GetScopeExtensionName()) +
+         ")";
+}
+
 gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(
     const gd::PropertiesContainer& propertiesContainer,
     const gd::NamedPropertyDescriptor& property,

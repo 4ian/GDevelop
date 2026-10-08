@@ -113,11 +113,7 @@ describe('libGD.js', function () {
 
       // A layout can be moved from a folder to another.
       const scene1Node = rootFolder.getItemChild('Scene1');
-      rootFolder.moveFolderOrItemToAnotherFolder(
-        scene1Node,
-        folder,
-        0
-      );
+      rootFolder.moveFolderOrItemToAnotherFolder(scene1Node, folder, 0);
       expect(folder.getChildrenCount()).toBe(2);
       expect(folder.getChildAt(0).getItem().getName()).toBe('Scene1');
       expect(rootFolder.hasItemNamed('Scene1')).toBe(true);

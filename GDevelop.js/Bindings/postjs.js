@@ -577,8 +577,14 @@ patchClassesForUseAfterFreeDetection(Module, {
     ['EffectsContainer', 'EffectsContainer'],
     ['InitialInstancesContainer', 'InitialInstancesContainer'],
     ['LayersContainer', 'LayersContainer'],
-    ['ExternalEventsFolderOrExternalEvents', 'ExternalEventsFolderOrExternalEvents'],
-    ['ExternalLayoutFolderOrExternalLayout', 'ExternalLayoutFolderOrExternalLayout'],
+    [
+      'ExternalEventsFolderOrExternalEvents',
+      'ExternalEventsFolderOrExternalEvents',
+    ],
+    [
+      'ExternalLayoutFolderOrExternalLayout',
+      'ExternalLayoutFolderOrExternalLayout',
+    ],
     ['LayoutFolderOrLayout', 'LayoutFolderOrLayout'],
     ['ObjectFolderOrObject', 'ObjectFolderOrObject'],
     ['ObjectGroupsContainer', 'ObjectGroupsContainer'],

@@ -2072,6 +2072,15 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                               const itemToSelect = items[0];
                               if (!itemToSelect) return;
                               if (itemToSelect.isRoot) return;
+                              // A selection stays in one section: a Ctrl+click
+                              // or Shift+click range reaching another section
+                              // does not extend it, like the objects list does
+                              // with the global and scene objects.
+                              const sectionRootId = itemToSelect.content.getRootId();
+                              const sameSectionItems = items.filter(
+                                item =>
+                                  item.content.getRootId() === sectionRootId
+                              );
                               // When a folder is explicitly deselected
                               // (Ctrl+click), also drop its descendants that
                               // a previous range had added to the selection.
@@ -2081,7 +2090,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                               setSelectedItems(
                                 dropDescendantsOfRemovedFolders(
                                   removedFolderOrItems,
-                                  items,
+                                  sameSectionItems,
                                   item => item.content.getFolderOrItem()
                                 )
                               );

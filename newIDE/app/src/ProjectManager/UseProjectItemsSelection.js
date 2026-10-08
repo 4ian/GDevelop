@@ -28,21 +28,20 @@ function useProjectItemsSelection(): {|
   );
 
   /**
-   * The selected nodes organized in folders, of the section of the first
-   * selected item (a selection spanning several sections acts on this one),
-   * without the nodes inside another selected folder. Null when the first
-   * selected item is not organized in folders (an extension...).
+   * The selected nodes organized in folders (a selection stays in one
+   * section), without the nodes inside another selected folder. Null when the
+   * selection is not organized in folders (extensions...).
    */
   const getSelectedFolderOrItems = React.useCallback(
     (): ?SelectedFolderOrItems => {
       if (selectedItems.length === 0) return null;
-      const rootId = selectedItems[0].content.getRootId();
-      const kind = getProjectItemFoldersKind(rootId);
+      const kind = getProjectItemFoldersKind(
+        selectedItems[0].content.getRootId()
+      );
       if (!kind) return null;
 
       const folderOrItems = getTopLevelFolderOrItems(
         selectedItems
-          .filter(item => item.content.getRootId() === rootId)
           .map(item => item.content.getFolderOrItem())
           .filter(Boolean)
       );

@@ -2800,6 +2800,73 @@ describe('libGD.js', function () {
       expect(validateVolumeParameter('1 +')).toBe(false);
       expect(validateVolumeParameter('"Not a number"')).toBe(false);
     });
+
+    it('checks that the object has the behavior of an untyped behavior parameter', function () {
+      // `ActivateBehavior` accepts any behavior: its "behavior" parameter has
+      // no behavior type, but the object must still have the behavior.
+      const objectWithBehavior = layout
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'ObjectWithBehavior', 0);
+      objectWithBehavior.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+      layout
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'ObjectWithoutBehavior', 1);
+
+      const validateParameter = (objectName, behaviorName, parameterIndex) => {
+        const action = new gd.Instruction();
+        action.setType('ActivateBehavior');
+        action.setParametersCount(3);
+        action.setParameter(0, objectName);
+        action.setParameter(1, behaviorName);
+        action.setParameter(2, 'yes');
+        const result = gd.InstructionValidator.validateParameter(
+          gd.JsPlatform.get(),
+          projectScopedContainers,
+          action,
+          gd.MetadataProvider.getActionMetadata(
+            gd.JsPlatform.get(),
+            'ActivateBehavior'
+          ),
+          parameterIndex
+        );
+        const isValid = result.isValid();
+        action.delete();
+        return isValid;
+      };
+      const behaviorParameterIndex = 1;
+      const objectParameterIndex = 0;
+
+      expect(
+        validateParameter(
+          'ObjectWithBehavior',
+          'PlatformerObject',
+          behaviorParameterIndex
+        )
+      ).toBe(true);
+      expect(
+        validateParameter(
+          'ObjectWithoutBehavior',
+          'PlatformerObject',
+          behaviorParameterIndex
+        )
+      ).toBe(false);
+      expect(
+        validateParameter('ObjectWithBehavior', '', behaviorParameterIndex)
+      ).toBe(false);
+
+      // The error is on the behavior parameter: the object stays valid.
+      expect(
+        validateParameter(
+          'ObjectWithoutBehavior',
+          'PlatformerObject',
+          objectParameterIndex
+        )
+      ).toBe(true);
+    });
   });
 
   describe('EventsRefactorer', function () {

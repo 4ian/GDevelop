@@ -10,6 +10,7 @@
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/IDE/VariableInstructionSwitcher.h"
@@ -94,6 +95,29 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
              parameterMetadata.GetExtraInfo()) &&
         InstructionValidator::HasRequiredBehaviors(
             instruction, metadata, parameterIndex, objectsContainersList);
+  } else if (gd::ParameterMetadata::IsBehavior(parameterType)) {
+    const auto objectParameterIndex =
+        gd::ParameterMetadataTools::GetObjectParameterIndexFor(
+            metadata.GetParameters(), parameterIndex);
+    if (objectParameterIndex == gd::String::npos) {
+      return result;  // No object to check against: consider it valid.
+    }
+    const auto &objectOrGroupName =
+        instruction.GetParameter(objectParameterIndex).GetPlainString();
+    const auto &objectsContainersList =
+        projectScopedContainers.GetObjectsContainersList();
+    const auto &behaviorType = parameterMetadata.GetExtraInfo();
+    // The object must have a behavior with this name and, when the parameter
+    // declares a behavior type (most behavior instructions), of this type.
+    // Untyped behavior parameters (like "De/activate a behavior") accept any
+    // behavior of the object.
+    result.isValid =
+        behaviorType.empty()
+            ? objectsContainersList.HasBehaviorInObjectOrGroup(
+                  objectOrGroupName, value)
+            : objectsContainersList.GetTypeOfBehaviorInObjectOrGroup(
+                  objectOrGroupName, value,
+                  /** searchInGroups = */ true) == behaviorType;
   } else if (gd::ParameterMetadata::IsExpression("resource", parameterType)) {
     const auto &resourceName =
         instruction.GetParameter(parameterIndex).GetPlainString();
@@ -191,6 +215,7 @@ bool InstructionValidator::HasRequiredBehaviors(
     }
     const auto &behaviorType = behaviorParameter.GetExtraInfo();
     if (behaviorType.empty()) {
+      // The behavior name is checked by the behavior parameter itself.
       continue;
     }
     if (index >= instruction.GetParametersCount()) {

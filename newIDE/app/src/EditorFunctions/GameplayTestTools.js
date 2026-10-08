@@ -166,10 +166,12 @@ export const runGameplayTest: EditorFunction = {
         didModifyProject = true;
       }
     } else if (source === null && !testsContainer.hasTestNamed(testName)) {
+      // Mostly reached when re-running a temporary test by name (or with a
+      // blank source): it was never saved, so its code must be passed again.
       return makeFailure(
         `No test named "${testName}" in ${getGameplayTestScopeDescription(
           scope
-        )} - pass its code as \`source\` to create it.`
+        )} - pass its code as \`source\` to create it. A temporary test (\`persist: false\`) is never saved: to run it again, pass its full code as \`source\` with \`persist: false\`.`
       );
     }
 

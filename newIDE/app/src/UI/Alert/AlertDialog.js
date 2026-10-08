@@ -6,7 +6,6 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 
 import Dialog from '../Dialog';
 import FlatButton from '../FlatButton';
-import Text from '../Text';
 import { MarkdownText } from '../MarkdownText';
 
 type Props = {|
@@ -43,9 +42,7 @@ function AlertDialog(props: Props): React.Node {
           onRequestClose={props.onDismiss}
           onApply={props.onDismiss}
         >
-          <Text>
-            <MarkdownText translatableSource={props.message} isStandaloneText />
-          </Text>
+          <MarkdownText translatableSource={props.message} isStandaloneText />
         </Dialog>
       )}
     </I18n>

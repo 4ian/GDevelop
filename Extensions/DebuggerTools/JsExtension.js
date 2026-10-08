@@ -38,12 +38,13 @@ module.exports = {
     extension
       .addAction(
         'Pause',
-        _('Pause game execution'),
+        _('Pause game execution (breakpoint)'),
         _(
-          'This pauses the game, useful for inspecting the game state through the debugger. ' +
+          'This pauses the game, like a breakpoint: useful for inspecting the game state through the debugger. ' +
+            'Any recording in progress is stopped, so that the debugger shows the game as it is at this moment. ' +
             'Note that events will be still executed until the end before the game is paused.'
         ),
-        _('Pause game execution'),
+        _('Pause game execution (breakpoint)'),
         '',
         'res/actions/bug32.png',
         'res/actions/bug32.png'
@@ -52,6 +53,43 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
       .setFunctionName('gdjs.evtTools.debuggerTools.pause');
+
+    extension
+      .addAction(
+        'StartProfiling',
+        _('Start recording the game'),
+        _(
+          'This starts recording the game, like the "Record" button of the debugger: the frames, ' +
+            'the performance and the resources are measured from now on. Useful to record exactly ' +
+            'what happens at a given moment, instead of trying to click the button at the right time.'
+        ),
+        _('Start recording the game (for the debugger)'),
+        '',
+        'res/actions/bug32.png',
+        'res/actions/bug32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
+      .setFunctionName('gdjs.evtTools.debuggerTools.startProfiling');
+
+    extension
+      .addAction(
+        'StopProfiling',
+        _('Stop recording the game'),
+        _(
+          'This stops the recording started with "Start recording the game": what was measured ' +
+            'stays displayed in the debugger.'
+        ),
+        _('Stop recording the game (for the debugger)'),
+        '',
+        'res/actions/bug32.png',
+        'res/actions/bug32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
+      .setFunctionName('gdjs.evtTools.debuggerTools.stopProfiling');
 
     extension
       .addAction(

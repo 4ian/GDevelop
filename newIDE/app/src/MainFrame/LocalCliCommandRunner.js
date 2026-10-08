@@ -309,9 +309,15 @@ type RunCliCommandIpcPayload = {|
 |};
 
 const ensureProjectExtensionsReadyForCli = async (
+  project: gdProject,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
 ): Promise<boolean> => {
-  await eventsFunctionsExtensionsState.ensureLoadFinished();
+  // A command can export the game: never with the code following the
+  // execution of the events (see `ensureEventsExecutionInstrumentation`).
+  await eventsFunctionsExtensionsState.ensureEventsExecutionInstrumentation(
+    project,
+    false
+  );
 
   if (eventsFunctionsExtensionsState.eventsFunctionsExtensionsError) {
     console.error(
@@ -373,6 +379,7 @@ const runCliCommand = async ({
 }: RunCliCommandOptions): Promise<void> => {
   try {
     const extensionsReady = await ensureProjectExtensionsReadyForCli(
+      project,
       eventsFunctionsExtensionsState
     );
     if (!extensionsReady) {

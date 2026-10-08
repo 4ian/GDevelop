@@ -21,6 +21,7 @@ import {
   type EventsScope,
   ProjectScopedContainersAccessor,
 } from '../../InstructionOrExpression/EventsScope';
+import { TrackedEventPtrContext } from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
 
 const styles = {
   addButton: {
@@ -148,6 +149,7 @@ export default function InstructionsList({
         instruction={instruction}
         isCondition={areConditions}
         key={instruction.ptr}
+        indexInList={i}
         selected={isInstructionSelected(selection, instruction)}
         onMoveToInstruction={() => onMoveToInstruction(instructionContext)}
         onClick={() => onInstructionClick(instructionContext)}
@@ -304,3 +306,17 @@ export default function InstructionsList({
     </I18n>
   );
 }
+
+/**
+ * A list of instructions for which no execution is shown (the sub-instructions
+ * of "And", "Or", "Not", the conditions of a "While"): the preview does not
+ * report them, as their indexes would be the same as the ones of the
+ * conditions of the event.
+ */
+export const InstructionsListWithoutExecutionTracking = (
+  props: Props
+): React.Node => (
+  <TrackedEventPtrContext.Provider value={null}>
+    <InstructionsList {...props} />
+  </TrackedEventPtrContext.Provider>
+);

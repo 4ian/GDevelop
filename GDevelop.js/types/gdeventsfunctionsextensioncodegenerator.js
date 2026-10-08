@@ -2,6 +2,7 @@
 declare class gdEventsFunctionsExtensionCodeGenerator {
   constructor(project: gdProject): void;
   generateFreeEventsFunctionCompleteCode(extension: gdEventsFunctionsExtension, eventsFunction: gdEventsFunction, codeNamespac: string, includes: gdSetString, compilationForRuntime: boolean): string;
+  setGenerateEventsExecutionTracking(enable: boolean): void;
   delete(): void;
   ptr: number;
 };

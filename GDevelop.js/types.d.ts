@@ -3253,12 +3253,16 @@ export class ParticleEmitterObject extends ObjectConfiguration {
 
 export class LayoutCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
+  setGenerateEventsExecutionTracking(enable: boolean): void;
+  setEvaluateForAllInstances(enable: boolean): void;
   generateLayoutCompleteCode(layout: Layout, includes: SetString, diagnosticReport: DiagnosticReport, compilationForRuntime: boolean): string;
+  generateExpressionEvaluationCode(layout: Layout, type: string, expression: string, objectName: string): string;
 }
 
 export class BehaviorCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
   generateRuntimeBehaviorCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  setGenerateEventsExecutionTracking(enable: boolean): void;
   static getBehaviorPropertyGetterName(propertyName: string): string;
   static getBehaviorPropertySetterName(propertyName: string): string;
   static getBehaviorPropertyToggleFunctionName(propertyName: string): string;
@@ -3270,6 +3274,7 @@ export class BehaviorCodeGenerator extends EmscriptenObject {
 export class ObjectCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
   generateRuntimeObjectCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  setGenerateEventsExecutionTracking(enable: boolean): void;
   static getObjectPropertyGetterName(propertyName: string): string;
   static getObjectPropertySetterName(propertyName: string): string;
   static getObjectPropertyToggleFunctionName(propertyName: string): string;
@@ -3278,6 +3283,7 @@ export class ObjectCodeGenerator extends EmscriptenObject {
 export class EventsFunctionsExtensionCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
   generateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean): string;
+  setGenerateEventsExecutionTracking(enable: boolean): void;
 }
 
 export class PreviewExportOptions extends EmscriptenObject {
@@ -3300,6 +3306,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setNativeMobileApp(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
+  setInstrumentEventsExecution(enable: boolean): PreviewExportOptions;
   setIsInGameEdition(enable: boolean): PreviewExportOptions;
   setInGameEditorSettingsJson(inGameEditorSettingsJson: string): PreviewExportOptions;
   setEditorId(editorId: string): PreviewExportOptions;

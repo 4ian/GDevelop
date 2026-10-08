@@ -1,20 +1,28 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
-
+import { Trans, t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import ReactJsonView from 'react-json-view';
+import InspectorTreeView, {
+  buildPropertiesItems,
+  makePropertiesFolderItem,
+  makeSection,
+  type InspectedProperty,
+} from './InspectorTreeView';
 import {
   type GameData,
   type EditFunction,
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
-import mapValues from 'lodash/mapValues';
 import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import Text from '../../UI/Text';
-import TimersInspector from './TimersInspector';
+import { Column } from '../../UI/Grid';
+import { buildTimersItems } from './TimersInspector';
+import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import LayersIcon from '../../UI/CustomSvgIcons/Layers';
+import TimerIcon from '@material-ui/icons/Timer';
 
 type Props = {|
   runtimeScene: GameData,
@@ -22,155 +30,182 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
-type State = {|
-  newObjectName: string,
-|};
+/**
+ * The camera and the state of a layer, each one changed in the game by the
+ * method of the layer that the events use too.
+ */
+const getLayerProperties = (
+  // $FlowFixMe[unclear-type]
+  layer: Object,
+  callOnLayer: (methodName: string, newValue: any) => void,
+  i18n: I18nType
+): Array<InspectedProperty> => [
+  {
+    name: i18n._(t`Camera X position`),
+    value: layer._cameraX,
+    onEdit: newValue => callOnLayer('setCameraX', newValue),
+  },
+  {
+    name: i18n._(t`Camera Y position`),
+    value: layer._cameraY,
+    onEdit: newValue => callOnLayer('setCameraY', newValue),
+  },
+  {
+    name: i18n._(t`Camera zoom`),
+    value: layer._zoomFactor,
+    onEdit: newValue => callOnLayer('setCameraZoom', newValue),
+  },
+  {
+    name: i18n._(t`Camera rotation (in deg)`),
+    value: layer._cameraRotation,
+    onEdit: newValue => callOnLayer('setCameraRotation', newValue),
+  },
+  {
+    name: i18n._(t`Time scale`),
+    value: layer._timeScale,
+    onEdit: newValue => callOnLayer('setTimeScale', newValue),
+  },
+  {
+    name: i18n._(t`Layer is hidden`),
+    value: !!layer._hidden,
+    onEdit: newValue => callOnLayer('show', !newValue),
+  },
+];
 
-// $FlowFixMe[missing-local-annot]
-const transformLayer = layer => {
-  if (!layer) return null;
-  return {
-    'Camera rotation (in deg)': layer._cameraRotation,
-    'Camera zoom': layer._zoomFactor,
-    'Layer is hidden': !!layer._hidden,
-    'Camera X position': layer._cameraX,
-    'Camera Y position': layer._cameraY,
-    'Time scale': layer._timeScale,
-  };
-};
+const RuntimeSceneInspectorTree = ({
+  runtimeScene,
+  onCall,
+  i18n,
+}: {|
+  ...Props,
+  i18n: I18nType,
+|}): React.Node => {
+  const [newObjectName, setNewObjectName] = React.useState<string>('');
 
-// $FlowFixMe[missing-local-annot]
-const transform = runtimeScene => {
-  if (!runtimeScene) return null;
+  const items = React.useMemo(
+    () => {
+      const generalProperties: Array<InspectedProperty> = [
+        {
+          name: i18n._(t`Time scale`),
+          value: runtimeScene._timeManager
+            ? runtimeScene._timeManager._timeScale
+            : null,
+          onEdit: newValue =>
+            onCall(['_timeManager', 'setTimeScale'], [newValue]),
+        },
+        {
+          name: i18n._(t`Actions waiting to be finished`),
+          value: runtimeScene._asyncTasksManager
+            ? runtimeScene._asyncTasksManager.tasksWithCallback.length
+            : 0,
+        },
+      ];
 
-  return {
-    'Time scale': runtimeScene._timeManager
-      ? runtimeScene._timeManager._timeScale
-      : null,
-    Layers:
-      runtimeScene._layers && runtimeScene._layers.items
-        ? mapValues(runtimeScene._layers.items, transformLayer)
-        : null,
-    'Actions waiting to be finished':
-      runtimeScene._asyncTasksManager.tasksWithCallback.length,
-  };
-};
+      const layersItems =
+        runtimeScene._layers && runtimeScene._layers.items
+          ? Object.keys(runtimeScene._layers.items)
+              .filter(layerName => !!runtimeScene._layers.items[layerName])
+              .map(layerName =>
+                makePropertiesFolderItem(
+                  `layers/${layerName}`,
+                  layerName,
+                  getLayerProperties(
+                    runtimeScene._layers.items[layerName],
+                    (methodName, newValue) =>
+                      onCall(
+                        ['_layers', 'items', layerName, methodName],
+                        [newValue]
+                      ),
+                    i18n
+                  )
+                )
+              )
+          : null;
 
-// $FlowFixMe[missing-local-annot]
-const handleEdit = (edit, { onCall, onEdit }: Props) => {
-  if (edit.namespace.length === 0 && edit.name === 'Time scale') {
-    onCall(['_timeManager', 'setTimeScale'], [parseFloat(edit.new_value)]);
-  } else if (edit.namespace.length >= 2) {
-    if (edit.namespace[0] === 'Layers') {
-      if (edit.name === 'Camera rotation (in deg)') {
-        onCall(
-          ['_layers', 'items', edit.namespace[1], 'setCameraRotation'],
-          [parseFloat(edit.new_value)]
-        );
-      } else if (edit.name === 'Camera zoom') {
-        onCall(
-          ['_layers', 'items', edit.namespace[1], 'setCameraZoom'],
-          [parseFloat(edit.new_value)]
-        );
-      } else if (edit.name === 'Layer is hidden') {
-        onCall(
-          ['_layers', 'items', edit.namespace[1], 'show'],
-          [!edit.new_value]
-        );
-      } else if (edit.name === 'Camera X position') {
-        onCall(
-          ['_layers', 'items', edit.namespace[1], 'setCameraX'],
-          [parseFloat(edit.new_value)]
-        );
-      } else if (edit.name === 'Camera Y position') {
-        onCall(
-          ['_layers', 'items', edit.namespace[1], 'setCameraY'],
-          [parseFloat(edit.new_value)]
-        );
-      } else if (edit.name === 'Time scale') {
-        onCall(
-          ['_layers', 'items', edit.namespace[1], 'setTimeScale'],
-          [parseFloat(edit.new_value)]
-        );
-      }
-    }
-  } else return false;
+      return [
+        makeSection(
+          'general',
+          i18n._(t`General`),
+          buildPropertiesItems('general', generalProperties),
+          { isRoot: true, icon: <EditSceneIcon /> }
+        ),
+        makeSection('layers', i18n._(t`Layers`), layersItems, {
+          isRoot: true,
+          emptyHint: i18n._(t`This scene has no layer.`),
+          icon: <LayersIcon />,
+        }),
+        makeSection(
+          'timers',
+          i18n._(t`Timers`),
+          buildTimersItems(
+            'timers',
+            runtimeScene._timeManager ? runtimeScene._timeManager._timers : null
+          ),
+          {
+            isRoot: true,
+            emptyHint: i18n._(t`This scene has no timer.`),
+            icon: <TimerIcon />,
+          }
+        ),
+      ];
+    },
+    [runtimeScene, onCall, i18n]
+  );
 
-  return true;
-};
-
-export default class RuntimeSceneInspector extends React.Component<
-  Props,
-  State
-> {
-  state: State = {
-    newObjectName: '',
-  };
-
-  render(): any {
-    const { runtimeScene, onCall } = this.props;
-    if (!runtimeScene) return null;
-
-    return (
-      <React.Fragment>
-        <Text>
-          <Trans>Layers:</Trans>
-        </Text>
-        <ReactJsonView
-          collapsed={false}
-          name={false}
-          src={transform(runtimeScene)}
-          enableClipboard={false}
-          displayDataTypes={false}
-          displayObjectSize={false}
-          onEdit={edit => handleEdit(edit, this.props)}
-          groupArraysAfterLength={50}
-          theme="monokai"
-        />
-        <Text>
-          <Trans>Timers:</Trans>
-        </Text>
-        <TimersInspector timers={runtimeScene._timeManager._timers} />
-        <Text>
-          <Trans>
-            Create a new instance on the scene (will be at position 0;0):
-          </Trans>
-        </Text>
-        {runtimeScene._objects && runtimeScene._objects.items && (
-          <TextFieldWithButtonLayout
-            noFloatingLabelText
-            renderTextField={() => (
-              <SemiControlledAutoComplete
-                hintText={t`Enter the name of the object`}
-                value={this.state.newObjectName}
-                onChange={value => {
-                  this.setState({
-                    newObjectName: value,
-                  });
-                }}
-                dataSource={Object.keys(runtimeScene._objects.items).map(
-                  objectName => ({
-                    text: objectName,
-                    value: objectName,
-                  })
-                )}
-                openOnFocus
-                fullWidth
-              />
-            )}
-            renderButton={style => (
-              <RaisedButton
-                style={style}
-                label={<Trans>Create</Trans>}
-                primary
-                onClick={() => {
-                  onCall(['createObject'], [this.state.newObjectName]);
-                }}
-              />
-            )}
-          />
+  return (
+    <React.Fragment>
+      <InspectorTreeView items={items} />
+      {/* What the game could not send is replaced by a placeholder string in
+          the dump: only walk through real objects. */}
+      {runtimeScene._objects &&
+        typeof runtimeScene._objects === 'object' &&
+        runtimeScene._objects.items &&
+        typeof runtimeScene._objects.items === 'object' && (
+          <Column noMargin>
+            <Text size="body2" color="secondary">
+              <Trans>
+                Create a new instance on the scene (will be at position 0;0):
+              </Trans>
+            </Text>
+            <TextFieldWithButtonLayout
+              noFloatingLabelText
+              renderTextField={() => (
+                <SemiControlledAutoComplete
+                  hintText={t`Enter the name of the object`}
+                  value={newObjectName}
+                  onChange={setNewObjectName}
+                  dataSource={Object.keys(runtimeScene._objects.items).map(
+                    objectName => ({
+                      text: objectName,
+                      value: objectName,
+                    })
+                  )}
+                  openOnFocus
+                  fullWidth
+                />
+              )}
+              renderButton={style => (
+                <RaisedButton
+                  style={style}
+                  label={<Trans>Create</Trans>}
+                  primary
+                  onClick={() => onCall(['createObject'], [newObjectName])}
+                />
+              )}
+            />
+          </Column>
         )}
-      </React.Fragment>
-    );
-  }
-}
+    </React.Fragment>
+  );
+};
+
+const RuntimeSceneInspector = (props: Props): React.Node => {
+  if (!props.runtimeScene) return null;
+  return (
+    <I18n>
+      {({ i18n }) => <RuntimeSceneInspectorTree {...props} i18n={i18n} />}
+    </I18n>
+  );
+};
+
+export default RuntimeSceneInspector;

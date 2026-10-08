@@ -148,6 +148,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     onPreviewWithoutHotReload={props.launchNewPreview}
                     onNetworkPreview={props.launchNetworkPreview}
                     onHotReloadPreview={props.launchHotReloadPreview}
+                    onClosePreviews={props.closeAllPreviews}
                     onLaunchPreviewWithDiagnosticReport={
                       props.launchPreviewWithDiagnosticReport
                     }

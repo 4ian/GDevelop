@@ -1,6 +1,7 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <utility>
 
 #include "GDCore/CommonTools.h"
@@ -489,8 +490,14 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
         if (i == cId - 1) outputCode += ") ";
       }
 
+      const gd::String instructionExecutionId =
+          GetInstructionExecutionId(true, cId);
       outputCode += "{\n";
+      outputCode +=
+          GenerateInstructionExecutionTrackingBegin(instructionExecutionId);
       outputCode += conditionCode;
+      outputCode +=
+          GenerateInstructionExecutionTrackingEnd(instructionExecutionId);
       outputCode += "}";
     } else {
       // Deprecated way to cancel code generation - but still honor it.
@@ -860,12 +867,36 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
       // GenerateActionCode.
       outputCode += "/* Skipped action (empty type) */";
     } else {
+      const gd::String instructionExecutionId =
+          GetInstructionExecutionId(false, aId);
+      outputCode +=
+          GenerateInstructionExecutionTrackingBegin(instructionExecutionId);
       outputCode += actionCode;
+      outputCode +=
+          GenerateInstructionExecutionTrackingEnd(instructionExecutionId);
     }
     outputCode += "}\n";
   }
 
   return outputCode;
+}
+
+gd::String EventsCodeGenerator::GetOriginalEventExecutionId(
+    const gd::BaseEvent& event) {
+  const auto originalEvent = event.originalEvent.lock();
+  if (!originalEvent) return "";
+
+  // The address of the event is what the editor uses as its identity.
+  return gd::String::From(
+      reinterpret_cast<std::uintptr_t>(originalEvent.get()));
+}
+
+gd::String EventsCodeGenerator::GetInstructionExecutionId(
+    bool isCondition, std::size_t indexInList) const {
+  if (currentEventExecutionId.empty()) return "";
+
+  return currentEventExecutionId + (isCondition ? ":c" : ":a") +
+         gd::String::From(indexInList);
 }
 
 gd::String EventsCodeGenerator::GenerateParameterCodes(
@@ -1146,7 +1177,12 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
 
     context.SetFollowedByElseEvent(hasFollowingElseEvent);
 
+    // Instructions generated for this event (sub-events included, as they are
+    // generated inside it) are tracked using the id of the original event.
+    const gd::String previousEventExecutionId = currentEventExecutionId;
+    currentEventExecutionId = GetOriginalEventExecutionId(event);
     gd::String eventCoreCode = event.GenerateEventCode(*this, context);
+    currentEventExecutionId = previousEventExecutionId;
 
     if (isElseEvent) {
       hasAnyElseEvent = true;
@@ -1568,6 +1604,7 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
       scene(&layout),
       errorOccurred(false),
       compilationForRuntime(false),
+      generateEventsExecutionTracking(false),
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
       eventsListNextUniqueId(0),
@@ -1583,6 +1620,7 @@ EventsCodeGenerator::EventsCodeGenerator(
       scene(nullptr),
       errorOccurred(false),
       compilationForRuntime(false),
+      generateEventsExecutionTracking(false),
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
       eventsListNextUniqueId(0),

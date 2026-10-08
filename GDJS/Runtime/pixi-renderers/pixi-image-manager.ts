@@ -561,6 +561,81 @@ namespace gdjs {
     }
 
     /**
+     * Estimate the GPU memory used by the loaded textures: 4 bytes per pixel
+     * for each PixiJS texture, and again for each Three.js texture made from
+     * them (uploaded separately). Null when nothing is loaded.
+     */
+    getEstimatedGpuMemoryBytes(): integer | null {
+      let estimatedBytes = 0;
+      let texturesCount = 0;
+      for (const texture of this._loadedTextures.getLoadedContents()) {
+        const textureBytes = PixiImageManager._estimateTextureBytes(texture);
+        if (textureBytes !== null) {
+          estimatedBytes += textureBytes;
+          texturesCount++;
+        }
+      }
+      const threeTextures: THREE.Texture[] = [];
+      this._loadedThreeTextures.values(threeTextures);
+      for (const threeTexture of threeTextures) {
+        const image = threeTexture.image;
+        if (image && image.width && image.height) {
+          estimatedBytes += image.width * image.height * 4;
+          texturesCount++;
+        }
+      }
+      return texturesCount > 0 ? estimatedBytes : null;
+    }
+
+    /**
+     * Describe a loaded texture for the debugger (see `ResourceManager`).
+     */
+    getResourceDebugMetrics(
+      resourceName: string
+    ): gdjs.ResourceDebugMetrics | null {
+      const texture = this._loadedTextures.getFromName(resourceName);
+      if (!texture || texture === this._invalidTexture || texture.destroyed) {
+        return null;
+      }
+      const textureBytes = PixiImageManager._estimateTextureBytes(texture);
+      if (textureBytes === null) {
+        return null;
+      }
+      const hasThreeTexture =
+        this._loadedThreeTextures.containsKey(resourceName);
+      const metrics: gdjs.ResourceDebugMetrics = {
+        width: texture.baseTexture.realWidth,
+        height: texture.baseTexture.realHeight,
+        estimatedMemoryBytes: hasThreeTexture ? textureBytes * 2 : textureBytes,
+      };
+      const source = (texture.baseTexture.resource as any)?.source;
+      if (
+        typeof HTMLVideoElement !== 'undefined' &&
+        source instanceof HTMLVideoElement &&
+        isFinite(source.duration)
+      ) {
+        metrics.durationInSeconds = source.duration;
+      }
+      if (hasThreeTexture) {
+        metrics.extra = { hasThreeTexture: true };
+      }
+      return metrics;
+    }
+
+    private static _estimateTextureBytes(
+      texture: PIXI.Texture
+    ): integer | null {
+      if (texture.destroyed || !texture.baseTexture || !texture.valid) {
+        return null;
+      }
+      const { realWidth, realHeight } = texture.baseTexture;
+      if (!realWidth || !realHeight) {
+        return null;
+      }
+      return realWidth * realHeight * 4;
+    }
+
+    /**
      * To be called when the game is disposed.
      * Clear caches of loaded textures and materials.
      */

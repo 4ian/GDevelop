@@ -604,6 +604,38 @@ namespace gdjs {
     }
 
     /**
+     * Describe a loaded sound or music for the debugger (see `ResourceManager`).
+     * Sounds are decoded to PCM by WebAudio (estimated as stereo, 32 bits per
+     * sample at the context sample rate). Musics are streamed by HTML5 audio:
+     * their memory is left to the size of the file, known by the loader.
+     */
+    getResourceDebugMetrics(
+      resourceName: string
+    ): gdjs.ResourceDebugMetrics | null {
+      const music = this._loadedMusics.getFromName(resourceName);
+      const sound = music ? null : this._loadedSounds.getFromName(resourceName);
+      const howl = music || sound;
+      if (!howl) {
+        return null;
+      }
+      const durationInSeconds = howl.duration();
+      const metrics: gdjs.ResourceDebugMetrics = {
+        extra: { howlState: howl.state(), isMusic: !!music },
+      };
+      if (durationInSeconds > 0) {
+        metrics.durationInSeconds = durationInSeconds;
+        if (sound) {
+          const sampleRate =
+            Howler.ctx && Howler.ctx.sampleRate ? Howler.ctx.sampleRate : 44100;
+          metrics.estimatedMemoryBytes = Math.round(
+            durationInSeconds * sampleRate * 2 * 4
+          );
+        }
+      }
+      return metrics;
+    }
+
+    /**
      * Ensure rate is in a range valid for Howler.js
      * @return The clamped rate
      */

@@ -1,0 +1,75 @@
+/* Flexbox row for the inspector tree. */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.row:hover {
+  background-color: var(--theme-list-item-hover-background-color);
+}
+
+.rowName {
+  flex: 0 1 auto;
+  min-width: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--theme-text-secondary-color);
+}
+
+.rowIcon svg {
+  font-size: 16px;
+}
+
+.rowSeparator {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.rowValue,
+.rowValue p {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  color: var(--theme-text-secondary-color);
+}
+
+/* A value edited in place: as wide as a short value, on the right. */
+.rowField {
+  flex: 0 1 140px;
+  min-width: 60px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* How many rows a folded section holds. */
+.rowCount {
+  flex-shrink: 0;
+  color: var(--theme-text-secondary-color);
+  opacity: 0.7;
+}
+
+.rowHint,
+.rowHint p {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  font-style: italic;
+}

@@ -51,5 +51,20 @@ namespace gdjs {
       this._nameToContent.clear();
       this._fileToContent.clear();
     }
+
+    /** Check if a content is cached for this resource name. */
+    has(resourceName: string): boolean {
+      return this._nameToContent.has(resourceName);
+    }
+
+    /** The names of the resources that have a content cached. */
+    getLoadedResourceNames(): Array<string> {
+      return Array.from(this._nameToContent.keys());
+    }
+
+    /** The distinct contents cached (a content shared by several names counts once). */
+    getLoadedContents(): Array<C> {
+      return Array.from(new Set(this._fileToContent.values()));
+    }
   }
 }

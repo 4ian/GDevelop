@@ -2,6 +2,7 @@
 declare class gdBehaviorCodeGenerator {
   constructor(project: gdProject): void;
   generateRuntimeBehaviorCompleteCode(eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: gdMapStringString, includes: gdSetString, compilationForRuntime: boolean): string;
+  setGenerateEventsExecutionTracking(enable: boolean): void;
   static getBehaviorPropertyGetterName(propertyName: string): string;
   static getBehaviorPropertySetterName(propertyName: string): string;
   static getBehaviorPropertyToggleFunctionName(propertyName: string): string;

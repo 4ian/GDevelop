@@ -1,0 +1,23 @@
+/* The value of an expression, shown over the instructions: same font as them. */
+.tooltip {
+  max-width: 520px;
+  padding: 6px 10px;
+  font-family: var(--gdevelop-classic-font-family);
+  color: var(--theme-text-default-color);
+  background-color: var(--theme-dialog-background-color);
+  border: 1px solid var(--theme-dialog-separator-color);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.value {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.variables {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--theme-dialog-separator-color);
+  color: var(--theme-text-secondary-color);
+}

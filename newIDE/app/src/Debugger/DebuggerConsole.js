@@ -71,6 +71,13 @@ export class LogsManager {
     }
   }
 
+  /** Forget every log (the groups are kept, so the filters stay stable). */
+  clear() {
+    this.logs = [];
+    this._pendingLogs.length = 0;
+    this._onNewLog.forEach(f => f());
+  }
+
   on(event: 'group' | 'log', handler: () => void) {
     if (event === 'group') this._onNewGroup.add(handler);
     if (event === 'log') this._onNewLog.add(handler);
@@ -211,70 +218,69 @@ export const DebuggerConsole = ({
                 style={styles.list}
                 rowCount={filteredLogs.length}
                 rowHeight={cellMeasurerCache.rowHeight}
-                rowRenderer={({ index, key, parent, style }) => (
-                  <CellMeasurer
-                    cache={cellMeasurerCache}
-                    columnIndex={0}
-                    key={key}
-                    parent={parent}
-                    rowIndex={index}
-                  >
-                    {({ registerChild }) => (
-                      <div
-                        key={key}
-                        style={{
-                          ...style,
-                          padding: 2,
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                        }}
-                        ref={registerChild}
-                      >
-                        <Column noMargin>
-                          {iconMap[filteredLogs[index].type] || iconMap['info']}
-                        </Column>
-                        <Spacer />
-                        <Column noMargin expand>
-                          <Line noMargin>
-                            <div style={styles.consoleTextArea}>
-                              {filteredLogs[index].message}
-                            </div>
-                          </Line>
-                          {showDetails && (
-                            <>
-                              <Spacer />
-                              <Line noMargin>
-                                {filteredLogs[index].group ? (
+                rowRenderer={({ index, key, parent, style }) => {
+                  // Named in lower case: the identifier of a message is the
+                  // sentence itself, so an interpolated value must read well
+                  // inside it.
+                  const logGroup = filteredLogs[index].group;
+                  const logTimestamp =
+                    Math.round(filteredLogs[index].timestamp * 1000) / 1000000 +
+                    's';
+                  return (
+                    <CellMeasurer
+                      cache={cellMeasurerCache}
+                      columnIndex={0}
+                      key={key}
+                      parent={parent}
+                      rowIndex={index}
+                    >
+                      {({ registerChild }) => (
+                        <div
+                          key={key}
+                          style={{
+                            ...style,
+                            padding: 2,
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                          }}
+                          ref={registerChild}
+                        >
+                          <Column noMargin>
+                            {iconMap[filteredLogs[index].type] ||
+                              iconMap['info']}
+                          </Column>
+                          <Spacer />
+                          <Column noMargin expand>
+                            <Line noMargin>
+                              <div style={styles.consoleTextArea}>
+                                {filteredLogs[index].message}
+                              </div>
+                            </Line>
+                            {showDetails && (
+                              <>
+                                <Spacer />
+                                <Line noMargin>
+                                  {filteredLogs[index].group ? (
+                                    <Tag
+                                      icon={<FolderIcon />}
+                                      label={<Trans>Group: {logGroup}</Trans>}
+                                    />
+                                  ) : null}
                                   <Tag
-                                    icon={<FolderIcon />}
+                                    icon={<TimerIcon />}
                                     label={
-                                      <Trans>
-                                        Group: {filteredLogs[index].group}
-                                      </Trans>
+                                      <Trans>Timestamp: {logTimestamp}</Trans>
                                     }
                                   />
-                                ) : null}
-                                <Tag
-                                  icon={<TimerIcon />}
-                                  label={
-                                    <Trans>
-                                      Timestamp:{' '}
-                                      {Math.round(
-                                        filteredLogs[index].timestamp * 1000
-                                      ) /
-                                        1000000 +
-                                        's'}
-                                    </Trans>
-                                  }
-                                />
-                              </Line>
-                            </>
-                          )}
-                        </Column>
-                      </div>
-                    )}
-                  </CellMeasurer>
-                )}
+                                </Line>
+                              </>
+                            )}
+                          </Column>
+                        </div>
+                      )}
+                    </CellMeasurer>
+                  );
+                }}
               />
             );
           }}

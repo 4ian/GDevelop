@@ -197,6 +197,14 @@ import {
   type PreviewState,
   usePreviewDebuggerServerWatcher,
 } from './PreviewState';
+import { useEventsExecutionTracking } from '../EventsExecutionTracking/UseEventsExecutionTracking';
+import {
+  type DebuggerPlaySpeed,
+  type LaunchDebuggerAndPreviewOptions,
+} from '../EventsExecutionTracking/EventsExecutionTrackingStore';
+import WatchedVariablesPanel from '../EventsExecutionTracking/WatchedVariablesPanel';
+import EventsExecutionTrackingContext from '../EventsExecutionTracking/EventsExecutionTrackingContext';
+import DebuggerSessionContext from '../Debugger/DebuggerSessionContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
@@ -452,6 +460,20 @@ export type Props = {|
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
 
+/** The scene whose variables are offered in the "watched variables" panel. */
+const getLayoutForWatchedVariables = (
+  project: gdProject,
+  previewState: PreviewState
+): ?gdLayout => {
+  const layoutName = previewState.isPreviewOverriden
+    ? previewState.overridenPreviewLayoutName
+    : previewState.previewLayoutName;
+  if (layoutName && project.hasLayoutNamed(layoutName)) {
+    return project.getLayout(layoutName);
+  }
+  return project.getLayoutsCount() > 0 ? project.getLayoutAt(0) : null;
+};
+
 const MainFrame = (props: Props): React.MixedElement => {
   const [state, setState]: [
     State,
@@ -592,6 +614,18 @@ const MainFrame = (props: Props): React.MixedElement => {
     [preferences, showConfirmation, setDiagnosticReportDialogOpen]
   );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
+  const [
+    debuggerPlaySpeed,
+    setDebuggerPlaySpeed,
+  ] = React.useState<DebuggerPlaySpeed>('normal');
+  const [
+    isWatchedVariablesPanelOpen,
+    setIsWatchedVariablesPanelOpen,
+  ] = React.useState<boolean>(false);
+  const toggleWatchedVariablesPanel = React.useCallback(
+    () => setIsWatchedVariablesPanelOpen(isOpen => !isOpen),
+    []
+  );
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const lastProjectSettingsPromise = React.useRef<?Promise<void>>(null);
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
@@ -621,6 +655,14 @@ const MainFrame = (props: Props): React.MixedElement => {
     clearInGameEditorExtensionErrors,
     hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
+  const eventsExecutionTrackingStore = React.useContext(
+    EventsExecutionTrackingContext
+  );
+  useEventsExecutionTracking({
+    previewDebuggerServer,
+    playSpeed: debuggerPlaySpeed,
+    isDebuggerOpened: !!getEditorTabOpenedWithKey(state.editorTabs, 'debugger'),
+  });
   const {
     ensureInteractionHappened,
     renderOpenConfirmDialog,
@@ -1206,6 +1248,11 @@ const MainFrame = (props: Props): React.MixedElement => {
     async (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
+      // The watched variables and the durations reported by the previews are
+      // those of this project: they mean nothing in the next one.
+      eventsExecutionTrackingStore.clearWatchedExpressions();
+      eventsExecutionTrackingStore.clear();
+      setIsWatchedVariablesPanelOpen(false);
 
       console.info('Closing project...');
       const previewLauncher = _previewLauncher.current;
@@ -1264,6 +1311,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewDebuggerServer,
       currentProjectRef,
       eventsFunctionsExtensionsState,
+      eventsExecutionTrackingStore,
       setHasProjectOpened,
       setState,
       sealUnsavedChanges,
@@ -1618,14 +1666,20 @@ const MainFrame = (props: Props): React.MixedElement => {
         if (error.name === 'CloudProjectReadingError') {
           setCloudProjectFileMetadataToRecover(fileMetadata);
         } else {
-          console.error('Failed to open the project:', error);
-          const errorMessage = getOpenErrorMessage
+          console.error(
+            `Failed to open the project "${fileMetadata.fileIdentifier}":`,
+            error
+          );
+          const errorMessageDescriptor = getOpenErrorMessage
             ? getOpenErrorMessage(error)
             : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;
+          const errorMessage = i18n._(errorMessageDescriptor);
 
           await showAlert({
             title: t`Unable to open the project`,
-            message: errorMessage,
+            message: t`Could not open "${
+              fileMetadata.fileIdentifier
+            }". ${errorMessage}`,
           });
           throw error;
         }
@@ -2797,6 +2851,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       forceDiagnosticReport,
       launchCaptureOptions,
       isForInGameEdition,
+      isForDebugger,
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
@@ -2912,9 +2967,23 @@ const MainFrame = (props: Props): React.MixedElement => {
           : createCaptureOptionsForPreview(launchCaptureOptions),
       ]);
 
+      // The executed instructions are only reported when the game is
+      // debugged: it is not slowed down otherwise. `isForDebugger` is
+      // given when the debugger is being opened, as the editor tabs are
+      // only updated on the next render.
+      const instrumentEventsExecution =
+        !isForInGameEdition &&
+        (!!isForDebugger ||
+          !!getEditorTabOpenedWithKey(state.editorTabs, 'debugger'));
+
       try {
         await Promise.all([
-          eventsFunctionsExtensionsState.ensureLoadFinished(),
+          // The extensions are compiled by the editor: their code must report
+          // the executed instructions like the scenes do.
+          eventsFunctionsExtensionsState.ensureEventsExecutionInstrumentation(
+            currentProject,
+            instrumentEventsExecution
+          ),
           // The preview will load all the resources of the project: ensure
           // the credentials to access them (if any) are still valid.
           ensureCanAccessResources(),
@@ -2959,6 +3028,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
           isForInGameEdition: !!isForInGameEdition,
           isForGameplayTest: false,
+          instrumentEventsExecution,
           editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
           editorCameraState3D: isForInGameEdition
             ? isForInGameEdition.editorCameraState3D
@@ -2974,6 +3044,11 @@ const MainFrame = (props: Props): React.MixedElement => {
 
           previewWindows,
         });
+        // The events sheets can show again what the game reports: its code
+        // was just generated from the events as they are now.
+        if (!isForInGameEdition) {
+          eventsExecutionTrackingStore.onEventsCodeGenerated();
+        }
 
         setPreviewLoading(null);
 
@@ -3026,6 +3101,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       authenticatedUser.profile,
       eventsFunctionsExtensionsState,
       ensureCanAccessResources,
+      eventsExecutionTrackingStore,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
       preferences.values.openDiagnosticReportAutomatically,
@@ -3049,6 +3125,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const launchNewPreview = React.useCallback(
     // $FlowFixMe[missing-local-annot]
     async options => {
+      const isForDebugger = options ? options.isForDebugger : false;
       const launchCaptureOptions =
         currentProject && !hasNonEditionPreviewsRunning
           ? // TODO Rename it getPreviewLaunchCaptureOptions
@@ -3062,6 +3139,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         networkPreview: false,
         numberOfWindows,
         launchCaptureOptions,
+        isForDebugger,
       });
     },
     [
@@ -3153,6 +3231,13 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     [hardReloadAllPreviews, launchPreview]
   );
+
+  const closeAllPreviews = React.useCallback(() => {
+    const previewLauncher = _previewLauncher.current;
+    if (previewLauncher && previewLauncher.closeAllPreviews) {
+      previewLauncher.closeAllPreviews();
+    }
+  }, []);
 
   const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = React.useMemo(
     () => ({
@@ -3439,11 +3524,34 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const launchDebuggerAndPreview = React.useCallback(
-    () => {
+    (options: ?LaunchDebuggerAndPreviewOptions) => {
       openDebugger();
-      launchNewPreview();
+      // The game plays at the speed asked for, or at the one already chosen.
+      // The options are checked as this is also used as a plain click handler.
+      if (options && typeof options.playSpeed === 'string') {
+        setDebuggerPlaySpeed(options.playSpeed);
+      }
+      launchNewPreview({ isForDebugger: true });
     },
-    [openDebugger, launchNewPreview]
+    [openDebugger, launchNewPreview, setDebuggerPlaySpeed]
+  );
+
+  const debuggerSession = React.useMemo(
+    () => ({
+      debuggerPlaySpeed,
+      setDebuggerPlaySpeed,
+      isWatchedVariablesPanelOpen,
+      onToggleWatchedVariablesPanel: toggleWatchedVariablesPanel,
+      onLaunchDebuggerAndPreview: launchDebuggerAndPreview,
+      onClosePreviews: closeAllPreviews,
+    }),
+    [
+      debuggerPlaySpeed,
+      isWatchedVariablesPanelOpen,
+      toggleWatchedVariablesPanel,
+      launchDebuggerAndPreview,
+      closeAllPreviews,
+    ]
   );
 
   const openInstructionOrExpression = (type: string) => {
@@ -6052,6 +6160,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     launchNewPreview: launchNewPreview,
     launchNetworkPreview: launchNetworkPreview,
     launchHotReloadPreview: launchHotReloadPreview,
+    closeAllPreviews: closeAllPreviews,
     launchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
     setPreviewOverride: setPreviewOverride,
     openVersionHistoryPanel: openVersionHistoryPanel,
@@ -6192,6 +6301,13 @@ const MainFrame = (props: Props): React.MixedElement => {
         previewDebuggerServer={previewDebuggerServer || null}
         onStopRequested={stopRunningProjectGameplayTest}
       />
+      {isWatchedVariablesPanelOpen && currentProject && (
+        <WatchedVariablesPanel
+          project={currentProject}
+          layout={getLayoutForWatchedVariables(currentProject, previewState)}
+          onClose={toggleWatchedVariablesPanel}
+        />
+      )}
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
@@ -6270,55 +6386,59 @@ const MainFrame = (props: Props): React.MixedElement => {
       {// Render games platform frame before the editors, so the editor have priority
       // in what to display (ex: Loader of play section)
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
-      <PoppedOutWindows
-        {...editorTabsPaneProps}
-        onClose={onExternalWindowClose}
-        onPopIn={onPopInTab}
-      />
-      {/* Editors of the main window register their commands in their own
-      command manager, so that they stay separated from the ones of the popped
-      out windows (rendered above, outside of this provider): a keyboard
-      shortcut must always run the command of the window where it was pressed. */}
-      <WindowCommandsProvider>
-        <LeaderboardProvider
-          gameId={currentProject ? currentProject.getProjectUuid() : ''}
-        >
-          {renderNpmScriptConfirmDialog()}
-          <PanesContainer
-            hasEditorsInLeftPane={hasEditorsInLeftPane}
-            hasEditorsInRightPane={hasEditorsInRightPane}
-            onRequestDrawerClose={requestCloseAskAiDrawerInPane}
-            renderPane={({
-              paneIdentifier,
-              isLeftMostPane,
-              isRightMostPane,
-              isDrawer,
-              areSidePanesDrawers,
-              onSetPointerEventsNone,
-              onSetPaneDrawerState,
-              onRequestPaneClose,
-              drawerState,
-              rightPaneDrawerOpen,
-            }) => (
-              <EditorTabsPane
-                {...editorTabsPaneProps}
-                paneIdentifier={paneIdentifier}
-                isLeftMostPane={isLeftMostPane}
-                isRightMostPane={isRightMostPane}
-                isDrawer={isDrawer}
-                areSidePanesDrawers={areSidePanesDrawers}
-                onSetPointerEventsNone={onSetPointerEventsNone}
-                onSetPaneDrawerState={onSetPaneDrawerState}
-                onPopOutTab={onPopOutTab}
-                onRequestPaneClose={onRequestPaneClose}
-                drawerState={drawerState}
-                rightPaneDrawerOpen={rightPaneDrawerOpen}
-              />
-            )}
-          />
-        </LeaderboardProvider>
-        <CommandPalette ref={commandPaletteRef} />
-      </WindowCommandsProvider>
+      {/* The debugger, in the main window or popped out, shares its session
+      (play speed, watched variables, previews) with the main frame. */}
+      <DebuggerSessionContext.Provider value={debuggerSession}>
+        <PoppedOutWindows
+          {...editorTabsPaneProps}
+          onClose={onExternalWindowClose}
+          onPopIn={onPopInTab}
+        />
+        {/* Editors of the main window register their commands in their own
+        command manager, so that they stay separated from the ones of the popped
+        out windows (rendered above, outside of this provider): a keyboard
+        shortcut must always run the command of the window where it was pressed. */}
+        <WindowCommandsProvider>
+          <LeaderboardProvider
+            gameId={currentProject ? currentProject.getProjectUuid() : ''}
+          >
+            {renderNpmScriptConfirmDialog()}
+            <PanesContainer
+              hasEditorsInLeftPane={hasEditorsInLeftPane}
+              hasEditorsInRightPane={hasEditorsInRightPane}
+              onRequestDrawerClose={requestCloseAskAiDrawerInPane}
+              renderPane={({
+                paneIdentifier,
+                isLeftMostPane,
+                isRightMostPane,
+                isDrawer,
+                areSidePanesDrawers,
+                onSetPointerEventsNone,
+                onSetPaneDrawerState,
+                onRequestPaneClose,
+                drawerState,
+                rightPaneDrawerOpen,
+              }) => (
+                <EditorTabsPane
+                  {...editorTabsPaneProps}
+                  paneIdentifier={paneIdentifier}
+                  isLeftMostPane={isLeftMostPane}
+                  isRightMostPane={isRightMostPane}
+                  isDrawer={isDrawer}
+                  areSidePanesDrawers={areSidePanesDrawers}
+                  onSetPointerEventsNone={onSetPointerEventsNone}
+                  onSetPaneDrawerState={onSetPaneDrawerState}
+                  onPopOutTab={onPopOutTab}
+                  onRequestPaneClose={onRequestPaneClose}
+                  drawerState={drawerState}
+                  rightPaneDrawerOpen={rightPaneDrawerOpen}
+                />
+              )}
+            />
+          </LeaderboardProvider>
+          <CommandPalette ref={commandPaletteRef} />
+        </WindowCommandsProvider>
+      </DebuggerSessionContext.Provider>
       <LoaderModal
         showImmediately={showLoaderImmediately}
         showAfterDelay={showLoaderAfterDelay}

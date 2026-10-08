@@ -20,6 +20,7 @@ export type PreviewAndShareButtonsProps = {|
   onHotReloadPreview: () => void,
   onNetworkPreview: () => Promise<void>,
   onHotReloadPreview: () => Promise<void>,
+  onClosePreviews: () => void,
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
   setPreviewOverride: ({|
     isPreviewOverriden: boolean,
@@ -40,6 +41,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     onNetworkPreview,
     onOpenDebugger,
     onHotReloadPreview,
+    onClosePreviews,
     onLaunchPreviewWithDiagnosticReport,
     canDoNetworkPreview,
     isPreviewEnabled,
@@ -110,6 +112,11 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
               },
             ],
           },
+          {
+            label: i18n._(t`Force kill previews`),
+            click: onClosePreviews,
+            enabled: hasPreviewsRunning,
+          },
           { type: 'separator' },
           ...(previewState.overridenPreviewLayoutName
             ? [
@@ -164,6 +171,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         canDoNetworkPreview,
         onOpenDebugger,
         onPreviewWithoutHotReload,
+        onClosePreviews,
         isPreviewEnabled,
         hasPreviewsRunning,
         isGameplayTestRunInProgress,

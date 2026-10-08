@@ -44,11 +44,13 @@ export type AlertMessageIdentifier =
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name';
+  | 'project-should-have-unique-package-name'
+  | 'debugger-slows-the-game-down';
 
 export type EditorMosaicName =
   | 'scene-editor'
   | 'debugger'
+  | 'debugger-inspector'
   | 'resources-editor'
   | 'events-functions-extension-editor'
   | 'gameplay-test-editor';
@@ -252,6 +254,8 @@ export type PreferencesValues = {|
   takeScreenshotOnPreview: boolean,
   gameplayTestFramePosition: {| left: number, bottom: number |} | null,
   gameplayTestFrameZoomFactor: number | null,
+  watchedVariablesPanelPosition: {| left: number, bottom: number |} | null,
+  watchedVariablesPanelSize: {| width: number, height: number |} | null,
   showAiAskButtonInTitleBar: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
   automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
@@ -259,6 +263,10 @@ export type PreferencesValues = {|
   disableNpmScriptConfirmation: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
+  /** Start recording in the debugger as soon as the game is launched or restarted. */
+  debuggerShouldRecordOnLaunch: boolean,
+  /** Forget what the debugger recorded when a new recording is started. */
+  debuggerShouldClearOnRecord: boolean,
 |};
 
 /**
@@ -385,6 +393,14 @@ export type Preferences = {|
     bottom: number,
   |}) => void,
   setGameplayTestFrameZoomFactor: (zoomFactor: number) => void,
+  setWatchedVariablesPanelPosition: (position: {|
+    left: number,
+    bottom: number,
+  |}) => void,
+  setWatchedVariablesPanelSize: (size: {|
+    width: number,
+    height: number,
+  |}) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
   setAutomaticallyApplyAiRequestEditsForProjectId: (
@@ -394,6 +410,8 @@ export type Preferences = {|
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
   setShowJsTypeError: (enabled: boolean) => void,
   setCanonicalEventSerialization: (enabled: boolean) => void,
+  setDebuggerShouldRecordOnLaunch: (enabled: boolean) => void,
+  setDebuggerShouldClearOnRecord: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -458,6 +476,8 @@ export const initialPreferences = {
     takeScreenshotOnPreview: true,
     gameplayTestFramePosition: null,
     gameplayTestFrameZoomFactor: null,
+    watchedVariablesPanelPosition: null,
+    watchedVariablesPanelSize: null,
     showAiAskButtonInTitleBar: true,
     automaticallyUseCreditsForAiRequests: false,
     automaticallyApplyAiRequestEditsByProjectId: {},
@@ -465,6 +485,8 @@ export const initialPreferences = {
     disableNpmScriptConfirmation: false,
     showJsTypeError: false,
     canonicalEventSerialization: false,
+    debuggerShouldRecordOnLaunch: false,
+    debuggerShouldClearOnRecord: true,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -554,6 +576,14 @@ export const initialPreferences = {
     bottom: number,
   |}) => {},
   setGameplayTestFrameZoomFactor: (zoomFactor: number) => {},
+  setWatchedVariablesPanelPosition: (position: {|
+    left: number,
+    bottom: number,
+  |}) => {},
+  setWatchedVariablesPanelSize: (size: {|
+    width: number,
+    height: number,
+  |}) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
   setAutomaticallyApplyAiRequestEditsForProjectId: (
@@ -563,6 +593,8 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
   setShowJsTypeError: (enabled: boolean) => {},
   setCanonicalEventSerialization: (enabled: boolean) => {},
+  setDebuggerShouldRecordOnLaunch: (enabled: boolean) => {},
+  setDebuggerShouldClearOnRecord: (enabled: boolean) => {},
 };
 
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(

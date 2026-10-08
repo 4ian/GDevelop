@@ -1,0 +1,24 @@
+/* Holds the mosaic of the inspector: the list and the inspected element. */
+.inspector {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* The mosaic of the debugger already moves up when the soft keyboard opens:
+   moving the inspector too would move it twice. */
+.inspector :global(.mosaic.avoid-soft-keyboard) {
+  transform: none;
+}
+
+/* The inspected element fills the pane: its tree scrolls, not the pane. */
+.inspectorDetailsContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  padding: 0 8px 8px 8px;
+}

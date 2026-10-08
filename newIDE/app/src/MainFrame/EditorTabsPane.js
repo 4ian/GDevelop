@@ -24,6 +24,7 @@ import {
   saveUiSettings,
 } from './EditorTabs/EditorTabsHandler';
 import { type PreviewState } from './PreviewState';
+import { type LaunchDebuggerAndPreviewOptions } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
@@ -133,10 +134,11 @@ export type EditorTabsPaneCommonProps = {|
     versionId: string
   ) => Promise<?ExpandedCloudProjectVersion>,
   openShareDialog: (tab?: ShareTab) => void,
-  launchDebuggerAndPreview: () => void,
+  launchDebuggerAndPreview: (?LaunchDebuggerAndPreviewOptions) => void,
   launchNewPreview: (?{ numberOfWindows: number }) => Promise<void>,
   launchNetworkPreview: () => Promise<void>,
   launchHotReloadPreview: () => Promise<void>,
+  closeAllPreviews: () => void,
   launchPreviewWithDiagnosticReport: () => Promise<void>,
   setPreviewOverride: (override: {|
     isPreviewOverriden: boolean,
@@ -384,6 +386,7 @@ const EditorTabsPane: React.ComponentType<{
     launchNewPreview,
     launchNetworkPreview,
     launchHotReloadPreview,
+    closeAllPreviews,
     launchPreviewWithDiagnosticReport,
     setPreviewOverride,
     openVersionHistoryPanel,
@@ -767,6 +770,7 @@ const EditorTabsPane: React.ComponentType<{
         onPreviewWithoutHotReload={launchNewPreview}
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}
+        onClosePreviews={closeAllPreviews}
         onLaunchPreviewWithDiagnosticReport={launchPreviewWithDiagnosticReport}
         canDoNetworkPreview={canDoNetworkPreview}
         setPreviewOverride={setPreviewOverride}

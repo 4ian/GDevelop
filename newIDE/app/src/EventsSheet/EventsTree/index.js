@@ -16,8 +16,14 @@ import {
   eventsTreeWithSearchResults,
   handle,
   aiGeneratedEventHandle,
+  executedEventHandle,
   icon,
 } from './ClassNames';
+import EventsExecutionTrackingContext, {
+  TrackedEventPtrContext,
+  useEventExecution,
+} from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
+import { formatExecutionDuration } from '../../EventsExecutionTracking/formatting';
 import {
   type SelectionState,
   type EventContext,
@@ -58,6 +64,7 @@ import { useLongTouch } from '../../Utils/UseLongTouch';
 import { useDragDropManager } from 'react-dnd';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import LiveExpressionValueTooltip from '../../EventsExecutionTracking/LiveExpressionValueTooltip';
 
 const gd: libGDevelop = global.gd;
 
@@ -249,6 +256,8 @@ const EventContainer = (props: EventsContainerProps) => {
   );
 
   const EventComponent = EventsRenderingService.getEventComponent(event);
+  // Set while a followed preview executes instructions of this event.
+  const eventExecution = useEventExecution(event.ptr);
 
   const eventType = event.getType();
   const coloredHandleStyle = (() => {
@@ -299,8 +308,14 @@ const EventContainer = (props: EventsContainerProps) => {
                       [aiGeneratedEventHandle]: highlightedAiGeneratedEventIds.has(
                         event.getAiGeneratedEventId()
                       ),
+                      [executedEventHandle]: !!eventExecution,
                     })}
                     style={coloredHandleStyle}
+                    title={
+                      eventExecution
+                        ? formatExecutionDuration(eventExecution.durationMs)
+                        : undefined
+                    }
                   />
                 )}
                 <div style={styles.container}>
@@ -357,7 +372,11 @@ const EventContainer = (props: EventsContainerProps) => {
             )}
           </div>
         );
-        return props.isDragged ? content : connectDropTarget(content);
+        return (
+          <TrackedEventPtrContext.Provider value={event.ptr}>
+            {props.isDragged ? content : connectDropTarget(content)}
+          </TrackedEventPtrContext.Provider>
+        );
       }}
     </EventDragSourceAndDropTarget>
   );
@@ -499,6 +518,7 @@ const EventsTree: React.ComponentType<{
   const forceUpdate = useForceUpdate();
 
   const _list = React.useRef<?any>(null);
+  const containerRef = React.useRef<?HTMLDivElement>(null);
   const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
 
   React.useLayoutEffect(
@@ -645,6 +665,25 @@ const EventsTree: React.ComponentType<{
   // so off-screen events keep their last known height instead of collapsing to
   // defaultEventHeight.
   const heightsByRowIndex = React.useRef<{ [number]: number }>({});
+
+  // The parent of every event shown, so that the store can sum what a group
+  // took from what its sub-events reported. Filled while the rows are built,
+  // and read by the store only.
+  const parentEventPtrs = React.useRef<Map<number, number>>(new Map());
+  const eventsExecutionTrackingStore = React.useContext(
+    EventsExecutionTrackingContext
+  );
+  React.useEffect(
+    () => {
+      const followedEventPtrs = parentEventPtrs.current;
+      eventsExecutionTrackingStore.registerEventsHierarchy(followedEventPtrs);
+      return () =>
+        eventsExecutionTrackingStore.unregisterEventsHierarchy(
+          followedEventPtrs
+        );
+    },
+    [eventsExecutionTrackingStore]
+  );
 
   const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
   const getEventRow = React.useCallback(
@@ -995,9 +1034,12 @@ const EventsTree: React.ComponentType<{
     depth: number = 0,
     parentDisabled: boolean = false,
     parentAbsolutePath: Array<number> = [],
-    parentRelativePath: ?Array<number> = null
+    parentRelativePath: ?Array<number> = null,
+    parentEventPtr: number | null = null
   ) => {
     treeData.length = 0;
+    // The pointers of the deleted events must not be kept: they are reused.
+    if (depth === 0) parentEventPtrs.current.clear();
     mapFor(0, eventsList.getEventsCount(), i => {
       const event = eventsList.getEventAt(i);
       flattenedList.push(event);
@@ -1015,6 +1057,9 @@ const EventsTree: React.ComponentType<{
         : parentProjectScopedContainersAccessor;
 
       eventPtrToRowIndex.current['' + event.ptr] = absoluteIndex;
+      if (parentEventPtr !== null) {
+        parentEventPtrs.current.set(event.ptr, parentEventPtr);
+      }
 
       const isValidElseEvent =
         event.getType() === 'BuiltinCommonInstructions::Else'
@@ -1032,7 +1077,8 @@ const EventsTree: React.ComponentType<{
         depth + 1,
         disabled,
         currentAbsolutePath,
-        currentRelativePath
+        currentRelativePath,
+        event.ptr
       );
 
       treeData.push({
@@ -1268,6 +1314,7 @@ const EventsTree: React.ComponentType<{
 
   return (
     <div
+      ref={containerRef}
       style={{
         ...styles.container,
         fontSize: `${zoomLevel}px`,
@@ -1314,6 +1361,11 @@ const EventsTree: React.ComponentType<{
           // errors in never-scrolled-to rows.
           scrollToAlignment: 'smart',
         }}
+      />
+      <LiveExpressionValueTooltip
+        containerRef={containerRef}
+        layout={props.scope.layout}
+        project={props.project}
       />
     </div>
   );

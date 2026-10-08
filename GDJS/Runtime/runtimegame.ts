@@ -233,9 +233,29 @@ namespace gdjs {
     _notifyScenesForGameResolutionResize: boolean = false;
 
     /**
+     * The profiler recording the frames of the running scenes, or null when
+     * not profiling. It belongs to the game (not to a scene) so that a
+     * recording survives scene changes.
+     */
+    _profiler: gdjs.Profiler | null = null;
+    _onProfilerStopped: ((stoppedProfiler: gdjs.Profiler) => void) | null =
+      null;
+
+    /** `performance.now()` (or `Date.now()`) when the game was created. */
+    _gameStartTime: float;
+
+    /**
      * When paused, the game won't step and will be freezed. Useful for debugging.
      */
     _paused: boolean = false;
+
+    /**
+     * Multiplier applied to the time elapsed between two frames before the
+     * game logic runs. Lower than 1 slows the game down (for debugging: the
+     * editor uses it to follow the execution of events). Unlike the time
+     * scale of a scene, it is not affected by the events of the game.
+     */
+    _gameSpeedFactor: float = 1;
 
     /**
      * True during the first frame the game is back from being hidden.
@@ -284,6 +304,7 @@ namespace gdjs {
      */
     constructor(data: ProjectData, options?: RuntimeGameOptions) {
       this._options = options || {};
+      this._gameStartTime = RuntimeGame._getTimeNow();
 
       this._isPreview = this._options.isPreview || false;
       if (this._isPreview) {
@@ -1403,10 +1424,20 @@ namespace gdjs {
             } else {
               // The game is not paused (and so, not edited): both the rendering
               // and game logic (a full "step") is executed.
-              if (!this._sceneStack.step(elapsedTime)) {
+              if (!this._sceneStack.step(elapsedTime * this._gameSpeedFactor)) {
                 return false; // Return if game asked to be stopped.
               }
               this._hasJustResumed = false;
+              if (gdjs.eventsExecutionTracker) {
+                if (this._paused) {
+                  // The game was paused by this frame (the "pause" action, for
+                  // example): report everything it executed right away, as no
+                  // other frame will come.
+                  gdjs.eventsExecutionTracker.flush();
+                } else {
+                  gdjs.eventsExecutionTracker.onFrameEnded();
+                }
+              }
             }
 
             this.getInputManager().onFrameEnded();
@@ -1438,6 +1469,8 @@ namespace gdjs {
      * @param removeCanvas If true, the canvas will be removed from the DOM.
      */
     dispose(removeCanvas?: boolean): void {
+      this.stopEventsExecutionTracking();
+      this.stopProfiler();
       if (this._inGameEditor) {
         this._inGameEditor.dispose();
       }
@@ -1685,32 +1718,244 @@ namespace gdjs {
       );
     }
 
+    private static _getTimeNow(): float {
+      return typeof performance !== 'undefined' &&
+        typeof performance.now === 'function'
+        ? performance.now()
+        : Date.now();
+    }
+
     /**
-     * Start a profiler for the currently running scene.
+     * The time elapsed since the game was created, in milliseconds. This is
+     * the common clock of everything the debugger reports (profiler frames,
+     * resources loading...).
+     */
+    getGameTimeMs(): float {
+      return RuntimeGame._getTimeNow() - this._gameStartTime;
+    }
+
+    /**
+     * Get the profiler recording the running scenes, or null if none.
+     */
+    getProfiler(): gdjs.Profiler | null {
+      return this._profiler;
+    }
+
+    /**
+     * Start recording the time spent in the sections of the engine and of the
+     * events, for every scene until `stopProfiler` is called (or the
+     * recording reaches its maximum duration).
+     *
+     * @returns false if a profiler was already running.
+     */
+    startProfiler(options: {
+      onChunk?: (chunk: gdjs.ProfilerChunk) => void;
+      onStopped?: (stoppedProfiler: gdjs.Profiler) => void;
+    }): boolean {
+      this._throwIfDisposed();
+      if (this._profiler) {
+        return false;
+      }
+      const profiler = new gdjs.Profiler(() => this.getGameTimeMs());
+      profiler.setOnChunk(options.onChunk || null);
+      profiler.setSampleProvider(() => this._samplePerformanceCounters());
+      profiler.setOnRecordingCapReached(() => {
+        if (this._profiler === profiler) {
+          this.stopProfiler();
+        }
+      });
+      const currentScene = this._sceneStack.getCurrentScene();
+      if (currentScene) {
+        profiler.setCurrentSceneName(currentScene.getName());
+      }
+      this._profiler = profiler;
+      this._onProfilerStopped = options.onStopped || null;
+      // The WebGL context and the filter system are wrapped only while
+      // recording: these are the measures of the panel that cost the game
+      // something.
+      this._renderer.startCountingDrawCalls();
+      this._renderer.startMeasuringFilters();
+      return true;
+    }
+
+    /**
+     * Stop the running profiler, sending the last recorded frames.
+     */
+    stopProfiler(): void {
+      const stoppedProfiler = this._profiler;
+      if (!stoppedProfiler) {
+        return;
+      }
+      const onProfilerStopped = this._onProfilerStopped;
+      this._profiler = null;
+      this._onProfilerStopped = null;
+      this._renderer.stopCountingDrawCalls();
+      this._renderer.stopMeasuringFilters();
+      stoppedProfiler.flushChunk();
+      stoppedProfiler.setOnChunk(null);
+      if (onProfilerStopped) {
+        onProfilerStopped(stoppedProfiler);
+      }
+    }
+
+    /**
+     * Read the memory and renderer counters put in the profiler samples.
+     */
+    private _samplePerformanceCounters(): gdjs.ProfilerPerformanceSampleSource {
+      const performanceMemory: {
+        usedJSHeapSize?: number;
+        jsHeapSizeLimit?: number;
+      } | null =
+        typeof performance !== 'undefined' && (performance as any).memory
+          ? (performance as any).memory
+          : null;
+      const threeRenderer = this._renderer.getThreeRenderer();
+      const rendererMemory = threeRenderer ? threeRenderer.info.memory : null;
+
+      // What the last frame rendered, straight from the renderer of the
+      // running scene. Null when no scene runs, rather than zero: nothing was
+      // measured, which is not the same as nothing being rendered.
+      const currentScene = this._sceneStack.getCurrentScene();
+      const sceneRenderer = currentScene ? currentScene.getRenderer() : null;
+      const layerMetrics =
+        sceneRenderer && sceneRenderer.getLayerRenderingMetrics
+          ? sceneRenderer.getLayerRenderingMetrics()
+          : null;
+
+      // PixiJS holds every texture it was given, and runs a garbage
+      // collector of its own: 300 managed textures for 12 sprites is the
+      // signature of a missing atlas.
+      const pixiRenderer: any = this._renderer.getPIXIRenderer();
+      const pixiTextureSystem =
+        pixiRenderer && pixiRenderer.texture ? pixiRenderer.texture : null;
+      const managedTextures =
+        pixiTextureSystem && pixiTextureSystem.managedTextures
+          ? pixiTextureSystem.managedTextures
+          : null;
+      const textureGarbageCollector =
+        pixiRenderer && pixiRenderer.textureGC ? pixiRenderer.textureGC : null;
+
+      return {
+        usedJSHeapBytes:
+          performanceMemory && performanceMemory.usedJSHeapSize !== undefined
+            ? performanceMemory.usedJSHeapSize
+            : null,
+        jsHeapSizeLimitBytes:
+          performanceMemory && performanceMemory.jsHeapSizeLimit !== undefined
+            ? performanceMemory.jsHeapSizeLimit
+            : null,
+        estimatedGpuMemoryBytes: this._resourcesLoader
+          .getImageManager()
+          .getEstimatedGpuMemoryBytes(),
+        texturesCount: rendererMemory ? rendererMemory.textures : null,
+        geometriesCount: rendererMemory ? rendererMemory.geometries : null,
+        // Summed by the profiler over the frames of the chunk, not here.
+        drawCalls3DPerFrame: null,
+        triangles3DPerFrame: null,
+        drawCalls2DPerFrame: null,
+        rendered2DLayersCount: layerMetrics
+          ? layerMetrics.rendered2DLayersCount
+          : null,
+        rendered3DLayersCount: layerMetrics
+          ? layerMetrics.rendered3DLayersCount
+          : null,
+        renderedObjectsCount: layerMetrics
+          ? layerMetrics.renderedObjectsCount
+          : null,
+        managedTexturesCount: managedTextures ? managedTextures.length : null,
+        textureGarbageCollectionsCount:
+          textureGarbageCollector &&
+          typeof textureGarbageCollector.count === 'number'
+            ? textureGarbageCollector.count
+            : null,
+      };
+    }
+
+    /**
+     * Start a profiler.
+     * @deprecated The profiler belongs to the game: use `startProfiler`.
      * @param onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
      */
     startCurrentSceneProfiler(
       onProfilerStopped: (oldProfiler: Profiler) => void
     ) {
-      this._throwIfDisposed();
-      const currentScene = this._sceneStack.getCurrentScene();
-      if (!currentScene) {
-        return false;
-      }
-      currentScene.startProfiler(onProfilerStopped);
-      return true;
+      return this.startProfiler({ onStopped: onProfilerStopped });
     }
 
     /**
-     * Stop the profiler for the currently running scene.
+     * Stop the profiler.
+     * @deprecated The profiler belongs to the game: use `stopProfiler`.
      */
     stopCurrentSceneProfiler() {
       this._throwIfDisposed();
-      const currentScene = this._sceneStack.getCurrentScene();
-      if (!currentScene) {
-        return;
+      this.stopProfiler();
+    }
+
+    /**
+     * The client connected to the debugger of the editor, or null when the
+     * game is not being debugged.
+     */
+    getDebuggerClient(): gdjs.AbstractDebuggerClient | null {
+      return this._debuggerClient;
+    }
+
+    /**
+     * Start reporting which instructions of the events are executed, and how
+     * long they take (previews only: the generated code of exported games
+     * does not track anything).
+     * @param onReport Called regularly with the instructions that ran.
+     */
+    startEventsExecutionTracking(
+      onReport: (output: EventsExecutionTrackerOutput) => void
+    ): void {
+      this._throwIfDisposed();
+      this.stopEventsExecutionTracking();
+      // Only included in the previews launched with a debugger.
+      if (typeof gdjs.EventsExecutionTracker !== 'function') return;
+      gdjs.eventsExecutionTracker = new gdjs.EventsExecutionTracker(onReport);
+    }
+
+    /**
+     * Stop reporting the execution of the events (see
+     * `startEventsExecutionTracking`). Does nothing if it was not started.
+     */
+    stopEventsExecutionTracking(): void {
+      if (!gdjs.eventsExecutionTracker) return;
+
+      gdjs.eventsExecutionTracker.flush();
+      gdjs.eventsExecutionTracker = null;
+    }
+
+    /**
+     * Advance the game of exactly one frame (as if it ran at 60 FPS) while it
+     * is paused, to follow frame by frame what the events do. Does nothing if
+     * the game is not paused.
+     */
+    stepOneFrame(): void {
+      this._throwIfDisposed();
+      if (!this._paused) return;
+
+      const frameDurationMs = 1000 / 60;
+      try {
+        this._sceneStack.step(frameDurationMs);
+        this.getInputManager().onFrameEnded();
+      } catch (error) {
+        logger.error('Error while stepping one frame of the game:', error);
       }
-      currentScene.stopProfiler();
+      // Report right away what this frame executed.
+      if (gdjs.eventsExecutionTracker) gdjs.eventsExecutionTracker.flush();
+    }
+
+    /**
+     * Set the multiplier applied to the time elapsed between two frames
+     * (see `_gameSpeedFactor`). 1 is the normal speed.
+     */
+    setGameSpeedFactor(gameSpeedFactor: float): void {
+      this._gameSpeedFactor = Math.max(0, gameSpeedFactor);
+    }
+
+    getGameSpeedFactor(): float {
+      return this._gameSpeedFactor;
     }
 
     /**

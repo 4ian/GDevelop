@@ -278,7 +278,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                           codeOutputDir,
                           includesFiles,
                           wholeProjectDiagnosticReport,
-                          true)) {
+                          true,
+                          options.instrumentEventsExecution)) {
       return false;
     }
     previousTime = LogTimeSpent("Events code export", previousTime);
@@ -1247,6 +1248,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
     InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
     InsertUnique(includesFiles, "debugger-client/InGameDebugger.js");
+    // Only what the debugger reads: never part of an exported game.
+    InsertUnique(includesFiles, "resource-load-tracker.js");
+    InsertUnique(includesFiles, "events-execution-tracker.js");
     // Gameplay tests can only be run when a debugger client is included
     // (i.e: during previews), as the test scripts are sent over the
     // debugger connection.
@@ -1359,7 +1363,8 @@ bool ExporterHelper::ExportScenesEventsCode(
     gd::String outputDir,
     std::vector<gd::String> &includesFiles,
     gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport,
-    bool exportForPreview) {
+    bool exportForPreview,
+    bool instrumentEventsExecution) {
   fs.MkDir(outputDir);
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
@@ -1371,6 +1376,8 @@ bool ExporterHelper::ExportScenesEventsCode(
         wholeProjectDiagnosticReport.AddNewDiagnosticReportForScene(
             layout.GetName());
     LayoutCodeGenerator layoutCodeGenerator(project);
+    layoutCodeGenerator.SetGenerateEventsExecutionTracking(
+        exportForPreview && instrumentEventsExecution);
     gd::String eventsOutput = layoutCodeGenerator.GenerateLayoutCompleteCode(
         layout, eventsIncludes, diagnosticReport, !exportForPreview);
     gd::String filename =

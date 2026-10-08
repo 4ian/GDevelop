@@ -289,7 +289,9 @@ export const useKeyboardShortcuts = ({
             name =>
               defaultSecondaryShortcuts[name] === shortcutData.shortcutString
           );
-        if (!commandName) return;
+        // The shortcut map (from the preferences) can name a command that
+        // does not exist anymore.
+        if (!commandName || !commandsList[commandName]) return;
 
         // On desktop app, ignore shortcuts that are handled by Electron,
         // unless ignoreHandledByElectron is set (for external windows where

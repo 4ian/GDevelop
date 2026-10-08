@@ -104,7 +104,8 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
                   ? GenerateDoStepPreEventsPreludeCode()
                   : "",
               includeFiles,
-              compilationForRuntime);
+              compilationForRuntime,
+              generateEventsExecutionTracking);
 
       // Compatibility with GD <= 5.0 beta 75
       if (functionName == "onOwnerRemovedFromScene") {

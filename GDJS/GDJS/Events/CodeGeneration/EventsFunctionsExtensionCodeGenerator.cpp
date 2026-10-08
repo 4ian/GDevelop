@@ -32,7 +32,8 @@ if (typeof CODE_NAMESPACE !== "undefined") {
                                                       eventsFunction,
                                                       codeNamespace,
                                                       includeFiles,
-                                                      compilationForRuntime);
+                                                      compilationForRuntime,
+                                                      generateEventsExecutionTracking);
 
   gd::String lifecycleRegistrationCode = "";
   lifecycleRegistrationCode +=

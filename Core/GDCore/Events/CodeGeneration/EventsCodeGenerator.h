@@ -316,6 +316,24 @@ class GD_CORE_API EventsCodeGenerator {
   }
 
   /**
+   * \brief Return true if the generated code must report the execution of
+   * the instructions to the editor (see
+   * GenerateInstructionExecutionTrackingBegin).
+   */
+  bool GenerateEventsExecutionTracking() const {
+    return generateEventsExecutionTracking;
+  }
+
+  /**
+   * \brief Set if the generated code must report the execution of the
+   * instructions to the editor. Off by default: the tracking has a cost, it is
+   * only enabled for the previews launched with the debugger.
+   */
+  void SetGenerateEventsExecutionTracking(bool enable) {
+    generateEventsExecutionTracking = enable;
+  }
+
+  /**
    * \brief Report that an error occurred during code generation ( Event code
    * won't be generated )
    */
@@ -448,6 +466,62 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateProfilerSectionEnd(const gd::String& section) {
     return "";
   };
+
+  /**
+   * \brief Return the identifier, as known by the editor, of the event from
+   * which the given (copied) event was generated - see
+   * gd::CloneRememberingOriginalEvent. Empty if unknown.
+   *
+   * Used to let the editor highlight the instructions executed by a preview.
+   */
+  static gd::String GetOriginalEventExecutionId(const gd::BaseEvent& event);
+
+  /**
+   * \brief Generate the code notifying that an instruction starts being
+   * executed, so that the editor can highlight it (nothing by default).
+   *
+   * \param instructionExecutionId The id built by GetInstructionExecutionId.
+   */
+  virtual gd::String GenerateInstructionExecutionTrackingBegin(
+      const gd::String& instructionExecutionId) {
+    return "";
+  };
+
+  /**
+   * \brief Generate the code notifying that an instruction was executed
+   * (nothing by default).
+   */
+  virtual gd::String GenerateInstructionExecutionTrackingEnd(
+      const gd::String& instructionExecutionId) {
+    return "";
+  };
+
+  /**
+   * \brief Return the id identifying, for the editor, an instruction of the
+   * event being generated (see GetOriginalEventExecutionId). Empty if the
+   * event is unknown.
+   */
+  gd::String GetInstructionExecutionId(bool isCondition,
+                                       std::size_t indexInList) const;
+
+  /**
+   * rief Stop tracking the executed instructions, until
+   * ResumeInstructionExecutionTracking is called with the returned value.
+   *
+   * Used for the lists the editor shows no execution for (the sub-instructions
+   * of "And" and "Not", the conditions of a "While"): their indexes would give
+   * the same ids as the conditions of the event, and overwrite them.
+   */
+  gd::String SuspendInstructionExecutionTracking() {
+    gd::String suspendedEventExecutionId = currentEventExecutionId;
+    currentEventExecutionId = "";
+    return suspendedEventExecutionId;
+  }
+
+  void ResumeInstructionExecutionTracking(
+      const gd::String& suspendedEventExecutionId) {
+    currentEventExecutionId = suspendedEventExecutionId;
+  }
 
   /**
    * \brief Get the namespace to be used to store code generated
@@ -859,6 +933,12 @@ class GD_CORE_API EventsCodeGenerator {
   bool errorOccurred;          ///< Must be set to true if an error occurred.
   bool compilationForRuntime;  ///< Is set to true if the code generation is
                                ///< made for runtime only.
+  bool generateEventsExecutionTracking;  ///< Is set to true to report the
+                                         ///< executed instructions to the
+                                         ///< editor (debugger).
+  gd::String currentEventExecutionId;  ///< Id, for the editor, of the event
+                                       ///< being generated (see
+                                       ///< GetOriginalEventExecutionId).
 
   std::set<gd::String>
       includeFiles;  ///< List of headers files used by instructions. A (shared)

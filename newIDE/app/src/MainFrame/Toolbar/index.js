@@ -160,6 +160,7 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                   onOpenDebugger={props.onOpenDebugger}
                   onNetworkPreview={props.onNetworkPreview}
                   onHotReloadPreview={props.onHotReloadPreview}
+                  onClosePreviews={props.onClosePreviews}
                   onLaunchPreviewWithDiagnosticReport={
                     props.onLaunchPreviewWithDiagnosticReport
                   }

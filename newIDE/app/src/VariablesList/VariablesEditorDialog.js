@@ -256,6 +256,9 @@ const VariablesEditorDialog = ({
       open={open}
       flexBody
       fullHeight
+      // The "watched variables" panel of the debugger stays usable while the
+      // variables are edited: both are used together.
+      allowInteractionWithFloatingPanels
       id={id}
       fixedContent={
         tabs.length > 1 ? (

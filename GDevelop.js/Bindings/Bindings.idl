@@ -4403,11 +4403,18 @@ ParticleEmitterObject implements ObjectConfiguration;
 [Prefix="gdjs::"]
 interface LayoutCodeGenerator {
     void LayoutCodeGenerator([Ref] Project project);
+    void SetGenerateEventsExecutionTracking(boolean enable);
+    void SetEvaluateForAllInstances(boolean enable);
     [Const, Value] DOMString GenerateLayoutCompleteCode(
         [Const, Ref] Layout layout,
         [Ref] SetString includes,
         [Ref] DiagnosticReport diagnosticReport,
         boolean compilationForRuntime);
+    [Const, Value] DOMString GenerateExpressionEvaluationCode(
+        [Const, Ref] Layout layout,
+        [Const] DOMString type,
+        [Const] DOMString expression,
+        [Const] DOMString objectName);
 };
 
 [Prefix="gdjs::"]
@@ -4420,6 +4427,7 @@ interface BehaviorCodeGenerator {
         [Const, Ref] MapStringString behaviorMethodMangledNames,
         [Ref] SetString includes,
         boolean compilationForRuntime);
+    void SetGenerateEventsExecutionTracking(boolean enable);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyToggleFunctionName([Const] DOMString propertyName);
@@ -4438,6 +4446,7 @@ interface ObjectCodeGenerator {
         [Const, Ref] MapStringString objectMethodMangledNames,
         [Ref] SetString includes,
         boolean compilationForRuntime);
+    void SetGenerateEventsExecutionTracking(boolean enable);
     [Const, Value] DOMString STATIC_GetObjectPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetObjectPropertySetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetObjectPropertyToggleFunctionName([Const] DOMString propertyName);
@@ -4447,6 +4456,7 @@ interface ObjectCodeGenerator {
 interface EventsFunctionsExtensionCodeGenerator {
     void EventsFunctionsExtensionCodeGenerator([Ref] Project project);
     [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunctionsExtension extension, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime);
+    void SetGenerateEventsExecutionTracking(boolean enable);
 };
 
 [Prefix="gdjs::"]
@@ -4470,6 +4480,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetNativeMobileApp(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
+    [Ref] PreviewExportOptions SetInstrumentEventsExecution(boolean enable);
     [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);
     [Ref] PreviewExportOptions SetInGameEditorSettingsJson([Const] DOMString inGameEditorSettingsJson);
     [Ref] PreviewExportOptions SetEditorId([Const] DOMString editorId);

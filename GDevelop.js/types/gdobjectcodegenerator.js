@@ -2,6 +2,7 @@
 declare class gdObjectCodeGenerator {
   constructor(project: gdProject): void;
   generateRuntimeObjectCompleteCode(eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, codeNamespace: string, objectMethodMangledNames: gdMapStringString, includes: gdSetString, compilationForRuntime: boolean): string;
+  setGenerateEventsExecutionTracking(enable: boolean): void;
   static getObjectPropertyGetterName(propertyName: string): string;
   static getObjectPropertySetterName(propertyName: string): string;
   static getObjectPropertyToggleFunctionName(propertyName: string): string;

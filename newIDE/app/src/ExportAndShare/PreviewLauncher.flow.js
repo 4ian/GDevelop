@@ -21,6 +21,11 @@ export type LaunchPreviewOptions = {
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
   numberOfWindows?: number,
+  /**
+   * Launched to be debugged: the debugging tools are all enabled on the game
+   * (the executed instructions are reported to the editor).
+   */
+  isForDebugger?: boolean,
   isForInGameEdition?: {|
     editorId: string,
     forcedSceneName: string | null,
@@ -61,6 +66,11 @@ export type PreviewOptions = {|
   },
   isForInGameEdition: boolean,
   isForGameplayTest: boolean,
+  /**
+   * Report the executed instructions to the editor (for the debugger). Has a
+   * cost: only when the debugger is opened.
+   */
+  instrumentEventsExecution: boolean,
   editorId: string,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
@@ -137,7 +147,17 @@ export interface PreviewDebuggerServer {
   getExistingEmbeddedGameFrameDebuggerIds(): Array<DebuggerId>;
   getExistingPreviewDebuggerIds(): Array<DebuggerId>;
   sendMessage(id: DebuggerId, message: Object): void;
-  sendMessageWithResponse(message: Object): Promise<Object>;
+  /**
+   * Send a message and wait for the answer carrying the same `messageId`.
+   * Sent to every debugger, or only to `debuggerId` when given.
+   * `timeoutMs` defaults to a second: give more to a game that has a lot to
+   * report (the state of the resources of a big project, for example).
+   */
+  sendMessageWithResponse(
+    message: Object,
+    debuggerId?: DebuggerId,
+    timeoutMs?: number
+  ): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
   unregisterEmbeddedGameFrame(window: WindowProxy): void;

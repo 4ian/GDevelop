@@ -135,6 +135,8 @@ import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
 import { isNullPtr } from '../Utils/IsNullPtr';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
+import EventsExecutionTrackingContext from '../EventsExecutionTracking/EventsExecutionTrackingContext';
+import { type EventsExecutionTrackingStore } from '../EventsExecutionTracking/EventsExecutionTrackingStore';
 
 const gd: libGDevelop = global.gd;
 
@@ -290,6 +292,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   ComponentProps,
   State
 > {
+  static contextType: React.Context<EventsExecutionTrackingStore> = EventsExecutionTrackingContext;
   _eventsTree: ?EventsTreeInterface;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanelInterface;
@@ -404,9 +407,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       this._addNewEvent
     );
 
-    if (this.state.eventsHistory !== prevState.eventsHistory)
+    if (this.state.eventsHistory !== prevState.eventsHistory) {
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
+      // What a running preview reports is about the events it was generated
+      // from: not shown anymore until it is launched or hot-reloaded again.
+      this.context.onEventsModified();
+    }
 
     // If the tab becomes active again, we ensure the dom is focused
     // allowing the keyboard shortcuts to work.

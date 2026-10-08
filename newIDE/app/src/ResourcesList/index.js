@@ -32,8 +32,13 @@ const styles = {
 };
 
 const getResourceName = (resource: gdResource) => resource.getName();
-export const getDefaultResourceThumbnail = (resource: gdResource): string => {
-  switch (resource.getKind()) {
+export const getDefaultResourceThumbnail = (resource: gdResource): string =>
+  getDefaultResourceThumbnailForKind(resource.getKind());
+
+export const getDefaultResourceThumbnailForKind = (kind: string): string => {
+  switch (kind) {
+    case 'image':
+      return 'res/actions/sprite24.png';
     case 'audio':
       return 'res/actions/music24.png';
     case 'json':

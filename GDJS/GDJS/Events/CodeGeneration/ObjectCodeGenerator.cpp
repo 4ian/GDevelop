@@ -87,7 +87,8 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
                       ? "gdjs.CustomRuntimeObject.prototype.onCreated.call(this);\n"
                       : "",
                   includeFiles,
-                  compilationForRuntime);
+                  compilationForRuntime,
+                  generateEventsExecutionTracking);
         }
 
         bool hasDoStepPreEventsFunction =

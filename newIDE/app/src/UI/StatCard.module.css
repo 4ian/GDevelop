@@ -1,0 +1,33 @@
+.statCard {
+  min-width: 0;
+  border-radius: 8px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--theme-primary-color);
+  outline-offset: 1px;
+}
+
+/* The label of the card and its info icon, on the same line. */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.help {
+  display: inline-flex;
+  align-items: center;
+  color: var(--theme-text-secondary-color);
+  cursor: help;
+  opacity: 0.7;
+}
+
+.help:hover {
+  opacity: 1;
+}

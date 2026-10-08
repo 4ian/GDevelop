@@ -300,7 +300,13 @@ export default class ExportLauncher extends Component<Props, State> {
           }
         : undefined;
 
-      await eventsFunctionsExtensionsState.ensureLoadFinished();
+      // An exported game never embeds the code following the execution of
+      // the events: the extensions are compiled again without it if the last
+      // preview had it.
+      await eventsFunctionsExtensionsState.ensureEventsExecutionInstrumentation(
+        project,
+        false
+      );
 
       const exportOutput = await exportPipeline.launchExport(
         exportPipelineContext,

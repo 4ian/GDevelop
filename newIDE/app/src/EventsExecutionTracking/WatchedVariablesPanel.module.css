@@ -1,0 +1,233 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  /* The list of variables scrolls on its own, filling the panel. */
+  height: 100%;
+  box-sizing: border-box;
+  padding: 4px 8px 8px 8px;
+  gap: 4px;
+  font-family: var(--gdevelop-classic-font-family);
+}
+
+.addRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* The search of the watched variables, above the row that adds one: the
+field takes the whole width of the panel. */
+.searchRow {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.searchRow > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The icon naming the scene selector, on the left of the row. It takes room
+from the left of the two fields: the column of the values gives it back. */
+.sceneIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  /* On the text of the field, not in the middle of the row: the field is
+  taller than its text, whose baseline sits just above its underline. */
+  align-self: flex-end;
+  padding-bottom: 1px;
+  /* Closer to the edge of the panel, and a bit of air between the icon and
+  the field it names. */
+  margin-left: -2px;
+  margin-right: 2px;
+  width: 18px;
+  font-size: 18px;
+  color: var(--theme-text-secondary-color);
+}
+
+.addRowField {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Flexbox row for better adaptation to TreeView indentation. */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  min-width: 0;
+  width: 100%;
+  position: relative;
+}
+
+/* No hover background here: the tree view already paints the whole row,
+arrow included, and a second one would show as a band inside the first. */
+
+.rowIcon {
+  flex-shrink: 0;
+  width: 18px;
+  font-size: 18px;
+  color: var(--theme-text-secondary-color);
+}
+
+/* Next to a value read on the first instance of several: the icon carries
+the meaning on its own, in the colour of the rest of the row. */
+.rowFirstInstance {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  /* Kept in the layout even when empty, so the type icon and the value of a
+  row without it start where those of the rows with it start. */
+  width: 22px;
+  justify-content: center;
+  font-size: 16px;
+  cursor: help;
+}
+
+/* The values of every row start at the same place, whatever the indentation
+of the name on the left: a column that can be read straight down. */
+.rowValueColumn {
+  /* Starts under the separation of the two fields of the row above, at half
+  the width of the panel. The percentage is read on the row, which the tree
+  view has already indented, so the indentation is added back here. The 26px
+  are the delete button on the right, minus half the gap of the fields. */
+  flex: 0 0 auto;
+  /* The scene icon and its gap push the separation of the two fields to the
+  right by half of what they take. */
+  width: calc(50% + var(--row-indent, 0px) / 2 - 26px + 10px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rowName {
+  flex: 0 1 auto;
+  min-width: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowType {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--theme-text-secondary-color);
+  opacity: 0.6;
+}
+
+/* A variable that does not exist (anymore) in the project or in the game. */
+.row.missing .rowName {
+  text-decoration: line-through 2px;
+  color: var(--theme-error-color);
+  opacity: 0.7;
+}
+
+.rowSeparator {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.rowValue,
+.rowValue p {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  color: var(--theme-text-secondary-color);
+}
+
+/* The delete button is always in the layout to avoid shifting, but invisible until hover. */
+
+.rowDelete {
+  flex-shrink: 0;
+  width: 28px;
+  visibility: hidden;
+}
+
+.row:hover .rowDelete,
+.rowDelete:focus-within {
+  visibility: visible;
+}
+
+.rowValue.error {
+  color: var(--theme-error-color);
+}
+
+/* The rows are virtualized: the list takes the height left by the panel. */
+.tree {
+  flex: 1;
+  min-height: 120px;
+  display: flex;
+  min-width: 0;
+  width: 100%;
+}
+
+/* Override TreeView styles so that .row takes the full width.
+   Use attribute selectors because CSS modules hash the class names. */
+.tree [class*='fullHeightFlexContainer'] {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding-right: 0 !important;
+}
+
+.tree [class*='rowContainer'] {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.tree [class*='fullSpaceContainer'] {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.tree [class*='rowContent'] {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.tree [class*='rowContentSide'] {
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0;
+  padding-right: 0 !important;
+}
+
+.tree [class*='itemTextContainer'] {
+  display: block !important;
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0;
+}
+
+.tree [class*='itemName'] {
+  display: flex !important;
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0;
+}
+
+/* The row fills the width left by the arrow of the tree view. */
+.tree .row {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Nothing watched yet: the hint and the help sit in the middle of the panel. */
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+}

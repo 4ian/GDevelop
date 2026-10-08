@@ -1,173 +1,174 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
-import RaisedButton from '../../UI/RaisedButton';
+import FlatButton from '../../UI/FlatButton';
 import MeasuresTable from './MeasuresTable';
-import { type ProfilerOutput } from '..';
+import FrameStrip from './FrameStrip';
+import FlameChart from './FlameChart';
 import EmptyMessage from '../../UI/EmptyMessage';
 import Background from '../../UI/Background';
 import ScrollView from '../../UI/ScrollView';
 import Text from '../../UI/Text';
+import { Line } from '../../UI/Grid';
+import { ColumnStackLayout } from '../../UI/Layout';
 import LinearProgress from '../../UI/LinearProgress';
-import StatusChip, { StatusDot } from '../../UI/StatusChip';
-import History from '../../UI/CustomSvgIcons/History';
+import { type DebuggerId } from '../../ExportAndShare/PreviewLauncher.flow';
+import { type ProfilerMeasuresSection } from '..';
+import {
+  ProfilerRecordingStore,
+  useProfilerRecording,
+  type ProfilerRecording,
+} from '../ProfilerRecording/ProfilerRecordingStore';
+import {
+  aggregateFramesToMeasures,
+  formatGameTime,
+  getFrameStats,
+  getFramesInRange,
+  getRecordingTimeBounds,
+  getTimelineMarkers,
+  getShownRange,
+} from '../ProfilerRecording/ProfilerRecordingAggregation';
+import StartRecordingPlaceholder from '../StartRecordingPlaceholder';
 import classes from './Profiler.module.css';
+import { formatMilliseconds } from '../../Utils/FormatMeasures';
+
+/** Above this share of the frame, `render` is worth saying something about. */
+const HEAVY_RENDER_SHARE = 0.5;
+/** Above this share of the render, one section is what to look at first. */
+const DOMINANT_SECTION_SHARE = 0.4;
 
 /**
- * Round to at most one decimal, without trailing ".0" on whole numbers.
+ * What the measures say to do, when they say something clear. Only the
+ * render is covered: it is the section that carries no meaning on its own,
+ * every other one being named after the events it runs.
  */
-const formatNumber = (value: number): string =>
-  Number.isFinite(value) ? (Math.round(value * 10) / 10).toLocaleString() : '—';
+const getRenderAdvice = (measures: ?ProfilerMeasuresSection): React.Node => {
+  if (!measures || !measures.time) return null;
+  const renderSection = measures.subsections['render'];
+  if (!renderSection || !renderSection.time) return null;
+  if (renderSection.time < measures.time * HEAVY_RENDER_SHARE) return null;
 
-type Stat = {|
-  label: React.Node,
-  value: React.Node,
-  /** Shown under the value when there is something worth saying. */
-  note?: React.Node,
-|};
-
-/**
- * The high level numbers of a profiler run, as cards for the summary.
- * Anything the engine did not measure (an older game, or a game that does not
- * render in 3D) is left out rather than shown as a zero.
- */
-const getStats = (profilerOutput: ProfilerOutput): Array<Stat> => {
-  const { stats, framesAverageMeasures } = profilerOutput;
-  const stat: Array<Stat> = [];
-
-  stat.push({
-    label: <Trans>Frames collected</Trans>,
-    value: formatNumber(stats.framesCount),
-  });
-
-  const averageFrameTime = framesAverageMeasures
-    ? framesAverageMeasures.time
-    : 0;
-  if (averageFrameTime) {
-    stat.push({
-      label: <Trans>Average frame</Trans>,
-      value: <Trans>{formatNumber(averageFrameTime)} ms</Trans>,
-      note: (
-        <Trans>{formatNumber(1000 / averageFrameTime)} frames per second</Trans>
-      ),
-    });
+  let heaviestName = null;
+  let heaviestTime = 0;
+  for (const name in renderSection.subsections) {
+    const subsection = renderSection.subsections[name];
+    if (subsection.time > heaviestTime) {
+      heaviestTime = subsection.time;
+      heaviestName = name;
+    }
   }
-
-  if (stats.averageDrawCallsCount != null) {
-    stat.push({
-      label: <Trans>3D draw calls</Trans>,
-      value: formatNumber(stats.averageDrawCallsCount),
-      note: <Trans>per frame, on average</Trans>,
-    });
-  }
-  if (stats.averageTrianglesCount != null) {
-    stat.push({
-      label: <Trans>3D triangles</Trans>,
-      value: formatNumber(stats.averageTrianglesCount),
-      note: <Trans>per frame, on average</Trans>,
-    });
-  }
-  if (stats.geometriesCount != null || stats.texturesCount != null) {
-    stat.push({
-      label: <Trans>3D geometries / textures</Trans>,
-      value: `${formatNumber(stats.geometriesCount || 0)} / ${formatNumber(
-        stats.texturesCount || 0
-      )}`,
-      note: <Trans>held by the renderer</Trans>,
-    });
-  }
-  if (stats.shaderProgramsCount != null) {
-    stat.push({
-      label: <Trans>Shader programs</Trans>,
-      value: formatNumber(stats.shaderProgramsCount),
-    });
-  }
-  if (stats.shaderProgramCompilationsCount != null) {
-    const compilations = stats.shaderProgramCompilationsCount;
-    stat.push({
-      label: <Trans>Shaders compiled during the run</Trans>,
-      value: formatNumber(compilations),
-      note: compilations ? (
-        <Trans>
-          on {formatNumber(stats.framesWithShaderCompilationCount || 0)} dropped
-          frame(s) - see the console for what differed
-        </Trans>
-      ) : (
-        <Trans>none, so no frame was spent compiling</Trans>
-      ),
-    });
-  }
-
-  return stat;
-};
-
-const renderStatusChip = (
-  profilerOutput: ?ProfilerOutput,
-  profilingInProgress: boolean
-) => {
-  if (profilingInProgress) {
+  const renderPercent = Math.round((renderSection.time / measures.time) * 100);
+  if (
+    !heaviestName ||
+    heaviestTime < renderSection.time * DOMINANT_SECTION_SHARE
+  ) {
     return (
-      <StatusChip tone="progress" loading label={<Trans>Profiling...</Trans>} />
+      <Trans>
+        Rendering takes {renderPercent}% of the frame, spread over its sections:
+        fewer objects on screen, or fewer layers, is what brings it down.
+      </Trans>
     );
   }
-  if (profilerOutput) {
-    return (
-      <StatusChip
-        tone="info"
-        icon={<History />}
-        label={<Trans>Last run</Trans>}
-      />
-    );
-  }
-  return <StatusChip icon={<StatusDot />} label={<Trans>Never run</Trans>} />;
+  const heaviestPercent = Math.round((heaviestTime / renderSection.time) * 100);
+  const heaviestSectionName = heaviestName;
+  return (
+    <Trans>
+      Rendering takes {renderPercent}% of the frame, and {heaviestPercent}% of
+      that goes into "{heaviestSectionName}": that is what to look at first.
+    </Trans>
+  );
 };
 
 type Props = {|
-  onStart: () => void,
-  onStop: () => void,
-  profilerOutput: ?ProfilerOutput,
   profilingInProgress: boolean,
+  recordingStore: ProfilerRecordingStore,
+  debuggerId: DebuggerId,
+  canRecord: boolean,
+  onStartRecording: () => void,
+  /** The recording this one is compared to, when one was pinned. */
+  baselineRecording?: ?ProfilerRecording,
 |};
 
+/**
+ * The timeline profiler: record for a while, then explore the frames (the
+ * strip), the sections of the selected frames (the flame chart) and their
+ * average over the selection (the table).
+ */
 const Profiler = ({
-  onStart,
-  onStop,
-  profilerOutput,
   profilingInProgress,
+  recordingStore,
+  debuggerId,
+  canRecord,
+  onStartRecording,
+  baselineRecording,
 }: Props): React.Node => {
-  // While a run is in progress, the numbers of the previous one are not shown:
-  // they would look like the ones being measured.
-  const shownProfilerOutput = profilingInProgress ? null : profilerOutput;
+  const recording = useProfilerRecording(recordingStore, debuggerId);
+  // The store appends to the recording in place: what changed is told by
+  // these counters, which the memos below depend on.
+  const framesCount = recording ? recording.frames.length : 0;
+  const startsCount = recording ? recording.startsAtGameTimeMs.length : 0;
+
+  const bounds = recording ? getRecordingTimeBounds(recording) : null;
+  const shownRange = recording ? getShownRange(recording) : null;
+  const framesInRange = React.useMemo(
+    () =>
+      recording && shownRange
+        ? getFramesInRange(recording.frames, shownRange)
+        : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recording, shownRange, framesCount]
+  );
+  const measures = React.useMemo(
+    () =>
+      recording
+        ? aggregateFramesToMeasures(recording.names, framesInRange)
+        : null,
+    [recording, framesInRange]
+  );
+  // The reference is averaged over its whole run: the selection of the
+  // current one has no meaning in a recording taken weeks earlier.
+  const baselineMeasures = React.useMemo(
+    () =>
+      baselineRecording
+        ? aggregateFramesToMeasures(
+            baselineRecording.names,
+            baselineRecording.frames
+          )
+        : null,
+    [baselineRecording]
+  );
+  // What to conclude, when there is something to conclude: a number nobody
+  // can act on is noise, and `render` at 75% was exactly that.
+  const renderAdvice = React.useMemo(() => getRenderAdvice(measures), [
+    measures,
+  ]);
+  const frameStats = React.useMemo(() => getFrameStats(framesInRange), [
+    framesInRange,
+  ]);
+  // Named in lower case: the identifier of the message is the sentence
+  // itself, so an interpolated value must read well inside it.
+  const rangeStart = shownRange ? formatGameTime(shownRange.fromMs) : '';
+  const rangeEnd = shownRange ? formatGameTime(shownRange.toMs) : '';
+  const shownFramesCount = frameStats.framesCount;
+  const averageDuration = formatMilliseconds(frameStats.averageMs);
+  const maxDuration = formatMilliseconds(frameStats.maxMs);
+  const slowFramesCount = frameStats.slowFramesCount;
+  const markers = React.useMemo(
+    () => (recording ? getTimelineMarkers(recording) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recording, framesCount, startsCount]
+  );
+
+  const hasFrames = !!recording && recording.frames.length > 0;
 
   return (
     <Background>
-      <div className={classes.header}>
-        {/* The panel is already titled "Profiler" by the window holding it. */}
-        {renderStatusChip(profilerOutput, profilingInProgress)}
-        {profilingInProgress ? (
-          <RaisedButton
-            label={<Trans>Stop profiling</Trans>}
-            onClick={onStop}
-          />
-        ) : (
-          <RaisedButton
-            label={
-              profilerOutput ? (
-                <Trans>Restart</Trans>
-              ) : (
-                <Trans>Start profiling</Trans>
-              )
-            }
-            onClick={onStart}
-            primary={!profilerOutput}
-          />
-        )}
-      </div>
       {profilingInProgress && (
-        <div className={classes.progressBar}>
+        <Line noMargin neverShrink>
           <LinearProgress style={{ height: 2 }} />
-        </div>
+        </Line>
       )}
       <ScrollView
         autoHideScrollbar
@@ -175,56 +176,94 @@ const Profiler = ({
         // is centered in the whole panel.
         style={{ display: 'flex', flexDirection: 'column' }}
       >
-        {shownProfilerOutput ? (
+        {recording && bounds && shownRange && hasFrames ? (
           <div className={classes.content}>
-            <div className={classes.section}>
-              <Text noMargin size="body-small" color="secondary">
-                <Trans>Summary</Trans>
-              </Text>
-              <div className={classes.statsGrid}>
-                {getStats(shownProfilerOutput).map((stat, index) => (
-                  <div className={classes.statCard} key={index}>
-                    <Text noMargin size="body-small" color="secondary">
-                      {stat.label}
-                    </Text>
-                    <Text
-                      noMargin
-                      size="block-title"
-                      style={{ fontVariantNumeric: 'tabular-nums' }}
-                    >
-                      {stat.value}
-                    </Text>
-                    {stat.note && (
-                      <Text noMargin size="body-small" color="secondary">
-                        {stat.note}
-                      </Text>
-                    )}
-                  </div>
-                ))}
+            <ColumnStackLayout noMargin noOverflowParent>
+              <I18n>
+                {({ i18n }) => (
+                  <FrameStrip
+                    frames={recording.frames}
+                    bounds={bounds}
+                    selectedRange={recording.selectedRange}
+                    onSelectRange={range =>
+                      recordingStore.setSelectedRange(debuggerId, range)
+                    }
+                    markers={markers}
+                    recordingStartLabel={i18n._(t`Record start`)}
+                  />
+                )}
+              </I18n>
+              <div className={classes.rangeSummary}>
+                <Text noMargin size="body-small" color="secondary">
+                  <Trans>
+                    {rangeStart} to {rangeEnd} ({shownFramesCount} frames) -
+                    average {averageDuration}, max {maxDuration},{' '}
+                    {slowFramesCount} slow frames
+                  </Trans>
+                </Text>
+                {recording.selectedRange && (
+                  <FlatButton
+                    label={<Trans>Select all</Trans>}
+                    onClick={() =>
+                      recordingStore.setSelectedRange(debuggerId, null)
+                    }
+                  />
+                )}
               </div>
-            </div>
-            <div className={classes.section}>
+              <FlameChart
+                frames={framesInRange}
+                names={recording.names}
+                range={shownRange}
+              />
+            </ColumnStackLayout>
+            <ColumnStackLayout noMargin noOverflowParent>
+              <Text noMargin size="body-small" color="secondary">
+                <Trans>
+                  Time spent in each section of a frame, averaged over the
+                  selection
+                </Trans>
+              </Text>
+              <MeasuresTable
+                profilerMeasures={measures}
+                baselineMeasures={baselineMeasures}
+              />
+              {renderAdvice && (
+                <Text noMargin size="body-small" color="secondary">
+                  {renderAdvice}
+                </Text>
+              )}
+            </ColumnStackLayout>
+          </div>
+        ) : recording && recording.legacyOutput && !profilingInProgress ? (
+          // A game engine too old to send frames: only the averages.
+          <div className={classes.content}>
+            <ColumnStackLayout noMargin noOverflowParent>
               <Text noMargin size="body-small" color="secondary">
                 <Trans>Time spent in each section of a frame</Trans>
               </Text>
               <MeasuresTable
-                profilerMeasures={shownProfilerOutput.framesAverageMeasures}
+                profilerMeasures={recording.legacyOutput.framesAverageMeasures}
               />
-            </div>
+            </ColumnStackLayout>
           </div>
-        ) : (
+        ) : profilingInProgress ? (
           <EmptyMessage>
-            {profilingInProgress ? (
-              <Trans>
-                Profiling: stop it after a few seconds to see the results.
-              </Trans>
-            ) : (
-              <Trans>
-                Start profiling and then stop it after a few seconds to see the
-                results.
-              </Trans>
-            )}
+            <Trans>
+              Recording: the frames appear as they are played. Stop when you
+              have enough to look at.
+            </Trans>
           </EmptyMessage>
+        ) : (
+          <StartRecordingPlaceholder
+            description={
+              <Trans>
+                Record while playing the game, then stop to explore what
+                happened in each frame.
+              </Trans>
+            }
+            canRecord={canRecord}
+            onStartRecording={onStartRecording}
+          />
         )}
       </ScrollView>
     </Background>

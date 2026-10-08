@@ -15,21 +15,13 @@ import {
   Area,
 } from 'recharts';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import { type GDevelopTheme } from '../UI/Theme';
-import Paper from '../UI/Paper';
-import { ColumnStackLayout } from '../UI/Layout';
-import Text from '../UI/Text';
+import { RechartsChartTooltip } from '../UI/ChartTooltip';
+import {
+  chartWidth,
+  defaultChartMargins as chartMargins,
+  getChartsStyleFromTheme,
+} from '../UI/ChartsStyle';
 import { durationValues, type ChartData } from './GameAnalyticsEvaluator';
-
-const chartMargins = {
-  top: 5,
-  bottom: 5,
-  right: 25,
-  left: 0,
-};
-// There is a known bug with recharts that causes the chart to not render if the width is 100%
-// in a flexbox component. check https://github.com/recharts/recharts/issues/172
-const chartWidth = '99%';
 
 const minutesFormatter = (value: number) => {
   return value.toFixed(2);
@@ -38,56 +30,6 @@ const minutesFormatter = (value: number) => {
 const percentFormatter = (value: number) => {
   return value.toFixed(2);
 };
-
-const getChartsStyleFromTheme = (gdevelopTheme: GDevelopTheme) => ({
-  tooltipContent: {
-    color: gdevelopTheme.chart.textColor,
-    padding: 10,
-  },
-  tickLabel: {
-    fontFamily: gdevelopTheme.chart.fontFamily,
-  },
-  chartLineDot: {
-    fill: gdevelopTheme.chart.dataColor1,
-    strokeWidth: 0,
-  },
-});
-
-const CustomTooltip = ({
-  payload,
-  label,
-  customStyle,
-  labelSuffix,
-}: {|
-  payload: ?Array<any>,
-  label: string,
-  customStyle: Object,
-  labelSuffix: ?string,
-|}) =>
-  payload ? (
-    <Paper style={customStyle} background="light">
-      <ColumnStackLayout>
-        <Text size="sub-title" noMargin>
-          {label} {labelSuffix ? labelSuffix : ''}
-        </Text>
-        {payload.length > 0 &&
-          payload.map(
-            (
-              {
-                name,
-                unit,
-                value,
-              }: {| name: string, unit: ?string, value: number |},
-              index
-            ) => (
-              <Text noMargin key={index}>{`${name}: ${
-                Number.isInteger(value) ? value.toString() : value.toFixed(2)
-              }${unit ? ` ${unit}` : ''}`}</Text>
-            )
-          )}
-      </ColumnStackLayout>
-    </Paper>
-  ) : null;
 
 type ChartProps = {|
   i18n: I18nType,
@@ -143,12 +85,9 @@ export const SessionsChart = ({
           tick={{ fontSize: fontSize === 'small' ? 12 : 16 }}
         />
         <Tooltip
-          content={props =>
-            CustomTooltip({
-              ...props,
-              customStyle: styles.tooltipContent,
-            })
-          }
+          content={props => (
+            <RechartsChartTooltip payload={props.payload} label={props.label} />
+          )}
         />
       </AreaChart>
     </ResponsiveContainer>
@@ -193,12 +132,9 @@ export const BounceRateChart = ({
           style={styles.tickLabel}
         />
         <Tooltip
-          content={props =>
-            CustomTooltip({
-              ...props,
-              customStyle: styles.tooltipContent,
-            })
-          }
+          content={props => (
+            <RechartsChartTooltip payload={props.payload} label={props.label} />
+          )}
         />
       </LineChart>
     </ResponsiveContainer>
@@ -243,12 +179,9 @@ export const MeanPlayTimeChart = ({
           style={styles.tickLabel}
         />
         <Tooltip
-          content={props =>
-            CustomTooltip({
-              ...props,
-              customStyle: styles.tooltipContent,
-            })
-          }
+          content={props => (
+            <RechartsChartTooltip payload={props.payload} label={props.label} />
+          )}
         />
       </LineChart>
     </ResponsiveContainer>
@@ -296,13 +229,13 @@ export const PlayersRepartitionPerDurationChart = ({
           strokeDasharray="3 3"
         />
         <Tooltip
-          content={props =>
-            CustomTooltip({
-              ...props,
-              customStyle: styles.tooltipContent,
-              labelSuffix: i18n._(t`minutes`),
-            })
-          }
+          content={props => (
+            <RechartsChartTooltip
+              payload={props.payload}
+              label={props.label}
+              labelSuffix={i18n._(t`minutes`)}
+            />
+          )}
         />
       </AreaChart>
     </ResponsiveContainer>
@@ -392,12 +325,9 @@ export const PlayersDurationPerDayChart = ({
           unit={'%'}
         />
         <Tooltip
-          content={props =>
-            CustomTooltip({
-              ...props,
-              customStyle: styles.tooltipContent,
-            })
-          }
+          content={props => (
+            <RechartsChartTooltip payload={props.payload} label={props.label} />
+          )}
         />
       </AreaChart>
     </ResponsiveContainer>

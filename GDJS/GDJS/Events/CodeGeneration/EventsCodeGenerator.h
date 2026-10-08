@@ -53,7 +53,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
                                        const gd::String& codeNamespace,
                                        std::set<gd::String>& includeFiles,
                                        gd::DiagnosticReport& diagnosticReport,
-                                       bool compilationForRuntime = false);
+                                       bool compilationForRuntime = false,
+                                       bool generateEventsExecutionTracking = false);
 
   /**
    * Generate JavaScript for executing events of an events based function.
@@ -66,6 +67,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param includeFiles Will be filled with the necessary include files.
    * \param compilationForRuntime Set this to true if the code is generated for
    * runtime.
+   * \param generateEventsExecutionTracking Set this to true to report the
+   * executed instructions to the editor (previews launched with the debugger).
    *
    * \return JavaScript code
    */
@@ -75,7 +78,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false);
+      bool compilationForRuntime = false,
+      bool generateEventsExecutionTracking = false);
 
   /**
    * Generate JavaScript for executing events of a events based behavior
@@ -92,6 +96,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param includeFiles Will be filled with the necessary include files.
    * \param compilationForRuntime Set this to true if the code
    * is generated for runtime.
+   * \param generateEventsExecutionTracking Set this to true to report the
+   * executed instructions to the editor (previews launched with the debugger).
    *
    * \return JavaScript code
    */
@@ -105,7 +111,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& onceTriggersVariable,
       const gd::String& preludeCode,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false);
+      bool compilationForRuntime = false,
+      bool generateEventsExecutionTracking = false);
 
   /**
    * Generate JavaScript for executing events of a events based object
@@ -126,6 +133,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param includeFiles Will be filled with the necessary include files.
    * \param compilationForRuntime Set this to true if the code
    * is generated for runtime.
+   * \param generateEventsExecutionTracking Set this to true to report the
+   * executed instructions to the editor (previews launched with the debugger).
    *
    * \return JavaScript code
    */
@@ -140,7 +149,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& preludeCode,
       const gd::String& endingCode,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false);
+      bool compilationForRuntime = false,
+      bool generateEventsExecutionTracking = false);
 
   /**
    * \brief Generate code for executing an event list
@@ -376,6 +386,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& section) override;
   virtual gd::String GenerateProfilerSectionEnd(
       const gd::String& section) override;
+  virtual gd::String GenerateInstructionExecutionTrackingBegin(
+      const gd::String& instructionExecutionId) override;
+  virtual gd::String GenerateInstructionExecutionTrackingEnd(
+      const gd::String& instructionExecutionId) override;
 
   virtual gd::String GenerateRelationalOperation(
       const gd::String& relationalOperator,
@@ -458,6 +472,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
   gd::String GenerateEventsFunctionReturn(
       const gd::EventsFunction& eventFunction);
+
+  // LayoutCodeGenerator generates expression evaluation code for the editor.
+  friend class LayoutCodeGenerator;
 
   /**
    * \brief Construct a code generator for the specified project and layout.

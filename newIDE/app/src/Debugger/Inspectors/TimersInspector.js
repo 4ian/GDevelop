@@ -1,44 +1,60 @@
 // @flow
 import * as React from 'react';
-import ReactJsonView from 'react-json-view';
+import InspectorTreeView, {
+  buildValueItems,
+  type InspectorItem,
+} from './InspectorTreeView';
 
 // This mirrors the internals of gdjs.Timer.
 type Timer = {| _name: string, _time: number, _paused: boolean |};
 // This mirrors the internals of Hashtable<gdjs.Timer>.
-type TimersHashtable = {|
+export type TimersHashtable = {|
   items: {
     [timerName: string]: Timer,
   },
 |};
 
-const transform = (timersHashtable: TimersHashtable) => {
-  if (!timersHashtable) return null;
-  return Object.entries(timersHashtable.items).map(
-    // $FlowFixMe[incompatible-type] - Object.entries does not infer well the type of the value.
-    ([timerName, timer]: [string, Timer]) => ({
-      'Timer name': timer._name,
+/** The timers, one folder each, named as in the events. */
+export const buildTimersItems = (
+  parentId: string,
+  timersHashtable: ?TimersHashtable
+): ?Array<InspectorItem> => {
+  if (
+    !timersHashtable ||
+    typeof timersHashtable !== 'object' ||
+    !timersHashtable.items ||
+    typeof timersHashtable.items !== 'object'
+  )
+    return null;
+  const timers = {};
+  Object.keys(timersHashtable.items).forEach(timerName => {
+    const timer = timersHashtable.items[timerName];
+    if (!timer || typeof timer !== 'object') {
+      // A placeholder left by the dump: shown as is rather than read.
+      timers[timerName] = timer;
+      return;
+    }
+    timers[timer._name || timerName] = {
       'Time (in seconds)': timer._time / 1000,
       'Is paused': timer._paused,
-    })
-  );
+    };
+  });
+  return buildValueItems(parentId, timers);
 };
 
 type Props = {|
   timers: ?TimersHashtable,
 |};
 
-const TimersInspector = (props: Props): React.Node => (
-  <ReactJsonView
-    collapsed={false}
-    name={false}
-    src={props.timers ? transform(props.timers) : null}
-    enableClipboard={false}
-    displayDataTypes={false}
-    displayObjectSize={false}
-    groupArraysAfterLength={50}
-    theme="monokai"
-    // TODO: Add possibility to edit a timer data
-  />
-);
+const TimersInspector = ({ timers }: Props): React.Node => {
+  const items = React.useMemo(() => buildTimersItems('timers', timers), [
+    timers,
+  ]);
+  return timers ? (
+    <InspectorTreeView items={items || []} />
+  ) : (
+    <InspectorTreeView src={null} />
+  );
+};
 
 export default TimersInspector;

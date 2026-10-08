@@ -3500,10 +3500,7 @@ namespace gdjs {
        * counts, and renderer/memory counters when available.
        */
       stopProfiling(): GameplayTestProfilingResult | null {
-        const currentScene = this._runtimeGame
-          .getSceneStack()
-          .getCurrentScene();
-        const profiler = currentScene ? currentScene.getProfiler() : null;
+        const profiler = this._runtimeGame.getProfiler();
         if (!profiler) return null;
         const framesAverageMeasures = profiler.getFramesAverageMeasures();
         const framesMaxMeasures = profiler.getFramesMaxMeasures();

@@ -1,7 +1,12 @@
 // @flow
 import * as React from 'react';
-import { List, ListItem } from '../UI/List';
-import get from 'lodash/get';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import classes from './InspectorsList.module.css';
+import { getAtInspectorPath } from './inspectorPath';
+import { type ReadOnlyTreeViewInterface } from '../UI/TreeView/ReadOnlyTreeView';
+import SearchableReadOnlyTreeView from '../UI/TreeView/SearchableReadOnlyTreeView';
 import {
   type InspectorDescription,
   type InspectorDescriptionsGetter,
@@ -11,75 +16,190 @@ import {
 type Props = {|
   gameData: GameData,
   getInspectorDescriptions: InspectorDescriptionsGetter,
+  selectedInspectorFullPath: Array<string>,
   onChooseInspector: (
     InspectorDescription,
     fullInspectorPath: Array<string>
   ) => void,
 |};
 
-const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-  },
-  list: {
-    overflowY: 'scroll',
-    flex: 1,
-  },
+/** A node of the tree: an inspector, with its data path in the game dump. */
+type InspectorTreeItem = {|
+  +isRoot?: boolean,
+  +isPlaceholder?: boolean,
+  id: string,
+  label: string,
+  description: InspectorDescription,
+  fullPath: Array<string>,
+  /** The data this inspector describes (used to compute its children). */
+  data: any,
+|};
+
+const ITEM_HEIGHT = 32;
+const getItemId = (item: InspectorTreeItem) => item.id;
+const getItemHeight = () => ITEM_HEIGHT;
+// The rows are rendered nodes, not texts: the search is done on the label.
+const getItemSearchedTexts = (item: InspectorTreeItem) => [item.label];
+
+/** The row: the icon of what it is, then its label. */
+const getItemName = (item: InspectorTreeItem) => (
+  <span className={classes.row}>
+    {item.description.icon && (
+      <span className={classes.rowIcon}>{item.description.icon}</span>
+    )}
+    <span className={classes.rowLabel} title={item.label}>
+      {item.label}
+    </span>
+  </span>
+);
+
+/**
+ * What a row shows: a name coming from the game, or a wording of the editor
+ * translated here, so that the label is searched and sorted as it is read.
+ */
+const getDescriptionLabel = (
+  i18n: I18nType,
+  description: InspectorDescription
+): string =>
+  description.translatableLabel
+    ? i18n._(description.translatableLabel)
+    : description.label || '';
+
+const buildItems = (
+  i18n: I18nType,
+  data: GameData,
+  getInspectorDescriptions: InspectorDescriptionsGetter,
+  parentPath: Array<string>
+): Array<InspectorTreeItem> =>
+  getInspectorDescriptions(data)
+    .filter(Boolean)
+    .map(description => {
+      const fullPath = parentPath.concat(description.key);
+      return {
+        id: fullPath.join('.'),
+        label: getDescriptionLabel(i18n, description),
+        description,
+        fullPath,
+        data: getAtInspectorPath(data, description.key),
+      };
+    });
+
+/**
+ * The content of the running game (scenes, objects, variables, layers...) as
+ * a tree, like the lists of the editors. Choosing an item shows its inspector.
+ */
+const InspectorsListContent = ({
+  i18n,
+  gameData,
+  getInspectorDescriptions,
+  selectedInspectorFullPath,
+  onChooseInspector,
+}: {|
+  ...Props,
+  i18n: I18nType,
+|}): React.Node => {
+  const items = React.useMemo(
+    () =>
+      gameData ? buildItems(i18n, gameData, getInspectorDescriptions, []) : [],
+    [i18n, gameData, getInspectorDescriptions]
+  );
+  // Children are computed once per item, for the whole dump (the cache is
+  // renewed with the items, when the dump changes).
+  const childrenCache = React.useMemo<Map<string, Array<InspectorTreeItem>>>(
+    () => new Map(),
+    [items] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const getItemChildren = React.useCallback(
+    (item: InspectorTreeItem): ?Array<InspectorTreeItem> => {
+      const getSubInspectors = item.description.getSubInspectors;
+      if (!getSubInspectors) return null;
+      let children = childrenCache.get(item.id);
+      if (!children) {
+        children = buildItems(i18n, item.data, getSubInspectors, item.fullPath);
+        childrenCache.set(item.id, children);
+      }
+      // An object without instance, a scene without variable: nothing to
+      // open, so the row is shown as a leaf rather than an empty folder.
+      return children.length ? children : null;
+    },
+    [i18n, childrenCache]
+  );
+
+  const initiallyOpenedNodeIds = React.useMemo(
+    () =>
+      items.filter(item => item.description.initiallyOpen).map(item => item.id),
+    [items]
+  );
+  const selectedId = selectedInspectorFullPath.join('.');
+  const selectedItems = React.useMemo(
+    () => {
+      const findItem = (
+        candidates: Array<InspectorTreeItem>
+      ): InspectorTreeItem | null => {
+        for (const candidate of candidates) {
+          if (candidate.id === selectedId) return candidate;
+          if (selectedId.startsWith(candidate.id + '.')) {
+            const children = getItemChildren(candidate);
+            const found: InspectorTreeItem | null = children
+              ? findItem(children)
+              : null;
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      const selectedItem = selectedId ? findItem(items) : null;
+      return selectedItem ? [selectedItem] : [];
+    },
+    [items, selectedId, getItemChildren]
+  );
+
+  const treeViewRef = React.useRef<?ReadOnlyTreeViewInterface<InspectorTreeItem>>(
+    null
+  );
+  // Clicking the row of a folder opens or closes it (not only its arrow).
+  const onClickItem = React.useCallback(
+    (item: InspectorTreeItem) => {
+      const treeView = treeViewRef.current;
+      if (!treeView || !getItemChildren(item)) return;
+      const [isOpen] = treeView.areItemsOpenFromId([item.id]);
+      if (isOpen) treeView.closeItems([item.id]);
+      else treeView.openItems([item.id]);
+    },
+    [getItemChildren]
+  );
+
+  // Never unmounted when the game data goes away: the tree would lose
+  // everything the user had opened, and get it back folded.
+  return (
+    <SearchableReadOnlyTreeView
+      ref={treeViewRef}
+      searchPlaceholder={t`Search an object, an instance...`}
+      getItemSearchedTexts={getItemSearchedTexts}
+      items={items}
+      estimatedItemSize={ITEM_HEIGHT}
+      getItemHeight={getItemHeight}
+      getItemName={getItemName}
+      getItemId={getItemId}
+      getItemChildren={getItemChildren}
+      selectedItems={selectedItems}
+      onClickItem={onClickItem}
+      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+      onSelectItems={(selectedTreeItems: Array<InspectorTreeItem>) => {
+        const item = selectedTreeItems[0];
+        if (item) onChooseInspector(item.description, item.fullPath);
+      }}
+      multiSelect={false}
+    />
+  );
 };
 
 /**
- * Generate a visual list of inspectors, using gameData and getInspectorDescriptions
+ * The tree needs the translations to build its rows: the labels are searched
+ * and shown as strings, not as React nodes.
  */
-export default class InspectorsList extends React.Component<Props, void> {
-  _renderInspectorList(
-    gameData: GameData,
-    getInspectorDescriptions: InspectorDescriptionsGetter,
-    path: Array<string>
-    // $FlowFixMe[prop-missing]
-  ): Array<React.Element<any> | null> {
-    return getInspectorDescriptions(gameData).map(inspectorDescription => {
-      if (!inspectorDescription) return null;
-      const fullInspectorPath = path.concat(inspectorDescription.key);
+const InspectorsList = (props: Props): React.Node => (
+  <I18n>{({ i18n }) => <InspectorsListContent {...props} i18n={i18n} />}</I18n>
+);
 
-      const getSubInspectors = inspectorDescription.getSubInspectors;
-
-      return (
-        <ListItem
-          key={fullInspectorPath.join('.')}
-          primaryText={inspectorDescription.label}
-          initiallyOpen={!!inspectorDescription.initiallyOpen}
-          onClick={() =>
-            this.props.onChooseInspector(
-              inspectorDescription,
-              fullInspectorPath
-            )
-          }
-          renderNestedItems={
-            getSubInspectors
-              ? () =>
-                  this._renderInspectorList(
-                    get(gameData, inspectorDescription.key, null),
-                    getSubInspectors,
-                    fullInspectorPath
-                  )
-              : undefined
-          }
-        />
-      );
-    });
-  }
-
-  render(): any {
-    return this.props.gameData ? (
-      // $FlowFixMe[incompatible-type]
-      <List style={styles.list}>
-        {this._renderInspectorList(
-          this.props.gameData,
-          this.props.getInspectorDescriptions,
-          []
-        )}
-      </List>
-    ) : null;
-  }
-}
+export default InspectorsList;

@@ -371,8 +371,12 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
          gd::EventsCodeGenerationContext &parentContext) {
         gd::String outputCode;
 
+        const gd::String suspendedEventExecutionId =
+            codeGenerator.SuspendInstructionExecutionTracking();
         outputCode += codeGenerator.GenerateConditionsListCode(
             instruction.GetSubInstructions(), parentContext);
+        codeGenerator.ResumeInstructionExecutionTracking(
+            suspendedEventExecutionId);
 
         outputCode += codeGenerator.GenerateUpperScopeBooleanFullName(
                           "isConditionTrue", parentContext) +
@@ -389,8 +393,12 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
          gd::EventsCodeGenerationContext &parentContext) {
         gd::String outputCode;
 
+        const gd::String suspendedEventExecutionId =
+            codeGenerator.SuspendInstructionExecutionTracking();
         outputCode += codeGenerator.GenerateConditionsListCode(
             instruction.GetSubInstructions(), parentContext);
+        codeGenerator.ResumeInstructionExecutionTracking(
+            suspendedEventExecutionId);
 
         outputCode += codeGenerator.GenerateUpperScopeBooleanFullName(
                           "isConditionTrue", parentContext) +
@@ -456,9 +464,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         }
 
         // Prepare codes
+        const gd::String suspendedEventExecutionId =
+            codeGenerator.SuspendInstructionExecutionTracking();
         gd::String whileConditionsStr =
             codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(),
                                                      context);
+        codeGenerator.ResumeInstructionExecutionTracking(
+            suspendedEventExecutionId);
         gd::String whileIfPredicate = "true";
         if (!event.GetWhileConditions().empty())
           whileIfPredicate =

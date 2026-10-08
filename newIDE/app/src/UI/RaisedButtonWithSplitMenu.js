@@ -34,7 +34,7 @@ const shouldNeverBeCalled = () => {
 };
 
 const styles = {
-  mainButton: { flex: 1 },
+  mainButton: { flex: 1, whiteSpace: 'nowrap' },
   arrowDropDownButton: {
     // Reduce the size forced by Material UI to avoid making the arrow
     // too big.

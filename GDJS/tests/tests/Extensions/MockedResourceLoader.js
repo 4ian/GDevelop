@@ -10,6 +10,7 @@
 gdjs.MockedResourceManager = class MockedResourceManager {
   loadResourcePromises = new Map();
   loadResourceCallbacks = new Map();
+  loadResourceRejectCallbacks = new Map();
   disposedResources = new Set();
   loadedResources = new Set();
   waitingForProcessing = new Set();
@@ -28,11 +29,41 @@ gdjs.MockedResourceManager = class MockedResourceManager {
       return existingPromise;
     }
 
-    const promise = new Promise((resolve) => {
+    const promise = new Promise((resolve, reject) => {
       this.loadResourceCallbacks.set(resourceName, resolve);
+      this.loadResourceRejectCallbacks.set(resourceName, reject);
     });
     this.loadResourcePromises.set(resourceName, promise);
     return promise;
+  }
+
+  /**
+   * Make the pending download of a resource fail (the loader will retry it).
+   * @param {string} resourceName
+   * @param {string} errorMessage
+   */
+  failPendingResource(resourceName, errorMessage) {
+    const rejectCallback = this.loadResourceRejectCallbacks.get(resourceName);
+    if (!rejectCallback) {
+      throw new Error(
+        `Resource ${resourceName} was not being loaded, so cannot be marked as failed.`
+      );
+    }
+    this.loadResourceCallbacks.delete(resourceName);
+    this.loadResourceRejectCallbacks.delete(resourceName);
+    this.loadResourcePromises.delete(resourceName);
+    rejectCallback(new Error(errorMessage));
+  }
+
+  /**
+   * Describe a ready resource for the debugger (see `gdjs.ResourceManager`).
+   * @param {string} resourceName
+   * @returns {gdjs.ResourceDebugMetrics | null}
+   */
+  getResourceDebugMetrics(resourceName) {
+    return this.readyResources.has(resourceName)
+      ? { estimatedMemoryBytes: 1024, extra: { mocked: true } }
+      : null;
   }
 
   async processResource(resourceName) {
@@ -57,6 +88,7 @@ gdjs.MockedResourceManager = class MockedResourceManager {
       this.loadedResources.add(resourceName);
       loadResourceCallback();
       this.loadResourceCallbacks.delete(resourceName);
+      this.loadResourceRejectCallbacks.delete(resourceName);
       this.loadResourcePromises.delete(resourceName);
     } else {
       throw new Error(
@@ -97,6 +129,8 @@ gdjs.MockedResourceManager = class MockedResourceManager {
   unloadResource(resource) {
     this.disposedResources.add(resource.name);
     this.loadedResources.delete(resource.name);
+    this.waitingForProcessing.delete(resource.name);
+    this.readyResources.delete(resource.name);
     this.loadResourceCallbacks.delete(resource.name);
     this.loadResourcePromises.delete(resource.name);
   }

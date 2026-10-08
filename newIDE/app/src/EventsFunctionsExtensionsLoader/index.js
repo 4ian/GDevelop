@@ -23,7 +23,16 @@ export type EventsFunctionCodeWriterCallbacks = {|
 type Options = {
   eventsFunctionCodeWriter: EventsFunctionCodeWriter,
   i18n: I18nType,
+  /**
+   * Generate the code reporting the executed instructions to the editor, for
+   * the previews launched with the debugger. Off by default: it has a cost.
+   */
+  instrumentEventsExecution?: boolean,
 };
+
+export type LoadProjectEventsFunctionsExtensionsOptions = {|
+  instrumentEventsExecution: boolean,
+|};
 
 type OptionsForGeneration = {
   ...Options,
@@ -41,7 +50,8 @@ type CodeGenerationContext = {|
 export const loadProjectEventsFunctionsExtensions = (
   project: gdProject,
   eventsFunctionCodeWriter: EventsFunctionCodeWriter,
-  i18n: I18nType
+  i18n: I18nType,
+  { instrumentEventsExecution }: LoadProjectEventsFunctionsExtensionsOptions
 ): Promise<Array<void>> => {
   return Promise.all(
     // First pass: generate extensions from the events functions extensions,
@@ -66,6 +76,7 @@ export const loadProjectEventsFunctionsExtensions = (
             skipCodeGeneration: false,
             eventsFunctionCodeWriter,
             i18n,
+            instrumentEventsExecution,
           }
         );
       })
@@ -354,6 +365,11 @@ const generateFreeFunction = (
       eventsFunction,
       codeGenerationContext.codeNamespacePrefix
     );
+    // Only for the previews launched with the debugger: an export compiles
+    // the extensions again without it (`ensureEventsExecutionInstrumentation`).
+    eventsFunctionsExtensionCodeGenerator.setGenerateEventsExecutionTracking(
+      !!options.instrumentEventsExecution
+    );
     let code;
     try {
       code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
@@ -478,6 +494,11 @@ function generateBehavior(
       );
       const includeFiles = new gd.SetString();
       const behaviorCodeGenerator = new gd.BehaviorCodeGenerator(project);
+      // Only for the previews launched with the debugger: an export compiles
+      // the extensions again without it (`ensureEventsExecutionInstrumentation`).
+      behaviorCodeGenerator.setGenerateEventsExecutionTracking(
+        !!options.instrumentEventsExecution
+      );
       const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
         eventsFunctionsExtension,
         eventsBasedBehavior,
@@ -581,6 +602,11 @@ function generateObject(
       );
       const includeFiles = new gd.SetString();
       const objectCodeGenerator = new gd.ObjectCodeGenerator(project);
+      // Only for the previews launched with the debugger: an export compiles
+      // the extensions again without it (`ensureEventsExecutionInstrumentation`).
+      objectCodeGenerator.setGenerateEventsExecutionTracking(
+        !!options.instrumentEventsExecution
+      );
       const code = objectCodeGenerator.generateRuntimeObjectCompleteCode(
         eventsFunctionsExtension,
         eventsBasedObject,

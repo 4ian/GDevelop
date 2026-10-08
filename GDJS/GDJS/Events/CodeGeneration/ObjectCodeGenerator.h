@@ -42,6 +42,14 @@ class ObjectCodeGenerator {
       bool compilationForRuntime = false);
 
   /**
+   * rief Also generate the code reporting the executed instructions to the
+   * debugger (only for the previews launched with the debugger).
+   */
+  void SetGenerateEventsExecutionTracking(bool enable) {
+    generateEventsExecutionTracking = enable;
+  }
+
+  /**
    * \brief Generate the name of the method to get the value of the property
    * of a object.
    */
@@ -113,6 +121,7 @@ class ObjectCodeGenerator {
       const gd::EventsBasedObject& eventsBasedObject);
 
   gd::Project& project;
+  bool generateEventsExecutionTracking = false;
 
   static gd::String onCreatedFunctionName;
   static gd::String doStepPreEventsFunctionName;

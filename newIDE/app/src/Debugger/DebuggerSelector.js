@@ -8,10 +8,18 @@ import {
   type DebuggerId,
   type DebuggerStatus,
 } from '../ExportAndShare/PreviewLauncher.flow';
+import { type DebuggerRecordingMetadata } from './Export/DebuggerRecordingFile';
 
 type Props = {|
   selectedId: DebuggerId,
   debuggerStatus: { [DebuggerId]: DebuggerStatus },
+  /** The games still running: the others were closed, their data is kept. */
+  connectedDebuggerIds: Array<DebuggerId>,
+  /**
+   * The recordings read from a file, named after the run they hold, not after
+   * the file (which the user may have renamed).
+   */
+  importedRecordings: { [DebuggerId]: DebuggerRecordingMetadata },
   onChooseDebugger: DebuggerId => void,
 |};
 
@@ -21,7 +29,9 @@ export default class DebuggerSelector extends React.Component<Props, void> {
     const debuggerIdsWithoutInGameEdition = debuggerIds.filter(
       id => !this.props.debuggerStatus[id].isInGameEdition
     );
-    const hasDebuggers = !!debuggerIdsWithoutInGameEdition.length;
+    const importedIds = Object.keys(this.props.importedRecordings);
+    const hasDebuggers =
+      !!debuggerIdsWithoutInGameEdition.length || !!importedIds.length;
     return (
       <I18n>
         {({ i18n }) => (
@@ -33,13 +43,29 @@ export default class DebuggerSelector extends React.Component<Props, void> {
           >
             {debuggerIdsWithoutInGameEdition.map(id => {
               const status = this.props.debuggerStatus[id];
-              const statusText = status.isPaused ? t`Paused` : t`Playing`;
+              const statusText = !this.props.connectedDebuggerIds.includes(id)
+                ? t`Closed`
+                : status.isPaused
+                ? t`Paused`
+                : t`Playing`;
 
               return (
                 <SelectOption
                   value={id}
                   key={id}
                   label={t`Game preview "${id}" (${i18n._(statusText)})`}
+                />
+              );
+            })}
+            {importedIds.map(id => {
+              const metadata = this.props.importedRecordings[id];
+              const projectName = metadata.projectName || i18n._(t`Recording`);
+              const date = (metadata.exportedAt || '').slice(0, 10);
+              return (
+                <SelectOption
+                  value={id}
+                  key={id}
+                  label={t`${projectName} - ${date} (imported)`}
                 />
               );
             })}

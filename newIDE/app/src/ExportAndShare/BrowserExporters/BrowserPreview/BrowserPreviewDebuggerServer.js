@@ -4,14 +4,18 @@ import {
   type PreviewDebuggerServer,
   type DebuggerId,
 } from '../../PreviewLauncher.flow';
+import {
+  makePreviewDebuggerServerSubscribers,
+  makePendingResponses,
+} from '../../PreviewDebuggerServerUtils';
 
 let debuggerServerState: 'started' | 'stopped' = 'stopped';
-const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
+const subscribers = makePreviewDebuggerServerSubscribers();
+const forEachCallbacks = subscribers.forEach;
 
 let nextDebuggerId = 0;
 
-const responseCallbacks = new Map<number, (value: Object) => void>();
-let nextMessageWithResponseId = 1;
+const pendingResponses = makePendingResponses();
 
 const existingPreviewWindows: {
   [DebuggerId]: WindowProxy,
@@ -63,7 +67,7 @@ const stopWindowClosedPolling = () => {
 };
 
 const notifyConnectionClosed = (id: DebuggerId) => {
-  callbacksList.forEach(({ onConnectionClosed }) =>
+  forEachCallbacks(({ onConnectionClosed }) =>
     onConnectionClosed({
       id,
       debuggerIds: getExistingDebuggerIds(),
@@ -118,12 +122,8 @@ class BrowserPreviewDebuggerServer {
 
       try {
         const parsedMessage = JSON.parse(event.data);
-        const answerCallback = responseCallbacks.get(parsedMessage.messageId);
-        if (answerCallback) {
-          answerCallback(parsedMessage);
-          responseCallbacks.delete(parsedMessage.messageId);
-        }
-        callbacksList.forEach(({ onHandleParsedMessage }) =>
+        pendingResponses.resolve(parsedMessage);
+        forEachCallbacks(({ onHandleParsedMessage }) =>
           onHandleParsedMessage({ id, parsedMessage })
         );
       } catch (error) {
@@ -136,7 +136,7 @@ class BrowserPreviewDebuggerServer {
 
     setupWindowClosedPolling();
 
-    callbacksList.forEach(({ onServerStateChanged }) => onServerStateChanged());
+    forEachCallbacks(({ onServerStateChanged }) => onServerStateChanged());
   }
   sendMessage(id: DebuggerId, message: Object) {
     const theWindow =
@@ -156,26 +156,17 @@ class BrowserPreviewDebuggerServer {
       );
     }
   }
-  sendMessageWithResponse(message: Object): Promise<Object> {
-    const messageId = nextMessageWithResponseId;
-    nextMessageWithResponseId++;
-    for (const id of getExistingDebuggerIds()) {
-      this.sendMessage(id, { ...message, messageId });
-    }
-
-    const timeout = 1000;
-    const promise = new Promise<Object>((resolve, reject) => {
-      responseCallbacks.set(messageId, resolve);
-      setTimeout(() => {
-        reject(
-          new Error(
-            `Timeout while waiting for response from the debugger(s) for message with id ${messageId}.`
-          )
-        );
-        responseCallbacks.delete(messageId);
-      }, timeout);
+  sendMessageWithResponse(
+    message: Object,
+    debuggerId?: DebuggerId,
+    timeoutMs?: number
+  ): Promise<Object> {
+    return pendingResponses.send({
+      message,
+      targetIds: debuggerId != null ? [debuggerId] : getExistingDebuggerIds(),
+      sendMessage: (id, messageWithId) => this.sendMessage(id, messageWithId),
+      timeoutMs,
     });
-    return promise;
   }
   getServerState(): 'started' | 'stopped' {
     return debuggerServerState;
@@ -190,12 +181,7 @@ class BrowserPreviewDebuggerServer {
     return getExistingPreviewDebuggerIds();
   }
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void {
-    callbacksList.push(callbacks);
-
-    return () => {
-      const callbacksIndex = callbacksList.indexOf(callbacks);
-      if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
-    };
+    return subscribers.register(callbacks);
   }
   registerEmbeddedGameFrame(window: WindowProxy) {
     if (window === embbededGameFrameWindow) return;
@@ -212,7 +198,7 @@ class BrowserPreviewDebuggerServer {
       'Registered the gameplay test frame window in the debugger server.'
     );
     gameplayTestFrameWindow = window;
-    callbacksList.forEach(({ onConnectionOpened }) =>
+    forEachCallbacks(({ onConnectionOpened }) =>
       onConnectionOpened({
         id: 'gameplay-test-frame',
         debuggerIds: getExistingDebuggerIds(),
@@ -283,7 +269,7 @@ class BrowserPreviewDebuggerServer {
       notifyConnectionClosed('gameplay-test-frame');
     }
 
-    responseCallbacks.clear();
+    pendingResponses.clear();
   }
 }
 export const browserPreviewDebuggerServer: PreviewDebuggerServer = new BrowserPreviewDebuggerServer();
@@ -307,7 +293,7 @@ export const registerNewPreviewWindow = (
   setupWindowClosedPolling();
 
   // Notify the debuggers that a new preview was opened.
-  callbacksList.forEach(({ onConnectionOpened }) =>
+  forEachCallbacks(({ onConnectionOpened }) =>
     onConnectionOpened({
       id,
       debuggerIds: getExistingDebuggerIds(),

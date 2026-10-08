@@ -1,0 +1,323 @@
+// @flow
+import { Trans } from '@lingui/macro';
+import * as React from 'react';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import Text from '../../UI/Text';
+import EmptyMessage from '../../UI/EmptyMessage';
+import {
+  type ProfilerFrame,
+  type ProfilerRecordingRange,
+} from '../ProfilerRecording/ProfilerRecordingStore';
+import { formatGameTime } from '../ProfilerRecording/ProfilerRecordingAggregation';
+import { useCanvasWithDevicePixelRatio } from '../useCanvasWithDevicePixelRatio';
+import { getReadableSectionColors } from '../themeColors';
+import { useTimelineViewport } from '../useTimelineViewport';
+import { ChartTooltip, FloatingChartTooltip } from '../../UI/ChartTooltip';
+import classes from './Profiler.module.css';
+import { formatMilliseconds } from '../../Utils/FormatMeasures';
+
+type Props = {|
+  frames: Array<ProfilerFrame>,
+  names: Array<string>,
+  range: ProfilerRecordingRange,
+|};
+
+/** Above this many frames, the chart would be unreadable: ask to zoom in. */
+export const MAX_FRAMES_IN_FLAME_CHART = 120;
+const RULER_HEIGHT = 18;
+const ROW_HEIGHT = 18;
+const MIN_TEXT_WIDTH_PX = 30;
+/** The narrowest view the wheel can zoom to. */
+const MIN_VIEW_SPAN_MS = 0.05;
+const TOOLTIP_MAX_WIDTH = 240;
+
+type HoveredSpan = {|
+  frame: ProfilerFrame,
+  spanIndex: number,
+  x: number,
+  y: number,
+|};
+
+/**
+ * The sections of the selected frames, drawn like the flame chart of a
+ * browser: time from left to right, nesting from top to bottom. Wheel to
+ * zoom, drag to pan, double click to see the whole selection again.
+ */
+const FlameChart = ({ frames, names, range }: Props): React.Node => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const {
+    containerRef,
+    canvasRef,
+    size,
+    getContext,
+    getLocalPosition,
+  } = useCanvasWithDevicePixelRatio();
+  const [view, setView] = React.useState<ProfilerRecordingRange>(range);
+  const [hoveredSpan, setHoveredSpan] = React.useState<?HoveredSpan>(null);
+  const {
+    viewSpanMs,
+    timeToX,
+    xToTime,
+    zoomAroundX,
+    startPan,
+    panTo,
+    endPan,
+  } = useTimelineViewport({
+    width: size.width,
+    bounds: range,
+    view,
+    onChangeView: setView,
+    minSpanMs: MIN_VIEW_SPAN_MS,
+  });
+
+  // Look at the whole selection whenever it changes.
+  React.useEffect(
+    () => {
+      setView(range);
+    },
+    [range.fromMs, range.toMs] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+  const maxDepth = React.useMemo(
+    () => {
+      let depth = 0;
+      for (const frame of frames) {
+        for (const spanDepth of frame.depths) {
+          if (spanDepth > depth) depth = spanDepth;
+        }
+      }
+      return depth;
+    },
+    [frames]
+  );
+
+  const isTooManyFrames = frames.length > MAX_FRAMES_IN_FLAME_CHART;
+
+  React.useEffect(
+    () => {
+      const context = getContext();
+      if (!context || isTooManyFrames) return;
+      const { width, height } = size;
+      const backgroundColor = gdevelopTheme.palette.alternateCanvasColor;
+      const textColor = gdevelopTheme.text.color.primary;
+      const secondaryTextColor = gdevelopTheme.text.color.secondary;
+
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = backgroundColor;
+      context.fillRect(0, 0, width, height);
+      context.font = `11px ${gdevelopTheme.chart.fontFamily}`;
+      context.textBaseline = 'middle';
+
+      // Frame boundaries and the ruler.
+      for (const frame of frames) {
+        const startX = timeToX(frame.frameStartTimeMs);
+        const endX = timeToX(frame.frameStartTimeMs + frame.frameDurationMs);
+        if (endX < 0 || startX > width) continue;
+        context.strokeStyle = secondaryTextColor;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(Math.floor(startX) + 0.5, 0);
+        context.lineTo(Math.floor(startX) + 0.5, height);
+        context.stroke();
+        if (endX - startX > 60) {
+          context.fillStyle = secondaryTextColor;
+          context.fillText(
+            `#${frame.frameIndex} ${formatMilliseconds(frame.frameDurationMs)}`,
+            startX + 4,
+            RULER_HEIGHT / 2,
+            endX - startX - 8
+          );
+        }
+      }
+
+      // The spans.
+      for (const frame of frames) {
+        for (let spanIndex = 0; spanIndex < frame.nameIds.length; spanIndex++) {
+          const spanStartMs =
+            frame.frameStartTimeMs + frame.startsMs[spanIndex];
+          const startX = timeToX(spanStartMs);
+          const spanWidth = (frame.durationsMs[spanIndex] / viewSpanMs) * width;
+          if (startX + spanWidth < 0 || startX > width || spanWidth < 0.3) {
+            continue;
+          }
+          const y = RULER_HEIGHT + frame.depths[spanIndex] * ROW_HEIGHT;
+          const name = names[frame.nameIds[spanIndex]] || '?';
+          const isHovered =
+            hoveredSpan &&
+            hoveredSpan.frame === frame &&
+            hoveredSpan.spanIndex === spanIndex;
+          const {
+            backgroundColor,
+            textColor: spanTextColor,
+          } = getReadableSectionColors(gdevelopTheme, name);
+          context.fillStyle = backgroundColor;
+          context.fillRect(
+            startX,
+            y + 1,
+            Math.max(0.5, spanWidth - 0.5),
+            ROW_HEIGHT - 2
+          );
+          if (isHovered) {
+            context.strokeStyle = textColor;
+            context.lineWidth = 1.5;
+            context.strokeRect(
+              startX,
+              y + 1,
+              Math.max(0.5, spanWidth - 0.5),
+              ROW_HEIGHT - 2
+            );
+          }
+          if (spanWidth > MIN_TEXT_WIDTH_PX) {
+            // Black or white, whichever reads on this span (WCAG 2.1 AAA).
+            context.fillStyle = spanTextColor;
+            context.fillText(
+              name,
+              Math.max(2, startX) + 3,
+              y + ROW_HEIGHT / 2,
+              Math.min(spanWidth, width - Math.max(0, startX)) - 6
+            );
+          }
+        }
+      }
+    },
+    [
+      frames,
+      names,
+      view,
+      viewSpanMs,
+      size,
+      hoveredSpan,
+      isTooManyFrames,
+      gdevelopTheme,
+      timeToX,
+      getContext,
+    ]
+  );
+
+  const findSpanAt = (x: number, y: number): ?HoveredSpan => {
+    if (y < RULER_HEIGHT) return null;
+    const depth = Math.floor((y - RULER_HEIGHT) / ROW_HEIGHT);
+    const timeMs = xToTime(x);
+    for (const frame of frames) {
+      if (
+        timeMs < frame.frameStartTimeMs ||
+        timeMs > frame.frameStartTimeMs + frame.frameDurationMs
+      ) {
+        continue;
+      }
+      const relativeMs = timeMs - frame.frameStartTimeMs;
+      for (
+        let spanIndex = frame.nameIds.length - 1;
+        spanIndex >= 0;
+        spanIndex--
+      ) {
+        if (
+          frame.depths[spanIndex] === depth &&
+          relativeMs >= frame.startsMs[spanIndex] &&
+          relativeMs <= frame.startsMs[spanIndex] + frame.durationsMs[spanIndex]
+        ) {
+          return { frame, spanIndex, x, y };
+        }
+      }
+    }
+    return null;
+  };
+
+  const onWheel = (event: SyntheticWheelEvent<HTMLDivElement>) => {
+    if (!size.width) return;
+    event.preventDefault();
+    zoomAroundX(getLocalPosition(event).x, event.deltaY);
+  };
+
+  const onMouseDown = (event: SyntheticMouseEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    startPan(getLocalPosition(event).x);
+  };
+
+  const onMouseMove = (event: SyntheticMouseEvent<HTMLDivElement>) => {
+    const { x, y } = getLocalPosition(event);
+    if (panTo(x)) {
+      setHoveredSpan(null);
+      return;
+    }
+    setHoveredSpan(findSpanAt(x, y));
+  };
+
+  if (isTooManyFrames) {
+    // Named in lower case: the identifier of the message is the sentence
+    // itself, and a constant in capitals would end up read by the user.
+    const selectedFramesCount = frames.length;
+    const maxFramesCount = MAX_FRAMES_IN_FLAME_CHART;
+    return (
+      <div className={classes.flameChart}>
+        <EmptyMessage>
+          <Trans>
+            {selectedFramesCount} frames are selected: select fewer frames (at
+            most {maxFramesCount}) on the strip above to see them in detail
+            here. The table below still covers the whole selection.
+          </Trans>
+        </EmptyMessage>
+      </div>
+    );
+  }
+
+  const chartHeight = RULER_HEIGHT + (maxDepth + 1) * ROW_HEIGHT + 4;
+  const hoveredName = hoveredSpan
+    ? names[hoveredSpan.frame.nameIds[hoveredSpan.spanIndex]] || '?'
+    : null;
+
+  return (
+    <div
+      ref={containerRef}
+      className={classes.flameChart}
+      style={{ height: Math.max(80, chartHeight) }}
+      onWheel={onWheel}
+      onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      onMouseUp={() => {
+        endPan();
+      }}
+      onMouseLeave={() => {
+        endPan();
+        setHoveredSpan(null);
+      }}
+      onDoubleClick={() => setView(range)}
+    >
+      <canvas ref={canvasRef} className={classes.canvas} />
+      {hoveredSpan && hoveredName != null && (
+        <FloatingChartTooltip
+          x={hoveredSpan.x}
+          y={hoveredSpan.y}
+          containerWidth={size.width}
+          containerHeight={size.height}
+          maxWidth={TOOLTIP_MAX_WIDTH}
+        >
+          <ChartTooltip
+            size="small"
+            title={hoveredName}
+            maxWidth={TOOLTIP_MAX_WIDTH}
+          >
+            <Text noMargin size="body-small" color="secondary">
+              {formatMilliseconds(
+                hoveredSpan.frame.durationsMs[hoveredSpan.spanIndex]
+              )}{' '}
+              (
+              {(
+                (hoveredSpan.frame.durationsMs[hoveredSpan.spanIndex] /
+                  Math.max(0.001, hoveredSpan.frame.frameDurationMs)) *
+                100
+              ).toFixed(1)}
+              % of frame #{hoveredSpan.frame.frameIndex}) at{' '}
+              {formatGameTime(
+                hoveredSpan.frame.frameStartTimeMs +
+                  hoveredSpan.frame.startsMs[hoveredSpan.spanIndex]
+              )}
+            </Text>
+          </ChartTooltip>
+        </FloatingChartTooltip>
+      )}
+    </div>
+  );
+};
+
+export default FlameChart;

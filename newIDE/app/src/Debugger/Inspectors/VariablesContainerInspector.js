@@ -1,141 +1,70 @@
 // @flow
 import * as React from 'react';
-import ReactJsonView from 'react-json-view';
+import {
+  getPlainVariables,
+  getVariablePathInGame,
+  type VariablesContainer,
+} from './variablesContainerData';
 import {
   type EditFunction,
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
-import {
-  transformVariablesContainer,
-  type DebuggerVariable as Variable,
-  type DebuggerVariablesContainer as VariablesContainer,
-} from './DebuggerVariable';
+import InspectorTreeView, {
+  buildValueItems,
+  type InspectorItem,
+} from './InspectorTreeView';
+
+export type { VariablesContainer };
 
 /**
- * Returns the list of properties to access the variable at the specified path in the specified variables container.
- * Also returns the variable already living there.
+ * The variables of a container, one row each (a folder for a collection).
+ *
+ * With `onCall`, their values can be edited: `setValue` is called on the
+ * variable in the game. `pathToContainer` is where the container is, from the
+ * element `onCall` is relative to (`['_variables']` for an instance).
  */
-const constructPathToVariable = (
-  editPath: Array<string>,
-  variablesContainer: VariablesContainer
-): {| path: ?Array<string>, variable: ?Variable |} => {
-  const variableInContainerName = editPath.shift();
-  const path = ['_variables', 'items', variableInContainerName];
-  // $FlowFixMe[incompatible-type]
-  let variable = variablesContainer._variables.items[variableInContainerName];
-  let skip = false;
+export const buildVariablesItems = (
+  parentId: string,
+  variablesContainer: ?VariablesContainer,
+  onCall?: ?CallFunction,
+  pathToContainer: Array<string> = []
+): ?Array<InspectorItem> => {
+  const variables = getPlainVariables(variablesContainer);
+  if (!variables) return null;
 
-  for (const variableName of editPath) {
-    // Skip every second key as it is the "value"
-    // key which is displayed only for better user
-    // experience but doesn't really exists
-    skip = !skip;
-    if (skip) continue;
-
-    // Walk down in the children of the collection.
-    if (variable._type === 'structure') {
-      path.push('_children', variableName);
-      variable = variable._children[variableName];
-    } else if (variable._type === 'array') {
-      path.push('_childrenArray', variableName);
-      variable = variable._childrenArray[parseInt(variableName, 10)];
-    }
-    // Bad path: abort.
-    else return { path: null, variable: null };
-  }
-
-  // $FlowFixMe[incompatible-type]
-  return { path, variable };
-};
-
-// $FlowFixMe[missing-local-annot]
-const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
-  if (!variablesContainer) return;
-
-  // Reconstruct the variable to edit from the path
-  const { path, variable } = constructPathToVariable(
-    edit.namespace,
-    variablesContainer
-  );
-  if (!path) {
-    console.error('Invalid path passed to the debugger: ', edit);
-    return false;
-  }
-  if (!variable) {
-    console.error("Variable doesn't exist: ", edit);
-    return false;
-  }
-
-  if (edit.name === 'type') {
-    path.push('castTo');
-    if (
-      edit.new_value === 'string' ||
-      edit.new_value === 'number' ||
-      edit.new_value === 'boolean' ||
-      edit.new_value === 'structure' ||
-      edit.new_value === 'array'
-    ) {
-      if (edit.new_value !== variable._type) onCall(path, [edit.new_value]);
-    } else {
-      console.error('Invalid type name: ' + edit.new_value);
-      return false;
-    }
-  } else if (edit.name === 'value') {
-    // Validate data type
-    if (variable._type === 'string' && typeof edit.new_value !== 'string')
-      edit.new_value = '' + edit.new_value;
-    else if (
-      variable._type === 'number' &&
-      typeof edit.new_value !== 'number'
-    ) {
-      edit.new_value = parseFloat(edit.new_value);
-      if (isNaN(edit.new_value)) {
-        console.error(`Cannot set variable of type number to NaN!`);
-        return false;
-      }
-    } else if (
-      variable._type === 'boolean' &&
-      typeof edit.new_value !== 'boolean'
-    )
-      edit.new_value =
-        typeof edit.new_value === 'string'
-          ? edit.new_value.toLowerCase() !== 'false' && edit.new_value !== '0'
-          : !!edit.new_value;
-    else if (variable._type === 'structure' || variable._type === 'array') {
-      console.error('Cannot set the value of a collection.');
-      return false;
-    }
-
-    path.push('setValue');
-    onCall(path, [edit.new_value]);
-  }
-
-  return true;
+  return buildValueItems(parentId, variables, {
+    editAt: onCall
+      ? (valuePath, newValue) => {
+          const variablePath = getVariablePathInGame(
+            variablesContainer,
+            valuePath
+          );
+          if (!variablePath) return;
+          onCall([...pathToContainer, ...variablePath, 'setValue'], [newValue]);
+        }
+      : null,
+  });
 };
 
 type Props = {|
   variablesContainer: ?VariablesContainer,
-  onCall: CallFunction,
-  onEdit: EditFunction,
+  onCall?: CallFunction,
+  onEdit?: EditFunction,
 |};
 
-const VariablesContainerInspector = (props: Props): React.Node => (
-  <ReactJsonView
-    collapsed={false}
-    name={false}
-    src={
-      props.variablesContainer
-        ? transformVariablesContainer(props.variablesContainer)
-        : null
-    }
-    enableClipboard={false}
-    displayDataTypes={false}
-    displayObjectSize={false}
-    onEdit={edit => handleEdit(edit, props)}
-    groupArraysAfterLength={50}
-    theme="monokai"
-    validationMessage="Invalid value"
-  />
-);
+const VariablesContainerInspector = ({
+  variablesContainer,
+  onCall,
+}: Props): React.Node => {
+  const items = React.useMemo(
+    () => buildVariablesItems('variables', variablesContainer, onCall),
+    [variablesContainer, onCall]
+  );
+  return variablesContainer ? (
+    <InspectorTreeView items={items || []} />
+  ) : (
+    <InspectorTreeView src={null} />
+  );
+};
 
 export default VariablesContainerInspector;

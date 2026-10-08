@@ -1,0 +1,7 @@
+/* A cell holding a number: aligned on the right, with digits of the same
+width, so that the numbers of a column can be compared at a glance. */
+.numberCell {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}

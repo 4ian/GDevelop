@@ -39,6 +39,40 @@
 }
 
 /**
+ * Events and instructions executed by a running preview
+ */
+.gd-events-sheet .executed-event-move-handle {
+  background: var(--event-sheet-events-highlighted-color);
+}
+
+.gd-events-sheet .executed-instruction {
+  background-color: var(--event-sheet-events-highlighted-background-color);
+  transition: background-color 250ms ease-out;
+}
+
+.gd-events-sheet .instruction-execution-time {
+  margin-left: 6px;
+  font-size: 0.85em;
+  opacity: 0.8;
+  color: var(--event-sheet-events-highlighted-color);
+  white-space: nowrap;
+}
+
+/* On the title bar of a group, whose background is a colour chosen by the
+user: the badge carries its own dark plate so that it stays readable on any
+of them, instead of borrowing the highlight colour of the theme. */
+.gd-events-sheet .group-execution-time {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.65em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+/**
  * Scaffolding lines on the left
  */
 .gd-events-sheet .rst__lineHalfHorizontalRight::before,

@@ -23,6 +23,15 @@ export type EventsFunctionsExtensionsState = {|
   getEventsFunctionsExtensionWriter: () => ?EventsFunctionsExtensionWriter,
   getEventsFunctionsExtensionOpener: () => ?EventsFunctionsExtensionOpener,
   ensureLoadFinished: () => Promise<void>,
+  /**
+   * Make sure the code of the extensions reports (or not) the executed
+   * instructions to the editor, reloading them if needed. Resolves once the
+   * extensions are ready.
+   */
+  ensureEventsExecutionInstrumentation: (
+    project: ?gdProject,
+    instrumentEventsExecution: boolean
+  ) => Promise<void>,
   getIncludeFileHashs: () => { [string]: number },
 |};
 
@@ -40,6 +49,8 @@ const defaultState = {
   getEventsFunctionsExtensionWriter: () => null,
   getEventsFunctionsExtensionOpener: () => null,
   ensureLoadFinished: () => Promise.reject(new Error('Use a provider')),
+  ensureEventsExecutionInstrumentation: () =>
+    Promise.reject(new Error('Use a provider')),
   getIncludeFileHashs: () => ({}),
 };
 

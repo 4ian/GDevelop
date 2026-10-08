@@ -14,12 +14,18 @@ import {
   icon,
   warningInstruction,
   readyToDrag,
+  executedInstruction,
+  instructionExecutionTime,
 } from './ClassNames';
+import { useInstructionExecution } from '../../EventsExecutionTracking/EventsExecutionTrackingContext';
+import { formatExecutionDuration } from '../../EventsExecutionTracking/formatting';
+import { getLiveExpressionAttributes } from '../../EventsExecutionTracking/LiveExpressionValueTooltip';
+import { getLastObjectParameterValue } from '../ParameterFields/ParameterMetadataTools';
 import {
   type InstructionsListContext,
   type InstructionContext,
 } from '../SelectionHandler';
-import InstructionsList from './InstructionsList';
+import { InstructionsListWithoutExecutionTracking } from './InstructionsList';
 import DropIndicator from './DropIndicator';
 import ParameterRenderingService from '../ParameterRenderingService';
 import InvalidParameterValue from './InvalidParameterValue';
@@ -70,6 +76,8 @@ type Props = {|
   platform: gdPlatform,
   instruction: gdInstruction,
   isCondition: boolean,
+  /** Position in the list of conditions or actions of the event. */
+  indexInList: number,
   onClick: Function,
   selected: boolean,
   disabled: boolean,
@@ -359,9 +367,33 @@ const Instruction = (props: Props): React.Node => {
             i18n,
           });
 
+          // Expressions and variables can show their value in the running
+          // preview when hovered.
+          const valueTypeMetadata = parameterMetadata.getValueTypeMetadata();
+          const canShowLiveValue =
+            expressionIsValid &&
+            !!scope.layout &&
+            (valueTypeMetadata.isNumber() ||
+              valueTypeMetadata.isString() ||
+              valueTypeMetadata.isVariable());
           return (
             <span
               key={i}
+              // Hovered, the value is shown by the tooltip of the events
+              // sheet (one for the whole sheet, not one per parameter).
+              {...(canShowLiveValue
+                ? getLiveExpressionAttributes({
+                    parameterType,
+                    expression: value,
+                    objectName: getLastObjectParameterValue({
+                      instructionMetadata: metadata,
+                      instruction,
+                      expressionMetadata: null,
+                      expression: null,
+                      parameterIndex,
+                    }),
+                  })
+                : null)}
               className={classNames({
                 [selectableArea]: true,
                 [instructionParameter]: true,
@@ -416,6 +448,12 @@ const Instruction = (props: Props): React.Node => {
       </span>
     );
   };
+
+  // Highlighted while a followed preview executes this instruction.
+  const instructionExecution = useInstructionExecution(
+    isCondition,
+    props.indexInList
+  );
 
   // Allow a long press to show the context menu
   const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
@@ -488,6 +526,7 @@ const Instruction = (props: Props): React.Node => {
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
                   [readyToDrag]: isReadyToDrag,
+                  [executedInstruction]: !!instructionExecution,
                   [warningInstruction]:
                     showDeprecatedInstructionWarning !== 'no' &&
                     (!isInstructionVisible(scope, metadata) ||
@@ -600,6 +639,11 @@ const Instruction = (props: Props): React.Node => {
                   }}
                 />
                 {renderInstructionText(metadata, i18n)}
+                {instructionExecution && (
+                  <span className={instructionExecutionTime}>
+                    {formatExecutionDuration(instructionExecution.durationMs)}
+                  </span>
+                )}
               </div>
             );
 
@@ -612,7 +656,7 @@ const Instruction = (props: Props): React.Node => {
                 {isOver && <DropIndicator canDrop={canDrop} />}
                 {instructionDragSourceDropTargetElement}
                 {metadata.canHaveSubInstructions() && (
-                  <InstructionsList
+                  <InstructionsListWithoutExecutionTracking
                     platform={props.platform}
                     style={
                       {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */

@@ -170,3 +170,28 @@
     transform: translate(0px, 0px);
   }
 }
+
+/* Rows whose content takes their whole width (see `fullWidthRows`), so that
+ * what a row renders can end with something aligned on the right. Kept after
+ * the other rules: they win over the widths and paddings above. */
+.fullWidthRows .fullHeightFlexContainer {
+  width: 100%;
+  box-sizing: border-box;
+}
+.fullWidthRows .rowContentSide {
+  flex: 1;
+  width: 100%;
+  padding-right: 0;
+}
+.fullWidthRows .itemTextContainer,
+.fullWidthRows .itemName {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+}
+.fullWidthRows .itemTextContainer {
+  display: block;
+}
+.fullWidthRows .itemName {
+  display: flex;
+}

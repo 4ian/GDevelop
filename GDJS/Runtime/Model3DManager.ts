@@ -305,6 +305,80 @@ namespace gdjs {
       return resourceKinds;
     }
 
+    /**
+     * Describe a loaded model for the debugger (see `ResourceManager`): the
+     * size of the downloaded file while it waits to be parsed, then the bytes
+     * of the geometries (and embedded textures) of the parsed model.
+     */
+    getResourceDebugMetrics(
+      resourceName: string
+    ): gdjs.ResourceDebugMetrics | null {
+      const downloadedArrayBuffer =
+        this._downloadedArrayBuffers.getFromName(resourceName);
+      const model = this._loadedThreeModels.getFromName(resourceName);
+      if (!model && !downloadedArrayBuffer) {
+        return null;
+      }
+      if (!model || model === this._invalidModel) {
+        return downloadedArrayBuffer
+          ? { estimatedMemoryBytes: downloadedArrayBuffer.byteLength }
+          : null;
+      }
+
+      let geometriesBytes = 0;
+      let texturesBytes = 0;
+      let meshesCount = 0;
+      const countedGeometries = new Set<THREE.BufferGeometry>();
+      const countedImages = new Set<unknown>();
+      model.scene.traverse((object3D) => {
+        const mesh = object3D as THREE.Mesh;
+        if (!mesh.isMesh) {
+          return;
+        }
+        meshesCount++;
+        const geometry = mesh.geometry;
+        if (geometry && !countedGeometries.has(geometry)) {
+          countedGeometries.add(geometry);
+          for (const attributeName in geometry.attributes) {
+            const attribute = geometry.attributes[attributeName] as {
+              array?: ArrayBufferView;
+            };
+            if (attribute.array) {
+              geometriesBytes += attribute.array.byteLength;
+            }
+          }
+          if (geometry.index && geometry.index.array) {
+            geometriesBytes += geometry.index.array.byteLength;
+          }
+        }
+        const materials = Array.isArray(mesh.material)
+          ? mesh.material
+          : [mesh.material];
+        for (const material of materials) {
+          const map = (material as { map?: THREE.Texture | null }).map;
+          const image = map ? map.image : null;
+          if (
+            image &&
+            image.width &&
+            image.height &&
+            !countedImages.has(image)
+          ) {
+            countedImages.add(image);
+            texturesBytes += image.width * image.height * 4;
+          }
+        }
+      });
+      return {
+        estimatedMemoryBytes: geometriesBytes + texturesBytes,
+        extra: {
+          meshesCount,
+          geometriesBytes,
+          texturesBytes,
+          animationsCount: model.animations.length,
+        },
+      };
+    }
+
     async processResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {

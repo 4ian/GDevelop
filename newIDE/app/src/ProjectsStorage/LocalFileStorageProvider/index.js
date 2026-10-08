@@ -47,9 +47,18 @@ export default ({
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;
 
-    return {
-      fileIdentifier: appArguments[POSITIONAL_ARGUMENTS_KEY][0],
-    };
+    const fileIdentifier = appArguments[POSITIONAL_ARGUMENTS_KEY][0];
+    // Ignore arguments that don't look like file paths (e.g., "app" from
+    // "electron app" in development mode).
+    if (
+      !fileIdentifier.includes('/') &&
+      !fileIdentifier.includes('\\') &&
+      !fileIdentifier.endsWith('.json')
+    ) {
+      return null;
+    }
+
+    return { fileIdentifier };
   },
   getProjectLocation: getProjectLocation,
   renderNewProjectSaveAsLocationChooser: renderNewProjectSaveAsLocationChooser,

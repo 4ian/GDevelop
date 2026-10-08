@@ -1026,6 +1026,161 @@ namespace gdjs {
     }
 
     /**
+     * The WebGL draw calls counted since the last read, or null when nobody
+     * asked to count them.
+     *
+     * PixiJS 7 has no draw call counter of its own at the renderer level (the
+     * `drawCalls` of the bundle belong to `GraphicsGeometry`, and the batch
+     * renderer is minified), so the drawing entry points of the WebGL context
+     * are wrapped, and only while a recording runs.
+     */
+    private _countedDrawCalls: integer | null = null;
+    /** The unwrapped functions, put back when the counting stops. */
+    private _originalDrawFunctions: Array<{
+      name: string;
+      originalFunction: Function;
+    }> | null = null;
+
+    private _getWebGLContext(): any {
+      const pixiRenderer: any = this._pixiRenderer;
+      return pixiRenderer && pixiRenderer.gl ? pixiRenderer.gl : null;
+    }
+
+    /**
+     * The profiler of the running recording, read by the wrapped functions
+     * below. Set by the renderer of the scene while it renders.
+     */
+    private _profilerForInstrumentation: gdjs.Profiler | null = null;
+    /** The unwrapped filter functions, put back when the counting stops. */
+    private _originalFilterFunctions: {
+      push: Function;
+      pop: Function;
+    } | null = null;
+
+    setProfilerForInstrumentation(profiler: gdjs.Profiler | null): void {
+      this._profilerForInstrumentation = profiler;
+    }
+
+    /**
+     * Count the draw calls made through the WebGL context, until
+     * `stopCountingDrawCalls` puts the context back as it was. Wrapping the
+     * context is not free, which is why it only ever happens while the user
+     * records.
+     */
+    startCountingDrawCalls(): void {
+      if (this._originalDrawFunctions) return;
+      const gl = this._getWebGLContext();
+      if (!gl) return;
+
+      this._countedDrawCalls = 0;
+      this._originalDrawFunctions = [];
+      const drawFunctionNames = [
+        'drawElements',
+        'drawArrays',
+        'drawElementsInstanced',
+        'drawArraysInstanced',
+      ];
+      for (const name of drawFunctionNames) {
+        const originalFunction = gl[name];
+        if (typeof originalFunction !== 'function') continue;
+        this._originalDrawFunctions.push({ name, originalFunction });
+        const renderer = this;
+        gl[name] = function (...args) {
+          if (renderer._countedDrawCalls !== null) renderer._countedDrawCalls++;
+          return originalFunction.apply(this, args);
+        };
+      }
+    }
+
+    /**
+     * Put the WebGL context back as it was. Anything that captured a wrapped
+     * function before this point would keep counting, which is why the
+     * wrapping is kept to the drawing entry points only.
+     */
+    stopCountingDrawCalls(): void {
+      const originalDrawFunctions = this._originalDrawFunctions;
+      if (!originalDrawFunctions) return;
+      const gl = this._getWebGLContext();
+      if (gl) {
+        for (const { name, originalFunction } of originalDrawFunctions) {
+          gl[name] = originalFunction;
+        }
+      }
+      this._originalDrawFunctions = null;
+      this._countedDrawCalls = null;
+    }
+
+    /**
+     * Measure what the filters of the layers cost, as a section of the
+     * profiler of their own.
+     *
+     * An effect on a layer makes PixiJS render it into a texture and run the
+     * filter passes over it, all inside the single render call of the scene:
+     * without this, one layer with a blur can dominate the frame and nothing
+     * says so. Only the inside of `push` and `pop` is measured, never what is
+     * drawn between them: that is the content of the layer, not the filter.
+     */
+    startMeasuringFilters(): void {
+      if (this._originalFilterFunctions) return;
+      const pixiRenderer: any = this._pixiRenderer;
+      const filterSystem = pixiRenderer ? pixiRenderer.filter : null;
+      if (
+        !filterSystem ||
+        typeof filterSystem.push !== 'function' ||
+        typeof filterSystem.pop !== 'function'
+      ) {
+        return;
+      }
+
+      const originalPush = filterSystem.push;
+      const originalPop = filterSystem.pop;
+      this._originalFilterFunctions = { push: originalPush, pop: originalPop };
+
+      const gameRenderer = this;
+      filterSystem.push = function (...args) {
+        const profiler = gameRenderer._profilerForInstrumentation;
+        if (!profiler) return originalPush.apply(this, args);
+        profiler.begin('filters');
+        try {
+          return originalPush.apply(this, args);
+        } finally {
+          profiler.end('filters');
+        }
+      };
+      filterSystem.pop = function (...args) {
+        const profiler = gameRenderer._profilerForInstrumentation;
+        if (!profiler) return originalPop.apply(this, args);
+        profiler.begin('filters');
+        try {
+          return originalPop.apply(this, args);
+        } finally {
+          profiler.end('filters');
+        }
+      };
+    }
+
+    stopMeasuringFilters(): void {
+      const originalFilterFunctions = this._originalFilterFunctions;
+      if (!originalFilterFunctions) return;
+      const pixiRenderer: any = this._pixiRenderer;
+      const filterSystem = pixiRenderer ? pixiRenderer.filter : null;
+      if (filterSystem) {
+        filterSystem.push = originalFilterFunctions.push;
+        filterSystem.pop = originalFilterFunctions.pop;
+      }
+      this._originalFilterFunctions = null;
+      this._profilerForInstrumentation = null;
+    }
+
+    /** The draw calls counted since the last read, and starts again from 0. */
+    takeCountedDrawCalls(): integer | null {
+      if (this._countedDrawCalls === null) return null;
+      const countedDrawCalls = this._countedDrawCalls;
+      this._countedDrawCalls = 0;
+      return countedDrawCalls;
+    }
+
+    /**
      * Get the Three.js renderer for the game - if any.
      */
     getThreeRenderer(): THREE.WebGLRenderer | null {

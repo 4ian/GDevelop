@@ -729,7 +729,16 @@ const PreferencesDialog = ({
             {
               id: 'debugger-layout',
               label: i18n._(t`Debugger layout`),
-              renderControl: () => renderResetLayoutButton('debugger'),
+              renderControl: () =>
+                renderResetButton(
+                  () => {
+                    setDefaultEditorMosaicNode('debugger', null);
+                    // The inspector of the debugger has its own layout.
+                    setDefaultEditorMosaicNode('debugger-inspector', null);
+                  },
+                  !getDefaultEditorMosaicNode('debugger') &&
+                    !getDefaultEditorMosaicNode('debugger-inspector')
+                ),
             },
             {
               id: 'resources-editor-layout',

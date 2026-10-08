@@ -35,6 +35,10 @@ export const dropIndicator = 'drop-indicator';
 export const cantDropIndicator = 'cant-drop-indicator';
 export const handle = 'move-handle';
 export const aiGeneratedEventHandle = 'ai-generated-event-move-handle';
+export const executedEventHandle = 'executed-event-move-handle';
+export const executedInstruction = 'executed-instruction';
+export const instructionExecutionTime = 'instruction-execution-time';
+export const groupExecutionTime = 'group-execution-time';
 
 export const linkContainer = 'link-container';
 

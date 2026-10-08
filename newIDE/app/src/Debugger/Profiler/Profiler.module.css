@@ -1,18 +1,3 @@
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  gap: 8px;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--theme-list-item-separator-color);
-}
-
-.progressBar {
-  display: flex;
-  flex-shrink: 0;
-}
-
 .content {
   display: flex;
   flex-direction: column;
@@ -23,67 +8,30 @@
   min-width: 0;
 }
 
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px;
-  min-width: 0;
-}
-
-.statCard {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background-color: var(--theme-surface-alternate-canvas-background-color);
-}
-
-/* The tree of the sections measured during a frame. */
+/* The tree of the sections measured during a frame (a `gd-table`, like the
+list of the instances). */
 
 .measuresTable {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   min-width: 0;
   border-radius: 8px;
   overflow: hidden;
-  font-family: var(--gdevelop-modern-font-family);
-  background-color: var(--theme-surface-alternate-canvas-background-color);
-}
-
-.row {
-  display: grid;
-  /* The name takes the remaining room, the numbers keep a stable width. */
-  grid-template-columns: minmax(0, 1fr) 64px 64px 64px;
-  align-items: center;
-  gap: 8px;
-  height: 28px;
-  padding: 0 12px 0 8px;
-  font-size: 13px;
-}
-
-.headerRow {
-  height: 30px;
-  font-size: 12px;
-  color: var(--theme-text-secondary-color);
-  border-bottom: 1px solid var(--theme-list-item-separator-color);
 }
 
 /* The share of the frame taken by a section is drawn as a bar filling the row
 from its left, so that the heaviest sections stand out while reading the tree.
-The share of the row is given by the `--profiler-share` variable. */
-.bodyRow {
+The share of the row is given by the `--profiler-share` variable. The bar ends
+on a full opacity vertical line: the fill alone is too faint to tell where a
+bar stops, especially on a screen looked at from afar. */
+.shareRow {
+  cursor: pointer;
   background-image: linear-gradient(
     to right,
     color-mix(in srgb, var(--theme-primary-light) 30%, transparent) 0
+      calc(var(--profiler-share) - 2px),
+    var(--theme-primary-light) calc(var(--profiler-share) - 2px)
       var(--profiler-share),
     transparent var(--profiler-share)
   );
@@ -94,16 +42,10 @@ The share of the row is given by the `--profiler-share` variable. */
   background-position: left center;
 }
 
-.bodyRow:nth-child(odd) {
-  background-color: color-mix(
-    in srgb,
-    var(--theme-text-default-color) 4%,
-    transparent
-  );
-}
-
-.bodyRow:hover {
-  background-color: var(--theme-list-item-hover-background-color);
+/* A section only one of the two runs has: still listed, so that a renamed
+group does not silently vanish from the comparison, but dimmed. */
+.oneSidedRow {
+  opacity: 0.55;
 }
 
 .nameCell {
@@ -121,12 +63,6 @@ The share of the row is given by the `--profiler-share` variable. */
 
 .rootRow .name {
   font-weight: bold;
-}
-
-.numberCell {
-  text-align: right;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
 }
 
 .toggle {
@@ -156,4 +92,48 @@ The share of the row is given by the `--profiler-share` variable. */
 .togglePlaceholder {
   flex-shrink: 0;
   width: 20px;
+}
+
+/* The timeline: the strip of frames, and the flame chart of the selection. */
+
+.frameStrip {
+  position: relative;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: crosshair;
+  user-select: none;
+  background-color: var(--theme-surface-alternate-canvas-background-color);
+}
+
+.flameChart {
+  position: relative;
+  min-height: 80px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  background-color: var(--theme-surface-alternate-canvas-background-color);
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.rangeSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* The tables of the debugger use the same font as the rest of its panels. */
+.measuresTable :global(.gd-table) {
+  font-family: var(--gdevelop-modern-font-family);
 }

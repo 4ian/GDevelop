@@ -1,0 +1,25 @@
+/* A row of the list: the icon of what it is, then its label. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rowIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--theme-text-secondary-color);
+}
+
+.rowIcon svg {
+  font-size: 16px;
+}
+
+.rowLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

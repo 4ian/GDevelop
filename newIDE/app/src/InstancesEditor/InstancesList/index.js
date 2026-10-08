@@ -236,7 +236,7 @@ class InstancesList extends Component<Props, State> {
     if (isRowVisible) {
       this.props.onFocusOnSelection();
     } else {
-      this.table.scrollToRow(rowIndex);
+      if (this.table) this.table.scrollToRow(rowIndex);
     }
   };
 

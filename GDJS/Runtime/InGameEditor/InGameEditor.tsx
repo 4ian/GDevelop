@@ -1199,7 +1199,7 @@ namespace gdjs {
         getTransformControlsMode: () => this._getTransformControlsMode(),
         setTransformControlsMode: (mode: 'translate' | 'rotate' | 'scale') =>
           this._setTransformControlsMode(mode),
-        focusOnSelection: () => this._focusOnSelection(),
+        focusOnSelection: () => this.focusOnSelection(),
         switchToFreeCamera: () => this._getEditorCamera().switchToFreeCamera(),
         switchToOrbitCamera: () =>
           this._getEditorCamera().switchToOrbitAroundZ0(4000),
@@ -2058,7 +2058,11 @@ namespace gdjs {
       this._visibleScreenArea = visibleScreenArea;
     }
 
-    private _focusOnSelection() {
+    /**
+     * Frame the selected objects in the visible screen area (the "F" shortcut
+     * of the editor).
+     */
+    focusOnSelection() {
       const selectedObjects = this._selection.getSelectedObjects();
       if (selectedObjects.length === 0) {
         return;
@@ -2083,7 +2087,7 @@ namespace gdjs {
           'IN_GAME_EDITOR_FOCUS_ON_SELECTION'
         )
       ) {
-        this._focusOnSelection();
+        this.focusOnSelection();
       }
 
       if (

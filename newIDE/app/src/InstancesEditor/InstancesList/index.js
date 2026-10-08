@@ -9,6 +9,8 @@ import {
 } from 'react-virtualized';
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
+import isUserTyping from '../../KeyboardShortcuts/IsUserTyping';
+import isDialogOpen from '../../UI/OpenedDialogChecker';
 import CompactSearchBar from '../../UI/CompactSearchBar';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
@@ -64,6 +66,7 @@ const styles = {
     overflowX: 'auto',
     overflowY: 'hidden',
     backgroundColor: 'var(--table-header-background-color)',
+    outline: 'none',
   },
 };
 
@@ -138,6 +141,7 @@ type Props = {|
   selectedInstances: Array<gdInitialInstance>,
   onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
   onInstancesModified: (Array<gdInitialInstance>) => void,
+  onFocusOnSelection: () => void,
 |};
 
 class InstancesList extends Component<Props, State> {
@@ -149,9 +153,13 @@ class InstancesList extends Component<Props, State> {
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
+  _visibleRowsStartIndex: number = 0;
+  _visibleRowsStopIndex: number = -1;
+  // Only listens to the keys pressed while the list has the focus.
   _keyboardShortcuts: KeyboardShortcuts = new KeyboardShortcuts({
-    isActive: () => false,
-    shortcutCallbacks: {},
+    shortcutCallbacks: {
+      onFocusOnSelection: () => this._focusOnLastSelectedInstance(),
+    },
   });
 
   // This should be updated, see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html.
@@ -194,6 +202,58 @@ class InstancesList extends Component<Props, State> {
       [this.renderedRows[index].instance],
       this._keyboardShortcuts.shouldMultiSelect()
     );
+  };
+
+  _onRowsRendered = ({
+    startIndex,
+    stopIndex,
+  }: {
+    startIndex: number,
+    stopIndex: number,
+  }) => {
+    this._visibleRowsStartIndex = startIndex;
+    this._visibleRowsStopIndex = stopIndex;
+  };
+
+  /**
+   * "F" first scrolls the list to the last selected instance, then, once its
+   * row is visible, focuses the view on the selection.
+   */
+  _focusOnLastSelectedInstance = () => {
+    const { selectedInstances } = this.props;
+    if (!this.table || selectedInstances.length === 0) return;
+
+    const lastSelectedInstance =
+      selectedInstances[selectedInstances.length - 1];
+    const rowIndex = this.renderedRows.findIndex(
+      renderedRow => renderedRow.instance.ptr === lastSelectedInstance.ptr
+    );
+    if (rowIndex === -1) return; // The instance is filtered out by the search.
+
+    const isRowVisible =
+      this._visibleRowsStartIndex <= rowIndex &&
+      rowIndex <= this._visibleRowsStopIndex;
+    if (isRowVisible) {
+      this.props.onFocusOnSelection();
+    } else {
+      this.table.scrollToRow(rowIndex);
+    }
+  };
+
+  // Like the game view, take the keyboard focus when hovered, so that the
+  // shortcuts apply to the list without having to click on it first.
+  _focusOnHover = (event: SyntheticMouseEvent<HTMLDivElement>) => {
+    const tableContainer = event.currentTarget;
+    const { ownerDocument } = tableContainer;
+    if (
+      tableContainer.contains(ownerDocument.activeElement) ||
+      isUserTyping(ownerDocument) ||
+      isDialogOpen(ownerDocument)
+    ) {
+      return;
+    }
+
+    tableContainer.focus();
   };
 
   _rowGetter = ({ index }: {| index: number |}): RenderedRowInfo => {
@@ -374,6 +434,8 @@ class InstancesList extends Component<Props, State> {
         </Line>
         <div
           style={styles.tableContainer}
+          tabIndex={-1}
+          onMouseOver={this._focusOnHover}
           onKeyDown={this._keyboardShortcuts.onKeyDown}
           onKeyUp={this._keyboardShortcuts.onKeyUp}
         >
@@ -393,6 +455,7 @@ class InstancesList extends Component<Props, State> {
                 rowGetter={this._rowGetter}
                 rowHeight={32}
                 onRowClick={this._onRowClick}
+                onRowsRendered={this._onRowsRendered}
                 rowClassName={this._rowClassName}
                 sort={this._sort}
                 sortBy={sortBy}

@@ -463,7 +463,7 @@ describe('finding surfaces with the in-game editor', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toBe(
-        '`surface_beneath.grid` must be an integer from 2 to 16 (got 40).'
+        '`surface_beneath.grid` must be an integer from 2 to 32 (got 40).'
       );
     });
   });

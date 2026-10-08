@@ -4335,9 +4335,9 @@ const describeInstances: EditorFunction = {
     const grid = surfaceOptions
       ? SafeExtractor.extractNumberProperty(args.surface_beneath, 'grid')
       : null;
-    if (grid !== null && !(Number.isInteger(grid) && grid >= 2 && grid <= 16))
+    if (grid !== null && !(Number.isInteger(grid) && grid >= 2 && grid <= 32))
       return makeGenericFailure(
-        `\`surface_beneath.grid\` must be an integer from 2 to 16 (got ${grid}).`
+        `\`surface_beneath.grid\` must be an integer from 2 to 32 (got ${grid}).`
       );
 
     const objectNames = new Set(

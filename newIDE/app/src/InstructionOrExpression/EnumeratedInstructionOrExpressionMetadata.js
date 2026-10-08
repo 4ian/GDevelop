@@ -40,6 +40,7 @@ export type EnumeratedInstructionMetadata = {|
 export type EnumeratedExpressionMetadata = {|
   type: string,
   displayedName: string,
+  description: string,
   fullGroupName: string,
   iconFilename: string,
   metadata: gdExpressionMetadata,

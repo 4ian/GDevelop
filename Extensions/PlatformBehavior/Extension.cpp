@@ -419,7 +419,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            _("When this action is executed, the object is able to jump again, "
              "even if it is in the air: this can be useful to allow a double "
              "jump for example. This is not a permanent effect: you must call "
-             "again this action everytime you want to allow the object to jump "
+             "again this action every time you want to allow the object to jump "
              "(apart if it's on the floor)."),
            _("Allow _PARAM0_ to jump again"),
            _("Platformer state"),

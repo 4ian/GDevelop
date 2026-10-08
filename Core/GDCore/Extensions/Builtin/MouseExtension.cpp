@@ -120,7 +120,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
   extension
       .AddAction("HideCursor",
                  _("Hide the cursor"),
-                 _("Hide the cursor."),
+                 _("Hide the mouse cursor, making it invisible."),
                  _("Hide the cursor"),
                  "",
                  "res/actions/mouse24.png",
@@ -135,7 +135,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
   extension
       .AddAction("ShowCursor",
                  _("Show the cursor"),
-                 _("Show the cursor."),
+                 _("Show the mouse cursor, making it visible."),
                  _("Show the cursor"),
                  "",
                  "res/actions/mouse24.png",

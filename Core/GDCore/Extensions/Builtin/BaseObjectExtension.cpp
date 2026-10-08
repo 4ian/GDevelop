@@ -483,7 +483,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("SetZOrder",
                 _("Z order"),
-                _("Modify the Z-order of an object"),
+                _("Modify the Z order of an object"),
                 _("the z-order"),
                 _("Layers and cameras"),
                 "res/actions/planicon24.png",
@@ -707,7 +707,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("Hide",
                 _("Hide"),
-                _("Hide the specified object."),
+                _("Hide the specified object, making it invisible."),
                 _("Hide _PARAM0_"),
                 _("Visibility"),
                 "res/actions/visibilite24.png",
@@ -722,7 +722,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("Show",
                 _("Show"),
-                _("Show the specified object."),
+                _("Show the specified object, making it visible."),
                 _("Show _PARAM0_"),
                 _("Visibility"),
                 "res/actions/visibilite24.png",
@@ -753,9 +753,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddCondition("ZOrder",
-                   _("Z-order"),
-                   _("Compare the Z-order of the specified object."),
-                   _("the Z-order"),
+                   _("Z order"),
+                   _("Compare the Z order of the specified object."),
+                   _("the Z order"),
                    _("Layer"),
                    "res/conditions/planicon24.png",
                    "res/conditions/planicon.png")
@@ -1123,7 +1123,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddCondition("BehaviorActivated",
                    _("Behavior activated"),
-                   _("Check if the behavior is activated for the object."),
+                   _("Check if the behavior is activated or deactivated for the object."),
                    _("Behavior _PARAM1_ of _PARAM0_ is activated"),
                    _("Behaviors"),
                    "res/functions/activate_black.svg",
@@ -1135,7 +1135,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("ActivateBehavior",
                 _("De/activate a behavior"),
-                _("De/activate the behavior for the object."),
+                _("Activate or deactivate the behavior for the object."),
                 _("Activate behavior _PARAM1_ of _PARAM0_: _PARAM2_"),
                 _("Behaviors"),
                 "res/functions/activate_black.svg",
@@ -1366,7 +1366,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("UnPauseObjectTimer",
                 _("Unpause an object timer"),
-                _("Unpause an object timer."),
+                _("Unpause (resume) an object timer."),
                 _("Unpause timer _PARAM1_ of _PARAM0_"),
                 _("Timers"),
                 "res/actions/unPauseTimer24.png",
@@ -1486,15 +1486,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHidden();
 
   obj.AddExpression("ZOrder",
-                    _("Z-order"),
-                    _("Z-order of an object"),
+                    _("Z order"),
+                    _("Z order of an object"),
                     "",
                     "res/actions/planicon.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Plan",
-                    _("Z-order"),
-                    _("Z-order of an object"),
+                    _("Z order"),
+                    _("Z order of an object"),
                     _("Visibility"),
                     "res/actions/planicon.png")
       .AddParameter("object", _("Object"))
@@ -1623,7 +1623,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   // Deprecated
   obj.AddAction("EnableEffect",
                 _("Enable an object effect"),
-                _("Enable an effect on the object"),
+                _("Enable or disable an effect on the object"),
                 _("Enable effect _PARAM1_ on _PARAM0_: _PARAM2_"),
                 _("Effects"),
                 "res/actions/effect_black.svg",
@@ -1689,7 +1689,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   // Deprecated
   obj.AddCondition("IsEffectEnabled",
                    _("Effect is enabled"),
-                   _("Check if the effect on an object is enabled."),
+                   _("Check if the effect on an object is enabled or disabled."),
                    _("Effect _PARAM1_ of _PARAM0_ is enabled"),
                    _("Effects"),
                    "res/actions/effect_black.svg",

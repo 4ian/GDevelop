@@ -26,6 +26,7 @@ type CommonProps = {|
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   isInline?: boolean,
+  shouldHideExpressionListButton?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
   resourceManagementProps?: ResourceManagementProps,

@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import VariableField, {
-  renderVariableWithIcon,
-  type VariableFieldInterface,
-} from './VariableField';
+import VariableField, { renderVariableWithIcon } from './VariableField';
 import SceneVariablesDialog from '../../VariablesList/SceneVariablesDialog';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import {
@@ -12,14 +9,13 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { enumerateVariables } from './EnumerateVariables';
 import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
 
 const gd: libGDevelop = global.gd;
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?VariableFieldInterface>(null);
+    const field = React.useRef<?ParameterFieldInterface>(null);
     const [
       variableEditorOpen,
       setVariableEditorOpen,
@@ -51,24 +47,12 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [eventsFunctionsExtension, layout]
     );
 
-    const enumerateSceneVariables = React.useCallback(
-      () => {
-        return layout
-          ? enumerateVariables(layout.getVariables())
-          : eventsFunctionsExtension
-          ? enumerateVariables(eventsFunctionsExtension.getSceneVariables())
-          : [];
-      },
-      [eventsFunctionsExtension, layout]
-    );
-
     const onVariableEditorApply = React.useCallback(
       (selectedVariableName: string | null) => {
         if (selectedVariableName && selectedVariableName.startsWith(value)) {
           onChange(selectedVariableName);
         }
         setVariableEditorOpen(null);
-        if (field.current) field.current.updateAutocompletions();
       },
       [onChange, value]
     );
@@ -77,7 +61,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
-          enumerateVariables={enumerateSceneVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -99,6 +82,12 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
           openEventsBasedEntityPropertyEditorDialog={null}
+          instructionMetadata={props.instructionMetadata}
+          expression={props.expression}
+          expressionMetadata={props.expressionMetadata}
+          parameterIndex={props.parameterIndex}
+          resourceManagementProps={props.resourceManagementProps}
+          parameterRenderingService={props.parameterRenderingService}
         />
         {variableEditorOpen && layout && project && (
           <SceneVariablesDialog

@@ -41,6 +41,8 @@ describe('gd.ExpressionCompletionFinder', function () {
       gd.JsPlatform.get(),
       projectScopedContainers,
       type,
+      '',
+      '',
       expressionNode,
       // We're looking for completion for the character just before the caret.
       Math.max(0, caretPosition - 1)

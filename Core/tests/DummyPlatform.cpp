@@ -491,6 +491,11 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .SetFunctionName("returnVariable");
   extension
       ->AddExpression(
+          "GetGlobalVariableAsNumber", "Get me a variable value", "", "", "")
+      .AddParameter("globalvar", "Global variable")
+      .SetFunctionName("returnGlobalVariable");
+  extension
+      ->AddExpression(
           "GetAnyVariableAsNumber", "Get me a variable value", "", "", "")
       .AddParameter("variable", "Variable")
       .SetFunctionName("getAnyVariableAsNumber");

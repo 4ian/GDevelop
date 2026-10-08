@@ -4,7 +4,10 @@ import { mapFor, mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { type EditorFunctionGenericOutput } from './index';
-import { getModel3DObjectSizeInfo } from './Model3DSizeInfo';
+import {
+  ensureModel3DMeasurementLoaded,
+  getModel3DObjectSizeInfo,
+} from './Model3DSizeInfo';
 
 const gd: libGDevelop = global.gd;
 
@@ -25,6 +28,45 @@ export type ObjectSizeInfo = {|
 |};
 
 /**
+ * The frame giving its size and origin to a Sprite: the first one of its first
+ * animation, or null for a Sprite with no frame yet.
+ */
+const getFirstSprite = (object: gdObject): gdSprite | null => {
+  const animations = gd
+    .asSpriteConfiguration(object.getConfiguration())
+    .getAnimations();
+  if (
+    animations.getAnimationsCount() === 0 ||
+    animations.getAnimation(0).getDirectionsCount() === 0
+  )
+    return null;
+  const direction = animations.getAnimation(0).getDirection(0);
+  return direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
+};
+
+/**
+ * Loads what `getObjectSizeInfo` measures an object with, when the editor has
+ * not loaded it yet: the model of a 3D model, the texture of the first frame
+ * of a Sprite (not loaded until the editor draws it, like for a sprite just
+ * installed from the asset store).
+ */
+export const ensureObjectSizeInfoLoaded = async (
+  object: gdObject,
+  project: gdProject,
+  pixiResourcesLoader: any
+): Promise<void> => {
+  await ensureModel3DMeasurementLoaded(object, project, pixiResourcesLoader);
+  if (object.getType() !== 'Sprite') return;
+
+  const firstSprite = getFirstSprite(object);
+  if (!firstSprite) return;
+  const imageName = firstSprite.getImageName();
+  const texture = pixiResourcesLoader.getPIXITexture(project, imageName);
+  if (texture && texture.valid && texture.width > 0) return;
+  await pixiResourcesLoader.loadTextures(project, [imageName]);
+};
+
+/**
  * Returns the default size, origin and center of an object as numeric values.
  * Uses PixiResourcesLoader to get the actual texture dimensions for Sprite objects.
  * Accepts an optional assetShortHeader for Sprite objects installed from the asset store,
@@ -42,20 +84,9 @@ export const getObjectSizeInfo = (
 
   if (objectType === 'Sprite') {
     const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
-    const animations = spriteConfiguration.getAnimations();
     const preScale = spriteConfiguration.getPreScale();
-    if (
-      animations.getAnimationsCount() > 0 &&
-      animations.getAnimation(0).getDirectionsCount() > 0 &&
-      animations
-        .getAnimation(0)
-        .getDirection(0)
-        .getSpritesCount() > 0
-    ) {
-      const firstSprite = animations
-        .getAnimation(0)
-        .getDirection(0)
-        .getSprite(0);
+    const firstSprite = getFirstSprite(object);
+    if (firstSprite) {
       const originX = firstSprite.getOrigin().getX();
       const originY = firstSprite.getOrigin().getY();
 

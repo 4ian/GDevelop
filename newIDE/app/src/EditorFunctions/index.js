@@ -101,6 +101,7 @@ import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
 import {
+  ensureObjectSizeInfoLoaded,
   extractRequiredString,
   formatPropertiesList,
   getObjectSizeInfo,
@@ -112,7 +113,6 @@ import {
   type ObjectSizeInfo,
 } from './Utils';
 import {
-  ensureModel3DMeasurementLoaded,
   ensureModel3DMeasurementsLoaded,
   isModel3DObjectMeasured,
 } from './Model3DSizeInfo';
@@ -1650,7 +1650,7 @@ const createOrReplaceObject: EditorFunction = {
                   getPropertiesText(object),
                 ].join(' '),
               };
-              await ensureModel3DMeasurementLoaded(
+              await ensureObjectSizeInfoLoaded(
                 object,
                 project,
                 PixiResourcesLoader
@@ -1780,11 +1780,7 @@ const createOrReplaceObject: EditorFunction = {
           getPropertiesText(object),
         ].join(' '),
       };
-      await ensureModel3DMeasurementLoaded(
-        object,
-        project,
-        PixiResourcesLoader
-      );
+      await ensureObjectSizeInfoLoaded(object, project, PixiResourcesLoader);
       return addVariantWithoutInstancesHint(
         injectObjectSizeInfo(scratchResult, {
           [targetObjectName]: getObjectSizeInfo(
@@ -2552,7 +2548,7 @@ const inspectObjectPropertiesEffects: EditorFunction = {
     if (inspectParts.length > 0) {
       output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
     }
-    await ensureModel3DMeasurementLoaded(object, project, PixiResourcesLoader);
+    await ensureObjectSizeInfoLoaded(object, project, PixiResourcesLoader);
     injectObjectSizeInfo(output, {
       [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
     });
@@ -4707,7 +4703,7 @@ const put2dInstances: EditorFunction = {
         )) ||
       null;
     if (namedObject)
-      await ensureModel3DMeasurementLoaded(
+      await ensureObjectSizeInfoLoaded(
         namedObject,
         project,
         PixiResourcesLoader
@@ -5709,7 +5705,7 @@ const put3dInstances: EditorFunction = {
         )) ||
       null;
     if (namedObject)
-      await ensureModel3DMeasurementLoaded(
+      await ensureObjectSizeInfoLoaded(
         namedObject,
         project,
         PixiResourcesLoader

@@ -1,6 +1,7 @@
 // @flow
 import { editorFunctions, type EditorFunctionGenericOutput } from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
+import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -617,6 +618,72 @@ describe('put_2d_instances (brush_position_anchor)', () => {
     // A text is positioned by the corner of its box: centering it moves it by
     // half the size given to its instances.
     expect(getPlacedPosition()).toEqual([0, 80]);
+  });
+
+  describe('with a sprite whose texture is not loaded yet', () => {
+    // Like a sprite just installed from the asset store: the editor has not
+    // drawn it yet, so its texture is only known once loaded.
+    const makeLoaderLoadingTexturesOnDemand = () => {
+      const loadedResourceNames = new Set<string>();
+      return {
+        ...PixiResourcesLoaderMock,
+        loadTextures: async (
+          project: gdProject,
+          resourceNames: Array<string>
+        ) => {
+          resourceNames.forEach(name => loadedResourceNames.add(name));
+        },
+        getPIXITexture: (project: gdProject, resourceName: string) =>
+          loadedResourceNames.has(resourceName)
+            ? { valid: true, width: 64, height: 128 }
+            : PixiResourcesLoaderMock.getInvalidPIXITexture(),
+      };
+    };
+
+    beforeEach(() => {
+      const door = testScene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'Door', 0);
+      const animation = new gd.Animation();
+      animation.setDirectionsCount(1);
+      const sprite = new gd.Sprite();
+      sprite.setImageName('FreshlyInstalledDoor');
+      animation.getDirection(0).addSprite(sprite);
+      gd.asSpriteConfiguration(door.getConfiguration())
+        .getAnimations()
+        .addAnimation(animation);
+      sprite.delete();
+      animation.delete();
+    });
+
+    const putDoor = async (args: any) =>
+      await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        PixiResourcesLoader: makeLoaderLoadingTexturesOnDemand(),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Door',
+          layer_name: '',
+          brush_kind: 'point',
+          brush_position: '100,100',
+          brush_position_anchor: 'center',
+          ...args,
+        },
+      });
+
+    it('centers it using the size of its texture', async () => {
+      const result = await putDoor({});
+
+      expect(result.success).toBe(true);
+      expect(getPlacedPosition()).toEqual([68, 36]);
+    });
+
+    it('centers it using the size given to its instances', async () => {
+      const result = await putDoor({ instances_size: '320,320' });
+
+      expect(result.success).toBe(true);
+      expect(getPlacedPosition()).toEqual([-60, -60]);
+    });
   });
 
   it('refuses the anchors of 3D objects', async () => {

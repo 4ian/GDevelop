@@ -602,7 +602,7 @@ namespace gdjs {
     pivot: Point3D;
   };
 
-  type SelectionMovement = {
+  type SelectionMovement3D = {
     translationX: float;
     translationY: float;
     translationZ: float;
@@ -926,30 +926,37 @@ namespace gdjs {
         if (options && options.ignoreIf(object)) {
           continue;
         }
-        if (is3D(object)) {
-          const aabb2D = object.getAABB();
-          const minZ = object.getUnrotatedAABBMinZ();
-          const maxZ = object.getUnrotatedAABBMaxZ();
-          if (aabb) {
-            aabb.min[0] = Math.min(aabb.min[0], aabb2D.min[0]);
-            aabb.min[1] = Math.min(aabb.min[1], aabb2D.min[1]);
-            aabb.min[2] = Math.min(aabb.min[2], minZ);
-            aabb.max[0] = Math.max(aabb.max[0], aabb2D.max[0]);
-            aabb.max[1] = Math.max(aabb.max[1], aabb2D.max[1]);
-            aabb.max[2] = Math.max(aabb.max[2], maxZ);
-          } else {
-            aabb = {
-              min: [aabb2D.min[0], aabb2D.min[1], minZ],
-              max: [aabb2D.max[0], aabb2D.max[1], maxZ],
-            };
-          }
+        const aabb2D = object.getAABB();
+        const minZ = is3D(object) ? object.getUnrotatedAABBMinZ() : 0;
+        const maxZ = is3D(object) ? object.getUnrotatedAABBMaxZ() : 0;
+        if (aabb) {
+          aabb.min[0] = Math.min(aabb.min[0], aabb2D.min[0]);
+          aabb.min[1] = Math.min(aabb.min[1], aabb2D.min[1]);
+          aabb.min[2] = Math.min(aabb.min[2], minZ);
+          aabb.max[0] = Math.max(aabb.max[0], aabb2D.max[0]);
+          aabb.max[1] = Math.max(aabb.max[1], aabb2D.max[1]);
+          aabb.max[2] = Math.max(aabb.max[2], maxZ);
+        } else {
+          aabb = {
+            min: [aabb2D.min[0], aabb2D.min[1], minZ],
+            max: [aabb2D.max[0], aabb2D.max[1], maxZ],
+          };
         }
       }
       return aabb;
     }
   }
 
-  class ObjectMover {
+  const isAABBInsidePolygon = (
+    polygon: gdjs.Polygon,
+    aabb: gdjs.AABB
+  ): boolean =>
+    gdjs.Polygon.isPointInside(polygon, aabb.min[0], aabb.min[1]) &&
+    gdjs.Polygon.isPointInside(polygon, aabb.min[0], aabb.max[1]) &&
+    gdjs.Polygon.isPointInside(polygon, aabb.max[0], aabb.max[1]) &&
+    gdjs.Polygon.isPointInside(polygon, aabb.max[0], aabb.min[1]);
+
+  class ObjectMover3D {
     private editor: InGameEditor;
     private _changeHappened = false;
     private startTime = 0;
@@ -995,7 +1002,7 @@ namespace gdjs {
 
     move(
       selectedObjects: Array<gdjs.RuntimeObject>,
-      movement: SelectionMovement
+      movement: SelectionMovement3D
     ) {
       if (Date.now() - this.startTime < 150) {
         // Avoid miss-clicks gizmo dragging point to change object positions.
@@ -1125,6 +1132,377 @@ namespace gdjs {
     }
   }
 
+  class ObjectMover2D {
+    private editor: InGameEditor;
+    private _changeHappened = false;
+    private _unrotatedInstanceAABBs = new Map<gdjs.RuntimeObject, AABB3D>();
+    private _instanceAABBs = new Map<gdjs.RuntimeObject, AABB3D>();
+    private _instancePositions = new Map<gdjs.RuntimeObject, FloatPoint>();
+    private _instanceAngles = new Map<gdjs.RuntimeObject, float>();
+
+    constructor(editor: InGameEditor) {
+      this.editor = editor;
+    }
+
+    startMove() {
+      this._changeHappened = false;
+      this._unrotatedInstanceAABBs.clear();
+      this._instanceAABBs.clear();
+      this._instancePositions.clear();
+      this._instanceAngles.clear();
+    }
+
+    endMove(): boolean {
+      const changeHappened = this._changeHappened;
+      this._unrotatedInstanceAABBs.clear();
+      this._instanceAABBs.clear();
+      this._instancePositions.clear();
+      this._instanceAngles.clear();
+      this._changeHappened = false;
+      // TODO
+      return changeHappened || true;
+    }
+
+    translate(
+      selectedObjects: Array<gdjs.RuntimeObject>,
+      translationX: float,
+      translationY: float
+    ) {
+      console.log(
+        selectedObjects.length,
+        'Translation',
+        translationX,
+        translationY
+      );
+      for (const selectedInstance of selectedObjects) {
+        const initialInstanceOriginPosition =
+          this._getOrCreateInstanceOriginPosition(selectedInstance);
+        const initialInstanceOriginX = initialInstanceOriginPosition[0];
+        const initialInstanceOriginY = initialInstanceOriginPosition[1];
+
+        const newX = initialInstanceOriginX + translationX;
+        const newY = initialInstanceOriginY + translationY;
+
+        selectedInstance.setX(Math.round(newX));
+        selectedInstance.setY(Math.round(newY));
+      }
+      return;
+    }
+
+    rotate(
+      selectedObjects: Array<gdjs.RuntimeObject>,
+      rotationZ: float,
+      fixedPointX: float,
+      fixedPointY: float
+    ) {
+      for (const selectedInstance of selectedObjects) {
+        const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
+        const initialCenterX = (initialAABB.min[0] + initialAABB.max[0]) / 2;
+        const initialCenterY = (initialAABB.min[1] + initialAABB.max[1]) / 2;
+        console.log('Rotate around', fixedPointX, fixedPointY);
+        const initialAngle = this._getOrCreateInstanceAngle(selectedInstance);
+        const initialInstanceOriginPosition =
+          this._getOrCreateInstanceOriginPosition(selectedInstance);
+
+        // TODO
+        const proportional = false;
+        let degreeAngle = rotationZ + initialAngle;
+        if (proportional) {
+          degreeAngle = Math.round(degreeAngle / 15) * 15;
+        }
+        // We round the angle to the nearest degree when an instance is rotated in the editor.
+        // This is to avoid having a lot of decimals in the angle of instances.
+        // It does not prevent the user from having decimals, when editing the angle manually.
+        const newAngle = Math.round(((degreeAngle % 360) + 360) % 360);
+        selectedInstance.setAngle(newAngle);
+
+        const rotationAngle = ((degreeAngle - initialAngle) * Math.PI) / 180;
+        const cosa = Math.cos(-rotationAngle);
+        const sina = Math.sin(-rotationAngle);
+        const deltaX = initialCenterX - fixedPointX;
+        const deltaY = initialCenterY - fixedPointY;
+        // We also round the position to the nearest pixel after rotation.
+        const newX = Math.round(
+          fixedPointX +
+            (initialInstanceOriginPosition[0] - initialCenterX) +
+            cosa * deltaX +
+            sina * deltaY
+        );
+        const newY = Math.round(
+          fixedPointY +
+            (initialInstanceOriginPosition[1] - initialCenterY) -
+            sina * deltaX +
+            cosa * deltaY
+        );
+        selectedInstance.setX(newX);
+        selectedInstance.setY(newY);
+      }
+    }
+
+    resize(
+      selectedObjects: Array<gdjs.RuntimeObject>,
+      scaleX: float,
+      scaleY: float,
+      scaleZ: float,
+      fixedPointX: float,
+      fixedPointY: float
+    ) {
+      console.log(
+        selectedObjects.length,
+        'Anchor',
+        fixedPointX,
+        fixedPointY,
+        'Scale',
+        scaleX,
+        scaleY
+      );
+
+      // TODO
+      const proportional = false;
+      const hasRotatedInstance = false;
+
+      for (const selectedInstance of selectedObjects) {
+        const initialUnrotatedInstanceAABB =
+          this._getOrCreateUnrotatedInstanceAABB(selectedInstance);
+        const initialUnrotatedInstanceWidth =
+          initialUnrotatedInstanceAABB.max[0] -
+          initialUnrotatedInstanceAABB.min[0];
+        const initialUnrotatedInstanceHeight =
+          initialUnrotatedInstanceAABB.max[1] -
+          initialUnrotatedInstanceAABB.min[1];
+        const initialUnrotatedInstanceDepth =
+          initialUnrotatedInstanceAABB.max[2] -
+          initialUnrotatedInstanceAABB.min[2];
+        const initialUnrotatedInstanceCenterX =
+          (initialUnrotatedInstanceAABB.max[0] +
+            initialUnrotatedInstanceAABB.min[0]) /
+          2;
+        const initialUnrotatedInstanceCenterY =
+          (initialUnrotatedInstanceAABB.max[1] +
+            initialUnrotatedInstanceAABB.min[1]) /
+          2;
+        const initialUnrotatedInstanceCenterZ =
+          (initialUnrotatedInstanceAABB.max[2] +
+            initialUnrotatedInstanceAABB.min[2]) /
+          2;
+
+        const initialInstanceOriginPosition =
+          this._getOrCreateInstanceOriginPosition(selectedInstance);
+        const initialInstanceOriginX = initialInstanceOriginPosition[0];
+        const initialInstanceOriginY = initialInstanceOriginPosition[1];
+
+        // Assume a size of 1 pixel to start the resizing
+        // if the instance had a size of 0.
+        const initialWidth = initialUnrotatedInstanceWidth || 1;
+        const initialHeight = initialUnrotatedInstanceHeight || 1;
+        const initialDepth = initialUnrotatedInstanceDepth || 1;
+
+        // The position and size of an instance describe the shape
+        // before the rotation is applied.
+        // The calculus is like a 90° or 270° rotation of the basis around the scaling.
+        // The AABB dimensions are the same in both cases and the AABB center
+        // is stable by instance rotation. This allows to use the same formula
+        // for both 90° or 270°.
+        const angle = ((selectedInstance.getAngle() % 360) + 360) % 360;
+        let newX = initialInstanceOriginX;
+        let newY = initialInstanceOriginY;
+        let newWidth = initialWidth;
+        let newHeight = initialHeight;
+        let newDepth = initialDepth;
+        if (
+          !proportional &&
+          !hasRotatedInstance &&
+          (angle === 90 || angle === 270)
+        ) {
+          newWidth = scaleY * initialWidth;
+          newHeight = scaleX * initialHeight;
+          newDepth = scaleZ * initialDepth;
+
+          // These 4 variables are the positions and vector after the scaling.
+          // It's easier to scale the instance center
+          // because it's not affected by the instance rotation.
+          const centerX =
+            (initialUnrotatedInstanceCenterX - fixedPointX) * scaleX +
+            fixedPointX;
+          const centerY =
+            (initialUnrotatedInstanceCenterY - fixedPointY) * scaleY +
+            fixedPointY;
+          // and then add the vector from the center to the origin.
+          // It's the vector on the unrotated instance
+          // and the scale was applied on the rotated one so it's switched.
+          const centerToOriginX =
+            scaleY * (initialInstanceOriginX - initialUnrotatedInstanceCenterX);
+          const centerToOriginY =
+            scaleX * (initialInstanceOriginY - initialUnrotatedInstanceCenterY);
+          newX = centerX + centerToOriginX;
+          newY = centerY + centerToOriginY;
+        } else {
+          newWidth = scaleX * initialWidth;
+          newHeight = scaleY * initialHeight;
+          newDepth = scaleZ * initialDepth;
+          newX = (initialInstanceOriginX - fixedPointX) * scaleX + fixedPointX;
+          newY = (initialInstanceOriginY - fixedPointY) * scaleY + fixedPointY;
+        }
+
+        // After resizing, we round the new positions and dimensions to the nearest pixel.
+        // This is to avoid having a lot of decimals appearing, and it does not
+        // prevent the user from modifying them manually in the inline fields.
+        selectedInstance.setX(Math.round(newX));
+        selectedInstance.setY(Math.round(newY));
+
+        // Also round the size.
+        selectedInstance.setWidth(Math.round(newWidth));
+        selectedInstance.setHeight(Math.round(newHeight));
+        if (is3D(selectedInstance)) {
+          selectedInstance.setDepth(Math.round(newDepth));
+        }
+
+        console.log(
+          'Position',
+          selectedInstance.getX(),
+          selectedInstance.getY(),
+          'Size',
+          selectedInstance.getWidth(),
+          selectedInstance.getHeight()
+        );
+      }
+    }
+
+    _getOrCreateUnrotatedInstanceAABB(instance: gdjs.RuntimeObject): AABB3D {
+      const initialUnrotatedInstanceAABB =
+        this._unrotatedInstanceAABBs.get(instance);
+      if (initialUnrotatedInstanceAABB) return initialUnrotatedInstanceAABB;
+
+      const unrotatedAABB: AABB3D = {
+        min: [0, 0, 0],
+        max: [0, 0, 0],
+      };
+      this._getUnrotatedInstanceAABB(instance, unrotatedAABB);
+      this._unrotatedInstanceAABBs.set(instance, unrotatedAABB);
+      return unrotatedAABB;
+    }
+
+    _getOrCreateInstanceAABB(instance: gdjs.RuntimeObject): AABB3D {
+      const initialAABB = this._instanceAABBs.get(instance);
+      if (initialAABB) return initialAABB;
+
+      const aabb: AABB3D = {
+        min: [0, 0, 0],
+        max: [0, 0, 0],
+      };
+      this._getInstanceAABB(instance, aabb);
+      this._instanceAABBs.set(instance, aabb);
+      return aabb;
+    }
+
+    _getUnrotatedInstanceAABB(
+      instance: gdjs.RuntimeObject,
+      unrotatedAABB: AABB3D
+    ): AABB3D {
+      const minX = instance.getDrawableX();
+      const minY = instance.getDrawableY();
+      const maxX = minX + instance.getWidth();
+      const maxY = minY + instance.getHeight();
+      let minZ = 0;
+      let maxZ = 0;
+      if (is3D(instance)) {
+        minZ = instance.getDrawableZ
+          ? instance.getDrawableZ()
+          : instance.getZ();
+        maxZ = minZ + instance.getDepth();
+      }
+      unrotatedAABB.min[0] = minX;
+      unrotatedAABB.min[1] = minY;
+      unrotatedAABB.min[2] = minZ;
+      unrotatedAABB.max[0] = maxX;
+      unrotatedAABB.max[1] = maxY;
+      unrotatedAABB.max[2] = maxZ;
+      return unrotatedAABB;
+    }
+
+    _getInstanceAABB(instance: gdjs.RuntimeObject, bounds: AABB3D): AABB3D {
+      const angle = (instance.getAngle() * Math.PI) / 180;
+      //@ts-ignore
+      const isFlippedX = instance.isFlippedX && instance.isFlippedX();
+      //@ts-ignore
+      const isFlippedY = instance.isFlippedY && instance.isFlippedY();
+      const unrotatedAABB = this._getUnrotatedInstanceAABB(instance, bounds);
+      if (angle === 0 && !isFlippedX && !isFlippedY) {
+        return unrotatedAABB;
+      }
+
+      // Compute the rotated rectangle of the instance, so we can then
+      // compute the new, unrotated AABB out of it.
+
+      const rotatedRectangle = new gdjs.Polygon();
+      {
+        const unrotatedLeft = unrotatedAABB.min[0];
+        const unrotatedTop = unrotatedAABB.min[1];
+        const unrotatedRight = unrotatedAABB.max[0];
+        const unrotatedBottom = unrotatedAABB.max[1];
+
+        rotatedRectangle.vertices.push([unrotatedLeft, unrotatedTop]);
+        rotatedRectangle.vertices.push([unrotatedLeft, unrotatedBottom]);
+        rotatedRectangle.vertices.push([unrotatedRight, unrotatedBottom]);
+        rotatedRectangle.vertices.push([unrotatedRight, unrotatedTop]);
+
+        let centerX = instance.getCenterXInScene();
+        let centerY = instance.getCenterYInScene();
+        rotatedRectangle.move(-centerX, -centerY);
+        for (const vertex of rotatedRectangle.vertices) {
+          if (isFlippedX) {
+            vertex[0] = -vertex[0];
+          }
+          if (isFlippedY) {
+            vertex[1] = -vertex[1];
+          }
+        }
+        rotatedRectangle.rotate(angle);
+        rotatedRectangle.move(centerX, centerY);
+      }
+
+      // Compute the new, unrotated AABB from the rotated rectangle of the instance.
+      let left = Number.MAX_VALUE;
+      let right = -Number.MAX_VALUE;
+      let top = Number.MAX_VALUE;
+      let bottom = -Number.MAX_VALUE;
+      for (const vertex of rotatedRectangle.vertices) {
+        left = Math.min(left, vertex[0]);
+        right = Math.max(right, vertex[0]);
+        top = Math.min(top, vertex[1]);
+        bottom = Math.max(bottom, vertex[1]);
+      }
+
+      // Add the 3D coordinates, for which rotation is not considered
+      // (but could be if we have a full 3D editor one day).
+      bounds.min[0] = left;
+      bounds.min[1] = top;
+      bounds.max[0] = right;
+      bounds.max[1] = bottom;
+      return bounds;
+    }
+
+    _getOrCreateInstanceOriginPosition(
+      instance: gdjs.RuntimeObject
+    ): FloatPoint {
+      const initialPosition = this._instancePositions.get(instance);
+      if (initialPosition) return initialPosition;
+
+      const position: FloatPoint = [instance.getX(), instance.getY()];
+      this._instancePositions.set(instance, position);
+      return position;
+    }
+
+    _getOrCreateInstanceAngle(instance: gdjs.RuntimeObject): any {
+      const initialAngle = this._instanceAngles.get(instance);
+      if (initialAngle !== undefined) return initialAngle;
+
+      const angle = instance.getAngle();
+      this._instanceAngles.set(instance, angle);
+      return angle;
+    }
+  }
+
   const getCameraForwardVector = (threeCamera: THREE.Camera) => {
     // Make sure camera's matrixWorld is up-to-date (usually is, but good practice).
     threeCamera.updateMatrixWorld();
@@ -1249,7 +1627,8 @@ namespace gdjs {
     // (which stay visible in the editor).
     private _hiddenInstanceMarkers: Map<RuntimeObject, THREE.Sprite> =
       new Map();
-    private _objectMover = new ObjectMover(this);
+    private _objectMover2D = new ObjectMover2D(this);
+    private _objectMover3D = new ObjectMover3D(this);
 
     private _wasMouseLeftButtonPressed = false;
     private _wasMouseRightButtonPressed = false;
@@ -1276,7 +1655,7 @@ namespace gdjs {
     private _draggedSelectedObjectInitialX: float = 0;
     private _draggedSelectedObjectInitialY: float = 0;
     private _draggedSelectedObjectInitialZ: float = 0;
-    private _draggedSelectedObjectTotalDelta: SelectionMovement = {
+    private _draggedSelectedObjectTotalDelta: SelectionMovement3D = {
       translationX: 0,
       translationY: 0,
       translationZ: 0,
@@ -1306,7 +1685,10 @@ namespace gdjs {
       this._runtimeGame = game;
       this._editorCamera = new EditorCamera(this);
       this._editorGrid = new EditorGrid(this);
-      this._selectionControls = new SelectionControls(this, this._objectMover);
+      this._selectionControls = new SelectionControls2D(
+        this,
+        this._objectMover2D
+      );
 
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
@@ -1376,6 +1758,13 @@ namespace gdjs {
      */
     getShortcuts(): InGameEditorShortcuts {
       return this._shortcuts;
+    }
+
+    setCursorIcon(cursorName: string) {
+      const canvas = this._runtimeGame.getRenderer().getCanvas();
+      if (canvas) {
+        canvas.style.cursor = cursorName || 'default';
+      }
     }
 
     private _applyInGameEditorSettings() {
@@ -1520,6 +1909,11 @@ namespace gdjs {
         return;
       }
       this._currentScene.onGameResolutionResized();
+    }
+
+    private buildSelectionControls(): SelectionControls {
+      // return new SelectionControls3D(this, this._objectMover3D);
+      return new SelectionControls2D(this, this._objectMover2D);
     }
 
     async switchToSceneOrVariant(
@@ -2311,7 +2705,7 @@ namespace gdjs {
           !this._selectionControls.shouldDragSelectedObject())
       ) {
         this._draggedSelectedObject = null;
-        const changeHappened = this._objectMover.endMove();
+        const changeHappened = this._objectMover3D.endMove();
         this._sendSelectionUpdate({
           hasSelectedObjectBeenModified: changeHappened,
         });
@@ -2366,7 +2760,7 @@ namespace gdjs {
           this._draggedSelectedObjectInitialZ = is3D(object)
             ? object.getZ()
             : 0;
-          this._objectMover.startMove();
+          this._objectMover3D.startMove();
         }
       }
 
@@ -2426,7 +2820,7 @@ namespace gdjs {
         this._draggedSelectedObjectTotalDelta.translationY = 0;
         this._draggedSelectedObjectTotalDelta.translationZ = 0;
       }
-      this._objectMover.move(
+      this._objectMover3D.move(
         this._selection.getSelectedObjects(),
         this._draggedSelectedObjectTotalDelta
       );
@@ -2551,6 +2945,45 @@ namespace gdjs {
           // Selection rectangle ended.
 
           const objects = new Set<gdjs.RuntimeObject>();
+          // TODO Cut the selection box part that is over the horizon.
+          const projectedSelectionBox: gdjs.Polygon = new gdjs.Polygon();
+          projectedSelectionBox.vertices.push(
+            this._getProjectedPoint(
+              this._getUnormalizedScreenPoint([
+                this._selectionBox.startPoint.x,
+                this._selectionBox.startPoint.y,
+              ])
+            ) as FloatPoint,
+            this._getProjectedPoint(
+              this._getUnormalizedScreenPoint([
+                this._selectionBox.startPoint.x,
+                this._selectionBox.endPoint.y,
+              ])
+            ) as FloatPoint,
+            this._getProjectedPoint(
+              this._getUnormalizedScreenPoint([
+                this._selectionBox.endPoint.x,
+                this._selectionBox.endPoint.y,
+              ])
+            ) as FloatPoint,
+            this._getProjectedPoint(
+              this._getUnormalizedScreenPoint([
+                this._selectionBox.endPoint.x,
+                this._selectionBox.startPoint.y,
+              ])
+            ) as FloatPoint
+          );
+          if (!projectedSelectionBox.vertices.every(Boolean)) {
+            return;
+          }
+          for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
+            if (
+              !is3D(object) &&
+              isAABBInsidePolygon(projectedSelectionBox, object.getAABB())
+            ) {
+              objects.add(object);
+            }
+          }
           for (const selectThreeObject of this._selectionBox.select()) {
             // TODO Select the object if all its meshes are inside the rectangle
             // instead of if any is.
@@ -2905,6 +3338,11 @@ namespace gdjs {
       this._updateInstances(updatedInstances);
       this._addInstances(addedInstances);
 
+      console.log(
+        'sendInstanceChanges',
+        this._selection.getSelectedObjects().length,
+        [...updatedInstances]
+      );
       debuggerClient.sendInstanceChanges({
         isSendingBackSelectionForDefaultSize: options
           ? options.isSendingBackSelectionForDefaultSize || false
@@ -2925,60 +3363,61 @@ namespace gdjs {
     private getInstanceDataFromRuntimeObject(
       runtimeObject: gdjs.RuntimeObject
     ): InstanceData | null {
-      if (is3D(runtimeObject)) {
-        if (!runtimeObject.persistentUuid) return null;
+      if (!runtimeObject.persistentUuid) return null;
 
-        const width = runtimeObject.getWidth();
-        const height = runtimeObject.getHeight();
-        const depth = runtimeObject.getDepth();
-        const defaultWidth = runtimeObject.getOriginalWidth();
-        const defaultHeight = runtimeObject.getOriginalHeight();
-        const defaultDepth = runtimeObject.getOriginalDepth();
+      const width = runtimeObject.getWidth();
+      const height = runtimeObject.getHeight();
+      const depth = !is3D(runtimeObject) ? undefined : runtimeObject.getDepth();
+      const defaultWidth = runtimeObject.getOriginalWidth();
+      const defaultHeight = runtimeObject.getOriginalHeight();
+      const defaultDepth = !is3D(runtimeObject)
+        ? undefined
+        : runtimeObject.getOriginalDepth();
 
-        const oldData = this._getInstanceData(runtimeObject.persistentUuid);
-        const instanceData: InstanceData = {
-          name: runtimeObject.getName(),
-          zOrder: runtimeObject.getZOrder(),
-          persistentUuid: runtimeObject.persistentUuid,
-          x: runtimeObject.getX(),
-          y: runtimeObject.getY(),
-          z: runtimeObject.getZ(),
-          layer: runtimeObject.getLayer(),
-          angle: runtimeObject.getAngle(),
-          rotationY: runtimeObject.getRotationY(),
-          rotationX: runtimeObject.getRotationX(),
-          customSize: width !== defaultWidth || height !== defaultHeight,
-          width,
-          height,
-          depth: depth === defaultDepth ? undefined : depth,
-          locked: oldData ? oldData.locked : false,
-          sealed: oldData ? oldData.sealed : false,
-          // Not modified by the InGameEditor (which always shows instances,
-          // even those hidden at start), but must be preserved:
-          hidden: oldData ? oldData.hidden : undefined,
-          // Not modified by the InGameEditor itself: the editor only lowers
-          // the opacity for edition, and flipping is changed from the IDE
-          // (which then sends the updated instance data). But they must be
-          // preserved:
-          opacity: oldData ? oldData.opacity : undefined,
-          flippedX: oldData ? oldData.flippedX : undefined,
-          flippedY: oldData ? oldData.flippedY : undefined,
-          flippedZ: oldData ? oldData.flippedZ : undefined,
-          // TODO: how to transmit/should we transmit other properties?
-          numberProperties: [],
-          stringProperties: [],
-          initialVariables: [],
-          // @ts-ignore
-          defaultWidth,
-          defaultHeight,
-          defaultDepth,
-        };
+      const oldData = this._getInstanceData(runtimeObject.persistentUuid);
+      const instanceData: InstanceData = {
+        name: runtimeObject.getName(),
+        zOrder: runtimeObject.getZOrder(),
+        persistentUuid: runtimeObject.persistentUuid,
+        x: runtimeObject.getX(),
+        y: runtimeObject.getY(),
+        z: !is3D(runtimeObject) ? undefined : runtimeObject.getZ(),
+        layer: runtimeObject.getLayer(),
+        angle: runtimeObject.getAngle(),
+        rotationY: !is3D(runtimeObject)
+          ? undefined
+          : runtimeObject.getRotationY(),
+        rotationX: !is3D(runtimeObject)
+          ? undefined
+          : runtimeObject.getRotationX(),
+        customSize: width !== defaultWidth || height !== defaultHeight,
+        width,
+        height,
+        depth: depth === defaultDepth ? undefined : depth,
+        locked: oldData ? oldData.locked : false,
+        sealed: oldData ? oldData.sealed : false,
+        // Not modified by the InGameEditor (which always shows instances,
+        // even those hidden at start), but must be preserved:
+        hidden: oldData ? oldData.hidden : undefined,
+        // Not modified by the InGameEditor itself: the editor only lowers
+        // the opacity for edition, and flipping is changed from the IDE
+        // (which then sends the updated instance data). But they must be
+        // preserved:
+        opacity: oldData ? oldData.opacity : undefined,
+        flippedX: oldData ? oldData.flippedX : undefined,
+        flippedY: oldData ? oldData.flippedY : undefined,
+        flippedZ: oldData ? oldData.flippedZ : undefined,
+        // TODO: how to transmit/should we transmit other properties?
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
+        // @ts-ignore
+        defaultWidth,
+        defaultHeight,
+        defaultDepth,
+      };
 
-        return instanceData;
-      } else {
-        // TODO: handle 2D objects/instances.
-        return null;
-      }
+      return instanceData;
     }
 
     private _removeInstances(
@@ -3289,10 +3728,11 @@ namespace gdjs {
         editedInstanceContainer._setLayerDefaultZOrders();
         const newObject = editedInstanceContainer.createObject(name);
         if (!newObject) return;
-        if (!is3D(newObject)) {
-          editedInstanceContainer.markObjectForDeletion(newObject);
-          return;
-        }
+        // TODO
+        // if (!is3D(newObject)) {
+        //   editedInstanceContainer.markObjectForDeletion(newObject);
+        //   return;
+        // }
         newObject.persistentUuid = gdjs.makeUuid();
         newObject.setLayer(selectedLayer.getName());
         newObject.setZOrder(selectedLayer.getDefaultZOrder());
@@ -3475,6 +3915,48 @@ namespace gdjs {
       return [cursorX, cursorY];
     }
 
+    /**
+     * @returns The canvas point projected on the plane Z = 0 or `null` if the canvas point is in the sky.
+     */
+    _getProjectedPoint(cursor: FloatPoint): FloatPoint | null {
+      const currentScene = this._currentScene;
+      if (!currentScene) return null;
+
+      const layer = this._getCameraLayer('');
+      if (!layer) {
+        return null;
+      }
+      const projectedCursor = layer.convertCoords(
+        cursor[0],
+        cursor[1],
+        0,
+        cursor
+      );
+
+      const cameraX = layer.getCameraX();
+      const cameraY = layer.getCameraY();
+      const cameraZ = getCameraZ(currentScene, layer.getName(), 0);
+
+      const cursorX = projectedCursor[0];
+      const cursorY = projectedCursor[1];
+
+      const threeCamera = layer.getRenderer().getThreeCamera();
+      if (!threeCamera) {
+        return projectedCursor;
+      }
+      const { forward } = getCameraForwardVector(threeCamera);
+      const deltaX = cursorX - cameraX;
+      const deltaY = cursorY - cameraY;
+      const deltaZ = 0 - cameraZ;
+      // It happens when the cursor is over the horizon and projected on the plane Z = 0.
+      const isCursorBehindTheCamera =
+        forward.dot(new THREE.Vector3(deltaX, deltaY, deltaZ)) < 1;
+      if (isCursorBehindTheCamera) {
+        return null;
+      }
+      return projectedCursor;
+    }
+
     reloadInstances(instances: Array<InstanceData>) {
       const editedInstanceContainer = this.getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
@@ -3577,6 +4059,24 @@ namespace gdjs {
         this._getNormalizedScreenY(inputManager.getCursorY())
       );
       raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera);
+    }
+
+    _recastFromCursor(
+      objects: Array<THREE.Object3D>
+    ): Array<THREE.Intersection> {
+      const currentScene = this._currentScene;
+      if (!currentScene) {
+        return [];
+      }
+      const topLayer =
+        currentScene._orderedLayers[currentScene._orderedLayers.length - 1];
+      const runtimeLayerRender = topLayer.getRenderer();
+      const threeCamera = runtimeLayerRender.getThreeCamera();
+      if (!threeCamera) {
+        return [];
+      }
+      this.setRayFromCursor(this._raycaster, threeCamera);
+      return this._raycaster.intersectObjects(objects, true);
     }
 
     // TODO: Cache the result for the frame
@@ -3938,6 +4438,20 @@ namespace gdjs {
       return -(y / this._runtimeGame.getGameResolutionHeight()) * 2 + 1;
     }
 
+    private _getUnormalizedScreenX(x: float): float {
+      return ((x + 1) / 2) * this._runtimeGame.getGameResolutionWidth();
+    }
+
+    private _getUnormalizedScreenY(y: float): float {
+      return ((-y + 1) / 2) * this._runtimeGame.getGameResolutionHeight();
+    }
+
+    private _getUnormalizedScreenPoint(point: FloatPoint): FloatPoint {
+      point[0] = this._getUnormalizedScreenX(point[0]);
+      point[1] = this._getUnormalizedScreenY(point[1]);
+      return point;
+    }
+
     getObjectUnderCursor(): gdjs.RuntimeObject | null {
       const closestIntersect = this._getClosestIntersectionUnderCursor({
         ignoreUnselectableInstances: true,
@@ -4015,15 +4529,6 @@ namespace gdjs {
 
     restoreCameraState(editorCamera3D: EditorCameraState) {
       this._getEditorCamera().restoreCameraState(editorCamera3D);
-    }
-
-    private _updateMouseCursor() {
-      const mouseCursor = this._getEditorCamera().getRequestedMouseCursor();
-
-      const canvas = this._runtimeGame.getRenderer().getCanvas();
-      if (canvas) {
-        canvas.style.cursor = mouseCursor || 'default';
-      }
     }
 
     private _handleTransformControlsMode() {
@@ -4187,7 +4692,6 @@ namespace gdjs {
       this._updateInnerAreaOutline();
       this._handleContextMenu();
       this._handleShortcuts();
-      this._updateMouseCursor();
 
       const domElementContainer = this._runtimeGame
         .getRenderer()
@@ -4927,7 +5431,6 @@ namespace gdjs {
     freeCameraControl: FreeCameraControl;
     private _hasChanged = false;
     private _hadChanged = false;
-    private _mouseCursor: string | null = null;
 
     constructor(editor: gdjs.InGameEditor) {
       this.editor = editor;
@@ -4944,10 +5447,6 @@ namespace gdjs {
       return this.isFreeCamera()
         ? this.freeCameraControl
         : this.orbitCameraControl;
-    }
-
-    getRequestedMouseCursor(): string | null {
-      return this._mouseCursor;
     }
 
     switchToOrbitAroundObject(object: gdjs.RuntimeObject): void {
@@ -5194,9 +5693,9 @@ namespace gdjs {
 
       // Always allow to use Space+click to switch to free camera and pan.
       // Display a grab cursor to indicate that.
-      this._mouseCursor = null;
+      this.editor.setCursorIcon('');
       if (isSpacePressed(inputManager)) {
-        this._mouseCursor = 'grab';
+        this.editor.setCursorIcon('grab');
 
         // Switch to pan if space + left click is used.
         if (inputManager.isMouseButtonPressed(0) && !this.isFreeCamera()) {
@@ -6222,7 +6721,29 @@ namespace gdjs {
     }
   }
 
-  class SelectionControls {
+  interface SelectionControls {
+    step(): void;
+
+    getTransformControlsMode(): 'translate' | 'rotate' | 'scale';
+
+    setTransformControlsMode(mode: 'translate' | 'rotate' | 'scale'): void;
+
+    isHovered(): boolean;
+
+    forceUpdate(): void;
+
+    shouldDragSelectedObject(): boolean;
+
+    update(): void;
+
+    remove(): void;
+
+    isShown(): boolean;
+
+    hasActuallyMoved(): boolean;
+  }
+
+  class SelectionControls3D implements SelectionControls {
     private editor: InGameEditor;
     object: gdjs.RuntimeObject | null = null;
     dummyThreeObject: THREE.Object3D = new THREE.Object3D();
@@ -6231,13 +6752,13 @@ namespace gdjs {
       'translate';
     private _isShown = false;
 
-    private _selectionControlsMovementTotalDelta: SelectionMovement | null =
+    private _selectionControlsMovementTotalDelta: SelectionMovement3D | null =
       null;
     private _hasActuallyMoved = false;
     private _wasMovingLastFrame = false;
-    private _objectMover: ObjectMover;
+    private _objectMover: ObjectMover3D;
 
-    constructor(editor: InGameEditor, objectMover: ObjectMover) {
+    constructor(editor: InGameEditor, objectMover: ObjectMover3D) {
       this.editor = editor;
       this._objectMover = objectMover;
     }
@@ -6248,6 +6769,7 @@ namespace gdjs {
         !this._selectionControlsMovementTotalDelta
       ) {
         const changeHappened = this._objectMover.endMove();
+        console.log('endMove', changeHappened);
         this.editor._sendSelectionUpdate({
           hasSelectedObjectBeenModified: changeHappened,
         });
@@ -6904,6 +7426,808 @@ namespace gdjs {
 
     hasActuallyMoved(): boolean {
       return this._hasActuallyMoved;
+    }
+  }
+
+  class SelectionControls2D implements SelectionControls {
+    private editor: InGameEditor;
+    private _isShown = false;
+    private selectionHandle: SelectionHandle2D;
+
+    constructor(editor: InGameEditor, objectMover2D: ObjectMover2D) {
+      this.editor = editor;
+      this.selectionHandle = new SelectionHandle2D(objectMover2D);
+    }
+
+    step() {
+      this.selectionHandle.step(this.editor);
+    }
+
+    getTransformControlsMode(): 'scale' | 'translate' | 'rotate' {
+      return 'translate';
+    }
+
+    setTransformControlsMode(mode: 'scale' | 'translate' | 'rotate'): void {}
+
+    isHovered(): boolean {
+      return false;
+    }
+
+    forceUpdate(): void {
+      if (this._isShown) {
+        this.remove();
+      }
+      this.update();
+    }
+
+    shouldDragSelectedObject(): boolean {
+      return false;
+    }
+
+    update(): void {
+      const selectedObjects = this.editor.getSelectedObjects();
+      if (selectedObjects.length === 0) {
+        this.remove();
+        return;
+      }
+      const cameraLayer = this.editor._getCameraLayer(
+        selectedObjects[0].getLayer()
+      );
+      if (!cameraLayer) {
+        return;
+      }
+      const runtimeLayerRender = cameraLayer ? cameraLayer.getRenderer() : null;
+      const threeCamera = runtimeLayerRender
+        ? runtimeLayerRender.getThreeCamera()
+        : null;
+      const threeScene = runtimeLayerRender
+        ? runtimeLayerRender.getThreeScene()
+        : null;
+      if (!threeCamera || !threeScene) {
+        return;
+      }
+      threeScene.add(this.selectionHandle);
+      this._isShown = true;
+    }
+
+    remove(): void {
+      if (!this._isShown) {
+        return;
+      }
+      this.selectionHandle.removeFromParent();
+      this._isShown = false;
+      console.log('Remove selection');
+    }
+
+    isShown(): boolean {
+      return this._isShown;
+    }
+
+    hasActuallyMoved(): boolean {
+      return this.selectionHandle.hasActuallyMoved();
+    }
+  }
+
+  const selectionStyle = {
+    bigButtonSize: 10,
+    smallButtonSize: 8,
+    buttonPadding: 5,
+    hitAreaPadding: 5,
+  };
+
+  enum ButtonLocation {
+    Right = 1,
+    Bottom = 2,
+    Top = 4,
+    Left = 8,
+    TopLeft = Top | Left,
+    TopRight = Top | Right,
+    BottomRight = Bottom | Right,
+    BottomLeft = Bottom | Left,
+  }
+
+  const buttonLocations = [
+    ButtonLocation.Right,
+    ButtonLocation.Bottom,
+    ButtonLocation.Top,
+    ButtonLocation.Left,
+    ButtonLocation.TopLeft,
+    ButtonLocation.TopRight,
+    ButtonLocation.BottomRight,
+    ButtonLocation.BottomLeft,
+  ];
+
+  // class SelectionHandleButton2D {
+  //   buttonLocation: ButtonLocation;
+  //   threeObject: ThreeSquare;
+
+  //   constructor (buttonLocation: ButtonLocation,
+  //   threeObject: ThreeSquare) {
+  //     this.buttonLocation = buttonLocation;
+  //     this.threeObject = threeObject;
+  //   }
+  // }
+
+  const areAnyInstancesNotStraight = (objects: gdjs.RuntimeObject[]) => {
+    for (const object of objects) {
+      if (object.getAngle() % 90 !== 0) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  class SelectionHandle2D extends THREE.Object3D {
+    buttons: Array<ThreeSquare> = [];
+    rotationButton: ThreeCircle;
+    area: ThreeSquare;
+
+    state: 'idle' | 'resizing' | 'panning' | 'rotating' = 'idle';
+    draggedButtonLocation: ButtonLocation | null = null;
+    initialSelectionAABB: AABB3D = { min: [0, 0, 0], max: [0, 0, 0] };
+    initialCursorPosition: FloatPoint = [0, 0];
+
+    private _hasActuallyMoved = false;
+    private _objectMover: ObjectMover2D;
+
+    constructor(objectMover: ObjectMover2D) {
+      super();
+      this._objectMover = objectMover;
+      this.area = new ThreeSquare(0x6868e8, 0.3, 0x6868e8, 0.8);
+      this.add(this.area);
+
+      for (const buttonLocation of buttonLocations) {
+        const button = new ThreeSquare(0xffffff, 1, 0x6868e8, 1);
+        this.buttons[buttonLocation] = button;
+        this.add(button);
+      }
+      this.rotationButton = new ThreeCircle(0xffffff, 1, 0x6868e8, 1);
+      this.add(this.rotationButton);
+    }
+
+    private update(
+      aabb: AABB3D,
+      threeCamera: THREE.PerspectiveCamera | THREE.OrthographicCamera,
+      canvasHeight: float
+    ) {
+      let minX = aabb.min[0];
+      let minY = aabb.min[1];
+      let maxX = aabb.max[0];
+      let maxY = aabb.max[1];
+      const centerX = (minX + maxX) / 2;
+      const centerY = (minY + maxY) / 2;
+
+      this.buttons[ButtonLocation.TopLeft].position.x = minX;
+      this.buttons[ButtonLocation.TopLeft].position.y = minY;
+      this.buttons[ButtonLocation.TopRight].position.x = maxX;
+      this.buttons[ButtonLocation.TopRight].position.y = minY;
+      this.buttons[ButtonLocation.BottomRight].position.x = maxX;
+      this.buttons[ButtonLocation.BottomRight].position.y = maxY;
+      this.buttons[ButtonLocation.BottomLeft].position.x = minX;
+      this.buttons[ButtonLocation.BottomLeft].position.y = maxY;
+
+      this.buttons[ButtonLocation.Top].position.x = centerX;
+      this.buttons[ButtonLocation.Top].position.y = minY;
+      this.buttons[ButtonLocation.Right].position.x = maxX;
+      this.buttons[ButtonLocation.Right].position.y = centerY;
+      this.buttons[ButtonLocation.Bottom].position.x = centerX;
+      this.buttons[ButtonLocation.Bottom].position.y = maxY;
+      this.buttons[ButtonLocation.Left].position.x = minX;
+      this.buttons[ButtonLocation.Left].position.y = centerY;
+
+      this.rotationButton.position.x = centerX;
+      this.rotationButton.position.y = minY;
+
+      this.area.position.x = centerX;
+      this.area.position.y = centerY;
+      this.area.scale.x = aabb.max[0] - aabb.min[0];
+      this.area.scale.y = aabb.max[1] - aabb.min[1];
+
+      let cameraFactor;
+      let cameraForward;
+      let cameraToObject;
+      if (threeCamera instanceof THREE.PerspectiveCamera) {
+        cameraForward = new THREE.Vector3(0, 0, -1);
+        cameraForward.applyQuaternion(threeCamera.quaternion);
+
+        cameraToObject = new THREE.Vector3();
+
+        cameraFactor =
+          (196 * Math.tan((threeCamera.fov * Math.PI) / 360)) /
+          (threeCamera.zoom * canvasHeight);
+      } else {
+        cameraFactor =
+          (threeCamera.top - threeCamera.bottom) / threeCamera.zoom;
+      }
+      for (const buttonLocation of buttonLocations) {
+        const button = this.buttons[buttonLocation];
+
+        let factor = cameraFactor;
+        if (threeCamera instanceof THREE.PerspectiveCamera) {
+          button.getWorldPosition(cameraToObject).sub(threeCamera.position);
+          factor = cameraFactor * cameraToObject.dot(cameraForward);
+        }
+
+        button.rotation.order = threeCamera.rotation.order;
+        button.rotation.x = -threeCamera.rotation.x;
+        button.rotation.y = threeCamera.rotation.y;
+        button.rotation.z = -threeCamera.rotation.z;
+
+        const isCorner =
+          (buttonLocation & (ButtonLocation.Left | ButtonLocation.Right)) > 0 &&
+          (buttonLocation & (ButtonLocation.Top | ButtonLocation.Bottom)) > 0;
+        const size = isCorner
+          ? selectionStyle.bigButtonSize
+          : selectionStyle.smallButtonSize;
+        const scale = size * factor;
+        button.scale.set(scale, scale, 1);
+
+        const unitX =
+          buttonLocation & ButtonLocation.Left
+            ? -1
+            : buttonLocation & ButtonLocation.Right
+              ? 1
+              : 0;
+        const unitY =
+          buttonLocation & ButtonLocation.Top
+            ? -1
+            : buttonLocation & ButtonLocation.Bottom
+              ? 1
+              : 0;
+        const margin = selectionStyle.buttonPadding;
+        button.position.x += unitX * (size / 2 + margin) * factor;
+        button.position.y += unitY * (size / 2 + margin) * factor;
+      }
+      {
+        const button = this.rotationButton;
+
+        let factor = cameraFactor;
+        if (threeCamera instanceof THREE.PerspectiveCamera) {
+          button.getWorldPosition(cameraToObject).sub(threeCamera.position);
+          factor = cameraFactor * cameraToObject.dot(cameraForward);
+        }
+
+        button.rotation.order = threeCamera.rotation.order;
+        button.rotation.x = -threeCamera.rotation.x;
+        button.rotation.y = threeCamera.rotation.y;
+        button.rotation.z = -threeCamera.rotation.z;
+
+        const size = selectionStyle.smallButtonSize;
+        const scale = size * factor;
+        button.scale.set(scale, scale, 1);
+
+        const unitX = 0;
+        const unitY = -1;
+        const margin = selectionStyle.smallButtonSize * 4;
+        button.position.x += unitX * (size / 2 + margin) * factor;
+        button.position.y += unitY * (size / 2 + margin) * factor;
+      }
+    }
+
+    step(editor: InGameEditor) {
+      const selectedObjects = editor.getSelectedObjects();
+      if (selectedObjects.length === 0) {
+        return;
+      }
+      const currentScene = editor.getCurrentScene();
+      if (!currentScene) {
+        return;
+      }
+      const topLayer =
+        currentScene._orderedLayers[currentScene._orderedLayers.length - 1];
+      const runtimeLayerRender = topLayer.getRenderer();
+      const threeCamera = runtimeLayerRender.getThreeCamera();
+      const threeScene = runtimeLayerRender.getThreeScene();
+      if (!threeCamera || !threeScene) {
+        return;
+      }
+      const selectionAABB = editor.getSelectionAABB();
+      if (!selectionAABB) {
+        return;
+      }
+      // TODO Update the controls after the transformation is applied to avoid a 1-frame delay.
+      this.update(
+        selectionAABB,
+        threeCamera,
+        editor.getRuntimeGame().getGameResolutionHeight()
+      );
+
+      editor.setCursorIcon('');
+      const intersects = editor._recastFromCursor(this.children);
+      if (intersects.length === 0) {
+        return;
+      }
+      let hoverredButtonLocation: ButtonLocation | null = null;
+      let isRotationButtonHovered = false;
+      let isAreaHovered = false;
+      for (const intersect of intersects) {
+        for (
+          let index = 0;
+          index < this.buttons.length && this.state === 'idle';
+          index++
+        ) {
+          const button = this.buttons[index];
+
+          if (intersect.object.parent === button) {
+            hoverredButtonLocation = index;
+
+            const isVertical =
+              (index & (ButtonLocation.Left | ButtonLocation.Right)) === 0;
+            const isHorizontal =
+              (index & (ButtonLocation.Top | ButtonLocation.Bottom)) === 0;
+
+            editor.setCursorIcon(
+              isVertical
+                ? 'ns-resize'
+                : isHorizontal
+                  ? 'ew-resize'
+                  : index & ButtonLocation.Top
+                    ? 'nesw-resize'
+                    : 'nwse-resize'
+            );
+            break;
+          }
+        }
+        if (intersect.object.parent === this.rotationButton) {
+          isRotationButtonHovered = true;
+          editor.setCursorIcon(`url("${getSvgIconUrl(editor.getRuntimeGame(), 'InGameEditor-rotate24_black')}"),auto`);
+          break;
+        }
+      }
+      if (!hoverredButtonLocation && !isRotationButtonHovered) {
+        for (const intersect of intersects) {
+          if (intersect.object.parent === this.area) {
+            isAreaHovered = true;
+            break;
+          }
+        }
+      }
+
+      const inputManager = editor.getRuntimeGame().getInputManager();
+      const isLeftButtonPressed = inputManager.isMouseButtonPressed(0);
+      if (!isLeftButtonPressed || editor.isLeftMouseButtonCaptured()) {
+        if (this.state === 'idle') {
+          return;
+        }
+        const changeHappened = this._objectMover.endMove();
+        console.log('endMove', changeHappened);
+        editor._sendSelectionUpdate({
+          hasSelectedObjectBeenModified: changeHappened,
+        });
+
+        this.state = 'idle';
+        this.draggedButtonLocation = null;
+        this._hasActuallyMoved = false;
+        return;
+      }
+
+      if (editor.isMouseLeftButtonJustPressed()) {
+        const intersects = editor._recastFromCursor(this.children);
+        if (intersects.length === 0) {
+          return;
+        }
+        this.state = 'idle';
+        this.draggedButtonLocation = null;
+        this._hasActuallyMoved = false;
+        const selectionAABB = editor.getSelectionAABB();
+        if (!selectionAABB) {
+          return;
+        }
+        if (hoverredButtonLocation) {
+          this.state = 'resizing';
+          this.draggedButtonLocation = hoverredButtonLocation;
+          console.log('Start resizing', this.draggedButtonLocation);
+        } else if (isRotationButtonHovered) {
+          this.state = 'rotating';
+        } else if (isAreaHovered) {
+          this.state = 'panning';
+          console.log('Start dragging');
+        }
+        if (this.state !== 'idle') {
+          this.initialCursorPosition[0] = gdjs.evtTools.input.getCursorX(
+            currentScene,
+            '',
+            0
+          );
+          this.initialCursorPosition[1] = gdjs.evtTools.input.getCursorY(
+            currentScene,
+            '',
+            0
+          );
+          this.initialSelectionAABB.min[0] = selectionAABB.min[0];
+          this.initialSelectionAABB.min[1] = selectionAABB.min[1];
+          this.initialSelectionAABB.max[0] = selectionAABB.max[0];
+          this.initialSelectionAABB.max[1] = selectionAABB.max[1];
+          console.log('Start move');
+          this._objectMover.startMove();
+        }
+      }
+
+      if (this.state === 'idle') {
+        return;
+      }
+      editor.captureLeftMouseButton();
+      if (this.state === 'panning') {
+        const cursorX = gdjs.evtTools.input.getCursorX(currentScene, '', 0);
+        const cursorY = gdjs.evtTools.input.getCursorY(currentScene, '', 0);
+
+        // TODO Handle grid
+
+        const translationX = cursorX - this.initialCursorPosition[0];
+        const translationY = cursorY - this.initialCursorPosition[1];
+        this._hasActuallyMoved =
+          this._hasActuallyMoved || translationX !== 0 || translationY !== 0;
+        this._objectMover.translate(
+          editor.getSelectedObjects() as Array<gdjs.RuntimeObject>,
+          translationX,
+          translationY
+        );
+      } else if (this.state === 'resizing') {
+        if (!this.draggedButtonLocation) {
+          return;
+        }
+        const oldAABB = this.initialSelectionAABB;
+        const newAABB: AABB3D = { min: [0, 0, 0], max: [0, 0, 0] };
+        newAABB.min[0] = oldAABB.min[0];
+        newAABB.min[1] = oldAABB.min[1];
+        newAABB.max[0] = oldAABB.max[0];
+        newAABB.max[1] = oldAABB.max[1];
+        let totalDeltaX = 0;
+        let totalDeltaY = 0;
+        const cursorX = gdjs.evtTools.input.getCursorX(currentScene, '', 0);
+        const cursorY = gdjs.evtTools.input.getCursorY(currentScene, '', 0);
+        if (this.draggedButtonLocation & ButtonLocation.Left) {
+          totalDeltaX = cursorX - this.initialCursorPosition[0];
+          newAABB.min[0] = oldAABB.min[0] + totalDeltaX;
+        } else if (this.draggedButtonLocation & ButtonLocation.Right) {
+          totalDeltaX = cursorX - this.initialCursorPosition[0];
+          newAABB.max[0] = oldAABB.max[0] + totalDeltaX;
+        }
+        if (this.draggedButtonLocation & ButtonLocation.Top) {
+          totalDeltaY = cursorY - this.initialCursorPosition[1];
+          newAABB.min[1] = oldAABB.min[1] + totalDeltaY;
+        } else if (this.draggedButtonLocation & ButtonLocation.Bottom) {
+          totalDeltaY = cursorY - this.initialCursorPosition[1];
+          newAABB.max[1] = oldAABB.max[1] + totalDeltaY;
+        }
+
+        const grabbingRelativeX =
+          this.draggedButtonLocation & ButtonLocation.Left
+            ? 0
+            : this.draggedButtonLocation & ButtonLocation.Right
+              ? 1
+              : 0.5;
+        const grabbingRelativeY =
+          this.draggedButtonLocation & ButtonLocation.Top
+            ? 0
+            : this.draggedButtonLocation & ButtonLocation.Bottom
+              ? 1
+              : 0.5;
+
+        const initialSelectionAABB = this.initialSelectionAABB;
+        const initialSelectionWidth =
+          initialSelectionAABB.max[0] - initialSelectionAABB.min[0];
+        const initialSelectionHeight =
+          initialSelectionAABB.max[1] - initialSelectionAABB.min[1];
+        const initialSelectionDepth =
+          initialSelectionAABB.max[2] - initialSelectionAABB.min[2];
+
+        // Round the grabbed handle position on the grid.
+        const initialGrabbingX =
+          initialSelectionAABB.min[0] +
+          initialSelectionWidth * grabbingRelativeX;
+        const initialGrabbingY =
+          initialSelectionAABB.min[1] +
+          initialSelectionHeight * grabbingRelativeY;
+        const grabbingPositionX = initialGrabbingX + totalDeltaX;
+        const grabbingPositionY = initialGrabbingY + totalDeltaY;
+        // TODO Should the grid really be handled here?
+        // if (
+        //   this.instancesEditorSettings.snap &&
+        //   this.instancesEditorSettings.grid &&
+        //   !noGridSnap
+        // ) {
+        //   roundPositionForResizing(
+        //     grabbingPosition,
+        //     this.instancesEditorSettings.gridWidth,
+        //     this.instancesEditorSettings.gridHeight,
+        //     this.instancesEditorSettings.gridOffsetX,
+        //     this.instancesEditorSettings.gridOffsetY,
+        //     this.instancesEditorSettings.gridType
+        //   );
+        // } else {
+        //   // Without a grid, the position is still rounded to the nearest pixel.
+        //   grabbingPosition[0] = Math.round(grabbingPosition[0]);
+        //   grabbingPosition[1] = Math.round(grabbingPosition[1]);
+        // }
+        let roundedTotalDeltaX = grabbingPositionX - initialGrabbingX;
+        let roundedTotalDeltaY = grabbingPositionY - initialGrabbingY;
+
+        const canMoveOnX =
+          (this.draggedButtonLocation &
+            (ButtonLocation.Left | ButtonLocation.Right)) !==
+          0;
+        const canMoveOnY =
+          (this.draggedButtonLocation &
+            (ButtonLocation.Top | ButtonLocation.Bottom)) !==
+          0;
+        if (!canMoveOnX) {
+          roundedTotalDeltaX = 0;
+        }
+        if (!canMoveOnY) {
+          roundedTotalDeltaY = 0;
+        }
+
+        const isLeft = this.draggedButtonLocation & ButtonLocation.Left;
+        const isTop = this.draggedButtonLocation & ButtonLocation.Top;
+
+        // Flip the deltas to end up in the nominal case of a bottom-right grabbed node.
+        // Because a negative deltaX on the left grabbing handle will make the width greater
+        // as a positive deltaX on the right grabbing handle would do.
+        const flippedTotalDeltaX = isLeft
+          ? -roundedTotalDeltaX
+          : roundedTotalDeltaX;
+        const flippedTotalDeltaY = isTop
+          ? -roundedTotalDeltaY
+          : roundedTotalDeltaY;
+
+        let scaleX =
+          initialSelectionWidth !== 0
+            ? (initialSelectionWidth + flippedTotalDeltaX) /
+              initialSelectionWidth
+            : flippedTotalDeltaX;
+        let scaleY =
+          initialSelectionHeight !== 0
+            ? (initialSelectionHeight + flippedTotalDeltaY) /
+              initialSelectionHeight
+            : flippedTotalDeltaY;
+        let scaleZ = 1;
+
+        // TODO
+        const hasRotatedInstance = areAnyInstancesNotStraight(
+          editor.getSelectedObjects() as Array<gdjs.RuntimeObject>
+        );
+        const proportional = false;
+
+        // Applying a rotation then a scaling can result to
+        // an affine transformation with a shear transformation - which we don't want.
+        // If any instance is rotated, we keep the aspect ratio (i.e: force proportional resizing)
+        // to ensure a transformation without any shear.
+        if (proportional || hasRotatedInstance) {
+          // Choose the axis where the selection is the biggest.
+          // That way the cursor is always on one edge.
+          if (
+            !canMoveOnY ||
+            (canMoveOnX &&
+              flippedTotalDeltaX * initialSelectionHeight >
+                flippedTotalDeltaY * initialSelectionWidth)
+          ) {
+            scaleY = scaleX;
+            scaleZ = scaleX;
+          } else {
+            scaleX = scaleY;
+            scaleZ = scaleY;
+          }
+        }
+
+        // No negative scale because instances can't be mirrored.
+        // Make the minimal selection size to 1 to avoid absorption.
+        // If size is already 0, use a minimum scale to avoid negative scales.
+        scaleX = Math.max(
+          initialSelectionWidth !== 0 ? 1 / initialSelectionWidth : 0.00001,
+          scaleX
+        );
+        scaleY = Math.max(
+          initialSelectionHeight !== 0 ? 1 / initialSelectionHeight : 0.00001,
+          scaleY
+        );
+        scaleZ = Math.max(
+          initialSelectionDepth !== 0 ? 1 / initialSelectionDepth : 0.00001,
+          scaleZ
+        );
+
+        const fixedPointX =
+          initialSelectionAABB.max[0] -
+          grabbingRelativeX * initialSelectionWidth;
+        const fixedPointY =
+          initialSelectionAABB.max[1] -
+          grabbingRelativeY * initialSelectionHeight;
+
+        this._hasActuallyMoved =
+          this._hasActuallyMoved || scaleX !== 1 || scaleY !== 1;
+        this._objectMover.resize(
+          editor.getSelectedObjects() as Array<gdjs.RuntimeObject>,
+          scaleX,
+          scaleY,
+          scaleZ,
+          fixedPointX,
+          fixedPointY
+        );
+      } else if (this.state === 'rotating') {
+        const cursorX = gdjs.evtTools.input.getCursorX(currentScene, '', 0);
+        const cursorY = gdjs.evtTools.input.getCursorY(currentScene, '', 0);
+
+        const deltaX = cursorX - this.initialCursorPosition[0];
+        const initialSelectionHeight =
+          this.initialSelectionAABB.max[1] - this.initialSelectionAABB.min[1];
+        const initialSelectionCenterX =
+          (this.initialSelectionAABB.min[0] +
+            this.initialSelectionAABB.max[0]) /
+          2;
+        const initialSelectionCenterY =
+          (this.initialSelectionAABB.min[1] +
+            this.initialSelectionAABB.max[1]) /
+          2;
+        // Because the button is on top, consider the initial rotation vector to
+        // be directed to the top.
+        const deltaY =
+          cursorY - this.initialCursorPosition[1] - initialSelectionHeight / 2;
+
+        // The grabbable handle for rotation is on top.
+        // Initially, totalDelta = (0 , selectionAABB.height() / 2)
+        // (see the affectation of totalDeltaY in the rotateBy method).
+        // So the initial angle given by atan2 is -90.
+        // 90 is added to start with a angle delta of 0.
+        const angle = (Math.atan2(deltaY, deltaX) * 180) / Math.PI + 90;
+
+        this._hasActuallyMoved = this._hasActuallyMoved || angle !== 0;
+        this._objectMover.rotate(
+          editor.getSelectedObjects() as Array<gdjs.RuntimeObject>,
+          angle,
+          initialSelectionCenterX,
+          initialSelectionCenterY
+        );
+      }
+      {
+        const selectionAABB = editor.getSelectionAABB();
+        if (!selectionAABB) {
+          return;
+        }
+        this.update(
+          selectionAABB,
+          threeCamera,
+          editor.getRuntimeGame().getGameResolutionHeight()
+        );
+      }
+    }
+
+    hasActuallyMoved(): boolean {
+      return this._hasActuallyMoved;
+    }
+  }
+
+  class ThreeSquare extends THREE.Object3D {
+    constructor(
+      fillColor: THREE.ColorRepresentation | null,
+      fillOpacity: number,
+      strokeColor: THREE.ColorRepresentation | null,
+      strokeOpacity: number
+    ) {
+      super();
+
+      if (fillColor) {
+        const fillMesh = new THREE.Mesh(
+          new THREE.PlaneGeometry(),
+          new THREE.MeshBasicMaterial({
+            color: fillColor,
+            opacity: fillOpacity,
+            toneMapped: false,
+            depthTest: false,
+            transparent: true,
+          })
+        );
+        fillMesh.renderOrder = Number.MAX_SAFE_INTEGER;
+        this.add(fillMesh);
+      }
+      if (strokeColor) {
+        const indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0]);
+        const positions = new Float32Array([
+          -0.5,
+          -0.5,
+          0, //
+          0.5,
+          -0.5,
+          0, //
+          0.5,
+          0.5,
+          0, //
+          -0.5,
+          0.5,
+          0, //
+        ]);
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+        geometry.setAttribute(
+          'position',
+          new THREE.BufferAttribute(positions, 3)
+        );
+
+        const contourLine = new THREE.LineSegments<
+          THREE.BufferGeometry,
+          THREE.LineBasicMaterial
+        >(
+          geometry,
+          new THREE.LineBasicMaterial({
+            color: strokeColor,
+            opacity: strokeOpacity,
+            toneMapped: false,
+            depthTest: false,
+            transparent: true,
+          })
+        );
+
+        contourLine.renderOrder = Number.MAX_SAFE_INTEGER;
+        this.add(contourLine);
+      }
+    }
+  }
+
+  class ThreeCircle extends THREE.Object3D {
+    constructor(
+      fillColor: THREE.ColorRepresentation | null,
+      fillOpacity: number,
+      strokeColor: THREE.ColorRepresentation | null,
+      strokeOpacity: number
+    ) {
+      super();
+
+      const segmentCount = 16;
+      if (fillColor) {
+        const fillMesh = new THREE.Mesh(
+          new THREE.CircleGeometry(0.5, segmentCount),
+          new THREE.MeshBasicMaterial({
+            color: fillColor,
+            opacity: fillOpacity,
+            toneMapped: false,
+            depthTest: false,
+            transparent: true,
+          })
+        );
+        fillMesh.renderOrder = Number.MAX_SAFE_INTEGER;
+        this.add(fillMesh);
+      }
+      if (strokeColor) {
+        const indices = new Uint16Array(segmentCount * 2);
+        const positions = new Float32Array(segmentCount * 3);
+
+        indices[0] = 0;
+        indices[indices.length - 1] = 0;
+        for (let index = 0; index < segmentCount; index++) {
+          indices[index * 2 + 1] = index;
+          indices[index * 2 + 2] = index;
+        }
+
+        for (let index = 0; index < segmentCount; index++) {
+          const angle = (2 * Math.PI * index) / segmentCount;
+          positions[index * 3] = 0.5 * Math.cos(angle);
+          positions[index * 3 + 1] = 0.5 * Math.sin(angle);
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+        geometry.setAttribute(
+          'position',
+          new THREE.BufferAttribute(positions, 3)
+        );
+
+        const contourLine = new THREE.LineSegments<
+          THREE.BufferGeometry,
+          THREE.LineBasicMaterial
+        >(
+          geometry,
+          new THREE.LineBasicMaterial({
+            color: strokeColor,
+            opacity: strokeOpacity,
+            toneMapped: false,
+            depthTest: false,
+            transparent: true,
+          })
+        );
+
+        contourLine.renderOrder = Number.MAX_SAFE_INTEGER;
+        this.add(contourLine);
+      }
     }
   }
 

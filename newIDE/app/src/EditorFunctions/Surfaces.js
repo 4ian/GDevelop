@@ -189,10 +189,12 @@ const isShowingScope = (
  */
 export const showScopeInInGameEditor = async ({
   resolvedScope,
+  sendChangesToEditor,
   openSceneEditor,
   openExternalLayoutEditor,
 }: {|
   resolvedScope: ResolvedScope,
+  sendChangesToEditor: () => void,
   openSceneEditor: (sceneName: string) => void,
   openExternalLayoutEditor: (externalLayoutName: string) => void,
 |}): Promise<
@@ -206,6 +208,8 @@ export const showScopeInInGameEditor = async ({
     };
   }
 
+  // The calls made before in the same batch may have changed the surfaces.
+  sendChangesToEditor();
   const wasInGameEditorDisabled = updateInGameEditor() === 'disabled';
   if (wasInGameEditorDisabled) enableInGameEditor();
   if (externalLayout) openExternalLayoutEditor(externalLayout.getName());

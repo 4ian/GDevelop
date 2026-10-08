@@ -618,6 +618,10 @@ export type LaunchFunctionOptionsWithoutProject = {|
     changes: WillDeleteGameplayTestChanges
   ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  // The changes of scenes, objects and instances are sent to the editor once
+  // per batch of calls: this sends the ones made so far, so that the game
+  // shown by the editor has them.
+  sendChangesToEditor: () => void,
   // Extensions authored by the AI (see `OutsideEditorChanges.js`): the
   // changes are coalesced per batch, `ensureExtensionsUpToDate` flushes them
   // (regenerating the extensions) when a function needs fresh metadata, and
@@ -4291,6 +4295,7 @@ const describeInstances: EditorFunction = {
     project,
     args,
     editorCallbacks,
+    sendChangesToEditor,
     PixiResourcesLoader,
   }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
@@ -4435,6 +4440,7 @@ const describeInstances: EditorFunction = {
     if (surfaceOptions && instancesWithBox.length > 0) {
       const showScope = await showScopeInInGameEditor({
         resolvedScope,
+        sendChangesToEditor,
         openSceneEditor: sceneName =>
           editorCallbacks.onOpenLayout(sceneName, {
             openEventsEditor: false,
@@ -4878,6 +4884,7 @@ const put2dInstances: EditorFunction = {
     args,
     toolsVersion,
     editorCallbacks,
+    sendChangesToEditor,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -5284,6 +5291,7 @@ const put2dInstances: EditorFunction = {
       if (dropOptions) {
         const showScope = await showScopeInInGameEditor({
           resolvedScope,
+          sendChangesToEditor,
           openSceneEditor: sceneName =>
             editorCallbacks.onOpenLayout(sceneName, {
               openEventsEditor: false,
@@ -5963,6 +5971,7 @@ const put3dInstances: EditorFunction = {
     args,
     toolsVersion,
     editorCallbacks,
+    sendChangesToEditor,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -6401,6 +6410,7 @@ const put3dInstances: EditorFunction = {
       if (dropOptions) {
         const showScope = await showScopeInInGameEditor({
           resolvedScope,
+          sendChangesToEditor,
           openSceneEditor: sceneName =>
             editorCallbacks.onOpenLayout(sceneName, {
               openEventsEditor: false,

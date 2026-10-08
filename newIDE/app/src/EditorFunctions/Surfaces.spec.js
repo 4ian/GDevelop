@@ -149,6 +149,32 @@ describe('finding surfaces with the in-game editor', () => {
     });
 
   describe('put_3d_instances with drop_to_surface', () => {
+    it('sends the changes made before in the batch to the editor before finding surfaces', async () => {
+      const calls: Array<string> = [];
+      mockRaycastInGameEditor.mockImplementation(async request => {
+        calls.push('raycast');
+        return raycastOnGroundAndPlatform(request);
+      });
+
+      await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        sendChangesToEditor: () => {
+          calls.push('sendChangesToEditor');
+        },
+        args: {
+          scope: { type: 'scene', scene_name: 'TestScene' },
+          layer_name: '',
+          object_name: 'House',
+          brush_kind: 'point',
+          brush_position: '300,400',
+          drop_to_surface: {},
+        },
+      });
+
+      expect(calls[0]).toBe('sendChangesToEditor');
+      expect(calls).toContain('raycast');
+    });
+
     it('drops new instances from above everything onto the surface below', async () => {
       const result = await putInstances('put_3d_instances', {
         object_name: 'House',

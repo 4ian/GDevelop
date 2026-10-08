@@ -199,6 +199,7 @@ namespace gdjs {
     _sceneAndExtensionsData: Array<SceneAndExtensionsData> = [];
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
     _effectsManager: EffectsManager;
+    _namedEasingsManager: gdjs.NamedEasingsManager;
     _maxFPS: integer;
     _minFPS: integer;
     _gameResolutionWidth: integer;
@@ -338,6 +339,7 @@ namespace gdjs {
         ? new gdjs.DebuggerClient(this)
         : null;
       this._effectsManager = new gdjs.EffectsManager();
+      this._namedEasingsManager = new gdjs.NamedEasingsManager(data);
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
@@ -400,6 +402,7 @@ namespace gdjs {
         getGlobalResourceNames(projectData),
         projectData.layouts
       );
+      this._namedEasingsManager = new gdjs.NamedEasingsManager(projectData);
     }
 
     private _updateSceneAndExtensionsData(): void {
@@ -567,6 +570,10 @@ namespace gdjs {
      */
     getEffectsManager(): gdjs.EffectsManager {
       return this._effectsManager;
+    }
+
+    getNamedEasingsManager(): gdjs.NamedEasingsManager {
+      return this._namedEasingsManager;
     }
 
     /**

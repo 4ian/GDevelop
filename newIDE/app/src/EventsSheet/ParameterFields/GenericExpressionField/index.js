@@ -19,6 +19,7 @@ import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpress
 import {
   type ParameterFieldProps,
   type FieldFocusFunction,
+  getParameterHelperMarkdownText,
 } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
@@ -136,6 +137,8 @@ type Props = {|
     style: Object,
     onChange: (newValue: string) => void,
   |}) => React.Node,
+  // Shown under the field, after the parameter long description.
+  extraHelperMarkdownText?: ?string,
   ...ParameterFieldProps,
 |};
 
@@ -623,9 +626,10 @@ export default class ExpressionField extends React.Component<Props, State> {
       : this.props.isInline
       ? undefined
       : '-'; // We're using multiline TextField, which does not support having no label.
-    const longDescription = parameterMetadata
-      ? parameterMetadata.getLongDescription()
-      : undefined;
+    const longDescription = getParameterHelperMarkdownText(
+      parameterMetadata,
+      this.props.extraHelperMarkdownText
+    );
 
     const popoverStyle = {
       width: this._fieldElementWidth || 'auto',

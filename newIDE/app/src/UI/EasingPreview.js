@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
-import { getEasingFunction } from '../Utils/Easings';
+import { getEasingFunction, getEasingValueRange } from '../Utils/Easings';
 
 type Props = {|
   /** The name of the easing, as used by the Tween extension (e.g. "easeInOutQuad"). */
@@ -28,16 +28,15 @@ export const getEasingPreviewPaths = (
   if (!easingFunction) return null;
 
   const points = [];
-  let minValue = 0;
-  let maxValue = 1;
   for (let i = 0; i <= SAMPLES_COUNT; i++) {
     const pos = i / SAMPLES_COUNT;
     const value = easingFunction(pos);
-    if (!Number.isFinite(value)) continue;
-    points.push([pos, value]);
-    minValue = Math.min(minValue, value);
-    maxValue = Math.max(maxValue, value);
+    if (Number.isFinite(value)) points.push([pos, value]);
   }
+  const { min: minValue, max: maxValue } = getEasingValueRange(
+    easingFunction,
+    SAMPLES_COUNT
+  );
 
   const drawableWidth = width - 2 * padding;
   const drawableHeight = height - 2 * padding;

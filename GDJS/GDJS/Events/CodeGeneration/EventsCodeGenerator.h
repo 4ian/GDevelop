@@ -234,6 +234,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::NamedPropertyDescriptor& property,
       const gd::String& operandCode) override;
 
+  virtual gd::String GenerateEasingCode(
+      const gd::String& easingStringCode) override;
+
  protected:
   virtual gd::String GenerateParameterCodes(
       const gd::Expression& parameter,

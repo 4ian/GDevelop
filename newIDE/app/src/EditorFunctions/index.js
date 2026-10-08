@@ -122,6 +122,14 @@ import {
   INSTANCE_ANCHORS_3D,
   type InstanceAnchor,
 } from './InstanceAnchor';
+import {
+  dropInstancesOnSurfaces,
+  getInstanceBox,
+  getSurfacesOfInstances,
+  parseSurfaceOptions,
+  showScopeInInGameEditor,
+  type InstanceWithBox,
+} from './Surfaces';
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
 import {
@@ -4279,7 +4287,12 @@ const describeInstances: EditorFunction = {
       ),
     };
   },
-  launchFunction: async ({ project, args, PixiResourcesLoader }) => {
+  launchFunction: async ({
+    project,
+    args,
+    editorCallbacks,
+    PixiResourcesLoader,
+  }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
       allowedTypes: INSTANCES_SCOPE_TYPES,
     });
@@ -4304,6 +4317,24 @@ const describeInstances: EditorFunction = {
       'include_raw_json'
     );
 
+    const surfaceBeneathParsing = parseSurfaceOptions({
+      args,
+      argumentName: 'surface_beneath',
+      isUpAllowed: true,
+      objectsContainer,
+      globalObjectsContainer,
+    });
+    if (!surfaceBeneathParsing.success)
+      return makeGenericFailure(surfaceBeneathParsing.message);
+    const surfaceOptions = surfaceBeneathParsing.options;
+    const grid = surfaceOptions
+      ? SafeExtractor.extractNumberProperty(args.surface_beneath, 'grid')
+      : null;
+    if (grid !== null && !(Number.isInteger(grid) && grid >= 2 && grid <= 16))
+      return makeGenericFailure(
+        `\`surface_beneath.grid\` must be an integer from 2 to 16 (got ${grid}).`
+      );
+
     const objectNames = new Set(
       filter_by_object_name
         .split(',')
@@ -4311,7 +4342,10 @@ const describeInstances: EditorFunction = {
         .filter(Boolean)
     );
 
-    const instances = [];
+    const instances: Array<Object> = [];
+    // The instances whose surfaces are found, with their index in `instances`.
+    const instancesWithBox: Array<InstanceWithBox> = [];
+    const instancesWithBoxIndices: Array<number> = [];
     const objectSizeInfoByName: { [string]: ObjectSizeInfo | null } = {};
 
     const isInstanceDescribed = (instance: gdInitialInstance) =>
@@ -4372,6 +4406,22 @@ const describeInstances: EditorFunction = {
             instance,
             defaultSize
           );
+          if (surfaceOptions && sizeInfo) {
+            const mode = sizeInfo.originZ === null ? '2d' : '3d';
+            const position = [instance.getX(), instance.getY()];
+            const size = [simplifiedInstance.width, simplifiedInstance.height];
+            if (mode === '3d') {
+              position.push(instance.getZ());
+              size.push(simplifiedInstance.depth);
+            }
+            const box = size.every(value => Number.isFinite(value))
+              ? getInstanceBox({ position, size, objectSizeInfo: sizeInfo })
+              : null;
+            if (box) {
+              instancesWithBox.push({ instance, mode, box });
+              instancesWithBoxIndices.push(instances.length);
+            }
+          }
           instances.push(
             includeRawJson
               ? { ...simplifiedInstance, rawJson: getInstanceRawJson(instance) }
@@ -4381,8 +4431,37 @@ const describeInstances: EditorFunction = {
       );
     });
 
+    let surfacesMessage = null;
+    if (surfaceOptions && instancesWithBox.length > 0) {
+      const showScope = await showScopeInInGameEditor({
+        resolvedScope,
+        openSceneEditor: sceneName =>
+          editorCallbacks.onOpenLayout(sceneName, {
+            openEventsEditor: false,
+            openSceneEditor: true,
+            focusWhenOpened: 'scene',
+          }),
+        openExternalLayoutEditor: editorCallbacks.onOpenExternalLayout,
+      });
+      if (!showScope.success) return makeGenericFailure(showScope.message);
+      const surfacesOfInstances = await getSurfacesOfInstances({
+        resolvedScope,
+        instancesWithBox,
+        surfaceOptions,
+        grid,
+      });
+      if (!surfacesOfInstances.success)
+        return makeGenericFailure(surfacesOfInstances.message);
+      surfacesOfInstances.surfaces.forEach((surfaces, index) => {
+        const instanceIndex = instancesWithBoxIndices[index];
+        instances[instanceIndex] = { ...instances[instanceIndex], ...surfaces };
+      });
+      surfacesMessage = showScope.message;
+    }
+
     const result: EditorFunctionGenericOutput = {
       success: true,
+      ...(surfacesMessage ? { message: surfacesMessage } : {}),
       instances: instances,
       ...getInstancesScopeOutputFields(resolvedScope),
       positionSemantics: getPositionSemanticsForScope(resolvedScope),
@@ -4412,6 +4491,57 @@ const iterateOnInstances = (
   // $FlowFixMe[incompatible-type]
   initialInstances.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
+};
+
+/**
+ * Undo what `put_2d_instances`/`put_3d_instances` did to instances: remove
+ * the created ones, and give their original state back to the existing ones.
+ */
+const restoreInstances = ({
+  initialInstances,
+  instances,
+  existingInstanceStates,
+}: {|
+  initialInstances: gdInitialInstancesContainer,
+  instances: Array<gdInitialInstance>,
+  existingInstanceStates: Map<gdInitialInstance, Object>,
+|}) => {
+  instances.forEach(instance => {
+    const originalState = existingInstanceStates.get(instance);
+    if (!originalState) {
+      initialInstances.removeInstance(instance);
+      return;
+    }
+    instance.setLayer(originalState.originalLayer);
+    instance.setX(originalState.originalX);
+    instance.setY(originalState.originalY);
+    if (originalState.originalZ !== undefined)
+      instance.setZ(originalState.originalZ);
+    if (originalState.originalRotationX !== undefined) {
+      instance.setRotationX(originalState.originalRotationX);
+      instance.setRotationY(originalState.originalRotationY);
+      instance.setAngle(originalState.originalRotationZ);
+    } else {
+      instance.setAngle(originalState.originalRotation);
+    }
+    if (originalState.originalZOrder !== undefined)
+      instance.setZOrder(originalState.originalZOrder);
+    if (originalState.originalOpacity !== undefined)
+      instance.setOpacity(originalState.originalOpacity);
+    instance.setHidden(originalState.originalHidden);
+    const hasCustomSize = originalState.originalCustomWidth !== null;
+    instance.setHasCustomSize(hasCustomSize);
+    if (hasCustomSize) {
+      instance.setCustomWidth(originalState.originalCustomWidth);
+      instance.setCustomHeight(originalState.originalCustomHeight);
+    }
+    if (originalState.originalCustomDepth !== undefined) {
+      const hasCustomDepth = originalState.originalCustomDepth !== null;
+      instance.setHasCustomDepth(hasCustomDepth);
+      if (hasCustomDepth)
+        instance.setCustomDepth(originalState.originalCustomDepth);
+    }
+  });
 };
 
 /**
@@ -4747,6 +4877,7 @@ const put2dInstances: EditorFunction = {
     project,
     args,
     toolsVersion,
+    editorCallbacks,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -4855,6 +4986,22 @@ const put2dInstances: EditorFunction = {
           .map(id => id.trim())
           .filter(Boolean)
       : [];
+    const dropToSurfaceParsing = parseSurfaceOptions({
+      args,
+      argumentName: 'drop_to_surface',
+      isUpAllowed: false,
+      objectsContainer,
+      globalObjectsContainer,
+    });
+    if (!dropToSurfaceParsing.success)
+      return makeGenericFailure(dropToSurfaceParsing.message);
+    const dropOptions = dropToSurfaceParsing.options;
+    if (dropOptions && brush_kind === 'erase') {
+      return makeGenericFailure(
+        '`drop_to_surface` can not be used with the "erase" brush.'
+      );
+    }
+
     let existingInstanceIds = requestedInstanceIds;
     if (
       object_name &&
@@ -5021,7 +5168,7 @@ const put2dInstances: EditorFunction = {
           : null);
       const anchorResolution = resolveInstanceAnchor({
         args,
-        allowedAnchors: INSTANCE_ANCHORS_2D,
+        allowedAnchors: dropOptions ? ['origin'] : INSTANCE_ANCHORS_2D,
         object: namedObject,
         objectName: object_name,
         project,
@@ -5029,6 +5176,13 @@ const put2dInstances: EditorFunction = {
         size: effectiveSize,
       });
       if (anchorResolution.success === false) return anchorResolution.failure;
+      if (dropOptions && !effectiveSize) {
+        return makeGenericFailure(
+          `\`drop_to_surface\` needs the box of the instances, which is unknown${
+            object_name ? '' : ' (pass `object_name`)'
+          }. Give them a size with \`instances_size\`.`
+        );
+      }
       const { anchor } = anchorResolution;
 
       // The `line` and `grid` brushes need an end position to spread instances.
@@ -5124,6 +5278,22 @@ const put2dInstances: EditorFunction = {
             resolvedScope.label
           }. Use only existing objects (create them first if needed).`
         );
+      }
+
+      let showScopeMessage = '';
+      if (dropOptions) {
+        const showScope = await showScopeInInGameEditor({
+          resolvedScope,
+          openSceneEditor: sceneName =>
+            editorCallbacks.onOpenLayout(sceneName, {
+              openEventsEditor: false,
+              openSceneEditor: true,
+              focusWhenOpened: 'scene',
+            }),
+          openExternalLayoutEditor: editorCallbacks.onOpenExternalLayout,
+        });
+        if (!showScope.success) return makeGenericFailure(showScope.message);
+        showScopeMessage = showScope.message;
       }
 
       // Store original states of existing instances for comparison
@@ -5338,6 +5508,29 @@ const put2dInstances: EditorFunction = {
         });
       }
 
+      let dropMessage = '';
+      if (dropOptions && effectiveSize) {
+        const drop = await dropInstancesOnSurfaces({
+          resolvedScope,
+          instances: modifiedAndCreatedInstances,
+          mode: '2d',
+          surfaceOptions: dropOptions,
+          areInstancesPlacedByBrush: isPlacementBrush,
+          isFromAboveEverything: false,
+          getInstanceSize: instance => getInstanceSize(instance, effectiveSize),
+          objectSizeInfo,
+        });
+        if (!drop.success) {
+          restoreInstances({
+            initialInstances,
+            instances: modifiedAndCreatedInstances,
+            existingInstanceStates,
+          });
+          return makeGenericFailure(drop.message);
+        }
+        dropMessage = `${showScopeMessage} ${drop.message}`;
+      }
+
       // The position the instances really hold, which the brush position only
       // is when they are placed by their origin.
       const anchorOffsets =
@@ -5543,6 +5736,8 @@ const put2dInstances: EditorFunction = {
           ).join(', ')}. Verify ids and layer names.`
         );
       }
+
+      if (dropMessage) changes.push(dropMessage);
 
       if (changes.length === 0) {
         const matchedCount = existingInstanceStates.size;
@@ -5767,6 +5962,7 @@ const put3dInstances: EditorFunction = {
     project,
     args,
     toolsVersion,
+    editorCallbacks,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -5893,6 +6089,36 @@ const put3dInstances: EditorFunction = {
         layersContainer
       );
     }
+
+    const dropToSurfaceParsing = parseSurfaceOptions({
+      args,
+      argumentName: 'drop_to_surface',
+      isUpAllowed: true,
+      objectsContainer,
+      globalObjectsContainer,
+    });
+    if (!dropToSurfaceParsing.success)
+      return makeGenericFailure(dropToSurfaceParsing.message);
+    const dropOptions = dropToSurfaceParsing.options;
+    if (dropOptions && brush_kind === 'erase') {
+      return makeGenericFailure(
+        '`drop_to_surface` can not be used with the "erase" brush.'
+      );
+    }
+    // Dropped from above everything, a position needs no Z.
+    const isXYPositionAllowed = !!dropOptions && dropOptions.up === 'z';
+    const isFromAboveEverything =
+      isXYPositionAllowed &&
+      !SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(brush_position) &&
+      !!SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(brush_position);
+    const parseBrushPosition = (
+      position: ?string
+    ): [number, number, number] | null => {
+      if (!isFromAboveEverything)
+        return SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(position);
+      const xy = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(position);
+      return xy ? [xy[0], xy[1], 0] : null;
+    };
 
     let existingInstanceIds = requestedInstanceIds;
     if (
@@ -6044,12 +6270,10 @@ const put3dInstances: EditorFunction = {
       }
 
       const parsedBrushPosition = brush_position
-        ? SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(brush_position)
+        ? parseBrushPosition(brush_position)
         : null;
       const brushSize = brush_size || 0;
-      const brushEndPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
-        brush_end_position
-      );
+      const brushEndPosition = parseBrushPosition(brush_end_position);
       const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
         instances_size
       );
@@ -6065,7 +6289,9 @@ const put3dInstances: EditorFunction = {
           : null);
       const anchorResolution = resolveInstanceAnchor({
         args,
-        allowedAnchors: INSTANCE_ANCHORS_3D,
+        allowedAnchors: dropOptions
+          ? ['origin', 'bottom_center']
+          : INSTANCE_ANCHORS_3D,
         object: namedObject,
         objectName: sizedObjectName,
         project,
@@ -6073,7 +6299,16 @@ const put3dInstances: EditorFunction = {
         size: effectiveSize,
       });
       if (anchorResolution.success === false) return anchorResolution.failure;
-      const { anchor } = anchorResolution;
+      if (dropOptions && !effectiveSize) {
+        return makeGenericFailure(
+          `\`drop_to_surface\` needs the box of the instances, which is unknown${
+            sizedObjectName ? '' : ' (they are not all of the same object)'
+          }. Give them a size with \`instances_size\`, or drop the instances of each object in a separate call.`
+        );
+      }
+      // Dropped instances are placed by the bottom of their box, after
+      // they were put at the brush positions.
+      const anchor = dropOptions ? 'origin' : anchorResolution.anchor;
 
       // The `line` brush needs an end position to spread instances. Fail early
       // (before creating any instance) so the caller retries with a valid
@@ -6160,6 +6395,22 @@ const put3dInstances: EditorFunction = {
             resolvedScope.label
           }. Use only existing objects (create them first if needed).`
         );
+      }
+
+      let showScopeMessage = '';
+      if (dropOptions) {
+        const showScope = await showScopeInInGameEditor({
+          resolvedScope,
+          openSceneEditor: sceneName =>
+            editorCallbacks.onOpenLayout(sceneName, {
+              openEventsEditor: false,
+              openSceneEditor: true,
+              focusWhenOpened: 'scene',
+            }),
+          openExternalLayoutEditor: editorCallbacks.onOpenExternalLayout,
+        });
+        if (!showScope.success) return makeGenericFailure(showScope.message);
+        showScopeMessage = showScope.message;
       }
 
       // Store original states of existing instances for comparison
@@ -6333,6 +6584,29 @@ const put3dInstances: EditorFunction = {
           instance.setY(instance.getY() + offsets[1]);
           instance.setZ(instance.getZ() + offsets[2]);
         });
+      }
+
+      let dropMessage = '';
+      if (dropOptions && effectiveSize) {
+        const drop = await dropInstancesOnSurfaces({
+          resolvedScope,
+          instances: modifiedAndCreatedInstances,
+          mode: '3d',
+          surfaceOptions: dropOptions,
+          areInstancesPlacedByBrush: isPlacementBrush,
+          isFromAboveEverything,
+          getInstanceSize: instance => getInstanceSize(instance, effectiveSize),
+          objectSizeInfo,
+        });
+        if (!drop.success) {
+          restoreInstances({
+            initialInstances,
+            instances: modifiedAndCreatedInstances,
+            existingInstanceStates,
+          });
+          return makeGenericFailure(drop.message);
+        }
+        dropMessage = `${showScopeMessage} ${drop.message}`;
       }
 
       // The position the instances really hold, which the brush position only
@@ -6542,6 +6816,8 @@ const put3dInstances: EditorFunction = {
           ).join(', ')}. Verify ids and layer names.`
         );
       }
+
+      if (dropMessage) changes.push(dropMessage);
 
       if (changes.length === 0) {
         const matchedCount = existingInstanceStates.size;

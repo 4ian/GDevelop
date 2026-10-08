@@ -594,6 +594,44 @@ namespace gdjs {
     max: Point3D;
   };
 
+  /** A segment, in the scene coordinates, along which surfaces are searched. */
+  export type InGameEditorRay = {
+    from: Point3D;
+    to: Point3D;
+    /** An instance this ray goes through (in addition to the excluded ones). */
+    excludedInstanceUuid?: string;
+  };
+
+  export type InGameEditorRaycastRequest = {
+    rays: Array<InGameEditorRay>;
+    /**
+     * `3d` finds the meshes of 3D objects, `2d` the hitboxes of 2D objects
+     * (only the X and Y of the rays are used).
+     */
+    mode: '3d' | '2d';
+    /** The only objects that can be hit, or null for all of them. */
+    includedObjectNames: Array<string> | null;
+    excludedObjectNames: Array<string>;
+    excludedInstanceUuids: Array<string>;
+  };
+
+  /** The first instance hit by a ray. */
+  export type InGameEditorRaycastHit = {
+    x: float;
+    y: float;
+    z: float;
+    objectName: string;
+    instanceUuid: string | null;
+  };
+
+  /** What the in-game editor shows (a scene, an external layout or a variant). */
+  export type InGameEditorEditedLocation = {
+    sceneName: string | null;
+    externalLayoutName: string | null;
+    eventsBasedObjectType: string | null;
+    eventsBasedObjectVariantName: string | null;
+  };
+
   const defaultEffectsData: EffectData[] = [
     {
       effectType: 'Scene3D::HemisphereLight',
@@ -1056,6 +1094,8 @@ namespace gdjs {
       null;
     private _editedInstanceDataList: InstanceData[] = [];
     private _editedLayerDataList: LayerData[] = [];
+    /** Null while switching to another scene or variant. */
+    private _editedLocation: InGameEditorEditedLocation | null = null;
     private _selectedLayerName: string = '';
     private _innerArea: AABB3D | null = null;
     /**
@@ -1072,6 +1112,7 @@ namespace gdjs {
     private _unregisterContextLostListener: (() => void) | null = null;
     private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
     private _raycaster: THREE.Raycaster = new THREE.Raycaster();
+    private _segmentRaycaster: THREE.Raycaster = new THREE.Raycaster();
 
     private _isVisible = true;
     private _timeSinceLastInteraction = 0;
@@ -1412,6 +1453,7 @@ namespace gdjs {
         this._currentScene.unloadScene();
         this._currentScene = null;
       }
+      this._editedLocation = null;
       // The 3D scene is rebuilt and the inner area marker is lost in the process.
       this._threeInnerArea = null;
       this._innerArea = null;
@@ -1522,6 +1564,14 @@ namespace gdjs {
       }
       this._editedInstanceDataList = editedInstanceDataList;
       this._editedLayerDataList = editedLayerDataList;
+      this._editedLocation = {
+        sceneName: eventsBasedObjectType ? null : sceneName,
+        externalLayoutName: eventsBasedObjectType ? null : externalLayoutName,
+        eventsBasedObjectType,
+        eventsBasedObjectVariantName: eventsBasedObjectType
+          ? eventsBasedObjectVariantName || ''
+          : null,
+      };
       this._editorId = editorId || '';
       if (editorCamera3D) {
         this.restoreCameraState(editorCamera3D);
@@ -3687,11 +3737,21 @@ namespace gdjs {
           }
           this._editorGrid.setVisible(true);
           if (this._editorGrid.isSpanningEnabled(inputManager, isAltPressed)) {
-            cursorX = this._editorGrid.getSnappedX(cursorX);
-            cursorY = this._editorGrid.getSnappedY(cursorY);
+            const snappedX = this._editorGrid.getSnappedX(cursorX);
+            const snappedY = this._editorGrid.getSnappedY(cursorY);
+            if (is3D(this._draggedNewObject)) {
+              cursorZ = this._getSurfaceZNear(
+                snappedX,
+                snappedY,
+                cursorZ,
+                // Slopes up to 2:1 are followed.
+                2 * Math.hypot(snappedX - cursorX, snappedY - cursorY) + 1,
+                this._draggedNewObject
+              );
+            }
+            cursorX = snappedX;
+            cursorY = snappedY;
           }
-          // TODO The object Z should be changed according to the new X and Y
-          // to match the ground.
           this._draggedNewObject.setX(Math.round(cursorX));
           this._draggedNewObject.setY(Math.round(cursorY));
           // We don't round on Z because if cubes are stacked and there depth
@@ -3910,24 +3970,61 @@ namespace gdjs {
       } = {}
     ): THREE.Intersection | null {
       const { excludedObjects, ignoreUnselectableInstances } = options;
-      const runtimeGame = this._runtimeGame;
-      const firstIntersectsByLayer: {
-        [layerName: string]: null | {
-          intersect: THREE.Intersection;
-        };
-      } = {};
-      const cursorX = runtimeGame.getInputManager().getCursorX();
-      const cursorY = runtimeGame.getInputManager().getCursorY();
+      const inputManager = this._runtimeGame.getInputManager();
+      const normalizedDeviceCoordinates = this._getTempVector2d(
+        this._getNormalizedScreenX(inputManager.getCursorX()),
+        this._getNormalizedScreenY(inputManager.getCursorY())
+      );
+      const closestHit = this._getClosestIntersection({
+        raycaster: this._raycaster,
+        setRay: (raycaster, threeCamera) =>
+          raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera),
+        excludedObjects,
+        // Unselectable instances are skipped when picking an object, so that
+        // objects behind them can be selected.
+        isRuntimeObjectIgnored: ignoreUnselectableInstances
+          ? (runtimeObject) =>
+              !!runtimeObject && !this._isInstanceSelectable(runtimeObject)
+          : undefined,
+      });
+      return closestHit ? closestHit.intersect : null;
+    }
 
-      const layerNames = [];
+    /**
+     * Find the closest visible 3D mesh hit by a ray, in all the visible
+     * layers.
+     * @returns The intersection, with its distance and point in the scene
+     * units, and the instance it belongs to (if any).
+     */
+    private _getClosestIntersection({
+      raycaster,
+      setRay,
+      excludedObjects,
+      isRuntimeObjectIgnored,
+    }: {
+      raycaster: THREE.Raycaster;
+      /** Set the ray in the Three.js world coordinates of a layer. */
+      setRay: (
+        raycaster: THREE.Raycaster,
+        threeCamera: THREE.Camera,
+        threeGroup: THREE.Group
+      ) => void;
+      excludedObjects?: Array<gdjs.RuntimeObject>;
+      isRuntimeObjectIgnored?: (
+        runtimeObject: gdjs.RuntimeObject | null
+      ) => boolean;
+    }): {
+      intersect: THREE.Intersection;
+      runtimeObject: gdjs.RuntimeObject | null;
+    } | null {
       const currentScene = this._currentScene;
-      const threeRenderer = runtimeGame.getRenderer().getThreeRenderer();
+      const threeRenderer = this._runtimeGame.getRenderer().getThreeRenderer();
       if (!currentScene || !threeRenderer) return null;
 
       // Only check layer 0, on which Three.js objects are by default,
       // and move selection boxes + dragged object to layer 1 so they
       // are not considered by raycasting.
-      this._raycaster.layers.set(0);
+      raycaster.layers.set(0);
       this._selectionBoxes.forEach((box) => box.setLayer(1));
       if (this._threeInnerArea) {
         for (const child of this._threeInnerArea.children) {
@@ -3946,6 +4043,12 @@ namespace gdjs {
         }
       }
 
+      let closestHit: {
+        intersect: THREE.Intersection;
+        runtimeObject: gdjs.RuntimeObject | null;
+      } | null = null;
+      const worldScale = currentScene.getRenderer3DWorldScale();
+      const layerNames: Array<string> = [];
       currentScene.getAllLayerNames(layerNames);
       layerNames.forEach((layerName) => {
         const runtimeLayer = currentScene.getLayer(layerName);
@@ -3959,35 +4062,32 @@ namespace gdjs {
         // Note that raycasting is done by Three.js, which means it could slow down
         // if lots of 3D objects are shown. We consider that if this needs improvements,
         // this must be handled by the game engine culling
-        const normalizedDeviceCoordinates = this._getTempVector2d(
-          this._getNormalizedScreenX(cursorX),
-          this._getNormalizedScreenY(cursorY)
-        );
-        this._raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera);
-        const intersects = this._raycaster.intersectObjects(
+        setRay(raycaster, threeCamera, threeGroup);
+        const intersects = raycaster.intersectObjects(
           threeGroup.children,
           true
         );
 
         // Three.js raycasting ignores visibility, so hidden objects are skipped
-        // here. Unselectable instances are skipped too when picking an object,
-        // so that objects behind them can be selected.
-        const firstIntersect = intersects.find((intersect) => {
-          if (!this._isThreeObjectVisible(intersect.object)) return false;
-          if (!ignoreUnselectableInstances) return true;
+        // here.
+        for (const intersect of intersects) {
+          if (!this._isThreeObjectVisible(intersect.object)) continue;
           const runtimeObject = this._getObject3D(intersect.object);
-          return !runtimeObject || this._isInstanceSelectable(runtimeObject);
-        });
-        if (!firstIntersect) return;
+          if (isRuntimeObjectIgnored && isRuntimeObjectIgnored(runtimeObject))
+            continue;
 
-        const worldScale = currentScene.getRenderer3DWorldScale();
-        firstIntersect.distance *= worldScale;
-        firstIntersect.point.x *= worldScale;
-        firstIntersect.point.y *= worldScale;
-        firstIntersect.point.z *= worldScale;
-        firstIntersectsByLayer[layerName] = {
-          intersect: firstIntersect,
-        };
+          intersect.distance *= worldScale;
+          intersect.point.x *= worldScale;
+          intersect.point.y *= worldScale;
+          intersect.point.z *= worldScale;
+          if (
+            !closestHit ||
+            intersect.distance < closestHit.intersect.distance
+          ) {
+            closestHit = { intersect, runtimeObject };
+          }
+          break;
+        }
       });
 
       // Reset selection boxes layers so they are properly displayed.
@@ -4010,18 +4110,161 @@ namespace gdjs {
         }
       }
 
-      let closestIntersect: THREE.Intersection | null = null;
-      for (const intersect of Object.values(firstIntersectsByLayer)) {
-        if (
-          intersect &&
-          (!closestIntersect ||
-            intersect.intersect.distance < closestIntersect.distance)
-        ) {
-          closestIntersect = intersect.intersect;
-        }
+      return closestHit;
+    }
+
+    /**
+     * Find, for each ray, the first instance it hits, as shown in the editor:
+     * the 3D meshes, or the hitboxes of the 2D objects.
+     */
+    raycast(request: InGameEditorRaycastRequest): {
+      editedLocation: InGameEditorEditedLocation | null;
+      hits: Array<InGameEditorRaycastHit | null>;
+    } {
+      const editedInstanceContainer = this.getEditedInstanceContainer();
+      if (!this._currentScene || !editedInstanceContainer) {
+        return { editedLocation: null, hits: request.rays.map(() => null) };
+      }
+      // Like at each frame, so that the objects show the last changes sent
+      // by the editor: the meshes of custom objects are only updated by their
+      // events, and their position before being rendered. Frames are not
+      // rendered while the editor is hidden.
+      this._currentScene._updateObjectsForInGameEditor();
+      this._currentScene._updateObjectsPreRender();
+      const includedObjectNames = request.includedObjectNames
+        ? new Set(request.includedObjectNames)
+        : null;
+      const excludedObjectNames = new Set(request.excludedObjectNames);
+      const excludedInstanceUuids = new Set(request.excludedInstanceUuids);
+      const isRuntimeObjectIgnored = (
+        runtimeObject: gdjs.RuntimeObject | null,
+        ray: InGameEditorRay
+      ): boolean =>
+        !runtimeObject ||
+        (!!ray.excludedInstanceUuid &&
+          runtimeObject.persistentUuid === ray.excludedInstanceUuid) ||
+        (!!includedObjectNames &&
+          !includedObjectNames.has(runtimeObject.getName())) ||
+        excludedObjectNames.has(runtimeObject.getName()) ||
+        (!!runtimeObject.persistentUuid &&
+          excludedInstanceUuids.has(runtimeObject.persistentUuid));
+
+      const hits =
+        request.mode === '2d'
+          ? request.rays.map((ray) =>
+              this._raycast2D(
+                ray,
+                editedInstanceContainer,
+                isRuntimeObjectIgnored
+              )
+            )
+          : this._raycast3D(request.rays, isRuntimeObjectIgnored);
+      return { editedLocation: this._editedLocation, hits };
+    }
+
+    private _raycast3D(
+      rays: Array<InGameEditorRay>,
+      isRuntimeObjectIgnored: (
+        runtimeObject: gdjs.RuntimeObject | null,
+        ray: InGameEditorRay
+      ) => boolean
+    ): Array<InGameEditorRaycastHit | null> {
+      const currentScene = this._currentScene;
+      if (!currentScene) return rays.map(() => null);
+      // Instances changed by the editor since the last frame are not moved
+      // yet in the Three.js world.
+      const layerNames: Array<string> = [];
+      currentScene.getAllLayerNames(layerNames);
+      for (const layerName of layerNames) {
+        const threeScene = currentScene
+          .getLayer(layerName)
+          .getRenderer()
+          .getThreeScene();
+        if (threeScene) threeScene.updateMatrixWorld();
       }
 
-      return closestIntersect;
+      const from = new THREE.Vector3();
+      const to = new THREE.Vector3();
+      return rays.map((ray) => {
+        const closestHit = this._getClosestIntersection({
+          raycaster: this._segmentRaycaster,
+          setRay: (raycaster, threeCamera, threeGroup) => {
+            threeGroup.localToWorld(
+              from.set(ray.from[0], ray.from[1], ray.from[2])
+            );
+            threeGroup.localToWorld(to.set(ray.to[0], ray.to[1], ray.to[2]));
+            const length = from.distanceTo(to);
+            raycaster.set(from, to.sub(from).divideScalar(length || 1));
+            raycaster.near = 0;
+            raycaster.far = length;
+          },
+          isRuntimeObjectIgnored: (runtimeObject) =>
+            isRuntimeObjectIgnored(runtimeObject, ray),
+        });
+        if (!closestHit || !closestHit.runtimeObject) return null;
+        const { intersect, runtimeObject } = closestHit;
+        return {
+          x: intersect.point.x,
+          y: -intersect.point.y,
+          z: intersect.point.z,
+          objectName: runtimeObject.getName(),
+          instanceUuid: runtimeObject.persistentUuid,
+        };
+      });
+    }
+
+    /**
+     * @returns The Z of the highest surface at X and Y between `z - distance`
+     * and `z + distance`, or `z` if there is none.
+     */
+    private _getSurfaceZNear(
+      x: float,
+      y: float,
+      z: float,
+      distance: float,
+      excludedObject: gdjs.RuntimeObject
+    ): float {
+      const [hit] = this._raycast3D(
+        [{ from: [x, y, z + distance], to: [x, y, z - distance] }],
+        (runtimeObject) => !runtimeObject || runtimeObject === excludedObject
+      );
+      return hit ? hit.z : z;
+    }
+
+    private _raycast2D(
+      ray: InGameEditorRay,
+      editedInstanceContainer: gdjs.RuntimeInstanceContainer,
+      isRuntimeObjectIgnored: (
+        runtimeObject: gdjs.RuntimeObject | null,
+        ray: InGameEditorRay
+      ) => boolean
+    ): InGameEditorRaycastHit | null {
+      const [fromX, fromY] = ray.from;
+      const [toX, toY] = ray.to;
+      let closestHit: InGameEditorRaycastHit | null = null;
+      let closestSquaredDistance = Number.MAX_VALUE;
+      for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
+        if (
+          is3D(object) ||
+          object.isHidden() ||
+          !editedInstanceContainer.getLayer(object.getLayer()).isVisible() ||
+          isRuntimeObjectIgnored(object, ray)
+        ) {
+          continue;
+        }
+        const result = object.raycastTest(fromX, fromY, toX, toY, true);
+        if (result.collision && result.closeSqDist < closestSquaredDistance) {
+          closestSquaredDistance = result.closeSqDist;
+          closestHit = {
+            x: result.closeX,
+            y: result.closeY,
+            z: 0,
+            objectName: object.getName(),
+            instanceUuid: object.persistentUuid,
+          };
+        }
+      }
+      return closestHit;
     }
 
     private _getCursorIn3D(

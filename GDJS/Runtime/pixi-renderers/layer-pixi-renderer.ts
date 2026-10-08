@@ -777,7 +777,7 @@ namespace gdjs {
             // transparent ones). In most cases, the 2D rendering is composed of a lot
             // of transparent areas, and we can't risk it being displayed first and wrongly
             // occluding 3D objects shown behind.
-            this._threePlaneMesh.renderOrder = Number.MAX_SAFE_INTEGER;
+            this._threePlaneMesh.renderOrder = Number.MAX_SAFE_INTEGER - 1;
             this._threeScene.add(this._threePlaneMesh);
           }
 

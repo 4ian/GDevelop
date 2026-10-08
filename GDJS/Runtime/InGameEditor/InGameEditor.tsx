@@ -554,20 +554,6 @@ namespace gdjs {
     shortcuts: {},
   };
 
-  let hasWindowFocus = true;
-  // References for cleanup
-  const _onWindowFocus = () => {
-    hasWindowFocus = true;
-  };
-  const _onWindowBlur = () => {
-    hasWindowFocus = false;
-  };
-
-  if (typeof window !== 'undefined') {
-    window.addEventListener('focus', _onWindowFocus);
-    window.addEventListener('blur', _onWindowBlur);
-  }
-
   function isDefined<T>(value: T | null | undefined): value is NonNullable<T> {
     return value !== null && value !== undefined;
   }
@@ -1085,6 +1071,17 @@ namespace gdjs {
 
     /** Keep track of the focus to know if the game was blurred since the last frame. */
     private _windowHadFocus = true;
+    /**
+     * True while the window has the focus. Updated by the listeners registered
+     * in the constructor and removed in `dispose`.
+     */
+    private _hasWindowFocus = true;
+    private _onWindowFocus = () => {
+      this._hasWindowFocus = true;
+    };
+    private _onWindowBlur = () => {
+      this._hasWindowFocus = false;
+    };
 
     // The controls shown to manipulate the selection.
     private _selectionControls: {
@@ -1215,6 +1212,13 @@ namespace gdjs {
       this._applyInGameEditorSettings();
       this.onProjectDataChange(projectData);
 
+      // Track the window focus to release the pressed keys when the editor is
+      // blurred (see `updateAndRender`).
+      if (typeof window !== 'undefined') {
+        window.addEventListener('focus', this._onWindowFocus);
+        window.addEventListener('blur', this._onWindowBlur);
+      }
+
       // Uncomment to get access to the runtime game from the console and do
       // testing.
       // window.globalRuntimeGameForTesting = game;
@@ -1251,8 +1255,8 @@ namespace gdjs {
         this._unregisterContextLostListener = null;
       }
       if (typeof window !== 'undefined') {
-        window.removeEventListener('focus', _onWindowFocus);
-        window.removeEventListener('blur', _onWindowBlur);
+        window.removeEventListener('focus', this._onWindowFocus);
+        window.removeEventListener('blur', this._onWindowBlur);
       }
       this._renderExtensionToolbars(null);
     }
@@ -4244,10 +4248,10 @@ namespace gdjs {
       const inputManager = this._runtimeGame.getInputManager();
 
       // Ensure we don't keep keys considered as pressed if the editor is blurred.
-      if (!hasWindowFocus && this._windowHadFocus) {
+      if (!this._hasWindowFocus && this._windowHadFocus) {
         inputManager.releaseAllPressedKeys();
       }
-      this._windowHadFocus = hasWindowFocus;
+      this._windowHadFocus = this._hasWindowFocus;
 
       // Update the state of the mouse/cursor for this frame.
       const mouseLeftButtonJustPressed =

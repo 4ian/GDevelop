@@ -3670,11 +3670,15 @@ export default class SceneEditor extends React.Component<Props, State> {
                           editedLayer: null,
                         });
                       }}
-                      onCancel={() =>
+                      onCancel={() => {
+                        // The layer was restored to its state before the dialog
+                        // was opened: refresh the preview, and the properties
+                        // panel if the layer is selected in it.
+                        this._onLayersModified(false);
                         this.setState({
                           editedLayer: null,
-                        })
-                      }
+                        });
+                      }}
                       hotReloadPreviewButtonProps={
                         this.props.hotReloadPreviewButtonProps
                       }

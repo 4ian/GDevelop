@@ -771,7 +771,10 @@ const adaptablePropertiesMapToSchema = ({
         if (
           rowProperties.every(
             property => property.getGroup() === rowProperties[0].getGroup()
-          )
+          ) &&
+          // Resource selectors are wide (text field + thumbnail), so always
+          // give them a full line instead of squeezing them in a row.
+          !rowProperties.some(property => property.getType() === 'resource')
         ) {
           const rowFields: Field[] = [];
           for (

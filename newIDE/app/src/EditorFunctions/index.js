@@ -101,6 +101,7 @@ import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
 import {
+  ensureObjectSizeInfoLoaded,
   extractRequiredString,
   formatPropertiesList,
   getObjectSizeInfo,
@@ -112,7 +113,6 @@ import {
   type ObjectSizeInfo,
 } from './Utils';
 import {
-  ensureModel3DMeasurementLoaded,
   ensureModel3DMeasurementsLoaded,
   isModel3DObjectMeasured,
 } from './Model3DSizeInfo';
@@ -1650,7 +1650,7 @@ const createOrReplaceObject: EditorFunction = {
                   getPropertiesText(object),
                 ].join(' '),
               };
-              await ensureModel3DMeasurementLoaded(
+              await ensureObjectSizeInfoLoaded(
                 object,
                 project,
                 PixiResourcesLoader
@@ -1780,11 +1780,7 @@ const createOrReplaceObject: EditorFunction = {
           getPropertiesText(object),
         ].join(' '),
       };
-      await ensureModel3DMeasurementLoaded(
-        object,
-        project,
-        PixiResourcesLoader
-      );
+      await ensureObjectSizeInfoLoaded(object, project, PixiResourcesLoader);
       return addVariantWithoutInstancesHint(
         injectObjectSizeInfo(scratchResult, {
           [targetObjectName]: getObjectSizeInfo(
@@ -2552,7 +2548,7 @@ const inspectObjectPropertiesEffects: EditorFunction = {
     if (inspectParts.length > 0) {
       output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
     }
-    await ensureModel3DMeasurementLoaded(object, project, PixiResourcesLoader);
+    await ensureObjectSizeInfoLoaded(object, project, PixiResourcesLoader);
     injectObjectSizeInfo(output, {
       [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
     });
@@ -4514,6 +4510,97 @@ const makeWrongObjectInstanceIdsFailure = (
     )}. Nothing was changed. Pass ids of "${objectName}" instances (from \`describe_instances\`), fix \`object_name\`, or omit \`object_name\` to target these instances.`
   );
 
+const getLayerLabel = (layerName: string): string =>
+  layerName ? `layer "${layerName}"` : 'the base layer ("")';
+
+/**
+ * A "none" or "erase" brush naming an object, without `existing_instance_ids`
+ * nor a position, targets every instance of the object on the layer: this is
+ * what the AI means by it (resize them all, erase them all...), as it often
+ * writes these calls without having read the instances.
+ */
+const isTargetingEveryObjectInstance = ({
+  brushKind,
+  namedObject,
+  existingInstanceIds,
+  brushPosition,
+  newInstancesCount,
+}: {|
+  brushKind: string,
+  namedObject: gdObject | null,
+  existingInstanceIds: Array<string>,
+  brushPosition: string | null,
+  newInstancesCount: number | null,
+|}): boolean =>
+  (brushKind === 'none' || brushKind === 'erase') &&
+  !!namedObject &&
+  existingInstanceIds.length === 0 &&
+  !brushPosition &&
+  !newInstancesCount;
+
+/**
+ * The ids of every instance of `objectName` on `layerName`, or the output to
+ * return when there is none there: a failure naming the layers the instances
+ * are on, or - for "erase" - a success when the object has no instance at all.
+ */
+const getObjectInstanceIdsOnLayer = ({
+  initialInstances,
+  objectName,
+  layerName,
+  brushKind,
+  scopeLabel,
+}: {|
+  initialInstances: gdInitialInstancesContainer,
+  objectName: string,
+  layerName: string,
+  brushKind: string,
+  scopeLabel: string,
+|}):
+  | {| found: true, instanceIds: Array<string> |}
+  | {| found: false, output: EditorFunctionGenericOutput |} => {
+  const instanceIds = [];
+  const otherLayerNames = new Set<string>();
+  iterateOnInstances(initialInstances, instance => {
+    if (instance.getObjectName() !== objectName) return;
+    if (instance.getLayer() === layerName) {
+      instanceIds.push(instance.getPersistentUuid());
+    } else {
+      otherLayerNames.add(instance.getLayer());
+    }
+  });
+  if (instanceIds.length > 0) return { found: true, instanceIds };
+
+  if (otherLayerNames.size > 0) {
+    return {
+      found: false,
+      output: makeGenericFailure(
+        `"${objectName}" has no instance on ${getLayerLabel(
+          layerName
+        )}: its instances are on ${Array.from(otherLayerNames)
+          .map(getLayerLabel)
+          .join(
+            ', '
+          )}. Nothing was changed. Pass their layer as \`layer_name\`, or their \`existing_instance_ids\` (from \`describe_instances\`).`
+      ),
+    };
+  }
+  if (brushKind === 'erase') {
+    return {
+      found: false,
+      output: {
+        success: true,
+        message: `"${objectName}" has no instance in ${scopeLabel}: nothing to erase.`,
+      },
+    };
+  }
+  return {
+    found: false,
+    output: makeGenericFailure(
+      `"${objectName}" has no instance in ${scopeLabel}, so nothing was changed. To create instances, use the "point" brush with \`brush_position\`.`
+    ),
+  };
+};
+
 /**
  * Places new instance(s), or move/erase existing instances, of an existing object onto a specified 2D layer
  * within a scene using a virtual brush at given X, Y coordinates.
@@ -4551,6 +4638,30 @@ const put2dInstances: EditorFunction = {
       new_instances_count === null && existingInstanceIds.length === 0
         ? 1
         : new_instances_count;
+
+    if (
+      (brush_kind === 'none' || brush_kind === 'erase') &&
+      object_name &&
+      existingInstanceIds.length === 0 &&
+      !brush_position &&
+      !new_instances_count
+    ) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text:
+          brush_kind === 'erase' ? (
+            <Trans>
+              Erase every <b>{object_name}</b> instance (layer:{' '}
+              {layer_name || 'base'}) in {scopeLabel}.
+            </Trans>
+          ) : (
+            <Trans>
+              Change every <b>{object_name}</b> instance (layer:{' '}
+              {layer_name || 'base'}) in {scopeLabel}.
+            </Trans>
+          ),
+      };
+    }
 
     const existingInstanceCount = existingInstanceIds.length;
     const brushPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
@@ -4707,7 +4818,7 @@ const put2dInstances: EditorFunction = {
         )) ||
       null;
     if (namedObject)
-      await ensureModel3DMeasurementLoaded(
+      await ensureObjectSizeInfoLoaded(
         namedObject,
         project,
         PixiResourcesLoader
@@ -4736,12 +4847,33 @@ const put2dInstances: EditorFunction = {
 
     // An empty id would match every instance (`uuid.startsWith('')` is always
     // true), so a trailing comma or a blank entry must never survive parsing.
-    const existingInstanceIds = existing_instance_ids
+    const requestedInstanceIds = existing_instance_ids
       ? existing_instance_ids
           .split(',')
           .map(id => id.trim())
           .filter(Boolean)
       : [];
+    let existingInstanceIds = requestedInstanceIds;
+    if (
+      object_name &&
+      isTargetingEveryObjectInstance({
+        brushKind: brush_kind,
+        namedObject,
+        existingInstanceIds: requestedInstanceIds,
+        brushPosition: brush_position,
+        newInstancesCount: new_instances_count,
+      })
+    ) {
+      const objectInstanceIds = getObjectInstanceIdsOnLayer({
+        initialInstances,
+        objectName: object_name,
+        layerName,
+        brushKind: brush_kind,
+        scopeLabel: resolvedScope.label,
+      });
+      if (!objectInstanceIds.found) return objectInstanceIds.output;
+      existingInstanceIds = objectInstanceIds.instanceIds;
+    }
 
     if (brush_kind === 'erase') {
       const brushPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
@@ -5527,6 +5659,30 @@ const put3dInstances: EditorFunction = {
         ? 1
         : new_instances_count;
 
+    if (
+      (brush_kind === 'none' || brush_kind === 'erase') &&
+      object_name &&
+      existingInstanceIds.length === 0 &&
+      !brush_position &&
+      !new_instances_count
+    ) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text:
+          brush_kind === 'erase' ? (
+            <Trans>
+              Erase every <b>{object_name}</b> instance (layer:{' '}
+              {layer_name || 'base'}) in {scopeLabel}.
+            </Trans>
+          ) : (
+            <Trans>
+              Change every <b>{object_name}</b> instance (layer:{' '}
+              {layer_name || 'base'}) in {scopeLabel}.
+            </Trans>
+          ),
+      };
+    }
+
     const existingInstanceCount = existingInstanceIds.length;
     const brushPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
       brush_position
@@ -5675,7 +5831,7 @@ const put3dInstances: EditorFunction = {
 
     // An empty id would match every instance (`uuid.startsWith('')` is always
     // true), so a trailing comma or a blank entry must never survive parsing.
-    const existingInstanceIds = existing_instance_ids
+    const requestedInstanceIds = existing_instance_ids
       ? existing_instance_ids
           .split(',')
           .map(id => id.trim())
@@ -5685,10 +5841,10 @@ const put3dInstances: EditorFunction = {
     // Instances moved by their ids without `object_name` are sized (for the
     // anchors and the space they occupy) by their object, when they share one.
     const existingInstancesObjectNames = new Set<string>();
-    if (!object_name && existingInstanceIds.length > 0) {
+    if (!object_name && requestedInstanceIds.length > 0) {
       iterateOnInstances(initialInstances, instance => {
         if (
-          existingInstanceIds.some(id =>
+          requestedInstanceIds.some(id =>
             instance.getPersistentUuid().startsWith(id)
           )
         )
@@ -5709,7 +5865,7 @@ const put3dInstances: EditorFunction = {
         )) ||
       null;
     if (namedObject)
-      await ensureModel3DMeasurementLoaded(
+      await ensureObjectSizeInfoLoaded(
         namedObject,
         project,
         PixiResourcesLoader
@@ -5734,6 +5890,28 @@ const put3dInstances: EditorFunction = {
         resolvedScope.label,
         layersContainer
       );
+    }
+
+    let existingInstanceIds = requestedInstanceIds;
+    if (
+      object_name &&
+      isTargetingEveryObjectInstance({
+        brushKind: brush_kind,
+        namedObject,
+        existingInstanceIds: requestedInstanceIds,
+        brushPosition: brush_position,
+        newInstancesCount: new_instances_count,
+      })
+    ) {
+      const objectInstanceIds = getObjectInstanceIdsOnLayer({
+        initialInstances,
+        objectName: object_name,
+        layerName,
+        brushKind: brush_kind,
+        scopeLabel: resolvedScope.label,
+      });
+      if (!objectInstanceIds.found) return objectInstanceIds.output;
+      existingInstanceIds = objectInstanceIds.instanceIds;
     }
 
     if (brush_kind === 'erase') {

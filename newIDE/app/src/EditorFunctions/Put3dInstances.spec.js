@@ -662,3 +662,99 @@ describe('put_3d_instances (3D model objects)', () => {
     expect(result.message).not.toContain('has no 3D model yet');
   });
 });
+
+// A "none" or "erase" brush naming an object, with no ids nor position,
+// targets every instance of that object on the layer.
+describe('put_3d_instances (every instance of an object)', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    makeTestExtensions(gd);
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+    testScene
+      .getObjects()
+      .insertNewObject(project, 'FakeScene3D::Cube3DObject', 'Cube', 0);
+    testScene
+      .getObjects()
+      .insertNewObject(project, 'FakeScene3D::Cube3DObject', 'Ground', 1);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const launchPut3dInstances = (args: any) =>
+    editorFunctions.put_3d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: { scene_name: 'TestScene', layer_name: '', ...args },
+    });
+
+  const placeInstances = async (objectName: string, count: number) => {
+    const result = await launchPut3dInstances({
+      object_name: objectName,
+      brush_kind: 'point',
+      brush_position: '100,200,0',
+      new_instances_count: count,
+    });
+    expect(result.success).toBe(true);
+  };
+
+  const getInstanceSizes = (): Array<string> => {
+    const sizes = [];
+    const functor = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe[cannot-write]
+    functor.invoke = instancePtr => {
+      const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
+        instancePtr,
+        gd.InitialInstance
+      );
+      sizes.push(
+        `${instance.getObjectName()} ${
+          instance.hasCustomSize()
+            ? `${instance.getCustomWidth()}x${instance.getCustomHeight()}x${instance.getCustomDepth()}`
+            : 'default size'
+        }`
+      );
+    };
+    // $FlowFixMe[incompatible-type]
+    testScene.getInitialInstances().iterateOverInstances(functor);
+    functor.delete();
+    return sizes;
+  };
+
+  it('resizes every instance of the object with the none brush', async () => {
+    await placeInstances('Cube', 2);
+    await placeInstances('Ground', 1);
+
+    const result = await launchPut3dInstances({
+      object_name: 'Cube',
+      brush_kind: 'none',
+      existing_instance_ids: '',
+      instances_size: '50,60,70',
+    });
+
+    expect(result.success).toBe(true);
+    expect(getInstanceSizes()).toEqual([
+      'Cube 50x60x70',
+      'Cube 50x60x70',
+      'Ground default size',
+    ]);
+  });
+
+  it('erases every instance of the object with the erase brush', async () => {
+    await placeInstances('Cube', 2);
+    await placeInstances('Ground', 1);
+
+    const result = await launchPut3dInstances({
+      object_name: 'Cube',
+      brush_kind: 'erase',
+    });
+
+    expect(result.success).toBe(true);
+    expect(getInstanceSizes()).toEqual(['Ground default size']);
+  });
+});

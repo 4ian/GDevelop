@@ -45,25 +45,45 @@ const getFirstSprite = (object: gdObject): gdSprite | null => {
 };
 
 /**
- * Loads what `getObjectSizeInfo` measures an object with, when the editor has
- * not loaded it yet: the model of a 3D model, the texture of the first frame
- * of a Sprite (not loaded until the editor draws it, like for a sprite just
- * installed from the asset store).
+ * Loads the texture of the first frame of a Sprite, which the editor only
+ * loads when it draws it (not yet for a sprite just installed from the asset
+ * store).
  */
-export const ensureObjectSizeInfoLoaded = async (
+const ensureSpriteTextureLoaded = async (
   object: gdObject,
   project: gdProject,
   pixiResourcesLoader: any
 ): Promise<void> => {
-  await ensureModel3DMeasurementLoaded(object, project, pixiResourcesLoader);
-  if (object.getType() !== 'Sprite') return;
-
   const firstSprite = getFirstSprite(object);
   if (!firstSprite) return;
   const imageName = firstSprite.getImageName();
   const texture = pixiResourcesLoader.getPIXITexture(project, imageName);
   if (texture && texture.valid && texture.width > 0) return;
   await pixiResourcesLoader.loadTextures(project, [imageName]);
+};
+
+/**
+ * Loads the resource `getObjectSizeInfo` measures an object with, for the
+ * object types whose size is only known once a resource is loaded.
+ */
+export const ensureObjectSizeInfoLoaded = async (
+  object: gdObject,
+  project: gdProject,
+  pixiResourcesLoader: any
+): Promise<void> => {
+  switch (object.getType()) {
+    case 'Sprite':
+      return ensureSpriteTextureLoaded(object, project, pixiResourcesLoader);
+    case 'Scene3D::Model3DObject':
+      return ensureModel3DMeasurementLoaded(
+        object,
+        project,
+        pixiResourcesLoader
+      );
+    default:
+      // The size of the other objects is in their configuration.
+      return;
+  }
 };
 
 /**

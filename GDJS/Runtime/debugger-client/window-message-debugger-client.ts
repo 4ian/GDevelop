@@ -31,8 +31,10 @@ namespace gdjs {
       window.addEventListener('message', this._onWindowMessage);
     }
 
-    dispose() {
+    dispose(): void {
       window.removeEventListener('message', this._onWindowMessage);
+      // Drop the opener so that no message is sent anymore once disposed.
+      this._opener = null;
     }
 
     protected _sendMessage(message: string) {

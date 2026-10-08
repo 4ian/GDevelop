@@ -1448,6 +1448,10 @@ namespace gdjs {
       this._sceneStack.dispose();
       this._renderer.dispose(removeCanvas);
       this._resourcesLoader.dispose();
+      // Drop the disposed helpers so that any late call (uncaught exception
+      // reporting, status updates...) is a no-op.
+      this._inGameEditor = null;
+      this._debuggerClient = null;
 
       this._wasDisposed = true;
     }

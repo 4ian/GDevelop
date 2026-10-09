@@ -490,8 +490,51 @@ namespace gdjs {
         this.shapeDimensionB = behaviorData.shapeDimensionB;
         this._needToRecreateShape = true;
       }
+      if (behaviorData.shapeDimensionC !== undefined) {
+        this.shapeDimensionC = behaviorData.shapeDimensionC;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shapeOffsetX !== undefined) {
+        this.setShapeOffsetX(behaviorData.shapeOffsetX);
+      }
+      if (behaviorData.shapeOffsetY !== undefined) {
+        this.setShapeOffsetY(behaviorData.shapeOffsetY);
+      }
+      if (behaviorData.shapeOffsetZ !== undefined) {
+        this.setShapeOffsetZ(behaviorData.shapeOffsetZ);
+      }
+      if (behaviorData.massCenterOffsetX !== undefined) {
+        this.massCenterOffsetX = behaviorData.massCenterOffsetX;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.massCenterOffsetY !== undefined) {
+        this.massCenterOffsetY = behaviorData.massCenterOffsetY;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.massCenterOffsetZ !== undefined) {
+        this.massCenterOffsetZ = behaviorData.massCenterOffsetZ;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.meshShapeResourceName !== undefined) {
+        this.meshShapeResourceName = behaviorData.meshShapeResourceName;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shape !== undefined) {
+        this._shape = behaviorData.shape;
+        this._needToRecreateShape = true;
+      }
+      if (behaviorData.shapeOrientation !== undefined) {
+        this.shapeOrientation = behaviorData.shapeOrientation;
+        this._needToRecreateShape = true;
+      }
+      if (this._shape === 'Box') {
+        this.shapeOrientation = 'Z';
+      }
       if (behaviorData.density !== undefined) {
         this.setDensity(behaviorData.density);
+      }
+      if (behaviorData.massOverride !== undefined) {
+        this.setMassOverride(behaviorData.massOverride);
       }
       if (behaviorData.friction !== undefined) {
         this.setFriction(behaviorData.friction);
@@ -509,21 +552,19 @@ namespace gdjs {
         this.setGravityScale(behaviorData.gravityScale);
       }
 
-      // TODO: make these properties updatable.
+      // These properties can't be changed on an existing Jolt body:
+      // the body is recreated at the next update.
       if (behaviorData.layers !== undefined) {
-        return false;
+        this.layers = behaviorData.layers;
+        this._needToRecreateBody = true;
       }
       if (behaviorData.masks !== undefined) {
-        return false;
-      }
-      if (behaviorData.vertices !== undefined) {
-        return false;
+        this.masks = behaviorData.masks;
+        this._needToRecreateBody = true;
       }
       if (behaviorData.bodyType !== undefined) {
-        return false;
-      }
-      if (behaviorData.shape !== undefined) {
-        return false;
+        this.bodyType = behaviorData.bodyType;
+        this._needToRecreateBody = true;
       }
       return true;
     }

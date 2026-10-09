@@ -30,6 +30,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior Benchmark', function () {
             roundCoordinates: true,
           },
         ],
+        variables: [],
+        effects: [],
       });
       object.getWidth = function () {
         return 10;
@@ -52,27 +54,25 @@ describe('gdjs.PlatformerObjectRuntimeBehavior Benchmark', function () {
   it('benchmark', function () {
     this.timeout(30000);
 
-    for (let b = 0; b < 10; ++b) {
-      const benchmarkSuite = makeBenchmarkSuite({
-        benchmarksCount: 1,
-        iterationsCount: stepCount,
-      });
-      benchmarkSuite.add('jump in loop', (t) => {
-        for (let i = 0; i < duplicateCount; ++i) {
-          const object = objects[i];
-          if (t % 60 == i % 60) {
-            object.getBehavior('auto1').simulateJumpKey();
-          }
-          if (t + (i % 61) < 31) {
-            object.getBehavior('auto1').simulateRightKey();
-          }
-          if (t + (i % 61) >= 31) {
-            object.getBehavior('auto1').simulateLeftKey();
-          }
+    const benchmarkSuite = makeBenchmarkSuite({
+      benchmarksCount: 10,
+      iterationsCount: stepCount,
+    });
+    benchmarkSuite.add('platformer objects jumping in loop', (t) => {
+      for (let i = 0; i < duplicateCount; ++i) {
+        const object = objects[i];
+        if (t % 60 == i % 60) {
+          object.getBehavior('auto1').simulateJumpKey();
         }
-        runtimeScene.renderAndStep(1000 / 60);
-      });
-      console.log(benchmarkSuite.run());
-    }
+        if (t + (i % 61) < 31) {
+          object.getBehavior('auto1').simulateRightKey();
+        }
+        if (t + (i % 61) >= 31) {
+          object.getBehavior('auto1').simulateLeftKey();
+        }
+      }
+      runtimeScene.renderAndStep(1000 / 60);
+    });
+    console.log(benchmarkSuite.run());
   });
 });

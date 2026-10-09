@@ -362,6 +362,28 @@ namespace gdjs {
     };
 
     /**
+     * The measures of `harness.benchmark`: the time of each measured frame
+     * (game logic and rendering), and counters that don't depend on the
+     * machine, to compare two versions of the engine running the same
+     * scenario.
+     */
+    export type GameplayTestBenchmarkResult = {
+      name: string;
+      /** The time of each measured frame, in order. */
+      frameTimesMs: Array<number>;
+      medianFrameTimeMs: number;
+      /** The profiled sections (see `GameplayTestProfilingResult`). */
+      sections: Array<{ name: string; avgTimeMs: number; maxTimeMs: number }>;
+      /** WebGL draw calls (2D and 3D) per frame, or null without renderer. */
+      drawCallsPerFrame: number | null;
+      objectsCount: integer;
+      /** A hash of the position and angle of every object at the end: two
+       * versions of the engine running the same scenario must end on the
+       * same state. */
+      stateChecksum: string;
+    };
+
+    /**
      * The outcome of `lookTowardWithMouseDelta`: whether the aim succeeded,
      * the remaining aim error, and whether the game responded to the mouse
      * at all. `sawYawResponse: false` usually means the game ignores mouse
@@ -442,6 +464,8 @@ namespace gdjs {
       screenshotsTakenCount: integer;
       /** The `stopProfiling()` summaries captured during the run. */
       profiles: Array<GameplayTestProfilingResult>;
+      /** The `benchmark()` measures captured during the run. */
+      benchmarks: Array<GameplayTestBenchmarkResult>;
       performance: {
         avgStepMs: number;
         worstStepMs: number;
@@ -476,6 +500,9 @@ namespace gdjs {
     const MAX_PROFILING_TIMELINE_ENTRIES = 120;
     const MAX_PROFILING_WORST_FRAMES = 5;
     const MAX_PROFILES_PER_RESULT = 5;
+    const MAX_BENCHMARKS_PER_RESULT = 20;
+    const DEFAULT_BENCHMARK_WARMUP_FRAMES = 60;
+    const DEFAULT_BENCHMARK_FRAMES = 300;
     /** The scene change cause declared by the harness (see
      * `SceneStack.runWithSceneChangeCause`). */
     const GAMEPLAY_TEST_SCENE_CHANGE_CAUSE = 'gameplayTest';
@@ -757,6 +784,10 @@ namespace gdjs {
       /** The profiling summaries captured during the run (attached to the
        * result as `profiles`). */
       _profiles: Array<GameplayTestProfilingResult> = [];
+      _benchmarks: Array<GameplayTestBenchmarkResult> = [];
+      /** The `Math.random` replaced by `setRandomSeed`, restored at the end
+       * of the run. */
+      _originalMathRandom: (() => number) | null = null;
       _timeoutMs: number;
       _loadingTimeoutMs: number;
       /** Time spent waiting for loading (game boot, scene assets) so far:
@@ -1290,17 +1321,17 @@ namespace gdjs {
 
       /**
        * Step a single game frame (game logic + rendering) with a fixed
-       * time delta.
+       * time delta, and return the time it took.
        */
-      _stepSingleFrame(dtMs: float): void {
+      _stepSingleFrame(dtMs: float): float {
         this._checkGuards();
-        const stepStartTimeMs = Date.now();
+        const stepStartTimeMs = performance.now();
         this._runtimeGame.getSceneStack().step(dtMs);
+        const stepTimeMs = performance.now() - stepStartTimeMs;
         this._callOnFrameEnded();
         this._framesExecuted++;
         this._gameTimeMs += dtMs;
-        const stepTimeMs = Date.now() - stepStartTimeMs;
-        this._lastFrameStepTimeMs = stepStartTimeMs + stepTimeMs;
+        this._lastFrameStepTimeMs = Date.now();
         this._totalStepTimeMs += stepTimeMs;
         if (stepTimeMs > this._worstStepTimeMs) {
           this._worstStepTimeMs = stepTimeMs;
@@ -1311,6 +1342,7 @@ namespace gdjs {
           this._lastProgressTimeMs = Date.now();
           this._onProgress(this._framesExecuted);
         }
+        return stepTimeMs;
       }
 
       /**
@@ -3623,6 +3655,162 @@ namespace gdjs {
       }
 
       /**
+       * Replace `Math.random` by a generator seeded with the given number
+       * until the end of the test, so that the game makes the same random
+       * choices at every run.
+       */
+      setRandomSeed(seed: integer): void {
+        if (!this._originalMathRandom) {
+          this._originalMathRandom = Math.random;
+        }
+        // Mulberry32 (https://gist.github.com/tommyettinger/46a874533244883189143505d203312c).
+        let state = seed >>> 0;
+        Math.random = () => {
+          state = (state + 0x6d2b79f5) >>> 0;
+          let t = state;
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      _restoreMathRandom(): void {
+        if (this._originalMathRandom) {
+          Math.random = this._originalMathRandom;
+          this._originalMathRandom = null;
+        }
+      }
+
+      /**
+       * Step `warmupFrames` frames (not measured: the JavaScript engine
+       * optimizes the code meanwhile), then measure each of the next
+       * `frames` frames, the profiled sections, the draw calls and a
+       * checksum of the final state.
+       * Frames never wait for an animation frame (which renders the game
+       * once more, and can be delayed by the browser), so that two runs of
+       * the same scenario do the same work.
+       */
+      async benchmark(
+        name: string,
+        options?: { warmupFrames?: integer; frames?: integer; dtMs?: float }
+      ): Promise<GameplayTestBenchmarkResult> {
+        const warmupFrames =
+          options && options.warmupFrames !== undefined
+            ? options.warmupFrames
+            : DEFAULT_BENCHMARK_WARMUP_FRAMES;
+        const frames = (options && options.frames) || DEFAULT_BENCHMARK_FRAMES;
+        const dtMs = (options && options.dtMs) || DEFAULT_FRAME_DT_MS;
+        const frameTimesMs: Array<number> = [];
+        const stepFramesWithoutRendering = async (
+          frameCount: integer,
+          isMeasured: boolean
+        ) => {
+          for (let i = 0; i < frameCount; i++) {
+            const stepTimeMs = this._stepSingleFrame(dtMs);
+            if (isMeasured) {
+              frameTimesMs.push(Math.round(stepTimeMs * 1000) / 1000);
+            }
+            await this._waitForGameSceneSwitchIfNeeded();
+            if (Date.now() - this._lastYieldTimeMs >= YIELD_BUDGET_MS) {
+              await new Promise<void>((resolve) => setTimeout(resolve, 0));
+              this._lastYieldTimeMs = Date.now();
+            }
+          }
+        };
+        await stepFramesWithoutRendering(warmupFrames, false);
+
+        // Available when the browser is launched with `--js-flags=--expose-gc`.
+        const collectGarbage = (globalThis as any).gc;
+        if (typeof collectGarbage === 'function') collectGarbage();
+
+        const drawCallsCounter = this._countDrawCalls();
+        this.startProfiling();
+        try {
+          await stepFramesWithoutRendering(frames, true);
+        } finally {
+          if (drawCallsCounter) drawCallsCounter.uninstall();
+        }
+        const profile = this.stopProfiling();
+
+        const sortedFrameTimesMs = [...frameTimesMs].sort((a, b) => a - b);
+        const benchmarkResult: GameplayTestBenchmarkResult = {
+          name,
+          frameTimesMs,
+          medianFrameTimeMs:
+            sortedFrameTimesMs[Math.floor(sortedFrameTimesMs.length / 2)] || 0,
+          sections: profile ? profile.sections : [],
+          drawCallsPerFrame: drawCallsCounter
+            ? Math.round((drawCallsCounter.getCount() / frames) * 100) / 100
+            : null,
+          objectsCount:
+            this._getCurrentScene().getAdhocListOfAllInstances().length,
+          stateChecksum: this._computeStateChecksum(),
+        };
+        this._benchmarks.push(benchmarkResult);
+        if (this._benchmarks.length > MAX_BENCHMARKS_PER_RESULT) {
+          this._benchmarks.shift();
+        }
+        return benchmarkResult;
+      }
+
+      /**
+       * Count the WebGL draw calls, made by PixiJS and Three.js (which
+       * share the same WebGL context), until `uninstall` is called.
+       */
+      private _countDrawCalls(): {
+        getCount: () => integer;
+        uninstall: () => void;
+      } | null {
+        const pixiRenderer = this._runtimeGame.getRenderer().getPIXIRenderer();
+        const gl: any = pixiRenderer ? pixiRenderer.gl : null;
+        if (!gl) return null;
+        let count = 0;
+        const originalMethods: { [methodName: string]: Function } = {};
+        for (const methodName of [
+          'drawArrays',
+          'drawElements',
+          'drawArraysInstanced',
+          'drawElementsInstanced',
+        ]) {
+          const originalMethod = gl[methodName];
+          if (!originalMethod) continue;
+          originalMethods[methodName] = originalMethod;
+          gl[methodName] = function () {
+            count++;
+            return originalMethod.apply(this, arguments);
+          };
+        }
+        return {
+          getCount: () => count,
+          uninstall: () => {
+            for (const methodName in originalMethods) {
+              gl[methodName] = originalMethods[methodName];
+            }
+          },
+        };
+      }
+
+      private _computeStateChecksum(): string {
+        const instances = [
+          ...this._getCurrentScene().getAdhocListOfAllInstances(),
+        ].sort((a, b) => a.id - b.id);
+        // FNV-1a hash of the rounded values.
+        let hash = 0x811c9dc5;
+        const addText = (text: string) => {
+          for (let i = 0; i < text.length; i++) {
+            hash = Math.imul(hash ^ text.charCodeAt(i), 16777619);
+          }
+        };
+        for (const instance of instances) {
+          addText(instance.getName());
+          addText(instance.getX().toFixed(2));
+          addText(instance.getY().toFixed(2));
+          addText(instance.getAngle().toFixed(2));
+        }
+        return (hash >>> 0).toString(16);
+      }
+
+      /**
        * Record a console log in the test result (also shown in the
        * browser console). Used by the `console` given to the script.
        */
@@ -3772,6 +3960,7 @@ namespace gdjs {
           screenshots: this._screenshots,
           screenshotsTakenCount: this._screenshotsTakenCount,
           profiles: this._profiles,
+          benchmarks: this._benchmarks,
           performance:
             this._framesExecuted > 0
               ? {
@@ -3779,7 +3968,7 @@ namespace gdjs {
                     Math.round(
                       (this._totalStepTimeMs / this._framesExecuted) * 100
                     ) / 100,
-                  worstStepMs: this._worstStepTimeMs,
+                  worstStepMs: Math.round(this._worstStepTimeMs * 100) / 100,
                 }
               : null,
         };
@@ -4179,6 +4368,7 @@ namespace gdjs {
           // Ignore errors during cleanup.
         }
         inputManager.onFrameEnded = originalOnFrameEnded;
+        harness._restoreMathRandom();
         harness._uninstallPageVisibilityTracking();
         harness._uninstallPointerLockShim();
         harness._uninstallSoundLog();

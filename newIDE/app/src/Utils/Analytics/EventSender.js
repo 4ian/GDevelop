@@ -434,7 +434,13 @@ export const sendProjectOpened = (metadata: {|
   // the storage provider does not expose a last-modified date.
   timeSinceLastModified: number | null,
 |}) => {
-  recordDailyAggregatedEvent('project-opened', metadata);
+  // Sent once a day per project, so that the projects (and so the templates
+  // they were created from) that are opened again can still be known.
+  recordDailyAggregatedEvent(
+    'project-opened',
+    metadata,
+    `project-opened-${metadata.projectUuid}`
+  );
 };
 
 export const sendTutorialOpened = (tutorialName: string) => {

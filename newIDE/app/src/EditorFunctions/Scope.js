@@ -406,6 +406,35 @@ const makeEmptyResolvedScope = (scope: ToolScope): ResolvedScope => ({
   readOnlyReason: null,
 });
 
+const hasLinkTo = (eventsList: gdEventsList, target: string): boolean => {
+  for (let i = 0; i < eventsList.getEventsCount(); i++) {
+    const event = eventsList.getEventAt(i);
+    if (
+      event.getType() === 'BuiltinCommonInstructions::Link' &&
+      gd.asLinkEvent(event).getTarget() === target
+    )
+      return true;
+    if (event.canHaveSubEvents() && hasLinkTo(event.getSubEvents(), target))
+      return true;
+  }
+  return false;
+};
+
+const findSceneOfExternalEvents = (
+  project: gdProject,
+  externalEvents: gdExternalEvents
+): ?gdLayout => {
+  const associatedSceneName = externalEvents.getAssociatedLayout();
+  if (associatedSceneName && project.hasLayoutNamed(associatedSceneName)) {
+    return project.getLayout(associatedSceneName);
+  }
+  for (let i = 0; i < project.getLayoutsCount(); i++) {
+    const layout = project.getLayoutAt(i);
+    if (hasLinkTo(layout.getEvents(), externalEvents.getName())) return layout;
+  }
+  return null;
+};
+
 /**
  * Resolve a scope to the containers of the project it designates, or a
  * failure listing what exists (the same "not found" style as the scenes).
@@ -474,9 +503,18 @@ export const resolveScope = (
         )}.`
       );
     }
+    const externalEvents = project.getExternalEvents(externalEventsName);
+    // Their events use the objects and variables of a scene: the associated
+    // one, like in the events editor, or else the first scene linking to them.
+    // None when they are not used anywhere: they can still be read.
+    const layout = findSceneOfExternalEvents(project, externalEvents);
     return {
       ...base,
-      externalEvents: project.getExternalEvents(externalEventsName),
+      externalEvents,
+      layout,
+      objectsContainer: layout ? layout.getObjects() : null,
+      globalObjectsContainer: layout ? project.getObjects() : null,
+      layersContainer: layout ? layout.getLayers() : null,
     };
   }
 

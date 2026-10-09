@@ -196,7 +196,16 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
-    // No thing to be done.
+    if (
+      changes.externalEvents &&
+      this.getExternalEvents() === changes.externalEvents
+    ) {
+      if (this.editor)
+        this.editor.onEventsModifiedOutsideEditor({
+          newOrChangedAiGeneratedEventIds:
+            changes.newOrChangedAiGeneratedEventIds,
+        });
+    }
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {

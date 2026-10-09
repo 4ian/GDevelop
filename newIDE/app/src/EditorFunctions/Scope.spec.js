@@ -281,6 +281,36 @@ describe('Scope', () => {
       });
     });
 
+    it('resolves external events with the containers of their associated scene, or else of a scene linking to them', () => {
+      const level = project.getLayout('Level');
+      const getResolvedLayout = () => {
+        const resolved = resolveScope(project, {
+          type: 'external_events',
+          external_events_name: 'Movement',
+        });
+        if (resolved.success === false) throw new Error(resolved.message);
+        expect(resolved.externalEvents).toBe(
+          project.getExternalEvents('Movement')
+        );
+        return resolved;
+      };
+
+      gd.asLinkEvent(
+        level
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 0)
+      ).setTarget('Movement');
+      const linked = getResolvedLayout();
+      expect(linked.layout).toBe(level);
+      expect(linked.objectsContainer).toBe(level.getObjects());
+      expect(linked.globalObjectsContainer).toBe(project.getObjects());
+      expect(linked.layersContainer).toBe(level.getLayers());
+
+      const menu = project.insertNewLayout('Menu', 1);
+      project.getExternalEvents('Movement').setAssociatedLayout('Menu');
+      expect(getResolvedLayout().layout).toBe(menu);
+    });
+
     it('resolves the extension scopes, with the read-only reason of store extensions', () => {
       const extension = resolveScope(project, {
         type: 'extension',

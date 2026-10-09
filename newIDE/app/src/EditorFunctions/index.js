@@ -6786,17 +6786,19 @@ const getEventsSourceTarget = (
     |}
   | {| success: false, message: string |} => {
   const { layout, externalEvents } = resolvedScope;
-  if (layout) {
-    return {
-      success: true,
-      eventsList: layout.getEvents(),
-      eventsFunction: null,
-    };
-  }
+  // Checked first: the `layout` of external events is the scene giving them
+  // their objects and variables, not the events to read.
   if (externalEvents) {
     return {
       success: true,
       eventsList: externalEvents.getEvents(),
+      eventsFunction: null,
+    };
+  }
+  if (layout) {
+    return {
+      success: true,
+      eventsList: layout.getEvents(),
       eventsFunction: null,
     };
   }
@@ -7448,12 +7450,21 @@ const addSceneEvents: EditorFunction = {
       const resolvedScope = resolveScopeFromArgs(project, args, {
         allowedTypes: [
           'scene',
+          'external_events',
           'extension',
           'custom_behavior',
           'custom_object',
         ],
       });
       if (resolvedScope.success === false) return resolvedScope;
+      const { externalEvents } = resolvedScope;
+      if (externalEvents && !resolvedScope.layout) {
+        const externalEventsName = externalEvents.getName();
+        return {
+          success: false,
+          message: `External events "${externalEventsName}" have no associated scene and no scene links to them: their events would have no objects nor variables. Add a \`link "${externalEventsName}"\` event to the scene they are for first, or write the events in that scene.`,
+        };
+      }
       if (!resolvedScope.layout) {
         // Events written in a function of an extension: the extension must be
         // editable (a store extension is read-only).
@@ -7505,9 +7516,11 @@ const addSceneEvents: EditorFunction = {
       eventsFunction,
     } = eventsTarget;
     const scene = resolvedScope.layout;
+    const { externalEvents } = resolvedScope;
     // A scene name is only sent for a scene (the generation API keeps it
-    // beside the scope for older editors).
-    const sceneName = scene ? resolvedScope.scope.scene_name || '' : '';
+    // beside the scope for older editors), and for external events: the scene
+    // whose objects and variables they use.
+    const sceneName = scene ? scene.getName() : '';
 
     // The existing events are sent as JSON only: the generation backend
     // renders them itself (as a bounded EventScript view) for its model.
@@ -7571,6 +7584,12 @@ const addSceneEvents: EditorFunction = {
         onExtensionsModifiedOutsideEditor({
           extensionNames: [extensionName],
           needsCodeRegeneration: true,
+        });
+      } else if (externalEvents) {
+        onSceneEventsModifiedOutsideEditor({
+          scene: null,
+          externalEvents,
+          newOrChangedAiGeneratedEventIds: new Set(),
         });
       } else {
         onSceneEventsModifiedOutsideEditor({
@@ -7920,6 +7939,12 @@ Events were not changed (extensions, variables or behaviors needed by them may h
           onExtensionsModifiedOutsideEditor({
             extensionNames: [extensionName],
             needsCodeRegeneration: true,
+          });
+        } else if (upToDateResolvedScope.externalEvents) {
+          onSceneEventsModifiedOutsideEditor({
+            scene: null,
+            externalEvents: upToDateResolvedScope.externalEvents,
+            newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
           });
         } else {
           onSceneEventsModifiedOutsideEditor({

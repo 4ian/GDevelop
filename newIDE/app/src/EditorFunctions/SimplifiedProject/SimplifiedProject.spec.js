@@ -1330,6 +1330,35 @@ describe('SimplifiedProject', () => {
     `);
   });
 
+  it('lists the external events of the scene it is scoped to, and those of no scene', () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level', 0);
+    project.insertNewLayout('Menu', 1);
+    project
+      .insertNewExternalEvents('LevelLogic', 0)
+      .setAssociatedLayout('Level');
+    project.insertNewExternalEvents('MenuLogic', 1).setAssociatedLayout('Menu');
+    project
+      .insertNewExternalEvents('Shared', 2)
+      .getEvents()
+      .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+    const { externalEvents } = makeSimplifiedProjectBuilder(
+      gd
+    ).getSimplifiedProject(project, { scopeToScene: 'Level' });
+
+    expect(externalEvents).toEqual([
+      {
+        externalEventsName: 'LevelLogic',
+        associatedSceneName: 'Level',
+        eventsCount: 0,
+      },
+      { externalEventsName: 'Shared', associatedSceneName: '', eventsCount: 1 },
+    ]);
+    project.delete();
+  });
+
   it('should include summaries of project specific extensions', () => {
     makeTestExtensions(gd);
 

@@ -191,6 +191,19 @@ describe('scope of the events and variables functions', () => {
         events_description: 'Open the dialog',
       })
     ).toBeTruthy();
+    const externalEventsScope = {
+      type: 'external_events',
+      external_events_name: 'Movement',
+    };
+    expect(
+      render('read_events_source', { scope: externalEventsScope })
+    ).toBeTruthy();
+    expect(
+      render('add_scene_events', {
+        scope: externalEventsScope,
+        events_description: 'Make the player jump',
+      })
+    ).toBeTruthy();
     expect(
       render('add_or_edit_variable', {
         scope: dialogVariantScope(''),
@@ -655,6 +668,37 @@ describe('scope of the events and variables functions', () => {
       );
       expect(externalEventsResult.eventsForSceneNamed).toBeUndefined();
       expect(externalEventsResult.eventScript).toContain('comment');
+    });
+
+    it('says how to read a linked scene, also from a disabled link', async () => {
+      project.insertNewLayout('Shared', 1);
+      const linkEvent = project
+        .getLayout('Level')
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 0);
+      gd.asLinkEvent(linkEvent).setTarget('Shared');
+      linkEvent.setDisabled(true);
+
+      const result = await launch('read_events_source', {
+        scope: { type: 'scene', scene_name: 'Level' },
+      });
+
+      expect(result.eventScript).toContain('disabled link "Shared"');
+      expect(result.notes).toEqual([
+        '`link "Shared"` includes the events of the scene "Shared": read them with scope { type: "scene", scene_name: "Shared" }.',
+      ]);
+    });
+
+    it('says when external events have no events', async () => {
+      project.insertNewExternalEvents('Empty', 0);
+
+      const result = await launch('read_events_source', {
+        scope: { type: 'external_events', external_events_name: 'Empty' },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.eventScript).toBe('These external events have no events.');
+      expect(result.notes).toEqual(['The events sheet is empty.']);
     });
 
     describe('a `js` event larger than `max_chars`', () => {

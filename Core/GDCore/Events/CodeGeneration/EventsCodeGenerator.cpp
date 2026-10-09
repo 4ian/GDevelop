@@ -396,7 +396,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         context.SetCurrentObject(realObjects[i]);
         context.ObjectsListNeeded(realObjects[i]);
 
-        if (gd::EventsCodeGenerator::AreBehaviorParametersOfFirstObjectValid(
+        if (HasRequiredBaseObjectCapability(realObjects[i], instrInfos) &&
+            gd::EventsCodeGenerator::AreBehaviorParametersOfFirstObjectValid(
                 realObjects[i], condition, instrInfos, realObjects.size() != 1)) {
           // Prepare arguments and generate the condition whole code
           vector<gd::String> arguments = GenerateParametersCodes(
@@ -503,6 +504,29 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
   maxConditionsListsSize = std::max(maxConditionsListsSize, conditions.size());
 
   return outputCode;
+}
+
+bool EventsCodeGenerator::HasRequiredBaseObjectCapability(
+    const gd::String& objectName, const gd::InstructionMetadata& instrInfos) {
+  const gd::String& requiredCapability =
+      instrInfos.GetRequiredBaseObjectCapability();
+  if (requiredCapability.empty() ||
+      !GetObjectsContainersList()
+           .GetBehaviorNamesInObjectOrGroup(objectName, requiredCapability)
+           .empty()) {
+    return true;
+  }
+
+  if (diagnosticReport) {
+    gd::ProjectDiagnostic projectDiagnostic(
+        gd::ProjectDiagnostic::ErrorType::MissingBehavior,
+        "",
+        "",
+        requiredCapability,
+        objectName);
+    diagnosticReport->Add(projectDiagnostic);
+  }
+  return false;
 }
 
 bool EventsCodeGenerator::AreBehaviorParametersOfAllObjectsValid(
@@ -685,7 +709,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
         context.SetCurrentObject(realObjects[i]);
         context.ObjectsListNeeded(realObjects[i]);
 
-        if (gd::EventsCodeGenerator::AreBehaviorParametersOfFirstObjectValid(
+        if (HasRequiredBaseObjectCapability(realObjects[i], instrInfos) &&
+            gd::EventsCodeGenerator::AreBehaviorParametersOfFirstObjectValid(
                 realObjects[i], action, instrInfos, realObjects.size() != 1)) {
           // Prepare arguments and generate the whole action code
           vector<gd::String> arguments = GenerateParametersCodes(

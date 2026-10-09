@@ -857,6 +857,13 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::String &objectName, const gd::Instruction &instruction,
       const gd::InstructionMetadata &instrInfos, bool isObjectInGroup);
 
+  /**
+   * \brief Check if the object has the capability required by the (object)
+   * instruction, if any (for instance, the 3D capability for "SetZ").
+   */
+  bool HasRequiredBaseObjectCapability(
+      const gd::String &objectName, const gd::InstructionMetadata &instrInfos);
+
   const gd::Platform& platform;  ///< The platform being used.
 
   gd::ProjectScopedContainers projectScopedContainers;

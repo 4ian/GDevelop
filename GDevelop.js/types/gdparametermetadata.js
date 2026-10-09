@@ -13,6 +13,7 @@ declare class gdParameterMetadata {
   setDescription(description_: string): gdParameterMetadata;
   getLongDescription(): string;
   setLongDescription(longDescription_: string): gdParameterMetadata;
+  getRequiredObjectCapability(): string;
   getHint(): string;
   setHint(hint_: string): gdParameterMetadata;
   isCodeOnly(): boolean;

@@ -4,6 +4,20 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /** A value compared with a condition operator ("=", "<", ">", "<=", ">=" or "!="). */
+  const compareWithOperator = (
+    currentValue: float,
+    operator: string,
+    value: float
+  ): boolean => {
+    if (operator === '<') return currentValue < value;
+    if (operator === '>') return currentValue > value;
+    if (operator === '<=') return currentValue <= value;
+    if (operator === '>=') return currentValue >= value;
+    if (operator === '!=') return currentValue !== value;
+    return currentValue === value;
+  };
+
   /**
    * @category Objects > 3D Objects
    */
@@ -78,6 +92,27 @@ namespace gdjs {
      * @param deltaAngle the rotation angle in degree
      */
     turnAroundZ(deltaAngle: float): void;
+
+    /**
+     * Turn the object around its own X axis (which moves with the object
+     * rotation) at its center.
+     * @param deltaAngle the rotation angle in degree
+     */
+    turnAroundLocalX(deltaAngle: float): void;
+
+    /**
+     * Turn the object around its own Y axis (which moves with the object
+     * rotation) at its center.
+     * @param deltaAngle the rotation angle in degree
+     */
+    turnAroundLocalY(deltaAngle: float): void;
+
+    /**
+     * Turn the object around its own Z axis (which moves with the object
+     * rotation) at its center.
+     * @param deltaAngle the rotation angle in degree
+     */
+    turnAroundLocalZ(deltaAngle: float): void;
 
     /**
      * Get the X component of the forward vector of the object.
@@ -242,12 +277,35 @@ namespace gdjs {
       this.object.setRotationY(angle);
     }
 
+    /**
+     * Change the X, Y and Z rotations at once (the Z rotation is the angle).
+     */
+    setRotation(rotationX: float, rotationY: float, rotationZ: float): void {
+      this.object.setRotationX(rotationX);
+      this.object.setRotationY(rotationY);
+      this.object.setAngle(rotationZ);
+    }
+
     getRotationX(): float {
       return this.object.getRotationX();
     }
 
     getRotationY(): float {
       return this.object.getRotationY();
+    }
+
+    /**
+     * The rotation on Z axis is the angle of the object.
+     */
+    getRotationZ(): float {
+      return this.object.getAngle();
+    }
+
+    /**
+     * The rotation on Z axis is the angle of the object.
+     */
+    setRotationZ(angle: float): void {
+      this.object.setAngle(angle);
     }
 
     turnAroundX(deltaAngle: float): void {
@@ -260,6 +318,18 @@ namespace gdjs {
 
     turnAroundZ(deltaAngle: float): void {
       this.object.turnAroundZ(deltaAngle);
+    }
+
+    turnAroundLocalX(deltaAngle: float): void {
+      this.object.turnAroundLocalX(deltaAngle);
+    }
+
+    turnAroundLocalY(deltaAngle: float): void {
+      this.object.turnAroundLocalY(deltaAngle);
+    }
+
+    turnAroundLocalZ(deltaAngle: float): void {
+      this.object.turnAroundLocalZ(deltaAngle);
     }
 
     getForwardX(): float {
@@ -304,6 +374,23 @@ namespace gdjs {
 
     setDepth(depth: float): void {
       this.object.setDepth(depth);
+    }
+
+    /**
+     * Compare the width, height and depth of the object with the same
+     * operator: true if the three comparisons are true.
+     */
+    compareSize(
+      operator: string,
+      width: float,
+      height: float,
+      depth: float
+    ): boolean {
+      return (
+        compareWithOperator(this.object.getWidth(), operator, width) &&
+        compareWithOperator(this.object.getHeight(), operator, height) &&
+        compareWithOperator(this.object.getDepth(), operator, depth)
+      );
     }
 
     setScaleZ(newScale: number): void {

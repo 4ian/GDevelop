@@ -54,9 +54,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const { parameterMetadata } = props;
 
-    const [errorText, setErrorText] = React.useState<?string>(null);
-    const [behaviorNames, setBehaviorNames] = React.useState<Array<string>>([]);
-
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -69,58 +66,54 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : '';
 
-    const updateBehaviorsList = React.useCallback(
-      () => {
-        const {
-          instructionMetadata,
-          instruction,
-          expressionMetadata,
-          expression,
-          parameterIndex,
-          projectScopedContainersAccessor,
-        } = props;
-        const objectName = getLastObjectParameterValue({
-          instructionMetadata,
-          instruction,
-          expressionMetadata,
-          expression,
-          parameterIndex,
-        });
-        if (!objectName) return;
+    // Computed synchronously (and not in an effect) so that the first render
+    // already knows the behaviors of the object: otherwise the field would
+    // briefly display an error before the list is filled.
+    const objectName = getLastObjectParameterValue({
+      instructionMetadata: props.instructionMetadata,
+      instruction: props.instruction,
+      expressionMetadata: props.expressionMetadata,
+      expression: props.expression,
+      parameterIndex: props.parameterIndex,
+    });
+    const behaviorNames = React.useMemo(
+      () =>
+        objectName
+          ? getSelectableBehavior(
+              props.projectScopedContainersAccessor,
+              objectName,
+              allowedBehaviorType
+            )
+          : [],
+      // Recompute on each props change: the object (not in the props) may
+      // have been changed in the instruction, or a behavior may have been
+      // added to it (from the instruction editor dialog).
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [props, objectName, allowedBehaviorType]
+    );
 
-        const newBehaviorNames = getSelectableBehavior(
-          projectScopedContainersAccessor,
-          objectName,
-          allowedBehaviorType
-        );
-        setBehaviorNames(newBehaviorNames);
+    React.useEffect(
+      () => {
         if (
+          objectName &&
           !allowedBehaviorType &&
           !!props.value &&
-          newBehaviorNames.length === 0
+          behaviorNames.length === 0
         ) {
           // Force emptying the current value if there is no behavior.
           // Useful when the object is changed to one without behaviors.
           props.onChange('');
         }
       },
-      [props, allowedBehaviorType]
+      [props, objectName, allowedBehaviorType, behaviorNames]
     );
 
-    const getError = (value?: string) => {
-      if (!value && !props.value) return null;
-
-      const isValidChoice =
-        behaviorNames.filter(choice => props.value === choice).length !== 0;
-
-      if (!isValidChoice) return 'This behavior is not attached to the object';
-
-      return null;
-    };
-
-    const doValidation = (value?: string) => {
-      setErrorText(getError(value));
-    };
+    // Derived from the current value so that the error is visible as soon as
+    // the field is displayed (and not only after it lost focus).
+    const errorText =
+      !!props.value && !behaviorNames.includes(props.value)
+        ? 'This behavior is not attached to the object'
+        : null;
 
     const forceChooseBehavior = React.useCallback(
       () => {
@@ -143,13 +136,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         forceChooseBehavior();
       },
       [forceChooseBehavior]
-    );
-
-    React.useEffect(
-      () => {
-        updateBehaviorsList();
-      },
-      [updateBehaviorsList]
     );
 
     const noBehaviorErrorText = allowedBehaviorType ? (
@@ -178,9 +164,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         onChange={props.onChange}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
-        onBlur={event => {
-          doValidation(event.currentTarget.value);
-        }}
         dataSource={behaviorNames.map(behaviorName => ({
           text: behaviorName,
           value: behaviorName,

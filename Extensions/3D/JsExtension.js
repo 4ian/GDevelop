@@ -37,6 +37,8 @@ module.exports = {
       .setIcon('res/conditions/3d_box.svg');
 
     {
+      // The axes of an object that can be chosen as its front or up.
+      const objectAxisChoices = ['+X', '-X', '+Y', '-Y', '+Z', '-Z'];
       const base3D = extension
         .addBehavior(
           'Base3DBehavior',
@@ -61,7 +63,7 @@ module.exports = {
           _('Z (elevation)'),
           _('the Z position (the "elevation")'),
           _('the Z position'),
-          _('Position'),
+          _('Position ❯ Position'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -74,7 +76,7 @@ module.exports = {
         .addExpressionAndConditionAndAction(
           'number',
           'CenterZ',
-          _('Center Z position'),
+          _('Center Z'),
           _('the Z position of the center of rotation'),
           _('the Z position of the center'),
           _('Position ❯ Center'),
@@ -93,7 +95,7 @@ module.exports = {
           _('Depth (size on Z axis)'),
           _('the depth (size on Z axis)'),
           _('the depth'),
-          _('Size'),
+          _('Size ❯ Size'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -103,13 +105,33 @@ module.exports = {
         .setGetter('getDepth');
 
       base3D
+        .addScopedCondition(
+          'Size',
+          _('Width, height and depth'),
+          _(
+            'Compare the width, height and depth of a 3D object. The three comparisons must be true.'
+          ),
+          _('The size of _PARAM0_ _PARAM2_ _PARAM3_ x _PARAM4_ x _PARAM5_'),
+          _('Size ❯ Size'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('relationalOperator', _('Sign of the test'), 'number')
+        .addParameter('number', _('Width'), '', false)
+        .addParameter('number', _('Height'), '', false)
+        .addParameter('number', _('Depth'), '', false)
+        .setFunctionName('compareSize');
+
+      base3D
         .addExpressionAndConditionAndAction(
           'number',
           'ScaleZ',
-          _('Scale on Z axis'),
+          _('Z'),
           _('the scale on Z axis of an object (default scale is 1)'),
           _('the scale on Z axis scale'),
-          _('Size'),
+          _('Size ❯ Scale'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -158,10 +180,12 @@ module.exports = {
         .addExpressionAndConditionAndAction(
           'number',
           'RotationX',
-          _('Rotation on X axis'),
-          _('the rotation on X axis'),
-          _('the rotation on X axis'),
-          _('Angle'),
+          _('X'),
+          _(
+            'the X rotation, around the X axis of the object (local axis), applied after its Z and Y rotations'
+          ),
+          _('the X rotation'),
+          _('Angle ❯ Rotation'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -179,10 +203,12 @@ module.exports = {
         .addExpressionAndConditionAndAction(
           'number',
           'RotationY',
-          _('Rotation on Y axis'),
-          _('the rotation on Y axis'),
-          _('the rotation on Y axis'),
-          _('Angle'),
+          _('Y'),
+          _(
+            'the Y rotation, around the Y axis of the object (local axis), applied after its Z rotation'
+          ),
+          _('the Y rotation'),
+          _('Angle ❯ Rotation'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -198,13 +224,34 @@ module.exports = {
 
       base3D
         .addScopedAction(
-          'TurnAroundX',
-          _('Turn around X axis'),
+          'SetRotation',
+          _('XYZ'),
           _(
-            "Turn the object around X axis. This axis doesn't move with the object rotation."
+            'Change the X, Y and Z rotations of the object (the Z rotation is its angle).'
           ),
-          _('Turn _PARAM0_ from _PARAM2_° around X axis'),
-          _('Angle'),
+          _(
+            'Change the rotation of _PARAM0_ to _PARAM2_° (X), _PARAM3_° (Y), _PARAM4_° (Z)'
+          ),
+          _('Angle ❯ Rotation'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('X rotation (in degrees)'), '', false)
+        .addParameter('number', _('Y rotation (in degrees)'), '', false)
+        .addParameter('number', _('Z rotation (in degrees)'), '', false)
+        .setFunctionName('setRotation');
+
+      base3D
+        .addScopedAction(
+          'TurnAroundX',
+          _('Turn around X axis (global axis)'),
+          _(
+            "Add a rotation around the X axis of the scene (global axis), starting from the current orientation. This axis doesn't move with the object, so all the rotations of the object can change."
+          ),
+          _('Turn _PARAM0_ by _PARAM2_° around the global X axis'),
+          _('Angle ❯ Turn around global axis'),
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
@@ -217,12 +264,12 @@ module.exports = {
       base3D
         .addScopedAction(
           'TurnAroundY',
-          _('Turn around Y axis'),
+          _('Turn around Y axis (global axis)'),
           _(
-            "Turn the object around Y axis. This axis doesn't move with the object rotation."
+            "Add a rotation around the Y axis of the scene (global axis), starting from the current orientation. This axis doesn't move with the object, so all the rotations of the object can change."
           ),
-          _('Turn _PARAM0_ from _PARAM2_° around Y axis'),
-          _('Angle'),
+          _('Turn _PARAM0_ by _PARAM2_° around the global Y axis'),
+          _('Angle ❯ Turn around global axis'),
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
@@ -235,12 +282,12 @@ module.exports = {
       base3D
         .addScopedAction(
           'TurnAroundZ',
-          _('Turn around Z axis'),
+          _('Turn around Z axis (global axis)'),
           _(
-            "Turn the object around Z axis. This axis doesn't move with the object rotation."
+            "Add a rotation around the Z axis of the scene (global axis), starting from the current orientation. This axis doesn't move with the object, so all the rotations of the object can change."
           ),
-          _('Turn _PARAM0_ from _PARAM2_° around Z axis'),
-          _('Angle'),
+          _('Turn _PARAM0_ by _PARAM2_° around the global Z axis'),
+          _('Angle ❯ Turn around global axis'),
           'res/conditions/3d_box.svg',
           'res/conditions/3d_box.svg'
         )
@@ -249,6 +296,163 @@ module.exports = {
         .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundZ');
+
+      // The same turns, around the axes of the object instead of the ones of
+      // the scene.
+
+      base3D
+        .addScopedAction(
+          'TurnAroundLocalX',
+          _('Turn around X axis (local axis)'),
+          _(
+            'Add a rotation around the X axis of the object (local axis), starting from the current orientation. This axis moves with the object rotation, so all the rotations of the object can change.'
+          ),
+          _('Turn _PARAM0_ by _PARAM2_° around its local X axis'),
+          _('Angle ❯ Turn around local axis'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('Angle to add (in degrees)'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('turnAroundLocalX');
+
+      base3D
+        .addScopedAction(
+          'TurnAroundLocalY',
+          _('Turn around Y axis (local axis)'),
+          _(
+            'Add a rotation around the Y axis of the object (local axis), starting from the current orientation. This axis moves with the object rotation, so all the rotations of the object can change.'
+          ),
+          _('Turn _PARAM0_ by _PARAM2_° around its local Y axis'),
+          _('Angle ❯ Turn around local axis'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('Angle to add (in degrees)'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('turnAroundLocalY');
+
+      base3D
+        .addScopedAction(
+          'TurnAroundLocalZ',
+          _('Turn around Z axis (local axis)'),
+          _(
+            'Add a rotation around the Z axis of the object (local axis), starting from the current orientation. This axis moves with the object rotation, so all the rotations of the object can change.'
+          ),
+          _('Turn _PARAM0_ by _PARAM2_° around its local Z axis'),
+          _('Angle ❯ Turn around local axis'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('Angle to add (in degrees)'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('turnAroundLocalZ');
+
+      base3D
+        .addScopedAction(
+          'TurnTowardPosition',
+          _('Turn toward a position'),
+          _(
+            'Turn the object so that its front axis points toward a position, while the rotation around this front axis is kept (or, if chosen, its up axis points as much as possible toward the Z axis of the scene, the global axis).'
+          ),
+          _(
+            'Turn _PARAM0_ toward _PARAM2_; _PARAM3_; _PARAM4_ (front: _PARAM5_, up: _PARAM6_)'
+          ),
+          _('Angle ❯ Turn toward'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('X position'), '', false)
+        .addParameter('number', _('Y position'), '', false)
+        .addParameter('number', _('Z position'), '', false)
+        .addParameter(
+          'stringWithSelector',
+          _('Front axis of the object (pointing toward the position)'),
+          JSON.stringify(objectAxisChoices),
+          true
+        )
+        .setDefaultValue('"+X"')
+        .addParameter(
+          'stringWithSelector',
+          _('Up axis of the object (pointing toward the global Z axis)'),
+          JSON.stringify(objectAxisChoices),
+          true
+        )
+        .setDefaultValue('"+Z"')
+        .setParameterLongDescription(
+          _(
+            'Use +Y for models made for a Y-up world. It must be perpendicular to the front axis.'
+          )
+        )
+        .addParameter(
+          'yesorno',
+          _('Keep the rotation around the front axis'),
+          '',
+          true
+        )
+        .setDefaultValue('yes')
+        .setParameterLongDescription(
+          _(
+            'If yes, the up axis keeps its current direction as much as possible: the rotations around the front axis (like the X rotation when the front axis is +X) add up. If no, the up axis points as much as possible toward the global Z axis.'
+          )
+        )
+        .setFunctionName('turnTowardPosition');
+
+      base3D
+        .addScopedAction(
+          'TurnTowardObject',
+          _('Turn toward an object'),
+          _(
+            'Turn the object so that its front axis points toward the center of another object, while the rotation around this front axis is kept (or, if chosen, its up axis points as much as possible toward the Z axis of the scene, the global axis).'
+          ),
+          _('Turn _PARAM0_ toward _PARAM2_ (front: _PARAM3_, up: _PARAM4_)'),
+          _('Angle ❯ Turn toward'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('objectPtr', _('Target object'), '', false)
+        .addParameter(
+          'stringWithSelector',
+          _('Front axis of the object (pointing toward the target)'),
+          JSON.stringify(objectAxisChoices),
+          true
+        )
+        .setDefaultValue('"+X"')
+        .addParameter(
+          'stringWithSelector',
+          _('Up axis of the object (pointing toward the global Z axis)'),
+          JSON.stringify(objectAxisChoices),
+          true
+        )
+        .setDefaultValue('"+Z"')
+        .setParameterLongDescription(
+          _(
+            'Use +Y for models made for a Y-up world. It must be perpendicular to the front axis.'
+          )
+        )
+        .addParameter(
+          'yesorno',
+          _('Keep the rotation around the front axis'),
+          '',
+          true
+        )
+        .setDefaultValue('yes')
+        .setParameterLongDescription(
+          _(
+            'If yes, the up axis keeps its current direction as much as possible: the rotations around the front axis (like the X rotation when the front axis is +X) add up. If no, the up axis points as much as possible toward the global Z axis.'
+          )
+        )
+        .setFunctionName('turnTowardObject');
 
       base3D
         .addExpression(
@@ -357,6 +561,61 @@ module.exports = {
         .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .setFunctionName('getRightZ');
+
+      // The rotation on Z axis is the angle of the object, also listed here
+      // next to the rotations on X and Y axes.
+      base3D
+        .addScopedCondition(
+          'RotationZ',
+          _('Z (global axis)'),
+          _(
+            'Compare the Z rotation (this is the angle of the object). It is around the Z axis of the scene (global axis).'
+          ),
+          _('the Z rotation'),
+          _('Angle ❯ Rotation'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .useStandardRelationalOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angle (in degrees)')
+          )
+        )
+        .setFunctionName('getRotationZ');
+
+      base3D
+        .addScopedAction(
+          'SetRotationZ',
+          _('Z (global axis)'),
+          _(
+            'Change the Z rotation (this is the angle of the object). Adding to it turns the object around the Z axis of the scene (global axis), like "Turn around Z axis (global axis)".'
+          ),
+          _('the Z rotation'),
+          _('Angle ❯ Rotation'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .useStandardOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angle (in degrees)')
+          )
+        )
+        .setFunctionName('setRotationZ')
+        .setGetter('getRotationZ');
+
+      // The Z position is changed and compared with the "Z position" action
+      // and condition of the base object. These ones are hidden, still
+      // supported for existing projects. The expression stays shown, so that
+      // it's written `MyObject.Z()` like the other expressions of this
+      // capability.
+      base3D.getAllActions().get('Scene3D::Base3DBehavior::SetZ').setHidden();
+      base3D.getAllConditions().get('Scene3D::Base3DBehavior::Z').setHidden();
     }
 
     {

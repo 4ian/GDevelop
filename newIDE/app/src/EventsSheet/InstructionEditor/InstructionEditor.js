@@ -125,7 +125,8 @@ export const useInstructionEditor = ({
       chosenObjectInstructionsInfo,
       chosenObjectInstructionsInfoTree: createTree(
         chosenObjectInstructionsInfo,
-        i18n
+        i18n,
+        { sortObjectInstructions: true }
       ),
     };
   };

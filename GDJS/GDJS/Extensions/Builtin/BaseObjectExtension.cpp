@@ -15,6 +15,51 @@
 
 namespace gdjs {
 
+namespace {
+/**
+ * Generate the code changing the optional Z position of the "SetXY" and
+ * "SetCenter" actions (operator in parameter 5, value in parameter 6).
+ *
+ * The Z position is left unchanged when empty (which is the case for events
+ * made before it existed) and it's ignored for objects without the 3D
+ * capability.
+ */
+gd::String GenerateOptionalZPositionCode(
+    gd::Instruction &instruction,
+    gd::EventsCodeGenerator &codeGenerator,
+    gd::EventsCodeGenerationContext &context,
+    const gd::String &realObjectName,
+    const gd::String &objectListName,
+    const gd::String &getterName,
+    const gd::String &setterName) {
+  const gd::String &zExpression = instruction.GetParameter(6).GetPlainString();
+  if (zExpression.empty() ||
+      codeGenerator.GetObjectsContainersList()
+          .GetBehaviorNamesInObjectOrGroup(realObjectName,
+                                           "Scene3D::Base3DBehavior")
+          .empty()) {
+    return "";
+  }
+
+  gd::String expressionCode = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+      codeGenerator,
+      context,
+      "number",
+      zExpression,
+      instruction.GetParameter(0).GetPlainString());
+
+  const gd::String &op = instruction.GetParameter(5).GetPlainString();
+  bool isNotAssignmentOperator =
+      op == "/" || op == "*" || op == "-" || op == "+";
+  gd::String newZ = isNotAssignmentOperator
+                        ? (objectListName + "[i]." + getterName + "() " + op +
+                           "(" + expressionCode + ")")
+                        : expressionCode;
+
+  return "    " + objectListName + "[i]." + setterName + "(" + newZ + ");\n";
+}
+}  // namespace
+
 BaseObjectExtension::BaseObjectExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(*this);
 
@@ -29,6 +74,8 @@ BaseObjectExtension::BaseObjectExtension() {
 
   objectActions["SetX"].SetFunctionName("setX").SetGetter("getX");
   objectActions["SetY"].SetFunctionName("setY").SetGetter("getY");
+  objectActions["SetZ"].SetFunctionName("setZ").SetGetter("getZ");
+  objectConditions["PosZ"].SetFunctionName("getZ");
   // Compatibility with GD <= 5.6.251
   objectActions["MettreX"].SetFunctionName("setX").SetGetter("getX");
   objectActions["MettreY"].SetFunctionName("setY").SetGetter("getY");
@@ -407,6 +454,13 @@ BaseObjectExtension::BaseObjectExtension() {
           outputCode += "for(var i = 0, len = " + objectListName +
                         ".length ;i < len;++i) {\n";
           outputCode += "    " + call + ";\n";
+          outputCode += GenerateOptionalZPositionCode(instruction,
+                                                      codeGenerator,
+                                                      context,
+                                                      realObjectName,
+                                                      objectListName,
+                                                      "getZ",
+                                                      "setZ");
           outputCode += "}\n";
 
           context.SetNoCurrentObject();
@@ -469,6 +523,13 @@ BaseObjectExtension::BaseObjectExtension() {
           outputCode += "for(var i = 0, len = " + objectListName +
                         ".length ;i < len;++i) {\n";
           outputCode += "    " + call + ";\n";
+          outputCode += GenerateOptionalZPositionCode(instruction,
+                                                      codeGenerator,
+                                                      context,
+                                                      realObjectName,
+                                                      objectListName,
+                                                      "getCenterZInScene",
+                                                      "setCenterZInScene");
           outputCode += "}\n";
 
           context.SetNoCurrentObject();

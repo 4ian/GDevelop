@@ -1867,6 +1867,7 @@ interface InstructionMetadata {
     boolean IsRelevantForFunctionEvents();
     boolean IsRelevantForAsynchronousFunctionEvents();
     boolean IsRelevantForCustomObjectEvents();
+    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] InstructionMetadata SetCanHaveSubInstructions();
     [Ref] InstructionMetadata SetHelpPath([Const] DOMString helpPath);
@@ -2042,6 +2043,7 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDescription([Const] DOMString description_);
     [Const, Ref] DOMString GetLongDescription();
     [Ref] ParameterMetadata SetLongDescription([Const] DOMString longDescription_);
+    [Const, Ref] DOMString GetRequiredObjectCapability();
     [Const, Ref] DOMString GetHint();
     [Ref] ParameterMetadata SetHint([Const] DOMString hint_);
     boolean IsCodeOnly();

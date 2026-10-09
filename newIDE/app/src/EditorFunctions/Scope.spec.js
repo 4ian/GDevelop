@@ -1,7 +1,6 @@
 // @flow
 import {
   BOTH_GIVEN_DISAGREE_MESSAGE,
-  EXTERNAL_EVENTS_NOT_SUPPORTED_MESSAGE,
   NAMED_VARIANT_REJECTED_MESSAGE,
   getNamedVariantRejection,
   getOutsideEditorChangesTarget,
@@ -31,7 +30,7 @@ const allowedTypes: Array<ToolScopeType> = [
   'custom_object_variant',
 ];
 
-/** A project with a scene, an external layout and an extension with a behavior and a custom object. */
+/** A project with a scene, an external layout, external events and an extension with a behavior and a custom object. */
 const createFakeProjectWithScopes = (): gdProject => {
   // $FlowFixMe[invalid-constructor]
   const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -40,6 +39,7 @@ const createFakeProjectWithScopes = (): gdProject => {
   project.getObjects().insertNewObject(project, 'Sprite', 'GlobalSprite', 0);
   project.insertNewExternalLayout('Orphan', 0);
   project.insertNewExternalLayout('LevelChunk', 1).setAssociatedLayout('Level');
+  project.insertNewExternalEvents('Movement', 0);
 
   const extension = project.insertNewEventsFunctionsExtension('UI', 0);
   extension.getEventsFunctions().insertNewEventsFunction('FreeFunction', 0);
@@ -114,7 +114,7 @@ describe('Scope', () => {
       );
     });
 
-    it('rejects unknown, refused and reserved types', () => {
+    it('rejects unknown and refused types', () => {
       expect(() =>
         parseScopeArgument({ scope: { type: 'layout' } }, { allowedTypes })
       ).toThrow('`scope.type` must be one of:');
@@ -129,7 +129,7 @@ describe('Scope', () => {
           { scope: { type: 'external_events', external_events_name: 'E' } },
           { allowedTypes }
         )
-      ).toThrow(EXTERNAL_EVENTS_NOT_SUPPORTED_MESSAGE);
+      ).toThrow('`scope.type` "external_events" is not accepted here');
     });
 
     it('requireScopeArgument falls back to the default scope, else fails', () => {
@@ -255,6 +255,60 @@ describe('Scope', () => {
       expect(notFound.success).toBe(false);
       if (notFound.success === false)
         expect(notFound.message).toContain('"Orphan", "LevelChunk"');
+    });
+
+    it('resolves external events and lists them when not found', () => {
+      const resolved = resolveScope(project, {
+        type: 'external_events',
+        external_events_name: 'Movement',
+      });
+      if (resolved.success === false) throw new Error(resolved.message);
+      expect(resolved.externalEvents).toBe(
+        project.getExternalEvents('Movement')
+      );
+      expect(resolved.layout).toBe(null);
+      expect(resolved.label).toBe('external events "Movement"');
+
+      expect(
+        resolveScope(project, {
+          type: 'external_events',
+          external_events_name: 'Nope',
+        })
+      ).toEqual({
+        success: false,
+        message:
+          'External events not found: "Nope". External events in this project: "Movement".',
+      });
+    });
+
+    it('resolves external events with the containers of their associated scene, or else of a scene linking to them', () => {
+      const level = project.getLayout('Level');
+      const getResolvedLayout = () => {
+        const resolved = resolveScope(project, {
+          type: 'external_events',
+          external_events_name: 'Movement',
+        });
+        if (resolved.success === false) throw new Error(resolved.message);
+        expect(resolved.externalEvents).toBe(
+          project.getExternalEvents('Movement')
+        );
+        return resolved;
+      };
+
+      gd.asLinkEvent(
+        level
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 0)
+      ).setTarget('Movement');
+      const linked = getResolvedLayout();
+      expect(linked.layout).toBe(level);
+      expect(linked.objectsContainer).toBe(level.getObjects());
+      expect(linked.globalObjectsContainer).toBe(project.getObjects());
+      expect(linked.layersContainer).toBe(level.getLayers());
+
+      const menu = project.insertNewLayout('Menu', 1);
+      project.getExternalEvents('Movement').setAssociatedLayout('Menu');
+      expect(getResolvedLayout().layout).toBe(menu);
     });
 
     it('resolves the extension scopes, with the read-only reason of store extensions', () => {

@@ -40,9 +40,17 @@ describe('OutsideEditorChanges keys', () => {
     ).toBe('events-based-object:3:Dark');
   });
 
-  it('coalesces events changes per scene or per function', () => {
+  it('coalesces events changes per scene, per function or per external events', () => {
     const scene = fakeGdObject(1);
     const eventsFunction = fakeGdObject(4);
+    const externalEvents = fakeGdObject(5);
+    expect(
+      getSceneEventsOutsideEditorChangesKey({
+        scene: null,
+        externalEvents,
+        newOrChangedAiGeneratedEventIds: new Set(),
+      })
+    ).toBe('external-events:5');
     expect(
       getSceneEventsOutsideEditorChangesKey({
         scene,

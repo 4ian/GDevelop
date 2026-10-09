@@ -366,6 +366,8 @@ export type EditorFunctionGenericOutput = {|
 
   // Used for de-duplication of outputs:
   eventsForSceneNamed?: string,
+  // `read_events_source` in external events: their name.
+  eventsForExternalEventsNamed?: string,
   // `read_events_source` in a function of an extension: the scope read, the
   // function read and what its events can use.
   eventsForScopeLabel?: string,
@@ -6696,6 +6698,7 @@ const readSceneEvents: EditorFunction = {
 };
 
 export const noEventsInFunctionText = 'This function has no events.';
+const noEventsInExternalEventsText = 'These external events have no events.';
 
 const EVENTS_SOURCE_MAX_CHARS_DEFAULT = 12000;
 const EVENTS_SOURCE_MAX_CHARS_MINIMUM = 2000;
@@ -6768,9 +6771,9 @@ const getScopeSummary = (
 };
 
 /**
- * The events to read: those of a scene, or those of the function named by
- * `function_name` in an extension scope (with the function itself, to
- * summarize what it can use).
+ * The events to read: those of a scene or of external events, or those of
+ * the function named by `function_name` in an extension scope (with the
+ * function itself, to summarize what it can use).
  */
 const getEventsSourceTarget = (
   resolvedScope: ResolvedScope,
@@ -6782,7 +6785,16 @@ const getEventsSourceTarget = (
       eventsFunction: gdEventsFunction | null,
     |}
   | {| success: false, message: string |} => {
-  const { layout } = resolvedScope;
+  const { layout, externalEvents } = resolvedScope;
+  // Checked first: the `layout` of external events is the scene giving them
+  // their objects and variables, not the events to read.
+  if (externalEvents) {
+    return {
+      success: true,
+      eventsList: externalEvents.getEvents(),
+      eventsFunction: null,
+    };
+  }
   if (layout) {
     return {
       success: true,
@@ -6799,10 +6811,41 @@ const getEventsSourceTarget = (
   };
 };
 
+const linkLineRegex = /^\s*(?:disabled )?link "((?:[^"\\]|\\.)*)"/gm;
+
 /**
- * Reads the events of a scene as EventScript source (the exact syntax
- * accepted by the `event_script` field of events generation), with filters
- * to keep the output small.
+ * Tell how to read the events included by the `link` lines of a rendered
+ * source: the line only names its target, which can be external events or
+ * a scene.
+ */
+const getLinkedEventsNotes = (
+  project: gdProject,
+  eventScriptText: string
+): Array<string> => {
+  const targets = new Set<string>();
+  for (const match of eventScriptText.matchAll(linkLineRegex)) {
+    try {
+      targets.add(JSON.parse(`"${match[1]}"`));
+    } catch (error) {
+      // Not a valid string literal: nothing to say about it.
+    }
+  }
+  return [...targets].map(target => {
+    const quotedTarget = JSON.stringify(target);
+    if (project.hasExternalEventsNamed(target)) {
+      return `\`link ${quotedTarget}\` includes the external events ${quotedTarget}: read them with scope { type: "external_events", external_events_name: ${quotedTarget} }.`;
+    }
+    if (project.hasLayoutNamed(target)) {
+      return `\`link ${quotedTarget}\` includes the events of the scene ${quotedTarget}: read them with scope { type: "scene", scene_name: ${quotedTarget} }.`;
+    }
+    return `\`link ${quotedTarget}\` names no external events nor scene of the project: it includes nothing.`;
+  });
+};
+
+/**
+ * Reads the events of a scene, of external events or of a function as
+ * EventScript source (the exact syntax accepted by the `event_script` field
+ * of events generation), with filters to keep the output small.
  */
 const readEventsSource: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
@@ -6898,7 +6941,13 @@ const readEventsSource: EditorFunction = {
     isCalledFromScript,
   }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
-      allowedTypes: ['scene', 'extension', 'custom_behavior', 'custom_object'],
+      allowedTypes: [
+        'scene',
+        'external_events',
+        'extension',
+        'custom_behavior',
+        'custom_object',
+      ],
     });
     if (resolvedScope.success === false)
       return makeScopeFailureOutput(resolvedScope);
@@ -6983,13 +7032,17 @@ const readEventsSource: EditorFunction = {
     // An empty `text` does NOT mean the scene has no events: a filter can
     // match nothing on a populated sheet (the notes say which case it is).
     // Only a truly empty sheet gets the "no events" text.
+    const { externalEvents } = resolvedScope;
     const eventScriptText =
       text ||
       (eventsList.getEventsCount() === 0
         ? eventsFunction
           ? noEventsInFunctionText
+          : externalEvents
+          ? noEventsInExternalEventsText
           : noEventsInSceneText
         : '');
+    const allNotes = [...notes, ...getLinkedEventsNotes(project, text)];
 
     const output: EditorFunctionGenericOutput = {
       success: true,
@@ -6999,6 +7052,8 @@ const readEventsSource: EditorFunction = {
             functionName: eventsFunction.getName(),
             scopeSummary,
           }
+        : externalEvents
+        ? { eventsForExternalEventsNamed: externalEvents.getName() }
         : { eventsForSceneNamed: resolvedScope.scope.scene_name || '' }),
       eventScript: scopeSummaryHeaderText
         ? scopeSummaryHeaderText +
@@ -7008,7 +7063,7 @@ const readEventsSource: EditorFunction = {
     };
     if (jsCodeExcerpt) output.jsCodeExcerpt = jsCodeExcerpt;
     if (truncated) output.truncated = true;
-    if (notes.length > 0) output.notes = notes;
+    if (allNotes.length > 0) output.notes = allNotes;
     if (renderingErrors.length > 0) {
       // Surface partial failures so the cause is reported, not dropped.
       output.eventsRenderingErrors = renderingErrors;
@@ -7395,12 +7450,21 @@ const addSceneEvents: EditorFunction = {
       const resolvedScope = resolveScopeFromArgs(project, args, {
         allowedTypes: [
           'scene',
+          'external_events',
           'extension',
           'custom_behavior',
           'custom_object',
         ],
       });
       if (resolvedScope.success === false) return resolvedScope;
+      const { externalEvents } = resolvedScope;
+      if (externalEvents && !resolvedScope.layout) {
+        const externalEventsName = externalEvents.getName();
+        return {
+          success: false,
+          message: `External events "${externalEventsName}" have no associated scene and no scene links to them: their events would have no objects nor variables. Add a \`link "${externalEventsName}"\` event to the scene they are for first, or write the events in that scene.`,
+        };
+      }
       if (!resolvedScope.layout) {
         // Events written in a function of an extension: the extension must be
         // editable (a store extension is read-only).
@@ -7452,9 +7516,11 @@ const addSceneEvents: EditorFunction = {
       eventsFunction,
     } = eventsTarget;
     const scene = resolvedScope.layout;
+    const { externalEvents } = resolvedScope;
     // A scene name is only sent for a scene (the generation API keeps it
-    // beside the scope for older editors).
-    const sceneName = scene ? resolvedScope.scope.scene_name || '' : '';
+    // beside the scope for older editors), and for external events: the scene
+    // whose objects and variables they use.
+    const sceneName = scene ? scene.getName() : '';
 
     // The existing events are sent as JSON only: the generation backend
     // renders them itself (as a bounded EventScript view) for its model.
@@ -7518,6 +7584,12 @@ const addSceneEvents: EditorFunction = {
         onExtensionsModifiedOutsideEditor({
           extensionNames: [extensionName],
           needsCodeRegeneration: true,
+        });
+      } else if (externalEvents) {
+        onSceneEventsModifiedOutsideEditor({
+          scene: null,
+          externalEvents,
+          newOrChangedAiGeneratedEventIds: new Set(),
         });
       } else {
         onSceneEventsModifiedOutsideEditor({
@@ -7867,6 +7939,12 @@ Events were not changed (extensions, variables or behaviors needed by them may h
           onExtensionsModifiedOutsideEditor({
             extensionNames: [extensionName],
             needsCodeRegeneration: true,
+          });
+        } else if (upToDateResolvedScope.externalEvents) {
+          onSceneEventsModifiedOutsideEditor({
+            scene: null,
+            externalEvents: upToDateResolvedScope.externalEvents,
+            newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
           });
         } else {
           onSceneEventsModifiedOutsideEditor({

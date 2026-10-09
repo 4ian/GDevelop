@@ -1,5 +1,72 @@
 // @flow
-import { createHiddenStallTracker } from './GameplayTestRunner';
+import {
+  createHiddenStallTracker,
+  runGameplayTests,
+} from './GameplayTestRunner';
+
+const gd: libGDevelop = global.gd;
+
+describe('runGameplayTests', () => {
+  let project: gdProject;
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  // A launcher whose preview fails to start, like the browser one when its
+  // storage is full: no game will ever boot.
+  const runWithFailingPreviewLaunch = (launchError: Error) => {
+    const previewDebuggerServer: any = {
+      registerCallbacks: () => () => {},
+      sendMessage: () => {},
+    };
+    const previewLauncher: any = {
+      launchPreview: () => Promise.reject(launchError),
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    };
+    return runGameplayTests({
+      project,
+      tests: [
+        { scope: { type: 'project' }, testName: 'First', source: '' },
+        { scope: { type: 'project' }, testName: 'Second', source: '' },
+      ],
+      previewLauncher,
+      previewDebuggerServer,
+      options: {},
+    });
+  };
+
+  it('reports the tests as not run, without waiting for the game, when the browser storage is full', async () => {
+    const quotaError = new Error('Quota exceeded.');
+    quotaError.name = 'QuotaExceededError';
+
+    const results = await runWithFailingPreviewLaunch(quotaError);
+
+    expect(results.map(result => [result.testName, result.status])).toEqual([
+      ['First', 'unavailable'],
+      ['Second', 'unavailable'],
+    ]);
+    expect(results[0].errors).toEqual([
+      'The game preview could not be started: the browser storage used by GDevelop is full, so the files of the game could not be stored. No preview nor gameplay test can run until the user frees this storage (in the site settings of the browser) and reloads GDevelop.',
+    ]);
+  });
+
+  it('gives the cause of any other failure to start the preview', async () => {
+    const results = await runWithFailingPreviewLaunch(
+      new Error('Export failed.')
+    );
+
+    expect(results[0].status).toBe('unavailable');
+    expect(results[0].errors).toEqual([
+      'The game preview could not be started: Export failed.',
+    ]);
+  });
+});
 
 describe('createHiddenStallTracker', () => {
   /** A clock that can be moved forward by the test. */

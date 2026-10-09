@@ -307,6 +307,11 @@ describe('gdjs.evtTools.object.hitBoxesCollisionTest', function () {
       if (random() < 0.3) object.setAngle(random() * 360);
       if (random() < 0.1) object.setCustomCenter(0, 0);
       if (random() < 0.005) object.setX(NaN);
+      if (random() < 0.01) {
+        // Extreme positions, but finite bounds (at opposite corners).
+        const extremeX = random() < 0.5 ? 1e308 : -1e308;
+        object.setPosition(extremeX, -extremeX);
+      }
       objects.push(object);
     }
     return objects;

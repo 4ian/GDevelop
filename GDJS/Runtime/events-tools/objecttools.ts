@@ -254,7 +254,12 @@ namespace gdjs {
         bounds[1] = absoluteCenterY - radius;
         bounds[2] = absoluteCenterX + radius;
         bounds[3] = absoluteCenterY + radius;
-        return isFinite(bounds[0] + bounds[1] + bounds[2] + bounds[3]);
+        return (
+          isFinite(bounds[0]) &&
+          isFinite(bounds[1]) &&
+          isFinite(bounds[2]) &&
+          isFinite(bounds[3])
+        );
       };
 
       /**
@@ -293,7 +298,13 @@ namespace gdjs {
         return count;
       };
 
-      const buildGrid = (objectsLists: Array<gdjs.RuntimeObject[]>) => {
+      /**
+       * @returns false if the objects are spread on an area too large to be
+       * represented by numbers.
+       */
+      const buildGrid = (
+        objectsLists: Array<gdjs.RuntimeObject[]>
+      ): boolean => {
         gridObjects.length = 0;
         objectsNotInGrid.length = 0;
         let minX = Infinity;
@@ -328,6 +339,7 @@ namespace gdjs {
         if (!gridObjects.length) {
           minX = minY = maxX = maxY = sizesSum = 0;
         }
+        if (!isFinite(maxX - minX) || !isFinite(maxY - minY)) return false;
         gridMinX = minX;
         gridMinY = minY;
         gridCellSize = Math.max(sizesSum / (gridObjects.length || 1), 1);
@@ -400,6 +412,7 @@ namespace gdjs {
           gridObjects.length
         );
         gridObjectsLastTestedObjectIndex.fill(-1, 0, gridObjects.length);
+        return true;
       };
 
       /**
@@ -456,7 +469,11 @@ namespace gdjs {
        * When there are many pairs of objects, the objects of the second
        * lists are put in a grid, and each object of the first lists is only
        * tested with the objects of the cells covered by its bounding circle.
-       * The picked objects are exactly the same as with `twoListsTest`.
+       *
+       * The picked objects are exactly the same as with `twoListsTest`: only
+       * pairs for which the predicate is false are not tested, and the
+       * objects picked by `twoListsTest` only depend on the pairs for which
+       * the predicate is true, not on the order in which pairs are tested.
        */
       export const twoListsTestOfObjectsWithOverlappingBoundingCircles =
         function (
@@ -480,7 +497,8 @@ namespace gdjs {
             isTestingEveryPairFaster(
               countObjects(objects1Lists),
               countObjects(objects2Lists)
-            )
+            ) ||
+            !buildGrid(objects2Lists)
           ) {
             return testEveryPairOfObjects(
               predicate,
@@ -493,7 +511,6 @@ namespace gdjs {
 
           unpickObjects(objects1Lists);
           unpickObjects(objects2Lists);
-          buildGrid(objects2Lists);
 
           let isTrue = false;
           let object1Index = 0;

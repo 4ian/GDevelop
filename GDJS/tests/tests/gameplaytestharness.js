@@ -978,6 +978,62 @@ describe('gdjs.gameplayTests', () => {
     expect(result.status).to.be('passed');
   });
 
+  it('benchmarks frames and reports the measures in the result', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.spawn('MyObject', 10, 20);
+      const benchmark = await harness.benchmark('Test benchmark', {
+        warmupFrames: 2,
+        frames: 5,
+      });
+      harness.assert(benchmark.frameTimesMs.length === 5, '5 frames are measured');
+      harness.assert(
+        benchmark.medianFrameTimeMs >= 0,
+        'The median frame time is returned'
+      );
+      harness.assert(benchmark.objectsCount === 1, 'The objects are counted');
+      harness.assert(
+        benchmark.drawCallsPerFrame === null,
+        'No draw calls are counted without renderer'
+      );
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    expect(result.framesExecuted).to.be(1 + 2 + 5);
+    expect(result.benchmarks.length).to.be(1);
+    expect(result.benchmarks[0].name).to.be('Test benchmark');
+    expect(result.benchmarks[0].stateChecksum).to.be.a('string');
+  });
+
+  it('seeds Math.random until the end of the test', async () => {
+    const originalMathRandom = Math.random;
+    const runTestScriptPickingRandomNumbers = () =>
+      runTestScript(
+        makeRuntimeGame(),
+        `
+        harness.setRandomSeed(42);
+        await harness.goToScene('Scene 1');
+        console.log('Random numbers: ' + [Math.random(), Math.random()]);
+        `
+      );
+    /** @param {gdjs.gameplayTests.GameplayTestResult} result */
+    const getRandomNumbersLog = (result) =>
+      result.consoleLogs.find((log) =>
+        log.message.startsWith('Random numbers: ')
+      );
+    const result1 = await runTestScriptPickingRandomNumbers();
+    const result2 = await runTestScriptPickingRandomNumbers();
+
+    expect(result1.status).to.be('passed');
+    expect(getRandomNumbersLog(result1)).to.be.ok();
+    expect(getRandomNumbersLog(result1)).to.eql(getRandomNumbersLog(result2));
+    expect(Math.random).to.be(originalMathRandom);
+  });
+
   it('reports an aim result object with the mouse responsiveness', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

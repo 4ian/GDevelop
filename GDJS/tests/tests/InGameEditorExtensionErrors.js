@@ -91,6 +91,8 @@ describe('Errors of the code of extensions in the in-game editor', function () {
     /** @type {Array<any>} */
     const sentMessages = [];
     class TestDebuggerClient extends gdjs.AbstractDebuggerClient {
+      dispose() {}
+
       /** @param {string} message */
       _sendMessage(message) {
         sentMessages.push(JSON.parse(message));

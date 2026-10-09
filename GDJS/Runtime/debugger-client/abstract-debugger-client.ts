@@ -615,6 +615,12 @@ namespace gdjs {
     }
 
     /**
+     * Release the listeners and the connection used by the client, which must
+     * not be used anymore afterwards: messages are then silently dropped.
+     */
+    abstract dispose(): void;
+
+    /**
      * Should be re-implemented by derived class to send a stringified message object
      * to the debugger server.
      * @param message

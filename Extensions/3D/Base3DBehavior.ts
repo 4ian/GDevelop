@@ -221,6 +221,16 @@ namespace gdjs {
     content: Object3DDataContent;
   }
 
+  /** The axes of an object that can be chosen as its front or up. */
+  const axisVectors: { [axis: string]: [float, float, float] } = {
+    '+X': [1, 0, 0],
+    '-X': [-1, 0, 0],
+    '+Y': [0, 1, 0],
+    '-Y': [0, -1, 0],
+    '+Z': [0, 0, 1],
+    '-Z': [0, 0, -1],
+  };
+
   /**
    * A behavior that forwards the Base3D interface to its object.
    * @category Core Engine > Behavior
@@ -330,6 +340,167 @@ namespace gdjs {
 
     turnAroundLocalZ(deltaAngle: float): void {
       this.object.turnAroundLocalZ(deltaAngle);
+    }
+
+    /**
+     * Turn the object so that one of its axes (its front) points toward a
+     * position, from its center. Another one of its axes (its up) keeps its
+     * direction, or points as much as possible toward the top of the scene (the
+     * Z axis).
+     *
+     * @param frontAxis the axis of the object pointing toward the position:
+     * "+X", "-X", "+Y", "-Y", "+Z" or "-Z".
+     * @param upAxis the axis of the object pointing up, perpendicular to the
+     * front axis: "+X", "-X", "+Y", "-Y", "+Z" or "-Z".
+     * @param keepRotationAroundFront `true` (the default) to keep the current
+     * rotation of the object around its front axis (the up axis keeps its
+     * direction as much as possible), so that the rotations around this axis
+     * add up. `false` to point the up axis toward the top of the scene.
+     */
+    turnTowardPosition(
+      targetX: float,
+      targetY: float,
+      targetZ: float,
+      frontAxis: string = '+X',
+      upAxis: string = '+Z',
+      keepRotationAroundFront: boolean = true
+    ): void {
+      const temporaries = Base3DBehavior._getTurnTowardTemporaries();
+      const worldFront = temporaries.worldFront.set(
+        targetX - this.object.getCenterXInScene(),
+        targetY - this.object.getCenterYInScene(),
+        targetZ - this.object.getCenterZInScene()
+      );
+      if (worldFront.lengthSq() === 0) {
+        return;
+      }
+      worldFront.normalize();
+
+      const localFront = temporaries.localFront.fromArray(
+        axisVectors[frontAxis] || axisVectors['+X']
+      );
+      const localUp = temporaries.localUp.fromArray(
+        axisVectors[upAxis] || axisVectors['+Z']
+      );
+      if (Math.abs(localFront.dot(localUp)) > 0.5) {
+        // The up axis must be perpendicular to the front axis: models made
+        // for a Y-up world look along their Z axis.
+        localUp.fromArray(
+          localFront.z !== 0 ? axisVectors['+Y'] : axisVectors['+Z']
+        );
+      }
+
+      // The up axis goes as close as possible to the top of the scene, or to
+      // its current direction to keep the rotation around the front axis. When
+      // this direction is along the front, the other one is used.
+      const currentUp = temporaries.currentUp
+        .copy(localUp)
+        .applyEuler(
+          temporaries.currentRotation.set(
+            gdjs.toRad(this.object.getRotationX()),
+            gdjs.toRad(this.object.getRotationY()),
+            gdjs.toRad(this.object.getAngle()),
+            'ZYX'
+          )
+        );
+      const sceneUp = temporaries.sceneUp.set(0, 0, 1);
+      const worldUp = temporaries.worldUp.copy(
+        keepRotationAroundFront ? currentUp : sceneUp
+      );
+      if (Math.abs(worldFront.dot(worldUp)) > 0.9999) {
+        worldUp.copy(keepRotationAroundFront ? sceneUp : currentUp);
+        if (Math.abs(worldFront.dot(worldUp)) > 0.9999) {
+          worldUp.set(1, 0, 0);
+        }
+      }
+      worldUp.addScaledVector(worldFront, -worldFront.dot(worldUp)).normalize();
+
+      // The rotation sends the local front, up and third axes to the ones in
+      // the scene: rotation = worldBasis * transpose(localBasis).
+      const localThird = temporaries.localThird.crossVectors(
+        localFront,
+        localUp
+      );
+      const worldThird = temporaries.worldThird.crossVectors(
+        worldFront,
+        worldUp
+      );
+      const rotationMatrix = temporaries.worldBasis
+        .makeBasis(worldFront, worldUp, worldThird)
+        .multiply(
+          temporaries.localBasis
+            .makeBasis(localFront, localUp, localThird)
+            .transpose()
+        );
+      const rotation = temporaries.newRotation.setFromRotationMatrix(
+        rotationMatrix,
+        'ZYX'
+      );
+      this.object.setRotationX(gdjs.toDegrees(rotation.x));
+      this.object.setRotationY(gdjs.toDegrees(rotation.y));
+      this.object.setAngle(gdjs.toDegrees(rotation.z));
+    }
+
+    /**
+     * Turn the object so that one of its axes (its front) points toward the
+     * center of another object (2D objects are considered at Z = 0), while
+     * another one of its axes (its up) points as much as possible toward the
+     * top of the scene (or keeps its direction, see `turnTowardPosition`).
+     */
+    turnTowardObject(
+      targetObject: gdjs.RuntimeObject | null,
+      frontAxis: string = '+X',
+      upAxis: string = '+Z',
+      keepRotationAroundFront: boolean = true
+    ): void {
+      if (!targetObject) {
+        return;
+      }
+      this.turnTowardPosition(
+        targetObject.getCenterXInScene(),
+        targetObject.getCenterYInScene(),
+        gdjs.Base3DHandler.is3D(targetObject)
+          ? targetObject.getCenterZInScene()
+          : 0,
+        frontAxis,
+        upAxis,
+        keepRotationAroundFront
+      );
+    }
+
+    private static _turnTowardTemporaries: {
+      worldFront: THREE.Vector3;
+      worldUp: THREE.Vector3;
+      worldThird: THREE.Vector3;
+      localFront: THREE.Vector3;
+      localUp: THREE.Vector3;
+      localThird: THREE.Vector3;
+      currentUp: THREE.Vector3;
+      sceneUp: THREE.Vector3;
+      worldBasis: THREE.Matrix4;
+      localBasis: THREE.Matrix4;
+      currentRotation: THREE.Euler;
+      newRotation: THREE.Euler;
+    } | null = null;
+
+    private static _getTurnTowardTemporaries() {
+      if (!Base3DBehavior._turnTowardTemporaries) {
+        Base3DBehavior._turnTowardTemporaries = {
+          worldFront: new THREE.Vector3(),
+          worldUp: new THREE.Vector3(),
+          worldThird: new THREE.Vector3(),
+          localFront: new THREE.Vector3(),
+          localUp: new THREE.Vector3(),
+          localThird: new THREE.Vector3(),
+          currentUp: new THREE.Vector3(),
+          sceneUp: new THREE.Vector3(),
+          worldBasis: new THREE.Matrix4(),
+          localBasis: new THREE.Matrix4(),
+          currentRotation: new THREE.Euler(),
+          newRotation: new THREE.Euler(),
+        };
+      }
+      return Base3DBehavior._turnTowardTemporaries;
     }
 
     getForwardX(): float {

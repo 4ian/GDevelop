@@ -37,6 +37,8 @@ module.exports = {
       .setIcon('res/conditions/3d_box.svg');
 
     {
+      // The axes of an object that can be chosen as its front or up.
+      const objectAxisChoices = ['+X', '-X', '+Y', '-Y', '+Z', '-Z'];
       const base3D = extension
         .addBehavior(
           'Base3DBehavior',
@@ -351,6 +353,106 @@ module.exports = {
         .addParameter('number', _('Angle to add (in degrees)'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundLocalZ');
+
+      base3D
+        .addScopedAction(
+          'TurnTowardPosition',
+          _('Turn toward a position'),
+          _(
+            'Turn the object so that its front axis points toward a position, while the rotation around this front axis is kept (or, if chosen, its up axis points as much as possible toward the Z axis of the scene, the global axis).'
+          ),
+          _(
+            'Turn _PARAM0_ toward _PARAM2_; _PARAM3_; _PARAM4_ (front: _PARAM5_, up: _PARAM6_)'
+          ),
+          _('Angle ❯ Turn toward'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('X position'), '', false)
+        .addParameter('number', _('Y position'), '', false)
+        .addParameter('number', _('Z position'), '', false)
+        .addParameter(
+          'stringWithSelector',
+          _('Front axis of the object (pointing toward the position)'),
+          JSON.stringify(objectAxisChoices),
+          true
+        )
+        .setDefaultValue('"+X"')
+        .addParameter(
+          'stringWithSelector',
+          _('Up axis of the object (pointing toward the global Z axis)'),
+          JSON.stringify(objectAxisChoices),
+          true
+        )
+        .setDefaultValue('"+Z"')
+        .setParameterLongDescription(
+          _(
+            'Use +Y for models made for a Y-up world. It must be perpendicular to the front axis.'
+          )
+        )
+        .addParameter(
+          'yesorno',
+          _('Keep the rotation around the front axis'),
+          '',
+          true
+        )
+        .setDefaultValue('yes')
+        .setParameterLongDescription(
+          _(
+            'If yes, the up axis keeps its current direction as much as possible: the rotations around the front axis (like the X rotation when the front axis is +X) add up. If no, the up axis points as much as possible toward the global Z axis.'
+          )
+        )
+        .setFunctionName('turnTowardPosition');
+
+      base3D
+        .addScopedAction(
+          'TurnTowardObject',
+          _('Turn toward an object'),
+          _(
+            'Turn the object so that its front axis points toward the center of another object, while the rotation around this front axis is kept (or, if chosen, its up axis points as much as possible toward the Z axis of the scene, the global axis).'
+          ),
+          _('Turn _PARAM0_ toward _PARAM2_ (front: _PARAM3_, up: _PARAM4_)'),
+          _('Angle ❯ Turn toward'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('objectPtr', _('Target object'), '', false)
+        .addParameter(
+          'stringWithSelector',
+          _('Front axis of the object (pointing toward the target)'),
+          JSON.stringify(objectAxisChoices),
+          true
+        )
+        .setDefaultValue('"+X"')
+        .addParameter(
+          'stringWithSelector',
+          _('Up axis of the object (pointing toward the global Z axis)'),
+          JSON.stringify(objectAxisChoices),
+          true
+        )
+        .setDefaultValue('"+Z"')
+        .setParameterLongDescription(
+          _(
+            'Use +Y for models made for a Y-up world. It must be perpendicular to the front axis.'
+          )
+        )
+        .addParameter(
+          'yesorno',
+          _('Keep the rotation around the front axis'),
+          '',
+          true
+        )
+        .setDefaultValue('yes')
+        .setParameterLongDescription(
+          _(
+            'If yes, the up axis keeps its current direction as much as possible: the rotations around the front axis (like the X rotation when the front axis is +X) add up. If no, the up axis points as much as possible toward the global Z axis.'
+          )
+        )
+        .setFunctionName('turnTowardObject');
 
       base3D
         .addExpression(

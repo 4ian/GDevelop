@@ -87,6 +87,7 @@ const getGroupsItemsOrder = (
   [i18n._(t`Angle`)]: {
     order: [
       i18n._(t`Rotation`),
+      i18n._(t`Turn toward`),
       i18n._(t`Turn around local axis`),
       i18n._(t`Turn around global axis`),
     ],

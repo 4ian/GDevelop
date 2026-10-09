@@ -9,7 +9,7 @@ describe('gdjs.Polygon', function() {
 
     const benchmarkSuite = makeBenchmarkSuite({
       benchmarksCount: 20,
-      iterationsCount: 30000,
+      iterationsCount: 120000,
     });
     benchmarkSuite
       .add('collisionTest between two overlapping rectangles', i => {

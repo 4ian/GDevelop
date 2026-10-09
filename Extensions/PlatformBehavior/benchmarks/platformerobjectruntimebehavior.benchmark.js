@@ -2,7 +2,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior Benchmark', function () {
   let runtimeScene;
   let objects;
   const duplicateCount = 60;
-  const stepCount = 6000;
+  const stepCount = 1000;
 
   beforeEach(function () {
     runtimeScene = makePlatformerTestRuntimeScene();
@@ -52,22 +52,29 @@ describe('gdjs.PlatformerObjectRuntimeBehavior Benchmark', function () {
   });
 
   it('benchmark', function () {
-    this.timeout(30000);
+    this.timeout(60000);
 
+    // Many short batches: the median is less sensitive to a slow batch
+    // (garbage collection...).
     const benchmarkSuite = makeBenchmarkSuite({
-      benchmarksCount: 10,
+      benchmarksCount: 60,
       iterationsCount: stepCount,
     });
-    benchmarkSuite.add('platformer objects jumping in loop', (t) => {
+    // Counted across batches: the objects move the same way whatever the
+    // batch size.
+    let frameIndex = 0;
+    benchmarkSuite.add('platformer objects jumping in loop', () => {
+      const t = frameIndex++;
       for (let i = 0; i < duplicateCount; ++i) {
         const object = objects[i];
         if (t % 60 == i % 60) {
           object.getBehavior('auto1').simulateJumpKey();
         }
-        if (t + (i % 61) < 31) {
+        // Go right then left, to stay on the platforms: the same work is
+        // measured by every batch.
+        if ((t + i) % 60 < 30) {
           object.getBehavior('auto1').simulateRightKey();
-        }
-        if (t + (i % 61) >= 31) {
+        } else {
           object.getBehavior('auto1').simulateLeftKey();
         }
       }

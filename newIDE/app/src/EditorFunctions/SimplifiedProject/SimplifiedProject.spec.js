@@ -297,6 +297,18 @@ describe('SimplifiedProject', () => {
             "version": "1.0.0",
           },
         ],
+        "externalEvents": Array [
+          Object {
+            "associatedSceneName": "",
+            "eventsCount": 0,
+            "externalEventsName": "TestExternalEvents1",
+          },
+          Object {
+            "associatedSceneName": "",
+            "eventsCount": 0,
+            "externalEventsName": "TestExternalEvents2",
+          },
+        ],
         "externalLayouts": Array [],
         "globalObjectGroups": Array [],
         "globalObjects": Array [

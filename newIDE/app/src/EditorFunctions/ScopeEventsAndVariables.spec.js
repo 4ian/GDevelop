@@ -616,6 +616,47 @@ describe('scope of the events and variables functions', () => {
       expect(result.eventScript).not.toBe(noEventsInSceneText);
     });
 
+    it('reads the external events a `link` line of a scene names', async () => {
+      project
+        .insertNewExternalEvents('Movement', 0)
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Comment', 0);
+      const sceneEvents = project.getLayout('Level').getEvents();
+      gd.asLinkEvent(
+        sceneEvents.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Link',
+          0
+        )
+      ).setTarget('Movement');
+      gd.asLinkEvent(
+        sceneEvents.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Link',
+          1
+        )
+      ).setTarget('Missing');
+
+      const sceneResult = await launch('read_events_source', {
+        scope: { type: 'scene', scene_name: 'Level' },
+      });
+      expect(sceneResult.eventScript).toContain('link "Movement"');
+      expect(sceneResult.notes).toEqual([
+        '`link "Movement"` includes the external events "Movement": read them with scope { type: "external_events", external_events_name: "Movement" }.',
+        '`link "Missing"` names no external events nor scene of the project: it includes nothing.',
+      ]);
+
+      const externalEventsResult = await launch('read_events_source', {
+        scope: { type: 'external_events', external_events_name: 'Movement' },
+      });
+      expect(externalEventsResult.success).toBe(true);
+      expect(externalEventsResult.eventsForExternalEventsNamed).toBe(
+        'Movement'
+      );
+      expect(externalEventsResult.eventsForSceneNamed).toBeUndefined();
+      expect(externalEventsResult.eventScript).toContain('comment');
+    });
+
     describe('a `js` event larger than `max_chars`', () => {
       const lines = Array.from(
         { length: 3000 },

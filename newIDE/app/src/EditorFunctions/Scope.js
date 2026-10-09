@@ -8,12 +8,10 @@ const gd: libGDevelop = global.gd;
 
 /**
  * The `scope` argument shared by the editor functions: which container of the
- * project a call applies to (a scene, the instances of an external layout, an
- * extension, a custom object or behavior, a variant of a custom object).
- * Mirrors `gdevelop-tool-scope.js` in the backend (GDevelop-services): keep
- * the rules and the messages in sync.
- *
- * `external_events` is reserved: no function accepts it yet.
+ * project a call applies to (a scene, the instances of an external layout,
+ * external events, an extension, a custom object or behavior, a variant of a
+ * custom object). Mirrors `gdevelop-tool-scope.js` in the backend
+ * (GDevelop-services): keep the rules and the messages in sync.
  */
 export type ToolScopeType =
   | 'project'
@@ -46,6 +44,7 @@ export type ResolvedScope = {|
   label: string,
   layout: ?gdLayout,
   externalLayout: ?gdExternalLayout,
+  externalEvents: ?gdExternalEvents,
   eventsFunctionsExtension: ?gdEventsFunctionsExtension,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
@@ -110,8 +109,6 @@ const SCOPE_FIELDS_BY_TYPE: { [ToolScopeType]: Array<string> } = {
 
 export const BOTH_GIVEN_DISAGREE_MESSAGE =
   'Both scene_name and scope were given and they disagree: pass only scope.';
-export const EXTERNAL_EVENTS_NOT_SUPPORTED_MESSAGE =
-  'external_events is not supported yet';
 // Structural edits (children, behaviors, variables of children, groups) only
 // happen on the default variant: the named variants inherit them.
 export const NAMED_VARIANT_REJECTED_MESSAGE =
@@ -176,9 +173,6 @@ export const parseScopeArgument = (
     );
   }
   const type: ToolScopeType = (rawScope.type: any);
-  if (type === 'external_events') {
-    throw new Error(EXTERNAL_EVENTS_NOT_SUPPORTED_MESSAGE);
-  }
   if (!allowedTypes.includes(type)) {
     throw new Error(
       `\`scope.type\` "${type}" is not accepted here: use one of ${listAllowedTypes(
@@ -399,6 +393,7 @@ const makeEmptyResolvedScope = (scope: ToolScope): ResolvedScope => ({
   label: getScopeLabel(scope),
   layout: null,
   externalLayout: null,
+  externalEvents: null,
   eventsFunctionsExtension: null,
   eventsBasedBehavior: null,
   eventsBasedObject: null,
@@ -469,7 +464,20 @@ export const resolveScope = (
     };
   }
   if (scope.type === 'external_events') {
-    return makeFailure(EXTERNAL_EVENTS_NOT_SUPPORTED_MESSAGE);
+    const externalEventsName = scope.external_events_name || '';
+    if (!project.hasExternalEventsNamed(externalEventsName)) {
+      return makeFailure(
+        `External events not found: "${externalEventsName}". External events in this project: ${listNames(
+          mapFor(0, project.getExternalEventsCount(), i =>
+            project.getExternalEventsAt(i).getName()
+          )
+        )}.`
+      );
+    }
+    return {
+      ...base,
+      externalEvents: project.getExternalEvents(externalEventsName),
+    };
   }
 
   // The four extension scopes.

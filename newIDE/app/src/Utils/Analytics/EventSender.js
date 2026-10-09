@@ -4,6 +4,7 @@ import { getUserUUID, resetUserUUID } from './UserUUID';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { User as FirebaseUser } from 'firebase/auth';
 import {
+  countDailyAggregatedEventOccurrence,
   getProgramOpeningCount,
   incrementProgramOpeningCount,
 } from './LocalStats';
@@ -32,9 +33,32 @@ let posthogLoaded = false;
 // Flag helpful to know if the user has been identified, to avoid sending initial events
 // to a random uuid (like program_opening), which may not be merged to the main user's account.
 let userIdentified = false;
-let posthogLastPropertiesSent = '';
 let currentlyRunningInAppTutorial = null;
 let currentProjectUuid: string | null = null;
+
+const lastUserIdAndPropertiesSentLocalStorageKey =
+  'gd-analytics-last-user-id-and-properties-sent';
+
+const loadLastUserIdAndPropertiesSent = (): ?string => {
+  try {
+    return localStorage.getItem(lastUserIdAndPropertiesSentLocalStorageKey);
+  } catch (e) {
+    console.warn('Unable to load the last user properties sent', e);
+  }
+
+  return null;
+};
+
+const saveLastUserIdAndPropertiesSent = (userIdAndProperties: string) => {
+  try {
+    localStorage.setItem(
+      lastUserIdAndPropertiesSentLocalStorageKey,
+      userIdAndProperties
+    );
+  } catch (e) {
+    console.warn('Unable to store the last user properties sent', e);
+  }
+};
 
 let gdevelopEditorAnalytics: {|
   initialize: (rootElement: HTMLElement) => Promise<void>,
@@ -190,6 +214,26 @@ const recordEvent = (
 };
 
 /**
+ * Used to send an event at most once per day (UTC), for events happening often: each
+ * occurrence costs one analytics event otherwise.
+ * The sent event has a `countSinceLastSent` property with the number of occurrences since
+ * the last time it was sent (the occurrences of the day are reported by the next sent one),
+ * so the total number of occurrences is the sum of this property.
+ */
+const recordDailyAggregatedEvent = (
+  name: string,
+  metadata?: { [string]: any },
+  aggregationKey?: string
+) => {
+  const countSinceLastSent = countDailyAggregatedEventOccurrence(
+    aggregationKey || name
+  );
+  if (countSinceLastSent === null) return;
+
+  recordEvent(name, { ...metadata, countSinceLastSent });
+};
+
+/**
  * Used once at the beginning of the app to initialize the analytics.
  */
 export const installAnalyticsEvents = () => {
@@ -208,6 +252,14 @@ export const installAnalyticsEvents = () => {
       posthogLoaded = true;
     },
     autocapture: false, // we disable autocapture because we want to control which events we send.
+    // The app is opened once per session and `program_opening` is already sent:
+    // page views would be redundant events.
+    capture_pageview: false,
+    capture_pageleave: false,
+    // When nothing is stored by PostHog yet (first launch), use the anonymous UUID
+    // as the PostHog anonymous id: identifying the anonymous user with it then
+    // does not require an `$identify` event.
+    get_device_id: () => getUserUUID(),
     session_recording: {
       // Iframes (in-game editor, gameplay tests) are not recorded: the recording would
       // keep a reference to every document loaded in them (including game WebAssembly memories).
@@ -246,7 +298,6 @@ export const identifyUserForAnalytics = (
     versionWithHash: getIDEVersionWithHash(),
     appLanguage,
     browserLanguage,
-    programOpeningCount: getProgramOpeningCount(),
     themeName: userPreferences ? userPreferences.themeName : 'Unknown',
     ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
     // Additional profile information:
@@ -273,16 +324,20 @@ export const identifyUserForAnalytics = (
       return;
     }
 
-    // Identify which user is using the app, after de-duplicating the call to
-    // avoid useless calls.
+    // Identify which user is using the app, only if the user or its properties
+    // changed since they were last sent (even in a previous launch of the app):
+    // each call sends an `$identify` or `$set` event otherwise.
     // This is so we can build stats on the used version, languages and usage
     // of GDevelop features.
-    const stringifiedUserProperties = JSON.stringify(userProperties);
-    if (stringifiedUserProperties !== posthogLastPropertiesSent) {
+    const userIdAndProperties = JSON.stringify({ userId, userProperties });
+    if (
+      posthog.get_distinct_id() !== userId ||
+      userIdAndProperties !== loadLastUserIdAndPropertiesSent()
+    ) {
       posthog.identify(userId, userProperties);
-      posthogLastPropertiesSent = stringifiedUserProperties;
-      userIdentified = true;
+      saveLastUserIdAndPropertiesSent(userIdAndProperties);
     }
+    userIdentified = true;
   })();
 
   (async () => {
@@ -336,7 +391,9 @@ export const onUserLogoutForAnalytics = () => {
 
 export const sendProgramOpening = () => {
   incrementProgramOpeningCount();
-  recordEvent('program_opening');
+  recordDailyAggregatedEvent('program_opening', {
+    $set: { programOpeningCount: getProgramOpeningCount() },
+  });
 };
 
 export const sendExportLaunched = (exportKind: string) => {
@@ -387,7 +444,13 @@ export const sendProjectOpened = (metadata: {|
   // the storage provider does not expose a last-modified date.
   timeSinceLastModified: number | null,
 |}) => {
-  recordEvent('project-opened', metadata);
+  // Sent once a day per project, so that the projects (and so the templates
+  // they were created from) that are opened again can still be known.
+  recordDailyAggregatedEvent(
+    'project-opened',
+    metadata,
+    `project-opened-${metadata.projectUuid}`
+  );
 };
 
 export const sendTutorialOpened = (tutorialName: string) => {
@@ -426,7 +489,7 @@ export const sendAssetPackOpened = (options: {|
   assetPackKind: 'public' | 'private' | 'unknown',
   source: 'store-home' | 'author-profile' | 'new-object',
 |}) => {
-  recordEvent('asset_pack_opened', options);
+  recordDailyAggregatedEvent('asset_pack_opened', options);
 };
 
 export const sendAssetPackBuyClicked = (options: {|
@@ -649,7 +712,7 @@ export const sendAssetOpened = (options: {|
   assetPackId: string | null,
   assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
-  recordEvent('asset-opened', options);
+  recordDailyAggregatedEvent('asset-opened', options);
 };
 
 export const sendAssetAddedToProject = (options: {|
@@ -660,7 +723,7 @@ export const sendAssetAddedToProject = (options: {|
   assetPackId: string | null,
   assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
-  recordEvent('asset-added-to-project', options);
+  recordDailyAggregatedEvent('asset-added-to-project', options);
 };
 
 export const sendExtensionDetailsOpened = (name: string) => {
@@ -668,11 +731,11 @@ export const sendExtensionDetailsOpened = (name: string) => {
 };
 
 export const sendExtensionAddedToProject = (name: string) => {
-  recordEvent('extension-added-to-project', { name });
+  recordDailyAggregatedEvent('extension-added-to-project', { name });
 };
 
 export const sendNewObjectCreated = (name: string) => {
-  recordEvent('new-object-created', { name });
+  recordDailyAggregatedEvent('new-object-created', { name });
 };
 
 export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
@@ -694,16 +757,12 @@ export const sendCancelSubscriptionToChange = (metadata: {|
   recordEvent('cancel-subscription-to-change', metadata);
 };
 
-const canSendExternalEditorOpened = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 60, // Only once per hour per external editor.
-});
-
 export const sendExternalEditorOpened = (editorName: string) => {
-  if (!canSendExternalEditorOpened(editorName)) {
-    return;
-  }
-
-  recordEvent('open_external_editor', { editorName });
+  recordDailyAggregatedEvent(
+    'open_external_editor',
+    { editorName },
+    `open_external_editor-${editorName}`
+  );
 };
 
 export const sendBehaviorsEditorShown = (metadata: {|
@@ -721,7 +780,7 @@ export const sendBehaviorAdded = (metadata: {|
   behaviorType: string,
   parentEditor: 'behaviors-editor' | 'instruction-editor-dialog',
 |}) => {
-  recordEvent('behavior-added', metadata);
+  recordDailyAggregatedEvent('behavior-added', metadata);
 };
 
 export const sendCloudProjectCouldNotBeOpened = (metadata: {|
@@ -741,10 +800,6 @@ export const sendEventsExtractedAsFunction = (metadata: {|
   recordEvent('events-extracted-as-function', metadata);
 };
 
-const canSendPreviewStarted = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 60 * 6, // Only once every 6 hours per preview kind.
-});
-
 export const sendPreviewStarted = (metadata: {|
   projectUuid: string,
   networkPreview: boolean,
@@ -755,21 +810,18 @@ export const sendPreviewStarted = (metadata: {|
   forceDiagnosticReport: boolean,
   previewLaunchDuration: number,
 |}) => {
-  if (
-    !canSendPreviewStarted(
-      JSON.stringify({
-        networkPreview: metadata.networkPreview,
-        hotReload: metadata.hotReload,
-        projectDataOnlyExport: metadata.projectDataOnlyExport,
-        fullLoadingScreen: metadata.fullLoadingScreen,
-        forceDiagnosticReport: metadata.forceDiagnosticReport,
-      })
-    )
-  ) {
-    return;
-  }
-
-  recordEvent('preview-started', metadata);
+  // Sent once a day per preview kind.
+  recordDailyAggregatedEvent(
+    'preview-started',
+    metadata,
+    `preview-started-${JSON.stringify({
+      networkPreview: metadata.networkPreview,
+      hotReload: metadata.hotReload,
+      projectDataOnlyExport: metadata.projectDataOnlyExport,
+      fullLoadingScreen: metadata.fullLoadingScreen,
+      forceDiagnosticReport: metadata.forceDiagnosticReport,
+    })}`
+  );
 };
 
 export const sendSocialFollowUpdated = (
@@ -864,7 +916,7 @@ export const sendAssetSwapStart = ({
   originalObjectName: string,
   objectType: string,
 |}) => {
-  recordEvent('asset-swap-start', {
+  recordDailyAggregatedEvent('asset-swap-start', {
     originalObjectName,
     objectType,
   });
@@ -879,7 +931,7 @@ export const sendAssetSwapFinished = ({
   newObjectName: string,
   objectType: string,
 |}) => {
-  recordEvent('asset-swap-finished', {
+  recordDailyAggregatedEvent('asset-swap-finished', {
     originalObjectName,
     newObjectName,
     objectType,

@@ -547,13 +547,10 @@ namespace gdjs {
           ) ||
           !buildGrid(objects2Lists, updateObjectBounds, extraArg)
         ) {
-          // Calling the small `twoListsTest` rather than its loop keeps the
-          // loop out of this large function: inlined here, it was measured
-          // up to 8% slower.
-          return gdjs.evtTools.object.twoListsTest(
+          return testEveryPairOfObjects(
             predicate,
-            objectsLists1,
-            objectsLists2,
+            objects1Lists,
+            objects2Lists,
             inverted,
             extraArg
           );

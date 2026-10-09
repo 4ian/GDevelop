@@ -27,7 +27,7 @@ const reportBenchmarkResult = (benchmarkResult) => {
  * @returns {() => number} A function returning a number in [0, 1[.
  */
 const makeSeededRandom = (seed) => {
-  // Mulberry32 (https://gist.github.com/tommyettinger/46a874533244883189143505d203312c).
+  // Mulberry32, a small and fast pseudo-random generator.
   let state = seed >>> 0;
   return () => {
     state = (state + 0x6d2b79f5) >>> 0;

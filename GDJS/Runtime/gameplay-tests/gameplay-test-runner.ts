@@ -372,7 +372,8 @@ namespace gdjs {
       /** The time of each measured frame, in order. */
       frameTimesMs: Array<number>;
       medianFrameTimeMs: number;
-      /** The profiled sections (see `GameplayTestProfilingResult`). */
+      /** The profiled sections (see `GameplayTestProfilingResult`), for
+       * the last 600 measured frames at most. */
       sections: Array<{ name: string; avgTimeMs: number; maxTimeMs: number }>;
       /** WebGL draw calls (2D and 3D) per frame, or null without renderer. */
       drawCallsPerFrame: number | null;
@@ -3663,7 +3664,7 @@ namespace gdjs {
         if (!this._originalMathRandom) {
           this._originalMathRandom = Math.random;
         }
-        // Mulberry32 (https://gist.github.com/tommyettinger/46a874533244883189143505d203312c).
+        // Mulberry32, a small and fast pseudo-random generator.
         let state = seed >>> 0;
         Math.random = () => {
           state = (state + 0x6d2b79f5) >>> 0;

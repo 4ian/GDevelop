@@ -33,8 +33,9 @@ describe('gdjs.evtTools.object.hitBoxesCollisionTest', function () {
    * @param {string} name
    * @param {number} enemiesCount
    * @param {number | null} bulletsCount The number of bullets, or null to test the enemies with themselves.
+   * @param {(enemiesLists: ObjectsLists, bulletsLists: ObjectsLists) => void} condition
    */
-  const benchmarkCollisions = (name, enemiesCount, bulletsCount) => {
+  const benchmarkCondition = (name, enemiesCount, bulletsCount, condition) => {
     const random = makeSeededRandom(enemiesCount);
     const allEnemies = createObjects('Enemy', enemiesCount, random);
     const allBullets =
@@ -54,25 +55,86 @@ describe('gdjs.evtTools.object.hitBoxesCollisionTest', function () {
 
     const benchmarkSuite = makeBenchmarkSuite({
       benchmarksCount: 30,
-      // About the same duration for each objects count, with a brute-force
-      // test of every pair of objects.
+      // Batches long enough to measure both testing every pair of objects
+      // and a faster algorithm (proportional to the number of objects).
       iterationsCount: Math.ceil(
-        1000000 / (enemiesCount * (bulletsCount || enemiesCount))
+        Math.max(
+          1000000 / (enemiesCount * (bulletsCount || enemiesCount)),
+          10000 / (enemiesCount + (bulletsCount || enemiesCount))
+        )
       ),
     });
     benchmarkSuite.add(name, () => {
       gdjs.copyArray(allEnemies, enemies);
       if (bulletsCount !== null) gdjs.copyArray(allBullets, bullets);
-      gdjs.evtTools.object.hitBoxesCollisionTest(
-        enemiesLists,
-        bulletsLists,
-        false,
-        runtimeScene,
-        false
-      );
+      condition(enemiesLists, bulletsLists);
     });
     console.log(benchmarkSuite.run());
   };
+
+  /**
+   * @param {string} name
+   * @param {number} enemiesCount
+   * @param {number | null} bulletsCount
+   */
+  const benchmarkCollisions = (name, enemiesCount, bulletsCount) =>
+    benchmarkCondition(
+      name,
+      enemiesCount,
+      bulletsCount,
+      (enemiesLists, bulletsLists) =>
+        gdjs.evtTools.object.hitBoxesCollisionTest(
+          enemiesLists,
+          bulletsLists,
+          false,
+          runtimeScene,
+          false
+        )
+    );
+
+  /**
+   * @param {number} distance
+   * @param {number} enemiesCount
+   * @param {number | null} bulletsCount
+   */
+  const benchmarkDistances = (distance, enemiesCount, bulletsCount) =>
+    benchmarkCondition(
+      `distanceTest (${distance} pixels) of ${enemiesCount} objects with ` +
+        (bulletsCount === null ? 'themselves' : `${bulletsCount} objects`),
+      enemiesCount,
+      bulletsCount,
+      (enemiesLists, bulletsLists) =>
+        gdjs.evtTools.object.distanceTest(
+          enemiesLists,
+          bulletsLists,
+          distance,
+          false
+        )
+    );
+
+  /** @type {Array<[number, number | null]>} */
+  const distanceScenarios = [
+    [10, 10],
+    [30, 30],
+    [100, 100],
+    [500, 500],
+    [1000, 1000],
+    [1, 1000],
+    [10, 1000],
+    [1000, 1],
+    [500, null],
+  ];
+  for (const [enemiesCount, bulletsCount] of distanceScenarios) {
+    it(`benchmark distances between ${enemiesCount} objects and ${bulletsCount || 'themselves'}`, function () {
+      this.timeout(60000);
+      benchmarkDistances(100, enemiesCount, bulletsCount);
+    });
+  }
+
+  it('benchmark distances between objects all close to each other', function () {
+    this.timeout(60000);
+    benchmarkDistances(100000, 500, 500);
+  });
 
   for (const objectsCount of [10, 30, 100, 500, 1000]) {
     it(`benchmark ${objectsCount} objects colliding with ${objectsCount} other objects`, function () {

@@ -247,7 +247,7 @@ describe('gdjs.evtTools.object', function () {
   });
 });
 
-describe('gdjs.evtTools.object.hitBoxesCollisionTest', function () {
+describe('gdjs.evtTools.object conditions on pairs of objects', function () {
   /**
    * An object with its hit box partly outside of its size (like a sprite with
    * a custom collision mask larger than its image).
@@ -337,18 +337,19 @@ describe('gdjs.evtTools.object.hitBoxesCollisionTest', function () {
     };
   };
 
-  it('picks the same objects as testing every pair of objects', function () {
+  /** @type {Array<[number, number | null]>} The objects counts of each list (null to test the first list with itself). */
+  const scenarios = [
+    [5, 5],
+    [40, 40],
+    [300, 300],
+    [10, 2000],
+    [2000, 10],
+    [300, null],
+  ];
+
+  it('hitBoxesCollisionTest picks the same objects as testing every pair of objects', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
-    /** @type {Array<[number, number | null]>} The objects counts of each list (null to test the first list with itself). */
-    const scenarios = [
-      [5, 5],
-      [40, 40],
-      [300, 300],
-      [10, 2000],
-      [2000, 10],
-      [300, null],
-    ];
     for (const seed of [1, 2, 3]) {
       const random = makeSeededRandom(seed);
       for (const [objects1Count, objects2Count] of scenarios) {
@@ -390,6 +391,58 @@ describe('gdjs.evtTools.object.hitBoxesCollisionTest', function () {
             );
             expect(pickedObjectIds).to.eql(expectedPickedObjectIds);
             if (!inverted && objects1Count > 5) {
+              // Ensure the scenarios using a grid are not trivial.
+              expect(expectedPickedObjectIds.result).to.be(true);
+            }
+          }
+        }
+      }
+    }
+  });
+
+  it('distanceTest picks the same objects as testing every pair of objects', function () {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+    for (const seed of [1, 2, 3]) {
+      const random = makeSeededRandom(seed);
+      for (const [objects1Count, objects2Count] of scenarios) {
+        const objects1 = createObjects(
+          runtimeScene,
+          'Enemy',
+          objects1Count,
+          random
+        );
+        const objects2 =
+          objects2Count === null
+            ? null
+            : createObjects(runtimeScene, 'Bullet', objects2Count, random);
+        for (const inverted of [false, true]) {
+          for (const distance of [0, 10, 50, 300, 1e9, -40, NaN, Infinity]) {
+            const expectedPickedObjectIds = getPickedObjectIds(
+              (objectsLists1, objectsLists2) =>
+                gdjs.evtTools.object.twoListsTest(
+                  gdjs.evtTools.object._distanceBetweenObjects,
+                  objectsLists1,
+                  objectsLists2,
+                  inverted,
+                  distance * distance
+                ),
+              objects1,
+              objects2
+            );
+            const pickedObjectIds = getPickedObjectIds(
+              (objectsLists1, objectsLists2) =>
+                gdjs.evtTools.object.distanceTest(
+                  objectsLists1,
+                  objectsLists2,
+                  distance,
+                  inverted
+                ),
+              objects1,
+              objects2
+            );
+            expect(pickedObjectIds).to.eql(expectedPickedObjectIds);
+            if (!inverted && distance === 50 && objects1Count > 5) {
               // Ensure the scenarios using a grid are not trivial.
               expect(expectedPickedObjectIds.result).to.be(true);
             }

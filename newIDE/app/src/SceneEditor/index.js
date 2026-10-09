@@ -1342,7 +1342,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     instances.forEach(instance => {
       if (invisibleLayerOnWhichInstancesHaveJustBeenAdded === null) {
         const layer = this.props.layersContainer.getLayer(instance.getLayer());
-        if (!layer.getVisibility()) {
+        if (layer.isHiddenInEditor()) {
           invisibleLayerOnWhichInstancesHaveJustBeenAdded = instance.getLayer();
         }
       }
@@ -1725,6 +1725,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     targetPosition?: 'center' | 'upperCenter'
   ) => {
     this._setSelectedInstances(instances, multiSelect);
+    // Selecting instances (from the instances list) keeps the view where it
+    // is, unless a target position is asked (on small screens, where the
+    // drawer hides the scene).
+    if (!targetPosition) return;
+
     const { editorDisplay } = this;
     if (editorDisplay) {
       let offset = null;
@@ -2447,7 +2452,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     editorDisplay.viewControls.centerViewOnLastInstance(selectedInstances);
 
     if (this.props.gameEditorMode === 'embedded-game') {
-      changeViewPosition('centerViewOnLastSelectedInstance');
+      // Frame the selection exactly like the "F" shortcut pressed in the view.
+      changeViewPosition('focusOnSelection');
     }
   };
 

@@ -12,6 +12,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
+import CameraIcon from '../UI/CustomSvgIcons/Camera';
+import CameraOffIcon from '../UI/CustomSvgIcons/CameraOff';
 import LockIcon from '../UI/CustomSvgIcons/Lock';
 import LockOpenIcon from '../UI/CustomSvgIcons/LockOpen';
 import Radio from '@material-ui/core/Radio';
@@ -107,6 +109,10 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
   }
 
   _isVisible(): boolean {
+    return !this.layer.isHiddenInEditor();
+  }
+
+  _isVisibleInGame(): boolean {
     return this.layer.getVisibility();
   }
 
@@ -115,6 +121,11 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
   }
 
   _setVisibility(visible: boolean): void {
+    this.layer.setHiddenInEditor(!visible);
+    this.props.triggerOnLayersModified();
+  }
+
+  _setVisibilityInGame(visible: boolean): void {
     this.layer.setVisibility(visible);
     this.props.triggerOnLayersModified();
   }
@@ -128,9 +139,15 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     return [
       {
         icon: this._isVisible() ? <VisibilityIcon /> : <VisibilityOffIcon />,
-        label: i18n._(t`Visible`),
+        label: i18n._(t`Visible in the editor`),
         click: () => this._setVisibility(!this._isVisible()),
         id: 'layer-visibility',
+      },
+      {
+        icon: this._isVisibleInGame() ? <CameraIcon /> : <CameraOffIcon />,
+        label: i18n._(t`Visible when the scene starts`),
+        click: () => this._setVisibilityInGame(!this._isVisibleInGame()),
+        id: 'layer-visibility-in-game',
       },
       {
         icon:
@@ -175,9 +192,15 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
       },
       {
         type: 'checkbox',
-        label: i18n._(t`Visible`),
+        label: i18n._(t`Visible in the editor`),
         checked: this._isVisible(),
         click: () => this._setVisibility(!this._isVisible()),
+      },
+      {
+        type: 'checkbox',
+        label: i18n._(t`Visible when the scene starts`),
+        checked: this._isVisibleInGame(),
+        click: () => this._setVisibilityInGame(!this._isVisibleInGame()),
       },
       {
         type: 'checkbox',

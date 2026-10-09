@@ -554,6 +554,10 @@ namespace gdjs {
             // TODO: use data.payload.visibleScreenArea
             inGameEditor.centerViewOnLastSelectedInstance();
           }
+        } else if (data.command === 'focusOnSelection') {
+          if (inGameEditor) {
+            inGameEditor.focusOnSelection();
+          }
         } else if (data.command === 'updateInnerArea') {
           if (inGameEditor) {
             inGameEditor.updateInnerArea(

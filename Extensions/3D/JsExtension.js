@@ -465,8 +465,10 @@ module.exports = {
       base3D
         .addScopedCondition(
           'RotationZ',
-          _('Z'),
-          _('Compare the Z rotation (this is the angle of the object).'),
+          _('Z (global axis)'),
+          _(
+            'Compare the Z rotation (this is the angle of the object). It is around the Z axis of the scene (global axis).'
+          ),
           _('the Z rotation'),
           _('Angle ❯ Rotation'),
           'res/conditions/3d_box.svg',
@@ -485,8 +487,10 @@ module.exports = {
       base3D
         .addScopedAction(
           'SetRotationZ',
-          _('Z'),
-          _('Change the Z rotation (this is the angle of the object).'),
+          _('Z (global axis)'),
+          _(
+            'Change the Z rotation (this is the angle of the object). Adding to it turns the object around the Z axis of the scene (global axis), like "Turn around Z axis (global axis)".'
+          ),
           _('the Z rotation'),
           _('Angle ❯ Rotation'),
           'res/conditions/3d_box.svg',

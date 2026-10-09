@@ -34,6 +34,7 @@ let posthogLoaded = false;
 let userIdentified = false;
 let posthogLastPropertiesSent = '';
 let currentlyRunningInAppTutorial = null;
+let currentProjectUuid: string | null = null;
 
 let gdevelopEditorAnalytics: {|
   initialize: (rootElement: HTMLElement) => Promise<void>,
@@ -93,6 +94,10 @@ export const setCurrentlyRunningInAppTutorial = (
   tutorial: string | null
 ): string | null => (currentlyRunningInAppTutorial = tutorial);
 
+export const setCurrentProjectUuid = (projectUuid: string | null) => {
+  currentProjectUuid = projectUuid;
+};
+
 const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
   const lastSentEventTimestamps = {};
   return (eventName: string) => {
@@ -116,6 +121,7 @@ const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
  */
 const getAppMetadata = () => ({
   isInAppTutorialRunning: currentlyRunningInAppTutorial,
+  currentProjectUuid,
   isInDesktopApp: isElectronApp,
   isInWebApp: !isElectronApp && !isNativeMobileApp(),
   isInNativeMobileApp: isNativeMobileApp(),
@@ -142,7 +148,11 @@ const getAppMetadata = () => ({
  * Used to send an event to the analytics.
  * This function will retry to send the event if the analytics service is not ready.
  */
-const recordEvent = (name: string, metadata?: { [string]: any }) => {
+const recordEvent = (
+  name: string,
+  metadata?: { [string]: any },
+  appMetadata: { [string]: any } = getAppMetadata()
+) => {
   if (isDev) {
     // Uncomment to inspect analytics in development.
     // console.log(`Should have sent analytics event "${name}"`, metadata);
@@ -156,7 +166,7 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
         console.info(
           `Retrying to send the app analytics event with name ${name}`
         );
-        recordEvent(name, metadata);
+        recordEvent(name, metadata, appMetadata);
       }, 2000);
 
       return;
@@ -164,7 +174,7 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
 
     posthog.capture(name, {
       ...metadata,
-      ...getAppMetadata(),
+      ...appMetadata,
     });
   })();
 
@@ -173,7 +183,7 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
     if (gdevelopEditorAnalytics) {
       await gdevelopEditorAnalytics.trackEvent(name, {
         ...metadata,
-        ...getAppMetadata(),
+        ...appMetadata,
       });
     }
   })();

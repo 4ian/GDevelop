@@ -218,6 +218,7 @@ import {
   sendEventsExtractedAsFunction,
   sendPreviewStarted,
   sendProjectOpened,
+  setCurrentProjectUuid,
 } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/UseLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -716,6 +717,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   const { currentFileMetadata, updateStatus } = state;
   const currentProject = exceptionallyGuardAgainstDeadObject(
     state.currentProject
+  );
+
+  React.useEffect(
+    () => {
+      setCurrentProjectUuid(
+        currentProject ? currentProject.getProjectUuid() : null
+      );
+    },
+    [currentProject]
   );
 
   const fileIdentifier = currentFileMetadata
@@ -4895,6 +4905,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           return;
         }
 
+        if (originalProjectUuid)
+          setCurrentProjectUuid(upToDateProject.getProjectUuid());
         sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
         setCloudProjectSaveChoiceOpen(false);

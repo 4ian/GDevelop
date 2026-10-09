@@ -85,6 +85,21 @@ const makeGameplayTestOutput = (
     };
   }
 
+  // The game could not even be started: nothing is wrong with the test nor
+  // the game, and running it again changes nothing until the cause is fixed.
+  if (result.status === 'unavailable') {
+    return {
+      success: false,
+      ...makeGameplayTestResultReadableOutput(result),
+      message:
+        'The test did NOT run: the game preview could not be started (see `errors`). ' +
+        'This says nothing about the game nor the test. Do NOT change them, do not run ' +
+        'gameplay tests again in this request and do not report it as a problem of the ' +
+        'game: tell the user why the preview could not start and what to do about it.',
+      meta: didModifyProject ? { didModifyProject: true } : undefined,
+    };
+  }
+
   return {
     success: result.status === 'passed',
     ...makeGameplayTestResultReadableOutput(result),

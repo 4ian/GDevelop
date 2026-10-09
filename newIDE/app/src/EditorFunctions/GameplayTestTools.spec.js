@@ -66,6 +66,32 @@ describe('run_gameplay_test', () => {
   const getRunTest = () =>
     mockRunProjectGameplayTests.mock.calls[0][0].tests[0];
 
+  it('says that a test whose game could not start did not run, and must not be retried', async () => {
+    addStoredTest('MyTest');
+    mockRunProjectGameplayTests.mockImplementation(({ tests }) =>
+      Promise.resolve([
+        {
+          ...makePassedResult(tests[0].testName),
+          status: 'unavailable',
+          errors: ['The game preview could not be started: Export failed.'],
+        },
+      ])
+    );
+
+    const result = await launch({
+      scope: { type: 'project' },
+      test_name: 'MyTest',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.status).toBe('unavailable');
+    expect(result.errors).toEqual([
+      'The game preview could not be started: Export failed.',
+    ]);
+    expect(result.message).toContain('The test did NOT run');
+    expect(result.message).toContain('do not run gameplay tests again');
+  });
+
   it('runs the stored test as-is when `source` is omitted', async () => {
     addStoredTest('MyTest');
 

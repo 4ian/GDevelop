@@ -187,4 +187,46 @@ describe('gdjs.RuntimeScene integration tests', function () {
       expect(runtimeScene.hasLayer('MyOtherLayer')).to.be(true);
     });
   });
+
+  describe('Objects deletion', function () {
+    it('keeps the order of the remaining instances', function () {
+      const runtimeScene = new gdjs.RuntimeScene(gdjs.getPixiRuntimeGame());
+      runtimeScene.addLayer({
+        name: '',
+        visibility: true,
+        cameras: [],
+        effects: [],
+        ambientLightColorR: 0,
+        ambientLightColorG: 0,
+        ambientLightColorB: 0,
+        isLightingLayer: false,
+        followBaseLayerCamera: false,
+      });
+      const objects = [];
+      for (let i = 0; i < 300; i++) {
+        const object = new gdjs.TestRuntimeObject(runtimeScene, {
+          name: 'Object',
+          type: '',
+          behaviors: [],
+          effects: [],
+          variables: [],
+        });
+        runtimeScene.addObject(object);
+        objects.push(object);
+      }
+
+      // Instances are removed differently at the start of the list.
+      const deletedIndices = [0, 1, 2, 10, 62, 63, 64, 65, 66, 150, 298, 299];
+      const expectedRemainingObjectIds = objects
+        .filter((object, index) => !deletedIndices.includes(index))
+        .map((object) => object.id);
+      for (const index of [64, 0, 299, 2, 63, 150, 1, 65, 10, 298, 66, 62]) {
+        objects[index].deleteFromScene();
+      }
+
+      expect(
+        runtimeScene.getObjects('Object').map((object) => object.id)
+      ).to.eql(expectedRemainingObjectIds);
+    });
+  });
 });

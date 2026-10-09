@@ -647,14 +647,22 @@ describe('Scene benchmarks', function () {
     });
   });
 
-  it('benchmark objects creation and deletion', async function () {
-    this.timeout(120000);
-    await runSceneBenchmark({
-      name: 'Objects creation and deletion (100 per frame)',
+  /**
+   * @param {number} objectsCountPerFrame
+   * @param {number} maxObjectsCount
+   * @param {number} frames
+   */
+  const benchmarkObjectsCreationAndDeletion = (
+    objectsCountPerFrame,
+    maxObjectsCount,
+    frames
+  ) =>
+    runSceneBenchmark({
+      name: `Objects creation and deletion (${objectsCountPerFrame} per frame among ${maxObjectsCount})`,
       objects: [createSpriteObjectData('Bullet')],
       instances: [],
       eventsFunction: (runtimeScene) => {
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < objectsCountPerFrame; i++) {
           const bullet = runtimeScene.createObject('Bullet');
           if (bullet) {
             bullet.setPosition(
@@ -666,13 +674,25 @@ describe('Scene benchmarks', function () {
           }
         }
         const bullets = getObjects(runtimeScene, 'Bullet');
-        if (bullets.length > 2000) {
-          for (const bullet of bullets.slice(0, 100)) {
+        if (bullets.length > maxObjectsCount) {
+          for (const bullet of bullets.slice(0, objectsCountPerFrame)) {
             bullet.deleteFromScene();
           }
         }
       },
+      // Enough frames to reach the maximum number of objects.
+      warmupFrames: Math.ceil(maxObjectsCount / objectsCountPerFrame) + 10,
+      frames,
     });
+
+  it('benchmark objects creation and deletion', async function () {
+    this.timeout(120000);
+    await benchmarkObjectsCreationAndDeletion(100, 2000, 200);
+  });
+
+  it('benchmark many objects creation and deletion', async function () {
+    this.timeout(120000);
+    await benchmarkObjectsCreationAndDeletion(1000, 10000, 40);
   });
 
   it('benchmark heavy events', async function () {

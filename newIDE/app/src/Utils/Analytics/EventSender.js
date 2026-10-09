@@ -489,7 +489,14 @@ export const sendAssetPackOpened = (options: {|
   assetPackKind: 'public' | 'private' | 'unknown',
   source: 'store-home' | 'author-profile' | 'new-object',
 |}) => {
-  recordDailyAggregatedEvent('asset_pack_opened', options);
+  // Sent once a day per asset pack, so that asset packs can be compared.
+  recordDailyAggregatedEvent(
+    'asset_pack_opened',
+    options,
+    `asset_pack_opened-${options.assetPackId ||
+      options.assetPackTag ||
+      options.assetPackName}`
+  );
 };
 
 export const sendAssetPackBuyClicked = (options: {|
@@ -731,7 +738,12 @@ export const sendExtensionDetailsOpened = (name: string) => {
 };
 
 export const sendExtensionAddedToProject = (name: string) => {
-  recordDailyAggregatedEvent('extension-added-to-project', { name });
+  // Sent once a day per extension, so that extensions can be compared.
+  recordDailyAggregatedEvent(
+    'extension-added-to-project',
+    { name },
+    `extension-added-to-project-${name}`
+  );
 };
 
 export const sendNewObjectCreated = (name: string) => {
@@ -780,7 +792,12 @@ export const sendBehaviorAdded = (metadata: {|
   behaviorType: string,
   parentEditor: 'behaviors-editor' | 'instruction-editor-dialog',
 |}) => {
-  recordDailyAggregatedEvent('behavior-added', metadata);
+  // Sent once a day per behavior type, so that behaviors can be compared.
+  recordDailyAggregatedEvent(
+    'behavior-added',
+    metadata,
+    `behavior-added-${metadata.behaviorType}`
+  );
 };
 
 export const sendCloudProjectCouldNotBeOpened = (metadata: {|
@@ -916,10 +933,15 @@ export const sendAssetSwapStart = ({
   originalObjectName: string,
   objectType: string,
 |}) => {
-  recordDailyAggregatedEvent('asset-swap-start', {
-    originalObjectName,
-    objectType,
-  });
+  // Sent once a day per swapped object, so that swaps can be compared.
+  recordDailyAggregatedEvent(
+    'asset-swap-start',
+    {
+      originalObjectName,
+      objectType,
+    },
+    `asset-swap-start-${JSON.stringify({ objectType, originalObjectName })}`
+  );
 };
 
 export const sendAssetSwapFinished = ({
@@ -931,11 +953,16 @@ export const sendAssetSwapFinished = ({
   newObjectName: string,
   objectType: string,
 |}) => {
-  recordDailyAggregatedEvent('asset-swap-finished', {
-    originalObjectName,
-    newObjectName,
-    objectType,
-  });
+  // Sent once a day per swapped object, so that swaps can be compared.
+  recordDailyAggregatedEvent(
+    'asset-swap-finished',
+    {
+      originalObjectName,
+      newObjectName,
+      objectType,
+    },
+    `asset-swap-finished-${JSON.stringify({ objectType, originalObjectName })}`
+  );
 };
 
 const canSendPlaySectionOpened = makeCanSendEvent({

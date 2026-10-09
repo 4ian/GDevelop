@@ -77,6 +77,54 @@ namespace gdjs {
         this._marginBottom =
           0;
       this._setupOrientation();
+      this._setupFullscreenListeners();
+      this._applyFullscreenPatch();
+    }
+
+    private _setupFullscreenListeners(): void {
+      document.addEventListener(
+        'fullscreenchange',
+        this._onFullscreenChange.bind(this)
+      );
+      document.addEventListener(
+        'webkitfullscreenchange',
+        this._onFullscreenChange.bind(this)
+      );
+      document.addEventListener(
+        'mozfullscreenchange',
+        this._onFullscreenChange.bind(this)
+      );
+    }
+
+    private _applyFullscreenPatch(): void {
+      if (!(window as any)._gdjsFullScreenPatch) {
+        (window as any)._gdjsFullScreenPatch = true;
+        document.addEventListener('fullscreenchange', () => {
+          this.setFullScreen(document.fullscreenElement != null);
+        });
+        document.addEventListener('webkitfullscreenchange', () => {
+          this.setFullScreen(document.fullscreenElement != null);
+        });
+        document.addEventListener('mozfullscreenchange', () => {
+          this.setFullScreen(document.fullscreenElement != null);
+        });
+      }
+    }
+
+    private _onFullscreenChange(): void {
+      // Use type assertions to handle vendor-specific properties
+      const doc = document as any;
+      this._isFullscreen = !!(
+        doc.fullscreenElement ||
+        doc.webkitFullscreenElement ||
+        doc.mozFullScreenElement
+      );
+
+      // Force a resize of the canvas to update UI elements
+      this._resizeCanvas();
+
+      // Notify the game that the window size has changed
+      this._game.onWindowInnerSizeChanged();
     }
 
     /**
@@ -465,46 +513,31 @@ namespace gdjs {
           }
         } else {
           // Use HTML5 Fullscreen API
-          //TODO: Do this on a user gesture, otherwise most browsers won't activate fullscreen
+          const doc = document as any;
+          const docElement = document.documentElement as any;
+
           if (this._isFullscreen) {
-            // @ts-ignore
-            if (document.documentElement.requestFullscreen) {
-              // @ts-ignore
-              document.documentElement.requestFullscreen();
-            } else {
-              // @ts-ignore
-              if (document.documentElement.mozRequestFullScreen) {
-                // @ts-ignore
-                document.documentElement.mozRequestFullScreen();
-              } else {
-                // @ts-ignore
-                if (document.documentElement.webkitRequestFullScreen) {
-                  // @ts-ignore
-                  document.documentElement.webkitRequestFullScreen();
-                }
-              }
+            if (docElement.requestFullscreen) {
+              docElement.requestFullscreen();
+            } else if (docElement.webkitRequestFullscreen) {
+              docElement.webkitRequestFullscreen();
+            } else if (docElement.mozRequestFullScreen) {
+              docElement.mozRequestFullScreen();
             }
           } else {
-            // @ts-ignore
-            if (document.exitFullscreen) {
-              // @ts-ignore
-              document.exitFullscreen();
-            } else {
-              // @ts-ignore
-              if (document.mozCancelFullScreen) {
-                // @ts-ignore
-                document.mozCancelFullScreen();
-              } else {
-                // @ts-ignore
-                if (document.webkitCancelFullScreen) {
-                  // @ts-ignore
-                  document.webkitCancelFullScreen();
-                }
-              }
+            if (doc.exitFullscreen) {
+              doc.exitFullscreen();
+            } else if (doc.webkitExitFullscreen) {
+              doc.webkitExitFullscreen();
+            } else if (doc.mozCancelFullScreen) {
+              doc.mozCancelFullScreen();
             }
           }
         }
+        // Force a resize of the canvas to update UI elements
         this._resizeCanvas();
+        // Notify the game that the window size has changed
+        this._game.onWindowInnerSizeChanged();
       }
     }
 
@@ -522,8 +555,7 @@ namespace gdjs {
         }
       }
 
-      // Height check is used to detect user triggered full screen (for example F11 shortcut).
-      return this._isFullscreen || window.screen.height === window.innerHeight;
+      return this._isFullscreen;
     }
 
     /**

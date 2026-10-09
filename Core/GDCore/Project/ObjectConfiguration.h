@@ -206,6 +206,13 @@ class GD_CORE_API ObjectConfiguration {
   ///@}
 
 protected:
+  /**
+   * \brief Return the property to choose the animation an initial instance
+   * starts with, listing the animations of this object configuration.
+   */
+  gd::PropertyDescriptor GetStartingAnimationProperty(
+      const gd::InitialInstance& instance) const;
+
   gd::String type; ///< Which type of object is represented by this
                    ///< configuration.
 

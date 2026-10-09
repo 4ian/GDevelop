@@ -1,0 +1,4 @@
+This is Yarn Editor v0.4.116 (https://github.com/YarnSpinnerTool/YarnEditor/commit/4fcfd2e09053b33a90450ddaa72845ebd594ee8b)
+
+It has been Monkey-patched to fix an issue with Electron > 18, where electron.remote cannot be used anymore.
+In this version, we pass down remote (from require(@electron/remote)) to yarn to the required actions)

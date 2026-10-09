@@ -29,7 +29,7 @@ Tests are located in the **tests** folder for the game engine, or directly in th
 
 ### Benchmarks
 
-Benchmarks are in the **benchmarks** folder: micro benchmarks of the game engine functions, and scene benchmarks (`scenes.js`) running scenes like a game with the gameplay test harness (`harness.benchmark`).
+Benchmarks are in the **benchmarks** folder: micro benchmarks of the game engine functions, and scene benchmarks (in **benchmarks/scenes**) running scenes like a game with the gameplay test harness (`harness.benchmark`).
 
 To compare the speed of your changes with the version your branch started from:
 

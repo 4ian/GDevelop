@@ -34,7 +34,10 @@ module.exports = function (config) {
   const benchmarkFiles = [
     './GDJS/tests/benchmarks/init.js',
     './Extensions/**/benchmarks/**.benchmark.js',
-    './GDJS/tests/benchmarks/**/*.js',
+    './GDJS/tests/benchmarks/*.js',
+    // Last, so that the micro benchmarks are not affected by what the scenes
+    // leave behind (memory to collect, rendering to finish...).
+    './GDJS/tests/benchmarks/scenes/*.js',
   ];
 
   config.set({

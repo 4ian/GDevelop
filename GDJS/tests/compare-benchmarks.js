@@ -132,6 +132,40 @@ const formatTime = (timeMs) =>
   timeMs >= 10 ? timeMs.toFixed(1) + 'ms' : timeMs.toFixed(3) + 'ms';
 
 /**
+ * Counters don't depend on the machine: compare them exactly. A counter
+ * differing between rounds of the same version is not deterministic.
+ * @param {Array<BenchmarkResult>} baseResults
+ * @param {Array<BenchmarkResult>} headResults
+ * @returns {Array<{name: string, base: string, head: string}>}
+ */
+const compareCounters = (baseResults, headResults) => {
+  const counterNames = new Set(
+    [...baseResults, ...headResults].flatMap((result) =>
+      Object.keys(result.counters || {})
+    )
+  );
+  return [...counterNames].map((counterName) => {
+    /** @param {Array<BenchmarkResult>} results */
+    const formatCounter = (results) => {
+      const values = [
+        ...new Set(
+          results.map((result) => String((result.counters || {})[counterName]))
+        ),
+      ];
+      if (!values.length) return '-';
+      return values.length === 1
+        ? values[0]
+        : values.join(' / ') + ' (not deterministic)';
+    };
+    return {
+      name: counterName,
+      base: formatCounter(baseResults),
+      head: formatCounter(headResults),
+    };
+  });
+};
+
+/**
  * @param {{[version: string]: Array<Array<BenchmarkResult>>}} resultsByVersionAndRound
  */
 const compareResults = (resultsByVersionAndRound) => {
@@ -167,7 +201,7 @@ const compareResults = (resultsByVersionAndRound) => {
         change: null,
         changeRange: null,
         verdict: baseMediansMs.length ? 'removed or failing' : 'new',
-        counters: null,
+        counters: compareCounters(baseResults, headResults),
       };
     }
 
@@ -184,36 +218,6 @@ const compareResults = (resultsByVersionAndRound) => {
       Math.abs(change) >= MINIMUM_SIGNIFICANT_CHANGE &&
       (changeRange[0] > 0 || changeRange[1] < 0);
 
-    // Counters don't depend on the machine: compare them exactly. A counter
-    // differing between rounds of the same version is not deterministic.
-    /** @type {Array<{name: string, base: string, head: string}>} */
-    const counters = [];
-    const baseCounters = baseResults[0].counters || {};
-    const headCounters = headResults[0].counters || {};
-    for (const counterName of Object.keys({
-      ...baseCounters,
-      ...headCounters,
-    })) {
-      /** @param {Array<BenchmarkResult>} results */
-      const formatCounter = (results) => {
-        const values = [
-          ...new Set(
-            results.map((result) =>
-              String((result.counters || {})[counterName])
-            )
-          ),
-        ];
-        return values.length === 1
-          ? values[0]
-          : values.join(' / ') + ' (not deterministic)';
-      };
-      counters.push({
-        name: counterName,
-        base: formatCounter(baseResults),
-        head: formatCounter(headResults),
-      });
-    }
-
     return {
       name,
       baseMs,
@@ -221,7 +225,7 @@ const compareResults = (resultsByVersionAndRound) => {
       change,
       changeRange,
       verdict: !isSignificant ? 'unchanged' : change < 0 ? 'faster' : 'slower',
-      counters,
+      counters: compareCounters(baseResults, headResults),
     };
   });
 };
@@ -245,7 +249,8 @@ const makeMarkdownReport = (
     '<!-- benchmark-results -->',
     '### ⏱️ Game engine benchmarks',
     '',
-    `Comparing \`${headCommit.slice(0, 8)}\` to its base \`${baseCommit.slice(0, 8)}\`, ` +
+    `Comparing \`${headCommit.slice(0, 8)}\` to its base \`${baseCommit.slice(0, 8)}\` ` +
+      '(on a pull request, the version tested is the pull request merged into its base), ' +
       `run alternately ${rounds} times on the same machine (${os.cpus()[0].model}, ` +
       `${os.cpus().length} cores, rendering without GPU).`,
     '',
@@ -266,19 +271,27 @@ const makeMarkdownReport = (
   ];
 
   const changedCounters = comparisons.flatMap(({ name, counters }) =>
-    (counters || [])
+    counters
       .filter(
         (counter) =>
-          counter.base !== counter.head ||
+          (counter.base !== '-' &&
+            counter.head !== '-' &&
+            counter.base !== counter.head) ||
+          counter.base.includes('not deterministic') ||
           counter.head.includes('not deterministic')
       )
       .map((counter) => ({ benchmarkName: name, ...counter }))
   );
+  const comparedCountersBenchmarksCount = comparisons.filter(({ counters }) =>
+    counters.some((counter) => counter.base !== '-' && counter.head !== '-')
+  ).length;
   lines.push(
     '',
     changedCounters.length
-      ? '⚠️ **Counters changed** (draw calls, objects count or final state of a scene):'
-      : '✅ The counters of the scene benchmarks (draw calls, objects count and final state) are unchanged.'
+      ? '⚠️ **Counters changed or not deterministic** (draw calls, objects count or final state of a scene):'
+      : comparedCountersBenchmarksCount
+        ? `✅ The counters (draw calls, objects count and final state) of the ${comparedCountersBenchmarksCount} scene benchmarks run on both versions are unchanged.`
+        : 'ℹ️ No scene benchmark ran on both versions: their counters (draw calls, objects count and final state) could not be compared.'
   );
   if (changedCounters.length) {
     lines.push(

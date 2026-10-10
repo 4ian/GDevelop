@@ -27,13 +27,13 @@ namespace gdjs {
       : false;
 
   // PixiJS splits every measured text in graphemes (using `Intl.Segmenter`,
-  // which is slow), even without letter spacing. A text made only of
-  // printable ASCII characters has exactly one grapheme per character, so it
-  // is split directly.
+  // which is slow), even without letter spacing. Printable ASCII and Latin-1
+  // characters never combine into a grapheme, so a text made only of them is
+  // split directly.
   const pixiGraphemeSegmenter = PIXI.TextMetrics.graphemeSegmenter;
-  const printableAsciiTextRegex = /^[\x20-\x7e]*$/;
+  const printableLatin1TextRegex = /^[\x20-\x7e\xa0-\xff]*$/;
   PIXI.TextMetrics.graphemeSegmenter = (text: string) =>
-    printableAsciiTextRegex.test(text)
+    printableLatin1TextRegex.test(text)
       ? text.split('')
       : pixiGraphemeSegmenter(text);
 

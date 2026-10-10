@@ -10,6 +10,7 @@ describe('PIXI.TextMetrics.graphemeSegmenter', function () {
       ' ~!"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}',
       'Line\r\nbreak\nand\ttab',
       'Accentué',
+      'Pontuação: déjà vu ¿Qué? Straße ½ © ÿ ­',
       'é combining mark',
       '👍🏽 emoji 👨‍👩‍👧',
       '日本語のテキスト',

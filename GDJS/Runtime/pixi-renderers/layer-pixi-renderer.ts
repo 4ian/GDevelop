@@ -187,6 +187,60 @@ namespace gdjs {
   const assumedFovIn2D = 45;
 
   /**
+   * A 3D object of a layer, as seen by `LayerPixiRenderer.cull3DObjects`.
+   */
+  type Culled3DRendererObject = THREE.Object3D & {
+    gdjsRuntimeObject?: gdjs.RuntimeObject;
+    gdjsCulling?: {
+      isCulled: boolean;
+      // The transform when the matrices were last updated.
+      position: THREE.Vector3;
+      quaternion: THREE.Quaternion;
+      scale: THREE.Vector3;
+    };
+  };
+
+  /**
+   * Replace `updateMatrixWorld` of the objects that can be culled: Three.js
+   * updates the matrices of all the objects of a scene at each render, even
+   * hidden ones. The matrices of culled objects are updated by
+   * `cull3DObjects` when they move instead.
+   */
+  function updateMatrixWorldUnlessCulled(
+    this: Culled3DRendererObject,
+    force?: boolean
+  ) {
+    if (this.gdjsCulling && this.gdjsCulling.isCulled) return;
+    THREE.Object3D.prototype.updateMatrixWorld.call(this, force);
+  }
+
+  /**
+   * The layer whose 3D scene is being rendered, to check the lights casting
+   * shadows (see `watchShadowLights`).
+   */
+  let layerRendererBeingRendered: gdjs.LayerPixiRenderer | null = null;
+
+  /**
+   * Let the layers know the lights for which Three.js renders shadow maps:
+   * objects can't be culled when a light casting shadows is somewhere not
+   * checked by `cull3DObjects`.
+   */
+  const watchShadowLights = (threeRenderer: THREE.WebGLRenderer) => {
+    const shadowMap = threeRenderer.shadowMap as THREE.WebGLShadowMap & {
+      gdjsIsWatched?: boolean;
+    };
+    if (shadowMap.gdjsIsWatched) return;
+    shadowMap.gdjsIsWatched = true;
+    const render = shadowMap.render;
+    shadowMap.render = function (lights, scene, camera) {
+      if (layerRendererBeingRendered) {
+        layerRendererBeingRendered._checkRenderedShadowLights(lights);
+      }
+      render.call(this, lights, scene, camera);
+    };
+  };
+
+  /**
    * The renderer for a gdjs.Layer using Pixi.js.
    * @category Renderers > Layers
    */
@@ -1445,7 +1499,217 @@ namespace gdjs {
     remove3DRendererObject(object: THREE.Object3D): void {
       if (!this._threeGroup) return;
 
+      const culledObject = object as Culled3DRendererObject;
+      if (culledObject.gdjsCulling && culledObject.gdjsCulling.isCulled) {
+        this._showCulledObject(culledObject);
+      }
       this._threeGroup.remove(object);
+    }
+
+    private _cullingFrustums: THREE.Frustum[] = [];
+    private _cullingFrustumsCount = 0;
+    private _cullingShadowLights: THREE.Light[] = [];
+    private _hasUncheckedShadowLights = false;
+    private _culledObjectsCount = 0;
+    private _cullingGroupMatrix: THREE.Matrix4 | null = null;
+    private _cullingMatrix: THREE.Matrix4 | null = null;
+    private _cullingSphere: THREE.Sphere | null = null;
+
+    /**
+     * Hide the 3D objects that can't be seen: outside of the camera frustum
+     * and unable to cast a shadow in it. Three.js would otherwise go through
+     * all their meshes at each render, for the camera and for each shadow map
+     * (to update their matrices and find the ones to render).
+     *
+     * Only objects rendering nothing outside of their box are culled. Their
+     * matrices are still updated when they move (for raycasts).
+     *
+     * @param threeRenderer The renderer that will render the layer.
+     * @param isEnabled `false` to show again the culled objects, for example
+     * before rendering with another camera.
+     */
+    cull3DObjects(
+      threeRenderer: THREE.WebGLRenderer,
+      isEnabled: boolean
+    ): void {
+      const threeGroup = this._threeGroup;
+      if (!threeGroup) return;
+      watchShadowLights(threeRenderer);
+      layerRendererBeingRendered = this;
+      // Culling is not possible either when the last render had shadows of
+      // lights not checked by `_updateFrustums` (see `watchShadowLights`).
+      const isCullingPossible =
+        isEnabled && !this._hasUncheckedShadowLights && this._updateFrustums();
+      this._hasUncheckedShadowLights = false;
+      if (!isCullingPossible && this._culledObjectsCount === 0) return;
+
+      if (!this._cullingGroupMatrix) {
+        this._cullingGroupMatrix = new THREE.Matrix4();
+        this._cullingSphere = new THREE.Sphere();
+      }
+      threeGroup.updateWorldMatrix(true, false);
+      const groupMatrix = threeGroup.matrixWorld;
+      const hasGroupMoved = !groupMatrix.equals(this._cullingGroupMatrix);
+      this._cullingGroupMatrix.copy(groupMatrix);
+      const groupScale = groupMatrix.getMaxScaleOnAxis();
+      const sphere = this._cullingSphere!;
+
+      const children = threeGroup.children as Culled3DRendererObject[];
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        const object = child.gdjsRuntimeObject as
+          | gdjs.RuntimeObject3D
+          | undefined;
+        const culling = child.gdjsCulling;
+        if (
+          !isCullingPossible ||
+          !object ||
+          !object.isRenderedInsideItsBox ||
+          !object.isRenderedInsideItsBox()
+        ) {
+          if (culling && culling.isCulled) this._showCulledObject(child);
+          continue;
+        }
+
+        // The box rotates around the center: this sphere contains it.
+        const width = object.getWidth();
+        const height = object.getHeight();
+        const depth = object.getDepth();
+        const centerX = object.getCenterX();
+        const centerY = object.getCenterY();
+        const centerZ = object.getCenterZ();
+        sphere.center
+          .set(
+            object.getDrawableX() + centerX,
+            object.getDrawableY() + centerY,
+            object.getDrawableZ() + centerZ
+          )
+          .applyMatrix4(groupMatrix);
+        sphere.radius =
+          Math.hypot(
+            Math.max(centerX, width - centerX),
+            Math.max(centerY, height - centerY),
+            Math.max(centerZ, depth - centerZ)
+          ) * groupScale;
+        let isInView = false;
+        for (let j = 0; j < this._cullingFrustumsCount; j++) {
+          if (this._cullingFrustums[j].intersectsSphere(sphere)) {
+            isInView = true;
+            break;
+          }
+        }
+
+        if (isInView) {
+          if (culling && culling.isCulled) this._showCulledObject(child);
+        } else if (!culling || !culling.isCulled) {
+          if (!child.visible) continue;
+          child.visible = false;
+          if (culling) {
+            culling.isCulled = true;
+            culling.position.copy(child.position);
+            culling.quaternion.copy(child.quaternion);
+            culling.scale.copy(child.scale);
+          } else {
+            child.gdjsCulling = {
+              isCulled: true,
+              position: child.position.clone(),
+              quaternion: child.quaternion.clone(),
+              scale: child.scale.clone(),
+            };
+            child.updateMatrixWorld = updateMatrixWorldUnlessCulled;
+          }
+          this._culledObjectsCount++;
+        } else if (
+          hasGroupMoved ||
+          !culling.position.equals(child.position) ||
+          !culling.quaternion.equals(child.quaternion) ||
+          !culling.scale.equals(child.scale)
+        ) {
+          culling.position.copy(child.position);
+          culling.quaternion.copy(child.quaternion);
+          culling.scale.copy(child.scale);
+          THREE.Object3D.prototype.updateMatrixWorld.call(child, true);
+        }
+      }
+    }
+
+    private _showCulledObject(child: Culled3DRendererObject): void {
+      child.gdjsCulling!.isCulled = false;
+      child.visible = !(
+        child.gdjsRuntimeObject && child.gdjsRuntimeObject.isHidden()
+      );
+      this._culledObjectsCount--;
+    }
+
+    /**
+     * Compute the frustums of the camera and of the cameras of the shadow
+     * maps.
+     * @returns `false` when objects can't be culled.
+     */
+    private _updateFrustums(): boolean {
+      const threeScene = this._threeScene;
+      const threeCamera = this._threeCamera;
+      if (!threeScene || !threeCamera || !this._threeGroup) return false;
+      this._cullingFrustumsCount = 0;
+      this._cullingShadowLights.length = 0;
+      threeCamera.updateMatrixWorld();
+      this._addFrustum(threeCamera);
+      return (
+        this._addShadowFrustums(threeScene.children) &&
+        this._addShadowFrustums(this._threeGroup.children)
+      );
+    }
+
+    private _addShadowFrustums(objects: THREE.Object3D[]): boolean {
+      for (let i = 0; i < objects.length; i++) {
+        const light = objects[i] as THREE.DirectionalLight | THREE.SpotLight;
+        if (!light.isLight || !light.castShadow || !light.visible) continue;
+        if (
+          !(light as THREE.DirectionalLight).isDirectionalLight &&
+          !(light as THREE.SpotLight).isSpotLight
+        ) {
+          // Other shadows (point lights) are rendered with several cameras.
+          return false;
+        }
+        // The scene matrix is only updated when rendering.
+        light.updateWorldMatrix(true, false);
+        light.target.updateWorldMatrix(true, false);
+        light.shadow.updateMatrices(light);
+        this._addFrustum(light.shadow.camera);
+        this._cullingShadowLights.push(light);
+      }
+      return true;
+    }
+
+    private _addFrustum(camera: THREE.Camera): void {
+      if (!this._cullingMatrix) this._cullingMatrix = new THREE.Matrix4();
+      let frustum = this._cullingFrustums[this._cullingFrustumsCount];
+      if (!frustum) {
+        frustum = new THREE.Frustum();
+        this._cullingFrustums.push(frustum);
+      }
+      frustum.setFromProjectionMatrix(
+        this._cullingMatrix.multiplyMatrices(
+          camera.projectionMatrix,
+          camera.matrixWorldInverse
+        ),
+        camera.coordinateSystem,
+        camera.reversedDepth
+      );
+      this._cullingFrustumsCount++;
+    }
+
+    /**
+     * Called by Three.js (see `watchShadowLights`) with the lights for which
+     * shadow maps are rendered.
+     */
+    _checkRenderedShadowLights(lights: THREE.Light[]): void {
+      for (let i = 0; i < lights.length; i++) {
+        if (!this._cullingShadowLights.includes(lights[i])) {
+          this._hasUncheckedShadowLights = true;
+          return;
+        }
+      }
     }
 
     updateClearColor(): void {

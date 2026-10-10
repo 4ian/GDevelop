@@ -244,6 +244,11 @@ namespace gdjs {
       return this._faceResourceNames[faceIndex];
     }
 
+    override isRenderedInsideItsBox(): boolean {
+      // Children could have been added by extensions.
+      return this.get3DRendererObject().children.length === 0;
+    }
+
     getRenderer(): gdjs.RuntimeObject3DRenderer {
       return this._renderer;
     }

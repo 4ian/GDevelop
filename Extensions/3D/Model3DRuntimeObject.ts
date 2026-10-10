@@ -330,6 +330,10 @@ namespace gdjs {
       );
     }
 
+    override isRenderedInsideItsBox(): boolean {
+      return this._renderer.isRenderedInsideItsBox();
+    }
+
     getRenderer(): RuntimeObject3DRenderer {
       return this._renderer;
     }

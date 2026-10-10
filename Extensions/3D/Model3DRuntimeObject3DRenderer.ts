@@ -412,6 +412,12 @@ namespace gdjs {
       });
     }
 
+    isRenderedInsideItsBox(): boolean {
+      // Animations can move the model outside of its box, and children could
+      // have been added by extensions.
+      return !this._action && this.get3DRendererObject().children.length === 1;
+    }
+
     /**
      * Return true if animation has ended.
      * The animation had ended if:

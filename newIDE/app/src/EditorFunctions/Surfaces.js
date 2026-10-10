@@ -8,6 +8,7 @@ import {
   type InGameEditorRaycastHit,
 } from '../EmbeddedGame/InGameEditorQueries';
 import { type ResolvedScope } from './Scope';
+import { type EditorCallbacks } from './index';
 import { type ObjectSizeInfo } from './Utils';
 import { getBoxPointOffset } from './InstanceAnchor';
 import getObjectByName from '../Utils/GetObjectByName';
@@ -17,21 +18,21 @@ import { SafeExtractor } from '../Utils/SafeExtractor';
  * The up direction of a scene: `z` for most 3D games, `-y` for side view
  * games (in 2D, it is always `-y`).
  */
-export type SurfaceUp = 'z' | '-y';
+type SurfaceUp = 'z' | '-y';
 
 /** The surfaces to find, from `drop_to_surface` or `surface_beneath`. */
-export type SurfaceOptions = {|
+type SurfaceOptions = {|
   up: SurfaceUp,
   // The only objects that are surfaces, or null for all of them.
   includedObjectNames: Array<string> | null,
   excludedObjectNames: Array<string>,
 |};
 
-export type SurfacesMode = '3d' | '2d';
+type SurfacesMode = '3d' | '2d';
 
 // A distance, in pixels, beyond everything shown in a scene: rays start this
 // far to find every surface below a position.
-export const BEYOND_EVERYTHING_DISTANCE = 1000000;
+const BEYOND_EVERYTHING_DISTANCE = 1000000;
 
 // The in-game editor must answer each message within a second, which it can
 // miss while it loads or renders a scene for the first time: rays are sent
@@ -166,45 +167,107 @@ export const parseSurfaceOptions = ({
   };
 };
 
+/**
+ * What the in-game editor shows for a scope (a scene, an external layout or a
+ * variant of a custom object), and how to open its editor. Null for the other
+ * scopes.
+ */
+const getScopeEditor = (
+  resolvedScope: ResolvedScope
+): {|
+  location: InGameEditorEditedLocation,
+  open: (editorCallbacks: EditorCallbacks) => void,
+|} | null => {
+  const {
+    layout,
+    externalLayout,
+    eventsFunctionsExtension,
+    eventsBasedObject,
+    variant,
+    isDefaultVariant,
+  } = resolvedScope;
+  if (eventsFunctionsExtension && eventsBasedObject && variant) {
+    const extensionName = eventsFunctionsExtension.getName();
+    const objectName = eventsBasedObject.getName();
+    // The default variant is shown with an empty name.
+    const variantName = isDefaultVariant ? '' : variant.getName();
+    return {
+      location: {
+        sceneName: null,
+        externalLayoutName: null,
+        eventsBasedObjectType: `${extensionName}::${objectName}`,
+        eventsBasedObjectVariantName: variantName,
+      },
+      open: editorCallbacks =>
+        editorCallbacks.onOpenCustomObjectEditor(
+          extensionName,
+          objectName,
+          variantName
+        ),
+    };
+  }
+  if (!layout) return null;
+  return {
+    location: {
+      sceneName: layout.getName(),
+      externalLayoutName: externalLayout ? externalLayout.getName() : null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    },
+    open: editorCallbacks => {
+      if (externalLayout) {
+        editorCallbacks.onOpenExternalLayout(externalLayout.getName());
+      } else {
+        editorCallbacks.onOpenLayout(layout.getName(), {
+          openEventsEditor: false,
+          openSceneEditor: true,
+          focusWhenOpened: 'scene',
+        });
+      }
+    },
+  };
+};
+
 const isShowingScope = (
   editedLocation: InGameEditorEditedLocation | null,
   resolvedScope: ResolvedScope
 ): boolean => {
-  const { layout, externalLayout } = resolvedScope;
+  const scopeEditor = getScopeEditor(resolvedScope);
+  if (!editedLocation || !scopeEditor) return false;
+  const { location } = scopeEditor;
   return (
-    !!editedLocation &&
-    !!layout &&
-    !editedLocation.eventsBasedObjectType &&
-    editedLocation.sceneName === layout.getName() &&
+    editedLocation.sceneName === location.sceneName &&
     (editedLocation.externalLayoutName || null) ===
-      (externalLayout ? externalLayout.getName() : null)
+      location.externalLayoutName &&
+    editedLocation.eventsBasedObjectType === location.eventsBasedObjectType &&
+    editedLocation.eventsBasedObjectVariantName ===
+      location.eventsBasedObjectVariantName
   );
 };
 
 /**
- * Open the scene (or external layout) of a scope in the editor and wait for
- * the in-game editor to show it with the last changes of the project, as it
- * is what finds the surfaces.
+ * Open the scene, external layout or custom object variant of a scope in the
+ * editor and wait for the in-game editor to show it with the last changes of
+ * the project, as it is what finds the surfaces.
  * @returns What was done, to be told in the result of the call.
  */
-export const showScopeInInGameEditor = async ({
+const showScopeInInGameEditor = async ({
   resolvedScope,
   sendChangesToEditor,
-  openSceneEditor,
-  openExternalLayoutEditor,
+  editorCallbacks,
 }: {|
   resolvedScope: ResolvedScope,
   sendChangesToEditor: () => void,
-  openSceneEditor: (sceneName: string) => void,
-  openExternalLayoutEditor: (externalLayoutName: string) => void,
+  editorCallbacks: EditorCallbacks,
 |}): Promise<
   {| success: true, message: string |} | {| success: false, message: string |}
 > => {
-  const { layout, externalLayout, label } = resolvedScope;
-  if (!layout) {
+  const { label } = resolvedScope;
+  const scopeEditor = getScopeEditor(resolvedScope);
+  if (!scopeEditor) {
     return {
       success: false,
-      message: `Surfaces can only be found in a scene or an external layout, not in ${label}: give the positions without \`drop_to_surface\`/\`surface_beneath\`.`,
+      message: `Surfaces can only be found in a scene, an external layout or a custom object variant, not in ${label}: give the positions without \`drop_to_surface\`/\`surface_beneath\`.`,
     };
   }
 
@@ -212,8 +275,7 @@ export const showScopeInInGameEditor = async ({
   sendChangesToEditor();
   const wasInGameEditorDisabled = updateInGameEditor() === 'disabled';
   if (wasInGameEditorDisabled) enableInGameEditor();
-  if (externalLayout) openExternalLayoutEditor(externalLayout.getName());
-  else openSceneEditor(layout.getName());
+  scopeEditor.open(editorCallbacks);
 
   const deadline = Date.now() + IN_GAME_EDITOR_READY_TIMEOUT_MS;
   let lastError = null;
@@ -254,7 +316,7 @@ export const showScopeInInGameEditor = async ({
  * Find the first instance hit by each ray in the scope shown by the in-game
  * editor (see `showScopeInInGameEditor`).
  */
-export const castRaysInScope = async ({
+const castRaysInScope = async ({
   resolvedScope,
   rays,
   mode,
@@ -336,27 +398,9 @@ export const getInstanceBox = ({
 };
 
 /**
- * The point of the box of an instance that rests on a surface (the middle of
- * its bottom), as fractions of its size on each axis.
- */
-export const getBottomCenterFractions = (
-  up: SurfaceUp,
-  axesCount: number
-): Array<number> =>
-  (up === 'z' ? [0.5, 0.5, 0] : [0.5, 1, 0.5]).slice(0, axesCount);
-
-/**
- * The position on the up axis of a point (Z, or Y with `-y`).
- */
-export const getHeight = (
-  point: $ReadOnlyArray<number>,
-  up: SurfaceUp
-): number => (up === 'z' ? point[2] : point[1]);
-
-/**
  * A ray going down from `from` (up being `up`), until beyond everything.
  */
-export const makeDownwardRay = (
+const makeDownwardRay = (
   from: $ReadOnlyArray<number>,
   up: SurfaceUp,
   length: number = BEYOND_EVERYTHING_DISTANCE * 2
@@ -368,7 +412,7 @@ export const makeDownwardRay = (
 };
 
 /** How a hit is told in the results of a call. */
-export const describeHit = (
+const describeHit = (
   hit: InGameEditorRaycastHit,
   up: SurfaceUp,
   mode: SurfacesMode
@@ -394,6 +438,8 @@ const MAX_DESCRIBED_DROPPED_INSTANCES = 20;
  */
 export const dropInstancesOnSurfaces = async ({
   resolvedScope,
+  sendChangesToEditor,
+  editorCallbacks,
   instances,
   mode,
   surfaceOptions,
@@ -403,6 +449,8 @@ export const dropInstancesOnSurfaces = async ({
   objectSizeInfo,
 }: {|
   resolvedScope: ResolvedScope,
+  sendChangesToEditor: () => void,
+  editorCallbacks: EditorCallbacks,
   instances: Array<gdInitialInstance>,
   mode: SurfacesMode,
   surfaceOptions: SurfaceOptions,
@@ -421,8 +469,13 @@ export const dropInstancesOnSurfaces = async ({
   const drops = [];
   for (const instance of instances) {
     const size = getInstanceSize(instance);
+    // The point of the box that rests on the surface, as fractions of its size.
+    const bottomCenterFractions = (up === 'z'
+      ? [0.5, 0.5, 0]
+      : [0.5, 1, 0.5]
+    ).slice(0, axesCount);
     const bottomCenterOffset = getBoxPointOffset(
-      getBottomCenterFractions(up, axesCount),
+      bottomCenterFractions,
       size,
       objectSizeInfo
     );
@@ -447,6 +500,12 @@ export const dropInstancesOnSurfaces = async ({
     drops.push({ instance, brushPoint, rayStart, bottomCenterOffset });
   }
 
+  const showScope = await showScopeInInGameEditor({
+    resolvedScope,
+    sendChangesToEditor,
+    editorCallbacks,
+  });
+  if (!showScope.success) return showScope;
   const castRays = await castRaysInScope({
     resolvedScope,
     rays: drops.map(({ rayStart }) => makeDownwardRay(rayStart, up)),
@@ -500,7 +559,9 @@ export const dropInstancesOnSurfaces = async ({
   const notDescribedCount = drops.length - descriptions.length;
   return {
     success: true,
-    message: `Dropped onto surfaces (${instancesOnSurfacesCount} of ${
+    message: `${
+      showScope.message
+    } Dropped onto surfaces (${instancesOnSurfacesCount} of ${
       drops.length
     } found one): ${descriptions.join('; ')}${
       notDescribedCount > 0 ? `; and ${notDescribedCount} more` : ''
@@ -517,7 +578,7 @@ export type InstanceWithBox = {|
   box: {| min: Array<number>, max: Array<number> |},
 |};
 
-export type SurfaceBeneath = {|
+type SurfaceBeneath = {|
   z?: number,
   y?: number,
   objectName: string,
@@ -527,7 +588,7 @@ export type SurfaceBeneath = {|
 
 type SurfacePoint = {| x: number, y: number, z?: number |};
 
-export type SurfaceGrid = {|
+type SurfaceGrid = {|
   xs: Array<number>,
   ys?: Array<number>,
   z?: Array<Array<number | null>>,
@@ -544,17 +605,22 @@ export type SurfaceGrid = {|
  */
 export const getSurfacesOfInstances = async ({
   resolvedScope,
+  sendChangesToEditor,
+  editorCallbacks,
   instancesWithBox,
   surfaceOptions,
   grid,
 }: {|
   resolvedScope: ResolvedScope,
+  sendChangesToEditor: () => void,
+  editorCallbacks: EditorCallbacks,
   instancesWithBox: Array<InstanceWithBox>,
   surfaceOptions: SurfaceOptions,
   grid: number | null,
 |}): Promise<
   | {|
       success: true,
+      message: string,
       surfaces: Array<{|
         surfaceBeneath: SurfaceBeneath | null,
         surfaceGrid?: SurfaceGrid,
@@ -611,6 +677,12 @@ export const getSurfacesOfInstances = async ({
     return { beneathRayIndex, gridRayIndex, xs, ys: noSteps };
   });
 
+  const showScope = await showScopeInInGameEditor({
+    resolvedScope,
+    sendChangesToEditor,
+    editorCallbacks,
+  });
+  if (!showScope.success) return showScope;
   const hitsByMode: {
     [SurfacesMode]: Array<InGameEditorRaycastHit | null>,
   } = { '3d': [], '2d': [] };
@@ -702,5 +774,5 @@ export const getSurfacesOfInstances = async ({
       return { surfaceBeneath, surfaceGrid };
     }
   );
-  return { success: true, surfaces };
+  return { success: true, message: showScope.message, surfaces };
 };

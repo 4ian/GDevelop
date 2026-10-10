@@ -125,23 +125,55 @@ describe('gdjs.InGameEditor.raycast', function () {
     },
   };
 
-  /** @returns {Promise<gdjs.InGameEditor>} */
-  const createInGameEditorShowingIsland = async () => {
-    runtimeGame = new gdjs.RuntimeGame(
-      gdjs.createProjectData({ layouts: [sceneData] }),
-      {
-        initialRuntimeGameStatus: {
-          isPaused: true,
-          isInGameEdition: true,
-          sceneName: 'Island',
-          injectedExternalLayoutName: null,
-          skipCreatingInstancesFromScene: false,
-          eventsBasedObjectType: null,
-          eventsBasedObjectVariantName: null,
-          editorId: 'scene-editor',
-        },
-      }
-    );
+  /**
+   * A custom object with the ground and the house of the island as children.
+   * @type {EventsBasedObjectData}
+   */
+  const islandObjectData = {
+    name: 'IslandObject',
+    variables: [],
+    instances: sceneData.instances,
+    objects: sceneData.objects,
+    objectsGroups: [],
+    layers: sceneData.layers,
+    areaMinX: 0,
+    areaMinY: 0,
+    areaMinZ: 0,
+    areaMaxX: 1000,
+    areaMaxY: 1000,
+    areaMaxZ: 200,
+    _initialInnerArea: null,
+    isInnerAreaFollowingParentSize: false,
+    variants: [],
+    usedResources: [],
+    editionSettings: sceneData.uiSettings,
+  };
+
+  /**
+   * @param {{eventsBasedObjectType: string | null}} location The custom object
+   * whose default variant is shown, or null to show the scene.
+   * @returns {Promise<gdjs.InGameEditor>}
+   */
+  const createInGameEditorShowingIsland = async ({ eventsBasedObjectType }) => {
+    const projectData = gdjs.createProjectData({ layouts: [sceneData] });
+    projectData.eventsFunctionsExtensions.push({
+      name: 'Kit',
+      eventsBasedObjects: [islandObjectData],
+      globalVariables: [],
+      sceneVariables: [],
+    });
+    runtimeGame = new gdjs.RuntimeGame(projectData, {
+      initialRuntimeGameStatus: {
+        isPaused: true,
+        isInGameEdition: true,
+        sceneName: 'Island',
+        injectedExternalLayoutName: null,
+        skipCreatingInstancesFromScene: false,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+        editorId: 'scene-editor',
+      },
+    });
     // The scene has no resources to load, and the loading screen needs images.
     runtimeGame.loadFirstAssetsAndStartBackgroundLoading = async () => {};
     gameContainer = document.createElement('div');
@@ -151,10 +183,10 @@ describe('gdjs.InGameEditor.raycast', function () {
     if (!inGameEditor) throw new Error('The game has no in-game editor.');
     await inGameEditor.switchToSceneOrVariant(
       'scene-editor',
-      'Island',
+      eventsBasedObjectType ? null : 'Island',
       null,
-      null,
-      null,
+      eventsBasedObjectType,
+      eventsBasedObjectType ? '' : null,
       null
     );
     return inGameEditor;
@@ -196,7 +228,9 @@ describe('gdjs.InGameEditor.raycast', function () {
     };
 
   it('gives the first instance hit by each ray, and the scene shown', async () => {
-    const inGameEditor = await createInGameEditorShowingIsland();
+    const inGameEditor = await createInGameEditorShowingIsland({
+      eventsBasedObjectType: null,
+    });
 
     const result = inGameEditor.raycast(
       createRaycastRequest({
@@ -227,8 +261,40 @@ describe('gdjs.InGameEditor.raycast', function () {
     ]);
   });
 
+  it('gives the first child hit by each ray in the custom object variant shown', async () => {
+    gdjs.registerObject('Kit::IslandObject', gdjs.CustomRuntimeObject3D);
+    const inGameEditor = await createInGameEditorShowingIsland({
+      eventsBasedObjectType: 'Kit::IslandObject',
+    });
+
+    const result = inGameEditor.raycast(
+      createRaycastRequest({
+        rays: [createDownwardRay(150, 150), createDownwardRay(500, 500)],
+      })
+    );
+
+    expect(result.editedLocation).to.eql({
+      sceneName: null,
+      externalLayoutName: null,
+      eventsBasedObjectType: 'Kit::IslandObject',
+      eventsBasedObjectVariantName: '',
+    });
+    expect(result.hits.map(roundHit)).to.eql([
+      { x: 150, y: 150, z: 200, objectName: 'House', instanceUuid: 'house-1' },
+      {
+        x: 500,
+        y: 500,
+        z: 100,
+        objectName: 'Ground',
+        instanceUuid: 'ground-1',
+      },
+    ]);
+  });
+
   it('only hits the included objects, and not the excluded ones', async () => {
-    const inGameEditor = await createInGameEditorShowingIsland();
+    const inGameEditor = await createInGameEditorShowingIsland({
+      eventsBasedObjectType: null,
+    });
     /** @param {Partial<gdjs.InGameEditorRaycastRequest>} filters */
     const getObjectNameHit = (filters) => {
       const [hit] = inGameEditor.raycast(
@@ -262,7 +328,9 @@ describe('gdjs.InGameEditor.raycast', function () {
   });
 
   it('hits instances moved since the last frame', async () => {
-    const inGameEditor = await createInGameEditorShowingIsland();
+    const inGameEditor = await createInGameEditorShowingIsland({
+      eventsBasedObjectType: null,
+    });
     const container = inGameEditor.getEditedInstanceContainer();
     if (!container) throw new Error('No scene is edited.');
     const [house] = container.getObjects('House') || [];
@@ -276,7 +344,9 @@ describe('gdjs.InGameEditor.raycast', function () {
   });
 
   it('hits the hitboxes of 2D objects in 2D', async () => {
-    const inGameEditor = await createInGameEditorShowingIsland();
+    const inGameEditor = await createInGameEditorShowingIsland({
+      eventsBasedObjectType: null,
+    });
     const container = inGameEditor.getEditedInstanceContainer();
     if (!(container instanceof gdjs.RuntimeScene))
       throw new Error('No scene is edited.');

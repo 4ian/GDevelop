@@ -30,6 +30,7 @@ const testSceneLocation: InGameEditorEditedLocation = {
   eventsBasedObjectType: null,
   eventsBasedObjectVariantName: null,
 };
+let mockShownLocation: InGameEditorEditedLocation = testSceneLocation;
 
 /**
  * The scene shown by the fake in-game editor: in 3D, a ground at Z = 100,
@@ -47,7 +48,7 @@ const raycastOnGroundAndPlatform = async (
     (!!request.includedObjectNames &&
       !request.includedObjectNames.includes(surface.objectName));
   return {
-    editedLocation: testSceneLocation,
+    editedLocation: mockShownLocation,
     hits: request.rays.map(({ from, to }) => {
       if (isSurfaceIgnored || from[0] < 0 || from[0] > 1000) return null;
       if (request.mode === '3d') {
@@ -98,6 +99,7 @@ describe('finding surfaces with the in-game editor', () => {
       .getObjectGroups()
       .insertNew('Grounds', 0)
       .addObject('Ground');
+    mockShownLocation = testSceneLocation;
     mockUpdateInGameEditor.mockReset();
     mockUpdateInGameEditor.mockReturnValue('up-to-date');
     mockEnableInGameEditor.mockReset();
@@ -109,7 +111,9 @@ describe('finding surfaces with the in-game editor', () => {
     project.delete();
   });
 
-  const getInstances = (): Array<gdInitialInstance> => {
+  const getInstances = (
+    initialInstances: gdInitialInstancesContainer = testScene.getInitialInstances()
+  ): Array<gdInitialInstance> => {
     const instances = [];
     const functor = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe[cannot-write]
@@ -123,13 +127,15 @@ describe('finding surfaces with the in-game editor', () => {
       );
     };
     // $FlowFixMe[incompatible-type]
-    testScene.getInitialInstances().iterateOverInstances(functor);
+    initialInstances.iterateOverInstances(functor);
     functor.delete();
     return instances;
   };
 
-  const getInstancePositions = (): Array<Array<number>> =>
-    getInstances().map(instance => [
+  const getInstancePositions = (
+    initialInstances?: gdInitialInstancesContainer
+  ): Array<Array<number>> =>
+    getInstances(initialInstances).map(instance => [
       instance.getX(),
       instance.getY(),
       instance.getZ(),
@@ -375,6 +381,56 @@ describe('finding surfaces with the in-game editor', () => {
       expect(anchorResult.success).toBe(false);
       expect(getInstancePositions()).toEqual([]);
       expect(mockRaycastInGameEditor).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('in a custom object variant', () => {
+    it('drops the children onto the surfaces shown by the custom object editor', async () => {
+      const island = project
+        .getEventsFunctionsExtension('Kit')
+        .getEventsBasedObjects()
+        .insertNew('Island', 0);
+      island.markAsRenderedIn3D(true);
+      const variant = island.getDefaultVariant();
+      variant.getObjects().insertNewObject(project, 'Kit::House', 'House', 0);
+      mockShownLocation = {
+        sceneName: null,
+        externalLayoutName: null,
+        eventsBasedObjectType: 'Kit::Island',
+        eventsBasedObjectVariantName: '',
+      };
+      const options = makeFakeLaunchFunctionOptionsWithProject(project);
+
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...options,
+        args: {
+          scope: {
+            type: 'custom_object_variant',
+            extension_name: 'Kit',
+            custom_object_name: 'Island',
+            variant_name: '',
+          },
+          layer_name: '',
+          object_name: 'House',
+          brush_kind: 'point',
+          brush_position: '300,400',
+          instances_size: '100,100,50',
+          drop_to_surface: {},
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(
+        options.editorCallbacks.onOpenCustomObjectEditor
+      ).toHaveBeenCalledWith('Kit', 'Island', '');
+      expect(getInstancePositions(variant.getInitialInstances())).toEqual([
+        [250, 350, 100],
+      ]);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Opened custom object "Kit::Island" (default variant) in the editor to find the surfaces.'
+        )
+      );
     });
   });
 

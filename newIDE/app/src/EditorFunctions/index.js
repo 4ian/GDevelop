@@ -127,7 +127,6 @@ import {
   getInstanceBox,
   getSurfacesOfInstances,
   parseSurfaceOptions,
-  showScopeInInGameEditor,
   type InstanceWithBox,
 } from './Surfaces';
 import { executeScript } from './ScriptExecution/ScriptRunner';
@@ -4438,20 +4437,10 @@ const describeInstances: EditorFunction = {
 
     let surfacesMessage = null;
     if (surfaceOptions && instancesWithBox.length > 0) {
-      const showScope = await showScopeInInGameEditor({
-        resolvedScope,
-        sendChangesToEditor,
-        openSceneEditor: sceneName =>
-          editorCallbacks.onOpenLayout(sceneName, {
-            openEventsEditor: false,
-            openSceneEditor: true,
-            focusWhenOpened: 'scene',
-          }),
-        openExternalLayoutEditor: editorCallbacks.onOpenExternalLayout,
-      });
-      if (!showScope.success) return makeGenericFailure(showScope.message);
       const surfacesOfInstances = await getSurfacesOfInstances({
         resolvedScope,
+        sendChangesToEditor,
+        editorCallbacks,
         instancesWithBox,
         surfaceOptions,
         grid,
@@ -4462,7 +4451,7 @@ const describeInstances: EditorFunction = {
         const instanceIndex = instancesWithBoxIndices[index];
         instances[instanceIndex] = { ...instances[instanceIndex], ...surfaces };
       });
-      surfacesMessage = showScope.message;
+      surfacesMessage = surfacesOfInstances.message;
     }
 
     const result: EditorFunctionGenericOutput = {
@@ -5287,23 +5276,6 @@ const put2dInstances: EditorFunction = {
         );
       }
 
-      let showScopeMessage = '';
-      if (dropOptions) {
-        const showScope = await showScopeInInGameEditor({
-          resolvedScope,
-          sendChangesToEditor,
-          openSceneEditor: sceneName =>
-            editorCallbacks.onOpenLayout(sceneName, {
-              openEventsEditor: false,
-              openSceneEditor: true,
-              focusWhenOpened: 'scene',
-            }),
-          openExternalLayoutEditor: editorCallbacks.onOpenExternalLayout,
-        });
-        if (!showScope.success) return makeGenericFailure(showScope.message);
-        showScopeMessage = showScope.message;
-      }
-
       // Store original states of existing instances for comparison
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const existingInstanceStates = new Map();
@@ -5520,6 +5492,8 @@ const put2dInstances: EditorFunction = {
       if (dropOptions && effectiveSize) {
         const drop = await dropInstancesOnSurfaces({
           resolvedScope,
+          sendChangesToEditor,
+          editorCallbacks,
           instances: modifiedAndCreatedInstances,
           mode: '2d',
           surfaceOptions: dropOptions,
@@ -5536,7 +5510,7 @@ const put2dInstances: EditorFunction = {
           });
           return makeGenericFailure(drop.message);
         }
-        dropMessage = `${showScopeMessage} ${drop.message}`;
+        dropMessage = drop.message;
       }
 
       // The position the instances really hold, which the brush position only
@@ -6406,23 +6380,6 @@ const put3dInstances: EditorFunction = {
         );
       }
 
-      let showScopeMessage = '';
-      if (dropOptions) {
-        const showScope = await showScopeInInGameEditor({
-          resolvedScope,
-          sendChangesToEditor,
-          openSceneEditor: sceneName =>
-            editorCallbacks.onOpenLayout(sceneName, {
-              openEventsEditor: false,
-              openSceneEditor: true,
-              focusWhenOpened: 'scene',
-            }),
-          openExternalLayoutEditor: editorCallbacks.onOpenExternalLayout,
-        });
-        if (!showScope.success) return makeGenericFailure(showScope.message);
-        showScopeMessage = showScope.message;
-      }
-
       // Store original states of existing instances for comparison
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const existingInstanceStates = new Map();
@@ -6600,6 +6557,8 @@ const put3dInstances: EditorFunction = {
       if (dropOptions && effectiveSize) {
         const drop = await dropInstancesOnSurfaces({
           resolvedScope,
+          sendChangesToEditor,
+          editorCallbacks,
           instances: modifiedAndCreatedInstances,
           mode: '3d',
           surfaceOptions: dropOptions,
@@ -6616,7 +6575,7 @@ const put3dInstances: EditorFunction = {
           });
           return makeGenericFailure(drop.message);
         }
-        dropMessage = `${showScopeMessage} ${drop.message}`;
+        dropMessage = drop.message;
       }
 
       // The position the instances really hold, which the brush position only

@@ -276,12 +276,10 @@ describe('finding surfaces with the in-game editor', () => {
         instances_size: '100,100,50',
       });
 
+      // Without `existing_instance_ids`: every house.
       const result = await putInstances('put_3d_instances', {
         object_name: 'House',
         brush_kind: 'none',
-        existing_instance_ids: getInstances()[0]
-          .getPersistentUuid()
-          .slice(0, 10),
         instances_size: '100,100,50',
         drop_to_surface: {},
       });
@@ -512,6 +510,12 @@ describe('finding surfaces with the in-game editor', () => {
         highest: { x: 50, y: 25, z: 100 },
         lowest: { x: 50, y: 75, z: 100 },
       });
+      // The message keeps them when the data of a read in a script is dropped.
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          '("Ground"): highest x=50, y=25, z=100; lowest x=50, y=75, z=100.'
+        )
+      );
     });
 
     it('refuses a grid out of bounds', async () => {

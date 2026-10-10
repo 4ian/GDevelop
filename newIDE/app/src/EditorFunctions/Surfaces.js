@@ -571,6 +571,9 @@ export const dropInstancesOnSurfaces = async ({
 
 const roundHeight = (value: number): number => Math.round(value * 100) / 100;
 
+// The surface grids summed up one by one in the result of a call.
+const MAX_DESCRIBED_GRIDS = 10;
+
 /** An instance whose surfaces are described, with its unrotated box. */
 export type InstanceWithBox = {|
   instance: gdInitialInstance,
@@ -588,13 +591,15 @@ type SurfaceBeneath = {|
 
 type SurfacePoint = {| x: number, y: number, z?: number |};
 
+// The highest and lowest points come first: they stay readable when the
+// output of a script is truncated.
 type SurfaceGrid = {|
+  highest: SurfacePoint | null,
+  lowest: SurfacePoint | null,
   xs: Array<number>,
   ys?: Array<number>,
   z?: Array<Array<number | null>>,
   y?: Array<number | null>,
-  highest: SurfacePoint | null,
-  lowest: SurfacePoint | null,
 |};
 
 /**
@@ -762,17 +767,47 @@ export const getSurfacesOfInstances = async ({
       const roundedXs = xs.map(roundHeight);
       const surfaceGrid: SurfaceGrid = isZUp
         ? {
+            highest,
+            lowest,
             xs: roundedXs,
             ys: ys.map(roundHeight),
             z: ys.map((y, row) =>
               heights.slice(row * xs.length, (row + 1) * xs.length)
             ),
-            highest,
-            lowest,
           }
-        : { xs: roundedXs, y: heights, highest, lowest };
+        : { highest, lowest, xs: roundedXs, y: heights };
       return { surfaceBeneath, surfaceGrid };
     }
   );
-  return { success: true, message: showScope.message, surfaces };
+  // Also in the message, which is kept when the data of a read is not.
+  const describePoint = (point: SurfacePoint | null): string =>
+    point
+      ? `x=${point.x}, y=${point.y}${
+          point.z !== undefined ? `, z=${point.z}` : ''
+        }`
+      : 'none';
+  const gridDescriptions = [];
+  surfaces.forEach(({ surfaceGrid }, index) => {
+    if (!surfaceGrid || gridDescriptions.length >= MAX_DESCRIBED_GRIDS) return;
+    const { instance } = instancesWithBox[index];
+    gridDescriptions.push(
+      `${instance
+        .getPersistentUuid()
+        .slice(0, 10)} ("${instance.getObjectName()}"): highest ${describePoint(
+        surfaceGrid.highest
+      )}; lowest ${describePoint(surfaceGrid.lowest)}`
+    );
+  });
+  return {
+    success: true,
+    message:
+      gridDescriptions.length > 0
+        ? `${
+            showScope.message
+          } Highest and lowest points of the surface grids: ${gridDescriptions.join(
+            ' | '
+          )}.`
+        : showScope.message,
+    surfaces,
+  };
 };

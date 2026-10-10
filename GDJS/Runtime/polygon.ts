@@ -228,15 +228,13 @@ namespace gdjs {
         i < len1 + len2;
         i++
       ) {
-        // The edge from a vertex to the next one, computed only when needed
-        // (the test often stops at the first axes) like `computeEdges` does.
+        // Edges are computed only when their axis is tested: the test often
+        // stops at the first axes.
         const vertices = i < len1 ? p1.vertices : p2.vertices;
         const vertexIndex = i < len1 ? i : i - len1;
         const v1 = vertices[vertexIndex];
         const v2 =
-          vertexIndex + 1 >= vertices.length
-            ? vertices[0]
-            : vertices[vertexIndex + 1];
+          vertices[vertexIndex + 1 < vertices.length ? vertexIndex + 1 : 0];
         const axis = collisionTestStatics.axis;
 
         //Get the axis to which polygons will be projected

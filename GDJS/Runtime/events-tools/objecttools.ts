@@ -181,18 +181,15 @@ namespace gdjs {
       };
 
       /**
-       * Building the grid costs about the time of testing a number of pairs
-       * per object (more for a fast predicate): testing every pair is faster
-       * when there are not many more pairs than objects (like 10 objects with
-       * 10 others, or 1 object with 1000 others).
+       * Building the grid costs about the time of testing a few pairs per
+       * object: testing every pair is faster when there are not many more
+       * pairs than objects (like 10 objects with 10 others, or 1 object with
+       * 1000 others).
        */
       const isTestingEveryPairFaster = (
         objects1Count: integer,
-        objects2Count: integer,
-        minPairsCountPerObjectToUseGrid: integer
-      ) =>
-        objects1Count * objects2Count <=
-        minPairsCountPerObjectToUseGrid * (objects1Count + objects2Count);
+        objects2Count: integer
+      ) => objects1Count * objects2Count <= 8 * (objects1Count + objects2Count);
       /**
        * An object covering more grid cells than this is not put in the grid
        * but tested with every object: a few very large objects would
@@ -203,16 +200,6 @@ namespace gdjs {
       type ObjectsPairPredicate = (
         object1: gdjs.RuntimeObject,
         object2: gdjs.RuntimeObject,
-        extraArg: any
-      ) => boolean;
-      /**
-       * Store in `bounds` the bounds (minX, minY, maxX, maxY) of an object,
-       * such that the predicate is false for objects whose bounds don't
-       * overlap.
-       * @returns false if the bounds are not finite numbers.
-       */
-      type ObjectBoundsUpdater = (
-        object: gdjs.RuntimeObject,
         extraArg: any
       ) => boolean;
 
@@ -246,22 +233,27 @@ namespace gdjs {
           : new Int32Array(Math.max(size, 2 * array.length));
 
       /**
-       * Store in `bounds` the bounds (minX, minY, maxX, maxY) of the square
-       * of the given half size around the given center, with a margin so
-       * that rounding errors can't make it smaller than it should be.
+       * Store in `bounds` the bounds (minX, minY, maxX, maxY) of the
+       * bounding circle used by `gdjs.RuntimeObject.collisionTest`, with a
+       * margin so that rounding errors can't separate touching circles.
        * @returns false if the bounds are not finite numbers.
        */
-      const setBoundsAround = (
-        centerX: float,
-        centerY: float,
-        halfSize: float
+      const updateBoundingCircleBounds = (
+        object: gdjs.RuntimeObject
       ): boolean => {
-        const margin =
-          1 + (Math.abs(centerX) + Math.abs(centerY) + halfSize) * 1e-12;
-        bounds[0] = centerX - halfSize - margin;
-        bounds[1] = centerY - halfSize - margin;
-        bounds[2] = centerX + halfSize + margin;
-        bounds[3] = centerY + halfSize + margin;
+        const width = object.getWidth();
+        const height = object.getHeight();
+        const centerX = object.getCenterX();
+        const centerY = object.getCenterY();
+        const radiusX = Math.max(centerX, width - centerX);
+        const radiusY = Math.max(centerY, height - centerY);
+        const radius = Math.sqrt(radiusX * radiusX + radiusY * radiusY) + 1;
+        const absoluteCenterX = object.getDrawableX() + centerX;
+        const absoluteCenterY = object.getDrawableY() + centerY;
+        bounds[0] = absoluteCenterX - radius;
+        bounds[1] = absoluteCenterY - radius;
+        bounds[2] = absoluteCenterX + radius;
+        bounds[3] = absoluteCenterY + radius;
         return (
           isFinite(bounds[0]) &&
           isFinite(bounds[1]) &&
@@ -269,39 +261,6 @@ namespace gdjs {
           isFinite(bounds[3])
         );
       };
-
-      /**
-       * Store in `bounds` the bounds of the bounding circle used by
-       * `gdjs.RuntimeObject.collisionTest`.
-       */
-      const updateBoundingCircleBounds: ObjectBoundsUpdater = (object) => {
-        const width = object.getWidth();
-        const height = object.getHeight();
-        const centerX = object.getCenterX();
-        const centerY = object.getCenterY();
-        const radiusX = Math.max(centerX, width - centerX);
-        const radiusY = Math.max(centerY, height - centerY);
-        return setBoundsAround(
-          object.getDrawableX() + centerX,
-          object.getDrawableY() + centerY,
-          Math.sqrt(radiusX * radiusX + radiusY * radiusY)
-        );
-      };
-
-      /**
-       * Store in `bounds` the bounds of a square around the center of the
-       * object (the one used by `getSqDistanceToObject`): two objects whose
-       * centers are at the given distance or closer have overlapping squares.
-       */
-      const updateDistanceSquareBounds: ObjectBoundsUpdater = (
-        object,
-        squaredDistance: float
-      ) =>
-        setBoundsAround(
-          object.getDrawableX() + object.getCenterX(),
-          object.getDrawableY() + object.getCenterY(),
-          Math.sqrt(squaredDistance) / 2
-        );
 
       /**
        * Store in `cellRange` the grid cells (minColumn, minRow, maxColumn,
@@ -344,9 +303,7 @@ namespace gdjs {
        * represented by numbers.
        */
       const buildGrid = (
-        objectsLists: Array<gdjs.RuntimeObject[]>,
-        updateObjectBounds: ObjectBoundsUpdater,
-        extraArg: any
+        objectsLists: Array<gdjs.RuntimeObject[]>
       ): boolean => {
         gridObjects.length = 0;
         objectsNotInGrid.length = 0;
@@ -355,16 +312,15 @@ namespace gdjs {
         let maxX = -Infinity;
         let maxY = -Infinity;
         let sizesSum = 0;
-        const objectsCount = countObjects(objectsLists);
         gridObjectsBounds = ensureFloat64ArraySize(
           gridObjectsBounds,
-          4 * objectsCount
+          4 * countObjects(objectsLists)
         );
         for (let i = 0; i < objectsLists.length; ++i) {
           const objects = objectsLists[i];
           for (let k = 0; k < objects.length; ++k) {
             const object = objects[k];
-            if (!updateObjectBounds(object, extraArg)) {
+            if (!updateBoundingCircleBounds(object)) {
               objectsNotInGrid.push(object);
               continue;
             }
@@ -426,14 +382,6 @@ namespace gdjs {
         for (let cell = 0; cell < cellsCount; ++cell) {
           gridCellsStart[cell + 1] += gridCellsStart[cell];
         }
-        // Testing every pair is faster if objects are tested on average with
-        // most of the objects anyway (when objects cover most of the grid).
-        const objectsInCellsCount = objectsCount - objectsNotInGrid.length || 1;
-        const entriesCount = gridCellsStart[cellsCount];
-        const averageTestedObjectsCount =
-          (entriesCount / objectsInCellsCount) * (entriesCount / cellsCount) +
-          objectsNotInGrid.length;
-        if (averageTestedObjectsCount > objectsCount / 2) return false;
         gridCellsObjects = ensureInt32ArraySize(
           gridCellsObjects,
           gridCellsStart[cellsCount]
@@ -515,146 +463,129 @@ namespace gdjs {
 
       /**
        * Same as `twoListsTest`, for a predicate that is always false for
-       * objects whose bounds (given by `updateObjectBounds`) don't overlap.
+       * objects whose bounding circles (the ones used by
+       * `gdjs.RuntimeObject.collisionTest`) don't overlap.
        *
        * When there are many pairs of objects, the objects of the second
        * lists are put in a grid, and each object of the first lists is only
-       * tested with the objects of the cells covered by its bounds.
+       * tested with the objects of the cells covered by its bounding circle.
        *
        * The picked objects are exactly the same as with `twoListsTest`: only
        * pairs for which the predicate is false are not tested, and the
        * objects picked by `twoListsTest` only depend on the pairs for which
        * the predicate is true, not on the order in which pairs are tested.
        */
-      const twoListsTestUsingGrid = function (
-        predicate: ObjectsPairPredicate,
-        updateObjectBounds: ObjectBoundsUpdater,
-        minPairsCountPerObjectToUseGrid: integer,
-        objectsLists1: ObjectsLists,
-        objectsLists2: ObjectsLists,
-        inverted: boolean,
-        extraArg: any
-      ): boolean {
-        const objects1Lists = gdjs.staticArray(twoListsTestUsingGrid);
-        objectsLists1.values(objects1Lists);
-        const objects2Lists = gdjs.staticArray2(twoListsTestUsingGrid);
-        objectsLists2.values(objects2Lists);
-        if (
-          isTestingEveryPairFaster(
-            countObjects(objects1Lists),
-            countObjects(objects2Lists),
-            minPairsCountPerObjectToUseGrid
-          ) ||
-          !buildGrid(objects2Lists, updateObjectBounds, extraArg)
-        ) {
-          return testEveryPairOfObjects(
-            predicate,
-            objects1Lists,
-            objects2Lists,
-            inverted,
-            extraArg
+      export const twoListsTestOfObjectsWithOverlappingBoundingCircles =
+        function (
+          predicate: ObjectsPairPredicate,
+          objectsLists1: ObjectsLists,
+          objectsLists2: ObjectsLists,
+          inverted: boolean,
+          extraArg: any
+        ): boolean {
+          const objects1Lists = gdjs.staticArray(
+            gdjs.evtTools.object
+              .twoListsTestOfObjectsWithOverlappingBoundingCircles
           );
-        }
+          objectsLists1.values(objects1Lists);
+          const objects2Lists = gdjs.staticArray2(
+            gdjs.evtTools.object
+              .twoListsTestOfObjectsWithOverlappingBoundingCircles
+          );
+          objectsLists2.values(objects2Lists);
+          if (
+            isTestingEveryPairFaster(
+              countObjects(objects1Lists),
+              countObjects(objects2Lists)
+            ) ||
+            !buildGrid(objects2Lists)
+          ) {
+            return testEveryPairOfObjects(
+              predicate,
+              objects1Lists,
+              objects2Lists,
+              inverted,
+              extraArg
+            );
+          }
 
-        unpickObjects(objects1Lists);
-        unpickObjects(objects2Lists);
+          unpickObjects(objects1Lists);
+          unpickObjects(objects2Lists);
 
-        let isTrue = false;
-        let object1Index = 0;
-        for (let i = 0; i < objects1Lists.length; ++i) {
-          const objects1 = objects1Lists[i];
-          for (let k = 0; k < objects1.length; ++k, ++object1Index) {
-            const object1 = objects1[k];
-            let atLeastOneObject = false;
-            if (updateObjectBounds(object1, extraArg)) {
-              updateCellRange(bounds[0], bounds[1], bounds[2], bounds[3]);
-            } else {
-              // Not a finite position or size: test with the whole grid.
-              updateCellRange(-Infinity, -Infinity, Infinity, Infinity);
-            }
-            for (let row = cellRange[1]; row <= cellRange[3]; ++row) {
-              for (
-                let column = cellRange[0];
-                column <= cellRange[2];
-                ++column
-              ) {
-                const cell = row * gridColumnsCount + column;
-                const cellEnd = gridCellsStart[cell + 1];
+          let isTrue = false;
+          let object1Index = 0;
+          for (let i = 0; i < objects1Lists.length; ++i) {
+            const objects1 = objects1Lists[i];
+            for (let k = 0; k < objects1.length; ++k, ++object1Index) {
+              const object1 = objects1[k];
+              let atLeastOneObject = false;
+              if (updateBoundingCircleBounds(object1)) {
+                updateCellRange(bounds[0], bounds[1], bounds[2], bounds[3]);
+              } else {
+                // Not a finite position or size: test with the whole grid.
+                updateCellRange(-Infinity, -Infinity, Infinity, Infinity);
+              }
+              for (let row = cellRange[1]; row <= cellRange[3]; ++row) {
                 for (
-                  let entry = gridCellsStart[cell];
-                  entry < cellEnd;
-                  ++entry
+                  let column = cellRange[0];
+                  column <= cellRange[2];
+                  ++column
                 ) {
-                  // An object covering several cells is tested only once.
-                  const object2Index = gridCellsObjects[entry];
-                  if (
-                    gridObjectsLastTestedObjectIndex[object2Index] ===
-                    object1Index
+                  const cell = row * gridColumnsCount + column;
+                  const cellEnd = gridCellsStart[cell + 1];
+                  for (
+                    let entry = gridCellsStart[cell];
+                    entry < cellEnd;
+                    ++entry
                   ) {
-                    continue;
-                  }
-                  gridObjectsLastTestedObjectIndex[object2Index] = object1Index;
-                  if (
-                    testObjectsPair(
-                      object1,
-                      gridObjects[object2Index],
-                      predicate,
-                      inverted,
-                      extraArg
-                    )
-                  ) {
-                    atLeastOneObject = true;
+                    // An object covering several cells is tested only once.
+                    const object2Index = gridCellsObjects[entry];
+                    if (
+                      gridObjectsLastTestedObjectIndex[object2Index] ===
+                      object1Index
+                    ) {
+                      continue;
+                    }
+                    gridObjectsLastTestedObjectIndex[object2Index] =
+                      object1Index;
+                    if (
+                      testObjectsPair(
+                        object1,
+                        gridObjects[object2Index],
+                        predicate,
+                        inverted,
+                        extraArg
+                      )
+                    ) {
+                      atLeastOneObject = true;
+                    }
                   }
                 }
               }
-            }
-            for (let l = 0; l < objectsNotInGrid.length; ++l) {
-              if (
-                testObjectsPair(
-                  object1,
-                  objectsNotInGrid[l],
-                  predicate,
-                  inverted,
-                  extraArg
-                )
-              ) {
-                atLeastOneObject = true;
+              for (let l = 0; l < objectsNotInGrid.length; ++l) {
+                if (
+                  testObjectsPair(
+                    object1,
+                    objectsNotInGrid[l],
+                    predicate,
+                    inverted,
+                    extraArg
+                  )
+                ) {
+                  atLeastOneObject = true;
+                }
+              }
+              if (inverted ? !atLeastOneObject : atLeastOneObject) {
+                isTrue = true;
+                object1.pick = true;
               }
             }
-            if (inverted ? !atLeastOneObject : atLeastOneObject) {
-              isTrue = true;
-              object1.pick = true;
-            }
           }
-        }
 
-        keepOnlyPickedObjects(objects1Lists);
-        if (!inverted) keepOnlyPickedObjects(objects2Lists);
-        return isTrue;
-      };
-
-      /**
-       * Same as `twoListsTest`, for a predicate that is always false for
-       * objects whose bounding circles (the ones used by
-       * `gdjs.RuntimeObject.collisionTest`) don't overlap, faster when there
-       * are many objects (see `twoListsTestUsingGrid`).
-       */
-      export const twoListsTestOfObjectsWithOverlappingBoundingCircles = (
-        predicate: ObjectsPairPredicate,
-        objectsLists1: ObjectsLists,
-        objectsLists2: ObjectsLists,
-        inverted: boolean,
-        extraArg: any
-      ): boolean =>
-        twoListsTestUsingGrid(
-          predicate,
-          updateBoundingCircleBounds,
-          8,
-          objectsLists1,
-          objectsLists2,
-          inverted,
-          extraArg
-        );
+          keepOnlyPickedObjects(objects1Lists);
+          if (!inverted) keepOnlyPickedObjects(objects2Lists);
+          return isTrue;
+        };
 
       /**
        * Filter objects to keep only the one that fullfil the predicate
@@ -743,12 +674,8 @@ namespace gdjs {
         distance: float,
         inverted: boolean
       ) {
-        return twoListsTestUsingGrid(
+        return gdjs.evtTools.object.twoListsTest(
           gdjs.evtTools.object._distanceBetweenObjects,
-          updateDistanceSquareBounds,
-          // Testing the distance of a pair is fast: the grid is only worth
-          // it for more pairs than for collisions.
-          40,
           objectsLists1,
           objectsLists2,
           inverted,

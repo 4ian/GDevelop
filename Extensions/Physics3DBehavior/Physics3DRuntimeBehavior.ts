@@ -396,6 +396,16 @@ namespace gdjs {
      */
     _shapeHalfDepth: float = 0;
 
+    /** The surface used as shape, if the object gives one (see `gdjs.Surface`). */
+    private _surface: gdjs.Surface | null = null;
+    private _surfaceVersion: integer = 0;
+    /** The height field of the shape, changed in place when the surface changes. */
+    private _heightFieldShape: Jolt.HeightFieldShape | null = null;
+    private _heightFieldColumns: integer = 0;
+    private _heightFieldRows: integer = 0;
+    private _heightFieldDepth: float = 0;
+    private _changedHeightSamples: Jolt.ArrayFloat | null = null;
+
     /**
      * sharedData is a reference to the shared data of the scene, that registers
      * every physics behavior that is created so that collisions can be cleared
@@ -680,6 +690,11 @@ namespace gdjs {
 
     _destroyBody() {
       this.bodyUpdater.destroyBody();
+      this._heightFieldShape = null;
+      if (this._changedHeightSamples) {
+        Jolt.destroy(this._changedHeightSamples);
+        this._changedHeightSamples = null;
+      }
       this._contactsEndedThisFrame.length = 0;
       this._contactsStartedThisFrame.length = 0;
       this._currentContacts.length = 0;
@@ -697,6 +712,10 @@ namespace gdjs {
     }
 
     createShape(): Jolt.Shape {
+      const surfaceShape = this._createSurfaceShape();
+      if (surfaceShape) {
+        return surfaceShape;
+      }
       if (
         this.massCenterOffsetX === 0 &&
         this.massCenterOffsetY === 0 &&
@@ -903,6 +922,336 @@ namespace gdjs {
       );
     }
 
+    /**
+     * Objects giving their surface (see `gdjs.RuntimeObject.getSurface`) use
+     * it instead of the shape properties.
+     */
+    private _createSurfaceShape(): Jolt.Shape | null {
+      const surface = this.owner.getSurface();
+      this._surface = surface;
+      this._heightFieldShape = null;
+      if (!surface) {
+        return null;
+      }
+      this._surfaceVersion = surface.getVersion();
+      const heightField = surface.getHeightField();
+      const triangles = heightField ? null : surface.getTriangles();
+      if (!heightField && !triangles) {
+        return null;
+      }
+      const { worldInvScale } = this._sharedData;
+      const width = this.owner3D.getWidth() * worldInvScale;
+      const height = this.owner3D.getHeight() * worldInvScale;
+      const depth = this.owner3D.getDepth() * worldInvScale;
+      this._shapeHalfWidth = width / 2;
+      this._shapeHalfHeight = height / 2;
+      this._shapeHalfDepth = depth / 2;
+      const surfaceShapeSettings = heightField
+        ? this._createHeightFieldShapeSettings(
+            heightField,
+            width,
+            height,
+            depth
+          )
+        : this._createTrianglesShapeSettings(triangles!, width, height, depth);
+      const shapeSettings = new Jolt.RotatedTranslatedShapeSettings(
+        this.getVec3(0, 0, 0),
+        heightField
+          ? // Heights of Jolt height fields are along Y: a quarter turn
+            // around X puts them along Z.
+            this.getQuat(Math.SQRT1_2, 0, 0, Math.SQRT1_2)
+          : this.getQuat(0, 0, 0, 1),
+        surfaceShapeSettings
+      );
+      const shape = shapeSettings.Create().Get();
+      Jolt.destroy(shapeSettings);
+      if (heightField) {
+        this._heightFieldShape = Jolt.castObject(
+          Jolt.castObject(shape, Jolt.RotatedTranslatedShape).GetInnerShape(),
+          Jolt.HeightFieldShape
+        );
+        this._heightFieldColumns = heightField.columns;
+        this._heightFieldRows = heightField.rows;
+        this._heightFieldDepth = depth;
+      }
+      return shape;
+    }
+
+    private _createHeightFieldShapeSettings(
+      heightField: gdjs.SurfaceHeightField,
+      width: float,
+      height: float,
+      depth: float
+    ): Jolt.HeightFieldShapeSettings {
+      const { columns, rows } = heightField;
+      // Heights can only be changed in place when the sample count is a power
+      // of 2: extra samples have no collision.
+      const sampleCount = Math.max(
+        4,
+        Math.pow(2, Math.ceil(Math.log2(Math.max(columns, rows))))
+      );
+      const settings = new Jolt.HeightFieldShapeSettings();
+      // The object box is centered on the body. Rows are flipped: they go
+      // along -Z before the quarter turn putting heights along Z.
+      settings.mOffset.Set(-width / 2, 0, -height / 2);
+      // Samples are not scaled along Y: Jolt changes heights in place with
+      // heights already scaled.
+      settings.mScale.Set(width / (columns - 1), 1, height / (rows - 1));
+      settings.mSampleCount = sampleCount;
+      settings.mBlockSize = 4;
+      // Heights can be changed in place on the whole depth of the box.
+      settings.mMinHeightValue = -depth / 2;
+      settings.mMaxHeightValue = depth / 2;
+      settings.mHeightSamples.resize(sampleCount * sampleCount);
+      this._copyHeightsToSamples(
+        heightField,
+        depth,
+        new Float32Array(
+          Jolt.HEAPF32.buffer,
+          Jolt.getPointer(settings.mHeightSamples.data()),
+          sampleCount * sampleCount
+        ),
+        0,
+        0,
+        sampleCount,
+        sampleCount
+      );
+      return settings;
+    }
+
+    /**
+     * Copy heights to a block of samples of a Jolt height field, whose rows
+     * are flipped (see `_createHeightFieldShapeSettings`).
+     */
+    private _copyHeightsToSamples(
+      heightField: gdjs.SurfaceHeightField,
+      depth: float,
+      samples: Float32Array,
+      firstColumn: integer,
+      firstSampleRow: integer,
+      sizeX: integer,
+      sizeY: integer
+    ): void {
+      const { columns, rows, heights } = heightField;
+      const noCollision =
+        Jolt.HeightFieldShapeConstantValues.prototype.cNoCollisionValue;
+      for (let y = 0; y < sizeY; y++) {
+        const row = rows - 1 - (firstSampleRow + y);
+        for (let x = 0; x < sizeX; x++) {
+          const column = firstColumn + x;
+          const height =
+            row >= 0 && column < columns
+              ? heights[row * columns + column]
+              : NaN;
+          samples[y * sizeX + x] = Number.isNaN(height)
+            ? noCollision
+            : (Math.min(Math.max(height, 0), 1) - 0.5) * depth;
+        }
+      }
+    }
+
+    private _createTrianglesShapeSettings(
+      triangles: gdjs.SurfaceTriangles,
+      width: float,
+      height: float,
+      depth: float
+    ): Jolt.MeshShapeSettings {
+      const { positions, indices } = triangles;
+      const vertexList = new Jolt.VertexList();
+      const float3 = new Jolt.Float3(0, 0, 0);
+      for (let index = 0; index + 2 < positions.length; index += 3) {
+        // The object box is centered on the body.
+        float3.x = (positions[index] - 0.5) * width;
+        float3.y = (positions[index + 1] - 0.5) * height;
+        float3.z = (positions[index + 2] - 0.5) * depth;
+        // The list creates a copy of the Float3.
+        vertexList.push_back(float3);
+      }
+      const indexedTriangleList = new Jolt.IndexedTriangleList();
+      const indexedTriangle = new Jolt.IndexedTriangle();
+      for (let index = 0; index + 2 < indices.length; index += 3) {
+        indexedTriangle.set_mIdx(0, indices[index]);
+        indexedTriangle.set_mIdx(1, indices[index + 1]);
+        indexedTriangle.set_mIdx(2, indices[index + 2]);
+        // The list creates a copy of the IndexedTriangle.
+        indexedTriangleList.push_back(indexedTriangle);
+      }
+      const physicsMaterialList = new Jolt.PhysicsMaterialList();
+      // Parameters passed to `MeshShapeSettings` are copied.
+      const settings = new Jolt.MeshShapeSettings(
+        vertexList,
+        indexedTriangleList,
+        physicsMaterialList
+      );
+      Jolt.destroy(float3);
+      Jolt.destroy(vertexList);
+      Jolt.destroy(indexedTriangle);
+      Jolt.destroy(indexedTriangleList);
+      Jolt.destroy(physicsMaterialList);
+      return settings;
+    }
+
+    /**
+     * Change the heights of the shape where the surface changed, or ask for
+     * the shape to be recreated.
+     */
+    private _updateShapeFromSurface(): void {
+      const surface = this.owner.getSurface();
+      if (surface !== this._surface) {
+        this._needToRecreateShape = true;
+        return;
+      }
+      if (!surface) {
+        return;
+      }
+      const version = surface.getVersion();
+      if (version === this._surfaceVersion) {
+        return;
+      }
+      const changedArea = this._heightFieldShape
+        ? surface.getChangedArea(this._surfaceVersion)
+        : null;
+      this._surfaceVersion = version;
+      const heightField = changedArea ? surface.getHeightField() : null;
+      if (
+        !changedArea ||
+        !heightField ||
+        !this._updateHeightFieldShape(heightField, changedArea)
+      ) {
+        this._needToRecreateShape = true;
+      }
+    }
+
+    /** @returns false when the shape must be recreated instead. */
+    private _updateHeightFieldShape(
+      heightField: gdjs.SurfaceHeightField,
+      area: gdjs.SurfaceArea
+    ): boolean {
+      const shape = this._heightFieldShape;
+      const body = this._body;
+      const { columns, rows } = heightField;
+      if (
+        !shape ||
+        !body ||
+        columns !== this._heightFieldColumns ||
+        rows !== this._heightFieldRows
+      ) {
+        return false;
+      }
+      // Jolt changes blocks of samples, whose rows are flipped.
+      const blockSize = shape.GetBlockSize();
+      const sampleCount = shape.GetSampleCount();
+      const alignDown = (value: integer) =>
+        Math.floor(value / blockSize) * blockSize;
+      const alignUp = (value: integer) =>
+        Math.min(Math.ceil(value / blockSize) * blockSize, sampleCount);
+      const firstColumn = alignDown(
+        Math.max(0, Math.floor(area.minX * (columns - 1)))
+      );
+      const endColumn = alignUp(
+        Math.min(columns, Math.ceil(area.maxX * (columns - 1)) + 1)
+      );
+      const firstSampleRow = alignDown(
+        Math.max(0, rows - 1 - Math.ceil(area.maxY * (rows - 1)))
+      );
+      const endSampleRow = alignUp(
+        Math.min(rows, rows - Math.floor(area.minY * (rows - 1)))
+      );
+      const sizeX = endColumn - firstColumn;
+      const sizeY = endSampleRow - firstSampleRow;
+      if (sizeX <= 0 || sizeY <= 0) {
+        return true;
+      }
+      if (!this._changedHeightSamples) {
+        this._changedHeightSamples = new Jolt.ArrayFloat();
+      }
+      const changedHeightSamples = this._changedHeightSamples;
+      changedHeightSamples.resize(sizeX * sizeY);
+      this._copyHeightsToSamples(
+        heightField,
+        this._heightFieldDepth,
+        new Float32Array(
+          Jolt.HEAPF32.buffer,
+          Jolt.getPointer(changedHeightSamples.data()),
+          sizeX * sizeY
+        ),
+        firstColumn,
+        firstSampleRow,
+        sizeX,
+        sizeY
+      );
+      shape.SetHeights(
+        firstColumn,
+        firstSampleRow,
+        sizeX,
+        sizeY,
+        changedHeightSamples.data(),
+        sizeX,
+        this._sharedData.jolt.GetTempAllocator()
+      );
+      this._sharedData.bodyInterface.NotifyShapeChanged(
+        body.GetID(),
+        this.getVec3(0, 0, 0),
+        false,
+        Jolt.EActivation_DontActivate
+      );
+      this._wakeUpBodiesOnSurfaceArea(
+        area,
+        Math.max(1 / (columns - 1), 1 / (rows - 1))
+      );
+      return true;
+    }
+
+    /** Bodies sleeping on a changed part of the surface would float or sink. */
+    private _wakeUpBodiesOnSurfaceArea(
+      area: gdjs.SurfaceArea,
+      margin: float
+    ): void {
+      const { owner3D } = this;
+      const { worldInvScale } = this._sharedData;
+      const quaternion = owner3D.get3DRendererObject().quaternion;
+      const corner = new THREE.Vector3();
+      const box = new THREE.Box3();
+      for (const x of [area.minX - margin, area.maxX + margin]) {
+        for (const y of [area.minY - margin, area.maxY + margin]) {
+          for (const z of [0, 1]) {
+            corner
+              .set(
+                (x - 0.5) * owner3D.getWidth(),
+                (y - 0.5) * owner3D.getHeight(),
+                (z - 0.5) * owner3D.getDepth()
+              )
+              .applyQuaternion(quaternion);
+            box.expandByPoint(corner);
+          }
+        }
+      }
+      box.expandByScalar(1);
+      const min = new Jolt.Vec3(
+        (owner3D.getCenterXInScene() + box.min.x) * worldInvScale,
+        (owner3D.getCenterYInScene() + box.min.y) * worldInvScale,
+        (owner3D.getCenterZInScene() + box.min.z) * worldInvScale
+      );
+      const max = new Jolt.Vec3(
+        (owner3D.getCenterXInScene() + box.max.x) * worldInvScale,
+        (owner3D.getCenterYInScene() + box.max.y) * worldInvScale,
+        (owner3D.getCenterZInScene() + box.max.z) * worldInvScale
+      );
+      const aaBox = new Jolt.AABox(min, max);
+      const broadPhaseLayerFilter = new Jolt.BroadPhaseLayerFilter();
+      const objectLayerFilter = new Jolt.ObjectLayerFilter();
+      this._sharedData.bodyInterface.ActivateBodiesInAABox(
+        aaBox,
+        broadPhaseLayerFilter,
+        objectLayerFilter
+      );
+      Jolt.destroy(min);
+      Jolt.destroy(max);
+      Jolt.destroy(aaBox);
+      Jolt.destroy(broadPhaseLayerFilter);
+      Jolt.destroy(objectLayerFilter);
+    }
+
     private getMeshShapeSettings(
       model3DRuntimeObject: gdjs.Model3DRuntimeObject,
       width: float,
@@ -1059,6 +1408,12 @@ namespace gdjs {
 
     private _recreateShape(): void {
       this.bodyUpdater.recreateShape();
+      if (this._surface) {
+        this._wakeUpBodiesOnSurfaceArea(
+          { minX: 0, minY: 0, maxX: 1, maxY: 1 },
+          0
+        );
+      }
 
       this._objectOldWidth = this.owner3D.getWidth();
       this._objectOldHeight = this.owner3D.getHeight();
@@ -1235,13 +1590,15 @@ namespace gdjs {
         this.recreateBody();
       }
 
+      this._updateShapeFromSurface();
+
       // The object size has changed, recreate the shape.
       // The width has changed and there is no custom dimension A (box: width, circle: radius, edge: length) or
       // The height has changed, the shape is not an edge (edges doesn't have height),
       // it isn't a box with custom height or a circle with custom radius
       if (
         this._needToRecreateShape ||
-        (!this.hasCustomShapeDimension() &&
+        ((this._surface || !this.hasCustomShapeDimension()) &&
           (this._objectOldWidth !== this.owner3D.getWidth() ||
             this._objectOldHeight !== this.owner3D.getHeight() ||
             this._objectOldDepth !== this.owner3D.getDepth()))
@@ -2173,7 +2530,8 @@ namespace gdjs {
           shape,
           behavior._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
           behavior._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
-          behavior.bodyType === 'Static'
+          // Surfaces can't be moved by the physics engine.
+          behavior.bodyType === 'Static' || behavior.owner.getSurface()
             ? Jolt.EMotionType_Static
             : behavior.bodyType === 'Kinematic'
               ? Jolt.EMotionType_Kinematic

@@ -707,6 +707,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [gameEditorMode, setGameEditorMode] = React.useState<
     'embedded-game' | 'instances-editor'
   >('instances-editor');
+  const onEnableInGameEditor = React.useCallback(
+    () => setGameEditorMode('embedded-game'),
+    []
+  );
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -6181,6 +6185,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       <EmbeddedGameFrame
         key={currentProject ? currentProject.ptr : 0}
         enabled={gameEditorMode === 'embedded-game'}
+        onEnable={onEnableInGameEditor}
         previewDebuggerServer={previewDebuggerServer || null}
         onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
       >

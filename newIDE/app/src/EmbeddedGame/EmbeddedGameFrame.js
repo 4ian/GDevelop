@@ -17,6 +17,12 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useInGameEditorSettings } from './InGameEditorSettings';
 import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
 import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
+import {
+  registerInGameEditorQueryHandlers,
+  type InGameEditorRaycastRequest,
+  type InGameEditorRaycastResult,
+  type InGameEditorStatus,
+} from './InGameEditorQueries';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -197,6 +203,8 @@ const logSwitchingInfo = ({
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
   enabled: boolean,
+  // Switch the scene editors to the in-game editor.
+  onEnable: () => void,
   onLaunchPreviewForInGameEdition: ({|
     ...PreviewInGameEditorTarget,
     ...HotReloadSteps,
@@ -220,6 +228,7 @@ export const EmbeddedGameFrame = ({
   previewDebuggerServer,
   onLaunchPreviewForInGameEdition,
   enabled,
+  onEnable,
   children,
 }: Props): React.MixedElement => {
   const [
@@ -537,12 +546,47 @@ export const EmbeddedGameFrame = ({
       onChangeViewPosition = (command: ChangeViewPositionCommand) => {
         sendVisibleScreenArea(command);
       };
+      registerInGameEditorQueryHandlers({
+        enable: onEnable,
+        update: (): InGameEditorStatus => {
+          if (!previewDebuggerServer || !enabled) return 'disabled';
+          if (isPreviewOngoing.current) return 'updating';
+          if (isHotReloadNeeded(hotReloadSteps.current)) {
+            // The changes wait for an editor to be shown: apply them to the
+            // one shown now.
+            if (lastPreviewContainer.current && onSwitchToSceneEdition) {
+              onSwitchToSceneEdition({
+                ...lastPreviewContainer.current,
+                shouldReloadProjectData: false,
+                shouldReloadLibraries: false,
+                shouldReloadResources: false,
+                shouldHardReload: false,
+                reasons: ['in-game-editor-update-requested'],
+              });
+            }
+            return 'updating';
+          }
+          return 'up-to-date';
+        },
+        raycast: async (
+          request: InGameEditorRaycastRequest
+        ): Promise<InGameEditorRaycastResult> => {
+          if (!previewDebuggerServer || !enabled)
+            throw new Error('The in-game editor is not used.');
+          const answer = await previewDebuggerServer.sendMessageWithResponse({
+            command: 'raycast',
+            payload: request,
+          });
+          return answer.payload;
+        },
+      });
     },
     [
       previewDebuggerServer,
       previewIndexHtmlLocation,
       onLaunchPreviewForInGameEdition,
       enabled,
+      onEnable,
       sendVisibleScreenArea,
     ]
   );

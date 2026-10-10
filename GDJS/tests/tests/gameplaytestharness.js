@@ -2110,6 +2110,20 @@ describe('gdjs.gameplayTests', () => {
       expect(harness._runWarnings.length).to.be(0);
     });
 
+    it('warns that stepUntilObjectIsStable only waits for the first instance', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+      await harness.stepUntilObjectIsStable('CombinedTank', { maxFrames: 2 });
+      expect(harness._runWarnings.length).to.be(0);
+
+      harness.spawn('CombinedTank', 300, 200, undefined, 'UI');
+      await harness.stepUntilObjectIsStable('CombinedTank', { maxFrames: 2 });
+
+      expect(harness._runWarnings.length).to.be(1);
+      expect(harness._runWarnings[0]).to.contain(
+        'only waits for the first of the 2 instances of "CombinedTank"'
+      );
+    });
+
     it('moves a point with the Z and Z scale of a parent without a THREE object', () => {
       const harness = makeStartedHarness(makeRuntimeGame());
       // A 3D custom object places its children at

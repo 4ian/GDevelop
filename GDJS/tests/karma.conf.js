@@ -228,6 +228,8 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/Extensions/3D/A_RuntimeObject3DRenderer.js`,
       `${gdjsRuntimePath}/Extensions/3D/Cube3DRuntimeObject.js`,
       `${gdjsRuntimePath}/Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js`,
+      `${gdjsRuntimePath}/Extensions/3D/Model3DRuntimeObject.js`,
+      `${gdjsRuntimePath}/Extensions/3D/Model3DRuntimeObject3DRenderer.js`,
       `${gdjsRuntimePath}/Extensions/3D/CustomRuntimeObject3D.js`,
       `${gdjsRuntimePath}/Extensions/3D/CustomRuntimeObject3DRenderer.js`,
       `${gdjsRuntimePath}/Extensions/3D/BloomEffect.js`,

@@ -220,7 +220,8 @@ namespace gdjs {
       let gridColumnsCount = 1;
       let gridRowsCount = 1;
       const bounds = new Float64Array(4);
-      const cellRange = new Int32Array(4);
+      // Not 32-bit integers: cells of far objects would wrap into the grid.
+      const cellRange = new Float64Array(4);
 
       // The content of the array is not kept when it is enlarged.
       const ensureFloat64ArraySize = (array: Float64Array, size: integer) =>

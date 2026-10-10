@@ -114,7 +114,10 @@ namespace gdjs {
     }
 
     updateAnimation(timeDelta: float) {
-      this._animationMixer.update(timeDelta);
+      // The mixer has no action until an animation is played.
+      if (this._action) {
+        this._animationMixer.update(timeDelta);
+      }
     }
 
     override updatePosition() {

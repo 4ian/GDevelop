@@ -735,17 +735,7 @@ namespace gdjs {
         const allInstances = this._instances.get(obj.getName());
         for (let i = 0, len = allInstances.length; i < len; ++i) {
           if (allInstances[i].id == objId) {
-            if (i < 64) {
-              // Unlike `splice`, `shift` removes the first element without
-              // moving the others in V8 and SpiderMonkey: objects deleted
-              // from the start of the list, often the oldest ones, are
-              // removed in constant time instead of a time proportional
-              // to the number of instances.
-              for (let j = i; j > 0; --j) allInstances[j] = allInstances[j - 1];
-              allInstances.shift();
-            } else {
-              allInstances.splice(i, 1);
-            }
+            allInstances.splice(i, 1);
             this._allInstancesListIsUpToDate = false;
             break;
           }

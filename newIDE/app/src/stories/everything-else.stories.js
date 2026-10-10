@@ -1739,6 +1739,7 @@ storiesOf('DebuggerContent', module)
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <DebuggerContent
+          canStartProfiler
           gameData={debuggerGameDataDump}
           onPause={action('on pause')}
           onPlay={action('on play')}
@@ -1759,6 +1760,7 @@ storiesOf('DebuggerContent', module)
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
         <DebuggerContent
+          canStartProfiler
           gameData={null}
           onPause={action('on pause')}
           onPlay={action('on play')}

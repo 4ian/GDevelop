@@ -9,6 +9,7 @@ import ConsoleIcon from '../UI/CustomSvgIcons/Console';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
 import PauseIcon from '../UI/CustomSvgIcons/Pause';
 import IconButton from '../UI/IconButton';
+import { useIsGameplayTestRunInProgress } from '../GameplayTests/GameplayTestRunner';
 
 type Props = {|
   onPlay: () => void,
@@ -23,63 +24,62 @@ type Props = {|
   canOpenConsole: boolean,
 |};
 
-export class Toolbar extends React.PureComponent<Props> {
-  render(): any {
-    const {
-      onPlay,
-      onPause,
-      canPlay,
-      canPause,
-      onToggleProfiler,
-      canOpenProfiler,
-      onToggleConsole,
-      canOpenConsole,
-      isProfilerShown,
-      isConsoleShown,
-    } = this.props;
+export const Toolbar = ({
+  onPlay,
+  onPause,
+  canPlay,
+  canPause,
+  onToggleProfiler,
+  canOpenProfiler,
+  onToggleConsole,
+  canOpenConsole,
+  isProfilerShown,
+  isConsoleShown,
+}: Props): React.Node => {
+  const isGameplayTestRunInProgress = useIsGameplayTestRunInProgress();
 
-    return (
-      <ToolbarGroup lastChild>
-        <IconButton
-          size="small"
-          color="default"
-          onClick={onToggleProfiler}
-          disabled={!canOpenProfiler}
-          selected={isProfilerShown}
-          tooltip={t`Open the performance profiler`}
-        >
-          <ProfilerIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          onClick={onToggleConsole}
-          disabled={!canOpenConsole}
-          selected={isConsoleShown}
-          tooltip={t`Open the console`}
-        >
-          <ConsoleIcon />
-        </IconButton>
+  return (
+    <ToolbarGroup lastChild>
+      <IconButton
+        size="small"
+        color="default"
+        onClick={onToggleProfiler}
+        disabled={!canOpenProfiler || isGameplayTestRunInProgress}
+        selected={isProfilerShown}
+        tooltip={t`Open the performance profiler`}
+      >
+        <ProfilerIcon />
+      </IconButton>
+      <IconButton
+        size="small"
+        color="default"
+        onClick={onToggleConsole}
+        disabled={!canOpenConsole}
+        selected={isConsoleShown}
+        tooltip={t`Open the console`}
+      >
+        <ConsoleIcon />
+      </IconButton>
 
-        {canPause ? (
-          <FlatButton
-            primary
-            onClick={onPause}
-            leftIcon={<PauseIcon />}
-            label={<Trans>Pause</Trans>}
-          />
-        ) : (
-          <RaisedButton
-            primary
-            onClick={onPlay}
-            icon={<PlayIcon />}
-            label={<Trans>Play</Trans>}
-            disabled={!canPlay}
-          />
-        )}
-      </ToolbarGroup>
-    );
-  }
-}
+      {canPause ? (
+        <FlatButton
+          primary
+          onClick={onPause}
+          leftIcon={<PauseIcon />}
+          label={<Trans>Pause</Trans>}
+          disabled={isGameplayTestRunInProgress}
+        />
+      ) : (
+        <RaisedButton
+          primary
+          onClick={onPlay}
+          icon={<PlayIcon />}
+          label={<Trans>Play</Trans>}
+          disabled={!canPlay || isGameplayTestRunInProgress}
+        />
+      )}
+    </ToolbarGroup>
+  );
+};
 
 export default Toolbar;

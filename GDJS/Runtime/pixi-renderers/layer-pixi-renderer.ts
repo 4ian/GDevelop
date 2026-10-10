@@ -203,15 +203,34 @@ namespace gdjs {
   /**
    * Replace `updateMatrixWorld` of the objects that can be culled: Three.js
    * updates the matrices of all the objects of a scene at each render, even
-   * hidden ones. The matrices of culled objects are updated by
-   * `cull3DObjects` when they move instead.
+   * hidden ones. The matrices of culled objects are only updated when they
+   * move, so that raycasts and extensions reading them still work.
    */
   function updateMatrixWorldUnlessCulled(
     this: Culled3DRendererObject,
     force?: boolean
   ) {
-    if (this.gdjsCulling && this.gdjsCulling.isCulled) return;
+    const culling = this.gdjsCulling;
+    if (culling && culling.isCulled) {
+      if (
+        culling.position.equals(this.position) &&
+        culling.quaternion.equals(this.quaternion) &&
+        culling.scale.equals(this.scale)
+      ) {
+        return;
+      }
+      updateCulledObjectMatrices(this);
+      return;
+    }
     THREE.Object3D.prototype.updateMatrixWorld.call(this, force);
+  }
+
+  function updateCulledObjectMatrices(object: Culled3DRendererObject) {
+    const culling = object.gdjsCulling!;
+    culling.position.copy(object.position);
+    culling.quaternion.copy(object.quaternion);
+    culling.scale.copy(object.scale);
+    THREE.Object3D.prototype.updateMatrixWorld.call(object, true);
   }
 
   /**
@@ -1606,29 +1625,20 @@ namespace gdjs {
           child.visible = false;
           if (culling) {
             culling.isCulled = true;
-            culling.position.copy(child.position);
-            culling.quaternion.copy(child.quaternion);
-            culling.scale.copy(child.scale);
           } else {
             child.gdjsCulling = {
               isCulled: true,
-              position: child.position.clone(),
-              quaternion: child.quaternion.clone(),
-              scale: child.scale.clone(),
+              position: new THREE.Vector3(),
+              quaternion: new THREE.Quaternion(),
+              scale: new THREE.Vector3(),
             };
             child.updateMatrixWorld = updateMatrixWorldUnlessCulled;
           }
+          // The object may have moved since the last render.
+          updateCulledObjectMatrices(child);
           this._culledObjectsCount++;
-        } else if (
-          hasGroupMoved ||
-          !culling.position.equals(child.position) ||
-          !culling.quaternion.equals(child.quaternion) ||
-          !culling.scale.equals(child.scale)
-        ) {
-          culling.position.copy(child.position);
-          culling.quaternion.copy(child.quaternion);
-          culling.scale.copy(child.scale);
-          THREE.Object3D.prototype.updateMatrixWorld.call(child, true);
+        } else if (hasGroupMoved) {
+          updateCulledObjectMatrices(child);
         }
       }
     }

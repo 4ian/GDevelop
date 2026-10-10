@@ -172,24 +172,37 @@ describe('gdjs.LayerPixiRenderer (3D culling)', () => {
     expect(farCube.get3DRendererObject().visible).to.be(false);
   });
 
-  it('keeps the position of hidden objects up to date for raycasts', () => {
+  it('keeps the matrices of hidden objects up to date for raycasts', () => {
     const runtimeScene = makeScene();
+    const layerRenderer = runtimeScene.getLayer('').getRenderer();
     const cube = runtimeScene.createObject('Cube');
+    /** Cast a ray going down through a point of the scene. */
+    const isCubeHitByRayAt = (x, y) => {
+      const origin = new THREE.Vector3(x, y, 1000).applyMatrix4(
+        layerRenderer.getThreeGroup().matrixWorld
+      );
+      const raycaster = new THREE.Raycaster(
+        origin,
+        new THREE.Vector3(0, 0, -1)
+      );
+      return (
+        raycaster.intersectObject(cube.get3DRendererObject(), true).length > 0
+      );
+    };
+
     cube.setPosition(farX, 250);
     runtimeScene.renderAndStep(1000 / 60);
+    expect(cube.get3DRendererObject().visible).to.be(false);
+    expect(isCubeHitByRayAt(farX + 50, 300)).to.be(true);
+
     cube.setPosition(farX, 5000);
     runtimeScene.renderAndStep(1000 / 60);
-    expect(cube.get3DRendererObject().visible).to.be(false);
+    expect(isCubeHitByRayAt(farX + 50, 5050)).to.be(true);
 
-    // A ray going down through the center of the cube, in Three.js coordinates.
-    const layerRenderer = runtimeScene.getLayer('').getRenderer();
-    const center = new THREE.Vector3(farX + 50, 5050, 1000).applyMatrix4(
-      layerRenderer.getThreeGroup().matrixWorld
-    );
-    const raycaster = new THREE.Raycaster(center, new THREE.Vector3(0, 0, -1));
-    expect(
-      raycaster.intersectObject(cube.get3DRendererObject(), true).length
-    ).to.be.greaterThan(0);
+    // Extensions update the matrices of objects moved by events.
+    cube.setPosition(farX, 8000);
+    cube.get3DRendererObject().updateMatrixWorld();
+    expect(isCubeHitByRayAt(farX + 50, 8050)).to.be(true);
   });
 
   it("doesn't hide objects in the in-game editor", () => {

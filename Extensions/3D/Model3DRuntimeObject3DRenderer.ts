@@ -114,7 +114,10 @@ namespace gdjs {
     }
 
     updateAnimation(timeDelta: float) {
-      this._animationMixer.update(timeDelta);
+      // The mixer has no action until an animation is played.
+      if (this._action) {
+        this._animationMixer.update(timeDelta);
+      }
     }
 
     override updatePosition() {
@@ -410,6 +413,12 @@ namespace gdjs {
         child.castShadow = this._model3DRuntimeObject._isCastingShadow;
         child.receiveShadow = this._model3DRuntimeObject._isReceivingShadow;
       });
+    }
+
+    isRenderedInsideItsBox(): boolean {
+      // Animations can move the model outside of its box, and children could
+      // have been added by extensions.
+      return !this._action && this.get3DRendererObject().children.length === 1;
     }
 
     /**

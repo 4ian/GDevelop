@@ -220,8 +220,7 @@ namespace gdjs {
       let gridColumnsCount = 1;
       let gridRowsCount = 1;
       const bounds = new Float64Array(4);
-      // Not 32-bit integers: cells of far objects would wrap into the grid.
-      const cellRange = new Float64Array(4);
+      const cellRange = new Int32Array(4);
 
       // The content of the array is not kept when it is enlarged.
       const ensureFloat64ArraySize = (array: Float64Array, size: integer) =>
@@ -266,6 +265,9 @@ namespace gdjs {
       /**
        * Store in `cellRange` the grid cells (minColumn, minRow, maxColumn,
        * maxRow) covered by the given bounds.
+       *
+       * Both ends are clamped: bounds outside of the grid give an empty range,
+       * even far enough to overflow the 32-bit integers of `cellRange`.
        */
       const updateCellRange = (
         minX: float,
@@ -273,21 +275,27 @@ namespace gdjs {
         maxX: float,
         maxY: float
       ) => {
-        cellRange[0] = Math.max(
-          0,
-          Math.floor((minX - gridMinX) / gridCellSize)
+        cellRange[0] = Math.min(
+          gridColumnsCount,
+          Math.max(0, Math.floor((minX - gridMinX) / gridCellSize))
         );
-        cellRange[1] = Math.max(
-          0,
-          Math.floor((minY - gridMinY) / gridCellSize)
+        cellRange[1] = Math.min(
+          gridRowsCount,
+          Math.max(0, Math.floor((minY - gridMinY) / gridCellSize))
         );
-        cellRange[2] = Math.min(
-          gridColumnsCount - 1,
-          Math.floor((maxX - gridMinX) / gridCellSize)
+        cellRange[2] = Math.max(
+          -1,
+          Math.min(
+            gridColumnsCount - 1,
+            Math.floor((maxX - gridMinX) / gridCellSize)
+          )
         );
-        cellRange[3] = Math.min(
-          gridRowsCount - 1,
-          Math.floor((maxY - gridMinY) / gridCellSize)
+        cellRange[3] = Math.max(
+          -1,
+          Math.min(
+            gridRowsCount - 1,
+            Math.floor((maxY - gridMinY) / gridCellSize)
+          )
         );
       };
 

@@ -327,6 +327,37 @@ describe('gdjs.InGameEditor.raycast', function () {
     ).to.be(null);
   });
 
+  it('gives back their layers to the objects filtered out', async () => {
+    const inGameEditor = await createInGameEditorShowingIsland({
+      eventsBasedObjectType: null,
+    });
+    const container = inGameEditor.getEditedInstanceContainer();
+    if (!container) throw new Error('No scene is edited.');
+    const [house] = container.getObjects('House') || [];
+    const houseRendererObject = house.get3DRendererObject();
+    if (!houseRendererObject) throw new Error('The house is not in 3D.');
+    /** @type {Array<number>} */
+    const layersMasks = [];
+    houseRendererObject.traverse((threeObject) =>
+      layersMasks.push(threeObject.layers.mask)
+    );
+
+    const [hit] = inGameEditor.raycast(
+      createRaycastRequest({
+        rays: [createDownwardRay(150, 150)],
+        excludedObjectNames: ['House'],
+      })
+    ).hits;
+
+    expect(hit && hit.objectName).to.be('Ground');
+    /** @type {Array<number>} */
+    const layersMasksAfter = [];
+    houseRendererObject.traverse((threeObject) =>
+      layersMasksAfter.push(threeObject.layers.mask)
+    );
+    expect(layersMasksAfter).to.eql(layersMasks);
+  });
+
   it('hits instances moved since the last frame', async () => {
     const inGameEditor = await createInGameEditorShowingIsland({
       eventsBasedObjectType: null,

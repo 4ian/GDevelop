@@ -154,6 +154,27 @@ describe('finding surfaces with the in-game editor', () => {
       },
     });
 
+  // The editor waits for the in-game editor: let the time pass.
+  const runLettingTimePass = async <T>(run: () => Promise<T>): Promise<T> => {
+    jest.useFakeTimers();
+    let isDone = false;
+    const promise = run();
+    promise.then(
+      () => {
+        isDone = true;
+      },
+      () => {
+        isDone = true;
+      }
+    );
+    while (!isDone) {
+      jest.advanceTimersByTime(1000);
+      for (let index = 0; index < 20; index++) await Promise.resolve();
+    }
+    jest.useRealTimers();
+    return promise;
+  };
+
   describe('put_3d_instances with drop_to_surface', () => {
     it('sends the changes made before in the batch to the editor before finding surfaces', async () => {
       const calls: Array<string> = [];
@@ -304,29 +325,19 @@ describe('finding surfaces with the in-game editor', () => {
         throw new Error('Timeout');
       });
 
-      // The editor waits for the in-game editor: let the time pass.
-      jest.useFakeTimers();
-      let isDone = false;
-      const resultPromise = putInstances('put_3d_instances', {
-        object_name: 'House',
-        brush_kind: 'point',
-        brush_position: '300,400',
-        new_instances_count: 2,
-        existing_instance_ids: getInstances()[0]
-          .getPersistentUuid()
-          .slice(0, 10),
-        instances_size: '100,100,50',
-        drop_to_surface: {},
-      });
-      resultPromise.then(() => {
-        isDone = true;
-      });
-      while (!isDone) {
-        jest.advanceTimersByTime(1000);
-        for (let index = 0; index < 20; index++) await Promise.resolve();
-      }
-      jest.useRealTimers();
-      const result = await resultPromise;
+      const result = await runLettingTimePass(() =>
+        putInstances('put_3d_instances', {
+          object_name: 'House',
+          brush_kind: 'point',
+          brush_position: '300,400',
+          new_instances_count: 2,
+          existing_instance_ids: getInstances()[0]
+            .getPersistentUuid()
+            .slice(0, 10),
+          instances_size: '100,100,50',
+          drop_to_surface: {},
+        })
+      );
 
       expect(result.success).toBe(false);
       expect(result.message).toEqual(
@@ -538,6 +549,59 @@ describe('finding surfaces with the in-game editor', () => {
       expect(result.message).toEqual(
         expect.stringContaining(
           '("Ground"): highest x=50, y=25, z=100; lowest x=50, y=75, z=100.'
+        )
+      );
+    });
+
+    it('waits for the in-game editor as long as it answers, however long the call takes', async () => {
+      await putInstances('put_3d_instances', {
+        object_name: 'Ground',
+        brush_kind: 'line',
+        new_instances_count: 3,
+        brush_position: '0,0,0',
+        brush_end_position: '600,0,0',
+        instances_size: '200,100,100',
+      });
+      // 3075 rays in 7 batches of 3 seconds each: longer than 20 seconds.
+      mockRaycastInGameEditor.mockImplementation(async request => {
+        if (request.rays.length > 0)
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        return raycastOnGroundAndPlatform(request);
+      });
+
+      const result = await runLettingTimePass(() =>
+        describeInstances({
+          filter_by_object_name: 'Ground',
+          surface_beneath: { grid: 32 },
+        })
+      );
+
+      expect(result.success).toBe(true);
+      expect(
+        mockRaycastInGameEditor.mock.calls.filter(
+          ([request]) => request.rays.length > 0
+        )
+      ).toHaveLength(7);
+    });
+
+    it('makes the grids coarser when many instances are described', async () => {
+      await putInstances('put_3d_instances', {
+        object_name: 'Ground',
+        brush_kind: 'line',
+        new_instances_count: 20,
+        brush_position: '0,0,0',
+        brush_end_position: '950,0,0',
+        instances_size: '40,40,40',
+      });
+
+      const result = await describeInstances({ surface_beneath: { grid: 32 } });
+
+      expect(result.success).toBe(true);
+      // 21 instances with the house: 4096 points at most, so 13 per side.
+      expect(getInstanceOutputs(result)[0].surfaceGrid.xs).toHaveLength(13);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'The grids have 13 points per side instead of 32, for the 21 instances described'
         )
       );
     });

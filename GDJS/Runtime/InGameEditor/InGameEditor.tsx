@@ -4136,6 +4136,12 @@ namespace gdjs {
         : null;
       const excludedObjectNames = new Set(request.excludedObjectNames);
       const excludedInstanceUuids = new Set(request.excludedInstanceUuids);
+      const isFilteredOut = (runtimeObject: gdjs.RuntimeObject): boolean =>
+        (!!includedObjectNames &&
+          !includedObjectNames.has(runtimeObject.getName())) ||
+        excludedObjectNames.has(runtimeObject.getName()) ||
+        (!!runtimeObject.persistentUuid &&
+          excludedInstanceUuids.has(runtimeObject.persistentUuid));
       const isRuntimeObjectIgnored = (
         runtimeObject: gdjs.RuntimeObject | null,
         ray: InGameEditorRay
@@ -4143,23 +4149,48 @@ namespace gdjs {
         !runtimeObject ||
         (!!ray.excludedInstanceUuid &&
           runtimeObject.persistentUuid === ray.excludedInstanceUuid) ||
-        (!!includedObjectNames &&
-          !includedObjectNames.has(runtimeObject.getName())) ||
-        excludedObjectNames.has(runtimeObject.getName()) ||
-        (!!runtimeObject.persistentUuid &&
-          excludedInstanceUuids.has(runtimeObject.persistentUuid));
+        isFilteredOut(runtimeObject);
 
-      const hits =
-        request.mode === '2d'
-          ? request.rays.map((ray) =>
-              this._raycast2D(
-                ray,
-                editedInstanceContainer,
-                isRuntimeObjectIgnored
-              )
+      if (request.mode === '2d') {
+        return {
+          editedLocation: this._editedLocation,
+          hits: request.rays.map((ray) =>
+            this._raycast2D(
+              ray,
+              editedInstanceContainer,
+              isRuntimeObjectIgnored
             )
-          : this._raycast3D(request.rays, isRuntimeObjectIgnored);
-      return { editedLocation: this._editedLocation, hits };
+          ),
+        };
+      }
+      // The meshes of the objects filtered out are not tested at all: a mesh
+      // with many triangles (like water) would be tested by every ray.
+      const leftOutThreeObjects: Array<{
+        threeObject: THREE.Object3D;
+        layersMask: integer;
+      }> = [];
+      for (const runtimeObject of editedInstanceContainer.getAdhocListOfAllInstances()) {
+        if (!is3D(runtimeObject) || !isFilteredOut(runtimeObject)) continue;
+        const rendererObject = runtimeObject.get3DRendererObject();
+        if (!rendererObject) continue;
+        rendererObject.traverse((threeObject) => {
+          leftOutThreeObjects.push({
+            threeObject,
+            layersMask: threeObject.layers.mask,
+          });
+          threeObject.layers.set(1);
+        });
+      }
+      try {
+        return {
+          editedLocation: this._editedLocation,
+          hits: this._raycast3D(request.rays, isRuntimeObjectIgnored),
+        };
+      } finally {
+        for (const { threeObject, layersMask } of leftOutThreeObjects) {
+          threeObject.layers.mask = layersMask;
+        }
+      }
     }
 
     private _raycast3D(

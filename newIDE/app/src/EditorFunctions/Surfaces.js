@@ -34,12 +34,15 @@ type SurfacesMode = '3d' | '2d';
 // far to find every surface below a position.
 const BEYOND_EVERYTHING_DISTANCE = 1000000;
 
-// The in-game editor must answer each message within a second, which it can
-// miss while it loads or renders a scene for the first time: rays are sent
-// again until it answers.
-const RAYS_PER_MESSAGE = 100;
-const RAYCAST_TIMEOUT_MS = 20000;
+// Rays are sent in batches, each one sent again until the in-game editor
+// answers it (it can miss one while it loads a scene). The call fails only
+// when the in-game editor stops answering, however many rays there are.
+const RAYS_PER_MESSAGE = 500;
+const IN_GAME_EDITOR_SILENCE_TIMEOUT_MS = 20000;
 const IN_GAME_EDITOR_READY_TIMEOUT_MS = 20000;
+// The points of the grids of all the instances described in one call, to
+// keep it to a few seconds: the grids are made coarser beyond.
+const MAX_GRID_POINTS = 4096;
 const IN_GAME_EDITOR_POLLING_DELAY_MS = 200;
 
 const delay = (ms: number): Promise<void> =>
@@ -334,9 +337,9 @@ const castRaysInScope = async ({
   | {| success: true, hits: Array<InGameEditorRaycastHit | null> |}
   | {| success: false, message: string |}
 > => {
-  const deadline = Date.now() + RAYCAST_TIMEOUT_MS;
   const hits: Array<InGameEditorRaycastHit | null> = [];
   for (let index = 0; index < rays.length; index += RAYS_PER_MESSAGE) {
+    const deadline = Date.now() + IN_GAME_EDITOR_SILENCE_TIMEOUT_MS;
     let result = null;
     let lastError = null;
     while (!result) {
@@ -643,6 +646,17 @@ export const getSurfacesOfInstances = async ({
       (_, index) => min + ((index + 0.5) * (max - min)) / count
     );
 
+  // Coarser grids when many instances are described, to keep the call short.
+  const gridSide = grid
+    ? Math.min(
+        grid,
+        Math.max(
+          2,
+          Math.floor(Math.sqrt(MAX_GRID_POINTS / instancesWithBox.length))
+        )
+      )
+    : null;
+
   const raysByMode: { [SurfacesMode]: Array<InGameEditorRay> } = {
     '3d': [],
     '2d': [],
@@ -663,12 +677,12 @@ export const getSurfacesOfInstances = async ({
       excludedInstanceUuid: instance.getPersistentUuid(),
     });
 
-    if (!grid)
+    if (!gridSide)
       return { beneathRayIndex, gridRayIndex: -1, xs: noSteps, ys: noSteps };
     const gridRayIndex = rays.length;
-    const xs = getSteps(min[0], max[0], grid);
+    const xs = getSteps(min[0], max[0], gridSide);
     if (up === 'z') {
-      const ys = getSteps(min[1], max[1], grid);
+      const ys = getSteps(min[1], max[1], gridSide);
       const height = max[2] - min[2] + 2;
       ys.forEach(y =>
         xs.forEach(x =>
@@ -800,16 +814,20 @@ export const getSurfacesOfInstances = async ({
       )}; lowest ${describePoint(surfaceGrid.lowest)}`
     );
   });
-  return {
-    success: true,
-    message:
-      gridDescriptions.length > 0
-        ? `${
-            showScope.message
-          } Highest and lowest points of the surface grids: ${gridDescriptions.join(
-            ' | '
-          )}.`
-        : showScope.message,
-    surfaces,
-  };
+  const messages = [showScope.message];
+  if (grid && gridSide && gridSide < grid) {
+    messages.push(
+      `The grids have ${gridSide} points per side instead of ${grid}, for the ${
+        instancesWithBox.length
+      } instances described: describe fewer instances (\`filter_by_object_name\`) for finer grids.`
+    );
+  }
+  if (gridDescriptions.length > 0) {
+    messages.push(
+      `Highest and lowest points of the surface grids: ${gridDescriptions.join(
+        ' | '
+      )}.`
+    );
+  }
+  return { success: true, message: messages.join(' '), surfaces };
 };

@@ -573,10 +573,11 @@ export const EmbeddedGameFrame = ({
         ): Promise<InGameEditorRaycastResult> => {
           if (!previewDebuggerServer || !enabled)
             throw new Error('The in-game editor is not used.');
-          const answer = await previewDebuggerServer.sendMessageWithResponse({
-            command: 'raycast',
-            payload: request,
-          });
+          // Many rays can take seconds on a large scene.
+          const answer = await previewDebuggerServer.sendMessageWithResponse(
+            { command: 'raycast', payload: request },
+            { timeoutMs: 10000 }
+          );
           return answer.payload;
         },
       });

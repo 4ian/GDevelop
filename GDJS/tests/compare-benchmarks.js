@@ -8,7 +8,7 @@
  * version, on the same machine: the differences of speed between machines
  * (or a machine slowing down during the run) don't affect the comparison.
  *
- * Usage: node compare-benchmarks.js [--base-ref=origin/master] [--rounds=3]
+ * Usage: node compare-benchmarks.js [--base-ref=origin/master] [--rounds=4]
  *   [--grep=<benchmark name pattern>] [--markdown=<file>] [--json=<file>]
  *   [--browser=ChromeHeadlessBenchmark]
  */
@@ -20,7 +20,10 @@ const args = require('minimist')(process.argv.slice(2), {
   string: ['base-ref', 'grep', 'markdown', 'json', 'browser'],
   default: {
     'base-ref': 'origin/master',
-    rounds: 3,
+    // With 3 rounds, a benchmark whose speed varies between launches of the
+    // browser is reported as changed 10% of the time when nothing changed
+    // (the 3 rounds of a version are all faster by chance).
+    rounds: 4,
     browser: 'ChromeHeadlessBenchmark',
   },
 });
@@ -40,6 +43,7 @@ const resultsPath = path.join(repositoryPath, builtRuntimesPath, 'results');
  *   counters?: {[counterName: string]: number | string | null},
  * }} BenchmarkResult
  * @typedef {'base' | 'head'} Version
+ * @typedef {ReturnType<typeof compareResults>[number]} Comparison
  */
 
 /**
@@ -214,8 +218,18 @@ const compareResults = (resultsByVersionAndRound) => {
       headMediansMs.map((headMedianMs) => headMedianMs / baseMedianMs - 1)
     );
     const changeRange = [Math.min(...roundChanges), Math.max(...roundChanges)];
+    // A change smaller than the differences between the rounds of a same
+    // version can be the rounds of a version being all faster by chance.
+    /** @param {Array<number>} mediansMs */
+    const getRoundsSpread = (mediansMs) =>
+      Math.max(...mediansMs) / Math.min(...mediansMs) - 1;
     const isSignificant =
-      Math.abs(change) >= MINIMUM_SIGNIFICANT_CHANGE &&
+      Math.abs(change) >=
+        Math.max(
+          MINIMUM_SIGNIFICANT_CHANGE,
+          getRoundsSpread(baseMediansMs),
+          getRoundsSpread(headMediansMs)
+        ) &&
       (changeRange[0] > 0 || changeRange[1] < 0);
 
     return {
@@ -230,45 +244,61 @@ const compareResults = (resultsByVersionAndRound) => {
   });
 };
 
+const verdictEmojis = {
+  faster: '🚀',
+  slower: '🐢',
+  unchanged: '≈',
+  new: '🆕',
+  'removed or failing': '⚠️',
+};
+
+/** @param {Array<Comparison>} comparisons */
+const makeComparisonsTable = (comparisons) => [
+  '| | Benchmark | Base | This version | Change | Range between rounds |',
+  '|---|---|---:|---:|---:|---:|',
+  ...comparisons.map(
+    ({ name, baseMs, headMs, change, changeRange, verdict }) =>
+      `| ${verdictEmojis[verdict]} | ${name} | ` +
+      `${baseMs === null ? '-' : formatTime(baseMs)} | ` +
+      `${headMs === null ? '-' : formatTime(headMs)} | ` +
+      `${change === null ? '-' : formatChange(change)} | ` +
+      `${changeRange === null ? '-' : changeRange.map(formatChange).join(' to ')} |`
+  ),
+];
+
+/** @param {Array<Comparison>} comparisons */
+const makeHeadline = (comparisons) => {
+  const verdictLabels = {
+    faster: 'faster',
+    slower: 'slower',
+    new: 'new',
+    'removed or failing': 'removed or failing',
+  };
+  const verdictCounts = Object.entries(verdictLabels)
+    .map(([verdict, label]) => {
+      const count = comparisons.filter(
+        (comparison) => comparison.verdict === verdict
+      ).length;
+      return count ? `${verdictEmojis[verdict]} ${count} ${label}` : null;
+    })
+    .filter(Boolean);
+  return verdictCounts.length
+    ? verdictCounts.join(', ')
+    : `✅ no significant change on the ${comparisons.length} benchmarks`;
+};
+
 /**
- * @param {ReturnType<typeof compareResults>} comparisons
+ * @param {Array<Comparison>} comparisons
  * @param {{baseCommit: string, headCommit: string, rounds: number}} context
  */
 const makeMarkdownReport = (
   comparisons,
   { baseCommit, headCommit, rounds }
 ) => {
-  const verdictEmojis = {
-    faster: '🚀 faster',
-    slower: '🐢 slower',
-    unchanged: '≈',
-    new: '🆕',
-    'removed or failing': '⚠️ removed or failing',
-  };
-  const lines = [
-    '<!-- benchmark-results -->',
-    '### ⏱️ Game engine benchmarks',
-    '',
-    `Comparing \`${headCommit.slice(0, 8)}\` to its base \`${baseCommit.slice(0, 8)}\` ` +
-      '(on a pull request, the version tested is the pull request merged into its base), ' +
-      `run alternately ${rounds} times on the same machine (${os.cpus()[0].model}, ` +
-      `${os.cpus().length} cores, rendering without GPU).`,
-    '',
-    '| Benchmark | Base | This version | Change | Range between rounds | |',
-    '|---|---:|---:|---:|---:|---|',
-    ...comparisons.map(
-      ({ name, baseMs, headMs, change, changeRange, verdict }) =>
-        `| ${name} | ${baseMs === null ? '-' : formatTime(baseMs)} | ` +
-        `${headMs === null ? '-' : formatTime(headMs)} | ` +
-        `${change === null ? '-' : formatChange(change)} | ` +
-        `${changeRange === null ? '-' : changeRange.map(formatChange).join(' to ')} | ` +
-        `${verdictEmojis[verdict]} |`
-    ),
-    '',
-    'Times are the median duration of a batch of iterations (micro benchmarks) or of a frame (scene benchmarks). ' +
-      `A change is reported only when larger than ${MINIMUM_SIGNIFICANT_CHANGE * 100}% ` +
-      'and measured by every pair of rounds.',
-  ];
+  const notableComparisons = comparisons
+    .filter(({ verdict }) => verdict !== 'unchanged')
+    // Biggest changes first, then the new, removed or failing benchmarks.
+    .sort((a, b) => Math.abs(b.change || 0) - Math.abs(a.change || 0));
 
   const changedCounters = comparisons.flatMap(({ name, counters }) =>
     counters
@@ -285,16 +315,19 @@ const makeMarkdownReport = (
   const comparedCountersBenchmarksCount = comparisons.filter(({ counters }) =>
     counters.some((counter) => counter.base !== '-' && counter.head !== '-')
   ).length;
-  lines.push(
-    '',
-    changedCounters.length
-      ? '⚠️ **Counters changed or not deterministic** (draw calls, objects count or final state of a scene):'
-      : comparedCountersBenchmarksCount
-        ? `✅ The counters (draw calls, objects count and final state) of the ${comparedCountersBenchmarksCount} scene benchmarks run on both versions are unchanged.`
-        : 'ℹ️ No scene benchmark ran on both versions: their counters (draw calls, objects count and final state) could not be compared.'
-  );
+
+  const lines = [
+    '<!-- benchmark-results -->',
+    `### ⏱️ Game engine benchmarks: ${makeHeadline(comparisons)}`,
+  ];
+  if (notableComparisons.length) {
+    lines.push('', ...makeComparisonsTable(notableComparisons));
+  }
+  // Counters changing means the behavior changed: always shown.
   if (changedCounters.length) {
     lines.push(
+      '',
+      '⚠️ **Counters changed or not deterministic** (draw calls, objects count or final state of a scene):',
       '',
       '| Benchmark | Counter | Base | This version |',
       '|---|---|---|---|',
@@ -304,6 +337,33 @@ const makeMarkdownReport = (
       )
     );
   }
+  lines.push(
+    '',
+    '<details>',
+    `<summary>All the ${comparisons.length} benchmarks and how they are measured</summary>`,
+    '',
+    ...makeComparisonsTable(comparisons),
+    ''
+  );
+  if (!changedCounters.length) {
+    lines.push(
+      comparedCountersBenchmarksCount
+        ? `✅ The counters (draw calls, objects count and final state) of the ${comparedCountersBenchmarksCount} scene benchmarks run on both versions are unchanged.`
+        : 'ℹ️ No scene benchmark ran on both versions: their counters (draw calls, objects count and final state) could not be compared.',
+      ''
+    );
+  }
+  lines.push(
+    `Comparing \`${headCommit.slice(0, 8)}\` to its base \`${baseCommit.slice(0, 8)}\` ` +
+      '(on a pull request, the version tested is the pull request merged into its base), ' +
+      `run alternately ${rounds} times on the same machine (${os.cpus()[0].model}, ` +
+      `${os.cpus().length} cores, rendering without GPU). ` +
+      'Times are the median duration of a batch of iterations (micro benchmarks) or of a frame (scene benchmarks). ' +
+      `A change is reported only when larger than ${MINIMUM_SIGNIFICANT_CHANGE * 100}% ` +
+      'and than the differences between the rounds of a same version, and measured by every pair of rounds.',
+    '',
+    '</details>'
+  );
   return lines.join('\n') + '\n';
 };
 

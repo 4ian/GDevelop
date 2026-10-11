@@ -99,6 +99,23 @@ module.exports = function (config) {
         timeout: 10000, // Give a bit more time for CIs (the default 2s can be too low sometimes, as a real browser is involved).
       },
     },
+    // A cross-origin isolated page has a precise timer (5µs instead of
+    // 100µs), needed to measure frames and batches lasting about 1ms.
+    customHeaders:
+      config.enableBenchmarks || config.benchmarksOnly
+        ? [
+            {
+              match: '.*',
+              name: 'Cross-Origin-Opener-Policy',
+              value: 'same-origin',
+            },
+            {
+              match: '.*',
+              name: 'Cross-Origin-Embedder-Policy',
+              value: 'require-corp',
+            },
+          ]
+        : [],
     basePath: '../..',
     proxies: {
       '/base/tests-utils/': '/base/GDJS/tests/tests-utils/',

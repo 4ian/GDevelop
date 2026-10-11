@@ -166,12 +166,17 @@ void EventsBasedObjectVariantHelper::FindAllChildrenCustomObjectType(
   const auto &objects = eventsBasedObject.GetObjects();
 
   for (size_t i = 0; i < objects.GetObjectsCount(); i++) {
-    const auto &object = objects.GetObject(i);
-    if (std::find(objectTypes.begin(), objectTypes.end(), object.GetType()) ==
+    const auto &objectType = objects.GetObject(i).GetType();
+    if (std::find(objectTypes.begin(), objectTypes.end(), objectType) ==
             objectTypes.end() &&
-        project.HasEventsBasedObject(object.GetType())) {
-      objectTypes.push_back(object.GetType());
-      FindAllChildrenCustomObjectType(project, eventsBasedObject, objectTypes);
+        project.HasEventsBasedObject(objectType)) {
+      objectTypes.push_back(objectType);
+      // Recurse on the child events-based object to also find the custom object
+      // types used deeper in the hierarchy.
+      // Types that were already found are skipped, which also avoids infinite
+      // loops in case events-based objects have (invalid) cyclic dependencies.
+      FindAllChildrenCustomObjectType(
+          project, project.GetEventsBasedObject(objectType), objectTypes);
     }
   }
 }

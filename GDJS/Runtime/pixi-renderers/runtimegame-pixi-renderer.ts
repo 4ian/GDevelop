@@ -811,10 +811,19 @@ namespace gdjs {
       }
       canvas.onmousemove = (e) => {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
-        manager.onMouseMove(pos[0], pos[1], {
-          movementX: e.movementX,
-          movementY: e.movementY,
-        });
+        // The browser movementX/Y are only reliable while the pointer is locked
+        // (the cursor position is then frozen by the browser). Otherwise they are
+        // inconsistent across browsers (e.g. Firefox adds the game canvas offset
+        // to them, breaking first-person cameras unless fullscreen), so let the
+        // InputManager derive the movement from the cursor position instead.
+        // See https://github.com/4ian/GDevelop/issues/6338.
+        manager.onMouseMove(
+          pos[0],
+          pos[1],
+          this.isPointerLocked()
+            ? { movementX: e.movementX, movementY: e.movementY }
+            : undefined
+        );
       };
       canvas.onmousedown = (e) => {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);

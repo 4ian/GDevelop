@@ -79,6 +79,15 @@ public:
       const gd::ProjectScopedContainers &projectScopedContainers,
       gd::Instruction &instruction);
 
+  /**
+   * \brief After a type switch, fix the operator parameter if its current value
+   * is no longer valid for the new instruction type. Call this when the type
+   * actually changed. Covers all switchable variable instruction variants:
+   * conditions, Set actions, and Push (array) actions, for both scene and
+   * object variables.
+   */
+  static void ResetParametersAfterSwitch(gd::Instruction &instruction);
+
 private:
   static const gd::String variableGetterIdentifier;
   static const gd::String variableSetterIdentifier;

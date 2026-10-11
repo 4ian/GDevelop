@@ -218,8 +218,18 @@ const compareResults = (resultsByVersionAndRound) => {
       headMediansMs.map((headMedianMs) => headMedianMs / baseMedianMs - 1)
     );
     const changeRange = [Math.min(...roundChanges), Math.max(...roundChanges)];
+    // A change smaller than the differences between the rounds of a same
+    // version can be the rounds of a version being all faster by chance.
+    /** @param {Array<number>} mediansMs */
+    const getRoundsSpread = (mediansMs) =>
+      Math.max(...mediansMs) / Math.min(...mediansMs) - 1;
     const isSignificant =
-      Math.abs(change) >= MINIMUM_SIGNIFICANT_CHANGE &&
+      Math.abs(change) >=
+        Math.max(
+          MINIMUM_SIGNIFICANT_CHANGE,
+          getRoundsSpread(baseMediansMs),
+          getRoundsSpread(headMediansMs)
+        ) &&
       (changeRange[0] > 0 || changeRange[1] < 0);
 
     return {
@@ -350,7 +360,7 @@ const makeMarkdownReport = (
       `${os.cpus().length} cores, rendering without GPU). ` +
       'Times are the median duration of a batch of iterations (micro benchmarks) or of a frame (scene benchmarks). ' +
       `A change is reported only when larger than ${MINIMUM_SIGNIFICANT_CHANGE * 100}% ` +
-      'and measured by every pair of rounds.',
+      'and than the differences between the rounds of a same version, and measured by every pair of rounds.',
     '',
     '</details>'
   );

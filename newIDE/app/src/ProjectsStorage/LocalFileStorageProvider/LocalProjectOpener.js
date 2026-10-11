@@ -3,6 +3,10 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { type FileMetadata } from '../index';
 import { unsplit } from '../../Utils/ObjectSplitter';
 import { openFilePicker, readJSONFile } from '../../Utils/FileSystem';
+import {
+  applyProjectEditorSettings,
+  getEditorSettingsSidecarPath,
+} from './LocalEditorSettingsSidecar';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
@@ -34,9 +38,34 @@ export const onOpen = (
       // to be un-splitted, but not the content of these properties), to avoid very slow processing
       // of large game files.
       maxUnsplitDepth: 3,
-    }).then(() => {
-      return { content: object };
-    });
+    })
+      .then(() => {
+        // Editor settings were stored in a sidecar file next to the project
+        // when it was saved: read them back into the project. If the project
+        // still contains some (it was last saved by an older version), they
+        // are kept as they are, and will be moved to the sidecar file the
+        // next time the project is saved.
+        const editorSettingsSidecarPath = getEditorSettingsSidecarPath(
+          filePath
+        );
+        if (!fs || !fs.existsSync(editorSettingsSidecarPath)) {
+          return;
+        }
+
+        return readJSONFile(editorSettingsSidecarPath)
+          .then(editorSettings => {
+            applyProjectEditorSettings(object, editorSettings);
+          })
+          .catch(error => {
+            console.warn(
+              'Unable to read the editor settings stored next to the project - opening the project without them.',
+              error
+            );
+          });
+      })
+      .then(() => {
+        return { content: object };
+      });
   });
 };
 

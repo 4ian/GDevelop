@@ -123,6 +123,7 @@ namespace gdjs {
     _padding: integer = 5;
     _str: string;
     _renderer: gdjs.TextRuntimeObjectRenderer;
+    _rotationCenter: FloatPoint | null = null;
 
     // We can store the scale as nothing else can change it.
     _scaleX: number = 1;
@@ -389,6 +390,12 @@ namespace gdjs {
       this._renderer.updatePosition();
     }
 
+    private _lockRotationCenter() {
+      if (this._rotationCenter) return;
+
+      this._rotationCenter = [this.getCenterX(), this.getCenterY()];
+    }
+
     override setX(x: float): void {
       super.setX(x);
       this._updateTextPosition();
@@ -401,6 +408,10 @@ namespace gdjs {
 
     override setAngle(angle: float): void {
       super.setAngle(angle);
+      if (angle === 0 && this._rotationCenter) {
+        this._rotationCenter = null;
+        this._updateTextPosition();
+      }
       this._renderer.updateAngle();
     }
 
@@ -456,6 +467,9 @@ namespace gdjs {
     setText(text: string): void {
       if (text === this._str) {
         return;
+      }
+      if (this.angle !== 0) {
+        this._lockRotationCenter();
       }
       this._str = text;
       this._renderer.updateString();
@@ -734,6 +748,18 @@ namespace gdjs {
             ? this.getHeight()
             : 0)
       );
+    }
+
+    override getCenterX(): float {
+      return this._rotationCenter
+        ? this._rotationCenter[0]
+        : super.getCenterX();
+    }
+
+    override getCenterY(): float {
+      return this._rotationCenter
+        ? this._rotationCenter[1]
+        : super.getCenterY();
     }
 
     /**

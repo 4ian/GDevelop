@@ -52,6 +52,11 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     return generator.GenerateDefaultValue(rootType);
   }
 
+  if (codeGenerator.IsExpressionValidationSkipped()) {
+    node->Visit(generator);
+    return generator.GetOutput();
+  }
+
   gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
                                     codeGenerator.GetProjectScopedContainers(),
                                     rootType,
@@ -59,6 +64,7 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
                                     extraInfo);
   node->Visit(validator);
   if (!validator.GetFatalErrors().empty()) {
+    codeGenerator.SetExpressionValidationFailed();
     std::cout << "Error: \"" << validator.GetFatalErrors()[0]->GetMessage()
               << "\" in: \"" << expression.GetPlainString() << "\" ("
               << rootType << ")" << std::endl;

@@ -8,7 +8,7 @@
  * version, on the same machine: the differences of speed between machines
  * (or a machine slowing down during the run) don't affect the comparison.
  *
- * Usage: node compare-benchmarks.js [--base-ref=origin/master] [--rounds=3]
+ * Usage: node compare-benchmarks.js [--base-ref=origin/master] [--rounds=5]
  *   [--grep=<benchmark name pattern>] [--markdown=<file>] [--json=<file>]
  *   [--browser=ChromeHeadlessBenchmark]
  */
@@ -20,7 +20,10 @@ const args = require('minimist')(process.argv.slice(2), {
   string: ['base-ref', 'grep', 'markdown', 'json', 'browser'],
   default: {
     'base-ref': 'origin/master',
-    rounds: 3,
+    // With 3 rounds, a benchmark whose speed varies between launches of the
+    // browser is reported as changed 10% of the time when nothing changed
+    // (the 3 rounds of a version are all faster by chance).
+    rounds: 5,
     browser: 'ChromeHeadlessBenchmark',
   },
 });

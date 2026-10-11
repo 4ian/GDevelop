@@ -53,6 +53,8 @@ export type MainMenuCallbacks = {|
   onOpenAskAi: () => void,
   onSelectAll: () => void,
   setElectronUpdateStatus: ElectronUpdateStatus => void,
+  onSaveScene: () => void,
+  onLoadScene: () => void,
 |};
 
 export type MainMenuExtraCallbacks = {|
@@ -81,6 +83,8 @@ export type MainMenuEvent =
   | 'main-menu-open-profile'
   | 'main-menu-open-ask-ai'
   | 'main-menu-select-all'
+  | 'main-menu-save-scene'
+  | 'main-menu-load-scene'
   | 'update-status';
 
 const getMainMenuEventCallback = (
@@ -108,6 +112,8 @@ const getMainMenuEventCallback = (
     'main-menu-open-profile': callbacks.onOpenProfile,
     'main-menu-open-ask-ai': callbacks.onOpenAskAi,
     'main-menu-select-all': callbacks.onSelectAll,
+    'main-menu-save-scene': callbacks.onSaveScene,
+    'main-menu-load-scene': callbacks.onLoadScene,
     'update-status': callbacks.setElectronUpdateStatus,
   };
 
@@ -185,6 +191,17 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Export (web, iOS, Android)...`),
         accelerator: getElectronAccelerator(shortcutMap['EXPORT_GAME']),
         onClickSendEvent: 'main-menu-export',
+        enabled: !!project,
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Export Scene`),
+        onClickSendEvent: 'main-menu-save-scene',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Import Scene`),
+        onClickSendEvent: 'main-menu-load-scene',
         enabled: !!project,
       },
       { type: 'separator' },

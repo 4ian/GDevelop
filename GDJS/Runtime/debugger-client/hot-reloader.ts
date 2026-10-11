@@ -329,12 +329,14 @@ namespace gdjs {
           const inGameEditor = this._runtimeGame.getInGameEditor();
           if (inGameEditor) {
             inGameEditor.onProjectDataChange(newProjectData);
+            // The status leaves out the fields that are not set: they are
+            // null for the in-game editor, as when the game starts.
             await inGameEditor.switchToSceneOrVariant(
               newRuntimeGameStatus.editorId || null,
               newRuntimeGameStatus.sceneName,
-              newRuntimeGameStatus.injectedExternalLayoutName,
-              newRuntimeGameStatus.eventsBasedObjectType,
-              newRuntimeGameStatus.eventsBasedObjectVariantName,
+              newRuntimeGameStatus.injectedExternalLayoutName || null,
+              newRuntimeGameStatus.eventsBasedObjectType || null,
+              newRuntimeGameStatus.eventsBasedObjectVariantName || null,
               newRuntimeGameStatus.editorCamera3D || null
             );
           }

@@ -235,13 +235,15 @@ const isShowingScope = (
   const scopeEditor = getScopeEditor(resolvedScope);
   if (!editedLocation || !scopeEditor) return false;
   const { location } = scopeEditor;
+  // The in-game editor answers in JSON: a field it left undefined is missing.
   return (
-    editedLocation.sceneName === location.sceneName &&
+    (editedLocation.sceneName || null) === location.sceneName &&
     (editedLocation.externalLayoutName || null) ===
       location.externalLayoutName &&
-    editedLocation.eventsBasedObjectType === location.eventsBasedObjectType &&
-    editedLocation.eventsBasedObjectVariantName ===
-      location.eventsBasedObjectVariantName
+    (editedLocation.eventsBasedObjectType || null) ===
+      location.eventsBasedObjectType &&
+    (editedLocation.eventsBasedObjectVariantName || null) ===
+      (location.eventsBasedObjectVariantName || null)
   );
 };
 

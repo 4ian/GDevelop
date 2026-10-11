@@ -338,6 +338,30 @@ describe('finding surfaces with the in-game editor', () => {
       expect(getInstances()[0].hasCustomSize()).toBe(false);
     });
 
+    it('finds the scene shown when the in-game editor leaves out the unset fields of its location', async () => {
+      // After a hot reload, the in-game editor has no external layout nor
+      // custom object: its answer, sent as JSON, has none of these fields.
+      mockShownLocation = JSON.parse(
+        JSON.stringify({
+          sceneName: 'TestScene',
+          externalLayoutName: undefined,
+          eventsBasedObjectType: undefined,
+          eventsBasedObjectVariantName: undefined,
+        })
+      );
+
+      const result = await putInstances('put_3d_instances', {
+        object_name: 'House',
+        brush_kind: 'point',
+        brush_position: '300,400',
+        instances_size: '100,100,50',
+        drop_to_surface: {},
+      });
+
+      expect(result.success).toBe(true);
+      expect(getInstancePositions()).toEqual([[250, 350, 100]]);
+    });
+
     it('switches the scene editors to the in-game editor when it is not used', async () => {
       mockUpdateInGameEditor.mockReturnValueOnce('disabled');
 

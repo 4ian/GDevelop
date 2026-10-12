@@ -13,7 +13,7 @@ import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
-import { isWebGLSupported } from '../../Utils/WebGL';
+import { isWebGL2Supported } from '../../Utils/WebGL';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -442,7 +442,7 @@ export const initialPreferences = {
     openDiagnosticReportAutomatically: true,
     blockPreviewAndExportOnDiagnosticErrors: false,
     showDeprecatedInstructionWarning: 'no',
-    use3DEditor: (isWebGLSupported(): boolean),
+    use3DEditor: (isWebGL2Supported(): boolean),
     showBasicProfilingCounters: false,
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: ((app ? findDefaultFolder(app) : ''): string),

@@ -1499,6 +1499,9 @@ namespace gdjs {
       if (!this._renderTexture) {
         return;
       }
+      if (this._renderTexture.resolution !== pixiRenderer.resolution) {
+        this._renderTexture.setResolution(pixiRenderer.resolution);
+      }
       if (
         this._oldWidth !== pixiRenderer.screen.width ||
         this._oldHeight !== pixiRenderer.screen.height

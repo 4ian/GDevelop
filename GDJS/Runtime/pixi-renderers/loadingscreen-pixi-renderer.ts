@@ -99,28 +99,33 @@ namespace gdjs {
       if (!this._pixiRenderer) return;
 
       if (this._backgroundSprite && this._backgroundSprite.texture.valid) {
-        this._backgroundSprite.position.x = this._pixiRenderer.width / 2;
-        this._backgroundSprite.position.y = this._pixiRenderer.height / 2;
+        this._backgroundSprite.position.x = this._pixiRenderer.screen.width / 2;
+        this._backgroundSprite.position.y =
+          this._pixiRenderer.screen.height / 2;
         const scale = Math.max(
-          this._pixiRenderer.width / this._backgroundSprite.texture.width,
-          this._pixiRenderer.height / this._backgroundSprite.texture.height
+          this._pixiRenderer.screen.width /
+            this._backgroundSprite.texture.width,
+          this._pixiRenderer.screen.height /
+            this._backgroundSprite.texture.height
         );
         this._backgroundSprite.scale.x = scale;
         this._backgroundSprite.scale.y = scale;
       }
 
       if (this._gdevelopLogoSprite) {
-        this._gdevelopLogoSprite.position.x = this._pixiRenderer.width / 2;
-        this._gdevelopLogoSprite.position.y = this._pixiRenderer.height / 2;
+        this._gdevelopLogoSprite.position.x =
+          this._pixiRenderer.screen.width / 2;
+        this._gdevelopLogoSprite.position.y =
+          this._pixiRenderer.screen.height / 2;
         const logoWidth = 680;
         const border =
-          this._pixiRenderer.width > this._pixiRenderer.height &&
-          this._pixiRenderer.width > 500
+          this._pixiRenderer.screen.width > this._pixiRenderer.screen.height &&
+          this._pixiRenderer.screen.width > 500
             ? 150
             : 35;
         const desiredWidth = Math.min(
           logoWidth,
-          Math.max(1, this._pixiRenderer.width - border * 2)
+          Math.max(1, this._pixiRenderer.screen.width - border * 2)
         );
         const scale = desiredWidth / logoWidth;
         this._gdevelopLogoSprite.scale.x = scale;
@@ -129,7 +134,8 @@ namespace gdjs {
         // Give up trying to show the logo if the resolution is really too small.
         // TODO: use a low resolution logo instead.
         this._gdevelopLogoSprite.visible =
-          this._pixiRenderer.width > 200 && this._pixiRenderer.height > 200;
+          this._pixiRenderer.screen.width > 200 &&
+          this._pixiRenderer.screen.height > 200;
       }
     }
 
@@ -220,7 +226,7 @@ namespace gdjs {
         const color = this._loadingScreenData.progressBarColor;
         let progressBarWidth =
           (this._loadingScreenData.progressBarWidthPercent / 100) *
-          this._pixiRenderer.width;
+          this._pixiRenderer.screen.width;
         if (this._loadingScreenData.progressBarMaxWidth > 0) {
           if (progressBarWidth > this._loadingScreenData.progressBarMaxWidth)
             progressBarWidth = this._loadingScreenData.progressBarMaxWidth;
@@ -232,12 +238,16 @@ namespace gdjs {
 
         const progressBarHeight = this._loadingScreenData.progressBarHeight;
         const progressBarX = Math.floor(
-          this._pixiRenderer.width / 2 - progressBarWidth / 2
+          this._pixiRenderer.screen.width / 2 - progressBarWidth / 2
         );
         const progressBarY =
-          this._pixiRenderer.height < 350
-            ? Math.floor(this._pixiRenderer.height - 10 - progressBarHeight)
-            : Math.floor(this._pixiRenderer.height - 90 - progressBarHeight);
+          this._pixiRenderer.screen.height < 350
+            ? Math.floor(
+                this._pixiRenderer.screen.height - 10 - progressBarHeight
+              )
+            : Math.floor(
+                this._pixiRenderer.screen.height - 90 - progressBarHeight
+              );
         const lineWidth = 1;
         // Display bar with an additional 1% to ensure it's filled at the end.
         const progress = Math.min(1, (this._progressPercent + 1) / 100);

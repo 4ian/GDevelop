@@ -63,12 +63,49 @@ module.exports = {
             'the performance and the resources are measured from now on. Useful to record exactly ' +
             'what happens at a given moment, instead of trying to click the button at the right time.'
         ),
-        _('Start recording the game (for the debugger)'),
+        _(
+          'Start recording the game (for the debugger), named _PARAM1_ (duration: _PARAM2_ seconds, measure rendering: _PARAM3_, if already recording: _PARAM4_)'
+        ),
         '',
         'res/actions/bug32.png',
         'res/actions/bug32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Name of the recording'), '', true)
+      .setParameterLongDescription(
+        _('Shown in the debugger, to find this recording.')
+      )
+      .addParameter('expression', _('Duration (in seconds)'), '', true)
+      .setParameterLongDescription(
+        _(
+          'The recording stops by itself after this duration. 0 to record until "Stop recording the game" (or the maximum duration of 5 minutes).'
+        )
+      )
+      .setDefaultValue('0')
+      .addParameter(
+        'yesorno',
+        _('Measure the rendering (draw calls and effects)'),
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        _(
+          'Measuring the draw calls and the effects of layers costs the game a bit of time. Disable it to measure only the events and the engine as precisely as possible.'
+        )
+      )
+      .setDefaultValue('yes')
+      .addParameter(
+        'stringWithSelector',
+        _('If a recording is already in progress'),
+        '["Keep", "Restart"]',
+        true
+      )
+      .setParameterLongDescription(
+        _(
+          '"Keep" leaves the recording in progress as it is. "Restart" stops it and starts a new one with these options.'
+        )
+      )
+      .setDefaultValue('"Keep"')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
       .setFunctionName('gdjs.evtTools.debuggerTools.startProfiling');
@@ -90,6 +127,57 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
       .setFunctionName('gdjs.evtTools.debuggerTools.stopProfiling');
+
+    extension
+      .addAction(
+        'AddProfilingMarker',
+        _('Add a marker to the recording'),
+        _(
+          'This marks the current moment of the recording with a text, shown as a line on the timelines of the debugger: ' +
+            'useful to find when something happened (an enemy wave, a level loaded...). Does nothing when the game is not recorded.'
+        ),
+        _('Add marker _PARAM1_ to the recording'),
+        '',
+        'res/actions/bug32.png',
+        'res/actions/bug32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Text of the marker'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
+      .setFunctionName('gdjs.evtTools.debuggerTools.addProfilingMarker');
+
+    extension
+      .addCondition(
+        'IsProfiling',
+        _('Game is being recorded'),
+        _(
+          'Check if the game is being recorded for the debugger (with the "Record" button or the "Start recording the game" action).'
+        ),
+        _('Game is being recorded'),
+        '',
+        'res/actions/bug32.png',
+        'res/actions/bug32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
+      .setFunctionName('gdjs.evtTools.debuggerTools.isProfiling');
+
+    extension
+      .addExpression(
+        'ProfilingDuration',
+        _('Duration of the recording'),
+        _(
+          'The duration of the recording in progress, in seconds (0 when the game is not recorded).'
+        ),
+        '',
+        'res/actions/bug32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
+      .setFunctionName('gdjs.evtTools.debuggerTools.getProfilingDuration');
 
     extension
       .addAction(

@@ -3,7 +3,10 @@ import {
   ProfilerRecordingStore,
   type ProfilerFrame,
 } from './ProfilerRecordingStore';
-import { extendSamplesToStarts } from './ProfilerRecordingAggregation';
+import {
+  extendSamplesToStarts,
+  getTimelineMarkers,
+} from './ProfilerRecordingAggregation';
 
 const makeFrame = (
   frameIndex: number,
@@ -21,6 +24,55 @@ const makeFrame = (
 });
 
 describe('ProfilerRecordingStore', () => {
+  it('keeps the name and the markers given by the game', () => {
+    const store = new ProfilerRecordingStore();
+    store.onStarted(1, {
+      recordingId: 1,
+      startedAtGameTimeMs: 0,
+      label: 'Boss fight',
+    });
+    store.onChunk(1, {
+      recordingId: 1,
+      chunkIndex: 0,
+      newNames: [{ id: 0, name: 'events' }],
+      frames: [makeFrame(0, 0, [0])],
+      samples: [],
+      markers: [{ atGameTimeMs: 5, label: 'Wave 1' }],
+    });
+    // A chunk without markers (or from an older game engine).
+    store.onChunk(1, {
+      recordingId: 1,
+      chunkIndex: 1,
+      newNames: [],
+      frames: [makeFrame(1, 16, [0])],
+      samples: [],
+    });
+
+    // Started again without a name: the previous one is kept.
+    store.onStarted(1, { recordingId: 2, startedAtGameTimeMs: 1000 });
+    store.onChunk(1, {
+      recordingId: 2,
+      chunkIndex: 0,
+      newNames: [],
+      frames: [],
+      samples: [],
+      markers: [{ atGameTimeMs: 1005, label: 'Wave 2' }],
+    });
+
+    const recording = store.getRecording(1);
+    if (!recording) throw new Error('No recording kept.');
+    expect(recording.label).toBe('Boss fight');
+    expect(recording.markers).toEqual([
+      { atGameTimeMs: 5, label: 'Wave 1' },
+      { atGameTimeMs: 1005, label: 'Wave 2' },
+    ]);
+    expect(
+      getTimelineMarkers(recording)
+        .filter(marker => marker.kind === 'game')
+        .map(marker => marker.label)
+    ).toEqual(['Wave 1', 'Wave 2']);
+  });
+
   it('appends a recording started again to the one kept', () => {
     const store = new ProfilerRecordingStore();
     store.onStarted(1, { recordingId: 1, startedAtGameTimeMs: 0 });

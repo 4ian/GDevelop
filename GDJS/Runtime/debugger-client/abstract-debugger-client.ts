@@ -1351,10 +1351,19 @@ namespace gdjs {
     /**
      * Start recording the game, and send what is recorded to the editor: the
      * chunks while it records, the averages and the end when it stops.
+     * @param options The options of the recording (see
+     * `RuntimeGame.startProfiler`).
      * @returns false if a recording was already running (it is kept).
      */
-    startProfilerAndReport(): boolean {
+    startProfilerAndReport(options?: {
+      maxDurationMs?: float;
+      label?: string;
+      measureRendering?: boolean;
+    }): boolean {
       return this._runtimegame.startProfiler({
+        maxDurationMs: options && options.maxDurationMs,
+        label: options && options.label,
+        measureRendering: options && options.measureRendering,
         onChunk: (chunk) => {
           this.sendProfilerChunk(chunk);
         },
@@ -1379,6 +1388,7 @@ namespace gdjs {
           payload: {
             recordingId: profiler.getRecordingId(),
             startedAtGameTimeMs: profiler.getRecordingStartGameTimeMs(),
+            label: profiler.getLabel(),
           },
         })
       );

@@ -219,11 +219,12 @@ export const getFrameStats = (frames: Array<ProfilerFrame>): FrameStats => {
 /** Where the scene running changed, from the frames themselves. */
 /**
  * A moment marked with a vertical line on the timelines: a scene starting
- * (labelled with its name) or a recording starting.
+ * (labelled with its name), a recording starting, or a moment marked by the
+ * game (labelled with its text).
  */
 export type TimelineMarker = {|
   atMs: number,
-  kind: 'scene' | 'recordingStart',
+  kind: 'scene' | 'recordingStart' | 'game',
   label: string,
 |};
 
@@ -254,7 +255,10 @@ export const extendSamplesToStarts = (
   return extendedSamples;
 };
 
-/** The markers of a recording: its scene changes and its starts, in time order. */
+/**
+ * The markers of a recording: its scene changes, its starts and the moments
+ * marked by the game, in time order.
+ */
 export const getTimelineMarkers = (
   recording: ProfilerRecording
 ): Array<TimelineMarker> =>
@@ -268,6 +272,11 @@ export const getTimelineMarkers = (
       atMs,
       kind: 'recordingStart',
       label: '',
+    })),
+    ...recording.markers.map(marker => ({
+      atMs: marker.atGameTimeMs,
+      kind: 'game',
+      label: marker.label,
     })),
   ].sort((markerA, markerB) => markerA.atMs - markerB.atMs);
 

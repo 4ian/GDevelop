@@ -228,6 +228,65 @@ describe('gdjs.Profiler', () => {
     expect(lastChunk.frames.length).to.be(2);
   });
 
+  it('stops by itself after the duration asked by the game, without reporting it as the cap', () => {
+    const { profiler, chunks, advance } = makeProfilerWithFakeClock();
+    let limitReachedCount = 0;
+    profiler.setOnRecordingCapReached(() => limitReachedCount++);
+    profiler.setMaxRecordingDurationMs(1000);
+
+    profiler.beginFrame();
+    advance(100);
+    profiler.endFrame();
+    expect(limitReachedCount).to.be(0);
+
+    profiler.beginFrame();
+    advance(950);
+    profiler.endFrame();
+
+    expect(limitReachedCount).to.be(1);
+    expect(profiler.isStoppedByCap()).to.be(false);
+    const lastChunk = chunks[chunks.length - 1];
+    expect(lastChunk.stoppedByCap).to.be(undefined);
+    expect(lastChunk.frames.length).to.be(2);
+  });
+
+  it('never records longer than the maximum duration, whatever is asked', () => {
+    const { profiler } = makeProfilerWithFakeClock();
+    profiler.setMaxRecordingDurationMs(
+      gdjs.PROFILER_MAX_RECORDING_DURATION_MS * 10
+    );
+    expect(profiler._maxRecordingDurationMs).to.be(
+      gdjs.PROFILER_MAX_RECORDING_DURATION_MS
+    );
+    profiler.setMaxRecordingDurationMs(0);
+    expect(profiler._maxRecordingDurationMs).to.be(
+      gdjs.PROFILER_MAX_RECORDING_DURATION_MS
+    );
+  });
+
+  it('sends the markers added by the game in the next chunk', () => {
+    const { profiler, chunks, advance } = makeProfilerWithFakeClock();
+    profiler.setLabel('Boss fight');
+    expect(profiler.getLabel()).to.be('Boss fight');
+
+    profiler.beginFrame();
+    advance(5);
+    profiler.addMarker('Wave 1');
+    profiler.endFrame();
+    profiler.flushChunk();
+
+    expect(chunks.length).to.be(1);
+    expect(chunks[0].markers).to.eql([{ atGameTimeMs: 5, label: 'Wave 1' }]);
+
+    // A marker alone is enough to send a chunk, and is sent only once.
+    profiler.addMarker('Wave 2');
+    profiler.flushChunk();
+    expect(chunks.length).to.be(2);
+    expect(chunks[1].markers).to.eql([{ atGameTimeMs: 5, label: 'Wave 2' }]);
+    profiler.flushChunk();
+    expect(chunks.length).to.be(2);
+  });
+
   it('is owned by the game and survives scene changes', () => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);

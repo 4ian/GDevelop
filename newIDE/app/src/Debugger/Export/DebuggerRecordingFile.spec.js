@@ -72,6 +72,9 @@ describe('DebuggerRecordingFile', () => {
     expect(readRecording.frames).toEqual(recording.frames);
     expect(readRecording.samples).toEqual(recording.samples);
     expect(readRecording.names).toEqual(recording.names);
+    expect(readRecording.markers).toEqual(recording.markers);
+    expect(readRecording.markers).toHaveLength(1);
+    expect(readRecording.label).toBe('Level 1');
     // Nothing is ever appended to an imported recording.
     expect(readRecording.status).toBe('stopped');
     expect(readRecording.nextChunkIndex).toBe(0);

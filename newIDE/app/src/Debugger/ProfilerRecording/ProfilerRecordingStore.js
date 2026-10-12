@@ -41,18 +41,29 @@ export type ProfilerPerformanceSample = {|
   textureGarbageCollectionsCount?: ?number,
 |};
 
+/** A moment marked by the game with the "Add a marker to the recording" action. */
+export type ProfilerMarker = {|
+  /** Milliseconds since the game started. */
+  atGameTimeMs: number,
+  label: string,
+|};
+
 export type ProfilerChunkPayload = {|
   recordingId: number,
   chunkIndex: number,
   newNames: Array<{| id: number, name: string |}>,
   frames: Array<ProfilerFrame>,
   samples: Array<ProfilerPerformanceSample>,
+  /** Absent when no marker was added (and from older game engines). */
+  markers?: Array<ProfilerMarker>,
   stoppedByCap?: boolean,
 |};
 
 export type ProfilerStartedPayload = {|
   recordingId: number,
   startedAtGameTimeMs: number,
+  /** The name given by the game (absent from older game engines). */
+  label?: string,
 |};
 
 export type ProfilerStoppedPayload = {|
@@ -77,6 +88,14 @@ export type ProfilerRecording = {|
   names: Array<string>,
   frames: Array<ProfilerFrame>,
   samples: Array<ProfilerPerformanceSample>,
+  /** The moments marked by the game, in time order. */
+  markers: Array<ProfilerMarker>,
+  /**
+   * The name given by the game when it started recording, or an empty
+   * string. A recording started again keeps the previous name unless the
+   * game gives a new one.
+   */
+  label: string,
   /** The averages sent when the recording stopped (kept for the summary stats). */
   legacyOutput: ?ProfilerOutput,
   nextChunkIndex: number,
@@ -115,6 +134,7 @@ export class ProfilerRecordingStore {
     // recording stays empty and only `legacyOutput` is shown.
     const recordingId = payload ? payload.recordingId : 0;
     const startedAtGameTimeMs = payload ? payload.startedAtGameTimeMs : 0;
+    const label = (payload && payload.label) || '';
     const existingRecording = this._recordings.get(debuggerId);
     if (existingRecording) {
       existingRecording.recordingId = recordingId;
@@ -125,6 +145,7 @@ export class ProfilerRecordingStore {
       existingRecording.nextChunkIndex = 0;
       existingRecording.nameIdOffset = existingRecording.names.length;
       existingRecording.startsAtGameTimeMs.push(startedAtGameTimeMs);
+      if (label) existingRecording.label = label;
     } else {
       this._recordings.set(debuggerId, {
         recordingId,
@@ -136,6 +157,8 @@ export class ProfilerRecordingStore {
         names: [],
         frames: [],
         samples: [],
+        markers: [],
+        label,
         legacyOutput: null,
         nextChunkIndex: 0,
         nameIdOffset: 0,
@@ -175,6 +198,11 @@ export class ProfilerRecordingStore {
     }
     for (const sample of chunk.samples) {
       recording.samples.push(sample);
+    }
+    if (chunk.markers) {
+      for (const marker of chunk.markers) {
+        recording.markers.push(marker);
+      }
     }
     if (chunk.stoppedByCap) {
       recording.stoppedByCap = true;

@@ -64,6 +64,8 @@ const toStoredRecording = (recording: ProfilerRecording) => ({
   names: recording.names,
   frames: recording.frames,
   samples: recording.samples,
+  markers: recording.markers,
+  label: recording.label,
   legacyOutput: recording.legacyOutput,
   selectedRange: recording.selectedRange,
 });
@@ -230,6 +232,17 @@ export const getRecordingFromFile = (
     samples: Array.isArray(storedRecording.samples)
       ? storedRecording.samples
       : [],
+    // Absent from the files written before the game could mark its recording.
+    markers: Array.isArray(storedRecording.markers)
+      ? storedRecording.markers.filter(
+          marker =>
+            marker &&
+            typeof marker.atGameTimeMs === 'number' &&
+            typeof marker.label === 'string'
+        )
+      : [],
+    label:
+      typeof storedRecording.label === 'string' ? storedRecording.label : '',
     legacyOutput: storedRecording.legacyOutput || null,
     nextChunkIndex: 0,
     nameIdOffset: 0,

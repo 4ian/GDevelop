@@ -140,6 +140,17 @@ namespace gdjs {
   >;
 
   /**
+   * A moment marked by the game while recording (see `Profiler.addMarker`),
+   * shown as a labelled line on the timelines of the debugger.
+   * @category Debugging > Profiler
+   */
+  export type ProfilerMarker = {
+    /** Milliseconds since the game started. */
+    atGameTimeMs: float;
+    label: string;
+  };
+
+  /**
    * A batch of recorded frames, sent to the editor while the recording is
    * running so the runtime never holds more than one pending chunk.
    * @category Debugging > Profiler
@@ -151,6 +162,8 @@ namespace gdjs {
     newNames: Array<{ id: integer; name: string }>;
     frames: Array<ProfilerFrameSpans>;
     samples: Array<ProfilerPerformanceSample>;
+    /** The markers added since the previous chunk (absent when none). */
+    markers?: Array<ProfilerMarker>;
     /** True when the recording reached its maximum duration and stopped. */
     stoppedByCap?: boolean;
   };
@@ -235,6 +248,18 @@ namespace gdjs {
     _isStoppedByCap: boolean = false;
 
     /**
+     * The duration after which the recording stops by itself: the maximum
+     * duration, or a shorter one asked by the game (see
+     * `setMaxRecordingDurationMs`).
+     */
+    _maxRecordingDurationMs: float = PROFILER_MAX_RECORDING_DURATION_MS;
+
+    /** A name given by the game to the recording, or an empty string. */
+    _label: string = '';
+
+    _pendingMarkers: Array<ProfilerMarker> = [];
+
+    /**
      * The renderer cache keys already seen, or null until the first measured
      * frame (whose programs are start-up cost, not part of the run).
      */
@@ -309,6 +334,39 @@ namespace gdjs {
       return this._getTimeNow() - this._recordingStartTime;
     }
 
+    /**
+     * Stop the recording by itself after this duration (capped to
+     * `PROFILER_MAX_RECORDING_DURATION_MS`). 0 or less keeps the maximum.
+     * Reaching a duration asked this way is not reported as `stoppedByCap`:
+     * the recording ended as it was asked to.
+     */
+    setMaxRecordingDurationMs(durationMs: float): void {
+      this._maxRecordingDurationMs =
+        durationMs > 0
+          ? Math.min(durationMs, PROFILER_MAX_RECORDING_DURATION_MS)
+          : PROFILER_MAX_RECORDING_DURATION_MS;
+    }
+
+    /** Name the recording, to find it in the debugger. */
+    setLabel(label: string): void {
+      this._label = label;
+    }
+
+    getLabel(): string {
+      return this._label;
+    }
+
+    /**
+     * Mark the current moment of the recording with a label, shown as a line
+     * on the timelines of the debugger.
+     */
+    addMarker(label: string): void {
+      this._pendingMarkers.push({
+        atGameTimeMs: Profiler._roundMs(this._getGameTimeMs()),
+        label,
+      });
+    }
+
     /** True when the recording stopped because it reached its maximum duration. */
     isStoppedByCap(): boolean {
       return this._isStoppedByCap;
@@ -340,7 +398,10 @@ namespace gdjs {
       this._sample2DDrawCallsFramesCount++;
     }
 
-    /** Called once when the recording reaches its maximum duration. */
+    /**
+     * Called once when the recording reaches its maximum duration (or the
+     * one given to `setMaxRecordingDurationMs`).
+     */
     setOnRecordingCapReached(onRecordingCapReached: (() => void) | null): void {
       this._onRecordingCapReached = onRecordingCapReached;
     }
@@ -466,12 +527,15 @@ namespace gdjs {
       }
 
       const now = this._getTimeNow();
-      if (
-        now - this._recordingStartTime >=
-        PROFILER_MAX_RECORDING_DURATION_MS
-      ) {
-        this._isStoppedByCap = true;
-        this._flushChunk(true);
+      if (now - this._recordingStartTime >= this._maxRecordingDurationMs) {
+        if (
+          this._maxRecordingDurationMs >= PROFILER_MAX_RECORDING_DURATION_MS
+        ) {
+          this._isStoppedByCap = true;
+          this._flushChunk(true);
+        } else {
+          this._flushChunk(false);
+        }
         if (this._onRecordingCapReached) {
           this._onRecordingCapReached();
         }
@@ -498,7 +562,8 @@ namespace gdjs {
       if (
         !stoppedByCap &&
         this._pendingFrames.length === 0 &&
-        this._pendingNewNames.length === 0
+        this._pendingNewNames.length === 0 &&
+        this._pendingMarkers.length === 0
       ) {
         this._lastChunkFlushTime = now;
         return;
@@ -511,6 +576,10 @@ namespace gdjs {
         frames: this._pendingFrames,
         samples: [this._takeSample(now)],
       };
+      if (this._pendingMarkers.length) {
+        chunk.markers = this._pendingMarkers;
+        this._pendingMarkers = [];
+      }
       if (stoppedByCap) {
         chunk.stoppedByCap = true;
       }

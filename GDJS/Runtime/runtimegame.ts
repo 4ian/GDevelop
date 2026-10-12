@@ -1746,11 +1746,19 @@ namespace gdjs {
      * events, for every scene until `stopProfiler` is called (or the
      * recording reaches its maximum duration).
      *
+     * @param options.maxDurationMs Stop the recording by itself after this
+     * duration (0 or absent: the maximum duration).
+     * @param options.label A name for the recording, to find it in the debugger.
+     * @param options.measureRendering False to leave out the draw calls and
+     * the filters, whose measure costs the game something (true by default).
      * @returns false if a profiler was already running.
      */
     startProfiler(options: {
       onChunk?: (chunk: gdjs.ProfilerChunk) => void;
       onStopped?: (stoppedProfiler: gdjs.Profiler) => void;
+      maxDurationMs?: float;
+      label?: string;
+      measureRendering?: boolean;
     }): boolean {
       this._throwIfDisposed();
       if (this._profiler) {
@@ -1758,6 +1766,8 @@ namespace gdjs {
       }
       const profiler = new gdjs.Profiler(() => this.getGameTimeMs());
       profiler.setOnChunk(options.onChunk || null);
+      profiler.setMaxRecordingDurationMs(options.maxDurationMs || 0);
+      profiler.setLabel(options.label || '');
       profiler.setSampleProvider(() => this._samplePerformanceCounters());
       profiler.setOnRecordingCapReached(() => {
         if (this._profiler === profiler) {
@@ -1772,9 +1782,11 @@ namespace gdjs {
       this._onProfilerStopped = options.onStopped || null;
       // The WebGL context and the filter system are wrapped only while
       // recording: these are the measures of the panel that cost the game
-      // something.
-      this._renderer.startCountingDrawCalls();
-      this._renderer.startMeasuringFilters();
+      // something, which is why they can be left out.
+      if (options.measureRendering !== false) {
+        this._renderer.startCountingDrawCalls();
+        this._renderer.startMeasuringFilters();
+      }
       return true;
     }
 

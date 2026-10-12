@@ -284,11 +284,13 @@ const PerformanceChart = ({
                     )}
                     {markers.map(marker => (
                       <ReferenceLine
-                        key={`${marker.kind}-${marker.atMs}`}
+                        key={`${marker.kind}-${marker.atMs}-${marker.label}`}
                         x={marker.atMs}
                         stroke={
                           marker.kind === 'recordingStart'
                             ? gdevelopTheme.chart.textColor
+                            : marker.kind === 'game'
+                            ? gdevelopTheme.statusIndicator.warning
                             : gdevelopTheme.chart.gridColor
                         }
                         strokeDasharray={
@@ -301,13 +303,19 @@ const PerformanceChart = ({
                                   marker.kind === 'recordingStart'
                                     ? i18n._(t`Record start`)
                                     : marker.label,
-                                fill: gdevelopTheme.chart.textColor,
+                                fill:
+                                  marker.kind === 'game'
+                                    ? gdevelopTheme.statusIndicator.warning
+                                    : gdevelopTheme.chart.textColor,
                                 fontSize: 10,
                                 // Scene names at the top, record starts at
                                 // the bottom: they often share the same time.
+                                // The markers of the game are in between.
                                 position:
                                   marker.kind === 'recordingStart'
                                     ? 'insideBottomLeft'
+                                    : marker.kind === 'game'
+                                    ? 'insideLeft'
                                     : 'insideTopLeft',
                               }
                             : undefined

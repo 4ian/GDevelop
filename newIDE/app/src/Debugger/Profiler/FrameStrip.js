@@ -75,6 +75,7 @@ const FrameStrip = ({
       const { width, height } = size;
       const backgroundColor = gdevelopTheme.palette.alternateCanvasColor;
       const textColor = gdevelopTheme.text.color.secondary;
+      const gameMarkerColor = gdevelopTheme.statusIndicator.warning;
       const primaryColor = gdevelopTheme.chart.dataColor1;
       const errorColor = gdevelopTheme.statusIndicator.error;
 
@@ -125,13 +126,16 @@ const FrameStrip = ({
       context.stroke();
       context.setLineDash([]);
 
-      // Scene changes (labelled at the top) and recording starts (dashed,
-      // labelled at the bottom: they often share the same time).
+      // Scene changes (labelled at the top), markers of the game (labelled
+      // below the scene names, in their own color) and recording starts
+      // (dashed, labelled at the bottom: they often share the same time).
       context.font = `10px ${gdevelopTheme.chart.fontFamily}`;
-      context.fillStyle = textColor;
-      context.strokeStyle = textColor;
       for (const marker of markers) {
         const isRecordingStart = marker.kind === 'recordingStart';
+        const isGameMarker = marker.kind === 'game';
+        const color = isGameMarker ? gameMarkerColor : textColor;
+        context.fillStyle = color;
+        context.strokeStyle = color;
         const x = Math.floor(timeToX(marker.atMs)) + 0.5;
         context.setLineDash(isRecordingStart ? [2, 3] : []);
         context.beginPath();
@@ -142,7 +146,7 @@ const FrameStrip = ({
         context.fillText(
           isRecordingStart ? recordingStartLabel : marker.label,
           x + 3,
-          isRecordingStart ? height - 1 : 1
+          isRecordingStart ? height - 1 : isGameMarker ? 12 : 1
         );
       }
       context.setLineDash([]);

@@ -45,7 +45,11 @@ export const makeFakeRecordingStore = (
   const random = makeRandom(42);
   const store = new ProfilerRecordingStore();
   const startedAtGameTimeMs = 2500;
-  store.onStarted(debuggerId, { recordingId: 1, startedAtGameTimeMs });
+  store.onStarted(debuggerId, {
+    recordingId: 1,
+    startedAtGameTimeMs,
+    label: 'Level 1',
+  });
 
   const frames: Array<ProfilerFrame> = [];
   const samples: Array<ProfilerPerformanceSample> = [];
@@ -154,6 +158,13 @@ export const makeFakeRecordingStore = (
     newNames: sectionNames.map((name, id) => ({ id, name })),
     frames,
     samples,
+    // As added by the "Add a marker to the recording" action.
+    markers: [
+      {
+        atGameTimeMs: Math.round(startedAtGameTimeMs + durationMs * 0.6),
+        label: 'Enemy wave',
+      },
+    ],
   });
   store.onStopped(debuggerId, {
     recordingId: 1,

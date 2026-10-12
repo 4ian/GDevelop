@@ -24,17 +24,40 @@ namespace gdjs {
       /**
        * Start recording the game (the profiler, performance and resources
        * panels of the debugger), as the "Record" button of the debugger does.
-       * Does nothing if a recording is already running.
        * @param instanceContainer - The current container.
+       * @param label - A name for the recording, to find it in the debugger.
+       * @param durationInSeconds - Stop the recording by itself after this
+       * duration (0: only when stopped, or at the maximum duration).
+       * @param measureRendering - false to leave out the draw calls and the
+       * filters, whose measure costs the game something.
+       * @param ifAlreadyRecording - "Keep" to leave a running recording as it
+       * is, "Restart" to stop it and start a new one with these options.
        */
       export const startProfiling = function (
-        instanceContainer: gdjs.RuntimeInstanceContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        label?: string,
+        durationInSeconds?: float,
+        measureRendering?: boolean,
+        ifAlreadyRecording?: string
       ) {
         const runtimeGame = instanceContainer.getGame();
         const debuggerClient = runtimeGame.getDebuggerClient();
         if (!debuggerClient) return;
 
-        const wasStarted = debuggerClient.startProfilerAndReport();
+        if (runtimeGame.getProfiler()) {
+          if (ifAlreadyRecording !== 'Restart') return;
+          runtimeGame.stopProfiler();
+        }
+
+        const wasStarted = debuggerClient.startProfilerAndReport({
+          label: label || '',
+          maxDurationMs:
+            durationInSeconds && durationInSeconds > 0
+              ? durationInSeconds * 1000
+              : 0,
+          // Absent for the events written before the option existed.
+          measureRendering: measureRendering !== false,
+        });
         const profiler = runtimeGame.getProfiler();
         if (wasStarted && profiler) {
           debuggerClient.sendProfilerStarted(profiler);
@@ -50,6 +73,42 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         instanceContainer.getGame().stopProfiler();
+      };
+
+      /**
+       * Mark the current moment of the recording, shown as a labelled line on
+       * the timelines of the debugger. Does nothing when not recording.
+       * @param instanceContainer - The current container.
+       * @param label - The text of the marker.
+       */
+      export const addProfilingMarker = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        label: string
+      ) {
+        const profiler = instanceContainer.getGame().getProfiler();
+        if (profiler) profiler.addMarker(label);
+      };
+
+      /**
+       * Check if the game is being recorded.
+       * @param instanceContainer - The current container.
+       */
+      export const isProfiling = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): boolean {
+        return !!instanceContainer.getGame().getProfiler();
+      };
+
+      /**
+       * The duration of the recording in progress, in seconds (0 when not
+       * recording).
+       * @param instanceContainer - The current container.
+       */
+      export const getProfilingDuration = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): float {
+        const profiler = instanceContainer.getGame().getProfiler();
+        return profiler ? profiler.getRecordingDurationMs() / 1000 : 0;
       };
 
       /**

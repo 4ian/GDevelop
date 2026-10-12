@@ -52,6 +52,8 @@ const makeRecording = (
   names: [],
   frames: [],
   samples: [],
+  markers: [],
+  label: '',
   legacyOutput: null,
   nextChunkIndex: 0,
   nameIdOffset: 0,

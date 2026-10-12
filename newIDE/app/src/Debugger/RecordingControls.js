@@ -48,13 +48,23 @@ export const RecordingStatusChip = ({
   // Named in lower case: the identifier of the message is the sentence
   // itself, so an interpolated value must read well inside it.
   const clockDuration = formatClockDuration(durationMs);
+  // The name given by the game with the "Start recording the game" action.
+  const recordingName = recording ? recording.label : '';
 
   if (profilingInProgress) {
     return (
       <StatusChip
         tone="progress"
         loading
-        label={<Trans>Recording {clockDuration}</Trans>}
+        label={
+          recordingName ? (
+            <Trans>
+              Recording "{recordingName}" {clockDuration}
+            </Trans>
+          ) : (
+            <Trans>Recording {clockDuration}</Trans>
+          )
+        }
       />
     );
   }
@@ -66,6 +76,10 @@ export const RecordingStatusChip = ({
         label={
           recording.stoppedByCap ? (
             <Trans>Stopped after 5 min</Trans>
+          ) : recordingName ? (
+            <Trans>
+              Last recording "{recordingName}" {clockDuration}
+            </Trans>
           ) : (
             <Trans>Last recording {clockDuration}</Trans>
           )

@@ -35,6 +35,14 @@
 	<script>
 
     (function() {
+        //Check the game files were all loaded (in a preview, they can be exported
+        //again while this page is still loading them).
+        if (!gdjs.projectData) {
+            throw new Error(
+                "The game data was not loaded: some files of the game are missing or could not be read."
+            );
+        }
+
         //Initialization
         var game = new gdjs.RuntimeGame(gdjs.projectData, {}/*GDJS_ADDITIONAL_SPEC*/);
 

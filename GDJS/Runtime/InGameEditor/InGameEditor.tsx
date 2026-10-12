@@ -733,6 +733,46 @@ namespace gdjs {
       .sort((a, b) => a - b); // Ensure stable order to help comparisons.
   };
 
+  /**
+   * The fingers of a gesture moving the view don't touch the screen at the
+   * same time: a finger alone is only used by tools after this delay.
+   */
+  const singleTouchDelayForToolsInMs = 150;
+
+  /**
+   * Tells if the left mouse button, or a finger, is pressed to use a tool of
+   * an extension rather than to move the view (see
+   * `InGameEditor.isCapturedLeftMouseButtonPressed`).
+   */
+  class ToolPointer {
+    private _isMovingView = false;
+    private _touchStartTime: number | null = null;
+
+    update(inputManager: gdjs.InputManager): void {
+      const touchCount = getCurrentTouchIdentifiers(inputManager).length;
+      if (touchCount >= 2 || isSpacePressed(inputManager)) {
+        this._isMovingView = true;
+      } else if (touchCount === 0 && !inputManager.isMouseButtonPressed(0)) {
+        // The view is moved until every finger and the button are released.
+        this._isMovingView = false;
+      }
+      if (touchCount === 0) {
+        this._touchStartTime = null;
+      } else if (this._touchStartTime === null) {
+        this._touchStartTime = Date.now();
+      }
+    }
+
+    isPressed(inputManager: gdjs.InputManager): boolean {
+      return (
+        inputManager.isMouseButtonPressed(0) &&
+        !this._isMovingView &&
+        (this._touchStartTime === null ||
+          Date.now() - this._touchStartTime >= singleTouchDelayForToolsInMs)
+      );
+    }
+  }
+
   const getTouchesCentroid = (inputManager: gdjs.InputManager) => {
     const ids = getCurrentTouchIdentifiers(inputManager);
     if (ids.length === 0) return { x: 0, y: 0 };
@@ -1213,11 +1253,14 @@ namespace gdjs {
     private _inGameEditorSettings: InGameEditorSettings;
     private _shortcuts: InGameEditorShortcuts = new InGameEditorShortcuts();
     private _isLeftMouseButtonCaptured = false;
+    private _toolPointer = new ToolPointer();
     private _requestedExtensionToolbars = new Map<
       string,
       Array<InGameEditorToolbarItem>
     >();
     private _extensionToolbars = new Map<string, ExtensionToolbar>();
+    /** The toolbars of extensions, one under the other, below the editor toolbar. */
+    private _extensionToolbarsContainer: HTMLElement | null = null;
 
     constructor(
       game: RuntimeGame,
@@ -1960,6 +2003,17 @@ namespace gdjs {
     }
 
     /**
+     * Check if the left mouse button, or a finger, is pressed to use the tool
+     * that captured it (see `captureLeftMouseButton`). It's not while the view
+     * is moved (with Space, or with 2 or 3 fingers) until everything is
+     * released, nor during the first moments of a touch, as the other fingers
+     * of a gesture can still come.
+     */
+    isCapturedLeftMouseButtonPressed(): boolean {
+      return this._toolPointer.isPressed(this._runtimeGame.getInputManager());
+    }
+
+    /**
      * Show a toolbar for a tool of an extension, below the editor toolbar and
      * looking like it, during the next frame: call it at every frame while
      * it must be shown.
@@ -1982,7 +2036,21 @@ namespace gdjs {
           this._extensionToolbars.delete(toolbarId);
         }
       }
-      if (parent) {
+      if (!parent || this._requestedExtensionToolbars.size === 0) {
+        if (this._extensionToolbarsContainer) {
+          this._extensionToolbarsContainer.remove();
+        }
+      } else {
+        let toolbarsContainer = this._extensionToolbarsContainer;
+        if (!toolbarsContainer) {
+          toolbarsContainer = document.createElement('div');
+          toolbarsContainer.className =
+            'InGameEditor-Extension-Toolbars-Container';
+          this._extensionToolbarsContainer = toolbarsContainer;
+        }
+        if (toolbarsContainer.parentElement !== parent) {
+          parent.appendChild(toolbarsContainer);
+        }
         let toolbarIndex = 0;
         for (const [toolbarId, items] of this._requestedExtensionToolbars) {
           let toolbar = this._extensionToolbars.get(toolbarId);
@@ -1998,7 +2066,7 @@ namespace gdjs {
             );
             this._extensionToolbars.set(toolbarId, toolbar);
           }
-          toolbar.render(parent, items, toolbarIndex++);
+          toolbar.render(toolbarsContainer, items, toolbarIndex++);
         }
       }
       this._requestedExtensionToolbars.clear();
@@ -2063,6 +2131,23 @@ namespace gdjs {
 
     setVisibleScreenArea(visibleScreenArea: ScreenArea) {
       this._visibleScreenArea = visibleScreenArea;
+
+      // Toolbars are centered in this area.
+      if (typeof document === 'undefined') return;
+      const rootElement = document.documentElement;
+      if (!rootElement) return;
+      rootElement.style.setProperty(
+        '--in-game-editor-visible-area-left',
+        visibleScreenArea.minX * 100 + '%'
+      );
+      rootElement.style.setProperty(
+        '--in-game-editor-visible-area-right',
+        (1 - visibleScreenArea.maxX) * 100 + '%'
+      );
+      rootElement.style.setProperty(
+        '--in-game-editor-visible-area-top',
+        visibleScreenArea.minY * 100 + '%'
+      );
     }
 
     private _focusOnSelection() {
@@ -4549,6 +4634,7 @@ namespace gdjs {
           !!this._selectionControls.threeTransformControls.axis;
       }
 
+      this._toolPointer.update(inputManager);
       this._handlePointerLock();
       this._handleTransformControlsMode();
       this._handleCameraMovement();
@@ -4650,25 +4736,49 @@ namespace gdjs {
       styleElement.textContent = `
         .InGameEditor-Toolbar-Centering-Container {
           position: fixed;
-          left: 0;
-          right: 0;
+          left: var(--in-game-editor-visible-area-left, 0%);
+          right: var(--in-game-editor-visible-area-right, 0%);
+          top: var(--in-game-editor-visible-area-top, 0%);
           display: flex;
           flex-direction: row;
           align-items: center;
           justify-content: center;
+          pointer-events: none;
 
           transition: transform 0.1s ease-in-out;
+        }
+        .InGameEditor-Extension-Toolbars-Container {
+          position: fixed;
+          left: var(--in-game-editor-visible-area-left, 0%);
+          right: var(--in-game-editor-visible-area-right, 0%);
+          top: calc(var(--in-game-editor-visible-area-top, 0%) + 36px);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          pointer-events: none;
         }
         .InGameEditor-Toolbar-Container {
           position: relative;
           pointer-events: all;
           display: flex;
           flex-direction: row;
+          flex-wrap: wrap;
           align-items: center;
           justify-content: center;
+          max-width: calc(100% - 16px);
+          box-sizing: border-box;
           top: 2px;
           border-radius: 3px;
           padding: 4px;
+          gap: 6px;
+        }
+        .InGameEditor-Toolbar-Group {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
           gap: 6px;
         }
         .InGameEditor-Toolbar-Container-Background {
@@ -4954,10 +5064,11 @@ namespace gdjs {
         this.remove();
         this._itemsLayout = itemsLayout;
         container = this._createContainer(items);
-        parent.appendChild(container);
         this._container = container;
       }
-      container.style.top = 36 * (toolbarIndex + 1) + 'px';
+      if (parent.children[toolbarIndex] !== container) {
+        parent.insertBefore(container, parent.children[toolbarIndex] || null);
+      }
 
       items.forEach((item, index) => {
         const element = this._itemElements[index];
@@ -4994,12 +5105,28 @@ namespace gdjs {
       this._itemElements = items.map((item, index) =>
         this._createItemElement(item, index)
       );
+      // Items between dividers stay together when the toolbar is too large
+      // for one row.
+      const groupsAndDividers: Array<HTMLElement> = [];
+      let group: HTMLElement | null = null;
+      items.forEach((item, index) => {
+        const element = this._itemElements[index];
+        if (item.type === 'divider') {
+          groupsAndDividers.push(element);
+          group = null;
+          return;
+        }
+        if (!group) {
+          group = document.createElement('div');
+          group.className = 'InGameEditor-Toolbar-Group';
+          groupsAndDividers.push(group);
+        }
+        group.appendChild(element);
+      });
       return (
-        <div class="InGameEditor-Toolbar-Centering-Container">
-          <div class="InGameEditor-Toolbar-Container">
-            <div class="InGameEditor-Toolbar-Container-Background" />
-            {this._itemElements}
-          </div>
+        <div class="InGameEditor-Toolbar-Container">
+          <div class="InGameEditor-Toolbar-Container-Background" />
+          {groupsAndDividers}
         </div>
       );
     }

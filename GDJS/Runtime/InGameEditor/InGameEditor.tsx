@@ -3224,6 +3224,11 @@ namespace gdjs {
       this._selectionControls.threeTransformControls
         .getHelper()
         .removeFromParent();
+      // Detaching is not enough: the controls keep their pointer event listeners
+      // on the canvas until disposed. Without this, every removed controls would
+      // keep handling (and raycasting on) all the pointer events, making the
+      // editor slower and slower and interfering with the new controls.
+      this._selectionControls.threeTransformControls.dispose();
       this._selectionControls.dummyThreeObject.removeFromParent();
       this._editorGrid.setVisible(false);
       this._selectionControls = null;
@@ -3915,7 +3920,17 @@ namespace gdjs {
           }
         });
       this._updateInstances(instances);
-      this._forceUpdateSelectionControls();
+      // Don't recreate the selection controls while they are being dragged: the
+      // editor can send updated instances at the very moment a drag starts (for
+      // example, a property field committing its value when it loses focus
+      // because the user clicked on the gizmo), and recreating the controls
+      // would cancel the drag.
+      if (
+        !this._selectionControls ||
+        !this._selectionControls.threeTransformControls.dragging
+      ) {
+        this._forceUpdateSelectionControls();
+      }
     }
 
     addInstances(instances: Array<InstanceData>) {

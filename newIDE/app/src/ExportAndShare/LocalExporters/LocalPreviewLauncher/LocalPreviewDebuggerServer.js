@@ -248,14 +248,17 @@ class LocalPreviewDebuggerServer {
       message: JSON.stringify(message),
     });
   }
-  sendMessageWithResponse(message: Object): Promise<Object> {
+  sendMessageWithResponse(
+    message: Object,
+    options?: {| timeoutMs?: number |}
+  ): Promise<Object> {
     const messageId = nextMessageWithResponseId;
     nextMessageWithResponseId++;
     for (const id of getExistingDebuggerIds()) {
       this.sendMessage(id, { ...message, messageId });
     }
 
-    const timeout = 1000;
+    const timeout = (options && options.timeoutMs) || 1000;
     const promise = new Promise<Object>((resolve, reject) => {
       responseCallbacks.set(messageId, resolve);
       setTimeout(() => {

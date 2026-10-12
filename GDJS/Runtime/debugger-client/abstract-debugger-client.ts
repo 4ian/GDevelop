@@ -569,6 +569,13 @@ namespace gdjs {
           if (inGameEditor) {
             this.sendSelectionAABB(data.messageId);
           }
+        } else if (data.command === 'raycast') {
+          if (inGameEditor) {
+            // Rays must hit the instances as the editor last sent them.
+            this._hotReloader.onceIdle(() =>
+              this.sendRaycastResult(data.messageId, data.payload)
+            );
+          }
         } else if (data.command === 'gameplayTest.run') {
           if (gdjs.gameplayTests) {
             gdjs.gameplayTests
@@ -1163,6 +1170,27 @@ namespace gdjs {
           command: 'gameplayTest.result',
           messageId,
           payload: result,
+        })
+      );
+    }
+
+    /**
+     * Send the instances hit by rays in the scene shown by the in-game editor.
+     */
+    sendRaycastResult(
+      messageId: number,
+      request: gdjs.InGameEditorRaycastRequest
+    ): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'raycastResult',
+          editorId: inGameEditor.getEditorId(),
+          messageId,
+          payload: inGameEditor.raycast(request),
         })
       );
     }

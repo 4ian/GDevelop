@@ -38,7 +38,9 @@ namespace gdjs {
       ch: 10,
       walkableSlopeAngle: 50,
       walkableHeight: 15,
-      detailSampleMaxError: 50,
+      // In cell depths: the navmesh height is at most 1 cell away from the
+      // floors (for characters on hills).
+      detailSampleMaxError: 1,
       walkableClimb: 2,
       walkableRadius: 1,
     };
@@ -64,7 +66,6 @@ namespace gdjs {
       }
       this.cellSize = Math.max(0, sharedData.cellSize) || 10;
       this.cellDepth = sharedData.cellDepth;
-      this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;
       this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
       this.stairHeightMax = sharedData.stairHeightMax;
       this.walkableDepth = sharedData.walkableDepth;
@@ -126,7 +127,12 @@ namespace gdjs {
       const indices: Array<integer> = [];
       for (const obstacle of this.obstacles) {
         const object = obstacle.owner;
-        if (gdjs.Base3DHandler.is3D(object)) {
+        const firstObstacleIndex = indices.length;
+        // Surfaces are in 3D: they are ignored by 2D navigation meshes.
+        const surface = this.is3D ? object.getSurface() : null;
+        if (surface && gdjs.Base3DHandler.is3D(object)) {
+          this.addSurfaceFor(object, surface, positions, indices);
+        } else if (gdjs.Base3DHandler.is3D(object)) {
           if (isModel3D(object) && obstacle._shape === 'Mesh') {
             this.addMeshFor(object, obstacle, positions, indices);
           } else {
@@ -134,6 +140,9 @@ namespace gdjs {
           }
         } else if (!this.is3D) {
           this.addPolygonsFor(object, positions, indices);
+        }
+        if (obstacle._isObstacleOnly) {
+          this.makeTrianglesNotWalkable(positions, indices, firstObstacleIndex);
         }
       }
       if (!this.is3D) {
@@ -373,6 +382,148 @@ namespace gdjs {
       for (const vertexIndex of cubeIndices) {
         indices.push(vertexIndex + indicesOffset);
       }
+    }
+
+    /**
+     * Recast only walks on triangles facing up: flipped to face down, they
+     * still block characters but can't be walked on.
+     *
+     * Surfaces less than a step (`walkableClimb`) above a walkable floor are
+     * still merged with it by Recast: they stay walkable. Excluding them
+     * would need to mark their volume as not walkable during the build
+     * (`markBoxArea` in Recast, or tile cache obstacles).
+     */
+    private makeTrianglesNotWalkable(
+      positions: Array<float>,
+      indices: Array<integer>,
+      firstIndex: integer
+    ): void {
+      for (let index = firstIndex; index + 2 < indices.length; index += 3) {
+        const a = indices[index] * 3;
+        const b = indices[index + 1] * 3;
+        const c = indices[index + 2] * 3;
+        // Y of (b - a) x (c - a), Y being the top for Recast.
+        const normalY =
+          (positions[b + 2] - positions[a + 2]) *
+            (positions[c] - positions[a]) -
+          (positions[b] - positions[a]) * (positions[c + 2] - positions[a + 2]);
+        if (normalY > 0) {
+          indices[index] = indices[index + 1];
+          indices[index + 1] = a / 3;
+        }
+      }
+    }
+
+    private addSurfaceFor(
+      object: gdjs.AbstractRuntimeObject3D,
+      surface: gdjs.Surface,
+      positions: Array<float>,
+      indices: Array<integer>
+    ): void {
+      const heightField = surface.getHeightField();
+      const triangles = heightField
+        ? this.getHeightFieldTriangles(object, heightField)
+        : surface.getTriangles();
+      if (!triangles) {
+        this.addBoxFor(object, positions, indices);
+        return;
+      }
+      const point = new THREE.Vector3();
+      const euler = new THREE.Euler(
+        gdjs.toRad(object.getRotationX()),
+        gdjs.toRad(object.getRotationY()),
+        gdjs.toRad(object.getAngle()),
+        'ZYX'
+      );
+      const indicesOffset = Math.round(positions.length / 3);
+      const surfacePositions = triangles.positions;
+      for (let index = 0; index + 2 < surfacePositions.length; index += 3) {
+        // Positions are from 0 to 1 in the object box, rotated around its center.
+        point.set(
+          (surfacePositions[index] - 0.5) * object.getWidth(),
+          (surfacePositions[index + 1] - 0.5) * object.getHeight(),
+          (surfacePositions[index + 2] - 0.5) * object.getDepth()
+        );
+        point.applyEuler(euler);
+        // Y is the top for Recast
+        positions.push(
+          object.getCenterXInScene() + point.x,
+          object.getCenterZInScene() + point.z,
+          object.getCenterYInScene() + point.y
+        );
+      }
+      const surfaceIndices = triangles.indices;
+      for (let index = 0; index + 2 < surfaceIndices.length; index += 3) {
+        // Swapping Y and Z mirrors triangles: they are flipped back.
+        indices.push(
+          indicesOffset + surfaceIndices[index + 1],
+          indicesOffset + surfaceIndices[index],
+          indicesOffset + surfaceIndices[index + 2]
+        );
+      }
+    }
+
+    /**
+     * Recast samples triangles with cells of the navigation mesh: the height
+     * field is sampled with the same precision, skipping smaller details.
+     */
+    private getHeightFieldTriangles(
+      object: gdjs.AbstractRuntimeObject3D,
+      heightField: gdjs.SurfaceHeightField
+    ): gdjs.SurfaceTriangles {
+      const { columns, rows, heights } = heightField;
+      const cellSize = Math.max(
+        object.getWidth() / (columns - 1),
+        object.getHeight() / (rows - 1)
+      );
+      const step = Math.max(1, Math.floor(this.cellSize / cellSize));
+      const getSampledIndices = (count: integer) => {
+        const sampledIndices: Array<integer> = [];
+        for (let index = 0; index < count - 1; index += step) {
+          sampledIndices.push(index);
+        }
+        sampledIndices.push(count - 1);
+        return sampledIndices;
+      };
+      const sampledColumns = getSampledIndices(columns);
+      const sampledRows = getSampledIndices(rows);
+      const rowSize = sampledColumns.length;
+      const positions = new Float32Array(rowSize * sampledRows.length * 3);
+      for (let j = 0; j < sampledRows.length; j++) {
+        const row = sampledRows[j];
+        for (let i = 0; i < rowSize; i++) {
+          const column = sampledColumns[i];
+          const index = (j * rowSize + i) * 3;
+          positions[index] = column / (columns - 1);
+          positions[index + 1] = row / (rows - 1);
+          positions[index + 2] = heights[row * columns + column];
+        }
+      }
+      const cellIndices: Array<integer> = [];
+      for (let j = 0; j + 1 < sampledRows.length; j++) {
+        for (let i = 0; i + 1 < rowSize; i++) {
+          const a = j * rowSize + i;
+          const b = a + 1;
+          const c = a + rowSize;
+          const d = c + 1;
+          // Cells with a hole (NaN) are skipped.
+          if (
+            Number.isNaN(
+              positions[a * 3 + 2] +
+                positions[b * 3 + 2] +
+                positions[c * 3 + 2] +
+                positions[d * 3 + 2]
+            )
+          ) {
+            continue;
+          }
+          cellIndices.push(a, b, c, b, d, c);
+        }
+      }
+      for (let index = 2; index < positions.length; index += 3) {
+        if (Number.isNaN(positions[index])) positions[index] = 0;
+      }
+      return { positions, indices: new Uint32Array(cellIndices) };
     }
 
     private addMeshFor(
@@ -650,6 +801,9 @@ namespace gdjs {
   export class NavMeshObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
     _shape: string;
     _meshShapeResourceName: string;
+    _isObstacleOnly: boolean;
+    _oldSurface: gdjs.Surface | null = null;
+    _oldSurfaceVersion: integer = 0;
 
     _oldX: float = 0;
     _oldY: float = 0;
@@ -671,6 +825,7 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
       this._shape = behaviorData.shape;
       this._meshShapeResourceName = behaviorData.meshShapeResourceName;
+      this._isObstacleOnly = !!behaviorData.obstacleOnly;
       this._manager = NavMeshObstaclesManager.getManager(instanceContainer);
 
       //Note that we can't use getX(), getWidth()... of owner here:
@@ -684,6 +839,10 @@ namespace gdjs {
       }
       if (behaviorData.meshShapeResourceName !== undefined) {
         this._meshShapeResourceName = behaviorData.meshShapeResourceName;
+        this._manager.invalidateNavMesh();
+      }
+      if (behaviorData.obstacleOnly !== undefined) {
+        this._isObstacleOnly = !!behaviorData.obstacleOnly;
         this._manager.invalidateNavMesh();
       }
       return true;
@@ -720,6 +879,18 @@ namespace gdjs {
         newDepth = this.owner.getDepth();
         newRotationX = this.owner.getRotationX();
         newRotationY = this.owner.getRotationY();
+      }
+      const surface = this.owner.getSurface();
+      const surfaceVersion = surface ? surface.getVersion() : 0;
+      if (
+        surface !== this._oldSurface ||
+        surfaceVersion !== this._oldSurfaceVersion
+      ) {
+        this._oldSurface = surface;
+        this._oldSurfaceVersion = surfaceVersion;
+        if (this._registeredInManager) {
+          this._manager.invalidateNavMesh();
+        }
       }
       if (
         this._oldX !== newX ||

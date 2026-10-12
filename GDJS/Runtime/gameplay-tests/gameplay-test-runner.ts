@@ -1583,6 +1583,12 @@ namespace gdjs {
         const tolerance = (options && options.tolerance) || 0.5;
         const stableFrames = (options && options.stableFrames) || 20;
         const maxFrames = (options && options.maxFrames) || 300;
+        const instancesCount = this._getInstances(objectName).length;
+        if (instancesCount > 1) {
+          this._addRunWarning(
+            `stepUntilObjectIsStable("${objectName}") only waits for the first of the ${instancesCount} instances of "${objectName}": the others can still be moving. Use \`stepUntil\` with a condition on the instance read.`
+          );
+        }
         let previous: [float, float, float] | null = null;
         let stillFrames = 0;
         return await this.stepUntil(() => stillFrames >= stableFrames, {

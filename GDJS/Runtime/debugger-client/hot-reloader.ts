@@ -61,6 +61,7 @@ namespace gdjs {
       onDone: (logs: HotReloaderLog[]) => void;
       options: HotReloadOptions;
     }> = [];
+    _onIdleCallbacks: Array<() => void> = [];
 
     /**
      * @param runtimeGame - The `gdjs.RuntimeGame` to be hot-reloaded.
@@ -201,6 +202,18 @@ namespace gdjs {
      * it's sub-optimal) and not miss any (one could for example be reloading libraries
      * or code, while other are just reloading resources).
      */
+    /**
+     * Call `callback` once the hot-reloads in progress or queued are done
+     * (right away if there are none).
+     */
+    onceIdle(callback: () => void): void {
+      if (!this._isHotReloadingSince && this._hotReloadsQueue.length === 0) {
+        callback();
+        return;
+      }
+      this._onIdleCallbacks.push(callback);
+    }
+
     async hotReload(options: HotReloadOptions): Promise<HotReloaderLog[]> {
       return new Promise((resolve) => {
         const hotReloadId = nextHotReloadId++;
@@ -316,12 +329,14 @@ namespace gdjs {
           const inGameEditor = this._runtimeGame.getInGameEditor();
           if (inGameEditor) {
             inGameEditor.onProjectDataChange(newProjectData);
+            // The status leaves out the fields that are not set: they are
+            // null for the in-game editor, as when the game starts.
             await inGameEditor.switchToSceneOrVariant(
               newRuntimeGameStatus.editorId || null,
               newRuntimeGameStatus.sceneName,
-              newRuntimeGameStatus.injectedExternalLayoutName,
-              newRuntimeGameStatus.eventsBasedObjectType,
-              newRuntimeGameStatus.eventsBasedObjectVariantName,
+              newRuntimeGameStatus.injectedExternalLayoutName || null,
+              newRuntimeGameStatus.eventsBasedObjectType || null,
+              newRuntimeGameStatus.eventsBasedObjectVariantName || null,
               newRuntimeGameStatus.editorCamera3D || null
             );
           }
@@ -382,6 +397,10 @@ namespace gdjs {
           `Still ${this._hotReloadsQueue.length} hot-reloads in queue. Starting the next one...`
         );
         this._processHotReloadsQueue();
+      } else {
+        const onIdleCallbacks = this._onIdleCallbacks;
+        this._onIdleCallbacks = [];
+        for (const onIdleCallback of onIdleCallbacks) onIdleCallback();
       }
     }
 

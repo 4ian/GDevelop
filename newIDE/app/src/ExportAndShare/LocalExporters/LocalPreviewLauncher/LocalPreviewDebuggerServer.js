@@ -220,14 +220,22 @@ class LocalPreviewDebuggerServer {
   }
   sendMessage(id: DebuggerId, message: Object) {
     if (id === 'embedded-game-frame') {
-      if (!embeddedGameFrameWindow) {
+      const theEmbeddedGameFrameWindow = embeddedGameFrameWindow;
+      if (!theEmbeddedGameFrameWindow) {
         console.error(
           'Cannot send message to the embedded game frame as it is not registered.'
         );
         return;
       }
 
-      embeddedGameFrameWindow.postMessage(message, '*');
+      if (message.command === 'hardReload') {
+        // The game is about to navigate away: it can't be considered as running - and
+        // so can't be hot-reloaded or have its files re-exported - until it announces
+        // itself again.
+        this.setEmbeddedGameFrameReady(false);
+      }
+
+      theEmbeddedGameFrameWindow.postMessage(message, '*');
       return;
     }
     if (id === 'gameplay-test-frame') {

@@ -152,6 +152,13 @@ class BrowserPreviewDebuggerServer {
         : existingPreviewWindows[id];
     if (!theWindow) return;
 
+    if (id === 'embedded-game-frame' && message.command === 'hardReload') {
+      // The game is about to navigate away: it can't be considered as running - and
+      // so can't be hot-reloaded or have its files re-exported - until it announces
+      // itself again.
+      this.setEmbeddedGameFrameReady(false);
+    }
+
     try {
       theWindow.postMessage(message, previewOrigin);
     } catch (error) {

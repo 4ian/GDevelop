@@ -263,6 +263,7 @@ export const EmbeddedGameFrame = ({
     null
   );
   const isPreviewOngoing = React.useRef<boolean>(false);
+  const hasGameFrameSomethingToLoad = React.useRef<boolean>(false);
   const cameraStates = React.useRef<Map<string, EditorCameraState>>(
     new Map<string, EditorCameraState>()
   );
@@ -273,6 +274,27 @@ export const EmbeddedGameFrame = ({
     })
   );
   const hasSomeDialogOpen = React.useRef<boolean>(false);
+
+  // Let the changes that were made while a preview was launching be applied, now that
+  // the game frame settled (the game started, or it was given up on).
+  const settleOngoingPreview = React.useCallback(() => {
+    if (!isPreviewOngoing.current) return;
+    isPreviewOngoing.current = false;
+
+    if (
+      isHotReloadNeeded(hotReloadSteps.current) &&
+      lastPreviewContainer.current
+    ) {
+      switchToSceneEdition({
+        ...lastPreviewContainer.current,
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['post-launch-preview'],
+      });
+    }
+  }, []);
 
   // The game is displayed in an iframe, which is a separate document: it only receives
   // the keyboard events if it has the focus. Give it the focus as soon as it is hovered,
@@ -375,6 +397,7 @@ export const EmbeddedGameFrame = ({
         if (!isGameFrameStarted) {
           setGameFrameLoadId(loadId => loadId + 1);
         }
+        hasGameFrameSomethingToLoad.current = true;
         const iframe = iframeRef.current;
         if (iframe) {
           iframe.contentWindow.focus();
@@ -485,20 +508,17 @@ export const EmbeddedGameFrame = ({
             reasons,
             editorCameraState3D: cameraStates.current.get(editorId) || null,
           }).finally(() => {
-            isPreviewOngoing.current = false;
-            if (
-              isHotReloadNeeded(hotReloadSteps.current) &&
-              lastPreviewContainer.current
-            ) {
-              switchToSceneEdition({
-                ...lastPreviewContainer.current,
-                shouldReloadProjectData: false,
-                shouldReloadLibraries: false,
-                shouldReloadResources: false,
-                shouldHardReload: false,
-                reasons: ['post-launch-preview'],
-              });
+            // A game that is (re)loading must tell the editor it started before
+            // anything else is exported: an export erases the files it is still
+            // loading, which makes it crash while starting. The preview is then
+            // settled when the game starts - or when it is given up on.
+            const isGameRunningInFrame = !!previewDebuggerServer.getExistingEmbeddedGameFrameDebuggerIds()
+              .length;
+            if (!isGameRunningInFrame && hasGameFrameSomethingToLoad.current) {
+              return;
             }
+
+            settleOngoingPreview();
           });
         } else {
           logSwitchingInfo({
@@ -614,6 +634,7 @@ export const EmbeddedGameFrame = ({
       onEnable,
       sendVisibleScreenArea,
       isGameFrameStarted,
+      settleOngoingPreview,
     ]
   );
 
@@ -621,22 +642,30 @@ export const EmbeddedGameFrame = ({
     ? `${previewIndexHtmlLocation}?gameFrameLoadId=${gameFrameLoadId}`
     : '';
 
+  // A new location is a new game to load: it has to announce itself again.
+  React.useEffect(
+    () => {
+      setIsGameFrameStarted(false);
+    },
+    [iframeSource]
+  );
+
   // Wait for the game to announce itself. "Started" and "waited for too long" are kept
   // separate on purpose: a game that answers late (a big project on a slow device)
   // dismisses the message by itself, without anything having to cancel the timeout.
   React.useEffect(
     () => {
-      if (!iframeSource) return undefined;
+      if (!iframeSource || isGameFrameStarted) return undefined;
 
-      setIsGameFrameStarted(false);
       setHasGameFrameStartTimedOut(false);
-      const timeoutId = setTimeout(
-        () => setHasGameFrameStartTimedOut(true),
-        GAME_FRAME_START_TIMEOUT_MS
-      );
+      const timeoutId = setTimeout(() => {
+        setHasGameFrameStartTimedOut(true);
+        // Don't keep the editor waiting on a game that will never start.
+        settleOngoingPreview();
+      }, GAME_FRAME_START_TIMEOUT_MS);
       return () => clearTimeout(timeoutId);
     },
-    [iframeSource]
+    [iframeSource, isGameFrameStarted, settleOngoingPreview]
   );
 
   React.useEffect(
@@ -646,7 +675,11 @@ export const EmbeddedGameFrame = ({
       return previewDebuggerServer.registerCallbacks({
         onErrorReceived: () => {},
         onServerStateChanged: () => {},
-        onConnectionClosed: () => {},
+        onConnectionClosed: ({ id }) => {
+          // The game left the frame (it was asked to reload itself, or it was closed):
+          // it must announce itself again before the frame can be used.
+          if (id === 'embedded-game-frame') setIsGameFrameStarted(false);
+        },
         onConnectionOpened: () => {},
         onConnectionErrored: () => {},
         onHandleParsedMessage: ({ id, parsedMessage }) => {
@@ -670,8 +703,9 @@ export const EmbeddedGameFrame = ({
     () => {
       if (previewDebuggerServer)
         previewDebuggerServer.setEmbeddedGameFrameReady(isGameFrameStarted);
+      if (isGameFrameStarted) settleOngoingPreview();
     },
-    [previewDebuggerServer, isGameFrameStarted]
+    [previewDebuggerServer, isGameFrameStarted, settleOngoingPreview]
   );
 
   const onReloadGameFrame = React.useCallback(() => {

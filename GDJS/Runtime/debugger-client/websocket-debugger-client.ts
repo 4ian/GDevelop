@@ -63,7 +63,7 @@ namespace gdjs {
           // the WebSocket connection between the editor and the game is closed. When we are in in-game edition,
           // we can't afford to lose the connection because it means the editor is unusable.
           // In this case, we hard reload the game to re-establish a new connection.
-          setTimeout(() => {
+          that._hardReloadTimeoutId = setTimeout(() => {
             logger.info(
               'Debugger connection closed while in in-game edition - this is suspicious so hard reloading to re-establish a new connection.'
             );
@@ -86,7 +86,33 @@ namespace gdjs {
     }
 
     private hasLoggedError: boolean = false;
+    private _wasDisposed: boolean = false;
+    /** The hard reload scheduled when the connection is lost in in-game edition. */
+    private _hardReloadTimeoutId: NodeJS.Timeout | null = null;
+
+    dispose(): void {
+      this._wasDisposed = true;
+      if (this._hardReloadTimeoutId !== null) {
+        clearTimeout(this._hardReloadTimeoutId);
+        this._hardReloadTimeoutId = null;
+      }
+      if (this._ws) {
+        // Detach the handlers before closing: `close()` fires `onclose` (and
+        // `onerror` if the connection was still being established), which must
+        // not trigger the hard reload done when the connection is lost in
+        // in-game edition.
+        this._ws.onopen = null;
+        this._ws.onclose = null;
+        this._ws.onerror = null;
+        this._ws.onmessage = null;
+        this._ws.close();
+      }
+    }
+
     protected _sendMessage(message: string) {
+      // Once disposed, messages are silently dropped: the connection is closed
+      // and logging a warning would call this method again.
+      if (this._wasDisposed) return;
       if (!this._ws) {
         // The error can be logged only once, since logger.warn will call this function again,
         // leading to an endless recursive call if we do not call it only once.

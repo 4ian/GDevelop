@@ -8,6 +8,10 @@ namespace gdjs {
    */
   export class WindowMessageDebuggerClient extends gdjs.AbstractDebuggerClient {
     _opener: Window | null = null;
+    private _onWindowMessage = (event: MessageEvent) => {
+      const data = event.data;
+      this.handleCommand(data);
+    };
 
     constructor(runtimeGame: RuntimeGame) {
       super(runtimeGame);
@@ -24,10 +28,13 @@ namespace gdjs {
         return;
       }
 
-      window.addEventListener('message', (event) => {
-        const data = event.data;
-        this.handleCommand(data);
-      });
+      window.addEventListener('message', this._onWindowMessage);
+    }
+
+    dispose(): void {
+      window.removeEventListener('message', this._onWindowMessage);
+      // Drop the opener so that no message is sent anymore once disposed.
+      this._opener = null;
     }
 
     protected _sendMessage(message: string) {

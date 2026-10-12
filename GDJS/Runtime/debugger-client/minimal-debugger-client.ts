@@ -8,6 +8,8 @@ namespace gdjs {
       super(runtimeGame);
     }
 
+    dispose(): void {}
+
     protected _sendMessage(message: string) {}
   }
 

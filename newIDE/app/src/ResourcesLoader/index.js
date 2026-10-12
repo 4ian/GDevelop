@@ -2,6 +2,7 @@
 import { addGDevelopResourceTokenIfRequired } from '../Utils/CrossOrigin';
 import optionalRequire from '../Utils/OptionalRequire';
 import { encodeLocalFileNameForUrl } from '../Utils/PercentEncodedFileName';
+import { getResource3DPreviewOrRequest } from '../ResourcesList/ResourcePreview/Resource3DPreviewCache';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -86,6 +87,19 @@ const isLocalFile = (urlOrFilename: string) => {
  */
 export default class ResourcesLoader {
   static _cache: UrlsCache = new UrlsCache();
+
+  /**
+   * Null if not rendered yet: it is then requested in the background.
+   */
+  static getModel3DPreviewUrl(
+    project: gdProject,
+    resourceName: string
+  ): ?string {
+    if (!resourceName) return null;
+    return getResource3DPreviewOrRequest(
+      ResourcesLoader.getResourceFullUrl(project, resourceName, {})
+    );
+  }
 
   /**
    * Remove the specified resources resolved URLs from the cache. Useful if the

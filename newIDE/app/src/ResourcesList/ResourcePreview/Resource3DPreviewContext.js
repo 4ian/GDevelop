@@ -7,6 +7,12 @@ import {
   loadDracoDecoderFiles,
   type DracoDecoderFiles,
 } from '../../Utils/DracoDecoder';
+import {
+  getCachedResource3DPreview,
+  setCachedResource3DPreview,
+  setResource3DPreviewRequester,
+  subscribeToResource3DPreviewRendered,
+} from './Resource3DPreviewCache';
 
 type WorkerInitMessage = {|
   type: 'INIT',
@@ -215,6 +221,12 @@ type Props = {|
   children: React.Node,
 |};
 
+export const useOnResource3DPreviewRendered = (listener: () => void) => {
+  React.useEffect(() => subscribeToResource3DPreviewRendered(listener), [
+    listener,
+  ]);
+};
+
 export const Resource3DPreviewProvider = ({
   children,
 }: Props): React.MixedElement => {
@@ -222,7 +234,6 @@ export const Resource3DPreviewProvider = ({
   const queueRef = React.useRef<
     Array<{ url: string, resolve: (dataUrl: ?string) => void }>
   >([]);
-  const previewCache = React.useRef<{ [url: string]: string }>({});
   const workerManagerRef = React.useRef<?Resource3DPreviewWorkerManager>(null);
 
   // Initialize the worker manager on mount
@@ -232,7 +243,6 @@ export const Resource3DPreviewProvider = ({
     // Cleanup on unmount
     return () => {
       queueRef.current = [];
-      previewCache.current = {};
 
       // Terminate the worker
       if (workerManagerRef.current) {
@@ -245,8 +255,9 @@ export const Resource3DPreviewProvider = ({
   const enqueueResource = React.useCallback((url: string): Promise<?string> => {
     return new Promise(resolve => {
       // If it's already in the cache, resolve immediately.
-      if (previewCache.current[url]) {
-        resolve(previewCache.current[url]);
+      const cachedPreview = getCachedResource3DPreview(url);
+      if (cachedPreview) {
+        resolve(cachedPreview);
         return;
       }
 
@@ -261,10 +272,18 @@ export const Resource3DPreviewProvider = ({
     });
   }, []);
 
+  React.useEffect(
+    () => {
+      setResource3DPreviewRequester(enqueueResource);
+      return () => setResource3DPreviewRequester(null);
+    },
+    [enqueueResource]
+  );
+
   const renderModel = React.useCallback(async (url: string) => {
     const workerManager = workerManagerRef.current;
     if (!workerManager) {
-      return null;
+      return 'JsPlatform/Extensions/3d_model.svg';
     }
 
     // Fetch the resource data on the main thread. Workers in Electron cannot
@@ -310,7 +329,7 @@ export const Resource3DPreviewProvider = ({
         // Handle the result
         if (dataUrl) {
           // Save it in the cache for future use
-          previewCache.current[currentResource] = dataUrl;
+          setCachedResource3DPreview(currentResource, dataUrl);
 
           // Resolve all the requests made for that URL
           const queueItemsToResolve = queueRef.current.filter(
@@ -340,10 +359,13 @@ export const Resource3DPreviewProvider = ({
     [currentResource, renderModel]
   );
 
+  const contextValue = React.useMemo(
+    () => ({ getResourcePreview: enqueueResource }),
+    [enqueueResource]
+  );
+
   return (
-    <Resource3DPreviewContext.Provider
-      value={{ getResourcePreview: enqueueResource }}
-    >
+    <Resource3DPreviewContext.Provider value={contextValue}>
       {children}
     </Resource3DPreviewContext.Provider>
   );

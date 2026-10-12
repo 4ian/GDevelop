@@ -1395,6 +1395,38 @@ describe('gdjs.gameplayTests', () => {
       harness.setMousePosition(100, 50, '');
       expect(typeof inputManager.getMouseX()).to.be('number');
     });
+
+    it('simulates the mouse position on a layer with a camera rotated in 3D', async () => {
+      const runtimeGame = makeRuntimeGame();
+      const harness = makeStartedHarness(runtimeGame);
+      await harness.goToScene('Scene 1');
+      const runtimeScene = harness.getCurrentRuntimeScene();
+      runtimeScene.addLayer({
+        name: '3D layer',
+        renderingType: '3d',
+        visibility: true,
+        cameras: [],
+        effects: [],
+        ambientLightColorR: 0,
+        ambientLightColorG: 0,
+        ambientLightColorB: 0,
+        isLightingLayer: false,
+        followBaseLayerCamera: false,
+      });
+      const layer = runtimeScene.getLayer('3D layer');
+      layer.setCameraX(100);
+      layer.setCameraY(200);
+      layer.setCameraRotationX(30);
+
+      harness.setMousePosition(150, 50, '3D layer');
+
+      expect(
+        gdjs.evtTools.input.getCursorX(runtimeScene, '3D layer', 0)
+      ).to.be.within(149.99, 150.01);
+      expect(
+        gdjs.evtTools.input.getCursorY(runtimeScene, '3D layer', 0)
+      ).to.be.within(49.99, 50.01);
+    });
   });
 
   describe('GameplayTestHarness snapshots of nested custom objects', () => {

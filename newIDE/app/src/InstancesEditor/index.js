@@ -265,6 +265,8 @@ export default class InstancesEditor extends Component<Props, State> {
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
     if (this._showObjectInstancesIn3D) {
       gameCanvas = document.createElement('canvas');
+    }
+    if (gameCanvas && gameCanvas.getContext('webgl2')) {
       const threeRenderer = new THREE.WebGLRenderer({
         canvas: gameCanvas,
       });

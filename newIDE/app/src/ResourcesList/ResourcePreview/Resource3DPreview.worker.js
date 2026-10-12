@@ -32,6 +32,24 @@ const removeMetalnessFromMesh = node => {
   }
 };
 
+// $FlowFixMe[missing-local-annot]
+const disposeModel = model => {
+  model.traverse(node => {
+    if (node.geometry) node.geometry.dispose();
+    if (!node.material) return;
+    const materials = Array.isArray(node.material)
+      ? node.material
+      : [node.material];
+    materials.forEach(material => {
+      Object.keys(material).forEach(key => {
+        const value = material[key];
+        if (value && value.isTexture) value.dispose();
+      });
+      material.dispose();
+    });
+  });
+};
+
 // Worker message types
 const MESSAGE_TYPES = {
   RENDER_MODEL: 'RENDER_MODEL',
@@ -41,8 +59,8 @@ const MESSAGE_TYPES = {
 };
 
 let renderer = null;
-let width = 256;
-let height = 256;
+let width = 128;
+let height = 128;
 let offscreenCanvas = null;
 let dracoLoader = null;
 
@@ -179,6 +197,11 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
         box.getCenter(center);
 
         const maxDim = Math.max(size.x, size.y, size.z);
+        if (!(maxDim > 0)) {
+          disposeModel(model);
+          reject(new Error('The 3D model has no visible mesh.'));
+          return;
+        }
         const scale = 1 / maxDim;
         model.scale.set(scale, scale, scale);
 
@@ -194,17 +217,42 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
         const camera = new THREE.PerspectiveCamera(
           45,
           width / height,
-          0.1,
+          0.01,
           1000
         );
-        // Those are empirical values to make the model fit nicely in the frame.
-        camera.position.set(
-          1 * (0.5 + size.x * scale),
-          1 * (0.5 + size.y * scale),
-          2 * (0.5 + size.z * scale)
+        const scaledSize = size.clone().multiplyScalar(scale);
+        const target = new THREE.Vector3(0, scaledSize.y / 2, 0);
+        const viewDirection = new THREE.Vector3(-1, 1, 2).normalize();
+        camera.position.copy(target).add(viewDirection);
+        camera.lookAt(target);
+
+        // Move the camera back until every corner of the AABB is in the frame.
+        const tanHalfVerticalFov = Math.tan(
+          THREE.MathUtils.degToRad(camera.fov / 2)
         );
-        // Aim camera slightly above center (based on size)
-        camera.lookAt(0, 0.5 * size.y * scale, 0);
+        const tanHalfHorizontalFov = tanHalfVerticalFov * camera.aspect;
+        const inverseCameraRotation = camera.quaternion.clone().invert();
+        let cameraDistance = 0;
+        for (const cornerX of [-scaledSize.x / 2, scaledSize.x / 2]) {
+          for (const cornerY of [-scaledSize.y / 2, scaledSize.y / 2]) {
+            for (const cornerZ of [-scaledSize.z / 2, scaledSize.z / 2]) {
+              const corner = new THREE.Vector3(
+                cornerX,
+                cornerY,
+                cornerZ
+              ).applyQuaternion(inverseCameraRotation);
+              cameraDistance = Math.max(
+                cameraDistance,
+                corner.z + Math.abs(corner.x) / tanHalfHorizontalFov,
+                corner.z + Math.abs(corner.y) / tanHalfVerticalFov
+              );
+            }
+          }
+        }
+        const frameMargin = 1.1;
+        camera.position
+          .copy(target)
+          .addScaledVector(viewDirection, cameraDistance * frameMargin);
 
         // Render the scene
         renderer.render(scene, camera);
@@ -216,9 +264,12 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
             })
           : Promise.resolve(renderer.domElement.toDataURL());
 
+        // The renderer is reused: free the GPU memory of the model.
+        const dispose = () => disposeModel(model);
+        screenshot.then(dispose, dispose);
         resolve(screenshot);
       },
-      undefined,
+      // Unlike `load`, `parse` has no progress callback.
       error => {
         reject(error);
       }

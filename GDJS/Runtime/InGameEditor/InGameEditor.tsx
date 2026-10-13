@@ -733,33 +733,24 @@ namespace gdjs {
       .sort((a, b) => a - b); // Ensure stable order to help comparisons.
   };
 
-  /**
-   * The fingers of a gesture moving the view don't touch the screen at the
-   * same time: a finger alone is only used by tools after this delay.
-   */
-  const singleTouchDelayForToolsInMs = 150;
+  const maxDelayBetweenFingersOfAGestureInMs = 150;
 
-  /**
-   * Tells if the left mouse button, or a finger, is pressed to use a tool of
-   * an extension rather than to move the view (see
-   * `InGameEditor.isCapturedLeftMouseButtonPressed`).
-   */
-  class ToolPointer {
+  /** The left mouse button, or a finger, used by a tool rather than to move the view. */
+  class CapturedLeftMouseButton {
     private _isMovingView = false;
-    private _touchStartTime: number | null = null;
+    private _firstTouchStartTime: number | null = null;
 
     update(inputManager: gdjs.InputManager): void {
       const touchCount = getCurrentTouchIdentifiers(inputManager).length;
       if (touchCount >= 2 || isSpacePressed(inputManager)) {
         this._isMovingView = true;
       } else if (touchCount === 0 && !inputManager.isMouseButtonPressed(0)) {
-        // The view is moved until every finger and the button are released.
         this._isMovingView = false;
       }
       if (touchCount === 0) {
-        this._touchStartTime = null;
-      } else if (this._touchStartTime === null) {
-        this._touchStartTime = Date.now();
+        this._firstTouchStartTime = null;
+      } else if (this._firstTouchStartTime === null) {
+        this._firstTouchStartTime = Date.now();
       }
     }
 
@@ -767,8 +758,15 @@ namespace gdjs {
       return (
         inputManager.isMouseButtonPressed(0) &&
         !this._isMovingView &&
-        (this._touchStartTime === null ||
-          Date.now() - this._touchStartTime >= singleTouchDelayForToolsInMs)
+        !this._canOtherFingersOfAGestureStillCome()
+      );
+    }
+
+    private _canOtherFingersOfAGestureStillCome(): boolean {
+      return (
+        this._firstTouchStartTime !== null &&
+        Date.now() - this._firstTouchStartTime <
+          maxDelayBetweenFingersOfAGestureInMs
       );
     }
   }
@@ -1253,13 +1251,12 @@ namespace gdjs {
     private _inGameEditorSettings: InGameEditorSettings;
     private _shortcuts: InGameEditorShortcuts = new InGameEditorShortcuts();
     private _isLeftMouseButtonCaptured = false;
-    private _toolPointer = new ToolPointer();
+    private _capturedLeftMouseButton = new CapturedLeftMouseButton();
     private _requestedExtensionToolbars = new Map<
       string,
       Array<InGameEditorToolbarItem>
     >();
     private _extensionToolbars = new Map<string, ExtensionToolbar>();
-    /** The toolbars of extensions, one under the other, below the editor toolbar. */
     private _extensionToolbarsContainer: HTMLElement | null = null;
 
     constructor(
@@ -2003,14 +2000,13 @@ namespace gdjs {
     }
 
     /**
-     * Check if the left mouse button, or a finger, is pressed to use the tool
-     * that captured it (see `captureLeftMouseButton`). It's not while the view
-     * is moved (with Space, or with 2 or 3 fingers) until everything is
-     * released, nor during the first moments of a touch, as the other fingers
-     * of a gesture can still come.
+     * Check if the left mouse button, or a finger, is pressed for the tool that
+     * captured it with `captureLeftMouseButton`, and not to move the view.
      */
     isCapturedLeftMouseButtonPressed(): boolean {
-      return this._toolPointer.isPressed(this._runtimeGame.getInputManager());
+      return this._capturedLeftMouseButton.isPressed(
+        this._runtimeGame.getInputManager()
+      );
     }
 
     /**
@@ -4634,7 +4630,7 @@ namespace gdjs {
           !!this._selectionControls.threeTransformControls.axis;
       }
 
-      this._toolPointer.update(inputManager);
+      this._capturedLeftMouseButton.update(inputManager);
       this._handlePointerLock();
       this._handleTransformControlsMode();
       this._handleCameraMovement();
@@ -5105,8 +5101,7 @@ namespace gdjs {
       this._itemElements = items.map((item, index) =>
         this._createItemElement(item, index)
       );
-      // Items between dividers stay together when the toolbar is too large
-      // for one row.
+      // Items between dividers stay on the same row.
       const groupsAndDividers: Array<HTMLElement> = [];
       let group: HTMLElement | null = null;
       items.forEach((item, index) => {

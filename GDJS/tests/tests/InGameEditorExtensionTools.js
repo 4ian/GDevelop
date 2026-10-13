@@ -41,6 +41,7 @@ describe('Tools of extensions in the in-game editor', function () {
     v: 0,
     b: 0,
     stopSoundsOnStartup: false,
+    renderer3DWorldScale: 100,
     variables: [],
     behaviorsSharedData: [],
     usedResources: [],

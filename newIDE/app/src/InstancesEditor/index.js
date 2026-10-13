@@ -198,6 +198,7 @@ export default class InstancesEditor extends Component<Props, State> {
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
+  _instanceUnderPointerDown: gdInitialInstance | null = null;
   _isPointerOverCanvas = false;
   _showObjectInstancesIn3D: boolean = false;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
@@ -1410,6 +1411,7 @@ export default class InstancesEditor extends Component<Props, State> {
     this.fpsLimiter.notifyInteractionHappened();
 
     this.hasCursorMovedSinceItIsDown = false;
+    this._instanceUnderPointerDown = instance;
 
     if (this.keyboardShortcuts.shouldMoveView()) {
       // If the user wants to move the view, discard the click on an instance:
@@ -1463,7 +1465,13 @@ export default class InstancesEditor extends Component<Props, State> {
     // but selecting the same instance twice has no side effect on the
     // selection.
     // - For MultiSelect, the selection is not done in _onDownInstance.
-    if (!this.hasCursorMovedSinceItIsDown) {
+    // Releasing the pointer after another interaction (rotating, resizing,
+    // dropping an object...) must not select the instance under the pointer.
+    const isUpOnInstanceUnderPointerDown =
+      !!this._instanceUnderPointerDown &&
+      this._instanceUnderPointerDown.ptr === instance.ptr;
+    this._instanceUnderPointerDown = null;
+    if (isUpOnInstanceUnderPointerDown && !this.hasCursorMovedSinceItIsDown) {
       this.props.instancesSelection.selectInstance({
         instance,
         multiSelect: this.keyboardShortcuts.shouldMultiSelect(),

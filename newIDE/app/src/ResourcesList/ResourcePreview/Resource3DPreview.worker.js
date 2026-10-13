@@ -67,6 +67,7 @@ const MESSAGE_TYPES = {
 let renderer = null;
 let width = 128;
 let height = 128;
+const previewTextureSize = 128;
 let offscreenCanvas = null;
 let dracoLoader = null;
 
@@ -164,6 +165,19 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
     if (dracoLoader) {
       loader.setDRACOLoader(dracoLoader);
     }
+    // Textures are decoded at the preview size: full size textures would only
+    // use memory for a few pixels.
+    loader.register(parser => {
+      if (parser.textureLoader.isImageBitmapLoader) {
+        parser.textureLoader.setOptions({
+          ...parser.textureLoader.options,
+          resizeWidth: previewTextureSize,
+          resizeHeight: previewTextureSize,
+          resizeQuality: 'low',
+        });
+      }
+      return { name: 'GDEVELOP_preview_texture_size' };
+    });
 
     loader.parse(
       resourceData,

@@ -104,7 +104,7 @@ namespace gdjs {
     initializeRenderers(gameCanvas: HTMLCanvasElement): void {
       this._throwIfDisposed();
 
-      if (typeof THREE !== 'undefined') {
+      if (typeof THREE !== 'undefined' && gameCanvas.getContext('webgl2')) {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
           antialias:

@@ -46,6 +46,8 @@ export namespace TiledTileMapLoader {
           const tileClass = tile.type || tile.class;
           // Tiled draws the image of a tile from an image collection at the
           // bottom-left corner of its cell. Shapes are relative to this image.
+          // Its left side is aligned with the cell, so shapes only need to be
+          // moved vertically when the image height differs from the cell one.
           const shapeOffsetY =
             tile.imageheight !== undefined &&
             tiledTileSet.tilerendersize !== "grid"

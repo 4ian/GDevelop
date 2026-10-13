@@ -311,6 +311,34 @@ describe('gdjs.gameplayTests', () => {
       expect(result.screenshotsTakenCount).to.be(0);
     });
 
+    it('takes screenshots at the full resolution of the game when asked', async () => {
+      const result = await runTestScript(
+        makeRuntimeGameWithCanvas(),
+        `
+        await harness.goToScene('Scene 1');
+        harness.setGameResolutionSize(1600, 900);
+        await harness.takeScreenshot('Downscaled');
+        await harness.takeScreenshot('Full', { fullResolution: true });
+        `
+      );
+
+      /** @param {string} jpegBase64 */
+      const getImageSize = (jpegBase64) =>
+        new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve([image.width, image.height]);
+          image.onerror = reject;
+          image.src = 'data:image/jpeg;base64,' + jpegBase64;
+        });
+      expect(result.status).to.be('passed');
+      expect(await getImageSize(result.screenshots[0].jpegBase64)).to.eql([
+        768, 432,
+      ]);
+      expect(await getImageSize(result.screenshots[1].jpegBase64)).to.eql([
+        1600, 900,
+      ]);
+    });
+
     it('renders the game right before taking a screenshot', async () => {
       const result = await runTestScript(
         makeRuntimeGameWithCanvas(),

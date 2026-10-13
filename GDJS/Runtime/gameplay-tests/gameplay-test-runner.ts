@@ -3530,10 +3530,15 @@ namespace gdjs {
       }
 
       /**
-       * Take a screenshot of the game canvas (downscaled). The first one
-       * and the last ones are returned in the test result.
+       * Take a screenshot of the game canvas (downscaled, unless
+       * `fullResolution` is set: the size of the game, which can be set with
+       * `setGameResolutionSize`). The first one and the last ones are
+       * returned in the test result.
        */
-      async takeScreenshot(label: string = ''): Promise<void> {
+      async takeScreenshot(
+        label: string = '',
+        options?: { fullResolution?: boolean }
+      ): Promise<void> {
         if (this._maxScreenshots <= 0) return;
         // Render the current state of the game now: fast runs skip renders,
         // and a slow renderer delays animation frames, so the canvas could
@@ -3548,10 +3553,13 @@ namespace gdjs {
           return;
         }
         try {
-          const scale = Math.min(
-            1,
-            SCREENSHOT_MAX_SIZE / Math.max(canvas.width, canvas.height, 1)
-          );
+          const fullResolution = !!(options && options.fullResolution);
+          const scale = fullResolution
+            ? 1
+            : Math.min(
+                1,
+                SCREENSHOT_MAX_SIZE / Math.max(canvas.width, canvas.height, 1)
+              );
           const targetWidth = Math.max(1, Math.round(canvas.width * scale));
           const targetHeight = Math.max(1, Math.round(canvas.height * scale));
           const downscaledCanvas = document.createElement('canvas');
@@ -3560,7 +3568,10 @@ namespace gdjs {
           const context = downscaledCanvas.getContext('2d');
           if (!context) return;
           context.drawImage(canvas, 0, 0, targetWidth, targetHeight);
-          const dataUrl = downscaledCanvas.toDataURL('image/jpeg', 0.7);
+          const dataUrl = downscaledCanvas.toDataURL(
+            'image/jpeg',
+            fullResolution ? 0.92 : 0.7
+          );
           this._screenshotsTakenCount++;
           if (this._screenshots.length >= this._maxScreenshots) {
             // Keep the first one and the most recent ones.

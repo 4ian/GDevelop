@@ -28,7 +28,7 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "Draggable",
       _("Draggable object"),
-      _("Draggable"),
+      "Draggable",
       _("Move objects by holding a mouse button (or touch)."),
       "",
       "CppPlatform/Extensions/draggableicon.png",

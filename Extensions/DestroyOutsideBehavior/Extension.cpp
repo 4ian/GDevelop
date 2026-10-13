@@ -36,7 +36,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       extension
           .AddBehavior("DestroyOutside",
                        _("Destroy when outside of the screen"),
-                       _("DestroyOutside"),
+                       "DestroyOutside",
                        _("Destroy objects automatically when they go "
                          "outside of the 2D camera borders."),
                        "",

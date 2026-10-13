@@ -3362,6 +3362,14 @@ namespace gdjs {
           // Not modified by the InGameEditor (which always shows instances,
           // even those hidden at start), but must be preserved:
           hidden: oldData ? oldData.hidden : undefined,
+          // Not modified by the InGameEditor itself: the editor only lowers
+          // the opacity for edition, and flipping is changed from the IDE
+          // (which then sends the updated instance data). But they must be
+          // preserved:
+          opacity: oldData ? oldData.opacity : undefined,
+          flippedX: oldData ? oldData.flippedX : undefined,
+          flippedY: oldData ? oldData.flippedY : undefined,
+          flippedZ: oldData ? oldData.flippedZ : undefined,
           // TODO: how to transmit/should we transmit other properties?
           numberProperties: [],
           stringProperties: [],

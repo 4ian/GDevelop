@@ -227,6 +227,22 @@ export const useOnResource3DPreviewRendered = (listener: () => void) => {
   ]);
 };
 
+// The resource data is fetched on the main thread. Workers in Electron cannot
+// fetch file:// URLs because webSecurity:false only applies to the renderer
+// process, not the network service process used by workers.
+const fetchModelData = async (url: string): Promise<?ArrayBuffer> => {
+  try {
+    const response = await fetch(url, {
+      credentials: checkIfCredentialsRequired(url) ? 'include' : 'same-origin',
+    });
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    return await response.arrayBuffer();
+  } catch (error) {
+    console.error('Error fetching 3D model resource:', error);
+    return null;
+  }
+};
+
 export const Resource3DPreviewProvider = ({
   children,
 }: Props): React.MixedElement => {
@@ -280,26 +296,35 @@ export const Resource3DPreviewProvider = ({
     [enqueueResource]
   );
 
+  // The next model of the queue is fetched while the current one is rendered.
+  const prefetchedModelRef = React.useRef<?{
+    url: string,
+    resourceDataPromise: Promise<?ArrayBuffer>,
+  }>(null);
+
   const renderModel = React.useCallback(async (url: string) => {
     const workerManager = workerManagerRef.current;
     if (!workerManager) {
       return 'JsPlatform/Extensions/3d_model.svg';
     }
 
-    // Fetch the resource data on the main thread. Workers in Electron cannot
-    // fetch file:// URLs because webSecurity:false only applies to the renderer
-    // process, not the network service process used by workers.
-    let resourceData: ArrayBuffer;
-    try {
-      const response = await fetch(url, {
-        credentials: checkIfCredentialsRequired(url)
-          ? 'include'
-          : 'same-origin',
-      });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      resourceData = await response.arrayBuffer();
-    } catch (error) {
-      console.error('Error fetching 3D model resource:', error);
+    const prefetchedModel = prefetchedModelRef.current;
+    prefetchedModelRef.current = null;
+    const resourceDataPromise =
+      prefetchedModel && prefetchedModel.url === url
+        ? prefetchedModel.resourceDataPromise
+        : fetchModelData(url);
+
+    const nextItem = queueRef.current.find(item => item.url !== url);
+    if (nextItem && !getCachedResource3DPreview(nextItem.url)) {
+      prefetchedModelRef.current = {
+        url: nextItem.url,
+        resourceDataPromise: fetchModelData(nextItem.url),
+      };
+    }
+
+    const resourceData = await resourceDataPromise;
+    if (!resourceData) {
       return 'JsPlatform/Extensions/3d_model.svg';
     }
 

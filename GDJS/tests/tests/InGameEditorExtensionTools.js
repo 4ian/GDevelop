@@ -224,12 +224,22 @@ describe('Tools of extensions in the in-game editor', function () {
 
   it('shows the toolbars of extensions in the middle of the part of the game not covered by the editor panels', async () => {
     const inGameEditor = await createInGameEditor();
+    // The editor sends the visible area while the scene is loading.
+    const sceneSwitch = inGameEditor.switchToSceneOrVariant(
+      'scene-editor',
+      'Scene',
+      null,
+      null,
+      null,
+      null
+    );
     inGameEditor.setVisibleScreenArea({
       minX: 0.25,
       minY: 0.1,
       maxX: 1,
       maxY: 1,
     });
+    await sceneSwitch;
 
     const toolbarRect =
       getShownExtensionToolbar(inGameEditor).getBoundingClientRect();

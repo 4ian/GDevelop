@@ -1648,8 +1648,9 @@ namespace gdjs {
       if (editorCamera3D) {
         this.restoreCameraState(editorCamera3D);
       } else {
-        // TODO Get the visibleScreenArea from the editor.
-        this.zoomToInitialPosition({
+        // A guess of the visible area, not stored: the editor sends the real
+        // one while the scene is loading.
+        this._zoomToInnerArea({
           minX: 0.15,
           minY: 0.15,
           maxX: 0.85,
@@ -1898,6 +1899,10 @@ namespace gdjs {
       maxY: number;
     }) {
       this.setVisibleScreenArea(visibleScreenArea);
+      this._zoomToInnerArea(visibleScreenArea);
+    }
+
+    private _zoomToInnerArea(visibleScreenArea: ScreenArea) {
       if (this._innerArea) {
         this.zoomToFitArea(
           {

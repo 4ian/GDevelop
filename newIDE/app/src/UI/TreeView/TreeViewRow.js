@@ -461,11 +461,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                     )}
                   >
                     {node.rightComponent}
-                    {rightButtons.map(rightButton =>
+                    {rightButtons.map((rightButton, rightButtonIndex) =>
                       rightButton.primary ? (
                         <TreeViewRightPrimaryButton
                           id={rightButton.id}
-                          key={rightButton.id}
+                          key={rightButtonIndex}
                           onClick={e => {
                             e.stopPropagation();
                             if (rightButton.click) {
@@ -487,7 +487,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                       ) : (
                         <IconButton
                           id={rightButton.id}
-                          key={rightButton.id}
+                          key={rightButtonIndex}
                           size="small"
                           onClick={e => {
                             e.stopPropagation();

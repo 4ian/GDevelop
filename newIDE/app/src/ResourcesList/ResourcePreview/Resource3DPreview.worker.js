@@ -43,7 +43,13 @@ const disposeModel = model => {
     materials.forEach(material => {
       Object.keys(material).forEach(key => {
         const value = material[key];
-        if (value && value.isTexture) value.dispose();
+        if (!value || !value.isTexture) return;
+        // GLTFLoader decodes textures as ImageBitmaps, which are not freed by
+        // the garbage collector: close them explicitly.
+        if (value.image && typeof value.image.close === 'function') {
+          value.image.close();
+        }
+        value.dispose();
       });
       material.dispose();
     });

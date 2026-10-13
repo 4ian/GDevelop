@@ -15,14 +15,23 @@ export const setCachedResource3DPreview = (url: string, dataUrl: string) => {
   previewCache[url] = dataUrl;
 };
 
+// Frees the previews, whose blob URLs would otherwise stay alive until the
+// page is reloaded.
+export const burstResource3DPreviewCache = () => {
+  Object.keys(previewCache).forEach(url => {
+    if (previewCache[url].startsWith('blob:')) {
+      URL.revokeObjectURL(previewCache[url]);
+    }
+  });
+  previewCache = {};
+  requestedPreviewUrls.clear();
+};
+
 export const setResource3DPreviewRequester = (
   requester: ?(url: string) => Promise<?string>
 ) => {
   requestPreview = requester;
-  if (!requester) {
-    previewCache = {};
-    requestedPreviewUrls.clear();
-  }
+  if (!requester) burstResource3DPreviewCache();
 };
 
 const onPreviewRequestDone = () => {

@@ -70,6 +70,10 @@ let height = 128;
 const previewTextureSize = 128;
 let offscreenCanvas = null;
 let dracoLoader = null;
+// The scene, its light and the camera are reused for every model: only the
+// model is added, then removed and freed once rendered.
+let scene = null;
+let camera = null;
 
 /**
  * Create the loader for the Draco compressed 3D models.
@@ -123,6 +127,20 @@ const initRenderer = dracoDecoderFiles => {
 
   renderer.setSize(width, height, false);
 
+  scene = new THREE.Scene();
+  const light = new THREE.HemisphereLight();
+  light.intensity = Math.PI;
+  light.color = new THREE.Color(1, 1, 1);
+  light.groundColor = new THREE.Color(0.25, 0.25, 0.25);
+  light.position.set(0, 0, 1);
+  const lightGroup = new THREE.Group();
+  lightGroup.rotation.order = 'ZYX';
+  lightGroup.rotation.x = Math.PI / 4;
+  lightGroup.add(light);
+  scene.add(lightGroup);
+
+  camera = new THREE.PerspectiveCamera(45, width / height, 0.01, 1000);
+
   if (dracoDecoderFiles) {
     try {
       dracoLoader = createDracoLoader(dracoDecoderFiles);
@@ -141,22 +159,9 @@ const initRenderer = dracoDecoderFiles => {
 // fetch file:// URLs in Electron due to network service sandboxing).
 // $FlowFixMe[missing-local-annot]
 const renderModel = async (resourceUrl, resourceData, basePath) => {
-  if (!renderer) {
+  if (!renderer || !scene || !camera) {
     throw new Error('Renderer not initialized');
   }
-
-  const scene = new THREE.Scene();
-
-  const light = new THREE.HemisphereLight();
-  light.intensity = Math.PI;
-  light.color = new THREE.Color(1, 1, 1);
-  light.groundColor = new THREE.Color(0.25, 0.25, 0.25);
-  light.position.set(0, 0, 1);
-  const lightGroup = new THREE.Group();
-  lightGroup.rotation.order = 'ZYX';
-  lightGroup.rotation.x = Math.PI / 4;
-  lightGroup.add(light);
-  scene.add(lightGroup);
 
   // Parse the pre-fetched model data instead of fetching the URL,
   // so the worker never needs to make any network/file requests.
@@ -183,7 +188,7 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
       resourceData,
       basePath,
       gltf => {
-        if (!renderer) {
+        if (!renderer || !scene || !camera) {
           throw new Error('Renderer not initialized');
         }
 
@@ -234,12 +239,6 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
 
         scene.add(model);
 
-        const camera = new THREE.PerspectiveCamera(
-          45,
-          width / height,
-          0.01,
-          1000
-        );
         const scaledSize = size.clone().multiplyScalar(scale);
         const target = new THREE.Vector3(0, scaledSize.y / 2, 0);
         const viewDirection = new THREE.Vector3(-1, 1, 2).normalize();
@@ -276,6 +275,7 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
 
         // Render the scene
         renderer.render(scene, camera);
+        scene.remove(model);
 
         // Get the screenshot and return it
         const screenshot = offscreenCanvas.convertToBlob

@@ -594,6 +594,23 @@ namespace gdjs {
     max: Point3D;
   };
 
+  type SelectionRotation = {
+    /** The rotation applied to the selection, in scene coordinates. */
+    quaternion: THREE.Quaternion;
+    /** The point, in scene coordinates, around which the objects are rotated. */
+    pivot: Point3D;
+  };
+
+  type SelectionMovement = {
+    translationX: float;
+    translationY: float;
+    translationZ: float;
+    rotation: SelectionRotation | null;
+    scaleX: float;
+    scaleY: float;
+    scaleZ: float;
+  };
+
   /** A segment, in the scene coordinates, along which surfaces are searched. */
   export type InGameEditorRay = {
     from: Point3D;
@@ -862,9 +879,14 @@ namespace gdjs {
       return this._selectedObjects[this._selectedObjects.length - 1] || null;
     }
 
-    getAABB(): AABB3D | null {
+    getAABB(options?: {
+      ignoreIf: (object: gdjs.RuntimeObject) => boolean;
+    }): AABB3D | null {
       let aabb: AABB3D | null = null;
       for (const object of this._selectedObjects) {
+        if (options && options.ignoreIf(object)) {
+          continue;
+        }
         if (is3D(object)) {
           const aabb2D = object.getAABB();
           const minZ = object.getUnrotatedAABBMinZ();
@@ -892,6 +914,10 @@ namespace gdjs {
     private editor: InGameEditor;
     private _changeHappened = false;
     private startTime = 0;
+    // Only used inside `move`, kept here to avoid allocations during a drag.
+    private _temporaryRotatedCenterOffset = new THREE.Vector3();
+    private _temporaryRotatedObjectEuler = new THREE.Euler(0, 0, 0, 'ZYX');
+    private _temporaryRotatedObjectQuaternion = new THREE.Quaternion();
 
     constructor(editor: InGameEditor) {
       this.editor = editor;
@@ -903,6 +929,9 @@ namespace gdjs {
         x: float;
         y: float;
         z: float;
+        centerX: float;
+        centerY: float;
+        centerZ: float;
         rotationX: float;
         rotationY: float;
         angle: float;
@@ -927,22 +956,13 @@ namespace gdjs {
 
     move(
       selectedObjects: Array<gdjs.RuntimeObject>,
-      movement: {
-        translationX: float;
-        translationY: float;
-        translationZ: float;
-        rotationX: float;
-        rotationY: float;
-        rotationZ: float;
-        scaleX: float;
-        scaleY: float;
-        scaleZ: float;
-      }
+      movement: SelectionMovement
     ) {
       if (Date.now() - this.startTime < 150) {
         // Avoid miss-clicks gizmo dragging point to change object positions.
         return;
       }
+      const rotation = movement.rotation;
       selectedObjects.forEach((object) => {
         if (this.editor.isInstanceLocked(object)) {
           return;
@@ -953,9 +973,7 @@ namespace gdjs {
           movement.translationX !== 0 ||
           movement.translationY !== 0 ||
           movement.translationZ !== 0 ||
-          movement.rotationX !== 0 ||
-          movement.rotationY !== 0 ||
-          movement.rotationZ !== 0 ||
+          !!rotation ||
           movement.scaleX !== 1 ||
           movement.scaleY !== 1 ||
           movement.scaleZ !== 1;
@@ -967,6 +985,9 @@ namespace gdjs {
                 x: object.getX(),
                 y: object.getY(),
                 z: object.getZ(),
+                centerX: object.getCenterXInScene(),
+                centerY: object.getCenterYInScene(),
+                centerZ: object.getCenterZInScene(),
                 rotationX: object.getRotationX(),
                 rotationY: object.getRotationY(),
                 angle: object.getAngle(),
@@ -978,6 +999,9 @@ namespace gdjs {
                 x: object.getX(),
                 y: object.getY(),
                 z: 0,
+                centerX: object.getCenterXInScene(),
+                centerY: object.getCenterYInScene(),
+                centerZ: 0,
                 rotationX: 0,
                 rotationY: 0,
                 angle: object.getAngle(),
@@ -991,14 +1015,49 @@ namespace gdjs {
         if (!is3D(object)) {
           return;
         }
-        object.setX(Math.round(initialPosition.x + movement.translationX));
-        object.setY(Math.round(initialPosition.y + movement.translationY));
-        object.setAngle(
-          gdjs.evtTools.common.mod(
-            Math.round(initialPosition.angle + movement.rotationZ),
-            360
-          )
-        );
+        let translationX = movement.translationX;
+        let translationY = movement.translationY;
+        let translationZ = movement.translationZ;
+        let rotationX = initialPosition.rotationX;
+        let rotationY = initialPosition.rotationY;
+        let angle = initialPosition.angle;
+        if (rotation) {
+          // Like in the 2D editor, the selection rotates as a whole around its
+          // center: the rotation is applied to each object orientation and
+          // each object center is rotated around the pivot.
+          const { quaternion, pivot } = rotation;
+          const objectEuler = this._temporaryRotatedObjectEuler;
+          const objectQuaternion = this._temporaryRotatedObjectQuaternion;
+          objectEuler.set(
+            gdjs.toRad(rotationX),
+            gdjs.toRad(rotationY),
+            gdjs.toRad(angle),
+            'ZYX'
+          );
+          objectQuaternion.setFromEuler(objectEuler).premultiply(quaternion);
+          objectEuler.setFromQuaternion(objectQuaternion, 'ZYX');
+          rotationX = gdjs.toDegrees(objectEuler.x);
+          rotationY = gdjs.toDegrees(objectEuler.y);
+          angle = gdjs.toDegrees(objectEuler.z);
+
+          const rotatedCenterOffset = this._temporaryRotatedCenterOffset;
+          rotatedCenterOffset
+            .set(
+              initialPosition.centerX - pivot[0],
+              initialPosition.centerY - pivot[1],
+              initialPosition.centerZ - pivot[2]
+            )
+            .applyQuaternion(quaternion);
+          translationX +=
+            pivot[0] + rotatedCenterOffset.x - initialPosition.centerX;
+          translationY +=
+            pivot[1] + rotatedCenterOffset.y - initialPosition.centerY;
+          translationZ +=
+            pivot[2] + rotatedCenterOffset.z - initialPosition.centerZ;
+        }
+        object.setX(Math.round(initialPosition.x + translationX));
+        object.setY(Math.round(initialPosition.y + translationY));
+        object.setAngle(gdjs.evtTools.common.mod(Math.round(angle), 360));
         if (movement.scaleX !== 1) {
           object.setWidth(
             Math.round(initialPosition.width * Math.abs(movement.scaleX))
@@ -1010,18 +1069,12 @@ namespace gdjs {
           );
         }
         if (is3D(object)) {
-          object.setZ(Math.round(initialPosition.z + movement.translationZ));
+          object.setZ(Math.round(initialPosition.z + translationZ));
           object.setRotationX(
-            gdjs.evtTools.common.mod(
-              Math.round(initialPosition.rotationX + movement.rotationX),
-              360
-            )
+            gdjs.evtTools.common.mod(Math.round(rotationX), 360)
           );
           object.setRotationY(
-            gdjs.evtTools.common.mod(
-              Math.round(initialPosition.rotationY + movement.rotationY),
-              360
-            )
+            gdjs.evtTools.common.mod(Math.round(rotationY), 360)
           );
           if (movement.scaleZ !== 1) {
             object.setDepth(
@@ -1132,17 +1185,8 @@ namespace gdjs {
     private _transformControlsMode: 'translate' | 'rotate' | 'scale' =
       'translate';
     private _editorGrid: EditorGrid;
-    private _selectionControlsMovementTotalDelta: {
-      translationX: float;
-      translationY: float;
-      translationZ: float;
-      rotationX: float;
-      rotationY: float;
-      rotationZ: float;
-      scaleX: float;
-      scaleY: float;
-      scaleZ: float;
-    } | null = null;
+    private _selectionControlsMovementTotalDelta: SelectionMovement | null =
+      null;
     private _hasSelectionActuallyMoved = false;
     private _isTransformControlsHovered = false;
     private _wasMovingSelectionLastFrame = false;
@@ -1187,23 +1231,11 @@ namespace gdjs {
     private _draggedSelectedObjectInitialX: float = 0;
     private _draggedSelectedObjectInitialY: float = 0;
     private _draggedSelectedObjectInitialZ: float = 0;
-    private _draggedSelectedObjectTotalDelta: {
-      translationX: float;
-      translationY: float;
-      translationZ: float;
-      rotationX: float;
-      rotationY: float;
-      rotationZ: float;
-      scaleX: float;
-      scaleY: float;
-      scaleZ: float;
-    } = {
+    private _draggedSelectedObjectTotalDelta: SelectionMovement = {
       translationX: 0,
       translationY: 0,
       translationZ: 0,
-      rotationX: 0,
-      rotationY: 0,
-      rotationZ: 0,
+      rotation: null,
       scaleX: 1,
       scaleY: 1,
       scaleZ: 1,
@@ -2857,6 +2889,12 @@ namespace gdjs {
             let initialObjectDepth = 0;
             const initialDummyPosition = new THREE.Vector3();
             const initialDummyRotation = new THREE.Euler();
+            const initialDummyQuaternion = new THREE.Quaternion();
+            const invertedInitialDummyQuaternion = new THREE.Quaternion();
+            const selectionRotation: SelectionRotation = {
+              quaternion: new THREE.Quaternion(),
+              pivot: [0, 0, 0],
+            };
             const initialDummyScale = new THREE.Vector3();
             const scaleDragWorldPosition = new THREE.Vector3();
             const scaleDragWorldQuaternion = new THREE.Quaternion();
@@ -2886,16 +2924,21 @@ namespace gdjs {
                   : 0;
                 initialDummyPosition.copy(dummyThreeObject.position);
                 initialDummyRotation.copy(dummyThreeObject.rotation);
+                initialDummyQuaternion.copy(dummyThreeObject.quaternion);
                 initialDummyScale.copy(dummyThreeObject.scale);
                 return;
               }
 
-              let translationX =
-                dummyThreeObject.position.x - initialDummyPosition.x;
-              let translationY =
-                dummyThreeObject.position.y - initialDummyPosition.y;
-              let translationZ =
-                dummyThreeObject.position.z - initialDummyPosition.z;
+              const isRotating = this._transformControlsMode === 'rotate';
+              let translationX = isRotating
+                ? 0
+                : dummyThreeObject.position.x - initialDummyPosition.x;
+              let translationY = isRotating
+                ? 0
+                : dummyThreeObject.position.y - initialDummyPosition.y;
+              let translationZ = isRotating
+                ? 0
+                : dummyThreeObject.position.z - initialDummyPosition.z;
               if (
                 this._transformControlsMode === 'translate' &&
                 threeTransformControls.axis
@@ -3077,19 +3120,40 @@ namespace gdjs {
                   }
                 }
               }
+              let rotation: SelectionRotation | null = null;
+              if (
+                isRotating &&
+                !dummyThreeObject.quaternion.equals(initialDummyQuaternion)
+              ) {
+                // The dummy rotation is the object rotation with the Y and Z
+                // angles negated (see _updateDummyLocation), which is the
+                // object rotation mirrored on the X axis. The rotation done by
+                // the gizmo on the dummy is mirrored back the same way: the
+                // axis is mirrored and the angle is negated.
+                const { quaternion, pivot } = selectionRotation;
+                quaternion
+                  .copy(dummyThreeObject.quaternion)
+                  .multiply(
+                    invertedInitialDummyQuaternion
+                      .copy(initialDummyQuaternion)
+                      .invert()
+                  );
+                quaternion.set(
+                  quaternion.x,
+                  -quaternion.y,
+                  -quaternion.z,
+                  quaternion.w
+                );
+                pivot[0] = dummyThreeObject.position.x;
+                pivot[1] = dummyThreeObject.position.y;
+                pivot[2] = dummyThreeObject.position.z;
+                rotation = selectionRotation;
+              }
               this._selectionControlsMovementTotalDelta = {
                 translationX,
                 translationY,
                 translationZ,
-                rotationX: gdjs.toDegrees(
-                  dummyThreeObject.rotation.x - initialDummyRotation.x
-                ),
-                rotationY: -gdjs.toDegrees(
-                  dummyThreeObject.rotation.y - initialDummyRotation.y
-                ),
-                rotationZ: -gdjs.toDegrees(
-                  dummyThreeObject.rotation.z - initialDummyRotation.z
-                ),
+                rotation,
                 scaleX,
                 scaleY,
                 scaleZ,
@@ -3117,7 +3181,18 @@ namespace gdjs {
         !this._draggedNewObject &&
         !this._draggedSelectedObject
       ) {
-        const { threeTransformControls } = this._selectionControls;
+        const { threeTransformControls, dummyThreeObject } =
+          this._selectionControls;
+
+        if (
+          this._transformControlsMode === 'rotate' &&
+          !threeTransformControls.dragging
+        ) {
+          this._updateDummyRotationPivot(
+            dummyThreeObject,
+            lastEditableSelectedObject
+          );
+        }
 
         // Update the rotation snap.
         const inputManager = this._runtimeGame.getInputManager();
@@ -3198,12 +3273,9 @@ namespace gdjs {
         dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
         dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
 
-        dummyThreeObject.position.set(
-          lastEditableSelectedObject.getCenterXInScene(),
-          lastEditableSelectedObject.getCenterYInScene(),
-          is3D(lastEditableSelectedObject)
-            ? lastEditableSelectedObject.getCenterZInScene()
-            : 0
+        this._updateDummyRotationPivot(
+          dummyThreeObject,
+          lastEditableSelectedObject
         );
       } else {
         dummyThreeObject.position.set(
@@ -3214,6 +3286,48 @@ namespace gdjs {
             : 0
         );
       }
+    }
+
+    /**
+     * The whole selection rotates around its center (like in the 2D editor),
+     * so the rotation gizmo is shown there.
+     */
+    private _updateDummyRotationPivot(
+      dummyThreeObject: THREE.Object3D,
+      lastEditableSelectedObject: gdjs.RuntimeObject
+    ) {
+      const rotationPivot = this._getSelectionRotationPivot();
+      if (rotationPivot) {
+        dummyThreeObject.position.set(
+          rotationPivot[0],
+          rotationPivot[1],
+          rotationPivot[2]
+        );
+      } else {
+        dummyThreeObject.position.set(
+          lastEditableSelectedObject.getCenterXInScene(),
+          lastEditableSelectedObject.getCenterYInScene(),
+          is3D(lastEditableSelectedObject)
+            ? lastEditableSelectedObject.getCenterZInScene()
+            : 0
+        );
+      }
+    }
+
+    /**
+     * The center of the movable 3D objects of the selection, in scene
+     * coordinates (or null if none).
+     */
+    private _getSelectionRotationPivot(): Point3D | null {
+      const aabb = this._selection.getAABB({
+        ignoreIf: (object) => this.isInstanceLocked(object),
+      });
+      if (!aabb) return null;
+      return [
+        (aabb.min[0] + aabb.max[0]) / 2,
+        (aabb.min[1] + aabb.max[1]) / 2,
+        (aabb.min[2] + aabb.max[2]) / 2,
+      ];
     }
 
     private _removeSelectionControls(): void {

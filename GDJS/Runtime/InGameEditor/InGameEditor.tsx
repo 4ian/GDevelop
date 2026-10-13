@@ -1174,7 +1174,22 @@ namespace gdjs {
         value: float;
         onChange: (value: float) => void;
       }
+    | {
+        type: 'color';
+        id: string;
+        tooltip: string;
+        /** The chosen color, like "#ff8000". */
+        value: string;
+        onChange: (value: string) => void;
+      }
     | { type: 'divider'; id: string };
+
+  const supportedToolbarItemTypes: Array<string> = [
+    'button',
+    'slider',
+    'color',
+    'divider',
+  ];
 
   /** @category In-Game Editor */
   export class InGameEditor {
@@ -2060,6 +2075,15 @@ namespace gdjs {
       items: Array<InGameEditorToolbarItem>
     ): void {
       this._requestedExtensionToolbars.set(toolbarId, items);
+    }
+
+    /**
+     * Check if toolbars shown with `showToolbar` can have items of a type, for
+     * extensions working with older versions too (for example, showing
+     * buttons for a few colors when there is no color picker).
+     */
+    isToolbarItemTypeSupported(type: string): boolean {
+      return supportedToolbarItemTypes.includes(type);
     }
 
     private _renderExtensionToolbars(parent: HTMLElement | null): void {
@@ -4978,6 +5002,26 @@ namespace gdjs {
           width: 80px;
           accent-color: var(--in-game-editor-theme-icon-button-selected-background-color);
         }
+        .InGameEditor-Toolbar-Color {
+          width: 24px;
+          height: 24px;
+          padding: 0;
+          border: none;
+          border-radius: 4px;
+          background-color: transparent;
+          cursor: pointer;
+        }
+        .InGameEditor-Toolbar-Color::-webkit-color-swatch-wrapper {
+          padding: 3px;
+        }
+        .InGameEditor-Toolbar-Color::-webkit-color-swatch {
+          border: 1px solid var(--in-game-editor-theme-toolbar-separator-color);
+          border-radius: 50%;
+        }
+        .InGameEditor-Toolbar-Color::-moz-color-swatch {
+          border: 1px solid var(--in-game-editor-theme-toolbar-separator-color);
+          border-radius: 50%;
+        }
       `;
     }
 
@@ -5233,6 +5277,12 @@ namespace gdjs {
           if (document.activeElement !== slider) {
             slider.value = '' + item.value;
           }
+        } else if (item.type === 'color') {
+          const colorInput = element as HTMLInputElement;
+          colorInput.title = item.tooltip;
+          if (document.activeElement !== colorInput) {
+            colorInput.value = item.value;
+          }
         }
       });
     }
@@ -5274,6 +5324,25 @@ namespace gdjs {
     ): HTMLElement {
       if (item.type === 'divider') {
         return <div class="InGameEditor-Toolbar-Divider" />;
+      }
+      if (item.type === 'color') {
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.className = 'InGameEditor-Toolbar-Color';
+        colorInput.addEventListener('input', () => {
+          this._onInteraction();
+          const currentItem = this._items[index];
+          if (currentItem.type === 'color') {
+            try {
+              currentItem.onChange(colorInput.value);
+            } catch (error) {
+              this._onItemError(error);
+            }
+          }
+        });
+        // A focused element would receive the keyboard shortcuts of the editor.
+        colorInput.addEventListener('change', () => colorInput.blur());
+        return colorInput;
       }
       if (item.type === 'slider') {
         const slider = document.createElement('input');

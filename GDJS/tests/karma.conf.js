@@ -254,6 +254,7 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/Extensions/3D/DepthOfFieldEffect.js`,
       `${gdjsRuntimePath}/Extensions/3D/N8AOEffect.js`,
       `${gdjsRuntimePath}/Extensions/3D/DirectionalLight.js`,
+      `${gdjsRuntimePath}/Extensions/3D/Scene3DTools.js`,
       // Loaded only by the tests of the in-game editor, as it replaces the
       // objects of unknown types.
       {

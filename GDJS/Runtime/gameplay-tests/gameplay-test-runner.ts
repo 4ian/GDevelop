@@ -474,6 +474,8 @@ namespace gdjs {
     };
 
     const DEFAULT_TIMEOUT_MS = 30000;
+    /** The longest budget a test can ask for (see `setTimeoutMs`). */
+    const MAX_TIMEOUT_MS = 10 * 60 * 1000;
     /** Loading (game boot, scene assets) is excluded from `timeoutMs` -
      * on the web, a first preview can download assets for minutes - but
      * still bounded, so a dead network cannot hang a run forever. */
@@ -493,9 +495,6 @@ namespace gdjs {
     const FAST_RUN_RENDER_DUTY_MULTIPLIER = 4;
     const MAX_PLAYED_SOUNDS = 500;
     const DEFAULT_MAX_SCREENSHOTS = 4;
-    /** A hidden page gets no animation frame: capture the last rendered
-     * frame rather than waiting forever. */
-    const SCREENSHOT_RENDER_TIMEOUT_MS = 1000;
     const DEFAULT_PROBE_FRAMES = 30;
     const MAX_PROFILING_SECTIONS = 50;
     const MAX_PROFILING_TIMELINE_ENTRIES = 120;
@@ -794,6 +793,8 @@ namespace gdjs {
       /** Time spent waiting for loading (game boot, scene assets) so far:
        * excluded from the `_timeoutMs` budget, reported as `loadingMs`. */
       _loadingTimeMs: number = 0;
+      /** When the ongoing loading started (see `_countAsLoading`), or null. */
+      _loadingSinceMs: number | null = null;
       /** Time already spent frozen by the browser because the page was
        * hidden, excluded from the `_timeoutMs` budget (see
        * `_installPageVisibilityTracking`). */
@@ -981,7 +982,7 @@ namespace gdjs {
         if (
           Date.now() -
             this._startTimeMs -
-            this._loadingTimeMs -
+            this._getLoadingTimeMs() -
             this._getHiddenStallTimeMs() >
           this._timeoutMs
         ) {
@@ -1022,32 +1023,59 @@ namespace gdjs {
         loadingPromise: Promise<unknown>,
         description: string
       ): Promise<void> {
-        const loadingStartTimeMs = Date.now();
         const heartbeatIntervalId = setInterval(() => {
           if (this._onProgress) this._onProgress(this._framesExecuted);
         }, 1000);
         let loadingTimeoutId: any = null;
         try {
-          await Promise.race([
-            loadingPromise,
-            new Promise<never>((_, reject) => {
-              loadingTimeoutId = setTimeout(
-                () =>
-                  reject(
-                    new Error(
-                      `${description} did not finish loading within ` +
-                        `${this._loadingTimeoutMs}ms.`
-                    )
-                  ),
-                this._loadingTimeoutMs
-              );
-            }),
-          ]);
+          await this._countAsLoading(() =>
+            Promise.race([
+              loadingPromise,
+              new Promise<never>((_, reject) => {
+                loadingTimeoutId = setTimeout(
+                  () =>
+                    reject(
+                      new Error(
+                        `${description} did not finish loading within ` +
+                          `${this._loadingTimeoutMs}ms.`
+                      )
+                    ),
+                  this._loadingTimeoutMs
+                );
+              }),
+            ])
+          );
         } finally {
           clearInterval(heartbeatIntervalId);
           if (loadingTimeoutId) clearTimeout(loadingTimeoutId);
-          this._loadingTimeMs += Date.now() - loadingStartTimeMs;
         }
+      }
+
+      /**
+       * Run something counted as loading: excluded from the `timeoutMs`
+       * budget, while it runs (for the watchdog) and after (in `loadingMs`).
+       */
+      async _countAsLoading<T>(load: () => Promise<T>): Promise<T> {
+        // Already counted by an enclosing loading.
+        if (this._loadingSinceMs !== null) return load();
+        const loadingStartTimeMs = Date.now();
+        this._loadingSinceMs = loadingStartTimeMs;
+        try {
+          return await load();
+        } finally {
+          this._loadingTimeMs += Date.now() - loadingStartTimeMs;
+          this._loadingSinceMs = null;
+        }
+      }
+
+      /** The time spent loading so far, including an ongoing loading. */
+      _getLoadingTimeMs(): number {
+        return (
+          this._loadingTimeMs +
+          (this._loadingSinceMs !== null
+            ? Date.now() - this._loadingSinceMs
+            : 0)
+        );
       }
 
       /**
@@ -1445,20 +1473,39 @@ namespace gdjs {
           );
         }
         this._checkGuards();
-        this._runtimeGame
-          .getSceneStack()
-          .runWithSceneChangeCause(GAMEPLAY_TEST_SCENE_CHANGE_CAUSE, () =>
-            this._runtimeGame.getSceneStack().replace({
-              sceneName,
-              clear: true,
-              skipCreatingInstances: options
-                ? options.skipCreatingInstances
-                : undefined,
-            })
+        // Creating the scene and its first frame are counted as loading:
+        // they can take seconds in a big 3D scene (objects, physics bodies,
+        // shaders to compile, notably with a software renderer on CI).
+        await this._countAsLoading(async () => {
+          this._runtimeGame
+            .getSceneStack()
+            .runWithSceneChangeCause(GAMEPLAY_TEST_SCENE_CHANGE_CAUSE, () =>
+              this._runtimeGame.getSceneStack().replace({
+                sceneName,
+                clear: true,
+                skipCreatingInstances: options
+                  ? options.skipCreatingInstances
+                  : undefined,
+              })
+            );
+          // Step one frame so the scene is fully initialized ("beginning of
+          // scene" events have run) before the test continues.
+          await this.stepFrames(1);
+        });
+      }
+
+      /**
+       * Change the wall-clock budget of the test (30s by default, loading
+       * excluded), for a heavy game or a slow machine (like a 3D game
+       * rendered in software on a CI server). At most 10 minutes.
+       */
+      setTimeoutMs(timeoutMs: float): void {
+        if (!(timeoutMs > 0)) {
+          throw new Error(
+            'setTimeoutMs expects a positive number of milliseconds.'
           );
-        // Step one frame so the scene is fully initialized ("beginning of
-        // scene" events have run) before the test continues.
-        await this.stepFrames(1);
+        }
+        this._timeoutMs = Math.min(timeoutMs, MAX_TIMEOUT_MS);
       }
 
       /**
@@ -3488,14 +3535,13 @@ namespace gdjs {
        */
       async takeScreenshot(label: string = ''): Promise<void> {
         if (this._maxScreenshots <= 0) return;
-        // Let an animation frame happen so the canvas shows the current
-        // state of the game (fast runs only render a few times per second).
-        await Promise.race([
-          this._renderOnce(),
-          new Promise((resolve) =>
-            setTimeout(resolve, SCREENSHOT_RENDER_TIMEOUT_MS)
-          ),
-        ]);
+        // Render the current state of the game now: fast runs skip renders,
+        // and a slow renderer delays animation frames, so the canvas could
+        // show an old frame, or be black after a resize.
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        if (currentScene) currentScene.render();
         const canvas = this._runtimeGame.getRenderer().getCanvas();
         if (!canvas) {
           logger.warn('No canvas found: unable to take a screenshot.');
@@ -3953,7 +3999,7 @@ namespace gdjs {
           status,
           framesExecuted: this._framesExecuted,
           durationMs: this._startTimeMs ? Date.now() - this._startTimeMs : 0,
-          loadingMs: Math.round(this._loadingTimeMs),
+          loadingMs: Math.round(this._getLoadingTimeMs()),
           timeoutMs: this._timeoutMs,
           hiddenStallMs: Math.round(this._getHiddenStallTimeMs()),
           gameTimeMs: Math.round(this._gameTimeMs),
@@ -4297,7 +4343,7 @@ namespace gdjs {
             if (
               Date.now() -
                 harness._startTimeMs -
-                harness._loadingTimeMs -
+                harness._getLoadingTimeMs() -
                 harness._getHiddenStallTimeMs() >
               harness._timeoutMs + 1000
             ) {

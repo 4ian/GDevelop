@@ -1959,6 +1959,15 @@ namespace gdjs {
           sizeChanged = true;
         }
       }
+      // Check if opacity or flipping changed. They are applied by the object in
+      // `extraInitializationFromInitialInstance`, so just flag them as changed.
+      const opacityOrFlipChanged =
+        (oldInstance.opacity === undefined ? 255 : oldInstance.opacity) !==
+          (newInstance.opacity === undefined ? 255 : newInstance.opacity) ||
+        !oldInstance.flippedX !== !newInstance.flippedX ||
+        !oldInstance.flippedY !== !newInstance.flippedY ||
+        !oldInstance.flippedZ !== !newInstance.flippedZ;
+
       if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
         // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
         const oldCustomObjectData = oldObjectData as ObjectData &
@@ -2017,7 +2026,12 @@ namespace gdjs {
           return !oldStringProperty || oldStringProperty.value !== value;
         }
       );
-      if (numberPropertiesChanged || stringPropertiesChanged || sizeChanged) {
+      if (
+        numberPropertiesChanged ||
+        stringPropertiesChanged ||
+        sizeChanged ||
+        opacityOrFlipChanged
+      ) {
         runtimeObject.extraInitializationFromInitialInstance(newInstance);
         if (this._runtimeGame.isInGameEdition()) {
           gdjs.RuntimeObject.applyInGameEditorMinimumOpacity(runtimeObject);

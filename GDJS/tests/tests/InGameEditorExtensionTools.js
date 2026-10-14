@@ -273,4 +273,45 @@ describe('Tools of extensions in the in-game editor', function () {
       groups[0].getBoundingClientRect().top
     );
   });
+
+  it('shows color pickers in the toolbars of extensions', async () => {
+    const inGameEditor = await createInGameEditor();
+    expect(inGameEditor.isToolbarItemTypeSupported('color')).to.be(true);
+    expect(inGameEditor.isToolbarItemTypeSupported('unknown')).to.be(false);
+
+    /** @type {string[]} */
+    const chosenColors = [];
+    /** @param {string} value */
+    const showToolbarWithColor = (value) => {
+      inGameEditor.showToolbar('Tool', [
+        {
+          type: 'color',
+          id: 'Color',
+          tooltip: 'Color of the brush',
+          value,
+          onChange: (color) => chosenColors.push(color),
+        },
+      ]);
+      inGameEditor.updateAndRender();
+      const colorInput = document.querySelector(
+        '.InGameEditor-Extension-Toolbars-Container input[type="color"]'
+      );
+      if (!(colorInput instanceof HTMLInputElement)) {
+        throw new Error('The color picker is not shown.');
+      }
+      return colorInput;
+    };
+
+    const colorInput = showToolbarWithColor('#336699');
+    expect(colorInput.value).to.be('#336699');
+    expect(colorInput.title).to.be('Color of the brush');
+
+    colorInput.value = '#ff8000';
+    colorInput.dispatchEvent(new Event('input'));
+    expect(chosenColors).to.eql(['#ff8000']);
+
+    // The tool gives back the chosen color, or another one.
+    expect(showToolbarWithColor('#00ff00')).to.be(colorInput);
+    expect(colorInput.value).to.be('#00ff00');
+  });
 });

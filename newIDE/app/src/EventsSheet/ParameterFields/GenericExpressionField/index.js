@@ -524,19 +524,37 @@ export default class ExpressionField extends React.Component<Props, State> {
       ? this.context.values.showDeprecatedInstructionWarning
       : 'icon';
 
-    const { errorText, errorHighlights, isOnlyWarning } = extractErrors(
-      gd.JsPlatform.get(),
-      project,
-      projectScopedContainersAccessor,
-      expressionType,
-      parameterMetadata,
-      expressionNode,
-      objectName,
-      showDeprecatedInstructionWarning
-    );
-    const extraErrorText = onExtractAdditionalErrors
-      ? onExtractAdditionalErrors(expression, expressionNode)
-      : null;
+    // An optional parameter left empty is valid: the default value is used
+    // when generating the code (see `gd::InstructionValidator`).
+    const isEmptyOptionalParameter =
+      !!parameterMetadata &&
+      parameterMetadata.isOptional() &&
+      expression === '';
+
+    const {
+      errorText,
+      errorHighlights,
+      isOnlyWarning,
+    } = isEmptyOptionalParameter
+      ? {
+          errorText: null,
+          errorHighlights: ([]: Array<Highlight>),
+          isOnlyWarning: false,
+        }
+      : extractErrors(
+          gd.JsPlatform.get(),
+          project,
+          projectScopedContainersAccessor,
+          expressionType,
+          parameterMetadata,
+          expressionNode,
+          objectName,
+          showDeprecatedInstructionWarning
+        );
+    const extraErrorText =
+      onExtractAdditionalErrors && !isEmptyOptionalParameter
+        ? onExtractAdditionalErrors(expression, expressionNode)
+        : null;
     const formattedErrorText = [extraErrorText, errorText]
       .filter(Boolean)
       .join(' - ');
@@ -676,7 +694,12 @@ export default class ExpressionField extends React.Component<Props, State> {
                       value={value}
                       floatingLabelText={description}
                       helperMarkdownText={longDescription}
-                      hintText={expressionType === 'string' ? '""' : undefined}
+                      hintText={
+                        (parameterMetadata &&
+                          parameterMetadata.isOptional() &&
+                          parameterMetadata.getDefaultValue()) ||
+                        (expressionType === 'string' ? '""' : undefined)
+                      }
                       inputStyle={styles.input}
                       onChange={this._handleChange}
                       onBlur={this._handleBlurEvent}

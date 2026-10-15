@@ -9,13 +9,49 @@ namespace Jolt {
 const epsilon = 1 / (1 << 16);
 
 namespace gdjs {
+  /**
+   * The multithreaded build of Jolt needs `SharedArrayBuffer`, which is only
+   * available on cross-origin isolated pages (or when the browser enables it).
+   */
+  const canUseMultithreadedJolt = (): boolean =>
+    typeof SharedArrayBuffer !== 'undefined' &&
+    typeof navigator !== 'undefined' &&
+    (navigator.hardwareConcurrency || 1) > 1;
+
+  /** Number of threads helping the main thread to step the simulation. */
+  export const getJoltWorkerThreadsCount = (): integer =>
+    canUseMultithreadedJolt()
+      ? Math.min(Math.max((navigator.hardwareConcurrency || 1) - 1, 1), 4)
+      : 0;
+
+  const logger = new gdjs.Logger('Physics 3D');
+
+  /** See `jolt-buffered-contact-listener.js`. */
+  type BufferedContactListenerModule = {
+    contactAddedEventType: integer;
+    contactRemovedEventType: integer;
+    eventIntegersCount: integer;
+    createBufferedContactListenerMethods: (
+      jolt: typeof Jolt,
+      buffer: { bufferAddress: integer; capacity: integer }
+    ) => Partial<Jolt.ContactListenerJS>;
+  };
+  export let bufferedContactListenerModule: BufferedContactListenerModule | null =
+    null;
+
   const loadJolt = async () => {
     try {
-      const module = await import('./jolt-physics.wasm.js');
+      const module = canUseMultithreadedJolt()
+        ? await import('./jolt-physics.multithread.wasm.js')
+        : await import('./jolt-physics.wasm.js');
       const initializeJoltPhysics = module.default;
       if (!initializeJoltPhysics) {
         throw new Error('No default export found in Jolt.');
       }
+      bufferedContactListenerModule = await import(
+        // @ts-ignore - Plain JavaScript module, also loaded by the worker threads.
+        './jolt-buffered-contact-listener.js'
+      );
 
       const Jolt = await initializeJoltPhysics();
       //@ts-ignore
@@ -74,6 +110,15 @@ namespace gdjs {
     bodyInterface: Jolt.BodyInterface;
     /** Contact listener to keep track of current collisions */
     contactListener: Jolt.ContactListenerJS;
+    /**
+     * Contacts started or ended during a step, written by the contact listener
+     * (see `jolt-buffered-contact-listener.js`). It's only used as raw memory.
+     */
+    _contactEventsBuffer: Jolt.ArrayFloat;
+    /** Index in `Jolt.HEAP32` of the number of events in the buffer. */
+    _contactEventsCountIndex: integer;
+    _hasWarnedAboutContactEventsOverflow = false;
+    static readonly contactEventsCapacity = 32768;
     /** Avoid creating new vectors all the time */
     _tempVec3 = new Jolt.Vec3();
     _tempRVec3 = new Jolt.RVec3();
@@ -106,8 +151,44 @@ namespace gdjs {
       this.worldScale = sharedData.worldScale;
       this.worldInvScale = 1 / this.worldScale;
 
+      // The contact listener is called during the step, possibly by the worker
+      // threads of Jolt: it only writes the contacts into a buffer, which is
+      // read after the step (see `_dispatchBufferedContacts`).
+      const listenerModule = gdjs.bufferedContactListenerModule!;
+      this._contactEventsBuffer = new Jolt.ArrayFloat();
+      this._contactEventsBuffer.resize(
+        1 +
+          Physics3DSharedData.contactEventsCapacity *
+            listenerModule.eventIntegersCount
+      );
+      const bufferAddress = Jolt.getPointer(this._contactEventsBuffer.data());
+      this._contactEventsCountIndex = bufferAddress >> 2;
+      Jolt.HEAP32[this._contactEventsCountIndex] = 0;
+      this.contactListener = new Jolt.ContactListenerJS();
+      Object.assign(
+        this.contactListener,
+        listenerModule.createBufferedContactListenerMethods(Jolt, {
+          bufferAddress,
+          capacity: Physics3DSharedData.contactEventsCapacity,
+        })
+      );
+      // @ts-ignore - Only in the multithreaded build: the worker threads,
+      // started with the JoltInterface, give the same methods to the listener.
+      if (Jolt.configureWorkerScripts) {
+        // @ts-ignore
+        Jolt.configureWorkerScripts('./jolt-buffered-contact-listener.js', {
+          contactListenerAddress: Jolt.getPointer(this.contactListener),
+          bufferAddress,
+          capacity: Physics3DSharedData.contactEventsCapacity,
+        });
+      }
+
       // Initialize Jolt
       const settings = new Jolt.JoltSettings();
+      const workerThreadsCount = gdjs.getJoltWorkerThreadsCount();
+      if (workerThreadsCount > 0) {
+        settings.mMaxWorkerThreads = workerThreadsCount;
+      }
       gdjs.Physics3DSharedData.setupCollisionFiltering(settings);
       this.jolt = new Jolt.JoltInterface(settings);
       Jolt.destroy(settings);
@@ -117,64 +198,70 @@ namespace gdjs {
       );
       this.bodyInterface = this.physicsSystem.GetBodyInterface();
 
-      this.contactListener = new Jolt.ContactListenerJS();
       this.physicsSystem.SetContactListener(this.contactListener);
-      this.contactListener.OnContactAdded = (
-        bodyPtrA: number,
-        bodyPtrB: number,
-        manifoldPtr: number,
-        settingsPtr: number
-      ): void => {
-        const bodyA = Jolt.wrapPointer(bodyPtrA, Jolt.Body);
-        const bodyB = Jolt.wrapPointer(bodyPtrB, Jolt.Body);
+    }
 
-        const behaviorA = bodyA.gdjsAssociatedBehavior;
-        const behaviorB = bodyB.gdjsAssociatedBehavior;
-        if (!behaviorA || !behaviorB) {
-          return;
-        }
-
-        behaviorA.onContactBegin(behaviorB);
-        behaviorB.onContactBegin(behaviorA);
-      };
-      this.contactListener.OnContactRemoved = (
-        subShapePairPtr: number
-      ): void => {
-        const subShapePair = Jolt.wrapPointer(
-          subShapePairPtr,
-          Jolt.SubShapeIDPair
+    /**
+     * Call `onContactBegin` and `onContactEnd` for the contacts written into
+     * the buffer by the contact listener during the step.
+     */
+    private _dispatchBufferedContacts(): void {
+      const listenerModule = gdjs.bufferedContactListenerModule!;
+      const heap = Jolt.HEAP32;
+      const countIndex = this._contactEventsCountIndex;
+      const eventsCount = Atomics.load(heap, countIndex);
+      if (
+        eventsCount > Physics3DSharedData.contactEventsCapacity &&
+        !this._hasWarnedAboutContactEventsOverflow
+      ) {
+        this._hasWarnedAboutContactEventsOverflow = true;
+        logger.warn(
+          `Too many contacts started or ended during a physics step (${eventsCount}): only the first ${Physics3DSharedData.contactEventsCapacity} are reported to collision conditions.`
         );
-
-        // This is ok because bodies are not deleted during the Physics step.
-        const bodyLockInterface = this.physicsSystem.GetBodyLockInterface();
-        const bodyA = bodyLockInterface.TryGetBody(subShapePair.GetBody1ID());
-        const bodyB = bodyLockInterface.TryGetBody(subShapePair.GetBody2ID());
-
-        const behaviorA = bodyA.gdjsAssociatedBehavior;
-        const behaviorB = bodyB.gdjsAssociatedBehavior;
+      }
+      const dispatchedEventsCount = Math.min(
+        eventsCount,
+        Physics3DSharedData.contactEventsCapacity
+      );
+      const bodyLockInterface = this.physicsSystem.GetBodyLockInterface();
+      for (
+        let eventIndex = 0;
+        eventIndex < dispatchedEventsCount;
+        eventIndex++
+      ) {
+        const eventStart =
+          countIndex + 1 + eventIndex * listenerModule.eventIntegersCount;
+        const behaviorA = this._getBehaviorFromBodyId(
+          bodyLockInterface,
+          heap[eventStart + 1]
+        );
+        const behaviorB = this._getBehaviorFromBodyId(
+          bodyLockInterface,
+          heap[eventStart + 2]
+        );
         if (!behaviorA || !behaviorB) {
-          return;
+          continue;
         }
+        if (heap[eventStart] === listenerModule.contactAddedEventType) {
+          behaviorA.onContactBegin(behaviorB);
+          behaviorB.onContactBegin(behaviorA);
+        } else {
+          behaviorA.onContactEnd(behaviorB);
+          behaviorB.onContactEnd(behaviorA);
+        }
+      }
+      Atomics.store(heap, countIndex, 0);
+    }
 
-        behaviorA.onContactEnd(behaviorB);
-        behaviorB.onContactEnd(behaviorA);
-      };
-      this.contactListener.OnContactPersisted = (
-        bodyPtrA: number,
-        bodyPtrB: number,
-        manifoldPtr: number,
-        settingsPtr: number
-      ): void => {
-        // TODO we could rely on this event.
-      };
-      this.contactListener.OnContactValidate = (
-        bodyPtrA: number,
-        bodyPtrB: number,
-        inBaseOffset: number,
-        inCollisionResult: number
-      ): number => {
-        return Jolt.ValidateResult_AcceptAllContactsForThisBodyPair;
-      };
+    private _getBehaviorFromBodyId(
+      bodyLockInterface: Jolt.BodyLockInterfaceLocking,
+      bodyIdValue: integer
+    ): Physics3DRuntimeBehavior | null {
+      const bodyId = new Jolt.BodyID(bodyIdValue >>> 0);
+      // The body of a removed contact may not exist anymore.
+      const body = bodyLockInterface.TryGetBody(bodyId);
+      Jolt.destroy(bodyId);
+      return (body && body.gdjsAssociatedBehavior) || null;
     }
 
     getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -290,6 +377,7 @@ namespace gdjs {
 
       const numSteps = deltaTime > 1.0 / 55.0 ? 2 : 1;
       this.jolt.Step(deltaTime, numSteps);
+      this._dispatchBufferedContacts();
       this.stepped = true;
 
       // It's important that updateBodyFromObject and updateObjectFromBody are
@@ -328,6 +416,8 @@ namespace gdjs {
       }
       physics3DSharedData._meshShapeSettingsCache.clear();
       Jolt.destroy(physics3DSharedData.jolt);
+      // Destroyed after the worker threads, stopped with the JoltInterface.
+      Jolt.destroy(physics3DSharedData._contactEventsBuffer);
       runtimeScene.physics3DSharedData = null;
     }
   });

@@ -34,6 +34,8 @@ import {
 } from '../InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
+import { InGameEditorUnavailableMessage } from '../../EmbeddedGame/InGameEditorUnavailableMessage';
+import { isWebGL2Supported } from '../../Utils/WebGL';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
@@ -90,6 +92,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       onExtensionInstalled,
       isActive,
       onRestartInGameEditor,
+      onSwitchToInstancesEditor,
       showRestartInGameEditorAfterErrorButton,
     } = props;
     const selectedInstances = props.instancesSelection.getSelectedInstances();
@@ -322,7 +325,12 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
               componentTitle={<Trans>Instances editor.</Trans>}
               scope="scene-editor-canvas"
             >
-              {gameEditorMode === 'embedded-game' ? (
+              {gameEditorMode === 'embedded-game' && !isWebGL2Supported() ? (
+                <InGameEditorUnavailableMessage
+                  marginBottom={bottomContainerHeight}
+                  onSwitchToInstancesEditor={onSwitchToInstancesEditor}
+                />
+              ) : gameEditorMode === 'embedded-game' ? (
                 <EmbeddedGameFrameHole
                   marginBottom={bottomContainerHeight}
                   isActive={isActive}

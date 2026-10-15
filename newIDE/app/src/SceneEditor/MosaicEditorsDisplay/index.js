@@ -34,6 +34,8 @@ import {
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
+import { InGameEditorUnavailableMessage } from '../../EmbeddedGame/InGameEditorUnavailableMessage';
+import { isWebGL2Supported } from '../../Utils/WebGL';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 const initialMosaicEditorNodes = {
@@ -98,6 +100,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
       onCreateNewExtensionWithBehavior,
       isActive,
       onRestartInGameEditor,
+      onSwitchToInstancesEditor,
       showRestartInGameEditorAfterErrorButton,
     } = props;
     const {
@@ -413,7 +416,18 @@ const MosaicEditorsDisplay: React.ComponentType<{
         ),
       },
       'instances-editor':
-        gameEditorMode === 'embedded-game'
+        gameEditorMode === 'embedded-game' && !isWebGL2Supported()
+          ? {
+              type: 'primary',
+              noTitleBar: true,
+              noSoftKeyboardAvoidance: true,
+              renderEditor: () => (
+                <InGameEditorUnavailableMessage
+                  onSwitchToInstancesEditor={onSwitchToInstancesEditor}
+                />
+              ),
+            }
+          : gameEditorMode === 'embedded-game'
           ? {
               type: 'primary',
               noTitleBar: true,
@@ -585,7 +599,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
           // $FlowFixMe[incompatible-type]
           getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
         }
-        isTransparent={gameEditorMode === 'embedded-game'}
+        isTransparent={
+          gameEditorMode === 'embedded-game' && isWebGL2Supported()
+        }
         onDragOrResizedStarted={() => {
           preventGameFramePointerEvents(true);
         }}

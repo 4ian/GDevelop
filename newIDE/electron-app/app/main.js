@@ -57,6 +57,10 @@ const {
   routeCliCommandToLiveEditor,
 } = require('./CliCommandHandoff');
 
+// Allow the game previews (served from files, not cross-origin isolated) to use
+// SharedArrayBuffer, needed by the multithreaded physics engine.
+app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
+
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
 

@@ -81,6 +81,14 @@ namespace gdjs {
 
     stepped: boolean = false;
     /**
+     * Mesh shape settings shared by the instances using the same model with
+     * the same dimensions. Jolt caches the shape created from settings, so
+     * the triangles are only extracted and indexed once per entry.
+     * Each entry holds a reference (`AddRef`) to stay alive when bodies
+     * using it are destroyed.
+     */
+    _meshShapeSettingsCache = new Map<string, Jolt.ShapeSettings>();
+    /**
      * List of physics behavior in the runtimeScene. It should be updated
      * when a new physics object is created (constructor), on destruction (onDestroy),
      * on behavior activation (onActivate) and on behavior deactivation (onDeActivate).
@@ -778,33 +786,12 @@ namespace gdjs {
         this.bodyType === 'Static' &&
         isModel3D(this.owner)
       ) {
-        const meshShapeSettings: Array<Jolt.MeshShapeSettings> =
-          gdjs.staticArray(
-            Physics3DRuntimeBehavior.prototype
-              ._createNewShapeSettingsWithoutMassCenterOffset
-          );
-        this.getMeshShapeSettings(
+        shapeSettings = this._getOrCreateMeshShapeSettings(
           this.owner,
           width,
           height,
-          depth,
-          meshShapeSettings
+          depth
         );
-        if (meshShapeSettings.length === 1) {
-          shapeSettings = meshShapeSettings[0];
-        } else {
-          const compoundShapeSettings = new Jolt.StaticCompoundShapeSettings();
-          for (let index = 0; index < meshShapeSettings.length; index++) {
-            compoundShapeSettings.AddShapeShapeSettings(
-              this.getVec3(0, 0, 0),
-              this.getQuat(0, 0, 0, 1),
-              meshShapeSettings[index],
-              index
-            );
-          }
-          shapeSettings = compoundShapeSettings;
-        }
-        meshShapeSettings.length = 0;
         quat = this.getQuat(0, 0, 0, 1);
       } else {
         let convexShapeSettings: Jolt.ConvexShapeSettings;
@@ -1250,6 +1237,68 @@ namespace gdjs {
       Jolt.destroy(aaBox);
       Jolt.destroy(broadPhaseLayerFilter);
       Jolt.destroy(objectLayerFilter);
+    }
+
+    /**
+     * Return the mesh shape settings of the model, shared with the other
+     * instances using the same model with the same dimensions.
+     */
+    private _getOrCreateMeshShapeSettings(
+      model3DRuntimeObject: gdjs.Model3DRuntimeObject,
+      width: float,
+      height: float,
+      depth: float
+    ): Jolt.ShapeSettings {
+      const data = model3DRuntimeObject._data.content;
+      const object = this.owner3D;
+      const cacheKey = [
+        this.meshShapeResourceName || model3DRuntimeObject._modelResourceName,
+        width,
+        height,
+        depth,
+        object.isFlippedX(),
+        object.isFlippedY(),
+        object.isFlippedZ(),
+        data.rotationX,
+        data.rotationY,
+        data.rotationZ,
+      ].join('|');
+      const meshShapeSettingsCache = this._sharedData._meshShapeSettingsCache;
+      const cachedShapeSettings = meshShapeSettingsCache.get(cacheKey);
+      if (cachedShapeSettings) {
+        return cachedShapeSettings;
+      }
+
+      const meshShapeSettings: Array<Jolt.MeshShapeSettings> = gdjs.staticArray(
+        Physics3DRuntimeBehavior.prototype._getOrCreateMeshShapeSettings
+      );
+      this.getMeshShapeSettings(
+        model3DRuntimeObject,
+        width,
+        height,
+        depth,
+        meshShapeSettings
+      );
+      let shapeSettings: Jolt.ShapeSettings;
+      if (meshShapeSettings.length === 1) {
+        shapeSettings = meshShapeSettings[0];
+      } else {
+        const compoundShapeSettings = new Jolt.StaticCompoundShapeSettings();
+        for (let index = 0; index < meshShapeSettings.length; index++) {
+          compoundShapeSettings.AddShapeShapeSettings(
+            this.getVec3(0, 0, 0),
+            this.getQuat(0, 0, 0, 1),
+            meshShapeSettings[index],
+            index
+          );
+        }
+        shapeSettings = compoundShapeSettings;
+      }
+      meshShapeSettings.length = 0;
+      // Keep the settings alive when the shapes wrapping them are destroyed.
+      shapeSettings.AddRef();
+      meshShapeSettingsCache.set(cacheKey, shapeSettings);
+      return shapeSettings;
     }
 
     private getMeshShapeSettings(

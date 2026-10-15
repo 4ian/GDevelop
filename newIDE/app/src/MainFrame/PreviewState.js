@@ -10,6 +10,7 @@ import {
   type InGameEditorExtensionError,
   setLatestInGameEditorExtensionErrors,
 } from '../InGameEditorExtensionErrors';
+import { setInGameEditorRendererCreationFailed } from '../EmbeddedGame/InGameEditorAvailability';
 
 const MAX_IN_GAME_EDITOR_EXTENSION_ERRORS = 20;
 let nextInGameEditorExtensionErrorId = 1;
@@ -118,6 +119,14 @@ export const usePreviewDebuggerServerWatcher = (
               setGameHotReloadLogs(parsedMessage.payload.logs);
             }
           } else if (parsedMessage.command === 'status') {
+            if (
+              parsedMessage.payload.isInGameEdition &&
+              typeof parsedMessage.payload.is3DRenderingAvailable === 'boolean'
+            ) {
+              setInGameEditorRendererCreationFailed(
+                !parsedMessage.payload.is3DRenderingAvailable
+              );
+            }
             setDebuggerStatus(debuggerStatus => ({
               ...debuggerStatus,
               [id]: {

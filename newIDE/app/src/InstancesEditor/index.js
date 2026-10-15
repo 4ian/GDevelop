@@ -60,6 +60,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
+import { isWebGL2Supported } from '../Utils/WebGL';
 import { Trans } from '@lingui/macro';
 import { generateUUID } from 'three/src/math/MathUtils';
 import {
@@ -258,17 +259,34 @@ export default class InstancesEditor extends Component<Props, State> {
     });
 
     let gameCanvas: HTMLCanvasElement;
-    this._showObjectInstancesIn3D = this.props.showObjectInstancesIn3D;
     // Ensure we don't initialize with 0 dimensions, which is invalid for PixiJS/WebGL
     // and can cause shader creation to fail on some platforms (e.g. Windows with ANGLE).
     const initialWidth = this.props.width || 1;
     const initialHeight = this.props.height || 1;
+    // Three.js requires WebGL2. The preference can still be enabled on devices
+    // without it (it was persisted before this requirement), so fall back to 2D.
+    let threeCanvas: HTMLCanvasElement | null = null;
+    // $FlowFixMe[value-as-type]
+    let threeRenderer: THREE.WebGLRenderer | null = null;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
-    if (this._showObjectInstancesIn3D) {
-      gameCanvas = document.createElement('canvas');
-      const threeRenderer = new THREE.WebGLRenderer({
-        canvas: gameCanvas,
-      });
+    if (this.props.showObjectInstancesIn3D && isWebGL2Supported()) {
+      try {
+        threeCanvas = document.createElement('canvas');
+        threeRenderer = new THREE.WebGLRenderer({
+          canvas: threeCanvas,
+        });
+      } catch (error) {
+        console.error(
+          'Unable to create the Three.js renderer, falling back to 2D rendering:',
+          error
+        );
+        threeCanvas = null;
+        threeRenderer = null;
+      }
+    }
+    this._showObjectInstancesIn3D = !!threeRenderer;
+    if (threeCanvas && threeRenderer) {
+      gameCanvas = threeCanvas;
       threeRenderer.autoClear = false;
       threeRenderer.setSize(initialWidth, initialHeight);
 

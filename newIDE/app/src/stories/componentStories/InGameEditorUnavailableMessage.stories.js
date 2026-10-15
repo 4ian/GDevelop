@@ -12,10 +12,22 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+export const WebGL2NotSupported = (): React.Node => (
   <FixedHeightFlexContainer height={500}>
     <div style={{ flex: 1 }}>
       <InGameEditorUnavailableMessage
+        reason="webgl2-not-supported"
+        onSwitchToInstancesEditor={action('onSwitchToInstancesEditor')}
+      />
+    </div>
+  </FixedHeightFlexContainer>
+);
+
+export const RendererCreationFailed = (): React.Node => (
+  <FixedHeightFlexContainer height={500}>
+    <div style={{ flex: 1 }}>
+      <InGameEditorUnavailableMessage
+        reason="renderer-creation-failed"
         onSwitchToInstancesEditor={action('onSwitchToInstancesEditor')}
       />
     </div>

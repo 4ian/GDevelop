@@ -880,6 +880,7 @@ namespace gdjs {
       // point the game is still being constructed and has no scene stack yet.
       const sceneStack = this._runtimegame.getSceneStack();
       const currentScene = sceneStack ? sceneStack.getCurrentScene() : null;
+      const gameRenderer = this._runtimegame.getRenderer();
       this._sendMessage(
         circularSafeStringify({
           command: 'status',
@@ -888,6 +889,10 @@ namespace gdjs {
             isInGameEdition: this._runtimegame.isInGameEdition(),
             sceneName: currentScene ? currentScene.getName() : null,
             gameFrameLoadId: getGameFrameLoadId(),
+            // Unknown (null) until the renderers are initialized.
+            is3DRenderingAvailable: gameRenderer.getPIXIRenderer()
+              ? !!gameRenderer.getThreeRenderer()
+              : null,
           },
         })
       );

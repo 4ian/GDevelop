@@ -10,17 +10,21 @@ import AlertMessage from '../UI/AlertMessage';
 import RaisedButton from '../UI/RaisedButton';
 import Grid3d from '../UI/CustomSvgIcons/Grid3d';
 import Grid2d from '../UI/CustomSvgIcons/Grid2d';
+import { type InGameEditorUnavailabilityReason } from './InGameEditorAvailability';
 
 type Props = {|
+  reason: InGameEditorUnavailabilityReason,
   onSwitchToInstancesEditor: () => void,
   marginBottom?: number,
 |};
 
 /**
- * Displayed instead of the 3D editor (the in-game editor) on devices
- * without WebGL2, which is required by Three.js.
+ * Displayed instead of the 3D editor (the in-game editor) when it can't
+ * render: on devices without WebGL2 (required by Three.js), or when the
+ * 3D renderer could not be created.
  */
 export const InGameEditorUnavailableMessage = ({
+  reason,
   onSwitchToInstancesEditor,
   marginBottom,
 }: Props): React.Node => (
@@ -36,16 +40,28 @@ export const InGameEditorUnavailableMessage = ({
           <Grid3d fontSize="large" />
           <Spacer />
           <Text size="block-title">
-            <Trans>The 3D editor is not available on this device.</Trans>
+            {reason === 'webgl2-not-supported' ? (
+              <Trans>The 3D editor is not available on this device.</Trans>
+            ) : (
+              <Trans>The 3D editor could not start.</Trans>
+            )}
           </Text>
         </Line>
         <Divider />
         <AlertMessage kind="warning">
-          <Trans>
-            The 3D editor requires WebGL2, which is not supported by this
-            device. Updating your graphics drivers can solve this. In the
-            meantime, you can use the 2D editor.
-          </Trans>
+          {reason === 'webgl2-not-supported' ? (
+            <Trans>
+              The 3D editor requires WebGL2, which is not supported by this
+              device. Updating your graphics drivers can solve this. In the
+              meantime, you can use the 2D editor.
+            </Trans>
+          ) : (
+            <Trans>
+              The 3D rendering could not be initialized on this device.
+              Restarting GDevelop or updating your graphics drivers can solve
+              this. In the meantime, you can use the 2D editor.
+            </Trans>
+          )}
         </AlertMessage>
         <Line justifyContent="flex-end" noMargin>
           <RaisedButton

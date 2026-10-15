@@ -18,6 +18,7 @@
     "@storybook/react-webpack5": "7.4.6",
     "@storybook/theming": "7.4.6",
     "@types/node": "22.18.0",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "adm-zip": "^0.5.10",
     "axios-mock-adapter": "^1.22.0",
     "babel-core": "^7.0.0-bridge.0",
@@ -41,7 +42,7 @@
     "shelljs": "0.8.4",
     "storybook": "7.4.6",
     "style-dictionary": "^2.10.2",
-    "typescript": "^4.1.3",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
     "webpack": "5.88.2",
     "workbox-build": "^4.3.1",
     "worker-loader": "^3.0.8"
@@ -113,6 +114,7 @@
     },
     "react": "$react",
     "react-dom": "$react-dom",
+    "typescript": "$typescript",
     "react-dnd": "14.0.5",
     "react-dnd-touch-backend": "14.1.1",
     "dnd-core": "14.0.1"

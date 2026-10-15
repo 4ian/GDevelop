@@ -16,6 +16,7 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
  */
 const retryIfFailed = async ({ times, backoff }, functionCalled) => {
   let tries = 0;
+  /** @type {unknown} */
   let latestError = null;
   const useBackoff = !!backoff;
   let delayTime = (backoff && backoff.initialDelay) || 0;

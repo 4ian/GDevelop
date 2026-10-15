@@ -55,10 +55,9 @@ const EXAMPLES_REPO = 'https://github.com/GDevelopApp/GDevelop-examples.git';
 const EXAMPLES_BRANCH = 'main';
 const CLI_TIMEOUT_MS = 10 * 60 * 1000;
 
-/**
- * @param {string} msg
- * @returns {never}
- */
+// The type is on the variable (not only on the arrow function) so that
+// TypeScript knows the code after a call to `fail` is unreachable.
+/** @type {(msg: string) => never} */
 const fail = msg => {
   throw new Error(msg);
 };

@@ -466,6 +466,7 @@ const outputChangelog = ({
     );
   }
 
+  /** @type {GitEnrichedCommitInfo[] | null} */
   let templatesCommits = null;
   if (templatesGitPath) {
     const templatesRepoGitTools = getGitTools(templatesGitPath);

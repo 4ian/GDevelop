@@ -3,7 +3,10 @@
   "compilerOptions": {
     "module": "esnext",
     "noImplicitAny": true,
+    // TypeScript 7 defaults to `strict: true`.
+    "strict": false,
     "outDir": "./dist/tsc",
+    "rootDir": "./src",
     "target": "ES2017",
     "sourceMap": true,
     "declaration": true,
@@ -15,10 +18,10 @@
       "@types/offscreencanvas"
     ],
     "lib": ["DOM", "ES5", "ES6"],
-    "esModuleInterop": false, 
-    "downlevelIteration": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
+    // Avoid errors in PixiJS types with the DOM types of recent TypeScript versions.
+    "skipLibCheck": true,
   },
   "exclude": [
     "node_modules"

@@ -209,11 +209,11 @@ namespace gdjs {
       // `gridCellsStart[cell]` to `gridCellsStart[cell + 1]`.
       const gridObjects: gdjs.RuntimeObject[] = [];
       const objectsNotInGrid: gdjs.RuntimeObject[] = [];
-      let gridObjectsBounds = new Float64Array(4 * 64);
-      let gridCellsStart = new Int32Array(64);
-      let gridCellsObjects = new Int32Array(64);
-      let gridCellsNextObject = new Int32Array(64);
-      let gridObjectsLastTestedObjectIndex = new Int32Array(64);
+      let gridObjectsBounds: Float64Array = new Float64Array(4 * 64);
+      let gridCellsStart: Int32Array = new Int32Array(64);
+      let gridCellsObjects: Int32Array = new Int32Array(64);
+      let gridCellsNextObject: Int32Array = new Int32Array(64);
+      let gridObjectsLastTestedObjectIndex: Int32Array = new Int32Array(64);
       let gridMinX = 0;
       let gridMinY = 0;
       let gridCellSize = 1;

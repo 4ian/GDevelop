@@ -15,8 +15,10 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
+/** @typedef {import('../../GDevelop.js/types').PlatformExtension} PlatformExtension */
+
 /**
- * @param {gd.PlatformExtension} extension
+ * @param {PlatformExtension} extension
  * @param {(translationSource: string) => string} _
  * @param {GDNamespace} gd
  */
@@ -374,7 +376,7 @@ const defineTileMapCapability = function (extension, _, gd) {
 };
 
 /**
- * @param {gd.PlatformExtension} extension
+ * @param {PlatformExtension} extension
  * @param {(translationSource: string) => string} _
  * @param {GDNamespace} gd
  */
@@ -989,7 +991,7 @@ const defineExternalTileMap = function (extension, _, gd) {
 };
 
 /**
- * @param {gd.PlatformExtension} extension
+ * @param {PlatformExtension} extension
  * @param {(translationSource: string) => string} _
  * @param {GDNamespace} gd
  */
@@ -1484,7 +1486,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
 };
 
 /**
- * @param {gd.PlatformExtension} extension
+ * @param {PlatformExtension} extension
  * @param {(translationSource: string) => string} _
  * @param {GDNamespace} gd
  */

@@ -343,6 +343,7 @@ namespace gdjs {
       const geometry = new PIXI.Geometry();
       geometry
         .addAttribute('aVertexPosition', this._vertexBuffer, 2)
+        // @ts-ignore - PixiJS v7 IArrayBuffer type is not compatible with typed arrays since TypeScript 5.7.
         .addIndex(this._indexBuffer);
       if (!this._light) {
         this._light = new PIXI.Mesh(geometry, shader);
@@ -501,9 +502,11 @@ namespace gdjs {
         this._light.shader.uniforms.center = this._center;
         this._light.geometry
           .getBuffer('aVertexPosition')
+          // @ts-ignore - PixiJS v7 IArrayBuffer type is not compatible with typed arrays since TypeScript 5.7.
           .update(this._defaultVertexBuffer);
         this._light.geometry
           .getIndex()
+          // @ts-ignore - PixiJS v7 IArrayBuffer type is not compatible with typed arrays since TypeScript 5.7.
           .update(LightRuntimeObjectPixiRenderer._defaultIndexBuffer);
         return;
       }
@@ -558,7 +561,9 @@ namespace gdjs {
       if (!isSubArrayUsed) {
         this._light.geometry
           .getBuffer('aVertexPosition')
+          // @ts-ignore - PixiJS v7 IArrayBuffer type is not compatible with typed arrays since TypeScript 5.7.
           .update(this._vertexBuffer);
+        // @ts-ignore - PixiJS v7 IArrayBuffer type is not compatible with typed arrays since TypeScript 5.7.
         this._light.geometry.getIndex().update(this._indexBuffer);
       } else {
         this._light.geometry

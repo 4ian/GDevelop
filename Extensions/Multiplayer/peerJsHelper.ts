@@ -201,7 +201,7 @@ namespace gdjs {
       // @ts-ignore - We checked that DecompressionStream is available in the browser.
       const ds = new DecompressionStream(compressionStreamFormat);
       const writer = ds.writable.getWriter();
-      writer.write(receivedData);
+      writer.write(receivedData as Uint8Array<ArrayBuffer>);
       writer.close();
 
       const decompressedStream = ds.readable;

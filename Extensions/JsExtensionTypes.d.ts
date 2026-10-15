@@ -245,4 +245,10 @@ declare type ExtensionModule = {
   registerInstanceRenderers?: (
     objectsRenderingService: ObjectsRenderingService
   ) => void;
+  /**
+   * Register a function clearing the caches of the extension (called when a project is closed).
+   */
+  registerClearCache?: (
+    objectsRenderingService: ObjectsRenderingService
+  ) => void;
 };

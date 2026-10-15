@@ -23,6 +23,11 @@ module.exports = function (config) {
       compilerOptions: {
         module: "commonjs",
         noImplicitAny: true,
+        // TypeScript 6 (used by karma-typescript) defaults to `strict: true`
+        // and deprecates options removed in TypeScript 7.
+        strict: false,
+        ignoreDeprecations: "6.0",
+        skipLibCheck: true,
         outDir: "tmp",
         target: "ES5",
         sourceMap: true,

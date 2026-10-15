@@ -394,6 +394,7 @@ describe('Multiplayer', () => {
     };
   };
 
+  /** @type {any} */
   let _originalP2pIfAny = undefined;
 
   beforeEach(() => {

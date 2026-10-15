@@ -478,7 +478,10 @@ module.exports = {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
-    /** The bitmap font used in case another font can't be loaded. */
+    /**
+     * The bitmap font used in case another font can't be loaded.
+     * @type {PIXI.BitmapFont | null}
+     */
     let defaultBitmapFont = null;
 
     const defaultBitmapFontInstallKey = 'GD-DEFAULT-BITMAP-FONT';
@@ -495,6 +498,8 @@ module.exports = {
      * font name used by Pixi is the one inside the font data, but this name is not necessarily unique.
      * For example, 2 resources can use the same font, or we can have multiple objects with the same
      * font data and different textures).
+     * @param {string} bitmapFontInstallKey
+     * @returns {PIXI.BitmapFont}
      */
     const patchBitmapFont = (bitmapFont, bitmapFontInstallKey) => {
       const defaultName = bitmapFont.font;

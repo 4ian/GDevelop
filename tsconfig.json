@@ -4,6 +4,8 @@
   // See `GDJS/scripts/build.js`.
   "compilerOptions": {
     "noEmit": true,
+    // TypeScript 7 defaults to `strict: true`. Strict checks are instead enabled individually below.
+    "strict": false,
     "allowJs": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
@@ -12,19 +14,18 @@
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
     "skipLibCheck": true,
-    // Not used (as we don't compile with tsc), but necessary for iterating on Map/Set.
-    "downlevelIteration": true,
     // Required by PixiJS, for importing 3rd-party dependencies like EventEmitter3.
     "esModuleInterop": true,
     // Required by PixiJS, loaders needs this to use the more strict mini-signal types.
     "paths": {
       "mini-signals": [
-        "GDJS/node_modules/resource-loader/typings/mini-signals.d.ts"
+        "./GDJS/node_modules/resource-loader/typings/mini-signals.d.ts"
       ]
     },
-    "baseUrl": "./",
     "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise", "ES2018.Promise"],
     "typeRoots": ["GDJS/node_modules/@types/"],
+    // Include all packages from typeRoots (TypeScript 7 defaults to none).
+    "types": ["*"],
     // JSX syntax for lightweight rendering in the game engine:
     "jsx": "react",
     "jsxFactory": "h",
@@ -38,6 +39,7 @@
     "Extensions/**/*.ts",
     "GDJS/tests/tests/**/*.js",
     "GDJS/tests/tests-utils/**/*.js",
+    "GDJS/tests/tests-utils/test-helpers.d.ts",
     "GDJS/tests/benchmarks/**/*.js"
   ],
   // Exclude pre-built js code

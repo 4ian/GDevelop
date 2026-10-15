@@ -194,7 +194,7 @@ const EventsBasedObjectScenePropertiesDialog = ({
             onChange={(e, value) => setAreaMaxY(parseFloat(value) || 0)}
             errorText={
               areaMinY > areaMaxY ? (
-                <Trans>Bottom bound should be greater than right bound</Trans>
+                <Trans>Bottom bound should be greater than top bound</Trans>
               ) : null
             }
           />

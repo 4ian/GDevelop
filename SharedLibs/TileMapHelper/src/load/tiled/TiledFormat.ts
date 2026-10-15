@@ -311,6 +311,9 @@ export type TiledTileset = {
   /** (optional) */
   tileoffset?: TileOffset;
 
+  /** `tile` (default) or `grid`: the size to use when rendering tiles (since 1.9, optional) */
+  tilerendersize?: string;
+
   /** Array of {@link TiledTileDefinition} (optional) */
   tiles?: Array<TiledTileDefinition>;
 

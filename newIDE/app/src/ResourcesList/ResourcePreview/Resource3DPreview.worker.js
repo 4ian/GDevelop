@@ -36,6 +36,8 @@ const removeMetalnessFromMesh = node => {
 const disposeModel = model => {
   model.traverse(node => {
     if (node.geometry) node.geometry.dispose();
+    // The bones of skinned meshes are stored in a texture.
+    if (node.skeleton) node.skeleton.dispose();
     if (!node.material) return;
     const materials = Array.isArray(node.material)
       ? node.material
@@ -237,8 +239,6 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
         // Slight upward shift so base isn't too low
         model.position.y -= (center.y - size.y / 2) * scale;
 
-        scene.add(model);
-
         const scaledSize = size.clone().multiplyScalar(scale);
         const target = new THREE.Vector3(0, scaledSize.y / 2, 0);
         const viewDirection = new THREE.Vector3(-1, 1, 2).normalize();
@@ -273,16 +273,22 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
           .copy(target)
           .addScaledVector(viewDirection, cameraDistance * frameMargin);
 
-        // Render the scene
-        renderer.render(scene, camera);
-        scene.remove(model);
-
-        // Get the screenshot and return it
-        const screenshot = offscreenCanvas.convertToBlob
-          ? offscreenCanvas.convertToBlob().then(blob => {
-              return URL.createObjectURL(blob);
-            })
-          : Promise.resolve(renderer.domElement.toDataURL());
+        // Render the scene and get the screenshot. The scene is reused: the
+        // model must be removed from it even if the rendering fails.
+        let screenshot;
+        scene.add(model);
+        try {
+          renderer.render(scene, camera);
+          screenshot = offscreenCanvas.convertToBlob
+            ? offscreenCanvas.convertToBlob().then(blob => {
+                return URL.createObjectURL(blob);
+              })
+            : Promise.resolve(renderer.domElement.toDataURL());
+        } catch (error) {
+          screenshot = Promise.reject(error);
+        } finally {
+          scene.remove(model);
+        }
 
         // The renderer is reused: free the GPU memory of the model.
         const dispose = () => disposeModel(model);

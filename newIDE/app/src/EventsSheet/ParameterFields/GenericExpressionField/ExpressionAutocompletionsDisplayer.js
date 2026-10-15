@@ -24,6 +24,8 @@ import PropertyIcon from '../../../UI/CustomSvgIcons/Settings';
 import ParameterIcon from '../../../UI/CustomSvgIcons/Parameter';
 import { LineStackLayout } from '../../../UI/Layout';
 import { type AutocompletionAction } from './ExpressionAutocompletionsHandler';
+import useForceUpdate from '../../../Utils/UseForceUpdate';
+import { useOnResource3DPreviewRendered } from '../../../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -253,6 +255,7 @@ export default function ExpressionAutocompletionsDisplayer({
     (null: ?React.Component<any, any>)
   );
   const portalContainer = React.useContext(PortalContainerContext);
+  useOnResource3DPreviewRendered(useForceUpdate());
   React.useEffect(
     () => {
       if (scrollView.current && selectedAutocompletionElement.current) {

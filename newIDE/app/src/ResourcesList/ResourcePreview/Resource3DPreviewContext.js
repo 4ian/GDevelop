@@ -246,7 +246,6 @@ const fetchModelData = async (url: string): Promise<?ArrayBuffer> => {
 export const Resource3DPreviewProvider = ({
   children,
 }: Props): React.MixedElement => {
-  const [currentResource, setCurrentResource] = React.useState<?string>(null);
   const queueRef = React.useRef<
     Array<{ url: string, resolve: (dataUrl: ?string) => void }>
   >([]);
@@ -267,34 +266,6 @@ export const Resource3DPreviewProvider = ({
       }
     };
   }, []);
-
-  const enqueueResource = React.useCallback((url: string): Promise<?string> => {
-    return new Promise(resolve => {
-      // If it's already in the cache, resolve immediately.
-      const cachedPreview = getCachedResource3DPreview(url);
-      if (cachedPreview) {
-        resolve(cachedPreview);
-        return;
-      }
-
-      // Add the item to the queue.
-      queueRef.current.push({ url, resolve });
-      // If the queue didn't have items before,
-      // then process it immediately.
-      // Otherwise, let the queue process handle it.
-      if (queueRef.current.length === 1) {
-        setCurrentResource(url);
-      }
-    });
-  }, []);
-
-  React.useEffect(
-    () => {
-      setResource3DPreviewRequester(enqueueResource);
-      return () => setResource3DPreviewRequester(null);
-    },
-    [enqueueResource]
-  );
 
   // The next model of the queue is fetched while the current one is rendered.
   const prefetchedModelRef = React.useRef<?{
@@ -343,45 +314,48 @@ export const Resource3DPreviewProvider = ({
     }
   }, []);
 
-  // Effect to process the current resource
+  // The models are rendered one after the other, until the queue is empty.
+  const processQueue = React.useCallback(
+    async () => {
+      while (queueRef.current.length) {
+        const url = queueRef.current[0].url;
+        const dataUrl = await renderModel(url);
+        setCachedResource3DPreview(url, dataUrl);
+
+        // Resolve all the requests made for that URL and remove them from the queue.
+        queueRef.current
+          .filter(item => item.url === url)
+          .forEach(item => item.resolve(dataUrl));
+        queueRef.current = queueRef.current.filter(item => item.url !== url);
+      }
+    },
+    [renderModel]
+  );
+
+  const enqueueResource = React.useCallback(
+    (url: string): Promise<?string> => {
+      return new Promise(resolve => {
+        // If it's already in the cache, resolve immediately.
+        const cachedPreview = getCachedResource3DPreview(url);
+        if (cachedPreview) {
+          resolve(cachedPreview);
+          return;
+        }
+
+        queueRef.current.push({ url, resolve });
+        // Unless the queue is already being processed.
+        if (queueRef.current.length === 1) processQueue();
+      });
+    },
+    [processQueue]
+  );
+
   React.useEffect(
     () => {
-      if (!currentResource) return;
-
-      const processResource = async () => {
-        const dataUrl = await renderModel(currentResource);
-
-        // Handle the result
-        if (dataUrl) {
-          // Save it in the cache for future use
-          setCachedResource3DPreview(currentResource, dataUrl);
-
-          // Resolve all the requests made for that URL
-          const queueItemsToResolve = queueRef.current.filter(
-            item => item.url === currentResource
-          );
-          queueItemsToResolve.forEach(item => {
-            const { resolve } = item;
-            // $FlowFixMe[constant-condition]
-            if (resolve) resolve(dataUrl);
-          });
-
-          // Remove the items from the queue
-          queueRef.current = queueRef.current.filter(
-            item => item.url !== currentResource
-          );
-
-          // And trigger the next item to be processed
-          const nextItemToProcess = queueRef.current[0];
-          if (nextItemToProcess) {
-            setCurrentResource(nextItemToProcess.url);
-          }
-        }
-      };
-
-      processResource();
+      setResource3DPreviewRequester(enqueueResource);
+      return () => setResource3DPreviewRequester(null);
     },
-    [currentResource, renderModel]
+    [enqueueResource]
   );
 
   const contextValue = React.useMemo(

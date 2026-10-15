@@ -53,7 +53,7 @@ import {
   type MoveFunctionArguments,
 } from './helpers';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
-import useForceUpdate, { useForceRecompute } from '../../Utils/UseForceUpdate';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useOnResource3DPreviewRendered } from '../../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import { useDragDropManager } from 'react-dnd';
@@ -789,12 +789,8 @@ const EventsTree: React.ComponentType<{
     objectsContainer,
     showObjectThumbnails,
   } = props;
-  // Re-renders the instructions when 3D model previews are rendered.
-  const [
-    thumbnailsRecomputeTrigger,
-    forceRecomputeThumbnails,
-  ] = useForceRecompute();
-  useOnResource3DPreviewRendered(forceRecomputeThumbnails);
+  // The events are rendered again with the 3D model previews once rendered.
+  useOnResource3DPreviewRendered(forceUpdate);
   const renderObjectThumbnail = React.useCallback(
     (objectName: string) => {
       if (!showObjectThumbnails) return null;
@@ -816,14 +812,7 @@ const EventsTree: React.ComponentType<{
         />
       );
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      project,
-      globalObjectsContainer,
-      objectsContainer,
-      showObjectThumbnails,
-      thumbnailsRecomputeTrigger,
-    ]
+    [project, globalObjectsContainer, objectsContainer, showObjectThumbnails]
   );
 
   const { onEventMoved } = props;

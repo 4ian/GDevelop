@@ -2,27 +2,39 @@
 
 // Outside of React, so that thumbnails can read the previews synchronously.
 
-let previewCache: { [url: string]: string } = {};
+// Previews are stored by URL without the cache-burst parameter of local files
+// (see `ResourcesLoader`), so that a preview is still shown while it's rendered
+// again for a new URL.
+let previewCache: { [key: string]: {| url: string, preview: string |} } = {};
 let requestPreview: ?(url: string) => Promise<?string> = null;
 const requestedPreviewUrls: Set<string> = new Set();
 const previewRenderedListeners: Set<() => void> = new Set();
 let isListenersNotificationScheduled = false;
 
-export const getCachedResource3DPreview = (url: string): ?string =>
-  previewCache[url] || null;
+const getCacheKey = (url: string) => url.replace(/\?cache=\d+$/, '');
 
-export const setCachedResource3DPreview = (url: string, dataUrl: string) => {
-  previewCache[url] = dataUrl;
+const revokePreview = (preview: string) => {
+  if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
+};
+
+export const getCachedResource3DPreview = (url: string): ?string => {
+  const cached = previewCache[getCacheKey(url)];
+  return cached && cached.url === url ? cached.preview : null;
+};
+
+export const setCachedResource3DPreview = (url: string, preview: string) => {
+  const key = getCacheKey(url);
+  const previous = previewCache[key];
+  if (previous && previous.preview !== preview) revokePreview(previous.preview);
+  previewCache[key] = { url, preview };
 };
 
 // Frees the previews, whose blob URLs would otherwise stay alive until the
 // page is reloaded.
 export const burstResource3DPreviewCache = () => {
-  Object.keys(previewCache).forEach(url => {
-    if (previewCache[url].startsWith('blob:')) {
-      URL.revokeObjectURL(previewCache[url]);
-    }
-  });
+  Object.keys(previewCache).forEach(key =>
+    revokePreview(previewCache[key].preview)
+  );
   previewCache = {};
   requestedPreviewUrls.clear();
 };
@@ -53,10 +65,11 @@ export const subscribeToResource3DPreviewRendered = (
 };
 
 export const getResource3DPreviewOrRequest = (url: string): ?string => {
-  if (previewCache[url]) return previewCache[url];
+  const cached = previewCache[getCacheKey(url)];
+  if (cached && cached.url === url) return cached.preview;
   if (!requestedPreviewUrls.has(url)) {
     requestedPreviewUrls.add(url);
-    // Deferred: called while rendering, and requesting sets the provider state.
+    // Deferred, as this is called while rendering.
     queueMicrotask(() => {
       if (!requestPreview) {
         requestedPreviewUrls.delete(url);
@@ -65,5 +78,5 @@ export const getResource3DPreviewOrRequest = (url: string): ?string => {
       requestPreview(url).then(onPreviewRequestDone, onPreviewRequestDone);
     });
   }
-  return null;
+  return cached ? cached.preview : null;
 };

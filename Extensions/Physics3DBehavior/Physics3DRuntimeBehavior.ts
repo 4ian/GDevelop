@@ -323,6 +323,10 @@ namespace gdjs {
       Jolt.destroy(physics3DSharedData._tempVec3);
       Jolt.destroy(physics3DSharedData._tempRVec3);
       Jolt.destroy(physics3DSharedData._tempQuat);
+      for (const shapeSettings of physics3DSharedData._meshShapeSettingsCache.values()) {
+        shapeSettings.Release();
+      }
+      physics3DSharedData._meshShapeSettingsCache.clear();
       Jolt.destroy(physics3DSharedData.jolt);
       runtimeScene.physics3DSharedData = null;
     }

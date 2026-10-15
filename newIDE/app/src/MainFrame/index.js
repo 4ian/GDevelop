@@ -24,6 +24,7 @@ import ProfileDialog from '../Profile/ProfileDialog';
 import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
 import Window from '../Utils/Window';
 import { markLegacySkyboxes } from '../Utils/LegacySkyboxOrientation';
+import { isWebGL2Supported } from '../Utils/WebGL';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
@@ -6184,7 +6185,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         )}
       <EmbeddedGameFrame
         key={currentProject ? currentProject.ptr : 0}
-        enabled={gameEditorMode === 'embedded-game'}
+        // The in-game editor requires WebGL2 (a message is shown instead).
+        enabled={gameEditorMode === 'embedded-game' && isWebGL2Supported()}
         onEnable={onEnableInGameEditor}
         previewDebuggerServer={previewDebuggerServer || null}
         onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}

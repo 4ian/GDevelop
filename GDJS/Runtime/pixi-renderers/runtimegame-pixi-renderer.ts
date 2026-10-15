@@ -104,7 +104,13 @@ namespace gdjs {
     initializeRenderers(gameCanvas: HTMLCanvasElement): void {
       this._throwIfDisposed();
 
-      if (typeof THREE !== 'undefined' && gameCanvas.getContext('webgl2')) {
+      // Check WebGL2 support on a separate canvas: getting a context on the game
+      // canvas would make the browser ignore the context attributes asked
+      // later by Three.js (antialias, preserveDrawingBuffer...).
+      if (
+        typeof THREE !== 'undefined' &&
+        document.createElement('canvas').getContext('webgl2')
+      ) {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
           antialias:

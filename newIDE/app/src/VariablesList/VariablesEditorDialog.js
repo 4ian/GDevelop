@@ -48,6 +48,8 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onCancel: () => void,
   onApply: (selectedVariableName: string | null) => void,
+  // Called after each change made to the variables while the dialog is open.
+  onChange?: () => void,
   open: boolean,
   onEditObjectVariables?: () => void,
   title: React.Node,
@@ -68,6 +70,7 @@ type Props = {|
 const VariablesEditorDialog = ({
   onCancel,
   onApply,
+  onChange,
   open,
   onEditObjectVariables,
   title,
@@ -92,7 +95,7 @@ const VariablesEditorDialog = ({
   );
   const {
     onCancelChanges,
-    notifyOfChange,
+    notifyOfChange: notifyEditorOfChange,
     getOriginalContentSerializedElements,
   } = useSerializableObjectsCancelableEditor({
     serializableObjects,
@@ -101,6 +104,13 @@ const VariablesEditorDialog = ({
     // must be kept stable: only set them for variables not having one yet.
     ensurePersistentUuids: true,
   });
+  const notifyOfChange = React.useCallback(
+    () => {
+      notifyEditorOfChange();
+      if (onChange) onChange();
+    },
+    [notifyEditorOfChange, onChange]
+  );
 
   const lastSelectedVariableNodeId = React.useRef<string | null>(null);
   const onSelectedVariableChange = React.useCallback((nodes: Array<string>) => {

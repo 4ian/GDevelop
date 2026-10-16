@@ -159,6 +159,11 @@ export type BundleListingData = {|
   listing: 'BUNDLE',
 |};
 
+export type PurchasePaymentDetails = {|
+  total: number | null,
+  currency?: string,
+|};
+
 export type Purchase = {|
   id: string,
   usageType: string,
@@ -175,6 +180,7 @@ export type Purchase = {|
   manualGiftReason?: string,
   creditsAmount?: number,
   productType: ProductType,
+  paymentDetails?: PurchasePaymentDetails | null,
 |};
 
 type ProductLicenseType = 'personal' | 'commercial' | 'unlimited' | 'default';
@@ -395,28 +401,23 @@ export const listUserPurchases = async (
   });
 };
 
-export type InvoiceablePurchase = {|
-  id: string,
-  productId: string,
-  productType: ProductType,
+export type PurchaseWithProductName = {|
+  ...Purchase,
   productName: string | null,
-  createdAt: string,
-  total: number,
-  currency: string,
 |};
 
 export const listInvoiceablePurchases = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
-): Promise<Array<InvoiceablePurchase>> => {
+): Promise<Array<PurchaseWithProductName>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.get('/purchase/invoiceable', {
-    params: { userId },
+  const response = await client.get('/purchase', {
+    params: { userId, role: 'receiver', invoiceable: 'true' },
     headers: { Authorization: authorizationHeader },
   });
   return ensureIsArray({
     data: response.data,
-    endpointName: '/purchase/invoiceable of Shop API',
+    endpointName: '/purchase of Shop API',
   });
 };
 

@@ -22,7 +22,7 @@ import {
 import {
   listInvoiceablePurchases,
   generatePurchaseInvoice,
-  type InvoiceablePurchase,
+  type PurchaseWithProductName,
   type ProductType,
 } from '../Utils/GDevelopServices/Shop';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
@@ -54,6 +54,21 @@ const getProductTypeLabel = (productType: ProductType) => {
     default:
       return null;
   }
+};
+
+const getPurchaseDetails = (
+  i18n: I18nType,
+  purchase: PurchaseWithProductName
+): string => {
+  const date = i18n.date(purchase.createdAt);
+  const { paymentDetails } = purchase;
+  if (!paymentDetails || paymentDetails.total === null) return date;
+
+  return `${date} · ${formatAmount(
+    i18n,
+    paymentDetails.total,
+    paymentDetails.currency || 'USD'
+  )}`;
 };
 
 type InvoiceRowProps = {|
@@ -109,7 +124,7 @@ const InvoicesDialog = ({ onClose }: Props): React.Node => {
   const [
     invoiceablePurchases,
     setInvoiceablePurchases,
-  ] = React.useState<?Array<InvoiceablePurchase>>(null);
+  ] = React.useState<?Array<PurchaseWithProductName>>(null);
   const [loadingError, setLoadingError] = React.useState<?Error>(null);
   const [downloadingId, setDownloadingId] = React.useState<?string>(null);
 
@@ -256,13 +271,7 @@ const InvoicesDialog = ({ onClose }: Props): React.Node => {
                       invoiceablePurchase.productName ||
                       getProductTypeLabel(invoiceablePurchase.productType)
                     }
-                    details={`${i18n.date(
-                      invoiceablePurchase.createdAt
-                    )} · ${formatAmount(
-                      i18n,
-                      invoiceablePurchase.total,
-                      invoiceablePurchase.currency
-                    )}`}
+                    details={getPurchaseDetails(i18n, invoiceablePurchase)}
                     isDownloading={downloadingId === invoiceablePurchase.id}
                     disabled={!!downloadingId}
                     onDownload={() =>

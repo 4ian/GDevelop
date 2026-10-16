@@ -683,6 +683,55 @@ export const getRedirectToSubscriptionPortalUrl = async (
   return data.sessionPortalUrl;
 };
 
+export type SubscriptionPayment = {|
+  id: string,
+  createdAt: string,
+  amount: number,
+  currency: string,
+  planNameByLocale: MessageByLocale | null,
+  invoiceRequest:
+    | {| stripeInvoiceId: string |}
+    | {| paypalSubscriptionId: string, paypalTransactionId: string |},
+|};
+
+export const listSubscriptionPayments = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<SubscriptionPayment>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/subscription-payment', {
+    params: { userId },
+    headers: { Authorization: authorizationHeader },
+  });
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/subscription-payment of Usage API',
+  });
+};
+
+export const generateSubscriptionPaymentInvoice = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  subscriptionPayment: SubscriptionPayment
+): Promise<Blob> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.post(
+    '/subscription-v2/action/generate-invoice',
+    subscriptionPayment.invoiceRequest,
+    {
+      params: { userId },
+      headers: {
+        Authorization: authorizationHeader,
+        Accept: 'application/pdf',
+      },
+      responseType: 'blob',
+    }
+  );
+  return response.data;
+};
+
 export const getRedirectToCheckoutUrl = ({
   pricingSystemId,
   userId,

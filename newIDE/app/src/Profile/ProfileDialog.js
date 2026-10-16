@@ -25,6 +25,8 @@ import Text from '../UI/Text';
 import Link from '../UI/Link';
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import InvoicesDialog from './InvoicesDialog';
+import { isNativeMobileApp } from '../Utils/Platform';
 
 type Props = {|
   onClose: () => void,
@@ -36,6 +38,7 @@ const ProfileDialog = ({ onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
   const { isMobile } = useResponsiveWindowSize();
+  const [isInvoicesDialogOpen, setIsInvoicesDialogOpen] = React.useState(false);
 
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
@@ -134,6 +137,8 @@ const ProfileDialog = ({ onClose }: Props) => {
     !!authenticatedUser.subscription &&
     !!authenticatedUser.subscription.benefitsFromEducationPlan &&
     !authenticatedUser.subscription.isTeacher;
+  // App stores provide the receipts of payments made in the mobile app.
+  const isMobileApp = isNativeMobileApp();
   const isTeacherAccount =
     !!authenticatedUser.subscription &&
     !!authenticatedUser.subscription.benefitsFromEducationPlan &&
@@ -231,6 +236,25 @@ const ProfileDialog = ({ onClose }: Props) => {
                 <CreditsStatusBanner displayPurchaseAction />
               </Column>
             )}
+            {!isStudentAccount && !isMobileApp && (
+              <Line alignItems="center" justifyContent="space-between">
+                <Column noMargin>
+                  <Text size="block-title">
+                    <Trans>Invoices</Trans>
+                  </Text>
+                  <Text size="body" noMargin>
+                    <Trans>
+                      Download the invoices of your subscription and purchases.
+                    </Trans>
+                  </Text>
+                </Column>
+                <FlatButton
+                  label={<Trans>See invoices</Trans>}
+                  primary
+                  onClick={() => setIsInvoicesDialogOpen(true)}
+                />
+              </Line>
+            )}
             {!isStudentAccount && (
               <ContributionsDetails userId={authenticatedUser.profile.id} />
             )}
@@ -260,6 +284,9 @@ const ProfileDialog = ({ onClose }: Props) => {
             }
           />
         </Column>
+      )}
+      {isInvoicesDialogOpen && (
+        <InvoicesDialog onClose={() => setIsInvoicesDialogOpen(false)} />
       )}
     </Dialog>
   );

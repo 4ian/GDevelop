@@ -395,6 +395,52 @@ export const listUserPurchases = async (
   });
 };
 
+export type InvoiceablePurchase = {|
+  id: string,
+  productId: string,
+  productType: ProductType,
+  productName: string | null,
+  createdAt: string,
+  total: number,
+  currency: string,
+|};
+
+export const listInvoiceablePurchases = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<InvoiceablePurchase>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get('/purchase/invoiceable', {
+    params: { userId },
+    headers: { Authorization: authorizationHeader },
+  });
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/purchase/invoiceable of Shop API',
+  });
+};
+
+export const generatePurchaseInvoice = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  purchaseId: string
+): Promise<Blob> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    `/purchase/${purchaseId}/action/generate-invoice`,
+    {},
+    {
+      params: { userId },
+      headers: {
+        Authorization: authorizationHeader,
+        Accept: 'application/pdf',
+      },
+      responseType: 'blob',
+    }
+  );
+  return response.data;
+};
+
 export const getAuthorizationTokenForPrivateAssets = async (
   getAuthorizationHeader: () => Promise<string>,
   {

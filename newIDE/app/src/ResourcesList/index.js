@@ -21,6 +21,7 @@ import { Column, Line } from '../UI/Grid';
 import { type ResourcesActionsMenuBuilder } from '../ProjectsStorage';
 import InfoBar from '../UI/Messages/InfoBar';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { useOnResource3DPreviewRendered } from './ResourcePreview/Resource3DPreviewContext';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import { type ItemSelectionEvent } from '../UI/SortableVirtualizedItemList/ItemRow';
 
@@ -246,6 +247,13 @@ const ResourcesList: React.ComponentType<{
                 resource.getName(),
                 {}
               );
+            case 'model3D':
+              return (
+                ResourcesLoader.getModel3DPreviewUrl(
+                  project,
+                  resource.getName()
+                ) || getDefaultResourceThumbnail(resource)
+              );
             default:
               return getDefaultResourceThumbnail(resource);
           }
@@ -262,6 +270,12 @@ const ResourcesList: React.ComponentType<{
             sortableListRef.current.forceUpdateGrid();
         },
         [forceUpdate]
+      );
+      useOnResource3DPreviewRendered(
+        React.useCallback(() => {
+          if (sortableListRef.current)
+            sortableListRef.current.forceUpdateGrid();
+        }, [])
       );
 
       const focusList = React.useCallback(() => {

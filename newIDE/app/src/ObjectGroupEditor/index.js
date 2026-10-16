@@ -7,6 +7,8 @@ import ObjectSelector from '../ObjectsList/ObjectSelector';
 import { Column } from '../UI/Grid';
 import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import { useOnResource3DPreviewRendered } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import getObjectByName from '../Utils/GetObjectByName';
 import Paper from '../UI/Paper';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -40,6 +42,7 @@ const ObjectGroupEditor = ({
   onObjectRemoved,
   isObjectListLocked,
 }: Props): React.Node => {
+  useOnResource3DPreviewRendered(useForceUpdate());
   const [objectName, setObjectName] = React.useState<string>('');
 
   const addObject = React.useCallback(

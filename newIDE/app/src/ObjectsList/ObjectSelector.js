@@ -10,6 +10,8 @@ import SemiControlledAutoComplete, {
 } from '../UI/SemiControlledAutoComplete';
 import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import { useOnResource3DPreviewRendered } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import SelectField from '../UI/SelectField';
@@ -212,6 +214,7 @@ const ObjectSelector: React.ComponentType<{
     disabled,
     ...otherProps
   } = props;
+  useOnResource3DPreviewRendered(useForceUpdate());
 
   const objectsContainersList = projectScopedContainersAccessor
     .get()

@@ -12,6 +12,11 @@ import Tag from '../CustomSvgIcons/Tag';
 import Gaming from '../CustomSvgIcons/Gaming';
 import Cart from '../CustomSvgIcons/Cart';
 import Users from '../CustomSvgIcons/Users';
+import ChatBubbles from '../CustomSvgIcons/ChatBubbles';
+import Trophy from '../CustomSvgIcons/Trophy';
+import Window from '../../Utils/Window';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { shortenString } from '../../Utils/StringHelpers';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import RouterContext, {
@@ -26,6 +31,8 @@ const notificationTypeToIcon = {
   'claimable-asset-pack': <Cart />,
   'game-sessions-achievement': <Gaming />,
   'team-invitation': <Users />,
+  'game-comment-reply': <ChatBubbles />,
+  'badge-earned': <Trophy />,
 };
 
 const getNotificationPrimaryTextByType = (
@@ -101,6 +108,30 @@ const getNotificationPrimaryTextByType = (
       </Trans>
     );
   }
+  if (notification.type === 'game-comment-reply') {
+    if (notification.data.playerName) {
+      // prettier-ignore
+      return (
+        <Trans>
+          {notification.data.playerName} replied to your comment on
+          {notification.data.gameName}:
+          "{shortenString(notification.data.comment, 25)}..."
+        </Trans>
+      );
+    }
+    // prettier-ignore
+    return (
+      <Trans>
+        Someone replied to your comment on {notification.data.gameName}:
+        "{shortenString(notification.data.comment, 25)}..."
+      </Trans>
+    );
+  }
+  if (notification.type === 'badge-earned') {
+    return (
+      <Trans>You earned the badge "{notification.data.achievementName}"!</Trans>
+    );
+  }
   if (notification.type === 'game-sessions-achievement') {
     if (notification.data.gameCount === 1) {
       if (notification.data.gameId && notification.data.gameName) {
@@ -133,14 +164,23 @@ const getNotificationPrimaryTextByType = (
   return null;
 };
 
+/**
+ * Notifications of a type this version does not know are not displayed,
+ * so that new types never need a change of older versions.
+ */
+export const isNotificationDisplayed = (notification: Notification): boolean =>
+  !!getNotificationPrimaryTextByType(notification);
+
 const getNotificationClickCallback = ({
   notification,
+  profile,
   addRouteArguments,
   onCloseNotificationList,
   onMarkNotificationAsSeen,
   onOpenTeamInvitationDialog,
 }: {
   notification: Notification,
+  profile: ?Profile,
   addRouteArguments: RouteArguments => void,
   onCloseNotificationList: () => void,
   onMarkNotificationAsSeen: () => void,
@@ -177,6 +217,23 @@ const getNotificationClickCallback = ({
         'game-id': notification.data.gameId,
         'games-dashboard-tab': 'feedback',
       });
+      onMarkNotificationAsSeen();
+      onCloseNotificationList();
+    };
+  }
+  if (notification.type === 'game-comment-reply') {
+    const { gameId } = notification.data;
+    return () => {
+      Window.openExternalURL(`https://gd.games/games/${gameId}`);
+      onMarkNotificationAsSeen();
+      onCloseNotificationList();
+    };
+  }
+  if (notification.type === 'badge-earned') {
+    const username = profile && profile.username;
+    if (!username) return onMarkNotificationAsSeen;
+    return () => {
+      Window.openExternalURL(`https://gd.games/${username}`);
       onMarkNotificationAsSeen();
       onCloseNotificationList();
     };
@@ -244,8 +301,10 @@ const NotificationListItem = ({
 }: Props): null | React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { addRouteArguments } = React.useContext(RouterContext);
+  const { profile } = React.useContext(AuthenticatedUserContext);
   const onClickNotification = getNotificationClickCallback({
     notification,
+    profile,
     addRouteArguments,
     onMarkNotificationAsSeen,
     onCloseNotificationList,

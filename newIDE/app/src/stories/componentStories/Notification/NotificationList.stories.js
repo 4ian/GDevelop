@@ -29,6 +29,29 @@ const notifications: Notification[] = [
     data: { creditsAmount: 150, reason: 'subscription-monthly-drop' },
   },
   {
+    id: 'notification-id-01',
+    userId,
+    createdAt: now - 10 * ONE_MINUTE,
+    type: 'game-comment-reply',
+    data: {
+      gameId: 'game-id',
+      gameName: 'Space Pirates',
+      playerName: 'NovaCaptain',
+      comment: 'Thanks! The secret level is behind the waterfall.',
+    },
+  },
+  {
+    id: 'notification-id-02',
+    userId,
+    createdAt: now - 40 * ONE_MINUTE,
+    type: 'badge-earned',
+    data: {
+      achievementId: 'weekly-top-player',
+      achievementName: 'Top player of the week',
+      iconName: 'weekly-top-player',
+    },
+  },
+  {
     id: 'notification-id-1',
     userId,
     createdAt: now - ONE_HOUR - 5 * ONE_MINUTE,

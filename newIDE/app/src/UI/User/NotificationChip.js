@@ -5,6 +5,7 @@ import Popover from '@material-ui/core/Popover';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import IconButton from '../IconButton';
 import NotificationList from '../Notification/NotificationList';
+import { isNotificationDisplayed } from '../Notification/NotificationListItem';
 import Paper from '../Paper';
 import Badge from '../Badge';
 import Bell from '../CustomSvgIcons/Bell';
@@ -41,11 +42,15 @@ const NotificationChip = (props: Props): null | React.Node => {
     notificationId: string,
     inviterEmail: string,
   |} | null>(null);
+  const displayedNotifications = React.useMemo<?(Notification[])>(
+    () => notifications && notifications.filter(isNotificationDisplayed),
+    [notifications]
+  );
   const isThereASingleUnseenNotification = React.useMemo<boolean>(
     () =>
-      !!notifications &&
-      notifications.some(notification => !notification.seenAt),
-    [notifications]
+      !!displayedNotifications &&
+      displayedNotifications.some(notification => !notification.seenAt),
+    [displayedNotifications]
   );
 
   const onMarkAllAsRead = React.useCallback(
@@ -89,7 +94,7 @@ const NotificationChip = (props: Props): null | React.Node => {
     []
   );
 
-  if (!profile || !notifications) return null;
+  if (!profile || !displayedNotifications) return null;
 
   return (
     <>
@@ -125,7 +130,7 @@ const NotificationChip = (props: Props): null | React.Node => {
       >
         <Paper style={styles.notificationListContainer} background="light">
           <NotificationList
-            notifications={notifications}
+            notifications={displayedNotifications}
             onMarkAllAsRead={onMarkAllAsRead}
             onMarkNotificationAsSeen={onMarkNotificationAsSeen}
             canMarkAllAsRead={isThereASingleUnseenNotification}

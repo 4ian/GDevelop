@@ -92,6 +92,23 @@ type GameSessionsAchievementNotification = {
       },
 };
 
+type GameCommentReplyNotification = {
+  ...NotificationBaseAttributes,
+  type: 'game-comment-reply',
+  data: {
+    gameId: string,
+    gameName: string,
+    playerName?: string,
+    comment: string,
+  },
+};
+
+type BadgeEarnedNotification = {
+  ...NotificationBaseAttributes,
+  type: 'badge-earned',
+  data: { achievementId: string, achievementName: string, iconName: string },
+};
+
 export type Notification =
   | CreditsDropNotification
   | FreeTrialAboutToExpireNotification
@@ -99,7 +116,9 @@ export type Notification =
   | OneGameFeedbackReceivedNotification
   | MultipleGameFeedbackReceivedNotification
   | GameSessionsAchievementNotification
-  | TeamInvitationNotification;
+  | TeamInvitationNotification
+  | GameCommentReplyNotification
+  | BadgeEarnedNotification;
 
 export const listNotifications = async (
   getAuthorizationHeader: () => Promise<string>,

@@ -15,11 +15,32 @@ namespace gdjs {
     vb: number;
     af: number;
   }
+  /**
+   * `OldFilmFilter` adds its noise to the colors, which are premultiplied by
+   * alpha: on transparent pixels, this gives colors that are added on top of
+   * the layers below. As the effects of a scene layer are applied on the
+   * whole screen, the noise would show everywhere, even when the layer is
+   * empty. Scale the noise by alpha so that transparent pixels stay transparent.
+   */
+  const keepTransparentPixelsTransparent = (filter: PIXI.Filter) => {
+    const removeShaderName = (source: string) =>
+      source.replace(/#define SHADER_NAME .*\n/, '');
+    const { vertexSrc, fragmentSrc } = filter.program;
+    filter.program = PIXI.Program.from(
+      removeShaderName(vertexSrc),
+      removeShaderName(fragmentSrc).replace(
+        'color += _noise * noise;',
+        'color += _noise * noise * gl_FragColor.a;'
+      )
+    );
+  };
+
   gdjs.PixiFiltersTools.registerFilterCreator(
     'OldFilm',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(layer, effectData) {
         const filter = new PIXI.filters.OldFilmFilter();
+        keepTransparentPixelsTransparent(filter);
         const oldFilmFilter = filter as unknown as PIXI.filters.OldFilmFilter &
           OldFilmFilterExtra;
         oldFilmFilter._animationTimer = 0;

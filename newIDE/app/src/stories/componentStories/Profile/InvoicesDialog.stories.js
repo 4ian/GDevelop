@@ -82,9 +82,13 @@ const invoiceablePurchases: Array<InvoiceablePurchase> = [
   },
 ];
 
-const fakeInvoicePdf = new Blob(['%PDF-1.4 fake invoice'], {
-  type: 'application/pdf',
-});
+// A minimal valid one-page PDF (the xref offsets must match the content).
+const fakeInvoicePdf = new Blob(
+  [
+    '%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n4 0 obj\n<< /Length 43 >>\nstream\nBT /F1 24 Tf 72 720 Td (Fake invoice) Tj ET\nendstream\nendobj\n5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000241 00000 n \n0000000334 00000 n \ntrailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n404\n%%EOF\n',
+  ],
+  { type: 'application/pdf' }
+);
 
 const mockApis = ({
   subscriptionPaymentsReply,

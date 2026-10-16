@@ -280,6 +280,19 @@ class GD_CORE_API InitialInstance {
    */
   void SetHidden(bool enable = true) { hidden = enable; }
 
+  /**
+   * \brief Return true if the instance is hidden in the editor.
+   *
+   * This only affects the editor: the instance is still displayed in the game
+   * (unless it's hidden when the scene starts, see SetHidden).
+   */
+  bool IsHiddenInEditor() const { return hiddenInEditor; };
+
+  /**
+   * \brief Set if the instance is hidden in the editor.
+   */
+  void SetHiddenInEditor(bool enable = true) { hiddenInEditor = enable; }
+
   ///@}
 
   /** \name Variable management
@@ -498,6 +511,8 @@ class GD_CORE_API InitialInstance {
                            ///  should keep the same ratio.
   bool hidden = false;     ///< True if the instance is hidden when
                            ///  the scene starts.
+  bool hiddenInEditor = false;  ///< True if the instance is hidden in the
+                                ///  editor.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
                                       ///  useful for hot reloading.
 

@@ -9,12 +9,16 @@ import {
 } from 'react-virtualized';
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
+import isUserTyping from '../../KeyboardShortcuts/IsUserTyping';
+import isDialogOpen from '../../UI/OpenedDialogChecker';
 import CompactSearchBar from '../../UI/CompactSearchBar';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import Visibility from '../../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
+import Camera from '../../UI/CustomSvgIcons/Camera';
+import CameraOff from '../../UI/CustomSvgIcons/CameraOff';
 import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
 import Layers from '../../UI/CustomSvgIcons/Layers';
 import SortArrowUp from '../../UI/CustomSvgIcons/SortArrowUp';
@@ -38,6 +42,7 @@ type RenderedRowInfo = {
   name: string,
   locked: boolean,
   hidden: boolean,
+  hiddenInEditor: boolean,
   x: string,
   y: string,
   angle: string,
@@ -61,8 +66,21 @@ const styles = {
     overflowX: 'auto',
     overflowY: 'hidden',
     backgroundColor: 'var(--table-header-background-color)',
+    outline: 'none',
   },
 };
+
+const headerIconStyle = { width: 18, height: 18, display: 'block' };
+
+// Centers the header icon above the cells' small IconButton (3px padding
+// around a 24px icon), so the columns of toggles are aligned with their header.
+const toggleColumnHeaderIconStyle = { ...headerIconStyle, margin: '0 6px' };
+
+const renderLayerCell = ({
+  rowData: { layer },
+}: {
+  rowData: RenderedRowInfo,
+}): React.Node => (layer ? layer : <Trans>Base layer</Trans>);
 
 const compareStrings = (x: string, y: string, direction: number): number => {
   x = x.toLowerCase();
@@ -123,6 +141,7 @@ type Props = {|
   selectedInstances: Array<gdInitialInstance>,
   onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
   onInstancesModified: (Array<gdInitialInstance>) => void,
+  onFocusOnSelection: () => void,
 |};
 
 class InstancesList extends Component<Props, State> {
@@ -134,9 +153,13 @@ class InstancesList extends Component<Props, State> {
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
+  _visibleRowsStartIndex: number = 0;
+  _visibleRowsStopIndex: number = -1;
+  // Only listens to the keys pressed while the list has the focus.
   _keyboardShortcuts: KeyboardShortcuts = new KeyboardShortcuts({
-    isActive: () => false,
-    shortcutCallbacks: {},
+    shortcutCallbacks: {
+      onFocusOnSelection: () => this._focusOnLastSelectedInstance(),
+    },
   });
 
   // This should be updated, see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html.
@@ -157,6 +180,7 @@ class InstancesList extends Component<Props, State> {
           name,
           locked: instance.isLocked(),
           hidden: instance.isHidden(),
+          hiddenInEditor: instance.isHiddenInEditor(),
           x: toFixedWithoutTrailingZeros(instance.getX(), 2),
           y: toFixedWithoutTrailingZeros(instance.getY(), 2),
           angle: toFixedWithoutTrailingZeros(instance.getAngle(), 2),
@@ -178,6 +202,58 @@ class InstancesList extends Component<Props, State> {
       [this.renderedRows[index].instance],
       this._keyboardShortcuts.shouldMultiSelect()
     );
+  };
+
+  _onRowsRendered = ({
+    startIndex,
+    stopIndex,
+  }: {
+    startIndex: number,
+    stopIndex: number,
+  }) => {
+    this._visibleRowsStartIndex = startIndex;
+    this._visibleRowsStopIndex = stopIndex;
+  };
+
+  /**
+   * "F" first scrolls the list to the last selected instance, then, once its
+   * row is visible, focuses the view on the selection.
+   */
+  _focusOnLastSelectedInstance = () => {
+    const { selectedInstances } = this.props;
+    if (!this.table || selectedInstances.length === 0) return;
+
+    const lastSelectedInstance =
+      selectedInstances[selectedInstances.length - 1];
+    const rowIndex = this.renderedRows.findIndex(
+      renderedRow => renderedRow.instance.ptr === lastSelectedInstance.ptr
+    );
+    if (rowIndex === -1) return; // The instance is filtered out by the search.
+
+    const isRowVisible =
+      this._visibleRowsStartIndex <= rowIndex &&
+      rowIndex <= this._visibleRowsStopIndex;
+    if (isRowVisible) {
+      this.props.onFocusOnSelection();
+    } else {
+      if (this.table) this.table.scrollToRow(rowIndex);
+    }
+  };
+
+  // Like the game view, take the keyboard focus when hovered, so that the
+  // shortcuts apply to the list without having to click on it first.
+  _focusOnHover = (event: SyntheticMouseEvent<HTMLDivElement>) => {
+    const tableContainer = event.currentTarget;
+    const { ownerDocument } = tableContainer;
+    if (
+      tableContainer.contains(ownerDocument.activeElement) ||
+      isUserTyping(ownerDocument) ||
+      isDialogOpen(ownerDocument)
+    ) {
+      return;
+    }
+
+    tableContainer.focus();
   };
 
   _rowGetter = ({ index }: {| index: number |}): RenderedRowInfo => {
@@ -214,7 +290,30 @@ class InstancesList extends Component<Props, State> {
           this.props.onInstancesModified([instance]);
         }}
       >
-        {instance.isHidden() ? <VisibilityOff /> : <Visibility />}
+        {instance.isHidden() ? <CameraOff /> : <Camera />}
+      </IconButton>
+    );
+  };
+
+  _renderVisibilityInEditorCell = ({
+    rowData: { instance },
+  }: {
+    rowData: RenderedRowInfo,
+  }): React.Node => {
+    return (
+      <IconButton
+        size="small"
+        tooltip={
+          instance.isHiddenInEditor()
+            ? t`Hidden in the editor`
+            : t`Visible in the editor`
+        }
+        onClick={() => {
+          instance.setHiddenInEditor(!instance.isHiddenInEditor());
+          this.props.onInstancesModified([instance]);
+        }}
+      >
+        {instance.isHiddenInEditor() ? <VisibilityOff /> : <Visibility />}
       </IconButton>
     );
   };
@@ -286,6 +385,12 @@ class InstancesList extends Component<Props, State> {
             return compareStrings(a.layer, b.layer, direction);
           case 'locked':
             return direction * (Number(a.locked) - Number(b.locked));
+          case 'hidden':
+            return direction * (Number(a.hidden) - Number(b.hidden));
+          case 'hiddenInEditor':
+            return (
+              direction * (Number(a.hiddenInEditor) - Number(b.hiddenInEditor))
+            );
           case 'zOrder':
             return direction * (parseFloat(a.zOrder) - parseFloat(b.zOrder));
 
@@ -329,6 +434,8 @@ class InstancesList extends Component<Props, State> {
         </Line>
         <div
           style={styles.tableContainer}
+          tabIndex={-1}
+          onMouseOver={this._focusOnHover}
           onKeyDown={this._keyboardShortcuts.onKeyDown}
           onKeyUp={this._keyboardShortcuts.onKeyUp}
         >
@@ -348,6 +455,7 @@ class InstancesList extends Component<Props, State> {
                 rowGetter={this._rowGetter}
                 rowHeight={32}
                 onRowClick={this._onRowClick}
+                onRowsRendered={this._onRowsRendered}
                 rowClassName={this._rowClassName}
                 sort={this._sort}
                 sortBy={sortBy}
@@ -386,7 +494,7 @@ class InstancesList extends Component<Props, State> {
                   label={
                     <RotateZ
                       titleAccess="Rotation (Z)"
-                      style={{ width: 18, height: 18, display: 'block' }}
+                      style={headerIconStyle}
                     />
                   }
                   dataKey="angle"
@@ -395,29 +503,50 @@ class InstancesList extends Component<Props, State> {
                   headerRenderer={renderSortableHeader}
                 />
                 <RVColumn
-                  label={
-                    <Layers
-                      titleAccess="Layer"
-                      style={{ width: 18, height: 18, display: 'block' }}
-                    />
-                  }
+                  label={<Layers titleAccess="Layer" style={headerIconStyle} />}
                   dataKey="layer"
                   width={Math.max(width * 0.2, minimumWidths.layerName)}
                   className={'tableColumn tableColumnSecondary'}
                   headerRenderer={renderSortableHeader}
+                  cellRenderer={renderLayerCell}
                 />
                 <RVColumn
-                  label=""
+                  label={
+                    <Visibility
+                      titleAccess="Visible in the editor"
+                      style={toggleColumnHeaderIconStyle}
+                    />
+                  }
+                  dataKey="hiddenInEditor"
+                  width={Math.max(width * 0.05, minimumWidths.numberProperty)}
+                  className={'tableColumn'}
+                  headerRenderer={renderSortableHeader}
+                  cellRenderer={this._renderVisibilityInEditorCell}
+                />
+                <RVColumn
+                  label={
+                    <Camera
+                      titleAccess="Visible when the scene starts"
+                      style={toggleColumnHeaderIconStyle}
+                    />
+                  }
                   dataKey="hidden"
                   width={Math.max(width * 0.05, minimumWidths.numberProperty)}
                   className={'tableColumn'}
+                  headerRenderer={renderSortableHeader}
                   cellRenderer={this._renderVisibilityCell}
                 />
                 <RVColumn
-                  label=""
+                  label={
+                    <Lock
+                      titleAccess="Locked"
+                      style={toggleColumnHeaderIconStyle}
+                    />
+                  }
                   dataKey="locked"
                   width={Math.max(width * 0.05, minimumWidths.numberProperty)}
                   className={'tableColumn'}
+                  headerRenderer={renderSortableHeader}
                   cellRenderer={this._renderLockCell}
                 />
               </RVTable>

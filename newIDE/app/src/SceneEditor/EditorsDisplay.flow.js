@@ -41,6 +41,7 @@ export type SceneEditorsDisplayProps = {|
   onSelectInstances: (
     instances: Array<gdInitialInstance>,
     multiSelect: boolean,
+    // The view is moved to the instances only if a target position is given.
     targetPosition?: 'center' | 'upperCenter'
   ) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,

@@ -69,6 +69,7 @@ void InitialInstance::UnserializeFrom(gd::Project &project,
   SetSealed(element.GetBoolAttribute("sealed", false));
   SetShouldKeepRatio(element.GetBoolAttribute("keepRatio", false));
   SetHidden(element.GetBoolAttribute("hidden", false));
+  SetHiddenInEditor(element.GetBoolAttribute("hiddenInEditor", false));
 
   persistentUuid = element.GetStringAttribute("persistentUuid");
   if (persistentUuid.empty()) ResetPersistentUuid();
@@ -156,6 +157,8 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   if (IsSealed()) element.SetAttribute("sealed", IsSealed());
   if (ShouldKeepRatio()) element.SetAttribute("keepRatio", ShouldKeepRatio());
   if (IsHidden()) element.SetAttribute("hidden", IsHidden());
+  if (IsHiddenInEditor())
+    element.SetAttribute("hiddenInEditor", IsHiddenInEditor());
 
   if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
   element.SetStringAttribute("persistentUuid", persistentUuid);

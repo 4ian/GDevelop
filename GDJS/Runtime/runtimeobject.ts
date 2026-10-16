@@ -381,7 +381,7 @@ namespace gdjs {
           .getEffectsManager()
           .initializeEffect(effectData, this._rendererEffects, this);
         this.updateAllEffectParameters(effectData);
-        if (effectData.disabled) {
+        if (this._runtimeScene.isEffectDisabled(effectData)) {
           this.enableEffect(effectData.name, false);
         }
       }
@@ -520,7 +520,7 @@ namespace gdjs {
           .getEffectsManager()
           .initializeEffect(effectData, this._rendererEffects, this);
         this.updateAllEffectParameters(effectData);
-        if (effectData.disabled) {
+        if (this._runtimeScene.isEffectDisabled(effectData)) {
           this.enableEffect(effectData.name, false);
         }
       }

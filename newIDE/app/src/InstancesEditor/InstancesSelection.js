@@ -39,7 +39,9 @@ export default class InstancesSelection {
     layersLocks: ?{ [string]: boolean },
     ignoreSeal?: boolean,
   |}) {
-    if (!ignoreSeal && instance.isSealed()) return;
+    // Instances hidden in the editor can only be selected from the instances list.
+    if (!ignoreSeal && (instance.isSealed() || instance.isHiddenInEditor()))
+      return;
     if (this.isInstanceSelected(instance)) {
       if (multiSelect) this.unselectInstance(instance);
 

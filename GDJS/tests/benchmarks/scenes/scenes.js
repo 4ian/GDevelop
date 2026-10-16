@@ -137,6 +137,38 @@ describe('Scene benchmarks', function () {
       },
     });
 
+  const modelResourceName =
+    'base/GDJS/tests/tests-utils/assets/textured-triangle-blue.glb';
+
+  /**
+   * @param {string} name
+   * @returns {gdjs.Model3DObjectData}
+   */
+  const createModel3DObjectData = (name) => ({
+    name,
+    type: 'Scene3D::Model3DObject',
+    variables: [],
+    behaviors: [],
+    effects: [],
+    content: {
+      width: 100,
+      height: 100,
+      depth: 100,
+      modelResourceName,
+      rotationX: 0,
+      rotationY: 0,
+      rotationZ: 0,
+      keepAspectRatio: false,
+      materialType: 'StandardWithoutMetalness',
+      originLocation: 'TopLeft',
+      centerLocation: 'ObjectCenter',
+      animations: [],
+      crossfadeDuration: 0,
+      isCastingShadow: true,
+      isReceivingShadow: true,
+    },
+  });
+
   /**
    * @param {string} name
    * @param {{x: number, y: number, z?: number, width: number, height: number, depth?: number}} instance
@@ -191,6 +223,8 @@ describe('Scene benchmarks', function () {
    *   objects: Array<ObjectData>,
    *   instances: Array<InstanceData>,
    *   behaviorsSharedData?: Array<BehaviorSharedData & any>,
+   *   resources?: Array<ResourceData>,
+   *   layerEffects?: Array<EffectData>,
    *   eventsFunction?: (runtimeScene: gdjs.RuntimeScene) => void,
    *   renderingType?: '' | '2d' | '3d' | '2d+3d',
    *   warmupFrames?: number,
@@ -202,6 +236,8 @@ describe('Scene benchmarks', function () {
     objects,
     instances,
     behaviorsSharedData,
+    resources,
+    layerEffects,
     eventsFunction,
     renderingType,
     warmupFrames,
@@ -237,7 +273,7 @@ describe('Scene benchmarks', function () {
                 renderingType,
                 visibility: true,
                 cameras: [],
-                effects: [],
+                effects: layerEffects || [],
                 ambientLightColorR: 200,
                 ambientLightColorG: 200,
                 ambientLightColorB: 200,
@@ -270,6 +306,7 @@ describe('Scene benchmarks', function () {
               file: imageResourceName,
               userAdded: true,
             },
+            ...(resources || []),
           ],
         },
         propertiesOverrides: {
@@ -536,6 +573,95 @@ describe('Scene benchmarks', function () {
           worldScale: 100,
         },
       ],
+    });
+  });
+
+  it('benchmark a large 3D city', async function () {
+    this.timeout(120000);
+    // A city like in a driving game: many buildings, a few moving cars, and
+    // a camera driving through it. Most of the city can't be seen.
+    const blocksCount = 50;
+    const blockSize = 256;
+    const citySize = blocksCount * blockSize;
+    const random = makeSeededRandom(1);
+    const buildings = [];
+    for (let column = 0; column < blocksCount; column++) {
+      for (let row = 0; row < blocksCount; row++) {
+        buildings.push(
+          createInstance('Building', {
+            x: column * blockSize,
+            y: row * blockSize,
+            z: 0,
+            width: 160,
+            height: 160,
+            depth: 100 + random() * 300,
+          })
+        );
+      }
+    }
+    const cars = [];
+    for (let i = 0; i < 40; i++) {
+      cars.push(
+        createInstance('Car', {
+          x: random() * citySize,
+          y: Math.floor(random() * blocksCount) * blockSize + 200,
+          z: 0,
+          width: 40,
+          height: 20,
+          depth: 20,
+        })
+      );
+    }
+    await runSceneBenchmark({
+      name: 'Large 3D city (2500 buildings)',
+      objects: [
+        createModel3DObjectData('Building'),
+        createModel3DObjectData('Car'),
+        createCubeObjectData('Ground', []),
+      ],
+      instances: [
+        ...buildings,
+        ...cars,
+        createInstance('Ground', {
+          x: -blockSize,
+          y: -blockSize,
+          z: -16,
+          width: citySize + 2 * blockSize,
+          height: citySize + 2 * blockSize,
+          depth: 16,
+        }),
+      ],
+      renderingType: '3d',
+      resources: [
+        {
+          kind: 'model3D',
+          name: modelResourceName,
+          metadata: '',
+          file: modelResourceName,
+          userAdded: true,
+        },
+      ],
+      layerEffects: [
+        {
+          effectType: 'Scene3D::DirectionalLight',
+          name: 'Sun',
+          doubleParameters: { elevation: 45, rotation: 30, intensity: 1 },
+          stringParameters: { color: '255;255;255', top: 'Z+' },
+          booleanParameters: { isCastingShadow: true },
+        },
+      ],
+      eventsFunction: (runtimeScene) => {
+        const layer = runtimeScene.getLayer('');
+        const angle = runtimeScene.getTimeManager().getTimeFromStart() / 4000;
+        layer.setCameraX(citySize * (0.5 + 0.35 * Math.cos(angle)));
+        layer.setCameraY(citySize * (0.5 + 0.35 * Math.sin(angle)));
+        layer.setCameraZ(300, 45);
+        layer.setCameraRotation((angle * 180) / Math.PI);
+        layer.setCameraRotationX(60);
+        for (const car of getObjects(runtimeScene, 'Car')) {
+          car.setX((car.getX() + 5) % citySize);
+        }
+      },
     });
   });
 

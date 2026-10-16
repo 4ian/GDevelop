@@ -1907,7 +1907,11 @@ const VariablesList: React.ComponentType<{
             `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
           );
       }
-      _onChange(`value:${nodeId}`);
+      // The first change of an inherited variable makes it a variable of
+      // this container: the same step as the next changes of it.
+      _onChange(
+        `value:${isInherited ? nodeId.slice(inheritedPrefix.length) : nodeId}`
+      );
       forceUpdate();
     },
     [

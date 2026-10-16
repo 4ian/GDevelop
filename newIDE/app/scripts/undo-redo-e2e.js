@@ -211,7 +211,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Longer than the debounce grouping the panel modifications in a single
 // history step (see `_flushPendingPanelHistorySaveDebounced`).
-const HISTORY_SAVE_DELAY = 800;
+const HISTORY_SAVE_DELAY = 1800;
 
 class Editor {
   constructor(page) {
@@ -4179,6 +4179,82 @@ scenarios[
   expectEqual(await exists(editor, row), true, 'object still there after redo');
 };
 
+scenarios[
+  'undoing past the point the tab was left asks before reverting the events sheet change'
+] = async editor => {
+  const panel = '#scene-properties-editor';
+  const dialog = '[role="dialog"]';
+  await editor.unfoldVariablesSection(panel, 'scene-variables-section');
+  await editor.setFieldValue(`${panel} #variable-0-text-value`, '10');
+  await changeProjectFromTheEventsSheet(editor, props =>
+    props.layout
+      .getVariables()
+      .insertNew('FromEvents', 0)
+      .setValue(5)
+  );
+  await editor.waitUntil(
+    'variable shown',
+    async () => (await editor.getVariableNames(panel))[0] === 'FromEvents'
+  );
+  const varA = `${panel} #variable-1-text-value`;
+  const varB = `${panel} #variable-2-text-value`;
+
+  // A step made after coming back is applied without asking.
+  await editor.setFieldValue(varB, '20');
+  await editor.undo();
+  expectEqual(await exists(editor, dialog), false, 'asked for a newer step');
+  expectEqual(await editor.getFieldValue(varB), '2', 'VarB after undo');
+
+  // The step made before leaving: asks first, cancel changes nothing.
+  await editor.undo();
+  await editor.page.waitForSelector(dialog);
+  expectEqual(await editor.getFieldValue(varA), '10', 'VarA while asking');
+  await editor.clickButtonWithText(dialog, /^cancel$/);
+  await editor.waitUntil(
+    'dialog closed',
+    async () => !(await exists(editor, dialog))
+  );
+  expectEqual(
+    await editor.getVariableNames(panel),
+    ['FromEvents', 'VarA', 'VarB'],
+    'variables after cancel'
+  );
+  expectEqual(await editor.getFieldValue(varA), '10', 'VarA after cancel');
+
+  await editor.undo();
+  await editor.page.waitForSelector(dialog);
+  await editor.clickButtonWithText(dialog, /^continue$/);
+  await editor.waitUntil(
+    'step undone',
+    async () =>
+      (await editor.getFieldValue(`${panel} #variable-0-text-value`)) === '1'
+  );
+  expectEqual(
+    await editor.getVariableNames(panel),
+    ['VarA', 'VarB'],
+    'variables after the confirmed undo'
+  );
+
+  // Redo brings the events sheet change back, without asking.
+  await editor.redo();
+  expectEqual(await exists(editor, dialog), false, 'asked on redo');
+  expectEqual(
+    await editor.getVariableNames(panel),
+    ['FromEvents', 'VarA', 'VarB'],
+    'variables after redo'
+  );
+  expectEqual(await editor.getFieldValue(varA), '10', 'VarA after redo');
+
+  // Undoing it again would revert the change again: asks again.
+  await editor.undo();
+  expectEqual(await exists(editor, dialog), true, 'asked on the second undo');
+  await editor.clickButtonWithText(dialog, /^cancel$/);
+  await editor.waitUntil(
+    'dialog closed again',
+    async () => !(await exists(editor, dialog))
+  );
+};
+
 {
   const name = 'scene properties dialog makes one step per scene behavior';
   fixtureSetups[name] = project => {
@@ -4735,6 +4811,451 @@ Object.keys(scrollKeepingPanels).forEach(kind => {
       true,
       `no scroll after redo (after undo: ${positionAfterUndo}, seen: ${samples.join()})`
     );
+  };
+}
+
+scenarios[
+  'scene variables dialog records the changes in the order made'
+] = async editor => {
+  const stepsBefore = await getUndoStepsCount(editor);
+  await editor.clickSectionHeaderButton(
+    'scene-variables-section',
+    'open-editor'
+  );
+  await editor.page.waitForSelector('#scene-variables-dialog');
+  const dialog = '[role="dialog"]';
+  await editor.setFieldValue(`${dialog} #variable-0-text-value`, '10');
+  await editor.setFieldValue(`${dialog} #variable-1-text-value`, '20');
+  // Select the first variable: the new one is inserted after it, between
+  // the two changed ones.
+  const row = await editor.page.$(`${dialog} [data-variable-node-id="VarA"]`);
+  const box = await row.boundingBox();
+  // On the left of the row (its chevron area): not on a field.
+  await editor.page.mouse.click(box.x + 14, box.y + box.height / 2);
+  await sleep(200);
+  await editor.clickButtonWithText(dialog, /add variable/);
+  await sleep(HISTORY_SAVE_DELAY);
+  expectEqual(
+    (await editor.getVariableNames(dialog))[1] !== 'VarB',
+    true,
+    `new variable inserted in the middle (${await editor.getVariableNames(
+      dialog
+    )})`
+  );
+  await editor.clickButtonWithText(dialog, /^apply$/);
+  await editor.waitUntil(
+    'dialog closed',
+    async () => !(await editor.page.$('#scene-variables-dialog'))
+  );
+  await sleep(300);
+  expectEqual(
+    (await getUndoStepsCount(editor)) - stepsBefore,
+    3,
+    'steps recorded by the dialog'
+  );
+
+  const panel = '#scene-properties-editor';
+  const getState = async () => {
+    const names = await editor.getVariableNames(panel);
+    const valueOf = async name =>
+      editor.getFieldValue(
+        `${panel} #variable-${names.indexOf(name)}-text-value`
+      );
+    return [names.length, await valueOf('VarA'), await valueOf('VarB')];
+  };
+  expectEqual(await getState(), [3, '10', '20'], 'applied');
+  // Undone in the reverse order of the edits: the addition first.
+  await editor.undo();
+  expectEqual(await getState(), [2, '10', '20'], 'after the first undo');
+  await editor.undo();
+  expectEqual(await getState(), [2, '10', '2'], 'after the second undo');
+  await editor.undo();
+  expectEqual(await getState(), [2, '1', '2'], 'after the third undo');
+  await editor.redo();
+  expectEqual(await getState(), [2, '10', '2'], 'after a redo');
+};
+
+scenarios[
+  'undo of an object change with the objects panel closed opens it and highlights the object'
+] = async editor => {
+  const { page } = editor;
+  await editor.selectObjectInList('MyCube');
+  await clickSelectorIfPresent(
+    editor,
+    '#object-properties-section-unfold-button'
+  );
+  await editor.setFieldValue('#object-properties-editor [id="width"]', '200');
+  await (await page.$('#toolbar-open-objects-panel-button')).click();
+  await editor.waitUntil(
+    'objects panel closed',
+    async () => !(await page.$('#objects-list'))
+  );
+
+  await editor.recordHighlights();
+  await editor.undo();
+  await editor.waitUntil('objects panel opened', () =>
+    exists(editor, '#objects-list')
+  );
+  const highlights = await editor.getHighlights();
+  expectEqual(
+    highlights.includes('object-row:MyCube'),
+    true,
+    `object row highlighted (${highlights})`
+  );
+};
+
+scenarios[
+  'undo switching the panel from an instance to its object highlights the panel header'
+] = async editor => {
+  await editor.selectObjectInList('MyCube');
+  await clickSelectorIfPresent(
+    editor,
+    '#object-properties-section-unfold-button'
+  );
+  await editor.setFieldValue('#object-properties-editor [id="width"]', '200');
+  // Now the instance is shown: the panel looks nearly the same.
+  await editor.selectInstancesOf('MyCube');
+  expectEqual(await editor.getPanel(), 'instance', 'instance shown');
+
+  await editor.recordHighlights();
+  await editor.undo();
+  expectEqual(
+    await editor.getPanel(),
+    'object:MyCube',
+    'object shown by the undo'
+  );
+  const highlights = await editor.getHighlights();
+  expectEqual(
+    highlights.includes('object-properties-header'),
+    true,
+    `panel header highlighted (${highlights})`
+  );
+
+  // Back to the instance by a redo of an instance change: shown too.
+  await editor.redo();
+  await editor.selectInstancesOf('MyCube');
+  await editor.setFieldValue('#instance-properties-editor [id="X"]', '450');
+  await editor.selectObjectInList('MyCube');
+  await editor.recordHighlights();
+  await editor.undo();
+  expectEqual(
+    await editor.getPanel(),
+    'instance',
+    'instance shown by the undo'
+  );
+  expectEqual(
+    (await editor.getHighlights()).includes('instance-properties-header'),
+    true,
+    'instance panel header highlighted'
+  );
+};
+
+scenarios['a value typed with pauses is one undo step'] = async editor => {
+  await editor.selectInstancesOf('MyObject');
+  const field = '#instance-properties-editor [id="X"]';
+  const stepsBefore = await getUndoStepsCount(editor);
+  const input = await editor.page.waitForSelector(field);
+  await input.click({ clickCount: 3 });
+  // Hesitations of about a second between the digits.
+  for (const character of ['4', '5', '0']) {
+    await editor.page.keyboard.type(character);
+    await sleep(1000);
+  }
+  await editor.page.keyboard.press('Tab');
+  await sleep(HISTORY_SAVE_DELAY);
+  expectEqual(await editor.getFieldValue(field), '450', 'value typed');
+  expectEqual(
+    (await getUndoStepsCount(editor)) - stepsBefore,
+    1,
+    'steps for the typed value'
+  );
+  await editor.undo();
+  expectEqual(await editor.getFieldValue(field), '297', 'value after undo');
+};
+
+{
+  const name = 'typing into an inherited variable of an instance is one step';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objects[0].variables = [
+      { name: 'Life', type: 'number', value: 5 },
+    ];
+    project.layouts[0].instances[0].initialVariables = [];
+  };
+  scenarios[name] = async editor => {
+    await editor.selectInstancesOf('MyObject');
+    const panel = '#instance-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'instance-variables-section');
+    const field = `${panel} #variable-0-text-value`;
+    expectEqual(await editor.getFieldValue(field), '5', 'inherited value');
+    const stepsBefore = await getUndoStepsCount(editor);
+    await editor.setFieldValue(field, '12');
+    expectEqual(
+      (await getUndoStepsCount(editor)) - stepsBefore,
+      1,
+      'steps for the typed value'
+    );
+    await editor.undo();
+    expectEqual(await editor.getFieldValue(field), '5', 'value after undo');
+    await editor.redo();
+    expectEqual(await editor.getFieldValue(field), '12', 'value after redo');
+  };
+}
+
+{
+  const name =
+    'object editor dialog records a property change apart from the next behavior change';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objects[3].behaviors = [
+      {
+        name: 'DestroyOutside',
+        type: 'DestroyOutsideBehavior::DestroyOutside',
+        extraBorder: 0,
+      },
+    ];
+  };
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await editor.selectObjectInList('MyCube');
+    const stepsBefore = await getUndoStepsCount(editor);
+    await clickSelectorIfPresent(
+      editor,
+      '#object-properties-section-unfold-button'
+    );
+    await editor.clickSectionHeaderButton(
+      'object-properties-section',
+      'open-editor'
+    );
+    await page.waitForSelector('#object-editor-dialog');
+    await editor.setFieldValue('[role="dialog"] #cube3d-object-width', '200');
+    await clickDialogTab(editor, 'Behaviors');
+    // Typed digit by digit, like a user.
+    const field = await page.waitForSelector(
+      '[role="dialog"] [id="extraBorder"]'
+    );
+    await field.click({ clickCount: 3 });
+    for (const character of ['3', '3', '3']) {
+      await page.keyboard.type(character);
+      await sleep(400);
+    }
+    await page.keyboard.press('Tab');
+    await applyDialog(editor);
+    expectEqual(
+      (await getUndoStepsCount(editor)) - stepsBefore,
+      2,
+      'steps recorded by the dialog'
+    );
+
+    const getValues = async () => {
+      const { objectsAsInGame } = JSON.parse(
+        await getSerializedProject(editor)
+      );
+      const object = objectsAsInGame.MyCube;
+      return [
+        object.content.width,
+        object.behaviors.find(({ name }) => name === 'DestroyOutside')
+          .extraBorder,
+      ];
+    };
+    expectEqual(await getValues(), [200, 333], 'applied');
+    // The objects panel, closed, is opened again to show the object.
+    await (await page.$('#toolbar-open-objects-panel-button')).click();
+    await editor.waitUntil(
+      'objects panel closed',
+      async () => !(await page.$('#objects-list'))
+    );
+    await editor.undo();
+    await editor.waitUntil('objects panel opened', () =>
+      exists(editor, '#objects-list')
+    );
+    expectEqual(await getValues(), [200, 0], 'after the first undo');
+    await editor.undo();
+    expectEqual(await getValues(), [100, 0], 'after the second undo');
+  };
+}
+
+{
+  const name =
+    'undo/redo of an object behavior property keeps the behavior panels mounted and in place';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objects[0].behaviors = [
+      { name: 'Physics2', type: 'Physics2::Physics2Behavior' },
+      { name: 'Draggable', type: 'DraggableBehavior::Draggable' },
+      {
+        name: 'DestroyOutside',
+        type: 'DestroyOutsideBehavior::DestroyOutside',
+        extraBorder: 0,
+      },
+      {
+        name: 'TopDown',
+        type: 'TopDownMovementBehavior::TopDownMovementBehavior',
+      },
+    ];
+  };
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await editor.selectObjectInList('MyObject');
+    const panel = '#object-properties-editor';
+    const behaviorPanel = `${panel} [id="behavior-panel-DestroyOutside"]`;
+    const field = `${behaviorPanel} [id="extraBorder"]`;
+    await clickSelectorIfPresent(
+      editor,
+      `${panel} #behaviors-section-unfold-button`
+    );
+    await editor.waitUntil('behavior listed', () =>
+      isSelectorVisible(editor, behaviorPanel)
+    );
+    // Unfold every behavior, and mark the panel of the edited one to tell
+    // if it gets mounted again.
+    await page.evaluate(panel => {
+      Array.from(
+        document.querySelectorAll(`${panel} [id$="-unfold-button"]`)
+      ).forEach(button => button.click());
+    }, panel);
+    await editor.waitUntil('field visible', () =>
+      isSelectorVisible(editor, field)
+    );
+    await page.evaluate(behaviorPanel => {
+      document
+        .querySelector(behaviorPanel)
+        .setAttribute('data-e2e-mounted-panel', '1');
+    }, behaviorPanel);
+    const state = () =>
+      page.evaluate(
+        (behaviorPanel, field) => {
+          const element = document.querySelector(field);
+          const sceneEditorElement = document.getElementById('scene-editor');
+          const fiberKey = Object.keys(sceneEditorElement).find(key =>
+            key.startsWith('__reactFiber$')
+          );
+          let fiber = fiberKey ? sceneEditorElement[fiberKey] : null;
+          while (
+            fiber &&
+            !(fiber.stateNode && fiber.stateNode.instancesSelection)
+          )
+            fiber = fiber.return;
+          const object = fiber.stateNode.props.objectsContainer.getObject(
+            'MyObject'
+          );
+          return {
+            fieldTop: element
+              ? Math.round(element.getBoundingClientRect().top)
+              : null,
+            isPanelMounted: !!document.querySelector(
+              `${behaviorPanel}[data-e2e-mounted-panel]`
+            ),
+            behaviorPtr: object.getBehavior('DestroyOutside').ptr,
+          };
+        },
+        behaviorPanel,
+        field
+      );
+    const initial = await state();
+    await editor.setFieldValue(field, '50');
+    for (let i = 0; i < 2; i++) {
+      for (const action of ['undo', 'redo']) {
+        await editor[action]();
+        await sleep(1500);
+        const current = await state();
+        expectEqual(
+          current,
+          { ...initial, isPanelMounted: true },
+          `after ${action} ${i + 1} (initial: ${JSON.stringify(initial)})`
+        );
+      }
+    }
+    expectEqual(await editor.getFieldValue(field), '50', 'value after redo');
+  };
+}
+
+if (with3D) {
+  const name =
+    'removing a 3D physics behavior, undo, redo, undo does not crash the 3D editor';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objects[3].behaviors = [
+      {
+        name: 'Physics3D',
+        type: 'Physics3D::Physics3DBehavior',
+        object3D: 'Object3D',
+      },
+      {
+        name: 'PhysicsCharacter3D',
+        type: 'Physics3D::PhysicsCharacter3D',
+        physics3D: 'Physics3D',
+      },
+    ];
+  };
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await normalizeBehaviorsSharedData(editor);
+    await editor.switchTo3D();
+    await editor.selectObjectInList('MyCube');
+    const panel = '#object-properties-editor';
+    const behaviorPanel = `${panel} [id="behavior-panel-Physics3D"]`;
+    await clickSelectorIfPresent(
+      editor,
+      `${panel} #behaviors-section-unfold-button`
+    );
+    await editor.waitUntil('behavior listed', () =>
+      isSelectorVisible(editor, behaviorPanel)
+    );
+    const report = async label => {
+      await sleep(2500);
+      const crashDialog = await page.evaluate(
+        () =>
+          !!Array.from(document.querySelectorAll('[role="dialog"]')).find(
+            element => /Relaunch the 3D editor/.test(element.textContent)
+          )
+      );
+      const behaviors = await page.evaluate(() => {
+        const element = document.getElementById('scene-editor');
+        const fiberKey = Object.keys(element).find(key =>
+          key.startsWith('__reactFiber$')
+        );
+        let fiber = fiberKey ? element[fiberKey] : null;
+        while (
+          fiber &&
+          !(fiber.stateNode && fiber.stateNode.instancesSelection)
+        )
+          fiber = fiber.return;
+        return fiber.stateNode.props.objectsContainer
+          .getObject('MyCube')
+          .getAllBehaviorNames()
+          .toJSArray()
+          .join('+');
+      });
+      return `${label}: behaviors=${behaviors} crashDialog=${crashDialog} fatal=${
+        editor.fatalErrors.length
+      }`;
+    };
+    const withBehaviors = await report('start');
+    await clickSelectorIfPresent(editor, `${behaviorPanel} #remove-behavior`);
+    await sleep(500);
+    if (await page.$('[role="dialog"]'))
+      await editor.clickButtonWithText(
+        '[role="dialog"]',
+        /^(confirm|delete|yes|remove)/
+      );
+    const withoutBehaviors = await report('removed');
+    expectEqual(
+      withoutBehaviors.includes('Physics3D'),
+      false,
+      `behaviors removed (${withoutBehaviors})`
+    );
+    const expectState = async (label, expected) => {
+      const state = await report(label);
+      expectEqual(
+        state.replace(/^[^:]*:/, ''),
+        expected.replace(/^[^:]*:/, ''),
+        label
+      );
+    };
+    await editor.undo();
+    await expectState('undo', withBehaviors);
+    await editor.redo();
+    await expectState('redo', withoutBehaviors);
+    await editor.undo();
+    await expectState('undo again', withBehaviors);
+    expectEqual(editor.fatalErrors, [], 'fatal errors');
   };
 }
 

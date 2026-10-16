@@ -257,6 +257,88 @@ describe('getObjectsContainerHistoryTarget', () => {
     project.delete();
   });
 
+  it('keeps the same behavior objects across undo/redo, updating their content', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    const behavior = player.addNewBehavior(
+      project,
+      'DestroyOutsideBehavior::DestroyOutside',
+      'DestroyOutside'
+    );
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const getBehavior = () =>
+      objectsContainer.getObject('Player').getBehavior('DestroyOutside');
+    const getExtraBorder = () =>
+      getBehavior()
+        .getProperties()
+        .get('extraBorder')
+        .getValue();
+    const initialExtraBorder = getExtraBorder();
+    const before = target.getValue();
+    behavior.updateProperty('extraBorder', '50');
+    const after = target.getValue();
+
+    for (let i = 0; i < 2; i++) {
+      target.setValue(before);
+      expect(getBehavior().ptr).toBe(behavior.ptr);
+      expect(getExtraBorder()).toBe(initialExtraBorder);
+      target.setValue(after);
+      expect(getBehavior().ptr).toBe(behavior.ptr);
+      expect(getExtraBorder()).toBe('50');
+    }
+
+    project.delete();
+  });
+
+  it('replaces a behavior whose type changed between two steps', () => {
+    const { project, objectsContainer } = makeProject();
+    const player = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      0
+    );
+    player.addNewBehavior(
+      project,
+      'DestroyOutsideBehavior::DestroyOutside',
+      'MyBehavior'
+    );
+    const target = getObjectsContainerHistoryTarget(
+      objectsContainer,
+      project,
+      noopEnsurePersistentUuids
+    );
+    const before = target.getValue();
+    player.removeBehavior('MyBehavior');
+    player.addNewBehavior(
+      project,
+      'DraggableBehavior::Draggable',
+      'MyBehavior'
+    );
+    const after = target.getValue();
+
+    const getType = () =>
+      objectsContainer
+        .getObject('Player')
+        .getBehavior('MyBehavior')
+        .getTypeName();
+    target.setValue(before);
+    expect(getType()).toBe('DestroyOutsideBehavior::DestroyOutside');
+    target.setValue(after);
+    expect(getType()).toBe('DraggableBehavior::Draggable');
+
+    project.delete();
+  });
+
   it('restores the folder structure', () => {
     const { project, objectsContainer } = makeProject();
     const target = getObjectsContainerHistoryTarget(

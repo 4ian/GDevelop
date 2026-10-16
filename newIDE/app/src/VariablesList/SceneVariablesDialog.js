@@ -14,6 +14,7 @@ type Props = {|
   layout: gdLayout,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
+  onChange?: () => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
   initiallySelectedVariable: VariableDialogOpeningProps | null,
   isListLocked: boolean,
@@ -25,6 +26,7 @@ const SceneVariablesDialog = ({
   open,
   onCancel,
   onApply,
+  onChange,
   hotReloadPreviewButtonProps,
   initiallySelectedVariable,
   isListLocked,
@@ -71,6 +73,7 @@ const SceneVariablesDialog = ({
       open={open}
       onCancel={onCancel}
       onApply={onApply}
+      onChange={onChange}
       title={<Trans>{layout.getName()} variables</Trans>}
       // $FlowFixMe[incompatible-type]
       tabs={tabs}

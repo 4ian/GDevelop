@@ -393,7 +393,7 @@ export const CompactInstancePropertiesEditor: React.ComponentType<{
           onScroll={onScroll}
         >
           <Column expand noMargin id="instance-properties-editor">
-            <Column>
+            <Column id="instance-properties-header">
               <CompactPropertiesEditor
                 unsavedChanges={unsavedChanges}
                 schema={instanceSchema}

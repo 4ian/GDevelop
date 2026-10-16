@@ -25,6 +25,7 @@ import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import Window from '../Utils/Window';
+import AlertContext, { type ConfirmState } from '../UI/Alert/AlertContext';
 import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
@@ -468,10 +469,13 @@ type CopyCutPasteOptions = {|
 
 const editSceneIconReactNode = <EditSceneIcon />;
 
-// Edits of the same thing made within this delay are one undoable step.
-const PANEL_HISTORY_SAVE_DELAY = 500;
+// Edits of the same thing made within this delay are one undoable step
+// (long enough for a value typed with hesitations to be a single step).
+const PANEL_HISTORY_SAVE_DELAY = 1500;
 
 export default class SceneEditor extends React.Component<Props, State> {
+  static contextType: React.Context<ConfirmState> = AlertContext;
+  context: ConfirmState;
   instancesSelection: InstancesSelection;
   contextMenu: ?ContextMenuInterface;
   editorDisplay: ?SceneEditorsDisplayInterface;
@@ -1227,7 +1231,30 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   openSceneVariables = (open: boolean = true) => {
+    if (open) this._startSceneVariablesDialogSession();
     this.setState({ layoutVariablesDialogOpen: open });
+  };
+
+  _startSceneVariablesDialogSession = () => {
+    this._startDialogEditSession({
+      // The named items (`{name, serialized}`) of the history target.
+      serialize: () =>
+        this._serializeHistoryTargets(['sceneVariables']).sceneVariables || {},
+      recordStep: serializedVariables => {
+        this._setHistory(
+          savePartialValueToHistory(
+            this._getLatestHistory(),
+            { sceneVariables: serializedVariables },
+            undefined,
+            this._withRevealSelection({
+              source: 'panel',
+              editorId: 'properties',
+            })
+          )
+        );
+        this.updateToolbar();
+      },
+    });
   };
 
   editObject = (
@@ -1873,6 +1900,102 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._applyHistoryChange('redo');
   };
 
+  // Applying a step recorded before another editor changed a target (while
+  // this editor was inactive, see `_refreshHistoryValuesFromProject`)
+  // restores a snapshot made before that change: it's reverted too. The
+  // user is asked first - as long as the other editor's change is still
+  // there (it is until such a step is applied, and back when the step is
+  // applied the other way).
+  _stepsPredatingExternalChange: WeakMap<
+    UndoAction | RedoAction,
+    Array<string>
+  > = new WeakMap();
+  // By key of a target changed by another editor: is that change still
+  // there?
+  _isExternalChangeLiveByKey: Map<string, boolean> = new Map();
+  _isExternalChangeConfirmationOpen = false;
+
+  _markStepsPredatingExternalChange = (
+    history: HistoryState,
+    changedKeys: Array<string>
+  ) => {
+    const mark = (action: UndoAction | RedoAction, value: Object) => {
+      const keys = Object.keys(value).filter(key => changedKeys.includes(key));
+      if (!keys.length) return;
+      const alreadyMarkedKeys =
+        this._stepsPredatingExternalChange.get(action) || [];
+      this._stepsPredatingExternalChange.set(action, [
+        ...alreadyMarkedKeys,
+        ...keys.filter(key => !alreadyMarkedKeys.includes(key)),
+      ]);
+    };
+    history.previousActions.forEach(action =>
+      mark(action, action.valueBeforeChange)
+    );
+    history.futureActions.forEach(action =>
+      mark(action, action.valueAfterChange)
+    );
+    changedKeys.forEach(key => this._isExternalChangeLiveByKey.set(key, true));
+  };
+
+  _wouldRevertExternalChange = (action: UndoAction | RedoAction): boolean => {
+    const keys = this._stepsPredatingExternalChange.get(action);
+    return (
+      !!keys && keys.some(key => !!this._isExternalChangeLiveByKey.get(key))
+    );
+  };
+
+  /**
+   * Keep track of what the applied step did to the other editor's changes,
+   * and mark the step put on the other stack if applying it would revert
+   * them (its snapshot is the state before the step was applied).
+   */
+  _onStepPredatingExternalChangeApplied = (
+    action: UndoAction | RedoAction,
+    changedKeys: Array<string>,
+    counterpart: ?(UndoAction | RedoAction)
+  ) => {
+    const predatingKeys = this._stepsPredatingExternalChange.get(action) || [];
+    const keysWithExternalChange = changedKeys.filter(key =>
+      this._isExternalChangeLiveByKey.has(key)
+    );
+    const counterpartPredatingKeys = keysWithExternalChange.filter(
+      key => !this._isExternalChangeLiveByKey.get(key)
+    );
+    if (counterpart && counterpartPredatingKeys.length)
+      this._stepsPredatingExternalChange.set(
+        counterpart,
+        counterpartPredatingKeys
+      );
+    keysWithExternalChange.forEach(key =>
+      this._isExternalChangeLiveByKey.set(key, !predatingKeys.includes(key))
+    );
+  };
+
+  _askBeforeRevertingExternalChange = (direction: 'undo' | 'redo') => {
+    if (this._isExternalChangeConfirmationOpen) return;
+    this._isExternalChangeConfirmationOpen = true;
+    this.context.showConfirmDialog({
+      title:
+        direction === 'undo'
+          ? t`Undo changes made in another editor?`
+          : t`Redo changes made in another editor?`,
+      message:
+        direction === 'undo'
+          ? t`This step was made before changes done in another editor (the events sheet, the project manager, another scene...). Undoing it will also revert those changes.`
+          : t`This step was made before changes done in another editor (the events sheet, the project manager, another scene...). Redoing it will also revert those changes.`,
+      confirmButtonLabel: t`Continue`,
+      level: 'warning',
+      callback: (confirmed: boolean) => {
+        this._isExternalChangeConfirmationOpen = false;
+        if (confirmed)
+          this._applyHistoryChange(direction, {
+            isRevertingExternalChangeConfirmed: true,
+          });
+      },
+    });
+  };
+
   /**
    * A dialog editing a part of the tracked state is open: applying the
    * history would change (or delete) what it's editing.
@@ -1893,8 +2016,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  _applyHistoryChange = (direction: 'undo' | 'redo') => {
+  _applyHistoryChange = (
+    direction: 'undo' | 'redo',
+    options?: {| isRevertingExternalChangeConfirmed: boolean |}
+  ) => {
     if (this._isDialogEditingTrackedStateOpen()) return;
+    if (this._isExternalChangeConfirmationOpen) return;
 
     const history = this._getHistoryWithPendingModificationsSaved();
     const canApply = direction === 'undo' ? canUndo(history) : canRedo(history);
@@ -1916,6 +2043,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       if (!redoAction) return;
       action = redoAction;
       changedKeys = Object.keys(redoAction.valueAfterChange);
+    }
+    if (
+      !(options && options.isRevertingExternalChangeConfirmed) &&
+      this._wouldRevertExternalChange(action)
+    ) {
+      if (history !== this._getLatestHistory()) this._setHistory(history);
+      this._askBeforeRevertingExternalChange(direction);
+      return;
     }
     const changeContext: ?HistoryChangeContext = action.changeContext || null;
     const command: ?HistoryCommand = action.command || null;
@@ -1962,6 +2097,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         REFACTORED_HISTORY_KEYS
       );
     }
+    this._onStepPredatingExternalChangeApplied(
+      action,
+      changedKeys,
+      direction === 'undo'
+        ? getLastRedoableAction(newHistory)
+        : getLastUndoableAction(newHistory)
+    );
     // Select the instances touched by the change, so it can be seen -
     // notably in the 3D editor, where the camera is not moved (like
     // other engines do: the change is revealed by the selection). If no
@@ -1998,6 +2140,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       (!haveTouchedInstancesToShow &&
         this._getSelectionStateByName(revealSelectionByName)) ||
       this._getSelectObjectOfInstancesState(instancesToSelect);
+    // The properties panel looks alike for an instance and for its object:
+    // a switch between them must be shown.
+    const hasSelectionKindChanged =
+      selectionState.lastSelectionType !== undefined &&
+      selectionState.lastSelectionType !== this.state.lastSelectionType;
 
     this._latestHistory = newHistory;
     this.setState(
@@ -2055,7 +2202,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           changeContext,
           changedKeys,
           command && command.type === 'renameObject' ? renamedName : null,
-          command && command.type === 'renameObjectGroup' ? renamedName : null
+          command && command.type === 'renameObjectGroup' ? renamedName : null,
+          hasSelectionKindChanged
         );
       }
     );
@@ -2689,23 +2837,22 @@ export default class SceneEditor extends React.Component<Props, State> {
    * Update the cached value of the given targets without saving a step
    * (for targets changed outside of the history).
    */
-  _refreshHistoryValue = (keys: Array<string>) => {
+  _refreshHistoryValue = (keys: Array<string>): Array<string> => {
     const history = this._getLatestHistory();
     const refreshedHistory = refreshCompositeHistoryValue(
       history,
       this._getHistoryTargets(),
       keys
     );
+    const changedKeys = keys.filter(
+      key =>
+        JSON.stringify(history.currentValue[key]) !==
+        JSON.stringify(refreshedHistory.currentValue[key])
+    );
     // Nothing to do (and no "unsaved changes") when nothing changed.
-    if (
-      keys.every(
-        key =>
-          JSON.stringify(history.currentValue[key]) ===
-          JSON.stringify(refreshedHistory.currentValue[key])
-      )
-    )
-      return;
+    if (!changedKeys.length) return changedKeys;
     this._setHistory(refreshedHistory);
+    return changedKeys;
   };
 
   /**
@@ -2717,7 +2864,14 @@ export default class SceneEditor extends React.Component<Props, State> {
    */
   _refreshHistoryValuesFromProject = () => {
     this._flushPendingPanelHistorySave();
-    this._refreshHistoryValue(Object.keys(this._getHistoryTargets()));
+    const changedKeys = this._refreshHistoryValue(
+      Object.keys(this._getHistoryTargets())
+    );
+    if (changedKeys.length)
+      this._markStepsPredatingExternalChange(
+        this._getLatestHistory(),
+        changedKeys
+      );
   };
 
   /**
@@ -3484,7 +3638,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     const serializedObjects = updatedObjects
       .filter(object => !!exceptionallyGuardAgainstDeadObject(object))
       .map(object => serializeObjectWithCleanDefaultBehaviorFlags(object));
-    const { previewDebuggerServer } = this.props;
+    const { previewDebuggerServer, layout } = this.props;
+    // The behaviors of the objects need their shared data, which can have
+    // been added (back) with them: sent along, as in the project data.
+    const behaviorsSharedData = layout
+      ? layout
+          .getAllBehaviorSharedDataNames()
+          .toJSArray()
+          .map(name => {
+            const behaviorSharedData = layout.getBehaviorSharedData(name);
+            return {
+              ...serializeToJSObject(behaviorSharedData),
+              name,
+              type: behaviorSharedData.getTypeName(),
+            };
+          })
+      : [];
     if (previewDebuggerServer) {
       previewDebuggerServer
         .getExistingEmbeddedGameFrameDebuggerIds()
@@ -3493,6 +3662,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             command: 'hotReloadObjects',
             payload: {
               updatedObjects: serializedObjects,
+              behaviorsSharedData,
             },
           });
         });
@@ -5172,11 +5342,24 @@ export default class SceneEditor extends React.Component<Props, State> {
   /**
    * Flash the objects list row of the given object, if visible.
    */
+  _flashPropertiesPanelHeader = () => {
+    const containerElement = this._containerElement;
+    const { editorDisplay } = this;
+    if (!containerElement || !editorDisplay) return;
+    if (!editorDisplay.isEditorVisible('properties')) return;
+    ['object-properties-header', 'instance-properties-header'].forEach(id => {
+      const element = this._findElementByAttribute(containerElement, 'id', id);
+      if (element && this._isElementVisible(element))
+        this._flashElement(element);
+    });
+  };
+
   _flashObjectListRowByName = (objectName: string) => {
     const containerElement = this._containerElement;
     const { editorDisplay } = this;
     if (!containerElement || !editorDisplay) return;
-    if (!editorDisplay.isEditorVisible('objects-list')) return;
+    // The objects list can be closed: open it to show the object.
+    editorDisplay.ensureEditorVisible('objects-list');
 
     // The objects list is virtualized: the row may not even be mounted if
     // it's scrolled out of view - bring it into the rendered window first.
@@ -6194,7 +6377,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     changeContext: ?HistoryChangeContext,
     changedKeys: Array<string>,
     renamedObjectName: ?string,
-    renamedObjectGroupName: ?string
+    renamedObjectGroupName: ?string,
+    hasSelectionKindChanged: boolean = false
   ) => {
     const { editorDisplay } = this;
     if (!editorDisplay) return;
@@ -6258,6 +6442,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         if (renamedObjectGroupName) {
           this._flashObjectGroupsListRowByName(renamedObjectGroupName);
         }
+        if (hasSelectionKindChanged) this._flashPropertiesPanelHeader();
       });
     });
 
@@ -7012,14 +7197,22 @@ export default class SceneEditor extends React.Component<Props, State> {
                       open
                       project={project}
                       layout={layout}
+                      onChange={this._onDialogEditChange}
                       onApply={() => {
+                        this._flushDialogEditStep();
+                        this._endDialogEditSession();
+                        // Whatever was not recorded while the dialog was
+                        // open: nothing, usually.
                         this._recordGranularVariablesHistorySteps(
                           'sceneVariables',
                           { source: 'panel', editorId: 'properties' }
                         );
                         this.openSceneVariables(false);
                       }}
-                      onCancel={() => this.openSceneVariables(false)}
+                      onCancel={() => {
+                        this._cancelDialogEditSession();
+                        this.openSceneVariables(false);
+                      }}
                       hotReloadPreviewButtonProps={
                         this.props.hotReloadPreviewButtonProps
                       }

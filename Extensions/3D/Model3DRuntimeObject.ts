@@ -154,12 +154,40 @@ namespace gdjs {
      */
     private onModelChanged(objectData: Model3DObjectData) {
       this._updateModel(objectData);
-      if (this._animations.length > 0) {
-        this._renderer.playAnimation(
-          this._animations[0].source,
-          this._animations[0].loop,
-          true
-        );
+      this._playCurrentAnimation();
+    }
+
+    private _playCurrentAnimation() {
+      if (this._currentAnimationIndex >= this._animations.length) {
+        this._currentAnimationIndex = 0;
+      }
+      const animation = this._animations[this._currentAnimationIndex];
+      if (!animation) {
+        return;
+      }
+      this._renderer.playAnimation(animation.source, animation.loop, true);
+      if (this._animationPaused) {
+        this._renderer.pauseAnimation();
+      }
+    }
+
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
+      super.extraInitializationFromInitialInstance(initialInstanceData);
+      const animationData = initialInstanceData.numberProperties
+        ? initialInstanceData.numberProperties.find(
+            (data) => data.name === 'animation'
+          )
+        : null;
+      const animationIndex = animationData ? animationData.value | 0 : 0;
+      if (
+        animationIndex !== this._currentAnimationIndex &&
+        animationIndex >= 0 &&
+        animationIndex < this._animations.length
+      ) {
+        this._currentAnimationIndex = animationIndex;
+        this._playCurrentAnimation();
       }
     }
 
@@ -232,20 +260,17 @@ namespace gdjs {
         this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
       }
       if (this.getInstanceContainer().getGame().isInGameEdition()) {
-        const oldDefaultAnimationSource =
-          this._animations.length > 0 ? this._animations[0].source : null;
+        const oldAnimation = this._animations[this._currentAnimationIndex];
         this._animations = newObjectData.content.animations;
-        const newDefaultAnimationSource =
-          this._animations.length > 0 ? this._animations[0].source : null;
+        if (this._currentAnimationIndex >= this._animations.length) {
+          this._currentAnimationIndex = 0;
+        }
+        const newAnimation = this._animations[this._currentAnimationIndex];
         if (
-          newDefaultAnimationSource &&
-          oldDefaultAnimationSource !== newDefaultAnimationSource
+          newAnimation &&
+          (!oldAnimation || oldAnimation.source !== newAnimation.source)
         ) {
-          this._renderer.playAnimation(
-            newDefaultAnimationSource,
-            this._animations[0].loop,
-            true
-          );
+          this._playCurrentAnimation();
         }
       }
       return true;

@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import VariableField, {
-  renderVariableWithIcon,
-  type VariableFieldInterface,
-} from './VariableField';
+import VariableField, { renderVariableWithIcon } from './VariableField';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import GlobalVariablesDialog from '../../VariablesList/GlobalVariablesDialog';
 import {
@@ -12,13 +9,12 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { enumerateVariables } from './EnumerateVariables';
 
 const gd: libGDevelop = global.gd;
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?VariableFieldInterface>(null);
+    const field = React.useRef<?ParameterFieldInterface>(null);
     const [
       variableEditorOpen,
       setVariableEditorOpen,
@@ -39,18 +35,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project]
     );
 
-    const enumerateGlobaleVariables = React.useCallback(
-      () => {
-        return project ? enumerateVariables(project.getVariables()) : [];
-      },
-      [project]
-    );
-
     return (
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
-          enumerateVariables={enumerateGlobaleVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -67,6 +55,12 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
           openEventsBasedEntityPropertyEditorDialog={null}
+          instructionMetadata={props.instructionMetadata}
+          expression={props.expression}
+          expressionMetadata={props.expressionMetadata}
+          parameterIndex={props.parameterIndex}
+          resourceManagementProps={props.resourceManagementProps}
+          parameterRenderingService={props.parameterRenderingService}
         />
         {variableEditorOpen && project && (
           <GlobalVariablesDialog
@@ -81,7 +75,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 props.onChange(selectedVariableName);
               }
               setVariableEditorOpen(null);
-              if (field.current) field.current.updateAutocompletions();
             }}
             initiallySelectedVariable={variableEditorOpen}
             hotReloadPreviewButtonProps={null}

@@ -75,6 +75,7 @@ type ProcessEditorFunctionCallsOptions = {|
     changes: WillDeleteGameplayTestChanges
   ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  sendChangesToEditor: () => void,
   onExtensionsModifiedOutsideEditor: (
     changes: ExtensionsOutsideEditorChanges
   ) => void,
@@ -119,6 +120,7 @@ export const processEditorFunctionCalls = async ({
   onWillDeleteScene,
   onWillDeleteGameplayTest,
   onWillDeleteObject,
+  sendChangesToEditor,
   onExtensionsModifiedOutsideEditor,
   ensureExtensionsUpToDate,
   reloadExtensionMetadata,
@@ -255,6 +257,7 @@ export const processEditorFunctionCalls = async ({
         onWillDeleteScene,
         onWillDeleteGameplayTest,
         onWillDeleteObject,
+        sendChangesToEditor,
         onExtensionsModifiedOutsideEditor,
         ensureExtensionsUpToDate,
         reloadExtensionMetadata,

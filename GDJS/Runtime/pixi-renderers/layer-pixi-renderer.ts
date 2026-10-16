@@ -1343,6 +1343,12 @@ namespace gdjs {
 
       camera.updateMatrixWorld();
 
+      // The Three.js scene is scaled by the inverse world scale,
+      // so the camera is in Three.js units and not in scene units.
+      const runtimeScene = this._layer.getRuntimeScene();
+      const threeWorldZ =
+        worldZ * runtimeScene.getRenderer3DInverseWorldScale();
+
       if (camera instanceof THREE.OrthographicCamera) {
         // https://discourse.threejs.org/t/how-to-unproject-mouse2d-with-orthographic-camera/4777
         vector.set(normalizedX, normalizedY, 0);
@@ -1351,7 +1357,7 @@ namespace gdjs {
         // Find x and y for a given z along the camera direction line.
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
-        const distance = (worldZ - vector.z) / direction.z;
+        const distance = (threeWorldZ - vector.z) / direction.z;
         vector.x += distance * direction.x;
         vector.y += distance * direction.y;
       } else {
@@ -1362,7 +1368,7 @@ namespace gdjs {
         // Find x and y for a given z along the line between the camera and
         // the one on the frustum.
         vector.sub(camera.position).normalize();
-        const distance = (worldZ - camera.position.z) / vector.z;
+        const distance = (threeWorldZ - camera.position.z) / vector.z;
         vector.x = distance * vector.x + camera.position.x;
         vector.y = distance * vector.y + camera.position.y;
       }
@@ -1374,8 +1380,9 @@ namespace gdjs {
         return result;
       }
 
-      result[0] = vector.x;
-      result[1] = -vector.y;
+      const worldScale = runtimeScene.getRenderer3DWorldScale();
+      result[0] = vector.x * worldScale;
+      result[1] = -vector.y * worldScale;
       return result;
     }
 

@@ -475,6 +475,19 @@ class GD_CORE_API WholeProjectRefactorer {
   static void RenameLayout(gd::Project &project, const gd::String &oldName,
                            const gd::String &newName);
   /**
+   * \brief Refactor the project after a named easing is renamed.
+   */
+  static void RenameNamedEasing(gd::Project &project, const gd::String &oldName,
+                                const gd::String &newName);
+  /**
+   * \brief Refactor an events functions extension after a named easing is
+   * renamed.
+   */
+  static void RenameNamedEasingInEventsFunctionsExtension(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::String &oldName, const gd::String &newName);
+  /**
    * \brief Refactor the project after an external layout is renamed.
    */
   static void RenameExternalLayout(gd::Project &project,

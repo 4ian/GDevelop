@@ -672,4 +672,118 @@ describe("TiledTileMapLoader", function () {
       expect(layer.isFlippedDiagonally(2, 1)).to.be(false);
     });
   });
+
+  describe("with an image collection tile set", function () {
+    // A tile image bigger than the grid is drawn by Tiled at the bottom-left
+    // corner of its cell.
+    const tiledMap: TiledTileMap = {
+      compressionlevel: -1,
+      height: 1,
+      infinite: false,
+      layers: [
+        {
+          data: [1],
+          height: 1,
+          id: 1,
+          name: "Tile Layer 1",
+          opacity: 1,
+          type: "tilelayer",
+          visible: true,
+          width: 1,
+          x: 0,
+          y: 0,
+        },
+      ],
+      nextlayerid: 2,
+      nextobjectid: 1,
+      orientation: "orthogonal",
+      renderorder: "right-down",
+      tiledversion: "1.10.2",
+      tileheight: 8,
+      tilesets: [
+        {
+          columns: 0,
+          firstgid: 1,
+          grid: { height: 1, orientation: "orthogonal", width: 1 },
+          margin: 0,
+          name: "Objects",
+          spacing: 0,
+          tilecount: 1,
+          tileheight: 32,
+          tiles: [
+            {
+              id: 0,
+              image: "House.png",
+              imageheight: 32,
+              imagewidth: 24,
+              objectgroup: {
+                draworder: "index",
+                id: 2,
+                name: "",
+                objects: [
+                  {
+                    height: 10,
+                    id: 1,
+                    name: "",
+                    rotation: 0,
+                    type: "",
+                    visible: true,
+                    width: 20,
+                    x: 2,
+                    y: 20,
+                  },
+                  {
+                    height: 0,
+                    id: 2,
+                    name: "",
+                    polygon: [
+                      { x: 0, y: 0 },
+                      { x: 4, y: 0 },
+                      { x: 4, y: 4 },
+                    ],
+                    rotation: 0,
+                    type: "",
+                    visible: true,
+                    width: 0,
+                    x: 10,
+                    y: 2,
+                  },
+                ],
+                opacity: 1,
+                type: "objectgroup",
+                visible: true,
+                x: 0,
+                y: 0,
+              },
+            },
+          ],
+          tilewidth: 24,
+        } as TiledTileMap["tilesets"][number],
+      ],
+      tilewidth: 8,
+      type: "map",
+      version: "1.10",
+      width: 1,
+    };
+
+    const tileMap: EditableTileMap = TiledTileMapLoader.load(tiledMap, null);
+
+    it("anchors the shapes at the bottom-left of the cell", function () {
+      const hitBoxes = tileMap.getTileDefinition(0)!.getHitBoxes("")!;
+      // The image is 24 px higher than the 8 px cell.
+      expect(hitBoxes).to.eql([
+        [
+          [2, -4],
+          [2, 6],
+          [22, 6],
+          [22, -4],
+        ],
+        [
+          [10, -22],
+          [14, -22],
+          [14, -18],
+        ],
+      ]);
+    });
+  });
 });

@@ -24,6 +24,8 @@ import ProfileDialog from '../Profile/ProfileDialog';
 import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
 import Window from '../Utils/Window';
 import { markLegacySkyboxes } from '../Utils/LegacySkyboxOrientation';
+import { isWebGL2Supported } from '../Utils/WebGL';
+import { setInGameEditorRendererCreationFailed } from '../EmbeddedGame/InGameEditorAvailability';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
@@ -218,6 +220,7 @@ import {
   sendEventsExtractedAsFunction,
   sendPreviewStarted,
   sendProjectOpened,
+  setCurrentProjectUuid,
 } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/UseLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -706,6 +709,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [gameEditorMode, setGameEditorMode] = React.useState<
     'embedded-game' | 'instances-editor'
   >('instances-editor');
+  const onEnableInGameEditor = React.useCallback(
+    () => setGameEditorMode('embedded-game'),
+    []
+  );
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -716,6 +723,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   const { currentFileMetadata, updateStatus } = state;
   const currentProject = exceptionallyGuardAgainstDeadObject(
     state.currentProject
+  );
+
+  React.useEffect(
+    () => {
+      setCurrentProjectUuid(
+        currentProject ? currentProject.getProjectUuid() : null
+      );
+    },
+    [currentProject]
   );
 
   const fileIdentifier = currentFileMetadata
@@ -2158,6 +2174,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const onRestartInGameEditor = React.useCallback(
     (reason: string) => {
       setShowRestartInGameEditorAfterErrorButton(false);
+      // Reported again by the in-game editor once restarted.
+      setInGameEditorRendererCreationFailed(false);
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
@@ -4895,6 +4913,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           return;
         }
 
+        if (originalProjectUuid)
+          setCurrentProjectUuid(upToDateProject.getProjectUuid());
         sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
         setCloudProjectSaveChoiceOpen(false);
@@ -6168,7 +6188,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         )}
       <EmbeddedGameFrame
         key={currentProject ? currentProject.ptr : 0}
-        enabled={gameEditorMode === 'embedded-game'}
+        // The in-game editor requires WebGL2 (a message is shown instead).
+        enabled={gameEditorMode === 'embedded-game' && isWebGL2Supported()}
+        onEnable={onEnableInGameEditor}
         previewDebuggerServer={previewDebuggerServer || null}
         onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
       >

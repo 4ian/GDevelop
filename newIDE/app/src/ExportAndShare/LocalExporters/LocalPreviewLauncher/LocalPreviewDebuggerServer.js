@@ -17,6 +17,7 @@ const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
 
 let embeddedGameFrameWindow: WindowProxy | null = null;
+let isEmbeddedGameFrameReady = false;
 let gameplayTestFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
 
@@ -35,8 +36,12 @@ const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingPreviewDebuggerIds(),
 ];
 
+// A frame that has a location loaded but no game running in it yet (or a game that
+// failed to start) can't be hot-reloaded: messages sent to it are silently lost.
 const getExistingEmbeddedGameFrameDebuggerIds = (): Array<DebuggerId> =>
-  embeddedGameFrameWindow ? ['embedded-game-frame'] : [];
+  embeddedGameFrameWindow && isEmbeddedGameFrameReady
+    ? ['embedded-game-frame']
+    : [];
 
 const getExistingGameplayTestFrameDebuggerIds = (): Array<DebuggerId> =>
   gameplayTestFrameWindow ? ['gameplay-test-frame'] : [];
@@ -215,14 +220,22 @@ class LocalPreviewDebuggerServer {
   }
   sendMessage(id: DebuggerId, message: Object) {
     if (id === 'embedded-game-frame') {
-      if (!embeddedGameFrameWindow) {
+      const theEmbeddedGameFrameWindow = embeddedGameFrameWindow;
+      if (!theEmbeddedGameFrameWindow) {
         console.error(
           'Cannot send message to the embedded game frame as it is not registered.'
         );
         return;
       }
 
-      embeddedGameFrameWindow.postMessage(message, '*');
+      if (message.command === 'hardReload') {
+        // The game is about to navigate away: it can't be considered as running - and
+        // so can't be hot-reloaded or have its files re-exported - until it announces
+        // itself again.
+        this.setEmbeddedGameFrameReady(false);
+      }
+
+      theEmbeddedGameFrameWindow.postMessage(message, '*');
       return;
     }
     if (id === 'gameplay-test-frame') {
@@ -248,14 +261,17 @@ class LocalPreviewDebuggerServer {
       message: JSON.stringify(message),
     });
   }
-  sendMessageWithResponse(message: Object): Promise<Object> {
+  sendMessageWithResponse(
+    message: Object,
+    options?: {| timeoutMs?: number |}
+  ): Promise<Object> {
     const messageId = nextMessageWithResponseId;
     nextMessageWithResponseId++;
     for (const id of getExistingDebuggerIds()) {
       this.sendMessage(id, { ...message, messageId });
     }
 
-    const timeout = 1000;
+    const timeout = (options && options.timeoutMs) || 1000;
     const promise = new Promise<Object>((resolve, reject) => {
       responseCallbacks.set(messageId, resolve);
       setTimeout(() => {
@@ -299,12 +315,21 @@ class LocalPreviewDebuggerServer {
     }
 
     embeddedGameFrameWindow = embeddedWindow;
-    callbacksList.forEach(({ onConnectionOpened }) =>
-      onConnectionOpened({
-        id: 'embedded-game-frame',
-        debuggerIds: getExistingDebuggerIds(),
-      })
-    );
+  }
+  setEmbeddedGameFrameReady(isReady: boolean) {
+    if (isEmbeddedGameFrameReady === isReady) return;
+
+    isEmbeddedGameFrameReady = isReady;
+    if (isReady) {
+      callbacksList.forEach(({ onConnectionOpened }) =>
+        onConnectionOpened({
+          id: 'embedded-game-frame',
+          debuggerIds: getExistingDebuggerIds(),
+        })
+      );
+    } else {
+      notifyConnectionClosed('embedded-game-frame');
+    }
   }
   unregisterEmbeddedGameFrame(embeddedWindow: WindowProxy) {
     if (embeddedGameFrameWindow !== embeddedWindow) {
@@ -317,6 +342,7 @@ class LocalPreviewDebuggerServer {
     }
 
     embeddedGameFrameWindow = null;
+    isEmbeddedGameFrameReady = false;
     notifyConnectionClosed('embedded-game-frame');
   }
   registerGameplayTestFrame(embeddedWindow: WindowProxy) {
@@ -365,6 +391,7 @@ class LocalPreviewDebuggerServer {
 
     if (embeddedGameFrameWindow) {
       embeddedGameFrameWindow = null;
+      isEmbeddedGameFrameReady = false;
       notifyConnectionClosed('embedded-game-frame');
     }
 

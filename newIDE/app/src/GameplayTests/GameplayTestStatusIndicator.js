@@ -31,7 +31,10 @@ export type GameplayTestDisplayStatus =
   // The run was frozen because GDevelop was left in the background (the
   // browser stops running games in a hidden page) and did not finish. Says
   // nothing about the game: not a failure.
-  | 'paused';
+  | 'paused'
+  // The game preview could not be started (the browser storage is full...):
+  // the test did not run.
+  | 'unavailable';
 
 export const getDisplayStatusFromTest = (
   test: gdTest
@@ -43,7 +46,8 @@ export const getDisplayStatusFromTest = (
     lastRunStatus === 'error' ||
     lastRunStatus === 'stopped' ||
     lastRunStatus === 'timeout' ||
-    lastRunStatus === 'paused'
+    lastRunStatus === 'paused' ||
+    lastRunStatus === 'unavailable'
   ) {
     return lastRunStatus;
   }
@@ -71,6 +75,7 @@ const statusTones: { [GameplayTestDisplayStatus]: StatusChipTone } = {
   stopped: 'neutral',
   timeout: 'warning',
   paused: 'info',
+  unavailable: 'warning',
 };
 
 export const getGameplayTestStatusLabel = (
@@ -89,6 +94,8 @@ export const getGameplayTestStatusLabel = (
       return <Trans>Timed out</Trans>;
     case 'paused':
       return <Trans>Paused</Trans>;
+    case 'unavailable':
+      return <Trans>Could not start</Trans>;
     case 'launching':
       return <Trans>Starting the game...</Trans>;
     case 'running':
@@ -106,6 +113,7 @@ const renderStatusIcon = (status: GameplayTestDisplayStatus) => {
     case 'failed':
       return <ErrorFilled />;
     case 'error':
+    case 'unavailable':
       return <WarningRound />;
     case 'timeout':
       return <History />;

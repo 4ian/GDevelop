@@ -351,7 +351,7 @@ module.exports = {
           .setLabel(_('Shape'))
           .setDescription(
             _(
-              'The shape used for collisions. It gives their meaning to the dimension properties. A capsule or a cylinder is extended along the axis given by "Shape orientation" and a mesh uses the model given by "Simplified 3D model".'
+              'The shape used for collisions. It gives their meaning to the dimension properties. A capsule or a cylinder is extended along the axis given by "Shape orientation" and a mesh uses the model given by "Simplified 3D model". Objects giving their own surface, like terrains, always use it and are static.'
             )
           )
           .addChoice('Box', _('Box'))

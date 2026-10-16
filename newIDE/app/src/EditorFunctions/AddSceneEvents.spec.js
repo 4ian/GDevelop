@@ -217,6 +217,150 @@ describe('add_scene_events', () => {
     expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalled();
   });
 
+  describe('in external events', () => {
+    const externalEventsArgs = {
+      scope: { type: 'external_events', external_events_name: 'Movement' },
+      events_description: 'Make the player jump',
+      extension_names_list: '',
+      objects_list: 'Player',
+    };
+
+    it('changes the code of a `js` event of the external events directly', async () => {
+      const externalEvents = project.insertNewExternalEvents('Movement', 0);
+      externalEvents.setAssociatedLayout('TestScene');
+      const jsCodeEvent = gd.asJsCodeEvent(
+        externalEvents
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 0)
+      );
+      jsCodeEvent.setInlineCode('const speed = 1;');
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onSceneEventsModifiedOutsideEditor = jest.fn();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.generate_events.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          generateEvents,
+          onSceneEventsModifiedOutsideEditor,
+          args: {
+            ...externalEventsArgs,
+            event_batches: [
+              {
+                placement_relation:
+                  'replace_event_but_keep_existing_sub_events',
+                placement_target_event_id: 'event-0',
+                placement_rationale: 'The same event.',
+                edits: [
+                  {
+                    old_string: 'const speed = 1;',
+                    new_string: 'const speed = 2;',
+                  },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(generateEvents).not.toHaveBeenCalled();
+      expect(jsCodeEvent.getInlineCode()).toBe('const speed = 2;');
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith(
+        expect.objectContaining({ scene: null, externalEvents })
+      );
+    });
+
+    it('writes the events in the external events, with the objects and variables of their scene', async () => {
+      project.insertNewLayout('OtherScene', 0);
+      project
+        .insertNewExternalEvents('Movement', 0)
+        .setAssociatedLayout('TestScene');
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onSceneEventsModifiedOutsideEditor = jest.fn();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn().mockResolvedValue({
+        generationCompleted: true,
+        aiGeneratedEvent: makeFakeAiGeneratedEvent({
+          undeclaredVariables: [
+            { name: 'jumps', type: 'Number', requiredScope: 'scene' },
+          ],
+        }),
+      });
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_scene_events.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          generateEvents,
+          onSceneEventsModifiedOutsideEditor,
+          args: externalEventsArgs,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(generateEvents).toHaveBeenCalledWith(
+        expect.objectContaining({
+          scope: { type: 'external_events', external_events_name: 'Movement' },
+          sceneName: 'TestScene',
+        })
+      );
+      const externalEvents = project.getExternalEvents('Movement');
+      expect(externalEvents.getEvents().getEventsCount()).toBe(1);
+      const scene = project.getLayout('TestScene');
+      expect(scene.getEvents().getEventsCount()).toBe(0);
+      expect(scene.getVariables().has('jumps')).toBe(true);
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith(
+        expect.objectContaining({ scene: null, externalEvents })
+      );
+    });
+
+    it('uses the scene linking to the external events when none is associated', async () => {
+      project.insertNewLayout('OtherScene', 0);
+      project.insertNewExternalEvents('Movement', 0);
+      gd.asLinkEvent(
+        project
+          .getLayout('TestScene')
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 0)
+      ).setTarget('Movement');
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn().mockResolvedValue({
+        generationAborted: true,
+      });
+
+      await editorFunctions.add_scene_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        generateEvents,
+        args: externalEventsArgs,
+      });
+
+      expect(generateEvents).toHaveBeenCalledWith(
+        expect.objectContaining({ sceneName: 'TestScene' })
+      );
+    });
+
+    it('refuses external events used by no scene', async () => {
+      project.insertNewExternalEvents('Movement', 0);
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_scene_events.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          generateEvents,
+          args: externalEventsArgs,
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toBe(
+        'External events "Movement" have no associated scene and no scene links to them: their events would have no objects nor variables. Add a `link "Movement"` event to the scene they are for first, or write the events in that scene.'
+      );
+      expect(generateEvents).not.toHaveBeenCalled();
+    });
+  });
+
   it('fails with the generated event id and errors when no change could be applied', async () => {
     // $FlowFixMe[underconstrained-implicit-instantiation]
     const onSceneEventsModifiedOutsideEditor = jest.fn();

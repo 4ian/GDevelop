@@ -101,6 +101,7 @@ import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
 import {
+  ensureObjectSizeInfoLoaded,
   extractRequiredString,
   formatPropertiesList,
   getObjectSizeInfo,
@@ -112,7 +113,6 @@ import {
   type ObjectSizeInfo,
 } from './Utils';
 import {
-  ensureModel3DMeasurementLoaded,
   ensureModel3DMeasurementsLoaded,
   isModel3DObjectMeasured,
 } from './Model3DSizeInfo';
@@ -122,6 +122,13 @@ import {
   INSTANCE_ANCHORS_3D,
   type InstanceAnchor,
 } from './InstanceAnchor';
+import {
+  dropInstancesOnSurfaces,
+  getInstanceBox,
+  getSurfacesOfInstances,
+  parseSurfaceOptions,
+  type InstanceWithBox,
+} from './Surfaces';
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
 import {
@@ -366,6 +373,8 @@ export type EditorFunctionGenericOutput = {|
 
   // Used for de-duplication of outputs:
   eventsForSceneNamed?: string,
+  // `read_events_source` in external events: their name.
+  eventsForExternalEventsNamed?: string,
   // `read_events_source` in a function of an extension: the scope read, the
   // function read and what its events can use.
   eventsForScopeLabel?: string,
@@ -608,6 +617,10 @@ export type LaunchFunctionOptionsWithoutProject = {|
     changes: WillDeleteGameplayTestChanges
   ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
+  // The changes of scenes, objects and instances are sent to the editor once
+  // per batch of calls: this sends the ones made so far, so that the game
+  // shown by the editor has them.
+  sendChangesToEditor: () => void,
   // Extensions authored by the AI (see `OutsideEditorChanges.js`): the
   // changes are coalesced per batch, `ensureExtensionsUpToDate` flushes them
   // (regenerating the extensions) when a function needs fresh metadata, and
@@ -1650,7 +1663,7 @@ const createOrReplaceObject: EditorFunction = {
                   getPropertiesText(object),
                 ].join(' '),
               };
-              await ensureModel3DMeasurementLoaded(
+              await ensureObjectSizeInfoLoaded(
                 object,
                 project,
                 PixiResourcesLoader
@@ -1780,11 +1793,7 @@ const createOrReplaceObject: EditorFunction = {
           getPropertiesText(object),
         ].join(' '),
       };
-      await ensureModel3DMeasurementLoaded(
-        object,
-        project,
-        PixiResourcesLoader
-      );
+      await ensureObjectSizeInfoLoaded(object, project, PixiResourcesLoader);
       return addVariantWithoutInstancesHint(
         injectObjectSizeInfo(scratchResult, {
           [targetObjectName]: getObjectSizeInfo(
@@ -2552,7 +2561,7 @@ const inspectObjectPropertiesEffects: EditorFunction = {
     if (inspectParts.length > 0) {
       output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
     }
-    await ensureModel3DMeasurementLoaded(object, project, PixiResourcesLoader);
+    await ensureObjectSizeInfoLoaded(object, project, PixiResourcesLoader);
     injectObjectSizeInfo(output, {
       [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
     });
@@ -4281,7 +4290,13 @@ const describeInstances: EditorFunction = {
       ),
     };
   },
-  launchFunction: async ({ project, args, PixiResourcesLoader }) => {
+  launchFunction: async ({
+    project,
+    args,
+    editorCallbacks,
+    sendChangesToEditor,
+    PixiResourcesLoader,
+  }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
       allowedTypes: INSTANCES_SCOPE_TYPES,
     });
@@ -4306,6 +4321,24 @@ const describeInstances: EditorFunction = {
       'include_raw_json'
     );
 
+    const surfaceBeneathParsing = parseSurfaceOptions({
+      args,
+      argumentName: 'surface_beneath',
+      isUpAllowed: true,
+      objectsContainer,
+      globalObjectsContainer,
+    });
+    if (!surfaceBeneathParsing.success)
+      return makeGenericFailure(surfaceBeneathParsing.message);
+    const surfaceOptions = surfaceBeneathParsing.options;
+    const grid = surfaceOptions
+      ? SafeExtractor.extractNumberProperty(args.surface_beneath, 'grid')
+      : null;
+    if (grid !== null && !(Number.isInteger(grid) && grid >= 2 && grid <= 32))
+      return makeGenericFailure(
+        `\`surface_beneath.grid\` must be an integer from 2 to 32 (got ${grid}).`
+      );
+
     const objectNames = new Set(
       filter_by_object_name
         .split(',')
@@ -4313,7 +4346,10 @@ const describeInstances: EditorFunction = {
         .filter(Boolean)
     );
 
-    const instances = [];
+    const instances: Array<Object> = [];
+    // The instances whose surfaces are found, with their index in `instances`.
+    const instancesWithBox: Array<InstanceWithBox> = [];
+    const instancesWithBoxIndices: Array<number> = [];
     const objectSizeInfoByName: { [string]: ObjectSizeInfo | null } = {};
 
     const isInstanceDescribed = (instance: gdInitialInstance) =>
@@ -4374,6 +4410,22 @@ const describeInstances: EditorFunction = {
             instance,
             defaultSize
           );
+          if (surfaceOptions && sizeInfo) {
+            const mode = sizeInfo.originZ === null ? '2d' : '3d';
+            const position = [instance.getX(), instance.getY()];
+            const size = [simplifiedInstance.width, simplifiedInstance.height];
+            if (mode === '3d') {
+              position.push(instance.getZ());
+              size.push(simplifiedInstance.depth);
+            }
+            const box = size.every(value => Number.isFinite(value))
+              ? getInstanceBox({ position, size, objectSizeInfo: sizeInfo })
+              : null;
+            if (box) {
+              instancesWithBox.push({ instance, mode, box });
+              instancesWithBoxIndices.push(instances.length);
+            }
+          }
           instances.push(
             includeRawJson
               ? { ...simplifiedInstance, rawJson: getInstanceRawJson(instance) }
@@ -4383,8 +4435,28 @@ const describeInstances: EditorFunction = {
       );
     });
 
+    let surfacesMessage = null;
+    if (surfaceOptions && instancesWithBox.length > 0) {
+      const surfacesOfInstances = await getSurfacesOfInstances({
+        resolvedScope,
+        sendChangesToEditor,
+        editorCallbacks,
+        instancesWithBox,
+        surfaceOptions,
+        grid,
+      });
+      if (!surfacesOfInstances.success)
+        return makeGenericFailure(surfacesOfInstances.message);
+      surfacesOfInstances.surfaces.forEach((surfaces, index) => {
+        const instanceIndex = instancesWithBoxIndices[index];
+        instances[instanceIndex] = { ...instances[instanceIndex], ...surfaces };
+      });
+      surfacesMessage = surfacesOfInstances.message;
+    }
+
     const result: EditorFunctionGenericOutput = {
       success: true,
+      ...(surfacesMessage ? { message: surfacesMessage } : {}),
       instances: instances,
       ...getInstancesScopeOutputFields(resolvedScope),
       positionSemantics: getPositionSemanticsForScope(resolvedScope),
@@ -4414,6 +4486,57 @@ const iterateOnInstances = (
   // $FlowFixMe[incompatible-type]
   initialInstances.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
+};
+
+/**
+ * Undo what `put_2d_instances`/`put_3d_instances` did to instances: remove
+ * the created ones, and give their original state back to the existing ones.
+ */
+const restoreInstances = ({
+  initialInstances,
+  instances,
+  existingInstanceStates,
+}: {|
+  initialInstances: gdInitialInstancesContainer,
+  instances: Array<gdInitialInstance>,
+  existingInstanceStates: Map<gdInitialInstance, Object>,
+|}) => {
+  instances.forEach(instance => {
+    const originalState = existingInstanceStates.get(instance);
+    if (!originalState) {
+      initialInstances.removeInstance(instance);
+      return;
+    }
+    instance.setLayer(originalState.originalLayer);
+    instance.setX(originalState.originalX);
+    instance.setY(originalState.originalY);
+    if (originalState.originalZ !== undefined)
+      instance.setZ(originalState.originalZ);
+    if (originalState.originalRotationX !== undefined) {
+      instance.setRotationX(originalState.originalRotationX);
+      instance.setRotationY(originalState.originalRotationY);
+      instance.setAngle(originalState.originalRotationZ);
+    } else {
+      instance.setAngle(originalState.originalRotation);
+    }
+    if (originalState.originalZOrder !== undefined)
+      instance.setZOrder(originalState.originalZOrder);
+    if (originalState.originalOpacity !== undefined)
+      instance.setOpacity(originalState.originalOpacity);
+    instance.setHidden(originalState.originalHidden);
+    const hasCustomSize = originalState.originalCustomWidth !== null;
+    instance.setHasCustomSize(hasCustomSize);
+    if (hasCustomSize) {
+      instance.setCustomWidth(originalState.originalCustomWidth);
+      instance.setCustomHeight(originalState.originalCustomHeight);
+    }
+    if (originalState.originalCustomDepth !== undefined) {
+      const hasCustomDepth = originalState.originalCustomDepth !== null;
+      instance.setHasCustomDepth(hasCustomDepth);
+      if (hasCustomDepth)
+        instance.setCustomDepth(originalState.originalCustomDepth);
+    }
+  });
 };
 
 /**
@@ -4514,6 +4637,97 @@ const makeWrongObjectInstanceIdsFailure = (
     )}. Nothing was changed. Pass ids of "${objectName}" instances (from \`describe_instances\`), fix \`object_name\`, or omit \`object_name\` to target these instances.`
   );
 
+const getLayerLabel = (layerName: string): string =>
+  layerName ? `layer "${layerName}"` : 'the base layer ("")';
+
+/**
+ * A "none" or "erase" brush naming an object, without `existing_instance_ids`
+ * nor a position, targets every instance of the object on the layer: this is
+ * what the AI means by it (resize them all, erase them all...), as it often
+ * writes these calls without having read the instances.
+ */
+const isTargetingEveryObjectInstance = ({
+  brushKind,
+  namedObject,
+  existingInstanceIds,
+  brushPosition,
+  newInstancesCount,
+}: {|
+  brushKind: string,
+  namedObject: gdObject | null,
+  existingInstanceIds: Array<string>,
+  brushPosition: string | null,
+  newInstancesCount: number | null,
+|}): boolean =>
+  (brushKind === 'none' || brushKind === 'erase') &&
+  !!namedObject &&
+  existingInstanceIds.length === 0 &&
+  !brushPosition &&
+  !newInstancesCount;
+
+/**
+ * The ids of every instance of `objectName` on `layerName`, or the output to
+ * return when there is none there: a failure naming the layers the instances
+ * are on, or - for "erase" - a success when the object has no instance at all.
+ */
+const getObjectInstanceIdsOnLayer = ({
+  initialInstances,
+  objectName,
+  layerName,
+  brushKind,
+  scopeLabel,
+}: {|
+  initialInstances: gdInitialInstancesContainer,
+  objectName: string,
+  layerName: string,
+  brushKind: string,
+  scopeLabel: string,
+|}):
+  | {| found: true, instanceIds: Array<string> |}
+  | {| found: false, output: EditorFunctionGenericOutput |} => {
+  const instanceIds = [];
+  const otherLayerNames = new Set<string>();
+  iterateOnInstances(initialInstances, instance => {
+    if (instance.getObjectName() !== objectName) return;
+    if (instance.getLayer() === layerName) {
+      instanceIds.push(instance.getPersistentUuid());
+    } else {
+      otherLayerNames.add(instance.getLayer());
+    }
+  });
+  if (instanceIds.length > 0) return { found: true, instanceIds };
+
+  if (otherLayerNames.size > 0) {
+    return {
+      found: false,
+      output: makeGenericFailure(
+        `"${objectName}" has no instance on ${getLayerLabel(
+          layerName
+        )}: its instances are on ${Array.from(otherLayerNames)
+          .map(getLayerLabel)
+          .join(
+            ', '
+          )}. Nothing was changed. Pass their layer as \`layer_name\`, or their \`existing_instance_ids\` (from \`describe_instances\`).`
+      ),
+    };
+  }
+  if (brushKind === 'erase') {
+    return {
+      found: false,
+      output: {
+        success: true,
+        message: `"${objectName}" has no instance in ${scopeLabel}: nothing to erase.`,
+      },
+    };
+  }
+  return {
+    found: false,
+    output: makeGenericFailure(
+      `"${objectName}" has no instance in ${scopeLabel}, so nothing was changed. To create instances, use the "point" brush with \`brush_position\`.`
+    ),
+  };
+};
+
 /**
  * Places new instance(s), or move/erase existing instances, of an existing object onto a specified 2D layer
  * within a scene using a virtual brush at given X, Y coordinates.
@@ -4551,6 +4765,30 @@ const put2dInstances: EditorFunction = {
       new_instances_count === null && existingInstanceIds.length === 0
         ? 1
         : new_instances_count;
+
+    if (
+      (brush_kind === 'none' || brush_kind === 'erase') &&
+      object_name &&
+      existingInstanceIds.length === 0 &&
+      !brush_position &&
+      !new_instances_count
+    ) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text:
+          brush_kind === 'erase' ? (
+            <Trans>
+              Erase every <b>{object_name}</b> instance (layer:{' '}
+              {layer_name || 'base'}) in {scopeLabel}.
+            </Trans>
+          ) : (
+            <Trans>
+              Change every <b>{object_name}</b> instance (layer:{' '}
+              {layer_name || 'base'}) in {scopeLabel}.
+            </Trans>
+          ),
+      };
+    }
 
     const existingInstanceCount = existingInstanceIds.length;
     const brushPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
@@ -4634,6 +4872,8 @@ const put2dInstances: EditorFunction = {
     project,
     args,
     toolsVersion,
+    editorCallbacks,
+    sendChangesToEditor,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -4707,7 +4947,7 @@ const put2dInstances: EditorFunction = {
         )) ||
       null;
     if (namedObject)
-      await ensureModel3DMeasurementLoaded(
+      await ensureObjectSizeInfoLoaded(
         namedObject,
         project,
         PixiResourcesLoader
@@ -4736,12 +4976,49 @@ const put2dInstances: EditorFunction = {
 
     // An empty id would match every instance (`uuid.startsWith('')` is always
     // true), so a trailing comma or a blank entry must never survive parsing.
-    const existingInstanceIds = existing_instance_ids
+    const requestedInstanceIds = existing_instance_ids
       ? existing_instance_ids
           .split(',')
           .map(id => id.trim())
           .filter(Boolean)
       : [];
+    const dropToSurfaceParsing = parseSurfaceOptions({
+      args,
+      argumentName: 'drop_to_surface',
+      isUpAllowed: false,
+      objectsContainer,
+      globalObjectsContainer,
+    });
+    if (!dropToSurfaceParsing.success)
+      return makeGenericFailure(dropToSurfaceParsing.message);
+    const dropOptions = dropToSurfaceParsing.options;
+    if (dropOptions && brush_kind === 'erase') {
+      return makeGenericFailure(
+        '`drop_to_surface` can not be used with the "erase" brush.'
+      );
+    }
+
+    let existingInstanceIds = requestedInstanceIds;
+    if (
+      object_name &&
+      isTargetingEveryObjectInstance({
+        brushKind: brush_kind,
+        namedObject,
+        existingInstanceIds: requestedInstanceIds,
+        brushPosition: brush_position,
+        newInstancesCount: new_instances_count,
+      })
+    ) {
+      const objectInstanceIds = getObjectInstanceIdsOnLayer({
+        initialInstances,
+        objectName: object_name,
+        layerName,
+        brushKind: brush_kind,
+        scopeLabel: resolvedScope.label,
+      });
+      if (!objectInstanceIds.found) return objectInstanceIds.output;
+      existingInstanceIds = objectInstanceIds.instanceIds;
+    }
 
     if (brush_kind === 'erase') {
       const brushPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
@@ -4887,7 +5164,7 @@ const put2dInstances: EditorFunction = {
           : null);
       const anchorResolution = resolveInstanceAnchor({
         args,
-        allowedAnchors: INSTANCE_ANCHORS_2D,
+        allowedAnchors: dropOptions ? ['origin'] : INSTANCE_ANCHORS_2D,
         object: namedObject,
         objectName: object_name,
         project,
@@ -4895,6 +5172,13 @@ const put2dInstances: EditorFunction = {
         size: effectiveSize,
       });
       if (anchorResolution.success === false) return anchorResolution.failure;
+      if (dropOptions && !effectiveSize) {
+        return makeGenericFailure(
+          `\`drop_to_surface\` needs the box of the instances, which is unknown${
+            object_name ? '' : ' (pass `object_name`)'
+          }. Give them a size with \`instances_size\`.`
+        );
+      }
       const { anchor } = anchorResolution;
 
       // The `line` and `grid` brushes need an end position to spread instances.
@@ -5204,6 +5488,31 @@ const put2dInstances: EditorFunction = {
         });
       }
 
+      let dropMessage = '';
+      if (dropOptions && effectiveSize) {
+        const drop = await dropInstancesOnSurfaces({
+          resolvedScope,
+          sendChangesToEditor,
+          editorCallbacks,
+          instances: modifiedAndCreatedInstances,
+          mode: '2d',
+          surfaceOptions: dropOptions,
+          areInstancesPlacedByBrush: isPlacementBrush,
+          isFromAboveEverything: false,
+          getInstanceSize: instance => getInstanceSize(instance, effectiveSize),
+          objectSizeInfo,
+        });
+        if (!drop.success) {
+          restoreInstances({
+            initialInstances,
+            instances: modifiedAndCreatedInstances,
+            existingInstanceStates,
+          });
+          return makeGenericFailure(drop.message);
+        }
+        dropMessage = drop.message;
+      }
+
       // The position the instances really hold, which the brush position only
       // is when they are placed by their origin.
       const anchorOffsets =
@@ -5410,6 +5719,8 @@ const put2dInstances: EditorFunction = {
         );
       }
 
+      if (dropMessage) changes.push(dropMessage);
+
       if (changes.length === 0) {
         const matchedCount = existingInstanceStates.size;
         const hasMutationParams =
@@ -5527,6 +5838,30 @@ const put3dInstances: EditorFunction = {
         ? 1
         : new_instances_count;
 
+    if (
+      (brush_kind === 'none' || brush_kind === 'erase') &&
+      object_name &&
+      existingInstanceIds.length === 0 &&
+      !brush_position &&
+      !new_instances_count
+    ) {
+      const scopeLabel = getScopeLabelFromArgs(args);
+      return {
+        text:
+          brush_kind === 'erase' ? (
+            <Trans>
+              Erase every <b>{object_name}</b> instance (layer:{' '}
+              {layer_name || 'base'}) in {scopeLabel}.
+            </Trans>
+          ) : (
+            <Trans>
+              Change every <b>{object_name}</b> instance (layer:{' '}
+              {layer_name || 'base'}) in {scopeLabel}.
+            </Trans>
+          ),
+      };
+    }
+
     const existingInstanceCount = existingInstanceIds.length;
     const brushPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
       brush_position
@@ -5609,6 +5944,8 @@ const put3dInstances: EditorFunction = {
     project,
     args,
     toolsVersion,
+    editorCallbacks,
+    sendChangesToEditor,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -5675,7 +6012,7 @@ const put3dInstances: EditorFunction = {
 
     // An empty id would match every instance (`uuid.startsWith('')` is always
     // true), so a trailing comma or a blank entry must never survive parsing.
-    const existingInstanceIds = existing_instance_ids
+    const requestedInstanceIds = existing_instance_ids
       ? existing_instance_ids
           .split(',')
           .map(id => id.trim())
@@ -5685,10 +6022,10 @@ const put3dInstances: EditorFunction = {
     // Instances moved by their ids without `object_name` are sized (for the
     // anchors and the space they occupy) by their object, when they share one.
     const existingInstancesObjectNames = new Set<string>();
-    if (!object_name && existingInstanceIds.length > 0) {
+    if (!object_name && requestedInstanceIds.length > 0) {
       iterateOnInstances(initialInstances, instance => {
         if (
-          existingInstanceIds.some(id =>
+          requestedInstanceIds.some(id =>
             instance.getPersistentUuid().startsWith(id)
           )
         )
@@ -5709,7 +6046,7 @@ const put3dInstances: EditorFunction = {
         )) ||
       null;
     if (namedObject)
-      await ensureModel3DMeasurementLoaded(
+      await ensureObjectSizeInfoLoaded(
         namedObject,
         project,
         PixiResourcesLoader
@@ -5734,6 +6071,58 @@ const put3dInstances: EditorFunction = {
         resolvedScope.label,
         layersContainer
       );
+    }
+
+    const dropToSurfaceParsing = parseSurfaceOptions({
+      args,
+      argumentName: 'drop_to_surface',
+      isUpAllowed: true,
+      objectsContainer,
+      globalObjectsContainer,
+    });
+    if (!dropToSurfaceParsing.success)
+      return makeGenericFailure(dropToSurfaceParsing.message);
+    const dropOptions = dropToSurfaceParsing.options;
+    if (dropOptions && brush_kind === 'erase') {
+      return makeGenericFailure(
+        '`drop_to_surface` can not be used with the "erase" brush.'
+      );
+    }
+    // Dropped from above everything, a position needs no Z.
+    const isXYPositionAllowed = !!dropOptions && dropOptions.up === 'z';
+    const isFromAboveEverything =
+      isXYPositionAllowed &&
+      !SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(brush_position) &&
+      !!SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(brush_position);
+    const parseBrushPosition = (
+      position: ?string
+    ): [number, number, number] | null => {
+      if (!isFromAboveEverything)
+        return SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(position);
+      const xy = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(position);
+      return xy ? [xy[0], xy[1], 0] : null;
+    };
+
+    let existingInstanceIds = requestedInstanceIds;
+    if (
+      object_name &&
+      isTargetingEveryObjectInstance({
+        brushKind: brush_kind,
+        namedObject,
+        existingInstanceIds: requestedInstanceIds,
+        brushPosition: brush_position,
+        newInstancesCount: new_instances_count,
+      })
+    ) {
+      const objectInstanceIds = getObjectInstanceIdsOnLayer({
+        initialInstances,
+        objectName: object_name,
+        layerName,
+        brushKind: brush_kind,
+        scopeLabel: resolvedScope.label,
+      });
+      if (!objectInstanceIds.found) return objectInstanceIds.output;
+      existingInstanceIds = objectInstanceIds.instanceIds;
     }
 
     if (brush_kind === 'erase') {
@@ -5864,12 +6253,10 @@ const put3dInstances: EditorFunction = {
       }
 
       const parsedBrushPosition = brush_position
-        ? SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(brush_position)
+        ? parseBrushPosition(brush_position)
         : null;
       const brushSize = brush_size || 0;
-      const brushEndPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
-        brush_end_position
-      );
+      const brushEndPosition = parseBrushPosition(brush_end_position);
       const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
         instances_size
       );
@@ -5885,7 +6272,9 @@ const put3dInstances: EditorFunction = {
           : null);
       const anchorResolution = resolveInstanceAnchor({
         args,
-        allowedAnchors: INSTANCE_ANCHORS_3D,
+        allowedAnchors: dropOptions
+          ? ['origin', 'bottom_center']
+          : INSTANCE_ANCHORS_3D,
         object: namedObject,
         objectName: sizedObjectName,
         project,
@@ -5893,7 +6282,16 @@ const put3dInstances: EditorFunction = {
         size: effectiveSize,
       });
       if (anchorResolution.success === false) return anchorResolution.failure;
-      const { anchor } = anchorResolution;
+      if (dropOptions && !effectiveSize) {
+        return makeGenericFailure(
+          `\`drop_to_surface\` needs the box of the instances, which is unknown${
+            sizedObjectName ? '' : ' (they are not all of the same object)'
+          }. Give them a size with \`instances_size\`, or drop the instances of each object in a separate call.`
+        );
+      }
+      // Dropped instances are placed by the bottom of their box, after
+      // they were put at the brush positions.
+      const anchor = dropOptions ? 'origin' : anchorResolution.anchor;
 
       // The `line` brush needs an end position to spread instances. Fail early
       // (before creating any instance) so the caller retries with a valid
@@ -6155,6 +6553,31 @@ const put3dInstances: EditorFunction = {
         });
       }
 
+      let dropMessage = '';
+      if (dropOptions && effectiveSize) {
+        const drop = await dropInstancesOnSurfaces({
+          resolvedScope,
+          sendChangesToEditor,
+          editorCallbacks,
+          instances: modifiedAndCreatedInstances,
+          mode: '3d',
+          surfaceOptions: dropOptions,
+          areInstancesPlacedByBrush: isPlacementBrush,
+          isFromAboveEverything,
+          getInstanceSize: instance => getInstanceSize(instance, effectiveSize),
+          objectSizeInfo,
+        });
+        if (!drop.success) {
+          restoreInstances({
+            initialInstances,
+            instances: modifiedAndCreatedInstances,
+            existingInstanceStates,
+          });
+          return makeGenericFailure(drop.message);
+        }
+        dropMessage = drop.message;
+      }
+
       // The position the instances really hold, which the brush position only
       // is when they are placed by their origin.
       const anchorOffsets =
@@ -6363,6 +6786,8 @@ const put3dInstances: EditorFunction = {
         );
       }
 
+      if (dropMessage) changes.push(dropMessage);
+
       if (changes.length === 0) {
         const matchedCount = existingInstanceStates.size;
         const hasMutationParams =
@@ -6518,6 +6943,7 @@ const readSceneEvents: EditorFunction = {
 };
 
 export const noEventsInFunctionText = 'This function has no events.';
+const noEventsInExternalEventsText = 'These external events have no events.';
 
 const EVENTS_SOURCE_MAX_CHARS_DEFAULT = 12000;
 const EVENTS_SOURCE_MAX_CHARS_MINIMUM = 2000;
@@ -6590,9 +7016,9 @@ const getScopeSummary = (
 };
 
 /**
- * The events to read: those of a scene, or those of the function named by
- * `function_name` in an extension scope (with the function itself, to
- * summarize what it can use).
+ * The events to read: those of a scene or of external events, or those of
+ * the function named by `function_name` in an extension scope (with the
+ * function itself, to summarize what it can use).
  */
 const getEventsSourceTarget = (
   resolvedScope: ResolvedScope,
@@ -6604,7 +7030,16 @@ const getEventsSourceTarget = (
       eventsFunction: gdEventsFunction | null,
     |}
   | {| success: false, message: string |} => {
-  const { layout } = resolvedScope;
+  const { layout, externalEvents } = resolvedScope;
+  // Checked first: the `layout` of external events is the scene giving them
+  // their objects and variables, not the events to read.
+  if (externalEvents) {
+    return {
+      success: true,
+      eventsList: externalEvents.getEvents(),
+      eventsFunction: null,
+    };
+  }
   if (layout) {
     return {
       success: true,
@@ -6621,10 +7056,41 @@ const getEventsSourceTarget = (
   };
 };
 
+const linkLineRegex = /^\s*(?:disabled )?link "((?:[^"\\]|\\.)*)"/gm;
+
 /**
- * Reads the events of a scene as EventScript source (the exact syntax
- * accepted by the `event_script` field of events generation), with filters
- * to keep the output small.
+ * Tell how to read the events included by the `link` lines of a rendered
+ * source: the line only names its target, which can be external events or
+ * a scene.
+ */
+const getLinkedEventsNotes = (
+  project: gdProject,
+  eventScriptText: string
+): Array<string> => {
+  const targets = new Set<string>();
+  for (const match of eventScriptText.matchAll(linkLineRegex)) {
+    try {
+      targets.add(JSON.parse(`"${match[1]}"`));
+    } catch (error) {
+      // Not a valid string literal: nothing to say about it.
+    }
+  }
+  return [...targets].map(target => {
+    const quotedTarget = JSON.stringify(target);
+    if (project.hasExternalEventsNamed(target)) {
+      return `\`link ${quotedTarget}\` includes the external events ${quotedTarget}: read them with scope { type: "external_events", external_events_name: ${quotedTarget} }.`;
+    }
+    if (project.hasLayoutNamed(target)) {
+      return `\`link ${quotedTarget}\` includes the events of the scene ${quotedTarget}: read them with scope { type: "scene", scene_name: ${quotedTarget} }.`;
+    }
+    return `\`link ${quotedTarget}\` names no external events nor scene of the project: it includes nothing.`;
+  });
+};
+
+/**
+ * Reads the events of a scene, of external events or of a function as
+ * EventScript source (the exact syntax accepted by the `event_script` field
+ * of events generation), with filters to keep the output small.
  */
 const readEventsSource: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
@@ -6720,7 +7186,13 @@ const readEventsSource: EditorFunction = {
     isCalledFromScript,
   }) => {
     const resolvedScope = resolveScopeFromArgs(project, args, {
-      allowedTypes: ['scene', 'extension', 'custom_behavior', 'custom_object'],
+      allowedTypes: [
+        'scene',
+        'external_events',
+        'extension',
+        'custom_behavior',
+        'custom_object',
+      ],
     });
     if (resolvedScope.success === false)
       return makeScopeFailureOutput(resolvedScope);
@@ -6805,13 +7277,17 @@ const readEventsSource: EditorFunction = {
     // An empty `text` does NOT mean the scene has no events: a filter can
     // match nothing on a populated sheet (the notes say which case it is).
     // Only a truly empty sheet gets the "no events" text.
+    const { externalEvents } = resolvedScope;
     const eventScriptText =
       text ||
       (eventsList.getEventsCount() === 0
         ? eventsFunction
           ? noEventsInFunctionText
+          : externalEvents
+          ? noEventsInExternalEventsText
           : noEventsInSceneText
         : '');
+    const allNotes = [...notes, ...getLinkedEventsNotes(project, text)];
 
     const output: EditorFunctionGenericOutput = {
       success: true,
@@ -6821,6 +7297,8 @@ const readEventsSource: EditorFunction = {
             functionName: eventsFunction.getName(),
             scopeSummary,
           }
+        : externalEvents
+        ? { eventsForExternalEventsNamed: externalEvents.getName() }
         : { eventsForSceneNamed: resolvedScope.scope.scene_name || '' }),
       eventScript: scopeSummaryHeaderText
         ? scopeSummaryHeaderText +
@@ -6830,7 +7308,7 @@ const readEventsSource: EditorFunction = {
     };
     if (jsCodeExcerpt) output.jsCodeExcerpt = jsCodeExcerpt;
     if (truncated) output.truncated = true;
-    if (notes.length > 0) output.notes = notes;
+    if (allNotes.length > 0) output.notes = allNotes;
     if (renderingErrors.length > 0) {
       // Surface partial failures so the cause is reported, not dropped.
       output.eventsRenderingErrors = renderingErrors;
@@ -7217,12 +7695,21 @@ const addSceneEvents: EditorFunction = {
       const resolvedScope = resolveScopeFromArgs(project, args, {
         allowedTypes: [
           'scene',
+          'external_events',
           'extension',
           'custom_behavior',
           'custom_object',
         ],
       });
       if (resolvedScope.success === false) return resolvedScope;
+      const { externalEvents } = resolvedScope;
+      if (externalEvents && !resolvedScope.layout) {
+        const externalEventsName = externalEvents.getName();
+        return {
+          success: false,
+          message: `External events "${externalEventsName}" have no associated scene and no scene links to them: their events would have no objects nor variables. Add a \`link "${externalEventsName}"\` event to the scene they are for first, or write the events in that scene.`,
+        };
+      }
       if (!resolvedScope.layout) {
         // Events written in a function of an extension: the extension must be
         // editable (a store extension is read-only).
@@ -7274,9 +7761,11 @@ const addSceneEvents: EditorFunction = {
       eventsFunction,
     } = eventsTarget;
     const scene = resolvedScope.layout;
+    const { externalEvents } = resolvedScope;
     // A scene name is only sent for a scene (the generation API keeps it
-    // beside the scope for older editors).
-    const sceneName = scene ? resolvedScope.scope.scene_name || '' : '';
+    // beside the scope for older editors), and for external events: the scene
+    // whose objects and variables they use.
+    const sceneName = scene ? scene.getName() : '';
 
     // The existing events are sent as JSON only: the generation backend
     // renders them itself (as a bounded EventScript view) for its model.
@@ -7340,6 +7829,12 @@ const addSceneEvents: EditorFunction = {
         onExtensionsModifiedOutsideEditor({
           extensionNames: [extensionName],
           needsCodeRegeneration: true,
+        });
+      } else if (externalEvents) {
+        onSceneEventsModifiedOutsideEditor({
+          scene: null,
+          externalEvents,
+          newOrChangedAiGeneratedEventIds: new Set(),
         });
       } else {
         onSceneEventsModifiedOutsideEditor({
@@ -7689,6 +8184,12 @@ Events were not changed (extensions, variables or behaviors needed by them may h
           onExtensionsModifiedOutsideEditor({
             extensionNames: [extensionName],
             needsCodeRegeneration: true,
+          });
+        } else if (upToDateResolvedScope.externalEvents) {
+          onSceneEventsModifiedOutsideEditor({
+            scene: null,
+            externalEvents: upToDateResolvedScope.externalEvents,
+            newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
           });
         } else {
           onSceneEventsModifiedOutsideEditor({

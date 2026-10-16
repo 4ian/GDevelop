@@ -106,7 +106,6 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
 
   edit(): void {
     this.props.onEditLayer(this.layer);
-    this.props.onSelectLayer(null);
   }
 
   _isVisible(): boolean {
@@ -186,7 +185,6 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Open layer editor`),
         click: () => {
           this.props.onEditLayer(this.layer);
-          this.props.onSelectLayer(null);
         },
       },
       {

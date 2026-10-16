@@ -34,6 +34,8 @@ import {
 } from '../InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
+import { InGameEditorUnavailableMessage } from '../../EmbeddedGame/InGameEditorUnavailableMessage';
+import { useInGameEditorUnavailabilityReason } from '../../EmbeddedGame/InGameEditorAvailability';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
@@ -90,6 +92,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       onExtensionInstalled,
       isActive,
       onRestartInGameEditor,
+      onSwitchToInstancesEditor,
       showRestartInGameEditorAfterErrorButton,
     } = props;
     const selectedInstances = props.instancesSelection.getSelectedInstances();
@@ -223,6 +226,8 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       [drawerOpeningState]
     );
 
+    const inGameEditorUnavailabilityReason = useInGameEditorUnavailabilityReason();
+
     // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => {
       const { current: editor } = editorRef;
@@ -322,7 +327,14 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
               componentTitle={<Trans>Instances editor.</Trans>}
               scope="scene-editor-canvas"
             >
-              {gameEditorMode === 'embedded-game' ? (
+              {gameEditorMode === 'embedded-game' &&
+              inGameEditorUnavailabilityReason ? (
+                <InGameEditorUnavailableMessage
+                  reason={inGameEditorUnavailabilityReason}
+                  marginBottom={bottomContainerHeight}
+                  onSwitchToInstancesEditor={onSwitchToInstancesEditor}
+                />
+              ) : gameEditorMode === 'embedded-game' ? (
                 <EmbeddedGameFrameHole
                   marginBottom={bottomContainerHeight}
                   isActive={isActive}

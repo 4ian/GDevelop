@@ -174,6 +174,7 @@ export type SceneEditorsDisplayProps = {|
 
   onOpenedEditorsChanged: () => void,
   onRestartInGameEditor: (reason: string) => void,
+  onSwitchToInstancesEditor: () => void,
   showRestartInGameEditorAfterErrorButton: boolean,
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject,

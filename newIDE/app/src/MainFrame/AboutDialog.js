@@ -247,6 +247,10 @@ const contributors = [
     description: 'Translations in Japanese, extensions and blog',
     link: 'https://gdevelop-jp.blogspot.com',
   },
+  {
+    name: 'Reptile',
+    description: 'Translation in Polish',
+  },
 ];
 
 const AboutDialog = ({ onClose, updateStatus }: Props) => {

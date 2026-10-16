@@ -2868,7 +2868,9 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toEqual(
-        expect.stringContaining('existing_instance_ids')
+        expect.stringContaining(
+          '"Player" has no instance in scene "TestScene", so nothing was changed.'
+        )
       );
       expect(getInstancePositions(testScene)).toEqual([]);
     });
@@ -2947,8 +2949,13 @@ describe('editorFunctions', () => {
         });
 
         expect(result.success).toBe(false);
+        // With the none brush, the call targets every instance of the object.
         expect(result.message).toEqual(
-          expect.stringContaining('Nothing to do')
+          expect.stringContaining(
+            brush_kind === 'none'
+              ? '"Player" has no instance in scene "TestScene", so nothing was changed.'
+              : 'Nothing to do'
+          )
         );
         expect(getInstancePositions(testScene)).toEqual([]);
       }
@@ -2969,7 +2976,9 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toEqual(
-        expect.stringContaining('cannot create new ones')
+        expect.stringContaining(
+          '"Player" has no instance in scene "TestScene", so nothing was changed.'
+        )
       );
       expect(getInstancePositions(testScene)).toEqual([]);
     });
@@ -3747,7 +3756,11 @@ describe('editorFunctions', () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.message).toEqual(expect.stringContaining('Nothing to do'));
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          '"Player" has no instance in scene "TestScene", so nothing was changed.'
+        )
+      );
       expect(getInstancePositions(testScene)).toEqual([]);
     });
 

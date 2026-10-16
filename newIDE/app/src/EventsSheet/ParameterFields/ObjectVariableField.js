@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import VariableField, {
-  renderVariableWithIcon,
-  type VariableFieldInterface,
-} from './VariableField';
+import VariableField, { renderVariableWithIcon } from './VariableField';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import ObjectVariablesDialog from '../../VariablesList/ObjectVariablesDialog';
 import ObjectGroupVariablesDialog from '../../VariablesList/ObjectGroupVariablesDialog';
@@ -16,8 +13,6 @@ import {
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
-import { enumerateVariables } from './EnumerateVariables';
-import { intersectionBy } from 'lodash';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 const gd: libGDevelop = global.gd;
@@ -60,7 +55,7 @@ export const getObjectOrGroupVariablesContainers = (
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectVariableField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?VariableFieldInterface>(null);
+    const field = React.useRef<?ParameterFieldInterface>(null);
     const [
       editorOpen,
       setEditorOpen,
@@ -138,16 +133,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ]
     );
 
-    const enumerateObjectVariables = React.useCallback(
-      () =>
-        variablesContainers.length > 0
-          ? variablesContainers
-              .map(variablesContainer => enumerateVariables(variablesContainer))
-              .reduce((a, b) => intersectionBy(a, b, 'name'))
-          : [],
-      [variablesContainers]
-    );
-
     const onVariableEditorApply = React.useCallback(
       (selectedVariableName: string | null) => {
         if (selectedVariableName && selectedVariableName.startsWith(value)) {
@@ -157,7 +142,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         // The variable editor may have refactored the events for a variable type
         // change which may have changed the currently edited instruction type.
         if (onInstructionTypeChanged) onInstructionTypeChanged();
-        if (field.current) field.current.updateAutocompletions();
       },
       [onChange, onInstructionTypeChanged, value]
     );
@@ -182,7 +166,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           project={project}
           instruction={instruction}
           variablesContainers={variablesContainers}
-          enumerateVariables={enumerateObjectVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -206,6 +189,12 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
           openEventsBasedEntityPropertyEditorDialog={null}
+          instructionMetadata={props.instructionMetadata}
+          expression={props.expression}
+          expressionMetadata={props.expressionMetadata}
+          parameterIndex={props.parameterIndex}
+          resourceManagementProps={props.resourceManagementProps}
+          parameterRenderingService={props.parameterRenderingService}
         />
         {editorOpen &&
           project &&

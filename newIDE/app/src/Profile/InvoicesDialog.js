@@ -10,7 +10,8 @@ import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import { Column } from '../UI/Grid';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import LeftLoader from '../UI/LeftLoader';
+import CircularProgress from '../UI/CircularProgress';
+import Download from '../UI/CustomSvgIcons/Download';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import {
@@ -77,13 +78,18 @@ const InvoiceRow = ({
         {details}
       </Text>
     </Column>
-    <LeftLoader isLoading={isDownloading}>
-      <FlatButton
-        label={<Trans>Download invoice</Trans>}
-        disabled={disabled}
-        onClick={onDownload}
-      />
-    </LeftLoader>
+    <FlatButton
+      leftIcon={
+        isDownloading ? (
+          <CircularProgress size={16} />
+        ) : (
+          <Download fontSize="small" />
+        )
+      }
+      label={<Trans>Download invoice</Trans>}
+      disabled={disabled}
+      onClick={onDownload}
+    />
   </LineStackLayout>
 );
 

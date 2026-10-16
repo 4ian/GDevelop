@@ -312,6 +312,10 @@ describe('gdjs.evtTools.object.hitBoxesCollisionTest', function () {
         const extremeX = random() < 0.5 ? 1e308 : -1e308;
         object.setPosition(extremeX, -extremeX);
       }
+      if (random() < 0.01) {
+        // Far from the others: more grid cells away than 32-bit integers.
+        object.setX((random() < 0.5 ? 1 : -1) * 10 ** (10 + 4 * random()));
+      }
       objects.push(object);
     }
     return objects;

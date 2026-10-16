@@ -114,6 +114,7 @@ namespace gdjs {
         try {
           this._threeRenderer = new THREE.WebGLRenderer({
             canvas: gameCanvas,
+            stencil: true,
             antialias:
               this._game.getAntialiasingMode() !== 'none' &&
               (this._game.isAntialisingEnabledOnMobile() ||

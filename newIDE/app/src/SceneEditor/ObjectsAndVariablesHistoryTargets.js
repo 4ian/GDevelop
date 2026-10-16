@@ -103,13 +103,14 @@ export const getObjectsContainerHistoryTarget = (
     targetObjects.forEach(({ name, type, serialized }, index) => {
       if (objectsContainer.hasObjectNamed(name)) {
         const object = objectsContainer.getObject(name);
-        // Unserializing adds (or updates) the behaviors, but never removes
-        // the ones that are not part of the restored object anymore.
-        // Default (capability) behaviors are never serialized: keep them.
+        // The behaviors are updated in place (unserializing the whole
+        // object would create them again: anything showing or holding a
+        // behavior would be reset). Default (capability) behaviors are
+        // never serialized: keep them.
+        const serializedBehaviors: Array<Object> =
+          (serialized && serialized.behaviors) || [];
         const targetBehaviorNames = new Set(
-          ((serialized && serialized.behaviors) || []).map(
-            behavior => behavior.name
-          )
+          serializedBehaviors.map(behavior => behavior.name)
         );
         object
           .getAllBehaviorNames()
@@ -120,7 +121,27 @@ export const getObjectsContainerHistoryTarget = (
               !object.getBehavior(behaviorName).isDefaultBehavior()
           )
           .forEach(behaviorName => object.removeBehavior(behaviorName));
-        unserializeFromJSObject(object, serialized, 'unserializeFrom', project);
+        unserializeFromJSObject(
+          object,
+          { ...serialized, behaviors: [] },
+          'unserializeFrom',
+          project
+        );
+        serializedBehaviors.forEach(serializedBehavior => {
+          const { name: behaviorName, type: behaviorType } = serializedBehavior;
+          if (
+            object.hasBehaviorNamed(behaviorName) &&
+            object.getBehavior(behaviorName).getTypeName() !== behaviorType
+          ) {
+            // Not the same behavior anymore: it can't be updated in place.
+            object.removeBehavior(behaviorName);
+          }
+          const behavior = object.hasBehaviorNamed(behaviorName)
+            ? object.getBehavior(behaviorName)
+            : object.addNewBehavior(project, behaviorType, behaviorName);
+          unserializeFromJSObject(behavior, serializedBehavior);
+          behavior.setFolded(!!serializedBehavior.isFolded);
+        });
       } else {
         const newObject = objectsContainer.insertNewObject(
           project,

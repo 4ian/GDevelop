@@ -69,11 +69,12 @@ namespace gdjs {
     worldScale: float;
     worldInvScale: float;
 
-    jolt: Jolt.JoltInterface;
-    physicsSystem: Jolt.PhysicsSystem;
-    bodyInterface: Jolt.BodyInterface;
+    // Assigned by `_createJoltWorld`, called by the constructor.
+    jolt!: Jolt.JoltInterface;
+    physicsSystem!: Jolt.PhysicsSystem;
+    bodyInterface!: Jolt.BodyInterface;
     /** Contact listener to keep track of current collisions */
-    contactListener: Jolt.ContactListenerJS;
+    contactListener!: Jolt.ContactListenerJS;
     /** Avoid creating new vectors all the time */
     _tempVec3 = new Jolt.Vec3();
     _tempRVec3 = new Jolt.RVec3();
@@ -90,6 +91,13 @@ namespace gdjs {
     private _physics3DHooks: Array<gdjs.Physics3DRuntimeBehavior.Physics3DHook> =
       [];
 
+    /** True while the scene is paused and its Jolt world is freed. */
+    private _isJoltWorldReleased = false;
+    private _velocitiesToRestore = new Map<
+      Physics3DRuntimeBehavior,
+      gdjs.Physics3DRuntimeBehavior.BodyVelocities
+    >();
+
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
       this.gravityX = sharedData.gravityX;
@@ -97,8 +105,14 @@ namespace gdjs {
       this.gravityZ = sharedData.gravityZ;
       this.worldScale = sharedData.worldScale;
       this.worldInvScale = 1 / this.worldScale;
+      this._createJoltWorld();
+    }
 
-      // Initialize Jolt
+    /**
+     * Create the Jolt physics world. Bodies are not created here: behaviors
+     * create them lazily when they don't have one.
+     */
+    private _createJoltWorld(): void {
       const settings = new Jolt.JoltSettings();
       gdjs.Physics3DSharedData.setupCollisionFiltering(settings);
       this.jolt = new Jolt.JoltInterface(settings);
@@ -167,6 +181,75 @@ namespace gdjs {
       ): number => {
         return Jolt.ValidateResult_AcceptAllContactsForThisBodyPair;
       };
+    }
+
+    private _destroyJoltWorld(): void {
+      Jolt.destroy(this.contactListener);
+      Jolt.destroy(this.jolt);
+    }
+
+    /**
+     * Free the Jolt physics world and every body in it while the scene is
+     * paused. The WASM heap of Jolt can't grow, so keeping the worlds of
+     * paused scenes alive makes the game run out of memory after a few
+     * stacked scenes.
+     *
+     * Velocities are kept to be restored by `restoreJoltWorld`.
+     * Other physics states like contacts, sleeping bodies or character states
+     * are lost.
+     */
+    releaseJoltWorld(): void {
+      if (this._isJoltWorldReleased) {
+        return;
+      }
+      for (const physicsBehavior of this._registeredBehaviors) {
+        const body = physicsBehavior._body;
+        if (body) {
+          const linearVelocity = body.GetLinearVelocity();
+          const angularVelocity = body.GetAngularVelocity();
+          this._velocitiesToRestore.set(physicsBehavior, {
+            linearVelocityX: linearVelocity.GetX(),
+            linearVelocityY: linearVelocity.GetY(),
+            linearVelocityZ: linearVelocity.GetZ(),
+            angularVelocityX: angularVelocity.GetX(),
+            angularVelocityY: angularVelocity.GetY(),
+            angularVelocityZ: angularVelocity.GetZ(),
+          });
+        }
+        physicsBehavior._destroyBody();
+      }
+      this._destroyJoltWorld();
+      this._isJoltWorldReleased = true;
+    }
+
+    /**
+     * Recreate the Jolt physics world freed by `releaseJoltWorld` and the
+     * bodies of the behaviors with their velocities.
+     */
+    restoreJoltWorld(): void {
+      if (!this._isJoltWorldReleased) {
+        return;
+      }
+      this._createJoltWorld();
+      this._isJoltWorldReleased = false;
+      for (const physicsBehavior of this._registeredBehaviors) {
+        physicsBehavior.recreateBody(
+          this._velocitiesToRestore.get(physicsBehavior)
+        );
+      }
+      this._velocitiesToRestore.clear();
+    }
+
+    /**
+     * Free every Jolt object owned by the shared data.
+     */
+    destroy(): void {
+      if (!this._isJoltWorldReleased) {
+        this._destroyJoltWorld();
+      }
+      Jolt.destroy(this._tempVec3);
+      Jolt.destroy(this._tempRVec3);
+      Jolt.destroy(this._tempQuat);
     }
 
     getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -311,12 +394,20 @@ namespace gdjs {
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
     const physics3DSharedData = runtimeScene.physics3DSharedData;
     if (physics3DSharedData) {
-      Jolt.destroy(physics3DSharedData.contactListener);
-      Jolt.destroy(physics3DSharedData._tempVec3);
-      Jolt.destroy(physics3DSharedData._tempRVec3);
-      Jolt.destroy(physics3DSharedData._tempQuat);
-      Jolt.destroy(physics3DSharedData.jolt);
+      physics3DSharedData.destroy();
       runtimeScene.physics3DSharedData = null;
+    }
+  });
+  gdjs.registerRuntimeScenePausedCallback(function (runtimeScene) {
+    const physics3DSharedData = runtimeScene.physics3DSharedData;
+    if (physics3DSharedData) {
+      physics3DSharedData.releaseJoltWorld();
+    }
+  });
+  gdjs.registerRuntimeSceneResumedCallback(function (runtimeScene) {
+    const physics3DSharedData = runtimeScene.physics3DSharedData;
+    if (physics3DSharedData) {
+      physics3DSharedData.restoreJoltWorld();
     }
   });
 
@@ -1506,14 +1597,9 @@ namespace gdjs {
       this.updateBodyFromObject();
     }
 
-    recreateBody(previousBodyData?: {
-      linearVelocityX: float;
-      linearVelocityY: float;
-      linearVelocityZ: float;
-      angularVelocityX: float;
-      angularVelocityY: float;
-      angularVelocityZ: float;
-    }) {
+    recreateBody(
+      previousBodyData?: gdjs.Physics3DRuntimeBehavior.BodyVelocities
+    ) {
       const bodyInterface = this._sharedData.bodyInterface;
       const linearVelocityX = previousBodyData
         ? previousBodyData.linearVelocityX
@@ -2502,6 +2588,15 @@ namespace gdjs {
        * Called before the physics engine step.
        */
       doBeforePhysicsStep(timeDelta: float): void;
+    }
+
+    export interface BodyVelocities {
+      linearVelocityX: float;
+      linearVelocityY: float;
+      linearVelocityZ: float;
+      angularVelocityX: float;
+      angularVelocityY: float;
+      angularVelocityZ: float;
     }
 
     export interface BodyUpdater {

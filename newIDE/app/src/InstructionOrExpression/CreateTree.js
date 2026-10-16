@@ -27,6 +27,19 @@ const getSortedFreeInstructionsTopLevelGroups = (i18n: I18nType) => [
   i18n._(t`Third-party`),
   i18n._(t`Advanced`),
 ];
+// Groups of the instructions of an object, the most used first.
+const getSortedObjectInstructionsTopLevelGroups = (i18n: I18nType) => [
+  i18n._(t`Position`),
+  i18n._(t`Angle`),
+  i18n._(t`Size`),
+  i18n._(t`Movement using forces`),
+  i18n._(t`Visibility`),
+  i18n._(t`Variables`),
+  i18n._(t`Timers`),
+  i18n._(t`Behaviors`),
+  i18n._(t`Objects`),
+  i18n._(t`Layers and cameras`),
+];
 
 export type TreeNode<T> =
   | T
@@ -40,9 +53,138 @@ export type InstructionOrExpressionTreeNode =
   | InstructionTreeNode
   | EnumeratedExpressionMetadata;
 
+type GroupItemsOrder = {|
+  // Instruction types without their namespace (`SetWidth` for
+  // `ResizableCapability::ResizableBehavior::SetWidth`), or sub-group names.
+  order: Array<string>,
+  subGroups?: { [subGroupName: string]: GroupItemsOrder },
+|};
+
+// Order of the items of some groups. The items that are not listed keep their
+// order, after the listed ones.
+const getGroupsItemsOrder = (
+  i18n: I18nType
+): { [groupName: string]: GroupItemsOrder } => ({
+  [i18n._(t`Position`)]: {
+    order: [i18n._(t`Position`), i18n._(t`Center`)],
+    subGroups: {
+      [i18n._(t`Position`)]: {
+        order: ['SetXY', 'SetX', 'PosX', 'SetY', 'PosY', 'SetZ', 'PosZ'],
+      },
+      [i18n._(t`Center`)]: {
+        order: [
+          'SetCenter',
+          'SetCenterX',
+          'CenterX',
+          'SetCenterY',
+          'CenterY',
+          'SetCenterZ',
+          'CenterZ',
+        ],
+      },
+    },
+  },
+  [i18n._(t`Angle`)]: {
+    order: [
+      i18n._(t`Rotation`),
+      i18n._(t`Turn toward`),
+      i18n._(t`Turn around local axis`),
+      i18n._(t`Turn around global axis`),
+    ],
+    subGroups: {
+      [i18n._(t`Rotation`)]: {
+        order: [
+          'SetRotation',
+          'SetRotationX',
+          'RotationX',
+          'SetRotationY',
+          'RotationY',
+          'SetRotationZ',
+          'RotationZ',
+        ],
+      },
+    },
+  },
+  [i18n._(t`Size`)]: {
+    order: [i18n._(t`Size`), i18n._(t`Scale`)],
+    subGroups: {
+      [i18n._(t`Size`)]: {
+        order: [
+          'SetSize',
+          'Size',
+          'SetWidth',
+          'Width',
+          'SetHeight',
+          'Height',
+          'SetDepth',
+          'Depth',
+        ],
+      },
+      [i18n._(t`Scale`)]: {
+        order: [
+          'SetValue',
+          'Value',
+          'SetX',
+          'X',
+          'SetY',
+          'Y',
+          'SetScaleZ',
+          'ScaleZ',
+        ],
+      },
+    },
+  },
+});
+
+const sortGroupItems = <T: EnumeratedInstructionOrExpressionMetadata>(
+  groupNode: { [string]: TreeNode<T> },
+  groupItemsOrder: GroupItemsOrder
+): { [string]: TreeNode<T> } => {
+  const getItemRank = (key: string): number => {
+    const item = groupNode[key];
+    const isInstruction = !!item && typeof item.type === 'string';
+    const itemName = isInstruction
+      ? // $FlowFixMe[incompatible-use] - Checked just above.
+        item.type.split('::').pop()
+      : key;
+    const rank = groupItemsOrder.order.indexOf(itemName);
+    return rank === -1 ? groupItemsOrder.order.length : rank;
+  };
+
+  return Object.keys(groupNode)
+    .map((key, insertionIndex) => ({ key, insertionIndex }))
+    .sort(
+      (first, second) =>
+        getItemRank(first.key) - getItemRank(second.key) ||
+        first.insertionIndex - second.insertionIndex
+    )
+    .reduce((sortedGroupNode, { key }) => {
+      const item = groupNode[key];
+      const subGroupItemsOrder =
+        groupItemsOrder.subGroups && groupItemsOrder.subGroups[key];
+      sortedGroupNode[key] =
+        subGroupItemsOrder && item && typeof item.type !== 'string'
+          ? // $FlowFixMe[incompatible-call] - A sub-group, not an instruction.
+            sortGroupItems(item, subGroupItemsOrder)
+          : item;
+      return sortedGroupNode;
+    }, {});
+};
+
+/**
+ * Create the tree of the given instructions or expressions, grouped by their
+ * group.
+ *
+ * With `sortObjectInstructions`, the groups of the instructions of an object
+ * and their items are sorted with the most used first (position, angle,
+ * size...), instead of alphabetically.
+ */
 export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
   allExpressions: Array<T>,
-  i18n: I18nType
+  i18n: I18nType,
+  {
+    sortObjectInstructions = false,
+  }: {| sortObjectInstructions?: boolean |} = {}
 ): TreeNode<T> => {
   const tree = {};
   const sortedFreeInstructionsTopLevelGroups = getSortedFreeInstructionsTopLevelGroups(
@@ -66,31 +208,41 @@ export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
     });
   });
 
+  const sortedObjectInstructionsTopLevelGroups = getSortedObjectInstructionsTopLevelGroups(
+    i18n
+  );
+  const groupsItemsOrder = getGroupsItemsOrder(i18n);
+  // Free instruction groups come first, in their order. Then the instructions
+  // without group and the object instruction groups, in their order. Then the
+  // categories of extensions that are not in these lists, in alphabetical
+  // order. The Advanced category is always the last one.
+  const getGroupRank = (groupName: string): [number, number] => {
+    const freeIndex = sortedFreeInstructionsTopLevelGroups.indexOf(groupName);
+    if (freeIndex === sortedFreeInstructionsTopLevelGroups.length - 1)
+      return [4, 0];
+    if (freeIndex !== -1) return [1, freeIndex];
+    if (!sortObjectInstructions) return [3, 0];
+    if (groupName === '') return [2, -1];
+    const objectIndex = sortedObjectInstructionsTopLevelGroups.indexOf(
+      groupName
+    );
+    if (objectIndex !== -1) return [2, objectIndex];
+    return [3, 0];
+  };
+
   const sortedTree = Object.keys(tree)
     .sort((a, b) => {
-      const aIndex = sortedFreeInstructionsTopLevelGroups.indexOf(a);
-      const bIndex = sortedFreeInstructionsTopLevelGroups.indexOf(b);
-      // Extensions can have instructions/expressions in categories that are not in
-      // sortedFreeInstructionsTopLevelGroups. In that case, they are displayed
-      // at the end of the list, but before the Advanced category, and in alphabetical
-      // order.
-      if (aIndex === -1 && bIndex === -1) {
-        return a.localeCompare(b);
-      }
-      if (aIndex === -1) {
-        if (bIndex === sortedFreeInstructionsTopLevelGroups.length - 1)
-          return -1;
-        return +1;
-      }
-      if (bIndex === -1) {
-        if (aIndex === sortedFreeInstructionsTopLevelGroups.length - 1)
-          return +1;
-        return -1;
-      }
-      return aIndex - bIndex;
+      const [aRank, aIndex] = getGroupRank(a);
+      const [bRank, bIndex] = getGroupRank(b);
+      return aRank - bRank || aIndex - bIndex || a.localeCompare(b);
     })
     .reduce((acc, groupName) => {
-      acc[groupName] = tree[groupName];
+      const groupItemsOrder = sortObjectInstructions
+        ? groupsItemsOrder[groupName]
+        : null;
+      acc[groupName] = groupItemsOrder
+        ? sortGroupItems(tree[groupName], groupItemsOrder)
+        : tree[groupName];
       return acc;
     }, {});
 

@@ -766,6 +766,7 @@ export class BehaviorsSharedData extends EmscriptenObject {
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  serializeTo(element: SerializerElement): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
 }

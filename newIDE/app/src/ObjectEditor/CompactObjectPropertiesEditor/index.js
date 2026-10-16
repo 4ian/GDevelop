@@ -615,6 +615,7 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
           >
             <ColumnStackLayout expand noOverflowParent>
               <LineStackLayout
+                id="object-properties-header"
                 noMargin
                 alignItems="center"
                 justifyContent="space-between"

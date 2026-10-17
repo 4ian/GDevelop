@@ -293,6 +293,7 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/Extensions/Effects/pixi-filters/filter-crt.js`,
       `${gdjsRuntimePath}/Extensions/Effects/old-film-pixi-filter.js`,
       `${gdjsRuntimePath}/Extensions/Effects/pixi-filters/filter-old-film.js`,
+      `${gdjsRuntimePath}/Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js`,
       `${gdjsRuntimePath}/Extensions/TileMap/tilemapcollisionmaskruntimeobject.js`,
       `${gdjsRuntimePath}/Extensions/TileMap/TileMapRuntimeManager.js`,
       `${gdjsRuntimePath}/Extensions/TileMap/TileMapBehavior.js`,
@@ -350,6 +351,13 @@ module.exports = function (config) {
       },
       {
         pattern: './GDJS/tests/tests-utils/simple-tiled-map/*.json',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
+        pattern: './GDJS/tests/tests-utils/simple-tiled-map/*.png',
         watched: false,
         included: false,
         served: true,

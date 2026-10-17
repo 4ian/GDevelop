@@ -212,8 +212,9 @@ namespace gdjs {
     }
 
     destroy(): void {
-      // Keep textures because they are shared by all tile maps.
-      this._pixiObject.destroy(false);
+      // Destroy the children too, as each one holds a vertex buffer in the
+      // GPU memory. Keep textures because they are shared by all tile maps.
+      this._pixiObject.destroy({ children: true });
     }
   }
 

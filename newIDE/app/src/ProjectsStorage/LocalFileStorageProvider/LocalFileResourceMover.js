@@ -136,9 +136,19 @@ export const moveUrlResourcesToLocalFiles = async ({
               localFilePath,
               extension,
             } = parseLocalFilePathOrExtensionFromMetadata(resource);
-            const downloadedFilePath = localFilePath
-              ? path.resolve(projectPath, localFilePath)
-              : generateUnusedFilepathFromResourceName(
+            const resolvedLocalFilePath =
+              localFilePath && path.resolve(projectPath, localFilePath);
+            // localFilePath comes from resource metadata stored in the
+            // project file, so it must be treated as untrusted: without
+            // this check, a project containing "../../../../some/file"
+            // would let a shared/opened project write outside its own
+            // folder.
+            const downloadedFilePath =
+              resolvedLocalFilePath &&
+              (resolvedLocalFilePath === projectPath ||
+                resolvedLocalFilePath.startsWith(projectPath + path.sep))
+                ? resolvedLocalFilePath
+                : generateUnusedFilepathFromResourceName(
                   baseAssetsPath,
                   downloadedFilePaths,
                   resource.getName(),

@@ -19,13 +19,33 @@ const findGDevelopCloudCookieValue = async () => {
   return gdevelopCloudCookieValue;
 };
 
+// `url` ultimately comes from a resource's "file" path, which is stored in
+// (and can be set by) the project file itself - so it must be treated as
+// untrusted. Only ever attach the GDevelop cloud session cookie when the
+// request is actually going to a gdevelop.io host; otherwise a project
+// resource pointing at an attacker-controlled URL would exfiltrate the
+// visitor's cloud session cookie to that host.
+const isGDevelopCloudHost = url => {
+  try {
+    const { hostname, protocol } = new URL(url);
+    return (
+      (protocol === 'https:' || protocol === 'http:') &&
+      (hostname === 'gdevelop.io' || hostname.endsWith('.gdevelop.io'))
+    );
+  } catch (error) {
+    return false;
+  }
+};
+
 module.exports = {
   /**
    * @param {string} url
    * @param {string} outputPath
    */
   downloadLocalFile: async (url, outputPath) => {
-    const gdevelopCloudCookieValue = await findGDevelopCloudCookieValue();
+    const gdevelopCloudCookieValue = isGDevelopCloudHost(url)
+      ? await findGDevelopCloudCookieValue()
+      : null;
 
     log.verbose(`Downloading ${url} to ${outputPath}...`);
     const response = await axios.get(url, {

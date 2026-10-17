@@ -17,6 +17,7 @@ import {
   type DebuggerStatus,
 } from '../ExportAndShare/PreviewLauncher.flow';
 import { type Log, LogsManager } from './DebuggerConsole';
+import { getIsGameplayTestRunInProgress } from '../GameplayTests/GameplayTestRunner';
 
 // Mirrors `gdjs.FrameMeasureOutput`: a plain tree (no back-references),
 // as sent by the game's profiler.
@@ -338,7 +339,20 @@ export default class Debugger extends React.Component<Props, State> {
     return true;
   };
 
+  _canStartProfiler = (id: DebuggerId): boolean => {
+    const status = this.state.debuggerStatus[id];
+    // Finished gameplay tests keep their preview paused. Rendering a paused
+    // scene does not begin a profiling frame, so starting a profiler would crash.
+    return (
+      this.state.debuggerIds.includes(id) &&
+      !!status &&
+      !status.isPaused &&
+      !status.isInGameEdition
+    );
+  };
+
   _startProfiler = (id: DebuggerId) => {
+    if (getIsGameplayTestRunInProgress() || !this._canStartProfiler(id)) return;
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'profiler.start' });
   };
@@ -427,6 +441,7 @@ export default class Debugger extends React.Component<Props, State> {
               onEdit={(path, args) => this._edit(selectedId, path, args)}
               onCall={(path, args) => this._call(selectedId, path, args)}
               onStartProfiler={() => this._startProfiler(selectedId)}
+              canStartProfiler={this._canStartProfiler(selectedId)}
               onStopProfiler={() => this._stopProfiler(selectedId)}
               profilerOutput={profilerOutputs[selectedId]}
               profilingInProgress={profilingInProgress[selectedId]}

@@ -24,6 +24,16 @@ export const isUsernameValid = (
   return !!username && /^[\w|-]+$/.test(username) && username.length < 31;
 };
 
+// Usernames of 2 letters are reserved for the languages of gd.games (`gd.games/fr` is the French home page).
+// Users who already have one can keep it.
+const isUsernameReserved = (
+  username: string,
+  initialUsername: ?string
+): boolean =>
+  /^[a-z]{2}$/i.test(username) &&
+  (!initialUsername ||
+    initialUsername.toLowerCase() !== username.toLowerCase());
+
 export const usernameFormatErrorMessage: React.Node = (
   <Trans>
     Please pick a short username with only alphanumeric characters as well as _
@@ -33,6 +43,10 @@ export const usernameFormatErrorMessage: React.Node = (
 
 export const usernameAvailabilityErrorMessage: React.Node = (
   <Trans>This username is already used, please pick another one.</Trans>
+);
+
+const usernameReservedErrorMessage: React.Node = (
+  <Trans>Usernames of 2 letters are reserved, please pick another one.</Trans>
 );
 
 type Props = {|
@@ -63,6 +77,9 @@ export const UsernameField = ({
   })
     ? undefined
     : usernameFormatErrorMessage;
+  const usernameReservedError = isUsernameReserved(value, initialUsername)
+    ? usernameReservedErrorMessage
+    : undefined;
 
   const [
     usernameAvailabilityError,
@@ -97,6 +114,14 @@ export const UsernameField = ({
     if (!username || !isUsernameValid(username, { allowEmpty: !!allowEmpty })) {
       updateUsernameAvailability({
         usernameAvailability: null,
+        error: null,
+      });
+      return;
+    }
+    // Reported as not available, so that it can't be submitted.
+    if (isUsernameReserved(username, initialUsername)) {
+      updateUsernameAvailability({
+        usernameAvailability: { username, isAvailable: false },
         error: null,
       });
       return;
@@ -146,7 +171,10 @@ export const UsernameField = ({
       fullWidth
       onChange={onChange}
       errorText={
-        usernameFormattingError || usernameAvailabilityError || errorText
+        usernameFormattingError ||
+        usernameReservedError ||
+        usernameAvailabilityError ||
+        errorText
       }
       endAdornment={
         isValidatingUsername && (

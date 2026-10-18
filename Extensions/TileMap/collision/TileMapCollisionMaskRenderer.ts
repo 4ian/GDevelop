@@ -24,6 +24,10 @@ namespace gdjs {
       }
 
       redrawCollisionMask() {
+        if (this._graphics.destroyed) {
+          // The tile map file can finish loading after the object was deleted.
+          return;
+        }
         this._graphics.clear();
         if (!this._object._debugMode) {
           return;
@@ -52,6 +56,10 @@ namespace gdjs {
 
       getRendererObject() {
         return this._graphics;
+      }
+
+      destroy(): void {
+        this._graphics.destroy();
       }
     }
   }

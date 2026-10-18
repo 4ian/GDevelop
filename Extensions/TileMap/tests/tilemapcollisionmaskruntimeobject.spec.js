@@ -267,6 +267,16 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
         false
       );
     });
+
+    it('destroys its renderer object when it is deleted', function () {
+      const rendererObject = tileMap.getRendererObject();
+      expect(rendererObject.destroyed).to.be(false);
+
+      tileMap.deleteFromScene();
+      runtimeScene.renderAndStep(1000 / 60);
+
+      expect(rendererObject.destroyed).to.be(true);
+    });
   });
 
   describe('Flipping cases', function () {

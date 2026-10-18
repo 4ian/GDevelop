@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -45,6 +46,7 @@ export const GdGamesFrame = ({
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
+  const { values: preferences } = React.useContext(PreferencesContext);
 
   const loadState = React.useRef<'loading' | 'loaded' | 'errored'>('loading');
   const isMounted = useIsMounted();
@@ -53,6 +55,8 @@ export const GdGamesFrame = ({
   const url = new URL(path, gdGamesHost);
   url.searchParams.set('supportedMessageIds', supportedMessageIds.join(','));
   url.searchParams.set('theme', paletteType);
+  // gd.games redirects to the page in this language (`/fr/app-embedded/...`) if it supports it.
+  url.searchParams.set('language', preferences.language);
 
   React.useEffect(
     () => {

@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
 import { homepageMobileMenuHeight } from '../HomePageMenuBar';
 import Paper from '../../../../UI/Paper';
 import { type IframePosition } from './UseGamesPlatformFrame';
@@ -40,10 +41,14 @@ const GamesPlatformFrame = ({
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
+  const { values: preferences } = React.useContext(PreferencesContext);
 
   // Use a ref to store the initial game id, as we don't want to trigger a re-render
   // when the game id changes.
   const gameId = React.useRef(initialGameId);
+  // Same for the language: changing it must not reload the frame (and stop a game being played).
+  // The new language is used the next time the frame is loaded.
+  const language = React.useRef(preferences.language);
 
   const url = new URL(
     gameId.current
@@ -52,6 +57,8 @@ const GamesPlatformFrame = ({
     gdGamesHost
   );
   if (gameId.current) url.searchParams.set('theme', paletteType);
+  // gd.games redirects to the page in this language (`/fr/app-embedded/...`) if it supports it.
+  url.searchParams.set('language', language.current);
 
   const src = loaded ? url.toString() : '';
 
@@ -60,9 +67,10 @@ const GamesPlatformFrame = ({
       if (!loaded) {
         // Every time the frame is unloaded, we reset it for the next load.
         gameId.current = initialGameId;
+        language.current = preferences.language;
       }
     },
-    [loaded, initialGameId]
+    [loaded, initialGameId, preferences.language]
   );
 
   // In this component, do not use useResponsiveWindowSize. The position

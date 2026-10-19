@@ -32,8 +32,11 @@ void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   objectType = element.GetStringAttribute("objectType");
+  // Shared properties are only serialized when there are some.
   sharedPropertyDescriptors.UnserializeElementsFrom(
-      "propertyDescriptor", element.GetChild("sharedPropertyDescriptors"));
+      "propertyDescriptor", element.HasChild("sharedPropertyDescriptors")
+                                ? element.GetChild("sharedPropertyDescriptors")
+                                : SerializerElement());
   if (element.HasChild("sharedPropertiesFolderStructure")) {
     sharedPropertyDescriptors.UnserializeFoldersFrom(
         project, element.GetChild("sharedPropertiesFolderStructure", 0));

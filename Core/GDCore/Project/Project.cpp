@@ -902,7 +902,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     layout.UnserializeFrom(*this, layoutElement);
   }
   SetFirstLayout(element.GetChild("firstLayout").GetStringValue());
-  SetPreviewLayout(element.GetChild("previewLayout").GetStringValue());
+  // The preview layout is only serialized when it is set.
+  SetPreviewLayout(element.GetStringAttribute("previewLayout"));
 
   externalEvents.clear();
   const SerializerElement& externalEventsElement =

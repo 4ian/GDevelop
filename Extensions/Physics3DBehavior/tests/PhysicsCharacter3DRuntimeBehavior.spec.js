@@ -216,13 +216,32 @@ describe('gdjs.PhysicsCharacter3DRuntimeBehavior', () => {
   };
 
   it('keeps the body of the character when the body type is changed', () => {
-    const { runtimeScene, character, behavior } =
-      createSceneWithCharacterOnPlatform();
+    const runtimeScene = createScene();
+    addPlatform(runtimeScene, {
+      x: 0,
+      y: 0,
+      z: 0,
+      width: 500,
+      height: 500,
+      depth: 100,
+    });
+    const { character, behavior } = addCharacter(runtimeScene, {
+      x: 400,
+      y: 225,
+      z: 100,
+    });
     /** @type {gdjs.Physics3DRuntimeBehavior} */
     // @ts-ignore
     const physics3D = character.getBehavior('Physics3D');
 
+    // Changed right after the character is created, like an action following
+    // the creation of the object, before the character handles its body.
     physics3D.setBodyType('Static');
+    for (let i = 0; i < 10; i++) {
+      runtimeScene.renderAndStep(frameDuration);
+    }
+    expect(behavior.isOnFloor()).to.be(true);
+    physics3D.setBodyType('Kinematic');
     walkOffThePlatform(runtimeScene, character, behavior);
 
     expect(physics3D.isDynamic()).to.be(true);

@@ -361,6 +361,16 @@ namespace gdjs {
       return result;
     }
 
+    override onCreated() {
+      // The body is handled by this behavior: its type can't be changed.
+      const behavior = this.owner.getBehavior(
+        this._physics3DBehaviorName
+      ) as gdjs.Physics3DRuntimeBehavior | null;
+      if (behavior) {
+        behavior._isBodyHandledByAnotherBehavior = true;
+      }
+    }
+
     override onDeActivate() {
       if (!this._physics3D) {
         return;

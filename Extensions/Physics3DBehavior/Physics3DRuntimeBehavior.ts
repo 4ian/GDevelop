@@ -397,6 +397,12 @@ namespace gdjs {
      */
     _shapeHalfDepth: float = 0;
 
+    /**
+     * Set by the behaviors handling the body themselves, like
+     * {@link gdjs.PhysicsCharacter3DRuntimeBehavior}: its type can't be changed.
+     */
+    _isBodyHandledByAnotherBehavior: boolean = false;
+
     /** The surface used as shape, if the object gives one (see `gdjs.Surface`). */
     private _surface: gdjs.Surface | null = null;
     private _surfaceVersion: integer = 0;
@@ -1766,12 +1772,7 @@ namespace gdjs {
       if (this.bodyType === bodyType) {
         return;
       }
-      if (
-        !(
-          this.bodyUpdater instanceof
-          gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater
-        )
-      ) {
+      if (this._isBodyHandledByAnotherBehavior) {
         return;
       }
       if (this._shape === 'Mesh' && bodyType !== 'Static') {

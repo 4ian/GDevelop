@@ -325,6 +325,78 @@ describe('gdjs.Physics3DRuntimeBehavior', () => {
     ).not.to.be(shapePointer);
   });
 
+  describe('changing the body type', () => {
+    /** A box in the air, at Z = 250. */
+    const addBox = (runtimeScene, bodyType) => {
+      const box = addCube(runtimeScene, 'Box', bodyType, {
+        width: 20,
+        height: 20,
+        depth: 20,
+      });
+      box.setCenterXInScene(500);
+      box.setCenterYInScene(500);
+      box.setZ(250);
+      return box;
+    };
+
+    it('lets a kinematic body fall when it is made dynamic', () => {
+      const runtimeScene = createScene();
+      const box = addBox(runtimeScene, 'Kinematic');
+      stepSeconds(runtimeScene, 1);
+      expect(box.getZ()).to.be.within(249.9, 250.1);
+
+      getPhysics3D(box).setBodyType('Dynamic');
+      stepSeconds(runtimeScene, 1);
+
+      expect(getPhysics3D(box).isDynamic()).to.be(true);
+      expect(box.getZ()).to.be.below(200);
+    });
+
+    it('keeps the velocity of the body', () => {
+      const runtimeScene = createScene();
+      const box = addBox(runtimeScene, 'Kinematic');
+      getPhysics3D(box).setLinearVelocityX(200);
+      stepSeconds(runtimeScene, 0.5);
+
+      getPhysics3D(box).setBodyType('Dynamic');
+      expect(getPhysics3D(box).getLinearVelocityX()).to.be.within(190, 200);
+      stepSeconds(runtimeScene, 0.5);
+
+      expect(box.getCenterXInScene()).to.be.above(680);
+      expect(box.getZ()).to.be.below(240);
+    });
+
+    it('applies an impulse given right after the change', () => {
+      const runtimeScene = createScene();
+      const box = addBox(runtimeScene, 'Kinematic');
+      stepSeconds(runtimeScene, 0.5);
+
+      getPhysics3D(box).setBodyType('Dynamic');
+      getPhysics3D(box).applyImpulseAtCenter(0.1, 0, 0);
+      stepSeconds(runtimeScene, 0.5);
+
+      expect(box.getCenterXInScene()).to.be.above(550);
+    });
+
+    it('collides with the same objects with the default layers', () => {
+      const runtimeScene = createScene();
+      const ground = addCube(runtimeScene, 'Ground', 'Kinematic', {
+        width: 1000,
+        height: 1000,
+        depth: 200,
+      });
+      getPhysics3D(ground).setBodyType('Static');
+      const box = addBox(runtimeScene, 'Static');
+      stepSeconds(runtimeScene, 0.5);
+      expect(box.getZ()).to.be.within(249.9, 250.1);
+
+      getPhysics3D(box).setBodyType('Dynamic');
+      stepSeconds(runtimeScene, 2);
+
+      expect(box.getZ()).to.be.within(198, 202);
+    });
+  });
+
   it('uses the box shape again when the surface is removed', () => {
     const runtimeScene = createScene();
     const ground = addGround(

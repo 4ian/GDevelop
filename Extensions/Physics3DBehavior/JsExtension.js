@@ -977,6 +977,29 @@ module.exports = {
         .setFunctionName('isKinematic');
 
       aut
+        .addScopedAction(
+          'SetBodyType',
+          _('Body type'),
+          _(
+            'Change the type of the body: static, dynamic or kinematic. For instance, an enemy moved by a pathfinding behavior can be kinematic, and become dynamic to be thrown by an impulse when it is hit. The velocities are kept. Static bodies are in the layers 1 to 4, dynamic and kinematic bodies in the layers 5 to 8: with the default layers (1 and 5), the object collides with the same objects after the change. Bodies of 3D characters and 3D cars, and mesh shapes (only static), are not changed.'
+          ),
+          _('Change the body type of _PARAM0_ to _PARAM2_'),
+          _('Dynamics'),
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .addParameter(
+          'stringWithSelector',
+          _('Body type'),
+          '["Static", "Dynamic", "Kinematic"]',
+          false
+        )
+        .getCodeExtraInformation()
+        .setFunctionName('setBodyType');
+
+      aut
         .addScopedCondition(
           'IsBullet',
           _('Is treated as a bullet'),

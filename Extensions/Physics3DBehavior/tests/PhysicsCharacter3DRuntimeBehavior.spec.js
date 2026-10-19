@@ -215,6 +215,19 @@ describe('gdjs.PhysicsCharacter3DRuntimeBehavior', () => {
     expect(behavior.isFallingWithoutJumping()).to.be(true);
   };
 
+  it('keeps the body of the character when the body type is changed', () => {
+    const { runtimeScene, character, behavior } =
+      createSceneWithCharacterOnPlatform();
+    /** @type {gdjs.Physics3DRuntimeBehavior} */
+    // @ts-ignore
+    const physics3D = character.getBehavior('Physics3D');
+
+    physics3D.setBodyType('Static');
+    walkOffThePlatform(runtimeScene, character, behavior);
+
+    expect(physics3D.isDynamic()).to.be(true);
+  });
+
   it('can jump from the floor, but not a second time while in the air', () => {
     const { runtimeScene, character, behavior } =
       createSceneWithCharacterOnPlatform();

@@ -271,6 +271,10 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   };
 
+  isFocused = (): boolean => {
+    return !!this._field && this._field.isFocused();
+  };
+
   getInputValue = (): string => {
     if (!this._inputElement) {
       return '';
@@ -790,7 +794,8 @@ export default class ExpressionField extends React.Component<Props, State> {
                       </Popper>
                     </ClickAwayListener>
                   )}
-                  {this._inputElement &&
+                  {this.isFocused() &&
+                    this._inputElement &&
                     !this.state.popoverOpen &&
                     parameterRenderingService && (
                       <ExpressionAutocompletionsDisplayer

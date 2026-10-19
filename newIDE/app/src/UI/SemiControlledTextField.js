@@ -53,6 +53,7 @@ type Props = {|
 
 export type SemiControlledTextFieldInterface = {|
   focus: FieldFocusFunction,
+  isFocused: () => boolean,
   forceSetValue: (text: string) => void,
   forceSetSelection: (start: number, end: number) => void,
   getInputNode: () => ?HTMLInputElement,
@@ -90,6 +91,10 @@ const SemiControlledTextField: React.ComponentType<{
     if (textFieldRef.current) textFieldRef.current.focus(options);
   };
 
+  const isFocused = (): boolean => {
+    return focused;
+  };
+
   const getInputNode = (): ?HTMLInputElement => {
     if (textFieldRef.current) return textFieldRef.current.getInputNode();
   };
@@ -104,6 +109,7 @@ const SemiControlledTextField: React.ComponentType<{
 
   React.useImperativeHandle(ref, () => ({
     focus,
+    isFocused,
     getInputNode,
     forceSetSelection,
     forceSetValue,

@@ -117,6 +117,11 @@ export const moveUrlResourcesToLocalFiles = async ({
   );
 
   const projectPath = path.dirname(fileMetadata.fileIdentifier);
+  // Resolved once, only to check that a resource's localFilePath stays
+  // within the project folder (see below) - projectPath itself can be
+  // relative (e.g. in tests), so it can't be compared directly against
+  // an already-resolved, necessarily-absolute path.
+  const absoluteProjectPath = path.resolve(projectPath);
   const baseAssetsPath = path.join(projectPath, 'assets');
   const downloadedFilePaths = new Set<string>();
   const erroredResources = [];
@@ -145,15 +150,17 @@ export const moveUrlResourcesToLocalFiles = async ({
             // folder.
             const downloadedFilePath =
               resolvedLocalFilePath &&
-              (resolvedLocalFilePath === projectPath ||
-                resolvedLocalFilePath.startsWith(projectPath + path.sep))
+              (resolvedLocalFilePath === absoluteProjectPath ||
+                resolvedLocalFilePath.startsWith(
+                  absoluteProjectPath + path.sep
+                ))
                 ? resolvedLocalFilePath
                 : generateUnusedFilepathFromResourceName(
-                  baseAssetsPath,
-                  downloadedFilePaths,
-                  resource.getName(),
-                  extension || ''
-                );
+                    baseAssetsPath,
+                    downloadedFilePaths,
+                    resource.getName(),
+                    extension || ''
+                  );
 
             await fs.ensureDir(baseAssetsPath);
             await fs.ensureDir(path.dirname(downloadedFilePath));

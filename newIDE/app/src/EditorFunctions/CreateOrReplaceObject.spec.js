@@ -180,6 +180,25 @@ describe('create_or_replace_object (additional cases)', () => {
     expect(testSceneObjects.getObjectsCount()).toBe(2);
   });
 
+  it('fails when the object name is empty', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_type: 'TextObject::Text',
+          object_name: '',
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toBe(
+      '`object_name` is empty: give the object a name. Nothing was created.'
+    );
+    expect(testScene.getObjects().getObjectsCount()).toBe(1);
+  });
+
   it('fails when creating from scratch with an invalid object type', async () => {
     const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
       {

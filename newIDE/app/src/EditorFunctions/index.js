@@ -1391,6 +1391,11 @@ const createOrReplaceObject: EditorFunction = {
       'object_type'
     );
     const targetObjectName = extractRequiredString(args, 'object_name');
+    if (!targetObjectName) {
+      return makeGenericFailure(
+        '`object_name` is empty: give the object a name. Nothing was created.'
+      );
+    }
     const target_object_scope = SafeExtractor.extractStringProperty(
       args,
       'target_object_scope'

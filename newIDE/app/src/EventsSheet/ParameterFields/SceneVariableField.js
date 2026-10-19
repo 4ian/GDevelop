@@ -62,6 +62,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         <VariableField
           variablesContainers={variablesContainers}
           parameterMetadata={props.parameterMetadata}
+          expressionType={'scenevar'}
           value={props.value}
           onChange={props.onChange}
           isInline={props.isInline}

@@ -92,6 +92,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           instruction={instruction}
           variablesContainers={variablesContainers}
           parameterMetadata={props.parameterMetadata}
+          expressionType={'variableOrPropertyOrParameter'}
           value={props.value}
           onChange={props.onChange}
           isInline={props.isInline}

@@ -2108,8 +2108,9 @@ module.exports = {
 
       onRemovedFromScene() {
         super.onRemovedFromScene();
-        // Keep textures because they are shared by all tile maps.
-        this._pixiObject.destroy(false);
+        // Destroy the children too, as each one holds a vertex buffer in the
+        // GPU memory. Keep textures because they are shared by all tile maps.
+        this._pixiObject.destroy({ children: true });
 
         // Not strictly necessary, but helps finding wrong
         // handling of this._pixiObject in its container.
@@ -2566,8 +2567,9 @@ module.exports = {
 
       onRemovedFromScene() {
         super.onRemovedFromScene();
-        // Keep textures because they are shared by all tile maps.
-        this._pixiObject.destroy(false);
+        // Destroy the children too, as each one holds a vertex buffer in the
+        // GPU memory. Keep textures because they are shared by all tile maps.
+        this._pixiObject.destroy({ children: true });
 
         // Not strictly necessary, but helps finding wrong
         // handling of this._pixiObject in its container.

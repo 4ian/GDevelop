@@ -81,6 +81,7 @@ namespace gdjs {
     _verticalTextAlignment: string;
 
     _renderer: gdjs.BitmapTextRuntimeObjectPixiRenderer;
+    _rotationCenter: FloatPoint | null = null;
 
     /**
      * @param instanceContainer The container the object belongs to.
@@ -251,6 +252,9 @@ namespace gdjs {
      * Set the text to display.
      */
     setText(text: string): void {
+      if (this.angle !== 0) {
+        this._lockRotationCenter();
+      }
       this._text = text;
       this._renderer.updateTextContent();
       this.invalidateHitboxes();
@@ -385,6 +389,11 @@ namespace gdjs {
 
     override setAngle(angle: float): void {
       super.setAngle(angle);
+      if (angle === 0 && this._rotationCenter) {
+        this._rotationCenter = null;
+        this._renderer.updatePosition();
+        this.invalidateHitboxes();
+      }
       this._renderer.updateAngle();
     }
 
@@ -458,6 +467,24 @@ namespace gdjs {
             ? this.getHeight()
             : 0)
       );
+    }
+
+    private _lockRotationCenter() {
+      if (this._rotationCenter) return;
+
+      this._rotationCenter = [this.getCenterX(), this.getCenterY()];
+    }
+
+    override getCenterX(): float {
+      return this._rotationCenter
+        ? this._rotationCenter[0]
+        : super.getCenterX();
+    }
+
+    override getCenterY(): float {
+      return this._rotationCenter
+        ? this._rotationCenter[1]
+        : super.getCenterY();
     }
   }
   gdjs.registerObject(

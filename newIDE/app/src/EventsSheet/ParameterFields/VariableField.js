@@ -41,7 +41,9 @@ import PropertyIcon from '../../UI/CustomSvgIcons/Settings';
 import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
 import Add from '../../UI/CustomSvgIcons/Add';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
-import GenericExpressionField from './GenericExpressionField';
+import GenericExpressionField, {
+  type ExpressionType,
+} from './GenericExpressionField';
 import { type AutocompletionAction } from './GenericExpressionField/ExpressionAutocompletionsHandler';
 
 const gd: libGDevelop = global.gd;
@@ -72,6 +74,8 @@ type Props = {
   openEventsBasedEntityPropertyEditorDialog:
     | (VariableDialogOpeningProps => void)
     | null,
+  expressionType: ExpressionType,
+  expressionTypeExtraInfo?: string,
 };
 
 export const getRootVariableName = (name: string): string => {
@@ -156,6 +160,8 @@ export default (React.forwardRef<Props, ParameterFieldInterface>(
       onChange,
       isInline,
       parameterMetadata,
+      expressionType,
+      expressionTypeExtraInfo,
       id,
       onInstructionTypeChanged,
       getVariableSourceFromIdentifier,
@@ -405,12 +411,14 @@ export default (React.forwardRef<Props, ParameterFieldInterface>(
               renderTextField={() => (
                 <GenericExpressionField
                   expressionType={
-                    parameterMetadata
+                    expressionType ||
+                    (parameterMetadata
                       ? // $FlowFixMe[incompatible-type]
                         parameterMetadata.getValueTypeMetadata().getName()
                       : // $FlowFixMe[incompatible-type]
-                        ''
+                        '')
                   }
+                  expressionTypeExtraInfo={expressionTypeExtraInfo}
                   ref={field}
                   id={id}
                   globalObjectsContainer={props.globalObjectsContainer}

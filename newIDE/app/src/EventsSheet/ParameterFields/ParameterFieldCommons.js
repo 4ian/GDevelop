@@ -62,6 +62,7 @@ export type ParameterFieldProps = {|
   openEventsBasedEntityPropertyEditorDialog?:
     | (VariableDialogOpeningProps => void)
     | null,
+  expressionTypeExtraInfo?: string,
 |};
 
 export type FieldFocusFunction = (

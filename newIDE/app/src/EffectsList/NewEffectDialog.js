@@ -205,35 +205,37 @@ const NewEffectFromScratch = ({
 
   return (
     <ColumnStackLayout expand noMargin useFullHeight>
-      <ResponsiveLineStackLayout noMargin>
-        {canChooseCategory && (
-          <SearchBarSelectField
-            value={category}
-            onChange={(e, i, value: string) => {
-              if (value === '2d' || value === '3d') setCategory(value);
-              else setCategory('');
-            }}
-          >
-            <SelectOption value="" label={t`All categories`} />
-            <SelectOption value="2d" label={t`2D`} />
-            <SelectOption value="3d" label={t`3D`} />
-          </SearchBarSelectField>
-        )}
-        <Column expand noMargin>
-          <SearchBar
-            id="effect-type-search-bar"
-            value={searchText}
-            onChange={setSearchText}
-            onRequestSearch={() => {
-              if (displayedEffectMetadata.length === 1) {
-                onChoose(displayedEffectMetadata[0].type);
-              }
-            }}
-            placeholder={t`Search effects`}
-            autoFocus="desktop"
-          />
-        </Column>
-      </ResponsiveLineStackLayout>
+      <ColumnStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin>
+          {canChooseCategory && (
+            <SearchBarSelectField
+              value={category}
+              onChange={(e, i, value: string) => {
+                if (value === '2d' || value === '3d') setCategory(value);
+                else setCategory('');
+              }}
+            >
+              <SelectOption value="" label={t`All categories`} />
+              <SelectOption value="2d" label={t`2D`} />
+              <SelectOption value="3d" label={t`3D`} />
+            </SearchBarSelectField>
+          )}
+          <Column expand noMargin>
+            <SearchBar
+              id="effect-type-search-bar"
+              value={searchText}
+              onChange={setSearchText}
+              onRequestSearch={() => {
+                if (displayedEffectMetadata.length === 1) {
+                  onChoose(displayedEffectMetadata[0].type);
+                }
+              }}
+              placeholder={t`Search effects`}
+              autoFocus="desktop"
+            />
+          </Column>
+        </ResponsiveLineStackLayout>
+      </ColumnStackLayout>
       <ScrollView>
         {displayedEffectMetadata.length === 0 ? (
           <EmptyMessage>

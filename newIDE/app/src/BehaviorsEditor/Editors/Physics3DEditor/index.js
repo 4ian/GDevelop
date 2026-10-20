@@ -378,8 +378,9 @@ const Physics3DEditor = (props: Props): React.Node => {
       </ResponsiveLineStackLayout>
       <Line expand>
         <ColumnStackLayout expand noMargin>
-          {/* Static and moving objects don't use the same layers, so only
-              the ones of the current body type are shown. */}
+          {/* Static and moving objects don't use the same layers: the layers
+              of the current body type are shown first, then the ones used if
+              the type is changed during the game. */}
           <CompactBitmaskField
             label={properties.get('layers').getLabel()}
             markdownDescription={properties.get('layers').getDescription()}
@@ -390,17 +391,27 @@ const Physics3DEditor = (props: Props): React.Node => {
               updateBehaviorProperty('layers', newValue.toString(10))
             }
           />
-          {!properties.get('masks').isHidden() && (
-            <CompactBitmaskField
-              label={properties.get('masks').getLabel()}
-              markdownDescription={properties.get('masks').getDescription()}
-              value={masksValues}
-              bitCount={8}
-              onChange={newValue =>
-                updateBehaviorProperty('masks', newValue.toString(10))
-              }
-            />
-          )}
+          <CompactBitmaskField
+            label={properties.get('layersIfTypeChanged').getLabel()}
+            markdownDescription={properties
+              .get('layersIfTypeChanged')
+              .getDescription()}
+            value={layersValues}
+            firstBit={isStatic ? 4 : 0}
+            bitCount={4}
+            onChange={newValue =>
+              updateBehaviorProperty('layers', newValue.toString(10))
+            }
+          />
+          <CompactBitmaskField
+            label={properties.get('masks').getLabel()}
+            markdownDescription={properties.get('masks').getDescription()}
+            value={masksValues}
+            bitCount={8}
+            onChange={newValue =>
+              updateBehaviorProperty('masks', newValue.toString(10))
+            }
+          />
         </ColumnStackLayout>
       </Line>
       <Accordion

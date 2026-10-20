@@ -266,7 +266,11 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'layers') {
+        // Both edit the layers of the static and of the moving objects.
+        if (
+          propertyName === 'layers' ||
+          propertyName === 'layersIfTypeChanged'
+        ) {
           behaviorContent
             .getOrCreateChild('layers')
             .setIntValue(parseInt(newValue, 10));
@@ -311,7 +315,7 @@ module.exports = {
           .addChoice('Kinematic', _('Kinematic'))
           .setDescription(
             _(
-              "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
+              'A static object won\'t move (perfect for obstacles). Dynamic objects are moved by the physics engine (gravity, forces and collisions). Kinematic objects are only moved by their velocity or by other behaviors, and push dynamic objects without being pushed (useful for moving platforms, or characters moved by a pathfinding behavior). The type can be changed during the game with the "Body type" action.'
             )
           )
           .setHasImpactOnOtherProperties(true);
@@ -668,14 +672,18 @@ module.exports = {
 
           .setGroup(_('Gravity'))
           .setAdvanced(true);
+        // Static objects use the layers 1 to 4 and moving ones the layers 5 to
+        // 8, so that they never register in the wrong layer group. Both are
+        // shown, as the type can be changed during the game: the layers of the
+        // current type first, then the ones used if the type is changed.
+        const layersValue = behaviorContent
+          .getChild('layers')
+          .getIntValue()
+          .toString(10);
         behaviorProperties
           .getOrCreate('layers')
-          .setValue(
-            behaviorContent.getChild('layers').getIntValue().toString(10)
-          )
+          .setValue(layersValue)
           .setType('Bitmask')
-          // Static objects use the layers 1 to 4 and moving ones the layers
-          // 5 to 8, so that they never register in the wrong layer group.
           .addExtraInfo('bitCount=4')
           .addExtraInfo(isStaticBody ? 'firstBit=0' : 'firstBit=4')
           .setLabel(_('Layers'))
@@ -687,23 +695,48 @@ module.exports = {
           .setGroup(_('Collision filtering'))
           .setAdvanced(true);
         behaviorProperties
+          .getOrCreate('layersIfTypeChanged')
+          .setValue(layersValue)
+          .setType('Bitmask')
+          .addExtraInfo('bitCount=4')
+          .addExtraInfo(isStaticBody ? 'firstBit=4' : 'firstBit=0')
+          .setLabel(
+            isStaticBody
+              ? _('Layers if made dynamic or kinematic')
+              : _('Layers if made static')
+          )
+          .setDescription(
+            isStaticBody
+              ? _(
+                  'Layers the object belongs to if it is made dynamic or kinematic during the game (with the "Body type" action): moving objects use the layers 5 to 8. Not used while the object is static.'
+                )
+              : _(
+                  'Layers the object belongs to if it is made static during the game (with the "Body type" action): static objects use the layers 1 to 4. Not used while the object is dynamic or kinematic.'
+                )
+          )
+          .setGroup(_('Collision filtering'))
+          .setAdvanced(true);
+        behaviorProperties
           .getOrCreate('masks')
           .setValue(
             behaviorContent.getChild('masks').getIntValue().toString(10)
           )
           .setType('Bitmask')
           .addExtraInfo('bitCount=8')
-          .setLabel(_('Masks'))
+          .setLabel(
+            isStaticBody ? _('Masks if made dynamic or kinematic') : _('Masks')
+          )
           .setDescription(
-            _(
-              'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 8 which is 128. Not used by static objects, which accept every collision.'
-            )
+            isStaticBody
+              ? _(
+                  'Layers the object collides with if it is made dynamic or kinematic during the game (with the "Body type" action), as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 8 which is 128. Not used while the object is static: a static object collides with every moving object whose masks include its layers.'
+                )
+              : _(
+                  'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 8 which is 128. Not used by static objects, which accept every collision.'
+                )
           )
           .setGroup(_('Collision filtering'))
-          .setAdvanced(true)
-          // Static objects accept every collision: it's the mask of the moving
-          // objects that matters.
-          .setHidden(isStaticBody);
+          .setAdvanced(true);
 
         return behaviorProperties;
       };

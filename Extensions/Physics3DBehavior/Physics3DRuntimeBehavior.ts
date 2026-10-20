@@ -47,6 +47,7 @@ namespace gdjs {
     aw: boolean | undefined;
     layers: number;
     masks: number;
+    bodyType: string;
   }
 
   /** @category Behaviors > Physics 3D */
@@ -396,6 +397,18 @@ namespace gdjs {
      */
     _shapeHalfDepth: float = 0;
 
+    /**
+     * The behaviors handling the body themselves when they are activated, like
+     * {@link gdjs.PhysicsCharacter3DRuntimeBehavior}.
+     */
+    private _bodyHandlingBehaviors: Array<gdjs.RuntimeBehavior> = [];
+
+    /**
+     * The body type set in the editor. It's the one used while a behavior
+     * handles the body.
+     */
+    private _initialBodyType: string;
+
     /** The surface used as shape, if the object gives one (see `gdjs.Surface`). */
     private _surface: gdjs.Surface | null = null;
     private _surfaceVersion: integer = 0;
@@ -436,6 +449,7 @@ namespace gdjs {
         new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
+      this._initialBodyType = behaviorData.bodyType;
       this.bullet = behaviorData.bullet;
       this.fixedRotation = behaviorData.fixedRotation;
       this._shape = behaviorData.shape;
@@ -587,6 +601,7 @@ namespace gdjs {
           ...bodyProps,
           layers: this.layers,
           masks: this.masks,
+          bodyType: this.bodyType,
         },
       };
     }
@@ -604,6 +619,9 @@ namespace gdjs {
       }
       if (behaviorSpecificProps.masks !== undefined) {
         this.masks = behaviorSpecificProps.masks;
+      }
+      if (behaviorSpecificProps.bodyType !== undefined) {
+        this.bodyType = behaviorSpecificProps.bodyType;
       }
 
       this._needToRecreateShape = true;
@@ -1735,6 +1753,61 @@ namespace gdjs {
 
     isKinematic(): boolean {
       return this.bodyType === 'Kinematic';
+    }
+
+    /**
+     * Change the type of the body: "Static", "Dynamic" or "Kinematic".
+     *
+     * The body is created again right away, keeping its velocities, so that
+     * the next actions (like applying an impulse) act on the new body.
+     *
+     * Static bodies are in the layers 1 to 4, dynamic and kinematic bodies in
+     * the layers 5 to 8: with the default layers (1 and 5), the body collides
+     * with the same objects after the change.
+     *
+     * Nothing is changed while another behavior handles the body (an activated
+     * 3D character or 3D car), and for mesh shapes, which can only be static.
+     */
+    setBodyType(bodyType: string): void {
+      if (
+        bodyType !== 'Static' &&
+        bodyType !== 'Dynamic' &&
+        bodyType !== 'Kinematic'
+      ) {
+        return;
+      }
+      if (this.bodyType === bodyType) {
+        return;
+      }
+      if (
+        this._bodyHandlingBehaviors.some((behavior) => behavior.activated())
+      ) {
+        return;
+      }
+      if (this._shape === 'Mesh' && bodyType !== 'Static') {
+        return;
+      }
+      this.bodyType = bodyType;
+      if (this._body) {
+        this.recreateBody();
+      }
+    }
+
+    /**
+     * Declare a behavior that handles the body itself while it's activated,
+     * like {@link gdjs.PhysicsCharacter3DRuntimeBehavior}: the body type can't
+     * be changed while one of them is activated.
+     */
+    _registerBodyHandlingBehavior(behavior: gdjs.RuntimeBehavior): void {
+      this._bodyHandlingBehaviors.push(behavior);
+    }
+
+    /**
+     * Called when a behavior handling the body is activated: the body type may
+     * have been changed while no behavior was handling the body.
+     */
+    _restoreInitialBodyType(): void {
+      this.bodyType = this._initialBodyType;
     }
 
     isBullet(): boolean {

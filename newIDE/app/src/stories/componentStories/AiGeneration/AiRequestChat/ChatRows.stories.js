@@ -29,6 +29,9 @@ import {
   internalAiRequestError,
   contextTooLargeAiRequestError,
   repeatedToolCallLoopAiRequestError,
+  providerUnavailableAiRequestError,
+  modelTimeoutAiRequestError,
+  completionBudgetExhaustedAiRequestError,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
 
 // The rows shown in the AI chat outside of a message: they ask the user
@@ -103,6 +106,26 @@ export const AiRequestErrorWithRepeatedToolCallLoop = (): React.Node => (
   </FixedWidthFlexContainer>
 );
 
+export const AiRequestErrorWithProviderUnavailable = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <AiRequestErrorRow
+      error={providerUnavailableAiRequestError}
+      onRetry={async () => action('onRetry')()}
+      onStartNewChat={action('onStartNewChat')}
+    />
+  </FixedWidthFlexContainer>
+);
+
+export const AiRequestErrorWithModelTimeout = (): React.Node => (
+  <FixedWidthFlexContainer width={600}>
+    <AiRequestErrorRow
+      error={modelTimeoutAiRequestError}
+      onRetry={async () => action('onRetry')()}
+      onStartNewChat={action('onStartNewChat')}
+    />
+  </FixedWidthFlexContainer>
+);
+
 // An unknown code is presented like any other failure: worth retrying.
 export const AiRequestErrorWithUnknownCode = (): React.Node => (
   <FixedWidthFlexContainer width={600}>
@@ -159,6 +182,9 @@ export const AllAiRequestErrors = (): React.Node => (
         internalAiRequestError,
         contextTooLargeAiRequestError,
         repeatedToolCallLoopAiRequestError,
+        providerUnavailableAiRequestError,
+        modelTimeoutAiRequestError,
+        completionBudgetExhaustedAiRequestError,
         null,
       ].map(error => (
         <AiRequestErrorRow

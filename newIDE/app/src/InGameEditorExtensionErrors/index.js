@@ -1,6 +1,8 @@
 // @flow
 import { isExtensionFromStore } from '../EditorFunctions/SimplifiedProject/SimplifiedExtensions';
 import { type AiRequestFunctionCallOutput } from '../Utils/GDevelopServices/Generation';
+import { type GameCrashReport } from '../Utils/GDevelopServices/Analytics';
+import { getIDEVersionWithHash } from '../Version';
 
 const MAX_ERRORS_GIVEN_TO_AI = 3;
 const MAX_CALL_CHAIN_LENGTH = 6;
@@ -51,6 +53,27 @@ export const isInGameEditorExtensionErrorFromStore = (
   !!extensionName &&
   project.hasEventsFunctionsExtensionNamed(extensionName) &&
   isExtensionFromStore(project.getEventsFunctionsExtension(extensionName));
+
+/**
+ * The crash report of an error of a store extension, sent like the game
+ * engine does for its crashes: the user can't fix these extensions.
+ */
+export const buildInGameEditorExtensionErrorGameCrashReport = (
+  project: gdProject,
+  { extensionName, phase, type, message, stack }: InGameEditorExtensionError
+): GameCrashReport => ({
+  type: 'javascript-uncaught-exception',
+  exception: { message, stack, extensionName, phase, type },
+  isPreview: true,
+  isInGameEdition: true,
+  gdevelop: { versionWithHash: getIDEVersionWithHash() },
+  game: {
+    gameId: project.getProjectUuid(),
+    name: project.getName(),
+    packageName: project.getPackageName(),
+    version: project.getVersion(),
+  },
+});
 
 /** Where the error happened, like "doStepPostEvents of MyExtension::MyObject". */
 export const getInGameEditorExtensionErrorOrigin = ({

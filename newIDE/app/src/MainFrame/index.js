@@ -104,7 +104,9 @@ import { requestAskAiPrefill } from '../AiGeneration/AskAiPrefill';
 import {
   isInGameEditorExtensionErrorFromStore,
   getAskAiToFixInGameEditorExtensionErrorsText,
+  buildInGameEditorExtensionErrorGameCrashReport,
 } from '../InGameEditorExtensionErrors';
+import { createGameCrashReport } from '../Utils/GDevelopServices/Analytics';
 import InGameEditorExtensionErrorsIndicator from '../InGameEditorExtensionErrors/InGameEditorExtensionErrorsIndicator';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
@@ -815,6 +817,38 @@ const MainFrame = (props: Props): React.MixedElement => {
    * See `isCurrentProjectFresh`.
    */
   const currentProjectRef = useStableUpToDateRef(currentProject);
+
+  // An error comes back after each hot reload: only report it once.
+  const reportedStoreExtensionErrorKeys = React.useRef<Set<string>>(new Set());
+  React.useEffect(
+    () => {
+      if (
+        !currentProject ||
+        preferences.values.previewCrashReportUploadLevel === 'none'
+      ) {
+        return;
+      }
+      inGameEditorExtensionErrors.forEach(error => {
+        if (
+          reportedStoreExtensionErrorKeys.current.has(error.key) ||
+          !isInGameEditorExtensionErrorFromStore(currentProject, error)
+        ) {
+          return;
+        }
+        reportedStoreExtensionErrorKeys.current.add(error.key);
+        createGameCrashReport(
+          buildInGameEditorExtensionErrorGameCrashReport(currentProject, error)
+        ).catch(requestError => {
+          console.error('Error while sending the crash report:', requestError);
+        });
+      });
+    },
+    [
+      inGameEditorExtensionErrors,
+      currentProject,
+      preferences.values.previewCrashReportUploadLevel,
+    ]
+  );
 
   const getEditorOpeningOptions = React.useCallback(
     ({

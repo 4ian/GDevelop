@@ -108,3 +108,28 @@ export const getGameMetricsFrom = async (
     endpointName: '/game-metrics of Analytics API',
   });
 };
+
+/** A crash report, in the format sent by the game engine. */
+export type GameCrashReport = {|
+  type: 'javascript-uncaught-exception',
+  exception: {
+    message: string,
+    stack: string,
+    ...
+  },
+  isPreview: boolean,
+  isInGameEdition: boolean,
+  gdevelop: {| versionWithHash: string |},
+  game: {|
+    gameId: string,
+    name: string,
+    packageName: string,
+    version: string,
+  |},
+|};
+
+export const createGameCrashReport = async (
+  gameCrashReport: GameCrashReport
+): Promise<void> => {
+  await client.post('/game-crash-report', gameCrashReport);
+};

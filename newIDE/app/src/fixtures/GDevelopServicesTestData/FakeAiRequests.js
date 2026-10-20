@@ -1152,3 +1152,17 @@ export const repeatedToolCallLoopAiRequestError: AiRequestError = {
   message:
     'The same tool call was repeated too many times: the AI request was stopped.',
 };
+export const providerUnavailableAiRequestError: AiRequestError = {
+  code: 'provider-unavailable',
+  message:
+    'The provider of the AI model is unavailable right now. Try again in a moment.',
+};
+export const modelTimeoutAiRequestError: AiRequestError = {
+  code: 'model-timeout',
+  message: 'The AI model took too long to answer. Try again.',
+};
+export const completionBudgetExhaustedAiRequestError: AiRequestError = {
+  code: 'completion-budget-exhausted',
+  message:
+    'The AI model thought for too long without answering. Try again, or ask for a smaller change.',
+};

@@ -46,18 +46,34 @@ type AiRequestErrorKind =
   | 'too-large'
   // The AI kept repeating the same action and was stopped: retrying can work,
   // but giving more details is more likely to.
-  | 'stuck';
+  | 'stuck'
+  // The provider of the AI model refused or failed the call: retrying in a
+  // moment is likely to work.
+  | 'unavailable'
+  // The AI model didn't answer in time: retrying can work, asking for a
+  // smaller change is more likely to.
+  | 'too-slow';
 
 const getAiRequestErrorKind = (error: ?AiRequestError): AiRequestErrorKind => {
   if (!error) return 'transient';
   if (error.code === 'context-too-large') return 'too-large';
   if (error.code === 'repeated-tool-call-loop') return 'stuck';
+  if (error.code === 'provider-unavailable') return 'unavailable';
+  if (
+    error.code === 'model-timeout' ||
+    error.code === 'completion-budget-exhausted'
+  )
+    return 'too-slow';
   return 'transient';
 };
 
 const renderTitle = (errorKind: AiRequestErrorKind): React.Node => {
   if (errorKind === 'too-large') return <Trans>This chat is too long</Trans>;
   if (errorKind === 'stuck') return <Trans>The AI got stuck</Trans>;
+  if (errorKind === 'unavailable')
+    return <Trans>The AI is unavailable right now</Trans>;
+  if (errorKind === 'too-slow')
+    return <Trans>The AI took too long to answer</Trans>;
   return <Trans>The AI ran into an error</Trans>;
 };
 
@@ -99,6 +115,22 @@ const renderExplanation = ({
       <Trans>
         The AI kept trying the same thing over and over, so it was stopped. This
         request was not counted in your AI usage.
+      </Trans>
+    );
+  }
+  if (canRetry && errorKind === 'unavailable') {
+    return (
+      <Trans>
+        This request was not counted in your AI usage. The work done so far is
+        kept: try again in a moment to continue where it stopped.
+      </Trans>
+    );
+  }
+  if (canRetry && errorKind === 'too-slow') {
+    return (
+      <Trans>
+        This request was not counted in your AI usage. The work done so far is
+        kept: try again, or ask the AI for a smaller change.
       </Trans>
     );
   }

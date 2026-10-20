@@ -247,6 +247,68 @@ describe('gdjs.PhysicsCharacter3DRuntimeBehavior', () => {
     expect(physics3D.isDynamic()).to.be(true);
   });
 
+  it('can change the body type while the character is deactivated, and uses its own body type once activated again', () => {
+    const { runtimeScene, character, behavior } =
+      createSceneWithCharacterOnPlatform();
+    /** @type {gdjs.Physics3DRuntimeBehavior} */
+    // @ts-ignore
+    const physics3D = character.getBehavior('Physics3D');
+
+    behavior.activate(false);
+    physics3D.setBodyType('Kinematic');
+    expect(physics3D.isKinematic()).to.be(true);
+    character.setZ(300);
+    for (let i = 0; i < 30; i++) {
+      runtimeScene.renderAndStep(frameDuration);
+    }
+    expect(character.getZ()).to.be.within(299.9, 300.1);
+
+    behavior.activate(true);
+    expect(physics3D.isDynamic()).to.be(true);
+    for (let i = 0; i < 60; i++) {
+      runtimeScene.renderAndStep(frameDuration);
+    }
+    expect(behavior.isOnFloor()).to.be(true);
+    walkOffThePlatform(runtimeScene, character, behavior);
+  });
+
+  it('keeps its own body type when activated while the physics behavior is deactivated', () => {
+    const { runtimeScene, character, behavior } =
+      createSceneWithCharacterOnPlatform();
+    /** @type {gdjs.Physics3DRuntimeBehavior} */
+    // @ts-ignore
+    const physics3D = character.getBehavior('Physics3D');
+
+    behavior.activate(false);
+    physics3D.activate(false);
+    physics3D.setBodyType('Kinematic');
+    expect(physics3D.isKinematic()).to.be(true);
+
+    // Only the physics behavior is activated again.
+    physics3D.activate(true);
+    character.setZ(300);
+    for (let i = 0; i < 30; i++) {
+      runtimeScene.renderAndStep(frameDuration);
+    }
+    expect(character.getZ()).to.be.within(299.9, 300.1);
+    physics3D.setBodyType('Static');
+    expect(physics3D.isStatic()).to.be(true);
+
+    // Only the character is activated again.
+    physics3D.activate(false);
+    behavior.activate(true);
+    expect(physics3D.isDynamic()).to.be(true);
+    physics3D.setBodyType('Kinematic');
+    expect(physics3D.isDynamic()).to.be(true);
+
+    physics3D.activate(true);
+    for (let i = 0; i < 60; i++) {
+      runtimeScene.renderAndStep(frameDuration);
+    }
+    expect(behavior.isOnFloor()).to.be(true);
+    walkOffThePlatform(runtimeScene, character, behavior);
+  });
+
   it('can jump from the floor, but not a second time while in the air', () => {
     const { runtimeScene, character, behavior } =
       createSceneWithCharacterOnPlatform();

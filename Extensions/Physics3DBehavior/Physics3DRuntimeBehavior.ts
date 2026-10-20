@@ -398,10 +398,16 @@ namespace gdjs {
     _shapeHalfDepth: float = 0;
 
     /**
-     * Set by the behaviors handling the body themselves, like
-     * {@link gdjs.PhysicsCharacter3DRuntimeBehavior}: its type can't be changed.
+     * The behaviors handling the body themselves when they are activated, like
+     * {@link gdjs.PhysicsCharacter3DRuntimeBehavior}.
      */
-    _isBodyHandledByAnotherBehavior: boolean = false;
+    private _bodyHandlingBehaviors: Array<gdjs.RuntimeBehavior> = [];
+
+    /**
+     * The body type set in the editor. It's the one used while a behavior
+     * handles the body.
+     */
+    private _initialBodyType: string;
 
     /** The surface used as shape, if the object gives one (see `gdjs.Surface`). */
     private _surface: gdjs.Surface | null = null;
@@ -443,6 +449,7 @@ namespace gdjs {
         new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
+      this._initialBodyType = behaviorData.bodyType;
       this.bullet = behaviorData.bullet;
       this.fixedRotation = behaviorData.fixedRotation;
       this._shape = behaviorData.shape;
@@ -1758,8 +1765,8 @@ namespace gdjs {
      * the layers 5 to 8: with the default layers (1 and 5), the body collides
      * with the same objects after the change.
      *
-     * Nothing is changed for bodies handled by another behavior (like the 3D
-     * character or the 3D car), and for mesh shapes, which can only be static.
+     * Nothing is changed while another behavior handles the body (an activated
+     * 3D character or 3D car), and for mesh shapes, which can only be static.
      */
     setBodyType(bodyType: string): void {
       if (
@@ -1772,7 +1779,9 @@ namespace gdjs {
       if (this.bodyType === bodyType) {
         return;
       }
-      if (this._isBodyHandledByAnotherBehavior) {
+      if (
+        this._bodyHandlingBehaviors.some((behavior) => behavior.activated())
+      ) {
         return;
       }
       if (this._shape === 'Mesh' && bodyType !== 'Static') {
@@ -1782,6 +1791,23 @@ namespace gdjs {
       if (this._body) {
         this.recreateBody();
       }
+    }
+
+    /**
+     * Declare a behavior that handles the body itself while it's activated,
+     * like {@link gdjs.PhysicsCharacter3DRuntimeBehavior}: the body type can't
+     * be changed while one of them is activated.
+     */
+    _registerBodyHandlingBehavior(behavior: gdjs.RuntimeBehavior): void {
+      this._bodyHandlingBehaviors.push(behavior);
+    }
+
+    /**
+     * Called when a behavior handling the body is activated: the body type may
+     * have been changed while no behavior was handling the body.
+     */
+    _restoreInitialBodyType(): void {
+      this.bodyType = this._initialBodyType;
     }
 
     isBullet(): boolean {

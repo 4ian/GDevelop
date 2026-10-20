@@ -278,6 +278,7 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js`,
       `${gdjsRuntimePath}/Extensions/Physics3DBehavior/Physics3DTools.js`,
       `${gdjsRuntimePath}/Extensions/Physics3DBehavior/PhysicsCharacter3DRuntimeBehavior.js`,
+      `${gdjsRuntimePath}/Extensions/Physics3DBehavior/PhysicsCar3DRuntimeBehavior.js`,
       `${gdjsRuntimePath}/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js`,
       `${gdjsRuntimePath}/Extensions/TweenBehavior/TweenManager.js`,
       `${gdjsRuntimePath}/Extensions/TweenBehavior/tweentools.js`,

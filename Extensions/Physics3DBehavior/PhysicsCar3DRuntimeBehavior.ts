@@ -158,6 +158,11 @@ namespace gdjs {
       if (this._physics3D) {
         return this._physics3D;
       }
+      // A deactivated car must not take the body (for instance when the drive
+      // wheels are changed).
+      if (!this.activated()) {
+        return null;
+      }
       const behavior = this.owner.getBehavior(
         this._physics3DBehaviorName
       ) as gdjs.Physics3DRuntimeBehavior;
@@ -362,12 +367,11 @@ namespace gdjs {
     }
 
     override onCreated() {
-      // The body is handled by this behavior: its type can't be changed.
       const behavior = this.owner.getBehavior(
         this._physics3DBehaviorName
       ) as gdjs.Physics3DRuntimeBehavior | null;
       if (behavior) {
-        behavior._isBodyHandledByAnotherBehavior = true;
+        behavior._registerBodyHandlingBehavior(this);
       }
     }
 
@@ -385,6 +389,7 @@ namespace gdjs {
       if (!behavior) {
         return;
       }
+      behavior._restoreInitialBodyType();
       behavior._destroyBody();
     }
 

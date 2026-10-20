@@ -395,6 +395,24 @@ describe('gdjs.Physics3DRuntimeBehavior', () => {
 
       expect(box.getZ()).to.be.within(198, 202);
     });
+
+    it('synchronizes the body type', () => {
+      const runtimeScene = createScene();
+      const box = addBox(runtimeScene, 'Kinematic');
+      const otherBox = addBox(runtimeScene, 'Kinematic');
+      otherBox.setCenterXInScene(800);
+      stepSeconds(runtimeScene, 0.5);
+
+      getPhysics3D(box).setBodyType('Dynamic');
+      const syncData = getPhysics3D(box).getNetworkSyncData({});
+      // The other box is moved where the box is: remove the box.
+      box.deleteFromScene();
+      getPhysics3D(otherBox).updateFromNetworkSyncData(syncData, {});
+      stepSeconds(runtimeScene, 1);
+
+      expect(getPhysics3D(otherBox).isDynamic()).to.be(true);
+      expect(otherBox.getZ()).to.be.below(200);
+    });
   });
 
   it('uses the box shape again when the surface is removed', () => {

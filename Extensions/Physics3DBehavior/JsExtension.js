@@ -981,7 +981,7 @@ module.exports = {
           'SetBodyType',
           _('Body type'),
           _(
-            'Change the type of the body: static, dynamic or kinematic. For instance, an enemy moved by a pathfinding behavior can be kinematic, and become dynamic to be thrown by an impulse when it is hit. The velocities are kept. Static bodies are in the layers 1 to 4, dynamic and kinematic bodies in the layers 5 to 8: with the default layers (1 and 5), the object collides with the same objects after the change. Bodies of 3D characters and 3D cars, and mesh shapes (only static), are not changed.'
+            'Change the type of the body: static, dynamic or kinematic. For instance, an enemy moved by a pathfinding behavior can be kinematic, and become dynamic to be thrown by an impulse when it is hit. The velocities are kept. Static bodies are in the layers 1 to 4, dynamic and kinematic bodies in the layers 5 to 8: with the default layers (1 and 5), the object collides with the same objects after the change. Nothing is changed while a 3D character or 3D car behavior of the object is activated (it gets back its type from the editor when activated again), and for mesh shapes (only static).'
           ),
           _('Change the body type of _PARAM0_ to _PARAM2_'),
           _('Dynamics'),

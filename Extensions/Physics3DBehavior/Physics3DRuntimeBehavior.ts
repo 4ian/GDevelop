@@ -474,59 +474,6 @@ namespace gdjs {
       return tempQuat;
     }
 
-    override applyBehaviorOverriding(behaviorData): boolean {
-      if (behaviorData.bullet !== undefined) {
-        this.setBullet(behaviorData.bullet);
-      }
-      if (behaviorData.fixedRotation !== undefined) {
-        this.setFixedRotation(behaviorData.fixedRotation);
-      }
-      if (behaviorData.shapeDimensionA !== undefined) {
-        this.shapeDimensionA = behaviorData.shapeDimensionA;
-        this._needToRecreateShape = true;
-      }
-      if (behaviorData.shapeDimensionB !== undefined) {
-        this.shapeDimensionB = behaviorData.shapeDimensionB;
-        this._needToRecreateShape = true;
-      }
-      if (behaviorData.density !== undefined) {
-        this.setDensity(behaviorData.density);
-      }
-      if (behaviorData.friction !== undefined) {
-        this.setFriction(behaviorData.friction);
-      }
-      if (behaviorData.restitution !== undefined) {
-        this.setRestitution(behaviorData.restitution);
-      }
-      if (behaviorData.linearDamping !== undefined) {
-        this.setLinearDamping(behaviorData.linearDamping);
-      }
-      if (behaviorData.angularDamping !== undefined) {
-        this.setAngularDamping(behaviorData.angularDamping);
-      }
-      if (behaviorData.gravityScale !== undefined) {
-        this.setGravityScale(behaviorData.gravityScale);
-      }
-
-      // TODO: make these properties updatable.
-      if (behaviorData.layers !== undefined) {
-        return false;
-      }
-      if (behaviorData.masks !== undefined) {
-        return false;
-      }
-      if (behaviorData.vertices !== undefined) {
-        return false;
-      }
-      if (behaviorData.bodyType !== undefined) {
-        return false;
-      }
-      if (behaviorData.shape !== undefined) {
-        return false;
-      }
-      return true;
-    }
-
     override getNetworkSyncData(
       options: GetNetworkSyncDataOptions
     ): Physics3DNetworkSyncData {
@@ -1546,10 +1493,21 @@ namespace gdjs {
     }
 
     override applyBehaviorOverriding(diff: BehaviorData): boolean {
+      const d = diff as any;
+      // Properties that can be updated on the existing body.
+      if (d.bullet !== undefined) this.setBullet(d.bullet);
+      if (d.fixedRotation !== undefined) this.setFixedRotation(d.fixedRotation);
+      if (d.density !== undefined) this.setDensity(d.density);
+      if (d.friction !== undefined) this.setFriction(d.friction);
+      if (d.restitution !== undefined) this.setRestitution(d.restitution);
+      if (d.linearDamping !== undefined) this.setLinearDamping(d.linearDamping);
+      if (d.angularDamping !== undefined)
+        this.setAngularDamping(d.angularDamping);
+      if (d.gravityScale !== undefined) this.setGravityScale(d.gravityScale);
+
       this._applyBehaviorData(diff);
 
       // Recreate the body if any shape-related property changed.
-      const d = diff as any;
       const shapeChanged =
         'shape' in d ||
         'shapeOrientation' in d ||
@@ -1563,7 +1521,9 @@ namespace gdjs {
         'massCenterOffsetY' in d ||
         'massCenterOffsetZ' in d ||
         'meshShapeResourceName' in d ||
-        'bodyType' in d;
+        'bodyType' in d ||
+        'layers' in d ||
+        'masks' in d;
       if (shapeChanged) {
         this.recreateBody();
       }

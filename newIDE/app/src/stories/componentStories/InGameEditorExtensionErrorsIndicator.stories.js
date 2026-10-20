@@ -66,3 +66,9 @@ export const OneError = (): React.Node => (
 export const SeveralErrorsIncludingAStoreExtension = (): React.Node => (
   <IndicatorStory shownErrors={errors} />
 );
+
+export const OnlyStoreExtensionErrors = (): React.Node => (
+  <IndicatorStory
+    shownErrors={errors.filter(error => error.extensionName === 'Terrain3D')}
+  />
+);

@@ -36,7 +36,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 22
           cache: "npm"
           cache-dependency-path: "newIDE/app/package-lock.json"
 
@@ -103,7 +103,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 22
 
       # Only the dependency of the script is installed, not the whole editor.
       - name: Install script dependencies

@@ -17,6 +17,7 @@ module.exports = defineConfig({
       include: /[\\/]src[\\/]/,
       // Locales are already compiled by Lingui, and are huge.
       exclude: /[\\/]src[\\/]locales[\\/]/,
+      parallel: true,
       babelLoaderOptions: config => {
         config.babelrc = false;
         config.configFile = false;
@@ -59,9 +60,7 @@ module.exports = defineConfig({
     open: process.env.BROWSER !== 'none',
   },
   performance: {
-    // Makes restarts of the development server about 4 times faster. Not used
-    // for production builds, as it's still experimental in Rsbuild 1.
-    buildCache: !isProduction,
+    buildCache: true,
   },
   tools: {
     rspack: config => {

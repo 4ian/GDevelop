@@ -2614,6 +2614,31 @@ describe('Multiplayer', () => {
   });
 
   describe('Player ping', () => {
+    it('ignores a queued heartbeat answer after the lobby has ended', async () => {
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
+      const allConnectedPlayers = [
+        { playerNumber: 1, peerId: 'player-1', isHost: true },
+        { playerNumber: 2, peerId: 'player-2' },
+      ];
+      initiateGameWithPlayers(allConnectedPlayers);
+      switchToPeer({ playerNumber: 1, allConnectedPlayers });
+
+      await gdjs.multiplayer.leaveGameLobby();
+      gdjs.multiplayerPeerJsHelper
+        .getOrCreateMessagesList('#heartbeat#2')
+        .pushMessage(
+          {
+            sentAt: Date.now(),
+            playerId: 'player-2-id',
+            username: 'Player 2',
+          },
+          'player-2'
+        );
+
+      gdjs.multiplayerMessageManager.handleHeartbeatsReceived();
+    });
+
     it('updates player pings on non-host clients after receiving heartbeats from the host', async () => {
       const {
         switchToPeer,

@@ -57,6 +57,9 @@ const useVariablesContainerRefactoring = ({
   // if it is still pending - so that two changes that must stay separate
   // (like for the history) are not applied as a single one.
   applyPendingRefactoringOfPreviousChanges: () => void,
+  // Forget the pending changes and start again from the current state of
+  // the variables container (after an undo/redo changed it).
+  resetSnapshot: () => void,
 |} => {
   const snapshotRef = React.useRef<gdSerializerElement | null>(null);
   // The state of the variables container after the last change.
@@ -184,40 +187,56 @@ const useVariablesContainerRefactoring = ({
     []
   );
 
+  const takeSnapshot = React.useCallback(() => {
+    // Only ensure UUIDs are set (for variables that don't have one yet) -
+    // existing UUIDs are preserved, as they are persisted in the project
+    // file and must stay stable to avoid useless changes in it.
+    const variablesContainer = variablesContainerRef.current;
+    variablesContainer.ensurePersistentUuids();
+    const snapshot = new gd.SerializerElement();
+    variablesContainer.serializeTo(snapshot);
+    snapshotRef.current = snapshot;
+  }, []);
+
+  const discardSnapshots = React.useCallback(() => {
+    // Cancel any pending debounced refactoring — the C++ object may
+    // already be deleted (e.g., the object was removed), so we must
+    // not attempt to access it.
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Free the snapshots C++ memory.
+    if (snapshotRef.current) {
+      snapshotRef.current.delete();
+      snapshotRef.current = null;
+    }
+    if (lastChangeSnapshotRef.current) {
+      lastChangeSnapshotRef.current.delete();
+      lastChangeSnapshotRef.current = null;
+    }
+  }, []);
+
   React.useEffect(
     () => {
       if (!enabled) return;
 
-      // Setup: snapshot the current state of the variables container.
-      // Only ensure UUIDs are set (for variables that don't have one yet) -
-      // existing UUIDs are preserved, as they are persisted in the project
-      // file and must stay stable to avoid useless changes in it.
-      variablesContainer.ensurePersistentUuids();
-      const snapshot = new gd.SerializerElement();
-      variablesContainer.serializeTo(snapshot);
-      snapshotRef.current = snapshot;
-
-      return () => {
-        // Cancel any pending debounced refactoring — the C++ object may
-        // already be deleted (e.g., the object was removed), so we must
-        // not attempt to access it.
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-          timerRef.current = null;
-        }
-
-        // Free the snapshots C++ memory.
-        if (snapshotRef.current) {
-          snapshotRef.current.delete();
-          snapshotRef.current = null;
-        }
-        if (lastChangeSnapshotRef.current) {
-          lastChangeSnapshotRef.current.delete();
-          lastChangeSnapshotRef.current = null;
-        }
-      };
+      takeSnapshot();
+      return discardSnapshots;
     },
-    [variablesContainer, enabled]
+    [variablesContainer, enabled, takeSnapshot, discardSnapshots]
+  );
+
+  const resetSnapshot = React.useCallback(
+    () => {
+      if (!snapshotRef.current) return;
+      if (!exceptionallyGuardAgainstDeadObject(variablesContainerRef.current))
+        return;
+      discardSnapshots();
+      takeSnapshot();
+    },
+    [takeSnapshot, discardSnapshots]
   );
 
   const applyPendingRefactoringOfPreviousChanges = React.useCallback(
@@ -265,7 +284,11 @@ const useVariablesContainerRefactoring = ({
     [applyPendingRefactoring]
   );
 
-  return { onVariablesUpdated, applyPendingRefactoringOfPreviousChanges };
+  return {
+    onVariablesUpdated,
+    applyPendingRefactoringOfPreviousChanges,
+    resetSnapshot,
+  };
 };
 
 export default useVariablesContainerRefactoring;

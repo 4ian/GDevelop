@@ -1105,6 +1105,27 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [editName]
     );
 
+    // Deleting an object of the scene also deletes its instances in the
+    // external layouts of the scene - which undo won't bring back.
+    const hasInstancesInExternalLayouts = React.useCallback(
+      (objectName: string): boolean => {
+        if (!layout) return false;
+        const layoutName = layout.getName();
+        for (let i = 0; i < project.getExternalLayoutsCount(); i++) {
+          const externalLayout = project.getExternalLayoutAt(i);
+          if (
+            externalLayout.getAssociatedLayout() === layoutName &&
+            externalLayout
+              .getInitialInstances()
+              .hasInstancesOfObject(objectName)
+          )
+            return true;
+        }
+        return false;
+      },
+      [project, layout]
+    );
+
     const {
       bulkCopy,
       bulkDelete,
@@ -1119,6 +1140,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       project,
       globalObjectsContainer,
       objectsContainer,
+      hasInstancesInExternalLayouts,
       selectedObjectFolderOrObjectsWithContext,
       canSetAsGlobalObject,
       selectObjectFolderOrObjectsWithContext,
@@ -1187,6 +1209,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         getThumbnail,
         showDeleteConfirmation,
+        hasInstancesInExternalLayouts,
         selectObjectFolderOrObjectWithContext,
         selectObjectFolderOrObjectsWithContext,
         addFolder,
@@ -1217,6 +1240,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         getThumbnail,
         showDeleteConfirmation,
+        hasInstancesInExternalLayouts,
         selectObjectFolderOrObjectWithContext,
         selectObjectFolderOrObjectsWithContext,
         addFolder,

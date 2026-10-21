@@ -207,6 +207,7 @@ export type SceneEditorsDisplayInterface = {|
   forceUpdateInstancesList: () => void,
   forceUpdatePropertiesEditor: () => void,
   revealPropertiesVariable: (nodeId: string) => void,
+  resetPropertiesVariablesRefactoring: () => void,
   forceUpdateObjectsList: () => void,
   scrollObjectsListToObject: (object: gdObject) => void,
   forceUpdateObjectGroupsList: () => void,

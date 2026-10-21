@@ -23,6 +23,7 @@ import ProjectManager, {
 import useProjectManagerHistory, {
   type ProjectManagerRenameCommand,
   type ProjectManagerHistoryChange,
+  type ProjectManagerHistoryTargetKey,
 } from './useProjectManagerHistory';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
@@ -1886,6 +1887,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           previousDeletion
             .then(() => onWillDeleteScene({ scene: layout }))
             .then(() => {
+              projectManagerHistory.recordDeletion('scenes', layout.getName());
               if (currentProject.getFirstLayout() === layout.getName())
                 currentProject.setFirstLayout('');
               currentProject.removeLayout(layout.getName());
@@ -1893,7 +1895,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         Promise.resolve()
       )
       .then(() => {
-        projectManagerHistory.recordStep('scenes', 'DELETE', names[0]);
         _onProjectItemModified();
         return true;
       });
@@ -1941,8 +1942,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     })).then(state => {
       const { currentProject } = state;
       if (currentProject) {
-        names.forEach(name => currentProject.removeExternalLayout(name));
-        projectManagerHistory.recordStep('externalLayouts', 'DELETE', names[0]);
+        names.forEach(name => {
+          projectManagerHistory.recordDeletion('externalLayouts', name);
+          currentProject.removeExternalLayout(name);
+        });
       }
       _onProjectItemModified();
       return true;
@@ -1991,8 +1994,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     })).then(state => {
       const { currentProject } = state;
       if (currentProject) {
-        names.forEach(name => currentProject.removeExternalEvents(name));
-        projectManagerHistory.recordStep('externalEvents', 'DELETE', names[0]);
+        names.forEach(name => {
+          projectManagerHistory.recordDeletion('externalEvents', name);
+          currentProject.removeExternalEvents(name);
+        });
       }
       _onProjectItemModified();
       return true;
@@ -2506,7 +2511,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onSceneAdded = React.useCallback(
     (name: string) => {
-      projectManagerHistory.recordStep('scenes', 'ADD', name);
+      projectManagerHistory.recordAddition('scenes', name);
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
@@ -2520,7 +2525,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onExternalLayoutAdded = React.useCallback(
     (name: string) => {
-      projectManagerHistory.recordStep('externalLayouts', 'ADD', name);
+      projectManagerHistory.recordAddition('externalLayouts', name);
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
@@ -2534,7 +2539,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onExternalEventsAdded = React.useCallback(
     (name: string) => {
-      projectManagerHistory.recordStep('externalEvents', 'ADD', name);
+      projectManagerHistory.recordAddition('externalEvents', name);
     },
     [projectManagerHistory]
   );
@@ -2884,12 +2889,44 @@ const MainFrame = (props: Props): React.MixedElement => {
     }, 100);
   };
 
+  // Like a deletion from the project manager: the editors opened on the
+  // items are closed before the items are removed by an undo/redo.
+  const closeTabsOfProjectManagerItems = async (
+    targetKey: ProjectManagerHistoryTargetKey,
+    itemNames: Array<string>
+  ) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+    for (const name of itemNames) {
+      if (targetKey === 'scenes') {
+        if (currentProject.hasLayoutNamed(name))
+          await onWillDeleteScene({ scene: currentProject.getLayout(name) });
+      } else if (targetKey === 'externalLayouts') {
+        if (currentProject.hasExternalLayoutNamed(name))
+          await onWillDeleteScene({
+            externalLayout: currentProject.getExternalLayout(name),
+          });
+      } else if (targetKey === 'externalEvents') {
+        if (currentProject.hasExternalEventsNamed(name)) {
+          const externalEvents = currentProject.getExternalEvents(name);
+          await setState(state => ({
+            ...state,
+            editorTabs: closeExternalEventsTabs(
+              state.editorTabs,
+              externalEvents
+            ),
+          }));
+        }
+      }
+    }
+  };
+
   const onProjectManagerUndo = React.useCallback(
-    () => {
-      const change = projectManagerHistory.undo(
-        state.currentProject,
-        applyProjectManagerRenameCommand
-      );
+    async () => {
+      const change = await projectManagerHistory.undo(state.currentProject, {
+        applyRenameCommand: applyProjectManagerRenameCommand,
+        onWillRemoveItems: closeTabsOfProjectManagerItems,
+      });
       if (change) revealProjectManagerHistoryChange(change);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2897,11 +2934,11 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onProjectManagerRedo = React.useCallback(
-    () => {
-      const change = projectManagerHistory.redo(
-        state.currentProject,
-        applyProjectManagerRenameCommand
-      );
+    async () => {
+      const change = await projectManagerHistory.redo(state.currentProject, {
+        applyRenameCommand: applyProjectManagerRenameCommand,
+        onWillRemoveItems: closeTabsOfProjectManagerItems,
+      });
       if (change) revealProjectManagerHistoryChange(change);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -6706,8 +6743,12 @@ const MainFrame = (props: Props): React.MixedElement => {
           onSceneAdded={onSceneAdded}
           onExternalLayoutAdded={onExternalLayoutAdded}
           onExternalEventsAdded={onExternalEventsAdded}
-          onUndo={onProjectManagerUndo}
-          onRedo={onProjectManagerRedo}
+          onUndo={() => {
+            onProjectManagerUndo();
+          }}
+          onRedo={() => {
+            onProjectManagerRedo();
+          }}
           onShareProject={() => {
             openShareDialog();
           }}

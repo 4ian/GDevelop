@@ -92,6 +92,7 @@ export type ObjectTreeViewItemProps = {|
     folder?: gdObjectFolderOrObject,
   |}) => void,
   showDeleteConfirmation: (options: any) => Promise<boolean>,
+  hasInstancesInExternalLayouts: (objectName: string) => boolean,
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -579,13 +580,18 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       objectsContainer,
       onObjectModified,
       showDeleteConfirmation,
+      hasInstancesInExternalLayouts,
       onDeleteObjects,
       selectObjectFolderOrObjectWithContext,
     } = this.props;
 
     const answer = await showDeleteConfirmation({
       title: t`Remove object`,
-      message: t`Are you sure you want to remove this object?`,
+      message: this._isGlobal
+        ? t`Are you sure you want to remove this global object? It will be removed from every scene. Undo will bring it back in the current scene only: its instances in the other scenes will be lost.`
+        : hasInstancesInExternalLayouts(object.getName())
+        ? t`Are you sure you want to remove this object? It will also be removed from the external layouts of this scene. Undo will bring it back in the scene only: its instances in the external layouts will be lost.`
+        : t`Are you sure you want to remove this object?`,
     });
     if (!answer) return false;
 

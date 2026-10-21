@@ -393,6 +393,28 @@ export const savePartialValueToHistory = (
 };
 
 /**
+ * Save a new step made of the given (partial, already serialized) values of
+ * some targets, before and after a change made by the caller - for a
+ * caller knowing both better than the cached current value.
+ */
+export const saveValueChangeToHistory = (
+  history: HistoryState,
+  valueBeforeChange: Object,
+  valueAfterChange: Object,
+  actionType?: RevertableActionType,
+  changeContext?: any
+): HistoryState => {
+  if (areSerializedValuesEqual(valueBeforeChange, valueAfterChange)) {
+    return history;
+  }
+  return pushUndoAction(
+    history,
+    { type: actionType, valueBeforeChange, changeContext },
+    { ...history.currentValue, ...valueAfterChange }
+  );
+};
+
+/**
  * Save a new step capturing the current state of the given targets.
  */
 export const saveCompositeToHistory = (

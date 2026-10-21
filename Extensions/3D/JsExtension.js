@@ -3700,7 +3700,13 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        return 'JsPlatform/Extensions/3d_model.svg';
+        const modelResourceName = gd
+          .castObject(objectConfiguration, gd.Model3DObjectConfiguration)
+          .getModelResourceName();
+        const previewUrl =
+          resourcesLoader.getModel3DPreviewUrl &&
+          resourcesLoader.getModel3DPreviewUrl(project, modelResourceName);
+        return previewUrl || 'JsPlatform/Extensions/3d_model.svg';
       }
 
       getOriginX() {

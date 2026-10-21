@@ -1,10 +1,6 @@
 /* eslint-env worker */
 // @flow
-// IMPORTANT: this file is compiled as a worker entry point by `worker-loader`,
-// which does NOT process it with Babel: it must stay plain JavaScript.
-// In particular, no Flow syntax can be used (type imports or annotations) -
-// otherwise the whole build breaks (silently producing an empty build folder,
-// which is caught by scripts/check-build-output.js).
+// This file is compiled as a worker entry point by `worker-rspack-loader`.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';

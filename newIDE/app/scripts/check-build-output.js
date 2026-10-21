@@ -8,9 +8,8 @@ const buildPath = path.join(__dirname, '..', 'build');
  * Verify that the build folder contains the files expected for a working
  * app. This is important because the build can, in some cases, "succeed"
  * while producing an empty or unusable build folder. For example, an error
- * in a web worker file (compiled by `worker-loader` in a child compilation)
- * is not reported as an error of the whole compilation - see
- * `Resource3DPreview.worker.js`.
+ * in a web worker file (compiled by `worker-rspack-loader` in a child compilation)
+ * may not be reported as an error of the whole compilation.
  */
 const checkBuildOutput = () => {
   const errors = [];
@@ -29,9 +28,9 @@ const checkBuildOutput = () => {
   };
 
   checkFileExists('', /^index\.html$/);
-  checkFileExists('static/js', /^main\..*\.js$/);
-  checkFileExists('static/css', /^main\..*\.css$/);
-  // Workers are compiled separately by worker-loader: check they were
+  checkFileExists('static/js', /^index\..*\.js$/);
+  checkFileExists('static/css', /^index\..*\.css$/);
+  // Workers are compiled separately by worker-rspack-loader: check they were
   // properly built too.
   checkFileExists('', /^Resource3DPreview\.worker\..*\.worker\.js$/);
   checkFileExists('', /^BackgroundSerializer\.worker\..*\.worker\.js$/);

@@ -1,7 +1,7 @@
 // @flow
 
 import VersionMetadata from '../Version/VersionMetadata';
-// Import the worker (handled by worker-loader)
+// Import the worker (handled by worker-rspack-loader)
 import BackgroundSerializerWorker from './BackgroundSerializer.worker';
 
 const gd: libGDevelop = global.gd;
@@ -26,7 +26,7 @@ const getOrCreateBackgroundSerializerWorker = (): Worker => {
     return serializerWorker;
   }
 
-  // $FlowFixMe[incompatible-type] - worker-loader types aren't recognized by Flow
+  // $FlowFixMe[incompatible-type] - worker-rspack-loader types aren't recognized by Flow
   // $FlowFixMe[invalid-constructor]
   serializerWorker = new BackgroundSerializerWorker();
 

@@ -10,6 +10,9 @@
     "@babel/preset-react": "^7.22.5",
     "@lingui/cli": "^2.7.3",
     "@lingui/macro": "^2.7.3",
+    "@rsbuild/core": "1.7.6",
+    "@rsbuild/plugin-babel": "1.2.1",
+    "@rsbuild/plugin-react": "1.4.6",
     "@storybook/addon-essentials": "7.4.6",
     "@storybook/addons": "7.4.6",
     "@storybook/components": "7.4.6",
@@ -44,7 +47,7 @@
     "typescript": "^4.1.3",
     "webpack": "5.88.2",
     "workbox-build": "^4.3.1",
-    "worker-loader": "^3.0.8"
+    "worker-rspack-loader": "3.1.5"
   },
   "dependencies": {
     "@blueprintjs/core": "file:src/Utils/BlueprintJsPlaceholder",
@@ -122,10 +125,10 @@
     "import-resources": "npm run make-version-metadata && npm run import-zipped-external-editors && npm run build-theme-resources && npm run make-service-worker && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js",
     "make-version-metadata": "cd scripts && node make-version-metadata.js",
     "make-service-worker": "cd scripts && node make-service-worker.js",
-    "start": "npm run import-resources && concurrently \"react-app-rewired start\" \"node scripts/watch-serve-GDJS-runtime.js\" -n \"editor,game engine\" --kill-others",
+    "start": "npm run import-resources && concurrently \"rsbuild dev\" \"node scripts/watch-serve-GDJS-runtime.js\" -n \"editor,game engine\" --kill-others",
     "electron-app": "cd ../electron-app && npm run start",
-    "build": "npm run import-resources && react-app-rewired build && node scripts/check-build-output.js",
-    "build:dev": "npm run import-resources && REACT_APP_ENV=development react-app-rewired build && node scripts/check-build-output.js && node scripts/copy-GDJS-Runtime-to-build.js",
+    "build": "npm run import-resources && rsbuild build && node scripts/check-build-output.js",
+    "build:dev": "npm run import-resources && REACT_APP_ENV=development rsbuild build && node scripts/check-build-output.js && node scripts/copy-GDJS-Runtime-to-build.js",
     "format": "prettier --write \"src/!(locales)/**/*.js\"",
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
     "lint": "eslint src/ --max-warnings=0",

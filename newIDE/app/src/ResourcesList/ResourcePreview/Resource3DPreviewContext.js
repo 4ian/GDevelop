@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-// Import the worker (will be handled by worker-loader)
+// Import the worker (will be handled by worker-rspack-loader)
 import Resource3DPreviewWorker from './Resource3DPreview.worker';
 import { checkIfCredentialsRequired } from '../../Utils/CrossOrigin';
 import {
@@ -80,7 +80,7 @@ class Resource3DPreviewWorkerManager {
   fallbackImagePath: string = 'JsPlatform/Extensions/3d_model.svg';
 
   constructor() {
-    // $FlowFixMe[incompatible-type] - worker-loader types aren't recognized by Flow
+    // $FlowFixMe[incompatible-type] - worker-rspack-loader types aren't recognized by Flow
     // $FlowFixMe[invalid-constructor]
     this.worker = new Resource3DPreviewWorker();
     this.setupMessageHandlers();

@@ -12,7 +12,7 @@ clone_depth: 5
 # Build must be triggered by the API.
 skip_tags: true # Don't rebuild on tags.
 init:
-  - ps: Install-Product node 16
+  - ps: Install-Product node 20
   - cmd: set NODE_OPTIONS=--max-old-space-size=8192
 cache:
   - '%APPDATA%\npm-cache'               # npm cache

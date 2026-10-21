@@ -378,7 +378,10 @@ export const savePartialValueToHistory = (
   history: HistoryState,
   partialValue: Object,
   actionType?: RevertableActionType,
-  changeContext?: any
+  changeContext?: any,
+  // A change made along with the snapshot one, that the caller reverts
+  // and re-applies itself (see `saveCommandToHistory`).
+  command?: any
 ): HistoryState => {
   const keys = Object.keys(partialValue);
   const valueBeforeChange = pickValues(history.currentValue, keys);
@@ -387,7 +390,7 @@ export const savePartialValueToHistory = (
   }
   return pushUndoAction(
     history,
-    { type: actionType, valueBeforeChange, changeContext },
+    { type: actionType, valueBeforeChange, changeContext, command },
     { ...history.currentValue, ...partialValue }
   );
 };

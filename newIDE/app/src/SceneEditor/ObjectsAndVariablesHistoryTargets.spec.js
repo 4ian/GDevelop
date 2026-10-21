@@ -5,6 +5,7 @@ import {
   getObjectGroupsContainerHistoryTarget as _getObjectGroupsContainerHistoryTarget,
 } from './ObjectsAndVariablesHistoryTargets';
 import { type CompositeTarget } from '../Utils/History';
+import { serializeToJSObject } from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -373,6 +374,46 @@ describe('getObjectsContainerHistoryTarget', () => {
         .getObject()
         .getName()
     ).toBe('Enemy');
+
+    project.delete();
+  });
+});
+
+describe('getObjectsContainerHistoryTarget - type changed outside the history', () => {
+  it('recreates an object whose type is not the one of the snapshot', () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const objectsContainer = layout.getObjects();
+    objectsContainer.insertNewObject(project, 'Sprite', 'Hero', 0);
+    const target = asValueTarget(
+      _getObjectsContainerHistoryTarget(
+        objectsContainer,
+        project,
+        noopEnsurePersistentUuids
+      )
+    );
+    const before = target.getValue();
+
+    // Something not tracked by the history replaces the object.
+    objectsContainer.removeObject('Hero');
+    const textObject = objectsContainer.insertNewObject(
+      project,
+      'TextObject::Text',
+      'Hero',
+      0
+    );
+    gd.asTextObjectConfiguration(textObject.getConfiguration()).setText(
+      'Hello'
+    );
+
+    target.setValue(before);
+    const hero = objectsContainer.getObject('Hero');
+    expect(hero.getType()).toBe('Sprite');
+    // A real Sprite configuration, not a Text one with a "Sprite" label.
+    const serializedHero = serializeToJSObject(hero);
+    expect(Array.isArray(serializedHero.animations)).toBe(true);
+    expect(serializedHero.string).toBeUndefined();
 
     project.delete();
   });

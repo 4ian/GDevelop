@@ -345,6 +345,10 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         openBehaviorEvents: props.openBehaviorEvents,
                         onExtractAsExternalLayout:
                           props.onExtractAsExternalLayout,
+                        onUndoExtractAsExternalLayout:
+                          props.onUndoExtractAsExternalLayout,
+                        onRedoExtractAsExternalLayout:
+                          props.onRedoExtractAsExternalLayout,
                         onExtractAsEventBasedObject:
                           props.onExtractAsEventBasedObject,
                         onEventBasedObjectTypeChanged:

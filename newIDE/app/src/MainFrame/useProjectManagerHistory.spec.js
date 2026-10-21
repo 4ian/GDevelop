@@ -352,6 +352,66 @@ describe('useProjectManagerHistory', () => {
     project.delete();
   });
 
+  it('applies one step for two undos started at the same time, and keeps a step recorded while an undo waits', async () => {
+    const project = makeProject();
+    const { call, resultRef } = renderProjectManagerHistoryTester(project);
+    project.insertNewLayout('Scene3', 2);
+    await call(r => r.recordAddition('scenes', 'Scene3'));
+    project.insertNewLayout('Scene4', 3);
+    await call(r => r.recordAddition('scenes', 'Scene4'));
+
+    const waitResolvers = [];
+    const onWillRemoveItems = () =>
+      new Promise<void>(resolve => {
+        waitResolvers.push(resolve);
+      });
+    const options: ProjectManagerHistoryApplyOptions = {
+      applyRenameCommand: noopApplyRenameCommand,
+      onWillRemoveItems,
+    };
+    const appliedCount = await call<number>(async r => {
+      const first = r.undo(project, options);
+      const second = r.undo(project, options);
+      // Recorded while the first undo waits for the tabs to close.
+      project.insertNewLayout('Scene5', 4);
+      if (resultRef.current)
+        resultRef.current.recordAddition('scenes', 'Scene5');
+      waitResolvers.forEach(resolve => resolve());
+      const results = await Promise.all([first, second]);
+      return results.filter(Boolean).length;
+    });
+    expect(appliedCount).toBeLessThanOrEqual(1);
+    expect(project.hasLayoutNamed('Scene3')).toBe(true);
+    expect(project.hasLayoutNamed('Scene5')).toBe(true);
+
+    // The step recorded during the wait is the next one to undo.
+    await call(r =>
+      r.undo(project, { applyRenameCommand: noopApplyRenameCommand })
+    );
+    expect(project.hasLayoutNamed('Scene5')).toBe(false);
+    expect(project.hasLayoutNamed('Scene3')).toBe(true);
+
+    project.delete();
+  });
+
+  it('only removes the added item when undoing an addition, keeping items added later without being recorded', async () => {
+    const project = makeProject();
+    const { call } = renderProjectManagerHistoryTester(project);
+    project.insertNewExternalEvents('A', 0);
+    await call(r => r.recordAddition('externalEvents', 'A'));
+    // Duplicated (or pasted, or created by the AI) without a record.
+    project.insertNewExternalEvents('A2', 1);
+
+    await call(r => r.undo(project, noopOptions));
+    expect(project.hasExternalEventsNamed('A')).toBe(false);
+    expect(project.hasExternalEventsNamed('A2')).toBe(true);
+    await call(r => r.redo(project, noopOptions));
+    expect(project.hasExternalEventsNamed('A')).toBe(true);
+    expect(project.hasExternalEventsNamed('A2')).toBe(true);
+
+    project.delete();
+  });
+
   it('tells which items an undo/redo is about to remove, before removing them', async () => {
     const project = makeProject();
     const { call } = renderProjectManagerHistoryTester(project);

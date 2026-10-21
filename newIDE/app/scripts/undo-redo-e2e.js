@@ -4,7 +4,7 @@
  *
  * Usage:
  *   node scripts/undo-redo-e2e.js [--url=http://localhost:3000]
- *     [--only=name1,name2] [--headed] [--list]
+ *     [--only=name1,name2] [--headed] [--list] [--3d [--all]]
  *   E2E_DEBUG=1 also prints the console errors and page errors.
  *
  * Chrome is found with the CHROME_PATH environment variable (or at its
@@ -303,11 +303,47 @@ class Editor {
       for (const item of items) {
         const text = await page.evaluate(el => el.textContent || '', item);
         if (regex.test(text)) {
-          await item.click();
+          try {
+            await item.click();
+          } catch (error) {
+            // The menu was rendered again (a submenu opening): retry.
+            if (/detached/i.test(error.message)) return false;
+            throw error;
+          }
           return true;
         }
       }
       return false;
+    });
+  }
+
+  // A submenu opens on hover of its parent entry: hover until the entry
+  // shows, then click it.
+  async clickSubmenuItem(parentRegex, regex) {
+    const { page } = this;
+    const findItem = async itemRegex => {
+      const items = await page.$$('li[role="menuitem"], li');
+      for (const item of items) {
+        const text = await page.evaluate(el => el.textContent || '', item);
+        if (itemRegex.test(text)) return item;
+      }
+      return null;
+    };
+    await this.waitUntil(`submenu item ${regex}`, async () => {
+      try {
+        const item = await findItem(regex);
+        if (item) {
+          await item.click();
+          return true;
+        }
+        const parent = await findItem(parentRegex);
+        if (parent) await parent.hover();
+        await sleep(300);
+        return false;
+      } catch (error) {
+        if (/detached/i.test(error.message)) return false;
+        throw error;
+      }
     });
   }
 
@@ -1729,7 +1765,7 @@ const renameVariableInPanel = async (editor, panel, oldName, newName) => {
 const getEventActionParameter = (editor, parameterIndex, actionIndex = 0) =>
   evaluateWithSceneEditor(
     editor,
-    (props, gd, parameterIndex, actionIndex) =>
+    (props, gd, sceneEditor, parameterIndex, actionIndex) =>
       gd
         .asStandardEvent(props.layout.getEvents().getEventAt(0))
         .getActions()
@@ -5532,6 +5568,8 @@ scenarios[
 };
 
 /** Run `fn(props, gd)` with the props of the active scene editor. */
+// `fn(props, gd, sceneEditor, ...args)` runs in the page with the props and
+// the instance of the active SceneEditor.
 const evaluateWithSceneEditor = (editor, fn, ...args) =>
   editor.page.evaluate(
     (source, ...args) => {
@@ -5551,7 +5589,7 @@ const evaluateWithSceneEditor = (editor, fn, ...args) =>
       return new Function('props', 'gd', 'return ' + source)(
         fiber.stateNode.props,
         libGD
-      )(fiber.stateNode.props, libGD, ...args);
+      )(fiber.stateNode.props, libGD, fiber.stateNode, ...args);
     },
     fn.toString(),
     ...args
@@ -5995,6 +6033,248 @@ const getExternalLayoutInstanceLayers = editor =>
       `no warning about external layouts in: ${otherText}`
     );
     await editor.clickButtonWithText('[role="dialog"]', /^cancel/i);
+  };
+}
+
+{
+  const name =
+    'deleting a layer with instances in an external layout warns that undo will not restore them';
+  fixtureSetups[name] = externalLayoutFixtureSetup;
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await editor.openPanel('layers');
+    const row = await page.waitForSelector(
+      '#layers-list [data-scene="Background"]'
+    );
+    await row.click({ button: 'right' });
+    await editor.clickMenuItem(/^delete/i);
+    await page.waitForSelector('[role="dialog"]');
+    const text = await page.$eval('[role="dialog"]', el => el.textContent);
+    expectEqual(
+      /external layout/i.test(text),
+      true,
+      `warning about external layouts in: ${text}`
+    );
+    await editor.clickButtonWithText('[role="dialog"]', /^cancel/i);
+  };
+}
+
+{
+  const name =
+    'undoing the extraction of instances to an external layout removes it';
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    const getState = () =>
+      evaluateWithSceneEditor(editor, (props, gd) => ({
+        externalLayouts: props.project.getExternalLayoutsCount(),
+        instances: props.layout.getInitialInstances().getInstancesCount(),
+      }));
+    const initialState = await getState();
+    expectEqual(initialState.externalLayouts, 0, 'no external layout');
+
+    await editor.selectInstancesOf('MyObject');
+    const canvas = await page.$('#scene-editor canvas');
+    const box = await canvas.boundingBox();
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, {
+      button: 'right',
+    });
+    await editor.clickSubmenuItem(
+      /^extract$/i,
+      /extract as an external layout/i
+    );
+    await page.waitForSelector('[role="dialog"] input');
+    await editor.clickButtonWithText('[role="dialog"]', /^move instances/i);
+    await editor.waitUntil(
+      'external layout created',
+      async () => (await getState()).externalLayouts === 1
+    );
+    const extractedState = await getState();
+    expectEqual(
+      extractedState.instances < initialState.instances,
+      true,
+      'instances moved out of the scene'
+    );
+    // The external layout opened in its own tab: go back to the scene.
+    expectEqual(
+      await hasEditorTab(editor, 'Scene part'),
+      true,
+      'external layout tab opened'
+    );
+    await clickEditorTab(editor, 'Scene');
+
+    await editor.undo();
+    expectEqual(await getState(), initialState, 'state after undo');
+    await editor.waitUntil(
+      'external layout tab closed',
+      async () => !(await hasEditorTab(editor, 'Scene part'))
+    );
+    await editor.redo();
+    expectEqual(await getState(), extractedState, 'state after redo');
+    await editor.undo();
+    expectEqual(await getState(), initialState, 'state after second undo');
+  };
+}
+
+const getInstanceVariableNames = (editor, persistentUuid) =>
+  evaluateWithSceneEditor(
+    editor,
+    (props, gd, sceneEditor, persistentUuid) => {
+      const element = new gd.SerializerElement();
+      props.initialInstances.serializeTo(element);
+      const instances = JSON.parse(gd.Serializer.toJSON(element));
+      element.delete();
+      const instance = instances.find(
+        instance => instance.persistentUuid === persistentUuid
+      );
+      return instance
+        ? instance.initialVariables.map(variable => variable.name)
+        : null;
+    },
+    persistentUuid
+  );
+
+{
+  const name =
+    'an object added outside the editor (by the AI) survives the undo of a later panel change';
+  scenarios[name] = async editor => {
+    await evaluateWithSceneEditor(editor, (props, gd, sceneEditor) => {
+      props.objectsContainer.insertNewObject(
+        props.project,
+        'Sprite',
+        'AddedByAI',
+        0
+      );
+      sceneEditor.onObjectsModifiedOutsideEditor();
+    });
+    await editor.page.waitForSelector(
+      '#objects-list [data-object-name="AddedByAI"]'
+    );
+    await editor.selectObjectInList('VariablesObject');
+    const panel = '#object-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'object-variables-section');
+    await editor.setFieldValue(`${panel} #variable-0-text-value`, '134');
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.undo();
+    expectEqual(
+      await evaluateWithSceneEditor(editor, props =>
+        props.objectsContainer.hasObjectNamed('AddedByAI')
+      ),
+      true,
+      'object added outside the editor still there after undo'
+    );
+    expectEqual(
+      await editor.getFieldValue(`${panel} #variable-0-text-value`),
+      '1',
+      'variable value after undo'
+    );
+  };
+}
+
+{
+  const name =
+    'instances keep the new name of a renamed object variable when a later instance change is undone';
+  const INSTANCE_WITH_VARIABLE_UUID = '44444444-4444-4444-4444-444444444444';
+  fixtureSetups[name] = project => {
+    project.layouts[0].instances.push({
+      persistentUuid: INSTANCE_WITH_VARIABLE_UUID,
+      angle: 0,
+      customSize: false,
+      height: 0,
+      layer: '',
+      locked: false,
+      name: 'VariablesObject',
+      width: 0,
+      x: 100,
+      y: 100,
+      zOrder: 3,
+      numberProperties: [],
+      stringProperties: [],
+      initialVariables: [{ name: 'VarA', type: 'number', value: 5 }],
+    });
+  };
+  scenarios[name] = async editor => {
+    await editor.selectObjectInList('VariablesObject');
+    const panel = '#object-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'object-variables-section');
+    await renameVariableInPanel(editor, panel, 'VarA', 'HP');
+    expectEqual(
+      await getInstanceVariableNames(editor, INSTANCE_WITH_VARIABLE_UUID),
+      ['HP'],
+      'instance variable renamed with the object variable'
+    );
+
+    await editor.selectInstancesOf('VariablesObject');
+    const x = '#instance-properties-editor [id="X"]';
+    await editor.setFieldValue(x, '400');
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.undo();
+    expectEqual(await editor.getFieldValue(x), '100', 'X after undo');
+    expectEqual(
+      await getInstanceVariableNames(editor, INSTANCE_WITH_VARIABLE_UUID),
+      ['HP'],
+      'instance variable name after the undo of the move'
+    );
+  };
+}
+
+{
+  const name =
+    'undoing a scene creation keeps a scene added later outside the history';
+  scenarios[name] = async editor => {
+    await openProjectManager(editor);
+    await addSceneFromProjectManager(editor, 'Added');
+    expectEqual(await getSceneNames(editor), ['Scene', 'Added'], 'added');
+    await evaluateWithSceneEditor(editor, props => {
+      props.project.insertNewLayout('Untracked', 2);
+    });
+    // The creation is two steps: the addition and the rename.
+    await pressUndoInProjectManager(editor);
+    await sleep(500);
+    await pressUndoInProjectManager(editor);
+    await sleep(500);
+    expectEqual(
+      await getSceneNames(editor),
+      ['Scene', 'Untracked'],
+      'scenes after undoing the creation'
+    );
+  };
+}
+
+{
+  const name =
+    'undoing a scene rename does nothing when the old name is taken by a scene added outside the history';
+  scenarios[name] = async editor => {
+    await openProjectManager(editor);
+    await renameProjectManagerItem(editor, 'Scene', 'Scene2');
+    expectEqual(await getSceneNames(editor), ['Scene2'], 'after rename');
+    await evaluateWithSceneEditor(editor, props => {
+      props.project.insertNewLayout('Scene', 1);
+    });
+    await pressUndoInProjectManager(editor);
+    await sleep(500);
+    expectEqual(
+      await getSceneNames(editor),
+      ['Scene2', 'Scene'],
+      'no duplicated scene name after undo'
+    );
+  };
+}
+
+{
+  const name =
+    'the behaviors section of an instance is folded unless the instance overrides a behavior';
+  fixtureSetups[name] = behaviorFixtureSetup;
+  scenarios[name] = async editor => {
+    await editor.selectInstancesOf('MyObject');
+    const behaviorPanel =
+      '#instance-properties-editor [id="behavior-panel-DestroyOutside"]';
+    await editor.page.waitForSelector('#instance-properties-editor');
+    await sleep(300);
+    expectEqual(
+      await isSelectorVisible(editor, behaviorPanel),
+      false,
+      'behaviors section folded without override'
+    );
   };
 }
 
@@ -7325,8 +7605,12 @@ const main = async () => {
     defaultViewport: { width: 1600, height: 1000 },
   });
 
+  // In 3D mode, only the scenarios needing the 3D editor run (the others
+  // already ran in 2D mode) - unless `--all` or `--only` is given.
   const names = Object.keys(scenarios).filter(
-    name => !only || only.some(filter => name.includes(filter))
+    name =>
+      (!only || only.some(filter => name.includes(filter))) &&
+      (!with3D || only || args.includes('--all') || /3D editor/.test(name))
   );
   const failures = [];
   for (const name of names) {
@@ -7350,6 +7634,7 @@ const main = async () => {
     } catch (error) {
       failures.push(name);
       console.log(`FAIL  ${name}\n      ${error.message}`);
+      if (process.env.E2E_DEBUG && error.stack) console.log(error.stack);
       // A crash usually explains a timeout: say it.
       if (editor && editor.fatalErrors.length)
         console.log(`      Fatal error(s): ${editor.fatalErrors.join(' | ')}`);

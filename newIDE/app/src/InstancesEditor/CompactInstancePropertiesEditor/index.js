@@ -236,6 +236,25 @@ export const CompactInstancePropertiesEditor: React.ComponentType<{
       persistedPanelStateId: persistedPanelStateId,
       persistedPanelStateType: 'instances-of-object',
     });
+    // Unless the user folded/unfolded it, the behaviors section is only
+    // open when an instance overrides a behavior - decided when the
+    // instances are selected, not on each render (an undo removing the
+    // override must not fold the section showing it).
+    const areBehaviorsFoldedByDefaultRef = React.useRef<boolean>(true);
+    const lastPersistedPanelStateIdRef = React.useRef<?string>(undefined);
+    if (lastPersistedPanelStateIdRef.current !== persistedPanelStateId) {
+      lastPersistedPanelStateIdRef.current = persistedPanelStateId;
+      const firstObject = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        instances.length ? instances[0].getObjectName() : ''
+      );
+      areBehaviorsFoldedByDefaultRef.current = firstObject
+        ? instances.every(
+            instance => !instance.hasAnyOverriddenProperty(firstObject)
+          )
+        : true;
+    }
 
     const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
       object?: gdObject,
@@ -429,8 +448,16 @@ export const CompactInstancePropertiesEditor: React.ComponentType<{
               <TopLevelCollapsibleSection
                 id="behaviors-section"
                 title={<Trans>Behaviors</Trans>}
-                isFolded={isSectionFolded('behaviors')}
-                toggleFolded={() => toggleSectionFolded('behaviors')}
+                isFolded={isSectionFolded(
+                  'behaviors',
+                  areBehaviorsFoldedByDefaultRef.current
+                )}
+                toggleFolded={() =>
+                  toggleSectionFolded(
+                    'behaviors',
+                    areBehaviorsFoldedByDefaultRef.current
+                  )
+                }
                 renderContent={() => (
                   <ColumnStackLayout noMargin>
                     {!allVisibleBehaviors.length && (

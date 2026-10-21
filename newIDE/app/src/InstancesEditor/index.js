@@ -122,6 +122,9 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onInstancesMoved: (instances: Array<gdInitialInstance>) => void,
   onInstancesResized: (instances: Array<gdInitialInstance>) => void,
   onInstancesRotated: (instances: Array<gdInitialInstance>) => void,
+  // The size of instances without custom size can be known late (a
+  // texture or a model loaded after a while): what displays it must update.
+  onInstancesDefaultSizeChanged: (instances: Array<gdInitialInstance>) => void,
   selectedObjectNames: Array<string>,
   onContextMenu: (
     x: number,
@@ -581,6 +584,7 @@ export default class InstancesEditor extends Component<Props, State> {
       onInstanceClicked: this._onInstanceClicked,
       onInstanceRightClicked: this._onInstanceRightClicked,
       onInstanceDoubleClicked: this._onInstanceDoubleClicked,
+      onInstanceDefaultSizeChanged: this._onInstanceDefaultSizeChanged,
       showObjectInstancesIn3D: this._showObjectInstancesIn3D,
     });
     this.selectionRectangle = new SelectionRectangle({
@@ -1410,6 +1414,19 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
+  _instancesWithChangedDefaultSize: Array<gdInitialInstance> = [];
+  _onInstanceDefaultSizeChanged = (instance: gdInitialInstance) => {
+    // Reported once per frame, for all the instances concerned.
+    if (this._instancesWithChangedDefaultSize.length === 0) {
+      requestAnimationFrame(() => {
+        const instances = this._instancesWithChangedDefaultSize;
+        this._instancesWithChangedDefaultSize = [];
+        this.props.onInstancesDefaultSizeChanged(instances);
+      });
+    }
+    this._instancesWithChangedDefaultSize.push(instance);
+  };
+
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
     if (!this.keyboardShortcuts.shouldIgnoreDoubleClick()) {
       this.props.onInstanceDoubleClicked(instance);
@@ -1813,6 +1830,12 @@ export default class InstancesEditor extends Component<Props, State> {
   ) => {
     if (instances.length === 0) return;
 
+    // Centering can be requested before the first render created the layer
+    // renderers (for example right after an undo/redo remounted them), in
+    // which case the measured rectangle would collapse to the instance
+    // origin (its top-left corner most of the time) instead of its center.
+    this.instancesRenderer.ensureLayerRenderersExist(this.pixiRenderer);
+
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
     let lastInstanceRectangle = instanceMeasurer.getInstanceAABB(
       instances[instances.length - 1],
@@ -1820,6 +1843,84 @@ export default class InstancesEditor extends Component<Props, State> {
     );
     this.fitViewToRectangle(lastInstanceRectangle, { adaptZoom: false });
     if (offset) this.scrollBy(offset[0], offset[1]);
+  };
+
+  /**
+   * Scroll the view by the smallest amount to make the last instance
+   * visible (with a margin), so the view does a small jump towards it -
+   * keeping the direction of the movement - rather than re-centering on it.
+   */
+  scrollViewToLastInstance = (instances: Array<gdInitialInstance>) => {
+    if (instances.length === 0) return;
+
+    // See `centerViewOnLastInstance` about why this is needed.
+    this.instancesRenderer.ensureLayerRenderersExist(this.pixiRenderer);
+    const aabb = this.instancesRenderer
+      .getInstanceMeasurer()
+      .getInstanceAABB(instances[instances.length - 1], new Rectangle());
+    this._scrollViewMinimallyToRectangle(aabb);
+  };
+
+  /**
+   * Scroll the view by the smallest amount to make the given point visible
+   * (with a margin).
+   */
+  scrollViewToPoint = (x: number, y: number) => {
+    this._scrollViewMinimallyToRectangle(new Rectangle(x, y, x, y));
+  };
+
+  _scrollViewMinimallyToRectangle = (rectangle: Rectangle) => {
+    const [viewLeft, viewTop] = this.viewPosition.toSceneCoordinates(0, 0);
+    const [viewRight, viewBottom] = this.viewPosition.toSceneCoordinates(
+      this.viewPosition.getWidth(),
+      this.viewPosition.getHeight()
+    );
+    // Keep a margin so the revealed target is not stuck to the view border.
+    const marginX = (viewRight - viewLeft) * 0.1;
+    const marginY = (viewBottom - viewTop) * 0.1;
+
+    // Only scroll on an axis where the rectangle is completely out of the
+    // view: an axis where it's already (even partly) visible must not
+    // move, so the jump keeps the direction of the target.
+    let scrollX = 0;
+    if (rectangle.right < viewLeft) {
+      scrollX = rectangle.left - (viewLeft + marginX);
+    } else if (rectangle.left > viewRight) {
+      scrollX = rectangle.right - (viewRight - marginX);
+    }
+    let scrollY = 0;
+    if (rectangle.bottom < viewTop) {
+      scrollY = rectangle.top - (viewTop + marginY);
+    } else if (rectangle.top > viewBottom) {
+      scrollY = rectangle.bottom - (viewBottom - marginY);
+    }
+    if (scrollX || scrollY) this.scrollBy(scrollX, scrollY);
+  };
+
+  /**
+   * Return true if any part of the instance is currently visible in the
+   * viewport.
+   */
+  isInstanceVisibleInViewport = (instance: gdInitialInstance): boolean => {
+    // The layer renderers (needed to measure instances) are created lazily
+    // at the first render: ensure they exist (this can be called right
+    // after a remount, before any render).
+    this.instancesRenderer.ensureLayerRenderersExist(this.pixiRenderer);
+    const aabb = this.instancesRenderer
+      .getInstanceMeasurer()
+      .getInstanceAABB(instance, new Rectangle());
+
+    const viewTopLeft = this.viewPosition.toSceneCoordinates(0, 0);
+    const viewBottomRight = this.viewPosition.toSceneCoordinates(
+      this.viewPosition.getWidth(),
+      this.viewPosition.getHeight()
+    );
+    return (
+      aabb.right >= viewTopLeft[0] &&
+      aabb.left <= viewBottomRight[0] &&
+      aabb.bottom >= viewTopLeft[1] &&
+      aabb.top <= viewBottomRight[1]
+    );
   };
 
   getLastContextMenuSceneCoordinates = (): any => {

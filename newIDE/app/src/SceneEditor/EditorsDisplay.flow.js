@@ -14,6 +14,7 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type HistoryHandler } from '../VariablesList/VariablesList';
 import { type InstancesEditorShortcutsCallbacks } from '../InstancesEditor';
 import { type EditorId } from './utils';
+import { type FieldModificationContext } from '../CompactPropertiesEditor';
 import Rectangle from '../Utils/Rectangle';
 import ViewPosition from '../InstancesEditor/ViewPosition';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
@@ -23,6 +24,13 @@ import { type EditorViewPosition2D } from '../InstancesEditor';
 import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
 
 export type LastSelectionType = 'instance' | 'object' | 'layer' | 'objectGroup';
+
+// Where a modification made outside of the canvas comes from - used by the
+// undo/redo to reveal the change where it was made.
+export type InstancesModificationContext = {|
+  +editorId?: EditorId,
+  +fieldName?: string,
+|};
 
 export type SceneEditorsDisplayProps = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -43,7 +51,19 @@ export type SceneEditorsDisplayProps = {|
     multiSelect: boolean,
     targetPosition?: 'center' | 'upperCenter'
   ) => void,
-  onInstancesModified?: (Array<gdInitialInstance>) => void,
+  onInstancesModified?: (
+    Array<gdInitialInstance>,
+    ?InstancesModificationContext
+  ) => void,
+  onScenePropertiesModified?: (?FieldModificationContext) => void,
+  onBehaviorSharedDataModified?: (?FieldModificationContext) => void,
+  onLayerPropertiesModified?: (
+    Array<gdLayer>,
+    ?FieldModificationContext
+  ) => void,
+  onObjectGroupModified?: (?FieldModificationContext) => void,
+  onObjectGroupsModified?: () => void,
+  onObjectFolderOrObjectsModified?: () => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: ({
     objectName: string,
@@ -148,6 +168,7 @@ export type SceneEditorsDisplayProps = {|
   onInstancesMoved: (Array<gdInitialInstance>) => void,
   onInstancesResized: (Array<gdInitialInstance>) => void,
   onInstancesRotated: (Array<gdInitialInstance>) => void,
+  onInstancesDefaultSizeChanged: (Array<gdInitialInstance>) => void,
   isInstanceOf3DObject: gdInitialInstance => boolean,
   onSelectAllInstancesOfObjectInLayout: string => void,
 
@@ -185,7 +206,10 @@ export type SceneEditorsDisplayInterface = {|
   getName: () => 'mosaic' | 'swipeableDrawer',
   forceUpdateInstancesList: () => void,
   forceUpdatePropertiesEditor: () => void,
+  revealPropertiesVariable: (nodeId: string) => void,
+  resetPropertiesVariablesRefactoring: () => void,
   forceUpdateObjectsList: () => void,
+  scrollObjectsListToObject: (object: gdObject) => void,
   forceUpdateObjectGroupsList: () => void,
   scrollObjectGroupsListToObjectGroup: (objectGroup: gdObjectGroup) => void,
   forceUpdateLayersList: () => void,
@@ -203,6 +227,9 @@ export type SceneEditorsDisplayInterface = {|
       Array<gdInitialInstance>,
       offset?: ?[number, number]
     ) => void,
+    isInstanceVisibleInViewport: gdInitialInstance => boolean,
+    scrollViewToLastInstance: (Array<gdInitialInstance>) => void,
+    scrollViewToPoint: (x: number, y: number) => void,
     getLastCursorSceneCoordinates: () => [number, number],
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,

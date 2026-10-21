@@ -64,6 +64,9 @@ export const NoProjectOpen = (): React.Node => {
                   )}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
+                  onExternalEventsAdded={action('onExternalEventsAdded')}
+                  onUndo={action('onUndo')}
+                  onRedo={action('onRedo')}
                   onDeleteLayout={action('onDeleteLayout')}
                   onDeleteExternalLayout={action('onDeleteExternalLayout')}
                   onDeleteEventsFunctionsExtension={action(
@@ -144,6 +147,9 @@ export const ProjectOpen = (): React.Node => {
                   )}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
+                  onExternalEventsAdded={action('onExternalEventsAdded')}
+                  onUndo={action('onUndo')}
+                  onRedo={action('onRedo')}
                   onDeleteLayout={action('onDeleteLayout')}
                   onDeleteExternalLayout={action('onDeleteExternalLayout')}
                   onDeleteEventsFunctionsExtension={action(

@@ -535,6 +535,11 @@ interface ObjectsContainer {
     [Value] VectorObjectFolderOrObject GetAllObjectFolderOrObjects();
     [Ref] ObjectGroupsContainer GetObjectGroups();
 
+    void SerializeObjectsTo([Ref] SerializerElement element);
+    void UnserializeObjectsFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+    void SerializeFoldersTo([Ref] SerializerElement element);
+    void UnserializeFoldersFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
     [Const, Value] DOMString FREE_GetTypeOfBehavior(
         [Const, Ref] ObjectsContainer layout,
         [Const] DOMString name,
@@ -873,6 +878,7 @@ interface BehaviorsSharedData {
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
     void InitializeContent();
+    void SerializeTo([Ref] SerializerElement element);
 
     boolean IsFolded();
     void SetFolded(boolean folded);

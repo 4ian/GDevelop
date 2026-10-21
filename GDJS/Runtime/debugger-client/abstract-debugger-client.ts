@@ -369,7 +369,8 @@ namespace gdjs {
             if (editedInstanceContainer) {
               that._hotReloader.hotReloadRuntimeSceneObjects(
                 data.payload.updatedObjects,
-                editedInstanceContainer
+                editedInstanceContainer,
+                data.payload.behaviorsSharedData
               );
             }
           }

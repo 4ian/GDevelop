@@ -44,6 +44,8 @@ type Props = {|
 
   onCancel: () => void,
   onApply: (hasAnyEffectBeenAdded: boolean) => void,
+  // Called after each change made to the layer while the dialog is open.
+  onChange?: () => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -59,6 +61,7 @@ const LayerEditorDialog = ({
   initialInstances,
   onCancel,
   onApply,
+  onChange,
   hotReloadPreviewButtonProps,
   resourceManagementProps,
   projectScopedContainersAccessor,
@@ -66,11 +69,18 @@ const LayerEditorDialog = ({
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,
-    notifyOfChange,
+    notifyOfChange: notifyEditorOfChange,
   } = useSerializableObjectCancelableEditor({
     serializableObject: layer,
     onCancel,
   });
+  const notifyOfChange = React.useCallback(
+    () => {
+      notifyEditorOfChange();
+      if (onChange) onChange();
+    },
+    [notifyEditorOfChange, onChange]
+  );
   const [
     camera3DFieldOfViewError,
     setCamera3DFieldOfViewError,
@@ -200,6 +210,7 @@ const LayerEditorDialog = ({
 
   return (
     <Dialog
+      id="layer-editor-dialog"
       title={
         layer.getName() ? (
           <Trans>{layer.getName()} properties</Trans>
@@ -279,6 +290,7 @@ const LayerEditorDialog = ({
             onChange={(e, i, value: string) => {
               layer.setDefaultCameraBehavior(value);
               forceUpdate();
+              notifyOfChange();
             }}
           >
             <SelectOption
@@ -343,6 +355,7 @@ const LayerEditorDialog = ({
                 onChange={(e, i, newValue: string) => {
                   layer.setRenderingType(newValue);
                   forceUpdate();
+                  notifyOfChange();
                 }}
               >
                 <SelectOption
@@ -377,6 +390,7 @@ const LayerEditorDialog = ({
                           layer.getCamera3DNearPlaneDistance()
                         );
                         forceUpdate();
+                        notifyOfChange();
                       }}
                     >
                       <SelectOption
@@ -406,6 +420,7 @@ const LayerEditorDialog = ({
                       commitOnBlur
                       fullWidth
                       errorText={camera3DNearPlaneDistanceError}
+                      id="Near plane distance"
                       onChange={onChangeCamera3DNearPlaneDistance}
                       value={layer.getCamera3DNearPlaneDistance().toString(10)}
                       floatingLabelText={<Trans>Near plane distance</Trans>}
@@ -415,6 +430,7 @@ const LayerEditorDialog = ({
                       commitOnBlur
                       fullWidth
                       errorText={camera3DFarPlaneDistanceError}
+                      id="Far plane distance"
                       onChange={onChangeCamera3DFarPlaneDistance}
                       value={layer.getCamera3DFarPlaneDistance().toString(10)}
                       floatingLabelText={<Trans>Far plane distance</Trans>}

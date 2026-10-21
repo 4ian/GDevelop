@@ -140,6 +140,39 @@ GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION_AND_SAVE path
   --cmd-args /path/to/FirstExtension.json --cmd-args /path/to/SecondExtension.json
 ```
 
+#### Scripting a project with the editor functions
+
+The functions used by the GDevelop AI to explore and edit a project can be called from the CLI
+(the functions handled by the GDevelop AI itself, like docs search or sub-agents, are not available).
+Events are written with `generate_events` and the "EventScript" syntax (see
+`app/src/EditorFunctions/PublicApi/event-script-guide.md`): they are compiled by the GDevelop
+backend (login required, free), never written by an agent.
+
+```bash
+# List the functions (and if they modify the project):
+gdevelop --run-command LIST_EDITOR_FUNCTIONS --json /path/to/game.json
+
+# Run calls given as JSON (a file, inline JSON, or - for stdin). They run one after the other
+# and stop at the first failure. The project is saved unless --dry-run is given.
+gdevelop --run-command RUN_EDITOR_FUNCTIONS /path/to/game.json --json \
+  --cmd-args '[{ "name": "create_scene", "arguments": { "scene_name": "GameOver" } }]'
+
+# Run a script calling the functions (the same API as the scripts of the GDevelop AI agents).
+# --read-only only allows the functions that don't modify the project.
+gdevelop --run-command RUN_EDITOR_SCRIPT /path/to/game.json --json --cmd-args script.js
+```
+
+`--json` prints the result as JSON on stdout (the logs are printed on stderr), `--results-path` writes it to a file.
+When the project is opened in a running editor, the calls are made in this editor (refreshing it, without saving the project).
+
+`gdevelop --mcp /path/to/game.json` serves the functions to an AI agent with the
+[Model Context Protocol](https://modelcontextprotocol.io) (stdio transport), for example with Claude Code:
+`claude mcp add gdevelop -- gdevelop --mcp /path/to/game.json`. Each function is a tool, with the
+argument schemas of `app/src/EditorFunctions/PublicApi/` (exported from the GDevelop AI backend),
+plus `save_project` and `read_script_api_definition`. Add `--show` to watch the agent work in the
+editor, `--read-only` to only expose the functions not modifying the project.
+In development, `--generation-api-url http://localhost:3013` uses a local `generation-api`.
+
 Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools), 
              `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` (export should fail when the project has diagnostic errors)
 

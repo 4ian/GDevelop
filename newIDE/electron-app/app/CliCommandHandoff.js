@@ -1,3 +1,4 @@
+const path = require('path');
 const parseArgs = require('minimist');
 const {
   normalizeFileIdentifier,
@@ -11,12 +12,31 @@ const argsParserOptions = {
     'disable-update-check',
     'keep-open',
     'block-on-diagnostic-errors',
+    'json',
+    'dry-run',
+    'read-only',
+    'mcp',
+    'show',
   ],
-  string: ['_', 'run-command', 'cmd-args'],
+  string: [
+    '_',
+    'run-command',
+    'cmd-args',
+    'results-path',
+    'generation-api-url',
+  ],
   // minimist would otherwise default this boolean to `false` when the flag is
   // absent, which would hide `gdevelop-settings.yaml`.
   default: { 'block-on-diagnostic-errors': null },
 };
+
+// The flags of a command forwarded with it to an already opened editor.
+const forwardedCommandOptionNames = [
+  'json',
+  'dry-run',
+  'read-only',
+  'results-path',
+];
 
 // Drop switches Chromium may inject into argv (e.g. --allow-file-access-from-files)
 // so they can't steal the value of our own -- flags during parsing.
@@ -49,6 +69,18 @@ const parseSecondInstanceArgs = ({ commandLine, additionalData, isDev }) =>
     : // In dev, electron is launched with an extra argument, so skip one more.
       parseGDevelopArgs(commandLine.slice(isDev ? 2 : 1));
 
+// Inline JSON and "-" (stdin) are kept as is, anything else is a path.
+const resolveCommandArgsPaths = commandArgs => {
+  if (!commandArgs) return commandArgs;
+  const values = Array.isArray(commandArgs) ? commandArgs : [commandArgs];
+  return values.map(value => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue || trimmedValue === '-' || /^[[{]/.test(trimmedValue))
+      return value;
+    return path.resolve(trimmedValue);
+  });
+};
+
 const isCliProjectAlreadyOpenElsewhere = parsedArgs => {
   const fileIdentifier = normalizeFileIdentifier(parsedArgs._[0]);
   return (
@@ -68,10 +100,19 @@ const routeCliCommandToLiveEditor = ({ parsedArgs, mainWindows }) => {
   );
   if (!targetWindow) return false;
 
+  const commandOptions = {};
+  forwardedCommandOptionNames.forEach(name => {
+    if (parsedArgs[name] !== undefined) commandOptions[name] = parsedArgs[name];
+  });
+  // Paths are resolved by the editor, which can run in another directory.
+  if (commandOptions['results-path'])
+    commandOptions['results-path'] = path.resolve(commandOptions['results-path']);
+
   targetWindow.webContents.send('run-cli-command', {
     commandName,
-    commandArgs: parsedArgs['cmd-args'],
+    commandArgs: resolveCommandArgsPaths(parsedArgs['cmd-args']),
     fileIdentifier,
+    commandOptions,
   });
   targetWindow.focus();
   return true;

@@ -16,6 +16,7 @@ import { createNewResource } from '../ResourcesList/ResourceSource';
 import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
 
 import PromisePool from '@supercharge/promise-pool';
+import { notLoggedInErrorMessage } from './UseGenerateEvents';
 
 type _UseSearchAndInstallResourceReturnType = {
   searchAndInstallResources: ResourceSearchAndInstallOptions => Promise<ResourceSearchAndInstallResult>,
@@ -36,7 +37,7 @@ export const useSearchAndInstallResource = ({
       async ({
         resources,
       }: ResourceSearchAndInstallOptions): Promise<ResourceSearchAndInstallResult> => {
-        if (!profile) throw new Error('User should be authenticated.');
+        if (!profile) throw new Error(notLoggedInErrorMessage);
         if (!project) throw new Error('Project should be opened.');
 
         const { results } = await PromisePool.withConcurrency(5)

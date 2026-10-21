@@ -26,6 +26,12 @@ const {
 } = require('./MainMenu');
 const { loadExternalEditorWindow } = require('./LocalExternalEditorWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
+const { setupMcpStdioPipe } = require('./CliMcpServerPipe');
+const { waitForPreviousCliInstance } = require('./CliInstanceLock');
+const {
+  createLiveMcpServer,
+  makeLiveMcpServerSettingsStore,
+} = require('./LiveMcpServer');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
@@ -60,6 +66,24 @@ const {
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
 
+const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
+// `--mcp`: serve the editor functions of the project on stdin/stdout, in its
+// own (headless) process, until the MCP client closes stdin.
+if (args['mcp']) args['run-command'] = 'SERVE_MCP';
+// With `--mcp` or `--json`, stdout only holds the output of the command: the
+// logs of the main process (including electron-log's) go to stderr.
+if (args['mcp'] || args['json']) {
+  const writeToStderr = (...values) =>
+    process.stderr.write(require('util').format(...values) + '\n');
+  console.log = writeToStderr;
+  console.info = writeToStderr;
+  console.debug = writeToStderr;
+  const stderrLogTransport = message => writeToStderr(...message.data);
+  stderrLogTransport.level = 'info';
+  log.transports.console.level = false;
+  log.transports.stderr = stderrLogTransport;
+}
+
 log.info('GDevelop Electron app starting...');
 
 // Logs made with electron-logs can be found
@@ -75,8 +99,9 @@ autoUpdater.autoDownload = false;
 let mainWindows = new Set();
 let mainWindow = null; // Primary window reference for backwards compatibility
 let windowCounter = 0; // Counter for creating unique session partitions
-
-const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
+// The window an agent connecting to the live MCP server is bound to.
+let lastFocusedMainWindow = null;
+let liveMcpServer = null;
 
 const devTools = !!args['dev-tools'];
 
@@ -100,7 +125,8 @@ if (process.platform === 'win32') {
 // a stale registry entry falls back to running headless in this process.
 const isCliRunCommand = !!args['run-command'];
 const gotTheLock =
-  isCliRunCommand && !isCliProjectAlreadyOpenElsewhere(args)
+  isCliRunCommand &&
+  (args['mcp'] || !isCliProjectAlreadyOpenElsewhere(args))
     ? true
     : app.requestSingleInstanceLock({ args });
 
@@ -223,7 +249,8 @@ function createNewWindow(windowArgs = args) {
     options.show = false;
   }
 
-  if (isCliWindow && !windowArgs['keep-open']) {
+  // `--show`: watch an agent working on the project through the MCP server.
+  if (isCliWindow && !windowArgs['keep-open'] && !windowArgs['show']) {
     options.show = false;
     options.skipTaskbar = true;
   }
@@ -257,7 +284,11 @@ function createNewWindow(windowArgs = args) {
       if (message.startsWith('%c')) return;
       if (message.includes('[renderer:')) return; // break recursion
       const tag = ['verbose', 'info', 'warning', 'error'][level] || 'log';
-      const stream = level >= 2 ? process.stderr : process.stdout;
+      // With --json, stdout only holds the result of the command.
+      const stream =
+        level >= 2 || windowArgs['json'] || windowArgs['mcp']
+          ? process.stderr
+          : process.stdout;
       stream.write(`[renderer:${tag}] ${message}\n`);
     });
   }
@@ -293,6 +324,8 @@ function createNewWindow(windowArgs = args) {
     // Remove from tracked windows
     mainWindows.delete(newWindow);
     clearWindowFileIdentifier(windowId);
+    if (lastFocusedMainWindow === newWindow) lastFocusedMainWindow = null;
+    if (liveMcpServer) liveMcpServer.onWindowClosed(windowId);
 
     // If this was the primary window, set a new primary
     if (isPrimaryWindow) {
@@ -400,12 +433,78 @@ function createNewWindow(windowArgs = args) {
   return newWindow;
 }
 
+const setupLiveMcpServer = () => {
+  const settingsStore = makeLiveMcpServerSettingsStore(app.getPath('userData'));
+  let lastError = null;
+  liveMcpServer = createLiveMcpServer({
+    getTargetWindow: () =>
+      lastFocusedMainWindow && !lastFocusedMainWindow.isDestroyed()
+        ? lastFocusedMainWindow
+        : mainWindow,
+    log,
+  });
+
+  app.on('browser-window-focus', (_event, window) => {
+    if (mainWindows.has(window)) lastFocusedMainWindow = window;
+  });
+
+  const getStatus = () => {
+    const settings = settingsStore.read();
+    const port = liveMcpServer.getPort();
+    return {
+      enabled: settings.enabled,
+      port,
+      url: port ? `http://127.0.0.1:${port}/mcp` : null,
+      token: settings.token,
+      error: lastError,
+    };
+  };
+
+  const applySettings = async () => {
+    const settings = settingsStore.read();
+    lastError = null;
+    if (!settings.enabled) {
+      await liveMcpServer.stop();
+      return;
+    }
+    try {
+      await liveMcpServer.start({ port: settings.port, token: settings.token });
+    } catch (error) {
+      lastError = error.message;
+      log.error('[MCP] Could not start the live editor server:', error);
+    }
+  };
+
+  ipcMain.on('mcp-live-send', (_event, payload) =>
+    liveMcpServer.onWindowResponse(payload)
+  );
+  ipcMain.handle('mcp-live-server-get-status', () => getStatus());
+  ipcMain.handle('mcp-live-server-set-enabled', async (_event, enabled) => {
+    settingsStore.write({ ...settingsStore.read(), enabled: !!enabled });
+    await applySettings();
+    return getStatus();
+  });
+  ipcMain.handle('mcp-live-server-reset-token', async () => {
+    settingsStore.write({ ...settingsStore.read(), token: null });
+    await applySettings();
+    return getStatus();
+  });
+
+  applySettings();
+};
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {
+app.on('ready', async function() {
   // Handoff calls app.quit() but 'ready' still runs; without the lock, do not create a window.
   if (!gotTheLock) {
     return;
+  }
+
+  // A CLI/MCP instance started while the previous one exits would run logged
+  // out (see CliInstanceLock.js): wait for it.
+  if (isCliRunCommand) {
+    await waitForPreviousCliInstance({ app, log, timeoutMs: 10000 });
   }
 
   registerGdideProtocol({ isDev });
@@ -449,10 +548,39 @@ app.on('ready', function() {
     app.exit(typeof exitCode === 'number' ? exitCode : 0);
   });
 
+  if (args['mcp']) setupMcpStdioPipe({ ipcMain, app });
+
+  // The result of a CLI command (with --json): resolved once written, so the
+  // app does not exit before stdout is flushed.
+  ipcMain.handle(
+    'cli-write-stdout',
+    (_event, text) =>
+      new Promise(resolve => process.stdout.write(String(text), () => resolve()))
+  );
+
+  // The input of a CLI command given as "-" (e.g. calls piped to GDevelop).
+  let cliStdinPromise = null;
+  ipcMain.handle('cli-read-stdin', () => {
+    if (!cliStdinPromise) {
+      cliStdinPromise = new Promise((resolve, reject) => {
+        const chunks = [];
+        process.stdin.on('data', chunk => chunks.push(chunk));
+        process.stdin.on('end', () =>
+          resolve(Buffer.concat(chunks).toString('utf8'))
+        );
+        process.stdin.on('error', reject);
+      });
+    }
+    return cliStdinPromise;
+  });
+
   ipcMain.on('set-window-project-path', (event, fileIdentifier) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     if (window) setWindowFileIdentifier(window.id, fileIdentifier);
   });
+
+  // Not in a CLI process (like `--mcp`): it has no editor the user works in.
+  if (!isCliRunCommand) setupLiveMcpServer();
 
   ipcMain.handle('install-cli-in-path', async () => {
     // Inside an AppImage, process.execPath points into a transient mount that

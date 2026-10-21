@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import paperDecorator from '../../PaperDecorator';
 
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import {
   fakeFileMetadataAndStorageProviderNameForCloudProject,
   fakeFileMetadataAndStorageProviderNameForLocalProject,

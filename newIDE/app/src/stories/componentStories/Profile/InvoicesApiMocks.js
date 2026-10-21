@@ -1,5 +1,5 @@
 // @flow
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import MockAdapter from 'axios-mock-adapter';
 
 import {

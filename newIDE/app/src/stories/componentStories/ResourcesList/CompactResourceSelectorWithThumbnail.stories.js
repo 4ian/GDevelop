@@ -4,7 +4,7 @@ import * as React from 'react';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import { CompactResourceSelectorWithThumbnail } from '../../../ResourcesList/CompactResourceSelectorWithThumbnail';
 import { ColumnStackLayout } from '../../../UI/Layout';

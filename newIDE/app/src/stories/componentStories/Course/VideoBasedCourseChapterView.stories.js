@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import VideoBasedCourseChapterView from '../../../Course/VideoBasedCourseChapterView';
 
 import paperDecorator from '../../PaperDecorator';

@@ -13,7 +13,8 @@
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { toId, storyNameFromExport } = require('@storybook/csf');
+// @ts-ignore - only exposed in the package "exports", which TypeScript 4 can't resolve.
+const { toId, storyNameFromExport } = require('storybook/internal/csf');
 
 const COMMENT_MARKER = '<!-- storybook-links -->';
 const STORYBOOK_BASE_URL = 'https://gdevelop-storybook.s3.amazonaws.com';

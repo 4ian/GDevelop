@@ -385,6 +385,7 @@ describe('change_project_properties_resources', () => {
   describe('files attached by the user', () => {
     // The browser `File` is not in the test environment (nor in Node 16):
     // a named Blob is what is read of it.
+    // $FlowFixMe[cannot-resolve-module] - Node.js module, only used in tests.
     const { Blob: NodeBlob } = require('buffer');
     const makeFile = (content: string, name: string, type: string) => {
       const file = new NodeBlob([content], { type });

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import paperDecorator from '../../PaperDecorator';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';

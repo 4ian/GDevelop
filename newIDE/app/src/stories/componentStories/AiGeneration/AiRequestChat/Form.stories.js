@@ -4,7 +4,7 @@ import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
 import { AiRequestChat } from '../../../../AiGeneration/AiRequestChat';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { SubscriptionProvider } from '../../../../Profile/Subscription/SubscriptionContext';
 import { CreditsPackageStoreStateProvider } from '../../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';

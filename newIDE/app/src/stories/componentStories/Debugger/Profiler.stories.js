@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 
 import Profiler from '../../../Debugger/Profiler';
 import profilerOutputsTestData from '../../../fixtures/ProfilerOutputsTestData.json';

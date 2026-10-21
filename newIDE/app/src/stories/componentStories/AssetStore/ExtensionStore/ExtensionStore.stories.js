@@ -2,7 +2,7 @@
 import * as React from 'react';
 import MockAdapter from 'axios-mock-adapter';
 import { I18n } from '@lingui/react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 
 import paperDecorator from '../../../PaperDecorator';
 import { ExtensionStore } from '../../../../AssetStore/ExtensionStore';

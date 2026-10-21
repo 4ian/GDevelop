@@ -15,7 +15,7 @@ import {
   internalAiRequestError,
   repeatedToolCallLoopAiRequestError,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import {
   defaultAuthenticatedUserWithNoSubscription,
   fakeSilverAuthenticatedUser,

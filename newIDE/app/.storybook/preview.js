@@ -5,6 +5,12 @@ import BrowserDropDownMenuDisablerDecorator from '../src/stories/BrowserDropDown
 import themeDecorator from '../src/stories/ThemeDecorator';
 import '../src/UI/icomoon-font.css'; // Styles for Icomoon font.
 import './app-level-styling.css';
+import { configureActions } from 'storybook/actions';
+
+configureActions({
+  depth: 2,
+  limit: 20,
+});
 
 export const globalTypes = {
   themeName: {

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import { t } from '@lingui/macro';
 import Add from '../../../UI/CustomSvgIcons/Add';
 

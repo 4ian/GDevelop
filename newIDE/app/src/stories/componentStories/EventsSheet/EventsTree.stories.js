@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 
 import EventsTree from '../../../EventsSheet/EventsTree';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';

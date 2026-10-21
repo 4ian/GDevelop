@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import paperDecorator from '../../PaperDecorator';
 import QuitInAppTutorialDialog from '../../../InAppTutorial/QuitInAppTutorialDialog';
 import { delay } from '../../../Utils/Delay';

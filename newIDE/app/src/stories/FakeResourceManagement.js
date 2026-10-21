@@ -1,5 +1,5 @@
 // @flow
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';

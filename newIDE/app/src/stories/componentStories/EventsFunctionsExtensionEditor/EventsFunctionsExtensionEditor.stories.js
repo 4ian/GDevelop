@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import { I18n } from '@lingui/react';
 
 // Keep first as it creates the `global.gd` object:

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import alertDecorator from '../../AlertDecorator';
 import { AskAiHistory } from '../../../AiGeneration/AskAiHistory';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import paperDecorator from '../../PaperDecorator';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import ProjectManager from '../../../ProjectManager';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 import GDevelopJsInitializerDecorator, {

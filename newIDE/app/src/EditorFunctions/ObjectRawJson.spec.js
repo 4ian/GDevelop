@@ -401,6 +401,7 @@ describe('object raw JSON and renames', () => {
   describe('a Sprite created from scratch', () => {
     // The browser `File` is not in the test environment: a named Blob is what
     // is read of it.
+    // $FlowFixMe[cannot-resolve-module] - Node.js module, only used in tests.
     const { Blob: NodeBlob } = require('buffer');
     const attachmentsForResources = {
       getFiles: async (attachmentIds: Array<string>) => {

@@ -10,16 +10,9 @@ GDevelop relies on some dependencies that can have special requirements.
 
 The app is built (`npm start`, `npm run build`) with **Rsbuild** (see `rsbuild.config.js`). Babel is only used to strip Flow types and run Lingui macros - everything else is done by SWC.
 
+- Storybook uses the same configuration (with `storybook-react-rsbuild`). Its optional `prettier` peer dependency is overridden to our Prettier version (it's only used to format code snippets of the docs, which are disabled).
 - Jest (`npm test`, see `jest.config.js`) uses Babel only, with `.babelrc.json`.
 - ESLint is not run during the build: run `npm run lint`.
-
-## Storybook
-
-**Storybook** is depending on webpack and babel.
-
-- It's important to have the same webpack version as the one provided by `react-scripts`, hence why `webpack` is specified in the `devDependencies`.
-- `babel-loader` is specified to be the exact version required by `react-scripts` (because `react-scripts` wants the exact version and will complain if forced to use the `babel-loader` of Storybook).
-  - **Try removing these extra `devDependencies`** if you upgrade Storybook or Create React App.
 
 ## LinguiJS
 

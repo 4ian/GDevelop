@@ -3,7 +3,7 @@
 import * as React from 'react';
 import MockAdapter from 'axios-mock-adapter';
 
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import emptyGameContent from './fixtures/emptyGame.json';
 
 import {

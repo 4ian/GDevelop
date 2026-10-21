@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 
 import CommandPalette from '../../CommandPalette/CommandPalette';
 import AutocompletePicker from '../../CommandPalette/CommandPalette/AutocompletePicker';

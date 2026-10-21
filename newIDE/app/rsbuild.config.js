@@ -22,15 +22,14 @@ module.exports = defineConfig({
         config.babelrc = false;
         config.configFile = false;
         config.sourceType = 'unambiguous';
-        config.presets = [];
-        config.plugins = [
-          require.resolve('@babel/plugin-transform-flow-strip-types'),
-          require.resolve('babel-plugin-macros'),
+        config.presets = [
+          require.resolve('@babel/preset-flow'),
           [
-            require.resolve('@babel/plugin-transform-react-jsx'),
+            require.resolve('@babel/preset-react'),
             { runtime: 'automatic', development: !isProduction },
           ],
         ];
+        config.plugins = [require.resolve('babel-plugin-macros')];
       },
     }),
   ],
@@ -76,6 +75,8 @@ module.exports = defineConfig({
         loader: 'worker-rspack-loader',
         options: {
           filename: '[name].[contenthash].worker.js',
+          // Needed for Storybook, which sets `output.chunkFilename` to a function.
+          chunkFilename: '[id].[contenthash].worker.js',
         },
       });
       return config;

@@ -39,6 +39,17 @@ class GD_CORE_API Effect {
   }
   bool IsEnabled() const { return isEnabled; }
 
+  /**
+   * \brief Set if the effect is hidden in the editor.
+   *
+   * This only affects the editor: the effect is still applied in the game
+   * (unless it's disabled, see SetEnabled).
+   */
+  void SetHiddenInEditor(bool hiddenInEditor_) {
+    hiddenInEditor = hiddenInEditor_;
+  }
+  bool IsHiddenInEditor() const { return hiddenInEditor; }
+
   void SetDoubleParameter(const gd::String &name, double value) {
     doubleParameters[name] = value;
   }
@@ -110,7 +121,8 @@ class GD_CORE_API Effect {
   bool folded;
   gd::String name;        ///< The name of the layer.
   gd::String effectType;  ///< The name of the effect to apply.
-  bool isEnabled = true; ///< Enable the effect at the beginning of the scene, at its object creation or in the editor.
+  bool isEnabled = true; ///< Enable the effect at the beginning of the scene or at its object creation.
+  bool hiddenInEditor = false; ///< True if the effect is not applied in the editor.
   std::map<gd::String, double> doubleParameters; ///< Values of parameters being doubles, keyed by names.
   std::map<gd::String, gd::String> stringParameters; ///< Values of parameters being strings, keyed by names.
   std::map<gd::String, bool> booleanParameters; ///< Values of parameters being booleans, keyed by names.

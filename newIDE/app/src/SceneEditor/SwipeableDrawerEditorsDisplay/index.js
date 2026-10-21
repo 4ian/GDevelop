@@ -592,6 +592,10 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                       selectedInstances={selectedInstances}
                       onSelectInstances={selectInstances}
                       onInstancesModified={onInstancesModified || noop}
+                      onFocusOnSelection={
+                        props.instancesEditorShortcutsCallbacks
+                          .onFocusOnSelection
+                      }
                       ref={instancesListRef}
                     />
                   </Paper>

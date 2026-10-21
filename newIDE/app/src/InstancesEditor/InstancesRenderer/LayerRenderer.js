@@ -198,7 +198,8 @@ export default class LayerRenderer {
 
       try {
         // "Culling" improves rendering performance of large levels
-        const isVisible = this._isInstanceVisible(instance);
+        const isVisible =
+          !instance.isHiddenInEditor() && this._isInstanceVisible(instance);
         if (pixiObject) {
           pixiObject.visible = isVisible;
           pixiObject.eventMode =
@@ -839,7 +840,7 @@ export default class LayerRenderer {
   }
 
   _updateVisibility() {
-    const isVisible = this.layer.getVisibility();
+    const isVisible = !this.layer.isHiddenInEditor();
     this.pixiContainer.visible = isVisible;
     if (this._threeScene) {
       this._threeScene.visible = isVisible;

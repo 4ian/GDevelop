@@ -316,7 +316,22 @@ const LayerEditorDialog = ({
             </Paper>
           )}
           <InlineCheckbox
-            label={<Trans>Hide the layer</Trans>}
+            label={<Trans>Hide the layer in the editor</Trans>}
+            checked={layer.isHiddenInEditor()}
+            onCheck={(e, checked) => {
+              layer.setHiddenInEditor(checked);
+              forceUpdate();
+              notifyOfChange();
+            }}
+            tooltipOrHelperText={
+              <Trans>
+                The layer is only hidden in the editor: it's still displayed in
+                the game.
+              </Trans>
+            }
+          />
+          <InlineCheckbox
+            label={<Trans>Hide the layer when the scene starts</Trans>}
             checked={!layer.getVisibility()}
             onCheck={(e, checked) => {
               layer.setVisibility(!checked);

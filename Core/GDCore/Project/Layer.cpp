@@ -18,6 +18,7 @@ Layer::Layer()
       defaultCameraBehavior("top-left-anchored-if-never-moved"),
       isVisible(true),
       isLocked(false),
+      isHiddenInEditor(false),
       isLightingLayer(false),
       followBaseLayerCamera(false),
       camera3DNearPlaneDistance(3),
@@ -47,6 +48,9 @@ void Layer::SerializeTo(SerializerElement& element) const {
   }
   element.SetAttribute("visibility", GetVisibility());
   element.SetAttribute("isLocked", IsLocked());
+  // Always written: when it's missing, it's deduced from the visibility (see
+  // UnserializeFrom).
+  element.SetAttribute("isHiddenInEditor", IsHiddenInEditor());
   element.SetAttribute("isLightingLayer", IsLightingLayer());
   element.SetAttribute("followBaseLayerCamera", IsFollowingBaseLayerCamera());
   element.SetAttribute("ambientLightColorR", (int)GetAmbientLightColorRed());
@@ -90,6 +94,10 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   SetDefaultCameraBehavior(element.GetStringAttribute("defaultCameraBehavior", "top-left-anchored-if-never-moved"));
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
   SetLocked(element.GetBoolAttribute("isLocked", false));
+  // Compatibility with GD <= 5.6.283: the visibility was used for both the game
+  // and the editor, so a layer hidden in the game stays hidden in the editor.
+  SetHiddenInEditor(
+      element.GetBoolAttribute("isHiddenInEditor", !GetVisibility()));
   SetLightingLayer(element.GetBoolAttribute("isLightingLayer", false));
   SetFollowBaseLayerCamera(
       element.GetBoolAttribute("followBaseLayerCamera", false));

@@ -83,6 +83,7 @@ const isHotReloadNeeded = (hotReloadSteps: HotReloadSteps): boolean =>
 
 type ChangeViewPositionCommand =
   | 'centerViewOnLastSelectedInstance'
+  | 'focusOnSelection'
   | 'zoomToInitialPosition'
   | 'zoomToFitContent'
   | 'zoomToFitSelection';

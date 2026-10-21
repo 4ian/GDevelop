@@ -11,6 +11,8 @@ declare class gdLayer {
   getDefaultCameraBehavior(): string;
   setVisibility(visible: boolean): void;
   getVisibility(): boolean;
+  setHiddenInEditor(isHiddenInEditor: boolean): void;
+  isHiddenInEditor(): boolean;
   setLocked(isLocked: boolean): void;
   isLocked(): boolean;
   setLightingLayer(lightingLayer: boolean): void;

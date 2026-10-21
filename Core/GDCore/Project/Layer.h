@@ -132,6 +132,21 @@ class GD_CORE_API Layer {
   bool GetVisibility() const { return isVisible; }
 
   /**
+   * \brief Change if the layer is hidden in the editor.
+   *
+   * This only affects the editor: the layer is still displayed in the game
+   * (unless its visibility is set to false).
+   */
+  void SetHiddenInEditor(bool isHiddenInEditor_) {
+    isHiddenInEditor = isHiddenInEditor_;
+  }
+
+  /**
+   * \brief Return true if the layer is hidden in the editor.
+   */
+  bool IsHiddenInEditor() const { return isHiddenInEditor; }
+
+  /**
    * \brief Change if layer can be modified or not.
    */
   void SetLocked(bool isLocked_) { isLocked = isLocked_; }
@@ -287,6 +302,7 @@ class GD_CORE_API Layer {
   gd::String cameraType;
   bool isVisible;            ///< True if the layer is visible
   bool isLocked;             ///< True if the layer is locked
+  bool isHiddenInEditor;     ///< True if the layer is hidden in the editor
   bool isLightingLayer;  ///< True if the layer is used to display lights and
                          ///< renders an ambient light.
   bool followBaseLayerCamera;  ///< True if the layer automatically follows the

@@ -792,3 +792,172 @@ describe('global objects/groups/variables shared across scene tabs', () => {
     project.delete();
   });
 });
+
+describe('variables refactoring when a rename is undone/redone', () => {
+  const makeProjectWithEvent = (
+    actionType: string,
+    parameters: Array<string>
+  ) => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const event = layout
+      .getEvents()
+      .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+    const action = new gd.Instruction();
+    action.setType(actionType);
+    action.setParametersCount(parameters.length);
+    parameters.forEach((parameter, index) =>
+      action.setParameter(index, parameter)
+    );
+    gd.asStandardEvent(event)
+      .getActions()
+      .insert(action, 0);
+    action.delete();
+    const getActionParameter = (index: number): string =>
+      gd
+        .asStandardEvent(layout.getEvents().getEventAt(0))
+        .getActions()
+        .get(0)
+        .getParameter(index)
+        .getPlainString();
+    return { project, layout, getActionParameter };
+  };
+
+  // What the editors do when the user edits variables: rename, then apply
+  // the refactoring computed from a snapshot taken before.
+  const renameWithRefactoring = (
+    project: gdProject,
+    variablesContainer: gdVariablesContainer,
+    oldName: string,
+    newName: string
+  ) => {
+    variablesContainer.ensurePersistentUuids();
+    const snapshot = new gd.SerializerElement();
+    variablesContainer.serializeTo(snapshot);
+    variablesContainer.rename(oldName, newName);
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      snapshot,
+      variablesContainer
+    );
+    gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+      project,
+      variablesContainer,
+      changeset,
+      snapshot
+    );
+    snapshot.delete();
+  };
+
+  it('renames a scene variable back in the events when its rename is undone, and again when redone', () => {
+    const { project, layout, getActionParameter } = makeProjectWithEvent(
+      'SetNumberVariable',
+      ['VarA', '=', '1']
+    );
+    const variablesContainer = layout.getVariables();
+    variablesContainer.insertNew('VarA', 0).setValue(0);
+    const target = asValueTarget(
+      _getVariablesContainerHistoryTarget(
+        variablesContainer,
+        (changeset, originalSerializedVariables) =>
+          gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+            project,
+            variablesContainer,
+            changeset,
+            originalSerializedVariables
+          )
+      )
+    );
+    const before = target.getValue();
+    renameWithRefactoring(project, variablesContainer, 'VarA', 'Score');
+    const after = target.getValue();
+    expect(getActionParameter(0)).toBe('Score');
+
+    target.setValue(before);
+    expect(variablesContainer.has('VarA')).toBe(true);
+    expect(getActionParameter(0)).toBe('VarA');
+
+    target.setValue(after);
+    expect(variablesContainer.has('Score')).toBe(true);
+    expect(getActionParameter(0)).toBe('Score');
+
+    project.delete();
+  });
+
+  it('does not refactor (and keeps the variables in place) when only a value changed', () => {
+    const { project, layout } = makeProjectWithEvent('SetNumberVariable', [
+      'VarA',
+      '=',
+      '1',
+    ]);
+    const variablesContainer = layout.getVariables();
+    const variable = variablesContainer.insertNew('VarA', 0);
+    variable.setValue(0);
+    const applyRefactoring = jest.fn<
+      [gdVariablesChangeset, gdSerializerElement],
+      void
+    >();
+    const target = asValueTarget(
+      _getVariablesContainerHistoryTarget(variablesContainer, applyRefactoring)
+    );
+    const before = target.getValue();
+    variable.setValue(42);
+    const after = target.getValue();
+
+    target.setValue(before);
+    target.setValue(after);
+    expect(applyRefactoring).not.toHaveBeenCalled();
+    expect(variablesContainer.get('VarA').ptr).toBe(variable.ptr);
+
+    project.delete();
+  });
+
+  it('renames an object variable back in the events when its rename is undone', () => {
+    const { project, layout, getActionParameter } = makeProjectWithEvent(
+      'SetNumberObjectVariable',
+      ['Enemy', 'VarA', '=', '1']
+    );
+    const objectsContainer = layout.getObjects();
+    const enemy = objectsContainer.insertNewObject(
+      project,
+      'Sprite',
+      'Enemy',
+      0
+    );
+    enemy
+      .getVariables()
+      .insertNew('VarA', 0)
+      .setValue(0);
+    const target = asValueTarget(
+      _getObjectsContainerHistoryTarget(
+        objectsContainer,
+        project,
+        object => {
+          object.getVariables().ensurePersistentUuids();
+        },
+        (object, changeset, originalSerializedVariables) =>
+          gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
+            project,
+            object.getVariables(),
+            layout.getInitialInstances(),
+            object.getName(),
+            changeset,
+            originalSerializedVariables
+          )
+      )
+    );
+    const before = target.getValue();
+    renameWithRefactoring(project, enemy.getVariables(), 'VarA', 'Score');
+    const after = target.getValue();
+    expect(getActionParameter(1)).toBe('Score');
+
+    target.setValue(before);
+    expect(enemy.getVariables().has('VarA')).toBe(true);
+    expect(getActionParameter(1)).toBe('VarA');
+
+    target.setValue(after);
+    expect(getActionParameter(1)).toBe('Score');
+
+    project.delete();
+  });
+});

@@ -311,7 +311,7 @@ type HistoryChangeContext =
 // A change that can't be captured by a snapshot of the history targets, as
 // it refactors the whole project (see `_applyHistoryCommand`).
 type HistoryCommand = {|
-  type: 'renameObject' | 'renameObjectGroup',
+  type: 'renameObject' | 'renameObjectGroup' | 'renameLayer',
   global: boolean,
   oldName: string,
   newName: string,
@@ -322,11 +322,13 @@ type HistoryCommand = {|
 const OBJECTS_HISTORY_KEYS = ['objects', 'globalObjects'];
 const OBJECT_GROUPS_HISTORY_KEYS = ['objectGroups', 'globalObjectGroups'];
 const VARIABLES_HISTORY_KEYS = ['sceneVariables', 'globalVariables'];
-// Targets renamed along with an object or a group (see `_renameObjectOrGroup`).
+// Targets renamed along with an object, a group or a layer (see
+// `_renameObjectOrGroup` and `_renameLayer`).
 const REFACTORED_HISTORY_KEYS = [
   ...OBJECTS_HISTORY_KEYS,
   ...OBJECT_GROUPS_HISTORY_KEYS,
   'instances',
+  'layers',
 ];
 // Targets that other editors (other scenes) can change too.
 // In development, check after each step that no target changed without
@@ -619,13 +621,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                 parsedMessage.payload.cursorY
               );
             } else if (parsedMessage.command === 'undo') {
-              if (canUndo(this.state.history)) {
-                this.undo();
-              }
+              // Not conditioned on the rendered history: a panel edit may
+              // be waiting to be saved as a step.
+              this.undo();
             } else if (parsedMessage.command === 'redo') {
-              if (canRedo(this.state.history)) {
-                this.redo();
-              }
+              this.redo();
             } else if (parsedMessage.command === 'copy') {
               this.copySelection();
             } else if (parsedMessage.command === 'paste') {
@@ -1853,7 +1853,17 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _getVariablesContainerHistoryTarget = (
     variablesContainer: gdVariablesContainer
-  ): CompositeTarget => getVariablesContainerHistoryTarget(variablesContainer);
+  ): CompositeTarget =>
+    getVariablesContainerHistoryTarget(
+      variablesContainer,
+      (changeset, originalSerializedVariables) =>
+        gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+          this.props.project,
+          variablesContainer,
+          changeset,
+          originalSerializedVariables
+        )
+    );
 
   _getObjectsContainerHistoryTarget = (
     objectsContainer: gdObjectsContainer
@@ -1861,7 +1871,25 @@ export default class SceneEditor extends React.Component<Props, State> {
     getObjectsContainerHistoryTarget(
       objectsContainer,
       this.props.project,
-      this._ensurePersistentUuidsOfObject
+      this._ensurePersistentUuidsOfObject,
+      (object, changeset, originalSerializedVariables) => {
+        const { project, initialInstances, eventsBasedObject } = this.props;
+        gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
+          project,
+          object.getVariables(),
+          initialInstances,
+          object.getName(),
+          changeset,
+          originalSerializedVariables
+        );
+        if (eventsBasedObject) {
+          gd.ObjectRefactorer.applyChangesToVariants(
+            eventsBasedObject,
+            object.getName(),
+            changeset
+          );
+        }
+      }
     );
 
   _getObjectGroupsContainerHistoryTarget = (
@@ -2180,6 +2208,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
 
         this.forceUpdatePropertiesEditor();
+        // The variables shown in the panel may have been renamed: the
+        // panel must compare the next edits with them, not with the
+        // variables as they were before.
+        if (this.editorDisplay)
+          this.editorDisplay.resetPropertiesVariablesRefactoring();
         this._ensureKeyboardFocusStaysInEditor();
 
         this.forceUpdateLayersList();
@@ -2203,6 +2236,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           changedKeys,
           command && command.type === 'renameObject' ? renamedName : null,
           command && command.type === 'renameObjectGroup' ? renamedName : null,
+          command && command.type === 'renameLayer' ? renamedName : null,
           hasSelectionKindChanged
         );
       }
@@ -2329,6 +2363,45 @@ export default class SceneEditor extends React.Component<Props, State> {
       this._renameObjectOrGroup(false, command.global, from, to);
     } else if (command.type === 'renameObjectGroup') {
       this._renameObjectOrGroup(true, command.global, from, to);
+    } else if (command.type === 'renameLayer') {
+      this._renameLayer(from, to);
+    }
+  };
+
+  /**
+   * Rename a layer, refactoring the whole project like the layers list
+   * does (events, external layouts and events...).
+   */
+  _renameLayer = (oldName: string, newName: string) => {
+    const {
+      project,
+      layout,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      layersContainer,
+    } = this.props;
+    if (oldName === newName || !layersContainer.hasLayerNamed(oldName)) return;
+
+    layersContainer.getLayer(oldName).setName(newName);
+    if (layout) {
+      gd.WholeProjectRefactorer.renameLayerInScene(
+        project,
+        layout,
+        oldName,
+        newName
+      );
+    } else if (eventsFunctionsExtension && eventsBasedObject) {
+      gd.WholeProjectRefactorer.renameLayerInEventsBasedObject(
+        project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        oldName,
+        newName
+      );
+    }
+    this.props.onLayerRenamedOrRemoved();
+    if (this.state.chosenLayer === oldName) {
+      this._onChooseLayer(newName);
     }
   };
 
@@ -3925,8 +3998,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onLayerRenamed = (oldName: string, newName: string) => {
-    // Instances too: they were moved to the renamed layer.
-    this._recordLayersAndInstancesStep(null);
+    // The layer was renamed across the whole project (events, external
+    // layouts...): recorded as a command, like an object rename.
+    this._recordHistoryCommand(
+      { type: 'renameLayer', global: false, oldName, newName },
+      { source: 'panel', editorId: 'layers-list' }
+    );
     this.forceUpdatePropertiesEditor();
     this.props.onLayerRenamedOrRemoved();
     if (this.state.chosenLayer === oldName) {
@@ -5386,6 +5463,28 @@ export default class SceneEditor extends React.Component<Props, State> {
     setTimeout(tryFlash, 150);
   };
 
+  _flashLayersListRowByName = (layerName: string) => {
+    const containerElement = this._containerElement;
+    const { editorDisplay } = this;
+    if (!containerElement || !editorDisplay) return;
+    editorDisplay.ensureEditorVisible('layers-list');
+
+    const tryFlash = (): boolean => {
+      const element = this._findElementByAttribute(
+        containerElement,
+        'data-scene',
+        layerName
+      );
+      if (element && this._isElementVisible(element)) {
+        this._flashElement(element);
+        return true;
+      }
+      return false;
+    };
+    if (tryFlash()) return;
+    setTimeout(tryFlash, 150);
+  };
+
   _flashLayersListBackgroundColorRow = () => {
     const containerElement = this._containerElement;
     const { editorDisplay } = this;
@@ -6378,6 +6477,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     changedKeys: Array<string>,
     renamedObjectName: ?string,
     renamedObjectGroupName: ?string,
+    renamedLayerName: ?string,
     hasSelectionKindChanged: boolean = false
   ) => {
     const { editorDisplay } = this;
@@ -6441,6 +6541,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
         if (renamedObjectGroupName) {
           this._flashObjectGroupsListRowByName(renamedObjectGroupName);
+        }
+        if (renamedLayerName) {
+          this._flashLayersListRowByName(renamedLayerName);
         }
         if (hasSelectionKindChanged) this._flashPropertiesPanelHeader();
       });

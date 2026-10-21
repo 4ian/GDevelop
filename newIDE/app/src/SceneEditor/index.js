@@ -310,12 +310,19 @@ type HistoryChangeContext =
 
 // A change that can't be captured by a snapshot of the history targets, as
 // it refactors the whole project (see `_applyHistoryCommand`).
-type HistoryCommand = {|
-  type: 'renameObject' | 'renameObjectGroup' | 'renameLayer',
-  global: boolean,
-  oldName: string,
-  newName: string,
-|};
+type HistoryCommand =
+  | {|
+      type: 'renameObject' | 'renameObjectGroup' | 'renameLayer',
+      global: boolean,
+      oldName: string,
+      newName: string,
+    |}
+  | {|
+      // The instances extracted are the snapshot part of the step.
+      type: 'extractAsExternalLayout',
+      externalLayoutName: string,
+      serializedExternalLayout: Object,
+    |};
 
 // The keys of the history targets (see `_getHistoryTargets`) - grouped as
 // the callers of `_recordHistoryStep` usually can't tell them apart.
@@ -388,6 +395,10 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onExtractAsExternalLayout?: (name: string) => void,
+  // Undo/redo of an extraction: the external layout is removed from the
+  // project (its tab closed first) or created again.
+  onUndoExtractAsExternalLayout?: (name: string) => Promise<void>,
+  onRedoExtractAsExternalLayout?: (name: string) => void,
   onExtractAsEventBasedObject: (
     extensionName: string,
     eventsBasedObjectName: string
@@ -936,6 +947,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     // /!\ Drop the selection to avoid keeping any references to deleted instances.
     // This could be avoided if the selection used something like UUID to address instances.
     this.instancesSelection.clearSelection();
+    this._refreshHistoryValuesFromProject();
 
     // /!\ Force the instances editor to destroy and mount again the
     // renderers to avoid keeping any references to existing instances
@@ -947,6 +959,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   onObjectsModifiedOutsideEditor = () => {
+    this._refreshHistoryValuesFromProject();
     // Force refresh of the objects list.
     this.forceUpdateObjectsList();
   };
@@ -981,6 +994,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.state.selectedObjectGroup) {
       this.setState({ selectedObjectGroup: null });
     }
+    this._refreshHistoryValuesFromProject();
 
     // Force refresh of the object groups list.
     this.forceUpdateObjectGroupsList();
@@ -1901,6 +1915,55 @@ export default class SceneEditor extends React.Component<Props, State> {
     serializeCompositeTargets(this._getHistoryTargets(), keys);
 
   /**
+   * The value of the targets edited by the properties panel (see
+   * `_getSelectionHistoryKeys`), serializing only the selected object(s) -
+   * or the objects of the selected group, which its variables are applied
+   * to - rather than every object on each keystroke.
+   */
+  _getSelectionPartialSnapshot = (
+    baseValue: Object,
+    keys: Array<string>
+  ): Object => {
+    const { objectsContainer, globalObjectsContainer } = this.props;
+    const {
+      lastSelectionType,
+      selectedObjectGroup,
+      selectedObjectFolderOrObjectsWithContext,
+    } = this.state;
+    if (lastSelectionType === 'object') {
+      const objects = selectedObjectFolderOrObjectsWithContext
+        .map(item =>
+          exceptionallyGuardAgainstDeadObject(item.objectFolderOrObject)
+        )
+        .filter(Boolean)
+        .filter(objectFolderOrObject => !objectFolderOrObject.isFolder())
+        .map(objectFolderOrObject => objectFolderOrObject.getObject());
+      return this._getObjectsPartialSnapshot(baseValue, objects);
+    }
+    if (lastSelectionType === 'objectGroup' && selectedObjectGroup) {
+      const objects = selectedObjectGroup
+        .getAllObjectsNames()
+        .toJSArray()
+        .map(objectName =>
+          objectsContainer.hasObjectNamed(objectName)
+            ? objectsContainer.getObject(objectName)
+            : globalObjectsContainer &&
+              globalObjectsContainer.hasObjectNamed(objectName)
+            ? globalObjectsContainer.getObject(objectName)
+            : null
+        )
+        .filter(Boolean);
+      return {
+        ...this._serializeHistoryTargets(
+          keys.filter(key => OBJECT_GROUPS_HISTORY_KEYS.includes(key))
+        ),
+        ...this._getObjectsPartialSnapshot(baseValue, objects),
+      };
+    }
+    return this._serializeHistoryTargets(keys);
+  };
+
+  /**
    * Return the history, with any modification pending a debounced save
    * (see `_queuePanelHistorySave`) committed to it. Must be used by
    * undo/redo: an uncommitted modification would otherwise be reverted
@@ -2224,11 +2287,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         // After the instances: the 3D editor can only select the ones it has.
         this._sendSelectedInstances();
 
-        const renamedName = command
-          ? direction === 'undo'
-            ? command.oldName
-            : command.newName
-          : null;
+        const renamedName =
+          command && command.type !== 'extractAsExternalLayout'
+            ? direction === 'undo'
+              ? command.oldName
+              : command.newName
+            : null;
         this._revealHistoryChanges(
           valueBeforeChange,
           newHistory.currentValue,
@@ -2356,6 +2420,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     command: HistoryCommand,
     direction: 'undo' | 'redo'
   ) => {
+    if (command.type === 'extractAsExternalLayout') {
+      this._applyExtractAsExternalLayoutCommand(command, direction);
+      return;
+    }
     const { oldName, newName } = command;
     const [from, to] =
       direction === 'undo' ? [newName, oldName] : [oldName, newName];
@@ -2366,6 +2434,40 @@ export default class SceneEditor extends React.Component<Props, State> {
     } else if (command.type === 'renameLayer') {
       this._renameLayer(from, to);
     }
+  };
+
+  _applyExtractAsExternalLayoutCommand = (
+    command: {|
+      type: 'extractAsExternalLayout',
+      externalLayoutName: string,
+      serializedExternalLayout: Object,
+    |},
+    direction: 'undo' | 'redo'
+  ) => {
+    const {
+      project,
+      onUndoExtractAsExternalLayout,
+      onRedoExtractAsExternalLayout,
+    } = this.props;
+    const { externalLayoutName, serializedExternalLayout } = command;
+    if (direction === 'undo') {
+      if (onUndoExtractAsExternalLayout)
+        onUndoExtractAsExternalLayout(externalLayoutName);
+      return;
+    }
+    if (project.hasExternalLayoutNamed(externalLayoutName)) return;
+    const externalLayout = project.insertNewExternalLayout(
+      externalLayoutName,
+      project.getExternalLayoutsCount()
+    );
+    unserializeFromJSObject(
+      externalLayout,
+      serializedExternalLayout,
+      'unserializeFrom',
+      project
+    );
+    if (onRedoExtractAsExternalLayout)
+      onRedoExtractAsExternalLayout(externalLayoutName);
   };
 
   /**
@@ -2932,6 +3034,8 @@ export default class SceneEditor extends React.Component<Props, State> {
    * Called when this editor becomes active again: the project may have been
    * changed by another editor meanwhile. What it changed is not undoable
    * from here, but must never be reverted by the undo of a later step.
+   * Also called when the AI (or another tool) changes the scene while this
+   * editor is active.
    * (Not to be called while this editor is used: it would absorb a change
    * of this editor made before its step is recorded.)
    */
@@ -2973,7 +3077,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     actionType: ?RevertableActionType,
     changeContext: HistoryChangeContext,
     keys: Array<string>,
-    callback?: () => void
+    callback?: () => void,
+    command?: HistoryCommand
   ) => {
     this._flushPendingPanelHistorySave();
     this._setHistory(
@@ -2981,13 +3086,16 @@ export default class SceneEditor extends React.Component<Props, State> {
         this._getLatestHistory(),
         this._serializeHistoryTargets(keys),
         actionType || undefined,
-        this._withRevealSelection(changeContext)
+        this._withRevealSelection(changeContext),
+        command
       ),
       () => {
         this.updateToolbar();
         if (callback) callback();
       }
     );
+    if (!keys.includes('instances'))
+      this._refreshInstancesRefactoredWithObjects(keys);
     this._checkNoUndeclaredHistoryChange(keys);
   };
 
@@ -3558,7 +3666,20 @@ export default class SceneEditor extends React.Component<Props, State> {
       ),
       () => this.updateToolbar()
     );
-    this._checkNoUndeclaredHistoryChange(Object.keys(pending.value));
+    const keys = Object.keys(pending.value);
+    this._refreshInstancesRefactoredWithObjects(keys);
+    this._checkNoUndeclaredHistoryChange(keys);
+  };
+
+  /**
+   * A change to the variables of an object (or of a group) is also applied
+   * to the instances of the object by the refactoring (a variable renamed
+   * or retyped), without a step: refresh their cached value so a later
+   * undo doesn't put the old names back.
+   */
+  _refreshInstancesRefactoredWithObjects = (keys: Array<string>) => {
+    if (keys.some(key => OBJECTS_HISTORY_KEYS.includes(key)))
+      this._refreshHistoryValue(['instances']);
   };
 
   // $FlowFixMe[missing-local-annot]
@@ -4504,7 +4625,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     return true;
   };
 
-  deleteSelection = () => {
+  deleteSelection = (options?: {| command: HistoryCommand |}) => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     const instancesToDelete = selectedInstances.filter(
       instance => !instance.isLocked()
@@ -4522,7 +4643,13 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.initialInstances.removeInstance(instance);
     });
 
-    this._recordHistoryStep('DELETE', { source: 'canvas' }, ['instances']);
+    this._recordHistoryStep(
+      'DELETE',
+      { source: 'canvas' },
+      ['instances'],
+      undefined,
+      options ? options.command : undefined
+    );
     this.setState({
       selectedObjectFolderOrObjectsWithContext: [],
     });
@@ -5140,7 +5267,13 @@ export default class SceneEditor extends React.Component<Props, State> {
       instance.delete();
     }
 
-    this.deleteSelection();
+    this.deleteSelection({
+      command: {
+        type: 'extractAsExternalLayout',
+        externalLayoutName: newName,
+        serializedExternalLayout: serializeToJSObject(newExternalLayout),
+      },
+    });
 
     this.setState({ extractAsExternalLayoutDialogOpen: false });
 
@@ -6849,7 +6982,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                                   baseValue,
                                   this.instancesSelection.getSelectedInstances()
                                 )
-                              : this._serializeHistoryTargets(keys)
+                              : this._getSelectionPartialSnapshot(
+                                  baseValue,
+                                  keys
+                                )
                         );
                       },
                     }}

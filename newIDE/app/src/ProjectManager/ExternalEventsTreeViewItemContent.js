@@ -20,6 +20,7 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
 
 export type ExternalEventsTreeViewItemCallbacks = {|
+  onExternalEventsAdded: (name: string) => void,
   onDeleteExternalEvents: gdExternalEvents => void,
   onRenameExternalEvents: (string, string) => void,
   onOpenExternalEvents: string => void,
@@ -209,6 +210,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
 
     this._onProjectItemModified();
     this.props.editName(getExternalEventsTreeViewItemId(newExternalEvents));
+    this.props.onExternalEventsAdded(newName);
   }
 
   _duplicate(): void {

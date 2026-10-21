@@ -2599,15 +2599,20 @@ const MainFrame = (props: Props): React.MixedElement => {
   const applyProjectManagerRenameCommand = (
     command: ProjectManagerRenameCommand,
     direction: 'undo' | 'redo'
-  ) => {
+  ): boolean => {
     const { currentProject } = state;
-    if (!currentProject) return;
+    if (!currentProject) return false;
 
     const fromName = direction === 'undo' ? command.newName : command.oldName;
     const toName = direction === 'undo' ? command.oldName : command.newName;
 
     if (command.type === 'renameScene') {
-      if (!currentProject.hasLayoutNamed(fromName)) return;
+      // The name can be taken by a scene added outside the history.
+      if (
+        !currentProject.hasLayoutNamed(fromName) ||
+        currentProject.hasLayoutNamed(toName)
+      )
+        return false;
       renameLayoutInProject(currentProject, fromName, toName);
       if (inAppTutorialOrchestratorRef.current) {
         inAppTutorialOrchestratorRef.current.changeData(fromName, toName);
@@ -2631,7 +2636,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         _onProjectItemModified();
       });
     } else if (command.type === 'renameExternalLayout') {
-      if (!currentProject.hasExternalLayoutNamed(fromName)) return;
+      if (
+        !currentProject.hasExternalLayoutNamed(fromName) ||
+        currentProject.hasExternalLayoutNamed(toName)
+      )
+        return false;
       const externalLayout = currentProject.getExternalLayout(fromName);
       externalLayout.setName(toName);
       gd.WholeProjectRefactorer.renameExternalLayout(
@@ -2662,7 +2671,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         _onProjectItemModified();
       });
     } else {
-      if (!currentProject.hasExternalEventsNamed(fromName)) return;
+      if (
+        !currentProject.hasExternalEventsNamed(fromName) ||
+        currentProject.hasExternalEventsNamed(toName)
+      )
+        return false;
       const externalEvents = currentProject.getExternalEvents(fromName);
       externalEvents.setName(toName);
       gd.WholeProjectRefactorer.renameExternalEvents(
@@ -2686,6 +2699,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         _onProjectItemModified();
       });
     }
+    return true;
   };
 
   /**
@@ -4026,6 +4040,20 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     [notifyChangesToInGameEditor, openExternalLayout]
   );
+
+  const onUndoExtractAsExternalLayout = async (name: string) => {
+    const { currentProject } = state;
+    if (!currentProject || !currentProject.hasExternalLayoutNamed(name)) return;
+    await onWillDeleteScene({
+      externalLayout: currentProject.getExternalLayout(name),
+    });
+    currentProject.removeExternalLayout(name);
+    _onProjectItemModified();
+  };
+
+  const onRedoExtractAsExternalLayout = (name: string) => {
+    _onProjectItemModified();
+  };
 
   const _onReloadEventsFunctionsExtensionsAsync = React.useCallback(
     async () => {
@@ -6395,6 +6423,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     renameResourcesInProject: renameResourcesInProject,
     openBehaviorEvents: openBehaviorEvents,
     onExtractAsExternalLayout: onExtractAsExternalLayout,
+    onUndoExtractAsExternalLayout: onUndoExtractAsExternalLayout,
+    onRedoExtractAsExternalLayout: onRedoExtractAsExternalLayout,
     onExtractAsEventBasedObject: onExtractAsEventBasedObject,
     onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,

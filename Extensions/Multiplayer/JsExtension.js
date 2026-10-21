@@ -211,7 +211,7 @@ module.exports = {
         'QuickJoinFailureReason',
         _('Quick join action failure reason'),
         _(
-          "Returns the reason why the Quick join action failed. It can either be 'FULL' if all lobbies were occupied, 'NOT_ENOUGH_PLAYERS' if the lobby's configuration requires more than 1 player to start the game and no other players were available. It can also take the value 'UNKNOWN'."
+          "Returns why the Quick join action failed: 'FULL' when all lobbies are occupied, 'NOT_ENOUGH_PLAYERS' when no other players are available for a lobby that requires multiple players, 'DOES_NOT_EXIST' when the requested lobby is not found, 'TIMEOUT' when a joining lobby does not provide a peer ID within 10 seconds, or 'UNKNOWN' for other errors."
         ),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'

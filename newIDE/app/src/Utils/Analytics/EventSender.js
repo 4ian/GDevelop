@@ -998,3 +998,14 @@ export const sendAiRequestMessageSent = (metadata: {|
 |}) => {
   recordEvent('ai-request-message-sent', metadata);
 };
+
+export const sendMcpToolCalled = (metadata: {|
+  toolName: string,
+  clientName: string | null,
+  success: boolean,
+  durationMs: number,
+  // `http`: an agent connected to the opened editor; `stdio`: `--mcp`.
+  transport: 'http' | 'stdio',
+|}) => {
+  recordEvent('mcp-tool-called', metadata);
+};

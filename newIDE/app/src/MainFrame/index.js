@@ -196,6 +196,10 @@ import {
   type ImportExtension,
   type SaveProject,
 } from './LocalCliCommandRunner';
+import {
+  type CliEditorFunctionsEditorCallbacks,
+  type CliProjectCreationCallbacks,
+} from './CliEditorFunctions';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import {
   type PreviewState,
@@ -412,6 +416,36 @@ const usePreviewLoadingState = () => {
   };
 };
 
+type CliCommandRunnerOptions = {|
+  project: ?gdProject,
+  i18n: I18n,
+  fileMetadata: ?FileMetadata,
+  fileIdentifier: ?string,
+  storageProviderName: ?string,
+  resourceManagementProps: ResourceManagementProps,
+  editorFunctionsEditorCallbacks: CliEditorFunctionsEditorCallbacks,
+  commandPaletteRef: {| current: ?CommandPaletteInterface |},
+  importExtension: ImportExtension,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  saveProject: SaveProject,
+  ensureProjectSettingsApplied: () => Promise<void>,
+  projectCreationCallbacks: CliProjectCreationCallbacks,
+|};
+
+// A child component, so that the editor services the CLI runner subscribes to
+// (the object and extension stores) re-render it rather than the MainFrame.
+const CliCommandRunner = ({
+  useCliCommandRunner,
+  options,
+}: {|
+  useCliCommandRunner: (options: CliCommandRunnerOptions) => void,
+  options: CliCommandRunnerOptions,
+|}) => {
+  useCliCommandRunner(options);
+  return null;
+};
+
 export type Props = {|
   renderMainMenu?: (
     BuildMainMenuProps,
@@ -443,17 +477,7 @@ export type Props = {|
   initialFileMetadataToOpen: ?FileMetadata,
   initialExampleSlugToOpen: ?string,
   i18n: I18n,
-  useCliCommandRunner: ({|
-    project: ?gdProject,
-    i18n: I18n,
-    fileIdentifier: ?string,
-    commandPaletteRef: {| current: ?CommandPaletteInterface |},
-    importExtension: ImportExtension,
-    onWillInstallExtension: (extensionNames: Array<string>) => void,
-    onExtensionInstalled: (extensionNames: Array<string>) => void,
-    saveProject: SaveProject,
-    ensureProjectSettingsApplied: () => Promise<void>,
-  |}) => void,
+  useCliCommandRunner: (options: CliCommandRunnerOptions) => void,
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
 
@@ -5923,18 +5947,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
   });
 
-  useCliCommandRunner({
-    project: state.currentProject,
-    i18n,
-    fileIdentifier,
-    commandPaletteRef,
-    importExtension,
-    onWillInstallExtension,
-    onExtensionInstalled,
-    saveProject,
-    ensureProjectSettingsApplied,
-  });
-
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
     () => ({
       resourceSources,
@@ -5961,6 +5973,43 @@ const MainFrame = (props: Props): React.MixedElement => {
       resourceCustomPropertyConfigs,
     ]
   );
+
+  const editorFunctionsEditorCallbacks: CliEditorFunctionsEditorCallbacks = {
+    notifications: {
+      onSceneEventsModifiedOutsideEditor,
+      onInstancesModifiedOutsideEditor,
+      onObjectsModifiedOutsideEditor,
+      onEffectsModifiedOutsideEditor: onEffectAdded,
+      onObjectGroupsModifiedOutsideEditor,
+      onExtensionsModifiedOutsideEditor,
+    },
+    onProjectItemRenamedOutsideEditor,
+    onWillDeleteScene,
+    onWillDeleteGameplayTest,
+    onWillDeleteObject,
+    onWillDeleteExtensionItem,
+  };
+
+  const cliCommandRunnerOptions: CliCommandRunnerOptions = {
+    project: state.currentProject,
+    i18n,
+    fileMetadata: currentFileMetadata,
+    fileIdentifier,
+    storageProviderName: getStorageProvider().internalName,
+    resourceManagementProps,
+    editorFunctionsEditorCallbacks,
+    commandPaletteRef,
+    importExtension,
+    onWillInstallExtension,
+    onExtensionInstalled,
+    saveProject,
+    ensureProjectSettingsApplied,
+    projectCreationCallbacks: {
+      createEmptyProject,
+      createProjectFromExample,
+      saveProjectAsWithStorageProvider,
+    },
+  };
 
   const projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = React.useMemo(
     () =>
@@ -6203,6 +6252,10 @@ const MainFrame = (props: Props): React.MixedElement => {
         'main-frame' /* The root styling, done in CSS to read some CSS variables. */
       }
     >
+      <CliCommandRunner
+        useCliCommandRunner={useCliCommandRunner}
+        options={cliCommandRunnerOptions}
+      />
       {!!renderPreviewLauncher &&
         renderPreviewLauncher(
           {

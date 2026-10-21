@@ -925,7 +925,9 @@ export const createAiGeneratedEvent = async (
     existingEventsJson: string | null,
     existingEventsJsonUserRelativeKey: string | null,
     placementHint: string | null,
-    relatedAiRequestId: string,
+    // Null for a request outside the GDevelop AI (the CLI, the MCP server):
+    // the events scripts are then only compiled, never handed to an agent.
+    relatedAiRequestId: string | null,
     estimatedComplexity: number | null,
   |}
 ): Promise<CreateAiGeneratedEventResult> => {

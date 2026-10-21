@@ -10,7 +10,7 @@ GDevelop relies on some dependencies that can have special requirements.
 
 The app is built (`npm start`, `npm run build`) with **Rsbuild** (see `rsbuild.config.js`). Babel is only used to strip Flow types and run Lingui macros - everything else is done by SWC.
 
-- `react-scripts` and `react-app-rewired` are only used for Jest (`npm test`) and Storybook. They can be removed once these are migrated.
+- Jest (`npm test`, see `jest.config.js`) uses Babel only, with `.babelrc.json`.
 - ESLint is not run during the build: run `npm run lint`.
 
 ## Storybook

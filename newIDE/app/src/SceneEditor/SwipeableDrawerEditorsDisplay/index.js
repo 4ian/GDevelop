@@ -147,6 +147,10 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       if (instanceOrObjectPropertiesEditorRef.current)
         instanceOrObjectPropertiesEditorRef.current.revealVariable(nodeId);
     }, []);
+    const resetPropertiesVariablesRefactoring = React.useCallback(() => {
+      if (instanceOrObjectPropertiesEditorRef.current)
+        instanceOrObjectPropertiesEditorRef.current.resetVariablesRefactoring();
+    }, []);
     const forceUpdateInstancesList = React.useCallback(() => {
       if (instancesListRef.current) instancesListRef.current.forceUpdate();
     }, []);
@@ -266,6 +270,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
         forceUpdateInstancesList,
         forceUpdatePropertiesEditor,
         revealPropertiesVariable,
+        resetPropertiesVariablesRefactoring,
         forceUpdateObjectsList,
         scrollObjectsListToObject,
         forceUpdateObjectGroupsList,

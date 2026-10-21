@@ -7383,45 +7383,11 @@ namespace gdjs {
     }
   }
 
-<<<<<<< ours
   class ObjectSelectionBoxHelper2D implements ObjectSelectionBoxHelper {
     editor: gdjs.InGameEditor;
     object: gdjs.RuntimeObject;
     area: ThreeSquare;
     isVisible: boolean = false;
-||||||| base
-  class SelectionControls {
-    private editor: InGameEditor;
-    object: gdjs.RuntimeObject | null = null;
-    dummyThreeObject: THREE.Object3D = new THREE.Object3D();
-    threeTransformControls: THREE_ADDONS.TransformControls | null = null;
-    private _transformControlsMode: 'translate' | 'rotate' | 'scale' =
-      'translate';
-    private _isShown = false;
-
-    private _selectionControlsMovementTotalDelta: SelectionMovement | null =
-      null;
-    private _hasActuallyMoved = false;
-    private _wasMovingLastFrame = false;
-    private _objectMover: ObjectMover;
-=======
-  class SelectionControls {
-    private editor: InGameEditor;
-    object: gdjs.RuntimeObject | null = null;
-    dummyThreeObject: THREE.Object3D = new THREE.Object3D();
-    threeTransformControls: THREE_ADDONS.TransformControls | null = null;
-    private _transformControlsMode: 'translate' | 'rotate' | 'scale' =
-      'translate';
-    private _isShown = false;
-
-    private _selectionControlsMovementTotalDelta: SelectionMovement | null =
-      null;
-    private _hasActuallyMoved = false;
-    private _wasMovingLastFrame = false;
-    private _objectMover: ObjectMover;
-    /** Put the controls back on the object, after it was changed. */
-    private _syncWithObject: (() => void) | null = null;
->>>>>>> theirs
 
     constructor(editor: gdjs.InGameEditor, object: gdjs.RuntimeObject) {
       this.editor = editor;
@@ -7518,6 +7484,8 @@ namespace gdjs {
     private _hasActuallyMoved = false;
     private _wasMovingLastFrame = false;
     private _objectMover: ObjectMover3D;
+    /** Put the controls back on the object, after it was changed. */
+    private _syncWithObject: (() => void) | null = null;
 
     _draggedSelectedObject: gdjs.RuntimeObject | null = null;
     private _objectToDuplicateOnDrag: gdjs.RuntimeObject | null = null;

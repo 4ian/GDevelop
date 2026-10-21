@@ -255,6 +255,7 @@ type Props = {|
 
 export type CompactObjectPropertiesEditorInterface = {|
   revealVariable: (nodeId: string) => void,
+  resetVariablesRefactoring: () => void,
 |};
 
 export const CompactObjectPropertiesEditor: React.ComponentType<{
@@ -302,11 +303,13 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
     const { showDeleteConfirmation } = useAlertDialog();
     const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
+    const resetVariablesRefactoringRef = React.useRef<() => void>(() => {});
     React.useImperativeHandle(ref, () => ({
       revealVariable: (nodeId: string) => {
         if (variablesListRef.current)
           variablesListRef.current.revealVariable(nodeId);
       },
+      resetVariablesRefactoring: () => resetVariablesRefactoringRef.current(),
     }));
     const object = objects[0];
     const variablesContainer = exceptionallyGuardAgainstDeadObject(
@@ -546,7 +549,10 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
     });
 
     // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
-    const { onVariablesUpdated } = useVariablesContainerRefactoring({
+    const {
+      onVariablesUpdated,
+      resetSnapshot: resetVariablesRefactoring,
+    } = useVariablesContainerRefactoring({
       project,
       variablesContainer: object.getVariables(),
       initialInstances,
@@ -557,6 +563,7 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
       objectsContainer: null,
       globalObjectsContainer: null,
     });
+    resetVariablesRefactoringRef.current = resetVariablesRefactoring;
 
     const propertiesSchema = React.useMemo(
       () => {

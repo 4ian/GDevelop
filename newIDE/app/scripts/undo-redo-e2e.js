@@ -1710,6 +1710,194 @@ scenarios[structureScenarioName] = async editor => {
   expectEqual(await getNames(), renamedNames, 'undo of the top level rename');
 };
 
+const renameVariableInPanel = async (editor, panel, oldName, newName) => {
+  const nameField = (await editor.page.evaluateHandle(
+    (panel, oldName) =>
+      Array.from(document.querySelectorAll(`${panel} input[id$="-name"]`)).find(
+        input => input.value === oldName
+      ),
+    panel,
+    oldName
+  )).asElement();
+  if (!nameField) throw new Error(`Variable "${oldName}" not in ${panel}.`);
+  await nameField.click({ clickCount: 3 });
+  await editor.page.keyboard.type(newName);
+  await editor.page.keyboard.press('Tab');
+  await sleep(HISTORY_SAVE_DELAY);
+};
+
+const getEventActionParameter = (editor, parameterIndex, actionIndex = 0) =>
+  evaluateWithSceneEditor(
+    editor,
+    (props, gd, parameterIndex, actionIndex) =>
+      gd
+        .asStandardEvent(props.layout.getEvents().getEventAt(0))
+        .getActions()
+        .get(actionIndex)
+        .getParameter(parameterIndex)
+        .getPlainString(),
+    parameterIndex,
+    actionIndex
+  );
+
+{
+  const name =
+    'undoing a scene variable rename renames it back in the events too';
+  fixtureSetups[name] = project => {
+    project.layouts[0].events = [
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['VarA', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+    ];
+  };
+  scenarios[name] = async editor => {
+    const panel = '#scene-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'scene-variables-section');
+    const getEventVariableName = () => getEventActionParameter(editor, 0);
+    await renameVariableInPanel(editor, panel, 'VarA', 'Score');
+    expectEqual(await getEventVariableName(), 'Score', 'event after rename');
+
+    await editor.undo();
+    expectEqual(
+      await editor.getVariableNames(panel),
+      ['VarA', 'VarB'],
+      'variables after undo'
+    );
+    expectEqual(await getEventVariableName(), 'VarA', 'event after undo');
+    await editor.redo();
+    expectEqual(await getEventVariableName(), 'Score', 'event after redo');
+
+    // The panel must follow the undo too: its next rename starts from the
+    // variable as the undo left it.
+    await editor.undo();
+    await renameVariableInPanel(editor, panel, 'VarA', 'Points');
+    expectEqual(
+      await getEventVariableName(),
+      'Points',
+      'event after a rename made in the panel after the undo'
+    );
+  };
+}
+
+{
+  const name =
+    'undoing an object variable rename renames it back in the events too';
+  fixtureSetups[name] = project => {
+    project.layouts[0].events = [
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberObjectVariable' },
+            parameters: ['VariablesObject', 'VarA', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+    ];
+  };
+  scenarios[name] = async editor => {
+    await editor.selectObjectInList('VariablesObject');
+    const panel = '#object-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'object-variables-section');
+    const getEventVariableName = () => getEventActionParameter(editor, 1);
+    await renameVariableInPanel(editor, panel, 'VarA', 'Score');
+    expectEqual(await getEventVariableName(), 'Score', 'event after rename');
+
+    await editor.undo();
+    expectEqual(await getEventVariableName(), 'VarA', 'event after undo');
+    await editor.redo();
+    expectEqual(await getEventVariableName(), 'Score', 'event after redo');
+
+    await editor.undo();
+    await renameVariableInPanel(editor, panel, 'VarA', 'Points');
+    expectEqual(
+      await getEventVariableName(),
+      'Points',
+      'event after a rename made in the panel after the undo'
+    );
+  };
+}
+
+{
+  const name =
+    'undoing a group variable rename renames it back in the events too';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objects[0].variables = makeVariables();
+    project.layouts[0].objectsGroups.push({
+      name: 'VariablesGroup',
+      objects: [{ name: 'VariablesObject' }, { name: 'MyObject' }],
+    });
+    project.layouts[0].events = [
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberObjectVariable' },
+            parameters: ['VariablesGroup', 'VarA', '=', '1'],
+          },
+          {
+            type: { value: 'SetNumberObjectVariable' },
+            parameters: ['VariablesObject', 'VarA', '=', '2'],
+          },
+          {
+            type: { value: 'SetNumberObjectVariable' },
+            parameters: ['MyObject', 'VarA', '=', '3'],
+          },
+        ],
+        events: [],
+      },
+    ];
+  };
+  scenarios[name] = async editor => {
+    await editor.selectGroup('VariablesGroup');
+    const panel = '#object-group-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'group-variables-section');
+    const getEventVariableNames = async () => [
+      await getEventActionParameter(editor, 1, 0),
+      await getEventActionParameter(editor, 1, 1),
+      await getEventActionParameter(editor, 1, 2),
+    ];
+    await renameVariableInPanel(editor, panel, 'VarA', 'Score');
+    expectEqual(
+      await getEventVariableNames(),
+      ['Score', 'Score', 'Score'],
+      'events after rename'
+    );
+
+    await editor.undo();
+    expectEqual(
+      await getEventVariableNames(),
+      ['VarA', 'VarA', 'VarA'],
+      'events after undo'
+    );
+    await editor.redo();
+    expectEqual(
+      await getEventVariableNames(),
+      ['Score', 'Score', 'Score'],
+      'events after redo'
+    );
+
+    await editor.undo();
+    await renameVariableInPanel(editor, panel, 'VarA', 'Points');
+    expectEqual(
+      await getEventVariableNames(),
+      ['Points', 'Points', 'Points'],
+      'events after a rename made in the panel after the undo'
+    );
+  };
+}
+
 const makeEffectHighlightScenario = (
   effectName,
   fieldId,
@@ -5342,6 +5530,473 @@ scenarios[
     'scene editor still active'
   );
 };
+
+/** Run `fn(props, gd)` with the props of the active scene editor. */
+const evaluateWithSceneEditor = (editor, fn, ...args) =>
+  editor.page.evaluate(
+    (source, ...args) => {
+      const element =
+        Array.from(document.querySelectorAll('#scene-editor')).find(element =>
+          element.hasAttribute('data-active')
+        ) || document.getElementById('scene-editor');
+      const fiberKey = Object.keys(element).find(key =>
+        key.startsWith('__reactFiber$')
+      );
+      let fiber = fiberKey ? element[fiberKey] : null;
+      while (fiber && !(fiber.stateNode && fiber.stateNode.instancesSelection))
+        fiber = fiber.return;
+      // eslint-disable-next-line no-undef
+      const libGD = gd;
+      // eslint-disable-next-line no-new-func
+      return new Function('props', 'gd', 'return ' + source)(
+        fiber.stateNode.props,
+        libGD
+      )(fiber.stateNode.props, libGD, ...args);
+    },
+    fn.toString(),
+    ...args
+  );
+
+// The project manager drawer stays in the DOM when closed (hidden).
+const isProjectManagerOpen = editor =>
+  editor.page.evaluate(() => {
+    const root = document.getElementById('project-manager');
+    return !!root && getComputedStyle(root).visibility === 'visible';
+  });
+
+const openProjectManager = async editor => {
+  const { page } = editor;
+  if (!(await isProjectManagerOpen(editor))) {
+    await (await page.$('#main-toolbar-project-manager-button')).click();
+    await editor.waitUntil('project manager open', () =>
+      isProjectManagerOpen(editor)
+    );
+  }
+  await sleep(800);
+};
+
+const closeProjectManager = async editor => {
+  await editor.page.keyboard.press('Escape');
+  await sleep(800);
+};
+
+const hasProjectManagerItem = (editor, name) =>
+  editor.page.evaluate(name => {
+    const root = document.getElementById('project-manager');
+    return (
+      !!root &&
+      Array.from(root.querySelectorAll('span, p, input')).some(
+        element => (element.value || element.textContent) === name
+      )
+    );
+  }, name);
+
+const getProjectManagerItemHandle = async (editor, name) => {
+  const handle = await editor.page.evaluateHandle(name => {
+    const root = document.getElementById('project-manager');
+    return Array.from(root.querySelectorAll('span, p')).find(
+      element => element.children.length === 0 && element.textContent === name
+    );
+  }, name);
+  if (!handle.asElement())
+    throw new Error(`No item ${name} in the project manager`);
+  return handle.asElement();
+};
+
+/** Whether an editor tab with this label is open (project manager aside). */
+const hasEditorTab = (editor, name) =>
+  editor.page.evaluate(
+    name =>
+      Array.from(document.querySelectorAll('span, p, div')).some(
+        element =>
+          element.children.length === 0 &&
+          element.textContent === name &&
+          !element.closest('#project-manager')
+      ),
+    name
+  );
+
+/** Click an item of the project manager, which opens its editor. */
+const openProjectManagerItem = async (editor, name) => {
+  await (await getProjectManagerItemHandle(editor, name)).click();
+  await editor.waitUntil(`${name} tab open`, () => hasEditorTab(editor, name));
+  await sleep(1500);
+};
+
+const getSceneNames = editor =>
+  evaluateWithSceneEditor(editor, props => {
+    const names = [];
+    for (let i = 0; i < props.project.getLayoutsCount(); i++)
+      names.push(props.project.getLayoutAt(i).getName());
+    return names;
+  });
+
+const deleteProjectManagerItem = async (editor, name) => {
+  const item = await getProjectManagerItemHandle(editor, name);
+  await item.click({ button: 'right' });
+  await editor.clickMenuItem(/^delete/i);
+  // The native confirmation is accepted by the script.
+  await editor.waitUntil(
+    `${name} deleted`,
+    async () => !(await hasProjectManagerItem(editor, name))
+  );
+  await sleep(500);
+};
+
+const renameProjectManagerItem = async (editor, name, newName) => {
+  const item = await getProjectManagerItemHandle(editor, name);
+  await item.click({ button: 'right' });
+  await editor.clickMenuItem(/^rename/i);
+  await sleep(500);
+  await editor.page.keyboard.down('Control');
+  await editor.page.keyboard.press('a');
+  await editor.page.keyboard.up('Control');
+  await editor.page.keyboard.type(newName);
+  await editor.page.keyboard.press('Enter');
+  await editor.waitUntil(`${name} renamed`, () =>
+    hasProjectManagerItem(editor, newName)
+  );
+  await sleep(500);
+};
+
+const addSceneFromProjectManager = async (editor, name) => {
+  await editor.page.evaluate(() => {
+    document.getElementById('add-new-scene-button').click();
+  });
+  await sleep(800);
+  await editor.page.keyboard.type(name);
+  await editor.page.keyboard.press('Enter');
+  await editor.waitUntil(`${name} created`, () =>
+    hasProjectManagerItem(editor, name)
+  );
+  await sleep(500);
+};
+
+const pressUndoInProjectManager = async (editor, withShift) => {
+  const { keyboard } = editor.page;
+  await keyboard.down('Control');
+  if (withShift) await keyboard.down('Shift');
+  await keyboard.press('z');
+  if (withShift) await keyboard.up('Shift');
+  await keyboard.up('Control');
+  await sleep(800);
+};
+
+scenarios[
+  'a scene deleted from the project manager comes back with its latest changes'
+] = async editor => {
+  const panel = '#scene-properties-editor';
+  await editor.unfoldVariablesSection(panel, 'scene-variables-section');
+  await editor.setFieldValue(`${panel} #variable-0-text-value`, '10');
+
+  await openProjectManager(editor);
+  await deleteProjectManagerItem(editor, 'Scene');
+  await pressUndoInProjectManager(editor, false);
+  await editor.waitUntil('scene back', () =>
+    hasProjectManagerItem(editor, 'Scene')
+  );
+  await openProjectManagerItem(editor, 'Scene');
+  await editor.unfoldVariablesSection(panel, 'scene-variables-section');
+  expectEqual(
+    await editor.getFieldValue(`${panel} #variable-0-text-value`),
+    '10',
+    'VarA of the restored scene'
+  );
+};
+
+scenarios[
+  'undoing a scene creation made after a scene rename keeps the renamed scene'
+] = async editor => {
+  await openProjectManager(editor);
+  await renameProjectManagerItem(editor, 'Scene', 'Scene2');
+  expectEqual(await getSceneNames(editor), ['Scene2'], 'scenes after rename');
+  await addSceneFromProjectManager(editor, 'MyNewScene');
+  expectEqual(
+    await getSceneNames(editor),
+    ['Scene2', 'MyNewScene'],
+    'scenes after add'
+  );
+  // A creation is two steps: the add, and the rename of the untitled scene.
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(
+    await getSceneNames(editor),
+    ['Scene2', 'Untitled scene'],
+    'scenes after the undo of the rename'
+  );
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(await getSceneNames(editor), ['Scene2'], 'scenes after undo');
+  expectEqual(
+    await hasProjectManagerItem(editor, 'Scene2'),
+    true,
+    'renamed scene shown after undo'
+  );
+  expectEqual(editor.fatalErrors, [], 'fatal errors');
+};
+
+scenarios['undoing a scene creation closes its tab'] = async editor => {
+  await openProjectManager(editor);
+  await addSceneFromProjectManager(editor, 'MyNewScene');
+  await openProjectManagerItem(editor, 'MyNewScene');
+  await openProjectManager(editor);
+  // A creation is two steps: the add, and the rename of the untitled scene.
+  await pressUndoInProjectManager(editor, false);
+  await pressUndoInProjectManager(editor, false);
+  expectEqual(
+    await hasProjectManagerItem(editor, 'Untitled scene'),
+    false,
+    'new scene after undo'
+  );
+  await closeProjectManager(editor);
+  await sleep(1000);
+  for (const name of ['MyNewScene', 'Untitled scene'])
+    expectEqual(
+      await hasEditorTab(editor, name),
+      false,
+      `tab of the removed scene (${name})`
+    );
+  // Use the remaining editor.
+  await clickEditorTab(editor, 'Scene');
+  await editor.selectInstancesOf('MyObject');
+  expectEqual(await editor.getPanel(), 'instance', 'panel of the scene');
+  expectEqual(editor.fatalErrors, [], 'fatal errors');
+};
+
+{
+  const name =
+    'undoing the deletion of the first scene makes it the first scene again';
+  fixtureSetups[name] = project => {
+    project.firstLayout = 'Scene';
+  };
+  scenarios[name] = async editor => {
+    await openProjectManager(editor);
+    await deleteProjectManagerItem(editor, 'Scene');
+    await pressUndoInProjectManager(editor, false);
+    await editor.waitUntil('scene back', () =>
+      hasProjectManagerItem(editor, 'Scene')
+    );
+    await openProjectManagerItem(editor, 'Scene');
+    expectEqual(
+      await evaluateWithSceneEditor(editor, props =>
+        props.project.getFirstLayout()
+      ),
+      'Scene',
+      'first scene after undo'
+    );
+  };
+}
+
+const externalLayoutFixtureSetup = project => {
+  project.externalLayouts = [
+    {
+      name: 'Ext',
+      associatedLayout: 'Scene',
+      editionSettings: {},
+      instances: [
+        {
+          persistentUuid: '33333333-3333-3333-3333-333333333333',
+          angle: 0,
+          customSize: false,
+          height: 0,
+          layer: 'Background',
+          locked: false,
+          name: 'MyObject',
+          width: 0,
+          x: 100,
+          y: 100,
+          zOrder: 1,
+          numberProperties: [],
+          stringProperties: [],
+          initialVariables: [],
+        },
+      ],
+    },
+  ];
+};
+
+const getExternalLayoutInstanceLayers = editor =>
+  evaluateWithSceneEditor(editor, (props, gd) => {
+    const element = new gd.SerializerElement();
+    props.project
+      .getExternalLayout('Ext')
+      .getInitialInstances()
+      .serializeTo(element);
+    const json = gd.Serializer.toJSON(element);
+    element.delete();
+    return JSON.parse(json).map(instance => instance.layer);
+  });
+
+{
+  const name =
+    'undoing a layer rename puts the external layout instances back on the layer';
+  fixtureSetups[name] = externalLayoutFixtureSetup;
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    const hasLayer = name =>
+      exists(editor, `#layers-list [data-scene="${name}"]`);
+    await editor.openPanel('layers');
+    await (await page.$('#layers-list [data-scene="Background"]')).click();
+    await sleep(300);
+    await page.keyboard.press('F2');
+    await sleep(300);
+    await page.keyboard.type('RenamedLayer');
+    await page.keyboard.press('Enter');
+    await editor.waitUntil('layer renamed', () => hasLayer('RenamedLayer'));
+    await sleep(HISTORY_SAVE_DELAY);
+    expectEqual(
+      await getExternalLayoutInstanceLayers(editor),
+      ['RenamedLayer'],
+      'external layout instance layer after the rename'
+    );
+
+    await editor.undo();
+    await editor.waitUntil('layer name back', () => hasLayer('Background'));
+    expectEqual(
+      await getExternalLayoutInstanceLayers(editor),
+      ['Background'],
+      'external layout instance layer after undo'
+    );
+    await editor.redo();
+    await editor.waitUntil('layer renamed again', () =>
+      hasLayer('RenamedLayer')
+    );
+    expectEqual(
+      await getExternalLayoutInstanceLayers(editor),
+      ['RenamedLayer'],
+      'external layout instance layer after redo'
+    );
+  };
+}
+
+{
+  const name =
+    'undoing a layer change keeps the external layout tab on the live layers';
+  fixtureSetups[name] = externalLayoutFixtureSetup;
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await openProjectManager(editor);
+    await openProjectManagerItem(editor, 'Ext');
+    await closeProjectManager(editor);
+    const getInstancesEditor = () => {
+      const element = Array.from(
+        document.querySelectorAll('#scene-editor')
+      ).find(element => element.hasAttribute('data-active'));
+      // The canvas is not a React element: start from the closest one.
+      let node = element.querySelector('canvas');
+      while (
+        node &&
+        !Object.keys(node).some(key => key.startsWith('__reactFiber$'))
+      )
+        node = node.parentElement;
+      const fiberKey = Object.keys(node).find(key =>
+        key.startsWith('__reactFiber$')
+      );
+      let fiber = fiberKey ? node[fiberKey] : null;
+      while (fiber && !(fiber.stateNode && fiber.stateNode.instancesRenderer))
+        fiber = fiber.return;
+      return fiber ? fiber.stateNode : null;
+    };
+    await page.evaluate(`(${getInstancesEditor})().__e2eProbe = true`);
+    await clickEditorTab(editor, 'Scene');
+
+    await editor.openPanel('layers');
+    const layerRow = name => `#layers-list [data-scene="${name}"]`;
+    await page.evaluate(selector => {
+      document.querySelector(`${selector} [id="layer-visibility"]`).click();
+    }, layerRow('Background'));
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.undo();
+
+    await clickEditorTab(editor, 'Ext');
+    await sleep(1000);
+    const staleLayers = await page.evaluate(`(() => {
+      const instancesEditor = (${getInstancesEditor})();
+      if (!instancesEditor) return ['no instances editor'];
+      if (!instancesEditor.__e2eProbe) return ['editor remounted'];
+      const { instancesRenderer, props } = instancesEditor;
+      return Object.keys(instancesRenderer.layersRenderers).filter(
+        layerName =>
+          !props.layersContainer.hasLayerNamed(layerName) ||
+          instancesRenderer.layersRenderers[layerName].layer.ptr !==
+            props.layersContainer.getLayer(layerName).ptr
+      );
+    })()`);
+    expectEqual(staleLayers, [], 'layer renderers on deleted layers');
+    expectEqual(editor.fatalErrors, [], 'fatal errors');
+  };
+}
+
+{
+  const name =
+    'deleting a global object warns that its instances in other scenes are not restored by undo';
+  fixtureSetups[name] = project => {
+    const layout = project.layouts[0];
+    const object = layout.objects.find(object => object.name === 'MyObject');
+    layout.objects = layout.objects.filter(
+      object => object.name !== 'MyObject'
+    );
+    project.objects = [object];
+  };
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    const row = '#objects-list [data-object-name="MyObject"]';
+    await (await page.waitForSelector(row)).click({ button: 'right' });
+    await editor.clickMenuItem(/^delete(?! folder)/i);
+    await page.waitForSelector('[role="dialog"]');
+    const text = await page.$eval('[role="dialog"]', el => el.textContent);
+    expectEqual(
+      /other scenes/i.test(text),
+      true,
+      `warning about other scenes in: ${text}`
+    );
+    await editor.clickButtonWithText(
+      '[role="dialog"]',
+      /^(confirm|delete|yes|remove|continue)/
+    );
+    await editor.waitUntil(
+      'object removed',
+      async () => !(await exists(editor, row))
+    );
+    await editor.undo();
+    await editor.waitUntil('object back', () => exists(editor, row));
+  };
+}
+
+{
+  const name =
+    'deleting an object with instances in an external layout warns that undo will not restore them';
+  fixtureSetups[name] = externalLayoutFixtureSetup;
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    const row = '#objects-list [data-object-name="MyObject"]';
+    await (await page.waitForSelector(row)).click({ button: 'right' });
+    await editor.clickMenuItem(/^delete(?! folder)/i);
+    await page.waitForSelector('[role="dialog"]');
+    const text = await page.$eval('[role="dialog"]', el => el.textContent);
+    expectEqual(
+      /external layout/i.test(text),
+      true,
+      `warning about external layouts in: ${text}`
+    );
+    await editor.clickButtonWithText('[role="dialog"]', /^cancel/i);
+    await editor.waitUntil(
+      'dialog closed',
+      async () => !(await exists(editor, '[role="dialog"]'))
+    );
+
+    // An object without instances in the external layout gets no warning.
+    const otherRow = '#objects-list [data-object-name="MyCube"]';
+    await (await page.waitForSelector(otherRow)).click({ button: 'right' });
+    await editor.clickMenuItem(/^delete(?! folder)/i);
+    await page.waitForSelector('[role="dialog"]');
+    const otherText = await page.$eval('[role="dialog"]', el => el.textContent);
+    expectEqual(
+      /external layout/i.test(otherText),
+      false,
+      `no warning about external layouts in: ${otherText}`
+    );
+    await editor.clickButtonWithText('[role="dialog"]', /^cancel/i);
+  };
+}
 
 scenarios[
   'a pasted instance keeps its position after undo and redo'

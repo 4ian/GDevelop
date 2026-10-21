@@ -134,6 +134,9 @@ export type InstanceOrObjectPropertiesEditorInterface = {|
   forceUpdate: () => void,
   getEditorTitle: () => React.Node,
   revealVariable: (nodeId: string) => void,
+  // To call after an undo/redo: the refactoring of the variables edited in
+  // the panel starts from their state at that time.
+  resetVariablesRefactoring: () => void,
 |};
 
 export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
@@ -197,6 +200,14 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             );
           else if (compactScenePropertiesEditorRef.current)
             compactScenePropertiesEditorRef.current.revealVariable(nodeId);
+        },
+        resetVariablesRefactoring: () => {
+          // The group properties editor rebuilds its merged variables
+          // container (and so its refactoring snapshot) in `forceUpdate`.
+          if (compactObjectPropertiesEditorRef.current)
+            compactObjectPropertiesEditorRef.current.resetVariablesRefactoring();
+          else if (compactScenePropertiesEditorRef.current)
+            compactScenePropertiesEditorRef.current.resetVariablesRefactoring();
         },
       })
     );

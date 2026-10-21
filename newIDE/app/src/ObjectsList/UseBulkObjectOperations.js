@@ -33,6 +33,7 @@ type Props = {|
   project: gdProject,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+  hasInstancesInExternalLayouts: (objectName: string) => boolean,
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   canSetAsGlobalObject: ?boolean,
 
@@ -76,6 +77,7 @@ function useBulkObjectOperations({
   project,
   globalObjectsContainer,
   objectsContainer,
+  hasInstancesInExternalLayouts,
   selectedObjectFolderOrObjectsWithContext,
   canSetAsGlobalObject,
   selectObjectFolderOrObjectsWithContext,
@@ -180,9 +182,19 @@ function useBulkObjectOperations({
 
       const answer = await showDeleteConfirmation({
         title: t`Remove objects`,
-        message: t`Are you sure you want to remove these ${
-          objectsToDelete.length
-        } objects?`,
+        message: selectionIsGlobal
+          ? t`Are you sure you want to remove these ${
+              objectsToDelete.length
+            } global objects? They will be removed from every scene. Undo will bring them back in the current scene only: their instances in the other scenes will be lost.`
+          : objectsToDelete.some(object =>
+              hasInstancesInExternalLayouts(object.getName())
+            )
+          ? t`Are you sure you want to remove these ${
+              objectsToDelete.length
+            } objects? They will also be removed from the external layouts of this scene. Undo will bring them back in the scene only: their instances in the external layouts will be lost.`
+          : t`Are you sure you want to remove these ${
+              objectsToDelete.length
+            } objects?`,
       });
       if (!answer) return false;
 
@@ -212,6 +224,7 @@ function useBulkObjectOperations({
       selectionIsGlobal,
       globalObjectsContainer,
       objectsContainer,
+      hasInstancesInExternalLayouts,
       showDeleteConfirmation,
       selectObjectFolderOrObjectsWithContext,
       onDeleteObjects,

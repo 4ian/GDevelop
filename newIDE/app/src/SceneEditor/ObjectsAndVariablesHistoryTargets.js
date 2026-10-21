@@ -6,6 +6,13 @@ import {
 } from '../Utils/Serializer';
 import { type CompositeTarget } from '../Utils/History';
 
+const gd: libGDevelop = global.gd;
+
+export type ApplyVariablesRefactoring = (
+  changeset: gdVariablesChangeset,
+  originalSerializedVariables: gdSerializerElement
+) => void;
+
 /**
  * History targets for an objects container, its object groups and a
  * variables container - extracted from `SceneEditor` so they can be unit
@@ -22,8 +29,106 @@ import { type CompositeTarget } from '../Utils/History';
  * reference that crashes on next use.
  */
 
-export const getVariablesContainerHistoryTarget = (
+const collectVariableIdentities = (
+  variable: gdVariable,
+  name: string,
+  identities: Map<string, string>
+) => {
+  const uuid = variable.getPersistentUuid();
+  if (uuid) identities.set(uuid, `${name}:${variable.getType()}`);
+  if (variable.getType() === gd.Variable.Structure) {
+    variable
+      .getAllChildrenNames()
+      .toJSArray()
+      .forEach(childName =>
+        collectVariableIdentities(
+          variable.getChild(childName),
+          childName,
+          identities
+        )
+      );
+  } else if (variable.getType() === gd.Variable.Array) {
+    mapFor(0, variable.getChildrenCount(), i =>
+      collectVariableIdentities(variable.getAtIndex(i), '', identities)
+    );
+  }
+};
+
+const getVariableIdentities = (
   variablesContainer: gdVariablesContainer
+): Map<string, string> => {
+  const identities = new Map<string, string>();
+  mapFor(0, variablesContainer.count(), i =>
+    collectVariableIdentities(
+      variablesContainer.getAt(i),
+      variablesContainer.getNameAt(i),
+      identities
+    )
+  );
+  return identities;
+};
+
+const haveVariablesBeenRenamedOrRetyped = (
+  identitiesBefore: Map<string, string>,
+  identitiesAfter: Map<string, string>
+): boolean => {
+  for (const [uuid, identity] of identitiesBefore) {
+    const identityAfter = identitiesAfter.get(uuid);
+    if (identityAfter !== undefined && identityAfter !== identity) return true;
+  }
+  return false;
+};
+
+/**
+ * Restore a variables container, then apply to the rest of the project
+ * (events, instances...) the same refactoring the editors apply when the
+ * variables are edited - so that a variable renamed (or whose type was
+ * changed) by an undo/redo is followed in the events using it.
+ * The refactoring recreates the variables of the container: it's only
+ * applied when a variable was actually renamed or retyped.
+ */
+const restoreVariablesWithRefactoring = (
+  variablesContainer: gdVariablesContainer,
+  restore: () => void,
+  applyRefactoring: ?ApplyVariablesRefactoring
+) => {
+  if (!applyRefactoring) {
+    restore();
+    return;
+  }
+  variablesContainer.ensurePersistentUuids();
+  const identitiesBefore = getVariableIdentities(variablesContainer);
+  const originalSerializedVariables = new gd.SerializerElement();
+  variablesContainer.serializeTo(originalSerializedVariables);
+
+  restore();
+
+  if (
+    haveVariablesBeenRenamedOrRetyped(
+      identitiesBefore,
+      getVariableIdentities(variablesContainer)
+    )
+  ) {
+    // The uuid of the container itself is not kept when it is restored
+    // from a JSON snapshot (an object's variables): the changeset can only
+    // be computed between two states of the same container.
+    variablesContainer.ensurePersistentUuids();
+    originalSerializedVariables.setStringAttribute(
+      'persistentUuid',
+      variablesContainer.getPersistentUuid()
+    );
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      originalSerializedVariables,
+      variablesContainer
+    );
+    applyRefactoring(changeset, originalSerializedVariables);
+  }
+  originalSerializedVariables.delete();
+};
+
+export const getVariablesContainerHistoryTarget = (
+  variablesContainer: gdVariablesContainer,
+  applyRefactoring: ?ApplyVariablesRefactoring
 ): CompositeTarget => ({
   getValue: () => {
     variablesContainer.ensurePersistentUuids();
@@ -36,41 +141,55 @@ export const getVariablesContainerHistoryTarget = (
     });
     return { variables };
   },
-  setValue: (value: Object) => {
-    const targetVariables = value.variables || [];
-    const targetNames = new Set(targetVariables.map(item => item.name));
-
-    const currentNames = [];
-    mapFor(0, variablesContainer.count(), i =>
-      currentNames.push(variablesContainer.getNameAt(i))
-    );
-    currentNames
-      .filter(name => !targetNames.has(name))
-      .forEach(name => variablesContainer.remove(name));
-
-    targetVariables.forEach(({ name, serialized }, index) => {
-      if (variablesContainer.has(name)) {
-        const variable = variablesContainer.get(name);
-        // Unserializing adds the children to the existing ones: without
-        // this, the children of an array would be duplicated (and the
-        // removed children of a structure would stay).
-        variable.clearChildren();
-        unserializeFromJSObject(variable, serialized);
-        const currentIndex = variablesContainer.getPosition(name);
-        if (currentIndex !== index)
-          variablesContainer.move(currentIndex, index);
-      } else {
-        const newVariable = variablesContainer.insertNew(name, index);
-        unserializeFromJSObject(newVariable, serialized);
-      }
-    });
-  },
+  setValue: (value: Object) =>
+    restoreVariablesWithRefactoring(
+      variablesContainer,
+      () => restoreVariablesContainer(variablesContainer, value),
+      applyRefactoring
+    ),
 });
+
+const restoreVariablesContainer = (
+  variablesContainer: gdVariablesContainer,
+  value: Object
+) => {
+  const targetVariables = value.variables || [];
+  const targetNames = new Set(targetVariables.map(item => item.name));
+
+  const currentNames = [];
+  mapFor(0, variablesContainer.count(), i =>
+    currentNames.push(variablesContainer.getNameAt(i))
+  );
+  currentNames
+    .filter(name => !targetNames.has(name))
+    .forEach(name => variablesContainer.remove(name));
+
+  targetVariables.forEach(({ name, serialized }, index) => {
+    if (variablesContainer.has(name)) {
+      const variable = variablesContainer.get(name);
+      // Unserializing adds the children to the existing ones: without
+      // this, the children of an array would be duplicated (and the
+      // removed children of a structure would stay).
+      variable.clearChildren();
+      unserializeFromJSObject(variable, serialized);
+      const currentIndex = variablesContainer.getPosition(name);
+      if (currentIndex !== index) variablesContainer.move(currentIndex, index);
+    } else {
+      const newVariable = variablesContainer.insertNew(name, index);
+      unserializeFromJSObject(newVariable, serialized);
+    }
+  });
+};
 
 export const getObjectsContainerHistoryTarget = (
   objectsContainer: gdObjectsContainer,
   project: gdProject,
-  ensurePersistentUuidsOfObject: (object: gdObject) => void
+  ensurePersistentUuidsOfObject: (object: gdObject) => void,
+  applyObjectVariablesRefactoring: ?(
+    object: gdObject,
+    changeset: gdVariablesChangeset,
+    originalSerializedVariables: gdSerializerElement
+  ) => void
 ): CompositeTarget => ({
   getValue: () => {
     const objects = [];
@@ -121,11 +240,23 @@ export const getObjectsContainerHistoryTarget = (
               !object.getBehavior(behaviorName).isDefaultBehavior()
           )
           .forEach(behaviorName => object.removeBehavior(behaviorName));
-        unserializeFromJSObject(
-          object,
-          { ...serialized, behaviors: [] },
-          'unserializeFrom',
-          project
+        restoreVariablesWithRefactoring(
+          object.getVariables(),
+          () =>
+            unserializeFromJSObject(
+              object,
+              { ...serialized, behaviors: [] },
+              'unserializeFrom',
+              project
+            ),
+          applyObjectVariablesRefactoring
+            ? (changeset, originalSerializedVariables) =>
+                applyObjectVariablesRefactoring(
+                  object,
+                  changeset,
+                  originalSerializedVariables
+                )
+            : null
         );
         serializedBehaviors.forEach(serializedBehavior => {
           const { name: behaviorName, type: behaviorType } = serializedBehavior;

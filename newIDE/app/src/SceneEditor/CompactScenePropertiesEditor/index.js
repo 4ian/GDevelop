@@ -83,6 +83,7 @@ type Props = {|
 
 export type CompactScenePropertiesEditorInterface = {|
   revealVariable: (nodeId: string) => void,
+  resetVariablesRefactoring: () => void,
 |};
 
 export const CompactScenePropertiesEditor: React.ComponentType<{
@@ -109,11 +110,13 @@ export const CompactScenePropertiesEditor: React.ComponentType<{
     const forceUpdate = useForceUpdate();
     const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
+    const resetVariablesRefactoringRef = React.useRef<() => void>(() => {});
     React.useImperativeHandle(ref, () => ({
       revealVariable: (nodeId: string) => {
         if (variablesListRef.current)
           variablesListRef.current.revealVariable(nodeId);
       },
+      resetVariablesRefactoring: () => resetVariablesRefactoringRef.current(),
     }));
 
     const allVisibleBehaviors = scene
@@ -155,7 +158,10 @@ export const CompactScenePropertiesEditor: React.ComponentType<{
     });
 
     // Variable refactoring: snapshot on mount, apply on unmount/scene change.
-    const { onVariablesUpdated } = useVariablesContainerRefactoring({
+    const {
+      onVariablesUpdated,
+      resetSnapshot: resetVariablesRefactoring,
+    } = useVariablesContainerRefactoring({
       project,
       variablesContainer: scene.getVariables(),
       initialInstances: null,
@@ -166,6 +172,7 @@ export const CompactScenePropertiesEditor: React.ComponentType<{
       objectsContainer: null,
       globalObjectsContainer: null,
     });
+    resetVariablesRefactoringRef.current = resetVariablesRefactoring;
 
     const propertiesSchema = React.useMemo(
       () => {

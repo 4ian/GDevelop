@@ -221,7 +221,19 @@ export const getObjectsContainerHistoryTarget = (
 
     targetObjects.forEach(({ name, type, serialized }, index) => {
       if (objectsContainer.hasObjectNamed(name)) {
-        const object = objectsContainer.getObject(name);
+        let object = objectsContainer.getObject(name);
+        if (object.getType() !== type) {
+          // Replaced by another kind of object outside the history: its
+          // configuration can't be updated in place.
+          const currentIndex = objectsContainer.getObjectPosition(name);
+          objectsContainer.removeObject(name);
+          object = objectsContainer.insertNewObject(
+            project,
+            type,
+            name,
+            currentIndex
+          );
+        }
         // The behaviors are updated in place (unserializing the whole
         // object would create them again: anything showing or holding a
         // behavior would be reset). Default (capability) behaviors are

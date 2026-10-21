@@ -280,6 +280,8 @@ export type RenderEditorContainerProps = {|
     changes: SceneEventsOutsideEditorChanges
   ) => void,
   onExtractAsExternalLayout: (name: string) => void,
+  onUndoExtractAsExternalLayout: (name: string) => Promise<void>,
+  onRedoExtractAsExternalLayout: (name: string) => void,
   onExtractAsEventBasedObject: (
     extensionName: string,
     eventsBasedObjectName: string

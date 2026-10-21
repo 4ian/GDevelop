@@ -42,34 +42,43 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     // A commit that was just pushed is normally only "contained" in the
     // remote branch(es) it was pushed to, so this is a more reliable source
     // of truth than the local branch name whenever it's available.
-    const containingBranchesString = shell.exec(
-      `git branch -r --contains "${gitRef}"`,
-      { silent: true }
-    );
-    if (!containingBranchesString.stderr && !containingBranchesString.code) {
-      const containingBranch = (containingBranchesString.stdout || '')
-        .split('\n')
-        .map(line => line.trim())
-        .filter(Boolean)[0];
-      if (containingBranch) {
-        // Strip the remote name prefix ("origin/development" -> "development").
-        const branchName = containingBranch.replace(/^[^/]+\//, '');
-        if (branchName) return branchName;
-      }
-    }
-
     const branchShellString = shell.exec(
       `git rev-parse --abbrev-ref "${gitRef}"`,
       {
         silent: true,
       }
     );
+    const localBranch =
+      branchShellString.stderr || branchShellString.code
+        ? ''
+        : (branchShellString.stdout || '').trim();
+
+    const containingBranchesString = shell.exec(
+      `git branch -r --contains "${gitRef}"`,
+      { silent: true }
+    );
+    if (!containingBranchesString.stderr && !containingBranchesString.code) {
+      const containingBranches = (containingBranchesString.stdout || '')
+        .split('\n')
+        .map(line => line.trim())
+        // Not the "origin/HEAD -> origin/master" pointer.
+        .filter(line => line && !line.includes('->'))
+        // Strip the remote name prefix ("origin/development" -> "development").
+        .map(line => line.replace(/^[^/]+\//, ''))
+        .filter(Boolean);
+      // The list is alphabetical: the local branch, when it's one of them,
+      // is the right one - not the first.
+      const containingBranch = containingBranches.includes(localBranch)
+        ? localBranch
+        : containingBranches[0];
+      if (containingBranch) return containingBranch;
+    }
 
     if (branchShellString.stderr || branchShellString.code) {
       return null;
     }
 
-    let branch = (branchShellString.stdout || '').trim();
+    let branch = localBranch;
     if (branch === 'HEAD') {
       // We're in detached HEAD. Try to read the branch from the CI environment variables.
       branch =
@@ -195,8 +204,10 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       return;
     }
     const [candidateBranch, ...remainingBranches] = branches;
-    downloadCommitLibGdJs(candidateBranch, gitRef).then(onLibGdJsDownloaded, () =>
-      tryDownloadCommitAcrossBranches(remainingBranches, gitRef, onAllFailed)
+    downloadCommitLibGdJs(candidateBranch, gitRef).then(
+      onLibGdJsDownloaded,
+      () =>
+        tryDownloadCommitAcrossBranches(remainingBranches, gitRef, onAllFailed)
     );
   };
 

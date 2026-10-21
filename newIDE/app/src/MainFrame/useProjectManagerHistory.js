@@ -1,24 +1,6 @@
 // @flow
 import * as React from 'react';
 import {
-  type HistoryState,
-  type CompositeTargets,
-  type CompositeTarget,
-  type UndoAction,
-  type RedoAction,
-  getCompositeHistoryInitialState,
-  saveValueChangeToHistory,
-  saveCommandToHistory,
-  serializeCompositeTargets,
-  refreshCompositeHistoryValue,
-  getLastUndoableAction,
-  getLastRedoableAction,
-  undoComposite,
-  redoComposite,
-  canUndo as canUndoHistory,
-  canRedo as canRedoHistory,
-} from '../Utils/History';
-import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
@@ -28,22 +10,28 @@ import {
 // instance being dragged) - so, unlike the scene editor's history, no
 // debouncing/merging of pending edits is needed here: every action is
 // recorded as its own, immediate step.
+//
+// Each step is about a single item: undoing the creation of a scene removes
+// that scene only, whatever was added to the project meanwhile without a
+// step (pasted, duplicated, created by the AI...). The content of an item
+// is only serialized when it's about to be removed, so it can be re-created
+// as it was.
 
 const HISTORY_MAX_SIZE = 50;
 
+export type ProjectManagerHistoryTargetKey =
+  | 'scenes'
+  | 'externalLayouts'
+  | 'externalEvents';
+
 /**
  * A project-level list (the project's scenes, external layouts or external
- * events), tracked as a single history target: its value is the ordered
- * list of items, each fully serialized, so a step can restore an item
- * removed by a later step (deletion here isn't a whole-project refactor,
- * unlike an object's - it only removes the item itself, so it can be
- * treated like any other tracked target).
- * The content of an item is only used to re-create it: a step never
- * changes an item that exists in both its before and after values.
+ * events).
  */
-export type ProjectManagerListTarget = {|
+type ProjectManagerList = {|
   getCount: () => number,
   getAt: (index: number) => Object /* gdSerializable, has getName() */,
+  has: (name: string) => boolean,
   insertNew: (name: string, position: number) => Object,
   remove: (name: string) => void,
   // The scenes list also tracks which one the game starts with.
@@ -51,84 +39,13 @@ export type ProjectManagerListTarget = {|
   setFirstItemName?: (name: string) => void,
 |};
 
-const getListItemNames = (list: ProjectManagerListTarget): Array<string> => {
-  const names = [];
-  for (let i = 0; i < list.getCount(); i++) {
-    names.push(list.getAt(i).getName());
-  }
-  return names;
-};
-
-const getProjectListHistoryTarget = (
-  list: ProjectManagerListTarget,
-  project: gdProject
-): CompositeTarget => ({
-  getValue: () => {
-    const items = [];
-    for (let i = 0; i < list.getCount(); i++) {
-      const item = list.getAt(i);
-      items.push({
-        name: item.getName(),
-        serialized: serializeToJSObject(item),
-      });
-    }
-    return list.getFirstItemName
-      ? { items, firstItemName: list.getFirstItemName() }
-      : { items };
-  },
-  setValue: (value: Object) => {
-    const targetItems = value.items || [];
-    const targetNames = new Set(targetItems.map(item => item.name));
-
-    const currentNames = getListItemNames(list);
-    // Only remove items that shouldn't exist any more, and only insert
-    // items that are missing - never remove-then-reinsert an item that's
-    // in both the current and the target state. That item would otherwise
-    // be destroyed and recreated as a new C++ object for no reason, even
-    // though nothing about it (its own content included) is tracked by
-    // this step - and any open editor for it (holding references to its
-    // instances, events, instructions...) would be left with dangling
-    // references to the destroyed original, crashing on next use.
-    currentNames
-      .filter(name => !targetNames.has(name))
-      .forEach(name => list.remove(name));
-
-    const remainingNames = new Set<string>();
-    for (let i = 0; i < list.getCount(); i++) {
-      remainingNames.add(list.getAt(i).getName());
-    }
-    targetItems.forEach(({ name, serialized }, index) => {
-      if (remainingNames.has(name)) return;
-      const item = list.insertNew(name, index);
-      unserializeFromJSObject(item, serialized, 'unserializeFrom', project);
-    });
-
-    if (list.setFirstItemName && typeof value.firstItemName === 'string') {
-      list.setFirstItemName(
-        targetNames.has(value.firstItemName) ? value.firstItemName : ''
-      );
-    }
-  },
-});
-
-/** The value of a list target without one of its items. */
-const getValueWithoutItem = (value: Object, itemName: string): Object => ({
-  ...value,
-  items: (value.items || []).filter(item => item.name !== itemName),
-  ...(value.firstItemName === itemName ? { firstItemName: '' } : {}),
-});
-
-export type ProjectManagerHistoryTargetKey =
-  | 'scenes'
-  | 'externalLayouts'
-  | 'externalEvents';
-
 const getProjectManagerLists = (
   project: gdProject
-): { [ProjectManagerHistoryTargetKey]: ProjectManagerListTarget } => ({
+): { [ProjectManagerHistoryTargetKey]: ProjectManagerList } => ({
   scenes: {
     getCount: () => project.getLayoutsCount(),
     getAt: index => project.getLayoutAt(index),
+    has: name => project.hasLayoutNamed(name),
     insertNew: (name, position) => project.insertNewLayout(name, position),
     remove: name => project.removeLayout(name),
     getFirstItemName: () => project.getFirstLayout(),
@@ -137,6 +54,7 @@ const getProjectManagerLists = (
   externalLayouts: {
     getCount: () => project.getExternalLayoutsCount(),
     getAt: index => project.getExternalLayoutAt(index),
+    has: name => project.hasExternalLayoutNamed(name),
     insertNew: (name, position) =>
       project.insertNewExternalLayout(name, position),
     remove: name => project.removeExternalLayout(name),
@@ -144,39 +62,65 @@ const getProjectManagerLists = (
   externalEvents: {
     getCount: () => project.getExternalEventsCount(),
     getAt: index => project.getExternalEventsAt(index),
+    has: name => project.hasExternalEventsNamed(name),
     insertNew: (name, position) =>
       project.insertNewExternalEvents(name, position),
     remove: name => project.removeExternalEvents(name),
   },
 });
 
-const getProjectManagerHistoryTargets = (
-  project: ?gdProject
-): CompositeTargets => {
-  if (!project) return {};
-  const lists = getProjectManagerLists(project);
-  return {
-    scenes: getProjectListHistoryTarget(lists.scenes, project),
-    externalLayouts: getProjectListHistoryTarget(
-      lists.externalLayouts,
-      project
-    ),
-    externalEvents: getProjectListHistoryTarget(lists.externalEvents, project),
-  };
+const getItemIndex = (list: ProjectManagerList, itemName: string): number => {
+  for (let i = 0; i < list.getCount(); i++) {
+    if (list.getAt(i).getName() === itemName) return i;
+  }
+  return -1;
 };
 
 /**
- * A rename can't be captured by a snapshot of the target list alone: it's
- * refactored across the whole project (other scenes' events, external
- * events/layouts referencing it by name) by `gd.WholeProjectRefactorer`, the
- * same way an object or object group rename is. So, like those, it's
- * recorded as a command: undo/redo re-invoke the refactorer in reverse.
+ * A rename can't be reverted by re-creating the item: it's refactored
+ * across the whole project (other scenes' events, external events/layouts
+ * referencing it by name) by `gd.WholeProjectRefactorer`, the same way an
+ * object or object group rename is. So, like those, it's recorded as a
+ * command: undo/redo re-invoke the refactorer in reverse.
  */
 export type ProjectManagerRenameCommand = {|
   type: 'renameScene' | 'renameExternalLayout' | 'renameExternalEvents',
   oldName: string,
   newName: string,
 |};
+
+/**
+ * What an item was when it was removed, to re-create it the same.
+ */
+type RemovedItem = {|
+  index: number,
+  serialized: Object,
+  wasFirstItem: boolean,
+|};
+
+type ProjectManagerHistoryAction =
+  | {|
+      type: 'add' | 'delete',
+      targetKey: ProjectManagerHistoryTargetKey,
+      itemName: string,
+      // Set while the item is not in the project (the step was undone for
+      // an addition, or not yet undone for a deletion).
+      removedItem: ?RemovedItem,
+    |}
+  | {|
+      type: 'rename',
+      command: ProjectManagerRenameCommand,
+    |};
+
+type ProjectManagerHistoryState = {|
+  previousActions: Array<ProjectManagerHistoryAction>,
+  futureActions: Array<ProjectManagerHistoryAction>,
+|};
+
+const getEmptyHistory = (): ProjectManagerHistoryState => ({
+  previousActions: [],
+  futureActions: [],
+});
 
 export type ProjectManagerHistoryChange = {|
   targetKey: ProjectManagerHistoryTargetKey,
@@ -186,10 +130,12 @@ export type ProjectManagerHistoryChange = {|
 |};
 
 export type ProjectManagerHistoryApplyOptions = {|
+  // Returns false when the rename can't be applied (the step is then left
+  // as is).
   applyRenameCommand: (
     command: ProjectManagerRenameCommand,
     direction: 'undo' | 'redo'
-  ) => void,
+  ) => boolean | void,
   /**
    * Called, and awaited, before the items are removed from the project:
    * the editors opened on them must be closed first.
@@ -242,6 +188,50 @@ export type UseProjectManagerHistoryResult = {|
   ) => Promise<?ProjectManagerHistoryChange>,
 |};
 
+const captureItem = (
+  list: ProjectManagerList,
+  itemName: string
+): ?RemovedItem => {
+  const index = getItemIndex(list, itemName);
+  if (index === -1) return null;
+  return {
+    index,
+    serialized: serializeToJSObject(list.getAt(index)),
+    wasFirstItem:
+      !!list.getFirstItemName && list.getFirstItemName() === itemName,
+  };
+};
+
+const removeItem = (list: ProjectManagerList, itemName: string) => {
+  if (!list.has(itemName)) return;
+  const { getFirstItemName, setFirstItemName } = list;
+  if (getFirstItemName && setFirstItemName && getFirstItemName() === itemName)
+    setFirstItemName('');
+  list.remove(itemName);
+};
+
+const insertItem = (
+  list: ProjectManagerList,
+  project: gdProject,
+  itemName: string,
+  removedItem: RemovedItem
+) => {
+  // The name can be taken by an item added outside the history.
+  if (list.has(itemName)) return;
+  const item = list.insertNew(
+    itemName,
+    Math.min(removedItem.index, list.getCount())
+  );
+  unserializeFromJSObject(
+    item,
+    removedItem.serialized,
+    'unserializeFrom',
+    project
+  );
+  if (removedItem.wasFirstItem && list.setFirstItemName)
+    list.setFirstItemName(itemName);
+};
+
 /**
  * Track undo/redo for the project manager: scenes, external layouts and
  * external events being created, deleted or renamed. Extensions are
@@ -251,69 +241,46 @@ export type UseProjectManagerHistoryResult = {|
 const useProjectManagerHistory = (
   project: ?gdProject
 ): UseProjectManagerHistoryResult => {
-  const [history, setHistory] = React.useState<HistoryState>(() =>
-    getCompositeHistoryInitialState(getProjectManagerHistoryTargets(project), {
-      historyMaxSize: HISTORY_MAX_SIZE,
-    })
+  const [history, setHistory] = React.useState<ProjectManagerHistoryState>(
+    getEmptyHistory
   );
   // Mirrors the value of `history` synchronously, so a change is visible to
   // the very next call in the same event, before React re-renders.
-  const latestHistoryRef = React.useRef<HistoryState>(history);
-  const setLatestHistory = (newHistory: HistoryState) => {
+  const latestHistoryRef = React.useRef<ProjectManagerHistoryState>(history);
+  const setLatestHistory = (newHistory: ProjectManagerHistoryState) => {
     latestHistoryRef.current = newHistory;
     setHistory(newHistory);
   };
 
-  // The hook is mounted once for the whole app's lifetime, before any
-  // project is loaded - so the state above is initialized with no project
-  // (empty targets) and never re-evaluated by React afterwards. Whenever
-  // the project actually becomes available (or a different one is opened),
-  // reset the history and re-seed its cached values from that project -
-  // otherwise the first ever undo/redo would revert to an empty, bogus
-  // "before" value instead of the project's real initial state.
+  // The hook is mounted once for the whole app's lifetime: the history is
+  // about one project at a time.
   const previousProjectRef = React.useRef<?gdProject>(project);
   React.useEffect(
     () => {
       if (previousProjectRef.current !== project) {
         previousProjectRef.current = project;
-        setLatestHistory(
-          getCompositeHistoryInitialState(
-            getProjectManagerHistoryTargets(project),
-            { historyMaxSize: HISTORY_MAX_SIZE }
-          )
-        );
+        setLatestHistory(getEmptyHistory());
       }
     },
     [project]
   );
 
-  // The cached value of a target goes stale as soon as an item is edited
-  // (in its own editor) or renamed: the values of a step are always taken
-  // from the project at the moment of the change, never from the cache.
-  const serializeTarget = (
-    projectToSerialize: gdProject,
-    targetKey: ProjectManagerHistoryTargetKey
-  ): Object =>
-    serializeCompositeTargets(
-      getProjectManagerHistoryTargets(projectToSerialize),
-      [targetKey]
-    )[targetKey];
+  const pushAction = (action: ProjectManagerHistoryAction) => {
+    const previousActions = [
+      ...latestHistoryRef.current.previousActions,
+      action,
+    ];
+    if (previousActions.length > HISTORY_MAX_SIZE)
+      previousActions.splice(0, previousActions.length - HISTORY_MAX_SIZE);
+    setLatestHistory({ previousActions, futureActions: [] });
+  };
 
   const recordAddition = (
     targetKey: ProjectManagerHistoryTargetKey,
     itemName: string
   ) => {
     if (!project) return;
-    const valueAfterChange = serializeTarget(project, targetKey);
-    setLatestHistory(
-      saveValueChangeToHistory(
-        latestHistoryRef.current,
-        { [targetKey]: getValueWithoutItem(valueAfterChange, itemName) },
-        { [targetKey]: valueAfterChange },
-        'ADD',
-        { targetKey, itemName }
-      )
-    );
+    pushAction({ type: 'add', targetKey, itemName, removedItem: null });
   };
 
   const recordDeletion = (
@@ -321,111 +288,103 @@ const useProjectManagerHistory = (
     itemName: string
   ) => {
     if (!project) return;
-    const valueBeforeChange = serializeTarget(project, targetKey);
-    setLatestHistory(
-      saveValueChangeToHistory(
-        latestHistoryRef.current,
-        { [targetKey]: valueBeforeChange },
-        { [targetKey]: getValueWithoutItem(valueBeforeChange, itemName) },
-        'DELETE',
-        { targetKey, itemName }
-      )
+    const removedItem = captureItem(
+      getProjectManagerLists(project)[targetKey],
+      itemName
     );
+    if (!removedItem) return;
+    pushAction({ type: 'delete', targetKey, itemName, removedItem });
   };
 
   const recordRename = (command: ProjectManagerRenameCommand) => {
-    const targetKey = renameCommandTargetKey(command);
-    const historyWithCommand = saveCommandToHistory(
-      latestHistoryRef.current,
-      command,
-      { targetKey, itemName: command.newName }
-    );
-    setLatestHistory(
-      project
-        ? refreshCompositeHistoryValue(
-            historyWithCommand,
-            getProjectManagerHistoryTargets(project),
-            [targetKey]
-          )
-        : historyWithCommand
-    );
+    if (!project) return;
+    pushAction({ type: 'rename', command });
   };
+
+  // An undo/redo waits for the tabs of the removed items to close: a second
+  // one started meanwhile would apply the same step again.
+  const isApplyingHistoryChangeRef = React.useRef(false);
 
   const applyHistoryChange = async (
     direction: 'undo' | 'redo',
     projectForApply: ?gdProject,
+    options: ProjectManagerHistoryApplyOptions
+  ): Promise<?ProjectManagerHistoryChange> => {
+    if (isApplyingHistoryChangeRef.current) return null;
+    isApplyingHistoryChangeRef.current = true;
+    try {
+      return await applyHistoryChangeNow(direction, projectForApply, options);
+    } finally {
+      isApplyingHistoryChangeRef.current = false;
+    }
+  };
+
+  const getActionToApply = (
+    direction: 'undo' | 'redo'
+  ): ?ProjectManagerHistoryAction => {
+    const { previousActions, futureActions } = latestHistoryRef.current;
+    const actions = direction === 'undo' ? previousActions : futureActions;
+    return actions[actions.length - 1];
+  };
+
+  const applyHistoryChangeNow = async (
+    direction: 'undo' | 'redo',
+    projectForApply: ?gdProject,
     { applyRenameCommand, onWillRemoveItems }: ProjectManagerHistoryApplyOptions
   ): Promise<?ProjectManagerHistoryChange> => {
-    let currentHistory = latestHistoryRef.current;
-    const canApply =
-      direction === 'undo'
-        ? canUndoHistory(currentHistory)
-        : canRedoHistory(currentHistory);
-    if (!canApply) return null;
+    const action = getActionToApply(direction);
+    if (!action || !projectForApply) return null;
 
-    const action =
-      direction === 'undo'
-        ? getLastUndoableAction(currentHistory)
-        : getLastRedoableAction(currentHistory);
-    if (!action) return null;
-    const changeContext = action.changeContext || null;
-
-    if (action.command) {
-      applyRenameCommand(action.command, direction);
-    }
-
-    const targets = getProjectManagerHistoryTargets(projectForApply);
-    const valueToApply: Object =
-      direction === 'undo'
-        ? ((action: any): UndoAction).valueBeforeChange
-        : ((action: any): RedoAction).valueAfterChange;
-    const keys: Array<ProjectManagerHistoryTargetKey> = (Object.keys(
-      valueToApply
-    ): any);
-    if (projectForApply && keys.length) {
-      // The step applied the other way must restore the items as they are
-      // now, not as they were when this step was recorded.
-      currentHistory = refreshCompositeHistoryValue(currentHistory, targets, [
-        ...keys,
-      ]);
-      if (onWillRemoveItems) {
-        const lists = getProjectManagerLists(projectForApply);
-        for (const key of keys) {
-          const targetNames = new Set(
-            (valueToApply[key].items || []).map(item => item.name)
-          );
-          const removedNames = getListItemNames(lists[key]).filter(
-            name => !targetNames.has(name)
-          );
-          if (removedNames.length) await onWillRemoveItems(key, removedNames);
-        }
+    let appliedAction = action;
+    let change: ProjectManagerHistoryChange;
+    if (action.type === 'rename') {
+      if (applyRenameCommand(action.command, direction) === false) return null;
+      change = {
+        targetKey: renameCommandTargetKey(action.command),
+        itemName:
+          direction === 'undo'
+            ? action.command.oldName
+            : action.command.newName,
+      };
+    } else {
+      const { targetKey, itemName } = action;
+      const list = getProjectManagerLists(projectForApply)[targetKey];
+      const isRemoving = (action.type === 'add') === (direction === 'undo');
+      if (isRemoving) {
+        if (onWillRemoveItems && list.has(itemName))
+          await onWillRemoveItems(targetKey, [itemName]);
+        // A step recorded during the wait is the one to apply next, not
+        // this one.
+        if (getActionToApply(direction) !== action) return null;
+        const removedItem = captureItem(list, itemName);
+        removeItem(list, itemName);
+        appliedAction = { ...action, removedItem };
+      } else {
+        if (action.removedItem)
+          insertItem(list, projectForApply, itemName, action.removedItem);
+        appliedAction = { ...action, removedItem: null };
       }
+      change = { targetKey, itemName };
     }
 
-    const newHistory =
+    const { previousActions, futureActions } = latestHistoryRef.current;
+    setLatestHistory(
       direction === 'undo'
-        ? undoComposite(currentHistory, targets, projectForApply)
-        : redoComposite(currentHistory, targets, projectForApply);
-    setLatestHistory(newHistory);
-
-    if (!changeContext) return null;
-    // A rename's changeContext.itemName is always the post-rename name, but
-    // undoing it renames the item back to its old name - the item to reveal
-    // depends on the direction just applied, not on that fixed value.
-    const itemName = action.command
-      ? direction === 'undo'
-        ? action.command.oldName
-        : action.command.newName
-      : changeContext.itemName;
-    return {
-      targetKey: changeContext.targetKey,
-      itemName,
-    };
+        ? {
+            previousActions: previousActions.slice(0, -1),
+            futureActions: [...futureActions, appliedAction],
+          }
+        : {
+            previousActions: [...previousActions, appliedAction],
+            futureActions: futureActions.slice(0, -1),
+          }
+    );
+    return change;
   };
 
   return {
-    canUndo: canUndoHistory(history),
-    canRedo: canRedoHistory(history),
+    canUndo: history.previousActions.length > 0,
+    canRedo: history.futureActions.length > 0,
     recordAddition,
     recordDeletion,
     recordRename,

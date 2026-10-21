@@ -54,6 +54,12 @@ export default class LayerRemoveDialog extends Component<Props, State> {
       : this.props.initialInstances.getLayerInstancesCount(
           this.props.layerRemoved
         );
+    const instancesCountInExternalLayouts = this.props.layout
+      ? instancesCountInLayout -
+        this.props.initialInstances.getLayerInstancesCount(
+          this.props.layerRemoved
+        )
+      : 0;
 
     let actions = [
       <FlatButton
@@ -131,6 +137,15 @@ export default class LayerRemoveDialog extends Component<Props, State> {
             </Trans>
           )}
         </Text>
+        {instancesCountInExternalLayouts > 0 && (
+          <Text>
+            <Trans>
+              {instancesCountInExternalLayouts} of them are in the external
+              layouts of this scene. Undo will not bring them back or move them
+              back there.
+            </Trans>
+          </Text>
+        )}
         {instancesCountInLayout > 0 && (
           <>
             <Text>

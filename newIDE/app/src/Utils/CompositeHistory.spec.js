@@ -131,6 +131,35 @@ describe('composite history', () => {
     expect(history.previousActions[0].command).toEqual({ type: 'rename' });
   });
 
+  it('keeps the command of a snapshot step recorded with one (the extraction of instances) through undo and redo', () => {
+    let history = getCompositeHistoryInitialState(targets, {
+      historyMaxSize: 10,
+    });
+    customState = { color: 'blue' };
+    history = savePartialValueToHistory(
+      history,
+      { custom: { color: 'blue' } },
+      'DELETE',
+      { source: 'canvas' },
+      { type: 'extract', name: 'Part' }
+    );
+    const action = getLastUndoableAction(history);
+    expect(action && action.command).toEqual({ type: 'extract', name: 'Part' });
+
+    history = undoComposite(history, targets);
+    expect(customState.color).toBe('red');
+    expect(history.futureActions[0].command).toEqual({
+      type: 'extract',
+      name: 'Part',
+    });
+    history = redoComposite(history, targets);
+    expect(customState.color).toBe('blue');
+    expect(history.previousActions[0].command).toEqual({
+      type: 'extract',
+      name: 'Part',
+    });
+  });
+
   it('supports custom serialization methods and per-target project passing', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);

@@ -352,6 +352,12 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             openBehaviorEvents={this.props.openBehaviorEvents}
             onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
+            onUndoExtractAsExternalLayout={
+              this.props.onUndoExtractAsExternalLayout
+            }
+            onRedoExtractAsExternalLayout={
+              this.props.onRedoExtractAsExternalLayout
+            }
             onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
             onOpenEventBasedObjectEditor={
               this.props.onOpenEventBasedObjectEditor

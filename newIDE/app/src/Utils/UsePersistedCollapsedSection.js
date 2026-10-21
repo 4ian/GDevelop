@@ -22,9 +22,10 @@ export const usePersistedCollapsedSection = ({
   persistedPanelStateId,
   foldedByDefault,
 }: Props): {
-  isSectionFolded: (sectionId: string) => boolean,
+  // The default of a section can be given when nothing is persisted for it.
+  isSectionFolded: (sectionId: string, foldedByDefault?: boolean) => boolean,
   setSectionFolded: (sectionId: string, isCollapsed: boolean) => void,
-  toggleSectionFolded: (sectionId: string) => void,
+  toggleSectionFolded: (sectionId: string, foldedByDefault?: boolean) => void,
 } => {
   const {
     getEditorStateForProject,
@@ -33,8 +34,11 @@ export const usePersistedCollapsedSection = ({
   const projectId = project.getProjectUuid();
 
   const isSectionFolded = React.useCallback(
-    (sectionId: string): boolean => {
-      const defaultValue = !!foldedByDefault;
+    (sectionId: string, sectionFoldedByDefault?: boolean): boolean => {
+      const defaultValue =
+        sectionFoldedByDefault === undefined
+          ? !!foldedByDefault
+          : sectionFoldedByDefault;
       const editorStateForProject = getEditorStateForProject(projectId);
       if (!editorStateForProject || !persistedPanelStateId) return defaultValue;
 
@@ -100,8 +104,11 @@ export const usePersistedCollapsedSection = ({
   );
 
   const toggleSectionFolded = React.useCallback(
-    (sectionId: string) =>
-      setSectionFolded(sectionId, !isSectionFolded(sectionId)),
+    (sectionId: string, sectionFoldedByDefault?: boolean) =>
+      setSectionFolded(
+        sectionId,
+        !isSectionFolded(sectionId, sectionFoldedByDefault)
+      ),
     [isSectionFolded, setSectionFolded]
   );
 

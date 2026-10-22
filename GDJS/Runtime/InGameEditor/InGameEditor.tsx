@@ -6250,7 +6250,6 @@ namespace gdjs {
         !this._selectionControlsMovementTotalDelta
       ) {
         const changeHappened = this._objectMover.endMove();
-        console.log('endMove', changeHappened);
         this.editor._sendSelectionUpdate({
           hasSelectedObjectBeenModified: changeHappened,
         });

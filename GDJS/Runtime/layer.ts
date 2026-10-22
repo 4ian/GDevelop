@@ -336,7 +336,7 @@ namespace gdjs {
       let position = result || [0, 0];
 
       if (this._renderer.isCameraRotatedIn3D()) {
-        return this._renderer.transformTo3DWorld(x, y, 0, cameraId, result);
+        return this._renderer.transformTo3DWorld(x, y, 0, cameraId, position);
       }
 
       x -= this.getRuntimeScene()._cachedGameResolutionWidth / 2;

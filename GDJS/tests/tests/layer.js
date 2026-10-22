@@ -123,6 +123,17 @@ describe('gdjs.Layer', () => {
 				});
 			});
 
+			it(`converts screen coordinates without a point for the result, like for a 2D layer (world scale: ${worldScale})`, () => {
+				const layer = make3DLayerWithRotatedCamera(worldScale, 'perspective');
+
+				// Extensions call it with the coordinates only.
+				const position = layer.convertCoords(300, 400);
+
+				const [sceneX, sceneY] = layer.convertCoords(300, 400, 0, [0, 0]);
+				expect(position[0]).to.be(sceneX);
+				expect(position[1]).to.be(sceneY);
+			});
+
 			it(`converts the screen center to the point looked at by the camera (world scale: ${worldScale})`, () => {
 				const layer = make3DLayerWithRotatedCamera(worldScale, 'perspective');
 				const cameraZ = layer.getCameraZ(45);

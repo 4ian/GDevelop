@@ -1231,8 +1231,7 @@ namespace gdjs {
     private _windowHadFocus = true;
 
     // The controls shown to manipulate the selection.
-    private _selectionControls: SelectionControls =
-      this.buildSelectionControls();
+    private _selectionControls: SelectionControls;
     private _editorGrid: EditorGrid;
 
     private _isTransformControlsHovered = false;
@@ -1307,6 +1306,7 @@ namespace gdjs {
       this._runtimeGame = game;
       this._editorCamera = new EditorCamera(this);
       this._editorGrid = new EditorGrid(this);
+      this._selectionControls = new SelectionControls(this, this._objectMover);
 
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
@@ -1522,10 +1522,6 @@ namespace gdjs {
       this._currentScene.onGameResolutionResized();
     }
 
-    private buildSelectionControls(): SelectionControls {
-      return new SelectionControls(this, this._objectMover);
-    }
-
     async switchToSceneOrVariant(
       editorId: string | null,
       sceneName: string | null,
@@ -1548,7 +1544,7 @@ namespace gdjs {
       // Clear any reference to `RuntimeObject` from the unloaded scene.
       this._selectionBoxes.clear();
       this._hiddenInstanceMarkers.clear();
-      this._selectionControls = this.buildSelectionControls();
+      this._selectionControls.remove();
       this._draggedNewObject = null;
       this._draggedSelectedObject = null;
       this._objectToDuplicateOnDrag = null;

@@ -72,6 +72,7 @@ const getCommandArgs = (): Array<string> =>
  * Priority (highest first):
  *  1. `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` CLI flags,
  *     for CI/release scripts that want to force the behavior explicitly.
+ *     Only an explicit boolean counts; `null`/`undefined` means the flag was not passed.
  *  2. The current `blockPreviewAndExportOnDiagnosticErrors` preference, which
  *     reflects the project's own `gdevelop-settings.yaml` once
  *     `ensureProjectSettingsApplied` has resolved (see `useCliCommandRunner`).

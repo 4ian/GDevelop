@@ -5,6 +5,8 @@
  */
 #include "EventsFunctionsContainer.h"
 
+#include <unordered_set>
+
 namespace gd {
 
 gd::EventsFunction &EventsFunctionsContainer::InsertNewEventsFunctionInFolder(
@@ -45,9 +47,15 @@ void EventsFunctionsContainer::ReinitializeFolderStructure() {
 
 
 void EventsFunctionsContainer::AddMissingFunctionsInRootFolder() {
+  // Get the names of the functions already in the folders once: searching the
+  // folders for each function would be O(number of functions^2).
+  std::unordered_set<gd::String> functionNamesInFolders;
+  rootFolder->AddFunctionNamesTo(functionNamesInFolders);
+
   for (std::size_t i = 0; i < GetEventsFunctionsCount(); ++i) {
     auto &function = GetEventsFunction(i);
-    if (!rootFolder->HasFunctionNamed(function.GetName())) {
+    if (functionNamesInFolders.find(function.GetName()) ==
+        functionNamesInFolders.end()) {
       gd::EventsFunction *groupSource = &function;
       // Groups were implicit for ActionWithOperator
       if (function.GetFunctionType() ==
@@ -62,6 +70,10 @@ void EventsFunctionsContainer::AddMissingFunctionsInRootFolder() {
       auto &folder = !group.empty() ? rootFolder->GetOrCreateChildFolder(group)
                                     : *rootFolder;
       folder.InsertFunction(&function);
+      // The function is now in the folders (unless the root is not a folder,
+      // which only happens with an invalid serialized folder structure).
+      if (rootFolder->IsFolder())
+        functionNamesInFolders.insert(function.GetName());
     }
   }
 }

@@ -43,6 +43,16 @@ bool FunctionFolderOrFunction::HasFunctionNamed(const gd::String &name) {
   return function->GetName() == name;
 }
 
+void FunctionFolderOrFunction::AddFunctionNamesTo(
+    std::unordered_set<gd::String> &functionNames) const {
+  if (IsFolder()) {
+    for (const auto &child : children)
+      child->AddFunctionNamesTo(functionNames);
+  } else if (function) {
+    functionNames.insert(function->GetName());
+  }
+}
+
 FunctionFolderOrFunction &
 FunctionFolderOrFunction::GetOrCreateChildFolder(const gd::String &name) {
   if (!IsFolder()) {
@@ -295,6 +305,20 @@ void FunctionFolderOrFunction::SerializeTo(SerializerElement &element) const {
 
 void FunctionFolderOrFunction::UnserializeFrom(const SerializerElement &element,
     gd::EventsFunctionsContainer &functionsContainer) {
+  // Index the functions by name once: searching the container for each
+  // function of the folders would be O(number of functions^2). Like
+  // GetEventsFunction, the first function having a given name is used.
+  std::unordered_map<gd::String, gd::EventsFunction *> functionsByName;
+  for (const auto &eventsFunction : functionsContainer.GetInternalVector()) {
+    functionsByName.emplace(eventsFunction->GetName(), eventsFunction.get());
+  }
+  DoUnserializeFrom(element, functionsByName);
+}
+
+void FunctionFolderOrFunction::DoUnserializeFrom(
+    const SerializerElement &element,
+    const std::unordered_map<gd::String, gd::EventsFunction *>
+        &functionsByName) {
   children.clear();
   gd::String potentialFolderName = element.GetStringAttribute("folderName", "");
 
@@ -310,8 +334,8 @@ void FunctionFolderOrFunction::UnserializeFrom(const SerializerElement &element,
         std::unique_ptr<FunctionFolderOrFunction>
             childFunctionFolderOrFunction =
                 make_unique<FunctionFolderOrFunction>();
-        childFunctionFolderOrFunction->UnserializeFrom(
-            childrenElements.GetChild(i), functionsContainer);
+        childFunctionFolderOrFunction->DoUnserializeFrom(
+            childrenElements.GetChild(i), functionsByName);
         if (!childFunctionFolderOrFunction->IsFolder() &&
             childFunctionFolderOrFunction->function == nullptr) {
           // Ignore invalid references to missing functions, that can happen
@@ -325,8 +349,9 @@ void FunctionFolderOrFunction::UnserializeFrom(const SerializerElement &element,
   } else {
     folderName = "";
     gd::String functionName = element.GetStringAttribute("functionName");
-    if (functionsContainer.HasEventsFunctionNamed(functionName)) {
-      function = &functionsContainer.GetEventsFunction(functionName);
+    auto foundFunction = functionsByName.find(functionName);
+    if (foundFunction != functionsByName.end()) {
+      function = foundFunction->second;
     } else {
       gd::LogError("Function with name " + functionName +
                    " not found in functions container.");

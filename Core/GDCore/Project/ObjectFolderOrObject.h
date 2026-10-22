@@ -6,6 +6,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_set>
 #include <vector>
 
 #include "GDCore/Serialization/SerializerElement.h"
@@ -71,6 +72,12 @@ class GD_CORE_API ObjectFolderOrObject {
    * name or if any of the children does (recursive search).
    */
   bool HasObjectNamed(const gd::String& name);
+  /**
+   * \brief Adds to the given set the names of all the objects found by
+   * HasObjectNamed: the object represented by the instance, or the objects
+   * of the children (recursive search).
+   */
+  void AddObjectNamesTo(std::unordered_set<gd::String>& objectNames) const;
   /**
    * \brief Returns the child instance holding the object with the given name
    * (recursive search).

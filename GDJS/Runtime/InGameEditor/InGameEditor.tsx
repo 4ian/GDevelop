@@ -6192,7 +6192,6 @@ namespace gdjs {
       const worldScale = this.object
         .getRuntimeScene()
         .getRenderer3DWorldScale();
-      this.container.scale.set(worldScale, -worldScale, worldScale);
       if (this.dummyObject3DForObject2D) {
         this.dummyObject3DForObject2D.position.set(
           this.object.getCenterXInScene(),
@@ -6204,6 +6203,9 @@ namespace gdjs {
           this.object.getHeight() + 2,
           0
         );
+        this.container.scale.set(1, -1, 1);
+      } else {
+        this.container.scale.set(worldScale, -worldScale, worldScale);
       }
       this.boxHelper.update();
     }

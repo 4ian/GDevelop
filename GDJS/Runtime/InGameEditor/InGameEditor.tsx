@@ -576,6 +576,7 @@ namespace gdjs {
     Scalable &
     Flippable & {
       getCenterZInScene(): float;
+      getDrawableZ(): float;
     };
 
   const is3D = (object: gdjs.RuntimeObject): object is RuntimeObjectWith3D => {
@@ -1224,25 +1225,16 @@ namespace gdjs {
     private _timeSinceLastInteraction = 0;
     private _isFirstFrame = true;
 
-    private _editorCamera;
+    private _editorCamera: EditorCamera;
 
     /** Keep track of the focus to know if the game was blurred since the last frame. */
     private _windowHadFocus = true;
 
     // The controls shown to manipulate the selection.
-    private _selectionControls: {
-      object: gdjs.RuntimeObject;
-      dummyThreeObject: THREE.Object3D;
-      threeTransformControls: THREE_ADDONS.TransformControls;
-    } | null = null;
-    private _transformControlsMode: 'translate' | 'rotate' | 'scale' =
-      'translate';
+    private _selectionControls: SelectionControls;
     private _editorGrid: EditorGrid;
-    private _selectionControlsMovementTotalDelta: SelectionMovement | null =
-      null;
-    private _hasSelectionActuallyMoved = false;
+
     private _isTransformControlsHovered = false;
-    private _wasMovingSelectionLastFrame = false;
 
     private _selectionBox: THREE_ADDONS.SelectionBox | null = null;
     private _selectionBoxElement: HTMLDivElement;
@@ -1278,8 +1270,8 @@ namespace gdjs {
     };
 
     // Dragged new object:
-    private _draggedNewObject: gdjs.RuntimeObject | null = null;
-    private _draggedSelectedObject: gdjs.RuntimeObject | null = null;
+    _draggedNewObject: gdjs.RuntimeObject | null = null;
+    _draggedSelectedObject: gdjs.RuntimeObject | null = null;
     private _objectToDuplicateOnDrag: gdjs.RuntimeObject | null = null;
     private _draggedSelectedObjectInitialX: float = 0;
     private _draggedSelectedObjectInitialY: float = 0;
@@ -1314,6 +1306,7 @@ namespace gdjs {
       this._runtimeGame = game;
       this._editorCamera = new EditorCamera(this);
       this._editorGrid = new EditorGrid(this);
+      this._selectionControls = new SelectionControls(this, this._objectMover);
 
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
@@ -1324,16 +1317,17 @@ namespace gdjs {
         inGameEditorSettings || defaultInGameEditorSettings;
 
       this._toolbar = new Toolbar({
-        getTransformControlsMode: () => this._getTransformControlsMode(),
+        getTransformControlsMode: () =>
+          this._selectionControls.getTransformControlsMode(),
         setTransformControlsMode: (mode: 'translate' | 'rotate' | 'scale') =>
-          this._setTransformControlsMode(mode),
+          this._selectionControls.setTransformControlsMode(mode),
         focusOnSelection: () => this._focusOnSelection(),
         switchToFreeCamera: () => this._getEditorCamera().switchToFreeCamera(),
         switchToOrbitCamera: () =>
           this._getEditorCamera().switchToOrbitAroundZ0(4000),
         isFreeCamera: () => this._getEditorCamera().isFreeCamera(),
         getSvgIconUrl: (iconName: string) => getSvgIconUrl(game, iconName),
-        hasSelectionControlsShown: () => !!this._selectionControls,
+        hasSelectionControlsShown: () => !!this._selectionControls.isShown(),
       });
 
       this._applyInGameEditorSettings();
@@ -1500,7 +1494,7 @@ namespace gdjs {
      * Return the layer to be used for camera calculus.
      * @see getEditorLayer
      */
-    private getCameraLayer(layerName: string): gdjs.RuntimeLayer | null {
+    _getCameraLayer(layerName: string): gdjs.RuntimeLayer | null {
       // When the edited container is a custom object,
       // only a base layer exists and `getLayer` falls back on it.
       return this._currentScene ? this._currentScene.getLayer(layerName) : null;
@@ -1508,7 +1502,7 @@ namespace gdjs {
 
     /**
      * Return the layer which contains the objects.
-     * @see getCameraLayer
+     * @see _getCameraLayer
      */
     private getEditorLayer(layerName: string): gdjs.RuntimeLayer | null {
       return this._editedInstanceContainer
@@ -1550,7 +1544,7 @@ namespace gdjs {
       // Clear any reference to `RuntimeObject` from the unloaded scene.
       this._selectionBoxes.clear();
       this._hiddenInstanceMarkers.clear();
-      this._selectionControls = null;
+      this._selectionControls.remove();
       this._draggedNewObject = null;
       this._draggedSelectedObject = null;
       this._objectToDuplicateOnDrag = null;
@@ -1901,6 +1895,10 @@ namespace gdjs {
       this._editorGrid.setSettings(instancesEditorSettings);
     }
 
+    getEditorGrid(): EditorGrid {
+      return this._editorGrid;
+    }
+
     private _getTempVector2d(x: float, y: float): THREE.Vector2 {
       this._tempVector2d.x = x;
       this._tempVector2d.y = y;
@@ -2031,12 +2029,20 @@ namespace gdjs {
       this._getEditorCamera().setZoom(zoom);
     }
 
-    getSelectionAABB(): AABB3D | null {
-      return this._selection.getAABB();
+    getSelectionAABB(options?: {
+      ignoreIf: (object: gdjs.RuntimeObject) => boolean;
+    }): AABB3D | null {
+      return this._selection.getAABB(options);
     }
 
     getSelectedObjects(): ReadonlyArray<gdjs.RuntimeObject> {
       return this._selection.getSelectedObjects();
+    }
+
+    getLastSelectedObject(options?: {
+      ignoreIf: (object: gdjs.RuntimeObject) => boolean;
+    }): gdjs.RuntimeObject | null {
+      return this._selection.getLastSelectedObject(options);
     }
 
     /**
@@ -2049,6 +2055,10 @@ namespace gdjs {
      */
     captureLeftMouseButton(): void {
       this._isLeftMouseButtonCaptured = true;
+    }
+
+    isLeftMouseButtonCaptured(): boolean {
+      return this._isLeftMouseButtonCaptured;
     }
 
     /**
@@ -2289,16 +2299,6 @@ namespace gdjs {
       this._sendSelectionUpdate({ hasSelectedObjectBeenModified: true });
     }
 
-    private _shouldDragSelectedObject(): boolean {
-      const inputManager = this._runtimeGame.getInputManager();
-      return (
-        !this._isLeftMouseButtonCaptured &&
-        isControlOrCmdPressed(inputManager) &&
-        (!this._selectionControls ||
-          !this._selectionControls.threeTransformControls.dragging)
-      );
-    }
-
     private _handleSelectedObjectDragging(): void {
       const inputManager = this._runtimeGame.getInputManager();
 
@@ -2306,7 +2306,7 @@ namespace gdjs {
       if (
         this._draggedSelectedObject &&
         (inputManager.isMouseButtonReleased(0) ||
-          !this._shouldDragSelectedObject())
+          !this._selectionControls.shouldDragSelectedObject())
       ) {
         this._draggedSelectedObject = null;
         const changeHappened = this._objectMover.endMove();
@@ -2317,13 +2317,13 @@ namespace gdjs {
 
       if (
         !inputManager.isMouseButtonPressed(0) ||
-        !this._shouldDragSelectedObject()
+        !this._selectionControls.shouldDragSelectedObject()
       ) {
         this._objectToDuplicateOnDrag = null;
       }
 
       // Inspect then if a drag should be started or continued.
-      if (!this._shouldDragSelectedObject()) {
+      if (!this._selectionControls.shouldDragSelectedObject()) {
         // We can early return as the rest is not applicable (we've already checked
         // if a drag should be ended).
         return;
@@ -2399,7 +2399,7 @@ namespace gdjs {
           intersectionY,
           intersectionZ
         );
-        const cameraLayer = this.getCameraLayer(
+        const cameraLayer = this._getCameraLayer(
           this._draggedSelectedObject.getLayer()
         );
         const threeScene = cameraLayer
@@ -2468,35 +2468,6 @@ namespace gdjs {
       return newObjectUnderCursor;
     }
 
-    private _handleSelectionMovement() {
-      // Finished moving the selection.
-      if (
-        this._wasMovingSelectionLastFrame &&
-        !this._selectionControlsMovementTotalDelta
-      ) {
-        const changeHappened = this._objectMover.endMove();
-        this._sendSelectionUpdate({
-          hasSelectedObjectBeenModified: changeHappened,
-        });
-      }
-
-      // Start moving the selection.
-      if (
-        !this._wasMovingSelectionLastFrame &&
-        this._selectionControlsMovementTotalDelta
-      ) {
-        this._objectMover.startMove();
-      }
-
-      // Move the selection.
-      if (this._selectionControlsMovementTotalDelta) {
-        this._objectMover.move(
-          this._selection.getSelectedObjects(),
-          this._selectionControlsMovementTotalDelta
-        );
-      }
-    }
-
     private _updateSelectionBox() {
       const inputManager = this._runtimeGame.getInputManager();
       const runtimeGame = this._runtimeGame;
@@ -2506,7 +2477,7 @@ namespace gdjs {
       if (!currentScene) return;
       const editedInstanceContainer = this._editedInstanceContainer;
       if (!editedInstanceContainer) return;
-      const cameraLayer = this.getCameraLayer('');
+      const cameraLayer = this._getCameraLayer('');
       if (!cameraLayer) return;
 
       const runtimeLayerRender = cameraLayer.getRenderer();
@@ -2523,7 +2494,7 @@ namespace gdjs {
       if (
         inputManager.isMouseButtonPressed(0) &&
         !this._isLeftMouseButtonCaptured &&
-        !this._shouldDragSelectedObject() &&
+        !this._selectionControls.shouldDragSelectedObject() &&
         !isSpacePressed(inputManager) &&
         !hasMultipleTouches
       ) {
@@ -2567,12 +2538,12 @@ namespace gdjs {
       }
       if (
         (inputManager.isMouseButtonReleased(0) ||
-          this._hasSelectionActuallyMoved) &&
+          this._selectionControls.hasActuallyMoved()) &&
         this._selectionBox
       ) {
         if (
           !this._selectionBox.endPoint.equals(this._selectionBox.startPoint) &&
-          !this._hasSelectionActuallyMoved &&
+          !this._selectionControls.hasActuallyMoved() &&
           !hasMultipleTouches
         ) {
           // Selection rectangle ended.
@@ -2850,620 +2821,12 @@ namespace gdjs {
       this._selectionBoxes.set(object, objectBoxHelper);
     }
 
-    private _getTransformControlsMode(): 'translate' | 'rotate' | 'scale' {
-      return this._transformControlsMode;
-    }
-
-    private _setTransformControlsMode(
-      mode: 'translate' | 'rotate' | 'scale'
-    ): void {
-      this._transformControlsMode = mode;
-      if (!this._selectionControls) {
-        return;
-      }
-      const { threeTransformControls, dummyThreeObject } =
-        this._selectionControls;
-      threeTransformControls.mode = mode;
-
-      const lastEditableSelectedObject = this._selection.getLastSelectedObject({
-        ignoreIf: (object) =>
-          this.isInstanceLocked(object) || this.isInstanceSealed(object),
-      });
-      if (!lastEditableSelectedObject) {
-        return;
-      }
-      const threeObject = lastEditableSelectedObject.get3DRendererObject();
-      if (!threeObject) {
-        return;
-      }
-      dummyThreeObject.rotation.copy(threeObject.rotation);
-      if (this._transformControlsMode === 'rotate') {
-        dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
-        dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
-      }
-    }
-
-    private _forceUpdateSelectionControls() {
-      if (this._selectionControls) {
-        this._removeSelectionControls();
-      }
-      this._updateSelectionControls();
-    }
-
-    private _updateSelectionControls() {
-      const inputManager = this._runtimeGame.getInputManager();
-      const currentScene = this._currentScene;
-      if (!currentScene) return;
-
-      const touchIds = getCurrentTouchIdentifiers(inputManager);
-      const hasMultipleTouches = touchIds.length >= 2;
-
-      // Selection controls are shown on the last object that can be manipulated
-      // (and if none, selection controls are not shown).
-      const lastEditableSelectedObject = this._selection.getLastSelectedObject({
-        ignoreIf: (object) =>
-          this.isInstanceLocked(object) || this.isInstanceSealed(object),
-      });
-
-      // Space or multiple touches will hide the selection controls as they are
-      // used to move the camera.
-      const shouldHideSelectionControls =
-        isSpacePressed(inputManager) ||
-        hasMultipleTouches ||
-        this._isLeftMouseButtonCaptured;
-
-      // Remove the selection controls if the last selected object has changed
-      // or if nothing movable is selected.
-      if (
-        this._selectionControls &&
-        (!lastEditableSelectedObject ||
-          (lastEditableSelectedObject &&
-            this._selectionControls.object !== lastEditableSelectedObject) ||
-          this._shouldDragSelectedObject() ||
-          shouldHideSelectionControls)
-      ) {
-        this._removeSelectionControls();
-      }
-
-      // Create the selection controls on the last object that can be manipulated.
-      if (
-        lastEditableSelectedObject &&
-        !this._selectionControls &&
-        !this._shouldDragSelectedObject() &&
-        !shouldHideSelectionControls &&
-        lastEditableSelectedObject.get3DRendererObject()
-      ) {
-        const cameraLayer = this.getCameraLayer(
-          lastEditableSelectedObject.getLayer()
-        );
-        if (cameraLayer) {
-          const runtimeLayerRender = cameraLayer
-            ? cameraLayer.getRenderer()
-            : null;
-          const threeCamera = runtimeLayerRender
-            ? runtimeLayerRender.getThreeCamera()
-            : null;
-          const threeScene = runtimeLayerRender
-            ? runtimeLayerRender.getThreeScene()
-            : null;
-          if (threeCamera && threeScene) {
-            // Create and attach the transform controls. It is attached to a dummy object
-            // to avoid the controls to directly move the runtime object (we handle this
-            // manually).
-            const threeTransformControls = new THREE_ADDONS.TransformControls(
-              threeCamera,
-              this._runtimeGame.getRenderer().getCanvas() || undefined
-            );
-            patchAxesOnTransformControlsGizmos(threeTransformControls);
-            patchColorsOnTransformControlsGizmos(threeTransformControls);
-            patchNegativeAxisHandlesOnTransformControlsGizmos(
-              threeTransformControls
-            );
-            patchAxisGuideLinesOnTransformControlsGizmos(
-              threeTransformControls
-            );
-
-            threeTransformControls.getHelper().rotation.order = 'ZYX';
-            const worldScale = this._currentScene
-              ? this._currentScene.getRenderer3DWorldScale()
-              : 1;
-            threeTransformControls
-              .getHelper()
-              .scale.set(worldScale, -worldScale, worldScale);
-            threeTransformControls.mode = this._transformControlsMode;
-            threeTransformControls.getHelper().traverse((obj) => {
-              // To be detected correctly by OutlinePass.
-              // @ts-ignore
-              obj.isTransformControls = true;
-            });
-
-            // The dummy object is an invisible object that is the one moved by the transform
-            // controls.
-            const dummyThreeObject = new THREE.Object3D();
-            this._updateDummyLocation(
-              dummyThreeObject,
-              lastEditableSelectedObject,
-              threeTransformControls
-            );
-            threeScene.add(dummyThreeObject);
-
-            threeTransformControls.attach(dummyThreeObject);
-            threeScene.add(threeTransformControls.getHelper());
-
-            // Keep track of the movement so the editor can apply it to the selection.
-            let initialObjectX = 0;
-            let initialObjectY = 0;
-            let initialObjectZ = 0;
-            let initialObjectWidth = 0;
-            let initialObjectHeight = 0;
-            let initialObjectDepth = 0;
-            const initialDummyPosition = new THREE.Vector3();
-            const initialDummyRotation = new THREE.Euler();
-            const initialDummyQuaternion = new THREE.Quaternion();
-            const invertedInitialDummyQuaternion = new THREE.Quaternion();
-            const selectionRotation: SelectionRotation = {
-              quaternion: new THREE.Quaternion(),
-              pivot: [0, 0, 0],
-            };
-            const initialDummyScale = new THREE.Vector3();
-            const scaleDragWorldPosition = new THREE.Vector3();
-            const scaleDragWorldQuaternion = new THREE.Quaternion();
-            const scaleDragWorldScale = new THREE.Vector3();
-            const scaleDragLocalStart = new THREE.Vector3();
-            const scaleDragLocalEnd = new THREE.Vector3();
-            threeTransformControls.addEventListener('change', (e) => {
-              if (!threeTransformControls.dragging) {
-                this._selectionControlsMovementTotalDelta = null;
-
-                this._updateDummyLocation(
-                  dummyThreeObject,
-                  lastEditableSelectedObject,
-                  threeTransformControls
-                );
-                // Reset the initial position to the current position, so that
-                // it's ready to be dragged again.
-                initialObjectX = lastEditableSelectedObject.getX();
-                initialObjectY = lastEditableSelectedObject.getY();
-                initialObjectZ = is3D(lastEditableSelectedObject)
-                  ? lastEditableSelectedObject.getZ()
-                  : 0;
-                initialObjectWidth = lastEditableSelectedObject.getWidth();
-                initialObjectHeight = lastEditableSelectedObject.getHeight();
-                initialObjectDepth = is3D(lastEditableSelectedObject)
-                  ? lastEditableSelectedObject.getDepth()
-                  : 0;
-                initialDummyPosition.copy(dummyThreeObject.position);
-                initialDummyRotation.copy(dummyThreeObject.rotation);
-                initialDummyQuaternion.copy(dummyThreeObject.quaternion);
-                initialDummyScale.copy(dummyThreeObject.scale);
-                return;
-              }
-
-              const isRotating = this._transformControlsMode === 'rotate';
-              let translationX = isRotating
-                ? 0
-                : dummyThreeObject.position.x - initialDummyPosition.x;
-              let translationY = isRotating
-                ? 0
-                : dummyThreeObject.position.y - initialDummyPosition.y;
-              let translationZ = isRotating
-                ? 0
-                : dummyThreeObject.position.z - initialDummyPosition.z;
-              if (
-                this._transformControlsMode === 'translate' &&
-                threeTransformControls.axis
-              ) {
-                if (threeTransformControls.axis === 'XYZ') {
-                  // We need to override the translation vector because
-                  // `threeTransformControls` don't know that the selection
-                  // must be excluded when looking for the cursor position.
-                  let isIntersectionFound = false;
-                  let intersectionX: float = 0;
-                  let intersectionY: float = 0;
-                  let intersectionZ: float = 0;
-                  if (is3D(lastEditableSelectedObject)) {
-                    const cursor = this._getCursorIn3D(
-                      this._selection.getSelectedObjects()
-                    );
-                    if (cursor) {
-                      isIntersectionFound = true;
-                      [intersectionX, intersectionY, intersectionZ] = cursor;
-                    }
-                  } else {
-                    const projectedCursor = this._getProjectedCursor();
-                    if (projectedCursor) {
-                      isIntersectionFound = true;
-                      [intersectionX, intersectionY] = projectedCursor;
-                    }
-                  }
-                  if (isIntersectionFound) {
-                    translationX = intersectionX - initialObjectX;
-                    translationY = intersectionY - initialObjectY;
-                    translationZ = intersectionZ - initialObjectZ;
-                  } else {
-                    translationX = 0;
-                    translationY = 0;
-                    translationZ = 0;
-                  }
-                }
-                const isMovingOnX = threeTransformControls.axis.includes('X');
-                const isMovingOnY = threeTransformControls.axis.includes('Y');
-                const isMovingOnZ = threeTransformControls.axis.includes('Z');
-                if (this._editorGrid.isSpanningEnabled(inputManager)) {
-                  if (isMovingOnX) {
-                    translationX =
-                      this._editorGrid.getSnappedX(
-                        initialObjectX + translationX
-                      ) - initialObjectX;
-                  }
-                  if (isMovingOnY) {
-                    translationY =
-                      this._editorGrid.getSnappedY(
-                        initialObjectY + translationY
-                      ) - initialObjectY;
-                  }
-                  if (isMovingOnZ) {
-                    translationZ =
-                      this._editorGrid.getSnappedZ(
-                        initialObjectZ + translationZ
-                      ) - initialObjectZ;
-                  }
-                }
-              }
-              // 0.2 = 20% of the movement speed (Three.js transform controls scaling is too fast)
-              const scaleDamping =
-                threeTransformControls.axis &&
-                threeTransformControls.axis.length === 1
-                  ? 1
-                  : 0.2;
-              let scaleX =
-                1 +
-                (dummyThreeObject.scale.x / initialDummyScale.x - 1) *
-                  scaleDamping;
-              let scaleY =
-                1 +
-                (dummyThreeObject.scale.y / initialDummyScale.y - 1) *
-                  scaleDamping;
-              let scaleZ =
-                1 +
-                (dummyThreeObject.scale.z / initialDummyScale.z - 1) *
-                  scaleDamping;
-              if (
-                this._transformControlsMode === 'scale' &&
-                threeTransformControls.axis &&
-                this._editorGrid.isSpanningEnabled(inputManager)
-              ) {
-                // Three.js computes the scale as a ratio of the pointer distances
-                // to the gizmo, which barely changes the size of small objects.
-                // Use the pointer movement in the object local axes instead.
-                // The pointer positions are in the Three.js world, so they are
-                // converted back to scene units with the world scale.
-                const { pointStart, pointEnd } = threeTransformControls as any;
-                dummyThreeObject.matrixWorld.decompose(
-                  scaleDragWorldPosition,
-                  scaleDragWorldQuaternion,
-                  scaleDragWorldScale
-                );
-                scaleDragWorldQuaternion.invert();
-                scaleDragLocalStart
-                  .copy(pointStart)
-                  .applyQuaternion(scaleDragWorldQuaternion)
-                  .multiplyScalar(worldScale);
-                scaleDragLocalEnd
-                  .copy(pointEnd)
-                  .applyQuaternion(scaleDragWorldQuaternion)
-                  .multiplyScalar(worldScale);
-                // Moving away from the gizmo center enlarges the object,
-                // whichever side of the axis the handle is on.
-                const getSizeDelta = (start: float, end: float) =>
-                  (end - start) * (start < 0 ? -1 : 1);
-                const uniformSizeDelta =
-                  ((pointEnd as THREE.Vector3).length() -
-                    (pointStart as THREE.Vector3).length()) *
-                  worldScale;
-                const isUniform = threeTransformControls.axis === 'XYZ';
-                const editorGrid = this._editorGrid;
-
-                // The scale gizmo is anchored on the object origin, so snap the
-                // opposite edge on the grid (like the 2D editor resize handles).
-                const getSnappedScaleX = () =>
-                  getScaleSnappedOnGrid(
-                    initialObjectX,
-                    initialObjectWidth,
-                    isUniform
-                      ? uniformSizeDelta
-                      : getSizeDelta(
-                          scaleDragLocalStart.x,
-                          scaleDragLocalEnd.x
-                        ),
-                    editorGrid.gridWidth,
-                    (x) => editorGrid.getSnappedX(x)
-                  );
-                const getSnappedScaleY = () =>
-                  getScaleSnappedOnGrid(
-                    initialObjectY,
-                    initialObjectHeight,
-                    isUniform
-                      ? uniformSizeDelta
-                      : getSizeDelta(
-                          scaleDragLocalStart.y,
-                          scaleDragLocalEnd.y
-                        ),
-                    editorGrid.gridHeight,
-                    (y) => editorGrid.getSnappedY(y)
-                  );
-                const getSnappedScaleZ = () =>
-                  getScaleSnappedOnGrid(
-                    initialObjectZ,
-                    initialObjectDepth,
-                    isUniform
-                      ? uniformSizeDelta
-                      : getSizeDelta(
-                          scaleDragLocalStart.z,
-                          scaleDragLocalEnd.z
-                        ),
-                    editorGrid.gridDepth,
-                    (z) => editorGrid.getSnappedZ(z)
-                  );
-                if (isUniform) {
-                  // Uniform scaling: like the 2D proportional resize, snap the
-                  // biggest side and apply the same ratio to the others.
-                  const uniformScale =
-                    initialObjectWidth >= initialObjectHeight &&
-                    initialObjectWidth >= initialObjectDepth
-                      ? getSnappedScaleX()
-                      : initialObjectHeight >= initialObjectDepth
-                        ? getSnappedScaleY()
-                        : getSnappedScaleZ();
-                  scaleX = uniformScale;
-                  scaleY = uniformScale;
-                  scaleZ = uniformScale;
-                } else {
-                  if (threeTransformControls.axis.includes('X')) {
-                    scaleX = getSnappedScaleX();
-                  }
-                  if (threeTransformControls.axis.includes('Y')) {
-                    scaleY = getSnappedScaleY();
-                  }
-                  if (threeTransformControls.axis.includes('Z')) {
-                    scaleZ = getSnappedScaleZ();
-                  }
-                }
-              }
-              let rotation: SelectionRotation | null = null;
-              if (
-                isRotating &&
-                !dummyThreeObject.quaternion.equals(initialDummyQuaternion)
-              ) {
-                // The dummy rotation is the object rotation with the Y and Z
-                // angles negated (see _updateDummyLocation), which is the
-                // object rotation mirrored on the X axis. The rotation done by
-                // the gizmo on the dummy is mirrored back the same way: the
-                // axis is mirrored and the angle is negated.
-                const { quaternion, pivot } = selectionRotation;
-                quaternion
-                  .copy(dummyThreeObject.quaternion)
-                  .multiply(
-                    invertedInitialDummyQuaternion
-                      .copy(initialDummyQuaternion)
-                      .invert()
-                  );
-                quaternion.set(
-                  quaternion.x,
-                  -quaternion.y,
-                  -quaternion.z,
-                  quaternion.w
-                );
-                pivot[0] = dummyThreeObject.position.x;
-                pivot[1] = dummyThreeObject.position.y;
-                pivot[2] = dummyThreeObject.position.z;
-                rotation = selectionRotation;
-              }
-              this._selectionControlsMovementTotalDelta = {
-                translationX,
-                translationY,
-                translationZ,
-                rotation,
-                scaleX,
-                scaleY,
-                scaleZ,
-              };
-
-              this._hasSelectionActuallyMoved =
-                this._hasSelectionActuallyMoved ||
-                !dummyThreeObject.position.equals(initialDummyPosition) ||
-                !dummyThreeObject.rotation.equals(initialDummyRotation) ||
-                !dummyThreeObject.scale.equals(initialDummyScale);
-            });
-
-            this._selectionControls = {
-              object: lastEditableSelectedObject,
-              dummyThreeObject,
-              threeTransformControls,
-            };
-          }
-        }
-      }
-
-      if (
-        lastEditableSelectedObject &&
-        this._selectionControls &&
-        !this._draggedNewObject &&
-        !this._draggedSelectedObject
-      ) {
-        const { threeTransformControls, dummyThreeObject } =
-          this._selectionControls;
-
-        if (
-          this._transformControlsMode === 'rotate' &&
-          !threeTransformControls.dragging
-        ) {
-          this._updateDummyRotationPivot(
-            dummyThreeObject,
-            lastEditableSelectedObject
-          );
-        }
-
-        // Update the rotation snap.
-        const inputManager = this._runtimeGame.getInputManager();
-        const shouldSnap =
-          this._transformControlsMode === 'rotate' &&
-          isAltPressed(inputManager);
-        const rotationSnap = shouldSnap
-          ? gdjs.toRad(ROTATION_SNAP_DEGREES)
-          : null;
-
-        threeTransformControls.setRotationSnap(rotationSnap);
-
-        // Update the grid.
-        const axis = threeTransformControls.axis;
-        if (axis) {
-          const isMovingOnX = axis ? axis.includes('X') : false;
-          const isMovingOnY = axis ? axis.includes('Y') : false;
-          const isMovingOnZ = axis ? axis.includes('Z') : false;
-          let gridNormal: 'X' | 'Y' | 'Z' = 'Z';
-          if (isMovingOnZ) {
-            if (!isMovingOnX && !isMovingOnY) {
-              // Choose the plan that faces the camera.
-              const cameraRotation = Math.abs(
-                gdjs.evtTools.common.angleDifference(
-                  this._editorCamera.getCameraRotation(),
-                  0
-                )
-              );
-              if (cameraRotation <= 45 || cameraRotation > 135) {
-                gridNormal = 'Y';
-              } else {
-                gridNormal = 'X';
-              }
-            } else if (!isMovingOnX) {
-              gridNormal = 'X';
-            } else if (!isMovingOnY) {
-              gridNormal = 'Y';
-            }
-          }
-          this._editorGrid.setNormal(gridNormal);
-        }
-        this._editorGrid.setPosition(
-          lastEditableSelectedObject.getX(),
-          lastEditableSelectedObject.getY(),
-          is3D(lastEditableSelectedObject)
-            ? lastEditableSelectedObject.getZ()
-            : 0
-        );
-        const cameraLayer = this.getCameraLayer(
-          lastEditableSelectedObject.getLayer()
-        );
-        const threeScene = cameraLayer
-          ? cameraLayer.getRenderer().getThreeScene()
-          : null;
-        if (threeScene) {
-          this._editorGrid.setTreeScene(threeScene);
-        }
-        this._editorGrid.setVisible(
-          this._transformControlsMode === 'translate' ||
-            this._transformControlsMode === 'scale'
-        );
-      }
-    }
-
-    private _updateDummyLocation(
-      dummyThreeObject: THREE.Object3D,
-      lastEditableSelectedObject: gdjs.RuntimeObject,
-      threeTransformControls: THREE_ADDONS.TransformControls
-    ) {
-      const threeObject = lastEditableSelectedObject.get3DRendererObject();
-      if (!threeObject) return;
-      dummyThreeObject.position.copy(threeObject.position);
-      dummyThreeObject.rotation.copy(threeObject.rotation);
-      dummyThreeObject.scale.copy(threeObject.scale);
-      if (this._transformControlsMode === 'rotate') {
-        // This is only done for the rotate mode because it messes with the
-        // orientation of the scale mode.
-        dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
-        dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
-
-        this._updateDummyRotationPivot(
-          dummyThreeObject,
-          lastEditableSelectedObject
-        );
-      } else {
-        dummyThreeObject.position.set(
-          lastEditableSelectedObject.getX(),
-          lastEditableSelectedObject.getY(),
-          is3D(lastEditableSelectedObject)
-            ? lastEditableSelectedObject.getZ()
-            : 0
-        );
-      }
-    }
-
-    /**
-     * The whole selection rotates around its center (like in the 2D editor),
-     * so the rotation gizmo is shown there.
-     */
-    private _updateDummyRotationPivot(
-      dummyThreeObject: THREE.Object3D,
-      lastEditableSelectedObject: gdjs.RuntimeObject
-    ) {
-      const rotationPivot = this._getSelectionRotationPivot();
-      if (rotationPivot) {
-        dummyThreeObject.position.set(
-          rotationPivot[0],
-          rotationPivot[1],
-          rotationPivot[2]
-        );
-      } else {
-        dummyThreeObject.position.set(
-          lastEditableSelectedObject.getCenterXInScene(),
-          lastEditableSelectedObject.getCenterYInScene(),
-          is3D(lastEditableSelectedObject)
-            ? lastEditableSelectedObject.getCenterZInScene()
-            : 0
-        );
-      }
-    }
-
-    /**
-     * The center of the movable 3D objects of the selection, in scene
-     * coordinates (or null if none).
-     */
-    private _getSelectionRotationPivot(): Point3D | null {
-      const aabb = this._selection.getAABB({
-        ignoreIf: (object) => this.isInstanceLocked(object),
-      });
-      if (!aabb) return null;
-      return [
-        (aabb.min[0] + aabb.max[0]) / 2,
-        (aabb.min[1] + aabb.max[1]) / 2,
-        (aabb.min[2] + aabb.max[2]) / 2,
-      ];
-    }
-
-    private _removeSelectionControls(): void {
-      if (!this._selectionControls) {
-        return;
-      }
-      this._selectionControls.threeTransformControls.detach();
-      this._selectionControls.threeTransformControls
-        .getHelper()
-        .removeFromParent();
-      // Detaching is not enough: the controls keep their pointer event listeners
-      // on the canvas until disposed. Without this, every removed controls would
-      // keep handling (and raycasting on) all the pointer events, making the
-      // editor slower and slower and interfering with the new controls.
-      this._selectionControls.threeTransformControls.dispose();
-      this._selectionControls.dummyThreeObject.removeFromParent();
-      this._editorGrid.setVisible(false);
-      this._selectionControls = null;
-    }
-
     activate(enable: boolean) {
       if (enable) {
         // Nothing to do.
       } else {
         this._runtimeGame.getSoundManager().unmuteEverything('in-game-editor');
-        this._removeSelectionControls();
+        this._selectionControls.remove();
         this._renderExtensionToolbars(null);
 
         // Cleanup selection boxes
@@ -3478,7 +2841,7 @@ namespace gdjs {
       this._isVisible = visible;
     }
 
-    private _sendSelectionUpdate(options?: {
+    _sendSelectionUpdate(options?: {
       hasSelectedObjectBeenModified?: boolean;
       isSendingBackSelectionForDefaultSize?: boolean;
       addedObjects?: Array<gdjs.RuntimeObject>;
@@ -3686,7 +3049,7 @@ namespace gdjs {
     private _updateInnerAreaOutline(): void {
       if (!this._currentScene) return;
 
-      const layer = this.getCameraLayer('');
+      const layer = this._getCameraLayer('');
       if (!layer) {
         return;
       }
@@ -3921,6 +3284,7 @@ namespace gdjs {
       }
 
       if (!this._draggedNewObject) {
+        editedInstanceContainer._setLayerDefaultZOrders();
         const newObject = editedInstanceContainer.createObject(name);
         if (!newObject) return;
         if (!is3D(newObject)) {
@@ -3929,6 +3293,7 @@ namespace gdjs {
         }
         newObject.persistentUuid = gdjs.makeUuid();
         newObject.setLayer(selectedLayer.getName());
+        newObject.setZOrder(selectedLayer.getDefaultZOrder());
         this._draggedNewObject = newObject;
       }
 
@@ -3963,7 +3328,7 @@ namespace gdjs {
         if (isCursorFound) {
           this._editorGrid.setNormal('Z');
           this._editorGrid.setPosition(cursorX, cursorY, cursorZ);
-          const cameraLayer = this.getCameraLayer(
+          const cameraLayer = this._getCameraLayer(
             this._draggedNewObject.getLayer()
           );
           const threeScene = cameraLayer
@@ -4070,7 +3435,7 @@ namespace gdjs {
       const currentScene = this._currentScene;
       if (!currentScene) return null;
 
-      const layer = this.getCameraLayer('');
+      const layer = this._getCameraLayer('');
       if (!layer) {
         return null;
       }
@@ -4152,17 +3517,7 @@ namespace gdjs {
           }
         });
       this._updateInstances(instances);
-      // Don't recreate the selection controls while they are being dragged: the
-      // editor can send updated instances at the very moment a drag starts (for
-      // example, a property field committing its value when it loses focus
-      // because the user clicked on the gizmo), and recreating the controls
-      // would cancel the drag.
-      if (
-        !this._selectionControls ||
-        !this._selectionControls.threeTransformControls.dragging
-      ) {
-        this._forceUpdateSelectionControls();
-      }
+      this._selectionControls.forceUpdate();
     }
 
     addInstances(instances: Array<InstanceData>) {
@@ -4210,6 +3565,19 @@ namespace gdjs {
       return true;
     }
 
+    private setRayFromCursor(
+      raycaster: THREE.Raycaster,
+      threeCamera: THREE.Camera
+    ) {
+      const inputManager = this._runtimeGame.getInputManager();
+      const normalizedDeviceCoordinates = this._getTempVector2d(
+        this._getNormalizedScreenX(inputManager.getCursorX()),
+        this._getNormalizedScreenY(inputManager.getCursorY())
+      );
+      raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera);
+    }
+
+    // TODO: Cache the result for the frame
     private _getClosestIntersectionUnderCursor(
       options: {
         excludedObjects?: Array<gdjs.RuntimeObject>;
@@ -4217,15 +3585,10 @@ namespace gdjs {
       } = {}
     ): THREE.Intersection | null {
       const { excludedObjects, ignoreUnselectableInstances } = options;
-      const inputManager = this._runtimeGame.getInputManager();
-      const normalizedDeviceCoordinates = this._getTempVector2d(
-        this._getNormalizedScreenX(inputManager.getCursorX()),
-        this._getNormalizedScreenY(inputManager.getCursorY())
-      );
       const closestHit = this._getClosestIntersection({
         raycaster: this._raycaster,
         setRay: (raycaster, threeCamera) =>
-          raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera),
+          this.setRayFromCursor(raycaster, threeCamera),
         excludedObjects,
         // Unselectable instances are skipped when picking an object, so that
         // objects behind them can be selected.
@@ -4545,7 +3908,7 @@ namespace gdjs {
       return closestHit;
     }
 
-    private _getCursorIn3D(
+    _getCursorIn3D(
       excludedObjects?: Array<gdjs.RuntimeObject>
     ): Point3D | null {
       const closestIntersect = this._getClosestIntersectionUnderCursor({
@@ -4669,21 +4032,21 @@ namespace gdjs {
           'IN_GAME_EDITOR_TRANSLATE_MODE'
         )
       ) {
-        this._setTransformControlsMode('translate');
+        this._selectionControls.setTransformControlsMode('translate');
       } else if (
         this._shortcuts.wasJustPressed(
           inputManager,
           'IN_GAME_EDITOR_ROTATE_MODE'
         )
       ) {
-        this._setTransformControlsMode('rotate');
+        this._selectionControls.setTransformControlsMode('rotate');
       } else if (
         this._shortcuts.wasJustPressed(
           inputManager,
           'IN_GAME_EDITOR_SCALE_MODE'
         )
       ) {
-        this._setTransformControlsMode('scale');
+        this._selectionControls.setTransformControlsMode('scale');
       }
     }
 
@@ -4744,6 +4107,13 @@ namespace gdjs {
       }
     }
 
+    isMouseLeftButtonJustPressed() {
+      const inputManager = this._runtimeGame.getInputManager();
+      return (
+        !this._wasMouseLeftButtonPressed && inputManager.isMouseButtonPressed(0)
+      );
+    }
+
     updateAndRender() {
       if (!this._unregisterContextLostListener) {
         this._setupWebGLContextLostListener();
@@ -4763,9 +4133,7 @@ namespace gdjs {
       this._windowHadFocus = hasWindowFocus;
 
       // Update the state of the mouse/cursor for this frame.
-      const mouseLeftButtonJustPressed =
-        !this._wasMouseLeftButtonPressed &&
-        inputManager.isMouseButtonPressed(0);
+      const mouseLeftButtonJustPressed = this.isMouseLeftButtonJustPressed();
       const mouseRightButtonJustPressed =
         !this._wasMouseRightButtonPressed &&
         inputManager.isMouseButtonPressed(1);
@@ -4786,14 +4154,13 @@ namespace gdjs {
       // Note: don't add more logic here. Instead, create a new method
       // to handle what you need, possibly with a dedicated class to abstract it.
 
-      if (!this._selectionControls) {
+      if (!this._selectionControls.isShown()) {
         this._isTransformControlsHovered = false;
       } else if (
         this._previousCursorX !== inputManager.getMouseX() ||
         this._previousCursorY !== inputManager.getMouseY()
       ) {
-        this._isTransformControlsHovered =
-          !!this._selectionControls.threeTransformControls.axis;
+        this._isTransformControlsHovered = this._selectionControls.isHovered();
       }
 
       this._capturedLeftMouseButton.update(inputManager);
@@ -4801,7 +4168,7 @@ namespace gdjs {
       this._handleTransformControlsMode();
       this._handleCameraMovement();
       this._handleSelectedObjectDragging();
-      this._handleSelectionMovement();
+      this._selectionControls.step();
       this._updateSelectionBox();
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
@@ -4813,7 +4180,7 @@ namespace gdjs {
       // When they are selected and `switchToSceneOrVariant` has just been
       // called, it avoid to put the control at (0; 0; 0).
       if (!this._isFirstFrame) {
-        this._updateSelectionControls();
+        this._selectionControls.update();
       }
       this._updateInnerAreaOutline();
       this._handleContextMenu();
@@ -4828,11 +4195,6 @@ namespace gdjs {
       }
 
       // Prepare state of the mouse/cursor for the next frame.
-      this._wasMovingSelectionLastFrame =
-        !!this._selectionControlsMovementTotalDelta;
-      if (!this._selectionControlsMovementTotalDelta) {
-        this._hasSelectionActuallyMoved = false;
-      }
       this._wasMouseLeftButtonPressed = inputManager.isMouseButtonPressed(0);
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
       this._wasMouseMiddleButtonPressed = inputManager.isMouseButtonPressed(2);
@@ -4859,7 +4221,7 @@ namespace gdjs {
       this._isFirstFrame = false;
     }
 
-    private _getEditorCamera(): EditorCamera {
+    _getEditorCamera(): EditorCamera {
       return this._editorCamera;
     }
   }
@@ -6826,7 +6188,6 @@ namespace gdjs {
       const worldScale = this.object
         .getRuntimeScene()
         .getRenderer3DWorldScale();
-      this.container.scale.set(worldScale, -worldScale, worldScale);
       if (this.dummyObject3DForObject2D) {
         this.dummyObject3DForObject2D.position.set(
           this.object.getCenterXInScene(),
@@ -6838,6 +6199,9 @@ namespace gdjs {
           this.object.getHeight() + 2,
           0
         );
+        this.container.scale.set(1, -1, 1);
+      } else {
+        this.container.scale.set(worldScale, -worldScale, worldScale);
       }
       this.boxHelper.update();
     }
@@ -6853,6 +6217,691 @@ namespace gdjs {
     setColor(color: THREE.ColorRepresentation) {
       this.boxHelper.material.color.set(color);
       this.boxHelper.material.needsUpdate = true;
+    }
+  }
+
+  class SelectionControls {
+    private editor: InGameEditor;
+    object: gdjs.RuntimeObject | null = null;
+    dummyThreeObject: THREE.Object3D = new THREE.Object3D();
+    threeTransformControls: THREE_ADDONS.TransformControls | null = null;
+    private _transformControlsMode: 'translate' | 'rotate' | 'scale' =
+      'translate';
+    private _isShown = false;
+
+    private _selectionControlsMovementTotalDelta: SelectionMovement | null =
+      null;
+    private _hasActuallyMoved = false;
+    private _wasMovingLastFrame = false;
+    private _objectMover: ObjectMover;
+
+    constructor(editor: InGameEditor, objectMover: ObjectMover) {
+      this.editor = editor;
+      this._objectMover = objectMover;
+    }
+
+    step(): void {
+      if (
+        this._wasMovingLastFrame &&
+        !this._selectionControlsMovementTotalDelta
+      ) {
+        const changeHappened = this._objectMover.endMove();
+        this.editor._sendSelectionUpdate({
+          hasSelectedObjectBeenModified: changeHappened,
+        });
+      }
+
+      // Start moving the selection.
+      if (
+        !this._wasMovingLastFrame &&
+        this._selectionControlsMovementTotalDelta
+      ) {
+        this._objectMover.startMove();
+      }
+
+      // Move the selection.
+      if (this._selectionControlsMovementTotalDelta) {
+        this._objectMover.move(
+          this.editor.getSelectedObjects() as Array<gdjs.RuntimeObject>,
+          this._selectionControlsMovementTotalDelta
+        );
+      }
+
+      this._wasMovingLastFrame = !!this._selectionControlsMovementTotalDelta;
+      if (!this._selectionControlsMovementTotalDelta) {
+        this._hasActuallyMoved = false;
+      }
+    }
+
+    getTransformControlsMode(): 'translate' | 'rotate' | 'scale' {
+      return this._transformControlsMode;
+    }
+
+    setTransformControlsMode(mode: 'translate' | 'rotate' | 'scale'): void {
+      this._transformControlsMode = mode;
+      if (!this._isShown || !this.threeTransformControls) {
+        return;
+      }
+      this.threeTransformControls.mode = mode;
+
+      const lastEditableSelectedObject = this.editor.getLastSelectedObject({
+        ignoreIf: (object) =>
+          this.editor.isInstanceLocked(object) ||
+          this.editor.isInstanceSealed(object),
+      });
+      if (!lastEditableSelectedObject) {
+        return;
+      }
+      const threeObject = lastEditableSelectedObject.get3DRendererObject();
+      if (!threeObject) {
+        return;
+      }
+      this.dummyThreeObject.rotation.copy(threeObject.rotation);
+      if (this._transformControlsMode === 'rotate') {
+        this.dummyThreeObject.rotation.y = -this.dummyThreeObject.rotation.y;
+        this.dummyThreeObject.rotation.z = -this.dummyThreeObject.rotation.z;
+      }
+    }
+
+    isHovered(): boolean {
+      return (
+        !!this.threeTransformControls && !!this.threeTransformControls.axis
+      );
+    }
+
+    forceUpdate(): void {
+      // Don't recreate the selection controls while they are being dragged: the
+      // editor can send updated instances at the very moment a drag starts (for
+      // example, a property field committing its value when it loses focus
+      // because the user clicked on the gizmo), and recreating the controls
+      // would cancel the drag.
+      if (this.threeTransformControls && this.threeTransformControls.dragging) {
+        return;
+      }
+      if (this._isShown) {
+        this.remove();
+      }
+      this.update();
+    }
+
+    shouldDragSelectedObject(): boolean {
+      const inputManager = this.editor.getRuntimeGame().getInputManager();
+      return (
+        !this.editor.isLeftMouseButtonCaptured() &&
+        isControlOrCmdPressed(inputManager) &&
+        (!this.isShown() ||
+          !this.threeTransformControls ||
+          !this.threeTransformControls.dragging)
+      );
+    }
+
+    update(): void {
+      const inputManager = this.editor.getRuntimeGame().getInputManager();
+      const currentScene = this.editor.getCurrentScene();
+      if (!currentScene) return;
+
+      const touchIds = getCurrentTouchIdentifiers(inputManager);
+      const hasMultipleTouches = touchIds.length >= 2;
+
+      // Selection controls are shown on the last object that can be manipulated
+      // (and if none, selection controls are not shown).
+      const lastEditableSelectedObject = this.editor.getLastSelectedObject({
+        ignoreIf: (object) =>
+          this.editor.isInstanceLocked(object) ||
+          this.editor.isInstanceSealed(object),
+      });
+
+      // Space or multiple touches will hide the selection controls as they are
+      // used to move the camera.
+      const shouldHideSelectionControls =
+        isSpacePressed(inputManager) ||
+        hasMultipleTouches ||
+        this.editor.isLeftMouseButtonCaptured();
+
+      // Remove the selection controls if the last selected object has changed
+      // or if nothing movable is selected.
+      if (
+        this._isShown &&
+        (!lastEditableSelectedObject ||
+          (lastEditableSelectedObject &&
+            this.object !== lastEditableSelectedObject) ||
+          this.shouldDragSelectedObject() ||
+          shouldHideSelectionControls)
+      ) {
+        this.remove();
+      }
+
+      // Create the selection controls on the last object that can be manipulated.
+      if (
+        lastEditableSelectedObject &&
+        !this._isShown &&
+        !this.shouldDragSelectedObject() &&
+        !shouldHideSelectionControls &&
+        lastEditableSelectedObject.get3DRendererObject()
+      ) {
+        const cameraLayer = this.editor._getCameraLayer(
+          lastEditableSelectedObject.getLayer()
+        );
+        if (cameraLayer) {
+          const runtimeLayerRender = cameraLayer
+            ? cameraLayer.getRenderer()
+            : null;
+          const threeCamera = runtimeLayerRender
+            ? runtimeLayerRender.getThreeCamera()
+            : null;
+          const threeScene = runtimeLayerRender
+            ? runtimeLayerRender.getThreeScene()
+            : null;
+          if (threeCamera && threeScene) {
+            // Create and attach the transform controls. It is attached to a dummy object
+            // to avoid the controls to directly move the runtime object (we handle this
+            // manually).
+            const threeTransformControls = new THREE_ADDONS.TransformControls(
+              threeCamera,
+              this.editor.getRuntimeGame().getRenderer().getCanvas() ||
+                undefined
+            );
+            patchAxesOnTransformControlsGizmos(threeTransformControls);
+            patchColorsOnTransformControlsGizmos(threeTransformControls);
+            patchNegativeAxisHandlesOnTransformControlsGizmos(
+              threeTransformControls
+            );
+            patchAxisGuideLinesOnTransformControlsGizmos(
+              threeTransformControls
+            );
+
+            threeTransformControls.getHelper().rotation.order = 'ZYX';
+            const currentScene = this.editor.getCurrentScene();
+            const worldScale = currentScene
+              ? currentScene.getRenderer3DWorldScale()
+              : 1;
+            threeTransformControls
+              .getHelper()
+              .scale.set(worldScale, -worldScale, worldScale);
+            threeTransformControls.mode = this._transformControlsMode;
+            threeTransformControls.getHelper().traverse((obj) => {
+              // To be detected correctly by OutlinePass.
+              // @ts-ignore
+              obj.isTransformControls = true;
+            });
+
+            // The dummy object is an invisible object that is the one moved by the transform
+            // controls.
+            this._updateDummyLocation(
+              this.dummyThreeObject,
+              lastEditableSelectedObject,
+              threeTransformControls
+            );
+            threeScene.add(this.dummyThreeObject);
+
+            threeTransformControls.attach(this.dummyThreeObject);
+            threeScene.add(threeTransformControls.getHelper());
+
+            // Keep track of the movement so the editor can apply it to the selection.
+            let initialObjectX = 0;
+            let initialObjectY = 0;
+            let initialObjectZ = 0;
+            let initialObjectWidth = 0;
+            let initialObjectHeight = 0;
+            let initialObjectDepth = 0;
+            const initialDummyPosition = new THREE.Vector3();
+            const initialDummyRotation = new THREE.Euler();
+            const initialDummyQuaternion = new THREE.Quaternion();
+            const invertedInitialDummyQuaternion = new THREE.Quaternion();
+            const selectionRotation: SelectionRotation = {
+              quaternion: new THREE.Quaternion(),
+              pivot: [0, 0, 0],
+            };
+            const initialDummyScale = new THREE.Vector3();
+            const scaleDragWorldPosition = new THREE.Vector3();
+            const scaleDragWorldQuaternion = new THREE.Quaternion();
+            const scaleDragWorldScale = new THREE.Vector3();
+            const scaleDragLocalStart = new THREE.Vector3();
+            const scaleDragLocalEnd = new THREE.Vector3();
+            threeTransformControls.addEventListener('change', (e) => {
+              if (!threeTransformControls.dragging) {
+                this._selectionControlsMovementTotalDelta = null;
+
+                this._updateDummyLocation(
+                  this.dummyThreeObject,
+                  lastEditableSelectedObject,
+                  threeTransformControls
+                );
+                // Reset the initial position to the current position, so that
+                // it's ready to be dragged again.
+                initialObjectX = lastEditableSelectedObject.getX();
+                initialObjectY = lastEditableSelectedObject.getY();
+                initialObjectZ = is3D(lastEditableSelectedObject)
+                  ? lastEditableSelectedObject.getZ()
+                  : 0;
+                initialObjectWidth = lastEditableSelectedObject.getWidth();
+                initialObjectHeight = lastEditableSelectedObject.getHeight();
+                initialObjectDepth = is3D(lastEditableSelectedObject)
+                  ? lastEditableSelectedObject.getDepth()
+                  : 0;
+                initialDummyPosition.copy(this.dummyThreeObject.position);
+                initialDummyRotation.copy(this.dummyThreeObject.rotation);
+                initialDummyQuaternion.copy(this.dummyThreeObject.quaternion);
+                initialDummyScale.copy(this.dummyThreeObject.scale);
+                return;
+              }
+
+              const editorGrid = this.editor.getEditorGrid();
+              const isRotating = this._transformControlsMode === 'rotate';
+              let translationX = isRotating
+                ? 0
+                : this.dummyThreeObject.position.x - initialDummyPosition.x;
+              let translationY = isRotating
+                ? 0
+                : this.dummyThreeObject.position.y - initialDummyPosition.y;
+              let translationZ = isRotating
+                ? 0
+                : this.dummyThreeObject.position.z - initialDummyPosition.z;
+              if (
+                this._transformControlsMode === 'translate' &&
+                threeTransformControls.axis
+              ) {
+                if (threeTransformControls.axis === 'XYZ') {
+                  // We need to override the translation vector because
+                  // `threeTransformControls` don't know that the selection
+                  // must be excluded when looking for the cursor position.
+                  let isIntersectionFound = false;
+                  let intersectionX: float = 0;
+                  let intersectionY: float = 0;
+                  let intersectionZ: float = 0;
+                  if (is3D(lastEditableSelectedObject)) {
+                    const cursor = this.editor._getCursorIn3D(
+                      this.editor.getSelectedObjects() as Array<RuntimeObject>
+                    );
+                    if (cursor) {
+                      isIntersectionFound = true;
+                      [intersectionX, intersectionY, intersectionZ] = cursor;
+                    }
+                  } else {
+                    const projectedCursor = this.editor._getProjectedCursor();
+                    if (projectedCursor) {
+                      isIntersectionFound = true;
+                      [intersectionX, intersectionY] = projectedCursor;
+                    }
+                  }
+                  if (isIntersectionFound) {
+                    translationX = intersectionX - initialObjectX;
+                    translationY = intersectionY - initialObjectY;
+                    translationZ = intersectionZ - initialObjectZ;
+                  } else {
+                    translationX = 0;
+                    translationY = 0;
+                    translationZ = 0;
+                  }
+                }
+                const isMovingOnX = threeTransformControls.axis.includes('X');
+                const isMovingOnY = threeTransformControls.axis.includes('Y');
+                const isMovingOnZ = threeTransformControls.axis.includes('Z');
+                if (editorGrid.isSpanningEnabled(inputManager)) {
+                  if (isMovingOnX) {
+                    translationX =
+                      editorGrid.getSnappedX(initialObjectX + translationX) -
+                      initialObjectX;
+                  }
+                  if (isMovingOnY) {
+                    translationY =
+                      editorGrid.getSnappedY(initialObjectY + translationY) -
+                      initialObjectY;
+                  }
+                  if (isMovingOnZ) {
+                    translationZ =
+                      editorGrid.getSnappedZ(initialObjectZ + translationZ) -
+                      initialObjectZ;
+                  }
+                }
+              }
+              // 0.2 = 20% of the movement speed (Three.js transform controls scaling is too fast)
+              const scaleDamping =
+                threeTransformControls.axis &&
+                threeTransformControls.axis.length === 1
+                  ? 1
+                  : 0.2;
+              let scaleX =
+                1 +
+                (this.dummyThreeObject.scale.x / initialDummyScale.x - 1) *
+                  scaleDamping;
+              let scaleY =
+                1 +
+                (this.dummyThreeObject.scale.y / initialDummyScale.y - 1) *
+                  scaleDamping;
+              let scaleZ =
+                1 +
+                (this.dummyThreeObject.scale.z / initialDummyScale.z - 1) *
+                  scaleDamping;
+              if (
+                this._transformControlsMode === 'scale' &&
+                threeTransformControls.axis &&
+                editorGrid.isSpanningEnabled(inputManager)
+              ) {
+                // Three.js computes the scale as a ratio of the pointer distances
+                // to the gizmo, which barely changes the size of small objects.
+                // Use the pointer movement in the object local axes instead.
+                // The pointer positions are in the Three.js world, so they are
+                // converted back to scene units with the world scale.
+                const { pointStart, pointEnd } = threeTransformControls as any;
+                this.dummyThreeObject.matrixWorld.decompose(
+                  scaleDragWorldPosition,
+                  scaleDragWorldQuaternion,
+                  scaleDragWorldScale
+                );
+                scaleDragWorldQuaternion.invert();
+                scaleDragLocalStart
+                  .copy(pointStart)
+                  .applyQuaternion(scaleDragWorldQuaternion)
+                  .multiplyScalar(worldScale);
+                scaleDragLocalEnd
+                  .copy(pointEnd)
+                  .applyQuaternion(scaleDragWorldQuaternion)
+                  .multiplyScalar(worldScale);
+                // Moving away from the gizmo center enlarges the object,
+                // whichever side of the axis the handle is on.
+                const getSizeDelta = (start: float, end: float) =>
+                  (end - start) * (start < 0 ? -1 : 1);
+                const uniformSizeDelta =
+                  ((pointEnd as THREE.Vector3).length() -
+                    (pointStart as THREE.Vector3).length()) *
+                  worldScale;
+                const isUniform = threeTransformControls.axis === 'XYZ';
+
+                // The scale gizmo is anchored on the object origin, so snap the
+                // opposite edge on the grid (like the 2D editor resize handles).
+                const getSnappedScaleX = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectX,
+                    initialObjectWidth,
+                    isUniform
+                      ? uniformSizeDelta
+                      : getSizeDelta(
+                          scaleDragLocalStart.x,
+                          scaleDragLocalEnd.x
+                        ),
+                    editorGrid.gridWidth,
+                    (x) => editorGrid.getSnappedX(x)
+                  );
+                const getSnappedScaleY = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectY,
+                    initialObjectHeight,
+                    isUniform
+                      ? uniformSizeDelta
+                      : getSizeDelta(
+                          scaleDragLocalStart.y,
+                          scaleDragLocalEnd.y
+                        ),
+                    editorGrid.gridHeight,
+                    (y) => editorGrid.getSnappedY(y)
+                  );
+                const getSnappedScaleZ = () =>
+                  getScaleSnappedOnGrid(
+                    initialObjectZ,
+                    initialObjectDepth,
+                    isUniform
+                      ? uniformSizeDelta
+                      : getSizeDelta(
+                          scaleDragLocalStart.z,
+                          scaleDragLocalEnd.z
+                        ),
+                    editorGrid.gridDepth,
+                    (z) => editorGrid.getSnappedZ(z)
+                  );
+                if (isUniform) {
+                  // Uniform scaling: like the 2D proportional resize, snap the
+                  // biggest side and apply the same ratio to the others.
+                  const uniformScale =
+                    initialObjectWidth >= initialObjectHeight &&
+                    initialObjectWidth >= initialObjectDepth
+                      ? getSnappedScaleX()
+                      : initialObjectHeight >= initialObjectDepth
+                        ? getSnappedScaleY()
+                        : getSnappedScaleZ();
+                  scaleX = uniformScale;
+                  scaleY = uniformScale;
+                  scaleZ = uniformScale;
+                } else {
+                  if (threeTransformControls.axis.includes('X')) {
+                    scaleX = getSnappedScaleX();
+                  }
+                  if (threeTransformControls.axis.includes('Y')) {
+                    scaleY = getSnappedScaleY();
+                  }
+                  if (threeTransformControls.axis.includes('Z')) {
+                    scaleZ = getSnappedScaleZ();
+                  }
+                }
+              }
+              let rotation: SelectionRotation | null = null;
+              if (
+                isRotating &&
+                !this.dummyThreeObject.quaternion.equals(initialDummyQuaternion)
+              ) {
+                // The dummy rotation is the object rotation with the Y and Z
+                // angles negated (see _updateDummyLocation), which is the
+                // object rotation mirrored on the X axis. The rotation done by
+                // the gizmo on the dummy is mirrored back the same way: the
+                // axis is mirrored and the angle is negated.
+                const { quaternion, pivot } = selectionRotation;
+                quaternion
+                  .copy(this.dummyThreeObject.quaternion)
+                  .multiply(
+                    invertedInitialDummyQuaternion
+                      .copy(initialDummyQuaternion)
+                      .invert()
+                  );
+                quaternion.set(
+                  quaternion.x,
+                  -quaternion.y,
+                  -quaternion.z,
+                  quaternion.w
+                );
+                pivot[0] = this.dummyThreeObject.position.x;
+                pivot[1] = this.dummyThreeObject.position.y;
+                pivot[2] = this.dummyThreeObject.position.z;
+                rotation = selectionRotation;
+              }
+              this._selectionControlsMovementTotalDelta = {
+                translationX,
+                translationY,
+                translationZ,
+                rotation,
+                scaleX,
+                scaleY,
+                scaleZ,
+              };
+
+              this._hasActuallyMoved =
+                this._hasActuallyMoved ||
+                !this.dummyThreeObject.position.equals(initialDummyPosition) ||
+                !this.dummyThreeObject.rotation.equals(initialDummyRotation) ||
+                !this.dummyThreeObject.scale.equals(initialDummyScale);
+            });
+
+            this.object = lastEditableSelectedObject;
+            this.threeTransformControls = threeTransformControls;
+            this._isShown = true;
+          }
+        }
+      }
+
+      if (
+        lastEditableSelectedObject &&
+        this._isShown &&
+        this.threeTransformControls &&
+        !this.editor._draggedNewObject &&
+        !this.editor._draggedSelectedObject
+      ) {
+        if (
+          this._transformControlsMode === 'rotate' &&
+          !this.threeTransformControls.dragging
+        ) {
+          this._updateDummyRotationPivot(
+            this.dummyThreeObject,
+            lastEditableSelectedObject
+          );
+        }
+
+        // Update the rotation snap.
+        const shouldSnap =
+          this._transformControlsMode === 'rotate' &&
+          isAltPressed(inputManager);
+        const rotationSnap = shouldSnap
+          ? gdjs.toRad(ROTATION_SNAP_DEGREES)
+          : null;
+
+        this.threeTransformControls.setRotationSnap(rotationSnap);
+
+        // Update the grid.
+        const editorGrid = this.editor.getEditorGrid();
+        const axis = this.threeTransformControls.axis;
+        if (axis) {
+          const isMovingOnX = axis ? axis.includes('X') : false;
+          const isMovingOnY = axis ? axis.includes('Y') : false;
+          const isMovingOnZ = axis ? axis.includes('Z') : false;
+          let gridNormal: 'X' | 'Y' | 'Z' = 'Z';
+          if (isMovingOnZ) {
+            if (!isMovingOnX && !isMovingOnY) {
+              // Choose the plan that faces the camera.
+              const cameraRotation = Math.abs(
+                gdjs.evtTools.common.angleDifference(
+                  this.editor._getEditorCamera().getCameraRotation(),
+                  0
+                )
+              );
+              if (cameraRotation <= 45 || cameraRotation > 135) {
+                gridNormal = 'Y';
+              } else {
+                gridNormal = 'X';
+              }
+            } else if (!isMovingOnX) {
+              gridNormal = 'X';
+            } else if (!isMovingOnY) {
+              gridNormal = 'Y';
+            }
+          }
+          editorGrid.setNormal(gridNormal);
+        }
+        editorGrid.setPosition(
+          lastEditableSelectedObject.getX(),
+          lastEditableSelectedObject.getY(),
+          is3D(lastEditableSelectedObject)
+            ? lastEditableSelectedObject.getZ()
+            : 0
+        );
+        const cameraLayer = this.editor._getCameraLayer(
+          lastEditableSelectedObject.getLayer()
+        );
+        const threeScene = cameraLayer
+          ? cameraLayer.getRenderer().getThreeScene()
+          : null;
+        if (threeScene) {
+          editorGrid.setTreeScene(threeScene);
+        }
+        editorGrid.setVisible(
+          this._transformControlsMode === 'translate' ||
+            this._transformControlsMode === 'scale'
+        );
+      }
+    }
+
+    remove(): void {
+      if (!this._isShown || !this.threeTransformControls) {
+        return;
+      }
+      this.threeTransformControls.detach();
+      this.threeTransformControls.getHelper().removeFromParent();
+      // Detaching is not enough: the controls keep their pointer event listeners
+      // on the canvas until disposed. Without this, every removed controls would
+      // keep handling (and raycasting on) all the pointer events, making the
+      // editor slower and slower and interfering with the new controls.
+      this.threeTransformControls.dispose();
+      this.dummyThreeObject.removeFromParent();
+      this.editor.getEditorGrid().setVisible(false);
+      this._isShown = false;
+    }
+
+    isShown(): boolean {
+      return this._isShown;
+    }
+
+    private _updateDummyLocation(
+      dummyThreeObject: THREE.Object3D,
+      lastEditableSelectedObject: gdjs.RuntimeObject,
+      threeTransformControls: THREE_ADDONS.TransformControls
+    ) {
+      const threeObject = lastEditableSelectedObject.get3DRendererObject();
+      if (!threeObject) return;
+      dummyThreeObject.position.copy(threeObject.position);
+      dummyThreeObject.rotation.copy(threeObject.rotation);
+      dummyThreeObject.scale.copy(threeObject.scale);
+      if (this._transformControlsMode === 'rotate') {
+        // This is only done for the rotate mode because it messes with the
+        // orientation of the scale mode.
+        dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
+        dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
+
+        this._updateDummyRotationPivot(
+          dummyThreeObject,
+          lastEditableSelectedObject
+        );
+      } else {
+        dummyThreeObject.position.set(
+          lastEditableSelectedObject.getX(),
+          lastEditableSelectedObject.getY(),
+          is3D(lastEditableSelectedObject)
+            ? lastEditableSelectedObject.getZ()
+            : 0
+        );
+      }
+    }
+
+    /**
+     * The whole selection rotates around its center (like in the 2D editor),
+     * so the rotation gizmo is shown there.
+     */
+    private _updateDummyRotationPivot(
+      dummyThreeObject: THREE.Object3D,
+      lastEditableSelectedObject: gdjs.RuntimeObject
+    ) {
+      const rotationPivot = this._getSelectionRotationPivot();
+      if (rotationPivot) {
+        dummyThreeObject.position.set(
+          rotationPivot[0],
+          rotationPivot[1],
+          rotationPivot[2]
+        );
+      } else {
+        dummyThreeObject.position.set(
+          lastEditableSelectedObject.getCenterXInScene(),
+          lastEditableSelectedObject.getCenterYInScene(),
+          is3D(lastEditableSelectedObject)
+            ? lastEditableSelectedObject.getCenterZInScene()
+            : 0
+        );
+      }
+    }
+
+    /**
+     * The center of the movable 3D objects of the selection, in scene
+     * coordinates (or null if none).
+     */
+    private _getSelectionRotationPivot(): Point3D | null {
+      const aabb = this.editor.getSelectionAABB({
+        ignoreIf: (object) => this.editor.isInstanceLocked(object),
+      });
+      if (!aabb) return null;
+      return [
+        (aabb.min[0] + aabb.max[0]) / 2,
+        (aabb.min[1] + aabb.max[1]) / 2,
+        (aabb.min[2] + aabb.max[2]) / 2,
+      ];
+    }
+
+    hasActuallyMoved(): boolean {
+      return this._hasActuallyMoved;
     }
   }
 

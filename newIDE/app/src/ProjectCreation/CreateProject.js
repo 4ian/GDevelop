@@ -88,6 +88,7 @@ const getCompositeSlug = (
 ) => {
   if (creationSource === 'ai-agent-request')
     return `ai-${exampleShortHeaderSlug}`;
+  if (creationSource === 'mcp') return `mcp-${exampleShortHeaderSlug}`;
   if (creationSource === 'course-chapter')
     return `course-${exampleShortHeaderSlug}`;
   if (creationSource === 'in-app-tutorial')

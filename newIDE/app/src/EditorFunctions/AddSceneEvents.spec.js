@@ -45,24 +45,93 @@ describe('add_scene_events', () => {
     expect(generateEvents).not.toHaveBeenCalled();
   });
 
-  it('fails when there is no related AI request ID', async () => {
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    const generateEvents = jest.fn();
+  describe('without an AI request (the CLI, the MCP server)', () => {
+    it('refuses a description of the events: only events scripts are compiled', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
 
-    const result: EditorFunctionGenericOutput = await editorFunctions.add_scene_events.launchFunction(
-      {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_scene_events.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          generateEvents,
+          relatedAiRequestId: null,
+          args: makeArgs({}),
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain(
+        'Without the GDevelop AI, events are only compiled from `event_script` batches'
+      );
+      expect(generateEvents).not.toHaveBeenCalled();
+    });
+
+    it('refuses a batch without an events script', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_scene_events.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          generateEvents,
+          relatedAiRequestId: null,
+          args: makeArgs({
+            events_description: undefined,
+            event_batches: [
+              {
+                event_script: 'always:\n  Wait(1)',
+                placement_relation: 'append_to_end',
+              },
+              {
+                events_description: 'Make the player jump',
+                placement_relation: 'append_to_end',
+              },
+            ],
+          }),
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain(
+        'give one for each batch (an `events_description` alone is not handled)'
+      );
+      expect(generateEvents).not.toHaveBeenCalled();
+    });
+
+    it('compiles the events scripts, with no AI request', async () => {
+      const generateEvents = jest.fn<Array<any>, any>(async () => ({
+        generationCompleted: false,
+        errorMessage: 'Stopped by the test.',
+      }));
+
+      await editorFunctions.add_scene_events.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),
         generateEvents,
         relatedAiRequestId: null,
-        args: makeArgs({}),
-      }
-    );
+        args: makeArgs({
+          events_description: undefined,
+          event_batches: [
+            {
+              event_script: 'always:\n  Wait(1)',
+              placement_relation: 'append_to_end',
+            },
+            {
+              placement_relation: 'delete',
+              placement_target_event_id: 'event-0',
+            },
+          ],
+        }),
+      });
 
-    expect(result.success).toBe(false);
-    expect(result.message).toBe(
-      'No related AI request ID found for events generation.'
-    );
-    expect(generateEvents).not.toHaveBeenCalled();
+      expect(generateEvents).toHaveBeenCalledTimes(1);
+      expect(generateEvents.mock.calls[0][0]).toMatchObject({
+        relatedAiRequestId: null,
+        eventBatches: [
+          { eventScript: 'always:\n  Wait(1)' },
+          { placementRelation: 'delete' },
+        ],
+      });
+    });
   });
 
   it('fails when no events description (and no event batches) is provided', async () => {

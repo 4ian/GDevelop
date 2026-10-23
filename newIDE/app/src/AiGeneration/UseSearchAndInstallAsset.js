@@ -20,6 +20,7 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
 import { toAssetStoreType } from '../AssetStore/AssetStoreSearchFilter';
 import { isEffectAsset } from '../Utils/GDevelopServices/Asset';
+import { notLoggedInErrorMessage } from './UseGenerateEvents';
 
 type _FuncReturnType = {
   searchAndInstallAsset: AssetSearchAndInstallOptions => Promise<AssetSearchAndInstallResult>,
@@ -60,7 +61,7 @@ export const useSearchAndInstallAsset = ({
       exactOrPartialAssetId,
       ...assetSearchOptions
     }: EffectAssetSearchAndInstallOptions): Promise<EffectAssetSearchAndInstallResult> => {
-      if (!profile) throw new Error('User should be authenticated.');
+      if (!profile) throw new Error(notLoggedInErrorMessage);
 
       let assetShortHeader = getAssetShortHeaderFromId(exactOrPartialAssetId);
       if (!assetShortHeader) {
@@ -150,7 +151,7 @@ export const useSearchAndInstallAsset = ({
         exactOrPartialAssetId,
         ...assetSearchOptions
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
-        if (!profile) throw new Error('User should be authenticated.');
+        if (!profile) throw new Error(notLoggedInErrorMessage);
 
         let assetShortHeader;
         if (exactOrPartialAssetId) {

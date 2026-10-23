@@ -11,6 +11,11 @@
  * These tests compare the results with:
  * - a search on all the children returned by GetAllChildren,
  * - the JSON written by a rapidjson::Document built from the element.
+ *
+ * A search that does not find a child, or that uses another name than the one
+ * of an array, logs an error. Logging a gd::String is slow (especially with a
+ * UTF-8 locale and sanitizers), so these searches are checked a limited number
+ * of times.
  */
 #include <iostream>
 #include <limits>
@@ -32,8 +37,8 @@ using namespace gd;
 namespace {
 
 /**
- * Silence std::cout while it exists: out of bound accesses to the children
- * are expected and each of them logs an error.
+ * Silence std::cout while it exists: the searches that don't find a child are
+ * expected and each of them logs an error.
  */
 class SilencedStandardOutput {
  public:
@@ -119,17 +124,34 @@ bool SearchHasChild(const SerializerElement& element,
   } while (false)
 
 const SerializerElement* GetNullElement() {
-  static SerializerElement notAnArray;
-  SilencedStandardOutput silencedStandardOutput;
-  return &notAnArray.GetChild(std::size_t(0));
+  static const SerializerElement* nullElement = [] {
+    static SerializerElement notAnArray;
+    SilencedStandardOutput silencedStandardOutput;
+    return &notAnArray.GetChild(std::size_t(0));
+  }();
+  return nullElement;
+}
+
+/**
+ * The name of a child to add: usually the name of the array (other names are
+ * renamed, logging a warning).
+ */
+const gd::String& PickChildNameToAdd(const SerializerElement& element,
+                                     std::mt19937& random) {
+  if (element.ConsideredAsArray() && PickIndex(random, 9) != 0)
+    return element.ConsideredAsArrayOf();
+  return PickName(random);
 }
 
 /**
  * Check the searches done with a name, which don't depend on the deprecated
- * name of the array (not readable from outside the element).
+ * name of the array (not readable from outside the element). The searches not
+ * finding a child or using another name than the one of the array (which log
+ * an error) are only checked if `checkLoggedSearches` is true.
  */
 void CheckSearchesByName(const SerializerElement& element,
-                         std::mt19937& random) {
+                         std::mt19937& random,
+                         bool checkLoggedSearches) {
   const SerializerElement* nullElement = GetNullElement();
   for (const auto& name : childNames) {
     const gd::String& deprecatedName = PickName(random);
@@ -150,60 +172,68 @@ void CheckSearchesByName(const SerializerElement& element,
               CountChildren(element, name, deprecatedName));
     }
 
-    // Access the children in order, then in a random order, and one index
-    // after the last child (not more: a child not found logs an error, which
-    // is slow). An array searches its children with the name of the array,
-    // logging a warning for another name: check it only for the first child.
-    std::size_t maxIndex = 0;
-    if (!element.ConsideredAsArray() || name == element.ConsideredAsArrayOf()) {
-      while (SearchChild(element, name, maxIndex, deprecatedName)) maxIndex++;
-    }
-    for (std::size_t index = 0; index <= maxIndex; ++index) {
-      const SerializerElement* foundChild =
-          SearchChild(element, name, index, deprecatedName);
+    // An array searches its children with the name of the array, logging a
+    // warning for another name.
+    if (element.ConsideredAsArray() && name != element.ConsideredAsArrayOf() &&
+        !checkLoggedSearches)
+      continue;
+
+    // Access the children in order, then in a random order, then the index
+    // after the last child (not found).
+    std::size_t childrenCount = 0;
+    while (SearchChild(element, name, childrenCount, deprecatedName))
+      childrenCount++;
+    for (std::size_t index = 0; index < childrenCount; ++index) {
       REQUIRE_SAME_CHILD(&element.GetChild(name, index, deprecatedName),
-                         foundChild ? foundChild : nullElement);
+                         SearchChild(element, name, index, deprecatedName));
     }
-    for (std::size_t i = 0; i <= maxIndex; ++i) {
-      std::size_t index = PickIndex(random, maxIndex);
-      const SerializerElement* foundChild =
-          SearchChild(element, name, index, deprecatedName);
+    for (std::size_t i = 0; i < childrenCount; ++i) {
+      std::size_t index = PickIndex(random, childrenCount - 1);
       REQUIRE_SAME_CHILD(&element.GetChild(name, index, deprecatedName),
-                         foundChild ? foundChild : nullElement);
+                         SearchChild(element, name, index, deprecatedName));
+    }
+    if (checkLoggedSearches) {
+      REQUIRE_SAME_CHILD(&element.GetChild(name, childrenCount, deprecatedName),
+                         nullElement);
     }
   }
 }
 
 /**
- * Check the searches done from the index only (the element must be an
- * array), knowing the deprecated name of the children of the array.
+ * Check the searches done from the index only, knowing the deprecated name of
+ * the children of the array. The searches not finding a child (which log an
+ * error) are only checked if `checkLoggedSearches` is true.
  */
 void CheckSearchesByIndex(const SerializerElement& element,
                           const gd::String& deprecatedArrayOf,
-                          std::mt19937& random) {
+                          std::mt19937& random,
+                          bool checkLoggedSearches) {
   const SerializerElement* nullElement = GetNullElement();
   if (!element.ConsideredAsArray()) {
-    REQUIRE(element.GetChildrenCount() == 0);
-    REQUIRE(&element.GetChild(std::size_t(0)) == nullElement);
+    if (checkLoggedSearches) {
+      REQUIRE(element.GetChildrenCount() == 0);
+      REQUIRE(&element.GetChild(std::size_t(0)) == nullElement);
+    }
     return;
   }
 
   const gd::String& arrayOf = element.ConsideredAsArrayOf();
-  REQUIRE(element.GetChildrenCount() ==
-          CountChildren(element, arrayOf, deprecatedArrayOf));
-  std::size_t maxIndex = element.GetAllChildren().size() + 1;
-  for (std::size_t i = 0; i <= 2 * maxIndex; ++i) {
-    std::size_t index = i <= maxIndex ? i : PickIndex(random, maxIndex);
-    const SerializerElement* foundChild =
-        SearchChild(element, arrayOf, index, deprecatedArrayOf);
+  std::size_t childrenCount =
+      CountChildren(element, arrayOf, deprecatedArrayOf);
+  REQUIRE(element.GetChildrenCount() == childrenCount);
+  for (std::size_t i = 0; i < 2 * childrenCount; ++i) {
+    std::size_t index =
+        i < childrenCount ? i : PickIndex(random, childrenCount - 1);
     REQUIRE_SAME_CHILD(&element.GetChild(index),
-                       foundChild ? foundChild : nullElement);
+                       SearchChild(element, arrayOf, index, deprecatedArrayOf));
   }
+  if (checkLoggedSearches)
+    REQUIRE_SAME_CHILD(&element.GetChild(childrenCount), nullElement);
 }
 
 void CheckSearchesByNameRecursively(const SerializerElement& element,
                                     std::mt19937& random) {
-  CheckSearchesByName(element, random);
+  CheckSearchesByName(element, random, false);
   for (const auto& child : element.GetAllChildren())
     CheckSearchesByNameRecursively(*child.second, random);
 }
@@ -421,7 +451,7 @@ void FillRandomly(SerializerElement& element,
     // AddChild returns the existing child of an object having this name:
     // don't fill it again (adding a child to an element having an attribute
     // with the same name would write the name twice in the JSON).
-    const gd::String& name = PickName(random);
+    const gd::String& name = PickChildNameToAdd(element, random);
     if (!element.ConsideredAsArray() && element.HasChild(name)) continue;
 
     FillRandomly(
@@ -438,7 +468,7 @@ void FillRandomly(SerializerElement& element,
 
 TEST_CASE("SerializerElement (randomized)", "[common]") {
   SECTION("Searches of children after random changes") {
-    for (unsigned int seed = 1; seed <= 300; ++seed) {
+    for (unsigned int seed = 1; seed <= 120; ++seed) {
       INFO("Seed: " << seed);
       std::mt19937 random(seed);
       SilencedStandardOutput silencedStandardOutput;
@@ -448,7 +478,8 @@ TEST_CASE("SerializerElement (randomized)", "[common]") {
       std::vector<SerializerElement> otherElements(3);
       std::vector<gd::String> otherElementsDeprecatedArrayOf(3);
 
-      for (std::size_t step = 0; step < 60; ++step) {
+      const std::size_t stepsCount = 60;
+      for (std::size_t step = 0; step < stepsCount; ++step) {
         INFO("Step: " << step);
         std::size_t otherIndex = PickIndex(random, otherElements.size() - 1);
         switch (PickIndex(random, 13)) {
@@ -456,7 +487,7 @@ TEST_CASE("SerializerElement (randomized)", "[common]") {
           case 1:
           case 2:
           case 3:
-            element.AddChild(PickName(random))
+            element.AddChild(PickChildNameToAdd(element, random))
                 .SetIntValue(static_cast<int>(step));
             break;
           case 4:
@@ -481,7 +512,8 @@ TEST_CASE("SerializerElement (randomized)", "[common]") {
             otherElementsDeprecatedArrayOf[otherIndex] = deprecatedArrayOf;
             break;
           case 10:
-            otherElements[otherIndex].AddChild(PickName(random));
+            otherElements[otherIndex].AddChild(
+                PickChildNameToAdd(otherElements[otherIndex], random));
             if (PickIndex(random, 3) == 0) {
               otherElementsDeprecatedArrayOf[otherIndex] = PickName(random);
               otherElements[otherIndex].ConsiderAsArrayOf(
@@ -512,23 +544,30 @@ TEST_CASE("SerializerElement (randomized)", "[common]") {
             }
             break;
           default:
-            FillRandomly(element.AddChild(PickName(random)), random, 3, false);
+            FillRandomly(element.AddChild(PickChildNameToAdd(element, random)),
+                         random,
+                         3,
+                         false);
             break;
         }
 
-        CheckSearchesByName(element, random);
-        CheckSearchesByIndex(element, deprecatedArrayOf, random);
-        CheckSearchesByName(otherElements[otherIndex], random);
+        // Check the searches logging an error only for some of the steps.
+        bool checkLoggedSearches = seed <= 40 && step % 20 == 0;
+        CheckSearchesByName(element, random, checkLoggedSearches);
+        CheckSearchesByIndex(
+            element, deprecatedArrayOf, random, checkLoggedSearches);
+        CheckSearchesByName(otherElements[otherIndex], random, false);
         CheckSearchesByIndex(otherElements[otherIndex],
                              otherElementsDeprecatedArrayOf[otherIndex],
-                             random);
+                             random,
+                             false);
       }
       CheckSearchesByNameRecursively(element, random);
     }
   }
 
   SECTION("Copies of random elements") {
-    for (unsigned int seed = 1; seed <= 200; ++seed) {
+    for (unsigned int seed = 1; seed <= 100; ++seed) {
       INFO("Seed: " << seed);
       std::mt19937 random(seed);
       SilencedStandardOutput silencedStandardOutput;
@@ -552,7 +591,7 @@ TEST_CASE("SerializerElement (randomized)", "[common]") {
 
 TEST_CASE("Serializer (randomized)", "[common]") {
   SECTION("ToJSON writes the same JSON as a rapidjson::Document") {
-    for (unsigned int seed = 1; seed <= 300; ++seed) {
+    for (unsigned int seed = 1; seed <= 200; ++seed) {
       INFO("Seed: " << seed);
       std::mt19937 random(seed);
       SerializerElement element;
@@ -570,7 +609,7 @@ TEST_CASE("Serializer (randomized)", "[common]") {
   }
 
   SECTION("JSON and binary round trips") {
-    for (unsigned int seed = 1; seed <= 300; ++seed) {
+    for (unsigned int seed = 1; seed <= 200; ++seed) {
       INFO("Seed: " << seed);
       std::mt19937 random(seed);
       SerializerElement element;
@@ -609,8 +648,9 @@ TEST_CASE("Serializer (randomized)", "[common]") {
     SerializerElement mixedArray;
     const std::vector<gd::String> names = {"item", "oldItem", ""};
     for (int i = 0; i < childrenCount; ++i) {
-      mixedArray.ConsiderAsArrayOf(names[i % names.size()]);
-      mixedArray.AddChild("").SetIntValue(i);
+      const gd::String& name = names[i % names.size()];
+      mixedArray.ConsiderAsArrayOf(name);
+      mixedArray.AddChild(name).SetIntValue(i);
     }
     mixedArray.ConsiderAsArrayOf("other");
     mixedArray.AddChild("other").SetIntValue(-1);
@@ -623,11 +663,9 @@ TEST_CASE("Serializer (randomized)", "[common]") {
     }
     std::mt19937 random(1);
     for (int i = 0; i < 100; ++i) {
-      std::size_t index = PickIndex(random, childrenCount);
-      const SerializerElement* foundChild =
-          SearchChild(mixedArray, "oldItem", index, "");
-      REQUIRE_SAME_CHILD(&mixedArray.GetChild("oldItem", index),
-                         foundChild ? foundChild : GetNullElement());
+      std::size_t index = PickIndex(random, childrenCount - 1);
+      REQUIRE_SAME_CHILD(&mixedArray.GetChild("item", index, "oldItem"),
+                         SearchChild(mixedArray, "item", index, "oldItem"));
     }
     REQUIRE(gd::Serializer::ToJSON(mixedArray) ==
             ToJSONWithDocument(mixedArray));

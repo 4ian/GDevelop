@@ -1,0 +1,47 @@
+{
+  "icons": [
+    {
+      "src": "icon_32x32.ico",
+      "sizes": "32x32",
+      "type": "image/vnd.microsoft.icon"
+    },
+    {
+      "src": "icon_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    }
+  ],
+  "name": "Yarn Story Editor",
+  "short_name": "Yarn",
+  "orientation": "portrait",
+  "display": "fullscreen",
+  "start_url": ".",
+  "description": "Yarn Story Editor",
+  "background_color": "#3367D6",
+  "theme_color": "#3367D6",
+  "share_target": {
+    "action": "/YarnEditor/",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

@@ -61,6 +61,12 @@ namespace gdjs {
      * The mouse movement Y (only moved by mouse events).
      */
     private _mouseMovementY: float = 0;
+    /**
+     * Whether the last known mouse position can be used to compute a movement
+     * delta. Reset when the mouse leaves/enters the canvas or when the pointer
+     * lock state changes, to avoid reporting a spurious large movement.
+     */
+    private _canComputeMouseMovementFromPosition: boolean = false;
 
     // TODO Remove _touches when there is no longer SpritePanelButton 1.2.0
     // extension in the wild.
@@ -273,17 +279,37 @@ namespace gdjs {
       y: float,
       options?: { movementX: float; movementY: float }
     ): void {
+      const previousMouseX = this._mouseX;
+      const previousMouseY = this._mouseY;
+
       this._setCursorPosition(x, y);
       this._mouseX = x;
       this._mouseY = y;
 
       if (options) {
-        // Mouse movement can be accumulated over multiple calls to onMouseMove during a single frame.
-        // This is the case with Firefox which calls onMouseMove multiple times, including with
-        // values being 0 (so we can't just rely on the last one).
+        // The pointer is locked: the browser freezes the cursor position, so the
+        // only reliable source of movement is the browser-provided movementX/Y.
+        // These can be reported across multiple onMouseMove calls during a single
+        // frame (notably on Firefox, including with values being 0, so we can't
+        // just rely on the last one), hence the accumulation.
         const { movementX, movementY } = options;
         if (movementX !== undefined) this._mouseMovementX += movementX;
         if (movementY !== undefined) this._mouseMovementY += movementY;
+        // A position delta is meaningless while the pointer is locked.
+        this._canComputeMouseMovementFromPosition = false;
+      } else {
+        // The pointer is not locked: derive the movement from the change of the
+        // cursor position instead of relying on the browser movementX/Y. The
+        // latter are unreliable across browsers (for example Firefox adds the
+        // game canvas offset to them, which makes first-person cameras drift or
+        // stick unless the game is fullscreen) and are not expressed in the game
+        // resolution units. Using the position delta keeps the movement
+        // consistent with getCursorX/Y on every browser.
+        if (this._canComputeMouseMovementFromPosition) {
+          this._mouseMovementX += x - previousMouseX;
+          this._mouseMovementY += y - previousMouseY;
+        }
+        this._canComputeMouseMovementFromPosition = true;
       }
 
       if (this.isMouseButtonPressed(InputManager.MOUSE_LEFT_BUTTON)) {
@@ -361,6 +387,9 @@ namespace gdjs {
      */
     onMouseLeave(): void {
       this._isMouseInsideCanvas = false;
+      // The next position can be anywhere on the canvas, so don't use it to
+      // compute a movement delta.
+      this._canComputeMouseMovementFromPosition = false;
     }
 
     /**
@@ -368,6 +397,9 @@ namespace gdjs {
      */
     onMouseEnter(): void {
       this._isMouseInsideCanvas = true;
+      // The next position can be anywhere on the canvas, so don't use it to
+      // compute a movement delta.
+      this._canComputeMouseMovementFromPosition = false;
     }
 
     /**

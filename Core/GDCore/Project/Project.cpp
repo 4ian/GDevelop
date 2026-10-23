@@ -891,16 +891,16 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
+  // The layouts, external events and external layouts can also be inserted one
+  // at a time after this method (see SerializeWithoutLayoutsAndExternalsTo):
+  // nothing else unserialized here must depend on them, and they must not
+  // depend on what is unserialized after them here.
   scenes.clear();
   const SerializerElement& layoutsElement =
       element.GetChild("layouts", 0, "Scenes");
   layoutsElement.ConsiderAsArrayOf("layout", "Scene");
   for (std::size_t i = 0; i < layoutsElement.GetChildrenCount(); ++i) {
-    const SerializerElement& layoutElement = layoutsElement.GetChild(i);
-
-    gd::Layout& layout = InsertNewLayout(
-        layoutElement.GetStringAttribute("name", "", "nom"), -1);
-    layout.UnserializeFrom(*this, layoutElement);
+    UnserializeAndInsertLayoutFrom(layoutsElement.GetChild(i));
   }
   SetFirstLayout(element.GetChild("firstLayout").GetStringValue());
   SetPreviewLayout(element.GetChild("previewLayout").GetStringValue());
@@ -910,13 +910,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       element.GetChild("externalEvents", 0, "ExternalEvents");
   externalEventsElement.ConsiderAsArrayOf("externalEvents", "ExternalEvents");
   for (std::size_t i = 0; i < externalEventsElement.GetChildrenCount(); ++i) {
-    const SerializerElement& externalEventElement =
-        externalEventsElement.GetChild(i);
-
-    gd::ExternalEvents& externalEvents = InsertNewExternalEvents(
-        externalEventElement.GetStringAttribute("name", "", "Name"),
-        GetExternalEventsCount());
-    externalEvents.UnserializeFrom(*this, externalEventElement);
+    UnserializeAndInsertExternalEventsFrom(externalEventsElement.GetChild(i));
   }
 
   tests.ClearTests();
@@ -934,13 +928,32 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       element.GetChild("externalLayouts", 0, "ExternalLayouts");
   externalLayoutsElement.ConsiderAsArrayOf("externalLayout", "ExternalLayout");
   for (std::size_t i = 0; i < externalLayoutsElement.GetChildrenCount(); ++i) {
-    const SerializerElement& externalLayoutElement =
-        externalLayoutsElement.GetChild(i);
-
-    gd::ExternalLayout& newExternalLayout =
-        InsertNewExternalLayout("", GetExternalLayoutsCount());
-    newExternalLayout.UnserializeFrom(*this, externalLayoutElement);
+    UnserializeAndInsertExternalLayoutFrom(externalLayoutsElement.GetChild(i));
   }
+}
+
+gd::Layout& Project::UnserializeAndInsertLayoutFrom(
+    const SerializerElement& element) {
+  gd::Layout& newLayout =
+      InsertNewLayout(element.GetStringAttribute("name", "", "nom"), -1);
+  newLayout.UnserializeFrom(*this, element);
+  return newLayout;
+}
+
+gd::ExternalEvents& Project::UnserializeAndInsertExternalEventsFrom(
+    const SerializerElement& element) {
+  gd::ExternalEvents& newExternalEvents = InsertNewExternalEvents(
+      element.GetStringAttribute("name", "", "Name"), GetExternalEventsCount());
+  newExternalEvents.UnserializeFrom(*this, element);
+  return newExternalEvents;
+}
+
+gd::ExternalLayout& Project::UnserializeAndInsertExternalLayoutFrom(
+    const SerializerElement& element) {
+  gd::ExternalLayout& newExternalLayout =
+      InsertNewExternalLayout("", GetExternalLayoutsCount());
+  newExternalLayout.UnserializeFrom(*this, element);
+  return newExternalLayout;
 }
 
 void Project::UnserializeAndInsertExtensionsFrom(
@@ -1071,6 +1084,27 @@ void Project::UnserializeAndInsertExtensionsFrom(
 }
 
 void Project::SerializeTo(SerializerElement& element) const {
+  SerializeWithoutLayoutsAndExternalsTo(element);
+
+  // Fill the lists left empty by SerializeWithoutLayoutsAndExternalsTo.
+  SerializerElement& layoutsElement = element.GetChild("layouts");
+  for (std::size_t i = 0; i < GetLayoutsCount(); i++)
+    GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
+
+  SerializerElement& externalEventsElement = element.GetChild("externalEvents");
+  for (std::size_t i = 0; i < GetExternalEventsCount(); ++i)
+    GetExternalEvents(i).SerializeTo(
+        externalEventsElement.AddChild("externalEvents"));
+
+  SerializerElement& externalLayoutsElement =
+      element.GetChild("externalLayouts");
+  for (std::size_t i = 0; i < externalLayouts.size(); ++i)
+    externalLayouts[i]->SerializeTo(
+        externalLayoutsElement.AddChild("externalLayout"));
+}
+
+void Project::SerializeWithoutLayoutsAndExternalsTo(
+    SerializerElement& element) const {
   SerializerElement& versionElement = element.AddChild("gdVersion");
   versionElement.SetAttribute("major", gd::VersionWrapper::Major());
   versionElement.SetAttribute("minor", gd::VersionWrapper::Minor());
@@ -1193,16 +1227,10 @@ void Project::SerializeTo(SerializerElement& element) const {
   if (!previewLayout.empty()) {
     element.SetAttribute("previewLayout", previewLayout);
   }
-  gd::SerializerElement& layoutsElement = element.AddChild("layouts");
-  layoutsElement.ConsiderAsArrayOf("layout");
-  for (std::size_t i = 0; i < GetLayoutsCount(); i++)
-    GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
-
-  SerializerElement& externalEventsElement = element.AddChild("externalEvents");
-  externalEventsElement.ConsiderAsArrayOf("externalEvents");
-  for (std::size_t i = 0; i < GetExternalEventsCount(); ++i)
-    GetExternalEvents(i).SerializeTo(
-        externalEventsElement.AddChild("externalEvents"));
+  // The layouts, external events and external layouts are serialized by
+  // SerializeTo, or one at a time by the caller.
+  element.AddChild("layouts").ConsiderAsArrayOf("layout");
+  element.AddChild("externalEvents").ConsiderAsArrayOf("externalEvents");
 
   if (tests.GetTestsCount() > 0) {
     tests.SerializeTestsTo(element.AddChild("tests"));
@@ -1220,12 +1248,7 @@ void Project::SerializeTo(SerializerElement& element) const {
     eventsFunctionsExtensions[i]->SerializeTo(
         eventsFunctionsExtensionsElement.AddChild("eventsFunctionsExtension"));
 
-  SerializerElement& externalLayoutsElement =
-      element.AddChild("externalLayouts");
-  externalLayoutsElement.ConsiderAsArrayOf("externalLayout");
-  for (std::size_t i = 0; i < externalLayouts.size(); ++i)
-    externalLayouts[i]->SerializeTo(
-        externalLayoutsElement.AddChild("externalLayout"));
+  element.AddChild("externalLayouts").ConsiderAsArrayOf("externalLayout");
 }
 
 bool Project::IsNameSafe(const gd::String& name) {

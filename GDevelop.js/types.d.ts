@@ -671,6 +671,10 @@ export class Project extends EmscriptenObject {
   getSceneResourcesUnloading(): string;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
+  serializeWithoutLayoutsAndExternalsTo(element: SerializerElement): void;
+  unserializeAndInsertLayoutFrom(element: SerializerElement): Layout;
+  unserializeAndInsertExternalEventsFrom(element: SerializerElement): ExternalEvents;
+  unserializeAndInsertExternalLayoutFrom(element: SerializerElement): ExternalLayout;
   getWholeProjectDiagnosticReport(): WholeProjectDiagnosticReport;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;

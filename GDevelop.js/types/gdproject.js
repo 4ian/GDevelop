@@ -122,6 +122,10 @@ declare class gdProject {
   getSceneResourcesUnloading(): string;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
+  serializeWithoutLayoutsAndExternalsTo(element: gdSerializerElement): void;
+  unserializeAndInsertLayoutFrom(element: gdSerializerElement): gdLayout;
+  unserializeAndInsertExternalEventsFrom(element: gdSerializerElement): gdExternalEvents;
+  unserializeAndInsertExternalLayoutFrom(element: gdSerializerElement): gdExternalLayout;
   getWholeProjectDiagnosticReport(): gdWholeProjectDiagnosticReport;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;

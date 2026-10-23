@@ -24,6 +24,7 @@ import ProfileDialog from '../Profile/ProfileDialog';
 import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
 import Window from '../Utils/Window';
 import { markLegacySkyboxes } from '../Utils/LegacySkyboxOrientation';
+import { unserializeProjectFromJSObject } from '../Utils/Serializer';
 import { isWebGL2Supported } from '../Utils/WebGL';
 import { setInGameEditorRendererCreationFailed } from '../EmbeddedGame/InGameEditorAvailability';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -383,6 +384,31 @@ const updateFileMetadataWithOpenedProject = (
   gameId: project.getProjectUuid(),
   name: project.getName(),
 });
+
+/**
+ * Create a project from the JS object of its file, unserialized one part at a
+ * time: the elements of the whole project are never in memory at once.
+ */
+const unserializeNewProject = (projectObject: Object): gdProject => {
+  const startTime = Date.now();
+  const newProject = gd.ProjectHelper.createNewGDJSProject();
+  try {
+    unserializeProjectFromJSObject(newProject, projectObject);
+    markLegacySkyboxes(newProject);
+  } catch (error) {
+    // Partly loaded and referenced nowhere else. Deleting it can fail too
+    // (when the memory is exhausted): the original error is still reported.
+    try {
+      newProject.delete();
+    } catch (deleteError) {
+      console.error('Unable to delete the partly loaded project:', deleteError);
+    }
+    throw error;
+  }
+  const duration = Date.now() - startTime;
+  console.info(`Unserialization took ${duration.toFixed(2)} ms`);
+  return newProject;
+};
 
 const initialPreviewState: PreviewState = {
   previewLayoutName: null,
@@ -1445,23 +1471,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
-  const loadFromSerializedProject = React.useCallback(
-    (
-      serializedProject: gdSerializerElement,
-      fileMetadata: ?FileMetadata
-    ): Promise<State> => {
-      const startTime = Date.now();
-      const newProject = gd.ProjectHelper.createNewGDJSProject();
-      newProject.unserializeFrom(serializedProject);
-      markLegacySkyboxes(newProject);
-      const duration = Date.now() - startTime;
-      console.info(`Unserialization took ${duration.toFixed(2)} ms`);
-
-      return loadFromProject(newProject, fileMetadata);
-    },
-    [loadFromProject]
-  );
-
   const setLoaderModalProgress = (
     progress: ?number,
     message: ?MessageDescriptor
@@ -1597,11 +1606,12 @@ const MainFrame = (props: Props): React.MixedElement => {
           return;
         }
 
-        const serializedProject = gd.Serializer.fromJSObject(content);
-
+        // Unserialized before the "try": if it fails, the project still opened
+        // keeps its unsaved changes, like when the file can't be read.
+        const newProject = unserializeNewProject(content);
         try {
-          const state = await loadFromSerializedProject(
-            serializedProject,
+          const state = await loadFromProject(
+            newProject,
             // Note that fileMetadata is the original, unchanged one, even if we're loading
             // an autosave. If we're for some reason loading an autosave, we still consider
             // that we're opening the file that was originally requested by the user.
@@ -1628,7 +1638,6 @@ const MainFrame = (props: Props): React.MixedElement => {
           return state;
         } finally {
           sealUnsavedChanges();
-          serializedProject.delete();
         }
       } catch (error) {
         if (error.name === 'CloudProjectReadingError') {
@@ -1651,7 +1660,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       i18n,
       getStorageProviderOperations,
       getStorageProvider,
-      loadFromSerializedProject,
+      loadFromProject,
       showConfirmation,
       showAlert,
       sealUnsavedChanges,

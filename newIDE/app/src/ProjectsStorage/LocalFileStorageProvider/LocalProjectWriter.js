@@ -2,8 +2,8 @@
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import {
-  serializeToJSObject,
-  serializeToJSON,
+  serializeProjectToJSObject,
+  serializeProjectToJSON,
   addFinalNewline,
 } from '../../Utils/Serializer';
 import { serializeToJSObjectInBackground } from '../../Utils/BackgroundSerializer';
@@ -135,7 +135,7 @@ const writeProjectFiles = async ({
     // exercised in production yet.
     serializedProjectObject = await serializeToJSObjectInBackground(project);
   } else {
-    serializedProjectObject = serializeToJSObject(project, 'serializeTo', {
+    serializedProjectObject = serializeProjectToJSObject(project, {
       canonicalEventSerialization,
     });
   }
@@ -384,7 +384,7 @@ export const onAutoSaveProject = (
   fileMetadata: FileMetadata
 ): Promise<void> => {
   const autoSavePath = fileMetadata.fileIdentifier + '.autosave';
-  return writeAndCheckFile(serializeToJSON(project), autoSavePath).catch(
+  return writeAndCheckFile(serializeProjectToJSON(project), autoSavePath).catch(
     err => {
       console.error(`Unable to write ${autoSavePath}:`, err);
       throw err;

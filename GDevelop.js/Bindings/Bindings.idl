@@ -700,6 +700,10 @@ interface Project {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+    void SerializeWithoutLayoutsAndExternalsTo([Ref] SerializerElement element);
+    [Ref] Layout UnserializeAndInsertLayoutFrom([Const, Ref] SerializerElement element);
+    [Ref] ExternalEvents UnserializeAndInsertExternalEventsFrom([Const, Ref] SerializerElement element);
+    [Ref] ExternalLayout UnserializeAndInsertExternalLayoutFrom([Const, Ref] SerializerElement element);
 
     [Ref] WholeProjectDiagnosticReport GetWholeProjectDiagnosticReport();
 

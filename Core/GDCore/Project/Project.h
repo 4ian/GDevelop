@@ -659,11 +659,59 @@ class GD_CORE_API Project {
   void UnserializeFrom(const SerializerElement& element);
 
   /**
-   * \brief Serialize the project.
+   * \brief Unserialize a layout and insert it at the end of the layouts,
+   * without checking its name.
    *
-   * "Dirty" flag is set to false when serialization is done.
+   * Used by UnserializeFrom, and to unserialize a project one part at a time
+   * (see SerializeWithoutLayoutsAndExternalsTo).
+   */
+  gd::Layout& UnserializeAndInsertLayoutFrom(const SerializerElement& element);
+
+  /**
+   * \brief Unserialize an external events sheet and insert it at the end of
+   * the external events, without checking its name.
+   *
+   * Used by UnserializeFrom, and to unserialize a project one part at a time
+   * (see SerializeWithoutLayoutsAndExternalsTo).
+   */
+  gd::ExternalEvents& UnserializeAndInsertExternalEventsFrom(
+      const SerializerElement& element);
+
+  /**
+   * \brief Unserialize an external layout and insert it at the end of the
+   * external layouts, without checking its name.
+   *
+   * Used by UnserializeFrom, and to unserialize a project one part at a time
+   * (see SerializeWithoutLayoutsAndExternalsTo).
+   */
+  gd::ExternalLayout& UnserializeAndInsertExternalLayoutFrom(
+      const SerializerElement& element);
+
+  /**
+   * \brief Serialize the project, with its layouts, external events and
+   * external layouts (see SerializeWithoutLayoutsAndExternalsTo).
    */
   void SerializeTo(SerializerElement& element) const;
+
+  /**
+   * \brief Serialize the project without its layouts, external events and
+   * external layouts (the "parts" of the project): their lists are written
+   * empty, at their usual place.
+   *
+   * To keep in memory the elements of only one part at a time, instead of the
+   * elements of the whole project, serialize each part in its own element,
+   * convert it (to JSON for example) and delete the element before the next
+   * part, then put the converted parts in the lists of the converted project.
+   * Serializing the parts in the lists of this element would keep all of them
+   * in memory, like SerializeTo.
+   *
+   * To unserialize a project one part at a time, call UnserializeFrom with
+   * these lists empty (it clears the parts), then
+   * UnserializeAndInsertLayoutFrom, UnserializeAndInsertExternalEventsFrom or
+   * UnserializeAndInsertExternalLayoutFrom for each part, in the order of its
+   * list (the order between the three lists does not matter).
+   */
+  void SerializeWithoutLayoutsAndExternalsTo(SerializerElement& element) const;
 
   /**
    * Get the major version of GDevelop used to save the project.

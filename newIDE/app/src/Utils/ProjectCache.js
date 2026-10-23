@@ -1,6 +1,6 @@
 // @flow
 
-import { serializeToJSON } from './Serializer';
+import { serializeProjectToJSON } from './Serializer';
 
 const CLOUD_PROJECT_AUTOSAVE_CACHE_KEY = 'gdevelop-cloud-project-autosave';
 const objectStoreScope = 'cloud-project-autosaves';
@@ -207,7 +207,7 @@ class ProjectCache {
         };
         transaction.objectStore(objectStoreScope).put({
           [keyName]: key,
-          project: serializeToJSON(project),
+          project: serializeProjectToJSON(project),
           createdAt: Date.now(),
         });
       } catch (error) {

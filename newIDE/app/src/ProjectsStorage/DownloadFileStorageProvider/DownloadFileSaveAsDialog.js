@@ -12,7 +12,10 @@ import {
   openBlobDownloadUrl,
 } from '../../Utils/BlobDownloadUrlHolder';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import { serializeToJSObject } from '../../Utils/Serializer';
+import {
+  serializeProjectToJSObject,
+  unserializeProjectFromJSObject,
+} from '../../Utils/Serializer';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import Text from '../../UI/Text';
 import {
@@ -207,11 +210,12 @@ export default function DownloadFileSaveAsDialog({
         setZippedProjectBlob(null);
         const newProject = gd.ProjectHelper.createNewGDJSProject();
         try {
-          // Make a copy of the project, as it will be updated.
-          const serializedProject = new gd.SerializerElement();
-          project.serializeTo(serializedProject);
-          newProject.unserializeFrom(serializedProject);
-          serializedProject.delete();
+          // Make a copy of the project, as it will be updated. It's copied
+          // like when it's saved then opened again, one part at a time.
+          unserializeProjectFromJSObject(
+            newProject,
+            serializeProjectToJSObject(project)
+          );
 
           // Download resources to blobs, and update the project resources.
           const blobFiles: Array<BlobFileDescriptor> = [];
@@ -225,7 +229,7 @@ export default function DownloadFileSaveAsDialog({
 
           // Serialize the project.
           textFiles.push({
-            text: JSON.stringify(serializeToJSObject(newProject)),
+            text: JSON.stringify(serializeProjectToJSObject(newProject)),
             filePath: PROJECT_JSON_FILENAME,
           });
 

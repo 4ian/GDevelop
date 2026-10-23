@@ -357,8 +357,12 @@ namespace gdjs {
         return;
       }
       if (this._threeCamera instanceof THREE.OrthographicCamera) {
-        const width = this._layer.getWidth();
-        const height = this._layer.getHeight();
+        const inverseWorldScale = this._layer
+          .getRuntimeScene()
+          .getScene()
+          .getRenderer3DInverseWorldScale();
+        const width = this._layer.getWidth() * inverseWorldScale;
+        const height = this._layer.getHeight() * inverseWorldScale;
         this._threeCamera.left = -width / 2;
         this._threeCamera.right = width / 2;
         this._threeCamera.top = height / 2;
@@ -556,8 +560,12 @@ namespace gdjs {
             this._layer.getCameraType() ===
             gdjs.RuntimeLayerCameraType.ORTHOGRAPHIC
           ) {
-            const width = this._layer.getWidth();
-            const height = this._layer.getHeight();
+            const inverseWorldScale = this._layer
+              .getRuntimeScene()
+              .getScene()
+              .getRenderer3DInverseWorldScale();
+            const width = this._layer.getWidth() * inverseWorldScale;
+            const height = this._layer.getHeight() * inverseWorldScale;
             this._threeCamera = new THREE.OrthographicCamera(
               -width / 2,
               width / 2,
@@ -1013,11 +1021,20 @@ namespace gdjs {
         -inverseWorldScale,
         inverseWorldScale
       );
-
+      if (this._threeCamera instanceof THREE.OrthographicCamera) {
+        const width = this._layer.getWidth() * inverseWorldScale;
+        const height = this._layer.getHeight() * inverseWorldScale;
+        this._threeCamera.left = -width / 2;
+        this._threeCamera.right = width / 2;
+        this._threeCamera.top = height / 2;
+        this._threeCamera.bottom = -height / 2;
+      }
       this._threeCamera.near =
         this._layer.getInitialCamera3DNearPlaneDistance() * inverseWorldScale;
       this._threeCamera.far =
         this._layer.getInitialCamera3DFarPlaneDistance() * inverseWorldScale;
+
+      this._threeCamera.updateProjectionMatrix();
     }
 
     updatePosition(): void {

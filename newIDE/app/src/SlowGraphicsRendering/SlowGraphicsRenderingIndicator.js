@@ -12,7 +12,10 @@ import WarningFilled from '../UI/CustomSvgIcons/WarningFilled';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { isWindows } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
-import { useSlowGraphicsRenderingReason } from '.';
+import {
+  type SlowGraphicsRenderingReason,
+  useSlowGraphicsRenderingReason,
+} from '.';
 import classes from './SlowGraphicsRenderingIndicator.module.css';
 const electron = optionalRequire('electron');
 
@@ -67,12 +70,21 @@ const IntegratedGraphicsCardExplanation = (): React.Node => (
   </>
 );
 
+type Props = {|
+  /** Only for stories: the reason is otherwise detected on this computer. */
+  mockedSlowGraphicsRenderingReason?: SlowGraphicsRenderingReason,
+|};
+
 /**
  * A discreet chip shown when the 3D rendering is a lot slower than it could
  * be on this computer, opening how to fix it.
  */
-const SlowGraphicsRenderingIndicator = (): React.Node => {
-  const slowGraphicsRenderingReason = useSlowGraphicsRenderingReason();
+const SlowGraphicsRenderingIndicator = ({
+  mockedSlowGraphicsRenderingReason,
+}: Props): React.Node => {
+  const detectedSlowGraphicsRenderingReason = useSlowGraphicsRenderingReason();
+  const slowGraphicsRenderingReason =
+    mockedSlowGraphicsRenderingReason || detectedSlowGraphicsRenderingReason;
   const { values, showAlertMessage } = React.useContext(PreferencesContext);
   const [isDismissed, setIsDismissed] = React.useState(false);
   const [anchorElement, setAnchorElement] = React.useState<?HTMLElement>(null);

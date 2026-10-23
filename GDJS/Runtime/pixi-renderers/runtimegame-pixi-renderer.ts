@@ -120,6 +120,8 @@ namespace gdjs {
               (this._game.isAntialisingEnabledOnMobile() ||
                 !gdjs.evtTools.common.isMobile()),
             preserveDrawingBuffer: true, // Keep to true to allow screenshots.
+            // Ask for the discrete graphics card, if any.
+            powerPreference: 'high-performance',
           });
         } catch (error) {
           // The context creation can still fail, for example with software
@@ -168,6 +170,8 @@ namespace gdjs {
           view: gameCanvas,
           preserveDrawingBuffer: true,
           antialias: false,
+          // Ask for the discrete graphics card, if any.
+          powerPreference: 'high-performance',
         }) as PIXI.Renderer;
       }
 

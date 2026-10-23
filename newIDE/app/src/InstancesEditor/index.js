@@ -274,6 +274,8 @@ export default class InstancesEditor extends Component<Props, State> {
         threeCanvas = document.createElement('canvas');
         threeRenderer = new THREE.WebGLRenderer({
           canvas: threeCanvas,
+          // Ask for the discrete graphics card, if any.
+          powerPreference: 'high-performance',
         });
       } catch (error) {
         console.error(

@@ -123,6 +123,36 @@ describe('gdjs.Layer', () => {
 				});
 			});
 
+			it(`shows the scene at its size with an orthographic camera (world scale: ${worldScale})`, () => {
+				const layer = make3DLayerWithRotatedCamera(worldScale, 'orthographic');
+				layer.setCameraRotationX(0);
+				layer.setCameraZoom(2);
+
+				const [centerX, centerY] = projectOnScreen(layer, 100, 200);
+				const [cornerX, cornerY] = projectOnScreen(
+					layer,
+					100 + layer.getWidth() / 4,
+					200 + layer.getHeight() / 4
+				);
+
+				expect(centerX).to.be.within(
+					layer.getWidth() / 2 - 0.01,
+					layer.getWidth() / 2 + 0.01
+				);
+				expect(centerY).to.be.within(
+					layer.getHeight() / 2 - 0.01,
+					layer.getHeight() / 2 + 0.01
+				);
+				expect(cornerX).to.be.within(
+					layer.getWidth() - 0.01,
+					layer.getWidth() + 0.01
+				);
+				expect(cornerY).to.be.within(
+					layer.getHeight() - 0.01,
+					layer.getHeight() + 0.01
+				);
+			});
+
 			it(`converts the screen center to the point looked at by the camera (world scale: ${worldScale})`, () => {
 				const layer = make3DLayerWithRotatedCamera(worldScale, 'perspective');
 				const cameraZ = layer.getCameraZ(45);

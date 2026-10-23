@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import Popover from '@material-ui/core/Popover';
 import Paper from '../UI/Paper';
 import Text from '../UI/Text';
-import StatusChip from '../UI/StatusChip';
+import FloatingStatusChipButton from '../UI/FloatingStatusChipButton';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
@@ -97,17 +97,12 @@ const SlowGraphicsRenderingIndicator = ({
 
   return (
     <>
-      <button
-        type="button"
-        className={classes.trigger}
+      <FloatingStatusChipButton
+        tone="warning"
+        icon={<WarningFilled />}
+        label={<Trans>Slow graphics</Trans>}
         onClick={event => setAnchorElement(event.currentTarget)}
-      >
-        <StatusChip
-          tone="warning"
-          icon={<WarningFilled />}
-          label={<Trans>Slow graphics</Trans>}
-        />
-      </button>
+      />
       <Popover
         open={!!anchorElement}
         anchorEl={anchorElement}

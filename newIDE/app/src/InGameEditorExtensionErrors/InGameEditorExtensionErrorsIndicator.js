@@ -5,6 +5,7 @@ import Popover from '@material-ui/core/Popover';
 import Paper from '../UI/Paper';
 import Text from '../UI/Text';
 import StatusChip from '../UI/StatusChip';
+import FloatingStatusChipButton from '../UI/FloatingStatusChipButton';
 import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
@@ -39,23 +40,18 @@ const InGameEditorExtensionErrorsIndicator = ({
 
   return (
     <>
-      <button
-        type="button"
-        className={classes.trigger}
+      <FloatingStatusChipButton
+        tone="warning"
+        icon={<WarningFilled />}
+        label={
+          <Plural
+            value={errors.length}
+            one="# extension error"
+            other="# extension errors"
+          />
+        }
         onClick={event => setAnchorElement(event.currentTarget)}
-      >
-        <StatusChip
-          tone="warning"
-          icon={<WarningFilled />}
-          label={
-            <Plural
-              value={errors.length}
-              one="# extension error"
-              other="# extension errors"
-            />
-          }
-        />
-      </button>
+      />
       <Popover
         open={!!anchorElement}
         anchorEl={anchorElement}

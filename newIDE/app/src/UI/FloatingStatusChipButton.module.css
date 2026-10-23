@@ -1,0 +1,48 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--theme-surface-canvas-background-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  font: inherit;
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+
+/* Lightens or darkens (according to the theme) the whole chip when hovered. */
+.button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: var(--theme-hover-background-color);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.button:hover::after {
+  opacity: 1;
+}
+
+/* A ring of the color of the status (the chip sets it as its color). */
+.button:hover > * {
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+
+.button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--theme-primary-color);
+  outline-offset: 2px;
+}

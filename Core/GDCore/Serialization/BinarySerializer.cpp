@@ -40,12 +40,17 @@ void BinarySerializer::SerializeElement(const SerializerElement& element,
     SerializeValue(element.GetValue(), buffer);
   }
 
-  // Serialize attributes
-  const auto& attributes = element.GetAllAttributes();
-  Write(buffer, static_cast<uint32_t>(attributes.size()));
-  for (const auto& attr : attributes) {
-    SerializeString(attr.first, buffer);
-    SerializeValue(attr.second, buffer);
+  // Serialize attributes (most elements have none: don't make GetAllAttributes
+  // allocate them).
+  if (!element.HasAttributes()) {
+    Write(buffer, static_cast<uint32_t>(0));
+  } else {
+    const auto& attributes = element.GetAllAttributes();
+    Write(buffer, static_cast<uint32_t>(attributes.size()));
+    for (const auto& attr : attributes) {
+      SerializeString(attr.first, buffer);
+      SerializeValue(attr.second, buffer);
+    }
   }
 
   // Serialize array flags

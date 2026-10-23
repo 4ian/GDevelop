@@ -98,6 +98,14 @@ namespace gdjs {
       return null;
     }
 
+    /**
+     * @returns `true` when nothing is rendered outside of the object box, so
+     * that the object can be hidden when its box can't be seen.
+     */
+    isRenderedInsideItsBox(): boolean {
+      return false;
+    }
+
     get3DRendererObject() {
       return this.getRenderer().get3DRendererObject();
     }

@@ -236,6 +236,10 @@ namespace gdjs {
               // Clear the depth as each layer is independent and display on top of the previous one,
               // even 3D objects.
               threeRenderer.clearDepth();
+              runtimeLayerRenderer.cull3DObjects(
+                threeRenderer,
+                !this._runtimeScene.getGame().isInGameEdition()
+              );
               if (runtimeLayerRenderer.hasPostProcessingPass()) {
                 // Whatever the pass rendering the scene is, it must clear the
                 // composer buffers with a transparent color, so that the parts
@@ -377,6 +381,8 @@ namespace gdjs {
         // Clear the depth as each layer is independent and display on top of the previous one,
         // even 3D objects.
         threeRenderer.clearDepth();
+        // The objects are culled for the camera of the layer.
+        runtimeLayerRenderer.cull3DObjects(threeRenderer, false);
         threeRenderer.render(threeScene, threeCamera);
       }
     }

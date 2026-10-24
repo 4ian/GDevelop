@@ -191,6 +191,7 @@ describe('Scene benchmarks', function () {
    *   objects: Array<ObjectData>,
    *   instances: Array<InstanceData>,
    *   behaviorsSharedData?: Array<BehaviorSharedData & any>,
+   *   eventsBasedObjects?: Array<EventsBasedObjectData>,
    *   eventsFunction?: (runtimeScene: gdjs.RuntimeScene) => void,
    *   renderingType?: '' | '2d' | '3d' | '2d+3d',
    *   warmupFrames?: number,
@@ -202,6 +203,7 @@ describe('Scene benchmarks', function () {
     objects,
     instances,
     behaviorsSharedData,
+    eventsBasedObjects,
     eventsFunction,
     renderingType,
     warmupFrames,
@@ -216,68 +218,77 @@ describe('Scene benchmarks', function () {
     // Where the events of a scene are found (see `setEventsGeneratedCodeFunction`).
     // @ts-ignore
     gdjs[mangledName + 'Code'] = { func: eventsFunction || (() => {}) };
-    const runtimeGame = new gdjs.RuntimeGame(
-      gdjs.createProjectData({
-        layouts: [
-          {
-            r: 0,
-            v: 0,
-            b: 0,
-            mangledName,
-            name,
-            stopSoundsOnStartup: false,
-            title: '',
-            behaviorsSharedData: behaviorsSharedData || [],
-            objects,
-            objectsGroups: [],
-            instances,
-            layers: [
-              {
-                name: '',
-                renderingType,
-                visibility: true,
-                cameras: [],
-                effects: [],
-                ambientLightColorR: 200,
-                ambientLightColorG: 200,
-                ambientLightColorB: 200,
-                isLightingLayer: false,
-                followBaseLayerCamera: false,
-              },
-            ],
-            variables: [],
-            usedResources: [],
-            renderer3DWorldScale: 100,
-            uiSettings: {
-              grid: false,
-              gridType: 'rectangular',
-              gridWidth: 10,
-              gridHeight: 10,
-              gridOffsetX: 0,
-              gridOffsetY: 0,
-              gridColor: 0,
-              gridAlpha: 1,
-              snap: false,
-            },
-          },
-        ],
-        resources: {
-          resources: [
+    const projectData = gdjs.createProjectData({
+      layouts: [
+        {
+          r: 0,
+          v: 0,
+          b: 0,
+          mangledName,
+          name,
+          stopSoundsOnStartup: false,
+          title: '',
+          behaviorsSharedData: behaviorsSharedData || [],
+          objects,
+          objectsGroups: [],
+          instances,
+          layers: [
             {
-              kind: 'image',
-              name: imageResourceName,
-              metadata: '',
-              file: imageResourceName,
-              userAdded: true,
+              name: '',
+              renderingType,
+              visibility: true,
+              cameras: [],
+              effects: [],
+              ambientLightColorR: 200,
+              ambientLightColorG: 200,
+              ambientLightColorB: 200,
+              isLightingLayer: false,
+              followBaseLayerCamera: false,
             },
           ],
+          variables: [],
+          usedResources: [],
+          renderer3DWorldScale: 100,
+          uiSettings: {
+            grid: false,
+            gridType: 'rectangular',
+            gridWidth: 10,
+            gridHeight: 10,
+            gridOffsetX: 0,
+            gridOffsetY: 0,
+            gridColor: 0,
+            gridAlpha: 1,
+            snap: false,
+          },
         },
-        propertiesOverrides: {
-          windowWidth: gameWidth,
-          windowHeight: gameHeight,
+      ],
+      resources: {
+        resources: [
+          {
+            kind: 'image',
+            name: imageResourceName,
+            metadata: '',
+            file: imageResourceName,
+            userAdded: true,
+          },
+        ],
+      },
+      propertiesOverrides: {
+        windowWidth: gameWidth,
+        windowHeight: gameHeight,
+      },
+    });
+    if (eventsBasedObjects) {
+      projectData.eventsFunctionsExtensions = [
+        {
+          name: customObjectsExtensionName,
+          eventsBasedObjects,
+          sceneVariables: [],
+          globalVariables: [],
         },
-      })
-    );
+      ];
+    }
+    const runtimeGame = new gdjs.RuntimeGame(projectData);
     // The assets of the scene are loaded by `harness.goToScene`.
     runtimeGame.getRenderer().createStandardCanvas(document.body);
 
@@ -670,6 +681,209 @@ describe('Scene benchmarks', function () {
           for (const bullet of bullets.slice(0, 100)) {
             bullet.deleteFromScene();
           }
+        }
+      },
+    });
+  });
+
+  // Custom objects (events-based objects): their transformation is composed
+  // from their own position, angle, scales and center of rotation, and used
+  // by everything that reads where their children are - the renderer, the hit
+  // boxes, and the conversions of the cursor into their inside.
+  const customObjectsExtensionName = 'BenchmarkExtension';
+
+  /**
+   * An events-based object made of sprites (2D) or cubes (3D), with an area
+   * of its own: the size and the center of rotation a GDevelop editor saves
+   * with it.
+   * @param {string} name
+   * @param {{is3D?: boolean, childrenCount?: number}} options
+   * @returns {EventsBasedObjectData}
+   */
+  const createEventsBasedObjectData = (name, { is3D, childrenCount = 2 }) => {
+    const childName = is3D ? 'ChildCube' : 'ChildSprite';
+    const childInstances = [];
+    for (let i = 0; i < childrenCount; i++) {
+      childInstances.push(
+        createInstance(childName, {
+          x: 16 * i,
+          y: 0,
+          z: 0,
+          width: 16,
+          height: 16,
+          depth: 16,
+        })
+      );
+    }
+    return /** @type {EventsBasedObjectData} */ ({
+      name,
+      isInnerAreaFollowingParentSize: false,
+      objects: [
+        is3D
+          ? createCubeObjectData(childName, [])
+          : createSpriteObjectData(childName),
+      ],
+      objectsGroups: [],
+      instances: childInstances,
+      layers: [],
+      variables: [],
+      usedResources: [{ name: imageResourceName }],
+      editionSettings: {
+        grid: false,
+        gridType: 'rectangular',
+        gridWidth: 10,
+        gridHeight: 10,
+        gridOffsetX: 0,
+        gridOffsetY: 0,
+        gridColor: 0,
+        gridAlpha: 1,
+        snap: false,
+      },
+      areaMinX: 0,
+      areaMinY: 0,
+      areaMinZ: 0,
+      areaMaxX: 16 * childrenCount,
+      areaMaxY: 16,
+      areaMaxZ: is3D ? 16 : 0,
+      _initialInnerArea: null,
+      variants: [],
+    });
+  };
+
+  /**
+   * @param {string} name
+   * @param {{is3D?: boolean}} options
+   * @returns {ObjectData}
+   */
+  const createCustomObjectData = (name, { is3D }) =>
+    /** @type {ObjectData} */ ({
+      name,
+      type: customObjectsExtensionName + '::' + name,
+      variables: [],
+      behaviors: [],
+      effects: [],
+      variant: '',
+      isInnerAreaFollowingParentSize: false,
+      // Custom objects don't use these dimensions.
+      content: is3D ? { width: 0, height: 0, depth: 0 } : {},
+    });
+
+  /**
+   * Make the type of a custom object usable in a scene, like the code
+   * generated for an events-based object does.
+   * @param {string} name
+   * @param {{is3D?: boolean}} options
+   */
+  const registerCustomObjectType = (name, { is3D }) =>
+    gdjs.registerObject(
+      customObjectsExtensionName + '::' + name,
+      is3D ? gdjs.CustomRuntimeObject3D : gdjs.CustomRuntimeObject2D
+    );
+
+  it('benchmark custom objects moving and rotating', async function () {
+    this.timeout(120000);
+    registerCustomObjectType('Turret', {});
+    await runSceneBenchmark({
+      name: 'Custom objects moving and rotating (2000)',
+      objects: [createCustomObjectData('Turret', {})],
+      eventsBasedObjects: [createEventsBasedObjectData('Turret', {})],
+      instances: createRandomInstances(
+        'Turret',
+        2000,
+        { width: 8, height: 4 },
+        makeSeededRandom(1)
+      ),
+      eventsFunction: (runtimeScene) => {
+        for (const turret of getObjects(runtimeScene, 'Turret')) {
+          turret.rotate(90);
+          turret.setX((turret.getX() + 1) % gameWidth);
+          turret.setY((turret.getY() + 0.5) % gameHeight);
+        }
+      },
+    });
+  });
+
+  it('benchmark custom objects with moving children', async function () {
+    this.timeout(120000);
+    registerCustomObjectType('Carrier', {});
+    await runSceneBenchmark({
+      name: 'Custom objects with moving children (1000)',
+      objects: [createCustomObjectData('Carrier', {})],
+      eventsBasedObjects: [createEventsBasedObjectData('Carrier', {})],
+      instances: createRandomInstances(
+        'Carrier',
+        1000,
+        { width: 8, height: 4 },
+        makeSeededRandom(1)
+      ),
+      eventsFunction: (runtimeScene) => {
+        for (const object of getObjects(runtimeScene, 'Carrier')) {
+          const carrier = /** @type {gdjs.CustomRuntimeObject2D} */ (object);
+          const childrenContainer = carrier.getChildrenContainer();
+          for (const child of childrenContainer.getObjects('ChildSprite') ||
+            []) {
+            child.setX((child.getX() + 1) % 32);
+          }
+          // What a game does with such an object: read where it is now.
+          carrier.getHitBoxes();
+        }
+      },
+    });
+  });
+
+  it('benchmark custom objects reading the cursor', async function () {
+    this.timeout(120000);
+    registerCustomObjectType('Button', {});
+    await runSceneBenchmark({
+      name: 'Custom objects reading the cursor (2000)',
+      objects: [createCustomObjectData('Button', {})],
+      eventsBasedObjects: [createEventsBasedObjectData('Button', {})],
+      instances: createRandomInstances(
+        'Button',
+        2000,
+        { width: 8, height: 4 },
+        makeSeededRandom(1)
+      ),
+      eventsFunction: (runtimeScene) => {
+        for (const object of getObjects(runtimeScene, 'Button')) {
+          const button = /** @type {gdjs.CustomRuntimeObject2D} */ (object);
+          button.setAngle(button.getAngle() + 1);
+          // The events of the object read the cursor inside it, which is the
+          // transformation of the object undone (`convertCoords`).
+          const childrenContainer = button.getChildrenContainer();
+          gdjs.evtTools.input.getCursorX(childrenContainer, '', 0);
+          gdjs.evtTools.input.getCursorY(childrenContainer, '', 0);
+        }
+      },
+    });
+  });
+
+  it('benchmark 3D custom objects moving and rotating', async function () {
+    this.timeout(120000);
+    registerCustomObjectType('Tank', { is3D: true });
+    await runSceneBenchmark({
+      name: '3D custom objects moving and rotating (500)',
+      objects: [createCustomObjectData('Tank', { is3D: true })],
+      // One cube per object: on a machine without GPU, drawing the faces of
+      // the cubes would cost far more than the engine work being measured.
+      eventsBasedObjects: [
+        createEventsBasedObjectData('Tank', { is3D: true, childrenCount: 1 }),
+      ],
+      instances: createRandomInstances(
+        'Tank',
+        500,
+        { width: 8, height: 4 },
+        makeSeededRandom(1)
+      ),
+      renderingType: '2d+3d',
+      eventsFunction: (runtimeScene) => {
+        for (const tank of getObjects(runtimeScene, 'Tank')) {
+          const tank3D = /** @type {gdjs.CustomRuntimeObject3D} */ (tank);
+          tank3D.setAngle(tank3D.getAngle() + 3);
+          tank3D.setRotationX(tank3D.getRotationX() + 1);
+          tank3D.setX((tank3D.getX() + 1) % gameWidth);
+          tank3D.setZ((tank3D.getZ() + 0.5) % 64);
+          tank3D.getHitBoxes();
         }
       },
     });

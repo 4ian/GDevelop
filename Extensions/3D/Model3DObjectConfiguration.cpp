@@ -242,6 +242,11 @@ Model3DObjectConfiguration::GetProperties() const {
 bool Model3DObjectConfiguration::UpdateInitialInstanceProperty(
     gd::InitialInstance &instance, const gd::String &propertyName,
     const gd::String &newValue) {
+  if (propertyName == "animation") {
+    instance.SetRawDoubleProperty(
+        "animation", std::max(0, newValue.empty() ? 0 : newValue.To<int>()));
+    return true;
+  }
   return false;
 }
 
@@ -249,6 +254,9 @@ std::map<gd::String, gd::PropertyDescriptor>
 Model3DObjectConfiguration::GetInitialInstanceProperties(
     const gd::InitialInstance &instance) {
   std::map<gd::String, gd::PropertyDescriptor> instanceProperties;
+  if (!animations.empty()) {
+    instanceProperties["animation"] = GetStartingAnimationProperty(instance);
+  }
   return instanceProperties;
 }
 

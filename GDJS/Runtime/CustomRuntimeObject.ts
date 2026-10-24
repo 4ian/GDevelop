@@ -101,16 +101,21 @@ namespace gdjs {
     protected _transformationRevision: integer = 1;
     private _computedTransformationRevision: integer = 0;
     /**
-     * What the inverse transformation is made of: where the local (0;0) lands
-     * and the coefficients of the rotation of the object. They are read far
-     * more often than they change (the cursor is converted for every object
-     * under it, every frame), so they are kept from one read to the next.
+     * Where the local (0;0) lands, which is the translation the way back from
+     * the parent undoes. It is read far more often than it changes (the
+     * cursor is converted for every object under it, every frame), so it is
+     * kept from one read to the next.
      */
     private _inverseTranslationX: float = 0;
     private _inverseTranslationY: float = 0;
-    private _inverseRotationCosine: float = 1;
-    private _inverseRotationSine: float = 0;
     private _computedInverseTransformationRevision: integer = 0;
+    /**
+     * The coefficients of the rotation of the object, computed once when the
+     * transformation is composed and used again to undo it: the two ways turn
+     * by exactly the same amounts, and the trigonometry is done once.
+     */
+    private _rotationCosine: float = 1;
+    private _rotationSine: float = 0;
     private static _temporaryPoint: FloatPoint = [0, 0];
     private static _temporaryCoefficients: FloatPoint = [0, 0];
     _type: string;
@@ -619,8 +624,21 @@ namespace gdjs {
       const centerY = this.getUnscaledCenterY() * absScaleY;
       const angleInRadians = (this.angle * Math.PI) / 180;
 
+      const coefficients = gdjs.CustomRuntimeObject._temporaryCoefficients;
+      gdjs.AffineTransformation.setRotationCoefficients(
+        angleInRadians,
+        coefficients
+      );
+      this._rotationCosine = coefficients[0];
+      this._rotationSine = coefficients[1];
+
       this._localTransformation.setToTranslation(this.x, this.y);
-      this._localTransformation.rotateAround(angleInRadians, centerX, centerY);
+      this._localTransformation.rotateAroundWithCoefficients(
+        this._rotationCosine,
+        this._rotationSine,
+        centerX,
+        centerY
+      );
       if (this._flippedX) {
         this._localTransformation.flipX(centerX);
       }
@@ -716,8 +734,8 @@ namespace gdjs {
       const deltaX = x - this._inverseTranslationX;
       const deltaY = y - this._inverseTranslationY;
 
-      const cos = this._inverseRotationCosine;
-      const sin = this._inverseRotationSine;
+      const cos = this._rotationCosine;
+      const sin = this._rotationSine;
       const rotatedX = cos * deltaX + sin * deltaY;
       const rotatedY = cos * deltaY - sin * deltaX;
       const unflippedX = this._flippedX ? -rotatedX : rotatedX;
@@ -738,20 +756,13 @@ namespace gdjs {
       const temporaryPoint = gdjs.CustomRuntimeObject._temporaryPoint;
       temporaryPoint[0] = 0;
       temporaryPoint[1] = 0;
+      // Composing the transformation is also what computes the coefficients
+      // of the rotation this undoes: a right angle gives exactly 0 and 1 on
+      // both ways, so a point on the edge of an object comes back exactly
+      // on it.
       this.getLocalTransformation().transform(temporaryPoint, temporaryPoint);
       this._inverseTranslationX = temporaryPoint[0];
       this._inverseTranslationY = temporaryPoint[1];
-
-      // The same coefficients the transformation was built with: a right
-      // angle gives exactly 0 and 1 on both ways, so a point on the edge of
-      // an object comes back exactly on it.
-      const coefficients = gdjs.CustomRuntimeObject._temporaryCoefficients;
-      gdjs.AffineTransformation.setRotationCoefficients(
-        (this.angle * Math.PI) / 180,
-        coefficients
-      );
-      this._inverseRotationCosine = coefficients[0];
-      this._inverseRotationSine = coefficients[1];
 
       this._computedInverseTransformationRevision =
         this._transformationRevision;

@@ -214,11 +214,22 @@ namespace gdjs {
      * @param angle The angle of rotation in radians.
      */
     rotate(angle: float) {
-      const matrix = this.matrix;
       const coefficients = gdjs.AffineTransformation._temporaryCoefficients;
       gdjs.AffineTransformation.setRotationCoefficients(angle, coefficients);
-      const cost = coefficients[0];
-      const sint = coefficients[1];
+      this.rotateWithCoefficients(coefficients[0], coefficients[1]);
+    }
+
+    /**
+     * Concatenate a rotation given by its coefficients, as
+     * {@link gdjs.AffineTransformation.setRotationCoefficients} gives them.
+     * A caller that needs the same rotation elsewhere (to undo it) computes
+     * them once and uses them on both sides.
+     *
+     * @param cost The cosine of the angle of rotation.
+     * @param sint The sine of the angle of rotation.
+     */
+    rotateWithCoefficients(cost: float, sint: float) {
+      const matrix = this.matrix;
 
       //           cost -sint 0
       //           sint  cost 0
@@ -303,8 +314,33 @@ namespace gdjs {
      * @param anchorY The rotation anchor point Y.
      */
     rotateAround(angle: float, anchorX: float, anchorY: float) {
+      const coefficients = gdjs.AffineTransformation._temporaryCoefficients;
+      gdjs.AffineTransformation.setRotationCoefficients(angle, coefficients);
+      this.rotateAroundWithCoefficients(
+        coefficients[0],
+        coefficients[1],
+        anchorX,
+        anchorY
+      );
+    }
+
+    /**
+     * Same as {@link gdjs.AffineTransformation.rotateAround}, with the
+     * coefficients of the rotation instead of its angle.
+     *
+     * @param cost The cosine of the angle of rotation.
+     * @param sint The sine of the angle of rotation.
+     * @param anchorX The rotation anchor point X.
+     * @param anchorY The rotation anchor point Y.
+     */
+    rotateAroundWithCoefficients(
+      cost: float,
+      sint: float,
+      anchorX: float,
+      anchorY: float
+    ) {
       this.translate(anchorX, anchorY);
-      this.rotate(angle);
+      this.rotateWithCoefficients(cost, sint);
       // First: translate anchor to origin
       this.translate(-anchorX, -anchorY);
     }

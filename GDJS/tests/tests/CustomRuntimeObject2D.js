@@ -589,6 +589,23 @@ describe('gdjs.CustomRuntimeObject', function () {
         );
       });
 
+      it('converts back from the parent with what the object is now, when it is read first', async () => {
+        // The way back reuses the rotation the transformation was composed
+        // with: it must be composed again first, even when nothing else read
+        // it since the object turned.
+        for (const angle of [90, 37, 180, -45]) {
+          const { customObject } = await makeTransformedCustomObject();
+          customObject.fromParentX(0, 0);
+
+          customObject.setAngle(angle);
+
+          const insideX = customObject.fromParentX(100, 50);
+          const insideY = customObject.fromParentY(100, 50);
+          expectNear(customObject.toParentX(insideX, insideY), 100);
+          expectNear(customObject.toParentY(insideX, insideY), 50);
+        }
+      });
+
       /** Where the renderer draws a point of the inside of the object. */
       const drawn = (customObject, x, y) => {
         customObject.getRenderer().ensureUpToDate();

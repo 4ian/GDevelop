@@ -243,6 +243,7 @@ module.exports = function (config) {
       `${gdjsRuntimePath}/Extensions/TextInput/textinputruntimeobject-pixi-renderer.js`,
       `${gdjsRuntimePath}/Extensions/TextObject/textruntimeobject.js`,
       `${gdjsRuntimePath}/Extensions/TextObject/textruntimeobject-pixi-renderer.js`,
+      `${gdjsRuntimePath}/Extensions/3D/Base3DBehavior.js`,
       `${gdjsRuntimePath}/Extensions/3D/A_RuntimeObject3D.js`,
       `${gdjsRuntimePath}/Extensions/3D/A_RuntimeObject3DRenderer.js`,
       `${gdjsRuntimePath}/Extensions/3D/Cube3DRuntimeObject.js`,

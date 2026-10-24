@@ -252,6 +252,23 @@ module.exports = {
 
       base3D
         .addExpression(
+          'DistanceTo3DPosition',
+          _('Distance to a 3D position'),
+          _(
+            'Return the distance between the center of the object and a position, on the X, Y and Z axes.'
+          ),
+          _('Position'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('X position'), '', false)
+        .addParameter('number', _('Y position'), '', false)
+        .addParameter('number', _('Z position'), '', false)
+        .setFunctionName('getDistanceTo3DPosition');
+
+      base3D
+        .addExpression(
           'ForwardX',
           _('Forward vector X component'),
           _('Return the object forward vector X component.'),

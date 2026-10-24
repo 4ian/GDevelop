@@ -262,6 +262,22 @@ namespace gdjs {
       };
 
       /**
+       * Return the distance between two positions, on the X, Y and Z axes.
+       */
+      export const distanceBetween3DPositions = function (
+        x1: number,
+        y1: number,
+        z1: number,
+        x2: number,
+        y2: number,
+        z2: number
+      ): number {
+        return Math.sqrt(
+          (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2)
+        );
+      };
+
+      /**
        * Return a linear interpolation between a and b.
        *
        * For instance, `lerp(2, 8, 0.5)` is `5`.

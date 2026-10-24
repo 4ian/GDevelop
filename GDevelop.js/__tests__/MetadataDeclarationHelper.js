@@ -1245,6 +1245,10 @@ describe('MetadataDeclarationHelper', () => {
         objectMetadata.getAllExpressions().get(expressionName).isPrivate()
       ).toBe(true)
     );
+    // A 2D object converts directions as angles.
+    expect(
+      objectMetadata.getAllExpressions().has('ToParentDirectionX')
+    ).toBe(false);
 
     expectArray(
       objectMetadata.getAllStrExpressions().keys().toJSArray()
@@ -1300,10 +1304,20 @@ describe('MetadataDeclarationHelper', () => {
         ).toBe(4);
       })
     );
-    // A direction is converted as two points in 3D: an angle around Z alone
+    // A direction is converted as a vector in 3D: an angle around Z alone
     // cannot follow a tilted object.
     expect(expressionNames).not.toContain('ToParentAngle');
     expect(expressionNames).not.toContain('FromParentAngle');
+    ['ToParentDirection', 'FromParentDirection'].forEach((conversion) =>
+      ['X', 'Y', 'Z'].forEach((axis) => {
+        const expression = objectMetadata
+          .getAllExpressions()
+          .get(conversion + axis);
+        // The object, then the X, Y and Z of the direction.
+        expect(expression.getParametersCount()).toBe(4);
+        expect(expression.isPrivate()).toBe(true);
+      })
+    );
 
     expectArray(
       objectMetadata.getDefaultBehaviors().toNewVectorString().toJSArray()

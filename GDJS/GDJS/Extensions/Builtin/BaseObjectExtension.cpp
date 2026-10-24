@@ -243,6 +243,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.raycastObjectToPosition");
   GetAllConditions()["Distance"].SetFunctionName(
       "gdjs.evtTools.object.distanceTest");
+  GetAllConditions()["Distance3D"].SetFunctionName(
+      "gdjs.evtTools.object.distance3DTest");
   GetAllConditions()["IsTotalForceAngleTowardObject"].SetFunctionName(
       "gdjs.evtTools.object.movesTowardTest");
   // Compatibility with GD <= 5.6.251

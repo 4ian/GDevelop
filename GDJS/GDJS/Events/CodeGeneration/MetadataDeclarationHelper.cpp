@@ -1356,8 +1356,8 @@ void MetadataDeclarationHelper::
 /**
  * The conversions crossing the boundary of a custom object, one object at a
  * time: the children of a custom object have their own coordinates, which
- * mean nothing outside of it. A 3D custom object takes and gives a Z, and a 2D
- * one also converts angles.
+ * mean nothing outside of it. A 3D custom object takes and gives a Z and also
+ * converts directions, a 2D one also converts angles.
  *
  * They are private: only the events of the object itself know what is inside
  * it. What they expose is converted, so that the scene (or the custom object
@@ -1422,11 +1422,57 @@ void MetadataDeclarationHelper::DeclareObjectCoordinateConversions(
             .AddParameter("object", _("Object"), objectType);
     addPoint(fromParent, false);
     fromParent.SetPrivate().SetFunctionName("fromParent" + axis);
+
+    if (!isRenderedIn3D) continue;
+
+    objectMetadata
+        .AddExpression(
+            "ToParentDirection" + axis,
+            _("<axis> of a direction inside the object, in its parent")
+                .FindAndReplace("<axis>", axis),
+            _("Convert a direction given inside the object (the forward "
+              "vector of a child object, for instance) to the space "
+              "containing the object (the scene, or the custom object "
+              "containing it), and return the <axis> of this direction as a "
+              "unit vector. The rotations, flips and scales of the object "
+              "are applied.")
+                .FindAndReplace("<axis>", axis),
+            _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X of the direction, inside the object"))
+        .AddParameter("number", _("Y of the direction, inside the object"))
+        .AddParameter("number", _("Z of the direction, inside the object"))
+        .SetPrivate()
+        .SetFunctionName("toParentDirection" + axis);
+
+    objectMetadata
+        .AddExpression(
+            "FromParentDirection" + axis,
+            _("<axis> of a direction of the parent, inside the object")
+                .FindAndReplace("<axis>", axis),
+            _("Convert a direction given in the space containing the object "
+              "(where the camera looks, for instance) to the inside of the "
+              "object, and return the <axis> of this direction as a unit "
+              "vector.")
+                .FindAndReplace("<axis>", axis),
+            _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number",
+                      _("X of the direction, in the space containing the "
+                        "object"))
+        .AddParameter("number",
+                      _("Y of the direction, in the space containing the "
+                        "object"))
+        .AddParameter("number",
+                      _("Z of the direction, in the space containing the "
+                        "object"))
+        .SetPrivate()
+        .SetFunctionName("fromParentDirection" + axis);
   }
 
   // An angle around Z is the whole orientation of a 2D object only: in 3D, a
   // direction tilted by a rotation on X or Y keeps no meaning as an angle
-  // across a tilted object. Directions are converted as two points there.
+  // across a tilted object. Directions are converted as vectors there.
   if (isRenderedIn3D) return;
 
   objectMetadata

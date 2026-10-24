@@ -447,6 +447,122 @@ namespace gdjs {
     }
 
     /**
+     * A direction of the inside of this object, in the space containing it:
+     * turned, flipped and scaled like the children drawn inside, then
+     * normalized. A direction collapsed by a scale of 0 has no length left,
+     * and is answered as (0;0;0).
+     */
+    private _applyTransformationToDirection3D(
+      x: float,
+      y: float,
+      z: float,
+      destination: THREE.Vector3
+    ): THREE.Vector3 {
+      return destination
+        .set(x, y, z)
+        .transformDirection(this.getLocalTransformation3D());
+    }
+
+    /**
+     * The other way round of {@link _applyTransformationToDirection3D}. A
+     * collapsed axis gives 0 to the direction on that axis, like it gives 0 to
+     * a point.
+     */
+    private _applyInverseTransformationToDirection3D(
+      x: float,
+      y: float,
+      z: float,
+      destination: THREE.Vector3
+    ): THREE.Vector3 {
+      if (
+        this._computedInverseTransformation3DRevision !==
+        this._transformationRevision
+      ) {
+        this._updateInverseTransformation3D();
+      }
+      destination
+        .set(x, y, z)
+        .applyQuaternion(this._inverseTransformationRotation);
+      const scale = this._inverseTransformationScale;
+      return destination
+        .set(
+          scale.x === 0 ? 0 : destination.x / scale.x,
+          scale.y === 0 ? 0 : destination.y / scale.y,
+          scale.z === 0 ? 0 : destination.z / scale.z
+        )
+        .normalize();
+    }
+
+    /**
+     * The X of a direction of the inside of this object (a forward vector of
+     * a child, for instance), in the space containing this object, as a unit
+     * vector. Unlike an angle, it stays exact when the object is tilted.
+     */
+    toParentDirectionX(x: float, y: float, z: float): float {
+      return this._applyTransformationToDirection3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).x;
+    }
+
+    /** The Y of {@link gdjs.CustomRuntimeObject3D.toParentDirectionX}. */
+    toParentDirectionY(x: float, y: float, z: float): float {
+      return this._applyTransformationToDirection3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).y;
+    }
+
+    /** The Z of {@link gdjs.CustomRuntimeObject3D.toParentDirectionX}. */
+    toParentDirectionZ(x: float, y: float, z: float): float {
+      return this._applyTransformationToDirection3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).z;
+    }
+
+    /**
+     * The X of a direction of the space containing this object (where the
+     * camera looks, for instance), inside this object, as a unit vector: the
+     * other way round of
+     * {@link gdjs.CustomRuntimeObject3D.toParentDirectionX}.
+     */
+    fromParentDirectionX(x: float, y: float, z: float): float {
+      return this._applyInverseTransformationToDirection3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).x;
+    }
+
+    /** The Y of {@link gdjs.CustomRuntimeObject3D.fromParentDirectionX}. */
+    fromParentDirectionY(x: float, y: float, z: float): float {
+      return this._applyInverseTransformationToDirection3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).y;
+    }
+
+    /** The Z of {@link gdjs.CustomRuntimeObject3D.fromParentDirectionX}. */
+    fromParentDirectionZ(x: float, y: float, z: float): float {
+      return this._applyInverseTransformationToDirection3D(
+        x,
+        y,
+        z,
+        gdjs.CustomRuntimeObject3D._temporaryConversionVector
+      ).z;
+    }
+
+    /**
      * Get the object rotation on the X axis.
      *
      * This is an Euler angle. Objects use the `ZYX` order.

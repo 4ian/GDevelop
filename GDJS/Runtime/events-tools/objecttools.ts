@@ -668,6 +668,40 @@ namespace gdjs {
         return obj1.getSqDistanceToObject(obj2) <= distance;
       };
 
+      /**
+       * The Z of the center of an object in the scene: 0 for a 2D object,
+       * which lies on the plane at Z 0.
+       */
+      const getCenterZInScene = (object: gdjs.RuntimeObject): float =>
+        gdjs.Base3DHandler.is3D(object) ? object.getCenterZInScene() : 0;
+
+      export const _distanceBetweenObjectsIn3D = function (
+        object1: gdjs.RuntimeObject,
+        object2: gdjs.RuntimeObject,
+        squaredDistance: float
+      ) {
+        const deltaZ = getCenterZInScene(object1) - getCenterZInScene(object2);
+        return (
+          object1.getSqDistanceToObject(object2) + deltaZ * deltaZ <=
+          squaredDistance
+        );
+      };
+
+      export const distance3DTest = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        distance: float,
+        inverted: boolean
+      ) {
+        return gdjs.evtTools.object.twoListsTest(
+          gdjs.evtTools.object._distanceBetweenObjectsIn3D,
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          distance * distance
+        );
+      };
+
       export const distanceTest = function (
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,

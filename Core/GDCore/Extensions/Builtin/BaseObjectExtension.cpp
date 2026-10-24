@@ -1859,8 +1859,27 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("conditionInverted", "")
       .SetHint(
           "The distance is measured on the X/Y plane only: Z is ignored. For "
-          "3D games, also compare the Z difference between the objects, or "
-          "compute the full 3D distance in an expression.")
+          "3D games, use the condition comparing the distance in 3D "
+          "(Distance3D).")
+      .MarkAsSimple();
+
+  extension
+      .AddCondition("Distance3D",
+                    _("Distance between two objects in 3D"),
+                    _("Compare the distance between the centers of two "
+                      "objects, on the X, Y and Z axes (a 2D object is at a Z "
+                      "of 0).\nIf condition is inverted, only objects that "
+                      "have a distance greater than specified to any other "
+                      "object will be picked."),
+                    _("_PARAM0_ distance to _PARAM1_ in 3D is below _PARAM2_ "
+                      "pixels"),
+                    _("Position"),
+                    "res/conditions/distance24.png",
+                    "res/conditions/distance.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectList", _("Object 2"))
+      .AddParameter("expression", _("Distance"))
+      .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
 
   extension

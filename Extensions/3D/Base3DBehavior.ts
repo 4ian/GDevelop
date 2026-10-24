@@ -234,6 +234,17 @@ namespace gdjs {
       this.object.setCenterZInScene(z);
     }
 
+    /**
+     * The distance between the center of the object and a position, on the
+     * X, Y and Z axes.
+     */
+    getDistanceTo3DPosition(x: float, y: float, z: float): float {
+      const deltaX = this.object.getCenterXInScene() - x;
+      const deltaY = this.object.getCenterYInScene() - y;
+      const deltaZ = this.object.getCenterZInScene() - z;
+      return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+    }
+
     setRotationX(angle: float): void {
       this.object.setRotationX(angle);
     }

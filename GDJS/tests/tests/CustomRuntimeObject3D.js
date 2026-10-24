@@ -201,6 +201,250 @@ describe('gdjs.CustomRuntimeObject3D', function () {
     });
   });
 
+  describe('toParentDirection / fromParentDirection', function () {
+    const tolerance = 1e-9;
+    /** @type {Array<[number, number, number]>} */
+    const directions = [
+      [1, 0, 0],
+      [0, 1, 0],
+      [0, 0, 1],
+      [3, -2, 5],
+      [-0.2, 0.7, -0.4],
+    ];
+
+    /**
+     * @param {gdjs.CustomRuntimeObject3D} customObject
+     * @param {[number, number, number]} direction
+     */
+    const getDirectionBetweenConvertedPoints = (customObject, [x, y, z]) =>
+      new THREE.Vector3(
+        customObject.toParentX(10 + x, 20 + y, 30 + z) -
+          customObject.toParentX(10, 20, 30),
+        customObject.toParentY(10 + x, 20 + y, 30 + z) -
+          customObject.toParentY(10, 20, 30),
+        customObject.toParentZ(10 + x, 20 + y, 30 + z) -
+          customObject.toParentZ(10, 20, 30)
+      ).normalize();
+
+    /**
+     * @param {THREE.Vector3} actual
+     * @param {THREE.Vector3} expected
+     */
+    const expectSameVector = (actual, expected) => {
+      expect(actual.distanceTo(expected)).to.be.below(tolerance);
+    };
+
+    it('gives the direction between two points converted inside, as a unit vector', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      for (const direction of directions) {
+        expectSameVector(
+          new THREE.Vector3(
+            customObject.toParentDirectionX(...direction),
+            customObject.toParentDirectionY(...direction),
+            customObject.toParentDirectionZ(...direction)
+          ),
+          getDirectionBetweenConvertedPoints(customObject, direction)
+        );
+      }
+    });
+
+    it('brings a direction back inside', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      for (const direction of directions) {
+        const parentX = customObject.toParentDirectionX(...direction);
+        const parentY = customObject.toParentDirectionY(...direction);
+        const parentZ = customObject.toParentDirectionZ(...direction);
+        expectSameVector(
+          new THREE.Vector3(
+            customObject.fromParentDirectionX(parentX, parentY, parentZ),
+            customObject.fromParentDirectionY(parentX, parentY, parentZ),
+            customObject.fromParentDirectionZ(parentX, parentY, parentZ)
+          ),
+          new THREE.Vector3(...direction).normalize()
+        );
+      }
+    });
+
+    it('follows a change made just before it, with nothing rendered in between', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      const before = customObject.toParentDirectionZ(1, 0, 0);
+
+      customObject.setRotationY(customObject.getRotationY() + 30);
+
+      expect(customObject.toParentDirectionZ(1, 0, 0)).not.to.be(before);
+      expectSameVector(
+        new THREE.Vector3(
+          customObject.toParentDirectionX(1, 0, 0),
+          customObject.toParentDirectionY(1, 0, 0),
+          customObject.toParentDirectionZ(1, 0, 0)
+        ),
+        getDirectionBetweenConvertedPoints(customObject, [1, 0, 0])
+      );
+    });
+
+    it('answers no direction, never NaN, along a collapsed axis', async () => {
+      const customObject = await makeTransformedCustomObject3D();
+      customObject.setScaleX(0);
+
+      // Everything along X is flattened: nothing is left of the direction.
+      expect(customObject.toParentDirectionX(1, 0, 0)).to.be(0);
+      expect(customObject.toParentDirectionY(1, 0, 0)).to.be(0);
+      expect(customObject.toParentDirectionZ(1, 0, 0)).to.be(0);
+      // The way back gives 0 on the collapsed axis, like for a point.
+      expect(customObject.fromParentDirectionX(1, 2, 3)).to.be(0);
+      expect(Number.isFinite(customObject.fromParentDirectionY(1, 2, 3))).to.be(
+        true
+      );
+    });
+  });
+
+  describe('distances in 3D', function () {
+    /**
+     * @param {gdjs.RuntimeScene} runtimeScene
+     * @param {string} name
+     * @param {[number, number, number]} position
+     */
+    const createPlacedCustomObject = (runtimeScene, name, [x, y, z]) => {
+      const customObject = new gdjs.CustomRuntimeObject3D(runtimeScene, {
+        name,
+        type: 'MyExtension::MyEventsBasedObject',
+        variant: '',
+        isInnerAreaFollowingParentSize: false,
+        variables: [],
+        behaviors: [],
+        effects: [],
+        content: { width: 0, height: 0, depth: 0 },
+      });
+      runtimeScene.addObject(customObject);
+      customObject.setPosition(x, y);
+      customObject.setZ(z);
+      return customObject;
+    };
+
+    it('computes the distance between two 3D positions', () => {
+      expect(
+        gdjs.evtTools.common.distanceBetween3DPositions(1, 2, 3, 3, 5, 9)
+      ).to.be(7);
+    });
+
+    it('compares the distance between the centers of objects in 3D', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const tank = createPlacedCustomObject(runtimeScene, 'Tank', [0, 0, 0]);
+      const plane = createPlacedCustomObject(
+        runtimeScene,
+        'Plane',
+        [0, 0, 200]
+      );
+      const truck = createPlacedCustomObject(
+        runtimeScene,
+        'Truck',
+        [60, 80, 0]
+      );
+      const centerToCenter = Math.hypot(
+        truck.getCenterXInScene() - tank.getCenterXInScene(),
+        truck.getCenterYInScene() - tank.getCenterYInScene()
+      );
+
+      /** @param {Array<gdjs.RuntimeObject>} vehicles */
+      const makeLists = (vehicles) => [
+        Hashtable.newFrom({ Tank: [tank] }),
+        Hashtable.newFrom({ Vehicle: vehicles }),
+      ];
+      // Above the tank: right next to it in 2D, 200 pixels away in 3D.
+      let [tanks, vehicles] = makeLists([plane, truck]);
+      expect(
+        gdjs.evtTools.object.distanceTest(tanks, vehicles, 150, false)
+      ).to.be(true);
+      expect(vehicles.get('Vehicle')).to.eql([plane, truck]);
+
+      [tanks, vehicles] = makeLists([plane, truck]);
+      expect(
+        gdjs.evtTools.object.distance3DTest(tanks, vehicles, 150, false)
+      ).to.be(true);
+      expect(vehicles.get('Vehicle')).to.eql([truck]);
+
+      // Inverted: the tank is picked when it is farther than the distance
+      // from every vehicle, which only the 3D distance says for the plane.
+      [tanks, vehicles] = makeLists([plane]);
+      expect(
+        gdjs.evtTools.object.distance3DTest(tanks, vehicles, 150, true)
+      ).to.be(true);
+      expect(tanks.get('Tank')).to.eql([tank]);
+      [tanks, vehicles] = makeLists([plane]);
+      expect(
+        gdjs.evtTools.object.distanceTest(tanks, vehicles, 150, true)
+      ).to.be(false);
+
+      [tanks, vehicles] = makeLists([plane, truck]);
+      expect(
+        gdjs.evtTools.object.distance3DTest(
+          tanks,
+          vehicles,
+          centerToCenter - 1,
+          false
+        )
+      ).to.be(false);
+    });
+
+    it('counts a 2D object at a Z of 0', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const plane = createPlacedCustomObject(
+        runtimeScene,
+        'Plane',
+        [0, 0, 200]
+      );
+      const flatObject = new gdjs.CustomRuntimeObject2D(runtimeScene, {
+        name: 'Flat',
+        type: 'MyExtension::MyEventsBasedObject',
+        variant: '',
+        isInnerAreaFollowingParentSize: false,
+        variables: [],
+        behaviors: [],
+        effects: [],
+        content: {},
+      });
+      runtimeScene.addObject(flatObject);
+      // Right below the center of the plane.
+      flatObject.setPosition(
+        flatObject.getX() +
+          plane.getCenterXInScene() -
+          flatObject.getCenterXInScene(),
+        flatObject.getY() +
+          plane.getCenterYInScene() -
+          flatObject.getCenterYInScene()
+      );
+      const deltaZ = plane.getCenterZInScene();
+
+      const isWithin = (distance) =>
+        gdjs.evtTools.object.distance3DTest(
+          Hashtable.newFrom({ Plane: [plane] }),
+          Hashtable.newFrom({ Flat: [flatObject] }),
+          distance,
+          false
+        );
+      expect(isWithin(deltaZ + 1)).to.be(true);
+      expect(isWithin(deltaZ - 1)).to.be(false);
+    });
+
+    it('gives the distance between the center of an object and a 3D position', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const tank = createPlacedCustomObject(runtimeScene, 'Tank', [10, 20, 30]);
+      const object3D = new gdjs.Base3DBehavior(
+        runtimeScene,
+        { name: 'Object3D', type: 'Scene3D::Base3DBehavior' },
+        tank
+      );
+
+      expect(
+        object3D.getDistanceTo3DPosition(
+          tank.getCenterXInScene() + 2,
+          tank.getCenterYInScene() + 3,
+          tank.getCenterZInScene() + 6
+        )
+      ).to.be(7);
+    });
+  });
+
   describe('turning around an axis of the scene', function () {
     it('turns from the rotations set before it, with nothing rendered in between', async () => {
       const { customObject } = await makeCustomObject3D();

@@ -124,6 +124,20 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Second point Y position"));
 
   extension
+      .AddExpression("DistanceBetween3DPositions",
+                     _("Distance between two 3D positions"),
+                     _("Compute the distance between two positions, on the X, "
+                       "Y and Z axes."),
+                     "",
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("First point X position"))
+      .AddParameter("expression", _("First point Y position"))
+      .AddParameter("expression", _("First point Z position"))
+      .AddParameter("expression", _("Second point X position"))
+      .AddParameter("expression", _("Second point Y position"))
+      .AddParameter("expression", _("Second point Z position"));
+
+  extension
       .AddExpression("mod",
                      _("Modulo"),
                      _("Compute \"x mod y\". GDevelop does NOT support the \% "

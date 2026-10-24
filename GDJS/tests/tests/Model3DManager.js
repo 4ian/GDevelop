@@ -398,6 +398,54 @@ describe('gdjs.Model3DManager', () => {
       expect(getBaseColorTexture(model2).source).to.be(imageTexture.source);
     });
 
+    it('textures a real model from the Kenney Retro Fantasy kit', async () => {
+      // The kit keeps the textures in separate files, next to the models: the
+      // editor imports them as image resources, mapped to their path.
+      const folder = 'base/GDJS/tests/tests-utils/assets/kenney-retro-fantasy/';
+      /** @returns {ResourceData} */
+      const makeTexture = (name) => ({
+        kind: 'image',
+        name,
+        file: folder + 'Textures/' + name + '.png',
+        metadata: '',
+        smoothed: false,
+        userAdded: false,
+      });
+      const { manager, imageManager } = createManagerWithImages([
+        {
+          kind: 'model3D',
+          name: 'wall-pane-wood.glb',
+          file: folder + 'wall-pane-wood.glb',
+          metadata: JSON.stringify({
+            embeddedResourcesMapping: {
+              'Textures/cobblestone.png': 'cobblestone',
+              'Textures/planks.png': 'planks',
+            },
+          }),
+          userAdded: false,
+        },
+        makeTexture('cobblestone'),
+        makeTexture('planks'),
+      ]);
+
+      const model = await loadModel(manager, 'wall-pane-wood.glb');
+
+      // Every material is textured, with the images of the image resources.
+      const textureSources = new Set();
+      model.scene.traverse((/** @type {any} */ object) => {
+        if (!object.material) return;
+        expect(object.material.map).to.be.ok();
+        textureSources.add(object.material.map.source);
+      });
+      expect(textureSources.size).to.be(2);
+      expect(
+        textureSources.has(imageManager.getThreeTexture('cobblestone').source)
+      ).to.be(true);
+      expect(
+        textureSources.has(imageManager.getThreeTexture('planks').source)
+      ).to.be(true);
+    });
+
     it('still shares the textures embedded in the same models', async () => {
       // One model mixing a texture in a separate file and an embedded one:
       // both kinds of textures must be handled.

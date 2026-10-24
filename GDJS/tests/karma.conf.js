@@ -351,6 +351,14 @@ module.exports = function (config) {
         nocache: false,
       },
       {
+        // A real 3D model, with its textures in separate files.
+        pattern: './GDJS/tests/tests-utils/assets/kenney-retro-fantasy/**/*',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
         pattern: './GDJS/tests/tests-utils/simple-tiled-map/*.json',
         watched: false,
         included: false,

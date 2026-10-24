@@ -10,9 +10,7 @@ namespace gdjs {
    * @see gdjs.CustomRuntimeObject
    * @category Core Engine > Instance Container
    */
-  export class CustomRuntimeObjectInstanceContainer
-    extends gdjs.RuntimeInstanceContainer
-  {
+  export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstanceContainer {
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _runtimeScene: gdjs.RuntimeScene;
     /** The parent container that contains the object associated with this container. */

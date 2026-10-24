@@ -771,7 +771,9 @@ describe('gdjs.CustomRuntimeObject', function () {
         for (const object of [tank, turret])
           object.getRenderer().ensureUpToDate();
         cannon.updatePreRender(turret.getChildrenContainer());
-        const pixiSprite = cannon.getRendererObject();
+        const pixiSprite = /** @type {PIXI.Sprite} */ (
+          cannon.getRendererObject()
+        );
         const getLayerContainer = (container) =>
           container.getLayer('').getRenderer().getRendererObject();
         const drawnIn = (container, x, y) =>

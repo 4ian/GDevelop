@@ -22,6 +22,8 @@ import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { useDebounce } from '../../Utils/UseDebounce';
+import { useIsMounted } from '../../Utils/UseIsMounted';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import Add from '../../UI/CustomSvgIcons/Add';
@@ -263,6 +265,15 @@ export const CompactObjectPropertiesEditor = ({
   isBehaviorListLocked,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
+  const isMounted = useIsMounted();
+  // Debounced to avoid one hot reload per keystroke on fields.
+  const debouncedNotifyBehaviorUpdated = useDebounce(
+    (objectToNotify: gdObject) => {
+      if (!isMounted.current) return;
+      onObjectsModified([objectToNotify]);
+    },
+    250
+  );
   const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
   const [
     duplicateAndEditVariantDialogOpen,
@@ -798,7 +809,9 @@ export const CompactObjectPropertiesEditor = ({
                           behaviors={[behavior]}
                           object={object}
                           layersContainer={layersContainer}
-                          onBehaviorUpdated={() => {}}
+                          onBehaviorUpdated={() =>
+                            debouncedNotifyBehaviorUpdated(object)
+                          }
                           resourceManagementProps={resourceManagementProps}
                           onOpenFullEditor={() =>
                             onEditObject(object, 'behaviors')

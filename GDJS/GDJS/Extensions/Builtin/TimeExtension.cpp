@@ -34,6 +34,10 @@ TimeExtension::TimeExtension() {
       "gdjs.evtTools.runtimeScene.getTimeScale");
   GetAllActions()["ChangeTimeScale"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.setTimeScale");
+  GetAllActions()["SetMaximumFPS"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.setMaximumFPS");
+  GetAllActions()["SetMinimumFPS"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.setMinimumFPS");
 
   GetAllExpressions()["TimeDelta"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds");

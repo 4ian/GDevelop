@@ -86,10 +86,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       "", _("Base object"), _("Base object"), "res/functions/object_black.svg");
 
   obj.AddCondition("PosX",
-                   _("X position"),
+                   _("X"),
                    _("Compare the X position of the object."),
                    _("the X position"),
-                   _("Position"),
+                   _("Position ❯ Position"),
                    "res/conditions/position24_black.png",
                    "res/conditions/position_black.png")
 
@@ -99,10 +99,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   obj.AddAction("SetX",
-                _("X position"),
+                _("X"),
                 _("Change the X position of an object."),
                 _("the X position"),
-                _("Position"),
+                _("Position ❯ Position"),
                 "res/actions/position24_black.png",
                 "res/actions/position_black.png")
 
@@ -116,10 +116,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   // End of compatibility code
 
   obj.AddCondition("PosY",
-                   _("Y position"),
+                   _("Y"),
                    _("Compare the Y position of an object."),
                    _("the Y position"),
-                   _("Position"),
+                   _("Position ❯ Position"),
                    "res/conditions/position24_black.png",
                    "res/conditions/position_black.png")
 
@@ -129,10 +129,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   obj.AddAction("SetY",
-                _("Y position"),
+                _("Y"),
                 _("Change the Y position of an object."),
                 _("the Y position"),
-                _("Position"),
+                _("Position ❯ Position"),
                 "res/actions/position24_black.png",
                 "res/actions/position_black.png")
 
@@ -145,12 +145,39 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddDuplicatedAction("MettreY", "SetY").SetHidden();
   // End of compatibility code
 
+  obj.AddCondition("PosZ",
+                   _("Z"),
+                   _("Compare the Z position of a 3D object."),
+                   _("the Z position"),
+                   _("Position ❯ Position"),
+                   "res/conditions/position24_black.png",
+                   "res/conditions/position_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
+      .SetRequiresBaseObjectCapability("Scene3D::Base3DBehavior")
+      .MarkAsSimple();
+
+  obj.AddAction("SetZ",
+                _("Z"),
+                _("Change the Z position of a 3D object."),
+                _("the Z position"),
+                _("Position ❯ Position"),
+                "res/actions/position24_black.png",
+                "res/actions/position_black.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
+      .SetRequiresBaseObjectCapability("Scene3D::Base3DBehavior")
+      .MarkAsSimple();
+
   obj.AddAction("SetXY",
                 _("Position"),
                 _("Change the position of an object."),
                 _("Change the position of _PARAM0_: _PARAM1_ _PARAM2_ (x "
-                  "axis), _PARAM3_ _PARAM4_ (y axis)"),
-                _("Position"),
+                  "axis), _PARAM3_ _PARAM4_ (y axis), _PARAM5_ _PARAM6_ (z "
+                  "axis)"),
+                _("Position ❯ Position"),
                 "res/actions/position24_black.png",
                 "res/actions/position_black.png")
 
@@ -159,6 +186,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("X position"))
       .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("Y position"))
+      .AddParameter("operator", _("Modification's sign"), "number", true)
+      .SetParameterRequiredObjectCapability("Scene3D::Base3DBehavior")
+      .AddParameter("expression", _("Z position"), "", true)
+      .SetParameterRequiredObjectCapability("Scene3D::Base3DBehavior")
+      .SetParameterLongDescription(
+          _("Leave empty to keep the current Z position."))
       .MarkAsSimple();
 
   // Compatibility with GD <= 5.6.251
@@ -170,7 +203,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the position of an object, using its center."),
                 _("Change the position of the center of _PARAM0_: _PARAM1_ "
                   "_PARAM2_ (x "
-                  "axis), _PARAM3_ _PARAM4_ (y axis)"),
+                  "axis), _PARAM3_ _PARAM4_ (y axis), _PARAM5_ _PARAM6_ (z "
+                  "axis)"),
                 _("Position ❯ Center"),
                 "res/actions/position24_black.png",
                 "res/actions/position_black.png")
@@ -179,12 +213,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("X position"))
       .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("Y position"))
+      .AddParameter("operator", _("Modification's sign"), "number", true)
+      .SetParameterRequiredObjectCapability("Scene3D::Base3DBehavior")
+      .AddParameter("expression", _("Z position"), "", true)
+      .SetParameterRequiredObjectCapability("Scene3D::Base3DBehavior")
+      .SetParameterLongDescription(
+          _("Leave empty to keep the current Z position of the center."))
       .MarkAsSimple();
 
   obj.AddExpressionAndConditionAndAction(
          "number",
          "CenterX",
-         _("Center X position"),
+         _("Center X"),
          _("the X position of the center of rotation"),
          _("the X position of the center"),
          _("Position ❯ Center"),
@@ -195,7 +235,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddExpressionAndConditionAndAction(
          "number",
          "CenterY",
-         _("Center Y position"),
+         _("Center Y"),
          _("the Y position of the center of rotation"),
          _("the Y position of the center"),
          _("Position ❯ Center"),
@@ -1716,8 +1756,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  _("Create an instance of the object at the specified position."
                    "The created object instance will be available for the next "
                    "actions and sub-events."),
-                 _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_ "
-                   "(layer: _PARAM4_)"),
+                 _("Create object _PARAM1_ at position "
+                   "_PARAM2_;_PARAM3_;_PARAM5_ (layer: _PARAM4_)"),
                  "",
                  "res/actions/create24.png",
                  "res/actions/create24.png")
@@ -1727,6 +1767,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position"))
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
+      // Added after the layer, so that existing events stay valid.
+      .AddParameter("expression", _("Z position"), "", true)
+      .SetDefaultValue("0")
+      .SetParameterRequiredObjectCapability("Scene3D::Base3DBehavior")
       .MarkAsSimple();
 
   extension
@@ -1735,7 +1779,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  _("Among the objects of the specified group, this action will "
                    "create the object with the specified name."),
                  _("Among objects _PARAM1_, create object named _PARAM2_ at "
-                   "position _PARAM3_;_PARAM4_ (layer: _PARAM5_)"),
+                   "position _PARAM3_;_PARAM4_;_PARAM6_ (layer: _PARAM5_)"),
                  "",
                  "res/actions/create24.png",
                  "res/actions/create24.png")
@@ -1752,6 +1796,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position"))
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
+      // Added after the layer, so that existing events stay valid.
+      .AddParameter("expression", _("Z position"), "", true)
+      .SetDefaultValue("0")
+      .SetParameterRequiredObjectCapability("Scene3D::Base3DBehavior")
       .MarkAsAdvanced();
 
   extension

@@ -22,6 +22,7 @@ declare class gdInstructionMetadata extends gdAbstractFunctionMetadata {
   isRelevantForFunctionEvents(): boolean;
   isRelevantForAsynchronousFunctionEvents(): boolean;
   isRelevantForCustomObjectEvents(): boolean;
+  getRequiredBaseObjectCapability(): string;
   setCanHaveSubInstructions(): gdInstructionMetadata;
   setHelpPath(helpPath: string): gdInstructionMetadata;
   setHidden(): gdInstructionMetadata;

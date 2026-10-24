@@ -47,10 +47,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
   aut.AddExpressionAndConditionAndAction(
          "number",
          "Value",
-         _("Scale"),
+         _("All axes"),
          _("the scale of the object (default scale is 1)"),
          _("the scale"),
-         _("Size"),
+         _("Size ❯ Scale"),
          "res/actions/scale24_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ScalableBehavior")
@@ -64,10 +64,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
   aut.AddExpressionAndConditionAndAction(
          "number",
          "X",
-         _("Scale on X axis"),
+         _("X"),
          _("the scale on X axis of the object (default scale is 1)"),
          _("the scale on X axis"),
-         _("Size"),
+         _("Size ❯ Scale"),
          "res/actions/scaleWidth24_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ScalableBehavior")
@@ -81,10 +81,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
   aut.AddExpressionAndConditionAndAction(
          "number",
          "Y",
-         _("Scale on Y axis"),
+         _("Y"),
          _("the scale on Y axis of the object (default scale is 1)"),
          _("the scale on Y axis"),
-         _("Size"),
+         _("Size ❯ Scale"),
          "res/actions/scaleHeight24_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ScalableBehavior")

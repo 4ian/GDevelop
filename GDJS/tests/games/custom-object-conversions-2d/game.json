@@ -1,0 +1,1806 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 285,
+    "major": 5,
+    "minor": 6,
+    "revision": 0
+  },
+  "initialGDVersion": "5.6.285",
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.example.gamename",
+    "pixelsRounding": false,
+    "projectUuid": "",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "version": "1.0.0",
+    "name": "Custom object conversions 2D",
+    "description": "",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "backgroundColor": 0,
+      "backgroundFadeInDuration": 0.2,
+      "backgroundImageResourceName": "",
+      "gdevelopLogoStyle": "light",
+      "logoAndProgressFadeInDuration": 0.2,
+      "logoAndProgressLogoFadeInDelay": 0,
+      "minDuration": 1.5,
+      "progressBarColor": 16777215,
+      "progressBarHeight": 20,
+      "progressBarMaxWidth": 200,
+      "progressBarMinWidth": 40,
+      "progressBarWidthPercent": 30,
+      "showGDevelopSplash": true,
+      "showProgressBar": true
+    },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
+    "authorIds": [],
+    "authorUsernames": [],
+    "categories": [],
+    "playableDevices": [],
+    "extensionProperties": [],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "file": "body.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "body.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "turret.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "turret.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "cannon.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "cannon.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "bullet.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "bullet.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "flag.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "flag.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "marker.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "marker.png",
+        "smoothed": true,
+        "userAdded": false
+      }
+    ]
+  },
+  "objects": [],
+  "objectsFolderStructure": {
+    "folderName": "__ROOT"
+  },
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 255,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Scene",
+      "name": "Scene",
+      "r": 247,
+      "renderer3DWorldScale": 100,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 249,
+      "uiSettings": {},
+      "objectsGroups": [],
+      "variables": [
+        {
+          "name": "AimMode",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "Heading",
+          "type": "number",
+          "value": 0
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Tank",
+          "persistentUuid": "Tank-140-150",
+          "width": 0,
+          "x": 140,
+          "y": 150,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Tank",
+          "persistentUuid": "Tank-400-150",
+          "width": 0,
+          "x": 400,
+          "y": 150,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Tank",
+          "persistentUuid": "Tank-660-150",
+          "width": 0,
+          "x": 660,
+          "y": 150,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Tank",
+          "persistentUuid": "Tank-270-400",
+          "width": 0,
+          "x": 270,
+          "y": 400,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Tank",
+          "persistentUuid": "Tank-530-400",
+          "width": 0,
+          "x": 530,
+          "y": 400,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 4
+            }
+          ]
+        }
+      ],
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "Tank",
+          "type": "TankKit::Tank",
+          "variant": "",
+          "variables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "content": {}
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Bullet",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Tank",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "bullet.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 2
+                      },
+                      "centerPoint": {
+                        "automatic": false,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 2
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Flag",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Tank",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "flag.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": false,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Crosshair",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "marker.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 4,
+                        "y": 4
+                      },
+                      "centerPoint": {
+                        "automatic": false,
+                        "name": "centre",
+                        "x": 4,
+                        "y": 4
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Tank"
+          },
+          {
+            "objectName": "Bullet"
+          },
+          {
+            "objectName": "Flag"
+          },
+          {
+            "objectName": "Crosshair"
+          }
+        ]
+      },
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Tank",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Flag",
+                    "Tank.FlagX()",
+                    "Tank.FlagY()",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Flag",
+                    "Tank",
+                    "=",
+                    "Tank.Variable(Id)"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "Flag",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "Id",
+                    "=",
+                    "Flag.Variable(Tank)"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "Flag",
+                    "=",
+                    "Tank.FlagX()",
+                    "=",
+                    "Tank.FlagY()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Flag",
+                    "=",
+                    "Tank.FlagAngle()"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "TankKit::Tank::AimAt"
+              },
+              "parameters": [
+                "Tank",
+                "MouseX()",
+                "MouseY()",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "2"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "TankKit::Tank::SetCannonHeading"
+              },
+              "parameters": [
+                "Tank",
+                "Heading",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Space\""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Tank",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Bullet",
+                    "Tank.MuzzleX()",
+                    "Tank.MuzzleY()",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Bullet",
+                    "=",
+                    "Tank.MuzzleAngle()"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "AddForceAL"
+                  },
+                  "parameters": [
+                    "Bullet",
+                    "Bullet.Angle()",
+                    "400",
+                    "1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Bullet",
+                    "Tank",
+                    "=",
+                    "Tank.Variable(Id)"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "tests": [
+    {
+      "description": "The muzzle, the flag point, aiming and firing of a tank made of nested custom objects follow every transformation (ToParentX/Y/Angle, FromParentX/Y/Angle), compared with what the renderer draws.",
+      "name": "TankConversions2D",
+      "type": "gameplay",
+      "source": [
+        "// Gameplay test: a 2D tank (a custom object) containing a turret (a custom",
+        "// object) containing a cannon (a sprite with a \"Muzzle\" point). The scene",
+        "// only uses the interface of the tank: Tank.MuzzleX/Y/Angle(), FlagX/Y/Angle()",
+        "// (converted with ToParentX/Y/Angle at each level), AimAt and SetCannonHeading",
+        "// (converted with FromParentX/Y/Angle at each level). Everything is compared",
+        "// with where the renderer (Pixi) actually draws the parts of the tank.",
+        "harness.setRandomSeed(42);",
+        "await harness.stepFrames(2);",
+        "const scene = harness.getCurrentRuntimeScene();",
+        "const sceneLayerContainer = scene.getLayer('').getRenderer().getRendererObject();",
+        "const random = (min, max) => min + Math.random() * (max - min);",
+        "const angleDifference = (a, b) => Math.abs(((((a - b) % 360) + 540) % 360) - 180);",
+        "const tankOf = (id) =>",
+        "  scene.getObjects('Tank').find((tank) => tank.getVariables().get('Id').getAsNumber() === id);",
+        "const childOf = (object, name) => object.getChildrenContainer().getObjects(name)[0];",
+        "",
+        "/** Where Pixi draws a pixel of the image of a sprite, in the scene. */",
+        "const drawnPixel = (sprite, x, y) => {",
+        "  const pixiSprite = sprite.getRendererObject();",
+        "  return sceneLayerContainer.toLocal(",
+        "    pixiSprite.toGlobal(",
+        "      new PIXI.Point(",
+        "        x - pixiSprite.anchor.x * pixiSprite.texture.width,",
+        "        y - pixiSprite.anchor.y * pixiSprite.texture.height",
+        "      )",
+        "    )",
+        "  );",
+        "};",
+        "const angleOf = (from, to) => gdjs.toDegrees(Math.atan2(to.y - from.y, to.x - from.x));",
+        "/** What the game draws of a tank: its muzzle, its cannon, its flag point. */",
+        "const drawnTank = (tank) => {",
+        "  const turret = childOf(tank, 'Turret');",
+        "  const cannon = childOf(turret, 'Cannon');",
+        "  const body = childOf(tank, 'Body');",
+        "  const cannonBase = drawnPixel(cannon, 0, 5);",
+        "  const muzzle = drawnPixel(cannon, 48, 5);",
+        "  const flag = drawnPixel(body, 8, 8);",
+        "  return {",
+        "    cannonBase,",
+        "    muzzle,",
+        "    cannonAngle: angleOf(cannonBase, muzzle),",
+        "    flag,",
+        "    bodyAngle: angleOf(drawnPixel(body, 0, 0), drawnPixel(body, 10, 0)),",
+        "  };",
+        "};",
+        "const render = () => scene.render();",
+        "",
+        "/** Any transformation of the tank, and anything inside it. */",
+        "const randomizeTank = (tank) => {",
+        "  tank.setPosition(random(120, 680), random(120, 480));",
+        "  tank.setAngle(random(-360, 360));",
+        "  tank.setScaleX(random(0.4, 1.8));",
+        "  tank.setScaleY(Math.random() < 0.3 ? tank.getScaleX() : random(0.4, 1.8));",
+        "  tank.flipX(Math.random() < 0.5);",
+        "  tank.flipY(Math.random() < 0.3);",
+        "  childOf(tank, 'Turret').setAngle(random(-360, 360));",
+        "  childOf(childOf(tank, 'Turret'), 'Cannon').setAngle(random(-90, 90));",
+        "};",
+        "/** The tanks on a ring around the middle of the screen, for screenshots. */",
+        "const layOutTanks = () => {",
+        "  scene.getObjects('Tank').forEach((tank, index, tanks) => {",
+        "    randomizeTank(tank);",
+        "    const angle = (index / tanks.length) * 2 * Math.PI;",
+        "    tank.setPosition(400 + 230 * Math.cos(angle), 300 + 200 * Math.sin(angle));",
+        "  });",
+        "};",
+        "/** Fire a few volleys, so the bullets draw where the cannons point. */",
+        "const fireVolleys = async (count) => {",
+        "  for (let i = 0; i < count; i++) {",
+        "    harness.setKeyPressed('Space', true);",
+        "    await harness.stepFrames(1);",
+        "    harness.setKeyPressed('Space', false);",
+        "    await harness.stepFrames(5);",
+        "  }",
+        "};",
+        "const deleteBullets = () => {",
+        "  for (const bullet of scene.getObjects('Bullet')) bullet.deleteFromScene();",
+        "};",
+        "const report = (name, worst, tolerance) => {",
+        "  console.log(`${name}: worst ${JSON.stringify(worst)}`);",
+        "  for (const key of Object.keys(worst)) {",
+        "    harness.assert(worst[key] < tolerance, `${name}: ${key} within ${tolerance} (worst ${worst[key]})`);",
+        "  }",
+        "};",
+        "",
+        "// 1. Whatever the transformations, the events give the muzzle, the cannon",
+        "// angle and the flag point that the game draws - and the flag attached by the",
+        "// events of the scene sits on it.",
+        "{",
+        "  const worst = { muzzle: 0, muzzleAngle: 0, flagPoint: 0, flagAngle: 0, attachedFlag: 0, attachedFlagAngle: 0 };",
+        "  for (let i = 0; i < 200; i++) {",
+        "    for (const tank of scene.getObjects('Tank')) randomizeTank(tank);",
+        "    await harness.stepFrames(1);",
+        "    render();",
+        "    for (const snapshot of harness.getObjects('Tank')) {",
+        "      const tank = scene.getObjects('Tank').find((object) => object.id === snapshot.id);",
+        "      const drawn = drawnTank(tank);",
+        "      const state = snapshot.state;",
+        "      worst.muzzle = Math.max(worst.muzzle, Math.hypot(state.MuzzleX - drawn.muzzle.x, state.MuzzleY - drawn.muzzle.y));",
+        "      worst.muzzleAngle = Math.max(worst.muzzleAngle, angleDifference(state.MuzzleAngle, drawn.cannonAngle));",
+        "      worst.flagPoint = Math.max(worst.flagPoint, Math.hypot(state.FlagX - drawn.flag.x, state.FlagY - drawn.flag.y));",
+        "      worst.flagAngle = Math.max(worst.flagAngle, angleDifference(state.FlagAngle, drawn.bodyAngle));",
+        "      const flag = scene",
+        "        .getObjects('Flag')",
+        "        .find((object) => object.getVariables().get('Tank').getAsNumber() === tank.getVariables().get('Id').getAsNumber());",
+        "      worst.attachedFlag = Math.max(worst.attachedFlag, Math.hypot(flag.getX() - drawn.flag.x, flag.getY() - drawn.flag.y));",
+        "      worst.attachedFlagAngle = Math.max(worst.attachedFlagAngle, angleDifference(flag.getAngle(), drawn.bodyAngle));",
+        "    }",
+        "  }",
+        "  report('Muzzle and flag point, 200 random frames x 5 tanks', worst, 1e-3);",
+        "  layOutTanks();",
+        "  await harness.stepFrames(1);",
+        "  await harness.takeScreenshot('Random transformations - flags attached', { fullResolution: true });",
+        "}",
+        "",
+        "// 2. Bullets fired by the scene from Tank.MuzzleX/Y, at Tank.MuzzleAngle(),",
+        "// leave the drawn muzzle along the drawn cannon.",
+        "{",
+        "  for (const tank of scene.getObjects('Tank')) randomizeTank(tank);",
+        "  await harness.stepFrames(1);",
+        "  render();",
+        "  const firedFrom = new Map(scene.getObjects('Tank').map((tank) => [tank.getVariables().get('Id').getAsNumber(), drawnTank(tank)]));",
+        "  harness.setKeyPressed('Space', true);",
+        "  await harness.stepFrames(1);",
+        "  harness.setKeyPressed('Space', false);",
+        "  harness.assert(scene.getObjects('Bullet').length === 5, 'Space fires one bullet per tank');",
+        "  await harness.stepFrames(20);",
+        "  const worst = { distanceToCannonLine: 0, bulletAngle: 0 };",
+        "  let isEveryBulletInFront = true;",
+        "  for (const bullet of scene.getObjects('Bullet')) {",
+        "    const drawn = firedFrom.get(bullet.getVariables().get('Tank').getAsNumber());",
+        "    const direction = gdjs.toRad(drawn.cannonAngle);",
+        "    const dx = bullet.getX() - drawn.muzzle.x;",
+        "    const dy = bullet.getY() - drawn.muzzle.y;",
+        "    const along = dx * Math.cos(direction) + dy * Math.sin(direction);",
+        "    worst.distanceToCannonLine = Math.max(worst.distanceToCannonLine, Math.abs(-dx * Math.sin(direction) + dy * Math.cos(direction)));",
+        "    worst.bulletAngle = Math.max(worst.bulletAngle, angleDifference(bullet.getAngle(), drawn.cannonAngle));",
+        "    // 400 pixels per second, for 20 or 21 frames.",
+        "    if (!(along > 120 && along < 150)) isEveryBulletInFront = false;",
+        "  }",
+        "  report('Bullets', worst, 1e-3);",
+        "  harness.assert(isEveryBulletInFront, 'Every bullet flew forward from the muzzle, at its speed');",
+        "  deleteBullets();",
+        "  layOutTanks();",
+        "  await fireVolleys(8);",
+        "  await harness.takeScreenshot('Bullets fired from Tank.MuzzleX-Y at Tank.MuzzleAngle', { fullResolution: true });",
+        "  deleteBullets();",
+        "}",
+        "",
+        "// 3. AimAt(MouseX(), MouseY()): the tank converts the cursor with FromParentX/Y,",
+        "// then the turret again: every drawn cannon points at the cursor.",
+        "{",
+        "  scene.getVariables().get('AimMode').setNumber(1);",
+        "  let worstAim = 0;",
+        "  for (let i = 0; i < 60; i++) {",
+        "    for (const tank of scene.getObjects('Tank')) randomizeTank(tank);",
+        "    const mouseX = random(0, 800);",
+        "    const mouseY = random(0, 600);",
+        "    harness.setMousePosition(mouseX, mouseY);",
+        "    await harness.stepFrames(1);",
+        "    render();",
+        "    for (const tank of scene.getObjects('Tank')) {",
+        "      const drawn = drawnTank(tank);",
+        "      const mouse = { x: mouseX, y: mouseY };",
+        "      if (Math.hypot(mouseX - drawn.cannonBase.x, mouseY - drawn.cannonBase.y) < 30) continue;",
+        "      worstAim = Math.max(worstAim, angleDifference(angleOf(drawn.cannonBase, mouse), drawn.cannonAngle));",
+        "    }",
+        "  }",
+        "  report('Aim at the cursor (FromParentX/Y)', { cannonToCursorAngle: worstAim }, 1e-3);",
+        "  // The cursor in the middle, shown by a crosshair: every cannon points at it.",
+        "  layOutTanks();",
+        "  harness.setMousePosition(400, 300);",
+        "  const crosshair = scene.createObject('Crosshair');",
+        "  crosshair.setPosition(400, 300);",
+        "  crosshair.setScale(3);",
+        "  await harness.stepFrames(1);",
+        "  deleteBullets();",
+        "  await fireVolleys(8);",
+        "  await harness.takeScreenshot('Aiming at the crosshair (FromParentX-Y) and firing', { fullResolution: true });",
+        "  // And somewhere else, after the tanks moved.",
+        "  layOutTanks();",
+        "  harness.setMousePosition(620, 140);",
+        "  crosshair.setPosition(620, 140);",
+        "  deleteBullets();",
+        "  await fireVolleys(8);",
+        "  await harness.takeScreenshot('Aiming at the crosshair after the tanks moved', { fullResolution: true });",
+        "  crosshair.deleteFromScene();",
+        "  deleteBullets();",
+        "}",
+        "",
+        "// 4. SetCannonHeading(Heading): converted with FromParentAngle at each level,",
+        "// the drawn cannons face the heading given in the scene.",
+        "{",
+        "  scene.getVariables().get('AimMode').setNumber(2);",
+        "  let worstHeading = 0;",
+        "  for (let i = 0; i < 60; i++) {",
+        "    for (const tank of scene.getObjects('Tank')) randomizeTank(tank);",
+        "    const heading = random(-360, 360);",
+        "    scene.getVariables().get('Heading').setNumber(heading);",
+        "    await harness.stepFrames(1);",
+        "    render();",
+        "    for (const tank of scene.getObjects('Tank')) {",
+        "      worstHeading = Math.max(worstHeading, angleDifference(drawnTank(tank).cannonAngle, heading));",
+        "    }",
+        "  }",
+        "  report('Heading (FromParentAngle)', { cannonToHeadingAngle: worstHeading }, 1e-3);",
+        "  layOutTanks();",
+        "  scene.getVariables().get('Heading').setNumber(-90);",
+        "  await fireVolleys(6);",
+        "  await harness.takeScreenshot('Every cannon facing up, heading -90 (FromParentAngle)', { fullResolution: true });",
+        "  deleteBullets();",
+        "  scene.getVariables().get('AimMode').setNumber(0);",
+        "}",
+        "",
+        "// 5. A collapsed tank (a scale of 0) still answers numbers, never NaN.",
+        "{",
+        "  const tank = tankOf(0);",
+        "  tank.setScaleX(0);",
+        "  await harness.stepFrames(1);",
+        "  const state = harness.getObjects('Tank').find((snapshot) => snapshot.id === tank.id).state;",
+        "  harness.assert(",
+        "    ['MuzzleX', 'MuzzleY', 'MuzzleAngle', 'FlagX', 'FlagY', 'FlagAngle'].every((name) => Number.isFinite(state[name])),",
+        "    'A tank collapsed by a scale of 0 answers numbers: ' + JSON.stringify(state)",
+        "  );",
+        "  scene.getVariables().get('AimMode').setNumber(1);",
+        "  harness.setMousePosition(10, 10);",
+        "  await harness.stepFrames(1);",
+        "  const cannon = childOf(childOf(tank, 'Turret'), 'Cannon');",
+        "  harness.assert(Number.isFinite(cannon.getAngle()), 'Aiming a collapsed tank never gives a NaN angle');",
+        "}",
+        ""
+      ]
+    }
+  ],
+  "eventsFunctionsExtensions": [
+    {
+      "author": "",
+      "category": "",
+      "dimension": "",
+      "extensionNamespace": "",
+      "fullName": "Tank kit",
+      "gdevelopVersion": "",
+      "helpPath": "",
+      "iconUrl": "",
+      "name": "TankKit",
+      "previewIconUrl": "",
+      "shortDescription": "",
+      "version": "1.0.0",
+      "description": "",
+      "tags": [],
+      "authorIds": [],
+      "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
+      "eventsFunctions": [],
+      "eventsFunctionsFolderStructure": {
+        "folderName": "__ROOT"
+      },
+      "eventsBasedBehaviors": [],
+      "eventsBasedObjects": [
+        {
+          "areaMaxX": 18,
+          "areaMaxY": 18,
+          "areaMaxZ": 0,
+          "areaMinX": -18,
+          "areaMinY": -18,
+          "areaMinZ": 0,
+          "defaultName": "Turret",
+          "description": "",
+          "fullName": "Turret",
+          "helpPath": "",
+          "iconUrl": "",
+          "isUsingLegacyInstancesRenderer": false,
+          "name": "Turret",
+          "previewIconUrl": "",
+          "objects": [
+            {
+              "adaptCollisionMaskAutomatically": false,
+              "assetStoreId": "",
+              "name": "TurretBase",
+              "type": "Sprite",
+              "updateIfNotVisible": false,
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "animations": [
+                {
+                  "name": "",
+                  "useMultipleDirections": false,
+                  "directions": [
+                    {
+                      "looping": false,
+                      "timeBetweenFrames": 1,
+                      "sprites": [
+                        {
+                          "hasCustomCollisionMask": false,
+                          "image": "turret.png",
+                          "points": [],
+                          "originPoint": {
+                            "name": "origine",
+                            "x": 0,
+                            "y": 0
+                          },
+                          "centerPoint": {
+                            "automatic": true,
+                            "name": "centre",
+                            "x": 0,
+                            "y": 0
+                          },
+                          "customCollisionMask": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "adaptCollisionMaskAutomatically": false,
+              "assetStoreId": "",
+              "name": "Cannon",
+              "type": "Sprite",
+              "updateIfNotVisible": false,
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "animations": [
+                {
+                  "name": "",
+                  "useMultipleDirections": false,
+                  "directions": [
+                    {
+                      "looping": false,
+                      "timeBetweenFrames": 1,
+                      "sprites": [
+                        {
+                          "hasCustomCollisionMask": false,
+                          "image": "cannon.png",
+                          "points": [
+                            {
+                              "name": "Muzzle",
+                              "x": 48,
+                              "y": 5
+                            }
+                          ],
+                          "originPoint": {
+                            "name": "origine",
+                            "x": 0,
+                            "y": 5
+                          },
+                          "centerPoint": {
+                            "automatic": false,
+                            "name": "centre",
+                            "x": 0,
+                            "y": 5
+                          },
+                          "customCollisionMask": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "TurretBase"
+              },
+              {
+                "objectName": "Cannon"
+              }
+            ]
+          },
+          "objectsGroups": [],
+          "layers": [
+            {
+              "ambientLightColorB": 200,
+              "ambientLightColorG": 200,
+              "ambientLightColorR": 200,
+              "camera2DPlaneMaxDrawingDistance": 5000,
+              "camera3DFarPlaneDistance": 10000,
+              "camera3DFieldOfView": 45,
+              "camera3DNearPlaneDistance": 3,
+              "cameraType": "",
+              "followBaseLayerCamera": false,
+              "isLightingLayer": false,
+              "isLocked": false,
+              "name": "",
+              "renderingType": "",
+              "visibility": true,
+              "cameras": [],
+              "effects": []
+            }
+          ],
+          "instances": [
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "TurretBase",
+              "persistentUuid": "TurretBase--18--18",
+              "width": 0,
+              "x": -18,
+              "y": -18,
+              "zOrder": 1,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            },
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "Cannon",
+              "persistentUuid": "Cannon-0-0",
+              "width": 0,
+              "x": 0,
+              "y": 0,
+              "zOrder": 2,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            }
+          ],
+          "editionSettings": {},
+          "eventsFunctions": [
+            {
+              "description": "AimAt",
+              "fullName": "AimAt",
+              "functionType": "Action",
+              "name": "AimAt",
+              "sentence": "AimAt of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Cannon",
+                        "=",
+                        "AngleBetweenPositions(Cannon.X(), Cannon.Y(), Object.FromParentX(TargetX, TargetY), Object.FromParentY(TargetX, TargetY))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret",
+                  "type": "object"
+                },
+                {
+                  "description": "TargetX",
+                  "name": "TargetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "TargetY",
+                  "name": "TargetY",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "SetCannonHeading",
+              "fullName": "SetCannonHeading",
+              "functionType": "Action",
+              "name": "SetCannonHeading",
+              "sentence": "SetCannonHeading of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Cannon",
+                        "=",
+                        "Object.FromParentAngle(Heading)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret",
+                  "type": "object"
+                },
+                {
+                  "description": "Heading",
+                  "name": "Heading",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleX",
+              "fullName": "MuzzleX",
+              "functionType": "Expression",
+              "name": "MuzzleX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentX(Cannon.PointX(\"Muzzle\"), Cannon.PointY(\"Muzzle\"))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleY",
+              "fullName": "MuzzleY",
+              "functionType": "Expression",
+              "name": "MuzzleY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(Cannon.PointX(\"Muzzle\"), Cannon.PointY(\"Muzzle\"))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleAngle",
+              "fullName": "MuzzleAngle",
+              "functionType": "Expression",
+              "name": "MuzzleAngle",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentAngle(Cannon.Angle())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "eventsFunctionsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "functionName": "AimAt"
+              },
+              {
+                "functionName": "SetCannonHeading"
+              },
+              {
+                "functionName": "MuzzleX"
+              },
+              {
+                "functionName": "MuzzleY"
+              },
+              {
+                "functionName": "MuzzleAngle"
+              }
+            ]
+          },
+          "propertyDescriptors": [],
+          "propertiesFolderStructure": {
+            "folderName": "__ROOT"
+          },
+          "variants": []
+        },
+        {
+          "areaMaxX": 40,
+          "areaMaxY": 25,
+          "areaMaxZ": 0,
+          "areaMinX": -40,
+          "areaMinY": -25,
+          "areaMinZ": 0,
+          "defaultName": "Tank",
+          "description": "",
+          "fullName": "Tank",
+          "helpPath": "",
+          "iconUrl": "",
+          "isUsingLegacyInstancesRenderer": false,
+          "name": "Tank",
+          "previewIconUrl": "",
+          "objects": [
+            {
+              "adaptCollisionMaskAutomatically": false,
+              "assetStoreId": "",
+              "name": "Body",
+              "type": "Sprite",
+              "updateIfNotVisible": false,
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "animations": [
+                {
+                  "name": "",
+                  "useMultipleDirections": false,
+                  "directions": [
+                    {
+                      "looping": false,
+                      "timeBetweenFrames": 1,
+                      "sprites": [
+                        {
+                          "hasCustomCollisionMask": false,
+                          "image": "body.png",
+                          "points": [
+                            {
+                              "name": "Flag",
+                              "x": 8,
+                              "y": 8
+                            }
+                          ],
+                          "originPoint": {
+                            "name": "origine",
+                            "x": 0,
+                            "y": 0
+                          },
+                          "centerPoint": {
+                            "automatic": true,
+                            "name": "centre",
+                            "x": 0,
+                            "y": 0
+                          },
+                          "customCollisionMask": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "assetStoreId": "",
+              "name": "Turret",
+              "type": "TankKit::Turret",
+              "variant": "",
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "content": {}
+            }
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "Body"
+              },
+              {
+                "objectName": "Turret"
+              }
+            ]
+          },
+          "objectsGroups": [],
+          "layers": [
+            {
+              "ambientLightColorB": 200,
+              "ambientLightColorG": 200,
+              "ambientLightColorR": 200,
+              "camera2DPlaneMaxDrawingDistance": 5000,
+              "camera3DFarPlaneDistance": 10000,
+              "camera3DFieldOfView": 45,
+              "camera3DNearPlaneDistance": 3,
+              "cameraType": "",
+              "followBaseLayerCamera": false,
+              "isLightingLayer": false,
+              "isLocked": false,
+              "name": "",
+              "renderingType": "",
+              "visibility": true,
+              "cameras": [],
+              "effects": []
+            }
+          ],
+          "instances": [
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "Body",
+              "persistentUuid": "Body--40--25",
+              "width": 0,
+              "x": -40,
+              "y": -25,
+              "zOrder": 1,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            },
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "Turret",
+              "persistentUuid": "Turret-10-0",
+              "width": 0,
+              "x": 10,
+              "y": 0,
+              "zOrder": 2,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            }
+          ],
+          "editionSettings": {},
+          "eventsFunctions": [
+            {
+              "description": "AimAt",
+              "fullName": "AimAt",
+              "functionType": "Action",
+              "name": "AimAt",
+              "sentence": "AimAt of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TankKit::Turret::AimAt"
+                      },
+                      "parameters": [
+                        "Turret",
+                        "Object.FromParentX(TargetX, TargetY)",
+                        "Object.FromParentY(TargetX, TargetY)",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                },
+                {
+                  "description": "TargetX",
+                  "name": "TargetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "TargetY",
+                  "name": "TargetY",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "SetCannonHeading",
+              "fullName": "SetCannonHeading",
+              "functionType": "Action",
+              "name": "SetCannonHeading",
+              "sentence": "SetCannonHeading of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TankKit::Turret::SetCannonHeading"
+                      },
+                      "parameters": [
+                        "Turret",
+                        "Object.FromParentAngle(Heading)",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                },
+                {
+                  "description": "Heading",
+                  "name": "Heading",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleX",
+              "fullName": "MuzzleX",
+              "functionType": "Expression",
+              "name": "MuzzleX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentX(Turret.MuzzleX(), Turret.MuzzleY())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleY",
+              "fullName": "MuzzleY",
+              "functionType": "Expression",
+              "name": "MuzzleY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(Turret.MuzzleX(), Turret.MuzzleY())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleAngle",
+              "fullName": "MuzzleAngle",
+              "functionType": "Expression",
+              "name": "MuzzleAngle",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentAngle(Turret.MuzzleAngle())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "FlagX",
+              "fullName": "FlagX",
+              "functionType": "Expression",
+              "name": "FlagX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentX(Body.PointX(\"Flag\"), Body.PointY(\"Flag\"))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "FlagY",
+              "fullName": "FlagY",
+              "functionType": "Expression",
+              "name": "FlagY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(Body.PointX(\"Flag\"), Body.PointY(\"Flag\"))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "FlagAngle",
+              "fullName": "FlagAngle",
+              "functionType": "Expression",
+              "name": "FlagAngle",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentAngle(Body.Angle())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "eventsFunctionsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "functionName": "AimAt"
+              },
+              {
+                "functionName": "SetCannonHeading"
+              },
+              {
+                "functionName": "MuzzleX"
+              },
+              {
+                "functionName": "MuzzleY"
+              },
+              {
+                "functionName": "MuzzleAngle"
+              },
+              {
+                "functionName": "FlagX"
+              },
+              {
+                "functionName": "FlagY"
+              },
+              {
+                "functionName": "FlagAngle"
+              }
+            ]
+          },
+          "propertyDescriptors": [],
+          "propertiesFolderStructure": {
+            "folderName": "__ROOT"
+          },
+          "variants": []
+        }
+      ]
+    }
+  ],
+  "externalLayouts": []
+}

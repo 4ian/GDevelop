@@ -1,0 +1,2119 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 285,
+    "major": 5,
+    "minor": 6,
+    "revision": 0
+  },
+  "initialGDVersion": "5.6.285",
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.example.gamename",
+    "pixelsRounding": false,
+    "projectUuid": "",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "version": "1.0.0",
+    "name": "Custom object conversions 3D",
+    "description": "",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "backgroundColor": 0,
+      "backgroundFadeInDuration": 0.2,
+      "backgroundImageResourceName": "",
+      "gdevelopLogoStyle": "light",
+      "logoAndProgressFadeInDuration": 0.2,
+      "logoAndProgressLogoFadeInDelay": 0,
+      "minDuration": 1.5,
+      "progressBarColor": 16777215,
+      "progressBarHeight": 20,
+      "progressBarMaxWidth": 200,
+      "progressBarMinWidth": 40,
+      "progressBarWidthPercent": 30,
+      "showGDevelopSplash": true,
+      "showProgressBar": true
+    },
+    "watermark": {
+      "placement": "bottom-left",
+      "showWatermark": true
+    },
+    "authorIds": [],
+    "authorUsernames": [],
+    "categories": [],
+    "playableDevices": [],
+    "extensionProperties": [],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "file": "white.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "white.png",
+        "smoothed": true,
+        "userAdded": false
+      }
+    ]
+  },
+  "objects": [],
+  "objectsFolderStructure": {
+    "folderName": "__ROOT"
+  },
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 255,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Scene",
+      "name": "Scene",
+      "r": 247,
+      "renderer3DWorldScale": 100,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 249,
+      "uiSettings": {},
+      "objectsGroups": [],
+      "variables": [
+        {
+          "name": "AimMode",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "TargetX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "TargetY",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "TargetZ",
+          "type": "number",
+          "value": 0
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Tank3D",
+          "persistentUuid": "Tank3D-200-200",
+          "width": 0,
+          "x": 200,
+          "y": 200,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Tank3D",
+          "persistentUuid": "Tank3D-560-200",
+          "width": 0,
+          "x": 560,
+          "y": 200,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Tank3D",
+          "persistentUuid": "Tank3D-200-420",
+          "width": 0,
+          "x": 200,
+          "y": 420,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Tank3D",
+          "persistentUuid": "Tank3D-560-420",
+          "width": 0,
+          "x": 560,
+          "y": 420,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 3
+            }
+          ]
+        }
+      ],
+      "objects": [
+        {
+          "assetStoreId": "",
+          "name": "Tank3D",
+          "type": "TankKit::Tank3D",
+          "variant": "",
+          "variables": [
+            {
+              "name": "Id",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "content": {}
+        },
+        {
+          "assetStoreId": "",
+          "name": "Shell",
+          "type": "Scene3D::Cube3DObject",
+          "variables": [
+            {
+              "name": "Dx",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "Dy",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "Dz",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "Tank",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "width": 4,
+            "height": 4,
+            "depth": 4,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Y",
+            "frontFaceResourceName": "white.png",
+            "backFaceResourceName": "white.png",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "white.png",
+            "rightFaceResourceName": "white.png",
+            "topFaceResourceName": "white.png",
+            "bottomFaceResourceName": "white.png",
+            "frontFaceVisible": true,
+            "backFaceVisible": true,
+            "leftFaceVisible": true,
+            "rightFaceVisible": true,
+            "topFaceVisible": true,
+            "bottomFaceVisible": true,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "tileScale": 1,
+            "materialType": "Basic",
+            "tint": "250;200;40",
+            "isCastingShadow": false,
+            "isReceivingShadow": false
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "Flag3D",
+          "type": "Scene3D::Cube3DObject",
+          "variables": [
+            {
+              "name": "Tank",
+              "type": "number",
+              "value": 0
+            }
+          ],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "width": 6,
+            "height": 6,
+            "depth": 6,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Y",
+            "frontFaceResourceName": "white.png",
+            "backFaceResourceName": "white.png",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "white.png",
+            "rightFaceResourceName": "white.png",
+            "topFaceResourceName": "white.png",
+            "bottomFaceResourceName": "white.png",
+            "frontFaceVisible": true,
+            "backFaceVisible": true,
+            "leftFaceVisible": true,
+            "rightFaceVisible": true,
+            "topFaceVisible": true,
+            "bottomFaceVisible": true,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "tileScale": 1,
+            "materialType": "Basic",
+            "tint": "220;30;30",
+            "isCastingShadow": false,
+            "isReceivingShadow": false
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "Target3D",
+          "type": "Scene3D::Cube3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "width": 6,
+            "height": 6,
+            "depth": 6,
+            "enableTextureTransparency": false,
+            "facesOrientation": "Y",
+            "frontFaceResourceName": "white.png",
+            "backFaceResourceName": "white.png",
+            "backFaceUpThroughWhichAxisRotation": "X",
+            "leftFaceResourceName": "white.png",
+            "rightFaceResourceName": "white.png",
+            "topFaceResourceName": "white.png",
+            "bottomFaceResourceName": "white.png",
+            "frontFaceVisible": true,
+            "backFaceVisible": true,
+            "leftFaceVisible": true,
+            "rightFaceVisible": true,
+            "topFaceVisible": true,
+            "bottomFaceVisible": true,
+            "frontFaceResourceRepeat": false,
+            "backFaceResourceRepeat": false,
+            "leftFaceResourceRepeat": false,
+            "rightFaceResourceRepeat": false,
+            "topFaceResourceRepeat": false,
+            "bottomFaceResourceRepeat": false,
+            "tileScale": 1,
+            "materialType": "Basic",
+            "tint": "255;0;255",
+            "isCastingShadow": false,
+            "isReceivingShadow": false
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Tank3D"
+          },
+          {
+            "objectName": "Shell"
+          },
+          {
+            "objectName": "Flag3D"
+          },
+          {
+            "objectName": "Target3D"
+          }
+        ]
+      },
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Tank3D",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Flag3D",
+                    "Tank3D.AntennaTopX() - 3",
+                    "Tank3D.AntennaTopY() - 3",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Flag3D",
+                    "Tank",
+                    "=",
+                    "Tank3D.Variable(Id)"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "Flag3D",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Id",
+                    "=",
+                    "Flag3D.Variable(Tank)"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "Flag3D",
+                    "=",
+                    "Tank3D.AntennaTopX() - 3",
+                    "=",
+                    "Tank3D.AntennaTopY() - 3"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Flag3D",
+                    "Object3D",
+                    "=",
+                    "Tank3D.AntennaTopZ()"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "TankKit::Tank3D::AimAt"
+              },
+              "parameters": [
+                "Tank3D",
+                "TargetX",
+                "TargetY",
+                "TargetZ",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Space\""
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Tank3D",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Shell",
+                    "Tank3D.MuzzleX() - 2",
+                    "Tank3D.MuzzleY() - 2",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Shell",
+                    "Object3D",
+                    "=",
+                    "Tank3D.MuzzleZ() - 2"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Shell",
+                    "Dx",
+                    "=",
+                    "(Tank3D.MuzzleX() - Tank3D.BreechX()) / sqrt(pow(Tank3D.MuzzleX() - Tank3D.BreechX(), 2) + pow(Tank3D.MuzzleY() - Tank3D.BreechY(), 2) + pow(Tank3D.MuzzleZ() - Tank3D.BreechZ(), 2))"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Shell",
+                    "Dy",
+                    "=",
+                    "(Tank3D.MuzzleY() - Tank3D.BreechY()) / sqrt(pow(Tank3D.MuzzleX() - Tank3D.BreechX(), 2) + pow(Tank3D.MuzzleY() - Tank3D.BreechY(), 2) + pow(Tank3D.MuzzleZ() - Tank3D.BreechZ(), 2))"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Shell",
+                    "Dz",
+                    "=",
+                    "(Tank3D.MuzzleZ() - Tank3D.BreechZ()) / sqrt(pow(Tank3D.MuzzleX() - Tank3D.BreechX(), 2) + pow(Tank3D.MuzzleY() - Tank3D.BreechY(), 2) + pow(Tank3D.MuzzleZ() - Tank3D.BreechZ(), 2))"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Shell",
+                    "Tank",
+                    "=",
+                    "Tank3D.Variable(Id)"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetX"
+              },
+              "parameters": [
+                "Shell",
+                "+",
+                "Shell.Variable(Dx) * 300 * TimeDelta()"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetY"
+              },
+              "parameters": [
+                "Shell",
+                "+",
+                "Shell.Variable(Dy) * 300 * TimeDelta()"
+              ]
+            },
+            {
+              "type": {
+                "value": "Scene3D::Base3DBehavior::SetZ"
+              },
+              "parameters": [
+                "Shell",
+                "Object3D",
+                "+",
+                "Shell.Variable(Dz) * 300 * TimeDelta()"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "",
+            "      if (!runtimeScene.__cameraSet) {",
+            "        runtimeScene.__cameraSet = true;",
+            "        const layer = runtimeScene.getLayer('');",
+            "        layer.setCameraRotationX(30);",
+            "        layer.setCameraY(layer.getCameraY() + 420);",
+            "        layer.setCameraZoom(1.1);",
+            "      }",
+            "    "
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "tests": [
+    {
+      "description": "The muzzle, the breech, the antenna top, aiming and firing of a 3D tank made of nested custom objects follow every transformation (ToParentX/Y/Z, FromParentX/Y/Z), compared with what the renderer draws.",
+      "name": "TankConversions3D",
+      "type": "gameplay",
+      "source": [
+        "// Gameplay test: a 3D tank (a custom object) containing a turret (a custom",
+        "// object) containing a cannon and an antenna (3D boxes). The scene only uses",
+        "// the interface of the tank: Tank3D.MuzzleX/Y/Z(), BreechX/Y/Z(),",
+        "// AntennaTopX/Y/Z() (converted with ToParentX/Y/Z at each level) and",
+        "// AimAt(x, y, z) (converted with FromParentX/Y/Z at each level). Everything is",
+        "// compared with where the renderer (THREE) actually draws the parts.",
+        "harness.setRandomSeed(7);",
+        "await harness.stepFrames(2);",
+        "const scene = harness.getCurrentRuntimeScene();",
+        "const layerGroup = scene.getLayer('').getRenderer().getThreeGroup();",
+        "const random = (min, max) => min + Math.random() * (max - min);",
+        "const childOf = (object, name) => object.getChildrenContainer().getObjects(name)[0];",
+        "const idOf = (object, name = 'Id') => object.getVariables().get(name).getAsNumber();",
+        "const render = () => {",
+        "  scene.render();",
+        "  layerGroup.updateMatrixWorld(true);",
+        "};",
+        "",
+        "/** Where THREE draws a point of a box (in its unit box, -0.5 to 0.5), in the scene. */",
+        "const drawnPoint = (box, x, y, z) => {",
+        "  const toScene = new THREE.Matrix4().copy(layerGroup.matrixWorld).invert();",
+        "  return new THREE.Vector3(x, y, z).applyMatrix4(box.get3DRendererObject().matrixWorld).applyMatrix4(toScene);",
+        "};",
+        "const drawnTank = (tank) => {",
+        "  const turret = childOf(tank, 'Turret3D');",
+        "  const cannon = childOf(turret, 'Cannon');",
+        "  return {",
+        "    muzzle: drawnPoint(cannon, 0.5, 0, 0),",
+        "    breech: drawnPoint(cannon, -0.5, 0, 0),",
+        "    antennaTop: drawnPoint(childOf(turret, 'Antenna'), 0, 0, 0.5),",
+        "  };",
+        "};",
+        "const pointOf = (state, name) => new THREE.Vector3(state[name + 'X'], state[name + 'Y'], state[name + 'Z']);",
+        "const centerOf = (box) =>",
+        "  new THREE.Vector3(box.getX() + box.getWidth() / 2, box.getY() + box.getHeight() / 2, box.getZ() + box.getDepth() / 2);",
+        "const degreesBetween = (a, b) => gdjs.toDegrees(a.angleTo(b));",
+        "",
+        "/** Any transformation of the tank, and anything inside it. */",
+        "const randomizeTank = (tank, { canBeUpsideDown = true } = {}) => {",
+        "  tank.setPosition(random(120, 680), random(120, 480));",
+        "  tank.setZ(random(-40, 40));",
+        "  tank.setAngle(random(-360, 360));",
+        "  tank.setRotationX(random(-30, 30));",
+        "  tank.setRotationY(random(-30, 30));",
+        "  tank.setScaleX(random(0.5, 1.6));",
+        "  tank.setScaleY(Math.random() < 0.3 ? tank.getScaleX() : random(0.5, 1.6));",
+        "  tank.setScaleZ(random(0.5, 1.6));",
+        "  tank.flipX(Math.random() < 0.5);",
+        "  tank.flipY(Math.random() < 0.3);",
+        "  tank.flipZ(canBeUpsideDown && Math.random() < 0.3);",
+        "  const turret = childOf(tank, 'Turret3D');",
+        "  turret.setAngle(random(-360, 360));",
+        "  childOf(turret, 'Cannon').setRotationY(random(-60, 60));",
+        "};",
+        "const layOutTanks = () => {",
+        "  scene.getObjects('Tank3D').forEach((tank, index, tanks) => {",
+        "    randomizeTank(tank, { canBeUpsideDown: false });",
+        "    const angle = (index / tanks.length) * 2 * Math.PI + Math.PI / 4;",
+        "    tank.setPosition(400 + 220 * Math.cos(angle), 310 + 150 * Math.sin(angle));",
+        "    tank.setZ(0);",
+        "  });",
+        "};",
+        "const fireVolleys = async (count) => {",
+        "  for (let i = 0; i < count; i++) {",
+        "    harness.setKeyPressed('Space', true);",
+        "    await harness.stepFrames(1);",
+        "    harness.setKeyPressed('Space', false);",
+        "    await harness.stepFrames(5);",
+        "  }",
+        "};",
+        "const deleteShells = () => {",
+        "  for (const shell of scene.getObjects('Shell')) shell.deleteFromScene();",
+        "};",
+        "const report = (name, worst, tolerance) => {",
+        "  console.log(`${name}: worst ${JSON.stringify(worst)}`);",
+        "  for (const key of Object.keys(worst)) {",
+        "    harness.assert(worst[key] < tolerance, `${name}: ${key} within ${tolerance} (worst ${worst[key]})`);",
+        "  }",
+        "};",
+        "",
+        "// 1. Whatever the transformations (tilted, flipped, scaled differently on",
+        "// each axis), the events give the muzzle, the breech and the top of the",
+        "// antenna that the game draws - and the flag attached by the scene sits on it.",
+        "{",
+        "  const worst = { muzzle: 0, breech: 0, antennaTop: 0, attachedFlag: 0 };",
+        "  for (let i = 0; i < 200; i++) {",
+        "    for (const tank of scene.getObjects('Tank3D')) randomizeTank(tank);",
+        "    await harness.stepFrames(1);",
+        "    render();",
+        "    for (const snapshot of harness.getObjects('Tank3D')) {",
+        "      const tank = scene.getObjects('Tank3D').find((object) => object.id === snapshot.id);",
+        "      const drawn = drawnTank(tank);",
+        "      worst.muzzle = Math.max(worst.muzzle, pointOf(snapshot.state, 'Muzzle').distanceTo(drawn.muzzle));",
+        "      worst.breech = Math.max(worst.breech, pointOf(snapshot.state, 'Breech').distanceTo(drawn.breech));",
+        "      worst.antennaTop = Math.max(worst.antennaTop, pointOf(snapshot.state, 'AntennaTop').distanceTo(drawn.antennaTop));",
+        "      const flag = scene.getObjects('Flag3D').find((object) => idOf(object, 'Tank') === idOf(tank));",
+        "      const flagBottom = centerOf(flag).add(new THREE.Vector3(0, 0, -3));",
+        "      worst.attachedFlag = Math.max(worst.attachedFlag, flagBottom.distanceTo(drawn.antennaTop));",
+        "    }",
+        "  }",
+        "  report('Muzzle, breech and antenna top, 200 random frames x 4 tanks', worst, 1e-3);",
+        "  layOutTanks();",
+        "  await harness.stepFrames(1);",
+        "  await harness.takeScreenshot('Random transformations - flags on the antennas', { fullResolution: true });",
+        "}",
+        "",
+        "// 2. Shells fired by the scene from Tank3D.MuzzleX/Y/Z, along the direction",
+        "// from Breech to Muzzle, fly along the drawn barrel - pitch and tilt included.",
+        "{",
+        "  for (const tank of scene.getObjects('Tank3D')) randomizeTank(tank);",
+        "  await harness.stepFrames(1);",
+        "  render();",
+        "  const firedFrom = new Map(scene.getObjects('Tank3D').map((tank) => [idOf(tank), drawnTank(tank)]));",
+        "  harness.setKeyPressed('Space', true);",
+        "  await harness.stepFrames(1);",
+        "  harness.setKeyPressed('Space', false);",
+        "  harness.assert(scene.getObjects('Shell').length === 4, 'Space fires one shell per tank');",
+        "  await harness.stepFrames(30);",
+        "  let worstDirection = 0;",
+        "  let isEveryShellInFront = true;",
+        "  for (const shell of scene.getObjects('Shell')) {",
+        "    const drawn = firedFrom.get(idOf(shell, 'Tank'));",
+        "    const flown = centerOf(shell).sub(drawn.muzzle);",
+        "    const barrel = drawn.muzzle.clone().sub(drawn.breech);",
+        "    worstDirection = Math.max(worstDirection, degreesBetween(flown, barrel));",
+        "    // 300 pixels per second, for 30 or 31 frames.",
+        "    if (!(flown.length() > 145 && flown.length() < 160)) isEveryShellInFront = false;",
+        "  }",
+        "  report('Shells', { shellToBarrelAngle: worstDirection }, 1e-3);",
+        "  harness.assert(isEveryShellInFront, 'Every shell flew forward from the muzzle, at its speed');",
+        "  deleteShells();",
+        "  layOutTanks();",
+        "  await fireVolleys(6);",
+        "  await harness.takeScreenshot('Shells fired from the muzzles along the barrels', { fullResolution: true });",
+        "  deleteShells();",
+        "}",
+        "",
+        "// 3. AimAt(x, y, z): the tank turns its turret toward the target seen in its",
+        "// own space (FromParentX/Y), and the turret raises its cannon toward it seen",
+        "// in its space (FromParentX/Z): every drawn barrel passes through the target.",
+        "{",
+        "  scene.getVariables().get('AimMode').setNumber(1);",
+        "  const setTarget = (target) => {",
+        "    scene.getVariables().get('TargetX').setNumber(target.x);",
+        "    scene.getVariables().get('TargetY').setNumber(target.y);",
+        "    scene.getVariables().get('TargetZ').setNumber(target.z);",
+        "  };",
+        "  let worstDistance = 0;",
+        "  let isEveryTargetInFront = true;",
+        "  let checkedCount = 0;",
+        "  for (let i = 0; i < 100; i++) {",
+        "    for (const tank of scene.getObjects('Tank3D')) randomizeTank(tank);",
+        "    const target = new THREE.Vector3(random(0, 800), random(0, 600), random(-40, 120));",
+        "    setTarget(target);",
+        "    await harness.stepFrames(1);",
+        "    render();",
+        "    for (const tank of scene.getObjects('Tank3D')) {",
+        "      if (Math.hypot(tank.getX() - target.x, tank.getY() - target.y) < 150) continue;",
+        "      const drawn = drawnTank(tank);",
+        "      const barrel = drawn.muzzle.clone().sub(drawn.breech).normalize();",
+        "      const toTarget = target.clone().sub(drawn.breech);",
+        "      worstDistance = Math.max(worstDistance, toTarget.clone().cross(barrel).length());",
+        "      if (toTarget.dot(barrel) <= 0) isEveryTargetInFront = false;",
+        "      checkedCount++;",
+        "    }",
+        "  }",
+        "  report(`Aim at a point (FromParentX/Y/Z), ${checkedCount} aims`, { targetToBarrelLineDistance: worstDistance }, 1e-3);",
+        "  harness.assert(isEveryTargetInFront, 'Every barrel points toward its target, not away from it');",
+        "",
+        "  layOutTanks();",
+        "  const target = new THREE.Vector3(400, 310, 60);",
+        "  setTarget(target);",
+        "  const targetBox = scene.createObject('Target3D');",
+        "  targetBox.setPosition(target.x - 3, target.y - 3);",
+        "  targetBox.setZ(target.z - 3);",
+        "  await harness.stepFrames(1);",
+        "  await fireVolleys(8);",
+        "  await harness.takeScreenshot('Aiming at the floating target (FromParentX-Y-Z) and firing', { fullResolution: true });",
+        "  deleteShells();",
+        "  layOutTanks();",
+        "  target.set(650, 180, 0);",
+        "  setTarget(target);",
+        "  targetBox.setPosition(target.x - 3, target.y - 3);",
+        "  targetBox.setZ(target.z - 3);",
+        "  await fireVolleys(8);",
+        "  await harness.takeScreenshot('Aiming at a target on the ground after the tanks moved', { fullResolution: true });",
+        "  deleteShells();",
+        "  scene.getVariables().get('AimMode').setNumber(0);",
+        "}",
+        "",
+        "// 4. A collapsed tank (a scale of 0 on an axis) still answers numbers.",
+        "{",
+        "  const tank = scene.getObjects('Tank3D')[0];",
+        "  for (const collapse of [() => tank.setScaleZ(0), () => tank.setScaleX(0)]) {",
+        "    collapse();",
+        "    scene.getVariables().get('AimMode').setNumber(1);",
+        "    await harness.stepFrames(1);",
+        "    const state = harness.getObjects('Tank3D').find((snapshot) => snapshot.id === tank.id).state;",
+        "    harness.assert(",
+        "      Object.values(state).every((value) => typeof value !== 'number' || Number.isFinite(value)),",
+        "      'A collapsed tank answers numbers: ' + JSON.stringify(state)",
+        "    );",
+        "    const turret = childOf(tank, 'Turret3D');",
+        "    harness.assert(",
+        "      Number.isFinite(turret.getAngle()) && Number.isFinite(childOf(turret, 'Cannon').getRotationY()),",
+        "      'Aiming a collapsed tank never gives a NaN rotation'",
+        "    );",
+        "  }",
+        "}",
+        ""
+      ]
+    }
+  ],
+  "eventsFunctionsExtensions": [
+    {
+      "author": "",
+      "category": "",
+      "dimension": "",
+      "extensionNamespace": "",
+      "fullName": "Tank kit",
+      "gdevelopVersion": "",
+      "helpPath": "",
+      "iconUrl": "",
+      "name": "TankKit",
+      "previewIconUrl": "",
+      "shortDescription": "",
+      "version": "1.0.0",
+      "description": "",
+      "tags": [],
+      "authorIds": [],
+      "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
+      "eventsFunctions": [],
+      "eventsFunctionsFolderStructure": {
+        "folderName": "__ROOT"
+      },
+      "eventsBasedBehaviors": [],
+      "eventsBasedObjects": [
+        {
+          "areaMaxX": 12,
+          "areaMaxY": 12,
+          "areaMaxZ": 12,
+          "areaMinX": -12,
+          "areaMinY": -12,
+          "areaMinZ": 0,
+          "defaultName": "Turret3D",
+          "description": "",
+          "fullName": "Turret3D",
+          "helpPath": "",
+          "iconUrl": "",
+          "is3D": true,
+          "isUsingLegacyInstancesRenderer": false,
+          "name": "Turret3D",
+          "previewIconUrl": "",
+          "objects": [
+            {
+              "assetStoreId": "",
+              "name": "TurretBase",
+              "type": "Scene3D::Cube3DObject",
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "content": {
+                "width": 24,
+                "height": 24,
+                "depth": 10,
+                "enableTextureTransparency": false,
+                "facesOrientation": "Y",
+                "frontFaceResourceName": "white.png",
+                "backFaceResourceName": "white.png",
+                "backFaceUpThroughWhichAxisRotation": "X",
+                "leftFaceResourceName": "white.png",
+                "rightFaceResourceName": "white.png",
+                "topFaceResourceName": "white.png",
+                "bottomFaceResourceName": "white.png",
+                "frontFaceVisible": true,
+                "backFaceVisible": true,
+                "leftFaceVisible": true,
+                "rightFaceVisible": true,
+                "topFaceVisible": true,
+                "bottomFaceVisible": true,
+                "frontFaceResourceRepeat": false,
+                "backFaceResourceRepeat": false,
+                "leftFaceResourceRepeat": false,
+                "rightFaceResourceRepeat": false,
+                "topFaceResourceRepeat": false,
+                "bottomFaceResourceRepeat": false,
+                "tileScale": 1,
+                "materialType": "Basic",
+                "tint": "60;110;60",
+                "isCastingShadow": false,
+                "isReceivingShadow": false
+              }
+            },
+            {
+              "assetStoreId": "",
+              "name": "Cannon",
+              "type": "Scene3D::Cube3DObject",
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "content": {
+                "width": 40,
+                "height": 6,
+                "depth": 6,
+                "enableTextureTransparency": false,
+                "facesOrientation": "Y",
+                "frontFaceResourceName": "white.png",
+                "backFaceResourceName": "white.png",
+                "backFaceUpThroughWhichAxisRotation": "X",
+                "leftFaceResourceName": "white.png",
+                "rightFaceResourceName": "white.png",
+                "topFaceResourceName": "white.png",
+                "bottomFaceResourceName": "white.png",
+                "frontFaceVisible": true,
+                "backFaceVisible": true,
+                "leftFaceVisible": true,
+                "rightFaceVisible": true,
+                "topFaceVisible": true,
+                "bottomFaceVisible": true,
+                "frontFaceResourceRepeat": false,
+                "backFaceResourceRepeat": false,
+                "leftFaceResourceRepeat": false,
+                "rightFaceResourceRepeat": false,
+                "topFaceResourceRepeat": false,
+                "bottomFaceResourceRepeat": false,
+                "tileScale": 1,
+                "materialType": "Basic",
+                "tint": "140;140;140",
+                "isCastingShadow": false,
+                "isReceivingShadow": false
+              }
+            },
+            {
+              "assetStoreId": "",
+              "name": "Antenna",
+              "type": "Scene3D::Cube3DObject",
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "content": {
+                "width": 2,
+                "height": 2,
+                "depth": 16,
+                "enableTextureTransparency": false,
+                "facesOrientation": "Y",
+                "frontFaceResourceName": "white.png",
+                "backFaceResourceName": "white.png",
+                "backFaceUpThroughWhichAxisRotation": "X",
+                "leftFaceResourceName": "white.png",
+                "rightFaceResourceName": "white.png",
+                "topFaceResourceName": "white.png",
+                "bottomFaceResourceName": "white.png",
+                "frontFaceVisible": true,
+                "backFaceVisible": true,
+                "leftFaceVisible": true,
+                "rightFaceVisible": true,
+                "topFaceVisible": true,
+                "bottomFaceVisible": true,
+                "frontFaceResourceRepeat": false,
+                "backFaceResourceRepeat": false,
+                "leftFaceResourceRepeat": false,
+                "rightFaceResourceRepeat": false,
+                "topFaceResourceRepeat": false,
+                "bottomFaceResourceRepeat": false,
+                "tileScale": 1,
+                "materialType": "Basic",
+                "tint": "40;40;40",
+                "isCastingShadow": false,
+                "isReceivingShadow": false
+              }
+            }
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "TurretBase"
+              },
+              {
+                "objectName": "Cannon"
+              },
+              {
+                "objectName": "Antenna"
+              }
+            ]
+          },
+          "objectsGroups": [],
+          "layers": [
+            {
+              "ambientLightColorB": 200,
+              "ambientLightColorG": 200,
+              "ambientLightColorR": 200,
+              "camera2DPlaneMaxDrawingDistance": 5000,
+              "camera3DFarPlaneDistance": 10000,
+              "camera3DFieldOfView": 45,
+              "camera3DNearPlaneDistance": 3,
+              "cameraType": "",
+              "followBaseLayerCamera": false,
+              "isLightingLayer": false,
+              "isLocked": false,
+              "name": "",
+              "renderingType": "",
+              "visibility": true,
+              "cameras": [],
+              "effects": []
+            }
+          ],
+          "instances": [
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "TurretBase",
+              "persistentUuid": "TurretBase--12--12",
+              "width": 0,
+              "x": -12,
+              "y": -12,
+              "zOrder": 1,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            },
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "Cannon",
+              "persistentUuid": "Cannon-4--3",
+              "width": 0,
+              "x": 4,
+              "y": -3,
+              "z": 3,
+              "zOrder": 2,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            },
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "Antenna",
+              "persistentUuid": "Antenna--10-8",
+              "width": 0,
+              "x": -10,
+              "y": 8,
+              "z": 10,
+              "zOrder": 3,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            }
+          ],
+          "editionSettings": {},
+          "eventsFunctions": [
+            {
+              "description": "AimCannonAt",
+              "fullName": "AimCannonAt",
+              "functionType": "Action",
+              "name": "AimCannonAt",
+              "sentence": "AimCannonAt of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::SetRotationY"
+                      },
+                      "parameters": [
+                        "Cannon",
+                        "Object3D",
+                        "=",
+                        "-ToDeg(atan2(Object.FromParentZ(TargetX, TargetY, TargetZ) - Cannon.Object3D::CenterZ(), Object.FromParentX(TargetX, TargetY, TargetZ) - Cannon.CenterX()))"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                },
+                {
+                  "description": "TargetX",
+                  "name": "TargetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "TargetY",
+                  "name": "TargetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "TargetZ",
+                  "name": "TargetZ",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleX",
+              "fullName": "MuzzleX",
+              "functionType": "Expression",
+              "name": "MuzzleX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentX(Cannon.CenterX() + Cannon.Object3D::ForwardX() * Cannon.Width() / 2, Cannon.CenterY() + Cannon.Object3D::ForwardY() * Cannon.Width() / 2, Cannon.Object3D::CenterZ() + Cannon.Object3D::ForwardZ() * Cannon.Width() / 2)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleY",
+              "fullName": "MuzzleY",
+              "functionType": "Expression",
+              "name": "MuzzleY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(Cannon.CenterX() + Cannon.Object3D::ForwardX() * Cannon.Width() / 2, Cannon.CenterY() + Cannon.Object3D::ForwardY() * Cannon.Width() / 2, Cannon.Object3D::CenterZ() + Cannon.Object3D::ForwardZ() * Cannon.Width() / 2)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleZ",
+              "fullName": "MuzzleZ",
+              "functionType": "Expression",
+              "name": "MuzzleZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentZ(Cannon.CenterX() + Cannon.Object3D::ForwardX() * Cannon.Width() / 2, Cannon.CenterY() + Cannon.Object3D::ForwardY() * Cannon.Width() / 2, Cannon.Object3D::CenterZ() + Cannon.Object3D::ForwardZ() * Cannon.Width() / 2)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "BreechX",
+              "fullName": "BreechX",
+              "functionType": "Expression",
+              "name": "BreechX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentX(Cannon.CenterX() - Cannon.Object3D::ForwardX() * Cannon.Width() / 2, Cannon.CenterY() - Cannon.Object3D::ForwardY() * Cannon.Width() / 2, Cannon.Object3D::CenterZ() - Cannon.Object3D::ForwardZ() * Cannon.Width() / 2)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "BreechY",
+              "fullName": "BreechY",
+              "functionType": "Expression",
+              "name": "BreechY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(Cannon.CenterX() - Cannon.Object3D::ForwardX() * Cannon.Width() / 2, Cannon.CenterY() - Cannon.Object3D::ForwardY() * Cannon.Width() / 2, Cannon.Object3D::CenterZ() - Cannon.Object3D::ForwardZ() * Cannon.Width() / 2)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "BreechZ",
+              "fullName": "BreechZ",
+              "functionType": "Expression",
+              "name": "BreechZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentZ(Cannon.CenterX() - Cannon.Object3D::ForwardX() * Cannon.Width() / 2, Cannon.CenterY() - Cannon.Object3D::ForwardY() * Cannon.Width() / 2, Cannon.Object3D::CenterZ() - Cannon.Object3D::ForwardZ() * Cannon.Width() / 2)"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "AntennaTopX",
+              "fullName": "AntennaTopX",
+              "functionType": "Expression",
+              "name": "AntennaTopX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentX(Antenna.CenterX(), Antenna.CenterY(), Antenna.Object3D::Z() + Antenna.Object3D::Depth())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "AntennaTopY",
+              "fullName": "AntennaTopY",
+              "functionType": "Expression",
+              "name": "AntennaTopY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(Antenna.CenterX(), Antenna.CenterY(), Antenna.Object3D::Z() + Antenna.Object3D::Depth())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "AntennaTopZ",
+              "fullName": "AntennaTopZ",
+              "functionType": "Expression",
+              "name": "AntennaTopZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentZ(Antenna.CenterX(), Antenna.CenterY(), Antenna.Object3D::Z() + Antenna.Object3D::Depth())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "eventsFunctionsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "functionName": "AimCannonAt"
+              },
+              {
+                "functionName": "MuzzleX"
+              },
+              {
+                "functionName": "MuzzleY"
+              },
+              {
+                "functionName": "MuzzleZ"
+              },
+              {
+                "functionName": "BreechX"
+              },
+              {
+                "functionName": "BreechY"
+              },
+              {
+                "functionName": "BreechZ"
+              },
+              {
+                "functionName": "AntennaTopX"
+              },
+              {
+                "functionName": "AntennaTopY"
+              },
+              {
+                "functionName": "AntennaTopZ"
+              }
+            ]
+          },
+          "propertyDescriptors": [],
+          "propertiesFolderStructure": {
+            "folderName": "__ROOT"
+          },
+          "variants": []
+        },
+        {
+          "areaMaxX": 40,
+          "areaMaxY": 25,
+          "areaMaxZ": 20,
+          "areaMinX": -40,
+          "areaMinY": -25,
+          "areaMinZ": 0,
+          "defaultName": "Tank3D",
+          "description": "",
+          "fullName": "Tank3D",
+          "helpPath": "",
+          "iconUrl": "",
+          "is3D": true,
+          "isUsingLegacyInstancesRenderer": false,
+          "name": "Tank3D",
+          "previewIconUrl": "",
+          "objects": [
+            {
+              "assetStoreId": "",
+              "name": "Hull",
+              "type": "Scene3D::Cube3DObject",
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "content": {
+                "width": 80,
+                "height": 50,
+                "depth": 20,
+                "enableTextureTransparency": false,
+                "facesOrientation": "Y",
+                "frontFaceResourceName": "white.png",
+                "backFaceResourceName": "white.png",
+                "backFaceUpThroughWhichAxisRotation": "X",
+                "leftFaceResourceName": "white.png",
+                "rightFaceResourceName": "white.png",
+                "topFaceResourceName": "white.png",
+                "bottomFaceResourceName": "white.png",
+                "frontFaceVisible": true,
+                "backFaceVisible": true,
+                "leftFaceVisible": true,
+                "rightFaceVisible": true,
+                "topFaceVisible": true,
+                "bottomFaceVisible": true,
+                "frontFaceResourceRepeat": false,
+                "backFaceResourceRepeat": false,
+                "leftFaceResourceRepeat": false,
+                "rightFaceResourceRepeat": false,
+                "topFaceResourceRepeat": false,
+                "bottomFaceResourceRepeat": false,
+                "tileScale": 1,
+                "materialType": "Basic",
+                "tint": "50;90;50",
+                "isCastingShadow": false,
+                "isReceivingShadow": false
+              }
+            },
+            {
+              "assetStoreId": "",
+              "name": "Turret3D",
+              "type": "TankKit::Turret3D",
+              "variant": "",
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "content": {}
+            }
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "Hull"
+              },
+              {
+                "objectName": "Turret3D"
+              }
+            ]
+          },
+          "objectsGroups": [],
+          "layers": [
+            {
+              "ambientLightColorB": 200,
+              "ambientLightColorG": 200,
+              "ambientLightColorR": 200,
+              "camera2DPlaneMaxDrawingDistance": 5000,
+              "camera3DFarPlaneDistance": 10000,
+              "camera3DFieldOfView": 45,
+              "camera3DNearPlaneDistance": 3,
+              "cameraType": "",
+              "followBaseLayerCamera": false,
+              "isLightingLayer": false,
+              "isLocked": false,
+              "name": "",
+              "renderingType": "",
+              "visibility": true,
+              "cameras": [],
+              "effects": []
+            }
+          ],
+          "instances": [
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "Hull",
+              "persistentUuid": "Hull--40--25",
+              "width": 0,
+              "x": -40,
+              "y": -25,
+              "zOrder": 1,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            },
+            {
+              "angle": 0,
+              "customSize": false,
+              "height": 0,
+              "layer": "",
+              "name": "Turret3D",
+              "persistentUuid": "Turret3D-10-0",
+              "width": 0,
+              "x": 10,
+              "y": 0,
+              "z": 20,
+              "zOrder": 2,
+              "numberProperties": [],
+              "stringProperties": [],
+              "initialVariables": []
+            }
+          ],
+          "editionSettings": {},
+          "eventsFunctions": [
+            {
+              "description": "AimAt",
+              "fullName": "AimAt",
+              "functionType": "Action",
+              "name": "AimAt",
+              "sentence": "AimAt of _PARAM0_",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Turret3D",
+                        "=",
+                        "AngleBetweenPositions(Turret3D.X(), Turret3D.Y(), Object.FromParentX(TargetX, TargetY, TargetZ), Object.FromParentY(TargetX, TargetY, TargetZ))"
+                      ]
+                    },
+                    {
+                      "type": {
+                        "value": "TankKit::Turret3D::AimCannonAt"
+                      },
+                      "parameters": [
+                        "Turret3D",
+                        "Object.FromParentX(TargetX, TargetY, TargetZ)",
+                        "Object.FromParentY(TargetX, TargetY, TargetZ)",
+                        "Object.FromParentZ(TargetX, TargetY, TargetZ)",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                },
+                {
+                  "description": "TargetX",
+                  "name": "TargetX",
+                  "type": "expression"
+                },
+                {
+                  "description": "TargetY",
+                  "name": "TargetY",
+                  "type": "expression"
+                },
+                {
+                  "description": "TargetZ",
+                  "name": "TargetZ",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleX",
+              "fullName": "MuzzleX",
+              "functionType": "Expression",
+              "name": "MuzzleX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentX(Turret3D.MuzzleX(), Turret3D.MuzzleY(), Turret3D.MuzzleZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleY",
+              "fullName": "MuzzleY",
+              "functionType": "Expression",
+              "name": "MuzzleY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(Turret3D.MuzzleX(), Turret3D.MuzzleY(), Turret3D.MuzzleZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "MuzzleZ",
+              "fullName": "MuzzleZ",
+              "functionType": "Expression",
+              "name": "MuzzleZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentZ(Turret3D.MuzzleX(), Turret3D.MuzzleY(), Turret3D.MuzzleZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "BreechX",
+              "fullName": "BreechX",
+              "functionType": "Expression",
+              "name": "BreechX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentX(Turret3D.BreechX(), Turret3D.BreechY(), Turret3D.BreechZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "BreechY",
+              "fullName": "BreechY",
+              "functionType": "Expression",
+              "name": "BreechY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(Turret3D.BreechX(), Turret3D.BreechY(), Turret3D.BreechZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "BreechZ",
+              "fullName": "BreechZ",
+              "functionType": "Expression",
+              "name": "BreechZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentZ(Turret3D.BreechX(), Turret3D.BreechY(), Turret3D.BreechZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "AntennaTopX",
+              "fullName": "AntennaTopX",
+              "functionType": "Expression",
+              "name": "AntennaTopX",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentX(Turret3D.AntennaTopX(), Turret3D.AntennaTopY(), Turret3D.AntennaTopZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "AntennaTopY",
+              "fullName": "AntennaTopY",
+              "functionType": "Expression",
+              "name": "AntennaTopY",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentY(Turret3D.AntennaTopX(), Turret3D.AntennaTopY(), Turret3D.AntennaTopZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "AntennaTopZ",
+              "fullName": "AntennaTopZ",
+              "functionType": "Expression",
+              "name": "AntennaTopZ",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.ToParentZ(Turret3D.AntennaTopX(), Turret3D.AntennaTopY(), Turret3D.AntennaTopZ())"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "expression"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank3D",
+                  "type": "object"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "eventsFunctionsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "functionName": "AimAt"
+              },
+              {
+                "functionName": "MuzzleX"
+              },
+              {
+                "functionName": "MuzzleY"
+              },
+              {
+                "functionName": "MuzzleZ"
+              },
+              {
+                "functionName": "BreechX"
+              },
+              {
+                "functionName": "BreechY"
+              },
+              {
+                "functionName": "BreechZ"
+              },
+              {
+                "functionName": "AntennaTopX"
+              },
+              {
+                "functionName": "AntennaTopY"
+              },
+              {
+                "functionName": "AntennaTopZ"
+              }
+            ]
+          },
+          "propertyDescriptors": [],
+          "propertiesFolderStructure": {
+            "folderName": "__ROOT"
+          },
+          "variants": []
+        }
+      ]
+    }
+  ],
+  "externalLayouts": []
+}

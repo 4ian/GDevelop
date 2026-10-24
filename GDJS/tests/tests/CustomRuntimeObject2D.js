@@ -745,6 +745,222 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
     });
 
+    describe('a child of a child', function () {
+      it('reaches the scene where the renderer draws it, converted at each boundary', async () => {
+        // A tank containing a turret: both turned, scaled and flipped, and the
+        // sprite (the cannon) turned inside the turret.
+        const { runtimeScene, customObject: tank } =
+          await makeCustomObjectWith2Children();
+        const turret = createCustomObject(tank.getChildrenContainer());
+        const cannon = turret
+          .getChildrenContainer()
+          .getInstancesOf('MySprite')[1];
+        tank.setPosition(300, 200);
+        tank.setAngle(25);
+        tank.setScaleX(1.5);
+        tank.setScaleY(0.75);
+        tank.flipX(true);
+        turret.setPosition(40, 10);
+        turret.setAngle(-70);
+        turret.setScaleX(0.5);
+        turret.flipY(true);
+        cannon.setAngle(35);
+
+        // Where Pixi draws two pixels of the cannon, in the scene and inside
+        // the turret: nothing of the runtime transformations is used.
+        for (const object of [tank, turret])
+          object.getRenderer().ensureUpToDate();
+        cannon.updatePreRender(turret.getChildrenContainer());
+        const pixiSprite = cannon.getRendererObject();
+        const getLayerContainer = (container) =>
+          container.getLayer('').getRenderer().getRendererObject();
+        const drawnIn = (container, x, y) =>
+          getLayerContainer(container).toLocal(
+            pixiSprite.toGlobal(
+              new PIXI.Point(
+                x - pixiSprite.anchor.x * pixiSprite.texture.width,
+                y - pixiSprite.anchor.y * pixiSprite.texture.height
+              )
+            )
+          );
+        const tipInTurret = drawnIn(turret.getChildrenContainer(), 60, 10);
+        const baseInTurret = drawnIn(turret.getChildrenContainer(), 4, 10);
+        const tipInScene = drawnIn(runtimeScene, 60, 10);
+        const baseInScene = drawnIn(runtimeScene, 4, 10);
+
+        // What the events of the turret then of the tank give.
+        const tipInTankX = turret.toParentX(tipInTurret.x, tipInTurret.y);
+        const tipInTankY = turret.toParentY(tipInTurret.x, tipInTurret.y);
+        expect(tank.toParentX(tipInTankX, tipInTankY)).to.be.within(
+          tipInScene.x - 1e-3,
+          tipInScene.x + 1e-3
+        );
+        expect(tank.toParentY(tipInTankX, tipInTankY)).to.be.within(
+          tipInScene.y - 1e-3,
+          tipInScene.y + 1e-3
+        );
+        const drawnAngle = gdjs.toDegrees(
+          Math.atan2(tipInScene.y - baseInScene.y, tipInScene.x - baseInScene.x)
+        );
+        const angleInTurret = gdjs.toDegrees(
+          Math.atan2(
+            tipInTurret.y - baseInTurret.y,
+            tipInTurret.x - baseInTurret.x
+          )
+        );
+        expect(angleInTurret).to.be.within(35 - 1e-3, 35 + 1e-3);
+        expect(
+          Math.abs(
+            gdjs.evtTools.common.angleDifference(
+              tank.toParentAngle(turret.toParentAngle(cannon.getAngle())),
+              drawnAngle
+            )
+          )
+        ).to.be.below(1e-3);
+
+        // And back: the scene position of the tip, inside the turret.
+        const tipInTankBackX = tank.fromParentX(tipInScene.x, tipInScene.y);
+        const tipInTankBackY = tank.fromParentY(tipInScene.x, tipInScene.y);
+        expect(turret.fromParentX(tipInTankBackX, tipInTankBackY)).to.be.within(
+          tipInTurret.x - 1e-3,
+          tipInTurret.x + 1e-3
+        );
+        expect(turret.fromParentY(tipInTankBackX, tipInTankBackY)).to.be.within(
+          tipInTurret.y - 1e-3,
+          tipInTurret.y + 1e-3
+        );
+      });
+    });
+
+    describe('toParentAngle / fromParentAngle', function () {
+      /**
+       * The angle of the direction going from the point (10;20) of the inside
+       * to the point one step further along `angle`, both converted as
+       * points: where a child turned by `angle` faces, seen from outside.
+       * @param {gdjs.CustomRuntimeObject} customObject
+       * @param {number} angle
+       */
+      const getAngleFacedOutside = (customObject, angle) => {
+        const angleInRadians = gdjs.toRad(angle);
+        const endX = 10 + 100 * Math.cos(angleInRadians);
+        const endY = 20 + 100 * Math.sin(angleInRadians);
+        return gdjs.toDegrees(
+          Math.atan2(
+            customObject.toParentY(endX, endY) - customObject.toParentY(10, 20),
+            customObject.toParentX(endX, endY) - customObject.toParentX(10, 20)
+          )
+        );
+      };
+
+      /**
+       * @param {number} actualAngle
+       * @param {number} expectedAngle
+       */
+      const expectSameDirection = (actualAngle, expectedAngle) => {
+        expect(
+          Math.abs(
+            gdjs.evtTools.common.angleDifference(actualAngle, expectedAngle)
+          )
+        ).to.be.below(1e-3);
+      };
+
+      const transformations = [
+        { scaleX: 1, scaleY: 1, flipX: false, flipY: false },
+        { scaleX: 2, scaleY: 2, flipX: true, flipY: false },
+        { scaleX: 2, scaleY: 2, flipX: false, flipY: true },
+        { scaleX: 2, scaleY: 2, flipX: true, flipY: true },
+        { scaleX: 2, scaleY: 0.5, flipX: false, flipY: false },
+        { scaleX: 0.5, scaleY: 3, flipX: true, flipY: false },
+        { scaleX: 3, scaleY: 1, flipX: true, flipY: true },
+      ];
+      const angles = [0, 30, 90, 135, 180, 250, -60];
+
+      it('gives the direction the children face, with every transformation', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setPosition(16, 8);
+        customObject.setRotationCenter(7, 11);
+        for (const transformation of transformations) {
+          for (const objectAngle of [0, 40, -100]) {
+            customObject.setAngle(objectAngle);
+            customObject.setScaleX(transformation.scaleX);
+            customObject.setScaleY(transformation.scaleY);
+            customObject.flipX(transformation.flipX);
+            customObject.flipY(transformation.flipY);
+            for (const angle of angles) {
+              expectSameDirection(
+                customObject.toParentAngle(angle),
+                getAngleFacedOutside(customObject, angle)
+              );
+            }
+          }
+        }
+      });
+
+      it('brings an angle back inside', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setRotationCenter(7, 11);
+        for (const transformation of transformations) {
+          customObject.setAngle(40);
+          customObject.setScaleX(transformation.scaleX);
+          customObject.setScaleY(transformation.scaleY);
+          customObject.flipX(transformation.flipX);
+          customObject.flipY(transformation.flipY);
+          for (const angle of angles) {
+            const parentAngle = customObject.toParentAngle(angle);
+            expect(customObject.fromParentAngle(parentAngle)).to.be.within(
+              angle - 1e-9,
+              angle + 1e-9
+            );
+          }
+        }
+      });
+
+      it('adds the angle of the object, without any rounding error nor wrapping', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setAngle(90);
+        customObject.setScale(2);
+
+        expect(customObject.toParentAngle(270)).to.be(360);
+        expect(customObject.toParentAngle(0)).to.be(90);
+        expect(customObject.fromParentAngle(90)).to.be(0);
+
+        customObject.flipX(true);
+        // Mirrored: facing right inside is facing left before the rotation.
+        expect(customObject.toParentAngle(0)).to.be(270);
+        expect(customObject.fromParentAngle(270)).to.be(0);
+      });
+
+      it('stays close to the angle it is given when scales bend it', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setScaleX(2);
+        customObject.setScaleY(0.5);
+
+        // Not -90: a child turned by 270 faces the same way, and nothing
+        // jumps by a turn when the scales change.
+        expect(customObject.toParentAngle(270)).to.be.within(
+          270 - 1e-9,
+          270 + 1e-9
+        );
+        expect(customObject.toParentAngle(45)).to.be.within(14, 15);
+      });
+
+      it('answers a direction, never NaN, when the object is collapsed', async () => {
+        const { customObject } = await makeCustomObjectWith2Children();
+        customObject.setAngle(30);
+        customObject.setScaleX(0);
+
+        // Everything inside is flattened on the Y axis of the object.
+        expectSameDirection(customObject.toParentAngle(45), 30 + 90);
+        // A direction along the collapsed axis has no length: kept as is.
+        expect(customObject.toParentAngle(0)).to.be(30);
+        expect(customObject.fromParentAngle(30 + 90)).to.be(90);
+
+        customObject.setScaleY(0);
+        expect(customObject.toParentAngle(45)).to.be(75);
+        expect(customObject.fromParentAngle(75)).to.be(45);
+      });
+    });
+
     describe('a collapsed object (a scale of 0)', function () {
       it('answers the closest point it can reach, never NaN', async () => {
         const { customObject } = await makeCustomObjectWith2Children();

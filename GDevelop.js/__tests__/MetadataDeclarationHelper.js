@@ -1219,10 +1219,32 @@ describe('MetadataDeclarationHelper', () => {
       'ToParentY',
       'FromParentX',
       'FromParentY',
+      'ToParentAngle',
+      'FromParentAngle',
     ]);
     const toParentX = objectMetadata.getAllExpressions().get('ToParentX');
     // The object, then the X and the Y of the point.
     expect(toParentX.getParametersCount()).toBe(3);
+    // The object, then the angle.
+    expect(
+      objectMetadata
+        .getAllExpressions()
+        .get('ToParentAngle')
+        .getParametersCount()
+    ).toBe(2);
+    // Only the events of the object know what is inside it.
+    [
+      'ToParentX',
+      'ToParentY',
+      'FromParentX',
+      'FromParentY',
+      'ToParentAngle',
+      'FromParentAngle',
+    ].forEach((expressionName) =>
+      expect(
+        objectMetadata.getAllExpressions().get(expressionName).isPrivate()
+      ).toBe(true)
+    );
 
     expectArray(
       objectMetadata.getAllStrExpressions().keys().toJSArray()
@@ -1278,6 +1300,10 @@ describe('MetadataDeclarationHelper', () => {
         ).toBe(4);
       })
     );
+    // A direction is converted as two points in 3D: an angle around Z alone
+    // cannot follow a tilted object.
+    expect(expressionNames).not.toContain('ToParentAngle');
+    expect(expressionNames).not.toContain('FromParentAngle');
 
     expectArray(
       objectMetadata.getDefaultBehaviors().toNewVectorString().toJSArray()

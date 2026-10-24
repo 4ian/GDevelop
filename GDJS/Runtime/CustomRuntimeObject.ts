@@ -685,6 +685,128 @@ namespace gdjs {
     }
 
     /**
+     * The angle, in the space containing this object, of a direction given by
+     * its angle inside this object: where a child turned by `angle` faces,
+     * seen from outside. The angle of the object is added to it, its flips
+     * mirror it and scales of different values on X and Y bend it, like they
+     * do to the children drawn inside.
+     *
+     * Only for 2D custom objects: in 3D, an angle around Z is not the whole
+     * direction of a child (it can be pitched), so a direction is converted as
+     * two points.
+     *
+     * @param angle The angle of the direction inside this object, in degrees.
+     */
+    toParentAngle(angle: float): float {
+      return (
+        gdjs.CustomRuntimeObject._getFlippedAngle(
+          gdjs.CustomRuntimeObject._getScaledAngle(
+            angle,
+            this.getScaleX(),
+            this.getScaleY()
+          ),
+          this._flippedX,
+          this._flippedY
+        ) + this.angle
+      );
+    }
+
+    /**
+     * The angle, inside this object, of a direction given by its angle in the
+     * space containing it: the other way round of
+     * {@link gdjs.CustomRuntimeObject.toParentAngle}.
+     *
+     * @param angle The angle of the direction in the space containing this
+     * object, in degrees.
+     */
+    fromParentAngle(angle: float): float {
+      const scaleX = this.getScaleX();
+      const scaleY = this.getScaleY();
+      // A collapsed axis gives 0 to the direction on that axis, like it gives
+      // 0 to a point.
+      return gdjs.CustomRuntimeObject._getScaledAngle(
+        gdjs.CustomRuntimeObject._getUnflippedAngle(
+          angle - this.angle,
+          this._flippedX,
+          this._flippedY
+        ),
+        scaleX === 0 ? 0 : 1 / scaleX,
+        scaleY === 0 ? 0 : 1 / scaleY
+      );
+    }
+
+    /**
+     * A direction mirrored by flips: a flip on X turns an angle `a` into
+     * `180 - a`, a flip on Y into `-a`.
+     */
+    private static _getFlippedAngle(
+      angle: float,
+      isFlippedX: boolean,
+      isFlippedY: boolean
+    ): float {
+      const angleFlippedOnX = isFlippedX ? 180 - angle : angle;
+      return isFlippedY ? -angleFlippedOnX : angleFlippedOnX;
+    }
+
+    /**
+     * The other way round of
+     * {@link gdjs.CustomRuntimeObject._getFlippedAngle}, undoing the flips in
+     * the reverse order: a round trip gives back the same number, not only
+     * the same direction.
+     */
+    private static _getUnflippedAngle(
+      angle: float,
+      isFlippedX: boolean,
+      isFlippedY: boolean
+    ): float {
+      const angleUnflippedOnY = isFlippedY ? -angle : angle;
+      return isFlippedX ? 180 - angleUnflippedOnY : angleUnflippedOnY;
+    }
+
+    /**
+     * The angle of the direction `(cos(angle) * scaleX ; sin(angle) * scaleY)`,
+     * as close as possible to `angle` (they are the same with equal scales,
+     * without any rounding error). A direction collapsed to nothing (both
+     * scales of 0, or the direction along the only collapsed axis) keeps
+     * `angle`.
+     */
+    private static _getScaledAngle(
+      angle: float,
+      scaleX: float,
+      scaleY: float
+    ): float {
+      if (scaleX === scaleY && scaleX !== 0) {
+        return angle;
+      }
+      const angleInRadians = gdjs.toRad(angle);
+      const directionX = Math.cos(angleInRadians) * scaleX;
+      const directionY = Math.sin(angleInRadians) * scaleY;
+      return gdjs.CustomRuntimeObject._getAngleOfDirection(
+        directionX,
+        directionY,
+        angle
+      );
+    }
+
+    /**
+     * The angle of a direction, in degrees, chosen among the equivalent ones
+     * (one turn apart) as the closest to `nearAngle`: a conversion is
+     * continuous, and never gives -90 for a child turned by 270. A direction
+     * of no length has no angle: `nearAngle` is kept.
+     */
+    private static _getAngleOfDirection(
+      directionX: float,
+      directionY: float,
+      nearAngle: float
+    ): float {
+      if (directionX === 0 && directionY === 0) {
+        return nearAngle;
+      }
+      const angle = gdjs.toDegrees(Math.atan2(directionY, directionX));
+      return angle + 360 * Math.round((nearAngle - angle) / 360);
+    }
+
+    /**
      * Return an array containing the coordinates of the point passed as parameter
      * in object local coordinates (as opposed to the parent coordinate coordinates).
      *

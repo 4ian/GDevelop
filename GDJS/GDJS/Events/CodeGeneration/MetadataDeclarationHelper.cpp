@@ -1354,67 +1354,114 @@ void MetadataDeclarationHelper::
 }
 
 /**
- * Declare the instructions (actions/conditions) and expressions for the
- * properties of the given events based object.
- * This is akin to what would happen by manually declaring a JS extension
- * (see `JsExtension.js` files of extensions).
- */
-/**
  * The conversions crossing the boundary of a custom object, one object at a
  * time: the children of a custom object have their own coordinates, which
- * mean nothing outside of it. A 3D custom object takes and gives a Z.
+ * mean nothing outside of it. A 3D custom object takes and gives a Z, and a 2D
+ * one also converts angles.
+ *
+ * They are private: only the events of the object itself know what is inside
+ * it. What they expose is converted, so that the scene (or the custom object
+ * containing it) never depends on how the object is made.
  */
 void MetadataDeclarationHelper::DeclareObjectCoordinateConversions(
     gd::ObjectMetadata &objectMetadata, const gd::String &objectType,
     bool isRenderedIn3D) {
-  const gd::String insideDescription =
-      _("the space where the children of this object are positioned");
-  const gd::String outsideDescription =
-      _("the space containing this object (the scene, or the custom object "
-        "holding it)");
+  auto addPoint = [&isRenderedIn3D](gd::ExpressionMetadata &expression,
+                                    bool isGivenInside) {
+    if (isGivenInside) {
+      expression.AddParameter("number", _("X position, inside the object"))
+          .AddParameter("number", _("Y position, inside the object"));
+      if (isRenderedIn3D)
+        expression.AddParameter("number", _("Z position, inside the object"));
+    } else {
+      expression
+          .AddParameter("number",
+                        _("X position, in the space containing the object"))
+          .AddParameter("number",
+                        _("Y position, in the space containing the object"));
+      if (isRenderedIn3D)
+        expression.AddParameter(
+            "number", _("Z position, in the space containing the object"));
+    }
+  };
 
   for (const auto &axis : std::vector<gd::String>{"X", "Y", "Z"}) {
     if (axis == "Z" && !isRenderedIn3D) continue;
 
-    auto addCoordinates = [&isRenderedIn3D](
-                              gd::ExpressionMetadata &expression,
-                              const gd::String &spaceDescription) {
-      expression.AddParameter("number", _("X position, in ") + spaceDescription)
-          .AddParameter("number", _("Y position, in ") + spaceDescription);
-      if (isRenderedIn3D) {
-        expression.AddParameter("number",
-                                _("Z position, in ") + spaceDescription);
-      }
-    };
-
     auto &toParent =
         objectMetadata
-            .AddExpression("ToParent" + axis,
-                           axis + _(" of a point of the inside, outside"),
-                           _("the ") + axis +
-                               _(" position, in the space containing this "
-                                 "object, of a point given inside it"),
-                           _("Position ❯ Coordinates"),
-                           "res/actions/position_black.png")
+            .AddExpression(
+                "ToParent" + axis,
+                _("<axis> of a point inside the object, in its parent")
+                    .FindAndReplace("<axis>", axis),
+                _("Convert a point given inside the object (where its child "
+                  "objects are positioned) to the space containing the object "
+                  "(the scene, or the custom object containing it), and "
+                  "return its <axis> position. Use it to expose the position "
+                  "of a child object (or of a point of it) to the parent.")
+                    .FindAndReplace("<axis>", axis),
+                _("Position ❯ Coordinates"), "res/actions/position_black.png")
             .AddParameter("object", _("Object"), objectType);
-    addCoordinates(toParent, insideDescription);
-    toParent.SetFunctionName("toParent" + axis);
+    addPoint(toParent, true);
+    toParent.SetPrivate().SetFunctionName("toParent" + axis);
 
     auto &fromParent =
         objectMetadata
-            .AddExpression("FromParent" + axis,
-                           axis + _(" of a point of the outside, inside"),
-                           _("the ") + axis +
-                               _(" position, inside this object, of a point "
-                                 "given in the space containing it"),
-                           _("Position ❯ Coordinates"),
-                           "res/actions/position_black.png")
+            .AddExpression(
+                "FromParent" + axis,
+                _("<axis> of a point of the parent, inside the object")
+                    .FindAndReplace("<axis>", axis),
+                _("Convert a point given in the space containing the object "
+                  "(the scene, or the custom object containing it) to the "
+                  "inside of the object (where its child objects are "
+                  "positioned), and return its <axis> position. Use it to "
+                  "bring a position given by the parent (a target, the "
+                  "cursor...) to the child objects.")
+                    .FindAndReplace("<axis>", axis),
+                _("Position ❯ Coordinates"), "res/actions/position_black.png")
             .AddParameter("object", _("Object"), objectType);
-    addCoordinates(fromParent, outsideDescription);
-    fromParent.SetFunctionName("fromParent" + axis);
+    addPoint(fromParent, false);
+    fromParent.SetPrivate().SetFunctionName("fromParent" + axis);
   }
+
+  // An angle around Z is the whole orientation of a 2D object only: in 3D, a
+  // direction tilted by a rotation on X or Y keeps no meaning as an angle
+  // across a tilted object. Directions are converted as two points there.
+  if (isRenderedIn3D) return;
+
+  objectMetadata
+      .AddExpression(
+          "ToParentAngle", _("Angle inside the object, to its parent"),
+          _("Convert an angle (a direction, in degrees) given inside the "
+            "object (where its child objects are positioned) to the space "
+            "containing the object (the scene, or the custom object containing "
+            "it). The angle, flips and scales of the object are applied. Use "
+            "it to expose the angle of a child object to the parent."),
+          _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+      .AddParameter("object", _("Object"), objectType)
+      .AddParameter("number", _("Angle, inside the object (in degrees)"))
+      .SetPrivate()
+      .SetFunctionName("toParentAngle");
+
+  objectMetadata
+      .AddExpression(
+          "FromParentAngle", _("Angle of the parent, inside the object"),
+          _("Convert an angle (a direction, in degrees) given in the space "
+            "containing the object (the scene, or the custom object "
+            "containing it) to the inside of the object (where its child "
+            "objects are positioned)."),
+          _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+      .AddParameter("object", _("Object"), objectType)
+      .AddParameter("number",
+                    _("Angle, in the space containing the object (in degrees)"))
+      .SetPrivate()
+      .SetFunctionName("fromParentAngle");
 }
 
+/**
+ * Declare the instructions (actions/conditions) and expressions that only
+ * the events of the given events based object can use.
+ */
 void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
     gd::PlatformExtension &extension, gd::ObjectMetadata &objectMetadata,
     const gd::EventsBasedObject &eventsBasedObject) {

@@ -605,6 +605,8 @@ export default class PixiResourcesLoader {
 
       // Also reload any resource embedding this resource:
       await this._reloadEmbedderResources(project, resourceName, 'atlas');
+      // (like 3D models keeping their textures in separate files).
+      await this._reloadEmbedderResources(project, resourceName, 'model3D');
     }
 
     await PixiResourcesLoader.loadTextures(project, [resourceName]);

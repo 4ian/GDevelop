@@ -288,6 +288,7 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
         } else if (parameterMetadata.GetType() == "model3DResource") {
           gd::String updatedParameterValue = parameterValue;
           worker.ExposeModel3D(updatedParameterValue);
+          worker.ExposeEmbeddeds(updatedParameterValue);
           instruction.SetParameter(parameterIndex, updatedParameterValue);
         } else if (parameterMetadata.GetType() == "atlasResource") {
           gd::String updatedParameterValue = parameterValue;

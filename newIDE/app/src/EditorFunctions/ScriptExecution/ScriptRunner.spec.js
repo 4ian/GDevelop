@@ -47,6 +47,38 @@ const getErrorOrThrow = (
 };
 
 describe('executeScript', () => {
+  it.each([
+    [true, false, true, true],
+    [false, true, true, true],
+    [true, true, false, undefined],
+    [true, false, false, undefined],
+  ])(
+    'honors explicit mutation metadata (modifiesProject=%s, success=%s, didModifyProject=%s)',
+    async (modifiesProject, success, didModifyProject, expected) => {
+      const result = await executeScript({
+        jsCode: 'await change_something({});',
+        exposedFunctions: [
+          makeFakeFunction({
+            name: 'change_something',
+            modifiesProject,
+            launch: async () => ({
+              success,
+              message: 'Result of the change.',
+              meta: { didModifyProject },
+            }),
+          }),
+        ],
+      });
+
+      expect(result.success).toBe(success);
+      expect(result.functionCallRecords).toHaveLength(1);
+      expect(result.functionCallRecords[0].didModifyProject).toBe(expected);
+      expect(result.functionCallRecords[0].output).toEqual({
+        message: 'Result of the change.',
+      });
+    }
+  );
+
   it('runs a script calling several functions sequentially and reports everything', async () => {
     const calls: Array<{ name: string, args: any }> = [];
     const createScene = makeFakeFunction({

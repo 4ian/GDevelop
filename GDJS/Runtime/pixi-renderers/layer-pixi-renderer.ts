@@ -507,6 +507,11 @@ namespace gdjs {
             this._threeScene,
             this._threeCamera
           );
+          // Keep a stencil buffer, like the render targets of the composer.
+          const { renderTarget, depthTexture } = this._sceneDepthRenderPass;
+          renderTarget.stencilBuffer = true;
+          depthTexture.format = THREE.DepthStencilFormat;
+          depthTexture.type = THREE.UnsignedInt248Type;
         }
         sceneRenderPass = this._sceneDepthRenderPass;
       }
@@ -588,6 +593,10 @@ namespace gdjs {
             this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
               threeRenderer
             );
+            // Keep a stencil buffer when the layer is rendered through
+            // post-processing passes, like when it's rendered on the canvas.
+            this._threeEffectComposer.renderTarget1.stencilBuffer = true;
+            this._threeEffectComposer.renderTarget2.stencilBuffer = true;
             this._threeRenderPass = new THREE_ADDONS.RenderPass(
               this._threeScene,
               this._threeCamera

@@ -105,10 +105,18 @@
         "userAdded": false
       },
       {
-        "file": "marker.png",
+        "file": "crosshair.png",
         "kind": "image",
         "metadata": "",
-        "name": "marker.png",
+        "name": "crosshair.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "selection.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "selection.png",
         "smoothed": true,
         "userAdded": false
       }
@@ -138,10 +146,15 @@
         {
           "name": "AimMode",
           "type": "number",
-          "value": 0
+          "value": 1
         },
         {
           "name": "Heading",
+          "type": "number",
+          "value": -90
+        },
+        {
+          "name": "SelectedId",
           "type": "number",
           "value": 0
         }
@@ -153,10 +166,10 @@
           "height": 0,
           "layer": "",
           "name": "Tank",
-          "persistentUuid": "Tank-140-150",
+          "persistentUuid": "Tank-140-170",
           "width": 0,
           "x": 140,
-          "y": 150,
+          "y": 170,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -174,10 +187,10 @@
           "height": 0,
           "layer": "",
           "name": "Tank",
-          "persistentUuid": "Tank-400-150",
+          "persistentUuid": "Tank-400-170",
           "width": 0,
           "x": 400,
-          "y": 150,
+          "y": 170,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -195,10 +208,10 @@
           "height": 0,
           "layer": "",
           "name": "Tank",
-          "persistentUuid": "Tank-660-150",
+          "persistentUuid": "Tank-660-170",
           "width": 0,
           "x": 660,
-          "y": 150,
+          "y": 170,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -216,10 +229,10 @@
           "height": 0,
           "layer": "",
           "name": "Tank",
-          "persistentUuid": "Tank-270-400",
+          "persistentUuid": "Tank-270-420",
           "width": 0,
           "x": 270,
-          "y": 400,
+          "y": 420,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -237,10 +250,10 @@
           "height": 0,
           "layer": "",
           "name": "Tank",
-          "persistentUuid": "Tank-530-400",
+          "persistentUuid": "Tank-530-420",
           "width": 0,
           "x": 530,
-          "y": 400,
+          "y": 420,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -251,6 +264,51 @@
               "value": 4
             }
           ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Crosshair",
+          "persistentUuid": "Crosshair-400-300",
+          "width": 0,
+          "x": 400,
+          "y": 300,
+          "zOrder": 10,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "Selection",
+          "persistentUuid": "Selection-140-170",
+          "width": 0,
+          "x": 140,
+          "y": 170,
+          "zOrder": 9,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "UI",
+          "name": "Hud",
+          "persistentUuid": "Hud-8-6",
+          "width": 0,
+          "x": 8,
+          "y": 6,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -384,18 +442,18 @@
                   "sprites": [
                     {
                       "hasCustomCollisionMask": false,
-                      "image": "marker.png",
+                      "image": "crosshair.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 4,
-                        "y": 4
+                        "x": 13,
+                        "y": 13
                       },
                       "centerPoint": {
                         "automatic": false,
                         "name": "centre",
-                        "x": 4,
-                        "y": 4
+                        "x": 13,
+                        "y": 13
                       },
                       "customCollisionMask": []
                     }
@@ -404,6 +462,90 @@
               ]
             }
           ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Selection",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "selection.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 32,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": false,
+                        "name": "centre",
+                        "x": 32,
+                        "y": 32
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Hud",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 14,
+          "color": {
+            "b": 50,
+            "g": 20,
+            "r": 20
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": true,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 3,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "",
+            "font": "",
+            "textAlignment": "left",
+            "verticalTextAlignment": "top",
+            "characterSize": 14,
+            "lineHeight": 0,
+            "color": "20;20;50"
+          }
         }
       ],
       "objectsFolderStructure": {
@@ -420,10 +562,28 @@
           },
           {
             "objectName": "Crosshair"
+          },
+          {
+            "objectName": "Selection"
+          },
+          {
+            "objectName": "Hud"
           }
         ]
       },
       "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "A tank (custom object) contains a turret (custom object) containing a cannon (sprite). The scene only uses the functions of the tank, which convert positions and angles with ToParentX/Y/Angle and FromParentX/Y/Angle at each level. The controls are listed on screen."
+        },
         {
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
@@ -469,6 +629,18 @@
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Attach a flag to the flag point of each tank (Tank.FlagX/FlagY/FlagAngle)."
         },
         {
           "type": "BuiltinCommonInstructions::ForEach",
@@ -519,6 +691,390 @@
           ]
         },
         {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Select a tank: Tab, or the keys 1 to 5."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Tab\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "SelectedId",
+                "=",
+                "mod(SelectedId + 1, 5)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Num1\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "SelectedId",
+                "=",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Num2\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "SelectedId",
+                "=",
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Num3\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "SelectedId",
+                "=",
+                "2"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Num4\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "SelectedId",
+                "=",
+                "3"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Num5\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "SelectedId",
+                "=",
+                "4"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Move (arrows), turn (A/D), scale (T/G on X, Y/H on Y) and flip (7, 8) the selected tank: anything the tank goes through, the conversions follow."
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "",
+            "  const input = runtimeScene.getGame().getInputManager();",
+            "  const isPressed = (name) => input.isKeyPressed(gdjs.evtTools.input.keysNameToCode[name]);",
+            "  const wasJustPressed = (name) => input.wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[name]);",
+            "  const deltaTime = runtimeScene.getElapsedTime() / 1000;",
+            "  const variables = runtimeScene.getVariables();",
+            "",
+            "      const selectedId = variables.get('SelectedId').getAsNumber();",
+            "      const tank = runtimeScene.getObjects('Tank').find((object) => object.getVariables().get('Id').getAsNumber() === selectedId);",
+            "      if (!tank) return;",
+            "      const speed = 200 * deltaTime;",
+            "      if (isPressed('Left')) tank.setX(tank.getX() - speed);",
+            "      if (isPressed('Right')) tank.setX(tank.getX() + speed);",
+            "      if (isPressed('Up')) tank.setY(tank.getY() - speed);",
+            "      if (isPressed('Down')) tank.setY(tank.getY() + speed);",
+            "      if (isPressed('a')) tank.setAngle(tank.getAngle() - 90 * deltaTime);",
+            "      if (isPressed('d')) tank.setAngle(tank.getAngle() + 90 * deltaTime);",
+            "      const scaleSpeed = deltaTime;",
+            "      if (isPressed('t')) tank.setScaleX(tank.getScaleX() + scaleSpeed);",
+            "      if (isPressed('g')) tank.setScaleX(Math.max(0, tank.getScaleX() - scaleSpeed));",
+            "      if (isPressed('y')) tank.setScaleY(tank.getScaleY() + scaleSpeed);",
+            "      if (isPressed('h')) tank.setScaleY(Math.max(0, tank.getScaleY() - scaleSpeed));",
+            "      if (wasJustPressed('Num7')) tank.flipX(!tank.isFlippedX());",
+            "      if (wasJustPressed('Num8')) tank.flipY(!tank.isFlippedY());",
+            "    "
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Aim mode (M): 0 = by hand (Q/E turn the turret, Z/C the cannon), 1 = at the cursor (AimAt, with FromParentX/Y), 2 = along a heading (J/L or the mouse wheel, SetCannonHeading with FromParentAngle)."
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"m\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "mod(AimMode + 1, 3)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "NumberObjectVariable"
+              },
+              "parameters": [
+                "Tank",
+                "Id",
+                "=",
+                "SelectedId"
+              ]
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "q"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TankKit::Tank::TurnTurret"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "-90 * TimeDelta()",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "e"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TankKit::Tank::TurnTurret"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "90 * TimeDelta()",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "z"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TankKit::Tank::TurnCannon"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "-90 * TimeDelta()",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "c"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "TankKit::Tank::TurnCannon"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "90 * TimeDelta()",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
@@ -542,6 +1098,52 @@
                 "MouseX()",
                 "MouseY()",
                 ""
+              ]
+            },
+            {
+              "type": {
+                "value": "Show"
+              },
+              "parameters": [
+                "Crosshair",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Crosshair",
+                "=",
+                "MouseX()",
+                "=",
+                "MouseY()"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "!=",
+                "1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Hide"
+              },
+              "parameters": [
+                "Crosshair"
               ]
             }
           ]
@@ -571,7 +1173,89 @@
                 ""
               ]
             }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "j"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Heading",
+                    "-",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "l"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Heading",
+                    "+",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "Heading",
+                    "+",
+                    "MouseWheelDelta() / 10"
+                  ]
+                }
+              ]
+            }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Fire (Space): a bullet from each muzzle (Tank.MuzzleX/MuzzleY), along the cannon (Tank.MuzzleAngle)."
         },
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -640,6 +1324,168 @@
               ]
             }
           ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PosX"
+              },
+              "parameters": [
+                "Bullet",
+                "<",
+                "-2000"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Delete"
+              },
+              "parameters": [
+                "Bullet",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PosX"
+              },
+              "parameters": [
+                "Bullet",
+                ">",
+                "3000"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Delete"
+              },
+              "parameters": [
+                "Bullet",
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Camera: drag with the right mouse button to move it, PageUp/PageDown to zoom, Home to reset it."
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "",
+            "  const input = runtimeScene.getGame().getInputManager();",
+            "  const isPressed = (name) => input.isKeyPressed(gdjs.evtTools.input.keysNameToCode[name]);",
+            "  const wasJustPressed = (name) => input.wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[name]);",
+            "  const deltaTime = runtimeScene.getElapsedTime() / 1000;",
+            "  const variables = runtimeScene.getVariables();",
+            "",
+            "      const layer = runtimeScene.getLayer('');",
+            "      const cursorX = input.getCursorX();",
+            "      const cursorY = input.getCursorY();",
+            "      const camera = runtimeScene.__manualCamera || (runtimeScene.__manualCamera = { lastCursorX: cursorX, lastCursorY: cursorY });",
+            "      if (input.isMouseButtonPressed(gdjs.InputManager.MOUSE_RIGHT_BUTTON)) {",
+            "        const zoom = layer.getCameraZoom();",
+            "        layer.setCameraX(layer.getCameraX() - (cursorX - camera.lastCursorX) / zoom);",
+            "        layer.setCameraY(layer.getCameraY() - (cursorY - camera.lastCursorY) / zoom);",
+            "      }",
+            "      camera.lastCursorX = cursorX;",
+            "      camera.lastCursorY = cursorY;",
+            "      if (isPressed('PageUp')) layer.setCameraZoom(layer.getCameraZoom() * (1 + deltaTime));",
+            "      if (isPressed('PageDown')) layer.setCameraZoom(layer.getCameraZoom() / (1 + deltaTime));",
+            "      if (wasJustPressed('Home')) {",
+            "        layer.setCameraZoom(1);",
+            "        layer.setCameraX(runtimeScene.getGame().getGameResolutionWidth() / 2);",
+            "        layer.setCameraY(runtimeScene.getGame().getGameResolutionHeight() / 2);",
+            "      }",
+            "    "
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
+        },
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "What the selected tank gives through its functions, on screen."
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": [
+            "",
+            "  const input = runtimeScene.getGame().getInputManager();",
+            "  const isPressed = (name) => input.isKeyPressed(gdjs.evtTools.input.keysNameToCode[name]);",
+            "  const wasJustPressed = (name) => input.wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[name]);",
+            "  const deltaTime = runtimeScene.getElapsedTime() / 1000;",
+            "  const variables = runtimeScene.getVariables();",
+            "",
+            "      const hud = runtimeScene.getObjects('Hud')[0];",
+            "      const ring = runtimeScene.getObjects('Selection')[0];",
+            "      const selectedId = variables.get('SelectedId').getAsNumber();",
+            "      const tank = runtimeScene.getObjects('Tank').find((object) => object.getVariables().get('Id').getAsNumber() === selectedId);",
+            "      const aimMode = variables.get('AimMode').getAsNumber();",
+            "      const f = (value) => value.toFixed(1);",
+            "      const cursorX = gdjs.evtTools.input.getCursorX(runtimeScene, '', 0);",
+            "      const cursorY = gdjs.evtTools.input.getCursorY(runtimeScene, '', 0);",
+            "      const aimModes = [",
+            "        'by hand (Q/E turret, Z/C cannon)',",
+            "        'at the cursor (FromParentX/Y)',",
+            "        'along a heading of ' + f(variables.get('Heading').getAsNumber()) + '° (J/L or wheel, FromParentAngle)',",
+            "      ];",
+            "      const lines = [",
+            "        'Tab or 1-5: select a tank   Space: fire   M: aim mode - ' + aimModes[aimMode],",
+            "        'Arrows: move   A/D: turn   T/G: scale X   Y/H: scale Y   7/8: flip X/Y',",
+            "        'Right drag: move the camera   PageUp/PageDown: zoom   Home: reset the camera',",
+            "      ];",
+            "      if (tank) {",
+            "        lines.push(",
+            "          'Tank ' + (selectedId + 1) + ': position ' + f(tank.getX()) + ' ; ' + f(tank.getY()) + '   angle ' + f(tank.getAngle()) +",
+            "            '°   scale ' + f(tank.getScaleX()) + ' x ' + f(tank.getScaleY()) +",
+            "            (tank.isFlippedX() ? '   flipped on X' : '') + (tank.isFlippedY() ? '   flipped on Y' : ''),",
+            "          'Muzzle (ToParentX/Y): ' + f(tank.MuzzleX()) + ' ; ' + f(tank.MuzzleY()) + '   angle (ToParentAngle): ' + f(tank.MuzzleAngle()) + '°',",
+            "          'Flag point: ' + f(tank.FlagX()) + ' ; ' + f(tank.FlagY()) + '   distance from the muzzle to the cursor: ' +",
+            "            f(gdjs.evtTools.common.distanceBetweenPositions(tank.MuzzleX(), tank.MuzzleY(), cursorX, cursorY))",
+            "        );",
+            "      }",
+            "      if (hud) hud.setText(lines.join('\\n'));",
+            "      if (ring) {",
+            "        ring.hide(!tank);",
+            "        if (tank) {",
+            "          ring.setPosition(tank.getCenterXInScene(), tank.getCenterYInScene());",
+            "          ring.setScale(Math.max(tank.getWidth(), tank.getHeight(), 20) / 50);",
+            "        }",
+            "      }",
+            "    "
+          ],
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": false
         }
       ],
       "layers": [
@@ -671,6 +1517,24 @@
             }
           ],
           "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "UI",
+          "renderingType": "2d",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
         }
       ],
       "behaviorsSharedData": []
@@ -690,8 +1554,10 @@
         "// (converted with FromParentX/Y/Angle at each level). Everything is compared",
         "// with where the renderer (Pixi) actually draws the parts of the tank.",
         "harness.setRandomSeed(42);",
-        "await harness.stepFrames(2);",
         "const scene = harness.getCurrentRuntimeScene();",
+        "// The game starts aiming at the cursor, for a player: the test sets each mode.",
+        "scene.getVariables().get('AimMode').setNumber(0);",
+        "await harness.stepFrames(2);",
         "const sceneLayerContainer = scene.getLayer('').getRenderer().getRendererObject();",
         "const random = (min, max) => min + Math.random() * (max - min);",
         "const angleDifference = (a, b) => Math.abs(((((a - b) % 360) + 540) % 360) - 180);",
@@ -852,12 +1718,10 @@
         "    }",
         "  }",
         "  report('Aim at the cursor (FromParentX/Y)', { cannonToCursorAngle: worstAim }, 1e-3);",
-        "  // The cursor in the middle, shown by a crosshair: every cannon points at it.",
+        "  // The cursor in the middle, shown by the crosshair of the game: every",
+        "  // cannon points at it.",
         "  layOutTanks();",
         "  harness.setMousePosition(400, 300);",
-        "  const crosshair = scene.createObject('Crosshair');",
-        "  crosshair.setPosition(400, 300);",
-        "  crosshair.setScale(3);",
         "  await harness.stepFrames(1);",
         "  deleteBullets();",
         "  await fireVolleys(8);",
@@ -865,11 +1729,9 @@
         "  // And somewhere else, after the tanks moved.",
         "  layOutTanks();",
         "  harness.setMousePosition(620, 140);",
-        "  crosshair.setPosition(620, 140);",
         "  deleteBullets();",
         "  await fireVolleys(8);",
         "  await harness.takeScreenshot('Aiming at the crosshair after the tanks moved', { fullResolution: true });",
-        "  crosshair.deleteFromScene();",
         "  deleteBullets();",
         "}",
         "",
@@ -1115,11 +1977,11 @@
           "editionSettings": {},
           "eventsFunctions": [
             {
-              "description": "AimAt",
-              "fullName": "AimAt",
+              "description": "Turn the cannon toward a position given in the space containing the turret.",
+              "fullName": "Aim the cannon at a position",
               "functionType": "Action",
               "name": "AimAt",
-              "sentence": "AimAt of _PARAM0_",
+              "sentence": "Aim the cannon of _PARAM0_ at _PARAM1_ ; _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -1146,12 +2008,12 @@
                   "type": "object"
                 },
                 {
-                  "description": "TargetX",
+                  "description": "X position of the target",
                   "name": "TargetX",
                   "type": "expression"
                 },
                 {
-                  "description": "TargetY",
+                  "description": "Y position of the target",
                   "name": "TargetY",
                   "type": "expression"
                 }
@@ -1159,11 +2021,11 @@
               "objectGroups": []
             },
             {
-              "description": "SetCannonHeading",
-              "fullName": "SetCannonHeading",
+              "description": "Turn the cannon so that it points along an angle given in the space containing the turret.",
+              "fullName": "Point the cannon along a heading",
               "functionType": "Action",
               "name": "SetCannonHeading",
-              "sentence": "SetCannonHeading of _PARAM0_",
+              "sentence": "Point the cannon of _PARAM0_ along _PARAM1_°",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -1190,7 +2052,7 @@
                   "type": "object"
                 },
                 {
-                  "description": "Heading",
+                  "description": "Heading (in degrees)",
                   "name": "Heading",
                   "type": "expression"
                 }
@@ -1198,8 +2060,47 @@
               "objectGroups": []
             },
             {
-              "description": "MuzzleX",
-              "fullName": "MuzzleX",
+              "description": "Turn the cannon by an angle.",
+              "fullName": "Turn the cannon",
+              "functionType": "Action",
+              "name": "TurnCannon",
+              "sentence": "Turn the cannon of _PARAM0_ by _PARAM1_°",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Cannon",
+                        "+",
+                        "Angle"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Turret",
+                  "type": "object"
+                },
+                {
+                  "description": "Angle to add (in degrees)",
+                  "name": "Angle",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The position of the muzzle of the cannon, in the space containing the turret (X).",
+              "fullName": "Muzzle position (X)",
               "functionType": "Expression",
               "name": "MuzzleX",
               "sentence": "",
@@ -1233,8 +2134,8 @@
               "objectGroups": []
             },
             {
-              "description": "MuzzleY",
-              "fullName": "MuzzleY",
+              "description": "The position of the muzzle of the cannon, in the space containing the turret (Y).",
+              "fullName": "Muzzle position (Y)",
               "functionType": "Expression",
               "name": "MuzzleY",
               "sentence": "",
@@ -1268,8 +2169,8 @@
               "objectGroups": []
             },
             {
-              "description": "MuzzleAngle",
-              "fullName": "MuzzleAngle",
+              "description": "The angle the cannon points at, in the space containing the turret.",
+              "fullName": "Muzzle angle",
               "functionType": "Expression",
               "name": "MuzzleAngle",
               "sentence": "",
@@ -1311,6 +2212,9 @@
               },
               {
                 "functionName": "SetCannonHeading"
+              },
+              {
+                "functionName": "TurnCannon"
               },
               {
                 "functionName": "MuzzleX"
@@ -1470,11 +2374,11 @@
           "editionSettings": {},
           "eventsFunctions": [
             {
-              "description": "AimAt",
-              "fullName": "AimAt",
+              "description": "Turn the cannon toward a position given in the space containing the tank (the scene).",
+              "fullName": "Aim the cannon at a position",
               "functionType": "Action",
               "name": "AimAt",
-              "sentence": "AimAt of _PARAM0_",
+              "sentence": "Aim the cannon of _PARAM0_ at _PARAM1_ ; _PARAM2_",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -1502,12 +2406,12 @@
                   "type": "object"
                 },
                 {
-                  "description": "TargetX",
+                  "description": "X position of the target",
                   "name": "TargetX",
                   "type": "expression"
                 },
                 {
-                  "description": "TargetY",
+                  "description": "Y position of the target",
                   "name": "TargetY",
                   "type": "expression"
                 }
@@ -1515,11 +2419,11 @@
               "objectGroups": []
             },
             {
-              "description": "SetCannonHeading",
-              "fullName": "SetCannonHeading",
+              "description": "Turn the cannon so that it points along an angle given in the space containing the tank (the scene).",
+              "fullName": "Point the cannon along a heading",
               "functionType": "Action",
               "name": "SetCannonHeading",
-              "sentence": "SetCannonHeading of _PARAM0_",
+              "sentence": "Point the cannon of _PARAM0_ along _PARAM1_°",
               "events": [
                 {
                   "type": "BuiltinCommonInstructions::Standard",
@@ -1546,7 +2450,7 @@
                   "type": "object"
                 },
                 {
-                  "description": "Heading",
+                  "description": "Heading (in degrees)",
                   "name": "Heading",
                   "type": "expression"
                 }
@@ -1554,8 +2458,86 @@
               "objectGroups": []
             },
             {
-              "description": "MuzzleX",
-              "fullName": "MuzzleX",
+              "description": "Turn the turret by an angle.",
+              "fullName": "Turn the turret",
+              "functionType": "Action",
+              "name": "TurnTurret",
+              "sentence": "Turn the turret of _PARAM0_ by _PARAM1_°",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetAngle"
+                      },
+                      "parameters": [
+                        "Turret",
+                        "+",
+                        "Angle"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                },
+                {
+                  "description": "Angle to add (in degrees)",
+                  "name": "Angle",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Turn the cannon by an angle, on its turret.",
+              "fullName": "Turn the cannon",
+              "functionType": "Action",
+              "name": "TurnCannon",
+              "sentence": "Turn the cannon of _PARAM0_ by _PARAM1_°",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "TankKit::Turret::TurnCannon"
+                      },
+                      "parameters": [
+                        "Turret",
+                        "Angle",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "supplementaryInformation": "TankKit::Tank",
+                  "type": "object"
+                },
+                {
+                  "description": "Angle to add (in degrees)",
+                  "name": "Angle",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "The position of the muzzle of the cannon, in the scene (X).",
+              "fullName": "Muzzle position (X)",
               "functionType": "Expression",
               "name": "MuzzleX",
               "sentence": "",
@@ -1589,8 +2571,8 @@
               "objectGroups": []
             },
             {
-              "description": "MuzzleY",
-              "fullName": "MuzzleY",
+              "description": "The position of the muzzle of the cannon, in the scene (Y).",
+              "fullName": "Muzzle position (Y)",
               "functionType": "Expression",
               "name": "MuzzleY",
               "sentence": "",
@@ -1624,8 +2606,8 @@
               "objectGroups": []
             },
             {
-              "description": "MuzzleAngle",
-              "fullName": "MuzzleAngle",
+              "description": "The angle the cannon points at, in the scene.",
+              "fullName": "Muzzle angle",
               "functionType": "Expression",
               "name": "MuzzleAngle",
               "sentence": "",
@@ -1659,8 +2641,8 @@
               "objectGroups": []
             },
             {
-              "description": "FlagX",
-              "fullName": "FlagX",
+              "description": "The point of the body where a flag is attached, in the scene (X).",
+              "fullName": "Flag point (X)",
               "functionType": "Expression",
               "name": "FlagX",
               "sentence": "",
@@ -1694,8 +2676,8 @@
               "objectGroups": []
             },
             {
-              "description": "FlagY",
-              "fullName": "FlagY",
+              "description": "The point of the body where a flag is attached, in the scene (Y).",
+              "fullName": "Flag point (Y)",
               "functionType": "Expression",
               "name": "FlagY",
               "sentence": "",
@@ -1729,8 +2711,8 @@
               "objectGroups": []
             },
             {
-              "description": "FlagAngle",
-              "fullName": "FlagAngle",
+              "description": "The angle of the body, where a flag is attached, in the scene.",
+              "fullName": "Flag angle",
               "functionType": "Expression",
               "name": "FlagAngle",
               "sentence": "",
@@ -1772,6 +2754,12 @@
               },
               {
                 "functionName": "SetCannonHeading"
+              },
+              {
+                "functionName": "TurnTurret"
+              },
+              {
+                "functionName": "TurnCannon"
               },
               {
                 "functionName": "MuzzleX"

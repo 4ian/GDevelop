@@ -157,6 +157,46 @@
           "name": "SelectedId",
           "type": "number",
           "value": 0
+        },
+        {
+          "name": "FlipTo",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "DragDx",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "DragDy",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "LastCursorX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "LastCursorY",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "AimModeText",
+          "type": "string",
+          "value": ""
+        },
+        {
+          "name": "TankText",
+          "type": "string",
+          "value": ""
+        },
+        {
+          "name": "FlipText",
+          "type": "string",
+          "value": ""
         }
       ],
       "instances": [
@@ -871,37 +911,535 @@
           "comment": "Move (arrows), turn (A/D), scale (T/G on X, Y/H on Y) and flip (7, 8) the selected tank: anything the tank goes through, the conversions follow."
         },
         {
-          "type": "BuiltinCommonInstructions::JsCode",
-          "inlineCode": [
-            "",
-            "  const input = runtimeScene.getGame().getInputManager();",
-            "  const isPressed = (name) => input.isKeyPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const wasJustPressed = (name) => input.wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const deltaTime = runtimeScene.getElapsedTime() / 1000;",
-            "  const variables = runtimeScene.getVariables();",
-            "",
-            "      const selectedId = variables.get('SelectedId').getAsNumber();",
-            "      const tank = runtimeScene.getObjects('Tank').find((object) => object.getVariables().get('Id').getAsNumber() === selectedId);",
-            "      if (!tank) return;",
-            "      const speed = 200 * deltaTime;",
-            "      if (isPressed('Left')) tank.setX(tank.getX() - speed);",
-            "      if (isPressed('Right')) tank.setX(tank.getX() + speed);",
-            "      if (isPressed('Up')) tank.setY(tank.getY() - speed);",
-            "      if (isPressed('Down')) tank.setY(tank.getY() + speed);",
-            "      if (isPressed('a')) tank.setAngle(tank.getAngle() - 90 * deltaTime);",
-            "      if (isPressed('d')) tank.setAngle(tank.getAngle() + 90 * deltaTime);",
-            "      const scaleSpeed = deltaTime;",
-            "      if (isPressed('t')) tank.setScaleX(tank.getScaleX() + scaleSpeed);",
-            "      if (isPressed('g')) tank.setScaleX(Math.max(0, tank.getScaleX() - scaleSpeed));",
-            "      if (isPressed('y')) tank.setScaleY(tank.getScaleY() + scaleSpeed);",
-            "      if (isPressed('h')) tank.setScaleY(Math.max(0, tank.getScaleY() - scaleSpeed));",
-            "      if (wasJustPressed('Num7')) tank.flipX(!tank.isFlippedX());",
-            "      if (wasJustPressed('Num8')) tank.flipY(!tank.isFlippedY());",
-            "    "
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberObjectVariable"
+              },
+              "parameters": [
+                "Tank",
+                "Id",
+                "=",
+                "SelectedId"
+              ]
+            }
           ],
-          "parameterObjects": "",
-          "useStrict": true,
-          "eventsSheetExpanded": false
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetX"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "-",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Right"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetX"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "+",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Up"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetY"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "-",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Down"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetY"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "+",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "a"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "-",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "d"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "+",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "t"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "Scale",
+                    "+",
+                    "TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "g"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "Scale",
+                    "=",
+                    "max(0, Tank.Scale::X() - TimeDelta())"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "y"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "Scale",
+                    "+",
+                    "TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "h"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "Scale",
+                    "=",
+                    "max(0, Tank.Scale::Y() - TimeDelta())"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextJustPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Num7\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlippedX"
+                      },
+                      "parameters": [
+                        "Tank",
+                        "Flippable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "FlippableCapability::FlippableBehavior::FlippedX"
+                      },
+                      "parameters": [
+                        "Tank",
+                        "Flippable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipX"
+                      },
+                      "parameters": [
+                        "Tank",
+                        "Flippable",
+                        "yes"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipX"
+                      },
+                      "parameters": [
+                        "Tank",
+                        "Flippable",
+                        "no"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextJustPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Num8\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlippedY"
+                      },
+                      "parameters": [
+                        "Tank",
+                        "Flippable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "FlippableCapability::FlippableBehavior::FlippedY"
+                      },
+                      "parameters": [
+                        "Tank",
+                        "Flippable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipY"
+                      },
+                      "parameters": [
+                        "Tank",
+                        "Flippable",
+                        "yes"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipY"
+                      },
+                      "parameters": [
+                        "Tank",
+                        "Flippable",
+                        "no"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "BuiltinCommonInstructions::Comment",
@@ -1390,38 +1928,195 @@
           "comment": "Camera: drag with the right mouse button to move it, PageUp/PageDown to zoom, Home to reset it."
         },
         {
-          "type": "BuiltinCommonInstructions::JsCode",
-          "inlineCode": [
-            "",
-            "  const input = runtimeScene.getGame().getInputManager();",
-            "  const isPressed = (name) => input.isKeyPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const wasJustPressed = (name) => input.wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const deltaTime = runtimeScene.getElapsedTime() / 1000;",
-            "  const variables = runtimeScene.getVariables();",
-            "",
-            "      const layer = runtimeScene.getLayer('');",
-            "      const cursorX = input.getCursorX();",
-            "      const cursorY = input.getCursorY();",
-            "      const camera = runtimeScene.__manualCamera || (runtimeScene.__manualCamera = { lastCursorX: cursorX, lastCursorY: cursorY });",
-            "      if (input.isMouseButtonPressed(gdjs.InputManager.MOUSE_RIGHT_BUTTON)) {",
-            "        const zoom = layer.getCameraZoom();",
-            "        layer.setCameraX(layer.getCameraX() - (cursorX - camera.lastCursorX) / zoom);",
-            "        layer.setCameraY(layer.getCameraY() - (cursorY - camera.lastCursorY) / zoom);",
-            "      }",
-            "      camera.lastCursorX = cursorX;",
-            "      camera.lastCursorY = cursorY;",
-            "      if (isPressed('PageUp')) layer.setCameraZoom(layer.getCameraZoom() * (1 + deltaTime));",
-            "      if (isPressed('PageDown')) layer.setCameraZoom(layer.getCameraZoom() / (1 + deltaTime));",
-            "      if (wasJustPressed('Home')) {",
-            "        layer.setCameraZoom(1);",
-            "        layer.setCameraX(runtimeScene.getGame().getGameResolutionWidth() / 2);",
-            "        layer.setCameraY(runtimeScene.getGame().getGameResolutionHeight() / 2);",
-            "      }",
-            "    "
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "MouseButtonPressed"
+              },
+              "parameters": [
+                "",
+                "Right"
+              ]
+            }
           ],
-          "parameterObjects": "",
-          "useStrict": true,
-          "eventsSheetExpanded": false
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "DragDx",
+                "=",
+                "-(MouseX(\"UI\", 0) - LastCursorX) / CameraZoom(\"\", 0)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "DragDy",
+                "=",
+                "-(MouseY(\"UI\", 0) - LastCursorY) / CameraZoom(\"\", 0)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraCenterX"
+              },
+              "parameters": [
+                "",
+                "+",
+                "DragDx * cos(ToRad(CameraAngle(\"\", 0))) - DragDy * sin(ToRad(CameraAngle(\"\", 0)))",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraCenterY"
+              },
+              "parameters": [
+                "",
+                "+",
+                "DragDx * sin(ToRad(CameraAngle(\"\", 0))) + DragDy * cos(ToRad(CameraAngle(\"\", 0)))",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "LastCursorX",
+                "=",
+                "MouseX(\"UI\", 0)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "LastCursorY",
+                "=",
+                "MouseY(\"UI\", 0)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyPressed"
+              },
+              "parameters": [
+                "",
+                "PageUp"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ZoomCamera"
+              },
+              "parameters": [
+                "",
+                "CameraZoom(\"\", 0) * (1 + TimeDelta())",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyPressed"
+              },
+              "parameters": [
+                "",
+                "PageDown"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ZoomCamera"
+              },
+              "parameters": [
+                "",
+                "CameraZoom(\"\", 0) / (1 + TimeDelta())",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Home\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ZoomCamera"
+              },
+              "parameters": [
+                "",
+                "1",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraCenterX"
+              },
+              "parameters": [
+                "",
+                "=",
+                "SceneWindowWidth() / 2",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraCenterY"
+              },
+              "parameters": [
+                "",
+                "=",
+                "SceneWindowHeight() / 2",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
         },
         {
           "type": "BuiltinCommonInstructions::Comment",
@@ -1436,56 +2131,245 @@
           "comment": "What the selected tank gives through its functions, on screen."
         },
         {
-          "type": "BuiltinCommonInstructions::JsCode",
-          "inlineCode": [
-            "",
-            "  const input = runtimeScene.getGame().getInputManager();",
-            "  const isPressed = (name) => input.isKeyPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const wasJustPressed = (name) => input.wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const deltaTime = runtimeScene.getElapsedTime() / 1000;",
-            "  const variables = runtimeScene.getVariables();",
-            "",
-            "      const hud = runtimeScene.getObjects('Hud')[0];",
-            "      const ring = runtimeScene.getObjects('Selection')[0];",
-            "      const selectedId = variables.get('SelectedId').getAsNumber();",
-            "      const tank = runtimeScene.getObjects('Tank').find((object) => object.getVariables().get('Id').getAsNumber() === selectedId);",
-            "      const aimMode = variables.get('AimMode').getAsNumber();",
-            "      const f = (value) => value.toFixed(1);",
-            "      const cursorX = gdjs.evtTools.input.getCursorX(runtimeScene, '', 0);",
-            "      const cursorY = gdjs.evtTools.input.getCursorY(runtimeScene, '', 0);",
-            "      const aimModes = [",
-            "        'by hand (Q/E turret, Z/C cannon)',",
-            "        'at the cursor (FromParentX/Y)',",
-            "        'along a heading of ' + f(variables.get('Heading').getAsNumber()) + '° (J/L or wheel, FromParentAngle)',",
-            "      ];",
-            "      const lines = [",
-            "        'Tab or 1-5: select a tank   Space: fire   M: aim mode - ' + aimModes[aimMode],",
-            "        'Arrows: move   A/D: turn   T/G: scale X   Y/H: scale Y   7/8: flip X/Y',",
-            "        'Right drag: move the camera   PageUp/PageDown: zoom   Home: reset the camera',",
-            "      ];",
-            "      if (tank) {",
-            "        lines.push(",
-            "          'Tank ' + (selectedId + 1) + ': position ' + f(tank.getX()) + ' ; ' + f(tank.getY()) + '   angle ' + f(tank.getAngle()) +",
-            "            '°   scale ' + f(tank.getScaleX()) + ' x ' + f(tank.getScaleY()) +",
-            "            (tank.isFlippedX() ? '   flipped on X' : '') + (tank.isFlippedY() ? '   flipped on Y' : ''),",
-            "          'Muzzle (ToParentX/Y): ' + f(tank.MuzzleX()) + ' ; ' + f(tank.MuzzleY()) + '   angle (ToParentAngle): ' + f(tank.MuzzleAngle()) + '°',",
-            "          'Flag point: ' + f(tank.FlagX()) + ' ; ' + f(tank.FlagY()) + '   distance from the muzzle to the cursor: ' +",
-            "            f(gdjs.evtTools.common.distanceBetweenPositions(tank.MuzzleX(), tank.MuzzleY(), cursorX, cursorY))",
-            "        );",
-            "      }",
-            "      if (hud) hud.setText(lines.join('\\n'));",
-            "      if (ring) {",
-            "        ring.hide(!tank);",
-            "        if (tank) {",
-            "          ring.setPosition(tank.getCenterXInScene(), tank.getCenterYInScene());",
-            "          ring.setScale(Math.max(tank.getWidth(), tank.getHeight(), 20) / 50);",
-            "        }",
-            "      }",
-            "    "
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "0"
+              ]
+            }
           ],
-          "parameterObjects": "",
-          "useStrict": true,
-          "eventsSheetExpanded": false
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "AimModeText",
+                "=",
+                "\"by hand (Q/E turret, Z/C cannon)\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "AimModeText",
+                "=",
+                "\"at the cursor (FromParentX/Y)\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "2"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "AimModeText",
+                "=",
+                "\"along a heading of \" + ToString(roundTo(Heading, 1)) + \"° (J/L or wheel, FromParentAngle)\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "TankText",
+                "=",
+                "\"\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberObjectVariable"
+              },
+              "parameters": [
+                "Tank",
+                "Id",
+                "=",
+                "SelectedId"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Selection",
+                "=",
+                "Tank.CenterX()",
+                "=",
+                "Tank.CenterY()"
+              ]
+            },
+            {
+              "type": {
+                "value": "ScalableCapability::ScalableBehavior::SetValue"
+              },
+              "parameters": [
+                "Selection",
+                "Scale",
+                "=",
+                "max(max(Tank.Width(), Tank.Height()), 20) / 50"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "FlipText",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "FlippableCapability::FlippableBehavior::FlippedX"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "Flippable"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "FlipText",
+                    "+",
+                    "\"   flipped on X\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "FlippableCapability::FlippableBehavior::FlippedY"
+                  },
+                  "parameters": [
+                    "Tank",
+                    "Flippable"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "FlipText",
+                    "+",
+                    "\"   flipped on Y\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "TankText",
+                    "=",
+                    "\"Tank \" + ToString(SelectedId + 1) + \": position \" + ToString(roundTo(Tank.X(), 1)) + \" ; \" + ToString(roundTo(Tank.Y(), 1)) + \"   angle \" + ToString(roundTo(Tank.Angle(), 1)) + \"°   scale \" + ToString(roundTo(Tank.Scale::X(), 1)) + \" x \" + ToString(roundTo(Tank.Scale::Y(), 1)) + FlipText + NewLine() + \"Muzzle (ToParentX/Y): \" + ToString(roundTo(Tank.MuzzleX(), 1)) + \" ; \" + ToString(roundTo(Tank.MuzzleY(), 1)) + \"   angle (ToParentAngle): \" + ToString(roundTo(Tank.MuzzleAngle(), 1)) + \"°\" + NewLine() + \"Flag point: \" + ToString(roundTo(Tank.FlagX(), 1)) + \" ; \" + ToString(roundTo(Tank.FlagY(), 1)) + \"   distance from the muzzle to the cursor: \" + ToString(roundTo(DistanceBetweenPositions(Tank.MuzzleX(), Tank.MuzzleY(), MouseX(), MouseY()), 1))"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+              },
+              "parameters": [
+                "Hud",
+                "Text",
+                "=",
+                "\"Tab or 1-5: select a tank   Space: fire   M: aim mode - \" + AimModeText + NewLine() + \"Arrows: move   A/D: turn   T/G: scale X   Y/H: scale Y   7/8: flip X/Y\" + NewLine() + \"Right drag: move the camera   PageUp/PageDown: zoom   Home: reset the camera\" + NewLine() + TankText"
+              ]
+            }
+          ]
         }
       ],
       "layers": [

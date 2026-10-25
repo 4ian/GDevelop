@@ -154,6 +154,66 @@
           "name": "Range",
           "type": "number",
           "value": 200
+        },
+        {
+          "name": "FlipTo",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "DragDx",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "DragDy",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "LastCursorX",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "LastCursorY",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "AimModeText",
+          "type": "string",
+          "value": ""
+        },
+        {
+          "name": "TankText",
+          "type": "string",
+          "value": ""
+        },
+        {
+          "name": "FlipText",
+          "type": "string",
+          "value": ""
+        },
+        {
+          "name": "EnemyIndex",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "LastPoleLink",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "IsPoleLinked",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "SpottedCount",
+          "type": "number",
+          "value": 0
         }
       ],
       "instances": [
@@ -469,6 +529,11 @@
               "name": "DistanceToCenter",
               "type": "number",
               "value": 0
+            },
+            {
+              "name": "PoleLink",
+              "type": "number",
+              "value": 0
             }
           ],
           "effects": [],
@@ -509,7 +574,13 @@
           "assetStoreId": "",
           "name": "Pole",
           "type": "Scene3D::Cube3DObject",
-          "variables": [],
+          "variables": [
+            {
+              "name": "Link",
+              "type": "number",
+              "value": 0
+            }
+          ],
           "effects": [],
           "behaviors": [],
           "content": {
@@ -681,7 +752,53 @@
               ]
             }
           ],
-          "actions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "EnemyIndex",
+                "=",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "Scene3D::SetCameraRotationX"
+              },
+              "parameters": [
+                "",
+                "=",
+                "30",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraCenterY"
+              },
+              "parameters": [
+                "",
+                "+",
+                "420",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "ZoomCamera"
+              },
+              "parameters": [
+                "",
+                "1.1",
+                "\"\"",
+                "0"
+              ]
+            }
+          ],
           "events": [
             {
               "type": "BuiltinCommonInstructions::ForEach",
@@ -714,24 +831,44 @@
               ]
             },
             {
-              "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": [
-                "",
-                "        for (let index = 0; index < 12; index++) {",
-                "          const angle = (index / 12) * 2 * Math.PI;",
-                "          const enemy = runtimeScene.createObject('Enemy3D');",
-                "          enemy.setPosition(400 + 330 * Math.cos(angle), 310 + 240 * Math.sin(angle));",
-                "          enemy.setZ([0, 60, 160, 260][index % 4]);",
-                "        }",
-                "        const layer = runtimeScene.getLayer('');",
-                "        layer.setCameraRotationX(30);",
-                "        layer.setCameraY(layer.getCameraY() + 420);",
-                "        layer.setCameraZoom(1.1);",
-                "      "
-              ],
-              "parameterObjects": "",
-              "useStrict": true,
-              "eventsSheetExpanded": false
+              "type": "BuiltinCommonInstructions::Repeat",
+              "repeatExpression": "12",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Enemy3D",
+                    "400 + 330 * cos(ToRad(EnemyIndex * 30))",
+                    "310 + 240 * sin(ToRad(EnemyIndex * 30))",
+                    ""
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Enemy3D",
+                    "Object3D",
+                    "=",
+                    "mod(EnemyIndex, 4) * 80"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "EnemyIndex",
+                    "+",
+                    "1"
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -951,47 +1088,875 @@
           "comment": "Move the selected tank (arrows, R/F on Z), turn it (A/D around Z, W/S around Y, Q/E around X), scale it (T/G on X, Y/H on Y, U/J on Z) and flip it (7, 8, 9 on X, Y, Z): anything the tank goes through, the conversions follow."
         },
         {
-          "type": "BuiltinCommonInstructions::JsCode",
-          "inlineCode": [
-            "",
-            "  const input = runtimeScene.getGame().getInputManager();",
-            "  const isPressed = (name) => input.isKeyPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const wasJustPressed = (name) => input.wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const deltaTime = runtimeScene.getElapsedTime() / 1000;",
-            "  const variables = runtimeScene.getVariables();",
-            "",
-            "      const selectedId = variables.get('SelectedId').getAsNumber();",
-            "      const tank = runtimeScene.getObjects('Tank3D').find((object) => object.getVariables().get('Id').getAsNumber() === selectedId);",
-            "      if (!tank) return;",
-            "      const speed = 200 * deltaTime;",
-            "      const turn = 90 * deltaTime;",
-            "      if (isPressed('Left')) tank.setX(tank.getX() - speed);",
-            "      if (isPressed('Right')) tank.setX(tank.getX() + speed);",
-            "      if (isPressed('Up')) tank.setY(tank.getY() - speed);",
-            "      if (isPressed('Down')) tank.setY(tank.getY() + speed);",
-            "      if (isPressed('r')) tank.setZ(tank.getZ() + speed);",
-            "      if (isPressed('f')) tank.setZ(tank.getZ() - speed);",
-            "      if (isPressed('a')) tank.setAngle(tank.getAngle() - turn);",
-            "      if (isPressed('d')) tank.setAngle(tank.getAngle() + turn);",
-            "      if (isPressed('w')) tank.setRotationY(tank.getRotationY() - turn);",
-            "      if (isPressed('s')) tank.setRotationY(tank.getRotationY() + turn);",
-            "      if (isPressed('q')) tank.setRotationX(tank.getRotationX() - turn);",
-            "      if (isPressed('e')) tank.setRotationX(tank.getRotationX() + turn);",
-            "      const scaleSpeed = deltaTime;",
-            "      if (isPressed('t')) tank.setScaleX(tank.getScaleX() + scaleSpeed);",
-            "      if (isPressed('g')) tank.setScaleX(Math.max(0, tank.getScaleX() - scaleSpeed));",
-            "      if (isPressed('y')) tank.setScaleY(tank.getScaleY() + scaleSpeed);",
-            "      if (isPressed('h')) tank.setScaleY(Math.max(0, tank.getScaleY() - scaleSpeed));",
-            "      if (isPressed('u')) tank.setScaleZ(tank.getScaleZ() + scaleSpeed);",
-            "      if (isPressed('j')) tank.setScaleZ(Math.max(0, tank.getScaleZ() - scaleSpeed));",
-            "      if (wasJustPressed('Num7')) tank.flipX(!tank.isFlippedX());",
-            "      if (wasJustPressed('Num8')) tank.flipY(!tank.isFlippedY());",
-            "      if (wasJustPressed('Num9')) tank.flipZ(!tank.isFlippedZ());",
-            "    "
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberObjectVariable"
+              },
+              "parameters": [
+                "Tank3D",
+                "Id",
+                "=",
+                "SelectedId"
+              ]
+            }
           ],
-          "parameterObjects": "",
-          "useStrict": true,
-          "eventsSheetExpanded": false
+          "actions": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetX"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "-",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Right"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetX"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "+",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Up"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetY"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "-",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "Down"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetY"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "+",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "a"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "-",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "d"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "+",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "t"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Scale",
+                    "+",
+                    "TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "g"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetX"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Scale",
+                    "=",
+                    "max(0, Tank3D.Scale::X() - TimeDelta())"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "y"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Scale",
+                    "+",
+                    "TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "h"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ScalableCapability::ScalableBehavior::SetY"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Scale",
+                    "=",
+                    "max(0, Tank3D.Scale::Y() - TimeDelta())"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextJustPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Num7\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlippedX"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Flippable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "FlippableCapability::FlippableBehavior::FlippedX"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Flippable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipX"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Flippable",
+                        "yes"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipX"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Flippable",
+                        "no"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextJustPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Num8\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlippedY"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Flippable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "FlippableCapability::FlippableBehavior::FlippedY"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Flippable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipY"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Flippable",
+                        "yes"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "FlippableCapability::FlippableBehavior::FlipY"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Flippable",
+                        "no"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "r"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Object3D",
+                    "+",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "f"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Object3D",
+                    "-",
+                    "200 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "w"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetRotationY"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Object3D",
+                    "-",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "s"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetRotationY"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Object3D",
+                    "+",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "q"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetRotationX"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Object3D",
+                    "-",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "e"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetRotationX"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Object3D",
+                    "+",
+                    "90 * TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "u"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetScaleZ"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Object3D",
+                    "+",
+                    "TimeDelta()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "j"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetScaleZ"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Object3D",
+                    "=",
+                    "max(0, Tank3D.Object3D::ScaleZ() - TimeDelta())"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "KeyFromTextJustPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Num9\""
+                  ]
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::FlippedZ"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Object3D"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Scene3D::Base3DBehavior::FlippedZ"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Object3D"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetNumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "1"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::FlipZ"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Object3D",
+                        "yes"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "NumberVariable"
+                      },
+                      "parameters": [
+                        "FlipTo",
+                        "=",
+                        "0"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "Scene3D::Base3DBehavior::FlipZ"
+                      },
+                      "parameters": [
+                        "Tank3D",
+                        "Object3D",
+                        "no"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "BuiltinCommonInstructions::Comment",
@@ -1700,51 +2665,367 @@
           "comment": "Camera: drag with the right mouse button to move it, PageUp/PageDown to zoom, I/K to tilt it, O/L to turn it, Home to reset it. Its direction is given to the tanks in the aim mode 2."
         },
         {
-          "type": "BuiltinCommonInstructions::JsCode",
-          "inlineCode": [
-            "",
-            "  const input = runtimeScene.getGame().getInputManager();",
-            "  const isPressed = (name) => input.isKeyPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const wasJustPressed = (name) => input.wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const deltaTime = runtimeScene.getElapsedTime() / 1000;",
-            "  const variables = runtimeScene.getVariables();",
-            "",
-            "      const layer = runtimeScene.getLayer('');",
-            "      const cursorX = input.getCursorX();",
-            "      const cursorY = input.getCursorY();",
-            "      const camera = runtimeScene.__manualCamera || (runtimeScene.__manualCamera = { lastCursorX: cursorX, lastCursorY: cursorY });",
-            "      if (input.isMouseButtonPressed(gdjs.InputManager.MOUSE_RIGHT_BUTTON)) {",
-            "        // Move along the ground, in the direction the camera is turned to.",
-            "        const zoom = layer.getCameraZoom();",
-            "        const rotation = gdjs.toRad(layer.getCameraRotation());",
-            "        const deltaX = -(cursorX - camera.lastCursorX) / zoom;",
-            "        const deltaY = -(cursorY - camera.lastCursorY) / zoom;",
-            "        layer.setCameraX(layer.getCameraX() + deltaX * Math.cos(rotation) - deltaY * Math.sin(rotation));",
-            "        layer.setCameraY(layer.getCameraY() + deltaX * Math.sin(rotation) + deltaY * Math.cos(rotation));",
-            "      }",
-            "      camera.lastCursorX = cursorX;",
-            "      camera.lastCursorY = cursorY;",
-            "      if (isPressed('PageUp')) layer.setCameraZoom(layer.getCameraZoom() * (1 + deltaTime));",
-            "      if (isPressed('PageDown')) layer.setCameraZoom(layer.getCameraZoom() / (1 + deltaTime));",
-            "      if (isPressed('i')) layer.setCameraRotationX(Math.min(80, layer.getCameraRotationX() + 45 * deltaTime));",
-            "      if (isPressed('k')) layer.setCameraRotationX(Math.max(0, layer.getCameraRotationX() - 45 * deltaTime));",
-            "      if (isPressed('o')) layer.setCameraRotation(layer.getCameraRotation() - 45 * deltaTime);",
-            "      if (isPressed('l')) layer.setCameraRotation(layer.getCameraRotation() + 45 * deltaTime);",
-            "      if (wasJustPressed('Home')) {",
-            "        layer.setCameraRotation(0);",
-            "        layer.setCameraRotationX(30);",
-            "        layer.setCameraZoom(1.1);",
-            "        layer.setCameraX(runtimeScene.getGame().getGameResolutionWidth() / 2);",
-            "        layer.setCameraY(runtimeScene.getGame().getGameResolutionHeight() / 2 + 420);",
-            "      }",
-            "      variables.get('CameraDx').setNumber(layer.getCameraForwardX());",
-            "      variables.get('CameraDy').setNumber(layer.getCameraForwardY());",
-            "      variables.get('CameraDz').setNumber(layer.getCameraForwardZ());",
-            "    "
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "MouseButtonPressed"
+              },
+              "parameters": [
+                "",
+                "Right"
+              ]
+            }
           ],
-          "parameterObjects": "",
-          "useStrict": true,
-          "eventsSheetExpanded": false
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "DragDx",
+                "=",
+                "-(MouseX(\"UI\", 0) - LastCursorX) / CameraZoom(\"\", 0)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "DragDy",
+                "=",
+                "-(MouseY(\"UI\", 0) - LastCursorY) / CameraZoom(\"\", 0)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraCenterX"
+              },
+              "parameters": [
+                "",
+                "+",
+                "DragDx * cos(ToRad(CameraAngle(\"\", 0))) - DragDy * sin(ToRad(CameraAngle(\"\", 0)))",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraCenterY"
+              },
+              "parameters": [
+                "",
+                "+",
+                "DragDx * sin(ToRad(CameraAngle(\"\", 0))) + DragDy * cos(ToRad(CameraAngle(\"\", 0)))",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "LastCursorX",
+                "=",
+                "MouseX(\"UI\", 0)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "LastCursorY",
+                "=",
+                "MouseY(\"UI\", 0)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyPressed"
+              },
+              "parameters": [
+                "",
+                "PageUp"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ZoomCamera"
+              },
+              "parameters": [
+                "",
+                "CameraZoom(\"\", 0) * (1 + TimeDelta())",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyPressed"
+              },
+              "parameters": [
+                "",
+                "PageDown"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ZoomCamera"
+              },
+              "parameters": [
+                "",
+                "CameraZoom(\"\", 0) / (1 + TimeDelta())",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyPressed"
+              },
+              "parameters": [
+                "",
+                "i"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Scene3D::SetCameraRotationX"
+              },
+              "parameters": [
+                "",
+                "=",
+                "min(80, Scene3D::CameraRotationX(\"\", 0) + 45 * TimeDelta())",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyPressed"
+              },
+              "parameters": [
+                "",
+                "k"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "Scene3D::SetCameraRotationX"
+              },
+              "parameters": [
+                "",
+                "=",
+                "max(0, Scene3D::CameraRotationX(\"\", 0) - 45 * TimeDelta())",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyPressed"
+              },
+              "parameters": [
+                "",
+                "o"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetCameraAngle"
+              },
+              "parameters": [
+                "",
+                "-",
+                "45 * TimeDelta()",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyPressed"
+              },
+              "parameters": [
+                "",
+                "l"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetCameraAngle"
+              },
+              "parameters": [
+                "",
+                "+",
+                "45 * TimeDelta()",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "KeyFromTextJustPressed"
+              },
+              "parameters": [
+                "",
+                "\"Home\""
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "ZoomCamera"
+              },
+              "parameters": [
+                "",
+                "1.1",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraCenterX"
+              },
+              "parameters": [
+                "",
+                "=",
+                "SceneWindowWidth() / 2",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraCenterY"
+              },
+              "parameters": [
+                "",
+                "=",
+                "SceneWindowHeight() / 2 + 420",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetCameraAngle"
+              },
+              "parameters": [
+                "",
+                "=",
+                "0",
+                "\"\"",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "Scene3D::SetCameraRotationX"
+              },
+              "parameters": [
+                "",
+                "=",
+                "30",
+                "\"\"",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "CameraDx",
+                "=",
+                "Scene3D::CameraForwardX(\"\", 0)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "CameraDy",
+                "=",
+                "Scene3D::CameraForwardY(\"\", 0)"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "CameraDz",
+                "=",
+                "Scene3D::CameraForwardZ(\"\", 0)"
+              ]
+            }
+          ]
         },
         {
           "type": "BuiltinCommonInstructions::Comment",
@@ -1759,78 +3040,512 @@
           "comment": "What the selected tank gives through its functions, on screen, and a pole under each enemy."
         },
         {
-          "type": "BuiltinCommonInstructions::JsCode",
-          "inlineCode": [
-            "",
-            "  const input = runtimeScene.getGame().getInputManager();",
-            "  const isPressed = (name) => input.isKeyPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const wasJustPressed = (name) => input.wasKeyJustPressed(gdjs.evtTools.input.keysNameToCode[name]);",
-            "  const deltaTime = runtimeScene.getElapsedTime() / 1000;",
-            "  const variables = runtimeScene.getVariables();",
-            "",
-            "      const poles = runtimeScene.__enemyPoles || (runtimeScene.__enemyPoles = new Map());",
-            "      const enemies = runtimeScene.getObjects('Enemy3D');",
-            "      for (const enemy of enemies) {",
-            "        let pole = poles.get(enemy.id);",
-            "        if (!pole || !runtimeScene.getObjects('Pole').includes(pole)) {",
-            "          pole = runtimeScene.createObject('Pole');",
-            "          poles.set(enemy.id, pole);",
-            "        }",
-            "        pole.setPosition(enemy.getCenterXInScene() - 1, enemy.getCenterYInScene() - 1);",
-            "        pole.setZ(Math.min(0, enemy.getZ()));",
-            "        pole.setDepth(Math.max(1, Math.abs(enemy.getZ())));",
-            "      }",
-            "      for (const [enemyId, pole] of poles) {",
-            "        if (!enemies.some((enemy) => enemy.id === enemyId)) {",
-            "          pole.deleteFromScene();",
-            "          poles.delete(enemyId);",
-            "        }",
-            "      }",
-            "",
-            "      const hud = runtimeScene.getObjects('Hud')[0];",
-            "      if (!hud) return;",
-            "      const selectedId = variables.get('SelectedId').getAsNumber();",
-            "      const tank = runtimeScene.getObjects('Tank3D').find((object) => object.getVariables().get('Id').getAsNumber() === selectedId);",
-            "      const aimMode = variables.get('AimMode').getAsNumber();",
-            "      const f = (value) => value.toFixed(1);",
-            "      const aimModes = [",
-            "        'by hand (Z/C turret, V/B cannon)',",
-            "        'at the target (left mouse: move it, wheel: raise it) - FromParentX/Y/Z',",
-            "        'where the camera looks - FromParentDirectionX/Y/Z',",
-            "        'along AimDx/AimDy/AimDz - FromParentDirectionX/Y/Z',",
-            "      ];",
-            "      const range = variables.get('Range').getAsNumber();",
-            "      const lines = [",
-            "        'Tab or 1-4: select a tank   Space: fire   M: aim mode - ' + aimModes[aimMode],",
-            "        'Arrows, R/F: move   A/D, W/S, Q/E: turn around Z, Y, X   T/G, Y/H, U/J: scale X, Y, Z   7/8/9: flip X, Y, Z',",
-            "        'Right drag: move the camera   PageUp/PageDown: zoom   I/K: tilt   O/L: turn   Home: reset the camera',",
-            "        'Radar range (+/-): ' + f(range) + '   spotted enemies: ' + enemies.filter((enemy) => enemy.getVariables().get('Spotted').getAsNumber() === 1).length + ' / ' + enemies.length,",
-            "      ];",
-            "      if (tank) {",
-            "        const muzzle = [tank.MuzzleX(), tank.MuzzleY(), tank.MuzzleZ()];",
-            "        const direction = [tank.AimDirectionX(), tank.AimDirectionY(), tank.AimDirectionZ()];",
-            "        const target = [variables.get('TargetX').getAsNumber(), variables.get('TargetY').getAsNumber(), variables.get('TargetZ').getAsNumber()];",
-            "        lines.push(",
-            "          'Tank ' + (selectedId + 1) + ': position ' + f(tank.getX()) + ' ; ' + f(tank.getY()) + ' ; ' + f(tank.getZ()) +",
-            "            '   rotation ' + f(tank.getRotationX()) + ' ; ' + f(tank.getRotationY()) + ' ; ' + f(tank.getAngle()) +",
-            "            '   scale ' + f(tank.getScaleX()) + ' x ' + f(tank.getScaleY()) + ' x ' + f(tank.getScaleZ()) +",
-            "            (tank.isFlippedX() ? '  flipped X' : '') + (tank.isFlippedY() ? '  flipped Y' : '') + (tank.isFlippedZ() ? '  flipped Z' : ''),",
-            "          'Muzzle (ToParentX/Y/Z): ' + muzzle.map(f).join(' ; ') + '   aim direction (ToParentDirectionX/Y/Z): ' + direction.map((value) => value.toFixed(2)).join(' ; '),",
-            "          'Distance from the muzzle to the target: ' + f(gdjs.evtTools.common.distanceBetween3DPositions(...muzzle, ...target)) +",
-            "            ' (on X/Y only: ' + f(gdjs.evtTools.common.distanceBetweenPositions(muzzle[0], muzzle[1], target[0], target[1])) + ')'",
-            "        );",
-            "      }",
-            "      hud.setText(lines.join('\\n'));",
-            "      const ring = runtimeScene.getObjects('Selection')[0];",
-            "      if (ring && tank) {",
-            "        ring.setPosition(tank.getCenterXInScene() - ring.getWidth() / 2, tank.getCenterYInScene() - ring.getHeight() / 2);",
-            "        ring.setZ(tank.getCenterZInScene() + 40);",
-            "      }",
-            "    "
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "Enemy3D",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberObjectVariable"
+              },
+              "parameters": [
+                "Enemy3D",
+                "PoleLink",
+                "=",
+                "0"
+              ]
+            }
           ],
-          "parameterObjects": "",
-          "useStrict": true,
-          "eventsSheetExpanded": false
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "LastPoleLink",
+                "+",
+                "1"
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberObjectVariable"
+              },
+              "parameters": [
+                "Enemy3D",
+                "PoleLink",
+                "=",
+                "LastPoleLink"
+              ]
+            },
+            {
+              "type": {
+                "value": "Create"
+              },
+              "parameters": [
+                "",
+                "Pole",
+                "Enemy3D.CenterX()",
+                "Enemy3D.CenterY()",
+                ""
+              ]
+            },
+            {
+              "type": {
+                "value": "SetNumberObjectVariable"
+              },
+              "parameters": [
+                "Pole",
+                "Link",
+                "=",
+                "LastPoleLink"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "Pole",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "IsPoleLinked",
+                "=",
+                "0"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberObjectVariable"
+                  },
+                  "parameters": [
+                    "Enemy3D",
+                    "PoleLink",
+                    "=",
+                    "Pole.Variable(Link)"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetNumberVariable"
+                  },
+                  "parameters": [
+                    "IsPoleLinked",
+                    "=",
+                    "1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "Pole",
+                    "=",
+                    "Enemy3D.CenterX() - 1",
+                    "=",
+                    "Enemy3D.CenterY() - 1"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetZ"
+                  },
+                  "parameters": [
+                    "Pole",
+                    "Object3D",
+                    "=",
+                    "min(0, Enemy3D.Object3D::Z())"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::SetDepth"
+                  },
+                  "parameters": [
+                    "Pole",
+                    "Object3D",
+                    "=",
+                    "max(1, abs(Enemy3D.Object3D::Z()))"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "NumberVariable"
+                  },
+                  "parameters": [
+                    "IsPoleLinked",
+                    "=",
+                    "0"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "Pole",
+                    ""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "0"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "AimModeText",
+                "=",
+                "\"by hand (Z/C turret, V/B cannon)\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "AimModeText",
+                "=",
+                "\"at the target (left mouse: move it, wheel: raise it) - FromParentX/Y/Z\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "2"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "AimModeText",
+                "=",
+                "\"where the camera looks - FromParentDirectionX/Y/Z\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberVariable"
+              },
+              "parameters": [
+                "AimMode",
+                "=",
+                "3"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "AimModeText",
+                "=",
+                "\"along AimDx/AimDy/AimDz - FromParentDirectionX/Y/Z\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "SpottedCount",
+                "=",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberObjectVariable"
+              },
+              "parameters": [
+                "Enemy3D",
+                "Spotted",
+                "=",
+                "1"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "SetNumberVariable"
+              },
+              "parameters": [
+                "SpottedCount",
+                "=",
+                "Count(Enemy3D)"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "SetStringVariable"
+              },
+              "parameters": [
+                "TankText",
+                "=",
+                "\"\""
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "NumberObjectVariable"
+              },
+              "parameters": [
+                "Tank3D",
+                "Id",
+                "=",
+                "SelectedId"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Selection",
+                "=",
+                "Tank3D.CenterX() - 4",
+                "=",
+                "Tank3D.CenterY() - 4"
+              ]
+            },
+            {
+              "type": {
+                "value": "Scene3D::Base3DBehavior::SetZ"
+              },
+              "parameters": [
+                "Selection",
+                "Object3D",
+                "=",
+                "Tank3D.Object3D::CenterZ() + 40"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "FlipText",
+                    "=",
+                    "\"\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "FlippableCapability::FlippableBehavior::FlippedX"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Flippable"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "FlipText",
+                    "+",
+                    "\"   flipped on X\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "FlippableCapability::FlippableBehavior::FlippedY"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Flippable"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "FlipText",
+                    "+",
+                    "\"   flipped on Y\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "Scene3D::Base3DBehavior::FlippedZ"
+                  },
+                  "parameters": [
+                    "Tank3D",
+                    "Object3D"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "FlipText",
+                    "+",
+                    "\"   flipped on Z\""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "SetStringVariable"
+                  },
+                  "parameters": [
+                    "TankText",
+                    "=",
+                    "\"Tank \" + ToString(SelectedId + 1) + \": position \" + ToString(roundTo(Tank3D.X(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Y(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Object3D::Z(), 1)) + \"   rotation \" + ToString(roundTo(Tank3D.Object3D::RotationX(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Object3D::RotationY(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Angle(), 1)) + \"   scale \" + ToString(roundTo(Tank3D.Scale::X(), 1)) + \" x \" + ToString(roundTo(Tank3D.Scale::Y(), 1)) + \" x \" + ToString(roundTo(Tank3D.Object3D::ScaleZ(), 1)) + FlipText + NewLine() + \"Muzzle (ToParentX/Y/Z): \" + ToString(roundTo(Tank3D.MuzzleX(), 1)) + \" ; \" + ToString(roundTo(Tank3D.MuzzleY(), 1)) + \" ; \" + ToString(roundTo(Tank3D.MuzzleZ(), 1)) + \"   aim direction (ToParentDirectionX/Y/Z): \" + ToString(roundTo(Tank3D.AimDirectionX(), 2)) + \" ; \" + ToString(roundTo(Tank3D.AimDirectionY(), 2)) + \" ; \" + ToString(roundTo(Tank3D.AimDirectionZ(), 2)) + NewLine() + \"Distance from the muzzle to the target: \" + ToString(roundTo(DistanceBetween3DPositions(Tank3D.MuzzleX(), Tank3D.MuzzleY(), Tank3D.MuzzleZ(), TargetX, TargetY, TargetZ), 1)) + \" (on X/Y only: \" + ToString(roundTo(DistanceBetweenPositions(Tank3D.MuzzleX(), Tank3D.MuzzleY(), TargetX, TargetY), 1)) + \")\""
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "TextContainerCapability::TextContainerBehavior::SetValue"
+              },
+              "parameters": [
+                "Hud",
+                "Text",
+                "=",
+                "\"Tab or 1-4: select a tank   Space: fire   M: aim mode - \" + AimModeText + NewLine() + \"Arrows, R/F: move   A/D, W/S, Q/E: turn around Z, Y, X   T/G, Y/H, U/J: scale X, Y, Z   7/8/9: flip X, Y, Z\" + NewLine() + \"Right drag: move the camera   PageUp/PageDown: zoom   I/K: tilt   O/L: turn   Home: reset the camera\" + NewLine() + \"Radar range (+/-): \" + ToString(roundTo(Range, 1)) + \"   spotted enemies: \" + ToString(SpottedCount) + \" / \" + ToString(SceneInstancesCount(Enemy3D)) + NewLine() + TankText"
+              ]
+            }
+          ]
         }
       ],
       "layers": [

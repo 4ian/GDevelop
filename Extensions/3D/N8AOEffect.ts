@@ -37,8 +37,6 @@ namespace gdjs {
             this.shaderPass.configuration.accumulate = false;
             this.shaderPass.configuration.transparencyAware = false;
             this.shaderPass.autoDetectTransparency = false;
-            // The pass renders the scene itself: keep a stencil buffer, like
-            // the render targets of the composer.
             this.shaderPass.configuration.stencil = true;
             this._isEnabled = false;
           }

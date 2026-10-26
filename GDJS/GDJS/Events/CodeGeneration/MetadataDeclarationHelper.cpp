@@ -1477,7 +1477,7 @@ void MetadataDeclarationHelper::DeclareObjectCoordinateConversions(
 
   objectMetadata
       .AddExpression(
-          "ToParentAngle", _("Angle inside the object, to its parent"),
+          "ToParentAngle", _("Angle inside the object, in its parent"),
           _("Convert an angle (a direction, in degrees) given inside the "
             "object (where its child objects are positioned) to the space "
             "containing the object (the scene, or the custom object containing "

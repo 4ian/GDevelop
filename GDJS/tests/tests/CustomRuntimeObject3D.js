@@ -443,6 +443,42 @@ describe('gdjs.CustomRuntimeObject3D', function () {
         )
       ).to.be(7);
     });
+
+    it('gives the distance between the centers of an object and another one, a 2D one being at a Z of 0', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const tank = createPlacedCustomObject(runtimeScene, 'Tank', [10, 20, 30]);
+      const plane = createPlacedCustomObject(
+        runtimeScene,
+        'Plane',
+        [12, 23, 36]
+      );
+      const flatObject = new gdjs.CustomRuntimeObject2D(runtimeScene, {
+        name: 'Flat',
+        type: 'MyExtension::MyEventsBasedObject',
+        variant: '',
+        isInnerAreaFollowingParentSize: false,
+        variables: [],
+        behaviors: [],
+        effects: [],
+        content: {},
+      });
+      runtimeScene.addObject(flatObject);
+      const object3D = new gdjs.Base3DBehavior(
+        runtimeScene,
+        { name: 'Object3D', type: 'Scene3D::Base3DBehavior' },
+        tank
+      );
+
+      expect(object3D.getDistanceToObject3D(plane)).to.be(7);
+      expect(object3D.getDistanceToObject3D(flatObject)).to.be(
+        Math.hypot(
+          tank.getCenterXInScene() - flatObject.getCenterXInScene(),
+          tank.getCenterYInScene() - flatObject.getCenterYInScene(),
+          tank.getCenterZInScene()
+        )
+      );
+      expect(object3D.getDistanceToObject3D(null)).to.be(0);
+    });
   });
 
   describe('turning around an axis of the scene', function () {

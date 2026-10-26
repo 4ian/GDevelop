@@ -1501,9 +1501,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHidden();
 
   obj.AddExpression("Distance",
-                    _("Distance between two objects"),
-                    _("Distance between two objects, on the X/Y plane only (Z "
-                      "is ignored)"),
+                    _("Distance between two objects (2D)"),
+                    _("Distance between the centers of two objects, on the "
+                      "X/Y plane only. To include Z, use ‘Distance between "
+                      "two objects (3D)’ of the 3D capability."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
@@ -1845,9 +1846,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition("Distance",
-                    _("Distance between two objects"),
-                    _("Compare the distance between two objects.\nIf condition "
-                      "is inverted, only objects that have a distance greater "
+                    _("Distance between two objects (2D)"),
+                    _("Compare the distance between the centers of two "
+                      "objects, on the X/Y plane only. To include Z, use "
+                      "‘Distance between two objects (3D)’.\nIf condition is "
+                      "inverted, only objects that have a distance greater "
                       "than specified to any other object will be picked."),
                     _("_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"),
                     _("Position"),
@@ -1865,10 +1868,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition("Distance3D",
-                    _("Distance between two objects in 3D"),
+                    _("Distance between two objects (3D)"),
                     _("Compare the distance between the centers of two "
                       "objects, on the X, Y and Z axes (a 2D object is at a Z "
-                      "of 0).\nIf condition is inverted, only objects that "
+                      "of 0). To ignore Z, use ‘Distance between two objects "
+                      "(2D)’.\nIf condition is inverted, only objects that "
                       "have a distance greater than specified to any other "
                       "object will be picked."),
                     _("_PARAM0_ distance to _PARAM1_ in 3D is below _PARAM2_ "

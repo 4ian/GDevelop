@@ -245,6 +245,21 @@ namespace gdjs {
       return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
     }
 
+    /**
+     * The distance between the centers of the object and another one, on the
+     * X, Y and Z axes (a 2D object is at a Z of 0).
+     */
+    getDistanceToObject3D(otherObject: gdjs.RuntimeObject | null): float {
+      if (!otherObject) return 0;
+      return this.getDistanceTo3DPosition(
+        otherObject.getCenterXInScene(),
+        otherObject.getCenterYInScene(),
+        gdjs.Base3DHandler.is3D(otherObject)
+          ? otherObject.getCenterZInScene()
+          : 0
+      );
+    }
+
     setRotationX(angle: float): void {
       this.object.setRotationX(angle);
     }

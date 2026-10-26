@@ -269,6 +269,21 @@ module.exports = {
 
       base3D
         .addExpression(
+          'Distance3D',
+          _('Distance between two objects (3D)'),
+          _(
+            'Return the distance between the centers of the object and another object, on the X, Y and Z axes (a 2D object is at a Z of 0). To ignore Z, use ‘Distance between two objects (2D)’.'
+          ),
+          _('Position'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('objectPtr', _('Other object'), '', false)
+        .setFunctionName('getDistanceToObject3D');
+
+      base3D
+        .addExpression(
           'ForwardX',
           _('Forward vector X component'),
           _('Return the object forward vector X component.'),

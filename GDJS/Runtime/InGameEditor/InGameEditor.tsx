@@ -1621,6 +1621,8 @@ namespace gdjs {
 
     // The controls shown to manipulate the selection.
     private _selectionControls: SelectionControls;
+    private _selectionControls2D: SelectionControls2D;
+    private _selectionControls3D: SelectionControls3D;
     private _editorGrid: EditorGrid;
 
     private _isTransformControlsHovered = false;
@@ -1696,10 +1698,15 @@ namespace gdjs {
       this._runtimeGame = game;
       this._editorCamera = new EditorCamera(this);
       this._editorGrid = new EditorGrid(this);
-      this._selectionControls = new SelectionControls2D(
+      this._selectionControls2D = new SelectionControls2D(
         this,
         this._objectMover2D
       );
+      this._selectionControls3D = new SelectionControls3D(
+        this,
+        this._objectMover3D
+      );
+      this._selectionControls = this._selectionControls2D;
 
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
@@ -2287,17 +2294,31 @@ namespace gdjs {
     ) {
       this._instancesEditorSettings = instancesEditorSettings;
       this._editorGrid.setSettings(instancesEditorSettings);
+      this.applyInstancesEditorSettings();
     }
 
     updateInstancesEditorSettings(
       instancesEditorSettings: InstancesEditorSettings
     ) {
       if (this._instancesEditorSettings) {
+        console.log('updateInstancesEditorSettings', instancesEditorSettings);
         Object.assign(this._instancesEditorSettings, instancesEditorSettings);
       } else {
         this._instancesEditorSettings = instancesEditorSettings;
       }
-      this._editorGrid.setSettings(instancesEditorSettings);
+      this.applyInstancesEditorSettings();
+    }
+
+    private applyInstancesEditorSettings() {
+      if (!this._instancesEditorSettings) {
+        return;
+      }
+      if (this._instancesEditorSettings.editorMode === '2d-editor') {
+        this._selectionControls = this._selectionControls2D;
+      } else {
+        this._selectionControls = this._selectionControls3D;
+      }
+      this._editorGrid.setSettings(this._instancesEditorSettings);
     }
 
     getEditorGrid(): EditorGrid {

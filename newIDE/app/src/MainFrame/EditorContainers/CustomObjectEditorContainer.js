@@ -34,6 +34,7 @@ import {
   parseCustomObjectEditorTabName,
   getObjectTypeFromCustomObjectEditorTabName,
 } from '../../Utils/CustomObjectEditorTabName';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -367,91 +368,105 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const variant = this.getVariant();
     if (!variant) return null;
 
-    if (!this._projectScopedContainersAccessor) {
+    const projectScopedContainersAccessor = this
+      ._projectScopedContainersAccessor;
+    if (!projectScopedContainersAccessor) {
       return null;
     }
 
     return (
       <div style={styles.container}>
-        <SceneEditor
-          editorId={this.props.editorId}
-          gameEditorMode={this.props.gameEditorMode}
-          setGameEditorMode={this.props.setGameEditorMode}
-          onRestartInGameEditor={this.props.onRestartInGameEditor}
-          showRestartInGameEditorAfterErrorButton={
-            this.props.showRestartInGameEditorAfterErrorButton
-          }
-          setToolbar={this.props.setToolbar}
-          resourceManagementProps={this.props.resourceManagementProps}
-          unsavedChanges={this.props.unsavedChanges}
-          ref={editor => (this.editor = editor)}
-          project={project}
-          projectScopedContainersAccessor={
-            this._projectScopedContainersAccessor
-          }
-          layout={null}
-          eventsFunctionsExtension={eventsFunctionsExtension}
-          eventsBasedObject={eventsBasedObject}
-          eventsBasedObjectVariant={variant}
-          globalObjectsContainer={null}
-          objectsContainer={variant.getObjects()}
-          layersContainer={variant.getLayers()}
-          initialInstances={variant.getInitialInstances()}
-          getInitialInstancesEditorSettings={() =>
-            prepareInstancesEditorSettings(
-              serializeToJSObject(variant.getAssociatedEditorSettings()),
-              Math.max(
-                variant.getAreaMaxX() - variant.getAreaMinX(),
-                variant.getAreaMaxY() - variant.getAreaMinY()
-              )
-            )
-          }
-          onOpenEvents={() =>
-            this.props.openObjectEvents(
-              eventsFunctionsExtension.getName(),
-              eventsBasedObject.getName()
-            )
-          }
-          isActive={isActive}
-          previewDebuggerServer={this.props.previewDebuggerServer}
-          hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-          openBehaviorEvents={this.props.openBehaviorEvents}
-          onObjectEdited={(objectWithContext, hasResourceChanged) =>
-            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject, {
-              editedObject: objectWithContext.object,
-              hasResourceChanged,
-            })
-          }
-          onObjectsDeleted={() =>
-            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
-          }
-          onObjectGroupEdited={() =>
-            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
-          }
-          onObjectGroupsDeleted={() =>
-            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
-          }
-          onEventsBasedObjectChildrenEdited={
-            this.props.onEventsBasedObjectChildrenEdited
-          }
-          onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
-          onOpenEventBasedObjectEditor={this.props.onOpenEventBasedObjectEditor}
-          onOpenEventBasedObjectVariantEditor={
-            this.props.onOpenEventBasedObjectVariantEditor
-          }
-          onWillInstallExtension={this.props.onWillInstallExtension}
-          onExtensionInstalled={this.props.onExtensionInstalled}
-          onCreateNewExtensionWithBehavior={null}
-          onDeleteEventsBasedObjectVariant={
-            this.props.onDeleteEventsBasedObjectVariant
-          }
-          onEffectAdded={this.props.onEffectAdded}
-          onLayerRenamedOrRemoved={this.props.onLayerRenamedOrRemoved}
-          onObjectListsModified={this.props.onObjectListsModified}
-          triggerHotReloadInGameEditorIfNeeded={
-            this.props.triggerHotReloadInGameEditorIfNeeded
-          }
-        />
+        <PreferencesContext.Consumer>
+          {({ getUseRealTime2DEditor }) => (
+            <SceneEditor
+              editorId={this.props.editorId}
+              gameEditorMode={this.props.gameEditorMode}
+              setGameEditorMode={this.props.setGameEditorMode}
+              onRestartInGameEditor={this.props.onRestartInGameEditor}
+              showRestartInGameEditorAfterErrorButton={
+                this.props.showRestartInGameEditorAfterErrorButton
+              }
+              setToolbar={this.props.setToolbar}
+              resourceManagementProps={this.props.resourceManagementProps}
+              unsavedChanges={this.props.unsavedChanges}
+              ref={editor => (this.editor = editor)}
+              project={project}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              layout={null}
+              eventsFunctionsExtension={eventsFunctionsExtension}
+              eventsBasedObject={eventsBasedObject}
+              eventsBasedObjectVariant={variant}
+              globalObjectsContainer={null}
+              objectsContainer={variant.getObjects()}
+              layersContainer={variant.getLayers()}
+              initialInstances={variant.getInitialInstances()}
+              getInitialInstancesEditorSettings={() =>
+                prepareInstancesEditorSettings(
+                  serializeToJSObject(variant.getAssociatedEditorSettings()),
+                  Math.max(
+                    variant.getAreaMaxX() - variant.getAreaMinX(),
+                    variant.getAreaMaxY() - variant.getAreaMinY()
+                  )
+                )
+              }
+              shouldUseRealTime2DEditor={getUseRealTime2DEditor()}
+              onOpenEvents={() =>
+                this.props.openObjectEvents(
+                  eventsFunctionsExtension.getName(),
+                  eventsBasedObject.getName()
+                )
+              }
+              isActive={isActive}
+              previewDebuggerServer={this.props.previewDebuggerServer}
+              hotReloadPreviewButtonProps={
+                this.props.hotReloadPreviewButtonProps
+              }
+              openBehaviorEvents={this.props.openBehaviorEvents}
+              onObjectEdited={(objectWithContext, hasResourceChanged) =>
+                this.props.onEventsBasedObjectChildrenEdited(
+                  eventsBasedObject,
+                  {
+                    editedObject: objectWithContext.object,
+                    hasResourceChanged,
+                  }
+                )
+              }
+              onObjectsDeleted={() =>
+                this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+              }
+              onObjectGroupEdited={() =>
+                this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+              }
+              onObjectGroupsDeleted={() =>
+                this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+              }
+              onEventsBasedObjectChildrenEdited={
+                this.props.onEventsBasedObjectChildrenEdited
+              }
+              onExtractAsEventBasedObject={
+                this.props.onExtractAsEventBasedObject
+              }
+              onOpenEventBasedObjectEditor={
+                this.props.onOpenEventBasedObjectEditor
+              }
+              onOpenEventBasedObjectVariantEditor={
+                this.props.onOpenEventBasedObjectVariantEditor
+              }
+              onWillInstallExtension={this.props.onWillInstallExtension}
+              onExtensionInstalled={this.props.onExtensionInstalled}
+              onCreateNewExtensionWithBehavior={null}
+              onDeleteEventsBasedObjectVariant={
+                this.props.onDeleteEventsBasedObjectVariant
+              }
+              onEffectAdded={this.props.onEffectAdded}
+              onLayerRenamedOrRemoved={this.props.onLayerRenamedOrRemoved}
+              onObjectListsModified={this.props.onObjectListsModified}
+              triggerHotReloadInGameEditorIfNeeded={
+                this.props.triggerHotReloadInGameEditorIfNeeded
+              }
+            />
+          )}
+        </PreferencesContext.Consumer>
       </div>
     );
   }

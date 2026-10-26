@@ -328,6 +328,7 @@ declare interface LayoutData extends InstanceContainerData {
 }
 
 declare interface InstancesEditorSettings {
+  editorMode: '2d-editor' | '3d-editor';
   grid: boolean;
   gridType: 'rectangular' | 'isometric';
   gridWidth: float;

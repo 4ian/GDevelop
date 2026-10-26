@@ -5,7 +5,9 @@ import {
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
   type PricingSystemDiscount,
+  type CouponValidationError,
 } from '../../../Utils/GDevelopServices/Usage';
+import { formatPriceWithCurrency } from '../PlanSmallCard';
 import RedemptionCodeIcon from '../../../UI/CustomSvgIcons/RedemptionCode';
 import {
   ColumnStackLayout,
@@ -42,6 +44,72 @@ const styles = {
   },
 };
 
+export type CouponError =
+  | CouponValidationError
+  | {| code: 'validation-request-failed' |};
+
+const getCouponDiscountMessage = (
+  pricingSystemDiscount: PricingSystemDiscount
+): React.Node => {
+  const { discountPercentage } = pricingSystemDiscount;
+  const savings = formatPriceWithCurrency(
+    pricingSystemDiscount.originalAmountInCents -
+      pricingSystemDiscount.discountedAmountInCents,
+    pricingSystemDiscount.currency
+  );
+  return discountPercentage !== null ? (
+    <Trans>
+      {discountPercentage}% off - Save {savings}
+    </Trans>
+  ) : (
+    <Trans>{savings} off</Trans>
+  );
+};
+
+const getCouponErrorMessage = (couponError: CouponError): React.Node => {
+  switch (couponError.code) {
+    case 'missing-code':
+      return <Trans>Please enter a coupon code.</Trans>;
+    case 'invalid-code':
+      return <Trans>This coupon code is not valid.</Trans>;
+    case 'inactive':
+      return <Trans>This coupon is no longer active.</Trans>;
+    case 'not-yet-valid':
+      return <Trans>This coupon is not yet valid.</Trans>;
+    case 'expired':
+      return <Trans>This coupon has expired.</Trans>;
+    case 'not-applicable-to-plan':
+      return <Trans>This coupon is not applicable to the selected plan.</Trans>;
+    case 'not-applicable-to-period':
+      if (couponError.period === 'week')
+        return (
+          <Trans>This coupon is not applicable to weekly subscriptions.</Trans>
+        );
+      if (couponError.period === 'month')
+        return (
+          <Trans>This coupon is not applicable to monthly subscriptions.</Trans>
+        );
+      return (
+        <Trans>This coupon is not applicable to yearly subscriptions.</Trans>
+      );
+    case 'wrong-currency':
+      const { currency } = couponError;
+      return <Trans>This coupon is only valid for {currency} purchases.</Trans>;
+    case 'redemption-code':
+      return (
+        <Trans>
+          To use a redemption code, go to your profile and click "Redeem a
+          code".
+        </Trans>
+      );
+    case 'validation-request-failed':
+      return <Trans>Error while validating the coupon. Try again later.</Trans>;
+    case 'not-applicable':
+    default:
+      return <Trans>This coupon is not applicable to any subscription.</Trans>;
+  }
+};
+
 const SubscriptionPlan = ({
   subscriptionPlanWithPricingSystems,
   disabled,
@@ -51,7 +119,7 @@ const SubscriptionPlan = ({
   setSeatsCount,
   couponCode,
   pricingSystemDiscounts,
-  couponErrorMessage,
+  couponError,
   isValidatingCoupon,
   onClearCoupon,
 }: {|
@@ -65,7 +133,7 @@ const SubscriptionPlan = ({
   setSeatsCount: (seatsCount: number) => void,
   couponCode: ?string,
   pricingSystemDiscounts: { [pricingSystemId: string]: PricingSystemDiscount },
-  couponErrorMessage: ?string,
+  couponError: ?CouponError,
   isValidatingCoupon: boolean,
   onClearCoupon: () => void,
 |}): React.Node => {
@@ -135,13 +203,15 @@ const SubscriptionPlan = ({
                   {pricingSystemDiscount ? (
                     <div style={{ color: gdevelopTheme.message.valid }}>
                       <Text color="inherit">
-                        {pricingSystemDiscount.discountMessage}
+                        {getCouponDiscountMessage(pricingSystemDiscount)}
                       </Text>
                     </div>
                   ) : (
                     <Text color="error">
                       -{' '}
-                      {couponErrorMessage || (
+                      {couponError ? (
+                        getCouponErrorMessage(couponError)
+                      ) : (
                         <Trans>Not applicable to this plan</Trans>
                       )}
                     </Text>

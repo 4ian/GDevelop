@@ -1504,7 +1504,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Distance between two objects (2D)"),
                     _("Distance between the centers of two objects, on the "
                       "X/Y plane only. To include Z, use ‘Distance between "
-                      "two objects (3D)’ of the 3D capability."),
+                      "two objects (3D)’."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
@@ -1523,8 +1523,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Distance between an object and a position (2D)"),
                     _("Distance between the center of an object and a "
                       "position, on the X/Y plane only. To include Z, use "
-                      "‘Distance between an object and a position (3D)’ of "
-                      "the 3D capability."),
+                      "‘Distance between an object and a position (3D)’."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))

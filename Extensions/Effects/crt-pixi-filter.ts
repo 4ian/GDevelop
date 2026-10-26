@@ -24,6 +24,7 @@ namespace gdjs {
       makePIXIFilter(layer, effectData) {
         const filter = new PIXI.filters.CRTFilter();
         gdjs.PixiFiltersTools.applyFilterOnlyOnContentBounds(filter);
+        gdjs.PixiFiltersTools.useHighPrecisionFragmentShader(filter);
         const crtFilter = filter as unknown as PIXI.filters.CRTFilter &
           CRTFilterExtra;
         crtFilter._animationTimer = 0;

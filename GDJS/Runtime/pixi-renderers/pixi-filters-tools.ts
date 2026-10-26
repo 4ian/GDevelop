@@ -41,6 +41,34 @@ namespace gdjs {
     });
 
     /**
+     * Compile the fragment shader of a filter in high precision, when the device
+     * supports it.
+     *
+     * PixiJS uses medium precision by default on non-Apple devices, which is
+     * 16-bit on most mobile GPUs. The random function used for the noise of
+     * filters like `CRTFilter` and `OldFilmFilter` then returns almost always
+     * the same value, and the noise disappears.
+     */
+    export const useHighPrecisionFragmentShader = (filter: PIXI.Filter) => {
+      const removePrecisionAndShaderName = (source: string) =>
+        source
+          .replace(/precision \w+ float;\n/g, '')
+          .replace(/#define SHADER_NAME .*\n/, '');
+      const { vertexSrc, fragmentSrc } = filter.program;
+      // PixiJS falls back to medium precision if high precision is not supported.
+      const defaultFragmentPrecision = PIXI.Program.defaultFragmentPrecision;
+      PIXI.Program.defaultFragmentPrecision = PIXI.PRECISION.HIGH;
+      try {
+        filter.program = PIXI.Program.from(
+          removePrecisionAndShaderName(vertexSrc),
+          removePrecisionAndShaderName(fragmentSrc)
+        );
+      } finally {
+        PIXI.Program.defaultFragmentPrecision = defaultFragmentPrecision;
+      }
+    };
+
+    /**
      * Make a filter only change the pixels inside the bounds of what it is
      * applied on, and use these bounds as its dimensions (for vignetting,
      * lines...).

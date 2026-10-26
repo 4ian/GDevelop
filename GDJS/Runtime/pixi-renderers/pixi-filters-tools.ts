@@ -40,6 +40,83 @@ namespace gdjs {
         '}\n',
     });
 
+    /**
+     * Make a filter only change the pixels inside the bounds of what it is
+     * applied on, and use these bounds as its dimensions (for vignetting,
+     * lines...).
+     *
+     * The effects of a scene layer are applied on the whole screen (see
+     * `LayerPixiRenderer._updateFilterArea`), but some filters (like `CRTFilter`
+     * and `OldFilmFilter`) add noise to every pixel, including transparent ones.
+     * Without this, a layer that is empty or has its content only on a part of
+     * the screen would show this noise on the whole screen.
+     *
+     * The fragment shader must use `vTextureCoord * filterArea.xy` for the pixel
+     * coordinates and the `dimensions` uniform for the size of the filtered area.
+     */
+    export const applyFilterOnlyOnContentBounds = (filter: PIXI.Filter) => {
+      const removeShaderName = (source: string) =>
+        source.replace(/#define SHADER_NAME .*\n/, '');
+      const { vertexSrc, fragmentSrc } = filter.program;
+      filter.program = PIXI.Program.from(
+        removeShaderName(vertexSrc),
+        removeShaderName(fragmentSrc)
+          .replace(
+            /vTextureCoord(\.xy)? \* filterArea\.xy/g,
+            '(vTextureCoord * filterArea.xy - contentFrame.xy)'
+          )
+          .replace(
+            'uniform vec2 dimensions;',
+            'uniform vec4 contentFrame;\n#define dimensions contentFrame.zw'
+          )
+          .replace(
+            'gl_FragColor = texture2D(uSampler, vTextureCoord);',
+            `gl_FragColor = texture2D(uSampler, vTextureCoord);
+    vec2 contentCoord = vTextureCoord * filterArea.xy - contentFrame.xy;
+    if (
+      contentCoord.x < 0.0 || contentCoord.y < 0.0 ||
+      contentCoord.x >= contentFrame.z || contentCoord.y >= contentFrame.w
+    ) {
+      return;
+    }`
+          )
+      );
+
+      const contentFrame = new Float32Array(4);
+      filter.uniforms.contentFrame = contentFrame;
+      const contentBounds = new PIXI.Rectangle();
+      const originalApply = filter.apply.bind(filter);
+      filter.apply = (
+        filterManager,
+        input,
+        output,
+        clearMode,
+        currentState
+      ) => {
+        if (currentState) {
+          const { sourceFrame, target, filters } = currentState;
+          // Same as the area that PixiJS computes when the filter area is not set.
+          contentBounds.copyFrom(target.getBounds(true));
+          if (contentBounds.width > 0 && contentBounds.height > 0) {
+            let padding = 0;
+            for (const filter of filters) padding += filter.padding;
+            contentBounds.pad(padding);
+            contentBounds.fit(sourceFrame);
+          }
+          contentFrame[0] = contentBounds.x - sourceFrame.x;
+          contentFrame[1] = contentBounds.y - sourceFrame.y;
+          contentFrame[2] = contentBounds.width;
+          contentFrame[3] = contentBounds.height;
+        } else {
+          contentFrame[0] = 0;
+          contentFrame[1] = 0;
+          contentFrame[2] = input.filterFrame?.width || 0;
+          contentFrame[3] = input.filterFrame?.height || 0;
+        }
+        originalApply(filterManager, input, output, clearMode, currentState);
+      };
+    };
+
     const _filterCreators: {
       [filterName: string]: FilterCreator;
     } = {};

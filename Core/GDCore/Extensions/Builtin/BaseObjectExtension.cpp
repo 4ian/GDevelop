@@ -1511,7 +1511,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectPtr", _("Object"));
 
   obj.AddExpression("SqDistance",
-                    _("Square distance between two objects"),
+                    _("Square distance between two objects (2D)"),
                     _("Square distance between the centers of two objects, on "
                       "the X/Y plane only."),
                     _("Position"),
@@ -1532,7 +1532,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Target Y position"));
 
   obj.AddExpression("SqDistanceToPosition",
-                    _("Square distance between an object and a position"),
+                    _("Square distance between an object and a position (2D)"),
                     _("Square distance between the center of an object and a "
                       "position, on the X/Y plane only."),
                     _("Position"),
@@ -2035,9 +2035,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition("IsTurnedTowardObject",
-                    _("An object is turned toward another"),
-                    _("Check if an object is turned toward another"),
+                    _("An object is turned toward another (2D)"),
+                    _("Check if the angle of an object points toward the "
+                      "center of another one, on the X/Y plane only. To "
+                      "include Z, use ‘An object is turned toward another "
+                      "(3D)’."),
                     _("_PARAM0_ is turned toward _PARAM1_ ± _PARAM2_°"),
+                    _("Angle"),
+                    "res/conditions/estTourne24.png",
+                    "res/conditions/estTourne.png")
+      .AddParameter("objectList", _("Name of the object"))
+      .AddParameter("objectList", _("Name of the second object"))
+      .AddParameter("expression",
+                    _("Angle of tolerance, in degrees (0: minimum tolerance)"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("IsTurnedTowardObject3D",
+                    _("An object is turned toward another (3D)"),
+                    _("Check if the forward direction of an object (with its "
+                      "rotations on X, Y and Z) points toward the center of "
+                      "another one, on the X, Y and Z axes (a 2D object is at "
+                      "a Z of 0 and points along its angle). To ignore Z, use "
+                      "‘An object is turned toward another (2D)’."),
+                    _("_PARAM0_ is turned toward _PARAM1_ ± _PARAM2_° in 3D"),
                     _("Angle"),
                     "res/conditions/estTourne24.png",
                     "res/conditions/estTourne.png")

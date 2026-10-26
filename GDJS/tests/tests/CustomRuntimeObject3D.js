@@ -132,6 +132,28 @@ describe('gdjs.CustomRuntimeObject3D', function () {
     expect(customObject.getDrawableZ()).to.be(32 - 300 * 0.5);
   });
 
+  /**
+   * @param {gdjs.RuntimeScene} runtimeScene
+   * @param {string} name
+   * @param {[number, number, number]} position
+   */
+  const createPlacedCustomObject = (runtimeScene, name, [x, y, z]) => {
+    const customObject = new gdjs.CustomRuntimeObject3D(runtimeScene, {
+      name,
+      type: 'MyExtension::MyEventsBasedObject',
+      variant: '',
+      isInnerAreaFollowingParentSize: false,
+      variables: [],
+      behaviors: [],
+      effects: [],
+      content: { width: 0, height: 0, depth: 0 },
+    });
+    runtimeScene.addObject(customObject);
+    customObject.setPosition(x, y);
+    customObject.setZ(z);
+    return customObject;
+  };
+
   describe('toParent / fromParent', function () {
     const tolerance = 1e-3;
 
@@ -299,28 +321,6 @@ describe('gdjs.CustomRuntimeObject3D', function () {
   });
 
   describe('distances in 3D', function () {
-    /**
-     * @param {gdjs.RuntimeScene} runtimeScene
-     * @param {string} name
-     * @param {[number, number, number]} position
-     */
-    const createPlacedCustomObject = (runtimeScene, name, [x, y, z]) => {
-      const customObject = new gdjs.CustomRuntimeObject3D(runtimeScene, {
-        name,
-        type: 'MyExtension::MyEventsBasedObject',
-        variant: '',
-        isInnerAreaFollowingParentSize: false,
-        variables: [],
-        behaviors: [],
-        effects: [],
-        content: { width: 0, height: 0, depth: 0 },
-      });
-      runtimeScene.addObject(customObject);
-      customObject.setPosition(x, y);
-      customObject.setZ(z);
-      return customObject;
-    };
-
     it('computes the distance between two 3D positions', () => {
       expect(
         gdjs.evtTools.common.distanceBetweenPositions3D(1, 2, 3, 3, 5, 9)
@@ -478,6 +478,177 @@ describe('gdjs.CustomRuntimeObject3D', function () {
         )
       );
       expect(object3D.getDistanceToObject3D(null)).to.be(0);
+    });
+  });
+
+  /**
+   * @param {gdjs.RuntimeScene} runtimeScene
+   * @param {string} name
+   */
+  const createFlatCustomObject = (runtimeScene, name) => {
+    const flatObject = new gdjs.CustomRuntimeObject2D(runtimeScene, {
+      name,
+      type: 'MyExtension::MyEventsBasedObject',
+      variant: '',
+      isInnerAreaFollowingParentSize: false,
+      variables: [],
+      behaviors: [],
+      effects: [],
+      content: {},
+    });
+    runtimeScene.addObject(flatObject);
+    return flatObject;
+  };
+
+  /**
+   * Move an object for its center to be at a position of the scene (a 2D
+   * object stays at a Z of 0).
+   * @param {gdjs.RuntimeObject} object
+   * @param {[number, number, number]} center
+   */
+  const placeCenterAt = (object, [x, y, z]) => {
+    object.setX(object.getX() + x - object.getCenterXInScene());
+    object.setY(object.getY() + y - object.getCenterYInScene());
+    if (gdjs.Base3DHandler.is3D(object)) {
+      object.setZ(object.getZ() + z - object.getCenterZInScene());
+    }
+  };
+
+  describe('turned toward an object in 3D', function () {
+    /**
+     * @param {gdjs.RuntimeObject} object
+     * @param {gdjs.RuntimeObject} otherObject
+     * @param {number} tolerance
+     */
+    const isTurnedTowardObject3D = (object, otherObject, tolerance) =>
+      gdjs.evtTools.object.isTurnedTowardObject3D(
+        Hashtable.newFrom({ Object: [object] }),
+        Hashtable.newFrom({ OtherObject: [otherObject] }),
+        tolerance,
+        false
+      );
+
+    it('includes the height of the other object, unlike the 2D condition', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const tank = createPlacedCustomObject(runtimeScene, 'Tank', [0, 0, 0]);
+      const truck = createPlacedCustomObject(runtimeScene, 'Truck', [0, 0, 0]);
+      const plane = createPlacedCustomObject(runtimeScene, 'Plane', [0, 0, 0]);
+      placeCenterAt(tank, [100, 100, 0]);
+      placeCenterAt(truck, [200, 100, 0]);
+      // Straight ahead on X/Y, and 45° above.
+      placeCenterAt(plane, [200, 100, 100]);
+
+      expect(isTurnedTowardObject3D(tank, truck, 1)).to.be(true);
+      expect(
+        gdjs.evtTools.object.isTurnedTowardObject(
+          Hashtable.newFrom({ Object: [tank] }),
+          Hashtable.newFrom({ OtherObject: [plane] }),
+          1,
+          false
+        )
+      ).to.be(true);
+      expect(isTurnedTowardObject3D(tank, plane, 44)).to.be(false);
+      expect(isTurnedTowardObject3D(tank, plane, 46)).to.be(true);
+    });
+
+    it('turns with the angle like the 2D condition', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const tank = createPlacedCustomObject(runtimeScene, 'Tank', [0, 0, 0]);
+      const truck = createPlacedCustomObject(runtimeScene, 'Truck', [0, 0, 0]);
+      placeCenterAt(tank, [100, 100, 0]);
+      placeCenterAt(truck, [100, 200, 0]);
+
+      expect(isTurnedTowardObject3D(tank, truck, 10)).to.be(false);
+      tank.setAngle(90);
+      expect(isTurnedTowardObject3D(tank, truck, 1)).to.be(true);
+    });
+
+    it('follows the forward direction of an object rotated on X, Y and Z', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const tank = createPlacedCustomObject(runtimeScene, 'Tank', [0, 0, 0]);
+      const target = createPlacedCustomObject(
+        runtimeScene,
+        'Target',
+        [0, 0, 0]
+      );
+      placeCenterAt(tank, [100, 100, 50]);
+      tank.setAngle(30);
+      tank.setRotationX(20);
+      tank.setRotationY(-40);
+      const [forwardX, forwardY, forwardZ] = [
+        tank.getForwardX(),
+        tank.getForwardY(),
+        tank.getForwardZ(),
+      ];
+      expect(Math.abs(forwardZ)).to.be.above(0.5);
+
+      placeCenterAt(target, [
+        100 + 300 * forwardX,
+        100 + 300 * forwardY,
+        50 + 300 * forwardZ,
+      ]);
+      expect(isTurnedTowardObject3D(tank, target, 0.01)).to.be(true);
+
+      // The same point mirrored below the object is far from its direction.
+      placeCenterAt(target, [
+        100 + 300 * forwardX,
+        100 + 300 * forwardY,
+        50 - 300 * forwardZ,
+      ]);
+      expect(isTurnedTowardObject3D(tank, target, 10)).to.be(false);
+    });
+
+    it('takes a 2D object at a Z of 0, pointing along its angle', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const plane = createPlacedCustomObject(runtimeScene, 'Plane', [0, 0, 0]);
+      const flatObject = createFlatCustomObject(runtimeScene, 'Flat');
+      placeCenterAt(flatObject, [100, 100, 0]);
+      placeCenterAt(plane, [100, 200, 100]);
+
+      // Toward the plane on X/Y, 45° below it.
+      flatObject.setAngle(90);
+      expect(isTurnedTowardObject3D(flatObject, plane, 44)).to.be(false);
+      expect(isTurnedTowardObject3D(flatObject, plane, 46)).to.be(true);
+      // The plane points along X: the 2D object, at its side and below it,
+      // is 90° from its direction.
+      expect(isTurnedTowardObject3D(plane, flatObject, 89)).to.be(false);
+      expect(isTurnedTowardObject3D(plane, flatObject, 91)).to.be(true);
+    });
+
+    it('is not turned toward an object at the same center', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const tank = createPlacedCustomObject(runtimeScene, 'Tank', [0, 0, 0]);
+      const truck = createPlacedCustomObject(runtimeScene, 'Truck', [0, 0, 0]);
+      placeCenterAt(tank, [100, 100, 10]);
+      placeCenterAt(truck, [100, 100, 10]);
+
+      expect(isTurnedTowardObject3D(tank, truck, 180)).to.be(false);
+    });
+
+    it('picks the objects turned toward none of the others when inverted', async () => {
+      const { runtimeScene } = await makeCustomObject3D();
+      const tank = createPlacedCustomObject(runtimeScene, 'Tank', [0, 0, 0]);
+      const truck = createPlacedCustomObject(runtimeScene, 'Truck', [0, 0, 0]);
+      const plane = createPlacedCustomObject(runtimeScene, 'Plane', [0, 0, 0]);
+      placeCenterAt(tank, [100, 100, 0]);
+      placeCenterAt(truck, [200, 100, 0]);
+      placeCenterAt(plane, [200, 100, 100]);
+
+      const tanks = Hashtable.newFrom({ Tank: [tank] });
+      const vehicles = Hashtable.newFrom({ Vehicle: [plane, truck] });
+      expect(
+        gdjs.evtTools.object.isTurnedTowardObject3D(tanks, vehicles, 10, false)
+      ).to.be(true);
+      expect(vehicles.get('Vehicle')).to.eql([truck]);
+
+      expect(
+        gdjs.evtTools.object.isTurnedTowardObject3D(
+          Hashtable.newFrom({ Tank: [tank] }),
+          Hashtable.newFrom({ Vehicle: [plane] }),
+          10,
+          true
+        )
+      ).to.be(true);
     });
   });
 

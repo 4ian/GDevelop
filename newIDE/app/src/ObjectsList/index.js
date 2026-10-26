@@ -1106,24 +1106,36 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     // Deleting an object of the scene also deletes its instances in the
-    // external layouts of the scene - which undo won't bring back.
-    const hasInstancesInExternalLayouts = React.useCallback(
+    // scene and in all its external layouts - and undo only brings back the
+    // ones of the edited scene or external layout.
+    const editedInstances = initialInstances || null;
+    const isEditingExternalLayout =
+      !!layout &&
+      !!editedInstances &&
+      layout.getInitialInstances().ptr !== editedInstances.ptr;
+    const hasInstancesLostByUndo = React.useCallback(
       (objectName: string): boolean => {
         if (!layout) return false;
+        if (
+          isEditingExternalLayout &&
+          layout.getInitialInstances().hasInstancesOfObject(objectName)
+        )
+          return true;
         const layoutName = layout.getName();
         for (let i = 0; i < project.getExternalLayoutsCount(); i++) {
           const externalLayout = project.getExternalLayoutAt(i);
+          const externalLayoutInstances = externalLayout.getInitialInstances();
           if (
             externalLayout.getAssociatedLayout() === layoutName &&
-            externalLayout
-              .getInitialInstances()
-              .hasInstancesOfObject(objectName)
+            (!editedInstances ||
+              externalLayoutInstances.ptr !== editedInstances.ptr) &&
+            externalLayoutInstances.hasInstancesOfObject(objectName)
           )
             return true;
         }
         return false;
       },
-      [project, layout]
+      [project, layout, editedInstances, isEditingExternalLayout]
     );
 
     const {
@@ -1140,7 +1152,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       project,
       globalObjectsContainer,
       objectsContainer,
-      hasInstancesInExternalLayouts,
+      hasInstancesLostByUndo,
+      isEditingExternalLayout,
       selectedObjectFolderOrObjectsWithContext,
       canSetAsGlobalObject,
       selectObjectFolderOrObjectsWithContext,
@@ -1209,7 +1222,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         getThumbnail,
         showDeleteConfirmation,
-        hasInstancesInExternalLayouts,
+        hasInstancesLostByUndo,
+        isEditingExternalLayout,
         selectObjectFolderOrObjectWithContext,
         selectObjectFolderOrObjectsWithContext,
         addFolder,
@@ -1240,7 +1254,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         getThumbnail,
         showDeleteConfirmation,
-        hasInstancesInExternalLayouts,
+        hasInstancesLostByUndo,
+        isEditingExternalLayout,
         selectObjectFolderOrObjectWithContext,
         selectObjectFolderOrObjectsWithContext,
         addFolder,

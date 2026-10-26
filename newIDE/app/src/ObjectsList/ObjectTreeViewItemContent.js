@@ -92,7 +92,8 @@ export type ObjectTreeViewItemProps = {|
     folder?: gdObjectFolderOrObject,
   |}) => void,
   showDeleteConfirmation: (options: any) => Promise<boolean>,
-  hasInstancesInExternalLayouts: (objectName: string) => boolean,
+  hasInstancesLostByUndo: (objectName: string) => boolean,
+  isEditingExternalLayout: boolean,
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -580,7 +581,8 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       objectsContainer,
       onObjectModified,
       showDeleteConfirmation,
-      hasInstancesInExternalLayouts,
+      hasInstancesLostByUndo,
+      isEditingExternalLayout,
       onDeleteObjects,
       selectObjectFolderOrObjectWithContext,
     } = this.props;
@@ -589,9 +591,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       title: t`Remove object`,
       message: this._isGlobal
         ? t`Are you sure you want to remove this global object? It will be removed from every scene. Undo will bring it back in the current scene only: its instances in the other scenes will be lost.`
-        : hasInstancesInExternalLayouts(object.getName())
-        ? t`Are you sure you want to remove this object? It will also be removed from the external layouts of this scene. Undo will bring it back in the scene only: its instances in the external layouts will be lost.`
-        : t`Are you sure you want to remove this object?`,
+        : !hasInstancesLostByUndo(object.getName())
+        ? t`Are you sure you want to remove this object?`
+        : isEditingExternalLayout
+        ? t`Are you sure you want to remove this object? It will also be removed from the scene and its other external layouts. Undo will bring it back in this external layout only: its instances in the scene and the other external layouts will be lost.`
+        : t`Are you sure you want to remove this object? It will also be removed from the external layouts of this scene. Undo will bring it back in the scene only: its instances in the external layouts will be lost.`,
     });
     if (!answer) return false;
 

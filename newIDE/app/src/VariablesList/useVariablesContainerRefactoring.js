@@ -57,6 +57,10 @@ const useVariablesContainerRefactoring = ({
   // if it is still pending - so that two changes that must stay separate
   // (like for the history) are not applied as a single one.
   applyPendingRefactoringOfPreviousChanges: () => void,
+  // Apply now the refactoring of the changes made so far, instead of
+  // waiting for the debounce (for a change that must be in the project,
+  // instances included, before it's saved to the history).
+  applyPendingRefactoringNow: () => void,
   // Forget the pending changes and start again from the current state of
   // the variables container (after an undo/redo changed it).
   resetSnapshot: () => void,
@@ -256,6 +260,17 @@ const useVariablesContainerRefactoring = ({
     [applyPendingRefactoring]
   );
 
+  const applyPendingRefactoringNow = React.useCallback(
+    () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      applyPendingRefactoring();
+    },
+    [applyPendingRefactoring]
+  );
+
   const onVariablesUpdated = React.useCallback(
     () => {
       if (!snapshotRef.current) return;
@@ -287,6 +302,7 @@ const useVariablesContainerRefactoring = ({
   return {
     onVariablesUpdated,
     applyPendingRefactoringOfPreviousChanges,
+    applyPendingRefactoringNow,
     resetSnapshot,
   };
 };

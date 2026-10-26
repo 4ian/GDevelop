@@ -577,7 +577,10 @@ class Editor {
   async focusEditor() {
     await this.page.evaluate(() => {
       if (document.activeElement) document.activeElement.blur();
-      document.getElementById('scene-editor').focus();
+      (
+        document.querySelector('#scene-editor[data-active]') ||
+        document.getElementById('scene-editor')
+      ).focus();
     });
   }
 
@@ -7581,6 +7584,323 @@ const serveFixture = () =>
     });
     server.listen(0, '127.0.0.1', () => resolve(server));
   });
+
+const PHYSICS_FIXTURE_SHARED_DATA = {
+  name: 'Physics2',
+  type: 'Physics2::Physics2Behavior',
+  gravityX: 1,
+  gravityY: 5,
+  scaleX: 100,
+  scaleY: 100,
+  worldScale: 100,
+};
+
+const getPhysicsSharedData = async editor => {
+  const { project } = JSON.parse(await getSerializedProject(editor));
+  return project.layouts[0].behaviorsSharedData.find(
+    ({ name }) => name === 'Physics2'
+  );
+};
+
+const removeBehaviorInPanel = async (editor, objectName, behaviorName) => {
+  const { page } = editor;
+  await editor.selectObjectInList(objectName);
+  const panel = '#object-properties-editor';
+  const behaviorPanel = `${panel} [id="behavior-panel-${behaviorName}"]`;
+  await clickSelectorIfPresent(
+    editor,
+    `${panel} #behaviors-section-unfold-button`
+  );
+  await editor.waitUntil('behavior listed', () =>
+    isSelectorVisible(editor, behaviorPanel)
+  );
+  await clickSelectorIfPresent(editor, `${behaviorPanel} #remove-behavior`);
+  await sleep(500);
+  if (await page.$('[role="dialog"]'))
+    await editor.clickButtonWithText(
+      '[role="dialog"]',
+      /^(confirm|delete|yes|remove)/
+    );
+  await sleep(HISTORY_SAVE_DELAY);
+};
+
+{
+  const name =
+    'undoing a behavior removal in the panel restores the scene settings of the behavior';
+  fixtureSetups[name] = project => {
+    project.layouts[0].objects[0].behaviors = [
+      { name: 'Physics2', type: 'Physics2::Physics2Behavior' },
+    ];
+    project.layouts[0].behaviorsSharedData = [PHYSICS_FIXTURE_SHARED_DATA];
+  };
+  scenarios[name] = async editor => {
+    const gravity = async () => {
+      const sharedData = await getPhysicsSharedData(editor);
+      return sharedData ? [sharedData.gravityX, sharedData.gravityY] : null;
+    };
+    const behaviors = () =>
+      evaluateWithSceneEditor(editor, props =>
+        props.objectsContainer
+          .getObject('MyObject')
+          .getAllBehaviorNames()
+          .toJSArray()
+          .filter(name => name === 'Physics2')
+      );
+    expectEqual(await gravity(), [1, 5], 'initial gravity');
+    await removeBehaviorInPanel(editor, 'MyObject', 'Physics2');
+    expectEqual(await behaviors(), [], 'behaviors after the removal');
+
+    await editor.undo();
+    expectEqual(await behaviors(), ['Physics2'], 'behaviors after undo');
+    expectEqual(await gravity(), [1, 5], 'gravity after undo');
+    await editor.redo();
+    expectEqual(await behaviors(), [], 'behaviors after redo');
+    await editor.undo();
+    expectEqual(await behaviors(), ['Physics2'], 'behaviors after second undo');
+    expectEqual(await gravity(), [1, 5], 'gravity after the second undo');
+  };
+}
+
+const deleteVariableInPanel = async (editor, panel, variableName) => {
+  const nameField = (await editor.page.evaluateHandle(
+    (panel, variableName) =>
+      Array.from(document.querySelectorAll(`${panel} input[id$="-name"]`)).find(
+        input => input.value === variableName
+      ),
+    panel,
+    variableName
+  )).asElement();
+  if (!nameField)
+    throw new Error(`Variable "${variableName}" not in ${panel}.`);
+  await nameField.click();
+  await sleep(200);
+  await editor.page.click(`${panel} #variables-list-delete-button`);
+  await sleep(HISTORY_SAVE_DELAY);
+};
+
+const instanceWithVariableOverrideFixtureSetup = uuid => project => {
+  project.layouts[0].instances.push({
+    persistentUuid: uuid,
+    angle: 0,
+    customSize: false,
+    height: 0,
+    layer: '',
+    locked: false,
+    name: 'VariablesObject',
+    width: 0,
+    x: 100,
+    y: 100,
+    zOrder: 3,
+    numberProperties: [],
+    stringProperties: [],
+    initialVariables: [{ name: 'VarA', type: 'number', value: 5 }],
+  });
+};
+
+{
+  const name =
+    'instances keep the deletion of an object variable when a later instance change is undone';
+  const INSTANCE_UUID = '55555555-5555-5555-5555-555555555555';
+  fixtureSetups[name] = instanceWithVariableOverrideFixtureSetup(INSTANCE_UUID);
+  scenarios[name] = async editor => {
+    await editor.selectObjectInList('VariablesObject');
+    const panel = '#object-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'object-variables-section');
+    await deleteVariableInPanel(editor, panel, 'VarA');
+    expectEqual(
+      await editor.getVariableNames(panel),
+      ['VarB'],
+      'object variables after the deletion'
+    );
+    expectEqual(
+      await getInstanceVariableNames(editor, INSTANCE_UUID),
+      [],
+      'instance override removed with the object variable'
+    );
+
+    await editor.selectInstancesOf('VariablesObject');
+    const x = '#instance-properties-editor [id="X"]';
+    await editor.setFieldValue(x, '400');
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.undo();
+    expectEqual(await editor.getFieldValue(x), '100', 'X after undo');
+    expectEqual(
+      await getInstanceVariableNames(editor, INSTANCE_UUID),
+      [],
+      'instance override still removed after the undo of the move'
+    );
+  };
+}
+
+{
+  const name =
+    'undoing the deletion of an object variable restores the overrides of its instances';
+  const INSTANCE_UUID = '56565656-5656-5656-5656-565656565656';
+  fixtureSetups[name] = instanceWithVariableOverrideFixtureSetup(INSTANCE_UUID);
+  scenarios[name] = async editor => {
+    await editor.selectObjectInList('VariablesObject');
+    const panel = '#object-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'object-variables-section');
+    await deleteVariableInPanel(editor, panel, 'VarA');
+    expectEqual(
+      await getInstanceVariableNames(editor, INSTANCE_UUID),
+      [],
+      'instance override removed with the object variable'
+    );
+
+    await editor.undo();
+    expectEqual(
+      await editor.getVariableNames(panel),
+      ['VarA', 'VarB'],
+      'object variables after undo'
+    );
+    expectEqual(
+      await getInstanceVariableNames(editor, INSTANCE_UUID),
+      ['VarA'],
+      'instance override after undo'
+    );
+    await editor.redo();
+    expectEqual(
+      await getInstanceVariableNames(editor, INSTANCE_UUID),
+      [],
+      'instance override after redo'
+    );
+  };
+}
+
+{
+  const name =
+    'an undo right after a variable rename in the panel leaves the events consistent';
+  fixtureSetups[name] = project => {
+    project.layouts[0].events = [
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['VarA', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+    ];
+  };
+  scenarios[name] = async editor => {
+    const panel = '#scene-properties-editor';
+    await editor.unfoldVariablesSection(panel, 'scene-variables-section');
+    const getEventVariableName = () => getEventActionParameter(editor, 0);
+    const getNames = () => editor.getVariableNames(panel);
+
+    // An unrelated step before the rename.
+    await editor.setFieldValue(`${panel} #variable-1-text-value`, '42');
+    await sleep(HISTORY_SAVE_DELAY);
+
+    const nameField = (await editor.page.evaluateHandle(
+      panel =>
+        Array.from(
+          document.querySelectorAll(`${panel} input[id$="-name"]`)
+        ).find(input => input.value === 'VarA'),
+      panel
+    )).asElement();
+    await nameField.click({ clickCount: 3 });
+    await editor.page.keyboard.type('Score');
+    await editor.page.keyboard.press('Tab');
+    // Undo before the (debounced) refactoring of the rename ran.
+    await editor.undo();
+    await sleep(500);
+    const names = await getNames();
+    const eventName = await getEventVariableName();
+    expectEqual(
+      names.includes(eventName),
+      true,
+      `event uses "${eventName}" but the variables are ${JSON.stringify(
+        names
+      )} after the undo`
+    );
+    await editor.redo();
+    await sleep(500);
+    const namesAfterRedo = await getNames();
+    const eventNameAfterRedo = await getEventVariableName();
+    expectEqual(
+      namesAfterRedo.includes(eventNameAfterRedo),
+      true,
+      `event uses "${eventNameAfterRedo}" but the variables are ${JSON.stringify(
+        namesAfterRedo
+      )} after the redo`
+    );
+  };
+}
+
+const getSceneInstancesCountOfObject = (editor, objectName) =>
+  evaluateWithSceneEditor(
+    editor,
+    (props, gd, sceneEditor, objectName) => {
+      const element = new gd.SerializerElement();
+      props.project
+        .getLayout('Scene')
+        .getInitialInstances()
+        .serializeTo(element);
+      const instances = JSON.parse(gd.Serializer.toJSON(element));
+      element.delete();
+      return instances.filter(instance => instance.name === objectName).length;
+    },
+    objectName
+  );
+
+{
+  const name =
+    'deleting an object from an external layout editor warns about the scene instances that undo will not restore';
+  fixtureSetups[name] = externalLayoutFixtureSetup;
+  scenarios[name] = async editor => {
+    const { page } = editor;
+    await openProjectManager(editor);
+    await openProjectManagerItem(editor, 'Ext');
+    await closeProjectManager(editor);
+    const sceneInstancesCount = await getSceneInstancesCountOfObject(
+      editor,
+      'MyObject'
+    );
+    expectEqual(sceneInstancesCount > 0, true, 'scene instances at start');
+
+    // Both editors are mounted: only the active one is visible.
+    const row =
+      '#scene-editor[data-active] #objects-list [data-object-name="MyObject"]';
+    await (await page.waitForSelector(row)).click({ button: 'right' });
+    await editor.clickMenuItem(/^delete(?! folder)/i);
+    await page.waitForSelector('[role="dialog"]');
+    const text = await page.$eval('[role="dialog"]', el => el.textContent);
+    await editor.clickButtonWithText(
+      '[role="dialog"]',
+      /^(delete|confirm|yes)/i
+    );
+    await editor.waitUntil(
+      'object deleted',
+      async () => !(await exists(editor, row))
+    );
+    await sleep(HISTORY_SAVE_DELAY);
+    await editor.undo();
+    await page.waitForSelector(row);
+    expectEqual(
+      await getExternalLayoutInstanceLayers(editor),
+      ['Background'],
+      'external layout instance after undo'
+    );
+    const sceneInstancesAfterUndo = await getSceneInstancesCountOfObject(
+      editor,
+      'MyObject'
+    );
+    if (sceneInstancesAfterUndo !== sceneInstancesCount) {
+      // Not restored: the user must have been warned about the scene, not
+      // about the external layout being edited (which undo does restore).
+      expectEqual(
+        /in this external layout only/i.test(text),
+        true,
+        `scene instances lost by undo (${sceneInstancesAfterUndo}/${sceneInstancesCount}) and the warning was: ${text}`
+      );
+    }
+  };
+}
 
 const main = async () => {
   if (args.includes('--list')) {

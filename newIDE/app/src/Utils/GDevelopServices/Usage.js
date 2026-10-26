@@ -738,12 +738,14 @@ export const getRedirectToCheckoutUrl = ({
   userEmail,
   quantity,
   couponCode,
+  language,
 }: {|
   pricingSystemId: string,
   userId: string,
   userEmail: string,
   quantity?: number,
   couponCode?: string,
+  language: string,
 |}): string => {
   const url = new URL(
     `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
@@ -754,6 +756,7 @@ export const getRedirectToCheckoutUrl = ({
   if (quantity !== undefined && quantity > 1)
     url.searchParams.set('quantity', quantity.toString());
   if (couponCode) url.searchParams.set('couponCode', couponCode);
+  url.searchParams.set('language', language);
   return url.toString();
 };
 
@@ -783,15 +786,33 @@ export const redeemCode = async (
 export interface PricingSystemDiscount {
   pricingSystemId: string;
   discountMessage: string;
+  // The percentage taken off the price, or null for a fixed amount discount.
+  discountPercentage: number | null;
   originalAmountInCents: number;
   discountedAmountInCents: number;
   currency: string;
   discountedPaypalPlanId: string | null;
 }
 
+export type CouponValidationError =
+  | {|
+      code:
+        | 'missing-code'
+        | 'invalid-code'
+        | 'inactive'
+        | 'not-yet-valid'
+        | 'expired'
+        | 'not-applicable-to-plan'
+        | 'not-applicable'
+        | 'redemption-code',
+    |}
+  | {| code: 'not-applicable-to-period', period: 'week' | 'month' | 'year' |}
+  | {| code: 'wrong-currency', currency: string |};
+
 export type CouponValidationApiResponse = {
   isValid: boolean,
   pricingSystemDiscounts: PricingSystemDiscount[],
+  error?: CouponValidationError,
   errorMessage?: string,
 };
 

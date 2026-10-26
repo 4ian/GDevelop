@@ -19,6 +19,7 @@ import { LineStackLayout } from '../../../../UI/Layout';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import { extractGDevelopApiErrorStatusAndCode } from '../../../../Utils/GDevelopServices/Errors';
 import PasswordPromptDialog from '../../../../AssetStore/PasswordPromptDialog';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
 
 type Props = {|
   course: Course,
@@ -40,6 +41,7 @@ const CoursePurchaseDialog = ({
     coursePurchases,
     loginState,
   } = React.useContext(AuthenticatedUserContext);
+  const preferences = React.useContext(PreferencesContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
     isCheckingPurchasesAfterLogin,
@@ -78,6 +80,7 @@ const CoursePurchaseDialog = ({
         priceName: price.name,
         userId: profile.id,
         userEmail: profile.email,
+        language: preferences.values.language,
         ...(password ? { password } : undefined),
       });
       Window.openExternalURL(checkoutUrl);

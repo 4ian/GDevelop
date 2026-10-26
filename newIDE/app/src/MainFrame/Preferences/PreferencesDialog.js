@@ -441,6 +441,7 @@ const PreferencesDialog = ({
     setBlockPreviewAndExportOnDiagnosticErrors,
     setShowDeprecatedInstructionWarning,
     setUse3DEditor,
+    setUseRealTime2DEditor,
     setShowBasicProfilingCounters,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
@@ -1110,6 +1111,16 @@ const PreferencesDialog = ({
                 renderToggle(
                   values.use3DEditor,
                   setUse3DEditor,
+                  !is3DRenderingSupported
+                ),
+            },
+            {
+              id: 'use-experimental-real-time-2d-editor',
+              label: i18n._(t`Use experimental real-time 2D scene editor`),
+              renderControl: () =>
+                renderToggle(
+                  values.useRealTime2DEditor,
+                  setUseRealTime2DEditor,
                   !is3DRenderingSupported
                 ),
             },

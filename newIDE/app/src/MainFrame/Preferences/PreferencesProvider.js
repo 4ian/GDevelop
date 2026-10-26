@@ -144,7 +144,8 @@ export const getInitialPreferences = (): {
   gameplayTestFramePosition: {| left: number, bottom: number |} | null,
   gameplayTestFrameZoomFactor: number | null,
   themeName: any,
-  use3DEditor: any,
+  use3DEditor: boolean,
+  useRealTime2DEditor: boolean,
   useBackgroundSerializerForSaving: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
@@ -360,6 +361,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUse3DEditor: (this._setUse3DEditor.bind(this): any),
     // $FlowFixMe[method-unbinding]
     getUse3DEditor: (this._getUse3DEditor.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setUseRealTime2DEditor: (this._setUseRealTime2DEditor.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    getUseRealTime2DEditor: (this._getUseRealTime2DEditor.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setShowBasicProfilingCounters: (this._setShowBasicProfilingCounters.bind(
       this
@@ -807,6 +812,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getUse3DEditor(): any {
     return this.state.values.use3DEditor;
+  }
+
+  _setUseRealTime2DEditor(useRealTime2DEditor: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          useRealTime2DEditor,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getUseRealTime2DEditor(): any {
+    return this.state.values.useRealTime2DEditor;
   }
 
   _setShowBasicProfilingCounters(showBasicProfilingCounters: boolean) {

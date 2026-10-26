@@ -1,9 +1,9 @@
 // @ts-nocheck
 
 /**
- * The effects of a scene layer are applied on the whole screen: they must keep
- * the transparent pixels of the layer transparent, or they show on top of the
- * layers below even when the layer is empty.
+ * The effects of a scene layer are applied on the whole screen: effects adding
+ * noise must only change the pixels inside the bounds of the layer content,
+ * or they show on top of the layers below even when the layer is empty.
  */
 describe('gdjs.LayerPixiRenderer (2D effects on transparent pixels)', () => {
   const makeLayerData = (name) => ({
@@ -104,11 +104,10 @@ describe('gdjs.LayerPixiRenderer (2D effects on transparent pixels)', () => {
 
   /**
    * Render a 800x600 scene with a blue background, an empty base layer and
-   * a layer with the effect, optionally containing a green rectangle
-   * covering the screen.
-   * @returns the colors of pixels sampled on a grid covering the screen.
+   * a layer with the effect, containing the given green rectangles.
+   * @returns the pixels sampled on a grid covering the screen.
    */
-  const renderAndSamplePixels = (effectData, { withRectangle }) => {
+  const renderAndSamplePixels = (effectData, rectangles) => {
     runtimeGame = gdjs.getPixiRuntimeGame({
       propertiesOverrides: { antialiasingMode: 'none' },
     });
@@ -122,13 +121,13 @@ describe('gdjs.LayerPixiRenderer (2D effects on transparent pixels)', () => {
       usedExtensionsWithVariablesData: [],
     });
     const layer = runtimeScene.getLayer('Effects');
-    if (withRectangle) {
-      const graphics = new PIXI.Graphics();
-      graphics.beginFill(0x00ff00);
-      graphics.drawRect(0, 0, 800, 600);
-      graphics.endFill();
-      layer.getRenderer().getRendererObject().addChild(graphics);
+    const graphics = new PIXI.Graphics();
+    graphics.beginFill(0x00ff00);
+    for (const { x, y, width, height } of rectangles) {
+      graphics.drawRect(x, y, width, height);
     }
+    graphics.endFill();
+    layer.getRenderer().getRendererObject().addChild(graphics);
     layer.addEffect(effectData);
 
     runtimeScene.onGameResolutionResized();
@@ -141,15 +140,23 @@ describe('gdjs.LayerPixiRenderer (2D effects on transparent pixels)', () => {
     const pixels = new Uint8Array(width * height * 4);
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
-    const sampledColors = [];
-    for (let y = 0; y < height; y += 10) {
-      for (let x = 0; x < width; x += 10) {
+    const sampledPixels = [];
+    for (let y = 5; y < height; y += 10) {
+      for (let x = 5; x < width; x += 10) {
         const i = (y * width + x) * 4;
-        sampledColors.push([pixels[i], pixels[i + 1], pixels[i + 2]]);
+        sampledPixels.push({
+          x,
+          color: [pixels[i], pixels[i + 1], pixels[i + 2]],
+        });
       }
     }
-    return sampledColors;
+    return sampledPixels;
   };
+
+  const leftHalf = { x: 0, y: 0, width: 400, height: 600 };
+  const bottomRightDot = { x: 796, y: 596, width: 4, height: 4 };
+  const isOnLeftHalf = ({ x }) => x < 400;
+  const isOnRightHalf = ({ x }) => x >= 400;
 
   const isColor = (color, expectedColor) =>
     color[0] === expectedColor[0] &&
@@ -165,25 +172,52 @@ describe('gdjs.LayerPixiRenderer (2D effects on transparent pixels)', () => {
   ].forEach(({ effectName, effectData }) => {
     describe(effectName, () => {
       it('does not change the layers below when the layer is empty', () => {
-        const sampledColors = renderAndSamplePixels(effectData, {
-          withRectangle: false,
-        });
+        const sampledPixels = renderAndSamplePixels(effectData, []);
 
-        const changedColors = sampledColors.filter(
-          (color) => !isColor(color, blue)
+        const changedPixels = sampledPixels.filter(
+          ({ color }) => !isColor(color, blue)
         );
-        expect(changedColors.length).to.be(0);
+        expect(changedPixels.length).to.be(0);
       });
 
-      it('still adds noise on what the layer contains', () => {
-        const sampledColors = renderAndSamplePixels(effectData, {
-          withRectangle: true,
-        });
+      it('adds noise on what the layer contains', () => {
+        const sampledPixels = renderAndSamplePixels(effectData, [
+          { x: 0, y: 0, width: 800, height: 600 },
+        ]);
 
-        const changedColors = sampledColors.filter(
-          (color) => !isColor(color, green)
+        const changedPixels = sampledPixels.filter(
+          ({ color }) => !isColor(color, green)
         );
-        expect(changedColors.length).to.be.above(sampledColors.length / 10);
+        expect(changedPixels.length).to.be.above(sampledPixels.length / 10);
+      });
+
+      it('adds noise on the transparent pixels inside the bounds of the layer content', () => {
+        const sampledPixels = renderAndSamplePixels(effectData, [
+          leftHalf,
+          bottomRightDot,
+        ]);
+
+        const rightHalfPixels = sampledPixels.filter(isOnRightHalf);
+        const changedPixels = rightHalfPixels.filter(
+          ({ color }) => !isColor(color, blue)
+        );
+        expect(changedPixels.length).to.be.above(rightHalfPixels.length / 10);
+      });
+
+      it('does not change the pixels outside the bounds of the layer content', () => {
+        const sampledPixels = renderAndSamplePixels(effectData, [leftHalf]);
+
+        const leftHalfPixels = sampledPixels.filter(isOnLeftHalf);
+        const changedLeftPixels = leftHalfPixels.filter(
+          ({ color }) => !isColor(color, green)
+        );
+        expect(changedLeftPixels.length).to.be.above(
+          leftHalfPixels.length / 10
+        );
+        const changedRightPixels = sampledPixels
+          .filter(isOnRightHalf)
+          .filter(({ color }) => !isColor(color, blue));
+        expect(changedRightPixels.length).to.be(0);
       });
     });
   });

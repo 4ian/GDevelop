@@ -49,6 +49,13 @@ export const getIntermediateNamedItemsStates = (
   before.forEach(item => {
     if (!afterByName.has(item.name)) changedNames.push(item.name);
   });
+  if (
+    changedNames.length === 0 &&
+    stableStringify(before) !== stableStringify(after)
+  ) {
+    // Only the order changed: a single step.
+    return [after];
+  }
 
   const states: Array<Array<Object>> = [];
   let current = before;

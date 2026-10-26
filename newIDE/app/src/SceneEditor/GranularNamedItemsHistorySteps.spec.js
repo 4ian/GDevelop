@@ -194,3 +194,11 @@ describe('getNamedItemsStateWithChangesApplied', () => {
     ).toEqual(after);
   });
 });
+
+describe('getIntermediateNamedItemsStates with a reorder', () => {
+  it('returns a single state when only the order of the items changed', () => {
+    const a = { name: 'A', serialized: { type: 'number', value: 1 } };
+    const b = { name: 'B', serialized: { type: 'number', value: 2 } };
+    expect(getIntermediateNamedItemsStates([a, b], [b, a])).toEqual([[b, a]]);
+  });
+});

@@ -544,6 +544,7 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
     // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
     const {
       onVariablesUpdated,
+      applyPendingRefactoringNow,
       resetSnapshot: resetVariablesRefactoring,
     } = useVariablesContainerRefactoring({
       project,
@@ -557,6 +558,21 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
       globalObjectsContainer: null,
     });
     resetVariablesRefactoringRef.current = resetVariablesRefactoring;
+    // A change saved on its own (a variable deleted, retyped...) is applied
+    // to the instances right away, so that the step holds them too.
+    const variablesHistoryHandler = React.useMemo(
+      () =>
+        historyHandler
+          ? {
+              ...historyHandler,
+              saveToHistory: (batchKey?: string) => {
+                if (!batchKey) applyPendingRefactoringNow();
+                historyHandler.saveToHistory(batchKey);
+              },
+            }
+          : undefined,
+      [historyHandler, applyPendingRefactoringNow]
+    );
 
     const propertiesSchema = React.useMemo(
       () => {
@@ -943,7 +959,7 @@ export const CompactObjectPropertiesEditor: React.ComponentType<{
                           )
                         : []
                     }
-                    historyHandler={historyHandler}
+                    historyHandler={variablesHistoryHandler}
                     onVariablesUpdated={onVariablesUpdated}
                     toolbarIconStyle={styles.icon}
                     compactEmptyPlaceholderText={

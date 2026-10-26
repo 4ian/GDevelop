@@ -1821,6 +1821,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           return value;
         },
         setValue: (value: Object) => {
+          // The behaviors were restored with the objects (before): create
+          // the shared data of the ones added back, before setting them.
+          gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
           Object.keys(value).forEach(name => {
             if (!layout.hasBehaviorSharedData(name)) return;
             const sharedData = layout.getBehaviorSharedData(name);
@@ -2225,8 +2228,21 @@ export default class SceneEditor extends React.Component<Props, State> {
     // Instances only take over the panels when they are what the change
     // touched. Otherwise they just stay selected on the canvas, and the
     // panels show the object/group/layer that was edited.
+    // An edit of an object (or group) in the properties panel can touch its
+    // instances too (a variable deleted or retyped): the object stays
+    // what's shown then.
+    const isPanelEditOfObject =
+      !!changeContext &&
+      changeContext.source === 'panel' &&
+      changeContext.editorId === 'properties' &&
+      !!changeContext.revealSelection &&
+      ['object', 'objectGroup'].includes(
+        changeContext.revealSelection.lastSelectionType
+      );
     const haveTouchedInstancesToShow =
-      changedOrAddedPersistentUuids.length > 0 && instancesToSelect.length > 0;
+      changedOrAddedPersistentUuids.length > 0 &&
+      instancesToSelect.length > 0 &&
+      !isPanelEditOfObject;
     const selectionState =
       (!haveTouchedInstancesToShow &&
         this._getSelectionStateByName(revealSelectionByName)) ||
@@ -2954,10 +2970,19 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     this._hotReloadObjects({ updatedObjects: objects });
     const fieldName = (context && context.fieldName) || '';
+    // A behavior removed (or added) takes its scene settings with it: same
+    // step, so that an undo brings them back.
+    const haveBehaviorsChanged = fieldName === 'behaviors';
+    if (haveBehaviorsChanged) this.updateBehaviorsSharedData();
     this._queuePanelHistorySave(
       `objects/${fieldName}`,
       { source: 'panel', editorId: 'properties' },
-      baseValue => this._getObjectsPartialSnapshot(baseValue, objects)
+      baseValue => ({
+        ...this._getObjectsPartialSnapshot(baseValue, objects),
+        ...(haveBehaviorsChanged
+          ? this._serializeHistoryTargets(['behaviorsSharedData'])
+          : {}),
+      })
     );
   };
 
@@ -6966,10 +6991,15 @@ export default class SceneEditor extends React.Component<Props, State> {
                         };
                         const keys = this._getSelectionHistoryKeys();
                         if (!batchKey) {
+                          // A variable deleted or retyped was also removed
+                          // from the instances of the objects (by the
+                          // refactoring, already applied): same step.
                           this._recordHistoryStep(
                             undefined,
                             changeContext,
-                            keys
+                            keys.some(key => OBJECTS_HISTORY_KEYS.includes(key))
+                              ? [...keys, 'instances']
+                              : keys
                           );
                           return;
                         }

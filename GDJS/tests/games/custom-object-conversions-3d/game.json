@@ -2598,7 +2598,7 @@
                 "Enemy3D",
                 "DistanceToTarget",
                 "=",
-                "Enemy3D.Object3D::DistanceTo3DPosition(TargetX, TargetY, TargetZ)"
+                "Enemy3D.Object3D::DistanceToPosition3D(TargetX, TargetY, TargetZ)"
               ]
             },
             {
@@ -2609,7 +2609,7 @@
                 "Enemy3D",
                 "DistanceToCenter",
                 "=",
-                "DistanceBetween3DPositions(Enemy3D.CenterX(), Enemy3D.CenterY(), Enemy3D.Object3D::CenterZ(), 400, 300, 0)"
+                "DistanceBetweenPositions3D(Enemy3D.CenterX(), Enemy3D.CenterY(), Enemy3D.Object3D::CenterZ(), 400, 300, 0)"
               ]
             }
           ]
@@ -3523,7 +3523,7 @@
                   "parameters": [
                     "TankText",
                     "=",
-                    "\"Tank \" + ToString(SelectedId + 1) + \": position \" + ToString(roundTo(Tank3D.X(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Y(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Object3D::Z(), 1)) + \"   rotation \" + ToString(roundTo(Tank3D.Object3D::RotationX(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Object3D::RotationY(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Angle(), 1)) + \"   scale \" + ToString(roundTo(Tank3D.Scale::X(), 1)) + \" x \" + ToString(roundTo(Tank3D.Scale::Y(), 1)) + \" x \" + ToString(roundTo(Tank3D.Object3D::ScaleZ(), 1)) + FlipText + NewLine() + \"Muzzle (ToParentX/Y/Z): \" + ToString(roundTo(Tank3D.MuzzleX(), 1)) + \" ; \" + ToString(roundTo(Tank3D.MuzzleY(), 1)) + \" ; \" + ToString(roundTo(Tank3D.MuzzleZ(), 1)) + \"   aim direction (ToParentDirectionX/Y/Z): \" + ToString(roundTo(Tank3D.AimDirectionX(), 2)) + \" ; \" + ToString(roundTo(Tank3D.AimDirectionY(), 2)) + \" ; \" + ToString(roundTo(Tank3D.AimDirectionZ(), 2)) + NewLine() + \"Distance from the muzzle to the target: \" + ToString(roundTo(DistanceBetween3DPositions(Tank3D.MuzzleX(), Tank3D.MuzzleY(), Tank3D.MuzzleZ(), TargetX, TargetY, TargetZ), 1)) + \" (on X/Y only: \" + ToString(roundTo(DistanceBetweenPositions(Tank3D.MuzzleX(), Tank3D.MuzzleY(), TargetX, TargetY), 1)) + \")\""
+                    "\"Tank \" + ToString(SelectedId + 1) + \": position \" + ToString(roundTo(Tank3D.X(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Y(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Object3D::Z(), 1)) + \"   rotation \" + ToString(roundTo(Tank3D.Object3D::RotationX(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Object3D::RotationY(), 1)) + \" ; \" + ToString(roundTo(Tank3D.Angle(), 1)) + \"   scale \" + ToString(roundTo(Tank3D.Scale::X(), 1)) + \" x \" + ToString(roundTo(Tank3D.Scale::Y(), 1)) + \" x \" + ToString(roundTo(Tank3D.Object3D::ScaleZ(), 1)) + FlipText + NewLine() + \"Muzzle (ToParentX/Y/Z): \" + ToString(roundTo(Tank3D.MuzzleX(), 1)) + \" ; \" + ToString(roundTo(Tank3D.MuzzleY(), 1)) + \" ; \" + ToString(roundTo(Tank3D.MuzzleZ(), 1)) + \"   aim direction (ToParentDirectionX/Y/Z): \" + ToString(roundTo(Tank3D.AimDirectionX(), 2)) + \" ; \" + ToString(roundTo(Tank3D.AimDirectionY(), 2)) + \" ; \" + ToString(roundTo(Tank3D.AimDirectionZ(), 2)) + NewLine() + \"Distance from the muzzle to the target: \" + ToString(roundTo(DistanceBetweenPositions3D(Tank3D.MuzzleX(), Tank3D.MuzzleY(), Tank3D.MuzzleZ(), TargetX, TargetY, TargetZ), 1)) + \" (on X/Y only: \" + ToString(roundTo(DistanceBetweenPositions(Tank3D.MuzzleX(), Tank3D.MuzzleY(), TargetX, TargetY), 1)) + \")\""
                   ]
                 }
               ]
@@ -3835,7 +3835,7 @@
         "",
         "// 5. A radar: the enemies within range of a tank, measured in 3D, are",
         "// spotted by the condition comparing the distance in 3D. The distances given",
-        "// by Object3D::DistanceTo3DPosition and DistanceBetween3DPositions are the",
+        "// by Object3D::DistanceToPosition3D and DistanceBetweenPositions3D are the",
         "// measured ones.",
         "{",
         "  const range = scene.getVariables().get('Range').getAsNumber();",
@@ -3885,7 +3885,7 @@
         "    spottedOnlyIfMeasuredIn2D > 0,",
         "    `Some enemies are within range on X/Y only, and are not spotted (${spottedOnlyIfMeasuredIn2D})`",
         "  );",
-        "  report('Distances in 3D', { distanceTo3DPosition: worstDistanceToTarget, distanceBetween3DPositions: worstDistanceToCenter }, 1e-6);",
+        "  report('Distances in 3D', { distanceToPosition3D: worstDistanceToTarget, distanceBetweenPositions3D: worstDistanceToCenter }, 1e-6);",
         "",
         "  // Enemies around the tanks, some above or below them.",
         "  layOutTanks();",

@@ -62,8 +62,8 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
       "gdjs.evtTools.common.angleBetweenPositions");
   GetAllExpressions()["DistanceBetweenPositions"].SetFunctionName(
       "gdjs.evtTools.common.distanceBetweenPositions");
-  GetAllExpressions()["DistanceBetween3DPositions"].SetFunctionName(
-      "gdjs.evtTools.common.distanceBetween3DPositions");
+  GetAllExpressions()["DistanceBetweenPositions3D"].SetFunctionName(
+      "gdjs.evtTools.common.distanceBetweenPositions3D");
   GetAllExpressions()["int"].SetFunctionName("Math.round");
   GetAllExpressions()["rint"].SetFunctionName("Math.round");
   GetAllExpressions()["round"].SetFunctionName("Math.round");

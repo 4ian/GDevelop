@@ -1512,16 +1512,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpression("SqDistance",
                     _("Square distance between two objects"),
-                    _("Square distance between two objects, on the X/Y plane "
-                      "only (Z is ignored)"),
+                    _("Square distance between the centers of two objects, on "
+                      "the X/Y plane only."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
   obj.AddExpression("DistanceToPosition",
-                    _("Distance between an object and a position"),
-                    _("Distance between an object and a position"),
+                    _("Distance between an object and a position (2D)"),
+                    _("Distance between the center of an object and a "
+                      "position, on the X/Y plane only. To include Z, use "
+                      "‘Distance between an object and a position (3D)’ of "
+                      "the 3D capability."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
@@ -1530,7 +1533,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpression("SqDistanceToPosition",
                     _("Square distance between an object and a position"),
-                    _("Square distance between an object and a position"),
+                    _("Square distance between the center of an object and a "
+                      "position, on the X/Y plane only."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))

@@ -264,7 +264,7 @@ namespace gdjs {
       /**
        * Return the distance between two positions, on the X, Y and Z axes.
        */
-      export const distanceBetween3DPositions = function (
+      export const distanceBetweenPositions3D = function (
         x1: number,
         y1: number,
         z1: number,

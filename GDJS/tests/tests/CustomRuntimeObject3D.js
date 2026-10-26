@@ -323,7 +323,7 @@ describe('gdjs.CustomRuntimeObject3D', function () {
 
     it('computes the distance between two 3D positions', () => {
       expect(
-        gdjs.evtTools.common.distanceBetween3DPositions(1, 2, 3, 3, 5, 9)
+        gdjs.evtTools.common.distanceBetweenPositions3D(1, 2, 3, 3, 5, 9)
       ).to.be(7);
     });
 
@@ -359,7 +359,7 @@ describe('gdjs.CustomRuntimeObject3D', function () {
 
       [tanks, vehicles] = makeLists([plane, truck]);
       expect(
-        gdjs.evtTools.object.distance3DTest(tanks, vehicles, 150, false)
+        gdjs.evtTools.object.distanceTest3D(tanks, vehicles, 150, false)
       ).to.be(true);
       expect(vehicles.get('Vehicle')).to.eql([truck]);
 
@@ -367,7 +367,7 @@ describe('gdjs.CustomRuntimeObject3D', function () {
       // from every vehicle, which only the 3D distance says for the plane.
       [tanks, vehicles] = makeLists([plane]);
       expect(
-        gdjs.evtTools.object.distance3DTest(tanks, vehicles, 150, true)
+        gdjs.evtTools.object.distanceTest3D(tanks, vehicles, 150, true)
       ).to.be(true);
       expect(tanks.get('Tank')).to.eql([tank]);
       [tanks, vehicles] = makeLists([plane]);
@@ -377,7 +377,7 @@ describe('gdjs.CustomRuntimeObject3D', function () {
 
       [tanks, vehicles] = makeLists([plane, truck]);
       expect(
-        gdjs.evtTools.object.distance3DTest(
+        gdjs.evtTools.object.distanceTest3D(
           tanks,
           vehicles,
           centerToCenter - 1,
@@ -416,7 +416,7 @@ describe('gdjs.CustomRuntimeObject3D', function () {
       const deltaZ = plane.getCenterZInScene();
 
       const isWithin = (distance) =>
-        gdjs.evtTools.object.distance3DTest(
+        gdjs.evtTools.object.distanceTest3D(
           Hashtable.newFrom({ Plane: [plane] }),
           Hashtable.newFrom({ Flat: [flatObject] }),
           distance,
@@ -436,7 +436,7 @@ describe('gdjs.CustomRuntimeObject3D', function () {
       );
 
       expect(
-        object3D.getDistanceTo3DPosition(
+        object3D.getDistanceToPosition3D(
           tank.getCenterXInScene() + 2,
           tank.getCenterYInScene() + 3,
           tank.getCenterZInScene() + 6

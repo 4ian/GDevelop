@@ -675,7 +675,7 @@ namespace gdjs {
       const getCenterZInScene = (object: gdjs.RuntimeObject): float =>
         gdjs.Base3DHandler.is3D(object) ? object.getCenterZInScene() : 0;
 
-      export const _distanceBetweenObjectsIn3D = function (
+      export const _distanceBetweenObjects3D = function (
         object1: gdjs.RuntimeObject,
         object2: gdjs.RuntimeObject,
         squaredDistance: float
@@ -687,14 +687,14 @@ namespace gdjs {
         );
       };
 
-      export const distance3DTest = function (
+      export const distanceTest3D = function (
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,
         distance: float,
         inverted: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
-          gdjs.evtTools.object._distanceBetweenObjectsIn3D,
+          gdjs.evtTools.object._distanceBetweenObjects3D,
           objectsLists1,
           objectsLists2,
           inverted,

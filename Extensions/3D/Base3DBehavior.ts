@@ -238,7 +238,7 @@ namespace gdjs {
      * The distance between the center of the object and a position, on the
      * X, Y and Z axes.
      */
-    getDistanceTo3DPosition(x: float, y: float, z: float): float {
+    getDistanceToPosition3D(x: float, y: float, z: float): float {
       const deltaX = this.object.getCenterXInScene() - x;
       const deltaY = this.object.getCenterYInScene() - y;
       const deltaZ = this.object.getCenterZInScene() - z;
@@ -251,7 +251,7 @@ namespace gdjs {
      */
     getDistanceToObject3D(otherObject: gdjs.RuntimeObject | null): float {
       if (!otherObject) return 0;
-      return this.getDistanceTo3DPosition(
+      return this.getDistanceToPosition3D(
         otherObject.getCenterXInScene(),
         otherObject.getCenterYInScene(),
         gdjs.Base3DHandler.is3D(otherObject)

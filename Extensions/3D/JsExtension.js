@@ -252,10 +252,10 @@ module.exports = {
 
       base3D
         .addExpression(
-          'DistanceTo3DPosition',
-          _('Distance to a 3D position'),
+          'DistanceToPosition3D',
+          _('Distance between an object and a position (3D)'),
           _(
-            'Return the distance between the center of the object and a position, on the X, Y and Z axes.'
+            'Return the distance between the center of the object and a position, on the X, Y and Z axes. To ignore Z, use ‘Distance between an object and a position (2D)’.'
           ),
           _('Position'),
           'res/conditions/3d_box.svg'
@@ -265,7 +265,7 @@ module.exports = {
         .addParameter('number', _('X position'), '', false)
         .addParameter('number', _('Y position'), '', false)
         .addParameter('number', _('Z position'), '', false)
-        .setFunctionName('getDistanceTo3DPosition');
+        .setFunctionName('getDistanceToPosition3D');
 
       base3D
         .addExpression(

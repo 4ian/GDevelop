@@ -244,7 +244,7 @@ BaseObjectExtension::BaseObjectExtension() {
   GetAllConditions()["Distance"].SetFunctionName(
       "gdjs.evtTools.object.distanceTest");
   GetAllConditions()["Distance3D"].SetFunctionName(
-      "gdjs.evtTools.object.distance3DTest");
+      "gdjs.evtTools.object.distanceTest3D");
   GetAllConditions()["IsTotalForceAngleTowardObject"].SetFunctionName(
       "gdjs.evtTools.object.movesTowardTest");
   // Compatibility with GD <= 5.6.251

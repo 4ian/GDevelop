@@ -114,8 +114,10 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
 
   extension
       .AddExpression("DistanceBetweenPositions",
-                     _("Distance between two positions"),
-                     _("Compute the distance between two positions."),
+                     _("Distance between two positions (2D)"),
+                     _("Compute the distance between two positions on the X/Y "
+                       "plane. For positions in 3D, use ‘Distance between "
+                       "two positions (3D)’."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("First point X position"))
@@ -124,8 +126,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Second point Y position"));
 
   extension
-      .AddExpression("DistanceBetween3DPositions",
-                     _("Distance between two 3D positions"),
+      .AddExpression("DistanceBetweenPositions3D",
+                     _("Distance between two positions (3D)"),
                      _("Compute the distance between two positions, on the X, "
                        "Y and Z axes."),
                      "",

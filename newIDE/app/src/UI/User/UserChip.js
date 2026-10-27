@@ -66,7 +66,14 @@ const UserChip = ({
     <LineStackLayout noMargin>
       {!isMobile ? (
         <TextButton
-          label={shortenString(profile.username || profile.email, 20)}
+          label={
+            // Some accounts (e.g: created with Apple) can have no username nor email.
+            profile.username || profile.email ? (
+              shortenString(profile.username || profile.email, 20)
+            ) : (
+              <Trans>My account</Trans>
+            )
+          }
           onClick={onOpenProfile}
           allowBrowserAutoTranslate={false}
           icon={

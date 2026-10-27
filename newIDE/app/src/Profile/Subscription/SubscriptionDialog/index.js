@@ -21,7 +21,7 @@ import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import { SubscriptionContext } from '../SubscriptionContext';
 import SubscriptionOptions from './SubscriptionOptions';
-import SubscriptionPlan from './SubscriptionPlan';
+import SubscriptionPlan, { type CouponError } from './SubscriptionPlan';
 import AlertMessage from '../../../UI/AlertMessage';
 import Paper from '../../../UI/Paper';
 import { formatPriceWithCurrency, getPlanIcon } from '../PlanSmallCard';
@@ -98,15 +98,13 @@ export default function SubscriptionDialog({
     [pricingSystemId: string]: PricingSystemDiscount,
   }>({});
   const [isValidatingCoupon, setIsValidatingCoupon] = React.useState(false);
-  const [couponErrorMessage, setCouponErrorMessage] = React.useState<?string>(
-    null
-  );
+  const [couponError, setCouponError] = React.useState<?CouponError>(null);
 
   const onClearCoupon = React.useCallback(
     () => {
       clearCouponCode();
       setPricingSystemDiscounts({});
-      setCouponErrorMessage(null);
+      setCouponError(null);
     },
     [clearCouponCode]
   );
@@ -207,14 +205,14 @@ export default function SubscriptionDialog({
       if (!couponCode) {
         // Clear local state when coupon is removed
         setPricingSystemDiscounts({});
-        setCouponErrorMessage(null);
+        setCouponError(null);
         setIsValidatingCoupon(false);
         return;
       }
 
       const validateCouponCode = async () => {
         setIsValidatingCoupon(true);
-        setCouponErrorMessage(null);
+        setCouponError(null);
 
         try {
           const result = await validateCoupon(couponCode);
@@ -229,12 +227,12 @@ export default function SubscriptionDialog({
             });
             setPricingSystemDiscounts(discountsMap);
           } else {
-            setCouponErrorMessage(result.errorMessage || null);
+            setCouponError(result.error || null);
             setPricingSystemDiscounts({});
           }
         } catch (error) {
           console.error('Error validating coupon:', error);
-          setCouponErrorMessage('Error validating coupon');
+          setCouponError({ code: 'validation-request-failed' });
           setPricingSystemDiscounts({});
         } finally {
           setIsValidatingCoupon(false);
@@ -410,7 +408,7 @@ export default function SubscriptionDialog({
                     setSeatsCount={setEducationPlanSeatsCount}
                     couponCode={couponCode}
                     pricingSystemDiscounts={pricingSystemDiscounts}
-                    couponErrorMessage={couponErrorMessage}
+                    couponError={couponError}
                     isValidatingCoupon={isValidatingCoupon}
                     onClearCoupon={onClearCoupon}
                   />

@@ -29,6 +29,8 @@ declare class gdWholeProjectRefactorer {
   static moveEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldExtensionName: string, newExtensionName: string, oldObjectName: string, newObjectName: string): void;
   static updateObjectNameInEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, sourceObjectName: string): void;
   static renameLayout(project: gdProject, oldName: string, newName: string): void;
+  static renameNamedEasing(project: gdProject, oldName: string, newName: string): void;
+  static renameNamedEasingInEventsFunctionsExtension(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
   static renameExternalLayout(project: gdProject, oldName: string, newName: string): void;
   static renameExternalEvents(project: gdProject, oldName: string, newName: string): void;
   static renameLayerInScene(project: gdProject, scene: gdLayout, oldName: string, newName: string): void;

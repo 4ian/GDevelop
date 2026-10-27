@@ -45,6 +45,14 @@ bool ObjectFolderOrObject::HasObjectNamed(const gd::String& name) {
   if (!object) return false;
   return object->GetName() == name;
 }
+void ObjectFolderOrObject::AddObjectNamesTo(
+    std::unordered_set<gd::String>& objectNames) const {
+  if (IsFolder()) {
+    for (const auto& child : children) child->AddObjectNamesTo(objectNames);
+  } else if (object) {
+    objectNames.insert(object->GetName());
+  }
+}
 ObjectFolderOrObject& ObjectFolderOrObject::GetObjectNamed(
     const gd::String& name) {
   if (object && object->GetName() == name) {

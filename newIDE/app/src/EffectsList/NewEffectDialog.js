@@ -20,6 +20,7 @@ import ScrollView from '../UI/ScrollView';
 import Text from '../UI/Text';
 import Chip from '../UI/Chip';
 import EmptyMessage from '../UI/EmptyMessage';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import LoaderModal from '../UI/LoaderModal';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
@@ -205,35 +206,37 @@ const NewEffectFromScratch = ({
 
   return (
     <ColumnStackLayout expand noMargin useFullHeight>
-      <ResponsiveLineStackLayout noMargin>
-        {canChooseCategory && (
-          <SearchBarSelectField
-            value={category}
-            onChange={(e, i, value: string) => {
-              if (value === '2d' || value === '3d') setCategory(value);
-              else setCategory('');
-            }}
-          >
-            <SelectOption value="" label={t`All categories`} />
-            <SelectOption value="2d" label={t`2D`} />
-            <SelectOption value="3d" label={t`3D`} />
-          </SearchBarSelectField>
-        )}
-        <Column expand noMargin>
-          <SearchBar
-            id="effect-type-search-bar"
-            value={searchText}
-            onChange={setSearchText}
-            onRequestSearch={() => {
-              if (displayedEffectMetadata.length === 1) {
-                onChoose(displayedEffectMetadata[0].type);
-              }
-            }}
-            placeholder={t`Search effects`}
-            autoFocus="desktop"
-          />
-        </Column>
-      </ResponsiveLineStackLayout>
+      <ColumnStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin>
+          {canChooseCategory && (
+            <SearchBarSelectField
+              value={category}
+              onChange={(e, i, value: string) => {
+                if (value === '2d' || value === '3d') setCategory(value);
+                else setCategory('');
+              }}
+            >
+              <SelectOption value="" label={t`All categories`} />
+              <SelectOption value="2d" label={t`2D`} />
+              <SelectOption value="3d" label={t`3D`} />
+            </SearchBarSelectField>
+          )}
+          <Column expand noMargin>
+            <SearchBar
+              id="effect-type-search-bar"
+              value={searchText}
+              onChange={setSearchText}
+              onRequestSearch={() => {
+                if (displayedEffectMetadata.length === 1) {
+                  onChoose(displayedEffectMetadata[0].type);
+                }
+              }}
+              placeholder={t`Search effects`}
+              autoFocus="desktop"
+            />
+          </Column>
+        </ResponsiveLineStackLayout>
+      </ColumnStackLayout>
       <ScrollView>
         {displayedEffectMetadata.length === 0 ? (
           <EmptyMessage>
@@ -268,7 +271,7 @@ type Props = {|
 
 /**
  * Let the user choose the effect to add, among the built-in effects (from
- * scratch) or, for layers, the effects of the asset store.
+ * scratch) or the effects of the asset store.
  */
 function NewEffectDialog({
   project,
@@ -281,15 +284,13 @@ function NewEffectDialog({
   onEffectAddedFromStore,
 }: Props) {
   const { isMobile } = useResponsiveWindowSize();
-  // The effects of the store go on layers.
-  const canAddEffectFromStore = target === 'layer';
   const {
     getNewEffectDialogDefaultTab,
     setNewEffectDialogDefaultTab,
   } = React.useContext(PreferencesContext);
   // Open the tab used last time (the store by default, so that its effects are seen).
   const [currentTab, setCurrentTab] = React.useState<Tab>(() =>
-    canAddEffectFromStore ? getNewEffectDialogDefaultTab() : 'from-scratch'
+    getNewEffectDialogDefaultTab()
   );
   const changeTab = React.useCallback(
     (newTab: Tab) => {
@@ -390,6 +391,8 @@ function NewEffectDialog({
               label={
                 isAssetBeingInstalled ? (
                   <Trans>Adding...</Trans>
+                ) : target === 'object' ? (
+                  <Trans>Add to the object</Trans>
                 ) : (
                   <Trans>Add to the layer</Trans>
                 )
@@ -407,26 +410,24 @@ function NewEffectDialog({
         fullHeight
         id="new-effect-dialog"
         fixedContent={
-          canAddEffectFromStore ? (
-            <Tabs
-              value={currentTab}
-              onChange={changeTab}
-              options={[
-                {
-                  label: <Trans>Effect store</Trans>,
-                  value: 'asset-store',
-                  id: 'effect-store-tab',
-                },
-                {
-                  label: <Trans>New effect from scratch</Trans>,
-                  value: 'from-scratch',
-                  id: 'new-effect-from-scratch-tab',
-                },
-              ]}
-              // Enforce scroll on mobile, because the tabs have long names.
-              variant={isMobile ? 'scrollable' : undefined}
-            />
-          ) : null
+          <Tabs
+            value={currentTab}
+            onChange={changeTab}
+            options={[
+              {
+                label: <Trans>Effect store</Trans>,
+                value: 'asset-store',
+                id: 'effect-store-tab',
+              },
+              {
+                label: <Trans>New effect from scratch</Trans>,
+                value: 'from-scratch',
+                id: 'new-effect-from-scratch-tab',
+              },
+            ]}
+            // Enforce scroll on mobile, because the tabs have long names.
+            variant={isMobile ? 'scrollable' : undefined}
+          />
         }
       >
         {currentTab === 'from-scratch' && (
@@ -443,6 +444,31 @@ function NewEffectDialog({
             ref={assetStore}
             onlyShowAssets
             fixedObjectTypes={storeEffectTypes}
+            fixedEffectTarget={target}
+            noResultsPlaceholder={
+              <Column noMargin expand justifyContent="center">
+                <EmptyPlaceholder
+                  title={
+                    target === 'object' ? (
+                      <Trans>No effect found for objects</Trans>
+                    ) : layerRenderingType === '3d' ? (
+                      <Trans>No effect found for 3D layers</Trans>
+                    ) : layerRenderingType === '2d' ? (
+                      <Trans>No effect found for 2D layers</Trans>
+                    ) : (
+                      <Trans>No effect found for this layer</Trans>
+                    )
+                  }
+                  description={
+                    <Trans>
+                      Try other words, or create an effect from scratch.
+                    </Trans>
+                  }
+                  actionLabel={<Trans>New effect from scratch</Trans>}
+                  onAction={() => changeTab('from-scratch')}
+                />
+              </Column>
+            }
           />
         )}
       </Dialog>

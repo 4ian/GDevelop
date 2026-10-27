@@ -5,6 +5,7 @@ namespace gdjs {
    */
   export class AffineTransformation {
     private matrix: Float32Array;
+    private static _temporaryCoefficients: FloatPoint = [0, 0];
 
     /**
      * Initialize to the identity.
@@ -213,17 +214,22 @@ namespace gdjs {
      * @param angle The angle of rotation in radians.
      */
     rotate(angle: float) {
-      const matrix = this.matrix;
-      let cost = Math.cos(angle);
-      let sint = Math.sin(angle);
+      const coefficients = gdjs.AffineTransformation._temporaryCoefficients;
+      gdjs.AffineTransformation.setRotationCoefficients(angle, coefficients);
+      this.rotateWithCoefficients(coefficients[0], coefficients[1]);
+    }
 
-      // Avoid rounding errors around 0.
-      if (cost === -1 || cost === 1) {
-        sint = 0;
-      }
-      if (sint === -1 || sint === 1) {
-        cost = 0;
-      }
+    /**
+     * Concatenate a rotation given by its coefficients, as
+     * {@link gdjs.AffineTransformation.setRotationCoefficients} gives them.
+     * A caller that needs the same rotation elsewhere (to undo it) computes
+     * them once and uses them on both sides.
+     *
+     * @param cost The cosine of the angle of rotation.
+     * @param sint The sine of the angle of rotation.
+     */
+    rotateWithCoefficients(cost: float, sint: float) {
+      const matrix = this.matrix;
 
       //           cost -sint 0
       //           sint  cost 0
@@ -275,6 +281,32 @@ namespace gdjs {
     }
 
     /**
+     * The cosine and the sine of an angle, with the rounding errors of the
+     * right angles removed (`Math.cos(Math.PI / 2)` is 6e-17, not 0).
+     *
+     * Everything undoing a rotation of these transformations must use them:
+     * a point on the edge of an object turned by 90 degrees would otherwise
+     * come back a fraction of a pixel outside of it, which is enough for the
+     * cursor to miss it.
+     *
+     * @param angle The angle of rotation in radians.
+     * @param destination Array that will be updated with the cosine and the
+     * sine of the angle.
+     */
+    static setRotationCoefficients(angle: float, destination: FloatPoint) {
+      let cost = Math.cos(angle);
+      let sint = Math.sin(angle);
+      if (cost === -1 || cost === 1) {
+        sint = 0;
+      }
+      if (sint === -1 || sint === 1) {
+        cost = 0;
+      }
+      destination[0] = cost;
+      destination[1] = sint;
+    }
+
+    /**
      * Concatenate a rotation.
      *
      * @param angle The angle of rotation in radians.
@@ -282,8 +314,33 @@ namespace gdjs {
      * @param anchorY The rotation anchor point Y.
      */
     rotateAround(angle: float, anchorX: float, anchorY: float) {
+      const coefficients = gdjs.AffineTransformation._temporaryCoefficients;
+      gdjs.AffineTransformation.setRotationCoefficients(angle, coefficients);
+      this.rotateAroundWithCoefficients(
+        coefficients[0],
+        coefficients[1],
+        anchorX,
+        anchorY
+      );
+    }
+
+    /**
+     * Same as {@link gdjs.AffineTransformation.rotateAround}, with the
+     * coefficients of the rotation instead of its angle.
+     *
+     * @param cost The cosine of the angle of rotation.
+     * @param sint The sine of the angle of rotation.
+     * @param anchorX The rotation anchor point X.
+     * @param anchorY The rotation anchor point Y.
+     */
+    rotateAroundWithCoefficients(
+      cost: float,
+      sint: float,
+      anchorX: float,
+      anchorY: float
+    ) {
       this.translate(anchorX, anchorY);
-      this.rotate(angle);
+      this.rotateWithCoefficients(cost, sint);
       // First: translate anchor to origin
       this.translate(-anchorX, -anchorY);
     }

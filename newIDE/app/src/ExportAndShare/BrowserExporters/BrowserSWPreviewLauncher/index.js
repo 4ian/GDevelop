@@ -439,6 +439,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       this.setState({
         error,
       });
+      // The gameplay test runner waits for the game to boot: tell it now
+      // that it never will.
+      if (previewOptions.isForGameplayTest) throw error;
     }
   };
 

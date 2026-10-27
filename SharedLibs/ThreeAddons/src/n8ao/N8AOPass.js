@@ -77,6 +77,7 @@ class N8AOPass extends Pass {
          * autoRenderBeauty: boolean
          * colorMultiply: boolean,
          * transparencyAware: boolean,
+         * stencil: boolean,
          * accumulate: boolean,
          * neuralDenoise: boolean
          * }

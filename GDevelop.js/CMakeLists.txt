@@ -89,6 +89,12 @@ target_link_libraries(GD "-s MODULARIZE=1")
 target_link_libraries(GD "-s EXPORT_NAME=\"initializeGDevelopJs\"") # Global function name for browsers
 target_link_libraries(GD "-s TOTAL_MEMORY=48MB") # Get some initial memory size that is a bit bigger than the default.
 target_link_libraries(GD "-s ALLOW_MEMORY_GROWTH=1")
+if(NOT "${GDEVELOPJS_BUILD_VARIANT}" STREQUAL "debug-sanitizers")
+	# When the memory can't grow anymore, abort with a clear error instead of making malloc return a null pointer:
+	# C code like rapidjson (used to write JSON) doesn't check it and would write through it, corrupting the memory.
+	# C++ `new` already aborts. AddressSanitizer reports these failures itself, so it keeps the default.
+	target_link_libraries(GD "-s ABORTING_MALLOC=1")
+endif()
 target_link_libraries(GD "-s NODEJS_CATCH_EXIT=0") # Don't print the entire GDCore code on error when running in node
 target_link_libraries(GD "-s ERROR_ON_UNDEFINED_SYMBOLS=0")
 target_link_libraries(GD "-s \"EXPORTED_FUNCTIONS=['_free','_malloc']\"")

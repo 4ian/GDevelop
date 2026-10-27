@@ -683,18 +683,69 @@ export const getRedirectToSubscriptionPortalUrl = async (
   return data.sessionPortalUrl;
 };
 
+export type SubscriptionPayment = {|
+  id: string,
+  createdAt: string,
+  amount: number,
+  currency: string,
+  planNameByLocale: MessageByLocale | null,
+  invoiceRequest:
+    | {| stripeInvoiceId: string |}
+    | {| paypalSubscriptionId: string, paypalTransactionId: string |},
+|};
+
+export const listSubscriptionPayments = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<SubscriptionPayment>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/subscription-payment', {
+    params: { userId },
+    headers: { Authorization: authorizationHeader },
+  });
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/subscription-payment of Usage API',
+  });
+};
+
+export const generateSubscriptionPaymentInvoice = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  subscriptionPayment: SubscriptionPayment
+): Promise<Blob> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.post(
+    '/subscription-v2/action/generate-invoice',
+    subscriptionPayment.invoiceRequest,
+    {
+      params: { userId },
+      headers: {
+        Authorization: authorizationHeader,
+        Accept: 'application/pdf',
+      },
+      responseType: 'blob',
+    }
+  );
+  return response.data;
+};
+
 export const getRedirectToCheckoutUrl = ({
   pricingSystemId,
   userId,
   userEmail,
   quantity,
   couponCode,
+  language,
 }: {|
   pricingSystemId: string,
   userId: string,
   userEmail: string,
   quantity?: number,
   couponCode?: string,
+  language: string,
 |}): string => {
   const url = new URL(
     `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
@@ -705,6 +756,7 @@ export const getRedirectToCheckoutUrl = ({
   if (quantity !== undefined && quantity > 1)
     url.searchParams.set('quantity', quantity.toString());
   if (couponCode) url.searchParams.set('couponCode', couponCode);
+  url.searchParams.set('language', language);
   return url.toString();
 };
 
@@ -734,15 +786,33 @@ export const redeemCode = async (
 export interface PricingSystemDiscount {
   pricingSystemId: string;
   discountMessage: string;
+  // The percentage taken off the price, or null for a fixed amount discount.
+  discountPercentage: number | null;
   originalAmountInCents: number;
   discountedAmountInCents: number;
   currency: string;
   discountedPaypalPlanId: string | null;
 }
 
+export type CouponValidationError =
+  | {|
+      code:
+        | 'missing-code'
+        | 'invalid-code'
+        | 'inactive'
+        | 'not-yet-valid'
+        | 'expired'
+        | 'not-applicable-to-plan'
+        | 'not-applicable'
+        | 'redemption-code',
+    |}
+  | {| code: 'not-applicable-to-period', period: 'week' | 'month' | 'year' |}
+  | {| code: 'wrong-currency', currency: string |};
+
 export type CouponValidationApiResponse = {
   isValid: boolean,
   pricingSystemDiscounts: PricingSystemDiscount[],
+  error?: CouponValidationError,
   errorMessage?: string,
 };
 

@@ -61,6 +61,112 @@ describe('gdjs.Layer', () => {
 		expect(layer.getCameraZ(45)).to.be(0);
 	});
 
+	describe('with a camera rotated in 3D', () => {
+		/**
+		 * @param {number} worldScale
+		 * @param {'perspective' | 'orthographic'} cameraType
+		 */
+		const make3DLayerWithRotatedCamera = (worldScale, cameraType) => {
+			const runtimeScene = new gdjs.RuntimeScene(gdjs.getPixiRuntimeGame());
+			runtimeScene.setRenderer3DWorldScale(worldScale);
+			runtimeScene.addLayer({
+				name: '',
+				renderingType: '3d',
+				cameraType,
+				visibility: true,
+				cameras: [],
+				effects: [],
+				ambientLightColorR: 0,
+				ambientLightColorG: 0,
+				ambientLightColorB: 0,
+				isLightingLayer: false,
+				followBaseLayerCamera: false,
+			});
+			const layer = runtimeScene.getLayer('');
+			layer.setCameraX(100);
+			layer.setCameraY(200);
+			layer.setCameraRotationX(30);
+			return layer;
+		};
+
+		/**
+		 * Project a point of the scene, on the plane Z = 0, on the screen
+		 * like the Three.js renderer does for 3D objects.
+		 * @param {gdjs.RuntimeLayer} layer
+		 * @param {number} x
+		 * @param {number} y
+		 */
+		const projectOnScreen = (layer, x, y) => {
+			const threeScene = layer.getRenderer().getThreeScene();
+			const camera = layer.getRenderer().getThreeCamera();
+			threeScene.updateMatrixWorld(true);
+			camera.updateMatrixWorld(true);
+			const projected = new THREE.Vector3(x, y, 0)
+				.applyMatrix4(threeScene.matrixWorld)
+				.project(camera);
+			return [
+				((projected.x + 1) / 2) * layer.getWidth(),
+				((1 - projected.y) / 2) * layer.getHeight(),
+			];
+		};
+
+		[1, 100, 250].forEach((worldScale) => {
+			['perspective', 'orthographic'].forEach((cameraType) => {
+				it(`converts screen coordinates to the plane Z = 0 (${cameraType} camera, world scale: ${worldScale})`, () => {
+					const layer = make3DLayerWithRotatedCamera(worldScale, cameraType);
+
+					const [sceneX, sceneY] = layer.convertCoords(300, 400, 0, [0, 0]);
+					const [screenX, screenY] = projectOnScreen(layer, sceneX, sceneY);
+
+					expect(screenX).to.be.within(299.99, 300.01);
+					expect(screenY).to.be.within(399.99, 400.01);
+				});
+			});
+
+			it(`shows the scene at its size with an orthographic camera (world scale: ${worldScale})`, () => {
+				const layer = make3DLayerWithRotatedCamera(worldScale, 'orthographic');
+				layer.setCameraRotationX(0);
+				layer.setCameraZoom(2);
+
+				const [centerX, centerY] = projectOnScreen(layer, 100, 200);
+				const [cornerX, cornerY] = projectOnScreen(
+					layer,
+					100 + layer.getWidth() / 4,
+					200 + layer.getHeight() / 4
+				);
+
+				expect(centerX).to.be.within(
+					layer.getWidth() / 2 - 0.01,
+					layer.getWidth() / 2 + 0.01
+				);
+				expect(centerY).to.be.within(
+					layer.getHeight() / 2 - 0.01,
+					layer.getHeight() / 2 + 0.01
+				);
+				expect(cornerX).to.be.within(
+					layer.getWidth() - 0.01,
+					layer.getWidth() + 0.01
+				);
+				expect(cornerY).to.be.within(
+					layer.getHeight() - 0.01,
+					layer.getHeight() + 0.01
+				);
+			});
+
+			it(`converts the screen center to the point looked at by the camera (world scale: ${worldScale})`, () => {
+				const layer = make3DLayerWithRotatedCamera(worldScale, 'perspective');
+				const cameraZ = layer.getCameraZ(45);
+
+				const [sceneX, sceneY] = layer.convertCoords(400, 300, 0, [0, 0]);
+
+				expect(sceneX).to.be.within(99.99, 100.01);
+				// The camera rotated on X looks toward Y-.
+				const expectedSceneY = 200 - cameraZ * Math.tan(gdjs.toRad(30));
+				expect(sceneY).to.be.within(expectedSceneY - 0.01, expectedSceneY + 0.01);
+			});
+		});
+	});
+
 	it('shows the 2D rendering of a 2D+3D layer on a plane covering the screen', () => {
 		const runtimeGameWithCanvas = gdjs.getPixiRuntimeGame();
 		runtimeGameWithCanvas

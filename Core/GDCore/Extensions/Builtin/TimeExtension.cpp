@@ -134,7 +134,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .AddAction("UnPauseTimer",
                  _("Unpause a scene timer"),
-                 _("Unpause a scene timer."),
+                 _("Unpause (resume) a scene timer."),
                  _("Unpause timer _PARAM1_"),
 
                  "",

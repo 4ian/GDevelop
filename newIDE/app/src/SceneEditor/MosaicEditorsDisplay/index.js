@@ -34,6 +34,8 @@ import {
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
 import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
+import { InGameEditorUnavailableMessage } from '../../EmbeddedGame/InGameEditorUnavailableMessage';
+import { useInGameEditorUnavailabilityReason } from '../../EmbeddedGame/InGameEditorAvailability';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
 const initialMosaicEditorNodes = {
@@ -98,6 +100,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
       onCreateNewExtensionWithBehavior,
       isActive,
       onRestartInGameEditor,
+      onSwitchToInstancesEditor,
       showRestartInGameEditorAfterErrorButton,
     } = props;
     const {
@@ -206,6 +209,8 @@ const MosaicEditorsDisplay: React.ComponentType<{
       },
       [isEditorVisible, toggleEditorView, objectsListDoNowOrAfterRender]
     );
+
+    const inGameEditorUnavailabilityReason = useInGameEditorUnavailabilityReason();
 
     // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => {
@@ -413,7 +418,19 @@ const MosaicEditorsDisplay: React.ComponentType<{
         ),
       },
       'instances-editor':
-        gameEditorMode === 'embedded-game'
+        gameEditorMode === 'embedded-game' && inGameEditorUnavailabilityReason
+          ? {
+              type: 'primary',
+              noTitleBar: true,
+              noSoftKeyboardAvoidance: true,
+              renderEditor: () => (
+                <InGameEditorUnavailableMessage
+                  reason={inGameEditorUnavailabilityReason}
+                  onSwitchToInstancesEditor={onSwitchToInstancesEditor}
+                />
+              ),
+            }
+          : gameEditorMode === 'embedded-game'
           ? {
               type: 'primary',
               noTitleBar: true,
@@ -585,7 +602,10 @@ const MosaicEditorsDisplay: React.ComponentType<{
           // $FlowFixMe[incompatible-type]
           getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
         }
-        isTransparent={gameEditorMode === 'embedded-game'}
+        isTransparent={
+          gameEditorMode === 'embedded-game' &&
+          !inGameEditorUnavailabilityReason
+        }
         onDragOrResizedStarted={() => {
           preventGameFramePointerEvents(true);
         }}

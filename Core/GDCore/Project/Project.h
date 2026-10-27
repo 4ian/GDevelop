@@ -16,6 +16,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesContainer.h"
+#include "GDCore/Project/NamedEasingsContainer.h"
 #include "GDCore/Project/TestsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Watermark.h"
@@ -777,6 +778,16 @@ class GD_CORE_API Project {
   const gd::TestsContainer& GetTests() const { return tests; }
   ///@}
 
+  /** \name Named easings management
+   */
+  ///@{
+  gd::NamedEasingsContainer& GetNamedEasings() { return namedEasings; }
+
+  const gd::NamedEasingsContainer& GetNamedEasings() const {
+    return namedEasings;
+  }
+  ///@}
+
   /** \name External layout management
    * Members functions related to external layout management.
    */
@@ -1211,6 +1222,7 @@ class GD_CORE_API Project {
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;  ///< List of all externals events
   gd::TestsContainer tests;  ///< The tests of the project.
+  gd::NamedEasingsContainer namedEasings;
   ExtensionProperties
       extensionProperties;  ///< The properties of the extensions.
   gd::WholeProjectDiagnosticReport wholeProjectDiagnosticReport;

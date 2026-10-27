@@ -11,7 +11,7 @@ describe('gdjs.RuntimeObject', function() {
 
         const benchmarkSuite = makeBenchmarkSuite({
             benchmarksCount: 60,
-            iterationsCount: 60000,
+            iterationsCount: 180000,
         });
         benchmarkSuite
           .add('getAABB of a non rotated, default center', (i) => {
@@ -37,7 +37,7 @@ describe('gdjs.RuntimeObject', function() {
 
         const benchmarkSuite = makeBenchmarkSuite({
             benchmarksCount: 60,
-            iterationsCount: 60000,
+            iterationsCount: 180000,
         });
         benchmarkSuite
           .add('getAABB of a non rotated, non default center', (i) => {

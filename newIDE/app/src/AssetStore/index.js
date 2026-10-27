@@ -24,6 +24,8 @@ import {
   type Course,
   doesAssetPackContainAudio,
   isAssetPackAudioOnly,
+  isEffectAssetMadeFor,
+  type EffectTarget,
 } from '../Utils/GDevelopServices/Asset';
 import {
   type PrivateAssetPackListingData,
@@ -65,10 +67,7 @@ import Text from '../UI/Text';
 import { capitalize } from 'lodash';
 import PrivateGameTemplateInformationPage from './PrivateGameTemplates/PrivateGameTemplateInformationPage';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
-import {
-  AssetSwappingAssetStoreSearchFilter,
-  ObjectTypeAssetStoreSearchFilter,
-} from './AssetStoreSearchFilter';
+import { AssetSwappingAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import { delay } from '../Utils/Delay';
 import { BundleStoreContext } from './Bundles/BundleStoreContext';
 import BundleInformationPage from './Bundles/BundleInformationPage';
@@ -87,6 +86,9 @@ type Props = {|
   assetSwappedObject?: ?gdObject,
   // Only list the assets of these object types, without packs.
   fixedObjectTypes?: ?Array<string>,
+  // Only list the effect assets made for objects, or for layers.
+  fixedEffectTarget?: EffectTarget,
+  noResultsPlaceholder?: React.Node,
 |};
 
 export type AssetStoreInterface = {|
@@ -133,6 +135,8 @@ export const AssetStore: React.ComponentType<{
       getCourseCompletion,
       assetSwappedObject,
       fixedObjectTypes,
+      fixedEffectTarget,
+      noResultsPlaceholder,
     }: Props,
     ref
   ) => {
@@ -198,25 +202,21 @@ export const AssetStore: React.ComponentType<{
       ]
     );
 
+    const hasFixedObjectTypes = !!fixedObjectTypes;
     const fixedObjectTypesKey = fixedObjectTypes
       ? fixedObjectTypes.join(',')
-      : '';
-    const appliedFixedObjectTypesKey = React.useRef<string>('');
+      : null;
+    const appliedFixedObjectTypesKey = React.useRef<?string>(null);
     React.useEffect(
       () => {
         if (appliedFixedObjectTypesKey.current === fixedObjectTypesKey) return;
         appliedFixedObjectTypesKey.current = fixedObjectTypesKey;
-        if (!fixedObjectTypesKey) return;
+        if (fixedObjectTypesKey === null) return;
 
         // Same page as when swapping an asset: a list of assets with no packs.
         shopNavigationState.openAssetSwapping();
         setAssetStoreSearchText('');
         clearAllAssetStoreFilters();
-        assetFiltersState.setObjectTypeFilter(
-          new ObjectTypeAssetStoreSearchFilter(
-            new Set(fixedObjectTypesKey.split(','))
-          )
-        );
         const assetsListInterface = assetsList.current;
         if (assetsListInterface) {
           assetsListInterface.scrollToPosition(0);
@@ -224,14 +224,30 @@ export const AssetStore: React.ComponentType<{
         }
       },
       [
-        assetFiltersState,
         fixedObjectTypesKey,
         clearAllAssetStoreFilters,
         setAssetStoreSearchText,
         shopNavigationState,
       ]
     );
-    const hidePacks = !!assetSwappedObject || !!fixedObjectTypes;
+    // The filters are shared by all the stores of the editor (and can be
+    // cleared by the user), so the fixed object types are applied here instead.
+    const displayedAssetShortHeaders = React.useMemo(
+      () => {
+        if (fixedObjectTypesKey === null || !assetShortHeadersSearchResults)
+          return assetShortHeadersSearchResults;
+
+        const fixedObjectTypesSet = new Set(fixedObjectTypesKey.split(','));
+        return assetShortHeadersSearchResults.filter(
+          assetShortHeader =>
+            fixedObjectTypesSet.has(assetShortHeader.objectType) &&
+            (!fixedEffectTarget ||
+              isEffectAssetMadeFor(assetShortHeader, fixedEffectTarget))
+        );
+      },
+      [assetShortHeadersSearchResults, fixedObjectTypesKey, fixedEffectTarget]
+    );
+    const hidePacks = !!assetSwappedObject || hasFixedObjectTypes;
 
     const {
       privateGameTemplateListingDatas,
@@ -263,18 +279,20 @@ export const AssetStore: React.ComponentType<{
 
     const { isMobile } = useResponsiveWindowSize();
 
+    // The filters (animations, colors, sizes...) only make sense for objects.
+    const hasFilters = !fixedEffectTarget;
     // Don't open the filters panel automatically.
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
     const openFiltersPanelIfAppropriate = React.useCallback(
       () => {
-        if (isMobile) {
+        if (isMobile || !hasFilters) {
           // Never open automatically the filters on small screens
           return;
         }
 
         setIsFiltersPanelOpen(true);
       },
-      [isMobile]
+      [isMobile, hasFilters]
     );
 
     const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
@@ -328,6 +346,7 @@ export const AssetStore: React.ComponentType<{
     );
 
     const canShowFiltersPanel =
+      hasFilters &&
       !openedAssetShortHeader && // Don't show filters on asset page.
       !openedPrivateAssetPackListingData && // Don't show filters on private asset pack information page.
       !openedPrivateGameTemplateListingData && // Don't show filters on private game template information page.
@@ -782,18 +801,11 @@ export const AssetStore: React.ComponentType<{
                   onClick={() => {
                     setSearchText('');
                     const page =
-                      assetSwappedObject || fixedObjectTypes
+                      assetSwappedObject || hasFixedObjectTypes
                         ? shopNavigationState.openAssetSwapping()
                         : shopNavigationState.openHome();
                     setScrollUpdateIsNeeded(page);
                     clearAllAssetStoreFilters();
-                    if (fixedObjectTypes) {
-                      assetFiltersState.setObjectTypeFilter(
-                        new ObjectTypeAssetStoreSearchFilter(
-                          new Set(fixedObjectTypes)
-                        )
-                      );
-                    }
                     setIsFiltersPanelOpen(false);
                   }}
                   size="small"
@@ -836,14 +848,16 @@ export const AssetStore: React.ComponentType<{
                     id="asset-store-search-bar"
                   />
                 </Column>
-                <IconButton
-                  onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
-                  disabled={!canShowFiltersPanel}
-                  selected={canShowFiltersPanel && isFiltersPanelOpen}
-                  size="small"
-                >
-                  <Tune />
-                </IconButton>
+                {hasFilters && (
+                  <IconButton
+                    onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
+                    disabled={!canShowFiltersPanel}
+                    selected={canShowFiltersPanel && isFiltersPanelOpen}
+                    size="small"
+                  >
+                    <Tune />
+                  </IconButton>
+                )}
               </LineStackLayout>
               <Spacer />
             </>
@@ -932,6 +946,7 @@ export const AssetStore: React.ComponentType<{
                 )
               ) : isOnSearchResultPage ? (
                 <AssetsList
+                  noResultsPlaceHolder={noResultsPlaceholder}
                   publicAssetPacks={
                     hidePacks ? [] : publicAssetPacksSearchResults
                   }
@@ -946,7 +961,7 @@ export const AssetStore: React.ComponentType<{
                   bundleListingDatas={
                     hidePacks ? [] : bundleListingDatasSearchResults
                   }
-                  assetShortHeaders={assetShortHeadersSearchResults}
+                  assetShortHeaders={displayedAssetShortHeaders}
                   ref={assetsList}
                   error={storeError}
                   onOpenDetails={onOpenDetails}
@@ -1030,7 +1045,7 @@ export const AssetStore: React.ComponentType<{
                       <Line justifyContent="space-between" alignItems="center">
                         <AssetStoreFilterPanel
                           assetSwappedObject={assetSwappedObject}
-                          hideObjectTypeFilter={!!fixedObjectTypes}
+                          hideObjectTypeFilter={hasFixedObjectTypes}
                         />
                       </Line>
                     </Column>

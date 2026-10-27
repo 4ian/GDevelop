@@ -159,6 +159,11 @@ export type BundleListingData = {|
   listing: 'BUNDLE',
 |};
 
+export type PurchasePaymentDetails = {|
+  total: number | null,
+  currency?: string,
+|};
+
 export type Purchase = {|
   id: string,
   usageType: string,
@@ -175,6 +180,7 @@ export type Purchase = {|
   manualGiftReason?: string,
   creditsAmount?: number,
   productType: ProductType,
+  paymentDetails?: PurchasePaymentDetails | null,
 |};
 
 type ProductLicenseType = 'personal' | 'commercial' | 'unlimited' | 'default';
@@ -395,6 +401,47 @@ export const listUserPurchases = async (
   });
 };
 
+export type PurchaseWithProductName = {|
+  ...Purchase,
+  productName: string | null,
+|};
+
+export const listInvoiceablePurchases = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<PurchaseWithProductName>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get('/purchase', {
+    params: { userId, role: 'receiver', invoiceable: 'true' },
+    headers: { Authorization: authorizationHeader },
+  });
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/purchase of Shop API',
+  });
+};
+
+export const generatePurchaseInvoice = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  purchaseId: string
+): Promise<Blob> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    `/purchase/${purchaseId}/action/generate-invoice`,
+    {},
+    {
+      params: { userId },
+      headers: {
+        Authorization: authorizationHeader,
+        Accept: 'application/pdf',
+      },
+      responseType: 'blob',
+    }
+  );
+  return response.data;
+};
+
 export const getAuthorizationTokenForPrivateAssets = async (
   getAuthorizationHeader: () => Promise<string>,
   {
@@ -480,12 +527,14 @@ export const getPurchaseCheckoutUrl = ({
   userId,
   userEmail,
   password,
+  language,
 }: {|
   productId: string,
   priceName: string,
   userId: string,
   userEmail: string,
   password?: string,
+  language: string,
 |}): string => {
   const url = new URL(
     `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-checkout`
@@ -496,6 +545,7 @@ export const getPurchaseCheckoutUrl = ({
   url.searchParams.set('userId', userId);
   url.searchParams.set('customerEmail', userEmail);
   if (password) url.searchParams.set('password', password);
+  url.searchParams.set('language', language);
 
   return url.toString();
 };

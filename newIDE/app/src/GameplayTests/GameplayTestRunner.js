@@ -45,7 +45,16 @@ export type GameplayTestResult = {
   // 'paused': the run was interrupted because the editor stayed in the
   // background, where the browser stops running the game. Not a failure of
   // the test: it must simply be run again.
-  status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout' | 'paused',
+  // 'unavailable': the game preview could not be started (the browser
+  // storage is full...): the test did not run, says nothing about it.
+  status:
+    | 'passed'
+    | 'failed'
+    | 'error'
+    | 'stopped'
+    | 'timeout'
+    | 'paused'
+    | 'unavailable',
   framesExecuted: number,
   durationMs: number,
   // Time spent waiting for the game to boot and for scene assets to load,
@@ -183,7 +192,7 @@ export const useIsGameplayTestRunInProgress = (): boolean => {
 
 const makeResultWithoutRun = (
   testName: string,
-  status: 'error' | 'stopped' | 'paused',
+  status: 'error' | 'stopped' | 'paused' | 'unavailable',
   errorMessage: string
 ): GameplayTestResult => ({
   testName,
@@ -264,6 +273,16 @@ const makePausedResult = (
   ),
   hiddenStallMs,
 });
+
+/**
+ * Why the game preview could not be started, in words telling the AI that the
+ * test and the game are not in question.
+ */
+const getPreviewLaunchFailureMessage = (error: any): string =>
+  error && error.name === 'QuotaExceededError'
+    ? 'The game preview could not be started: the browser storage used by GDevelop is full, so the files of the game could not be stored. No preview nor gameplay test can run until the user frees this storage (in the site settings of the browser) and reloads GDevelop.'
+    : `The game preview could not be started: ${(error && error.message) ||
+        String(error)}`;
 
 /**
  * Get the tests container for a scope ('project' or an extension name),
@@ -692,39 +711,48 @@ export const runGameplayTests = async ({
 
       try {
         // Export and launch a fresh preview into the gameplay test frame.
-        await previewLauncher.launchPreview(
-          // $FlowFixMe[prop-missing] - the launchers accept partial preview options for gameplay tests.
-          ({
-            project,
-            sceneName: project.getFirstLayout(),
-            externalLayoutName: null,
-            eventsBasedObjectType: null,
-            eventsBasedObjectVariantName: null,
-            networkPreview: false,
-            hotReload: false,
-            shouldReloadProjectData: true,
-            shouldReloadLibraries: true,
-            shouldGenerateScenesEventsCode: true,
-            shouldReloadResources: false,
-            shouldHardReload: false,
-            fullLoadingScreen: false,
-            fallbackAuthor: null,
-            authenticatedPlayer: null,
-            isForInGameEdition: false,
-            isForGameplayTest: true,
-            editorId: '',
-            getIsMenuBarHiddenInPreview: () => true,
-            getIsAlwaysOnTopInPreview: () => false,
-            captureOptions: null,
-            onCaptureFinished: async () => {},
-            inAppTutorialMessageInPreview: '',
-            inAppTutorialMessagePositionInPreview: '',
-            editorCameraState3D: null,
-            inGameEditorSettings: null,
-            numberOfWindows: 0,
-            previewWindows: null,
-          }: any)
-        );
+        try {
+          await previewLauncher.launchPreview(
+            // $FlowFixMe[prop-missing] - the launchers accept partial preview options for gameplay tests.
+            ({
+              project,
+              sceneName: project.getFirstLayout(),
+              externalLayoutName: null,
+              eventsBasedObjectType: null,
+              eventsBasedObjectVariantName: null,
+              networkPreview: false,
+              hotReload: false,
+              shouldReloadProjectData: true,
+              shouldReloadLibraries: true,
+              shouldGenerateScenesEventsCode: true,
+              shouldReloadResources: false,
+              shouldHardReload: false,
+              fullLoadingScreen: false,
+              fallbackAuthor: null,
+              authenticatedPlayer: null,
+              isForInGameEdition: false,
+              isForGameplayTest: true,
+              editorId: '',
+              getIsMenuBarHiddenInPreview: () => true,
+              getIsAlwaysOnTopInPreview: () => false,
+              captureOptions: null,
+              onCaptureFinished: async () => {},
+              inAppTutorialMessageInPreview: '',
+              inAppTutorialMessagePositionInPreview: '',
+              editorCameraState3D: null,
+              inGameEditorSettings: null,
+              numberOfWindows: 0,
+              previewWindows: null,
+            }: any)
+          );
+        } catch (launchError) {
+          // Nothing will boot: say why now, instead of waiting for the boot
+          // timeout.
+          const error = new Error(getPreviewLaunchFailureMessage(launchError));
+          // $FlowFixMe[prop-missing] - tag the error so the runner reports the tests as not run, not as failed.
+          error.isPreviewUnavailable = true;
+          throw error;
+        }
 
         await waitForGameToBeReady(previewDebuggerServer, stopController);
 
@@ -804,6 +832,13 @@ export const runGameplayTests = async ({
           // booting: mark the tests that could not be run as stopped.
           for (const { test } of testsWithSources.slice(results.length)) {
             results.push(makeStoppedResult(test.testName));
+          }
+        } else if (error.isPreviewUnavailable) {
+          console.error('[GameplayTestRunner] ' + error.message);
+          for (const { test } of testsWithSources.slice(results.length)) {
+            results.push(
+              makeResultWithoutRun(test.testName, 'unavailable', error.message)
+            );
           }
         } else {
           const errorMessage =

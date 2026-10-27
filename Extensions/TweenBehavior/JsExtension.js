@@ -1361,7 +1361,7 @@ module.exports = {
           'Tweens an object scale from its current scale to a new one (note: the scale can never be less than 0).'
         ),
         _(
-          'Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ (from center: _PARAM8_) with easing _PARAM5_ over _PARAM6_ms as _PARAM2_'
+          'Tween the scale of _PARAM0_ to X scale: _PARAM3_, Y scale: _PARAM4_ (from center: _PARAM8_) with easing _PARAM5_ over _PARAM6_ms as _PARAM2_'
         ),
         _('Size'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -1397,7 +1397,7 @@ module.exports = {
           'Tweens an object scale from its current scale to a new one (note: the scale can never be 0 or less).'
         ),
         _(
-          'Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ (from center: _PARAM8_) with easing _PARAM5_ over _PARAM6_ seconds as _PARAM2_'
+          'Tween the scale of _PARAM0_ to X scale: _PARAM3_, Y scale: _PARAM4_ (from center: _PARAM8_) with easing _PARAM5_ over _PARAM6_ seconds as _PARAM2_'
         ),
         _('Size'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -1461,12 +1461,12 @@ module.exports = {
     behavior
       .addAction(
         'AddObjectScaleXTween',
-        _('Tween object X-scale'),
+        _('Tween object X scale'),
         _(
-          'Tweens an object X-scale from its current value to a new one (note: the scale can never be less than 0).'
+          'Tweens an object X scale from its current value to a new one (note: the scale can never be less than 0).'
         ),
         _(
-          'Tween the X-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
+          'Tween the X scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
         _('Size'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -1495,12 +1495,12 @@ module.exports = {
     behavior
       .addScopedAction(
         'AddObjectScaleXTween2',
-        _('Tween object X-scale'),
+        _('Tween object X scale'),
         _(
-          'Tweens an object X-scale from its current value to a new one (note: the scale can never be 0 or less).'
+          'Tweens an object X scale from its current value to a new one (note: the scale can never be 0 or less).'
         ),
         _(
-          'Tween the X-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ seconds as _PARAM2_'
+          'Tween the X scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ seconds as _PARAM2_'
         ),
         _('Size'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -1529,12 +1529,12 @@ module.exports = {
     behavior
       .addAction(
         'AddObjectScaleYTween',
-        _('Tween object Y-scale'),
+        _('Tween object Y scale'),
         _(
-          'Tweens an object Y-scale from its current value to a new one (note: the scale can never be less than 0).'
+          'Tweens an object Y scale from its current value to a new one (note: the scale can never be less than 0).'
         ),
         _(
-          'Tween the Y-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
+          'Tween the Y scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
         _('Size'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -1563,12 +1563,12 @@ module.exports = {
     behavior
       .addScopedAction(
         'AddObjectScaleYTween2',
-        _('Tween object Y-scale'),
+        _('Tween object Y scale'),
         _(
-          'Tweens an object Y-scale from its current value to a new one (note: the scale can never be 0 or less).'
+          'Tweens an object Y scale from its current value to a new one (note: the scale can never be 0 or less).'
         ),
         _(
-          'Tween the Y-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ seconds as _PARAM2_'
+          'Tween the Y scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ seconds as _PARAM2_'
         ),
         _('Size'),
         'JsPlatform/Extensions/tween_behavior24.png',

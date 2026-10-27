@@ -44,6 +44,15 @@ export namespace TiledTileMapLoader {
             tile.animation ? tile.animation.length : 0
           );
           const tileClass = tile.type || tile.class;
+          // Tiled draws the image of a tile from an image collection at the
+          // bottom-left corner of its cell. Shapes are relative to this image.
+          // Its left side is aligned with the cell, so shapes only need to be
+          // moved vertically when the image height differs from the cell one.
+          const shapeOffsetY =
+            tile.imageheight !== undefined &&
+            tiledTileSet.tilerendersize !== "grid"
+              ? tiledTileMap.tileheight - tile.imageheight
+              : 0;
           if (tile.objectgroup && tile.objectgroup.objects) {
             for (const object of tile.objectgroup.objects) {
               const tag = object.type || object.class || tileClass || "";
@@ -62,7 +71,7 @@ export namespace TiledTileMapLoader {
                 }
                 polygon = object.polygon.map((point) => [
                   object.x + point.x * cos - point.y * sin,
-                  object.y + point.x * sin + point.y * cos,
+                  shapeOffsetY + object.y + point.x * sin + point.y * cos,
                 ]);
                 //TODO check that polygons are convex or split them?
                 // TODO Set hasFullHitBox to true if the polygon covers the whole tile.
@@ -76,15 +85,16 @@ export namespace TiledTileMapLoader {
                 object.width !== undefined &&
                 object.height !== undefined
               ) {
+                const top = shapeOffsetY + object.y;
                 polygon = [
-                  [object.x, object.y],
-                  [object.x, object.y + object.height],
-                  [object.x + object.width, object.y + object.height],
-                  [object.x + object.width, object.y],
+                  [object.x, top],
+                  [object.x, top + object.height],
+                  [object.x + object.width, top + object.height],
+                  [object.x + object.width, top],
                 ];
                 hasFullHitBox =
                   object.x === 0 &&
-                  object.y === 0 &&
+                  top === 0 &&
                   object.width === tiledTileMap.tilewidth &&
                   object.height === tiledTileMap.tileheight;
               }

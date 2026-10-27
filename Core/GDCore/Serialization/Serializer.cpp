@@ -66,101 +66,105 @@ void RapidJsonValueToElement(const Value& value,
   }
 }
 
-void ElementToRapidJson(const gd::SerializerElement& element,
-                        Value& value,
-                        Document::AllocatorType& allocator) {
-  if (!element.IsValueUndefined()) {
-    const SerializerValue& serializerValue = element.GetValue();
-    // TODO: use GetRaw to avoid conversions
-    if (serializerValue.IsBoolean())
-      value.SetBool(serializerValue.GetBool());
-    else if (serializerValue.IsDouble())
-      value.SetDouble(serializerValue.GetDouble());
-    else if (serializerValue.IsInt())
-      value.SetInt(serializerValue.GetInt());
-    else if (serializerValue.IsString()) {
-      // This does a copy of the string, and measure the string length.
-      value.SetString(serializerValue.GetRawString().c_str(), allocator);
+// Write the JSON of an element directly with the writer, in the order a
+// rapidjson::Document built from it would be written, but without building
+// that Document: a Document reserves 16 members for each object and copies all
+// the strings, which takes about 12 times the size of the JSON (more than the
+// elements themselves), on top of the elements and of the JSON text.
+// Like Document::Accept, stop as soon as the writer refuses a value.
+bool WriteValueToRapidJson(const SerializerValue& serializerValue,
+                           Writer<StringBuffer>& writer) {
+  // TODO: use GetRaw to avoid conversions
+  if (serializerValue.IsBoolean())
+    return writer.Bool(serializerValue.GetBool());
+  else if (serializerValue.IsDouble())
+    return writer.Double(serializerValue.GetDouble());
+  else if (serializerValue.IsInt())
+    return writer.Int(serializerValue.GetInt());
+  else if (serializerValue.IsString())
+    return writer.String(serializerValue.GetRawString().c_str());
+
+  return writer.Null();
+}
+
+bool WriteElementToRapidJson(const gd::SerializerElement& element,
+                             Writer<StringBuffer>& writer) {
+  if (!element.IsValueUndefined())
+    return WriteValueToRapidJson(element.GetValue(), writer);
+
+  if (element.ConsideredAsArray()) {
+    if (!writer.StartArray()) return false;
+    for (const auto& child : element.GetAllChildren()) {
+      if (!WriteElementToRapidJson(*child.second, writer)) return false;
     }
-  } else if (element.ConsideredAsArray()) {
-    value.SetArray();
+    return writer.EndArray();
+  }
 
-    const auto& children = element.GetAllChildren();
-    value.Reserve(children.size(), allocator);
+  if (!writer.StartObject()) return false;
 
-    for (const auto& child : children) {
-      Value childValue;
-      ElementToRapidJson(*child.second, childValue, allocator);
-      value.PushBack(childValue, allocator);
-    }
-  } else {
-    value.SetObject();
+  // Most elements have no attributes: don't make GetAllAttributes allocate them.
+  const bool hasAttributes = element.HasAttributes();
+  const auto& children = element.GetAllChildren();
 
-    const auto& attributes = element.GetAllAttributes();
-    const auto& children = element.GetAllChildren();
+  if (gd::Serializer::IsCanonicalMode()) {
+    // In canonical mode, merge attributes and children into a single
+    // alphabetically-sorted sequence so that the resulting JSON has
+    // stable, alphabetical key order. Attributes are stored in a
+    // std::map (already sorted) but children are stored in insertion
+    // order; we re-sort the union here.
+    //
+    // Children with the same name (rare, but allowed) keep their
+    // relative insertion order thanks to std::multimap stability.
+    //
+    // Exactly one of attributeValue / childElement is non-null per
+    // entry; we discriminate on which pointer is set.
+    struct Entry {
+      const SerializerValue* attributeValue;
+      const gd::SerializerElement* childElement;
+    };
+    std::multimap<gd::String, Entry> sortedEntries;
 
-    if (gd::Serializer::IsCanonicalMode()) {
-      // In canonical mode, merge attributes and children into a single
-      // alphabetically-sorted sequence so that the resulting JSON has
-      // stable, alphabetical key order. Attributes are stored in a
-      // std::map (already sorted) but children are stored in insertion
-      // order; we re-sort the union here.
-      //
-      // Children with the same name (rare, but allowed) keep their
-      // relative insertion order thanks to std::multimap stability.
-      //
-      // Exactly one of attributeValue / childElement is non-null per
-      // entry; we discriminate on which pointer is set.
-      struct Entry {
-        const SerializerValue* attributeValue;
-        const gd::SerializerElement* childElement;
-      };
-      std::multimap<gd::String, Entry> sortedEntries;
-
-      for (const auto& attribute : attributes) {
+    if (hasAttributes) {
+      for (const auto& attribute : element.GetAllAttributes()) {
         sortedEntries.emplace(
             attribute.first,
             Entry{&attribute.second, nullptr});
       }
-      for (const auto& child : children) {
-        sortedEntries.emplace(
-            child.first,
-            Entry{nullptr, child.second.get()});
-      }
+    }
+    for (const auto& child : children) {
+      sortedEntries.emplace(
+          child.first,
+          Entry{nullptr, child.second.get()});
+    }
 
-      for (const auto& entry : sortedEntries) {
-        Value name(entry.first.c_str(), allocator);
-        Value childValue;
-        if (entry.second.attributeValue != nullptr) {
-          // Implicit conversion SerializerValue -> SerializerElement.
-          ElementToRapidJson(
-              *entry.second.attributeValue, childValue, allocator);
-        } else if (entry.second.childElement != nullptr) {
-          ElementToRapidJson(
-              *entry.second.childElement, childValue, allocator);
-        } else {
-          // Defensive: skip malformed entries instead of dereferencing null.
-          continue;
-        }
-        value.AddMember(name, childValue, allocator);
+    for (const auto& entry : sortedEntries) {
+      if (entry.second.attributeValue != nullptr) {
+        if (!writer.Key(entry.first.c_str()) ||
+            !WriteValueToRapidJson(*entry.second.attributeValue, writer))
+          return false;
+      } else if (entry.second.childElement != nullptr) {
+        if (!writer.Key(entry.first.c_str()) ||
+            !WriteElementToRapidJson(*entry.second.childElement, writer))
+          return false;
       }
-    } else {
-      for (const auto& attribute : attributes) {
-        Value name(attribute.first.c_str(),
-                   allocator);  // Copying the name is required.
-        Value childValue;
-        ElementToRapidJson(attribute.second, childValue, allocator);
-        value.AddMember(name, childValue, allocator);
-      }
-      for (const auto& child : children) {
-        Value name(child.first.c_str(),
-                   allocator);  // Copying the name is required.
-        Value childValue;
-        ElementToRapidJson(*child.second, childValue, allocator);
-        value.AddMember(name, childValue, allocator);
+      // Defensive: malformed entries are skipped instead of dereferencing null.
+    }
+  } else {
+    if (hasAttributes) {
+      for (const auto& attribute : element.GetAllAttributes()) {
+        if (!writer.Key(attribute.first.c_str()) ||
+            !WriteValueToRapidJson(attribute.second, writer))
+          return false;
       }
     }
+    for (const auto& child : children) {
+      if (!writer.Key(child.first.c_str()) ||
+          !WriteElementToRapidJson(*child.second, writer))
+        return false;
+    }
   }
+
+  return writer.EndObject();
 }
 }  // namespace
 
@@ -187,14 +191,9 @@ SerializerElement Serializer::FromJSON(const char* json) {
 }
 
 gd::String Serializer::ToJSON(const SerializerElement& element) {
-  Document document;
-  Document::AllocatorType& allocator = document.GetAllocator();
-
-  ElementToRapidJson(element, document, allocator);
-
   StringBuffer buffer;
   Writer<StringBuffer> writer(buffer);
-  document.Accept(writer);
+  WriteElementToRapidJson(element, writer);
 
   return buffer.GetString();  // Temporary copy
 }

@@ -444,7 +444,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddAction("ShowLayer",
                  _("Show a layer"),
-                 _("Show a layer."),
+                 _("Show a layer, making it visible."),
                  _("Show layer _PARAM1_"),
                  "",
                  "res/actions/layer24.png",
@@ -457,7 +457,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddAction("HideLayer",
                  _("Hide a layer"),
-                 _("Hide a layer."),
+                 _("Hide a layer, making it invisible."),
                  _("Hide layer _PARAM1_"),
                  "",
                  "res/actions/layer24.png",
@@ -540,7 +540,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddCondition("LayerEffectEnabled",
                     _("Layer effect is enabled"),
-                    _("The effect on a layer is enabled"),
+                    _("Check if the effect on a layer is enabled or disabled."),
                     _("Effect _PARAM2_ on layer _PARAM1_ is enabled"),
                     _(""),
                     "res/actions/effect_black.svg",
@@ -554,7 +554,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddAction("EnableLayerEffect",
                  _("Enable layer effect"),
-                 _("Enable an effect on a layer"),
+                 _("Enable or disable an effect on a layer"),
                  _("Enable effect _PARAM2_ on layer _PARAM1_: _PARAM3_"),
                  _("Effects"),
                  "res/actions/effect_black.svg",

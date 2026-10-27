@@ -252,6 +252,38 @@ module.exports = {
 
       base3D
         .addExpression(
+          'DistanceToPosition3D',
+          _('Distance between an object and a position (3D)'),
+          _(
+            'Return the distance between the center of the object and a position, on the X, Y and Z axes. To ignore Z, use ‘Distance between an object and a position (2D)’.'
+          ),
+          _('Position'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('X position'), '', false)
+        .addParameter('number', _('Y position'), '', false)
+        .addParameter('number', _('Z position'), '', false)
+        .setFunctionName('getDistanceToPosition3D');
+
+      base3D
+        .addExpression(
+          'Distance3D',
+          _('Distance between two objects (3D)'),
+          _(
+            'Return the distance between the centers of the object and another object, on the X, Y and Z axes (a 2D object is at a Z of 0). To ignore Z, use ‘Distance between two objects (2D)’.'
+          ),
+          _('Position'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('objectPtr', _('Other object'), '', false)
+        .setFunctionName('getDistanceToObject3D');
+
+      base3D
+        .addExpression(
           'ForwardX',
           _('Forward vector X component'),
           _('Return the object forward vector X component.'),
@@ -3700,7 +3732,13 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        return 'JsPlatform/Extensions/3d_model.svg';
+        const modelResourceName = gd
+          .castObject(objectConfiguration, gd.Model3DObjectConfiguration)
+          .getModelResourceName();
+        const previewUrl =
+          resourcesLoader.getModel3DPreviewUrl &&
+          resourcesLoader.getModel3DPreviewUrl(project, modelResourceName);
+        return previewUrl || 'JsPlatform/Extensions/3d_model.svg';
       }
 
       getOriginX() {

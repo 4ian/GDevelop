@@ -22,6 +22,7 @@ import {
 } from '../../Utils/AppStorePurchases';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import PasswordPromptDialog from '../PasswordPromptDialog';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
@@ -45,6 +46,7 @@ const PrivateGameTemplatePurchaseDialog = ({
     onRefreshGameTemplatePurchases,
     gameTemplatePurchases,
   } = React.useContext(AuthenticatedUserContext);
+  const preferences = React.useContext(PreferencesContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
     isCheckingPurchasesAfterLogin,
@@ -98,6 +100,7 @@ const PrivateGameTemplatePurchaseDialog = ({
         priceName: price.name,
         userId: profile.id,
         userEmail: profile.email,
+        language: preferences.values.language,
         ...(password ? { password } : undefined),
       });
       Window.openExternalURL(checkoutUrl);

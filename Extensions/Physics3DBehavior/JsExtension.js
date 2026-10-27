@@ -266,7 +266,11 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'layers') {
+        // Both edit the layers of the static and of the moving objects.
+        if (
+          propertyName === 'layers' ||
+          propertyName === 'layersIfDynamicOrKinematic'
+        ) {
           behaviorContent
             .getOrCreateChild('layers')
             .setIntValue(parseInt(newValue, 10));
@@ -286,13 +290,10 @@ module.exports = {
         const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
         // The shape decides which dimensions are meaningful and how they
-        // should be labelled, and the body type decides which collision
-        // layers are used, so these properties adapt themselves to them.
+        // should be labelled, so these properties adapt themselves to it.
         const shape = behaviorContent.getChild('shape').getStringValue();
         const isBoxShape = shape === 'Box';
         const isMeshShape = shape === 'Mesh';
-        const isStaticBody =
-          behaviorContent.getChild('bodyType').getStringValue() === 'Static';
 
         behaviorProperties
           .getOrCreate('object3D')
@@ -311,7 +312,7 @@ module.exports = {
           .addChoice('Kinematic', _('Kinematic'))
           .setDescription(
             _(
-              "A static object won't move (perfect for obstacles). Dynamic objects can move. Kinematic will move according to forces applied to it only (useful for characters or specific mechanisms)."
+              'A static object won\'t move (perfect for obstacles). Dynamic objects are moved by the physics engine (gravity, forces and collisions). Kinematic objects are only moved by their velocity or by other behaviors, and push dynamic objects without being pushed (useful for moving platforms, or characters moved by a pathfinding behavior). The type can be changed during the game with the "Body type" action.'
             )
           )
           .setHasImpactOnOtherProperties(true);
@@ -351,7 +352,7 @@ module.exports = {
           .setLabel(_('Shape'))
           .setDescription(
             _(
-              'The shape used for collisions. It gives their meaning to the dimension properties. A capsule or a cylinder is extended along the axis given by "Shape orientation" and a mesh uses the model given by "Simplified 3D model".'
+              'The shape used for collisions. It gives their meaning to the dimension properties. A capsule or a cylinder is extended along the axis given by "Shape orientation" and a mesh uses the model given by "Simplified 3D model". Objects giving their own surface, like terrains, always use it and are static.'
             )
           )
           .addChoice('Box', _('Box'))
@@ -668,23 +669,44 @@ module.exports = {
 
           .setGroup(_('Gravity'))
           .setAdvanced(true);
+        // Static objects use the layers 1 to 4 and moving ones the layers 5 to
+        // 8, so that they never register in the wrong layer group. Both are
+        // shown, as the type can be changed during the game.
+        const staticCollisionFilteringGroup =
+          _('Collision filtering') + ' > ' + _('If static');
+        const movingCollisionFilteringGroup =
+          _('Collision filtering') + ' > ' + _('If dynamic or kinematic');
+        const layersValue = behaviorContent
+          .getChild('layers')
+          .getIntValue()
+          .toString(10);
         behaviorProperties
           .getOrCreate('layers')
-          .setValue(
-            behaviorContent.getChild('layers').getIntValue().toString(10)
-          )
+          .setValue(layersValue)
           .setType('Bitmask')
-          // Static objects use the layers 1 to 4 and moving ones the layers
-          // 5 to 8, so that they never register in the wrong layer group.
           .addExtraInfo('bitCount=4')
-          .addExtraInfo(isStaticBody ? 'firstBit=0' : 'firstBit=4')
+          .addExtraInfo('firstBit=0')
           .setLabel(_('Layers'))
           .setDescription(
             _(
-              'Layers the object belongs to, as a bitmask. Static objects use the layers 1 to 4 (1, 2, 4 and 8) and moving ones the layers 5 to 8 (16, 32, 64 and 128).'
+              'Layers the object belongs to while it is static: the layers 1 to 4. A static object collides with the dynamic and kinematic objects whose masks include its layers.'
             )
           )
-          .setGroup(_('Collision filtering'))
+          .setGroup(staticCollisionFilteringGroup)
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('layersIfDynamicOrKinematic')
+          .setValue(layersValue)
+          .setType('Bitmask')
+          .addExtraInfo('bitCount=4')
+          .addExtraInfo('firstBit=4')
+          .setLabel(_('Layers'))
+          .setDescription(
+            _(
+              'Layers the object belongs to while it is dynamic or kinematic: the layers 5 to 8.'
+            )
+          )
+          .setGroup(movingCollisionFilteringGroup)
           .setAdvanced(true);
         behaviorProperties
           .getOrCreate('masks')
@@ -693,17 +715,14 @@ module.exports = {
           )
           .setType('Bitmask')
           .addExtraInfo('bitCount=8')
-          .setLabel(_('Masks'))
+          .setLabel(_('Masks (collides with)'))
           .setDescription(
             _(
-              'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 8 which is 128. Not used by static objects, which accept every collision.'
+              'Layers the object collides with while it is dynamic or kinematic: the layers 1 to 4 of the static objects, and the layers 5 to 8 of the dynamic and kinematic objects. A static object has no masks: it collides with the dynamic and kinematic objects whose masks include its layers.'
             )
           )
-          .setGroup(_('Collision filtering'))
-          .setAdvanced(true)
-          // Static objects accept every collision: it's the mask of the moving
-          // objects that matters.
-          .setHidden(isStaticBody);
+          .setGroup(movingCollisionFilteringGroup)
+          .setAdvanced(true);
 
         return behaviorProperties;
       };
@@ -975,6 +994,29 @@ module.exports = {
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
         .getCodeExtraInformation()
         .setFunctionName('isKinematic');
+
+      aut
+        .addScopedAction(
+          'SetBodyType',
+          _('Body type'),
+          _(
+            'Change the type of the body: static, dynamic or kinematic. For instance, an enemy moved by a pathfinding behavior can be kinematic, and become dynamic to be thrown by an impulse when it is hit. The velocities are kept. Static bodies are in the layers 1 to 4, dynamic and kinematic bodies in the layers 5 to 8: with the default layers (1 and 5), the object collides with the same objects after the change. Nothing is changed while a 3D character or 3D car behavior of the object is activated (it gets back its type from the editor when activated again), and for mesh shapes (only static).'
+          ),
+          _('Change the body type of _PARAM0_ to _PARAM2_'),
+          _('Dynamics'),
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .addParameter(
+          'stringWithSelector',
+          _('Body type'),
+          '["Static", "Dynamic", "Kinematic"]',
+          false
+        )
+        .getCodeExtraInformation()
+        .setFunctionName('setBodyType');
 
       aut
         .addScopedCondition(

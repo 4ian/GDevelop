@@ -34,3 +34,4 @@
 .Trashes
 Thumbs.db
 .claude
+/GDJS/tests/.benchmark-runtimes

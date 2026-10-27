@@ -51,6 +51,14 @@ describe('server-side handled tools', () => {
     }
   });
 
+  it('read_javascript_reference fails and tells the AI to continue', async () => {
+    const result = await launch('read_javascript_reference');
+    expect(result.success).toBe(false);
+    expect(result.message).toBe(
+      'Unable to read the JavaScript reference - continue with your existing GDevelop knowledge.'
+    );
+  });
+
   it('run_explorer_agent and run_edit_agent fail as they are handled server-side', async () => {
     const explorerResult = await launch('run_explorer_agent');
     expect(explorerResult.success).toBe(false);

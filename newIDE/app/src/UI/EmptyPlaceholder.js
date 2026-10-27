@@ -75,8 +75,9 @@ export const EmptyPlaceholder = (props: Props): React.Node => (
           align="center"
           noMargin
           style={{
-            ...textEllipsisStyle,
             flex: 1,
+            // Wrap rather than cut: descriptions can be long once translated.
+            overflowWrap: 'break-word',
           }}
         >
           {props.description}

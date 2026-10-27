@@ -112,7 +112,7 @@ export const useRefreshLimits = (
 // The tools of the orchestrator AND of the sub-agents it creates server-side.
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
-export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v21';
+export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v22';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying
@@ -604,6 +604,11 @@ export const useProcessFunctionCalls = ({
         accumulatedObjectGroupsChanges.forEach(changes =>
           onObjectGroupsModifiedOutsideEditor(changes)
         );
+        // Also called during the batch: the changes sent are not sent again.
+        accumulatedSceneEventsChanges.clear();
+        accumulatedInstancesChanges.clear();
+        accumulatedObjectsChanges.clear();
+        accumulatedObjectGroupsChanges.clear();
       };
 
       // Regenerate the extensions changed so far, so the platform metadata (and
@@ -731,6 +736,9 @@ export const useProcessFunctionCalls = ({
           // Not coalesced: must run before the object is actually deleted so
           // editors can safely read it to close a dialog/panel referring to it.
           onWillDeleteObject,
+          // For the functions needing the game shown by the editor to have
+          // the changes made so far in the batch (to find surfaces in it).
+          sendChangesToEditor: flushAccumulatedOutsideEditorChanges,
           // Coalesced per extension: regenerating the extensions once for the
           // whole batch instead of once per call.
           onExtensionsModifiedOutsideEditor: changes =>

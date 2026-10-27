@@ -481,7 +481,7 @@ module.exports = {
         .setValue(behaviorContent.getChild('masks').getIntValue().toString(10))
         .setType('Bitmask')
         .addExtraInfo('bitCount=16')
-        .setLabel(_('Masks'))
+        .setLabel(_('Masks (collides with)'))
         .setDescription(
           _(
             'Layers the object can collide with, as a bitmask: layer 1 is 1, layer 2 is 2, layer 3 is 4, and so on up to layer 16 which is 32768.'
@@ -967,7 +967,7 @@ module.exports = {
         'SetSleepingAllowed',
         _('Sleeping allowed'),
         _(
-          'Allow or not an object to sleep. If enabled the object will be able to sleep, improving performance for non-currently-moving objects.'
+          'Enable or disable sleeping for an object. If enabled, the object will be able to sleep, improving performance for non-currently-moving objects.'
         ),
         _('Allow _PARAM0_ to sleep: _PARAM2_'),
         _('Dynamics'),

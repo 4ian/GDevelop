@@ -24,6 +24,8 @@ import ProfileDialog from '../Profile/ProfileDialog';
 import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
 import Window from '../Utils/Window';
 import { markLegacySkyboxes } from '../Utils/LegacySkyboxOrientation';
+import { isWebGL2Supported } from '../Utils/WebGL';
+import { setInGameEditorRendererCreationFailed } from '../EmbeddedGame/InGameEditorAvailability';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
@@ -102,8 +104,12 @@ import { requestAskAiPrefill } from '../AiGeneration/AskAiPrefill';
 import {
   isInGameEditorExtensionErrorFromStore,
   getAskAiToFixInGameEditorExtensionErrorsText,
+  buildInGameEditorExtensionErrorGameCrashReport,
 } from '../InGameEditorExtensionErrors';
+import { createGameCrashReport } from '../Utils/GDevelopServices/Analytics';
 import InGameEditorExtensionErrorsIndicator from '../InGameEditorExtensionErrors/InGameEditorExtensionErrorsIndicator';
+import SlowGraphicsRenderingIndicator from '../SlowGraphicsRendering/SlowGraphicsRenderingIndicator';
+import { LineStackLayout } from '../UI/Layout';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
@@ -218,6 +224,7 @@ import {
   sendEventsExtractedAsFunction,
   sendPreviewStarted,
   sendProjectOpened,
+  setCurrentProjectUuid,
 } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/UseLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -251,6 +258,7 @@ import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import { burstResource3DPreviewCache } from '../ResourcesList/ResourcePreview/Resource3DPreviewCache';
 import useResourcesWatcher from './ResourcesWatcher';
 import { useResourcesAccessRefresh } from './UseResourcesAccessRefresh';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
@@ -706,6 +714,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [gameEditorMode, setGameEditorMode] = React.useState<
     'embedded-game' | 'instances-editor'
   >('instances-editor');
+  const onEnableInGameEditor = React.useCallback(
+    () => setGameEditorMode('embedded-game'),
+    []
+  );
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -716,6 +728,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   const { currentFileMetadata, updateStatus } = state;
   const currentProject = exceptionallyGuardAgainstDeadObject(
     state.currentProject
+  );
+
+  React.useEffect(
+    () => {
+      setCurrentProjectUuid(
+        currentProject ? currentProject.getProjectUuid() : null
+      );
+    },
+    [currentProject]
   );
 
   const fileIdentifier = currentFileMetadata
@@ -799,6 +820,38 @@ const MainFrame = (props: Props): React.MixedElement => {
    * See `isCurrentProjectFresh`.
    */
   const currentProjectRef = useStableUpToDateRef(currentProject);
+
+  // An error comes back after each hot reload: only report it once.
+  const reportedStoreExtensionErrorKeys = React.useRef<Set<string>>(new Set());
+  React.useEffect(
+    () => {
+      if (
+        !currentProject ||
+        preferences.values.previewCrashReportUploadLevel === 'none'
+      ) {
+        return;
+      }
+      inGameEditorExtensionErrors.forEach(error => {
+        if (
+          reportedStoreExtensionErrorKeys.current.has(error.key) ||
+          !isInGameEditorExtensionErrorFromStore(currentProject, error)
+        ) {
+          return;
+        }
+        reportedStoreExtensionErrorKeys.current.add(error.key);
+        createGameCrashReport(
+          buildInGameEditorExtensionErrorGameCrashReport(currentProject, error)
+        ).catch(requestError => {
+          console.error('Error while sending the crash report:', requestError);
+        });
+      });
+    },
+    [
+      inGameEditorExtensionErrors,
+      currentProject,
+      preferences.values.previewCrashReportUploadLevel,
+    ]
+  );
 
   const getEditorOpeningOptions = React.useCallback(
     ({
@@ -1350,6 +1403,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
       PixiResourcesLoader.burstCache();
+      burstResource3DPreviewCache();
 
       // Set the on-disk path before exposing the project via state so that
       // consumers (like the CLI command dispatcher) can call getProjectFile()
@@ -2158,6 +2212,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const onRestartInGameEditor = React.useCallback(
     (reason: string) => {
       setShowRestartInGameEditorAfterErrorButton(false);
+      // Reported again by the in-game editor once restarted.
+      setInGameEditorRendererCreationFailed(false);
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
@@ -4895,6 +4951,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           return;
         }
 
+        if (originalProjectUuid)
+          setCurrentProjectUuid(upToDateProject.getProjectUuid());
         sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
         setCloudProjectSaveChoiceOpen(false);
@@ -6168,25 +6226,30 @@ const MainFrame = (props: Props): React.MixedElement => {
         )}
       <EmbeddedGameFrame
         key={currentProject ? currentProject.ptr : 0}
-        enabled={gameEditorMode === 'embedded-game'}
+        // The in-game editor requires WebGL2 (a message is shown instead).
+        enabled={gameEditorMode === 'embedded-game' && isWebGL2Supported()}
+        onEnable={onEnableInGameEditor}
         previewDebuggerServer={previewDebuggerServer || null}
         onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
       >
-        <InGameEditorExtensionErrorsIndicator
-          errors={inGameEditorExtensionErrors}
-          isFromStore={error =>
-            isInGameEditorExtensionErrorFromStore(currentProject, error)
-          }
-          onAskAiToFix={() =>
-            openAskAi({
-              prefilledUserRequest: getAskAiToFixInGameEditorExtensionErrorsText(
-                inGameEditorExtensionErrors
-              ),
-              prefillInCurrentChat: true,
-            })
-          }
-          onDismiss={clearInGameEditorExtensionErrors}
-        />
+        <LineStackLayout noMargin>
+          <SlowGraphicsRenderingIndicator />
+          <InGameEditorExtensionErrorsIndicator
+            errors={inGameEditorExtensionErrors}
+            isFromStore={error =>
+              isInGameEditorExtensionErrorFromStore(currentProject, error)
+            }
+            onAskAiToFix={() =>
+              openAskAi({
+                prefilledUserRequest: getAskAiToFixInGameEditorExtensionErrorsText(
+                  inGameEditorExtensionErrors
+                ),
+                prefillInCurrentChat: true,
+              })
+            }
+            onDismiss={clearInGameEditorExtensionErrors}
+          />
+        </LineStackLayout>
       </EmbeddedGameFrame>
       <GameplayTestFrame
         previewDebuggerServer={previewDebuggerServer || null}

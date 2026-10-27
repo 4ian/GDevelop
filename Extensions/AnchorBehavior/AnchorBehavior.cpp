@@ -57,7 +57,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("relativeToOriginalWindowSize")]
+  properties["relativeToOriginalWindowSize"]
       .SetValue(behaviorContent.GetBoolAttribute("relativeToOriginalWindowSize")
                     ? "true"
                     : "false")

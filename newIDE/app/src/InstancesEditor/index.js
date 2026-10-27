@@ -60,6 +60,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
+import { isWebGL2Supported } from '../Utils/WebGL';
 import { Trans } from '@lingui/macro';
 import { generateUUID } from 'three/src/math/MathUtils';
 import {
@@ -198,6 +199,7 @@ export default class InstancesEditor extends Component<Props, State> {
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
+  _instanceUnderPointerDown: gdInitialInstance | null = null;
   _isPointerOverCanvas = false;
   _showObjectInstancesIn3D: boolean = false;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
@@ -257,17 +259,36 @@ export default class InstancesEditor extends Component<Props, State> {
     });
 
     let gameCanvas: HTMLCanvasElement;
-    this._showObjectInstancesIn3D = this.props.showObjectInstancesIn3D;
     // Ensure we don't initialize with 0 dimensions, which is invalid for PixiJS/WebGL
     // and can cause shader creation to fail on some platforms (e.g. Windows with ANGLE).
     const initialWidth = this.props.width || 1;
     const initialHeight = this.props.height || 1;
+    // Three.js requires WebGL2. The preference can still be enabled on devices
+    // without it (it was persisted before this requirement), so fall back to 2D.
+    let threeCanvas: HTMLCanvasElement | null = null;
+    // $FlowFixMe[value-as-type]
+    let threeRenderer: THREE.WebGLRenderer | null = null;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
-    if (this._showObjectInstancesIn3D) {
-      gameCanvas = document.createElement('canvas');
-      const threeRenderer = new THREE.WebGLRenderer({
-        canvas: gameCanvas,
-      });
+    if (this.props.showObjectInstancesIn3D && isWebGL2Supported()) {
+      try {
+        threeCanvas = document.createElement('canvas');
+        threeRenderer = new THREE.WebGLRenderer({
+          canvas: threeCanvas,
+          // Ask for the discrete graphics card, if any.
+          powerPreference: 'high-performance',
+        });
+      } catch (error) {
+        console.error(
+          'Unable to create the Three.js renderer, falling back to 2D rendering:',
+          error
+        );
+        threeCanvas = null;
+        threeRenderer = null;
+      }
+    }
+    this._showObjectInstancesIn3D = !!threeRenderer;
+    if (threeCanvas && threeRenderer) {
+      gameCanvas = threeCanvas;
       threeRenderer.autoClear = false;
       threeRenderer.setSize(initialWidth, initialHeight);
 
@@ -1410,6 +1431,7 @@ export default class InstancesEditor extends Component<Props, State> {
     this.fpsLimiter.notifyInteractionHappened();
 
     this.hasCursorMovedSinceItIsDown = false;
+    this._instanceUnderPointerDown = instance;
 
     if (this.keyboardShortcuts.shouldMoveView()) {
       // If the user wants to move the view, discard the click on an instance:
@@ -1463,7 +1485,13 @@ export default class InstancesEditor extends Component<Props, State> {
     // but selecting the same instance twice has no side effect on the
     // selection.
     // - For MultiSelect, the selection is not done in _onDownInstance.
-    if (!this.hasCursorMovedSinceItIsDown) {
+    // Releasing the pointer after another interaction (rotating, resizing,
+    // dropping an object...) must not select the instance under the pointer.
+    const isUpOnInstanceUnderPointerDown =
+      !!this._instanceUnderPointerDown &&
+      this._instanceUnderPointerDown.ptr === instance.ptr;
+    this._instanceUnderPointerDown = null;
+    if (isUpOnInstanceUnderPointerDown && !this.hasCursorMovedSinceItIsDown) {
       this.props.instancesSelection.selectInstance({
         instance,
         multiSelect: this.keyboardShortcuts.shouldMultiSelect(),

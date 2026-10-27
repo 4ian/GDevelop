@@ -34,6 +34,8 @@ const InGameEditorExtensionErrorsIndicator = ({
 }: Props): React.Node => {
   const [anchorElement, setAnchorElement] = React.useState<?HTMLElement>(null);
   if (errors.length === 0) return null;
+  // The AI can't change store extensions: their errors are sent as crash reports.
+  const hasErrorsFixableByAi = errors.some(error => !isFromStore(error));
 
   return (
     <>
@@ -110,14 +112,16 @@ const InGameEditorExtensionErrorsIndicator = ({
                     onDismiss();
                   }}
                 />
-                <RaisedButton
-                  color="ai"
-                  label={<Trans>Ask the AI to fix</Trans>}
-                  onClick={() => {
-                    setAnchorElement(null);
-                    onAskAiToFix();
-                  }}
-                />
+                {hasErrorsFixableByAi && (
+                  <RaisedButton
+                    color="ai"
+                    label={<Trans>Ask the AI to fix</Trans>}
+                    onClick={() => {
+                      setAnchorElement(null);
+                      onAskAiToFix();
+                    }}
+                  />
+                )}
               </LineStackLayout>
             </ColumnStackLayout>
           </div>

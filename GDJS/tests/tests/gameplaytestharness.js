@@ -310,6 +310,55 @@ describe('gdjs.gameplayTests', () => {
       expect(result.screenshots).to.eql([]);
       expect(result.screenshotsTakenCount).to.be(0);
     });
+
+    it('takes screenshots at the full resolution of the game when asked', async () => {
+      const result = await runTestScript(
+        makeRuntimeGameWithCanvas(),
+        `
+        await harness.goToScene('Scene 1');
+        harness.setGameResolutionSize(1600, 900);
+        await harness.takeScreenshot('Downscaled');
+        await harness.takeScreenshot('Full', { fullResolution: true });
+        `
+      );
+
+      /** @param {string} jpegBase64 */
+      const getImageSize = (jpegBase64) =>
+        new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve([image.width, image.height]);
+          image.onerror = reject;
+          image.src = 'data:image/jpeg;base64,' + jpegBase64;
+        });
+      expect(result.status).to.be('passed');
+      expect(await getImageSize(result.screenshots[0].jpegBase64)).to.eql([
+        768, 432,
+      ]);
+      expect(await getImageSize(result.screenshots[1].jpegBase64)).to.eql([
+        1600, 900,
+      ]);
+    });
+
+    it('renders the game right before taking a screenshot', async () => {
+      const result = await runTestScript(
+        makeRuntimeGameWithCanvas(),
+        `
+        await harness.goToScene('Scene 1');
+        const scene = harness.getCurrentRuntimeScene();
+        const render = scene.render.bind(scene);
+        let renderCount = 0;
+        scene.render = () => {
+          renderCount++;
+          render();
+        };
+        await harness.takeScreenshot('Now');
+        harness.assert(renderCount === 1, 'Rendered ' + renderCount + ' times.');
+        `
+      );
+
+      expect(result.errors).to.eql([]);
+      expect(result.status).to.be('passed');
+    });
   });
 
   it('reports a script error', async () => {
@@ -586,6 +635,68 @@ describe('gdjs.gameplayTests', () => {
     expect(result.status).to.be('error');
     expect(result.errors[0]).to.contain('did not finish starting');
   }).timeout(10000);
+
+  it('excludes the creation of the scene and its first frame from the timeout budget', async () => {
+    const runtimeGame = makeRuntimeGame();
+    // A scene longer to create than the whole test budget (like a big 3D
+    // scene rendered in software).
+    const sceneStack = runtimeGame.getSceneStack();
+    const replace = sceneStack.replace.bind(sceneStack);
+    // @ts-ignore
+    sceneStack.replace = (options) => {
+      const endTimeMs = Date.now() + 300;
+      while (Date.now() < endTimeMs) {}
+      return replace(options);
+    };
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      await harness.stepFrames(2);
+      harness.assert(harness.getSceneName() === 'Scene 1', 'Scene is running');
+      `,
+      { timeoutMs: 200 }
+    );
+
+    expect(result.status).to.be('passed');
+    expect(result.loadingMs >= 280).to.be(true);
+  }).timeout(10000);
+
+  it('lets a test change its timeout budget', async () => {
+    const result = await runTestScript(
+      makeRuntimeGame(),
+      `
+      harness.setTimeoutMs(5000);
+      await harness.goToScene('Scene 1');
+      // Longer than the budget given by the payload.
+      await harness.stepFrames(1, {
+        onFrame: () => {
+          const endTimeMs = Date.now() + 300;
+          while (Date.now() < endTimeMs) {}
+        },
+      });
+      await harness.stepFrames(1);
+      harness.assert(true, 'Done');
+      `,
+      { timeoutMs: 200 }
+    );
+
+    expect(result.status).to.be('passed');
+    expect(result.timeoutMs).to.be(5000);
+  }).timeout(10000);
+
+  it('refuses a timeout budget that is not a positive number', async () => {
+    const result = await runTestScript(
+      makeRuntimeGame(),
+      `
+      harness.setTimeoutMs(-1);
+      await harness.goToScene('Scene 1');
+      `
+    );
+
+    expect(result.status).to.be('error');
+    expect(result.errors.join('\n')).to.contain('setTimeoutMs');
+  });
 
   it('excludes slow scene-asset loading from the timeout budget', async () => {
     const runtimeGame = makeRuntimeGame();
@@ -978,6 +1089,62 @@ describe('gdjs.gameplayTests', () => {
     expect(result.status).to.be('passed');
   });
 
+  it('benchmarks frames and reports the measures in the result', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.spawn('MyObject', 10, 20);
+      const benchmark = await harness.benchmark('Test benchmark', {
+        warmupFrames: 2,
+        frames: 5,
+      });
+      harness.assert(benchmark.frameTimesMs.length === 5, '5 frames are measured');
+      harness.assert(
+        benchmark.medianFrameTimeMs >= 0,
+        'The median frame time is returned'
+      );
+      harness.assert(benchmark.objectsCount === 1, 'The objects are counted');
+      harness.assert(
+        benchmark.drawCallsPerFrame === null,
+        'No draw calls are counted without renderer'
+      );
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    expect(result.framesExecuted).to.be(1 + 2 + 5);
+    expect(result.benchmarks.length).to.be(1);
+    expect(result.benchmarks[0].name).to.be('Test benchmark');
+    expect(result.benchmarks[0].stateChecksum).to.be.a('string');
+  });
+
+  it('seeds Math.random until the end of the test', async () => {
+    const originalMathRandom = Math.random;
+    const runTestScriptPickingRandomNumbers = () =>
+      runTestScript(
+        makeRuntimeGame(),
+        `
+        harness.setRandomSeed(42);
+        await harness.goToScene('Scene 1');
+        console.log('Random numbers: ' + [Math.random(), Math.random()]);
+        `
+      );
+    /** @param {gdjs.gameplayTests.GameplayTestResult} result */
+    const getRandomNumbersLog = (result) =>
+      result.consoleLogs.find((log) =>
+        log.message.startsWith('Random numbers: ')
+      );
+    const result1 = await runTestScriptPickingRandomNumbers();
+    const result2 = await runTestScriptPickingRandomNumbers();
+
+    expect(result1.status).to.be('passed');
+    expect(getRandomNumbersLog(result1)).to.be.ok();
+    expect(getRandomNumbersLog(result1)).to.eql(getRandomNumbersLog(result2));
+    expect(Math.random).to.be(originalMathRandom);
+  });
+
   it('reports an aim result object with the mouse responsiveness', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(
@@ -1338,6 +1505,38 @@ describe('gdjs.gameplayTests', () => {
       // so this maps back to game resolution coordinates).
       harness.setMousePosition(100, 50, '');
       expect(typeof inputManager.getMouseX()).to.be('number');
+    });
+
+    it('simulates the mouse position on a layer with a camera rotated in 3D', async () => {
+      const runtimeGame = makeRuntimeGame();
+      const harness = makeStartedHarness(runtimeGame);
+      await harness.goToScene('Scene 1');
+      const runtimeScene = harness.getCurrentRuntimeScene();
+      runtimeScene.addLayer({
+        name: '3D layer',
+        renderingType: '3d',
+        visibility: true,
+        cameras: [],
+        effects: [],
+        ambientLightColorR: 0,
+        ambientLightColorG: 0,
+        ambientLightColorB: 0,
+        isLightingLayer: false,
+        followBaseLayerCamera: false,
+      });
+      const layer = runtimeScene.getLayer('3D layer');
+      layer.setCameraX(100);
+      layer.setCameraY(200);
+      layer.setCameraRotationX(30);
+
+      harness.setMousePosition(150, 50, '3D layer');
+
+      expect(
+        gdjs.evtTools.input.getCursorX(runtimeScene, '3D layer', 0)
+      ).to.be.within(149.99, 150.01);
+      expect(
+        gdjs.evtTools.input.getCursorY(runtimeScene, '3D layer', 0)
+      ).to.be.within(49.99, 50.01);
     });
   });
 
@@ -2052,6 +2251,20 @@ describe('gdjs.gameplayTests', () => {
       harness.getNearby('MyObject', 'CombinedTank', 900);
 
       expect(harness._runWarnings.length).to.be(0);
+    });
+
+    it('warns that stepUntilObjectIsStable only waits for the first instance', async () => {
+      const harness = await makeHarnessWithSpawnedTank();
+      await harness.stepUntilObjectIsStable('CombinedTank', { maxFrames: 2 });
+      expect(harness._runWarnings.length).to.be(0);
+
+      harness.spawn('CombinedTank', 300, 200, undefined, 'UI');
+      await harness.stepUntilObjectIsStable('CombinedTank', { maxFrames: 2 });
+
+      expect(harness._runWarnings.length).to.be(1);
+      expect(harness._runWarnings[0]).to.contain(
+        'only waits for the first of the 2 instances of "CombinedTank"'
+      );
     });
 
     it('moves a point with the Z and Z scale of a parent without a THREE object', () => {

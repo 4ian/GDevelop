@@ -180,6 +180,237 @@ namespace gdjs {
         easeTo: (pos: number) => Math.pow(pos, 0.25),
       };
 
+      /*!
+       * BezierEasing - use bezier curve for transition easing function
+       * by Gaëtan Renaudeau 2014 - 2015 – MIT License
+       * https://github.com/gre/bezier-easing
+       *
+       * Permission is hereby granted, free of charge, to any person obtaining a copy
+       * of this software and associated documentation files (the "Software"), to deal
+       * in the Software without restriction, including without limitation the rights
+       * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+       * copies of the Software, and to permit persons to whom the Software is
+       * furnished to do so, subject to the following conditions:
+       *
+       * The above copyright notice and this permission notice shall be included in all
+       * copies or substantial portions of the Software.
+       *
+       * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+       * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+       * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+       * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+       * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+       * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+       * SOFTWARE.
+       */
+      const NEWTON_ITERATIONS = 4;
+      const NEWTON_MIN_SLOPE = 0.001;
+      const SUBDIVISION_PRECISION = 0.0000001;
+      const SUBDIVISION_MAX_ITERATIONS = 10;
+      const SPLINE_TABLE_SIZE = 11;
+      const SAMPLE_STEP_SIZE = 1.0 / (SPLINE_TABLE_SIZE - 1.0);
+      const CUSTOM_EASING_CACHE_MAX_ENTRIES = 256;
+
+      const CUBIC_BEZIER_NUMBER =
+        '[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?';
+      const CUBIC_BEZIER_PATTERN = new RegExp(
+        '^\\s*cubic-bezier\\s*\\(\\s*(' +
+          CUBIC_BEZIER_NUMBER +
+          ')\\s*,\\s*(' +
+          CUBIC_BEZIER_NUMBER +
+          ')\\s*,\\s*(' +
+          CUBIC_BEZIER_NUMBER +
+          ')\\s*,\\s*(' +
+          CUBIC_BEZIER_NUMBER +
+          ')\\s*\\)\\s*$',
+        'i'
+      );
+
+      export type CubicBezierPoints = [float, float, float, float];
+
+      const customEasingCache = new Map<string, EasingFunction | null>();
+      const logger = new gdjs.Logger('Tween');
+
+      // A Map iterates in insertion order: the first key is the least recently used.
+      const deleteLeastRecentlyUsedCustomEasing = (): void => {
+        const leastRecentlyUsedIdentifier = customEasingCache
+          .keys()
+          .next().value;
+        if (leastRecentlyUsedIdentifier !== undefined) {
+          customEasingCache.delete(leastRecentlyUsedIdentifier);
+        }
+      };
+
+      const bezierCoefficientA = (a1: float, a2: float): float =>
+        1.0 - 3.0 * a2 + 3.0 * a1;
+      const bezierCoefficientB = (a1: float, a2: float): float =>
+        3.0 * a2 - 6.0 * a1;
+      const bezierCoefficientC = (a1: float): float => 3.0 * a1;
+
+      const calcBezier = (t: float, a1: float, a2: float): float =>
+        ((bezierCoefficientA(a1, a2) * t + bezierCoefficientB(a1, a2)) * t +
+          bezierCoefficientC(a1)) *
+        t;
+
+      const getSlope = (t: float, a1: float, a2: float): float =>
+        3.0 * bezierCoefficientA(a1, a2) * t * t +
+        2.0 * bezierCoefficientB(a1, a2) * t +
+        bezierCoefficientC(a1);
+
+      const binarySubdivide = (
+        x: float,
+        a: float,
+        b: float,
+        x1: float,
+        x2: float
+      ): float => {
+        let currentX = 0;
+        let currentT = 0;
+        let i = 0;
+        do {
+          currentT = a + (b - a) / 2.0;
+          currentX = calcBezier(currentT, x1, x2) - x;
+          if (currentX > 0.0) {
+            b = currentT;
+          } else {
+            a = currentT;
+          }
+        } while (
+          Math.abs(currentX) > SUBDIVISION_PRECISION &&
+          ++i < SUBDIVISION_MAX_ITERATIONS
+        );
+        return currentT;
+      };
+
+      const newtonRaphsonIterate = (
+        x: float,
+        guessT: float,
+        x1: float,
+        x2: float
+      ): float => {
+        for (let i = 0; i < NEWTON_ITERATIONS; ++i) {
+          const currentSlope = getSlope(guessT, x1, x2);
+          if (currentSlope === 0.0) {
+            return guessT;
+          }
+          const currentX = calcBezier(guessT, x1, x2) - x;
+          guessT -= currentX / currentSlope;
+        }
+        return guessT;
+      };
+
+      /** Parse a `cubic-bezier(x1,y1,x2,y2)` string. Return `null` if the string is not valid. */
+      export const parseCubicBezierOrNull = (
+        identifier: string
+      ): CubicBezierPoints | null => {
+        const match = CUBIC_BEZIER_PATTERN.exec(identifier);
+        if (!match) return null;
+
+        const x1 = Number(match[1]);
+        const y1 = Number(match[2]);
+        const x2 = Number(match[3]);
+        const y2 = Number(match[4]);
+        if (
+          !Number.isFinite(x1) ||
+          !Number.isFinite(y1) ||
+          !Number.isFinite(x2) ||
+          !Number.isFinite(y2) ||
+          x1 < 0 ||
+          x1 > 1 ||
+          x2 < 0 ||
+          x2 > 1
+        ) {
+          return null;
+        }
+        return [x1, y1, x2, y2];
+      };
+
+      export const createCubicBezierEasing = (
+        points: CubicBezierPoints
+      ): EasingFunction => {
+        const [x1, y1, x2, y2] = points;
+        if (x1 === y1 && x2 === y2) {
+          return easingFunctions.linear;
+        }
+
+        const sampleValues: Float32Array | Array<float> =
+          typeof Float32Array === 'function'
+            ? new Float32Array(SPLINE_TABLE_SIZE)
+            : new Array<float>(SPLINE_TABLE_SIZE);
+        for (let i = 0; i < SPLINE_TABLE_SIZE; ++i) {
+          sampleValues[i] = calcBezier(i * SAMPLE_STEP_SIZE, x1, x2);
+        }
+
+        const getTForX = (x: float): float => {
+          let intervalStart = 0.0;
+          let currentSample = 1;
+          const lastSample = SPLINE_TABLE_SIZE - 1;
+
+          for (
+            ;
+            currentSample !== lastSample && sampleValues[currentSample] <= x;
+            ++currentSample
+          ) {
+            intervalStart += SAMPLE_STEP_SIZE;
+          }
+          --currentSample;
+
+          const dist =
+            (x - sampleValues[currentSample]) /
+            (sampleValues[currentSample + 1] - sampleValues[currentSample]);
+          const guessForT = intervalStart + dist * SAMPLE_STEP_SIZE;
+          const initialSlope = getSlope(guessForT, x1, x2);
+          if (initialSlope >= NEWTON_MIN_SLOPE) {
+            return newtonRaphsonIterate(x, guessForT, x1, x2);
+          }
+          if (initialSlope === 0.0) {
+            return guessForT;
+          }
+          return binarySubdivide(
+            x,
+            intervalStart,
+            intervalStart + SAMPLE_STEP_SIZE,
+            x1,
+            x2
+          );
+        };
+
+        return (progress: float): float => {
+          if (progress === 0 || progress === 1) {
+            return progress;
+          }
+          return calcBezier(getTForX(progress), y1, y2);
+        };
+      };
+
+      /** Return a named easing or a custom easing. Return `null` if the identifier is not valid. */
+      export const getEasingFunction = (
+        easingIdentifier: string
+      ): EasingFunction | null => {
+        if (easingFunctions.hasOwnProperty(easingIdentifier)) {
+          return easingFunctions[easingIdentifier];
+        }
+
+        const cachedEasing = customEasingCache.get(easingIdentifier);
+        if (cachedEasing !== undefined) {
+          customEasingCache.delete(easingIdentifier);
+          customEasingCache.set(easingIdentifier, cachedEasing);
+          return cachedEasing;
+        }
+
+        if (customEasingCache.size >= CUSTOM_EASING_CACHE_MAX_ENTRIES) {
+          deleteLeastRecentlyUsedCustomEasing();
+        }
+
+        const points = parseCubicBezierOrNull(easingIdentifier);
+        const easing = points ? createCubicBezierEasing(points) : null;
+        if (!easing) {
+          logger.warn(`Unknown easing identifier: ${easingIdentifier}.`);
+        }
+        customEasingCache.set(easingIdentifier, easing);
+        return easing;
+      };
+
       type GetTimeSourceFunction = (
         tweenInformationNetworkSyncData: TweenInformationNetworkSyncData
       ) => TimeSource;
@@ -250,7 +481,7 @@ namespace gdjs {
           tweenInformation: TweenInformation,
           onFinish?: (() => void) | null
         ): void {
-          const easing = easingFunctions[easingIdentifier];
+          const easing = getEasingFunction(easingIdentifier);
           if (!easing) return;
 
           // Remove any prior tween
@@ -288,7 +519,7 @@ namespace gdjs {
           tweenInformation: TweenInformation,
           onFinish?: (() => void) | null
         ): void {
-          const easing = easingFunctions[easingIdentifier];
+          const easing = getEasingFunction(easingIdentifier);
           if (!easing) return;
 
           // Remove any prior tween
@@ -921,10 +1152,10 @@ namespace gdjs {
         // This local declaration is needed because otherwise the transpiled
         // code doesn't know it.
         const easingFunctions = gdjs.evtTools.tween.easingFunctions;
+        const getEasingFunction = gdjs.evtTools.tween.getEasingFunction;
 
-        const easingFunction = easingFunctions.hasOwnProperty(easingValue)
-          ? easingFunctions[easingValue]
-          : easingFunctions.linear;
+        const easingFunction =
+          getEasingFunction(easingValue) || easingFunctions.linear;
         return fromValue + (toValue - fromValue) * easingFunction(weighting);
       };
 

@@ -129,6 +129,28 @@ describe('libGD.js', function () {
       expect(tests.getTestsCount()).toBe(0);
     });
 
+    it('handles named easings', function () {
+      const namedEasings = project.getNamedEasings();
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(false);
+
+      const namedEasing = namedEasings.insertNewNamedEasing('PopupOpen', 0);
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(true);
+      expect(namedEasings.getNamedEasingsCount()).toBe(1);
+      expect(namedEasing.getName()).toBe('PopupOpen');
+      namedEasing.setX1(0.34);
+      namedEasing.setY1(1.56);
+      namedEasing.setX2(0.64);
+      namedEasing.setY2(1);
+      expect(namedEasings.getNamedEasing('PopupOpen').getX1()).toBe(0.34);
+      expect(namedEasings.getNamedEasingAt(0).getY1()).toBe(1.56);
+      expect(namedEasings.getNamedEasing('PopupOpen').getX2()).toBe(0.64);
+      expect(namedEasings.getNamedEasingAt(0).getY2()).toBe(1);
+
+      namedEasings.removeNamedEasing('PopupOpen');
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(false);
+      expect(namedEasings.getNamedEasingsCount()).toBe(0);
+    });
+
     it('handles external layouts', function () {
       expect(project.hasExternalLayoutNamed('My layout')).toBe(false);
 
@@ -2800,6 +2822,73 @@ describe('libGD.js', function () {
       expect(validateVolumeParameter('1 +')).toBe(false);
       expect(validateVolumeParameter('"Not a number"')).toBe(false);
     });
+
+    it('checks that the object has the behavior of an untyped behavior parameter', function () {
+      // `ActivateBehavior` accepts any behavior: its "behavior" parameter has
+      // no behavior type, but the object must still have the behavior.
+      const objectWithBehavior = layout
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'ObjectWithBehavior', 0);
+      objectWithBehavior.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+      layout
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'ObjectWithoutBehavior', 1);
+
+      const validateParameter = (objectName, behaviorName, parameterIndex) => {
+        const action = new gd.Instruction();
+        action.setType('ActivateBehavior');
+        action.setParametersCount(3);
+        action.setParameter(0, objectName);
+        action.setParameter(1, behaviorName);
+        action.setParameter(2, 'yes');
+        const result = gd.InstructionValidator.validateParameter(
+          gd.JsPlatform.get(),
+          projectScopedContainers,
+          action,
+          gd.MetadataProvider.getActionMetadata(
+            gd.JsPlatform.get(),
+            'ActivateBehavior'
+          ),
+          parameterIndex
+        );
+        const isValid = result.isValid();
+        action.delete();
+        return isValid;
+      };
+      const behaviorParameterIndex = 1;
+      const objectParameterIndex = 0;
+
+      expect(
+        validateParameter(
+          'ObjectWithBehavior',
+          'PlatformerObject',
+          behaviorParameterIndex
+        )
+      ).toBe(true);
+      expect(
+        validateParameter(
+          'ObjectWithoutBehavior',
+          'PlatformerObject',
+          behaviorParameterIndex
+        )
+      ).toBe(false);
+      expect(
+        validateParameter('ObjectWithBehavior', '', behaviorParameterIndex)
+      ).toBe(false);
+
+      // The error is on the behavior parameter: the object stays valid.
+      expect(
+        validateParameter(
+          'ObjectWithoutBehavior',
+          'PlatformerObject',
+          objectParameterIndex
+        )
+      ).toBe(true);
+    });
   });
 
   describe('EventsRefactorer', function () {
@@ -4981,6 +5070,30 @@ describe('libGD.js', function () {
       ]);
 
       project.delete();
+    });
+    it('handles named easings', function () {
+      const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
+      const namedEasings = eventsFunctionsExtension.getNamedEasings();
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(false);
+
+      const namedEasing = namedEasings.insertNewNamedEasing('PopupOpen', 0);
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(true);
+      expect(namedEasings.getNamedEasingsCount()).toBe(1);
+      expect(namedEasing.getName()).toBe('PopupOpen');
+      namedEasing.setX1(0.34);
+      namedEasing.setY1(1.56);
+      namedEasing.setX2(0.64);
+      namedEasing.setY2(1);
+      expect(namedEasings.getNamedEasing('PopupOpen').getX1()).toBe(0.34);
+      expect(namedEasings.getNamedEasingAt(0).getY1()).toBe(1.56);
+      expect(namedEasings.getNamedEasing('PopupOpen').getX2()).toBe(0.64);
+      expect(namedEasings.getNamedEasingAt(0).getY2()).toBe(1);
+
+      namedEasings.removeNamedEasing('PopupOpen');
+      expect(namedEasings.hasNamedEasingNamed('PopupOpen')).toBe(false);
+      expect(namedEasings.getNamedEasingsCount()).toBe(0);
+
+      eventsFunctionsExtension.delete();
     });
   });
   describe('gd.EventsBasedBehavior', () => {

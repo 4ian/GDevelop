@@ -1,30 +1,18 @@
 namespace gdjs {
   const loadRecast = async () => {
     try {
-      // Give the module instantiated from `recast-navigation.wasm.wasm` to
-      // RecastNav. Without an implementation, `RecastNav.init` instantiates
-      // the "compat" build embedded (in base64) in
-      // `recast-navigation-generators.js`, so each game would create 2
-      // WebAssembly instances (each with its own memory) instead of 1.
-      // Previews of the in-game editor and gameplay tests run in the editor
-      // process: this halves the WebAssembly memory reserved by each preview.
-      // `RecastNav.init` does nothing (and doesn't instantiate anything) if
-      // Recast is already initialized, for instance if this script is
-      // reloaded by the hot-reloader.
+      const module = await import('./recast-navigation.wasm.js');
+      const initializeRecast = module.default;
+      if (!initializeRecast) {
+        throw new Error('No default export found in Recast.');
+      }
+
+      // Without it, RecastNav would instantiate a second WebAssembly module:
+      // the "compat" build embedded in `A_recast-navigation-generators.js`.
       // The vendored `init` expects a function returning the module, but the
       // typings of `@recast-navigation/core` declare the module itself.
-      const instantiateRecastModule = async () => {
-        const module = await import('./recast-navigation.wasm.js');
-        const initializeRecast = module.default;
-        if (!initializeRecast) {
-          throw new Error('No default export found in Recast.');
-        }
-        return initializeRecast();
-      };
       await RecastNav.init(
-        instantiateRecastModule as unknown as Parameters<
-          typeof RecastNav.init
-        >[0]
+        initializeRecast as unknown as Parameters<typeof RecastNav.init>[0]
       );
     } catch (err) {
       console.error('Unable to load Recast navigation mesh library.', err);
@@ -383,24 +371,26 @@ namespace gdjs {
       const velocity = agent.desiredVelocity();
       const velocityX = velocity.x;
       const velocityY = velocity.z;
-      if (
-        Math.abs(velocityX) + Math.abs(velocityY) > 0 &&
+      if (Math.abs(velocityX) + Math.abs(velocityY) > 0) {
         // Avoid to rotate strangely at the end of the path
-        (Math.abs(destinationX - newX) > 3 || Math.abs(destinationY - newY) > 3)
-      ) {
-        this._movementAngle = gdjs.evtTools.common.mod(
-          gdjs.toDegrees(Math.atan2(velocityY, velocityX)),
-          360
-        );
-      }
-      if (
-        this._rotateObject &&
-        this.owner.getAngle() !== this._movementAngle + this._angleOffset
-      ) {
-        this.owner.rotateTowardAngle(
-          this._movementAngle + this._angleOffset,
-          this._angularMaxSpeed
-        );
+        if (
+          Math.abs(destinationX - newX) > 3 ||
+          Math.abs(destinationY - newY) > 3
+        ) {
+          this._movementAngle = gdjs.evtTools.common.mod(
+            gdjs.toDegrees(Math.atan2(velocityY, velocityX)),
+            360
+          );
+        }
+        if (
+          this._rotateObject &&
+          this.owner.getAngle() !== this._movementAngle + this._angleOffset
+        ) {
+          this.owner.rotateTowardAngle(
+            this._movementAngle + this._angleOffset,
+            this._angularMaxSpeed
+          );
+        }
       }
       if (
         Math.abs(newX - destinationX) < 1 &&

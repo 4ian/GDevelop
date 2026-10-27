@@ -63,6 +63,8 @@ export type EffectAsset = {|
   requiredExtensions?: Array<ExtensionDependency>,
 |};
 
+export type EffectTarget = 'object' | 'layer';
+
 export type AssetShortHeader = {|
   id: string,
   name: string,
@@ -77,6 +79,8 @@ export type AssetShortHeader = {|
   height: number,
   dominantColors: number[],
   assetPackId?: string,
+  // What an effect asset is made for. Unset when it is for anything its effect works on.
+  effectTargets?: Array<EffectTarget>,
 |};
 
 export type AssetHeader = {|
@@ -715,6 +719,13 @@ export const getEffectAssetMetadata = (
 export const isEffectAsset = (
   assetOrAssetShortHeader: AssetShortHeader | Asset
 ): boolean => !!getEffectAssetMetadata(assetOrAssetShortHeader);
+
+export const isEffectAssetMadeFor = (
+  assetShortHeader: AssetShortHeader,
+  target: EffectTarget
+): boolean =>
+  !assetShortHeader.effectTargets ||
+  assetShortHeader.effectTargets.includes(target);
 
 export const doesEffectWorkOnLayer = (
   effectMetadata: gdEffectMetadata,

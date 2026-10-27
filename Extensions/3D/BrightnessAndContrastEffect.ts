@@ -3,6 +3,33 @@ namespace gdjs {
     b: number;
     c: number;
   }
+  // `THREE_ADDONS.BrightnessContrastShader`, applied on the color of each pixel
+  // rather than on its color premultiplied by its opacity. Otherwise, the
+  // transparent parts of the layer would be changed too, and would be drawn
+  // on top of the layers rendered before this one.
+  const brightnessAndContrastFragmentShader = /* glsl */ `
+    uniform sampler2D tDiffuse;
+    uniform float brightness;
+    uniform float contrast;
+
+    varying vec2 vUv;
+
+    void main() {
+      gl_FragColor = texture2D(tDiffuse, vUv);
+      float opacity = clamp(gl_FragColor.a, 0.0, 1.0);
+      if (opacity <= 0.0) {
+        return;
+      }
+
+      vec3 color = gl_FragColor.rgb / opacity + brightness;
+      if (contrast > 0.0) {
+        color = (color - 0.5) / (1.0 - contrast) + 0.5;
+      } else {
+        color = (color - 0.5) * (1.0 + contrast) + 0.5;
+      }
+      gl_FragColor.rgb = max(color, 0.0) * opacity;
+    }`;
+
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::BrightnessAndContrast',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -18,11 +45,10 @@ namespace gdjs {
           _isEnabled: boolean;
 
           constructor() {
-            this.shaderPass = new THREE_ADDONS.ShaderPass(
-              gdjs.PixiFiltersTools.clampThreeShaderOutput(
-                THREE_ADDONS.BrightnessContrastShader
-              )
-            );
+            this.shaderPass = new THREE_ADDONS.ShaderPass({
+              ...THREE_ADDONS.BrightnessContrastShader,
+              fragmentShader: brightnessAndContrastFragmentShader,
+            });
             this._isEnabled = false;
           }
 

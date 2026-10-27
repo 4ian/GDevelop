@@ -51,10 +51,23 @@ export const getAnchorOffset = (
   size: $ReadOnlyArray<number>,
   objectSizeInfo: ObjectSizeInfo | null
 ): Array<number> | null => {
-  const zeroOffsets = size.map(() => 0);
-  if (anchor === 'origin') return zeroOffsets;
+  if (anchor === 'origin') return size.map(() => 0);
   const fractions = ANCHOR_FRACTIONS[anchor];
-  if (!fractions || !objectSizeInfo) return null;
+  if (!fractions) return null;
+  return getBoxPointOffset(fractions, size, objectSizeInfo);
+};
+
+/**
+ * What to add to the position of a point of the box of an instance of `size`,
+ * given as a fraction of the box size on each axis, to get the position of
+ * the origin of the instance. See `getAnchorOffset`.
+ */
+export const getBoxPointOffset = (
+  fractions: $ReadOnlyArray<number>,
+  size: $ReadOnlyArray<number>,
+  objectSizeInfo: ObjectSizeInfo | null
+): Array<number> | null => {
+  if (!objectSizeInfo) return null;
 
   const defaultSizes = [
     objectSizeInfo.width,

@@ -113,6 +113,38 @@ const setInstanceSize = ({
   instance.setHasCustomDepth(true);
 };
 
+const resetInstanceSize = ({
+  instance,
+  dimension,
+  getInstanceSize,
+  getInstanceDefaultSize,
+}: {|
+  instance: gdInitialInstance,
+  dimension: 0 | 1 | 2,
+  getInstanceSize: gdInitialInstance => Size,
+  getInstanceDefaultSize: gdInitialInstance => Size,
+|}) => {
+  sizesBeforeCollapse.delete(instance.ptr);
+  const defaultSize = getInstanceDefaultSize(instance);
+  const newSize = getInstanceSize(instance).map((value, index) =>
+    index === dimension ? defaultSize[index] : value
+  );
+  if (
+    instance.shouldKeepRatio() ||
+    newSize.every((value, index) => value === defaultSize[index])
+  ) {
+    instance.setHasCustomSize(false);
+    instance.setHasCustomDepth(false);
+    return;
+  }
+
+  instance.setCustomWidth(newSize[0]);
+  instance.setCustomHeight(newSize[1]);
+  instance.setCustomDepth(newSize[2]);
+  instance.setHasCustomSize(true);
+  instance.setHasCustomDepth(true);
+};
+
 const getEditObjectButton = ({
   i18n,
   onEditObject,
@@ -349,8 +381,16 @@ const getWidthField = ({
     return null;
   },
   onClickEndAdornment: (instance: gdInitialInstance) => {
-    instance.setHasCustomSize(false);
-    instance.setHasCustomDepth(false);
+    resetInstanceSize({
+      instance,
+      dimension: 0,
+      getInstanceSize: instance => [
+        getInstanceWidth(instance),
+        getInstanceHeight(instance),
+        getInstanceDepth(instance),
+      ],
+      getInstanceDefaultSize,
+    });
     forceUpdate();
   },
 });
@@ -395,8 +435,16 @@ const getHeightField = ({
     return null;
   },
   onClickEndAdornment: (instance: gdInitialInstance) => {
-    instance.setHasCustomSize(false);
-    instance.setHasCustomDepth(false);
+    resetInstanceSize({
+      instance,
+      dimension: 1,
+      getInstanceSize: instance => [
+        getInstanceWidth(instance),
+        getInstanceHeight(instance),
+        getInstanceDepth(instance),
+      ],
+      getInstanceDefaultSize,
+    });
     forceUpdate();
   },
 });
@@ -441,8 +489,16 @@ const getDepthField = ({
     return null;
   },
   onClickEndAdornment: (instance: gdInitialInstance) => {
-    instance.setHasCustomSize(false);
-    instance.setHasCustomDepth(false);
+    resetInstanceSize({
+      instance,
+      dimension: 2,
+      getInstanceSize: instance => [
+        getInstanceWidth(instance),
+        getInstanceHeight(instance),
+        getInstanceDepth(instance),
+      ],
+      getInstanceDefaultSize,
+    });
     forceUpdate();
   },
 });

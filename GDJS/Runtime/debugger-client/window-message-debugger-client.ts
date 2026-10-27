@@ -28,6 +28,12 @@ namespace gdjs {
         const data = event.data;
         this.handleCommand(data);
       });
+
+      // Tell the editor the game is alive as soon as the connection to it is set up.
+      // This happens before any resource is loaded (which can take tens of seconds on a
+      // slow device), so that a slow game is not mistaken for a frame that failed to load.
+      // Deferred by a tick because the game is still being constructed at this point.
+      setTimeout(() => this.sendRuntimeGameStatus(), 0);
     }
 
     protected _sendMessage(message: string) {

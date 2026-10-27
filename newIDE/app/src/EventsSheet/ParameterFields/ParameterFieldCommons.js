@@ -26,6 +26,7 @@ type CommonProps = {|
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   isInline?: boolean,
+  shouldHideExpressionListButton?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
   resourceManagementProps?: ResourceManagementProps,
@@ -61,6 +62,7 @@ export type ParameterFieldProps = {|
   openEventsBasedEntityPropertyEditorDialog?:
     | (VariableDialogOpeningProps => void)
     | null,
+  expressionTypeExtraInfo?: string,
 |};
 
 export type FieldFocusFunction = (
@@ -73,6 +75,18 @@ export type FieldFocusFunction = (
 export type ParameterFieldInterface = {|
   focus: FieldFocusFunction,
 |};
+
+/** The parameter long description, followed by the extra helper text, if any. */
+export const getParameterHelperMarkdownText = (
+  parameterMetadata: ?gdParameterMetadata,
+  extraHelperMarkdownText: ?string
+): ?string => {
+  const parts = [
+    parameterMetadata ? parameterMetadata.getLongDescription() : null,
+    extraHelperMarkdownText,
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join('  \n') : null;
+};
 
 export const getParameterValueOrDefault = (
   value: string,

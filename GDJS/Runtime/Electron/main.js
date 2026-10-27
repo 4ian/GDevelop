@@ -18,6 +18,11 @@ if (process.platform === 'win32') {
   );
 }
 
+// On computers having an integrated and a discrete graphics card (most gaming
+// laptops), Chromium uses the integrated one by default: games would run a lot
+// slower than they could. Must be set before the app is ready.
+app.commandLine.appendSwitch('force_high_performance_gpu');
+
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
 

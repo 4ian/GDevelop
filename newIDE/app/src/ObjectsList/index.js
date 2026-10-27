@@ -23,6 +23,7 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { useOnResource3DPreviewRendered } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { Column } from '../UI/Grid';
 import Add from '../UI/CustomSvgIcons/Add';
@@ -601,6 +602,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [forceUpdate]
     );
+    useOnResource3DPreviewRendered(forceUpdateList);
 
     const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
       from: ObjectFolderOrObjectWithContext | null,

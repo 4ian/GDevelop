@@ -7,7 +7,10 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import paperDecorator from '../../PaperDecorator';
 import NewEffectDialog from '../../../EffectsList/NewEffectDialog';
-import { AssetStoreStateProvider } from '../../../AssetStore/AssetStoreContext';
+import {
+  AssetStoreContext,
+  AssetStoreStateProvider,
+} from '../../../AssetStore/AssetStoreContext';
 import { AssetStoreNavigatorStateProvider } from '../../../AssetStore/AssetStoreNavigator';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 import { loadExtension } from '../../../JsExtensionsLoader';
@@ -52,11 +55,38 @@ const loadRealEffectExtensions = () => {
   }
 };
 
-const Wrapper = ({ children }: {| children: () => React.Node |}) => {
+/**
+ * Use the store deployed on staging, to see effects of the store before they
+ * are deployed on the live one.
+ */
+const UseStagingStore = ({ children }: {| children: () => React.Node |}) => {
+  const { environment, setEnvironment } = React.useContext(AssetStoreContext);
+  React.useEffect(
+    () => {
+      if (environment !== 'staging') setEnvironment('staging');
+    },
+    [environment, setEnvironment]
+  );
+  return environment === 'staging' ? children() : null;
+};
+
+const Wrapper = ({
+  children,
+  useStagingStore,
+}: {|
+  children: () => React.Node,
+  useStagingStore?: boolean,
+|}) => {
   loadRealEffectExtensions();
   return (
     <AssetStoreNavigatorStateProvider>
-      <AssetStoreStateProvider>{children()}</AssetStoreStateProvider>
+      <AssetStoreStateProvider>
+        {useStagingStore ? (
+          <UseStagingStore>{children}</UseStagingStore>
+        ) : (
+          children()
+        )}
+      </AssetStoreStateProvider>
     </AssetStoreNavigatorStateProvider>
   );
 };
@@ -69,6 +99,40 @@ export const ForAMixedLayer = (): React.Node => (
         effectsContainer={testProject.layerWithEffects.getEffects()}
         target="layer"
         layerRenderingType="2d+3d"
+        resourceManagementProps={fakeResourceManagementProps}
+        onClose={action('onClose')}
+        onChooseEffectType={action('onChooseEffectType')}
+        onEffectAddedFromStore={action('onEffectAddedFromStore')}
+      />
+    )}
+  </Wrapper>
+);
+
+export const ForA2DLayer = (): React.Node => (
+  <Wrapper>
+    {() => (
+      <NewEffectDialog
+        project={testProject.project}
+        effectsContainer={testProject.layerWithEffects.getEffects()}
+        target="layer"
+        layerRenderingType="2d"
+        resourceManagementProps={fakeResourceManagementProps}
+        onClose={action('onClose')}
+        onChooseEffectType={action('onChooseEffectType')}
+        onEffectAddedFromStore={action('onEffectAddedFromStore')}
+      />
+    )}
+  </Wrapper>
+);
+
+export const ForA2DLayerWithStagingStore = (): React.Node => (
+  <Wrapper useStagingStore>
+    {() => (
+      <NewEffectDialog
+        project={testProject.project}
+        effectsContainer={testProject.layerWithEffects.getEffects()}
+        target="layer"
+        layerRenderingType="2d"
         resourceManagementProps={fakeResourceManagementProps}
         onClose={action('onClose')}
         onChooseEffectType={action('onChooseEffectType')}
@@ -97,6 +161,23 @@ export const ForA3DLayer = (): React.Node => (
 
 export const ForAnObject = (): React.Node => (
   <Wrapper>
+    {() => (
+      <NewEffectDialog
+        project={testProject.project}
+        effectsContainer={testProject.spriteObjectWithEffects.getEffects()}
+        target="object"
+        layerRenderingType="2d"
+        resourceManagementProps={fakeResourceManagementProps}
+        onClose={action('onClose')}
+        onChooseEffectType={action('onChooseEffectType')}
+        onEffectAddedFromStore={action('onEffectAddedFromStore')}
+      />
+    )}
+  </Wrapper>
+);
+
+export const ForAnObjectWithStagingStore = (): React.Node => (
+  <Wrapper useStagingStore>
     {() => (
       <NewEffectDialog
         project={testProject.project}

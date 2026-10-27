@@ -55,6 +55,7 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
   directionalLight.setBooleanParameter('isCastingShadow', true);
   directionalLight.setStringParameter('shadowQuality', 'medium');
   directionalLight.setDoubleParameter('minimumShadowBias', 0);
+  directionalLight.setDoubleParameter('shadowNormalBias', 1);
   directionalLight.setDoubleParameter('distanceFromCamera', 1500);
   directionalLight.setDoubleParameter('frustumSize', 4000);
   directionalLight.setStringParameter(

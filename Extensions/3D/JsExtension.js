@@ -2362,6 +2362,17 @@ module.exports = {
         .setGroup(_('Shadows'))
         .setAdvanced(true);
       properties
+        .getOrCreate('shadowNormalBias')
+        .setValue('0')
+        .setLabel(_('Shadow normal bias'))
+        .setDescription(
+          _(
+            'Use this to avoid "shadow acne" (stripes on lit faces) without detaching shadows from objects. Surfaces are checked against the shadow map slightly above them, along their normal. In texels of the shadow map: 1 is enough in most cases.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
         .getOrCreate('frustumSize')
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))

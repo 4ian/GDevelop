@@ -23,6 +23,7 @@ namespace gdjs {
           private _rotation: float = 0;
           private _shadowMapSize: float = 1024;
           private _minimumShadowBias: float = 0;
+          private _shadowNormalBias: float = 0;
           private _distanceFromCamera: float = 1500;
           private _frustumSize: float = 4000;
           private _isShadowFittedToCamera: boolean = false;
@@ -200,6 +201,11 @@ namespace gdjs {
               lightDistance,
               inverseWorldScale
             );
+            // Contrary to the bias, the normal bias is a distance in the
+            // world: convert it from texels of the shadow map.
+            this._light.shadow.normalBias =
+              (this._shadowNormalBias * frustumSize * inverseWorldScale) /
+              this._shadowMapSize;
             this._updateLightOffset(lightDistance);
             this._snapShadowCenterToShadowMapTexels(frustumSize);
             this._light.target.position.copy(this._shadowCenter);
@@ -373,6 +379,8 @@ namespace gdjs {
               this._shadowDistance = value;
             } else if (parameterName === 'minimumShadowBias') {
               this._minimumShadowBias = value;
+            } else if (parameterName === 'shadowNormalBias') {
+              this._shadowNormalBias = Math.max(0, value);
             } else if (parameterName === 'shadowIntensity') {
               this._light.shadow.intensity = gdjs.evtTools.common.clamp(
                 value,
@@ -398,6 +406,8 @@ namespace gdjs {
               return this._shadowDistance;
             } else if (parameterName === 'minimumShadowBias') {
               return this._minimumShadowBias;
+            } else if (parameterName === 'shadowNormalBias') {
+              return this._shadowNormalBias;
             } else if (parameterName === 'shadowIntensity') {
               return this._light.shadow.intensity;
             } else if (parameterName === 'shadowSoftness') {

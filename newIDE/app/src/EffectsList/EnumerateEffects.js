@@ -84,10 +84,14 @@ export const enumerateEffectNames = (
  * them.
  */
 const parameterValuesForNewEffects: {
-  [effectType: string]: {| stringParameters: { [string]: string } |},
+  [effectType: string]: {|
+    stringParameters?: { [string]: string },
+    doubleParameters?: { [string]: number },
+  |},
 } = {
   'Scene3D::DirectionalLight': {
     stringParameters: { shadowRenderingMode: 'fittedToCameraView' },
+    doubleParameters: { shadowNormalBias: 1 },
   },
 };
 
@@ -117,11 +121,22 @@ export const setEffectDefaultParameters = (
 
   const parameterValues = parameterValuesForNewEffects[effect.getEffectType()];
   if (parameterValues) {
-    Object.keys(parameterValues.stringParameters).forEach(parameterName => {
-      effect.setStringParameter(
-        parameterName,
-        parameterValues.stringParameters[parameterName]
-      );
-    });
+    const { stringParameters, doubleParameters } = parameterValues;
+    if (stringParameters) {
+      Object.keys(stringParameters).forEach(parameterName => {
+        effect.setStringParameter(
+          parameterName,
+          stringParameters[parameterName]
+        );
+      });
+    }
+    if (doubleParameters) {
+      Object.keys(doubleParameters).forEach(parameterName => {
+        effect.setDoubleParameter(
+          parameterName,
+          doubleParameters[parameterName]
+        );
+      });
+    }
   }
 };

@@ -20,6 +20,7 @@ import ScrollView from '../UI/ScrollView';
 import Text from '../UI/Text';
 import Chip from '../UI/Chip';
 import EmptyMessage from '../UI/EmptyMessage';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import LoaderModal from '../UI/LoaderModal';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
@@ -444,6 +445,42 @@ function NewEffectDialog({
             onlyShowAssets
             fixedObjectTypes={storeEffectTypes}
             fixedEffectTarget={target}
+            noResultsPlaceholder={
+              <Column noMargin expand justifyContent="center">
+                <EmptyPlaceholder
+                  title={<Trans>No effect found</Trans>}
+                  description={
+                    target === 'object' ? (
+                      <Trans>
+                        There is no effect for objects in the store matching
+                        this search. Try other words, or create an effect from
+                        scratch.
+                      </Trans>
+                    ) : layerRenderingType === '3d' ? (
+                      <Trans>
+                        There is no effect for 3D layers in the store matching
+                        this search. Try other words, or create an effect from
+                        scratch.
+                      </Trans>
+                    ) : layerRenderingType === '2d' ? (
+                      <Trans>
+                        There is no effect for 2D layers in the store matching
+                        this search. Try other words, or create an effect from
+                        scratch.
+                      </Trans>
+                    ) : (
+                      <Trans>
+                        There is no effect for this layer in the store matching
+                        this search. Try other words, or create an effect from
+                        scratch.
+                      </Trans>
+                    )
+                  }
+                  actionLabel={<Trans>New effect from scratch</Trans>}
+                  onAction={() => changeTab('from-scratch')}
+                />
+              </Column>
+            }
           />
         )}
       </Dialog>

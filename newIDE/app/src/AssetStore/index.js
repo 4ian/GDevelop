@@ -88,6 +88,7 @@ type Props = {|
   fixedObjectTypes?: ?Array<string>,
   // Only list the effect assets made for objects, or for layers.
   fixedEffectTarget?: EffectTarget,
+  noResultsPlaceholder?: React.Node,
 |};
 
 export type AssetStoreInterface = {|
@@ -135,6 +136,7 @@ export const AssetStore: React.ComponentType<{
       assetSwappedObject,
       fixedObjectTypes,
       fixedEffectTarget,
+      noResultsPlaceholder,
     }: Props,
     ref
   ) => {
@@ -944,6 +946,7 @@ export const AssetStore: React.ComponentType<{
                 )
               ) : isOnSearchResultPage ? (
                 <AssetsList
+                  noResultsPlaceHolder={noResultsPlaceholder}
                   publicAssetPacks={
                     hidePacks ? [] : publicAssetPacksSearchResults
                   }

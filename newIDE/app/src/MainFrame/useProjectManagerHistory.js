@@ -215,9 +215,9 @@ const insertItem = (
   project: gdProject,
   itemName: string,
   removedItem: RemovedItem
-) => {
+): boolean => {
   // The name can be taken by an item added outside the history.
-  if (list.has(itemName)) return;
+  if (list.has(itemName)) return false;
   const item = list.insertNew(
     itemName,
     Math.min(removedItem.index, list.getCount())
@@ -230,6 +230,7 @@ const insertItem = (
   );
   if (removedItem.wasFirstItem && list.setFirstItemName)
     list.setFirstItemName(itemName);
+  return true;
 };
 
 /**
@@ -360,8 +361,13 @@ const useProjectManagerHistory = (
         removeItem(list, itemName);
         appliedAction = { ...action, removedItem };
       } else {
-        if (action.removedItem)
-          insertItem(list, projectForApply, itemName, action.removedItem);
+        // Nothing restored (the name is taken): leave the step as is, it
+        // can be applied once the name is free again.
+        if (
+          action.removedItem &&
+          !insertItem(list, projectForApply, itemName, action.removedItem)
+        )
+          return null;
         appliedAction = { ...action, removedItem: null };
       }
       change = { targetKey, itemName };

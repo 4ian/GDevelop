@@ -412,6 +412,31 @@ describe('useProjectManagerHistory', () => {
     project.delete();
   });
 
+  it('leaves the deletion step in place when its name is taken at undo time, and restores it later', async () => {
+    const project = makeProject();
+    project.getLayout('Scene2').setBackgroundColor(10, 20, 30);
+    const { resultRef, call } = renderProjectManagerHistoryTester(project);
+
+    await call(r => r.recordDeletion('scenes', 'Scene2'));
+    project.removeLayout('Scene2');
+    // A scene with the same name, created outside the history.
+    project.insertNewLayout('Scene2', 1);
+
+    expect(await call(r => r.undo(project, noopOptions))).toBeNull();
+    expect(resultRef.current && resultRef.current.canUndo).toBe(true);
+    expect(project.getLayout('Scene2').getBackgroundColorRed()).not.toBe(10);
+
+    // Once the name is free again, the undo restores the deleted scene.
+    project.removeLayout('Scene2');
+    expect(await call(r => r.undo(project, noopOptions))).toEqual({
+      targetKey: 'scenes',
+      itemName: 'Scene2',
+    });
+    expect(project.getLayout('Scene2').getBackgroundColorRed()).toBe(10);
+
+    project.delete();
+  });
+
   it('tells which items an undo/redo is about to remove, before removing them', async () => {
     const project = makeProject();
     const { call } = renderProjectManagerHistoryTester(project);

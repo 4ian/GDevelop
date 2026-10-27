@@ -1211,7 +1211,44 @@ describe('MetadataDeclarationHelper', () => {
       objectMetadata.getAllExpressions().keys().toJSArray()
     ).toContainAll([
       // Deprecated
-      'ScaleX', 'ScaleY', 'Opacity']);
+      'ScaleX',
+      'ScaleY',
+      'Opacity',
+      // Crossing the boundary of the object, with a point of its own plane.
+      'ToParentX',
+      'ToParentY',
+      'FromParentX',
+      'FromParentY',
+      'ToParentAngle',
+      'FromParentAngle',
+    ]);
+    const toParentX = objectMetadata.getAllExpressions().get('ToParentX');
+    // The object, then the X and the Y of the point.
+    expect(toParentX.getParametersCount()).toBe(3);
+    // The object, then the angle.
+    expect(
+      objectMetadata
+        .getAllExpressions()
+        .get('ToParentAngle')
+        .getParametersCount()
+    ).toBe(2);
+    // Only the events of the object know what is inside it.
+    [
+      'ToParentX',
+      'ToParentY',
+      'FromParentX',
+      'FromParentY',
+      'ToParentAngle',
+      'FromParentAngle',
+    ].forEach((expressionName) =>
+      expect(
+        objectMetadata.getAllExpressions().get(expressionName).isPrivate()
+      ).toBe(true)
+    );
+    // A 2D object converts directions as angles.
+    expect(
+      objectMetadata.getAllExpressions().has('ToParentDirectionX')
+    ).toBe(false);
 
     expectArray(
       objectMetadata.getAllStrExpressions().keys().toJSArray()
@@ -1249,6 +1286,38 @@ describe('MetadataDeclarationHelper', () => {
     expect(extension.getExtensionObjectsTypes().size()).toBe(1);
     expect(extension.getExtensionObjectsTypes().at(0)).toBe('MyObject');
     const objectMetadata = extension.getObjectMetadata('MyObject');
+
+    const expressionNames = objectMetadata
+      .getAllExpressions()
+      .keys()
+      .toJSArray();
+    // A 3D custom object converts a point of 3 coordinates, on 3 axes.
+    ['ToParent', 'FromParent'].forEach((conversion) =>
+      ['X', 'Y', 'Z'].forEach((axis) => {
+        const expressionName = conversion + axis;
+        expect(expressionNames).toContain(expressionName);
+        expect(
+          objectMetadata
+            .getAllExpressions()
+            .get(expressionName)
+            .getParametersCount()
+        ).toBe(4);
+      })
+    );
+    // A direction is converted as a vector in 3D: an angle around Z alone
+    // cannot follow a tilted object.
+    expect(expressionNames).not.toContain('ToParentAngle');
+    expect(expressionNames).not.toContain('FromParentAngle');
+    ['ToParentDirection', 'FromParentDirection'].forEach((conversion) =>
+      ['X', 'Y', 'Z'].forEach((axis) => {
+        const expression = objectMetadata
+          .getAllExpressions()
+          .get(conversion + axis);
+        // The object, then the X, Y and Z of the direction.
+        expect(expression.getParametersCount()).toBe(4);
+        expect(expression.isPrivate()).toBe(true);
+      })
+    );
 
     expectArray(
       objectMetadata.getDefaultBehaviors().toNewVectorString().toJSArray()

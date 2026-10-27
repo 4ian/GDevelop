@@ -94,9 +94,18 @@ class GD_CORE_API EventsFunctionTools {
       const PropertiesContainer &properties,
       gd::ResourcesContainer &outputResourcesContainer);
 
+  static void PropertiesToResourcesContainer(
+      const PropertiesContainer &properties,
+      const PropertiesContainer &sharedProperties,
+      gd::ResourcesContainer &outputResourcesContainer);
+
 private:
   static void AddPropertiesToVariablesContainer(
       const PropertiesContainer &properties,
       gd::VariablesContainer &outputVariablesContainer);
+
+  static void AddPropertiesToResourcesContainer(
+      const PropertiesContainer &properties,
+      gd::ResourcesContainer &outputResourcesContainer);
 };
 }  // namespace gd

@@ -220,14 +220,28 @@ void EventsFunctionTools::ParametersToResourcesContainer(
 void EventsFunctionTools::PropertiesToResourcesContainer(
     const PropertiesContainer &properties,
     gd::ResourcesContainer &outputResourcesContainer) {
+  outputResourcesContainer.Clear();
+  AddPropertiesToResourcesContainer(properties, outputResourcesContainer);
+}
+
+void EventsFunctionTools::PropertiesToResourcesContainer(
+    const PropertiesContainer &properties,
+    const PropertiesContainer &sharedProperties,
+    gd::ResourcesContainer &outputResourcesContainer) {
+  outputResourcesContainer.Clear();
+  AddPropertiesToResourcesContainer(properties, outputResourcesContainer);
+  AddPropertiesToResourcesContainer(sharedProperties, outputResourcesContainer);
+}
+
+void EventsFunctionTools::AddPropertiesToResourcesContainer(
+    const PropertiesContainer &properties,
+    gd::ResourcesContainer &outputResourcesContainer) {
   if (outputResourcesContainer.GetSourceType() !=
       gd::ResourcesContainer::SourceType::Properties) {
     throw std::logic_error("Tried to generate a resources container from "
                            "properties with the wrong source type.");
   }
-  outputResourcesContainer.Clear();
 
-  gd::String lastObjectName;
   for (std::size_t i = 0; i < properties.GetCount(); ++i) {
     const auto &property = properties.Get(i);
     if (property.GetName().empty()) {

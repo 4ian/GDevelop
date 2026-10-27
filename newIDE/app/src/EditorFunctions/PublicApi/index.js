@@ -2,6 +2,7 @@
 import functionsV22 from './v22/functions.json';
 import scriptApiDefinitionV22 from './v22/script-api.d.ts';
 import eventScriptGuide from './event-script-guide.md';
+import gameplayHarnessGuide from './gameplay-harness-guide.md';
 
 /**
  * The public API of the editor functions, as given to the external agents
@@ -10,8 +11,9 @@ import eventScriptGuide from './event-script-guide.md';
  * The argument schemas and the script API definition are exported from the
  * GDevelop AI backend (`generation-api/scripts/export-editor-functions-api.js`
  * in GDevelop-services) for a version of its tools, and committed here.
- * The EventScript guide is authored here, and read by the prompts of the
- * GDevelop AI (the AiPrompts repository) from this file.
+ * The EventScript and gameplay test harness guides are authored here, and
+ * read by the prompts of the GDevelop AI (the AiPrompts repository) from
+ * these files.
  */
 
 export type PublicApiFunction = {|
@@ -29,6 +31,8 @@ export type PublicApi = {|
   scriptApiDefinition: string,
   // The syntax of the "EventScript" of `generate_events`.
   eventScriptGuide: string,
+  // The API of the `harness` of the gameplay tests (`run_gameplay_test`).
+  gameplayHarnessGuide: string,
 |};
 
 export const PUBLIC_API_TOOLS_VERSION = 'v22';
@@ -38,4 +42,5 @@ export const getPublicApi = (): PublicApi => ({
   functions: functionsV22.functions,
   scriptApiDefinition: scriptApiDefinitionV22,
   eventScriptGuide,
+  gameplayHarnessGuide,
 });

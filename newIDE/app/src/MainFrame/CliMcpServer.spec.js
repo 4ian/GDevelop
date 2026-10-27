@@ -7,6 +7,8 @@ import {
   type McpOpenedProject,
   type McpProjectCreation,
   type McpCreateProject,
+  type McpSearchResources,
+  type McpFoundResource,
   type JsonRpcResponse,
 } from './CliMcpServer';
 
@@ -89,6 +91,8 @@ describe('CliMcpServer', () => {
     // Handled by the GDevelop AI backend, not by the editor.
     expect(toolNames).not.toContain('search_docs');
     expect(toolNames).not.toContain('run_edit_agent');
+    // Only when the editor can search the resources.
+    expect(toolNames).not.toContain('search_resource_store');
 
     const createSceneTool = tools.find(tool => tool.name === 'create_scene');
     expect(createSceneTool.inputSchema.required).toEqual(['scene_name']);
@@ -187,6 +191,7 @@ describe('CliMcpServer', () => {
     expect(uris).toEqual([
       'gdevelop://docs/script-api.d.ts',
       'gdevelop://docs/event-script-guide.md',
+      'gdevelop://docs/gameplay-test-harness-guide.md',
     ]);
 
     const readResponse = await handleMcpMessage(
@@ -214,6 +219,88 @@ describe('CliMcpServer', () => {
     expect(getResult(toolResponse).content[0].text).toContain(
       'declare function inspect_variables('
     );
+  });
+
+  it('gives the gameplay test harness guide, pointed to by `run_gameplay_test`', async () => {
+    const tools = getMcpTools({ isReadOnly: false });
+    const runGameplayTestTool = tools.find(
+      tool => tool.name === 'run_gameplay_test'
+    );
+    if (!runGameplayTestTool) throw new Error('No run_gameplay_test tool.');
+    expect(runGameplayTestTool.description).toContain(
+      'read_gameplay_test_harness_guide'
+    );
+
+    const response = await handleMcpMessage(
+      {
+        jsonrpc: '2.0',
+        id: 9,
+        method: 'tools/call',
+        params: { name: 'read_gameplay_test_harness_guide', arguments: {} },
+      },
+      makeFakeCliMcpServerHandlers()
+    );
+    expect(getResult(response).content[0].text).toContain('interface Harness');
+  });
+
+  it('searches the resources installed by name, when the editor can', async () => {
+    const searchResources = jest.fn(
+      async (options: Object): Promise<Array<McpFoundResource>> => [
+        {
+          name: 'Monster growl.wav',
+          tags: ['monster', 'growl'],
+          metadata: { duration: 1.2, kind: 'sound' },
+        },
+      ]
+    );
+    const handlers: CliMcpServerHandlers = {
+      ...makeFakeCliMcpServerHandlers(),
+      searchResources: (searchResources: McpSearchResources),
+    };
+    const listResponse = await handleMcpMessage(
+      { jsonrpc: '2.0', id: 10, method: 'tools/list' },
+      handlers
+    );
+    expect(getResult(listResponse).tools.map(tool => tool.name)).toContain(
+      'search_resource_store'
+    );
+
+    const response = await handleMcpMessage(
+      {
+        jsonrpc: '2.0',
+        id: 11,
+        method: 'tools/call',
+        params: {
+          name: 'search_resource_store',
+          arguments: { search_terms: 'monster, growl', resource_kind: 'audio' },
+        },
+      },
+      handlers
+    );
+    expect(searchResources).toHaveBeenCalledWith({
+      searchTerms: 'monster, growl',
+      resourceKind: 'audio',
+    });
+    const result = getResult(response);
+    expect(result.isError).toBe(false);
+    expect(JSON.parse(result.content[0].text).resources[0].name).toBe(
+      'Monster growl.wav'
+    );
+
+    const invalidResponse = await handleMcpMessage(
+      {
+        jsonrpc: '2.0',
+        id: 12,
+        method: 'tools/call',
+        params: {
+          name: 'search_resource_store',
+          arguments: { search_terms: 'growl', resource_kind: 'image' },
+        },
+      },
+      handlers
+    );
+    expect(getResult(invalidResponse).isError).toBe(true);
+    expect(handlers.runEditorFunctionCalls).not.toHaveBeenCalled();
   });
 
   it('gives the screenshots of a gameplay test as images', async () => {

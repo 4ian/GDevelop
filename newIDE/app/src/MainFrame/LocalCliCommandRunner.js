@@ -37,8 +37,11 @@ import {
   makeMcpMessagesQueue,
   type McpOpenedProject,
   type McpProjectCreation,
+  type McpSearchResources,
   type McpToolCallReport,
 } from './CliMcpServer';
+import { createResourceSearch } from '../Utils/GDevelopServices/Generation';
+import { notLoggedInErrorMessage } from '../AiGeneration/UseGenerateEvents';
 import { listAllExamples } from '../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
@@ -734,9 +737,33 @@ export const useCliCommandRunner = ({
   );
   const preferences = React.useContext(PreferencesContext);
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
-  const { loginState } = React.useContext(AuthenticatedUserContext);
+  const { loginState, profile, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
+  );
   const loginStateRef = React.useRef(loginState);
   loginStateRef.current = loginState;
+  const profileRef = React.useRef(profile);
+  profileRef.current = profile;
+  const getAuthorizationHeaderRef = React.useRef(getAuthorizationHeader);
+  getAuthorizationHeaderRef.current = getAuthorizationHeader;
+  // The search the editor does to install a resource by name (see
+  // `useSearchAndInstallResource`), done for the agent to choose the name.
+  const mcpSearchResources: McpSearchResources = React.useCallback(
+    async ({ searchTerms, resourceKind }) => {
+      const currentProfile = profileRef.current;
+      if (!currentProfile) throw new Error(notLoggedInErrorMessage);
+      const resourceSearch = await createResourceSearch(
+        () => getAuthorizationHeaderRef.current(),
+        { userId: currentProfile.id, searchTerms, resourceKind }
+      );
+      return (resourceSearch.results || []).map(({ resource }) => ({
+        name: resource.name,
+        tags: resource.tags || [],
+        metadata: resource.metadata || null,
+      }));
+    },
+    []
+  );
   const ensureLoginSettled = React.useCallback(async () => {
     const startTime = Date.now();
     while (
@@ -826,6 +853,7 @@ export const useCliCommandRunner = ({
           isReadOnly: !!appArguments['read-only'],
           onToolCalled: (report: McpToolCallReport) =>
             sendMcpToolCalled({ ...report, transport: 'stdio' }),
+          searchResources: mcpSearchResources,
           runEditorFunctionCalls: async (functionCalls, options) => {
             await mcpProjectReady.promise;
             return latestRunEditorFunctionCalls(functionCalls, options);
@@ -845,7 +873,7 @@ export const useCliCommandRunner = ({
       ipcRenderer.send('mcp-ready');
       return () => ipcRenderer.removeListener('mcp-message', onMcpMessageEvent);
     },
-    [latestRunEditorFunctionCalls, latestSaveProject]
+    [latestRunEditorFunctionCalls, latestSaveProject, mcpSearchResources]
   );
   const onMcpProjectReady = React.useCallback(
     () => mcpProjectReadyRef.current.resolve(),
@@ -958,6 +986,7 @@ export const useCliCommandRunner = ({
               onToolCalled: (report: McpToolCallReport) =>
                 sendMcpToolCalled({ ...report, transport: 'http' }),
               projectCreation: mcpProjectCreation,
+              searchResources: mcpSearchResources,
               runEditorFunctionCalls: latestRunEditorFunctionCalls,
               saveProject: async () =>
                 !!(await latestSaveProject({ skipNewVersionWarning: true })),
@@ -988,7 +1017,12 @@ export const useCliCommandRunner = ({
         );
       };
     },
-    [latestRunEditorFunctionCalls, latestSaveProject, mcpProjectCreation]
+    [
+      latestRunEditorFunctionCalls,
+      latestSaveProject,
+      mcpProjectCreation,
+      mcpSearchResources,
+    ]
   );
 
   React.useEffect(

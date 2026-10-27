@@ -15,15 +15,18 @@ import { getPublicApi } from '../EditorFunctions/PublicApi';
  * on stdin/stdout (the "stdio" transport).
  *
  * Each editor function is a tool, described by the argument schemas of the
- * public API (see `EditorFunctions/PublicApi`). The script API definition
- * and the EventScript guide are given as resources (and the guide in the
- * instructions of the server, as writing events needs it).
+ * public API (see `EditorFunctions/PublicApi`). The script API definition,
+ * the EventScript guide and the gameplay test harness guide are given as
+ * resources (and the EventScript guide in the instructions of the server, as
+ * writing events needs it).
  */
 
 const SUPPORTED_PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 
 const SCRIPT_API_DEFINITION_URI = 'gdevelop://docs/script-api.d.ts';
 const EVENT_SCRIPT_GUIDE_URI = 'gdevelop://docs/event-script-guide.md';
+const GAMEPLAY_HARNESS_GUIDE_URI =
+  'gdevelop://docs/gameplay-test-harness-guide.md';
 
 type JsonRpcId = string | number;
 
@@ -85,6 +88,18 @@ export type McpProjectCreation = {|
   createProject: McpCreateProject,
 |};
 
+export type McpFoundResource = {|
+  name: string,
+  tags: Array<string>,
+  // Like the duration of an audio file, or the alphabets of a font.
+  metadata: ?Object,
+|};
+
+export type McpSearchResources = ({|
+  searchTerms: string,
+  resourceKind: 'audio' | 'font',
+|}) => Promise<Array<McpFoundResource>>;
+
 export type McpToolCallReport = {|
   toolName: string,
   clientName: string | null,
@@ -100,6 +115,8 @@ export type CliMcpServerHandlers = {|
   onToolCalled?: (report: McpToolCallReport) => void,
   // Absent when a project is always opened (`--mcp`).
   projectCreation?: McpProjectCreation,
+  // Searches the free resources (sounds, musics, fonts) installed by name.
+  searchResources?: McpSearchResources,
   // Only the functions not modifying the project are exposed, and scripts
   // can only call them.
   isReadOnly: boolean,
@@ -154,6 +171,42 @@ const readScriptApiDefinitionTool: McpTool = {
   inputSchema: { type: 'object', properties: {} },
   annotations: { readOnlyHint: true },
 };
+
+const readGameplayHarnessGuideTool: McpTool = {
+  name: 'read_gameplay_test_harness_guide',
+  description:
+    'Read the guide of the `harness` a gameplay test (`run_gameplay_test`) is written with: its API (stepping frames, simulating inputs, reading the objects, asserting) and the rules of reliable tests (also the resource ' +
+    GAMEPLAY_HARNESS_GUIDE_URI +
+    '). Read it before writing a test.',
+  inputSchema: { type: 'object', properties: {} },
+  annotations: { readOnlyHint: true },
+};
+
+const searchResourceStoreTool: McpTool = {
+  name: 'search_resource_store',
+  description:
+    'Search the GDevelop resource store for free audio files (sounds or musics) or fonts. Returns up to 10 resources with their name, tags and metadata (for audio: the duration in seconds and whether it is a `sound` or a `music`; for fonts: the supported alphabets). ' +
+    'Use the exact `name` of the chosen resource where it is used (like a "play a sound" action of `generate_events`, or the font property of a text object): it is then installed in the project from the store. Only searches: it does not change the project.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      search_terms: {
+        type: 'string',
+        description:
+          'Single words separated by commas, the most generic first. For example: `explosion, retro`, `music, calm, piano` or `pixel, bold`.',
+      },
+      resource_kind: {
+        type: 'string',
+        enum: ['audio', 'font'],
+        description: '`audio` for sounds and musics, `font` for fonts.',
+      },
+    },
+    required: ['search_terms', 'resource_kind'],
+  },
+  annotations: { readOnlyHint: true },
+};
+
+const MAX_FOUND_RESOURCES = 10;
 
 const listGameTemplatesTool: McpTool = {
   name: 'list_game_templates',
@@ -220,9 +273,11 @@ const filterGameTemplates = (
 export const getMcpTools = ({
   isReadOnly,
   canCreateProject = false,
+  canSearchResources = false,
 }: {|
   isReadOnly: boolean,
   canCreateProject?: boolean,
+  canSearchResources?: boolean,
 |}): Array<McpTool> => {
   const callableFunctions = new Map(
     describeCliEditorFunctions().map(description => [
@@ -246,7 +301,12 @@ export const getMcpTools = ({
         const callableFunction = callableFunctions.get(publicApiFunction.name);
         return {
           name: publicApiFunction.name,
-          description: publicApiFunction.description,
+          description:
+            publicApiFunction.name === 'run_gameplay_test'
+              ? `${publicApiFunction.description} Read \`${
+                  readGameplayHarnessGuideTool.name
+                }\` before writing the \`source\` of a test.`
+              : publicApiFunction.description,
           inputSchema: publicApiFunction.inputSchema,
           annotations: {
             readOnlyHint:
@@ -259,7 +319,9 @@ export const getMcpTools = ({
   return [
     ...functionTools,
     readScriptApiDefinitionTool,
+    readGameplayHarnessGuideTool,
     ...(isReadOnly ? [] : [saveProjectTool]),
+    ...(canSearchResources && !isReadOnly ? [searchResourceStoreTool] : []),
     ...(canCreateProject ? [listGameTemplatesTool, createProjectTool] : []),
   ];
 };
@@ -289,6 +351,8 @@ export const getMcpInstructions = ({
     'Explore before editing: `read_game_project_json` gives the scenes, objects, variables and events of the project; the `inspect_*` and `describe_instances` tools give details.',
     'Prefer `run_script` for several related steps: it runs JavaScript calling the functions as async functions. Read `read_script_api_definition` first for their exact signatures and outputs.',
     'Events (the game logic) are written with `generate_events`, giving an `event_script` for each batch: the "EventScript" syntax below. The script is compiled by the GDevelop backend; on compile errors nothing is applied and the errors are returned, fix the script and call again. Events cannot be written from a description.',
+    'Resources (images, 3D models, sounds, musics, fonts) need no file: images and 3D models come with the objects created from the asset store (`create_or_replace_object`); a new sound or music is installed from the free library when events use a new audio file name, and a new font when the font property of an object is set to a new name. Find the exact names with `search_resource_store` rather than inventing them, so that the right file is installed.',
+    'Gameplay tests (`run_gameplay_test`) play the game in a real preview, simulating the inputs of the player: read `read_gameplay_test_harness_guide` before writing one.',
     isReadOnly
       ? 'The project is opened read-only: only the functions not modifying it are available.'
       : 'The changes are kept in memory: call `save_project` once a coherent set of changes is done.',
@@ -312,6 +376,13 @@ const resources = [
     description: 'The syntax of the `event_script` of `generate_events`.',
     mimeType: 'text/markdown',
   },
+  {
+    uri: GAMEPLAY_HARNESS_GUIDE_URI,
+    name: 'Gameplay test harness guide',
+    description:
+      'The API of the `harness` of the gameplay tests (`run_gameplay_test`), and the rules of reliable tests.',
+    mimeType: 'text/markdown',
+  },
 ];
 
 const readResource = (uri: string): ?{| mimeType: string, text: string |} => {
@@ -320,6 +391,12 @@ const readResource = (uri: string): ?{| mimeType: string, text: string |} => {
   }
   if (uri === EVENT_SCRIPT_GUIDE_URI) {
     return { mimeType: 'text/markdown', text: getPublicApi().eventScriptGuide };
+  }
+  if (uri === GAMEPLAY_HARNESS_GUIDE_URI) {
+    return {
+      mimeType: 'text/markdown',
+      text: getPublicApi().gameplayHarnessGuide,
+    };
   }
   return null;
 };
@@ -407,7 +484,44 @@ const callTool = async (
   if (name === readScriptApiDefinitionTool.name) {
     return makeToolResult(getPublicApi().scriptApiDefinition, false);
   }
-  const { projectCreation } = handlers;
+  if (name === readGameplayHarnessGuideTool.name) {
+    return makeToolResult(getPublicApi().gameplayHarnessGuide, false);
+  }
+  const { projectCreation, searchResources } = handlers;
+  if (
+    searchResources &&
+    !handlers.isReadOnly &&
+    name === searchResourceStoreTool.name
+  ) {
+    const searchTerms =
+      typeof toolArguments.search_terms === 'string'
+        ? toolArguments.search_terms.trim()
+        : '';
+    const resourceKind = toolArguments.resource_kind;
+    if (!searchTerms) {
+      return makeToolResult({ message: 'Missing `search_terms`.' }, true);
+    }
+    if (resourceKind !== 'audio' && resourceKind !== 'font') {
+      return makeToolResult(
+        { message: '`resource_kind` must be `audio` or `font`.' },
+        true
+      );
+    }
+    const foundResources = await searchResources({
+      searchTerms,
+      resourceKind,
+    });
+    return makeToolResult(
+      foundResources.length
+        ? { resources: foundResources.slice(0, MAX_FOUND_RESOURCES) }
+        : {
+            resources: [],
+            message:
+              'Nothing found: try other search terms, more generic or fewer.',
+          },
+      false
+    );
+  }
   if (projectCreation && name === listGameTemplatesTool.name) {
     const templates = filterGameTemplates(
       await projectCreation.listGameTemplates(),
@@ -562,6 +676,7 @@ export const handleMcpMessage = async (
           tools: getMcpTools({
             isReadOnly: handlers.isReadOnly,
             canCreateProject: !!handlers.projectCreation,
+            canSearchResources: !!handlers.searchResources,
           }),
         },
       };

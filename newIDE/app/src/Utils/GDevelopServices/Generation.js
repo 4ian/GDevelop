@@ -317,6 +317,9 @@ export type ResourceSearch = {
     resource: {
       name: string,
       url: string,
+      tags?: Array<string>,
+      // Like the duration of an audio file, or the alphabets of a font.
+      metadata?: ?Object,
     },
   }> | null,
 };

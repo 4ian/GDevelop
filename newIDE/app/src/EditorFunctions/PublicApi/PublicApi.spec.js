@@ -39,4 +39,9 @@ describe('PublicApi', () => {
     expect(publicApi.eventScriptGuide).toContain('always:');
     expect(publicApi.eventScriptGuide).toContain('js """');
   });
+
+  it('has the gameplay test harness guide', () => {
+    expect(publicApi.gameplayHarnessGuide).toContain('interface Harness');
+    expect(publicApi.gameplayHarnessGuide).toContain('stepFrames(');
+  });
 });

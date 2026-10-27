@@ -956,6 +956,77 @@ namespace gdjs {
     gdjs.Polygon.isPointInside(polygon, aabb.max[0], aabb.max[1]) &&
     gdjs.Polygon.isPointInside(polygon, aabb.max[0], aabb.min[1]);
 
+  /**
+   * Return true if the specified position is inside object rotated bounding box.
+   *
+   * The position should be in "world" coordinates, i.e use gdjs.Layer.convertCoords
+   * if you need to pass the mouse or a touch position that you get from gdjs.InputManager.
+   */
+  const insideObject = (
+    object: gdjs.RuntimeObject,
+    x: float,
+    y: float
+  ): boolean => {
+    const centerX = object.getCenterXInScene();
+    const centerY = object.getCenterYInScene();
+    const minX = object.getDrawableX() - centerX;
+    const minY = object.getDrawableY() - centerY;
+    const maxX = minX + object.getWidth();
+    const maxY = minY + object.getHeight();
+    const radius =
+      Math.max(Math.abs(minX), Math.abs(maxX)) +
+      Math.max(Math.abs(minY), Math.abs(maxY));
+
+    const deltaX = x - centerX;
+    const deltaY = y - centerY;
+    if (Math.abs(deltaX) + Math.abs(deltaY) > radius) {
+      return false;
+    }
+    const angle = gdjs.toRad(object.getAngle());
+    const unrotatedX = deltaX * Math.cos(-angle) - deltaY * Math.sin(-angle);
+    const unrotatedY = deltaX * Math.sin(-angle) + deltaY * Math.cos(-angle);
+    return (
+      minX <= unrotatedX &&
+      unrotatedX <= maxX &&
+      minY <= unrotatedY &&
+      unrotatedY <= maxY
+    );
+  };
+
+  /**
+   * Return true if the cursor, or any touch, is on the object.
+   *
+   * @return true if the cursor, or any touch, is on the object.
+   */
+  const cursorOnObject = (object: gdjs.RuntimeObject): boolean => {
+    const workingPoint: FloatPoint = [0, 0];
+    const instanceContainer = object.getInstanceContainer();
+    const inputManager = instanceContainer.getGame().getInputManager();
+    const layer = instanceContainer.getLayer(object.layer);
+    const mousePos = layer.convertCoords(
+      inputManager.getCursorX(),
+      inputManager.getCursorY(),
+      0,
+      workingPoint
+    );
+    if (insideObject(object, mousePos[0], mousePos[1])) {
+      return true;
+    }
+    const touchIds = inputManager.getAllTouchIdentifiers();
+    for (let i = 0; i < touchIds.length; ++i) {
+      const touchPos = layer.convertCoords(
+        inputManager.getTouchX(touchIds[i]),
+        inputManager.getTouchY(touchIds[i]),
+        0,
+        workingPoint
+      );
+      if (insideObject(object, touchPos[0], touchPos[1])) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   class ObjectMover3D {
     private editor: InGameEditor;
     private _changeHappened = false;
@@ -2314,8 +2385,10 @@ namespace gdjs {
         return;
       }
       if (this._instancesEditorSettings.editorMode === '2d-editor') {
+        this._selectionControls3D.remove();
         this._selectionControls = this._selectionControls2D;
       } else {
+        this._selectionControls2D.remove();
         this._selectionControls = this._selectionControls3D;
       }
       this._editorGrid.setSettings(this._instancesEditorSettings);
@@ -4014,6 +4087,7 @@ namespace gdjs {
             }
             runtimeObject.setAngle(instance.angle);
             runtimeObject.setLayer(instance.layer);
+            runtimeObject.setZOrder(instance.zOrder);
             if (is3D(runtimeObject)) {
               runtimeObject.setZ(instance.z === undefined ? 0 : instance.z);
               runtimeObject.setRotationX(
@@ -4501,7 +4575,7 @@ namespace gdjs {
         let topLayer: gdjs.RuntimeLayer | null = null;
         let topLayerIndex = 0;
         for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
-          if (is3D(object) || !object.cursorOnObject()) {
+          if (is3D(object) || !cursorOnObject(object)) {
             continue;
           }
           const layer = editedInstanceContainer.getLayer(object.getLayer());
@@ -7726,6 +7800,7 @@ namespace gdjs {
   class SelectionHandle2D extends THREE.Object3D {
     buttons: Array<ThreeSquare> = [];
     rotationButton: ThreeCircle;
+    // TODO Put one box for each instace
     area: ThreeSquare;
 
     state: 'idle' | 'resizing' | 'panning' | 'rotating' = 'idle';

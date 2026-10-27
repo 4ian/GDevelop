@@ -294,12 +294,8 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     return this.inFolder.getIndex();
   }
 
-  moveAt(
-    destinationIndex: number,
-    targetFolder?: ProjectItemFolderOrItem
-  ): void {
-    this.inFolder.moveAt(destinationIndex, targetFolder);
-  }
+  // Moves are done by the project manager, on the folder structure.
+  moveAt(destinationIndex: number): void {}
 
   copy(): void {
     this.inFolder.copy();

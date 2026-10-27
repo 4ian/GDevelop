@@ -4,7 +4,7 @@ import {
   getFolderOrItemIndex,
   enumerateItemsInFolder,
   getTopLevelFolderOrItems,
-  moveFolderOrItemAt,
+  syncLayoutsOrderWithFolders,
   dropDescendantsOfRemovedFolders,
   getItemsToDeleteFromSelection,
   removeEmptyFoldersFromSelection,
@@ -35,18 +35,36 @@ describe('ProjectItemFolders', () => {
     return names;
   };
 
-  it('moves a node in its folder, or in another folder', () => {
+  const moveToFolder = (
+    folderOrItem: ProjectItemFolderOrItem,
+    position: number,
+    folder: ProjectItemFolderOrItem
+  ) =>
+    folderOrItem
+      .getParent()
+      .moveFolderOrItemToAnotherFolder(folderOrItem, folder, position);
+
+  const getLayoutsNames = (project: gdProject): Array<string> => {
+    const names = [];
+    for (let index = 0; index < project.getLayoutsCount(); index++) {
+      names.push(project.getLayoutAt(index).getName());
+    }
+    return names;
+  };
+
+  it('reorders the scenes like they are shown in their folders', () => {
     const project = makeProjectWithScenes(['A', 'B', 'C']);
     const rootFolder = project.getLayoutsRootFolder();
-    const folder = rootFolder.insertNewFolder('Folder', 3);
+    const folder = rootFolder.insertNewFolder('Folder', 0);
+    moveToFolder(rootFolder.getItemChild('C'), 0, folder);
+    rootFolder.moveChild(
+      rootFolder.getChildPosition(rootFolder.getItemChild('A')),
+      2
+    );
+    expect(getChildrenNames(rootFolder)).toEqual(['[Folder]', 'B', 'A']);
 
-    // Moving down: the moved node is not counted in the destination index.
-    moveFolderOrItemAt(rootFolder.getItemChild('A'), 2);
-    expect(getChildrenNames(rootFolder)).toEqual(['B', 'A', 'C', '[Folder]']);
-
-    moveFolderOrItemAt(rootFolder.getItemChild('C'), 0, folder);
-    expect(getChildrenNames(rootFolder)).toEqual(['B', 'A', '[Folder]']);
-    expect(getChildrenNames(folder)).toEqual(['C']);
+    syncLayoutsOrderWithFolders(project);
+    expect(getLayoutsNames(project)).toEqual(['C', 'B', 'A']);
     expect(getFolderOrItemIndex(folder.getItemChild('C'))).toBe(0);
 
     project.delete();
@@ -61,7 +79,7 @@ describe('ProjectItemFolders', () => {
     // Only empty folders: nothing would be moved out by removing it.
     expect(enumerateItemsInFolder(folder)).toHaveLength(0);
 
-    moveFolderOrItemAt(rootFolder.getItemChild('A'), 0, subFolder);
+    moveToFolder(rootFolder.getItemChild('A'), 0, subFolder);
     expect(enumerateItemsInFolder(folder)).toHaveLength(1);
 
     project.delete();
@@ -72,8 +90,8 @@ describe('ProjectItemFolders', () => {
     const rootFolder = project.getLayoutsRootFolder();
     const folder = rootFolder.insertNewFolder('Folder', 0);
     const subFolder = folder.insertNewFolder('SubFolder', 0);
-    moveFolderOrItemAt(rootFolder.getItemChild('A'), 1, folder);
-    moveFolderOrItemAt(rootFolder.getItemChild('B'), 0, subFolder);
+    moveToFolder(rootFolder.getItemChild('A'), 1, folder);
+    moveToFolder(rootFolder.getItemChild('B'), 0, subFolder);
 
     expect(
       enumerateItemsInFolder(folder).map(scene => scene.getName())
@@ -99,7 +117,7 @@ describe('ProjectItemFolders', () => {
     const rootFolder = project.getLayoutsRootFolder();
     const folder = rootFolder.insertNewFolder('Folder', 3);
     const subFolder = folder.insertNewFolder('SubFolder', 0);
-    moveFolderOrItemAt(rootFolder.getItemChild('B'), 0, subFolder);
+    moveToFolder(rootFolder.getItemChild('B'), 0, subFolder);
     const selection = [rootFolder.getItemChild('A'), folder];
 
     const itemsToDelete = getItemsToDeleteFromSelection(selection);
@@ -117,7 +135,7 @@ describe('ProjectItemFolders', () => {
     const project = makeProjectWithScenes(['A', 'B']);
     const rootFolder = project.getLayoutsRootFolder();
     const folder = rootFolder.insertNewFolder('Folder', 2);
-    moveFolderOrItemAt(rootFolder.getItemChild('A'), 0, folder);
+    moveToFolder(rootFolder.getItemChild('A'), 0, folder);
     const nodeOfA = folder.getItemChild('A');
     const nodeOfB = rootFolder.getItemChild('B');
     const identity = (node: ProjectItemFolderOrItem) => node;
@@ -137,7 +155,7 @@ describe('ProjectItemFolders', () => {
     const project = makeProjectWithScenes(['A', 'B']);
     const rootFolder = project.getLayoutsRootFolder();
     const folder = rootFolder.insertNewFolder('Folder', 2);
-    moveFolderOrItemAt(rootFolder.getItemChild('B'), 0, folder);
+    moveToFolder(rootFolder.getItemChild('B'), 0, folder);
 
     const itemB = folder.getItemChild('B');
     const itemA = rootFolder.getItemChild('A');

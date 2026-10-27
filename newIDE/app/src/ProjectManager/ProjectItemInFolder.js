@@ -10,7 +10,6 @@ import {
   getFolderOrItemTreeViewItemId,
   getParentFolderTreeViewItemId,
   getFolderOrItemIndex,
-  moveFolderOrItemAt,
 } from './ProjectItemFolders';
 import {
   copyFolderOrItemToClipboard,
@@ -72,11 +71,6 @@ export class ProjectItemInFolder {
 
   getIndex(): number {
     return getFolderOrItemIndex(this.folderOrItem);
-  }
-
-  moveAt(destinationIndex: number, targetFolder?: ProjectItemFolderOrItem) {
-    moveFolderOrItemAt(this.folderOrItem, destinationIndex, targetFolder);
-    this.onFolderStructureModified();
   }
 
   copy(): void {

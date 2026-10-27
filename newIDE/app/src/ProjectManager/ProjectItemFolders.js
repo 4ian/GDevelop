@@ -218,37 +218,23 @@ export const getClosestVisibleParentId = (
   return topToBottomAscendanceId[firstClosedFolderIndex];
 };
 
+/**
+ * Reorder the scenes of the project like they are shown in their folders, as
+ * the order of the list is used at runtime (first scene by default) and by
+ * the other editors.
+ */
+export const syncLayoutsOrderWithFolders = (project: gdProject): void => {
+  enumerateItemsInFolder(project.getLayoutsRootFolder()).forEach(
+    (layout, index) => {
+      const position = project.getLayoutPosition(layout.getName());
+      if (position !== index) project.moveLayout(position, index);
+    }
+  );
+};
+
 export const getFolderOrItemIndex = (
   folderOrItem: ProjectItemFolderOrItem
 ): number => folderOrItem.getParent().getChildPosition(folderOrItem);
-
-/**
- * Move a node at the given position of its folder, or of `targetFolder`.
- */
-export const moveFolderOrItemAt = (
-  folderOrItem: ProjectItemFolderOrItem,
-  destinationIndex: number,
-  targetFolder?: ProjectItemFolderOrItem
-): void => {
-  const currentParentFolder = folderOrItem.getParent();
-  const destinationFolder = targetFolder || currentParentFolder;
-
-  if (destinationFolder === currentParentFolder) {
-    const originIndex = getFolderOrItemIndex(folderOrItem);
-    if (destinationIndex === originIndex) return;
-    currentParentFolder.moveChild(
-      originIndex,
-      // When moving the item down, it must not be counted.
-      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
-    );
-  } else {
-    currentParentFolder.moveFolderOrItemToAnotherFolder(
-      folderOrItem,
-      destinationFolder,
-      destinationIndex
-    );
-  }
-};
 
 /**
  * Keep items whose ancestors are not also selected. A folder in the selection

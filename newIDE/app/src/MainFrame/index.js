@@ -136,6 +136,7 @@ import {
 } from './UpdaterTools';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
 import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
@@ -1740,57 +1741,26 @@ const MainFrame = (props: Props): React.MixedElement => {
     [openProjectManager]
   );
 
-  const maxListedRemovedItems = 10;
-
   /**
-   * Ask before removing project items, with the delete dialog of the editor:
-   * the usual sentence for a single one, followed by the list of their names
-   * for several (a folder being cut).
+   * Ask before removing project items, like the objects list: one sentence for
+   * a single item, for several items or for a folder and its content.
    */
   const confirmItemsRemoval = ({
-    names,
-    getOtherItemsLabel,
-    title,
-    singleItemMessage,
-    getSeveralItemsMessage,
+    count,
     folderName,
-    getFolderMessage,
+    single,
+    several,
+    folder,
   }: {|
-    names: Array<string>,
-    // Ends a list too long to be shown in full.
-    getOtherItemsLabel: (otherItemsCount: number) => MessageDescriptor,
-    title: MessageDescriptor,
-    singleItemMessage: MessageDescriptor,
-    // The messages are Markdown: the names are given as a list.
-    getSeveralItemsMessage: (namesList: string) => MessageDescriptor,
-    // When the items are removed with the folder holding them.
+    count: number,
     folderName: ?string,
-    getFolderMessage: (
-      folderName: string,
-      namesList: string
-    ) => MessageDescriptor,
-  |}): Promise<boolean> => {
-    // In the value, as the whitespace of the message is collapsed.
-    const shownNames = names.slice(0, maxListedRemovedItems);
-    const otherItemsCount = names.length - shownNames.length;
-    const listLines = shownNames.map(name => `- ${name}`);
-    if (otherItemsCount > 0)
-      listLines.push(`- ${i18n._(getOtherItemsLabel(otherItemsCount))}`);
-    const namesList = '\n\n' + listLines.join('\n');
-    if (folderName != null) {
-      return showDeleteConfirmation({
-        title: t`Remove folder`,
-        message: getFolderMessage(folderName, namesList),
-      });
-    }
-    return showDeleteConfirmation({
-      title,
-      message:
-        names.length === 1
-          ? singleItemMessage
-          : getSeveralItemsMessage(namesList),
-    });
-  };
+    single: ShowConfirmDeleteDialogOptions,
+    several: ShowConfirmDeleteDialogOptions,
+    folder: ShowConfirmDeleteDialogOptions,
+  |}): Promise<boolean> =>
+    showDeleteConfirmation(
+      folderName != null ? folder : count === 1 ? single : several
+    );
 
   /** Where the removed items come from, to say it when confirming. */
   type ItemsRemovalOptions = {| folderName?: string |};
@@ -1803,16 +1773,26 @@ const MainFrame = (props: Props): React.MixedElement => {
     const { currentProject } = state;
     if (!currentProject || layouts.length === 0) return false;
 
+    const names = layouts.map(layout => layout.getName());
     const answer = await confirmItemsRemoval({
-      names: layouts.map(layout => layout.getName()),
-      getOtherItemsLabel: count => t`And ${count} other scenes`,
-      title: layouts.length === 1 ? t`Remove scene` : t`Remove scenes`,
-      singleItemMessage: t`Are you sure you want to remove this scene? This can't be undone.`,
-      getSeveralItemsMessage: namesList =>
-        t`Are you sure you want to remove these scenes? This can't be undone.${namesList}`,
+      count: names.length,
       folderName,
-      getFolderMessage: (folderName, namesList) =>
-        t`Are you sure you want to remove the folder "${folderName}" and the scenes it contains? This can't be undone.${namesList}`,
+      single: {
+        title: t`Remove scene`,
+        message: t`Are you sure you want to remove this scene? This can't be undone.`,
+      },
+      several: {
+        title: t`Remove scenes`,
+        message: t`Are you sure you want to remove these ${
+          names.length
+        } scenes? This can't be undone.`,
+      },
+      folder: {
+        title: t`Remove folder and scenes`,
+        message: t`Are you sure you want to remove this folder and all its content (scenes ${names.join(
+          ', '
+        )})? This can't be undone.`,
+      },
     });
     if (!answer) return false;
 
@@ -1846,18 +1826,24 @@ const MainFrame = (props: Props): React.MixedElement => {
       externalLayout.getName()
     );
     const answer = await confirmItemsRemoval({
-      names,
-      getOtherItemsLabel: count => t`And ${count} other external layouts`,
-      title:
-        names.length === 1
-          ? t`Remove external layout`
-          : t`Remove external layouts`,
-      singleItemMessage: t`Are you sure you want to remove this external layout? This can't be undone.`,
-      getSeveralItemsMessage: namesList =>
-        t`Are you sure you want to remove these external layouts? This can't be undone.${namesList}`,
+      count: names.length,
       folderName,
-      getFolderMessage: (folderName, namesList) =>
-        t`Are you sure you want to remove the folder "${folderName}" and the external layouts it contains? This can't be undone.${namesList}`,
+      single: {
+        title: t`Remove external layout`,
+        message: t`Are you sure you want to remove this external layout? This can't be undone.`,
+      },
+      several: {
+        title: t`Remove external layouts`,
+        message: t`Are you sure you want to remove these ${
+          names.length
+        } external layouts? This can't be undone.`,
+      },
+      folder: {
+        title: t`Remove folder and external layouts`,
+        message: t`Are you sure you want to remove this folder and all its content (external layouts ${names.join(
+          ', '
+        )})? This can't be undone.`,
+      },
     });
     if (!answer) return false;
 
@@ -1888,15 +1874,24 @@ const MainFrame = (props: Props): React.MixedElement => {
       externalEvents.getName()
     );
     const answer = await confirmItemsRemoval({
-      names,
-      getOtherItemsLabel: count => t`And ${count} other external events`,
-      title: t`Remove external events`,
-      singleItemMessage: t`Are you sure you want to remove these external events? This can't be undone.`,
-      getSeveralItemsMessage: namesList =>
-        t`Are you sure you want to remove all these external events? This can't be undone.${namesList}`,
+      count: names.length,
       folderName,
-      getFolderMessage: (folderName, namesList) =>
-        t`Are you sure you want to remove the folder "${folderName}" and the external events it contains? This can't be undone.${namesList}`,
+      single: {
+        title: t`Remove external events`,
+        message: t`Are you sure you want to remove these external events? This can't be undone.`,
+      },
+      several: {
+        title: t`Remove external events`,
+        message: t`Are you sure you want to remove these ${
+          names.length
+        } external events? This can't be undone.`,
+      },
+      folder: {
+        title: t`Remove folder and external events`,
+        message: t`Are you sure you want to remove this folder and all its content (external events ${names.join(
+          ', '
+        )})? This can't be undone.`,
+      },
     });
     if (!answer) return false;
 
@@ -1926,18 +1921,24 @@ const MainFrame = (props: Props): React.MixedElement => {
 
     const testNames = tests.map(test => test.getName());
     const answer = await confirmItemsRemoval({
-      names: testNames,
-      getOtherItemsLabel: count => t`And ${count} other gameplay tests`,
-      title:
-        testNames.length === 1
-          ? t`Remove gameplay test`
-          : t`Remove gameplay tests`,
-      singleItemMessage: t`Are you sure you want to remove this gameplay test? This can't be undone.`,
-      getSeveralItemsMessage: namesList =>
-        t`Are you sure you want to remove these gameplay tests? This can't be undone.${namesList}`,
+      count: testNames.length,
       folderName,
-      getFolderMessage: (folderName, namesList) =>
-        t`Are you sure you want to remove the folder "${folderName}" and the gameplay tests it contains? This can't be undone.${namesList}`,
+      single: {
+        title: t`Remove gameplay test`,
+        message: t`Are you sure you want to remove this gameplay test? This can't be undone.`,
+      },
+      several: {
+        title: t`Remove gameplay tests`,
+        message: t`Are you sure you want to remove these ${
+          testNames.length
+        } gameplay tests? This can't be undone.`,
+      },
+      folder: {
+        title: t`Remove folder and gameplay tests`,
+        message: t`Are you sure you want to remove this folder and all its content (gameplay tests ${testNames.join(
+          ', '
+        )})? This can't be undone.`,
+      },
     });
     if (!answer) return false;
 

@@ -51,17 +51,17 @@ function useProjectItemsSelection(): {|
   );
 
   /**
-   * Unselect item if one of the parent is collapsed (folded) so that the item
-   * does not stay selected and not visible to the user.
+   * Unselect the items inside a collapsed (folded) folder so that they do not
+   * stay selected and not visible to the user.
    */
   const onCollapseItem = React.useCallback(
     (item: TreeViewItem) => {
-      if (selectedItems.length !== 1 || item.isPlaceholder) {
-        return;
-      }
-      if (selectedItems[0].content.isDescendantOf(item.content)) {
-        setSelectedItems([]);
-      }
+      if (selectedItems.length === 0 || item.isPlaceholder) return;
+      const remainingSelectedItems = selectedItems.filter(
+        selectedItem => !selectedItem.content.isDescendantOf(item.content)
+      );
+      if (remainingSelectedItems.length === selectedItems.length) return;
+      setSelectedItems(remainingSelectedItems);
     },
     [selectedItems]
   );

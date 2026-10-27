@@ -65,6 +65,7 @@ import {
   moveNewItemToFolder,
   getClosestVisibleParentId,
   getFoldersAscendanceWithoutRootFolder,
+  syncLayoutsOrderWithFolders,
 } from './ProjectItemFolders';
 import {
   ExtensionTreeViewItemContent,
@@ -177,12 +178,7 @@ export interface TreeViewItemContent {
   paste(): void;
   cut(): void;
   getIndex(): number;
-  // `targetFolder` is only used by the items organized in folders, to move an
-  // item into another folder than its current parent.
-  moveAt(
-    destinationIndex: number,
-    targetFolder?: ProjectItemFolderOrItem
-  ): void;
+  moveAt(destinationIndex: number): void;
   // Only for the items organized in folders: the node holding the item.
   getFolderOrItem(): ?ProjectItemFolderOrItem;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
@@ -640,10 +636,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const forceUpdateList = React.useCallback(
       () => {
+        // The folders may have been reorganized: the first scene of the list
+        // is the one started when no first scene is set.
+        if (project) syncLayoutsOrderWithFolders(project);
         forceUpdate();
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
-      [forceUpdate]
+      [project, forceUpdate]
     );
 
     const [searchText, setSearchText] = React.useState('');
@@ -1244,9 +1243,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     );
 
     const {
-      groupSelectionInFolder,
+      bulkMoveToNewFolder,
       deleteSelection,
       copySelection,
+      buildBulkMenuTemplate,
     } = useBulkProjectItemsOperations({
       project,
       selectedItems,
@@ -1257,7 +1257,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onDeleteExternalEventsList,
       onDeleteGameplayTests,
       onProjectItemModified,
-      onTreeModified,
       forceUpdateList,
       animateClosestVisibleParent,
       onNewFolderCreated,
@@ -1268,7 +1267,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         const keyboardShortcuts = keyboardShortcutsRef.current;
         keyboardShortcuts.setShortcutCallback(
           'onGroupInFolder',
-          groupSelectionInFolder
+          bulkMoveToNewFolder
         );
         keyboardShortcuts.setShortcutCallback('onDelete', deleteSelection);
         keyboardShortcuts.setShortcutCallback('onCopy', copySelection);
@@ -1277,7 +1276,24 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           deleteSelection();
         });
       },
-      [groupSelectionInFolder, deleteSelection, copySelection]
+      [bulkMoveToNewFolder, deleteSelection, copySelection]
+    );
+
+    const buildContextMenuTemplate = React.useCallback(
+      (i18n: I18nType) => (
+        item: TreeViewItem,
+        index: number
+      ): Array<MenuItemTemplate> => {
+        const isPartOfMultiSelection =
+          selectedItems.length > 1 &&
+          selectedItems.some(
+            selected => selected.content.getId() === item.content.getId()
+          );
+        return isPartOfMultiSelection
+          ? buildBulkMenuTemplate(i18n)
+          : buildMenuTemplate(i18n)(item, index);
+      },
+      [selectedItems, buildBulkMenuTemplate]
     );
 
     const extensionTreeViewItemProps = React.useMemo<?ExtensionTreeViewItemProps>(
@@ -2097,7 +2113,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                             }}
                             onClickItem={onClickItem}
                             onRenameItem={renameItem}
-                            buildMenuTemplate={buildMenuTemplate(i18n)}
+                            buildMenuTemplate={buildContextMenuTemplate(i18n)}
                             getItemRightButton={getTreeViewItemRightButton(
                               i18n
                             )}

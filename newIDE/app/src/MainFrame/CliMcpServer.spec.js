@@ -164,6 +164,68 @@ describe('CliMcpServer', () => {
     );
   });
 
+  it('gives the calls of a script without the arguments of the successful ones', async () => {
+    const handlers: CliMcpServerHandlers = {
+      ...makeFakeCliMcpServerHandlers(),
+      runEditorFunctionCalls: async functionCalls => ({
+        success: true,
+        didModifyProject: true,
+        results: functionCalls.map(functionCall => ({
+          ...functionCall,
+          success: true,
+          output: {
+            consoleLogs: ['Done'],
+            functionCallRecords: [
+              {
+                functionName: 'create_scene',
+                args: { scene_name: 'Level2' },
+                success: true,
+                output: { message: 'Created the scene.' },
+              },
+              {
+                functionName: 'create_scene',
+                args: { scene_name: '' },
+                success: false,
+                output: { message: 'Missing scene_name.' },
+              },
+            ],
+          },
+        })),
+        notRunCalls: [],
+      }),
+    };
+    const response = await handleMcpMessage(
+      {
+        jsonrpc: '2.0',
+        id: 13,
+        method: 'tools/call',
+        params: {
+          name: 'run_script',
+          arguments: { title: 'Scenes', js_code: 'await create_scene({});' },
+        },
+      },
+      handlers
+    );
+
+    const { functionCallRecords, consoleLogs } = JSON.parse(
+      getResult(response).content[0].text
+    );
+    expect(consoleLogs).toEqual(['Done']);
+    expect(functionCallRecords).toEqual([
+      {
+        functionName: 'create_scene',
+        success: true,
+        output: { message: 'Created the scene.' },
+      },
+      {
+        functionName: 'create_scene',
+        args: { scene_name: '' },
+        success: false,
+        output: { message: 'Missing scene_name.' },
+      },
+    ]);
+  });
+
   it('refuses a tool that is not exposed', async () => {
     const handlers = makeFakeCliMcpServerHandlers({ isReadOnly: true });
     const response = await handleMcpMessage(

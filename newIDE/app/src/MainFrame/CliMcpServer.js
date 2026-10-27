@@ -422,6 +422,23 @@ const extractScreenshots = (
   return { value: { ...value, screenshots }, images };
 };
 
+/**
+ * The calls a script made are given back with their outputs: the arguments of
+ * the successful ones are dropped, as the agent wrote them in its script.
+ */
+const withoutSuccessfulCallsArguments = (output: any): any => {
+  if (!output || !Array.isArray(output.functionCallRecords)) return output;
+  return {
+    ...output,
+    functionCallRecords: output.functionCallRecords.map(record => {
+      if (!record || !record.success) return record;
+      const { args, ...recordWithoutArgs } = record;
+      return recordWithoutArgs;
+    }),
+  };
+};
+
+// Results are re-read by the model at each of its next turns: no indentation.
 const makeToolResult = (value: any, isError: boolean): McpToolResult => {
   const { value: valueWithoutImages, images } = extractScreenshots(value);
   return {
@@ -431,7 +448,7 @@ const makeToolResult = (value: any, isError: boolean): McpToolResult => {
         text:
           typeof valueWithoutImages === 'string'
             ? valueWithoutImages
-            : JSON.stringify(valueWithoutImages, null, 2),
+            : JSON.stringify(valueWithoutImages),
       },
       ...images,
     ],
@@ -613,7 +630,14 @@ const callTool = async (
   const isGameplayTestReport =
     !!result && !!result.output && typeof result.output.status === 'string';
   return makeToolResult(
-    result ? { success: result.success, ...result.output } : report,
+    result
+      ? {
+          success: result.success,
+          ...(name === 'run_script'
+            ? withoutSuccessfulCallsArguments(result.output)
+            : result.output),
+        }
+      : report,
     !report.success && !isGameplayTestReport
   );
 };

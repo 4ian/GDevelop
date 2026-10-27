@@ -123,19 +123,10 @@ export type GuidedLessonsRecommendation = {
   type: 'guided-lessons',
   lessonsIds: string[],
 };
-export type QuickCustomizationRecommendation = {
-  type: 'quick-customization',
-  list: Array<{
-    type: 'example',
-    exampleSlug: string,
-    thumbnailTitleByLocale: MessageByLocale,
-  }>,
-};
 export type Recommendation =
   | GDevelopTutorialRecommendation
   | GuidedLessonsRecommendation
-  | PlanRecommendation
-  | QuickCustomizationRecommendation;
+  | PlanRecommendation;
 
 export type UserPublicProfile = {|
   id: string,

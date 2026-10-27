@@ -15,8 +15,7 @@ EventsBasedBehavior::EventsBasedBehavior()
     : AbstractEventsBasedEntity(
           "MyBehavior", gd::EventsFunctionsContainer::FunctionOwner::Behavior),
       sharedPropertyDescriptors(
-          gd::EventsFunctionsContainer::FunctionOwner::Behavior),
-      quickCustomizationVisibility(QuickCustomization::Visibility::Default) {}
+          gd::EventsFunctionsContainer::FunctionOwner::Behavior) {}
 
 void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
@@ -27,21 +26,17 @@ void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
     sharedPropertyDescriptors.SerializeFoldersTo(
         element.AddChild("sharedPropertiesFolderStructure"));
   }
-  if (quickCustomizationVisibility != QuickCustomization::Visibility::Default) {
-    element.SetStringAttribute(
-        "quickCustomizationVisibility",
-        quickCustomizationVisibility == QuickCustomization::Visibility::Visible
-            ? "visible"
-            : "hidden");
-  }
 }
 
 void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   objectType = element.GetStringAttribute("objectType");
+  // Shared properties are only serialized when there are some.
   sharedPropertyDescriptors.UnserializeElementsFrom(
-      "propertyDescriptor", element.GetChild("sharedPropertyDescriptors"));
+      "propertyDescriptor", element.HasChild("sharedPropertyDescriptors")
+                                ? element.GetChild("sharedPropertyDescriptors")
+                                : SerializerElement());
   if (element.HasChild("sharedPropertiesFolderStructure")) {
     sharedPropertyDescriptors.UnserializeFoldersFrom(
         project, element.GetChild("sharedPropertiesFolderStructure", 0));
@@ -49,14 +44,6 @@ void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
   // Compatibility with GD <= 5.6.251
   sharedPropertyDescriptors.AddMissingPropertiesInRootFolder();
   // end of compatibility code
-  if (element.HasChild("quickCustomizationVisibility")) {
-    quickCustomizationVisibility =
-        element.GetStringAttribute("quickCustomizationVisibility") == "visible"
-            ? QuickCustomization::Visibility::Visible
-            : QuickCustomization::Visibility::Hidden;
-  } else {
-    quickCustomizationVisibility = QuickCustomization::Visibility::Default;
-  }
 }
 
 }  // namespace gd

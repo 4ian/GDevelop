@@ -70,7 +70,7 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   },
   attachmentsForResources: {
     getFiles: async () => ({}),
-    storeResourceFiles: async () => true,
+    storeResourceFiles: async () => 'stored',
   },
   onObjectsModifiedOutsideEditor: jest.fn(),
   onEffectsModifiedOutsideEditor: jest.fn(),
@@ -78,6 +78,7 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   onWillDeleteGameplayTest: jest.fn(),
   onWillDeleteObject: jest.fn(),
   onExtensionsModifiedOutsideEditor: jest.fn(),
+  sendChangesToEditor: jest.fn(),
   ensureExtensionsUpToDate: jest.fn(() => Promise.resolve()),
   // Without a project there is no extension to reload.
   reloadExtensionMetadata: jest.fn(),

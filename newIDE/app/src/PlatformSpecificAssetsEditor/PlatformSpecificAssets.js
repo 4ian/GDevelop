@@ -256,7 +256,7 @@ const PlatformSpecificAssets = ({
               );
             }}
             helperMarkdownText={i18n._(
-              t`The image should be at least 864x864px, and the logo must fit [within a circle of 576px](https://developer.android.com/guide/topics/ui/splash-screen#splash_screen_dimensions). Transparent borders are automatically added when generated to help ensuring `
+              t`The image should be at least 864x864px, and the logo must fit [within a circle of 576px](https://developer.android.com/guide/topics/ui/splash-screen#splash_screen_dimensions). Transparent borders are automatically added when generated to help ensure the logo is not cropped.`
             )}
             disabled={isLoading}
           />

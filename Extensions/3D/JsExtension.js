@@ -252,6 +252,38 @@ module.exports = {
 
       base3D
         .addExpression(
+          'DistanceToPosition3D',
+          _('Distance between an object and a position (3D)'),
+          _(
+            'Return the distance between the center of the object and a position, on the X, Y and Z axes. To ignore Z, use ‘Distance between an object and a position (2D)’.'
+          ),
+          _('Position'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('X position'), '', false)
+        .addParameter('number', _('Y position'), '', false)
+        .addParameter('number', _('Z position'), '', false)
+        .setFunctionName('getDistanceToPosition3D');
+
+      base3D
+        .addExpression(
+          'Distance3D',
+          _('Distance between two objects (3D)'),
+          _(
+            'Return the distance between the centers of the object and another object, on the X, Y and Z axes (a 2D object is at a Z of 0). To ignore Z, use ‘Distance between two objects (2D)’.'
+          ),
+          _('Position'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('objectPtr', _('Other object'), '', false)
+        .setFunctionName('getDistanceToObject3D');
+
+      base3D
+        .addExpression(
           'ForwardX',
           _('Forward vector X component'),
           _('Return the object forward vector X component.'),
@@ -1047,7 +1079,7 @@ module.exports = {
             'Enabling texture transparency has an impact on rendering performance.'
           )
         )
-        .setGroup(_('Texture'));
+        .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('facesOrientation')
@@ -1092,7 +1124,7 @@ module.exports = {
         .setValue(objectContent.tint || '255;255;255')
         .setType('Color')
         .setLabel(_('Tint'))
-        .setGroup(_('Texture'));
+        .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('frontFaceResourceName')
@@ -2299,6 +2331,57 @@ module.exports = {
         .setType('choice')
         .setGroup(_('Shadows'));
       properties
+        .getOrCreate('shadowRenderingMode')
+        .setValue('centeredAroundCamera')
+        .addChoice('fittedToCameraView', _('Fitted to camera view (default)'))
+        .addChoice(
+          'centeredAroundCamera',
+          _("Centered around camera (legacy - don't use anymore)")
+        )
+        .setLabel(_('Rendering mode'))
+        .setDescription(
+          _(
+            'Fitted to camera view draws shadows only for what the camera sees, up to the shadow distance, for sharper shadows. The legacy mode will be removed in the future.'
+          )
+        )
+        .setType('choice')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowDistance')
+        .setValue('2000')
+        .setLabel(_('Shadow distance'))
+        .setDescription(
+          _(
+            'Distance from the camera up to which shadows are drawn. The smaller it is, the sharper shadows are. Not used by the legacy rendering mode.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowIntensity')
+        .setValue('1')
+        .setLabel(_('Shadow intensity'))
+        .setDescription(
+          _(
+            'How dark the shadows are, from 0 (no shadow) to 1 (only lit by the other lights).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowSoftness')
+        .setValue('1')
+        .setLabel(_('Shadow softness'))
+        .setDescription(
+          _(
+            'How blurry the edges of shadows are, in texels of the shadow map. It has no impact on performance.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
         .getOrCreate('minimumShadowBias')
         .setValue('0')
         .setLabel(_('Shadow bias'))
@@ -2314,14 +2397,24 @@ module.exports = {
         .getOrCreate('frustumSize')
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))
+        .setDescription(
+          _(
+            'Size of the area around the camera where shadows are drawn. Only used by the legacy rendering mode.'
+          )
+        )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))
-        .setAdvanced(true);
+        .setDeprecated(true);
       properties
         .getOrCreate('distanceFromCamera')
         .setValue('1500')
         .setLabel(_("Distance from layer's camera"))
+        .setDescription(
+          _(
+            'How far towards the sun objects can be and still cast shadows into the view. Objects farther than this do not cast shadows.'
+          )
+        )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))
@@ -2402,15 +2495,15 @@ module.exports = {
         .addExtraInfo('image')
         .setLabel(_('Left face (X-)'));
       properties
-        .getOrCreate('bottomFaceResourceName')
-        .setType('resource')
-        .addExtraInfo('image')
-        .setLabel(_('Bottom face (Y+)'));
-      properties
         .getOrCreate('topFaceResourceName')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Top face (Y-)'));
+        .setLabel(_('Top face (Y+)'));
+      properties
+        .getOrCreate('bottomFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Bottom face (Y-)'));
       properties
         .getOrCreate('frontFaceResourceName')
         .setType('resource')
@@ -2421,12 +2514,51 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Back face (Z-)'));
+      properties
+        .getOrCreate('top')
+        .setValue('Z+')
+        .setLabel(_('3D world top'))
+        .setType('choice')
+        .addChoice('Z+', _('Z+ (most 3D games)'))
+        .addChoice('Y-', _('Y- (side view 3D games)'))
+        .addChoice(
+          'Legacy',
+          _('Legacy Z+ (deprecated, faces must be rotated by hand)')
+        )
+        .setGroup(_('Orientation'))
+        .setDescription(
+          _(
+            'With Z+ or Y-, the faces are the ones of a usual cube map, as exported by most tools.'
+          )
+        );
+      properties
+        .getOrCreate('environmentIntensity')
+        .setValue('1')
+        .setLabel(_('Environment light intensity'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Intensity of the light given by the skybox to 3D boxes and 3D models using a standard material. 0 disables it.'
+          )
+        );
+      properties
+        .getOrCreate('backgroundIntensity')
+        .setValue('1')
+        .setLabel(_('Background brightness'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Brightness of the skybox images shown in the background (1 shows them as they are).'
+          )
+        );
     }
     {
       const effect = extension
         .addEffect('HueAndSaturation')
         .setFullName(_('Hue and saturation'))
-        .setDescription(_('Adjust hue and saturation.'))
+        .setDescription(
+          _('Adjust hue and saturation. Put it after the tone mapping, if any.')
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/HueAndSaturationEffect.js');
@@ -2449,7 +2581,9 @@ module.exports = {
       const effect = extension
         .addEffect('Exposure')
         .setFullName(_('Exposure'))
-        .setDescription(_('Adjust exposure.'))
+        .setDescription(
+          _('Adjust exposure. Put it before the tone mapping, if any.')
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/ExposureEffect.js');
@@ -2463,37 +2597,79 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('ToneMapping')
+        .setFullName(_('Tone mapping'))
+        .setDescription(
+          _(
+            'Map the colors of the scene to the screen like a camera, to keep details in the brightest parts. Put it after the effects on the light of the scene (exposure, depth of field, bloom) and before the color adjustments (brightness and contrast, hue and saturation).'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ToneMappingEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('mode')
+        .setValue('Neutral')
+        .setLabel(_('Mode'))
+        .setType('choice')
+        .addChoice('Neutral', _('Neutral (keeps the colors of the scene)'))
+        .addChoice('ACESFilmic', _('ACES Filmic (cinematic, contrasted)'))
+        .addChoice('AgX', _('AgX (realistic, soft)'))
+        .addChoice('Reinhard', _('Reinhard'))
+        .addChoice('Cineon', _('Cineon'));
+      properties
+        .getOrCreate('exposure')
+        .setValue('1')
+        .setLabel(_('Exposure'))
+        .setType('number')
+        .setDescription(_('Brightness of the scene before the tone mapping.'));
+    }
+    {
+      const effect = extension
         .addEffect('Bloom')
         .setFullName(_('Bloom'))
-        .setDescription(_('Apply a bloom effect.'))
+        .setDescription(
+          _(
+            'Make the brightest parts of the scene glow. Put it before the tone mapping, if any.'
+          )
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/BloomEffect.js');
       const properties = effect.getProperties();
       properties
         .getOrCreate('strength')
-        .setValue('1')
+        .setValue('0.5')
         .setLabel(_('Strength'))
         .setType('number')
         .setDescription(_('Between 0 and 3'));
       properties
         .getOrCreate('radius')
-        .setValue('0')
+        .setValue('0.4')
         .setLabel(_('Radius'))
         .setType('number')
         .setDescription(_('Between 0 and 1'));
       properties
         .getOrCreate('threshold')
-        .setValue('0')
+        .setValue('0.85')
         .setLabel(_('Threshold'))
         .setType('number')
-        .setDescription(_('Between 0 and 1'));
+        .setDescription(
+          _(
+            'Brightness from which pixels glow, between 0 and 1. With 0, the whole scene glows.'
+          )
+        );
     }
     {
       const effect = extension
         .addEffect('BrightnessAndContrast')
         .setFullName(_('Brightness and contrast.'))
-        .setDescription(_('Adjust brightness and contrast.'))
+        .setDescription(
+          _(
+            'Adjust brightness and contrast. Put it after the tone mapping, if any.'
+          )
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/BrightnessAndContrastEffect.js');
@@ -2510,6 +2686,122 @@ module.exports = {
         .setLabel(_('Contrast'))
         .setType('number')
         .setDescription(_('Between -1 and 1'));
+    }
+    {
+      const effect = extension
+        .addEffect('N8AO')
+        .setFullName(_('Ambient occlusion'))
+        .setDescription(
+          _(
+            'Darken the creases, holes and corners where the ambient light is blocked by nearby surfaces.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/N8AOEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('radius')
+        .setValue('100')
+        .setLabel(_('Radius'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _(
+            'Distance up to which surfaces darken each other. A radius close to the size of the objects gives the best results.'
+          )
+        );
+      properties
+        .getOrCreate('intensity')
+        .setValue('3')
+        .setLabel(_('Intensity'))
+        .setType('number');
+      properties
+        .getOrCreate('distanceFalloff')
+        .setValue('1')
+        .setLabel(_('Distance falloff'))
+        .setType('number')
+        .setDescription(
+          _(
+            'How fast the ambient occlusion fades away with distance in proportion to its radius.'
+          )
+        )
+        .setAdvanced(true);
+      properties
+        .getOrCreate('color')
+        .setValue('0;0;0')
+        .setLabel(_('Color'))
+        .setType('color')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('quality')
+        .setValue('Performance')
+        .setLabel(_('Quality'))
+        .setType('choice')
+        .addChoice('Performance', _('Fastest (recommended for mobile)'))
+        .addChoice('Low', _('Low'))
+        .addChoice('Medium', _('Medium'))
+        .addChoice('High', _('High'))
+        .addChoice('Ultra', _('Ultra (slowest)'))
+        .setDescription(
+          _(
+            'Higher qualities use more samples, giving less noisy shadows but being slower to render.'
+          )
+        );
+    }
+    {
+      const effect = extension
+        .addEffect('DepthOfField')
+        .setFullName(_('Depth of field'))
+        .setDescription(
+          _(
+            'Blur what is closer or further than the focus distance, like a camera lens. Put it before the bloom and the tone mapping, if any.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/DepthOfFieldEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('focusDistance')
+        .setValue('500')
+        .setLabel(_('Focus distance'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _('Distance from the camera where the image is the sharpest.')
+        );
+      properties
+        .getOrCreate('focusRange')
+        .setValue('600')
+        .setLabel(_('Focus range'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _('Depth around the focus distance staying fully sharp.')
+        );
+      properties
+        .getOrCreate('transitionDistance')
+        .setValue('1500')
+        .setLabel(_('Transition distance'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _(
+            'Distance after the focus range over which the blur increases up to its maximum.'
+          )
+        );
+      properties
+        .getOrCreate('maxBlur')
+        .setValue('6')
+        .setLabel(_('Maximum blur'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _(
+            'Blur radius of the most out-of-focus parts, in pixels of the game resolution.'
+          )
+        );
     }
     // Don't forget to update the alert condition in Model3DEditor.js when
     // adding a new light.
@@ -3440,7 +3732,13 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        return 'JsPlatform/Extensions/3d_model.svg';
+        const modelResourceName = gd
+          .castObject(objectConfiguration, gd.Model3DObjectConfiguration)
+          .getModelResourceName();
+        const previewUrl =
+          resourcesLoader.getModel3DPreviewUrl &&
+          resourcesLoader.getModel3DPreviewUrl(project, modelResourceName);
+        return previewUrl || 'JsPlatform/Extensions/3d_model.svg';
       }
 
       getOriginX() {

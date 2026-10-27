@@ -178,6 +178,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       name: 'Scene1',
       stopSoundsOnStartup: false,
       title: '',
+      renderer3DWorldScale: 100,
       behaviorsSharedData: [],
       objects: objects || [
         createSpriteData({ name: 'MyObject', image: 'ResourceA' }),
@@ -199,7 +200,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
-      }
+      },
     };
   };
 
@@ -222,7 +223,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       objects: objects || [
         createSpriteData({ name: 'MyChildObject', image: 'ResourceA' }),
       ],
-        objectsGroups: [],
+      objectsGroups: [],
       layers: [baseLayer],
       areaMinX: 0,
       areaMinY: 0,
@@ -246,7 +247,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
-      }
+      },
     };
   };
 
@@ -363,6 +364,199 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       runtimeGame
     );
     expect(scene.getInstancesOf('MyObject')[0].isVisible()).to.be(true);
+  });
+
+  it('can set then remove the custom size of an instance at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const instance = scene.getInstancesOf('MyObject')[0];
+    const originalWidth = instance.getOriginalWidth();
+    const originalHeight = instance.getOriginalHeight();
+    expect(originalWidth).not.to.be(0);
+    expect(instance.getWidth()).to.be(originalWidth);
+    expect(instance.getHeight()).to.be(originalHeight);
+
+    const customSizeProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [
+            {
+              persistentUuid: '1',
+              x: 111,
+              y: 123,
+              customSize: true,
+              width: 50,
+              height: 60,
+            },
+          ],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      customSizeProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.getWidth()).to.be(50);
+    expect(instance.getHeight()).to.be(60);
+
+    // Remove the custom size (like an undo in the editor would do).
+    const defaultSizeProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      customSizeProjectData,
+      defaultSizeProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.getWidth()).to.be(originalWidth);
+    expect(instance.getHeight()).to.be(originalHeight);
+  });
+
+  it('can change then restore the opacity of an instance at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const instance = scene.getInstancesOf('MyObject')[0];
+    if (!(instance instanceof gdjs.SpriteRuntimeObject)) {
+      throw new Error("Couldn't instantiate a sprite for testing.");
+    }
+    expect(instance.getOpacity()).to.be(255);
+
+    const translucentProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123, opacity: 128 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      translucentProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.getOpacity()).to.be(128);
+
+    // Restore the default opacity: the attribute is absent from the data,
+    // like the serializer produces.
+    const opaqueAgainProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      translucentProjectData,
+      opaqueAgainProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.getOpacity()).to.be(255);
+  });
+
+  it('can flip then unflip an instance at hot-reload', async () => {
+    const oldProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(oldProjectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    const instance = scene.getInstancesOf('MyObject')[0];
+    if (!(instance instanceof gdjs.SpriteRuntimeObject)) {
+      throw new Error("Couldn't instantiate a sprite for testing.");
+    }
+    expect(instance.isFlippedX()).to.be(false);
+    expect(instance.isFlippedY()).to.be(false);
+
+    const flippedProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [
+            {
+              persistentUuid: '1',
+              x: 111,
+              y: 123,
+              flippedX: true,
+              flippedY: true,
+            },
+          ],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      oldProjectData,
+      flippedProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.isFlippedX()).to.be(true);
+    expect(instance.isFlippedY()).to.be(true);
+
+    // Unflip: the attributes are absent from the data, like the serializer
+    // produces.
+    const unflippedProjectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1', x: 111, y: 123 }],
+        }),
+      ],
+    });
+    await hotReloader._hotReloadRuntimeGame(
+      flippedProjectData,
+      unflippedProjectData,
+      [],
+      runtimeGame
+    );
+    expect(instance.isFlippedX()).to.be(false);
+    expect(instance.isFlippedY()).to.be(false);
   });
 
   it('keeps instances hidden at start visible when in the in-game editor', async () => {

@@ -10,6 +10,7 @@ import {
   type ExtensionDependency,
 } from '../Utils/GDevelopServices/Extension';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { markEffectIfLegacySkybox } from '../Utils/LegacySkyboxOrientation';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
@@ -164,6 +165,7 @@ export const installEffectAsset = ({
     const value = stringParameters[name];
     effect.setStringParameter(name, resourceNewNames[value] || value);
   });
+  markEffectIfLegacySkybox(effect);
   return effect;
 };
 

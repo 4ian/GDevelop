@@ -57,6 +57,11 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
   directionalLight.setDoubleParameter('minimumShadowBias', 0);
   directionalLight.setDoubleParameter('distanceFromCamera', 1500);
   directionalLight.setDoubleParameter('frustumSize', 4000);
+  directionalLight.setStringParameter(
+    'shadowRenderingMode',
+    'fittedToCameraView'
+  );
+  directionalLight.setDoubleParameter('shadowDistance', 2000);
 
   const ambientLight = layer
     .getEffects()
@@ -81,8 +86,6 @@ const getCompositeSlug = (
   creationSource: NewProjectCreationSource,
   exampleShortHeaderSlug: string
 ) => {
-  if (creationSource === 'quick-customization')
-    return `qc-${exampleShortHeaderSlug}`;
   if (creationSource === 'ai-agent-request')
     return `ai-${exampleShortHeaderSlug}`;
   if (creationSource === 'course-chapter')

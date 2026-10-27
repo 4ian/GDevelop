@@ -17,7 +17,6 @@ type Props = {|
     skipNewVersionWarning: boolean,
   |}) => Promise<?FileMetadata>,
   project: ?gdProject,
-  isInQuickCustomization: boolean,
 |};
 
 const ONE_MINUTE = 60 * 1000;
@@ -56,7 +55,6 @@ export const getUnsavedChangesAmount = (
 const useSaveReminder = ({
   onSave,
   project,
-  isInQuickCustomization,
 }: Props): (() => React.MixedElement) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const { currentlyRunningInAppTutorial } = React.useContext(
@@ -76,7 +74,6 @@ const useSaveReminder = ({
 
       if (
         !displaySaveReminderPreference.activated ||
-        isInQuickCustomization ||
         currentlyRunningInAppTutorial ||
         !project
       ) {

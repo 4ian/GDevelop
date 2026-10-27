@@ -12,7 +12,6 @@ import {
   registerGame,
   type Game,
 } from '../../../../Utils/GDevelopServices/Game';
-import { type QuickCustomizationRecommendation } from '../../../../Utils/GDevelopServices/User';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
 import { ColumnStackLayout } from '../../../../UI/Layout';
@@ -31,13 +30,11 @@ import { type ResourceManagementProps } from '../../../../ResourcesList/Resource
 import Text from '../../../../UI/Text';
 import Grid from '@material-ui/core/Grid';
 import WalletWidget from '../../../../GameDashboard/Wallet/WalletWidget';
-import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/QuickCustomizationGameTiles';
 import {
   type NewProjectSetup,
   type ExampleProjectSetup,
 } from '../../../../ProjectCreation/NewProjectSetupDialog';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import UrlStorageProvider from '../../../../ProjectsStorage/UrlStorageProvider';
 import {
   type WindowSizeType,
   useResponsiveWindowSize,
@@ -174,7 +171,6 @@ const CreateSection = ({
   const {
     profile,
     getAuthorizationHeader,
-    recommendations,
     subscription,
     limits,
   } = authenticatedUser;
@@ -189,17 +185,6 @@ const CreateSection = ({
   );
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
-  );
-  // $FlowIgnore
-  const quickCustomizationRecommendation: ?QuickCustomizationRecommendation = React.useMemo(
-    () => {
-      return recommendations
-        ? recommendations.find(
-            recommendation => recommendation.type === 'quick-customization'
-          )
-        : null;
-    },
-    [recommendations]
   );
   const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
   const isMobileOrMediumWidth =
@@ -669,40 +654,6 @@ const CreateSection = ({
                   setFilter={setGamesListFilter}
                 />
               )}
-              {gamesListFilter !== 'deleted' &&
-                quickCustomizationRecommendation && (
-                  <ColumnStackLayout noMargin>
-                    <Line noMargin>
-                      <Text size="block-title">
-                        <Trans>Remix a game in 2 minutes</Trans>
-                      </Text>
-                    </Line>
-                    <QuickCustomizationGameTiles
-                      onSelectExampleShortHeader={async exampleShortHeader => {
-                        const projectIsClosed = await askToCloseProject();
-                        if (!projectIsClosed) {
-                          return;
-                        }
-
-                        const newProjectSetup: NewProjectSetup = {
-                          storageProvider: UrlStorageProvider,
-                          saveAsLocation: null,
-                          openQuickCustomizationDialog: true,
-                          creationSource: 'quick-customization',
-                        };
-                        onCreateProjectFromExample({
-                          exampleShortHeader,
-                          newProjectSetup,
-                          i18n,
-                        });
-                      }}
-                      quickCustomizationRecommendation={
-                        quickCustomizationRecommendation
-                      }
-                      disabled={isLoading}
-                    />
-                  </ColumnStackLayout>
-                )}
               {gamesListFilter !== 'deleted' &&
                 !hasAProjectOpenedNowOrRecentlyOrGameSaved && (
                   <ColumnStackLayout noMargin>

@@ -8,12 +8,10 @@ const gd: libGDevelop = global.gd;
 
 /**
  * The `scope` argument shared by the editor functions: which container of the
- * project a call applies to (a scene, the instances of an external layout, an
- * extension, a custom object or behavior, a variant of a custom object).
- * Mirrors `gdevelop-tool-scope.js` in the backend (GDevelop-services): keep
- * the rules and the messages in sync.
- *
- * `external_events` is reserved: no function accepts it yet.
+ * project a call applies to (a scene, the instances of an external layout,
+ * external events, an extension, a custom object or behavior, a variant of a
+ * custom object). Mirrors `gdevelop-tool-scope.js` in the backend
+ * (GDevelop-services): keep the rules and the messages in sync.
  */
 export type ToolScopeType =
   | 'project'
@@ -46,6 +44,7 @@ export type ResolvedScope = {|
   label: string,
   layout: ?gdLayout,
   externalLayout: ?gdExternalLayout,
+  externalEvents: ?gdExternalEvents,
   eventsFunctionsExtension: ?gdEventsFunctionsExtension,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
@@ -110,8 +109,6 @@ const SCOPE_FIELDS_BY_TYPE: { [ToolScopeType]: Array<string> } = {
 
 export const BOTH_GIVEN_DISAGREE_MESSAGE =
   'Both scene_name and scope were given and they disagree: pass only scope.';
-export const EXTERNAL_EVENTS_NOT_SUPPORTED_MESSAGE =
-  'external_events is not supported yet';
 // Structural edits (children, behaviors, variables of children, groups) only
 // happen on the default variant: the named variants inherit them.
 export const NAMED_VARIANT_REJECTED_MESSAGE =
@@ -176,9 +173,6 @@ export const parseScopeArgument = (
     );
   }
   const type: ToolScopeType = (rawScope.type: any);
-  if (type === 'external_events') {
-    throw new Error(EXTERNAL_EVENTS_NOT_SUPPORTED_MESSAGE);
-  }
   if (!allowedTypes.includes(type)) {
     throw new Error(
       `\`scope.type\` "${type}" is not accepted here: use one of ${listAllowedTypes(
@@ -399,6 +393,7 @@ const makeEmptyResolvedScope = (scope: ToolScope): ResolvedScope => ({
   label: getScopeLabel(scope),
   layout: null,
   externalLayout: null,
+  externalEvents: null,
   eventsFunctionsExtension: null,
   eventsBasedBehavior: null,
   eventsBasedObject: null,
@@ -410,6 +405,35 @@ const makeEmptyResolvedScope = (scope: ToolScope): ResolvedScope => ({
   layersContainer: null,
   readOnlyReason: null,
 });
+
+const hasLinkTo = (eventsList: gdEventsList, target: string): boolean => {
+  for (let i = 0; i < eventsList.getEventsCount(); i++) {
+    const event = eventsList.getEventAt(i);
+    if (
+      event.getType() === 'BuiltinCommonInstructions::Link' &&
+      gd.asLinkEvent(event).getTarget() === target
+    )
+      return true;
+    if (event.canHaveSubEvents() && hasLinkTo(event.getSubEvents(), target))
+      return true;
+  }
+  return false;
+};
+
+const findSceneOfExternalEvents = (
+  project: gdProject,
+  externalEvents: gdExternalEvents
+): ?gdLayout => {
+  const associatedSceneName = externalEvents.getAssociatedLayout();
+  if (associatedSceneName && project.hasLayoutNamed(associatedSceneName)) {
+    return project.getLayout(associatedSceneName);
+  }
+  for (let i = 0; i < project.getLayoutsCount(); i++) {
+    const layout = project.getLayoutAt(i);
+    if (hasLinkTo(layout.getEvents(), externalEvents.getName())) return layout;
+  }
+  return null;
+};
 
 /**
  * Resolve a scope to the containers of the project it designates, or a
@@ -469,7 +493,29 @@ export const resolveScope = (
     };
   }
   if (scope.type === 'external_events') {
-    return makeFailure(EXTERNAL_EVENTS_NOT_SUPPORTED_MESSAGE);
+    const externalEventsName = scope.external_events_name || '';
+    if (!project.hasExternalEventsNamed(externalEventsName)) {
+      return makeFailure(
+        `External events not found: "${externalEventsName}". External events in this project: ${listNames(
+          mapFor(0, project.getExternalEventsCount(), i =>
+            project.getExternalEventsAt(i).getName()
+          )
+        )}.`
+      );
+    }
+    const externalEvents = project.getExternalEvents(externalEventsName);
+    // Their events use the objects and variables of a scene: the associated
+    // one, like in the events editor, or else the first scene linking to them.
+    // None when they are not used anywhere: they can still be read.
+    const layout = findSceneOfExternalEvents(project, externalEvents);
+    return {
+      ...base,
+      externalEvents,
+      layout,
+      objectsContainer: layout ? layout.getObjects() : null,
+      globalObjectsContainer: layout ? project.getObjects() : null,
+      layersContainer: layout ? layout.getLayers() : null,
+    };
   }
 
   // The four extension scopes.

@@ -62,12 +62,12 @@ namespace gdjs {
           updatePreRender(target: gdjs.EffectsTarget): any {}
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this.light.intensity = value;
+              this.light.intensity = value * Math.PI;
             }
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'intensity') {
-              return this.light.intensity;
+              return this.light.intensity / Math.PI;
             }
             return 0;
           }

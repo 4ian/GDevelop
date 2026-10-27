@@ -357,6 +357,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
           this.props.onDeleteEventsBasedObjectVariant
         }
         onEffectAdded={this.props.onEffectAdded}
+        onLayerRenamedOrRemoved={this.props.onLayerRenamedOrRemoved}
         onObjectListsModified={this.props.onObjectListsModified}
         onObjectEdited={(objectWithContext, hasResourceChanged) =>
           this.props.onSceneObjectEdited(

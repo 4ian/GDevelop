@@ -83,6 +83,11 @@ const devTools = !!args['dev-tools'];
 // See registerGdideProtocol (used for HTML modules support)
 protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 
+// On computers having an integrated and a discrete graphics card (most gaming
+// laptops), Chromium uses the integrated one by default: the 3D editor and the
+// previews would run a lot slower than they could. Must be set before the app is ready.
+app.commandLine.appendSwitch('force_high_performance_gpu');
+
 // Notifications on Microsoft Windows platforms show the app user model id.
 // If not set, defaults to `electron.app.{app.name}`.
 if (process.platform === 'win32') {

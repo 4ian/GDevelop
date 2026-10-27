@@ -70,7 +70,7 @@ namespace gdjs {
           updatePreRender(target: gdjs.EffectsTarget): any {}
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this._light.intensity = value;
+              this._light.intensity = value * Math.PI;
             } else if (parameterName === 'elevation') {
               this._elevation = value;
               this.updateRotation();
@@ -81,7 +81,7 @@ namespace gdjs {
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'intensity') {
-              return this._light.intensity;
+              return this._light.intensity / Math.PI;
             } else if (parameterName === 'elevation') {
               return this._elevation;
             } else if (parameterName === 'rotation') {

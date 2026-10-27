@@ -6,11 +6,12 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
-#include "GDCore/Project/QuickCustomization.h"
 
 namespace gd {
 class Project;
@@ -75,6 +76,13 @@ class GD_CORE_API FunctionFolderOrFunction {
    * name or if any of the children does (recursive search).
    */
   bool HasFunctionNamed(const gd::String& name);
+
+  /**
+   * \brief Adds to the given set the names of all the functions found by
+   * HasFunctionNamed: the function represented by the instance, or the
+   * functions of the children (recursive search).
+   */
+  void AddFunctionNamesTo(std::unordered_set<gd::String>& functionNames) const;
 
   /**
    * \brief Returns the child instance holding the function with the given name
@@ -209,6 +217,15 @@ class GD_CORE_API FunctionFolderOrFunction {
  private:
   void DoUpdateGroupNameOfAllFunctions(const gd::String& groupPath);
   const gd::String GetGroupPath();
+
+  /**
+   * \brief Unserialize the instance, getting the functions from their name
+   * with `functionsByName`.
+   */
+  void DoUnserializeFrom(
+      const SerializerElement& element,
+      const std::unordered_map<gd::String, gd::EventsFunction*>&
+          functionsByName);
 
   static gd::FunctionFolderOrFunction badFunctionFolderOrFunction;
   static gd::String emptyGroupName;

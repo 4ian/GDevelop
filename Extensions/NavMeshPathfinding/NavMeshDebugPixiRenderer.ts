@@ -116,6 +116,17 @@ namespace gdjs {
       this.meshes.length = 0;
     }
 
+    /**
+     * Free the debug drawer from the WebAssembly memory.
+     */
+    dispose() {
+      this.removeFor3D();
+      if (this.debugDrawerUtils) {
+        this.debugDrawerUtils.dispose();
+        this.debugDrawerUtils = null;
+      }
+    }
+
     renderFor3D() {
       this.removeFor3D();
       if (!this.enabled || !this.obstaclesManager.is3D) {

@@ -5,17 +5,25 @@ import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.fl
 import { objectWithContextReactDndType } from '../ObjectsList';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import Text from '../UI/Text';
+import RaisedButton from '../UI/RaisedButton';
 import classes from './EmbeddedGameFrame.module.css';
 import { type DropTargetMonitor } from 'react-dnd';
 import { registerOpenedDialogsCountCallback } from '../UI/Dialog';
 import {
   getActiveEmbeddedGameFrameHoleRect,
   registerActiveEmbeddedGameFrameHoleCountCallback,
+  registerEmbeddedGameFrameHoleResizeCallback,
 } from './EmbeddedGameFrameHole';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useInGameEditorSettings } from './InGameEditorSettings';
 import { startNativeAppActivity } from '../Utils/NativeAppLifecycle';
 import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
+import {
+  registerInGameEditorQueryHandlers,
+  type InGameEditorRaycastRequest,
+  type InGameEditorRaycastResult,
+  type InGameEditorStatus,
+} from './InGameEditorQueries';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -196,14 +204,25 @@ const logSwitchingInfo = ({
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
   enabled: boolean,
+  // Switch the scene editors to the in-game editor.
+  onEnable: () => void,
   onLaunchPreviewForInGameEdition: ({|
     ...PreviewInGameEditorTarget,
     ...HotReloadSteps,
     editorCameraState3D: EditorCameraState | null,
   |}) => Promise<void>,
+  // Shown at the bottom of the game, above it (like indicators).
+  children?: React.Node,
 |};
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
+
+/**
+ * How long the game frame is given to tell the editor that it started, before offering
+ * to load it again. The game announces itself as soon as its code is loaded, before any
+ * resource is loaded, so this only has to cover the loading of the game code.
+ */
+const GAME_FRAME_START_TIMEOUT_MS = 15000;
 
 const noHotReloadSteps = {
   shouldReloadProjectData: false,
@@ -217,6 +236,8 @@ export const EmbeddedGameFrame = ({
   previewDebuggerServer,
   onLaunchPreviewForInGameEdition,
   enabled,
+  onEnable,
+  children,
 }: Props): React.MixedElement => {
   const [
     previewIndexHtmlLocation,
@@ -226,6 +247,15 @@ export const EmbeddedGameFrame = ({
     isPointerEventsPrevented,
     setIsPointerEventsPrevented,
   ] = React.useState(false);
+  // The preview location is identical for every preview of a session, so it can't be
+  // used on its own to navigate the iframe again: this identifies a single load of the
+  // frame, and changing it is what actually reloads the game.
+  const [gameFrameLoadId, setGameFrameLoadId] = React.useState<number>(0);
+  const [isGameFrameStarted, setIsGameFrameStarted] = React.useState(false);
+  const [
+    hasGameFrameStartTimedOut,
+    setHasGameFrameStartTimedOut,
+  ] = React.useState(false);
   const iframeRef = React.useRef<HTMLIFrameElement | null>(null);
   // $FlowFixMe[incompatible-type]
   const hotReloadSteps = React.useRef<HotReloadSteps>(noHotReloadSteps);
@@ -233,6 +263,7 @@ export const EmbeddedGameFrame = ({
     null
   );
   const isPreviewOngoing = React.useRef<boolean>(false);
+  const hasGameFrameSomethingToLoad = React.useRef<boolean>(false);
   const cameraStates = React.useRef<Map<string, EditorCameraState>>(
     new Map<string, EditorCameraState>()
   );
@@ -243,6 +274,27 @@ export const EmbeddedGameFrame = ({
     })
   );
   const hasSomeDialogOpen = React.useRef<boolean>(false);
+
+  // Let the changes that were made while a preview was launching be applied, now that
+  // the game frame settled (the game started, or it was given up on).
+  const settleOngoingPreview = React.useCallback(() => {
+    if (!isPreviewOngoing.current) return;
+    isPreviewOngoing.current = false;
+
+    if (
+      isHotReloadNeeded(hotReloadSteps.current) &&
+      lastPreviewContainer.current
+    ) {
+      switchToSceneEdition({
+        ...lastPreviewContainer.current,
+        shouldReloadProjectData: false,
+        shouldReloadLibraries: false,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['post-launch-preview'],
+      });
+    }
+  }, []);
 
   // The game is displayed in an iframe, which is a separate document: it only receives
   // the keyboard events if it has the focus. Give it the focus as soon as it is hovered,
@@ -262,6 +314,57 @@ export const EmbeddedGameFrame = ({
 
     iframe.contentWindow.focus();
   }, []);
+
+  // Send the part of the game frame that is not covered by the editor panels,
+  // either with a command changing the view or so that the in-game editor
+  // can use it later (e.g. to focus on the selection).
+  const sendVisibleScreenArea = React.useCallback(
+    (command: ChangeViewPositionCommand | 'setVisibleScreenArea') => {
+      const iframe = iframeRef.current;
+      if (!iframe || !previewDebuggerServer) return;
+
+      const embeddedGameFrameRect = iframe.getBoundingClientRect();
+      const embeddedGameFrameHoleRect = getActiveEmbeddedGameFrameHoleRect();
+      if (
+        !embeddedGameFrameHoleRect ||
+        !embeddedGameFrameRect.width ||
+        !embeddedGameFrameRect.height
+      )
+        return;
+
+      const visibleScreenArea = {
+        minX:
+          (embeddedGameFrameHoleRect.left - embeddedGameFrameRect.left) /
+          embeddedGameFrameRect.width,
+        minY:
+          (embeddedGameFrameHoleRect.top - embeddedGameFrameRect.top) /
+          embeddedGameFrameRect.height,
+        maxX:
+          (embeddedGameFrameHoleRect.right - embeddedGameFrameRect.left) /
+          embeddedGameFrameRect.width,
+        maxY:
+          (embeddedGameFrameHoleRect.bottom - embeddedGameFrameRect.top) /
+          embeddedGameFrameRect.height,
+      };
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command,
+            payload: { visibleScreenArea },
+          });
+        });
+    },
+    [previewDebuggerServer]
+  );
+
+  React.useEffect(
+    () =>
+      registerEmbeddedGameFrameHoleResizeCallback(() =>
+        sendVisibleScreenArea('setVisibleScreenArea')
+      ),
+    [sendVisibleScreenArea]
+  );
 
   const inGameEditorSettings = useInGameEditorSettings();
   React.useEffect(
@@ -287,6 +390,14 @@ export const EmbeddedGameFrame = ({
         options: AttachToPreviewOptions
       ): void => {
         setPreviewIndexHtmlLocation(options.previewIndexHtmlLocation);
+        // No game is running in the frame, so this is a new game to load rather than a
+        // hot-reload: navigate the iframe again. Without this, a load that failed (a
+        // navigation that never completed, files that could not be served...) would
+        // stay failed forever, as the location alone never changes.
+        if (!isGameFrameStarted) {
+          setGameFrameLoadId(loadId => loadId + 1);
+        }
+        hasGameFrameSomethingToLoad.current = true;
         const iframe = iframeRef.current;
         if (iframe) {
           iframe.contentWindow.focus();
@@ -397,20 +508,17 @@ export const EmbeddedGameFrame = ({
             reasons,
             editorCameraState3D: cameraStates.current.get(editorId) || null,
           }).finally(() => {
-            isPreviewOngoing.current = false;
-            if (
-              isHotReloadNeeded(hotReloadSteps.current) &&
-              lastPreviewContainer.current
-            ) {
-              switchToSceneEdition({
-                ...lastPreviewContainer.current,
-                shouldReloadProjectData: false,
-                shouldReloadLibraries: false,
-                shouldReloadResources: false,
-                shouldHardReload: false,
-                reasons: ['post-launch-preview'],
-              });
+            // A game that is (re)loading must tell the editor it started before
+            // anything else is exported: an export erases the files it is still
+            // loading, which makes it crash while starting. The preview is then
+            // settled when the game starts - or when it is given up on.
+            const isGameRunningInFrame = !!previewDebuggerServer.getExistingEmbeddedGameFrameDebuggerIds()
+              .length;
+            if (!isGameRunningInFrame && hasGameFrameSomethingToLoad.current) {
+              return;
             }
+
+            settleOngoingPreview();
           });
         } else {
           logSwitchingInfo({
@@ -434,6 +542,7 @@ export const EmbeddedGameFrame = ({
                 editorCamera3D: cameraStates.current.get(editorId),
               });
             });
+          sendVisibleScreenArea('setVisibleScreenArea');
         }
       };
       onSwitchInGameEditorIfNoHotReloadIsNeeded = ({
@@ -476,52 +585,146 @@ export const EmbeddedGameFrame = ({
               cameraState3D: cameraStates.current.get(editorId),
             });
           });
+        sendVisibleScreenArea('setVisibleScreenArea');
       };
       onChangeViewPosition = (command: ChangeViewPositionCommand) => {
-        const iframe = iframeRef.current;
-        if (!iframe) return;
-
-        const embeddedGameFrameRect = iframe.getBoundingClientRect();
-        const embeddedGameFrameHoleRect = getActiveEmbeddedGameFrameHoleRect();
-        if (!embeddedGameFrameHoleRect || !embeddedGameFrameRect) return;
-
-        if (!previewDebuggerServer) return;
-        previewDebuggerServer
-          .getExistingEmbeddedGameFrameDebuggerIds()
-          .forEach(debuggerId => {
-            previewDebuggerServer.sendMessage(debuggerId, {
-              command,
-              payload: {
-                visibleScreenArea: {
-                  minX:
-                    (embeddedGameFrameHoleRect.left -
-                      embeddedGameFrameRect.left) /
-                    embeddedGameFrameRect.width,
-                  minY:
-                    (embeddedGameFrameHoleRect.top -
-                      embeddedGameFrameRect.top) /
-                    embeddedGameFrameRect.height,
-                  maxX:
-                    (embeddedGameFrameHoleRect.right -
-                      embeddedGameFrameRect.left) /
-                    embeddedGameFrameRect.width,
-                  maxY:
-                    (embeddedGameFrameHoleRect.bottom -
-                      embeddedGameFrameRect.top) /
-                    embeddedGameFrameRect.height,
-                },
-              },
-            });
-          });
+        sendVisibleScreenArea(command);
       };
+      registerInGameEditorQueryHandlers({
+        enable: onEnable,
+        update: (): InGameEditorStatus => {
+          if (!previewDebuggerServer || !enabled) return 'disabled';
+          if (isPreviewOngoing.current) return 'updating';
+          if (isHotReloadNeeded(hotReloadSteps.current)) {
+            // The changes wait for an editor to be shown: apply them to the
+            // one shown now.
+            if (lastPreviewContainer.current && onSwitchToSceneEdition) {
+              onSwitchToSceneEdition({
+                ...lastPreviewContainer.current,
+                shouldReloadProjectData: false,
+                shouldReloadLibraries: false,
+                shouldReloadResources: false,
+                shouldHardReload: false,
+                reasons: ['in-game-editor-update-requested'],
+              });
+            }
+            return 'updating';
+          }
+          return 'up-to-date';
+        },
+        raycast: async (
+          request: InGameEditorRaycastRequest
+        ): Promise<InGameEditorRaycastResult> => {
+          if (!previewDebuggerServer || !enabled)
+            throw new Error('The in-game editor is not used.');
+          // Many rays can take seconds on a large scene.
+          const answer = await previewDebuggerServer.sendMessageWithResponse(
+            { command: 'raycast', payload: request },
+            { timeoutMs: 10000 }
+          );
+          return answer.payload;
+        },
+      });
     },
     [
       previewDebuggerServer,
       previewIndexHtmlLocation,
       onLaunchPreviewForInGameEdition,
       enabled,
+      onEnable,
+      sendVisibleScreenArea,
+      isGameFrameStarted,
+      settleOngoingPreview,
     ]
   );
+
+  const iframeSource = previewIndexHtmlLocation
+    ? `${previewIndexHtmlLocation}?gameFrameLoadId=${gameFrameLoadId}`
+    : '';
+
+  // A new location is a new game to load: it has to announce itself again.
+  React.useEffect(
+    () => {
+      setIsGameFrameStarted(false);
+    },
+    [iframeSource]
+  );
+
+  // Wait for the game to announce itself. "Started" and "waited for too long" are kept
+  // separate on purpose: a game that answers late (a big project on a slow device)
+  // dismisses the message by itself, without anything having to cancel the timeout.
+  React.useEffect(
+    () => {
+      if (!iframeSource || isGameFrameStarted) return undefined;
+
+      setHasGameFrameStartTimedOut(false);
+      const timeoutId = setTimeout(() => {
+        setHasGameFrameStartTimedOut(true);
+        // Don't keep the editor waiting on a game that will never start.
+        settleOngoingPreview();
+      }, GAME_FRAME_START_TIMEOUT_MS);
+      return () => clearTimeout(timeoutId);
+    },
+    [iframeSource, isGameFrameStarted, settleOngoingPreview]
+  );
+
+  React.useEffect(
+    () => {
+      if (!previewDebuggerServer) return undefined;
+
+      return previewDebuggerServer.registerCallbacks({
+        onErrorReceived: () => {},
+        onServerStateChanged: () => {},
+        onConnectionClosed: ({ id }) => {
+          // The game left the frame (it was asked to reload itself, or it was closed):
+          // it must announce itself again before the frame can be used.
+          if (id === 'embedded-game-frame') setIsGameFrameStarted(false);
+        },
+        onConnectionOpened: () => {},
+        onConnectionErrored: () => {},
+        onHandleParsedMessage: ({ id, parsedMessage }) => {
+          // Any status from the game proves it is running - but only if it comes from
+          // the load being waited for, and not from one that is being replaced.
+          if (
+            id === 'embedded-game-frame' &&
+            parsedMessage.command === 'status' &&
+            parsedMessage.payload &&
+            parsedMessage.payload.gameFrameLoadId === String(gameFrameLoadId)
+          ) {
+            setIsGameFrameStarted(true);
+          }
+        },
+      });
+    },
+    [previewDebuggerServer, gameFrameLoadId]
+  );
+
+  React.useEffect(
+    () => {
+      if (previewDebuggerServer)
+        previewDebuggerServer.setEmbeddedGameFrameReady(isGameFrameStarted);
+      if (isGameFrameStarted) settleOngoingPreview();
+    },
+    [previewDebuggerServer, isGameFrameStarted, settleOngoingPreview]
+  );
+
+  const onReloadGameFrame = React.useCallback(() => {
+    const lastPreviewInGameEditorTarget = lastPreviewContainer.current;
+    if (!lastPreviewInGameEditorTarget) {
+      setGameFrameLoadId(loadId => loadId + 1);
+      return;
+    }
+
+    // Launch a whole new preview: the files served to the frame could be the problem.
+    switchToSceneEdition({
+      ...lastPreviewInGameEditorTarget,
+      shouldReloadProjectData: true,
+      shouldReloadLibraries: true,
+      shouldReloadResources: true,
+      shouldHardReload: true,
+      reasons: ['reloaded-after-game-frame-did-not-start'],
+    });
+  }, []);
 
   // A game loaded in the frame adds its whole memory to the one used by the editor.
   React.useEffect(
@@ -656,7 +859,7 @@ export const EmbeddedGameFrame = ({
         <iframe
           ref={iframeRef}
           title="Game Preview"
-          src={previewIndexHtmlLocation}
+          src={iframeSource}
           tabIndex={0}
           // Listened on the iframe itself and not on its container, so that the overlay
           // covering it (drop target, pointer events blocker) doesn't take the focus.
@@ -732,6 +935,30 @@ export const EmbeddedGameFrame = ({
             );
           }}
         </DropTarget>
+        {enabled && children && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 12,
+              left: '50%',
+              transform: 'translateX(-50%)',
+            }}
+          >
+            {children}
+          </div>
+        )}
+        {hasGameFrameStartTimedOut && !isGameFrameStarted && (
+          <div className={classes.notStartedOverlay}>
+            <Text color="inherit" align="center">
+              <Trans>The game preview did not start.</Trans>
+            </Text>
+            <RaisedButton
+              primary
+              label={<Trans>Reload</Trans>}
+              onClick={onReloadGameFrame}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

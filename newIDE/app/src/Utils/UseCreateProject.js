@@ -53,7 +53,6 @@ type Props = {|
     fileMetadata: ?FileMetadata,
     options: {
       openAllScenes: boolean,
-      openQuickCustomizationDialog: boolean,
       forceOpenAskAiEditor: boolean,
     },
   |}) => Promise<void>,
@@ -212,16 +211,10 @@ const useCreateProject = ({
           currentProject.setTemplateSlug(newProjectSource.templateSlug);
         }
 
-        if (
-          authenticatedUser.profile &&
-          !newProjectSetup.openQuickCustomizationDialog
-        ) {
+        if (authenticatedUser.profile) {
           // If the user is connected, try to register the game to avoid
           // any gdevelop services to ask the user to register the game.
           // (for instance, leaderboards, player authentication, ...)
-          //
-          // Skip this if quick customization is requested, as this will be done later
-          // at publishing time.
           try {
             await registerGame(
               authenticatedUser.getAuthorizationHeader,
@@ -329,7 +322,6 @@ const useCreateProject = ({
           fileMetadata: updatedFileMetadata,
           options: {
             openAllScenes: !!options && options.openAllScenes,
-            openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,
             forceOpenAskAiEditor: !!newProjectSetup.forceOpenAskAiEditor,
           },
         });

@@ -294,9 +294,14 @@ export const AssetStoreStateProvider = ({
     !!limits.capabilities.classrooms &&
     limits.capabilities.classrooms.hidePremiumProducts;
 
+  // Only the last fetch is applied: switching the environment while a fetch is
+  // running must not let the previous environment's assets come last.
+  const lastFetchIndex = React.useRef<number>(0);
   const fetchAssetsAndFilters = React.useCallback(
     () => {
       (async () => {
+        lastFetchIndex.current++;
+        const fetchIndex = lastFetchIndex.current;
         setError(null);
 
         try {
@@ -308,6 +313,7 @@ export const AssetStoreStateProvider = ({
           const fetchedAuthors = await listAllAuthors({ environment });
           const fetchedLicenses = await listAllLicenses({ environment });
           const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks();
+          if (fetchIndex !== lastFetchIndex.current) return;
 
           console.info(
             `Loaded ${
@@ -323,6 +329,7 @@ export const AssetStoreStateProvider = ({
           setLicenses(fetchedLicenses);
           setPrivateAssetPackListingDatas(fetchedPrivateAssetPackListingDatas);
         } catch (error) {
+          if (fetchIndex !== lastFetchIndex.current) return;
           console.error(
             `Unable to load the assets from the asset store:`,
             error

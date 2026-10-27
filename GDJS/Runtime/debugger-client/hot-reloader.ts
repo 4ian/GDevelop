@@ -61,6 +61,7 @@ namespace gdjs {
       onDone: (logs: HotReloaderLog[]) => void;
       options: HotReloadOptions;
     }> = [];
+    _onIdleCallbacks: Array<() => void> = [];
 
     /**
      * @param runtimeGame - The `gdjs.RuntimeGame` to be hot-reloaded.
@@ -116,6 +117,9 @@ namespace gdjs {
         if (
           // Don't reload Box2d as it would confuse and crash the asm.js library.
           endsWith(srcFilename, 'box2d.js') ||
+          // Don't reload the Recast navigation library as it would lose
+          // its initialized WebAssembly module.
+          endsWith(srcFilename, 'recast-navigation-generators.js') ||
           // Don't reload sha256.js library.
           endsWith(srcFilename, 'sha256.js') ||
           // Don't reload shopify-buy library.
@@ -198,6 +202,18 @@ namespace gdjs {
      * it's sub-optimal) and not miss any (one could for example be reloading libraries
      * or code, while other are just reloading resources).
      */
+    /**
+     * Call `callback` once the hot-reloads in progress or queued are done
+     * (right away if there are none).
+     */
+    onceIdle(callback: () => void): void {
+      if (!this._isHotReloadingSince && this._hotReloadsQueue.length === 0) {
+        callback();
+        return;
+      }
+      this._onIdleCallbacks.push(callback);
+    }
+
     async hotReload(options: HotReloadOptions): Promise<HotReloaderLog[]> {
       return new Promise((resolve) => {
         const hotReloadId = nextHotReloadId++;
@@ -313,12 +329,14 @@ namespace gdjs {
           const inGameEditor = this._runtimeGame.getInGameEditor();
           if (inGameEditor) {
             inGameEditor.onProjectDataChange(newProjectData);
+            // The status leaves out the fields that are not set: they are
+            // null for the in-game editor, as when the game starts.
             await inGameEditor.switchToSceneOrVariant(
               newRuntimeGameStatus.editorId || null,
               newRuntimeGameStatus.sceneName,
-              newRuntimeGameStatus.injectedExternalLayoutName,
-              newRuntimeGameStatus.eventsBasedObjectType,
-              newRuntimeGameStatus.eventsBasedObjectVariantName,
+              newRuntimeGameStatus.injectedExternalLayoutName || null,
+              newRuntimeGameStatus.eventsBasedObjectType || null,
+              newRuntimeGameStatus.eventsBasedObjectVariantName || null,
               newRuntimeGameStatus.editorCamera3D || null
             );
           }
@@ -379,6 +397,10 @@ namespace gdjs {
           `Still ${this._hotReloadsQueue.length} hot-reloads in queue. Starting the next one...`
         );
         this._processHotReloadsQueue();
+      } else {
+        const onIdleCallbacks = this._onIdleCallbacks;
+        this._onIdleCallbacks = [];
+        for (const onIdleCallback of onIdleCallbacks) onIdleCallback();
       }
     }
 
@@ -830,6 +852,7 @@ namespace gdjs {
         newLayoutData.v,
         newLayoutData.b
       );
+      runtimeScene.setRenderer3DWorldScale(newLayoutData.renderer3DWorldScale);
       if (oldLayoutData.title !== newLayoutData.title) {
         runtimeScene
           .getGame()
@@ -1628,6 +1651,9 @@ namespace gdjs {
           }
         }
       });
+      runtimeLayer.setEffectsOrder(
+        newEffectsData.map((effectData) => effectData.name)
+      );
     }
 
     _hotReloadRuntimeLayerEffect(
@@ -1905,9 +1931,11 @@ namespace gdjs {
         }
       } else {
         if (!newInstance.customSize && oldInstance.customSize) {
-          // The custom size was removed. Just flag the size as changed
-          // and hope the object will handle this in
-          // `extraInitializationFromInitialInstance`.
+          // The custom size was removed: restore the original size, as objects
+          // don't reset it in `extraInitializationFromInitialInstance`.
+          runtimeObject.setWidth(runtimeObject.getOriginalWidth());
+          runtimeObject.setHeight(runtimeObject.getOriginalHeight());
+          somethingChanged = true;
           sizeChanged = true;
         }
       }
@@ -1924,12 +1952,22 @@ namespace gdjs {
           newInstance.depth === undefined &&
           oldInstance.depth !== undefined
         ) {
-          // The custom depth was removed. Just flag the depth as changed
-          // and hope the object will handle this in
-          // `extraInitializationFromInitialInstance`.
+          // The custom depth was removed: restore the original depth, as
+          // objects don't reset it in `extraInitializationFromInitialInstance`.
+          runtimeObject.setDepth(runtimeObject.getOriginalDepth());
+          somethingChanged = true;
           sizeChanged = true;
         }
       }
+      // Check if opacity or flipping changed. They are applied by the object in
+      // `extraInitializationFromInitialInstance`, so just flag them as changed.
+      const opacityOrFlipChanged =
+        (oldInstance.opacity === undefined ? 255 : oldInstance.opacity) !==
+          (newInstance.opacity === undefined ? 255 : newInstance.opacity) ||
+        !oldInstance.flippedX !== !newInstance.flippedX ||
+        !oldInstance.flippedY !== !newInstance.flippedY ||
+        !oldInstance.flippedZ !== !newInstance.flippedZ;
+
       if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
         // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
         const oldCustomObjectData = oldObjectData as ObjectData &
@@ -1988,8 +2026,16 @@ namespace gdjs {
           return !oldStringProperty || oldStringProperty.value !== value;
         }
       );
-      if (numberPropertiesChanged || stringPropertiesChanged || sizeChanged) {
+      if (
+        numberPropertiesChanged ||
+        stringPropertiesChanged ||
+        sizeChanged ||
+        opacityOrFlipChanged
+      ) {
         runtimeObject.extraInitializationFromInitialInstance(newInstance);
+        if (this._runtimeGame.isInGameEdition()) {
+          gdjs.RuntimeObject.applyInGameEditorMinimumOpacity(runtimeObject);
+        }
         somethingChanged = true;
       }
       if (somethingChanged) {

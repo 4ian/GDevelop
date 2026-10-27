@@ -43,7 +43,9 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return false;
             }
-            target.getRenderer().addPostProcessingPass(this.shaderPass);
+            target
+              .getRenderer()
+              .addPostProcessingPass(this.shaderPass, effectData.name);
             this._isEnabled = true;
             return true;
           }

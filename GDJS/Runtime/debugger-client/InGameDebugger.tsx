@@ -1,6 +1,9 @@
 namespace gdjs {
+  type HChild = HTMLElement | string | null | false | undefined;
+
   /**
    * A minimal utility to define DOM elements.
+   * Children can be arrays, and empty children (null, false) are skipped.
    * Also copied in InGameEditor.tsx.
    */
   function h<K extends keyof HTMLElementTagNameMap>(
@@ -8,23 +11,28 @@ namespace gdjs {
     attrs: {
       style?: Partial<CSSStyleDeclaration>;
       onClick?: () => void;
-    },
-    ...nodes: (HTMLElement | string)[]
+    } | null,
+    ...nodes: (HChild | HChild[])[]
   ): HTMLElement {
     const node = document.createElement(tag);
-    Object.keys(attrs).forEach((key) => {
+    const attributes = attrs || {};
+    Object.keys(attributes).forEach((key) => {
       if (key === 'style') {
-        for (const [styleName, value] of Object.entries(attrs.style!)) {
+        for (const [styleName, value] of Object.entries(attributes.style!)) {
           node.style[styleName] = value;
         }
       } else if (key === 'onClick') {
-        node.addEventListener('click', attrs[key]!);
+        node.addEventListener('click', attributes[key]!);
       } else {
-        node.setAttribute(key, '' + attrs[key]);
+        node.setAttribute(key, '' + attributes[key]);
       }
     });
 
-    node.append(...nodes);
+    for (const child of nodes) {
+      for (const element of Array.isArray(child) ? child : [child]) {
+        if (element) node.append(element);
+      }
+    }
     return node;
   }
 

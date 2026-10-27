@@ -91,7 +91,6 @@ TopDownMovementBehavior::GetProperties(
           gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
   properties["IgnoreDefaultControls"]
       .SetLabel(_("Disable default keyboard controls"))
-      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
                     ? "true"
                     : "false")

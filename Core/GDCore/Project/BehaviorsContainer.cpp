@@ -12,7 +12,6 @@
 #include "GDCore/Project/CustomBehavior.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
-#include "GDCore/Project/QuickCustomization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/UUID/UUID.h"
@@ -150,18 +149,6 @@ void BehaviorsContainer::UnserializeFrom(gd::Project &project,
 
     bool isFolded = behaviorElement.GetBoolAttribute("isFolded", false);
     behavior->SetFolded(isFolded);
-
-    // Handle Quick Customization info.
-    if (behaviorElement.HasChild("propertiesQuickCustomizationVisibilities")) {
-      behavior->GetPropertiesQuickCustomizationVisibilities().UnserializeFrom(
-          behaviorElement.GetChild("propertiesQuickCustomizationVisibilities"));
-    }
-    if (behaviorElement.HasChild("quickCustomizationVisibility")) {
-      behavior->SetQuickCustomizationVisibility(
-          QuickCustomization::StringAsVisibility(
-              behaviorElement.GetStringAttribute(
-                  "quickCustomizationVisibility")));
-    }
   }
 }
 
@@ -189,22 +176,11 @@ void BehaviorsContainer::SerializeTo(SerializerElement &element) const {
     if (behavior.IsFolded())
       behaviorElement.SetAttribute("isFolded", true);
 
-    // Handle Quick Customization info.
+    // Compatibility with projects saved with the removed Quick Customization:
+    // the content can contain its former visibilities, remove them.
     behaviorElement.RemoveChild("propertiesQuickCustomizationVisibilities");
-    const QuickCustomizationVisibilitiesContainer
-        &propertiesQuickCustomizationVisibilities =
-            behavior.GetPropertiesQuickCustomizationVisibilities();
-    if (!propertiesQuickCustomizationVisibilities.IsEmpty()) {
-      propertiesQuickCustomizationVisibilities.SerializeTo(
-          behaviorElement.AddChild("propertiesQuickCustomizationVisibilities"));
-    }
-    const QuickCustomization::Visibility visibility =
-        behavior.GetQuickCustomizationVisibility();
-    if (visibility != QuickCustomization::Visibility::Default) {
-      behaviorElement.SetAttribute(
-          "quickCustomizationVisibility",
-          QuickCustomization::VisibilityAsString(visibility));
-    }
+    behaviorElement.RemoveAttribute("quickCustomizationVisibility");
+    // end of compatibility code
   }
 }
 

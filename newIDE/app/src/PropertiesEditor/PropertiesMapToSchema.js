@@ -15,8 +15,6 @@ import { keyNames } from '../Utils/KeyboardKeyNames';
 import { getChoiceDisplayLabel } from '../Utils/ChoiceLabel';
 import Restore from '../UI/CustomSvgIcons/Restore';
 
-const gd: libGDevelop = global.gd;
-
 const createField = (
   name: string,
   property: gdPropertyDescriptor,
@@ -491,6 +489,9 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Width', 'Height', 'Depth'],
 ];
 
+/** Separates a group from its sub-group in a property group name. */
+const subgroupSeparator = ' > ';
+
 const uncapitalize = (str: string) => {
   if (!str) return str;
   return str[0].toLowerCase() + str.substr(1);
@@ -508,12 +509,10 @@ const isPropertyVisible = ({
   properties,
   name,
   visibility,
-  quickCustomizationVisibilities,
 }: {
   properties: gdMapStringPropertyDescriptor,
   name: string,
-  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
-  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated',
 }): boolean => {
   if (!properties.has(name)) {
     return false;
@@ -534,34 +533,6 @@ const isPropertyVisible = ({
   if (visibility === 'Basic') {
     return !property.isAdvanced() && !property.isDeprecated();
   }
-  if (visibility === 'Basic-Quick') {
-    // "Basic":
-    if (property.isDeprecated()) return false;
-    if (property.isAdvanced()) return false;
-
-    // Honor visibility if set on the property.
-    if (
-      property.getQuickCustomizationVisibility() ===
-      gd.QuickCustomization.Hidden
-    )
-      return false;
-    if (
-      property.getQuickCustomizationVisibility() ===
-      gd.QuickCustomization.Visible
-    )
-      return true;
-
-    // Honor visibility if set on the container.
-    if (quickCustomizationVisibilities) {
-      const visibility = quickCustomizationVisibilities.get(name);
-      if (visibility === gd.QuickCustomization.Hidden) return false;
-      if (visibility === gd.QuickCustomization.Visible) return true;
-    }
-
-    // Otherwise, hide some properties that we know are complex.
-    const propertyType = property.getType();
-    if (propertyType === 'Behavior') return false; // Hide "required behaviors".
-  }
   return true;
 };
 
@@ -571,8 +542,7 @@ type CommonProps = {|
     | gdMapStringPropertyDescriptor
     | null,
   object?: ?gdObject,
-  visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
-  quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
+  visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated',
   showcaseNonDefaultValues?: boolean,
   hideResourceProperties?: boolean,
 |};
@@ -581,7 +551,6 @@ export const effectPropertiesMapToSchema = ({
   defaultValueProperties,
   object,
   visibility = 'All',
-  quickCustomizationVisibilities,
   hideResourceProperties,
   showcaseNonDefaultValues,
 }: {
@@ -594,7 +563,6 @@ export const effectPropertiesMapToSchema = ({
     object,
     layersContainer: null,
     visibility,
-    quickCustomizationVisibilities,
     hideResourceProperties,
     showcaseNonDefaultValues,
     shouldDisabledFieldsWithMixedValues: false,
@@ -647,7 +615,6 @@ const propertiesMapToSchema = ({
   object,
   layersContainer,
   visibility = 'All',
-  quickCustomizationVisibilities,
   showcaseNonDefaultValues,
   hideResourceProperties,
   shouldDisabledFieldsWithMixedValues,
@@ -669,7 +636,6 @@ const propertiesMapToSchema = ({
     object,
     layersContainer,
     visibility,
-    quickCustomizationVisibilities,
     showcaseNonDefaultValues,
     hideResourceProperties,
     shouldDisabledFieldsWithMixedValues,
@@ -701,7 +667,6 @@ const adaptablePropertiesMapToSchema = ({
   object,
   layersContainer,
   visibility = 'All',
-  quickCustomizationVisibilities,
   showcaseNonDefaultValues,
   hideResourceProperties,
   getNumberValue,
@@ -747,7 +712,6 @@ const adaptablePropertiesMapToSchema = ({
         properties,
         name,
         visibility,
-        quickCustomizationVisibilities,
       })
     ) {
       return null;
@@ -778,7 +742,6 @@ const adaptablePropertiesMapToSchema = ({
                 properties,
                 name: rowPropertyName,
                 visibility,
-                quickCustomizationVisibilities,
               })
             ) {
               rowPropertyNames.push(rowPropertyName);
@@ -796,7 +759,6 @@ const adaptablePropertiesMapToSchema = ({
                   properties,
                   name: rowPropertyName,
                   visibility,
-                  quickCustomizationVisibilities,
                 })
               ) {
                 rowPropertyNames.push(rowPropertyName);
@@ -812,7 +774,10 @@ const adaptablePropertiesMapToSchema = ({
         if (
           rowProperties.every(
             property => property.getGroup() === rowProperties[0].getGroup()
-          )
+          ) &&
+          // Resource selectors are wide (text field + thumbnail), so always
+          // give them a full line instead of squeezing them in a row.
+          !rowProperties.some(property => property.getType() === 'resource')
         ) {
           const rowFields: Field[] = [];
           for (
@@ -890,16 +855,45 @@ const adaptablePropertiesMapToSchema = ({
       fields.push(field);
     }
   });
-  if (fieldsByGroups.size === 0) {
+  // A group name can contain a sub-group, like "Collision filtering > If static":
+  // its fields are shown in a titled section inside the group. Sub-groups keep
+  // the order of their first property.
+  const fieldsByTopGroups = new Map<string, Array<Field>>();
+  for (const [groupName, fields] of fieldsByGroups) {
+    const separatorIndex = groupName.indexOf(subgroupSeparator);
+    const topGroupName =
+      separatorIndex === -1 ? groupName : groupName.slice(0, separatorIndex);
+    let topGroupFields = fieldsByTopGroups.get(topGroupName);
+    if (!topGroupFields) {
+      topGroupFields = [];
+      fieldsByTopGroups.set(topGroupName, topGroupFields);
+    }
+    if (separatorIndex === -1) {
+      topGroupFields.push(...fields);
+    } else {
+      const subgroupName = groupName.slice(
+        separatorIndex + subgroupSeparator.length
+      );
+      topGroupFields.push({
+        name: subgroupName,
+        type: 'column',
+        title: subgroupName,
+        isSubgroup: true,
+        children: fields,
+      });
+    }
+  }
+
+  if (fieldsByTopGroups.size === 0) {
     return [];
   }
-  const defaultGroupField = fieldsByGroups.get('');
-  if (fieldsByGroups.size === 1 && defaultGroupField) {
+  const defaultGroupField = fieldsByTopGroups.get('');
+  if (fieldsByTopGroups.size === 1 && defaultGroupField) {
     // Avoid to create a blank title
     return defaultGroupField;
   }
   // Create a group for the default one too because it would look weird with the indentation.
-  const groupNames = [...fieldsByGroups.keys()].sort((a, b) =>
+  const groupNames = [...fieldsByTopGroups.keys()].sort((a, b) =>
     a.localeCompare(b)
   );
   return groupNames.map(groupName => ({
@@ -907,7 +901,7 @@ const adaptablePropertiesMapToSchema = ({
     type: 'column',
     title: groupName,
     // The group actually always exists here.
-    children: fieldsByGroups.get(groupName) || [],
+    children: fieldsByTopGroups.get(groupName) || [],
   }));
 };
 

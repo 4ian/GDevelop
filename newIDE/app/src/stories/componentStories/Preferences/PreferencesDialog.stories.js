@@ -30,13 +30,16 @@ export default {
  */
 const StatefulPreferencesProvider = ({
   initialUserShortcutMap,
+  initialValues,
   children,
 }: {|
   initialUserShortcutMap: ShortcutMap,
+  initialValues?: Partial<typeof initialPreferences.values>,
   children: React.Node,
 |}) => {
   const [values, setValues] = React.useState({
     ...initialPreferences.values,
+    ...initialValues,
     userShortcutMap: initialUserShortcutMap,
   });
 
@@ -132,15 +135,23 @@ const PreferencesDialogStory = ({
   initialTab,
   initialSection,
   initialUserShortcutMap = {},
+  initialValues,
   isDesktop = false,
+  is3DRenderingSupported = true,
 }: {|
   initialTab?: PreferencesTabName,
   initialSection?: PreferencesSectionName,
   initialUserShortcutMap?: ShortcutMap,
+  initialValues?: Partial<typeof initialPreferences.values>,
   /** Display the settings of the desktop version. */
   isDesktop?: boolean,
+  /** Simulate a device with or without WebGL2. */
+  is3DRenderingSupported?: boolean,
 |}) => (
-  <StatefulPreferencesProvider initialUserShortcutMap={initialUserShortcutMap}>
+  <StatefulPreferencesProvider
+    initialUserShortcutMap={initialUserShortcutMap}
+    initialValues={initialValues}
+  >
     <I18n>
       {({ i18n }) => (
         <PreferencesDialog
@@ -148,10 +159,8 @@ const PreferencesDialogStory = ({
           initialTab={initialTab}
           initialSection={initialSection}
           isDesktop={isDesktop}
+          is3DRenderingSupported={is3DRenderingSupported}
           onClose={action('onClose')}
-          onOpenQuickCustomizationDialog={action(
-            'onOpenQuickCustomizationDialog'
-          )}
         />
       )}
     </I18n>
@@ -179,6 +188,21 @@ export const DesktopFoldersSection = (): React.Node => (
 
 export const EventsSheetSection = (): React.Node => (
   <PreferencesDialogStory initialSection="events-sheet" />
+);
+
+export const SceneEditorSection = (): React.Node => (
+  <PreferencesDialogStory
+    initialSection="scene-editor"
+    initialValues={{ use3DEditor: true }}
+  />
+);
+
+export const SceneEditorSectionWithoutWebGL2 = (): React.Node => (
+  <PreferencesDialogStory
+    initialSection="scene-editor"
+    initialValues={{ use3DEditor: false }}
+    is3DRenderingSupported={false}
+  />
 );
 
 export const KeyboardShortcutsSection = (): React.Node => (

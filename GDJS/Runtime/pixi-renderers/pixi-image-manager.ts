@@ -55,7 +55,7 @@ namespace gdjs {
     /**
      * Map associating a resource name to the loaded Three.js texture.
      */
-    private _loadedThreeTextures: Hashtable<THREE.Texture>;
+    private _loadedThreeTextures: Hashtable<THREE.Texture<HTMLImageElement>>;
     private _loadedThreeMaterials = new ThreeMaterialCache();
     private _loadedThreeCubeTextures = new Map<string, THREE.CubeTexture>();
     private _loadedThreeCubeTextureKeysByResourceName = new ArrayMap<
@@ -118,6 +118,23 @@ namespace gdjs {
       }
 
       return existingTexture;
+    }
+
+    /**
+     * Return the image of a resource, to read its pixels (like a heightmap).
+     * Use `loadResource` to wait for it to be loaded.
+     * @param resourceName The name of the resource
+     * @returns The image, or null if it's not loaded (yet).
+     */
+    getImageSource(resourceName: string): HTMLImageElement | null {
+      const resource = this._getImageResource(resourceName);
+      const texture = resource && this._loadedTextures.get(resource);
+      if (!texture || texture.destroyed || !texture.valid) {
+        return null;
+      }
+      // @ts-ignore - source does exist on resource.
+      const image = texture.baseTexture.resource.source;
+      return image instanceof HTMLImageElement ? image : null;
     }
 
     /**
@@ -186,7 +203,7 @@ namespace gdjs {
      * @param resourceName The name of the resource
      * @returns The requested texture, or a placeholder if not found.
      */
-    getThreeTexture(resourceName: string): THREE.Texture {
+    getThreeTexture(resourceName: string): THREE.Texture<HTMLImageElement> {
       const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
       if (loadedThreeTexture) {
         return loadedThreeTexture;
@@ -567,7 +584,7 @@ namespace gdjs {
     dispose(): void {
       this._loadedTextures.clear();
 
-      const threeTextures: THREE.Texture[] = [];
+      const threeTextures: Array<THREE.Texture<HTMLImageElement>> = [];
       this._loadedThreeTextures.values(threeTextures);
       this._loadedThreeTextures.clear();
       for (const threeTexture of threeTextures) {

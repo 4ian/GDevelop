@@ -19,8 +19,6 @@ declare class gdObjectFolderOrObject {
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: gdObjectFolderOrObject): void;
   isADescendantOf(otherObjectFolderOrObject: gdObjectFolderOrObject): boolean;
-  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
-  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): void;
   delete(): void;
   ptr: number;
 };

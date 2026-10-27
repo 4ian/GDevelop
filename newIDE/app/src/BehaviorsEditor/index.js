@@ -44,7 +44,6 @@ import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import QuickCustomizationPropertiesVisibilityDialog from '../QuickCustomization/QuickCustomizationPropertiesVisibilityDialog';
 import Text from '../UI/Text';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
@@ -84,9 +83,6 @@ type BehaviorConfigurationEditorProps = {|
   canPasteBehaviors: boolean,
   pasteBehaviors: () => Promise<void>,
   openExtension: (behaviorType: string) => void,
-  openBehaviorPropertiesQuickCustomizationDialog: (
-    behaviorName: string
-  ) => void,
   isListLocked: boolean,
   layersContainer: gdLayersContainer,
 |};
@@ -110,7 +106,6 @@ const BehaviorConfigurationEditor = React.forwardRef<
       canPasteBehaviors,
       pasteBehaviors,
       openExtension,
-      openBehaviorPropertiesQuickCustomizationDialog,
       isListLocked,
       layersContainer,
     },
@@ -233,18 +228,6 @@ const BehaviorConfigurationEditor = React.forwardRef<
                       },
                     ]
                   : []),
-                ...(!Window.isDev()
-                  ? []
-                  : [
-                      { type: 'separator' },
-                      {
-                        label: i18n._(t`Quick Customization settings`),
-                        click: () =>
-                          openBehaviorPropertiesQuickCustomizationDialog(
-                            behaviorName
-                          ),
-                      },
-                    ]),
               ]}
             />,
           ]}
@@ -759,11 +742,6 @@ const BehaviorsEditor = (props: Props): React.Node => {
   } = props;
   const forceUpdate = useForceUpdate();
 
-  const [
-    selectedQuickCustomizationPropertiesBehavior,
-    setSelectedQuickCustomizationPropertiesBehavior,
-  ] = React.useState<?gdBehavior>(null);
-
   const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
   const {
     changeBehaviorName,
@@ -824,20 +802,6 @@ const BehaviorsEditor = (props: Props): React.Node => {
       openBehaviorEvents(extensionName, behaviorName);
     },
     [openBehaviorEvents, project]
-  );
-
-  const openBehaviorPropertiesQuickCustomizationDialog = React.useCallback(
-    (behaviorName: string) => {
-      const object = objects[0];
-      if (!object) {
-        return;
-      }
-      if (!object.hasBehaviorNamed(behaviorName)) return;
-      const behavior = object.getBehavior(behaviorName);
-
-      setSelectedQuickCustomizationPropertiesBehavior(behavior);
-    },
-    [objects]
   );
 
   const isClipboardContainingBehaviors = Clipboard.has(
@@ -909,9 +873,6 @@ const BehaviorsEditor = (props: Props): React.Node => {
                   onBehaviorsUpdated={onBehaviorsUpdated}
                   onChangeBehaviorName={changeBehaviorName}
                   openExtension={openExtension}
-                  openBehaviorPropertiesQuickCustomizationDialog={
-                    openBehaviorPropertiesQuickCustomizationDialog
-                  }
                   canPasteBehaviors={isClipboardContainingBehaviors}
                   pasteBehaviors={pasteBehaviors}
                   resourceManagementProps={props.resourceManagementProps}
@@ -972,17 +933,6 @@ const BehaviorsEditor = (props: Props): React.Node => {
         </React.Fragment>
       )}
       {newBehaviorDialog}
-      {!!selectedQuickCustomizationPropertiesBehavior && (
-        <QuickCustomizationPropertiesVisibilityDialog
-          open={!!selectedQuickCustomizationPropertiesBehavior}
-          onClose={() => setSelectedQuickCustomizationPropertiesBehavior(null)}
-          propertyNames={selectedQuickCustomizationPropertiesBehavior
-            .getProperties()
-            .keys()
-            .toJSArray()}
-          propertiesQuickCustomizationVisibilities={selectedQuickCustomizationPropertiesBehavior.getPropertiesQuickCustomizationVisibilities()}
-        />
-      )}
     </Column>
   );
 };

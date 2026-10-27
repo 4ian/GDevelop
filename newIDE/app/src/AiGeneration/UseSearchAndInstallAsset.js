@@ -19,7 +19,10 @@ import {
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
 import { toAssetStoreType } from '../AssetStore/AssetStoreSearchFilter';
-import { isEffectAsset } from '../Utils/GDevelopServices/Asset';
+import {
+  isEffectAsset,
+  isEffectAssetMadeFor,
+} from '../Utils/GDevelopServices/Asset';
 
 type _FuncReturnType = {
   searchAndInstallAsset: AssetSearchAndInstallOptions => Promise<AssetSearchAndInstallResult>,
@@ -55,6 +58,7 @@ export const useSearchAndInstallAsset = ({
   const searchAndInstallEffectAsset = React.useCallback(
     async ({
       effectsContainer,
+      effectTarget,
       effectName,
       effectType,
       exactOrPartialAssetId,
@@ -107,6 +111,17 @@ export const useSearchAndInstallAsset = ({
           message: `Asset with id "${exactOrPartialAssetId}" is a "${
             assetShortHeader.objectType
           }" effect, not a "${effectType}": leave the effect type out or give the one of the asset.`,
+          effect: null,
+          assetShortHeader: null,
+        };
+      }
+      if (!isEffectAssetMadeFor(assetShortHeader, effectTarget)) {
+        const otherTarget = effectTarget === 'layer' ? 'objects' : 'layers';
+        return {
+          status: 'nothing-found',
+          message: `Asset with id "${exactOrPartialAssetId}" is an effect made for ${otherTarget}, not ${effectTarget}s: choose another asset, or add a "${
+            assetShortHeader.objectType
+          }" effect without an asset and set its properties.`,
           effect: null,
           assetShortHeader: null,
         };

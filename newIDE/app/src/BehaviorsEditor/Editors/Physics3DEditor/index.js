@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { Line, Column } from '../../../UI/Grid';
+import { Line, Column, Spacer } from '../../../UI/Grid';
 import Checkbox from '../../../UI/Checkbox';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
@@ -10,8 +10,10 @@ import Text from '../../../UI/Text';
 import DismissableAlertMessage from '../../../UI/DismissableAlertMessage';
 import {
   ColumnStackLayout,
+  LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../UI/Layout';
+import { Level2Separator } from '../../../CompactPropertiesEditor';
 import { CompactBitmaskField } from '../../../UI/CompactBitmaskField';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import {
@@ -59,6 +61,15 @@ const areAdvancedPropertiesModified = (
   return hasFoundModifiedAdvancedProperty;
 };
 
+const CollisionFilteringTitle = ({ title }: {| title: React.Node |}) => (
+  <LineStackLayout expand noMargin alignItems="center">
+    <Text size="body" noMargin>
+      {title}
+    </Text>
+    <Level2Separator />
+  </LineStackLayout>
+);
+
 const Physics3DEditor = (props: Props): React.Node => {
   const {
     object,
@@ -103,8 +114,6 @@ const Physics3DEditor = (props: Props): React.Node => {
   const shape = properties.get('shape').getValue();
   const layersValues = parseInt(properties.get('layers').getValue(), 10);
   const masksValues = parseInt(properties.get('masks').getValue(), 10);
-
-  const isStatic = properties.get('bodyType').getValue() === 'Static';
 
   // The property is hidden for the shapes that can't be oriented.
   const canShapeBeOriented = !properties.get('shapeOrientation').isHidden();
@@ -376,33 +385,50 @@ const Physics3DEditor = (props: Props): React.Node => {
           }
         />
       </ResponsiveLineStackLayout>
-      <Line expand>
-        <ColumnStackLayout expand noMargin>
-          {/* Static and moving objects don't use the same layers, so only
-              the ones of the current body type are shown. */}
-          <CompactBitmaskField
-            label={properties.get('layers').getLabel()}
-            markdownDescription={properties.get('layers').getDescription()}
-            value={layersValues}
-            firstBit={isStatic ? 0 : 4}
-            bitCount={4}
-            onChange={newValue =>
-              updateBehaviorProperty('layers', newValue.toString(10))
-            }
-          />
-          {!properties.get('masks').isHidden() && (
-            <CompactBitmaskField
-              label={properties.get('masks').getLabel()}
-              markdownDescription={properties.get('masks').getDescription()}
-              value={masksValues}
-              bitCount={8}
-              onChange={newValue =>
-                updateBehaviorProperty('masks', newValue.toString(10))
-              }
-            />
-          )}
-        </ColumnStackLayout>
-      </Line>
+      {/* Static objects use the layers 1 to 4, and dynamic and kinematic ones
+          the layers 5 to 8 and their masks. Both are shown, as the type can be
+          changed during the game. */}
+      <ColumnStackLayout expand noMargin>
+        <Spacer />
+        <Text size="sub-title" noMargin>
+          <Trans>Collision filtering</Trans>
+        </Text>
+        <CollisionFilteringTitle title={<Trans>If static</Trans>} />
+        <CompactBitmaskField
+          label={properties.get('layers').getLabel()}
+          markdownDescription={properties.get('layers').getDescription()}
+          value={layersValues}
+          firstBit={0}
+          bitCount={4}
+          onChange={newValue =>
+            updateBehaviorProperty('layers', newValue.toString(10))
+          }
+        />
+        <CollisionFilteringTitle
+          title={<Trans>If dynamic or kinematic</Trans>}
+        />
+        <CompactBitmaskField
+          label={properties.get('layersIfDynamicOrKinematic').getLabel()}
+          markdownDescription={properties
+            .get('layersIfDynamicOrKinematic')
+            .getDescription()}
+          value={layersValues}
+          firstBit={4}
+          bitCount={4}
+          onChange={newValue =>
+            updateBehaviorProperty('layers', newValue.toString(10))
+          }
+        />
+        <CompactBitmaskField
+          label={properties.get('masks').getLabel()}
+          markdownDescription={properties.get('masks').getDescription()}
+          value={masksValues}
+          bitCount={8}
+          onChange={newValue =>
+            updateBehaviorProperty('masks', newValue.toString(10))
+          }
+        />
+      </ColumnStackLayout>
       <Accordion
         defaultExpanded={areAdvancedPropertiesExpandedByDefault}
         noMargin

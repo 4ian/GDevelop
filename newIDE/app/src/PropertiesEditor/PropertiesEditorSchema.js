@@ -191,6 +191,8 @@ export type Field =
       preventWrap?: boolean,
       removeSpacers?: boolean,
       title?: ?string,
+      /** A section inside a group, with a smaller title. */
+      isSubgroup?: boolean,
       children: Array<Field>,
       isHidden?: (Array<Instance>) => boolean,
     |};

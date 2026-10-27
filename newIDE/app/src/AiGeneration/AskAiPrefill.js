@@ -1,23 +1,29 @@
 // @flow
 
-// Allow any part of the editor to ask the Ask AI editor to start a new chat
-// with a pre-filled user request ("Edit with AI" buttons...). The Ask AI
+// Allow any part of the editor to ask the Ask AI editor to pre-fill a user
+// request, in a new chat ("Edit with AI" buttons...) or the current one. The Ask AI
 // editor may not be mounted yet when the pre-fill is requested (the tab is
 // usually being opened at the same time): the request is kept pending until
 // it registers.
 
-let pendingPrefilledUserRequestText: string | null = null;
-let listener: null | ((userRequestText: string) => void) = null;
+export type AskAiPrefill = {|
+  userRequestText: string,
+  // Pre-fill the chat being shown (if any) instead of starting a new one.
+  inCurrentChat: boolean,
+|};
+
+let pendingPrefill: AskAiPrefill | null = null;
+let listener: null | ((prefill: AskAiPrefill) => void) = null;
 
 /**
- * Ask the Ask AI editor to start a new chat with this pre-filled user
- * request (delivered as soon as it is mounted).
+ * Ask the Ask AI editor to pre-fill a user request, in a new chat or the one
+ * being shown (delivered as soon as it is mounted).
  */
-export const requestAskAiPrefill = (userRequestText: string) => {
+export const requestAskAiPrefill = (prefill: AskAiPrefill) => {
   if (listener) {
-    listener(userRequestText);
+    listener(prefill);
   } else {
-    pendingPrefilledUserRequestText = userRequestText;
+    pendingPrefill = prefill;
   }
 };
 
@@ -26,13 +32,13 @@ export const requestAskAiPrefill = (userRequestText: string) => {
  * function to unregister. Any pending request is delivered immediately.
  */
 export const registerAskAiPrefillListener = (
-  newListener: (userRequestText: string) => void
+  newListener: (prefill: AskAiPrefill) => void
 ): (() => void) => {
   listener = newListener;
-  if (pendingPrefilledUserRequestText !== null) {
-    const userRequestText = pendingPrefilledUserRequestText;
-    pendingPrefilledUserRequestText = null;
-    newListener(userRequestText);
+  if (pendingPrefill !== null) {
+    const prefill = pendingPrefill;
+    pendingPrefill = null;
+    newListener(prefill);
   }
   return () => {
     if (listener === newListener) listener = null;

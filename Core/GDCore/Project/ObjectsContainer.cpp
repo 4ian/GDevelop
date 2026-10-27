@@ -6,6 +6,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 
 #include <algorithm>
+#include <unordered_set>
 
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Object.h"
@@ -60,9 +61,18 @@ void ObjectsContainer::UnserializeFoldersFrom(
 }
 
 void ObjectsContainer::AddMissingObjectsInRootFolder() {
+  // Get the names of the objects already in the folders once: searching the
+  // folders for each object would be O(number of objects^2).
+  std::unordered_set<gd::String> objectNamesInFolders;
+  rootFolder->AddObjectNamesTo(objectNamesInFolders);
+
   for (std::size_t i = 0; i < initialObjects.size(); ++i) {
-    if (!rootFolder->HasObjectNamed(initialObjects[i]->GetName())) {
+    const gd::String& objectName = initialObjects[i]->GetName();
+    if (objectNamesInFolders.find(objectName) == objectNamesInFolders.end()) {
       rootFolder->InsertObject(&(*initialObjects[i]));
+      // The object is now in the folders (unless the root is not a folder,
+      // which only happens with an invalid serialized folder structure).
+      if (rootFolder->IsFolder()) objectNamesInFolders.insert(objectName);
     }
   }
 }

@@ -8,4 +8,4 @@ To update the library:
 - Run `yarn build`
 - Check out `umd-build`
 - Run `yarn build`
-- Copy `recast-navigation-js/packages/recast-navigation/recast-navigation-generators.js` and the wasm build into this folder
+- Copy `recast-navigation-js/packages/recast-navigation/recast-navigation-generators.js` into this folder as `A_recast-navigation-generators.js` (include files are loaded sorted by name: it must be loaded before the behaviors), and the wasm build

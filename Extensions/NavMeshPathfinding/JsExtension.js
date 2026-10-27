@@ -262,8 +262,7 @@ module.exports = {
           .setValue(
             sharedContent.getChild('cellSize').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('cellDepth')
@@ -274,8 +273,7 @@ module.exports = {
           .setValue(
             sharedContent.getChild('cellDepth').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('slopeMaxAngle')
@@ -289,8 +287,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('stairHeightMax')
@@ -304,8 +301,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('walkableRadius')
@@ -323,8 +319,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('walkableDepth')
@@ -343,8 +338,7 @@ module.exports = {
               .getDoubleValue()
               .toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         sharedProperties
           .getOrCreate('speedScaleY')
@@ -359,8 +353,7 @@ module.exports = {
           .setValue(
             sharedContent.getChild('speedScaleY').getDoubleValue().toString(10)
           )
-          .setAdvanced(true)
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+          .setAdvanced(true);
 
         return sharedProperties;
       };
@@ -396,14 +389,14 @@ module.exports = {
         .addIncludeFile(
           'Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js'
         )
-        .addIncludeFile(
+        .addRequiredFile(
           'Extensions/NavMeshPathfinding/recast-navigation.wasm.js'
         )
         .addRequiredFile(
           'Extensions/NavMeshPathfinding/recast-navigation.wasm.wasm'
         )
         .addIncludeFile(
-          'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
+          'Extensions/NavMeshPathfinding/A_recast-navigation-generators.js'
         );
 
       aut
@@ -802,6 +795,13 @@ module.exports = {
             .setStringValue(newValue);
           return true;
         }
+
+        if (propertyName === 'obstacleOnly') {
+          behaviorContent
+            .getOrCreateChild('obstacleOnly')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
         return false;
       };
       behavior.getProperties = function (behaviorContent) {
@@ -812,7 +812,9 @@ module.exports = {
           .setValue(behaviorContent.getChild('shape').getStringValue())
           .setType('Choice')
           .setLabel('Shape')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setDescription(
+            _('Objects giving their own surface, like terrains, always use it.')
+          )
           .addChoice('Box', _('Box'))
           .addChoice('Mesh', _('Mesh'));
         behaviorProperties
@@ -824,6 +826,21 @@ module.exports = {
           .addExtraInfo('model3D')
           .setLabel(_('Simplified 3D model'))
           .setDescription(_("Leave empty to use object's one"));
+        behaviorProperties
+          .getOrCreate('obstacleOnly')
+          .setValue(
+            behaviorContent.hasChild('obstacleOnly') &&
+              behaviorContent.getChild('obstacleOnly').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('Obstacle only'))
+          .setDescription(
+            _(
+              "Characters go around the object but can't walk on it (for example water or a table). Parts less than a step high above a floor can still be walked on."
+            )
+          );
 
         return behaviorProperties;
       };
@@ -831,6 +848,7 @@ module.exports = {
       behavior.initializeContent = function (behaviorContent) {
         behaviorContent.addChild('shape').setStringValue('Box');
         behaviorContent.addChild('meshShapeResourceName').setStringValue('');
+        behaviorContent.addChild('obstacleOnly').setBoolValue(false);
       };
 
       const sharedData = new gd.BehaviorSharedDataJsImplementation();
@@ -866,14 +884,14 @@ module.exports = {
         .addIncludeFile(
           'Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js'
         )
-        .addIncludeFile(
+        .addRequiredFile(
           'Extensions/NavMeshPathfinding/recast-navigation.wasm.js'
         )
         .addRequiredFile(
           'Extensions/NavMeshPathfinding/recast-navigation.wasm.wasm'
         )
         .addIncludeFile(
-          'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
+          'Extensions/NavMeshPathfinding/A_recast-navigation-generators.js'
         );
     }
 
@@ -894,9 +912,11 @@ module.exports = {
       .addIncludeFile(
         'Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js'
       )
-      .addIncludeFile('Extensions/NavMeshPathfinding/recast-navigation.wasm.js')
+      // `recast-navigation.wasm.js` is an ES module loaded with `import()` by
+      // NavMeshCharacterRuntimeBehavior.js: it's a required file of the
+      // behaviors and must not be included as a classic script.
       .addIncludeFile(
-        'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
+        'Extensions/NavMeshPathfinding/A_recast-navigation-generators.js'
       )
       .addIncludeFile(
         'Extensions/NavMeshPathfinding/NavMeshDebugPixiRenderer.js'

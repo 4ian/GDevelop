@@ -262,7 +262,7 @@ type Props = {|
   onEditLayer: (layer: ?gdLayer) => void,
   onLayersModified: () => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
-  onLayerRenamed: () => void,
+  onLayerRenamed: (oldName: string, newName: string) => void,
   onCreateLayer: () => void,
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,
@@ -374,6 +374,16 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
       [forceUpdate, onLayersModified, unsavedChanges]
     );
 
+    // Renamed or removed layers are fully reloaded by `onLayerRenamed`
+    // and `onRemoveLayer`, so `onLayersModified` is not called for them.
+    const triggerOnLayerRenamedOrRemoved = React.useCallback(
+      () => {
+        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        forceUpdate();
+      },
+      [forceUpdate, unsavedChanges]
+    );
+
     const triggerOnBackgroundColorChanged = React.useCallback(
       () => {
         onBackgroundColorChanged();
@@ -409,8 +419,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             uniqueNewName
           );
         }
-        onLayerRenamed();
-        triggerOnLayersModified();
+        onLayerRenamed(oldName, uniqueNewName);
+        triggerOnLayerRenamedOrRemoved();
       },
       [
         eventsBasedObject,
@@ -419,7 +429,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         layout,
         onLayerRenamed,
         project,
-        triggerOnLayersModified,
+        triggerOnLayerRenamedOrRemoved,
       ]
     );
 
@@ -438,7 +448,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                   if (!doRemove) return;
 
                   layersContainer.removeLayer(layerName);
-                  triggerOnLayersModified();
+                  triggerOnLayerRenamedOrRemoved();
                 });
               },
               onEditLayer,
@@ -471,6 +481,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         scrollToItem,
         showDeleteConfirmation,
         triggerOnLayersModified,
+        triggerOnLayerRenamedOrRemoved,
         onRemoveLayer,
       ]
     );

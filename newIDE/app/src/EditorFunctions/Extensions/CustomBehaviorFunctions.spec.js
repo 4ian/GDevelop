@@ -273,7 +273,6 @@ describe('CustomBehaviorFunctions', () => {
           { setting_name: 'description', new_value: 'What it does' },
           { setting_name: 'objectType', new_value: '' },
           { setting_name: 'isPrivate', new_value: true },
-          { setting_name: 'quickCustomizationVisibility', new_value: 'hidden' },
         ],
       });
 
@@ -283,9 +282,6 @@ describe('CustomBehaviorFunctions', () => {
       expect(eventsBasedBehavior.getDescription()).toBe('What it does');
       expect(eventsBasedBehavior.getObjectType()).toBe('');
       expect(eventsBasedBehavior.isPrivate()).toBe(true);
-      expect(eventsBasedBehavior.getQuickCustomizationVisibility()).toBe(
-        gd.QuickCustomization.Hidden
-      );
     });
 
     it('reports a call that changed nothing as a success', async () => {
@@ -317,20 +313,7 @@ describe('CustomBehaviorFunctions', () => {
 
       expect(output.success).toBe(false);
       expect(output.message).toContain('"isAwesome" does not exist');
-      expect(output.message).toContain('"quickCustomizationVisibility"');
-    });
-
-    it('lists the values of quickCustomizationVisibility on a wrong one', async () => {
-      const { output } = await launchFunction(changeCustomBehavior, project, {
-        extension_name: 'MyExt',
-        custom_behavior_name: 'MyBehavior',
-        changed_settings: [
-          { setting_name: 'quickCustomizationVisibility', new_value: 'maybe' },
-        ],
-      });
-
-      expect(output.success).toBe(false);
-      expect(output.message).toContain('"default", "visible", "hidden"');
+      expect(output.message).toContain('"isPrivate"');
     });
 
     it('renames the behavior and the objects using it', async () => {

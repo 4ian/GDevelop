@@ -36,15 +36,14 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       extension
           .AddBehavior("DestroyOutside",
                        _("Destroy when outside of the screen"),
-                       _("DestroyOutside"),
+                       "DestroyOutside",
                        _("Destroy objects automatically when they go "
                          "outside of the 2D camera borders."),
                        "",
                        "CppPlatform/Extensions/destroyoutsideicon.png",
                        "DestroyOutsideBehavior",
                        std::make_shared<DestroyOutsideBehavior>(),
-                       std::shared_ptr<gd::BehaviorsSharedData>())
-          .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+                       std::shared_ptr<gd::BehaviorsSharedData>());
 
   aut.AddExpressionAndConditionAndAction(
          "number",

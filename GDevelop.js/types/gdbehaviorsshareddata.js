@@ -9,7 +9,6 @@ declare class gdBehaviorsSharedData {
   initializeContent(): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
-  getPropertiesQuickCustomizationVisibilities(): gdQuickCustomizationVisibilitiesContainer;
   delete(): void;
   ptr: number;
 };

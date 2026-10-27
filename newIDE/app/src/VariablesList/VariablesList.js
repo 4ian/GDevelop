@@ -75,7 +75,6 @@ import VariablesListToolbar from './VariablesListToolbar';
 import { normalizeString } from '../Utils/Search';
 import { I18n } from '@lingui/react';
 import SwitchHorizontal from '../UI/CustomSvgIcons/SwitchHorizontal';
-import useRefocusField from './useRefocusField';
 import {
   SimpleTextField,
   type SimpleTextFieldInterface,
@@ -197,10 +196,10 @@ type VariableRowProps = {|
   isSelected: boolean,
   onSelect: (shouldMultiselect: boolean, nodeId: string) => void,
   variableNameInputRefs: {|
-    current: { [number]: SimpleTextFieldInterface },
+    current: { [nodeId: string]: SimpleTextFieldInterface },
   |},
   topLevelVariableValueInputRefs: {|
-    current: { [number]: SimpleTextFieldInterface },
+    current: { [nodeId: string]: SimpleTextFieldInterface },
   |},
   parentType: Variable_Type | null,
   directlyStoreValueChangesWhileEditing: boolean,
@@ -225,7 +224,6 @@ type VariableRowProps = {|
   valueAsBool: boolean | null,
   onChangeValue: (string, nodeId: string) => void,
   isCollection: boolean,
-  variablePointer: number,
   onAddChild: string => void,
   editInheritedVariable: string => void,
   deleteNode: string => void,
@@ -270,7 +268,6 @@ const VariableRow = React.memo<VariableRowProps>(
     valueAsBool,
     onChangeValue,
     isCollection,
-    variablePointer,
     onAddChild,
     editInheritedVariable,
     deleteNode,
@@ -381,14 +378,12 @@ const VariableRow = React.memo<VariableRowProps>(
                   <SimpleTextField
                     type="text"
                     ref={element => {
-                      // The pointers of deleted variables get reused, so an
-                      // unmounted field must not be left behind.
+                      // An unmounted field must not be left behind, as its
+                      // node id can be used again by a variable renamed or
+                      // added later.
                       if (element)
-                        variableNameInputRefs.current[
-                          variablePointer
-                        ] = element;
-                      else
-                        delete variableNameInputRefs.current[variablePointer];
+                        variableNameInputRefs.current[nodeId] = element;
+                      else delete variableNameInputRefs.current[nodeId];
                     }}
                     directlyStoreValueChangesWhileEditing={
                       directlyStoreValueChangesWhileEditing
@@ -471,11 +466,11 @@ const VariableRow = React.memo<VariableRowProps>(
                           if (depth !== 0) return;
                           if (element)
                             topLevelVariableValueInputRefs.current[
-                              variablePointer
+                              nodeId
                             ] = element;
                           else
                             delete topLevelVariableValueInputRefs.current[
-                              variablePointer
+                              nodeId
                             ];
                         }}
                         type={type === gd.Variable.Number ? 'number' : 'text'}
@@ -660,22 +655,25 @@ const VariablesList: React.ComponentType<{
     Array<string>
   >([]);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
+  // The fields are stored by node id rather than by variable pointer: the
+  // variables can be re-created on the C++ side without the list being
+  // rendered again (the side panels apply the refactoring of the project after
+  // a change by unserializing the variables container), so their pointers
+  // can't be relied upon to find the field of a variable.
   const variableNameInputRefs = React.useRef<{|
     // All the variable name inputs must be stored because the React key
     // for the row contains the variable name (this could be changed) so
     // if you change the name, you need the reference to the input
     // in order to refocus the field when the name is changed.
-    [number]: SimpleTextFieldInterface,
+    [nodeId: string]: SimpleTextFieldInterface,
   |}>({});
   const topLevelVariableValueInputRefs = React.useRef<{|
     // All the variable value inputs must be stored at the top level
     // in the case the user wants to modify the value at the instance level
     // of an object's variable: in that case, a new variable is created and
     // the new variable value field needs to be focused.
-    [number]: SimpleTextFieldInterface,
+    [nodeId: string]: SimpleTextFieldInterface,
   |}>({});
-  // $FlowFixMe[incompatible-type] - Hard to fix issue regarding strict checking with interface.
-  const refocusNameField = useRefocusField(variableNameInputRefs);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
@@ -1610,14 +1608,14 @@ const VariablesList: React.ComponentType<{
       const nodeId: string = parsedContext.nodeId;
       const depth: number = parsedContext.depth;
 
-      const { variable, lineage, name } = getVariableContextFromNodeId(
+      const variableContext = getVariableContextFromNodeId(
         nodeId,
         variablesContainer
       );
+      const { variable, lineage, name } = variableContext;
       if (name === null || !variable || newName === name) return;
 
-      const currentlyFocusedNameField =
-        variableNameInputRefs.current[variable.ptr];
+      const currentlyFocusedNameField = variableNameInputRefs.current[nodeId];
       const caretPosition = currentlyFocusedNameField
         ? currentlyFocusedNameField.getCaretPosition()
         : null;
@@ -1668,7 +1666,19 @@ const VariablesList: React.ComponentType<{
         nodeId,
         safeAndUniqueNewName
       );
-      refocusNameField({ identifier: variable.ptr, caretPosition });
+      // The row is keyed by its node id, so it's a new field that must be
+      // focused once the variable is rendered under its new name.
+      const newNodeId = getNodeIdFromVariableContext({
+        ...variableContext,
+        name: safeAndUniqueNewName,
+      });
+      if (newNodeId) {
+        setVariableToReveal({
+          nodeId: newNodeId,
+          fieldToFocus: 'name',
+          caretPosition,
+        });
+      }
     },
     [
       variablesContainer,
@@ -1678,7 +1688,6 @@ const VariablesList: React.ComponentType<{
       _onChange,
       onRenameLoopIndexVariable,
       updateExpandedAndSelectedNodesFollowingNameChange,
-      refocusNameField,
     ]
   );
 
@@ -1776,7 +1785,7 @@ const VariablesList: React.ComponentType<{
           }
         });
         const currentlyFocusedValueField =
-          topLevelVariableValueInputRefs.current[changedInheritedVariable.ptr];
+          topLevelVariableValueInputRefs.current[nodeId];
         setVariableToReveal({
           nodeId: name,
           fieldToFocus: 'value',
@@ -1858,10 +1867,6 @@ const VariablesList: React.ComponentType<{
         ({ nodeId }) => nodeId === variableToReveal.nodeId
       )
     : -1;
-  const variablePointerToReveal =
-    rowIndexToReveal >= 0
-      ? flattenedVariables[rowIndexToReveal].variable.ptr
-      : 0;
 
   // Scroll to the variable to reveal, then - once its row is rendered, which
   // only happens after the scroll - focus the field of it to focus.
@@ -1883,13 +1888,13 @@ const VariablesList: React.ComponentType<{
         return;
       }
 
-      const { fieldToFocus, caretPosition } = variableToReveal;
+      const { nodeId, fieldToFocus, caretPosition } = variableToReveal;
       if (fieldToFocus) {
         const fieldRefs =
           fieldToFocus === 'name'
             ? variableNameInputRefs
             : topLevelVariableValueInputRefs;
-        const field = fieldRefs.current[variablePointerToReveal];
+        const field = fieldRefs.current[nodeId];
         if (field) {
           field.focus(
             caretPosition === null || caretPosition === undefined
@@ -1903,7 +1908,6 @@ const VariablesList: React.ComponentType<{
     [
       variableToReveal,
       rowIndexToReveal,
-      variablePointerToReveal,
       scrollRowIntoView,
       firstRowIndex,
       afterLastRowIndex,
@@ -2002,7 +2006,6 @@ const VariablesList: React.ComponentType<{
         typeErrorMessage={typeErrorMessage}
         isLoopIndexVariable={isLoopIndexVariable}
         removeLoopIndexVariable={removeLoopIndexVariable}
-        variablePointer={variable.ptr}
         onChangeType={onChangeType}
         hasMixedValues={hasMixedValues}
         valueAsString={valueAsString}

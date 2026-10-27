@@ -784,6 +784,11 @@ export type ActiveSubAgent = {|
   callId: string,
 |};
 
+type QueuedEditApproval = {|
+  request: EditApprovalRequest,
+  resolve: boolean => void,
+|};
+
 export type AiRequestContextState = {|
   aiRequestStorage: AiRequestStorage,
   aiRequestHistory: AiRequestHistory,
@@ -980,26 +985,55 @@ export const AiRequestProvider = ({
     setPendingEditApproval,
   ] = React.useState<EditApprovalRequest | null>(null);
   const editApprovalResolverRef = React.useRef<(boolean => void) | null>(null);
-  const requestEditApproval = React.useCallback(
-    (request: EditApprovalRequest): Promise<boolean> => {
-      // If a previous prompt is somehow still pending, refuse it before
-      // replacing it, so its processing loop unblocks.
-      const previousResolver = editApprovalResolverRef.current;
-      if (previousResolver) previousResolver(false);
-
-      return new Promise(resolve => {
-        editApprovalResolverRef.current = resolve;
-        setPendingEditApproval(request);
-      });
+  // Sub-agents run in parallel (for example, one gameplay tester per
+  // `run_tests` call) and each asks for its own approval: the ones arriving
+  // while a prompt is shown wait for it to be answered.
+  const queuedEditApprovalsRef = React.useRef<Array<QueuedEditApproval>>([]);
+  const showEditApproval = React.useCallback(
+    (queuedEditApproval: ?QueuedEditApproval) => {
+      editApprovalResolverRef.current = queuedEditApproval
+        ? queuedEditApproval.resolve
+        : null;
+      setPendingEditApproval(
+        queuedEditApproval ? queuedEditApproval.request : null
+      );
     },
     []
   );
-  const resolveEditApproval = React.useCallback((accepted: boolean) => {
-    const resolver = editApprovalResolverRef.current;
-    editApprovalResolverRef.current = null;
-    setPendingEditApproval(null);
-    if (resolver) resolver(accepted);
-  }, []);
+  // Dismissing leaves the promises of the dismissed prompts unresolved: their
+  // calls stay locked by the processing, as the request is being suspended.
+  const dismissEditApprovals = React.useCallback(
+    () => {
+      queuedEditApprovalsRef.current = [];
+      showEditApproval(null);
+    },
+    [showEditApproval]
+  );
+  const requestEditApproval = React.useCallback(
+    (request: EditApprovalRequest): Promise<boolean> =>
+      new Promise(resolve => {
+        if (editApprovalResolverRef.current) {
+          queuedEditApprovalsRef.current.push({ request, resolve });
+          return;
+        }
+        showEditApproval({ request, resolve });
+      }),
+    [showEditApproval]
+  );
+  const resolveEditApproval = React.useCallback(
+    (accepted: boolean) => {
+      const resolver = editApprovalResolverRef.current;
+      // A refusal suspends the whole flow (see `useProcessFunctionCalls`): the
+      // other approvals waiting are not asked anymore.
+      if (accepted) {
+        showEditApproval(queuedEditApprovalsRef.current.shift());
+      } else {
+        dismissEditApprovals();
+      }
+      if (resolver) resolver(accepted);
+    },
+    [showEditApproval, dismissEditApprovals]
+  );
   const [
     isFetchingSuggestions,
     setIsFetchingSuggestions,
@@ -1428,9 +1462,7 @@ export const AiRequestProvider = ({
   const suspendAiRequest = React.useCallback(
     async (aiRequestId: string): Promise<void> => {
       if (!profile) return;
-      // Dismiss any pending edit approval.
-      editApprovalResolverRef.current = null;
-      setPendingEditApproval(null);
+      dismissEditApprovals();
 
       // Optimistic update: mark as suspended locally immediately so any in-flight
       // async code sees the suspended status on the next render.
@@ -1454,6 +1486,7 @@ export const AiRequestProvider = ({
     },
     [
       profile,
+      dismissEditApprovals,
       aiRequests,
       getAuthorizationHeader,
       updateAiRequest,

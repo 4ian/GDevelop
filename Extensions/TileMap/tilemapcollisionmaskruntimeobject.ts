@@ -157,6 +157,11 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     getVisibilityAABB() {
       return null;
     }

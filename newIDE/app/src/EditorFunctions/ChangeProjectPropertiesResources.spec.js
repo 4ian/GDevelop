@@ -1,6 +1,7 @@
 // @flow
 import { editorFunctions, type EditorFunctionGenericOutput } from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
+import { type ResourceFilesStorage } from './AttachmentResources';
 
 const gd: libGDevelop = global.gd;
 
@@ -394,7 +395,7 @@ describe('change_project_properties_resources', () => {
     const fontFile = makeFile('fake ttf', 'title.ttf', 'font/ttf');
 
     /** Stores the in-memory files like the cloud or local storage would. */
-    const storeResourceFilesInProject = async () => {
+    const storeResourceFilesInProject = async (): Promise<ResourceFilesStorage> => {
       const resourcesManager = project.getResourcesManager();
       resourcesManager
         .getAllResourceNames()
@@ -404,12 +405,12 @@ describe('change_project_properties_resources', () => {
           if (resource.getFile().startsWith('blob:'))
             resource.setFile(`https://project-resources/${name}`);
         });
-      return true;
+      return 'stored';
     };
 
     const launchWithAttachments = (
       args: Object,
-      storeResourceFiles: () => Promise<boolean> = storeResourceFilesInProject
+      storeResourceFiles: () => Promise<ResourceFilesStorage> = storeResourceFilesInProject
     ) =>
       editorFunctions.change_project_properties_resources.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),
@@ -502,7 +503,7 @@ describe('change_project_properties_resources', () => {
             },
           ],
         },
-        async () => true
+        async () => 'stored'
       );
 
       expect(result.success).toBe(false);
@@ -519,7 +520,7 @@ describe('change_project_properties_resources', () => {
     it('keeps the files in memory until a project not saved yet is saved', async () => {
       const result: EditorFunctionGenericOutput = await launchWithAttachments(
         { added_resources: [{ attachment_id: 'logo-id' }] },
-        async () => false
+        async () => 'stored-when-project-is-saved'
       );
 
       expect(result.success).toBe(true);
@@ -531,6 +532,36 @@ describe('change_project_properties_resources', () => {
       ).toMatch(/^blob:/);
       expect(result.message).toContain(
         'The project is not saved yet: the files will be stored in it when it is saved.'
+      );
+    });
+
+    it('undoes all the changes when the project was not saved to store the files', async () => {
+      addProjectResources();
+
+      const result: EditorFunctionGenericOutput = await launchWithAttachments(
+        {
+          added_resources: [{ attachment_id: 'font-id' }],
+          changed_resources: [
+            {
+              resource_name: 'hero.png',
+              replace_file_with_attachment_id: 'logo-id',
+            },
+          ],
+        },
+        async () => 'project-not-saved'
+      );
+
+      expect(result.success).toBe(false);
+      const resourcesManager = project.getResourcesManager();
+      expect(resourcesManager.hasResource('title.ttf')).toBe(false);
+      expect(resourcesManager.getResource('hero.png').getFile()).toBe(
+        'assets/hero.png'
+      );
+      expect(result.message).toContain(
+        'The attached files were not added: the project must be saved (in the cloud) to store them'
+      );
+      expect(result.message).toContain(
+        'Stop and ask the user to save their project, then try again.'
       );
     });
 

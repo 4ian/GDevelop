@@ -2,6 +2,7 @@
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { editorFunctions, type EditorFunctionGenericOutput } from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
+import { type ResourceFilesStorage } from './AttachmentResources';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -412,7 +413,7 @@ describe('object raw JSON and renames', () => {
         return files;
       },
       // Stores the files like the cloud or local storage would.
-      storeResourceFiles: async () => {
+      storeResourceFiles: async (): Promise<ResourceFilesStorage> => {
         const resourcesManager = project.getResourcesManager();
         resourcesManager
           .getAllResourceNames()
@@ -422,7 +423,7 @@ describe('object raw JSON and renames', () => {
             if (resource.getFile().startsWith('blob:'))
               resource.setFile(`https://project-resources/${name}`);
           });
-        return true;
+        return 'stored';
       },
     };
 

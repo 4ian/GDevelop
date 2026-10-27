@@ -12,7 +12,6 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
-#include "GDCore/Project/QuickCustomization.h"
 namespace gd {
 class Behavior;
 class BehaviorsSharedData;
@@ -329,15 +328,6 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
     return *this;
   }
 
-  QuickCustomization::Visibility GetQuickCustomizationVisibility() const {
-    return quickCustomizationVisibility;
-  }
-
-  BehaviorMetadata &SetQuickCustomizationVisibility(QuickCustomization::Visibility visibility) {
-    quickCustomizationVisibility = visibility;
-    return *this;
-  }
-
   BehaviorMetadata &SetOpenFullEditorLabel(const gd::String& label) {
     openFullEditorLabel = label;
     return *this;
@@ -427,7 +417,6 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   bool isRelevantForChildObjects = true;
   bool isActivatedByDefaultInEditor = false;
   gd::String openFullEditorLabel;
-  QuickCustomization::Visibility quickCustomizationVisibility = QuickCustomization::Visibility::Default;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;

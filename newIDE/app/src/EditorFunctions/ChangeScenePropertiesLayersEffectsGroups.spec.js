@@ -336,6 +336,37 @@ describe('change_scene_properties_layers_effects_groups', () => {
     expect(effect.getStringParameter('image')).toBe('Existing.png');
   });
 
+  it('asks the asset store for an effect made for layers', async () => {
+    let askedEffectTarget = null;
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        searchAndInstallEffectAsset: async ({ effectTarget }) => {
+          askedEffectTarget = effectTarget;
+          return {
+            status: 'nothing-found',
+            message:
+              'Asset with id "a1b2c3" is an effect made for objects, not layers: choose another asset, or add a "HslAdjustment" effect without an asset and set its properties.',
+            effect: null,
+            assetShortHeader: null,
+          };
+        },
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            { layer_name: '', effect_name: 'Flash', asset_id: 'a1b2c3' },
+          ],
+        },
+      }
+    );
+
+    expect(askedEffectTarget).toBe('layer');
+    expect(result.success).toBe(false);
+    expect(result.warnings).toContain(
+      'No effect could be added from the asset store on layer "" for "Flash": Asset with id "a1b2c3" is an effect made for objects, not layers: choose another asset, or add a "HslAdjustment" effect without an asset and set its properties.'
+    );
+  });
+
   it('reports an effect the asset store does not have, or of another type', async () => {
     const effects = testScene
       .getLayers()
@@ -377,6 +408,32 @@ describe('change_scene_properties_layers_effects_groups', () => {
     );
     expect(effects.hasEffectNamed('Sky')).toBe(false);
     expect(effects.hasEffectNamed('Sky2')).toBe(false);
+  });
+
+  it('gives a new layer effect the default values of its parameters', async () => {
+    const effects = testScene
+      .getLayers()
+      .getLayer('')
+      .getEffects();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_layer_effects: [
+            {
+              layer_name: '',
+              effect_name: 'MySepia',
+              effect_type: 'FakeSepia',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(effects.getEffect('MySepia').getDoubleParameter('opacity')).toBe(1);
   });
 
   it('renames a layer effect', async () => {

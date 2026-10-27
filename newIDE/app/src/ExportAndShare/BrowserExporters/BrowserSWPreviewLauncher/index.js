@@ -232,9 +232,8 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       previewExportOptions.setCrashReportUploadLevel(
         this.props.crashReportUploadLevel
       );
-      previewExportOptions.setPreviewContext(this.props.previewContext);
+      previewExportOptions.setPreviewContext('preview');
       previewExportOptions.setProjectTemplateSlug(project.getTemplateSlug());
-      previewExportOptions.setSourceGameId(this.props.sourceGameId);
 
       if (previewOptions.inAppTutorialMessageInPreview) {
         previewExportOptions.setInAppTutorialMessageInPreview(
@@ -440,6 +439,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       this.setState({
         error,
       });
+      // The gameplay test runner waits for the game to boot: tell it now
+      // that it never will.
+      if (previewOptions.isForGameplayTest) throw error;
     }
   };
 

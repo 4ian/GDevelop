@@ -158,7 +158,9 @@ describe('navigateSimplifiedProjectJson', () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.message).toBe(
-        'Key "name" not found. Available keys: sceneName, objects.'
+        'Key "name" not found. Available keys: sceneName, objects. ' +
+          'scenes[0] is the item with sceneName "Home". The items of scenes are: [0] "Home", [1] "Level1", [2] "Level2", [3] "BossLevel", [4] "Level3". ' +
+          'To read one by its name: { path: "scenes", filter: { property: "sceneName", value: "..." } }.'
       );
     }
   });

@@ -14,7 +14,6 @@ declare class gdBehavior {
   isFolded(): boolean;
   setFolded(folded: boolean): void;
   isDefaultBehavior(): boolean;
-  getPropertiesQuickCustomizationVisibilities(): gdQuickCustomizationVisibilitiesContainer;
   delete(): void;
   ptr: number;
 };

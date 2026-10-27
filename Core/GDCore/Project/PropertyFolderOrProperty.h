@@ -6,11 +6,12 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
-#include "GDCore/Project/QuickCustomization.h"
 
 namespace gd {
 class Project;
@@ -75,6 +76,13 @@ class GD_CORE_API PropertyFolderOrProperty {
    * name or if any of the children does (recursive search).
    */
   bool HasPropertyNamed(const gd::String& name);
+
+  /**
+   * \brief Adds to the given set the names of all the properties found by
+   * HasPropertyNamed: the property represented by the instance, or the
+   * properties of the children (recursive search).
+   */
+  void AddPropertyNamesTo(std::unordered_set<gd::String>& propertyNames) const;
 
   /**
    * \brief Returns the child instance holding the property with the given name
@@ -210,6 +218,16 @@ class GD_CORE_API PropertyFolderOrProperty {
  private:
   void SetGroupNameOfAllProperties(const gd::String& groupName);
   const gd::String &GetGroupName();
+
+  /**
+   * \brief Unserialize the instance, getting the properties from their name
+   * with `propertiesByName`.
+   */
+  void DoUnserializeFrom(
+      gd::Project& project,
+      const SerializerElement& element,
+      const std::unordered_map<gd::String, gd::NamedPropertyDescriptor*>&
+          propertiesByName);
 
   static gd::PropertyFolderOrProperty badPropertyFolderOrProperty;
   static gd::String emptyGroupName;

@@ -13,7 +13,7 @@ import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
-import { isWebGLSupported } from '../../Utils/WebGL';
+import { isWebGL2Supported } from '../../Utils/WebGL';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -44,7 +44,8 @@ export type AlertMessageIdentifier =
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name';
+  | 'project-should-have-unique-package-name'
+  | 'slow-graphics-rendering';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -218,6 +219,7 @@ export type PreferencesValues = {|
   hasProjectOpened: boolean,
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
+  newEffectDialogDefaultTab: 'asset-store' | 'from-scratch',
   shareDialogDefaultTab: 'invite' | 'publish',
   isMenuBarHiddenInPreview: boolean,
   isAlwaysOnTopInPreview: boolean,
@@ -322,6 +324,8 @@ export type Preferences = {|
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
   getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
   setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
+  getNewEffectDialogDefaultTab: () => 'asset-store' | 'from-scratch',
+  setNewEffectDialogDefaultTab: ('asset-store' | 'from-scratch') => void,
   getShareDialogDefaultTab: () => 'invite' | 'publish',
   setShareDialogDefaultTab: ('invite' | 'publish') => void,
   getIsMenuBarHiddenInPreview: () => boolean,
@@ -425,6 +429,8 @@ export const initialPreferences = {
     newObjectDialogDefaultTab: ((electron
       ? 'new-object'
       : 'asset-store'): string),
+    // Show the effects of the store first, as they are not otherwise visible.
+    newEffectDialogDefaultTab: 'asset-store',
     shareDialogDefaultTab: 'publish',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
@@ -437,7 +443,7 @@ export const initialPreferences = {
     openDiagnosticReportAutomatically: true,
     blockPreviewAndExportOnDiagnosticErrors: false,
     showDeprecatedInstructionWarning: 'no',
-    use3DEditor: (isWebGLSupported(): boolean),
+    use3DEditor: (isWebGL2Supported(): boolean),
     showBasicProfilingCounters: false,
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: ((app ? findDefaultFolder(app) : ''): string),
@@ -502,6 +508,8 @@ export const initialPreferences = {
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
   getNewObjectDialogDefaultTab: (): string => 'asset-store',
   setNewObjectDialogDefaultTab: () => {},
+  getNewEffectDialogDefaultTab: (): string => 'asset-store',
+  setNewEffectDialogDefaultTab: () => {},
   getShareDialogDefaultTab: (): string => 'invite',
   setShareDialogDefaultTab: () => {},
   getIsMenuBarHiddenInPreview: (): boolean => true,

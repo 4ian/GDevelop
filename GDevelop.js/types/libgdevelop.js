@@ -119,6 +119,8 @@ declare class libGDevelop {
   ExternalEvents: Class<gdExternalEvents>;
   Test: Class<gdTest>;
   TestsContainer: Class<gdTestsContainer>;
+  NamedEasing: Class<gdNamedEasing>;
+  NamedEasingsContainer: Class<gdNamedEasingsContainer>;
   ExternalLayout: Class<gdExternalLayout>;
   Effect: Class<gdEffect>;
   EffectsContainer: Class<gdEffectsContainer>;
@@ -181,9 +183,6 @@ declare class libGDevelop {
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
   InGameEditorResourceMetadata: Class<gdInGameEditorResourceMetadata>;
-  QuickCustomization_Visibility: Class<QuickCustomization_Visibility>;
-  QuickCustomization: Class<gdQuickCustomization>;
-  QuickCustomizationVisibilitiesContainer: Class<gdQuickCustomizationVisibilitiesContainer>;
   Screenshot: Class<gdScreenshot>;
   CaptureOptions: Class<gdCaptureOptions>;
   BehaviorMetadata: Class<gdBehaviorMetadata>;

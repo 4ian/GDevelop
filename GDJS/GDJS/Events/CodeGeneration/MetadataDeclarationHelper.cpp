@@ -116,8 +116,7 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
                   eventsBasedBehavior.GetName(), project,
                   PlatformExtension::GetBehaviorFullType(
                       extension.GetName(), eventsBasedBehavior.GetName())))
-          .SetObjectType(eventsBasedBehavior.GetObjectType())
-          .SetQuickCustomizationVisibility(eventsBasedBehavior.GetQuickCustomizationVisibility());
+          .SetObjectType(eventsBasedBehavior.GetObjectType());
 
   if (eventsBasedBehavior.IsPrivate())
     behaviorMetadata.SetPrivate();
@@ -1355,10 +1354,159 @@ void MetadataDeclarationHelper::
 }
 
 /**
- * Declare the instructions (actions/conditions) and expressions for the
- * properties of the given events based object.
- * This is akin to what would happen by manually declaring a JS extension
- * (see `JsExtension.js` files of extensions).
+ * The conversions crossing the boundary of a custom object, one object at a
+ * time: the children of a custom object have their own coordinates, which
+ * mean nothing outside of it. A 3D custom object takes and gives a Z and also
+ * converts directions, a 2D one also converts angles.
+ *
+ * They are private: only the events of the object itself know what is inside
+ * it. What they expose is converted, so that the scene (or the custom object
+ * containing it) never depends on how the object is made.
+ */
+void MetadataDeclarationHelper::DeclareObjectCoordinateConversions(
+    gd::ObjectMetadata &objectMetadata, const gd::String &objectType,
+    bool isRenderedIn3D) {
+  auto addPoint = [&isRenderedIn3D](gd::ExpressionMetadata &expression,
+                                    bool isGivenInside) {
+    if (isGivenInside) {
+      expression.AddParameter("number", _("X position, inside the object"))
+          .AddParameter("number", _("Y position, inside the object"));
+      if (isRenderedIn3D)
+        expression.AddParameter("number", _("Z position, inside the object"));
+    } else {
+      expression
+          .AddParameter("number",
+                        _("X position, in the space containing the object"))
+          .AddParameter("number",
+                        _("Y position, in the space containing the object"));
+      if (isRenderedIn3D)
+        expression.AddParameter(
+            "number", _("Z position, in the space containing the object"));
+    }
+  };
+
+  for (const auto &axis : std::vector<gd::String>{"X", "Y", "Z"}) {
+    if (axis == "Z" && !isRenderedIn3D) continue;
+
+    auto &toParent =
+        objectMetadata
+            .AddExpression(
+                "ToParent" + axis,
+                _("<axis> of a point inside the object, in its parent")
+                    .FindAndReplace("<axis>", axis),
+                _("Convert a point given inside the object (where its child "
+                  "objects are positioned) to the space containing the object "
+                  "(the scene, or the custom object containing it), and "
+                  "return its <axis> position. Use it to expose the position "
+                  "of a child object (or of a point of it) to the parent.")
+                    .FindAndReplace("<axis>", axis),
+                _("Position ❯ Coordinates"), "res/actions/position_black.png")
+            .AddParameter("object", _("Object"), objectType);
+    addPoint(toParent, true);
+    toParent.SetPrivate().SetFunctionName("toParent" + axis);
+
+    auto &fromParent =
+        objectMetadata
+            .AddExpression(
+                "FromParent" + axis,
+                _("<axis> of a point of the parent, inside the object")
+                    .FindAndReplace("<axis>", axis),
+                _("Convert a point given in the space containing the object "
+                  "(the scene, or the custom object containing it) to the "
+                  "inside of the object (where its child objects are "
+                  "positioned), and return its <axis> position. Use it to "
+                  "bring a position given by the parent (a target, the "
+                  "cursor...) to the child objects.")
+                    .FindAndReplace("<axis>", axis),
+                _("Position ❯ Coordinates"), "res/actions/position_black.png")
+            .AddParameter("object", _("Object"), objectType);
+    addPoint(fromParent, false);
+    fromParent.SetPrivate().SetFunctionName("fromParent" + axis);
+
+    if (!isRenderedIn3D) continue;
+
+    objectMetadata
+        .AddExpression(
+            "ToParentDirection" + axis,
+            _("<axis> of a direction inside the object, in its parent")
+                .FindAndReplace("<axis>", axis),
+            _("Convert a direction given inside the object (the forward "
+              "vector of a child object, for instance) to the space "
+              "containing the object (the scene, or the custom object "
+              "containing it), and return the <axis> of this direction as a "
+              "unit vector. The rotations, flips and scales of the object "
+              "are applied.")
+                .FindAndReplace("<axis>", axis),
+            _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X of the direction, inside the object"))
+        .AddParameter("number", _("Y of the direction, inside the object"))
+        .AddParameter("number", _("Z of the direction, inside the object"))
+        .SetPrivate()
+        .SetFunctionName("toParentDirection" + axis);
+
+    objectMetadata
+        .AddExpression(
+            "FromParentDirection" + axis,
+            _("<axis> of a direction of the parent, inside the object")
+                .FindAndReplace("<axis>", axis),
+            _("Convert a direction given in the space containing the object "
+              "(where the camera looks, for instance) to the inside of the "
+              "object, and return the <axis> of this direction as a unit "
+              "vector.")
+                .FindAndReplace("<axis>", axis),
+            _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number",
+                      _("X of the direction, in the space containing the "
+                        "object"))
+        .AddParameter("number",
+                      _("Y of the direction, in the space containing the "
+                        "object"))
+        .AddParameter("number",
+                      _("Z of the direction, in the space containing the "
+                        "object"))
+        .SetPrivate()
+        .SetFunctionName("fromParentDirection" + axis);
+  }
+
+  // An angle around Z is the whole orientation of a 2D object only: in 3D, a
+  // direction tilted by a rotation on X or Y keeps no meaning as an angle
+  // across a tilted object. Directions are converted as vectors there.
+  if (isRenderedIn3D) return;
+
+  objectMetadata
+      .AddExpression(
+          "ToParentAngle", _("Angle inside the object, in its parent"),
+          _("Convert an angle (a direction, in degrees) given inside the "
+            "object (where its child objects are positioned) to the space "
+            "containing the object (the scene, or the custom object containing "
+            "it). The angle, flips and scales of the object are applied. Use "
+            "it to expose the angle of a child object to the parent."),
+          _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+      .AddParameter("object", _("Object"), objectType)
+      .AddParameter("number", _("Angle, inside the object (in degrees)"))
+      .SetPrivate()
+      .SetFunctionName("toParentAngle");
+
+  objectMetadata
+      .AddExpression(
+          "FromParentAngle", _("Angle of the parent, inside the object"),
+          _("Convert an angle (a direction, in degrees) given in the space "
+            "containing the object (the scene, or the custom object "
+            "containing it) to the inside of the object (where its child "
+            "objects are positioned)."),
+          _("Position ❯ Coordinates"), "res/actions/rotate_black.png")
+      .AddParameter("object", _("Object"), objectType)
+      .AddParameter("number",
+                    _("Angle, in the space containing the object (in degrees)"))
+      .SetPrivate()
+      .SetFunctionName("fromParentAngle");
+}
+
+/**
+ * Declare the instructions (actions/conditions) and expressions that only
+ * the events of the given events based object can use.
  */
 void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
     gd::PlatformExtension &extension, gd::ObjectMetadata &objectMetadata,
@@ -1383,6 +1531,8 @@ void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
         .MarkAsAdvanced()
         .SetPrivate()
         .SetFunctionName("setRotationCenter3D");
+
+    DeclareObjectCoordinateConversions(objectMetadata, objectType, true);
   }
   else {
     objectMetadata
@@ -1399,6 +1549,8 @@ void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
         .MarkAsAdvanced()
         .SetPrivate()
         .SetFunctionName("setRotationCenter");
+
+    DeclareObjectCoordinateConversions(objectMetadata, objectType, false);
   }
 }
 

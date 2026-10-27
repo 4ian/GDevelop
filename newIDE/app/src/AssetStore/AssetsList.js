@@ -971,7 +971,8 @@ const AssetsList: React.ComponentType<{
             <LargeSpacer />
           </Column>
         ) : null}
-        {isNavigatingInsideFolder ? (
+        {// While the assets are loading, a loader is already displayed above.
+        isNavigatingInsideFolder && assetTiles ? (
           <PlaceholderLoader />
         ) : assetTiles && assetTiles.length ? (
           <GridList

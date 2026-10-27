@@ -520,6 +520,11 @@ export const AssetDetails: React.ComponentType<{
                           A "{effectAssetMetadata.getFullName()}" effect, to add
                           on a 3D layer of a scene.
                         </Trans>
+                      ) : !effectAssetMetadata.isMarkedAsNotWorkingForObjects() ? (
+                        <Trans>
+                          A "{effectAssetMetadata.getFullName()}" effect, to add
+                          on an object or on a 2D layer of a scene.
+                        </Trans>
                       ) : effectAssetMetadata.isMarkedAsOnlyWorkingFor2D() ? (
                         <Trans>
                           A "{effectAssetMetadata.getFullName()}" effect, to add

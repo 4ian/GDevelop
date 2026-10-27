@@ -73,7 +73,7 @@ function YesNoCancelDialog(props: Props): React.Node {
           onRequestClose={props.onClickCancel}
           onApply={props.onClickYes}
         >
-          <Text>
+          <Text displayAsBlockContainer>
             <MarkdownText translatableSource={props.message} isStandaloneText />
           </Text>
         </Dialog>

@@ -237,7 +237,14 @@ namespace gdjs {
               // even 3D objects.
               threeRenderer.clearDepth();
               if (runtimeLayerRenderer.hasPostProcessingPass()) {
+                // Whatever the pass rendering the scene is, it must clear the
+                // composer buffers with a transparent color, so that the parts
+                // of the layer where nothing is rendered stay transparent (the
+                // layers rendered before this one must remain visible).
+                const clearAlpha = threeRenderer.getClearAlpha();
+                threeRenderer.setClearAlpha(0);
                 threeEffectComposer.render();
+                threeRenderer.setClearAlpha(clearAlpha);
               } else {
                 threeRenderer.render(threeScene, threeCamera);
               }

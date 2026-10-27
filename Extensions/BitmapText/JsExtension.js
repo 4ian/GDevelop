@@ -414,7 +414,7 @@ module.exports = {
       .addAction(
         'SetWordWrap',
         _('Word wrapping'),
-        _('De/activate word wrapping.'),
+        _('Activate or deactivate word wrapping.'),
         _('Activate word wrapping of _PARAM0_: _PARAM1_'),
         '',
         'res/actions/wordWrap24_black.png',

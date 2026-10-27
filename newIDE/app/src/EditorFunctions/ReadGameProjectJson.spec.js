@@ -81,11 +81,21 @@ describe('read_game_project_json', () => {
     ]);
   });
 
-  it('fails with the available keys for an unknown path', async () => {
+  it('fails with the available keys, and the item read by its index, for an unknown path', async () => {
     const result = await launch({ path: 'scenes[0].unknownKey' });
     expect(result.success).toBe(false);
     expect(result.message).toBe(
-      'Key "unknownKey" not found. Available keys: sceneName, objects, objectGroups, sceneVariables, layers, instancesOnSceneDescription.'
+      'Key "unknownKey" not found. Available keys: sceneName, objects, objectGroups, sceneVariables, layers, instancesOnSceneDescription. ' +
+        'scenes[0] is the item with sceneName "Level1". The items of scenes are: [0] "Level1", [1] "Level2", [2] "Menu". ' +
+        'To read one by its name: { path: "scenes", filter: { property: "sceneName", value: "..." } }.'
+    );
+  });
+
+  it('fails with only the available keys for an unknown key that is not in a list item', async () => {
+    const result = await launch({ path: 'unknownKey' });
+    expect(result.success).toBe(false);
+    expect(result.message).toMatch(
+      /^Key "unknownKey" not found\. Available keys: [^.]*\.$/
     );
   });
 });

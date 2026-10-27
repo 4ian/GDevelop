@@ -107,20 +107,21 @@ describe('NameHelpers', () => {
 
   describe('getEnumSettingValue', () => {
     it('returns the matching value', () => {
-      expect(
-        getEnumSettingValue('hidden', ['default', 'visible', 'hidden'], 'v')
-      ).toEqual({ success: true, value: 'hidden' });
+      expect(getEnumSettingValue('string', ['number', 'string'], 'v')).toEqual({
+        success: true,
+        value: 'string',
+      });
     });
 
     it('lists the allowed values on anything else', () => {
       const result = getEnumSettingValue(
-        'sometimes',
-        ['default', 'visible', 'hidden'],
-        'quickCustomizationVisibility'
+        'boolean',
+        ['number', 'string'],
+        'expression_type'
       );
       expect(result.success).toBe(false);
       expect(result.success ? '' : result.message).toBe(
-        '`quickCustomizationVisibility` must be one of "default", "visible", "hidden" (got "sometimes").'
+        '`expression_type` must be one of "number", "string" (got "boolean").'
       );
     });
   });

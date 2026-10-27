@@ -49,6 +49,7 @@ import defaultShortcuts, {
   defaultSecondaryShortcuts,
 } from '../../KeyboardShortcuts/DefaultShortcuts';
 import AlertMessage from '../../UI/AlertMessage';
+import { isWebGL2Supported } from '../../Utils/WebGL';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import CompactSelectField from '../../UI/CompactSelectField';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
@@ -339,7 +340,6 @@ const styles = {
 type Props = {|
   i18n: I18n,
   onClose: (options: {| languageDidChange: boolean |}) => void,
-  onOpenQuickCustomizationDialog: () => void,
   /** The tab displayed when the dialog opens. Defaults to the preferences. */
   initialTab?: PreferencesTabName,
   /** The preferences section displayed when the dialog opens. Defaults to the general one. */
@@ -350,6 +350,11 @@ type Props = {|
    * only useful to force it, for example in Storybook.
    */
   isDesktop?: boolean,
+  /**
+   * Whether 3D rendering (WebGL2) is supported. Defaults to the detected
+   * support: only useful to force it, for example in Storybook.
+   */
+  is3DRenderingSupported?: boolean,
 |};
 
 /**
@@ -359,9 +364,11 @@ type Props = {|
 const SettingToggle = ({
   checked,
   onCheck,
+  disabled,
 }: {|
   checked: boolean,
   onCheck: (newValue: boolean) => void,
+  disabled?: boolean,
 |}) => {
   const controlIds = useSettingsRowControlIds();
   return (
@@ -372,6 +379,7 @@ const SettingToggle = ({
       ariaLabelledBy={controlIds ? controlIds.labelId : undefined}
       checked={checked}
       onCheck={onCheck}
+      disabled={disabled}
     />
   );
 };
@@ -379,10 +387,10 @@ const SettingToggle = ({
 const PreferencesDialog = ({
   i18n,
   onClose,
-  onOpenQuickCustomizationDialog,
   initialTab,
   initialSection,
   isDesktop = !!electron,
+  is3DRenderingSupported = isWebGL2Supported(),
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { showConfirmation } = useAlertDialog();
@@ -594,8 +602,11 @@ const PreferencesDialog = ({
 
   const renderToggle = (
     checked: boolean,
-    onCheck: (newValue: boolean) => void
-  ) => <SettingToggle checked={checked} onCheck={onCheck} />;
+    onCheck: (newValue: boolean) => void,
+    disabled?: boolean
+  ) => (
+    <SettingToggle checked={checked} onCheck={onCheck} disabled={disabled} />
+  );
 
   const renderResetLayoutButton = (editorMosaicName: EditorMosaicName) => (
     <FlatButton
@@ -1063,11 +1074,22 @@ const PreferencesDialog = ({
               id: 'use-3d-editor',
               label: i18n._(t`Show objects in 3D in the scene editor`),
               renderControl: () =>
-                renderToggle(values.use3DEditor, setUse3DEditor),
+                renderToggle(
+                  values.use3DEditor,
+                  setUse3DEditor,
+                  !is3DRenderingSupported
+                ),
             },
           ],
           renderFooter: () =>
-            initialUse3DEditor.current !== values.use3DEditor ? (
+            !is3DRenderingSupported ? (
+              <AlertMessage kind="warning">
+                <Trans>
+                  3D rendering is not available because this device does not
+                  support WebGL2.
+                </Trans>
+              </AlertMessage>
+            ) : initialUse3DEditor.current !== values.use3DEditor ? (
               <AlertMessage kind="info">
                 <Trans>
                   For the 3D change to take effect, close and reopen all
@@ -1238,16 +1260,6 @@ const PreferencesDialog = ({
                   values.useGDJSDevelopmentWatcher,
                   setUseGDJSDevelopmentWatcher
                 ),
-            },
-            {
-              id: 'quick-customization',
-              label: i18n._(t`Quick customization`),
-              renderControl: () => (
-                <FlatButton
-                  onClick={onOpenQuickCustomizationDialog}
-                  label={<Trans>Open</Trans>}
-                />
-              ),
             },
           ],
         };

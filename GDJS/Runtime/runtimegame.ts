@@ -165,9 +165,6 @@ namespace gdjs {
     /** The template slug that was used to create the project. */
     projectTemplateSlug?: string;
 
-    /** The source game id that was used to create the project. */
-    sourceGameId?: string;
-
     /** Any capture that should be done during the preview. */
     captureOptions?: CaptureOptions;
 
@@ -202,6 +199,7 @@ namespace gdjs {
     _sceneAndExtensionsData: Array<SceneAndExtensionsData> = [];
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
     _effectsManager: EffectsManager;
+    _namedEasingsManager: gdjs.NamedEasingsManager;
     _maxFPS: integer;
     _minFPS: integer;
     _gameResolutionWidth: integer;
@@ -341,6 +339,7 @@ namespace gdjs {
         ? new gdjs.DebuggerClient(this)
         : null;
       this._effectsManager = new gdjs.EffectsManager();
+      this._namedEasingsManager = new gdjs.NamedEasingsManager(data);
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
@@ -403,6 +402,7 @@ namespace gdjs {
         getGlobalResourceNames(projectData),
         projectData.layouts
       );
+      this._namedEasingsManager = new gdjs.NamedEasingsManager(projectData);
     }
 
     private _updateSceneAndExtensionsData(): void {
@@ -570,6 +570,10 @@ namespace gdjs {
      */
     getEffectsManager(): gdjs.EffectsManager {
       return this._effectsManager;
+    }
+
+    getNamedEasingsManager(): gdjs.NamedEasingsManager {
+      return this._namedEasingsManager;
     }
 
     /**
@@ -1752,6 +1756,24 @@ namespace gdjs {
      */
     isInGameEdition(): boolean {
       return this._isInGameEdition;
+    }
+
+    /**
+     * In the in-game editor, report an error thrown by the code of an
+     * extension, instead of letting it stop the editor.
+     * @param error What was thrown.
+     * @param origin Where: the phase (`onCreated`, `doStepPostEvents`...), and
+     * the type of the object or behavior running it, if any.
+     */
+    reportInGameEditorExtensionError(
+      error: unknown,
+      origin: { phase: string; type?: string }
+    ): void {
+      if (this._debuggerClient) {
+        this._debuggerClient.reportInGameEditorExtensionError(error, origin);
+      } else {
+        logger.error('Error in the code of an extension:', error);
+      }
     }
 
     /**

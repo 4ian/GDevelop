@@ -183,6 +183,7 @@ const SimpleTileMapEditor = ({
           floatingLabelFixed
           floatingLabelText={<Trans>Tile size</Trans>}
           id="tileSize"
+          type="number"
           onChange={value => setTileSize(Math.max(parseInt(value, 10) || 0, 0))}
           value={tileSize.toString()}
         />

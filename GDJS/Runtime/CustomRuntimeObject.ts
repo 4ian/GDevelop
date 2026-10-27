@@ -92,9 +92,32 @@ namespace gdjs {
     private _customCenter: FloatPoint | null = null;
     private _localTransformation: gdjs.AffineTransformation =
       new gdjs.AffineTransformation();
-    private _localInverseTransformation: gdjs.AffineTransformation =
-      new gdjs.AffineTransformation();
-    private _isLocalTransformationDirty: boolean = true;
+    /**
+     * Bumped by `invalidateTransformation` every time anything the
+     * transformation is built from changes. Each consumer keeps the revision
+     * it last used (the matrices below, the renderer its own dirty flag), so
+     * one of them reading the transformation never leaves another stale.
+     */
+    protected _transformationRevision: integer = 1;
+    private _computedTransformationRevision: integer = 0;
+    /**
+     * Where the local (0;0) lands, which is the translation the way back from
+     * the parent undoes. It is read far more often than it changes (the
+     * cursor is converted for every object under it, every frame), so it is
+     * kept from one read to the next.
+     */
+    private _inverseTranslationX: float = 0;
+    private _inverseTranslationY: float = 0;
+    private _computedInverseTransformationRevision: integer = 0;
+    /**
+     * The coefficients of the rotation of the object, computed once when the
+     * transformation is composed and used again to undo it: the two ways turn
+     * by exactly the same amounts, and the trigonometry is done once.
+     */
+    private _rotationCosine: float = 1;
+    private _rotationSine: float = 0;
+    private static _temporaryPoint: FloatPoint = [0, 0];
+    private static _temporaryCoefficients: FloatPoint = [0, 0];
     _type: string;
 
     /**
@@ -115,6 +138,29 @@ namespace gdjs {
       this._renderer = this._createRender();
 
       this._initializeFromObjectData(objectData);
+
+      if (parent.getGame().isInGameEdition()) {
+        // In the in-game editor, an error thrown by the events of the object
+        // is reported, and the editor goes on. The method is read at each
+        // call: the code of the object can be hot-reloaded.
+        for (const methodName of [
+          'onCreated',
+          'doStepPostEvents',
+          'onHotReloading',
+          'onDestroy',
+        ]) {
+          (this as any)[methodName] = (...args: any[]) => {
+            try {
+              return Object.getPrototypeOf(this)[methodName].apply(this, args);
+            } catch (error) {
+              parent.getGame().reportInGameEditorExtensionError(error, {
+                phase: methodName,
+                type: this._type,
+              });
+            }
+          };
+        }
+      }
 
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
@@ -162,6 +208,7 @@ namespace gdjs {
         this._innerArea.max[0] = usedVariantData.areaMaxX;
         this._innerArea.max[1] = usedVariantData.areaMaxY;
         this._innerArea.max[2] = usedVariantData.areaMaxZ;
+        this.invalidateTransformation();
       }
       this._instanceContainer.loadFrom(customObjectData, usedVariantData);
     }
@@ -402,8 +449,26 @@ namespace gdjs {
 
     onChildrenLocationChanged() {
       this._isUntransformedHitBoxesDirty = true;
-      this.invalidateHitboxes();
-      this.getRenderer().update();
+      if (this._isCenterOfRotationFollowingChildren()) {
+        // An object with no fixed area is as big as its children: they moved,
+        // so its center of rotation - and its transformation - moved with them.
+        this.invalidateTransformation();
+      } else {
+        // The object itself did not move: only what it contains did, which
+        // changes its hit boxes (and the ones of the objects containing it)
+        // but leaves its transformation as it was.
+        this.invalidateHitboxes();
+      }
+    }
+
+    /**
+     * Whether the center of rotation of the object - what its transformation
+     * and its renderer turn it around - is the middle of its children. An
+     * object given an area of its own (or a center of rotation) keeps it
+     * wherever its children go.
+     */
+    private _isCenterOfRotationFollowingChildren(): boolean {
+      return !this._customCenter && !this._innerArea;
     }
 
     override updateHitBoxes(): void {
@@ -505,17 +570,51 @@ namespace gdjs {
      * @returns the affine transformation.
      */
     getLocalTransformation(): gdjs.AffineTransformation {
-      if (this._isLocalTransformationDirty) {
+      if (
+        this._computedTransformationRevision !== this._transformationRevision
+      ) {
         this._updateLocalTransformation();
       }
       return this._localTransformation;
     }
 
-    getLocalInverseTransformation(): gdjs.AffineTransformation {
-      if (this._isLocalTransformationDirty) {
-        this._updateLocalTransformation();
-      }
-      return this._localInverseTransformation;
+    /**
+     * Everything the transformation of the object is built from (its position,
+     * its angle, its scales, its flips, its center of rotation and the area
+     * its children live in) changed: the matrices are recomputed on the next
+     * read, the hit boxes are invalidated and the renderer is told to update
+     * itself. Every mutator goes through this: a consumer forgotten here is a
+     * transformation read (or drawn) from values that no longer exist.
+     */
+    invalidateTransformation(): void {
+      this._invalidateTransformationWithoutRendererUpdate();
+      this.getRenderer().update();
+    }
+
+    /**
+     * Same as {@link gdjs.CustomRuntimeObject.invalidateTransformation}, for a
+     * mutator that tells the renderer what changed on its own (`updateX`,
+     * `updateY`, `updateAngle`): the renderer writes that one value on its
+     * container instead of building it again, and a build asked for earlier
+     * (a scale, a center of rotation...) is still pending.
+     */
+    private _invalidateTransformationWithoutRendererUpdate(): void {
+      this._transformationRevision++;
+      this.invalidateHitboxes();
+    }
+
+    /**
+     * Whether a position of the space containing this object has a place of
+     * its own inside it. A scale of 0 on X or Y collapses everything inside
+     * the object onto a line (or a point), and every position outside of it
+     * lands on that same line.
+     *
+     * Only X and Y: a position given to an object (the cursor, a touch) is a
+     * position of the plane containing it. A 3D custom object flattened by a
+     * scale of 0 on Z keeps its children where they are on that plane.
+     */
+    isTransformationInvertibleOnXAndY(): boolean {
+      return this._scaleX !== 0 && this._scaleY !== 0;
     }
 
     _updateLocalTransformation() {
@@ -525,8 +624,21 @@ namespace gdjs {
       const centerY = this.getUnscaledCenterY() * absScaleY;
       const angleInRadians = (this.angle * Math.PI) / 180;
 
+      const coefficients = gdjs.CustomRuntimeObject._temporaryCoefficients;
+      gdjs.AffineTransformation.setRotationCoefficients(
+        angleInRadians,
+        coefficients
+      );
+      this._rotationCosine = coefficients[0];
+      this._rotationSine = coefficients[1];
+
       this._localTransformation.setToTranslation(this.x, this.y);
-      this._localTransformation.rotateAround(angleInRadians, centerX, centerY);
+      this._localTransformation.rotateAroundWithCoefficients(
+        this._rotationCosine,
+        this._rotationSine,
+        centerX,
+        centerY
+      );
       if (this._flippedX) {
         this._localTransformation.flipX(centerX);
       }
@@ -535,9 +647,181 @@ namespace gdjs {
       }
       this._localTransformation.scale(absScaleX, absScaleY);
 
-      this._localInverseTransformation.copyFrom(this._localTransformation);
-      this._localInverseTransformation.invert();
-      this._isLocalTransformationDirty = false;
+      this._computedTransformationRevision = this._transformationRevision;
+    }
+
+    /**
+     * The X of a point of the inside of this object (the space its children
+     * live in), in the space containing this object - the scene when this
+     * object is in one, the custom object holding it otherwise. The boundary
+     * of one object is crossed: to reach the scene from a child of a child,
+     * convert again with the object containing this one.
+     *
+     * @param x The X position of the point, inside this object.
+     * @param y The Y position of the point, inside this object.
+     * @param z The Z position of the point, which a 2D custom object ignores
+     * (its children have no Z of their own). 3D custom objects override these
+     * conversions with their own transformation.
+     */
+    toParentX(x: float, y: float, z: float = 0): float {
+      const point = gdjs.CustomRuntimeObject._temporaryPoint;
+      this.applyObjectTransformation(x, y, point);
+      return point[0];
+    }
+
+    /** The Y of {@link gdjs.CustomRuntimeObject.toParentX}. */
+    toParentY(x: float, y: float, z: float = 0): float {
+      const point = gdjs.CustomRuntimeObject._temporaryPoint;
+      this.applyObjectTransformation(x, y, point);
+      return point[1];
+    }
+
+    /**
+     * The X of a point of the space containing this object, inside this object
+     * (the space its children live in): the other way round of
+     * {@link gdjs.CustomRuntimeObject.toParentX}.
+     *
+     * A scale of 0 collapsed the object: the point is then the closest one it
+     * can reach, with 0 on every collapsed axis (see
+     * {@link gdjs.CustomRuntimeObject.applyObjectInverseTransformation}).
+     *
+     * @param x The X position of the point, in the space containing this object.
+     * @param y The Y position of the point, in the space containing this object.
+     * @param z The Z position of the point, ignored by a 2D custom object.
+     */
+    fromParentX(x: float, y: float, z: float = 0): float {
+      const point = gdjs.CustomRuntimeObject._temporaryPoint;
+      this.applyObjectInverseTransformation(x, y, point);
+      return point[0];
+    }
+
+    /** The Y of {@link gdjs.CustomRuntimeObject.fromParentX}. */
+    fromParentY(x: float, y: float, z: float = 0): float {
+      const point = gdjs.CustomRuntimeObject._temporaryPoint;
+      this.applyObjectInverseTransformation(x, y, point);
+      return point[1];
+    }
+
+    /**
+     * The angle, in the space containing this object, of a direction given by
+     * its angle inside this object: where a child turned by `angle` faces,
+     * seen from outside. The angle of the object is added to it, its flips
+     * mirror it and scales of different values on X and Y bend it, like they
+     * do to the children drawn inside.
+     *
+     * Only for 2D custom objects: in 3D, an angle around Z is not the whole
+     * direction of a child (it can be pitched), so a direction is converted as
+     * two points.
+     *
+     * @param angle The angle of the direction inside this object, in degrees.
+     */
+    toParentAngle(angle: float): float {
+      return (
+        gdjs.CustomRuntimeObject._getFlippedAngle(
+          gdjs.CustomRuntimeObject._getScaledAngle(
+            angle,
+            this.getScaleX(),
+            this.getScaleY()
+          ),
+          this._flippedX,
+          this._flippedY
+        ) + this.angle
+      );
+    }
+
+    /**
+     * The angle, inside this object, of a direction given by its angle in the
+     * space containing it: the other way round of
+     * {@link gdjs.CustomRuntimeObject.toParentAngle}.
+     *
+     * @param angle The angle of the direction in the space containing this
+     * object, in degrees.
+     */
+    fromParentAngle(angle: float): float {
+      const scaleX = this.getScaleX();
+      const scaleY = this.getScaleY();
+      // A collapsed axis gives 0 to the direction on that axis, like it gives
+      // 0 to a point.
+      return gdjs.CustomRuntimeObject._getScaledAngle(
+        gdjs.CustomRuntimeObject._getUnflippedAngle(
+          angle - this.angle,
+          this._flippedX,
+          this._flippedY
+        ),
+        scaleX === 0 ? 0 : 1 / scaleX,
+        scaleY === 0 ? 0 : 1 / scaleY
+      );
+    }
+
+    /**
+     * A direction mirrored by flips: a flip on X turns an angle `a` into
+     * `180 - a`, a flip on Y into `-a`.
+     */
+    private static _getFlippedAngle(
+      angle: float,
+      isFlippedX: boolean,
+      isFlippedY: boolean
+    ): float {
+      const angleFlippedOnX = isFlippedX ? 180 - angle : angle;
+      return isFlippedY ? -angleFlippedOnX : angleFlippedOnX;
+    }
+
+    /**
+     * The other way round of
+     * {@link gdjs.CustomRuntimeObject._getFlippedAngle}, undoing the flips in
+     * the reverse order: a round trip gives back the same number, not only
+     * the same direction.
+     */
+    private static _getUnflippedAngle(
+      angle: float,
+      isFlippedX: boolean,
+      isFlippedY: boolean
+    ): float {
+      const angleUnflippedOnY = isFlippedY ? -angle : angle;
+      return isFlippedX ? 180 - angleUnflippedOnY : angleUnflippedOnY;
+    }
+
+    /**
+     * The angle of the direction `(cos(angle) * scaleX ; sin(angle) * scaleY)`,
+     * as close as possible to `angle` (they are the same with equal scales,
+     * without any rounding error). A direction collapsed to nothing (both
+     * scales of 0, or the direction along the only collapsed axis) keeps
+     * `angle`.
+     */
+    private static _getScaledAngle(
+      angle: float,
+      scaleX: float,
+      scaleY: float
+    ): float {
+      if (scaleX === scaleY && scaleX !== 0) {
+        return angle;
+      }
+      const angleInRadians = gdjs.toRad(angle);
+      const directionX = Math.cos(angleInRadians) * scaleX;
+      const directionY = Math.sin(angleInRadians) * scaleY;
+      return gdjs.CustomRuntimeObject._getAngleOfDirection(
+        directionX,
+        directionY,
+        angle
+      );
+    }
+
+    /**
+     * The angle of a direction, in degrees, chosen among the equivalent ones
+     * (one turn apart) as the closest to `nearAngle`: a conversion is
+     * continuous, and never gives -90 for a child turned by 270. A direction
+     * of no length has no angle: `nearAngle` is kept.
+     */
+    private static _getAngleOfDirection(
+      directionX: float,
+      directionY: float,
+      nearAngle: float
+    ): float {
+      if (directionX === 0 && directionY === 0) {
+        return nearAngle;
+      }
+      const angle = gdjs.toDegrees(Math.atan2(directionY, directionX));
+      return angle + 360 * Math.round((nearAngle - angle) / 360);
     }
 
     /**
@@ -556,10 +840,54 @@ namespace gdjs {
       y: float,
       destination: FloatPoint
     ) {
-      const source = destination;
-      source[0] = x;
-      source[1] = y;
-      this.getLocalInverseTransformation().transform(source, destination);
+      // The transformation of the object is `point -> M point + t`, where
+      // `M = rotation * flips * scales` and `t` is everything else (the center
+      // of rotation and the flip offsets included): `t` is where the local
+      // (0;0) lands. The rotation and the flips keep lengths, so they are
+      // always undone exactly; only a scale can collapse an axis, and the
+      // local coordinate of a collapsed axis is answered as 0 (every point of
+      // it has the same image: none of them is more the point than another).
+      if (
+        this._computedInverseTransformationRevision !==
+        this._transformationRevision
+      ) {
+        this._updateInverseTransformation();
+      }
+      const deltaX = x - this._inverseTranslationX;
+      const deltaY = y - this._inverseTranslationY;
+
+      const cos = this._rotationCosine;
+      const sin = this._rotationSine;
+      const rotatedX = cos * deltaX + sin * deltaY;
+      const rotatedY = cos * deltaY - sin * deltaX;
+      const unflippedX = this._flippedX ? -rotatedX : rotatedX;
+      const unflippedY = this._flippedY ? -rotatedY : rotatedY;
+      const absScaleX = Math.abs(this._scaleX);
+      const absScaleY = Math.abs(this._scaleY);
+      destination[0] = absScaleX === 0 ? 0 : unflippedX / absScaleX;
+      destination[1] = absScaleY === 0 ? 0 : unflippedY / absScaleY;
+    }
+
+    /**
+     * What {@link gdjs.CustomRuntimeObject.applyObjectInverseTransformation}
+     * undoes: where the local (0;0) lands, and the coefficients the rotation
+     * was built with. They are read from the transformation itself, so the two
+     * ways can never be built from different values.
+     */
+    private _updateInverseTransformation(): void {
+      const temporaryPoint = gdjs.CustomRuntimeObject._temporaryPoint;
+      temporaryPoint[0] = 0;
+      temporaryPoint[1] = 0;
+      // Composing the transformation is also what computes the coefficients
+      // of the rotation this undoes: a right angle gives exactly 0 and 1 on
+      // both ways, so a point on the edge of an object comes back exactly
+      // on it.
+      this.getLocalTransformation().transform(temporaryPoint, temporaryPoint);
+      this._inverseTranslationX = temporaryPoint[0];
+      this._inverseTranslationY = temporaryPoint[1];
+
+      this._computedInverseTransformationRevision =
+        this._transformationRevision;
     }
 
     override getDrawableX(): float {
@@ -740,8 +1068,7 @@ namespace gdjs {
       this._customCenter[0] = x;
       this._customCenter[1] = y;
 
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
+      this.invalidateTransformation();
     }
 
     hasCustomRotationCenter(): boolean {
@@ -777,6 +1104,7 @@ namespace gdjs {
       if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         this._innerArea.min[0] *= scaleX;
         this._innerArea.max[0] *= scaleX;
+        this.invalidateTransformation();
       } else {
         this.setScaleX(scaleX);
       }
@@ -791,6 +1119,7 @@ namespace gdjs {
       if (this._innerArea && this._isInnerAreaFollowingParentSize) {
         this._innerArea.min[1] *= scaleY;
         this._innerArea.max[1] *= scaleY;
+        this.invalidateTransformation();
       } else {
         this.setScaleY(scaleY);
       }
@@ -812,8 +1141,7 @@ namespace gdjs {
         return;
       }
       this.x = x;
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
+      this._invalidateTransformationWithoutRendererUpdate();
       this.getRenderer().updateX();
     }
 
@@ -822,8 +1150,7 @@ namespace gdjs {
         return;
       }
       this.y = y;
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
+      this._invalidateTransformationWithoutRendererUpdate();
       this.getRenderer().updateY();
     }
 
@@ -832,8 +1159,7 @@ namespace gdjs {
         return;
       }
       this.angle = angle;
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
+      this._invalidateTransformationWithoutRendererUpdate();
       this.getRenderer().updateAngle();
     }
 
@@ -858,9 +1184,7 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.invalidateTransformation();
     }
 
     /**
@@ -880,9 +1204,7 @@ namespace gdjs {
         return;
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
-      this._isLocalTransformationDirty = true;
-      this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.invalidateTransformation();
     }
 
     /**
@@ -902,8 +1224,7 @@ namespace gdjs {
         return;
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this.invalidateHitboxes();
-      this.getRenderer().update();
+      this.invalidateTransformation();
     }
 
     /**
@@ -974,8 +1295,7 @@ namespace gdjs {
       if (enable !== this._flippedX) {
         this._scaleX *= -1;
         this._flippedX = enable;
-        this.invalidateHitboxes();
-        this.getRenderer().update();
+        this.invalidateTransformation();
       }
     }
 
@@ -983,8 +1303,7 @@ namespace gdjs {
       if (enable !== this._flippedY) {
         this._scaleY *= -1;
         this._flippedY = enable;
-        this.invalidateHitboxes();
-        this.getRenderer().update();
+        this.invalidateTransformation();
       }
     }
 

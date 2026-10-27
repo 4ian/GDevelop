@@ -23,6 +23,7 @@ const makeFakeEnumeratedExpressionMetadata = (
   type: name,
   name: name,
   displayedName: expressionMetadata.getFullName(),
+  description: expressionMetadata.getDescription(),
   fullGroupName: expressionMetadata.getGroup(),
   iconFilename: expressionMetadata.getSmallIconFilename(),
   metadata: expressionMetadata,

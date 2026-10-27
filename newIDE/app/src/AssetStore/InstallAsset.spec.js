@@ -49,6 +49,46 @@ const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 
 describe('InstallAsset', () => {
   describe('installEffectAsset', () => {
+    it('marks a skybox without a top as legacy and keeps the top of the others', () => {
+      const { project } = makeTestProject(gd);
+      const effectsContainer = project
+        .insertNewLayout('MyTestLayout', 0)
+        .getLayers()
+        .getLayer('')
+        .getEffects();
+      const effectAsset = (fakeSkyboxAsset.effectAssets || [])[0];
+
+      const legacyEffect = installEffectAsset({
+        project,
+        effectsContainer,
+        asset: fakeSkyboxAsset,
+        effectName: 'LegacySky',
+      });
+      const standardEffect = installEffectAsset({
+        project,
+        effectsContainer,
+        asset: {
+          ...fakeSkyboxAsset,
+          effectAssets: [
+            {
+              ...effectAsset,
+              effect: {
+                ...effectAsset.effect,
+                stringParameters: {
+                  ...effectAsset.effect.stringParameters,
+                  top: 'Z+',
+                },
+              },
+            },
+          ],
+        },
+        effectName: 'StandardSky',
+      });
+
+      expect(legacyEffect.getStringParameter('top')).toBe('Legacy');
+      expect(standardEffect.getStringParameter('top')).toBe('Z+');
+    });
+
     it('installs a skybox as an effect showing its images', () => {
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);

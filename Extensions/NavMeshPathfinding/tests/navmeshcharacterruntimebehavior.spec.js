@@ -35,6 +35,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
         name: 'Scene1',
         stopSoundsOnStartup: false,
         title: '',
+        renderer3DWorldScale: 1,
         behaviorsSharedData: [],
         objects: [],
         objectsGroups: [],
@@ -312,6 +313,24 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     runtimeScene.renderAndStep(1000 / 60);
     // The path is a straight line as the obstacle is gone.
     expect(getPathLength(character)).to.be.within(180, 220);
+  });
+
+  it('frees the navigation mesh and the crowd when the scene is unloaded', function () {
+    character.setPosition(400, 300);
+    runtimeScene.renderAndStep(1000 / 60);
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    const navMeshObstaclesManager = runtimeScene.navMeshObstaclesManager;
+    expect(navMeshObstaclesManager.navMesh).not.to.be(null);
+    expect(navMeshObstaclesManager.crowd).not.to.be(null);
+
+    runtimeScene.unloadScene();
+
+    expect(navMeshObstaclesManager.navMesh).to.be(null);
+    expect(navMeshObstaclesManager.crowd).to.be(null);
+    expect(navMeshObstaclesManager.characters.size).to.be(0);
+    expect(runtimeScene.navMeshObstaclesManager).to.be(undefined);
   });
 
   describe('(network synchronization)', function () {

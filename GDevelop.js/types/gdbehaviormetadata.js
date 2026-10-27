@@ -38,8 +38,6 @@ declare class gdBehaviorMetadata {
   markAsIrrelevantForChildObjects(): gdBehaviorMetadata;
   isActivatedByDefaultInEditor(): boolean;
   markAsActivatedByDefaultInEditor(): gdBehaviorMetadata;
-  getQuickCustomizationVisibility(): QuickCustomization_Visibility;
-  setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): gdBehaviorMetadata;
   setOpenFullEditorLabel(label: string): gdBehaviorMetadata;
   getOpenFullEditorLabel(): string;
   get(): gdBehavior;

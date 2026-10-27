@@ -12,6 +12,7 @@ export const addSerializedInstances = ({
   serializedInstances,
   addInstancesInTheForeground = false,
   doesObjectExistInContext,
+  doesLayerExistInContext,
 }: {|
   project: gdProject,
   instancesContainer: gdInitialInstancesContainer,
@@ -19,6 +20,7 @@ export const addSerializedInstances = ({
   serializedInstances: Array<Object>,
   addInstancesInTheForeground?: boolean,
   doesObjectExistInContext: string => boolean,
+  doesLayerExistInContext?: string => boolean,
 |}): Array<gdInitialInstance> => {
   const zOrderFinder = new gd.HighestZOrderFinder();
   zOrderFinder.reset();
@@ -38,6 +40,12 @@ export const addSerializedInstances = ({
         project
       );
       if (!doesObjectExistInContext(instance.getObjectName())) return null;
+      if (
+        doesLayerExistInContext &&
+        !doesLayerExistInContext(instance.getLayer())
+      ) {
+        instance.setLayer('');
+      }
       instance.setX(instance.getX() - copyReferential[0]);
       instance.setY(instance.getY() - copyReferential[1]);
       if (addInstancesInTheForeground) {

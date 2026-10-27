@@ -7,6 +7,11 @@
 namespace gdjs {
   const logger = new gdjs.Logger('LayerPixiRenderer');
 
+  type PostProcessingPass = {
+    pass: THREE_ADDONS.Pass;
+    effectName: string;
+  };
+
   const FRUSTUM_EDGES: Array<[number, number]> = [
     // near plane edges
     [0, 1],
@@ -189,6 +194,13 @@ namespace gdjs {
     private _pixiContainer: PIXI.Container;
 
     private _layer: gdjs.RuntimeLayer;
+    private _runtimeGameRenderer: gdjs.RuntimeGameRenderer;
+
+    /**
+     * True for a layer of a scene, false for a layer inside a custom object
+     * (only the former is covering the whole screen).
+     */
+    private _isSceneLayer: boolean;
 
     /** For a lighting layer, the sprite used to display the render texture. */
     private _lightingSprite: PIXI.Sprite | null = null;
@@ -215,6 +227,14 @@ namespace gdjs {
       | null = null;
     private _threeCameraDirty: boolean = false;
     private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
+    private _threeRenderPass: THREE_ADDONS.RenderPass | null = null;
+    private _customRenderPass: THREE_ADDONS.N8AOPass | null = null;
+    private _sceneDepthRenderPass: THREE_ADDONS.SceneDepthRenderPass | null =
+      null;
+    private _sceneDepthTextureUsersCount = 0;
+    private _postProcessingPasses: PostProcessingPass[] = [];
+    // The antialiasing (if any) and output passes, after the effects.
+    private _threeFinalPasses: THREE_ADDONS.Pass[] = [];
     private _basis: Basis | null = null;
     private static matrix4: THREE.Matrix4 | null = null;
 
@@ -245,6 +265,9 @@ namespace gdjs {
       this._pixiContainer = new PIXI.Container();
       this._pixiContainer.sortableChildren = true;
       this._layer = layer;
+      this._runtimeGameRenderer = runtimeGameRenderer;
+      const instanceContainer = layer.getInstanceContainer();
+      this._isSceneLayer = instanceContainer === instanceContainer.getScene();
       this._isLightingLayer = layer.isLightingLayer();
       const parentRendererObject =
         runtimeInstanceContainerRenderer.getRendererObject();
@@ -252,6 +275,7 @@ namespace gdjs {
         parentRendererObject.addChild(this._pixiContainer);
       }
       this._pixiContainer.filters = [];
+      this._updateFilterArea();
 
       // Setup rendering for lighting or 3D rendering:
       const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
@@ -285,6 +309,47 @@ namespace gdjs {
     onGameResolutionResized() {
       // Ensure the 3D camera aspect is updated:
       this._update3DCameraAspectAndPosition();
+
+      this._updateFilterArea();
+    }
+
+    /**
+     * Tell PixiJS the area on which the effects (filters) of a scene layer must
+     * be applied: the whole screen.
+     *
+     * Without this, PixiJS uses the bounding box of what the layer contains,
+     * which has two downsides:
+     * - the bounding box of the whole layer is computed at every frame;
+     * - when this bounding box is smaller than the screen, PixiJS renders the
+     *   layer in a bigger (rounded up to a power of two) texture taken from its
+     *   pool. Effects reading the neighbor pixels (blurs notably) then read the
+     *   empty area around the layer, which shows up as a seam on the right and
+     *   bottom edges of the screen.
+     */
+    private _updateFilterArea() {
+      if (!this._isSceneLayer) {
+        // A layer of a custom object only covers the object: let PixiJS compute
+        // the area from its content.
+        return;
+      }
+      const pixiRenderer = this._runtimeGameRenderer.getPIXIRenderer();
+      if (!pixiRenderer) {
+        return;
+      }
+      const filterArea = this._pixiContainer.filterArea;
+      if (filterArea) {
+        filterArea.x = 0;
+        filterArea.y = 0;
+        filterArea.width = pixiRenderer.screen.width;
+        filterArea.height = pixiRenderer.screen.height;
+      } else {
+        this._pixiContainer.filterArea = new PIXI.Rectangle(
+          0,
+          0,
+          pixiRenderer.screen.width,
+          pixiRenderer.screen.height
+        );
+      }
     }
 
     private _update3DCameraAspectAndPosition() {
@@ -292,8 +357,12 @@ namespace gdjs {
         return;
       }
       if (this._threeCamera instanceof THREE.OrthographicCamera) {
-        const width = this._layer.getWidth();
-        const height = this._layer.getHeight();
+        const inverseWorldScale = this._layer
+          .getRuntimeScene()
+          .getScene()
+          .getRenderer3DInverseWorldScale();
+        const width = this._layer.getWidth() * inverseWorldScale;
+        const height = this._layer.getHeight() * inverseWorldScale;
         this._threeCamera.left = -width / 2;
         this._threeCamera.right = width / 2;
         this._threeCamera.top = height / 2;
@@ -330,41 +399,124 @@ namespace gdjs {
       return this._threeEffectComposer;
     }
 
-    addPostProcessingPass(pass: THREE_ADDONS.Pass) {
+    /**
+     * Add a pass applying an effect after the rendering of the scene.
+     * Passes are applied in the order of the effects of the layer.
+     * @param pass The pass to add.
+     * @param effectName The name of the effect adding the pass.
+     */
+    addPostProcessingPass(pass: THREE_ADDONS.Pass, effectName: string) {
       if (!this._threeEffectComposer) {
         return;
       }
-      const game = this._layer.getRuntimeScene().getGame();
-      // TODO Keep the effects in the same order they are defined
-      // because the order matter for the final result.
-      // There is the same issue with 2D effects too.
-
-      // The composer contains:
-      // - RenderPass
-      // - inserted passes for effects
-      // - SMAAPass (optionally)
-      // - OutputPass
-      const index =
-        this._threeEffectComposer.passes.length -
-        (game.getAntialiasingMode() === 'none' ? 1 : 2);
-      this._threeEffectComposer.insertPass(pass, index);
+      const renderTarget = this._threeEffectComposer.renderTarget1;
+      pass.setSize(renderTarget.width, renderTarget.height);
+      this._postProcessingPasses.push({ pass, effectName });
+      this.updatePostProcessingPassesOrder();
     }
 
     removePostProcessingPass(pass: THREE_ADDONS.Pass) {
+      this._postProcessingPasses = this._postProcessingPasses.filter(
+        (postProcessingPass) => postProcessingPass.pass !== pass
+      );
+      this.updatePostProcessingPassesOrder();
+    }
+
+    /**
+     * Put the post-processing passes in the order of the effects of the layer.
+     */
+    updatePostProcessingPassesOrder() {
       if (!this._threeEffectComposer) {
         return;
       }
-      this._threeEffectComposer.removePass(pass);
+      const effectNames = Object.keys(this._layer.getRendererEffects());
+      this._postProcessingPasses.sort(
+        (a, b) =>
+          effectNames.indexOf(a.effectName) - effectNames.indexOf(b.effectName)
+      );
+
+      const passes = this._threeEffectComposer.passes;
+      passes.splice(
+        1,
+        passes.length - 1,
+        ...this._postProcessingPasses.map(({ pass }) => pass),
+        ...this._threeFinalPasses
+      );
     }
 
     hasPostProcessingPass() {
       if (!this._threeEffectComposer) {
         return false;
       }
-      const game = this._layer.getRuntimeScene().getGame();
-      // RenderPass, OutputPass and optionally SMAAPass are default passes.
-      const emptyCount = game.getAntialiasingMode() === 'none' ? 2 : 3;
-      return this._threeEffectComposer.passes.length > emptyCount;
+      return (
+        this._threeEffectComposer.passes[0] !== this._threeRenderPass ||
+        this._postProcessingPasses.length > 0
+      );
+    }
+
+    /**
+     * Replace the pass rendering the scene to compute the ambient occlusion.
+     * @param pass The pass rendering the scene, or null to use the default one.
+     */
+    setCustomRenderPass(pass: THREE_ADDONS.N8AOPass | null) {
+      this._customRenderPass = pass;
+      this._updateSceneRenderPass();
+    }
+
+    /**
+     * Declare that an effect needs the depth of the scene (see
+     * `getSceneDepthTexture`), or doesn't need it anymore.
+     */
+    setSceneDepthTextureNeeded(isNeeded: boolean) {
+      this._sceneDepthTextureUsersCount = Math.max(
+        0,
+        this._sceneDepthTextureUsersCount + (isNeeded ? 1 : -1)
+      );
+      this._updateSceneRenderPass();
+    }
+
+    /**
+     * @returns The depth of the scene rendered in this frame, if an effect
+     * declared it needed it with `setSceneDepthTextureNeeded`.
+     */
+    getSceneDepthTexture(): THREE.DepthTexture | null {
+      if (this._customRenderPass) {
+        return this._customRenderPass.beautyRenderTarget.depthTexture;
+      }
+      if (this._sceneDepthTextureUsersCount > 0 && this._sceneDepthRenderPass) {
+        return this._sceneDepthRenderPass.depthTexture;
+      }
+      return null;
+    }
+
+    private _updateSceneRenderPass() {
+      if (
+        !this._threeEffectComposer ||
+        !this._threeRenderPass ||
+        !this._threeScene ||
+        !this._threeCamera
+      ) {
+        return;
+      }
+      let sceneRenderPass: THREE_ADDONS.Pass = this._threeRenderPass;
+      if (this._customRenderPass) {
+        sceneRenderPass = this._customRenderPass;
+      } else if (this._sceneDepthTextureUsersCount > 0) {
+        if (!this._sceneDepthRenderPass) {
+          this._sceneDepthRenderPass = new THREE_ADDONS.SceneDepthRenderPass(
+            this._threeScene,
+            this._threeCamera
+          );
+        }
+        sceneRenderPass = this._sceneDepthRenderPass;
+      }
+      if (this._threeEffectComposer.passes[0] === sceneRenderPass) {
+        return;
+      }
+      // The pass was not resized with the composer while it was not in it.
+      const renderTarget = this._threeEffectComposer.renderTarget1;
+      sceneRenderPass.setSize(renderTarget.width, renderTarget.height);
+      this._threeEffectComposer.passes[0] = sceneRenderPass;
     }
 
     /**
@@ -401,11 +553,6 @@ namespace gdjs {
           }
 
           this._threeScene = new THREE.Scene();
-
-          // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
-          // We use a mirroring rather than a camera rotation so that the Z order is not changed.
-          this._threeScene.scale.y = -1;
-
           this._threeGroup = new THREE.Group();
           this._threeScene.add(this._threeGroup);
 
@@ -413,46 +560,73 @@ namespace gdjs {
             this._layer.getCameraType() ===
             gdjs.RuntimeLayerCameraType.ORTHOGRAPHIC
           ) {
-            const width = this._layer.getWidth();
-            const height = this._layer.getHeight();
+            const inverseWorldScale = this._layer
+              .getRuntimeScene()
+              .getScene()
+              .getRenderer3DInverseWorldScale();
+            const width = this._layer.getWidth() * inverseWorldScale;
+            const height = this._layer.getHeight() * inverseWorldScale;
             this._threeCamera = new THREE.OrthographicCamera(
               -width / 2,
               width / 2,
               height / 2,
-              -height / 2,
-              this._layer.getInitialCamera3DNearPlaneDistance(),
-              this._layer.getInitialCamera3DFarPlaneDistance()
+              -height / 2
             );
           } else {
             this._threeCamera = new THREE.PerspectiveCamera(
               this._layer.getInitialCamera3DFieldOfView(),
-              1,
-              this._layer.getInitialCamera3DNearPlaneDistance(),
-              this._layer.getInitialCamera3DFarPlaneDistance()
+              1
             );
           }
           this._threeCamera.rotation.order = 'ZYX';
 
+          this.updateWorldScale();
+
           const game = this._layer.getRuntimeScene().getGame();
           const threeRenderer = game.getRenderer().getThreeRenderer();
           if (threeRenderer) {
-            // When adding more default passes, make sure to update
-            // `addPostProcessingPass` and `hasPostProcessingPass` formulas.
+            // Keep a stencil buffer when the layer is rendered through
+            // post-processing passes, like when it's rendered on the canvas.
+            const drawingBufferSize = threeRenderer.getDrawingBufferSize(
+              new THREE.Vector2()
+            );
             this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
-              threeRenderer
+              threeRenderer,
+              new THREE.WebGLRenderTarget(
+                drawingBufferSize.x,
+                drawingBufferSize.y,
+                { type: THREE.HalfFloatType, stencilBuffer: true }
+              )
             );
-            this._threeEffectComposer.addPass(
-              new THREE_ADDONS.RenderPass(this._threeScene, this._threeCamera)
+            this._threeRenderPass = new THREE_ADDONS.RenderPass(
+              this._threeScene,
+              this._threeCamera
             );
+            this._threeEffectComposer.addPass(this._threeRenderPass);
             if (game.getAntialiasingMode() !== 'none') {
-              this._threeEffectComposer.addPass(
-                new THREE_ADDONS.SMAAPass(
-                  game.getGameResolutionWidth(),
-                  game.getGameResolutionHeight()
-                )
-              );
+              this._threeFinalPasses.push(new THREE_ADDONS.SMAAPass());
             }
-            this._threeEffectComposer.addPass(new THREE_ADDONS.OutputPass());
+            const outputPass = new THREE_ADDONS.OutputPass();
+            // The composer result is drawn on top of the layers already rendered
+            // on the canvas: blend it (the buffers hold premultiplied colors)
+            // instead of overwriting everything.
+            outputPass.material.transparent = true;
+            outputPass.material.depthTest = false;
+            outputPass.material.depthWrite = false;
+            outputPass.material.blending = THREE.CustomBlending;
+            outputPass.material.blendEquation = THREE.AddEquation;
+            outputPass.material.blendSrc = THREE.OneFactor;
+            outputPass.material.blendDst = THREE.OneMinusSrcAlphaFactor;
+            // TODO: the composer blends transparency in linear space, unlike
+            // rendering without post-processing (in sRGB space), and the output
+            // pass converts premultiplied colors to sRGB. So semi-transparent
+            // pixels can be brighter than without effects, especially over
+            // the layers below. Fixing this needs a decision on which blending
+            // to match, keeping the light added by a bloom on transparent pixels.
+            this._threeFinalPasses.push(outputPass);
+            for (const pass of this._threeFinalPasses) {
+              this._threeEffectComposer.addPass(pass);
+            }
           }
 
           if (
@@ -528,7 +702,7 @@ namespace gdjs {
             this._threePlaneMaterial = new THREE.ShaderMaterial(
               noGammaCorrectionShader
             );
-            this._threePlaneMaterial;
+            this._threePlaneMaterial.depthWrite = false;
 
             // Finally, create the mesh shown in the scene.
             this._threePlaneMesh = new THREE.Mesh(
@@ -569,10 +743,13 @@ namespace gdjs {
     setCamera3DNearPlaneDistance(distance: number) {
       if (!this._threeCamera) return;
 
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
       this._threeCamera.near = Math.min(
         // 0 is not a valid value for three js perspective camera:
         // https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.
-        Math.max(distance, 0.0001),
+        Math.max(distance * inverseWorldScale, 0.000001),
         // Near value cannot exceed far value.
         this._threeCamera.far
       );
@@ -581,18 +758,30 @@ namespace gdjs {
 
     getCamera3DNearPlaneDistance(): float {
       if (!this._threeCamera) return 0;
-      return this._threeCamera.near;
+      const worldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DWorldScale();
+      return this._threeCamera.near * worldScale;
     }
 
     setCamera3DFarPlaneDistance(distance: number) {
       if (!this._threeCamera) return;
-      this._threeCamera.far = Math.max(distance, this._threeCamera.near);
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
+      this._threeCamera.far = Math.max(
+        distance * inverseWorldScale,
+        this._threeCamera.near
+      );
       this._threeCameraDirty = true;
     }
 
     getCamera3DFarPlaneDistance(): float {
       if (!this._threeCamera) return 0;
-      return this._threeCamera.far;
+      const worldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DWorldScale();
+      return this._threeCamera.far * worldScale;
     }
 
     setCamera3DFieldOfView(angle: number) {
@@ -756,10 +945,10 @@ namespace gdjs {
       // Interpolate Infinity→base via 1/w (bounded):
       const BIG = 1e12; // “practically infinite”
       const denom = Math.max(w, 1e-6);
-      const effectiveMaxH = Math.min(
-        BIG,
-        this._2DPlaneMaxDrawingDistance / denom
-      );
+      const maxDrawingDistance =
+        this._2DPlaneMaxDrawingDistance *
+        this._layer.getRuntimeScene().getRenderer3DInverseWorldScale();
+      const effectiveMaxH = Math.min(BIG, maxDrawingDistance / denom);
 
       // Apply the max height.
       if (effectiveMaxH < BIG) {
@@ -828,25 +1017,61 @@ namespace gdjs {
       return [cx, cy];
     }
 
+    updateWorldScale(): void {
+      if (!this._threeScene || !this._threeCamera) {
+        return;
+      }
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
+      // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
+      // We use a mirroring rather than a camera rotation so that the Z order is not changed.
+      this._threeScene.scale.set(
+        inverseWorldScale,
+        -inverseWorldScale,
+        inverseWorldScale
+      );
+      if (this._threeCamera instanceof THREE.OrthographicCamera) {
+        const width = this._layer.getWidth() * inverseWorldScale;
+        const height = this._layer.getHeight() * inverseWorldScale;
+        this._threeCamera.left = -width / 2;
+        this._threeCamera.right = width / 2;
+        this._threeCamera.top = height / 2;
+        this._threeCamera.bottom = -height / 2;
+      }
+      this._threeCamera.near =
+        this._layer.getInitialCamera3DNearPlaneDistance() * inverseWorldScale;
+      this._threeCamera.far =
+        this._layer.getInitialCamera3DFarPlaneDistance() * inverseWorldScale;
+
+      this._threeCamera.updateProjectionMatrix();
+    }
+
     updatePosition(): void {
       const instanceContainer = this._layer.getInstanceContainer();
       const runtimeGame = instanceContainer.getGame();
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
 
       // Update the 3D camera position and rotation.
       if (this._threeCamera) {
         const angle = -gdjs.toRad(this._layer.getCameraRotation());
-        this._threeCamera.position.x = this._layer.getCameraX();
-        this._threeCamera.position.y = -this._layer.getCameraY(); // scene is mirrored on Y
+        this._threeCamera.position.x =
+          this._layer.getCameraX() * inverseWorldScale;
+        // The scene is mirrored on Y
+        this._threeCamera.position.y =
+          -this._layer.getCameraY() * inverseWorldScale;
         this._threeCamera.rotation.z = angle;
 
         if (this._threeCamera instanceof THREE.OrthographicCamera) {
           this._threeCamera.zoom = this._layer.getCameraZoom();
           this._threeCamera.updateProjectionMatrix();
-          this._threeCamera.position.z = this._layer.getCameraZ(null);
+          this._threeCamera.position.z =
+            this._layer.getCameraZ(null) * inverseWorldScale;
         } else {
-          this._threeCamera.position.z = this._layer.getCameraZ(
-            this._threeCamera.fov
-          );
+          this._threeCamera.position.z =
+            this._layer.getCameraZ(this._threeCamera.fov) * inverseWorldScale;
         }
       }
 
@@ -877,27 +1102,36 @@ namespace gdjs {
 
           const [cx, cy] = this._get2DPlanePosition(boxH);
 
+          // The size and position are in the world coordinates, but the plane
+          // is in the scene, which is scaled by the inverse of the world scale
+          // and mirrored on Y.
+          const worldScale = this._layer
+            .getRuntimeScene()
+            .getRenderer3DWorldScale();
+          const planeWidth = boxW * worldScale;
+          const planeHeight = boxH * worldScale;
+          const planeX = cx * worldScale;
+          const planeY = -cy * worldScale;
+
           // Update the 2D plane size, position and rotation (so 2D remains upright).
           // Plane size (geometry is 1×1).
-          this._threePlaneMesh.scale.set(boxW, boxH, 1);
-          this._threePlaneMesh.position.set(cx, -cy, 0);
+          this._threePlaneMesh.scale.set(planeWidth, planeHeight, 1);
+          this._threePlaneMesh.position.set(planeX, planeY, 0);
           this._threePlaneMesh.rotation.set(0, 0, -angle);
 
           if (shouldRenderLayerIn3D) {
             // Update the 2D Pixi container size and rotation to match the "zoom" (which comes from the 2D plane size)
             // rotation and position.
-            effectivePixiZoom = this._layer.getWidth() / boxW; // == height/boxH
+            effectivePixiZoom = this._layer.getWidth() / planeWidth; // == height/planeHeight
             this._pixiContainer.scale.set(effectivePixiZoom, effectivePixiZoom);
             this._pixiContainer.rotation = angle;
 
-            const followX = cx;
-            const followY = -cy;
             const centerX2d =
-              followX * effectivePixiZoom * angleCosValue -
-              followY * effectivePixiZoom * angleSinValue;
+              planeX * effectivePixiZoom * angleCosValue -
+              planeY * effectivePixiZoom * angleSinValue;
             const centerY2d =
-              followX * effectivePixiZoom * angleSinValue +
-              followY * effectivePixiZoom * angleCosValue;
+              planeX * effectivePixiZoom * angleSinValue +
+              planeY * effectivePixiZoom * angleCosValue;
             this._pixiContainer.position.x =
               this._layer.getWidth() / 2 - centerX2d;
             this._pixiContainer.position.y =
@@ -994,7 +1228,6 @@ namespace gdjs {
     updateResolution() {
       if (this._threeEffectComposer) {
         const game = this._layer.getRuntimeScene().getGame();
-        this._threeEffectComposer.setPixelRatio(window.devicePixelRatio);
         this._threeEffectComposer.setSize(
           game.getGameResolutionWidth(),
           game.getGameResolutionHeight()
@@ -1137,6 +1370,12 @@ namespace gdjs {
 
       camera.updateMatrixWorld();
 
+      // The Three.js scene is scaled by the inverse world scale,
+      // so the camera is in Three.js units and not in scene units.
+      const runtimeScene = this._layer.getRuntimeScene();
+      const threeWorldZ =
+        worldZ * runtimeScene.getRenderer3DInverseWorldScale();
+
       if (camera instanceof THREE.OrthographicCamera) {
         // https://discourse.threejs.org/t/how-to-unproject-mouse2d-with-orthographic-camera/4777
         vector.set(normalizedX, normalizedY, 0);
@@ -1145,7 +1384,7 @@ namespace gdjs {
         // Find x and y for a given z along the camera direction line.
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
-        const distance = (worldZ - vector.z) / direction.z;
+        const distance = (threeWorldZ - vector.z) / direction.z;
         vector.x += distance * direction.x;
         vector.y += distance * direction.y;
       } else {
@@ -1156,7 +1395,7 @@ namespace gdjs {
         // Find x and y for a given z along the line between the camera and
         // the one on the frustum.
         vector.sub(camera.position).normalize();
-        const distance = (worldZ - camera.position.z) / vector.z;
+        const distance = (threeWorldZ - camera.position.z) / vector.z;
         vector.x = distance * vector.x + camera.position.x;
         vector.y = distance * vector.y + camera.position.y;
       }
@@ -1168,8 +1407,9 @@ namespace gdjs {
         return result;
       }
 
-      result[0] = vector.x;
-      result[1] = -vector.y;
+      const worldScale = runtimeScene.getRenderer3DWorldScale();
+      result[0] = vector.x * worldScale;
+      result[1] = -vector.y * worldScale;
       return result;
     }
 
@@ -1336,7 +1576,9 @@ namespace gdjs {
         // "Hack" into the Three.js renderer by getting the internal WebGL texture for the PixiJS plane,
         // and set it so that it's the same as the WebGL texture for the PixiJS RenderTexture.
         // This works because PixiJS and Three.js are using the same WebGL context.
-        const texture = threeRenderer.properties.get(this._threePlaneTexture);
+        const texture: any = threeRenderer.properties.get(
+          this._threePlaneTexture
+        );
         texture.__webglTexture = glTexture.texture;
       }
     }

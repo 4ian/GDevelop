@@ -20,7 +20,6 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import VisibilityOffIcon from '../../UI/CustomSvgIcons/VisibilityOff';
-import { renderQuickCustomizationMenuItems } from '../../QuickCustomization/QuickCustomizationMenuItems';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { buildMoveToMenu } from './EventsBasedEntityPropertyFolderTreeViewItemContent';
 
@@ -397,15 +396,6 @@ export class EventsBasedEntityPropertyTreeViewItemContent
           property
         ),
       },
-      ...renderQuickCustomizationMenuItems({
-        i18n,
-        visibility: property.getQuickCustomizationVisibility(),
-        onChangeVisibility: visibility => {
-          property.setQuickCustomizationVisibility(visibility);
-          this.props.forceUpdate();
-          this.props.onPropertiesUpdated();
-        },
-      }),
     ];
   }
 

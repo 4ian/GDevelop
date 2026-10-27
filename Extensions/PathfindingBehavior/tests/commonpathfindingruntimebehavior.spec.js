@@ -35,6 +35,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           name: 'Scene1',
           stopSoundsOnStartup: false,
           title: '',
+          renderer3DWorldScale: 100,
           behaviorsSharedData: [],
           objects: [],
           objectsGroups: [],

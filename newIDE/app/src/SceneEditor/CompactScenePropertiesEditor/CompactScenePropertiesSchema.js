@@ -116,12 +116,32 @@ const getWindowTitleField = ({ i18n }: {| i18n: I18nType |}): Field => ({
   visibility: 'advanced',
 });
 
+const getWorldScaleField = ({
+  i18n,
+  onRenderer3DWorldScaleFieldChanged,
+}: {
+  i18n: I18nType,
+  onRenderer3DWorldScaleFieldChanged: () => void,
+}): Field => ({
+  name: 'WorldScale',
+  getLabel: () => i18n._(t`3D renderer world scale`),
+  valueType: 'number',
+  getValue: (scene: gdLayout) => scene.getRenderer3DWorldScale(),
+  setValue: (scene: gdLayout, newValue: number) => {
+    scene.setRenderer3DWorldScale(newValue);
+    onRenderer3DWorldScaleFieldChanged();
+  },
+  visibility: 'advanced',
+});
+
 export const makeSchema = ({
   i18n,
   onBackgroundColorChanged,
+  onRenderer3DWorldScaleFieldChanged,
 }: {|
   i18n: I18nType,
   onBackgroundColorChanged: () => void,
+  onRenderer3DWorldScaleFieldChanged: () => void,
 |}): Schema => {
   return [
     {
@@ -158,6 +178,15 @@ export const makeSchema = ({
       preventWrap: true,
       removeSpacers: true,
       children: [getWindowTitleField({ i18n })],
+    },
+    {
+      name: 'WorldScale',
+      type: 'row',
+      preventWrap: true,
+      removeSpacers: true,
+      children: [
+        getWorldScaleField({ i18n, onRenderer3DWorldScaleFieldChanged }),
+      ],
     },
   ];
 };

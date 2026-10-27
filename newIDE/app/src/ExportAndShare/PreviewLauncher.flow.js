@@ -86,8 +86,6 @@ export type PreparePreviewWindowsOptions = {|
 /** The props that PreviewLauncher must support */
 export type PreviewLauncherProps = {|
   crashReportUploadLevel: string,
-  previewContext: string,
-  sourceGameId: string,
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
   onCaptureFinished: CaptureOptions => Promise<void>,
@@ -139,9 +137,18 @@ export interface PreviewDebuggerServer {
   getExistingEmbeddedGameFrameDebuggerIds(): Array<DebuggerId>;
   getExistingPreviewDebuggerIds(): Array<DebuggerId>;
   sendMessage(id: DebuggerId, message: Object): void;
-  sendMessageWithResponse(message: Object): Promise<Object>;
+  sendMessageWithResponse(
+    message: Object,
+    options?: {| timeoutMs?: number |}
+  ): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
+  /**
+   * Tell whether a game is actually running in the embedded game frame (and so can be
+   * hot-reloaded). The frame having a location loaded is not enough: the game inside it
+   * must have announced itself.
+   */
+  setEmbeddedGameFrameReady(isReady: boolean): void;
   unregisterEmbeddedGameFrame(window: WindowProxy): void;
   registerGameplayTestFrame(window: WindowProxy): void;
   unregisterGameplayTestFrame(window: WindowProxy): void;

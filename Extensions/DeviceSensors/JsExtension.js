@@ -251,8 +251,8 @@ module.exports = {
     extension
       .addCondition(
         'AccelerationX',
-        _('Compare the value of acceleration on X-axis'),
-        _('Compare the value of acceleration on the X-axis (m/s²).'),
+        _('Compare the value of acceleration on X axis'),
+        _('Compare the value of acceleration on the X axis (m/s²).'),
         _('the acceleration X'),
         _('Motion'),
         'JsPlatform/Extensions/motion_acceleration_x32.png',
@@ -267,8 +267,8 @@ module.exports = {
     extension
       .addCondition(
         'AccelerationY',
-        _('Compare the value of acceleration on Y-axis'),
-        _('Compare the value of acceleration on the Y-axis (m/s²).'),
+        _('Compare the value of acceleration on Y axis'),
+        _('Compare the value of acceleration on the Y axis (m/s²).'),
         _('the acceleration Y'),
         _('Motion'),
         'JsPlatform/Extensions/motion_acceleration_y32.png',
@@ -283,8 +283,8 @@ module.exports = {
     extension
       .addCondition(
         'AccelerationZ',
-        _('Compare the value of acceleration on Z-axis'),
-        _('Compare the value of acceleration on the Z-axis (m/s²).'),
+        _('Compare the value of acceleration on Z axis'),
+        _('Compare the value of acceleration on the Z axis (m/s²).'),
         _('the acceleration Z'),
         _('Motion'),
         'JsPlatform/Extensions/motion_acceleration_z32.png',
@@ -364,7 +364,7 @@ module.exports = {
       .addExpression(
         'AccelerationX',
         _('Acceleration X value'),
-        _('Get the devices acceleration on the X-axis (m/s²)'),
+        _('Get the devices acceleration on the X axis (m/s²)'),
         _('Motion'),
         'JsPlatform/Extensions/motion_acceleration_x16.png'
       )
@@ -376,7 +376,7 @@ module.exports = {
       .addExpression(
         'AccelerationY',
         _('Acceleration Y value'),
-        _('Get the devices acceleration on the Y-axis (m/s²)'),
+        _('Get the devices acceleration on the Y axis (m/s²)'),
         _('Motion'),
         'JsPlatform/Extensions/motion_acceleration_y16.png'
       )
@@ -388,7 +388,7 @@ module.exports = {
       .addExpression(
         'AccelerationZ',
         _('Acceleration Z value'),
-        _('Get the devices acceleration on the Z-axis (m/s²)'),
+        _('Get the devices acceleration on the Z axis (m/s²)'),
         _('Motion'),
         'JsPlatform/Extensions/motion_acceleration_z16.png'
       )

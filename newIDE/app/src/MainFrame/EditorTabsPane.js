@@ -267,6 +267,8 @@ export type EditorTabsPaneCommonProps = {|
   ) => void,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onExtractAsExternalLayout: (name: string) => void,
+  onUndoExtractAsExternalLayout: (name: string) => Promise<void>,
+  onRedoExtractAsExternalLayout: (name: string) => void,
   onExtractAsEventBasedObject: (
     extensionName: string,
     eventsBasedObjectName: string
@@ -435,6 +437,8 @@ const EditorTabsPane: React.ComponentType<{
     renameResourcesInProject,
     openBehaviorEvents,
     onExtractAsExternalLayout,
+    onUndoExtractAsExternalLayout,
+    onRedoExtractAsExternalLayout,
     onExtractAsEventBasedObject,
     onEventBasedObjectTypeChanged,
     onOpenEventBasedObjectEditor,
@@ -918,6 +922,8 @@ const EditorTabsPane: React.ComponentType<{
                     },
                     openBehaviorEvents: openBehaviorEvents,
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
+                    onUndoExtractAsExternalLayout: onUndoExtractAsExternalLayout,
+                    onRedoExtractAsExternalLayout: onRedoExtractAsExternalLayout,
                     onExtractAsEventBasedObject: onExtractAsEventBasedObject,
                     onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,

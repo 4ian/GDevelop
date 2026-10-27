@@ -33,6 +33,8 @@ type Props = {|
   project: gdProject,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+  hasInstancesLostByUndo: (objectName: string) => boolean,
+  isEditingExternalLayout: boolean,
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   canSetAsGlobalObject: ?boolean,
 
@@ -73,6 +75,8 @@ function useBulkObjectOperations({
   project,
   globalObjectsContainer,
   objectsContainer,
+  hasInstancesLostByUndo,
+  isEditingExternalLayout,
   selectedObjectFolderOrObjectsWithContext,
   canSetAsGlobalObject,
   selectObjectFolderOrObjectsWithContext,
@@ -175,9 +179,23 @@ function useBulkObjectOperations({
 
       const answer = await showDeleteConfirmation({
         title: t`Remove objects`,
-        message: t`Are you sure you want to remove these ${
-          objectsToDelete.length
-        } objects? This can't be undone.`,
+        message: selectionIsGlobal
+          ? t`Are you sure you want to remove these ${
+              objectsToDelete.length
+            } global objects? They will be removed from every scene. Undo will bring them back in the current scene only: their instances in the other scenes will be lost.`
+          : !objectsToDelete.some(object =>
+              hasInstancesLostByUndo(object.getName())
+            )
+          ? t`Are you sure you want to remove these ${
+              objectsToDelete.length
+            } objects?`
+          : isEditingExternalLayout
+          ? t`Are you sure you want to remove these ${
+              objectsToDelete.length
+            } objects? They will also be removed from the scene and its other external layouts. Undo will bring them back in this external layout only: their instances in the scene and the other external layouts will be lost.`
+          : t`Are you sure you want to remove these ${
+              objectsToDelete.length
+            } objects? They will also be removed from the external layouts of this scene. Undo will bring them back in the scene only: their instances in the external layouts will be lost.`,
       });
       if (!answer) return false;
 
@@ -207,6 +225,8 @@ function useBulkObjectOperations({
       selectionIsGlobal,
       globalObjectsContainer,
       objectsContainer,
+      hasInstancesLostByUndo,
+      isEditingExternalLayout,
       showDeleteConfirmation,
       selectObjectFolderOrObjectsWithContext,
       onDeleteObjects,
@@ -316,7 +336,7 @@ function useBulkObjectOperations({
 
       const answer = Window.showConfirmDialog(
         i18n._(
-          t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects. This action cannot be undone.
+          t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects.
 
           Do you want to set these ${
             objectItems.length

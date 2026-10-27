@@ -6234,6 +6234,8 @@ namespace gdjs {
     private _hasActuallyMoved = false;
     private _wasMovingLastFrame = false;
     private _objectMover: ObjectMover;
+    /** Put the controls back on the object, after it was changed. */
+    private _syncWithObject: (() => void) | null = null;
 
     constructor(editor: InGameEditor, objectMover: ObjectMover) {
       this.editor = editor;
@@ -6458,31 +6460,34 @@ namespace gdjs {
             const scaleDragWorldScale = new THREE.Vector3();
             const scaleDragLocalStart = new THREE.Vector3();
             const scaleDragLocalEnd = new THREE.Vector3();
+            const syncDummyWithObject = () => {
+              this._selectionControlsMovementTotalDelta = null;
+
+              this._updateDummyLocation(
+                this.dummyThreeObject,
+                lastEditableSelectedObject,
+                threeTransformControls
+              );
+              // Reset the initial position to the current position, so that
+              // it's ready to be dragged again.
+              initialObjectX = lastEditableSelectedObject.getX();
+              initialObjectY = lastEditableSelectedObject.getY();
+              initialObjectZ = is3D(lastEditableSelectedObject)
+                ? lastEditableSelectedObject.getZ()
+                : 0;
+              initialObjectWidth = lastEditableSelectedObject.getWidth();
+              initialObjectHeight = lastEditableSelectedObject.getHeight();
+              initialObjectDepth = is3D(lastEditableSelectedObject)
+                ? lastEditableSelectedObject.getDepth()
+                : 0;
+              initialDummyPosition.copy(this.dummyThreeObject.position);
+              initialDummyRotation.copy(this.dummyThreeObject.rotation);
+              initialDummyQuaternion.copy(this.dummyThreeObject.quaternion);
+              initialDummyScale.copy(this.dummyThreeObject.scale);
+            };
             threeTransformControls.addEventListener('change', (e) => {
               if (!threeTransformControls.dragging) {
-                this._selectionControlsMovementTotalDelta = null;
-
-                this._updateDummyLocation(
-                  this.dummyThreeObject,
-                  lastEditableSelectedObject,
-                  threeTransformControls
-                );
-                // Reset the initial position to the current position, so that
-                // it's ready to be dragged again.
-                initialObjectX = lastEditableSelectedObject.getX();
-                initialObjectY = lastEditableSelectedObject.getY();
-                initialObjectZ = is3D(lastEditableSelectedObject)
-                  ? lastEditableSelectedObject.getZ()
-                  : 0;
-                initialObjectWidth = lastEditableSelectedObject.getWidth();
-                initialObjectHeight = lastEditableSelectedObject.getHeight();
-                initialObjectDepth = is3D(lastEditableSelectedObject)
-                  ? lastEditableSelectedObject.getDepth()
-                  : 0;
-                initialDummyPosition.copy(this.dummyThreeObject.position);
-                initialDummyRotation.copy(this.dummyThreeObject.rotation);
-                initialDummyQuaternion.copy(this.dummyThreeObject.quaternion);
-                initialDummyScale.copy(this.dummyThreeObject.scale);
+                syncDummyWithObject();
                 return;
               }
 
@@ -6722,9 +6727,21 @@ namespace gdjs {
 
             this.object = lastEditableSelectedObject;
             this.threeTransformControls = threeTransformControls;
+            this._syncWithObject = syncDummyWithObject;
             this._isShown = true;
           }
         }
+      }
+
+      // The object can have been changed by something else than the controls
+      // (a hot-reload after an undo/redo or an edit in the properties panel...).
+      if (
+        this._isShown &&
+        this._syncWithObject &&
+        this.threeTransformControls &&
+        !this.threeTransformControls.dragging
+      ) {
+        this._syncWithObject();
       }
 
       if (
@@ -6820,6 +6837,7 @@ namespace gdjs {
       this.threeTransformControls.dispose();
       this.dummyThreeObject.removeFromParent();
       this.editor.getEditorGrid().setVisible(false);
+      this._syncWithObject = null;
       this._isShown = false;
     }
 

@@ -35,7 +35,7 @@ export const getMcpClientSetups = ({
       name: 'Claude Code',
       kind: 'command',
       configurationFilePath: null,
-      text: `claude mcp add --transport http ${SERVER_NAME} ${url} --header "Authorization: ${authorization}"`,
+      text: `claude mcp add --scope user --transport http ${SERVER_NAME} ${url} --header "Authorization: ${authorization}"`,
     },
     {
       clientId: 'cursor',
@@ -66,7 +66,7 @@ export const getMcpClientSetups = ({
       name: 'Gemini CLI',
       kind: 'command',
       configurationFilePath: null,
-      text: `gemini mcp add --transport http --header "Authorization: ${authorization}" ${SERVER_NAME} ${url}`,
+      text: `gemini mcp add --scope user --transport http --header "Authorization: ${authorization}" ${SERVER_NAME} ${url}`,
     },
     {
       clientId: 'codex',

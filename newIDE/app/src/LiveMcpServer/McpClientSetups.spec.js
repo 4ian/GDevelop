@@ -14,10 +14,10 @@ describe('McpClientSetups', () => {
 
   it('gives the command or configuration of each client', () => {
     expect(getSetupText('claude-code')).toBe(
-      'claude mcp add --transport http gdevelop http://127.0.0.1:52520/mcp --header "Authorization: Bearer abc123"'
+      'claude mcp add --scope user --transport http gdevelop http://127.0.0.1:52520/mcp --header "Authorization: Bearer abc123"'
     );
     expect(getSetupText('gemini-cli')).toBe(
-      'gemini mcp add --transport http --header "Authorization: Bearer abc123" gdevelop http://127.0.0.1:52520/mcp'
+      'gemini mcp add --scope user --transport http --header "Authorization: Bearer abc123" gdevelop http://127.0.0.1:52520/mcp'
     );
     expect(JSON.parse(getSetupText('cursor'))).toEqual({
       mcpServers: {

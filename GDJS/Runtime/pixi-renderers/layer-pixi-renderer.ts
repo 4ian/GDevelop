@@ -585,8 +585,18 @@ namespace gdjs {
           const game = this._layer.getRuntimeScene().getGame();
           const threeRenderer = game.getRenderer().getThreeRenderer();
           if (threeRenderer) {
+            // Keep a stencil buffer when the layer is rendered through
+            // post-processing passes, like when it's rendered on the canvas.
+            const drawingBufferSize = threeRenderer.getDrawingBufferSize(
+              new THREE.Vector2()
+            );
             this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
-              threeRenderer
+              threeRenderer,
+              new THREE.WebGLRenderTarget(
+                drawingBufferSize.x,
+                drawingBufferSize.y,
+                { type: THREE.HalfFloatType, stencilBuffer: true }
+              )
             );
             this._threeRenderPass = new THREE_ADDONS.RenderPass(
               this._threeScene,

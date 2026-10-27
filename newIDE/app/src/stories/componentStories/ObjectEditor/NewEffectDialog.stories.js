@@ -130,6 +130,23 @@ export const ForAMixedLayer = (): React.Node => (
   </Wrapper>
 );
 
+export const ForAMixedLayerWithStagingStore = (): React.Node => (
+  <Wrapper useStagingStore>
+    {() => (
+      <NewEffectDialog
+        project={testProject.project}
+        effectsContainer={testProject.layerWithEffects.getEffects()}
+        target="layer"
+        layerRenderingType="2d+3d"
+        resourceManagementProps={fakeResourceManagementProps}
+        onClose={action('onClose')}
+        onChooseEffectType={action('onChooseEffectType')}
+        onEffectAddedFromStore={action('onEffectAddedFromStore')}
+      />
+    )}
+  </Wrapper>
+);
+
 export const ForA2DLayer = (): React.Node => (
   <Wrapper>
     {() => (
@@ -166,6 +183,23 @@ export const ForA2DLayerWithStagingStore = (): React.Node => (
 
 export const ForA3DLayer = (): React.Node => (
   <Wrapper>
+    {() => (
+      <NewEffectDialog
+        project={testProject.project}
+        effectsContainer={testProject.layerWith3DEffects.getEffects()}
+        target="layer"
+        layerRenderingType="3d"
+        resourceManagementProps={fakeResourceManagementProps}
+        onClose={action('onClose')}
+        onChooseEffectType={action('onChooseEffectType')}
+        onEffectAddedFromStore={action('onEffectAddedFromStore')}
+      />
+    )}
+  </Wrapper>
+);
+
+export const ForA3DLayerWithStagingStore = (): React.Node => (
+  <Wrapper useStagingStore>
     {() => (
       <NewEffectDialog
         project={testProject.project}

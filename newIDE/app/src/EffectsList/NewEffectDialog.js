@@ -448,33 +448,21 @@ function NewEffectDialog({
             noResultsPlaceholder={
               <Column noMargin expand justifyContent="center">
                 <EmptyPlaceholder
-                  title={<Trans>No effect found</Trans>}
-                  description={
+                  title={
                     target === 'object' ? (
-                      <Trans>
-                        There is no effect for objects in the store matching
-                        this search. Try other words, or create an effect from
-                        scratch.
-                      </Trans>
+                      <Trans>No effect found for objects</Trans>
                     ) : layerRenderingType === '3d' ? (
-                      <Trans>
-                        There is no effect for 3D layers in the store matching
-                        this search. Try other words, or create an effect from
-                        scratch.
-                      </Trans>
+                      <Trans>No effect found for 3D layers</Trans>
                     ) : layerRenderingType === '2d' ? (
-                      <Trans>
-                        There is no effect for 2D layers in the store matching
-                        this search. Try other words, or create an effect from
-                        scratch.
-                      </Trans>
+                      <Trans>No effect found for 2D layers</Trans>
                     ) : (
-                      <Trans>
-                        There is no effect for this layer in the store matching
-                        this search. Try other words, or create an effect from
-                        scratch.
-                      </Trans>
+                      <Trans>No effect found for this layer</Trans>
                     )
+                  }
+                  description={
+                    <Trans>
+                      Try other words, or create an effect from scratch.
+                    </Trans>
                   }
                   actionLabel={<Trans>New effect from scratch</Trans>}
                   onAction={() => changeTab('from-scratch')}

@@ -1439,17 +1439,6 @@ namespace gdjs {
       }
     }
 
-    private areAnyInstancesNotStraight(
-      objects: Array<gdjs.RuntimeObject>
-    ): boolean {
-      for (const object of objects) {
-        if (object.getAngle() % 90 !== 0) {
-          return true;
-        }
-      }
-      return false;
-    }
-
     _getOrCreateUnrotatedInstanceAABB(instance: gdjs.RuntimeObject): AABB3D {
       const initialUnrotatedInstanceAABB =
         this._unrotatedInstanceAABBs.get(instance);
@@ -1998,11 +1987,6 @@ namespace gdjs {
         return;
       }
       this._currentScene.onGameResolutionResized();
-    }
-
-    private buildSelectionControls(): SelectionControls {
-      // return new SelectionControls3D(this, this._objectMover3D);
-      return new SelectionControls2D(this, this._objectMover2D);
     }
 
     async switchToSceneOrVariant(
@@ -5135,6 +5119,7 @@ namespace gdjs {
         };
       }
 
+      // TODO Hide the main toolbar in 2D mode?
       const displayed = this._hasSelectionControlsShown();
 
       this._renderedElements.container.tabIndex = displayed ? 0 : -1;
@@ -7974,7 +7959,6 @@ namespace gdjs {
       if (!selectionAABB) {
         return;
       }
-      // TODO Update the controls after the transformation is applied to avoid a 1-frame delay.
       this.update(
         selectionAABB,
         threeCamera,
@@ -8261,11 +8245,10 @@ namespace gdjs {
             : flippedTotalDeltaY;
         let scaleZ = 1;
 
-        // TODO
         const hasRotatedInstance = areAnyInstancesNotStraight(
           editor.getSelectedObjects() as Array<gdjs.RuntimeObject>
         );
-        const proportional = false;
+        const proportional = isShiftPressed(inputManager);;
 
         // Applying a rotation then a scaling can result to
         // an affine transformation with a shear transformation - which we don't want.

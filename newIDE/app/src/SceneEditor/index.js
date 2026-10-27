@@ -1784,9 +1784,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           backgroundColorRed: layout.getBackgroundColorRed(),
           backgroundColorGreen: layout.getBackgroundColorGreen(),
           backgroundColorBlue: layout.getBackgroundColorBlue(),
+          renderer3DWorldScale: layout.getRenderer3DWorldScale(),
         }),
         setValue: (value: Object) => {
           layout.setWindowDefaultTitle(value.windowDefaultTitle);
+          layout.setRenderer3DWorldScale(value.renderer3DWorldScale);
           layout.setStopSoundsOnStartup(value.stopSoundsOnStartup);
           layout.setResourcesPreloading(value.resourcesPreloading);
           layout.setResourcesUnloading(value.resourcesUnloading);
@@ -2298,8 +2300,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.updateToolbar();
         this._sendHotReloadAllInstances();
         this._sendHotReloadLayers();
-        if (changedKeys.includes('sceneProperties'))
+        if (changedKeys.includes('sceneProperties')) {
           this._sendSetBackgroundColor();
+          this._sendSetRenderer3DWorldScale();
+        }
         // After the instances: the 3D editor can only select the ones it has.
         this._sendSelectedInstances();
 

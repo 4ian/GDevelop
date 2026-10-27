@@ -7902,6 +7902,90 @@ const getSceneInstancesCountOfObject = (editor, objectName) =>
   };
 }
 
+{
+  const name =
+    'the 3D world scale of the scene can be undone from the properties panel';
+  scenarios[name] = async editor => {
+    const panel = '#scene-properties-editor';
+    await clickSelectorIfPresent(
+      editor,
+      '#scene-properties-section-unfold-button'
+    );
+    await clickSelectorIfPresent(
+      editor,
+      `${panel} #show-advanced-properties-button`
+    );
+    const field = `${panel} [id="WorldScale"]`;
+    await editor.page.waitForSelector(field);
+    const getWorldScale = () =>
+      evaluateWithSceneEditor(editor, props =>
+        props.layout.getRenderer3DWorldScale()
+      );
+    const initialWorldScale = await getWorldScale();
+    await editor.setFieldValue(field, String(initialWorldScale * 2));
+    await sleep(HISTORY_SAVE_DELAY);
+    expectEqual(
+      await getWorldScale(),
+      initialWorldScale * 2,
+      'world scale set'
+    );
+
+    await editor.undo();
+    expectEqual(await getWorldScale(), initialWorldScale, 'after undo');
+    await editor.redo();
+    expectEqual(await getWorldScale(), initialWorldScale * 2, 'after redo');
+  };
+}
+
+const makeExtractionUndoRedoRaceScenario = undoThenRedo => async editor => {
+  const { page } = editor;
+  const getState = () =>
+    evaluateWithSceneEditor(editor, (props, gd) => ({
+      externalLayouts: props.project.getExternalLayoutsCount(),
+      instances: props.layout.getInitialInstances().getInstancesCount(),
+    }));
+  const initialState = await getState();
+
+  await editor.selectInstancesOf('MyObject');
+  const canvas = await page.$('#scene-editor canvas');
+  const box = await canvas.boundingBox();
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, {
+    button: 'right',
+  });
+  await editor.clickSubmenuItem(/^extract$/i, /extract as an external layout/i);
+  await page.waitForSelector('[role="dialog"] input');
+  await editor.clickButtonWithText('[role="dialog"]', /^move instances/i);
+  await editor.waitUntil(
+    'external layout created',
+    async () => (await getState()).externalLayouts === 1
+  );
+  const extractedState = await getState();
+  await clickEditorTab(editor, 'Scene');
+
+  await undoThenRedo(editor);
+  await sleep(2000);
+
+  const state = await getState();
+  expectEqual(
+    state,
+    state.externalLayouts === 1 ? extractedState : initialState,
+    `after undo then redo (initially ${initialState.instances} instances)`
+  );
+};
+
+scenarios[
+  'a redo right after undoing an extraction to an external layout loses nothing (keyboard)'
+] = makeExtractionUndoRedoRaceScenario(async editor => {
+  await editor.focusEditor();
+  const { keyboard } = editor.page;
+  await keyboard.down('Control');
+  await keyboard.press('z');
+  await keyboard.down('Shift');
+  await keyboard.press('z');
+  await keyboard.up('Shift');
+  await keyboard.up('Control');
+});
+
 const main = async () => {
   if (args.includes('--list')) {
     Object.keys(scenarios).forEach(name => console.log(name));

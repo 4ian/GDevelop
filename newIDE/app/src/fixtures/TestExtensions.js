@@ -72,6 +72,139 @@ const makeFakeBehaviorRequiring = (
 };
 
 /**
+ * Declare the fake effects used by the tests and the stories in the given
+ * "Effects" extension.
+ */
+export const declareFakeEffects = (extension: gdPlatformExtension) => {
+  const sepiaEffect = extension
+    .addEffect('FakeSepia')
+    .setFullName('Fake Sepia Effect')
+    .setDescription('A fake sepia effect')
+    .markAsOnlyWorkingFor2D()
+    .addIncludeFile('Extensions/Effects/fake-sepia.js');
+  const sepiaProperties = sepiaEffect.getProperties();
+  sepiaProperties
+    .getOrCreate('opacity')
+    .setValue('1')
+    .setLabel('Opacity (between 0 and 1)')
+    .setType('number');
+
+  const layerOnlySepiaEffect = extension
+    .addEffect('FakeSepiaThatWouldWorkOnlyForLayers')
+    .setFullName('Fake Sepia Effect only for layers')
+    .setDescription('A fake sepia effect only for layers')
+    .addIncludeFile('Extensions/Effects/fake-sepia-only-for-layers.js')
+    .markAsOnlyWorkingFor2D()
+    .markAsNotWorkingForObjects();
+  const layerOnlySepiaProperties = layerOnlySepiaEffect.getProperties();
+  layerOnlySepiaProperties
+    .getOrCreate('opacity')
+    .setValue('1')
+    .setLabel('Opacity (between 0 and 1)')
+    .setType('number');
+
+  const nightEffect = extension
+    .addEffect('FakeNight')
+    .setFullName('Fake Night Effect')
+    .setDescription('A fake night effect')
+    .markAsOnlyWorkingFor2D()
+    .addIncludeFile('Extensions/Effects/fake-night.js');
+  const nightProperties = nightEffect.getProperties();
+  nightProperties
+    .getOrCreate('intensity')
+    .setValue('1')
+    .setLabel('Intensity (between 0 and 1)')
+    .setType('number');
+  nightProperties
+    .getOrCreate('opacity')
+    .setValue('1')
+    .setLabel('Opacity (between 0 and 1)')
+    .setType('number');
+
+  const variousParametersEffect = extension
+    .addEffect('FakeEffectWithVariousParameters')
+    .setFullName('Fake Effect With Various Parameters')
+    .setDescription('A fake effect using different parameters')
+    .markAsOnlyWorkingFor2D()
+    .addIncludeFile(
+      'Extensions/Effects/fake-effect-with-various-parameters.js'
+    );
+  const variousParametersEffectProperties = variousParametersEffect.getProperties();
+  variousParametersEffectProperties
+    .getOrCreate('intensity')
+    .setValue('1')
+    .setLabel('Intensity (between 0 and 1)')
+    .setType('number')
+    .setDescription(
+      'Some interesting description about this intensity parameter that can be used by the effect.'
+    );
+  variousParametersEffectProperties
+    .getOrCreate('someColor')
+    .setValue('1')
+    .setLabel('Some color')
+    .setType('color')
+    .setDescription(
+      'Some interesting description about this color parameter that can be used by the effect.'
+    );
+  variousParametersEffectProperties
+    .getOrCreate('image')
+    .setValue('')
+    .setLabel('An image resource')
+    .setType('resource')
+    .addExtraInfo('image')
+    .setDescription(
+      'Some interesting description about this image resource that can be used by the effect.'
+    );
+  variousParametersEffectProperties
+    .getOrCreate('someBoolean')
+    .setValue('true')
+    .setLabel('Some setting to enable or not for the effect')
+    .setType('boolean')
+    .setDescription('And some *optional* description.');
+  {
+    const effect3D = extension
+      .addEffect('FakeDirectionalLight')
+      .setFullName('Fake directional light')
+      .setDescription('An effect for 3D layers')
+      .markAsNotWorkingForObjects()
+      .markAsOnlyWorkingFor3D()
+      .addIncludeFile('Extensions/3D/fake-DirectionalLight.js');
+    const properties = effect3D.getProperties();
+    properties
+      .getOrCreate('color')
+      .setValue('255;255;255')
+      .setLabel('Light color')
+      .setType('color');
+    properties
+      .getOrCreate('intensity')
+      .setValue('0.5')
+      .setLabel('Intensity')
+      .setType('number');
+    properties
+      .getOrCreate('top')
+      .setValue('Y-')
+      .setLabel('3D world top')
+      .setType('choice')
+      .addChoice('Y-', 'Y-')
+      .addChoice('Z+', 'Z+')
+      .setGroup('Orientation');
+    properties
+      .getOrCreate('elevation')
+      .setValue('45')
+      .setLabel('Elevation (in degrees)')
+      .setType('number')
+      .setGroup('Orientation')
+      .setDescription('Maximal elevation is reached at 90°.');
+    properties
+      .getOrCreate('rotation')
+      .setValue('0')
+      .setLabel('Rotation (in degrees)')
+      .setType('number')
+      .setGroup('Orientation');
+  }
+};
+
+/**
  * Create dummy extensions into gd.JsPlatform
  * @param gd The GD instance to use to create the extensions and find the platform.
  */
@@ -93,132 +226,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'MIT'
     );
 
-    const sepiaEffect = extension
-      .addEffect('FakeSepia')
-      .setFullName('Fake Sepia Effect')
-      .setDescription('A fake sepia effect')
-      .markAsOnlyWorkingFor2D()
-      .addIncludeFile('Extensions/Effects/fake-sepia.js');
-    const sepiaProperties = sepiaEffect.getProperties();
-    sepiaProperties
-      .getOrCreate('opacity')
-      .setValue('1')
-      .setLabel('Opacity (between 0 and 1)')
-      .setType('number');
-
-    const layerOnlySepiaEffect = extension
-      .addEffect('FakeSepiaThatWouldWorkOnlyForLayers')
-      .setFullName('Fake Sepia Effect only for layers')
-      .setDescription('A fake sepia effect only for layers')
-      .addIncludeFile('Extensions/Effects/fake-sepia-only-for-layers.js')
-      .markAsOnlyWorkingFor2D()
-      .markAsNotWorkingForObjects();
-    const layerOnlySepiaProperties = layerOnlySepiaEffect.getProperties();
-    layerOnlySepiaProperties
-      .getOrCreate('opacity')
-      .setValue('1')
-      .setLabel('Opacity (between 0 and 1)')
-      .setType('number');
-
-    const nightEffect = extension
-      .addEffect('FakeNight')
-      .setFullName('Fake Night Effect')
-      .setDescription('A fake night effect')
-      .markAsOnlyWorkingFor2D()
-      .addIncludeFile('Extensions/Effects/fake-night.js');
-    const nightProperties = nightEffect.getProperties();
-    nightProperties
-      .getOrCreate('intensity')
-      .setValue('1')
-      .setLabel('Intensity (between 0 and 1)')
-      .setType('number');
-    nightProperties
-      .getOrCreate('opacity')
-      .setValue('1')
-      .setLabel('Opacity (between 0 and 1)')
-      .setType('number');
-
-    const variousParametersEffect = extension
-      .addEffect('FakeEffectWithVariousParameters')
-      .setFullName('Fake Effect With Various Parameters')
-      .setDescription('A fake effect using different parameters')
-      .markAsOnlyWorkingFor2D()
-      .addIncludeFile(
-        'Extensions/Effects/fake-effect-with-various-parameters.js'
-      );
-    const variousParametersEffectProperties = variousParametersEffect.getProperties();
-    variousParametersEffectProperties
-      .getOrCreate('intensity')
-      .setValue('1')
-      .setLabel('Intensity (between 0 and 1)')
-      .setType('number')
-      .setDescription(
-        'Some interesting description about this intensity parameter that can be used by the effect.'
-      );
-    variousParametersEffectProperties
-      .getOrCreate('someColor')
-      .setValue('1')
-      .setLabel('Some color')
-      .setType('color')
-      .setDescription(
-        'Some interesting description about this color parameter that can be used by the effect.'
-      );
-    variousParametersEffectProperties
-      .getOrCreate('image')
-      .setValue('')
-      .setLabel('An image resource')
-      .setType('resource')
-      .addExtraInfo('image')
-      .setDescription(
-        'Some interesting description about this image resource that can be used by the effect.'
-      );
-    variousParametersEffectProperties
-      .getOrCreate('someBoolean')
-      .setValue('true')
-      .setLabel('Some setting to enable or not for the effect')
-      .setType('boolean')
-      .setDescription('And some *optional* description.');
-    {
-      const effect3D = extension
-        .addEffect('FakeDirectionalLight')
-        .setFullName('Fake directional light')
-        .setDescription('An effect for 3D layers')
-        .markAsNotWorkingForObjects()
-        .markAsOnlyWorkingFor3D()
-        .addIncludeFile('Extensions/3D/fake-DirectionalLight.js');
-      const properties = effect3D.getProperties();
-      properties
-        .getOrCreate('color')
-        .setValue('255;255;255')
-        .setLabel('Light color')
-        .setType('color');
-      properties
-        .getOrCreate('intensity')
-        .setValue('0.5')
-        .setLabel('Intensity')
-        .setType('number');
-      properties
-        .getOrCreate('top')
-        .setValue('Y-')
-        .setLabel('3D world top')
-        .setType('choice')
-        .addChoice('Y-', 'Y-')
-        .addChoice('Z+', 'Z+')
-        .setGroup('Orientation');
-      properties
-        .getOrCreate('elevation')
-        .setValue('45')
-        .setLabel('Elevation (in degrees)')
-        .setType('number')
-        .setGroup('Orientation')
-        .setDescription('Maximal elevation is reached at 90°.');
-      properties
-        .getOrCreate('rotation')
-        .setValue('0')
-        .setLabel('Rotation (in degrees)')
-        .setType('number')
-        .setGroup('Orientation');
-    }
+    declareFakeEffects(extension);
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }

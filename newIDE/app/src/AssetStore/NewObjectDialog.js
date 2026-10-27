@@ -30,6 +30,7 @@ import {
   isEffectAsset,
   getEffectAssetMetadata,
   doesEffectWorkOnLayer,
+  isEffectAssetMadeFor,
 } from '../Utils/GDevelopServices/Asset';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import enumerateLayers from '../LayersList/EnumerateLayers';
@@ -368,10 +369,8 @@ export const useChooseEffectNameForEffectAsset = (): (({|
       assetShortHeader: AssetShortHeader,
       effectsContainer: gdEffectsContainer,
     |}): Promise<string | null> => {
-      const effectMetadata = getEffectAssetMetadata(assetShortHeader);
-      const newEffectName = newNameGenerator(
-        effectMetadata ? effectMetadata.getFullName() : 'Effect',
-        name => effectsContainer.hasEffectNamed(name)
+      const newEffectName = newNameGenerator(assetShortHeader.name, name =>
+        effectsContainer.hasEffectNamed(name)
       );
       const competingEffect = findEffectCompetingWith(
         effectsContainer,
@@ -409,7 +408,13 @@ const enumerateLayersForEffectAsset = (
   const effectMetadata = assetShortHeader
     ? getEffectAssetMetadata(assetShortHeader)
     : null;
-  if (!layersContainer || !effectMetadata) return [];
+  if (
+    !layersContainer ||
+    !effectMetadata ||
+    !assetShortHeader ||
+    !isEffectAssetMadeFor(assetShortHeader, 'layer')
+  )
+    return [];
   return enumerateLayers(layersContainer).filter(layer =>
     doesEffectWorkOnLayer(
       effectMetadata,

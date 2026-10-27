@@ -95,7 +95,10 @@ import type {
   WillDeleteGameplayTestChanges,
   WillDeleteObjectChanges,
 } from './OutsideEditorChanges';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  type EffectTarget,
+} from '../Utils/GDevelopServices/Asset';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
@@ -501,6 +504,7 @@ export type AssetSearchAndInstallOptions = {|
 // effect takes the type of the asset: `effectType`, when given, must match.
 export type EffectAssetSearchAndInstallOptions = {|
   effectsContainer: gdEffectsContainer,
+  effectTarget: EffectTarget,
   effectName: string,
   effectType: string | null,
   exactOrPartialAssetId: string,
@@ -9950,6 +9954,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           const { status, message, effect } = await searchAndInstallEffectAsset(
             {
               effectsContainer: layer.getEffects(),
+              effectTarget: 'layer',
               effectName,
               effectType: effect_type || null,
               exactOrPartialAssetId: asset_id,

@@ -92,6 +92,7 @@ function useBulkObjectOperations({
   bulkCut: () => Promise<void>,
   bulkPaste: () => void,
   bulkDuplicate: () => void,
+  bulkMoveToNewFolder: () => void,
   bulkSetAsGlobalObject: (
     i18n: I18nType,
     options?: {| folder?: gdObjectFolderOrObject, index?: number |}
@@ -525,6 +526,7 @@ function useBulkObjectOperations({
                 {
                   label: i18n._(t`Create new folder...`),
                   click: () => bulkMoveToNewFolder(),
+                  accelerator: 'CmdOrCtrl+G',
                 },
               ],
             },
@@ -562,6 +564,7 @@ function useBulkObjectOperations({
     bulkCut,
     bulkPaste,
     bulkDuplicate,
+    bulkMoveToNewFolder,
     bulkSetAsGlobalObject,
     buildBulkMenuTemplate,
   };

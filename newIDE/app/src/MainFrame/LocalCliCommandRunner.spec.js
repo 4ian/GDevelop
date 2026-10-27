@@ -1,11 +1,9 @@
 // @flow
-import { initialPreferences } from './Preferences/PreferencesContext';
 import Window from '../Utils/Window';
 import { shouldBlockOnDiagnosticErrorsForCli } from './LocalCliCommandRunner';
 
 jest.mock('../Utils/Window', () => {
-  // $FlowFixMe[unsupported-syntax]
-  const originalModule = jest.requireActual('../Utils/Window');
+  const originalModule = jest.requireActual<any>('../Utils/Window');
   originalModule.default.getArguments = jest.fn(() => ({}));
   return originalModule;
 });
@@ -13,7 +11,6 @@ jest.mock('../Utils/Window', () => {
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 
 const preferencesWith = (blockPreviewAndExportOnDiagnosticErrors: boolean) => ({
-  ...initialPreferences,
   getBlockPreviewAndExportOnDiagnosticErrors: () =>
     blockPreviewAndExportOnDiagnosticErrors,
 });

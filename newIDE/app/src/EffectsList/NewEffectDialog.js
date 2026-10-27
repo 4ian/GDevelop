@@ -270,7 +270,7 @@ type Props = {|
 
 /**
  * Let the user choose the effect to add, among the built-in effects (from
- * scratch) or, for layers, the effects of the asset store.
+ * scratch) or the effects of the asset store.
  */
 function NewEffectDialog({
   project,
@@ -283,15 +283,13 @@ function NewEffectDialog({
   onEffectAddedFromStore,
 }: Props) {
   const { isMobile } = useResponsiveWindowSize();
-  // The effects of the store go on layers.
-  const canAddEffectFromStore = target === 'layer';
   const {
     getNewEffectDialogDefaultTab,
     setNewEffectDialogDefaultTab,
   } = React.useContext(PreferencesContext);
   // Open the tab used last time (the store by default, so that its effects are seen).
   const [currentTab, setCurrentTab] = React.useState<Tab>(() =>
-    canAddEffectFromStore ? getNewEffectDialogDefaultTab() : 'from-scratch'
+    getNewEffectDialogDefaultTab()
   );
   const changeTab = React.useCallback(
     (newTab: Tab) => {
@@ -392,6 +390,8 @@ function NewEffectDialog({
               label={
                 isAssetBeingInstalled ? (
                   <Trans>Adding...</Trans>
+                ) : target === 'object' ? (
+                  <Trans>Add to the object</Trans>
                 ) : (
                   <Trans>Add to the layer</Trans>
                 )
@@ -409,26 +409,24 @@ function NewEffectDialog({
         fullHeight
         id="new-effect-dialog"
         fixedContent={
-          canAddEffectFromStore ? (
-            <Tabs
-              value={currentTab}
-              onChange={changeTab}
-              options={[
-                {
-                  label: <Trans>Effect store</Trans>,
-                  value: 'asset-store',
-                  id: 'effect-store-tab',
-                },
-                {
-                  label: <Trans>New effect from scratch</Trans>,
-                  value: 'from-scratch',
-                  id: 'new-effect-from-scratch-tab',
-                },
-              ]}
-              // Enforce scroll on mobile, because the tabs have long names.
-              variant={isMobile ? 'scrollable' : undefined}
-            />
-          ) : null
+          <Tabs
+            value={currentTab}
+            onChange={changeTab}
+            options={[
+              {
+                label: <Trans>Effect store</Trans>,
+                value: 'asset-store',
+                id: 'effect-store-tab',
+              },
+              {
+                label: <Trans>New effect from scratch</Trans>,
+                value: 'from-scratch',
+                id: 'new-effect-from-scratch-tab',
+              },
+            ]}
+            // Enforce scroll on mobile, because the tabs have long names.
+            variant={isMobile ? 'scrollable' : undefined}
+          />
         }
       >
         {currentTab === 'from-scratch' && (
@@ -445,6 +443,7 @@ function NewEffectDialog({
             ref={assetStore}
             onlyShowAssets
             fixedObjectTypes={storeEffectTypes}
+            fixedEffectTarget={target}
           />
         )}
       </Dialog>

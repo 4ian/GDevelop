@@ -277,18 +277,20 @@ export const AssetStore: React.ComponentType<{
 
     const { isMobile } = useResponsiveWindowSize();
 
+    // The filters (animations, colors, sizes...) only make sense for objects.
+    const hasFilters = !fixedEffectTarget;
     // Don't open the filters panel automatically.
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
     const openFiltersPanelIfAppropriate = React.useCallback(
       () => {
-        if (isMobile) {
+        if (isMobile || !hasFilters) {
           // Never open automatically the filters on small screens
           return;
         }
 
         setIsFiltersPanelOpen(true);
       },
-      [isMobile]
+      [isMobile, hasFilters]
     );
 
     const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
@@ -342,6 +344,7 @@ export const AssetStore: React.ComponentType<{
     );
 
     const canShowFiltersPanel =
+      hasFilters &&
       !openedAssetShortHeader && // Don't show filters on asset page.
       !openedPrivateAssetPackListingData && // Don't show filters on private asset pack information page.
       !openedPrivateGameTemplateListingData && // Don't show filters on private game template information page.
@@ -843,14 +846,16 @@ export const AssetStore: React.ComponentType<{
                     id="asset-store-search-bar"
                   />
                 </Column>
-                <IconButton
-                  onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
-                  disabled={!canShowFiltersPanel}
-                  selected={canShowFiltersPanel && isFiltersPanelOpen}
-                  size="small"
-                >
-                  <Tune />
-                </IconButton>
+                {hasFilters && (
+                  <IconButton
+                    onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
+                    disabled={!canShowFiltersPanel}
+                    selected={canShowFiltersPanel && isFiltersPanelOpen}
+                    size="small"
+                  >
+                    <Tune />
+                  </IconButton>
+                )}
               </LineStackLayout>
               <Spacer />
             </>

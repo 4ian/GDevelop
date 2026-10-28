@@ -1068,6 +1068,8 @@ module.exports = {
     Cube3DObject.getProperties = function () {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       const objectContent = this.content;
+      const facesGroup = _('Textures') + ' > ' + _('Faces');
+      const tilingGroup = _('Textures') + ' > ' + _('Tiling');
 
       objectProperties
         .getOrCreate('enableTextureTransparency')
@@ -1132,7 +1134,7 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Front face'))
-        .setGroup(_('Textures'));
+        .setGroup(facesGroup);
 
       objectProperties
         .getOrCreate('backFaceResourceName')
@@ -1140,7 +1142,7 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Back face'))
-        .setGroup(_('Textures'));
+        .setGroup(facesGroup);
 
       objectProperties
         .getOrCreate('backFaceUpThroughWhichAxisRotation')
@@ -1163,7 +1165,7 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Left face'))
-        .setGroup(_('Textures'));
+        .setGroup(facesGroup);
 
       objectProperties
         .getOrCreate('rightFaceResourceName')
@@ -1171,7 +1173,7 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Right face'))
-        .setGroup(_('Textures'));
+        .setGroup(facesGroup);
 
       objectProperties
         .getOrCreate('topFaceResourceName')
@@ -1179,7 +1181,7 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Top face'))
-        .setGroup(_('Textures'));
+        .setGroup(facesGroup);
 
       objectProperties
         .getOrCreate('bottomFaceResourceName')
@@ -1187,49 +1189,49 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Bottom face'))
-        .setGroup(_('Textures'));
+        .setGroup(facesGroup);
 
       objectProperties
         .getOrCreate('frontFaceResourceRepeat')
         .setValue(objectContent.frontFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile'))
-        .setGroup(_('Textures'));
+        .setLabel(_('Front face'))
+        .setGroup(tilingGroup);
 
       objectProperties
         .getOrCreate('backFaceResourceRepeat')
         .setValue(objectContent.backFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile'))
-        .setGroup(_('Textures'));
+        .setLabel(_('Back face'))
+        .setGroup(tilingGroup);
 
       objectProperties
         .getOrCreate('leftFaceResourceRepeat')
         .setValue(objectContent.leftFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile'))
-        .setGroup(_('Textures'));
+        .setLabel(_('Left face'))
+        .setGroup(tilingGroup);
 
       objectProperties
         .getOrCreate('rightFaceResourceRepeat')
         .setValue(objectContent.rightFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile'))
-        .setGroup(_('Textures'));
+        .setLabel(_('Right face'))
+        .setGroup(tilingGroup);
 
       objectProperties
         .getOrCreate('topFaceResourceRepeat')
         .setValue(objectContent.topFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile'))
-        .setGroup(_('Textures'));
+        .setLabel(_('Top face'))
+        .setGroup(tilingGroup);
 
       objectProperties
         .getOrCreate('bottomFaceResourceRepeat')
         .setValue(objectContent.bottomFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Tile'))
-        .setGroup(_('Textures'));
+        .setLabel(_('Bottom face'))
+        .setGroup(tilingGroup);
 
       objectProperties
         .getOrCreate('tileScale')
@@ -1241,7 +1243,7 @@ module.exports = {
             'The scale applied to tiled textures. A value of 1 displays them at the same size as in 2D.'
           )
         )
-        .setGroup(_('Textures'));
+        .setGroup(tilingGroup);
 
       objectProperties
         .getOrCreate('frontFaceVisible')
@@ -1375,6 +1377,11 @@ module.exports = {
       .setCategory('General')
       .setAssetStoreTag('3d cubes')
       .setHelpPath('/objects/3d-box')
+      .addPropertyGroup(_('Default size'))
+      .addPropertyGroup(_('Textures'))
+      .addPropertyGroup(_('Lighting'))
+      .addPropertyGroup(_('Face visibility'))
+      .addPropertyGroup(_('Face orientation'))
       // Effects are unsupported because the object is not rendered with PIXI.
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')

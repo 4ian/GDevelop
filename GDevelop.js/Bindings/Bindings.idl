@@ -2215,6 +2215,9 @@ interface ObjectMetadata {
 
     [Ref] ObjectMetadata SetOpenFullEditorLabel([Const] DOMString label);
     [Const, Ref] DOMString GetOpenFullEditorLabel();
+
+    [Ref] ObjectMetadata AddPropertyGroup([Const] DOMString group);
+    [Const, Ref] VectorString GetPropertyGroups();
 };
 
 interface InGameEditorResourceMetadata {
@@ -2353,6 +2356,9 @@ interface BehaviorMetadata {
 
     [Ref] BehaviorMetadata SetOpenFullEditorLabel([Const] DOMString label);
     [Const, Ref] DOMString GetOpenFullEditorLabel();
+
+    [Ref] BehaviorMetadata AddPropertyGroup([Const] DOMString group);
+    [Const, Ref] VectorString GetPropertyGroups();
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();

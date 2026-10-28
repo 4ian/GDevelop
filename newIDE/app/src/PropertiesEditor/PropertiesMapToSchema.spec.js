@@ -133,14 +133,45 @@ describe('propertiesMapToSchema (rows)', () => {
     expect(schema[0].valueType).toBe('resource');
     expect(schema[1].valueType).toBe('resource');
   });
+
+  it('shows paired resource properties one after the other, in the order of the pair', () => {
+    const schema = makeSchema(properties => {
+      properties
+        .getOrCreate('backFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel('Back face');
+      properties
+        .getOrCreate('enableTextureTransparency')
+        .setValue('false')
+        .setType('boolean')
+        .setLabel('Enable texture transparency');
+      properties
+        .getOrCreate('frontFaceResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel('Front face');
+    });
+
+    expect(schema.map(field => field.name)).toEqual([
+      'frontFaceResourceName',
+      'backFaceResourceName',
+      'enableTextureTransparency',
+    ]);
+  });
 });
 
 describe('propertiesMapToSchema (groups)', () => {
   const makeSchema = (
-    setUpProperties: (properties: gdMapStringPropertyDescriptor) => void
+    setUpProperties: (properties: gdMapStringPropertyDescriptor) => void,
+    propertyGroupNames?: Array<string>
   ) => {
     const properties = new gd.MapStringPropertyDescriptor();
     setUpProperties(properties);
+    const propertyGroups = new gd.VectorString();
+    (propertyGroupNames || []).forEach(groupName =>
+      propertyGroups.push_back(groupName)
+    );
 
     const schema = propertiesMapToSchema({
       properties,
@@ -150,8 +181,10 @@ describe('propertiesMapToSchema (groups)', () => {
       object: null,
       layersContainer: null,
       shouldDisabledFieldsWithMixedValues: false,
+      propertyGroups,
     });
     properties.delete();
+    propertyGroups.delete();
     return schema;
   };
 
@@ -215,6 +248,32 @@ describe('propertiesMapToSchema (groups)', () => {
     ]);
   });
 
+  it('shows the fields of a group before its sub-groups', () => {
+    const schema = makeSchema(properties => {
+      properties
+        .getOrCreate('a')
+        .setValue('0')
+        .setType('number')
+        .setGroup('Group > Sub-group');
+      properties
+        .getOrCreate('b')
+        .setValue('0')
+        .setType('number')
+        .setGroup('Group');
+    });
+
+    expect(getNamesAndTitles(schema)).toEqual([
+      {
+        title: 'Group',
+        isSubgroup: false,
+        children: [
+          'b',
+          { title: 'Sub-group', isSubgroup: true, children: ['a'] },
+        ],
+      },
+    ]);
+  });
+
   it('keeps the fields of a group next to its sub-groups', () => {
     const schema = makeSchema(properties => {
       properties
@@ -238,6 +297,34 @@ describe('propertiesMapToSchema (groups)', () => {
           { title: 'Sub-group', isSubgroup: true, children: ['b'] },
         ],
       },
+    ]);
+  });
+
+  it('shows the groups in the given order, then the other ones alphabetically', () => {
+    const schema = makeSchema(
+      properties => {
+        ['Lighting', 'Default size', 'Advanced', 'Textures > Tiling'].forEach(
+          (groupName, index) =>
+            properties
+              .getOrCreate('property' + index)
+              .setValue('0')
+              .setType('number')
+              .setGroup(groupName)
+        );
+        properties
+          .getOrCreate('ungrouped')
+          .setValue('0')
+          .setType('number');
+      },
+      ['Default size', 'Textures', 'Lighting']
+    );
+
+    expect(schema.map(field => field.title)).toEqual([
+      '',
+      'Default size',
+      'Textures',
+      'Lighting',
+      'Advanced',
     ]);
   });
 });

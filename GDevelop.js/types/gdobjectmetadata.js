@@ -36,6 +36,8 @@ declare class gdObjectMetadata {
   isRenderedIn3D(): boolean;
   setOpenFullEditorLabel(label: string): gdObjectMetadata;
   getOpenFullEditorLabel(): string;
+  addPropertyGroup(group: string): gdObjectMetadata;
+  getPropertyGroups(): gdVectorString;
   delete(): void;
   ptr: number;
 };

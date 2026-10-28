@@ -129,6 +129,7 @@ namespace gdjs {
       | 'FULL'
       | 'NOT_ENOUGH_PLAYERS'
       | 'DOES_NOT_EXIST'
+      | 'TIMEOUT'
       | 'UNKNOWN'
       | null = null;
     let _lobbyId: string | null = null;
@@ -152,6 +153,7 @@ namespace gdjs {
     let _websocket: WebSocket | null = null;
     let _websocketHeartbeatIntervalFunction: NodeJS.Timeout | null = null;
     let _lobbyHeartbeatIntervalFunction: NodeJS.Timeout | null = null;
+    let _joinGamePeerIdTimeout: NodeJS.Timeout | null = null;
 
     const DEFAULT_WEBSOCKET_HEARTBEAT_INTERVAL = 10000;
     const DEFAULT_LOBBY_HEARTBEAT_INTERVAL = 30000;
@@ -163,6 +165,14 @@ namespace gdjs {
     const DEFAULT_LOBBY_EXPECTED_CONNECTED_PLAYERS_TIMEOUT = 10000;
     let _resumeTimeout: NodeJS.Timeout | null = null;
     const DEFAULT_LOBBY_EXPECTED_RESUME_TIMEOUT = 12000;
+    const DEFAULT_LOBBY_JOIN_GAME_PEER_ID_TIMEOUT = 10000;
+
+    const clearJoinGamePeerIdTimeout = () => {
+      if (_joinGamePeerIdTimeout !== null) {
+        clearTimeout(_joinGamePeerIdTimeout);
+        _joinGamePeerIdTimeout = null;
+      }
+    };
 
     export const DEFAULT_OBJECT_MAX_SYNC_RATE = 30;
     // The number of times per second an object should be synchronized if it keeps changing.
@@ -648,6 +658,7 @@ namespace gdjs {
                 logger.error('Malformed message received');
                 return;
               }
+              clearJoinGamePeerIdTimeout();
               const retryData = { times: 2, delayInMs: 500 };
               try {
                 gdjs.evtTools.network.retryIfFailed(retryData, async () => {
@@ -772,7 +783,7 @@ namespace gdjs {
         onLobbyQuickJoinFinished(runtimeScene);
         return;
       } else if (_actionAfterJoiningLobby === 'JOIN_GAME') {
-        handleJoinGameMessage();
+        handleJoinGameMessage(runtimeScene);
         return;
       } else if (_actionAfterJoiningLobby === 'START_GAME') {
         const retryData = { times: 2, delayInMs: 500 };
@@ -817,6 +828,7 @@ namespace gdjs {
     };
 
     const handleLeaveLobbyEvent = function () {
+      clearJoinGamePeerIdTimeout();
       if (_websocket) {
         _websocket.close();
       }
@@ -1087,25 +1099,47 @@ namespace gdjs {
      * When the game receives a join game message from the lobby, send it via the WS
      * waiting for a peerId to be received and that the connection happens automatically.
      */
-    const handleJoinGameMessage = function () {
+    const handleJoinGameMessage = function (runtimeScene: gdjs.RuntimeScene) {
       if (!_websocket) {
         logger.error(
           'No connection to send the join game message. Are you connected to a lobby?'
         );
         return;
       }
-      // TODO: When the message is sent, it is expected to then receive a "peerId" message
-      // from the websocket. This "peerId" message might not be sent for different reasons.
-      // Should there be a security that checks if the "peerId" message has been received
-      // in the next 10s or something more global that checks the lobby status after the player
-      // has committed to open a connection with it?
 
+      clearJoinGamePeerIdTimeout();
       _websocket.send(
         JSON.stringify({
           action: 'joinGame',
           connectionType: 'lobby',
         })
       );
+
+      const peerIdTimeout = setTimeout(() => {
+        if (_joinGamePeerIdTimeout !== peerIdTimeout) return;
+        _joinGamePeerIdTimeout = null;
+        logger.error(
+          'Timed out while waiting for the lobby to send a peer ID.'
+        );
+
+        const wasQuickJoining = _isQuickJoiningOrStartingAGame;
+        if (wasQuickJoining) {
+          _quickJoinLobbyJustFailed = true;
+          _quickJoinLobbyFailureReason = 'TIMEOUT';
+        } else {
+          gdjs.multiplayerComponents.displayConnectionErrorNotification(
+            runtimeScene
+          );
+        }
+
+        handleLeaveLobbyEvent();
+        if (wasQuickJoining) {
+          onLobbyQuickJoinFinished(runtimeScene);
+        } else {
+          _actionAfterJoiningLobby = null;
+        }
+      }, DEFAULT_LOBBY_JOIN_GAME_PEER_ID_TIMEOUT);
+      _joinGamePeerIdTimeout = peerIdTimeout;
     };
 
     /**
@@ -1558,7 +1592,7 @@ namespace gdjs {
           break;
         }
         case 'joinGame': {
-          handleJoinGameMessage();
+          handleJoinGameMessage(runtimeScene);
           break;
         }
       }
@@ -1627,6 +1661,7 @@ namespace gdjs {
     };
 
     const onLobbyQuickJoinFinished = (runtimeScene: gdjs.RuntimeScene) => {
+      clearJoinGamePeerIdTimeout();
       _isQuickJoiningOrStartingAGame = false;
       _actionAfterJoiningLobby = null;
       gdjs.multiplayerComponents.displayLoader(runtimeScene, false);

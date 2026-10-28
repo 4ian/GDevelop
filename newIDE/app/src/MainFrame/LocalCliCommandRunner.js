@@ -207,18 +207,27 @@ const writeCliGameplayTestResults = (
     return {
       ...output,
       screenshots: result.screenshots.map((screenshot, index) => {
+        const { pngBase64 } = screenshot;
         const screenshotPath = path.join(
           screenshotsDirectoryPath,
           `${sanitizeForFileName(result.testName)}-frame-${
             screenshot.frame
-          }-${sanitizeForFileName(screenshot.label || `${index}`)}.jpg`
+          }-${sanitizeForFileName(screenshot.label || `${index}`)}.${
+            pngBase64 ? 'png' : 'jpg'
+          }`
         );
         try {
           fs.mkdirSync(screenshotsDirectoryPath, { recursive: true });
-          fs.writeFileSync(screenshotPath, screenshot.jpegBase64, 'base64');
+          fs.writeFileSync(
+            screenshotPath,
+            pngBase64 || screenshot.jpegBase64,
+            'base64'
+          );
           return {
             label: screenshot.label,
             frame: screenshot.frame,
+            width: screenshot.width,
+            height: screenshot.height,
             file: screenshotPath,
           };
         } catch (error) {

@@ -62,7 +62,11 @@ namespace gdjs {
       // TODO (3D): call the method with the same name on RuntimeLayers so they can dispose?
     }
 
-    render() {
+    /**
+     * Draw the scene.
+     * @param options See `gdjs.RuntimeScene.render`.
+     */
+    render(options?: gdjs.RuntimeSceneRenderOptions) {
       const runtimeGameRenderer = this._runtimeGameRenderer;
       if (!runtimeGameRenderer) return;
 
@@ -70,6 +74,14 @@ namespace gdjs {
       if (!pixiRenderer) return;
 
       const threeRenderer = this._threeRenderer;
+      const isBackgroundColorForced =
+        !!options && options.backgroundColor !== undefined;
+      const backgroundColor =
+        options && options.backgroundColor !== undefined
+          ? options.backgroundColor
+          : this._runtimeScene.getBackgroundColor();
+      const shouldClearCanvas =
+        isBackgroundColorForced || this._runtimeScene.getClearCanvas();
 
       // If we are in VR, we cannot render like this: we must use the special VR
       // rendering method to not display a black screen.
@@ -126,10 +138,9 @@ namespace gdjs {
 
             if (isFirstRender) {
               // Render the background color.
-              pixiRenderer.background.color =
-                this._runtimeScene.getBackgroundColor();
+              pixiRenderer.background.color = backgroundColor;
               pixiRenderer.background.alpha = 1;
-              if (this._runtimeScene.getClearCanvas()) pixiRenderer.clear();
+              if (shouldClearCanvas) pixiRenderer.clear();
 
               isFirstRender = false;
             }
@@ -199,19 +210,29 @@ namespace gdjs {
                 threeRenderer.resetState();
               }
 
+              // The background shown by an effect (a skybox), replaced by
+              // the forced background color while this layer is drawn.
+              let replacedThreeSceneBackground:
+                | THREE.Color
+                | THREE.Texture
+                | null = null;
               if (isFirstRender) {
                 // Render the background color.
-                threeRenderer.setClearColor(
-                  this._runtimeScene.getBackgroundColor()
-                );
+                threeRenderer.setClearColor(backgroundColor);
                 threeRenderer.resetState();
-                if (this._runtimeScene.getClearCanvas()) threeRenderer.clear();
+                if (shouldClearCanvas) threeRenderer.clear();
                 if (!this._backgroundColor) {
                   this._backgroundColor = new THREE.Color();
                 }
-                this._backgroundColor.set(
-                  this._runtimeScene.getBackgroundColor()
-                );
+                this._backgroundColor.set(backgroundColor);
+                if (
+                  isBackgroundColorForced &&
+                  threeScene.background &&
+                  threeScene.background !== this._backgroundColor
+                ) {
+                  replacedThreeSceneBackground = threeScene.background;
+                  threeScene.background = this._backgroundColor;
+                }
                 if (!threeScene.background) {
                   threeScene.background = this._backgroundColor;
                 }
@@ -239,6 +260,9 @@ namespace gdjs {
                 threeRenderer.setClearAlpha(clearAlpha);
               } else {
                 threeRenderer.render(threeScene, threeCamera);
+              }
+              if (replacedThreeSceneBackground) {
+                threeScene.background = replacedThreeSceneBackground;
               }
 
               this._layerRenderingMetrics.rendered3DLayersCount++;
@@ -283,9 +307,9 @@ namespace gdjs {
 
         // Render all the layers then.
         // TODO: replace by a loop like in 3D?
-        pixiRenderer.background.color = this._runtimeScene.getBackgroundColor();
+        pixiRenderer.background.color = backgroundColor;
         pixiRenderer.render(this._pixiContainer, {
-          clear: this._runtimeScene.getClearCanvas(),
+          clear: shouldClearCanvas,
         });
         this._layerRenderingMetrics.rendered2DLayersCount++;
       }

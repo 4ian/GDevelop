@@ -11,6 +11,9 @@ namespace gdjs {
   export type RuntimeSceneRenderOptions = {
     /** Update everything for rendering, but don't draw anything. */
     skipDrawing?: boolean;
+    /** Draw on this background color, instead of the one of the scene and
+     * instead of what an effect shows as the background (a skybox). */
+    backgroundColor?: integer;
   };
 
   const logger = new gdjs.Logger('RuntimeScene');
@@ -524,7 +527,7 @@ namespace gdjs {
         );
       }
 
-      this._renderer.render();
+      this._renderer.render(options);
     }
 
     /**

@@ -40,6 +40,18 @@ export type GameplayTestAssertion = {|
   passed: boolean,
 |};
 
+export type GameplayTestScreenshot = {
+  label: string,
+  frame: number,
+  // Missing in the results of older versions of the game engine.
+  width?: number,
+  height?: number,
+  // For a PNG screenshot, the same image flattened on a gray background.
+  jpegBase64: string,
+  // Only for a PNG screenshot (with a transparent background, notably).
+  pngBase64?: string,
+};
+
 export type GameplayTestResult = {
   testName: string,
   // 'paused': the run was interrupted because the editor stayed in the
@@ -77,9 +89,11 @@ export type GameplayTestResult = {
   consoleLogs: Array<{ level: 'log' | 'warn' | 'error', message: string }>,
   eventLog: Array<Object>,
   finalState: Object | null,
-  screenshots: Array<{ label: string, frame: number, jpegBase64: string }>,
+  screenshots: Array<GameplayTestScreenshot>,
   // Screenshots taken, including the ones not kept in `screenshots`.
   screenshotsTakenCount?: number,
+  // The screenshots taken but not kept (only the first and the last ones are).
+  droppedScreenshots?: Array<{ label: string, frame: number }>,
   // The `stopProfiling()` summaries captured during the run.
   profiles: Array<Object>,
   performance: Object | null,
@@ -250,8 +264,13 @@ export const makeGameplayTestResultReadableOutput = (
   consoleLogs: result.consoleLogs.map(log => `[${log.level}] ${log.message}`),
   eventLog: result.eventLog,
   finalState: result.finalState,
-  screenshots: result.screenshots,
+  // The PNG version of a screenshot is only for files (see the CLI): the
+  // JPEG version is the one read.
+  screenshots: result.screenshots.map(({ pngBase64, ...screenshot }) =>
+    pngBase64 ? { ...screenshot, format: 'png' } : screenshot
+  ),
   screenshotsTakenCount: result.screenshotsTakenCount,
+  droppedScreenshots: result.droppedScreenshots,
   profiles: result.profiles,
   performance: result.performance,
 });

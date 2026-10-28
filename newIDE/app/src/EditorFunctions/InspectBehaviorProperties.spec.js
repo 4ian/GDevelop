@@ -107,3 +107,69 @@ describe('inspect_behavior_properties (not found and shared properties)', () => 
     expect(result.sharedProperties).toBeUndefined();
   });
 });
+
+describe('inspect_behavior_properties (network synchronization)', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const inspectPlatformerBehavior = async (): Promise<EditorFunctionGenericOutput> =>
+    editorFunctions.inspect_behavior_properties.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Player',
+        behavior_name: 'PlatformerObject',
+      },
+    });
+
+  it('tells if the behavior is synchronized when the object is synchronized with other players', async () => {
+    const object = testScene
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Player', 0);
+    // The Multiplayer extension is not loaded in tests, but only the type of
+    // the behavior is used to know if an object is synchronized.
+    object.addNewBehavior(
+      project,
+      'Multiplayer::MultiplayerObjectBehavior',
+      'MultiplayerObject'
+    );
+    object.addNewBehavior(
+      project,
+      'PlatformBehavior::PlatformerObjectBehavior',
+      'PlatformerObject'
+    );
+
+    const result = await inspectPlatformerBehavior();
+    expect(result.success).toBe(true);
+    expect(result.isSynchronizedOverNetwork).toBe(true);
+
+    object.getBehavior('PlatformerObject').setSynchronizedOverNetwork(false);
+    const resultAfterChange = await inspectPlatformerBehavior();
+    expect(resultAfterChange.isSynchronizedOverNetwork).toBe(false);
+  });
+
+  it('does not tell it when the object is not synchronized with other players', async () => {
+    const object = testScene
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Player', 0);
+    object.addNewBehavior(
+      project,
+      'PlatformBehavior::PlatformerObjectBehavior',
+      'PlatformerObject'
+    );
+
+    const result = await inspectPlatformerBehavior();
+    expect(result.success).toBe(true);
+    expect(result).not.toHaveProperty('isSynchronizedOverNetwork');
+  });
+});

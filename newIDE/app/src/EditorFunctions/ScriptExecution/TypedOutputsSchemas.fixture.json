@@ -300,6 +300,9 @@
               },
               "behaviorType": {
                 "type": "string"
+              },
+              "isSynchronizedOverNetwork": {
+                "type": "boolean"
               }
             },
             "required": ["behaviorName", "behaviorType"]
@@ -327,6 +330,9 @@
           "items": {
             "$namedType": "NamedProperty"
           }
+        },
+        "isSynchronizedOverNetwork": {
+          "type": "boolean"
         }
       },
       "required": ["properties"]

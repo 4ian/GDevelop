@@ -245,6 +245,35 @@ describe('typed outputs conformance (script API declared reads)', () => {
     validateResultAgainstSchema(result, 'inspect_object_properties_effects');
   });
 
+  it('inspect_object_properties_effects output conforms for an object synchronized with other players', async () => {
+    const playerObject = testScene.getObjects().getObject('Player');
+    playerObject.addNewBehavior(
+      project,
+      'Multiplayer::MultiplayerObjectBehavior',
+      'MultiplayerObject'
+    );
+    playerObject
+      .addNewBehavior(
+        project,
+        'DestroyOutsideBehavior::DestroyOutside',
+        'DestroyOutside'
+      )
+      .setSynchronizedOverNetwork(false);
+    const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene', object_name: 'Player' },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(result, 'inspect_object_properties_effects');
+    expect(result.behaviors).toContainEqual({
+      behaviorName: 'DestroyOutside',
+      behaviorType: 'DestroyOutsideBehavior::DestroyOutside',
+      isSynchronizedOverNetwork: false,
+    });
+  });
+
   it('inspect_scene_properties_layers_effects output conforms', async () => {
     const result: EditorFunctionGenericOutput = await editorFunctions.inspect_scene_properties_layers_effects.launchFunction(
       {
@@ -376,6 +405,33 @@ describe('typed outputs conformance (script API declared reads)', () => {
     );
     expect(result.success).toBe(true);
     validateResultAgainstSchema(result, 'inspect_behavior_properties');
+  });
+
+  it('inspect_behavior_properties output conforms for an object synchronized with other players', async () => {
+    const playerObject = testScene.getObjects().getObject('Player');
+    playerObject.addNewBehavior(
+      project,
+      'Multiplayer::MultiplayerObjectBehavior',
+      'MultiplayerObject'
+    );
+    playerObject.addNewBehavior(
+      project,
+      'DestroyOutsideBehavior::DestroyOutside',
+      'DestroyOutside'
+    );
+    const result: EditorFunctionGenericOutput = await editorFunctions.inspect_behavior_properties.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          behavior_name: 'DestroyOutside',
+        },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(result, 'inspect_behavior_properties');
+    expect(result.isSynchronizedOverNetwork).toBe(true);
   });
 
   // `inspect_extension` returns up to four levels in one output: exercise them

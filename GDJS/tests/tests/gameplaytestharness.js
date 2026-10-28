@@ -662,6 +662,69 @@ describe('gdjs.gameplayTests', () => {
     expect(result.loadingMs >= 280).to.be(true);
   }).timeout(10000);
 
+  it('tells the editor when it is loading, before creating the scene', async () => {
+    const runtimeGame = makeRuntimeGame();
+    /** @type {Array<{isLoading: boolean, isSceneCreated: boolean}>} */
+    const progresses = [];
+    const result = await gdjs.gameplayTests.runGameplayTest(
+      runtimeGame,
+      {
+        testName: 'Test',
+        source: `
+        await harness.goToScene('Scene 2');
+        await harness.stepFrames(1);
+        `,
+        timeoutMs: 5000,
+      },
+      (progress) => {
+        const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+        progresses.push({
+          isLoading: progress.isLoading,
+          isSceneCreated:
+            !!currentScene && currentScene.getName() === 'Scene 2',
+        });
+      }
+    );
+
+    expect(result.status).to.be('passed');
+    const firstLoadingProgressIndex = progresses.findIndex(
+      (progress) => progress.isLoading
+    );
+    expect(firstLoadingProgressIndex).not.to.be(-1);
+    expect(progresses[firstLoadingProgressIndex].isSceneCreated).to.be(false);
+    expect(progresses[progresses.length - 1]).to.eql({
+      isLoading: false,
+      isSceneCreated: true,
+    });
+  });
+
+  it('runs a test once the stopped test it replaces has ended', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const stoppedResultPromise = runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
+      `,
+      { timeoutMs: 120 * 1000 }
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    // The editor stops a test it gave up on, then runs the next one right
+    // away, while the stopped one is still ending.
+    gdjs.gameplayTests.stopCurrentGameplayTest();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.assert(true, 'Ran');
+      `
+    );
+
+    expect((await stoppedResultPromise).status).to.be('stopped');
+    expect(result.errors).to.eql([]);
+    expect(result.status).to.be('passed');
+  });
+
   it('lets a test change its timeout budget', async () => {
     const result = await runTestScript(
       makeRuntimeGame(),

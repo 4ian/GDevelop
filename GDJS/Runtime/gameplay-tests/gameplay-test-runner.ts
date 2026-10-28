@@ -98,6 +98,20 @@ namespace gdjs {
       freezeWhenFinished?: boolean;
     };
 
+    /**
+     * Sent to the editor while a test runs (at least every second), so it
+     * can tell a slow run from a dead one.
+     */
+    export type GameplayTestProgress = {
+      frame: integer;
+      /** True while the game boots, loads scene assets, creates a scene and
+       * steps its first frame, or draws for a screenshot (the first draws
+       * compile the shaders): the game can then stay busy for a long time
+       * without being able to report anything, so the editor waits up to
+       * `loadingTimeoutMs` before giving up instead of `timeoutMs`. */
+      isLoading: boolean;
+    };
+
     export type GameplayTestAssertion = {
       message: string;
       passed: boolean;
@@ -441,9 +455,11 @@ namespace gdjs {
       status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout';
       framesExecuted: integer;
       durationMs: number;
-      /** Time spent waiting for the game to boot and for scene assets to
-       * load, excluded from the `timeoutMs` budget. `durationMs` includes
-       * it: `durationMs - loadingMs` is what counted against the budget. */
+      /** Time spent waiting for the game to boot, for scene assets to load,
+       * for scenes to be created with their first frame, and drawing the
+       * game for screenshots (the first draws compile the shaders),
+       * excluded from the `timeoutMs` budget. `durationMs` includes it:
+       * `durationMs - loadingMs` is what counted against the budget. */
       loadingMs: number;
       /** The wall-clock budget the run had, loading excluded
        * (`durationMs - loadingMs` close to it means the test is at risk of
@@ -855,7 +871,7 @@ namespace gdjs {
       /** Whether the one-time "mouse deltas without pointer lock" hint was
        * already recorded (see `setMouseDelta`). */
       _hasWarnedMouseDelta: boolean = false;
-      _onProgress: ((frame: integer) => void) | null = null;
+      _onProgress: ((progress: GameplayTestProgress) => void) | null = null;
       _lastProgressTimeMs: number = 0;
       /** Rejects the promise raced against the test script, so a stop
        * interrupts the script even when it awaits something else than the
@@ -1042,9 +1058,10 @@ namespace gdjs {
         loadingPromise: Promise<unknown>,
         description: string
       ): Promise<void> {
-        const heartbeatIntervalId = setInterval(() => {
-          if (this._onProgress) this._onProgress(this._framesExecuted);
-        }, 1000);
+        const heartbeatIntervalId = setInterval(
+          () => this._reportProgress(),
+          1000
+        );
         let loadingTimeoutId: any = null;
         try {
           await this._countAsLoading(() =>
@@ -1079,11 +1096,26 @@ namespace gdjs {
         if (this._loadingSinceMs !== null) return load();
         const loadingStartTimeMs = Date.now();
         this._loadingSinceMs = loadingStartTimeMs;
+        // Before anything that could keep the game busy: the editor must
+        // know it is loading to wait long enough for it.
+        this._reportProgress();
         try {
           return await load();
         } finally {
           this._loadingTimeMs += Date.now() - loadingStartTimeMs;
           this._loadingSinceMs = null;
+          this._reportProgress();
+        }
+      }
+
+      /** Tell the editor the run is alive (see `GameplayTestProgress`). */
+      _reportProgress(): void {
+        this._lastProgressTimeMs = Date.now();
+        if (this._onProgress) {
+          this._onProgress({
+            frame: this._framesExecuted,
+            isLoading: this._loadingSinceMs !== null,
+          });
         }
       }
 
@@ -1389,9 +1421,8 @@ namespace gdjs {
         }
         this._trackChangesAfterStep();
         this._drainPlayedSounds();
-        if (this._onProgress && Date.now() - this._lastProgressTimeMs > 500) {
-          this._lastProgressTimeMs = Date.now();
-          this._onProgress(this._framesExecuted);
+        if (Date.now() - this._lastProgressTimeMs > 500) {
+          this._reportProgress();
         }
         return stepTimeMs;
       }
@@ -3595,7 +3626,11 @@ namespace gdjs {
         const currentScene = this._runtimeGame
           .getSceneStack()
           .getCurrentScene();
-        if (currentScene) currentScene.render();
+        // Counted as loading: the first draws compile the shaders, which can
+        // keep the game busy for long in a big 3D scene.
+        if (currentScene) {
+          await this._countAsLoading(async () => currentScene.render());
+        }
         const canvas = this._runtimeGame.getRenderer().getCanvas();
         if (!canvas) {
           logger.warn('No canvas found: unable to take a screenshot.');
@@ -4275,8 +4310,20 @@ namespace gdjs {
     export const runGameplayTest = async (
       runtimeGame: gdjs.RuntimeGame,
       payload: GameplayTestRunPayload,
-      onProgress?: (frame: integer) => void
+      onProgress?: (progress: GameplayTestProgress) => void
     ): Promise<GameplayTestResult> => {
+      if (currentlyRunningHarness && currentlyRunningHarness._stopped) {
+        // The editor stops a test it gave up on (it stayed silent for too
+        // long) before running the next one, but the stopped test only ends
+        // after the step it is busy with: wait for it.
+        const stoppedHarness = currentlyRunningHarness;
+        const deadlineMs = Date.now() + stoppedHarness._loadingTimeoutMs;
+        while (currentlyRunningHarness === stoppedHarness) {
+          if (Date.now() > deadlineMs) break;
+          if (onProgress) onProgress({ frame: 0, isLoading: true });
+          await new Promise((resolve) => setTimeout(resolve, 250));
+        }
+      }
       if (currentlyRunningHarness) {
         const failedResult = new GameplayTestHarness(
           runtimeGame,
@@ -4350,7 +4397,7 @@ namespace gdjs {
           Date.now() - lastBootHeartbeatTimeMs > 1000
         ) {
           lastBootHeartbeatTimeMs = Date.now();
-          harness._onProgress(0);
+          harness._onProgress({ frame: 0, isLoading: true });
         }
         await new Promise((resolve) => setTimeout(resolve, 20));
       }
@@ -4466,7 +4513,7 @@ namespace gdjs {
         });
         // Report the test as started (frame 0): a test can legitimately
         // spend time without stepping any frame.
-        if (harness._onProgress) harness._onProgress(0);
+        harness._reportProgress();
         try {
           await Promise.race([
             scriptFunction(harness, scriptConsole),

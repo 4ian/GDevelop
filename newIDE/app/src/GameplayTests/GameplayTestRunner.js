@@ -95,6 +95,10 @@ export type GameplayTestToRun = {|
 
 export type GameplayTestRunOptions = {|
   timeoutMs?: number,
+  // The longest the game can stay busy loading (booting, loading the assets
+  // of a scene, creating a scene, drawing its first frames) without
+  // reporting any progress. Default: 5 minutes.
+  loadingTimeoutMs?: number,
   // 'on': the first and last screenshots taken by the test, or one taken
   // when it ends if it took none.
   screenshots?: 'off' | 'on',
@@ -132,6 +136,12 @@ const GAMEPLAY_TEST_FRAME_DEBUGGER_ID = 'gameplay-test-frame';
 const GAME_READY_TIMEOUT_MS = 60 * 1000;
 const GAME_READY_POLL_INTERVAL_MS = 300;
 const RESULT_EXTRA_TIMEOUT_MS = 10 * 1000;
+const DEFAULT_LOADING_TIMEOUT_MS = 5 * 60 * 1000;
+// The game runs in an iframe of the editor, in the same thread: while it is
+// busy (compiling the shaders of a big 3D scene...), the timers of the editor
+// can't run either. A watchdog firing this late means the game was busy, not
+// that it crashed.
+const WATCHDOG_LATENESS_TOLERANCE_MS = 2000;
 // A silence shorter than this while the editor is in the background is not
 // considered a stall: the game sends progress every 500ms, so a quick tab
 // switch can pass unnoticed by the game.
@@ -455,6 +465,7 @@ const runSingleTest = async ({
   test,
   source,
   timeoutMs,
+  loadingTimeoutMs,
   screenshots,
   speedFactor,
   stateInspectors,
@@ -464,6 +475,7 @@ const runSingleTest = async ({
   test: GameplayTestToRun,
   source: string,
   timeoutMs: number,
+  loadingTimeoutMs: number,
   screenshots: 'off' | 'on',
   speedFactor: number | null,
   stateInspectors: GameplayTestStateInspectors,
@@ -473,6 +485,8 @@ const runSingleTest = async ({
 
   return new Promise(resolve => {
     let watchdogTimeoutId: ?TimeoutID = null;
+    // Until the game tells otherwise, it can be busy booting or loading.
+    let isGameLoading = true;
     const hiddenStallTracker = createHiddenStallTracker({
       isHiddenAtStart: getIsPageHidden(),
     });
@@ -500,6 +514,9 @@ const runSingleTest = async ({
             // loads assets - loading is not counted against the test
             // timeout): give it a full budget again.
             hiddenStallTracker.reportProgress();
+            isGameLoading = !!(
+              parsedMessage.payload && parsedMessage.payload.isLoading
+            );
             armWatchdog();
             if (onProgress && parsedMessage.payload) {
               onProgress(test, parsedMessage.payload.frame || 0);
@@ -535,7 +552,10 @@ const runSingleTest = async ({
     // result. Re-armed by every progress message: a game legitimately
     // spends long over its own timeout while loading assets (loading is
     // excluded from the test budget), but it heartbeats while doing so - a
-    // full silence is what means it crashed.
+    // full silence is what means it crashed. While the game says it is
+    // loading, a single step of it (creating a big scene, compiling the
+    // shaders of its first draw) can keep it silent for long: it is then
+    // given the loading budget.
     //
     // Unless the editor is in the background: browsers then stop animation
     // frames, so the game stops stepping and goes silent for a reason that
@@ -544,8 +564,24 @@ const runSingleTest = async ({
     const armWatchdog = () => {
       if (watchdogTimeoutId !== null) clearTimeout(watchdogTimeoutId);
       const wasHidden = getIsPageHidden();
+      const wasGameLoading = isGameLoading;
+      const budgetMs =
+        (wasGameLoading ? loadingTimeoutMs : timeoutMs) +
+        RESULT_EXTRA_TIMEOUT_MS;
+      const expectedFireTimeMs =
+        Date.now() + (wasHidden ? MAX_HIDDEN_STALL_MS : budgetMs);
       watchdogTimeoutId = setTimeout(
         () => {
+          if (
+            Date.now() - expectedFireTimeMs >
+            WATCHDOG_LATENESS_TOLERANCE_MS
+          ) {
+            // The editor was frozen with the game (see
+            // WATCHDOG_LATENESS_TOLERANCE_MS): the game was busy, and its
+            // progress messages are about to be received.
+            armWatchdog();
+            return;
+          }
           // Visibility changed while waiting (the timer itself is throttled
           // in a hidden page, so it can fire long after it was armed): the
           // budget that just elapsed was not the right one.
@@ -559,19 +595,31 @@ const runSingleTest = async ({
               pausedMs: totalHiddenStallMs,
               isRunInterrupted: true,
             });
-            finish(makePausedResult(test.testName, totalHiddenStallMs));
+            giveUp(makePausedResult(test.testName, totalHiddenStallMs));
             return;
           }
-          finish(
+          giveUp(
             makeErrorResult(
               test.testName,
-              `No result nor progress received from the game after ${timeoutMs +
-                RESULT_EXTRA_TIMEOUT_MS}ms - the game may have crashed or been closed.`
+              `No result nor progress received from the game after ${budgetMs}ms${
+                wasGameLoading
+                  ? ' while it was loading (booting, loading the assets of a scene, creating a scene or drawing its first frames)'
+                  : ''
+              } - the game may have crashed or been closed.`
             )
           );
         },
-        wasHidden ? MAX_HIDDEN_STALL_MS : timeoutMs + RESULT_EXTRA_TIMEOUT_MS
+        wasHidden ? MAX_HIDDEN_STALL_MS : budgetMs
       );
+    };
+
+    // The game may still be running the test (busy in a long step): stop
+    // it, so that it does not keep running it and the next test can run.
+    const giveUp = (result: GameplayTestResult) => {
+      previewDebuggerServer.sendMessage(GAMEPLAY_TEST_FRAME_DEBUGGER_ID, {
+        command: 'gameplayTest.stop',
+      });
+      finish(result);
     };
 
     // Follow the editor being hidden and shown again, to tell a frozen run
@@ -600,6 +648,7 @@ const runSingleTest = async ({
       testName: test.testName,
       source,
       timeoutMs,
+      loadingTimeoutMs,
       // Readable state for object/behavior snapshots, derived from the
       // extensions metadata.
       stateInspectors,
@@ -791,6 +840,8 @@ export const runGameplayTests = async ({
             test,
             source,
             timeoutMs,
+            loadingTimeoutMs:
+              options.loadingTimeoutMs || DEFAULT_LOADING_TIMEOUT_MS,
             screenshots: options.screenshots || 'off',
             speedFactor: options.speedFactor || null,
             stateInspectors,

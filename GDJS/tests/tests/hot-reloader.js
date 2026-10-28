@@ -1084,6 +1084,11 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(instances.length).to.be(1);
     expect(getSpriteCurrentFrameImage(instances[0])).to.be('ResourceC');
 
+    const createdInstance = scene.createObject('MyObject');
+    if (!createdInstance)
+      throw new Error("Couldn't create an instance for testing.");
+    expect(getSpriteCurrentFrameImage(createdInstance)).to.be('ResourceC');
+
     // Like the in-game editor does when it switches back to the scene.
     const sceneAndExtensionsData =
       runtimeGame.getSceneAndExtensionsData('Scene1');

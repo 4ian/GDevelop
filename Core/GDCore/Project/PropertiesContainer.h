@@ -78,6 +78,9 @@ public:
   GetAllPropertyFolderOrProperty() const;
 
   gd::PropertyFolderOrProperty &GetRootFolder() { return *rootFolder; }
+  const gd::PropertyFolderOrProperty &GetRootFolder() const {
+    return *rootFolder;
+  }
 
   void AddMissingPropertiesInRootFolder();
 

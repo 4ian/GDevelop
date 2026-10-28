@@ -40,6 +40,8 @@ declare class gdBehaviorMetadata {
   markAsActivatedByDefaultInEditor(): gdBehaviorMetadata;
   setOpenFullEditorLabel(label: string): gdBehaviorMetadata;
   getOpenFullEditorLabel(): string;
+  addPropertyGroup(group: string): gdBehaviorMetadata;
+  getPropertyGroups(): gdVectorString;
   get(): gdBehavior;
   getSharedDataInstance(): gdBehaviorsSharedData;
   getProperties(): gdMapStringPropertyDescriptor;

@@ -303,9 +303,7 @@ const Cube3DEditor = ({
                   properties.get(faceProperty.visibilityProperty).getValue() ===
                   'true'
                 }
-                label={properties
-                  .get(faceProperty.visibilityProperty)
-                  .getLabel()}
+                label={<Trans>Visible</Trans>}
                 onCheck={(_, value) => {
                   onChangeProperty(
                     faceProperty.visibilityProperty,
@@ -320,9 +318,7 @@ const Cube3DEditor = ({
                     .get(faceProperty.resourceRepeatProperty)
                     .getValue() === 'true'
                 }
-                label={properties
-                  .get(faceProperty.resourceRepeatProperty)
-                  .getLabel()}
+                label={<Trans>Tile</Trans>}
                 onCheck={(_, value) => {
                   onChangeProperty(
                     faceProperty.resourceRepeatProperty,

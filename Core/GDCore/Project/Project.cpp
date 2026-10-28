@@ -1262,8 +1262,8 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   if (tests.GetTestsCount() > 0) {
     tests.SerializeTestsTo(element.AddChild("tests"));
-    tests.SerializeFolderStructureTo(element.AddChild("testsFolderStructure"));
   }
+  tests.SerializeFolderStructureTo(element.AddChild("testsFolderStructure"));
 
   if (namedEasings.GetNamedEasingsCount() > 0) {
     namedEasings.SerializeNamedEasingsTo(element.AddChild("namedEasings"));

@@ -33,22 +33,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { type FileMetadata } from '../ProjectsStorage';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { useEditorFunctionsServices } from '../AiGeneration/UseEditorFunctionsServices';
-import {
-  makeMcpMessagesQueue,
-  type McpOpenedProject,
-  type McpProjectCreation,
-  type McpSearchResources,
-  type McpToolCallReport,
-} from './CliMcpServer';
-import { createResourceSearch } from '../Utils/GDevelopServices/Generation';
-import { notLoggedInErrorMessage } from '../AiGeneration/UseGenerateEvents';
-import { listAllExamples } from '../Utils/GDevelopServices/Example';
-import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
-import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
-import { cloudStorageProviderInternalName } from '../ProjectsStorage/CloudStorageProvider/CloudStoageProviderInternalName';
-import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
-import { sendMcpToolCalled } from '../Utils/Analytics/EventSender';
-import { getIDEVersion } from '../Version';
+import { useMcpServers } from './McpServerTools/UseMcpServers';
 
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -87,7 +72,7 @@ export type CliOptions = {|
   readOnly: boolean,
 |};
 
-type RunEditorFunctionCalls = (
+export type RunEditorFunctionCalls = (
   functionCalls: Array<CliEditorFunctionCall>,
   options: {| runScriptReadOnly: boolean |}
 ) => Promise<CliEditorFunctionCallsReport>;
@@ -528,16 +513,6 @@ export const getAwaitableCliRunner = (commandName: string): ?CliCommandRunner =>
 const CLI_PROJECT_LOAD_TIMEOUT_MS = 120_000;
 const CLI_LOGIN_SETTLE_TIMEOUT_MS = 30_000;
 
-const makeMcpProjectReady = (): {|
-  promise: Promise<void>,
-  resolve: () => void,
-|} => {
-  let resolve: () => void = () => {};
-  const promise: Promise<void> = new Promise(resolvePromise => {
-    resolve = () => resolvePromise();
-  });
-  return { promise, resolve };
-};
 const FIRE_AND_FORGET_GRACE_MS = 1500;
 
 const exitApp = (exitCode: number) => {
@@ -737,33 +712,9 @@ export const useCliCommandRunner = ({
   );
   const preferences = React.useContext(PreferencesContext);
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
-  const { loginState, profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const { loginState } = React.useContext(AuthenticatedUserContext);
   const loginStateRef = React.useRef(loginState);
   loginStateRef.current = loginState;
-  const profileRef = React.useRef(profile);
-  profileRef.current = profile;
-  const getAuthorizationHeaderRef = React.useRef(getAuthorizationHeader);
-  getAuthorizationHeaderRef.current = getAuthorizationHeader;
-  // The search the editor does to install a resource by name (see
-  // `useSearchAndInstallResource`), done for the agent to choose the name.
-  const mcpSearchResources: McpSearchResources = React.useCallback(
-    async ({ searchTerms, resourceKind }) => {
-      const currentProfile = profileRef.current;
-      if (!currentProfile) throw new Error(notLoggedInErrorMessage);
-      const resourceSearch = await createResourceSearch(
-        () => getAuthorizationHeaderRef.current(),
-        { userId: currentProfile.id, searchTerms, resourceKind }
-      );
-      return (resourceSearch.results || []).map(({ resource }) => ({
-        name: resource.name,
-        tags: resource.tags || [],
-        metadata: resource.metadata || null,
-      }));
-    },
-    []
-  );
   const ensureLoginSettled = React.useCallback(async () => {
     const startTime = Date.now();
     while (
@@ -837,193 +788,15 @@ export const useCliCommandRunner = ({
     []
   );
 
-  // The MCP server (`--mcp`) answers the handshake of the client as soon as
-  // the editor is loaded (a client gives up after ~30s, and would start
-  // another instance), and makes the tool calls wait for the project.
-  const mcpProjectReadyRef = React.useRef(makeMcpProjectReady());
-  React.useEffect(
-    () => {
-      if (!ipcRenderer) return;
-      const appArguments = Window.getArguments();
-      if (!appArguments['mcp']) return;
-      const mcpProjectReady = mcpProjectReadyRef.current;
-      const onMcpMessage = makeMcpMessagesQueue({
-        handlers: {
-          getServerVersion: getIDEVersion,
-          isReadOnly: !!appArguments['read-only'],
-          onToolCalled: (report: McpToolCallReport) =>
-            sendMcpToolCalled({ ...report, transport: 'stdio' }),
-          searchResources: mcpSearchResources,
-          runEditorFunctionCalls: async (functionCalls, options) => {
-            await mcpProjectReady.promise;
-            return latestRunEditorFunctionCalls(functionCalls, options);
-          },
-          saveProject: async () => {
-            await mcpProjectReady.promise;
-            return !!(await latestSaveProject({ skipNewVersionWarning: true }));
-          },
-        },
-        send: text => {
-          if (ipcRenderer) ipcRenderer.send('mcp-send', text);
-        },
-      });
-      const onMcpMessageEvent = (event: any, line: string) =>
-        onMcpMessage(line);
-      ipcRenderer.on('mcp-message', onMcpMessageEvent);
-      ipcRenderer.send('mcp-ready');
-      return () => ipcRenderer.removeListener('mcp-message', onMcpMessageEvent);
-    },
-    [latestRunEditorFunctionCalls, latestSaveProject, mcpSearchResources]
-  );
-  const onMcpProjectReady = React.useCallback(
-    () => mcpProjectReadyRef.current.resolve(),
-    []
-  );
-
-  const projectCreationCallbacksRef = React.useRef(projectCreationCallbacks);
-  projectCreationCallbacksRef.current = projectCreationCallbacks;
-  const i18nRef = React.useRef(i18n);
-  i18nRef.current = i18n;
-  // Like the GDevelop AI, the project is created from a template (or empty),
-  // then saved in the cloud projects of the user.
-  const mcpProjectCreation: McpProjectCreation = React.useMemo(
-    () => ({
-      listGameTemplates: async () => {
-        const { exampleShortHeaders } = await listAllExamples();
-        return exampleShortHeaders.map(exampleShortHeader => ({
-          slug: exampleShortHeader.slug,
-          name: exampleShortHeader.name,
-          shortDescription: exampleShortHeader.shortDescription,
-          tags: exampleShortHeader.tags,
-        }));
-      },
-      createProject: async ({ name, templateSlug }) => {
-        const {
-          createEmptyProject,
-          createProjectFromExample,
-          saveProjectAsWithStorageProvider,
-        } = projectCreationCallbacksRef.current;
-        const newProjectSetup: NewProjectSetup = {
-          projectName: name,
-          storageProvider: UrlStorageProvider,
-          saveAsLocation: null,
-          creationSource: 'mcp',
-        };
-        let createdProject = null;
-        if (templateSlug) {
-          const { exampleShortHeaders } = await listAllExamples();
-          const exampleShortHeader = exampleShortHeaders.find(
-            header => header.slug === templateSlug
-          );
-          if (!exampleShortHeader) {
-            return {
-              success: false,
-              message: `No game template with the slug "${templateSlug}": use \`list_game_templates\` to find one.`,
-            };
-          }
-          ({ createdProject } = await createProjectFromExample({
-            exampleShortHeader,
-            newProjectSetup,
-            i18n: i18nRef.current,
-          }));
-        } else {
-          ({ createdProject } = await createEmptyProject(newProjectSetup));
-        }
-        if (!createdProject) {
-          return {
-            success: false,
-            message:
-              'The project could not be created (possibly a network error). Try again.',
-          };
-        }
-
-        const fileMetadata = await saveProjectAsWithStorageProvider({
-          requestedStorageProvider: CloudStorageProvider,
-          forcedSavedAsLocation: { name },
-          createdProject,
-        });
-        const createdFrom = templateSlug
-          ? `from the template "${templateSlug}"`
-          : 'empty (one scene)';
-        return {
-          success: true,
-          message: fileMetadata
-            ? `Created the project "${name}" ${createdFrom}, opened in the editor and saved in the GDevelop cloud projects of the user.`
-            : `Created the project "${name}" ${createdFrom}, opened in the editor, but it could not be saved in the cloud projects of the user (they may not be logged in, or have reached their limit of cloud projects). Tell the user to save it themselves.`,
-        };
-      },
-    }),
-    []
-  );
-
-  const openedProjectRef = React.useRef<?McpOpenedProject>(null);
-  openedProjectRef.current = project
-    ? {
-        name: project.getName(),
-        location: fileIdentifier || null,
-        isCloudProject:
-          storageProviderName === cloudStorageProviderInternalName,
-      }
-    : null;
-
-  // The agents connected to the live editor server (see `LiveMcpServer.js` in
-  // the Electron app) through this window: one queue per session.
-  React.useEffect(
-    () => {
-      if (!ipcRenderer) return;
-      const sessionQueues: Map<string, (line: string) => void> = new Map();
-      const onLiveMcpMessage = (
-        event: any,
-        { sessionId, line }: {| sessionId: string, line: string |}
-      ) => {
-        let onMessage = sessionQueues.get(sessionId);
-        if (!onMessage) {
-          onMessage = makeMcpMessagesQueue({
-            handlers: {
-              getServerVersion: getIDEVersion,
-              isReadOnly: false,
-              getOpenedProject: () => openedProjectRef.current,
-              onToolCalled: (report: McpToolCallReport) =>
-                sendMcpToolCalled({ ...report, transport: 'http' }),
-              projectCreation: mcpProjectCreation,
-              searchResources: mcpSearchResources,
-              runEditorFunctionCalls: latestRunEditorFunctionCalls,
-              saveProject: async () =>
-                !!(await latestSaveProject({ skipNewVersionWarning: true })),
-            },
-            send: text => {
-              if (ipcRenderer)
-                ipcRenderer.send('mcp-live-send', { sessionId, text });
-            },
-          });
-          sessionQueues.set(sessionId, onMessage);
-        }
-        onMessage(line);
-      };
-      const onLiveMcpSessionClosed = (
-        event: any,
-        { sessionId }: {| sessionId: string |}
-      ) => {
-        sessionQueues.delete(sessionId);
-      };
-      ipcRenderer.on('mcp-live-message', onLiveMcpMessage);
-      ipcRenderer.on('mcp-live-session-closed', onLiveMcpSessionClosed);
-      return () => {
-        if (!ipcRenderer) return;
-        ipcRenderer.removeListener('mcp-live-message', onLiveMcpMessage);
-        ipcRenderer.removeListener(
-          'mcp-live-session-closed',
-          onLiveMcpSessionClosed
-        );
-      };
-    },
-    [
-      latestRunEditorFunctionCalls,
-      latestSaveProject,
-      mcpProjectCreation,
-      mcpSearchResources,
-    ]
-  );
+  const { onMcpProjectReady } = useMcpServers({
+    i18n,
+    project,
+    fileIdentifier,
+    storageProviderName,
+    projectCreationCallbacks,
+    runEditorFunctionCalls: latestRunEditorFunctionCalls,
+    saveProject: latestSaveProject,
+  });
 
   React.useEffect(
     () => {

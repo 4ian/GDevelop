@@ -5,7 +5,24 @@ import {
   type CliEditorFunctionCall,
   type CliEditorFunctionCallsReport,
 } from './CliEditorFunctions';
-import { getPublicApi } from '../EditorFunctions/PublicApi';
+import {
+  getPublicApi,
+  type PublicApiFunction,
+} from '../EditorFunctions/PublicApi';
+import { NON_SCRIPTABLE_FUNCTION_NAMES } from '../EditorFunctions/ScriptExecution/NonScriptableFunctionNames';
+import {
+  describeProject,
+  type McpOpenedProject,
+  type McpServerTool,
+  type McpTool,
+} from './McpServerTools/McpServerTool';
+import {
+  docTools,
+  readGameplayHarnessGuideToolName,
+  SCRIPT_API_DEFINITION_URI,
+  EVENT_SCRIPT_GUIDE_URI,
+  GAMEPLAY_HARNESS_GUIDE_URI,
+} from './McpServerTools/DocTools';
 
 /**
  * A Model Context Protocol server (https://modelcontextprotocol.io) exposing
@@ -15,18 +32,14 @@ import { getPublicApi } from '../EditorFunctions/PublicApi';
  * on stdin/stdout (the "stdio" transport).
  *
  * Each editor function is a tool, described by the argument schemas of the
- * public API (see `EditorFunctions/PublicApi`). The script API definition,
+ * public API (see `EditorFunctions/PublicApi`), and the other tools (docs,
+ * project creation...) are `McpServerTools`. The script API definition,
  * the EventScript guide and the gameplay test harness guide are given as
  * resources (and the EventScript guide in the instructions of the server, as
  * writing events needs it).
  */
 
 const SUPPORTED_PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];
-
-const SCRIPT_API_DEFINITION_URI = 'gdevelop://docs/script-api.d.ts';
-const EVENT_SCRIPT_GUIDE_URI = 'gdevelop://docs/event-script-guide.md';
-const GAMEPLAY_HARNESS_GUIDE_URI =
-  'gdevelop://docs/gameplay-test-harness-guide.md';
 
 type JsonRpcId = string | number;
 
@@ -55,51 +68,6 @@ type McpToolResult = {|
   isError: boolean,
 |};
 
-export type McpTool = {|
-  name: string,
-  description: string,
-  inputSchema: Object,
-  annotations?: {| readOnlyHint: boolean |},
-|};
-
-export type McpOpenedProject = {|
-  name: string,
-  // The file path (or cloud identifier) of the project, if saved.
-  location: string | null,
-  // The cloud identifier means nothing to the agent: it is not shown.
-  isCloudProject?: boolean,
-|};
-
-export type McpGameTemplate = {|
-  slug: string,
-  name: string,
-  shortDescription: string,
-  tags: Array<string>,
-|};
-
-// Creates the project, opened in the editor, and saves it.
-export type McpCreateProject = ({|
-  name: string,
-  templateSlug: string | null,
-|}) => Promise<{| success: boolean, message: string |}>;
-
-export type McpProjectCreation = {|
-  listGameTemplates: () => Promise<Array<McpGameTemplate>>,
-  createProject: McpCreateProject,
-|};
-
-export type McpFoundResource = {|
-  name: string,
-  tags: Array<string>,
-  // Like the duration of an audio file, or the alphabets of a font.
-  metadata: ?Object,
-|};
-
-export type McpSearchResources = ({|
-  searchTerms: string,
-  resourceKind: 'audio' | 'font',
-|}) => Promise<Array<McpFoundResource>>;
-
 export type McpToolCallReport = {|
   toolName: string,
   clientName: string | null,
@@ -113,10 +81,8 @@ export type CliMcpServerHandlers = {|
   // the one given in the arguments).
   getOpenedProject?: () => ?McpOpenedProject,
   onToolCalled?: (report: McpToolCallReport) => void,
-  // Absent when a project is always opened (`--mcp`).
-  projectCreation?: McpProjectCreation,
-  // Searches the free resources (sounds, musics, fonts) installed by name.
-  searchResources?: McpSearchResources,
+  // Added to the docs tools, which are always there.
+  serverTools?: Array<McpServerTool>,
   // Only the functions not modifying the project are exposed, and scripts
   // can only call them.
   isReadOnly: boolean,
@@ -139,14 +105,6 @@ const makeMcpSession = (): McpSession => ({
   knownProject: null,
 });
 
-const describeProject = (project: McpOpenedProject): string =>
-  `"${project.name}"` +
-  (project.isCloudProject
-    ? ' (a cloud project)'
-    : project.location
-    ? ` (${project.location})`
-    : '');
-
 const isSameProject = (
   project: McpOpenedProject,
   otherProject: McpOpenedProject
@@ -162,122 +120,23 @@ const saveProjectTool: McpTool = {
   inputSchema: { type: 'object', properties: {} },
 };
 
-const readScriptApiDefinitionTool: McpTool = {
-  name: 'read_script_api_definition',
-  description:
-    'Read the TypeScript definition of the functions a `run_script` script can call, with their output types (also the resource ' +
-    SCRIPT_API_DEFINITION_URI +
-    '). Read it before writing a script.',
-  inputSchema: { type: 'object', properties: {} },
-  annotations: { readOnlyHint: true },
-};
-
-const readGameplayHarnessGuideTool: McpTool = {
-  name: 'read_gameplay_test_harness_guide',
-  description:
-    'Read the guide of the `harness` a gameplay test (`run_gameplay_test`) is written with: its API (stepping frames, simulating inputs, reading the objects, asserting) and the rules of reliable tests (also the resource ' +
-    GAMEPLAY_HARNESS_GUIDE_URI +
-    '). Read it before writing a test.',
-  inputSchema: { type: 'object', properties: {} },
-  annotations: { readOnlyHint: true },
-};
-
-const searchResourceStoreTool: McpTool = {
-  name: 'search_resource_store',
-  description:
-    'Search the GDevelop resource store for free audio files (sounds or musics) or fonts. Returns up to 10 resources with their name, tags and metadata (for audio: the duration in seconds and whether it is a `sound` or a `music`; for fonts: the supported alphabets). ' +
-    'Use the exact `name` of the chosen resource where it is used (like a "play a sound" action of `generate_events`, or the font property of a text object): it is then installed in the project from the store. Only searches: it does not change the project.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      search_terms: {
-        type: 'string',
-        description:
-          'Single words separated by commas, the most generic first. For example: `explosion, retro`, `music, calm, piano` or `pixel, bold`.',
-      },
-      resource_kind: {
-        type: 'string',
-        enum: ['audio', 'font'],
-        description: '`audio` for sounds and musics, `font` for fonts.',
-      },
-    },
-    required: ['search_terms', 'resource_kind'],
-  },
-  annotations: { readOnlyHint: true },
-};
-
-const MAX_FOUND_RESOURCES = 10;
-
-const listGameTemplatesTool: McpTool = {
-  name: 'list_game_templates',
-  description:
-    'List the game templates (examples) a new project can start from, with `create_project`. Only useful when no project is opened in the editor.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      search: {
-        type: 'string',
-        description:
-          'Optional: only list the templates whose name, description or tags contain all these words (separated by spaces), like "platformer" or "3d racing".',
-      },
-    },
-  },
-  annotations: { readOnlyHint: true },
-};
-
-const createProjectTool: McpTool = {
-  name: 'create_project',
-  description:
-    'Create a new game project, opened in the editor, from a game template (see `list_game_templates`) or empty. Only possible when no project is opened in the editor (the user can open an existing one instead: ask first if they want a new game). The project is saved in the GDevelop cloud projects of the user (they must be logged in); call `save_project` afterwards to save the changes.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      project_name: {
-        type: 'string',
-        description: 'The name of the game.',
-      },
-      template_slug: {
-        type: 'string',
-        description:
-          'Optional: the `slug` of the game template to start from, from `list_game_templates`. If not set, the project is empty (one scene).',
-      },
-    },
-    required: ['project_name'],
-  },
-};
-
-const MAX_LISTED_GAME_TEMPLATES = 60;
-
-const filterGameTemplates = (
-  templates: Array<McpGameTemplate>,
-  search: string
-): Array<McpGameTemplate> => {
-  const words = search
-    .toLowerCase()
-    .split(/\s+/)
-    .filter(Boolean);
-  if (!words.length) return templates;
-  return templates.filter(template => {
-    const text = [template.name, template.shortDescription, ...template.tags]
-      .join(' ')
-      .toLowerCase();
-    return words.every(word => text.includes(word));
-  });
-};
+const getAvailableServerTools = (
+  handlers: CliMcpServerHandlers
+): Array<McpServerTool> =>
+  [...docTools, ...(handlers.serverTools || [])].filter(serverTool =>
+    serverTool.isAvailable({ isReadOnly: handlers.isReadOnly })
+  );
 
 /**
  * The tools of the server: the editor functions described by the public API
- * (the ones the editor implements), plus the project save and the script API
- * definition.
+ * (the ones the editor implements), the project save and the server tools.
  */
 export const getMcpTools = ({
   isReadOnly,
-  canCreateProject = false,
-  canSearchResources = false,
+  serverTools = [],
 }: {|
   isReadOnly: boolean,
-  canCreateProject?: boolean,
-  canSearchResources?: boolean,
+  serverTools?: Array<McpServerTool>,
 |}): Array<McpTool> => {
   const callableFunctions = new Map(
     describeCliEditorFunctions().map(description => [
@@ -285,8 +144,8 @@ export const getMcpTools = ({
       description,
     ])
   );
-  const functionTools = getPublicApi()
-    .functions.filter(publicApiFunction => {
+  const publicApiFunctions = getPublicApi().functions.filter(
+    publicApiFunction => {
       const callableFunction = callableFunctions.get(publicApiFunction.name);
       if (!callableFunction) return false;
       // A read-only script can still run: it only calls read-only functions.
@@ -295,18 +154,39 @@ export const getMcpTools = ({
         !callableFunction.modifiesProject ||
         publicApiFunction.name === 'run_script'
       );
-    })
-    .map(
+    }
+  );
+  const otherTools = [
+    ...(isReadOnly ? [] : [saveProjectTool]),
+    ...serverTools.map(serverTool => serverTool.definition),
+  ];
+  // Agents try to call them in scripts (the script API definition declares
+  // `generate_events` and `run_gameplay_test`).
+  const nonScriptableToolNames = [
+    ...publicApiFunctions
+      .map(publicApiFunction => publicApiFunction.name)
+      .filter(
+        name => name !== 'run_script' && NON_SCRIPTABLE_FUNCTION_NAMES.has(name)
+      ),
+    ...otherTools.map(tool => tool.name),
+  ];
+  const getDescription = ({ name, description }: PublicApiFunction) => {
+    if (name === 'run_gameplay_test')
+      return `${description} Read \`${readGameplayHarnessGuideToolName}\` before writing the \`source\` of a test.`;
+    if (name === 'run_script')
+      return `${description} These are tools, not functions a script can call: ${nonScriptableToolNames
+        .map(toolName => `\`${toolName}\``)
+        .join(', ')}.`;
+    return description;
+  };
+
+  return [
+    ...publicApiFunctions.map(
       (publicApiFunction): McpTool => {
         const callableFunction = callableFunctions.get(publicApiFunction.name);
         return {
           name: publicApiFunction.name,
-          description:
-            publicApiFunction.name === 'run_gameplay_test'
-              ? `${publicApiFunction.description} Read \`${
-                  readGameplayHarnessGuideTool.name
-                }\` before writing the \`source\` of a test.`
-              : publicApiFunction.description,
+          description: getDescription(publicApiFunction),
           inputSchema: publicApiFunction.inputSchema,
           annotations: {
             readOnlyHint:
@@ -314,15 +194,8 @@ export const getMcpTools = ({
           },
         };
       }
-    );
-
-  return [
-    ...functionTools,
-    readScriptApiDefinitionTool,
-    readGameplayHarnessGuideTool,
-    ...(isReadOnly ? [] : [saveProjectTool]),
-    ...(canSearchResources && !isReadOnly ? [searchResourceStoreTool] : []),
-    ...(canCreateProject ? [listGameTemplatesTool, createProjectTool] : []),
+    ),
+    ...otherTools,
   ];
 };
 
@@ -468,11 +341,14 @@ const checkOpenedProject = (
   if (!handlers.getOpenedProject) return null;
   const openedProject = handlers.getOpenedProject();
   if (!openedProject) {
+    const hints = getAvailableServerTools(handlers)
+      .map(serverTool => serverTool.noOpenedProjectHint)
+      .filter(Boolean);
     return makeToolResult(
       {
-        message: handlers.projectCreation
-          ? 'No project is opened in the GDevelop editor. Ask the user to open the project to work on, or if they want a new game, create it with `create_project`.'
-          : 'No project is opened in the GDevelop editor. Ask the user to open the project to work on, then call again.',
+        message: `No project is opened in the GDevelop editor. Ask the user to open the project to work on, ${
+          hints.length ? `or ${hints.join(', or ')}` : 'then call again'
+        }.`,
       },
       true
     );
@@ -498,104 +374,16 @@ const callTool = async (
   handlers: CliMcpServerHandlers,
   session: McpSession
 ): Promise<McpToolResult> => {
-  if (name === readScriptApiDefinitionTool.name) {
-    return makeToolResult(getPublicApi().scriptApiDefinition, false);
-  }
-  if (name === readGameplayHarnessGuideTool.name) {
-    return makeToolResult(getPublicApi().gameplayHarnessGuide, false);
-  }
-  const { projectCreation, searchResources } = handlers;
-  if (
-    searchResources &&
-    !handlers.isReadOnly &&
-    name === searchResourceStoreTool.name
-  ) {
-    const searchTerms =
-      typeof toolArguments.search_terms === 'string'
-        ? toolArguments.search_terms.trim()
-        : '';
-    const resourceKind = toolArguments.resource_kind;
-    if (!searchTerms) {
-      return makeToolResult({ message: 'Missing `search_terms`.' }, true);
-    }
-    if (resourceKind !== 'audio' && resourceKind !== 'font') {
-      return makeToolResult(
-        { message: '`resource_kind` must be `audio` or `font`.' },
-        true
-      );
-    }
-    const foundResources = await searchResources({
-      searchTerms,
-      resourceKind,
+  const serverTool = getAvailableServerTools(handlers).find(
+    serverTool => serverTool.definition.name === name
+  );
+  if (serverTool) {
+    const { value, isError } = await serverTool.call(toolArguments, {
+      getOpenedProject: handlers.getOpenedProject,
     });
-    return makeToolResult(
-      foundResources.length
-        ? { resources: foundResources.slice(0, MAX_FOUND_RESOURCES) }
-        : {
-            resources: [],
-            message:
-              'Nothing found: try other search terms, more generic or fewer.',
-          },
-      false
-    );
-  }
-  if (projectCreation && name === listGameTemplatesTool.name) {
-    const templates = filterGameTemplates(
-      await projectCreation.listGameTemplates(),
-      typeof toolArguments.search === 'string' ? toolArguments.search : ''
-    );
-    return makeToolResult(
-      {
-        // The tags (the features used by the template) are only searched.
-        templates: templates
-          .slice(0, MAX_LISTED_GAME_TEMPLATES)
-          .map(({ slug, name, shortDescription }) => ({
-            slug,
-            name,
-            shortDescription,
-          })),
-        ...(templates.length > MAX_LISTED_GAME_TEMPLATES
-          ? {
-              message: `${templates.length -
-                MAX_LISTED_GAME_TEMPLATES} more templates: use \`search\` to find others.`,
-            }
-          : {}),
-      },
-      false
-    );
-  }
-  if (projectCreation && name === createProjectTool.name) {
-    const openedProject = handlers.getOpenedProject
-      ? handlers.getOpenedProject()
-      : null;
-    if (openedProject) {
-      return makeToolResult(
-        {
-          message: `Nothing was done: a project is already opened in the editor (${describeProject(
-            openedProject
-          )}). A new project can only be created when none is opened: work on this one, or ask the user to close it first.`,
-        },
-        true
-      );
-    }
-    const projectName =
-      typeof toolArguments.project_name === 'string'
-        ? toolArguments.project_name.trim()
-        : '';
-    if (!projectName) {
-      return makeToolResult({ message: 'Missing `project_name`.' }, true);
-    }
-    const result = await projectCreation.createProject({
-      name: projectName,
-      templateSlug:
-        typeof toolArguments.template_slug === 'string' &&
-        toolArguments.template_slug.trim()
-          ? toolArguments.template_slug.trim()
-          : null,
-    });
-    // The created project is the one the next calls act on.
-    if (result.success) session.knownProject = null;
-    return makeToolResult(result, !result.success);
+    // The opened project is the one the next calls act on.
+    if (serverTool.opensProject && !isError) session.knownProject = null;
+    return makeToolResult(value, isError);
   }
 
   const openedProjectError = checkOpenedProject(handlers, session);
@@ -699,8 +487,7 @@ export const handleMcpMessage = async (
         result: {
           tools: getMcpTools({
             isReadOnly: handlers.isReadOnly,
-            canCreateProject: !!handlers.projectCreation,
-            canSearchResources: !!handlers.searchResources,
+            serverTools: getAvailableServerTools(handlers),
           }),
         },
       };

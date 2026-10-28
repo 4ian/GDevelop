@@ -4,13 +4,19 @@ import {
   handleMcpMessage,
   makeMcpMessagesQueue,
   type CliMcpServerHandlers,
-  type McpOpenedProject,
-  type McpProjectCreation,
-  type McpCreateProject,
-  type McpSearchResources,
-  type McpFoundResource,
   type JsonRpcResponse,
 } from './CliMcpServer';
+import { type McpOpenedProject } from './McpServerTools/McpServerTool';
+import {
+  makeProjectCreationTools,
+  type McpProjectCreation,
+  type McpCreateProject,
+} from './McpServerTools/ProjectCreationTools';
+import {
+  makeResourceStoreTools,
+  type McpSearchResources,
+  type McpFoundResource,
+} from './McpServerTools/ResourceStoreTools';
 
 // The real PixiResourcesLoader transitively imports ESM-only packages that
 // Jest cannot parse: replace it with the test mock.
@@ -109,6 +115,21 @@ describe('CliMcpServer', () => {
     expect(toolNames).toContain('run_script');
     expect(toolNames).not.toContain('create_scene');
     expect(toolNames).not.toContain('save_project');
+  });
+
+  it('tells in `run_script` the tools a script cannot call', () => {
+    const tools = getMcpTools({
+      isReadOnly: false,
+      serverTools: makeResourceStoreTools(async () => []),
+    });
+    const runScriptTool = tools.find(tool => tool.name === 'run_script');
+    if (!runScriptTool) throw new Error('No run_script tool.');
+    const description = runScriptTool.description;
+    expect(description).toContain('`generate_events`');
+    expect(description).toContain('`run_gameplay_test`');
+    expect(description).toContain('`save_project`');
+    expect(description).toContain('`search_resource_store`');
+    expect(description).not.toContain('`create_scene`');
   });
 
   it('runs an editor function called as a tool and returns its output', async () => {
@@ -317,7 +338,9 @@ describe('CliMcpServer', () => {
     );
     const handlers: CliMcpServerHandlers = {
       ...makeFakeCliMcpServerHandlers(),
-      searchResources: (searchResources: McpSearchResources),
+      serverTools: makeResourceStoreTools(
+        (searchResources: McpSearchResources)
+      ),
     };
     const listResponse = await handleMcpMessage(
       { jsonrpc: '2.0', id: 10, method: 'tools/list' },
@@ -588,7 +611,7 @@ describe('CliMcpServer', () => {
       const handlers: CliMcpServerHandlers = {
         ...makeFakeCliMcpServerHandlers(),
         getOpenedProject: () => null,
-        projectCreation,
+        serverTools: makeProjectCreationTools(projectCreation),
       };
       const toolNames = getResult(
         await handleMcpMessage(
@@ -630,7 +653,7 @@ describe('CliMcpServer', () => {
       const handlers: CliMcpServerHandlers = {
         ...makeFakeCliMcpServerHandlers(),
         getOpenedProject: () => openedProject,
-        projectCreation,
+        serverTools: makeProjectCreationTools(projectCreation),
       };
       const responses = [];
       const onMessage = makeMcpMessagesQueue({

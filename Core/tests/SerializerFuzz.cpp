@@ -594,6 +594,7 @@ TEST_CASE("Serializer (randomized)", "[common]") {
     for (unsigned int seed = 1; seed <= 200; ++seed) {
       INFO("Seed: " << seed);
       std::mt19937 random(seed);
+      SilencedStandardOutput silencedStandardOutput;
       SerializerElement element;
       FillRandomly(element, random, 6, true);
 
@@ -612,6 +613,7 @@ TEST_CASE("Serializer (randomized)", "[common]") {
     for (unsigned int seed = 1; seed <= 200; ++seed) {
       INFO("Seed: " << seed);
       std::mt19937 random(seed);
+      SilencedStandardOutput silencedStandardOutput;
       SerializerElement element;
       FillRandomly(element, random, 6, false);
 

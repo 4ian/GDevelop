@@ -47,6 +47,10 @@ const {
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 const { installCliInPath } = require('./InstallCliInPath');
 const {
+  readSystemClipboardText,
+  writeSystemClipboardText,
+} = require('./SystemClipboard');
+const {
   setWindowFileIdentifier,
   clearWindowFileIdentifier,
 } = require('./OpenProjectsRegistry');
@@ -59,6 +63,13 @@ const {
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
+
+// @electron/remote 2.1.2 walks `module.parent` to the root and requires from
+// there. On Electron 45 that root is the Electron bootstrap, which cannot see
+// app/node_modules. Resolve from this file instead.
+app.on('remote-require', (event, _webContents, moduleName) => {
+  event.returnValue = require(moduleName);
+});
 
 log.info('GDevelop Electron app starting...');
 
@@ -181,6 +192,7 @@ function createNewWindow(windowArgs = args) {
       // Allow Node.js API access in renderer process, as long
       // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
+      sandbox: false,
       contextIsolation: false,
       // Keep timers and `requestAnimationFrame` running at full speed when
       // the window is minimized or covered by another window (Chromium
@@ -252,9 +264,18 @@ function createNewWindow(windowArgs = args) {
   // Uses process.stdout/stderr directly (not electron-log) to avoid
   // re-entering the renderer console and causing an infinite loop.
   if (isCliWindow) {
-    newWindow.webContents.on('console-message', (_event, level, message) => {
+    newWindow.webContents.on('console-message', (event, level, message) => {
+      if (typeof level !== 'number') {
+        message = event.message;
+        const eventLevel = event.level;
+        if (typeof eventLevel === 'number') level = eventLevel;
+        else if (eventLevel === 'warning') level = 2;
+        else if (eventLevel === 'error') level = 3;
+        else if (eventLevel === 'debug' || eventLevel === 'verbose') level = 0;
+        else level = 1;
+      }
       if (level < 1) return;
-      if (message.startsWith('%c')) return;
+      if (typeof message !== 'string' || message.startsWith('%c')) return;
       if (message.includes('[renderer:')) return; // break recursion
       const tag = ['verbose', 'info', 'warning', 'error'][level] || 'log';
       const stream = level >= 2 ? process.stderr : process.stdout;
@@ -351,6 +372,7 @@ function createNewWindow(windowArgs = args) {
             // nodeIntegration: true,
             // contextIsolation: false,
             webSecurity: false,
+            sandbox: false,
           },
         },
       };
@@ -444,6 +466,19 @@ app.on('ready', function() {
       },
     ]);
   }
+
+  ipcMain.on('clipboard-read-text', event => {
+    event.returnValue = readSystemClipboardText();
+  });
+
+  ipcMain.on('clipboard-write-text', (event, text) => {
+    try {
+      writeSystemClipboardText(text);
+    } catch (error) {
+      log.error('Failed to write the clipboard', error);
+    }
+    event.returnValue = null;
+  });
 
   ipcMain.on('app-exit', (_event, exitCode) => {
     app.exit(typeof exitCode === 'number' ? exitCode : 0);

@@ -115,15 +115,7 @@ namespace gdjs {
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
           const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
 
-          // Determine if this layer will actually render in 3D mode.
-          // Keep in sync with: `shouldRenderLayerIn3D` in `layer-pixi-renderer.ts`.
-          const shouldRenderLayerIn3D =
-            this._runtimeScene.getGame().isInGameEdition() ||
-            (runtimeLayerRenderingType !==
-              gdjs.RuntimeLayerRenderingType.TWO_D &&
-              runtimeLayerRenderer.has3DObjects());
-
-          if (!shouldRenderLayerIn3D) {
+          if (!this._shouldRenderLayerIn3D(runtimeLayer)) {
             // Render a layer with 2D rendering (PixiJS).
 
             if (lastRenderWas3D) {
@@ -308,6 +300,53 @@ namespace gdjs {
 
       // Uncomment to check the number of 2D&3D rendering done
       // console.log(this._layerRenderingMetrics);
+    }
+
+    /**
+     * Determine if a layer will actually render in 3D mode.
+     * Keep in sync with: `shouldRenderLayerIn3D` in `layer-pixi-renderer.ts`.
+     */
+    private _shouldRenderLayerIn3D(runtimeLayer: gdjs.RuntimeLayer): boolean {
+      return (
+        this._runtimeScene.getGame().isInGameEdition() ||
+        (runtimeLayer.getRenderingType() !==
+          gdjs.RuntimeLayerRenderingType.TWO_D &&
+          runtimeLayer.getRenderer().has3DObjects())
+      );
+    }
+
+    /**
+     * Do what `render` does that the game logic can depend on, without
+     * drawing anything: update the world matrices of the 3D scenes and of
+     * their cameras, as Three.js does at the beginning of a render. Raycasts
+     * against 3D objects and their bounding boxes read them.
+     *
+     * Only the layers that `render` would draw in 3D are updated, so that
+     * the game logic reads the same matrices whether frames are drawn or not.
+     */
+    updateWithoutDrawing() {
+      const threeRenderer = this._threeRenderer;
+      if (!threeRenderer || threeRenderer.xr.isPresenting) return;
+
+      for (const runtimeLayer of this._runtimeScene._orderedLayers) {
+        if (!runtimeLayer.isVisible()) continue;
+        if (!this._shouldRenderLayerIn3D(runtimeLayer)) continue;
+
+        const runtimeLayerRenderer = runtimeLayer.getRenderer();
+        const threeScene = runtimeLayerRenderer.getThreeScene();
+        const threeCamera = runtimeLayerRenderer.getThreeCamera();
+        if (
+          !threeScene ||
+          !threeCamera ||
+          !runtimeLayerRenderer.getThreeEffectComposer()
+        ) {
+          continue;
+        }
+        if (threeScene.matrixWorldAutoUpdate) threeScene.updateMatrixWorld();
+        if (!threeCamera.parent && threeCamera.matrixWorldAutoUpdate) {
+          threeCamera.updateMatrixWorld();
+        }
+      }
     }
 
     /**

@@ -50,6 +50,17 @@ namespace gdjs {
       [conditionOrExpressionName: string]: boolean | number | string;
     };
 
+    /**
+     * When the game is drawn while a test steps it:
+     * - `onScreenshot`: never, except to take a screenshot. Frames run the
+     *   game logic and everything it can read from the rendering (objects
+     *   and layers updated for rendering, world matrices of 3D objects), but
+     *   skip the draw calls, the post-processing passes and the shadow maps.
+     *   Much faster, notably with a software renderer.
+     * - `everyFrame`: every stepped frame is drawn, like in the game.
+     */
+    export type GameplayTestRenderingMode = 'onScreenshot' | 'everyFrame';
+
     export type GameplayTestRunPayload = {
       testName: string;
       /** The body of `async (harness) => { ... }`. */
@@ -71,6 +82,10 @@ namespace gdjs {
        * as possible.
        */
       speedFactor?: number;
+      /** When the game is drawn (see `GameplayTestRenderingMode`). Default:
+       * `everyFrame` when the run is paced (`speedFactor`: a human watches
+       * it), `onScreenshot` otherwise. */
+      renderingMode?: GameplayTestRenderingMode;
       /** Maximum number of screenshots kept: the first one and the last
        * ones. When the script takes none, one is taken when it ends.
        * 0 disables screenshots. Default: 4. */
@@ -825,6 +840,7 @@ namespace gdjs {
       _paceSpeedFactor: float | null = null;
       _paceReferenceWallTimeMs: number = 0;
       _paceReferenceGameTimeMs: number = 0;
+      _renderingMode: GameplayTestRenderingMode;
       _maxScreenshots: integer;
       _screenshotsTakenCount: integer = 0;
       _totalStepTimeMs: number = 0;
@@ -865,6 +881,9 @@ namespace gdjs {
           : null;
         this._paceReferenceWallTimeMs = Date.now();
         this._paceReferenceGameTimeMs = 0;
+        this._renderingMode =
+          payload.renderingMode ||
+          (this._paceSpeedFactor !== null ? 'everyFrame' : 'onScreenshot');
         this._maxScreenshots =
           payload.maxScreenshots === undefined
             ? DEFAULT_MAX_SCREENSHOTS
@@ -1349,13 +1368,16 @@ namespace gdjs {
       }
 
       /**
-       * Step a single game frame (game logic + rendering) with a fixed
-       * time delta, and return the time it took.
+       * Step a single game frame with a fixed time delta, and return the
+       * time it took. The frame is drawn according to the rendering mode
+       * (see `setRenderingMode`), unless `shouldDraw` forces it.
        */
-      _stepSingleFrame(dtMs: float): float {
+      _stepSingleFrame(dtMs: float, shouldDraw?: boolean): float {
         this._checkGuards();
         const stepStartTimeMs = performance.now();
-        this._runtimeGame.getSceneStack().step(dtMs);
+        this._runtimeGame.getSceneStack().step(dtMs, {
+          skipDrawing: !(shouldDraw || this._renderingMode === 'everyFrame'),
+        });
         const stepTimeMs = performance.now() - stepStartTimeMs;
         this._callOnFrameEnded();
         this._framesExecuted++;
@@ -1431,6 +1453,13 @@ namespace gdjs {
           this._paceReferenceGameTimeMs = this._gameTimeMs;
         }
         if (Date.now() - this._lastYieldTimeMs < YIELD_BUDGET_MS) return;
+        if (this._renderingMode === 'onScreenshot') {
+          // Nothing is drawn until a screenshot: never wait for an animation
+          // frame, only let pending events (like a stop request) be processed.
+          await new Promise<void>((resolve) => setTimeout(resolve, 0));
+          this._lastYieldTimeMs = Date.now();
+          return;
+        }
         // Fast (unpaced) run: don't wait for an animation frame at every
         // yield - with a slow renderer (software WebGL...), rendering would
         // dominate the wall-clock time of the run. Yield through a timer
@@ -1492,6 +1521,36 @@ namespace gdjs {
           // scene" events have run) before the test continues.
           await this.stepFrames(1);
         });
+      }
+
+      /**
+       * Choose when the game is drawn while the test steps it:
+       * `'onScreenshot'` (the default, unless the run is paced for a human
+       * watching it) only draws the game to take a screenshot, which makes
+       * frames much faster; `'everyFrame'` draws every stepped frame, like
+       * the game does. The game logic is the same in both modes: what it can
+       * read from the rendering (objects and layers updated for rendering,
+       * world matrices of 3D objects used by 3D raycasts) is still updated
+       * at every frame. Use `'everyFrame'` only to measure the rendering or
+       * to test something reading what is drawn.
+       */
+      setRenderingMode(renderingMode: GameplayTestRenderingMode): void {
+        if (
+          renderingMode !== 'onScreenshot' &&
+          renderingMode !== 'everyFrame'
+        ) {
+          throw new Error(
+            `Unknown rendering mode ${JSON.stringify(
+              renderingMode
+            )}. Use 'onScreenshot' or 'everyFrame'.`
+          );
+        }
+        this._renderingMode = renderingMode;
+      }
+
+      /** The rendering mode (see `setRenderingMode`). */
+      getRenderingMode(): GameplayTestRenderingMode {
+        return this._renderingMode;
       }
 
       /**
@@ -3719,11 +3778,15 @@ namespace gdjs {
       /**
        * Replace `Math.random` by a generator seeded with the given number
        * until the end of the test, so that the game makes the same random
-       * choices at every run.
+       * choices at every run. Drawing the game does not use it (Three.js
+       * draws random identifiers for what it creates the first time it draws
+       * something): the game logic gets the same random numbers whether
+       * frames are drawn or not (see `setRenderingMode`).
        */
       setRandomSeed(seed: integer): void {
         if (!this._originalMathRandom) {
           this._originalMathRandom = Math.random;
+          this._installUnseededRandomWhileDrawing();
         }
         // Mulberry32, a small and fast pseudo-random generator.
         let state = seed >>> 0;
@@ -3740,7 +3803,39 @@ namespace gdjs {
         if (this._originalMathRandom) {
           Math.random = this._originalMathRandom;
           this._originalMathRandom = null;
+          this._uninstallUnseededRandomWhileDrawing();
         }
+      }
+
+      /** Undo `_installUnseededRandomWhileDrawing`. */
+      _uninstallUnseededRandomWhileDrawing: () => void = () => {};
+
+      /**
+       * Make the scenes draw with the original `Math.random`, so that what
+       * the drawing consumes does not shift the seeded sequence used by the
+       * game logic (see `setRandomSeed`).
+       */
+      private _installUnseededRandomWhileDrawing(): void {
+        const harness = this;
+        const rendererPrototype = gdjs.RuntimeScenePixiRenderer.prototype;
+        const originalRender = rendererPrototype.render;
+        rendererPrototype.render = function (
+          this: gdjs.RuntimeScenePixiRenderer
+        ) {
+          const seededRandom = Math.random;
+          if (harness._originalMathRandom) {
+            Math.random = harness._originalMathRandom;
+          }
+          try {
+            originalRender.call(this);
+          } finally {
+            Math.random = seededRandom;
+          }
+        };
+        this._uninstallUnseededRandomWhileDrawing = () => {
+          rendererPrototype.render = originalRender;
+          this._uninstallUnseededRandomWhileDrawing = () => {};
+        };
       }
 
       /**
@@ -3748,9 +3843,10 @@ namespace gdjs {
        * optimizes the code meanwhile), then measure each of the next
        * `frames` frames, the profiled sections, the draw calls and a
        * checksum of the final state.
-       * Frames never wait for an animation frame (which renders the game
-       * once more, and can be delayed by the browser), so that two runs of
-       * the same scenario do the same work.
+       * Frames are always drawn, whatever the rendering mode, and never
+       * wait for an animation frame (which renders the game once more, and
+       * can be delayed by the browser), so that two runs of the same
+       * scenario do the same work.
        */
       async benchmark(
         name: string,
@@ -3768,7 +3864,7 @@ namespace gdjs {
           isMeasured: boolean
         ) => {
           for (let i = 0; i < frameCount; i++) {
-            const stepTimeMs = this._stepSingleFrame(dtMs);
+            const stepTimeMs = this._stepSingleFrame(dtMs, true);
             if (isMeasured) {
               frameTimesMs.push(Math.round(stepTimeMs * 1000) / 1000);
             }
@@ -4171,10 +4267,10 @@ namespace gdjs {
     /**
      * Run a gameplay test script against the game and return its result.
      *
-     * The game main loop keeps rendering (paused) while the test steps the
-     * game logic deterministically at full speed, yielding to the browser
-     * regularly so the run stays visible and interruptible (see
-     * `_maybeYield`).
+     * The game main loop is paused while the test steps the game logic
+     * deterministically at full speed, yielding to the browser regularly so
+     * the run stays interruptible (see `_maybeYield`). The game is drawn
+     * according to the rendering mode (see `setRenderingMode`).
      */
     export const runGameplayTest = async (
       runtimeGame: gdjs.RuntimeGame,
@@ -4274,6 +4370,15 @@ namespace gdjs {
       const originalOnFrameEnded = inputManager.onFrameEnded.bind(inputManager);
       inputManager.onFrameEnded = () => {};
       harness._callOnFrameEnded = originalOnFrameEnded;
+
+      // The paused main loop draws the game at every animation frame: when
+      // the game is only drawn for screenshots, skip these draws too.
+      const sceneStack = runtimeGame.getSceneStack();
+      const originalRenderWithoutStep = sceneStack.renderWithoutStep;
+      sceneStack.renderWithoutStep = () =>
+        harness._renderingMode === 'onScreenshot'
+          ? !!sceneStack.getCurrentScene()
+          : originalRenderWithoutStep.call(sceneStack);
 
       harness._installPointerLockShim();
       harness._installSoundLog();
@@ -4430,6 +4535,7 @@ namespace gdjs {
           // Ignore errors during cleanup.
         }
         inputManager.onFrameEnded = originalOnFrameEnded;
+        sceneStack.renderWithoutStep = originalRenderWithoutStep;
         harness._restoreMathRandom();
         harness._uninstallPageVisibilityTracking();
         harness._uninstallPointerLockShim();

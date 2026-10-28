@@ -743,6 +743,15 @@ export default class InstancesEditor extends Component<Props, State> {
     if (this.pixiRenderer) {
       this.pixiRenderer.destroy();
     }
+    const { threeRenderer } = this;
+    if (threeRenderer) {
+      // Release the WebGL context (shared with PixiJS) right away: otherwise its
+      // GPU memory is only freed when garbage collected, and a new one is
+      // created each time the editor is shown again.
+      threeRenderer.dispose();
+      threeRenderer.forceContextLoss();
+      this.threeRenderer = null;
+    }
   }
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.

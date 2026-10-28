@@ -4,6 +4,9 @@ import Window from './Window';
 
 const gd: libGDevelop = global.gd;
 
+export const multiplayerObjectBehaviorType =
+  'Multiplayer::MultiplayerObjectBehavior';
+
 export const hasBehaviorWithType = (object: gdObject, type: string): number =>
   object
     .getAllBehaviorNames()
@@ -11,6 +14,13 @@ export const hasBehaviorWithType = (object: gdObject, type: string): number =>
     .filter(
       behaviorName => object.getBehavior(behaviorName).getTypeName() === type
     ).length;
+
+/**
+ * Return true if the object is synchronized with other players (multiplayer),
+ * in which case its behaviors can be set as synchronized or not.
+ */
+export const isObjectSynchronizedOverNetwork = (object: gdObject): boolean =>
+  !!hasBehaviorWithType(object, multiplayerObjectBehaviorType);
 
 export const addBehaviorToObject = (
   project: gdProject,

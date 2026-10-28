@@ -12,6 +12,7 @@
 #include <cctype>
 #include <fstream>
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 #include "GDCore/CommonTools.h"
@@ -950,6 +951,25 @@ void Project::UnserializeAndInsertExtensionsFrom(
 
   std::map<gd::String, gd::SerializerElement> objectTypeToVariantsElement;
 
+  // Index the positions of the extensions by name, so that finding the
+  // extension of each element is not O(number of extensions). Like
+  // GetEventsFunctionsExtensionPosition, the first extension having a given
+  // name is used.
+  std::unordered_map<gd::String, std::size_t> extensionPositionsByName;
+  for (std::size_t position = 0; position < eventsFunctionsExtensions.size();
+       ++position) {
+    extensionPositionsByName.emplace(
+        eventsFunctionsExtensions[position]->GetName(), position);
+  }
+  auto getExtensionPosition =
+      [&extensionPositionsByName](const gd::String& extensionName)
+      -> std::size_t {
+    auto foundPosition = extensionPositionsByName.find(extensionName);
+    return foundPosition != extensionPositionsByName.end()
+               ? foundPosition->second
+               : gd::String::npos;
+  };
+
   // First, only unserialize behaviors and objects names.
   // As event based objects can contains custom behaviors and custom objects,
   // this allows them to reference EventBasedBehavior and EventBasedObject
@@ -961,11 +981,14 @@ void Project::UnserializeAndInsertExtensionsFrom(
         eventsFunctionsExtensionsElement.GetChild(i);
     const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
 
+    std::size_t extensionPosition = getExtensionPosition(name);
+    if (extensionPosition == gd::String::npos) {
+      extensionPosition = GetEventsFunctionsExtensionsCount();
+      InsertNewEventsFunctionsExtension(name, extensionPosition);
+      extensionPositionsByName[name] = extensionPosition;
+    }
     gd::EventsFunctionsExtension& eventsFunctionsExtension =
-        HasEventsFunctionsExtensionNamed(name)
-            ? GetEventsFunctionsExtension(name)
-            : InsertNewEventsFunctionsExtension(
-                  name, GetEventsFunctionsExtensionsCount());
+        *eventsFunctionsExtensions[extensionPosition];
 
     // Backup the events-based object variants
     for (auto &eventsBasedObject :
@@ -989,7 +1012,7 @@ void Project::UnserializeAndInsertExtensionsFrom(
         eventsFunctionsExtensionsElement.GetChild(elementIndex);
     const gd::String& extensionName = eventsFunctionsExtensionElement.GetStringAttribute("name");
 
-    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
+    size_t extensionIndex = getExtensionPosition(extensionName);
     if (extensionIndex == gd::String::npos) {
       // Should never happen because the extension was added in the first pass.
       gd::LogError("Can't find extension " + extensionName + " in the list of extensions in second pass of unserialization.");
@@ -1009,7 +1032,7 @@ void Project::UnserializeAndInsertExtensionsFrom(
         eventsFunctionsExtensionsElement.GetChild(elementIndex);
     const gd::String& extensionName = eventsFunctionsExtensionElement.GetStringAttribute("name");
 
-    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
+    size_t extensionIndex = getExtensionPosition(extensionName);
     if (extensionIndex == gd::String::npos) {
       // Should never happen because the extension was added in the first pass.
       gd::LogError("Can't find extension " + extensionName + " in the list of extensions in second pass of unserialization.");
@@ -1029,7 +1052,7 @@ void Project::UnserializeAndInsertExtensionsFrom(
         eventsFunctionsExtensionsElement.GetChild(elementIndex);
     const gd::String& extensionName = eventsFunctionsExtensionElement.GetStringAttribute("name");
 
-    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
+    size_t extensionIndex = getExtensionPosition(extensionName);
     if (extensionIndex == gd::String::npos) {
       // Should never happen because the extension was added in the first pass.
       gd::LogError("Can't find extension " + extensionName + " in the list of extensions in third pass of unserialization.");

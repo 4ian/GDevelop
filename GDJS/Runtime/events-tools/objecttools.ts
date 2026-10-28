@@ -668,6 +668,40 @@ namespace gdjs {
         return obj1.getSqDistanceToObject(obj2) <= distance;
       };
 
+      /**
+       * The Z of the center of an object in the scene: 0 for a 2D object,
+       * which lies on the plane at Z 0.
+       */
+      const getCenterZInScene = (object: gdjs.RuntimeObject): float =>
+        gdjs.Base3DHandler.is3D(object) ? object.getCenterZInScene() : 0;
+
+      export const _distanceBetweenObjects3D = function (
+        object1: gdjs.RuntimeObject,
+        object2: gdjs.RuntimeObject,
+        squaredDistance: float
+      ) {
+        const deltaZ = getCenterZInScene(object1) - getCenterZInScene(object2);
+        return (
+          object1.getSqDistanceToObject(object2) + deltaZ * deltaZ <=
+          squaredDistance
+        );
+      };
+
+      export const distanceTest3D = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        distance: float,
+        inverted: boolean
+      ) {
+        return gdjs.evtTools.object.twoListsTest(
+          gdjs.evtTools.object._distanceBetweenObjects3D,
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          distance * distance
+        );
+      };
+
       export const distanceTest = function (
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,
@@ -780,6 +814,60 @@ namespace gdjs {
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.evtTools.object._isTurnedTowardObject,
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          tolerance
+        );
+      };
+
+      export const _isTurnedTowardObject3D = function (
+        object1: gdjs.RuntimeObject,
+        object2: gdjs.RuntimeObject,
+        tolerance: float
+      ) {
+        const deltaX =
+          object2.getCenterXInScene() - object1.getCenterXInScene();
+        const deltaY =
+          object2.getCenterYInScene() - object1.getCenterYInScene();
+        const deltaZ = getCenterZInScene(object2) - getCenterZInScene(object1);
+        const distance = Math.sqrt(
+          deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ
+        );
+        // An object at the same center has no direction to be turned toward.
+        if (distance === 0) return false;
+
+        let forwardX: float;
+        let forwardY: float;
+        let forwardZ: float;
+        if (gdjs.Base3DHandler.is3D(object1)) {
+          forwardX = object1.getForwardX();
+          forwardY = object1.getForwardY();
+          forwardZ = object1.getForwardZ();
+        } else {
+          const angle = gdjs.toRad(object1.getAngle());
+          forwardX = Math.cos(angle);
+          forwardY = Math.sin(angle);
+          forwardZ = 0;
+        }
+        const cosine =
+          (forwardX * deltaX + forwardY * deltaY + forwardZ * deltaZ) /
+          distance;
+        // Rounding errors can put the cosine of aligned directions past 1.
+        const angleToObject = gdjs.toDegrees(
+          Math.acos(Math.min(1, Math.max(-1, cosine)))
+        );
+        return angleToObject <= tolerance;
+      };
+
+      export const isTurnedTowardObject3D = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        tolerance: float,
+        inverted: boolean
+      ) {
+        return gdjs.evtTools.object.twoListsTest(
+          gdjs.evtTools.object._isTurnedTowardObject3D,
           objectsLists1,
           objectsLists2,
           inverted,

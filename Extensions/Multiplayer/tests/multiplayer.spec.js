@@ -585,11 +585,11 @@ describe('Multiplayer', () => {
         .get('MyGlobalArrayVariable')
         .getAllChildrenArray();
       expect(p2GlobalArrayVariable.length).to.be(3);
-      expect(p2GlobalArrayVariable[0].getAsString()).to.be(
+      expect(p2GlobalArrayVariable[0]?.getAsString()).to.be(
         'Hello from remote global array'
       );
-      expect(p2GlobalArrayVariable[1].getAsNumber()).to.be(143);
-      expect(p2GlobalArrayVariable[2].getAsBoolean()).to.be(true);
+      expect(p2GlobalArrayVariable[1]?.getAsNumber()).to.be(143);
+      expect(p2GlobalArrayVariable[2]?.getAsBoolean()).to.be(true);
       const p2GlobalStructureVariable = p2RuntimeScene
         .getGame()
         .getVariables()

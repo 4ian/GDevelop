@@ -1,9 +1,10 @@
 import {
+  DepthStencilFormat,
   DepthTexture,
   HalfFloatType,
   ShaderMaterial,
   UniformsUtils,
-  UnsignedIntType,
+  UnsignedInt248Type,
   WebGLRenderTarget,
 } from "three";
 import { Pass, FullScreenQuad } from "./examples/jsm/postprocessing/Pass.js";
@@ -29,8 +30,12 @@ class SceneDepthRenderPass extends Pass {
     // Like a RenderPass, the scene is rendered in the read buffer.
     this.needsSwap = false;
 
-    this.renderTarget = new WebGLRenderTarget(1, 1, { type: HalfFloatType });
-    this.renderTarget.depthTexture = new DepthTexture(1, 1, UnsignedIntType);
+    this.renderTarget = new WebGLRenderTarget(1, 1, {
+      type: HalfFloatType,
+      stencilBuffer: true,
+    });
+    this.renderTarget.depthTexture = new DepthTexture(1, 1, UnsignedInt248Type);
+    this.renderTarget.depthTexture.format = DepthStencilFormat;
 
     this._copyMaterial = new ShaderMaterial({
       uniforms: UniformsUtils.clone(CopyShader.uniforms),

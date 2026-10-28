@@ -79,49 +79,71 @@ const getYearlyDiscountDisplayText = (
 const formatPriceWithDiscount = (
   pricingSystem: SubscriptionPlanPricingSystem,
   discount: ?PricingSystemDiscount,
-  periodLabel: 'Yearly' | 'Monthly',
+  period: 'year' | 'month',
   validColor: string
 ) => {
   if (discount) {
+    const priceBeforeDiscount = (
+      <span style={{ textDecoration: 'line-through' }}>
+        {formatPriceWithCurrency(
+          pricingSystem.amountInCents,
+          pricingSystem.currency
+        )}
+      </span>
+    );
+    const priceAfterDiscount = (
+      <span style={{ color: validColor }}>
+        {formatPriceWithCurrency(
+          discount.discountedAmountInCents,
+          discount.currency
+        )}
+      </span>
+    );
+    if (period === 'year') {
+      return !pricingSystem.isPerUser ? (
+        <Trans>
+          Yearly, {priceBeforeDiscount} {priceAfterDiscount}
+        </Trans>
+      ) : (
+        <Trans>
+          Yearly, {priceBeforeDiscount} {priceAfterDiscount} per seat
+        </Trans>
+      );
+    }
     return !pricingSystem.isPerUser ? (
       <Trans>
-        {periodLabel},{' '}
-        <span style={{ textDecoration: 'line-through' }}>
-          {formatPriceWithCurrency(
-            pricingSystem.amountInCents,
-            pricingSystem.currency
-          )}
-        </span>{' '}
-        <span style={{ color: validColor }}>
-          {formatPriceWithCurrency(
-            discount.discountedAmountInCents,
-            discount.currency
-          )}
-        </span>
+        Monthly, {priceBeforeDiscount} {priceAfterDiscount}
       </Trans>
     ) : (
       <Trans>
-        {periodLabel},{' '}
-        <span style={{ textDecoration: 'line-through' }}>
-          {formatPriceWithCurrency(
-            pricingSystem.amountInCents,
-            pricingSystem.currency
-          )}
-        </span>{' '}
-        <span style={{ color: validColor }}>
-          {formatPriceWithCurrency(
-            discount.discountedAmountInCents,
-            discount.currency
-          )}
-        </span>{' '}
-        per seat
+        Monthly, {priceBeforeDiscount} {priceAfterDiscount} per seat
       </Trans>
     );
   }
 
+  if (period === 'year') {
+    return !pricingSystem.isPerUser ? (
+      <Trans>
+        Yearly,
+        {formatPriceWithCurrency(
+          pricingSystem.amountInCents,
+          pricingSystem.currency
+        )}
+      </Trans>
+    ) : (
+      <Trans>
+        Yearly,
+        {formatPriceWithCurrency(
+          pricingSystem.amountInCents,
+          pricingSystem.currency
+        )}{' '}
+        per seat
+      </Trans>
+    );
+  }
   return !pricingSystem.isPerUser ? (
     <Trans>
-      {periodLabel},
+      Monthly,
       {formatPriceWithCurrency(
         pricingSystem.amountInCents,
         pricingSystem.currency
@@ -129,7 +151,7 @@ const formatPriceWithDiscount = (
     </Trans>
   ) : (
     <Trans>
-      {periodLabel},
+      Monthly,
       {formatPriceWithCurrency(
         pricingSystem.amountInCents,
         pricingSystem.currency
@@ -320,7 +342,7 @@ const SubscriptionPlanPricingSummary = ({
                                 {formatPriceWithDiscount(
                                   yearlyPlanPrice,
                                   yearlyDiscount,
-                                  'Yearly',
+                                  'year',
                                   gdevelopTheme.message.valid
                                 )}
                               </Text>
@@ -393,7 +415,7 @@ const SubscriptionPlanPricingSummary = ({
                                 {formatPriceWithDiscount(
                                   monthlyPlanPrice,
                                   monthlyDiscount,
-                                  'Monthly',
+                                  'month',
                                   gdevelopTheme.message.valid
                                 )}
                               </Text>

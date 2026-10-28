@@ -4,6 +4,9 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Project/PropertiesContainer.h"
+
+#include <unordered_set>
+
 #include "GDCore/Project/NamedPropertyDescriptor.h"
 
 namespace gd {
@@ -130,13 +133,23 @@ PropertiesContainer::GetAllPropertyFolderOrProperty() const {
 }
 
 void PropertiesContainer::AddMissingPropertiesInRootFolder() {
+  // Get the names of the properties already in the folders once: searching
+  // the folders for each property would be O(number of properties^2).
+  std::unordered_set<gd::String> propertyNamesInFolders;
+  rootFolder->AddPropertyNamesTo(propertyNamesInFolders);
+
   for (std::size_t i = 0; i < properties.GetCount(); ++i) {
     auto &property = properties.Get(i);
-    if (!rootFolder->HasPropertyNamed(property.GetName())) {
+    if (propertyNamesInFolders.find(property.GetName()) ==
+        propertyNamesInFolders.end()) {
       const gd::String &group = property.GetGroup();
       auto &folder = !group.empty() ? rootFolder->GetOrCreateChildFolder(group)
                                     : *rootFolder;
       folder.InsertProperty(&property);
+      // The property is now in the folders (unless the root is not a folder,
+      // which only happens with an invalid serialized folder structure).
+      if (rootFolder->IsFolder())
+        propertyNamesInFolders.insert(property.GetName());
     }
   }
 }

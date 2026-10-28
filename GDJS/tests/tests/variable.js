@@ -126,8 +126,8 @@ describe('gdjs.Variable', function () {
 
     expect(array.getChild('0').getAsString()).to.be('Hello');
     expect(array.getChildAt(0).getAsString()).to.be('Hello');
-    expect(array.getAllChildrenArray()[1].getAsString()).to.be('World');
-    expect(structure.getAllChildrenArray()[0].getAsString()).to.be('Hello');
+    expect(array.getAllChildrenArray()[1]?.getAsString()).to.be('World');
+    expect(structure.getAllChildrenArray()[0]?.getAsString()).to.be('Hello');
   });
 
   it('can be serialized to JSON', function () {

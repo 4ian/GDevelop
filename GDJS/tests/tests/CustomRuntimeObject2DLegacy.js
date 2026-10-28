@@ -58,7 +58,7 @@ describe('gdjs.CustomRuntimeObject', function () {
             },
           ],
         },
-      }
+      },
     });
     instanceContainer.addObject(customObject);
     return customObject;
@@ -151,6 +151,31 @@ describe('gdjs.CustomRuntimeObject', function () {
         [64, 64],
         [128, 0],
       ]);
+    });
+
+    it('moves its transformation when its children move', async () => {
+      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+      const runtimeScene = createSceneWithLayer(runtimeGame);
+      makeCustomObjectWith2Children(runtimeScene);
+      customObject.setAngle(90);
+      /** @type {FloatPoint} */
+      const before = [0, 0];
+      customObject.applyObjectTransformation(10, 20, before);
+
+      leftSprite.setPosition(-100, -50);
+
+      // This object has no area of its own: its children are its bounds, so
+      // its center of rotation - and its transformation - moved with them.
+      /** @type {FloatPoint} */
+      const after = [0, 0];
+      customObject.applyObjectTransformation(10, 20, after);
+      expect(after).not.to.eql(before);
+
+      customObject._updateLocalTransformation();
+      /** @type {FloatPoint} */
+      const recomputed = [0, 0];
+      customObject.applyObjectTransformation(10, 20, recomputed);
+      expect(after).to.eql(recomputed);
     });
 
     it('can translate its hit-boxes', async () => {
@@ -491,8 +516,7 @@ describe('gdjs.CustomRuntimeObject', function () {
 
         customObject.setPosition(16, 8);
         expect(instanceContainer.convertCoords(16, 8, workingPoint)).to.eql([
-          0,
-          0,
+          0, 0,
         ]);
       });
 
@@ -505,8 +529,7 @@ describe('gdjs.CustomRuntimeObject', function () {
         leftSprite.setPosition(-16, -8);
         customObject.setPosition(0, 0);
         expect(instanceContainer.convertCoords(0, 0, workingPoint)).to.eql([
-          0,
-          0,
+          0, 0,
         ]);
       });
 
@@ -519,8 +542,7 @@ describe('gdjs.CustomRuntimeObject', function () {
         leftSprite.setPosition(16, 8);
         customObject.setPosition(0, 0);
         expect(instanceContainer.convertCoords(0, 0, workingPoint)).to.eql([
-          0,
-          0,
+          0, 0,
         ]);
       });
     });

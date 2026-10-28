@@ -13,6 +13,7 @@ import {
 } from '../../../Utils/Analytics/EventSender';
 import Window from '../../../Utils/Window';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import PreferencesContext from '../../../MainFrame/Preferences/PreferencesContext';
 
 const cancelConfirmationTexts = {
   level: 'normal',
@@ -80,6 +81,7 @@ export const useBuyUpdateOrCancelPlan = ({
 }: Props): BuyUpdateOrCancelPlanState => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { subscription, profile } = authenticatedUser;
+  const preferences = React.useContext(PreferencesContext);
   const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
   const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
     false
@@ -117,6 +119,7 @@ export const useBuyUpdateOrCancelPlan = ({
           userEmail: profile.email,
           quantity,
           couponCode: couponCode || undefined,
+          language: preferences.values.language,
         })
       );
       return;
@@ -181,6 +184,7 @@ export const useBuyUpdateOrCancelPlan = ({
         userId: profile.id,
         userEmail: profile.email,
         couponCode: couponCode || undefined,
+        language: preferences.values.language,
       })
     );
   };

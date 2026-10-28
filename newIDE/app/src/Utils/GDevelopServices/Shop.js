@@ -527,12 +527,14 @@ export const getPurchaseCheckoutUrl = ({
   userId,
   userEmail,
   password,
+  language,
 }: {|
   productId: string,
   priceName: string,
   userId: string,
   userEmail: string,
   password?: string,
+  language: string,
 |}): string => {
   const url = new URL(
     `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-checkout`
@@ -543,6 +545,7 @@ export const getPurchaseCheckoutUrl = ({
   url.searchParams.set('userId', userId);
   url.searchParams.set('customerEmail', userEmail);
   if (password) url.searchParams.set('password', password);
+  url.searchParams.set('language', language);
 
   return url.toString();
 };

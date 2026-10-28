@@ -1501,26 +1501,29 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHidden();
 
   obj.AddExpression("Distance",
-                    _("Distance between two objects"),
-                    _("Distance between two objects, on the X/Y plane only (Z "
-                      "is ignored)"),
+                    _("Distance between two objects (2D)"),
+                    _("Distance between the centers of two objects, on the "
+                      "X/Y plane only. To include Z, use ‘Distance between "
+                      "two objects (3D)’."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
   obj.AddExpression("SqDistance",
-                    _("Square distance between two objects"),
-                    _("Square distance between two objects, on the X/Y plane "
-                      "only (Z is ignored)"),
+                    _("Square distance between two objects (2D)"),
+                    _("Square distance between the centers of two objects, on "
+                      "the X/Y plane only."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
   obj.AddExpression("DistanceToPosition",
-                    _("Distance between an object and a position"),
-                    _("Distance between an object and a position"),
+                    _("Distance between an object and a position (2D)"),
+                    _("Distance between the center of an object and a "
+                      "position, on the X/Y plane only. To include Z, use "
+                      "‘Distance between an object and a position (3D)’."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
@@ -1528,8 +1531,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Target Y position"));
 
   obj.AddExpression("SqDistanceToPosition",
-                    _("Square distance between an object and a position"),
-                    _("Square distance between an object and a position"),
+                    _("Square distance between an object and a position (2D)"),
+                    _("Square distance between the center of an object and a "
+                      "position, on the X/Y plane only."),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
@@ -1845,9 +1849,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition("Distance",
-                    _("Distance between two objects"),
-                    _("Compare the distance between two objects.\nIf condition "
-                      "is inverted, only objects that have a distance greater "
+                    _("Distance between two objects (2D)"),
+                    _("Compare the distance between the centers of two "
+                      "objects, on the X/Y plane only. To include Z, use "
+                      "‘Distance between two objects (3D)’.\nIf condition is "
+                      "inverted, only objects that have a distance greater "
                       "than specified to any other object will be picked."),
                     _("_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"),
                     _("Position"),
@@ -1859,8 +1865,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("conditionInverted", "")
       .SetHint(
           "The distance is measured on the X/Y plane only: Z is ignored. For "
-          "3D games, also compare the Z difference between the objects, or "
-          "compute the full 3D distance in an expression.")
+          "3D games, use the condition comparing the distance in 3D "
+          "(Distance3D).")
+      .MarkAsSimple();
+
+  extension
+      .AddCondition("Distance3D",
+                    _("Distance between two objects (3D)"),
+                    _("Compare the distance between the centers of two "
+                      "objects, on the X, Y and Z axes (a 2D object is at a Z "
+                      "of 0). To ignore Z, use ‘Distance between two objects "
+                      "(2D)’.\nIf condition is inverted, only objects that "
+                      "have a distance greater than specified to any other "
+                      "object will be picked."),
+                    _("_PARAM0_ distance to _PARAM1_ in 3D is below _PARAM2_ "
+                      "pixels"),
+                    _("Position"),
+                    "res/conditions/distance24.png",
+                    "res/conditions/distance.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectList", _("Object 2"))
+      .AddParameter("expression", _("Distance"))
+      .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
 
   extension
@@ -2008,9 +2034,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition("IsTurnedTowardObject",
-                    _("An object is turned toward another"),
-                    _("Check if an object is turned toward another"),
+                    _("An object is turned toward another (2D)"),
+                    _("Check if the angle of an object points toward the "
+                      "center of another one, on the X/Y plane only. To "
+                      "include Z, use ‘An object is turned toward another "
+                      "(3D)’."),
                     _("_PARAM0_ is turned toward _PARAM1_ ± _PARAM2_°"),
+                    _("Angle"),
+                    "res/conditions/estTourne24.png",
+                    "res/conditions/estTourne.png")
+      .AddParameter("objectList", _("Name of the object"))
+      .AddParameter("objectList", _("Name of the second object"))
+      .AddParameter("expression",
+                    _("Angle of tolerance, in degrees (0: minimum tolerance)"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("IsTurnedTowardObject3D",
+                    _("An object is turned toward another (3D)"),
+                    _("Check if the forward direction of an object (with its "
+                      "rotations on X, Y and Z) points toward the center of "
+                      "another one, on the X, Y and Z axes (a 2D object is at "
+                      "a Z of 0 and points along its angle). To ignore Z, use "
+                      "‘An object is turned toward another (2D)’."),
+                    _("_PARAM0_ is turned toward _PARAM1_ ± _PARAM2_° in 3D"),
                     _("Angle"),
                     "res/conditions/estTourne24.png",
                     "res/conditions/estTourne.png")

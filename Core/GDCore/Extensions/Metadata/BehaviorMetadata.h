@@ -328,6 +328,22 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
     return *this;
   }
 
+  /**
+   * Check if the behavior is synchronized over the network by default, when
+   * its object is synchronized with other players (multiplayer).
+   */
+  bool IsSynchronizedByDefault() const { return isSynchronizedByDefault; }
+
+  /**
+   * Set that the behavior is not synchronized over the network by default:
+   * only the game of the player owning the object runs it. Useful for
+   * behaviors reacting to the inputs of the player.
+   */
+  BehaviorMetadata &SetNotSynchronizedByDefault() {
+    isSynchronizedByDefault = false;
+    return *this;
+  }
+
   BehaviorMetadata &SetOpenFullEditorLabel(const gd::String& label) {
     openFullEditorLabel = label;
     return *this;
@@ -429,6 +445,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   bool isHidden = false;
   bool isRelevantForChildObjects = true;
   bool isActivatedByDefaultInEditor = false;
+  bool isSynchronizedByDefault = true;
   gd::String openFullEditorLabel;
   std::vector<gd::String> propertyGroups;
 

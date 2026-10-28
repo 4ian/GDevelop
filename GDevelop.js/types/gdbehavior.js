@@ -14,6 +14,9 @@ declare class gdBehavior {
   isFolded(): boolean;
   setFolded(folded: boolean): void;
   isDefaultBehavior(): boolean;
+  isSynchronizedOverNetwork(): boolean;
+  setSynchronizedOverNetwork(isSynchronizedOverNetwork: boolean): void;
+  isSynchronizedOverNetworkByDefault(): boolean;
   delete(): void;
   ptr: number;
 };

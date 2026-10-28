@@ -10,6 +10,8 @@ declare class gdEventsBasedBehavior extends gdAbstractEventsBasedEntity {
   setHelpPath(helpPath: string): gdEventsBasedBehavior;
   setObjectType(fullName: string): gdEventsBasedBehavior;
   getObjectType(): string;
+  isSynchronizedOverNetworkByDefault(): boolean;
+  setSynchronizedOverNetworkByDefault(isSynchronizedOverNetworkByDefault: boolean): gdEventsBasedBehavior;
   getSharedPropertyDescriptors(): gdPropertiesContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;

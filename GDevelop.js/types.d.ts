@@ -832,6 +832,9 @@ export class Behavior extends EmscriptenObject {
   isFolded(): boolean;
   setFolded(folded: boolean): void;
   isDefaultBehavior(): boolean;
+  isSynchronizedOverNetwork(): boolean;
+  setSynchronizedOverNetwork(isSynchronizedOverNetwork: boolean): void;
+  isSynchronizedOverNetworkByDefault(): boolean;
 }
 
 export class BehaviorJsImplementation extends Behavior {
@@ -1949,6 +1952,8 @@ export class BehaviorMetadata extends EmscriptenObject {
   markAsIrrelevantForChildObjects(): BehaviorMetadata;
   isActivatedByDefaultInEditor(): boolean;
   markAsActivatedByDefaultInEditor(): BehaviorMetadata;
+  isSynchronizedByDefault(): boolean;
+  setNotSynchronizedByDefault(): BehaviorMetadata;
   setOpenFullEditorLabel(label: string): BehaviorMetadata;
   getOpenFullEditorLabel(): string;
   addPropertyGroup(group: string): BehaviorMetadata;
@@ -2669,6 +2674,8 @@ export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   setHelpPath(helpPath: string): EventsBasedBehavior;
   setObjectType(fullName: string): EventsBasedBehavior;
   getObjectType(): string;
+  isSynchronizedOverNetworkByDefault(): boolean;
+  setSynchronizedOverNetworkByDefault(isSynchronizedOverNetworkByDefault: boolean): EventsBasedBehavior;
   getSharedPropertyDescriptors(): PropertiesContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;

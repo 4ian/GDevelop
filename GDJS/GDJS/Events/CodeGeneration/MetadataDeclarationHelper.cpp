@@ -120,6 +120,8 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
 
   if (eventsBasedBehavior.IsPrivate())
     behaviorMetadata.SetPrivate();
+  if (!eventsBasedBehavior.IsSynchronizedOverNetworkByDefault())
+    behaviorMetadata.SetNotSynchronizedByDefault();
 
   for (const auto &group :
        GetPropertyGroups(eventsBasedBehavior.GetPropertyDescriptors())) {

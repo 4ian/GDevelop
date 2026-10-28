@@ -214,6 +214,12 @@ declare type BehaviorData = {
   name: string;
   /** The behavior type. Used by GDJS to find the proper behavior to construct. */
   type: string;
+  /**
+   * False if the behavior state must not be synchronized with other players
+   * (for behaviors reacting to the inputs of the player owning the object).
+   * Synchronized if not specified.
+   */
+  isSynchronizedOverNetwork?: boolean;
 };
 
 declare type BehaviorNetworkSyncData = {

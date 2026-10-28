@@ -505,7 +505,10 @@ namespace gdjs {
       // These passes render the scene in their own render target.
       if (this._customRenderPass) {
         sceneRenderPass = this._customRenderPass;
-        this._setRenderTargetSamples(this._customRenderPass.beautyRenderTarget);
+        this._setRenderTargetSamples(
+          this._customRenderPass.beautyRenderTarget,
+          this._renderTargetSamples
+        );
       } else if (this._sceneDepthTextureUsersCount > 0) {
         if (!this._sceneDepthRenderPass) {
           this._sceneDepthRenderPass = new THREE_ADDONS.SceneDepthRenderPass(
@@ -514,8 +517,25 @@ namespace gdjs {
           );
         }
         sceneRenderPass = this._sceneDepthRenderPass;
-        this._setRenderTargetSamples(this._sceneDepthRenderPass.renderTarget);
+        this._setRenderTargetSamples(
+          this._sceneDepthRenderPass.renderTarget,
+          this._renderTargetSamples
+        );
       }
+      // The render targets of the composer only need to be multisampled when
+      // the scene is rendered in them (the other passes are full-screen).
+      const composerSamples =
+        sceneRenderPass === this._threeRenderPass
+          ? this._renderTargetSamples
+          : 0;
+      this._setRenderTargetSamples(
+        this._threeEffectComposer.renderTarget1,
+        composerSamples
+      );
+      this._setRenderTargetSamples(
+        this._threeEffectComposer.renderTarget2,
+        composerSamples
+      );
       if (this._threeEffectComposer.passes[0] === sceneRenderPass) {
         return;
       }
@@ -525,11 +545,14 @@ namespace gdjs {
       this._threeEffectComposer.passes[0] = sceneRenderPass;
     }
 
-    private _setRenderTargetSamples(renderTarget: THREE.WebGLRenderTarget) {
-      if (renderTarget.samples === this._renderTargetSamples) {
+    private _setRenderTargetSamples(
+      renderTarget: THREE.WebGLRenderTarget,
+      samples: integer
+    ) {
+      if (renderTarget.samples === samples) {
         return;
       }
-      renderTarget.samples = this._renderTargetSamples;
+      renderTarget.samples = samples;
       // Recreate the WebGL buffers with the new number of samples.
       renderTarget.dispose();
     }

@@ -1150,10 +1150,21 @@ namespace gdjs {
       // runtimeInstanceContainer gives an access as a map.
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      const oldObjects: Array<ObjectData | null> = updatedObjects.map(
-        (objectData) =>
-          runtimeInstanceContainer._objects.get(objectData.name) || null
-      );
+      // The registered object data are the ones from the ProjectData:
+      // they are registered when the scene is loaded and registered again
+      // below after each hot-reload.
+      //
+      // In gdjs.CustomRuntimeObjectInstanceContainer.loadFrom, object can
+      // be registered with a different instance from the ProjectData. This
+      // is only done for children of a custom object with a children overriding.
+      // In the case of the editor, the fake custom object used for editing
+      // variants has no children overriding (see
+      // gdjs.RuntimeGame._createSceneWithCustomObject).
+      const projectObjectDataList: Array<ObjectData | null> =
+        updatedObjects.map(
+          (objectData) =>
+            runtimeInstanceContainer._objects.get(objectData.name) || null
+        );
 
       const projectData: ProjectData = this._runtimeGame._data;
       const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
@@ -1162,30 +1173,21 @@ namespace gdjs {
       );
 
       this._hotReloadRuntimeSceneObjects(
-        oldObjects,
+        projectObjectDataList,
         newObjectDataList,
         runtimeInstanceContainer
       );
-      // Update the GameData
       for (let index = 0; index < updatedObjects.length; index++) {
-        const oldObjectData = oldObjects[index];
+        const projectObjectData = projectObjectDataList[index];
         // When the object is new, the hot-reload call `registerObject`
         // so `_objects` is already updated.
-        if (oldObjectData) {
-          // In gdjs.CustomRuntimeObjectInstanceContainer.loadFrom, object can
-          // be registered with a different instance from the ProjectData. This
-          // is only done for children of a custom object with a children overriding.
-          // In the case of the editor, the fake custom object used for editing
-          // variants has no children overriding (see
-          // gdjs.RuntimeGame._createSceneWithCustomObject).
-          // Thus, the oldObjectData is always the one from the ProjectData.
-          HotReloader.assignOrDelete(oldObjectData, updatedObjects[index]);
-          // The hot-reload registered a copy of the object data. Register the
-          // one from the ProjectData again, or the next hot-reload would
-          // update the copy and the ProjectData would keep this version: a
-          // scene loaded again from it (when the editor switches back to it)
-          // would lose the next changes.
-          runtimeInstanceContainer.updateObject(oldObjectData);
+        if (projectObjectData) {
+          HotReloader.assignOrDelete(projectObjectData, updatedObjects[index]);
+          // The hot-reload registered a copy (`newObjectDataList`). Without
+          // registering the ProjectData one again, the next hot-reload would
+          // update the copy, and a scene loaded again from the ProjectData
+          // (when the editor switches back to it) would lose the changes.
+          runtimeInstanceContainer.updateObject(projectObjectData);
         } else {
           console.warn(
             `Can't update object data for "${updatedObjects[index].name}" because it doesn't exist.`

@@ -1180,6 +1180,12 @@ namespace gdjs {
           // gdjs.RuntimeGame._createSceneWithCustomObject).
           // Thus, the oldObjectData is always the one from the ProjectData.
           HotReloader.assignOrDelete(oldObjectData, updatedObjects[index]);
+          // The hot-reload registered a copy of the object data. Register the
+          // one from the ProjectData again, or the next hot-reload would
+          // update the copy and the ProjectData would keep this version: a
+          // scene loaded again from it (when the editor switches back to it)
+          // would lose the next changes.
+          runtimeInstanceContainer.updateObject(oldObjectData);
         } else {
           console.warn(
             `Can't update object data for "${updatedObjects[index].name}" because it doesn't exist.`

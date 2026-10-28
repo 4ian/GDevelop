@@ -1050,6 +1050,51 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     expect(variablesContainer.get('MyVariable2').getAsNumber()).to.be(789);
     expect(variablesContainer.getFromIndex(1).getAsNumber()).to.be(789);
   });
+
+  it('keeps the project data up-to-date when objects are hot-reloaded several times', async () => {
+    const projectData = createProjectData({
+      layouts: [
+        createSceneData({
+          instances: [{ persistentUuid: '1' }],
+          objects: [createSpriteData({ name: 'MyObject', image: 'ResourceA' })],
+        }),
+      ],
+    });
+    const runtimeGame = new gdjs.RuntimeGame(projectData);
+    const hotReloader = new gdjs.HotReloader(runtimeGame);
+    await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+      'Scene1',
+      () => {}
+    );
+    runtimeGame._sceneStack.push('Scene1');
+    const scene = runtimeGame.getSceneStack().getCurrentScene();
+    if (!scene) throw new Error("Couldn't set a current scene for testing.");
+
+    // Like the in-game editor does when an object is edited.
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createSpriteData({ name: 'MyObject', image: 'ResourceB' })],
+      scene
+    );
+    hotReloader.hotReloadRuntimeSceneObjects(
+      [createSpriteData({ name: 'MyObject', image: 'ResourceC' })],
+      scene
+    );
+
+    const instances = scene.getInstancesOf('MyObject');
+    expect(instances.length).to.be(1);
+    expect(getSpriteCurrentFrameImage(instances[0])).to.be('ResourceC');
+
+    // Like the in-game editor does when it switches back to the scene.
+    const sceneAndExtensionsData =
+      runtimeGame.getSceneAndExtensionsData('Scene1');
+    if (!sceneAndExtensionsData)
+      throw new Error("Couldn't find the scene data for testing.");
+    const reloadedScene = new gdjs.RuntimeScene(runtimeGame);
+    reloadedScene.loadFromScene(sceneAndExtensionsData);
+    const reloadedInstances = reloadedScene.getInstancesOf('MyObject');
+    expect(reloadedInstances.length).to.be(1);
+    expect(getSpriteCurrentFrameImage(reloadedInstances[0])).to.be('ResourceC');
+  });
 });
 
 describe('gdjs.HotReloader._hotReloadVariablesContainer', () => {

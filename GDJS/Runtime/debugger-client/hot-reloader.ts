@@ -994,7 +994,7 @@ namespace gdjs {
         oldObjectDataList,
         newObjectDataList,
         runtimeInstanceContainer,
-        { shouldUpdateRegisteredObjectData: true }
+        { shouldReplaceRegisteredObjectData: true }
       );
       this._hotReloadRuntimeSceneInstances(
         oldProjectData,
@@ -1181,7 +1181,7 @@ namespace gdjs {
         // hot-reload update the copy, and a scene loaded again from the
         // ProjectData (when the editor switches back to it) would lose the
         // changes.
-        { shouldUpdateRegisteredObjectData: false }
+        { shouldReplaceRegisteredObjectData: false }
       );
       for (let index = 0; index < updatedObjects.length; index++) {
         const projectObjectData = projectObjectDataList[index];
@@ -1201,7 +1201,7 @@ namespace gdjs {
       oldObjects: Array<ObjectData | null>,
       newObjects: ObjectData[],
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer,
-      options: { shouldUpdateRegisteredObjectData: boolean }
+      options: { shouldReplaceRegisteredObjectData: boolean }
     ): void {
       oldObjects.forEach((oldObjectData) => {
         if (!oldObjectData) {
@@ -1251,9 +1251,9 @@ namespace gdjs {
       newObjectData: ObjectData,
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer,
       {
-        shouldUpdateRegisteredObjectData,
+        shouldReplaceRegisteredObjectData,
       }: {
-        shouldUpdateRegisteredObjectData: boolean;
+        shouldReplaceRegisteredObjectData: boolean;
       }
     ): void {
       let hotReloadSucceeded = true;
@@ -1266,8 +1266,8 @@ namespace gdjs {
             '" was modified and is hot-reloaded.',
         });
 
-        if (shouldUpdateRegisteredObjectData) {
-          // Update the registered object data, used for new instances.
+        if (shouldReplaceRegisteredObjectData) {
+          // Replace the registered object data, used for new instances.
           runtimeInstanceContainer.updateObject(newObjectData);
         }
 

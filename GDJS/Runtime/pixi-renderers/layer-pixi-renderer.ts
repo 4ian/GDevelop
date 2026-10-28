@@ -235,6 +235,9 @@ namespace gdjs {
     private _postProcessingPasses: PostProcessingPass[] = [];
     // The antialiasing (if any) and output passes, after the effects.
     private _threeFinalPasses: THREE_ADDONS.Pass[] = [];
+    // The multisampling of the render targets of the post-processing passes,
+    // like the canvas, so that effects don't remove its antialiasing.
+    private _renderTargetSamples = 0;
     private _basis: Basis | null = null;
     private static matrix4: THREE.Matrix4 | null = null;
 
@@ -499,8 +502,10 @@ namespace gdjs {
         return;
       }
       let sceneRenderPass: THREE_ADDONS.Pass = this._threeRenderPass;
+      // These passes render the scene in their own render target.
       if (this._customRenderPass) {
         sceneRenderPass = this._customRenderPass;
+        this._setRenderTargetSamples(this._customRenderPass.beautyRenderTarget);
       } else if (this._sceneDepthTextureUsersCount > 0) {
         if (!this._sceneDepthRenderPass) {
           this._sceneDepthRenderPass = new THREE_ADDONS.SceneDepthRenderPass(
@@ -509,6 +514,7 @@ namespace gdjs {
           );
         }
         sceneRenderPass = this._sceneDepthRenderPass;
+        this._setRenderTargetSamples(this._sceneDepthRenderPass.renderTarget);
       }
       if (this._threeEffectComposer.passes[0] === sceneRenderPass) {
         return;
@@ -517,6 +523,15 @@ namespace gdjs {
       const renderTarget = this._threeEffectComposer.renderTarget1;
       sceneRenderPass.setSize(renderTarget.width, renderTarget.height);
       this._threeEffectComposer.passes[0] = sceneRenderPass;
+    }
+
+    private _setRenderTargetSamples(renderTarget: THREE.WebGLRenderTarget) {
+      if (renderTarget.samples === this._renderTargetSamples) {
+        return;
+      }
+      renderTarget.samples = this._renderTargetSamples;
+      // Recreate the WebGL buffers with the new number of samples.
+      renderTarget.dispose();
     }
 
     /**
@@ -590,12 +605,21 @@ namespace gdjs {
             const drawingBufferSize = threeRenderer.getDrawingBufferSize(
               new THREE.Vector2()
             );
+            const contextAttributes = threeRenderer
+              .getContext()
+              .getContextAttributes();
+            this._renderTargetSamples =
+              contextAttributes && contextAttributes.antialias ? 4 : 0;
             this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
               threeRenderer,
               new THREE.WebGLRenderTarget(
                 drawingBufferSize.x,
                 drawingBufferSize.y,
-                { type: THREE.HalfFloatType, stencilBuffer: true }
+                {
+                  type: THREE.HalfFloatType,
+                  stencilBuffer: true,
+                  samples: this._renderTargetSamples,
+                }
               )
             );
             this._threeRenderPass = new THREE_ADDONS.RenderPass(
@@ -603,7 +627,12 @@ namespace gdjs {
               this._threeCamera
             );
             this._threeEffectComposer.addPass(this._threeRenderPass);
-            if (game.getAntialiasingMode() !== 'none') {
+            // SMAA can't smooth thin details (like grass): it's only used
+            // when the canvas is not multisampled (on mobile, if disabled).
+            if (
+              game.getAntialiasingMode() !== 'none' &&
+              this._renderTargetSamples === 0
+            ) {
               this._threeFinalPasses.push(new THREE_ADDONS.SMAAPass());
             }
             const outputPass = new THREE_ADDONS.OutputPass();

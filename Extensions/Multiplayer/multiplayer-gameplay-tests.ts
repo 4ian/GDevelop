@@ -161,9 +161,9 @@ namespace gdjs {
      * Make the game believe a lobby game is running, with no network: the
      * current player is `playerNumber`, host or not, with the other
      * `players` connected (the host is player 1, or `playerNumber` when
-     * `isHost`). Like a real lobby, the connection to the other players
-     * is established first, then the game starts: "Lobby game has just
-     * started" is true during the next frame. Steps 1 frame.
+     * `isHost`). Like a real lobby, the other players join first (a frame
+     * is stepped for each of them), then the game starts: "Lobby game has
+     * just started" is true during the next frame.
      *
      * The simulated players acknowledge the messages that must be (custom
      * messages, ownership changes, destructions), unless
@@ -252,7 +252,16 @@ namespace gdjs {
           senderPeerId: getPeerIdOfPlayer(hostPlayerNumber),
         }));
       }
+      // The joins are handled one per frame, before the game starts.
       await this._harness.stepFrames(1);
+      for (
+        let frame = 0;
+        frame < lobby.players.length &&
+        gdjs.multiplayerMessageManager.hasAnyPlayerJustJoined();
+        frame++
+      ) {
+        await this._harness.stepFrames(1);
+      }
       gdjs.multiplayer.startLobbyGameWithoutLobby({
         runtimeScene: this._harness.getCurrentRuntimeScene(),
         currentPlayerNumber: lobby.playerNumber,

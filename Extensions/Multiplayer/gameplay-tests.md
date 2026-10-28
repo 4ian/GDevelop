@@ -5,7 +5,7 @@ Simulates a lobby game and the other players, without network. Everything else g
 ```typescript
 interface Harness {
   multiplayer: {
-    /** The game believes a lobby game runs: the current player is `playerNumber`, the host is player 1 (or `playerNumber` with `isHost`), the other `players` are connected. Steps 1 frame; "lobby game has just started" is true during the next one. The other players acknowledge what must be (custom messages, ownership changes, destructions) unless `acknowledgeMessages: false`. */
+    /** The game believes a lobby game runs: the current player is `playerNumber`, the host is player 1 (or `playerNumber` with `isHost`), the other `players` join (a frame is stepped for each). "Lobby game has just started" is then true during the next frame. The other players acknowledge what must be (custom messages, ownership changes, destructions) unless `acknowledgeMessages: false`. */
     startLobbyGame(options: { playerNumber: number; isHost: boolean; players: Array<{ playerNumber: number; username?: string }>; acknowledgeMessages?: boolean }): Promise<void>;
     /** Create an instance owned by another player (0 = host) as its first network update does: it gets a network id. Steps 1-3 frames, returns its id. */
     addRemoteInstance(objectName: string, options: { owner: number; x: number; y: number; z?: number; angle?: number; variables?: { [name: string]: any } }): Promise<number>;

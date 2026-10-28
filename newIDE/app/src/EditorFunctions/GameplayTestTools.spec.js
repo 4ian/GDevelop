@@ -26,9 +26,13 @@ const makePassedResult = (testName: string) => ({
   gameTimeMs: 160,
   assertions: [],
   errors: [],
+  warnings: [],
   consoleLogs: [],
   eventLog: [],
   finalState: null,
+  screenshots: [],
+  profiles: [],
+  performance: null,
 });
 
 describe('run_gameplay_test', () => {

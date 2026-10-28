@@ -22,6 +22,8 @@ declare class gdPlatformExtension {
   addExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addDependency(): gdDependencyMetadata;
+  addGameplayTestIncludeFile(includeFile: string): gdPlatformExtension;
+  getGameplayTestIncludeFiles(): gdVectorString;
   addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: gdBehavior, sharedDatasInstance: gdBehaviorsSharedData): gdBehaviorMetadata;
   addObject(name: string, fullname: string, description: string, icon24x24: string, instance: gdObjectConfiguration): gdObjectMetadata;
   addEffect(name: string): gdEffectMetadata;

@@ -4602,6 +4602,40 @@ namespace gdjs {
       /** Undo the pointer lock shim (see `_installPointerLockShim`). */
       _uninstallPointerLockShim: () => void = () => {};
 
+      /** Called at the end of the test (see `onTestEnded`). */
+      _testEndedCallbacks: Array<() => void> = [];
+
+      /**
+       * Call `callback` at the end of the test, whatever its outcome, before
+       * the game is given back to the editor. For harness extensions (see
+       * `gdjs.gameplayTests.registerHarnessExtension`), to undo what their
+       * helpers changed in the game.
+       */
+      onTestEnded(callback: () => void): void {
+        this._testEndedCallbacks.push(callback);
+      }
+
+      /** Add the helpers of the registered harness extensions. */
+      _installHarnessExtensions(): void {
+        for (const [name, factory] of harnessExtensionFactories) {
+          this[name] = factory(this);
+        }
+      }
+
+      /** Call the `onTestEnded` callbacks, the last registered first. */
+      _callTestEndedCallbacks(): void {
+        for (const callback of this._testEndedCallbacks.reverse()) {
+          try {
+            callback();
+          } catch (error) {
+            logger.error(
+              'Error while cleaning up after a gameplay test: ' + error
+            );
+          }
+        }
+        this._testEndedCallbacks = [];
+      }
+
       /**
        * Patch pointer lock during the test: `requestPointerLock` never
        * really locks the OS mouse, but as soon as the game requests it, a
@@ -4868,6 +4902,48 @@ namespace gdjs {
     };
 
     /**
+     * Creates the helpers an extension adds to the harness of a test (see
+     * `registerHarnessExtension`).
+     */
+    export type GameplayTestHarnessExtensionFactory = (
+      harness: GameplayTestHarness
+    ) => object;
+
+    const harnessExtensionFactories = new Map<
+      string,
+      GameplayTestHarnessExtensionFactory
+    >();
+
+    /**
+     * Add helpers to the harness of every gameplay test: `factory` is called
+     * at the beginning of each test, and what it returns becomes
+     * `harness.<name>` (like `harness.multiplayer`).
+     *
+     * Made to be called by a file of an extension included only in gameplay
+     * test previews (`extension.addGameplayTestIncludeFile` in its
+     * `JsExtension.js`). The helpers throw an `Error` with a message saying
+     * what to do, like the harness does, and can undo what they changed at
+     * the end of the test with `harness.onTestEnded`. Their types are
+     * declared by extending the `GameplayTestHarness` interface.
+     */
+    export const registerHarnessExtension = (
+      name: string,
+      factory: GameplayTestHarnessExtensionFactory
+    ): void => {
+      if (!/^[a-z][a-zA-Z0-9]*$/.test(name)) {
+        throw new Error(
+          `Invalid harness extension name "${name}": use a camelCase name, like "multiplayer".`
+        );
+      }
+      if (name in GameplayTestHarness.prototype) {
+        throw new Error(
+          `"${name}" is already a member of the harness: give another name to the harness extension.`
+        );
+      }
+      harnessExtensionFactories.set(name, factory);
+    };
+
+    /**
      * The gameplay test being currently run, if any.
      */
     let currentlyRunningHarness: GameplayTestHarness | null = null;
@@ -5070,6 +5146,7 @@ namespace gdjs {
 
       let result: GameplayTestResult;
       try {
+        harness._installHarnessExtensions();
         // A wall-clock watchdog, in case the script awaits something that
         // never resolves. Checked periodically (not a one-shot timer) so
         // the time spent loading - which grows `_loadingTimeMs` - and the
@@ -5171,6 +5248,7 @@ namespace gdjs {
         } catch (error) {
           // Ignore errors during cleanup.
         }
+        harness._callTestEndedCallbacks();
         inputManager.onFrameEnded = originalOnFrameEnded;
         sceneStack.renderWithoutStep = originalRenderWithoutStep;
         harness._restoreMathRandom();

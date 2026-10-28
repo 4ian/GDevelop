@@ -361,6 +361,42 @@ describe('gdjs.gameplayTests', () => {
     });
   });
 
+  describe('harness extensions', () => {
+    /** @type {Array<string>} */
+    const testEndedCalls = [];
+    before(() => {
+      gdjs.gameplayTests.registerHarnessExtension('example', (harness) => ({
+        getSceneNameTwice: () => harness.getSceneName().repeat(2),
+        undoAtTheEnd: () =>
+          harness.onTestEnded(() => testEndedCalls.push('undone')),
+      }));
+    });
+
+    it('adds the helpers of an extension to the harness, and calls back at the end of the test', async () => {
+      const result = await runTestScript(
+        makeRuntimeGame(),
+        `
+        await harness.goToScene('Scene 1');
+        harness.example.undoAtTheEnd();
+        harness.assert(harness.example.getSceneNameTwice() === 'Scene 1Scene 1', 'The helpers can use the harness.');
+        harness.fail('Failing before the end');
+        `
+      );
+
+      expect(result.errors).to.eql(['Failing before the end']);
+      expect(testEndedCalls).to.eql(['undone']);
+    });
+
+    it('refuses an extension name that is already a member of the harness, or not in camelCase', () => {
+      expect(() =>
+        gdjs.gameplayTests.registerHarnessExtension('stepFrames', () => ({}))
+      ).to.throwException(/"stepFrames" is already a member of the harness/);
+      expect(() =>
+        gdjs.gameplayTests.registerHarnessExtension('My extension', () => ({}))
+      ).to.throwException(/Invalid harness extension name "My extension"/);
+    });
+  });
+
   it('reports a script error', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

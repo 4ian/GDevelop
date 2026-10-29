@@ -10,6 +10,7 @@ import {
   getItemsToDeleteFromSelection,
   removeEmptyFoldersFromSelection,
   enumerateFoldersInFolder,
+  getSelectionTopLevelItems,
 } from './ProjectItemFolders';
 import {
   copyFolderOrItemsToClipboard,
@@ -156,8 +157,14 @@ function useBulkProjectItemsOperations({
     () => {
       const selection = getSelectedFolderOrItems();
       if (!selection || selection.folderOrItems.length === 1) {
-        // A single item or folder says it with its own words.
-        if (selectedItems.length > 0) selectedItems[0].content.delete();
+        // A single item or folder says it with its own words. A row inside a
+        // selected folder is not the one to delete: its folder is.
+        const [itemToDelete] = selection
+          ? getSelectionTopLevelItems(selectedItems, item =>
+              item.content.getFolderOrItem()
+            )
+          : selectedItems;
+        if (itemToDelete) itemToDelete.content.delete();
         return;
       }
       const { kind, folderOrItems } = selection;

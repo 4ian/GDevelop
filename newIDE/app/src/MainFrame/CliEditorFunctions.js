@@ -6,6 +6,7 @@ import {
   type LaunchFunctionCollaborators,
 } from '../EditorFunctions';
 import { processEditorFunctionCalls } from '../EditorFunctions/EditorFunctionCallRunner';
+import { PUBLIC_API_TOOLS_VERSION } from '../EditorFunctions/PublicApi';
 import { NON_SCRIPTABLE_FUNCTION_NAMES } from '../EditorFunctions/ScriptExecution/NonScriptableFunctionNames';
 import {
   makeCoalescedOutsideEditorChanges,
@@ -23,12 +24,6 @@ import {
   type SaveAsLocation,
   type FileMetadata,
 } from '../ProjectsStorage';
-
-// The version of the behavior of the functions (like the GDevelop AI agents
-// using it, a call changing nothing is a success, so a script can be re-run).
-// Pinned so that the scripts written for the CLI keep working when the
-// GDevelop AI moves to a newer version.
-const CLI_TOOLS_VERSION = 'v20';
 
 // The editor has only a stub for these functions: they are resolved by the
 // GDevelop AI backend, as part of an AI request.
@@ -245,7 +240,7 @@ export const runCliEditorFunctionCalls = async ({
         i18n,
         editorCallbacks: cliEditorCallbacks,
         toolOptions: null,
-        toolsVersion: CLI_TOOLS_VERSION,
+        toolsVersion: PUBLIC_API_TOOLS_VERSION,
         runScriptReadOnly,
         relatedAiRequestId: null,
         getRelatedAiRequestLastMessages: () => ({

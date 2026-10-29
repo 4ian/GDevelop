@@ -412,21 +412,21 @@ const callTool = async (
     parseCliEditorFunctionCalls({ name, arguments: toolArguments }),
     { runScriptReadOnly: handlers.isReadOnly }
   );
-  const result = report.results[0];
+  // A tool call is a single function call, so it has a single result.
+  const [result] = report.results;
+  if (!result) throw new Error(`No result for the call to ${name}.`);
   // A gameplay test that ran and failed is a result, not a tool error: clients
   // drop the images of an error.
   const isGameplayTestReport =
-    !!result && !!result.output && typeof result.output.status === 'string';
+    !!result.output && typeof result.output.status === 'string';
   return makeToolResult(
-    result
-      ? {
-          success: result.success,
-          ...(name === 'run_script'
-            ? withoutSuccessfulCallsArguments(result.output)
-            : result.output),
-        }
-      : report,
-    !report.success && !isGameplayTestReport
+    {
+      success: result.success,
+      ...(name === 'run_script'
+        ? withoutSuccessfulCallsArguments(result.output)
+        : result.output),
+    },
+    !result.success && !isGameplayTestReport
   );
 };
 

@@ -20,8 +20,12 @@ import { type MenuButton } from '../UI/TreeView';
 import IconButton from '../UI/IconButton';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
 
-// The same clipboard kind as the project tests (in the Project Manager), so
-// tests can be copied between the project and extensions.
+// The Project Manager still reads this legacy clipboard kind, so tests can be
+// copied from an extension to the project (but not the other way around).
+
+// TODO: Support folders for the gameplay tests of extensions, like in the
+// Project Manager, and use its clipboard format (ProjectItemFoldersClipboard)
+// so that tests can be copied from the project to an extension again.
 const GAMEPLAY_TEST_CLIPBOARD_KIND = 'Gameplay test';
 
 export type GameplayTestCallbacks = {|
